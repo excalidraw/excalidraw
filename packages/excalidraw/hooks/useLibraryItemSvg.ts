@@ -1,7 +1,8 @@
-import { exportToSvg } from "@excalidraw/utils/export";
 import { useEffect, useState } from "react";
 
 import { COLOR_PALETTE } from "@excalidraw/common";
+
+import { exportToSvg } from "../scene/export";
 
 import { atom, useAtom } from "../editor-jotai";
 
@@ -12,17 +13,18 @@ export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
 export const libraryItemSvgsCache = atom<SvgCache>(new Map());
 
 const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
-  // TODO should pass theme (appState.exportWithDark) - we're still using
-  // CSS filter here
   return await exportToSvg({
-    elements,
-    appState: {
-      exportBackground: false,
-      viewBackgroundColor: COLOR_PALETTE.white,
+    data: {
+      elements,
+      appState: {
+        exportBackground: false,
+        viewBackgroundColor: COLOR_PALETTE.white,
+      },
+      files: null,
     },
-    files: null,
-    renderEmbeddables: false,
-    skipInliningFonts: true,
+    config: {
+      skipInliningFonts: true,
+    },
   });
 };
 

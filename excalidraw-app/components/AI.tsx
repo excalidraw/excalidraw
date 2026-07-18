@@ -35,15 +35,19 @@ export const AIComponents = ({
           }
 
           const blob = await exportToBlob({
-            elements: getNonDeletedElements(children),
-            appState: {
-              ...appState,
-              exportBackground: true,
-              viewBackgroundColor: appState.viewBackgroundColor,
+            data: {
+              elements: getNonDeletedElements(children),
+              appState: {
+                ...appState,
+                exportBackground: true,
+                viewBackgroundColor: appState.viewBackgroundColor,
+              },
+              files: excalidrawAPI.getFiles(),
             },
-            exportingFrame: frame,
-            files: excalidrawAPI.getFiles(),
-            mimeType: MIME_TYPES.jpg,
+            config: {
+              exportingFrame: frame,
+              mimeType: MIME_TYPES.jpg,
+            },
           });
 
           const dataURL = await getDataURL(blob);

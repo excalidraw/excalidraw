@@ -72,18 +72,20 @@ const ChartPreviewBtn = (props: {
     const previewNode = previewRef.current!;
 
     (async () => {
-      svg = await exportToSvg(
-        elements,
-        {
-          exportBackground: false,
-          viewBackgroundColor: "#fff",
-          exportWithDarkMode: theme === "dark",
+      svg = await exportToSvg({
+        data: {
+          elements,
+          appState: {
+            exportBackground: false,
+            viewBackgroundColor: "#fff",
+          },
+          files: null,
         },
-        null, // files
-        {
+        config: {
           skipInliningFonts: true,
+          theme,
         },
-      );
+      });
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
       previewNode.appendChild(svg);
@@ -134,18 +136,20 @@ const PlainTextPreviewBtn = (props: {
     const previewNode = previewRef.current!;
 
     (async () => {
-      const svg = await exportToSvg(
-        [textElement],
-        {
-          exportBackground: false,
-          viewBackgroundColor: "#fff",
-          exportWithDarkMode: theme === "dark",
+      const svg = await exportToSvg({
+        data: {
+          elements: [textElement],
+          appState: {
+            exportBackground: false,
+            viewBackgroundColor: "#fff",
+          },
+          files: null,
         },
-        null,
-        {
+        config: {
           skipInliningFonts: true,
+          theme,
         },
-      );
+      });
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
       previewNode.appendChild(svg);

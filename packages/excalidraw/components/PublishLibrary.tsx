@@ -1,4 +1,3 @@
-import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -13,6 +12,7 @@ import {
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { t } from "../i18n";
+import { exportToCanvas, exportToSvg } from "../scene/export";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
@@ -63,9 +63,14 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
   // ---------------------------------------------------------------------------
   for (const [index, item] of libraryItems.entries()) {
     const itemCanvas = await exportToCanvas({
-      elements: item.elements,
-      files: null,
-      maxWidthOrHeight: BOX_SIZE,
+      data: {
+        elements: item.elements,
+        files: null,
+        appState: {},
+      },
+      config: {
+        maxWidthOrHeight: BOX_SIZE,
+      },
     });
 
     const { width, height } = itemCanvas;
@@ -127,14 +132,18 @@ const SingleLibraryItem = ({
     }
     (async () => {
       const svg = await exportToSvg({
-        elements: libItem.elements,
-        appState: {
-          ...appState,
-          viewBackgroundColor: "#fff",
-          exportBackground: true,
+        data: {
+          elements: libItem.elements,
+          appState: {
+            ...appState,
+            viewBackgroundColor: "#fff",
+            exportBackground: true,
+          },
+          files: null,
         },
-        files: null,
-        skipInliningFonts: true,
+        config: {
+          skipInliningFonts: true,
+        },
       });
       node.innerHTML = svg.outerHTML;
     })();
