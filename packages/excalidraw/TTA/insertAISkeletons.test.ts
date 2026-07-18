@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   getBoundTextMaxWidth,
+  getCommonBounds,
   isTextElement,
   measureText,
   type ExcalidrawElementSkeleton,
@@ -19,9 +20,12 @@ import {
   INTERMEDIATE_PREVIEW_ELEMENT_KEY,
 } from "./insertAISkeletons";
 
-import type { AppClassProperties } from "../types";
+import type { AppClassProperties, NormalizedZoomValue } from "../types";
 
-const createTestApp = (initialElements: ExcalidrawElement[] = []) => {
+const createTestApp = (
+  initialElements: ExcalidrawElement[] = [],
+  appStateOverrides: Partial<AppClassProperties["state"]> = {},
+) => {
   let elements = [...initialElements];
   let lastSync: {
     elements: ExcalidrawElement[];
@@ -38,6 +42,7 @@ const createTestApp = (initialElements: ExcalidrawElement[] = []) => {
       offsetTop: 0,
       zoom: { value: 1 },
       selectedElementIds: {},
+      ...appStateOverrides,
     } as AppClassProperties["state"],
     scene: {
       getNonDeletedElements: () =>
@@ -70,6 +75,13 @@ const getById = <T extends { id: string }>(
   elements: readonly T[],
   id: string,
 ) => elements.find((element) => element.id === id);
+
+const getInsertedBoundsCenter = (
+  inserted: readonly NonDeletedExcalidrawElement[],
+) => {
+  const [minX, minY, maxX, maxY] = getCommonBounds(inserted);
+  return { x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
+};
 
 describe("insertAISkeletons", () => {
   it("preserves existing deleted elements when inserting", () => {
@@ -740,5 +752,67 @@ describe("insertAISkeletons", () => {
     expect(arrow.startBinding?.elementId).toBeDefined();
     expect(arrow.endBinding?.elementId).toBeDefined();
     expect(arrow.frameId).toBeNull();
+  });
+
+  it("centers inserted elements in the visible viewport when the canvas has a page offset", () => {
+    const { app } = createTestApp([], {
+      width: 1000,
+      height: 800,
+      offsetLeft: 480,
+      offsetTop: 120,
+    });
+
+    const inserted = insertAISkeletons(app, [
+      { type: "rectangle", id: "rect-1", x: 0, y: 0, width: 100, height: 50 },
+    ]);
+
+    // Scene-space viewport center is (width / 2) / zoom - scroll; the canvas
+    // page offset cancels out of the client→scene transform and must NOT
+    // shift the result (C4 in tta.md: the old formula landed this at
+    // (20, 280) — i.e. offset px to the left/top of the visible center).
+    const center = getInsertedBoundsCenter(inserted);
+    expect(center.x).toBeCloseTo(500);
+    expect(center.y).toBeCloseTo(400);
+  });
+
+  it("centers inserted elements with offset, zoom and scroll combined", () => {
+    const { app } = createTestApp([], {
+      width: 1000,
+      height: 800,
+      offsetLeft: 480,
+      offsetTop: 120,
+      scrollX: 100,
+      scrollY: -50,
+      zoom: { value: 2 as NormalizedZoomValue },
+    });
+
+    const inserted = insertAISkeletons(app, [
+      { type: "rectangle", id: "rect-1", x: 0, y: 0, width: 100, height: 50 },
+    ]);
+
+    // x: (1000 / 2) / 2 - 100 = 150 ; y: (800 / 2) / 2 - (-50) = 250
+    // (old formula: (-90, 190))
+    const center = getInsertedBoundsCenter(inserted);
+    expect(center.x).toBeCloseTo(150);
+    expect(center.y).toBeCloseTo(250);
+  });
+
+  it("keeps offset-0 centering unchanged at zoom/scroll (excalidraw.com regression)", () => {
+    const { app } = createTestApp([], {
+      width: 1000,
+      height: 800,
+      scrollX: 100,
+      scrollY: -50,
+      zoom: { value: 2 as NormalizedZoomValue },
+    });
+
+    const inserted = insertAISkeletons(app, [
+      { type: "rectangle", id: "rect-1", x: 0, y: 0, width: 100, height: 50 },
+    ]);
+
+    // Identical before and after the fix — pins the offset-0 behavior.
+    const center = getInsertedBoundsCenter(inserted);
+    expect(center.x).toBeCloseTo(150);
+    expect(center.y).toBeCloseTo(250);
   });
 });

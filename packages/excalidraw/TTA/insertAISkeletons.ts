@@ -12,6 +12,8 @@ import {
 
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
+import { viewportCoordsToSceneCoords } from "@excalidraw/common";
+
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
@@ -22,26 +24,22 @@ import { restoreElements } from "../data/restore";
 import type { AppClassProperties } from "../types";
 
 const getViewportCenter = (appState: AppClassProperties["state"]) => {
-  const {
-    width = 0,
-    height = 0,
-    scrollX = 0,
-    scrollY = 0,
-    offsetLeft = 0,
-    offsetTop = 0,
-    zoom,
-  } = appState as AppClassProperties["state"] & {
-    offsetLeft?: number;
-    offsetTop?: number;
-  };
+  // Viewport center in client (page) coordinates: the canvas occupies
+  // `width`×`height` px starting at `offsetLeft`/`offsetTop`. Routing through
+  // the canonical client→scene transform (rather than hand-rolling it) keeps
+  // this in lockstep with how the rest of the editor centers content — see
+  // `addElementsFromPasteOrLibrary`'s `position: "center"` handling. Note the
+  // offsets cancel out of the math; a previous inline version dropped them on
+  // the wrong side and inserted off-center in embedded hosts (C4 in tta.md).
+  const { x, y } = viewportCoordsToSceneCoords(
+    {
+      clientX: appState.offsetLeft + appState.width / 2,
+      clientY: appState.offsetTop + appState.height / 2,
+    },
+    appState,
+  );
 
-  const zoomValue =
-    (zoom && typeof zoom.value === "number" ? zoom.value : 1) || 1;
-
-  return {
-    sceneX: (width / 2 - offsetLeft) / zoomValue - scrollX,
-    sceneY: (height / 2 - offsetTop) / zoomValue - scrollY,
-  };
+  return { sceneX: x, sceneY: y };
 };
 
 export const AI_GENERATED_ELEMENTS_KEY = "aiSidebarGenerationId";

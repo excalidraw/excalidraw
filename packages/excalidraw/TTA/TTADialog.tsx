@@ -64,8 +64,8 @@ const MIN_RETRYING_VISIBLE_MS = 500;
 const DEFAULT_MAX_IMAGES = 4;
 
 // Atoms for state persistence across component mounts
-export const ttaChatMessagesAtom = atom<ChatMessage[]>([]);
-export const ttaRateLimitsAtom = atom<TTARateLimits | null>(null);
+const ttaChatMessagesAtom = atom<ChatMessage[]>([]);
+const ttaRateLimitsAtom = atom<TTARateLimits | null>(null);
 
 export interface TTADialogProps {
   maxImages?: number;
@@ -245,12 +245,7 @@ const TTADialogContent = ({
   );
 
   const applyServerChatMetadata = useCallback(
-    (metadata: {
-      chatId?: string | null;
-      turnId?: string | null;
-      messageId?: string | null;
-      updatedAt?: number | null;
-    }) => {
+    (metadata: { chatId?: string | null; updatedAt?: number | null }) => {
       if (metadata.chatId) {
         applyServerChatId(metadata.chatId);
       }
@@ -448,11 +443,17 @@ const TTADialogContent = ({
     }
   }, [isOpen, focusComposerInput]);
 
+  // Scroll to the latest message when the panel (re)opens onto an existing
+  // conversation and whenever a message is appended.
   useEffect(() => {
     const wasOpen = previousIsOpenRef.current;
     previousIsOpenRef.current = isOpen;
+    const previousMessageCount = previousChatMessageCountRef.current;
+    previousChatMessageCountRef.current = chatMessages.length;
 
-    if (!isOpen || wasOpen || !chatMessages.length) {
+    const didJustOpen = isOpen && !wasOpen && chatMessages.length > 0;
+    const didAppendMessage = chatMessages.length > previousMessageCount;
+    if (!didJustOpen && !didAppendMessage) {
       return;
     }
 
@@ -465,22 +466,6 @@ const TTADialogContent = ({
   }, [chatMessages.length, isOpen, scrollChatToBottom]);
 
   // --- Generation & Preview Logic ---
-
-  useEffect(() => {
-    const previousMessageCount = previousChatMessageCountRef.current;
-    const didAppendMessage = chatMessages.length > previousMessageCount;
-    previousChatMessageCountRef.current = chatMessages.length;
-
-    if (!didAppendMessage) {
-      return;
-    }
-    const frameId = requestAnimationFrame(() => {
-      scrollChatToBottom();
-    });
-    return () => {
-      cancelAnimationFrame(frameId);
-    };
-  }, [chatMessages.length, scrollChatToBottom]);
 
   const removeGeneratedElementsByGenerationTags = useCallback(
     (

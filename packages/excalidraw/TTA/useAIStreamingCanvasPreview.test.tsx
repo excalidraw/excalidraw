@@ -30,7 +30,12 @@ const createMockApp = (initialElements: ExcalidrawElement[] = []) => {
     },
   );
   const syncActionResult = vi.fn(
-    ({ elements: nextElements }: { elements: ExcalidrawElement[] }) => {
+    ({
+      elements: nextElements,
+    }: {
+      elements: ExcalidrawElement[];
+      captureUpdate?: unknown;
+    }) => {
       elements = nextElements;
     },
   );

@@ -17,6 +17,7 @@ import {
 
 import "./TTADialog.scss";
 
+import { TTA_CHAT_EMPTY_PLACEHOLDER_SRC } from "./assets";
 import {
   compareConversationsByUpdatedAt,
   getConversationMessages,
@@ -36,7 +37,7 @@ export interface TTAHistoryProps {
 
 const TTAHistoryThumbnailPlaceholder = () => (
   <div className="tta-history__thumb">
-    <img src="/tta-chat-empty.svg" alt="" />
+    <img src={TTA_CHAT_EMPTY_PLACEHOLDER_SRC} alt="" />
   </div>
 );
 
@@ -55,7 +56,7 @@ const TTAHistoryThumbnail = ({
 
   return (
     <div className="tta-history__thumb" data-chat-id={chatId}>
-      <img src={previewSvg || "/tta-chat-empty.svg"} alt="" />
+      <img src={previewSvg || TTA_CHAT_EMPTY_PLACEHOLDER_SRC} alt="" />
     </div>
   );
 };

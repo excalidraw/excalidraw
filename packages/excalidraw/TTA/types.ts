@@ -139,7 +139,6 @@ export type AssistantChatMessage = {
   progressPhase?: AIStreamProgressPhase;
   generationStartedAt?: number;
   generationElapsedMs?: number;
-  // content: string;
   createdAt?: number;
   turnId?: string;
   messageId?: string;

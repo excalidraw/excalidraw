@@ -11,10 +11,6 @@ import type {
   AI_ERROR_CODE,
 } from "./types";
 
-export const TTA_BASE_PATH = `/v1/ai/tta`;
-export const TTA_GENERATE_STREAM_PATH = `${TTA_BASE_PATH}/generate/stream`;
-export const TTA_TRUNCATE_PATH = `${TTA_BASE_PATH}/chat/truncate`;
-
 type AIClientError = Error & {
   code?: AI_ERROR_CODE | number;
 };

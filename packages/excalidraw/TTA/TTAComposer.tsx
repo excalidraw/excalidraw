@@ -15,8 +15,6 @@ import { useI18n } from "../i18n";
 import { TTAWarningMessage } from "./TTAWarningMessage";
 import "./TTAComposer.scss";
 
-const DEFAULT_MAX_IMAGES = 4;
-
 export type TTAComposerImage = {
   hash: string;
   image: string;
@@ -26,15 +24,13 @@ interface TTAComposerProps {
   onSend: (message: string, images?: string[]) => void;
   onStop?: () => void;
   isSending?: boolean;
-  value?: string;
-  onChange?: (value: string) => void;
-  images?: TTAComposerImage[];
-  onImagesChange?: (images: TTAComposerImage[]) => void;
-  maxImages?: number;
+  value: string;
+  onChange: (value: string) => void;
+  images: TTAComposerImage[];
+  onImagesChange: (images: TTAComposerImage[]) => void;
+  maxImages: number;
   onMaxImages?: (maxImages: number) => React.ReactNode;
   placeholder?: string;
-  allowImageUpload?: boolean;
-  rightActions?: React.ReactNode;
   onPreviewImage?: (url: string) => void;
   disabled?: boolean;
 }
@@ -55,65 +51,41 @@ const TTAComposer: React.FC<TTAComposerProps> = ({
   onSend,
   onStop,
   isSending = false,
-  value,
+  value: inputValue,
   onChange,
-  images,
+  images: selectedImages,
   onImagesChange,
-  maxImages = DEFAULT_MAX_IMAGES,
+  maxImages: MAX_IMAGES,
   onMaxImages,
   placeholder,
-  allowImageUpload = true,
-  rightActions,
   onPreviewImage,
   disabled = false,
 }) => {
   const { t } = useI18n();
-  const [uncontrolledValue, setUncontrolledValue] = useState("");
-  const [uncontrolledImages, setUncontrolledImages] = useState<
-    TTAComposerImage[]
-  >([]);
   const [maxImagesWarning, setMaxImagesWarning] =
     useState<React.ReactNode>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // `appendImageFiles` reads the image list across `await`s, where the
+  // `images` prop may be a render behind — the ref always holds the latest.
   const selectedImagesRef = useRef<readonly TTAComposerImage[]>([]);
-
-  const inputValue = value ?? uncontrolledValue;
-  const selectedImages = images === undefined ? uncontrolledImages : images;
-  const MAX_IMAGES = maxImages ?? DEFAULT_MAX_IMAGES;
 
   useEffect(() => {
     selectedImagesRef.current = selectedImages;
   }, [selectedImages]);
 
-  const updateValue = useCallback(
-    (next: string) => {
-      if (value === undefined) {
-        setUncontrolledValue(next);
-      }
-      onChange?.(next);
-    },
-    [value, onChange],
-  );
-
   const updateImages = useCallback(
     (next: TTAComposerImage[]) => {
       selectedImagesRef.current = next;
-      if (images === undefined) {
-        setUncontrolledImages(next);
-      }
-      onImagesChange?.(next);
+      onImagesChange(next);
     },
-    [images, onImagesChange],
+    [onImagesChange],
   );
 
   const resetValue = useCallback(() => {
-    if (value === undefined) {
-      setUncontrolledValue("");
-    }
-    onChange?.("");
+    onChange("");
     updateImages([]);
     setMaxImagesWarning(null);
-  }, [value, onChange, updateImages]);
+  }, [onChange, updateImages]);
 
   const showMaxImagesWarning = useCallback(() => {
     setMaxImagesWarning(
@@ -206,13 +178,13 @@ const TTAComposer: React.FC<TTAComposerProps> = ({
     }
 
     const trimmed = inputValue.trim();
-    if (!trimmed && (!allowImageUpload || !selectedImages.length)) {
+    if (!trimmed && !selectedImages.length) {
       return;
     }
 
     onSend(
       trimmed,
-      allowImageUpload && selectedImages.length
+      selectedImages.length
         ? selectedImages.map((image) => image.image)
         : undefined,
     );
@@ -226,14 +198,7 @@ const TTAComposer: React.FC<TTAComposerProps> = ({
         }
       }, 0);
     }
-  }, [
-    disabled,
-    inputValue,
-    selectedImages,
-    onSend,
-    resetValue,
-    allowImageUpload,
-  ]);
+  }, [disabled, inputValue, selectedImages, onSend, resetValue]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (
@@ -280,10 +245,6 @@ const TTAComposer: React.FC<TTAComposerProps> = ({
 
   const handlePaste = useCallback(
     async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      if (!allowImageUpload) {
-        return;
-      }
-
       if (disabled) {
         return;
       }
@@ -305,12 +266,10 @@ const TTAComposer: React.FC<TTAComposerProps> = ({
       event.preventDefault();
       await appendImageFiles(imageFiles);
     },
-    [allowImageUpload, appendImageFiles, disabled],
+    [appendImageFiles, disabled],
   );
 
-  const hasContent =
-    inputValue.trim().length > 0 ||
-    (allowImageUpload && selectedImages.length > 0);
+  const hasContent = inputValue.trim().length > 0 || selectedImages.length > 0;
   const canSend = hasContent && !isSending && !disabled;
 
   return (
@@ -318,7 +277,7 @@ const TTAComposer: React.FC<TTAComposerProps> = ({
       {maxImagesWarning && (
         <TTAWarningMessage>{maxImagesWarning}</TTAWarningMessage>
       )}
-      {allowImageUpload && selectedImages.length > 0 && (
+      {selectedImages.length > 0 && (
         <div className="tta-composer__preview">
           {selectedImages.map((selectedImage, index) => (
             <div
@@ -372,7 +331,7 @@ const TTAComposer: React.FC<TTAComposerProps> = ({
           <textarea
             ref={textareaRef}
             value={inputValue}
-            onChange={(event) => updateValue(event.target.value)}
+            onChange={(event) => onChange(event.target.value)}
             onKeyDown={handleKeyDown}
             onPaste={handlePaste}
             onWheelCapture={handleWheelCapture}
@@ -386,22 +345,19 @@ const TTAComposer: React.FC<TTAComposerProps> = ({
       </div>
 
       <div className="tta-composer__toolbar">
-        {allowImageUpload && (
-          <div className="tta-composer__toolbar-section">
-            <button
-              type="button"
-              className="tta-composer__icon-button tta-composer__icon-button--image"
-              aria-label={t("ai.input.add")}
-              onClick={handleOpenImagePicker}
-              disabled={disabled}
-            >
-              <span className="tta-composer__image-icon">{ImageIcon}</span>
-            </button>
-          </div>
-        )}
+        <div className="tta-composer__toolbar-section">
+          <button
+            type="button"
+            className="tta-composer__icon-button tta-composer__icon-button--image"
+            aria-label={t("ai.input.add")}
+            onClick={handleOpenImagePicker}
+            disabled={disabled}
+          >
+            <span className="tta-composer__image-icon">{ImageIcon}</span>
+          </button>
+        </div>
 
         <div className="tta-composer__toolbar-section">
-          {rightActions}
           {isSending && onStop ? (
             <button
               type="button"

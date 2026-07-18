@@ -152,18 +152,6 @@ export const stopIncompleteAssistantMessages = (
     return message;
   });
 
-export const getLatestAssistantTurnId = (
-  messages: ChatMessage[],
-): string | null => {
-  for (let index = messages.length - 1; index >= 0; index--) {
-    const message = messages[index];
-    if (message.role === "assistant" && message.turnId) {
-      return message.turnId;
-    }
-  }
-  return null;
-};
-
 export const getLatestAssistantMessageId = (
   messages: ChatMessage[],
 ): string | null => {
@@ -187,19 +175,6 @@ export const getLatestRetryableAssistantMessage = (
       !message.warningType
     ) {
       return message;
-    }
-  }
-  return null;
-};
-
-export const getLatestAssistantTurnIdBeforeIndex = (
-  messages: ChatMessage[],
-  beforeIndex: number,
-): string | null => {
-  for (let index = beforeIndex; index >= 0; index--) {
-    const message = messages[index];
-    if (message.role === "assistant" && message.turnId) {
-      return message.turnId;
     }
   }
   return null;
@@ -238,15 +213,6 @@ export const getTurnStartIndexForAssistantDelete = (
     }
   }
   return turnStartIndex;
-};
-
-export const getConversationTitle = (
-  messages: ChatMessage[],
-  defaultTitle = "Untitled chat",
-) => {
-  const firstUserMessage = messages.find((msg) => msg.role === "user");
-  const title = firstUserMessage?.content?.trim() || defaultTitle;
-  return title.slice(0, 80);
 };
 
 export const getConversationTitleFromTurns = (

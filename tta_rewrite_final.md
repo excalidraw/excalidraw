@@ -240,7 +240,7 @@ Each step ships independently; run `yarn test:typecheck` + `yarn test:update` pe
 
 | # | Step | Fixes | Test impact |
 |---|---|---|---|
-| 0 | **Dead-code sweep + micro-fixes**: Appendix A deletions; C4 via `viewportCoordsToSceneCoords`; M6 asset import; dedupe `DEFAULT_MAX_IMAGES` + preview-key constants; merge scroll effects | C4, M6, N6 | `insertAISkeletons.test.ts` center expectations |
+| 0 ✅ | **Dead-code sweep + micro-fixes**: Appendix A deletions; C4 via `viewportCoordsToSceneCoords`; M6 asset import; dedupe `DEFAULT_MAX_IMAGES` + preview-key constants; merge scroll effects | C4, M6, N6 | `insertAISkeletons.test.ts` center expectations |
 | 1 | **Terminal contract** (§2.2): `client.ts` rewrite, `sse.ts` `onDoneSentinel`, on-error canvas policy via existing commit dance | C2, M4, N5, N8, N9 | invert `client.test.ts:230`; keep other 6 green; audit TTD untouched |
 | 2 | **Single-flight owner** (§2.3): `runGeneration`, retry-target fix, gate switch/delete | C1, C3, N1, N2 | new tests: double-send no-op, switch-mid-stream stops, retry-after-fail payload |
 | 3 | **Status union + message split** (§2.1) — mechanical, broad | N4, N7 | port `useAIStreamingLifecycle.test.tsx`; TTAChatMessage render keys |
@@ -250,6 +250,9 @@ Each step ships independently; run `yarn test:typecheck` + `yarn test:update` pe
 | 7 | **TTADialog decomposition**: extract `useTTAChatActions` (send/retry/delete/stop orchestration), fold remaining bookkeeping per §2.5; final polish (§8 leftovers) | §4.4 of tta.md | none beyond green suite |
 
 Steps 1–2 clear every 🔴 client bug with no data-model change. Steps 3–5 are the structural shrink. After step 7, verify the §4 checklist end-to-end against the running app (chrome-devtools MCP) including: stop mid-stream, retry-after-parse-error (N1!), chat switch mid-stream, reload mid-stream, offset-embedded host insert, two-tab history.
+
+**Progress log**
+- ✅ **Step 0 landed 2026-07-05** (net −71 lines): C4 fixed + 3 new centering tests; all step-0 Appendix A deletions done (12 dead i18n keys removed after cross-repo grep; `allowImageUpload` prop dropped too — equally dead); M6 fixed by inlining the SVG as a data URI in new [assets.ts](packages/excalidraw/TTA/assets.ts) (`public/tta-chat-empty.svg` deleted). Bonus: fixed a pre-existing `yarn test:typecheck` break from `3a7c9fbad` (the `syncActionResult` mock in `useAIStreamingCanvasPreview.test.tsx` lacked `captureUpdate`). Baseline confirmed: the 2 known `insertAISkeletons.test.ts` failures pre-date the rewrite; gate after step 0 = typecheck clean, 24 TTA tests passing + those 2.
 
 ---
 
@@ -289,10 +292,10 @@ Client-minted ids (old plan's Principle 1) are **dropped from scope entirely**: 
 
 ## Appendix A — deletion list (step 0 unless noted)
 
-- [chatHelpers.ts](packages/excalidraw/TTA/chatHelpers.ts): `getLatestAssistantTurnId`, `getLatestAssistantTurnIdBeforeIndex`, `getConversationTitle` (keep `FromTurns` variant until step 4 merges them); round-trip trio + `AssistantChatTurnMessage`/`ChatTurn` (step 4).
-- [client.ts](packages/excalidraw/TTA/client.ts): `TTA_BASE_PATH`/`TTA_GENERATE_STREAM_PATH`/`TTA_TRUNCATE_PATH`; `[ai-server]` `ignorePayload` filter; changed-chatId re-`onStarted` branch (:262-277); `AIChatTruncateResponse.revision` (step 1).
-- [types.ts](packages/excalidraw/TTA/types.ts): `parseError`, commented-out `content`, `lifecycleStatus` on client messages (step 3); `AIStreamFinalPayload.lifecycleStatus` optionality drift (step 1).
-- [TTAComposer.tsx](packages/excalidraw/TTA/TTAComposer.tsx): uncontrolled value/images mode + `selectedImagesRef` sync + `rightActions` prop; local `DEFAULT_MAX_IMAGES`.
-- [TTADialog.tsx](packages/excalidraw/TTA/TTADialog.tsx): `applyServerChatMetadata`'s unused `turnId`/`messageId` params; unexport `ttaChatMessagesAtom`/`ttaRateLimitsAtom` (no consumers); one of the two scroll effects; `chatIdRef` (step 4).
-- i18n `en.json`: `ai.chat.newChat`, `ai.chat.viewGeneratedResult`, `ai.chat.prompts.*`, `ai.chat.status.{syntaxErrorFixing,errorFixing}`, `ai.chat.errors.{title,serverError,generationError,requestError,tryAgain,configuration,technicalDetails}` (confirm no server/host reliance first).
-- excalidraw-app: duplicated `INTERMEDIATE_PREVIEW_ELEMENT_KEY` string in [data/index.ts:46](excalidraw-app/data/index.ts#L46) (import from package, step 5).
+- ✅ [chatHelpers.ts](packages/excalidraw/TTA/chatHelpers.ts): `getLatestAssistantTurnId`, `getLatestAssistantTurnIdBeforeIndex`, `getConversationTitle` (keep `FromTurns` variant until step 4 merges them); ⏳ round-trip trio + `AssistantChatTurnMessage`/`ChatTurn` (step 4).
+- ✅ [client.ts](packages/excalidraw/TTA/client.ts): `TTA_BASE_PATH`/`TTA_GENERATE_STREAM_PATH`/`TTA_TRUNCATE_PATH`; ⏳ `[ai-server]` `ignorePayload` filter; changed-chatId re-`onStarted` branch (:262-277); `AIChatTruncateResponse.revision` (step 1).
+- ✅ [types.ts](packages/excalidraw/TTA/types.ts): commented-out `content`; ⏳ `parseError`, `lifecycleStatus` on client messages (step 3); `AIStreamFinalPayload.lifecycleStatus` optionality drift (step 1).
+- ✅ [TTAComposer.tsx](packages/excalidraw/TTA/TTAComposer.tsx): uncontrolled value/images mode + `rightActions` + `allowImageUpload` props; local `DEFAULT_MAX_IMAGES` (`value`/`images`/`maxImages` now required — TTADialog always passed them). Kept `selectedImagesRef`: it guards async staleness in `appendImageFiles`, not the uncontrolled mode.
+- ✅ [TTADialog.tsx](packages/excalidraw/TTA/TTADialog.tsx): `applyServerChatMetadata`'s unused `turnId`/`messageId` params; unexport `ttaChatMessagesAtom`/`ttaRateLimitsAtom` (no consumers); merged the two scroll effects; ⏳ `chatIdRef` (step 4).
+- ✅ i18n `en.json`: `ai.chat.newChat`, `ai.chat.viewGeneratedResult`, `ai.chat.prompts.*`, `ai.chat.status.{syntaxErrorFixing,errorFixing}`, `ai.chat.errors.{title,serverError,generationError,requestError,tryAgain,configuration,technicalDetails}` (all 12 confirmed unused in both repos before removal).
+- ⏳ excalidraw-app: duplicated `INTERMEDIATE_PREVIEW_ELEMENT_KEY` string in [data/index.ts:46](excalidraw-app/data/index.ts#L46) (import from package, step 5).

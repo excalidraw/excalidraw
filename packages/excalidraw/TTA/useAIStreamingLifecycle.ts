@@ -41,8 +41,6 @@ type UseAIStreamingLifecycleOptions = {
   setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
   applyServerChatMetadata: (metadata: {
     chatId?: string | null;
-    turnId?: string | null;
-    messageId?: string | null;
     updatedAt?: number | null;
   }) => void;
   removeGeneratedElementsByMessageId: (messageId: string | null) => void;
@@ -313,8 +311,6 @@ export const useAIStreamingLifecycle = ({
 
         applyServerChatMetadata({
           chatId: finalPayload.chatId,
-          turnId: finalTurnId,
-          messageId: finalMessageId,
           updatedAt: finalPayload.updatedAt,
         });
 
