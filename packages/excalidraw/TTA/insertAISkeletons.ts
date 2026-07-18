@@ -16,7 +16,10 @@ import { viewportCoordsToSceneCoords } from "@excalidraw/common";
 
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import { restoreElements } from "../data/restore";
@@ -44,6 +47,44 @@ const getViewportCenter = (appState: AppClassProperties["state"]) => {
 
 export const AI_GENERATED_ELEMENTS_KEY = "aiSidebarGenerationId";
 export const INTERMEDIATE_PREVIEW_ELEMENT_KEY = "intermediatePreviewElement";
+
+/**
+ * Whether the element is a live streaming-preview element — a real scene
+ * element inserted with `CaptureUpdateAction.NEVER` while a generation is
+ * still streaming. Such elements must never be persisted (hosts should filter
+ * them from saves — see excalidraw-app's `getPersistableElements`).
+ */
+export const isIntermediatePreviewElement = (
+  element: ExcalidrawElement,
+): boolean => element.customData?.[INTERMEDIATE_PREVIEW_ELEMENT_KEY] === true;
+
+/**
+ * Tombstones every non-deleted element tagged with one of the given
+ * generation tags. Pure — returns the next elements array and whether
+ * anything changed; the caller decides how to apply it to the scene.
+ */
+export const getElementsWithDeletedGenerationTags = (
+  elements: readonly ExcalidrawElement[],
+  generationTags: ReadonlySet<string>,
+): { elements: ExcalidrawElement[]; didChange: boolean } => {
+  let didChange = false;
+  const nextElements = elements.map((element) => {
+    if (element.isDeleted) {
+      return element;
+    }
+    const elementGenerationTag =
+      element.customData?.[AI_GENERATED_ELEMENTS_KEY];
+    if (
+      typeof elementGenerationTag === "string" &&
+      generationTags.has(elementGenerationTag)
+    ) {
+      didChange = true;
+      return newElementWith(element, { isDeleted: true });
+    }
+    return element;
+  });
+  return { elements: nextElements, didChange };
+};
 
 interface InsertSkeletonsOptions {
   targetCenter?: { x: number; y: number };
@@ -157,18 +198,17 @@ export const convertAISkeletonsToSceneElements = (
   const dy = destination.y - elementsCenterY;
 
   const generationId = options?.generationId;
-  const isIntermediatePreviewElement =
-    options?.intermediatePreviewElement === true;
+  const isIntermediatePreview = options?.intermediatePreviewElement === true;
 
   return elbowNormalizedElements.map((element) => {
     const nextCustomData =
-      generationId || isIntermediatePreviewElement
+      generationId || isIntermediatePreview
         ? {
             ...(element.customData ?? {}),
             ...(generationId
               ? { [AI_GENERATED_ELEMENTS_KEY]: generationId }
               : {}),
-            ...(isIntermediatePreviewElement
+            ...(isIntermediatePreview
               ? { [INTERMEDIATE_PREVIEW_ELEMENT_KEY]: true }
               : {}),
           }

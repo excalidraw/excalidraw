@@ -476,6 +476,14 @@ export { TTAIndexedDBAdapter } from "./TTA/history";
 export { TTADefaultTransportAdapter } from "./TTA/client";
 export { TTAStreamFetch } from "./TTA/client";
 export { TTAWarningMessage } from "./TTA/TTAWarningMessage";
+// TTA canvas tagging: hosts need these to filter intermediate streaming
+// preview elements out of persistence (they are live scene elements that must
+// never be saved — tta_rewrite_final.md §2.4/N3).
+export {
+  isIntermediatePreviewElement,
+  AI_GENERATED_ELEMENTS_KEY,
+  INTERMEDIATE_PREVIEW_ELEMENT_KEY,
+} from "./TTA/insertAISkeletons";
 export type {
   TTDPersistenceAdapter,
   TTDTransportAdapter,

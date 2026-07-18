@@ -46,6 +46,8 @@ import { FileStatusStore } from "./fileStatusStore";
 import { Locker } from "./Locker";
 import { updateBrowserStateVersion } from "./tabSync";
 
+import { getPersistableElements } from "./index";
+
 const filesStore = createStore("files-db", "files-store");
 
 export const localStorageQuotaExceededAtom = atom(false);
@@ -89,7 +91,9 @@ const saveDataStateToLocalStorage = (
 
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
+      // like the collab/Firebase path, never persist TTA intermediate
+      // streaming-preview elements (tta_rewrite_final.md §2.4/N3)
+      JSON.stringify(getPersistableElements(getNonDeletedElements(elements))),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,

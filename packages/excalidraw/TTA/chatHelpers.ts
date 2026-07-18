@@ -30,16 +30,19 @@ export const stopIncompleteAssistantMessages = (
   );
 
 /**
- * Server message id of the latest assistant generation — the canvas tag of the
- * conversation's current on-canvas result.
+ * Local generation id of the latest assistant generation with drawable
+ * content — the canvas tag (`customData[AI_GENERATED_ELEMENTS_KEY]`) of the
+ * conversation's current on-canvas result. Only assistants with skeletons
+ * produce tags: a generation that never rendered has nothing on the canvas to
+ * replace.
  */
-export const getLatestAssistantMessageId = (
+export const getLatestAssistantGenerationId = (
   messages: ChatMessage[],
 ): string | null => {
   for (let index = messages.length - 1; index >= 0; index--) {
     const message = messages[index];
-    if (message.role === "assistant" && message.server?.messageId) {
-      return message.server.messageId;
+    if (message.role === "assistant" && message.skeletons?.length) {
+      return message.id;
     }
   }
   return null;
@@ -57,25 +60,20 @@ export const getLatestRetryableAssistantMessage = (
   return null;
 };
 
+/**
+ * Canvas tags (= local generation ids) of every assistant generation with
+ * drawable content in the conversation.
+ */
 export const getAssistantGenerationTags = (
   messages: ChatMessage[],
 ): string[] => {
-  const generationTags = new Set<string>();
+  const generationTags: string[] = [];
   for (const message of messages) {
-    if (message.role !== "assistant") {
-      continue;
-    }
-    let generationTag: string | null = null;
-    if (message.server?.messageId) {
-      generationTag = message.server.messageId;
-    } else if (message.skeletons?.length) {
-      generationTag = `ai-delete-${message.id}`;
-    }
-    if (generationTag) {
-      generationTags.add(generationTag);
+    if (message.role === "assistant" && message.skeletons?.length) {
+      generationTags.push(message.id);
     }
   }
-  return [...generationTags];
+  return generationTags;
 };
 
 export const getTurnStartIndexForAssistantDelete = (

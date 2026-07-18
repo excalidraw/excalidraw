@@ -3,22 +3,46 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { useAIStreamingLifecycle } from "./useAIStreamingLifecycle";
+import { useCanvasDraft } from "./useCanvasDraft";
 
 import type { TTAStreamFetchResult } from "./client";
 import type { ChatMessage } from "./types";
 import type { AppClassProperties } from "../types";
 
-const createMockApp = () =>
-  ({
+const createMockApp = () => {
+  let elements: unknown[] = [];
+
+  const updateScene = vi.fn(({ elements: nextElements }) => {
+    elements = nextElements;
+  });
+  const syncActionResult = vi.fn(({ elements: nextElements }) => {
+    elements = nextElements;
+  });
+
+  return {
     api: {
-      updateScene: vi.fn(),
+      updateScene,
+    },
+    state: {
+      width: 1000,
+      height: 1000,
+      scrollX: 0,
+      scrollY: 0,
+      offsetLeft: 0,
+      offsetTop: 0,
+      zoom: { value: 1 },
+      selectedElementIds: {},
     },
     scene: {
-      getNonDeletedElements: () => [],
-      getElementsIncludingDeleted: () => [],
+      getNonDeletedElements: () =>
+        elements.filter(
+          (element) => !(element as { isDeleted?: boolean }).isDeleted,
+        ),
+      getElementsIncludingDeleted: () => elements,
     },
-    syncActionResult: vi.fn(),
-  } as unknown as AppClassProperties);
+    syncActionResult,
+  } as unknown as AppClassProperties;
+};
 
 const TestHarness = ({
   streamResult,
@@ -37,8 +61,6 @@ const TestHarness = ({
     () => streamFetchProp ?? vi.fn().mockResolvedValue(streamResult),
   );
   const [applyServerChatMetadata] = useState(() => vi.fn());
-  const [removeGeneratedElementsByMessageId] = useState(() => vi.fn());
-  const [commitQueuedGenerationReplacements] = useState(() => vi.fn());
   const didGenerateRef = useRef(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -55,13 +77,13 @@ const TestHarness = ({
     },
   ]);
 
+  const canvasDraft = useCanvasDraft({ app });
+
   const lifecycle = useAIStreamingLifecycle({
-    app,
     chatMessages,
     setChatMessages,
     applyServerChatMetadata,
-    removeGeneratedElementsByMessageId,
-    commitQueuedGenerationReplacements,
+    canvasDraft,
     streamFetch,
     onRateLimitInfo,
   });
@@ -144,8 +166,8 @@ describe("useAIStreamingLifecycle", () => {
     const onRateLimitInfo = vi.fn();
     const skeleton = { type: "rectangle", x: 0, y: 0, width: 10, height: 10 };
     const streamFetch = vi.fn().mockImplementation(async (options) => {
-      // Deliberately no onStarted: activeMessageId stays null, which skips the
-      // canvas-preview path — this test pins message-state behavior only.
+      // Deliberately no onStarted: the canvas draft is keyed by the LOCAL
+      // generation id, so the chunk renders even before `started` arrives.
       options.onChunk?.({ skeletons: [skeleton], isComplete: false });
       return {
         error: {

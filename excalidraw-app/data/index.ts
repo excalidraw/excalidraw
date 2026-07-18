@@ -8,6 +8,7 @@ import {
   IV_LENGTH_BYTES,
 } from "@excalidraw/excalidraw/data/encryption";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+import { isIntermediatePreviewElement } from "@excalidraw/excalidraw/TTA/insertAISkeletons";
 import { isInvisiblySmallElement } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
 import { t } from "@excalidraw/excalidraw/i18n";
@@ -43,12 +44,12 @@ import type { WS_SUBTYPES } from "../app_constants";
 export type SyncableExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"SyncableExcalidrawElement">;
 
-export const INTERMEDIATE_PREVIEW_ELEMENT_KEY = "intermediatePreviewElement";
+export { isIntermediatePreviewElement };
 
-export const isIntermediatePreviewElement = (
-  element: ExcalidrawElement,
-): boolean => element.customData?.[INTERMEDIATE_PREVIEW_ELEMENT_KEY] === true;
-
+/**
+ * Filters out TTA intermediate streaming-preview elements — real scene
+ * elements that must never be persisted (tta_rewrite_final.md §2.4/N3).
+ */
 export const getPersistableElements = <TElement extends ExcalidrawElement>(
   elements: readonly TElement[],
 ) =>

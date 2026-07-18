@@ -10,12 +10,11 @@ import {
   type ChatMessage,
 } from "./types";
 import { getAIChatErrorCode, withAIChatErrorMeta } from "./chatErrors";
-import { useAIStreamingCanvasPreview } from "./useAIStreamingCanvasPreview";
 
 import type { Dispatch, SetStateAction } from "react";
 
+import type { CanvasDraft } from "./useCanvasDraft";
 import type { TTATransportAdapter } from "./client";
-import type { AppClassProperties } from "../types";
 
 const isAbortError = (error: unknown) =>
   error instanceof Error && error.name === "AbortError";
@@ -35,15 +34,13 @@ const assistantMessageHasError = (
 };
 
 type UseAIStreamingLifecycleOptions = {
-  app: AppClassProperties;
   chatMessages: ChatMessage[];
   setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
   applyServerChatMetadata: (metadata: {
     chatId?: string | null;
     updatedAt?: number | null;
   }) => void;
-  removeGeneratedElementsByMessageId: (messageId: string | null) => void;
-  commitQueuedGenerationReplacements: (activeMessageId?: string | null) => void;
+  canvasDraft: CanvasDraft;
   streamFetch: TTATransportAdapter["stream"];
   onRateLimitInfo?: (rateLimitInfo: {
     rateLimit?: number | null;
@@ -61,12 +58,10 @@ const STREAM_IDLE_STATUS_DELAY = 5000;
 const getElapsedMs = (startedAt: number) => Math.max(0, Date.now() - startedAt);
 
 export const useAIStreamingLifecycle = ({
-  app,
   chatMessages,
   setChatMessages,
   applyServerChatMetadata,
-  removeGeneratedElementsByMessageId,
-  commitQueuedGenerationReplacements,
+  canvasDraft,
   streamFetch,
   onRateLimitInfo,
 }: UseAIStreamingLifecycleOptions) => {
@@ -112,28 +107,6 @@ export const useAIStreamingLifecycle = ({
       ];
     });
   }, [setChatMessages]);
-
-  const {
-    applyStreamingCanvasPreviewResult,
-    throttledApplyStreamingCanvasPreviewResult,
-    clearStreamingCanvasPreview,
-    clearActiveCanvasDraftFromCanvas,
-    commitStreamingCanvasPreview,
-    resetActiveCanvasDraft,
-    resetStreamingCanvasPreviewState,
-  } = useAIStreamingCanvasPreview({
-    app,
-    removeGeneratedElementsByMessageId,
-    commitQueuedGenerationReplacements,
-  });
-
-  const cancelPendingCanvasPreviewRenders = useCallback(() => {
-    throttledApplyStreamingCanvasPreviewResult.cancel();
-  }, [throttledApplyStreamingCanvasPreviewResult]);
-
-  const resetCanvasPreviewRenderState = useCallback(() => {
-    resetStreamingCanvasPreviewState();
-  }, [resetStreamingCanvasPreviewState]);
 
   const generateResponse = useCallback(
     async (assistantId: string, payload: AIGenerateRequestPayload) => {
@@ -181,7 +154,7 @@ export const useAIStreamingLifecycle = ({
         activeStreamAbortControllerRef.current = abortController;
         // A canceled predecessor skips its ownership-checked cleanup (see the
         // `finally` below), so start from a clean throttle state here.
-        resetCanvasPreviewRenderState();
+        canvasDraft.cancelPendingRenders();
 
         if (stopRequestedRef.current) {
           abortController.abort();
@@ -236,16 +209,16 @@ export const useAIStreamingLifecycle = ({
                 status: streamingStatus("generating"),
                 skeletons: partialPayload.skeletons,
               });
-              if (!activeMessageId) {
-                return;
-              }
-              // Always render partials as non-final: the server marks its last
-              // partial `isComplete: true`, but the authoritative final render
-              // (IMMEDIATELY capture + selection) happens once on `done` —
-              // honoring it here would commit the draft twice.
-              throttledApplyStreamingCanvasPreviewResult(
+              // The draft is keyed by the local generation id (known
+              // synchronously), so chunks render regardless of whether
+              // `started` arrived yet. Always render partials as non-final:
+              // the server marks its last partial `isComplete: true`, but the
+              // authoritative final render (IMMEDIATELY capture + selection)
+              // happens once on `done` — honoring it here would commit the
+              // draft twice.
+              canvasDraft.applyChunk(
                 { skeletons: partialPayload.skeletons, isComplete: false },
-                activeMessageId,
+                assistantId,
               );
             },
           });
@@ -256,7 +229,6 @@ export const useAIStreamingLifecycle = ({
         }
 
         if (error) {
-          cancelPendingCanvasPreviewRenders();
           patchAssistantMessage(assistantId, {
             status: {
               kind: "error",
@@ -270,7 +242,7 @@ export const useAIStreamingLifecycle = ({
           // no-op and the previous generation stays visible (its queued
           // replacement tag survives, so the next successful generation still
           // replaces it).
-          commitStreamingCanvasPreview();
+          canvasDraft.commitDraft();
           return;
         }
 
@@ -278,8 +250,6 @@ export const useAIStreamingLifecycle = ({
           return;
         }
 
-        throttledApplyStreamingCanvasPreviewResult.flush();
-        cancelPendingCanvasPreviewRenders();
         const finalTurnId = finalPayload.turnId ?? activeTurnId;
         const finalMessageId = finalPayload.messageId ?? activeMessageId;
         activeTurnId = finalTurnId;
@@ -313,18 +283,13 @@ export const useAIStreamingLifecycle = ({
           // the successful attempt becomes the turn's retry target (N1)
           lastCompletedMessageId: finalMessageId ?? undefined,
         });
-        // Without a message id the draft can't be tagged/keyed — unreachable
-        // against today's server (`started` always precedes `done`), but never
-        // leave the bubble spinning because of it (N5 in tta_rewrite_final.md).
-        if (finalMessageId) {
-          applyStreamingCanvasPreviewResult(finalPayload, finalMessageId);
-        }
+        canvasDraft.applyFinal(finalPayload, assistantId);
 
         if (isExhaustedRateLimit(rateLimitRemaining)) {
           appendRateLimitWarningMessage();
         }
       } catch (error: unknown) {
-        cancelPendingCanvasPreviewRenders();
+        canvasDraft.cancelPendingRenders();
         if (stopRequestedRef.current || isAbortError(error)) {
           return;
         }
@@ -345,7 +310,7 @@ export const useAIStreamingLifecycle = ({
         // commit the rendered draft instead of wiping it. Even when the final
         // render threw mid-insert (INVALID_RESULT) after tombstoning the
         // preview frame, the commit resurrects those elements as committed.
-        commitStreamingCanvasPreview();
+        canvasDraft.commitDraft();
 
         patchAssistantMessage(assistantId, {
           status: {
@@ -364,8 +329,7 @@ export const useAIStreamingLifecycle = ({
         // holds the successor's controller (or null) — tearing down the
         // shared throttle/stop state here would clobber the live stream.
         if (activeStreamAbortControllerRef.current === abortController) {
-          cancelPendingCanvasPreviewRenders();
-          resetCanvasPreviewRenderState();
+          canvasDraft.cancelPendingRenders();
           activeStreamAbortControllerRef.current = null;
           stopRequestedRef.current = false;
         }
@@ -373,14 +337,10 @@ export const useAIStreamingLifecycle = ({
     },
     [
       applyServerChatMetadata,
-      applyStreamingCanvasPreviewResult,
       appendRateLimitWarningMessage,
-      cancelPendingCanvasPreviewRenders,
-      commitStreamingCanvasPreview,
+      canvasDraft,
       onRateLimitInfo,
       patchAssistantMessage,
-      resetCanvasPreviewRenderState,
-      throttledApplyStreamingCanvasPreviewResult,
       streamFetch,
     ],
   );
@@ -398,23 +358,12 @@ export const useAIStreamingLifecycle = ({
 
   useEffect(() => {
     return () => {
-      cancelPendingCanvasPreviewRenders();
-      clearStreamingCanvasPreview();
       cancelActiveStream();
     };
-  }, [
-    cancelPendingCanvasPreviewRenders,
-    cancelActiveStream,
-    clearStreamingCanvasPreview,
-  ]);
+  }, [cancelActiveStream]);
 
   return {
-    clearStreamingCanvasPreview,
-    commitStreamingCanvasPreview,
-    clearActiveCanvasDraftFromCanvas,
-    resetActiveCanvasDraft,
     cancelActiveStream,
-    cancelPendingCanvasPreviewRenders,
     setStopRequested,
     generateResponse,
   };

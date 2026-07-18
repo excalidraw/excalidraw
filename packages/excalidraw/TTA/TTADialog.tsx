@@ -19,9 +19,10 @@ import { useAppStateValue } from "../hooks/useAppStateValue";
 import { getDataURL } from "../data/blob";
 
 import {
-  AI_GENERATED_ELEMENTS_KEY,
   convertAISkeletonsToSceneElements,
+  getElementsWithDeletedGenerationTags,
   insertAISkeletons,
+  isIntermediatePreviewElement,
 } from "./insertAISkeletons";
 import "./TTADialog.scss";
 import TTAComposer, { type TTAComposerImage } from "./TTAComposer";
@@ -36,13 +37,14 @@ import {
 
 import {
   getAssistantGenerationTags,
-  getLatestAssistantMessageId,
+  getLatestAssistantGenerationId,
   getLatestRetryableAssistantMessage,
   getTurnStartIndexForAssistantDelete,
   stopIncompleteAssistantMessages,
 } from "./chatHelpers";
 import { isAIChatErrorHandled } from "./chatErrors";
 import { useAIStreamingLifecycle } from "./useAIStreamingLifecycle";
+import { useCanvasDraft } from "./useCanvasDraft";
 import { useGenerationSlot } from "./useGenerationSlot";
 import { useTTAChatHistory } from "./useTTAChatHistory";
 
@@ -122,7 +124,6 @@ const TTADialogContent = ({
   const openSidebar = useAppStateValue("openSidebar");
 
   const chatHistoryRef = useRef<HTMLDivElement>(null);
-  const pendingGenerationReplacementTagsRef = useRef<string[]>([]);
   const previousIsOpenRef = useRef(isOpen);
   const previousChatMessageCountRef = useRef(chatMessages.length);
 
@@ -459,50 +460,21 @@ const TTADialogContent = ({
       if (!generationTags.length) {
         return;
       }
-      const generationTagSet = new Set(generationTags);
-      const existingElements = app.scene.getElementsIncludingDeleted();
-      let didChange = false;
-      const nextElements = existingElements.map((element) => {
-        if (element.isDeleted) {
-          return element;
-        }
-
-        const elementGenerationTag =
-          element.customData?.[AI_GENERATED_ELEMENTS_KEY];
-        if (
-          typeof elementGenerationTag === "string" &&
-          generationTagSet.has(elementGenerationTag)
-        ) {
-          didChange = true;
-          return newElementWith(element, { isDeleted: true });
-        }
-        return element;
-      });
+      const { elements, didChange } = getElementsWithDeletedGenerationTags(
+        app.scene.getElementsIncludingDeleted(),
+        new Set(generationTags),
+      );
       if (didChange) {
+        // Element-only mutations use `updateScene`; anything captured/selected
+        // goes through `syncActionResult`.
         if (captureUpdate === CaptureUpdateAction.IMMEDIATELY) {
-          app.api.updateScene({
-            elements: nextElements,
-            captureUpdate,
-          });
+          app.syncActionResult({ elements, captureUpdate });
         } else {
-          app.syncActionResult({
-            elements: nextElements,
-            captureUpdate,
-          });
+          app.api.updateScene({ elements, captureUpdate });
         }
       }
     },
     [app],
-  );
-
-  const removeGeneratedElementsByMessageId = useCallback(
-    (messageId: string | null) => {
-      if (!messageId) {
-        return;
-      }
-      removeGeneratedElementsByGenerationTags([messageId]);
-    },
-    [removeGeneratedElementsByGenerationTags],
   );
 
   const getElementsForMessage = useCallback(
@@ -511,11 +483,7 @@ const TTADialogContent = ({
         return [];
       }
 
-      const message = chatMessages.find((entry) => {
-        return (
-          entry.role === "assistant" && entry.server?.messageId === messageId
-        );
-      });
+      const message = chatMessages.find((entry) => entry.id === messageId);
       if (message?.role !== "assistant" || !message.skeletons?.length) {
         return [];
       }
@@ -552,67 +520,52 @@ const TTADialogContent = ({
     [app, getElementsForMessage],
   );
 
-  const queueGenerationReplacement = useCallback(
-    (generationTag: string | null | undefined) => {
-      if (!generationTag) {
-        return;
-      }
-      const pending = pendingGenerationReplacementTagsRef.current;
-      if (pending.includes(generationTag)) {
-        return;
-      }
-      // Keep the previous generation visible until the next one yields
-      // renderable skeletons.
-      pendingGenerationReplacementTagsRef.current = [...pending, generationTag];
-    },
-    [],
-  );
+  // The single canvas-draft owner (tta_rewrite_final.md §2.4): streaming
+  // renders, the commit dance, and the generation-replacement queue, keyed by
+  // the local generation id (`message.id`).
+  const canvasDraft = useCanvasDraft({ app });
 
-  const clearQueuedGenerationReplacements = useCallback(() => {
-    pendingGenerationReplacementTagsRef.current = [];
-  }, []);
+  const { cancelActiveStream, setStopRequested, generateResponse } =
+    useAIStreamingLifecycle({
+      chatMessages,
+      setChatMessages,
+      applyServerChatMetadata,
+      canvasDraft,
+      streamFetch: transportAdapter.stream,
+      onRateLimitInfo: handleRateLimitInfo,
+    });
 
-  const commitQueuedGenerationReplacements = useCallback(
-    (activeMessageId?: string | null) => {
-      const pending = pendingGenerationReplacementTagsRef.current;
-      if (!pending.length) {
-        return;
+  // N3 defense (tta_rewrite_final.md §2.4): older builds leaked intermediate
+  // preview elements into locally persisted scenes. They are invisible to TTA
+  // (no draft record points at them), so tombstone any orphaned flagged
+  // elements. Runs on mount and again when the panel opens (the persisted
+  // scene may not have loaded yet at mount time), and never while a
+  // generation is streaming (the live preview is flagged too).
+  const didSweepOrphanedPreviewElementsRef = useRef(false);
+  useEffect(() => {
+    if (didSweepOrphanedPreviewElementsRef.current && !isOpen) {
+      return;
+    }
+    didSweepOrphanedPreviewElementsRef.current = true;
+    if (hasActiveGeneration()) {
+      return;
+    }
+    const existingElements = app.scene.getElementsIncludingDeleted();
+    let didChange = false;
+    const nextElements = existingElements.map((element) => {
+      if (!element.isDeleted && isIntermediatePreviewElement(element)) {
+        didChange = true;
+        return newElementWith(element, { isDeleted: true });
       }
-      const removable = activeMessageId
-        ? pending.filter((tag) => tag !== activeMessageId)
-        : pending;
-      pendingGenerationReplacementTagsRef.current = [];
-      if (!removable.length) {
-        return;
-      }
-      // Remove stale generations once the active one has started rendering.
-      removeGeneratedElementsByGenerationTags(
-        removable,
-        CaptureUpdateAction.IMMEDIATELY,
-      );
-    },
-    [removeGeneratedElementsByGenerationTags],
-  );
-
-  const {
-    clearStreamingCanvasPreview,
-    clearActiveCanvasDraftFromCanvas,
-    commitStreamingCanvasPreview,
-    resetActiveCanvasDraft,
-    cancelActiveStream,
-    cancelPendingCanvasPreviewRenders,
-    setStopRequested,
-    generateResponse,
-  } = useAIStreamingLifecycle({
-    app,
-    chatMessages,
-    setChatMessages,
-    applyServerChatMetadata,
-    removeGeneratedElementsByMessageId,
-    commitQueuedGenerationReplacements,
-    streamFetch: transportAdapter.stream,
-    onRateLimitInfo: handleRateLimitInfo,
-  });
+      return element;
+    });
+    if (didChange) {
+      app.api.updateScene({
+        elements: nextElements,
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+    }
+  }, [app, hasActiveGeneration, isOpen]);
 
   const handleInsertResult = useCallback(
     (message: ChatMessage) => {
@@ -724,7 +677,7 @@ const TTADialogContent = ({
         // cancel-and-replace (retry): abort the active stream and take over.
         // The canceled stream's ownership-checked cleanup can't clobber us.
         cancelActiveStream();
-        cancelPendingCanvasPreviewRenders();
+        canvasDraft.cancelPendingRenders();
         releaseGenerationSlot();
       }
       const release = acquireGenerationSlot();
@@ -736,7 +689,7 @@ const TTADialogContent = ({
       void stream()
         .catch((err) => {
           console.error("[AI Chat] error:", err);
-          clearStreamingCanvasPreview();
+          canvasDraft.clearDraft();
           if (isAIChatErrorHandled(err)) {
             return;
           }
@@ -784,8 +737,7 @@ const TTADialogContent = ({
     [
       acquireGenerationSlot,
       cancelActiveStream,
-      cancelPendingCanvasPreviewRenders,
-      clearStreamingCanvasPreview,
+      canvasDraft,
       hasActiveGeneration,
       releaseGenerationSlot,
       setChatMessages,
@@ -812,7 +764,7 @@ const TTADialogContent = ({
       createdAt: Date.now(),
     };
 
-    const lastAssistantMessageId = getLatestAssistantMessageId(chatMessages);
+    const lastGenerationId = getLatestAssistantGenerationId(chatMessages);
     const conversation = [...chatMessages, userMessage];
     const assistantId = `assistant-${randomId()}`;
 
@@ -825,9 +777,9 @@ const TTADialogContent = ({
         setChatMessages((prev) => [...prev, userMessage]);
         setComposerInputValue("");
         setComposerImages([]);
-        clearStreamingCanvasPreview();
-        if (lastAssistantMessageId) {
-          queueGenerationReplacement(lastAssistantMessageId);
+        canvasDraft.clearDraft();
+        if (lastGenerationId) {
+          canvasDraft.queueReplacement(lastGenerationId);
         }
       },
       stream: () =>
@@ -848,8 +800,7 @@ const TTADialogContent = ({
       }
       setStopRequested(true);
       cancelActiveStream();
-      cancelPendingCanvasPreviewRenders();
-      commitStreamingCanvasPreview();
+      canvasDraft.commitDraft();
       releaseGenerationSlot();
       touchActiveChatUpdatedAt();
 
@@ -878,8 +829,7 @@ const TTADialogContent = ({
     },
     [
       cancelActiveStream,
-      cancelPendingCanvasPreviewRenders,
-      commitStreamingCanvasPreview,
+      canvasDraft,
       hasActiveGeneration,
       releaseGenerationSlot,
       setChatMessages,
@@ -893,12 +843,10 @@ const TTADialogContent = ({
   const handleStartNewChat = useCallback(
     async (options?: { saveCurrentToHistory?: boolean }) => {
       const saveCurrentToHistory = options?.saveCurrentToHistory ?? true;
-      resetActiveCanvasDraft();
-      clearQueuedGenerationReplacements();
       if (saveCurrentToHistory && chatMessages.length && activeChatId) {
         saveConversationToHistory(activeChatId, chatMessages);
       }
-      clearStreamingCanvasPreview();
+      canvasDraft.reset();
       setActiveChatUpdatedAt(null);
       setChatMessages([]);
       setComposerInputValue("");
@@ -911,10 +859,8 @@ const TTADialogContent = ({
     },
     [
       activeChatId,
+      canvasDraft,
       chatMessages,
-      clearQueuedGenerationReplacements,
-      clearStreamingCanvasPreview,
-      resetActiveCanvasDraft,
       saveConversationToHistory,
       setActiveChatId,
       setActiveChatUpdatedAt,
@@ -992,7 +938,7 @@ const TTADialogContent = ({
       // the draft is committed to the canvas under the old chat and the
       // orphaned stream can no longer patch state or re-point the chat id.
       stopActiveGeneration("interrupted");
-      clearQueuedGenerationReplacements();
+      canvasDraft.reset();
       setChatMessages(stopIncompleteAssistantMessages(chat.messages));
       setActiveChatId(chat.id);
       setActiveChatUpdatedAt(chat.updatedAt);
@@ -1003,7 +949,7 @@ const TTADialogContent = ({
       });
     },
     [
-      clearQueuedGenerationReplacements,
+      canvasDraft,
       focusComposerInput,
       scrollChatToBottom,
       setActiveChatId,
@@ -1077,13 +1023,16 @@ const TTADialogContent = ({
         assistantId: retryAssistantId,
         mutate: () => {
           touchActiveChatUpdatedAt();
-          clearStreamingCanvasPreview();
+          canvasDraft.clearDraft();
           // A failed generation commits its rendered partial to the canvas
           // (the on-error policy in useAIStreamingLifecycle), so an
           // error-retry must queue it for replacement just like regenerate
           // does — otherwise the retried generation would render on top of
-          // the stale partial.
-          queueGenerationReplacement(message.server?.messageId ?? null);
+          // the stale partial. The tag is the LOCAL id: for an error-retry it
+          // equals the new attempt's id, which the queue handles (the failed
+          // attempt's elements are removed right before the new attempt's
+          // first render).
+          canvasDraft.queueReplacement(message.id);
           if (isErrorRetry) {
             setChatMessages((prev) =>
               prev.map((entry) =>
@@ -1132,7 +1081,7 @@ const TTADialogContent = ({
           );
 
           const retryImage = await (!isErrorRetry
-            ? exportImageFromMessageSkeletons(message.server?.messageId)
+            ? exportImageFromMessageSkeletons(message.id)
             : undefined);
 
           await streamAssistantResponse(
@@ -1152,10 +1101,9 @@ const TTADialogContent = ({
       });
     },
     [
+      canvasDraft,
       chatMessages,
-      clearStreamingCanvasPreview,
       latestRetryableAssistantMessageId,
-      queueGenerationReplacement,
       rateLimits?.rateLimitRemaining,
       runGeneration,
       setChatMessages,
@@ -1182,11 +1130,8 @@ const TTADialogContent = ({
       // (no draft commit: delete is destructive, the canvas is cleared below).
       setStopRequested(true);
       cancelActiveStream();
-      cancelPendingCanvasPreviewRenders();
       releaseGenerationSlot();
-      clearQueuedGenerationReplacements();
-      clearStreamingCanvasPreview();
-      clearActiveCanvasDraftFromCanvas();
+      canvasDraft.reset();
       touchActiveChatUpdatedAt();
 
       const turnStartIndex = getTurnStartIndexForAssistantDelete(
@@ -1259,12 +1204,11 @@ const TTADialogContent = ({
             entry.role === "assistant" && Boolean(entry.skeletons?.length),
         );
       if (latestAssistant?.skeletons?.length) {
-        const generationId =
-          latestAssistant.server?.messageId ??
-          `ai-delete-${latestAssistant.id}`;
         try {
           insertAISkeletons(app, latestAssistant.skeletons, {
-            generationId,
+            // the local message id IS the canvas tag (tta_rewrite_final.md
+            // §2.4)
+            generationId: latestAssistant.id,
             regenerateIds: true,
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             selectInsertedElements: true,
@@ -1283,11 +1227,9 @@ const TTADialogContent = ({
     [
       activeChatId,
       app,
+      canvasDraft,
       chatMessages,
       cancelActiveStream,
-      clearActiveCanvasDraftFromCanvas,
-      clearStreamingCanvasPreview,
-      clearQueuedGenerationReplacements,
       deleteChat,
       getServerChatId,
       applyActiveChatUpdatedAt,
@@ -1298,7 +1240,6 @@ const TTADialogContent = ({
       setComposerInputValue,
       setChatMessages,
       setIsHistoryVisible,
-      cancelPendingCanvasPreviewRenders,
       releaseGenerationSlot,
       setStopRequested,
       touchActiveChatUpdatedAt,
