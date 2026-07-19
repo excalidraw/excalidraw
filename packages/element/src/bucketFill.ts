@@ -24,6 +24,7 @@ import {
 } from "./bounds";
 import { intersectElementWithLineSegment, isPointInElement } from "./collision";
 import { hasBackground } from "./comparisons";
+import { getFreedrawStrokeCenterPoints } from "./shape";
 import { isFreeDrawElement, isLineElement, isValidPolygon } from "./typeChecks";
 import { isPathALoop } from "./utils";
 
@@ -32,6 +33,7 @@ import type { Point } from "points-on-curve";
 import type {
   ElementsMap,
   ExcalidrawElement,
+  ExcalidrawFreeDrawElement,
   ExcalidrawLineElement,
   NonDeletedExcalidrawElement,
 } from "./types";
@@ -298,6 +300,36 @@ const lineElementIdealSegments = (
         ) as unknown as readonly LocalPoint[])
       : element.points;
   const points = localPoints.map((point) =>
+    pointRotateRads(
+      pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+      center,
+      element.angle,
+    ),
+  );
+  const segments: LineSegment<GlobalPoint>[] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    segments.push(lineSegment(points[i], points[i + 1]));
+  }
+  return segments;
+};
+
+/**
+ * Boundary segments for a freedraw element from its RENDERED centerline
+ * (perfect-freehand's streamline-smoothed stroke points), not its raw
+ * input points.
+ *
+ * Raw freedraw points can sit 20px+ apart and the renderer smooths the
+ * path between them, so raw chords visibly deviate from the stroke on
+ * screen: fills poke out at raw vertices, slivers open along sagging
+ * chords, and closures that only exist in the smoothed path (the stroke
+ * crossing itself near its start) are missed entirely.
+ */
+const freedrawIdealSegments = (
+  element: ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
+): LineSegment<GlobalPoint>[] => {
+  const center = elementCenterPoint(element, elementsMap);
+  const points = getFreedrawStrokeCenterPoints(element).map((point) =>
     pointRotateRads(
       pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
       center,
@@ -802,9 +834,10 @@ const buildFaces = (
   //
   // A dangling end is simply a degree-1 node. This relies on boundaries
   // being single-pass paths: line elements use their logical points (see
-  // `lineElementIdealSegments`), freedraw its own point chain, and closed
-  // shapes their ideal outlines — none of them produce the rough renderer's
-  // double-pass geometry, whose ends would be degree-2.
+  // `lineElementIdealSegments`), freedraw its smoothed centerline (see
+  // `freedrawIdealSegments`), and closed shapes their ideal outlines —
+  // none of them produce the rough renderer's double-pass geometry, whose
+  // ends would be degree-2.
   // ---------------------------------------------------------------------------
   const bridgeRadius = Math.max(eps, options.gapTolerance);
   const isDanglingEnd = (node: number): boolean =>
@@ -1335,6 +1368,8 @@ export const computeBucketFillPolygon = (args: {
       );
       const segments = isLineElement(element)
         ? lineElementIdealSegments(element, elementsMap)
+        : isFreeDrawElement(element)
+        ? freedrawIdealSegments(element, elementsMap)
         : getElementLineSegments(element, elementsMap);
       // freedraw and non-polygon line loops render as closed once their
       // endpoints are within LINE_CONFIRM_THRESHOLD (isPathALoop), but their

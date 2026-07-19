@@ -11,6 +11,7 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import type { GlobalPoint, LocalPoint, Polygon } from "@excalidraw/math";
 
 import { computeBucketFillPolygon, isRestylableFill } from "../src/bucketFill";
+import { getFreedrawStrokeCenterPoints } from "../src/shape";
 
 import type { ElementsMap, NonDeletedExcalidrawElement } from "../src/types";
 
@@ -202,14 +203,32 @@ describe("computeBucketFillPolygon", () => {
   it("fills a freedraw loop with a hand-drawn closure gap", () => {
     // regression: isPathALoop accepts closure gaps up to LINE_CONFIRM_THRESHOLD
     // (8px), so the segment chain must be bridged explicitly or the region
-    // reads as open even though it renders (and hit-tests) as closed
-    const points: LocalPoint[] = [
-      pointFrom<LocalPoint>(0, 0),
-      pointFrom<LocalPoint>(100, 0),
-      pointFrom<LocalPoint>(100, 100),
-      pointFrom<LocalPoint>(0, 100),
-      pointFrom<LocalPoint>(0, 5),
+    // reads as open even though it renders (and hit-tests) as closed.
+    // Realistically dense points (~10px spacing, like actual drawing input) —
+    // the boundary follows the streamline-smoothed centerline, which only
+    // tracks the input at drawing-like densities
+    const points: LocalPoint[] = [];
+    const corners = [
+      [0, 0],
+      [100, 0],
+      [100, 100],
+      [0, 100],
+      [0, 5],
     ];
+    for (let c = 0; c < corners.length - 1; c++) {
+      const [ax, ay] = corners[c];
+      const [bx, by] = corners[c + 1];
+      const steps = Math.ceil(Math.hypot(bx - ax, by - ay) / 10);
+      for (let s = 0; s < steps; s++) {
+        points.push(
+          pointFrom<LocalPoint>(
+            ax + ((bx - ax) * s) / steps,
+            ay + ((by - ay) * s) / steps,
+          ),
+        );
+      }
+    }
+    points.push(pointFrom<LocalPoint>(0, 5));
     const freedraw = API.createElement({
       type: "freedraw",
       x: 0,
@@ -1203,6 +1222,103 @@ describe("computeBucketFillPolygon", () => {
     }
     expect(inside.ownerId).toBe(outer.id);
     expect(polygonArea(inside.scenePoints)).toBeCloseTo(10000, -2);
+  });
+
+  it("fills a sparse freedraw along its rendered (smoothed) centerline", () => {
+    // raw freedraw points can sit 20px+ apart; the renderer draws a
+    // streamline-smoothed path between them, so the fill boundary must
+    // sample that same path, not the raw chords (which visibly poke out)
+    // prettier-ignore
+    const CIRCLE_POINTS: [number, number][] = [[240,120],[238.18,140.84],[232.76,161.04],[223.92,180],[211.93,197.13],[197.13,211.93],[180,223.92],[161.04,232.76],[140.84,238.18],[120,240],[99.16,238.18],[78.96,232.76],[60,223.92],[42.87,211.93],[28.07,197.13],[16.08,180],[7.24,161.04],[1.82,140.84],[0,120],[1.82,99.16],[7.24,78.96],[16.08,60],[28.07,42.87],[42.87,28.07],[60,16.08],[78.96,7.24],[99.16,1.82],[120,0],[140.84,1.82],[161.04,7.24],[180,16.08],[197.13,28.07],[211.93,42.87],[223.92,60],[232.76,78.96],[238.18,99.16],[239.93,115.81]];
+    const circle = API.createElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      width: 240,
+      height: 240,
+      points: CIRCLE_POINTS.map((p) => pointFrom<LocalPoint>(p[0], p[1])),
+    });
+    const { elements, elementsMap } = setup([
+      circle as NonDeletedExcalidrawElement,
+    ]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(120, 120),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    const distToPolyline = (p: GlobalPoint, poly: [number, number][]) => {
+      let best = Infinity;
+      for (let i = 0; i < poly.length - 1; i++) {
+        const [ax, ay] = poly[i];
+        const [bx, by] = poly[i + 1];
+        const dx = bx - ax;
+        const dy = by - ay;
+        const l2 = dx * dx + dy * dy;
+        const t = l2
+          ? Math.max(0, Math.min(1, ((p[0] - ax) * dx + (p[1] - ay) * dy) / l2))
+          : 0;
+        best = Math.min(
+          best,
+          Math.hypot(p[0] - (ax + t * dx), p[1] - (ay + t * dy)),
+        );
+      }
+      return best;
+    };
+    const rawPolyline = [...CIRCLE_POINTS, CIRCLE_POINTS[0]];
+    const smoothedPolyline = [
+      ...getFreedrawStrokeCenterPoints(circle),
+      CIRCLE_POINTS[0],
+    ] as [number, number][];
+    // every fill vertex lies ON the smoothed centerline (RDP only removes
+    // vertices, it never moves them)...
+    const deviationFromSmoothed = Math.max(
+      ...result.scenePoints.map((v) => distToPolyline(v, smoothedPolyline)),
+    );
+    expect(deviationFromSmoothed).toBeLessThan(0.5);
+    // ...and measurably OFF the raw polyline, proving the boundary follows
+    // the rendered path rather than the raw chords
+    const deviationFromRaw = Math.max(
+      ...result.scenePoints.map((v) => distToPolyline(v, rawPolyline)),
+    );
+    expect(deviationFromRaw).toBeGreaterThan(1.5);
+  });
+
+  it("fills a freedraw whose closure only exists in the smoothed stroke", () => {
+    // real-world repro: the raw ends sit ~21px apart and ~14px from the
+    // rest of the raw path — but the RENDERED (smoothed) stroke passes
+    // within ~3px of its own tail, which reads as visually closed and must
+    // be bridgeable
+    // prettier-ignore
+    const BLOB_POINTS: [number, number][] = [[0,0],[0,-0.3],[0,-0.6],[-0.6,-0.6],[-2.1,-0.6],[-4.7,-0.6],[-7.9,-0.6],[-11.2,0.3],[-18.2,3.8],[-26.2,7.9],[-33.8,13.2],[-42.3,20.0],[-50.9,27.6],[-56.7,34.7],[-62.0,43.5],[-63.2,50.3],[-63.8,54.7],[-60.0,60.3],[-51.7,65.3],[-38.2,69.1],[-21.5,72.3],[-3.5,73.8],[16.5,75.0],[36.7,75.0],[66.7,75.0],[74.4,75.8],[76.1,75.8],[76.1,76.1],[75.6,76.7],[71.1,77.9],[59.7,80.5],[46.2,85.0],[33.5,89.1],[21.2,95.0],[12.6,101.1],[6.8,106.7],[4.4,112.6],[4.4,116.4],[5.6,119.9],[10.3,124.1],[18.8,127.3],[32.0,129.6],[47.3,131.7],[62.6,131.7],[80.5,131.7],[97.3,129.1],[114.4,126.4],[139.0,123.5],[147.0,122.0],[150.2,122.0],[152.9,121.7],[154.6,120.2],[155.8,118.5],[157.9,114.1],[162.0,104.9],[167.0,93.2],[172.3,81.4],[177.3,69.7],[181.4,60.6],[184.6,52.0],[186.4,46.2],[187.3,42.3],[187.8,39.7],[187.8,37.6],[187.8,36.2],[185.5,34.4],[181.1,32.0],[172.9,29.4],[158.7,25.0],[144.3,21.8],[128.2,19.1],[100.0,14.4],[90.8,13.2],[86.7,12.1],[85.8,11.5],[85.5,11.5],[85.5,11.2],[86.1,10.9],[87.6,9.7],[88.8,7.9],[89.4,6.5],[89.4,5.6],[89.4,4.4],[86.7,2.9],[81.4,1.5],[74.1,0.3],[62.6,-0.6],[50.9,-1.2],[42.0,-1.2],[31.7,-1.2],[23.2,-0.6],[17.1,0.6],[12.1,1.5],[9.7,2.1],[8.5,2.1],[7.9,2.1],[7.6,2.1],[7.3,2.1],[6.5,1.5],[4.7,0],[1.8,-1.2],[-1.5,-2.4],[-5.6,-2.9],[-10.0,-3.8],[-14.7,-4.1],[-17.6,-4.4],[-21.5,-5.3],[-23.8,-5.6],[-25.6,-5.9],[-26.8,-6.2],[-27.0,-6.2],[-27.3,-6.2],[-27.3,-5.3],[-27.3,-4.4],[-26.8,-2.9],[-25.9,-1.5],[-24.7,-0.3],[-24.1,0.3],[-23.2,1.2],[-22.6,1.5],[-22.0,1.8],[-21.8,2.1],[-21.5,2.1],[-21.5,2.1]];
+    const blob = API.createElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      width: 252,
+      height: 138,
+      points: BLOB_POINTS.map((p) => pointFrom<LocalPoint>(p[0], p[1])),
+    });
+    const { elements, elementsMap } = setup([
+      blob as NonDeletedExcalidrawElement,
+    ]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(126, 69),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(polygonArea(result.scenePoints)).toBeGreaterThan(15000);
   });
 
   describe("islands (holes)", () => {
