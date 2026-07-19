@@ -991,6 +991,122 @@ describe("computeBucketFillPolygon", () => {
     expect(result.ownerId).toBe(rect.id);
   });
 
+  it("an opaque prior fill hides strokes beneath it from new fills", () => {
+    // the line crossing the rect would normally split it in two — but it
+    // lies UNDER an opaque fill, so the user can't see it and it must not
+    // stop the new fill either
+    const buried = API.createElement({
+      type: "line",
+      x: -5,
+      y: 50,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(110, 0)],
+    });
+    const priorFill = API.createElement({
+      type: "line",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 0),
+        pointFrom<LocalPoint>(100, 100),
+        pointFrom<LocalPoint>(0, 100),
+        pointFrom<LocalPoint>(0, 0),
+      ],
+      polygon: true,
+      backgroundColor: "#b2f2bb",
+      fillStyle: "solid",
+      strokeColor: "transparent",
+    });
+    (priorFill as any).customData = { bucketFill: { version: 1 } };
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    // realistic fill stacking: buried line lowest, fill above it, owner on top
+    const { elements, elementsMap } = setup([buried, priorFill, rect]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 25),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    // the whole rect, not the top half the buried line would carve out
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -2);
+    expect(result.boundaryElementIds).not.toContain(buried.id);
+  });
+
+  it("a fill given a visible stroke afterwards acts as a boundary", () => {
+    const strokedFill = API.createElement({
+      type: "line",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 0),
+        pointFrom<LocalPoint>(100, 100),
+        pointFrom<LocalPoint>(0, 100),
+        pointFrom<LocalPoint>(0, 0),
+      ],
+      polygon: true,
+      backgroundColor: "#b2f2bb",
+      fillStyle: "solid",
+      strokeColor: "#1e1e1e",
+    });
+    (strokedFill as any).customData = { bucketFill: { version: 1 } };
+    const outer = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    const { elements, elementsMap } = setup([strokedFill, outer]);
+
+    const annulus = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(25, 100),
+      elements,
+      elementsMap,
+    });
+
+    expect(annulus.ok).toBe(true);
+    if (!annulus.ok) {
+      return;
+    }
+    // the stroked fill is a visible outline now: it islands the region
+    expect(polygonArea(annulus.scenePoints)).toBeCloseTo(30000, -2);
+    expect(annulus.boundaryElementIds).toContain(strokedFill.id);
+
+    // ...but a fill still never becomes an OWNER: clicking inside it falls
+    // through to the rect while the fill's outline bounds the region
+    const inside = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(100, 100),
+      elements,
+      elementsMap,
+    });
+    expect(inside.ok).toBe(true);
+    if (!inside.ok) {
+      return;
+    }
+    expect(inside.ownerId).toBe(outer.id);
+    expect(polygonArea(inside.scenePoints)).toBeCloseTo(10000, -2);
+  });
+
   describe("islands (holes)", () => {
     const rect = (x: number, y: number, size: number) =>
       API.createElement({

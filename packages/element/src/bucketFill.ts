@@ -449,9 +449,9 @@ const FILL_BOUNDARY_TYPES = new Set<ExcalidrawElement["type"]>([
   "freedraw",
 ]);
 
-/** invisible or generated elements never participate in a fill */
-const isExcludedFromFill = (element: ExcalidrawElement): boolean =>
-  element.opacity <= 0 || isBucketFill(element);
+/** fully invisible elements never participate in a fill */
+const isInvisible = (element: ExcalidrawElement): boolean =>
+  element.opacity <= 0;
 
 const isClosedOwnerCandidate = (element: ExcalidrawElement): boolean => {
   if (!FILL_BOUNDARY_TYPES.has(element.type)) {
@@ -466,8 +466,13 @@ const isClosedOwnerCandidate = (element: ExcalidrawElement): boolean => {
   return true;
 };
 
+// Boundary and coverer roles are decided by VISIBILITY, not provenance:
+// generated fills participate like any other element. In practice their
+// default transparent stroke keeps them out of the boundary set — but once
+// the user gives a fill a visible stroke, that outline genuinely bounds
+// regions on screen and must bound new fills too.
 const isEligibleBoundary = (element: ExcalidrawElement): boolean =>
-  !isExcludedFromFill(element) &&
+  !isInvisible(element) &&
   FILL_BOUNDARY_TYPES.has(element.type) &&
   // skip outlines that don't render a visible stroke
   !isTransparent(element.strokeColor);
@@ -479,7 +484,11 @@ const findOwner = (
 ): NonDeletedExcalidrawElement | null => {
   for (let i = elements.length - 1; i >= 0; i--) {
     const element = elements[i];
-    if (isExcludedFromFill(element)) {
+    // generated fills are deliberately never OWNERS (unlike boundary /
+    // coverer roles): re-clicking a filled region should re-derive the
+    // region from the actual strokes, not from the previous fill's ring —
+    // and keyhole rings (zero-width bridges) make degenerate owner outlines
+    if (isInvisible(element) || isBucketFill(element)) {
       continue;
     }
     if (!isClosedOwnerCandidate(element)) {
@@ -1274,12 +1283,11 @@ export const computeBucketFillPolygon = (args: {
         isEligibleBoundary(element) &&
         inRange(element),
     );
-    // the opaque elements that hide outlines beneath them
+    // the opaque elements that hide outlines beneath them — including
+    // existing bucket fills: an outline buried under an opaque fill is
+    // invisible, so it must not stop a new fill either
     const coverers = elements.filter(
-      (element) =>
-        !isBucketFill(element) &&
-        rendersOpaqueFill(element) &&
-        inRange(element),
+      (element) => rendersOpaqueFill(element) && inRange(element),
     );
 
     const rawSegments: SourceSegment[] = [];
