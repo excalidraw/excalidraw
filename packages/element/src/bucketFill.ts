@@ -8,13 +8,19 @@ import {
   pointDistance,
   pointFrom,
   pointRotateRads,
+  polygonIncludesPoint,
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
 import { isTransparent } from "@excalidraw/common";
 
 import type { Bounds } from "@excalidraw/common";
-import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
+import type {
+  GlobalPoint,
+  LineSegment,
+  LocalPoint,
+  Polygon,
+} from "@excalidraw/math";
 
 import {
   doBoundsIntersect,
@@ -25,7 +31,12 @@ import {
 import { intersectElementWithLineSegment, isPointInElement } from "./collision";
 import { hasBackground } from "./comparisons";
 import { getFreedrawStrokeCenterPoints } from "./shape";
-import { isFreeDrawElement, isLineElement, isValidPolygon } from "./typeChecks";
+import {
+  isFreeDrawElement,
+  isLinearElement,
+  isLineElement,
+  isValidPolygon,
+} from "./typeChecks";
 import { isPathALoop } from "./utils";
 
 import type { Point } from "points-on-curve";
@@ -205,6 +216,20 @@ const signedArea = (pts: GlobalPoint[]): number => {
     area += (pts[j][0] + pts[i][0]) * (pts[j][1] - pts[i][1]);
   }
   return area / 2;
+};
+
+const ringBounds = (ring: readonly GlobalPoint[]): Bounds => {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of ring) {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+  return [minX, minY, maxX, maxY];
 };
 
 /** Parametric position of `q` projected onto the line through a-b. */
@@ -1549,18 +1574,28 @@ export const computeBucketFillPolygon = (args: {
     }
   }
 
-  // 6. z-order: the fill should sit above any participating element whose
-  // opaque background would otherwise render over (hide) it, but below
-  // participants that only contribute an outline, so their borders stay
-  // visible. A participant "covers" the fill when it paints an opaque
-  // background (same predicate boundary clipping uses) and the filled
-  // region lies inside it (the click lands inside).
+  // 6. z-order. Two constraints, applied over ALL scene elements (not just
+  // the region's participants):
   //
-  // Deliberately includes ALL islands — even ones whose hole could not be
-  // spliced under the point budget (and is thus absent from
-  // `boundaryElementIds`): the fill paints straight through a dropped
-  // island, so keeping the fill below it is what keeps the island visible
-  // at all.
+  // - the fill goes ABOVE the topmost opaque element containing the click
+  //   (same "covers" predicate boundary clipping uses) — anything whose
+  //   opaque background would otherwise hide the fill;
+  // - otherwise it goes BELOW the lowest element that must stay visible:
+  //   every participant (their outlines border the fill; deliberately
+  //   including islands whose hole was dropped for the point budget — the
+  //   fill paints straight through those, so staying below them is what
+  //   keeps them visible at all), plus any visible NON-participant whose
+  //   mark lies inside the region (a floating line, a label, an icon — an
+  //   opaque fill would bury them). A visible stroke merely CROSSING the
+  //   region would have subdivided the face and be a participant already,
+  //   so sampling the element center + path points is enough to catch the
+  //   wholly-inside marks that remain. The even-odd containment matches
+  //   the render rule, so elements inside a keyhole hole are correctly NOT
+  //   constrained (the fill doesn't paint there).
+  //
+  // When both constraints apply, above-the-coverer wins: anything below
+  // the coverer is hidden by it anyway, so placing the fill above changes
+  // nothing the user can see.
   const participantIds = new Set<string>(
     owner ? [owner.id, ...contributors] : contributors,
   );
@@ -1569,13 +1604,58 @@ export const computeBucketFillPolygon = (args: {
       participantIds.add(id);
     }
   }
-  let lowestParticipant: ExcalidrawElement | null = null;
+
+  const fillRegion = scenePoints as unknown as Polygon<GlobalPoint>;
+  const [regionMinX, regionMinY, regionMaxX, regionMaxY] =
+    ringBounds(scenePoints);
+  const rendersAnyMark = (element: ExcalidrawElement): boolean =>
+    !isInvisible(element) &&
+    (element.type === "image" ||
+      // stroke — doubles as the text color for text elements
+      !isTransparent(element.strokeColor) ||
+      (hasBackground(element.type) && !isTransparent(element.backgroundColor)));
+  const markInsideRegion = (element: ExcalidrawElement): boolean => {
+    const [minX, minY, maxX, maxY] = getElementBounds(element, elementsMap);
+    if (
+      maxX < regionMinX ||
+      minX > regionMaxX ||
+      maxY < regionMinY ||
+      minY > regionMaxY
+    ) {
+      return false;
+    }
+    const samples: GlobalPoint[] = [
+      pointFrom<GlobalPoint>((minX + maxX) / 2, (minY + maxY) / 2),
+    ];
+    if (isLinearElement(element) || isFreeDrawElement(element)) {
+      const center = elementCenterPoint(element, elementsMap);
+      const step = Math.max(1, Math.floor(element.points.length / 8));
+      for (let i = 0; i < element.points.length; i += step) {
+        samples.push(
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              element.x + element.points[i][0],
+              element.y + element.points[i][1],
+            ),
+            center,
+            element.angle,
+          ),
+        );
+      }
+    }
+    return samples.some((sample) => polygonIncludesPoint(sample, fillRegion));
+  };
+
+  let lowestAbove: ExcalidrawElement | null = null;
   let covering: ExcalidrawElement | null = null;
   for (const element of elements) {
-    if (!participantIds.has(element.id)) {
+    const mustStayAbove =
+      participantIds.has(element.id) ||
+      (rendersAnyMark(element) && markInsideRegion(element));
+    if (!mustStayAbove) {
       continue;
     }
-    lowestParticipant = lowestParticipant ?? element;
+    lowestAbove = lowestAbove ?? element;
     if (
       rendersOpaqueFill(element) &&
       isPointInElement(point, element, elementsMap)
@@ -1589,7 +1669,7 @@ export const computeBucketFillPolygon = (args: {
     ? { placement: "above", elementId: covering.id }
     : {
         placement: "below",
-        elementId: (lowestParticipant ?? elements[elements.length - 1]).id,
+        elementId: (lowestAbove ?? elements[elements.length - 1]).id,
       };
 
   return {
@@ -1600,20 +1680,6 @@ export const computeBucketFillPolygon = (args: {
     scenePoints,
     insertion,
   };
-};
-
-const ringBounds = (ring: readonly GlobalPoint[]): Bounds => {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const [x, y] of ring) {
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
-  }
-  return [minX, minY, maxX, maxY];
 };
 
 /**

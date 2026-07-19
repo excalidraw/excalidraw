@@ -1025,6 +1025,133 @@ describe("computeBucketFillPolygon", () => {
     expect(result.ownerId).toBe(rect.id);
   });
 
+  it("inserts below a visible non-contributor inside the region", () => {
+    // a floating line inside the rect doesn't subdivide the region (its
+    // dangling chain forms no face), so it isn't a contributor — but it's
+    // visible, and an opaque fill above it would bury it
+    const floating = API.createElement({
+      type: "line",
+      x: 30,
+      y: 50,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(40, 0)],
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    // scene order: line lowest — the fill must slot in below it
+    const { elements, elementsMap } = setup([floating, rect]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(10, 10),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.insertion).toEqual({
+      placement: "below",
+      elementId: floating.id,
+    });
+  });
+
+  it("inserts below a text label inside the region", () => {
+    const label = API.createElement({
+      type: "text",
+      x: 30,
+      y: 40,
+      text: "hi",
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    const { elements, elementsMap } = setup([label, rect]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(10, 10),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.insertion).toEqual({
+      placement: "below",
+      elementId: label.id,
+    });
+  });
+
+  it("inserts above a covering non-participant (sub-region refill)", () => {
+    // whole-rect fill exists; a line then subdivides the region and the top
+    // half is filled anew — the new fill must go ABOVE the old opaque fill
+    // (not below the participants, where the old fill would hide it)
+    const oldFill = API.createElement({
+      type: "line",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 0),
+        pointFrom<LocalPoint>(100, 100),
+        pointFrom<LocalPoint>(0, 100),
+        pointFrom<LocalPoint>(0, 0),
+      ],
+      polygon: true,
+      backgroundColor: "#b2f2bb",
+      fillStyle: "solid",
+      strokeColor: "transparent",
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    const splitter = API.createElement({
+      type: "line",
+      x: -5,
+      y: 50,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(110, 0)],
+    });
+    const { elements, elementsMap } = setup([oldFill, rect, splitter]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 25),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.insertion).toEqual({
+      placement: "above",
+      elementId: oldFill.id,
+    });
+  });
+
   it("an opaque prior fill hides strokes beneath it from new fills", () => {
     // the line crossing the rect would normally split it in two — but it
     // lies UNDER an opaque fill, so the user can't see it and it must not
