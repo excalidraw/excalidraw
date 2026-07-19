@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EditorJotaiProvider } from "../editor-jotai";
 
+import { evictAssistantPreviews } from "./useAIAssistantPreview";
 import { useTTAChatHistory } from "./useTTAChatHistory";
 
 import type {
@@ -11,6 +12,10 @@ import type {
   ChatMessage,
   TTAPersistenceAdapter,
 } from "./types";
+
+vi.mock("./useAIAssistantPreview", () => ({
+  evictAssistantPreviews: vi.fn(),
+}));
 
 const userMessage = (id: string, content: string): ChatMessage => ({
   id,
@@ -169,9 +174,22 @@ describe("useTTAChatHistory", () => {
     });
   });
 
-  it("deletes a chat from state and storage", async () => {
+  it("deletes a chat from state and storage and evicts its cached previews", async () => {
+    const storedChat: ChatConversation = {
+      ...chat("chat-1", 100),
+      messages: [
+        userMessage("user-1", "draw a cat"),
+        {
+          id: "assistant-1",
+          role: "assistant",
+          createdAt: 2,
+          skeletons: [],
+          status: { kind: "done", elapsedMs: 5, outcome: "generated" },
+        },
+      ],
+    };
     const adapter: TTAPersistenceAdapter = {
-      loadChats: vi.fn().mockResolvedValue([chat("chat-1", 100)]),
+      loadChats: vi.fn().mockResolvedValue([storedChat]),
       saveChat: vi.fn().mockResolvedValue(undefined),
       deleteChat: vi.fn().mockResolvedValue(undefined),
     };
@@ -190,5 +208,7 @@ describe("useTTAChatHistory", () => {
       expect(hookRef.current!.chatHistory).toHaveLength(0);
     });
     expect(adapter.deleteChat).toHaveBeenCalledWith("chat-1");
+    // M7: the deleted chat's assistant thumbnails leave the preview cache
+    expect(evictAssistantPreviews).toHaveBeenCalledWith(["assistant-1"]);
   });
 });

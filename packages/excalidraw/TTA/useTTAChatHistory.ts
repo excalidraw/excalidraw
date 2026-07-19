@@ -7,6 +7,7 @@ import {
   compareConversationsByUpdatedAt,
   getConversationTitle,
 } from "./chatHelpers";
+import { evictAssistantPreviews } from "./useAIAssistantPreview";
 
 import type {
   ChatConversation,
@@ -225,12 +226,21 @@ export const useTTAChatHistory = ({
       if (!chatId) {
         return;
       }
-      setChatHistory((prev) => prev.filter((chat) => chat.id !== chatId));
+      // M7: drop the deleted chat's thumbnails from the preview LRU cache
+      const chat = chatHistory.find((entry) => entry.id === chatId);
+      if (chat) {
+        evictAssistantPreviews(
+          chat.messages
+            .filter((chatMessage) => chatMessage.role === "assistant")
+            .map((chatMessage) => chatMessage.id),
+        );
+      }
+      setChatHistory((prev) => prev.filter((entry) => entry.id !== chatId));
       void persistenceAdapter.deleteChat(chatId).catch((error) => {
         console.warn("[AI Chat] Failed to delete chat:", error);
       });
     },
-    [persistenceAdapter, setChatHistory],
+    [chatHistory, persistenceAdapter, setChatHistory],
   );
 
   const latestHistoryChat = useMemo(() => {
