@@ -40,6 +40,7 @@ import {
   RectangleToolButton,
   SelectionToolButton,
   SelectionToolPopover,
+  StickyNoteToolButton,
   TextToolButton,
 } from "./Tools";
 
@@ -287,6 +288,7 @@ export const Toolbar = ({
           <FreedrawToolButton {...toolProps} />
         )}
         <TextToolButton {...toolProps} />
+        <StickyNoteToolButton {...toolProps} />
         {UIOptions.tools?.image !== false && <ImageToolButton {...toolProps} />}
         <EraserToolButton {...toolProps} />
 

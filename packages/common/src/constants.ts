@@ -211,6 +211,18 @@ export const FRAME_STYLE = {
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
+export const STICKY_NOTE_MIN_FONT_SIZE = 16;
+export const STICKY_NOTE_DEFAULT_FONT_SIZE = 28;
+export const STICKY_NOTE_FONT_STEP = 2;
+export const STICKY_NOTE_PADDING = 16;
+export const DEFAULT_STICKY_NOTE_SIZE = 250;
+export const STICKY_NOTE_MIN_BASE_WIDTH = 40;
+export const STICKY_NOTE_MIN_BASE_HEIGHT = 40;
+export const DEFAULT_STICKY_NOTE_BG = "#ffd43b";
+export const STICKY_NOTE_SHADOW_OFFSET = 3;
+export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
+export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
+export const STICKY_NOTE_EDGE_SHADOW_OPACITY = 0.05;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
@@ -497,6 +509,7 @@ export const TOOL_TYPE = {
   hand: "hand",
   frame: "frame",
   magicframe: "magicframe",
+  stickynote: "stickynote",
   embeddable: "embeddable",
   laser: "laser",
   autoshape: "autoshape",

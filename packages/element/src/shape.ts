@@ -226,6 +226,7 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
+    case "stickynote":
     case "iframe":
     case "embeddable":
     case "diamond":
@@ -767,9 +768,15 @@ const _generateElementShape = (
   const isDarkMode = theme === THEME.DARK;
   switch (element.type) {
     case "rectangle":
+    case "stickynote":
     case "iframe":
     case "embeddable": {
-      let shape: ElementShapes[typeof element.type];
+      let shape: ElementShapes[
+        | "rectangle"
+        | "stickynote"
+        | "iframe"
+        | "embeddable"
+      ];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
 
@@ -1073,6 +1080,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
 ): GeometricShape<Point> => {
   switch (element.type) {
     case "rectangle":
+    case "stickynote":
     case "diamond":
     case "frame":
     case "magicframe":

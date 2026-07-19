@@ -58,6 +58,9 @@ import {
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
+  DEFAULT_STICKY_NOTE_SIZE,
+  STICKY_NOTE_MIN_BASE_HEIGHT,
+  STICKY_NOTE_MIN_BASE_WIDTH,
   isLocalLink,
   normalizeLink,
   toValidURL,
@@ -127,6 +130,7 @@ import {
   newFreeDrawElement,
   newEmbeddableElement,
   newMagicFrameElement,
+  newStickyNoteElement,
   newIframeElement,
   newArrowElement,
   newElement,
@@ -155,6 +159,7 @@ import {
   isElbowArrow,
   isBindableElement,
   isTextElement,
+  isStickyNoteElement,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -171,6 +176,9 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
+  computeBoundTextPosition,
+  computeStickyNoteTextLayout,
+  normalizeStickyNoteStrokeColor,
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
@@ -274,6 +282,7 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
+  ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeLikeElement,
@@ -677,6 +686,7 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
+  private shouldSuppressStickyNoteCreationPreview = false;
 
   private _initialized = false;
 
@@ -2314,7 +2324,11 @@ class App extends React.Component<AppProps, AppState> {
       height: this.state.height,
       width: this.state.width,
       editingTextElement: this.state.editingTextElement,
-      newElement: this.state.newElement,
+      newElement:
+        this.shouldSuppressStickyNoteCreationPreview &&
+        isStickyNoteElement(this.state.newElement)
+          ? null
+          : this.state.newElement,
       selectedElements,
       selectedElementsAreBeingDragged:
         this.state.selectedElementsAreBeingDragged,
@@ -3007,7 +3021,15 @@ class App extends React.Component<AppProps, AppState> {
         ) {
           if (shouldUpdateStrokeColor) {
             this.syncActionResult({
-              appState: { ...this.state, currentItemStrokeColor: color },
+              appState: {
+                ...this.state,
+                ...(this.state.activeTool.type === "stickynote"
+                  ? {
+                      currentItemStickynoteStrokeColor:
+                        normalizeStickyNoteStrokeColor(color),
+                    }
+                  : { currentItemStrokeColor: color }),
+              },
               captureUpdate: CaptureUpdateAction.IMMEDIATELY,
             });
           } else {
@@ -3020,9 +3042,13 @@ class App extends React.Component<AppProps, AppState> {
           this.updateScene({
             elements: this.scene.getElementsIncludingDeleted().map((el) => {
               if (this.state.selectedElementIds[el.id]) {
+                const nextColor =
+                  shouldUpdateStrokeColor && isStickyNoteElement(el)
+                    ? normalizeStickyNoteStrokeColor(color)
+                    : color;
                 return newElementWith(el, {
                   [shouldUpdateStrokeColor ? "strokeColor" : "backgroundColor"]:
-                    color,
+                    nextColor,
                 });
               }
               return el;
@@ -6264,20 +6290,71 @@ class App extends React.Component<AppProps, AppState> {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
+      const latestTextElement = this.scene.getElement<ExcalidrawTextElement>(
+        element.id,
+      );
+
+      if (!latestTextElement || !isTextElement(latestTextElement)) {
+        return;
+      }
+
+      const container = getContainerElement(latestTextElement, elementsMap);
+      const stickyLayout =
+        container && isStickyNoteElement(container)
+          ? computeStickyNoteTextLayout(
+              container,
+              latestTextElement,
+              nextOriginalText,
+            )
+          : null;
+      const stickyTextPosition =
+        stickyLayout && container && isStickyNoteElement(container)
+          ? computeBoundTextPosition(
+              { ...container, ...stickyLayout.container },
+              {
+                ...latestTextElement,
+                text: stickyLayout.text,
+                fontSize: stickyLayout.fontSize,
+                width: stickyLayout.width,
+                height: stickyLayout.height,
+              } as ExcalidrawTextElementWithContainer,
+              elementsMap,
+            )
+          : null;
+
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
-          if (_element.id === element.id && isTextElement(_element)) {
+          if (
+            stickyLayout &&
+            container &&
+            _element.id === container.id &&
+            isStickyNoteElement(_element)
+          ) {
+            return newElementWith(_element, stickyLayout.container);
+          }
+          if (_element.id === latestTextElement.id && isTextElement(_element)) {
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
+              ...(stickyLayout && stickyTextPosition
+                ? {
+                    text: stickyLayout.text,
+                    fontSize: stickyLayout.fontSize,
+                    width: stickyLayout.width,
+                    height: stickyLayout.height,
+                    ...stickyTextPosition,
+                  }
+                : {}),
               // returns (wrapped) text and new dimensions
-              ...refreshTextDimensions(
-                _element,
-                getContainerElement(_element, elementsMap),
-                elementsMap,
-                nextOriginalText,
-              ),
+              ...(stickyLayout
+                ? {}
+                : refreshTextDimensions(
+                    _element,
+                    getContainerElement(_element, elementsMap),
+                    elementsMap,
+                    nextOriginalText,
+                  )),
             });
           }
           return _element;
@@ -6845,7 +6922,8 @@ class App extends React.Component<AppProps, AppState> {
       !existingTextElement &&
       shouldBindToContainer &&
       container &&
-      !isArrowElement(container)
+      !isArrowElement(container) &&
+      !isStickyNoteElement(container)
     ) {
       const fontString = {
         fontSize,
@@ -6918,7 +6996,10 @@ class App extends React.Component<AppProps, AppState> {
       newTextElement({
         x: newTextElementPosition.x,
         y: newTextElementPosition.y,
-        strokeColor: this.state.currentItemStrokeColor,
+        strokeColor:
+          shouldBindToContainer && isStickyNoteElement(container)
+            ? this.state.currentItemStickynoteStrokeColor
+            : this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.getCurrentItemStrokeWidth("text"),
@@ -6927,6 +7008,10 @@ class App extends React.Component<AppProps, AppState> {
         opacity: this.state.currentItemOpacity,
         text: "",
         fontSize,
+        fontSizeMax:
+          shouldBindToContainer && isStickyNoteElement(container)
+            ? fontSize
+            : undefined,
         fontFamily,
         textAlign:
           arrowEndpointBinding?.textAlign ??
@@ -10387,6 +10472,7 @@ class App extends React.Component<AppProps, AppState> {
     elementType:
       | "selection"
       | "rectangle"
+      | "stickynote"
       | "diamond"
       | "ellipse"
       | "iframe"
@@ -10409,7 +10495,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createGenericElementOnPointerDown = (
-    elementType: ExcalidrawGenericElement["type"] | "embeddable",
+    elementType:
+      | ExcalidrawGenericElement["type"]
+      | "embeddable"
+      | "stickynote",
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -10428,7 +10517,10 @@ class App extends React.Component<AppProps, AppState> {
     const baseElementAttributes = {
       x: gridX,
       y: gridY,
-      strokeColor: this.state.currentItemStrokeColor,
+      strokeColor:
+        elementType === "stickynote"
+          ? this.state.currentItemStickynoteStrokeColor
+          : this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.getCurrentItemStrokeWidth(elementType),
@@ -10446,6 +10538,11 @@ class App extends React.Component<AppProps, AppState> {
         type: "embeddable",
         ...baseElementAttributes,
       });
+    } else if (elementType === "stickynote") {
+      element = newStickyNoteElement({
+        type: "stickynote",
+        ...baseElementAttributes,
+      });
     } else {
       element = newElement({
         type: elementType,
@@ -10456,6 +10553,12 @@ class App extends React.Component<AppProps, AppState> {
     if (element.type === "selection") {
       this.setState({
         selectionElement: element,
+      });
+    } else if (element.type === "stickynote") {
+      this.shouldSuppressStickyNoteCreationPreview = true;
+      this.setState({
+        multiElement: null,
+        newElement: element,
       });
     } else {
       this.insertNewElement(element);
@@ -11910,6 +12013,66 @@ class App extends React.Component<AppProps, AppState> {
         this.handleTextWysiwyg(newElement, {
           isExistingElement: true,
         });
+      }
+
+      if (newElement && isStickyNoteElement(newElement)) {
+        const shouldUseDefaultSize = !pointerDownState.drag.hasOccurred;
+        const size = DEFAULT_STICKY_NOTE_SIZE;
+        const nextWidth = shouldUseDefaultSize ? size : newElement.width;
+        const nextHeight = shouldUseDefaultSize ? size : newElement.height;
+        const nextX = shouldUseDefaultSize
+          ? pointerDownState.origin.x - size / 2
+          : newElement.x;
+        const nextY = shouldUseDefaultSize
+          ? pointerDownState.origin.y - size / 2
+          : newElement.y;
+
+        this.scene.mutateElement(
+          newElement,
+          {
+            x: nextX,
+            y: nextY,
+            width: nextWidth,
+            height: nextHeight,
+            baseHeight: nextHeight,
+          },
+          {
+            informMutation: false,
+            isDragging: false,
+          },
+        );
+
+        this.shouldSuppressStickyNoteCreationPreview = false;
+
+        if (!this.scene.getElement(newElement.id)) {
+          this.insertNewElement(newElement);
+        }
+
+        this.store.scheduleCapture();
+        this.scene.triggerUpdate();
+
+        if (activeTool.locked) {
+          this.setState((prevState) => ({
+            newElement: null,
+            selectedElementIds: makeNextSelectedElementIds({}, prevState),
+          }));
+          this.cursor.applyForTool();
+          return;
+        }
+
+        this.cursor.reset();
+        this.setState({
+          newElement: null,
+          activeTool: updateActiveTool(this.state, {
+            type: this.state.preferredSelectionTool.type,
+          }),
+        });
+        this.startTextEditing({
+          sceneX: newElement.x + newElement.width / 2,
+          sceneY: newElement.y + newElement.height / 2,
+          container: newElement,
+        });
+        return;
       }
 
       if (
@@ -13393,6 +13556,30 @@ class App extends React.Component<AppProps, AppState> {
     gridX += snapOffset.x;
     gridY += snapOffset.y;
 
+    const isDraggingStickyNote = isStickyNoteElement(newElement);
+    const hasDraggedStickyNote =
+      isDraggingStickyNote &&
+      (gridX !== pointerDownState.originInGrid.x ||
+        gridY !== pointerDownState.originInGrid.y);
+    const nextWidth =
+      hasDraggedStickyNote
+        ? Math.max(
+            distance(pointerDownState.originInGrid.x, gridX),
+            STICKY_NOTE_MIN_BASE_WIDTH,
+          )
+        : distance(pointerDownState.originInGrid.x, gridX);
+    const nextHeight =
+      hasDraggedStickyNote
+        ? Math.max(
+            distance(pointerDownState.originInGrid.y, gridY),
+            STICKY_NOTE_MIN_BASE_HEIGHT,
+          )
+        : distance(pointerDownState.originInGrid.y, gridY);
+
+    if (hasDraggedStickyNote) {
+      pointerDownState.drag.hasOccurred = true;
+    }
+
     this.setState({
       snapLines,
     });
@@ -13405,8 +13592,8 @@ class App extends React.Component<AppProps, AppState> {
         originY: pointerDownState.originInGrid.y,
         x: gridX,
         y: gridY,
-        width: distance(pointerDownState.originInGrid.x, gridX),
-        height: distance(pointerDownState.originInGrid.y, gridY),
+        width: nextWidth,
+        height: nextHeight,
         shouldMaintainAspectRatio: isImageElement(newElement)
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
@@ -13417,6 +13604,10 @@ class App extends React.Component<AppProps, AppState> {
         originOffset: this.state.originSnapOffset,
         informMutation,
       });
+    }
+
+    if (hasDraggedStickyNote) {
+      this.shouldSuppressStickyNoteCreationPreview = false;
     }
 
     this.setState({

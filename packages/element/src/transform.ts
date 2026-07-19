@@ -665,6 +665,12 @@ export const convertToExcalidrawElements = (
       }
 
       default: {
+        if ((element as { type?: string }).type === "stickynote") {
+          console.error(
+            'ExcalidrawElementSkeleton type "stickynote" is not supported yet.',
+          );
+          continue;
+        }
         excalidrawElement = element;
         assertNever(
           element,

@@ -19,12 +19,14 @@ import {
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
+  normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 
 import {
   hasBoundTextElement,
   isArrowElement,
+  isStickyNoteElement,
   isTextBindableContainer,
   isTextElement,
   isUsingAdaptiveRadius,
@@ -87,6 +89,7 @@ export const actionUnbindText = register({
           width,
           height,
           text: boundTextElement.originalText,
+          fontSizeMax: undefined,
           x,
           y,
           labelPosition: null,
@@ -165,6 +168,13 @@ export const actionBindText = register({
       labelPosition: isArrowElement(container)
         ? DEFAULT_BOUND_TEXT_LABEL_POSITION
         : null,
+      ...(isStickyNoteElement(container)
+        ? {
+            fontSizeMax: normalizeStickyNoteFontSize(
+              textElement.fontSizeMax ?? textElement.fontSize,
+            ),
+          }
+        : null),
     });
     app.scene.mutateElement(container, {
       boundElements: (container.boundElements || []).concat({

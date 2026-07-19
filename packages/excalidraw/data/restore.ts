@@ -45,7 +45,11 @@ import {
   validateElbowPoints,
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
-import { bumpVersion } from "@excalidraw/element";
+import {
+  bumpVersion,
+  clampStickyNoteProps,
+  normalizeStickyNoteStrokeColor,
+} from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
@@ -222,6 +226,7 @@ export const AllowedExcalidrawActiveTools: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  stickynote: true,
   eraser: false,
   custom: true,
   frame: true,
@@ -560,6 +565,7 @@ export const restoreElement = (
         labelPosition: isFiniteNumber(element.labelPosition)
           ? clamp(element.labelPosition, 0, 1)
           : null,
+        fontSizeMax: element.fontSizeMax,
       });
 
       // if empty text, mark as deleted. We keep in array
@@ -711,6 +717,15 @@ export const restoreElement = (
     case "iframe":
     case "embeddable":
       return restoreElementWithProperties(element, {});
+    case "stickynote":
+      return clampStickyNoteProps(
+        restoreElementWithProperties(element, {
+          baseHeight:
+            element.baseHeight ??
+            (element as typeof element & { maxHeight?: number }).maxHeight ??
+            element.height,
+        }),
+      );
     case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {
@@ -1238,6 +1253,9 @@ export const restoreAppState = (
     ),
     gridStep: getNormalizedGridStep(
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
+    ),
+    currentItemStickynoteStrokeColor: normalizeStickyNoteStrokeColor(
+      nextAppState.currentItemStickynoteStrokeColor,
     ),
     editingFrame: null,
   };

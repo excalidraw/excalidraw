@@ -1,6 +1,11 @@
 import React from "react";
 
-import { CODES, STROKE_WIDTH } from "@excalidraw/common";
+import {
+  CODES,
+  COLOR_PALETTE,
+  ROUNDNESS,
+  STROKE_WIDTH,
+} from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -84,5 +89,69 @@ describe("actionStyles", () => {
     expect(firstRect.strokeStyle).toBe("dotted");
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);
+  });
+
+  it("should show and apply roughness for sticky notes", async () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      roughness: 0,
+    });
+
+    API.setElements([stickyNote]);
+    API.setSelectedElements([stickyNote]);
+
+    fireEvent.click(screen.getByTitle("Cartoonist"));
+
+    expect(API.getSelectedElement().roughness).toBe(2);
+  });
+
+  it("should show and apply roundness for sticky notes", async () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      roundness: null,
+    });
+
+    API.setElements([stickyNote]);
+    API.setSelectedElements([stickyNote]);
+
+    fireEvent.click(screen.getByTitle("Round"));
+
+    expect(API.getSelectedElement().roundness).toEqual({
+      type: ROUNDNESS.PROPORTIONAL_RADIUS,
+    });
+  });
+
+  it("should hide transparent stroke color for sticky notes", async () => {
+    UI.clickTool("stickynote");
+
+    togglePopover("Stroke");
+
+    expect(screen.queryByTestId("color-transparent")).toBeNull();
+    expect(document.querySelector(".color-picker__button--hidden")).not.toBe(
+      null,
+    );
+  });
+
+  it("should track sticky note stroke color separately", async () => {
+    API.setAppState({
+      currentItemStrokeColor: COLOR_PALETTE.red[4],
+      currentItemStickynoteStrokeColor: COLOR_PALETTE.black,
+    });
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      strokeColor: COLOR_PALETTE.black,
+    });
+
+    API.setElements([stickyNote]);
+    API.setSelectedElements([stickyNote]);
+
+    togglePopover("Stroke");
+    UI.clickOnTestId("color-blue");
+
+    expect(API.getSelectedElement().strokeColor).toBe(COLOR_PALETTE.blue[4]);
+    expect(h.state.currentItemStickynoteStrokeColor).toBe(
+      COLOR_PALETTE.blue[4],
+    );
+    expect(h.state.currentItemStrokeColor).toBe(COLOR_PALETTE.red[4]);
   });
 });

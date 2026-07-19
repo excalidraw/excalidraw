@@ -25,7 +25,11 @@ import {
 } from "./heading";
 import { LinearElementEditor } from "./linearElementEditor";
 import { mutateElement } from "./mutateElement";
-import { newArrowElement, newElement } from "./newElement";
+import {
+  newArrowElement,
+  newElement,
+  newStickyNoteElement,
+} from "./newElement";
 import { aabbForElement } from "./bounds";
 import { elementsAreInFrameBounds, elementOverlapsWithFrame } from "./frame";
 import {
@@ -230,8 +234,7 @@ const cloneFlowchartNode = (
   x: number,
   y: number,
 ) => {
-  const node = newElement({
-    type: template.type,
+  const commonNodeProps = {
     x,
     y,
     width: template.width,
@@ -244,7 +247,19 @@ const cloneFlowchartNode = (
     opacity: template.opacity,
     fillStyle: template.fillStyle,
     strokeStyle: template.strokeStyle,
-  });
+  };
+
+  const node =
+    template.type === "stickynote"
+      ? newStickyNoteElement({
+          type: "stickynote",
+          ...commonNodeProps,
+          baseHeight: template.baseHeight,
+        })
+      : newElement({
+          type: template.type,
+          ...commonNodeProps,
+        });
 
   invariant(
     isFlowchartNodeElement(node),
@@ -254,7 +269,7 @@ const cloneFlowchartNode = (
   return node;
 };
 
-const addNewNodes = (
+export const addNewNodes = (
   startNode: NonDeleted<ExcalidrawFlowchartNodeElement>,
   appState: AppState,
   direction: LinkDirection,

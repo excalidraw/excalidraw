@@ -25,7 +25,9 @@ import {
   canHaveArrowheads,
   getSelectedElements,
   hasBackground,
+  hasFillStyle,
   hasFreedrawMode,
+  hasRoughness,
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
@@ -116,11 +118,11 @@ export const getShapeActionPredicates = (
       // bucket fill never renders transparent (it falls back to a real
       // color), so its fill style stays relevant either way
       activeToolType === "bucketfill" ||
-      (hasBackground(activeToolType) &&
+      (hasFillStyle(activeToolType) &&
         !isTransparent(appState.currentItemBackgroundColor)) ||
       targetElements.some(
         (element) =>
-          hasBackground(element.type) &&
+          hasFillStyle(element.type) &&
           !isTransparent(element.backgroundColor),
       ),
 
@@ -128,7 +130,7 @@ export const getShapeActionPredicates = (
     strokeWidth: forToolOrSelection(hasStrokeWidth),
     freedrawMode: forToolOrSelection(hasFreedrawMode),
     strokeStyle: forToolOrSelection(hasStrokeStyle),
-    sloppiness: forToolOrSelection(hasStrokeStyle),
+    sloppiness: forToolOrSelection(hasRoughness),
     roundness: forToolOrSelection(canChangeRoundness),
     arrowType: forToolOrSelection(toolIsArrow),
     arrowheads: forToolOrSelection(canHaveArrowheads),

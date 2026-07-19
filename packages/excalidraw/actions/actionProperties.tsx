@@ -31,6 +31,7 @@ import {
 
 import {
   canBecomePolygon,
+  clampStickyNoteProps,
   getNonDeletedElements,
   isNonDeletedElement,
 } from "@excalidraw/element";
@@ -48,6 +49,9 @@ import { getArrowheadForPicker } from "@excalidraw/element";
 
 import {
   getBoundTextElement,
+  getContainerElement,
+  normalizeStickyNoteStrokeColor,
+  normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 
@@ -57,11 +61,12 @@ import {
   isElbowArrow,
   isLinearElement,
   isLineElement,
+  isStickyNoteElement,
   isTextElement,
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { hasStrokeColor } from "@excalidraw/element";
+import { hasFillStyle, hasStrokeColor } from "@excalidraw/element";
 
 import {
   updateElbowArrowPoints,
@@ -179,6 +184,22 @@ const getStylesPanelInfo = (app: AppClassProperties) => {
   } as const;
 };
 
+const isStickyNoteStrokeColorElement = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+) => {
+  if (isStickyNoteElement(element)) {
+    return true;
+  }
+
+  if (isTextElement(element) && isBoundToContainer(element)) {
+    const container = getContainerElement(element, elementsMap);
+    return isStickyNoteElement(container);
+  }
+
+  return false;
+};
+
 export const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -290,13 +311,18 @@ const changeFontSize = (
       if (isTextElement(oldElement)) {
         const newFontSize = getNewFontSize(oldElement);
         newFontSizes.add(newFontSize);
+        const container = app.scene.getContainerElement(oldElement);
+        const isStickyBoundText =
+          container !== null && isStickyNoteElement(container);
 
         let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
-          fontSize: newFontSize,
+          ...(isStickyBoundText
+            ? { fontSizeMax: normalizeStickyNoteFontSize(newFontSize) }
+            : { fontSize: newFontSize }),
         });
         redrawTextBoundingBox(
           newElement,
-          app.scene.getContainerElement(oldElement),
+          container,
           app.scene,
         );
 
@@ -340,38 +366,76 @@ const changeFontSize = (
 // -----------------------------------------------------------------------------
 
 export const actionChangeStrokeColor = register<
-  Pick<AppState, "currentItemStrokeColor">
+  Pick<AppState, "currentItemStrokeColor" | "currentItemStickynoteStrokeColor">
 >({
   name: "changeStrokeColor",
   label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    const nextValue = value
+      ? {
+          ...value,
+          ...(value.currentItemStickynoteStrokeColor
+            ? {
+                currentItemStickynoteStrokeColor:
+                  normalizeStickyNoteStrokeColor(
+                    value.currentItemStickynoteStrokeColor,
+                  ),
+              }
+            : null),
+        }
+      : null;
+    const hasStrokeColorValue =
+      nextValue?.currentItemStrokeColor ||
+      nextValue?.currentItemStickynoteStrokeColor;
+    const elementsMap = arrayToMap(elements);
+
     return {
-      ...(value?.currentItemStrokeColor && {
+      ...(hasStrokeColorValue && {
         elements: changeProperty(
           elements,
           appState,
           (el) => {
-            return hasStrokeColor(el.type)
-              ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
-              : el;
+            if (!hasStrokeColor(el.type)) {
+              return el;
+            }
+
+            const strokeColor = isStickyNoteStrokeColorElement(el, elementsMap)
+              ? nextValue?.currentItemStickynoteStrokeColor ??
+                normalizeStickyNoteStrokeColor(nextValue!.currentItemStrokeColor)
+              : nextValue?.currentItemStrokeColor ??
+                nextValue!.currentItemStickynoteStrokeColor;
+
+            return newElementWith(el, { strokeColor });
           },
           true,
         ),
       }),
       appState: {
         ...appState,
-        ...value,
+        ...nextValue,
       },
-      captureUpdate: !!value?.currentItemStrokeColor
+      captureUpdate: !!hasStrokeColorValue
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
+    const elementsMap = arrayToMap(elements);
+    const selectedStrokeElements = getSelectedElements(elements, appState, {
+      includeBoundTextElement: true,
+    }).filter((element) => hasStrokeColor(element.type));
+    const hasSelectedStickyNoteStrokeElement = selectedStrokeElements.some(
+      (element) => isStickyNoteStrokeColorElement(element, elementsMap),
+    );
+    const hasSelectedNonStickyStrokeElement = selectedStrokeElements.some(
+      (element) => !isStickyNoteStrokeColorElement(element, elementsMap),
+    );
+    const isStickyNoteStrokePicker =
+      hasSelectedStickyNoteStrokeElement ||
+      (!selectedStrokeElements.length &&
+        appState.activeTool.type === "stickynote");
 
     return (
       <>
@@ -390,12 +454,35 @@ export const actionChangeStrokeColor = register<
             (element) => element.strokeColor,
             true,
             (hasSelection) =>
-              !hasSelection ? appState.currentItemStrokeColor : null,
+              !hasSelection
+                ? appState.activeTool.type === "stickynote"
+                  ? appState.currentItemStickynoteStrokeColor
+                  : appState.currentItemStrokeColor
+                : null,
           )}
-          onChange={(color) => updateData({ currentItemStrokeColor: color })}
+          onChange={(color) =>
+            updateData({
+              ...(selectedStrokeElements.length
+                ? hasSelectedNonStickyStrokeElement
+                  ? { currentItemStrokeColor: color }
+                  : null
+                : appState.activeTool.type !== "stickynote"
+                ? { currentItemStrokeColor: color }
+                : null),
+              ...(isStickyNoteStrokePicker
+                ? {
+                    currentItemStickynoteStrokeColor:
+                      normalizeStickyNoteStrokeColor(color),
+                  }
+                : null),
+            })
+          }
           elements={elements}
           appState={appState}
           updateData={updateData}
+          hiddenPaletteColorNames={
+            isStickyNoteStrokePicker ? ["transparent"] : undefined
+          }
         />
       </>
     );
@@ -441,7 +528,13 @@ export const actionChangeBackgroundColor = register<
       });
     } else {
       nextElements = changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
+        isStickyNoteElement(el)
+          ? clampStickyNoteProps(
+              newElementWith(el, {
+                backgroundColor: value.currentItemBackgroundColor,
+              }),
+            )
+          : newElementWith(el, {
           backgroundColor: value.currentItemBackgroundColor,
         }),
       );
@@ -557,9 +650,7 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
     );
     return {
       elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          fillStyle: value,
-        }),
+        hasFillStyle(el.type) ? newElementWith(el, { fillStyle: value }) : el,
       ),
       appState: { ...appState, currentItemFillStyle: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -567,9 +658,12 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
     const selectedElements = getSelectedElements(elements, appState);
+    const selectedFillStyleElements = selectedElements.filter((element) =>
+      hasFillStyle(element.type),
+    );
     const allElementsZigZag =
-      selectedElements.length > 0 &&
-      selectedElements.every((el) => el.fillStyle === "zigzag");
+      selectedFillStyleElements.length > 0 &&
+      selectedFillStyleElements.every((el) => el.fillStyle === "zigzag");
 
     return (
       <fieldset>
@@ -604,7 +698,7 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
               elements,
               app,
               (element) => element.fillStyle,
-              (element) => element.hasOwnProperty("fillStyle"),
+              (element) => hasFillStyle(element.type),
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemFillStyle,
             )}
@@ -612,7 +706,9 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
               const nextValue =
                 event.altKey &&
                 value === "hachure" &&
-                selectedElements.every((el) => el.fillStyle === "hachure")
+                selectedFillStyleElements.every(
+                  (el) => el.fillStyle === "hachure",
+                )
                   ? "zigzag"
                   : value;
 
@@ -707,10 +803,17 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          seed: randomInteger(),
-          roughness: value,
-        }),
+        isStickyNoteElement(el)
+          ? clampStickyNoteProps(
+              newElementWith(el, {
+                seed: randomInteger(),
+                roughness: value,
+              }),
+            )
+          : newElementWith(el, {
+              seed: randomInteger(),
+              roughness: value,
+            }),
       ),
       appState: { ...appState, currentItemRoughness: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -990,14 +1093,16 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
                 app,
                 (element) => {
                   if (isTextElement(element)) {
-                    return element.fontSize;
+                    return element.fontSizeMax ?? element.fontSize;
                   }
                   const boundTextElement = getBoundTextElement(
                     element,
                     app.scene.getNonDeletedElementsMap(),
                   );
                   if (boundTextElement) {
-                    return boundTextElement.fontSize;
+                    return (
+                      boundTextElement.fontSizeMax ?? boundTextElement.fontSize
+                    );
                   }
                   return null;
                 },
@@ -1038,7 +1143,8 @@ export const actionDecreaseFontSize = register({
       Math.round(
         // get previous value before relative increase (doesn't work fully
         // due to rounding and float precision issues)
-        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) * element.fontSize,
+        (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) *
+          (element.fontSizeMax ?? element.fontSize),
       ),
     );
   },
@@ -1059,7 +1165,10 @@ export const actionIncreaseFontSize = register({
   trackEvent: false,
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>
-      Math.round(element.fontSize * (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)),
+      Math.round(
+        (element.fontSizeMax ?? element.fontSize) *
+          (1 + FONT_SIZE_RELATIVE_INCREASE_STEP),
+      ),
     );
   },
   keyTest: (event) => {
@@ -1683,7 +1792,7 @@ export const actionChangeRoundness = register<"sharp" | "round">({
           return el;
         }
 
-        return newElementWith(el, {
+        const nextElement = newElementWith(el, {
           roundness:
             value === "round"
               ? {
@@ -1693,6 +1802,10 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                 }
               : null,
         });
+
+        return isStickyNoteElement(nextElement)
+          ? clampStickyNoteProps(nextElement)
+          : nextElement;
       }),
       appState: {
         ...appState,
@@ -1739,7 +1852,8 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                   ? "round"
                   : "sharp",
               (element) =>
-                !isArrowElement(element) && element.hasOwnProperty("roundness"),
+                !isArrowElement(element) &&
+                element.hasOwnProperty("roundness"),
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemRoundness,
             )}
