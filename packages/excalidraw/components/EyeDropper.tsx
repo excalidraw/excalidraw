@@ -102,9 +102,22 @@ export const EyeDropper: React.FC<{
       clientY: number;
       altKey: boolean;
     }) => {
-      // FIXME swap offset when the preview gets outside viewport
-      colorPreviewDiv.style.top = `${clientY + 20}px`;
-      colorPreviewDiv.style.left = `${clientX + 20}px`;
+      // Keep the color preview within the viewport.
+      const previewWidth = colorPreviewDiv.offsetWidth || 48;
+      const previewHeight = colorPreviewDiv.offsetHeight || 48;
+
+      let top = clientY + 20;
+      let left = clientX + 20;
+
+      if (top + previewHeight > window.innerHeight) {
+        top = clientY - 20 - previewHeight;
+      }
+      if (left + previewWidth > window.innerWidth) {
+        left = clientX - 20 - previewWidth;
+      }
+
+      colorPreviewDiv.style.top = `${top}px`;
+      colorPreviewDiv.style.left = `${left}px`;
 
       const currentColor = getCurrentColor({ clientX, clientY });
 
