@@ -95,6 +95,76 @@ describe("bucket fill tool", () => {
     expect(h.state.activeTool.type).toBe("bucketFill");
   });
 
+  it("fires the public onPointerDown/onPointerUp callbacks", async () => {
+    // regression: the bucket branch used to early-return before the shared
+    // pointer lifecycle, silently skipping the public callback contract
+    const onPointerDown = vi.fn();
+    const onPointerUp = vi.fn();
+    await render(
+      <Excalidraw
+        handleKeyboardGlobally={true}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+      />,
+    );
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.clickAt(80, 70);
+
+    expect(onPointerDown).toHaveBeenCalledTimes(1);
+    expect(onPointerUp).toHaveBeenCalledTimes(1);
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(1);
+  });
+
+  it("recovers from a lost pointer-up via the shared cleanup", () => {
+    // regression: the old bespoke once-listener only reset pointer state on
+    // a real pointer-up; the shared missing-pointer-up cleanup now covers
+    // lost ones (e.g. window blurred mid-click)
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.downAt(80, 70);
+    expect(h.state.cursorButton).toBe("down");
+
+    act(() => {
+      (h.app as any).maybeCleanupAfterMissingPointerUp(null);
+    });
+    expect(h.state.cursorButton).toBe("up");
+    // the click still produced its fill on pointer down
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(1);
+    mouse.upAt(80, 70);
+  });
+
+  it("dragging with the bucket tool neither selects nor creates extras", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.downAt(80, 70);
+    mouse.moveTo(120, 100); // drag well past any threshold
+    mouse.upAt(120, 100);
+
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(1);
+    expect(h.state.selectionElement).toBeNull();
+    expect(Object.keys(h.state.selectedElementIds)).toHaveLength(0);
+    expect(h.state.activeTool.type).toBe("bucketFill");
+  });
+
   it("re-clicking a filled region does not stack a duplicate fill", () => {
     seedRectangle();
     act(() => {

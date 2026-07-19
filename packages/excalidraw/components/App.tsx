@@ -8758,24 +8758,6 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    // bucket fill is a one-shot click tool; resolve it before the drag /
-    // selection machinery below and return early. Sits after the shared
-    // guards above so that non-primary buttons (right/middle click) and
-    // multi-touch don't fill, and collab receives the pointer-down.
-    if (this.state.activeTool.type === TOOL_TYPE.bucketFill) {
-      if (!this.state.viewModeEnabled) {
-        this.handleBucketFillOnPointerDown(scenePointer);
-        const onBucketFillPointerUp = (event: PointerEvent) => {
-          this.setState({ cursorButton: "up" });
-          this.savePointer(event.clientX, event.clientY, "up");
-        };
-        addEventListener(window, EVENT.POINTER_UP, onBucketFillPointerUp, {
-          once: true,
-        });
-      }
-      return;
-    }
-
     // State for the duration of a pointer interaction, which starts with a
     // pointerDown event, ends with a pointerUp event (or another pointerDown)
     const pointerDownState = this.initialPointerDownState(event);
@@ -8969,6 +8951,14 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "autoshape") {
       this.drawShape.handlePointerDown(pointerDownState);
+    } else if (this.state.activeTool.type === TOOL_TYPE.bucketFill) {
+      // one-shot click tool: the fill resolves right here on pointer down.
+      // Dispatched like any other tool (laser has the same shape) so the
+      // shared pointer lifecycle below — public onPointerDown/onPointerUp
+      // callbacks, pointer-up teardown, missing-pointer-up cleanup — runs
+      // for bucket clicks too. In view mode this branch is unreachable:
+      // `handleCanvasPanUsingWheelOrSpaceDrag` swallows the pointer-down.
+      this.handleBucketFillOnPointerDown(scenePointer);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -12600,6 +12590,9 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !this.isToolLocked() &&
         activeTool.type !== "freedraw" &&
+        // bucket fill stays active for back-to-back fills regardless of the
+        // tool lock (paint-bucket UX)
+        activeTool.type !== TOOL_TYPE.bucketFill &&
         (activeTool.type !== "lasso" ||
           // if lasso is turned on but from selection => reset to selection
           (activeTool.type === "lasso" && activeTool.fromSelection))
