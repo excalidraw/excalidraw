@@ -221,6 +221,51 @@ export const useTTAChatHistory = ({
     [chatHistory, persistChat, setChatHistory],
   );
 
+  /**
+   * Adopts server chat metadata delivered by stream frames (`started`/`done`)
+   * and truncate responses (tta_rewrite_final.md §2.5): adopts the server
+   * chat id — a brand-new chat is buffered in memory until then (the
+   * auto-save below gates on a non-empty active id), so its history row is
+   * only ever created under the real server id — and touches `updatedAt` in
+   * both the active-chat mirror and the chat's history row.
+   */
+  const applyServerChatMetadata = useCallback(
+    (metadata: { chatId?: string | null; updatedAt?: number | null }) => {
+      const nextChatId = metadata.chatId;
+      if (nextChatId) {
+        setActiveChatId((prev) => (prev === nextChatId ? prev : nextChatId));
+      }
+      if (typeof metadata.updatedAt === "number") {
+        const updatedAt = metadata.updatedAt;
+        setActiveChatUpdatedAt(updatedAt);
+        const targetChatId = nextChatId || activeChatId;
+        if (targetChatId) {
+          setChatHistory((prev) => {
+            const existingIndex = prev.findIndex(
+              (chat) => chat.id === targetChatId,
+            );
+            if (
+              existingIndex === -1 ||
+              prev[existingIndex].updatedAt === updatedAt
+            ) {
+              return prev;
+            }
+            const copy = [...prev];
+            copy[existingIndex] = { ...copy[existingIndex], updatedAt };
+            return copy;
+          });
+        }
+      }
+    },
+    [activeChatId, setActiveChatId, setActiveChatUpdatedAt, setChatHistory],
+  );
+
+  /** Stamps "now" on the active chat (mirror + history row) — used by local
+   * mutations (send, stop, retry, delete). */
+  const touchActiveChatUpdatedAt = useCallback(() => {
+    applyServerChatMetadata({ updatedAt: Date.now() });
+  }, [applyServerChatMetadata]);
+
   const deleteChat = useCallback(
     (chatId: string) => {
       if (!chatId) {
@@ -257,6 +302,8 @@ export const useTTAChatHistory = ({
     saveConversationToHistory,
     renameChat,
     deleteChat,
+    applyServerChatMetadata,
+    touchActiveChatUpdatedAt,
     setActiveChatId,
     setActiveChatUpdatedAt,
     setChatHistory,

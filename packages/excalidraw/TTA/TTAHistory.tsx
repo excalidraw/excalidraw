@@ -298,6 +298,8 @@ export const TTAHistory: React.FC<TTAHistoryProps> = ({
                         <input
                           type="text"
                           value={editingTitle}
+                          // titles derive at 80 chars (getConversationTitle)
+                          maxLength={80}
                           onChange={(e) => setEditingTitle(e.target.value)}
                           onClick={(e) => e.stopPropagation()}
                           onKeyDown={(e) => {

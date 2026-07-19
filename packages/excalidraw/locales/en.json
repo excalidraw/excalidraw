@@ -791,6 +791,7 @@
         "requestFailed": "We couldn't complete this request. Please try again.",
         "connection": "Connection to the AI service was interrupted. Please retry.",
         "offline": "You're offline. Please reconnect to the internet and try again.",
+        "deleteFailed": "Couldn't sync the deletion to the server. Deleted messages may reappear when this chat is next loaded.",
         "supportBanner": "Need help?",
         "githubIssue": "Open a GitHub issue"
       },
@@ -802,7 +803,8 @@
         "confirm": "Confirm",
         "cancel": "Cancel",
         "rename": "Rename",
-        "delete": "Delete"
+        "delete": "Delete",
+        "deletePrompt": "Delete this chat? This will permanently remove it and its messages from your history."
       },
       "status": {
         "thinking": "Thinking...",
