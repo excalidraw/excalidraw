@@ -86,10 +86,6 @@ export const segmentsIntersectAt = <Point extends GlobalPoint | LocalPoint>(
   const u = vectorCross(i, r) / denominator;
   const t = vectorCross(i, s) / denominator;
 
-  if (u === 0) {
-    return null;
-  }
-
   const p = vectorAdd(a0, vectorScale(r, t));
 
   if (t >= 0 && t < 1 && u >= 0 && u < 1) {
