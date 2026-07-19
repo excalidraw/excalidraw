@@ -990,4 +990,322 @@ describe("computeBucketFillPolygon", () => {
     // owner is the rectangle, not the prior fill on top of it
     expect(result.ownerId).toBe(rect.id);
   });
+
+  describe("islands (holes)", () => {
+    const rect = (x: number, y: number, size: number) =>
+      API.createElement({
+        type: "rectangle",
+        x,
+        y,
+        width: size,
+        height: size,
+        roundness: null,
+        backgroundColor: "transparent",
+      });
+
+    // NOTE: `polygonArea` (abs shoelace) doubles as the NET area for keyhole
+    // rings — the zero-width bridges cancel and holes subtract
+
+    /**
+     * containment under the even-odd rule — the rule the renderer paints
+     * looped-line fills with, so this asserts what actually shows on screen
+     */
+    const evenOddContains = (pts: GlobalPoint[], p: GlobalPoint): boolean => {
+      let inside = false;
+      for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        const [xi, yi] = pts[i];
+        const [xj, yj] = pts[j];
+        if (
+          yi > p[1] !== yj > p[1] &&
+          p[0] < ((xj - xi) * (p[1] - yi)) / (yj - yi) + xi
+        ) {
+          inside = !inside;
+        }
+      }
+      return inside;
+    };
+
+    it("punches a hole for an island inside the filled region", () => {
+      const outer = rect(0, 0, 200);
+      const inner = rect(50, 50, 100);
+      const { elements, elementsMap } = setup([outer, inner]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(25, 100), // in the annulus
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      // annulus, not the whole outer interior (which would be ~40000)
+      expect(polygonArea(result.scenePoints)).toBeCloseTo(30000, -2);
+      expect(isClosed(result.scenePoints)).toBe(true);
+      // the island bounds the fill too
+      expect(result.boundaryElementIds).toContain(inner.id);
+      // and participates in z-order: below the lowest participant
+      expect(result.insertion).toEqual({
+        placement: "below",
+        elementId: outer.id,
+      });
+    });
+
+    it("clicking inside the island still fills just the island", () => {
+      const outer = rect(0, 0, 200);
+      const inner = rect(50, 50, 100);
+      const { elements, elementsMap } = setup([outer, inner]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(100, 100),
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      expect(result.ownerId).toBe(inner.id);
+      expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -2);
+    });
+
+    it("subtracts only outermost islands (island-in-island)", () => {
+      const outer = rect(0, 0, 300);
+      const middle = rect(50, 50, 200);
+      const innermost = rect(100, 100, 100);
+      const { elements, elementsMap } = setup([outer, middle, innermost]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(25, 150), // outer annulus
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      // outer minus middle; the innermost sits inside the hole and is
+      // irrelevant to the clicked region
+      expect(polygonArea(result.scenePoints)).toBeCloseTo(90000 - 40000, -2);
+    });
+
+    it("subtracts a subdivided island by its outside contour", () => {
+      const outer = rect(0, 0, 200);
+      const inner = rect(50, 50, 100);
+      // line splitting the island into two faces — the island's footprint
+      // must still be subtracted as ONE contour
+      const splitter = API.createElement({
+        type: "line",
+        x: 50,
+        y: 100,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+      });
+      const { elements, elementsMap } = setup([outer, inner, splitter]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(25, 100),
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      expect(polygonArea(result.scenePoints)).toBeCloseTo(30000, -2);
+    });
+
+    it("an island connected to the boundary is not a hole", () => {
+      const outer = rect(0, 0, 200);
+      const inner = rect(50, 50, 100);
+      // line connecting the island to the outer wall merges the components;
+      // the click region becomes a C-shaped single face instead
+      const connector = API.createElement({
+        type: "line",
+        x: 150,
+        y: 100,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(50, 0)],
+      });
+      const { elements, elementsMap } = setup([outer, inner, connector]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(25, 100),
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      // same net region as the annulus, reached without any hole splicing
+      expect(polygonArea(result.scenePoints)).toBeCloseTo(30000, -2);
+    });
+
+    it("an open line island does not punch a hole", () => {
+      const owner = rect(0, 0, 100);
+      const floating = API.createElement({
+        type: "line",
+        x: 30,
+        y: 50,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(40, 0)],
+      });
+      const { elements, elementsMap } = setup([owner, floating]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(10, 10),
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -2);
+    });
+
+    it("punches multiple sibling islands", () => {
+      const outer = rect(0, 0, 300);
+      const a = rect(30, 30, 80);
+      const b = rect(190, 190, 80);
+      const { elements, elementsMap } = setup([outer, a, b]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(150, 20),
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      expect(polygonArea(result.scenePoints)).toBeCloseTo(90000 - 2 * 6400, -2);
+      expect(
+        evenOddContains(result.scenePoints, pointFrom<GlobalPoint>(70, 70)),
+      ).toBe(false);
+      expect(
+        evenOddContains(result.scenePoints, pointFrom<GlobalPoint>(230, 230)),
+      ).toBe(false);
+      expect(
+        evenOddContains(result.scenePoints, pointFrom<GlobalPoint>(150, 150)),
+      ).toBe(true);
+    });
+
+    it("overlapping islands punch their union regardless of element order", () => {
+      // regression: bounded-vs-unbounded face orientation used to be
+      // inferred from the largest |area| face, but the outermost outline's
+      // interior and outside contour tie on |area|, making the outcome an
+      // enumeration-order coin flip — overlapping islands then decomposed
+      // into arbitrary sub-face "holes" (lenses filling, islands vanishing)
+      const mkRect = (x: number, y: number) =>
+        API.createElement({
+          type: "rectangle",
+          x,
+          y,
+          width: 120,
+          height: 80,
+          roundness: null,
+          backgroundColor: "transparent",
+        });
+      const outer = rect(0, 0, 400);
+      const a = mkRect(40, 100);
+      const b = mkRect(140, 140);
+      const c = mkRect(240, 100);
+
+      for (const order of [
+        [a, b, c, outer],
+        [c, b, a, outer],
+        [b, a, c, outer],
+      ]) {
+        const { elements, elementsMap } = setup(order);
+
+        const result = computeBucketFillPolygon({
+          point: pointFrom<GlobalPoint>(200, 30),
+          elements,
+          elementsMap,
+        });
+
+        expect(result.ok).toBe(true);
+        if (!result.ok) {
+          return;
+        }
+        // outer minus the union: 3×(120×80) − two 20×40 lenses
+        expect(polygonArea(result.scenePoints)).toBeCloseTo(
+          160000 - (3 * 9600 - 2 * 800),
+          -2,
+        );
+        // what renders (even-odd): every part of the union is unpainted —
+        // the lenses, the single-rect parts — and the outer region is painted
+        expect(
+          evenOddContains(result.scenePoints, pointFrom<GlobalPoint>(150, 160)),
+        ).toBe(false); // a∩b lens
+        expect(
+          evenOddContains(result.scenePoints, pointFrom<GlobalPoint>(80, 140)),
+        ).toBe(false); // a only
+        expect(
+          evenOddContains(result.scenePoints, pointFrom<GlobalPoint>(200, 170)),
+        ).toBe(false); // b only
+        expect(
+          evenOddContains(result.scenePoints, pointFrom<GlobalPoint>(200, 30)),
+        ).toBe(true); // outer region
+      }
+    });
+
+    it("inserts below the island when the island is lowest in z-order", () => {
+      const inner = rect(50, 50, 100);
+      const outer = rect(0, 0, 200);
+      // island BELOW the outer shape in scene order: the fill must still go
+      // below the island so its outline stays visible
+      const { elements, elementsMap } = setup([inner, outer]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(25, 100),
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      expect(result.insertion).toEqual({
+        placement: "below",
+        elementId: inner.id,
+      });
+    });
+
+    it("a hole dropped for the point budget leaves boundaries but keeps z-order", () => {
+      const inner = rect(50, 50, 100);
+      const outer = rect(0, 0, 200);
+      const { elements, elementsMap } = setup([inner, outer]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(25, 100),
+        elements,
+        elementsMap,
+        // the outer ring fits the cap, the hole does not
+        options: { maxGeneratedPoints: 6 },
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      // the fill paints through the dropped island...
+      expect(polygonArea(result.scenePoints)).toBeCloseTo(40000, -2);
+      // ...so it must NOT claim the island as a boundary...
+      expect(result.boundaryElementIds).not.toContain(inner.id);
+      // ...but still inserts below it, keeping the painted-over island
+      // visible (deliberate: see the participant-set note in the source)
+      expect(result.insertion).toEqual({
+        placement: "below",
+        elementId: inner.id,
+      });
+    });
+  });
 });

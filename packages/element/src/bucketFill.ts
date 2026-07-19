@@ -50,6 +50,16 @@ import type {
  * the click lands inside a closed element, or — for regions formed by open
  * lines, including against other elements' outside walls — from an expanding
  * search box around the click (owner-less fallback).
+ *
+ * Islands (disconnected outlines fully inside the selected region) become
+ * holes: their contours are spliced into the returned ring as zero-width
+ * "keyhole" bridges, so the result stays a single closed polygon that
+ * renders with unpainted hole interiors. Looped-line fills are painted with
+ * the even-odd rule (roughjs uses it for solid polygon/curve fills and the
+ * SVG export sets `fill-rule="evenodd"` explicitly; pattern fills use
+ * scanline parity, which behaves the same) — the doubled bridge edges
+ * cancel under it. Holes are nonetheless spliced with opposite winding, so
+ * the path stays correct under the nonzero rule too.
  */
 
 /**
@@ -140,6 +150,12 @@ export type BucketFillGeometryResult =
        */
       ownerId: ExcalidrawElement["id"] | null;
       boundaryElementIds: ExcalidrawElement["id"][];
+      /**
+       * closed polygon ring in scene coordinates. When the region contains
+       * islands, this is a keyhole path: the hole contours are spliced in
+       * via zero-width bridges, so it still renders as one polygon with
+       * unpainted hole interiors
+       */
       scenePoints: GlobalPoint[];
       insertion: BucketFillInsertion;
     }
@@ -500,6 +516,12 @@ type SourceSegment = {
 type Face = {
   ring: GlobalPoint[];
   contributors: Set<string>;
+  /**
+   * connected component of the arrangement graph this face belongs to —
+   * faces of OTHER components lying inside a selected face are islands
+   * (holes), while faces of the same component are just its subdivisions
+   */
+  componentId: number;
 };
 
 /**
@@ -873,6 +895,29 @@ const buildFaces = (
     }
   }
 
+  // connected components of the final graph (bridges included, so a bridged
+  // island shares a component with what it bridged to and can't become a
+  // hole) — used to tell true islands from same-component subdivisions
+  const componentOf = new Map<number, number>();
+  let componentCount = 0;
+  for (const start of adjacency.keys()) {
+    if (componentOf.has(start)) {
+      continue;
+    }
+    const queue = [start];
+    componentOf.set(start, componentCount);
+    while (queue.length) {
+      const node = queue.pop()!;
+      for (const neighbour of adjacency.get(node) ?? []) {
+        if (!componentOf.has(neighbour)) {
+          componentOf.set(neighbour, componentCount);
+          queue.push(neighbour);
+        }
+      }
+    }
+    componentCount++;
+  }
+
   // sort outgoing half-edges by angle around each node
   const angleOf = (from: number, to: number): number =>
     Math.atan2(
@@ -933,6 +978,7 @@ const buildFaces = (
         faces.push({
           ring: ring.map((index) => store.nodes[index]),
           contributors,
+          componentId: componentOf.get(node) ?? -1,
         });
       }
     }
@@ -941,34 +987,51 @@ const buildFaces = (
   return faces;
 };
 
+type FaceSelection = {
+  face: Face;
+  /** island contours to punch out of the face — see `selectFaceFromArrangement` */
+  holes: Face[];
+};
+
 /**
  * Select the smallest bounded face that contains the click point. The single
  * unbounded face has the largest absolute area; faces sharing its orientation
  * are skipped, which leaves only true (bounded) cells.
+ *
+ * Also collects the face's holes: each disconnected component has exactly one
+ * outer-orientation ring (its outside contour), and when that contour lies
+ * inside the selected face the component is an island the flood fill must
+ * flow around. Only outermost islands count — an island nested inside
+ * another island already sits inside a hole.
  */
 const selectFaceFromArrangement = (
   faces: Face[],
   point: GlobalPoint,
   options: BucketFillOptions,
-): Face | null => {
+): FaceSelection | null => {
   if (faces.length === 0) {
     return null;
   }
 
-  let outerSign = 0;
-  let maxAbsArea = -1;
+  // The half-edge walk ("next = the neighbour immediately clockwise of the
+  // twin", in screen coordinates with y pointing down) traces every BOUNDED
+  // face with negative shoelace area and every component's outside contour
+  // with positive area — a structural invariant of the walk rule. Bounded vs
+  // unbounded must be decided by this sign alone, NOT by comparing areas:
+  // the outermost outline's interior face and outside contour trace the same
+  // polygon with equal |area|, so any size-based heuristic degenerates into
+  // an enumeration-order coin flip (which made hole detection depend on
+  // element order/position — see the overlapping-islands regression tests).
+  const outerSign = 1;
+  const areaOf = new Map<Face, number>();
   for (const face of faces) {
-    const area = signedArea(face.ring);
-    if (Math.abs(area) > maxAbsArea) {
-      maxAbsArea = Math.abs(area);
-      outerSign = Math.sign(area);
-    }
+    areaOf.set(face, signedArea(face.ring));
   }
 
   let best: Face | null = null;
   let bestArea = Infinity;
   for (const face of faces) {
-    const area = signedArea(face.ring);
+    const area = areaOf.get(face)!;
     if (Math.sign(area) === outerSign) {
       continue;
     }
@@ -985,7 +1048,34 @@ const selectFaceFromArrangement = (
     }
   }
 
-  return best;
+  if (!best) {
+    return null;
+  }
+  const selected = best;
+
+  const islandCandidates = faces.filter(
+    (face) =>
+      face.componentId !== selected.componentId &&
+      // a component's outside contour shares the unbounded face's orientation
+      Math.sign(areaOf.get(face)!) === outerSign &&
+      Math.abs(areaOf.get(face)!) >= options.minArea &&
+      // the click face never sits inside one of its own holes (defensive —
+      // the smallest-containing-face selection above already guarantees it)
+      !polygonIncludesPointNonZero(point, face.ring) &&
+      // components never intersect (crossings would have merged them), so a
+      // single-vertex test decides containment
+      polygonIncludesPointNonZero(face.ring[0], selected.ring),
+  );
+  const holes = islandCandidates.filter(
+    (hole) =>
+      !islandCandidates.some(
+        (other) =>
+          other !== hole &&
+          polygonIncludesPointNonZero(hole.ring[0], other.ring),
+      ),
+  );
+
+  return { face: selected, holes };
 };
 
 // -----------------------------------------------------------------------------
@@ -1024,12 +1114,13 @@ const removeCollinear = (
 };
 
 /**
- * Simplify a ring of points and return it explicitly closed (first point
- * repeated as last). Returns null when it cannot form a valid polygon.
+ * Simplify an open ring under a point budget. Returns null when it collapses
+ * below a triangle or cannot fit the budget.
  */
-const finalizePolygon = (
+const simplifyRing = (
   ring: GlobalPoint[],
   options: BucketFillOptions,
+  budget: number,
 ): GlobalPoint[] | null => {
   const pts = dedupeConsecutive(ring, options.snapEpsilon);
   if (pts.length < 3) {
@@ -1040,21 +1131,106 @@ const finalizePolygon = (
   // uses (identical default tolerance), escalating until under the point cap
   let tolerance = 0.75;
   let simplified = simplify(pts, tolerance) as GlobalPoint[];
-  while (simplified.length > options.maxGeneratedPoints && tolerance < 1e6) {
+  while (simplified.length > budget && tolerance < 1e6) {
     tolerance *= 2;
     simplified = simplify(pts, tolerance) as GlobalPoint[];
   }
-  if (simplified.length > options.maxGeneratedPoints) {
+  if (simplified.length > budget) {
     return null;
   }
 
   simplified = removeCollinear(simplified, 0.05);
-  if (simplified.length < 3) {
+  return simplified.length >= 3 ? simplified : null;
+};
+
+/**
+ * Splice a hole contour into the ring as a zero-width "keyhole": walk the
+ * ring to the attachment vertex, bridge to the hole, traverse the hole, and
+ * bridge back along the same edge. The doubled bridge cancels under the
+ * even-odd rule the renderer uses for looped-line fills (and under the
+ * pattern fills' scanline parity), leaving the hole interior unpainted
+ * while the result stays one closed polygon.
+ */
+const spliceHoleIntoRing = (
+  ring: GlobalPoint[],
+  hole: GlobalPoint[],
+): GlobalPoint[] => {
+  // opposite winding: even-odd doesn't care, but this keeps the path
+  // correct under the nonzero rule as well (defense against renderer or
+  // export changes)
+  const oriented =
+    Math.sign(signedArea(hole)) === Math.sign(signedArea(ring))
+      ? [...hole].reverse()
+      : hole;
+
+  // shortest bridge, so the (invisible) channel never spans the region
+  let bestRingIndex = 0;
+  let bestHoleIndex = 0;
+  let bestDistance = Infinity;
+  for (let i = 0; i < ring.length; i++) {
+    for (let j = 0; j < oriented.length; j++) {
+      const distance = pointDistance(ring[i], oriented[j]);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestRingIndex = i;
+        bestHoleIndex = j;
+      }
+    }
+  }
+
+  const out: GlobalPoint[] = ring.slice(0, bestRingIndex + 1);
+  // full hole loop, ending back on its attachment vertex
+  for (let k = 0; k <= oriented.length; k++) {
+    out.push(oriented[(bestHoleIndex + k) % oriented.length]);
+  }
+  out.push(ring[bestRingIndex]);
+  out.push(...ring.slice(bestRingIndex + 1));
+  return out;
+};
+
+/**
+ * Simplify the face ring and its hole contours (each independently, so the
+ * keyhole bridges stay exactly zero-width), splice the holes in, and return
+ * the result explicitly closed (first point repeated as last), along with
+ * the indices of the holes that were actually spliced. Returns null when
+ * the outer ring cannot form a valid polygon; holes that cannot fit the
+ * remaining point budget are dropped (the island then just gets painted
+ * over, the pre-hole-support behavior).
+ */
+const finalizePolygon = (
+  outerRing: GlobalPoint[],
+  holeRings: GlobalPoint[][],
+  options: BucketFillOptions,
+): { scenePoints: GlobalPoint[]; splicedHoleIndices: number[] } | null => {
+  let ring = simplifyRing(outerRing, options, options.maxGeneratedPoints);
+  if (!ring) {
     return null;
   }
 
+  // largest first, so a tight point budget drops the least visible islands
+  const byAreaDesc = holeRings
+    .map((holeRing, index) => ({ holeRing, index }))
+    .sort(
+      (a, b) =>
+        Math.abs(signedArea(b.holeRing)) - Math.abs(signedArea(a.holeRing)),
+    );
+  const splicedHoleIndices: number[] = [];
+  for (const { holeRing, index } of byAreaDesc) {
+    // a spliced hole costs its own points + 2 bridge duplicates
+    const budget = options.maxGeneratedPoints - ring.length - 2;
+    if (budget < 3) {
+      break;
+    }
+    const hole = simplifyRing(holeRing, options, budget);
+    if (!hole) {
+      continue;
+    }
+    ring = spliceHoleIntoRing(ring, hole);
+    splicedHoleIndices.push(index);
+  }
+
   // close the polygon exactly once
-  return [...simplified, simplified[0]];
+  return { scenePoints: [...ring, ring[0]], splicedHoleIndices };
 };
 
 // -----------------------------------------------------------------------------
@@ -1173,7 +1349,7 @@ export const computeBucketFillPolygon = (args: {
 
   const buildAndSelect = (
     rawSegments: SourceSegment[],
-  ): Face | null | "too_complex" => {
+  ): FaceSelection | null | "too_complex" => {
     const faces = buildFaces(rawSegments, options);
     if (!faces) {
       return "too_complex";
@@ -1182,7 +1358,7 @@ export const computeBucketFillPolygon = (args: {
   };
 
   // 4. resolve the face under the click
-  let face: Face | null = null;
+  let selection: FaceSelection | null = null;
   if (owner) {
     const pad = options.gapTolerance + 2 + Math.max(owner.strokeWidth ?? 1, 1);
     const searchBounds = expandBounds(
@@ -1200,7 +1376,7 @@ export const computeBucketFillPolygon = (args: {
     if (!selected) {
       return { ok: false, reason: "open_region" };
     }
-    face = selected;
+    selection = selected;
   } else {
     // owner-less fallback: search an expanding box around the click. A face
     // is final once its ring stays clear of the box frontier — any element
@@ -1212,7 +1388,7 @@ export const computeBucketFillPolygon = (args: {
       0,
     );
     let radius = options.fallbackSearchRadius;
-    for (let attempt = 0; attempt < 4 && !face; attempt++, radius *= 2) {
+    for (let attempt = 0; attempt < 4 && !selection; attempt++, radius *= 2) {
       const box: Bounds = [
         point[0] - radius,
         point[1] - radius,
@@ -1233,7 +1409,7 @@ export const computeBucketFillPolygon = (args: {
       if (
         selected &&
         (isLastAttempt ||
-          selected.ring.every(
+          selected.face.ring.every(
             (p) =>
               p[0] > box[0] + options.gapTolerance &&
               p[1] > box[1] + options.gapTolerance &&
@@ -1241,13 +1417,13 @@ export const computeBucketFillPolygon = (args: {
               p[1] < box[3] - options.gapTolerance,
           ))
       ) {
-        face = selected;
+        selection = selected;
       }
       // growing only helps when it brings NEW elements into range; if every
       // eligible boundary in the scene is already a candidate, a bigger box
       // rebuilds the identical arrangement — bail out instead of burning up
       // to 3 more full builds on a miss
-      if (!face) {
+      if (!selection) {
         const inRange = elements.reduce(
           (count, element) =>
             count +
@@ -1262,21 +1438,37 @@ export const computeBucketFillPolygon = (args: {
         }
       }
     }
-    if (!face) {
+    if (!selection) {
       // no enclosed region under the pointer — stay silent like `no_owner`;
       // clicking open canvas shouldn't nag
       return { ok: false, reason: "no_owner" };
     }
   }
-  const { ring, contributors } = face;
+  const { face, holes } = selection;
 
-  // 5. simplify and validate
-  const scenePoints = finalizePolygon(ring, options);
-  if (!scenePoints) {
+  // 5. simplify and validate. Note the returned ring may be a keyhole path
+  // (holes spliced in via zero-width bridges); its signed area is then the
+  // NET filled area, which is exactly what the size check should measure.
+  const finalized = finalizePolygon(
+    face.ring,
+    holes.map((hole) => hole.ring),
+    options,
+  );
+  if (!finalized) {
     return { ok: false, reason: "invalid_polygon" };
   }
+  const { scenePoints, splicedHoleIndices } = finalized;
   if (Math.abs(signedArea(scenePoints)) < options.minArea) {
     return { ok: false, reason: "too_small" };
+  }
+
+  // spliced islands genuinely bound the visible fill, so they join the
+  // boundary metadata (and, via the app layer, group inheritance)
+  const contributors = new Set<string>(face.contributors);
+  for (const index of splicedHoleIndices) {
+    for (const id of holes[index].contributors) {
+      contributors.add(id);
+    }
   }
 
   // 6. z-order: the fill should sit above any participating element whose
@@ -1285,9 +1477,20 @@ export const computeBucketFillPolygon = (args: {
   // visible. A participant "covers" the fill when it paints an opaque
   // background (same predicate boundary clipping uses) and the filled
   // region lies inside it (the click lands inside).
+  //
+  // Deliberately includes ALL islands — even ones whose hole could not be
+  // spliced under the point budget (and is thus absent from
+  // `boundaryElementIds`): the fill paints straight through a dropped
+  // island, so keeping the fill below it is what keeps the island visible
+  // at all.
   const participantIds = new Set<string>(
     owner ? [owner.id, ...contributors] : contributors,
   );
+  for (const hole of holes) {
+    for (const id of hole.contributors) {
+      participantIds.add(id);
+    }
+  }
   let lowestParticipant: ExcalidrawElement | null = null;
   let covering: ExcalidrawElement | null = null;
   for (const element of elements) {
