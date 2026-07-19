@@ -97,7 +97,7 @@ jobs:
 
       # ── Snyk Security Scan (optional, requires SNYK_TOKEN secret) ─────────
       - name: Snyk Security Scan
-        if: env.SNYK_TOKEN != ''
+        if: ${{ secrets.SNYK_TOKEN != '' }}
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
@@ -121,8 +121,8 @@ jobs:
       - name: Check for copyleft licenses in production deps
         run: |
           echo "::group::Production dependency license check"
-          # Use license-checker for more reliable results
-          npx license-checker --production --summary \
-            --excludePackagesStartingWith "@excalidraw" 2>/dev/null || \
-            echo "license-checker not available, using yarn list fallback"
+          yarn licenses list --production --no-private 2>/dev/null | \
+            grep -iE '(gpl|agpl)' && \
+            (echo "⚠️  Copyleft license found in some production dependencies" && exit 1) || \
+            echo "✅ No copyleft licenses found in production dependencies"
           echo "::endgroup::"
