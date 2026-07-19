@@ -131,7 +131,7 @@ describe("bucket fill tool", () => {
     expect(h.state.activeTool.type).toBe("bucketFill");
   });
 
-  it("shows only the fill color picker in the panel when the tool is active", () => {
+  it("shows fill color, fill style and opacity in the panel when the tool is active", () => {
     seedRectangle();
     selectBucketFill();
 
@@ -139,8 +139,32 @@ describe("bucket fill tool", () => {
     expect(panel).not.toBeNull();
     // the fill (background) color picker is shown...
     expect(panel!.querySelector('[aria-label="Background"]')).not.toBeNull();
+    // ...along with the fill style + opacity controls for the created fills...
+    expect(panel!.querySelector('[data-testid="fill-hachure"]')).not.toBeNull();
+    expect(panel!.querySelector('[data-testid="opacity"]')).not.toBeNull();
     // ...and nothing else from the generic shape panel (e.g. stroke)
     expect(panel!.querySelector('[aria-label="Stroke"]')).toBeNull();
+  });
+
+  it("uses the current fill style and opacity for created fills", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({
+        currentItemBackgroundColor: "#ffec99",
+        currentItemFillStyle: "hachure",
+        currentItemOpacity: 60,
+      });
+    });
+    selectBucketFill();
+
+    mouse.clickAt(80, 70);
+
+    const fill = h.elements.find(
+      (el) => el.type === "line" && !el.isDeleted,
+    ) as ExcalidrawLineElement | undefined;
+    expect(fill).toBeDefined();
+    expect(fill!.fillStyle).toBe("hachure");
+    expect(fill!.opacity).toBe(60);
   });
 
   it("selects the tool with the b shortcut", () => {

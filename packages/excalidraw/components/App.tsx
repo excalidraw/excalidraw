@@ -8423,7 +8423,7 @@ class App extends React.Component<AppProps, AppState> {
       polygon: true,
       strokeColor: "transparent",
       backgroundColor,
-      fillStyle: "solid",
+      fillStyle: this.state.currentItemFillStyle,
       strokeWidth: 1,
       strokeStyle: "solid",
       roughness: 0,
