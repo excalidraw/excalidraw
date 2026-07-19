@@ -32,6 +32,13 @@ export interface TTAHistoryProps {
   onDeleteChat: (chatId: string) => void;
   onRenameChat: (chatId: string, newTitle: string) => void;
   onClose: () => void;
+  /**
+   * Suspends the overlay's window-capture Escape handling while a modal sits
+   * on top of it (the chat-delete ConfirmDialog) — that capture listener runs
+   * before any handler of the modal itself, so without this the overlay would
+   * close behind the modal on Escape.
+   */
+  suspendEscape?: boolean;
 }
 
 const TTAHistoryThumbnailPlaceholder = () => (
@@ -66,6 +73,7 @@ export const TTAHistory: React.FC<TTAHistoryProps> = ({
   onDeleteChat,
   onRenameChat,
   onClose,
+  suspendEscape = false,
 }) => {
   const { t } = useI18n();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -89,6 +97,11 @@ export const TTAHistory: React.FC<TTAHistoryProps> = ({
         return;
       }
 
+      if (suspendEscape) {
+        // a modal on top of the overlay owns Escape right now
+        return;
+      }
+
       if (editingChatId) {
         setEditingChatId(null);
         event.stopPropagation();
@@ -107,7 +120,7 @@ export const TTAHistory: React.FC<TTAHistoryProps> = ({
 
     window.addEventListener("keydown", handleKeyDown, true);
     return () => window.removeEventListener("keydown", handleKeyDown, true);
-  }, [editingChatId, historySearch, onClose]);
+  }, [editingChatId, historySearch, onClose, suspendEscape]);
 
   const handleStartRename = (chat: ChatConversation, e: React.MouseEvent) => {
     e.stopPropagation();

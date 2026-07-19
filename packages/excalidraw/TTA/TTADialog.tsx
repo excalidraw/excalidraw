@@ -510,6 +510,7 @@ const TTADialogContent = ({
     latestRetryableAssistantMessageId,
     composerImages,
     rateLimits,
+    isConfirmDialogOpen: Boolean(pendingDeleteMessageId || pendingDeleteChatId),
   };
 
   const panelActions: TTADialogPanelActions = {

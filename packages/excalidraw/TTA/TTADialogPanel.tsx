@@ -43,6 +43,8 @@ export type TTADialogPanelView = {
   latestHistoryChat: ChatConversation | null;
   latestRetryableAssistantMessageId: string | null;
   rateLimits: TTARateLimits | null;
+  /** A ConfirmDialog is open on top of the panel (suspends overlay Escape). */
+  isConfirmDialogOpen: boolean;
 };
 
 export type TTADialogPanelActions = {
@@ -352,6 +354,7 @@ export const TTADialogPanel = ({
           onDeleteChat={actions.onDeleteHistoryChat}
           onRenameChat={actions.onRenameHistoryChat}
           onClose={actions.onHideHistory}
+          suspendEscape={view.isConfirmDialogOpen}
         />
       )}
     </div>
