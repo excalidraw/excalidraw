@@ -1,5 +1,8 @@
 import { KEYS } from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
+import { pointFrom } from "@excalidraw/math";
+
+import type { LocalPoint } from "@excalidraw/math";
 
 import type { ExcalidrawLineElement } from "@excalidraw/element/types";
 
@@ -74,8 +77,8 @@ describe("bucket fill tool", () => {
     expect(fill!.backgroundColor).toBe("#ffec99");
     expect(fill!.strokeColor).toBe("transparent");
     expect(fill!.fillStyle).toBe("solid");
-    // marked as a generated fill (no scene metadata beyond the marker)
-    expect(fill!.customData).toEqual({ bucketFill: { version: 1 } });
+    // no metadata marker: fills are recognized by shape, not provenance
+    expect(fill!.customData).toBeUndefined();
 
     // linear elements must be normalized: points[0] === [0, 0], and the
     // polygon is explicitly closed
@@ -90,6 +93,112 @@ describe("bucket fill tool", () => {
     // filling regions back-to-back
     expect(h.state.selectedElementIds[fill!.id]).not.toBe(true);
     expect(h.state.activeTool.type).toBe("bucketFill");
+  });
+
+  it("re-clicking a filled region does not stack a duplicate fill", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.clickAt(80, 70);
+    mouse.clickAt(80, 70);
+
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(1);
+  });
+
+  it("re-clicking with a changed color restyles the existing fill", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.clickAt(80, 70);
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffc9c9" });
+    });
+    mouse.clickAt(80, 70);
+
+    const fills = h.elements.filter(
+      (el) => el.type === "line" && !el.isDeleted,
+    );
+    expect(fills).toHaveLength(1);
+    expect(fills[0].backgroundColor).toBe("#ffc9c9");
+
+    // the restyle is its own undoable step
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.Z);
+    });
+    const afterUndo = h.elements.filter(
+      (el) => el.type === "line" && !el.isDeleted,
+    );
+    expect(afterUndo).toHaveLength(1);
+    expect(afterUndo[0].backgroundColor).toBe("#ffec99");
+  });
+
+  it("restyles an orphaned fill even when no region can be derived", () => {
+    const rect = seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.clickAt(80, 70);
+
+    // delete the rectangle: the fill's boundaries are gone, so no region
+    // can be derived around the click anymore
+    act(() => {
+      h.app.updateScene({
+        elements: h.elements.filter((el) => el.id !== rect.id),
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    });
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffc9c9" });
+    });
+
+    mouse.clickAt(80, 70); // on the orphaned paint
+
+    const fills = h.elements.filter(
+      (el) => el.type === "line" && !el.isDeleted,
+    );
+    expect(fills).toHaveLength(1);
+    expect(fills[0].backgroundColor).toBe("#ffc9c9");
+  });
+
+  it("clicking a since-subdivided part of a filled region creates a new fill", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    mouse.clickAt(80, 70); // fill the whole rectangle
+
+    // split the region with a line drawn afterwards
+    const splitter = API.createElement({
+      type: "line",
+      x: 10,
+      y: 70,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(140, 0)],
+    });
+    act(() => {
+      h.app.updateScene({
+        elements: [...h.elements, splitter],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    });
+
+    mouse.clickAt(80, 45); // top half: a different (smaller) region now
+
+    const fills = h.elements.filter(
+      (el) => el.type === "line" && !el.isDeleted && el.id !== splitter.id,
+    );
+    expect(fills).toHaveLength(2);
   });
 
   it("can fill multiple regions in a row without re-selecting the tool", () => {

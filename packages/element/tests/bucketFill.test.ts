@@ -3,13 +3,14 @@ import {
   distanceToLineSegment,
   lineSegment,
   pointFrom,
+  polygonIncludesPoint,
 } from "@excalidraw/math";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
-import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Polygon } from "@excalidraw/math";
 
-import { computeBucketFillPolygon } from "../src/bucketFill";
+import { computeBucketFillPolygon, isRestylableFill } from "../src/bucketFill";
 
 import type { ElementsMap, NonDeletedExcalidrawElement } from "../src/types";
 
@@ -958,7 +959,7 @@ describe("computeBucketFillPolygon", () => {
     expect(result).toEqual({ ok: false, reason: "too_complex" });
   });
 
-  it("ignores prior bucket fills when detecting an owner", () => {
+  it("fill-compatible paint never becomes the owner", () => {
     const rect = API.createElement({
       type: "rectangle",
       x: 0,
@@ -967,14 +968,28 @@ describe("computeBucketFillPolygon", () => {
       height: 100,
       roundness: null,
     });
+    // a strokeless bg polygon (what a generated fill is — no marker, fills
+    // are recognized by shape) sitting ON TOP of the rect. Hachure, so it
+    // exercises the ownership exclusion in isolation without also acting
+    // as an opaque coverer that would clip the rect's coincident outline
     const priorFill = API.createElement({
       type: "line",
       x: 0,
       y: 0,
       width: 100,
       height: 100,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 0),
+        pointFrom<LocalPoint>(100, 100),
+        pointFrom<LocalPoint>(0, 100),
+        pointFrom<LocalPoint>(0, 0),
+      ],
+      polygon: true,
+      backgroundColor: "#b2f2bb",
+      fillStyle: "hachure",
+      strokeColor: "transparent",
     });
-    (priorFill as any).customData = { bucketFill: { version: 1 } };
     const { elements, elementsMap } = setup([rect, priorFill]);
 
     const result = computeBucketFillPolygon({
@@ -987,7 +1002,7 @@ describe("computeBucketFillPolygon", () => {
     if (!result.ok) {
       return;
     }
-    // owner is the rectangle, not the prior fill on top of it
+    // owner is the rectangle, not the paint on top of it
     expect(result.ownerId).toBe(rect.id);
   });
 
@@ -1019,7 +1034,6 @@ describe("computeBucketFillPolygon", () => {
       fillStyle: "solid",
       strokeColor: "transparent",
     });
-    (priorFill as any).customData = { bucketFill: { version: 1 } };
     const rect = API.createElement({
       type: "rectangle",
       x: 0,
@@ -1047,6 +1061,91 @@ describe("computeBucketFillPolygon", () => {
     expect(result.boundaryElementIds).not.toContain(buried.id);
   });
 
+  it("isRestylableFill accepts strokeless bg polygons covering the region", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    const { elements, elementsMap } = setup([rect]);
+    const click = pointFrom<GlobalPoint>(50, 50);
+    const result = computeBucketFillPolygon({
+      point: click,
+      elements,
+      elementsMap,
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    const scenePoints = result.scenePoints;
+
+    // NOTE deliberately no `customData.bucketFill` — restylability is
+    // shape-based (the marker goes stale once the user restyles a fill)
+    const mkFill = (size: number, overrides: object = {}) =>
+      API.createElement({
+        type: "line",
+        x: 0,
+        y: 0,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(size, 0),
+          pointFrom<LocalPoint>(size, size),
+          pointFrom<LocalPoint>(0, size),
+          pointFrom<LocalPoint>(0, 0),
+        ],
+        polygon: true,
+        backgroundColor: "#b2f2bb",
+        fillStyle: "solid",
+        strokeColor: "transparent",
+        ...overrides,
+      });
+
+    // fill-like polygon covering the clicked region -> restylable
+    const fill = mkFill(100);
+    expect(
+      isRestylableFill({
+        hitElement: fill,
+        scenePoints,
+        elementsMap: setup([fill, rect]).elementsMap,
+      }),
+    ).toBe(true);
+
+    // a fill the user gave a visible stroke has been repurposed into an
+    // outline (it participates as a boundary instead) -> not restylable
+    const stroked = mkFill(100, { strokeColor: "#1e1e1e" });
+    expect(
+      isRestylableFill({
+        hitElement: stroked,
+        scenePoints,
+        elementsMap: setup([stroked, rect]).elementsMap,
+      }),
+    ).toBe(false);
+
+    // covers a smaller region than the computed one -> not restylable
+    const subRegion = mkFill(20);
+    expect(
+      isRestylableFill({
+        hitElement: subRegion,
+        scenePoints,
+        elementsMap: setup([subRegion, rect]).elementsMap,
+      }),
+    ).toBe(false);
+
+    // a plain shape is never restylable
+    expect(
+      isRestylableFill({
+        hitElement: rect,
+        scenePoints,
+        elementsMap,
+      }),
+    ).toBe(false);
+  });
+
   it("a fill given a visible stroke afterwards acts as a boundary", () => {
     const strokedFill = API.createElement({
       type: "line",
@@ -1066,7 +1165,6 @@ describe("computeBucketFillPolygon", () => {
       fillStyle: "solid",
       strokeColor: "#1e1e1e",
     });
-    (strokedFill as any).customData = { bucketFill: { version: 1 } };
     const outer = API.createElement({
       type: "rectangle",
       x: 0,
@@ -1126,20 +1224,8 @@ describe("computeBucketFillPolygon", () => {
      * containment under the even-odd rule — the rule the renderer paints
      * looped-line fills with, so this asserts what actually shows on screen
      */
-    const evenOddContains = (pts: GlobalPoint[], p: GlobalPoint): boolean => {
-      let inside = false;
-      for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-        const [xi, yi] = pts[i];
-        const [xj, yj] = pts[j];
-        if (
-          yi > p[1] !== yj > p[1] &&
-          p[0] < ((xj - xi) * (p[1] - yi)) / (yj - yi) + xi
-        ) {
-          inside = !inside;
-        }
-      }
-      return inside;
-    };
+    const evenOddContains = (pts: GlobalPoint[], p: GlobalPoint): boolean =>
+      polygonIncludesPoint(p, pts as unknown as Polygon<GlobalPoint>);
 
     it("punches a hole for an island inside the filled region", () => {
       const outer = rect(0, 0, 200);

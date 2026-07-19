@@ -37,7 +37,7 @@ import type {
 } from "./types";
 
 /**
- * Pure geometry for the bucket fill tool. No React, no app state, no DOM.
+ * Pure geometry helpers for the bucket fill tool.
  *
  * Given a click point and the scene elements, this computes the closed polygon
  * (in scene/global coordinates) that fills the enclosed region under the
@@ -46,10 +46,19 @@ import type {
  *
  * All fills go through a single path: a planar segment arrangement is built
  * (segments split at intersections) and the smallest bounded face containing
- * the click is selected. Candidates come from the owner's surroundings when
- * the click lands inside a closed element, or — for regions formed by open
- * lines, including against other elements' outside walls — from an expanding
- * search box around the click (owner-less fallback).
+ * the click is selected.
+ *
+ * The OWNER is the topmost closed, visible element containing the click
+ * point — a shape, a closed (`polygon`) line, or a looped freedraw. It is
+ * not the fill's boundary per se; it anchors the fast common case: only
+ * elements near the owner's bounds feed the arrangement, and the app layer
+ * inherits the fill's frame/group membership from it. When no owner exists
+ * (regions formed by open lines, including against other elements' outside
+ * walls), candidates come from an expanding search box around the click
+ * instead — the owner-less fallback. Fill-compatible paint (see
+ * `isBucketFillCompatible`) never becomes an owner: clicking it restyles
+ * the existing paint (app layer) or re-derives the region from the actual
+ * strokes around it.
  *
  * Islands (disconnected outlines fully inside the selected region) become
  * holes: their contours are spliced into the returned ring as zero-width
@@ -71,6 +80,15 @@ import type {
  * here does not distort the filled shape.
  */
 const BUCKET_FILL_GAP_TOLERANCE = 6;
+
+/**
+ * How far apart, in scene px, two fill outlines' bounds may lie and still
+ * count as the same region (see `findRestylableBucketFill`). Covers the
+ * pipeline's own jitter — polygon simplification (~0.75px) and node
+ * canonicalization (`snapEpsilon`) — while staying under typical stroke
+ * widths, so "the same region" matches what the user sees.
+ */
+const BUCKET_FILL_REGION_MATCH_TOLERANCE = 2;
 
 /**
  * Max deviation, in scene px, of a curved (`roundness`) line's sampled
@@ -120,7 +138,7 @@ export const DEFAULT_BUCKET_FILL_OPTIONS: BucketFillOptions = {
   gapTolerance: BUCKET_FILL_GAP_TOLERANCE,
   minArea: 4,
   maxBoundarySegments: 2000,
-  maxGeneratedPoints: 256,
+  maxGeneratedPoints: 512,
   fallbackSearchRadius: 512,
 };
 
@@ -403,9 +421,6 @@ class NodeStore {
 // owner & boundary selection
 // -----------------------------------------------------------------------------
 
-const isBucketFill = (element: ExcalidrawElement): boolean =>
-  !!element.customData?.bucketFill;
-
 /**
  * Whether the element visually paints an opaque background fill — i.e. can
  * actually hide outlines beneath it. Element types that never render their
@@ -453,6 +468,25 @@ const FILL_BOUNDARY_TYPES = new Set<ExcalidrawElement["type"]>([
 const isInvisible = (element: ExcalidrawElement): boolean =>
   element.opacity <= 0;
 
+/**
+ * Whether the element renders as pure paint the bucket tool could have
+ * produced: a closed, visible line polygon with a background and no visible
+ * stroke. Recognition is by SHAPE, not by a metadata marker — any marker
+ * would go stale the moment the user restyles a fill, and a hand-drawn
+ * strokeless background polygon is indistinguishable from a generated fill
+ * anyway. Such paint never becomes an owner and is what the app layer
+ * restyles in place on re-click (see `isRestylableFill`).
+ */
+export const isBucketFillCompatible = (
+  element: ExcalidrawElement,
+): element is ExcalidrawLineElement =>
+  isLineElement(element) &&
+  element.polygon &&
+  isValidPolygon(element.points) &&
+  !isInvisible(element) &&
+  !isTransparent(element.backgroundColor) &&
+  isTransparent(element.strokeColor);
+
 const isClosedOwnerCandidate = (element: ExcalidrawElement): boolean => {
   if (!FILL_BOUNDARY_TYPES.has(element.type)) {
     return false;
@@ -484,11 +518,12 @@ const findOwner = (
 ): NonDeletedExcalidrawElement | null => {
   for (let i = elements.length - 1; i >= 0; i--) {
     const element = elements[i];
-    // generated fills are deliberately never OWNERS (unlike boundary /
-    // coverer roles): re-clicking a filled region should re-derive the
-    // region from the actual strokes, not from the previous fill's ring —
-    // and keyhole rings (zero-width bridges) make degenerate owner outlines
-    if (isInvisible(element) || isBucketFill(element)) {
+    // fill-compatible paint is deliberately never an OWNER (unlike its
+    // boundary / coverer roles): re-clicking a filled region should either
+    // restyle the paint (app layer) or re-derive the region from the
+    // actual strokes, not from the previous fill's ring — and keyhole
+    // rings (zero-width bridges) make degenerate owner outlines
+    if (isInvisible(element) || isBucketFillCompatible(element)) {
       continue;
     }
     if (!isClosedOwnerCandidate(element)) {
@@ -1530,4 +1565,68 @@ export const computeBucketFillPolygon = (args: {
     scenePoints,
     insertion,
   };
+};
+
+const ringBounds = (ring: readonly GlobalPoint[]): Bounds => {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of ring) {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+  return [minX, minY, maxX, maxY];
+};
+
+/**
+ * Whether the element the click landed on is a fill the bucket tool should
+ * restyle in place (instead of stacking an identical fill on top), given
+ * the computed region.
+ *
+ * Fill-compatibility is decided by shape (`isBucketFillCompatible`): a fill
+ * the user gave a stroke to has been repurposed into an outline and
+ * participates as a boundary instead of being restyled.
+ *
+ * One guard on top: the computed region's net area and bounds must match
+ * the element's. Without it, a click inside a shape drawn ON TOP of a
+ * filled region would recolor the underlying fill instead of filling that
+ * shape; a click on a since-subdivided part of an old fill likewise
+ * creates a new (smaller) fill rather than restyling the old one.
+ */
+export const isRestylableFill = (args: {
+  hitElement: ExcalidrawElement;
+  scenePoints: readonly GlobalPoint[];
+  elementsMap: ElementsMap;
+}): boolean => {
+  const { hitElement, scenePoints, elementsMap } = args;
+  if (!isBucketFillCompatible(hitElement)) {
+    return false;
+  }
+
+  const center = elementCenterPoint(hitElement, elementsMap);
+  const ring = hitElement.points.map((p) =>
+    pointRotateRads(
+      pointFrom<GlobalPoint>(hitElement.x + p[0], hitElement.y + p[1]),
+      center,
+      hitElement.angle,
+    ),
+  );
+  // same region? net areas (keyhole bridges cancel) and bounds must agree
+  const fillArea = Math.abs(signedArea(ring));
+  const regionArea = Math.abs(signedArea(scenePoints as GlobalPoint[]));
+  const sameArea =
+    Math.abs(fillArea - regionArea) <= 0.05 * Math.max(fillArea, regionArea);
+  const [aMinX, aMinY, aMaxX, aMaxY] = ringBounds(ring);
+  const [bMinX, bMinY, bMaxX, bMaxY] = ringBounds(scenePoints);
+  const tolerance = BUCKET_FILL_REGION_MATCH_TOLERANCE;
+  const sameBounds =
+    Math.abs(aMinX - bMinX) <= tolerance &&
+    Math.abs(aMinY - bMinY) <= tolerance &&
+    Math.abs(aMaxX - bMaxX) <= tolerance &&
+    Math.abs(aMaxY - bMaxY) <= tolerance;
+
+  return sameArea && sameBounds;
 };
