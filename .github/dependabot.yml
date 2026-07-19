@@ -14,10 +14,11 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
-      - "automated"
+    # Ignore internal monorepo packages (not published to npm)
+    ignore:
+      - dependency-name: "@excalidraw/*"
     versioning-strategy: increase
     groups:
-      # Group patch & minor updates together to reduce PR noise
       minor-and-patch:
         applies-to: version-updates
         patterns:
@@ -37,7 +38,8 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "automated"
+    ignore:
+      - dependency-name: "@excalidraw/*"
     groups:
       minor-and-patch:
         applies-to: version-updates
@@ -47,7 +49,7 @@ updates:
           - "minor"
           - "patch"
 
-  # packages/excalidraw
+  # packages/excalidraw (published npm package)
   - package-ecosystem: "npm"
     directory: "/packages/excalidraw"
     schedule:
@@ -58,7 +60,8 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
-      - "automated"
+    ignore:
+      - dependency-name: "@excalidraw/*"
     groups:
       minor-and-patch:
         applies-to: version-updates
@@ -78,4 +81,3 @@ updates:
       timezone: "Europe/Prague"
     labels:
       - "dependencies"
-      - "automated"
