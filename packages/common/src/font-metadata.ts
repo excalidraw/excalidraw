@@ -111,6 +111,15 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     },
     private: true,
   },
+  [FONT_FAMILY["Playpen Arabic"]]: {
+    metrics: {
+      // Reusing Excalifont metrics until dedicated metrics are tuned.
+      unitsPerEm: 1000,
+      ascender: 886,
+      descender: -374,
+      lineHeight: 1.25,
+    },
+  },
   [FONT_FAMILY_FALLBACKS.Xiaolai]: {
     metrics: {
       unitsPerEm: 1000,
