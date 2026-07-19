@@ -253,6 +253,55 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -3);
   });
 
+  it("fills an exactly-closed freedraw loop", () => {
+    // the sibling of the gapped-closure test: last point === first point,
+    // so no synthetic closing segment is needed at all
+    const points: LocalPoint[] = [];
+    const corners = [
+      [0, 0],
+      [100, 0],
+      [100, 100],
+      [0, 100],
+      [0, 0],
+    ];
+    for (let c = 0; c < corners.length - 1; c++) {
+      const [ax, ay] = corners[c];
+      const [bx, by] = corners[c + 1];
+      const steps = Math.ceil(Math.hypot(bx - ax, by - ay) / 10);
+      for (let s = 0; s < steps; s++) {
+        points.push(
+          pointFrom<LocalPoint>(
+            ax + ((bx - ax) * s) / steps,
+            ay + ((by - ay) * s) / steps,
+          ),
+        );
+      }
+    }
+    points.push(pointFrom<LocalPoint>(0, 0));
+    const freedraw = API.createElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points,
+    });
+    const { elements, elementsMap } = setup([freedraw]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(isClosed(result.scenePoints)).toBe(true);
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -3);
+  });
+
   it("fills a line polygon", () => {
     const triangle = API.createElement({
       type: "line",
@@ -931,6 +980,86 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeLessThan(5500);
   });
 
+  const lineSquare = (half: number) => {
+    const mkLine = (x: number, y: number, dx: number, dy: number) =>
+      API.createElement({
+        type: "line",
+        x,
+        y,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(dx, dy)],
+      });
+    return [
+      mkLine(-half, -half, 2 * half, 0),
+      mkLine(half, -half, 0, 2 * half),
+      mkLine(half, half, -2 * half, 0),
+      mkLine(-half, half, 0, -2 * half),
+    ] as NonDeletedExcalidrawElement[];
+  };
+
+  it("the owner-less fallback keeps expanding past an empty first radius", () => {
+    // regression: an empty candidate set at the first radius used to return
+    // no_owner immediately — a 2,000px square of open lines around the
+    // click has all its strokes beyond the initial 512px box
+    const { elements, elementsMap } = setup(lineSquare(1000));
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(0, 0),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(4_000_000, -5);
+  });
+
+  it("the owner-less fallback accepts a complete face touching the frontier", () => {
+    // regression: all four lines fit the first 512px box, but the ring's
+    // vertices at ±508 graze the frontier — with every eligible element
+    // already in range the face is complete and must be accepted, not
+    // rejected as possibly-unfinished
+    const { elements, elementsMap } = setup(lineSquare(508));
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(0, 0),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(1016 * 1016, -4);
+  });
+
+  it("a fully invisible closed element cannot own a fill", () => {
+    // regression: a rect with transparent stroke AND transparent background
+    // renders no pixels — clicking the seemingly empty canvas used to
+    // conjure a fill out of it
+    const ghost = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+      strokeColor: "transparent",
+      backgroundColor: "transparent",
+    });
+    const { elements, elementsMap } = setup([ghost]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result).toEqual({ ok: false, reason: "no_owner" });
+  });
+
   it("returns no_owner for open canvas", () => {
     const { elements, elementsMap } = setup([]);
     const result = computeBucketFillPolygon({
@@ -1149,6 +1278,109 @@ describe("computeBucketFillPolygon", () => {
     expect(result.insertion).toEqual({
       placement: "above",
       elementId: oldFill.id,
+    });
+  });
+
+  it("inserts above a coverer straddling the region edge (center outside)", () => {
+    // regression: the coverer constraint must be evaluated for EVERY
+    // element — an opaque strokeless rect straddling the region edge
+    // contains the click while being neither a participant nor (with its
+    // center outside the region) a sampled in-region mark; gating the
+    // coverer check on those buried the fill beneath it
+    const line = API.createElement({
+      type: "line",
+      x: -20,
+      y: 100,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(240, 0)],
+      strokeColor: "#1e1e1e",
+    });
+    const coverer = API.createElement({
+      type: "rectangle",
+      x: 160,
+      y: 20,
+      width: 100,
+      height: 60,
+      roundness: null,
+      backgroundColor: "#ffc9c9",
+      fillStyle: "solid",
+      strokeColor: "transparent",
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    // z-order: line (lowest), coverer, rect — the rect on top keeps the
+    // coverer from clipping any face boundary
+    const { elements, elementsMap } = setup([line, coverer, rect]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(170, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.insertion).toEqual({
+      placement: "above",
+      elementId: coverer.id,
+    });
+  });
+
+  it("inserts above an opaque coverer overlapping the region away from the click", () => {
+    // same trio as above, but the click lands OUTSIDE the coverer: after a
+    // fill the region must read uniformly filled (the raster flood-fill
+    // outcome), so opaque paint overlapping the region anywhere — not just
+    // under the click — must not poke through the new fill
+    const line = API.createElement({
+      type: "line",
+      x: -20,
+      y: 100,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(240, 0)],
+      strokeColor: "#1e1e1e",
+    });
+    const coverer = API.createElement({
+      type: "rectangle",
+      x: 150,
+      y: 20,
+      width: 110,
+      height: 60,
+      roundness: null,
+      backgroundColor: "#a5d8ff",
+      fillStyle: "solid",
+      strokeColor: "transparent",
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+      roundness: null,
+      backgroundColor: "transparent",
+    });
+    const { elements, elementsMap } = setup([line, coverer, rect]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(60, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.insertion).toEqual({
+      placement: "above",
+      elementId: coverer.id,
     });
   });
 

@@ -526,6 +526,17 @@ const isInvisible = (element: ExcalidrawElement): boolean =>
   element.opacity <= 0;
 
 /**
+ * Whether the element renders any pixels at all: a visible stroke (doubles
+ * as the text color for text elements), a background its type actually
+ * paints, or image content.
+ */
+const rendersAnyMark = (element: ExcalidrawElement): boolean =>
+  !isInvisible(element) &&
+  (element.type === "image" ||
+    !isTransparent(element.strokeColor) ||
+    (hasBackground(element.type) && !isTransparent(element.backgroundColor)));
+
+/**
  * Whether the element renders as pure paint the bucket tool could have
  * produced: a closed, visible line polygon with a background and no visible
  * stroke. Recognition is by SHAPE, not by a metadata marker — any marker
@@ -579,8 +590,11 @@ const findOwner = (
     // boundary / coverer roles): re-clicking a filled region should either
     // restyle the paint (app layer) or re-derive the region from the
     // actual strokes, not from the previous fill's ring — and keyhole
-    // rings (zero-width bridges) make degenerate owner outlines
-    if (isInvisible(element) || isBucketFillCompatible(element)) {
+    // rings (zero-width bridges) make degenerate owner outlines.
+    // Elements that render no pixels can't own either — an invisible
+    // (transparent stroke + transparent background) shape would otherwise
+    // let a click on seemingly empty canvas conjure a fill out of nowhere.
+    if (!rendersAnyMark(element) || isBucketFillCompatible(element)) {
       continue;
     }
     if (!isClosedOwnerCandidate(element)) {
@@ -651,8 +665,8 @@ const buildFaces = (
   //   actual strokes.
   // - `gapTolerance` governs the bridging pass further down, which closes
   //   visual gaps by ADDING short connector edges at loose stroke ends. It
-  //   can be generous (8px) without distorting the shape, because bridging
-  //   never moves existing vertices.
+  //   can be generous (see BUCKET_FILL_GAP_TOLERANCE) without distorting
+  //   the shape, because bridging never moves existing vertices.
   const store = new NodeStore(eps);
   const segments: WorkingSegment[] = [];
   // first element that produced each node — used to attribute bridge edges
@@ -723,6 +737,12 @@ const buildFaces = (
         continue;
       }
       const node = store.getOrCreate(intersection);
+      // intersection nodes need a source too — one may end up a loose end
+      // (after visibility clipping) and get bridged, and bridge attribution
+      // reads `nodeElement`
+      if (!nodeElement.has(node)) {
+        nodeElement.set(node, si.elementId);
+      }
       si.splits.push({
         node,
         t: projectParam(si.pa, si.pb, store.nodes[node]),
@@ -956,7 +976,8 @@ const buildFaces = (
       }
 
       const bridgeElement =
-        nodeElement.get(loose) ?? segments[0]?.elementId ?? "";
+        // every node gets a source at creation; the fallback is defensive
+        nodeElement.get(loose) ?? segments[0].elementId;
       if (bestEdge && bestEdgeDistance < bestNodeDistance) {
         // split the edge at the projection (a point ON the stroke) and
         // connect the loose end to it
@@ -1415,6 +1436,12 @@ export const computeBucketFillPolygon = (args: {
         }
       }
       for (const segment of segments) {
+        // enforce the segment budget WHILE collecting: without this, a huge
+        // scene does all the expensive visibility clipping before the cap
+        // is ever consulted
+        if (rawSegments.length > options.maxBoundarySegments) {
+          return;
+        }
         // keep sub-epsilon segments: buildFaces collapses them via node
         // merging without breaking the chain (see note there); only true
         // zero-length degenerates are noise
@@ -1439,10 +1466,10 @@ export const computeBucketFillPolygon = (args: {
         }
       }
     };
-    if (primary) {
-      collect(primary);
-    }
-    for (const element of boundaries) {
+    for (const element of primary ? [primary, ...boundaries] : boundaries) {
+      if (rawSegments.length > options.maxBoundarySegments) {
+        break;
+      }
       collect(element);
     }
     return rawSegments.length > options.maxBoundarySegments
@@ -1490,6 +1517,9 @@ export const computeBucketFillPolygon = (args: {
       (count, element) => count + (isEligibleBoundary(element) ? 1 : 0),
       0,
     );
+    if (totalEligible === 0) {
+      return { ok: false, reason: "no_owner" };
+    }
     let radius = options.fallbackSearchRadius;
     for (let attempt = 0; attempt < 4 && !selection; attempt++, radius *= 2) {
       const box: Bounds = [
@@ -1498,20 +1528,39 @@ export const computeBucketFillPolygon = (args: {
         point[0] + radius,
         point[1] + radius,
       ];
+      const inRange = elements.reduce(
+        (count, element) =>
+          count +
+          (isEligibleBoundary(element) &&
+          doBoundsIntersect(box, getElementBounds(element, elementsMap))
+            ? 1
+            : 0),
+        0,
+      );
+      // every eligible element is in range: whatever this box yields is
+      // FINAL — a bigger box would rebuild the identical arrangement, and
+      // the frontier heuristic below only exists to approximate exactly
+      // this condition
+      const isFinalAttempt = attempt === 3 || inRange === totalEligible;
+      if (inRange === 0) {
+        // empty at this radius — the region may still lie farther out, so
+        // keep growing (a distant enclosure, e.g. a huge line square whose
+        // strokes are all beyond the first box)
+        continue;
+      }
       const rawSegments = collectSegments(box, null);
       // the fallback is speculative — never toast on its failures. Over the
       // segment cap counts as a failure, not a "too complex" complaint.
-      if (!rawSegments || rawSegments.length === 0) {
+      if (!rawSegments) {
         return { ok: false, reason: "no_owner" };
       }
       const selected = buildAndSelect(rawSegments);
       if (selected === "too_complex") {
         return { ok: false, reason: "no_owner" };
       }
-      const isLastAttempt = attempt === 3;
       if (
         selected &&
-        (isLastAttempt ||
+        (isFinalAttempt ||
           selected.face.ring.every(
             (p) =>
               p[0] > box[0] + options.gapTolerance &&
@@ -1522,23 +1571,9 @@ export const computeBucketFillPolygon = (args: {
       ) {
         selection = selected;
       }
-      // growing only helps when it brings NEW elements into range; if every
-      // eligible boundary in the scene is already a candidate, a bigger box
-      // rebuilds the identical arrangement — bail out instead of burning up
-      // to 3 more full builds on a miss
-      if (!selection) {
-        const inRange = elements.reduce(
-          (count, element) =>
-            count +
-            (isEligibleBoundary(element) &&
-            doBoundsIntersect(box, getElementBounds(element, elementsMap))
-              ? 1
-              : 0),
-          0,
-        );
-        if (inRange === totalEligible) {
-          break;
-        }
+      if (!selection && isFinalAttempt) {
+        // nothing more can enter range — no point burning further builds
+        break;
       }
     }
     if (!selection) {
@@ -1577,9 +1612,12 @@ export const computeBucketFillPolygon = (args: {
   // 6. z-order. Two constraints, applied over ALL scene elements (not just
   // the region's participants):
   //
-  // - the fill goes ABOVE the topmost opaque element containing the click
-  //   (same "covers" predicate boundary clipping uses) — anything whose
-  //   opaque background would otherwise hide the fill;
+  // - the fill goes ABOVE the topmost opaque element whose paint overlaps
+  //   the region ANYWHERE (same "covers" predicate boundary clipping uses).
+  //   After a fill the region should read uniformly filled — the raster
+  //   flood-fill outcome — so older opaque paint must not poke through it;
+  //   the paint containing the click point is just the special case where
+  //   the fill would otherwise be hidden at the very point clicked;
   // - otherwise it goes BELOW the lowest element that must stay visible:
   //   every participant (their outlines border the fill; deliberately
   //   including islands whose hole was dropped for the point budget — the
@@ -1593,9 +1631,10 @@ export const computeBucketFillPolygon = (args: {
   //   the render rule, so elements inside a keyhole hole are correctly NOT
   //   constrained (the fill doesn't paint there).
   //
-  // When both constraints apply, above-the-coverer wins: anything below
-  // the coverer is hidden by it anyway, so placing the fill above changes
-  // nothing the user can see.
+  // When the two constraints conflict (an overlapping coverer sits above
+  // some in-region mark in z), above-the-coverer wins: a mark buried under
+  // opaque paint was largely hidden already, while paint poking through a
+  // fresh fill always reads as the fill having failed.
   const participantIds = new Set<string>(
     owner ? [owner.id, ...contributors] : contributors,
   );
@@ -1608,12 +1647,6 @@ export const computeBucketFillPolygon = (args: {
   const fillRegion = scenePoints as unknown as Polygon<GlobalPoint>;
   const [regionMinX, regionMinY, regionMaxX, regionMaxY] =
     ringBounds(scenePoints);
-  const rendersAnyMark = (element: ExcalidrawElement): boolean =>
-    !isInvisible(element) &&
-    (element.type === "image" ||
-      // stroke — doubles as the text color for text elements
-      !isTransparent(element.strokeColor) ||
-      (hasBackground(element.type) && !isTransparent(element.backgroundColor)));
   const markInsideRegion = (element: ExcalidrawElement): boolean => {
     const [minX, minY, maxX, maxY] = getElementBounds(element, elementsMap);
     if (
@@ -1646,21 +1679,58 @@ export const computeBucketFillPolygon = (args: {
     return samples.some((sample) => polygonIncludesPoint(sample, fillRegion));
   };
 
+  /**
+   * Whether the element's paint overlaps the fill region anywhere. Sampled
+   * in both directions (element outline inside the region, region ring
+   * inside the element — covering partial overlap and containment either
+   * way), plus the click point itself; exactness doesn't matter for a
+   * z-order decision.
+   */
+  const paintOverlapsRegion = (element: ExcalidrawElement): boolean => {
+    const [minX, minY, maxX, maxY] = getElementBounds(element, elementsMap);
+    if (
+      maxX < regionMinX ||
+      minX > regionMaxX ||
+      maxY < regionMinY ||
+      minY > regionMaxY
+    ) {
+      return false;
+    }
+    if (isPointInElement(point, element, elementsMap)) {
+      return true;
+    }
+    const outline = getElementLineSegments(element, elementsMap);
+    const outlineStep = Math.max(1, Math.floor(outline.length / 16));
+    for (let i = 0; i < outline.length; i += outlineStep) {
+      if (polygonIncludesPoint(outline[i][0], fillRegion)) {
+        return true;
+      }
+    }
+    const ringStep = Math.max(1, Math.floor(scenePoints.length / 16));
+    for (let i = 0; i < scenePoints.length; i += ringStep) {
+      if (isPointInElement(scenePoints[i], element, elementsMap)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   let lowestAbove: ExcalidrawElement | null = null;
   let covering: ExcalidrawElement | null = null;
   for (const element of elements) {
+    // the coverer constraint is evaluated for EVERY element, not just the
+    // `mustStayAbove` ones: an opaque element overlapping the region away
+    // from the click (or straddling its edge, center outside) is neither a
+    // participant nor a sampled in-region mark — missing it would insert
+    // the fill beneath it, and its paint would poke through the fill
+    if (rendersOpaqueFill(element) && paintOverlapsRegion(element)) {
+      covering = element;
+    }
     const mustStayAbove =
       participantIds.has(element.id) ||
       (rendersAnyMark(element) && markInsideRegion(element));
-    if (!mustStayAbove) {
-      continue;
-    }
-    lowestAbove = lowestAbove ?? element;
-    if (
-      rendersOpaqueFill(element) &&
-      isPointInElement(point, element, elementsMap)
-    ) {
-      covering = element;
+    if (mustStayAbove) {
+      lowestAbove = lowestAbove ?? element;
     }
   }
   // a face always has contributors from `elements`, so a participant exists;

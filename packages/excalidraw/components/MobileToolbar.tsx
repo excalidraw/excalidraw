@@ -77,6 +77,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const bucketFillToolSelected = activeTool.type === "bucketFill";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -317,6 +318,16 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             disabled={isToolButtonDisabled(app, "laser")}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "bucketFill" })}
+            icon={bucketFillIcon}
+            data-testid="toolbar-bucketFill"
+            selected={bucketFillToolSelected}
+            shortcut={KEYS.B.toLocaleUpperCase()}
+            disabled={isToolButtonDisabled(app, "bucketFill")}
+          >
+            {t("toolBar.bucketFill")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate

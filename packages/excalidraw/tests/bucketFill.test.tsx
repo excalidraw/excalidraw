@@ -519,6 +519,43 @@ describe("bucket fill tool", () => {
     expect(h.elements.filter((el) => el.type === "line")).toHaveLength(0);
   });
 
+  it("a second touch pointer does not fill (pinch/pan intent)", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      clientX: 80,
+      clientY: 70,
+      button: 0,
+      pointerId: 1,
+      pointerType: "touch",
+    });
+    // a second finger lands while the first is still down
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      clientX: 100,
+      clientY: 90,
+      button: 0,
+      pointerId: 2,
+      pointerType: "touch",
+    });
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      pointerId: 2,
+      pointerType: "touch",
+    });
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      pointerId: 1,
+      pointerType: "touch",
+    });
+
+    // only the first finger's fill exists
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(1);
+  });
+
   it("does not fill in view mode", () => {
     seedRectangle();
     act(() => {
