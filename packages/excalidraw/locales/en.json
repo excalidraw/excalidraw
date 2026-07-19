@@ -770,6 +770,7 @@
         "regenerate": "Regenerate",
         "delete": "Delete",
         "retry": "Retry",
+        "rerun": "Run again",
         "deletePrompt": "Delete this result? This will delete this turn and all later messages, and replace the AI-generated elements on the canvas with the last remaining result.",
         "deletePromptFirstTurn": "Delete this result? This is the first turn, so this will clear the entire chat and remove AI-generated elements from the canvas."
       },

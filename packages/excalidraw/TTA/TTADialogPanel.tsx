@@ -59,6 +59,8 @@ export type TTADialogPanelActions = {
   ) => void;
   onInsertResult: (message: ChatMessage) => void;
   onRetry: (messageId: string) => void;
+  /** Re-runs a trailing prompt-only user turn as a fresh send (§5.8). */
+  onRerunMessage: (message: ChatMessage) => void;
   onRequestDelete: (messageId: string) => void;
   scrollChatToBottom: (options?: TTAChatScrollOptions) => void;
   onDismissSupportBanner: () => void;
@@ -205,6 +207,7 @@ const TTADialogPanelBody = ({
     | "composerInputValue"
     | "composerImages"
     | "chatMessages"
+    | "isSendingChat"
     | "latestHistoryChat"
     | "latestRetryableAssistantMessageId"
     | "rateLimits"
@@ -214,6 +217,7 @@ const TTADialogPanelBody = ({
     | "onSelectHistoryChat"
     | "onInsertResult"
     | "onRetry"
+    | "onRerunMessage"
     | "onRequestDelete"
     | "onOpenPreviewModal"
     | "scrollChatToBottom"
@@ -236,7 +240,7 @@ const TTADialogPanelBody = ({
         )}
       {!!view.chatMessages.length && (
         <div className="tta-chat-list" ref={chatHistoryRef}>
-          {view.chatMessages.map((message) => (
+          {view.chatMessages.map((message, index) => (
             <TTAChatMessage
               key={message.id}
               message={message}
@@ -245,6 +249,17 @@ const TTADialogPanelBody = ({
               showRetry={
                 message.role === "assistant" &&
                 message.id === view.latestRetryableAssistantMessageId
+              }
+              onRerun={() => actions.onRerunMessage(message)}
+              showRerun={
+                // §5.8 re-run affordance: a trailing user message with no
+                // assistant/system reply (reload or switch-away
+                // mid-generation) can be run again as a fresh turn — hidden
+                // whenever a generation is in flight (single-flight, so also
+                // while another chat's generation streams in the background).
+                message.role === "user" &&
+                index === view.chatMessages.length - 1 &&
+                !view.isSendingChat
               }
               rateLimits={view.rateLimits}
               onDelete={() => actions.onRequestDelete(message.id)}

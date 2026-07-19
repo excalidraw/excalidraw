@@ -534,6 +534,13 @@ const TTADialogContent = ({
     onRetry: (messageId) => {
       handleRetry(messageId);
     },
+    // §5.8 re-run: a fresh turn with the same prompt and images — never a
+    // retry payload (the orphaned turn has no completed attempt to target).
+    onRerunMessage: (message) => {
+      if (message.role === "user") {
+        sendChatPrompt(message.content, message.images);
+      }
+    },
     onRequestDelete: requestDelete,
     scrollChatToBottom,
     onDismissSupportBanner: dismissSupportBanner,

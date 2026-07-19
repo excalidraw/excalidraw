@@ -222,6 +222,31 @@ export const useTTAChatHistory = ({
   );
 
   /**
+   * Touches a chat's history-row `updatedAt` in memory (if the row exists).
+   * Does not persist by itself — the row is written by the save paths.
+   * Unlike `applyServerChatMetadata` this never touches the active-chat
+   * mirror, so it is safe for chats that are not currently displayed (a
+   * backgrounded generation's chat).
+   */
+  const touchChatUpdatedAt = useCallback(
+    (chatId: string, updatedAt: number) => {
+      setChatHistory((prev) => {
+        const existingIndex = prev.findIndex((chat) => chat.id === chatId);
+        if (
+          existingIndex === -1 ||
+          prev[existingIndex].updatedAt === updatedAt
+        ) {
+          return prev;
+        }
+        const copy = [...prev];
+        copy[existingIndex] = { ...copy[existingIndex], updatedAt };
+        return copy;
+      });
+    },
+    [setChatHistory],
+  );
+
+  /**
    * Adopts server chat metadata delivered by stream frames (`started`/`done`)
    * and truncate responses (tta_rewrite_final.md §2.5): adopts the server
    * chat id — a brand-new chat is buffered in memory until then (the
@@ -240,24 +265,30 @@ export const useTTAChatHistory = ({
         setActiveChatUpdatedAt(updatedAt);
         const targetChatId = nextChatId || activeChatId;
         if (targetChatId) {
-          setChatHistory((prev) => {
-            const existingIndex = prev.findIndex(
-              (chat) => chat.id === targetChatId,
-            );
-            if (
-              existingIndex === -1 ||
-              prev[existingIndex].updatedAt === updatedAt
-            ) {
-              return prev;
-            }
-            const copy = [...prev];
-            copy[existingIndex] = { ...copy[existingIndex], updatedAt };
-            return copy;
-          });
+          touchChatUpdatedAt(targetChatId, updatedAt);
         }
       }
     },
-    [activeChatId, setActiveChatId, setActiveChatUpdatedAt, setChatHistory],
+    [activeChatId, setActiveChatId, setActiveChatUpdatedAt, touchChatUpdatedAt],
+  );
+
+  /**
+   * Persists a NON-active chat's row — the one exception to the "only the
+   * active chat is written" policy (tta_rewrite_final.md §2.5): a generation
+   * that reached a terminal status while its chat was backgrounded (chat
+   * switch mid-stream) writes its origin chat's row through here. Delegates
+   * to the normal save path, so terminal-only message filtering, title
+   * derivation, and updatedAt semantics all match the active-chat auto-save.
+   * `chat.title` is advisory only — an existing row keeps its title, a new
+   * row derives one from the first user message.
+   */
+  const saveBackgroundChat = useCallback(
+    (chat: ChatConversation) => {
+      saveConversationToHistory(chat.id, chat.messages, {
+        updatedAt: chat.updatedAt,
+      });
+    },
+    [saveConversationToHistory],
   );
 
   /** Stamps "now" on the active chat (mirror + history row) — used by local
@@ -300,10 +331,12 @@ export const useTTAChatHistory = ({
     chatHistory,
     latestHistoryChat,
     saveConversationToHistory,
+    saveBackgroundChat,
     renameChat,
     deleteChat,
     applyServerChatMetadata,
     touchActiveChatUpdatedAt,
+    touchChatUpdatedAt,
     setActiveChatId,
     setActiveChatUpdatedAt,
     setChatHistory,

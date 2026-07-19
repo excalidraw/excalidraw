@@ -174,6 +174,61 @@ describe("useTTAChatHistory", () => {
     });
   });
 
+  it("saveBackgroundChat writes a non-active chat's row with the normal filtering, title, and updatedAt semantics", async () => {
+    const adapter: TTAPersistenceAdapter = {
+      loadChats: vi.fn().mockResolvedValue([]),
+      saveChat: vi.fn().mockResolvedValue(undefined),
+      deleteChat: vi.fn().mockResolvedValue(undefined),
+    };
+
+    const { hookRef } = renderHistoryHook(adapter);
+    await waitFor(() => expect(adapter.loadChats).toHaveBeenCalled());
+
+    // a backgrounded generation's chat that reached terminal (§2.5: the one
+    // write that isn't the active chat)
+    act(() => {
+      hookRef.current!.saveBackgroundChat({
+        id: "chat-bg",
+        title: "",
+        updatedAt: 555,
+        messages: [
+          userMessage("user-1", "background prompt"),
+          {
+            id: "assistant-1",
+            role: "assistant",
+            createdAt: 2,
+            skeletons: [],
+            status: { kind: "done", elapsedMs: 5, outcome: "generated" },
+          },
+          {
+            id: "assistant-2",
+            role: "assistant",
+            createdAt: 3,
+            status: { kind: "streaming", phase: "generating", startedAt: 3 },
+          },
+        ],
+      });
+    });
+
+    // the active-chat pointer is untouched
+    expect(hookRef.current!.activeChatId).toBe("");
+    // the row was upserted in memory with the derived title and the given
+    // updatedAt, filtered to persistable (terminal-only) messages
+    const row = hookRef.current!.chatHistory.find(
+      (entry) => entry.id === "chat-bg",
+    );
+    expect(row).toMatchObject({ title: "background prompt", updatedAt: 555 });
+    expect(row!.messages.map((message) => message.id)).toEqual([
+      "user-1",
+      "assistant-1",
+    ]);
+    // ...and persisted through the adapter
+    await waitFor(() => expect(adapter.saveChat).toHaveBeenCalledTimes(1));
+    expect(
+      (adapter.saveChat as ReturnType<typeof vi.fn>).mock.calls[0][0],
+    ).toMatchObject({ id: "chat-bg", title: "background prompt" });
+  });
+
   it("deletes a chat from state and storage and evicts its cached previews", async () => {
     const storedChat: ChatConversation = {
       ...chat("chat-1", 100),

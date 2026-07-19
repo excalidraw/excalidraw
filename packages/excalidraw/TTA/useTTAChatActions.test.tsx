@@ -37,6 +37,23 @@ const userMessage = (id: string, content: string): ChatMessage => ({
   createdAt: 1,
 });
 
+/** The switch target used by the backgrounding tests. */
+const otherChat = (): ChatConversation => ({
+  id: "chat-2",
+  title: "other chat",
+  updatedAt: 123,
+  messages: [
+    userMessage("user-b", "hello"),
+    {
+      id: "assistant-b",
+      role: "assistant",
+      createdAt: 2,
+      status: { kind: "done", elapsedMs: 10, outcome: "generated" },
+      skeletons: [rectSkeleton],
+    },
+  ],
+});
+
 const createMockApp = () => {
   let elements: unknown[] = [];
 
@@ -85,9 +102,11 @@ const createHistoryHandles = (
   setActiveChatId: vi.fn(),
   setActiveChatUpdatedAt: vi.fn(),
   saveConversationToHistory: vi.fn(),
+  saveBackgroundChat: vi.fn(),
   deleteChat: vi.fn(),
   applyServerChatMetadata: vi.fn(),
   touchActiveChatUpdatedAt: vi.fn(),
+  touchChatUpdatedAt: vi.fn(),
   ...overrides,
 });
 
@@ -135,6 +154,21 @@ const TestHarness = ({
 
   const canvasDraft = useCanvasDraft({ app });
 
+  // Live active-chat pointer: `setActiveChatId` updates it (and still records
+  // the call on the provided mock) so switch/delete flows observe the same
+  // pointer the real history hook would expose.
+  const [activeChatId, setActiveChatIdState] = useState(
+    historyHandles.activeChatId,
+  );
+  const history: TTAChatActionsHistoryHandles = {
+    ...historyHandles,
+    activeChatId,
+    setActiveChatId: ((update: string) => {
+      historyHandles.setActiveChatId(update);
+      setActiveChatIdState(update);
+    }) as TTAChatActionsHistoryHandles["setActiveChatId"],
+  };
+
   const actions = useTTAChatActions({
     app,
     t: mockT,
@@ -142,7 +176,7 @@ const TestHarness = ({
     setChatMessages,
     canvasDraft,
     transportAdapter,
-    history: historyHandles,
+    history,
     rateLimits: null,
     onRateLimitInfo: stableFns.onRateLimitInfo,
     isPanelOpen: true,
@@ -209,16 +243,15 @@ describe("useTTAChatActions", () => {
     });
   });
 
-  it("auto-stops an in-flight generation on chat switch: abort + commit + stopped bubble + freed slot (N2)", async () => {
+  it("continues an in-flight generation in the background on chat switch and rejoins it live on switch back", async () => {
     const { app, syncActionResult } = createMockApp();
-    let capturedSignal: AbortSignal | null = null;
+    let capturedOptions: any = null;
     const streamFetch = vi.fn().mockImplementation((options) => {
-      capturedSignal = options.signal;
-      // one renderable chunk so the canvas draft has something to commit
+      capturedOptions = options;
+      // one renderable chunk while the chat is still displayed
       options.onChunk?.({ skeletons: [rectSkeleton], isComplete: false });
       return new Promise(() => {});
     });
-    const stateLog: ChatMessage[][] = [];
     const actionsRef = { current: null as TTAChatActions | null };
 
     render(
@@ -228,7 +261,6 @@ describe("useTTAChatActions", () => {
         historyHandles={createHistoryHandles({ activeChatId: "chat-1" })}
         initialMessages={[]}
         actionsRef={actionsRef}
-        stateLog={stateLog}
       />,
     );
 
@@ -236,55 +268,246 @@ describe("useTTAChatActions", () => {
       actionsRef.current!.sendChatPrompt("draw a cat");
     });
     expect(streamFetch).toHaveBeenCalledTimes(1);
-    // the streaming preview renders uncaptured — nothing committed yet
+
+    act(() => {
+      actionsRef.current!.handleSelectChat(otherChat());
+    });
+
+    // the stream survives the switch (no auto-stop, no abort) and nothing
+    // was committed to the canvas Stop-style
+    expect(capturedOptions.signal.aborted).toBe(false);
     expect(syncActionResult).not.toHaveBeenCalledWith(
       expect.objectContaining({
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       }),
     );
+    // the displayed conversation is the selected chat
+    expect(getMessages().map((message) => message.id)).toEqual([
+      "user-b",
+      "assistant-b",
+    ]);
 
-    const otherChat: ChatConversation = {
-      id: "chat-2",
-      title: "other chat",
-      updatedAt: 123,
-      messages: [
-        userMessage("user-b", "hello"),
-        {
-          id: "assistant-b",
-          role: "assistant",
-          createdAt: 2,
-          status: { kind: "done", elapsedMs: 10, outcome: "generated" },
-          skeletons: [rectSkeleton],
-        },
-      ],
-    };
+    // background chunks land in the buffer — the displayed list is untouched
     act(() => {
-      actionsRef.current!.handleSelectChat(otherChat);
+      capturedOptions.onChunk?.({
+        skeletons: [rectSkeleton, rectSkeleton],
+        isComplete: false,
+      });
+    });
+    expect(getMessages().map((message) => message.id)).toEqual([
+      "user-b",
+      "assistant-b",
+    ]);
+
+    // switch back mid-stream: the buffered conversation (with the live
+    // streaming bubble and the chunks received in the background) is
+    // displayed again, without interrupted-normalization
+    act(() => {
+      actionsRef.current!.handleSelectChat({
+        id: "chat-1",
+        title: "origin chat",
+        updatedAt: 1,
+        messages: [],
+      });
+    });
+    const rejoined = getMessages();
+    expect(rejoined).toHaveLength(2);
+    expect(rejoined[0]).toMatchObject({ role: "user", content: "draw a cat" });
+    expect(rejoined[1]).toMatchObject({
+      role: "assistant",
+      status: { kind: "streaming" },
+    });
+    expect(
+      (rejoined[1] as Extract<ChatMessage, { role: "assistant" }>).skeletons,
+    ).toHaveLength(2);
+    // still the same single stream — never aborted, never re-fetched
+    expect(capturedOptions.signal.aborted).toBe(false);
+    expect(streamFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("persists the origin chat's row via saveBackgroundChat when a backgrounded generation reaches terminal", async () => {
+    const { app } = createMockApp();
+    let capturedOptions: any = null;
+    let resolveStream: (value: unknown) => void = () => {};
+    const streamFetch = vi.fn().mockImplementation((options) => {
+      capturedOptions = options;
+      return new Promise((resolve) => {
+        resolveStream = resolve;
+      });
+    });
+    const historyHandles = createHistoryHandles({ activeChatId: "chat-1" });
+    const actionsRef = { current: null as TTAChatActions | null };
+
+    render(
+      <TestHarness
+        app={app}
+        transportAdapter={{ stream: streamFetch, truncate: vi.fn() }}
+        historyHandles={historyHandles}
+        initialMessages={[]}
+        actionsRef={actionsRef}
+      />,
+    );
+
+    act(() => {
+      actionsRef.current!.sendChatPrompt("draw a cat");
+    });
+    // `started` arrives while the chat is still displayed — adopted normally
+    act(() => {
+      capturedOptions.onStarted?.({
+        chatId: "chat-1",
+        turnId: "turn-1",
+        messageId: "srv-msg-1",
+      });
+    });
+    expect(historyHandles.applyServerChatMetadata).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      actionsRef.current!.handleSelectChat(otherChat());
     });
 
-    // the stream was aborted
-    expect(capturedSignal!.aborted).toBe(true);
-    // the streaming bubble was marked stopped/interrupted (this intermediate
-    // state is what the old chat's auto-save persists) before the switch
-    // replaced the conversation
-    expect(
-      stateLog.some((state) =>
-        state.some(
-          (message) =>
-            message.role === "assistant" &&
-            message.status.kind === "stopped" &&
-            message.status.reason === "interrupted",
-        ),
-      ),
-    ).toBe(true);
-    // the rendered draft was committed to the canvas like pressing Stop
-    // (IMMEDIATELY-captured re-insert of the preview elements)
-    expect(syncActionResult).toHaveBeenCalledWith(
-      expect.objectContaining({
-        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-      }),
+    // terminal while backgrounded
+    await act(async () => {
+      resolveStream({
+        finalPayload: {
+          skeletons: [rectSkeleton],
+          isComplete: true,
+          chatId: "chat-1",
+          turnId: "turn-1",
+          messageId: "srv-msg-1",
+          updatedAt: 777,
+        },
+        error: null,
+      });
+    });
+
+    await waitFor(() =>
+      expect(historyHandles.saveBackgroundChat).toHaveBeenCalledTimes(1),
     );
-    // the conversation now shows the selected chat
+    const saved = (
+      historyHandles.saveBackgroundChat as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0] as ChatConversation;
+    expect(saved.id).toBe("chat-1");
+    expect(saved.updatedAt).toBe(777);
+    expect(saved.messages.map((message) => message.role)).toEqual([
+      "user",
+      "assistant",
+    ]);
+    expect(saved.messages[1]).toMatchObject({
+      status: { kind: "done", outcome: "generated" },
+      skeletons: [rectSkeleton],
+    });
+    // the displayed chat was never touched by the backgrounded terminal
+    expect(getMessages().map((message) => message.id)).toEqual([
+      "user-b",
+      "assistant-b",
+    ]);
+    // the done metadata routed to the buffer, not the active-chat mirror
+    expect(historyHandles.applyServerChatMetadata).toHaveBeenCalledTimes(1);
+    expect(historyHandles.touchChatUpdatedAt).toHaveBeenCalledWith(
+      "chat-1",
+      777,
+    );
+  });
+
+  it("routes a backgrounded `started` chatId to the buffer, not the displayed chat", async () => {
+    const { app } = createMockApp();
+    let capturedOptions: any = null;
+    const streamFetch = vi.fn().mockImplementation((options) => {
+      capturedOptions = options;
+      return new Promise(() => {});
+    });
+    // brand-new chat: no chat id until `started`
+    const historyHandles = createHistoryHandles({ activeChatId: "" });
+    const actionsRef = { current: null as TTAChatActions | null };
+
+    render(
+      <TestHarness
+        app={app}
+        transportAdapter={{ stream: streamFetch, truncate: vi.fn() }}
+        historyHandles={historyHandles}
+        initialMessages={[]}
+        actionsRef={actionsRef}
+      />,
+    );
+
+    act(() => {
+      actionsRef.current!.sendChatPrompt("draw a cat");
+    });
+    act(() => {
+      actionsRef.current!.handleSelectChat(otherChat());
+    });
+    // `started` arrives after the chat was backgrounded
+    act(() => {
+      capturedOptions.onStarted?.({
+        chatId: "chat-server-9",
+        turnId: "turn-1",
+        messageId: "srv-msg-1",
+      });
+    });
+
+    // the server chat id must NOT be adopted onto the displayed chat
+    expect(historyHandles.applyServerChatMetadata).not.toHaveBeenCalled();
+    expect(historyHandles.setActiveChatId).not.toHaveBeenCalledWith(
+      "chat-server-9",
+    );
+
+    // ...but the buffer adopted it: selecting the server chat id rejoins the
+    // live generation
+    act(() => {
+      actionsRef.current!.handleSelectChat({
+        id: "chat-server-9",
+        title: "",
+        updatedAt: 5,
+        messages: [],
+      });
+    });
+    const messages = getMessages();
+    expect(messages[0]).toMatchObject({ role: "user", content: "draw a cat" });
+    expect(messages[1]).toMatchObject({
+      role: "assistant",
+      status: { kind: "streaming" },
+    });
+  });
+
+  it("stops the backgrounded generation and drops its buffer when the buffered chat is deleted", async () => {
+    const { app } = createMockApp();
+    let capturedOptions: any = null;
+    const streamFetch = vi.fn().mockImplementation((options) => {
+      capturedOptions = options;
+      options.onChunk?.({ skeletons: [rectSkeleton], isComplete: false });
+      return new Promise(() => {});
+    });
+    const historyHandles = createHistoryHandles({ activeChatId: "chat-1" });
+    const actionsRef = { current: null as TTAChatActions | null };
+
+    render(
+      <TestHarness
+        app={app}
+        transportAdapter={{ stream: streamFetch, truncate: vi.fn() }}
+        historyHandles={historyHandles}
+        initialMessages={[]}
+        actionsRef={actionsRef}
+      />,
+    );
+
+    act(() => {
+      actionsRef.current!.sendChatPrompt("draw a cat");
+    });
+    act(() => {
+      actionsRef.current!.handleSelectChat(otherChat());
+    });
+    expect(capturedOptions.signal.aborted).toBe(false);
+
+    act(() => {
+      actionsRef.current!.handleDeleteChat("chat-1");
+    });
+
+    // the backgrounded generation was stopped and the chat deleted
+    expect(capturedOptions.signal.aborted).toBe(true);
+    expect(historyHandles.deleteChat).toHaveBeenCalledWith("chat-1");
+    // nothing is persisted for a chat that is being deleted
+    expect(historyHandles.saveBackgroundChat).not.toHaveBeenCalled();
+    // the displayed chat is unaffected
     expect(getMessages().map((message) => message.id)).toEqual([
       "user-b",
       "assistant-b",
@@ -295,6 +518,127 @@ describe("useTTAChatActions", () => {
       actionsRef.current!.sendChatPrompt("draw a dog");
     });
     expect(streamFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps the backgrounded generation streaming when the displayed chat is deleted", async () => {
+    const { app } = createMockApp();
+    let capturedOptions: any = null;
+    let resolveStream: (value: unknown) => void = () => {};
+    const streamFetch = vi.fn().mockImplementation((options) => {
+      capturedOptions = options;
+      return new Promise((resolve) => {
+        resolveStream = resolve;
+      });
+    });
+    const historyHandles = createHistoryHandles({ activeChatId: "chat-1" });
+    const actionsRef = { current: null as TTAChatActions | null };
+
+    render(
+      <TestHarness
+        app={app}
+        transportAdapter={{ stream: streamFetch, truncate: vi.fn() }}
+        historyHandles={historyHandles}
+        initialMessages={[]}
+        actionsRef={actionsRef}
+      />,
+    );
+
+    act(() => {
+      actionsRef.current!.sendChatPrompt("draw a cat");
+    });
+    act(() => {
+      capturedOptions.onStarted?.({
+        chatId: "chat-1",
+        turnId: "turn-1",
+        messageId: "srv-msg-1",
+      });
+    });
+    act(() => {
+      actionsRef.current!.handleSelectChat(otherChat());
+    });
+
+    // deleting the DISPLAYED chat must not stop the background generation
+    act(() => {
+      actionsRef.current!.handleDeleteChat("chat-2");
+    });
+    expect(capturedOptions.signal.aborted).toBe(false);
+    expect(historyHandles.deleteChat).toHaveBeenCalledWith("chat-2");
+    // the displayed conversation was cleared (new-chat flow)
+    expect(getMessages()).toEqual([]);
+
+    // ...and its terminal still persists the origin chat's row
+    await act(async () => {
+      resolveStream({
+        finalPayload: {
+          skeletons: [rectSkeleton],
+          isComplete: true,
+          chatId: "chat-1",
+          turnId: "turn-1",
+          messageId: "srv-msg-1",
+          updatedAt: 888,
+        },
+        error: null,
+      });
+    });
+    await waitFor(() =>
+      expect(historyHandles.saveBackgroundChat).toHaveBeenCalledTimes(1),
+    );
+    expect(
+      (historyHandles.saveBackgroundChat as ReturnType<typeof vi.fn>).mock
+        .calls[0][0],
+    ).toMatchObject({ id: "chat-1", updatedAt: 888 });
+  });
+
+  it("re-runs a trailing prompt-only turn as a fresh send with the same prompt and images (§5.8)", async () => {
+    const { app } = createMockApp();
+    const streamFetch = vi.fn().mockImplementation(() => new Promise(() => {}));
+    const actionsRef = { current: null as TTAChatActions | null };
+
+    render(
+      <TestHarness
+        app={app}
+        transportAdapter={{ stream: streamFetch, truncate: vi.fn() }}
+        historyHandles={createHistoryHandles({ activeChatId: "chat-1" })}
+        initialMessages={[
+          {
+            id: "user-1",
+            role: "user",
+            content: "draw a cat",
+            images: ["data:image/jpeg;base64,abc"],
+            createdAt: 1,
+          },
+        ]}
+        actionsRef={actionsRef}
+      />,
+    );
+
+    // what the dialog's re-run affordance dispatches for the trailing turn
+    act(() => {
+      actionsRef.current!.sendChatPrompt("draw a cat", [
+        "data:image/jpeg;base64,abc",
+      ]);
+    });
+
+    expect(streamFetch).toHaveBeenCalledTimes(1);
+    const { payload } = streamFetch.mock.calls[0][0];
+    expect(payload.prompt).toBe("draw a cat");
+    expect(payload.images).toEqual(["data:image/jpeg;base64,abc"]);
+    // a fresh turn, never a retry payload (§2.5: re-run = fresh turn)
+    expect(payload.retry).toBeUndefined();
+
+    // the fresh turn appends a NEW user message + streaming assistant bubble
+    const messages = getMessages();
+    expect(messages).toHaveLength(3);
+    expect(messages[1]).toMatchObject({
+      role: "user",
+      content: "draw a cat",
+      images: ["data:image/jpeg;base64,abc"],
+    });
+    expect(messages[1].id).not.toBe("user-1");
+    expect(messages[2]).toMatchObject({
+      role: "assistant",
+      status: { kind: "streaming" },
+    });
   });
 
   it("omits retryAssistantMessageId when the turn never succeeded (N1)", async () => {

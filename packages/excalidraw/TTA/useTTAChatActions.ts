@@ -55,10 +55,34 @@ export type TTAChatActionsHistoryHandles = Pick<
   | "setActiveChatId"
   | "setActiveChatUpdatedAt"
   | "saveConversationToHistory"
+  | "saveBackgroundChat"
   | "deleteChat"
   | "applyServerChatMetadata"
   | "touchActiveChatUpdatedAt"
+  | "touchChatUpdatedAt"
 >;
+
+/**
+ * The (single) in-flight generation whose chat is no longer displayed
+ * (2026-07-19 post-QA direction, replacing the N2 auto-stop-on-switch
+ * policy): switching chats mid-stream no longer stops the generation — its
+ * conversation moves into this buffer and every stream-driven patch is
+ * routed here instead of into the displayed list. The generation keeps
+ * painting the shared canvas (unchanged). Because generations are
+ * single-flight there is at most one buffer, never a router.
+ *
+ * - `chatId` is null for a brand-new chat until `started` delivers the
+ *   server id (buffer-until-`started`, §2.5).
+ * - `updatedAt` plays the active-chat-mirror role for the buffered chat.
+ * - Cleared on: rejoin (switch back — the messages are adopted as the
+ *   displayed list), terminal (the chat's row is persisted via
+ *   `saveBackgroundChat`), and buffered-chat delete (dropped, no persist).
+ */
+type BackgroundGeneration = {
+  chatId: string | null;
+  messages: ChatMessage[];
+  updatedAt: number | null;
+};
 
 export type UseTTAChatActionsOptions = {
   app: AppClassProperties;
@@ -119,10 +143,110 @@ export const useTTAChatActions = ({
     setActiveChatId,
     setActiveChatUpdatedAt,
     saveConversationToHistory,
+    saveBackgroundChat,
     deleteChat,
     applyServerChatMetadata,
     touchActiveChatUpdatedAt,
+    touchChatUpdatedAt,
   } = history;
+
+  const backgroundGenerationRef = useRef<BackgroundGeneration | null>(null);
+
+  /**
+   * Stream-driven message patches go through this wrapper: while the
+   * in-flight generation's chat is backgrounded, updaters apply to the
+   * buffer's messages instead of the displayed conversation (which belongs
+   * to a different chat). Preserves functional-updater semantics — the
+   * lifecycle passes updaters, not arrays. Single-flight guarantees any
+   * routed patch belongs to the buffered generation.
+   */
+  const routeChatMessagesUpdate = useCallback(
+    (action: SetStateAction<ChatMessage[]>) => {
+      const background = backgroundGenerationRef.current;
+      if (background) {
+        background.messages =
+          typeof action === "function" ? action(background.messages) : action;
+        return;
+      }
+      setChatMessages(action);
+    },
+    [setChatMessages],
+  );
+
+  /**
+   * `started`/`done` metadata for a backgrounded generation must not touch
+   * the displayed chat: the server chat id goes to the buffer (adopting it
+   * on `activeChatId` would corrupt the displayed conversation) and
+   * `updatedAt` touches the buffered chat's history row (if it exists), not
+   * the active-chat mirror.
+   */
+  const routeServerChatMetadata = useCallback(
+    (metadata: { chatId?: string | null; updatedAt?: number | null }) => {
+      const background = backgroundGenerationRef.current;
+      if (!background) {
+        applyServerChatMetadata(metadata);
+        return;
+      }
+      if (metadata.chatId) {
+        background.chatId = metadata.chatId;
+      }
+      if (typeof metadata.updatedAt === "number") {
+        background.updatedAt = metadata.updatedAt;
+        if (background.chatId) {
+          touchChatUpdatedAt(background.chatId, metadata.updatedAt);
+        }
+      }
+    },
+    [applyServerChatMetadata, touchChatUpdatedAt],
+  );
+
+  /**
+   * `touchActiveChatUpdatedAt` counterpart that respects backgrounding: a
+   * local mutation of the in-flight generation (Stop) stamps the chat that
+   * OWNS the generation, which is the buffered one when backgrounded.
+   */
+  const touchOwningChatUpdatedAt = useCallback(() => {
+    const background = backgroundGenerationRef.current;
+    if (background) {
+      background.updatedAt = Date.now();
+      if (background.chatId) {
+        touchChatUpdatedAt(background.chatId, background.updatedAt);
+      }
+      return;
+    }
+    touchActiveChatUpdatedAt();
+  }, [touchActiveChatUpdatedAt, touchChatUpdatedAt]);
+
+  /**
+   * Terminal-while-backgrounded persistence: upsert + persist the buffered
+   * chat's row (the one non-active write, §2.5) and clear the buffer — a
+   * switch-back afterwards loads the row via the normal selection path,
+   * which now contains the terminal bubble. A buffer whose generation never
+   * received `started` (no chat id — e.g. an early error on a brand-new
+   * chat) is dropped: there is no row to write, same data-loss window as a
+   * reload before `started`. Idempotent — runs from the stream's `finally`
+   * and, defensively, right before a new generation takes the slot (a stale
+   * buffer must never adopt the successor's patches).
+   */
+  const finalizeBackgroundGeneration = useCallback(() => {
+    const background = backgroundGenerationRef.current;
+    if (!background) {
+      return;
+    }
+    backgroundGenerationRef.current = null;
+    if (!background.chatId) {
+      console.warn(
+        "[AI Chat] dropping a backgrounded generation that never received a chat id",
+      );
+      return;
+    }
+    saveBackgroundChat({
+      id: background.chatId,
+      title: "",
+      messages: background.messages,
+      updatedAt: background.updatedAt ?? Date.now(),
+    });
+  }, [saveBackgroundChat]);
 
   // Single-flight: at most one generation at a time; `isSendingChat` is the
   // slot's render mirror (drives every disabled state and the Stop button).
@@ -206,11 +330,14 @@ export const useTTAChatActions = ({
     [app, getElementsForMessage],
   );
 
+  // The lifecycle needs no backgrounding awareness: every chat-state write it
+  // performs goes through the routed wrappers above, which redirect into the
+  // background buffer while the generation's chat is not displayed.
   const { cancelActiveStream, setStopRequested, generateResponse } =
     useAIStreamingLifecycle({
       chatMessages,
-      setChatMessages,
-      applyServerChatMetadata,
+      setChatMessages: routeChatMessagesUpdate,
+      applyServerChatMetadata: routeServerChatMetadata,
       canvasDraft,
       streamFetch: transportAdapter.stream,
       onRateLimitInfo,
@@ -333,6 +460,63 @@ export const useTTAChatActions = ({
   );
 
   /**
+   * Full user-Stop semantics: abort the stream, commit the rendered draft to
+   * the canvas (NEVER→IMMEDIATELY dance), free the slot, mark the streaming
+   * bubble stopped. Also used by chat delete mid-stream (N2), which behaves
+   * exactly like pressing Stop first. Stop reflects global single-flight:
+   * pressing it while a different chat is displayed stops the backgrounded
+   * generation — the stopped-bubble patch and the updatedAt touch route into
+   * the buffer, and the buffer is persisted by `finalizeBackgroundGeneration`
+   * (from the aborted stream's `finally`, or synchronously by the next slot
+   * takeover).
+   */
+  const stopActiveGeneration = useCallback(
+    (stopReason: "user" | "interrupted") => {
+      if (!hasActiveGeneration()) {
+        return;
+      }
+      setStopRequested(true);
+      cancelActiveStream();
+      canvasDraft.commitDraft();
+      releaseGenerationSlot();
+      touchOwningChatUpdatedAt();
+
+      // Mark the last assistant message (of the chat owning the generation)
+      // as stopped.
+      routeChatMessagesUpdate((prev) => {
+        const lastMsg = prev[prev.length - 1];
+        if (
+          lastMsg &&
+          lastMsg.role === "assistant" &&
+          lastMsg.status.kind === "streaming"
+        ) {
+          return [
+            ...prev.slice(0, -1),
+            {
+              ...lastMsg,
+              status: {
+                kind: "stopped",
+                elapsedMs: Math.max(0, Date.now() - lastMsg.status.startedAt),
+                reason: stopReason,
+              },
+            },
+          ];
+        }
+        return prev;
+      });
+    },
+    [
+      cancelActiveStream,
+      canvasDraft,
+      hasActiveGeneration,
+      releaseGenerationSlot,
+      routeChatMessagesUpdate,
+      setStopRequested,
+      touchOwningChatUpdatedAt,
+    ],
+  );
+
+  /**
    * The single entry point for send and retry (tta_rewrite_final.md §2.3):
    * reserves the in-flight slot synchronously BEFORE any chat mutation (so a
    * concurrent Enter-send can never mutate the conversation — C1), then
@@ -355,16 +539,31 @@ export const useTTAChatActions = ({
         if (!replaceActive) {
           return false;
         }
-        // cancel-and-replace (retry): abort the active stream and take over.
-        // The canceled stream's ownership-checked cleanup can't clobber us.
-        cancelActiveStream();
-        canvasDraft.cancelPendingRenders();
-        releaseGenerationSlot();
+        if (backgroundGenerationRef.current) {
+          // The active generation belongs to a backgrounded chat (retry was
+          // pressed on a terminal bubble of the displayed chat). Settle it
+          // like pressing Stop — commit its draft, mark its bubble
+          // interrupted — instead of silently cancelling; the finalize below
+          // persists its row before this generation takes over.
+          stopActiveGeneration("interrupted");
+        } else {
+          // cancel-and-replace (retry): abort the active stream and take
+          // over. The canceled stream's ownership-checked cleanup can't
+          // clobber us.
+          cancelActiveStream();
+          canvasDraft.cancelPendingRenders();
+          releaseGenerationSlot();
+        }
       }
       const release = acquireGenerationSlot();
       if (!release) {
         return false;
       }
+      // A background buffer can only still exist here if its generation no
+      // longer holds the slot (stopped above, or Stop pressed earlier while
+      // its stream hadn't settled). Settle it NOW — this generation's
+      // patches must never be routed into a stale buffer.
+      finalizeBackgroundGeneration();
       mutate();
       setStopRequested(false);
       void stream()
@@ -375,7 +574,7 @@ export const useTTAChatActions = ({
             return;
           }
           const message = err instanceof Error ? err.message : String(err);
-          setChatMessages((prev) => {
+          routeChatMessagesUpdate((prev) => {
             // patch the generation's own bubble when it exists (retry
             // placeholders would otherwise spin forever), append otherwise
             if (
@@ -412,17 +611,26 @@ export const useTTAChatActions = ({
             ];
           });
         })
-        .finally(release);
+        .finally(() => {
+          release();
+          // Terminal while backgrounded: the terminal patch has landed in
+          // the buffer by now — persist the buffered chat's row and clear
+          // the buffer. No-op when the generation ended in the foreground
+          // (or the buffer was already settled/dropped).
+          finalizeBackgroundGeneration();
+        });
       return true;
     },
     [
       acquireGenerationSlot,
       cancelActiveStream,
       canvasDraft,
+      finalizeBackgroundGeneration,
       hasActiveGeneration,
       releaseGenerationSlot,
-      setChatMessages,
+      routeChatMessagesUpdate,
       setStopRequested,
+      stopActiveGeneration,
     ],
   );
 
@@ -481,64 +689,18 @@ export const useTTAChatActions = ({
     ],
   );
 
-  /**
-   * Full user-Stop semantics: abort the stream, commit the rendered draft to
-   * the canvas (NEVER→IMMEDIATELY dance), free the slot, mark the streaming
-   * bubble stopped. Also used by chat switch/delete mid-stream (N2), which
-   * behave exactly like pressing Stop first.
-   */
-  const stopActiveGeneration = useCallback(
-    (stopReason: "user" | "interrupted") => {
-      if (!hasActiveGeneration()) {
-        return;
-      }
-      setStopRequested(true);
-      cancelActiveStream();
-      canvasDraft.commitDraft();
-      releaseGenerationSlot();
-      touchActiveChatUpdatedAt();
-
-      // Mark the last assistant message as stopped.
-      setChatMessages((prev) => {
-        const lastMsg = prev[prev.length - 1];
-        if (
-          lastMsg &&
-          lastMsg.role === "assistant" &&
-          lastMsg.status.kind === "streaming"
-        ) {
-          return [
-            ...prev.slice(0, -1),
-            {
-              ...lastMsg,
-              status: {
-                kind: "stopped",
-                elapsedMs: Math.max(0, Date.now() - lastMsg.status.startedAt),
-                reason: stopReason,
-              },
-            },
-          ];
-        }
-        return prev;
-      });
-    },
-    [
-      cancelActiveStream,
-      canvasDraft,
-      hasActiveGeneration,
-      releaseGenerationSlot,
-      setChatMessages,
-      setStopRequested,
-      touchActiveChatUpdatedAt,
-    ],
-  );
-
   const handleStartNewChat = useCallback(
     async (options?: { saveCurrentToHistory?: boolean }) => {
       const saveCurrentToHistory = options?.saveCurrentToHistory ?? true;
       if (saveCurrentToHistory && chatMessages.length && activeChatId) {
         saveConversationToHistory(activeChatId, chatMessages);
       }
-      canvasDraft.reset();
+      // A backgrounded generation owns the canvas draft — leave it painting.
+      // (Only reachable with a buffer via deleting the displayed chat: the
+      // New Chat button/shortcut are disabled while `isSendingChat`.)
+      if (!backgroundGenerationRef.current) {
+        canvasDraft.reset();
+      }
       setActiveChatUpdatedAt(null);
       setChatMessages([]);
       clearComposer();
@@ -564,27 +726,90 @@ export const useTTAChatActions = ({
 
   const handleDeleteChat = useCallback(
     (chatId: string) => {
-      if (activeChatId === chatId) {
-        // deleting the chat that owns the in-flight generation — stop it
-        // first (N2: an orphaned stream would keep painting the canvas and
-        // re-point the active chat back to the deleted id)
+      const background = backgroundGenerationRef.current;
+      if (background && background.chatId === chatId) {
+        // Deleting the chat that owns the backgrounded generation: stop it
+        // (Stop semantics: abort + commit the rendered draft) and drop the
+        // buffer — nothing is persisted for a chat that is being deleted.
+        // The displayed chat is a different one by construction, so it is
+        // unaffected.
         stopActiveGeneration("interrupted");
+        backgroundGenerationRef.current = null;
+        deleteChat(chatId);
+        return;
+      }
+      if (activeChatId === chatId) {
+        if (!background) {
+          // deleting the displayed chat that owns the in-flight generation —
+          // stop it first (N2: an orphaned stream would keep painting the
+          // canvas and re-point the active chat back to the deleted id)
+          stopActiveGeneration("interrupted");
+        }
+        // (with a background buffer, the in-flight generation belongs to the
+        // buffered chat — it keeps streaming through this delete)
+        deleteChat(chatId);
+        handleStartNewChat({ saveCurrentToHistory: false });
+        return;
       }
       deleteChat(chatId);
-      if (activeChatId === chatId) {
-        handleStartNewChat({ saveCurrentToHistory: false });
-      }
     },
     [activeChatId, deleteChat, handleStartNewChat, stopActiveGeneration],
   );
 
   const handleSelectChat = useCallback(
     (chat: ChatConversation) => {
-      // Switching chats mid-stream behaves like pressing Stop first (N2):
-      // the draft is committed to the canvas under the old chat and the
-      // orphaned stream can no longer patch state or re-point the chat id.
-      stopActiveGeneration("interrupted");
-      canvasDraft.reset();
+      const background = backgroundGenerationRef.current;
+
+      if (background && background.chatId === chat.id) {
+        // Rejoin the buffered chat: its buffered messages are fresher than
+        // the history row (they carry the live streaming bubble). The
+        // generation is foreground again — clear the buffer so its patches
+        // land in the displayed list. No interrupted-normalization (the
+        // streaming bubble is live, not orphaned) and no canvas-draft reset
+        // (the generation owns the draft).
+        backgroundGenerationRef.current = null;
+        setChatMessages(background.messages);
+        setActiveChatId(chat.id);
+        setActiveChatUpdatedAt(background.updatedAt ?? chat.updatedAt);
+        hideHistory();
+        requestAnimationFrame(() => {
+          scrollChatToBottom();
+          focusComposerInput();
+        });
+        return;
+      }
+
+      if (!background && hasActiveGeneration()) {
+        if (chat.id === activeChatId) {
+          // Selecting the chat that is already displayed while it streams:
+          // nothing to switch — rehydrating from its (stale) row would drop
+          // the live bubble.
+          hideHistory();
+          requestAnimationFrame(() => {
+            scrollChatToBottom();
+            focusComposerInput();
+          });
+          return;
+        }
+        // Switching away mid-stream: the generation continues in the
+        // background (2026-07-19 post-QA direction; replaces the N2
+        // auto-stop). It keeps painting the shared canvas; its patches and
+        // server metadata are routed into this buffer until terminal
+        // (row persisted) or rejoin.
+        backgroundGenerationRef.current = {
+          chatId: activeChatId || null,
+          messages: chatMessages,
+          updatedAt: null,
+        };
+      } else if (!background) {
+        // No generation in flight anywhere: the draft record is stale
+        // (already committed/cleared) — drop it together with any queued
+        // replacement tags so they can't fire in the target chat's context.
+        canvasDraft.reset();
+      }
+      // (background non-null and not the rejoin target: switching between
+      // two other chats — the buffer and the canvas draft stay untouched)
+
       setChatMessages(stopIncompleteAssistantMessages(chat.messages));
       setActiveChatId(chat.id);
       setActiveChatUpdatedAt(chat.updatedAt);
@@ -595,14 +820,16 @@ export const useTTAChatActions = ({
       });
     },
     [
+      activeChatId,
       canvasDraft,
+      chatMessages,
       focusComposerInput,
+      hasActiveGeneration,
       hideHistory,
       scrollChatToBottom,
       setActiveChatId,
       setActiveChatUpdatedAt,
       setChatMessages,
-      stopActiveGeneration,
     ],
   );
 
@@ -767,11 +994,16 @@ export const useTTAChatActions = ({
       }
 
       // Cancel any in-flight generation and remove draft preview elements
-      // (no draft commit: delete is destructive, the canvas is cleared below).
-      setStopRequested(true);
-      cancelActiveStream();
-      releaseGenerationSlot();
-      canvasDraft.reset();
+      // (no draft commit: delete is destructive, the canvas is rebuilt
+      // below) — unless the generation belongs to a backgrounded chat: it
+      // keeps streaming and owns the draft; only this (displayed) chat's
+      // committed canvas state is rebuilt.
+      if (!backgroundGenerationRef.current) {
+        setStopRequested(true);
+        cancelActiveStream();
+        releaseGenerationSlot();
+        canvasDraft.reset();
+      }
       touchActiveChatUpdatedAt();
 
       const turnStartIndex = getTurnStartIndexForAssistantDelete(

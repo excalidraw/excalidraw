@@ -34,18 +34,32 @@ export interface TTAChatMessageProps {
   onDelete: () => void;
   showDelete?: boolean;
   onPreview: (url: string) => void;
+  /**
+   * Re-run affordance for a trailing prompt-only user turn
+   * (tta_rewrite_final.md §5.8): a reload or chat switch mid-generation
+   * leaves the chat ending on a user message with no assistant reply —
+   * re-run sends the same prompt + images as a fresh turn.
+   */
+  onRerun?: () => void;
+  showRerun?: boolean;
   scrollChatToBottom?: (options?: TTAChatScrollOptions) => void;
   renderWarning?: TTADialogRenderWarning;
   rateLimits?: TTARateLimits | null;
 }
 
-type TTAUserChatMessageProps = Pick<TTAChatMessageProps, "onPreview"> & {
+type TTAUserChatMessageProps = Pick<
+  TTAChatMessageProps,
+  "onPreview" | "onRerun" | "showRerun" | "rateLimits"
+> & {
   message: UserMessage;
 };
 
 const TTAUserChatMessage = ({
   message,
   onPreview,
+  onRerun,
+  showRerun = false,
+  rateLimits,
 }: TTAUserChatMessageProps) => {
   const { t } = useI18n();
   const [isCopied, setIsCopied] = useState(false);
@@ -72,14 +86,30 @@ const TTAUserChatMessage = ({
     };
   }, []);
 
-  const actionsNode = message.content ? (
-    <ChatMessageActionButton
-      icon={isCopied ? checkIcon : copyIcon}
-      onClick={() => handleCopy(message.content)}
-      ariaLabel={t("labels.copy")}
-      title={t("labels.copy")}
-    />
-  ) : undefined;
+  const showCopy = Boolean(message.content);
+  const actionsNode =
+    showCopy || showRerun ? (
+      <>
+        {showCopy && (
+          <ChatMessageActionButton
+            icon={isCopied ? checkIcon : copyIcon}
+            onClick={() => handleCopy(message.content)}
+            ariaLabel={t("labels.copy")}
+            title={t("labels.copy")}
+          />
+        )}
+        {showRerun && (
+          <ChatMessageActionButton
+            icon={RetryIcon}
+            label={t("ai.chat.actions.rerun")}
+            onClick={() => onRerun?.()}
+            ariaLabel={t("ai.chat.actions.rerun")}
+            title={t("ai.chat.actions.rerun")}
+            disabled={rateLimits?.rateLimitRemaining === 0}
+          />
+        )}
+      </>
+    ) : undefined;
 
   return (
     <ChatMessage
@@ -496,6 +526,12 @@ export const TTAChatMessage: React.FC<TTAChatMessageProps> = (props) => {
   }
 
   return (
-    <TTAUserChatMessage message={props.message} onPreview={props.onPreview} />
+    <TTAUserChatMessage
+      message={props.message}
+      onPreview={props.onPreview}
+      onRerun={props.onRerun}
+      showRerun={props.showRerun}
+      rateLimits={props.rateLimits}
+    />
   );
 };
