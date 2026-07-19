@@ -6,8 +6,25 @@ import { useAIStreamingLifecycle } from "./useAIStreamingLifecycle";
 import { useCanvasDraft } from "./useCanvasDraft";
 
 import type { TTAStreamFetchResult } from "./client";
-import type { ChatMessage } from "./types";
+import type { AssistantMessage, ChatMessage } from "./types";
 import type { AppClassProperties } from "../types";
+
+const streamingStatusOf = (message: AssistantMessage) => {
+  if (message.status.kind !== "streaming") {
+    throw new Error(
+      `expected a streaming status, got "${message.status.kind}"`,
+    );
+  }
+  return message.status;
+};
+
+const deferred = () => {
+  let resolve!: () => void;
+  const promise = new Promise<void>((_resolve) => {
+    resolve = _resolve;
+  });
+  return { promise, resolve };
+};
 
 const createMockApp = () => {
   let elements: unknown[] = [];
@@ -48,6 +65,7 @@ const TestHarness = ({
   streamResult,
   streamFetch: streamFetchProp,
   onRateLimitInfo,
+  onMessagesChange,
 }: {
   streamResult?: TTAStreamFetchResult;
   streamFetch?: ReturnType<typeof vi.fn>;
@@ -55,6 +73,8 @@ const TestHarness = ({
     rateLimit?: number | null;
     rateLimitRemaining?: number | null;
   }) => void;
+  /** Receives the raw (non-serialized) message array on every change. */
+  onMessagesChange?: (messages: ChatMessage[]) => void;
 }) => {
   const [app] = useState(createMockApp);
   const [streamFetch] = useState(
@@ -88,6 +108,10 @@ const TestHarness = ({
     onRateLimitInfo,
   });
   const { generateResponse } = lifecycle;
+
+  useEffect(() => {
+    onMessagesChange?.(chatMessages);
+  }, [chatMessages, onMessagesChange]);
 
   useEffect(() => {
     if (didGenerateRef.current) {
@@ -159,6 +183,116 @@ describe("useAIStreamingLifecycle", () => {
     expect(messages[2]).toMatchObject({
       role: "system",
       variant: "messageLimitExceeded",
+    });
+  });
+
+  it("keeps the streaming label until the status genuinely changes (keep-alive chunks are no-ops)", async () => {
+    const skeleton = { type: "rectangle", x: 0, y: 0, width: 10, height: 10 };
+    const statusText = "Something went wrong. Retrying...";
+    const keepAliveGate = deferred();
+    const contentGate = deferred();
+    const doneGate = deferred();
+    const streamFetch = vi.fn().mockImplementation(async (options) => {
+      options.onStarted?.({
+        chatId: "chat-1",
+        turnId: "turn-1",
+        messageId: "message-1",
+      });
+      await keepAliveGate.promise;
+      // empty keep-alive frames around a server `message` frame — the server
+      // emits these continuously, and they must not replace the status
+      // object (no-op) nor wipe the label
+      options.onChunk?.({ skeletons: [], isComplete: false });
+      options.onChunk?.({ skeletons: [], isComplete: false });
+      options.onMessage?.({ message: statusText });
+      options.onChunk?.({ skeletons: [], isComplete: false });
+      await contentGate.promise;
+      // real content — the label downgrade is legitimate progress
+      options.onChunk?.({ skeletons: [skeleton], isComplete: false });
+      await doneGate.promise;
+      return {
+        finalPayload: {
+          skeletons: [skeleton],
+          isComplete: true,
+          chatId: "chat-1",
+          turnId: "turn-1",
+          messageId: "message-1",
+        },
+        error: null,
+      };
+    });
+
+    const snapshots: ChatMessage[][] = [];
+    render(
+      <TestHarness
+        onRateLimitInfo={vi.fn()}
+        streamFetch={streamFetch}
+        onMessagesChange={(messages) => snapshots.push(messages)}
+      />,
+    );
+
+    await waitFor(() => {
+      const messages = JSON.parse(screen.getByTestId("messages").textContent!);
+      expect(messages[1].status).toMatchObject({
+        kind: "streaming",
+        phase: "generating",
+      });
+    });
+    const startedAt = streamingStatusOf(
+      snapshots.at(-1)![1] as AssistantMessage,
+    ).startedAt;
+
+    keepAliveGate.resolve();
+
+    // the server statusText set between keep-alive chunks survives them
+    await waitFor(() => {
+      const messages = JSON.parse(screen.getByTestId("messages").textContent!);
+      expect(messages[1].status).toMatchObject({
+        kind: "streaming",
+        phase: "finalizing",
+        statusText,
+      });
+    });
+
+    // the unlabeled keep-alives before the `message` frame were complete
+    // no-ops: every "generating, no label" render shares one message object
+    const unlabeledGenerating = snapshots
+      .map((messages) => messages[1] as AssistantMessage)
+      .filter(
+        (message) =>
+          message.status.kind === "streaming" &&
+          message.status.phase === "generating" &&
+          !message.status.statusText,
+      );
+    expect(unlabeledGenerating.length).toBeGreaterThan(0);
+    expect(new Set(unlabeledGenerating).size).toBe(1);
+    // startedAt never resets mid-stream — the elapsed ticker depends on it
+    expect(
+      streamingStatusOf(snapshots.at(-1)![1] as AssistantMessage).startedAt,
+    ).toBe(startedAt);
+
+    contentGate.resolve();
+
+    // a renderable chunk is a real change: back to the unlabeled generating
+    // phase, with the partial skeletons on the message
+    await waitFor(() => {
+      const messages = JSON.parse(screen.getByTestId("messages").textContent!);
+      expect(messages[1].skeletons).toEqual([skeleton]);
+      expect(messages[1].status).toMatchObject({
+        kind: "streaming",
+        phase: "generating",
+      });
+      expect(messages[1].status.statusText).toBeUndefined();
+    });
+
+    doneGate.resolve();
+
+    await waitFor(() => {
+      const messages = JSON.parse(screen.getByTestId("messages").textContent!);
+      expect(messages[1].status).toMatchObject({
+        kind: "done",
+        outcome: "generated",
+      });
     });
   });
 

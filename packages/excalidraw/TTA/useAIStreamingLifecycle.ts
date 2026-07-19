@@ -7,6 +7,7 @@ import {
   type AIGenerateRequestPayload,
   type AIStreamProgressPhase,
   type AssistantMessage,
+  type AssistantStatus,
   type ChatMessage,
 } from "./types";
 import { getAIChatErrorCode, withAIChatErrorMeta } from "./chatErrors";
@@ -56,6 +57,18 @@ const isExhaustedRateLimit = (rateLimitRemaining?: number | null) =>
 const STREAM_IDLE_STATUS_DELAY = 5000;
 
 const getElapsedMs = (startedAt: number) => Math.max(0, Date.now() - startedAt);
+
+/**
+ * A streaming status the user can currently read: free server text
+ * (`message` frames) or an idle-timer phase with a built-in label.
+ * `starting`/`waiting`/`generating` render spinner-only.
+ */
+const isLabeledStreamingStatus = (
+  status: Extract<AssistantStatus, { kind: "streaming" }>,
+) =>
+  Boolean(status.statusText) ||
+  status.phase === "thinking" ||
+  status.phase === "finalizing";
 
 export const useAIStreamingLifecycle = ({
   chatMessages,
@@ -116,16 +129,64 @@ export const useAIStreamingLifecycle = ({
       let hasReceivedRenderableChunk = false;
       const generationStartedAt = Date.now();
 
-      const streamingStatus = (
+      /**
+       * Streaming-status patch. The union model replaces the whole `status`
+       * object per stream event, so this guards the replacement (the pre-union
+       * field patches were just as blind, but the server's empty-partial
+       * keep-alives made the visible label flash in and out — the regression
+       * this closes):
+       * - a no-op patch (same phase + statusText) keeps the previous status
+       *   object instead of minting an identical one;
+       * - `keepLabel` (keep-alive chunks with no new content) never downgrades
+       *   a labeled state (server statusText / idle thinking-finalizing) to an
+       *   unlabeled phase — the label persists until the status genuinely
+       *   changes (next label, real content, or a terminal state);
+       * - `startedAt` carries over from the current streaming status so the
+       *   elapsed ticker never resets mid-stream.
+       */
+      const patchStreamingStatus = (
         phase: AIStreamProgressPhase,
-        statusText?: string,
-      ) =>
-        ({
-          kind: "streaming",
-          phase,
-          startedAt: generationStartedAt,
-          ...(statusText ? { statusText } : {}),
-        } as const);
+        options?: {
+          statusText?: string;
+          keepLabel?: boolean;
+          patch?: Partial<Omit<AssistantMessage, "status">>;
+        },
+      ) => {
+        setChatMessages((prev) =>
+          prev.map((message) => {
+            if (message.id !== assistantId || message.role !== "assistant") {
+              return message;
+            }
+            const current =
+              message.status.kind === "streaming" ? message.status : null;
+            const nextStatusText = options?.statusText || undefined;
+            const isNoOpStatus =
+              current !== null &&
+              current.phase === phase &&
+              (current.statusText || undefined) === nextStatusText;
+            const keepCurrentStatus =
+              isNoOpStatus ||
+              (options?.keepLabel === true &&
+                current !== null &&
+                isLabeledStreamingStatus(current));
+            if (keepCurrentStatus) {
+              return options?.patch
+                ? { ...message, ...options.patch }
+                : message;
+            }
+            return {
+              ...message,
+              ...options?.patch,
+              status: {
+                kind: "streaming",
+                phase,
+                startedAt: current?.startedAt ?? generationStartedAt,
+                ...(nextStatusText ? { statusText: nextStatusText } : {}),
+              },
+            };
+          }),
+        );
+      };
 
       const clearIdleStatusTimeout = () => {
         if (idleStatusTimeout !== null) {
@@ -140,11 +201,9 @@ export const useAIStreamingLifecycle = ({
           if (stopRequestedRef.current) {
             return;
           }
-          patchAssistantMessage(assistantId, {
-            status: streamingStatus(
-              hasReceivedRenderableChunk ? "finalizing" : "thinking",
-            ),
-          });
+          patchStreamingStatus(
+            hasReceivedRenderableChunk ? "finalizing" : "thinking",
+          );
         }, STREAM_IDLE_STATUS_DELAY);
       };
 
@@ -160,8 +219,17 @@ export const useAIStreamingLifecycle = ({
           abortController.abort();
         }
 
+        // Full replace on purpose: each attempt's stream starts the elapsed
+        // ticker from its own `generationStartedAt` (the documented startedAt
+        // reset on retry — types.ts), and wipes any seeded "Retrying..." /
+        // "Regenerating..." statusText after its MIN_RETRYING_VISIBLE_MS
+        // window. Every later patch preserves this baseline.
         patchAssistantMessage(assistantId, {
-          status: streamingStatus("starting"),
+          status: {
+            kind: "streaming",
+            phase: "starting",
+            startedAt: generationStartedAt,
+          },
         });
 
         const { finalPayload, error, rateLimit, rateLimitRemaining } =
@@ -169,27 +237,26 @@ export const useAIStreamingLifecycle = ({
             payload,
             signal: abortController.signal,
             onStreamCreated: () => {
-              patchAssistantMessage(assistantId, {
-                status: streamingStatus("waiting"),
-              });
+              patchStreamingStatus("waiting");
               scheduleIdleStatus();
             },
             onStarted: (startedPayload) => {
               activeTurnId = startedPayload.turnId;
               activeMessageId = startedPayload.messageId;
               applyServerChatMetadata(startedPayload);
-              patchAssistantMessage(assistantId, {
-                status: streamingStatus("generating"),
-                server: {
-                  turnId: startedPayload.turnId,
-                  messageId: startedPayload.messageId,
+              patchStreamingStatus("generating", {
+                patch: {
+                  server: {
+                    turnId: startedPayload.turnId,
+                    messageId: startedPayload.messageId,
+                  },
                 },
               });
               scheduleIdleStatus();
             },
             onMessage: (messagePayload) => {
-              patchAssistantMessage(assistantId, {
-                status: streamingStatus("finalizing", messagePayload.message),
+              patchStreamingStatus("finalizing", {
+                statusText: messagePayload.message,
               });
               scheduleIdleStatus();
             },
@@ -199,15 +266,15 @@ export const useAIStreamingLifecycle = ({
               }
               scheduleIdleStatus();
               if (!partialPayload.skeletons.length) {
-                patchAssistantMessage(assistantId, {
-                  status: streamingStatus("generating"),
-                });
+                // Keep-alive frame — no content progressed, so it must not
+                // wipe a visible label (the server emits these continuously
+                // while the model thinks or its internal retry backs off).
+                patchStreamingStatus("generating", { keepLabel: true });
                 return;
               }
               hasReceivedRenderableChunk = true;
-              patchAssistantMessage(assistantId, {
-                status: streamingStatus("generating"),
-                skeletons: partialPayload.skeletons,
+              patchStreamingStatus("generating", {
+                patch: { skeletons: partialPayload.skeletons },
               });
               // The draft is keyed by the local generation id (known
               // synchronously), so chunks render regardless of whether
@@ -341,6 +408,7 @@ export const useAIStreamingLifecycle = ({
       canvasDraft,
       onRateLimitInfo,
       patchAssistantMessage,
+      setChatMessages,
       streamFetch,
     ],
   );
