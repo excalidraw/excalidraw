@@ -118,6 +118,57 @@ describe("computeBucketFillPolygon", () => {
     expect(result.scenePoints.length).toBeGreaterThan(6);
   });
 
+  it("fills a curved line polygon along its smoothed path", () => {
+    // curved (`roundness`) lines render a curve fitted through the points;
+    // the fill boundary must sample that curve, not cut corners along the
+    // raw polyline
+    const points = [
+      pointFrom<LocalPoint>(0, 50),
+      pointFrom<LocalPoint>(35, 0),
+      pointFrom<LocalPoint>(100, 20),
+      pointFrom<LocalPoint>(90, 80),
+      pointFrom<LocalPoint>(30, 100),
+      pointFrom<LocalPoint>(0, 50),
+    ];
+    const blob = API.createElement({
+      type: "line",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      points,
+      polygon: true,
+      roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+    });
+    const { elements, elementsMap } = setup([blob]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    // the smoothed curve bulges away from the polyline between sparse
+    // points — some fill vertex must deviate from every polyline chord by
+    // clearly more than the snap epsilon (a polyline-based boundary would
+    // keep all vertices within ~1px of the chords)
+    const chords = points
+      .slice(0, -1)
+      .map((p, i) => lineSegment(p as any, points[i + 1] as any));
+    const maxDeviation = Math.max(
+      ...result.scenePoints.map((vertex) =>
+        Math.min(
+          ...chords.map((chord) => distanceToLineSegment(vertex, chord as any)),
+        ),
+      ),
+    );
+    expect(maxDeviation).toBeGreaterThan(2);
+  });
+
   it("fills a diamond", () => {
     // regression: a roundness:null diamond still has tiny (~2px chord) corner
     // arcs whose densely-subdivided segments used to be dropped by the

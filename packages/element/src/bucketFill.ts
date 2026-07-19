@@ -1,4 +1,5 @@
-import { simplify } from "points-on-curve";
+import { pointsOnBezierCurves, simplify } from "points-on-curve";
+import { curveToBezier } from "points-on-curve/lib/curve-to-bezier";
 
 import {
   distanceToLineSegment,
@@ -6,16 +7,18 @@ import {
   lineSegmentIntersectionPoints,
   pointDistance,
   pointFrom,
+  pointRotateRads,
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
 import { isTransparent } from "@excalidraw/common";
 
 import type { Bounds } from "@excalidraw/common";
-import type { GlobalPoint, LineSegment } from "@excalidraw/math";
+import type { GlobalPoint, LineSegment, LocalPoint } from "@excalidraw/math";
 
 import {
   doBoundsIntersect,
+  elementCenterPoint,
   getElementBounds,
   getElementLineSegments,
 } from "./bounds";
@@ -24,9 +27,12 @@ import { hasBackground } from "./comparisons";
 import { isFreeDrawElement, isLineElement, isValidPolygon } from "./typeChecks";
 import { isPathALoop } from "./utils";
 
+import type { Point } from "points-on-curve";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
+  ExcalidrawLineElement,
   NonDeletedExcalidrawElement,
 } from "./types";
 
@@ -55,6 +61,19 @@ import type {
  * here does not distort the filled shape.
  */
 const BUCKET_FILL_GAP_TOLERANCE = 6;
+
+/**
+ * Max deviation, in scene px, of a curved (`roundness`) line's sampled
+ * boundary from its true rendered curve (see `lineElementIdealSegments`).
+ * The fidelity knob for fills along curved lines: lower hugs the curve
+ * tighter but feeds more segments into the arrangement — cost grows roughly
+ * linearly with segment count.
+ *
+ * Note the final polygon is independently simplified at ~0.75px
+ * (`finalizePolygon`), so values much below that add segments without
+ * adding visible fidelity.
+ */
+const BUCKET_FILL_CURVE_MAX_DEVIATION = 0.5;
 
 export type BucketFillOptions = {
   /**
@@ -207,6 +226,55 @@ const subtractIntervals = (
     result = next;
   }
   return result;
+};
+
+/**
+ * Boundary segments for a line element from its LOGICAL path (the element's
+ * points), not its rough rendering.
+ *
+ * Rough rendering draws lines as two jittery passes; using those as
+ * boundaries makes the fill hug the inner pass and leaves an unfilled
+ * sliver between the passes. The logical path runs down the stroke's
+ * centerline, so the fill straddles the sketchy stroke — exactly how
+ * Excalidraw draws shape backgrounds (fill from the ideal path, rough
+ * stroke on top). It also makes line endpoints genuine degree-1 graph
+ * nodes, which is what the bridging pass keys on.
+ *
+ * Curved (`roundness`) lines deviate slightly at bends since the points are
+ * the pre-smoothing polyline; the stroke width hides it.
+ */
+const lineElementIdealSegments = (
+  element: ExcalidrawLineElement,
+  elementsMap: ElementsMap,
+): LineSegment<GlobalPoint>[] => {
+  const center = elementCenterPoint(element, elementsMap);
+  // curved (`roundness`) lines render a smooth curve fitted through the
+  // points — sample that same fit (curveToBezier is what roughjs' curve op
+  // uses) so the boundary follows what's actually on screen instead of
+  // cutting corners along the raw polyline
+  const localPoints =
+    element.roundness && element.points.length > 2
+      ? (pointsOnBezierCurves(
+          curveToBezier(element.points as unknown as Point[]),
+          // near-exact adaptive subdivision (the lib default); the sample
+          // count is then bounded by the RDP pass below, which is the
+          // actual fidelity knob
+          0.15,
+          BUCKET_FILL_CURVE_MAX_DEVIATION,
+        ) as unknown as readonly LocalPoint[])
+      : element.points;
+  const points = localPoints.map((point) =>
+    pointRotateRads(
+      pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+      center,
+      element.angle,
+    ),
+  );
+  const segments: LineSegment<GlobalPoint>[] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    segments.push(lineSegment(points[i], points[i + 1]));
+  }
+  return segments;
 };
 
 /**
@@ -666,44 +734,15 @@ const buildFaces = (
   // worst artifact is a tiny connector edge spanning the visual gap,
   // typically hidden under the stroke width.
   //
-  // "Dangling end" is a ONE-SIDED node, not just a degree-1 node: rough
-  // rendering draws strokes as two jittery passes, so a stroke END is a node
-  // whose (two) incident edges both leave in nearly the same direction.
-  // Formally: all incident edge directions fit inside a narrow cone, i.e.
-  // the largest angular gap between them exceeds 225°. Interior chain nodes
-  // (~180° apart) and genuine crossings (edges all around) don't qualify;
-  // sharp corners (~270° gap) do, which is desirable — a corner sitting a
-  // few px from another stroke is exactly the kind of sketchy joint to
-  // close.
+  // A dangling end is simply a degree-1 node. This relies on boundaries
+  // being single-pass paths: line elements use their logical points (see
+  // `lineElementIdealSegments`), freedraw its own point chain, and closed
+  // shapes their ideal outlines — none of them produce the rough renderer's
+  // double-pass geometry, whose ends would be degree-2.
   // ---------------------------------------------------------------------------
   const bridgeRadius = Math.max(eps, options.gapTolerance);
-  const DANGLING_END_MIN_GAP = (Math.PI * 5) / 4; // 225°
-  const isDanglingEnd = (node: number): boolean => {
-    const unique = [...new Set(adjacency.get(node) ?? [])];
-    if (unique.length === 0) {
-      return false;
-    }
-    if (unique.length === 1) {
-      return true;
-    }
-    // more than 4 distinct directions is a busy junction, never a stroke end
-    if (unique.length > 4) {
-      return false;
-    }
-    const angles = unique
-      .map((neighbour) =>
-        Math.atan2(
-          store.nodes[neighbour][1] - store.nodes[node][1],
-          store.nodes[neighbour][0] - store.nodes[node][0],
-        ),
-      )
-      .sort((a, b) => a - b);
-    let maxGap = angles[0] + Math.PI * 2 - angles[angles.length - 1];
-    for (let i = 1; i < angles.length; i++) {
-      maxGap = Math.max(maxGap, angles[i] - angles[i - 1]);
-    }
-    return maxGap > DANGLING_END_MIN_GAP;
-  };
+  const isDanglingEnd = (node: number): boolean =>
+    new Set(adjacency.get(node) ?? []).size === 1;
   const looseEnds: number[] = [];
   for (const node of adjacency.keys()) {
     if (isDanglingEnd(node)) {
@@ -729,118 +768,107 @@ const buildFaces = (
       return owners;
     };
 
-    // a single sweep can spend an end's bridge on a useless nearby target
-    // (e.g. the unmerged twin endpoint of a rough double-pass stroke); such
-    // an end usually remains one-sided, so iterate to a fixed point
-    for (let round = 0; round < 3; round++) {
-      let bridgedAny = false;
-      for (const loose of looseEnds) {
-        // skip ends already closed by an earlier bridge
-        if (!isDanglingEnd(loose)) {
+    for (const loose of looseEnds) {
+      // skip ends already closed by an earlier bridge
+      if (!isDanglingEnd(loose)) {
+        continue;
+      }
+      const p = store.nodes[loose];
+      const neighbours = adjacency.get(loose) ?? [];
+
+      // nearest non-adjacent node within the bridge radius. Candidates
+      // closer than the snap epsilon are skipped — they're effectively the
+      // same point and `addEdge` refuses such degenerate edges anyway
+      let bestNode = -1;
+      let bestNodeDistance = Infinity;
+      for (let n = 0; n < store.nodes.length; n++) {
+        if (n === loose || neighbours.includes(n)) {
           continue;
         }
-        const p = store.nodes[loose];
-        const neighbours = adjacency.get(loose) ?? [];
-
-        // nearest non-adjacent node within the bridge radius. Candidates
-        // closer than the snap epsilon are skipped — they're effectively the
-        // same point and `addEdge` refuses such degenerate edges anyway
-        let bestNode = -1;
-        let bestNodeDistance = Infinity;
-        for (let n = 0; n < store.nodes.length; n++) {
-          if (n === loose || neighbours.includes(n)) {
-            continue;
-          }
-          const distance = pointDistance(p, store.nodes[n]);
-          if (
-            distance >= eps &&
-            distance <= bridgeRadius &&
-            distance < bestNodeDistance
-          ) {
-            bestNodeDistance = distance;
-            bestNode = n;
-          }
-        }
-
-        // nearest edge (not incident to the loose end) whose interior the
-        // loose end projects onto, within the bridge radius
-        let bestEdge: { u: number; v: number } | null = null;
-        let bestEdgeDistance = Infinity;
-        let bestEdgeT = 0;
-        for (const edge of liveEdges) {
-          if (
-            !edgeSet.has(edgeKey(edge.u, edge.v)) ||
-            edge.u === loose ||
-            edge.v === loose
-          ) {
-            continue;
-          }
-          const eu = store.nodes[edge.u];
-          const ev = store.nodes[edge.v];
-          if (
-            p[0] < Math.min(eu[0], ev[0]) - bridgeRadius ||
-            p[0] > Math.max(eu[0], ev[0]) + bridgeRadius ||
-            p[1] < Math.min(eu[1], ev[1]) - bridgeRadius ||
-            p[1] > Math.max(eu[1], ev[1]) + bridgeRadius
-          ) {
-            continue;
-          }
-          const t = projectParam(eu, ev, p);
-          if (t <= 0 || t >= 1) {
-            continue;
-          }
-          const distance = distanceToLineSegment(p, lineSegment(eu, ev));
-          if (distance <= bridgeRadius && distance < bestEdgeDistance) {
-            bestEdgeDistance = distance;
-            bestEdge = edge;
-            bestEdgeT = t;
-          }
-        }
-
-        const bridgeElement =
-          nodeElement.get(loose) ?? segments[0]?.elementId ?? "";
-        if (bestEdge && bestEdgeDistance < bestNodeDistance) {
-          // split the edge at the projection (a point ON the stroke) and
-          // connect the loose end to it
-          const eu = store.nodes[bestEdge.u];
-          const ev = store.nodes[bestEdge.v];
-          const projection = store.getOrCreate(pointAtParam(eu, ev, bestEdgeT));
-          if (projection === bestEdge.u || projection === bestEdge.v) {
-            // projection merged into an endpoint — plain node bridge
-            addEdge(loose, projection, bridgeElement);
-            liveEdges.push({ u: loose, v: projection });
-          } else {
-            if (!nodeElement.has(projection)) {
-              nodeElement.set(
-                projection,
-                edgeToElements
-                  .get(edgeKey(bestEdge.u, bestEdge.v))
-                  ?.values()
-                  .next().value ?? bridgeElement,
-              );
-            }
-            const owners =
-              unlink(bestEdge.u, bestEdge.v) ?? new Set([bridgeElement]);
-            for (const owner of owners) {
-              addEdge(bestEdge.u, projection, owner);
-              addEdge(projection, bestEdge.v, owner);
-            }
-            liveEdges.push(
-              { u: bestEdge.u, v: projection },
-              { u: projection, v: bestEdge.v },
-            );
-            addEdge(loose, projection, bridgeElement);
-            liveEdges.push({ u: loose, v: projection });
-          }
-          bridgedAny = true;
-        } else if (bestNode >= 0) {
-          addEdge(loose, bestNode, bridgeElement);
-          liveEdges.push({ u: loose, v: bestNode });
-          bridgedAny = true;
+        const distance = pointDistance(p, store.nodes[n]);
+        if (
+          distance >= eps &&
+          distance <= bridgeRadius &&
+          distance < bestNodeDistance
+        ) {
+          bestNodeDistance = distance;
+          bestNode = n;
         }
       }
-      if (!bridgedAny) {
-        break;
+
+      // nearest edge (not incident to the loose end) whose interior the
+      // loose end projects onto, within the bridge radius
+      let bestEdge: { u: number; v: number } | null = null;
+      let bestEdgeDistance = Infinity;
+      let bestEdgeT = 0;
+      for (const edge of liveEdges) {
+        if (
+          !edgeSet.has(edgeKey(edge.u, edge.v)) ||
+          edge.u === loose ||
+          edge.v === loose
+        ) {
+          continue;
+        }
+        const eu = store.nodes[edge.u];
+        const ev = store.nodes[edge.v];
+        if (
+          p[0] < Math.min(eu[0], ev[0]) - bridgeRadius ||
+          p[0] > Math.max(eu[0], ev[0]) + bridgeRadius ||
+          p[1] < Math.min(eu[1], ev[1]) - bridgeRadius ||
+          p[1] > Math.max(eu[1], ev[1]) + bridgeRadius
+        ) {
+          continue;
+        }
+        const t = projectParam(eu, ev, p);
+        if (t <= 0 || t >= 1) {
+          continue;
+        }
+        const distance = distanceToLineSegment(p, lineSegment(eu, ev));
+        if (distance <= bridgeRadius && distance < bestEdgeDistance) {
+          bestEdgeDistance = distance;
+          bestEdge = edge;
+          bestEdgeT = t;
+        }
+      }
+
+      const bridgeElement =
+        nodeElement.get(loose) ?? segments[0]?.elementId ?? "";
+      if (bestEdge && bestEdgeDistance < bestNodeDistance) {
+        // split the edge at the projection (a point ON the stroke) and
+        // connect the loose end to it
+        const eu = store.nodes[bestEdge.u];
+        const ev = store.nodes[bestEdge.v];
+        const projection = store.getOrCreate(pointAtParam(eu, ev, bestEdgeT));
+        if (projection === bestEdge.u || projection === bestEdge.v) {
+          // projection merged into an endpoint — plain node bridge
+          addEdge(loose, projection, bridgeElement);
+          liveEdges.push({ u: loose, v: projection });
+        } else {
+          if (!nodeElement.has(projection)) {
+            nodeElement.set(
+              projection,
+              edgeToElements
+                .get(edgeKey(bestEdge.u, bestEdge.v))
+                ?.values()
+                .next().value ?? bridgeElement,
+            );
+          }
+          const owners =
+            unlink(bestEdge.u, bestEdge.v) ?? new Set([bridgeElement]);
+          for (const owner of owners) {
+            addEdge(bestEdge.u, projection, owner);
+            addEdge(projection, bestEdge.v, owner);
+          }
+          liveEdges.push(
+            { u: bestEdge.u, v: projection },
+            { u: projection, v: bestEdge.v },
+          );
+          addEdge(loose, projection, bridgeElement);
+          liveEdges.push({ u: loose, v: projection });
+        }
+      } else if (bestNode >= 0) {
+        addEdge(loose, bestNode, bridgeElement);
+        liveEdges.push({ u: loose, v: bestNode });
       }
     }
   }
@@ -1086,11 +1114,15 @@ export const computeBucketFillPolygon = (args: {
           coverer.id !== element.id &&
           (indexOf.get(coverer.id) ?? 0) > elementIndex,
       );
-      const segments = getElementLineSegments(element, elementsMap);
+      const segments = isLineElement(element)
+        ? lineElementIdealSegments(element, elementsMap)
+        : getElementLineSegments(element, elementsMap);
       // freedraw and non-polygon line loops render as closed once their
       // endpoints are within LINE_CONFIRM_THRESHOLD (isPathALoop), but their
       // segment chain leaves that closure gap open — bridge it explicitly so
-      // the region reads as closed here too
+      // the region reads as closed here too. Deliberately isPathALoop (the
+      // renderer's own closure rule), NOT gapTolerance: whether an element
+      // paints its background must match whether fill treats it as closed.
       if (
         (element.type === "freedraw" ||
           (isLineElement(element) && !element.polygon)) &&
