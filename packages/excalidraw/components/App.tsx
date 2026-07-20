@@ -9360,16 +9360,11 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (this.state.selectedLinearElement?.isEditing) {
+          // keep the editor open on pointer down — whether to exit is decided
+          // on pointer up (we exit unless a point box-selection occurred),
+          // otherwise dragging on the canvas to box-select points would
+          // immediately exit the editor (#10561)
           this.setState((prevState) => ({
-            selectedLinearElement: prevState.selectedLinearElement
-              ? {
-                  ...prevState.selectedLinearElement,
-                  isEditing:
-                    !!hitElement &&
-                    hitElement.id ===
-                      this.state.selectedLinearElement?.elementId,
-                }
-              : null,
             selectedElementIds: prevState.selectedLinearElement
               ? makeNextSelectedElementIds(
                   {
