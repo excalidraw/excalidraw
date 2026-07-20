@@ -127,6 +127,7 @@
     "distributeVertically": "Distribute vertically",
     "flipHorizontal": "Flip horizontal",
     "flipVertical": "Flip vertical",
+    "flipArrowDirection": "Flip arrow direction",
     "viewMode": "View mode",
     "share": "Share",
     "showStroke": "Show stroke color picker",
