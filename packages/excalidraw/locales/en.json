@@ -534,6 +534,8 @@
   },
   "stats": {
     "angle": "Angle",
+    "area": "Area",
+    "perimeter": "Perimeter",
     "shapes": "Shapes",
     "height": "Height",
     "scene": "Scene",

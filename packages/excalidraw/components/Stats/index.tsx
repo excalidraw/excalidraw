@@ -30,6 +30,7 @@ import MultiDimension from "./MultiDimension";
 import MultiFontSize from "./MultiFontSize";
 import MultiPosition from "./MultiPosition";
 import Position from "./Position";
+import { getShapeArea, getShapePerimeter } from "./measurements";
 import { getAtomicUnits } from "./utils";
 
 import "./Stats.scss";
@@ -181,6 +182,9 @@ export const StatsInner = memo(
     const _frameAndChildrenSelectedTogether = useMemo(() => {
       return frameAndChildrenSelectedTogether(selectedElements);
     }, [selectedElements]);
+
+    const area = singleElement ? getShapeArea(singleElement) : null;
+    const perimeter = singleElement ? getShapePerimeter(singleElement) : null;
 
     return (
       <div className="exc-stats">
@@ -349,6 +353,21 @@ export const StatsInner = memo(
                           appState={appState}
                         />
                       </StatsRow>
+                      {area !== null && (
+                        <div className="exc-stats__separator" />
+                      )}
+                      {area !== null && (
+                        <StatsRow columns={2} data-testid="stats-area">
+                          <div>{t("stats.area")}</div>
+                          <div>{round(area, 2)}</div>
+                        </StatsRow>
+                      )}
+                      {perimeter !== null && (
+                        <StatsRow columns={2} data-testid="stats-perimeter">
+                          <div>{t("stats.perimeter")}</div>
+                          <div>{round(perimeter, 2)}</div>
+                        </StatsRow>
+                      )}
                     </>
                   )}
 

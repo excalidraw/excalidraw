@@ -47,6 +47,11 @@
     }
   }
 
+  &__separator {
+    border-top: 1px solid var(--default-border-color);
+    margin: 0.25rem 0;
+  }
+
   &__row--heading {
     text-align: center;
     font-weight: bold;
