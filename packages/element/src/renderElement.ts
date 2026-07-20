@@ -42,8 +42,13 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+import {
+  getElementAbsoluteCoords,
+  getElementBounds,
+  getDiamondPoints,
+} from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
+import { getGradientLineCoords } from "./gradient";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
   getBoundTextElement,
@@ -315,7 +320,63 @@ const drawImagePlaceholder = (
   );
 };
 
-const drawElementOnCanvas = (
+const fillGradientBackground = (
+  element: NonDeletedExcalidrawElement,
+  context: CanvasRenderingContext2D,
+) => {
+  if (
+    (element.type !== "rectangle" &&
+      element.type !== "diamond" &&
+      element.type !== "ellipse") ||
+    element.fillStyle !== "gradient" ||
+    !element.gradient
+  ) {
+    return;
+  }
+
+  const { x1, y1, x2, y2 } = getGradientLineCoords(
+    element.width,
+    element.height,
+    element.gradient.angle,
+  );
+
+  const canvasGradient = context.createLinearGradient(x1, y1, x2, y2);
+  canvasGradient.addColorStop(0, element.backgroundColor);
+  canvasGradient.addColorStop(1, element.gradient.color2);
+
+  context.save();
+  context.fillStyle = canvasGradient;
+
+  if (element.type === "ellipse") {
+    context.beginPath();
+    context.ellipse(
+      element.width / 2,
+      element.height / 2,
+      element.width / 2,
+      element.height / 2,
+      0,
+      0,
+      2 * Math.PI,
+    );
+    context.fill();
+  } else if (element.type === "diamond") {
+    const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+      getDiamondPoints(element);
+    context.beginPath();
+    context.moveTo(topX, topY);
+    context.lineTo(rightX, rightY);
+    context.lineTo(bottomX, bottomY);
+    context.lineTo(leftX, leftY);
+    context.closePath();
+    context.fill();
+  } else {
+    context.fillRect(0, 0, element.width, element.height);
+  }
+
+  context.restore();
+};
+
+export const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
@@ -329,6 +390,8 @@ const drawElementOnCanvas = (
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
+
+      fillGradientBackground(element, context);
 
       rc.draw(ShapeCache.generateElementShape(element, renderConfig));
       break;

@@ -580,6 +580,40 @@ describe("exporting frames", () => {
       );
     });
 
+    it("exports a gradient-filled rectangle with a linearGradient def", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        width: 100,
+        height: 50,
+        x: 0,
+        y: 0,
+        backgroundColor: "#ff0000",
+        fillStyle: "gradient",
+        gradient: { color2: "#0000ff", angle: 0 },
+      });
+
+      const svg = await exportToSvg({
+        elements: [rectangle],
+        files: null,
+        exportPadding: 0,
+      });
+
+      const gradientDef = svg.querySelector("defs linearGradient");
+      expect(gradientDef).not.toBeNull();
+      expect(gradientDef?.querySelectorAll("stop").length).toBe(2);
+      const stops = gradientDef?.querySelectorAll("stop");
+      expect(stops?.[0]?.getAttribute("stop-color")).toBe("#ff0000");
+      expect(stops?.[1]?.getAttribute("stop-color")).toBe("#0000ff");
+
+      const fillRect = svg.querySelector('rect[fill^="url(#"]');
+      expect(fillRect).not.toBeNull();
+
+      const parent = fillRect?.parentElement;
+      expect(parent).not.toBeNull();
+      const siblings = Array.from(parent?.children ?? []);
+      expect(siblings.indexOf(fillRect as Element)).toBe(0);
+    });
+
     it("should not export frame-overlapping elements belonging to different frame", async () => {
       const frame1 = API.createElement({
         type: "frame",

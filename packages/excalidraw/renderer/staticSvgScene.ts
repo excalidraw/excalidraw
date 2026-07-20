@@ -32,6 +32,8 @@ import { getContainingFrame } from "@excalidraw/element";
 
 import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
+import { getGradientLineCoords, getDiamondPoints } from "@excalidraw/element";
+
 import { ShapeCache } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
@@ -154,6 +156,70 @@ const renderElementToSvg = (
         shape,
         MAX_DECIMALS_FOR_SVG_EXPORT,
       );
+
+      if (element.fillStyle === "gradient" && element.gradient) {
+        const gradientId = `gradient-${element.id}`;
+        const { x1, y1, x2, y2 } = getGradientLineCoords(
+          element.width,
+          element.height,
+          element.gradient.angle,
+        );
+
+        const defs =
+          svgRoot.querySelector("defs") ||
+          (() => {
+            const created = svgRoot.ownerDocument.createElementNS(SVG_NS, "defs");
+            svgRoot.appendChild(created);
+            return created;
+          })();
+
+        const linearGradient = svgRoot.ownerDocument.createElementNS(
+          SVG_NS,
+          "linearGradient",
+        );
+        linearGradient.setAttribute("id", gradientId);
+        linearGradient.setAttribute("gradientUnits", "userSpaceOnUse");
+        linearGradient.setAttribute("x1", `${x1}`);
+        linearGradient.setAttribute("y1", `${y1}`);
+        linearGradient.setAttribute("x2", `${x2}`);
+        linearGradient.setAttribute("y2", `${y2}`);
+
+        const stop1 = svgRoot.ownerDocument.createElementNS(SVG_NS, "stop");
+        stop1.setAttribute("offset", "0");
+        stop1.setAttribute("stop-color", element.backgroundColor);
+        linearGradient.appendChild(stop1);
+
+        const stop2 = svgRoot.ownerDocument.createElementNS(SVG_NS, "stop");
+        stop2.setAttribute("offset", "1");
+        stop2.setAttribute("stop-color", element.gradient.color2);
+        linearGradient.appendChild(stop2);
+
+        defs.appendChild(linearGradient);
+
+        let fillNode: SVGElement;
+        if (element.type === "ellipse") {
+          fillNode = svgRoot.ownerDocument.createElementNS(SVG_NS, "ellipse");
+          fillNode.setAttribute("cx", `${element.width / 2}`);
+          fillNode.setAttribute("cy", `${element.height / 2}`);
+          fillNode.setAttribute("rx", `${element.width / 2}`);
+          fillNode.setAttribute("ry", `${element.height / 2}`);
+        } else if (element.type === "diamond") {
+          const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+            getDiamondPoints(element);
+          fillNode = svgRoot.ownerDocument.createElementNS(SVG_NS, "polygon");
+          fillNode.setAttribute(
+            "points",
+            `${topX},${topY} ${rightX},${rightY} ${bottomX},${bottomY} ${leftX},${leftY}`,
+          );
+        } else {
+          fillNode = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+          fillNode.setAttribute("width", `${element.width}`);
+          fillNode.setAttribute("height", `${element.height}`);
+        }
+        fillNode.setAttribute("fill", `url(#${gradientId})`);
+        node.insertBefore(fillNode, node.firstChild);
+      }
+
       if (opacity !== 1) {
         node.setAttribute("stroke-opacity", `${opacity}`);
         node.setAttribute("fill-opacity", `${opacity}`);
