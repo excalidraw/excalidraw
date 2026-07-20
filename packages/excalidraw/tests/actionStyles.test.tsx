@@ -85,4 +85,56 @@ describe("actionStyles", () => {
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);
   });
+
+  it("shows gradient controls when fill style is set to gradient, and hides them otherwise", async () => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    expect(screen.queryByTestId("gradient-angle")).toBeNull();
+
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    expect(screen.getByTestId("gradient-angle")).not.toBeNull();
+  });
+
+  it("seeds gradient defaults when switching fill style to gradient", async () => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    const rect = API.getSelectedElement();
+    expect(rect.gradient).toBeNull();
+
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    const updatedRect = API.getSelectedElement();
+    expect(updatedRect.gradient).toEqual({
+      color2: rect.backgroundColor,
+      angle: 0,
+    });
+  });
+
+  it("preserves a previously chosen gradient when switching fill style away and back", async () => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    // Change the gradient angle away from the default seeded value.
+    fireEvent.change(screen.getByTestId("gradient-angle"), {
+      target: { value: "90" },
+    });
+
+    const gradientedRect = API.getSelectedElement();
+    expect(gradientedRect.gradient?.angle).toBe(90);
+
+    // Switch away from gradient, then back to it.
+    fireEvent.click(screen.getByTestId("fill-solid"));
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    const finalRect = API.getSelectedElement();
+    expect(finalRect.gradient).toEqual(gradientedRect.gradient);
+  });
 });

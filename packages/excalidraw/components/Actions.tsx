@@ -159,6 +159,7 @@ export const SelectedShapeActions = ({
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
       {predicates.fill && renderAction("changeFillStyle")}
+      {predicates.fill && renderAction("changeGradient")}
 
       {predicates.strokeWidth && renderAction("changeStrokeWidth")}
 
@@ -280,6 +281,7 @@ const CombinedShapeProperties = ({
           >
             <div className="selected-shape-actions">
               {predicates.fill && renderAction("changeFillStyle")}
+              {predicates.fill && renderAction("changeGradient")}
               {predicates.strokeWidth && renderAction("changeStrokeWidth")}
               {
                 /* in compact UI the freedraw pressure setting is rendered as a

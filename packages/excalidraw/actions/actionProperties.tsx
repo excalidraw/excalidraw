@@ -502,6 +502,17 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           fillStyle: value,
+          ...(value === "gradient" && el.gradient == null
+            ? {
+                gradient: {
+                  color2:
+                    el.backgroundColor === "transparent"
+                      ? "#ffffff"
+                      : el.backgroundColor,
+                  angle: 0,
+                },
+              }
+            : null),
         }),
       ),
       appState: { ...appState, currentItemFillStyle: value },
@@ -542,6 +553,12 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
                 icon: FillSolidIcon,
                 testId: `fill-solid`,
               },
+              {
+                value: "gradient",
+                text: t("labels.gradient"),
+                icon: FillSolidIcon,
+                testId: `fill-gradient`,
+              },
             ]}
             value={getFormValue(
               elements,
@@ -564,6 +581,87 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
           />
         </div>
       </fieldset>
+    );
+  },
+});
+
+export const actionChangeGradient = register<{
+  color2?: string;
+  angle?: number;
+}>({
+  name: "changeGradient",
+  label: "labels.gradient",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          gradient: {
+            color2:
+              value?.color2 ??
+              el.gradient?.color2 ??
+              (el.backgroundColor === "transparent"
+                ? "#ffffff"
+                : el.backgroundColor),
+            angle: value?.angle ?? el.gradient?.angle ?? 0,
+          },
+        }),
+      ),
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    const isGradientActive =
+      selectedElements.length > 0 &&
+      selectedElements.every((el) => el.fillStyle === "gradient");
+
+    if (!isGradientActive) {
+      return null;
+    }
+
+    const color2 = getFormValue(
+      elements,
+      app,
+      (element) =>
+        element.gradient?.color2 ??
+        (element.backgroundColor === "transparent"
+          ? "#ffffff"
+          : element.backgroundColor),
+      true,
+      () => null,
+    );
+    const angle = getFormValue(
+      elements,
+      app,
+      (element) => element.gradient?.angle ?? 0,
+      true,
+      () => null,
+    );
+
+    return (
+      <>
+        <ColorPicker
+          type="elementGradientEnd"
+          label={t("labels.gradientEndColor")}
+          color={color2}
+          onChange={(value) => updateData({ color2: value })}
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+        />
+        <Range
+          label={t("labels.gradientAngle")}
+          value={angle ?? 0}
+          hasCommonValue={angle !== null}
+          onChange={(value) => updateData({ angle: value })}
+          min={0}
+          max={360}
+          step={1}
+          testId="gradient-angle"
+        />
+      </>
     );
   },
 });
