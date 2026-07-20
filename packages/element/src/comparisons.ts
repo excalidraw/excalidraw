@@ -48,6 +48,9 @@ export const canChangeRoundness = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "image";
 
+export const canHaveGradientFill = (type: ElementOrToolType) =>
+  type === "rectangle" || type === "diamond" || type === "ellipse";
+
 export const toolIsArrow = (type: ElementOrToolType) => type === "arrow";
 
 export const canHaveArrowheads = (type: ElementOrToolType) => type === "arrow";

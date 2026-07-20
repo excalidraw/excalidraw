@@ -16,7 +16,7 @@ import type {
 } from "@excalidraw/common/utility-types";
 
 export type ChartType = "bar" | "line" | "radar";
-export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag";
+export type FillStyle = "hachure" | "cross-hatch" | "solid" | "zigzag" | "gradient";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
 export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
 export type Theme = typeof THEME[keyof typeof THEME];
@@ -47,6 +47,7 @@ type _ExcalidrawElementBase = Readonly<{
   strokeWidth: number;
   strokeStyle: StrokeStyle;
   roundness: null | { type: RoundnessType; value?: number };
+  gradient: null | { color2: string; angle: number };
   roughness: number;
   opacity: number;
   width: number;

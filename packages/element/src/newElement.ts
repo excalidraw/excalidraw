@@ -71,6 +71,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "roughness"
   | "strokeWidth"
   | "roundness"
+  | "gradient"
   | "locked"
   | "opacity"
   | "customData"
@@ -95,6 +96,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     frameId = null,
     index = null,
     roundness = null,
+    gradient = null,
     boundElements = null,
     link = null,
     locked = DEFAULT_ELEMENT_PROPS.locked,
@@ -146,6 +148,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     frameId,
     index,
     roundness,
+    gradient,
     seed: rest.seed ?? randomInteger(),
     version: rest.version || 1,
     versionNonce: rest.versionNonce ?? 0,
