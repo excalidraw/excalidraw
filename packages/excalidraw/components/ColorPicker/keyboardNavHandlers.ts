@@ -55,6 +55,7 @@ interface HotkeyHandlerProps {
     update: React.SetStateAction<ActiveColorPickerSectionAtomType>,
   ) => void;
   activeShade: number;
+  excludedColors?: readonly string[];
 }
 
 /**
@@ -68,6 +69,7 @@ const hotkeyHandler = ({
   customColors,
   setActiveColorPickerSection,
   activeShade,
+  excludedColors,
 }: HotkeyHandlerProps): boolean => {
   if (colorObj?.shade != null) {
     // shift + numpad is extremely messed up on windows apparently
@@ -98,6 +100,11 @@ const hotkeyHandler = ({
     const r = Array.isArray(paletteValue)
       ? paletteValue[activeShade]
       : paletteValue;
+    // hotkeys of excluded (hidden) palette entries are dead, not remapped —
+    // this keeps every other color on its usual key
+    if (r == null || excludedColors?.includes(r)) {
+      return false;
+    }
     onChange(r);
     setActiveColorPickerSection("baseColors");
     return true;
@@ -119,6 +126,7 @@ interface ColorPickerKeyNavHandlerProps {
   activeShade: number;
   onEyeDropperToggle: (force?: boolean) => void;
   onEscape: (event: React.KeyboardEvent | KeyboardEvent) => void;
+  excludedColors?: readonly string[];
 }
 
 /**
@@ -136,6 +144,7 @@ export const colorPickerKeyNavHandler = ({
   activeShade,
   onEyeDropperToggle,
   onEscape,
+  excludedColors,
 }: ColorPickerKeyNavHandlerProps): boolean => {
   if (event[KEYS.CTRL_OR_CMD]) {
     return false;
@@ -226,6 +235,7 @@ export const colorPickerKeyNavHandler = ({
       customColors,
       setActiveColorPickerSection,
       activeShade,
+      excludedColors,
     })
   ) {
     return true;
@@ -249,11 +259,27 @@ export const colorPickerKeyNavHandler = ({
       const colorNames = Object.keys(palette) as (keyof ColorPalette)[];
       const indexOfColorName = colorNames.indexOf(colorName);
 
-      const newColorIndex = arrowHandler(
+      let newColorIndex = arrowHandler(
         event.key,
         indexOfColorName,
         colorNames.length,
       );
+
+      // step over excluded (hidden) palette entries, continuing in the
+      // arrow's direction
+      let guard = 0;
+      while (newColorIndex !== undefined && guard++ < colorNames.length) {
+        const value = palette[colorNames[newColorIndex]];
+        const resolved = Array.isArray(value) ? value[activeShade] : value;
+        if (!excludedColors?.includes(resolved)) {
+          break;
+        }
+        newColorIndex = arrowHandler(
+          event.key,
+          newColorIndex,
+          colorNames.length,
+        );
+      }
 
       if (newColorIndex !== undefined) {
         const newColorName = colorNames[newColorIndex];

@@ -152,6 +152,18 @@ export const SelectedShapeActions = ({
     app,
   );
 
+  // the bucket fill tool configures only the fill it creates: color, fill
+  // style, and opacity (shared `currentItem*` values; no stroke properties)
+  if (appState.activeTool.type === "bucketFill") {
+    return (
+      <div className="selected-shape-actions">
+        <div>{renderAction("changeBucketFillBackgroundColor")}</div>
+        {renderAction("changeFillStyle")}
+        {renderAction("changeOpacity")}
+      </div>
+    );
+  }
+
   return (
     <div className="selected-shape-actions">
       <div>{predicates.strokeColor && renderAction("changeStrokeColor")}</div>
@@ -629,10 +641,14 @@ export const CompactShapeActions = ({
         </div>
       )}
 
-      {/* Background Color */}
+      {/* Background Color (the bucket fill variant excludes `transparent`) */}
       {predicates.backgroundColor && (
         <div className="compact-action-item">
-          {renderAction("changeBackgroundColor")}
+          {renderAction(
+            appState.activeTool.type === "bucketFill"
+              ? "changeBucketFillBackgroundColor"
+              : "changeBackgroundColor",
+          )}
         </div>
       )}
 

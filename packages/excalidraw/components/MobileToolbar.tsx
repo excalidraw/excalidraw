@@ -28,6 +28,7 @@ import {
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
+  bucketFillIcon,
   mermaidLogoIcon,
   MagicIcon,
 } from "./icons";
@@ -73,6 +74,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const bucketFillToolSelected = activeTool.type === "bucketFill";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -107,7 +109,14 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const showFrameToolOutside = toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   const extraTools: readonly typeof activeTool.type[] = (
-    ["text", "frame", "embeddable", "laser", "magicframe"] as const
+    [
+      "text",
+      "frame",
+      "embeddable",
+      "laser",
+      "bucketFill",
+      "magicframe",
+    ] as const
   ).filter((tool) => {
     if (showTextToolOutside && tool === "text") {
       return false;
@@ -129,6 +138,8 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       ? EmbedIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
+      : activeTool.type === "bucketFill"
+      ? bucketFillIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
       : extraToolsIcon
@@ -294,6 +305,16 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             disabled={isToolButtonDisabled(app, "laser")}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "bucketFill" })}
+            icon={bucketFillIcon}
+            data-testid="toolbar-bucketFill"
+            selected={bucketFillToolSelected}
+            shortcut={KEYS.B.toLocaleUpperCase()}
+            disabled={isToolButtonDisabled(app, "bucketFill")}
+          >
+            {t("toolBar.bucketFill")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate

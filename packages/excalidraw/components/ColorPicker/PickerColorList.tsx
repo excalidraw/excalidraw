@@ -21,6 +21,11 @@ interface PickerColorListProps {
   onChange: (color: string) => void;
   activeShade: number;
   showHotKey?: boolean;
+  /**
+   * palette colors to hide. Hidden entries keep their position in the hotkey
+   * order (their hotkey goes dead instead of remapping the colors after them).
+   */
+  excludedColors?: readonly string[];
 }
 
 const PickerColorList = ({
@@ -29,6 +34,7 @@ const PickerColorList = ({
   onChange,
   activeShade,
   showHotKey = true,
+  excludedColors,
 }: PickerColorListProps) => {
   const colorObj = getColorNameAndShadeFromColor({
     color,
@@ -51,6 +57,19 @@ const PickerColorList = ({
       {Object.entries(palette).map(([key, value], index) => {
         const color =
           (Array.isArray(value) ? value[activeShade] : value) || "transparent";
+
+        if (excludedColors?.includes(color)) {
+          // invisible placeholder so the remaining colors keep their exact
+          // grid positions (and hotkeys) — muscle memory stays intact
+          return (
+            <div
+              key={key}
+              className="color-picker__button color-picker__button--large"
+              style={{ visibility: "hidden" }}
+              aria-hidden="true"
+            />
+          );
+        }
 
         const keybinding = colorPickerHotkeyBindings[index];
         const label = t(
