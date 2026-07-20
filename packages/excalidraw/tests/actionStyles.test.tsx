@@ -119,6 +119,23 @@ describe("actionStyles", () => {
     expect(updatedRect.gradient?.color2).not.toEqual(rect.backgroundColor);
   });
 
+  it("seeds gradient defaults when selecting gradient with no element selected, before drawing", async () => {
+    UI.clickTool("rectangle");
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    expect(screen.queryByTestId("fill-gradient")).not.toBeNull();
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    const rect = API.getSelectedElement();
+    expect(rect.fillStyle).toBe("gradient");
+    expect(rect.gradient).not.toBeNull();
+    expect(rect.gradient?.color2).not.toEqual(rect.backgroundColor);
+  });
+
   it("preserves a previously chosen gradient when switching fill style away and back", async () => {
     UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
     togglePopover("Background");

@@ -525,7 +525,20 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
             : null),
         }),
       ),
-      appState: { ...appState, currentItemFillStyle: value },
+      appState: {
+        ...appState,
+        currentItemFillStyle: value,
+        ...(value === "gradient" && appState.currentItemGradient == null
+          ? {
+              currentItemGradient: {
+                color2: getDefaultGradientColor2(
+                  appState.currentItemBackgroundColor,
+                ),
+                angle: 0,
+              },
+            }
+          : null),
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
