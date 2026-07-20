@@ -5,7 +5,10 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  ROUNDNESS,
 } from "@excalidraw/common";
+
+import { getCornerRadius } from "@excalidraw/element";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -590,6 +593,7 @@ describe("exporting frames", () => {
         backgroundColor: "#ff0000",
         fillStyle: "gradient",
         gradient: { color2: "#0000ff", angle: 0 },
+        roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
       });
 
       const svg = await exportToSvg({
@@ -612,6 +616,15 @@ describe("exporting frames", () => {
       expect(parent).not.toBeNull();
       const siblings = Array.from(parent?.children ?? []);
       expect(siblings.indexOf(fillRect as Element)).toBe(0);
+
+      // gradient fill rect must be rounded to match the rectangle's own
+      // corner radius, otherwise gradient color spills past rounded corners
+      const expectedRadius = getCornerRadius(
+        Math.min(rectangle.width, rectangle.height),
+        rectangle,
+      );
+      expect(fillRect?.getAttribute("rx")).toBe(`${expectedRadius}`);
+      expect(fillRect?.getAttribute("ry")).toBe(`${expectedRadius}`);
     });
 
     it("should not export frame-overlapping elements belonging to different frame", async () => {

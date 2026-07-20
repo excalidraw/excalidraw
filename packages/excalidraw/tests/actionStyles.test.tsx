@@ -109,10 +109,14 @@ describe("actionStyles", () => {
     fireEvent.click(screen.getByTestId("fill-gradient"));
 
     const updatedRect = API.getSelectedElement();
+    // color2 should default to a color visibly different from the background
+    // (blue here), not the background color itself, otherwise the gradient
+    // is invisible.
     expect(updatedRect.gradient).toEqual({
-      color2: rect.backgroundColor,
+      color2: "#ffffff",
       angle: 0,
     });
+    expect(updatedRect.gradient?.color2).not.toEqual(rect.backgroundColor);
   });
 
   it("preserves a previously chosen gradient when switching fill style away and back", async () => {
@@ -136,5 +140,34 @@ describe("actionStyles", () => {
 
     const finalRect = API.getSelectedElement();
     expect(finalRect.gradient).toEqual(gradientedRect.gradient);
+  });
+
+  it("does not offer the gradient fill option for line elements", async () => {
+    UI.createElement("line", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    expect(screen.queryByTestId("fill-gradient")).toBeNull();
+    expect(screen.queryByTestId("gradient-angle")).toBeNull();
+  });
+
+  it("opens the gradient end color picker without clobbering the gradient", async () => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+    togglePopover("Background"); // close it, so only the gradient-end popover can be open below
+
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    const seededGradient = API.getSelectedElement().gradient;
+
+    const trigger = screen.getByLabelText("Gradient end color");
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+
+    togglePopover("Gradient end color");
+
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText("Hex code")).not.toBeNull();
+    expect(API.getSelectedElement().gradient).toEqual(seededGradient);
   });
 });

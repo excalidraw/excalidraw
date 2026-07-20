@@ -215,6 +215,12 @@ const renderElementToSvg = (
           fillNode = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
           fillNode.setAttribute("width", `${element.width}`);
           fillNode.setAttribute("height", `${element.height}`);
+          const radius = getCornerRadius(
+            Math.min(element.width, element.height),
+            element,
+          );
+          fillNode.setAttribute("rx", `${radius}`);
+          fillNode.setAttribute("ry", `${radius}`);
         }
         fillNode.setAttribute("fill", `url(#${gradientId})`);
         node.insertBefore(fillNode, node.firstChild);

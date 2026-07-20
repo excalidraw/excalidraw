@@ -369,6 +369,16 @@ const fillGradientBackground = (
     context.lineTo(leftX, leftY);
     context.closePath();
     context.fill();
+  } else if (context.roundRect) {
+    context.beginPath();
+    context.roundRect(
+      0,
+      0,
+      element.width,
+      element.height,
+      getCornerRadius(Math.min(element.width, element.height), element),
+    );
+    context.fill();
   } else {
     context.fillRect(0, 0, element.width, element.height);
   }
