@@ -685,7 +685,8 @@
       "mermaidParseError": "Mermaid syntax error"
     },
     "rateLimit": {
-      "messageLimit": "You've hit your AI limit on the free plan. Try out Excalidraw+ for more or come back tomorrow.",
+      "messageLimit": "You've reached today's AI message limit. Please try again tomorrow.",
+      "messageLimitWithUpgrade": "You've hit your AI limit on the free plan. Try out Excalidraw+ for more or come back tomorrow.",
       "generalRateLimit": "Hold your horses, you're too fast for us! Please wait a moment before trying again.",
       "messageLimitInputPlaceholder": "You've reached your message limit"
     },
@@ -738,5 +739,98 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Scroll wheel"
+  },
+  "ai": {
+    "input": {
+      "placeholder": "What would you like to create?",
+      "placeholderRefine": "Continue refining your drawing...",
+      "add": "Add",
+      "send": "Send message",
+      "stop": "Stop generation",
+      "maxImages_one": "Only one image per turn is supported.",
+      "maxImages": "Only a maximum of {{maxImages}} images per turn is supported."
+    },
+    "chat": {
+      "preview": "Preview",
+      "untitledChat": "Untitled chat",
+      "newChat": "New chat",
+      "history": "History",
+      "keepOpen": "Keep AI sidebar open",
+      "close": "Close AI sidebar",
+      "generatedResult": "Generated result",
+      "attachedImage": "Attached image",
+      "closePreview": "Close preview",
+      "viewGeneratedResult": "View generated result",
+      "enlargedPreview": "Enlarged AI generated preview",
+      "imageLimit": "Only one image per turn is supported on excalidraw.com. Upgrade to <link>Excalidraw+</link> for more.",
+      "roles": {
+        "you": "You",
+        "assistant": "AI Assistant"
+      },
+
+      "actions": {
+        "addToCanvas": "Add to canvas",
+        "regenerate": "Regenerate",
+        "delete": "Delete",
+        "retry": "Retry",
+        "deletePrompt": "Delete this result? This will delete this turn and all later messages, and replace the AI-generated elements on the canvas with the last remaining result.",
+        "deletePromptFirstTurn": "Delete this result? This is the first turn, so this will clear the entire chat and remove AI-generated elements from the canvas."
+      },
+      "emptyState": {
+        "resume": "Continue where you left off",
+        "lastUpdated": "Last updated {{time}}",
+        "guidance": "Create diagrams, wireframes, or anything you want.",
+        "storageNotice": "Your prompts and generations are stored on our servers so you can continue chats later.",
+        "seeMore": "See more.",
+        "storageDialog": {
+          "title": "AI usage",
+          "description": "Your prompts and generated results are saved on our servers so you can pick up your chats anytime.<br></br>We may use content generated on excalidraw.com to help improve our AI in the future. Content created in <link>Excalidraw+</link> will not be used for this purpose."
+        }
+      },
+      "errors": {
+        "title": "Couldn't generate a response.",
+        "rateLimit": "You've exhausted today's free quota. Please try again later or upgrade to Excalidraw Plus.",
+        "serverError": "The AI server is unavailable right now. Please try again soon.",
+        "serverUnavailable": "The AI server is currently offline or unreachable. Please try again in a moment.",
+        "generationError": "The AI response could not be completed. Please try again.",
+        "invalidResult": "The AI response couldn't be rendered. Please regenerate and try again.",
+        "requestError": "Your request couldn't be processed. Try rephrasing and sending it again.",
+        "requestFailed": "We couldn't complete this request. Please try again.",
+        "tryAgain": "Try again in a moment.",
+        "connection": "Connection to the AI service was interrupted. Please retry.",
+        "offline": "You're offline. Please reconnect to the internet and try again.",
+        "configuration": "AI server is not configured. Please set it up and try again.",
+        "technicalDetails": "Technical details",
+        "supportBanner": "Need help?",
+        "githubIssue": "Open a GitHub issue"
+      },
+      "historyPanel": {
+        "title": "History",
+        "searchPlaceholder": "Search past chats",
+        "noChats": "No chats match your search.",
+        "back": "Go back",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "rename": "Rename",
+        "delete": "Delete"
+      },
+      "prompts": {
+        "facebookFeed": "Draw a Facebook feed page wireframe mockup",
+        "brainstorming": "Generate brainstorming ideas for a workshop",
+        "house": "Draw a house with a garage to the side"
+      },
+      "status": {
+        "syntaxErrorFixing": "Syntax error detected. Attempting to fix...",
+        "errorFixing": "Error detected. Attempting to fix...",
+        "retrying": "Retrying...",
+        "regenerating": "Regenerating...",
+        "generatedResponse": "Generated response.",
+        "emptyResponse": "(empty response)"
+      },
+      "stopReason": {
+        "user": "Generation stopped by user.",
+        "interrupted": "Generation interrupted."
+      }
+    }
   }
 }

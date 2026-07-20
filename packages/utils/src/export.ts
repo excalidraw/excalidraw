@@ -178,6 +178,7 @@ export const exportToSvg = async ({
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
+  // TODO consider defaulting to true
   skipInliningFonts?: true;
   reuseImages?: boolean;
 }): Promise<SVGSVGElement> => {

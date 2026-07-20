@@ -117,9 +117,6 @@
       }
     </script>
 
-    <!-- Following placeholder is replaced during the build step -->
-    <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
-
     <!-- Register Assistant as the UI font, before the scene inits -->
     <link
       rel="stylesheet"
@@ -132,6 +129,10 @@
       window.EXCALIDRAW_ASSET_PATH = window.origin;
     </script>
     <% } %>
+
+    <!-- Following placeholder is replaced during PROD build step -->
+    <!-- see scripts/woff2/woff2-vite-plugins.js -->
+    <!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />

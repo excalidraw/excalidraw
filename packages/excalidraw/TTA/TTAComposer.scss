@@ -1,0 +1,303 @@
+@use "../css/variables.module" as *;
+
+.tta-composer {
+  max-width: 48rem;
+  margin: 0 auto;
+  border-top: 1px solid var(--sidebar-border-color);
+  padding-top: 1rem;
+}
+
+.tta-composer__container {
+  --tta-composer-shadow: 0px 18px 35px rgba(15, 23, 42, 0.12);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--island-bg-color);
+  border-radius: 12px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tta-composer__container:hover {
+  border-color: var(--color-primary-light-darker);
+}
+
+.tta-composer__container:focus-within {
+  border-color: #6965db;
+}
+
+.tta-composer__textarea-wrapper {
+  position: relative;
+  padding: 0 0 0.5rem;
+  display: flex;
+}
+
+.tta-composer__textarea {
+  flex: 1;
+  resize: none;
+  border: none !important;
+  background: var(--island-bg-color) !important;
+  color: var(--text-primary-color);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding: 0 !important;
+  max-height: 240px;
+  overflow-y: auto;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere;
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  &::placeholder {
+    color: var(--color-muted-darker);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:is(:hover, :focus-visible, :active) {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(105, 101, 219, 0.18) transparent;
+  }
+
+  &:is(:hover, :focus-visible, :active)::-webkit-scrollbar {
+    width: 0.35rem;
+    height: 0.35rem;
+  }
+
+  &:is(:hover, :focus-visible, :active)::-webkit-scrollbar-thumb {
+    background-color: var(--island-bg-color);
+    border-radius: 999px;
+  }
+}
+
+.tta-composer__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 0.75rem;
+}
+
+.tta-composer__toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.tta-composer__toolbar-section:last-child {
+  justify-content: flex-end;
+}
+
+.tta-composer__icon-button {
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  border-radius: 8px;
+  color: var(--color-muted-darker);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-light);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary-light-darker);
+  }
+}
+
+.tta-composer__image-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateX(-1px);
+}
+
+.tta-composer__plus-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.tta-composer__audio-btn {
+  display: none;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.tta-composer__char-count {
+  display: none;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  font-weight: 500;
+
+  @media (min-width: 640px) {
+    display: inline-block;
+  }
+}
+
+.tta-composer__send-btn {
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  background-color: var(--sidebar-border-color);
+  color: var(--color-muted-darker, #999);
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--color-muted-darker, #999);
+
+    .tta-composer__send-icon {
+      color: var(--color-muted-darker, #999);
+    }
+  }
+}
+
+.tta-composer__send-btn--active {
+  background-color: var(--color-primary);
+  color: var(--color-icon-white);
+  cursor: pointer;
+}
+
+.tta-composer__send-btn--active:hover {
+  transform: scale(1.05) translateY(-1px);
+  background-color: var(--color-primary-darker);
+}
+
+.tta-composer__send-btn--active:active {
+  transform: scale(0.95);
+}
+
+.tta-composer__send-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  transition: margin-left 0.2s ease;
+}
+
+.tta-composer__send-icon--active {
+  /* margin-left: 0.125rem; */ /* Removed for up arrow alignment */
+}
+
+.tta-composer__stop-btn {
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  background-color: var(--text-primary-color);
+  color: var(--color-icon-white);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.tta-composer__stop-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.tta-composer__container:focus-within .tta-composer__focus-glow {
+  opacity: 1;
+}
+
+.tta-composer__disclaimer {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-muted-darker);
+}
+
+.tta-composer__preview {
+  padding: 0.5rem 1rem;
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tta-composer__preview-image-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--sidebar-border-color);
+  background: var(--default-bg-color);
+  flex-shrink: 0;
+
+  &:hover .tta-composer__preview-close {
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.tta-composer__preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tta-composer__preview-close {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}

@@ -20,13 +20,14 @@ import { TTDWelcomeMessage } from "./TTDWelcomeMessage";
 import type {
   MermaidToExcalidrawLibProps,
   TTDPersistenceAdapter,
+  TTDTransportAdapter,
   TTTDDialog,
 } from "./types";
 
 export const TTDDialog = (
   props:
     | {
-        onTextSubmit: TTTDDialog.onTextSubmit;
+        transportAdapter: TTDTransportAdapter;
         renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
         renderWarning?: TTTDDialog.renderWarning;
         persistenceAdapter: TTDPersistenceAdapter;
@@ -56,9 +57,7 @@ const TTDDialogBase = withInternalFallback(
     tab: "text-to-diagram" | "mermaid";
   } & (
     | {
-        onTextSubmit(
-          props: TTTDDialog.OnTextSubmitProps,
-        ): Promise<TTTDDialog.OnTextSubmitRetValue>;
+        transportAdapter: TTDTransportAdapter;
         renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
         renderWarning?: TTTDDialog.renderWarning;
         persistenceAdapter: TTDPersistenceAdapter;
@@ -115,7 +114,7 @@ const TTDDialogBase = withInternalFallback(
             <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
               <TextToDiagram
                 mermaidToExcalidrawLib={mermaidToExcalidrawLib}
-                onTextSubmit={rest.onTextSubmit}
+                onTextSubmit={rest.transportAdapter.stream}
                 renderWelcomeScreen={rest.renderWelcomeScreen}
                 renderWarning={rest.renderWarning}
                 persistenceAdapter={rest.persistenceAdapter}

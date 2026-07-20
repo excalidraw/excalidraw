@@ -1,9 +1,10 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   CLASSES,
   DEFAULT_SIDEBAR,
+  Debug,
   TOOL_TYPE,
   arrayToMap,
   capitalizeString,
@@ -448,6 +449,45 @@ const LayerUI = ({
   };
 
   const isSidebarDocked = useAtomValue(isSidebarDockedAtom);
+  const [dockedSidebarWidthPx, setDockedSidebarWidthPx] = useState(0);
+
+  useEffect(() => {
+    if (
+      typeof document === "undefined" ||
+      typeof window === "undefined" ||
+      !appState.openSidebar ||
+      !isSidebarDocked ||
+      !editorInterface.canFitSidebar
+    ) {
+      setDockedSidebarWidthPx(0);
+      return;
+    }
+
+    const sidebarEl = document.querySelector<HTMLElement>(".sidebar");
+    if (!sidebarEl) {
+      setDockedSidebarWidthPx(0);
+      return;
+    }
+
+    const updateWidth = () => {
+      const width = sidebarEl.getBoundingClientRect().width;
+      setDockedSidebarWidthPx(Number.isFinite(width) ? width : 0);
+    };
+
+    updateWidth();
+
+    const resizeObserver =
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(updateWidth);
+    resizeObserver?.observe(sidebarEl);
+
+    window.addEventListener("resize", updateWidth);
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateWidth);
+    };
+  }, [appState.openSidebar, isSidebarDocked, editorInterface.canFitSidebar]);
 
   const layerUIJSX = (
     <>
@@ -605,7 +645,11 @@ const LayerUI = ({
               appState.openSidebar &&
               isSidebarDocked &&
               editorInterface.canFitSidebar
-                ? { width: `calc(100% - var(--right-sidebar-width))` }
+                ? {
+                    width: dockedSidebarWidthPx
+                      ? `calc(100% - ${dockedSidebarWidthPx}px)`
+                      : `calc(100% - var(--right-sidebar-width))`,
+                  }
                 : {}
             }
           >

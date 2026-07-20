@@ -14,12 +14,13 @@ module.exports.woff2BrowserPlugin = () => {
     name: "woff2BrowserPlugin",
     enforce: "pre",
     config(_, { command }) {
+      // NOTE comment this out to debug dev fonts
       isDev = command === "serve";
     },
-    transform(code, id) {
+    transform(_code, id) {
       // using copy / replace as fonts defined in the `.css` don't have to be manually copied over (vite/rollup does this automatically),
       // but at the same time can't be easily prefixed with the `EXCALIDRAW_ASSET_PATH` only for the `excalidraw-app`
-      if (!isDev && id.endsWith("/excalidraw/fonts/fonts.css")) {
+      if (!isDev && id.includes("/excalidraw/fonts/fonts.css")) {
         return `/* WARN: The following content is generated during excalidraw-app build */
 
       @font-face {
@@ -62,11 +63,17 @@ module.exports.woff2BrowserPlugin = () => {
         display: swap;
       }`;
       }
+    },
+    // transform() above only won't work for DEV index.html, so for debugging
+    // purposes, we use transformIndexHtml
+    transformIndexHtml(html, ctx) {
+      if (isDev || !ctx.filename.includes("excalidraw-app/index.html")) {
+        return;
+      }
 
-      if (!isDev && id.endsWith("excalidraw-app/index.html")) {
-        return code.replace(
-          "<!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->",
-          `<script>
+      return html.replace(
+        "<!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->",
+        `<script>
         // point into our CDN in prod, fallback to root (excalidraw.com) domain in case of issues
         window.EXCALIDRAW_ASSET_PATH = [
           "${OSS_FONTS_CDN}",
@@ -105,8 +112,7 @@ module.exports.woff2BrowserPlugin = () => {
         crossorigin="anonymous"
       />
     `,
-        );
-      }
+      );
     },
   };
 };

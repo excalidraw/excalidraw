@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { actionShortcuts } from "../../actions";
 import { useTunnels } from "../../context/tunnels";
 import { ExitZenModeButton, UndoRedoActions, ZoomActions } from "../Actions";
-import { useApp } from "../App";
+import { useApp, useAppProps } from "../App";
 import { HelpButton } from "../HelpButton";
 import { Section } from "../Section";
 import Stack from "../Stack";
@@ -26,8 +26,14 @@ const Footer = ({
   defaultUIEnabled: boolean;
   zoomUIEnabled: boolean;
 }) => {
-  const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
+  const props = useAppProps();
   const app = useApp();
+
+  const {
+    FooterCenterTunnel,
+    TTADialogTriggerTunnel,
+    WelcomeScreenHelpHintTunnel,
+  } = useTunnels();
 
   return (
     <footer
@@ -73,6 +79,9 @@ const Footer = ({
             },
           )}
         >
+          {defaultUIEnabled && props.aiEnabled !== false && (
+            <TTADialogTriggerTunnel.Out />
+          )}
           <div style={{ position: "relative" }}>
             {renderWelcomeScreen && <WelcomeScreenHelpHintTunnel.Out />}
             {defaultUIEnabled && (

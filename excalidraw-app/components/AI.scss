@@ -1,0 +1,45 @@
+.tta-chat-empty-storage-notice {
+  font-size: 0.75rem;
+  padding: 0 2rem;
+  color: var(--text-secondary-color);
+  line-height: 1.4;
+  text-align: center;
+}
+
+.tta-chat-empty-storage-notice__more {
+  border: 0;
+  background: transparent;
+  color: inherit !important;
+  cursor: pointer;
+  font: inherit !important;
+  margin: 0;
+  padding: 0;
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: #bbb;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.2em;
+
+  @at-root .excalidraw.theme--dark #{&} {
+    text-decoration-color: #555;
+  }
+
+  &:hover {
+    color: var(--text-primary-color);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 1px 0 0 currentColor;
+  }
+}
+
+.tta-chat-empty-storage-dialog {
+  color: var(--text-secondary-color);
+  font-size: 0.875rem;
+  line-height: 1.5;
+
+  p {
+    margin: 0;
+  }
+}

@@ -32,7 +32,7 @@ import type {
 
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 
-import { getSyncableElements } from ".";
+import { getPersistableElements, getSyncableElements } from ".";
 
 import type { SyncableExcalidrawElement } from ".";
 import type Portal from "../collab/Portal";
@@ -133,7 +133,7 @@ export const isSavedToFirebase = (
   elements: readonly ExcalidrawElement[],
 ): boolean => {
   if (portal.socket && portal.roomId && portal.roomKey) {
-    const sceneVersion = getSceneVersion(elements);
+    const sceneVersion = getSceneVersion(getPersistableElements(elements));
 
     return FirebaseSceneVersionCache.get(portal.socket) === sceneVersion;
   }
@@ -175,8 +175,12 @@ const createFirebaseSceneDocument = async (
   elements: readonly SyncableExcalidrawElement[],
   roomKey: string,
 ) => {
-  const sceneVersion = getSceneVersion(elements);
-  const { ciphertext, iv } = await encryptElements(roomKey, elements);
+  const persistableElements = getPersistableElements(elements);
+  const sceneVersion = getSceneVersion(persistableElements);
+  const { ciphertext, iv } = await encryptElements(
+    roomKey,
+    persistableElements,
+  );
   return {
     sceneVersion,
     ciphertext: Bytes.fromUint8Array(new Uint8Array(ciphertext)),
@@ -200,6 +204,7 @@ export const saveToFirebase = async (
     return null;
   }
 
+  const persistableElements = getPersistableElements(elements);
   const firestore = _getFirestore();
   const docRef = doc(firestore, "scenes", roomId);
 
@@ -207,7 +212,10 @@ export const saveToFirebase = async (
     const snapshot = await transaction.get(docRef);
 
     if (!snapshot.exists()) {
-      const storedScene = await createFirebaseSceneDocument(elements, roomKey);
+      const storedScene = await createFirebaseSceneDocument(
+        persistableElements,
+        roomKey,
+      );
 
       transaction.set(docRef, storedScene);
 
@@ -220,7 +228,7 @@ export const saveToFirebase = async (
     );
     const reconciledElements = getSyncableElements(
       reconcileElements(
-        elements,
+        persistableElements,
         prevStoredElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
         appState,
       ),

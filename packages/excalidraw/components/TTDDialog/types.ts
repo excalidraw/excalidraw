@@ -6,6 +6,7 @@ import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 
 import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
 
+import type { AIRateLimitWarningDescriptor } from "../../aiWarnings";
 import type { BinaryFiles } from "../../types";
 
 export type LLMMessage = {
@@ -71,6 +72,12 @@ export interface TTDPersistenceAdapter {
   saveChats(chats: SavedChats): Promise<void>;
 }
 
+export interface TTDTransportAdapter {
+  stream(
+    props: TTTDDialog.OnTextSubmitProps,
+  ): Promise<TTTDDialog.OnTextSubmitRetValue>;
+}
+
 export interface MermaidToExcalidrawLibProps {
   loaded: boolean;
   api: Promise<{
@@ -114,6 +121,7 @@ export namespace TTTDDialog {
    * return undefined to use default rendering
    */
   export type renderWarning = (
+    warning: AIRateLimitWarningDescriptor,
     chatMessage: TChat.ChatMessage,
   ) => React.ReactNode | undefined;
 

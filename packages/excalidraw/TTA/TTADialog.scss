@@ -1,0 +1,634 @@
+@import "../css/styles.scss";
+
+// --- Floating Launcher & Button ---
+
+.tta-floating-launcher {
+  position: fixed;
+  bottom: 4.5rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  pointer-events: none;
+  z-index: var(--zIndex-ui-tta-chat);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.tta-floating-inline {
+  display: inline-flex;
+  align-items: center;
+  pointer-events: auto;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+
+  .tta-floating-button {
+    box-shadow: none;
+  }
+}
+
+.tta-floating-button {
+  pointer-events: auto;
+  border: none;
+  border-radius: var(--border-radius-lg);
+  padding: 0.65rem 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  background-color: var(--color-primary);
+  color: var(--color-icon-white);
+  box-shadow: 0px 14px 30px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: var(--color-primary-darker);
+  }
+
+  &--active {
+    background: var(--color-primary-darker);
+  }
+}
+
+.tta-floating-button__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
+// --- Floating Panel Surface ---
+
+.tta-panel__surface {
+  pointer-events: auto;
+  background: var(--default-bg-color, #fff);
+  border-radius: var(--border-radius-lg);
+  width: min(400px, calc(100vw - 2.5rem));
+  height: min(720px, calc(100vh - 10rem));
+  box-shadow: var(--shadow-island);
+  position: relative;
+  overflow: hidden;
+}
+
+.tta-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--sidebar-border-color);
+}
+
+.tta-panel__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.tta-panel__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.tta-panel__icon-button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-primary-color);
+  padding: 0rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.tta-panel__new-chat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tta-panel__new-chat-text {
+  white-space: nowrap;
+}
+
+.tta-panel__icon-button--active {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-primary);
+
+  svg {
+    fill: currentColor;
+  }
+
+  &:hover {
+    background: var(--color-primary-light);
+  }
+}
+
+.tta-panel__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+// --- Chat Panel Structure ---
+
+.tta-chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  font-family: "Assistant", var(--ui-font, system-ui, sans-serif);
+}
+
+.tta-chat-panel--floating {
+  position: relative;
+  box-shadow: var(--shadow-island);
+  background-color: var(--island-bg-color);
+}
+
+// --- Chat Messages Area ---
+
+.tta-chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.tta-chat-list {
+  flex: 1;
+  background-color: transparent;
+  border-radius: var(--border-radius-md);
+  padding: 0.75rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tta-chat-empty-state {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1rem;
+}
+
+.tta-chat-empty-middle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.tta-chat-empty-intro {
+  width: 100%;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.tta-chat-empty-top {
+  width: 100%;
+}
+
+.tta-chat-empty-resume-card {
+  width: 100%;
+  border: 1px solid var(--sidebar-border-color);
+  background-color: transparent;
+  border-radius: var(--border-radius-lg);
+  padding: 0.65rem;
+  color: inherit;
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-0.5px);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(105, 101, 219, 0.35);
+  }
+}
+
+.tta-chat-empty-resume-card__preview {
+  width: 88px;
+  height: 62px;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--sidebar-border-color);
+  background: var(--sidebar-bg-color);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.tta-chat-empty-resume-card__placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--button-gray-1),
+    var(--button-gray-2, var(--sidebar-border-color))
+  );
+}
+
+.tta-chat-empty-resume-card__content {
+  min-width: 0;
+  text-align: left;
+}
+
+.tta-chat-empty-resume-card__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tta-chat-empty-resume-card__title {
+  margin-top: 0.1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tta-chat-empty-resume-card__meta {
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  color: var(--text-secondary-color);
+}
+
+.tta-chat-empty-how-it-works {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--sidebar-bg-color);
+  padding: 0.7rem 0.75rem;
+}
+
+.tta-chat-empty-how-it-works__title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary-color);
+}
+
+.tta-chat-empty-how-it-works__steps {
+  margin: 0.45rem 0 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary-color);
+}
+
+.tta-chat-empty-tagline {
+  font-size: 0.9rem;
+  padding: 0 4rem;
+  color: var(--text-primary-color);
+  line-height: 1.4;
+  text-align: center;
+}
+
+.tta-panel__support-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.4rem;
+  padding: 0.65rem 0.75rem;
+  border-top: 1px solid var(--sidebar-border-color);
+  background: var(--sidebar-bg-color);
+  font-size: 0.75rem;
+}
+
+.tta-panel__support-banner-text {
+  color: var(--text-secondary-color);
+  flex: 1;
+  min-width: 0;
+}
+
+.tta-panel__support-banner-links {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+
+  a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+}
+
+.tta-panel__support-banner-dismiss {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.8rem;
+  padding: 0;
+  cursor: pointer;
+
+  svg {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  &:hover {
+    color: var(--text-primary-color);
+  }
+}
+
+.tta-panel__footer {
+  padding: 0 0.75rem 0.75rem;
+}
+
+// --- Preview Modal ---
+
+.tta-preview-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.85rem;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  &__body {
+    max-height: 70vh;
+    overflow: auto;
+    padding: 0.5rem;
+    background: var(--sidebar-bg-color);
+  }
+
+  img {
+    width: 100%;
+    height: auto;
+  }
+
+  &__close {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+    padding: 0.25rem;
+  }
+}
+
+// --- History ---
+
+.tta-history {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: inherit;
+  background-color: var(--island-bg-color);
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: var(--text-primary-color);
+}
+
+.tta-history__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tta-history__title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.tta-history__back-button {
+  border: none;
+  background: transparent;
+  color: var(--text-primary-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: var(--border-radius-lg);
+  height: 2.25rem;
+
+  &:hover {
+    background-color: var(--button-hover-bg);
+  }
+}
+
+.tta-history__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tta-history__search {
+  border-radius: var(--border-radius-lg);
+  padding: 0.85rem 0.6rem;
+  background: rgba(99, 102, 241, 0.05);
+  color: var(--text-primary-color);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    color: inherit;
+    outline: none;
+
+    &:focus,
+    &:focus-visible,
+    &:active {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
+.tta-history__search-icon {
+  font-size: 0.9rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  opacity: 0.7;
+}
+
+.tta-history__empty {
+  color: var(--fg-muted);
+}
+
+.tta-history__list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-right: -0.75rem;
+  padding-right: 0.75rem;
+}
+
+.tta-history__item {
+  padding: 0.75rem;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--sidebar-border-color);
+  background-color: transparent;
+  color: var(--text-primary-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: auto;
+  position: relative;
+
+  @at-root .excalidraw.theme--light #{&} {
+    border-color: rgba(0, 0, 0, 0.06);
+  }
+
+  &:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+    cursor: pointer;
+
+    .tta-history__actions {
+      display: flex;
+    }
+  }
+}
+
+.tta-history__details {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tta-history__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  height: 2.25rem;
+}
+
+.tta-history__actions {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tta-history__action-button--delete:hover {
+  color: var(--color-danger);
+}
+
+.tta-history__edit-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tta-history__edit-actions .tta-panel__icon-button--cancel:hover {
+  color: var(--color-danger);
+}
+
+.tta-history__item-title-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+}
+
+.tta-history__rename-input {
+  flex: 1;
+  font-size: 0.95rem;
+  padding: 0 0.25rem !important;
+  height: 1.75rem;
+  background: transparent !important;
+  color: var(--text-primary-color);
+  min-width: 0;
+
+  &:focus,
+  &:focus-visible,
+  &:active {
+    background: transparent !important;
+    border-width: 1px;
+    box-shadow: none !important;
+  }
+}
+
+.tta-history__item-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tta-history__thumb {
+  width: 100%;
+  height: 12rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-bottom: solid 1px var(--sidebar-border-color);
+  padding-bottom: 0.75rem;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 0.5rem;
+  }
+}

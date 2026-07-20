@@ -48,6 +48,22 @@ export const getDateTime = () => {
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
+export const formatTimeToHourMinute = (
+  value: Date | number,
+  opts?: { locale?: string | string[]; hour12?: boolean },
+) => {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleTimeString(opts?.locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+    ...(opts?.hour12 === undefined ? {} : { hour12: opts.hour12 }),
+  });
+};
+
 export const isToolIcon = (
   target: Element | EventTarget | null,
 ): target is HTMLElement =>

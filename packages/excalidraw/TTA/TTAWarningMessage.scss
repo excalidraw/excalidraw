@@ -1,0 +1,11 @@
+.tta-warning-message {
+  width: min(100%, 21rem);
+  margin: 0.5rem auto 0.75rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid var(--color-warning-dark);
+  border-radius: 8px;
+  background: var(--color-warning);
+  color: var(--color-warning-color);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+}

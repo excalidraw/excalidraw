@@ -17,7 +17,7 @@ export type ButtonColor =
   | "warning"
   | "muted"
   | "success";
-export type ButtonSize = "medium" | "large";
+export type ButtonSize = "small" | "medium" | "large";
 
 export type FilledButtonProps = {
   label?: string;

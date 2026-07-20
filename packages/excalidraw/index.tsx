@@ -468,12 +468,49 @@ export { Stats } from "./components/Stats";
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
+export { TTDRateLimitWarningContent } from "./components/TTDDialog/Chat/TTDRateLimitWarningContent";
+export { TTDDefaultTransportAdapter } from "./components/TTDDialog/utils/TTDStreamFetch";
 export { TTDStreamFetch } from "./components/TTDDialog/utils/TTDStreamFetch";
+export { TTADialog } from "./TTA/TTADialog";
+export { TTAIndexedDBAdapter } from "./TTA/history";
+export { TTADefaultTransportAdapter } from "./TTA/client";
+export { TTAStreamFetch } from "./TTA/client";
+export { TTAWarningMessage } from "./TTA/TTAWarningMessage";
 export type {
   TTDPersistenceAdapter,
+  TTDTransportAdapter,
   SavedChat,
   SavedChats,
 } from "./components/TTDDialog/types";
+export type {
+  TTDStreamFetchRequest,
+  TTDStreamFetchOptions,
+  TTDStreamResponseFetch,
+  TTDTransportAdapterConfig,
+} from "./components/TTDDialog/utils/TTDStreamFetch";
+export type { TTADialogProps } from "./TTA/TTADialog";
+export type {
+  TTAStreamFetchOptions,
+  TTAStreamFetchRequest,
+  TTAStreamFetchResult,
+  TTAStreamError,
+  TTAStreamResponseFetch,
+  TTATransportAdapter,
+  TTADefaultTransportAdapterConfig,
+  AIChatTruncateRequest,
+  AIChatTruncateResponse,
+  TTATruncateFetchRequest,
+  TTATruncateResponseFetch,
+} from "./TTA/client";
+export type {
+  TTADialogRenderWelcomeScreen,
+  TTADialogRenderWarning,
+  TTAPersistenceAdapter,
+} from "./TTA/types";
+export type {
+  AIRateLimitWarningDescriptor,
+  AIRateLimitWarningVariant,
+} from "./aiWarnings";
 
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
 

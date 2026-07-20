@@ -43,6 +43,19 @@ import type { WS_SUBTYPES } from "../app_constants";
 export type SyncableExcalidrawElement = OrderedExcalidrawElement &
   MakeBrand<"SyncableExcalidrawElement">;
 
+export const INTERMEDIATE_PREVIEW_ELEMENT_KEY = "intermediatePreviewElement";
+
+export const isIntermediatePreviewElement = (
+  element: ExcalidrawElement,
+): boolean => element.customData?.[INTERMEDIATE_PREVIEW_ELEMENT_KEY] === true;
+
+export const getPersistableElements = <TElement extends ExcalidrawElement>(
+  elements: readonly TElement[],
+) =>
+  elements.filter(
+    (element) => !isIntermediatePreviewElement(element),
+  ) as TElement[];
+
 export const isSyncableElement = (
   element: OrderedExcalidrawElement,
 ): element is SyncableExcalidrawElement => {

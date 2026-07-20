@@ -1,19 +1,33 @@
+import {
+  extractRateLimitHeaders,
+  iterateSSEJSONChunks,
+} from "../../../data/sse";
 import { RequestError } from "../../../errors";
 
-import type { LLMMessage, TTTDDialog } from "../types";
+import type { LLMMessage, TTDTransportAdapter, TTTDDialog } from "../types";
 
-interface RateLimitInfo {
-  rateLimit?: number;
-  rateLimitRemaining?: number;
+export interface TTDStreamFetchRequest {
+  method: "POST";
+  headers: {
+    Accept: "text/event-stream";
+    "Content-Type": "application/json";
+  };
+  payload: {
+    messages: readonly LLMMessage[];
+  };
+  signal?: AbortSignal;
 }
 
-interface StreamingOptions {
-  url: string;
+export type TTDStreamResponseFetch = (
+  request: TTDStreamFetchRequest,
+) => Promise<Response>;
+
+export interface TTDStreamFetchOptions {
   messages: readonly LLMMessage[];
   onChunk?: (chunk: string) => void;
-  extractRateLimits?: boolean;
   signal?: AbortSignal;
   onStreamCreated?: () => void;
+  fetch: TTDStreamResponseFetch;
 }
 
 export type StreamChunk =
@@ -33,84 +47,50 @@ export type StreamChunk =
       };
     };
 
-function extractRateLimitHeaders(headers: Headers): RateLimitInfo {
-  const rateLimit = headers.get("X-Ratelimit-Limit");
-  const rateLimitRemaining = headers.get("X-Ratelimit-Remaining");
+export interface TTDTransportAdapterConfig {
+  stream: TTDStreamResponseFetch;
+}
 
-  return {
-    rateLimit: rateLimit ? parseInt(rateLimit, 10) : undefined,
-    rateLimitRemaining: rateLimitRemaining
-      ? parseInt(rateLimitRemaining, 10)
-      : undefined,
+export class TTDDefaultTransportAdapter implements TTDTransportAdapter {
+  constructor(private readonly config: TTDTransportAdapterConfig) {}
+
+  stream: TTDTransportAdapter["stream"] = async (options) => {
+    return TTDStreamFetch({
+      ...options,
+      fetch: this.config.stream,
+    });
   };
 }
 
-async function* parseSSEStream(
-  reader: ReadableStreamDefaultReader<Uint8Array>,
-): AsyncGenerator<string, void, unknown> {
-  const decoder = new TextDecoder();
-  let buffer = "";
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-
-      if (done) {
-        break;
-      }
-
-      buffer += decoder.decode(value, { stream: true });
-
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-
-      for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (!trimmedLine) {
-          continue;
-        }
-
-        if (trimmedLine.startsWith("data: ")) {
-          const data = trimmedLine.slice(6);
-          yield data;
-        }
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
-}
-
 export async function TTDStreamFetch(
-  options: StreamingOptions,
+  options: TTDStreamFetchOptions,
 ): Promise<TTTDDialog.OnTextSubmitRetValue> {
   const {
-    url,
     messages,
     onChunk,
     onStreamCreated,
-    extractRateLimits = true,
     signal,
+    fetch: streamFetch,
   } = options;
 
   try {
     let fullResponse = "";
-    let rateLimitInfo: RateLimitInfo = {};
+    const rateLimitInfo = extractRateLimitHeaders(new Headers());
     let error: RequestError | null = null;
 
-    const response = await fetch(url, {
+    const response = await streamFetch({
       method: "POST",
       headers: {
         Accept: "text/event-stream",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages }),
+      payload: {
+        messages,
+      },
       signal,
     });
 
-    if (extractRateLimits) {
-      rateLimitInfo = extractRateLimitHeaders(response.headers);
-    }
+    Object.assign(rateLimitInfo, extractRateLimitHeaders(response.headers));
 
     if (!response.ok) {
       if (response.status === 429) {
@@ -130,9 +110,9 @@ export async function TTDStreamFetch(
       });
     }
 
-    const reader = response.body?.getReader();
+    const stream = response.body;
 
-    if (!reader) {
+    if (!stream) {
       throw new RequestError({
         message: "Couldn't get reader from response body",
         status: 500,
@@ -142,38 +122,35 @@ export async function TTDStreamFetch(
     onStreamCreated?.();
 
     try {
-      for await (const data of parseSSEStream(reader)) {
-        if (data === "[DONE]") {
+      for await (const chunk of iterateSSEJSONChunks<StreamChunk | null>(
+        stream,
+        {
+          onInvalidJSON: (payload, parseError) => {
+            console.warn("Failed to parse SSE data:", payload, parseError);
+          },
+        },
+      )) {
+        if (chunk === null) {
           break;
         }
 
-        try {
-          const chunk: StreamChunk = JSON.parse(data);
-
-          if (chunk === null) {
+        switch (chunk.type) {
+          case "content": {
+            const delta = chunk.delta;
+            if (delta) {
+              fullResponse += delta;
+              onChunk?.(delta);
+            }
             break;
           }
-
-          switch (chunk.type) {
-            case "content": {
-              const delta = chunk.delta;
-              if (delta) {
-                fullResponse += delta;
-                onChunk?.(delta);
-              }
-              break;
-            }
-            case "error":
-              error = new RequestError({
-                message: chunk.error.message,
-                status: 500,
-              });
-              break;
-            case "done":
-              break;
-          }
-        } catch (e) {
-          console.warn("Failed to parse SSE data:", data, e);
+          case "error":
+            error = new RequestError({
+              message: chunk.error.message,
+              status: 500,
+            });
+            break;
+          case "done":
+            break;
         }
       }
     } catch (streamError: any) {

@@ -2220,15 +2220,31 @@ export const fixDuplicatedBindingsAfterDuplication = (
     if (isElbowArrow(duplicateElement)) {
       Object.assign(
         duplicateElement,
-        updateElbowArrowPoints(duplicateElement, duplicateElementsMap, {
-          points: [
-            duplicateElement.points[0],
-            duplicateElement.points[duplicateElement.points.length - 1],
-          ],
-        }),
+        normalizeElbowArrow(duplicateElement, duplicateElementsMap),
       );
     }
   }
+};
+
+export const normalizeElbowArrow = (
+  arrow: ExcalidrawElbowArrowElement,
+  elementsMap: NonDeletedSceneElementsMap,
+) =>
+  updateElbowArrowPoints(arrow, elementsMap, {
+    points: [arrow.points[0], arrow.points[arrow.points.length - 1]],
+  });
+
+export const normalizeElbowArrows = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+  elementsMap?: NonDeletedSceneElementsMap,
+) => {
+  const map =
+    elementsMap ?? (arrayToMap(elements) as NonDeletedSceneElementsMap);
+  return elements.map((element) =>
+    isElbowArrow(element)
+      ? { ...element, ...normalizeElbowArrow(element, map) }
+      : element,
+  );
 };
 
 export const fixBindingsAfterDeletion = (

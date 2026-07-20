@@ -103,7 +103,7 @@ export const getApproxMinLineHeight = (
   return getLineHeightInPx(fontSize, lineHeight) + BOUND_TEXT_PADDING * 2;
 };
 
-let textMetricsProvider: TextMetricsProvider | undefined;
+const PROVIDER_KEY = Symbol.for("excalidraw.textMetricsProvider");
 
 /**
  * Set a custom text metrics provider.
@@ -111,7 +111,7 @@ let textMetricsProvider: TextMetricsProvider | undefined;
  * Useful for overriding the width calculation algorithm where canvas API is not available / desired.
  */
 export const setCustomTextMetricsProvider = (provider: TextMetricsProvider) => {
-  textMetricsProvider = provider;
+  (globalThis as any)[PROVIDER_KEY] = provider;
 };
 
 export interface TextMetricsProvider {
@@ -150,11 +150,15 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
 }
 
 export const getLineWidth = (text: string, font: FontString) => {
-  if (!textMetricsProvider) {
-    textMetricsProvider = new CanvasTextMetricsProvider();
+  let provider: TextMetricsProvider | undefined = (globalThis as any)[
+    PROVIDER_KEY
+  ];
+
+  if (!provider) {
+    provider = new CanvasTextMetricsProvider();
   }
 
-  return textMetricsProvider.getLineWidth(text, font);
+  return provider.getLineWidth(text, font);
 };
 
 export const getTextWidth = (text: string, font: FontString) => {

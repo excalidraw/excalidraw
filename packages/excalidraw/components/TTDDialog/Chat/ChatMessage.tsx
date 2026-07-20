@@ -2,10 +2,15 @@ import clsx from "clsx";
 import React, { useState, useEffect } from "react";
 
 import { t } from "../../../i18n";
-import { FilledButton } from "../../FilledButton";
 import { TrashIcon, codeIcon, stackPushIcon, RetryIcon } from "../../icons";
 
+import {
+  ChatMessage as ChatMessageBase,
+  ChatMessageActionButton,
+} from "../../AI";
+
 import type { TChat, TTTDDialog } from "../types";
+import type { AIRateLimitWarningDescriptor } from "../../../aiWarnings";
 
 export const ChatMessage: React.FC<{
   message: TChat.ChatMessage;
@@ -58,161 +63,126 @@ export const ChatMessage: React.FC<{
     return () => clearTimeout(timer);
   }, [message.error, message.lastAttemptAt, isLastMessage]);
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
+  // --- Warning message (rate limit) ---
   if (message.type === "warning") {
-    const customOverride = renderWarning?.(message);
+    const warning: AIRateLimitWarningDescriptor = {
+      kind: "rateLimit",
+      variant: message.warningType ?? "rateLimitExceeded",
+    };
+    const customOverride = renderWarning?.(warning, message);
+
+    const warningContent =
+      customOverride !== undefined
+        ? customOverride
+        : message.warningType === "messageLimitExceeded"
+        ? t("chat.rateLimit.messageLimit")
+        : t("chat.rateLimit.generalRateLimit");
     return (
-      <div className="chat-message chat-message--system">
-        <div className="chat-message__content">
-          <div className="chat-message__header">
-            <span className="chat-message__role">{t("chat.role.system")}</span>
-            <span className="chat-message__timestamp">
-              {formatTime(message.timestamp)}
-            </span>
-          </div>
-          <div className="chat-message__body">
-            <div className="chat-message__text">
-              {customOverride ? (
-                customOverride
-              ) : message.warningType === "messageLimitExceeded" ? (
-                <>
-                  {t("chat.rateLimit.messageLimit")}
-                  <div style={{ marginTop: "10px" }}>
-                    <FilledButton
-                      onClick={() => {
-                        window.open(
-                          `${
-                            import.meta.env.VITE_APP_PLUS_LP
-                          }/plus?utm_source=excalidraw&utm_medium=app&utm_content=ttdChatBanner#excalidraw-redirect`,
-                          "_blank",
-                          "noopener",
-                        );
-                      }}
-                    >
-                      {t("chat.upsellBtnLabel")}
-                    </FilledButton>
-                  </div>
-                </>
-              ) : (
-                t("chat.rateLimit.generalRateLimit")
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <ChatMessageBase
+        className="ai-chat-message--ttd"
+        role="system"
+        roleLabel={t("chat.role.system")}
+        timestamp={message.timestamp}
+        content={warningContent}
+      />
     );
   }
 
-  return (
-    <div className={`chat-message chat-message--${message.type}`}>
-      <div className="chat-message__content">
-        <div className="chat-message__header">
-          <span className="chat-message__role">
-            {message.type === "user"
-              ? t("chat.role.user")
-              : t("chat.role.assistant")}
-          </span>
-          <span className="chat-message__timestamp">
-            {formatTime(message.timestamp)}
-          </span>
-        </div>
-        <div className="chat-message__body">
-          {message.error ? (
-            <>
-              <div className="chat-message__error">{message.content}</div>
-              {message.errorType !== "parse" && (
-                <div className="chat-message__error_message">
-                  Error: {message.error || t("chat.errors.generationFailed")}
-                </div>
-              )}
-              {message.errorType === "parse" && allowFixingParseError && (
-                <div className="chat-message__error_message">
-                  <p>{t("chat.errors.invalidDiagram")}</p>
-                  <div className="chat-message__error-actions">
-                    {onMermaidTabClick && (
-                      <button
-                        className="chat-message__error-link"
-                        onClick={() => onMermaidTabClick(message)}
-                        type="button"
-                      >
-                        {t("chat.errors.fixInMermaid")}
-                      </button>
-                    )}
-                    {onAiRepairClick && (
-                      <button
-                        className="chat-message__error-link"
-                        onClick={() => onAiRepairClick(message)}
-                        disabled={rateLimitRemaining === 0}
-                        type="button"
-                      >
-                        {t("chat.errors.aiRepair")}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="chat-message__text">
-              {message.content}
-              {message.isGenerating && (
-                <span className="chat-message__cursor">▋</span>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-      {message.type === "assistant" && !message.isGenerating && (
-        <div className="chat-message__actions">
-          {!message.error && onInsertMessage && (
-            <button
-              className="chat-message__action"
-              onClick={() => onInsertMessage(message)}
-              type="button"
-              aria-label={t("chat.insert")}
-              title={t("chat.insert")}
-            >
-              {stackPushIcon}
-            </button>
-          )}
-          {onMermaidTabClick && message.content && (
-            <button
-              className="chat-message__action"
-              onClick={() => onMermaidTabClick(message)}
-              type="button"
-              aria-label={t("chat.viewAsMermaid")}
-              title={t("chat.viewAsMermaid")}
-            >
-              {codeIcon}
-            </button>
-          )}
-          {onDeleteMessage && message.errorType !== "network" && (
-            <button
-              className="chat-message__action chat-message__action--danger"
-              onClick={() => onDeleteMessage(message.id)}
-              type="button"
-              aria-label={t("chat.deleteMessage")}
-              title={t("chat.deleteMessage")}
-            >
-              {TrashIcon}
-            </button>
-          )}
-          {message.errorType === "network" && onRetry && isLastMessage && (
-            <button
-              className={clsx("chat-message__action", { invisible: !canRetry })}
-              onClick={() => onRetry(message)}
-              type="button"
-              aria-label={t("chat.retry")}
-              title={t("chat.retry")}
-            >
-              {RetryIcon}
-            </button>
-          )}
+  // --- Error node ---
+  const errorNode = message.error ? (
+    <>
+      <div className="ai-chat-message__error-text">{message.content}</div>
+      {message.errorType !== "parse" && (
+        <div className="ai-chat-message__error-message">
+          Error: {message.error || t("chat.errors.generationFailed")}
         </div>
       )}
-    </div>
+      {message.errorType === "parse" && allowFixingParseError && (
+        <div className="ai-chat-message__error-message">
+          <p>{t("chat.errors.invalidDiagram")}</p>
+          <div className="ai-chat-message__error-actions">
+            {onMermaidTabClick && (
+              <button
+                className="ai-chat-message__error-link"
+                onClick={() => onMermaidTabClick(message)}
+                type="button"
+              >
+                {t("chat.errors.fixInMermaid")}
+              </button>
+            )}
+            {onAiRepairClick && (
+              <button
+                className="ai-chat-message__error-link"
+                onClick={() => onAiRepairClick(message)}
+                disabled={rateLimitRemaining === 0}
+                type="button"
+              >
+                {t("chat.errors.aiRepair")}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  ) : undefined;
+
+  // --- Actions for assistant messages ---
+  const actionsNode =
+    message.type === "assistant" && !message.isGenerating ? (
+      <>
+        {!message.error && onInsertMessage && (
+          <ChatMessageActionButton
+            icon={stackPushIcon}
+            label="To canvas"
+            onClick={() => onInsertMessage(message)}
+            ariaLabel={t("chat.insert")}
+          />
+        )}
+        {onMermaidTabClick && message.content && (
+          <ChatMessageActionButton
+            icon={codeIcon}
+            label="Edit"
+            onClick={() => onMermaidTabClick(message)}
+            ariaLabel={t("chat.viewAsMermaid")}
+          />
+        )}
+        {onDeleteMessage && message.errorType !== "network" && (
+          <ChatMessageActionButton
+            icon={TrashIcon}
+            label="Delete"
+            onClick={() => onDeleteMessage(message.id)}
+            ariaLabel={t("chat.deleteMessage")}
+            danger
+          />
+        )}
+        {message.errorType === "network" && onRetry && isLastMessage && (
+          <ChatMessageActionButton
+            icon={RetryIcon}
+            onClick={() => onRetry(message)}
+            ariaLabel={t("chat.retry")}
+            className={clsx({
+              "ai-chat-message__action--invisible": !canRetry,
+            })}
+          />
+        )}
+      </>
+    ) : undefined;
+
+  const roleLabel =
+    message.type === "user" ? t("chat.role.user") : t("chat.role.assistant");
+
+  const visibleContent = message.error ? undefined : message.content;
+
+  return (
+    <ChatMessageBase
+      className="ai-chat-message--ttd"
+      role={message.type === "user" ? "user" : "assistant"}
+      roleLabel={roleLabel}
+      timestamp={message.timestamp}
+      content={visibleContent}
+      isGenerating={message.isGenerating}
+      error={errorNode}
+      actions={actionsNode}
+    />
   );
 };

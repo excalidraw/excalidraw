@@ -35,6 +35,26 @@ const createDataChunk = (data: string): string => {
 
 const DONE_CHUNK = "data: [DONE]\n\n";
 
+const createTransportFetch =
+  () =>
+  async ({
+    method,
+    headers,
+    payload,
+    signal,
+  }: {
+    method: "POST";
+    headers: Record<string, string>;
+    payload: unknown;
+    signal?: AbortSignal;
+  }) =>
+    global.fetch("https://api.example.com/stream", {
+      method,
+      headers,
+      body: JSON.stringify(payload),
+      signal,
+    });
+
 describe("TTDStreamFetch", () => {
   let originalFetch: typeof global.fetch;
 
@@ -63,8 +83,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
         onChunk: (chunk) => chunks.push(chunk),
       });
 
@@ -87,8 +107,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.generatedResponse).toBe("Line 1\nLine 2");
@@ -105,8 +125,8 @@ describe("TTDStreamFetch", () => {
       });
 
       await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
         onStreamCreated,
       });
 
@@ -127,8 +147,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.generatedResponse).toBe("valid");
@@ -148,8 +168,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.generatedResponse).toBe("before null");
@@ -171,36 +191,12 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
-        extractRateLimits: true,
+        fetch: createTransportFetch(),
       });
 
       expect(result.rateLimit).toBe(100);
       expect(result.rateLimitRemaining).toBe(95);
-    });
-
-    it("should not extract rate limits when disabled", async () => {
-      const mockChunks = [createContentChunk("test"), DONE_CHUNK];
-
-      const headers = new Headers();
-      headers.set("X-Ratelimit-Limit", "100");
-      headers.set("X-Ratelimit-Remaining", "95");
-
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        headers,
-        body: createMockStream(mockChunks),
-      });
-
-      const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
-        messages: [],
-        extractRateLimits: false,
-      });
-
-      expect(result.rateLimit).toBeUndefined();
-      expect(result.rateLimitRemaining).toBeUndefined();
     });
 
     it("should handle missing rate limit headers", async () => {
@@ -213,9 +209,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
-        extractRateLimits: true,
+        fetch: createTransportFetch(),
       });
 
       expect(result.rateLimit).toBeUndefined();
@@ -234,8 +229,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.error).toBeDefined();
@@ -255,8 +250,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.error).toBeDefined();
@@ -272,8 +267,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.error).toBeDefined();
@@ -288,8 +283,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.error).toBeDefined();
@@ -308,8 +303,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.error).toBeDefined();
@@ -322,8 +317,8 @@ describe("TTDStreamFetch", () => {
         .mockRejectedValue(new Error("Network connection failed"));
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.error).toBeDefined();
@@ -348,8 +343,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.generatedResponse).toBe("valid");
@@ -371,8 +366,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
         signal: abortController.signal,
       });
 
@@ -381,7 +376,6 @@ describe("TTDStreamFetch", () => {
     });
 
     it("should handle abort error thrown during streaming", async () => {
-      // Create a stream that throws an AbortError
       const stream = new ReadableStream({
         async pull() {
           const error = new Error("The operation was aborted");
@@ -397,8 +391,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.error).toBeDefined();
@@ -421,8 +415,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.generatedResponse).toBe("valid");
@@ -443,15 +437,14 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.generatedResponse).toBe("firstsecond");
     });
 
     it("should handle partial chunks across reads", async () => {
-      // Split an SSE message across multiple chunks
       const mockChunks = [
         "data: ",
         createContentChunkData("partial"),
@@ -466,8 +459,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.generatedResponse).toBe("partial");
@@ -487,8 +480,8 @@ describe("TTDStreamFetch", () => {
       });
 
       const result = await TTDStreamFetch({
-        url: "https://api.example.com/stream",
         messages: [],
+        fetch: createTransportFetch(),
       });
 
       expect(result.generatedResponse).toBe("content");

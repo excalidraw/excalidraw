@@ -908,6 +908,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
+        // aiEnabled={false}
         onChange={onChange}
         onExport={onExport}
         initialData={initialStatePromiseRef.current.promise}

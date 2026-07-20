@@ -16,7 +16,7 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import type { MarkOptional } from "@excalidraw/common/utility-types";
+import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
 
 import { bindBindingElement } from "./binding";
 import {
@@ -30,7 +30,7 @@ import {
   type ElementConstructorOpts,
 } from "./newElement";
 import { measureText, normalizeText } from "./textMeasurements";
-import { isArrowElement } from "./typeChecks";
+import { isArrowElement, isBindableElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
@@ -256,8 +256,8 @@ const bindLinearElementToElement = (
   startBoundElement?: ExcalidrawElement;
   endBoundElement?: ExcalidrawElement;
 } => {
-  let startBoundElement;
-  let endBoundElement;
+  let startBoundElement: ExcalidrawElement | undefined;
+  let endBoundElement: ExcalidrawElement | undefined;
 
   Object.assign(linearElement, {
     startBinding: linearElement?.startBinding || null,
@@ -322,6 +322,12 @@ const bindLinearElementToElement = (
             });
             break;
           }
+          case "frame": {
+            if (existingElement && isBindableElement(existingElement)) {
+              startBoundElement = existingElement;
+            }
+            break;
+          }
           default: {
             assertNever(
               linearElement as never,
@@ -331,7 +337,9 @@ const bindLinearElementToElement = (
           }
         }
       }
+    }
 
+    if (startBoundElement && isBindableElement(startBoundElement)) {
       bindBindingElement(
         linearElement,
         startBoundElement as NonDeleted<ExcalidrawBindableElement>,
@@ -398,6 +406,12 @@ const bindLinearElementToElement = (
             });
             break;
           }
+          case "frame": {
+            if (existingElement && isBindableElement(existingElement)) {
+              endBoundElement = existingElement;
+            }
+            break;
+          }
           default: {
             assertNever(
               linearElement as never,
@@ -407,7 +421,9 @@ const bindLinearElementToElement = (
           }
         }
       }
+    }
 
+    if (endBoundElement && isBindableElement(endBoundElement)) {
       bindBindingElement(
         linearElement,
         endBoundElement as NonDeleted<ExcalidrawBindableElement>,
@@ -768,7 +784,9 @@ export const convertToExcalidrawElements = (
       Object.assign(elementInFrame, { frameId: frame.id });
 
       elementInFrame?.boundElements?.forEach((boundElement) => {
-        const ele = elementStore.getElement(boundElement.id);
+        const boundElementId =
+          oldToNewElementIdMap.get(boundElement.id) ?? boundElement.id;
+        const ele = elementStore.getElement(boundElementId);
         if (!ele) {
           throw new Error(
             `Bound element with id ${boundElement.id} doesn't exist`,
@@ -789,10 +807,10 @@ export const convertToExcalidrawElements = (
     maxX = maxX + PADDING;
     maxY = maxY + PADDING;
 
-    const frameX = frame?.x || minX;
-    const frameY = frame?.y || minY;
-    const frameWidth = frame?.width || maxX - minX;
-    const frameHeight = frame?.height || maxY - minY;
+    const frameX = frame?.x ?? minX;
+    const frameY = frame?.y ?? minY;
+    const frameWidth = frame?.width ?? maxX - minX;
+    const frameHeight = frame?.height ?? maxY - minY;
 
     Object.assign(frame, {
       x: frameX,
@@ -800,14 +818,75 @@ export const convertToExcalidrawElements = (
       width: frameWidth,
       height: frameHeight,
     });
-    if (
-      isDevEnv() &&
-      element.children.length &&
-      (frame?.x || frame?.y || frame?.width || frame?.height)
-    ) {
-      console.info(
-        "User provided frame attributes are being considered, if you find this inaccurate, please remove any of the attributes - x, y, width and height so frame coordinates and dimensions are calculated automatically",
-      );
+  }
+
+  // remap old ids of pre-existing relationships (i.e. those not created through
+  // skeleton transformation)
+  if (opts?.regenerateIds && oldToNewElementIdMap.size) {
+    const remapId = (id?: string | null) =>
+      id ? oldToNewElementIdMap.get(id) ?? id : id;
+
+    const remapBoundElements = (
+      boundElements?: ExcalidrawElement["boundElements"],
+    ) => {
+      if (!boundElements?.length) {
+        return boundElements;
+      }
+      let didChange = false;
+      const nextBoundElements = boundElements.map((boundElement) => {
+        const nextId = remapId(boundElement.id);
+        if (nextId !== boundElement.id) {
+          didChange = true;
+          return { ...boundElement, id: nextId };
+        }
+        return boundElement;
+      });
+      return didChange ? nextBoundElements : boundElements;
+    };
+
+    for (const element of elementStore.excalidrawElements.values()) {
+      const mutableElement = element as Mutable<ExcalidrawElement>;
+
+      if ("containerId" in mutableElement && mutableElement.containerId) {
+        mutableElement.containerId =
+          remapId(mutableElement.containerId) ?? null;
+      }
+
+      if (mutableElement.boundElements?.length) {
+        mutableElement.boundElements = remapBoundElements(
+          mutableElement.boundElements,
+        ) as typeof mutableElement.boundElements;
+      }
+
+      if (
+        "startBinding" in mutableElement &&
+        mutableElement.startBinding?.elementId
+      ) {
+        const nextId =
+          remapId(mutableElement.startBinding.elementId) ??
+          mutableElement.startBinding.elementId;
+        mutableElement.startBinding = {
+          ...mutableElement.startBinding,
+          elementId: nextId,
+        };
+      }
+
+      if (
+        "endBinding" in mutableElement &&
+        mutableElement.endBinding?.elementId
+      ) {
+        const nextId =
+          remapId(mutableElement.endBinding.elementId) ??
+          mutableElement.endBinding.elementId;
+        mutableElement.endBinding = {
+          ...mutableElement.endBinding,
+          elementId: nextId,
+        };
+      }
+
+      if ("frameId" in mutableElement && mutableElement.frameId) {
+        mutableElement.frameId = remapId(mutableElement.frameId) ?? null;
+      }
     }
   }
 

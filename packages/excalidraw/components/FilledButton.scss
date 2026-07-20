@@ -24,7 +24,7 @@
     background-color: var(--back-color);
     border-color: var(--border-color);
 
-    border-radius: 0.5rem;
+    border-radius: var(--border-radius-lg);
     border-width: 1px;
     border-style: solid;
 
@@ -310,6 +310,21 @@
 
       .ExcButton__contents {
         gap: 0.5rem;
+      }
+    }
+
+    &--size-small {
+      font-weight: 600;
+      font-size: 0.675rem;
+      min-height: 2rem;
+      padding: 0.25rem 0.75rem;
+
+      letter-spacing: normal;
+
+      border-radius: var(--border-radius-md);
+
+      .ExcButton__contents {
+        gap: 0.375rem;
       }
     }
 
