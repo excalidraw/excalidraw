@@ -13,6 +13,7 @@ import { useStable } from "../hooks/useStable";
 import { getSelectedElements } from "../scene";
 
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
+import { positionElementBesideCursor } from "./positionElementBesideCursor";
 
 import "./EyeDropper.scss";
 
@@ -102,19 +103,15 @@ export const EyeDropper: React.FC<{
       clientY: number;
       altKey: boolean;
     }) => {
-      // Keep the color preview within the viewport.
-      const previewWidth = colorPreviewDiv.offsetWidth || 48;
-      const previewHeight = colorPreviewDiv.offsetHeight || 48;
-
-      let top = clientY + 20;
-      let left = clientX + 20;
-
-      if (top + previewHeight > window.innerHeight) {
-        top = clientY - 20 - previewHeight;
-      }
-      if (left + previewWidth > window.innerWidth) {
-        left = clientX - 20 - previewWidth;
-      }
+      const { top, left } = positionElementBesideCursor({
+        cursor: { x: clientX, y: clientY },
+        element: {
+          width: colorPreviewDiv.offsetWidth,
+          height: colorPreviewDiv.offsetHeight,
+        },
+        container: eyeDropperContainer.getBoundingClientRect(),
+        gap: 20,
+      });
 
       colorPreviewDiv.style.top = `${top}px`;
       colorPreviewDiv.style.left = `${left}px`;
