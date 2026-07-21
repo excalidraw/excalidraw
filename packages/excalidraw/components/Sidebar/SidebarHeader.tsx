@@ -43,14 +43,16 @@ export const SidebarHeader = ({
             </Button>
           </Tooltip>
         )}
-        <Button
-          data-testid="sidebar-close"
-          className="sidebar__close"
-          onSelect={props.onCloseRequest}
-          aria-label={t("buttons.close")}
-        >
-          {CloseIcon}
-        </Button>
+        <Tooltip label={t("buttons.close")}>
+          <Button
+            data-testid="sidebar-close"
+            className="sidebar__close"
+            onSelect={props.onCloseRequest}
+            aria-label={t("buttons.close")}
+          >
+            {CloseIcon}
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );
