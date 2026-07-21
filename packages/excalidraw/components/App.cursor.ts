@@ -33,6 +33,7 @@ export class AppCursor {
     | (HTMLCanvasElement & { theme?: AppState["theme"] })
     | null = null;
   private eraserPreviewDataURL: DataURL | null = null;
+  private copyCursorDataURL: string | null = null;
 
   constructor(private app: App) {}
 
@@ -40,9 +41,20 @@ export class AppCursor {
     return this.app.interactiveCanvas;
   }
 
+  private getCopyCursor = () => {
+    if (!this.copyCursorDataURL) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="rgba(255,255,255,0.9)" stroke="rgba(0,0,0,0.7)" stroke-width="1"/><path d="M9 5.5v7M5.5 9h7" fill="none" stroke="rgba(0,0,0,0.85)" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+      this.copyCursorDataURL = `url("data:image/svg+xml,${encodeURIComponent(
+        svg,
+      )}") 9 9, copy`;
+    }
+    return this.copyCursorDataURL;
+  };
+
   set = (cursor: string) => {
     if (this.canvas) {
-      this.canvas.style.cursor = cursor;
+      this.canvas.style.cursor =
+        cursor === CURSOR_TYPE.COPY ? this.getCopyCursor() : cursor;
     }
   };
 

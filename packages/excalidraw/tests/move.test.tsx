@@ -169,13 +169,21 @@ describe("duplicate element on move when ALT is clicked", () => {
       renderStaticScene.mockClear();
     }
 
-    fireEvent.pointerDown(canvas, { clientX: 50, clientY: 20 });
+    fireEvent.pointerDown(canvas, {
+      clientX: 50,
+      clientY: 20,
+      altKey: true,
+    });
+    expect(canvas.style.cursor).toContain("url(");
+
     fireEvent.pointerMove(canvas, { clientX: 20, clientY: 40, altKey: true });
+    expect(canvas.style.cursor).toContain("url(");
 
     // firing another pointerMove event with alt key pressed should NOT trigger
     // another duplication
     fireEvent.pointerMove(canvas, { clientX: 20, clientY: 40, altKey: true });
     fireEvent.pointerMove(canvas, { clientX: 10, clientY: 60 });
+    expect(canvas.style.cursor).not.toContain("url(");
     fireEvent.pointerUp(canvas);
 
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);

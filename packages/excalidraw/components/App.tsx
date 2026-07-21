@@ -8665,6 +8665,10 @@ class App extends React.Component<AppProps, AppState> {
       event,
     );
 
+    // If Alt/Option is already held when pointer down begins, show duplicate
+    // cursor feedback immediately before dragging starts.
+    this.maybeUpdateDuplicateDragCursor(pointerDownState, event.nativeEvent);
+
     if (this.state.activeTool.type === "eraser") {
       this.eraserTrail.startPath(
         pointerDownState.lastCoords.x,
@@ -10315,10 +10319,29 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  private maybeUpdateDuplicateDragCursor = (
+    pointerDownState: PointerDownState,
+    event: KeyboardEvent | PointerEvent,
+  ) => {
+    if (
+      pointerDownState.hit.allHitElements.some((element) =>
+        this.isASelectedElement(element),
+      ) ||
+      pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
+    ) {
+      if (event.altKey) {
+        this.cursor.set(CURSOR_TYPE.COPY);
+      } else {
+        this.cursor.reset();
+      }
+    }
+  };
+
   private onKeyDownFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
+      this.maybeUpdateDuplicateDragCursor(pointerDownState, event);
       if (this.maybeHandleResize(pointerDownState, event)) {
         return;
       }
@@ -10332,6 +10355,7 @@ class App extends React.Component<AppProps, AppState> {
     return withBatchedUpdates((event: KeyboardEvent) => {
       // Prevents focus from escaping excalidraw tab
       event.key === KEYS.ALT && event.preventDefault();
+      this.maybeUpdateDuplicateDragCursor(pointerDownState, event);
       if (this.maybeHandleResize(pointerDownState, event)) {
         return;
       }
@@ -10838,6 +10862,12 @@ class App extends React.Component<AppProps, AppState> {
             // should be removed
             selectionElement: null,
           });
+
+          if (event.altKey) {
+            this.cursor.set(CURSOR_TYPE.COPY);
+          } else {
+            this.cursor.reset();
+          }
 
           // We duplicate the selected element if alt is pressed on pointer move
           if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
