@@ -17,7 +17,7 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { updateTextEditor } from "./queries/dom";
-import { act, render, waitFor } from "./test-utils";
+import { act, render, screen, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -73,6 +73,43 @@ describe("search", () => {
       Keyboard.keyPress(KEYS.F);
     });
     expect(searchInput?.matches(":focus")).toBe(true);
+  });
+
+  it("should focus help search instead of opening canvas search on cmd+f in help dialog", async () => {
+    Keyboard.keyPress(KEYS.QUESTION_MARK);
+    expect(h.app.state.openDialog?.name).toBe("help");
+
+    const helpSearchInput = (await screen.findByPlaceholderText(
+      "Search shortcuts",
+    )) as HTMLInputElement;
+    act(() => {
+      helpSearchInput.blur();
+    });
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    expect(h.app.state.openDialog?.name).toBe("help");
+    expect(h.app.state.openSidebar).toBeNull();
+    expect(helpSearchInput.matches(":focus")).toBe(true);
+  });
+
+  it("should filter help shortcuts", async () => {
+    Keyboard.keyPress(KEYS.QUESTION_MARK);
+
+    const helpSearchInput = (await screen.findByPlaceholderText(
+      "Search shortcuts",
+    )) as HTMLInputElement;
+    expect(screen.getByText("Zoom in")).toBeTruthy();
+    expect(screen.getByText("Undo")).toBeTruthy();
+
+    updateTextEditor(helpSearchInput, "zoom in");
+
+    await waitFor(() => {
+      expect(screen.getByText("Zoom in")).toBeTruthy();
+      expect(screen.queryByText("Undo")).toBeNull();
+    });
   });
 
   it("should match text and cycle through matches on Enter", async () => {

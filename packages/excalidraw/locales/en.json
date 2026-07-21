@@ -453,6 +453,7 @@
     "preventBinding": "Prevent arrow binding",
     "tools": "Tools",
     "shortcuts": "Keyboard shortcuts",
+    "searchPlaceholder": "Search shortcuts",
     "textFinish": "Finish editing (text editor)",
     "textNewLine": "Add new line (text editor)",
     "title": "Help",
