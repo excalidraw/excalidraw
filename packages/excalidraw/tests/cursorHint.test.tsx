@@ -193,7 +193,12 @@ describe("cursor hint", () => {
   });
 
   it("tracks pointer position while visible", () => {
-    mockBoundingClientRect({ width: 1920, height: 1080 });
+    mockBoundingClientRect({
+      left: 100,
+      top: 50,
+      width: 1920,
+      height: 1080,
+    });
 
     try {
       UI.clickTool("arrow");
@@ -201,8 +206,8 @@ describe("cursor hint", () => {
 
       fireEvent.pointerMove(window, { clientX: 200, clientY: 100 });
 
-      // 16px offset from the pointer
-      expect(getCursorHint()!.style.transform).toBe("translate(216px, 116px)");
+      // container-relative position, 16px offset from the pointer
+      expect(getCursorHint()!.style.transform).toBe("translate(116px, 66px)");
     } finally {
       restoreOriginalGetBoundingClientRect();
     }

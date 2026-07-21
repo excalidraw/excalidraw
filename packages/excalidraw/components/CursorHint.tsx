@@ -6,6 +6,7 @@ import { ARROW_TYPE, EVENT } from "@excalidraw/common";
 import { atom, useAtom } from "../editor-jotai";
 
 import { useApp, useExcalidrawContainer } from "./App";
+import { positionElementBesideCursor } from "./positionElementBesideCursor";
 import {
   LineIcon,
   sharpArrowIcon,
@@ -22,7 +23,7 @@ const CURSOR_HINT_DURATION = 700;
 /** fade-out duration (keep in sync with CursorHint.scss) */
 const CURSOR_HINT_FADE_DURATION = 100;
 /** distance from the pointer so the hint isn't covered by the cursor */
-const CURSOR_HINT_OFFSET = 16;
+const CURSOR_HINT_GAP = 16;
 
 /**
  * While a recently shown hint is still fresh in memory, tool-switch hints
@@ -126,17 +127,17 @@ export const CursorHint = () => {
       if (!element) {
         return;
       }
-      const rect = container.getBoundingClientRect();
-      let x = clientX - rect.left + CURSOR_HINT_OFFSET;
-      let y = clientY - rect.top + CURSOR_HINT_OFFSET;
-      // flip to the other side of the pointer when overflowing the container
-      if (x + element.offsetWidth > rect.width) {
-        x = clientX - rect.left - CURSOR_HINT_OFFSET - element.offsetWidth;
-      }
-      if (y + element.offsetHeight > rect.height) {
-        y = clientY - rect.top - CURSOR_HINT_OFFSET - element.offsetHeight;
-      }
-      element.style.transform = `translate(${x}px, ${y}px)`;
+      const { left, top } = positionElementBesideCursor({
+        cursor: { x: clientX, y: clientY },
+        element: {
+          width: element.offsetWidth,
+          height: element.offsetHeight,
+        },
+        container: container.getBoundingClientRect(),
+        gap: CURSOR_HINT_GAP,
+      });
+
+      element.style.transform = `translate(${left}px, ${top}px)`;
     };
 
     updatePosition(app.viewport.lastPosition.x, app.viewport.lastPosition.y);
