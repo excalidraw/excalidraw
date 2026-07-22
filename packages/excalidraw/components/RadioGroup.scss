@@ -34,12 +34,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 20px;
+      min-width: 2.5rem;
       height: 24px;
       padding: 0 0.375rem;
 
       color: var(--RadioGroup-choice-color-off);
       background: var(--RadioGroup-choice-background-off);
+      white-space: nowrap;
 
       border-radius: 8px;
 

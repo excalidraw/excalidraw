@@ -192,7 +192,10 @@
     "boxSelectionContain": "包含",
     "boxSelectionOverlap": "重叠",
     "arrowBinding": "箭头绑定",
-    "midpointSnapping": "中点吸附"
+    "midpointSnapping": "中点吸附",
+    "signin": "登录",
+    "signup": "注册",
+    "signup_now": "立即注册"
   },
   "elementLink": {
     "title": "链接到对象",

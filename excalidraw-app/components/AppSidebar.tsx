@@ -5,6 +5,7 @@ import {
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 
 import "./AppSidebar.scss";
 
@@ -67,6 +68,7 @@ const SidebarPromoCopy = (props: SidebarPromoCopyProps) => {
 
 export const AppSidebar = () => {
   const { theme, openSidebar } = useUIAppState();
+  const { t } = useI18n();
 
   return (
     <DefaultSidebar>
@@ -101,7 +103,7 @@ export const AppSidebar = () => {
               import.meta.env.VITE_APP_PLUS_LP
             }/plus?utm_source=excalidraw&utm_medium=app&utm_content=comments_promo#excalidraw-redirect`}
           >
-            Sign up now
+            {t("labels.signup_now")}
           </LinkButton>
         </div>
       </Sidebar.Tab>
@@ -122,7 +124,7 @@ export const AppSidebar = () => {
               import.meta.env.VITE_APP_PLUS_LP
             }/plus?utm_source=excalidraw&utm_medium=app&utm_content=presentations_promo#excalidraw-redirect`}
           >
-            Sign up now
+            {t("labels.signup_now")}
           </LinkButton>
         </div>
       </Sidebar.Tab>
