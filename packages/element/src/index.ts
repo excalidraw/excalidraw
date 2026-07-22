@@ -40,19 +40,21 @@ export const hashString = (s: string): number => {
   return hash >>> 0; // Ensure unsigned 32-bit integer
 };
 
-export const getVisibleElements = (elements: readonly ExcalidrawElement[]) =>
-  elements.filter(
-    (el) => !el.isDeleted && !isInvisiblySmallElement(el),
-  ) as readonly NonDeletedExcalidrawElement[];
-
-export const getNonDeletedElements = <T extends ExcalidrawElement>(
-  elements: readonly T[],
-) =>
-  elements.filter((element) => !element.isDeleted) as readonly NonDeleted<T>[];
-
 export const isNonDeletedElement = <T extends ExcalidrawElement>(
   element: T,
 ): element is NonDeleted<T> => !element.isDeleted;
+
+export const getVisibleElements = (
+  elements: readonly ExcalidrawElement[],
+): readonly NonDeletedExcalidrawElement[] =>
+  elements.filter(
+    (el): el is NonDeletedExcalidrawElement =>
+      isNonDeletedElement(el) && !isInvisiblySmallElement(el),
+  );
+
+export const getNonDeletedElements = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+): readonly NonDeleted<T>[] => elements.filter(isNonDeletedElement);
 
 export * from "./align";
 export * from "./binding";

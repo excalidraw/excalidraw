@@ -15,14 +15,125 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
-### Breaking changes
+### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
+
+- Added `activeTool` prop (`{ type: ToolType } | { type: "custom"; customType: string }`) for forcing the active editor tool (controlled). While set, user- and API-driven tool switching is ignored — `setActiveTool` refuses non-matching activations with a console warning, non-forced toolbar buttons render disabled, and the tool-lock toggle (`Q`) is inert — and the editor snaps back if internal flows reset the tool (e.g. `restore()` on scene load). The forced tool behaves as if locked — it doesn't revert to selection after use and drawn elements aren't auto-selected — without mutating `appState.activeTool.locked`, so the user's persisted padlock preference stays untouched. Unset the prop to return tool control to the editor (the current tool stays active). The forced tool must be activatable to take effect — not disabled via `UIOptions.tools`, and (while non-interactive) allowed via `interaction.enabled.tools`; otherwise the editor stays on the `selection` tool and applies the forced tool once it becomes activatable. `image` cannot be forced (its activation opens the file picker). Composes with `interaction.enabled.tools` for presentation-style hosts: force `laser` for the presenter, `selection` + `interaction={false}` for viewers.
+
+### User-driven tools while non-interactive (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
+
+- Added `interaction.enabled.tools` (`{ laser?: boolean; custom?: boolean }`) — the listed tools stay user-driven while the editor is otherwise non-interactive: pointer input keeps driving the tool when it's the active tool. With `laser` enabled, pointer strokes draw laser trails and pointer positions keep broadcasting through `onPointerUpdate`, so e.g. collaborators see a presenter's laser & cursor while the presenter's editor is otherwise inert. With `custom` enabled, custom tools (`activeTool.type === "custom"`) keep receiving `onPointerDown` / `onPointerUp` — activate them with `locked: true` or they revert to the selection tool (and go inert) after the first pointer interaction. Enabling a tool does not enable user-driven tool _switching_ — the keyboard stays disabled and tool selection remains host-driven (`ExcalidrawAPI.setActiveTool`). Composes with `enabled.navigation`: the enabled tool wins the primary-pointer drag, while wheel input (and wheel-button drag) still pans/zooms. The editor consumes touch input over the canvas while the active tool is enabled (strokes don't scroll the page).
+
+- While the editor is non-interactive, `ExcalidrawAPI.setActiveTool` only activates tools allowed via `interaction.enabled.tools` — activating any other tool is refused with a console warning (previously the switch went through even though the tool couldn't be used, e.g. updating the canvas cursor). The same invariant is maintained for the tool state itself: when the active tool loses its exception (e.g. `enabled.tools` changes, or the editor becomes fully non-interactive mid-session), it resets to the default `selection` tool, so stale tool state — e.g. a presenter's laser after handing off — doesn't leak through `onChange` / collab pointer payloads.
+
+### Interaction and UI control (2026-07-05) [#11605](https://github.com/excalidraw/excalidraw/pull/11605)
+
+- Added `interaction` prop (`boolean | { enabled?: { navigation?: boolean; links?: boolean; embeds?: boolean; interactiveContent?: boolean; browserZoom?: boolean } }`). When set to `false`, the editor becomes fully inert for the user — no panning, zooming, selecting, editing, keyboard shortcuts, clipboard, or drag&drop. It implies view mode (`appState.viewModeEnabled` reports `true` and cannot be unset while non-interactive), and the page scrolls naturally over the component since wheel/touch input is no longer captured (the browser's own zoom is still prevented over the editor by default). Interactions under `enabled` are opt-in exceptions: with `navigation` allowed, the user can pan (pointer drag, wheel, PageUp/PageDown — shift for horizontal) and zoom (ctrl/cmd + wheel, pinch, and the canvas zoom & zoom-to-fit shortcuts — ctrl/cmd +/-/0, shift+1/2/3) the canvas view-mode style — respecting `appState.scrollConstraints`, so it composes with viewport locking for constrained viewers, while the rest of the keyboard stays disabled and the editor consumes wheel & touch input again (the page no longer scrolls over the editor); with `links` allowed, link icons render and linked elements stay clickable (view-mode behavior: clicking anywhere on a linked element opens its link) while the editor stays otherwise non-interactive — when links are not allowed, link icons are not rendered at all; with `embeds` allowed, embeddable & iframe elements stay interactive (hover & click activates them, view-mode style); `interactiveContent` is an additive shorthand enabling `links` & `embeds` (and future interactive content kinds) together; with `browserZoom` allowed, the browser's own zoom gestures (ctrl/cmd + wheel, pinch, keyboard) stay available over the editor (moot when `navigation` is allowed, since the editor consumes the zoom input instead). The scene still renders and remains fully controllable through the imperative API (`updateScene`, `setViewport`, ...), making it suitable for live previews, thumbnails, and annotation overlays.
+
+- Added `ui` prop (`boolean | { enabled: { zoom?: boolean; scrollBackToContent?: boolean } }`). When set to `false`, Excalidraw's default UI is not rendered — toolbar, default menu and footer controls, sidebars, canvas popups, and context menu. The object form likewise hides the default UI but opts the zoom controls and/or scroll-back-to-content button back in. Canvas content (elements, text editing, frame names, embeds) still renders, and the editor remains interactive unless `interaction={false}` is set as well. Host children continue to mount (they may be functional, e.g. a collaboration component), and host-supplied UI — including Excalidraw-exported components such as `<MainMenu>` and `<Footer>` — continues to render together with any supporting dialogs it opens. You're responsible for hiding your own presentational components.
+
+### Tool system & toolbar rework [#11649](https://github.com/excalidraw/excalidraw/pull/11649)
+
+The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>` elements composed from a central tool registry, and all tool activation now goes through a single `setActiveTool` code path.
+
+#### Breaking changes
+
+- `ExcalidrawAPI.setActiveTool(tool, keepSelection?)` — the second parameter changed from a boolean to an options object: `setActiveTool(tool, { keepSelection?: boolean; toggle?: boolean = false })`. The hand and eraser tools are now _toggle tools_: activating one records the previously active tool, and if `toggle=true`, activating it again switches back — including via `setActiveTool` itself, so repeated `setActiveTool({ type: "hand" }, { toggle: true })` calls alternate rather than no-op. By default `false` for idempotent activation.
+
+- Tool buttons render as semantic `<button>` elements with `aria-pressed` instead of `<label>`-wrapped hidden `<input type="radio">` / `<input type="checkbox">`. If you style or query the editor DOM:
+
+  - The `.ToolIcon_type_radio`, `.ToolIcon_type_checkbox`, and `.ToolIcon--selected` class names no longer exist — the pressed state is exposed through the `.ToolIcon--checked` class and the `aria-pressed` attribute.
+  - `<Sidebar.Trigger>` (including the default Library trigger) renders a `<button>` instead of a `<label>` + checkbox.
+
+- Removed internal actions superseded by the `setActiveTool` funnel and the tool registry: `toggleHandTool`, `toggleEraserTool`, `toggleLassoTool`, `setFrameAsActiveTool`, `setEmbeddableAsActiveTool` (these `ActionName`s no longer exist).
+
+#### Behavior changes
+
+- Hand (`H`) and eraser (`E`) shortcuts now reliably toggle back to the previously active tool (previously inconsistent across platforms and input paths, and unavailable for hand in view mode). Pressing `Escape` while hand or eraser is active likewise returns to the previous tool. Re-clicking their toolbar buttons is a no-op.
+- Clicking the active selection tool switches to lasso on all platforms (previously this only worked on iOS due to a controlled-radio quirk).
+- Tool letter shortcuts are CapsLock-insensitive, `Shift+letter` never switches tools, and `Ctrl+E` no longer toggles the eraser.
+- Switching tools no longer creates undo-history entries.
+- Command palette tool commands are derived from the tool registry: the duplicate "Hand" entry is gone, "Web Embed" was added, and "Lasso" is always listed.
+- Pen mode now activates on the first pen tap on any tool button (previously deferred and occasionally dropped).
+
+#### Fixes
+
+- Mobile toolbar popovers: the active option stays highlighted after tapping it (the highlight was being suppressed by sticky touch-hover).
+- The active-tool highlight can no longer desync from the actually active tool (controlled-radio DOM desync).
+
+### Viewport control & scroll/zoom locking (2026-07-03) [#11554](https://github.com/excalidraw/excalidraw/pull/11554)
+
+`ExcalidrawAPI.scrollToContent` was rebuilt into `ExcalidrawAPI.setViewport()` — a single API for navigating the viewport (`fit: "scale-down" | "contain" | "none"`), locking scroll/zoom to a target (with rubberband overscroll), fitting around the rendered editor UI, and initializing the viewport on scene load.
+
+#### Breaking changes
+
+- `ExcalidrawAPI.scrollToContent(target?, opts?)` was replaced with `ExcalidrawAPI.setViewport(opts | null)`.
+
+  ```tsx
+  // before
+  excalidrawAPI.scrollToContent(element, {
+    fitToViewport: true,
+    animate: true,
+  });
+  // after
+  excalidrawAPI.setViewport({ target: element, fit: "contain" });
+  ```
+
+  - `target` is required and no longer defaults to the whole scene — pass `target: excalidrawAPI.getSceneElements()` for the old default. Besides element(s) or an element id / element-link URL, it now also accepts `Bounds` and `{ x, y, width?, height? }` rects (missing dimensions default to the viewport size). Deleted and non-scene elements in the target are filtered out with a console warning.
+  - `fitToContent` / `fitToViewport` were replaced by `fit: "scale-down" | "contain"` respectively, defaulting to `"scale-down"` (zoomed so the target fits, at most 100%). Previously the default depended on the target: element-id / element-link (string) targets defaulted to fit-to-content — matching the new default — while element(s) or omitted targets defaulted to recentering at the current zoom without changing it; pass `fit: "none"` for that behavior.
+  - `animate` / `duration` were replaced by `animation: boolean | { duration?: number }`. Navigation now always animates by default; previously only string targets did, while element(s) targets jumped unless `animate: true` — pass `animation: false` to jump instantly.
+  - `canvasOffsets` was replaced by `offsets`, which also accepts UI-derived offsets (see Features below).
+  - `viewportZoomFactor`, `minZoom`, and `maxZoom` are no longer supported.
+
+- `zoomToFitBounds` takes `fit: "scale-down" | "contain" | "none"` instead of `fitToViewport` / `viewportZoomFactor`, and no longer rounds the resulting zoom down to the nearest 10% step by default — pass `steppedZoom: true` to keep the old rounding.
+
+#### Features
+
+- `setViewport({ ..., lock })` locks the viewport to the resolved target: `lock.scroll` constrains panning to the target box and `lock.zoom` makes the resolved zoom the minimum zoom (zooming in stays allowed). During an animated navigation into a locked viewport, user pan, zoom, fit, and page-navigation input is consumed without mutating or cancelling the transition; the destination lock is installed together with the final viewport once the animation settles. A newer `setViewport(...)` supersedes the transition and starts from the currently rendered viewport. `setViewport(null)` cancels a pending transition and clears any pending or active lock without navigating; a navigation without `lock` likewise supersedes any lock.
+
+- `lock.overscroll` adds a rubberband to the lock: panning can overshoot the constraint by the given amount (viewport px, zoom-independent) and snaps back once wheel input settles or the active pointer or multi-finger gesture is released. Defaults to `true` = `DEFAULT_OVERSCROLL` (150px, exported from the package root); pass a number to customize, or `false` / `0` for a rigid lock. Zooming itself remains hard-clamped against the lock, gliding along its edge instead of overscrolling, and stays available during snap-back without cancelling the rubberband animation or discarding its existing screen-space overscroll.
+
+- While a lock is active, the zoom-to-fit shortcuts (shift+1/2/3) target the locked box instead of the scene elements (with no selection), so they return the viewport to the lock's resting state; reset-zoom (ctrl/cmd+0) resets to the lock's minimum zoom instead of 100%. Fit results are always re-clamped against the lock. [#11605](https://github.com/excalidraw/excalidraw/pull/11605)
+
+- Added `<Excalidraw initialState={{ viewport }} />` for initializing the viewport (and optionally installing a lock) once on scene load. Accepts the same options as `setViewport` except `animation`, and takes precedence over `initialData.scrollToContent`.
+
+- The `offsets` option (on `setViewport` and `initialState.viewport`) insets the usable viewport per side so targets aren't fitted underneath overlaid UI. It combines static pixel sides with `ui: true | ViewportOffsetsOptions`, which measures the currently rendered editor UI (toolbar, styles panel, sidebar…) — with configurable padding, per-side overrides, and reserving space for currently-hidden surfaces (`reserve: { stylesPanel?: boolean; sidebar?: boolean }`). The same measurement is exposed through the new `ExcalidrawAPI.getViewportOffsets(opts?)`, and custom UI rendered inside the editor container can opt into being measured via the `data-viewport-ui="top" | "bottom" | "side"` attribute.
+
+### Other Breaking changes
+
+- `UIAppState` no longer includes `zoom`, `shouldCacheIgnoreZoom`, and the canvas-interaction transients `snapLines`, `originSnapOffset`, `suggestedBinding`, `frameToHighlight`, and `elementsToHighlight`. These update per pointermove or per animation frame and no longer re-render the editor UI, so UI render props receiving `UIAppState` (`renderCustomStats`, custom `<Footer/>` content, etc.) don't receive them anymore and would render stale values if they read them off the full `AppState`. Subscribe through `useExcalidrawStateValue` instead — the component re-renders only when the selected value changes:
+
+  ```tsx
+  import { useExcalidrawStateValue } from "@excalidraw/excalidraw";
+
+  const ZoomReadout = () => {
+    // `undefined` on initial render, before the editor API initializes
+    const zoomValue = useExcalidrawStateValue(
+      (appState) => appState.zoom.value,
+    );
+
+    if (zoomValue == null) {
+      return null;
+    }
+
+    return <div>{(zoomValue * 100).toFixed(0)}%</div>;
+  };
+  ```
+
+  Outside of React components, you can also subscribe via `ExcalidrawAPI.onStateChange((appState) => appState.zoom.value, (zoomValue) => {...})`, or keep using the existing `onScrollChange(scrollX, scrollY, zoom)` prop.
+
+- Theme changes initiated by the default UI are now delegated to `<Excalidraw onThemeChange={(theme) => ...} />` when supplied. If `onThemeChange` is not supplied, light/dark theme toggling still falls back to updating the internal editor state.
+
+  - `MainMenu.DefaultItems.ToggleTheme` no longer accepts the item-level `onSelect` callback. Host apps that need to control light/dark/system theme should pass `onThemeChange` to `<Excalidraw />` instead.
+  - `MainMenu.DefaultItems.ToggleTheme` with system theme support now uses `allowSystemTheme` together with `theme={Theme | "system"}` only to render the selected value. For the regular light/dark item, pass `allowSystemTheme={false}`.
+  - `CommandPalette.defaultItems.toggleTheme` was removed. The default theme command is now rendered by the command palette itself when `UIOptions.canvasActions.toggleTheme` enables the action (see below).
+  - `UIOptions.canvasActions.toggleTheme` still controls default theme UI availability. When it is `null`, it defaults to `true` if `props.theme` is omitted or `props.onThemeChange` is supplied, and otherwise defaults to disabled.
 
 - Renamed the `excalidrawAPI` prop to `onExcalidrawAPI`.
-  - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
+  - `onExcalidrawAPI` is now called on mount (instead of during constructor), and later on unmount (with `null` value). The API may be removed altogether in the future (you can use `onMount` & `onUnmount` to manage the `ExcalidrawAPI` object (e.g. to cache it to a global state), already).
 
-### Features
+### Other Features
 
-- Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on umount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
+- Added `ExcalidrawAPI.isDestroyed` flag. Set to `true` once the editor unmounts. Calling any `get*` method, `onStateChange`, or `onEvent` on a destroyed API instance will throw in development and `console.error` in production. The `ExcalidrawAPI` will be reset to `null` on unmount, but to be extra safe, you should check `ExcalidrawAPI.isDestroyed` before calling these methods to guard against subtle race conditions in your code.
 
 - Added `onMount`, `onInitialize`, and `onUnmount` props. `onMount` receives `{ excalidrawAPI, container }` once the editor root is mounted. `onInitialize` fires once the initial scene has loaded. `onUnmount` fires just before unmounting.
 
@@ -36,7 +147,10 @@ Please add the latest change on the top under the correct section.
       });
 
       api.onEvent("editor:initialize").then((readyApi) => {
-        readyApi.scrollToContent();
+        readyApi.setViewport({
+          target: readyApi.getSceneElements(),
+          animation: false,
+        });
       });
     }}
   />
@@ -46,7 +160,7 @@ Please add the latest change on the top under the correct section.
 
 - Also added `"editor:unmount"` lifecycle event, only accessible via `api.onEvent("editor:unmount")`.
 
-- Exported `<ExcalidrawAPIProvider/>`, `useExcalidrawAPI()`, `useAppStateValue(prop | props | selectorFunction)`, and `useOnExcalidrawStateChange(prop | props | selectorFunction, callback)` from the package. The imperative API also now exposes `onStateChange(prop | props | selectorFunction, callback?)`, and `onEvent(name, callback)`.
+- Exported `<ExcalidrawAPIProvider/>`, `useExcalidrawAPI()`, `useExcalidrawStateValue(prop | props | selectorFunction)`, and `useOnExcalidrawStateChange(prop | props | selectorFunction, callback)` from the package. The imperative API also now exposes `onStateChange(prop | props | selectorFunction, callback?)`, and `onEvent(name, callback)`.
 
   ```tsx
   <ExcalidrawAPIProvider>
@@ -55,12 +169,12 @@ Please add the latest change on the top under the correct section.
   </ExcalidrawAPIProvider>;
 
   function Logger() {
-    // initially null before the ExcalidrawAPIProvider initializes ater
+    // initially null before the ExcalidrawAPIProvider initializes after
     // <Excalidraw/> renders
     // When <Excalidraw/> unmounts, is reset back to null
     const api = useExcalidrawAPI();
 
-    useAppStateValue("viewModeEnabled", (viewModeEnabled) => {
+    useExcalidrawStateValue("viewModeEnabled", (viewModeEnabled) => {
       console.log("view mode changed:", viewModeEnabled);
     });
 
@@ -93,6 +207,12 @@ Please add the latest change on the top under the correct section.
   ```
 
 ## Excalidraw Library
+
+### Breaking changes
+
+- `updateActiveTool` (from `@excalidraw/common`): the `lastActiveToolBeforeEraser` property of the `data` parameter was renamed to `lastActiveTool` (it was already stored under that name on `appState.activeTool`, and is no longer eraser-specific).
+
+- `getClosestElementBounds` is no longer exported from `@excalidraw/element`. Use `getCommonBounds` / `getElementBounds` from `@excalidraw/element`, or reimplement the closest-target distance check with `getElementBounds` if you need the same behavior [#11554](https://github.com/excalidraw/excalidraw/pull/11554).
 
 ## 0.18.0 (2025-03-11)
 

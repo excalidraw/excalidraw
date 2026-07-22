@@ -16,11 +16,9 @@ import type {
 } from "@excalidraw/element/types";
 
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
-
-import { ButtonIcon } from "../components/ButtonIcon";
 
 import { newElementWith } from "../../element/src/mutateElement";
 
@@ -98,7 +96,7 @@ export const actionToggleLinearEditor = register({
         : "labels.lineEditor.edit",
     );
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={lineEditorIcon}
         title={label}
@@ -204,12 +202,13 @@ export const actionTogglePolygon = register({
     );
 
     return (
-      <ButtonIcon
+      <IconButton
+        type="toggle"
         icon={polygonIcon}
         title={label}
         aria-label={label}
-        active={allPolygon}
-        onClick={() => updateData(null)}
+        checked={allPolygon}
+        onSelect={() => updateData(null)}
         style={{ marginLeft: "auto" }}
       />
     );

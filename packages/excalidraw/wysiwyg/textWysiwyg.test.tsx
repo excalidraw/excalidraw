@@ -20,6 +20,7 @@ import {
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
@@ -1011,7 +1012,7 @@ describe("textWysiwyg", () => {
           width: 100,
           height: 50,
         });
-        API.setSelectedElements([element]);
+        API.setSelectedElements([element] as NonDeletedExcalidrawElement[]);
         Keyboard.keyPress(KEYS.ENTER);
         expect(h.elements.length).toBe(1);
       });
@@ -1052,7 +1053,10 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(2);
       expect(h.elements[1].type).toBe("text");
 
-      API.setSelectedElements([h.elements[0], h.elements[1]]);
+      API.setSelectedElements([
+        h.elements[0],
+        h.elements[1],
+      ] as NonDeletedExcalidrawElement[]);
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
@@ -1710,7 +1714,7 @@ describe("textWysiwyg", () => {
         "Excalidraw is an opensource virtual collaborative whiteboard",
       );
 
-      API.setSelectedElements([textElement]);
+      API.setSelectedElements([textElement] as NonDeletedExcalidrawElement[]);
 
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,

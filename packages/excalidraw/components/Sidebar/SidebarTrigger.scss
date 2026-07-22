@@ -22,8 +22,18 @@
       height: var(--lg-icon-size);
     }
 
+    // the <button> wrapper — resets the native button chrome (the visual
+    // styling lives on the inner .sidebar-trigger)
     &__label-element {
       align-self: flex-start;
+      appearance: none;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background-color: transparent;
+      font: inherit;
+      color: inherit;
+      text-align: inherit;
     }
   }
 

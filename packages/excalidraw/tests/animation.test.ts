@@ -70,4 +70,98 @@ describe("AnimationController", () => {
     expect(secondFrames).toBe(1);
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it("does not resurrect an animation cancelled during its initial callback", () => {
+    let frames = 0;
+
+    AnimationController.start(FIRST_KEY, () => {
+      frames++;
+      AnimationController.cancel(FIRST_KEY);
+      return { keep: true };
+    });
+
+    expect(frames).toBe(1);
+    expect(AnimationController.running(FIRST_KEY)).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("cleans up the registration when the initial callback throws", () => {
+    expect(() =>
+      AnimationController.start(FIRST_KEY, () => {
+        throw new Error("initial frame failed");
+      }),
+    ).toThrow("initial frame failed");
+
+    expect(AnimationController.running(FIRST_KEY)).toBe(false);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it("preserves a same-key replacement started during the initial callback", async () => {
+    let originalFrames = 0;
+    let replacementFrames = 0;
+
+    const replacement = ({ state }: { state?: { keep: true } }) => {
+      replacementFrames++;
+      return state ? null : { keep: true as const };
+    };
+
+    AnimationController.start(FIRST_KEY, () => {
+      originalFrames++;
+      AnimationController.cancel(FIRST_KEY);
+      AnimationController.start(FIRST_KEY, replacement);
+      return { keep: true };
+    });
+
+    expect(originalFrames).toBe(1);
+    expect(replacementFrames).toBe(1);
+    expect(AnimationController.running(FIRST_KEY)).toBe(true);
+
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(originalFrames).toBe(1);
+    expect(replacementFrames).toBe(2);
+    expect(AnimationController.running(FIRST_KEY)).toBe(false);
+  });
+
+  it("does not let a completed callback delete its same-key replacement", async () => {
+    // tests for this unwanted case:
+    //
+    // 1. The original animation’s scheduled callback begins.
+    // 2. Before it returns, application code cancels it and starts
+    //    a replacement using the same key.
+    // 3. The original callback returns null.
+    // 4. Previously, tick() then called delete(key), accidentally deleting
+    //    the replacement.
+
+    let originalFrames = 0;
+    let replacementFrames = 0;
+
+    const replacement = ({ state }: { state?: { keep: true } }) => {
+      replacementFrames++;
+      return state ? null : { keep: true as const };
+    };
+
+    AnimationController.start(FIRST_KEY, ({ state }) => {
+      if (!state) {
+        return { keep: true };
+      }
+
+      originalFrames++;
+      AnimationController.cancel(FIRST_KEY);
+      AnimationController.start(FIRST_KEY, replacement);
+      return null;
+    });
+
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(originalFrames).toBe(1);
+    expect(replacementFrames).toBe(1);
+    expect(AnimationController.running(FIRST_KEY)).toBe(true);
+
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(originalFrames).toBe(1);
+    expect(replacementFrames).toBe(2);
+    expect(AnimationController.running(FIRST_KEY)).toBe(false);
+  });
 });
