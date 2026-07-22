@@ -11749,14 +11749,30 @@ class App extends React.Component<AppProps, AppState> {
                 const index = element.groupIds.indexOf(
                   this.state.editingGroupId!,
                 );
+                const nextGroupIds = element.groupIds.slice(0, index);
 
                 this.scene.mutateElement(
                   element,
                   {
-                    groupIds: element.groupIds.slice(0, index),
+                    groupIds: nextGroupIds,
                   },
                   { informMutation: false, isDragging: false },
                 );
+
+                const boundText = getBoundTextElement(
+                  element,
+                  this.scene.getNonDeletedElementsMap(),
+                );
+
+                if (boundText) {
+                  this.scene.mutateElement(
+                    boundText,
+                    {
+                      groupIds: nextGroupIds,
+                    },
+                    { informMutation: false, isDragging: false },
+                  );
+                }
               }
 
               nextElements.forEach((element) => {
