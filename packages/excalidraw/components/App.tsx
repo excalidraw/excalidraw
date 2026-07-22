@@ -5920,6 +5920,14 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    // finalize any in-progress multi-point drawing, else the editor is left
+    // with a stale `multiElement` state pointing to the unfinished element
+    // (elbow arrows are excluded as they finalize through their own
+    // pointer-driven path)
+    if (this.state.multiElement && !isElbowArrow(this.state.multiElement)) {
+      this.actionManager.executeAction(actionFinalize);
+    }
+
     const isToggleTool = TOGGLE_TOOLS.includes(tool.type);
     const toggle = opts.toggle === true && isToggleTool;
 
