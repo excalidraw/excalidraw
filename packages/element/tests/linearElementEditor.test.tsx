@@ -335,6 +335,23 @@ describe("Test Linear Elements", () => {
     await getTextEditor();
   });
 
+  it("should not create text on dblclick outside the line editor", () => {
+    createTwoPointerLinearElement("line");
+
+    mouse.doubleClick();
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+
+    // double-clicking outside the line: the first click exits the line
+    // editor, so fire the full pointer sequence the browser produces
+    mouse.clickAt(200, 200);
+    expect(h.state.selectedLinearElement?.isEditing).toBeFalsy();
+    mouse.clickAt(200, 200);
+    mouse.doubleClickAt(200, 200);
+
+    expect(h.state.editingTextElement).toBeNull();
+    expect(h.elements.length).toBe(1);
+  });
+
   describe("Arrowhead toggle on endpoint dblclick", () => {
     // the toggle replaces the element (immutable update), so always re-read
     // the arrow from the scene instead of holding on to a stale reference
