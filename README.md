@@ -71,7 +71,7 @@ Excalidraw 编辑器（npm 包）支持：
 
 ## Excalidraw.com
 
-托管在 [excalidraw.com](https://excalidraw.com) 的应用是你可以用 Excalidraw 构建的最小展示。其[源代码](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app)也是本仓库的一部分，该应用具有以下特点：
+托管在 https://giraffeair.github.io/excalidraw/ 的应用是你可以用 Excalidraw 构建的最小展示。其[源代码](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app)也是本仓库的一部分，该应用具有以下特点：
 
 - 📡&nbsp;PWA 支持（离线可用）。
 - 🤼&nbsp;实时协作。
