@@ -11,8 +11,11 @@ import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
+  // Base path for deployment (e.g. "/excalidraw/" for GitHub Pages project sites)
+  const basePath = process.env.VITE_APP_BASE_PATH || "/";
   // https://vitejs.dev/config/
   return {
+    base: basePath,
     server: {
       port: Number(envVars.VITE_APP_PORT || 3000),
       // open the browser
@@ -133,7 +136,8 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       Sitemap({
-        hostname: "https://excalidraw.com",
+        hostname:
+          process.env.VITE_APP_SITEMAP_HOSTNAME || "https://excalidraw.com",
         outDir: "build",
         changefreq: "monthly",
         // its static in public folder
@@ -252,21 +256,21 @@ export default defineConfig(({ mode }) => {
               type: "image/png",
             },
           ],
-          start_url: "/",
+          start_url: basePath,
           id: "excalidraw",
           display: "standalone",
           theme_color: "#121212",
           background_color: "#ffffff",
           file_handlers: [
             {
-              action: "/",
+              action: basePath,
               accept: {
                 "application/vnd.excalidraw+json": [".excalidraw"],
               },
             },
           ],
           share_target: {
-            action: "/web-share-target",
+            action: `${basePath}web-share-target`,
             method: "POST",
             enctype: "multipart/form-data",
             params: {

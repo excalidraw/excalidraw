@@ -1,0 +1,56 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install
+      - name: Build
+        env:
+          VITE_APP_DISABLE_SENTRY: "true"
+          VITE_APP_BASE_PATH: "/excalidraw/"
+          VITE_APP_SITEMAP_HOSTNAME: "https://giraffeair.github.io/excalidraw"
+        run: yarn --cwd ./excalidraw-app build:app:docker
+      - name: Generate version info
+        run: yarn --cwd ./excalidraw-app build:version
+      - name: Add .nojekyll
+        run: touch excalidraw-app/build/.nojekyll
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: excalidraw-app/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
