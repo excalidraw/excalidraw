@@ -103,52 +103,52 @@ export const ColorInput = ({
             setInnerValue(color);
             setValidationError(null);
           }}
-        tabIndex={-1}
-        onFocus={() => setActiveColorPickerSection("hex")}
-        onKeyDown={(event) => {
-          if (event.key === KEYS.TAB) {
-            return;
-          } else if (event.key === KEYS.ESCAPE) {
-            eyeDropperTriggerRef.current?.focus();
-          }
-          event.stopPropagation();
-        }}
-        placeholder={placeholder}
-      />
-      {/* TODO reenable on mobile with a better UX */}
-      {editorInterface.formFactor !== "phone" && (
-        <>
-          <div
-            style={{
-              width: "1px",
-              height: "1.25rem",
-              backgroundColor: "var(--default-border-color)",
-            }}
-          />
-          <div
-            ref={eyeDropperTriggerRef}
-            className={clsx("excalidraw-eye-dropper-trigger", {
-              selected: eyeDropperState,
-            })}
-            onClick={() =>
-              setEyeDropperState((s) =>
-                s
-                  ? null
-                  : {
-                      keepOpenOnAlt: false,
-                      onSelect: (color) => onChange(color),
-                      colorPickerType,
-                    },
-              )
+          tabIndex={-1}
+          onFocus={() => setActiveColorPickerSection("hex")}
+          onKeyDown={(event) => {
+            if (event.key === KEYS.TAB) {
+              return;
+            } else if (event.key === KEYS.ESCAPE) {
+              eyeDropperTriggerRef.current?.focus();
             }
-            title={`${t(
-              "labels.eyeDropper",
-            )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
-          >
-            {eyeDropperIcon}
-          </div>
-        </>
-      )}
+            event.stopPropagation();
+          }}
+          placeholder={placeholder}
+        />
+        {/* TODO reenable on mobile with a better UX */}
+        {editorInterface.formFactor !== "phone" && (
+          <>
+            <div
+              style={{
+                width: "1px",
+                height: "1.25rem",
+                backgroundColor: "var(--default-border-color)",
+              }}
+            />
+            <div
+              ref={eyeDropperTriggerRef}
+              className={clsx("excalidraw-eye-dropper-trigger", {
+                selected: eyeDropperState,
+              })}
+              onClick={() =>
+                setEyeDropperState((s) =>
+                  s
+                    ? null
+                    : {
+                        keepOpenOnAlt: false,
+                        onSelect: (color) => onChange(color),
+                        colorPickerType,
+                      },
+                )
+              }
+              title={`${t(
+                "labels.eyeDropper",
+              )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
+            >
+              {eyeDropperIcon}
+            </div>
+          </>
+        )}
       </div>
       {validationError && (
         <div
