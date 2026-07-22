@@ -192,7 +192,10 @@
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "midpointSnapping": "Snap to midpoints",
+    "signin": "Sign in",
+    "signup": "Sign up",
+    "signup_now": "Sign up now"
   },
   "elementLink": {
     "title": "Link to object",
