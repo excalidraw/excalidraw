@@ -42,6 +42,7 @@ import {
 import { Island } from "./Island";
 
 import { getShapeActionPredicates } from "./shapeActionPredicates";
+import { getSelectedTableCellElements } from "../actions/actionTable";
 
 import type { ShapeActionPredicates } from "./shapeActionPredicates";
 import type { AppClassProperties, UIAppState, AppState } from "../types";
@@ -187,6 +188,20 @@ export const SelectedShapeActions = ({
       {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
 
       {renderAction("changeOpacity")}
+
+      {getSelectedTableCellElements(targetElements, appState).length > 0 && (
+        <fieldset>
+          <legend>Table Actions</legend>
+          <div className="buttonList">
+            {renderAction("insertRowAbove")}
+            {renderAction("insertRowBelow")}
+            {renderAction("insertColLeft")}
+            {renderAction("insertColRight")}
+            {renderAction("deleteRow")}
+            {renderAction("deleteCol")}
+          </div>
+        </fieldset>
+      )}
 
       <LayersFieldset renderAction={renderAction} />
 
@@ -694,6 +709,17 @@ export const CompactShapeActions = ({
       {predicates.showExtraActions && (
         <div className="compact-action-item">
           {renderAction("deleteSelectedElements")}
+        </div>
+      )}
+
+      {getSelectedTableCellElements(targetElements, appState).length > 0 && (
+        <div className="compact-action-item" style={{ display: "flex", flexWrap: "wrap", gap: "4px", gridColumn: "1 / -1" }}>
+          {renderAction("insertRowAbove")}
+          {renderAction("insertRowBelow")}
+          {renderAction("insertColLeft")}
+          {renderAction("insertColRight")}
+          {renderAction("deleteRow")}
+          {renderAction("deleteCol")}
         </div>
       )}
 

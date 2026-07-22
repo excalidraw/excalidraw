@@ -21,6 +21,7 @@ import {
   laserPointerToolIcon,
   MagicIcon,
   mermaidLogoIcon,
+  TableIcon,
 } from "./icons";
 import {
   ArrowToolButton,
@@ -141,6 +142,13 @@ const ExtraToolsDropdown = ({
             {t("toolBar.lasso")}
           </DropdownMenu.Item>
         )}
+        <DropdownMenu.Item
+          onSelect={() => app.setOpenDialog({ name: "table" })}
+          icon={TableIcon}
+          data-testid="toolbar-table"
+        >
+          {t("toolBar.table")}
+        </DropdownMenu.Item>
         <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
           Generate
         </div>
