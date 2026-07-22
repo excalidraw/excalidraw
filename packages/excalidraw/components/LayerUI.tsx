@@ -25,7 +25,7 @@ import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
 import { ExportIcon } from "./icons"; 
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 
 import { t } from "../i18n";
 import { getScrollToContentState } from "../scene";
@@ -398,7 +398,7 @@ const LayerUI = ({
             )}
           >
             {UIOptions.canvasActions.saveAsImage && (
-              <ToolButton
+              <IconButton
                 className="QuickExport-button"
                 type="button"
                 icon={ExportIcon}
