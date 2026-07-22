@@ -10,9 +10,10 @@
     position: relative;
     border-radius: 4px;
     box-shadow: 0 3px 10px color.adjust(#000, $alpha: -0.8);
+    padding: 0;
     list-style: none;
     user-select: none;
-    margin: 0;
+    margin: -0.25rem 0 0 0.125rem;
     padding: 0.5rem 0;
     background-color: var(--popup-secondary-bg-color);
     border: 1px solid var(--button-gray-3);

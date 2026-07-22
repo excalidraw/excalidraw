@@ -13,7 +13,6 @@ import {
   pointDistance,
   pointDistanceSq,
   pointFrom,
-  pointFromArray,
   pointFromVector,
   pointRotateRads,
   pointsEqual,
@@ -759,9 +758,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       threshold: 0,
       overrideShouldTestInside: true,
     });
-  const otherEndpointInitialBinding =
-    appState.selectedLinearElement?.initialState
-      .arrowOtherEndpointInitialBinding;
 
   // Handle outside-outside binding to the same element
   if (
@@ -777,18 +773,10 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           ? globalPoint
           : // NOTE: Can only affect the start point because new arrows always drag the end point
           opts?.newArrow
-          ? pointFromArray<GlobalPoint>(
-              getGridPoint(
-                appState.selectedLinearElement!.initialState.origin![0],
-                appState.selectedLinearElement!.initialState.origin![1],
-                opts.gridSize as NullableGridSize,
-              ),
-            )!
-          : otherBindableElement
-          ? getGlobalFixedPointForBindableElement(
-              otherBinding.fixedPoint,
-              otherBindableElement,
-              elementsMap,
+          ? getGridPoint(
+              appState.selectedLinearElement!.initialState.origin![0],
+              appState.selectedLinearElement!.initialState.origin![1],
+              opts.gridSize as NullableGridSize,
             )
           : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
@@ -801,12 +789,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
         element: hit,
         focusPoint: endDragged
           ? globalPoint
-          : otherBindableElement
-          ? getGlobalFixedPointForBindableElement(
-              otherBinding.fixedPoint,
-              otherBindableElement,
-              elementsMap,
-            )
           : LinearElementEditor.getPointAtIndexGlobalCoordinates(
               arrow,
               -1,
@@ -896,53 +878,36 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       threshold: maxBindingDistance_simple(appState.zoom),
       overrideShouldTestInside: true,
     });
-  const otherPointWasInsideAtStart =
-    otherEndpointInitialBinding?.mode === "inside";
   const otherNeverOverride = opts?.newArrow
     ? appState.selectedLinearElement?.initialState.arrowStartIsInside
-    : otherBinding?.mode === "inside" && otherPointWasInsideAtStart;
-
-  let other: BindingStrategy = { mode: undefined };
-  if (!otherNeverOverride) {
-    if (
-      otherBinding?.mode === "inside" &&
-      !otherPointWasInsideAtStart &&
-      otherBindableElement &&
-      !opts?.newArrow
-    ) {
-      other = {
-        mode: "orbit",
-        element: otherBindableElement,
-        focusPoint: otherFocusPoint || otherEndpoint,
-      };
-    } else if (
-      otherBindableElement &&
+    : otherBinding?.mode === "inside";
+  const other: BindingStrategy = !otherNeverOverride
+    ? otherBindableElement &&
       !otherFocusPointIsInElement &&
       !pointIsCloseToOtherElement &&
       appState.selectedLinearElement?.initialState.altFocusPoint
-    ) {
-      other = {
-        mode: "orbit",
-        element: otherBindableElement,
-        focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
-      };
-    } else if (opts?.angleLocked && otherBindableElement) {
-      other = {
-        mode: "orbit",
-        element: otherBindableElement,
-        focusPoint:
-          projectFixedPointOntoDiagonal(
-            arrow,
-            otherEndpoint,
-            otherBindableElement,
-            startDragged ? "end" : "start",
-            elementsMap,
-            appState.zoom,
-            appState.isMidpointSnappingEnabled,
-          ) || otherEndpoint,
-      };
-    }
-  }
+      ? {
+          mode: "orbit",
+          element: otherBindableElement,
+          focusPoint: appState.selectedLinearElement.initialState.altFocusPoint,
+        }
+      : opts?.angleLocked && otherBindableElement
+      ? {
+          mode: "orbit",
+          element: otherBindableElement,
+          focusPoint:
+            projectFixedPointOntoDiagonal(
+              arrow,
+              otherEndpoint,
+              otherBindableElement,
+              startDragged ? "end" : "start",
+              elementsMap,
+              appState.zoom,
+              false,
+            ) || otherEndpoint,
+        }
+      : { mode: undefined }
+    : { mode: undefined };
 
   return {
     start: startDragged ? current : other,

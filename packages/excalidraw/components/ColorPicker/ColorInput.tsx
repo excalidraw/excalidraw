@@ -10,9 +10,12 @@ import { useEditorInterface } from "../App";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { eyeDropperIcon } from "../icons";
 
-import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import {
+  activeColorPickerSectionAtom,
+  getHexColorInputError,
+} from "./colorPickerUtils";
 
-import type { ColorPickerType } from "./colorPickerUtils";
+import type { ColorPickerType, HexColorInputError } from "./colorPickerUtils";
 
 export const ColorInput = ({
   color,
@@ -29,21 +32,28 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [validationError, setValidationError] =
+    useState<HexColorInputError | null>(null);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
 
   useEffect(() => {
     setInnerValue(color);
+    setValidationError(null);
   }, [color]);
 
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = normalizeInputColor(value);
+      const error = getHexColorInputError(value);
+      setValidationError(error);
 
-      if (color) {
-        onChange(color);
+      if (!error) {
+        const normalizedColor = normalizeInputColor(value);
+        if (normalizedColor) {
+          onChange(normalizedColor);
+        }
       }
       setInnerValue(value);
     },
@@ -68,21 +78,31 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
-      <div className="color-picker__input-hash">#</div>
-      <input
-        ref={activeSection === "hex" ? inputRef : undefined}
-        style={{ border: 0, padding: 0 }}
-        spellCheck={false}
-        className="color-picker-input"
-        aria-label={label}
-        onChange={(event) => {
-          changeColor(event.target.value);
-        }}
-        value={(innerValue || "").replace(/^#/, "")}
-        onBlur={() => {
-          setInnerValue(color);
-        }}
+    <div className="color-picker__input-wrapper">
+      <div
+        className={clsx("color-picker__input-label", {
+          "color-picker__input-label--invalid": validationError,
+        })}
+      >
+        <div className="color-picker__input-hash">#</div>
+        <input
+          ref={activeSection === "hex" ? inputRef : undefined}
+          style={{ border: 0, padding: 0 }}
+          spellCheck={false}
+          className="color-picker-input"
+          aria-label={label}
+          aria-invalid={validationError ? true : undefined}
+          aria-describedby={
+            validationError ? "color-picker-hex-error" : undefined
+          }
+          onChange={(event) => {
+            changeColor(event.target.value);
+          }}
+          value={(innerValue || "").replace(/^#/, "")}
+          onBlur={() => {
+            setInnerValue(color);
+            setValidationError(null);
+          }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
         onKeyDown={(event) => {
@@ -128,6 +148,18 @@ export const ColorInput = ({
             {eyeDropperIcon}
           </div>
         </>
+      )}
+      </div>
+      {validationError && (
+        <div
+          id="color-picker-hex-error"
+          className="color-picker__input-error"
+          role="alert"
+        >
+          {validationError === "invalidCharacters"
+            ? t("colorPicker.invalidHexCharacters")
+            : t("colorPicker.invalidHexLength")}
+        </div>
       )}
     </div>
   );

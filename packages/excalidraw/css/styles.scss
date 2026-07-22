@@ -583,20 +583,9 @@ body.excalidraw-cursor-resize * {
     aside {
       display: none;
     }
-
-    .floating-status-stack {
-      bottom: calc(30px + var(--sab, 0));
-      z-index: var(--zIndex-ui-bottom);
-    }
-
     .scroll-back-to-content {
       bottom: calc(100px + var(--sab, 0));
       z-index: -1;
-    }
-
-    .floating-status-stack .scroll-back-to-content {
-      bottom: auto;
-      z-index: auto;
     }
   }
 
@@ -652,13 +641,6 @@ body.excalidraw-cursor-resize * {
 
     // with navigation allowed, touch input drives the canvas pan/zoom again
     &.excalidraw--navigation canvas {
-      touch-action: none;
-    }
-
-    // with the active tool allowed (`interaction.enabled.tools`), touch
-    // input drives the tool again — e.g. laser strokes must not scroll the
-    // page
-    &.excalidraw--tools canvas {
       touch-action: none;
     }
 

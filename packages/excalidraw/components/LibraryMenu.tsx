@@ -296,7 +296,7 @@ export const LibraryMenu = memo(() => {
               app.focusContainer();
             }
           } else if (selectedItems.length > 0) {
-            const { x, y } = app.viewport.lastPosition;
+            const { x, y } = app.lastViewportPosition;
             const elementUnderCursor = document.elementFromPoint(x, y);
             // also deselect elements if sidebar doesn't have focus but the
             // cursor is over it

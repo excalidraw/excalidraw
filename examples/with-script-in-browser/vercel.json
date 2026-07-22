@@ -1,10 +1,4 @@
 {
-  "git": {
-    "deploymentEnabled": {
-      "master": true,
-      "**": false
-    }
-  },
   "outputDirectory": "dist",
   "installCommand": "yarn install",
   "buildCommand": "yarn build:packages && yarn build"

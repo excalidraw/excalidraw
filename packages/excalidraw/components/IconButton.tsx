@@ -168,8 +168,6 @@ export const IconButton = React.forwardRef(
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         aria-pressed={props.checked}
         data-testid={props["data-testid"]}
-        disabled={!!props.disabled}
-        aria-disabled={!!props.disabled}
         onPointerDown={(event) => {
           lastPointerTypeRef.current = event.pointerType || null;
         }}

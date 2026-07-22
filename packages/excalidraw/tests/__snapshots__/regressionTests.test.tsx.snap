@@ -8726,7 +8726,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
     "hoveredFocusPointBinding": null,
     "initialState": {
       "altFocusPoint": null,
-      "arrowOtherEndpointInitialBinding": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
@@ -8961,7 +8960,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
     "hoveredFocusPointBinding": null,
     "initialState": {
       "altFocusPoint": null,
-      "arrowOtherEndpointInitialBinding": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
@@ -9392,7 +9390,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
     "hoveredFocusPointBinding": null,
     "initialState": {
       "altFocusPoint": null,
-      "arrowOtherEndpointInitialBinding": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,
@@ -9809,7 +9806,6 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
     "hoveredFocusPointBinding": null,
     "initialState": {
       "altFocusPoint": null,
-      "arrowOtherEndpointInitialBinding": null,
       "arrowStartIsInside": false,
       "lastClickedPoint": -1,
       "origin": null,

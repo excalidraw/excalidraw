@@ -17,14 +17,12 @@ const Footer = ({
   showExitZenModeBtn,
   renderWelcomeScreen,
   defaultUIEnabled,
-  zoomUIEnabled,
 }: {
   appState: UIAppState;
   actionManager: ActionManager;
   showExitZenModeBtn: boolean;
   renderWelcomeScreen: boolean;
   defaultUIEnabled: boolean;
-  zoomUIEnabled: boolean;
 }) => {
   const { FooterCenterTunnel, WelcomeScreenHelpHintTunnel } = useTunnels();
   const app = useApp();
@@ -34,7 +32,7 @@ const Footer = ({
       role="contentinfo"
       className="layer-ui__wrapper__footer App-menu App-menu_bottom"
     >
-      {(defaultUIEnabled || (zoomUIEnabled && app.isNavigationEnabled())) && (
+      {defaultUIEnabled && (
         <div
           className={clsx(
             "layer-ui__wrapper__footer-left zen-mode-transition",
@@ -46,11 +44,11 @@ const Footer = ({
         >
           <Stack.Col gap={2}>
             <Section heading="canvasActions">
-              {zoomUIEnabled && app.isNavigationEnabled() && (
+              {app.isNavigationEnabled() && (
                 <ZoomActions renderAction={actionManager.renderAction} />
               )}
 
-              {defaultUIEnabled && !appState.viewModeEnabled && (
+              {!appState.viewModeEnabled && (
                 <UndoRedoActions
                   renderAction={actionManager.renderAction}
                   className={clsx("zen-mode-transition", {
