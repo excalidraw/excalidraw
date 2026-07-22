@@ -9,7 +9,8 @@
   <a href="https://excalidraw.com">Excalidraw 编辑器</a> |
   <a href="https://plus.excalidraw.com/blog">博客</a> |
   <a href="https://docs.excalidraw.com">文档</a> |
-  <a href="https://plus.excalidraw.com">Excalidraw+</a>
+  <a href="https://plus.excalidraw.com">Excalidraw+</a> |
+  <a href="README.md">English</a>
 </h4>
 
 <div align="center">
@@ -123,6 +124,3 @@ yarn add react react-dom @excalidraw/excalidraw
 
 [![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
 
----
-
-[🔤 阅读英文版](README.md)
