@@ -30,7 +30,7 @@ import {
   type ElementConstructorOpts,
 } from "./newElement";
 import { measureText, normalizeText } from "./textMeasurements";
-import { isArrowElement } from "./typeChecks";
+import { isArrowElement, isTextElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
@@ -217,6 +217,17 @@ const DEFAULT_LINEAR_ELEMENT_PROPS = {
 };
 
 const DEFAULT_DIMENSION = 100;
+
+// ids of text elements measured before their font faces were loaded, thus
+// with metrics based on a fallback font. The editor re-measures them once
+// the fonts are available (see Fonts.onLoaded).
+const staleTextMetricsIds = new Set<ExcalidrawElement["id"]>();
+
+export const hasStaleTextMetrics = (id: ExcalidrawElement["id"]) =>
+  staleTextMetricsIds.has(id);
+
+export const clearStaleTextMetrics = (id: ExcalidrawElement["id"]) =>
+  staleTextMetricsIds.delete(id);
 
 const bindTextToContainer = (
   container: ExcalidrawElement,
@@ -811,5 +822,18 @@ export const convertToExcalidrawElements = (
     }
   }
 
-  return elementStore.getElements();
+  const convertedElements = elementStore.getElements();
+
+  if (typeof window !== "undefined" && window.document?.fonts?.check) {
+    for (const element of convertedElements) {
+      if (
+        isTextElement(element) &&
+        !window.document.fonts.check(getFontString(element), element.text)
+      ) {
+        staleTextMetricsIds.add(element.id);
+      }
+    }
+  }
+
+  return convertedElements;
 };

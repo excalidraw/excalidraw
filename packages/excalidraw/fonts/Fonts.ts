@@ -9,6 +9,11 @@ import {
 import { getContainerElement } from "@excalidraw/element";
 import { charWidth } from "@excalidraw/element";
 import { containsCJK } from "@excalidraw/element";
+import {
+  hasStaleTextMetrics,
+  clearStaleTextMetrics,
+  redrawTextBoundingBox,
+} from "@excalidraw/element";
 
 import {
   FONT_METADATA,
@@ -137,6 +142,25 @@ export class Fonts {
         if (container) {
           ShapeCache.delete(container);
         }
+      }
+    }
+
+    // text elements created before their fonts were loaded (i.e. through
+    // `convertToExcalidrawElements`) have metrics based on a fallback font,
+    // so once the actual font is available they need to be re-measured
+    for (const element of this.scene.getNonDeletedElements()) {
+      if (
+        isTextElement(element) &&
+        hasStaleTextMetrics(element.id) &&
+        window.document.fonts.check(getFontString(element), element.text)
+      ) {
+        clearStaleTextMetrics(element.id);
+        redrawTextBoundingBox(
+          element,
+          getContainerElement(element, elementsMap),
+          this.scene,
+        );
+        didUpdate = true;
       }
     }
 
