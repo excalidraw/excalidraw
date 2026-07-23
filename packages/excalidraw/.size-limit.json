@@ -1,16 +1,16 @@
 [
   {
-    "path": "dist/excalidraw.production.min.js",
+    "path": "dist/prod/index.js",
     "limit": "340 kB"
   },
   {
-    "path": "dist/excalidraw-assets/locales",
-    "name": "dist/excalidraw-assets/locales",
-    "limit": "290 kB"
+    "path": "dist/prod/**/subset*",
+    "name": "subset chunks",
+    "limit": "100 kB"
   },
   {
-    "path": "dist/excalidraw-assets/vendor-*.js",
-    "name": "dist/excalidraw-assets/vendor*.js",
-    "limit": "900 kB"
+    "path": "dist/prod/**/*.woff2",
+    "name": "font assets",
+    "limit": "50 kB"
   }
 ]
