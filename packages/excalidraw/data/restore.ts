@@ -19,9 +19,8 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
-  STROKE_WIDTH,
   STROKE_WIDTH_KEYS,
-  type StrokeWidthKey,
+  STROKE_WIDTH,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -58,6 +57,8 @@ import { refreshTextDimensions } from "@excalidraw/element";
 import { getNormalizedDimensions } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
+
+import type { StrokeWidthKey } from "@excalidraw/common";
 
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
