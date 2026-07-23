@@ -40,6 +40,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import MainMenu from "./main-menu/MainMenu";
 import { ActiveConfirmDialog } from "./ActiveConfirmDialog";
 import { useEditorInterface, useStylesPanelMode } from "./App";
+import { useAutoHidePanel } from "../hooks/useAutoHidePanel";
 import { OverwriteConfirmDialog } from "./OverwriteConfirm/OverwriteConfirm";
 import { sidebarRightIcon } from "./icons";
 import { DefaultSidebar } from "./DefaultSidebar";
@@ -162,6 +163,14 @@ const LayerUI = ({
   const stylesPanelMode = useStylesPanelMode();
   const isCompactStylesPanel = stylesPanelMode === "compact";
   const tunnels = useInitializeTunnels();
+
+  // Auto-hide the shape actions panel when freedraw tool is active
+  const isAutoHideEnabled =
+    appState.activeTool.type === "freedraw" &&
+    !appState.zenModeEnabled &&
+    !appState.viewModeEnabled;
+  const { panelRef: shapeActionsPanelRef, isHidden: isShapeActionsHidden } =
+    useAutoHidePanel(isAutoHideEnabled);
 
   const spacing = isCompactStylesPanel
     ? {
@@ -307,9 +316,12 @@ const LayerUI = ({
             {renderCanvasActions()}
             {defaultUIEnabled && (
               <div
+                ref={shapeActionsPanelRef}
                 className={clsx("selected-shape-actions-container", {
                   "selected-shape-actions-container--compact":
                     isCompactStylesPanel,
+                  "selected-shape-actions-container--hidden":
+                    isAutoHideEnabled && isShapeActionsHidden,
                 })}
               >
                 {shouldRenderSelectedShapeActions &&
