@@ -17,6 +17,8 @@ import * as StaticScene from "../renderer/staticScene";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { render, fireEvent, act, unmountComponent } from "./test-utils";
 
+import type { Zoom } from "../types";
+
 unmountComponent();
 
 const renderInteractiveScene = vi.spyOn(
@@ -89,6 +91,7 @@ describe("move element", () => {
         "orbit",
         "start",
         h.app.scene,
+        { value: 1 } as Zoom,
       );
       bindBindingElement(
         arrow.get() as NonDeleted<ExcalidrawArrowElement>,
@@ -96,6 +99,7 @@ describe("move element", () => {
         "orbit",
         "end",
         h.app.scene,
+        { value: 1 } as Zoom,
       );
     });
 
@@ -112,10 +116,13 @@ describe("move element", () => {
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
     expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
-      [[106.00000000000001, 55.6867741935484]],
+      [[106, 56.011199999998695]],
       0,
     );
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[88, 88]], 0);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
+      [[88, 88.01760000000121]],
+      0,
+    );
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -134,10 +141,13 @@ describe("move element", () => {
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
     expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
-      [[106, 55.6867741935484]],
+      [[106, 56.011199999998695]],
       0,
     );
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[89, 90]], 0);
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints(
+      [[89, 90.01760000000121]],
+      0,
+    );
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

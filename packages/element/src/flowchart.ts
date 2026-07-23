@@ -376,8 +376,16 @@ const createBindingArrow = (
     "orbit",
     "start",
     scene,
+    appState.zoom,
   );
-  bindBindingElement(bindingArrow, endBindingElement, "orbit", "end", scene);
+  bindBindingElement(
+    bindingArrow,
+    endBindingElement,
+    "orbit",
+    "end",
+    scene,
+    appState.zoom,
+  );
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();
   changedElements.set(
