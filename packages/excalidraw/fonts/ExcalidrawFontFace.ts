@@ -146,8 +146,13 @@ export class ExcalidrawFontFace {
       return [new URL(uri)];
     }
 
-    // absolute assets paths, which are found in tests and excalidraw-app build, won't work with base url, so we are stripping initial slash away
-    const assetUrl: string = uri.replace(/^\/+/, "");
+    // absolute assets paths (e.g. "/Excalidraw-better/fonts/..." from Vite build)
+    // already include the base path, so resolve directly against origin
+    if (uri.startsWith("/")) {
+      return [new URL(uri, window?.location?.origin)];
+    }
+
+    const assetUrl: string = uri;
     const urls: URL[] = [];
 
     if (typeof window.EXCALIDRAW_ASSET_PATH === "string") {
