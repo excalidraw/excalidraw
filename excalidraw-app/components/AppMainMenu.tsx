@@ -13,6 +13,10 @@ import type { Theme } from "@excalidraw/element/types";
 import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
+import { useSetAtom } from "../app-jotai";
+import { gitHubLoadDialogOpenAtom } from "./GitHubLoadDialog";
+import { GitHubIcon } from "./GitHubSaveDialog";
+
 import { saveDebugState } from "./DebugCanvas";
 
 export const AppMainMenu: React.FC<{
@@ -22,10 +26,21 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   refresh: () => void;
 }> = React.memo((props) => {
+  const openGitHubLoadDialog = useSetAtom(gitHubLoadDialogOpenAtom);
+  const appPlusApp = import.meta.env.VITE_APP_PLUS_APP;
+  const appPlusLp = import.meta.env.VITE_APP_PLUS_LP;
+
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
       <MainMenu.DefaultItems.SaveToActiveFile />
+      <MainMenu.Item
+        icon={<GitHubIcon />}
+        onSelect={() => openGitHubLoadDialog(true)}
+      >
+        Load from GitHub
+      </MainMenu.Item>
+
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
       {props.isCollabEnabled && (
@@ -41,9 +56,7 @@ export const AppMainMenu: React.FC<{
       <MainMenu.Separator />
       <MainMenu.ItemLink
         icon={ExcalLogo}
-        href={`${
-          import.meta.env.VITE_APP_PLUS_LP
-        }/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
+        href={`${appPlusLp}/plus?utm_source=excalidraw&utm_medium=app&utm_content=hamburger`}
         className=""
       >
         Excalidraw+
@@ -51,7 +64,8 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.Socials />
       <MainMenu.ItemLink
         icon={loginIcon}
-        href={`${import.meta.env.VITE_APP_PLUS_APP}${
+        href={`${appPlusApp}
+        ${
           isExcalidrawPlusSignedUser ? "" : "/sign-up"
         }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
         className="highlighted"
