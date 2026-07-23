@@ -12305,6 +12305,7 @@ exports[`history > multiplayer undo/redo > should support undo and redo when esc
 exports[`history > multiplayer undo/redo > should update history entries after remote changes on the same properties > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLayerId": "default-layer",
   "activeLockedId": null,
   "activeTool": {
     "customType": null,

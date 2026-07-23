@@ -362,6 +362,7 @@ describe("Layers", () => {
         y: 0,
         width: 100,
         height: 100,
+        groupIds: [],
         // No layerId property
       } as any;
 

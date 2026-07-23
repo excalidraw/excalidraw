@@ -228,7 +228,6 @@ import {
   dragNewElement,
   dragSelectedElements,
   getDragOffsetXY,
-  isNonDeletedElement,
   isElementInVisibleLayer,
   Scene,
   Store,
