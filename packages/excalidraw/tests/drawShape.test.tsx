@@ -181,6 +181,52 @@ describe("drawShape tool", () => {
     expect(h.state.selectedElementIds).toEqual({});
   });
 
+  it("upgrades a line drawn between two bindable shapes to a bound arrow", () => {
+    const start = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+    const end = API.createElement({
+      type: "rectangle",
+      x: 400,
+      y: 400,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([start, end]);
+
+    sketch(seg([205, 205], [395, 395], 30));
+
+    const arrow = h.elements.find((element) => element.type === "arrow");
+    assert(isArrowElement(arrow));
+
+    expect(arrow.startBinding?.elementId).toBe(start.id);
+    expect(arrow.endBinding?.elementId).toBe(end.id);
+    expect(h.state.selectedElementIds).toEqual({});
+    expect(h.state.selectedLinearElement).toBeNull();
+  });
+
+  it("keeps a line that binds at most one end a line", () => {
+    const only = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([only]);
+
+    sketch(seg([205, 205], [395, 395], 30));
+
+    expect(h.elements.map((element) => element.type)).toEqual([
+      "rectangle",
+      "line",
+    ]);
+  });
+
   it("allows sketching consecutive shapes without reselecting the tool", () => {
     sketch(rectanglePath(100, 100, 200, 120));
     sketch(circlePath(600, 300, 80));
@@ -250,6 +296,33 @@ describe("drawShape styles panel & selection (preview path)", () => {
 
     expect(h.elements.map((element) => element.type)).toEqual(["rectangle"]);
     expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("upgrades a line between two bindable shapes identically with a live preview", () => {
+    const start = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+    const end = API.createElement({
+      type: "rectangle",
+      x: 400,
+      y: 400,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([start, end]);
+
+    sketchWithPreview(seg([205, 205], [395, 395], 30));
+
+    const arrow = h.elements.find((element) => element.type === "arrow");
+    assert(isArrowElement(arrow));
+
+    expect(arrow.startBinding?.elementId).toBe(start.id);
+    expect(arrow.endBinding?.elementId).toBe(end.id);
+    expect(h.state.newElement).toBeNull();
   });
 
   it("keeps the styles panel on tool defaults while sketching", () => {

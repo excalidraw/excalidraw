@@ -12595,7 +12595,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (activeTool.type === "drawShape") {
-        this.drawShape.handlePointerUp(childEvent);
+        this.drawShape.handlePointerUp();
         return;
       }
 
