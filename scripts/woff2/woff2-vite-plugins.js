@@ -8,16 +8,12 @@ const OSS_FONTS_CDN = "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/oss/";
  */
 module.exports.woff2BrowserPlugin = () => {
   let isDev;
-  let basePath = "/";
 
   return {
     name: "woff2BrowserPlugin",
     enforce: "pre",
     config(_, { command }) {
       isDev = command === "serve";
-    },
-    configResolved(resolvedConfig) {
-      basePath = resolvedConfig.base || "/";
     },
     transform(code, id) {
       // using copy / replace as fonts defined in the `.css` don't have to be manually copied over (vite/rollup does this automatically),
@@ -70,10 +66,11 @@ module.exports.woff2BrowserPlugin = () => {
         return code.replace(
           "<!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->",
           `<script>
-        // point into our CDN in prod, fallback to base path in case of issues
+        // point into our CDN in prod, fallback to root in case of issues
+        // (Vite already prefixes asset URLs with base path, so we use "/")
         window.EXCALIDRAW_ASSET_PATH = [
           "${OSS_FONTS_CDN}",
-          "${basePath}",
+          "/",
         ];
       </script>
 
