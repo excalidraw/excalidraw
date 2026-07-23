@@ -13,6 +13,7 @@ import type {
 } from "@excalidraw/excalidraw/types";
 
 import {
+  COORDS_PRECISION,
   DEFAULT_VERSION,
   ENV,
   FONT_FAMILY,
@@ -300,7 +301,7 @@ export const viewportCoordsToSceneCoords = (
     scrollX: number;
     scrollY: number;
   },
-  decimals: number = 2,
+  decimals: number = COORDS_PRECISION,
 ) => {
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
@@ -309,11 +310,9 @@ export const viewportCoordsToSceneCoords = (
     return toBrandedType<GlobalCoord>({ x, y });
   }
 
-  const precision = Math.pow(10, decimals);
-
   return toBrandedType<GlobalCoord>({
-    x: round(x, precision),
-    y: round(y, precision),
+    x: round(x, decimals),
+    y: round(y, decimals),
   });
 };
 

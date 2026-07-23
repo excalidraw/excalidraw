@@ -309,8 +309,9 @@ describe("stats for a generic element", () => {
       pointFrom(cx, cy),
       rectangle.angle,
     );
-    expect(currentTopLeftX).toBeCloseTo(topLeftX, 4);
-    expect(currentTopLeftY).toBeCloseTo(topLeftY, 4);
+    // top left is fixed only up to coords rounding (COORDS_PRECISION)
+    expect(currentTopLeftX).toBeCloseTo(topLeftX, 2);
+    expect(currentTopLeftY).toBeCloseTo(topLeftY, 2);
 
     testInputProperty(rectangle, "height", "H", rectangle.height, 400);
     [cx, cy] = [
@@ -323,8 +324,9 @@ describe("stats for a generic element", () => {
       rectangle.angle,
     );
 
-    expect(currentTopLeftX).toBeCloseTo(topLeftX, 4);
-    expect(currentTopLeftY).toBeCloseTo(topLeftY, 4);
+    // top left is fixed only up to coords rounding (COORDS_PRECISION)
+    expect(currentTopLeftX).toBeCloseTo(topLeftX, 2);
+    expect(currentTopLeftY).toBeCloseTo(topLeftY, 2);
   });
 });
 
