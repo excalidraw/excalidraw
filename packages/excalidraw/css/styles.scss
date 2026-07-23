@@ -395,9 +395,20 @@ body.excalidraw-cursor-resize * {
 
   .selected-shape-actions-container {
     width: fit-content;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 
     &--compact {
       min-width: 48px;
+    }
+
+    &--hidden {
+      transform: translateX(calc(-100% + 8px));
+      opacity: 0.5;
+
+      &:hover {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
   }
 
