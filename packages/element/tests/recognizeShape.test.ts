@@ -89,11 +89,10 @@ describe("recognizeShape", () => {
     // the right angles that map them onto themselves. Every other class is
     // swept over arbitrary angles.
     const RIGHT_ANGLES = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
-    const ANY_ANGLES = [0.3, Math.PI / 4, 1.2, 2.5, 4.7];
-    // A stroke needs a bounding box of some area to be recognized at all, so a
-    // line drawn (near) horizontally or vertically stays freedraw however
-    // straight it is. 4.7 rad is within a degree of vertical.
-    const SLANTED_ANGLES = [0.3, Math.PI / 4, 1.2, 2.5];
+    // 4.7 rad is within a degree of vertical — the size gate compares the
+    // larger bounding-box dimension, so thin (near-)axis-aligned strokes are
+    // recognized like any other.
+    const ANY_ANGLES = [0, 0.3, Math.PI / 4, 1.2, Math.PI / 2, 2.5, 4.7];
 
     const cases: [string, [number, number][], number[], string][] = [
       ["a square", rectangle(200, 200), RIGHT_ANGLES, "rectangle"],
@@ -103,7 +102,7 @@ describe("recognizeShape", () => {
       ["a wide diamond", diamond(300, 150), RIGHT_ANGLES, "diamond"],
       ["a circle", ellipse(100, 100), ANY_ANGLES, "ellipse"],
       ["an ellipse", ellipse(150, 75), ANY_ANGLES, "ellipse"],
-      ["a line", line(300), SLANTED_ANGLES, "line"],
+      ["a line", line(300), ANY_ANGLES, "line"],
       ["an arrow with a small head", arrow(300, 0.15), ANY_ANGLES, "arrow"],
       ["an arrow with a large head", arrow(300, 0.45), ANY_ANGLES, "arrow"],
     ];
@@ -170,5 +169,21 @@ describe("recognizeShape", () => {
     ];
 
     expect(recognizeShape(sketch(tiny), null).type).toBe("freedraw");
+  });
+
+  it("gates on apparent (screen) size, so zoom decides what is too small", () => {
+    const smallCircle = ellipse(8, 8); // 16 scene units across
+
+    expect(recognizeShape(sketch(smallCircle), null).type).toBe("freedraw");
+    expect(recognizeShape(sketch(smallCircle), null, 10).type).toBe("ellipse");
+
+    // 300 apparent px at 0.1 zoom
+    expect(
+      recognizeShape(sketch(line(3000), { angle: 0.3 }), null, 0.1).type,
+    ).toBe("line");
+    // 10 apparent px at 0.1 zoom
+    expect(
+      recognizeShape(sketch(line(100), { angle: 0.3 }), null, 0.1).type,
+    ).toBe("freedraw");
   });
 });

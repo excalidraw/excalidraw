@@ -1,6 +1,6 @@
 import { flushSync } from "react-dom";
 
-import { getElementBoundsFromPoints, randomInteger } from "@excalidraw/common";
+import { randomInteger } from "@excalidraw/common";
 
 import {
   convertToShape,
@@ -52,69 +52,64 @@ export class AppDrawShape {
     const points = this.trail.getCurrentPoints();
     this.trail.endPath();
 
+    // note: size gate inside recognizeShape
     if (points.length >= 3) {
-      const [minX, minY, maxX, maxY] = getElementBoundsFromPoints(points);
-      const width = maxX - minX;
-      const height = maxY - minY;
+      const detectedElement =
+        app.state.newElement ||
+        convertToShape(
+          points,
+          app.state,
+          app.scene.getNonDeletedElementsMap(),
+          app.state.newElement,
+          app.scene.getNonDeletedFramesLikes(),
+        );
 
-      if (width > 2 && height > 2) {
-        const detectedElement =
-          app.state.newElement ||
-          convertToShape(
-            points,
-            app.state,
+      if (detectedElement) {
+        const _detectedElement = {
+          ...detectedElement,
+          seed: randomInteger(),
+          opacity: app.state.currentItemOpacity,
+        };
+        app.insertNewElement(_detectedElement);
+
+        if (isBindingElement(_detectedElement)) {
+          const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            _detectedElement,
+            1,
             app.scene.getNonDeletedElementsMap(),
-            app.state.newElement,
-            app.scene.getNonDeletedFramesLikes(),
           );
 
-        if (detectedElement) {
-          const _detectedElement = {
-            ...detectedElement,
-            seed: randomInteger(),
-            opacity: app.state.currentItemOpacity,
-          };
-          app.insertNewElement(_detectedElement);
+          app.scene.mutateElement(_detectedElement, {
+            startArrowhead: app.state.currentItemStartArrowhead,
+            endArrowhead: app.state.currentItemEndArrowhead,
+          });
 
-          if (isBindingElement(_detectedElement)) {
-            const [x, y] = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          flushSync(() => {
+            const linearElement = new LinearElementEditor(
               _detectedElement,
-              1,
               app.scene.getNonDeletedElementsMap(),
             );
-
-            app.scene.mutateElement(_detectedElement, {
-              startArrowhead: app.state.currentItemStartArrowhead,
-              endArrowhead: app.state.currentItemEndArrowhead,
-            });
-
-            flushSync(() => {
-              const linearElement = new LinearElementEditor(
-                _detectedElement,
-                app.scene.getNonDeletedElementsMap(),
-              );
-              app.setState({
-                newElement: _detectedElement,
-                selectedLinearElement: {
-                  ...linearElement,
-                  pointerOffset: {
-                    x: 0,
-                    y: 0,
-                  },
-                  initialState: {
-                    ...linearElement.initialState,
-                    lastClickedPoint: 1,
-                  },
-                  selectedPointsIndices: [1],
+            app.setState({
+              newElement: _detectedElement,
+              selectedLinearElement: {
+                ...linearElement,
+                pointerOffset: {
+                  x: 0,
+                  y: 0,
                 },
-              });
+                initialState: {
+                  ...linearElement.initialState,
+                  lastClickedPoint: 1,
+                },
+                selectedPointsIndices: [1],
+              },
             });
+          });
 
-            app.actionManager.executeAction(actionFinalize, "ui", {
-              event: childEvent,
-              sceneCoords: { x, y },
-            });
-          }
+          app.actionManager.executeAction(actionFinalize, "ui", {
+            event: childEvent,
+            sceneCoords: { x, y },
+          });
         }
       }
     }

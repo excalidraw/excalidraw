@@ -77,6 +77,15 @@ interface ShapeRecognitionResult<P extends LocalPoint | GlobalPoint> {
 // Number of points every stroke is resampled to before feature extraction.
 const RESAMPLE_N = 64;
 
+// Minimum apparent (on-screen) size of a stroke's larger bounding-box
+// dimension, in pixels, for recognition to run — below this the stroke reads
+// as an accidental scribble. Compared against `sceneSize * zoom` so the same
+// physical gesture behaves the same at every zoom level.
+//
+// Maximum not required. Runtime is O(point count), points come in at roughly
+// one per frame.
+const RECOGNITION_MIN_SCREEN_SIZE = 25;
+
 // A stroke whose endpoints are farther apart than this fraction of its own
 // path length is treated as open (a line or an arrow) rather than closed (a
 // rectangle, diamond or ellipse).
@@ -362,12 +371,13 @@ function getArrowEndpoint<P extends LocalPoint | GlobalPoint>(
 export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   points: P[],
   previousElement: ExcalidrawElement | null,
+  zoom: number = 1,
 ): ShapeRecognitionResult<P> => {
   const boundingBox = getElementBoundsFromPoints(points);
 
   const [minX, minY, maxX, maxY] = boundingBox;
-  const area = (maxX - minX) * (maxY - minY);
-  if (!points || points.length < 3 || area < 50 * 50) {
+  const maxDim = Math.max(maxX - minX, maxY - minY);
+  if (points.length < 3 || maxDim * zoom < RECOGNITION_MIN_SCREEN_SIZE) {
     return { type: "freedraw", points, boundingBox };
   }
 
@@ -393,7 +403,11 @@ export const convertToShape = (
   previousElement: ExcalidrawElement | null,
   frames?: readonly ExcalidrawFrameLikeElement[],
 ): NonDeletedRecognizedShapeElement | undefined => {
-  const recognizedShape = recognizeShape(points, previousElement);
+  const recognizedShape = recognizeShape(
+    points,
+    previousElement,
+    appState.zoom.value,
+  );
 
   const boundingBox = recognizedShape.boundingBox;
   const [minX, minY, maxX, maxY] = boundingBox;
@@ -631,42 +645,34 @@ export const convertToShapeHandlePointerMoveFromPointerDown = (
     app.drawShape.trail.addPointToPath(pointerCoords.x, pointerCoords.y);
 
     const drawShapeTrailPoints = app.drawShape.trail.getCurrentPoints();
+    // note: size gate inside recognizeShape
     if (drawShapeTrailPoints.length >= 3) {
-      const [minX, minY, maxX, maxY] =
-        getElementBoundsFromPoints(drawShapeTrailPoints);
-      const width = maxX - minX;
-      const height = maxY - minY;
+      const shapePreview = convertToShape(
+        drawShapeTrailPoints,
+        app.state,
+        app.scene.getNonDeletedElementsMap(),
+        app.state.newElement,
+        app.scene.getNonDeletedFramesLikes(),
+      ) as ExcalidrawNonSelectionElement | undefined;
 
-      if (width > 2 && height > 2) {
-        const shapePreview = convertToShape(
-          drawShapeTrailPoints,
-          app.state,
-          app.scene.getNonDeletedElementsMap(),
-          app.state.newElement,
-          app.scene.getNonDeletedFramesLikes(),
-        ) as ExcalidrawNonSelectionElement | undefined;
+      if (shapePreview) {
+        const prevPreview = app.state.newElement;
+        const nextPreview = {
+          ...shapePreview,
+          // Keep a stable id across the gesture while the recognized type
+          // is unchanged, so the preview element's identity doesn't churn
+          // frame to frame.
+          id:
+            prevPreview?.type === shapePreview.type
+              ? prevPreview.id
+              : shapePreview.id,
+          seed: 1,
+          opacity: ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
+          isDeleted: false as const,
+        } as NonDeletedRecognizedShapeElement;
 
-        if (shapePreview) {
-          const prevPreview = app.state.newElement;
-          const nextPreview = {
-            ...shapePreview,
-            // Keep a stable id across the gesture while the recognized type
-            // is unchanged, so the preview element's identity doesn't churn
-            // frame to frame.
-            id:
-              prevPreview?.type === shapePreview.type
-                ? prevPreview.id
-                : shapePreview.id,
-            seed: 1,
-            opacity: ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
-            isDeleted: false as const,
-          } as NonDeletedRecognizedShapeElement;
-
-          if (!isDrawShapePreviewEqual(prevPreview, nextPreview)) {
-            app.setState({ newElement: nextPreview });
-          }
-        } else if (app.state.newElement !== null) {
-          app.setState({ newElement: null });
+        if (!isDrawShapePreviewEqual(prevPreview, nextPreview)) {
+          app.setState({ newElement: nextPreview });
         }
       } else if (app.state.newElement !== null) {
         app.setState({ newElement: null });
