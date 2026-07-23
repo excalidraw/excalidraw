@@ -429,6 +429,36 @@ describe("Test Linear Elements", () => {
       expect(line.points.length).toEqual(3);
     });
 
+    it("should box-select points when dragging on the canvas", () => {
+      createThreePointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      enterLineEditingMode(line);
+
+      // rubber-band over the last two points (at (90, 70) and (70, 20)),
+      // starting from an empty canvas area. Needs two pointer moves (so no
+      // `drag()`): the first one only creates the selection rectangle,
+      // box-selection kicks in on the next one.
+      fireEvent.pointerDown(interactiveCanvas, { clientX: 55, clientY: 5 });
+      fireEvent.pointerMove(interactiveCanvas, { clientX: 100, clientY: 60 });
+      fireEvent.pointerMove(interactiveCanvas, { clientX: 130, clientY: 100 });
+      fireEvent.pointerUp(interactiveCanvas, { clientX: 130, clientY: 100 });
+
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+      expect(h.state.selectedLinearElement?.selectedPointsIndices).toEqual([
+        1, 2,
+      ]);
+    });
+
+    it("should exit the editor when clicking on the canvas without dragging", () => {
+      createThreePointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      enterLineEditingMode(line);
+
+      mouse.clickAt(200, 200);
+
+      expect(h.state.selectedLinearElement?.isEditing).toBeFalsy();
+    });
+
     it("should allow dragging line from midpoint in 2 pointer lines", async () => {
       createTwoPointerLinearElement("line");
 
