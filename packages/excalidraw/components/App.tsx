@@ -6212,9 +6212,14 @@ class App extends React.Component<AppProps, AppState> {
 
         // keyboard-submit keeps focus on the edited object. For bound text, keep
         // the container selected even if the text becomes empty and is deleted.
-        const elementIdToSelect = viaKeyboard
-          ? element.containerId || (!isDeleted ? element.id : null)
-          : null;
+        // The autoshape tool stays active through the editing session and never
+        // selects anything — don't fight the finalize action's selection reset.
+        const elementIdToSelect =
+          viaKeyboard &&
+          !this.isToolLocked() &&
+          this.state.activeTool.type !== "autoshape"
+            ? element.containerId || (!isDeleted ? element.id : null)
+            : null;
 
         if (elementIdToSelect) {
           // needed to ensure state is updated before "finalize" action
@@ -6251,7 +6256,9 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
 
-        if (this.isToolLocked()) {
+        // tools that survive the submit (locked, or autoshape's
+        // double-click-to-type flow) need their cursor back
+        if (this.isToolLocked() || this.state.activeTool.type === "autoshape") {
           this.cursor.applyForTool();
         }
 
@@ -6925,8 +6932,14 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.multiElement) {
       return;
     }
-    // we should only be able to double click when mode is selection
-    if (this.state.activeTool.type !== this.state.preferredSelectionTool.type) {
+    // double click only creates/edits text in selection mode, or with the
+    // autoshape tool (double-click-to-type without leaving the tool; all the
+    // selection-dependent branches below are inert there since autoshape
+    // never selects anything)
+    if (
+      this.state.activeTool.type !== this.state.preferredSelectionTool.type &&
+      this.state.activeTool.type !== "autoshape"
+    ) {
       return;
     }
 
@@ -7102,6 +7115,11 @@ class App extends React.Component<AppProps, AppState> {
 
         if (container) {
           if (
+            // with autoshape, any hit inside a bindable shape means "type in
+            // this shape" — unlike selection mode, a transparent unfilled
+            // container binds even when its stroke wasn't hit (Alt keeps the
+            // free-text-at-point escape hatch)
+            this.state.activeTool.type === "autoshape" ||
             hasBoundTextElement(container) ||
             !isTransparent(container.backgroundColor) ||
             hitElementItself({
