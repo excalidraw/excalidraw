@@ -209,7 +209,81 @@ describe("drawShape tool", () => {
     expect(h.state.selectedLinearElement).toBeNull();
   });
 
-  it("keeps a line that binds at most one end a line", () => {
+  it("orbit-binds arrows sketched from inside one shape into another, endpoints on the outlines", () => {
+    const start = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+    const end = API.createElement({
+      type: "rectangle",
+      x: 400,
+      y: 400,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([start, end]);
+
+    // starts and ends deep inside the shapes
+    sketch(seg([150, 150], [450, 450], 30));
+
+    const arrow = h.elements.find((element) => element.type === "arrow");
+    assert(isArrowElement(arrow));
+
+    expect(arrow.startBinding?.mode).toBe("orbit");
+    expect(arrow.endBinding?.mode).toBe("orbit");
+
+    // the endpoints were pulled out of the shape interiors onto the outlines
+    const [endDx, endDy] = arrow.points[arrow.points.length - 1];
+    expect(arrow.x).toBeGreaterThan(200);
+    expect(arrow.y).toBeGreaterThan(200);
+    expect(arrow.x + endDx).toBeLessThan(400);
+    expect(arrow.y + endDy).toBeLessThan(400);
+  });
+
+  it("keeps inside-bindings for an arrow sketched within a single shape", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 500,
+      height: 500,
+    });
+    API.setElements([container]);
+
+    sketch(arrowPath(150, 300, 400, 300));
+
+    const arrow = h.elements.find((element) => element.type === "arrow");
+    assert(isArrowElement(arrow));
+
+    expect(arrow.startBinding?.mode).toBe("inside");
+    expect(arrow.endBinding?.mode).toBe("inside");
+    // the endpoints stay where they were drawn
+    expect(arrow.x).toBeCloseTo(150, 0);
+    expect(arrow.y).toBeCloseTo(300, 0);
+  });
+
+  it("keeps a line sketched within a single shape a line", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 500,
+      height: 500,
+    });
+    API.setElements([container]);
+
+    sketch(seg([150, 150], [450, 450], 30));
+
+    expect(h.elements.map((element) => element.type)).toEqual([
+      "rectangle",
+      "line",
+    ]);
+  });
+
+  it("upgrades a line from inside a shape to blank canvas into an arrow orbit-bound at the shape", () => {
     const only = API.createElement({
       type: "rectangle",
       x: 100,
@@ -219,12 +293,47 @@ describe("drawShape tool", () => {
     });
     API.setElements([only]);
 
-    sketch(seg([205, 205], [395, 395], 30));
+    sketch(seg([150, 150], [395, 395], 30));
 
-    expect(h.elements.map((element) => element.type)).toEqual([
-      "rectangle",
-      "line",
-    ]);
+    const arrow = h.elements.find((element) => element.type === "arrow");
+    assert(isArrowElement(arrow));
+
+    expect(arrow.startBinding?.elementId).toBe(only.id);
+    expect(arrow.startBinding?.mode).toBe("orbit");
+    expect(arrow.endBinding).toBeNull();
+    // the start was pulled out of the shape interior onto the outline
+    expect(arrow.x).toBeGreaterThan(200);
+    expect(arrow.y).toBeGreaterThan(200);
+  });
+
+  it("upgrades a line from blank canvas into a shape into an arrow orbit-bound at the shape", () => {
+    const only = API.createElement({
+      type: "rectangle",
+      x: 400,
+      y: 400,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([only]);
+
+    sketch(seg([100, 100], [450, 450], 30));
+
+    const arrow = h.elements.find((element) => element.type === "arrow");
+    assert(isArrowElement(arrow));
+
+    expect(arrow.startBinding).toBeNull();
+    expect(arrow.endBinding?.elementId).toBe(only.id);
+    expect(arrow.endBinding?.mode).toBe("orbit");
+    // the end was pulled back onto the outline
+    const [endDx, endDy] = arrow.points[arrow.points.length - 1];
+    expect(arrow.x + endDx).toBeLessThan(400);
+    expect(arrow.y + endDy).toBeLessThan(400);
+  });
+
+  it("keeps a line touching no shape a line", () => {
+    sketch(seg([100, 100], [400, 400], 30));
+
+    expect(h.elements.map((element) => element.type)).toEqual(["line"]);
   });
 
   it("allows sketching consecutive shapes without reselecting the tool", () => {

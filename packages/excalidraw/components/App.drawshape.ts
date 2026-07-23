@@ -1,7 +1,7 @@
 import { randomInteger } from "@excalidraw/common";
 
 import {
-  bindOrUnbindBindingElement,
+  bindBindingElement,
   convertToShape,
   convertToShapeHandlePointerMoveFromPointerDown,
   getHoveredElementForBinding,
@@ -10,6 +10,7 @@ import {
   LinearElementEditor,
   maxBindingDistance_simple,
   newArrowElement,
+  updateBoundPoint,
 } from "@excalidraw/element";
 
 import type {
@@ -17,6 +18,7 @@ import type {
   ExcalidrawLineElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
+  PointsPositionUpdates,
 } from "@excalidraw/element/types";
 
 import { actionFinalize } from "../actions";
@@ -62,55 +64,96 @@ export class AppDrawShape {
   };
 
   /**
-   * Binds the given endpoint of a freshly inserted drawShape arrow to the
-   * bindable element it hovers, if any.
+   * Binds both endpoints of a freshly inserted drawShape arrow to the
+   * bindable elements they hover, if any.
+   *
+   * Endpoints bind in "orbit" mode — the arrow starts/ends at the target's
+   * outline — even when the stroke was started or released inside the shape
+   * (a sketched connector aims at the shape, not at a point inside it). The
+   * exception is a sketch contained in a single shape: both ends then bind
+   * "inside" and stay where they were drawn, like the interactive
+   * inside→inside flow.
    */
-  private bindArrowEndpoint = (
-    arrow: NonDeleted<ExcalidrawArrowElement>,
-    index: 0 | -1,
-  ) => {
+  private bindRecognizedArrow = (arrow: NonDeleted<ExcalidrawArrowElement>) => {
     const { app } = this;
     const elementsMap = app.scene.getNonDeletedElementsMap();
-    const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-      arrow,
-      index,
-      elementsMap,
-    );
-    const target = getHoveredElementForBinding(
-      globalPoint,
-      app.scene.getNonDeletedElements(),
-      elementsMap,
-      maxBindingDistance_simple(app.state.zoom),
-    );
-    if (!target) {
+    const elements = app.scene.getNonDeletedElements();
+    const bindingDistance = maxBindingDistance_simple(app.state.zoom);
+
+    const endpoints = (["start", "end"] as const).map((startOrEnd) => {
+      const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      );
+      return {
+        startOrEnd,
+        globalPoint,
+        target: getHoveredElementForBinding(
+          globalPoint,
+          elements,
+          elementsMap,
+          bindingDistance,
+        ),
+      };
+    });
+
+    const sameTarget =
+      !!endpoints[0].target && endpoints[0].target === endpoints[1].target;
+    const isMidpointSnappingEnabled =
+      app.state.isMidpointSnappingEnabled && !app.state.gridModeEnabled;
+
+    for (const { startOrEnd, globalPoint, target } of endpoints) {
+      if (target) {
+        bindBindingElement(
+          arrow,
+          target,
+          sameTarget ? "inside" : "orbit",
+          startOrEnd,
+          app.scene,
+          globalPoint,
+          app.state.isBindingEnabled,
+          isMidpointSnappingEnabled,
+        );
+      }
+    }
+
+    if (sameTarget) {
       return;
     }
 
-    bindOrUnbindBindingElement(
-      arrow,
-      new Map([
-        [
-          index === 0 ? 0 : arrow.points.length - 1,
-          {
-            point: LinearElementEditor.pointFromAbsoluteCoords(
-              arrow,
-              globalPoint,
-              elementsMap,
-            ),
-          },
-        ],
-      ]),
-      globalPoint[0],
-      globalPoint[1],
-      app.scene,
-      app.state,
-      { newArrow: true },
-    );
+    // pull the orbit-bound endpoints onto the target outlines; both bindings
+    // exist by now, so each endpoint clips the segment between the two focus
+    // points (mirrors the focusPoint branch of bindOrUnbindBindingElement)
+    const updates: PointsPositionUpdates = new Map();
+    for (const { startOrEnd, target } of endpoints) {
+      if (!target) {
+        continue;
+      }
+      const point = updateBoundPoint(
+        arrow,
+        startOrEnd === "start" ? "startBinding" : "endBinding",
+        startOrEnd === "start" ? arrow.startBinding : arrow.endBinding,
+        target,
+        elementsMap,
+      );
+      if (point) {
+        updates.set(startOrEnd === "start" ? 0 : arrow.points.length - 1, {
+          point,
+        });
+      }
+    }
+    if (updates.size) {
+      LinearElementEditor.movePoints(arrow, app.scene, updates);
+    }
   };
 
   /**
-   * A sketched line whose both endpoints land on bindable elements was meant
-   * as a connector — upgrade it to an arrow (called before insertion).
+   * A sketched line that connects a bindable element with something else —
+   * another element or blank canvas — was meant as a connector: upgrade it
+   * to an arrow (called before insertion). A line touching no shape, or
+   * contained in a single shape (an annotation, not a connector), stays a
+   * line.
    */
   private maybeUpgradeLineToArrow = (
     line: NonDeleted<ExcalidrawLineElement>,
@@ -120,7 +163,7 @@ export class AppDrawShape {
     const elements = app.scene.getNonDeletedElements();
     const bindingDistance = maxBindingDistance_simple(app.state.zoom);
 
-    const bothEndsBindable = ([0, -1] as const).every((index) =>
+    const [startTarget, endTarget] = ([0, -1] as const).map((index) =>
       getHoveredElementForBinding(
         LinearElementEditor.getPointAtIndexGlobalCoordinates(
           line,
@@ -132,7 +175,7 @@ export class AppDrawShape {
         bindingDistance,
       ),
     );
-    if (!bothEndsBindable) {
+    if ((!startTarget && !endTarget) || startTarget === endTarget) {
       return null;
     }
 
@@ -191,8 +234,7 @@ export class AppDrawShape {
         app.insertNewElement(element);
 
         if (app.state.isBindingEnabled && isBindingElement(element)) {
-          this.bindArrowEndpoint(element, 0);
-          this.bindArrowEndpoint(element, -1);
+          this.bindRecognizedArrow(element);
         }
       }
     }
