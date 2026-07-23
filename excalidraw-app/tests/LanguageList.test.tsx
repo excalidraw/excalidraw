@@ -1,3 +1,4 @@
+import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
 import { defaultLang, languages } from "@excalidraw/excalidraw/i18n";
 import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
@@ -7,15 +8,35 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import ExcalidrawApp from "../App";
+import { LanguageList } from "../app-language/LanguageList";
+import { useAppLangCode } from "../app-language/language-state";
+import { Provider } from "../app-jotai";
 
 const TEST_LANG_CODE = "fr-FR";
+
+const TestApp = () => {
+  const [langCode] = useAppLangCode();
+
+  return (
+    <Excalidraw langCode={langCode}>
+      <MainMenu>
+        <MainMenu.ItemCustom>
+          <LanguageList />
+        </MainMenu.ItemCustom>
+      </MainMenu>
+    </Excalidraw>
+  );
+};
 
 describe("Test LanguageList", () => {
   it("rerenders UI on language change", async () => {
     expect(languages.some((lang) => lang.code === TEST_LANG_CODE)).toBe(true);
 
-    await render(<ExcalidrawApp />);
+    await render(
+      <Provider>
+        <TestApp />
+      </Provider>,
+    );
 
     // select rectangle tool to show properties menu
     UI.clickTool("rectangle");

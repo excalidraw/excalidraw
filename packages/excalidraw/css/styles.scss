@@ -583,9 +583,20 @@ body.excalidraw-cursor-resize * {
     aside {
       display: none;
     }
+
+    .floating-status-stack {
+      bottom: calc(30px + var(--sab, 0));
+      z-index: var(--zIndex-ui-bottom);
+    }
+
     .scroll-back-to-content {
       bottom: calc(100px + var(--sab, 0));
       z-index: -1;
+    }
+
+    .floating-status-stack .scroll-back-to-content {
+      bottom: auto;
+      z-index: auto;
     }
   }
 

@@ -12,19 +12,23 @@ import {
   actionZoomToFitSelection,
 } from "../actions/actionCanvas";
 import { getNormalizedZoom } from "../scene";
-import { getStateForZoom } from "../scene/zoom";
 import {
-  animateToConstraints,
+  snapBackToConstraints,
+  SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
+  SCROLL_TO_CONTENT_ANIMATION_KEY,
+} from "../components/App.viewport";
+import {
   constrainScrollState,
   DEFAULT_OVERSCROLL,
-  isViewportOverscrolled,
-  SCROLL_TO_CONTENT_ANIMATION_KEY,
+  getViewportForZoomWithScrollConstraints,
 } from "../viewport";
 import { AnimationController } from "../renderer/animation";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
 import {
+  fireEvent,
+  GlobalTestState,
   mockBoundingClientRect,
   render,
   restoreOriginalGetBoundingClientRect,
@@ -66,6 +70,23 @@ const makeLock = (
   overscroll: 0,
   ...overrides,
 });
+
+const waitForAnimationToStop = (key: string, maxFrames = 200) => {
+  return React.act(
+    () =>
+      new Promise<void>((resolve) => {
+        let remaining = maxFrames;
+        const check = () => {
+          if (!AnimationController.running(key) || --remaining <= 0) {
+            resolve();
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+        requestAnimationFrame(check);
+      }),
+  );
+};
 
 describe("constrainScrollState (pure)", () => {
   it("returns scroll/zoom unchanged when there is no lock", () => {
@@ -334,53 +355,6 @@ describe("rubberband overscroll (pure)", () => {
   });
 });
 
-describe("isViewportOverscrolled (pure)", () => {
-  const base = { x: 0, y: 0, width: 1000, height: 1000 } as const;
-
-  it("is false when there is no lock", () => {
-    expect(
-      isViewportOverscrolled(
-        makeState({ scrollX: 9999, scrollConstraints: null }),
-      ),
-    ).toBe(false);
-  });
-
-  it("is false when the viewport is within the hard bounds", () => {
-    expect(
-      isViewportOverscrolled(
-        makeState({
-          scrollX: -100,
-          scrollY: -100,
-          scrollConstraints: makeLock({ ...base, lockScroll: true }),
-        }),
-      ),
-    ).toBe(false);
-  });
-
-  it("is true when panned past an edge (scroll lock)", () => {
-    // scrollX 30 is past the hard max of 0
-    expect(
-      isViewportOverscrolled(
-        makeState({
-          scrollX: 30,
-          scrollConstraints: makeLock({ ...base, lockScroll: true }),
-        }),
-      ),
-    ).toBe(true);
-  });
-
-  it("is true when zoomed out below the locked zoom (zoom lock)", () => {
-    expect(
-      isViewportOverscrolled(
-        makeState({
-          zoom: { value: getNormalizedZoom(0.1) },
-          scrollConstraints: makeLock({ ...base, lockZoom: true, zoom: 0.2 }),
-        }),
-      ),
-    ).toBe(true);
-  });
-});
-
 describe("animateToConstraints (rubberband snap-back)", () => {
   afterEach(() => {
     AnimationController.reset();
@@ -397,26 +371,77 @@ describe("animateToConstraints (rubberband snap-back)", () => {
   it("starts an animation toward the box when overscrolled", () => {
     const onFrame = vi.fn();
     // scrollX 200 is outside the hard range [-800, 0]
-    animateToConstraints(
+    snapBackToConstraints(
       makeState({ scrollX: 200, scrollConstraints: lock }),
       onFrame,
     );
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      true,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(true);
     expect(onFrame).toHaveBeenCalled();
   });
 
   it("is a no-op when already within the box", () => {
     const onFrame = vi.fn();
-    animateToConstraints(
+    snapBackToConstraints(
       makeState({ scrollX: -100, scrollConstraints: lock }),
       onFrame,
     );
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
     expect(onFrame).not.toHaveBeenCalled();
+  });
+
+  it("does not supersede an active viewport navigation", () => {
+    AnimationController.start(SCROLL_TO_CONTENT_ANIMATION_KEY, () => ({}));
+
+    snapBackToConstraints(
+      makeState({ scrollX: 200, scrollConstraints: lock }),
+      vi.fn(),
+    );
+
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      true,
+    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
+  });
+});
+
+describe("getViewportForZoomWithScrollConstraints", () => {
+  it("preserves the screen-space overscroll distance while zooming", () => {
+    const state = {
+      ...makeState({
+        scrollY: 50,
+        scrollConstraints: makeLock({
+          x: 0,
+          y: 0,
+          width: 1000,
+          height: 1000,
+          lockScroll: true,
+          overscroll: 50,
+        }),
+      }),
+      offsetLeft: 0,
+      offsetTop: 0,
+    } as AppState;
+
+    const viewport = getViewportForZoomWithScrollConstraints(
+      {
+        viewportX: 0,
+        viewportY: 0,
+        nextZoom: getNormalizedZoom(2),
+      },
+      state,
+    );
+    const restingViewport = constrainScrollState({ ...state, ...viewport });
+
+    expect(viewport.zoom.value).toBe(2);
+    expect(
+      (viewport.scrollY - restingViewport.scrollY) * viewport.zoom.value,
+    ).toBeCloseTo(50);
   });
 });
 
@@ -435,7 +460,7 @@ describe("setViewport lock (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -453,7 +478,7 @@ describe("setViewport lock (integration)", () => {
 
     // clearing the lock lets it scroll freely again
     React.act(() => {
-      h.app.setViewport(null);
+      h.app.viewport.setViewport(null);
     });
     expect(h.state.scrollConstraints).toBe(null);
     const before = h.state.scrollY;
@@ -461,8 +486,8 @@ describe("setViewport lock (integration)", () => {
     expect(h.state.scrollY).toBeLessThan(before);
   });
 
-  it("defers installing the lock until an animated scroll settles", async () => {
-    await render(<Excalidraw />);
+  it("withholds user viewport input until an animated lock settles", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
     await waitFor(() => expect(h.state.width).toBe(200));
 
     const rect = API.createElement({
@@ -475,20 +500,234 @@ describe("setViewport lock (integration)", () => {
     API.setElements([rect]);
 
     React.act(() => {
-      h.app.setViewport({
-        target: rect,
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
         fit: "scale-down",
-        animation: { duration: 300 },
+        animation: false,
         lock: { scroll: true },
       });
     });
+    expect(h.state.scrollConstraints).not.toBe(null);
 
-    // the animation is in flight and the lock has NOT been installed yet —
-    // it's chained to run once the scroll settles
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+    try {
+      React.act(() => {
+        h.app.viewport.setViewport({
+          target: rect,
+          fit: "scale-down",
+          animation: { duration: 10 },
+          lock: { scroll: true },
+        });
+      });
+
+      // the animation is in flight and the lock has NOT been installed yet —
+      // it's chained to run once the scroll settles
+      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+        true,
+      );
+      // The previous active lock is superseded immediately; the destination
+      // lock is held internally until the animation lands.
+      expect(h.state.scrollConstraints).toBe(null);
+      expect(h.app.viewport.isLockedTransitionPending).toBe(true);
+
+      const viewportDuringTransition = {
+        scrollX: h.state.scrollX,
+        scrollY: h.state.scrollY,
+        zoom: h.state.zoom.value,
+      };
+
+      // Pan, wheel/pinch zoom, zoom controls, and fit actions are all
+      // consumed while the pending lock owns the viewport. None may cancel
+      // the animation or perturb its current frame.
+      Keyboard.keyPress(KEYS.PAGE_DOWN);
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+        ctrlKey: true,
+        deltaY: -10,
+      });
+      React.act(() => {
+        h.app.actionManager.executeAction(actionZoomIn, "ui");
+        h.app.actionManager.executeAction(actionResetZoom, "ui");
+        h.app.actionManager.executeAction(actionZoomToFit, "ui");
+        h.app.actionManager.executeAction(actionZoomToFitSelection, "ui");
+      });
+
+      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+        true,
+      );
+      expect({
+        scrollX: h.state.scrollX,
+        scrollY: h.state.scrollY,
+        zoom: h.state.zoom.value,
+      }).toEqual(viewportDuringTransition);
+
+      await waitForAnimationToStop(SCROLL_TO_CONTENT_ANIMATION_KEY);
+
+      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+        false,
+      );
+      expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+      expect(h.state.scrollConstraints).toMatchObject({
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+        lockScroll: true,
+      });
+    } finally {
+      window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    }
+  });
+
+  it("lets a newer animated lock supersede an older one", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const firstTarget = API.createElement({
+      type: "rectangle",
+      x: 1000,
+      y: 1000,
+      width: 100,
+      height: 100,
+    });
+    const secondTarget = API.createElement({
+      type: "rectangle",
+      x: 3000,
+      y: 3000,
+      width: 200,
+      height: 200,
+    });
+    API.setElements([firstTarget, secondTarget]);
+
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+    try {
+      React.act(() => {
+        h.app.viewport.setViewport({
+          target: firstTarget,
+          animation: { duration: 1000 },
+          lock: { scroll: true },
+        });
+      });
+
+      expect(h.app.viewport.isLockedTransitionPending).toBe(true);
+
+      React.act(() => {
+        h.app.viewport.setViewport({
+          target: secondTarget,
+          animation: { duration: 10 },
+          lock: { scroll: true, zoom: true },
+        });
+      });
+
+      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+        true,
+      );
+      expect(h.app.viewport.isLockedTransitionPending).toBe(true);
+
+      await waitForAnimationToStop(SCROLL_TO_CONTENT_ANIMATION_KEY);
+
+      expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+      expect(h.state.scrollConstraints).toMatchObject({
+        x: secondTarget.x,
+        y: secondTarget.y,
+        width: secondTarget.width,
+        height: secondTarget.height,
+        lockScroll: true,
+        lockZoom: true,
+      });
+    } finally {
+      window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    }
+  });
+
+  it("clears both active and pending locks with setViewport(null)", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        animation: false,
+        lock: { scroll: true },
+      });
+    });
+    expect(h.state.scrollConstraints).not.toBe(null);
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [2000, 2000, 3000, 3000],
+        animation: { duration: 1000 },
+        lock: { scroll: true, zoom: true },
+      });
+    });
+
+    // The superseded active lock is removed while the target lock is pending.
+    expect(h.state.scrollConstraints).toBe(null);
+    expect(h.app.viewport.isLockedTransitionPending).toBe(true);
+
+    React.act(() => {
+      h.app.viewport.setViewport(null);
+    });
+
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+    expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+    expect(h.state.scrollConstraints).toBe(null);
+    expect(h.state.shouldCacheIgnoreZoom).toBe(false);
+  });
+
+  it("still lets user input cancel an unlocked viewport animation", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [2000, 2000, 3000, 3000],
+        animation: { duration: 1000 },
+      });
+    });
+
     expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
       true,
     );
+    expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+
+    React.act(() => {
+      h.app.viewport.translate({ scrollX: 123, scrollY: 456 });
+    });
+
+    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
+      false,
+    );
+    expect(h.state.scrollX).toBe(123);
+    expect(h.state.scrollY).toBe(456);
+  });
+
+  it("applies back-to-back lock updates in call order", async () => {
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        animation: false,
+        lock: { scroll: true },
+      });
+      h.app.viewport.setViewport({
+        target: [1000, 1000, 2000, 2000],
+        animation: false,
+        lock: { scroll: true, zoom: true },
+      });
+      h.app.viewport.setViewport({
+        target: [2000, 2000, 3000, 3000],
+        animation: false,
+      });
+    });
+
     expect(h.state.scrollConstraints).toBe(null);
+    expect(h.state.zoom.value).toBeCloseTo(0.1);
+    expect(h.state.scrollX).toBeCloseTo(-1500);
+    expect(h.state.scrollY).toBeCloseTo(-2000);
   });
 
   it("supports rect targets and defaults missing dimensions to the viewport", async () => {
@@ -496,7 +735,7 @@ describe("setViewport lock (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: { x: 10, y: 20, width: 50 },
         fit: "scale-down",
         animation: false,
@@ -512,7 +751,7 @@ describe("setViewport lock (integration)", () => {
     });
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: { x: 30, y: 40, height: 60 },
         fit: "scale-down",
         animation: false,
@@ -528,7 +767,7 @@ describe("setViewport lock (integration)", () => {
     });
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: { x: 70, y: 80 },
         fit: "scale-down",
         animation: false,
@@ -570,7 +809,7 @@ describe("setViewport lock (integration)", () => {
       API.setElements([validRect, deletedRect]);
 
       React.act(() => {
-        h.app.setViewport({
+        h.app.viewport.setViewport({
           target: [
             validRect,
             deletedRect,
@@ -597,7 +836,7 @@ describe("setViewport lock (integration)", () => {
       warnSpy.mockClear();
 
       React.act(() => {
-        h.app.setViewport({
+        h.app.viewport.setViewport({
           target: [
             deletedRect,
             missingRect,
@@ -626,7 +865,7 @@ describe("setViewport lock (integration)", () => {
     expect(h.app.actionManager.isActionEnabled(actionZoomToFit)).toBe(true);
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 500, 500],
         fit: "scale-down",
         animation: false,
@@ -678,7 +917,7 @@ describe("setViewport lock (integration)", () => {
     API.setElements([rect]);
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: rect,
         fit: "contain",
         animation: false,
@@ -715,7 +954,7 @@ describe("setViewport lock (integration)", () => {
     API.setElements([rect]);
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: rect,
         fit: "contain",
         animation: false,
@@ -751,7 +990,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -776,7 +1015,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -794,9 +1033,8 @@ describe("rubberband overscroll (integration)", () => {
     // outside the 50px give. The zoom must be hard-clamped (equivalent to
     // sliding the zoom origin back into bounds), not rubberbanded.
     React.act(() => {
-      // eslint-disable-next-line dot-notation -- private method; bracket access is the TS escape hatch
-      h.app["translateCanvas"]((state: AppState) => ({
-        ...getStateForZoom(
+      h.app.viewport.translate((state: AppState) => ({
+        ...getViewportForZoomWithScrollConstraints(
           { viewportX: 0, viewportY: 0, nextZoom: getNormalizedZoom(0.2) },
           state,
         ),
@@ -805,7 +1043,6 @@ describe("rubberband overscroll (integration)", () => {
 
     expect(h.state.zoom.value).toBeCloseTo(0.2);
     expect(h.state.scrollX).toBeCloseTo(0);
-    expect(isViewportOverscrolled(h.state)).toBe(false);
 
     // panning, by contrast, still gets the rubberband give
     Keyboard.keyPress(KEYS.PAGE_UP);
@@ -820,7 +1057,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -851,7 +1088,6 @@ describe("rubberband overscroll (integration)", () => {
     expect(h.state.scrollY).toBeLessThanOrEqual(
       50 / h.state.zoom.value + 0.001,
     );
-    expect(isViewportOverscrolled(h.state)).toBe(true);
 
     // zooming must keep working while overscrolled (used to be pinned),
     // without yanking the viewport back inside the box
@@ -870,7 +1106,7 @@ describe("rubberband overscroll (integration)", () => {
     await waitFor(() => expect(h.state.width).toBe(200));
 
     React.act(() => {
-      h.app.setViewport({
+      h.app.viewport.setViewport({
         target: [0, 0, 1000, 1000],
         fit: "scale-down",
         animation: false,
@@ -886,26 +1122,131 @@ describe("rubberband overscroll (integration)", () => {
     finger2.downAt(60, 2);
     finger1.move(0, 5);
     finger2.move(0, 5);
-    expect(isViewportOverscrolled(h.state)).toBe(true);
+    const heldScrollY = h.state.scrollY;
+    expect(heldScrollY).toBeGreaterThan(0);
 
     // the debounced snap-back elapses while the fingers are still down —
     // it must be withheld, not fight the held gesture
     React.act(() => {
       // eslint-disable-next-line dot-notation -- private; simulates the debounce delay elapsing
-      h.app["snapBackToScrollConstraintsDebounced"].flush();
+      h.app.viewport["snapBackDebounced"].flush();
     });
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
-    expect(isViewportOverscrolled(h.state)).toBe(true);
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
+    expect(h.state.scrollY).toBe(heldScrollY);
 
     // lifting one finger ends the gesture → the rubberband releases
     finger1.up();
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      true,
-    );
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(true);
 
     finger2.up();
+  });
+
+  it("withholds the rubberband snap-back until a desktop pan ends", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+      h.app.setActiveTool({ type: "hand" });
+    });
+
+    const mouse = new Pointer("mouse");
+
+    // Drag down past the top edge and hold the mouse button there.
+    mouse.downAt(50, 2);
+    mouse.move(0, 5);
+    const heldScrollY = h.state.scrollY;
+    expect(heldScrollY).toBeGreaterThan(0);
+
+    // The debounce may elapse while the mouse is still held, but the viewport
+    // must remain attached to the pointer until the pan session ends.
+    React.act(() => {
+      // eslint-disable-next-line dot-notation -- private; simulates the debounce delay elapsing
+      h.app.viewport["snapBackDebounced"].flush();
+    });
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
+    expect(h.state.scrollY).toBe(heldScrollY);
+
+    mouse.up();
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(true);
+
+    // Direct manipulation takes ownership of the viewport again.
+    mouse.downAt(50, 7);
+    mouse.move(0, 1);
+    expect(
+      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+    ).toBe(false);
+    mouse.up();
+  });
+
+  it("continues rubberband snap-back while wheel-zooming", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+      h.app.setActiveTool({ type: "hand" });
+    });
+
+    const mouse = new Pointer("mouse");
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+    try {
+      mouse.downAt(50, 2);
+      mouse.move(0, 5);
+      mouse.up();
+
+      expect(
+        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      ).toBe(true);
+      expect(h.state.scrollY).toBeGreaterThan(
+        constrainScrollState(h.state).scrollY,
+      );
+
+      const zoomBefore = h.state.zoom.value;
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+        ctrlKey: true,
+        deltaY: -10,
+      });
+
+      expect(h.state.zoom.value).toBeGreaterThan(zoomBefore);
+      expect(h.state.scrollY).toBeGreaterThan(
+        constrainScrollState(h.state).scrollY,
+      );
+      expect(
+        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      ).toBe(true);
+
+      await waitForAnimationToStop(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+
+      expect(
+        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      ).toBe(false);
+      expect(h.state.zoom.value).toBeGreaterThan(zoomBefore);
+      const restingViewport = constrainScrollState(h.state);
+      expect(h.state.scrollX).toBeCloseTo(restingViewport.scrollX);
+      expect(h.state.scrollY).toBeCloseTo(restingViewport.scrollY);
+      expect(h.state.zoom.value).toBeCloseTo(restingViewport.zoom.value);
+    } finally {
+      window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    }
   });
 
   it("defaults to DEFAULT_OVERSCROLL when omitted or `true`, 0 when `false`", async () => {
@@ -914,7 +1255,7 @@ describe("rubberband overscroll (integration)", () => {
 
     const install = (overscroll?: boolean | number) => {
       React.act(() => {
-        h.app.setViewport({
+        h.app.viewport.setViewport({
           target: [0, 0, 1000, 1000],
           fit: "scale-down",
           animation: false,

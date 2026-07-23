@@ -16,12 +16,7 @@ import { Island } from "./Island";
 import { PenModeButton } from "./PenModeButton";
 
 import type { ActionManager } from "../actions/manager";
-import type {
-  AppClassProperties,
-  AppProps,
-  AppState,
-  UIAppState,
-} from "../types";
+import type { AppClassProperties, AppState, UIAppState } from "../types";
 import type { JSX } from "react";
 
 type MobileMenuProps = {
@@ -44,7 +39,7 @@ type MobileMenuProps = {
   renderSidebars: () => JSX.Element | null;
   renderWelcomeScreen: boolean;
   defaultUIEnabled: boolean;
-  UIOptions: AppProps["UIOptions"];
+  scrollBackToContentUIEnabled: boolean;
   app: AppClassProperties;
 };
 
@@ -58,7 +53,7 @@ export const MobileMenu = ({
   renderSidebars,
   renderWelcomeScreen,
   defaultUIEnabled,
-  UIOptions,
+  scrollBackToContentUIEnabled,
   app,
   onPenModeToggle,
 }: MobileMenuProps) => {
@@ -123,6 +118,27 @@ export const MobileMenu = ({
     return <MobileToolbar app={app} setAppState={setAppState} />;
   };
 
+  const shouldRenderScrollBackToContent =
+    scrollBackToContentUIEnabled && appState.scrolledOutside;
+  const shouldRenderDefaultBottomBar =
+    defaultUIEnabled && !appState.viewModeEnabled;
+  const scrollBackToContentButton =
+    shouldRenderScrollBackToContent &&
+    !appState.openMenu &&
+    !appState.openSidebar ? (
+      <button
+        type="button"
+        className="scroll-back-to-content"
+        onClick={() => {
+          setAppState((appState) => ({
+            ...getScrollToContentState(elements, appState),
+          }));
+        }}
+      >
+        {t("buttons.scrollBackToContent")}
+      </button>
+    ) : null;
+
   return (
     <>
       {renderSidebars()}
@@ -132,7 +148,7 @@ export const MobileMenu = ({
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
       </div>
 
-      {defaultUIEnabled && !appState.viewModeEnabled && (
+      {shouldRenderDefaultBottomBar && (
         <div
           className="App-bottom-bar"
           style={{
@@ -149,26 +165,15 @@ export const MobileMenu = ({
           />
 
           <Island className="App-toolbar">
-            {!appState.viewModeEnabled &&
-              appState.openDialog?.name !== "elementLinkSelector" &&
+            {appState.openDialog?.name !== "elementLinkSelector" &&
               renderToolbar()}
-            {appState.scrolledOutside &&
-              !appState.openMenu &&
-              !appState.openSidebar && (
-                <button
-                  type="button"
-                  className="scroll-back-to-content"
-                  onClick={() => {
-                    setAppState((appState) => ({
-                      ...getScrollToContentState(elements, appState),
-                    }));
-                  }}
-                >
-                  {t("buttons.scrollBackToContent")}
-                </button>
-              )}
+            {scrollBackToContentButton}
           </Island>
         </div>
+      )}
+
+      {!shouldRenderDefaultBottomBar && scrollBackToContentButton && (
+        <div className="floating-status-stack">{scrollBackToContentButton}</div>
       )}
 
       <FixedSideContainer side="top" className="App-top-bar">

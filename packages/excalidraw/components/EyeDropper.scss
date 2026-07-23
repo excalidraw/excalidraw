@@ -2,6 +2,8 @@
   .excalidraw-eye-dropper-container,
   .excalidraw-eye-dropper-backdrop {
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     z-index: var(--zIndex-eyeDropperBackdrop);
@@ -20,7 +22,7 @@
     pointer-events: none;
     width: 3rem;
     height: 3rem;
-    position: fixed;
+    position: absolute;
     z-index: var(--zIndex-eyeDropperPreview);
     border-radius: 1rem;
     border: 1px solid var(--default-border-color);
