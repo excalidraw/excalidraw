@@ -1147,7 +1147,7 @@ const ExcalidrawWrapper = () => {
               ],
               perform: () => {
                 window.open(
-                  "https://github.com/excalidraw/excalidraw",
+                  "https://github.com/GiraffeAir/Excalidraw-better",
                   "_blank",
                   "noopener noreferrer",
                 );
