@@ -285,6 +285,7 @@
     "localStorageQuotaExceeded": "Browser storage quota exceeded. Changes will not be saved."
   },
   "errors": {
+    "invalidHexColor": "Invalid hex color",
     "unsupportedFileType": "Unsupported file type.",
     "imageInsertError": "Couldn't insert image. Try again later...",
     "fileTooBig": "File is too big. Maximum allowed size is {{maxSize}}.",
