@@ -76,7 +76,7 @@
         align-items: center;
 
         background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
-          left center;
+        left center;
 
         border: 1px solid var(--ImageExportModal-preview-border);
         border-radius: 12px;
@@ -168,6 +168,24 @@
           padding-top: 32px;
           flex-basis: 100%;
           justify-content: center;
+        }
+      }
+
+      &__warnings {
+        border: 1px solid var(--color-warning);
+        border-radius: var(--border-radius-lg);
+        padding: 0.75rem;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+
+        strong {
+          display: block;
+          margin-bottom: 0.5rem;
+        }
+
+        ul {
+          margin: 0;
+          padding-left: 1.25rem;
         }
       }
     }
