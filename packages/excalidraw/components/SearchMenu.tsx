@@ -96,6 +96,11 @@ export const SearchMenu = () => {
   });
   const searchedQueryRef = useRef<SearchQuery | null>(null);
   const lastSceneNonceRef = useRef<number | undefined>(undefined);
+  // Tracks the visual order of matches from the last completed search run,
+  // keyed by `${element.id}:${match.index}`. Used to keep results stable
+  // across re-runs of the same query (e.g. when scene changes during drag).
+  // See https://github.com/excalidraw/excalidraw/issues/9503
+  const prevMatchOrderRef = useRef<Map<string, number>>(new Map());
 
   const [focusIndex, setFocusIndex] = useAtom(searchItemInFocusAtom);
   const elementsMap = app.scene.getNonDeletedElementsMap();
@@ -104,31 +109,41 @@ export const SearchMenu = () => {
     if (isSearching) {
       return;
     }
+    const isQueryChanged = searchQuery !== searchedQueryRef.current;
     if (
-      searchQuery !== searchedQueryRef.current ||
+      isQueryChanged ||
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
     ) {
+      if (isQueryChanged) {
+        prevMatchOrderRef.current = new Map();
+      }
       searchedQueryRef.current = null;
-      handleSearch(searchQuery, app, (matchItems, index) => {
-        setSearchMatches({
-          nonce: randomInteger(),
-          items: matchItems,
-        });
-        searchedQueryRef.current = searchQuery;
-        lastSceneNonceRef.current = app.scene.getSceneNonce();
-        setAppState({
-          searchMatches: matchItems.length
-            ? {
-                focusedId: null,
-                matches: matchItems.map((searchMatch) => ({
-                  id: searchMatch.element.id,
-                  focus: false,
-                  matchedLines: searchMatch.matchedLines,
-                })),
-              }
-            : null,
-        });
-      });
+      handleSearch(
+        searchQuery,
+        app,
+        (matchItems, index) => {
+          setSearchMatches({
+            nonce: randomInteger(),
+            items: matchItems,
+          });
+          searchedQueryRef.current = searchQuery;
+          lastSceneNonceRef.current = app.scene.getSceneNonce();
+          prevMatchOrderRef.current = buildMatchOrder(matchItems);
+          setAppState({
+            searchMatches: matchItems.length
+              ? {
+                  focusedId: null,
+                  matches: matchItems.map((searchMatch) => ({
+                    id: searchMatch.element.id,
+                    focus: false,
+                    matchedLines: searchMatch.matchedLines,
+                  })),
+                }
+              : null,
+          });
+        },
+        isQueryChanged ? null : prevMatchOrderRef.current,
+      );
     }
   }, [
     isSearching,
@@ -258,6 +273,7 @@ export const SearchMenu = () => {
       setFocusIndex(null);
       searchedQueryRef.current = null;
       lastSceneNonceRef.current = undefined;
+      prevMatchOrderRef.current = new Map();
       setAppState({
         searchMatches: null,
       });
@@ -353,29 +369,37 @@ export const SearchMenu = () => {
             setInputValue(value);
             setIsSearching(true);
             const searchQuery = value.trim() as SearchQuery;
-            handleSearch(searchQuery, app, (matchItems, index) => {
-              setSearchMatches({
-                nonce: randomInteger(),
-                items: matchItems,
-              });
-              setFocusIndex(index);
-              searchedQueryRef.current = searchQuery;
-              lastSceneNonceRef.current = app.scene.getSceneNonce();
-              setAppState({
-                searchMatches: matchItems.length
-                  ? {
-                      focusedId: null,
-                      matches: matchItems.map((searchMatch) => ({
-                        id: searchMatch.element.id,
-                        focus: false,
-                        matchedLines: searchMatch.matchedLines,
-                      })),
-                    }
-                  : null,
-              });
+            // user-driven query change -> drop previous order so we resort by y
+            prevMatchOrderRef.current = new Map();
+            handleSearch(
+              searchQuery,
+              app,
+              (matchItems, index) => {
+                setSearchMatches({
+                  nonce: randomInteger(),
+                  items: matchItems,
+                });
+                setFocusIndex(index);
+                searchedQueryRef.current = searchQuery;
+                lastSceneNonceRef.current = app.scene.getSceneNonce();
+                prevMatchOrderRef.current = buildMatchOrder(matchItems);
+                setAppState({
+                  searchMatches: matchItems.length
+                    ? {
+                        focusedId: null,
+                        matches: matchItems.map((searchMatch) => ({
+                          id: searchMatch.element.id,
+                          focus: false,
+                          matchedLines: searchMatch.matchedLines,
+                        })),
+                      }
+                    : null,
+                });
 
-              setIsSearching(false);
-            });
+                setIsSearching(false);
+              },
+              null,
+            );
           }}
           selectOnRender
         />
@@ -777,11 +801,48 @@ const escapeSpecialCharacters = (string: string) => {
   return string.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&");
 };
 
+const getMatchKey = (item: SearchMatchItem) =>
+  `${item.element.id}:${item.index}`;
+
+const buildMatchOrder = (
+  items: readonly SearchMatchItem[],
+): Map<string, number> => {
+  const order = new Map<string, number>();
+  for (let i = 0; i < items.length; i++) {
+    order.set(getMatchKey(items[i]), i);
+  }
+  return order;
+};
+
+// Sorts in place. On first run for a query (previousOrder is null), sorts
+// matches top-to-bottom by `y` for an intuitive initial presentation. On
+// re-runs of the same query, preserves the previous visual order so dragging
+// or editing elements doesn't reshuffle the list (#9503). New matches that
+// weren't in the previous run go to the end, ordered by `y` among themselves.
+const sortMatchesPreservingOrder = (
+  items: SearchMatchItem[],
+  previousOrder: Map<string, number> | null,
+) => {
+  if (!previousOrder || previousOrder.size === 0) {
+    items.sort((a, b) => a.element.y - b.element.y);
+    return;
+  }
+  items.sort((a, b) => {
+    const ka = previousOrder.get(getMatchKey(a)) ?? Infinity;
+    const kb = previousOrder.get(getMatchKey(b)) ?? Infinity;
+    if (ka !== kb) {
+      return ka - kb;
+    }
+    return a.element.y - b.element.y;
+  });
+};
+
 const handleSearch = debounce(
   (
     searchQuery: SearchQuery,
     app: AppClassProperties,
     cb: (matchItems: SearchMatchItem[], focusIndex: number | null) => void,
+    previousOrder: Map<string, number> | null,
   ) => {
     if (!searchQuery || searchQuery === "") {
       cb([], null);
@@ -796,9 +857,6 @@ const handleSearch = debounce(
     const frames = elements.filter((el) =>
       isFrameLikeElement(el),
     ) as ExcalidrawFrameLikeElement[];
-
-    texts.sort((a, b) => a.y - b.y);
-    frames.sort((a, b) => a.y - b.y);
 
     const textMatches: SearchMatchItem[] = [];
 
@@ -850,6 +908,9 @@ const handleSearch = debounce(
         }
       }
     }
+
+    sortMatchesPreservingOrder(frameMatches, previousOrder);
+    sortMatchesPreservingOrder(textMatches, previousOrder);
 
     const visibleIds = new Set(
       app.visibleElements.map((visibleElement) => visibleElement.id),
