@@ -299,6 +299,7 @@ import {
   actionCopy,
   actionCopyAsPng,
   actionCopyAsSvg,
+  actionExportImage,
   copyText,
   actionCopyStyles,
   actionCut,
@@ -13435,6 +13436,7 @@ class App extends React.Component<AppProps, AppState> {
       return [
         actionPaste,
         CONTEXT_MENU_SEPARATOR,
+        actionExportImage,
         actionCopyAsPng,
         actionCopyAsSvg,
         copyText,
@@ -13484,6 +13486,7 @@ class App extends React.Component<AppProps, AppState> {
       CONTEXT_MENU_SEPARATOR,
       actionToggleCropEditor,
       CONTEXT_MENU_SEPARATOR,
+      actionExportImage,
       ...options,
       CONTEXT_MENU_SEPARATOR,
       actionCopyStyles,
