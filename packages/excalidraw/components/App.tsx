@@ -12422,15 +12422,20 @@ class App extends React.Component<AppProps, AppState> {
     if (!existingFileData?.dataURL) {
       const { maxWidthOrHeight, maxFileSizeBytes } = this.props.imageOptions;
 
-      try {
-        imageFile = await resizeImageFile(imageFile, {
-          maxWidthOrHeight,
-        });
-      } catch (error: any) {
-        console.error(
-          "Error trying to resizing image file on insertion",
-          error,
-        );
+      // only downscale when the file exceeds the size limit — resizing
+      // re-encodes through canvas, which degrades sharpness and strips
+      // wide-gamut color profiles (#11613)
+      if (imageFile.size > maxFileSizeBytes) {
+        try {
+          imageFile = await resizeImageFile(imageFile, {
+            maxWidthOrHeight,
+          });
+        } catch (error: any) {
+          console.error(
+            "Error trying to resize image file on insertion",
+            error,
+          );
+        }
       }
 
       if (imageFile.size > maxFileSizeBytes) {
