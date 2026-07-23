@@ -407,6 +407,23 @@ describe("autoshape styles panel & selection (preview path)", () => {
     expect(h.state.selectedElementIds).toEqual({});
   });
 
+  it("shows no preview for lines (noise), yet still commits them on release", () => {
+    const linePoints = seg([100, 100], [400, 400], 30);
+    mouse.downAt(100, 100);
+    act(() => {
+      for (const [x, y] of linePoints.slice(1)) {
+        h.app.drawShape.trail.addPointToPath(x, y);
+        h.app.drawShape.handlePointerMove({ x, y });
+      }
+    });
+
+    // the stroke reads as a line mid-gesture — no preview element
+    expect(h.state.newElement).toBeNull();
+
+    mouse.upAt(400, 400);
+    expect(h.elements.map((element) => element.type)).toEqual(["line"]);
+  });
+
   it("upgrades a line between two bindable shapes identically with a live preview", () => {
     const start = API.createElement({
       type: "rectangle",
