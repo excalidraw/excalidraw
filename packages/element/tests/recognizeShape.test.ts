@@ -63,6 +63,52 @@ const ellipse = (rx: number, ry: number): [number, number][] => {
   return points;
 };
 
+// Moving-average smoothing: rounds every corner the way a relaxed pen does.
+const smooth = (
+  pts: readonly [number, number][],
+  window: number,
+): [number, number][] =>
+  pts.map((_, i) => {
+    let sx = 0;
+    let sy = 0;
+    for (let k = -window; k <= window; k++) {
+      const [x, y] = pts[(i + k + pts.length) % pts.length];
+      sx += x;
+      sy += y;
+    }
+    return [sx / (2 * window + 1), sy / (2 * window + 1)];
+  });
+
+// A sloppy hand-drawn "rectangle" that tapers, bucket-like: wider at the top
+// than the bottom. Its hull fill ratio, (topW + bottomW) / (2 * topW), lands
+// right at an ellipse's PI/4 — only its sharp corners tell the two apart.
+const taperedRectangle = (
+  topW: number,
+  bottomW: number,
+  h: number,
+): [number, number][] =>
+  outline([
+    [-topW / 2, -h / 2],
+    [topW / 2, -h / 2],
+    [bottomW / 2, h / 2],
+    [-bottomW / 2, h / 2],
+  ]);
+
+// A rectangle drawn with broad, pen-like rounded corners. Its outline is a
+// superellipse midway between an ellipse (exponent 2) and a sharp rectangle.
+const roundedRectangle = (rx: number, ry: number): [number, number][] => {
+  const points: [number, number][] = [];
+  for (let a = 0; a <= Math.PI * 2 + 0.05; a += 0.1) {
+    const cos = Math.cos(a);
+    const sin = Math.sin(a);
+    points.push([
+      Math.sign(cos) * Math.sqrt(Math.abs(cos)) * rx,
+      Math.sign(sin) * Math.sqrt(Math.abs(sin)) * ry,
+    ]);
+  }
+  return points;
+};
+
 const line = (length: number) => edge([-length / 2, 0], [length / 2, 0], 40);
 
 /** A shaft, then a V head traced back from the tip and over itself. */
@@ -98,6 +144,12 @@ describe("recognizeShape", () => {
       ["a square", rectangle(200, 200), RIGHT_ANGLES, "rectangle"],
       ["a wide rectangle", rectangle(300, 150), RIGHT_ANGLES, "rectangle"],
       ["a thin rectangle", rectangle(500, 100), RIGHT_ANGLES, "rectangle"],
+      [
+        "a tapered rectangle",
+        taperedRectangle(170, 100, 200),
+        RIGHT_ANGLES,
+        "rectangle",
+      ],
       ["a diamond", diamond(200, 200), RIGHT_ANGLES, "diamond"],
       ["a wide diamond", diamond(300, 150), RIGHT_ANGLES, "diamond"],
       ["a circle", ellipse(100, 100), ANY_ANGLES, "ellipse"],
@@ -138,6 +190,38 @@ describe("recognizeShape", () => {
     const gapped = rectangle(200, 200).slice(0, -6);
 
     expect(recognizeShape(sketch(gapped), null).type).toBe("rectangle");
+  });
+
+  it("recognizes a pen-drawn outline with rounded corners as a rectangle", () => {
+    expect(recognizeShape(sketch(roundedRectangle(100, 70)), null).type).toBe(
+      "rectangle",
+    );
+
+    // ...while a true ellipse of the same proportions remains an ellipse
+    expect(recognizeShape(sketch(ellipse(100, 70)), null).type).toBe("ellipse");
+  });
+
+  it("tells a tapered, bucket-like rectangle from an ellipse by its corners", () => {
+    // proportions traced from real sketches that used to recognize as
+    // ellipses: hull fill ≈ 0.8 ≈ PI/4, so corner sharpness must decide
+    const buckets: [number, number, number][] = [
+      [110, 65, 220],
+      [110, 65, 130],
+      [75, 50, 115],
+      [120, 60, 250],
+    ];
+
+    for (const [topW, bottomW, h] of buckets) {
+      // lightly rounded corners + wobble, like the real strokes
+      const points = sketch(smooth(taperedRectangle(topW, bottomW, h), 2), {
+        noise: 2,
+      });
+
+      expect({
+        bucket: [topW, bottomW, h],
+        type: recognizeShape(points, null).type,
+      }).toEqual({ bucket: [topW, bottomW, h], type: "rectangle" });
+    }
   });
 
   it("leaves a stroke that resembles no known shape as freedraw", () => {

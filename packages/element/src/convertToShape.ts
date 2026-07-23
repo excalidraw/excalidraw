@@ -21,7 +21,6 @@ import {
   polygonArea,
   principalAxes,
   principalCoords,
-  simplifyConvexPolygon,
   skewness,
 } from "@excalidraw/math";
 
@@ -47,6 +46,12 @@ import type {
 import { getFrameLikeElements } from "./frame";
 import { isLinearElement, isUsingAdaptiveRadius } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
+
+declare global {
+  interface Window {
+    LAST_POINTS?: readonly GlobalPoint[];
+  }
+}
 
 // A moment-based shape recognizer.
 //
@@ -105,10 +110,10 @@ const ARROW_MIN_SKEW = 0.3;
 // not enough like any known shape and stays freedraw.
 const CLOSED_SHAPE_MAX_DISTANCE = 1.5;
 
-// Accumulated turn required for a hull vertex to survive simplification. Sets
-// the corner count an ellipse reports (~360°/25° ≈ 14) while leaving the four
-// right-angle corners of a rectangle or diamond intact.
-const HULL_CORNER_ANGLE_THRESHOLD = (25 * Math.PI) / 180;
+// Half-width, in resampled points, of the chord window used to measure local
+// turning along the stroke. Wide enough to smooth pen wobble, narrow enough
+// that adjacent corners of a small quadrilateral stay separate peaks.
+const TURN_WINDOW = 3;
 
 // =============================================================================
 // Feature extraction
@@ -184,14 +189,78 @@ interface StrokeFeatures {
   // frame: ~1 for a rectangle, ~PI/4 for an ellipse, ~1/2 for a diamond.
   hullFillRatio: number;
 
-  // Corner count of the simplified convex hull: 4 for a rectangle or diamond,
-  // many for an ellipse.
-  hullCorners: number;
+  // Share of the stroke's total turning concentrated in its 4 strongest
+  // corner loci: ~1 for any quadrilateral — however tapered or slanted, all
+  // turning happens at the corners — vs. ~0.5 for an ellipse, whose turning
+  // is spread along the whole outline. This is what tells a sloppy,
+  // trapezoid-ish rectangle (hull fill ≈ PI/4, same as an ellipse's) from an
+  // actual ellipse: sharp corners.
+  cornerTurnShare: number;
 
   // kurtosis along x times kurtosis along y, in the screen frame. The two
   // factors each vary with the aspect ratio, but their product barely does:
   // ~1.83 for any rectangle, 2.25 for any ellipse, 3.24 for any diamond.
   kurtosisProduct: number;
+}
+
+// The turn angle at every resampled point, measured between the incoming and
+// outgoing chords `TURN_WINDOW` points away. The stroke is deliberately NOT
+// treated as a closed loop: wrapping around would let the closure artifacts of
+// a hand-drawn outline (overshooting or undershooting the starting point)
+// fabricate a sharp corner that was never drawn.
+function windowedTurns<P extends LocalPoint | GlobalPoint>(
+  pts: readonly P[],
+): number[] {
+  const turns: number[] = [];
+  for (let i = TURN_WINDOW; i < pts.length - TURN_WINDOW; i++) {
+    const [ax, ay] = pts[i - TURN_WINDOW];
+    const [bx, by] = pts[i];
+    const [cx, cy] = pts[i + TURN_WINDOW];
+    const v1x = bx - ax;
+    const v1y = by - ay;
+    const v2x = cx - bx;
+    const v2y = cy - by;
+    turns.push(
+      Math.abs(Math.atan2(v1x * v2y - v1y * v2x, v1x * v2x + v1y * v2y)),
+    );
+  }
+  return turns;
+}
+
+// See StrokeFeatures.cornerTurnShare. Greedily picks the 4 strongest turn
+// peaks, each absorbing its ±TURN_WINDOW neighborhood so one physical corner
+// (whose turn smears across the window) counts once.
+function cornerTurnShare<P extends LocalPoint | GlobalPoint>(
+  pts: readonly P[],
+): number {
+  const turns = windowedTurns(pts);
+  const total = turns.reduce((sum, turn) => sum + turn, 0);
+  if (total === 0) {
+    return 0;
+  }
+
+  const taken = new Array<boolean>(turns.length).fill(false);
+  let top4 = 0;
+  for (let corner = 0; corner < 4; corner++) {
+    let peak = -1;
+    let peakTurn = 0;
+    for (let i = 0; i < turns.length; i++) {
+      if (!taken[i] && turns[i] > peakTurn) {
+        peakTurn = turns[i];
+        peak = i;
+      }
+    }
+    if (peak < 0) {
+      break;
+    }
+    for (let i = peak - TURN_WINDOW; i <= peak + TURN_WINDOW; i++) {
+      if (i >= 0 && i < turns.length && !taken[i]) {
+        top4 += turns[i];
+        taken[i] = true;
+      }
+    }
+  }
+  return top4 / total;
 }
 
 function extractFeatures<P extends LocalPoint | GlobalPoint>(
@@ -218,10 +287,6 @@ function extractFeatures<P extends LocalPoint | GlobalPoint>(
   const majorProjection = principalCoords(pts, axes).map(([u]) => u);
 
   const hull = convexHull(pts);
-  const hullCorners = simplifyConvexPolygon(
-    hull,
-    HULL_CORNER_ANGLE_THRESHOLD,
-  ).length;
   const [minX, minY, maxX, maxY] = getBoundsFromPoints(pts);
   const boxArea = (maxX - minX) * (maxY - minY);
 
@@ -230,7 +295,7 @@ function extractFeatures<P extends LocalPoint | GlobalPoint>(
     elongation: elongation(axes),
     majorSkew: skewness(majorProjection),
     hullFillRatio: boxArea > 0 ? polygonArea(hull) / boxArea : 0,
-    hullCorners,
+    cornerTurnShare: cornerTurnShare(pts),
     kurtosisProduct:
       kurtosis(pts.map(([x]) => x)) * kurtosis(pts.map(([, y]) => y)),
   };
@@ -243,31 +308,34 @@ function extractFeatures<P extends LocalPoint | GlobalPoint>(
 const CLOSED_SHAPE_PROTOTYPES: readonly {
   type: Shape;
   hullFillRatio: number;
-  hullCorners: number;
+  cornerTurnShare: number;
   kurtosisProduct: number;
 }[] = [
   {
     type: "rectangle",
     hullFillRatio: 1,
-    hullCorners: 4,
+    cornerTurnShare: 0.95,
     kurtosisProduct: 1.83,
   },
   {
     type: "diamond",
     hullFillRatio: 0.5,
-    hullCorners: 4,
+    cornerTurnShare: 0.95,
     kurtosisProduct: 3.24,
   },
   {
     type: "ellipse",
     hullFillRatio: Math.PI / 4,
-    hullCorners: 14,
+    cornerTurnShare: 0.55,
     kurtosisProduct: 2.25,
   },
 ];
 
-const HULL_FILL_RATIO_TOLERANCE = 0.15;
-const HULL_CORNERS_TOLERANCE = 6;
+// Hull fill no longer has to separate rectangles from ellipses on its own
+// (cornerTurnShare carries that), so it can afford the slack that lets a
+// tapered, hand-drawn quadrilateral (fill ≈ 0.8) still read as a rectangle.
+const HULL_FILL_RATIO_TOLERANCE = 0.2;
+const CORNER_TURN_SHARE_TOLERANCE = 0.2;
 const KURTOSIS_PRODUCT_TOLERANCE = 0.7;
 
 // Pick the closed shape whose prototype the stroke's features sit closest to,
@@ -280,10 +348,12 @@ function classifyClosedStroke(features: StrokeFeatures): Shape {
     const distance = Math.hypot(
       (features.hullFillRatio - prototype.hullFillRatio) /
         HULL_FILL_RATIO_TOLERANCE,
-      (features.hullCorners - prototype.hullCorners) / HULL_CORNERS_TOLERANCE,
+      (features.cornerTurnShare - prototype.cornerTurnShare) /
+        CORNER_TURN_SHARE_TOLERANCE,
       (features.kurtosisProduct - prototype.kurtosisProduct) /
         KURTOSIS_PRODUCT_TOLERANCE,
     );
+
     if (distance < bestDistance) {
       bestDistance = distance;
       best = prototype.type;
@@ -375,6 +445,11 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   previousElement: ExcalidrawElement | null,
   zoom: number = 1,
 ): ShapeRecognitionResult<P> => {
+  // DEBUG (will be removed lated)
+  if (typeof window !== "undefined") {
+    window.LAST_POINTS = points.map(([x, y]) => pointFrom<GlobalPoint>(x, y));
+  }
+
   const boundingBox = getBoundsFromPoints(points);
 
   const [minX, minY, maxX, maxY] = boundingBox;
