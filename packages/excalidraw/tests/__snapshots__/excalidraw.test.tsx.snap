@@ -489,7 +489,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
         data-orientation="vertical"
         data-radix-collection-item=""
-        href="https://github.com/excalidraw/excalidraw"
+        href="https://github.com/GiraffeAir/Excalidraw-better"
         rel="noopener noopener"
         role="menuitem"
         tabindex="-1"

@@ -355,7 +355,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <a
         aria-label="GitHub"
         class="dropdown-menu-item dropdown-menu-item-base"
-        href="https://github.com/excalidraw/excalidraw"
+        href="https://github.com/GiraffeAir/Excalidraw-better"
         rel="noreferrer"
         target="_blank"
         title="GitHub"
