@@ -1,4 +1,5 @@
 import {
+  COORDS_PRECISION,
   DEFAULT_ADAPTIVE_RADIUS,
   DEFAULT_PROPORTIONAL_RADIUS,
   invariant,
@@ -20,6 +21,7 @@ import {
   pointRotateRads,
   pointTranslate,
   rectangle,
+  round,
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
@@ -751,4 +753,55 @@ export const projectFixedPointOntoDiagonal = (
   }
 
   return null;
+};
+
+const roundCoord = (value: number) => round(value, COORDS_PRECISION);
+
+const roundPoints = (points: readonly LocalPoint[]): readonly LocalPoint[] => {
+  let didChange = false;
+  const rounded = points.map((point) => {
+    const x = roundCoord(point[0]);
+    const y = roundCoord(point[1]);
+    if (x === point[0] && y === point[1]) {
+      return point;
+    }
+    didChange = true;
+    return pointFrom<LocalPoint>(x, y);
+  });
+  return didChange ? rounded : points;
+};
+
+const GEOMETRY_KEYS = ["x", "y", "width", "height"] as const;
+
+/**
+ * Rounds the geometry props (x, y, width, height, points) of an element
+ * or element update to `COORDS_PRECISION` decimals.
+ *
+ * NOTE: image crop is intentionally not rounded — it is derived data coupled
+ * to element width/height by exact natural-size ratios, so quantizing it
+ * independently would make crop recomputation drift by one rounding step.
+ */
+export const roundElementGeometry = <T extends object>(updates: T): T => {
+  const source = updates as any;
+  let result: any = null;
+  const copy = () => result ?? (result = { ...updates });
+
+  for (const key of GEOMETRY_KEYS) {
+    const value = source[key];
+    if (typeof value === "number") {
+      const rounded = roundCoord(value);
+      if (rounded !== value) {
+        copy()[key] = rounded;
+      }
+    }
+  }
+
+  if (Array.isArray(source.points)) {
+    const rounded = roundPoints(source.points);
+    if (rounded !== source.points) {
+      copy().points = rounded;
+    }
+  }
+
+  return result ?? updates;
 };

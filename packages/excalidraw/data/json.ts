@@ -1,4 +1,5 @@
 import {
+  COORDS_PRECISION,
   EXPORT_DATA_TYPES,
   getExportSource,
   MIME_TYPES,
@@ -21,6 +22,45 @@ import type {
   ExportedLibraryData,
   ImportedLibraryData,
 } from "./types";
+
+const SCALAR_ROUNDED_KEYS = new Set(["x", "y", "width", "height"]);
+
+// JSON.stringify encodes \x00 as \u0000 (6-char literal sequence) in the output
+// string. We use this as a sentinel so we can strip the surrounding quotes
+// afterward, emitting raw number tokens without a float round-trip.
+const PRECISION_SENTINEL = "\x00";
+const PRECISION_SENTINEL_RE = /"\\u0000([^"]+)\\u0000"/g;
+
+export const stringifyWithPrecision = (
+  value: unknown,
+  precision = COORDS_PRECISION,
+  space?: number | string,
+): string => {
+  const fmt = (n: number) =>
+    `${PRECISION_SENTINEL}${n.toFixed(precision)}${PRECISION_SENTINEL}`;
+
+  return JSON.stringify(
+    value,
+    function (key, val) {
+      if (
+        SCALAR_ROUNDED_KEYS.has(key) &&
+        typeof val === "number" &&
+        !(this && typeof this === "object" && "naturalWidth" in this)
+      ) {
+        return fmt(val);
+      }
+      if (key === "points" && Array.isArray(val)) {
+        return (val as number[][]).map((pt) =>
+          Array.isArray(pt)
+            ? pt.map((n) => (typeof n === "number" ? fmt(n) : n))
+            : pt,
+        );
+      }
+      return val;
+    },
+    space,
+  ).replace(PRECISION_SENTINEL_RE, "$1");
+};
 
 export type JSONExportData = {
   elements: readonly ExcalidrawElement[];
@@ -71,7 +111,7 @@ export const serializeAsJSON = (
           undefined,
   };
 
-  return JSON.stringify(data, null, 2);
+  return stringifyWithPrecision(data, COORDS_PRECISION, 2);
 };
 
 export const saveAsJSON = async ({
@@ -141,7 +181,7 @@ export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
     source: getExportSource(),
     libraryItems,
   };
-  return JSON.stringify(data, null, 2);
+  return stringifyWithPrecision(data, COORDS_PRECISION, 2);
 };
 
 export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {

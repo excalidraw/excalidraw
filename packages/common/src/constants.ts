@@ -555,3 +555,6 @@ export const MOBILE_ACTION_BUTTON_BG = {
 
 export const DEFAULT_STROKE_STREAMLINE = 0.5;
 export const DEFAULT_STROKE_STREAMLINE_PRECISE = 0.2;
+
+// Number of decimals element coordinates (x, y, width, height, points, crop)
+export const COORDS_PRECISION = 2;
