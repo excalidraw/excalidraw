@@ -111,8 +111,8 @@ describe("findShapeByKey()", () => {
   it("matches shift-bound tools only when shift is held", () => {
     const app = appWithPreferredTool("selection");
 
-    expect(findShapeByKey("X", app, true)).toBe("drawShape");
-    expect(findShapeByKey("x", app, true)).toBe("drawShape");
+    expect(findShapeByKey("X", app, true)).toBe("autoshape");
+    expect(findShapeByKey("x", app, true)).toBe("autoshape");
     // Pressing "X" while CapsLock is active (no shift) stays freedraw
     expect(findShapeByKey("X", app, false)).toBe("freedraw");
   });

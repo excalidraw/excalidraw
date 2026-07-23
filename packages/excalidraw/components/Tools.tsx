@@ -130,7 +130,7 @@ export const TOOLS = defineTools({
     icon: frameToolIcon,
     letterKey: KEYS.F,
   },
-  drawShape: {
+  autoshape: {
     icon: drawShapeToolIcon,
     letterKey: KEYS.X,
     shiftKey: true,
@@ -422,19 +422,19 @@ export const FreedrawToolPopover = ({
       title: capitalizeString(t("toolBar.freedraw")),
     },
     {
-      type: "drawShape",
-      icon: TOOLS.drawShape.icon,
-      fillable: TOOLS.drawShape.fillable,
-      title: capitalizeString(t("toolBar.drawShape")),
+      type: "autoshape",
+      icon: TOOLS.autoshape.icon,
+      fillable: TOOLS.autoshape.fillable,
+      title: capitalizeString(t("toolBar.autoshape")),
     },
   ] as const;
 
   const [lastDrawingTool, setLastDrawingTool] = useState<
     typeof DRAWING_TOOLS[number]["type"]
-  >(activeTool.type === "drawShape" ? "drawShape" : "freedraw");
+  >(activeTool.type === "autoshape" ? "autoshape" : "freedraw");
 
   useEffect(() => {
-    if (activeTool.type === "freedraw" || activeTool.type === "drawShape") {
+    if (activeTool.type === "freedraw" || activeTool.type === "autoshape") {
       setLastDrawingTool(activeTool.type);
     }
   }, [activeTool.type]);
@@ -451,7 +451,7 @@ export const FreedrawToolPopover = ({
       defaultOption={lastDrawingTool}
       data-testid="toolbar-freedraw"
       onToolChange={(type: string) => {
-        if (type === "freedraw" || type === "drawShape") {
+        if (type === "freedraw" || type === "autoshape") {
           setLastDrawingTool(type);
           app.setActiveTool({ type });
         }

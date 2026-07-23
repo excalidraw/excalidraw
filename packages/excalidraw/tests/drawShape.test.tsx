@@ -108,12 +108,12 @@ const circlePath = (
   return points;
 };
 
-describe("drawShape tool", () => {
+describe("autoshape tool", () => {
   beforeEach(async () => {
     localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
     act(() => {
-      h.app.setActiveTool({ type: "drawShape" });
+      h.app.setActiveTool({ type: "autoshape" });
     });
   });
 
@@ -131,11 +131,11 @@ describe("drawShape tool", () => {
     expect(h.elements[0].type).toBe("ellipse");
   });
 
-  it("keeps the drawShape tool active after finalizing a shape", () => {
+  it("keeps the autoshape tool active after finalizing a shape", () => {
     sketch(rectanglePath(100, 100, 200, 120));
 
     expect(h.elements).toHaveLength(1);
-    expect(h.state.activeTool.type).toBe("drawShape");
+    expect(h.state.activeTool.type).toBe("autoshape");
   });
 
   it("does not select the recognized element, so styles stay tool defaults", () => {
@@ -344,7 +344,7 @@ describe("drawShape tool", () => {
     expect(h.elements).toHaveLength(2);
     expect(h.elements[0].type).toBe("rectangle");
     expect(h.elements[1].type).toBe("ellipse");
-    expect(h.state.activeTool.type).toBe("drawShape");
+    expect(h.state.activeTool.type).toBe("autoshape");
   });
 
   it("ignores a sketch too small to be a shape", () => {
@@ -356,11 +356,11 @@ describe("drawShape tool", () => {
     ]);
 
     expect(h.elements).toHaveLength(0);
-    expect(h.state.activeTool.type).toBe("drawShape");
+    expect(h.state.activeTool.type).toBe("autoshape");
   });
 });
 
-describe("drawShape styles panel & selection (preview path)", () => {
+describe("autoshape styles panel & selection (preview path)", () => {
   /**
    * Unlike `sketch`, also drives the pointermove handler, so
    * `state.newElement` holds the live recognition preview mid-gesture the way
@@ -384,7 +384,7 @@ describe("drawShape styles panel & selection (preview path)", () => {
     localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
     act(() => {
-      h.app.setActiveTool({ type: "drawShape" });
+      h.app.setActiveTool({ type: "autoshape" });
     });
   });
 
@@ -394,7 +394,7 @@ describe("drawShape styles panel & selection (preview path)", () => {
     expect(h.elements.map((element) => element.type)).toEqual(["arrow"]);
     expect(h.state.selectedElementIds).toEqual({});
     expect(h.state.selectedLinearElement).toBeNull();
-    expect(h.state.activeTool.type).toBe("drawShape");
+    expect(h.state.activeTool.type).toBe("autoshape");
   });
 
   it("does not select a recognized rectangle drawn with a live preview", () => {
@@ -486,7 +486,7 @@ describe("drawShape styles panel & selection (preview path)", () => {
   });
 });
 
-describe("drawShape finalize funnel", () => {
+describe("autoshape finalize funnel", () => {
   /** starts a gesture and leaves the pointer down */
   const startSketch = (points: [number, number][]) => {
     const [startX, startY] = points[0];
@@ -504,7 +504,7 @@ describe("drawShape finalize funnel", () => {
     localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
     act(() => {
-      h.app.setActiveTool({ type: "drawShape" });
+      h.app.setActiveTool({ type: "autoshape" });
     });
   });
 
@@ -568,7 +568,7 @@ describe("drawShape finalize funnel", () => {
   });
 });
 
-describe("drawShape tool activation", () => {
+describe("autoshape tool activation", () => {
   beforeEach(async () => {
     localStorage.clear();
     await render(<Excalidraw handleKeyboardGlobally={true} />);
@@ -581,7 +581,7 @@ describe("drawShape tool activation", () => {
       Keyboard.keyPress(KEYS.X);
     });
 
-    expect(h.state.activeTool.type).toBe("drawShape");
+    expect(h.state.activeTool.type).toBe("autoshape");
   });
 
   it("is not activated by an unmodified X (freedraw's shortcut)", () => {
@@ -599,17 +599,17 @@ describe("drawShape tool activation", () => {
 
     fireEvent.click(
       document.querySelector<HTMLButtonElement>(
-        '[data-testid="toolbar-drawShape"]',
+        '[data-testid="toolbar-autoshape"]',
       )!,
     );
 
-    expect(h.state.activeTool.type).toBe("drawShape");
+    expect(h.state.activeTool.type).toBe("autoshape");
   });
 });
 
-describe("drawShape compact toolbar placement", () => {
+describe("autoshape compact toolbar placement", () => {
   it.each(["tablet", "phone"] as const)(
-    "groups drawShape under freedraw on %s",
+    "groups autoshape under freedraw on %s",
     async (formFactor) => {
       const { container } = await render(
         <Excalidraw UIOptions={{ getFormFactor: () => formFactor }} />,
@@ -626,13 +626,13 @@ describe("drawShape compact toolbar placement", () => {
 
       const drawShapeOption = await waitFor(() => {
         const option = document.querySelector<HTMLButtonElement>(
-          '.tool-popover-content [data-testid="toolbar-drawShape"]',
+          '.tool-popover-content [data-testid="toolbar-autoshape"]',
         );
         expect(option).not.toBeNull();
         return option!;
       });
       fireEvent.click(drawShapeOption);
-      expect(h.state.activeTool.type).toBe("drawShape");
+      expect(h.state.activeTool.type).toBe("autoshape");
       expect(freedrawTrigger).toHaveAttribute("aria-pressed", "true");
 
       const extraToolsTrigger = container.querySelector(
@@ -651,7 +651,7 @@ describe("drawShape compact toolbar placement", () => {
         return menu!;
       });
       expect(
-        extraTools.querySelector('[data-testid="toolbar-drawShape"]'),
+        extraTools.querySelector('[data-testid="toolbar-autoshape"]'),
       ).not.toBeNull();
     },
   );

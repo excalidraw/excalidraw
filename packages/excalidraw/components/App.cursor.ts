@@ -84,7 +84,7 @@ export class AppCursor {
       this.set(CURSOR_TYPE.GRAB);
     } else if (isEraserActive({ activeTool })) {
       this.applyEraser();
-    } else if (activeTool.type === "drawShape") {
+    } else if (activeTool.type === "autoshape") {
       this.set(CURSOR_TYPE.CROSSHAIR);
     } else if (activeTool.type === "laser") {
       const url =

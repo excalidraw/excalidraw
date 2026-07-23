@@ -104,8 +104,8 @@ const getHints = ({
     return t("hints.embeddable");
   }
 
-  if (activeTool.type === "drawShape") {
-    return t("hints.drawShape");
+  if (activeTool.type === "autoshape") {
+    return t("hints.autoshape");
   }
 
   if (

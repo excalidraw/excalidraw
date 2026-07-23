@@ -8656,7 +8656,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
-    } else if (this.state.activeTool.type === "drawShape") {
+    } else if (this.state.activeTool.type === "autoshape") {
       this.drawShape.handlePointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
@@ -11559,7 +11559,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         isLinearElement(newElement) &&
-        this.state.activeTool.type !== "drawShape"
+        this.state.activeTool.type !== "autoshape"
       ) {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
@@ -12252,7 +12252,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (activeTool.type === "drawShape") {
+      if (activeTool.type === "autoshape") {
         this.actionManager.executeAction(actionFinalize);
         return;
       }

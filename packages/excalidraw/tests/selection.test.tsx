@@ -1351,7 +1351,7 @@ describe("tool locking & selection", () => {
         // no top-level toolbar button (rendered in the extra-tools dropdown)
         value !== "frame" &&
         value !== "embeddable" &&
-        value !== "drawShape"
+        value !== "autoshape"
       ) {
         const element = UI.createElement(value);
         expect(h.state.selectedElementIds[element.id]).not.toBe(true);

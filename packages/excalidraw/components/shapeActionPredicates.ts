@@ -137,14 +137,14 @@ export const getShapeActionPredicates = (
       suppportsHorizontalAlign(targetElements, elementsMap),
     verticalAlign: shouldAllowVerticalAlign(targetElements, elementsMap),
 
-    opacity: activeToolType !== "drawShape" || hasSelection,
+    opacity: activeToolType !== "autoshape" || hasSelection,
 
     // arrangement
     // z-order controls are hidden while the freedraw or drawShape tool is
     // active without an actual selection
     layers:
       (activeToolType !== "freedraw" &&
-        activeToolType !== "drawShape" &&
+        activeToolType !== "autoshape" &&
         !targetElements.some((element) => element.type === "freedraw")) ||
       getSelectedElements(elementsMap, appState).some(
         (element) => element.type === "freedraw",

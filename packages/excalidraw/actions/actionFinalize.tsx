@@ -58,7 +58,7 @@ export const actionFinalize = register<FormData>({
     let newElements = elements;
     const { focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
-    const isDrawShapeTool = appState.activeTool.type === "drawShape";
+    const isDrawShapeTool = appState.activeTool.type === "autoshape";
 
     if (data && appState.selectedLinearElement) {
       const { event, sceneCoords } = data;
@@ -358,7 +358,7 @@ export const actionFinalize = register<FormData>({
     // the drawShape flow finalizes without a `newElement` (the sketch is
     // converted separately), so it stays active regardless of `element`
     const keepActiveTool =
-      appState.activeTool.type === "drawShape" ||
+      appState.activeTool.type === "autoshape" ||
       ((isToolLocked || appState.activeTool.type === "freedraw") && !!element);
 
     if (!keepActiveTool) {

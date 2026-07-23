@@ -224,7 +224,7 @@ export const getTargetElements = (
     : // the drawShape recognition preview in `newElement` is not a real
     // in-progress element — targeting it would make the styles panel track
     // whatever shape is currently recognized instead of the tool defaults
-    appState.newElement && appState.activeTool.type !== "drawShape"
+    appState.newElement && appState.activeTool.type !== "autoshape"
     ? [appState.newElement]
     : getSelectedElements(elements, appState, {
         includeBoundTextElement: true,

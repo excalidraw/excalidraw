@@ -73,7 +73,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   }, [activeTool.type]);
 
   const frameToolSelected = activeTool.type === "frame";
-  const drawShapeToolSelected = activeTool.type === "drawShape";
+  const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
 
@@ -289,14 +289,14 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             {t("toolBar.embeddable")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "drawShape" })}
+            onSelect={() => app.setActiveTool({ type: "autoshape" })}
             icon={drawShapeToolIcon}
-            shortcut={getToolShortcut("drawShape")}
-            data-testid="toolbar-drawShape"
+            shortcut={getToolShortcut("autoshape")}
+            data-testid="toolbar-autoshape"
             selected={drawShapeToolSelected}
-            disabled={isToolButtonDisabled(app, "drawShape")}
+            disabled={isToolButtonDisabled(app, "autoshape")}
           >
-            {t("toolBar.drawShape")}
+            {t("toolBar.autoshape")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}
