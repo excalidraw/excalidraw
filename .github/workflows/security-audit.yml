@@ -1,0 +1,128 @@
+# Security audit workflow
+# Runs dependency vulnerability scanning on schedule, on PRs, and manually
+name: Security Audit
+
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "yarn.lock"
+      - "excalidraw-app/package.json"
+      - "packages/*/package.json"
+      - "examples/*/package.json"
+      - ".github/workflows/security-audit.yml"
+      - ".github/dependabot.yml"
+  push:
+    branches: [master]
+    paths:
+      - "package.json"
+      - "yarn.lock"
+      - ".github/workflows/security-audit.yml"
+      - ".github/dependabot.yml"
+  schedule:
+    # Run weekly on Monday morning
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+    # Allow manual trigger for ad-hoc audits
+    inputs:
+      severity-threshold:
+        description: "Minimum severity to fail on"
+        required: true
+        default: "high"
+        type: choice
+        options:
+          - low
+          - moderate
+          - high
+          - critical
+
+permissions:
+  contents: read
+  # Required for Dependabot alert queries via gh api
+  dependabot-alerts: read
+
+jobs:
+  # ── npm / yarn audit ──────────────────────────────────────────────────────
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20.x
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # ── yarn audit (production deps only) ─────────────────────────────────
+      # Fails on critical severity by default; respects workflow_dispatch input
+      - name: Run yarn audit
+        env:
+          THRESHOLD: ${{ github.event.inputs.severity-threshold || 'critical' }}
+        run: |
+          echo "::group::yarn audit output"
+          yarn audit --groups dependencies --level high 2>&1 || true
+          echo "::endgroup::"
+
+          # Fail only on the configured threshold
+          echo "Severity threshold: ${THRESHOLD}"
+          if yarn audit --groups dependencies --level "${THRESHOLD}" 2>&1; then
+            echo "✅ No ${THRESHOLD}-severity vulnerabilities found in production dependencies"
+          else
+            echo "❌ ${THRESHOLD}-severity vulnerabilities found!"
+            yarn audit --groups dependencies --level "${THRESHOLD}"
+            exit 1
+          fi
+
+      # ── GitHub Advisory Database check ────────────────────────────────────
+      - name: Check GitHub Advisory Alerts
+        if: github.repository == 'excalidraw/excalidraw'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "::group::GitHub Advisory Alerts"
+          OPEN_ALERTS=$(gh api \
+            "repos/${{ github.repository }}/dependabot/alerts?state=open&per_page=10" \
+            --jq '.[] | "\(.security_advisory.severity | ascii_upcase): \(.security_advisory.summary)"' \
+            2>/dev/null) || OPEN_ALERTS=""
+          if [ -z "$OPEN_ALERTS" ]; then
+            echo "No open advisory alerts"
+          else
+            echo "$OPEN_ALERTS"
+          fi
+          echo "::endgroup::"
+
+      # ── Snyk Security Scan (optional, requires SNYK_TOKEN secret) ─────────
+      - name: Snyk Security Scan
+        if: ${{ secrets.SNYK_TOKEN != '' }}
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          echo "::group::Snyk Open Source scan"
+          npx snyk test --severity-threshold=high --all-projects \
+            --exclude="examples/*" 2>&1 || true
+          echo "::endgroup::"
+
+  # ── License check ─────────────────────────────────────────────────────────
+  license-check:
+    name: License check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20.x
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Check for copyleft licenses in production deps
+        run: |
+          echo "::group::Production dependency license check"
+          yarn licenses list --production --no-private 2>/dev/null | \
+            grep -iE '(gpl|agpl)' && \
+            (echo "⚠️  Copyleft license found in some production dependencies" && exit 1) || \
+            echo "✅ No copyleft licenses found in production dependencies"
+          echo "::endgroup::"

@@ -1065,8 +1065,10 @@ class App extends React.Component<AppProps, AppState> {
     let data = null;
     try {
       data = JSON.parse(event.data);
-    } catch (e) {}
-    if (!data) {
+    } catch (e) {
+        console.warn("Error parsing message event data:", e);
+      }
+      if (!data) {
       return;
     }
 

@@ -431,7 +431,7 @@ export const resolvablePromise = <T>() => {
 //https://stackoverflow.com/a/9462382/8418
 export const nFormatter = (num: number, digits: number): string => {
   const si = [
-    { value: 1, symbol: "b" },
+    { value: 1, symbol: "" },
     { value: 1e3, symbol: "k" },
     { value: 1e6, symbol: "M" },
     { value: 1e9, symbol: "G" },
