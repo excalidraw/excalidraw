@@ -109,7 +109,7 @@ export class AppCursor {
     const cursorImageSizePx = 20;
     const theme = this.app.state.theme;
 
-    if (!this.dotCursorCanvasCache || this.dotCursorCanvasCache.theme !== theme) {
+    if (this.dotCursorCanvasCache?.theme !== theme) {
       const isDarkTheme = theme === THEME.DARK;
       this.dotCursorCanvasCache = document.createElement("canvas");
       this.dotCursorCanvasCache.theme = theme;
