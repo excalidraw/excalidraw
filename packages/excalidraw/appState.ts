@@ -293,7 +293,7 @@ export const clearAppStateForLocalStorage = (appState: Partial<AppState>) => {
   return _clearAppStateForStorage(appState, "browser");
 };
 
-export const cleanAppStateForExport = (appState: Partial<AppState>) => {
+export const clearAppStateForExport = (appState: Partial<AppState>) => {
   return _clearAppStateForStorage(appState, "export");
 };
 
