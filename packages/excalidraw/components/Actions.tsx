@@ -162,14 +162,11 @@ export const SelectedShapeActions = ({
 
       {predicates.strokeWidth && renderAction("changeStrokeWidth")}
 
+      {predicates.strokeStyle && <>{renderAction("changeStrokeStyle")}</>}
+
       {predicates.freedrawMode && renderAction("changeFreedrawMode")}
 
-      {predicates.strokeStyle && (
-        <>
-          {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
-        </>
-      )}
+      {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
 
       {predicates.roundness && <>{renderAction("changeRoundness")}</>}
 
@@ -186,9 +183,9 @@ export const SelectedShapeActions = ({
       {predicates.verticalAlign && renderAction("changeVerticalAlign")}
       {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
 
-      {renderAction("changeOpacity")}
+      {predicates.opacity && renderAction("changeOpacity")}
 
-      <LayersFieldset renderAction={renderAction} />
+      {predicates.layers && <LayersFieldset renderAction={renderAction} />}
 
       {predicates.align && (
         <AlignFieldset
@@ -289,13 +286,11 @@ const CombinedShapeProperties = ({
                 predicates.freedrawMode && renderAction("changeFreedrawMode")
               }
               {predicates.strokeStyle && (
-                <>
-                  {renderAction("changeStrokeStyle")}
-                  {renderAction("changeSloppiness")}
-                </>
+                <>{renderAction("changeStrokeStyle")}</>
               )}
+              {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
-              {renderAction("changeOpacity")}
+              {predicates.opacity && renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>
         )}
@@ -321,11 +316,11 @@ const CombinedArrowProperties = ({
   container: HTMLDivElement | null;
   app: AppClassProperties;
 }) => {
-  const isOpen = appState.openPopup === "compactArrowProperties";
-
   if (!predicates.arrowType) {
     return null;
   }
+
+  const isOpen = appState.openPopup === "compactArrowProperties";
 
   return (
     <div className="compact-action-item">
@@ -549,7 +544,9 @@ const CombinedExtraActions = ({
             onClose={() => {}}
           >
             <div className="selected-shape-actions">
-              <LayersFieldset renderAction={renderAction} />
+              {predicates.layers && (
+                <LayersFieldset renderAction={renderAction} />
+              )}
 
               {predicates.align && (
                 <AlignFieldset

@@ -23,6 +23,7 @@ import { alignActionsPredicate } from "../actions/actionAlign";
 import {
   canChangeRoundness,
   canHaveArrowheads,
+  getSelectedElements,
   hasBackground,
   hasFreedrawMode,
   hasStrokeStyle,
@@ -124,6 +125,7 @@ export const getShapeActionPredicates = (
     strokeWidth: forToolOrSelection(hasStrokeWidth),
     freedrawMode: forToolOrSelection(hasFreedrawMode),
     strokeStyle: forToolOrSelection(hasStrokeStyle),
+    sloppiness: forToolOrSelection(hasStrokeStyle),
     roundness: forToolOrSelection(canChangeRoundness),
     arrowType: forToolOrSelection(toolIsArrow),
     arrowheads: forToolOrSelection(canHaveArrowheads),
@@ -135,7 +137,18 @@ export const getShapeActionPredicates = (
       suppportsHorizontalAlign(targetElements, elementsMap),
     verticalAlign: shouldAllowVerticalAlign(targetElements, elementsMap),
 
+    opacity: activeToolType !== "autoshape" || hasSelection,
+
     // arrangement
+    // z-order controls are hidden while the freedraw or drawShape tool is
+    // active without an actual selection
+    layers:
+      (activeToolType !== "freedraw" &&
+        activeToolType !== "autoshape" &&
+        !targetElements.some((element) => element.type === "freedraw")) ||
+      getSelectedElements(elementsMap, appState).some(
+        (element) => element.type === "freedraw",
+      ),
     align:
       !isSingleElementBoundContainer && alignActionsPredicate(appState, app),
     distribute: targetElements.length > 2,

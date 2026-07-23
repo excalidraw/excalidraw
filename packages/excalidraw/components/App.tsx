@@ -431,6 +431,7 @@ import ConvertElementTypePopup, {
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppCursor } from "./App.cursor";
+import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -708,6 +709,8 @@ class App extends React.Component<AppProps, AppState> {
   private removedArrowheads = new Map<string, Arrowhead>();
   /** previous frame pointer coords */
   previousPointerMoveCoords: { x: number; y: number } | null = null;
+
+  drawShape = new AppDrawShape(this);
   laserTrails = new LaserTrails(this);
   eraserTrail = new EraserTrail(this);
   lassoTrail = new LassoTrail(this);
@@ -2438,6 +2441,7 @@ class App extends React.Component<AppProps, AppState> {
                               this.laserTrails,
                               this.lassoTrail,
                               this.eraserTrail,
+                              this.drawShape.trail,
                             ]}
                           />
                           {this.isDefaultUIEnabled() && <CursorHint />}
@@ -3785,6 +3789,7 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
     this.library.destroy();
     this.laserTrails.stop();
+    this.drawShape.stop();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
@@ -5499,14 +5504,11 @@ class App extends React.Component<AppProps, AppState> {
         !event.ctrlKey &&
         !event.altKey &&
         !event.metaKey &&
-        // so that an uppercase letter can only mean CapsLock (Shift+letter
-        // must not switch tools — findShapeByKey lowercases the key)
-        !event.shiftKey &&
         !this.state.newElement &&
         !this.state.selectionElement &&
         !this.state.selectedElementsAreBeingDragged
       ) {
-        const shape = findShapeByKey(event.key, this);
+        const shape = findShapeByKey(event.key, this, event.shiftKey);
 
         if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
           return;
@@ -5948,6 +5950,13 @@ class App extends React.Component<AppProps, AppState> {
         `"${tool.type}" tool activation ignored — the active tool is controlled by the host via "props.activeTool"`,
       );
       return;
+    }
+
+    if (this.drawShape.hasPendingGesture()) {
+      // switching tools mid-sketch (e.g. paste resets to the selection tool)
+      // must not strand the gesture — commit it through the finalize funnel
+      // while the drawShape tool is still active
+      this.actionManager.executeAction(actionFinalize);
     }
 
     const isToggleTool = TOGGLE_TOOLS.includes(tool.type);
@@ -7510,7 +7519,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private insertNewElement = (element: ExcalidrawElement) => {
+  public insertNewElement = (element: ExcalidrawElement) => {
     this.insertNewElements([element]);
 
     const frame = element.frameId
@@ -8677,6 +8686,8 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+    } else if (this.state.activeTool.type === "autoshape") {
+      this.drawShape.handlePointerDown(pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -10478,6 +10489,10 @@ class App extends React.Component<AppProps, AppState> {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
       }
 
+      if (this.drawShape.handlePointerMove(pointerCoords)) {
+        return;
+      }
+
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
@@ -11572,7 +11587,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (isLinearElement(newElement)) {
+      if (
+        isLinearElement(newElement) &&
+        this.state.activeTool.type !== "autoshape"
+      ) {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
@@ -12261,6 +12279,11 @@ class App extends React.Component<AppProps, AppState> {
 
       if (activeTool.type === "laser") {
         this.laserTrails.endPath();
+        return;
+      }
+
+      if (activeTool.type === "autoshape") {
+        this.actionManager.executeAction(actionFinalize);
         return;
       }
 

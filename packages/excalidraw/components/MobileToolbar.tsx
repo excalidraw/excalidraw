@@ -12,7 +12,8 @@ import { ToolPopover } from "./ToolPopover";
 import {
   EraserToolButton,
   FrameToolButton,
-  FreedrawToolButton,
+  FreedrawToolPopover,
+  getToolShortcut,
   HandToolButton,
   ImageToolButton,
   isToolButtonDisabled,
@@ -24,10 +25,11 @@ import {
 import {
   TextIcon,
   ImageIcon,
-  extraToolsIcon,
+  DotsIcon,
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
+  drawShapeToolIcon,
   mermaidLogoIcon,
   MagicIcon,
 } from "./icons";
@@ -71,6 +73,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   }, [activeTool.type]);
 
   const frameToolSelected = activeTool.type === "frame";
+  const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
 
@@ -131,8 +134,8 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       ? laserPointerToolIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
-      : extraToolsIcon
-    : extraToolsIcon;
+      : DotsIcon
+    : DotsIcon;
 
   const toolProps = { app, activeTool };
 
@@ -152,7 +155,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       <SelectionToolPopover {...toolProps} setAppState={setAppState} />
 
       {/* Free Draw */}
-      <FreedrawToolButton {...toolProps} hideShortcut />
+      <FreedrawToolPopover {...toolProps} />
 
       {/* Eraser */}
       <EraserToolButton {...toolProps} hideShortcut />
@@ -284,6 +287,16 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             disabled={isToolButtonDisabled(app, "embeddable")}
           >
             {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "autoshape" })}
+            icon={drawShapeToolIcon}
+            shortcut={getToolShortcut("autoshape")}
+            data-testid="toolbar-autoshape"
+            selected={drawShapeToolSelected}
+            disabled={isToolButtonDisabled(app, "autoshape")}
+          >
+            {t("toolBar.autoshape")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}

@@ -102,3 +102,4 @@ export * from "./utils";
 export * from "./zindex";
 export * from "./arrows/helpers";
 export * from "./arrowheads";
+export * from "./convertToShape";
