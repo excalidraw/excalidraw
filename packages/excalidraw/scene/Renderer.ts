@@ -2,6 +2,7 @@ import {
   getCommonFrameId,
   getFrameChildrenInsertionIndex,
   isElementInViewport,
+  isElementInVisibleLayer,
 } from "@excalidraw/element";
 
 import { arrayToMap, memoize, toBrandedType } from "@excalidraw/common";
@@ -35,6 +36,7 @@ type GetRenderableElementsOpts = {
   selectedElements: readonly NonDeletedExcalidrawElement[];
   selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
   frameToHighlight: AppState["frameToHighlight"];
+  layers: AppState["layers"];
 };
 
 export class Renderer {
@@ -90,16 +92,23 @@ export class Renderer {
     elements,
     editingTextElement,
     newElement,
+    layers,
   }: {
     elements: readonly NonDeletedExcalidrawElement[];
     editingTextElement: AppState["editingTextElement"];
     newElement: AppState["newElement"];
+    layers: AppState["layers"];
   }) {
     const elementsMap = toBrandedType<RenderableElementsMap>(new Map());
     const newElementCanvasElement = newElement?.frameId ? null : newElement;
 
     for (const element of elements) {
       if (newElementCanvasElement?.id === element.id) {
+        continue;
+      }
+
+      // Skip elements on hidden layers
+      if (!isElementInVisibleLayer(element, layers)) {
         continue;
       }
 
@@ -168,6 +177,7 @@ export class Renderer {
       width,
       editingTextElement,
       newElement,
+      layers,
     }: Omit<
       GetRenderableElementsOpts,
       | "selectedElements"
@@ -183,6 +193,7 @@ export class Renderer {
           elements,
           editingTextElement,
           newElement,
+          layers,
         });
 
       const visibleElements = this.getVisibleCanvasElements({
@@ -225,6 +236,7 @@ export class Renderer {
       width: opts.width,
       editingTextElement: opts.editingTextElement,
       newElement: opts.newElement,
+      layers: opts.layers,
     });
 
     // if we're dragging elements over a frame, reorder the selected elements

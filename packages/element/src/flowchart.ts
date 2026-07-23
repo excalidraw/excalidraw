@@ -244,6 +244,7 @@ const cloneFlowchartNode = (
     opacity: template.opacity,
     fillStyle: template.fillStyle,
     strokeStyle: template.strokeStyle,
+    layerId: template.layerId,
   });
 
   invariant(

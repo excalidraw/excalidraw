@@ -22,6 +22,7 @@ export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
 export type Theme = typeof THEME[keyof typeof THEME];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
+export type LayerId = string;
 export type PointerType = "mouse" | "pen" | "touch";
 export type StrokeRoundness = "round" | "sharp";
 export type RoundnessType = ValueOf<typeof ROUNDNESS>;
@@ -36,6 +37,23 @@ export type BoundElement = Readonly<{
   id: ExcalidrawLinearElement["id"];
   type: "arrow" | "text";
 }>;
+
+/**
+ * Layer definition for organizing elements.
+ * Layers provide visibility control, locking, and organizational grouping.
+ */
+export type Layer = {
+  /** Unique identifier for the layer */
+  id: LayerId;
+  /** User-editable display name */
+  name: string;
+  /** Whether elements on this layer are rendered */
+  visible: boolean;
+  /** Whether elements on this layer can be selected/edited */
+  locked: boolean;
+  /** Ordering index (higher = renders on top in layer panel, but layers don't affect element z-order) */
+  order: number;
+};
 
 type _ExcalidrawElementBase = Readonly<{
   id: string;
@@ -72,6 +90,8 @@ type _ExcalidrawElementBase = Readonly<{
       Ordered from deepest to shallowest. */
   groupIds: readonly GroupId[];
   frameId: string | null;
+  /** ID of the layer this element belongs to. null = default layer (backward compatible) */
+  layerId: LayerId | null;
   /** other elements that are bound to this element */
   boundElements: readonly BoundElement[] | null;
   /** epoch (ms) timestamp of last element update */

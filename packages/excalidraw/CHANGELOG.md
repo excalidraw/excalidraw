@@ -208,6 +208,16 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
 
 ## Excalidraw Library
 
+### Features
+
+- Layers system for organizing elements [#7725](https://github.com/excalidraw/excalidraw/issues/7725)
+  - Create, rename, delete, and reorder layers
+  - Toggle layer visibility
+  - Assign elements to layers
+  - Multi-select layers with Cmd/Ctrl + Click
+  - Merge selected layers or merge all layers
+  - Layers panel in the sidebar
+
 ### Breaking changes
 
 - `updateActiveTool` (from `@excalidraw/common`): the `lastActiveToolBeforeEraser` property of the `data` parameter was renamed to `lastActiveTool` (it was already stored under that name on `appState.activeTool`, and is no longer eraser-specific).

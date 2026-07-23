@@ -2106,6 +2106,17 @@ export const eyeClosedIcon = createIcon(
   tablerIconProps,
 );
 
+// tabler-icons: stack-2
+export const layersIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 4l-8 4l8 4l8 -4l-8 -4" />
+    <path d="M4 12l8 4l8 -4" />
+    <path d="M4 16l8 4l8 -4" />
+  </g>,
+  tablerIconProps,
+);
+
 export const brainIcon = createIcon(
   <g stroke="currentColor" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -2544,6 +2555,14 @@ export const chevronRight = createIcon(
   tablerIconProps,
 );
 
+export const chevronUpIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 15l6 -6l6 6" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: adjustments-horizontal
 export const settingsIcon = createIcon(
   <g strokeWidth={1.25}>
@@ -2557,6 +2576,14 @@ export const settingsIcon = createIcon(
     <path d="M17 18m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
     <path d="M4 18l11 0" />
     <path d="M19 18l1 0" />
+  </g>,
+  tablerIconProps,
+);
+
+export const chevronDownIcon = createIcon(
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M6 9l6 6l6 -6" />
   </g>,
   tablerIconProps,
 );
