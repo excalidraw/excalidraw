@@ -7,8 +7,6 @@ import {
 
 import type { NullableGridSize } from "@excalidraw/excalidraw/types";
 
-import type { Bounds } from "./bounds";
-
 export const getSizeFromPoints = (
   points: readonly (GlobalPoint | LocalPoint)[],
 ) => {
@@ -80,30 +78,4 @@ export const getGridPoint = (
     );
   }
   return pointFrom<GlobalPoint>(x, y);
-};
-
-export const getElementBoundsFromPoints = <P extends LocalPoint | GlobalPoint>(
-  points: readonly P[],
-): Bounds => {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-
-  for (const [x, y] of points) {
-    if (x < minX) {
-      minX = x;
-    }
-    if (y < minY) {
-      minY = y;
-    }
-    if (x > maxX) {
-      maxX = x;
-    }
-    if (y > maxY) {
-      maxY = y;
-    }
-  }
-
-  return [minX, minY, maxX, maxY];
 };

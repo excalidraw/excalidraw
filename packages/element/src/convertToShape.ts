@@ -1,4 +1,7 @@
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import {
+  getBoundsFromPoints,
+  getElementAbsoluteCoords,
+} from "@excalidraw/element/bounds";
 import {
   newArrowElement,
   newElement,
@@ -6,7 +9,6 @@ import {
 } from "@excalidraw/element/newElement";
 import {
   ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
-  getElementBoundsFromPoints,
   getStrokeWidthByKey,
   ROUNDNESS,
 } from "@excalidraw/common";
@@ -220,7 +222,7 @@ function extractFeatures<P extends LocalPoint | GlobalPoint>(
     hull,
     HULL_CORNER_ANGLE_THRESHOLD,
   ).length;
-  const [minX, minY, maxX, maxY] = getElementBoundsFromPoints(pts);
+  const [minX, minY, maxX, maxY] = getBoundsFromPoints(pts);
   const boxArea = (maxX - minX) * (maxY - minY);
 
   return {
@@ -373,7 +375,7 @@ export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   previousElement: ExcalidrawElement | null,
   zoom: number = 1,
 ): ShapeRecognitionResult<P> => {
-  const boundingBox = getElementBoundsFromPoints(points);
+  const boundingBox = getBoundsFromPoints(points);
 
   const [minX, minY, maxX, maxY] = boundingBox;
   const maxDim = Math.max(maxX - minX, maxY - minY);
