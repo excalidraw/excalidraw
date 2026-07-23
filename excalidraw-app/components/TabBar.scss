@@ -1,0 +1,169 @@
+// CSS variables from the Excalidraw theme are scoped to `.excalidraw`, but
+// the tab bar lives outside that subtree. Re-declare the few variables we
+// rely on (mirroring packages/excalidraw/css/theme.scss) so the bar styles
+// resolve in both light and dark themes.
+
+.excalidraw-tabbar {
+  --excalidraw-tabbar-bg: #ececf4;
+  --excalidraw-tabbar-bg-hover: #f6f6f9;
+  --excalidraw-tabbar-bg-active: #ffffff;
+  --excalidraw-tabbar-bg-strong: #f1f0ff;
+  --excalidraw-tabbar-border: #f1f0ff;
+  --excalidraw-tabbar-fg: #1b1b1f;
+  --excalidraw-tabbar-fg-active: #6965db;
+
+  display: flex;
+  align-items: stretch;
+  height: 36px;
+  flex: 0 0 auto;
+  background-color: var(--excalidraw-tabbar-bg);
+  border-bottom: 1px solid var(--excalidraw-tabbar-border);
+  font-family: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
+    Helvetica Neue, Cantarell, Ubuntu, Roboto, Noto Sans, Oxygen, sans-serif;
+  font-size: 0.8125rem;
+  color: var(--excalidraw-tabbar-fg);
+  user-select: none;
+  z-index: 5;
+
+  &__scroll {
+    display: flex;
+    flex: 1 1 auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--excalidraw-tabbar-bg-strong);
+      border-radius: 2px;
+    }
+  }
+
+  &__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 110px;
+    max-width: 220px;
+    padding: 0 0.5rem 0 0.75rem;
+    height: 100%;
+    border-right: 1px solid var(--excalidraw-tabbar-border);
+    cursor: pointer;
+    background-color: transparent;
+    color: var(--excalidraw-tabbar-fg);
+    transition: background-color 0.12s ease;
+    position: relative;
+    flex: 0 0 auto;
+
+    &:hover {
+      background-color: var(--excalidraw-tabbar-bg-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--excalidraw-tabbar-fg-active);
+      outline-offset: -2px;
+    }
+
+    &.excalidraw-tabbar__tab--active {
+      background-color: var(--excalidraw-tabbar-bg-active);
+      color: var(--excalidraw-tabbar-fg-active);
+      font-weight: 600;
+      box-shadow: inset 0 -3px 0 var(--excalidraw-tabbar-fg-active),
+        inset 0 1px 0 var(--excalidraw-tabbar-fg-active);
+    }
+
+    &.excalidraw-tabbar__tab--drop-target {
+      background-color: var(--excalidraw-tabbar-bg-hover);
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        background-color: var(--excalidraw-tabbar-fg-active);
+        border-radius: 1px;
+      }
+    }
+  }
+
+  &__name {
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1;
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    min-width: 60px;
+    background-color: var(--excalidraw-tabbar-bg-active);
+    color: var(--excalidraw-tabbar-fg);
+    border: 1px solid var(--excalidraw-tabbar-fg-active);
+    border-radius: 3px;
+    padding: 2px 4px;
+    font: inherit;
+    outline: none;
+  }
+
+  &__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    color: var(--excalidraw-tabbar-fg);
+    border-radius: 3px;
+    cursor: pointer;
+    opacity: 0.55;
+
+    &:hover {
+      opacity: 1;
+      background-color: var(--excalidraw-tabbar-bg-strong);
+    }
+  }
+
+  &__new {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 100%;
+    border: 0;
+    border-left: 1px solid var(--excalidraw-tabbar-border);
+    background-color: transparent;
+    color: var(--excalidraw-tabbar-fg);
+    cursor: pointer;
+    flex: 0 0 auto;
+
+    &:hover {
+      background-color: var(--excalidraw-tabbar-bg-hover);
+      color: var(--excalidraw-tabbar-fg-active);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--excalidraw-tabbar-fg-active);
+      outline-offset: -2px;
+    }
+  }
+}
+
+// Dark theme overrides. We piggy-back on Excalidraw's theme class which is
+// applied to the html element by the app shell.
+html.dark .excalidraw-tabbar,
+.theme--dark .excalidraw-tabbar {
+  --excalidraw-tabbar-bg: hsl(240, 8%, 15%);
+  --excalidraw-tabbar-bg-hover: hsl(240, 6%, 10%);
+  --excalidraw-tabbar-bg-active: hsl(0, 0%, 7%);
+  --excalidraw-tabbar-bg-strong: #2e2d39;
+  --excalidraw-tabbar-border: #2e2d39;
+  --excalidraw-tabbar-fg: #e3e3e8;
+  --excalidraw-tabbar-fg-active: #a8a5ff;
+}
