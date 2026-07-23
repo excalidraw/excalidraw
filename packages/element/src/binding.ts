@@ -1174,11 +1174,13 @@ export const unbindBindingElement = (
     const boundElement = scene
       .getNonDeletedElementsMap()
       .get(binding.elementId) as NonDeleted<ExcalidrawBindableElement>;
-    scene.mutateElement(boundElement, {
-      boundElements: boundElement.boundElements?.filter(
-        (element) => element.id !== arrow.id,
-      ),
-    });
+    if (boundElement) {
+      scene.mutateElement(boundElement, {
+        boundElements: boundElement.boundElements?.filter(
+          (element) => element.id !== arrow.id,
+        ),
+      });
+    }
   }
 
   scene.mutateElement(arrow, { [field]: null });
