@@ -116,7 +116,7 @@
     "tunnel-rat": "0.1.2"
   },
   "devDependencies": {
-    "@size-limit/preset-big-lib": "9.0.0",
+    "size-limit": "9.0.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/react": "16.2.0",

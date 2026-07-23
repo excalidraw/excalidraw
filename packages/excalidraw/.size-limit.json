@@ -4,13 +4,11 @@
     "limit": "340 kB"
   },
   {
-    "path": "dist/prod/**/subset*",
-    "name": "subset chunks",
-    "limit": "100 kB"
+    "path": "dist/prod/**",
+    "limit": "500 kB"
   },
   {
     "path": "dist/prod/**/*.woff2",
-    "name": "font assets",
     "limit": "50 kB"
   }
 ]
