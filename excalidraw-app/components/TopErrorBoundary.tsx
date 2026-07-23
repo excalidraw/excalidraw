@@ -66,7 +66,7 @@ export class TopErrorBoundary extends React.Component<
     }
 
     window.open(
-      `https://github.com/excalidraw/excalidraw/issues/new?body=${body}`,
+      `https://github.com/GiraffeAir/Excalidraw-better/issues/new?body=${body}`,
       "_blank",
       "noopener noreferrer",
     );

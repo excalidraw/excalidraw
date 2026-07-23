@@ -30,8 +30,8 @@ jobs:
       - name: Build
         env:
           VITE_APP_DISABLE_SENTRY: "true"
-          VITE_APP_BASE_PATH: "/excalidraw/"
-          VITE_APP_SITEMAP_HOSTNAME: "https://giraffeair.github.io/excalidraw"
+          VITE_APP_BASE_PATH: "/Excalidraw-better/"
+          VITE_APP_SITEMAP_HOSTNAME: "https://giraffeair.github.io/Excalidraw-better"
         run: yarn --cwd ./excalidraw-app build:app:docker
       - name: Generate version info
         run: yarn --cwd ./excalidraw-app build:version
