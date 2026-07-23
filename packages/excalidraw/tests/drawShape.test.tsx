@@ -9,7 +9,7 @@ import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
-import { GlobalTestState, act, fireEvent, render } from "./test-utils";
+import { GlobalTestState, act, fireEvent, render, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -605,4 +605,54 @@ describe("drawShape tool activation", () => {
 
     expect(h.state.activeTool.type).toBe("drawShape");
   });
+});
+
+describe("drawShape compact toolbar placement", () => {
+  it.each(["tablet", "phone"] as const)(
+    "groups drawShape under freedraw on %s",
+    async (formFactor) => {
+      const { container } = await render(
+        <Excalidraw UIOptions={{ getFormFactor: () => formFactor }} />,
+      );
+      fireEvent.resize(window);
+      await waitFor(() =>
+        expect(h.app.editorInterface.formFactor).toBe(formFactor),
+      );
+
+      const freedrawTrigger = container.querySelector(
+        '[data-testid="toolbar-freedraw"]',
+      )!;
+      fireEvent.click(freedrawTrigger);
+
+      const drawShapeOption = await waitFor(() => {
+        const option = document.querySelector<HTMLButtonElement>(
+          '.tool-popover-content [data-testid="toolbar-drawShape"]',
+        );
+        expect(option).not.toBeNull();
+        return option!;
+      });
+      fireEvent.click(drawShapeOption);
+      expect(h.state.activeTool.type).toBe("drawShape");
+      expect(freedrawTrigger).toHaveAttribute("aria-pressed", "true");
+
+      const extraToolsTrigger = container.querySelector(
+        ".App-toolbar__extra-tools-trigger",
+      )!;
+      expect(extraToolsTrigger).not.toHaveClass(
+        "App-toolbar__extra-tools-trigger--selected",
+      );
+
+      fireEvent.click(extraToolsTrigger);
+      const extraTools = await waitFor(() => {
+        const menu = document.querySelector(
+          ".App-toolbar__extra-tools-dropdown",
+        );
+        expect(menu).not.toBeNull();
+        return menu!;
+      });
+      expect(
+        extraTools.querySelector('[data-testid="toolbar-drawShape"]'),
+      ).not.toBeNull();
+    },
+  );
 });

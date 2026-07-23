@@ -45,7 +45,7 @@ export const ToolPopover = ({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const currentType = activeTool.type;
   const isActive = displayedOption.type === currentType;
-  const SIDE_OFFSET = 32 / 2 + 10;
+  const SIDE_OFFSET = 16;
   const { container } = useExcalidrawContainer();
 
   // if currentType is not in options, close popup

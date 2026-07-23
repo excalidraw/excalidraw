@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { useEffect, useState } from "react";
 
 import { KEYS, capitalizeString } from "@excalidraw/common";
 
@@ -133,7 +134,7 @@ export const TOOLS = defineTools({
     icon: drawShapeToolIcon,
     letterKey: KEYS.X,
     shiftKey: true,
-    fillable: true,
+    fillable: false,
   },
   embeddable: {
     icon: EmbedIcon,
@@ -395,6 +396,64 @@ export const SelectionToolPopover = ({
           setAppState({
             preferredSelectionTool: { type, initialized: true },
           });
+        }
+      }}
+      displayedOption={displayedOption}
+    />
+  );
+};
+
+/**
+ * The freedraw ⇄ draw-shape popover used in compact (tablet) and mobile
+ * toolbars. The trigger remembers and displays the most recently used option.
+ */
+export const FreedrawToolPopover = ({
+  app,
+  activeTool,
+}: {
+  app: AppClassProperties;
+  activeTool: UIAppState["activeTool"];
+}) => {
+  const DRAWING_TOOLS = [
+    {
+      type: "freedraw",
+      icon: TOOLS.freedraw.icon,
+      fillable: TOOLS.freedraw.fillable,
+      title: capitalizeString(t("toolBar.freedraw")),
+    },
+    {
+      type: "drawShape",
+      icon: TOOLS.drawShape.icon,
+      fillable: TOOLS.drawShape.fillable,
+      title: capitalizeString(t("toolBar.drawShape")),
+    },
+  ] as const;
+
+  const [lastDrawingTool, setLastDrawingTool] = useState<
+    typeof DRAWING_TOOLS[number]["type"]
+  >(activeTool.type === "drawShape" ? "drawShape" : "freedraw");
+
+  useEffect(() => {
+    if (activeTool.type === "freedraw" || activeTool.type === "drawShape") {
+      setLastDrawingTool(activeTool.type);
+    }
+  }, [activeTool.type]);
+
+  const displayedOption =
+    DRAWING_TOOLS.find((tool) => tool.type === lastDrawingTool) ||
+    DRAWING_TOOLS[0];
+
+  return (
+    <ToolPopover
+      app={app}
+      options={DRAWING_TOOLS}
+      activeTool={activeTool}
+      defaultOption={lastDrawingTool}
+      data-testid="toolbar-freedraw"
+      onToolChange={(type: string) => {
+        if (type === "freedraw" || type === "drawShape") {
+          setLastDrawingTool(type);
+          app.setActiveTool({ type });
         }
       }}
       displayedOption={displayedOption}

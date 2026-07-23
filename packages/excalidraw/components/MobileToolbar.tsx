@@ -12,7 +12,7 @@ import { ToolPopover } from "./ToolPopover";
 import {
   EraserToolButton,
   FrameToolButton,
-  FreedrawToolButton,
+  FreedrawToolPopover,
   getToolShortcut,
   HandToolButton,
   ImageToolButton,
@@ -110,7 +110,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const showFrameToolOutside = toolbarWidth >= MIN_WIDTH + 3 * ADDITIONAL_WIDTH;
 
   const extraTools: readonly typeof activeTool.type[] = (
-    ["text", "frame", "embeddable", "drawShape", "laser", "magicframe"] as const
+    ["text", "frame", "embeddable", "laser", "magicframe"] as const
   ).filter((tool) => {
     if (showTextToolOutside && tool === "text") {
       return false;
@@ -130,8 +130,6 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       ? frameToolIcon
       : activeTool.type === "embeddable"
       ? EmbedIcon
-      : activeTool.type === "drawShape"
-      ? drawShapeToolIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
       : activeTool.type === "magicframe"
@@ -157,7 +155,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       <SelectionToolPopover {...toolProps} setAppState={setAppState} />
 
       {/* Free Draw */}
-      <FreedrawToolButton {...toolProps} hideShortcut />
+      <FreedrawToolPopover {...toolProps} />
 
       {/* Eraser */}
       <EraserToolButton {...toolProps} hideShortcut />

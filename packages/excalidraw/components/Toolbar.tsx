@@ -28,6 +28,7 @@ import {
   DiamondToolButton,
   EllipseToolButton,
   EraserToolButton,
+  FreedrawToolPopover,
   FreedrawToolButton,
   getToolShortcut,
   HandToolButton,
@@ -77,7 +78,7 @@ const ExtraToolsDropdown = ({
           "App-toolbar__extra-tools-trigger--selected":
             frameToolSelected ||
             embeddableToolSelected ||
-            drawShapeToolSelected ||
+            (isFullStylesPanel && drawShapeToolSelected) ||
             lassoToolSelected ||
             // in collab we're already highlighting the laser button
             // outside toolbar, so let's not highlight extra-tools button
@@ -94,7 +95,7 @@ const ExtraToolsDropdown = ({
           ? frameToolIcon
           : embeddableToolSelected
           ? EmbedIcon
-          : drawShapeToolSelected
+          : isFullStylesPanel && drawShapeToolSelected
           ? drawShapeToolIcon
           : laserToolSelected && !app.props.isCollaborating
           ? laserPointerToolIcon
@@ -265,7 +266,11 @@ export const Toolbar = ({
         <EllipseToolButton {...toolProps} />
         <ArrowToolButton {...toolProps} />
         <LineToolButton {...toolProps} />
-        <FreedrawToolButton {...toolProps} />
+        {isCompactStylesPanel ? (
+          <FreedrawToolPopover {...toolProps} />
+        ) : (
+          <FreedrawToolButton {...toolProps} />
+        )}
         <TextToolButton {...toolProps} />
         {UIOptions.tools?.image !== false && <ImageToolButton {...toolProps} />}
         <EraserToolButton {...toolProps} />
