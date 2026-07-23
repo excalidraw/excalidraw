@@ -5,11 +5,10 @@ on:
       - master
 permissions:
   pull-requests: write
+  contents: read
 jobs:
   size:
     runs-on: ubuntu-latest
-    env:
-      CI_JOB_NUMBER: 1
     steps:
       - name: Checkout repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -17,14 +16,53 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 20.x
-      - name: Install in packages/excalidraw
+      - name: Install
         run: yarn
         working-directory: packages/excalidraw
         env:
           CI: true
-      - uses: andresz1/size-limit-action@e7493a72a44b113341c0cf6186ab49c17c4b65c1 # v1
+      - name: Build
+        run: yarn run build:esm
+        working-directory: packages/excalidraw
+      - name: Check bundle sizes
+        id: size
+        run: |
+          node ../../scripts/size-check.js
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+        working-directory: packages/excalidraw
+      - name: Comment size report
+        if: always()
+        uses: actions/github-script@v7
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          build_script: build:esm
-          skip_step: install
-          directory: packages/excalidraw
+          script: |
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('packages/excalidraw/.size-limit-report.json', 'utf-8'));
+            let body = '## size-limit report 📦\n\n';
+            body += '| Path | Size | Status |\n';
+            body += '|------|------|--------|\n';
+            for (const r of results) {
+              const status = r.passed ? '✅' : '❌';
+              const size = (r.size / 1024).toFixed(1) + ' kB';
+              body += `| ${r.name} | ${size} | ${status} |\n`;
+            }
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const sizeComment = comments.find(c => c.body.startsWith('## size-limit report'));
+            if (sizeComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: sizeComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

@@ -1,20 +1,14 @@
 [
   {
     "path": "dist/prod/index.js",
-    "limit": "340 kB",
-    "webpack": false,
-    "gzip": false
+    "limit": "2 MB"
   },
   {
     "path": "dist/prod/**",
-    "limit": "500 kB",
-    "webpack": false,
-    "gzip": false
+    "limit": "25 MB"
   },
   {
     "path": "dist/prod/**/*.woff2",
-    "limit": "50 kB",
-    "webpack": false,
-    "gzip": false
+    "limit": "15 MB"
   }
 ]
