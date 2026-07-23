@@ -13,6 +13,7 @@ import {
   isFreeDrawElement,
   isLineElement,
   isPointInElement,
+  isTextElement,
 } from "@excalidraw/element";
 import {
   lineSegment,
@@ -31,7 +32,11 @@ import { getBoundTextElementId } from "@excalidraw/element";
 import type { Bounds } from "@excalidraw/common";
 
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  ExcalidrawTextElementWithContainer,
+} from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animatedTrail";
 
@@ -199,17 +204,33 @@ const eraserTest = (
   elementsMap: ElementsMap,
   zoom: number,
 ): boolean => {
+  let targetElement = element;
+
+  if (isTextElement(targetElement) && isBoundToContainer(targetElement)) {
+    const container = elementsMap.get(targetElement.containerId);
+    if (container) {
+      targetElement = {
+        ...targetElement,
+        ...computeBoundTextPosition(
+          container,
+          targetElement as ExcalidrawTextElementWithContainer,
+          elementsMap,
+        ),
+      };
+    }
+  }
+
   const lastPoint = pathSegment[1];
 
   // PERF: Do a quick bounds intersection test first because it's cheap
-  const threshold = isFreeDrawElement(element) ? 15 : element.strokeWidth / 2;
+  const threshold = isFreeDrawElement(targetElement) ? 15 : targetElement.strokeWidth / 2;
   const segmentBounds = [
     Math.min(pathSegment[0][0], pathSegment[1][0]) - threshold,
     Math.min(pathSegment[0][1], pathSegment[1][1]) - threshold,
     Math.max(pathSegment[0][0], pathSegment[1][0]) + threshold,
     Math.max(pathSegment[0][1], pathSegment[1][1]) + threshold,
   ] as Bounds;
-  const origElementBounds = getElementBounds(element, elementsMap);
+  const origElementBounds = getElementBounds(targetElement, elementsMap);
   const elementBounds: Bounds = [
     origElementBounds[0] - threshold,
     origElementBounds[1] - threshold,
@@ -225,8 +246,8 @@ const eraserTest = (
   // even though the eraser path segment doesn't intersect with or
   // get close to the shape's stroke
   if (
-    shouldTestInside(element) &&
-    isPointInElement(lastPoint, element, elementsMap)
+    shouldTestInside(targetElement) &&
+    isPointInElement(lastPoint, targetElement, elementsMap)
   ) {
     return true;
   }
@@ -234,10 +255,10 @@ const eraserTest = (
   // Freedraw elements are tested for erasure by measuring the distance
   // of the eraser path and the freedraw shape outline lines to a tolerance
   // which offers a good visual precision at various zoom levels
-  if (isFreeDrawElement(element)) {
-    const outlinePoints = getFreedrawOutlinePoints(element);
+  if (isFreeDrawElement(targetElement)) {
+    const outlinePoints = getFreedrawOutlinePoints(targetElement);
     const strokeSegments = getFreedrawOutlineAsSegments(
-      element,
+      targetElement,
       outlinePoints,
       elementsMap,
     );
@@ -251,7 +272,7 @@ const eraserTest = (
 
     const poly = polygon(
       ...(outlinePoints.map(([x, y]) =>
-        pointFrom<GlobalPoint>(element.x + x, element.y + y),
+        pointFrom<GlobalPoint>(targetElement.x + x, targetElement.y + y),
       ) as GlobalPoint[]),
     );
 
@@ -265,18 +286,18 @@ const eraserTest = (
     return false;
   }
 
-  const boundTextElement = getBoundTextElement(element, elementsMap);
+  const boundTextElement = getBoundTextElement(targetElement, elementsMap);
 
-  if (isArrowElement(element) || (isLineElement(element) && !element.polygon)) {
+  if (isArrowElement(targetElement) || (isLineElement(targetElement) && !targetElement.polygon)) {
     const tolerance = Math.max(
-      element.strokeWidth,
-      (element.strokeWidth * 2) / zoom,
+      targetElement.strokeWidth,
+      (targetElement.strokeWidth * 2) / zoom,
     );
 
     // If the eraser movement is so fast that a large distance is covered
     // between the last two points, the distanceToElement miss, so we test
     // agaist each segment of the linear element
-    const segments = getElementLineSegments(element, elementsMap);
+    const segments = getElementLineSegments(targetElement, elementsMap);
     for (const seg of segments) {
       if (lineSegmentsDistance(seg, pathSegment) <= tolerance) {
         return true;
@@ -287,13 +308,13 @@ const eraserTest = (
   }
 
   return (
-    intersectElementWithLineSegment(element, elementsMap, pathSegment, 0, true)
+    intersectElementWithLineSegment(targetElement, elementsMap, pathSegment, 0, true)
       .length > 0 ||
     (!!boundTextElement &&
       intersectElementWithLineSegment(
         {
           ...boundTextElement,
-          ...computeBoundTextPosition(element, boundTextElement, elementsMap),
+          ...computeBoundTextPosition(targetElement, boundTextElement, elementsMap),
         },
         elementsMap,
         pathSegment,
