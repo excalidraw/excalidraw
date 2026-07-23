@@ -32,13 +32,17 @@ import type { PointerDownState } from "../types";
  * sketch converted into a recognized excalidraw element). Pointer events
  * are piped here from App.
  *
- * The whole gesture is finalized here, synchronously, on the concrete
- * inserted element: recognize → (maybe upgrade line to arrow) → insert →
- * bind endpoints → one generic actionFinalize for cleanup. actionFinalize
- * contains no drawShape-specific element logic.
+ * The gesture is committed by `finalize()` — recognize → (maybe upgrade
+ * line to arrow) → insert → bind endpoints — which is invoked from within
+ * `actionFinalize`, the editor's single finalization funnel. Whatever
+ * triggers a finalize (the gesture's own pointerup, a mid-gesture paste
+ * switching tools, …), the pending sketch resolves there exactly once.
  */
 export class AppDrawShape {
   public trail: DrawShapeTrail;
+
+  /** a pointerdown started a sketch that `finalize()` hasn't resolved yet */
+  private gestureInProgress = false;
 
   constructor(private app: App) {
     this.trail = new DrawShapeTrail(app);
@@ -48,7 +52,17 @@ export class AppDrawShape {
     this.trail.stop();
   };
 
+  hasPendingGesture = () => {
+    return this.gestureInProgress;
+  };
+
   handlePointerDown = (pointerDownState: PointerDownState) => {
+    if (this.gestureInProgress) {
+      // a stale gesture (e.g. after a missed pointerup) — resolve it before
+      // starting a new one
+      this.app.actionManager.executeAction(actionFinalize);
+    }
+    this.gestureInProgress = true;
     this.trail.startPath(
       pointerDownState.lastCoords.x,
       pointerDownState.lastCoords.y,
@@ -202,10 +216,17 @@ export class AppDrawShape {
     });
   };
 
-  handlePointerUp = () => {
+  /**
+   * Commits the pending sketch, if any, and clears the trail. Invoked from
+   * within `actionFinalize` — never call directly, execute `actionFinalize`
+   * instead so element insertion flows into the action's returned elements.
+   */
+  finalize = () => {
     const { app } = this;
 
-    const points = this.trail.getCurrentPoints();
+    // when no gesture is in progress this only clears residual trail state
+    const points = this.gestureInProgress ? this.trail.getCurrentPoints() : [];
+    this.gestureInProgress = false;
     this.trail.endPath();
 
     // note: size gate inside recognizeShape
@@ -239,9 +260,6 @@ export class AppDrawShape {
       }
     }
 
-    // generic cleanup only: clears the preview from `newElement`, keeps the
-    // tool active, keeps nothing selected, commits the undo capture
-    app.actionManager.executeAction(actionFinalize);
     this.trail.clearTrails();
   };
 }

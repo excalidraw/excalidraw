@@ -5922,6 +5922,13 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (this.drawShape.hasPendingGesture()) {
+      // switching tools mid-sketch (e.g. paste resets to the selection tool)
+      // must not strand the gesture — commit it through the finalize funnel
+      // while the drawShape tool is still active
+      this.actionManager.executeAction(actionFinalize);
+    }
+
     const isToggleTool = TOGGLE_TOOLS.includes(tool.type);
     const toggle = opts.toggle === true && isToggleTool;
 
@@ -12246,7 +12253,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (activeTool.type === "drawShape") {
-        this.drawShape.handlePointerUp();
+        this.actionManager.executeAction(actionFinalize);
         return;
       }
 

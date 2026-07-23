@@ -4,6 +4,7 @@ import { getTargetElements, isArrowElement } from "@excalidraw/element";
 
 import { Excalidraw } from "../index";
 
+import { actionFinalize } from "../actions";
 import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 
 import { API } from "./helpers/api";
@@ -486,6 +487,88 @@ describe("drawShape styles panel & selection (preview path)", () => {
 
     mouse.upAt(300, 220);
     expect(h.state.selectedElementIds).toEqual({});
+  });
+});
+
+describe("drawShape finalize funnel", () => {
+  /** starts a gesture and leaves the pointer down */
+  const startSketch = (points: [number, number][]) => {
+    const [startX, startY] = points[0];
+
+    mouse.downAt(startX, startY);
+    act(() => {
+      for (const [x, y] of points.slice(1)) {
+        h.app.drawShape.trail.addPointToPath(x, y);
+        h.app.drawShape.handlePointerMove({ x, y });
+      }
+    });
+  };
+
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    act(() => {
+      h.app.setActiveTool({ type: "drawShape" });
+    });
+  });
+
+  it("commits the pending sketch when actionFinalize fires mid-gesture", () => {
+    startSketch(rectanglePath(100, 100, 200, 120));
+
+    act(() => {
+      h.app.actionManager.executeAction(actionFinalize);
+    });
+
+    expect(h.elements.map((element) => element.type)).toEqual(["rectangle"]);
+    expect(h.state.newElement).toBeNull();
+    expect(h.app.drawShape.hasPendingGesture()).toBe(false);
+
+    // releasing the pointer must not commit a second element
+    mouse.upAt(300, 220);
+    expect(h.elements).toHaveLength(1);
+  });
+
+  it("commits the sketch when the tool is switched away mid-gesture (paste resets the tool)", () => {
+    startSketch(rectanglePath(100, 100, 200, 120));
+
+    act(() => {
+      h.app.setActiveTool({ type: "selection" });
+    });
+
+    expect(h.elements.map((element) => element.type)).toEqual(["rectangle"]);
+    expect(h.app.drawShape.hasPendingGesture()).toBe(false);
+    expect(h.state.newElement).toBeNull();
+    expect(h.state.activeTool.type).toBe("selection");
+
+    mouse.upAt(300, 220);
+    expect(h.elements).toHaveLength(1);
+  });
+
+  it("blocks undo while a sketch is in progress", () => {
+    sketch(rectanglePath(100, 100, 200, 120));
+    expect(h.elements).toHaveLength(1);
+
+    // start a second gesture; a tiny stroke isn't recognized yet, so
+    // `newElement` alone would not block history
+    startSketch([
+      [600, 100],
+      [610, 105],
+      [620, 100],
+    ]);
+    expect(h.state.newElement).toBeNull();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.Z);
+    });
+
+    // undo was blocked — the previously committed shape is still there
+    expect(h.elements).toHaveLength(1);
+    expect(h.elements[0].isDeleted).toBe(false);
+
+    mouse.upAt(620, 100);
+    // the tiny sketch is discarded, the committed shape survives
+    expect(h.elements).toHaveLength(1);
+    expect(h.app.drawShape.hasPendingGesture()).toBe(false);
   });
 });
 

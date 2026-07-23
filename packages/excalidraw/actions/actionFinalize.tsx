@@ -58,7 +58,7 @@ export const actionFinalize = register<FormData>({
     let newElements = elements;
     const { focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
-    const isDrawShape = appState.activeTool.type === "drawShape";
+    const isDrawShapeTool = appState.activeTool.type === "drawShape";
 
     if (data && appState.selectedLinearElement) {
       const { event, sceneCoords } = data;
@@ -175,9 +175,11 @@ export const actionFinalize = register<FormData>({
           appState: {
             ...appState,
             cursorButton: "up",
-            selectedElementIds: isDrawShape ? {} : appState.selectedElementIds,
+            selectedElementIds: isDrawShapeTool
+              ? {}
+              : appState.selectedElementIds,
             selectedLinearElement:
-              activeToolLocked || isDrawShape
+              activeToolLocked || isDrawShapeTool
                 ? null
                 : {
                     ...linearElementEditor,
@@ -203,14 +205,27 @@ export const actionFinalize = register<FormData>({
       focusContainer();
     }
 
+    // clean up pending gesture even if active tool is already not drawShape
+    const hadPendingSketch = app.drawShape.hasPendingGesture();
+    if (hadPendingSketch || isDrawShapeTool) {
+      app.drawShape.finalize();
+      if (hadPendingSketch) {
+        // finalize() inserts the recognized element via app.insertNewElement
+        // — re-read so the returned array includes it (replaceAllElements
+        // would otherwise drop it)
+        newElements = app.scene.getElementsIncludingDeleted();
+      }
+    }
+
     let element: NonDeleted<ExcalidrawElement> | null = null;
     if (appState.multiElement) {
       element = appState.multiElement;
     } else if (
       // the drawShape preview in `newElement` is not a scene element and the
-      // gesture is finalized by AppDrawShape.handlePointerUp itself — never
-      // treat the preview as an in-progress element here
-      !isDrawShape &&
+      // sketch was finalized by app.drawShape.finalize() above — never treat
+      // the preview as an in-progress element here
+      !isDrawShapeTool &&
+      !hadPendingSketch &&
       (appState.newElement?.type === "freedraw" ||
         isBindingElement(appState.newElement))
     ) {
@@ -384,7 +399,7 @@ export const actionFinalize = register<FormData>({
         editingTextElement: null,
         suggestedBinding: null,
         frameToHighlight: null,
-        selectedElementIds: isDrawShape
+        selectedElementIds: isDrawShapeTool
           ? {}
           : element && !isToolLocked && appState.activeTool.type !== "freedraw"
           ? {
@@ -393,7 +408,7 @@ export const actionFinalize = register<FormData>({
             }
           : appState.selectedElementIds,
 
-        selectedLinearElement: isDrawShape ? null : selectedLinearElement,
+        selectedLinearElement: isDrawShapeTool ? null : selectedLinearElement,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
       captureUpdate: shouldCommit
