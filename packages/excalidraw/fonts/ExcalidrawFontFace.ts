@@ -147,7 +147,27 @@ export class ExcalidrawFontFace {
     }
 
     // absolute assets paths, which are found in tests and excalidraw-app build, won't work with base url, so we are stripping initial slash away
-    const assetUrl: string = uri.replace(/^\/+/, "");
+    let assetUrl: string = uri.replace(/^\/+/, "");
+
+    // When the app is deployed under a base path (e.g. "/Excalidraw-better/"), Vite's asset imports
+    // return URLs already prefixed with the base path. Since EXCALIDRAW_ASSET_PATH also includes the
+    // base path, we need to strip it to avoid double-prefixing.
+    const basePath = Array.isArray(window.EXCALIDRAW_ASSET_PATH)
+      ? window.EXCALIDRAW_ASSET_PATH[1]
+      : typeof window.EXCALIDRAW_ASSET_PATH === "string" &&
+          !window.EXCALIDRAW_ASSET_PATH.startsWith("http")
+        ? window.EXCALIDRAW_ASSET_PATH
+        : null;
+
+    if (basePath) {
+      const normalizedBasePath = basePath
+        .replace(/^\/+/, "")
+        .replace(/\/+$/, "");
+      if (normalizedBasePath && assetUrl.startsWith(normalizedBasePath + "/")) {
+        assetUrl = assetUrl.slice(normalizedBasePath.length + 1);
+      }
+    }
+
     const urls: URL[] = [];
 
     if (typeof window.EXCALIDRAW_ASSET_PATH === "string") {
