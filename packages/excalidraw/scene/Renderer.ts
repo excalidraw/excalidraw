@@ -36,7 +36,7 @@ type GetRenderableElementsOpts = {
   selectedElements: readonly NonDeletedExcalidrawElement[];
   selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
   frameToHighlight: AppState["frameToHighlight"];
-  layers: AppState["layers"];
+  layers?: AppState["layers"];
 };
 
 export class Renderer {
@@ -193,7 +193,7 @@ export class Renderer {
           elements,
           editingTextElement,
           newElement,
-          layers,
+          layers: layers ?? [],
         });
 
       const visibleElements = this.getVisibleCanvasElements({
