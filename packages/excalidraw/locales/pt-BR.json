@@ -595,7 +595,8 @@
     "colors": "Cores",
     "shades": "Tons",
     "hexCode": "Código hexadecimal",
-    "noShades": "Sem tons disponíveis para essa cor"
+    "noShades": "Sem tons disponíveis para essa cor",
+    "invalidColor": "Cor inválida. Utilize o formato #RRGGBB."
   },
   "overwriteConfirm": {
     "action": {
