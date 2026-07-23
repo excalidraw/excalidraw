@@ -181,6 +181,7 @@ export const actionFinalize = register<FormData>({
           appState: {
             ...appState,
             cursorButton: "up",
+            selectedElementIds: isDrawShape ? {} : appState.selectedElementIds,
             selectedLinearElement:
               activeToolLocked || isDrawShape
                 ? null
@@ -446,16 +447,14 @@ export const actionFinalize = register<FormData>({
         editingTextElement: null,
         suggestedBinding: null,
         frameToHighlight: null,
-        selectedElementIds:
-          element &&
-          !isToolLocked &&
-          appState.activeTool.type !== "freedraw" &&
-          !isDrawShape
-            ? {
-                ...appState.selectedElementIds,
-                [element.id]: true,
-              }
-            : appState.selectedElementIds,
+        selectedElementIds: isDrawShape
+          ? {}
+          : element && !isToolLocked && appState.activeTool.type !== "freedraw"
+          ? {
+              ...appState.selectedElementIds,
+              [element.id]: true,
+            }
+          : appState.selectedElementIds,
 
         selectedLinearElement: isDrawShape ? null : selectedLinearElement,
       },

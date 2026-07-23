@@ -53,8 +53,7 @@ export const canChangeStrokeColor = (
       commonSelectedType !== "image" &&
       commonSelectedType !== "frame" &&
       commonSelectedType !== "magicframe") ||
-    targetElements.some((element) => hasStrokeColor(element.type)) ||
-    appState.activeTool.type === "drawShape"
+    targetElements.some((element) => hasStrokeColor(element.type))
   );
 };
 
@@ -64,8 +63,7 @@ export const canChangeBackgroundColor = (
 ) => {
   return (
     hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type)) ||
-    appState.activeTool.type === "drawShape"
+    targetElements.some((element) => hasBackground(element.type))
   );
 };
 
@@ -121,16 +119,12 @@ export const getShapeActionPredicates = (
         (element) =>
           hasBackground(element.type) &&
           !isTransparent(element.backgroundColor),
-      ) ||
-      activeToolType === "drawShape",
+      ),
 
     // stroke / shape properties
     strokeWidth: forToolOrSelection(hasStrokeWidth),
     freedrawMode: forToolOrSelection(hasFreedrawMode),
-    strokeStyle:
-      forToolOrSelection(hasStrokeStyle) || activeToolType === "drawShape",
-    // sloppiness doesn't apply to drawShape (recognized shapes keep the
-    // drawn stroke), so it's split from strokeStyle
+    strokeStyle: forToolOrSelection(hasStrokeStyle),
     sloppiness: forToolOrSelection(hasStrokeStyle),
     roundness: forToolOrSelection(canChangeRoundness),
     arrowType: forToolOrSelection(toolIsArrow),
@@ -143,11 +137,14 @@ export const getShapeActionPredicates = (
       suppportsHorizontalAlign(targetElements, elementsMap),
     verticalAlign: shouldAllowVerticalAlign(targetElements, elementsMap),
 
+    opacity: activeToolType !== "drawShape" || hasSelection,
+
     // arrangement
-    // z-order controls are hidden while the freedraw tool is active without
-    // an actual freedraw selection
+    // z-order controls are hidden while the freedraw or drawShape tool is
+    // active without an actual selection
     layers:
       (activeToolType !== "freedraw" &&
+        activeToolType !== "drawShape" &&
         !targetElements.some((element) => element.type === "freedraw")) ||
       getSelectedElements(elementsMap, appState).some(
         (element) => element.type === "freedraw",

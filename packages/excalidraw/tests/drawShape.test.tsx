@@ -1,8 +1,10 @@
 import { KEYS } from "@excalidraw/common";
 
-import { isArrowElement } from "@excalidraw/element";
+import { getTargetElements, isArrowElement } from "@excalidraw/element";
 
 import { Excalidraw } from "../index";
+
+import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
@@ -203,6 +205,105 @@ describe("drawShape tool", () => {
 
   it("applies its own cursor while active", () => {
     expect(GlobalTestState.interactiveCanvas.style.cursor).toContain("url(");
+  });
+});
+
+describe("drawShape styles panel & selection (preview path)", () => {
+  /**
+   * Unlike `sketch`, also drives the pointermove handler, so
+   * `state.newElement` holds the live recognition preview mid-gesture the way
+   * it does in the real app.
+   */
+  const sketchWithPreview = (points: [number, number][]) => {
+    const [startX, startY] = points[0];
+
+    mouse.downAt(startX, startY);
+    act(() => {
+      for (const [x, y] of points.slice(1)) {
+        h.app.drawShape.trail.addPointToPath(x, y);
+        h.app.drawShape.handlePointerMove({ x, y });
+      }
+    });
+    const [endX, endY] = points[points.length - 1];
+    mouse.upAt(endX, endY);
+  };
+
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    act(() => {
+      h.app.setActiveTool({ type: "drawShape" });
+    });
+  });
+
+  it("does not select a recognized arrow drawn with a live preview", () => {
+    sketchWithPreview(arrowPath(100, 100, 400, 300));
+
+    expect(h.elements.map((element) => element.type)).toEqual(["arrow"]);
+    expect(h.state.selectedElementIds).toEqual({});
+    expect(h.state.selectedLinearElement).toBeNull();
+    expect(h.state.activeTool.type).toBe("drawShape");
+  });
+
+  it("does not select a recognized rectangle drawn with a live preview", () => {
+    sketchWithPreview(rectanglePath(100, 100, 200, 120));
+
+    expect(h.elements.map((element) => element.type)).toEqual(["rectangle"]);
+    expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("keeps the styles panel on tool defaults while sketching", () => {
+    mouse.downAt(100, 100);
+    act(() => {
+      for (const [x, y] of rectanglePath(100, 100, 200, 120).slice(1)) {
+        h.app.drawShape.trail.addPointToPath(x, y);
+        h.app.drawShape.handlePointerMove({ x, y });
+      }
+    });
+
+    // the preview exists, but the styles panel must not target it — it keeps
+    // showing the tool defaults
+    expect(h.state.newElement?.type).toBe("rectangle");
+    const targetElements = getTargetElements(
+      h.app.scene.getNonDeletedElementsMap(),
+      h.state,
+    );
+    expect(targetElements).toEqual([]);
+
+    // the drawShape panel is limited to stroke color, background, fill style
+    // and stroke style
+    const predicates = getShapeActionPredicates(
+      h.state,
+      targetElements,
+      h.app.scene.getNonDeletedElementsMap(),
+      h.app,
+    );
+    expect(predicates.strokeColor).toBe(true);
+    expect(predicates.backgroundColor).toBe(true);
+    expect(predicates.strokeStyle).toBe(true);
+    // fill follows the standard rule: hidden while the background is
+    // transparent (the default), shown otherwise
+    expect(predicates.fill).toBe(false);
+    expect(predicates.strokeWidth).toBe(false);
+    expect(predicates.sloppiness).toBe(true);
+    expect(predicates.roundness).toBe(false);
+    expect(predicates.opacity).toBe(false);
+    expect(predicates.layers).toBe(false);
+
+    act(() => {
+      h.setState({ currentItemBackgroundColor: "#ffc9c9" });
+    });
+    expect(
+      getShapeActionPredicates(
+        h.state,
+        targetElements,
+        h.app.scene.getNonDeletedElementsMap(),
+        h.app,
+      ).fill,
+    ).toBe(true);
+
+    mouse.upAt(300, 220);
+    expect(h.state.selectedElementIds).toEqual({});
   });
 });
 
