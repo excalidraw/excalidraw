@@ -29,10 +29,10 @@ const laserPointerCursorDataURL_darkMode = `data:${
  * cursors set here.
  */
 export class AppCursor {
-  private eraserCanvasCache:
+  private dotCursorCanvasCache:
     | (HTMLCanvasElement & { theme?: AppState["theme"] })
     | null = null;
-  private eraserPreviewDataURL: DataURL | null = null;
+  private dotCursorPreviewDataURL: DataURL | null = null;
 
   constructor(private app: App) {}
 
@@ -77,8 +77,11 @@ export class AppCursor {
       this.clear();
     } else if (isHandToolActive({ activeTool })) {
       this.set(CURSOR_TYPE.GRAB);
-    } else if (isEraserActive({ activeTool })) {
-      this.applyEraser();
+    } else if (
+      isEraserActive({ activeTool }) ||
+      activeTool.type === "freedraw"
+    ) {
+      this.applyDotCursor();
     } else if (activeTool.type === "laser") {
       const url =
         this.app.state.theme === THEME.LIGHT
@@ -102,22 +105,22 @@ export class AppCursor {
     }
   };
 
-  private applyEraser = () => {
+  private applyDotCursor = () => {
     const cursorImageSizePx = 20;
     const theme = this.app.state.theme;
 
-    if (!this.eraserCanvasCache || this.eraserCanvasCache.theme !== theme) {
+    if (!this.dotCursorCanvasCache || this.dotCursorCanvasCache.theme !== theme) {
       const isDarkTheme = theme === THEME.DARK;
-      this.eraserCanvasCache = document.createElement("canvas");
-      this.eraserCanvasCache.theme = theme;
-      this.eraserCanvasCache.height = cursorImageSizePx;
-      this.eraserCanvasCache.width = cursorImageSizePx;
-      const context = this.eraserCanvasCache.getContext("2d")!;
+      this.dotCursorCanvasCache = document.createElement("canvas");
+      this.dotCursorCanvasCache.theme = theme;
+      this.dotCursorCanvasCache.height = cursorImageSizePx;
+      this.dotCursorCanvasCache.width = cursorImageSizePx;
+      const context = this.dotCursorCanvasCache.getContext("2d")!;
       context.lineWidth = 1;
       context.beginPath();
       context.arc(
-        this.eraserCanvasCache.width / 2,
-        this.eraserCanvasCache.height / 2,
+        this.dotCursorCanvasCache.width / 2,
+        this.dotCursorCanvasCache.height / 2,
         5,
         0,
         2 * Math.PI,
@@ -126,13 +129,13 @@ export class AppCursor {
       context.fill();
       context.strokeStyle = isDarkTheme ? "#fff" : "#000";
       context.stroke();
-      this.eraserPreviewDataURL = this.eraserCanvasCache.toDataURL(
+      this.dotCursorPreviewDataURL = this.dotCursorCanvasCache.toDataURL(
         MIME_TYPES.svg,
       ) as DataURL;
     }
 
     this.set(
-      `url(${this.eraserPreviewDataURL}) ${cursorImageSizePx / 2} ${
+      `url(${this.dotCursorPreviewDataURL}) ${cursorImageSizePx / 2} ${
         cursorImageSizePx / 2
       }, auto`,
     );
