@@ -1,5 +1,5 @@
-import { THEME } from "@excalidraw/common";
-import { pointFrom } from "@excalidraw/math";
+import { getStrokeWidthByKey, THEME } from "@excalidraw/common";
+import { clamp, pointFrom } from "@excalidraw/math";
 
 import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 import type { GlobalPoint } from "@excalidraw/math";
@@ -26,7 +26,20 @@ export class DrawShapeTrail implements Trail {
     return {
       simplify: 0,
       streamline: 0.4,
-      sizeMapping: () => 1,
+      size: 1,
+      sizeMapping: () => {
+        const size = clamp(
+          getStrokeWidthByKey(
+            "line",
+            this.app.state.currentItemStrokeWidthKey,
+          ) *
+            0.65 *
+            this.app.state.zoom.value,
+          1.25,
+          4,
+        );
+        return size;
+      },
     } as Partial<LaserPointerOptions>;
   }
 
