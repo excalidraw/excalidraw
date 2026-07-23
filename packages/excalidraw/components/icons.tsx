@@ -1964,16 +1964,6 @@ export const eyeDropperIcon = createIcon(
   tablerIconProps,
 );
 
-export const extraToolsIcon = createIcon(
-  <g strokeWidth={1.5}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <path d="M12 3l-4 7h8z"></path>
-    <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"></path>
-    <path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"></path>
-  </g>,
-  tablerIconProps,
-);
-
 export const frameToolIcon = createIcon(
   <g strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -2023,16 +2013,12 @@ export const ArrowRightIcon = createIcon(
 );
 
 export const drawShapeToolIcon = createIcon(
-  <g
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.25"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M4 10.5l11-6.35v12.7L4 10.5z" />
+  <g strokeWidth="1.5">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M3 9.5a6.5 6.5 0 1 0 13 0a6.5 6.5 0 1 0 -13 0" />
+    <path d="M10 12a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2l0 -7" />
   </g>,
-  20,
+  tablerIconProps,
 );
 
 export const laserPointerToolIcon = createIcon(

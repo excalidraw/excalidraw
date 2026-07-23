@@ -13,10 +13,6 @@
       .ToolIcon__keybinding {
         display: none;
       }
-
-      .App-toolbar__divider {
-        margin: 0;
-      }
     }
 
     &__divider {
@@ -24,11 +20,6 @@
       height: 1.5rem;
       align-self: center;
       background-color: var(--default-border-color);
-      margin: 0 0.25rem;
-
-      @include isMobile {
-        margin: 0;
-      }
     }
   }
 

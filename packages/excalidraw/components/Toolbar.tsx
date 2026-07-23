@@ -16,12 +16,12 @@ import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
   drawShapeToolIcon,
   EmbedIcon,
-  extraToolsIcon,
   frameToolIcon,
   LassoIcon,
   laserPointerToolIcon,
   MagicIcon,
   mermaidLogoIcon,
+  DotsIcon,
 } from "./icons";
 import {
   ArrowToolButton,
@@ -100,7 +100,7 @@ const ExtraToolsDropdown = ({
           ? laserPointerToolIcon
           : lassoToolSelected
           ? LassoIcon
-          : extraToolsIcon}
+          : DotsIcon}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
         onClickOutside={() => setIsExtraToolsMenuOpen(false)}
@@ -245,7 +245,10 @@ export const Toolbar = ({
               disabled={app.props.activeTool != null}
             />
 
-            <div className="App-toolbar__divider" />
+            <div
+              className="App-toolbar__divider"
+              style={{ marginRight: "0.25rem" }}
+            />
           </>
         )}
 
@@ -267,7 +270,10 @@ export const Toolbar = ({
         {UIOptions.tools?.image !== false && <ImageToolButton {...toolProps} />}
         <EraserToolButton {...toolProps} />
 
-        <div className="App-toolbar__divider" />
+        <div
+          className="App-toolbar__divider"
+          style={{ marginLeft: "0.25rem" }}
+        />
 
         <ExtraToolsDropdown
           app={app}

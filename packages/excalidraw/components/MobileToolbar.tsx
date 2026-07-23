@@ -25,7 +25,7 @@ import {
 import {
   TextIcon,
   ImageIcon,
-  extraToolsIcon,
+  DotsIcon,
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
@@ -136,8 +136,8 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       ? laserPointerToolIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
-      : extraToolsIcon
-    : extraToolsIcon;
+      : DotsIcon
+    : DotsIcon;
 
   const toolProps = { app, activeTool };
 
