@@ -858,6 +858,10 @@ export const textWysiwyg = ({
     unbindUpdate();
     unsubOnChange();
     unbindOnScroll();
+    excalidrawContainer?.removeEventListener(
+      "scroll",
+      preventContainerScroll,
+    );
 
     editable.remove();
   };
@@ -983,6 +987,18 @@ export const textWysiwyg = ({
   const unbindOnScroll = app.onScrollChangeEmitter.on(() => {
     updateWysiwygStyle();
   });
+
+  // Prevent the browser from scrolling the excalidraw container when the
+  // WYSIWYG textarea is focused near the viewport edge. The container has
+  // overflow:hidden, but browsers still scroll it to keep focused elements
+  // visible, which shifts the toolbar and menus (see #8936).
+  const preventContainerScroll = () => {
+    if (excalidrawContainer) {
+      excalidrawContainer.scrollTop = 0;
+      excalidrawContainer.scrollLeft = 0;
+    }
+  };
+  excalidrawContainer?.addEventListener("scroll", preventContainerScroll);
 
   // ---------------------------------------------------------------------------
 
