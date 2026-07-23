@@ -358,10 +358,6 @@ describe("drawShape tool", () => {
     expect(h.elements).toHaveLength(0);
     expect(h.state.activeTool.type).toBe("drawShape");
   });
-
-  it("applies its own cursor while active", () => {
-    expect(GlobalTestState.interactiveCanvas.style.cursor).toContain("url(");
-  });
 });
 
 describe("drawShape styles panel & selection (preview path)", () => {

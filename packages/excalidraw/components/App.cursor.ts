@@ -85,7 +85,7 @@ export class AppCursor {
     } else if (isEraserActive({ activeTool })) {
       this.applyEraser();
     } else if (activeTool.type === "drawShape") {
-      this.applyDrawShape();
+      this.set(CURSOR_TYPE.CROSSHAIR);
     } else if (activeTool.type === "laser") {
       const url =
         this.app.state.theme === THEME.LIGHT
@@ -140,40 +140,6 @@ export class AppCursor {
 
     this.set(
       `url(${this.eraserPreviewDataURL}) ${cursorImageSizePx / 2} ${
-        cursorImageSizePx / 2
-      }, auto`,
-    );
-  };
-
-  private applyDrawShape = () => {
-    const cursorImageSizePx = 20;
-    const theme = this.app.state.theme;
-
-    if (
-      !this.drawShapeCanvasCache ||
-      this.drawShapeCanvasCache.theme !== theme
-    ) {
-      const isDarkTheme = theme === THEME.DARK;
-      this.drawShapeCanvasCache = document.createElement("canvas");
-      this.drawShapeCanvasCache.theme = theme;
-      this.drawShapeCanvasCache.height = cursorImageSizePx;
-      this.drawShapeCanvasCache.width = cursorImageSizePx;
-      const context = this.drawShapeCanvasCache.getContext("2d")!;
-      context.strokeStyle = isDarkTheme ? "#fff" : "#000";
-      context.lineWidth = 1;
-      context.beginPath();
-      context.moveTo(4, 10.5);
-      context.lineTo(15, 4.15);
-      context.lineTo(15, 16.85);
-      context.closePath();
-      context.stroke();
-      this.drawShapePreviewDataURL = this.drawShapeCanvasCache.toDataURL(
-        MIME_TYPES.svg,
-      ) as DataURL;
-    }
-
-    this.set(
-      `url(${this.drawShapePreviewDataURL}) ${cursorImageSizePx / 2} ${
         cursorImageSizePx / 2
       }, auto`,
     );
