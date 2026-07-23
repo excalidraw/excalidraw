@@ -10916,6 +10916,7 @@ class App extends React.Component<AppProps, AppState> {
               elements,
               appState: this.state,
               randomizeSeed: true,
+              isAltDrag: true,
               idsOfElementsToDuplicate,
               overrides: ({ duplicateElement, origElement }) => {
                 return {
