@@ -1,5 +1,8 @@
 import { expect, vi } from "vitest";
 
+import { pointFrom } from "@excalidraw/math/point";
+import type { LocalPoint } from "@excalidraw/math/types";
+
 import { Excalidraw } from "../index";
 
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
@@ -61,8 +64,8 @@ mockMermaidToExcalidraw({
               y: 44,
               strokeWidth: 2,
               points: [
-                [0, 0],
-                [0, 50],
+                pointFrom<LocalPoint>(0, 0),
+                pointFrom<LocalPoint>(0, 50),
               ],
               roundness: {
                 type: 2,
