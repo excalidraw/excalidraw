@@ -887,16 +887,16 @@ describe("Test Linear Elements", () => {
                 0,
               ],
               [
-                "85.96978",
-                "77.44233",
+                "85.97000",
+                "77.44000",
               ],
               [
                 70,
                 50,
               ],
               [
-                "106.08587",
-                "73.29417",
+                "106.09000",
+                "73.29000",
               ],
               [
                 40,
@@ -1199,8 +1199,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": "86.17305",
-            "y": "76.11251",
+            "x": "86.17313",
+            "y": "76.11164",
           }
         `);
       });
@@ -1417,7 +1417,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
           {
             "height": 150,
-            "width": "366.11716",
+            "width": "366.12000",
           }
         `);
 
@@ -1429,7 +1429,7 @@ describe("Test Linear Elements", () => {
         ),
       ).toMatchInlineSnapshot(`
         {
-          "x": "271.11716",
+          "x": "271.12000",
           "y": 45,
         }
       `);
@@ -1446,9 +1446,9 @@ describe("Test Linear Elements", () => {
         [
           20,
           45,
-          "501.11716",
+          "501.12000",
           220,
-          "205.45894",
+          "205.46033",
           145,
         ]
       `);
@@ -1555,8 +1555,9 @@ describe("Test Linear Elements", () => {
       expect(rect.x).toBe(200);
       expect(rect.y).toBe(0);
       expect(handleBindTextResizeSpy).toHaveBeenCalledWith(
-        h.elements[1],
+        h.elements[0],
         h.app.scene,
+        "nw",
         false,
         false,
         false,

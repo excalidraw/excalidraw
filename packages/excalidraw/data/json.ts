@@ -1,4 +1,5 @@
 import {
+  COORDS_PRECISION,
   EXPORT_DATA_TYPES,
   getExportSource,
   MIME_TYPES,
@@ -32,7 +33,7 @@ const PRECISION_SENTINEL_RE = /"\\u0000([^"]+)\\u0000"/g;
 
 export const stringifyWithPrecision = (
   value: unknown,
-  precision = 2,
+  precision = COORDS_PRECISION,
   space?: number | string,
 ): string => {
   const fmt = (n: number) =>
@@ -40,8 +41,12 @@ export const stringifyWithPrecision = (
 
   return JSON.stringify(
     value,
-    (key, val) => {
-      if (SCALAR_ROUNDED_KEYS.has(key) && typeof val === "number") {
+    function (key, val) {
+      if (
+        SCALAR_ROUNDED_KEYS.has(key) &&
+        typeof val === "number" &&
+        !(this && typeof this === "object" && "naturalWidth" in this)
+      ) {
         return fmt(val);
       }
       if (key === "points" && Array.isArray(val)) {
@@ -106,7 +111,7 @@ export const serializeAsJSON = (
           undefined,
   };
 
-  return stringifyWithPrecision(data, 2, 2);
+  return stringifyWithPrecision(data, COORDS_PRECISION, 2);
 };
 
 export const saveAsJSON = async ({
@@ -176,7 +181,7 @@ export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
     source: getExportSource(),
     libraryItems,
   };
-  return stringifyWithPrecision(data, 2, 2);
+  return stringifyWithPrecision(data, COORDS_PRECISION, 2);
 };
 
 export const saveLibraryAsJSON = async (libraryItems: LibraryItems) => {

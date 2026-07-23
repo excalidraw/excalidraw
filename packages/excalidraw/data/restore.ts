@@ -55,6 +55,7 @@ import {
   normalizeStickyNoteBackgroundColor,
   normalizeStickyNoteFontSize,
   normalizeStickyNoteStrokeColor,
+  roundElementGeometry,
 } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { isStickyNoteElement } from "@excalidraw/element";
@@ -499,7 +500,7 @@ const restoreElementWithProperties = <
       "customData" in extra ? extra.customData : element.customData;
   }
 
-  const ret = {
+  const ret = roundElementGeometry({
     // spread the original element properties to not lose unknown ones
     // for forward-compatibility
     ...element,
@@ -507,7 +508,7 @@ const restoreElementWithProperties = <
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
-  } as unknown as T;
+  }) as unknown as T;
 
   // strip legacy props (migrated in previous steps)
   delete ret.strokeSharpness;

@@ -175,8 +175,9 @@ describe("Crop an image", () => {
       [-initialWidth / 3, 0],
       true,
     );
-    expect(image.width).toBeCloseTo(resizedWidth, 10);
-    expect(image.height).toBeCloseTo(resizedHeight, 10);
+    // recomputing from rounded coords can drift by one step of COORDS_PRECISION
+    expect(image.width).toBeCloseTo(resizedWidth, 1);
+    expect(image.height).toBeCloseTo(resizedHeight, 1);
 
     // re-crop to initial state
     UI.crop(image, "w", naturalWidth, naturalHeight, [-initialWidth / 3, 0]);
@@ -187,9 +188,12 @@ describe("Crop an image", () => {
     resizedWidth = image.width;
     resizedHeight = image.height;
 
-    // test corner handle aspect ratio preserving
+    // test corner handle aspect ratio preserving (up to coords rounding)
     UI.crop(image, "se", naturalWidth, naturalHeight, [initialWidth, 0], true);
-    expect(image.width / image.height).toBe(resizedWidth / resizedHeight);
+    expect(image.width / image.height).toBeCloseTo(
+      resizedWidth / resizedHeight,
+      3,
+    );
     expect(image.width).toBeLessThanOrEqual(initialWidth + 0.0001);
     expect(image.height).toBeLessThanOrEqual(initialHeight + 0.0001);
 
@@ -205,15 +209,15 @@ describe("Crop an image", () => {
     // 50 x 50 square
     UI.crop(image, "nw", naturalWidth, naturalHeight, [150, 50]);
     UI.crop(image, "n", naturalWidth, naturalHeight, [0, -100], true);
-    expect(image.width).toBeCloseTo(image.height);
+    expect(image.width).toBeCloseTo(image.height, 1);
     // image is at the corner, not space to its right to expand, should not be able to resize
-    expect(image.height).toBeCloseTo(50);
+    expect(image.height).toBeCloseTo(50, 1);
 
     UI.crop(image, "nw", naturalWidth, naturalHeight, [-150, -100], true);
-    expect(image.width).toBeCloseTo(image.height);
-    // max height should be reached
-    expect(image.height).toBeCloseTo(initialHeight);
-    expect(image.width).toBeCloseTo(initialHeight);
+    expect(image.width).toBeCloseTo(image.height, 1);
+    // max height should be reached (up to coords rounding)
+    expect(image.height).toBeCloseTo(initialHeight, 1);
+    expect(image.width).toBeCloseTo(initialHeight, 1);
   });
 });
 
