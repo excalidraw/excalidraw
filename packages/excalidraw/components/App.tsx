@@ -7082,7 +7082,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.cursor.reset();
-    if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
+    if (!this.state.viewModeEnabled) {
       const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
       if (isIframeLikeElement(hitElement)) {
@@ -7095,10 +7095,10 @@ class App extends React.Component<AppProps, AppState> {
       // shouldn't edit/create text when inside line editor (often false positive)
 
       if (!this.state.selectedLinearElement?.isEditing) {
-        const container = this.getTextBindableContainerAtPosition(
-          sceneX,
-          sceneY,
-        );
+        const container =
+          // skip binding to container on dblclick when holding ctrl
+          !event[KEYS.CTRL_OR_CMD] &&
+          this.getTextBindableContainerAtPosition(sceneX, sceneY);
 
         if (container) {
           if (
@@ -7126,7 +7126,7 @@ class App extends React.Component<AppProps, AppState> {
           sceneX,
           sceneY,
           insertAtParentCenter: !event.altKey,
-          container,
+          container: container || null,
         });
       }
     }
