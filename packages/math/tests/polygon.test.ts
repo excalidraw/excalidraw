@@ -2,7 +2,6 @@ import { pointFrom } from "../src/point";
 import {
   convexHull,
   polygonArea,
-  polygonPerimeter,
   polygonSignedArea,
   simplifyConvexPolygon,
 } from "../src/polygon";
@@ -29,13 +28,6 @@ describe("polygonArea", () => {
   it("reports the winding direction in the sign", () => {
     expect(polygonSignedArea(square)).toBe(100);
     expect(polygonSignedArea([...square].reverse())).toBe(-100);
-  });
-});
-
-describe("polygonPerimeter", () => {
-  it("includes the closing edge", () => {
-    expect(polygonPerimeter(square)).toBe(40);
-    expect(polygonPerimeter([...square, square[0]])).toBe(40);
   });
 });
 

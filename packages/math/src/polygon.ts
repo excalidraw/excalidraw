@@ -1,5 +1,4 @@
 import { pointsEqual } from "./point";
-import { lineSegment, pointOnLineSegment } from "./segment";
 import { PRECISION } from "./utils";
 
 import type { GlobalPoint, LocalPoint, Polygon } from "./types";
@@ -69,23 +68,6 @@ export const polygonIncludesPointNonZero = <Point extends [number, number]>(
   return windingNumber !== 0;
 };
 
-export const pointOnPolygon = <Point extends LocalPoint | GlobalPoint>(
-  p: Point,
-  poly: Polygon<Point>,
-  threshold = PRECISION,
-) => {
-  let on = false;
-
-  for (let i = 0, l = poly.length - 1; i < l; i++) {
-    if (pointOnLineSegment(p, lineSegment(poly[i], poly[i + 1]), threshold)) {
-      on = true;
-      break;
-    }
-  }
-
-  return on;
-};
-
 function polygonClose<Point extends LocalPoint | GlobalPoint>(
   polygon: Point[],
 ) {
@@ -122,20 +104,6 @@ export function polygonArea<Point extends LocalPoint | GlobalPoint>(
   polygon: readonly Point[],
 ): number {
   return Math.abs(polygonSignedArea(polygon));
-}
-
-/**
- * The total length of a polygon's edges, including the closing edge.
- */
-export function polygonPerimeter<Point extends LocalPoint | GlobalPoint>(
-  polygon: readonly Point[],
-): number {
-  const pts = polygonIsClosed(polygon) ? polygon.slice(0, -1) : polygon;
-  let sum = 0;
-  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-    sum += Math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1]);
-  }
-  return sum;
 }
 
 /**
