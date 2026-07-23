@@ -30,7 +30,6 @@ import {
   FreedrawToolButton,
   HandToolButton,
   ImageToolButton,
-  isToolButtonDisabled,
   LassoToolButton,
   LineToolButton,
   RectangleToolButton,
@@ -107,7 +106,6 @@ const ExtraToolsDropdown = ({
           shortcut={KEYS.F.toLocaleUpperCase()}
           data-testid="toolbar-frame"
           selected={frameToolSelected}
-          disabled={isToolButtonDisabled(app, "frame")}
         >
           {t("toolBar.frame")}
         </DropdownMenu.Item>
@@ -116,7 +114,6 @@ const ExtraToolsDropdown = ({
           icon={EmbedIcon}
           data-testid="toolbar-embeddable"
           selected={embeddableToolSelected}
-          disabled={isToolButtonDisabled(app, "embeddable")}
         >
           {t("toolBar.embeddable")}
         </DropdownMenu.Item>
@@ -126,7 +123,6 @@ const ExtraToolsDropdown = ({
           data-testid="toolbar-laser"
           selected={laserToolSelected}
           shortcut={KEYS.K.toLocaleUpperCase()}
-          disabled={isToolButtonDisabled(app, "laser")}
         >
           {t("toolBar.laser")}
         </DropdownMenu.Item>
@@ -136,7 +132,6 @@ const ExtraToolsDropdown = ({
             icon={LassoIcon}
             data-testid="toolbar-lasso"
             selected={lassoToolSelected}
-            disabled={isToolButtonDisabled(app, "lasso")}
           >
             {t("toolBar.lasso")}
           </DropdownMenu.Item>
@@ -158,7 +153,6 @@ const ExtraToolsDropdown = ({
             icon={MagicIcon}
             data-testid="toolbar-magicframe"
             badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
-            disabled={isToolButtonDisabled(app, "magicframe")}
           >
             {t("toolBar.magicframe")}
           </DropdownMenu.Item>
@@ -219,19 +213,13 @@ export const Toolbar = ({
             penDetected={appState.penDetected}
           />
         )}
-        {app.props.activeTool == null && (
-          <>
-            <LockButton
-              checked={appState.activeTool.locked}
-              onChange={onLockToggle}
-              title={t("toolBar.lock")}
-              // the active tool — including its lock state — is host-controlled
-              disabled={app.props.activeTool != null}
-            />
+        <LockButton
+          checked={appState.activeTool.locked}
+          onChange={onLockToggle}
+          title={t("toolBar.lock")}
+        />
 
-            <div className="App-toolbar__divider" />
-          </>
-        )}
+        <div className="App-toolbar__divider" />
 
         <HandToolButton {...toolProps} hideKeyBinding />
         {isCompactStylesPanel ? (

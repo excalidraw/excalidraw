@@ -92,8 +92,6 @@ interface LayerUIProps {
   children?: React.ReactNode;
   app: AppClassProperties;
   defaultUIEnabled: boolean;
-  zoomUIEnabled: boolean;
-  scrollBackToContentUIEnabled: boolean;
   isCollaborating: boolean;
   generateLinkForSelection?: AppProps["generateLinkForSelection"];
 }
@@ -153,8 +151,6 @@ const LayerUI = ({
   children,
   app,
   defaultUIEnabled,
-  zoomUIEnabled,
-  scrollBackToContentUIEnabled,
   isCollaborating,
   generateLinkForSelection,
 }: LayerUIProps) => {
@@ -594,7 +590,7 @@ const LayerUI = ({
           renderSidebars={renderSidebars}
           renderWelcomeScreen={renderWelcomeScreen}
           defaultUIEnabled={defaultUIEnabled}
-          scrollBackToContentUIEnabled={scrollBackToContentUIEnabled}
+          UIOptions={UIOptions}
         />
       )}
       {editorInterface.formFactor !== "phone" && (
@@ -617,10 +613,9 @@ const LayerUI = ({
               showExitZenModeBtn={showExitZenModeBtn}
               renderWelcomeScreen={renderWelcomeScreen}
               defaultUIEnabled={defaultUIEnabled}
-              zoomUIEnabled={zoomUIEnabled}
             />
             {(appState.toast ||
-              (scrollBackToContentUIEnabled && appState.scrolledOutside)) && (
+              (defaultUIEnabled && appState.scrolledOutside)) && (
               <div className="floating-status-stack">
                 {appState.toast && (
                   <Toast
@@ -631,7 +626,7 @@ const LayerUI = ({
                   />
                 )}
                 {!appState.toast &&
-                  scrollBackToContentUIEnabled &&
+                  defaultUIEnabled &&
                   appState.scrolledOutside && (
                     <button
                       type="button"

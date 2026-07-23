@@ -8,7 +8,6 @@ import { Popover } from "radix-ui";
 import { trackEvent } from "../analytics";
 
 import { IconButton } from "./IconButton";
-import { isToolButtonDisabled } from "./Tools";
 
 import "./ToolPopover.scss";
 
@@ -70,9 +69,6 @@ export const ToolPopover = ({
           type="toggle"
           icon={displayedOption.icon}
           checked={isActive}
-          disabled={options.every((option) =>
-            isToolButtonDisabled(app, option.type),
-          )}
           title={capitalizeString(displayedOption.title)}
           aria-label={capitalizeString(displayedOption.title)}
           data-testid={dataTestId}
@@ -95,7 +91,6 @@ export const ToolPopover = ({
             type="toggle"
             icon={icon}
             checked={currentType === type}
-            disabled={isToolButtonDisabled(app, type)}
             title={capitalizeString(type)}
             aria-label={capitalizeString(type)}
             data-testid={`toolbar-${type}`}

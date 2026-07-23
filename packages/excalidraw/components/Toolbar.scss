@@ -47,11 +47,10 @@
       background-color: transparent;
     }
 
-    // same state colors as checked tool buttons (`ToolIcon--checked`)
     &--selected,
     &--selected:hover {
-      background: var(--color-surface-primary-container);
-      color: var(--color-on-primary-container);
+      background: var(--color-primary-light);
+      color: var(--color-primary);
     }
   }
 

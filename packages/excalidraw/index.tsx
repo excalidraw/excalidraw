@@ -84,7 +84,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     viewModeEnabled,
     interaction,
     ui,
-    activeTool,
     zenModeEnabled,
     gridModeEnabled,
     libraryReturnUrl,
@@ -220,7 +219,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           viewModeEnabled={viewModeEnabled}
           interaction={interaction}
           ui={ui}
-          activeTool={activeTool}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
@@ -265,8 +263,6 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
     UIOptions: prevUIOptions = {},
     imageOptions: prevImageOptions,
     interaction: prevInteraction,
-    ui: prevUI,
-    activeTool: prevActiveTool,
     ...prev
   } = prevProps;
   const {
@@ -274,22 +270,8 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
     UIOptions: nextUIOptions = {},
     imageOptions: nextImageOptions,
     interaction: nextInteraction,
-    ui: nextUI,
-    activeTool: nextActiveTool,
     ...next
   } = nextProps;
-
-  // compare `activeTool` semantically so that hosts inlining the object
-  // (`activeTool={{ type: "laser" }}`) don't bust the memo every render
-  const isActiveToolSame =
-    prevActiveTool === nextActiveTool ||
-    (prevActiveTool?.type === nextActiveTool?.type &&
-      (prevActiveTool?.type === "custom" ? prevActiveTool.customType : null) ===
-        (nextActiveTool?.type === "custom" ? nextActiveTool.customType : null));
-
-  if (!isActiveToolSame) {
-    return false;
-  }
 
   // compare `interaction` semantically so that hosts inlining the config
   // object (`interaction={{ enabled: { links: true } }}`) don't bust the
@@ -307,29 +289,9 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
       !!prevInteraction.enabled?.navigation ===
         !!nextInteraction.enabled?.navigation &&
       !!prevInteraction.enabled?.browserZoom ===
-        !!nextInteraction.enabled?.browserZoom &&
-      !!prevInteraction.enabled?.tools?.laser ===
-        !!nextInteraction.enabled?.tools?.laser &&
-      !!prevInteraction.enabled?.tools?.custom ===
-        !!nextInteraction.enabled?.tools?.custom);
+        !!nextInteraction.enabled?.browserZoom);
 
   if (!isInteractionSame) {
-    return false;
-  }
-
-  // compare `ui` semantically so that hosts inlining the config object don't
-  // bust the memo every render
-  const isUISame =
-    prevUI === nextUI ||
-    (typeof prevUI === "object" &&
-      prevUI !== null &&
-      typeof nextUI === "object" &&
-      nextUI !== null &&
-      !!prevUI.enabled?.zoom === !!nextUI.enabled?.zoom &&
-      !!prevUI.enabled?.scrollBackToContent ===
-        !!nextUI.enabled?.scrollBackToContent);
-
-  if (!isUISame) {
     return false;
   }
 

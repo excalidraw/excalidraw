@@ -1,10 +1,4 @@
 {
-  "git": {
-    "deploymentEnabled": {
-      "master": true,
-      "**": false
-    }
-  },
   "outputDirectory": "build",
   "installCommand": "yarn install"
 }

@@ -182,8 +182,8 @@ describe("cursor hint", () => {
 
   it("does not show hint when pointer position is unknown", () => {
     // simulate no pointermove having happened yet
-    h.app.viewport.lastPosition.x = 0;
-    h.app.viewport.lastPosition.y = 0;
+    h.app.lastViewportPosition.x = 0;
+    h.app.lastViewportPosition.y = 0;
 
     UI.clickTool("arrow");
     pressKey(KEYS.A);
@@ -193,12 +193,7 @@ describe("cursor hint", () => {
   });
 
   it("tracks pointer position while visible", () => {
-    mockBoundingClientRect({
-      left: 100,
-      top: 50,
-      width: 1920,
-      height: 1080,
-    });
+    mockBoundingClientRect({ width: 1920, height: 1080 });
 
     try {
       UI.clickTool("arrow");
@@ -206,8 +201,8 @@ describe("cursor hint", () => {
 
       fireEvent.pointerMove(window, { clientX: 200, clientY: 100 });
 
-      // container-relative position, 16px offset from the pointer
-      expect(getCursorHint()!.style.transform).toBe("translate(116px, 66px)");
+      // 16px offset from the pointer
+      expect(getCursorHint()!.style.transform).toBe("translate(216px, 116px)");
     } finally {
       restoreOriginalGetBoundingClientRect();
     }

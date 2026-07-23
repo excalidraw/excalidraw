@@ -28,7 +28,6 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   NonDeleted,
-  FixedPointBinding,
   NonDeletedSceneElementsMap,
   PointsPositionUpdates,
 } from "../types";
@@ -112,17 +111,10 @@ const focusPointUpdate = (
 ) => {
   const pointUpdates = new Map();
 
-  const originalAdjacentBinding =
-    appState.selectedLinearElement?.initialState
-      .arrowOtherEndpointInitialBinding;
   const bindingField = isStartBinding ? "startBinding" : "endBinding";
   const adjacentBindingField = isStartBinding ? "endBinding" : "startBinding";
   let currentBinding = arrow[bindingField];
-  let adjacentBinding =
-    originalAdjacentBinding?.mode === "orbit" &&
-    arrow[adjacentBindingField]?.mode === "inside"
-      ? originalAdjacentBinding
-      : arrow[adjacentBindingField];
+  let adjacentBinding = arrow[adjacentBindingField];
 
   // Update the dragged focus point related end
   if (currentBinding && bindableElement) {
@@ -172,7 +164,7 @@ const focusPointUpdate = (
       // Same shape bound on both ends
       const boundToSameElementAfterUpdate =
         bindableElement && adjacentBinding.elementId === bindableElement.id;
-      if (boundToSameElementAfterUpdate) {
+      if (switchToInsideBinding || boundToSameElementAfterUpdate) {
         adjacentBinding = {
           ...adjacentBinding,
           mode: "inside",
@@ -348,7 +340,6 @@ export const handleFocusPointPointerDown = (
 ): {
   hitFocusPoint: "start" | "end" | null;
   pointerOffset: { x: number; y: number };
-  arrowOtherEndpointInitialBinding: FixedPointBinding | null;
 } => {
   const pointerPos = pointFrom(
     pointerDownState.origin.x,
@@ -386,7 +377,6 @@ export const handleFocusPointPointerDown = (
             x: pointerPos[0] - focusPoint[0],
             y: pointerPos[1] - focusPoint[1],
           },
-          arrowOtherEndpointInitialBinding: arrow.endBinding,
         };
       }
     }
@@ -422,7 +412,6 @@ export const handleFocusPointPointerDown = (
             x: pointerPos[0] - focusPoint[0],
             y: pointerPos[1] - focusPoint[1],
           },
-          arrowOtherEndpointInitialBinding: arrow.startBinding,
         };
       }
     }
@@ -431,7 +420,6 @@ export const handleFocusPointPointerDown = (
   return {
     hitFocusPoint: null,
     pointerOffset: { x: 0, y: 0 },
-    arrowOtherEndpointInitialBinding: null,
   };
 };
 
@@ -496,10 +484,6 @@ export const handleFocusPointPointerUp = (
       ],
     });
   }
-
-  return {
-    arrowOtherEndpointInitialBinding: null,
-  };
 };
 
 export const handleFocusPointHover = (
