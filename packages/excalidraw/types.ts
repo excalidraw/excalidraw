@@ -52,6 +52,7 @@ import type {
 import type { GlobalPoint } from "@excalidraw/math";
 
 import type { Action } from "./actions/types";
+import type { ActionManager } from "./actions/manager";
 import type { Spreadsheet } from "./charts";
 import type { ClipboardData } from "./clipboard";
 import type App from "./components/App";
@@ -1034,6 +1035,7 @@ export type AppProps = Merge<
 /** A subset of App class properties that we need to use elsewhere
  * in the app, eg Manager. Factored out into a separate type to keep DRY. */
 export type AppClassProperties = {
+  actionManager: ActionManager;
   props: AppProps;
   state: AppState;
   api: App["api"];

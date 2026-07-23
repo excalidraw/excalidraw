@@ -2254,6 +2254,15 @@ export const flipHorizontal = createIcon(
   tablerIconProps,
 );
 
+export const arrowsExchangeIcon = createIcon(
+  <g strokeWidth={1.5}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M5 8h14M15 4l4 4l-4 4" />
+    <path d="M19 16H5M9 12l-4 4l4 4" />
+  </g>,
+  tablerIconProps,
+);
+
 export const paintIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
