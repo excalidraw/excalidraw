@@ -183,6 +183,7 @@ export class API {
     id?: string;
     isDeleted?: boolean;
     frameId?: ExcalidrawElement["id"] | null;
+    layerId?: ExcalidrawElement["layerId"];
     index?: ExcalidrawElement["index"];
     groupIds?: ExcalidrawElement["groupIds"];
     // generic element props
@@ -264,6 +265,7 @@ export class API {
       width,
       height,
       frameId: rest.frameId ?? null,
+      layerId: rest.layerId ?? null,
       index: rest.index ?? null,
       angle: (rest.angle ?? 0) as Radians,
       strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,

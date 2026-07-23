@@ -140,7 +140,10 @@ export type ActionName =
   | "cropEditor"
   | "wrapSelectionInFrame"
   | "toggleShapeSwitch"
-  | "togglePolygon";
+  | "togglePolygon"
+  | "moveToLayer"
+  | "mergeSelectedLayers"
+  | "mergeAllLayers";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];
@@ -203,7 +206,8 @@ export interface Action<TData = any> {
           | "collab"
           | "hyperlink"
           | "search_menu"
-          | "shape_switch";
+          | "shape_switch"
+          | "layer";
         action?: string;
         predicate?: (
           appState: Readonly<AppState>,

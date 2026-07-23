@@ -228,6 +228,7 @@ import {
   dragNewElement,
   dragSelectedElements,
   getDragOffsetXY,
+  isElementInVisibleLayer,
   Scene,
   Store,
   CaptureUpdateAction,
@@ -308,6 +309,7 @@ import {
   actionFlipHorizontal,
   actionFlipVertical,
   actionGroup,
+  actionMoveToLayer,
   actionPasteStyles,
   actionSelectAll,
   actionSendBackward,
@@ -2306,6 +2308,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementsAreBeingDragged:
         this.state.selectedElementsAreBeingDragged,
       frameToHighlight: this.state.frameToHighlight,
+      layers: this.state.layers,
     });
     this.visibleElements = visibleElements;
     this.hasRenderableElements = renderableElementsMap.size > 0;
@@ -4921,6 +4924,7 @@ class App extends React.Component<AppProps, AppState> {
             lineHeight,
             autoResize: !isTextUnwrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
+            layerId: this.state.activeLayerId,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -6486,14 +6490,19 @@ class App extends React.Component<AppProps, AppState> {
 
     const elements = (
       opts?.includeBoundTextElement && opts?.includeLockedElements
-        ? this.scene.getNonDeletedElements()
+        ? this.scene
+            .getNonDeletedElements()
+            .filter((element) =>
+              isElementInVisibleLayer(element, this.state.layers),
+            )
         : this.scene
             .getNonDeletedElements()
             .filter(
               (element) =>
                 (opts?.includeLockedElements || !element.locked) &&
                 (opts?.includeBoundTextElement ||
-                  !(isTextElement(element) && element.containerId)),
+                  !(isTextElement(element) && element.containerId)) &&
+                isElementInVisibleLayer(element, this.state.layers),
             )
     )
       .filter((el) => this.hitElement(x, y, el))
@@ -6779,6 +6788,7 @@ class App extends React.Component<AppProps, AppState> {
             : container.angle
           : (0 as Radians),
         frameId,
+        layerId: this.state.activeLayerId,
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -9723,6 +9733,7 @@ class App extends React.Component<AppProps, AppState> {
       },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      layerId: this.state.activeLayerId,
       points: [pointFrom<LocalPoint>(0, 0)],
       // pressures are only consumed when rendering a real-pressure stroke, so
       // skip persisting them while pressure is being simulated
@@ -9883,6 +9894,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      layerId: this.state.activeLayerId,
       x: gridX - placeholderSize / 2,
       y: gridY - placeholderSize / 2,
       width: placeholderSize,
@@ -10068,6 +10080,7 @@ class App extends React.Component<AppProps, AppState> {
               endArrowhead,
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
+              layerId: this.state.activeLayerId,
               elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
               fixedSegments:
                 this.state.currentItemArrowType === ARROW_TYPE.elbow
@@ -10091,6 +10104,7 @@ class App extends React.Component<AppProps, AppState> {
                   : null,
               locked: false,
               frameId: topLayerFrame ? topLayerFrame.id : null,
+              layerId: this.state.activeLayerId,
             });
 
       const point = pointFrom<GlobalPoint>(
@@ -10254,6 +10268,7 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      layerId: this.state.activeLayerId,
     } as const;
 
     let element;
@@ -10299,6 +10314,7 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
       opacity: this.state.currentItemOpacity,
       locked: false,
+      layerId: this.state.activeLayerId,
       ...FRAME_STYLE,
     } as const;
 
@@ -13513,11 +13529,12 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
+      actionUngroup,
+      actionMoveToLayer,
       actionTextAutoResize,
       actionUnbindText,
       actionBindText,
       actionWrapTextInContainer,
-      actionUngroup,
       CONTEXT_MENU_SEPARATOR,
       actionAddToLibrary,
       ...zIndexActions,

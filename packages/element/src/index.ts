@@ -76,6 +76,7 @@ export * from "./arrows/focus";
 export * from "./fractionalIndex";
 export * from "./frame";
 export * from "./groups";
+export * from "./layer";
 export * from "./heading";
 export * from "./image";
 export * from "./linearElementEditor";
