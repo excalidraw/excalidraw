@@ -463,7 +463,7 @@ describe("drawShape styles panel & selection (preview path)", () => {
     // fill follows the standard rule: hidden while the background is
     // transparent (the default), shown otherwise
     expect(predicates.fill).toBe(false);
-    expect(predicates.strokeWidth).toBe(false);
+    expect(predicates.strokeWidth).toBe(true);
     expect(predicates.sloppiness).toBe(true);
     expect(predicates.roundness).toBe(false);
     expect(predicates.opacity).toBe(false);
