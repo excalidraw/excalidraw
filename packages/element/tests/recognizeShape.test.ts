@@ -224,6 +224,60 @@ describe("recognizeShape", () => {
     }
   });
 
+  it("does not read sharply bent open strokes as lines or arrows", () => {
+    const semicircle: [number, number][] = Array.from(
+      { length: 40 },
+      (_, i) => {
+        const a = (Math.PI * i) / 39;
+        return [Math.cos(a) * 150, Math.sin(a) * 150];
+      },
+    );
+    const sawtooth: [number, number][] = Array.from({ length: 31 }, (_, i) => [
+      i * 10,
+      (i % 2) * 60,
+    ]);
+
+    const bent: [string, [number, number][]][] = [
+      [
+        "a right-angle elbow",
+        [...edge([0, 0], [110, 110], 20), ...edge([110, 110], [220, 0], 20)],
+      ],
+      [
+        "an L shape",
+        [...edge([0, 0], [0, 150], 20), ...edge([0, 150], [150, 150], 20)],
+      ],
+      [
+        "a checkmark",
+        [...edge([0, 60], [60, 120], 12), ...edge([60, 120], [200, 0], 24)],
+      ],
+      ["a semicircular arc", semicircle],
+      ["a sawtooth", sawtooth],
+    ];
+
+    for (const [name, points] of bent) {
+      expect({
+        name,
+        type: recognizeShape(sketch(points, { noise: 2 }), null).type,
+      }).toEqual({ name, type: "freedraw" });
+    }
+  });
+
+  it("still reads a lazily bowed or squiggly stroke as a line", () => {
+    const bowed: [number, number][] = Array.from({ length: 40 }, (_, i) => {
+      const t = i / 39;
+      return [t * 300, Math.sin(t * Math.PI) * 24];
+    });
+    const squiggly: [number, number][] = Array.from({ length: 40 }, (_, i) => {
+      const t = i / 39;
+      return [t * 300, Math.sin(t * Math.PI * 4) * 12];
+    });
+
+    expect(recognizeShape(sketch(bowed, { noise: 2 }), null).type).toBe("line");
+    expect(recognizeShape(sketch(squiggly, { noise: 2 }), null).type).toBe(
+      "line",
+    );
+  });
+
   it("leaves a stroke that resembles no known shape as freedraw", () => {
     const squiggle: [number, number][] = Array.from({ length: 60 }, (_, i) => [
       i * 4 - 120,

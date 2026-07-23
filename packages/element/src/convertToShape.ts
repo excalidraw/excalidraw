@@ -14,8 +14,10 @@ import {
 } from "@excalidraw/common";
 import {
   convexHull,
+  distanceToLineSegment,
   elongation,
   kurtosis,
+  lineSegment,
   orientPrincipalAxes,
   pointFrom,
   polygonArea,
@@ -100,6 +102,17 @@ const CLOSED_GAP_MAX_RATIO = 0.15;
 
 // Maximum elongation for an open stroke to count as straight.
 const LINEAR_MAX_ELONGATION = 0.25;
+
+// Fraction of the start→tip distance around the tip inside which an arrowhead
+// may live: points there are exempt from the shaft straightness check.
+const ARROWHEAD_ZONE_RATIO = 0.5;
+
+// Maximum distance any point outside the arrowhead zone may stray from the
+// start→tip chord, as a fraction of the chord length. Loose enough for a lazy
+// bow or a small squiggle, tight enough to reject elbows, arcs and sawtooths
+// that only *statistically* look straight (their point-cloud elongation
+// passes, their geometry doesn't).
+const LINEAR_MAX_SHAFT_DEVIATION = 0.15;
 
 // Minimum |skew| along the major axis for an open, straight stroke to be an
 // arrow rather than a plain line. Arrowhead add "mass" -> skews that way.
@@ -201,6 +214,44 @@ interface StrokeFeatures {
   // factors each vary with the aspect ratio, but their product barely does:
   // ~1.83 for any rectangle, 2.25 for any ellipse, 3.24 for any diamond.
   kurtosisProduct: number;
+
+  // How far the stroke strays from the straight chord between its start and
+  // its farthest point ("tip"), as a fraction of that chord's length — points
+  // within ARROWHEAD_ZONE_RATIO of the tip are exempt, so an arrowhead
+  // doesn't count as straying. ~0 for a line or arrow however wobbly, large
+  // for elbows, arcs and sawtooths, whose point-cloud statistics alone can
+  // still look line-like.
+  shaftDeviationRatio: number;
+}
+
+// See StrokeFeatures.shaftDeviationRatio.
+function shaftDeviationRatio<P extends LocalPoint | GlobalPoint>(
+  pts: readonly P[],
+): number {
+  const start = pts[0];
+  let tip = start;
+  let tipDistance = 0;
+  for (const point of pts) {
+    const distance = Math.hypot(point[0] - start[0], point[1] - start[1]);
+    if (distance > tipDistance) {
+      tipDistance = distance;
+      tip = point;
+    }
+  }
+  if (tipDistance === 0) {
+    return 0;
+  }
+
+  const chord = lineSegment(start, tip);
+  let maxDeviation = 0;
+  for (const point of pts) {
+    const tipDist = Math.hypot(point[0] - tip[0], point[1] - tip[1]);
+    if (tipDist <= ARROWHEAD_ZONE_RATIO * tipDistance) {
+      continue;
+    }
+    maxDeviation = Math.max(maxDeviation, distanceToLineSegment(point, chord));
+  }
+  return maxDeviation / tipDistance;
 }
 
 // The turn angle at every resampled point, measured between the incoming and
@@ -298,6 +349,7 @@ function extractFeatures<P extends LocalPoint | GlobalPoint>(
     cornerTurnShare: cornerTurnShare(pts),
     kurtosisProduct:
       kurtosis(pts.map(([x]) => x)) * kurtosis(pts.map(([, y]) => y)),
+    shaftDeviationRatio: shaftDeviationRatio(pts),
   };
 }
 
@@ -366,7 +418,10 @@ function classifyClosedStroke(features: StrokeFeatures): Shape {
 // An open stroke is a line or an arrow, provided it is straight enough; the
 // arrowhead is what makes the point distribution lopsided.
 function classifyOpenStroke(features: StrokeFeatures): Shape {
-  if (features.elongation > LINEAR_MAX_ELONGATION) {
+  if (
+    features.elongation > LINEAR_MAX_ELONGATION ||
+    features.shaftDeviationRatio > LINEAR_MAX_SHAFT_DEVIATION
+  ) {
     return "freedraw";
   }
   return Math.abs(features.majorSkew) >= ARROW_MIN_SKEW ? "arrow" : "line";
