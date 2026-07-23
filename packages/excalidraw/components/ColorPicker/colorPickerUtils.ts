@@ -38,6 +38,26 @@ export const colorPickerHotkeyBindings = [
   ["z", "x", "c", "v", "b"],
 ].flat();
 
+/**
+ * Picks a random color from the palette, excluding "transparent" and the
+ * currently active color (when possible) so the result always looks different.
+ */
+export const getRandomColor = (
+  palette: ColorPaletteCustom,
+  currentColor?: string | null,
+): string => {
+  const colors = Object.values(palette)
+    .flat()
+    .filter((color) => color !== "transparent");
+
+  const candidates =
+    colors.length > 1
+      ? colors.filter((color) => color !== currentColor)
+      : colors;
+
+  return candidates[Math.floor(Math.random() * candidates.length)];
+};
+
 export const isCustomColor = ({
   color,
   palette,
