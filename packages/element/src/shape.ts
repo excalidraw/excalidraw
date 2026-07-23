@@ -14,6 +14,8 @@ import {
 import {
   pointFrom,
   pointDistance,
+  lineSegment,
+  curveChordC2Spline,
   type LocalPoint,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -45,7 +47,7 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
-
+import { debugDrawLine, debugDrawPolygon } from "./visualdebug";
 import {
   canBecomePolygon,
   isElbowArrow,
@@ -619,60 +621,44 @@ export const generateLinearCollisionShape = (
         });
       }
 
-      return generator
-        .curve(points as unknown as RoughPoint[], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i) => {
-          if (i === 0) {
-            const p = pointRotateRads<GlobalPoint>(
-              pointFrom<GlobalPoint>(
-                element.x + op.data[0],
-                element.y + op.data[1],
-              ),
-              center,
-              element.angle,
-            );
+      // Generate collision ops from the same C2 spline as the rendered shape
+      // (generateRoundedSimpleArrowShape), so hit-testing matches rendering.
+      const rotateLocal = (lx: number, ly: number): LocalPoint => {
+        const g = pointRotateRads<GlobalPoint>(
+          pointFrom<GlobalPoint>(element.x + lx, element.y + ly),
+          center,
+          element.angle,
+        );
+        return pointFrom<LocalPoint>(g[0] - element.x, g[1] - element.y);
+      };
 
-            return {
-              op: "move",
-              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-            };
-          }
+      const collisionOps: Array<{
+        op: "move" | "lineTo" | "bcurveTo";
+        data: number[] | LocalPoint;
+      }> = [];
+      collisionOps.push({
+        op: "move",
+        data: rotateLocal(points[0][0], points[0][1]),
+      });
 
-          return {
-            op: "bcurveTo",
-            data: [
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[0],
-                  element.y + op.data[1],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[2],
-                  element.y + op.data[3],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[4],
-                  element.y + op.data[5],
-                ),
-                center,
-                element.angle,
-              ),
-            ]
-              .map((p) =>
-                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-              )
-              .flat(),
-          };
+      if (points.length === 2) {
+        collisionOps.push({
+          op: "lineTo",
+          data: rotateLocal(points[1][0], points[1][1]),
         });
+      } else {
+        for (const [, cp1, cp2, end] of curveChordC2Spline(points)) {
+          const rcp1 = rotateLocal(cp1[0], cp1[1]);
+          const rcp2 = rotateLocal(cp2[0], cp2[1]);
+          const rend = rotateLocal(end[0], end[1]);
+
+          collisionOps.push({
+            op: "bcurveTo",
+            data: [rcp1[0], rcp1[1], rcp2[0], rcp2[1], rend[0], rend[1]],
+          });
+        }
+      }
+      return collisionOps;
     }
     case "freedraw": {
       if (element.points.length < 2) {
@@ -914,7 +900,15 @@ const _generateElementShape = (
           ];
         }
       } else {
-        shape = [generator.curve(points as unknown as RoughPoint[], options)];
+        shape = [
+          generator.path(
+            generateRoundedSimpleArrowShape(points),
+            generateRoughOptions(element, true, isDarkMode),
+          ),
+        ];
+        if (import.meta.env.DEV && window.visualDebug?.data) {
+          debugRoundedArrowControlPoints(element.x, element.y, points);
+        }
       }
 
       // add lines only in arrow
@@ -998,10 +992,91 @@ const _generateElementShape = (
   }
 };
 
+/**
+ * Debug helper to visualise the C2 spline control points that back a rounded
+ * arrow/line. Derives its geometry from the same `curveChordC2Spline` the
+ * renderer and collision code use, so the overlay always matches the drawn
+ * curve.
+ *
+ * Chords are grey, CP1 handles/circles are green (outgoing from each knot),
+ * CP2 handles/diamonds are blue (incoming to the next knot).
+ */
+const debugRoundedArrowControlPoints = (
+  elementX: number,
+  elementY: number,
+  points: readonly LocalPoint[],
+  permanent: boolean = false,
+) => {
+  if (points.length < 2) {
+    return;
+  }
+
+  const g = (p: LocalPoint): GlobalPoint =>
+    pointFrom<GlobalPoint>(elementX + p[0], elementY + p[1]);
+
+  const PERMANENT = { permanent } as const;
+  const CP_RADIUS = 5;
+  const DIAMOND_RADIUS = 6;
+
+  for (const [start, cp1Local, cp2Local, end] of curveChordC2Spline(points)) {
+    const p0 = g(start);
+    const p1 = g(end);
+    const cp1 = g(cp1Local);
+    const cp2 = g(cp2Local);
+
+    // chord (grey)
+    debugDrawLine(lineSegment(p0, p1), { color: "#888888", ...PERMANENT });
+
+    // CP1 handle + circle (green = outgoing from p0)
+    debugDrawLine(lineSegment(p0, cp1), { color: "#00cc44", ...PERMANENT });
+    debugDrawPolygon(
+      Array.from({ length: 9 }, (_, k) =>
+        pointFrom<GlobalPoint>(
+          cp1[0] + Math.cos((k * Math.PI) / 4) * CP_RADIUS,
+          cp1[1] + Math.sin((k * Math.PI) / 4) * CP_RADIUS,
+        ),
+      ),
+      { color: "#00cc44", close: true, ...PERMANENT },
+    );
+
+    // CP2 handle + diamond (blue = incoming to p1)
+    debugDrawLine(lineSegment(p1, cp2), { color: "#0088ff", ...PERMANENT });
+    debugDrawPolygon(
+      [
+        pointFrom<GlobalPoint>(cp2[0], cp2[1] - DIAMOND_RADIUS),
+        pointFrom<GlobalPoint>(cp2[0] + DIAMOND_RADIUS, cp2[1]),
+        pointFrom<GlobalPoint>(cp2[0], cp2[1] + DIAMOND_RADIUS),
+        pointFrom<GlobalPoint>(cp2[0] - DIAMOND_RADIUS, cp2[1]),
+      ],
+      { color: "#0088ff", close: true, ...PERMANENT },
+    );
+  }
+};
+
+const generateRoundedSimpleArrowShape = (
+  points: readonly LocalPoint[],
+): string => {
+  if (points.length < 2) {
+    return "";
+  }
+
+  if (points.length === 2) {
+    return `M ${points[0][0]} ${points[0][1]} L ${points[1][0]} ${points[1][1]}`;
+  }
+
+  const curves = curveChordC2Spline(points);
+  const path: string[] = [`M ${points[0][0]} ${points[0][1]}`];
+  for (const [, cp1, cp2, end] of curves) {
+    path.push(`C ${cp1[0]} ${cp1[1]} ${cp2[0]} ${cp2[1]} ${end[0]} ${end[1]}`);
+  }
+
+  return path.join(" ");
+};
+
 const generateElbowArrowShape = (
   points: readonly LocalPoint[],
   radius: number,
-) => {
+): string => {
   const subpoints = [] as [number, number][];
   for (let i = 1; i < points.length - 1; i += 1) {
     const prev = points[i - 1];
