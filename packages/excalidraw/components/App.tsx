@@ -703,6 +703,10 @@ class App extends React.Component<AppProps, AppState> {
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
+  /** whether a line editor was active on the two most recent pointerdowns.
+   * The first click of a double-click exits the line editor, so at dblclick
+   * time the state alone can't tell the gesture started inside one */
+  private lineEditorActiveOnPointerDown: [boolean, boolean] = [false, false];
   /** arrowheads removed via endpoint double-click toggle, so a subsequent
    * toggle can restore the original arrowhead (keyed by `elementId:side`) */
   private removedArrowheads = new Map<string, Arrowhead>();
@@ -7083,9 +7087,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      // shouldn't edit/create text when inside line editor (often false positive)
-
-      if (!this.state.selectedLinearElement?.isEditing) {
+      // shouldn't edit/create text when inside line editor, including when
+      // the first click of the double-click exited it
+      if (
+        !this.state.selectedLinearElement?.isEditing &&
+        !this.lineEditorActiveOnPointerDown.some(Boolean)
+      ) {
         const container = this.getTextBindableContainerAtPosition(
           sceneX,
           sceneY,
@@ -8404,6 +8411,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.lastPointerDownEvent = event;
+    this.lineEditorActiveOnPointerDown = [
+      this.lineEditorActiveOnPointerDown[1],
+      !!this.state.selectedLinearElement?.isEditing,
+    ];
 
     // we must exit before we set `cursorButton` state and `savePointer`
     // else it will send pointer state & laser pointer events in collab when
