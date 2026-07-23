@@ -224,4 +224,38 @@ describe("multi point mode in linear elements", () => {
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(h.elements.length).toEqual(1);
   });
+
+  it("finalizes multi-point line when switching tool via toolbar", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    // select tool
+    const tool = getByToolName("line");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas.interactive")!;
+    // first point is added on pointer down
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
+
+    // second point, enable multi point
+    fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerMove(canvas, { clientX: 50, clientY: 60 });
+
+    // commit second point
+    fireEvent.pointerDown(canvas, { clientX: 50, clientY: 60 });
+    fireEvent.pointerUp(canvas);
+    fireEvent.pointerMove(canvas, { clientX: 100, clientY: 140 });
+
+    expect(h.state.multiElement).not.toBe(null);
+
+    // switching tool via toolbar should finalize the multi-point line
+    fireEvent.click(getByToolName("selection"));
+
+    expect(h.state.multiElement).toBe(null);
+    expect(h.state.activeTool.type).toEqual("selection");
+    expect(h.elements.length).toEqual(1);
+
+    const line = h.elements[0] as ExcalidrawLinearElement;
+    expect(line.isDeleted).toBe(false);
+    // the uncommitted trailing point is trimmed
+    expect(line.points.length).toEqual(2);
+  });
 });
