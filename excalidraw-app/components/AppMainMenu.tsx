@@ -1,8 +1,4 @@
-import {
-  loginIcon,
-  ExcalLogo,
-  eyeIcon,
-} from "@excalidraw/excalidraw/components/icons";
+import { eyeIcon } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
@@ -11,7 +7,6 @@ import { isDevEnv } from "@excalidraw/common";
 import type { Theme } from "@excalidraw/element/types";
 
 import { LanguageList } from "../app-language/LanguageList";
-import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 import { saveDebugState } from "./DebugCanvas";
 
