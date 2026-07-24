@@ -112,6 +112,67 @@ export class Store {
   }
 
   /**
+   * Commits a synthetic durable history entry without changing the live scene.
+   *
+   * Builds StoreSnapshot → StoreChange → StoreDelta from the provided
+   * logical before/after element maps and optional appState patches, then
+   * emits the resulting durable increment immediately through an isolated
+   * path that does not flush pending micro actions.
+   *
+   * appState patches are merged on top of the current observed appState
+   * baseline so only the provided keys participate in the synthetic diff.
+   */
+  public commitSyntheticIncrement(params: {
+    logicalBefore: {
+      elements: SceneElementsMap;
+      appState?: Partial<ObservedAppState>;
+    };
+    logicalAfter: {
+      elements: SceneElementsMap;
+      appState?: Partial<ObservedAppState>;
+    };
+  }): boolean {
+    const { logicalBefore, logicalAfter } = params;
+    const observedAppStateBaseline = this.snapshot.appState;
+    const syntheticAppStateBefore = logicalBefore.appState
+      ? { ...observedAppStateBaseline, ...logicalBefore.appState }
+      : observedAppStateBaseline;
+    const syntheticAppStateAfter = logicalAfter.appState
+      ? { ...observedAppStateBaseline, ...logicalAfter.appState }
+      : observedAppStateBaseline;
+    const didAppStateChange = Delta.isRightDifferent(
+      syntheticAppStateBefore,
+      syntheticAppStateAfter,
+    );
+    const prevSnapshot = StoreSnapshot.create(
+      logicalBefore.elements,
+      syntheticAppStateBefore,
+      {
+        didElementsChange: true,
+        didAppStateChange,
+      },
+    );
+    const nextSnapshot = StoreSnapshot.create(
+      logicalAfter.elements,
+      syntheticAppStateAfter,
+      {
+        didElementsChange: true,
+        didAppStateChange,
+      },
+    );
+    const change = StoreChange.create(prevSnapshot, nextSnapshot);
+    const delta = StoreDelta.calculate(prevSnapshot, nextSnapshot);
+
+    if (delta.isEmpty()) {
+      return false;
+    }
+
+    this.emitIsolatedDurableIncrement(change, delta);
+
+    return true;
+  }
+
+  /**
    * Schedule special "micro" actions, to-be executed before the next commit, before it executes a scheduled "macro" action.
    */
   public scheduleMicroAction(
@@ -206,6 +267,7 @@ export class Store {
   public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
+    this.scheduledMicroActions = [];
   }
 
   /**
@@ -242,6 +304,24 @@ export class Store {
 
       this.onDurableIncrementEmitter.trigger(increment);
       this.onStoreIncrementEmitter.trigger(increment);
+    }
+  }
+
+  /**
+   * Emits a synthetic durable increment immediately without draining the
+   * regular micro-action queue.
+   */
+  private emitIsolatedDurableIncrement(change: StoreChange, delta: StoreDelta) {
+    const nextSnapshot = this.applyChangeToSnapshot(change);
+
+    if (!nextSnapshot) {
+      return;
+    }
+
+    try {
+      this.emitDurableIncrement(nextSnapshot, change, delta);
+    } finally {
+      this.snapshot = nextSnapshot;
     }
   }
 
@@ -492,6 +572,89 @@ export class EphemeralIncrement extends StoreIncrement {
 }
 
 /**
+ * Serializable delta marker used to recover pre-tx undo baselines
+ * without rewriting history stack entries.
+ */
+export type TxUndoOverride = {
+  txId: string;
+  elementId: string;
+  prop: string;
+  expectedInsertedValue: unknown;
+  preTxBaselineValue: unknown;
+  consumedKey: string;
+};
+
+export type StoreDeltaMarkers = {
+  txUndoOverrides?: TxUndoOverride[];
+};
+
+const cloneTxUndoOverride = (override: TxUndoOverride): TxUndoOverride => ({
+  ...override,
+});
+
+const cloneStoreDeltaMarkers = (
+  markers: StoreDeltaMarkers | undefined,
+): StoreDeltaMarkers | undefined =>
+  markers
+    ? {
+        ...markers,
+        txUndoOverrides: markers.txUndoOverrides?.map(cloneTxUndoOverride),
+      }
+    : undefined;
+
+const pruneStoreDeltaMarkers = (delta: StoreDelta) => {
+  const txUndoOverrides = delta.markers?.txUndoOverrides;
+  if (!txUndoOverrides || txUndoOverrides.length === 0) {
+    return;
+  }
+
+  const updatedEntries = delta.elements.updated as Record<
+    string,
+    Delta<Record<string, unknown>>
+  >;
+  const nextTxUndoOverrides = txUndoOverrides.filter((override) => {
+    const updatedEntry = updatedEntries[override.elementId];
+    return (
+      !!updatedEntry &&
+      Object.prototype.hasOwnProperty.call(updatedEntry.inserted, override.prop)
+    );
+  });
+
+  if (nextTxUndoOverrides.length === txUndoOverrides.length) {
+    return;
+  }
+
+  if (nextTxUndoOverrides.length === 0) {
+    delta.markers = undefined;
+    return;
+  }
+
+  delta.markers = {
+    ...delta.markers,
+    txUndoOverrides: nextTxUndoOverrides.map(cloneTxUndoOverride),
+  };
+};
+
+export const mergeStoreDeltaMarkers = (
+  delta: StoreDelta,
+  markers: StoreDeltaMarkers,
+) => {
+  const txUndoOverrides = markers.txUndoOverrides ?? [];
+  if (txUndoOverrides.length === 0) {
+    return;
+  }
+
+  const existing = delta.markers?.txUndoOverrides ?? [];
+  delta.markers = {
+    ...delta.markers,
+    txUndoOverrides: [
+      ...existing.map(cloneTxUndoOverride),
+      ...txUndoOverrides.map(cloneTxUndoOverride),
+    ],
+  };
+};
+
+/**
  * Represents a captured delta by the Store.
  */
 export class StoreDelta {
@@ -499,6 +662,7 @@ export class StoreDelta {
     public readonly id: string,
     public readonly elements: ElementsDelta,
     public readonly appState: AppStateDelta,
+    public markers?: StoreDeltaMarkers,
   ) {}
 
   /**
@@ -508,12 +672,16 @@ export class StoreDelta {
     elements: ElementsDelta,
     appState: AppStateDelta,
     opts: {
-      id: string;
-    } = {
-      id: randomId(),
-    },
+      id?: string;
+      markers?: StoreDeltaMarkers;
+    } = {},
   ) {
-    return new this(opts.id, elements, appState);
+    return new this(
+      opts.id ?? randomId(),
+      elements,
+      appState,
+      cloneStoreDeltaMarkers(opts.markers),
+    );
   }
 
   /**
@@ -538,11 +706,12 @@ export class StoreDelta {
    * Restore a store delta instance from a DTO.
    */
   public static restore(storeDeltaDTO: DTO<StoreDelta>) {
-    const { id, elements, appState } = storeDeltaDTO;
+    const { id, elements, appState, markers } = storeDeltaDTO;
     return new this(
       id,
       ElementsDelta.restore(elements),
       AppStateDelta.restore(appState),
+      cloneStoreDeltaMarkers(markers),
     );
   }
 
@@ -553,11 +722,12 @@ export class StoreDelta {
     id,
     elements: { added, removed, updated },
     appState: { delta: appStateDelta },
+    markers,
   }: DTO<StoreDelta>) {
     const elements = ElementsDelta.create(added, removed, updated);
     const appState = AppStateDelta.create(appStateDelta);
 
-    return new this(id, elements, appState);
+    return new this(id, elements, appState, cloneStoreDeltaMarkers(markers));
   }
 
   /**
@@ -569,8 +739,10 @@ export class StoreDelta {
     for (const delta of deltas) {
       aggregatedDelta.elements.squash(delta.elements);
       aggregatedDelta.appState.squash(delta.appState);
+      mergeStoreDeltaMarkers(aggregatedDelta, delta.markers ?? {});
     }
 
+    pruneStoreDeltaMarkers(aggregatedDelta);
     return aggregatedDelta;
   }
 
@@ -578,7 +750,12 @@ export class StoreDelta {
    * Inverse store delta, creates new instance of `StoreDelta`.
    */
   public static inverse(delta: StoreDelta) {
-    return this.create(delta.elements.inverse(), delta.appState.inverse());
+    const inversed = this.create(
+      delta.elements.inverse(),
+      delta.appState.inverse(),
+      { markers: delta.markers },
+    );
+    return inversed;
   }
 
   /**
@@ -614,7 +791,7 @@ export class StoreDelta {
     nextElements: SceneElementsMap,
     modifierOptions?: "deleted" | "inserted",
   ): StoreDelta {
-    return this.create(
+    const nextDelta = this.create(
       delta.elements.applyLatestChanges(
         prevElements,
         nextElements,
@@ -623,8 +800,11 @@ export class StoreDelta {
       delta.appState,
       {
         id: delta.id,
+        markers: delta.markers,
       },
     );
+    pruneStoreDeltaMarkers(nextDelta);
+    return nextDelta;
   }
 
   public static empty() {
