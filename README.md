@@ -6,7 +6,7 @@
 </a>
 
 <h4 align="center">
-  <a href="https://excalidraw.com">Excalidraw 编辑器</a> |
+  <a href="https://giraffeair.github.io/Excalidraw-better/">Excalidraw 编辑器</a> |
   <a href="https://plus.excalidraw.com/blog">博客</a> |
   <a href="https://docs.excalidraw.com">文档</a> |
   <a href="https://plus.excalidraw.com">Excalidraw+</a> |
