@@ -494,3 +494,26 @@
     }
   }
 }
+.palette-table .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 32px);
+  gap: 4px;
+}
+
+.palette-table .palette-cell {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.palette-table .palette-cell.selected {
+  outline: 2px solid blue;
+}
+
+.add-color-btn {
+  margin-top: 8px;
+  padding: 4px 8px;
+  font-size: 14px;
+}
