@@ -18,6 +18,7 @@ import {
 } from "@excalidraw/common";
 
 import { hashElementsVersion, hashString } from "@excalidraw/element";
+import { CURRENT_SCHEMA_VERSION, getSchemaVersion } from "@excalidraw/element";
 
 import { getCommonBoundingBox } from "@excalidraw/element";
 
@@ -65,9 +66,11 @@ type LibraryUpdate = {
   updatedItems: Map<LibraryItem["id"], LibraryItem>;
 };
 
-// an object so that we can later add more properties to it without breaking,
-// such as schema version
-export type LibraryPersistedData = { libraryItems: LibraryItems };
+// an object so that we can later add more properties to it without breaking
+export type LibraryPersistedData = {
+  libraryItems: LibraryItems;
+  schemaVersion?: number;
+};
 
 const onLibraryUpdateEmitter = new Emitter<
   [update: LibraryUpdate, libraryItems: LibraryItems]
@@ -554,7 +557,11 @@ class AdapterTransaction {
       new Promise<LibraryItems>(async (resolve, reject) => {
         try {
           const data = await adapter.load({ source });
-          resolve(restoreLibraryItems(data?.libraryItems || [], "published"));
+          resolve(
+            restoreLibraryItems(data?.libraryItems || [], "published", {
+              schemaVersion: getSchemaVersion(data),
+            }),
+          );
         } catch (error: any) {
           reject(error);
         }
@@ -662,7 +669,10 @@ const persistLibraryUpdate = async (
       const version = getLibraryItemsHash(nextLibraryItems);
 
       if (version !== lastSavedLibraryItemsHash) {
-        await adapter.save({ libraryItems: nextLibraryItems });
+        await adapter.save({
+          libraryItems: nextLibraryItems,
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+        });
       }
 
       lastSavedLibraryItemsHash = version;
@@ -862,6 +872,7 @@ export const useHandleLibrary = (
                 restoredData = restoreLibraryItems(
                   libraryData.libraryItems || [],
                   "published",
+                  { schemaVersion: getSchemaVersion(libraryData) },
                 );
 
                 // we don't queue this operation because it's running inside

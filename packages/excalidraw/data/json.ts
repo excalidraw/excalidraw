@@ -5,6 +5,8 @@ import {
   VERSIONS,
 } from "@excalidraw/common";
 
+import { CURRENT_SCHEMA_VERSION } from "@excalidraw/element";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { MaybePromise } from "@excalidraw/common/utility-types";
@@ -58,6 +60,7 @@ export const serializeAsJSON = (
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
     version: VERSIONS.excalidraw,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
     source: getExportSource(),
     elements,
     appState:
@@ -138,6 +141,7 @@ export const serializeLibraryAsJSON = (libraryItems: LibraryItems) => {
   const data: ExportedLibraryData = {
     type: EXPORT_DATA_TYPES.excalidrawLibrary,
     version: VERSIONS.excalidrawLibrary,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
     source: getExportSource(),
     libraryItems,
   };

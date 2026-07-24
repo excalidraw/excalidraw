@@ -146,7 +146,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -178,7 +177,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -233,7 +231,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -272,7 +269,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -409,6 +405,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       },
     },
     "id": "id22",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -492,6 +489,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       },
     },
     "id": "id23",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -526,7 +524,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -559,7 +556,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -578,6 +574,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "updated": {},
     },
     "id": "id3",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -633,7 +630,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -654,6 +650,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "updated": {},
     },
     "id": "id6",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -804,7 +801,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -836,7 +832,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -884,7 +879,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -1001,6 +995,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       },
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1076,6 +1071,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       },
     },
     "id": "id22",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -1110,7 +1106,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1143,7 +1138,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1162,6 +1156,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "updated": {},
     },
     "id": "id3",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1217,7 +1212,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -1238,6 +1232,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "updated": {},
     },
     "id": "id6",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -1408,7 +1403,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   ],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -1454,7 +1448,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -1491,7 +1484,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -1540,7 +1532,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1573,7 +1564,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1619,6 +1609,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -1789,7 +1780,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   ],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -1835,7 +1825,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -1872,7 +1861,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -1941,7 +1929,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -2000,6 +1987,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2149,7 +2137,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -2181,7 +2168,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -2230,7 +2216,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2263,7 +2248,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2282,6 +2266,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "updated": {},
     },
     "id": "id3",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2435,7 +2420,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -2472,7 +2456,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -2527,7 +2510,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -2585,7 +2567,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2618,7 +2599,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2637,6 +2617,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       "updated": {},
     },
     "id": "id3",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2699,7 +2680,6 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -2758,6 +2738,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2912,7 +2893,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -2952,7 +2932,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -2995,7 +2974,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "ola",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3050,7 +3028,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3082,6 +3059,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id9",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3238,7 +3216,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3278,7 +3255,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3321,7 +3297,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "ola",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3383,7 +3358,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "originalText": "que pasa",
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3426,6 +3400,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id9",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3582,7 +3557,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3622,7 +3596,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "ola",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3665,7 +3638,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3741,6 +3713,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id9",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3892,7 +3865,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3929,7 +3901,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -3969,7 +3940,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -4046,6 +4016,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id9",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -4197,7 +4168,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -4237,7 +4207,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -4298,6 +4267,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -4454,7 +4424,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -4494,7 +4463,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -4546,7 +4514,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4576,6 +4543,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -4730,7 +4698,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -4770,7 +4737,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -4830,7 +4796,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "originalText": "que pasa",
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4868,6 +4833,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -5022,7 +4988,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -5062,7 +5027,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -5112,6 +5076,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id6",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -5268,7 +5233,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -5308,7 +5272,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -5360,6 +5323,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -5509,7 +5473,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -5549,7 +5512,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -5601,7 +5563,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5626,6 +5587,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -5780,7 +5742,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -5820,7 +5781,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "originalText": "que pasa",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -5880,7 +5840,6 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
             "originalText": "que pasa",
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5903,6 +5862,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -6052,7 +6012,6 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -6085,7 +6044,6 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -6134,7 +6092,6 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6153,6 +6110,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
       "updated": {},
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6178,6 +6136,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -6328,7 +6287,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -6362,7 +6320,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -6425,7 +6382,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6460,7 +6416,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6478,6 +6433,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id13",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6504,6 +6460,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6526,6 +6483,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -6674,7 +6632,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -6706,7 +6663,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -6738,7 +6694,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -6793,7 +6748,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6812,6 +6766,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6850,7 +6805,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6868,6 +6822,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id18",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6893,6 +6848,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id19",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6931,7 +6887,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6949,6 +6904,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id20",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6976,6 +6932,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -7127,7 +7084,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -7159,7 +7115,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -7191,7 +7146,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -7246,7 +7200,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7279,7 +7232,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7312,7 +7264,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7331,6 +7282,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7353,6 +7305,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id18",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7373,6 +7326,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id19",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -7532,7 +7486,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -7566,7 +7519,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -7600,7 +7552,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -7634,7 +7585,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -7679,6 +7629,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7704,6 +7655,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -7865,7 +7817,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -7943,7 +7894,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -7963,6 +7913,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7987,6 +7938,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -8011,6 +7963,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -8157,7 +8110,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -8213,7 +8165,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8231,6 +8182,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -8256,6 +8208,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -8402,7 +8355,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -8434,7 +8386,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -8466,7 +8417,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -8509,6 +8459,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -8547,7 +8498,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8580,7 +8530,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8613,7 +8562,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8629,6 +8577,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -8777,7 +8726,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -8809,7 +8757,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -8841,7 +8788,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -8884,6 +8830,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       },
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -8922,7 +8869,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8955,7 +8901,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8988,7 +8933,6 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -9004,6 +8948,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -9158,7 +9103,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -9190,7 +9134,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -9222,7 +9165,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#a5d8ff",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -9277,7 +9219,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -9296,6 +9237,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       "updated": {},
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -9333,7 +9275,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -9352,6 +9293,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       "updated": {},
     },
     "id": "id22",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -9374,6 +9316,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       "updated": {},
     },
     "id": "id23",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -9394,6 +9337,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       "updated": {},
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -9433,6 +9377,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       },
     },
     "id": "id25",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -9603,7 +9548,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   ],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "simulatePressure": false,
   "strokeColor": "#1e1e1e",
   "strokeOptions": {
@@ -9640,7 +9584,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#a5d8ff",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -9713,7 +9656,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeOptions": {
@@ -9737,6 +9679,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -9885,7 +9828,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -9917,7 +9859,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#a5d8ff",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -9972,7 +9913,6 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -9991,6 +9931,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       "updated": {},
     },
     "id": "id9",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -10018,6 +9959,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
       },
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10166,7 +10108,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -10198,7 +10139,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#a5d8ff",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -10241,6 +10181,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10281,7 +10222,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10300,6 +10240,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10448,7 +10389,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#ffec99",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -10503,7 +10443,6 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10522,6 +10461,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -10547,6 +10487,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
       },
     },
     "id": "id6",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10699,7 +10640,6 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -10734,7 +10674,6 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -10768,7 +10707,6 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -10802,7 +10740,6 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -10863,6 +10800,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -11038,7 +10976,6 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -11115,7 +11052,6 @@ exports[`history > multiplayer undo/redo > should override remotely added points
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -11136,6 +11072,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11195,6 +11132,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -11341,7 +11279,6 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -11396,7 +11333,6 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11415,6 +11351,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11446,6 +11383,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -11595,7 +11533,6 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -11627,7 +11564,6 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -11685,7 +11621,6 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   ],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "KPrBI4g_v9qUB1XxYLgSz",
@@ -11771,7 +11706,6 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "KPrBI4g_v9qUB1XxYLgSz",
@@ -11828,6 +11762,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11860,7 +11795,6 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11893,7 +11827,6 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11909,6 +11842,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -12542,7 +12476,6 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -12585,6 +12518,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12610,6 +12544,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
       },
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -12650,7 +12585,6 @@ exports[`history > multiplayer undo/redo > should update history entries after r
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12669,6 +12603,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -12815,7 +12750,6 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -12847,7 +12781,6 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -12903,7 +12836,6 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12919,6 +12851,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -13069,7 +13002,6 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -13101,7 +13033,6 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -13156,7 +13087,6 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13175,6 +13105,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
       "updated": {},
     },
     "id": "id6",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -13321,7 +13252,6 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -13372,7 +13302,6 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   ],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "simulatePressure": false,
   "strokeColor": "#1e1e1e",
   "strokeOptions": {
@@ -13428,7 +13357,6 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   ],
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "simulatePressure": false,
   "strokeColor": "#e03131",
   "strokeOptions": {
@@ -13488,7 +13416,6 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13507,6 +13434,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13527,6 +13455,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13575,7 +13504,6 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "simulatePressure": false,
             "strokeColor": "#e03131",
             "strokeOptions": {
@@ -13599,6 +13527,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -13750,7 +13679,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "transparent",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -13805,7 +13733,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "transparent",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13824,6 +13751,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -13972,7 +13900,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "transparent",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -14027,7 +13954,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "transparent",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14046,6 +13972,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -14204,7 +14131,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
     1,
     1,
   ],
-  "schemaVersion": 1,
   "status": "pending",
   "strokeColor": "transparent",
   "strokeStyle": "solid",
@@ -14243,7 +14169,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
     1,
     1,
   ],
-  "schemaVersion": 1,
   "status": "pending",
   "strokeColor": "transparent",
   "strokeStyle": "solid",
@@ -14306,7 +14231,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
               1,
               1,
             ],
-            "schemaVersion": 1,
             "status": "pending",
             "strokeColor": "transparent",
             "strokeStyle": "solid",
@@ -14346,7 +14270,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
               1,
               1,
             ],
-            "schemaVersion": 1,
             "status": "pending",
             "strokeColor": "transparent",
             "strokeStyle": "solid",
@@ -14366,6 +14289,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -14521,7 +14445,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
     1,
     1,
   ],
-  "schemaVersion": 1,
   "status": "pending",
   "strokeColor": "transparent",
   "strokeStyle": "solid",
@@ -14560,7 +14483,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
     1,
     1,
   ],
-  "schemaVersion": 1,
   "status": "pending",
   "strokeColor": "transparent",
   "strokeStyle": "solid",
@@ -14623,7 +14545,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
               1,
               1,
             ],
-            "schemaVersion": 1,
             "status": "pending",
             "strokeColor": "transparent",
             "strokeStyle": "solid",
@@ -14663,7 +14584,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
               1,
               1,
             ],
-            "schemaVersion": 1,
             "status": "pending",
             "strokeColor": "transparent",
             "strokeStyle": "solid",
@@ -14683,6 +14603,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -14832,7 +14753,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -14863,7 +14783,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -14926,7 +14845,6 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14945,6 +14863,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -15093,7 +15012,6 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -15125,7 +15043,6 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -15180,7 +15097,6 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -15199,6 +15115,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -15347,7 +15264,6 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -15379,7 +15295,6 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -15434,7 +15349,6 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -15453,6 +15367,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -15601,7 +15516,6 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -15639,6 +15553,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
       "updated": {},
     },
     "id": "id13",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -15659,6 +15574,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -15697,7 +15613,6 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -15713,6 +15628,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
       "updated": {},
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -15863,7 +15779,6 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -15895,7 +15810,6 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -15950,7 +15864,6 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -15969,6 +15882,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -15989,6 +15903,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
       "updated": {},
     },
     "id": "id9",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -16009,6 +15924,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
       "updated": {},
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -16046,7 +15962,6 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -16065,6 +15980,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
       "updated": {},
     },
     "id": "id13",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -16214,7 +16130,6 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -16248,6 +16163,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
       "updated": {},
     },
     "id": "id3",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -16401,7 +16317,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -16435,7 +16350,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -16497,7 +16411,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -16532,7 +16445,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -16551,6 +16463,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -16700,7 +16613,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -16732,7 +16644,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -16781,7 +16692,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -16814,7 +16724,6 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -16833,6 +16742,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
       "updated": {},
     },
     "id": "id3",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -16982,7 +16892,6 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -17149,7 +17058,6 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -17192,6 +17100,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -17217,6 +17126,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
       },
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -17237,6 +17147,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
       "updated": {},
     },
     "id": "id16",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -17277,7 +17188,6 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -17296,6 +17206,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -17451,6 +17362,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -17469,6 +17381,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -17628,7 +17541,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -17668,7 +17580,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "originalText": "ola",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -17708,7 +17619,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -17763,7 +17673,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -17897,6 +17806,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id18",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -17931,7 +17841,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -17972,7 +17881,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "originalText": "ola",
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -18008,7 +17916,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -18027,6 +17934,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -18047,6 +17955,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -18067,6 +17976,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -18125,6 +18035,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -18189,7 +18100,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -18248,6 +18158,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -18407,7 +18318,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -18447,7 +18357,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "originalText": "ola",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -18487,7 +18396,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -18542,7 +18450,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -18600,7 +18507,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -18641,7 +18547,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "originalText": "ola",
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -18677,7 +18582,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -18696,6 +18600,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -18716,6 +18621,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -18736,6 +18642,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -18794,6 +18701,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -18858,7 +18766,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -18925,6 +18832,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -19084,7 +18992,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -19124,7 +19031,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "originalText": "ola",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -19164,7 +19070,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -19219,7 +19124,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -19277,7 +19181,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -19318,7 +19221,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "originalText": "ola",
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -19354,7 +19256,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -19373,6 +19274,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -19393,6 +19295,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id22",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -19413,6 +19316,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id23",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -19471,6 +19375,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -19535,7 +19440,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -19602,6 +19506,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id25",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -19759,7 +19664,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -19799,7 +19703,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "originalText": "ola",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -19839,7 +19742,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -19894,7 +19796,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -20004,6 +19905,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -20038,7 +19940,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -20079,7 +19980,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "originalText": "ola",
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -20115,7 +20015,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -20134,6 +20033,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -20154,6 +20054,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -20174,6 +20075,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -20232,6 +20134,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -20296,7 +20199,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -20355,6 +20257,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -20382,6 +20285,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id18",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -20542,7 +20446,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -20582,7 +20485,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "originalText": "ola",
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -20622,7 +20524,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -20677,7 +20578,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -20783,6 +20683,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -20817,7 +20718,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -20858,7 +20758,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "originalText": "ola",
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -20894,7 +20793,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -20913,6 +20811,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -20933,6 +20832,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -20953,6 +20853,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21011,6 +20912,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21075,7 +20977,6 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -21134,6 +21035,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       },
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21161,6 +21063,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id18",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21181,6 +21084,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
       "updated": {},
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -21332,7 +21236,6 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -21364,7 +21267,6 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -21396,7 +21298,6 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -21451,7 +21352,6 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -21470,6 +21370,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21507,7 +21408,6 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -21526,6 +21426,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21563,7 +21464,6 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -21582,6 +21482,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21607,6 +21508,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
       },
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21629,6 +21531,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
       "updated": {},
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21649,6 +21552,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
       "updated": {},
     },
     "id": "id18",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -21684,6 +21588,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
       },
     },
     "id": "id22",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -21839,7 +21744,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -21873,7 +21777,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -21907,7 +21810,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -21941,7 +21843,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -21975,7 +21876,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -22009,7 +21909,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -22071,7 +21970,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -22106,7 +22004,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -22125,6 +22022,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -22172,7 +22070,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -22207,7 +22104,6 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -22226,6 +22122,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
       "updated": {},
     },
     "id": "id28",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -22374,7 +22271,6 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -22406,7 +22302,6 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -22438,7 +22333,6 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -22493,7 +22387,6 @@ exports[`history > singleplayer undo/redo > should support element creation, del
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -22512,6 +22405,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
       "updated": {},
     },
     "id": "id23",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -22549,7 +22443,6 @@ exports[`history > singleplayer undo/redo > should support element creation, del
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -22568,6 +22461,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
       "updated": {},
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -22605,7 +22499,6 @@ exports[`history > singleplayer undo/redo > should support element creation, del
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -22624,6 +22517,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
       "updated": {},
     },
     "id": "id25",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -22646,6 +22540,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
       "updated": {},
     },
     "id": "id26",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -22666,6 +22561,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
       "updated": {},
     },
     "id": "id27",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -22708,6 +22604,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
       "updated": {},
     },
     "id": "id28",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -22877,7 +22774,6 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "roundness": {
     "type": 2,
   },
-  "schemaVersion": 1,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -22954,7 +22850,6 @@ exports[`history > singleplayer undo/redo > should support linear element creati
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -22975,6 +22870,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
       "updated": {},
     },
     "id": "id20",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -23024,6 +22920,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
       },
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -23048,6 +22945,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
       "updated": {},
     },
     "id": "id22",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -23101,6 +22999,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
       },
     },
     "id": "id23",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -23125,6 +23024,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
       "updated": {},
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
 ]
 `;

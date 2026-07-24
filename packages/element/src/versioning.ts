@@ -1,57 +1,87 @@
 /**
- * The schema version that the current in-memory element shape corresponds to.
+ * The schema version the current in-memory element shape corresponds to.
  */
-export const CURRENT_ELEMENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 1;
+
+type SchemaMigration = {
+  // Upgrades a full element from schema version n to n + 1.
+  element: (element: any) => any;
+  // Upgrades a partial element (durable undo/redo).
+  elementPartial: (partial: any) => any;
+};
+
+const identity = <T>(value: T): T => value;
 
 /**
- * A migration that upgrades an element from one schema version to the next.
- */
-type ElementSchemaMigration = (element: any) => any;
-
-/**
- * `migrations[n]` upgrades an element from schema version `n` to `n + 1`.
+ * migrations[n] upgrades data from schema version to n + 1.
  *
- * Index `0` migrates legacy (unversioned) elements to version 1.
+ * NOTE: Index 0 migrates legacy (unversioned) data to version 1.
+ *
+ * IMPORTANT: data of unknown provenance (API input, clipboard from older
+ * builds etc.) is considered 'legacy' v0!
  */
-const migrations: Record<number, ElementSchemaMigration> = {
-  0: (element) => element,
+const migrations: Record<number, SchemaMigration> = {
+  0: { element: identity, elementPartial: identity },
 };
 
 /**
- * Returns an element's schema version, treating a missing `schemaVersion` (i.e.
- * a legacy element persisted before schema versioning) as version 0.
+ * Returns the schema version indicated by a container.
  */
-export const getElementSchemaVersion = (element: {
-  schemaVersion?: number;
-}): number =>
-  typeof element.schemaVersion === "number" ? element.schemaVersion : 0;
+export const getSchemaVersion = (source: unknown): number => {
+  const schemaVersion = (source as { schemaVersion?: unknown } | null)
+    ?.schemaVersion;
 
-/**
- * Lifts an element up to {@link CURRENT_ELEMENT_SCHEMA_VERSION} by running each
- * migration in sequence, then stamps the current schema version onto it.
- *
- * Safe to call on an already-current element (the migration chain is empty and
- * it is simply re-stamped). If a migration step is missing (which shouldn't
- * happen), it stops early rather than throwing, so a partially-known element is
- * still returned rather than lost.
- */
-export const upgradeElementSchema = <T>(
-  element: T,
-): T & { schemaVersion: number } => {
-  let version = getElementSchemaVersion(element as { schemaVersion?: number });
-  let upgraded: any = element;
+  return typeof schemaVersion === "number" && Number.isFinite(schemaVersion)
+    ? schemaVersion
+    : 0;
+};
 
-  while (version < CURRENT_ELEMENT_SCHEMA_VERSION) {
-    const migrate = migrations[version];
-    if (!migrate) {
+const runMigrations = <T>(
+  kind: keyof SchemaMigration,
+  value: T,
+  fromVersion: number,
+): T => {
+  let version = fromVersion;
+  let migrated: any = value;
+
+  // NOTE: data from a newer client (fromVersion > current) is returned as-is;
+  // unknown properties are preserved down the line for forward-compatibility
+  while (version < CURRENT_SCHEMA_VERSION) {
+    const migration = migrations[version];
+    if (!migration) {
       break;
     }
-    upgraded = migrate(upgraded);
+    migrated = migration[kind](migrated);
     version += 1;
   }
 
-  return {
-    ...upgraded,
-    schemaVersion: CURRENT_ELEMENT_SCHEMA_VERSION,
-  };
+  return migrated;
 };
+
+/**
+ * Lifts a full element from `fromVersion` up to
+ * {@link CURRENT_SCHEMA_VERSION} by running each migration in sequence.
+ */
+export const migrateElement = <T>(element: T, fromVersion: number): T =>
+  runMigrations("element", element, fromVersion);
+
+/**
+ * Lifts all elements of a container from `fromVersion` up to
+ * {@link CURRENT_SCHEMA_VERSION}.
+ */
+export const migrateElements = <T>(
+  elements: readonly T[],
+  fromVersion: number,
+): readonly T[] =>
+  fromVersion >= CURRENT_SCHEMA_VERSION
+    ? elements
+    : elements.map((element) => migrateElement(element, fromVersion));
+
+/**
+ * Lifts a partial element shape (as contained in deltas) from `fromVersion`
+ * up to {@link CURRENT_SCHEMA_VERSION}.
+ */
+export const migrateElementPartial = <T>(partial: T, fromVersion: number): T =>
+  fromVersion >= CURRENT_SCHEMA_VERSION
+    ? partial
+    : runMigrations("elementPartial", partial, fromVersion);

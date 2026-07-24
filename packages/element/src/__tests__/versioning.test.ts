@@ -1,72 +1,88 @@
 import {
-  CURRENT_ELEMENT_SCHEMA_VERSION,
-  getElementSchemaVersion,
-  upgradeElementSchema,
+  CURRENT_SCHEMA_VERSION,
+  getSchemaVersion,
+  migrateElement,
+  migrateElementPartial,
+  migrateElements,
 } from "../versioning";
 
-describe("element schema versioning", () => {
-  describe("getElementSchemaVersion", () => {
-    it("treats an element without schemaVersion as legacy (version 0)", () => {
-      expect(getElementSchemaVersion({})).toBe(0);
-      expect(getElementSchemaVersion({ schemaVersion: undefined })).toBe(0);
+describe("scene schema versioning", () => {
+  describe("getSchemaVersion", () => {
+    it("treats a container without schemaVersion as legacy (version 0)", () => {
+      expect(getSchemaVersion({})).toBe(0);
+      expect(getSchemaVersion({ schemaVersion: undefined })).toBe(0);
+      expect(getSchemaVersion(null)).toBe(0);
+      expect(getSchemaVersion(undefined)).toBe(0);
     });
 
-    it("returns the element's schemaVersion when present", () => {
-      expect(getElementSchemaVersion({ schemaVersion: 1 })).toBe(1);
-      expect(getElementSchemaVersion({ schemaVersion: 3 })).toBe(3);
+    it("treats an invalid schemaVersion as legacy (version 0)", () => {
+      expect(getSchemaVersion({ schemaVersion: "2" })).toBe(0);
+      expect(getSchemaVersion({ schemaVersion: NaN })).toBe(0);
+      expect(getSchemaVersion({ schemaVersion: Infinity })).toBe(0);
+    });
+
+    it("returns the container's schemaVersion when present", () => {
+      expect(getSchemaVersion({ schemaVersion: 1 })).toBe(1);
+      expect(getSchemaVersion({ schemaVersion: 3 })).toBe(3);
     });
   });
 
-  describe("upgradeElementSchema", () => {
-    it("lifts a legacy element to the current schema version", () => {
-      const legacy = { id: "a", type: "rectangle", backgroundColor: "#fff" };
+  describe("migrateElements", () => {
+    it("lifts legacy elements through the whole migration chain", () => {
+      const legacy = [{ id: "a", type: "rectangle", backgroundColor: "#fff" }];
 
-      const upgraded = upgradeElementSchema(legacy);
+      const migrated = migrateElements(legacy, 0);
 
-      expect(upgraded.schemaVersion).toBe(CURRENT_ELEMENT_SCHEMA_VERSION);
+      // v0 -> v1 migration keeps the element shape intact
+      expect(migrated).toEqual(legacy);
     });
 
-    it("preserves all other properties when upgrading", () => {
-      const legacy = { id: "a", type: "rectangle", backgroundColor: "#fff" };
+    it("returns the input array unchanged when already current", () => {
+      const elements = [{ id: "a", type: "rectangle" }];
 
-      const upgraded = upgradeElementSchema(legacy);
-
-      expect(upgraded).toEqual({
-        ...legacy,
-        schemaVersion: CURRENT_ELEMENT_SCHEMA_VERSION,
-      });
+      expect(migrateElements(elements, CURRENT_SCHEMA_VERSION)).toBe(elements);
     });
 
-    it("is idempotent on an already-current element", () => {
-      const current = {
-        id: "a",
-        type: "rectangle",
-        schemaVersion: CURRENT_ELEMENT_SCHEMA_VERSION,
-      };
+    it("returns the input array unchanged when coming from a newer client", () => {
+      const elements = [{ id: "a", type: "rectangle" }];
 
-      const upgraded = upgradeElementSchema(current);
-
-      expect(upgraded).toEqual(current);
+      expect(migrateElements(elements, CURRENT_SCHEMA_VERSION + 1)).toBe(
+        elements,
+      );
     });
+  });
 
+  describe("migrateElement", () => {
     it("does not mutate the input element", () => {
       const legacy = { id: "a", type: "rectangle" };
 
-      upgradeElementSchema(legacy);
+      const migrated = migrateElement(legacy, 0);
 
-      expect(legacy).not.toHaveProperty("schemaVersion");
+      expect(migrated).toEqual({ id: "a", type: "rectangle" });
+      expect(legacy).toEqual({ id: "a", type: "rectangle" });
+    });
+  });
+
+  describe("migrateElementPartial", () => {
+    it("lifts a legacy delta partial to the current schema version", () => {
+      const partial = { backgroundColor: "#fff", version: 2 };
+
+      expect(migrateElementPartial(partial, 0)).toEqual(partial);
     });
 
-    // Template for future N -> N+1 migrations. When a real migration is added
-    // (e.g. repurposing an attribute at schema version 2), assert here that a
-    // legacy element is transformed as expected end-to-end. Kept minimal on
-    // purpose so it documents the pattern without asserting fake behavior.
-    it("runs migrations in sequence up to the current version", () => {
-      const upgraded = upgradeElementSchema({ id: "a", schemaVersion: 0 });
+    it("returns the partial unchanged when already current", () => {
+      const partial = { backgroundColor: "#fff" };
 
-      expect(getElementSchemaVersion(upgraded)).toBe(
-        CURRENT_ELEMENT_SCHEMA_VERSION,
+      expect(migrateElementPartial(partial, CURRENT_SCHEMA_VERSION)).toBe(
+        partial,
       );
     });
+  });
+
+  // Template for future migrations
+  it("runs migrations in sequence up to the current version", () => {
+    const migrated = migrateElement({ id: "a" }, 0);
+
+    expect(migrated).toEqual({ id: "a" });
   });
 });

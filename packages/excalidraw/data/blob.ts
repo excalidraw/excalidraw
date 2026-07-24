@@ -7,6 +7,8 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
+import { getSchemaVersion } from "@excalidraw/element";
+
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
@@ -161,6 +163,7 @@ export const loadSceneOrLibraryFromBlob = async (
       const elements = restoreElements(data.elements, localElements, {
         repairBindings: true,
         deleteInvisibleElements: true,
+        schemaVersion: getSchemaVersion(data),
       });
       return {
         type: MIME_TYPES.excalidraw,
@@ -224,7 +227,9 @@ export const parseLibraryJSON = (
     throw new Error("Invalid library");
   }
   const libraryItems = data.libraryItems || data.library;
-  return restoreLibraryItems(libraryItems, defaultStatus);
+  return restoreLibraryItems(libraryItems, defaultStatus, {
+    schemaVersion: getSchemaVersion(data),
+  });
 };
 
 export const loadLibraryFromBlob = async (
