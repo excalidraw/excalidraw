@@ -1,5 +1,5 @@
 import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
-import { defaultLang, languages } from "@excalidraw/excalidraw/i18n";
+import { languages } from "@excalidraw/excalidraw/i18n";
 import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   screen,
@@ -20,9 +20,7 @@ const TestApp = () => {
   return (
     <Excalidraw langCode={langCode}>
       <MainMenu>
-        <MainMenu.ItemCustom>
-          <LanguageList />
-        </MainMenu.ItemCustom>
+        <LanguageList />
       </MainMenu>
     </Excalidraw>
   );
@@ -44,15 +42,20 @@ describe("Test LanguageList", () => {
     expect(screen.queryByTitle(/thin/i)).not.toBeNull();
     fireEvent.click(document.querySelector(".dropdown-menu-button")!);
 
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: TEST_LANG_CODE },
+    // Open language submenu
+    fireEvent.click(screen.getByText("Select language"));
+    // Click French option
+    await waitFor(() => {
+      expect(screen.getByText("Français")).toBeTruthy();
     });
+    fireEvent.click(screen.getByText("Français"));
     // switching to French, `thin` label should no longer exist
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).toBeNull());
-    // reset language
-    fireEvent.change(document.querySelector(".dropdown-select__language")!, {
-      target: { value: defaultLang.code },
+    // Click English to switch back (menu + submenu stay open via preventDefault)
+    await waitFor(() => {
+      expect(screen.getByText("English")).toBeTruthy();
     });
+    fireEvent.click(screen.getByText("English"));
     // switching back to English
     await waitFor(() => expect(screen.queryByTitle(/thin/i)).not.toBeNull());
   });
