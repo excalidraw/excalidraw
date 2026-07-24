@@ -149,14 +149,15 @@ export const actionFinalize = register<FormData>({
         // but do an update to all new elements anyway for undo/redo purposes.
 
         if (element && isInvisiblySmallElement(element)) {
-          // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-          newElements = newElements.map((el) => {
-            if (el.id === element.id) {
-              return newElementWith(el, {
-                isDeleted: true,
-              });
-            }
-            return el;
+          const [x, y] = element.points[0];
+          // we need to make the element "non-small" before deleting so that
+          // the sync engine doesn't ignore it
+          scene.mutateElement(element, {
+            points: [
+              ...element.points,
+              [x + Math.random() * 60, y + Math.random() * 60],
+            ] as LocalPoint[],
+            isDeleted: true,
           });
         }
 
@@ -295,12 +296,15 @@ export const actionFinalize = register<FormData>({
       }
 
       if (element && isInvisiblySmallElement(element)) {
-        // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
-        newElements = newElements.map((el) => {
-          if (el.id === element?.id) {
-            return newElementWith(el, { isDeleted: true });
-          }
-          return el;
+        const [x, y] = element.points[0];
+        // we need to make the element "non-small" before deleting so that
+        // the sync engine doesn't ignore it
+        scene.mutateElement(element, {
+          points: [
+            ...element.points,
+            [x + Math.random() * 60, y + Math.random() * 60],
+          ] as LocalPoint[],
+          isDeleted: true,
         });
       }
 

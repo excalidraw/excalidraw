@@ -648,10 +648,16 @@ export const textWysiwyg = ({
       event.preventDefault();
       submittedViaKeyboard = true;
       handleSubmit();
-    } else if (actionSaveToActiveFile.keyTest(event)) {
+    } else if (
+      (event.key === KEYS.S || event.key.toLowerCase() === KEYS.S) &&
+      event[KEYS.CTRL_OR_CMD] &&
+      !event.shiftKey
+    ) {
       event.preventDefault();
-      handleSubmit();
-      app.actionManager.executeAction(actionSaveToActiveFile);
+      if (actionSaveToActiveFile.keyTest(event)) {
+        handleSubmit();
+        app.actionManager.executeAction(actionSaveToActiveFile);
+      }
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
