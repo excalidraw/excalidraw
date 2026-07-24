@@ -11,7 +11,7 @@ import {
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
 import { UI } from "../tests/helpers/ui";
-import { render } from "../tests/test-utils";
+import { fireEvent, render, togglePopover } from "../tests/test-utils";
 
 describe("element locking", () => {
   beforeEach(async () => {
@@ -80,6 +80,20 @@ describe("element locking", () => {
 
       const centerTextAlign = queryByTestId(document.body, `align-right`);
       expect(centerTextAlign).toBeChecked();
+    });
+
+    it("should show feedback for invalid color input", () => {
+      UI.clickTool("rectangle");
+      togglePopover("Stroke");
+
+      const colorInput = document.querySelector<HTMLInputElement>(
+        ".color-picker-input",
+      )!;
+
+      fireEvent.change(colorInput, { target: { value: "gggggg" } });
+
+      expect(colorInput).toHaveAttribute("aria-invalid", "true");
+      expect(document.body).toHaveTextContent("Enter a valid color.");
     });
   });
 
