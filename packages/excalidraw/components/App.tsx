@@ -13326,11 +13326,17 @@ class App extends React.Component<AppProps, AppState> {
       activeEmbeddable: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
-    let [resizeX, resizeY] = getGridPoint(
-      pointerCoords.x - pointerDownState.resize.offset.x,
-      pointerCoords.y - pointerDownState.resize.offset.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
-    );
+    let [resizeX, resizeY] =
+      transformHandleType === "rotation"
+        ? [
+            pointerCoords.x - pointerDownState.resize.offset.x,
+            pointerCoords.y - pointerDownState.resize.offset.y,
+          ]
+        : getGridPoint(
+            pointerCoords.x - pointerDownState.resize.offset.x,
+            pointerCoords.y - pointerDownState.resize.offset.y,
+            event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+          );
 
     const frameElementsOffsetsMap = new Map<
       string,
