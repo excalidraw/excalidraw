@@ -26,6 +26,7 @@ interface Props {
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
   svgCache: SvgCache;
   itemsRenderedPerBatch: number;
+  renderItemOverlay?: (id: LibraryItem["id"]) => ReactNode;
 }
 
 export const LibraryMenuSectionGrid = ({
@@ -45,6 +46,7 @@ export const LibraryMenuSection = memo(
     onClick,
     svgCache,
     itemsRenderedPerBatch,
+    renderItemOverlay,
   }: Props) => {
     const [, startTransition] = useTransition();
     const [index, setIndex] = useState(0);
@@ -61,17 +63,22 @@ export const LibraryMenuSection = memo(
       <>
         {items.map((item, i) => {
           return i < index ? (
-            <LibraryUnit
-              elements={item?.elements}
-              isPending={!item?.id && !!item?.elements}
-              onClick={onClick}
-              svgCache={svgCache}
-              id={item?.id}
-              selected={isItemSelected(item.id)}
-              onToggle={onItemSelectToggle}
-              onDrag={onItemDrag}
+            <div
+              className="library-menu-items-container__cell"
               key={item?.id ?? i}
-            />
+            >
+              <LibraryUnit
+                elements={item?.elements}
+                isPending={!item?.id && !!item?.elements}
+                onClick={onClick}
+                svgCache={svgCache}
+                id={item?.id}
+                selected={isItemSelected(item.id)}
+                onToggle={onItemSelectToggle}
+                onDrag={onItemDrag}
+              />
+              {item?.id && renderItemOverlay?.(item.id)}
+            </div>
           ) : (
             <EmptyLibraryUnit key={i} />
           );
