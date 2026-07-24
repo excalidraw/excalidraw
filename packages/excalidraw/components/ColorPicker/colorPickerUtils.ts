@@ -4,7 +4,8 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { ColorPickerColor, ColorPaletteCustom } from "@excalidraw/common";
 
-import { atom } from "../../editor-jotai";
+
+
 
 export const getColorNameAndShadeFromColor = ({
   palette,
@@ -100,3 +101,7 @@ export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"
   | "elementStroke";
+import { atom } from "jotai";
+
+// This stores our recent colors
+export const recentColorsAtom = atom<string[]>([]);

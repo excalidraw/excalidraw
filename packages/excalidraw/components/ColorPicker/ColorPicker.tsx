@@ -2,6 +2,9 @@ import { Popover } from "radix-ui";
 import clsx from "clsx";
 import { useRef, useEffect } from "react";
 
+import { RecentColors } from "./RecentColors";
+import { recentColorsAtom } from "./colorPickerUtils";
+
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   COLOR_PALETTE,
@@ -84,6 +87,27 @@ const ColorPickerPopupContent = ({
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
 
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
+  const [, setRecentColors] = useAtom(recentColorsAtom);
+
+  // We wrap the onChange handler to save the color to recent colors
+  // while preserving Excalidraw's caret position logic
+  const handleColorChange = (changedColor: string) => {
+    const savedSelection = appState.editingTextElement
+      ? saveCaretPosition()
+      : null;
+
+    onChange(changedColor);
+
+    // Save to Jotai atom state
+    setRecentColors((prev) => {
+      const filtered = prev.filter((c) => c !== changedColor);
+      return [changedColor, ...filtered].slice(0, 5); // Max 5 recent colors
+    });
+
+    if (appState.editingTextElement && savedSelection) {
+      restoreCaretPosition(savedSelection);
+    }
+  };
 
   const colorInputJSX = (
     <div>
@@ -91,12 +115,12 @@ const ColorPickerPopupContent = ({
       <ColorInput
         color={color || ""}
         label={label}
-        onChange={(color) => {
-          onChange(color);
-        }}
+        onChange={handleColorChange}
         colorPickerType={type}
         placeholder={t("colorPicker.color")}
       />
+      {/* Moved inside the visible container! */}
+      <RecentColors onChange={handleColorChange} />
     </div>
   );
 
@@ -110,10 +134,8 @@ const ColorPickerPopupContent = ({
     <PropertiesPopover
       container={container}
       style={{ maxWidth: "13rem" }}
-      // Improve focus handling for text editing scenarios
       preventAutoFocusOnTouch={!!appState.editingTextElement}
       onFocusOutside={(event) => {
-        // refocus due to eye dropper
         if (!isWritableElement(event.target)) {
           focusPickerContent();
         }
@@ -121,20 +143,15 @@ const ColorPickerPopupContent = ({
       }}
       onPointerDownOutside={(event) => {
         if (eyeDropperState) {
-          // prevent from closing if we click outside the popover
-          // while eyedropping (e.g. click when clicking the sidebar;
-          // the eye-dropper-backdrop is prevented downstream)
           event.preventDefault();
         }
       }}
       onClose={() => {
-        // only clear if we're still the active popup (avoid racing with switch)
         if (getOpenPopup() === type) {
           updateData({ openPopup: null });
         }
         setActiveColorPickerSection(null);
 
-        // Refocus text editor when popover closes if we were editing text
         if (appState.editingTextElement) {
           setTimeout(() => {
             const textEditor = document.querySelector(
@@ -148,60 +165,51 @@ const ColorPickerPopupContent = ({
       }}
     >
       {palette ? (
-        <Picker
-          ref={colorPickerContentRef}
-          palette={palette}
-          color={color}
-          onChange={(changedColor) => {
-            // Save caret position before color change if editing text
-            const savedSelection = appState.editingTextElement
-              ? saveCaretPosition()
-              : null;
-
-            onChange(changedColor);
-
-            // Restore caret position after color change if editing text
-            if (appState.editingTextElement && savedSelection) {
-              restoreCaretPosition(savedSelection);
-            }
-          }}
-          onEyeDropperToggle={(force) => {
-            setEyeDropperState((state) => {
-              if (force) {
-                state = state || {
-                  keepOpenOnAlt: true,
-                  onSelect: onChange,
-                  colorPickerType: type,
-                };
-                state.keepOpenOnAlt = true;
-                return state;
-              }
-
-              return force === false || state
-                ? null
-                : {
-                    keepOpenOnAlt: false,
-                    onSelect: onChange,
+        <>
+          <Picker
+            ref={colorPickerContentRef}
+            palette={palette}
+            color={color}
+            onChange={handleColorChange}
+            onEyeDropperToggle={(force) => {
+              setEyeDropperState((state) => {
+                if (force) {
+                  state = state || {
+                    keepOpenOnAlt: true,
+                    onSelect: handleColorChange,
                     colorPickerType: type,
                   };
-            });
-          }}
-          onEscape={(event) => {
-            if (eyeDropperState) {
-              setEyeDropperState(null);
-            } else {
-              // close explicitly on Escape
-              updateData({ openPopup: null });
-            }
-          }}
-          type={type}
-          elements={elements}
-          updateData={updateData}
-          showTitle={isCompactMode}
-          showHotKey={!isMobileMode}
-        >
-          {colorInputJSX}
-        </Picker>
+                  state.keepOpenOnAlt = true;
+                  return state;
+                }
+
+                return force === false || state
+                  ? null
+                  : {
+                      keepOpenOnAlt: false,
+                      onSelect: handleColorChange,
+                      colorPickerType: type,
+                    };
+              });
+            }}
+            onEscape={(event) => {
+              if (eyeDropperState) {
+                setEyeDropperState(null);
+              } else {
+                updateData({ openPopup: null });
+              }
+            }}
+            type={type}
+            elements={elements}
+            updateData={updateData}
+            showTitle={isCompactMode}
+            showHotKey={!isMobileMode}
+          >
+            {colorInputJSX}
+          </Picker>
+          {/* Render RecentColors right below the Picker */}
+          
+        </>
       ) : (
         colorInputJSX
       )}
@@ -228,11 +236,9 @@ const ColorPickerTrigger = ({
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
   const handleClick = (e: React.MouseEvent) => {
-    // use pointerdown so we run before outside-close logic
     e.preventDefault();
     e.stopPropagation();
 
-    // If editing text, temporarily disable the wysiwyg blur event
     if (editingTextElement) {
       temporarilyDisableTextEditorBlur();
     }
@@ -323,7 +329,6 @@ export const ColorPicker = ({
             }
           }}
         >
-          {/* serves as an active color indicator as well */}
           <ColorPickerTrigger
             color={color}
             label={label}
@@ -331,19 +336,15 @@ export const ColorPicker = ({
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
             onToggle={() => {
-              // atomic switch: if another popup is open, close it first, then open this one next tick
               if (appState.openPopup === type) {
-                // toggle off on same trigger
                 updateData({ openPopup: null });
               } else if (appState.openPopup) {
                 updateData({ openPopup: type });
               } else {
-                // open this one
                 updateData({ openPopup: type });
               }
             }}
           />
-          {/* popup content */}
           {appState.openPopup === type && (
             <ColorPickerPopupContent
               type={type}
