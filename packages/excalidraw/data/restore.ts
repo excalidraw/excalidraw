@@ -1155,6 +1155,13 @@ export const restoreAppState = (
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
     ),
     editingFrame: null,
+    // `collaborators` is a Map, which `JSON.stringify` turns into `{}`, so a
+    // persisted-and-reimported appState yields a plain object here. Coerce it
+    // back to a Map to avoid `collaborators.forEach/.has is not a function`.
+    collaborators:
+      nextAppState.collaborators instanceof Map
+        ? nextAppState.collaborators
+        : new Map(),
   };
 };
 
