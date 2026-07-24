@@ -96,6 +96,7 @@ import { RadioSelection } from "../components/RadioSelection";
 import { IconButton } from "../components/IconButton";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
+import { FontSizePicker } from "../components/FontSizePicker/FontSizePicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
 import {
@@ -882,7 +883,23 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
     label: "labels.fontSize",
     trackEvent: false,
     perform: (elements, appState, value, app) => {
-      return changeFontSize(
+      if (
+        value &&
+        typeof value === "object" &&
+        "openPopup" in (value as Record<string, unknown>)
+      ) {
+        return {
+          elements,
+          appState: {
+            ...appState,
+            openPopup: (value as { openPopup: AppState["openPopup"] })
+              .openPopup,
+          },
+          captureUpdate: CaptureUpdateAction.EVENTUALLY,
+        };
+      }
+
+      const result = changeFontSize(
         elements,
         appState,
         app,
@@ -892,79 +909,101 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
         },
         value,
       );
+
+      if (appState.openPopup === "fontSize") {
+        result.appState = { ...result.appState, openPopup: null };
+      }
+
+      return result;
     },
     PanelComponent: ({ elements, appState, updateData, app, data }) => {
       const { isCompact } = getStylesPanelInfo(app);
+      const currentFontSize = getFormValue(
+        elements,
+        app,
+        (element) => {
+          if (isTextElement(element)) {
+            return element.fontSize;
+          }
+          const boundTextElement = getBoundTextElement(
+            element,
+            app.scene.getNonDeletedElementsMap(),
+          );
+          if (boundTextElement) {
+            return boundTextElement.fontSize;
+          }
+          return null;
+        },
+        (element) =>
+          isTextElement(element) ||
+          getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !==
+            null,
+        (hasSelection) =>
+          hasSelection
+            ? null
+            : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+      );
 
       return (
         <fieldset>
           <legend>{t("labels.fontSize")}</legend>
-          <div className="buttonList">
-            <RadioSelection
-              group="font-size"
-              options={[
-                {
-                  value: FONT_SIZES.sm,
-                  text: t("labels.small"),
-                  icon: FontSizeSmallIcon,
-                  testId: "fontSize-small",
-                },
-                {
-                  value: FONT_SIZES.md,
-                  text: t("labels.medium"),
-                  icon: FontSizeMediumIcon,
-                  testId: "fontSize-medium",
-                },
-                {
-                  value: FONT_SIZES.lg,
-                  text: t("labels.large"),
-                  icon: FontSizeLargeIcon,
-                  testId: "fontSize-large",
-                },
-                {
-                  value: FONT_SIZES.xl,
-                  text: t("labels.veryLarge"),
-                  icon: FontSizeExtraLargeIcon,
-                  testId: "fontSize-veryLarge",
-                },
-              ]}
-              value={getFormValue(
-                elements,
-                app,
-                (element) => {
-                  if (isTextElement(element)) {
-                    return element.fontSize;
-                  }
-                  const boundTextElement = getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
+          {isCompact ? (
+            <div className="buttonList">
+              <RadioSelection
+                group="font-size"
+                options={[
+                  {
+                    value: FONT_SIZES.sm,
+                    text: t("labels.small"),
+                    icon: FontSizeSmallIcon,
+                    testId: "fontSize-small",
+                  },
+                  {
+                    value: FONT_SIZES.md,
+                    text: t("labels.medium"),
+                    icon: FontSizeMediumIcon,
+                    testId: "fontSize-medium",
+                  },
+                  {
+                    value: FONT_SIZES.lg,
+                    text: t("labels.large"),
+                    icon: FontSizeLargeIcon,
+                    testId: "fontSize-large",
+                  },
+                  {
+                    value: FONT_SIZES.xl,
+                    text: t("labels.veryLarge"),
+                    icon: FontSizeExtraLargeIcon,
+                    testId: "fontSize-veryLarge",
+                  },
+                ]}
+                value={currentFontSize}
+                onChange={(value) => {
+                  withCaretPositionPreservation(
+                    () => updateData(value),
+                    isCompact,
+                    !!appState.editingTextElement,
+                    data?.onPreventClose,
                   );
-                  if (boundTextElement) {
-                    return boundTextElement.fontSize;
-                  }
-                  return null;
-                },
-                (element) =>
-                  isTextElement(element) ||
-                  getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  ) !== null,
-                (hasSelection) =>
-                  hasSelection
-                    ? null
-                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-              )}
+                }}
+              />
+            </div>
+          ) : (
+            <FontSizePicker
+              fontSize={currentFontSize}
               onChange={(value) => {
                 withCaretPositionPreservation(
                   () => updateData(value),
-                  isCompact,
+                  false,
                   !!appState.editingTextElement,
                   data?.onPreventClose,
                 );
               }}
+              elements={elements}
+              appState={appState}
+              updateData={updateData}
             />
-          </div>
+          )}
         </fieldset>
       );
     },
