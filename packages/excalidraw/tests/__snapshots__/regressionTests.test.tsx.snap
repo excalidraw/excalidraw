@@ -167,7 +167,6 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -186,6 +185,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -222,7 +222,6 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -241,6 +240,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -277,7 +277,6 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -296,6 +295,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -318,6 +318,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -338,6 +339,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -387,6 +389,7 @@ exports[`given element A and group of elements B and given both are selected whe
       },
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -407,6 +410,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id20",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -427,6 +431,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id23",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -600,7 +605,6 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -619,6 +623,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -655,7 +660,6 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -674,6 +678,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -710,7 +715,6 @@ exports[`given element A and group of elements B and given both are selected whe
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -729,6 +733,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -749,6 +754,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -798,6 +804,7 @@ exports[`given element A and group of elements B and given both are selected whe
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -818,6 +825,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -848,6 +856,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "updated": {},
     },
     "id": "id20",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -1012,7 +1021,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1031,6 +1039,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1067,7 +1076,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1086,6 +1094,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1108,6 +1117,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1128,6 +1138,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1173,6 +1184,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1199,6 +1211,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1237,7 +1250,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1256,6 +1268,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1283,6 +1296,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1303,6 +1317,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id27",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1368,6 +1383,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       },
     },
     "id": "id30",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1395,6 +1411,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id33",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1419,6 +1436,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
       "updated": {},
     },
     "id": "id36",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -1583,7 +1601,6 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1602,6 +1619,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1629,6 +1647,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
       },
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -1798,7 +1817,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1817,6 +1835,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1853,7 +1872,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1872,6 +1890,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1908,7 +1927,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -1927,6 +1945,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1949,6 +1968,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1969,6 +1989,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2018,6 +2039,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] undo s
       },
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2184,7 +2206,6 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2203,6 +2224,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2239,7 +2261,6 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2267,6 +2288,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] undo 
       },
     },
     "id": "id6",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2431,7 +2453,6 @@ exports[`regression tests > arrow keys > [end of test] undo stack 1`] = `
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2450,6 +2471,7 @@ exports[`regression tests > arrow keys > [end of test] undo stack 1`] = `
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2616,7 +2638,6 @@ exports[`regression tests > can drag element that covers another element, while 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2635,6 +2656,7 @@ exports[`regression tests > can drag element that covers another element, while 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2671,7 +2693,6 @@ exports[`regression tests > can drag element that covers another element, while 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2690,6 +2711,7 @@ exports[`regression tests > can drag element that covers another element, while 
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2726,7 +2748,6 @@ exports[`regression tests > can drag element that covers another element, while 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2745,6 +2766,7 @@ exports[`regression tests > can drag element that covers another element, while 
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2780,6 +2802,7 @@ exports[`regression tests > can drag element that covers another element, while 
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2944,7 +2967,6 @@ exports[`regression tests > change the properties of a shape > [end of test] und
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -2963,6 +2985,7 @@ exports[`regression tests > change the properties of a shape > [end of test] und
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2988,6 +3011,7 @@ exports[`regression tests > change the properties of a shape > [end of test] und
       },
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3013,6 +3037,7 @@ exports[`regression tests > change the properties of a shape > [end of test] und
       },
     },
     "id": "id6",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3038,6 +3063,7 @@ exports[`regression tests > change the properties of a shape > [end of test] und
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3181,7 +3207,6 @@ exports[`regression tests > click on an element and drag it > [dragged] element 
   "opacity": 100,
   "roughness": 1,
   "roundness": null,
-  "schemaVersion": 1,
   "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -3237,7 +3262,6 @@ exports[`regression tests > click on an element and drag it > [dragged] undo sta
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3256,6 +3280,7 @@ exports[`regression tests > click on an element and drag it > [dragged] undo sta
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3283,6 +3308,7 @@ exports[`regression tests > click on an element and drag it > [dragged] undo sta
       },
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3449,7 +3475,6 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3468,6 +3493,7 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3495,6 +3521,7 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
       },
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3522,6 +3549,7 @@ exports[`regression tests > click on an element and drag it > [end of test] undo
       },
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3688,7 +3716,6 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3707,6 +3734,7 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3743,7 +3771,6 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3762,6 +3789,7 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3784,6 +3812,7 @@ exports[`regression tests > click to select a shape > [end of test] undo stack 1
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3951,7 +3980,6 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -3970,6 +3998,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4006,7 +4035,6 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4025,6 +4053,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4061,7 +4090,6 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4080,6 +4108,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4103,6 +4132,7 @@ exports[`regression tests > click-drag to select a group > [end of test] undo st
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -4269,7 +4299,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4288,6 +4317,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4324,7 +4354,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4343,6 +4372,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4365,6 +4395,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4385,6 +4416,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4430,6 +4462,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4456,6 +4489,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "updated": {},
     },
     "id": "id16",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4495,6 +4529,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "updated": {},
     },
     "id": "id18",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4519,6 +4554,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "updated": {},
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4543,6 +4579,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
       "updated": {},
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -4661,7 +4698,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
     "opacity": 100,
     "roughness": 1,
     "roundness": null,
-    "schemaVersion": 1,
     "seed": 493213705,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
@@ -4737,7 +4773,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4756,6 +4791,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4792,7 +4828,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -4811,6 +4846,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4831,6 +4867,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -4996,7 +5033,6 @@ exports[`regression tests > deselects group of selected elements on pointer up w
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5015,6 +5051,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5051,7 +5088,6 @@ exports[`regression tests > deselects group of selected elements on pointer up w
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5070,6 +5106,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5090,6 +5127,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5111,6 +5149,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -5228,7 +5267,6 @@ exports[`regression tests > deselects selected element on pointer down when poin
     "opacity": 100,
     "roughness": 1,
     "roundness": null,
-    "schemaVersion": 1,
     "seed": 1116226695,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
@@ -5304,7 +5342,6 @@ exports[`regression tests > deselects selected element on pointer down when poin
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5323,6 +5360,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -5487,7 +5525,6 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5506,6 +5543,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5526,6 +5564,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -5690,7 +5729,6 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5709,6 +5747,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5745,7 +5784,6 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5764,6 +5802,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5800,7 +5839,6 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -5819,6 +5857,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5840,6 +5879,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
       "updated": {},
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5897,6 +5937,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
       },
     },
     "id": "id13",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -5924,6 +5965,7 @@ exports[`regression tests > double click to edit a group > [end of test] undo st
       "updated": {},
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -6092,7 +6134,6 @@ exports[`regression tests > drags selected elements from point inside common bou
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6111,6 +6152,7 @@ exports[`regression tests > drags selected elements from point inside common bou
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6147,7 +6189,6 @@ exports[`regression tests > drags selected elements from point inside common bou
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6166,6 +6207,7 @@ exports[`regression tests > drags selected elements from point inside common bou
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6186,6 +6228,7 @@ exports[`regression tests > drags selected elements from point inside common bou
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6225,6 +6268,7 @@ exports[`regression tests > drags selected elements from point inside common bou
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -6387,7 +6431,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6406,6 +6449,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6442,7 +6486,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6461,6 +6504,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6497,7 +6541,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -6516,6 +6559,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6572,7 +6616,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6593,6 +6636,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6650,7 +6694,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "polygon": false,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6671,6 +6714,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6730,7 +6774,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6751,6 +6794,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6802,6 +6846,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       },
     },
     "id": "id19",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6859,7 +6904,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "polygon": false,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6880,6 +6924,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id22",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6931,6 +6976,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       },
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6956,6 +7002,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id26",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7003,7 +7050,6 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeOptions": {
@@ -7027,6 +7073,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
       "updated": {},
     },
     "id": "id29",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -7194,7 +7241,6 @@ exports[`regression tests > given a group of selected elements with an element t
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7213,6 +7259,7 @@ exports[`regression tests > given a group of selected elements with an element t
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7249,7 +7296,6 @@ exports[`regression tests > given a group of selected elements with an element t
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7268,6 +7314,7 @@ exports[`regression tests > given a group of selected elements with an element t
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7304,7 +7351,6 @@ exports[`regression tests > given a group of selected elements with an element t
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7323,6 +7369,7 @@ exports[`regression tests > given a group of selected elements with an element t
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7343,6 +7390,7 @@ exports[`regression tests > given a group of selected elements with an element t
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7366,6 +7414,7 @@ exports[`regression tests > given a group of selected elements with an element t
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -7533,7 +7582,6 @@ exports[`regression tests > given a selected element A and a not selected elemen
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7552,6 +7600,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7588,7 +7637,6 @@ exports[`regression tests > given a selected element A and a not selected elemen
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7607,6 +7655,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7629,6 +7678,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7649,6 +7699,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -7815,7 +7866,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7847,7 +7897,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -7866,6 +7915,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7888,6 +7938,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "updated": {},
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -8054,7 +8105,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8086,7 +8136,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8105,6 +8154,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -8132,6 +8182,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -8296,7 +8347,6 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8315,6 +8365,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] undo st
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -8479,7 +8530,6 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] undo stac
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8498,6 +8548,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] undo stac
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -8662,7 +8713,6 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stac
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -8681,6 +8731,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stac
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -8896,7 +8947,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -8917,6 +8967,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -9130,7 +9181,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
             "polygon": false,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -9151,6 +9201,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -9326,7 +9377,6 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeOptions": {
@@ -9350,6 +9400,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] undo sta
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -9565,7 +9616,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -9586,6 +9636,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -9750,7 +9801,6 @@ exports[`regression tests > key d selects diamond tool > [end of test] undo stac
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -9769,6 +9819,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] undo stac
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -9982,7 +10033,6 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
             "polygon": false,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -10003,6 +10053,7 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10167,7 +10218,6 @@ exports[`regression tests > key o selects ellipse tool > [end of test] undo stac
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10186,6 +10236,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] undo stac
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10361,7 +10412,6 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
             ],
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "simulatePressure": false,
             "strokeColor": "#1e1e1e",
             "strokeOptions": {
@@ -10385,6 +10435,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] undo sta
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10549,7 +10600,6 @@ exports[`regression tests > key r selects rectangle tool > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10568,6 +10618,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] undo st
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10740,7 +10791,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10759,6 +10809,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -10795,7 +10846,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10814,6 +10864,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -10850,7 +10901,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -10869,6 +10919,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -10890,6 +10941,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -10947,6 +10999,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -10995,7 +11048,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11029,7 +11081,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11063,7 +11114,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11107,6 +11157,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] undo s
       },
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -11273,7 +11324,6 @@ exports[`regression tests > noop interaction after undo shouldn't create history
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11292,6 +11342,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11328,7 +11379,6 @@ exports[`regression tests > noop interaction after undo shouldn't create history
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11347,6 +11397,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11369,6 +11420,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11391,6 +11443,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -11680,7 +11733,6 @@ exports[`regression tests > shift click on selected element should deselect it o
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11699,6 +11751,7 @@ exports[`regression tests > shift click on selected element should deselect it o
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11719,6 +11772,7 @@ exports[`regression tests > shift click on selected element should deselect it o
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -11887,7 +11941,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11906,6 +11959,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11942,7 +11996,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -11961,6 +12014,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -11983,6 +12037,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12003,6 +12058,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12042,6 +12098,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -12212,7 +12269,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12231,6 +12287,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12267,7 +12324,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12286,6 +12342,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12322,7 +12379,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12341,6 +12397,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12362,6 +12419,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12419,6 +12477,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12476,6 +12535,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
       },
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -12650,7 +12710,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12669,6 +12728,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12705,7 +12765,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12724,6 +12783,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12746,6 +12806,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12766,6 +12827,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12811,6 +12873,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12852,7 +12915,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12871,6 +12933,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12907,7 +12970,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -12926,6 +12988,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id20",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12948,6 +13011,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id23",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -12968,6 +13032,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id26",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13013,6 +13078,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       },
     },
     "id": "id29",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13038,6 +13104,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       "updated": {},
     },
     "id": "id31",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13122,6 +13189,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
       },
     },
     "id": "id34",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -13416,7 +13484,6 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13435,6 +13502,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13471,7 +13539,6 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13490,6 +13557,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13526,7 +13594,6 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -13545,6 +13612,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13566,6 +13634,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id10",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13623,6 +13692,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       },
     },
     "id": "id13",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13650,6 +13720,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13670,6 +13741,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id18",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13725,6 +13797,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       },
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13752,6 +13825,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id24",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13778,6 +13852,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id27",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13806,6 +13881,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id29",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13832,6 +13908,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id31",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13859,6 +13936,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id34",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -13886,6 +13964,7 @@ exports[`regression tests > supports nested groups > [end of test] undo stack 1`
       "updated": {},
     },
     "id": "id36",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -14006,7 +14085,6 @@ exports[`regression tests > switches from group of selected elements to another 
     "opacity": 100,
     "roughness": 1,
     "roundness": null,
-    "schemaVersion": 1,
     "seed": 1006504105,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
@@ -14082,7 +14160,6 @@ exports[`regression tests > switches from group of selected elements to another 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14101,6 +14178,7 @@ exports[`regression tests > switches from group of selected elements to another 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -14137,7 +14215,6 @@ exports[`regression tests > switches from group of selected elements to another 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14156,6 +14233,7 @@ exports[`regression tests > switches from group of selected elements to another 
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -14192,7 +14270,6 @@ exports[`regression tests > switches from group of selected elements to another 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14211,6 +14288,7 @@ exports[`regression tests > switches from group of selected elements to another 
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -14231,6 +14309,7 @@ exports[`regression tests > switches from group of selected elements to another 
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -14350,7 +14429,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
     "opacity": 100,
     "roughness": 1,
     "roundness": null,
-    "schemaVersion": 1,
     "seed": 23633383,
     "strokeColor": "#1e1e1e",
     "strokeStyle": "solid",
@@ -14426,7 +14504,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14445,6 +14522,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -14481,7 +14559,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14500,6 +14577,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -14804,6 +14882,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -14863,7 +14942,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
             "roundness": {
               "type": 2,
             },
-            "schemaVersion": 1,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -14881,6 +14959,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
       "updated": {},
     },
     "id": "id12",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -14920,7 +14999,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14939,6 +15017,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -14975,7 +15054,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
             "opacity": 100,
             "roughness": 1,
             "roundness": null,
-            "schemaVersion": 1,
             "strokeColor": "#1e1e1e",
             "strokeStyle": "solid",
             "strokeWidth": 2,
@@ -14994,6 +15072,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] undo st
       "updated": {},
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
 ]
 `;

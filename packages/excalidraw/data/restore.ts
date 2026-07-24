@@ -39,10 +39,7 @@ import {
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 import { bumpVersion } from "@excalidraw/element";
-import {
-  CURRENT_ELEMENT_SCHEMA_VERSION,
-  upgradeElementSchema,
-} from "@excalidraw/element";
+import { migrateElements } from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
@@ -434,7 +431,6 @@ const restoreElementWithProperties = <
     // newly added elements
     version: element.version || 1,
     versionNonce: element.versionNonce ?? 0,
-    schemaVersion: element.schemaVersion || CURRENT_ELEMENT_SCHEMA_VERSION,
     index: element.index ?? null,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
@@ -507,7 +503,7 @@ export const restoreElement = (
     deleteInvisibleElements?: boolean;
   },
 ): typeof element | null => {
-  element = upgradeElementSchema({ ...element });
+  element = { ...element };
 
   switch (element.type) {
     case "text":
@@ -829,18 +825,23 @@ export const restoreElements = <T extends ExcalidrawElement>(
         refreshDimensions?: boolean;
         repairBindings?: boolean;
         deleteInvisibleElements?: boolean;
+        schemaVersion?: number;
       }
     | undefined,
 ): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const targetElementsMap = arrayToMap(targetElements || []);
+  const migratedTargetElements = migrateElements(
+    targetElements || [],
+    opts?.schemaVersion ?? 0,
+  );
+  const targetElementsMap = arrayToMap(migratedTargetElements);
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
 
   const restoredElements = syncInvalidIndices(
-    (targetElements || []).reduce((elements, element) => {
+    migratedTargetElements.reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {
@@ -1163,9 +1164,14 @@ export const restoreAppState = (
   };
 };
 
-const restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
+const restoreLibraryItem = (
+  libraryItem: LibraryItem,
+  schemaVersion: number | undefined,
+) => {
   const elements = getNonDeletedElements(
-    restoreElements(libraryItem.elements, null),
+    restoreElements(getNonDeletedElements(libraryItem.elements), null, {
+      schemaVersion,
+    }),
   );
   return elements.length ? { ...libraryItem, elements } : null;
 };
@@ -1173,17 +1179,24 @@ const restoreLibraryItem = (libraryItem: LibraryItem): LibraryItem | null => {
 export const restoreLibraryItems = (
   libraryItems: ImportedDataState["libraryItems"] = [],
   defaultStatus: LibraryItem["status"],
+  opts?: {
+    /** @see restoreElements */
+    schemaVersion?: number;
+  },
 ) => {
   const restoredItems: LibraryItem[] = [];
   for (const item of libraryItems) {
     // migrate older libraries
     if (Array.isArray(item)) {
-      const restoredItem = restoreLibraryItem({
-        status: defaultStatus,
-        elements: item,
-        id: randomId(),
-        created: Date.now(),
-      });
+      const restoredItem = restoreLibraryItem(
+        {
+          status: defaultStatus,
+          elements: item,
+          id: randomId(),
+          created: Date.now(),
+        },
+        opts?.schemaVersion,
+      );
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }
@@ -1192,12 +1205,15 @@ export const restoreLibraryItems = (
         LibraryItem,
         "id" | "status" | "created"
       >;
-      const restoredItem = restoreLibraryItem({
-        ..._item,
-        id: _item.id || randomId(),
-        status: _item.status || defaultStatus,
-        created: _item.created || Date.now(),
-      });
+      const restoredItem = restoreLibraryItem(
+        {
+          ..._item,
+          id: _item.id || randomId(),
+          status: _item.status || defaultStatus,
+          created: _item.created || Date.now(),
+        },
+        opts?.schemaVersion,
+      );
       if (restoredItem) {
         restoredItems.push(restoredItem);
       }

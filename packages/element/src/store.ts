@@ -19,6 +19,8 @@ import { newElementWith } from "./mutateElement";
 
 import { ElementsDelta, AppStateDelta, Delta } from "./delta";
 
+import { CURRENT_SCHEMA_VERSION, getSchemaVersion } from "./versioning";
+
 import {
   syncInvalidIndicesImmutable,
   hashElementsVersion,
@@ -499,6 +501,7 @@ export class StoreDelta {
     public readonly id: string,
     public readonly elements: ElementsDelta,
     public readonly appState: AppStateDelta,
+    public readonly schemaVersion: number = CURRENT_SCHEMA_VERSION,
   ) {}
 
   /**
@@ -513,7 +516,7 @@ export class StoreDelta {
       id: randomId(),
     },
   ) {
-    return new this(opts.id, elements, appState);
+    return new this(opts.id, elements, appState, CURRENT_SCHEMA_VERSION);
   }
 
   /**
@@ -535,26 +538,31 @@ export class StoreDelta {
   }
 
   /**
-   * Restore a store delta instance from a DTO.
+   * Restore a store delta instance from a DTO, lifting the contained element
+   * partials to the current schema version.
    */
   public static restore(storeDeltaDTO: DTO<StoreDelta>) {
     const { id, elements, appState } = storeDeltaDTO;
     return new this(
       id,
-      ElementsDelta.restore(elements),
+      ElementsDelta.restore(elements, getSchemaVersion(storeDeltaDTO)),
       AppStateDelta.restore(appState),
     );
   }
 
   /**
-   * Parse and load the delta from the remote payload.
+   * Parse and load the delta from the remote payload, lifting the contained
+   * element partials to the current schema version.
    */
-  public static load({
-    id,
-    elements: { added, removed, updated },
-    appState: { delta: appStateDelta },
-  }: DTO<StoreDelta>) {
-    const elements = ElementsDelta.create(added, removed, updated);
+  public static load(storeDeltaDTO: DTO<StoreDelta>) {
+    const {
+      id,
+      appState: { delta: appStateDelta },
+    } = storeDeltaDTO;
+    const elements = ElementsDelta.restore(
+      storeDeltaDTO.elements,
+      getSchemaVersion(storeDeltaDTO),
+    );
     const appState = AppStateDelta.create(appStateDelta);
 
     return new this(id, elements, appState);

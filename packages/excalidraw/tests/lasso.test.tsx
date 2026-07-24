@@ -359,7 +359,6 @@ describe("Basic lasso selection tests", () => {
           ...e,
           angle: e.angle as Radians,
           index: null,
-          schemaVersion: 1,
         } as ExcalidrawElement),
     );
 
@@ -1045,7 +1044,6 @@ describe("Special cases", () => {
         ...e,
         index: null,
         angle: e.angle as Radians,
-        schemaVersion: 1,
       })) as ExcalidrawElement[];
 
       h.elements = elements;
@@ -1765,7 +1763,6 @@ describe("Special cases", () => {
         ...e,
         index: null,
         angle: e.angle as Radians,
-        schemaVersion: 1,
       })) as ExcalidrawElement[];
 
       h.elements = elements;

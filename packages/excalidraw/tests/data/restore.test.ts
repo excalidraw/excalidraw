@@ -4,7 +4,7 @@ import { vi } from "vitest";
 import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
-import { CURRENT_ELEMENT_SCHEMA_VERSION } from "@excalidraw/element";
+import { CURRENT_SCHEMA_VERSION } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
@@ -44,7 +44,7 @@ describe("restoreElements", () => {
     expect(restoredElements.length).toBe(elements.length);
   });
 
-  it("lifts a legacy (unversioned) element to the current schema version", () => {
+  it("restores legacy (unversioned) elements through the migration pipeline", () => {
     // element persisted before schema versioning existed
     const legacyElement = {
       type: "rectangle",
@@ -53,30 +53,18 @@ describe("restoreElements", () => {
       y: 0,
     } as any as ExcalidrawElement;
 
-    expect(legacyElement).not.toHaveProperty("schemaVersion");
-
     const [restored] = restore.restoreElements([legacyElement], null);
-    expect(restored.schemaVersion).toBe(CURRENT_ELEMENT_SCHEMA_VERSION);
+    expect(restored.id).toBe("legacy");
+    expect(restored.type).toBe("rectangle");
   });
 
-  it("keeps the schema version of an already-versioned element", () => {
-    const versionedElement = API.createElement({ type: "rectangle" });
-    expect(versionedElement.schemaVersion).toBe(CURRENT_ELEMENT_SCHEMA_VERSION);
+  it("restores elements coming from a container at the current schema version", () => {
+    const element = API.createElement({ type: "rectangle" });
 
-    const [restored] = restore.restoreElements([versionedElement], null);
-    expect(restored.schemaVersion).toBe(CURRENT_ELEMENT_SCHEMA_VERSION);
-  });
-
-  it("stamps newly created elements with the current schema version", () => {
-    expect(API.createElement({ type: "rectangle" }).schemaVersion).toBe(
-      CURRENT_ELEMENT_SCHEMA_VERSION,
-    );
-    expect(API.createElement({ type: "text" }).schemaVersion).toBe(
-      CURRENT_ELEMENT_SCHEMA_VERSION,
-    );
-    expect(API.createElement({ type: "arrow" }).schemaVersion).toBe(
-      CURRENT_ELEMENT_SCHEMA_VERSION,
-    );
+    const [restored] = restore.restoreElements([element], null, {
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+    });
+    expect(restored.id).toBe(element.id);
   });
 
   it("when imported data state is null it should return an empty array of elements", () => {

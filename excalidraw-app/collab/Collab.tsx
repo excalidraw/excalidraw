@@ -22,6 +22,7 @@ import { decryptData } from "@excalidraw/excalidraw/data/encryption";
 import { getVisibleSceneBounds } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { isImageElement, isInitializedImageElement } from "@excalidraw/element";
+import { CURRENT_SCHEMA_VERSION, getSchemaVersion } from "@excalidraw/element";
 import { AbortError } from "@excalidraw/excalidraw/errors";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
@@ -587,8 +588,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               const remoteElements = toBrandedType<
                 readonly RemoteExcalidrawElement[]
               >(decryptedData.payload.elements);
-              const reconciledElements =
-                this._reconcileElements(remoteElements);
+              const reconciledElements = this._reconcileElements(
+                remoteElements,
+                getSchemaVersion(decryptedData.payload),
+              );
               this.handleRemoteSceneUpdate(reconciledElements);
               // noop if already resolved via init from firebase
               scenePromise.resolve({
@@ -604,6 +607,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
                 toBrandedType<readonly RemoteExcalidrawElement[]>(
                   decryptedData.payload.elements,
                 ),
+                getSchemaVersion(decryptedData.payload),
               ),
             );
             break;
@@ -753,15 +757,27 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private _reconcileElements = (
     remoteElements: readonly RemoteExcalidrawElement[],
+    remoteSchemaVersion: number = 0,
   ): ReconciledExcalidrawElement[] => {
     const appState = this.excalidrawAPI.getAppState();
 
     const existingElements = this.getSceneElementsIncludingDeleted();
 
+    if (remoteSchemaVersion > CURRENT_SCHEMA_VERSION) {
+      // NOTE: remote client is newer than us; we can't downgrade its elements,
+      // so restore as-is and rely on unknown properties being preserved
+      console.warn(
+        `Received collab update with schema version ${remoteSchemaVersion} ` +
+          `(local: ${CURRENT_SCHEMA_VERSION})`,
+      );
+    }
+
     // NOTE ideally we restore _after_ reconciliation but we can't do that
     // as we'd regenerate even elements such as appState.newElement which would
     // break the state
-    remoteElements = restoreElements(remoteElements, existingElements);
+    remoteElements = restoreElements(remoteElements, existingElements, {
+      schemaVersion: remoteSchemaVersion,
+    });
 
     let reconciledElements = reconcileElements(
       existingElements,
