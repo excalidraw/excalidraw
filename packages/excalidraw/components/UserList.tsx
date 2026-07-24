@@ -169,10 +169,11 @@ export const UserList = React.memo(
 
     const [maxAvatars, setMaxAvatars] = React.useState(DEFAULT_MAX_AVATARS);
 
-    const firstNCollaborators = uniqueCollaboratorsArray.slice(
-      0,
-      maxAvatars - 1,
-    );
+    const allFitWithoutOverflow = uniqueCollaboratorsArray.length <= maxAvatars;
+
+    const firstNCollaborators = allFitWithoutOverflow
+      ? uniqueCollaboratorsArray
+      : uniqueCollaboratorsArray.slice(0, maxAvatars - 1);
 
     const firstNAvatarsJSX = firstNCollaborators.map((collaborator) =>
       renderCollaborator({
@@ -204,7 +205,7 @@ export const UserList = React.memo(
         >
           {firstNAvatarsJSX}
 
-          {uniqueCollaboratorsArray.length > maxAvatars - 1 && (
+          {!allFitWithoutOverflow && (
             <Popover.Root>
               <Popover.Trigger className="UserList__more">
                 +{uniqueCollaboratorsArray.length - maxAvatars + 1}
