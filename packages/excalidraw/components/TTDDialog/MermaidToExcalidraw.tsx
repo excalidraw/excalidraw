@@ -262,6 +262,15 @@ const MermaidToExcalidraw = ({
               {el}
             </a>
           )}
+          stateLink={(el) => (
+            <a
+              href="https://mermaid.js.org/syntax/stateDiagram.html"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {el}
+            </a>
+          )}
           erdLink={(el) => (
             <a
               href="https://mermaid.js.org/syntax/entityRelationshipDiagram.html"
