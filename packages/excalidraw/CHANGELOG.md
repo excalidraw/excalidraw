@@ -13,6 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Fixes
+
+- Preserved explicit zero dimensions for line and arrow skeletons converted by `convertToExcalidrawElements`. [#11664](https://github.com/excalidraw/excalidraw/pull/11664)
+
 ## Excalidraw API
 
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
