@@ -101,6 +101,9 @@ import Collab, {
 import { AppFooter } from "./components/AppFooter";
 import { AppMainMenu } from "./components/AppMainMenu";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
+import { CollectionsDialog } from "./components/CollectionsDialog";
+import { collectionsDialogOpenAtom } from "./components/collectionsDialogAtom";
+import { SaveStatusIndicator } from "./components/SaveStatusIndicator";
 import {
   ExportToExcalidrawPlus,
   exportToExcalidrawPlus,
@@ -120,6 +123,8 @@ import {
   importFromLocalStorage,
   importUsernameFromLocalStorage,
 } from "./data/localStorage";
+import { applyActiveCollectionToInitialScene } from "./collections/initializeCollectionScene";
+import { useCollectionsAppIntegration } from "./collections/useCollectionsAppIntegration";
 
 import { loadFilesFromFirebase } from "./data/firebase";
 import {
@@ -237,6 +242,7 @@ const initializeScene = async (opts: {
     "files"
   > & {
     scrollToContent?: boolean;
+    files?: BinaryFiles;
   } = {
     elements: restoreElements(localDataState?.elements, null, {
       repairBindings: true,
@@ -247,6 +253,14 @@ const initializeScene = async (opts: {
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+
+  if (!isExternalScene) {
+    scene = await applyActiveCollectionToInitialScene(
+      scene,
+      localDataState?.elements ?? null,
+      localDataState?.appState ?? null,
+    );
+  }
   if (isExternalScene) {
     if (
       // don't prompt if scene is empty
@@ -410,6 +424,12 @@ const ExcalidrawWrapper = () => {
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
 
+  const collections = useCollectionsAppIntegration({
+    excalidrawAPI,
+    collabAPI,
+    setErrorMessage,
+  });
+
   useHandleLibrary({
     excalidrawAPI,
     adapter: LibraryIndexedDBAdapter,
@@ -494,6 +514,9 @@ const ExcalidrawWrapper = () => {
             ]);
           });
         } else if (isInitialLoad) {
+          if (data.scene.files && Object.keys(data.scene.files).length > 0) {
+            excalidrawAPI.addFiles(Object.values(data.scene.files));
+          }
           if (fileIds.length) {
             LocalData.fileStorage
               .getFiles(fileIds)
@@ -653,6 +676,8 @@ const ExcalidrawWrapper = () => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
       LocalData.flushSave();
 
+      collections.flushActiveCollectionOnUnload();
+
       if (
         excalidrawAPI &&
         LocalData.fileStorage.shouldPreventUnload(
@@ -672,7 +697,7 @@ const ExcalidrawWrapper = () => {
     return () => {
       window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
     };
-  }, [excalidrawAPI]);
+  }, [excalidrawAPI, collabAPI, collections]);
 
   const onChange = (
     elements: readonly OrderedExcalidrawElement[],
@@ -712,7 +737,11 @@ const ExcalidrawWrapper = () => {
             });
           }
         }
+
+        collections.afterLocalSave();
       });
+    } else {
+      collections.updateDirtyState();
     }
 
     // Render the debug scene if the debug canvas is available
@@ -989,6 +1018,9 @@ const ExcalidrawWrapper = () => {
       >
         <AppMainMenu
           onCollabDialogOpen={onCollabDialogOpen}
+          onCollectionsOpen={() =>
+            appJotaiStore.set(collectionsDialogOpenAtom, true)
+          }
           isCollaborating={isCollaborating}
           isCollabEnabled={!isCollabDisabled}
           theme={appTheme}
@@ -997,6 +1029,7 @@ const ExcalidrawWrapper = () => {
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
           isCollabEnabled={!isCollabDisabled}
+          onOpenCollection={collections.openCollectionById}
         />
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
@@ -1042,6 +1075,16 @@ const ExcalidrawWrapper = () => {
         {excalidrawAPI && !isCollabDisabled && (
           <Collab excalidrawAPI={excalidrawAPI} />
         )}
+
+        <CollectionsDialog
+          excalidrawAPI={excalidrawAPI}
+          onSwitchCollection={collections.switchCollection}
+          onSaveCollection={collections.saveCollectionToDisk}
+          onSaveCollectionAs={collections.saveCollectionAs}
+          onDownloadCollection={collections.downloadCollection}
+          isDirty={collections.isCollectionDirty}
+        />
+        <SaveStatusIndicator onSaveActive={collections.saveActiveCollection} />
 
         <ShareDialog
           collabAPI={collabAPI}
