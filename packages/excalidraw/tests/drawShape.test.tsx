@@ -2,6 +2,8 @@ import { KEYS } from "@excalidraw/common";
 
 import { getTargetElements, isArrowElement } from "@excalidraw/element";
 
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
+
 import { Excalidraw } from "../index";
 
 import { actionFinalize } from "../actions";
@@ -9,6 +11,7 @@ import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
+import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { GlobalTestState, act, fireEvent, render, waitFor } from "./test-utils";
 
 const { h } = window;
@@ -404,6 +407,23 @@ describe("autoshape styles panel & selection (preview path)", () => {
     expect(h.state.selectedElementIds).toEqual({});
   });
 
+  it("shows no preview for lines (noise), yet still commits them on release", () => {
+    const linePoints = seg([100, 100], [400, 400], 30);
+    mouse.downAt(100, 100);
+    act(() => {
+      for (const [x, y] of linePoints.slice(1)) {
+        h.app.drawShape.trail.addPointToPath(x, y);
+        h.app.drawShape.handlePointerMove({ x, y });
+      }
+    });
+
+    // the stroke reads as a line mid-gesture — no preview element
+    expect(h.state.newElement).toBeNull();
+
+    mouse.upAt(400, 400);
+    expect(h.elements.map((element) => element.type)).toEqual(["line"]);
+  });
+
   it("upgrades a line between two bindable shapes identically with a live preview", () => {
     const start = API.createElement({
       type: "rectangle",
@@ -565,6 +585,186 @@ describe("autoshape finalize funnel", () => {
     // the tiny sketch is discarded, the committed shape survives
     expect(h.elements).toHaveLength(1);
     expect(h.app.drawShape.hasPendingGesture()).toBe(false);
+  });
+});
+
+describe("autoshape double-click to type", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    act(() => {
+      h.app.setActiveTool({ type: "autoshape" });
+    });
+  });
+
+  it("creates free text on blank canvas and stays on the tool after submit", async () => {
+    mouse.doubleClickAt(200, 200);
+
+    expect(h.state.editingTextElement).not.toBeNull();
+    expect(h.state.activeTool.type).toBe("autoshape");
+
+    const editor = await getTextEditor();
+    updateTextEditor(editor, "hello");
+    Keyboard.exitTextEditor(editor);
+
+    const text = h.elements[0] as ExcalidrawTextElement;
+    expect(h.elements).toHaveLength(1);
+    expect(text.type).toBe("text");
+    expect(text.containerId).toBeNull();
+    expect(h.state.editingTextElement).toBeNull();
+    expect(h.state.activeTool.type).toBe("autoshape");
+    expect(API.getSelectedElements()).toHaveLength(0);
+  });
+
+  it("binds text to a transparent container even off-center (unlike selection mode)", async () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 100,
+      backgroundColor: "transparent",
+    });
+    API.setElements([rectangle]);
+
+    // interior hit far from both the stroke and the center
+    mouse.doubleClickAt(140, 120);
+
+    const editor = await getTextEditor();
+    expect(h.state.editingTextElement?.containerId).toBe(rectangle.id);
+
+    updateTextEditor(editor, "label");
+    Keyboard.exitTextEditor(editor);
+
+    const text = h.elements.find(
+      (element) => element.type === "text",
+    ) as ExcalidrawTextElement;
+    expect(text.containerId).toBe(rectangle.id);
+    expect(h.elements[0].boundElements).toEqual([
+      { type: "text", id: text.id },
+    ]);
+    expect(h.state.activeTool.type).toBe("autoshape");
+  });
+
+  it("edits the existing bound text instead of creating another", async () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 100,
+    });
+    // positioned at the container center, as bound text always is
+    const boundText = API.createElement({
+      type: "text",
+      text: "ola",
+      x: 190,
+      y: 145,
+      width: 20,
+      height: 10,
+      containerId: rectangle.id,
+    });
+    API.updateElement(rectangle, {
+      boundElements: [{ type: "text", id: boundText.id }],
+    });
+    API.setElements([rectangle, boundText]);
+
+    mouse.doubleClickAt(150, 130);
+
+    await getTextEditor();
+    expect(h.state.editingTextElement?.id).toBe(boundText.id);
+    expect(h.elements).toHaveLength(2);
+  });
+
+  it("creates free text at the pointer on Alt+double-click inside a container", async () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 100,
+    });
+    API.setElements([rectangle]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.doubleClickAt(140, 120);
+    });
+
+    await getTextEditor();
+    expect(h.state.editingTextElement?.containerId ?? null).toBeNull();
+  });
+
+  it("deletes the text and unbinds on empty submit", async () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 100,
+    });
+    API.setElements([rectangle]);
+
+    mouse.doubleClickAt(150, 130);
+    const editor = await getTextEditor();
+    Keyboard.exitTextEditor(editor);
+
+    expect(h.elements.filter((element) => !element.isDeleted)).toHaveLength(1);
+    expect(h.elements[0].boundElements ?? []).toHaveLength(0);
+    expect(h.state.activeTool.type).toBe("autoshape");
+  });
+
+  it("undo after submit removes only the text", async () => {
+    sketch(rectanglePath(100, 100, 200, 120));
+    expect(h.elements).toHaveLength(1);
+
+    mouse.doubleClickAt(400, 400);
+    const editor = await getTextEditor();
+    updateTextEditor(editor, "note");
+    Keyboard.exitTextEditor(editor);
+    expect(h.elements.filter((element) => !element.isDeleted)).toHaveLength(2);
+
+    Keyboard.undo();
+
+    expect(
+      h.elements.filter((element) => !element.isDeleted).map((el) => el.type),
+    ).toEqual(["rectangle"]);
+    expect(h.state.activeTool.type).toBe("autoshape");
+  });
+
+  it("allows to start a sketch on pointerdown while the editor is open", async () => {
+    mouse.doubleClickAt(200, 200);
+    await getTextEditor();
+    const editor = await getTextEditor();
+    updateTextEditor(editor, "note");
+
+    mouse.downAt(400, 400);
+    expect(h.app.drawShape.hasPendingGesture()).toBe(true);
+    mouse.upAt(400, 500);
+
+    // no shape got inserted by the click-away
+    expect(
+      h.elements.filter(
+        (element) => element.type === "text" && !element.isDeleted,
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("double-tap (touch) creates text through the same path", async () => {
+    act(() => {
+      // @ts-ignore private method — the touch double-tap detector funnels here
+      h.app.handleCanvasDoubleClick({
+        clientX: 200,
+        clientY: 200,
+        type: "touch",
+        altKey: false,
+        ctrlKey: false,
+        metaKey: false,
+        shiftKey: false,
+      });
+    });
+
+    expect(h.state.editingTextElement).not.toBeNull();
+    expect(h.state.activeTool.type).toBe("autoshape");
   });
 });
 
