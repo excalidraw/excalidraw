@@ -150,6 +150,12 @@ export const isBindingEnabled = (appState: {
   return appState.isBindingEnabled;
 };
 
+export const orbitBindOverrideEnabled = (appState: {
+  orbitBindOverrideEnabled: AppState["orbitBindOverrideEnabled"];
+}): boolean => {
+  return appState.orbitBindOverrideEnabled;
+};
+
 export const bindOrUnbindBindingElement = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
@@ -685,7 +691,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   }
 
   // If binding is disabled and an endpoint is dragged,
-  // we actively break the end binding
+  // we actively break either the start or end binding
   if (!isBindingEnabled(appState)) {
     start = startDragged ? { mode: null } : start;
     end = endDragged ? { mode: null } : end;
@@ -840,6 +846,30 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     };
   }
 
+  // Handle special orbit key case to orbit bind no matter what
+  if (orbitBindOverrideEnabled(appState)) {
+    return {
+      start: startDragged
+        ? hit
+          ? {
+              mode: "orbit",
+              element: hit,
+              focusPoint: globalPoint,
+            }
+          : { mode: null }
+        : start,
+      end: endDragged
+        ? hit
+          ? {
+              mode: "orbit",
+              element: hit,
+              focusPoint: globalPoint,
+            }
+          : { mode: null }
+        : end,
+    };
+  }
+
   // Handle normal cases
   const current: BindingStrategy = hit
     ? pointInElement
@@ -887,8 +917,8 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
   );
   const pointIsCloseToOtherElement =
-    otherFocusPoint &&
     otherBindableElement &&
+    otherFocusPoint &&
     hitElementItself({
       point: globalPoint,
       element: otherBindableElement,

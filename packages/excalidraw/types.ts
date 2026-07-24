@@ -227,6 +227,7 @@ export type InteractiveCanvasAppState = Readonly<
     multiElement: AppState["multiElement"];
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
+    orbitBindOverrideEnabled: AppState["orbitBindOverrideEnabled"];
     isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
     gridModeEnabled: AppState["gridModeEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
@@ -350,6 +351,8 @@ export interface AppState {
    * `bindingPreference` and keyboard modifiers (ctrl/alt)
    */
   isBindingEnabled: boolean;
+  /** indicates if arrow will orbit bind instead of inside binding */
+  orbitBindOverrideEnabled: boolean;
   /** user box selection preference; defaults to "contain" when unset */
   boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */
