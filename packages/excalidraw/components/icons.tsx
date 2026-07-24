@@ -1151,6 +1151,30 @@ export const FillSolidIcon = createIcon(
   { ...modifiedTablerIconProps, fill: "currentColor" },
 );
 
+export const FillGradientIcon = createIcon(
+  <>
+    <path
+      d="M4.91 2.625h10.18a2.284 2.284 0 0 1 2.285 2.284v10.182a2.284 2.284 0 0 1-2.284 2.284H4.909a2.284 2.284 0 0 1-2.284-2.284V4.909a2.284 2.284 0 0 1 2.284-2.284Z"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      fill="url(#FillGradientIcon)"
+    />
+    <defs>
+      <linearGradient
+        id="FillGradientIcon"
+        x1="2.625"
+        y1="2.625"
+        x2="17.375"
+        y2="17.375"
+      >
+        <stop offset="0" stopColor="currentColor" stopOpacity="0.15" />
+        <stop offset="1" stopColor="currentColor" stopOpacity="1" />
+      </linearGradient>
+    </defs>
+  </>,
+  modifiedTablerIconProps,
+);
+
 export const StrokeWidthBaseIcon = createIcon(
   <>
     <path

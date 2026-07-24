@@ -3,6 +3,7 @@ import { pointFrom } from "@excalidraw/math";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
@@ -61,6 +62,8 @@ import {
 
 import { hasStrokeColor } from "@excalidraw/element";
 
+import { canHaveGradientFill } from "@excalidraw/element";
+
 import {
   updateElbowArrowPoints,
   CaptureUpdateAction,
@@ -112,6 +115,7 @@ import {
   FillHachureIcon,
   FillCrossHatchIcon,
   FillSolidIcon,
+  FillGradientIcon,
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
@@ -486,6 +490,15 @@ export const actionChangeBackgroundColor = register<
   },
 });
 
+// Default gradient end color: pick a color visibly different from the
+// background so a newly-seeded gradient doesn't look identical to a solid fill.
+const getDefaultGradientColor2 = (
+  backgroundColor: ExcalidrawElement["backgroundColor"],
+) =>
+  backgroundColor === "transparent" || backgroundColor === COLOR_PALETTE.white
+    ? COLOR_PALETTE.black
+    : COLOR_PALETTE.white;
+
 export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
   name: "changeFillStyle",
   label: "labels.fill",
@@ -502,9 +515,30 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
           fillStyle: value,
+          ...(value === "gradient" && el.gradient == null
+            ? {
+                gradient: {
+                  color2: getDefaultGradientColor2(el.backgroundColor),
+                  angle: 0,
+                },
+              }
+            : null),
         }),
       ),
-      appState: { ...appState, currentItemFillStyle: value },
+      appState: {
+        ...appState,
+        currentItemFillStyle: value,
+        ...(value === "gradient" && appState.currentItemGradient == null
+          ? {
+              currentItemGradient: {
+                color2: getDefaultGradientColor2(
+                  appState.currentItemBackgroundColor,
+                ),
+                angle: 0,
+              },
+            }
+          : null),
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -513,6 +547,11 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
     const allElementsZigZag =
       selectedElements.length > 0 &&
       selectedElements.every((el) => el.fillStyle === "zigzag");
+    const canShowGradientOption =
+      (selectedElements.length > 0 &&
+        selectedElements.every((el) => canHaveGradientFill(el.type))) ||
+      (selectedElements.length === 0 &&
+        canHaveGradientFill(appState.activeTool.type));
 
     return (
       <fieldset>
@@ -542,6 +581,16 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
                 icon: FillSolidIcon,
                 testId: `fill-solid`,
               },
+              ...(canShowGradientOption
+                ? [
+                    {
+                      value: "gradient",
+                      text: t("labels.gradient"),
+                      icon: FillGradientIcon,
+                      testId: `fill-gradient`,
+                    },
+                  ]
+                : []),
             ]}
             value={getFormValue(
               elements,
@@ -564,6 +613,95 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
           />
         </div>
       </fieldset>
+    );
+  },
+});
+
+export const actionChangeGradient = register<{
+  color2?: string;
+  angle?: number;
+}>({
+  name: "changeGradient",
+  label: "labels.gradient",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    if (value?.color2 === undefined && value?.angle === undefined) {
+      return {
+        appState: {
+          ...appState,
+          ...value,
+        },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          gradient: {
+            color2:
+              value.color2 ??
+              el.gradient?.color2 ??
+              getDefaultGradientColor2(el.backgroundColor),
+            angle: value.angle ?? el.gradient?.angle ?? 0,
+          },
+        }),
+      ),
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const selectedElements = getSelectedElements(elements, appState);
+    const isGradientActive =
+      selectedElements.length > 0 &&
+      selectedElements.every((el) => el.fillStyle === "gradient") &&
+      selectedElements.every((el) => canHaveGradientFill(el.type));
+
+    if (!isGradientActive) {
+      return null;
+    }
+
+    const color2 = getFormValue(
+      elements,
+      app,
+      (element) =>
+        element.gradient?.color2 ??
+        getDefaultGradientColor2(element.backgroundColor),
+      true,
+      () => null,
+    );
+    const angle = getFormValue(
+      elements,
+      app,
+      (element) => element.gradient?.angle ?? 0,
+      true,
+      () => null,
+    );
+
+    return (
+      <>
+        <h3 aria-hidden="true">{t("labels.gradientEndColor")}</h3>
+        <ColorPicker
+          type="elementGradientEnd"
+          label={t("labels.gradientEndColor")}
+          color={color2}
+          onChange={(value) => updateData({ color2: value })}
+          elements={elements}
+          appState={appState}
+          updateData={updateData}
+        />
+        <Range
+          label={t("labels.gradientAngle")}
+          value={angle ?? 0}
+          hasCommonValue={angle !== null}
+          onChange={(value) => updateData({ angle: value })}
+          min={0}
+          max={360}
+          step={1}
+          testId="gradient-angle"
+        />
+      </>
     );
   },
 });

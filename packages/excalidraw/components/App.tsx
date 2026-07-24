@@ -10272,6 +10272,10 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
+      gradient:
+        this.state.currentItemFillStyle === "gradient"
+          ? this.state.currentItemGradient
+          : null,
     } as const;
 
     let element;

@@ -230,10 +230,13 @@ export const generateRoughOptions = (
     case "embeddable":
     case "diamond":
     case "ellipse": {
-      options.fillStyle = element.fillStyle;
-      options.fill = isTransparent(element.backgroundColor)
-        ? undefined
-        : applyDarkModeFilter(element.backgroundColor, isDarkMode);
+      options.fillStyle =
+        element.fillStyle === "gradient" ? "solid" : element.fillStyle;
+      options.fill =
+        element.fillStyle === "gradient" ||
+        isTransparent(element.backgroundColor)
+          ? undefined
+          : applyDarkModeFilter(element.backgroundColor, isDarkMode);
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }

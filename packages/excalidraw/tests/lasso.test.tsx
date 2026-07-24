@@ -108,6 +108,7 @@ describe("Basic lasso selection tests", () => {
         roundness: {
           type: 3,
         },
+        gradient: null,
         seed: 1558764732,
         version: 43,
         versionNonce: 575357188,
@@ -138,6 +139,7 @@ describe("Basic lasso selection tests", () => {
         roundness: {
           type: 2,
         },
+        gradient: null,
         seed: 1720937276,
         version: 69,
         versionNonce: 1991578556,
@@ -168,6 +170,7 @@ describe("Basic lasso selection tests", () => {
         roundness: {
           type: 2,
         },
+        gradient: null,
         seed: 476696636,
         version: 38,
         versionNonce: 1903760444,
@@ -198,6 +201,7 @@ describe("Basic lasso selection tests", () => {
         roundness: {
           type: 2,
         },
+        gradient: null,
         seed: 1302309508,
         version: 19,
         versionNonce: 1230691388,
@@ -237,6 +241,7 @@ describe("Basic lasso selection tests", () => {
         roundness: {
           type: 2,
         },
+        gradient: null,
         seed: 514585788,
         version: 18,
         versionNonce: 1338507580,
@@ -273,6 +278,7 @@ describe("Basic lasso selection tests", () => {
         frameId: null,
         index: "aD",
         roundness: null,
+        gradient: null,
         seed: 103578044,
         version: 167,
         versionNonce: 1117299588,
@@ -942,6 +948,7 @@ describe("Special cases", () => {
           roundness: {
             type: 3,
           },
+          gradient: null,
           seed: 227442978,
           version: 15,
           versionNonce: 204983970,
@@ -972,6 +979,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           seed: 955233890,
           version: 14,
           versionNonce: 2135303358,
@@ -1002,6 +1010,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           seed: 807647870,
           version: 16,
           versionNonce: 455740962,
@@ -1030,6 +1039,7 @@ describe("Special cases", () => {
           frameId: null,
           index: "aJ",
           roundness: null,
+          gradient: null,
           seed: 1134892578,
           version: 57,
           versionNonce: 1699466238,
@@ -1220,6 +1230,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1261,6 +1272,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1301,6 +1313,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1341,6 +1354,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1381,6 +1395,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1411,6 +1426,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1441,6 +1457,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1471,6 +1488,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1501,6 +1519,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1531,6 +1550,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1561,6 +1581,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1591,6 +1612,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1621,6 +1643,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1651,6 +1674,7 @@ describe("Special cases", () => {
           roundness: {
             type: 2,
           },
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1679,6 +1703,7 @@ describe("Special cases", () => {
           groupIds: ["uRBC-GT117eEzaf2ehdX_", "-9NzH7Fa5JaHu4ArEFpa_"],
           frameId: null,
           roundness: null,
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
@@ -1730,6 +1755,7 @@ describe("Special cases", () => {
           groupIds: ["uRBC-GT117eEzaf2ehdX_", "-9NzH7Fa5JaHu4ArEFpa_"],
           frameId: null,
           roundness: null,
+          gradient: null,
           boundElements: [],
           updated: 1740960278015,
           link: null,
