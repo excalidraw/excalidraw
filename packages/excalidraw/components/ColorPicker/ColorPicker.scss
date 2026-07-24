@@ -168,6 +168,7 @@
     &.compact-sizing {
       width: var(--mobile-action-button-size);
       height: var(--mobile-action-button-size);
+      border: 1px solid var(--color-gray-30);
     }
 
     &.mobile-border {
