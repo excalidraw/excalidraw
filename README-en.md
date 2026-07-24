@@ -6,7 +6,7 @@
 </a>
 
 <h4 align="center">
-  <a href="https://excalidraw.com">Excalidraw Editor</a> |
+  <a href="https://giraffeair.github.io/Excalidraw-better/">Excalidraw Editor</a> |
   <a href="https://plus.excalidraw.com/blog">Blog</a> |
   <a href="https://docs.excalidraw.com">Documentation</a> |
   <a href="https://plus.excalidraw.com">Excalidraw+</a> |
