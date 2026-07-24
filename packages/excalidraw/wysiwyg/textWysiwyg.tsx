@@ -5,8 +5,10 @@ import {
   POINTER_BUTTON,
   THEME,
   isWritableElement,
+  containsArabic,
   getFontString,
   getFontFamilyString,
+  isArabicFont,
   isTestEnv,
   MIME_TYPES,
   applyDarkModeFilter,
@@ -613,6 +615,40 @@ export const textWysiwyg = ({
       }
     };
 
+    const autoSwitchFont = () => {
+      const fullText = editable.value;
+      if (!fullText) {
+        return;
+      }
+
+      const currentFontFamily = app.state.currentItemFontFamily;
+      const hasArabic = containsArabic(fullText);
+
+      if (hasArabic && !isArabicFont(currentFontFamily)) {
+        const targetFont = app.state.lastArabicFontFamily;
+        app.setState({
+          currentItemFontFamily: targetFont,
+          lastLatinFontFamily: currentFontFamily,
+        });
+        app.scene.mutateElement(
+          app.scene.getElement(id) as ExcalidrawTextElement,
+          { fontFamily: targetFont },
+        );
+        updateWysiwygStyle();
+      } else if (!hasArabic && isArabicFont(currentFontFamily)) {
+        const targetFont = app.state.lastLatinFontFamily;
+        app.setState({
+          currentItemFontFamily: targetFont,
+          lastArabicFontFamily: currentFontFamily,
+        });
+        app.scene.mutateElement(
+          app.scene.getElement(id) as ExcalidrawTextElement,
+          { fontFamily: targetFont },
+        );
+        updateWysiwygStyle();
+      }
+    };
+
     editable.oninput = () => {
       const normalized = normalizeText(editable.value);
       if (editable.value !== normalized) {
@@ -623,6 +659,7 @@ export const textWysiwyg = ({
         editable.selectionStart = selectionStart;
         editable.selectionEnd = selectionStart;
       }
+      autoSwitchFont();
       onChange(editable.value);
     };
   }
