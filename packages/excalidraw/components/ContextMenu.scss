@@ -35,6 +35,7 @@
     border: none;
     white-space: nowrap;
     font-family: inherit;
+    font-size: 0.875rem;
 
     display: grid;
     grid-template-columns: 1fr 0.2fr;
@@ -98,5 +99,6 @@
   .context-menu-item-separator {
     border: none;
     border-top: 1px solid $color-gray-5;
+    margin: 0.5rem 0;
   }
 }
