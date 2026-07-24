@@ -18,6 +18,7 @@ import { useExcalidrawSetAppState } from "./App";
 import { LibraryMenu } from "./LibraryMenu";
 import { SearchMenu } from "./SearchMenu";
 import { Sidebar } from "./Sidebar/Sidebar";
+import { Tooltip } from "./Tooltip";
 import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryIcon, searchIcon } from "./icons";
 
@@ -99,12 +100,16 @@ export const DefaultSidebar = Object.assign(
           <Sidebar.Tabs>
             <Sidebar.Header>
               <Sidebar.TabTriggers>
-                <Sidebar.TabTrigger tab={CANVAS_SEARCH_TAB}>
-                  {searchIcon}
-                </Sidebar.TabTrigger>
-                <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
-                  {LibraryIcon}
-                </Sidebar.TabTrigger>
+                <Tooltip label="Search">
+                  <Sidebar.TabTrigger tab={CANVAS_SEARCH_TAB}>
+                    {searchIcon}
+                  </Sidebar.TabTrigger>
+                </Tooltip>
+                <Tooltip label="Library">
+                  <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
+                    {LibraryIcon}
+                  </Sidebar.TabTrigger>
+                </Tooltip>
                 <DefaultSidebarTabTriggersTunnel.Out />
               </Sidebar.TabTriggers>
             </Sidebar.Header>
