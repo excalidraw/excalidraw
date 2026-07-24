@@ -490,7 +490,7 @@ const MatchListBase = (props: MatchListProps) => {
   );
 
   return (
-    <div>
+    <div className="layer-ui__search-result">
       {frameNameMatches.length > 0 && (
         <div className="layer-ui__search-result-container">
           <div className="layer-ui__search-result-title">
