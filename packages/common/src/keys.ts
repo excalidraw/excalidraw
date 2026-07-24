@@ -140,6 +140,23 @@ export const isArrowKey = (key: string) =>
   key === KEYS.ARROW_DOWN ||
   key === KEYS.ARROW_UP;
 
+/**
+ * Matches the `]` / `}` key across keyboard layouts (used by the z-order
+ * shortcuts). On non-US layouts the `]` character lives on a different physical
+ * key, so `event.code` stays on that physical key (e.g. `Digit9` on a German
+ * layout) while `event.key` is the produced character — hence the fallback.
+ */
+export const isBracketRightKey = (
+  event: KeyboardEvent | React.KeyboardEvent<Element>,
+) =>
+  event.code === CODES.BRACKET_RIGHT || event.key === "]" || event.key === "}";
+
+/** Matches the `[` / `{` key across layouts. See {@link isBracketRightKey}. */
+export const isBracketLeftKey = (
+  event: KeyboardEvent | React.KeyboardEvent<Element>,
+) =>
+  event.code === CODES.BRACKET_LEFT || event.key === "[" || event.key === "{";
+
 export const shouldResizeFromCenter = (event: MouseEvent | KeyboardEvent) =>
   event.altKey;
 
