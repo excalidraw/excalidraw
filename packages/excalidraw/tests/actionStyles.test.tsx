@@ -85,4 +85,35 @@ describe("actionStyles", () => {
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);
   });
+
+  it("shows feedback for invalid custom hex colors", async () => {
+    UI.clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(20, 20);
+
+    togglePopover("Stroke");
+    const colorInput = screen.getByRole("textbox", { name: "Stroke" });
+
+    fireEvent.change(colorInput, {
+      target: { value: "12345" },
+    });
+
+    expect(
+      screen.getByText(
+        "Enter a valid hex color with 3, 4, 6, or 8 characters.",
+      ),
+    ).toBeInTheDocument();
+    expect(API.getSelectedElement().strokeColor).not.toBe("#12345");
+
+    fireEvent.change(colorInput, {
+      target: { value: "123456" },
+    });
+
+    expect(
+      screen.queryByText(
+        "Enter a valid hex color with 3, 4, 6, or 8 characters.",
+      ),
+    ).toBeNull();
+    expect(API.getSelectedElement().strokeColor).toBe("#123456");
+  });
 });
