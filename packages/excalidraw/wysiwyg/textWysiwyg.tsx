@@ -660,6 +660,13 @@ export const textWysiwyg = ({
       submittedViaKeyboard = true;
       handleSubmit();
     } else if (
+      event[KEYS.CTRL_OR_CMD] &&
+      event.key.toLowerCase() === KEYS.Z
+    ) {
+      // Prevent the browser default (e.g. reopening closed tab) while
+      // inside the WYSIWYG editor. The app-level undo/redo handles this.
+      event.preventDefault();
+    } else if (
       event.key === KEYS.TAB ||
       (event[KEYS.CTRL_OR_CMD] &&
         (event.code === CODES.BRACKET_LEFT ||
