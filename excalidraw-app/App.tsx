@@ -127,6 +127,7 @@ import {
   LibraryLocalStorageMigrationAdapter,
   LocalData,
   localStorageQuotaExceededAtom,
+  requestPersistentStorage,
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
@@ -506,6 +507,14 @@ const ExcalidrawWrapper = () => {
                   erroredFiles,
                   elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
                 });
+
+                if (erroredFiles.size > 0) {
+                  excalidrawAPI.updateScene({
+                    appState: {
+                      errorMessage: t("alerts.localImagesLost"),
+                    },
+                  });
+                }
               });
           }
           // on fresh load, clear unused files from IDB (from previous
@@ -523,6 +532,8 @@ const ExcalidrawWrapper = () => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
     }
+
+    requestPersistentStorage();
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
