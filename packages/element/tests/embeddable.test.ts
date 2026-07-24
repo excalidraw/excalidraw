@@ -230,4 +230,10 @@ describe("Google Drive video embedding", () => {
       ),
     ).toBe(true);
   });
+
+  it("should validate minimaxi.com subdomains", () => {
+    expect(
+      embeddableURLValidator("https://example.minimaxi.com/slides", undefined),
+    ).toBe(true);
+  });
 });
