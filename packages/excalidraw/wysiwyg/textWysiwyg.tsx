@@ -54,7 +54,7 @@ import type {
   ExcalidrawTextContainer,
 } from "@excalidraw/element/types";
 
-import { actionSaveToActiveFile } from "../actions";
+import { actionSaveFileToDisk, actionSaveToActiveFile } from "../actions";
 
 import {
   parseClipboard,
@@ -627,6 +627,28 @@ export const textWysiwyg = ({
     };
   }
 
+  const onWysiwygSave = (event: KeyboardEvent) => {
+    event.preventDefault();
+    handleSubmit();
+    if (app.state.fileHandle) {
+      app.actionManager.executeAction(actionSaveToActiveFile);
+    } else {
+      app.actionManager.executeAction(actionSaveFileToDisk);
+    }
+  };
+
+  const onCaptureKeyDown = (event: KeyboardEvent) => {
+    if (
+      event.key === KEYS.S &&
+      event[KEYS.CTRL_OR_CMD] &&
+      !event.shiftKey
+    ) {
+      onWysiwygSave(event);
+      event.stopPropagation();
+    }
+  };
+  document.addEventListener("keydown", onCaptureKeyDown, { capture: true });
+
   editable.onkeydown = (event) => {
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
@@ -649,9 +671,7 @@ export const textWysiwyg = ({
       submittedViaKeyboard = true;
       handleSubmit();
     } else if (actionSaveToActiveFile.keyTest(event)) {
-      event.preventDefault();
-      handleSubmit();
-      app.actionManager.executeAction(actionSaveToActiveFile);
+      onWysiwygSave(event);
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
@@ -849,6 +869,7 @@ export const textWysiwyg = ({
       observer.disconnect();
     }
 
+    document.removeEventListener("keydown", onCaptureKeyDown, { capture: true });
     window.removeEventListener("resize", updateWysiwygStyle);
     window.removeEventListener("wheel", stopEvent, true);
     window.removeEventListener("pointerdown", onPointerDown);
