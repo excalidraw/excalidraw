@@ -20,6 +20,9 @@ export const overwriteConfirmStateAtom = atom<OverwriteConfirmState>({
   active: false,
 });
 
+/** `true` confirm, `null` dismissed (backdrop / escape), `false` explicit reject */
+export type OverwriteConfirmResult = true | false | null;
+
 export async function openConfirmModal({
   title,
   description,
@@ -30,12 +33,12 @@ export async function openConfirmModal({
   description: React.ReactNode;
   actionLabel: string;
   color: "danger" | "warning";
-}) {
-  return new Promise<boolean>((resolve) => {
+}): Promise<OverwriteConfirmResult> {
+  return new Promise<OverwriteConfirmResult>((resolve) => {
     editorJotaiStore.set(overwriteConfirmStateAtom, {
       active: true,
       onConfirm: () => resolve(true),
-      onClose: () => resolve(false),
+      onClose: () => resolve(null),
       onReject: () => resolve(false),
       title,
       description,

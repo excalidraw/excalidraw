@@ -70,6 +70,7 @@ import type {
 } from "@excalidraw/element/types";
 import type {
   AppState,
+  BinaryFileData,
   ExcalidrawImperativeAPI,
   BinaryFiles,
   ExcalidrawInitialDataState,
@@ -146,6 +147,7 @@ import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
+import { SharedLinkDeferredNotice } from "./components/SharedLinkDeferredNotice";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -216,7 +218,10 @@ const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
 }): Promise<
-  { scene: ExcalidrawInitialDataState | null } & (
+  {
+    scene: ExcalidrawInitialDataState | null;
+    pendingJsonShareLink?: { id: string; key: string };
+  } & (
     | { isExternalScene: true; id: string; key: string }
     | { isExternalScene: false; id?: null; key?: null }
   )
@@ -247,6 +252,24 @@ const initializeScene = async (opts: {
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
+
+  // New tab / shared URL: keep local canvas until user taps notice → then same "Load from link" modal
+  if (
+    jsonBackendMatch &&
+    !roomLinkData &&
+    scene.elements.length > 0
+  ) {
+    window.history.replaceState({}, APP_NAME, window.location.origin);
+    return {
+      scene,
+      isExternalScene: false,
+      pendingJsonShareLink: {
+        id: jsonBackendMatch[1],
+        key: jsonBackendMatch[2],
+      },
+    };
+  }
+
   if (isExternalScene) {
     if (
       // don't prompt if scene is empty
@@ -394,6 +417,18 @@ const ExcalidrawWrapper = () => {
   }
 
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [pendingJsonShareLink, setPendingJsonShareLink] = useState<{
+    id: string;
+    key: string;
+  } | null>(null);
+
+  /** Local canvas before shared-link preview; used to revert on dismiss / modal cancel. */
+  const localCanvasRevertRef = useRef<{
+    elements: readonly OrderedExcalidrawElement[];
+    appState: AppState;
+    files: BinaryFiles;
+  } | null>(null);
+  const sharedPreviewKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
@@ -519,6 +554,174 @@ const ExcalidrawWrapper = () => {
     [collabAPI, excalidrawAPI],
   );
 
+  /** PR #11199-style: pause persisting shared external scene until user interacts (avoids clobbering other tabs). */
+  const attachSharedLinkImplicitSaveGate = useCallback(
+    (data: ResolutionType<typeof initializeScene>) => {
+      if (data.pendingJsonShareLink) {
+        return;
+      }
+      if (data.isExternalScene && !collabAPI?.isCollaborating()) {
+        LocalData.pauseSave("sharedLink");
+        const resume = () => {
+          LocalData.resumeSave("sharedLink");
+        };
+        window.addEventListener("pointerdown", resume, {
+          once: true,
+          capture: true,
+        });
+        window.addEventListener("keydown", resume, {
+          once: true,
+          capture: true,
+        });
+      }
+    },
+    [collabAPI],
+  );
+
+  const revertPendingSharedPreview = useCallback(() => {
+    const snap = localCanvasRevertRef.current;
+    if (!snap || !excalidrawAPI) {
+      LocalData.resumeSave("sharedLink");
+      return;
+    }
+    excalidrawAPI.updateScene({
+      elements: restoreElements(snap.elements, null, {
+        repairBindings: true,
+        deleteInvisibleElements: true,
+      }),
+      appState: {
+        ...restoreAppState(snap.appState, null),
+        viewModeEnabled: false,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+    const filesToRestore = Object.values(snap.files).filter(
+      (f): f is BinaryFileData => !!f,
+    );
+    if (filesToRestore.length) {
+      excalidrawAPI.addFiles(filesToRestore);
+    }
+    LocalData.resumeSave("sharedLink");
+    localCanvasRevertRef.current = null;
+    sharedPreviewKeyRef.current = null;
+  }, [excalidrawAPI]);
+
+  useEffect(() => {
+    if (!pendingJsonShareLink || !excalidrawAPI) {
+      sharedPreviewKeyRef.current = null;
+      return;
+    }
+
+    const previewKey = `${pendingJsonShareLink.id}:${pendingJsonShareLink.key}`;
+    if (sharedPreviewKeyRef.current === previewKey) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const run = async () => {
+      LocalData.pauseSave("sharedLink");
+
+      localCanvasRevertRef.current = {
+        elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+        appState: excalidrawAPI.getAppState(),
+        files: { ...excalidrawAPI.getFiles() },
+      };
+
+      // Lock editing before import finishes — prop alone is overwritten by updateScene(appState).
+      excalidrawAPI.updateScene({
+        appState: { viewModeEnabled: true },
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+
+      const { id, key } = pendingJsonShareLink;
+      const imported = await importFromBackend(id, key);
+      if (cancelled) {
+        return;
+      }
+
+      const localDataState = importFromLocalStorage();
+      const elements = bumpElementVersions(
+        restoreElements(imported.elements, null, {
+          repairBindings: true,
+          deleteInvisibleElements: true,
+        }),
+        localDataState?.elements,
+      );
+      const appState = restoreAppState(
+        imported.appState,
+        localDataState?.appState,
+      );
+      const nextScene = {
+        elements,
+        appState,
+        scrollToContent: true as const,
+      };
+
+      excalidrawAPI.updateScene({
+        elements: restoreElements(elements, null, {
+          repairBindings: true,
+          deleteInvisibleElements: true,
+        }),
+        appState: {
+          ...restoreAppState(appState, excalidrawAPI.getAppState()),
+          viewModeEnabled: true,
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+
+      const loadPayload = {
+        scene: nextScene,
+        isExternalScene: true as const,
+        id,
+        key,
+      } satisfies ResolutionType<typeof initializeScene>;
+
+      loadImages(loadPayload, false);
+
+      if (!cancelled) {
+        sharedPreviewKeyRef.current = previewKey;
+      }
+    };
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pendingJsonShareLink?.id, pendingJsonShareLink?.key, excalidrawAPI, loadImages]);
+
+  const onDeferredSharedLinkSeeOptions = useCallback(async () => {
+    const link = pendingJsonShareLink;
+    if (!link || !excalidrawAPI) {
+      return;
+    }
+
+    const result = await openConfirmModal(shareableLinkConfirmDialog);
+    if (result === true) {
+      LocalData.resumeSave("sharedLink");
+      setPendingJsonShareLink(null);
+      excalidrawAPI.updateScene({
+        appState: { viewModeEnabled: false },
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+      LocalData.save(
+        excalidrawAPI.getSceneElementsIncludingDeleted(),
+        excalidrawAPI.getAppState(),
+        excalidrawAPI.getFiles(),
+        () => {},
+      );
+      localCanvasRevertRef.current = null;
+      sharedPreviewKeyRef.current = null;
+      window.history.replaceState({}, APP_NAME, window.location.origin);
+    } else if (result === false) {
+      setPendingJsonShareLink(null);
+      revertPendingSharedPreview();
+      window.history.replaceState({}, APP_NAME, window.location.origin);
+    }
+    // `null`: closed modal via backdrop/escape — stay in shared preview + view mode
+  }, [pendingJsonShareLink, excalidrawAPI, revertPendingSharedPreview]);
+
   useEffect(() => {
     if (!excalidrawAPI || (!isCollabDisabled && !collabAPI)) {
       return;
@@ -527,6 +730,8 @@ const ExcalidrawWrapper = () => {
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
+      setPendingJsonShareLink(data.pendingJsonShareLink ?? null);
+      attachSharedLinkImplicitSaveGate(data);
     });
 
     const onHashChange = async (event: HashChangeEvent) => {
@@ -543,6 +748,8 @@ const ExcalidrawWrapper = () => {
 
         initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
           loadImages(data);
+          setPendingJsonShareLink(data.pendingJsonShareLink ?? null);
+          attachSharedLinkImplicitSaveGate(data);
           if (data.scene) {
             excalidrawAPI.updateScene({
               elements: restoreElements(data.scene.elements, null, {
@@ -558,6 +765,9 @@ const ExcalidrawWrapper = () => {
 
     const syncData = debounce(() => {
       if (isTestEnv()) {
+        return;
+      }
+      if (LocalData.isSharedLinkSaveLocked()) {
         return;
       }
       if (
@@ -646,8 +856,16 @@ const ExcalidrawWrapper = () => {
         visibilityChange,
         false,
       );
+      LocalData.resumeSave("sharedLink");
     };
-  }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode, loadImages]);
+  }, [
+    isCollabDisabled,
+    collabAPI,
+    excalidrawAPI,
+    setLangCode,
+    loadImages,
+    attachSharedLinkImplicitSaveGate,
+  ]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
@@ -902,7 +1120,7 @@ const ExcalidrawWrapper = () => {
 
   return (
     <div
-      style={{ height: "100%" }}
+      style={{ height: "100%", position: "relative" }}
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
       })}
@@ -912,6 +1130,7 @@ const ExcalidrawWrapper = () => {
         onExport={onExport}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
+        viewModeEnabled={!!pendingJsonShareLink}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
           canvasActions: {
@@ -998,6 +1217,16 @@ const ExcalidrawWrapper = () => {
           onCollabDialogOpen={onCollabDialogOpen}
           isCollabEnabled={!isCollabDisabled}
         />
+        {pendingJsonShareLink && (
+          <SharedLinkDeferredNotice
+            onSeeOptions={onDeferredSharedLinkSeeOptions}
+            onDismiss={() => {
+              setPendingJsonShareLink(null);
+              revertPendingSharedPreview();
+              window.history.replaceState({}, APP_NAME, window.location.origin);
+            }}
+          />
+        )}
         <OverwriteConfirmDialog>
           <OverwriteConfirmDialog.Actions.ExportToImage />
           <OverwriteConfirmDialog.Actions.SaveToDisk />
