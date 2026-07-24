@@ -220,8 +220,8 @@ const rotateSingleElement = (
     angle = ((5 * Math.PI) / 2 +
       Math.atan2(pointerY - cy, pointerX - cx)) as Radians;
     if (shouldRotateWithDiscreteAngle) {
-      angle = (angle + SHIFT_LOCKING_ANGLE / 2) as Radians;
-      angle = (angle - (angle % SHIFT_LOCKING_ANGLE)) as Radians;
+      // Round to nearest increment first
+      angle = (Math.round(angle / SHIFT_LOCKING_ANGLE) * SHIFT_LOCKING_ANGLE) as Radians;
     }
     angle = normalizeRadians(angle as Radians);
   }
@@ -415,8 +415,8 @@ const rotateMultipleElements = (
   let centerAngle =
     (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
   if (shouldRotateWithDiscreteAngle) {
-    centerAngle += SHIFT_LOCKING_ANGLE / 2;
-    centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
+    // Round to nearest increment for better precision at common angles like 90°
+    centerAngle = Math.round(centerAngle / SHIFT_LOCKING_ANGLE) * SHIFT_LOCKING_ANGLE;
   }
 
   const rotatedElementsMap = new Map<
