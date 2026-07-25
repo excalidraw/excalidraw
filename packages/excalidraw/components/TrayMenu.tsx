@@ -32,7 +32,7 @@ import Stack from "./Stack";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
   EmbedIcon,
-  extraToolsIcon,
+  DotsIcon,
   frameToolIcon,
   LassoIcon,
   laserPointerToolIcon,
@@ -180,7 +180,7 @@ const TrayToolbar = ({
             ? laserPointerToolIcon
             : lassoToolSelected
             ? LassoIcon
-            : extraToolsIcon}
+            : DotsIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsExtraToolsMenuOpen(false)}
