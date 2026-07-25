@@ -29,21 +29,31 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [isInvalid, setIsInvalid] = useState(false); 
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
 
+  
   useEffect(() => {
     setInnerValue(color);
+    setIsInvalid(false);
   }, [color]);
 
+  
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
       const color = normalizeInputColor(value);
 
+      
       if (color) {
         onChange(color);
+        setIsInvalid(false);
+      } else if (value.length > 0) {
+        setIsInvalid(true);
+      } else {
+        setIsInvalid(false);
       }
       setInnerValue(value);
     },
@@ -68,7 +78,8 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
+    
+    <div className={clsx("color-picker__input-label", { "is-invalid": isInvalid })}>
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
@@ -80,11 +91,28 @@ export const ColorInput = ({
           changeColor(event.target.value);
         }}
         value={(innerValue || "").replace(/^#/, "")}
+        
         onBlur={() => {
-          setInnerValue(color);
+          const trimmed = innerValue.trim();
+          if (trimmed && trimmed !== "transparent") {
+            if (!normalizeInputColor(trimmed)) {
+              setIsInvalid(true);
+            } else {
+              setIsInvalid(false);
+              setInnerValue(color);
+            }
+          } else {
+            setIsInvalid(false);
+            setInnerValue(color);
+          }
         }}
         tabIndex={-1}
-        onFocus={() => setActiveColorPickerSection("hex")}
+        aria-invalid={isInvalid}
+        title={isInvalid ? "Invalid hex color — use #RGB or #RRGGBB" : undefined}
+        onFocus={() => {
+          setIsInvalid(false);
+          setActiveColorPickerSection("hex");
+        }}
         onKeyDown={(event) => {
           if (event.key === KEYS.TAB) {
             return;
