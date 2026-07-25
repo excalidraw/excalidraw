@@ -956,6 +956,9 @@ class App extends React.Component<AppProps, AppState> {
   public isNavigationEnabled(
     props: Pick<AppProps, "interaction"> = this.props,
   ): boolean {
+    if (isPanWithRightMouseEnabled()) { //zsviczian #329 Miro-style right-button panning is canvas navigation
+      return true;
+    }
     if (typeof props.interaction === "object" && props.interaction !== null) {
       return props.interaction.enabled?.navigation === true;
     }
@@ -2598,7 +2601,7 @@ class App extends React.Component<AppProps, AppState> {
                               </ElementCanvasButtons>
                             )}
 
-                          {this.isDefaultUIEnabled() && this.state.contextMenu && (
+                          {(this.isDefaultUIEnabled() || isPanWithRightMouseEnabled()) && this.state.contextMenu && ( //zsviczian #329 render the Miro-style keyboard context menu
                             <ContextMenu
                               items={this.state.contextMenu.items}
                               top={this.state.contextMenu.top}
@@ -3212,6 +3215,12 @@ class App extends React.Component<AppProps, AppState> {
   // `ActionManager.handleKeyDown` gates); the rest of the keyboard handling
   // stays disabled while non-interactive
   private handleNavigationModeKeyDown = (event: KeyboardEvent) => {
+    //zsviczian START #329 keep the Miro-style context-menu shortcut in navigation-only mode
+    if (isPanWithRightMouseEnabled() && event.key.toLowerCase() === "m") {
+      this.onKeyDown(event);
+      return;
+    }
+    //zsviczian END
     if (this.maybeHandlePageScrollKeyDown(event)) {
       // the editor consumes the input — the page must not scroll along
       event.preventDefault();
@@ -5728,7 +5737,11 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
-      if (!this.isInteractionEnabled()) {
+      if (
+        !this.isInteractionEnabled() &&
+        //zsviczian #329 allow the Miro-style context-menu shortcut dispatched by navigation mode
+        !(isPanWithRightMouseEnabled() && event.key.toLowerCase() === "m")
+      ) {
         return;
       }
 
@@ -5886,35 +5899,20 @@ class App extends React.Component<AppProps, AppState> {
           document.activeElement,
         )
       ) {
-        // open context menu at current cursor position
-        const container = this.excalidrawContainerRef.current!;
-        const { top: offsetTop, left: offsetLeft } =
-          container.getBoundingClientRect();
-        const left = this.lastViewportPosition.x - offsetLeft;
-        const top = this.lastViewportPosition.y - offsetTop;
-
-        const { x, y } = viewportCoordsToSceneCoords(
+        //zsviczian START #329 trigger the canonical context-menu action at the current cursor position
+        this.handleCanvasContextMenu(
           {
-            clientX: this.lastViewportPosition.x,
-            clientY: this.lastViewportPosition.y,
-          } as any,
-          this.state,
+            button: POINTER_BUTTON.MAIN,
+            clientX: this.viewport.lastPosition.x,
+            clientY: this.viewport.lastPosition.y,
+            nativeEvent: new MouseEvent("contextmenu"),
+            preventDefault: () => event.preventDefault(),
+          } as unknown as React.MouseEvent<
+            HTMLElement | HTMLCanvasElement
+          >,
+          true,
         );
-        const element = this.getElementAtPosition(x, y, {
-          preferSelected: true,
-          includeLockedElements: true,
-        });
-        const selectedElements = this.scene.getSelectedElements(this.state);
-        const isHittingCommonBoundBox =
-          this.isHittingCommonBoundingBoxOfSelectedElements(
-            { x, y },
-            selectedElements,
-          );
-        const type = element || isHittingCommonBoundBox ? 'element' : 'canvas';
-        this.setState({
-          contextMenu: { top, left, items: this.getContextMenuItems(type) },
-        });
-        event.preventDefault();
+        //zsviczian END
         return;
       }
 
@@ -13789,9 +13787,11 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleCanvasContextMenu = (
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
+    isMiroKeyboardShortcut = false, //zsviczian #329
   ) => {
     // NOTE no preventDefault so the browser default context menu applies
-    if (!this.isInteractionEnabled()) {
+    //zsviczian #329 allow the Miro keyboard shortcut through the upstream interaction gate
+    if (!this.isInteractionEnabled() && !isMiroKeyboardShortcut) {
       return;
     }
     event.preventDefault();
@@ -13799,7 +13799,8 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     //mfuria #329. if right-click pan is enabled, we suppress opening our custom menu too.
-    if (isPanWithRightMouseEnabled()) {
+    //zsviczian #329 preserve right-click panning while allowing the M shortcut
+    if (isPanWithRightMouseEnabled() && !isMiroKeyboardShortcut) {
       return;
     }
 
