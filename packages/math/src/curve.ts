@@ -267,7 +267,10 @@ export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
     pointDistance(p, bezierEquation(c, t)),
   );
 
-  if (!solution) {
+  // `solution` is only nullish when the search window is narrower than the
+  // tolerance (e.g. a caller-supplied tolerance larger than the window). A
+  // legitimate solution of `t = 0` must not be treated as a failure.
+  if (solution == null) {
     return null;
   }
 
@@ -287,8 +290,10 @@ export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
 ) {
   const closest = curveClosestPoint(c, p);
 
+  // No closest point found: report an "infinitely far" distance so this curve
+  // is never mistaken for the nearest component when fed into `Math.min`.
   if (!closest) {
-    return 0;
+    return Infinity;
   }
 
   return pointDistance(p, closest);

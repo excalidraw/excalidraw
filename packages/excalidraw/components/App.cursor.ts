@@ -34,6 +34,11 @@ export class AppCursor {
     | null = null;
   private eraserPreviewDataURL: DataURL | null = null;
 
+  private drawShapeCanvasCache:
+    | (HTMLCanvasElement & { theme?: AppState["theme"] })
+    | null = null;
+  private drawShapePreviewDataURL: DataURL | null = null;
+
   constructor(private app: App) {}
 
   private get canvas() {
@@ -79,6 +84,8 @@ export class AppCursor {
       this.set(CURSOR_TYPE.GRAB);
     } else if (isEraserActive({ activeTool })) {
       this.applyEraser();
+    } else if (activeTool.type === "autoshape") {
+      this.set(CURSOR_TYPE.CROSSHAIR);
     } else if (activeTool.type === "laser") {
       const url =
         this.app.state.theme === THEME.LIGHT

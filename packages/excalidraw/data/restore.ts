@@ -218,6 +218,7 @@ export const AllowedExcalidrawActiveTools: Record<
   hand: true,
   mermaid: true,
   laser: false,
+  autoshape: false,
   magicframe: false,
 };
 

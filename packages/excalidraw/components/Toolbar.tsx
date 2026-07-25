@@ -15,20 +15,23 @@ import { PenModeButton } from "./PenModeButton";
 import Stack from "./Stack";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
+  drawShapeToolIcon,
   EmbedIcon,
-  extraToolsIcon,
   frameToolIcon,
   LassoIcon,
   laserPointerToolIcon,
   MagicIcon,
   mermaidLogoIcon,
+  DotsIcon,
 } from "./icons";
 import {
   ArrowToolButton,
   DiamondToolButton,
   EllipseToolButton,
   EraserToolButton,
+  FreedrawToolPopover,
   FreedrawToolButton,
+  getToolShortcut,
   HandToolButton,
   //ImageToolButton,
   isToolButtonDisabled,
@@ -61,6 +64,7 @@ const ExtraToolsDropdown = ({
   const { TTDDialogTriggerTunnel } = useTunnels();
 
   const frameToolSelected = activeTool.type === "frame";
+  const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
   const lassoToolSelected =
     isFullStylesPanel &&
@@ -75,6 +79,7 @@ const ExtraToolsDropdown = ({
           "App-toolbar__extra-tools-trigger--selected":
             frameToolSelected ||
             embeddableToolSelected ||
+            (isFullStylesPanel && drawShapeToolSelected) ||
             lassoToolSelected ||
             // in collab we're already highlighting the laser button
             // outside toolbar, so let's not highlight extra-tools button
@@ -91,11 +96,13 @@ const ExtraToolsDropdown = ({
           ? frameToolIcon
           : embeddableToolSelected
           ? EmbedIcon
+          : isFullStylesPanel && drawShapeToolSelected
+          ? drawShapeToolIcon
           : laserToolSelected && !app.props.isCollaborating
           ? laserPointerToolIcon
           : lassoToolSelected
           ? LassoIcon
-          : extraToolsIcon}
+          : DotsIcon}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
         onClickOutside={() => setIsExtraToolsMenuOpen(false)}
@@ -120,6 +127,16 @@ const ExtraToolsDropdown = ({
           disabled={isToolButtonDisabled(app, "embeddable")}
         >
           {t("toolBar.embeddable")}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onSelect={() => app.setActiveTool({ type: "autoshape" })}
+          icon={drawShapeToolIcon}
+          shortcut={getToolShortcut("autoshape")}
+          data-testid="toolbar-autoshape"
+          selected={drawShapeToolSelected}
+          disabled={isToolButtonDisabled(app, "autoshape")}
+        >
+          {t("toolBar.autoshape")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "laser" })}
@@ -231,7 +248,10 @@ export const Toolbar = ({
               disabled={app.props.activeTool != null}
             />
 
-            <div className="App-toolbar__divider" />
+            <div
+              className="App-toolbar__divider"
+              style={{ marginRight: "0.25rem" }}
+            />
           </>
         )}
 
@@ -248,7 +268,11 @@ export const Toolbar = ({
         <EllipseToolButton {...toolProps} />
         <ArrowToolButton {...toolProps} />
         <LineToolButton {...toolProps} />
-        <FreedrawToolButton {...toolProps} />
+        {isCompactStylesPanel ? (
+          <FreedrawToolPopover {...toolProps} />
+        ) : (
+          <FreedrawToolButton {...toolProps} />
+        )}
         <TextToolButton {...toolProps} />
         {/*UIOptions.tools?.image !== false && <ImageToolButton {...toolProps} />*/}
         {/*zsviczian custom image menu replaces default ImageToolButton */}
@@ -262,7 +286,10 @@ export const Toolbar = ({
         )}
         <EraserToolButton {...toolProps} />
 
-        <div className="App-toolbar__divider" />
+        <div
+          className="App-toolbar__divider"
+          style={{ marginLeft: "0.25rem" }}
+        />
 
         <ExtraToolsDropdown
           app={app}
