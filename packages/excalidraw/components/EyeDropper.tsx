@@ -13,6 +13,7 @@ import { useStable } from "../hooks/useStable";
 import { getSelectedElements } from "../scene";
 
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
+import { positionElementBesideCursor } from "./positionElementBesideCursor";
 
 import "./EyeDropper.scss";
 
@@ -102,9 +103,21 @@ export const EyeDropper: React.FC<{
       clientY: number;
       altKey: boolean;
     }) => {
-      // FIXME swap offset when the preview gets outside viewport
-      colorPreviewDiv.style.top = `${clientY - appState.offsetTop + 20}px`; //zsviczian added offset
-      colorPreviewDiv.style.left = `${clientX - appState.offsetLeft + 20}px`; //zsviczian added offset
+      const { top, left } = positionElementBesideCursor({
+        cursor: {
+          x: clientX - appState.offsetLeft, //zsviczian added offset
+          y: clientY - appState.offsetTop, //zsviczian added offset
+        },
+        element: {
+          width: colorPreviewDiv.offsetWidth,
+          height: colorPreviewDiv.offsetHeight,
+        },
+        container: eyeDropperContainer.getBoundingClientRect(),
+        gap: 20,
+      });
+
+      colorPreviewDiv.style.top = `${top}px`;
+      colorPreviewDiv.style.left = `${left}px`;
 
       const currentColor = getCurrentColor({ clientX, clientY });
 

@@ -35,7 +35,11 @@ const executeHistoryAction = (
     !appState.newElement &&
     !appState.selectedElementsAreBeingDragged &&
     !appState.selectionElement &&
-    !app.flowchart.isCreatingChart
+    !app.flowchart.isCreatingChart &&
+    // a drawShape sketch in progress isn't visible via `newElement` while
+    // the stroke is still unrecognized — block history mid-gesture the same
+    // way as for the other in-progress interactions above
+    !app.drawShape.hasPendingGesture()
   ) {
     const result = updater();
 
