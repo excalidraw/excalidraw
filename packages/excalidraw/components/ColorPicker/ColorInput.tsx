@@ -32,20 +32,38 @@ export const ColorInput = ({
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setInnerValue(color);
+    setError(null);
   }, [color]);
+
+  const isValidHexInput = (value: string): boolean => {
+    const stripped = value.replace(/^#/, "").trim();
+    if (stripped === "") {
+      return true;
+    }
+    return /^([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(
+      stripped,
+    );
+  };
 
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
-      const color = normalizeInputColor(value);
+      setInnerValue(value);
 
+      if (!isValidHexInput(value)) {
+        setError("Hex code must be 3, 4, 6, or 8 hex characters");
+        return;
+      }
+      setError(null);
+
+      const color = normalizeInputColor(value);
       if (color) {
         onChange(color);
       }
-      setInnerValue(value);
     },
     [onChange],
   );
@@ -72,7 +90,11 @@ export const ColorInput = ({
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
-        style={{ border: 0, padding: 0 }}
+        style={{
+          border: 0,
+          padding: 0,
+          outline: error ? "1px solid var(--color-danger)" : undefined,
+        }}
         spellCheck={false}
         className="color-picker-input"
         aria-label={label}
@@ -82,6 +104,7 @@ export const ColorInput = ({
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setError(null);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
@@ -95,6 +118,15 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+      {error && (
+        <div
+          className="color-picker__input-error"
+          role="alert"
+          data-testid="color-picker-input-error"
+        >
+          {error}
+        </div>
+      )}
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>
