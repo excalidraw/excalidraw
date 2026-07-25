@@ -112,9 +112,9 @@
     "toggleGrid": "Toggle grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
-    "libraryLoadingMessage": "Loading library…",
+    "libraryLoadingMessage": "Loading library\u2026",
     "libraries": "Browse libraries",
-    "loadingScene": "Loading scene…",
+    "loadingScene": "Loading scene\u2026",
     "loadScene": "Load scene from file",
     "align": "Align",
     "alignTop": "Align top",
@@ -604,7 +604,8 @@
     "colors": "Colors",
     "shades": "Shades",
     "hexCode": "Hex code",
-    "noShades": "No shades available for this color"
+    "noShades": "No shades available for this color",
+    "invalidColor": "Invalid color"
   },
   "overwriteConfirm": {
     "action": {
@@ -680,8 +681,8 @@
       "promptTooLong": "Prompt is too long (max {{max}} characters)",
       "generationFailed": "Generation failed",
       "invalidDiagram": "Generated an invalid diagram :(. You may edit manually, retry with auto-fix, or try a different prompt.",
-      "fixInMermaid": "Edit Mermaid manually →",
-      "aiRepair": "Regenerate (auto-fix) →",
+      "fixInMermaid": "Edit Mermaid manually \u2192",
+      "aiRepair": "Regenerate (auto-fix) \u2192",
       "requestAborted": "Request aborted",
       "requestFailed": "Request failed",
       "mermaidParseError": "Mermaid syntax error"
