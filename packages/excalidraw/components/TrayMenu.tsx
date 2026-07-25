@@ -31,6 +31,7 @@ import { Section } from "./Section";
 import Stack from "./Stack";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
+  drawShapeToolIcon, //zsviczian autoshape in tray menu
   EmbedIcon,
   DotsIcon,
   frameToolIcon,
@@ -45,6 +46,7 @@ import {
   EllipseToolButton,
   EraserToolButton,
   FreedrawToolButton,
+  getToolShortcut, //zsviczian autoshape in tray menu
   HandToolButton,
   isToolButtonDisabled,
   LineToolButton,
@@ -112,6 +114,7 @@ const TrayToolbar = ({
   const isTrayModePanel = stylesPanelMode === "tray"; //zsviczian
 
   const frameToolSelected = activeTool.type === "frame";
+  const drawShapeToolSelected = activeTool.type === "autoshape"; //zsviczian autoshape in tray menu
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
   const lassoToolSelected =
@@ -160,6 +163,7 @@ const TrayToolbar = ({
             "App-toolbar__extra-tools-trigger--selected":
               frameToolSelected ||
               embeddableToolSelected ||
+              drawShapeToolSelected || //zsviczian autoshape in tray menu
               lassoToolSelected ||
               (laserToolSelected && !app.props.isCollaborating),
           })}
@@ -176,6 +180,8 @@ const TrayToolbar = ({
             ? frameToolIcon
             : embeddableToolSelected
             ? EmbedIcon
+            : drawShapeToolSelected //zsviczian autoshape in tray menu
+            ? drawShapeToolIcon //zsviczian autoshape in tray menu
             : laserToolSelected && !app.props.isCollaborating
             ? laserPointerToolIcon
             : lassoToolSelected
@@ -206,6 +212,18 @@ const TrayToolbar = ({
           >
             {t("toolBar.embeddable")}
           </DropdownMenu.Item>
+          {/*zsviczian START autoshape in tray menu*/}
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "autoshape" })}
+            icon={drawShapeToolIcon}
+            shortcut={getToolShortcut("autoshape")}
+            data-testid="toolbar-autoshape"
+            selected={drawShapeToolSelected}
+            disabled={isToolButtonDisabled(app, "autoshape")}
+          >
+            {t("toolBar.autoshape")}
+          </DropdownMenu.Item>
+          {/*zsviczian END*/}
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "laser" })}
             icon={laserPointerToolIcon}
