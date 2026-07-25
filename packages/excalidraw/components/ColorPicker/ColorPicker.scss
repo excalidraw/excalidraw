@@ -383,6 +383,19 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    // Invalid hex value: red border + matching focus ring
+    &.color-picker__input-label--invalid {
+      border-color: #e03131;
+
+      .color-picker__input-hash {
+        color: #e03131;
+      }
+
+      &:focus-within {
+        box-shadow: 0 0 0 1px #e03131;
+      }
+    }
   }
 
   .color-picker__input-hash {

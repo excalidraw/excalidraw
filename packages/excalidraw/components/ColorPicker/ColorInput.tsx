@@ -37,6 +37,10 @@ export const ColorInput = ({
     setInnerValue(color);
   }, [color]);
 
+  // Show invalid state when user has typed a non-empty value that isn't a
+  // recognized color (hex, named color, transparent, etc.)
+  const isInvalid = innerValue !== "" && !normalizeInputColor(innerValue);
+
   const changeColor = useCallback(
     (inputValue: string) => {
       const value = inputValue.toLowerCase();
@@ -68,7 +72,11 @@ export const ColorInput = ({
   }, [setEyeDropperState]);
 
   return (
-    <div className="color-picker__input-label">
+    <div
+      className={clsx("color-picker__input-label", {
+        "color-picker__input-label--invalid": isInvalid,
+      })}
+    >
       <div className="color-picker__input-hash">#</div>
       <input
         ref={activeSection === "hex" ? inputRef : undefined}
@@ -76,6 +84,7 @@ export const ColorInput = ({
         spellCheck={false}
         className="color-picker-input"
         aria-label={label}
+        aria-invalid={isInvalid || undefined}
         onChange={(event) => {
           changeColor(event.target.value);
         }}
