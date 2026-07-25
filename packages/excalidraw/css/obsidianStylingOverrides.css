@@ -365,3 +365,7 @@
   margin-top: calc(var(--safe-area-inset-top) + var(--header-height) + var(--size-4-2));
   width: 100%;
 }
+
+.excalidraw footer.App-toolbar .ToolIcon_type_toggle {
+  padding: 2px;
+}
