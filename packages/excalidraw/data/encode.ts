@@ -199,11 +199,11 @@ function dataView(
       );
     }
     const method = `setUint${DATA_VIEW_BITS_MAP[bytes]}` as const;
-    new DataView(buffer.buffer)[method](offset, value);
+    new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength)[method](offset, value);
     return buffer;
   }
   const method = `getUint${DATA_VIEW_BITS_MAP[bytes]}` as const;
-  return new DataView(buffer.buffer)[method](offset);
+  return new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength)[method](offset);
 }
 
 // -----------------------------------------------------------------------------
