@@ -191,6 +191,8 @@
     "boxSelectionMode": "Select on",
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
+    "imageMaxDimension": "Max image size",
+    "imageDimensionOriginal": "Original",
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints",
     "signin": "Sign in",

@@ -338,7 +338,7 @@ export const EXPORT_SCALES = [1, 2, 3];
 export const DEFAULT_EXPORT_PADDING = 10; // px
 
 export const DEFAULT_IMAGE_OPTIONS: AppProps["imageOptions"] = {
-  maxWidthOrHeight: 1440,
+  maxWidthOrHeight: 4096,
   maxFileSizeBytes: 4 * 1024 * 1024,
 };
 

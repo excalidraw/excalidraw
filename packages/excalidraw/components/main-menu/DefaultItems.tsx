@@ -473,6 +473,39 @@ const PreferencesBoxSelectionModeItem = () => {
   );
 };
 
+const PreferencesImageMaxDimensionItem = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  const imageDimensionOptions = [
+    { value: 0, label: t("labels.imageDimensionOriginal") },
+    { value: 2048, label: "2048px" },
+    { value: 4096, label: "4096px" },
+    { value: 8192, label: "8192px" },
+  ] as const;
+
+  return (
+    <DropdownMenuItemContentRadio<number>
+      name="imageMaxDimension"
+      icon={emptyIcon}
+      value={appState.imageMaxDimension}
+      onChange={(value) => {
+        setAppState({
+          imageMaxDimension: value,
+        });
+      }}
+      choices={imageDimensionOptions.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+        ariaLabel: opt.label,
+      }))}
+    >
+      {t("labels.imageMaxDimension")}
+    </DropdownMenuItemContentRadio>
+  );
+};
+
 const PreferencesToggleSnapModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -618,6 +651,7 @@ export const Preferences = ({
         {children || (
           <>
             <PreferencesBoxSelectionModeItem />
+            <PreferencesImageMaxDimensionItem />
             <PreferencesToggleToolLockItem />
             <PreferencesToggleSnapModeItem />
             <PreferencesToggleGridModeItem />
@@ -636,6 +670,7 @@ export const Preferences = ({
 
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.BoxSelectionMode = PreferencesBoxSelectionModeItem;
+Preferences.ImageMaxDimension = PreferencesImageMaxDimensionItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;

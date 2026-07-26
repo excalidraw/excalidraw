@@ -131,6 +131,7 @@ export const getDefaultAppState = (): Omit<
     activeLockedId: null,
     bindMode: "orbit",
     boxSelectionMode: "contain",
+    imageMaxDimension: 4096,
   };
 };
 
@@ -263,6 +264,7 @@ const APP_STATE_STORAGE_CONF = (<
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  imageMaxDimension: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <
