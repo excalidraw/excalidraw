@@ -58,6 +58,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "gridSize": 20,
   "gridStep": 5,
   "hoveredElementIds": {},
+  "imageMaxDimension": 4096,
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
