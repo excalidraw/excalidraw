@@ -835,6 +835,9 @@ class App extends React.Component<AppProps, AppState> {
       zenModeEnabled,
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
+      imageMaxDimension:
+        props.imageOptions.maxWidthOrHeight ??
+        defaultAppState.imageMaxDimension,
       name,
       width: window.innerWidth,
       height: window.innerHeight,
@@ -3483,7 +3486,9 @@ class App extends React.Component<AppProps, AppState> {
       repairBindings: true,
       deleteInvisibleElements: true,
     });
-    let restoredAppState = restoreAppState(initialData?.appState, null);
+    let restoredAppState = restoreAppState(initialData?.appState, {
+      imageMaxDimension: this.props.imageOptions.maxWidthOrHeight,
+    });
     const activeTool = restoredAppState.activeTool;
 
     if (!restoredAppState.preferredSelectionTool.initialized) {
@@ -12379,7 +12384,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
-      const { maxWidthOrHeight, maxFileSizeBytes } = this.props.imageOptions;
+      const { maxFileSizeBytes } = this.props.imageOptions;
+      const maxWidthOrHeight =
+        this.state.imageMaxDimension > 0
+          ? this.state.imageMaxDimension
+          : Infinity;
 
       try {
         imageFile = await resizeImageFile(imageFile, {

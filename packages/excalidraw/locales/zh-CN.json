@@ -191,6 +191,8 @@
     "boxSelectionMode": "框选模式",
     "boxSelectionContain": "包含",
     "boxSelectionOverlap": "重叠",
+    "imageMaxDimension": "图片最大尺寸",
+    "imageDimensionOriginal": "原始尺寸",
     "arrowBinding": "箭头绑定",
     "midpointSnapping": "中点吸附",
     "signin": "登录",

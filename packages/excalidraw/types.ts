@@ -351,6 +351,11 @@ export interface AppState {
   isBindingEnabled: boolean;
   /** user box selection preference; defaults to "contain" when unset */
   boxSelectionMode: BoxSelectionMode;
+  /** 
+   * Maximum image dimension (width/height) for auto-resizing on insert.
+   * Set to 0 to disable image resizing (keep original size).
+   */
+  imageMaxDimension: number;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
   /** user preference whether arrow snap to midpoints while binding */
@@ -972,6 +977,11 @@ export type ExportOpts = {
 };
 
 export type ImageOptions = Partial<{
+  /**
+   * Maximum width or height of the image in pixels.
+   * Images larger than this will be scaled down.
+   * Pass `Infinity` to disable image dimension scaling.
+   */
   maxWidthOrHeight: number;
   maxFileSizeBytes: number;
 }>;

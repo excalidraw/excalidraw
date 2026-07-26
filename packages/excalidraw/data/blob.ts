@@ -370,7 +370,17 @@ export const resizeImageFile = async (
     throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
   }
 
-  if (!opts.outputType || opts.outputType === file.type) {
+  if (
+    !opts.outputType ||
+    opts.outputType === file.type
+  ) {
+    if (
+      !isFinite(opts.maxWidthOrHeight) ||
+      isNaN(opts.maxWidthOrHeight)
+    ) {
+      return file;
+    }
+
     const dimensions = await getImageFileDimensions(file);
 
     if (
