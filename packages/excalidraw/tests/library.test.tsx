@@ -7,6 +7,7 @@ import { MIME_TYPES, ORIG_ID } from "@excalidraw/common";
 import { getCommonBoundingBox } from "@excalidraw/element";
 
 import type {
+  ExcalidrawElement,
   ExcalidrawGenericElement,
   NonDeleted,
 } from "@excalidraw/element/types";
@@ -197,7 +198,28 @@ describe("library", () => {
       expect(mergeLibraryItems(firstImport, secondImport)).toEqual(firstImport);
     });
 
-    it("rejects an item with matching element fingerprints", async () => {
+    it("rejects identical elements with different version nonces", async () => {
+      const existingItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+      const importedItems = existingItems.map((item) => ({
+        ...item,
+        id: `${item.id}-different-item`,
+        elements: item.elements.map((element) => ({
+          ...element,
+          versionNonce: element.versionNonce + 1,
+        })),
+      }));
+
+      // Restoring legacy libraries can regenerate version nonces. The
+      // fingerprint fallback must still recognize the imported item.
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual(
+        existingItems,
+      );
+    });
+
+    it("rejects matching element fingerprints with different element ids", async () => {
       const existingItems = parseLibraryJSON(
         await libraryJSONPromise,
         "published",
@@ -208,7 +230,6 @@ describe("library", () => {
         elements: item.elements.map((element) => ({
           ...element,
           id: `${element.id}-different-element`,
-          versionNonce: element.versionNonce + 1,
         })),
       }));
 
@@ -217,27 +238,48 @@ describe("library", () => {
       );
     });
 
-    it("prepends items whose element fingerprints do not match", async () => {
-      const existingItems = parseLibraryJSON(
-        await libraryJSONPromise,
-        "published",
-      );
-      const importedItems = existingItems.map((item) => ({
-        ...item,
-        id: `${item.id}-different-item`,
-        elements: item.elements.map((element) => ({
+    it.each([
+      ["type", (element: ExcalidrawElement) => ({ ...element, type: "ellipse" })],
+      ["x", (element: ExcalidrawElement) => ({ ...element, x: element.x + 1 })],
+      ["y", (element: ExcalidrawElement) => ({ ...element, y: element.y + 1 })],
+      [
+        "width",
+        (element: ExcalidrawElement) => ({
           ...element,
-          id: `${element.id}-different-element`,
-          versionNonce: element.versionNonce + 1,
-          x: element.x + 100,
-        })),
-      }));
+          width: element.width + 1,
+        }),
+      ],
+      [
+        "height",
+        (element: ExcalidrawElement) => ({
+          ...element,
+          height: element.height + 1,
+        }),
+      ],
+    ] as const)(
+      "prepends an item when its element fingerprint's %s differs",
+      async (_property, mutateElement) => {
+        const existingItems = parseLibraryJSON(
+          await libraryJSONPromise,
+          "published",
+        );
+        const importedItems = existingItems.map((item) => ({
+          ...item,
+          id: `${item.id}-different-item`,
+          elements: item.elements.map((element) => ({
+            ...mutateElement(element),
+            // Avoid the element id + versionNonce fast path so this test
+            // exercises the fingerprint fallback.
+            id: `${element.id}-different-element`,
+          })),
+        }));
 
-      expect(mergeLibraryItems(existingItems, importedItems)).toEqual([
-        ...importedItems,
-        ...existingItems,
-      ]);
-    });
+        expect(mergeLibraryItems(existingItems, importedItems)).toEqual([
+          ...importedItems,
+          ...existingItems,
+        ]);
+      },
+    );
   });
 
   beforeEach(async () => {
