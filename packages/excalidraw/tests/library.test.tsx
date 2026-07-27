@@ -13,7 +13,10 @@ import type {
 
 import { parseLibraryJSON } from "../data/blob";
 import { serializeLibraryAsJSON } from "../data/json";
-import { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import {
+  distributeLibraryItemsOnSquareGrid,
+  mergeLibraryItems,
+} from "../data/library";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -26,6 +29,10 @@ const { h } = window;
 
 const libraryJSONPromise = API.readFile(
   "./fixtures/fixture_library.excalidrawlib",
+  "utf8",
+);
+const extendedLibraryJSONPromise = API.readFile(
+  "./fixtures/fixture_library_ext.excalidrawlib",
   "utf8",
 );
 
@@ -142,6 +149,97 @@ describe("library items inserting", () => {
 });
 
 describe("library", () => {
+  describe("mergeLibraryItems", () => {
+    it("rejects an item with the same library-item id", async () => {
+      const existingItems = parseLibraryJSON(
+        await extendedLibraryJSONPromise,
+        "published",
+      );
+      const importedItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      ).map((item) => ({ ...item, id: existingItems[0]!.id }));
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual(
+        existingItems,
+      );
+    });
+
+    it("adds an item with a different number of elements", async () => {
+      const existingItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+      const importedItems = parseLibraryJSON(
+        await extendedLibraryJSONPromise,
+        "published",
+      );
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual([
+        ...importedItems,
+        ...existingItems,
+      ]);
+    });
+
+    it("rejects an item with the same element ids and version nonces", async () => {
+      const firstImport = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+      const secondImport = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+
+      // This fixture uses the legacy array format, so restoring it generates a
+      // new library-item id for each import. Deduplication must use its elements.
+      expect(firstImport[0]?.id).not.toBe(secondImport[0]?.id);
+      expect(mergeLibraryItems(firstImport, secondImport)).toEqual(firstImport);
+    });
+
+    it("rejects an item with matching element fingerprints", async () => {
+      const existingItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+      const importedItems = existingItems.map((item) => ({
+        ...item,
+        id: `${item.id}-different-item`,
+        elements: item.elements.map((element) => ({
+          ...element,
+          id: `${element.id}-different-element`,
+          versionNonce: element.versionNonce + 1,
+        })),
+      }));
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual(
+        existingItems,
+      );
+    });
+
+    it("prepends items whose element fingerprints do not match", async () => {
+      const existingItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+      const importedItems = existingItems.map((item) => ({
+        ...item,
+        id: `${item.id}-different-item`,
+        elements: item.elements.map((element) => ({
+          ...element,
+          id: `${element.id}-different-element`,
+          versionNonce: element.versionNonce + 1,
+          x: element.x + 100,
+        })),
+      }));
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual([
+        ...importedItems,
+        ...existingItems,
+      ]);
+    });
+  });
+
   beforeEach(async () => {
     await render(<Excalidraw />);
     await act(() => {
