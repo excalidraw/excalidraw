@@ -189,6 +189,13 @@ const renderHoveredArrowTextAnchor = (
   elementsMap: ElementsMap,
 ) => {
   const { elementId, anchor } = appState.hoveredArrowTextAnchor!;
+
+  // binding an endpoint is an arrow binding, so it follows the binding
+  // toggle; a label is a container binding and is unaffected by it
+  if (anchor !== "label" && !appState.isBindingEnabled) {
+    return;
+  }
+
   const element = elementsMap.get(elementId);
 
   if (!element || !isArrowElement(element) || element.isDeleted) {

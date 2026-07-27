@@ -6638,6 +6638,24 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /**
+   * A free arrow endpoint a new text could be bound to. Binding an endpoint is
+   * an arrow binding, so it follows the binding toggle (ctrl/cmd) like every
+   * other one — holding it makes the text tool drop plain text instead.
+   */
+  private getBindableArrowEndpointAtPosition(x: number, y: number) {
+    if (!isBindingEnabled(this.state)) {
+      return null;
+    }
+
+    return getUnboundArrowEndpointAtPoint(
+      pointFrom(x, y),
+      this.scene.getNonDeletedElements(),
+      this.scene.getNonDeletedElementsMap(),
+      this.state.zoom,
+    );
+  }
+
+  /**
    * Mirrors what `handleTextOnPointerDown` would do at this position, so the
    * highlight can't promise something the click won't deliver.
    */
@@ -6645,12 +6663,7 @@ class App extends React.Component<AppProps, AppState> {
     x: number,
     y: number,
   ): AppState["hoveredArrowTextAnchor"] {
-    const endpoint = getUnboundArrowEndpointAtPoint(
-      pointFrom(x, y),
-      this.scene.getNonDeletedElements(),
-      this.scene.getNonDeletedElementsMap(),
-      this.state.zoom,
-    );
+    const endpoint = this.getBindableArrowEndpointAtPosition(x, y);
 
     if (endpoint) {
       return { elementId: endpoint.arrow.id, anchor: endpoint.startOrEnd };
@@ -9796,11 +9809,9 @@ class App extends React.Component<AppProps, AppState> {
 
     // a free arrow endpoint takes precedence over adding a label *to* the
     // arrow — it's the smaller, more deliberate target
-    const arrowEndpoint = getUnboundArrowEndpointAtPoint(
-      pointFrom(sceneX, sceneY),
-      this.scene.getNonDeletedElements(),
-      this.scene.getNonDeletedElementsMap(),
-      this.state.zoom,
+    const arrowEndpoint = this.getBindableArrowEndpointAtPosition(
+      sceneX,
+      sceneY,
     );
 
     const arrowEndpointBinding =

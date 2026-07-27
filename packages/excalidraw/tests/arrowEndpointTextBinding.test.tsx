@@ -1,3 +1,5 @@
+import { KEYS } from "@excalidraw/common";
+
 import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
@@ -187,6 +189,42 @@ describe("binding text to an arrow endpoint", () => {
       mouse.moveTo(100, 100);
 
       expect(h.state.hoveredArrowTextAnchor).toBeNull();
+    });
+  });
+
+  describe("binding toggle (ctrl/cmd)", () => {
+    it("does not offer an endpoint while binding is disabled", () => {
+      API.setElements([createArrow("arrow", [100, 300], [100, 100])]);
+      API.setAppState({ isBindingEnabled: false });
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+    });
+
+    it("still offers the label anchor — a label is not an arrow binding", () => {
+      API.setElements([createArrow("arrow", [100, 300], [100, 100])]);
+      API.setAppState({ isBindingEnabled: false });
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 200);
+
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "label",
+      });
+    });
+
+    it("drops plain text instead of binding the endpoint", async () => {
+      API.setElements([createArrow("arrow", [100, 300], [100, 100])]);
+      API.setAppState({ isBindingEnabled: false });
+
+      await bindTextAt(100, 100, "plain");
+
+      expect(getArrow("arrow").endBinding).toBeNull();
+      expect(getArrow("arrow").startBinding).toBeNull();
+      expect(getText().containerId).toBeNull();
     });
 
     it("does not highlight an endpoint that is already bound", () => {
