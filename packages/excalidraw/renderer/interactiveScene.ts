@@ -180,25 +180,29 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
 };
 
 /**
- * Marks the free arrow endpoint the text tool would attach a new text label to.
+ * Marks where on the hovered arrow the text tool would attach text — a free
+ * endpoint, or the midpoint the arrow's label would center on.
  */
-const renderHoveredArrowEndpoint = (
+const renderHoveredArrowTextAnchor = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elementsMap: ElementsMap,
 ) => {
-  const { elementId, startOrEnd } = appState.hoveredArrowEndpoint!;
+  const { elementId, anchor } = appState.hoveredArrowTextAnchor!;
   const element = elementsMap.get(elementId);
 
   if (!element || !isArrowElement(element) || element.isDeleted) {
     return;
   }
 
-  const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    element,
-    startOrEnd === "start" ? 0 : -1,
-    elementsMap,
-  );
+  const point =
+    anchor === "label"
+      ? LinearElementEditor.getBoundTextElementCenter(element, elementsMap)
+      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          element,
+          anchor === "start" ? 0 : -1,
+          elementsMap,
+        );
 
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
@@ -1713,8 +1717,8 @@ const _renderInteractiveScene = ({
     };
   }
 
-  if (appState.hoveredArrowEndpoint) {
-    renderHoveredArrowEndpoint(context, appState, allElementsMap);
+  if (appState.hoveredArrowTextAnchor) {
+    renderHoveredArrowTextAnchor(context, appState, allElementsMap);
   }
 
   if (appState.frameToHighlight) {

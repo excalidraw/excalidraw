@@ -6013,7 +6013,7 @@ class App extends React.Component<AppProps, AppState> {
         frameToHighlight: null,
         // only the text tool offers arrow-endpoint binding, and the highlight
         // is refreshed on pointermove — don't leave a stale one behind
-        hoveredArrowEndpoint: null,
+        hoveredArrowTextAnchor: null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -6608,42 +6608,82 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   /**
-   * With the text tool active, a free arrow endpoint under the cursor is a
-   * target for creating a text label bound to that endpoint. Returns the hit
-   * (if any) and keeps `appState.hoveredArrowEndpoint` — which drives the
-   * highlight — in sync.
+   * With the text tool active, an arrow under the cursor is a target for
+   * attaching text: a free endpoint binds the arrow to a new text element,
+   * anywhere else on the arrow adds a label at its midpoint. Returns where the
+   * text would land (if anywhere), and keeps `appState.hoveredArrowTextAnchor`
+   * — which drives the highlight — in sync.
    */
-  private updateHoveredArrowEndpoint = (scenePointer: {
+  private updateHoveredArrowTextAnchor = (scenePointer: {
     x: number;
     y: number;
-  }): ArrowEndpoint | null => {
+  }): AppState["hoveredArrowTextAnchor"] => {
     const hovered =
       this.state.activeTool.type === "text" &&
       !this.state.editingTextElement &&
       !this.state.newElement
-        ? getUnboundArrowEndpointAtPoint(
-            pointFrom(scenePointer.x, scenePointer.y),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            this.state.zoom,
-          )
+        ? this.getArrowTextAnchorAtPosition(scenePointer.x, scenePointer.y)
         : null;
 
-    const previous = this.state.hoveredArrowEndpoint;
+    const previous = this.state.hoveredArrowTextAnchor;
 
     if (
-      previous?.elementId !== hovered?.arrow.id ||
-      previous?.startOrEnd !== hovered?.startOrEnd
+      previous?.elementId !== hovered?.elementId ||
+      previous?.anchor !== hovered?.anchor
     ) {
-      this.setState({
-        hoveredArrowEndpoint: hovered
-          ? { elementId: hovered.arrow.id, startOrEnd: hovered.startOrEnd }
-          : null,
-      });
+      this.setState({ hoveredArrowTextAnchor: hovered });
     }
 
     return hovered;
   };
+
+  /**
+   * Mirrors what `handleTextOnPointerDown` would do at this position, so the
+   * highlight can't promise something the click won't deliver.
+   */
+  private getArrowTextAnchorAtPosition(
+    x: number,
+    y: number,
+  ): AppState["hoveredArrowTextAnchor"] {
+    const endpoint = getUnboundArrowEndpointAtPoint(
+      pointFrom(x, y),
+      this.scene.getNonDeletedElements(),
+      this.scene.getNonDeletedElementsMap(),
+      this.state.zoom,
+    );
+
+    if (endpoint) {
+      return { elementId: endpoint.arrow.id, anchor: endpoint.startOrEnd };
+    }
+
+    const container = this.getTextBindableContainerAtPosition(x, y);
+
+    // Only arrows get a midpoint label anchor worth pointing at; other
+    // containers center the text in themselves, which needs no affordance.
+    // An arrow that already has a label is edited in place, not re-anchored.
+    if (
+      !isArrowElement(container) ||
+      getBoundTextElement(container, this.scene.getNonDeletedElementsMap())
+    ) {
+      return null;
+    }
+
+    // `getTextBindableContainerAtPosition` resolves an arrow anywhere in its
+    // bounding box, but a click only becomes a *label* when it also snaps to
+    // the arrow's center — off-center clicks drop a free-floating text
+    // instead. Gate on the same check so the highlight can't promise a label
+    // the click won't deliver.
+    const snappedToCenter = this.getTextWysiwygSnappedToCenterPosition(
+      x,
+      y,
+      this.state,
+      container,
+    );
+
+    return snappedToCenter
+      ? { elementId: container.id, anchor: "label" }
+      : null;
+  }
 
   private getTextBindableContainerAtPosition(x: number, y: number) {
     const elements = this.scene.getNonDeletedElements();
@@ -8081,7 +8121,8 @@ class App extends React.Component<AppProps, AppState> {
       hitElement = hitElementMightBeLocked;
     }
 
-    const hoveredArrowEndpoint = this.updateHoveredArrowEndpoint(scenePointer);
+    const hoveredArrowTextAnchor =
+      this.updateHoveredArrowTextAnchor(scenePointer);
 
     if (
       !this.handleIframeLikeElementHover({
@@ -8110,7 +8151,7 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (this.state.activeTool.type === "text") {
         this.cursor.set(
-          hoveredArrowEndpoint
+          hoveredArrowTextAnchor
             ? CURSOR_TYPE.POINTER
             : isTextElement(hitElement)
             ? CURSOR_TYPE.TEXT
@@ -9771,7 +9812,7 @@ class App extends React.Component<AppProps, AppState> {
       );
 
     if (arrowEndpoint && arrowEndpointBinding) {
-      this.setState({ hoveredArrowEndpoint: null });
+      this.setState({ hoveredArrowTextAnchor: null });
       this.startTextEditing({
         sceneX: arrowEndpointBinding.anchor[0],
         sceneY: arrowEndpointBinding.anchor[1],

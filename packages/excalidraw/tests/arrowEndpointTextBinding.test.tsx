@@ -92,14 +92,92 @@ describe("binding text to an arrow endpoint", () => {
       UI.clickTool("text");
       mouse.moveTo(100, 100);
 
-      expect(h.state.hoveredArrowEndpoint).toEqual({
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
         elementId: "arrow",
-        startOrEnd: "end",
+        anchor: "end",
       });
 
-      // away from the endpoint
+      // away from the arrow entirely
+      mouse.moveTo(400, 400);
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+    });
+
+    it("highlights the label midpoint when hovering the arrow itself", () => {
+      API.setElements([createArrow("arrow", [100, 300], [100, 100])]);
+
+      UI.clickTool("text");
+      // mid-arrow, clear of both endpoints
       mouse.moveTo(100, 200);
-      expect(h.state.hoveredArrowEndpoint).toBeNull();
+
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "label",
+      });
+    });
+
+    it("prefers the endpoint over the label midpoint", () => {
+      // short enough that the endpoint and the midpoint are close together
+      API.setElements([createArrow("arrow", [100, 160], [100, 100])]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+
+      expect(h.state.hoveredArrowTextAnchor?.anchor).toBe("end");
+    });
+
+    it("does not offer a label midpoint on an arrow that already has one", () => {
+      const arrow = createArrow("arrow", [100, 300], [100, 100]);
+      const label = API.createElement({
+        type: "text",
+        containerId: arrow.id,
+        text: "existing",
+      });
+      API.setElements([
+        { ...arrow, boundElements: [{ id: label.id, type: "text" }] },
+        label,
+      ]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 200);
+
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+    });
+
+    // a click only becomes a label when it snaps to the arrow's center, so
+    // merely being inside the arrow's bounding box must not raise the anchor
+    it("does not offer a label midpoint away from the arrow's center", () => {
+      // bounding box spans (100,400)-(400,580); label centers on (250,580)
+      API.setElements([
+        API.createElement({
+          type: "arrow",
+          id: "arrow",
+          x: 100,
+          y: 400,
+          width: 300,
+          height: 180,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(150, 180),
+            pointFrom<LocalPoint>(300, 0),
+          ],
+        }),
+      ]);
+
+      UI.clickTool("text");
+
+      // inside the bounding box but nowhere near the stroke or the midpoint
+      mouse.moveTo(150, 560);
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+
+      // on the stroke, but far from the midpoint
+      mouse.moveTo(175, 490);
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+
+      mouse.moveTo(250, 580);
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "label",
+      });
     });
 
     it("does not highlight endpoints for other tools", () => {
@@ -108,7 +186,7 @@ describe("binding text to an arrow endpoint", () => {
       UI.clickTool("selection");
       mouse.moveTo(100, 100);
 
-      expect(h.state.hoveredArrowEndpoint).toBeNull();
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
     });
 
     it("does not highlight an endpoint that is already bound", () => {
@@ -124,8 +202,14 @@ describe("binding text to an arrow endpoint", () => {
 
       UI.clickTool("text");
       mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
 
-      expect(h.state.hoveredArrowEndpoint).toBeNull();
+      // ...but the arrow can still take a label at its midpoint
+      mouse.moveTo(100, 200);
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "label",
+      });
     });
 
     it("clears the highlight when switching away from the text tool", () => {
@@ -133,10 +217,10 @@ describe("binding text to an arrow endpoint", () => {
 
       UI.clickTool("text");
       mouse.moveTo(100, 100);
-      expect(h.state.hoveredArrowEndpoint).not.toBeNull();
+      expect(h.state.hoveredArrowTextAnchor).not.toBeNull();
 
       UI.clickTool("selection");
-      expect(h.state.hoveredArrowEndpoint).toBeNull();
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
     });
   });
 
@@ -235,6 +319,26 @@ describe("binding text to an arrow endpoint", () => {
       const text = getText();
       expect(text.width).toBeGreaterThan(0);
       expectPointsClose(bottomMidOf(text), anchorBefore);
+    });
+
+    // An orbit binding resolves the endpoint by intersecting the arrow's own
+    // line with the gap-grown text outline. Anchoring along the bound side's
+    // normal instead used to leave the tip `gap * tan(angle)` off to the side
+    // — invisible on orthogonal arrows, several px on diagonal ones, and only
+    // once the first keystroke triggered `updateBoundElements`.
+    it.each([
+      { name: "45°", from: [100, 100] as [number, number] },
+      { name: "steep", from: [160, 100] as [number, number] },
+      { name: "shallow", from: [100, 160] as [number, number] },
+    ])("does not shift a diagonal arrow's tip ($name)", async ({ from }) => {
+      API.setElements([createArrow("arrow", from, [300, 300])]);
+      const tipBefore = endpointOf(getArrow("arrow"), "end");
+
+      const editor = await bindTextAt(300, 300, "x");
+      expectPointsClose(endpointOf(getArrow("arrow"), "end"), tipBefore);
+
+      updateTextEditor(editor, "a considerably longer label");
+      expectPointsClose(endpointOf(getArrow("arrow"), "end"), tipBefore);
     });
   });
 

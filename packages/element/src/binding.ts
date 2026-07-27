@@ -19,6 +19,8 @@ import {
   pointFromVector,
   pointRotateRads,
   pointsEqual,
+  vector,
+  vectorDot,
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
@@ -44,6 +46,7 @@ import {
   HEADING_DOWN,
   HEADING_LEFT,
   HEADING_RIGHT,
+  HEADING_UP,
   compareHeading,
   headingForPointFromElement,
   headingIsHorizontal,
@@ -3252,9 +3255,23 @@ export const getTextBindingForArrowEndpoint = (
     return null;
   }
 
-  // the direction the arrow travels as it reaches this endpoint — i.e. the
-  // direction the text should extend away from the tip
-  const heading = vectorToHeading(vectorFromPoint(endpoint, neighbor));
+  // The direction the arrow travels as it reaches this endpoint, snapped to
+  // the dominant axis — i.e. the direction the text should extend away from
+  // the tip.
+  //
+  // Deliberately not `vectorToHeading`: its tie-break resolves an exact 45°
+  // vector to a direction the arrow isn't travelling in at all (a perfectly
+  // down-right vector yields UP), which would put the text on the wrong side.
+  // Here a tie picks the horizontal axis, always with the correct sign.
+  const direction = vectorFromPoint(endpoint, neighbor);
+  const heading: Heading =
+    Math.abs(direction[0]) >= Math.abs(direction[1])
+      ? direction[0] >= 0
+        ? HEADING_RIGHT
+        : HEADING_LEFT
+      : direction[1] >= 0
+      ? HEADING_DOWN
+      : HEADING_UP;
 
   // Keep the tip off the text's bounding box by the usual binding gap so the
   // arrowhead doesn't collide with the glyphs. Elbow arrows terminate on the
@@ -3264,13 +3281,35 @@ export const getTextBindingForArrowEndpoint = (
     ? 0
     : BASE_BINDING_GAP + arrow.strokeWidth / 2;
 
+  // How far back along the arrow the bound side has to sit for the tip to
+  // stay exactly where it is.
+  //
+  // `updateBoundPoint` resolves an orbit binding by intersecting the arrow's
+  // own line with the target's outline grown by `gap`; it does not step along
+  // the bound side's normal. Offsetting the anchor perpendicular to the side
+  // would therefore leave the tip `gap * tan(angle)` off to one side on a
+  // diagonal arrow. Walking back along the arrow instead keeps the anchor both
+  // `gap` clear of the tip and collinear with the arrow, so the intersection
+  // lands back on the tip itself.
+  //
+  // `heading` is the dominant axis of the arrow direction, so it is never more
+  // than 45° away from it and the divisor stays >= cos(45°).
+  const awayFromTip = vectorNormalize(vectorFromPoint(neighbor, endpoint));
+  const alongHeading = Math.abs(
+    vectorDot(awayFromTip, vector(heading[0], heading[1])),
+  );
+  const anchor = pointFromVector(
+    vectorScale(awayFromTip, -gap / alongHeading),
+    endpoint,
+  );
+
   if (compareHeading(heading, HEADING_RIGHT)) {
     // text sits to the right of the tip -> bind its left side
     return {
       fixedPoint: normalizeFixedPoint([0, 0.5]),
+      anchor,
       textAlign: TEXT_ALIGN.LEFT as TextAlign,
       verticalAlign: VERTICAL_ALIGN.MIDDLE as VerticalAlign,
-      anchor: pointFrom(endpoint[0] + gap, endpoint[1]),
     };
   }
 
@@ -3278,9 +3317,9 @@ export const getTextBindingForArrowEndpoint = (
     // text sits to the left of the tip -> bind its right side
     return {
       fixedPoint: normalizeFixedPoint([1, 0.5]),
+      anchor,
       textAlign: TEXT_ALIGN.RIGHT as TextAlign,
       verticalAlign: VERTICAL_ALIGN.MIDDLE as VerticalAlign,
-      anchor: pointFrom(endpoint[0] - gap, endpoint[1]),
     };
   }
 
@@ -3288,18 +3327,18 @@ export const getTextBindingForArrowEndpoint = (
     // text sits below the tip -> bind its top side
     return {
       fixedPoint: normalizeFixedPoint([0.5, 0]),
+      anchor,
       textAlign: TEXT_ALIGN.CENTER as TextAlign,
       verticalAlign: VERTICAL_ALIGN.TOP as VerticalAlign,
-      anchor: pointFrom(endpoint[0], endpoint[1] + gap),
     };
   }
 
   // text sits above the tip -> bind its bottom side
   return {
     fixedPoint: normalizeFixedPoint([0.5, 1]),
+    anchor,
     textAlign: TEXT_ALIGN.CENTER as TextAlign,
     verticalAlign: VERTICAL_ALIGN.BOTTOM as VerticalAlign,
-    anchor: pointFrom(endpoint[0], endpoint[1] - gap),
   };
 };
 
