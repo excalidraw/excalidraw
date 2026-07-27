@@ -262,7 +262,10 @@ describe("library", () => {
     });
 
     it.each([
-      ["type", (element: ExcalidrawElement) => ({ ...element, type: "ellipse" })],
+      [
+        "type",
+        (element: ExcalidrawElement) => ({ ...element, type: "ellipse" }),
+      ],
       ["x", (element: ExcalidrawElement) => ({ ...element, x: element.x + 1 })],
       ["y", (element: ExcalidrawElement) => ({ ...element, y: element.y + 1 })],
       [
@@ -297,10 +300,9 @@ describe("library", () => {
           })),
         }));
 
-        expect(mergeLibraryItems(existingItems, importedItems)).toEqual([
-          ...importedItems,
-          ...existingItems,
-        ]);
+        expect(
+          mergeLibraryItems(existingItems, importedItems as LibraryItems),
+        ).toEqual([...importedItems, ...existingItems]);
       },
     );
   });
