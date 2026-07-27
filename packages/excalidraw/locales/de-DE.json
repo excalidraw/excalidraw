@@ -378,8 +378,8 @@
     "eraserRevert": "",
     "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\".",
     "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "Doppelklicken Sie auf das Bild oder drücken Sie {{shortcut}}, um das Bild zuzuschneiden",
+    "leaveCropEditor": "Klicken Sie außerhalb des Bildes oder drücken Sie {{shortcut_1}} oder {{shortcut_2}}, um das Zuschneiden zu beenden"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
