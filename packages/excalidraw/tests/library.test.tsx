@@ -33,7 +33,11 @@ const libraryJSONPromise = API.readFile(
   "utf8",
 );
 const extendedLibraryJSONPromise = API.readFile(
-  "./fixtures/fixture_library_ext.excalidrawlib",
+  "./fixtures/fixture_library_ext_v2.excalidrawlib",
+  "utf8",
+);
+const extendedLegacyLibraryJSONPromise = API.readFile(
+  "./fixtures/fixture_library_ext_v1.excalidrawlib",
   "utf8",
 );
 
@@ -183,18 +187,37 @@ describe("library", () => {
     });
 
     it("rejects an item with the same element ids and version nonces", async () => {
+      const existingItems = parseLibraryJSON(
+        await extendedLibraryJSONPromise,
+        "published",
+      );
+      const importedItems = existingItems.map((item) => ({
+        ...item,
+        id: `${item.id}-different-item`,
+      }));
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual(
+        existingItems,
+      );
+    });
+
+    it("does not duplicate a non-trivial legacy library when re-imported", async () => {
       const firstImport = parseLibraryJSON(
-        await libraryJSONPromise,
+        await extendedLegacyLibraryJSONPromise,
         "published",
       );
       const secondImport = parseLibraryJSON(
-        await libraryJSONPromise,
+        await extendedLegacyLibraryJSONPromise,
         "published",
       );
 
-      // This fixture uses the legacy array format, so restoring it generates a
-      // new library-item id for each import. Deduplication must use its elements.
-      expect(firstImport[0]?.id).not.toBe(secondImport[0]?.id);
+      expect(firstImport).toHaveLength(2);
+      expect(firstImport.map((item) => item.elements)).toHaveLength(2);
+      expect(firstImport[0]?.elements).toHaveLength(2);
+      expect(firstImport[1]?.elements).toHaveLength(1);
+      expect(firstImport.map((item) => item.id)).not.toEqual(
+        secondImport.map((item) => item.id),
+      );
       expect(mergeLibraryItems(firstImport, secondImport)).toEqual(firstImport);
     });
 
