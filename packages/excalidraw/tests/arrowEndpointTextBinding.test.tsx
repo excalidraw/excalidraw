@@ -190,6 +190,20 @@ describe("binding text to an arrow endpoint", () => {
 
       expect(h.state.hoveredArrowTextAnchor).toBeNull();
     });
+
+    it("clears the highlight on escape", () => {
+      API.setElements([createArrow("arrow", [100, 300], [100, 100])]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).not.toBeNull();
+
+      // escape reverts the tool via the action's appState rather than
+      // `setActiveTool`, so the highlight has to be cleared there too
+      Keyboard.keyPress(KEYS.ESCAPE);
+
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+    });
   });
 
   describe("binding toggle (ctrl/cmd)", () => {
