@@ -20,6 +20,7 @@ import type {
   ExcalidrawElement,
   GroupId,
   ExcalidrawBindableElement,
+  ExcalidrawArrowElement,
   Arrowhead,
   FontFamilyValues,
   FileId,
@@ -230,6 +231,7 @@ export type InteractiveCanvasAppState = Readonly<
     isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
     gridModeEnabled: AppState["gridModeEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
+    hoveredArrowEndpoint: AppState["hoveredArrowEndpoint"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
     // Collaborators
@@ -363,6 +365,14 @@ export interface AppState {
   suggestedBinding: {
     element: NonDeleted<ExcalidrawBindableElement>;
     midPoint?: GlobalPoint;
+  } | null;
+  /**
+   * Free arrow endpoint the text tool is hovering over. Clicking it creates a
+   * text element bound to (and positioned against) that endpoint.
+   */
+  hoveredArrowEndpoint: {
+    elementId: ExcalidrawArrowElement["id"];
+    startOrEnd: "start" | "end";
   } | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
@@ -557,6 +567,7 @@ export type UIAppState = Omit<
   | "snapLines"
   | "originSnapOffset"
   | "suggestedBinding"
+  | "hoveredArrowEndpoint"
   | "frameToHighlight"
   | "elementsToHighlight"
 >;

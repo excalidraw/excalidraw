@@ -1,4 +1,6 @@
 import {
+  TEXT_ALIGN,
+  VERTICAL_ALIGN,
   arrayToMap,
   getFeatureFlag,
   getGridPoint,
@@ -39,6 +41,10 @@ import {
 } from "./collision";
 import { distanceToElement } from "./distance";
 import {
+  HEADING_DOWN,
+  HEADING_LEFT,
+  HEADING_RIGHT,
+  compareHeading,
   headingForPointFromElement,
   headingIsHorizontal,
   vectorToHeading,
@@ -86,6 +92,8 @@ import type {
   NonDeletedSceneElementsMap,
   Ordered,
   PointsPositionUpdates,
+  TextAlign,
+  VerticalAlign,
 } from "./types";
 
 export type BindingStrategy =
@@ -3153,4 +3161,179 @@ export const getBindingSideMidPoint = (
 
 const getMidPoint = (p1: GlobalPoint, p2: GlobalPoint): GlobalPoint => {
   return pointFrom((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2);
+};
+
+export type ArrowEndpoint = {
+  arrow: NonDeleted<ExcalidrawArrowElement>;
+  startOrEnd: "start" | "end";
+};
+
+/**
+ * Finds a free (unbound) arrow endpoint under the cursor, front-most first.
+ * Used by the text tool to offer creating a text label anchored to the tip of
+ * an arrow.
+ */
+export const getUnboundArrowEndpointAtPoint = (
+  scenePointer: GlobalPoint,
+  elements: readonly NonDeletedExcalidrawElement[],
+  elementsMap: ElementsMap,
+  zoom: AppState["zoom"],
+): ArrowEndpoint | null => {
+  const threshold =
+    (LinearElementEditor.POINT_HANDLE_SIZE + 1) / Math.max(zoom.value, 0.01);
+
+  // front to back, so the top-most arrow wins when endpoints overlap
+  for (let index = elements.length - 1; index >= 0; index--) {
+    const element = elements[index];
+
+    if (
+      !isArrowElement(element) ||
+      element.locked ||
+      element.points.length < 2
+    ) {
+      continue;
+    }
+
+    // prefer the end (arrowhead) over the start when both are within range
+    for (const startOrEnd of ["end", "start"] as const) {
+      if (element[startOrEnd === "start" ? "startBinding" : "endBinding"]) {
+        continue;
+      }
+
+      const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        element,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      );
+
+      if (pointDistance(scenePointer, point) <= threshold) {
+        return { arrow: element, startOrEnd };
+      }
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Describes how a text element should be created so that it reads as a label
+ * for the given arrow endpoint.
+ *
+ * The arrow is treated as fixed: rather than routing the arrow to the text, we
+ * pick the side of the text the arrow should attach to (the one it already
+ * points at), and place the text so that side's midpoint lands on the existing
+ * endpoint. The alignment returned pins that same midpoint while the text is
+ * typed, so the arrow doesn't swing around during editing.
+ */
+export const getTextBindingForArrowEndpoint = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  startOrEnd: "start" | "end",
+  elementsMap: ElementsMap,
+): {
+  /** the text-local ratio the arrow binds to (a side midpoint) */
+  fixedPoint: FixedPoint;
+  textAlign: TextAlign;
+  verticalAlign: VerticalAlign;
+  /** scene position the text's bound side midpoint should sit at */
+  anchor: GlobalPoint;
+} | null => {
+  const endpoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "start" ? 0 : -1,
+    elementsMap,
+  );
+  const neighbor = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    arrow,
+    startOrEnd === "start" ? 1 : -2,
+    elementsMap,
+  );
+
+  if (pointsEqual(endpoint, neighbor)) {
+    return null;
+  }
+
+  // the direction the arrow travels as it reaches this endpoint — i.e. the
+  // direction the text should extend away from the tip
+  const heading = vectorToHeading(vectorFromPoint(endpoint, neighbor));
+
+  // Keep the tip off the text's bounding box by the usual binding gap so the
+  // arrowhead doesn't collide with the glyphs. Elbow arrows terminate on the
+  // fixed point itself rather than gap-outside the outline, so offsetting
+  // there would just shift the arrow by the gap.
+  const gap = isElbowArrow(arrow)
+    ? 0
+    : BASE_BINDING_GAP + arrow.strokeWidth / 2;
+
+  if (compareHeading(heading, HEADING_RIGHT)) {
+    // text sits to the right of the tip -> bind its left side
+    return {
+      fixedPoint: normalizeFixedPoint([0, 0.5]),
+      textAlign: TEXT_ALIGN.LEFT as TextAlign,
+      verticalAlign: VERTICAL_ALIGN.MIDDLE as VerticalAlign,
+      anchor: pointFrom(endpoint[0] + gap, endpoint[1]),
+    };
+  }
+
+  if (compareHeading(heading, HEADING_LEFT)) {
+    // text sits to the left of the tip -> bind its right side
+    return {
+      fixedPoint: normalizeFixedPoint([1, 0.5]),
+      textAlign: TEXT_ALIGN.RIGHT as TextAlign,
+      verticalAlign: VERTICAL_ALIGN.MIDDLE as VerticalAlign,
+      anchor: pointFrom(endpoint[0] - gap, endpoint[1]),
+    };
+  }
+
+  if (compareHeading(heading, HEADING_DOWN)) {
+    // text sits below the tip -> bind its top side
+    return {
+      fixedPoint: normalizeFixedPoint([0.5, 0]),
+      textAlign: TEXT_ALIGN.CENTER as TextAlign,
+      verticalAlign: VERTICAL_ALIGN.TOP as VerticalAlign,
+      anchor: pointFrom(endpoint[0], endpoint[1] + gap),
+    };
+  }
+
+  // text sits above the tip -> bind its bottom side
+  return {
+    fixedPoint: normalizeFixedPoint([0.5, 1]),
+    textAlign: TEXT_ALIGN.CENTER as TextAlign,
+    verticalAlign: VERTICAL_ALIGN.BOTTOM as VerticalAlign,
+    anchor: pointFrom(endpoint[0], endpoint[1] - gap),
+  };
+};
+
+/**
+ * Binds an arrow endpoint to an explicit fixed point on a bindable element,
+ * bypassing the "derive the ratio from where the endpoint currently is"
+ * strategy used when dragging. Needed when the binding target is placed to fit
+ * the arrow rather than the other way round.
+ */
+export const bindBindingElementToFixedPoint = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  bindableElement: NonDeleted<ExcalidrawBindableElement>,
+  startOrEnd: "start" | "end",
+  fixedPoint: FixedPoint,
+  scene: Scene,
+): void => {
+  const binding: FixedPointBinding = {
+    elementId: bindableElement.id,
+    fixedPoint: normalizeFixedPoint(fixedPoint),
+    mode: "orbit",
+  };
+
+  scene.mutateElement(arrow, {
+    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
+  });
+
+  if (
+    !(bindableElement.boundElements ?? []).some(({ id }) => id === arrow.id)
+  ) {
+    scene.mutateElement(bindableElement, {
+      boundElements: (bindableElement.boundElements ?? []).concat({
+        id: arrow.id,
+        type: "arrow",
+      }),
+    });
+  }
 };

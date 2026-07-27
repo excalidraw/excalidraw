@@ -118,8 +118,11 @@ import {
   getCommonBounds,
   getElementAbsoluteCoords,
   bindOrUnbindBindingElements,
+  bindBindingElementToFixedPoint,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
+  getTextBindingForArrowEndpoint,
+  getUnboundArrowEndpointAtPoint,
   isBindingEnabled,
   updateBoundElements,
   LinearElementEditor,
@@ -288,7 +291,12 @@ import type {
   SceneElementsMap,
   NonDeletedSceneElementsMap,
   ExcalidrawBindableElement,
+  FixedPoint,
+  TextAlign,
+  VerticalAlign,
 } from "@excalidraw/element/types";
+
+import type { ArrowEndpoint } from "@excalidraw/element";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -6003,6 +6011,9 @@ class App extends React.Component<AppProps, AppState> {
           ? prevState.selectedLinearElement
           : null,
         frameToHighlight: null,
+        // only the text tool offers arrow-endpoint binding, and the highlight
+        // is refreshed on pointermove — don't leave a stale one behind
+        hoveredArrowEndpoint: null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -6596,6 +6607,44 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  /**
+   * With the text tool active, a free arrow endpoint under the cursor is a
+   * target for creating a text label bound to that endpoint. Returns the hit
+   * (if any) and keeps `appState.hoveredArrowEndpoint` — which drives the
+   * highlight — in sync.
+   */
+  private updateHoveredArrowEndpoint = (scenePointer: {
+    x: number;
+    y: number;
+  }): ArrowEndpoint | null => {
+    const hovered =
+      this.state.activeTool.type === "text" &&
+      !this.state.editingTextElement &&
+      !this.state.newElement
+        ? getUnboundArrowEndpointAtPoint(
+            pointFrom(scenePointer.x, scenePointer.y),
+            this.scene.getNonDeletedElements(),
+            this.scene.getNonDeletedElementsMap(),
+            this.state.zoom,
+          )
+        : null;
+
+    const previous = this.state.hoveredArrowEndpoint;
+
+    if (
+      previous?.elementId !== hovered?.arrow.id ||
+      previous?.startOrEnd !== hovered?.startOrEnd
+    ) {
+      this.setState({
+        hoveredArrowEndpoint: hovered
+          ? { elementId: hovered.arrow.id, startOrEnd: hovered.startOrEnd }
+          : null,
+      });
+    }
+
+    return hovered;
+  };
+
   private getTextBindableContainerAtPosition(x: number, y: number) {
     const elements = this.scene.getNonDeletedElements();
     const selectedElements = this.scene.getSelectedElements(this.state);
@@ -6647,6 +6696,7 @@ class App extends React.Component<AppProps, AppState> {
     container,
     autoEdit = true,
     initialCaretSceneCoords,
+    arrowEndpointBinding,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -6657,8 +6707,27 @@ class App extends React.Component<AppProps, AppState> {
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
     initialCaretSceneCoords?: { x: number; y: number };
+    /**
+     * creates the text as an arrow-endpoint label: (sceneX, sceneY) is then
+     * the scene position of the text's bound side midpoint rather than a
+     * caret position, and the text's alignment is dictated by the binding.
+     */
+    arrowEndpointBinding?: {
+      arrow: NonDeleted<ExcalidrawArrowElement>;
+      startOrEnd: "start" | "end";
+      fixedPoint: FixedPoint;
+      textAlign: TextAlign;
+      verticalAlign: VerticalAlign;
+    } | null;
   }) => {
     let shouldBindToContainer = false;
+
+    if (arrowEndpointBinding) {
+      // an arrow endpoint is not a text container — the text is a sibling the
+      // arrow binds to, not a label inside it
+      container = null;
+      insertAtParentCenter = false;
+    }
 
     let parentCenterPosition =
       insertAtParentCenter &&
@@ -6723,7 +6792,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const textCreationGridPoint = this.getTextCreationGridPoint(sceneX, sceneY);
 
-    const newTextElementPosition = parentCenterPosition
+    const newTextElementPosition = arrowEndpointBinding
+      ? // the anchor is dictated by the arrow, so neither the grid nor the
+        // caret-centering fudge may nudge it
+        { x: sceneX, y: sceneY }
+      : parentCenterPosition
       ? {
           x: parentCenterPosition.elementCenterX,
           y: parentCenterPosition.elementCenterY,
@@ -6771,12 +6844,14 @@ class App extends React.Component<AppProps, AppState> {
         text: "",
         fontSize,
         fontFamily,
-        textAlign: parentCenterPosition
-          ? "center"
-          : this.state.currentItemTextAlign,
-        verticalAlign: parentCenterPosition
-          ? VERTICAL_ALIGN.MIDDLE
-          : DEFAULT_VERTICAL_ALIGN,
+        textAlign:
+          arrowEndpointBinding?.textAlign ??
+          (parentCenterPosition ? "center" : this.state.currentItemTextAlign),
+        verticalAlign:
+          arrowEndpointBinding?.verticalAlign ??
+          (parentCenterPosition
+            ? VERTICAL_ALIGN.MIDDLE
+            : DEFAULT_VERTICAL_ALIGN),
         containerId: shouldBindToContainer ? container?.id : undefined,
         groupIds: container?.groupIds ?? [],
         lineHeight,
@@ -6808,6 +6883,16 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         this.insertNewElement(element);
       }
+    }
+
+    if (arrowEndpointBinding) {
+      bindBindingElementToFixedPoint(
+        arrowEndpointBinding.arrow,
+        element,
+        arrowEndpointBinding.startOrEnd,
+        arrowEndpointBinding.fixedPoint,
+        this.scene,
+      );
     }
 
     if (autoEdit || existingTextElement || container) {
@@ -7996,6 +8081,8 @@ class App extends React.Component<AppProps, AppState> {
       hitElement = hitElementMightBeLocked;
     }
 
+    const hoveredArrowEndpoint = this.updateHoveredArrowEndpoint(scenePointer);
+
     if (
       !this.handleIframeLikeElementHover({
         hitElement,
@@ -8023,7 +8110,11 @@ class App extends React.Component<AppProps, AppState> {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (this.state.activeTool.type === "text") {
         this.cursor.set(
-          isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
+          hoveredArrowEndpoint
+            ? CURSOR_TYPE.POINTER
+            : isTextElement(hitElement)
+            ? CURSOR_TYPE.TEXT
+            : CURSOR_TYPE.CROSSHAIR,
         );
       } else if (
         !event[KEYS.CTRL_OR_CMD] &&
@@ -9662,26 +9753,61 @@ class App extends React.Component<AppProps, AppState> {
     let sceneX = pointerDownState.origin.x;
     let sceneY = pointerDownState.origin.y;
 
-    const element = this.getElementAtPosition(sceneX, sceneY, {
-      includeBoundTextElement: true,
-    });
+    // a free arrow endpoint takes precedence over adding a label *to* the
+    // arrow — it's the smaller, more deliberate target
+    const arrowEndpoint = getUnboundArrowEndpointAtPoint(
+      pointFrom(sceneX, sceneY),
+      this.scene.getNonDeletedElements(),
+      this.scene.getNonDeletedElementsMap(),
+      this.state.zoom,
+    );
 
-    // FIXME
-    let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+    const arrowEndpointBinding =
+      arrowEndpoint &&
+      getTextBindingForArrowEndpoint(
+        arrowEndpoint.arrow,
+        arrowEndpoint.startOrEnd,
+        this.scene.getNonDeletedElementsMap(),
+      );
 
-    if (hasBoundTextElement(element)) {
-      container = element as NonDeleted<ExcalidrawTextContainer>;
-      sceneX = element.x + element.width / 2;
-      sceneY = element.y + element.height / 2;
+    if (arrowEndpoint && arrowEndpointBinding) {
+      this.setState({ hoveredArrowEndpoint: null });
+      this.startTextEditing({
+        sceneX: arrowEndpointBinding.anchor[0],
+        sceneY: arrowEndpointBinding.anchor[1],
+        // the anchor is fixed, so there's nothing to drag out — go straight
+        // to the editor rather than through the drag-to-size flow
+        autoEdit: true,
+        arrowEndpointBinding: {
+          arrow: arrowEndpoint.arrow,
+          startOrEnd: arrowEndpoint.startOrEnd,
+          fixedPoint: arrowEndpointBinding.fixedPoint,
+          textAlign: arrowEndpointBinding.textAlign,
+          verticalAlign: arrowEndpointBinding.verticalAlign,
+        },
+      });
+    } else {
+      const element = this.getElementAtPosition(sceneX, sceneY, {
+        includeBoundTextElement: true,
+      });
+
+      // FIXME
+      let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+
+      if (hasBoundTextElement(element)) {
+        container = element as NonDeleted<ExcalidrawTextContainer>;
+        sceneX = element.x + element.width / 2;
+        sceneY = element.y + element.height / 2;
+      }
+      this.startTextEditing({
+        sceneX,
+        sceneY,
+        insertAtParentCenter: !event.altKey,
+        container,
+        autoEdit: false,
+        initialCaretSceneCoords: { x: sceneX, y: sceneY },
+      });
     }
-    this.startTextEditing({
-      sceneX,
-      sceneY,
-      insertAtParentCenter: !event.altKey,
-      container,
-      autoEdit: false,
-      initialCaretSceneCoords: { x: sceneX, y: sceneY },
-    });
 
     if (!this.isToolLocked()) {
       this.setState(

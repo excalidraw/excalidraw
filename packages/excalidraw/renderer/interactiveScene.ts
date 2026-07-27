@@ -179,6 +179,35 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   );
 };
 
+/**
+ * Marks the free arrow endpoint the text tool would attach a new text label to.
+ */
+const renderHoveredArrowEndpoint = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  elementsMap: ElementsMap,
+) => {
+  const { elementId, startOrEnd } = appState.hoveredArrowEndpoint!;
+  const element = elementsMap.get(elementId);
+
+  if (!element || !isArrowElement(element) || element.isDeleted) {
+    return;
+  }
+
+  const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    element,
+    startOrEnd === "start" ? 0 : -1,
+    elementsMap,
+  );
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
+  highlightPoint(point, context, appState);
+
+  context.restore();
+};
+
 const renderFocusPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -1682,6 +1711,10 @@ const _renderInteractiveScene = ({
       ...animationState,
       bindingHighlight: undefined,
     };
+  }
+
+  if (appState.hoveredArrowEndpoint) {
+    renderHoveredArrowEndpoint(context, appState, allElementsMap);
   }
 
   if (appState.frameToHighlight) {

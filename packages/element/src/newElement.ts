@@ -236,7 +236,12 @@ const getTextElementPositionOffsets = (
         : opts.textAlign === "right"
         ? metrics.width
         : 0,
-    y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
+    y:
+      opts.verticalAlign === "middle"
+        ? metrics.height / 2
+        : opts.verticalAlign === "bottom"
+        ? metrics.height
+        : 0,
   };
 };
 
@@ -350,9 +355,18 @@ const getAdjustedDimensions = (
     const deltaX2 = (x2 - nextX2) / 2;
     const deltaY2 = (y2 - nextY2) / 2;
 
+    // grow away from the edge(s) the alignment anchors the text to, so that
+    // the anchor stays put as the text is edited. `verticalAlign` has no
+    // visual effect on unbound text, but standalone text bound to an arrow
+    // endpoint uses it to pin the side the arrow attaches to.
     [x, y] = adjustXYWithRotation(
       {
-        s: true,
+        n:
+          verticalAlign === VERTICAL_ALIGN.MIDDLE ||
+          verticalAlign === VERTICAL_ALIGN.BOTTOM,
+        s:
+          verticalAlign === VERTICAL_ALIGN.MIDDLE ||
+          verticalAlign === VERTICAL_ALIGN.TOP,
         e: textAlign === "center" || textAlign === "left",
         w: textAlign === "center" || textAlign === "right",
       },
