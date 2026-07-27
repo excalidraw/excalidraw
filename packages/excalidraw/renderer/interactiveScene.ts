@@ -121,12 +121,7 @@ const renderElbowArrowMidPointHighlight = (
 
   invariant(segmentMidPointHoveredCoords, "midPointCoords is null");
 
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(segmentMidPointHoveredCoords, context, appState);
-
-  context.restore();
 };
 
 const renderLinearElementPointHighlight = (
@@ -156,18 +151,18 @@ const renderLinearElementPointHighlight = (
     hoverPointIndex,
     elementsMap,
   );
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(point, context, appState);
-  context.restore();
 };
 
+/** draws the point marker in scene coordinates */
 const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
 ) => {
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
 
   fillCircle(
@@ -177,6 +172,8 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
+
+  context.restore();
 };
 
 /**
@@ -221,25 +218,7 @@ const renderHoveredArrowTextAnchor = (
           elementsMap,
         );
 
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(point, context, appState);
-
-  context.restore();
-};
-
-const renderFocusPointHighlight = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  focusPoint: GlobalPoint,
-) => {
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
-  highlightPoint(focusPoint, context, appState);
-
-  context.restore();
 };
 
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
@@ -1369,7 +1348,7 @@ const renderFocusPointIndicator = ({
     linearState?.hoveredFocusPointBinding === type &&
     !linearState.draggedFocusPointBinding
   ) {
-    renderFocusPointHighlight(context, appState, focusPoint);
+    highlightPoint(focusPoint, context, appState);
   }
 
   // render focus point

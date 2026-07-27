@@ -296,8 +296,6 @@ import type {
   VerticalAlign,
 } from "@excalidraw/element/types";
 
-import type { ArrowEndpoint } from "@excalidraw/element";
-
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
 import {
@@ -5685,7 +5683,6 @@ class App extends React.Component<AppProps, AppState> {
             }
             const midPoint = getContainerCenter(
               selectedElement,
-              this.state,
               this.scene.getNonDeletedElementsMap(),
             );
             const sceneX = midPoint.x;
@@ -7269,7 +7266,6 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             const midPoint = getContainerCenter(
               container,
-              this.state,
               this.scene.getNonDeletedElementsMap(),
             );
 
@@ -13839,7 +13835,6 @@ class App extends React.Component<AppProps, AppState> {
 
       const elementCenter = getContainerCenter(
         container,
-        appState,
         this.scene.getNonDeletedElementsMap(),
       );
       if (elementCenter) {

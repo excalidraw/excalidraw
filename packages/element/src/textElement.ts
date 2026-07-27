@@ -12,8 +12,6 @@ import {
 
 import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
-
 import type { ExtractSetType } from "@excalidraw/common/utility-types";
 
 import {
@@ -333,9 +331,12 @@ export const getContainerElement = <
   return null;
 };
 
+/**
+ * The point a text bound to this container centers on — and, for arrows, the
+ * point the text tool snaps a new label to.
+ */
 export const getContainerCenter = (
   container: ExcalidrawElement,
-  appState: AppState,
   elementsMap: ElementsMap,
 ) => {
   if (!isArrowElement(container)) {
@@ -344,33 +345,13 @@ export const getContainerCenter = (
       y: container.y + container.height / 2,
     };
   }
-  const points = LinearElementEditor.getPointsGlobalCoordinates(
+
+  const center = LinearElementEditor.getBoundTextElementCenter(
     container,
     elementsMap,
   );
-  if (points.length % 2 === 1) {
-    const index = Math.floor(container.points.length / 2);
-    const midPoint = LinearElementEditor.getPointGlobalCoordinates(
-      container,
-      container.points[index],
-      elementsMap,
-    );
-    return { x: midPoint[0], y: midPoint[1] };
-  }
-  const index = container.points.length / 2 - 1;
-  let midSegmentMidpoint = LinearElementEditor.getEditorMidPoints(
-    container,
-    elementsMap,
-    appState,
-  )[index];
-  if (!midSegmentMidpoint) {
-    midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
-      container,
-      index + 1,
-      elementsMap,
-    );
-  }
-  return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
+
+  return { x: center[0], y: center[1] };
 };
 
 export const getContainerCoords = (container: ExcalidrawElement) => {

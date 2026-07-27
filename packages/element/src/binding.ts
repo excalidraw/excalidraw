@@ -1109,6 +1109,32 @@ export const bindOrUnbindBindingElements = (
   });
 };
 
+/**
+ * Writes a binding onto the arrow and records the arrow on the bind target,
+ * keeping the two sides of the relationship in step.
+ */
+const applyBinding = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  bindableElement: NonDeleted<ExcalidrawBindableElement>,
+  binding: FixedPointBinding,
+  startOrEnd: "start" | "end",
+  scene: Scene,
+): void => {
+  scene.mutateElement(arrow, {
+    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
+  });
+
+  const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
+  if (!boundElementsMap.has(arrow.id)) {
+    scene.mutateElement(bindableElement, {
+      boundElements: (bindableElement.boundElements || []).concat({
+        id: arrow.id,
+        type: "arrow",
+      }),
+    });
+  }
+};
+
 export const bindBindingElement = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   hoveredElement: NonDeleted<ExcalidrawBindableElement>,
@@ -1150,19 +1176,7 @@ export const bindBindingElement = (
     };
   }
 
-  scene.mutateElement(arrow, {
-    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
-  });
-
-  const boundElementsMap = arrayToMap(hoveredElement.boundElements || []);
-  if (!boundElementsMap.has(arrow.id)) {
-    scene.mutateElement(hoveredElement, {
-      boundElements: (hoveredElement.boundElements || []).concat({
-        id: arrow.id,
-        type: "arrow",
-      }),
-    });
-  }
+  applyBinding(arrow, hoveredElement, binding, startOrEnd, scene);
 };
 
 export const unbindBindingElement = (
@@ -3182,9 +3196,6 @@ export const getUnboundArrowEndpointAtPoint = (
   elementsMap: ElementsMap,
   zoom: AppState["zoom"],
 ): ArrowEndpoint | null => {
-  const threshold =
-    (LinearElementEditor.POINT_HANDLE_SIZE + 1) / Math.max(zoom.value, 0.01);
-
   // front to back, so the top-most arrow wins when endpoints overlap
   for (let index = elements.length - 1; index >= 0; index--) {
     const element = elements[index];
@@ -3209,7 +3220,14 @@ export const getUnboundArrowEndpointAtPoint = (
         elementsMap,
       );
 
-      if (pointDistance(scenePointer, point) <= threshold) {
+      // same reach as grabbing a point handle in the linear editor
+      // (`LinearElementEditor.getPointIndexUnderCursor`), which can't be
+      // reused here: it reports whichever point is nearest, with no way to
+      // skip an endpoint that is already bound and fall through to the other
+      if (
+        pointDistance(scenePointer, point) * zoom.value <
+        LinearElementEditor.POINT_HANDLE_SIZE + 1
+      ) {
         return { arrow: element, startOrEnd };
       }
     }
@@ -3355,24 +3373,15 @@ export const bindBindingElementToFixedPoint = (
   fixedPoint: FixedPoint,
   scene: Scene,
 ): void => {
-  const binding: FixedPointBinding = {
-    elementId: bindableElement.id,
-    fixedPoint: normalizeFixedPoint(fixedPoint),
-    mode: "orbit",
-  };
-
-  scene.mutateElement(arrow, {
-    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
-  });
-
-  if (
-    !(bindableElement.boundElements ?? []).some(({ id }) => id === arrow.id)
-  ) {
-    scene.mutateElement(bindableElement, {
-      boundElements: (bindableElement.boundElements ?? []).concat({
-        id: arrow.id,
-        type: "arrow",
-      }),
-    });
-  }
+  applyBinding(
+    arrow,
+    bindableElement,
+    {
+      elementId: bindableElement.id,
+      fixedPoint: normalizeFixedPoint(fixedPoint),
+      mode: "orbit",
+    },
+    startOrEnd,
+    scene,
+  );
 };
