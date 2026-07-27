@@ -14,6 +14,16 @@ export const appJotaiStore = createStore();
 
 export { atom, Provider, useAtom, useAtomValue, useSetAtom };
 
+/**
+ * Multiproject state. The structural type is declared inline (instead of
+ * importing ProjectIndexEntry from data/projectsStore) to keep this module
+ * dependency-free and avoid import cycles.
+ */
+export const projectsListAtom = atom<
+  { id: string; title: string; updatedAt: number }[]
+>([]);
+export const activeProjectIdAtom = atom<string | null>(null);
+
 export const useAtomWithInitialValue = <
   T extends unknown,
   A extends PrimitiveAtom<T>,

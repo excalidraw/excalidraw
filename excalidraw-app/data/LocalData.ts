@@ -44,6 +44,7 @@ import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { FileStatusStore } from "./fileStatusStore";
 import { Locker } from "./Locker";
+import { collectAllProjectFileIds } from "./projectsStore";
 import { updateBrowserStateVersion } from "./tabSync";
 
 const filesStore = createStore("files-db", "files-store");
@@ -52,6 +53,9 @@ export const localStorageQuotaExceededAtom = atom(false);
 
 class LocalFileManager extends FileManager {
   clearObsoleteFiles = async (opts: { currentFileIds: FileId[] }) => {
+    // preserve images referenced by ANY stored project, not just the ones
+    // on the currently active scene
+    const projectFileIds = await collectAllProjectFileIds();
     await entries(filesStore).then((entries) => {
       for (const [id, imageData] of entries as [FileId, BinaryFileData][]) {
         // if image is unused (not on canvas) & is older than 1 day, delete it
@@ -61,7 +65,8 @@ class LocalFileManager extends FileManager {
         if (
           (!imageData.lastRetrieved ||
             Date.now() - imageData.lastRetrieved > 24 * 3600 * 1000) &&
-          !opts.currentFileIds.includes(id as FileId)
+          !opts.currentFileIds.includes(id as FileId) &&
+          !projectFileIds.has(id)
         ) {
           del(id, filesStore);
         }

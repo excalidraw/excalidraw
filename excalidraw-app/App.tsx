@@ -128,6 +128,11 @@ import {
   LocalData,
   localStorageQuotaExceededAtom,
 } from "./data/LocalData";
+import {
+  flushActiveProjectSave,
+  migrateLocalSceneToProject,
+  saveActiveProjectDebounced,
+} from "./data/projectsStore";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
@@ -146,6 +151,7 @@ import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
+import { ProjectsSidebar } from "./components/ProjectsSidebar";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -617,11 +623,13 @@ const ExcalidrawWrapper = () => {
 
     const onUnload = () => {
       LocalData.flushSave();
+      flushActiveProjectSave();
     };
 
     const visibilityChange = (event: FocusEvent | Event) => {
       if (event.type === EVENT.BLUR || document.hidden) {
         LocalData.flushSave();
+        flushActiveProjectSave();
       }
       if (
         event.type === EVENT.VISIBILITY_CHANGE ||
@@ -649,9 +657,17 @@ const ExcalidrawWrapper = () => {
     };
   }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode, loadImages]);
 
+  // initialize multiproject storage: on first run the legacy local scene
+  // becomes the user's first project (no-op afterwards). Also populates
+  // projectsListAtom / activeProjectIdAtom for the projects sidebar.
+  useEffect(() => {
+    migrateLocalSceneToProject();
+  }, []);
+
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
       LocalData.flushSave();
+      flushActiveProjectSave();
 
       if (
         excalidrawAPI &&
@@ -713,6 +729,9 @@ const ExcalidrawWrapper = () => {
           }
         }
       });
+
+      // dual-write: keep the active project's IDB record in sync
+      saveActiveProjectDebounced(elements, appState);
     }
 
     // Render the debug scene if the debug canvas is available
@@ -1061,6 +1080,7 @@ const ExcalidrawWrapper = () => {
         />
 
         <AppSidebar />
+        <ProjectsSidebar />
 
         {errorMessage && (
           <ErrorDialog onClose={() => setErrorMessage("")}>
