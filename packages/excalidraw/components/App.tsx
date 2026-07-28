@@ -5579,6 +5579,10 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
 
+        // the toggle changes what a text-tool click at the current position
+        // would do, with no pointermove to refresh the affordance
+        this.arrowText.refresh();
+
         maybeHandleArrowPointlikeDrag({ app: this, event });
       }
 
@@ -5859,6 +5863,8 @@ class App extends React.Component<AppProps, AppState> {
         flushSync(() => {
           this.setState({ isBindingEnabled: preferenceEnabled });
         });
+
+        this.arrowText.refresh();
       }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -9737,6 +9743,11 @@ class App extends React.Component<AppProps, AppState> {
     let sceneX = pointerDownState.origin.x;
     let sceneY = pointerDownState.origin.y;
 
+    // the click transitions into text editing either way, consuming (or
+    // bypassing) whatever anchor was highlighted — don't leave it lingering
+    // under the editor, which outlives the hover when the tool is locked
+    this.setState({ hoveredArrowTextAnchor: null });
+
     // a free arrow endpoint takes precedence over adding a label *to* the
     // arrow — it's the smaller, more deliberate target
     const arrowEndpoint = this.arrowText.getBindableEndpointAtPosition(
@@ -9745,7 +9756,6 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (arrowEndpoint) {
-      this.setState({ hoveredArrowTextAnchor: null });
       this.startTextEditing({
         sceneX,
         sceneY,

@@ -65,6 +65,19 @@ export class AppArrowText {
   };
 
   /**
+   * Re-evaluates the hovered anchor at the last known pointer position — for
+   * events that change what a click would do without the pointer moving,
+   * i.e. the ctrl/cmd binding toggle. (Events that invalidate the anchor
+   * wholesale — tool switches, finalize, deselect — clear it directly
+   * instead.)
+   */
+  refresh = (): void => {
+    if (this.app.lastPointerMoveCoords) {
+      this.updateHoveredAnchor(this.app.lastPointerMoveCoords);
+    }
+  };
+
+  /**
    * A free arrow endpoint a new text could be bound to. Binding an endpoint is
    * an arrow binding, so it follows the binding toggle (ctrl/cmd) like every
    * other one — holding it makes the text tool drop plain text instead.

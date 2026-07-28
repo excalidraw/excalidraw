@@ -233,6 +233,28 @@ describe("binding text to an arrow endpoint", () => {
       });
     });
 
+    // the highlight is maintained at write time — the renderer draws whatever
+    // `hoveredArrowTextAnchor` says — so the toggle itself has to refresh the
+    // anchor: there is no pointermove to do it
+    it("clears the highlight the moment ctrl is pressed, restores on release", () => {
+      API.setElements([createArrow("arrow", [100, 300], [100, 100])]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).not.toBeNull();
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyDown("Control");
+        expect(h.state.hoveredArrowTextAnchor).toBeNull();
+      });
+
+      Keyboard.keyUp("Control");
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "end",
+      });
+    });
+
     it("drops plain text instead of binding the endpoint", async () => {
       API.setElements([createArrow("arrow", [100, 300], [100, 100])]);
       API.setAppState({ isBindingEnabled: false });

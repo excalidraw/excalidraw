@@ -180,11 +180,11 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
  * Marks where on the hovered arrow the text tool would attach text — a free
  * endpoint, or the midpoint the arrow's label would center on.
  *
- * The anchor is only recomputed on pointermove, so the conditions that make it
- * actionable are re-checked here rather than trusting it to have been cleared:
- * Ctrl toggles `isBindingEnabled` without moving the pointer, and tool changes
- * routed through an action's appState (Escape, finalize) never pass through
- * `setActiveTool`.
+ * Purely presentational: `AppArrowText` maintains the anchor at every event
+ * that can change it (pointermove, the ctrl/cmd binding toggle, pointerdown,
+ * tool switches, finalize). The element lookup below only guards against the
+ * arrow vanishing through channels no local event covers, e.g. a collaborator
+ * deleting it.
  */
 const renderHoveredArrowTextAnchor = (
   context: CanvasRenderingContext2D,
@@ -192,16 +192,6 @@ const renderHoveredArrowTextAnchor = (
   elementsMap: ElementsMap,
 ) => {
   const { elementId, anchor } = appState.hoveredArrowTextAnchor!;
-
-  if (appState.activeTool.type !== "text") {
-    return;
-  }
-
-  // binding an endpoint is an arrow binding, so it follows the binding
-  // toggle; a label is a container binding and is unaffected by it
-  if (anchor !== "label" && !appState.isBindingEnabled) {
-    return;
-  }
 
   const element = elementsMap.get(elementId);
 
