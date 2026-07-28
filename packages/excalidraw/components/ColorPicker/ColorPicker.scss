@@ -383,10 +383,27 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    &--invalid {
+      border-color: var(--color-danger);
+
+      &:focus-within {
+        box-shadow: 0 0 0 1px var(--color-danger);
+      }
+    }
   }
 
   .color-picker__input-hash {
     padding: 0 0.25rem;
+  }
+
+  .color-picker__input-error {
+    grid-column: 1 / -1;
+    color: var(--color-danger);
+    font-size: 0.75rem;
+    line-height: 1.25;
+    margin-top: -0.25rem;
+    padding-bottom: 0.5rem;
   }
 
   .color-picker-input {
