@@ -423,6 +423,59 @@ describe("binding text to an arrow endpoint", () => {
   });
   });
 
+  describe("history", () => {
+    // generic text-creation history behaviour lives in textWysiwyg.test.tsx;
+    // these cover what the endpoint binding adds on top
+    it("removes the text and its binding in a single undo", async () => {
+      UI.createElement("arrow", { x: 100, y: 300, width: 0, height: -200 });
+      const arrowId = h.elements[0].id;
+      const arrow = () =>
+        h.elements.find(
+          (el): el is ExcalidrawArrowElement => el.id === arrowId,
+        )!;
+
+      const editor = await bindTextAt(100, 100, "bound");
+      Keyboard.exitTextEditor(editor);
+      const textId = arrow().endBinding?.elementId;
+      expect(textId).toBeDefined();
+
+      Keyboard.undo();
+
+      expect(h.elements.find((el) => el.id === textId)?.isDeleted).toBe(true);
+      expect(arrow().isDeleted).toBe(false);
+      expect(arrow().endBinding).toBeNull();
+
+      // and the endpoint is immediately reusable
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: arrowId,
+        anchor: "end",
+      });
+    });
+
+    it("restores the text and its binding on redo", async () => {
+      UI.createElement("arrow", { x: 100, y: 300, width: 0, height: -200 });
+      const arrowId = h.elements[0].id;
+      const arrow = () =>
+        h.elements.find(
+          (el): el is ExcalidrawArrowElement => el.id === arrowId,
+        )!;
+
+      const editor = await bindTextAt(100, 100, "bound");
+      Keyboard.exitTextEditor(editor);
+      const textId = arrow().endBinding?.elementId;
+
+      Keyboard.undo();
+      Keyboard.redo();
+
+      const text = h.elements.find((el) => el.id === textId)!;
+      expect(text.isDeleted).toBe(false);
+      expect(isTextElement(text) && text.text).toBe("bound");
+      expect(arrow().endBinding?.elementId).toBe(textId);
+    });
+  });
+
   describe("interaction with existing text-tool behavior", () => {
     it("adds a label to the arrow when clicking away from the endpoints", async () => {
       API.setElements([createArrow("arrow", [100, 100], [500, 100])]);
