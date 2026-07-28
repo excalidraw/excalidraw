@@ -4233,6 +4233,16 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ showWelcomeScreen: true });
     }
 
+    // the text tool hover highlight must not outlive the tool, no matter
+    // how the tool gets canceled (Esc/finalize paths bypass setActiveTool)
+    if (
+      prevState.activeTool.type === "text" &&
+      this.state.activeTool.type !== "text" &&
+      (this.state.elementsToHighlight || this.state.suggestedBinding)
+    ) {
+      this.setState({ elementsToHighlight: null, suggestedBinding: null });
+    }
+
     if (
       prevState.zoom.value !== this.state.zoom.value ||
       prevState.scrollX !== this.state.scrollX ||

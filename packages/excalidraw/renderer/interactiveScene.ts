@@ -42,6 +42,7 @@ import {
   isLineElement,
   maxBindingDistance_simple,
   isTextElement,
+  getTextElementWithAccuratePosition,
   LinearElementEditor,
   getActiveTextElement,
   getElementsInGroup,
@@ -1769,12 +1770,29 @@ const _renderInteractiveScene = ({
   }
 
   if (appState.elementsToHighlight) {
-    renderElementsBoxHighlight(
-      context,
-      appState,
-      appState.elementsToHighlight,
-      allElementsMap,
-    );
+    const firstElementToHighlight = appState.elementsToHighlight.at(0);
+    if (
+      appState.activeTool.type === "text" &&
+      appState.elementsToHighlight.length === 1 &&
+      firstElementToHighlight &&
+      isTextElement(firstElementToHighlight)
+    ) {
+      // the text element the text tool would edit on click — use the same
+      // subtle dashed box as when editing a wrapped text element
+      renderTextBox(
+        firstElementToHighlight,
+        context,
+        appState,
+        renderConfig.selectionColor,
+      );
+    } else {
+      renderElementsBoxHighlight(
+        context,
+        appState,
+        appState.elementsToHighlight,
+        allElementsMap,
+      );
+    }
   }
 
   if (appState.activeLockedId) {

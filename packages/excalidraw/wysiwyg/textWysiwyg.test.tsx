@@ -2044,6 +2044,31 @@ describe("textWysiwyg", () => {
       // away from the midpoint → no highlight
       mouse.moveTo(215, 200);
       expect(h.state.elementsToHighlight).toBe(null);
+    it("should clear the hover highlights when the text tool is canceled", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "free",
+        x: 500,
+        y: 500,
+        width: 40,
+        height: 25,
+      });
+      API.setElements([...h.elements, text]);
+
+      // text hover highlight is cleared on Escape
+      UI.clickTool("text");
+      mouse.moveTo(520, 512);
+      expect(h.state.elementsToHighlight?.[0]?.id).toBe(text.id);
+      Keyboard.keyPress(KEYS.ESCAPE);
+      expect(h.state.activeTool.type).not.toBe("text");
+      expect(h.state.elementsToHighlight).toBe(null);
+
+      // container binding highlight is cleared on Escape
+      UI.clickTool("text");
+      mouse.moveTo(55, 57.5);
+      expect(h.state.suggestedBinding?.element?.id).toBe(rectangle.id);
+      Keyboard.keyPress(KEYS.ESCAPE);
+      expect(h.state.suggestedBinding).toBe(null);
     });
 
     it("should highlight the text the text tool would edit on hover", async () => {
