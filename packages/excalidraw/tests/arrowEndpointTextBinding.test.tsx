@@ -392,6 +392,35 @@ describe("binding text to an arrow endpoint", () => {
       updateTextEditor(editor, "a considerably longer label");
       expectPointsClose(endpointOf(getArrow("arrow"), "end"), tipBefore);
     });
+
+    // the binding gap is derived from the *bind target*, so anchoring with the
+    // arrow's stroke width offsets the tip by half the difference between the
+    // two the moment `updateBoundElements` first runs
+    it.each([
+      { arrowStroke: 2, textStroke: "bold" as const },
+      { arrowStroke: 4, textStroke: "thin" as const },
+      { arrowStroke: 1, textStroke: "medium" as const },
+    ])(
+      "does not shift when the text's stroke width differs (arrow $arrowStroke vs $textStroke)",
+      async ({ arrowStroke, textStroke }) => {
+        API.setElements([
+          createArrow("arrow", [100, 300], [100, 100], {
+            strokeWidth: arrowStroke,
+          }),
+        ]);
+        API.setAppState({ currentItemStrokeWidthKey: textStroke });
+        const tipBefore = endpointOf(getArrow("arrow"), "end");
+
+        const editor = await bindTextAt(100, 100, "x");
+        expect(getText().strokeWidth).not.toBe(arrowStroke);
+        expectPointsClose(endpointOf(getArrow("arrow"), "end"), tipBefore);
+
+        updateTextEditor(editor, "a considerably longer label");
+        expectPointsClose(endpointOf(getArrow("arrow"), "end"), tipBefore);
+      },
+    );
+  });
+  });
   });
 
   describe("interaction with existing text-tool behavior", () => {

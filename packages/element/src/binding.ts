@@ -134,7 +134,9 @@ export const FOCUS_POINT_SIZE = 10 / 1.5;
 const MIN_BINDABLE_SIZE = 1;
 
 export const getBindingGap = (
-  bindTarget: ExcalidrawBindableElement,
+  // only the stroke width is needed, so the gap can also be computed for a
+  // bind target that doesn't exist yet (see `getTextBindingForArrowEndpoint`)
+  bindTarget: Pick<ExcalidrawBindableElement, "strokeWidth">,
   opts: Pick<ExcalidrawArrowElement, "elbowed">,
 ): number => {
   return (
@@ -3250,6 +3252,12 @@ export const getTextBindingForArrowEndpoint = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
+  /**
+   * stroke width the text will be created with — the binding gap is derived
+   * from the *bind target*, so using the arrow's would offset the anchor by
+   * half the difference between the two
+   */
+  targetStrokeWidth: number,
 ): {
   /** the text-local ratio the arrow binds to (a side midpoint) */
   fixedPoint: FixedPoint;
@@ -3292,12 +3300,13 @@ export const getTextBindingForArrowEndpoint = (
       : HEADING_UP;
 
   // Keep the tip off the text's bounding box by the usual binding gap so the
-  // arrowhead doesn't collide with the glyphs. Elbow arrows terminate on the
-  // fixed point itself rather than gap-outside the outline, so offsetting
-  // there would just shift the arrow by the gap.
+  // arrowhead doesn't collide with the glyphs. Must match the gap
+  // `updateBoundPoint` will resolve the binding with, or the first text update
+  // shifts the arrow. Elbow arrows terminate on the fixed point itself rather
+  // than gap-outside the outline, so offsetting there would just shift them.
   const gap = isElbowArrow(arrow)
     ? 0
-    : BASE_BINDING_GAP + arrow.strokeWidth / 2;
+    : getBindingGap({ strokeWidth: targetStrokeWidth }, arrow);
 
   // How far back along the arrow the bound side has to sit for the tip to
   // stay exactly where it is.

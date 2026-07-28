@@ -9816,6 +9816,8 @@ class App extends React.Component<AppProps, AppState> {
         arrowEndpoint.arrow,
         arrowEndpoint.startOrEnd,
         this.scene.getNonDeletedElementsMap(),
+        // must match the stroke width `startTextEditing` creates the text with
+        this.getCurrentItemStrokeWidth("text"),
       );
 
     if (arrowEndpoint && arrowEndpointBinding) {
