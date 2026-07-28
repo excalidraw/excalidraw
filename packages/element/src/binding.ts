@@ -3391,6 +3391,30 @@ export const getTextBindingForArrowEndpoint = (
  * strategy used when dragging. Needed when the binding target is placed to fit
  * the arrow rather than the other way round.
  */
+/**
+ * Whether an arrow endpoint is bound to this text — i.e. the text serves as an
+ * arrow-endpoint label. Checked on the arrows' own bindings: the text's
+ * `boundElements` only says an arrow relates to it, while the binding on the
+ * arrow is the authoritative side of the relationship.
+ */
+export const isEndpointBoundText = (
+  text: ExcalidrawTextElement,
+  elementsMap: ElementsMap,
+): boolean =>
+  !!text.boundElements?.some(({ id, type }) => {
+    if (type !== "arrow") {
+      return false;
+    }
+
+    const arrow = elementsMap.get(id);
+
+    return (
+      isArrowElement(arrow) &&
+      (arrow.startBinding?.elementId === text.id ||
+        arrow.endBinding?.elementId === text.id)
+    );
+  });
+
 export const bindBindingElementToFixedPoint = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   bindableElement: NonDeleted<ExcalidrawBindableElement>,

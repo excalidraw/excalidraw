@@ -124,6 +124,7 @@ import {
   getTextBindingForArrowEndpoint,
   getUnboundArrowEndpointAtPoint,
   isBindingEnabled,
+  isEndpointBoundText,
   updateBoundElements,
   LinearElementEditor,
   newElementWith,
@@ -13370,12 +13371,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // A text bound to an arrow endpoint can't be positioned by the drag — the
-    // binding already placed it — so only its width is dragged out. A text
-    // being created is unbound unless it was created at an endpoint, which
-    // records the arrow among its bound elements.
+    // binding already placed it — so only its width is dragged out.
     if (
       isTextElement(newElement) &&
-      newElement.boundElements?.some(({ type }) => type === "arrow")
+      isEndpointBoundText(newElement, this.scene.getNonDeletedElementsMap())
     ) {
       dragNewTextElement({
         newElement,
