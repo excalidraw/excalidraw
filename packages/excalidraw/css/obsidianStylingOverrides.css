@@ -369,3 +369,13 @@
 .excalidraw footer.App-toolbar .ToolIcon_type_toggle {
   padding: 2px;
 }
+
+.App-menu_top__left,
+.FixedSideContainer.FixedSideContainer_side_top.App-top-bar .Stack.Stack_vertical,
+.FixedSideContainer.FixedSideContainer_side_top.App-top-bar section {
+  pointer-events: none;
+
+  & > * {
+    pointer-events: var(--ui-pointerEvents);
+  }
+}
