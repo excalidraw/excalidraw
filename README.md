@@ -80,6 +80,15 @@ The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase
 
 We'll be adding these features as drop-in plugins for the npm package in the future.
 
+
+## AI vs Machine Learning vs Deep Learning
+
+This diagram explains the relationship between Artificial Intelligence (AI), Machine Learning (ML), and Deep Learning (DL).
+
+<p align="center">
+  <img src="./public/ai-vs-ml-vs-dl.png" alt="AI vs ML vs DL" width="900"/>
+</p>
+
 ## Quick start
 
 **Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
