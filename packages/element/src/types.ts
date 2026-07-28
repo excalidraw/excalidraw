@@ -154,8 +154,21 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     /** whether an element is cropped */
     crop: ImageCrop | null;
     /** whether the image is animated (gif, apng) */
-    is_anim?: true;
+    isAnimated?: true;
   }>;
+
+export type AnimatedImage = {
+  readonly width: number;
+  readonly height: number;
+  readonly frameCount: number;
+  readonly delays: readonly number[];
+  readonly totalDuration: number;
+  readonly loopCount: number;
+  readonly image: ImageBitmap | HTMLCanvasElement;
+  readonly renderedFrameIndex: number;
+  startTime: number;
+  seek(frameIndex: number): void;
+};
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<
   ExcalidrawImageElement,

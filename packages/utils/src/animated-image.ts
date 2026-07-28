@@ -14,15 +14,16 @@ const readBlobSlice = (
   });
 };
 
+export const readBlobBytes = (blob: Blob): Promise<Uint8Array> =>
+  readBlobSlice(blob, 0, blob.size);
+
 /**
  * Checks if a blob is an animated image (GIF, APNG, or animated WebP).
  *
  * Only reads the first HEADER_SIZE bytes of the blob instead of loading the
  * entire file into memory.
  */
-export async function isAnim(blob: Blob): Promise<boolean> {
-
-  // Fast path
+export async function isAnimatedImage(blob: Blob): Promise<boolean> {
   if (
     blob.type === "image/jpeg" ||
     blob.type === "image/bmp" ||
@@ -33,8 +34,6 @@ export async function isAnim(blob: Blob): Promise<boolean> {
     return false;
   }
 
-  // Read only the header portion of the blob — this is enough to check for
-  // APNG's acTL chunk or animated WebP's ANIM chunk.
   const HEADER_SIZE = 16384;
   const sliceSize = Math.min(blob.size, HEADER_SIZE);
   if (sliceSize === 0) {
@@ -42,8 +41,25 @@ export async function isAnim(blob: Blob): Promise<boolean> {
   }
   const view = await readBlobSlice(blob, 0, sliceSize);
 
-  return isGifAnim(view) || isApng(view) || isWebpAnim(view);
+  return sniffAnimatedImageType(view) !== null;
 }
+
+export type AnimatedImageType = "gif" | "apng" | "webp";
+
+export const sniffAnimatedImageType = (
+  view: Uint8Array,
+): AnimatedImageType | null => {
+  if (isGifAnim(view)) {
+    return "gif";
+  }
+  if (isApng(view)) {
+    return "apng";
+  }
+  if (isWebpAnim(view)) {
+    return "webp";
+  }
+  return null;
+};
 
 /**
  * Detect animated GIF by checking for GIF89a header and at least two

@@ -44,6 +44,7 @@ import type {
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
+import { getAnimatedImageFrameIndex } from "./image";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
   getBoundTextElement,
@@ -367,19 +368,22 @@ const drawElementOnCanvas = (
       break;
     }
     case "image": {
-      // anim images are drawn as html <img> in App.renderAnimationElements
-      // when exporting (to png)
-      if (element.is_anim && !renderConfig.isExporting) {
-        return;
-      }
       context.save();
       const cacheEntry =
         element.fileId !== null
           ? renderConfig.imageCache.get(element.fileId)
           : null;
-      const img = isInitializedImageElement(element)
-        ? cacheEntry?.image
-        : undefined;
+      const animation = cacheEntry?.animation;
+      if (animation) {
+        // Request the frame for the current playhead. Decoding is async and
+        // `animation.image` always holds the latest decoded frame
+        animation.seek(
+          getAnimatedImageFrameIndex(animation, performance.now()),
+        );
+      }
+      const img =
+        animation?.image ??
+        (isInitializedImageElement(element) ? cacheEntry?.image : undefined);
 
       if (img != null && !(img instanceof Promise)) {
         if (element.roundness && context.roundRect) {
@@ -394,14 +398,14 @@ const drawElementOnCanvas = (
           context.clip();
         }
 
+        const imgWidth =
+          img instanceof HTMLImageElement ? img.naturalWidth : img.width;
+        const imgHeight =
+          img instanceof HTMLImageElement ? img.naturalHeight : img.height;
+
         const { x, y, width, height } = element.crop
           ? element.crop
-          : {
-              x: 0,
-              y: 0,
-              width: img.naturalWidth,
-              height: img.naturalHeight,
-            };
+          : { x: 0, y: 0, width: imgWidth, height: imgHeight };
 
         const shouldInvertImage =
           renderConfig.theme === THEME.DARK &&
@@ -534,6 +538,30 @@ const drawElementOnCanvas = (
       }
     }
   }
+};
+
+const drawImageElementDirectly = (
+  element: NonDeleted<ExcalidrawImageElement>,
+  elementsMap: RenderableElementsMap,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+) => {
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+  const cx = (x1 + x2) / 2 + appState.scrollX;
+  const cy = (y1 + y2) / 2 + appState.scrollY;
+  const shiftX = (x2 - x1) / 2 - (element.x - x1);
+  const shiftY = (y2 - y1) / 2 - (element.y - y1);
+
+  context.save();
+  context.translate(cx, cy);
+  context.rotate(element.angle);
+  // scale must be applied *after* rotating
+  context.scale(element.scale[0], element.scale[1]);
+  context.translate(-shiftX, -shiftY);
+  drawElementOnCanvas(element, rc, context, renderConfig);
+  context.restore();
 };
 
 export const elementWithCanvasCache = new WeakMap<
@@ -910,6 +938,44 @@ export const renderElement = (
         // not exporting → optimized rendering (cache & render from element
         // canvases)
       } else {
+        // animated images draw the current frame directly each render
+        if (isImageElement(element)) {
+          const cacheEntry =
+            element.fileId !== null
+              ? renderConfig.imageCache.get(element.fileId)
+              : null;
+
+          if (cacheEntry?.animation) {
+            drawImageElementDirectly(
+              element,
+              elementsMap,
+              rc,
+              context,
+              renderConfig,
+              appState,
+            );
+
+            if (
+              element.id === appState.croppingElementId &&
+              element.crop !== null
+            ) {
+              context.save();
+              context.globalAlpha = 0.1;
+              drawImageElementDirectly(
+                getUncroppedImageElement(element, elementsMap),
+                elementsMap,
+                rc,
+                context,
+                renderConfig,
+                appState,
+              );
+              context.restore();
+            }
+
+            break;
+          }
+        }
+
         const elementWithCanvas = generateElementWithCanvas(
           element,
           allElementsMap,
