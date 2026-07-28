@@ -3216,6 +3216,22 @@ export const getUnboundArrowEndpointAtPoint = (
         continue;
       }
 
+      // a zero-length tail has no direction to place a text along, so
+      // `getTextBindingForArrowEndpoint` would refuse the endpoint — don't
+      // offer it at all rather than highlight something a click won't honor
+      if (
+        pointsEqual(
+          element.points[
+            startOrEnd === "start" ? 0 : element.points.length - 1
+          ],
+          element.points[
+            startOrEnd === "start" ? 1 : element.points.length - 2
+          ],
+        )
+      ) {
+        continue;
+      }
+
       const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
         element,
         startOrEnd === "start" ? 0 : -1,

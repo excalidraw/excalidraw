@@ -293,10 +293,9 @@ import type {
   SceneElementsMap,
   NonDeletedSceneElementsMap,
   ExcalidrawBindableElement,
-  FixedPoint,
-  TextAlign,
-  VerticalAlign,
 } from "@excalidraw/element/types";
+
+import type { ArrowEndpoint } from "@excalidraw/element";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -6788,7 +6787,7 @@ class App extends React.Component<AppProps, AppState> {
     container,
     autoEdit = true,
     initialCaretSceneCoords,
-    arrowEndpointBinding,
+    arrowEndpoint,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -6800,25 +6799,34 @@ class App extends React.Component<AppProps, AppState> {
     autoEdit?: boolean;
     initialCaretSceneCoords?: { x: number; y: number };
     /**
-     * creates the text as an arrow-endpoint label: (sceneX, sceneY) is then
-     * the scene position of the text's bound side midpoint rather than a
-     * caret position, and the text's alignment is dictated by the binding.
+     * creates the text as a label for this arrow endpoint: the binding then
+     * dictates the text's position and alignment, overriding (sceneX, sceneY)
      */
-    arrowEndpointBinding?: {
-      arrow: NonDeleted<ExcalidrawArrowElement>;
-      startOrEnd: "start" | "end";
-      fixedPoint: FixedPoint;
-      textAlign: TextAlign;
-      verticalAlign: VerticalAlign;
-    } | null;
+    arrowEndpoint?: ArrowEndpoint | null;
   }) => {
     let shouldBindToContainer = false;
+
+    // Resolved here rather than by the caller so that the stroke width the
+    // binding gap derives from (see `getBindingGap`) is, by construction, the
+    // one the text is created with below.
+    const arrowEndpointBinding =
+      arrowEndpoint &&
+      getTextBindingForArrowEndpoint(
+        arrowEndpoint.arrow,
+        arrowEndpoint.startOrEnd,
+        this.scene.getNonDeletedElementsMap(),
+        this.getCurrentItemStrokeWidth("text"),
+      );
 
     if (arrowEndpointBinding) {
       // an arrow endpoint is not a text container — the text is a sibling the
       // arrow binds to, not a label inside it
       container = null;
       insertAtParentCenter = false;
+      // the scene position of the text's bound side midpoint, not a caret
+      // position
+      sceneX = arrowEndpointBinding.anchor[0];
+      sceneY = arrowEndpointBinding.anchor[1];
     }
 
     let parentCenterPosition =
@@ -6977,11 +6985,11 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    if (arrowEndpointBinding) {
+    if (arrowEndpoint && arrowEndpointBinding) {
       bindBindingElementToFixedPoint(
-        arrowEndpointBinding.arrow,
+        arrowEndpoint.arrow,
         element,
-        arrowEndpointBinding.startOrEnd,
+        arrowEndpoint.startOrEnd,
         arrowEndpointBinding.fixedPoint,
         this.scene,
       );
@@ -9852,31 +9860,15 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
     );
 
-    const arrowEndpointBinding =
-      arrowEndpoint &&
-      getTextBindingForArrowEndpoint(
-        arrowEndpoint.arrow,
-        arrowEndpoint.startOrEnd,
-        this.scene.getNonDeletedElementsMap(),
-        // must match the stroke width `startTextEditing` creates the text with
-        this.getCurrentItemStrokeWidth("text"),
-      );
-
-    if (arrowEndpoint && arrowEndpointBinding) {
+    if (arrowEndpoint) {
       this.setState({ hoveredArrowTextAnchor: null });
       this.startTextEditing({
-        sceneX: arrowEndpointBinding.anchor[0],
-        sceneY: arrowEndpointBinding.anchor[1],
-        // the position is fixed by the binding, but the width is still the
-        // user's to drag out (see `dragNewEndpointBoundTextElement`)
+        sceneX,
+        sceneY,
+        // the binding fixes the position, but the width is still the user's
+        // to drag out (see `getEndpointBoundTextDragAnchor`)
         autoEdit: false,
-        arrowEndpointBinding: {
-          arrow: arrowEndpoint.arrow,
-          startOrEnd: arrowEndpoint.startOrEnd,
-          fixedPoint: arrowEndpointBinding.fixedPoint,
-          textAlign: arrowEndpointBinding.textAlign,
-          verticalAlign: arrowEndpointBinding.verticalAlign,
-        },
+        arrowEndpoint,
       });
     } else {
       const element = this.getElementAtPosition(sceneX, sceneY, {
