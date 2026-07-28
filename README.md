@@ -86,7 +86,7 @@ We'll be adding these features as drop-in plugins for the npm package in the fut
 This diagram explains the relationship between Artificial Intelligence (AI), Machine Learning (ML), and Deep Learning (DL).
 
 <p align="center">
-  <img src="./public/ai-vs-ml-vs-dl.png" alt="AI vs ML vs DL" width="900"/>
+  <img src="./public/Untitled-2026-07-20-1134.png" alt="AI vs ML vs DL" width="900"/>
 </p>
 
 ## Quick start
