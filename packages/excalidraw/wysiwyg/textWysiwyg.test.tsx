@@ -1975,21 +1975,29 @@ describe("textWysiwyg", () => {
       API.setElements([]);
     });
 
+    /**
+     * a fixed-width text wrapped onto two lines. `originalText`/`autoResize`
+     * are set after the fact — `API.createElement` accepts neither, and would
+     * otherwise leave an autogrowing element whose `originalText` still holds
+     * the line break.
+     */
     const wrappedText = (
       overrides: Partial<ExcalidrawTextElement> = {},
     ): ExcalidrawTextElement =>
-      API.createElement({
-        type: "text",
-        id: "text",
-        x: 100,
-        y: 100,
-        width: 300,
-        height: 50,
-        text: "this is it my friends\nald aksdl askdlasdk",
+      ({
+        ...API.createElement({
+          type: "text",
+          id: "text",
+          x: 100,
+          y: 100,
+          width: 300,
+          height: 50,
+          text: "this is it my friends\nald aksdl askdlasdk",
+        }),
         originalText: "this is it my friends ald aksdl askdlasdk",
         autoResize: false,
         ...overrides,
-      }) as ExcalidrawTextElement;
+      } as ExcalidrawTextElement);
 
     // unwrapping resizes the box, so whichever edge the alignment pins has to
     // stay put — otherwise the text slides out from under itself
@@ -2006,6 +2014,7 @@ describe("textWysiwyg", () => {
     ])("keeps the $textAlign anchor when unwrapping", ({ textAlign, edge }) => {
       API.setElements([wrappedText({ textAlign })]);
       API.setAppState({ selectedElementIds: { text: true } });
+      expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(false);
       const before = edge(h.elements[0] as ExcalidrawTextElement);
 
       API.executeAction(actionTextAutoResize);
@@ -2035,6 +2044,7 @@ describe("textWysiwyg", () => {
       ({ verticalAlign, edge }) => {
         API.setElements([wrappedText({ verticalAlign })]);
         API.setAppState({ selectedElementIds: { text: true } });
+        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(false);
         const before = edge(h.elements[0] as ExcalidrawTextElement);
 
         API.executeAction(actionTextAutoResize);

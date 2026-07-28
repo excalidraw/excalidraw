@@ -524,6 +524,58 @@ describe("binding text to an arrow endpoint", () => {
       expectPointsClose(endpointOf(getArrow("arrow"), "end"), tipBefore);
     });
 
+    // the anchor can only pin one point, so every other arrow bound to the text
+    // has to be re-routed to the resized box
+    it("re-routes the other arrows bound to the text", () => {
+      const wrapped = {
+        ...API.createElement({
+          type: "text",
+          id: "text",
+          x: 200,
+          y: 280,
+          width: 300,
+          height: 50,
+          text: "this is it my friends\nald aksdl askdlasdk",
+          textAlign: "right",
+          verticalAlign: "middle",
+          boundElements: [{ id: "fromTop", type: "arrow" }],
+        }),
+        // a wrapped, fixed-width text: `originalText` is what the resize
+        // measures against once it unwraps
+        originalText: "this is it my friends ald aksdl askdlasdk",
+        autoResize: false,
+      };
+      // bound to the text's top side, i.e. not the side the alignment pins
+      const fromTop = createArrow("fromTop", [350, 120], [350, 260], {
+        endBinding: {
+          elementId: "text",
+          fixedPoint: [0.5001, 0],
+          mode: "orbit",
+        },
+      });
+      API.setElements([wrapped, fromTop]);
+      const tipBefore = endpointOf(getArrow("fromTop"), "end");
+
+      API.setAppState({ selectedElementIds: { text: true } });
+      API.executeAction(actionTextAutoResize);
+
+      const text = getText();
+      // the box really did move out from under the arrow
+      expect(text.y).not.toBeCloseTo(280, 0);
+
+      const tipAfter = endpointOf(getArrow("fromTop"), "end");
+      expect(tipAfter).not.toEqual(tipBefore);
+      // still just clear of the top edge it is bound to...
+      expect(tipAfter[1]).toBeLessThan(text.y);
+      // ...and it chased the box's new centre. Not asserting the centre
+      // exactly: the arrow is diagonal now, so the outline intersection sits
+      // slightly to one side of the fixed point.
+      const centre = text.x + text.width / 2;
+      expect(Math.abs(tipAfter[0] - centre)).toBeLessThan(
+        Math.abs(tipBefore[0] - centre),
+      );
+    });
+
     it("leaves the arrow endpoint where it was", async () => {
       API.setElements([createArrow("arrow", [100, 100], [300, 100])]);
       const tipBefore = endpointOf(getArrow("arrow"), "end");
