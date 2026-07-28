@@ -69,6 +69,8 @@ import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
 
+import { isNonDeletedElement } from ".";
+
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
@@ -81,7 +83,6 @@ import type {
   NonDeletedSceneElementsMap,
   ElementsMap,
 } from "./types";
-
 import type { RoughCanvas } from "roughjs/bin/canvas";
 
 const isPendingImageElement = (
@@ -1013,7 +1014,8 @@ export const renderElement = (
         if (
           element.id === appState.croppingElementId &&
           isImageElement(elementWithCanvas.element) &&
-          elementWithCanvas.element.crop !== null
+          elementWithCanvas.element.crop !== null &&
+          isNonDeletedElement(elementWithCanvas.element)
         ) {
           context.save();
           context.globalAlpha = 0.1;
