@@ -5133,7 +5133,7 @@ describe("history", () => {
               }),
               endBinding: expect.objectContaining({
                 elementId: rect2.id,
-                fixedPoint: expect.arrayContaining([0, 0.5001]),
+                fixedPoint: expect.arrayContaining([0.5001, 0.5001]),
               }),
               isDeleted: true,
             }),

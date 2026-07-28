@@ -794,7 +794,7 @@ describe("binding to a point-like (sub-pixel) element", () => {
       }) as NonDeleted<ExcalidrawArrowElement>;
       API.setElements([rect, arrow]);
 
-      bindBindingElement(arrow, rect, "orbit", "end", h.scene);
+      bindBindingElement(arrow, rect, "orbit", "end", h.scene, h.state.zoom);
 
       const endBinding = arrow.endBinding as FixedPointBinding;
       expect(endBinding.elementId).toBe(rect.id);
