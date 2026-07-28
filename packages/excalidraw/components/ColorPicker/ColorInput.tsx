@@ -32,6 +32,7 @@ export const ColorInput = ({
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setInnerValue(color);
@@ -44,6 +45,11 @@ export const ColorInput = ({
 
       if (color) {
         onChange(color);
+        setError(null);
+      } else if (value.length > 0) {
+        setError(t("colorPicker.invalidHexColor"));
+      } else {
+        setError(null);
       }
       setInnerValue(value);
     },
@@ -82,6 +88,7 @@ export const ColorInput = ({
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setError(null);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
@@ -95,6 +102,11 @@ export const ColorInput = ({
         }}
         placeholder={placeholder}
       />
+      {error && (
+        <div className="color-picker__input-error" role="alert">
+          {error}
+        </div>
+      )}
       {/* TODO reenable on mobile with a better UX */}
       {editorInterface.formFactor !== "phone" && (
         <>
