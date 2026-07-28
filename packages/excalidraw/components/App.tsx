@@ -6644,12 +6644,35 @@ class App extends React.Component<AppProps, AppState> {
       return null;
     }
 
-    return getUnboundArrowEndpointAtPoint(
+    const endpoint = getUnboundArrowEndpointAtPoint(
       pointFrom(x, y),
       this.scene.getNonDeletedElements(),
       this.scene.getNonDeletedElementsMap(),
       this.state.zoom,
     );
+
+    if (!endpoint) {
+      return null;
+    }
+
+    // The endpoint scan only knows about arrows, so it happily reaches through
+    // whatever is drawn on top of them. An element stacked above the arrow that
+    // the pointer actually hits owns the click — the text tool should label
+    // that element rather than bind the endpoint hidden behind it.
+    const hitElement = this.getElementAtPosition(x, y, {
+      includeLockedElements: true,
+    });
+
+    if (
+      hitElement &&
+      hitElement.id !== endpoint.arrow.id &&
+      this.scene.getElementIndex(hitElement.id) >
+        this.scene.getElementIndex(endpoint.arrow.id)
+    ) {
+      return null;
+    }
+
+    return endpoint;
   }
 
   /**
@@ -11595,7 +11618,7 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         if (!this.isEditingTextContent()) {
-        this.store.scheduleCapture();
+          this.store.scheduleCapture();
         }
 
         if (hitLockedElement?.locked) {
@@ -12470,9 +12493,9 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElements(),
             this.state,
           ) ||
-        !isShallowEqual(
-          this.state.previousSelectedElementIds,
-          this.state.selectedElementIds,
+          !isShallowEqual(
+            this.state.previousSelectedElementIds,
+            this.state.selectedElementIds,
           ))
       ) {
         this.store.scheduleCapture();

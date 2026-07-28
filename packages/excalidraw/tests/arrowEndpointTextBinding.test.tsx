@@ -1,5 +1,7 @@
 import { KEYS } from "@excalidraw/common";
 
+import { isTextElement } from "@excalidraw/element";
+
 import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
@@ -250,6 +252,14 @@ describe("binding text to an arrow endpoint", () => {
             mode: "orbit",
           },
         }),
+        API.createElement({
+          type: "rectangle",
+          id: "other",
+          x: 400,
+          y: 400,
+          width: 100,
+          height: 100,
+        }),
       ]);
 
       UI.clickTool("text");
@@ -420,7 +430,67 @@ describe("binding text to an arrow endpoint", () => {
       },
     );
   });
-  });
+
+  describe("occlusion", () => {
+    const coveringRect = (overrides: Record<string, unknown> = {}) =>
+      API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 40,
+        y: 40,
+        width: 120,
+        height: 120,
+        backgroundColor: "#ffc9c9",
+        ...overrides,
+      });
+
+    it("does not reach through an element stacked above the endpoint", async () => {
+      // rect is drawn after (above) the arrow and covers its tip at (100, 100)
+      API.setElements([
+        createArrow("arrow", [100, 300], [100, 100]),
+        coveringRect(),
+      ]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+
+      // the click belongs to the rect, as it would without the arrow there
+      await bindTextAt(100, 100, "label");
+      expect(getArrow("arrow").endBinding).toBeNull();
+      expect(getText().containerId).toBe("rect");
+    });
+
+    it("still offers the endpoint when the arrow is stacked above", () => {
+      API.setElements([
+        coveringRect(),
+        createArrow("arrow", [100, 300], [100, 100]),
+      ]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "end",
+      });
+    });
+
+    it("is not occluded by a transparent element above it", () => {
+      // transparent shapes are only hit on their stroke, so they don't cover
+      API.setElements([
+        createArrow("arrow", [100, 300], [100, 100]),
+        coveringRect({ backgroundColor: "transparent" }),
+      ]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "end",
+      });
+    });
   });
 
   describe("history", () => {
