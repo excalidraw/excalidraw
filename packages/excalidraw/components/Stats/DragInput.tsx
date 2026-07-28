@@ -128,7 +128,10 @@ const StatsDragInput = <
     stateRef.current.updatePending = false;
 
     const parsed = Number(updatedValue);
-    if (isNaN(parsed)) {
+    // Number.isFinite also rejects "Infinity"/"1e999", which `isNaN` lets
+    // through — non-finite values corrupt element geometry (NaN/Infinity
+    // don't survive the JSON round-trip on save)
+    if (!Number.isFinite(parsed)) {
       setInputValue(value.toString());
       return;
     }
