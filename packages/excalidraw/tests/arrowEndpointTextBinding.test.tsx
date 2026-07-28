@@ -714,6 +714,112 @@ describe("binding text to an arrow endpoint", () => {
       expect(getArrow("arrow").startBinding).toBeNull();
     });
 
+    // the text tool edits before it creates: a text that is the top-most hit
+    // under the cursor takes the click, so the endpoint must not be offered
+    // over it. Occlusion alone can't provide this — its hit test skips bound
+    // texts.
+    it("yields to a container-bound label overlapping the endpoint", async () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 60,
+        y: 60,
+        width: 80,
+        height: 80,
+        // transparent, so the rect itself doesn't occlude the endpoint
+        backgroundColor: "transparent",
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        containerId: rect.id,
+        text: "under",
+        x: 75,
+        y: 87.5,
+        width: 50,
+        height: 25,
+      });
+      API.setElements([
+        createArrow("arrow", [100, 300], [100, 100]),
+        { ...rect, boundElements: [{ id: label.id, type: "text" }] },
+        label,
+      ]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+
+      // the click edits the label rather than binding the endpoint under it
+      mouse.clickAt(100, 100);
+      await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe("label");
+      expect(getArrow("arrow").endBinding).toBeNull();
+    });
+
+    it("creates a fresh text instead of adopting the selected one", async () => {
+      // with a text selected, a text-tool click normally edits that text no
+      // matter where the click lands — but a click on an endpoint promises a
+      // new label there, not a binding to whatever happened to be selected
+      API.setElements([
+        createArrow("arrow", [100, 300], [100, 100]),
+        API.createElement({
+          type: "text",
+          id: "faraway",
+          x: 400,
+          y: 400,
+          text: "faraway",
+        }),
+      ]);
+      API.setAppState({ selectedElementIds: { faraway: true } });
+
+      const editor = await bindTextAt(100, 100, "fresh");
+      Keyboard.exitTextEditor(editor);
+
+      const boundTextId = getArrow("arrow").endBinding?.elementId;
+      expect(boundTextId).toBeDefined();
+      expect(boundTextId).not.toBe("faraway");
+
+      const faraway = h.elements.find((el) => el.id === "faraway")!;
+      expect(isTextElement(faraway) && faraway.text).toBe("faraway");
+      expect(faraway.boundElements ?? []).toHaveLength(0);
+    });
+
+    it("creates a fresh text instead of adopting one lying beyond the tip", async () => {
+      // the text covers the anchor region past the tip, but the arrow is the
+      // top-most hit at the endpoint itself — the endpoint stays available,
+      // and the new label must not be conflated with the text underneath
+      API.setElements([
+        API.createElement({
+          type: "text",
+          id: "under",
+          x: 75,
+          y: 55,
+          width: 50,
+          height: 50,
+          text: "under",
+        }),
+        createArrow("arrow", [100, 300], [100, 100]),
+      ]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "end",
+      });
+
+      const editor = await bindTextAt(100, 100, "fresh");
+      Keyboard.exitTextEditor(editor);
+
+      const boundTextId = getArrow("arrow").endBinding?.elementId;
+      expect(boundTextId).toBeDefined();
+      expect(boundTextId).not.toBe("under");
+
+      const under = h.elements.find((el) => el.id === "under")!;
+      expect(isTextElement(under) && under.text).toBe("under");
+      expect(under.boundElements ?? []).toHaveLength(0);
+    });
+
     it("removes the binding when the text is submitted empty", async () => {
       API.setElements([createArrow("arrow", [100, 300], [100, 100])]);
 

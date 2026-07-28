@@ -6656,6 +6656,13 @@ class App extends React.Component<AppProps, AppState> {
       return null;
     }
 
+    // The text tool edits before it creates: when a text element is the
+    // top-most hit at this position, a click edits that text, so a nearby
+    // endpoint must not be offered over it.
+    if (this.getTextElementAtPosition(x, y)) {
+      return null;
+    }
+
     // The endpoint scan only knows about arrows, so it happily reaches through
     // whatever is drawn on top of them. An element stacked above the arrow that
     // the pointer actually hits owns the click — the text tool should label
@@ -6846,9 +6853,14 @@ class App extends React.Component<AppProps, AppState> {
         shouldBindToContainer = true;
       }
     }
-    const existingTextElement =
-      this.getSelectedTextElement(container) ||
-      this.getTextElementAtPosition(sceneX, sceneY);
+    // The endpoint flow always creates a fresh text: the lookups below would
+    // otherwise adopt a currently selected text (wherever it sits on canvas)
+    // or one that happens to lie around the anchor — even a container-bound
+    // one — and bind the arrow to that instead.
+    const existingTextElement = arrowEndpointBinding
+      ? null
+      : this.getSelectedTextElement(container) ||
+        this.getTextElementAtPosition(sceneX, sceneY);
 
     const fontFamily =
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
