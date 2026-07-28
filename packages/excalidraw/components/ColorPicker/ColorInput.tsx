@@ -53,9 +53,12 @@ export const ColorInput = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const eyeDropperTriggerRef = useRef<HTMLDivElement>(null);
 
+  // Only auto-focus the hex field when that section is intentionally active.
+  // Focusing on every activeSection change (with a stale ref) made the hex
+  // input steal focus and swallow the "I" eyedropper shortcut (#9410).
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
+    if (activeSection === "hex") {
+      inputRef.current?.focus();
     }
   }, [activeSection]);
 
@@ -67,11 +70,23 @@ export const ColorInput = ({
     };
   }, [setEyeDropperState]);
 
+  const toggleEyeDropper = useCallback(() => {
+    setEyeDropperState((s) =>
+      s
+        ? null
+        : {
+            keepOpenOnAlt: false,
+            onSelect: (color) => onChange(color),
+            colorPickerType,
+          },
+    );
+  }, [colorPickerType, onChange, setEyeDropperState]);
+
   return (
     <div className="color-picker__input-label">
       <div className="color-picker__input-hash">#</div>
       <input
-        ref={activeSection === "hex" ? inputRef : undefined}
+        ref={inputRef}
         style={{ border: 0, padding: 0 }}
         spellCheck={false}
         className="color-picker-input"
@@ -87,10 +102,39 @@ export const ColorInput = ({
         onFocus={() => setActiveColorPickerSection("hex")}
         onKeyDown={(event) => {
           if (event.key === KEYS.TAB) {
+            // Let the parent color picker handle section navigation
             return;
-          } else if (event.key === KEYS.ESCAPE) {
-            eyeDropperTriggerRef.current?.focus();
           }
+
+          if (event.key === KEYS.ESCAPE) {
+            eyeDropperTriggerRef.current?.focus();
+            event.stopPropagation();
+            return;
+          }
+
+          // Eyedropper shortcuts must work while the hex field is focused.
+          // Otherwise "S then I" (open stroke picker → eyedropper) degrades
+          // into typing "i" into the hex input (#9410).
+          if (event.key === KEYS.I || event.key === KEYS.ALT) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (event.key === KEYS.I) {
+              toggleEyeDropper();
+            } else {
+              // Match picker behavior: Alt holds the eyedropper open
+              setEyeDropperState((state) => {
+                state = state || {
+                  keepOpenOnAlt: true,
+                  onSelect: onChange,
+                  colorPickerType,
+                };
+                state.keepOpenOnAlt = true;
+                return state;
+              });
+            }
+            return;
+          }
+
           event.stopPropagation();
         }}
         placeholder={placeholder}
@@ -110,17 +154,7 @@ export const ColorInput = ({
             className={clsx("excalidraw-eye-dropper-trigger", {
               selected: eyeDropperState,
             })}
-            onClick={() =>
-              setEyeDropperState((s) =>
-                s
-                  ? null
-                  : {
-                      keepOpenOnAlt: false,
-                      onSelect: (color) => onChange(color),
-                      colorPickerType,
-                    },
-              )
-            }
+            onClick={toggleEyeDropper}
             title={`${t(
               "labels.eyeDropper",
             )} — ${KEYS.I.toLocaleUpperCase()} or ${getShortcutKey("Alt")} `}
