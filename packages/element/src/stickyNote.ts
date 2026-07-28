@@ -1,7 +1,9 @@
 import {
   DEFAULT_ELEMENT_PROPS,
   MIN_FONT_SIZE,
+  STICKY_NOTE_DEFAULT_FONT_SIZE,
   STICKY_NOTE_FONT_STEP,
+  STICKY_NOTE_MAX_FONT_SIZE,
   STICKY_NOTE_MIN_BASE_HEIGHT,
   STICKY_NOTE_MIN_BASE_WIDTH,
   STICKY_NOTE_MIN_FONT_SIZE,
@@ -221,8 +223,13 @@ export const getStickyNotePathCommands = (
   return commands;
 };
 
+// clamping the ceiling: the fit loop's `fontSize - STEP` descent stalls in 
+// for values >= ~2^56 (1e20 - 2 === 1e20) and would hang the editor
 export const normalizeStickyNoteFontSize = (fontSize: number) => {
-  return Math.max(MIN_FONT_SIZE, fontSize);
+  if (!Number.isFinite(fontSize)) {
+    return STICKY_NOTE_DEFAULT_FONT_SIZE;
+  }
+  return Math.min(STICKY_NOTE_MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize));
 };
 
 const getStickyNoteFontMax = (textElement: ExcalidrawTextElement) => {

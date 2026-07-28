@@ -1,6 +1,9 @@
 import {
   DEFAULT_STICKY_NOTE_SIZE,
+  MIN_FONT_SIZE,
   ROUNDNESS,
+  STICKY_NOTE_DEFAULT_FONT_SIZE,
+  STICKY_NOTE_MAX_FONT_SIZE,
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
   VERTICAL_ALIGN,
@@ -16,6 +19,7 @@ import { resizeSingleElement } from "../resizeElements";
 import {
   computeStickyNoteTextLayout,
   getStickyNoteCornerRadius,
+  normalizeStickyNoteFontSize,
 } from "../stickyNote";
 import { redrawTextBoundingBox } from "../textElement";
 
@@ -146,6 +150,41 @@ describe("sticky note text layout", () => {
     );
 
     expect(layout.fontSize).toBe(fontSize);
+  });
+
+  it("normalizes non-finite and out-of-range font ceilings", () => {
+    expect(normalizeStickyNoteFontSize(NaN)).toBe(
+      STICKY_NOTE_DEFAULT_FONT_SIZE,
+    );
+    expect(normalizeStickyNoteFontSize(Infinity)).toBe(
+      STICKY_NOTE_DEFAULT_FONT_SIZE,
+    );
+    expect(normalizeStickyNoteFontSize(-Infinity)).toBe(
+      STICKY_NOTE_DEFAULT_FONT_SIZE,
+    );
+    expect(normalizeStickyNoteFontSize(1e20)).toBe(STICKY_NOTE_MAX_FONT_SIZE);
+    expect(normalizeStickyNoteFontSize(0)).toBe(MIN_FONT_SIZE);
+    expect(normalizeStickyNoteFontSize(24)).toBe(24);
+  });
+
+  it("terminates the font fit for pathological font ceilings", () => {
+    const { scene, textId } = createStickyWithText("some text that must wrap");
+    const text = getBoundText(scene, textId);
+
+    // 1e20 - STICKY_NOTE_FONT_STEP === 1e20 in doubles: without the ceiling
+    // clamp the descent loop would never progress
+    for (const fontSizeMax of [1e20, Infinity, NaN]) {
+      scene.mutateElement(text, { fontSizeMax });
+
+      const layout = computeStickyNoteTextLayout(
+        getSticky(scene, text.containerId),
+        text,
+      );
+
+      expect(Number.isFinite(layout.fontSize)).toBe(true);
+      expect(layout.fontSize).toBeLessThanOrEqual(STICKY_NOTE_MAX_FONT_SIZE);
+      expect(Number.isFinite(layout.container.height)).toBe(true);
+    }
   });
 
   it("downscales font to fit the base size before growing height", () => {

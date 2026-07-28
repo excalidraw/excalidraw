@@ -10,6 +10,7 @@ import {
   COLOR_TOP_PICKS_SLOTS,
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
   DEFAULT_STROKE_STREAMLINE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
@@ -48,6 +49,7 @@ import { LinearElementEditor } from "@excalidraw/element";
 import {
   bumpVersion,
   clampStickyNoteProps,
+  normalizeStickyNoteFontSize,
   normalizeStickyNoteStrokeColor,
 } from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element";
@@ -537,6 +539,9 @@ export const restoreElement = (
         fontSize = parseFloat(fontPx);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
+      if (!isFiniteNumber(fontSize)) {
+        fontSize = DEFAULT_FONT_SIZE;
+      }
       const text = (typeof element.text === "string" && element.text) || "";
 
       // line-height might not be specified either when creating elements
@@ -565,7 +570,9 @@ export const restoreElement = (
         labelPosition: isFiniteNumber(element.labelPosition)
           ? clamp(element.labelPosition, 0, 1)
           : null,
-        fontSizeMax: element.fontSizeMax,
+        fontSizeMax: isFiniteNumber(element.fontSizeMax)
+          ? normalizeStickyNoteFontSize(element.fontSizeMax)
+          : undefined,
       });
 
       // if empty text, mark as deleted. We keep in array

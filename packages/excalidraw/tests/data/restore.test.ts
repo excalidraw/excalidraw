@@ -3,9 +3,11 @@ import { vi } from "vitest";
 
 import {
   COLOR_PALETTE,
+  DEFAULT_FONT_SIZE,
   DEFAULT_SIDEBAR,
   FONT_FAMILY,
   ROUNDNESS,
+  STICKY_NOTE_MAX_FONT_SIZE,
 } from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
@@ -206,6 +208,38 @@ describe("restoreElements", () => {
       seed: expect.any(Number),
       versionNonce: expect.any(Number),
     });
+  });
+
+  it("should sanitize non-finite font sizes on text elements", () => {
+    const textElement: any = API.createElement({
+      type: "text",
+      text: "text",
+    });
+    textElement.fontSize = NaN;
+    textElement.fontSizeMax = "abc";
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.fontSize).toBe(DEFAULT_FONT_SIZE);
+    expect(restoredText.fontSizeMax).toBe(undefined);
+  });
+
+  it("should clamp restored font ceilings to the sticky note maximum", () => {
+    const textElement: any = API.createElement({
+      type: "text",
+      text: "text",
+    });
+    textElement.fontSizeMax = 1e20;
+
+    const restoredText = restore.restoreElements(
+      [textElement],
+      null,
+    )[0] as ExcalidrawTextElement;
+
+    expect(restoredText.fontSizeMax).toBe(STICKY_NOTE_MAX_FONT_SIZE);
   });
 
   it("should restore freedraw element correctly", () => {

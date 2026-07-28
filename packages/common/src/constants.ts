@@ -212,6 +212,7 @@ export const FRAME_STYLE = {
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
 export const STICKY_NOTE_MIN_FONT_SIZE = 16;
+export const STICKY_NOTE_MAX_FONT_SIZE = 512;
 export const STICKY_NOTE_DEFAULT_FONT_SIZE = 28;
 export const STICKY_NOTE_FONT_STEP = 2;
 export const STICKY_NOTE_PADDING = 16;
