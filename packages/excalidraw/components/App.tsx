@@ -118,13 +118,9 @@ import {
   getCommonBounds,
   getElementAbsoluteCoords,
   bindOrUnbindBindingElements,
-  bindBindingElementToFixedPoint,
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
-  getTextBindingForArrowEndpoint,
-  getUnboundArrowEndpointAtPoint,
   isBindingEnabled,
-  isEndpointBoundText,
   updateBoundElements,
   LinearElementEditor,
   newElementWith,
@@ -230,8 +226,6 @@ import {
   getElementWithTransformHandleType,
   getTransformHandleTypeFromCoords,
   dragNewElement,
-  dragNewTextElement,
-  getEndpointBoundTextDragAnchor,
   dragSelectedElements,
   getDragOffsetXY,
   Scene,
@@ -438,6 +432,7 @@ import ConvertElementTypePopup, {
 } from "./ConvertElementTypePopup";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { AppArrowText } from "./App.arrowText";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
@@ -689,6 +684,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
+  public arrowText: AppArrowText = new AppArrowText(this);
   public viewport: AppViewport = new AppViewport(this, {
     getContainer: () => this.excalidrawContainerRef.current,
     getStylesPanelMode: () => this.stylesPanelMode,
@@ -6363,7 +6359,7 @@ class App extends React.Component<AppProps, AppState> {
     return selectedElement;
   }
 
-  private getTextElementAtPosition(
+  getTextElementAtPosition(
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawTextElement> | null {
@@ -6429,7 +6425,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
-  private getElementAtPosition(
+  getElementAtPosition(
     x: number,
     y: number,
     opts?: (
@@ -6606,128 +6602,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  /**
-   * With the text tool active, an arrow under the cursor is a target for
-   * attaching text: a free endpoint binds the arrow to a new text element,
-   * anywhere else on the arrow adds a label at its midpoint. Returns where the
-   * text would land (if anywhere), and keeps `appState.hoveredArrowTextAnchor`
-   * — which drives the highlight — in sync.
-   */
-  private updateHoveredArrowTextAnchor = (scenePointer: {
-    x: number;
-    y: number;
-  }): AppState["hoveredArrowTextAnchor"] => {
-    const hovered =
-      this.state.activeTool.type === "text" &&
-      !this.state.editingTextElement &&
-      !this.state.newElement
-        ? this.getArrowTextAnchorAtPosition(scenePointer.x, scenePointer.y)
-        : null;
-
-    const previous = this.state.hoveredArrowTextAnchor;
-
-    if (
-      previous?.elementId !== hovered?.elementId ||
-      previous?.anchor !== hovered?.anchor
-    ) {
-      this.setState({ hoveredArrowTextAnchor: hovered });
-    }
-
-    return hovered;
-  };
-
-  /**
-   * A free arrow endpoint a new text could be bound to. Binding an endpoint is
-   * an arrow binding, so it follows the binding toggle (ctrl/cmd) like every
-   * other one — holding it makes the text tool drop plain text instead.
-   */
-  private getBindableArrowEndpointAtPosition(x: number, y: number) {
-    if (!isBindingEnabled(this.state)) {
-      return null;
-    }
-
-    const endpoint = getUnboundArrowEndpointAtPoint(
-      pointFrom(x, y),
-      this.scene.getNonDeletedElements(),
-      this.scene.getNonDeletedElementsMap(),
-      this.state.zoom,
-    );
-
-    if (!endpoint) {
-      return null;
-    }
-
-    // The text tool edits before it creates: when a text element is the
-    // top-most hit at this position, a click edits that text, so a nearby
-    // endpoint must not be offered over it.
-    if (this.getTextElementAtPosition(x, y)) {
-      return null;
-    }
-
-    // The endpoint scan only knows about arrows, so it happily reaches through
-    // whatever is drawn on top of them. An element stacked above the arrow that
-    // the pointer actually hits owns the click — the text tool should label
-    // that element rather than bind the endpoint hidden behind it.
-    const hitElement = this.getElementAtPosition(x, y, {
-      includeLockedElements: true,
-    });
-
-    if (
-      hitElement &&
-      hitElement.id !== endpoint.arrow.id &&
-      this.scene.getElementIndex(hitElement.id) >
-        this.scene.getElementIndex(endpoint.arrow.id)
-    ) {
-      return null;
-    }
-
-    return endpoint;
-  }
-
-  /**
-   * Mirrors what `handleTextOnPointerDown` would do at this position, so the
-   * highlight can't promise something the click won't deliver.
-   */
-  private getArrowTextAnchorAtPosition(
-    x: number,
-    y: number,
-  ): AppState["hoveredArrowTextAnchor"] {
-    const endpoint = this.getBindableArrowEndpointAtPosition(x, y);
-
-    if (endpoint) {
-      return { elementId: endpoint.arrow.id, anchor: endpoint.startOrEnd };
-    }
-
-    const container = this.getTextBindableContainerAtPosition(x, y);
-
-    // Only arrows get a midpoint label anchor worth pointing at; other
-    // containers center the text in themselves, which needs no affordance.
-    // An arrow that already has a label is edited in place, not re-anchored.
-    if (
-      !isArrowElement(container) ||
-      getBoundTextElement(container, this.scene.getNonDeletedElementsMap())
-    ) {
-      return null;
-    }
-
-    // `getTextBindableContainerAtPosition` resolves an arrow anywhere in its
-    // bounding box, but a click only becomes a *label* when it also snaps to
-    // the arrow's center — off-center clicks drop a free-floating text
-    // instead. Gate on the same check so the highlight can't promise a label
-    // the click won't deliver.
-    const snappedToCenter = this.getTextWysiwygSnappedToCenterPosition(
-      x,
-      y,
-      this.state,
-      container,
-    );
-
-    return snappedToCenter
-      ? { elementId: container.id, anchor: "label" }
-      : null;
-  }
-
-  private getTextBindableContainerAtPosition(x: number, y: number) {
+  getTextBindableContainerAtPosition(x: number, y: number) {
     const elements = this.scene.getNonDeletedElements();
     const selectedElements = this.scene.getSelectedElements(this.state);
     if (selectedElements.length === 1) {
@@ -6819,10 +6694,8 @@ class App extends React.Component<AppProps, AppState> {
     // one the text is created with below.
     const arrowEndpointBinding =
       arrowEndpoint &&
-      getTextBindingForArrowEndpoint(
-        arrowEndpoint.arrow,
-        arrowEndpoint.startOrEnd,
-        this.scene.getNonDeletedElementsMap(),
+      this.arrowText.getTextBinding(
+        arrowEndpoint,
         this.getCurrentItemStrokeWidth("text"),
       );
 
@@ -6999,12 +6872,10 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (arrowEndpoint && arrowEndpointBinding) {
-      bindBindingElementToFixedPoint(
-        arrowEndpoint.arrow,
+      this.arrowText.bindText(
+        arrowEndpoint,
         element,
-        arrowEndpoint.startOrEnd,
         arrowEndpointBinding.fixedPoint,
-        this.scene,
       );
     }
 
@@ -8194,7 +8065,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const hoveredArrowTextAnchor =
-      this.updateHoveredArrowTextAnchor(scenePointer);
+      this.arrowText.updateHoveredAnchor(scenePointer);
 
     if (
       !this.handleIframeLikeElementHover({
@@ -9868,7 +9739,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // a free arrow endpoint takes precedence over adding a label *to* the
     // arrow — it's the smaller, more deliberate target
-    const arrowEndpoint = this.getBindableArrowEndpointAtPosition(
+    const arrowEndpoint = this.arrowText.getBindableEndpointAtPosition(
       sceneX,
       sceneY,
     );
@@ -13370,19 +13241,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    // A text bound to an arrow endpoint can't be positioned by the drag — the
-    // binding already placed it — so only its width is dragged out.
-    if (
-      isTextElement(newElement) &&
-      isEndpointBoundText(newElement, this.scene.getNonDeletedElementsMap())
-    ) {
-      dragNewTextElement({
-        newElement,
-        ...getEndpointBoundTextDragAnchor(newElement),
-        pointerX: pointerCoords.x,
-        zoom: this.state.zoom.value,
-        scene: this.scene,
-      });
+    if (this.arrowText.maybeDragNewText(newElement, pointerCoords)) {
       return;
     }
 
@@ -13894,7 +13753,7 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
-  private getTextWysiwygSnappedToCenterPosition(
+  getTextWysiwygSnappedToCenterPosition(
     x: number,
     y: number,
     appState: AppState,

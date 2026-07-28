@@ -17,7 +17,6 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { unbindBindingElement, updateBoundElements } from "./binding";
 import { getCommonBounds } from "./bounds";
-import { getTextAnchorRatios } from "./newElement";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { getBoundTextElement } from "./textElement";
 import { getMinTextElementWidth } from "./textMeasurements";
@@ -293,18 +292,6 @@ export const dragNewTextElement = ({
     },
     { informMutation, isDragging: false },
   );
-};
-
-/** the anchor a text bound to an arrow endpoint grows away from */
-export const getEndpointBoundTextDragAnchor = (
-  newElement: ExcalidrawTextElement,
-) => {
-  const anchorRatio = getTextAnchorRatios(newElement).x;
-
-  return {
-    anchorRatio,
-    anchorX: newElement.x + newElement.width * anchorRatio,
-  };
 };
 
 export const dragNewElement = ({
