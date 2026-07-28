@@ -431,6 +431,85 @@ describe("binding text to an arrow endpoint", () => {
     );
   });
 
+  describe("drag-sizing", () => {
+    /** press at the endpoint, drag to `toX`, release */
+    const dragTextAt = async (
+      [x, y]: [number, number],
+      toX: number,
+      text: string,
+    ) => {
+      UI.clickTool("text");
+      mouse.moveTo(x, y);
+      mouse.downAt(x, y);
+      // several moves so the drag registers
+      for (let i = 1; i <= 4; i++) {
+        mouse.moveTo(x + ((toX - x) * i) / 4, y);
+      }
+      mouse.upAt(toX, y);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, text);
+      return editor;
+    };
+
+    it("sets a fixed width without moving the anchor (left-bound)", async () => {
+      API.setElements([createArrow("arrow", [100, 100], [300, 100])]);
+
+      // arrow points right, so the text hangs off its left edge at x = tip+gap
+      await dragTextAt([300, 100], 520, "a label long enough to wrap");
+
+      const text = getText();
+      expect(text.autoResize).toBe(false);
+      expect(text.textAlign).toBe("left");
+      // left edge is the anchor and must be untouched by the drag
+      expect(text.x).toBeCloseTo(306, 0);
+      expect(text.width).toBeCloseTo(214, 0);
+    });
+
+    it("grows leftwards for a right-bound text, pinning its right edge", async () => {
+      API.setElements([createArrow("arrow", [500, 100], [300, 100])]);
+
+      await dragTextAt([300, 100], 80, "a label long enough to wrap");
+
+      const text = getText();
+      expect(text.autoResize).toBe(false);
+      expect(text.textAlign).toBe("right");
+      // the right edge is the anchor
+      expect(text.x + text.width).toBeCloseTo(294, 0);
+    });
+
+    it("keeps a centred text centred on the anchor", async () => {
+      API.setElements([createArrow("arrow", [300, 100], [300, 300])]);
+
+      await dragTextAt([300, 300], 430, "a label long enough to wrap");
+
+      const text = getText();
+      expect(text.autoResize).toBe(false);
+      expect(text.textAlign).toBe("center");
+      expect(text.x + text.width / 2).toBeCloseTo(300, 0);
+    });
+
+    it("does not let the drag run back over the arrow", async () => {
+      API.setElements([createArrow("arrow", [100, 100], [300, 100])]);
+
+      // drag towards the arrow, i.e. the wrong side of the anchor
+      await dragTextAt([300, 100], 150, "label");
+
+      const text = getText();
+      // treated as no drag at all — the text keeps autogrowing
+      expect(text.autoResize).toBe(true);
+      expect(text.x).toBeCloseTo(306, 0);
+    });
+
+    it("leaves the arrow endpoint where it was", async () => {
+      API.setElements([createArrow("arrow", [100, 100], [300, 100])]);
+      const tipBefore = endpointOf(getArrow("arrow"), "end");
+
+      await dragTextAt([300, 100], 520, "a label long enough to wrap");
+
+      expectPointsClose(endpointOf(getArrow("arrow"), "end"), tipBefore);
+    });
+  });
+
   describe("occlusion", () => {
     const coveringRect = (overrides: Record<string, unknown> = {}) =>
       API.createElement({

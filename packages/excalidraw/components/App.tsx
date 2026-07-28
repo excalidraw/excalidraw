@@ -229,6 +229,8 @@ import {
   getElementWithTransformHandleType,
   getTransformHandleTypeFromCoords,
   dragNewElement,
+  dragNewTextElement,
+  getEndpointBoundTextDragAnchor,
   dragSelectedElements,
   getDragOffsetXY,
   Scene,
@@ -9865,9 +9867,9 @@ class App extends React.Component<AppProps, AppState> {
       this.startTextEditing({
         sceneX: arrowEndpointBinding.anchor[0],
         sceneY: arrowEndpointBinding.anchor[1],
-        // the anchor is fixed, so there's nothing to drag out — go straight
-        // to the editor rather than through the drag-to-size flow
-        autoEdit: true,
+        // the position is fixed by the binding, but the width is still the
+        // user's to drag out (see `dragNewEndpointBoundTextElement`)
+        autoEdit: false,
         arrowEndpointBinding: {
           arrow: arrowEndpoint.arrow,
           startOrEnd: arrowEndpoint.startOrEnd,
@@ -13360,6 +13362,24 @@ class App extends React.Component<AppProps, AppState> {
 
     const newElement = this.state.newElement;
     if (!newElement) {
+      return;
+    }
+
+    // A text bound to an arrow endpoint can't be positioned by the drag — the
+    // binding already placed it — so only its width is dragged out. A text
+    // being created is unbound unless it was created at an endpoint, which
+    // records the arrow among its bound elements.
+    if (
+      isTextElement(newElement) &&
+      newElement.boundElements?.some(({ type }) => type === "arrow")
+    ) {
+      dragNewTextElement({
+        newElement,
+        ...getEndpointBoundTextDragAnchor(newElement),
+        pointerX: pointerCoords.x,
+        zoom: this.state.zoom.value,
+        scene: this.scene,
+      });
       return;
     }
 

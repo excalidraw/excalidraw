@@ -218,6 +218,25 @@ export const newMagicFrameElement = (
   return frameElement;
 };
 
+/**
+ * The point of the text box its alignment pins, as ratios of width/height.
+ *
+ * This is the point that stays put as the text grows — see the sides passed to
+ * `adjustXYWithRotation` in `getAdjustedDimensions`.
+ */
+export const getTextAnchorRatios = (opts: {
+  textAlign: ExcalidrawTextElement["textAlign"];
+  verticalAlign: ExcalidrawTextElement["verticalAlign"];
+}) => ({
+  x: opts.textAlign === "center" ? 0.5 : opts.textAlign === "right" ? 1 : 0,
+  y:
+    opts.verticalAlign === VERTICAL_ALIGN.MIDDLE
+      ? 0.5
+      : opts.verticalAlign === VERTICAL_ALIGN.BOTTOM
+      ? 1
+      : 0,
+});
+
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
   opts: {
@@ -229,19 +248,11 @@ const getTextElementPositionOffsets = (
     height: number;
   },
 ) => {
+  const ratios = getTextAnchorRatios(opts);
+
   return {
-    x:
-      opts.textAlign === "center"
-        ? metrics.width / 2
-        : opts.textAlign === "right"
-        ? metrics.width
-        : 0,
-    y:
-      opts.verticalAlign === "middle"
-        ? metrics.height / 2
-        : opts.verticalAlign === "bottom"
-        ? metrics.height
-        : 0,
+    x: metrics.width * ratios.x,
+    y: metrics.height * ratios.y,
   };
 };
 
