@@ -389,6 +389,14 @@
     padding: 0 0.25rem;
   }
 
+  .color-picker__input-error {
+    color: var(--color-danger);
+    font-size: 0.7rem;
+    padding: 0 12px 4px;
+    margin: -4px 8px 0;
+    line-height: 1.2;
+  }
+
   .color-picker-input {
     box-sizing: border-box;
     width: 100%;
