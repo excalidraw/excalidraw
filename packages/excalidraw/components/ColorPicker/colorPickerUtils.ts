@@ -100,3 +100,22 @@ export type ColorPickerType =
   | "canvasBackground"
   | "elementBackground"
   | "elementStroke";
+
+export type HexColorInputError = "invalidCharacters" | "invalidLength";
+
+/** Validates hex input in the color picker's # field (3/4/6/8 hex digits). */
+export const getHexColorInputError = (
+  value: string,
+): HexColorInputError | null => {
+  const hex = value.trim().replace(/^#/, "");
+  if (!hex) {
+    return null;
+  }
+  if (!/^[0-9a-fA-F]+$/.test(hex)) {
+    return "invalidCharacters";
+  }
+  if (![3, 4, 6, 8].includes(hex.length)) {
+    return "invalidLength";
+  }
+  return null;
+};
