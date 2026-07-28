@@ -29,6 +29,7 @@ export const ColorInput = ({
 }) => {
   const editorInterface = useEditorInterface();
   const [innerValue, setInnerValue] = useState(color);
+  const [isInvalid, setIsInvalid] = useState(false);
   const [activeSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
@@ -44,6 +45,9 @@ export const ColorInput = ({
 
       if (color) {
         onChange(color);
+        setIsInvalid(false);
+      } else {
+        setIsInvalid(true);
       }
       setInnerValue(value);
     },
@@ -82,6 +86,7 @@ export const ColorInput = ({
         value={(innerValue || "").replace(/^#/, "")}
         onBlur={() => {
           setInnerValue(color);
+          setIsInvalid(false);
         }}
         tabIndex={-1}
         onFocus={() => setActiveColorPickerSection("hex")}
@@ -128,6 +133,11 @@ export const ColorInput = ({
             {eyeDropperIcon}
           </div>
         </>
+      )}
+      {isInvalid && (
+        <div className="color-picker__input-error">
+          {t("colorPicker.invalidHex")}
+        </div>
       )}
     </div>
   );

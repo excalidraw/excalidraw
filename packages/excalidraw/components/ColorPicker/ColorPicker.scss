@@ -389,6 +389,15 @@
     padding: 0 0.25rem;
   }
 
+  .color-picker__input-error {
+    grid-column: 1 / -1;
+    color: var(--color-danger-color);
+    font-size: 0.7rem;
+    padding: 0 0.25rem;
+    margin-top: -4px;
+    line-height: 1.2;
+  }
+
   .color-picker-input {
     box-sizing: border-box;
     width: 100%;
