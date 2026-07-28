@@ -11,6 +11,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -498,6 +499,29 @@ describe("binding text to an arrow endpoint", () => {
       // treated as no drag at all — the text keeps autogrowing
       expect(text.autoResize).toBe(true);
       expect(text.x).toBeCloseTo(306, 0);
+    });
+
+    // the autoResize handle unwraps the text back to one line; anchoring that
+    // resize by alignment is what keeps the arrow still
+    it("does not move the arrow when the text is un-wrapped", async () => {
+      API.setElements([createArrow("arrow", [500, 100], [300, 100])]);
+      const tipBefore = endpointOf(getArrow("arrow"), "end");
+
+      // grows leftwards off the text's right edge
+      await dragTextAt([300, 100], 80, "a label long enough to wrap");
+      Keyboard.exitTextEditor(await getTextEditor());
+
+      const text = getText();
+      expect(text.autoResize).toBe(false);
+      const rightEdge = text.x + text.width;
+
+      API.setAppState({ selectedElementIds: { [text.id]: true } });
+      API.executeAction(actionTextAutoResize);
+
+      const resized = getText();
+      expect(resized.autoResize).toBe(true);
+      expect(resized.x + resized.width).toBeCloseTo(rightEdge, 4);
+      expectPointsClose(endpointOf(getArrow("arrow"), "end"), tipBefore);
     });
 
     it("leaves the arrow endpoint where it was", async () => {

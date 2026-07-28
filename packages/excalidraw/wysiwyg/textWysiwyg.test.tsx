@@ -40,6 +40,7 @@ import {
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
 import { actionBindText } from "../actions";
+import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 
 const { h } = window;
 
@@ -1966,6 +1967,82 @@ describe("textWysiwyg", () => {
       });
       expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
     });
+  });
+
+  describe("autoResize handle", () => {
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      API.setElements([]);
+    });
+
+    const wrappedText = (
+      overrides: Partial<ExcalidrawTextElement> = {},
+    ): ExcalidrawTextElement =>
+      API.createElement({
+        type: "text",
+        id: "text",
+        x: 100,
+        y: 100,
+        width: 300,
+        height: 50,
+        text: "this is it my friends\nald aksdl askdlasdk",
+        originalText: "this is it my friends ald aksdl askdlasdk",
+        autoResize: false,
+        ...overrides,
+      }) as ExcalidrawTextElement;
+
+    // unwrapping resizes the box, so whichever edge the alignment pins has to
+    // stay put — otherwise the text slides out from under itself
+    it.each([
+      { textAlign: "left" as const, edge: (t: ExcalidrawTextElement) => t.x },
+      {
+        textAlign: "right" as const,
+        edge: (t: ExcalidrawTextElement) => t.x + t.width,
+      },
+      {
+        textAlign: "center" as const,
+        edge: (t: ExcalidrawTextElement) => t.x + t.width / 2,
+      },
+    ])("keeps the $textAlign anchor when unwrapping", ({ textAlign, edge }) => {
+      API.setElements([wrappedText({ textAlign })]);
+      API.setAppState({ selectedElementIds: { text: true } });
+      const before = edge(h.elements[0] as ExcalidrawTextElement);
+
+      API.executeAction(actionTextAutoResize);
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      // the box really did change size, so the assertion isn't vacuous
+      expect(text.width).not.toBeCloseTo(300, 0);
+      expect(edge(text)).toBeCloseTo(before, 4);
+    });
+
+    it.each([
+      {
+        verticalAlign: "top" as const,
+        edge: (t: ExcalidrawTextElement) => t.y,
+      },
+      {
+        verticalAlign: "bottom" as const,
+        edge: (t: ExcalidrawTextElement) => t.y + t.height,
+      },
+      {
+        verticalAlign: "middle" as const,
+        edge: (t: ExcalidrawTextElement) => t.y + t.height / 2,
+      },
+    ])(
+      "keeps the $verticalAlign anchor when unwrapping",
+      ({ verticalAlign, edge }) => {
+        API.setElements([wrappedText({ verticalAlign })]);
+        API.setAppState({ selectedElementIds: { text: true } });
+        const before = edge(h.elements[0] as ExcalidrawTextElement);
+
+        API.executeAction(actionTextAutoResize);
+
+        const text = h.elements[0] as ExcalidrawTextElement;
+        expect(edge(text)).toBeCloseTo(before, 4);
+      },
+    );
   });
 
   describe("history", () => {

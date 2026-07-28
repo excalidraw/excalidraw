@@ -1,6 +1,10 @@
 import { getFontString } from "@excalidraw/common";
 
-import { isExcalidrawElement, newElementWith } from "@excalidraw/element";
+import {
+  getTextAnchorRatios,
+  isExcalidrawElement,
+  newElementWith,
+} from "@excalidraw/element";
 import { measureText } from "@excalidraw/element";
 
 import { isTextElement } from "@excalidraw/element";
@@ -44,10 +48,17 @@ export const actionTextAutoResize = register({
             element.lineHeight,
           );
 
+          // unwrapping resizes the box, so keep the point the text's alignment
+          // pins — otherwise a right-aligned or centred text slides sideways,
+          // and one bound to an arrow endpoint drags the arrow with it
+          const anchor = getTextAnchorRatios(element);
+
           return newElementWith(element, {
             autoResize: true,
             width: metrics.width,
             height: metrics.height,
+            x: element.x + (element.width - metrics.width) * anchor.x,
+            y: element.y + (element.height - metrics.height) * anchor.y,
             text: element.originalText,
           });
         }
