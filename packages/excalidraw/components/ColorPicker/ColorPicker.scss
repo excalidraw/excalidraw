@@ -421,6 +421,29 @@
     &:focus-visible {
       box-shadow: none;
     }
+
+    &--invalid {
+      color: var(--color-danger, #e03131);
+    }
+  }
+
+  .color-picker-input__error-indicator {
+    color: var(--color-danger, #e03131);
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1;
+    cursor: default;
+    user-select: none;
+  }
+
+  .color-picker__input-label {
+    &:focus-within:has(.color-picker-input--invalid) {
+      box-shadow: 0 0 0 1px var(--color-danger, #e03131);
+    }
+
+    &:has(.color-picker-input--invalid) {
+      border-color: var(--color-danger, #e03131);
+    }
   }
 
   .color-picker-label-swatch-container {
