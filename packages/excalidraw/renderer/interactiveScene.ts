@@ -121,12 +121,7 @@ const renderElbowArrowMidPointHighlight = (
 
   invariant(segmentMidPointHoveredCoords, "midPointCoords is null");
 
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(segmentMidPointHoveredCoords, context, appState);
-
-  context.restore();
 };
 
 const renderLinearElementPointHighlight = (
@@ -156,18 +151,18 @@ const renderLinearElementPointHighlight = (
     hoverPointIndex,
     elementsMap,
   );
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(point, context, appState);
-  context.restore();
 };
 
+/** draws the point marker in scene coordinates */
 const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
 ) => {
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
 
   fillCircle(
@@ -177,19 +172,43 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
-};
-
-const renderFocusPointHighlight = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  focusPoint: GlobalPoint,
-) => {
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
-  highlightPoint(focusPoint, context, appState);
 
   context.restore();
+};
+
+/**
+ * Marks where on the hovered arrow the text tool would attach text — a free
+ * endpoint, or the midpoint the arrow's label would center on.
+ *
+ * Purely presentational: `AppArrowText` maintains the anchor at every event
+ * that can change it (pointermove, the ctrl/cmd binding toggle, pointerdown,
+ * tool switches, finalize). The element lookup below only guards against the
+ * arrow vanishing through channels no local event covers, e.g. a collaborator
+ * deleting it.
+ */
+const renderHoveredArrowTextAnchor = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  elementsMap: ElementsMap,
+) => {
+  const { elementId, anchor } = appState.hoveredArrowTextAnchor!;
+
+  const element = elementsMap.get(elementId);
+
+  if (!element || !isArrowElement(element) || element.isDeleted) {
+    return;
+  }
+
+  const point =
+    anchor === "label"
+      ? LinearElementEditor.getBoundTextElementCenter(element, elementsMap)
+      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          element,
+          anchor === "start" ? 0 : -1,
+          elementsMap,
+        );
+
+  highlightPoint(point, context, appState);
 };
 
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
@@ -1319,7 +1338,7 @@ const renderFocusPointIndicator = ({
     linearState?.hoveredFocusPointBinding === type &&
     !linearState.draggedFocusPointBinding
   ) {
-    renderFocusPointHighlight(context, appState, focusPoint);
+    highlightPoint(focusPoint, context, appState);
   }
 
   // render focus point
@@ -1682,6 +1701,10 @@ const _renderInteractiveScene = ({
       ...animationState,
       bindingHighlight: undefined,
     };
+  }
+
+  if (appState.hoveredArrowTextAnchor) {
+    renderHoveredArrowTextAnchor(context, appState, allElementsMap);
   }
 
   if (appState.frameToHighlight) {

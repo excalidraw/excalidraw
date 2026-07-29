@@ -46,7 +46,11 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getFrameLikeElements } from "./frame";
-import { isLinearElement, isUsingAdaptiveRadius } from "./typeChecks";
+import {
+  isLinearElement,
+  isLineElement,
+  isUsingAdaptiveRadius,
+} from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 
 declare global {
@@ -590,20 +594,11 @@ export const convertToShape = (
     case "arrow": {
       const [arrowX, arrowY] = recognizedShape.points[0];
 
-      let globalEndX: number;
-      let globalEndY: number;
-      if (previousElement && previousElement.type === "line") {
-        const prevEndLocal = previousElement.points[1];
-        // No need for rotation handling
-        globalEndX = prevEndLocal[0] + previousElement.x;
-        globalEndY = prevEndLocal[1] + previousElement.y;
-      } else {
-        [globalEndX, globalEndY] = getArrowEndpoint(
-          recognizedShape.points,
-          recognizedShape.boundingBox,
-          recognizedShape.points[0],
-        );
-      }
+      const [globalEndX, globalEndY] = getArrowEndpoint(
+        recognizedShape.points,
+        recognizedShape.boundingBox,
+        recognizedShape.points[0],
+      );
       const endPoint: LocalPoint = pointFrom<LocalPoint>(
         globalEndX - arrowX,
         globalEndY - arrowY,
@@ -787,7 +782,11 @@ export const convertToShapeHandlePointerMoveFromPointerDown = (
         app.scene.getNonDeletedFramesLikes(),
       ) as ExcalidrawNonSelectionElement | undefined;
 
-      if (shapePreview) {
+      // Lines get no live preview — nearly every stroke reads as a line at
+      // some early point, so previewing them is mostly flicker. Releasing
+      // still commits the line: finalize() re-recognizes from the trail when
+      // no preview exists.
+      if (shapePreview && !isLineElement(shapePreview)) {
         const prevPreview = app.state.newElement;
         const nextPreview = {
           ...shapePreview,

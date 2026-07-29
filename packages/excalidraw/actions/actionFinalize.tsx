@@ -193,6 +193,7 @@ export const actionFinalize = register<FormData>({
                   },
             selectionElement: null,
             suggestedBinding: null,
+            hoveredArrowTextAnchor: null,
             newElement: null,
             multiElement: null,
           },
@@ -398,6 +399,7 @@ export const actionFinalize = register<FormData>({
         multiElement: null,
         editingTextElement: null,
         suggestedBinding: null,
+        hoveredArrowTextAnchor: null,
         frameToHighlight: null,
         selectedElementIds: isDrawShapeTool
           ? {}

@@ -258,6 +258,7 @@ const getRelevantAppStateProps = (
   isMidpointSnappingEnabled: appState.isMidpointSnappingEnabled,
   gridModeEnabled: appState.gridModeEnabled,
   suggestedBinding: appState.suggestedBinding,
+  hoveredArrowTextAnchor: appState.hoveredArrowTextAnchor,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
   collaborators: appState.collaborators, // Necessary for collab. sessions
