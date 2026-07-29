@@ -94,6 +94,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    min-width: 0;
     padding: 0.75rem;
     font-size: 0.875rem;
   }
@@ -103,6 +104,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 0;
   }
 
   .review-sidebar-composer label,
@@ -114,6 +116,7 @@
 
   .review-sidebar-composer textarea,
   .review-sidebar-reply input {
+    box-sizing: border-box;
     width: 100%;
     border: 1px solid var(--default-border-color);
     border-radius: var(--border-radius-md);
@@ -129,6 +132,7 @@
   }
 
   .review-sidebar button {
+    box-sizing: border-box;
     border: 1px solid var(--default-border-color);
     border-radius: var(--border-radius-md);
     background: var(--button-gray-1);
@@ -151,9 +155,12 @@
 
   .review-sidebar-thread,
   .review-sidebar-notification {
+    box-sizing: border-box;
     border: 1px solid var(--default-border-color);
     border-radius: var(--border-radius-md);
     padding: 0.625rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .review-sidebar-thread {
