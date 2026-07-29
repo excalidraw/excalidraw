@@ -15,6 +15,7 @@ import {
 } from "@excalidraw/common";
 
 import type { AppState, NormalizedZoomValue } from "./types";
+import { getDefaultReviewData } from "./review";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio
@@ -28,6 +29,7 @@ export const getDefaultAppState = (): Omit<
     showWelcomeScreen: false,
     theme: THEME.LIGHT,
     collaborators: new Map(),
+    review: getDefaultReviewData(),
     currentItemBackgroundColor: DEFAULT_ELEMENT_PROPS.backgroundColor,
     currentItemEndArrowhead: "arrow",
     currentItemFillStyle: DEFAULT_ELEMENT_PROPS.fillStyle,
@@ -154,6 +156,7 @@ const APP_STATE_STORAGE_CONF = (<
   showWelcomeScreen: { browser: true, export: false, server: false },
   theme: { browser: true, export: false, server: false },
   collaborators: { browser: false, export: false, server: false },
+  review: { browser: true, export: true, server: true },
   currentItemBackgroundColor: { browser: true, export: false, server: false },
   currentItemEndArrowhead: { browser: true, export: false, server: false },
   currentItemFillStyle: { browser: true, export: false, server: false },

@@ -418,6 +418,25 @@ export {
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
+  addReviewComment,
+  getDefaultReviewData,
+  getReviewThreadsForElement,
+  getUnresolvedReviewThreads,
+  markReviewNotificationRead,
+  parseReviewMentions,
+  REVIEW_REACTIONS,
+  setReviewThreadResolved,
+  toggleReviewReaction,
+} from "./review";
+export type {
+  ReviewComment,
+  ReviewData,
+  ReviewNotification,
+  ReviewReaction,
+  ReviewThread,
+  ReviewUser,
+} from "./review";
+export {
   loadFromBlob,
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,

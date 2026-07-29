@@ -60,6 +60,7 @@ import type Library from "./data/library";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
+import type { ReviewData } from "./review";
 import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
@@ -500,6 +501,7 @@ export interface AppState {
 
   fileHandle: FileSystemFileHandle | null;
   collaborators: Map<SocketId, Collaborator>;
+  review: ReviewData;
   stats: {
     open: boolean;
     /** bitmap. Use `STATS_PANELS` bit values */
