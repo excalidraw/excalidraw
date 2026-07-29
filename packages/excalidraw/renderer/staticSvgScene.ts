@@ -47,6 +47,93 @@ import type { AppState, BinaryFiles } from "../types";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 
+export const CHALK_SVG_FILTER_ID = "excalidraw-chalk";
+
+/**
+ * Builds the shared chalk <filter> for SVG export and appends it to `defs`.
+ * feTurbulence + feDisplacementMap roughens the edges; a second, thresholded
+ * turbulence is composited in to punch grain holes into the coverage — the SVG
+ * analogue of the canvas `destination-out` noise erosion.
+ */
+export const appendChalkSvgFilter = (defs: SVGElement) => {
+  const ns = defs.ownerDocument.createElementNS.bind(defs.ownerDocument);
+  const el = (tag: string, attrs: Record<string, string>) => {
+    const node = ns(SVG_NS, tag) as SVGElement;
+    for (const [k, v] of Object.entries(attrs)) {
+      node.setAttribute(k, v);
+    }
+    return node;
+  };
+
+  const filter = el("filter", {
+    id: CHALK_SVG_FILTER_ID,
+    x: "-6%",
+    y: "-6%",
+    width: "112%",
+    height: "112%",
+    "color-interpolation-filters": "sRGB",
+  });
+
+  // 1) roughen the edges (kept subtle so strokes stay straight-ish like the
+  //    canvas erosion, which nicks edges rather than waving them)
+  filter.appendChild(
+    el("feTurbulence", {
+      type: "fractalNoise",
+      baseFrequency: "0.9",
+      numOctaves: "2",
+      seed: "7",
+      stitchTiles: "stitch",
+      result: "chalkNoise",
+    }),
+  );
+  filter.appendChild(
+    el("feDisplacementMap", {
+      in: "SourceGraphic",
+      in2: "chalkNoise",
+      scale: "1.2",
+      xChannelSelector: "R",
+      yChannelSelector: "G",
+      result: "chalkRough",
+    }),
+  );
+  // 2) grain holes: ~2px-wavelength noise (matching the canvas GRAIN_CELL of 2px)
+  //    thresholded to a mostly-opaque 0/1 alpha mask with sparse holes
+  filter.appendChild(
+    el("feTurbulence", {
+      type: "fractalNoise",
+      baseFrequency: "0.5",
+      numOctaves: "2",
+      seed: "13",
+      stitchTiles: "stitch",
+      result: "chalkGrain",
+    }),
+  );
+  filter.appendChild(
+    el("feColorMatrix", {
+      in: "chalkGrain",
+      type: "matrix",
+      // alpha_out = 3.8*R - 0.95 (clamped) -> ~22% holes, matching canvas density
+      values: [
+        "0 0 0 0 0",
+        "0 0 0 0 0",
+        "0 0 0 0 0",
+        "3.8 0 0 0 -0.95",
+      ].join(" "),
+      result: "chalkMask",
+    }),
+  );
+  // keep the roughened graphic only where the mask is opaque -> broken coverage
+  filter.appendChild(
+    el("feComposite", {
+      in: "chalkRough",
+      in2: "chalkMask",
+      operator: "in",
+    }),
+  );
+
+  defs.appendChild(filter);
+};
+
 const roughSVGDrawWithPrecision = (
   rsvg: RoughSVG,
   drawable: Drawable,
@@ -130,6 +217,12 @@ const renderElementToSvg = (
   const addToRoot = (node: SVGElement, element: ExcalidrawElement) => {
     if (isTestEnv()) {
       node.setAttribute("data-id", element.id);
+    }
+    // chalk: texture strokes/fills and text glyphs via a shared SVG filter
+    // (the raster path grains per-element canvases; SVG uses feTurbulence).
+    // Skipped for images, matching the canvas renderer.
+    if (element.chalk && element.type !== "image") {
+      node.setAttribute("filter", `url(#${CHALK_SVG_FILTER_ID})`);
     }
     root.appendChild(node);
   };

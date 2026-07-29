@@ -65,19 +65,11 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
   },
-  [FONT_FAMILY["Chalk Serif"]]: {
+  [FONT_FAMILY.Neucha]: {
     metrics: {
-      unitsPerEm: 1000,
-      ascender: 709,
-      descender: -200,
-      lineHeight: 1.25,
-    },
-  },
-  [FONT_FAMILY["Rob Graves"]]: {
-    metrics: {
-      unitsPerEm: 2048,
-      ascender: 1621,
-      descender: -359,
+      unitsPerEm: 1024,
+      ascender: 787,
+      descender: -292,
       lineHeight: 1.25,
     },
   },

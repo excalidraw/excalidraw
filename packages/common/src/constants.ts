@@ -138,8 +138,7 @@ export const FONT_FAMILY = {
   "Comic Shanns": 8,
   "Liberation Sans": 9,
   Assistant: 10,
-  "Chalk Serif": 11,
-  "Rob Graves": 12,
+  Neucha: 13,
 };
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠

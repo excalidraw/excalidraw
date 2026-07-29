@@ -89,8 +89,13 @@ export const applyChalkTexture = (
   context: CanvasRenderingContext2D,
   width: number,
   height: number,
+  /**
+   * 0..1 multiplier on how much grain bites. Text uses a lower value so small
+   * glyph strokes don't erode away; shapes use the full amount.
+   */
+  intensity: number = 1,
 ): void => {
-  if (!CHALK_TEXTURE_ENABLED) {
+  if (!CHALK_TEXTURE_ENABLED || intensity <= 0) {
     return;
   }
 
@@ -108,6 +113,7 @@ export const applyChalkTexture = (
   // work in raw device pixels regardless of any element transform in effect
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.globalCompositeOperation = "destination-out";
+  context.globalAlpha = Math.min(1, intensity);
   context.fillStyle = pattern;
   context.fillRect(0, 0, width, height);
   context.restore();

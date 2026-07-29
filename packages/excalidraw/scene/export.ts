@@ -56,7 +56,10 @@ import { serializeAsJSON } from "../data/json";
 import { Fonts } from "../fonts";
 
 import { renderStaticScene } from "../renderer/staticScene";
-import { renderSceneToSvg } from "../renderer/staticSvgScene";
+import {
+  appendChalkSvgFilter,
+  renderSceneToSvg,
+} from "../renderer/staticSvgScene";
 
 import type { RenderableElementsMap } from "./types";
 
@@ -368,6 +371,9 @@ export const exportToSvg = async (
   svgRoot.appendChild(createHTMLComment("svg-source:excalidraw"));
   svgRoot.appendChild(metadataElement);
   svgRoot.appendChild(defsElement);
+
+  // chalk: define the shared grain filter referenced by chalk-enabled elements
+  appendChalkSvgFilter(defsElement);
 
   // ---------------------------------------------------------------------------
   // scene embed
