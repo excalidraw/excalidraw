@@ -105,8 +105,8 @@ export const EyeDropper: React.FC<{
     }) => {
       const { top, left } = positionElementBesideCursor({
         cursor: {
-          x: clientX - appState.offsetLeft, //zsviczian added offset
-          y: clientY - appState.offsetTop, //zsviczian added offset
+          x: clientX,
+          y: clientY,
         },
         element: {
           width: colorPreviewDiv.offsetWidth,
