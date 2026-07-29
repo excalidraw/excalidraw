@@ -420,6 +420,7 @@ import {
   getViewportForZoomWithScrollConstraints,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
+import { ReviewAttributionBadge } from "../components/ReviewAttributionBadge";
 import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
@@ -2457,6 +2458,15 @@ class App extends React.Component<AppProps, AppState> {
                             ]}
                           />
                           {this.isDefaultUIEnabled() && <CursorHint />}
+                          {this.isDefaultUIEnabled() &&
+                            selectedElements.length === 1 &&
+                            this.state.openDialog?.name !==
+                              "elementLinkSelector" && (
+                              <ReviewAttributionBadge
+                                element={firstSelectedElement}
+                                elementsMap={renderableElementsMap}
+                              />
+                            )}
                           {this.isDefaultUIEnabled() &&
                             selectedElements.length === 1 &&
                             this.state.openDialog?.name !==

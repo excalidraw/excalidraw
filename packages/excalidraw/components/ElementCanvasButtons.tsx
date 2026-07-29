@@ -31,10 +31,12 @@ const getContainerCoords = (
 
 export const ElementCanvasButtons = ({
   children,
+  className,
   element,
   elementsMap,
 }: {
   children: React.ReactNode;
+  className?: string;
   element: NonDeletedExcalidrawElement;
   elementsMap: ElementsMap;
 }) => {
@@ -55,7 +57,9 @@ export const ElementCanvasButtons = ({
 
   return (
     <div
-      className="excalidraw-canvas-buttons"
+      className={["excalidraw-canvas-buttons", className]
+        .filter(Boolean)
+        .join(" ")}
       style={{
         top: `${y}px`,
         left: `${x}px`,
