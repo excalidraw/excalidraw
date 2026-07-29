@@ -420,6 +420,7 @@ export interface AppState {
   currentItemStrokeWidthKey: StrokeWidthKey;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
+  currentItemChalk: boolean;
   currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;

@@ -39,6 +39,12 @@ export const DEFAULT_FONTS = [
     text: t("labels.code"),
     testId: "font-family-code",
   },
+  {
+    value: FONT_FAMILY["Chalk Serif"],
+    icon: FreedrawIcon,
+    text: t("labels.chalk"),
+    testId: "font-family-chalk",
+  },
 ];
 
 const defaultFontFamilies = new Set(DEFAULT_FONTS.map((x) => x.value));

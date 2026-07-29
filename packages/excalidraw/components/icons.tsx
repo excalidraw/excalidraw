@@ -1249,6 +1249,20 @@ export const SloppinessCartoonistIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const ChalkOffIcon = createIcon(
+  <path d="M3 12h14" strokeWidth="1.5" />,
+  modifiedTablerIconProps,
+);
+
+export const ChalkOnIcon = createIcon(
+  <path
+    d="M3 12h1.4m1 0h.7m1.1 0h2.2m1 0h.6m1.2 0h1m1.1 0h.7m1 0h1"
+    strokeWidth="1.75"
+    strokeLinecap="round"
+  />,
+  modifiedTablerIconProps,
+);
+
 export const strokeVariabilityConstantIcon = createIcon(
   <g>
     <path

@@ -69,6 +69,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "strokeColor"
   | "backgroundColor"
   | "roughness"
+  | "chalk"
   | "strokeWidth"
   | "roundness"
   | "locked"
@@ -87,6 +88,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     strokeWidth = DEFAULT_ELEMENT_PROPS.strokeWidth,
     strokeStyle = DEFAULT_ELEMENT_PROPS.strokeStyle,
     roughness = DEFAULT_ELEMENT_PROPS.roughness,
+    chalk = DEFAULT_ELEMENT_PROPS.chalk,
     opacity = DEFAULT_ELEMENT_PROPS.opacity,
     width = 0,
     height = 0,
@@ -141,6 +143,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     strokeWidth,
     strokeStyle,
     roughness,
+    chalk,
     opacity,
     groupIds,
     frameId,

@@ -48,6 +48,8 @@ type _ExcalidrawElementBase = Readonly<{
   strokeStyle: StrokeStyle;
   roundness: null | { type: RoundnessType; value?: number };
   roughness: number;
+  /** when true, strokes/fills are rendered with a chalk texture */
+  chalk: boolean;
   opacity: number;
   width: number;
   height: number;

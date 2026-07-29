@@ -35,6 +35,7 @@ export const getDefaultAppState = (): Omit<
     currentItemFontSize: DEFAULT_FONT_SIZE,
     currentItemOpacity: DEFAULT_ELEMENT_PROPS.opacity,
     currentItemRoughness: DEFAULT_ELEMENT_PROPS.roughness,
+    currentItemChalk: DEFAULT_ELEMENT_PROPS.chalk,
     currentItemStrokeVariability: "constant",
     currentItemStartArrowhead: null,
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
@@ -171,6 +172,7 @@ const APP_STATE_STORAGE_CONF = (<
   },
   currentItemOpacity: { browser: true, export: false, server: false },
   currentItemRoughness: { browser: true, export: false, server: false },
+  currentItemChalk: { browser: true, export: false, server: false },
   currentItemStrokeVariability: {
     browser: true,
     export: false,

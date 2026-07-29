@@ -168,6 +168,8 @@ export const SelectedShapeActions = ({
 
       {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
 
+      {predicates.chalk && <>{renderAction("changeChalk")}</>}
+
       {predicates.roundness && <>{renderAction("changeRoundness")}</>}
 
       {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
@@ -289,6 +291,7 @@ const CombinedShapeProperties = ({
                 <>{renderAction("changeStrokeStyle")}</>
               )}
               {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
+              {predicates.chalk && <>{renderAction("changeChalk")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
               {predicates.opacity && renderAction("changeOpacity")}
             </div>

@@ -115,6 +115,8 @@ import {
   SloppinessArchitectIcon,
   SloppinessArtistIcon,
   SloppinessCartoonistIcon,
+  ChalkOffIcon,
+  ChalkOnIcon,
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
@@ -689,6 +691,55 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
             (element) => element.hasOwnProperty("roughness"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemRoughness,
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
+});
+
+export const actionChangeChalk = register<boolean>({
+  name: "changeChalk",
+  label: "labels.chalk",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        newElementWith(el, {
+          seed: randomInteger(),
+          chalk: value,
+        }),
+      ),
+      appState: { ...appState, currentItemChalk: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => (
+    <fieldset>
+      <legend>{t("labels.chalk")}</legend>
+      <div className="buttonList">
+        <RadioSelection
+          group="chalk"
+          options={[
+            {
+              value: false,
+              text: t("labels.chalkOff"),
+              icon: ChalkOffIcon,
+            },
+            {
+              value: true,
+              text: t("labels.chalkOn"),
+              icon: ChalkOnIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            app,
+            (element) => element.chalk ?? false,
+            (element) => element.hasOwnProperty("chalk"),
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemChalk,
           )}
           onChange={(value) => updateData(value)}
         />

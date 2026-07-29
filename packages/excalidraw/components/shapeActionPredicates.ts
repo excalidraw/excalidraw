@@ -126,6 +126,7 @@ export const getShapeActionPredicates = (
     freedrawMode: forToolOrSelection(hasFreedrawMode),
     strokeStyle: forToolOrSelection(hasStrokeStyle),
     sloppiness: forToolOrSelection(hasStrokeStyle),
+    chalk: forToolOrSelection(hasStrokeStyle),
     roundness: forToolOrSelection(canChangeRoundness),
     arrowType: forToolOrSelection(toolIsArrow),
     arrowheads: forToolOrSelection(canHaveArrowheads),

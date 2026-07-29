@@ -63,6 +63,7 @@ import {
   isMagicFrameElement,
   isImageElement,
 } from "./typeChecks";
+import { applyChalkTexture } from "./chalk";
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
@@ -254,6 +255,13 @@ const generateElementCanvas = (
   drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
+
+  // chalk texture: when enabled per-element, erode strokes/fills for a
+  // chalkboard look. Skipped for text (the chalk fonts already carry the
+  // texture in their glyphs) and images (we don't grain raster content).
+  if (element.chalk && !isTextElement(element) && !isImageElement(element)) {
+    applyChalkTexture(context, canvas.width, canvas.height);
+  }
 
   return {
     element,
