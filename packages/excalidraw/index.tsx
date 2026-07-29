@@ -420,15 +420,20 @@ export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
   addReviewComment,
   getDefaultReviewData,
+  getElementReviewAttribution,
   getReviewThreadsForElement,
   getUnresolvedReviewThreads,
   markReviewNotificationRead,
   parseReviewMentions,
   REVIEW_REACTIONS,
+  setReviewCurrentUser,
   setReviewThreadResolved,
+  touchReviewContributor,
   toggleReviewReaction,
+  withElementReviewAttribution,
 } from "./review";
 export type {
+  ElementReviewAttribution,
   ReviewComment,
   ReviewData,
   ReviewNotification,

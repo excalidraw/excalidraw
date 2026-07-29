@@ -61,6 +61,7 @@ import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
 import type { ReviewData } from "./review";
+import type { ReviewUser } from "./review";
 import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
@@ -1240,6 +1241,8 @@ export interface ExcalidrawImperativeAPI {
    * used in conjunction with view mode (props.viewModeEnabled).
    */
   updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
+  setReviewCurrentUser: (user: ReviewUser | null) => void;
+  recordElementContribution: InstanceType<typeof App>["recordElementContribution"];
   onChange: (
     callback: (
       elements: readonly ExcalidrawElement[],

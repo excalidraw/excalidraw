@@ -1,4 +1,5 @@
 import type { Collaborator, SocketId } from "./types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 export const REVIEW_REACTIONS = ["thumbsUp", "check", "eyes"] as const;
 
@@ -47,7 +48,15 @@ export type ContributorActivity = Readonly<{
   lastContributionAt: number;
 }>;
 
+export type ElementReviewAttribution = Readonly<{
+  createdBy: ReviewUser;
+  createdAt: number;
+  lastEditedBy: ReviewUser;
+  lastEditedAt: number;
+}>;
+
 export type ReviewData = Readonly<{
+  currentUser: ReviewUser | null;
   threads: readonly ReviewThread[];
   notifications: readonly ReviewNotification[];
   contributors: Record<string, ContributorActivity>;
@@ -63,6 +72,7 @@ export type ReviewCommentInput = Readonly<{
 }>;
 
 export const getDefaultReviewData = (): ReviewData => ({
+  currentUser: null,
   threads: [],
   notifications: [],
   contributors: {},
@@ -97,7 +107,7 @@ export const parseReviewMentions = (body: string): string[] => {
   return Array.from(mentions);
 };
 
-const touchContributor = (
+export const touchReviewContributor = (
   data: ReviewData,
   user: ReviewUser,
   timestamp: number,
@@ -211,7 +221,7 @@ export const addReviewComment = (
       )
     : [...data.threads, thread];
 
-  const nextData = touchContributor(
+  const nextData = touchReviewContributor(
     {
       ...data,
       threads,
@@ -245,7 +255,7 @@ export const setReviewThreadResolved = ({
   actor: ReviewUser;
   timestamp?: number;
 }): ReviewData =>
-  touchContributor(
+  touchReviewContributor(
     {
       ...data,
       threads: data.threads.map((thread) =>
@@ -281,7 +291,7 @@ export const toggleReviewReaction = ({
 }): ReviewData => {
   const actorId = getReviewUserId(actor);
 
-  return touchContributor(
+  return touchReviewContributor(
     {
       ...data,
       threads: data.threads.map((thread) =>
@@ -337,4 +347,55 @@ export const getReviewThreadsForElement = (
 
 export const getUnresolvedReviewThreads = (data: ReviewData) =>
   data.threads.filter((thread) => !thread.resolved);
+
+export const setReviewCurrentUser = (
+  data: ReviewData,
+  user: ReviewUser | null,
+): ReviewData => ({
+  ...data,
+  currentUser: user,
+});
+
+export const getElementReviewAttribution = (
+  element: Pick<ExcalidrawElement, "customData">,
+): ElementReviewAttribution | null => {
+  const attribution = element.customData?.review?.attribution;
+  if (
+    !attribution ||
+    !attribution.createdBy ||
+    !attribution.lastEditedBy ||
+    typeof attribution.createdAt !== "number" ||
+    typeof attribution.lastEditedAt !== "number"
+  ) {
+    return null;
+  }
+
+  return attribution;
+};
+
+export const withElementReviewAttribution = <
+  TElement extends ExcalidrawElement,
+>(
+  element: TElement,
+  user: ReviewUser,
+  timestamp = now(),
+): TElement => {
+  const existingAttribution = getElementReviewAttribution(element);
+
+  return {
+    ...element,
+    customData: {
+      ...element.customData,
+      review: {
+        ...element.customData?.review,
+        attribution: {
+          createdBy: existingAttribution?.createdBy ?? user,
+          createdAt: existingAttribution?.createdAt ?? timestamp,
+          lastEditedBy: user,
+          lastEditedAt: timestamp,
+        },
+      },
+    },
+  };
+};
 

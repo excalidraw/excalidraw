@@ -359,6 +359,12 @@ import {
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
+import {
+  setReviewCurrentUser,
+  touchReviewContributor,
+  withElementReviewAttribution,
+} from "../review";
+import type { ReviewUser } from "../review";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -788,6 +794,8 @@ class App extends React.Component<AppProps, AppState> {
       getEditorInterface: () => this.editorInterface,
       updateFrameRendering: this.updateFrameRendering,
       toggleSidebar: this.toggleSidebar,
+      setReviewCurrentUser: this.setReviewCurrentUser,
+      recordElementContribution: this.recordElementContribution,
       onChange: (cb) => this.onChangeEmitter.on(cb),
       onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
       onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
@@ -5253,9 +5261,62 @@ class App extends React.Component<AppProps, AppState> {
     updates: ElementUpdate<TElement>,
     informMutation = true,
   ) => {
-    return this.scene.mutateElement(element, updates, {
+    const currentUser = this.state.review.currentUser;
+    const nextUpdates = currentUser
+      ? ({
+          ...updates,
+          customData: withElementReviewAttribution(
+            element,
+            currentUser,
+          ).customData,
+        } as ElementUpdate<TElement>)
+      : updates;
+
+    const previousVersion = element.version;
+    const nextElement = this.scene.mutateElement(element, nextUpdates, {
       informMutation,
       isDragging: false,
+    });
+
+    if (currentUser && nextElement.version !== previousVersion) {
+      this.setState({
+        review: touchReviewContributor(
+          this.state.review,
+          currentUser,
+          nextElement.updated,
+        ),
+      });
+    }
+
+    return nextElement;
+  };
+
+  public setReviewCurrentUser = (user: ReviewUser | null) => {
+    this.setState({
+      review: setReviewCurrentUser(this.state.review, user),
+    });
+  };
+
+  public recordElementContribution = (
+    elementIds: readonly ExcalidrawElement["id"][],
+    user: ReviewUser,
+    timestamp = Date.now(),
+  ) => {
+    const elementIdSet = new Set(elementIds);
+    const nextElements = this.scene
+      .getElementsIncludingDeleted()
+      .map((element) =>
+        elementIdSet.has(element.id)
+          ? withElementReviewAttribution(element, user, timestamp)
+          : element,
+      );
+
+    this.updateScene({
+      elements: nextElements,
+      appState: {
+        review: touchReviewContributor(this.state.review, user, timestamp),
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
   };
 
@@ -7588,7 +7649,14 @@ class App extends React.Component<AppProps, AppState> {
 
     const chunkedElements: ExcalidrawElement[][] = [];
 
-    for (const element of elements) {
+    const currentUser = this.state.review.currentUser;
+    const elementsToInsert = currentUser
+      ? elements.map((element) =>
+          withElementReviewAttribution(element, currentUser),
+        )
+      : elements;
+
+    for (const element of elementsToInsert) {
       const currentChunk = chunkedElements[chunkedElements.length - 1];
 
       if (currentChunk?.[0].frameId === element.frameId) {
@@ -7608,6 +7676,16 @@ class App extends React.Component<AppProps, AppState> {
           )
         : null;
       this.scene.insertElementsAtIndex(chunk, insertionIndex);
+    }
+
+    if (currentUser) {
+      this.setState({
+        review: touchReviewContributor(
+          this.state.review,
+          currentUser,
+          Date.now(),
+        ),
+      });
     }
   };
 
