@@ -397,6 +397,7 @@ const LayerUI = ({
             {defaultUIEnabled && appState.collaborators.size > 0 && (
               <UserList
                 collaborators={appState.collaborators}
+                contributors={appState.review.contributors}
                 userToFollow={appState.userToFollow?.socketId || null}
               />
             )}

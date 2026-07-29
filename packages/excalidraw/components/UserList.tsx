@@ -17,6 +17,7 @@ import { Tooltip } from "./Tooltip";
 import "./UserList.scss";
 
 import type { ActionManager } from "../actions/manager";
+import type { ContributorActivity } from "../review";
 import type { Collaborator, SocketId } from "../types";
 
 export type GoToCollaboratorComponentProps = {
@@ -96,6 +97,7 @@ type UserListProps = {
   className?: string;
   mobile?: boolean;
   collaborators: Map<SocketId, UserListUserObject>;
+  contributors?: Record<string, ContributorActivity>;
   userToFollow: SocketId | null;
 };
 
@@ -110,7 +112,13 @@ const collaboratorComparatorKeys = [
 ] as const;
 
 export const UserList = React.memo(
-  ({ className, mobile, collaborators, userToFollow }: UserListProps) => {
+  ({
+    className,
+    mobile,
+    collaborators,
+    contributors,
+    userToFollow,
+  }: UserListProps) => {
     const actionManager = useExcalidrawActionManager();
 
     const uniqueCollaboratorsMap = new Map<
@@ -129,7 +137,16 @@ export const UserList = React.memo(
 
     const uniqueCollaboratorsArray = Array.from(
       uniqueCollaboratorsMap.values(),
-    ).filter((collaborator) => collaborator.username?.trim());
+    )
+      .filter((collaborator) => collaborator.username?.trim())
+      .sort((a, b) => {
+        const aActivity =
+          contributors?.[a.id || a.socketId]?.lastContributionAt ?? 0;
+        const bActivity =
+          contributors?.[b.id || b.socketId]?.lastContributionAt ?? 0;
+
+        return bActivity - aActivity;
+      });
 
     const [searchTerm, setSearchTerm] = React.useState("");
     const filteredCollaborators = uniqueCollaboratorsArray.filter(
@@ -268,7 +285,8 @@ export const UserList = React.memo(
       prev.collaborators.size !== next.collaborators.size ||
       prev.mobile !== next.mobile ||
       prev.className !== next.className ||
-      prev.userToFollow !== next.userToFollow
+      prev.userToFollow !== next.userToFollow ||
+      prev.contributors !== next.contributors
     ) {
       return false;
     }
