@@ -60,8 +60,7 @@ import type Library from "./data/library";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { ImportedDataState } from "./data/types";
-import type { ReviewData } from "./review";
-import type { ReviewUser } from "./review";
+import type { ReviewData, ReviewReaction, ReviewUser } from "./review";
 import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
@@ -1243,6 +1242,18 @@ export interface ExcalidrawImperativeAPI {
   updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
   setReviewCurrentUser: (user: ReviewUser | null) => void;
   recordElementContribution: InstanceType<typeof App>["recordElementContribution"];
+  addReviewComment: InstanceType<typeof App>["addReviewComment"];
+  setReviewThreadResolved: InstanceType<typeof App>["setReviewThreadResolved"];
+  toggleReviewReaction: (
+    threadId: string,
+    commentId: string,
+    reaction: ReviewReaction,
+    actor: ReviewUser,
+    timestamp?: number,
+  ) => void;
+  markReviewNotificationRead: InstanceType<
+    typeof App
+  >["markReviewNotificationRead"];
   onChange: (
     callback: (
       elements: readonly ExcalidrawElement[],

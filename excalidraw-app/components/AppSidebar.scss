@@ -89,4 +89,123 @@
       overflow: visible;
     }
   }
+
+  .review-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .review-sidebar-composer,
+  .review-sidebar-reply {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .review-sidebar-composer label,
+  .review-sidebar-section h3 {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 700;
+  }
+
+  .review-sidebar-composer textarea,
+  .review-sidebar-reply input {
+    width: 100%;
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--input-bg-color);
+    color: var(--text-primary-color);
+    font: inherit;
+    padding: 0.5rem;
+  }
+
+  .review-sidebar-composer textarea {
+    min-height: 5rem;
+    resize: vertical;
+  }
+
+  .review-sidebar button {
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--button-gray-1);
+    color: var(--text-primary-color);
+    cursor: pointer;
+    font: inherit;
+    padding: 0.375rem 0.5rem;
+  }
+
+  .review-sidebar button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .review-sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .review-sidebar-thread,
+  .review-sidebar-notification {
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-md);
+    padding: 0.625rem;
+  }
+
+  .review-sidebar-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .review-sidebar-thread-header,
+  .review-sidebar-notification {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .review-sidebar-thread-title {
+    font-weight: 700;
+  }
+
+  .review-sidebar-thread-meta,
+  .review-sidebar-comment-meta,
+  .review-sidebar-empty {
+    color: var(--text-secondary-color);
+    font-size: 0.75rem;
+  }
+
+  .review-sidebar-comments {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .review-sidebar-comment-body {
+    margin-top: 0.125rem;
+    white-space: pre-wrap;
+  }
+
+  .review-sidebar-reactions {
+    display: flex;
+    gap: 0.375rem;
+    margin-top: 0.375rem;
+  }
+
+  .review-sidebar .review-sidebar-reaction {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.375rem;
+  }
+
+  .review-sidebar .review-sidebar-reaction[aria-pressed="true"] {
+    border-color: var(--color-primary);
+  }
 }

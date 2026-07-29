@@ -422,6 +422,7 @@ export {
   getDefaultReviewData,
   getElementReviewAttribution,
   getReviewThreadsForElement,
+  getReviewUserId,
   getUnresolvedReviewThreads,
   markReviewNotificationRead,
   parseReviewMentions,

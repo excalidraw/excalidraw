@@ -182,6 +182,44 @@ const createMentionNotifications = ({
     }));
 };
 
+const createReplyNotifications = ({
+  data,
+  thread,
+  comment,
+}: {
+  data: ReviewData;
+  thread: ReviewThread;
+  comment: ReviewComment;
+}): ReviewNotification[] => {
+  const participants = new Map<string, ReviewUser>();
+  thread.comments.forEach((threadComment) => {
+    participants.set(getReviewUserId(threadComment.author), threadComment.author);
+  });
+  participants.delete(getReviewUserId(comment.author));
+
+  return Array.from(participants.values())
+    .filter(
+      (user) =>
+        !data.notifications.some(
+          (notification) =>
+            notification.type === "reply" &&
+            notification.userId === getReviewUserId(user) &&
+            notification.commentId === comment.id,
+        ),
+    )
+    .map((user) => ({
+      id: createId("review-notification"),
+      userId: getReviewUserId(user),
+      threadId: thread.id,
+      commentId: comment.id,
+      elementId: thread.elementId,
+      type: "reply" as const,
+      actor: comment.author,
+      created: comment.created,
+      read: false,
+    }));
+};
+
 export const addReviewComment = (
   data: ReviewData,
   input: ReviewCommentInput,
@@ -227,6 +265,13 @@ export const addReviewComment = (
       threads,
       notifications: [
         ...data.notifications,
+        ...(existingThread
+          ? createReplyNotifications({
+              data,
+              thread: existingThread,
+              comment,
+            })
+          : []),
         ...createMentionNotifications({
           data,
           thread,
@@ -398,4 +443,3 @@ export const withElementReviewAttribution = <
     },
   };
 };
-

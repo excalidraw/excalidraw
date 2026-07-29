@@ -360,11 +360,15 @@ import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import {
+  addReviewComment as addReviewCommentToData,
+  markReviewNotificationRead,
   setReviewCurrentUser,
+  setReviewThreadResolved,
   touchReviewContributor,
+  toggleReviewReaction,
   withElementReviewAttribution,
 } from "../review";
-import type { ReviewUser } from "../review";
+import type { ReviewCommentInput, ReviewReaction, ReviewUser } from "../review";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -797,6 +801,10 @@ class App extends React.Component<AppProps, AppState> {
       toggleSidebar: this.toggleSidebar,
       setReviewCurrentUser: this.setReviewCurrentUser,
       recordElementContribution: this.recordElementContribution,
+      addReviewComment: this.addReviewComment,
+      setReviewThreadResolved: this.setReviewThreadResolved,
+      toggleReviewReaction: this.toggleReviewReaction,
+      markReviewNotificationRead: this.markReviewNotificationRead,
       onChange: (cb) => this.onChangeEmitter.on(cb),
       onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
       onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
@@ -5304,6 +5312,59 @@ class App extends React.Component<AppProps, AppState> {
   public setReviewCurrentUser = (user: ReviewUser | null) => {
     this.setState({
       review: setReviewCurrentUser(this.state.review, user),
+    });
+  };
+
+  public addReviewComment = (
+    input: Omit<ReviewCommentInput, "collaborators">,
+  ) => {
+    this.setState({
+      review: addReviewCommentToData(this.state.review, {
+        ...input,
+        collaborators: this.state.collaborators,
+      }),
+    });
+  };
+
+  public setReviewThreadResolved = (
+    threadId: string,
+    resolved: boolean,
+    actor: ReviewUser,
+    timestamp = Date.now(),
+  ) => {
+    this.setState({
+      review: setReviewThreadResolved({
+        data: this.state.review,
+        threadId,
+        resolved,
+        actor,
+        timestamp,
+      }),
+    });
+  };
+
+  public toggleReviewReaction = (
+    threadId: string,
+    commentId: string,
+    reaction: ReviewReaction,
+    actor: ReviewUser,
+    timestamp = Date.now(),
+  ) => {
+    this.setState({
+      review: toggleReviewReaction({
+        data: this.state.review,
+        threadId,
+        commentId,
+        reaction,
+        actor,
+        timestamp,
+      }),
+    });
+  };
+
+  public markReviewNotificationRead = (notificationId: string) => {
+    this.setState({
+      review: markReviewNotificationRead(this.state.review, notificationId),
     });
   };
 
