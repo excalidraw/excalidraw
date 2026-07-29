@@ -429,6 +429,7 @@ export {
   REVIEW_REACTIONS,
   setReviewCurrentUser,
   setReviewThreadResolved,
+  sortByReviewContribution,
   touchReviewContributor,
   toggleReviewReaction,
   withElementReviewAttribution,

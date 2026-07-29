@@ -393,6 +393,22 @@ export const getReviewThreadsForElement = (
 export const getUnresolvedReviewThreads = (data: ReviewData) =>
   data.threads.filter((thread) => !thread.resolved);
 
+export const sortByReviewContribution = <
+  T extends { id?: string; socketId?: string },
+>(
+  users: readonly T[],
+  contributors?: Record<string, ContributorActivity>,
+): T[] =>
+  [...users].sort((a, b) => {
+    const aActivity = contributors?.[a.id || a.socketId || ""];
+    const bActivity = contributors?.[b.id || b.socketId || ""];
+
+    return (
+      (bActivity?.lastContributionAt ?? 0) -
+      (aActivity?.lastContributionAt ?? 0)
+    );
+  });
+
 export const setReviewCurrentUser = (
   data: ReviewData,
   user: ReviewUser | null,

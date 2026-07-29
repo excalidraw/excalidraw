@@ -18,6 +18,7 @@ import "./UserList.scss";
 
 import type { ActionManager } from "../actions/manager";
 import type { ContributorActivity } from "../review";
+import { sortByReviewContribution } from "../review";
 import type { Collaborator, SocketId } from "../types";
 
 export type GoToCollaboratorComponentProps = {
@@ -135,18 +136,12 @@ export const UserList = React.memo(
       );
     });
 
-    const uniqueCollaboratorsArray = Array.from(
-      uniqueCollaboratorsMap.values(),
-    )
-      .filter((collaborator) => collaborator.username?.trim())
-      .sort((a, b) => {
-        const aActivity =
-          contributors?.[a.id || a.socketId]?.lastContributionAt ?? 0;
-        const bActivity =
-          contributors?.[b.id || b.socketId]?.lastContributionAt ?? 0;
-
-        return bActivity - aActivity;
-      });
+    const uniqueCollaboratorsArray = sortByReviewContribution(
+      Array.from(uniqueCollaboratorsMap.values()).filter((collaborator) =>
+        collaborator.username?.trim(),
+      ),
+      contributors,
+    );
 
     const [searchTerm, setSearchTerm] = React.useState("");
     const filteredCollaborators = uniqueCollaboratorsArray.filter(
