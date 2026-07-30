@@ -597,6 +597,49 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeLessThan(7000);
   });
 
+  it.each([
+    ["#RRGGBBAA hex", "#ffd43b80"],
+    ["rgba()", "rgba(255, 212, 59, 0.5)"],
+  ])(
+    "does not treat a partial-alpha (%s) background as covering",
+    (_label, backgroundColor) => {
+      // same scene as the semi-transparent test, but the translucency comes
+      // from the COLOR's alpha channel at full element opacity — the outline
+      // blended through it is just as visible and must still bound the region
+      const lower = API.createElement({
+        type: "rectangle",
+        x: 40,
+        y: 40,
+        width: 100,
+        height: 100,
+        roundness: null,
+      });
+      const owner = API.createElement({
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        roundness: null,
+        backgroundColor,
+      });
+      const { elements, elementsMap } = setup([lower, owner]);
+
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(20, 20),
+        elements,
+        elementsMap,
+      });
+
+      expect(result.ok).toBe(true);
+      if (!result.ok) {
+        return;
+      }
+      expect(polygonArea(result.scenePoints)).toBeGreaterThan(6000);
+      expect(polygonArea(result.scenePoints)).toBeLessThan(7000);
+    },
+  );
+
   it("fills the whole top element when clicking an opaque overlap", () => {
     // clicking the overlap of two OPAQUE shapes fills the whole top shape, not
     // the small overlap: the lower outline is hidden behind the top shape's

@@ -12,7 +12,7 @@ import {
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
-import { isTransparent } from "@excalidraw/common";
+import { isOpaqueColor, isTransparent } from "@excalidraw/common";
 
 import type { Bounds } from "@excalidraw/common";
 import type {
@@ -482,7 +482,9 @@ class NodeStore {
  * Whether the element visually paints an opaque background fill — i.e. can
  * actually hide outlines beneath it. Element types that never render their
  * `backgroundColor` (text, image, frames), see-through fill styles
- * (hachure/cross-hatch), partial opacity, and alpha colors all don't count.
+ * (hachure/cross-hatch), partial element opacity, and colors with an alpha
+ * channel below 1 (`#RRGGBBAA`, `rgba(…)`) all don't count — anything under
+ * them shows through.
  *
  * Shared with the app layer's z-order pass so "covers" means the same thing
  * in boundary clipping and in fill insertion.
@@ -492,7 +494,7 @@ export const rendersOpaqueFill = (element: ExcalidrawElement): boolean => {
     !hasBackground(element.type) ||
     element.fillStyle !== "solid" ||
     element.opacity < 100 ||
-    isTransparent(element.backgroundColor)
+    !isOpaqueColor(element.backgroundColor)
   ) {
     return false;
   }

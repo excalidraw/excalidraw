@@ -321,6 +321,17 @@ export const isTransparent = (color: string) => {
   return tinycolor(color).getAlpha() === 0;
 };
 
+/**
+ * Whether the color is fully opaque (alpha exactly 1).
+ *
+ * NOT the negation of `isTransparent`, which is true only at alpha 0 — a
+ * partial-alpha color (`#RRGGBBAA`, `rgba(…, 0.5)`) is neither transparent
+ * (it renders) nor opaque (what's beneath shows through it).
+ */
+export const isOpaqueColor = (color: string) => {
+  return tinycolor(color).getAlpha() === 1;
+};
+
 // -----------------------------------------------------------------------------
 // color contract helpers
 // -----------------------------------------------------------------------------
