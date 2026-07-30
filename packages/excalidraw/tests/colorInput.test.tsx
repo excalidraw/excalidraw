@@ -293,6 +293,50 @@ describe("ColorInput error handling", () => {
     });
   });
 
+  it("keeps the typed value when editing a valid color", async () => {
+    const colorInput = await openCanvasBackgroundColorPicker();
+
+    fireEvent.change(colorInput, { target: { value: "ff0000" } });
+    await waitFor(() => {
+      expect(colorInput.value).toBe("ff0000");
+    });
+
+    // deleting a char makes it invalid, but must not be reverted
+    fireEvent.change(colorInput, { target: { value: "ff000" } });
+    await waitFor(() => {
+      expect(colorInput.value).toBe("ff000");
+      expect(
+        document.querySelector(".color-picker__error-message"),
+      ).toBeTruthy();
+    });
+
+    // retyping it resolves to the color we're already at, so the `color` prop
+    // doesn't change — the input must still show what was typed
+    fireEvent.change(colorInput, { target: { value: "ff0000" } });
+    await waitFor(() => {
+      expect(colorInput.value).toBe("ff0000");
+      expect(document.querySelector(".color-picker__error-message")).toBeFalsy();
+    });
+  });
+
+  it("can delete a valid color down to an empty input", async () => {
+    const colorInput = await openCanvasBackgroundColorPicker();
+
+    fireEvent.change(colorInput, { target: { value: "1e9df0" } });
+    await waitFor(() => {
+      expect(colorInput.value).toBe("1e9df0");
+    });
+
+    for (const value of ["1e9df", "1e9d", "1e9", "1e", "1", ""]) {
+      fireEvent.change(colorInput, { target: { value } });
+      await waitFor(() => {
+        expect(colorInput.value).toBe(value);
+      });
+    }
+
+    expect(document.querySelector(".color-picker__error-message")).toBeFalsy();
+  });
+
   it("input has aria-invalid attribute when error is shown", async () => {
     const colorInput = await openCanvasBackgroundColorPicker();
 

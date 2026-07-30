@@ -46,16 +46,14 @@ export const ColorInput = ({
       if (color) {
         onChange(color);
         setErrorMessage(null);
+      } else if (value.length === 0) {
+        setErrorMessage(null);
+      } else if (/[^0-9a-f#]/.test(value)) {
+        setErrorMessage(t("colorPicker.invalidHexChars"));
       } else {
-        setInnerValue(value);
-        if (value.length === 0) {
-          setErrorMessage(null);
-        } else if (/[^0-9a-f#]/.test(value)) {
-          setErrorMessage(t("colorPicker.invalidHexChars"));
-        } else {
-          setErrorMessage(t("colorPicker.invalidHexLength"));
-        }
+        setErrorMessage(t("colorPicker.invalidHexLength"));
       }
+      setInnerValue(value);
     },
     [onChange],
   );
