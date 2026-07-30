@@ -61,6 +61,7 @@ const MenuContent = ({
     }
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === KEYS.ESCAPE) {
+        event.preventDefault();
         event.stopImmediatePropagation();
         callbacksRef.onClickOutside?.();
       }
