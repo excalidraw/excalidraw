@@ -130,7 +130,9 @@ const getMentionUsers = (
     const user: ReviewUser = {
       id: collaborator.id || socketId,
       username,
-      ...(collaborator.avatarUrl ? { avatarUrl: collaborator.avatarUrl } : null),
+      ...(collaborator.avatarUrl
+        ? { avatarUrl: collaborator.avatarUrl }
+        : null),
     };
     const userId = getReviewUserId(user);
 
@@ -261,6 +263,7 @@ const ReviewMentionControl = ({
         >
           {suggestions.map((user) => (
             <button
+              aria-selected={false}
               key={getReviewUserId(user)}
               onMouseDown={(event) => {
                 event.preventDefault();
