@@ -635,7 +635,8 @@ describe("ui={false}", () => {
     expect(queryContainer(".App-toolbar")).toBe(null);
     expect(queryContainer(".dropdown-menu-button")).toBe(null);
     expect(queryContainer(".default-sidebar-trigger")).toBe(null);
-    expect(queryContainer(".layer-ui__wrapper__footer-left")).toBe(null);
+    expect(queryContainer(".zoom-actions")).toBe(null);
+    expect(queryContainer(".undo-redo-buttons")).toBe(null);
     expect(queryContainer(".help-icon")).toBe(null);
   });
 
@@ -732,6 +733,10 @@ describe("ui={{ enabled: ... }}", () => {
 
     const scrollBackButton = queryContainer(".scroll-back-to-content");
     expect(scrollBackButton).not.toBe(null);
+    expect(scrollBackButton!.parentElement).toHaveClass(
+      "floating-status-stack",
+    );
+    expect(scrollBackButton!.closest(".exc-region-bottom")).toBe(null);
     fireEvent.click(scrollBackButton!);
     await waitFor(() => expect(h.state.scrolledOutside).toBe(false));
   });

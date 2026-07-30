@@ -34,22 +34,11 @@
   }
 }
 
-.excalidraw .App-menu_top .buttonList {
-  display: flex;
-}
-
 .excalidraw-wrapper {
   height: 800px;
   margin: 50px;
   position: relative;
   overflow: hidden;
-}
-
-:root[dir="ltr"]
-  .excalidraw
-  .layer-ui__wrapper
-  .zen-mode-transition.App-menu_bottom--transition-left {
-  transform: none;
 }
 
 .excalidraw .selected-shape-actions {
@@ -81,9 +70,6 @@
   .custom-element {
     padding: 0.1rem;
     margin: 0 8px;
-  }
-  .layer-ui__wrapper__footer.App-menu_bottom {
-    align-items: stretch;
   }
   // till its merged in OSS
   .App-toolbar-container .mobile-misc-tools-container {
