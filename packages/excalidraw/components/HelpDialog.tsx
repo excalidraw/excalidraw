@@ -393,6 +393,10 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
               label={t("helpDialog.deepBoxSelect")}
               shortcuts={[getShortcutKey(`CtrlOrCmd+${t("helpDialog.drag")}`)]}
             />
+            <Shortcut
+              label={t("helpDialog.constrainedDrag")}
+              shortcuts={[getShortcutKey(`Shift+${t("helpDialog.drag")}`)]}
+            />
             {/* firefox supports clipboard API under a flag, so we'll
                 show users what they can do in the error message */}
             {(probablySupportsClipboardBlob || isFirefox) && (
