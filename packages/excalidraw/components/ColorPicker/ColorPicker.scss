@@ -368,6 +368,12 @@
     }
   }
 
+  .color-picker__input-label-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
   .color-picker__input-label {
     display: grid;
     grid-template-columns: auto 1fr auto auto;
@@ -383,10 +389,26 @@
       box-shadow: 0 0 0 1px var(--color-primary-darkest);
       border-radius: var(--border-radius-lg);
     }
+
+    &.has-error {
+      border-color: var(--color-danger, #e03131);
+
+      &:focus-within {
+        box-shadow: 0 0 0 1px var(--color-danger, #e03131);
+      }
+    }
   }
 
   .color-picker__input-hash {
     padding: 0 0.25rem;
+  }
+
+  .color-picker__error-message {
+    color: var(--color-danger, #e03131);
+    font-size: 0.75rem;
+    padding: 0 8px 4px 8px;
+    text-align: left;
+    line-height: 1.3;
   }
 
   .color-picker-input {
