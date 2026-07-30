@@ -58,7 +58,7 @@ describe("bucket fill tool", () => {
     return rect;
   };
 
-  it("creates a selected line polygon with the current background color", () => {
+  it("creates a unselected line polygon with the current background color", () => {
     const rect = seedRectangle();
     act(() => {
       // the bucket fill color is the shared shape background color
