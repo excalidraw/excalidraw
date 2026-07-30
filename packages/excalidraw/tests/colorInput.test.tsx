@@ -336,7 +336,9 @@ describe("ColorInput error handling", () => {
     fireEvent.change(colorInput, { target: { value: "ff0000" } });
     await waitFor(() => {
       expect(colorInput.value).toBe("ff0000");
-      expect(document.querySelector(".color-picker__error-message")).toBeFalsy();
+      expect(
+        document.querySelector(".color-picker__error-message"),
+      ).toBeFalsy();
     });
   });
 
