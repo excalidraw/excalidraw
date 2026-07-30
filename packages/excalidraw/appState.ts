@@ -14,8 +14,9 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
-import type { AppState, NormalizedZoomValue } from "./types";
 import { getDefaultReviewData } from "./review";
+
+import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = EXPORT_SCALES.includes(devicePixelRatio)
   ? devicePixelRatio

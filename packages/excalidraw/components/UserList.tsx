@@ -8,6 +8,8 @@ import type { MarkRequired } from "@excalidraw/common/utility-types";
 
 import { t } from "../i18n";
 
+import { sortByReviewContribution } from "../review";
+
 import { useExcalidrawActionManager } from "./App";
 import { Island } from "./Island";
 import { QuickSearch } from "./QuickSearch";
@@ -18,7 +20,6 @@ import "./UserList.scss";
 
 import type { ActionManager } from "../actions/manager";
 import type { ContributorActivity } from "../review";
-import { sortByReviewContribution } from "../review";
 import type { Collaborator, SocketId } from "../types";
 
 export type GoToCollaboratorComponentProps = {

@@ -87,6 +87,12 @@ exports[`exportToSvg > with default arguments 1`] = `
   },
   "previousSelectedElementIds": {},
   "resizingElement": null,
+  "review": {
+    "contributors": {},
+    "currentUser": null,
+    "notifications": [],
+    "threads": [],
+  },
   "scrollConstraints": null,
   "scrollX": 0,
   "scrollY": 0,

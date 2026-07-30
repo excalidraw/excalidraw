@@ -368,7 +368,7 @@ import {
   toggleReviewReaction,
   withElementReviewAttribution,
 } from "../review";
-import type { ReviewCommentInput, ReviewReaction, ReviewUser } from "../review";
+
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -424,7 +424,6 @@ import {
   getViewportForZoomWithScrollConstraints,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
-import { ReviewAttributionBadge } from "../components/ReviewAttributionBadge";
 import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
@@ -467,6 +466,8 @@ import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
+
+import type { ReviewCommentInput, ReviewReaction, ReviewUser } from "../review";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -2466,15 +2467,6 @@ class App extends React.Component<AppProps, AppState> {
                             ]}
                           />
                           {this.isDefaultUIEnabled() && <CursorHint />}
-                          {this.isDefaultUIEnabled() &&
-                            selectedElements.length === 1 &&
-                            this.state.openDialog?.name !==
-                              "elementLinkSelector" && (
-                              <ReviewAttributionBadge
-                                element={firstSelectedElement}
-                                elementsMap={renderableElementsMap}
-                              />
-                            )}
                           {this.isDefaultUIEnabled() &&
                             selectedElements.length === 1 &&
                             this.state.openDialog?.name !==
@@ -5283,10 +5275,8 @@ class App extends React.Component<AppProps, AppState> {
     const nextUpdates = currentUser
       ? ({
           ...updates,
-          customData: withElementReviewAttribution(
-            element,
-            currentUser,
-          ).customData,
+          customData: withElementReviewAttribution(element, currentUser)
+            .customData,
         } as ElementUpdate<TElement>)
       : updates;
 

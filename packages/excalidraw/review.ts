@@ -1,9 +1,10 @@
-import type { Collaborator, SocketId } from "./types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import type { Collaborator, SocketId } from "./types";
 
 export const REVIEW_REACTIONS = ["thumbsUp", "check", "eyes"] as const;
 
-export type ReviewReaction = (typeof REVIEW_REACTIONS)[number];
+export type ReviewReaction = typeof REVIEW_REACTIONS[number];
 
 export type ReviewUser = Readonly<{
   id: string;
@@ -193,7 +194,10 @@ const createReplyNotifications = ({
 }): ReviewNotification[] => {
   const participants = new Map<string, ReviewUser>();
   thread.comments.forEach((threadComment) => {
-    participants.set(getReviewUserId(threadComment.author), threadComment.author);
+    participants.set(
+      getReviewUserId(threadComment.author),
+      threadComment.author,
+    );
   });
   participants.delete(getReviewUserId(comment.author));
 
@@ -349,7 +353,9 @@ export const toggleReviewReaction = ({
                   return comment;
                 }
 
-                const reactionUsers = new Set(comment.reactions[reaction] || []);
+                const reactionUsers = new Set(
+                  comment.reactions[reaction] || [],
+                );
                 if (reactionUsers.has(actorId)) {
                   reactionUsers.delete(actorId);
                 } else {

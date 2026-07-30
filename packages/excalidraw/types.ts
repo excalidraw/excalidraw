@@ -1241,7 +1241,9 @@ export interface ExcalidrawImperativeAPI {
    */
   updateFrameRendering: InstanceType<typeof App>["updateFrameRendering"];
   setReviewCurrentUser: (user: ReviewUser | null) => void;
-  recordElementContribution: InstanceType<typeof App>["recordElementContribution"];
+  recordElementContribution: InstanceType<
+    typeof App
+  >["recordElementContribution"];
   addReviewComment: InstanceType<typeof App>["addReviewComment"];
   setReviewThreadResolved: InstanceType<typeof App>["setReviewThreadResolved"];
   toggleReviewReaction: (

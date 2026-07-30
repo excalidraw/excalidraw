@@ -5,8 +5,10 @@ import {
   REVIEW_REACTIONS,
   Sidebar,
   THEME,
+  getElementReviewAttribution,
   getReviewUserId,
   useExcalidrawAPI,
+  withElementReviewAttribution,
 } from "@excalidraw/excalidraw";
 import {
   messageCircleIcon,
@@ -86,6 +88,12 @@ const REVIEW_REACTION_LABELS: Record<ReviewReaction, string> = {
   check: "✅",
   eyes: "👀",
 };
+
+const formatReviewActivityTime = (timestamp: number) =>
+  new Date(timestamp).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
 
 const getCurrentReviewUser = (
   currentUser: ReviewUser | null | undefined,
@@ -403,6 +411,82 @@ const ReviewThreadItem = ({
   );
 };
 
+const SelectedElementActivity = ({
+  selectedElementId,
+  user,
+}: {
+  selectedElementId: string | null;
+  user: ReviewUser;
+}) => {
+  const api = useExcalidrawAPI();
+  const selectedElement =
+    api && selectedElementId
+      ? api
+          .getSceneElementsIncludingDeleted()
+          .find(
+            (element) => element.id === selectedElementId && !element.isDeleted,
+          )
+      : null;
+  const attribution = selectedElement
+    ? getElementReviewAttribution(selectedElement)
+    : null;
+
+  React.useEffect(() => {
+    if (!api || !selectedElement || attribution) {
+      return;
+    }
+
+    api.updateScene({
+      elements: api
+        .getSceneElementsIncludingDeleted()
+        .map((element) =>
+          element.id === selectedElement.id
+            ? withElementReviewAttribution(element, user, element.updated)
+            : element,
+        ),
+    });
+  }, [api, attribution, selectedElement, user]);
+
+  if (!api) {
+    return null;
+  }
+
+  return (
+    <section className="review-sidebar-section">
+      <h3>Selected element activity</h3>
+      {!selectedElementId ? (
+        <p className="review-sidebar-empty">
+          Select one element to see activity
+        </p>
+      ) : !selectedElement ? (
+        <p className="review-sidebar-empty">Selected element was deleted</p>
+      ) : attribution ? (
+        <div
+          className="review-sidebar-activity"
+          data-testid="review-selected-element-activity"
+        >
+          <div>
+            <strong>Created by</strong>
+            <span>{attribution.createdBy.username}</span>
+            <time dateTime={new Date(attribution.createdAt).toISOString()}>
+              {formatReviewActivityTime(attribution.createdAt)}
+            </time>
+          </div>
+          <div>
+            <strong>Last edited by</strong>
+            <span>{attribution.lastEditedBy.username}</span>
+            <time dateTime={new Date(attribution.lastEditedAt).toISOString()}>
+              {formatReviewActivityTime(attribution.lastEditedAt)}
+            </time>
+          </div>
+        </div>
+      ) : (
+        <p className="review-sidebar-empty">Activity will appear shortly</p>
+      )}
+    </section>
+  );
+};
+
 const ReviewSidebar = () => {
   const appState = useUIAppState();
   const api = useExcalidrawAPI();
@@ -430,8 +514,16 @@ const ReviewSidebar = () => {
   const unreadNotifications = appState.review.notifications.filter(
     (notification) => !notification.read,
   );
-  const unresolvedThreads = appState.review.threads.filter(
+  const visibleThreads = selectedElementId
+    ? appState.review.threads.filter(
+        (thread) => thread.elementId === selectedElementId,
+      )
+    : appState.review.threads;
+  const visibleUnresolvedThreads = visibleThreads.filter(
     (thread) => !thread.resolved,
+  );
+  const visibleResolvedThreads = visibleThreads.filter(
+    (thread) => thread.resolved,
   );
 
   return (
@@ -498,9 +590,9 @@ const ReviewSidebar = () => {
       </section>
 
       <section className="review-sidebar-section">
-        <h3>Unresolved</h3>
-        {unresolvedThreads.length ? (
-          unresolvedThreads.map((thread) => (
+        <h3>{selectedElementId ? "Unresolved for selection" : "Unresolved"}</h3>
+        {visibleUnresolvedThreads.length ? (
+          visibleUnresolvedThreads.map((thread) => (
             <ReviewThreadItem
               deleted={!sceneElementIds.has(thread.elementId)}
               key={thread.id}
@@ -510,26 +602,35 @@ const ReviewSidebar = () => {
             />
           ))
         ) : (
-          <p className="review-sidebar-empty">No unresolved threads</p>
+          <p className="review-sidebar-empty">
+            {selectedElementId
+              ? "No unresolved threads for selection"
+              : "No unresolved threads"}
+          </p>
         )}
       </section>
 
-      {appState.review.threads.some((thread) => thread.resolved) && (
+      {(selectedElementId
+        ? visibleResolvedThreads.length > 0
+        : appState.review.threads.some((thread) => thread.resolved)) && (
         <section className="review-sidebar-section">
-          <h3>Resolved</h3>
-          {appState.review.threads
-            .filter((thread) => thread.resolved)
-            .map((thread) => (
-              <ReviewThreadItem
-                deleted={!sceneElementIds.has(thread.elementId)}
-                key={thread.id}
-                mentionUsers={mentionUsers}
-                thread={thread}
-                user={user}
-              />
-            ))}
+          <h3>{selectedElementId ? "Resolved for selection" : "Resolved"}</h3>
+          {visibleResolvedThreads.map((thread) => (
+            <ReviewThreadItem
+              deleted={!sceneElementIds.has(thread.elementId)}
+              key={thread.id}
+              mentionUsers={mentionUsers}
+              thread={thread}
+              user={user}
+            />
+          ))}
         </section>
       )}
+
+      <SelectedElementActivity
+        selectedElementId={selectedElementId}
+        user={user}
+      />
     </div>
   );
 };
