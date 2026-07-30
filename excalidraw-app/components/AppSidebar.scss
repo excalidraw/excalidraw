@@ -126,6 +126,40 @@
     padding: 0.5rem;
   }
 
+  .review-sidebar-mention-field {
+    position: relative;
+    min-width: 0;
+  }
+
+  .review-sidebar-mentions {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    left: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    box-sizing: border-box;
+    max-height: 10rem;
+    overflow-y: auto;
+    padding: 0.25rem;
+    border: 1px solid var(--default-border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--popup-bg-color);
+    box-shadow: var(--shadow-island);
+  }
+
+  .review-sidebar .review-sidebar-mentions button {
+    border: 0;
+    background: transparent;
+    text-align: left;
+  }
+
+  .review-sidebar .review-sidebar-mentions button:hover {
+    background: var(--button-gray-1);
+  }
+
   .review-sidebar-composer textarea {
     min-height: 5rem;
     resize: vertical;

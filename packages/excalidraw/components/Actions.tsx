@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useRef } from "react";
 import { Popover } from "radix-ui";
 
-import { CLASSES } from "@excalidraw/common";
+import { CLASSES, DEFAULT_SIDEBAR } from "@excalidraw/common";
 
 import { isArrowElement } from "@excalidraw/element";
 
@@ -36,6 +36,7 @@ import {
   TextSizeIcon,
   adjustmentsIcon,
   DotsHorizontalIcon,
+  messageCircleIcon,
   pencilIcon,
 } from "./icons";
 
@@ -58,6 +59,37 @@ const PROPERTIES_CLASSES = clsx([
   CLASSES.SHAPE_ACTIONS_THEME_SCOPE,
   "properties-content",
 ]);
+
+const REVIEW_SIDEBAR_TAB = "comments";
+
+const openReviewSidebar = (
+  setAppState: React.Component<any, AppState>["setState"],
+) => {
+  setAppState({
+    openSidebar: {
+      name: DEFAULT_SIDEBAR.name,
+      tab: REVIEW_SIDEBAR_TAB,
+    },
+    openMenu: null,
+    openPopup: null,
+  });
+};
+
+const ReviewCommentsAction = ({
+  setAppState,
+}: {
+  setAppState: React.Component<any, AppState>["setState"];
+}) => (
+  <button
+    type="button"
+    className="review-comments-action"
+    title="Comments"
+    aria-label="Comments"
+    onClick={() => openReviewSidebar(setAppState)}
+  >
+    {messageCircleIcon}
+  </button>
+);
 
 /**
  * The "arrange" (z-order) fieldset, identical across every styles-panel layout.
@@ -138,11 +170,13 @@ export const SelectedShapeActions = ({
   elementsMap,
   renderAction,
   app,
+  setAppState,
 }: {
   appState: UIAppState;
   elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
   renderAction: ActionManager["renderAction"];
   app: AppClassProperties;
+  setAppState: React.Component<any, AppState>["setState"];
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
   const predicates = getShapeActionPredicates(
@@ -202,6 +236,7 @@ export const SelectedShapeActions = ({
             {renderAction("group")}
             {renderAction("ungroup")}
             {predicates.link && renderAction("hyperlink")}
+            <ReviewCommentsAction setAppState={setAppState} />
             {predicates.cropEditor && renderAction("cropEditor")}
             {predicates.lineEditor && renderAction("toggleLinearEditor")}
           </div>
@@ -560,6 +595,7 @@ const CombinedExtraActions = ({
                   {renderAction("group")}
                   {renderAction("ungroup")}
                   {predicates.linkSingleOnly && renderAction("hyperlink")}
+                  <ReviewCommentsAction setAppState={setAppState} />
                   {predicates.cropEditor && renderAction("cropEditor")}
                   {showDuplicate && renderAction("duplicateSelection")}
                   {showDelete && renderAction("deleteSelectedElements")}

@@ -212,6 +212,7 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
                 getShortcutKey("CtrlOrCmd+Enter"),
               ]}
             />
+            <Shortcut label="Mention collaborators" shortcuts={["@"]} />
             <Shortcut
               label={t("helpDialog.curvedArrow")}
               shortcuts={[

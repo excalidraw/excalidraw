@@ -95,6 +95,189 @@ const getCurrentReviewUser = (
     username: "You",
   };
 
+const getMentionToken = (value: string, selectionStart: number) => {
+  const beforeCursor = value.slice(0, selectionStart);
+  const match = /(^|[^\w])@([a-zA-Z0-9_.-]*)$/.exec(beforeCursor);
+
+  if (!match) {
+    return null;
+  }
+
+  const query = match[2];
+  const start = beforeCursor.length - query.length - 1;
+
+  return {
+    end: selectionStart,
+    query: query.toLowerCase(),
+    start,
+  };
+};
+
+const getMentionUsers = (
+  appState: ReturnType<typeof useUIAppState>,
+  currentUser: ReviewUser,
+) => {
+  const users = new Map<string, ReviewUser>();
+  const currentUserId = getReviewUserId(currentUser);
+
+  appState.collaborators.forEach((collaborator, socketId) => {
+    const username = collaborator.username?.trim();
+
+    if (!username) {
+      return;
+    }
+
+    const user: ReviewUser = {
+      id: collaborator.id || socketId,
+      username,
+      ...(collaborator.avatarUrl ? { avatarUrl: collaborator.avatarUrl } : null),
+    };
+    const userId = getReviewUserId(user);
+
+    if (userId !== currentUserId) {
+      users.set(userId, user);
+    }
+  });
+
+  Object.values(appState.review.contributors).forEach((activity) => {
+    const userId = getReviewUserId(activity.user);
+
+    if (userId !== currentUserId) {
+      users.set(userId, activity.user);
+    }
+  });
+
+  return Array.from(users.values()).sort((a, b) =>
+    a.username.localeCompare(b.username),
+  );
+};
+
+const ReviewMentionControl = ({
+  ariaLabel,
+  disabled,
+  id,
+  mentionUsers,
+  multiline,
+  onChange,
+  placeholder,
+  value,
+}: {
+  ariaLabel?: string;
+  disabled?: boolean;
+  id?: string;
+  mentionUsers: readonly ReviewUser[];
+  multiline?: boolean;
+  onChange: (value: string) => void;
+  placeholder: string;
+  value: string;
+}) => {
+  const controlRef = React.useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const [selectionStart, setSelectionStart] = React.useState(value.length);
+  const mentionToken = disabled ? null : getMentionToken(value, selectionStart);
+  const suggestions = mentionToken
+    ? mentionUsers
+        .filter((user) =>
+          user.username.toLowerCase().startsWith(mentionToken.query),
+        )
+        .slice(0, 5)
+    : [];
+
+  const updateSelection = (
+    target: HTMLInputElement | HTMLTextAreaElement | null,
+  ) => {
+    if (target) {
+      setSelectionStart(target.selectionStart || 0);
+    }
+  };
+
+  const insertMention = (user: ReviewUser) => {
+    if (!mentionToken) {
+      return;
+    }
+
+    const nextValue = `${value.slice(0, mentionToken.start)}@${
+      user.username
+    } ${value.slice(mentionToken.end)}`;
+    const nextSelectionStart =
+      mentionToken.start + user.username.length + "@ ".length;
+
+    onChange(nextValue);
+
+    requestAnimationFrame(() => {
+      controlRef.current?.focus();
+      controlRef.current?.setSelectionRange(
+        nextSelectionStart,
+        nextSelectionStart,
+      );
+      setSelectionStart(nextSelectionStart);
+    });
+  };
+
+  const sharedProps = {
+    "aria-label": ariaLabel,
+    disabled,
+    id,
+    onChange: (
+      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+      onChange(event.target.value);
+      updateSelection(event.target);
+    },
+    onClick: (
+      event: React.MouseEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => updateSelection(event.currentTarget),
+    onKeyUp: (
+      event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => updateSelection(event.currentTarget),
+    onSelect: (
+      event: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => updateSelection(event.currentTarget),
+    placeholder,
+    value,
+  };
+
+  return (
+    <div className="review-sidebar-mention-field">
+      {multiline ? (
+        <textarea
+          {...sharedProps}
+          ref={(node) => {
+            controlRef.current = node;
+          }}
+        />
+      ) : (
+        <input
+          {...sharedProps}
+          ref={(node) => {
+            controlRef.current = node;
+          }}
+        />
+      )}
+      {suggestions.length > 0 && (
+        <div
+          className="review-sidebar-mentions"
+          data-testid="review-mention-suggestions"
+          role="listbox"
+        >
+          {suggestions.map((user) => (
+            <button
+              key={getReviewUserId(user)}
+              onMouseDown={(event) => {
+                event.preventDefault();
+                insertMention(user);
+              }}
+              role="option"
+              type="button"
+            >
+              @{user.username}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const CommentReactions = ({
   comment,
   onToggle,
@@ -132,10 +315,12 @@ const CommentReactions = ({
 
 const ReviewThreadItem = ({
   deleted,
+  mentionUsers,
   thread,
   user,
 }: {
   deleted: boolean;
+  mentionUsers: readonly ReviewUser[];
   thread: ReviewThread;
   user: ReviewUser;
 }) => {
@@ -202,9 +387,10 @@ const ReviewThreadItem = ({
           setReply("");
         }}
       >
-        <input
+        <ReviewMentionControl
           aria-label="Reply"
-          onChange={(event) => setReply(event.target.value)}
+          mentionUsers={mentionUsers}
+          onChange={setReply}
           placeholder="Reply..."
           value={reply}
         />
@@ -223,6 +409,10 @@ const ReviewSidebar = () => {
   const selectedElementId =
     selectedElementIds.length === 1 ? selectedElementIds[0] : null;
   const user = getCurrentReviewUser(appState.review.currentUser);
+  const mentionUsers = React.useMemo(
+    () => getMentionUsers(appState, user),
+    [appState, user],
+  );
 
   if (!api) {
     return null;
@@ -260,10 +450,12 @@ const ReviewSidebar = () => {
         }}
       >
         <label htmlFor="review-comment-input">Comment on selection</label>
-        <textarea
+        <ReviewMentionControl
           disabled={!selectedElementId}
           id="review-comment-input"
-          onChange={(event) => setComment(event.target.value)}
+          mentionUsers={mentionUsers}
+          multiline
+          onChange={setComment}
           placeholder={
             selectedElementId
               ? "Leave a comment. Use @name to mention collaborators."
@@ -309,6 +501,7 @@ const ReviewSidebar = () => {
             <ReviewThreadItem
               deleted={!sceneElementIds.has(thread.elementId)}
               key={thread.id}
+              mentionUsers={mentionUsers}
               thread={thread}
               user={user}
             />
@@ -327,6 +520,7 @@ const ReviewSidebar = () => {
               <ReviewThreadItem
                 deleted={!sceneElementIds.has(thread.elementId)}
                 key={thread.id}
+                mentionUsers={mentionUsers}
                 thread={thread}
                 user={user}
               />

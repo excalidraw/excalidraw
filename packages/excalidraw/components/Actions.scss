@@ -178,6 +178,30 @@
   }
 }
 
+.selected-shape-actions .review-comments-action,
+.compact-shape-actions .review-comments-action {
+  width: var(--default-button-size, 2rem);
+  height: var(--default-button-size, 2rem);
+  border: none;
+  border-radius: var(--border-radius-lg);
+  background: var(--mobile-action-button-bg);
+  color: var(--color-on-surface);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.selected-shape-actions .review-comments-action:hover,
+.compact-shape-actions .review-comments-action:hover {
+  background: var(--color-surface-high);
+}
+
 .compact-shape-actions-island {
   width: fit-content;
   overflow-x: hidden;
