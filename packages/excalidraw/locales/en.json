@@ -742,5 +742,18 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Scroll wheel"
+  },
+  "projects": {
+    "title": "My boards",
+    "menuItem": "My boards",
+    "new": "New board",
+    "empty": "No boards yet. Create your first one!",
+    "rename": "Rename board",
+    "delete": "Delete board",
+    "deleteConfirm": {
+      "title": "Delete board",
+      "description": "This will permanently delete \"{{title}}\". This action cannot be undone.",
+      "button": "Delete"
+    }
   }
 }

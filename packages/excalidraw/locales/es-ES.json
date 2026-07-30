@@ -731,5 +731,18 @@
     "spacebar": "",
     "delete": "",
     "mmb": ""
+  },
+  "projects": {
+    "title": "Mis pizarras",
+    "menuItem": "Mis pizarras",
+    "new": "Nueva pizarra",
+    "empty": "Aún no hay pizarras. ¡Crea la primera!",
+    "rename": "Renombrar pizarra",
+    "delete": "Eliminar pizarra",
+    "deleteConfirm": {
+      "title": "Eliminar pizarra",
+      "description": "Se eliminará permanentemente \"{{title}}\". Esta acción no se puede deshacer.",
+      "button": "Eliminar"
+    }
   }
 }

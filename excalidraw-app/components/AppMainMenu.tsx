@@ -2,8 +2,11 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  LibraryIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
+import { useExcalidrawAPI } from "@excalidraw/excalidraw/index";
+import { t } from "@excalidraw/excalidraw/i18n";
 import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";
@@ -14,6 +17,7 @@ import { LanguageList } from "../app-language/LanguageList";
 import { isExcalidrawPlusSignedUser } from "../app_constants";
 
 import { saveDebugState } from "./DebugCanvas";
+import { PROJECTS_SIDEBAR_NAME } from "./ProjectsSidebar";
 
 export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
@@ -22,6 +26,8 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   refresh: () => void;
 }> = React.memo((props) => {
+  const excalidrawAPI = useExcalidrawAPI();
+
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -36,6 +42,15 @@ export const AppMainMenu: React.FC<{
       )}
       <MainMenu.DefaultItems.CommandPalette className="highlighted" />
       <MainMenu.DefaultItems.SearchMenu />
+      <MainMenu.Item
+        icon={LibraryIcon}
+        data-testid="projects-menu-item"
+        onSelect={() =>
+          excalidrawAPI?.toggleSidebar({ name: PROJECTS_SIDEBAR_NAME })
+        }
+      >
+        {t("projects.menuItem")}
+      </MainMenu.Item>
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
