@@ -1,8 +1,12 @@
+// Host-supplied footer content owns the flexible space between the editor's
+// left and right footer controls. Hosts can position their content at either
+// edge (or both) with flex alignment and auto margins.
 .footer-center {
   pointer-events: none;
 
   display: flex;
   width: 100%;
+  align-items: center;
   justify-content: flex-start;
   margin-inline-end: 0.6rem;
 

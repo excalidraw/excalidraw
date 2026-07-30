@@ -12,8 +12,7 @@ const FooterCenter = ({ children }: { children?: React.ReactNode }) => {
     <FooterCenterTunnel.In>
       <div
         className={clsx("footer-center zen-mode-transition", {
-          "layer-ui__wrapper__footer-left--transition-bottom":
-            appState.zenModeEnabled,
+          "transition-bottom": appState.zenModeEnabled,
         })}
       >
         {children}

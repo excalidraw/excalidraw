@@ -16,31 +16,6 @@
     pointer-events: none;
     z-index: var(--zIndex-layerUI);
 
-    &__top-right {
-      display: flex;
-      width: 100%;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      pointer-events: none !important;
-
-      &--compact {
-        gap: 0.5rem;
-      }
-
-      & > * {
-        pointer-events: var(--ui-pointerEvents);
-      }
-    }
-
-    &__footer {
-      width: 100%;
-
-      &-right {
-        z-index: 100;
-        display: flex;
-      }
-    }
-
     .zen-mode-transition {
       transition: transform 0.5s ease-in-out;
 
@@ -60,7 +35,7 @@
         transform: translate(-999px, 0);
       }
 
-      &.layer-ui__wrapper__footer-left--transition-bottom {
+      &.transition-bottom {
         transform: translate(0, 92px);
       }
     }
@@ -70,10 +45,10 @@
       position: absolute;
       bottom: 0;
       [dir="ltr"] & {
-        right: 1rem;
+        right: 0;
       }
       [dir="rtl"] & {
-        left: 1rem;
+        left: 0;
       }
       opacity: 0;
       visibility: hidden;
@@ -106,23 +81,16 @@
       }
     }
 
-    .layer-ui__wrapper__footer-left,
-    .footer-center,
-    .layer-ui__wrapper__footer-right {
+    .footer-center {
       & > * {
         pointer-events: var(--ui-pointerEvents);
       }
-    }
-
-    .layer-ui__wrapper__footer-right {
-      margin-top: auto;
-      margin-bottom: auto;
     }
   }
 
   // on tablet, the pen mode button is rendered as a separate floating button
   // below the compact actions menu (see LayerUI.tsx)
-  .App-menu_top__left > .ToolIcon__penMode {
+  .exc-region-center-left > .ToolIcon__penMode {
     justify-self: center;
 
     .ToolIcon__icon {

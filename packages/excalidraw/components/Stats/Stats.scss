@@ -1,15 +1,8 @@
 .exc-stats {
   width: 204px;
-  position: absolute;
-  top: 60px;
   font-size: 12px;
   z-index: var(--zIndex-layerUI);
   pointer-events: var(--ui-pointerEvents);
-
-  :root[dir="rtl"] & {
-    left: 12px;
-    right: initial;
-  }
 
   h2 {
     font-size: 1.5em;

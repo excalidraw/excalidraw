@@ -85,7 +85,10 @@ describe("<Excalidraw/>", () => {
         </Footer>
       </Excalidraw>,
     ));
-    expect(container.querySelector(".footer-center")).toMatchInlineSnapshot(
+    const footerCenter = container.querySelector(".footer-center");
+    expect(footerCenter?.parentElement).toHaveClass("exc-region-bottom-center");
+    expect(footerCenter?.closest("footer.exc-region-bottom")).not.toBe(null);
+    expect(footerCenter).toMatchInlineSnapshot(
       `
       <div
         class="footer-center zen-mode-transition"

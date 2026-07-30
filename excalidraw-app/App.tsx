@@ -958,7 +958,7 @@ const ExcalidrawWrapper = () => {
           }
 
           return (
-            <div className="excalidraw-ui-top-right">
+            <>
               {excalidrawAPI?.getEditorInterface().formFactor === "desktop" && (
                 <ExcalidrawPlusPromoBanner
                   isSignedIn={isExcalidrawPlusSignedUser}
@@ -973,7 +973,7 @@ const ExcalidrawWrapper = () => {
                 }
                 editorInterface={editorInterface}
               />
-            </div>
+            </>
           );
         }}
         onLinkOpen={(element, event) => {

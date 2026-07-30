@@ -322,11 +322,29 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .excalidraw-ui-top-left,
-  .excalidraw-ui-top-right {
+  // content clusters — the editor-owned rows of a region's content (menu
+  // trigger, user list, …), shared between the desktop regions and the
+  // mobile top bar
+  .exc-region-top-left-content,
+  .exc-region-top-right-content {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+
+  // host-app slots — wrap ONLY the host-rendered content
+  // (`renderTopLeftUI` / `renderTopRightUI` output), nested inside the
+  // clusters/regions alongside the editor-owned content
+  .exc-region-top-left-host-slot,
+  .exc-region-top-right-host-slot {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    // don't leave a stray flex/grid gap behind when the host renders nothing
+    &:empty {
+      display: none;
+    }
   }
 
   .App-toolbar-content {
@@ -352,98 +370,299 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .App-menu {
+  // ---------------------------------------------------------------------------
+  // UI regions
+  //
+  // The editor UI has 3×3 logical regions:
+  //
+  //   .exc-region-top-left     .exc-region-top-center     .exc-region-top-right
+  //   .exc-region-center-left  .exc-region-center-center  .exc-region-center-right
+  //   .exc-region-bottom-left  .exc-region-bottom-center  .exc-region-bottom-right
+  //
+  // The top and center regions are built from one outer grid of 3 COLUMNS ×
+  // 5 ROWS. The extra rows let the center regions start right below whatever
+  // they need to clear, instead of all starting below the tallest thing in
+  // the top row (see "why 5 rows", below). The bottom row is one spanning
+  // `.exc-region-bottom` whose three children use an independent inner grid.
+  //
+  //           c1                  c2                c3
+  //      minmax(auto,1fr)         auto         minmax(auto,1fr)
+  //       ┌─────────┬───────────────────────┬─────────┐
+  //  r1   │TOP-LEFT │                       │         │
+  //       ├─────────┤      TOP-CENTER       │TOP-RIGHT│
+  //  r2   │         │       (toolbar)       ├─────────┤
+  //       │ CENTER  │                       │         │
+  //  r3   │ -LEFT   ├───────────────────────┤ CENTER  │
+  //       │         │                       │ -RIGHT  │
+  //  r4   │         │     CENTER-CENTER     │         │
+  //       ├─────────┴───────────────────────┴─────────┤
+  //  r5   │   BOTTOM { LEFT |   CENTER   | RIGHT }    │
+  //       └───────────────────────────────────────────┘
+  //
+  // Column tracks:
+  //   c1  TOP-LEFT's own minimum, then an EQUAL share of the leftover space
+  //   c2  sized only by the toolbar (TOP-CENTER, the only region in c2 alone)
+  //   c3  TOP-RIGHT's own minimum, then an EQUAL share of the leftover space
+  //
+  // c1 and c3 share the SAME flex factor (both `1fr`), so whatever space is
+  // left after c2 gets split evenly between them — which is what keeps the
+  // toolbar exactly viewport-centered even when TOP-LEFT and TOP-RIGHT are
+  // different widths (e.g. a bare menu button vs. a user-list + share
+  // button cluster). Only once one side's own content outgrows its EQUAL
+  // share does that side pin to its own size and the split stop being even.
+  //
+  // Row tracks (`auto auto auto minmax(0, 1fr) auto`):
+  //   r1  sized only by TOP-LEFT
+  //   r2  TOP-RIGHT's height, MINUS whatever r1 already covers
+  //   r3  the toolbar's height, MINUS whatever r1+r2 already cover
+  //   r4  everything left over
+  //   r5  the bottom band
+  //
+  // WHY 5 ROWS (INSTEAD OF 3 NESTED COLUMNS)
+  // ------------------------------------------
+  // We could put each top/center pair in its own nested column. That would
+  // give each center region a fully independent vertical stack, but it would
+  // also make CENTER-RIGHT follow TOP-RIGHT only. We deliberately need an
+  // asymmetric cross-column dependency:
+  //
+  //   line 2 (CENTER-LEFT start)   = height(TOP-LEFT)
+  //   line 3 (CENTER-RIGHT start)  = max(TOP-LEFT, TOP-RIGHT)
+  //   line 4 (CENTER-CENTER start) = max(TOP-LEFT, TOP-RIGHT, TOP-CENTER)
+  //
+  // Thus stats clears both top-left and top-right, while styles clears only
+  // top-left. Neither side waits for a taller toolbar. Independent nested
+  // columns cannot express that shared `max(TOP-LEFT, TOP-RIGHT)` boundary;
+  // the ordered outer rows can.
+  //
+  // If we eveer want to drop this constraint, we can reduce the columns to 3
+  // with independent nested grids.
+  // ------------------------------------------
+  //
+  // A grid track's size is set only by the items placed ENTIRELY inside it —
+  // an item that spans across other tracks has its size "absorbed" by
+  // whichever spanned track is still growable, instead of inflating the
+  // tracks it merely passes through. Rows 2 and 3 exist to use that rule on
+  // purpose, in two steps:
+  //
+  //   1. TOP-LEFT alone sizes r1 (nothing else is placed in r1 only).
+  //   2. TOP-RIGHT spans r1–r2. Since r1 is already fixed by TOP-LEFT,
+  //      the part of TOP-RIGHT that's TALLER than r1 spills into r2,
+  //      not affecting r1 height.
+  //   3. The toolbar (TOP-CENTER) spans r1–r3. Since r1+r2 are already
+  //      fixed, the part of the toolbar taller than r1+r2 spills into
+  //      r3, not affecting r1+r2 height.
+  //
+  // Each center region then starts on the row line that matches exactly what
+  // it needs to clear, and nothing else:
+  //   - CENTER-LEFT starts at line 2 (below TOP-LEFT only) — so it hangs
+  //     right below the menu, unmoved by the toolbar's height or a tall
+  //     host UI in TOP-RIGHT (e.g. a call tray).
+  //   - CENTER-RIGHT starts at line 3 (below the taller of TOP-LEFT and
+  //     TOP-RIGHT) — a tall call tray pushes it down; the toolbar does not.
+  //   - CENTER-CENTER starts at line 4 (below the whole top band).
+  //
+  // The result is intentional: a taller TOP-RIGHT moves stats but not styles;
+  // a taller TOP-LEFT moves both; and a taller TOP-CENTER moves neither.
+  //
+  // OTHER RULES
+  // ------------
+  //   - Gaps between tracks are 0. r2/r3 are 0px in the common case (nothing
+  //     needs the extra room), and any gap would double up whenever that
+  //     happens. Spacing between regions is done with margins on the
+  //     regions themselves instead.
+  //   - Outer region boxes overlap on purpose — that's how a region's excess
+  //     size gets absorbed into a shared track instead of pushing a boundary.
+  //     Content is pushed into a corner with `place-content`, and every
+  //     region is `pointer-events: none`, with only its content opting back
+  //     in via `pointer-events: var(--ui-pointerEvents)`. Never set
+  //     `pointer-events` on a region directly — its box overlaps its
+  //     neighbors, so it would swallow clicks meant for the canvas or for
+  //     another region.
+  //   - When touching the outer grid: TOP-LEFT / TOP-CENTER / TOP-RIGHT must
+  //     stay the only regions occupying a single column (c1 / c2 / c3
+  //     respectively) — every other outer item must keep spanning across c2
+  //     (and usually r4 too). In particular, the whole bottom wrapper spans
+  //     c1–c3; placing its children directly into those outer columns would
+  //     let their widths offset the toolbar.
+  // ---------------------------------------------------------------------------
+
+  .exc-regions {
+    position: absolute;
+    inset: var(--editor-container-padding);
+    padding-top: var(--sat, 0);
+    padding-right: var(--sar, 0);
+    padding-bottom: var(--sab, 0);
+    padding-left: var(--sal, 0);
+
     display: grid;
+    // c1/c3: EQUAL flex factor, so the leftover space (after c2) always
+    // splits evenly between them — that's what keeps the toolbar centered
+    // regardless of how wide TOP-LEFT/TOP-RIGHT's own content is · c2: sized
+    // only by the toolbar
+    grid-template-columns: minmax(auto, 1fr) auto minmax(auto, 1fr);
+    // r1: top-left anchor · r2: top-right overhang · r3: toolbar overhang ·
+    // r4: leftover · r5: bottom band
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+
     color: var(--icon-fill-color);
-  }
-
-  .shapes-section {
-    display: flex;
-    justify-content: center;
-    pointer-events: none !important;
-
-    & > * {
-      pointer-events: var(--ui-pointerEvents);
-    }
-  }
-
-  .App-menu_top {
-    grid-template-columns: 1fr 2fr 1fr;
-    grid-gap: 1rem;
-    align-items: flex-start;
     cursor: default;
-    pointer-events: none !important;
+    pointer-events: none;
+  }
+
+  .exc-region-top-left,
+  .exc-region-top-center,
+  .exc-region-top-right,
+  .exc-region-center-left,
+  .exc-region-center-center,
+  .exc-region-center-right {
+    display: grid;
+    min-height: 0;
+    pointer-events: none;
 
     & > * {
       pointer-events: var(--ui-pointerEvents);
     }
+  }
+
+  .exc-region-bottom,
+  .exc-region-bottom-left,
+  .exc-region-bottom-center,
+  .exc-region-bottom-right {
+    display: grid;
+    min-height: 0;
+    pointer-events: none;
+  }
+
+  .exc-region-bottom-left,
+  .exc-region-bottom-right {
+    & > * {
+      pointer-events: var(--ui-pointerEvents);
+    }
+  }
+
+  // `place-content` (not `place-items`) anchors the content inside the region,
+  // so that the region itself can stretch to its cell(s)
+  .exc-region-top-left {
+    grid-area: 1 / 1 / 2 / 2;
+    grid-auto-flow: column;
+    place-content: start start;
+  }
+
+  // single-track on the column axis on purpose: a non-spanning item's
+  // min-content floors its track, so at narrow widths the toolbar pushes the
+  // top-right UI (row overflow) instead of sliding under its neighbors
+  .exc-region-top-center {
+    grid-area: 1 / 2 / 4 / 3;
+    grid-auto-flow: column;
+    place-content: start center;
+    // clearance from the top-left/top-right anchors (in place of column gaps)
+    margin-inline: 1rem;
 
     @media (min-width: 1536px) {
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-gap: 3rem;
+      margin-inline: 3rem;
     }
   }
 
-  .App-menu_top > .App-menu_top__left {
-    grid-column: 1;
-    justify-self: start;
-  }
-
-  .App-menu_top > .shapes-section {
-    grid-column: 2;
-  }
-
-  .selected-shape-actions-container {
-    width: fit-content;
+  .exc-region-top-right {
+    grid-area: 1 / 3 / 3 / 4;
+    grid-auto-flow: column;
+    place-content: start end;
+    column-gap: 0.75rem;
 
     &--compact {
-      min-width: 48px;
+      column-gap: 0.5rem;
     }
   }
 
-  .App-menu_top > .layer-ui__wrapper__top-right {
-    grid-column: 3;
-    justify-self: end;
+  .exc-region-center-left {
+    grid-area: 2 / 1 / 5 / 3;
+    place-content: start start;
+    row-gap: var(--exc-regions-row-gap, 1rem);
+    margin-top: var(--exc-regions-row-gap, 1rem);
+    margin-bottom: 1rem;
   }
 
-  .App-menu_bottom {
-    position: absolute;
-    bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    cursor: default;
-    pointer-events: none !important;
-    box-sizing: border-box;
-    padding: 0 1rem;
+  .exc-region-center-center {
+    grid-area: 4 / 2 / 5 / 3;
+    place-content: center center;
+  }
 
-    &--transition-left {
-      section {
-        width: 185px;
-      }
-    }
+  .exc-region-center-right {
+    grid-area: 3 / 2 / 5 / 4;
+    place-content: start end;
+    row-gap: var(--exc-regions-row-gap, 1rem);
+    margin-top: var(--exc-regions-row-gap, 1rem);
+    margin-bottom: 1rem;
+  }
 
-    section {
+  // The bottom band is one outer-grid item so none of its occupants can size
+  // c1/c3 and offset the toolbar. Its independent inner grid recreates the
+  // footer contract: natural-width editor controls on either side and a host
+  // slot that owns all remaining space between them.
+  .exc-region-bottom {
+    grid-area: 5 / 1 / 6 / 4;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .exc-region-bottom-left {
+    grid-column: 1;
+    grid-auto-flow: column;
+    place-content: end start;
+
+    // the canvas actions (zoom, undo/redo)
+    & > section {
       display: flex;
     }
   }
 
-  .App-menu_bottom > *:first-child {
-    justify-self: flex-start;
+  .exc-region-bottom-center {
+    grid-column: 2;
+    align-items: end;
+    min-width: 0;
   }
 
-  .App-menu_bottom > *:last-child {
-    justify-self: flex-end;
+  .exc-region-bottom-right {
+    grid-column: 3;
+    grid-auto-flow: column;
+    place-content: end end;
   }
 
-  .App-menu_left {
-    grid-template-rows: 1fr auto 1fr;
-    height: 100%;
+  // Status UI stays tied to the canvas center instead of the center track of
+  // the inner footer grid, which shifts when the side controls have different
+  // widths. It deliberately overlays the bottom band just like the old
+  // absolutely positioned status stack.
+  .exc-regions > .floating-status-stack {
+    // note: must not span only the last row (region-bottom) else content
+    // of this container would expand height of the last row, which is currently
+    // vertically centered.
+    grid-area: 4 / 1 / 6 / 4;
+    place-self: end center;
+    margin-bottom: 1rem;
+
+    // the toast is click-through (only its close button is interactive)
+    & > .Toast {
+      pointer-events: none;
+    }
   }
 
-  .App-menu_right {
-    grid-template-rows: 1fr;
-    height: 100%;
+  // the styles panel is bounded by its region, and scrolls past it (the
+  // `min-height: 0`s let the panel shrink below its content height)
+  .selected-shape-actions-container {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    max-height: 100%;
+    min-height: 0;
+
+    &--compact {
+      min-width: 48px;
+    }
+
+    & > section {
+      min-height: 0;
+    }
   }
 
   .App-menu__left {
@@ -451,7 +670,7 @@ body.excalidraw-cursor-resize * {
     padding: 0.75rem;
     width: 12.5rem;
     box-sizing: border-box;
-    position: absolute;
+    min-height: 0;
   }
 
   .dropdown-select {
@@ -508,10 +727,6 @@ body.excalidraw-cursor-resize * {
 
     border: 1px solid var(--default-border-color);
     padding: 10px 20px;
-    position: absolute;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
     pointer-events: var(--ui-pointerEvents);
     font-family: inherit;
 
@@ -524,24 +739,14 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  // The desktop stack is placed by `.exc-regions` above; mobile positioning
+  // is applied in the mobile block below.
   .floating-status-stack {
-    position: absolute;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
     pointer-events: none;
-
-    .scroll-back-to-content {
-      position: static;
-      left: auto;
-      bottom: auto;
-      transform: none;
-      pointer-events: var(--ui-pointerEvents);
-    }
   }
 
   .help-icon {
@@ -585,18 +790,21 @@ body.excalidraw-cursor-resize * {
     }
 
     .floating-status-stack {
+      position: absolute;
+      left: 50%;
       bottom: calc(30px + var(--sab, 0));
+      transform: translateX(-50%);
       z-index: var(--zIndex-ui-bottom);
     }
 
-    .scroll-back-to-content {
+    // rendered inside the mobile toolbar island (see MobileMenu), and floats
+    // above it
+    .App-toolbar > .scroll-back-to-content {
+      position: absolute;
+      left: 50%;
       bottom: calc(100px + var(--sab, 0));
+      transform: translateX(-50%);
       z-index: -1;
-    }
-
-    .floating-status-stack .scroll-back-to-content {
-      bottom: auto;
-      z-index: auto;
     }
   }
 
@@ -624,13 +832,6 @@ body.excalidraw-cursor-resize * {
 
   .disable-pointerEvents {
     pointer-events: none !important;
-  }
-
-  &.excalidraw--view-mode {
-    .App-menu {
-      display: flex;
-      justify-content: space-between;
-    }
   }
 
   &.excalidraw--non-interactive {
