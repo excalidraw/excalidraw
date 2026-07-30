@@ -190,10 +190,10 @@ describe("ColorInput error handling", () => {
     });
   });
 
-  it("shows error for invalid hex characters", async () => {
+  it("shows generic error for non-hex-shaped invalid input", async () => {
     const colorInput = await openCanvasBackgroundColorPicker();
 
-    // Enter invalid hex characters
+    // Enter invalid input that isn't hex-shaped
     fireEvent.change(colorInput, { target: { value: "zzzzzz" } });
 
     // Check error message appears
@@ -202,13 +202,11 @@ describe("ColorInput error handling", () => {
         ".color-picker__error-message",
       ) as HTMLElement;
       expect(errorMessage).toBeTruthy();
-      expect(errorMessage.textContent).toContain(
-        "Invalid characters in hex code",
-      );
+      expect(errorMessage.textContent).toContain("Not a valid color");
     });
   });
 
-  it("shows error for non-hex text", async () => {
+  it("shows generic error for unrecognized color names", async () => {
     const colorInput = await openCanvasBackgroundColorPicker();
 
     // Enter non-hex text (not a valid color name)
@@ -220,9 +218,32 @@ describe("ColorInput error handling", () => {
         ".color-picker__error-message",
       ) as HTMLElement;
       expect(errorMessage).toBeTruthy();
-      expect(errorMessage.textContent).toContain(
-        "Invalid characters in hex code",
-      );
+      expect(errorMessage.textContent).toContain("Not a valid color");
+    });
+  });
+
+  it("does not show an error for a complete named color", async () => {
+    const colorInput = await openCanvasBackgroundColorPicker();
+
+    fireEvent.change(colorInput, { target: { value: "transparent" } });
+
+    await waitFor(() => {
+      expect(colorInput.value).toBe("transparent");
+      expect(
+        document.querySelector(".color-picker__error-message"),
+      ).toBeFalsy();
+    });
+  });
+
+  it("does not show an error for valid rgb() input", async () => {
+    const colorInput = await openCanvasBackgroundColorPicker();
+
+    fireEvent.change(colorInput, { target: { value: "rgb(255, 0, 0)" } });
+
+    await waitFor(() => {
+      expect(
+        document.querySelector(".color-picker__error-message"),
+      ).toBeFalsy();
     });
   });
 
