@@ -139,11 +139,15 @@ describe("bucket fill tool", () => {
       (h.app as any).maybeCleanupAfterMissingPointerUp(null);
     });
     expect(h.state.cursorButton).toBe("up");
-    // the click still produced its fill on pointer down
+    // the click never completed, so the armed fill is discarded — an
+    // interrupted interaction must not leave a permanent edit
     expect(
       h.elements.filter((el) => el.type === "line" && !el.isDeleted),
-    ).toHaveLength(1);
+    ).toHaveLength(0);
     mouse.upAt(80, 70);
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(0);
   });
 
   it("dragging with the bucket tool neither selects nor creates extras", () => {
@@ -519,7 +523,37 @@ describe("bucket fill tool", () => {
     expect(h.elements.filter((el) => el.type === "line")).toHaveLength(0);
   });
 
-  it("a second touch pointer does not fill (pinch/pan intent)", () => {
+  it("a normal touch tap fills once, on release", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      clientX: 80,
+      clientY: 70,
+      button: 0,
+      pointerId: 1,
+      pointerType: "touch",
+    });
+    // the fill is only armed while the finger is down — nothing committed yet
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(0);
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      clientX: 80,
+      clientY: 70,
+      pointerId: 1,
+      pointerType: "touch",
+    });
+
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(1);
+  });
+
+  it("a second touch pointer aborts the fill (pinch/pan intent)", () => {
     seedRectangle();
     act(() => {
       API.setAppState({ currentItemBackgroundColor: "#ffec99" });
@@ -550,7 +584,51 @@ describe("bucket fill tool", () => {
       pointerType: "touch",
     });
 
-    // only the first finger's fill exists
+    // the user meant to pinch/pan, not to fill — no permanent edit
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(0);
+  });
+
+  it("pointercancel aborts the fill", () => {
+    seedRectangle();
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: "#ffec99" });
+    });
+    selectBucketFill();
+
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      clientX: 80,
+      clientY: 70,
+      button: 0,
+      pointerId: 1,
+      pointerType: "touch",
+    });
+    // the browser takes the pointer over (scroll, palm rejection) — no
+    // pointerup will follow
+    fireEvent.pointerCancel(GlobalTestState.interactiveCanvas, {
+      pointerId: 1,
+      pointerType: "touch",
+    });
+
+    expect(
+      h.elements.filter((el) => el.type === "line" && !el.isDeleted),
+    ).toHaveLength(0);
+
+    // and the next tap fills normally
+    fireEvent.pointerDown(GlobalTestState.interactiveCanvas, {
+      clientX: 80,
+      clientY: 70,
+      button: 0,
+      pointerId: 2,
+      pointerType: "touch",
+    });
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      clientX: 80,
+      clientY: 70,
+      pointerId: 2,
+      pointerType: "touch",
+    });
     expect(
       h.elements.filter((el) => el.type === "line" && !el.isDeleted),
     ).toHaveLength(1);

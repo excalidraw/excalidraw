@@ -29,6 +29,37 @@ export class AppBucketFill {
   constructor(private app: App) {}
 
   /**
+   * The click armed on pointer down, committed on pointer up. Deferring the
+   * scene mutation to pointer up is what lets a pinch/pan second finger, a
+   * long-press context menu, or a pointercancel abort the fill — on pointer
+   * down the editor cannot yet know the gesture will stay a single-pointer
+   * click.
+   */
+  private pending: ScenePoint | null = null;
+
+  /** Arm a fill at the pointer-down position; nothing mutates yet. */
+  handlePointerDown = (scenePointer: ScenePoint) => {
+    this.pending = scenePointer;
+  };
+
+  /**
+   * Commit the armed fill, at the pointer-DOWN position (what the user
+   * aimed at). No-op when the gesture was aborted in the meantime.
+   */
+  handlePointerUp = () => {
+    const scenePointer = this.pending;
+    this.pending = null;
+    if (scenePointer) {
+      this.fill(scenePointer);
+    }
+  };
+
+  /** Abort the armed fill (second finger, context menu, pointercancel). */
+  cancel = () => {
+    this.pending = null;
+  };
+
+  /**
    * Apply the current bucket fill settings to an existing fill-compatible
    * element (no-op when nothing would change). One undoable step.
    */
@@ -55,7 +86,7 @@ export class AppBucketFill {
     this.app.scheduleCapture();
   };
 
-  handlePointerDown = (scenePointer: ScenePoint) => {
+  private fill = (scenePointer: ScenePoint) => {
     // shared with the generic shape background, but a transparent fill would
     // be invisible, so fall back to a real color (appState is not mutated)
     const backgroundColor = getBucketFillBackgroundColor(
