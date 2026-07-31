@@ -40,6 +40,9 @@ import {
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
 import { actionBindText } from "../actions";
+import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+
+const { h } = window;
 
 unmountComponent();
 
@@ -1963,6 +1966,135 @@ describe("textWysiwyg", () => {
         h.app.scene.mutateElement(textElement, {});
       });
       expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+    });
+  });
+
+  describe("autoResize handle", () => {
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      API.setElements([]);
+    });
+
+    /**
+     * a fixed-width text wrapped onto two lines. `originalText`/`autoResize`
+     * are set after the fact — `API.createElement` accepts neither, and would
+     * otherwise leave an autogrowing element whose `originalText` still holds
+     * the line break.
+     */
+    const wrappedText = (
+      overrides: Partial<ExcalidrawTextElement> = {},
+    ): ExcalidrawTextElement =>
+      ({
+        ...API.createElement({
+          type: "text",
+          id: "text",
+          x: 100,
+          y: 100,
+          width: 300,
+          height: 50,
+          text: "this is it my friends\nald aksdl askdlasdk",
+        }),
+        originalText: "this is it my friends ald aksdl askdlasdk",
+        autoResize: false,
+        ...overrides,
+      } as ExcalidrawTextElement);
+
+    // unwrapping resizes the box, so whichever edge the alignment pins has to
+    // stay put — otherwise the text slides out from under itself
+    it.each([
+      { textAlign: "left" as const, edge: (t: ExcalidrawTextElement) => t.x },
+      {
+        textAlign: "right" as const,
+        edge: (t: ExcalidrawTextElement) => t.x + t.width,
+      },
+      {
+        textAlign: "center" as const,
+        edge: (t: ExcalidrawTextElement) => t.x + t.width / 2,
+      },
+    ])("keeps the $textAlign anchor when unwrapping", ({ textAlign, edge }) => {
+      API.setElements([wrappedText({ textAlign })]);
+      API.setAppState({ selectedElementIds: { text: true } });
+      expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(false);
+      const before = edge(h.elements[0] as ExcalidrawTextElement);
+
+      API.executeAction(actionTextAutoResize);
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      // the box really did change size, so the assertion isn't vacuous
+      expect(text.width).not.toBeCloseTo(300, 0);
+      expect(edge(text)).toBeCloseTo(before, 4);
+    });
+
+    it.each([
+      {
+        verticalAlign: "top" as const,
+        edge: (t: ExcalidrawTextElement) => t.y,
+      },
+      {
+        verticalAlign: "bottom" as const,
+        edge: (t: ExcalidrawTextElement) => t.y + t.height,
+      },
+      {
+        verticalAlign: "middle" as const,
+        edge: (t: ExcalidrawTextElement) => t.y + t.height / 2,
+      },
+    ])(
+      "keeps the $verticalAlign anchor when unwrapping",
+      ({ verticalAlign, edge }) => {
+        API.setElements([wrappedText({ verticalAlign })]);
+        API.setAppState({ selectedElementIds: { text: true } });
+        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(false);
+        const before = edge(h.elements[0] as ExcalidrawTextElement);
+
+        API.executeAction(actionTextAutoResize);
+
+        const text = h.elements[0] as ExcalidrawTextElement;
+        expect(edge(text)).toBeCloseTo(before, 4);
+      },
+    );
+  });
+
+  describe("history", () => {
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      API.setElements([]);
+    });
+
+    // Creating a text used to land in two history entries — the empty element,
+    // then its content — so the first undo restored a live, zero-content
+    // element. For a text bound to an arrow endpoint that also left the
+    // endpoint occupied by something invisible.
+    //
+    // The invariant behind the single-undo behaviour is that creating the
+    // element must not be captured on its own. Pointerup has more than one
+    // capture site and they don't all fire in every environment, so assert the
+    // stack directly rather than only the observable undo.
+    it("does not open a history entry until the text is submitted", async () => {
+      const stackSize = () => (h.history as any).undoStack.length;
+
+      UI.clickTool("text");
+      const before = stackSize();
+
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+      expect(stackSize()).toBe(before);
+
+      updateTextEditor(editor, "plain");
+      Keyboard.exitTextEditor(editor);
+      expect(stackSize()).toBe(before + 1);
+    });
+
+    it("removes a plain text in a single undo", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "plain");
+      Keyboard.exitTextEditor(editor);
+
+      Keyboard.undo();
+
+      expect(h.elements.filter((el) => !el.isDeleted)).toHaveLength(0);
     });
   });
 });

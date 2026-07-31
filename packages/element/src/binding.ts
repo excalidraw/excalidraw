@@ -123,7 +123,9 @@ export const FOCUS_POINT_SIZE = 10 / 1.5;
 const MIN_BINDABLE_SIZE = 1;
 
 export const getBindingGap = (
-  bindTarget: ExcalidrawBindableElement,
+  // only the stroke width is needed, so the gap can also be computed for a
+  // bind target that doesn't exist yet (see `getTextBindingForArrowEndpoint`)
+  bindTarget: Pick<ExcalidrawBindableElement, "strokeWidth">,
   opts: Pick<ExcalidrawArrowElement, "elbowed">,
 ): number => {
   return (
@@ -1098,6 +1100,32 @@ export const bindOrUnbindBindingElements = (
   });
 };
 
+/**
+ * Writes a binding onto the arrow and records the arrow on the bind target,
+ * keeping the two sides of the relationship in step.
+ */
+const applyBinding = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  bindableElement: NonDeleted<ExcalidrawBindableElement>,
+  binding: FixedPointBinding,
+  startOrEnd: "start" | "end",
+  scene: Scene,
+): void => {
+  scene.mutateElement(arrow, {
+    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
+  });
+
+  const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
+  if (!boundElementsMap.has(arrow.id)) {
+    scene.mutateElement(bindableElement, {
+      boundElements: (bindableElement.boundElements || []).concat({
+        id: arrow.id,
+        type: "arrow",
+      }),
+    });
+  }
+};
+
 export const bindBindingElement = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   hoveredElement: NonDeleted<ExcalidrawBindableElement>,
@@ -1139,19 +1167,7 @@ export const bindBindingElement = (
     };
   }
 
-  scene.mutateElement(arrow, {
-    [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
-  });
-
-  const boundElementsMap = arrayToMap(hoveredElement.boundElements || []);
-  if (!boundElementsMap.has(arrow.id)) {
-    scene.mutateElement(hoveredElement, {
-      boundElements: (hoveredElement.boundElements || []).concat({
-        id: arrow.id,
-        type: "arrow",
-      }),
-    });
-  }
+  applyBinding(arrow, hoveredElement, binding, startOrEnd, scene);
 };
 
 export const unbindBindingElement = (
@@ -3153,4 +3169,30 @@ export const getBindingSideMidPoint = (
 
 const getMidPoint = (p1: GlobalPoint, p2: GlobalPoint): GlobalPoint => {
   return pointFrom((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2);
+};
+
+/**
+ * Binds an arrow endpoint to an explicit fixed point on a bindable element,
+ * bypassing the "derive the ratio from where the endpoint currently is"
+ * strategy used when dragging. Needed when the binding target is placed to fit
+ * the arrow rather than the other way round.
+ */
+export const bindBindingElementToFixedPoint = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  bindableElement: NonDeleted<ExcalidrawBindableElement>,
+  startOrEnd: "start" | "end",
+  fixedPoint: FixedPoint,
+  scene: Scene,
+): void => {
+  applyBinding(
+    arrow,
+    bindableElement,
+    {
+      elementId: bindableElement.id,
+      fixedPoint: normalizeFixedPoint(fixedPoint),
+      mode: "orbit",
+    },
+    startOrEnd,
+    scene,
+  );
 };

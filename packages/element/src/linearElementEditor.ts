@@ -1859,6 +1859,32 @@ export class LinearElementEditor {
     );
   }
 
+  /**
+   * The point a bound text label is centered on — the middle of the linear
+   * element, whether that's an actual point or the midpoint of the middle
+   * segment.
+   */
+  static getBoundTextElementCenter = (
+    element: ExcalidrawLinearElement,
+    elementsMap: ElementsMap,
+  ): GlobalPoint => {
+    if (element.points.length % 2 === 1) {
+      const index = Math.floor(element.points.length / 2);
+      return LinearElementEditor.getPointGlobalCoordinates(
+        element,
+        element.points[index],
+        elementsMap,
+      );
+    }
+
+    const index = element.points.length / 2 - 1;
+    return LinearElementEditor.getSegmentMidPoint(
+      element,
+      index + 1,
+      elementsMap,
+    );
+  };
+
   static getBoundTextElementPosition = (
     element: ExcalidrawLinearElement,
     boundTextElement: ExcalidrawTextElementWithContainer,
@@ -1871,29 +1897,16 @@ export class LinearElementEditor {
     if (points.length < 2) {
       mutateElement(boundTextElement, elementsMap, { isDeleted: true });
     }
-    let x = 0;
-    let y = 0;
-    if (element.points.length % 2 === 1) {
-      const index = Math.floor(element.points.length / 2);
-      const midPoint = LinearElementEditor.getPointGlobalCoordinates(
-        element,
-        element.points[index],
-        elementsMap,
-      );
-      x = midPoint[0] - boundTextElement.width / 2;
-      y = midPoint[1] - boundTextElement.height / 2;
-    } else {
-      const index = element.points.length / 2 - 1;
-      const midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
-        element,
-        index + 1,
-        elementsMap,
-      );
 
-      x = midSegmentMidpoint[0] - boundTextElement.width / 2;
-      y = midSegmentMidpoint[1] - boundTextElement.height / 2;
-    }
-    return { x, y };
+    const center = LinearElementEditor.getBoundTextElementCenter(
+      element,
+      elementsMap,
+    );
+
+    return {
+      x: center[0] - boundTextElement.width / 2,
+      y: center[1] - boundTextElement.height / 2,
+    };
   };
 
   static getMinMaxXYWithBoundText = (
