@@ -106,6 +106,7 @@ export const getDefaultAppState = (): Omit<
       panels: STATS_PANELS.generalStats | STATS_PANELS.elementProperties,
     },
     suggestedBinding: null,
+    hoveredArrowTextAnchor: null,
     frameRendering: {
       enabled: true,
       clip: true,
@@ -270,6 +271,7 @@ const APP_STATE_STORAGE_CONF = (<
   shouldCacheIgnoreZoom: { browser: true, export: false, server: false },
   stats: { browser: true, export: false, server: false },
   suggestedBinding: { browser: false, export: false, server: false },
+  hoveredArrowTextAnchor: { browser: false, export: false, server: false },
   frameRendering: { browser: false, export: false, server: false },
   frameToHighlight: { browser: false, export: false, server: false },
   editingFrame: { browser: false, export: false, server: false },
