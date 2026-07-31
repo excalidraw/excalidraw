@@ -78,8 +78,6 @@ import {
   updateObject,
   updateActiveTool,
   isTransparent,
-  getBucketFillBackgroundColor,
-  getSizeFromPoints,
   muteFSAbortError,
   isTestEnv,
   isDevEnv,
@@ -135,9 +133,6 @@ import {
   newElement,
   newImageElement,
   newLinearElement,
-  computeBucketFillPolygon,
-  isBucketFillCompatible,
-  isRestylableFill,
   newTextElement,
   refreshTextDimensions,
   deepCopyElement,
@@ -438,6 +433,7 @@ import ConvertElementTypePopup, {
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppArrowText } from "./App.arrowText";
+import { AppBucketFill } from "./App.bucketFill";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
@@ -687,6 +683,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
+  public bucketFill: AppBucketFill = new AppBucketFill(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
@@ -3093,6 +3090,8 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.triggerUpdate();
     }
   });
+
+  public scheduleCapture = () => this.store.scheduleCapture();
 
   // Lifecycle
 
@@ -6439,7 +6438,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
-  getElementAtPosition(
+  public getElementAtPosition(
     x: number,
     y: number,
     opts?: (
@@ -7478,7 +7477,7 @@ class App extends React.Component<AppProps, AppState> {
    * finds candidate frame under cursor (when dragging frame children/elements
    * inside frames)
    */
-  private getTopLayerFrameAtSceneCoords = (
+  public getTopLayerFrameAtSceneCoords = (
     /**
      * should be already grid aligned (basically should be what the call site
      * sets the element's coords to, if applicable)
@@ -8353,162 +8352,6 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  /**
-   * Apply the current bucket fill settings to an existing fill-compatible
-   * element (no-op when nothing would change). One undoable step.
-   */
-  private restyleBucketFill = (element: NonDeletedExcalidrawElement) => {
-    const backgroundColor = getBucketFillBackgroundColor(
-      this.state.currentItemBackgroundColor,
-    );
-    if (
-      element.backgroundColor === backgroundColor &&
-      element.fillStyle === this.state.currentItemFillStyle &&
-      element.opacity === this.state.currentItemOpacity
-    ) {
-      return;
-    }
-    this.scene.mutateElement(element, {
-      backgroundColor,
-      fillStyle: this.state.currentItemFillStyle,
-      opacity: this.state.currentItemOpacity,
-    });
-    // the roughjs drawable is cached by element reference; in-place
-    // mutation keeps the reference, so evict it or the canvas won't
-    // reflect the new style
-    ShapeCache.delete(element);
-    this.store.scheduleCapture();
-  };
-
-  private handleBucketFillOnPointerDown = (scenePointer: {
-    x: number;
-    y: number;
-  }) => {
-    // shared with the generic shape background, but a transparent fill would
-    // be invisible, so fall back to a real color (appState is not mutated)
-    const backgroundColor = getBucketFillBackgroundColor(
-      this.state.currentItemBackgroundColor,
-    );
-
-    const elements = this.scene.getNonDeletedElements();
-    const elementsMap = this.scene.getNonDeletedElementsMap();
-    const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
-
-    const hitElement = this.getElementAtPosition(point[0], point[1]);
-
-    // gap bridging is covered by the default gapTolerance (a bucket-specific
-    // constant): connector edges close visual gaps without distorting the
-    // shape, so no zoom-dependent tuning is needed
-    const result = computeBucketFillPolygon({ point, elements, elementsMap });
-
-    if (!result.ok) {
-      // no region could be derived, but the click still landed on existing
-      // paint (e.g. an orphaned fill whose boundaries were deleted, or a
-      // hand-drawn strokeless bg polygon on empty canvas) — restyling it is
-      // the sensible outcome, and beats a toast
-      if (hitElement && isBucketFillCompatible(hitElement)) {
-        this.restyleBucketFill(hitElement);
-        return;
-      }
-      if (result.reason === "too_complex") {
-        this.setToast({ message: t("bucketFill.tooComplex"), duration: 3000 });
-      } else if (
-        result.reason === "open_region" ||
-        result.reason === "too_small" ||
-        result.reason === "invalid_polygon"
-      ) {
-        this.setToast({ message: t("bucketFill.noRegion"), duration: 3000 });
-      }
-      // "no_owner" stays silent — clicking empty canvas shouldn't nag
-      return;
-    }
-
-    // re-clicking an already-filled region shouldn't stack a duplicate:
-    // restyle the existing fill with the current settings, or no-op when
-    // nothing would change
-    if (
-      hitElement &&
-      isRestylableFill({
-        hitElement,
-        scenePoints: result.scenePoints,
-        elementsMap,
-      })
-    ) {
-      this.restyleBucketFill(hitElement);
-      return;
-    }
-
-    const { width, height } = getSizeFromPoints(result.scenePoints);
-    // linear elements are normalized so points[0] must be [0, 0]; use the
-    // first scene point as the element origin
-    const [originX, originY] = result.scenePoints[0];
-    const points = result.scenePoints.map((p) =>
-      pointFrom<LocalPoint>(p[0] - originX, p[1] - originY),
-    );
-
-    const owner = result.ownerId ? elementsMap.get(result.ownerId) : null;
-    // owner-less fills (regions formed by open lines) take their frame from
-    // the click position and only inherit a group shared by every boundary
-    const frameId = owner
-      ? isFrameLikeElement(owner)
-        ? owner.id
-        : owner.frameId
-      : this.getTopLayerFrameAtSceneCoords(scenePointer)?.id ?? null;
-    const groupIds = owner
-      ? owner.groupIds
-      : result.boundaryElementIds
-          .map((id) => elementsMap.get(id)?.groupIds)
-          .filter((groupIds): groupIds is string[] => !!groupIds)
-          .reduce(
-            (common, groupIds) =>
-              common === null
-                ? groupIds
-                : common.filter((groupId) => groupIds.includes(groupId)),
-            null as string[] | null,
-          ) ?? [];
-
-    const fill = newLinearElement({
-      type: "line",
-      x: originX,
-      y: originY,
-      width,
-      height,
-      points,
-      polygon: true,
-      strokeColor: "transparent",
-      backgroundColor,
-      fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: 1,
-      strokeStyle: "solid",
-      roughness: 0,
-      roundness: null,
-      opacity: this.state.currentItemOpacity,
-      frameId,
-      groupIds,
-      // no marker: fills are recognized by shape (`isBucketFillCompatible`),
-      // since metadata would go stale the moment the user restyles the fill
-    });
-
-    // resolve the geometry's relative placement against the
-    // deleted-inclusive array that `insertElementsAtIndex` operates on
-    const anchorIndex = this.scene
-      .getElementsIncludingDeleted()
-      .findIndex((el) => el.id === result.insertion.elementId);
-    this.scene.insertElementsAtIndex(
-      [fill],
-      anchorIndex < 0
-        ? null
-        : result.insertion.placement === "above"
-        ? anchorIndex + 1
-        : anchorIndex,
-    );
-
-    // Keep the bucket fill tool active and do NOT select the new fill, so the
-    // user can keep filling regions back-to-back without re-selecting the tool
-    // (even when the tool isn't locked).
-    this.store.scheduleCapture();
-  };
-
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
@@ -8958,7 +8801,7 @@ class App extends React.Component<AppProps, AppState> {
       // callbacks, pointer-up teardown, missing-pointer-up cleanup — runs
       // for bucket clicks too. In view mode this branch is unreachable:
       // `handleCanvasPanUsingWheelOrSpaceDrag` swallows the pointer-down.
-      this.handleBucketFillOnPointerDown(scenePointer);
+      this.bucketFill.handlePointerDown(scenePointer);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
