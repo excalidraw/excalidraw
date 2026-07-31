@@ -6,6 +6,7 @@ import { isInteractive } from "@excalidraw/common";
 
 import { useEditorInterface } from "./App";
 import { Island } from "./Island";
+import { ObsidianRadixPortal } from "./ObsidianRadixPortal";
 
 interface PropertiesPopoverProps {
   className?: string;
@@ -44,7 +45,8 @@ export const PropertiesPopover = React.forwardRef<
       editorInterface.formFactor === "phone" && !editorInterface.isLandscape;
 
     return (
-      <Popover.Portal container={container}>
+      /* <Popover.Portal container={container}> */
+      <ObsidianRadixPortal portal={Popover.Portal} container={container}> //zsviczian body-level portal prevents vertical displacement in Obsidian popout windows
         <Popover.Content
           ref={ref}
           className={clsx("focus-visible-none", className)}
@@ -96,7 +98,7 @@ export const PropertiesPopover = React.forwardRef<
             }}
           />
         </Popover.Content>
-      </Popover.Portal>
+      </ObsidianRadixPortal> //zsviczian </Popover.Portal>
     );
   },
 );

@@ -7,8 +7,9 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
-import { useEditorInterface } from "../App";
+import { useEditorInterface, useExcalidrawContainer } from "../App";
 import { Island } from "../Island";
+import { ObsidianRadixPortal } from "../ObsidianRadixPortal";
 import Stack from "../Stack";
 
 import { DropdownMenuContentPropsContext } from "./common";
@@ -35,6 +36,7 @@ const MenuContent = ({
   align?: "start" | "center" | "end";
 }) => {
   const editorInterface = useEditorInterface();
+  const { container } = useExcalidrawContainer(); //zsviczian -- resolve the correct Obsidian popout document and collision boundary
   const appState = useUIAppState(); //zsviczian
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -89,25 +91,33 @@ const MenuContent = ({
 
   return (
     <DropdownMenuContentPropsContext.Provider value={{ onSelect }}>
-      <DropdownMenuPrimitive.Content
-        ref={menuRef}
-        className={classNames}
-        style={style}
-        data-testid="dropdown-menu"
-        align={align}
-        sideOffset={8}
-        onCloseAutoFocus={(event: Event) => event.preventDefault()}
+      {/* zsviczian START -- body-level portal prevents vertical displacement in Obsidian popout windows, #10221 */}
+      <ObsidianRadixPortal
+        portal={DropdownMenuPrimitive.Portal}
+        container={container}
       >
-        {/* the zIndex ensures this menu has higher stacking order,
+        <DropdownMenuPrimitive.Content
+          ref={menuRef}
+          className={classNames}
+          style={style}
+          data-testid="dropdown-menu"
+          align={align}
+          sideOffset={8}
+          collisionBoundary={container ?? undefined} //zsviczian -- constrain the portaled menu to the Excalidraw viewport, #10221
+          onCloseAutoFocus={(event: Event) => event.preventDefault()}
+        >
+          {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}
-        {editorInterface.formFactor === "phone" ? (
-          <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
-        ) : (
-          <Island className="dropdown-menu-container" padding={2}>
-            {children}
-          </Island>
-        )}
-      </DropdownMenuPrimitive.Content>
+          {editorInterface.formFactor === "phone" ? (
+            <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
+          ) : (
+            <Island className="dropdown-menu-container" padding={2}>
+              {children}
+            </Island>
+          )}
+        </DropdownMenuPrimitive.Content>
+      </ObsidianRadixPortal>
+      {/* zsviczian END */}
     </DropdownMenuContentPropsContext.Provider>
   );
 };

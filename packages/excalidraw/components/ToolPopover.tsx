@@ -13,6 +13,7 @@ import { isToolButtonDisabled } from "./Tools";
 import "./ToolPopover.scss";
 
 import { useExcalidrawContainer } from "./App";
+import { ObsidianRadixPortal } from "./ObsidianRadixPortal";
 
 import type { AppClassProperties } from "../types";
 
@@ -82,33 +83,35 @@ export const ToolPopover = ({
           }}
         />
       </Popover.Trigger>
-
-      <Popover.Content
-        className="tool-popover-content"
-        sideOffset={SIDE_OFFSET}
-        collisionBoundary={container ?? undefined}
-      >
-        {options.map(({ type, icon, title, fillable }) => (
-          <IconButton
-            className={clsx({ fillable })}
-            key={type}
-            type="toggle"
-            icon={icon}
-            checked={currentType === type}
-            disabled={isToolButtonDisabled(app, type)}
-            title={capitalizeString(type)}
-            aria-label={capitalizeString(type)}
-            data-testid={`toolbar-${type}`}
-            onSelect={() => {
-              if (app.state.activeTool.type !== type) {
-                trackEvent("toolbar", type, "ui");
-                app.setActiveTool({ type: type as any });
-                onToolChange?.(type);
-              }
-            }}
-          />
-        ))}
-      </Popover.Content>
+      {/*zsviczian body-level portal prevents vertical displacement in Obsidian popout windows*/}
+      <ObsidianRadixPortal portal={Popover.Portal} container={container}>
+        <Popover.Content
+          className="tool-popover-content"
+          sideOffset={SIDE_OFFSET}
+          collisionBoundary={container ?? undefined}
+        >
+          {options.map(({ type, icon, title, fillable }) => (
+            <IconButton
+              className={clsx({ fillable })}
+              key={type}
+              type="toggle"
+              icon={icon}
+              checked={currentType === type}
+              disabled={isToolButtonDisabled(app, type)}
+              title={capitalizeString(type)}
+              aria-label={capitalizeString(type)}
+              data-testid={`toolbar-${type}`}
+              onSelect={() => {
+                if (app.state.activeTool.type !== type) {
+                  trackEvent("toolbar", type, "ui");
+                  app.setActiveTool({ type: type as any });
+                  onToolChange?.(type);
+                }
+              }}
+            />
+          ))}
+        </Popover.Content>
+      </ObsidianRadixPortal> {/* zsviczian END */}
     </Popover.Root>
   );
 };
