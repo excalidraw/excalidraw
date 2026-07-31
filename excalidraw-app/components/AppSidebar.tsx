@@ -7,6 +7,7 @@ import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 
 import { Tooltip } from "@excalidraw/excalidraw/components/Tooltip";
+import { t } from "@excalidraw/excalidraw/i18n";
 
 import "./AppSidebar.scss";
 
@@ -73,18 +74,20 @@ export const AppSidebar = () => {
   return (
     <DefaultSidebar>
       <DefaultSidebar.TabTriggers>
-        <Tooltip label="Comments">
+        <Tooltip label={t("sidebar.comments")}>
           <Sidebar.TabTrigger
             tab="comments"
             style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
+            aria-label={t("sidebar.comments")}
           >
             {messageCircleIcon}
           </Sidebar.TabTrigger>
         </Tooltip>
-        <Tooltip label="Presentation">
+        <Tooltip label={t("sidebar.presentation")}>
           <Sidebar.TabTrigger
             tab="presentation"
             style={{ opacity: openSidebar?.tab === "presentation" ? 1 : 0.4 }}
+            aria-label={t("sidebar.presentation")}
           >
             {presentationIcon}
           </Sidebar.TabTrigger>
