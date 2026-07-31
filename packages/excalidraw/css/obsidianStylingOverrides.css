@@ -354,6 +354,10 @@
   }
 }
 
+.excalidraw-wrapper .excalidraw--tray .App-toolbar > .HintViewer {
+  position: absolute; /* zsviczian: keep the shared toolbar hint outside the tray island's flex layout */
+}
+
 .excalidraw-hidden,
 .excalidraw-display-none {
   display: none !important;
