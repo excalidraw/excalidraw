@@ -28,6 +28,31 @@ const polygonArea = (pts: GlobalPoint[]): number => {
   return Math.abs(area / 2);
 };
 
+/**
+ * Turn a computed fill polygon into the line element the app would create
+ * for it, so a follow-up `computeBucketFillPolygon` sees the prior fill.
+ */
+const materializeFill = (scenePoints: readonly GlobalPoint[]) => {
+  const minX = Math.min(...scenePoints.map((p) => p[0]));
+  const minY = Math.min(...scenePoints.map((p) => p[1]));
+  const maxX = Math.max(...scenePoints.map((p) => p[0]));
+  const maxY = Math.max(...scenePoints.map((p) => p[1]));
+  return API.createElement({
+    type: "line",
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+    points: scenePoints.map((p) =>
+      pointFrom<LocalPoint>(p[0] - minX, p[1] - minY),
+    ),
+    polygon: true,
+    backgroundColor: "#ffc9c9",
+    fillStyle: "solid",
+    strokeColor: "transparent",
+  });
+};
+
 const isClosed = (pts: GlobalPoint[]): boolean =>
   pts.length > 3 &&
   pts[0][0] === pts[pts.length - 1][0] &&
@@ -1480,6 +1505,117 @@ describe("computeBucketFillPolygon", () => {
     // the whole rect, not the top half the buried line would carve out
     expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -2);
     expect(result.boundaryElementIds).not.toContain(buried.id);
+  });
+
+  // a fill's polygon runs along the CENTERLINE of the strokes that bound it,
+  // so once the fill counts as a coverer, a clip test without a boundary
+  // margin eats those strokes on the next click and adjacent regions merge
+  // (or the region falls open). Rounded corners are what trigger it: the
+  // sampled arc midpoints land inside the fill ring within simplification
+  // jitter. See final-review-04.md §11.
+  it("a fill does not clip the strokes that bound it (fill-then-fill, transparent container on top)", () => {
+    const upper = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+      backgroundColor: "#ffd43b",
+      fillStyle: "solid",
+    });
+    const lower = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+      backgroundColor: "transparent",
+    });
+
+    // step 1: click the overlap — the lens between the two containers
+    const first = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(75, 75),
+      ...setup([upper, lower]),
+    });
+    expect(first.ok).toBe(true);
+    if (!first.ok) {
+      return;
+    }
+    expect(polygonArea(first.scenePoints)).toBeGreaterThan(2000);
+    expect(polygonArea(first.scenePoints)).toBeLessThan(2600);
+    expect(first.insertion).toEqual({
+      placement: "above",
+      elementId: upper.id,
+    });
+
+    // step 2: materialize the lens fill at its computed insertion and click
+    // the lower container's remaining region
+    const second = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(120, 120),
+      ...setup([upper, materializeFill(first.scenePoints), lower]),
+    });
+    expect(second.ok).toBe(true);
+    if (!second.ok) {
+      return;
+    }
+    // the lower container MINUS the lens (~7270), not the whole container
+    // (~9530 — the regression: the fill flooded through the lens)
+    expect(polygonArea(second.scenePoints)).toBeGreaterThan(6900);
+    expect(polygonArea(second.scenePoints)).toBeLessThan(7700);
+  });
+
+  it("a fill does not clip the strokes that bound it (fill-then-fill, opaque container on top)", () => {
+    const lower = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+      backgroundColor: "transparent",
+    });
+    const upper = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+      backgroundColor: "#ffd43b",
+      fillStyle: "solid",
+    });
+
+    // step 1: click the overlap — the opaque container is on top, so the
+    // region is its whole footprint
+    const first = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(75, 75),
+      ...setup([lower, upper]),
+    });
+    expect(first.ok).toBe(true);
+    if (!first.ok) {
+      return;
+    }
+    expect(polygonArea(first.scenePoints)).toBeGreaterThan(9000);
+    expect(polygonArea(first.scenePoints)).toBeLessThan(10000);
+    expect(first.insertion).toEqual({
+      placement: "above",
+      elementId: upper.id,
+    });
+
+    // step 2: click the lower container's remaining region — before the
+    // boundary-margin fix this failed outright (`open_region`)
+    const second = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(120, 120),
+      ...setup([lower, upper, materializeFill(first.scenePoints)]),
+    });
+    expect(second.ok).toBe(true);
+    if (!second.ok) {
+      return;
+    }
+    expect(polygonArea(second.scenePoints)).toBeGreaterThan(6900);
+    expect(polygonArea(second.scenePoints)).toBeLessThan(7700);
   });
 
   it("isRestylableFill accepts strokeless bg polygons covering the region", () => {

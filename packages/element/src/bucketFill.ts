@@ -30,6 +30,7 @@ import {
 } from "./bounds";
 import { intersectElementWithLineSegment, isPointInElement } from "./collision";
 import { hasBackground } from "./comparisons";
+import { distanceToElement } from "./distance";
 import { getFreedrawStrokeCenterPoints } from "./shape";
 import {
   isFreeDrawElement,
@@ -102,6 +103,19 @@ const BUCKET_FILL_GAP_TOLERANCE = 6;
  * widths, so "the same region" matches what the user sees.
  */
 const BUCKET_FILL_REGION_MATCH_TOLERANCE = 2;
+
+/**
+ * How deep inside a coverer, in scene px, a stroke must lie before it counts
+ * as hidden (see `clipSegmentToVisible`). A fill's polygon runs along the
+ * CENTERLINE of the strokes that bound it, so without a margin the fill —
+ * itself a coverer — would clip its own boundary strokes on the next click
+ * and adjacent regions would merge. A stroke on a coverer's edge still
+ * renders its outer half; only strokes buried deeper than this stay clipped.
+ * Sized like `BUCKET_FILL_REGION_MATCH_TOLERANCE`: above the pipeline's own
+ * jitter (~0.75px simplification + `snapEpsilon`), below typical visible
+ * stroke overlaps.
+ */
+const BUCKET_FILL_COVER_MARGIN = 2;
 
 /**
  * Max deviation, in scene px, of a curved (`roundness`) line's sampled
@@ -372,6 +386,11 @@ const freedrawIdealSegments = (
  * Clip a segment to only its visible parts: the portions covered by an opaque
  * (non-transparent background) element above the segment's source are hidden
  * and removed. Returns the visible sub-segments (possibly empty).
+ *
+ * A portion only counts as covered when it lies inside the coverer by at
+ * least `margin` — a stroke whose centerline sits ON a coverer's edge (the
+ * shape a fill bounded by that stroke takes) still renders its outer half,
+ * so it must keep bounding; see `BUCKET_FILL_COVER_MARGIN`.
  */
 const clipSegmentToVisible = (
   a: GlobalPoint,
@@ -379,6 +398,7 @@ const clipSegmentToVisible = (
   coverers: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
   eps: number,
+  margin: number,
 ): [GlobalPoint, GlobalPoint][] => {
   let intervals: [number, number][] = [[0, 1]];
   for (const coverer of coverers) {
@@ -405,12 +425,10 @@ const clipSegmentToVisible = (
       if (t1 - t0 < 1e-9) {
         continue;
       }
+      const mid = pointAtParam(a, b, (t0 + t1) / 2);
       if (
-        isPointInElement(
-          pointAtParam(a, b, (t0 + t1) / 2),
-          coverer,
-          elementsMap,
-        )
+        isPointInElement(mid, coverer, elementsMap) &&
+        distanceToElement(coverer, elementsMap, mid) > margin
       ) {
         covered.push([t0, t1]);
       }
@@ -1414,6 +1432,13 @@ export const computeBucketFillPolygon = (args: {
           coverer.id !== element.id &&
           (indexOf.get(coverer.id) ?? 0) > elementIndex,
       );
+      // half this element's stroke still renders when its centerline lies on
+      // a coverer's edge — never treat that band as hidden
+      const clipMargin = Math.max(
+        options.snapEpsilon,
+        element.strokeWidth / 2,
+        BUCKET_FILL_COVER_MARGIN,
+      );
       const segments = isLineElement(element)
         ? lineElementIdealSegments(element, elementsMap)
         : isFreeDrawElement(element)
@@ -1460,6 +1485,7 @@ export const computeBucketFillPolygon = (args: {
           coverersAbove,
           elementsMap,
           options.snapEpsilon,
+          clipMargin,
         )) {
           rawSegments.push({
             segment: lineSegment(a, b),
