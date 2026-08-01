@@ -49,7 +49,11 @@ export const ObsidianRadixPortal = ({
 
   return (
     <Portal container={container?.ownerDocument.body}>
-      <div className={container?.className} style={bridgeStyle}>
+      <div
+        className={container?.className}
+        style={bridgeStyle}
+        data-radix-portal // zsviczian -- keep body-portaled UI inside sidebar outside-click handling
+      >
         {children}
       </div>
     </Portal>
