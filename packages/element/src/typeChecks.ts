@@ -29,6 +29,7 @@ import type {
   ExcalidrawLineElement,
   ExcalidrawFlowchartNodeElement,
   ExcalidrawLinearElementSubType,
+  ElementsMap,
 } from "./types";
 
 export const isInitializedImageElement = <T extends ExcalidrawElement>(
@@ -412,4 +413,33 @@ export const isEligibleFrameChildType = (type: ElementOrToolType) => {
       return false;
     }
   }
+};
+
+export const isElementVisible = (
+  element: ExcalidrawElement | null | undefined,
+  elementsMap?: ElementsMap | Map<string, ExcalidrawElement> | null,
+): boolean => {
+  if (!element) {
+    return false;
+  }
+  if (element.isVisible === false) {
+    return false;
+  }
+  if (element.frameId && elementsMap) {
+    const parentFrame = elementsMap.get(element.frameId) as
+      | ExcalidrawFrameLikeElement
+      | undefined;
+    if (parentFrame) {
+      if (parentFrame.isVisible === false) {
+        return false;
+      }
+      if (element.layerId && parentFrame.layers) {
+        const layer = parentFrame.layers.find((l) => l.id === element.layerId);
+        if (layer && !layer.isVisible) {
+          return false;
+        }
+      }
+    }
+  }
+  return true;
 };

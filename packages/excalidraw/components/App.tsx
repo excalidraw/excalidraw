@@ -322,6 +322,7 @@ import {
   actionUngroup,
   actionLink,
   actionToggleElementLock,
+  actionToggleElementVisibility,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
   actionToggleArrowBinding,
@@ -13664,6 +13665,7 @@ class App extends React.Component<AppProps, AppState> {
       CONTEXT_MENU_SEPARATOR,
       actionDuplicateSelection,
       actionToggleElementLock,
+      actionToggleElementVisibility,
       CONTEXT_MENU_SEPARATOR,
       actionDeleteSelected,
     ];

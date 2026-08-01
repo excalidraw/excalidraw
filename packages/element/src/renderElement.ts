@@ -62,6 +62,7 @@ import {
   hasBoundTextElement,
   isMagicFrameElement,
   isImageElement,
+  isElementVisible,
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
@@ -206,6 +207,9 @@ const generateElementCanvas = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ): ExcalidrawElementWithCanvas | null => {
+  if (!isElementVisible(element, elementsMap)) {
+    return null;
+  }
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);

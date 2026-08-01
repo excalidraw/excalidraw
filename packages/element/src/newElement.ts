@@ -74,6 +74,8 @@ export type ElementConstructorOpts = MarkOptional<
   | "locked"
   | "opacity"
   | "customData"
+  | "isVisible"
+  | "layerId"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -98,6 +100,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     boundElements = null,
     link = null,
     locked = DEFAULT_ELEMENT_PROPS.locked,
+    isVisible = true,
+    layerId = null,
     ...rest
   }: ElementConstructorOpts & Omit<Partial<ExcalidrawGenericElement>, "type">,
 ) => {
@@ -154,6 +158,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     updated: getUpdatedTimestamp(),
     link,
     locked,
+    isVisible,
+    layerId,
     customData: rest.customData,
   };
   return element;
