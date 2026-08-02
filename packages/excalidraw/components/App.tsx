@@ -7748,37 +7748,40 @@ class App extends React.Component<AppProps, AppState> {
     > | null = null;
 
     if (!this.state.editingTextElement && !isOverScrollBar) {
-      // mirror what clicking at this position would do: editing an existing
-      // text element always wins (see startTextEditing), else highlight the
-      // empty container the new text would get bound to (see
-      // handleTextOnPointerDown)
-      const textAtPosition = this.getTextElementAtPosition(
+      // mirror what clicking at this position would do: a bindable arrow
+      // endpoint wins (see handleTextOnPointerDown) and gets its affordance
+      // via `hoveredArrowTextAnchor` — as do arrow midpoint-label anchors —
+      // so both are skipped here. Then editing an existing text element wins
+      // (see startTextEditing), else highlight the empty (non-arrow)
+      // container the new text would get bound to.
+      const arrowEndpoint = this.arrowText.getBindableEndpointAtPosition(
         sceneCoords.x,
         sceneCoords.y,
       );
-      if (textAtPosition) {
-        elementToHighlight = textAtPosition;
-      } else {
-        const container = this.getTextBindableContainerAtPosition(
+      if (!arrowEndpoint) {
+        const textAtPosition = this.getTextElementAtPosition(
           sceneCoords.x,
           sceneCoords.y,
         );
-        if (
-          container &&
-          !hasBoundTextElement(container) &&
-          !event.altKey &&
-          this.getTextWysiwygSnappedToCenterPosition(
+        if (textAtPosition) {
+          elementToHighlight = textAtPosition;
+        } else {
+          const container = this.getTextBindableContainerAtPosition(
             sceneCoords.x,
             sceneCoords.y,
-            this.state,
-            container,
-          )
-        ) {
-          // the binding highlight renderer only draws rectanguloid shapes,
-          // so arrow containers fall back to the box highlight
-          if (isArrowElement(container)) {
-            elementToHighlight = container;
-          } else {
+          );
+          if (
+            container &&
+            !isArrowElement(container) &&
+            !hasBoundTextElement(container) &&
+            !event.altKey &&
+            this.getTextWysiwygSnappedToCenterPosition(
+              sceneCoords.x,
+              sceneCoords.y,
+              this.state,
+              container,
+            )
+          ) {
             containerToBindTo = container;
           }
         }
