@@ -1780,7 +1780,10 @@ const _renderInteractiveScene = ({
       // the text element the text tool would edit on click — use the same
       // subtle dashed box as when editing a wrapped text element
       renderTextBox(
-        firstElementToHighlight,
+        getTextElementWithAccuratePosition(
+          firstElementToHighlight,
+          allElementsMap,
+        ),
         context,
         appState,
         renderConfig.selectionColor,

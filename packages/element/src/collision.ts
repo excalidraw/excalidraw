@@ -54,9 +54,10 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
-import { getBoundTextElement } from "./textElement";
-
-import { LinearElementEditor } from "./linearElementEditor";
+import {
+  getBoundTextElement,
+  getTextElementWithAccuratePosition,
+} from "./textElement";
 
 import { distanceToElement } from "./distance";
 
@@ -74,7 +75,6 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
-  ExcalidrawTextElementWithContainer,
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -191,24 +191,13 @@ export const hitElementItself = ({
     return false;
   }
 
-  // an arrow label's accurate position is not stored on the element but
-  // derived from the arrow (see getBoundTextElementPosition). The bounds
-  // test above already accounts for it (getElementBounds derives it
+  // an arrow label's stored coords can be stale. The bounds test above
+  // already accounts for it (getElementBounds derives the position
   // internally), but the precise test below reads the element coords
   // directly, so substitute them. Done after the early bail so the common
   // miss path stays allocation-free.
-  if (isTextElement(element) && element.containerId) {
-    const container = elementsMap.get(element.containerId);
-    if (container && isLinearElement(container)) {
-      element = {
-        ...element,
-        ...LinearElementEditor.getBoundTextElementPosition(
-          container,
-          element as ExcalidrawTextElementWithContainer,
-          elementsMap,
-        ),
-      };
-    }
+  if (isTextElement(element)) {
+    element = getTextElementWithAccuratePosition(element, elementsMap);
   }
 
   // Do the precise (and relatively costly) hit test
@@ -281,18 +270,10 @@ export const hitElementBoundText = (
   if (!boundTextElementCandidate) {
     return false;
   }
-  const boundTextElement = isLinearElement(element)
-    ? {
-        ...boundTextElementCandidate,
-        // arrow's bound text accurate position is not stored in the element's property
-        // but rather calculated and returned from the following static method
-        ...LinearElementEditor.getBoundTextElementPosition(
-          element,
-          boundTextElementCandidate,
-          elementsMap,
-        ),
-      }
-    : boundTextElementCandidate;
+  const boundTextElement = getTextElementWithAccuratePosition(
+    boundTextElementCandidate,
+    elementsMap,
+  );
 
   return isPointInElement(point, boundTextElement, elementsMap);
 };
