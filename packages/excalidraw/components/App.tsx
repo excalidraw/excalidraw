@@ -6159,6 +6159,7 @@ class App extends React.Component<AppProps, AppState> {
         // only the text tool offers arrow-endpoint binding, and the highlight
         // is refreshed on pointermove — don't leave a stale one behind
         hoveredArrowTextAnchor: null,
+        elementsToHighlight: null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -7710,6 +7711,84 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
+  private maybeUpdateTextToolHighlightOnPointerMove = (
+    sceneCoords: { x: number; y: number },
+    event: React.PointerEvent<HTMLCanvasElement>,
+    isOverScrollBar: boolean,
+  ) => {
+    // `elementsToHighlight` is shared with frame drag/resize flows, so only
+    // manage it while the text tool owns the interaction (switching tools
+    // resets it via setActiveTool)
+    if (this.state.activeTool.type !== "text") {
+      return;
+    }
+
+    if (
+      this.state.newElement ||
+      this.state.multiElement ||
+      this.state.selectionElement ||
+      this.state.selectedElementsAreBeingDragged
+    ) {
+      return;
+    }
+
+    let elementToHighlight: NonDeleted<ExcalidrawElement> | null = null;
+    let containerToBindTo: NonDeleted<
+      Exclude<ExcalidrawTextContainer, ExcalidrawArrowElement>
+    > | null = null;
+
+    if (!this.state.editingTextElement && !isOverScrollBar) {
+      // mirror what clicking at this position would do: editing an existing
+      // text element always wins (see startTextEditing), else highlight the
+      // empty container the new text would get bound to (see
+      // handleTextOnPointerDown)
+      const textAtPosition = this.getTextElementAtPosition(
+        sceneCoords.x,
+        sceneCoords.y,
+      );
+      if (textAtPosition) {
+        elementToHighlight = textAtPosition;
+      } else {
+        const container = this.getTextBindableContainerAtPosition(
+          sceneCoords.x,
+          sceneCoords.y,
+        );
+        if (
+          container &&
+          !hasBoundTextElement(container) &&
+          !event.altKey &&
+          this.getTextWysiwygSnappedToCenterPosition(
+            sceneCoords.x,
+            sceneCoords.y,
+            this.state,
+            container,
+          )
+        ) {
+          // the binding highlight renderer only draws rectanguloid shapes,
+          // so arrow containers fall back to the box highlight
+          if (isArrowElement(container)) {
+            elementToHighlight = container;
+          } else {
+            containerToBindTo = container;
+          }
+        }
+      }
+    }
+
+    if ((this.state.elementsToHighlight?.[0] ?? null) !== elementToHighlight) {
+      this.setState({
+        elementsToHighlight: elementToHighlight ? [elementToHighlight] : null,
+      });
+    }
+    if ((this.state.suggestedBinding?.element ?? null) !== containerToBindTo) {
+      this.setState({
+        suggestedBinding: containerToBindTo
+          ? { element: containerToBindTo }
+          : null,
+      });
+    }
+  };
+
   public insertNewElements = (elements: readonly ExcalidrawElement[]) => {
     if (!elements.length) {
       return;
@@ -7816,6 +7895,15 @@ class App extends React.Component<AppProps, AppState> {
         x: scenePointerX,
         y: scenePointerY,
       },
+      isOverScrollBar,
+    );
+
+    this.maybeUpdateTextToolHighlightOnPointerMove(
+      {
+        x: scenePointerX,
+        y: scenePointerY,
+      },
+      event,
       isOverScrollBar,
     );
 
@@ -9898,9 +9986,14 @@ class App extends React.Component<AppProps, AppState> {
     const sceneY = pointerDownState.origin.y;
 
     // the click transitions into text editing either way, consuming (or
-    // bypassing) whatever anchor was highlighted — don't leave it lingering
-    // under the editor, which outlives the hover when the tool is locked
-    this.setState({ hoveredArrowTextAnchor: null });
+    // bypassing) whatever anchor or hover highlight was shown — don't leave
+    // them lingering under the editor, which outlives the hover when the
+    // tool is locked
+    this.setState({
+      hoveredArrowTextAnchor: null,
+      elementsToHighlight: null,
+      suggestedBinding: null,
+    });
 
     // a free arrow endpoint takes precedence over adding a label *to* the
     // arrow — it's the smaller, more deliberate target

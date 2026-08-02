@@ -1912,6 +1912,70 @@ describe("textWysiwyg", () => {
       expect(text.autoResize).toBe(false);
     });
 
+    it("should highlight an empty container the text tool would bind to on hover", async () => {
+      UI.clickTool("text");
+
+      // near the container center → click would bind to it, shown with the
+      // same binding highlight as arrow binding
+      mouse.moveTo(55, 57.5);
+      expect(h.state.suggestedBinding?.element?.id).toBe(rectangle.id);
+
+      // alt opts out of binding, so no highlight either
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(54, 57.5);
+        expect(h.state.suggestedBinding).toBe(null);
+      });
+
+      // off-center → click would create a free text
+      mouse.moveTo(20, 30);
+      expect(h.state.suggestedBinding).toBe(null);
+    });
+
+    it("should box-highlight an empty arrow container the text tool would bind to on hover", async () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 200,
+        y: 200,
+        width: 100,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(100, 0)],
+      });
+      API.setElements([arrow]);
+
+      UI.clickTool("text");
+
+      // near the arrow midpoint → click would bind a label to the arrow;
+      // the binding highlight can't render arrows, so the box highlight
+      // is used instead
+      mouse.moveTo(250, 200);
+      expect(h.state.elementsToHighlight?.[0]?.id).toBe(arrow.id);
+      expect(h.state.suggestedBinding).toBe(null);
+
+      // away from the midpoint → no highlight
+      mouse.moveTo(215, 200);
+      expect(h.state.elementsToHighlight).toBe(null);
+    });
+
+    it("should highlight the text the text tool would edit on hover", async () => {
+      // create a centered label (60x25 label bbox: (25, 45)-(85, 70))
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Hello!");
+      Keyboard.exitTextEditor(editor);
+      const label = h.elements[1] as ExcalidrawTextElementWithContainer;
+
+      UI.clickTool("text");
+
+      // over the label → click would edit it
+      mouse.moveTo(55, 57.5);
+      expect(h.state.elementsToHighlight?.[0]?.id).toBe(label.id);
+
+      // inside the container but off the label → click would create a free
+      // text, so neither the label nor the labeled container is highlighted
+      mouse.moveTo(20, 30);
+      expect(h.state.elementsToHighlight).toBe(null);
+    });
+
     it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {
       const text = API.createElement({
         type: "text",
