@@ -53,7 +53,8 @@ const buildChalkTile = (): HTMLCanvasElement | null => {
 
   for (let i = 0; i < cells * cells; i++) {
     const r = Math.random();
-    const erosion = r > threshold ? Math.min(1, (r - threshold) * GRAIN_STRENGTH) : 0;
+    const erosion =
+      r > threshold ? Math.min(1, (r - threshold) * GRAIN_STRENGTH) : 0;
     // color is irrelevant for destination-out; only alpha matters
     data[i * 4 + 3] = Math.round(erosion * 255);
   }

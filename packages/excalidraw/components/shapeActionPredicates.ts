@@ -127,7 +127,9 @@ export const getShapeActionPredicates = (
     strokeStyle: forToolOrSelection(hasStrokeStyle),
     sloppiness: forToolOrSelection(hasStrokeStyle),
     // chalk textures strokes/fills AND text glyphs, so surface it for text too
-    chalk: forToolOrSelection((type) => hasStrokeStyle(type) || type === "text"),
+    chalk: forToolOrSelection(
+      (type) => hasStrokeStyle(type) || type === "text",
+    ),
     roundness: forToolOrSelection(canChangeRoundness),
     arrowType: forToolOrSelection(toolIsArrow),
     arrowheads: forToolOrSelection(canHaveArrowheads),

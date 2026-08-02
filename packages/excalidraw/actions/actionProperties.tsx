@@ -738,8 +738,7 @@ export const actionChangeChalk = register<boolean>({
             app,
             (element) => element.chalk ?? false,
             (element) => element.hasOwnProperty("chalk"),
-            (hasSelection) =>
-              hasSelection ? null : appState.currentItemChalk,
+            (hasSelection) => (hasSelection ? null : appState.currentItemChalk),
           )}
           onChange={(value) => updateData(value)}
         />

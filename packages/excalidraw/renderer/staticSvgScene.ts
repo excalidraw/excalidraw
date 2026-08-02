@@ -113,12 +113,9 @@ export const appendChalkSvgFilter = (defs: SVGElement) => {
       in: "chalkGrain",
       type: "matrix",
       // alpha_out = 3.8*R - 0.95 (clamped) -> ~22% holes, matching canvas density
-      values: [
-        "0 0 0 0 0",
-        "0 0 0 0 0",
-        "0 0 0 0 0",
-        "3.8 0 0 0 -0.95",
-      ].join(" "),
+      values: ["0 0 0 0 0", "0 0 0 0 0", "0 0 0 0 0", "3.8 0 0 0 -0.95"].join(
+        " ",
+      ),
       result: "chalkMask",
     }),
   );
