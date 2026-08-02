@@ -40,6 +40,7 @@ import {
 import {
   hasBoundTextElement,
   isBindableElement,
+  isBoundToContainer,
   isFrameLikeElement,
   isFreeDrawElement,
   isIframeLikeElement,
@@ -73,6 +74,7 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
+  ExcalidrawTextElementWithContainer,
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -141,7 +143,10 @@ export const hitElementItself = ({
   // A cached hit stays valid for any larger threshold, while a cached miss
   // stays valid only for a threshold no larger than the cached one (a larger
   // threshold could turn a miss into a hit).
+  // Skipped for container-bound labels — their position can change without
+  // their version being bumped (see ElementBounds.getBounds).
   if (
+    !isBoundToContainer(element) &&
     cachedPoint &&
     pointsEqual(point, cachedPoint) &&
     (cachedHit ? cachedThreshold <= threshold : cachedThreshold >= threshold) &&
@@ -184,6 +189,26 @@ export const hitElementItself = ({
   // rotated bounding box or not hitting the frame name (saves 99%)
   if (!hitBounds && !hitFrameName) {
     return false;
+  }
+
+  // an arrow label's accurate position is not stored on the element but
+  // derived from the arrow (see getBoundTextElementPosition). The bounds
+  // test above already accounts for it (getElementBounds derives it
+  // internally), but the precise test below reads the element coords
+  // directly, so substitute them. Done after the early bail so the common
+  // miss path stays allocation-free.
+  if (isTextElement(element) && element.containerId) {
+    const container = elementsMap.get(element.containerId);
+    if (container && isLinearElement(container)) {
+      element = {
+        ...element,
+        ...LinearElementEditor.getBoundTextElementPosition(
+          container,
+          element as ExcalidrawTextElementWithContainer,
+          elementsMap,
+        ),
+      };
+    }
   }
 
   // Do the precise (and relatively costly) hit test

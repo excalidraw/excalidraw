@@ -1098,6 +1098,9 @@ const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elements: readonly NonDeletedExcalidrawElement[],
+  // needed to derive the accurate position of container-bound labels,
+  // which isn't stored on the element itself
+  elementsMap: ElementsMap,
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
   const {
@@ -1113,7 +1116,7 @@ const renderElementsBoxHighlight = (
   );
 
   const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
-    const [x1, y1, x2, y2] = getCommonBounds(elements);
+    const [x1, y1, x2, y2] = getCommonBounds(elements, elementsMap);
     return {
       angle: 0,
       x1,
@@ -1766,7 +1769,12 @@ const _renderInteractiveScene = ({
   }
 
   if (appState.elementsToHighlight) {
-    renderElementsBoxHighlight(context, appState, appState.elementsToHighlight);
+    renderElementsBoxHighlight(
+      context,
+      appState,
+      appState.elementsToHighlight,
+      allElementsMap,
+    );
   }
 
   if (appState.activeLockedId) {
@@ -1778,6 +1786,7 @@ const _renderInteractiveScene = ({
       context,
       appState,
       elements as NonDeletedExcalidrawElement[], // We don't typecheck runtime because of performance
+      allElementsMap,
       {
         colors: [getThemedColor("#ced4da", appState.theme)],
         dashed: true,
