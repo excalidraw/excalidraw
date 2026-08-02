@@ -443,6 +443,35 @@ export const getBoundTextElementPosition = (
   }
 };
 
+/**
+ * Returns the text element with its accurate coords. An arrow label's
+ * position is derived from the arrow at render time rather than kept in
+ * sync on the element itself (see getBoundTextElementPosition), so
+ * consumers reading a label's coords directly must go through this helper.
+ */
+export const getTextElementWithAccuratePosition = <
+  T extends ExcalidrawTextElement,
+>(
+  textElement: T,
+  elementsMap: ElementsMap,
+): T => {
+  if (!textElement.containerId) {
+    return textElement;
+  }
+  const container = elementsMap.get(textElement.containerId);
+  if (!container || !isArrowElement(container)) {
+    return textElement;
+  }
+  return {
+    ...textElement,
+    ...LinearElementEditor.getBoundTextElementPosition(
+      container,
+      textElement as ExcalidrawTextElementWithContainer,
+      elementsMap,
+    ),
+  };
+};
+
 export const shouldAllowVerticalAlign = (
   selectedElements: readonly ExcalidrawElement[],
   elementsMap: ElementsMap,
