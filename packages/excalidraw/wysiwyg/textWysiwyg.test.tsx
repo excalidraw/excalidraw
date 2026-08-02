@@ -2021,7 +2021,7 @@ describe("textWysiwyg", () => {
       Keyboard.exitTextEditor(editor);
     });
 
-    it("should box-highlight an empty arrow container the text tool would bind to on hover", async () => {
+    it("should leave arrow anchors to hoveredArrowTextAnchor instead of the text-tool highlights", async () => {
       const arrow = API.createElement({
         type: "arrow",
         x: 200,
@@ -2035,15 +2035,25 @@ describe("textWysiwyg", () => {
       UI.clickTool("text");
 
       // near the arrow midpoint → click would bind a label to the arrow;
-      // the binding highlight can't render arrows, so the box highlight
-      // is used instead
+      // the affordance is the midpoint-label anchor, not our highlights
       mouse.moveTo(250, 200);
-      expect(h.state.elementsToHighlight?.[0]?.id).toBe(arrow.id);
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: arrow.id,
+        anchor: "label",
+      });
+      expect(h.state.elementsToHighlight).toBe(null);
       expect(h.state.suggestedBinding).toBe(null);
 
-      // away from the midpoint → no highlight
-      mouse.moveTo(215, 200);
+      // near a free endpoint → same: endpoint anchor only, no highlights
+      mouse.moveTo(300, 200);
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: arrow.id,
+        anchor: "end",
+      });
       expect(h.state.elementsToHighlight).toBe(null);
+      expect(h.state.suggestedBinding).toBe(null);
+    });
+
     it("should clear the hover highlights when the text tool is canceled", async () => {
       const text = API.createElement({
         type: "text",
