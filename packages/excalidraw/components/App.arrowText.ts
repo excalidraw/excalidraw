@@ -110,17 +110,17 @@ export class AppArrowText {
       return null;
     }
 
-    // The text tool edits before it creates: when a text element is the
-    // top-most hit at this position, a click edits that text, so a nearby
-    // endpoint must not be offered over it.
-    if (this.app.getTextElementAtPosition(x, y)) {
-      return null;
-    }
-
     // The endpoint scan only knows about arrows, so it happily reaches through
     // whatever is drawn on top of them. An element stacked above the arrow that
-    // the pointer actually hits owns the click — the text tool should label
-    // that element rather than bind the endpoint hidden behind it.
+    // the pointer actually hits owns the click — the text tool should edit or
+    // label that element rather than bind the endpoint hidden behind it. This
+    // includes text: a text stacked above the arrow keeps its edit behavior.
+    //
+    // The preference is z-aware on purpose. When the arrow is the top-most hit
+    // (e.g. drawn over an existing text), its endpoint has full preference
+    // over the whole hit circle — a z-blind "any text under the cursor wins"
+    // rule would make the affordance flicker between the endpoint anchor and
+    // text editing wherever a text bbox edge cuts into the circle.
     const hitElement = this.app.getElementAtPosition(x, y, {
       includeLockedElements: true,
     });

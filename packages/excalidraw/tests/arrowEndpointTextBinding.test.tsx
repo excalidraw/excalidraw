@@ -736,11 +736,10 @@ describe("binding text to an arrow endpoint", () => {
       expect(getArrow("arrow").startBinding).toBeNull();
     });
 
-    // the text tool edits before it creates: a text that is the top-most hit
-    // under the cursor takes the click, so the endpoint must not be offered
-    // over it. Occlusion alone can't provide this — its hit test skips bound
-    // texts.
-    it("yields to a container-bound label overlapping the endpoint", async () => {
+    // the text-vs-endpoint preference is z-aware: whatever is stacked above
+    // owns its hit area. Here the labeled container sits above the arrow, so
+    // its label takes the click and the endpoint is not offered through it.
+    it("yields to a container-bound label overlapping the endpoint from above", async () => {
       const rect = API.createElement({
         type: "rectangle",
         id: "rect",
@@ -776,6 +775,70 @@ describe("binding text to an arrow endpoint", () => {
       await getTextEditor();
       expect(h.state.editingTextElement?.id).toBe("label");
       expect(getArrow("arrow").endBinding).toBeNull();
+    });
+
+    it("yields to a free text stacked above the arrow", async () => {
+      API.setElements([
+        createArrow("arrow", [100, 300], [100, 100]),
+        API.createElement({
+          type: "text",
+          id: "overlap",
+          x: 95,
+          y: 87.5,
+          width: 50,
+          height: 25,
+          text: "txt",
+        }),
+      ]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).toBeNull();
+      expect(h.state.elementsToHighlight?.[0]?.id).toBe("overlap");
+
+      // the click edits the covering text
+      mouse.clickAt(100, 100);
+      await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe("overlap");
+      expect(getArrow("arrow").endBinding).toBeNull();
+    });
+
+    // ...but when the arrow is the one on top, its endpoint keeps full
+    // preference over the whole hit circle — a z-blind "any text under the
+    // cursor wins" rule would flicker the affordance against the text's
+    // bbox edge cutting into the circle
+    it("wins over a free text stacked below the arrow", async () => {
+      API.setElements([
+        API.createElement({
+          type: "text",
+          id: "overlap",
+          x: 95,
+          y: 87.5,
+          width: 50,
+          height: 25,
+          text: "txt",
+        }),
+        createArrow("arrow", [100, 300], [100, 100]),
+      ]);
+
+      UI.clickTool("text");
+      mouse.moveTo(100, 100);
+      expect(h.state.hoveredArrowTextAnchor).toEqual({
+        elementId: "arrow",
+        anchor: "end",
+      });
+      expect(h.state.elementsToHighlight).toBe(null);
+
+      // the click binds a fresh text to the endpoint; the covering text is
+      // left alone
+      const editor = await bindTextAt(100, 100, "bound");
+      Keyboard.exitTextEditor(editor);
+      const boundText = h.elements.find(
+        (el): el is ExcalidrawTextElement =>
+          el.type === "text" && el.id !== "overlap",
+      )!;
+      expect(boundText.text).toBe("bound");
+      expect(getArrow("arrow").endBinding?.elementId).toBe(boundText.id);
     });
 
     it("creates a fresh text instead of adopting the selected one", async () => {
