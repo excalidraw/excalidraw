@@ -365,7 +365,15 @@ export interface AppState {
   boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
-  /** user preference whether arrow snap to midpoints while binding */
+  /**
+   * user preference whether arrow snap to midpoints while binding.
+   *
+   * When enabled, the `suggestedBinding` highlight also renders midpoint
+   * indicators, but only while the pointer is outside the highlighted
+   * element (or when drawing an elbow arrow) — so consumers that suggest
+   * binding only while the pointer is inside the element (e.g. the text
+   * tool) never show them.
+   */
   isMidpointSnappingEnabled: boolean;
   /** user preference whether to show contextual hints above the toolbar */
   showHints: boolean;
@@ -405,6 +413,12 @@ export interface AppState {
    * frame-like element whose name is currently being edited
    */
   editingFrame: ExcalidrawFrameLikeElement["id"] | null;
+  /**
+   * Elements the UI highlights with a bounding-box outline. Used when
+   * dragging/resizing a frame (elements that would get added to it) and by
+   * the text tool on hover (the text element a click would edit, or the
+   * arrow container a click would bind a label to).
+   */
   elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
    * set when a new text is created or when an existing text is being edited
