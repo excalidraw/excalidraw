@@ -1931,6 +1931,96 @@ describe("textWysiwyg", () => {
       expect(h.state.suggestedBinding).toBe(null);
     });
 
+    it("should edit the arrow label when clicking on the label with the text tool", async () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 200,
+        y: 200,
+        width: 100,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(100, 0)],
+      });
+      const label = API.createElement({
+        type: "text",
+        text: "label",
+        x: 225,
+        y: 187.5,
+        width: 50,
+        height: 25,
+        containerId: arrow.id,
+      });
+      API.setElements([arrow, label]);
+      h.app.scene.mutateElement(arrow, {
+        boundElements: [{ type: "text", id: label.id }],
+      });
+
+      // clicking the label itself should edit it
+      UI.clickTool("text");
+      mouse.clickAt(250, 200);
+      let editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(label.id);
+      Keyboard.exitTextEditor(editor);
+
+      // clicking the arrow line off the label should create a free text
+      UI.clickTool("text");
+      mouse.clickAt(210, 200);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).not.toBe(label.id);
+      updateTextEditor(editor, "free");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(3);
+      expect((h.elements[2] as ExcalidrawTextElement).containerId).toBe(null);
+      expect(arrow.boundElements).toStrictEqual([
+        { id: label.id, type: "text" },
+      ]);
+    });
+
+    it("should hit the arrow label at its derived position after the arrow moves", async () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 200,
+        y: 200,
+        width: 100,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(100, 0)],
+      });
+      // label centered on the arrow midpoint (250, 200)
+      const label = API.createElement({
+        type: "text",
+        text: "label",
+        x: 225,
+        y: 187.5,
+        width: 50,
+        height: 25,
+        containerId: arrow.id,
+      });
+      API.setElements([arrow, label]);
+      h.app.scene.mutateElement(arrow, {
+        boundElements: [{ type: "text", id: label.id }],
+      });
+
+      // move the arrow; like dragging, this doesn't update the label's
+      // stored coords — its position is derived from the arrow at render
+      h.app.scene.mutateElement(arrow, { x: 300, y: 250 });
+
+      UI.clickTool("text");
+
+      // hovering at the label's derived position (new midpoint 350, 250)
+      mouse.moveTo(350, 250);
+      expect(h.state.elementsToHighlight?.[0]?.id).toBe(label.id);
+
+      // hovering at the label's stale stored position
+      mouse.moveTo(250, 200);
+      expect(h.state.elementsToHighlight).toBe(null);
+
+      // clicking at the derived position should edit the label
+      mouse.clickAt(350, 250);
+      const editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(label.id);
+      Keyboard.exitTextEditor(editor);
+    });
+
     it("should box-highlight an empty arrow container the text tool would bind to on hover", async () => {
       const arrow = API.createElement({
         type: "arrow",
