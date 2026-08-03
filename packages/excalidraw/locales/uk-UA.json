@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Пунктир",
     "strokeStyle_dotted": "Крапки",
     "sloppiness": "Охайність",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Прозорість",
     "textAlign": "Вирівнювання тексту",
     "edges": "Краї",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "Перетворити у код",
     "embeddable": "Веб вкладення",
     "laser": "Лазерний вказівник",
+    "autoshape": "",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
     "mermaidToExcalidraw": "Mermaid у Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Натисніть і потягніть, відпустіть коли завершите",
     "text": "Порада: можна також додати текст, двічі клацнувши по будь-якому місці інструментом вибору",
     "embeddable": "Клікніть та перетягніть для створення вбудованого вебсайту",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Кольори",
     "shades": "Тіні",
     "hexCode": "Hex-код",
-    "noShades": "Немає доступних відтінків цього кольору"
+    "noShades": "Немає доступних відтінків цього кольору",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
