@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Gạch ngang",
     "strokeStyle_dotted": "Nhiều chấm",
     "sloppiness": "Hoa văn nét",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Độ trong suốt",
     "textAlign": "Căn chỉnh văn bản",
     "edges": "Cạnh",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "Wireframe thành code",
     "embeddable": "Nhúng Web",
     "laser": "Con trỏ laser",
+    "autoshape": "",
     "hand": "Tay kéo",
     "extraTools": "Công cụ khác",
     "mermaidToExcalidraw": "Mermaid sang Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Ấn bà kéo, thả khi bạn xong",
     "text": "Mẹo: bạn có thể thêm văn bản tại bất cứ đâu bằng cách ấn hai lần bằng tool lựa chọn",
     "embeddable": "Nhấp và kéo để tạo nội dung nhúng từ website.",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "Giới hạn góc độ bằng cách giữ {{shortcut}} khi xoay",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
