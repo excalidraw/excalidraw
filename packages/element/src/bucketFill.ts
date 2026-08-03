@@ -241,6 +241,42 @@ const projectParam = (
   return ((q[0] - a[0]) * dx + (q[1] - a[1]) * dy) / len2;
 };
 
+/**
+ * Visit every grid cell (of `cellSize`) that intersects the `inflate`-expanded
+ * segment a-b, walking column by column so a long diagonal segment visits the
+ * cells it passes near rather than its full bounding box.
+ */
+const forEachCellAlongSegment = (
+  a: GlobalPoint,
+  b: GlobalPoint,
+  inflate: number,
+  cellSize: number,
+  visit: (cx: number, cy: number) => void,
+): void => {
+  const minX = Math.min(a[0], b[0]);
+  const maxX = Math.max(a[0], b[0]);
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const fromCx = Math.floor((minX - inflate) / cellSize);
+  const toCx = Math.floor((maxX + inflate) / cellSize);
+  for (let cx = fromCx; cx <= toCx; cx++) {
+    // y-extent of the segment over this column's (inflated) x-interval
+    let y0 = a[1];
+    let y1 = b[1];
+    if (dx !== 0) {
+      const t0 = (Math.max(minX, cx * cellSize - inflate) - a[0]) / dx;
+      const t1 = (Math.min(maxX, (cx + 1) * cellSize + inflate) - a[0]) / dx;
+      y0 = a[1] + t0 * dy;
+      y1 = a[1] + t1 * dy;
+    }
+    const fromCy = Math.floor((Math.min(y0, y1) - inflate) / cellSize);
+    const toCy = Math.floor((Math.max(y0, y1) + inflate) / cellSize);
+    for (let cy = fromCy; cy <= toCy; cy++) {
+      visit(cx, cy);
+    }
+  }
+};
+
 const perpendicularDistance = (
   p: GlobalPoint,
   a: GlobalPoint,
@@ -736,53 +772,85 @@ const buildFaces = (
     });
   }
 
-  // transversal intersections. Broad phase: sort by bbox minX and sweep, so
-  // each segment is only tested against x-overlapping ones (near-linear for
-  // spread-out scenes instead of all-pairs)
-  const byMinX = segments
-    .map((_, index) => index)
-    .sort((a, b) => segments[a].box[0] - segments[b].box[0]);
-  for (let oi = 0; oi < byMinX.length; oi++) {
-    const si = segments[byMinX[oi]];
-    const li = lineSegment(si.pa, si.pb);
-    const sweepMaxX = si.box[2] + eps;
-    for (let oj = oi + 1; oj < byMinX.length; oj++) {
-      const sj = segments[byMinX[oj]];
-      if (sj.box[0] > sweepMaxX) {
-        break;
+  // broad phase shared by the intersection and T-junction passes: a segment
+  // grid, each segment inserted into the cells along its path inflated by
+  // `eps`. Cell size scales with the scene extent so even a scene-spanning
+  // segment walks a bounded number of cells; when everything crowds into a
+  // few cells this degrades toward all-pairs, which the segment cap bounds
+  let sceneMinX = Infinity;
+  let sceneMinY = Infinity;
+  let sceneMaxX = -Infinity;
+  let sceneMaxY = -Infinity;
+  for (const s of segments) {
+    sceneMinX = Math.min(sceneMinX, s.box[0]);
+    sceneMinY = Math.min(sceneMinY, s.box[1]);
+    sceneMaxX = Math.max(sceneMaxX, s.box[2]);
+    sceneMaxY = Math.max(sceneMaxY, s.box[3]);
+  }
+  const sceneSpan = Math.max(sceneMaxX - sceneMinX, sceneMaxY - sceneMinY, 0);
+  const segCellSize = Math.max(eps * 2, sceneSpan / 128);
+  const segGrid = new Map<string, number[]>();
+  const segLines = segments.map((s) => lineSegment(s.pa, s.pb));
+  segments.forEach((s, index) => {
+    forEachCellAlongSegment(s.pa, s.pb, eps, segCellSize, (cx, cy) => {
+      const key = `${cx}:${cy}`;
+      const bucket = segGrid.get(key);
+      if (bucket) {
+        bucket.push(index);
+      } else {
+        segGrid.set(key, [index]);
       }
-      if (!doBoundsIntersect(expandBounds(si.box, eps), sj.box)) {
-        continue;
+    });
+  });
+
+  // transversal intersections, testing only pairs that share a grid cell
+  // (the eps-inflated insertion guarantees eps-near pairs always do)
+  const testedPairs = new Set<number>();
+  for (const bucket of segGrid.values()) {
+    for (let bi = 0; bi < bucket.length; bi++) {
+      for (let bj = bi + 1; bj < bucket.length; bj++) {
+        const i = Math.min(bucket[bi], bucket[bj]);
+        const j = Math.max(bucket[bi], bucket[bj]);
+        const pairKey = i * segments.length + j;
+        if (testedPairs.has(pairKey)) {
+          continue;
+        }
+        testedPairs.add(pairKey);
+        const si = segments[i];
+        const sj = segments[j];
+        if (!doBoundsIntersect(expandBounds(si.box, eps), sj.box)) {
+          continue;
+        }
+        const intersection = lineSegmentIntersectionPoints(
+          segLines[i],
+          segLines[j],
+          eps,
+        );
+        if (!intersection) {
+          continue;
+        }
+        const node = store.getOrCreate(intersection);
+        // intersection nodes need a source too — one may end up a loose end
+        // (after visibility clipping) and get bridged, and bridge attribution
+        // reads `nodeElement`
+        if (!nodeElement.has(node)) {
+          nodeElement.set(node, si.elementId);
+        }
+        si.splits.push({
+          node,
+          t: projectParam(si.pa, si.pb, store.nodes[node]),
+        });
+        sj.splits.push({
+          node,
+          t: projectParam(sj.pa, sj.pb, store.nodes[node]),
+        });
       }
-      const intersection = lineSegmentIntersectionPoints(
-        li,
-        lineSegment(sj.pa, sj.pb),
-        eps,
-      );
-      if (!intersection) {
-        continue;
-      }
-      const node = store.getOrCreate(intersection);
-      // intersection nodes need a source too — one may end up a loose end
-      // (after visibility clipping) and get bridged, and bridge attribution
-      // reads `nodeElement`
-      if (!nodeElement.has(node)) {
-        nodeElement.set(node, si.elementId);
-      }
-      si.splits.push({
-        node,
-        t: projectParam(si.pa, si.pb, store.nodes[node]),
-      });
-      sj.splits.push({
-        node,
-        t: projectParam(sj.pa, sj.pb, store.nodes[node]),
-      });
     }
   }
 
   // safety: intersection splitting can inflate the node count quadratically
-  // in pathological scenes; bail before the O(segments × nodes) T-junction
-  // pass turns a click into a multi-second freeze
+  // in pathological scenes; bail before the downstream passes (T-junctions,
+  // edge emission, face extraction) turn a click into a multi-second freeze
   if (store.nodes.length > options.maxBoundarySegments * 4) {
     return null;
   }
@@ -791,45 +859,28 @@ const buildFaces = (
   // existing node. Deliberately tight — routing an edge through a node that
   // sits further off the stroke would visibly bend the filled shape; wider
   // gaps are closed by the bridging pass below instead.
-  // Broad phase: nodes sorted by x (stable during this pass — no nodes are
-  // created here), binary-searched per segment so only x-overlapping nodes
-  // are inspected
-  const nodesByX = store.nodes
-    .map((_, index) => index)
-    .sort((a, b) => store.nodes[a][0] - store.nodes[b][0]);
-  for (const segment of segments) {
-    const fromX = segment.box[0] - eps;
-    const toX = segment.box[2] + eps;
-    // lower bound of fromX in nodesByX
-    let lo = 0;
-    let hi = nodesByX.length;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (store.nodes[nodesByX[mid]][0] < fromX) {
-        lo = mid + 1;
-      } else {
-        hi = mid;
-      }
+  // Broad phase: each node tests only the segments sharing its grid cell —
+  // the eps-inflated insertion guarantees any segment within `eps` of the
+  // node is in the node's own cell. (The node set is stable during this
+  // pass — no nodes are created here, so the grid stays complete.)
+  for (let n = 0; n < store.nodes.length; n++) {
+    const q = store.nodes[n];
+    const bucket = segGrid.get(
+      `${Math.floor(q[0] / segCellSize)}:${Math.floor(q[1] / segCellSize)}`,
+    );
+    if (!bucket) {
+      continue;
     }
-    for (let k = lo; k < nodesByX.length; k++) {
-      const n = nodesByX[k];
-      const q = store.nodes[n];
-      if (q[0] > toX) {
-        break;
-      }
+    for (const index of bucket) {
+      const segment = segments[index];
       if (n === segment.a || n === segment.b) {
-        continue;
-      }
-      if (q[1] < segment.box[1] - eps || q[1] > segment.box[3] + eps) {
         continue;
       }
       const t = projectParam(segment.pa, segment.pb, q);
       if (t <= 0 || t >= 1) {
         continue;
       }
-      if (
-        distanceToLineSegment(q, lineSegment(segment.pa, segment.pb)) <= eps
-      ) {
+      if (distanceToLineSegment(q, segLines[index]) <= eps) {
         segment.splits.push({ node: n, t });
       }
     }
@@ -928,30 +979,13 @@ const buildFaces = (
     const edgeCellSize = Math.max(bridgeRadius, 1);
     const edgeGrid = new Map<string, { u: number; v: number }[]>();
     const insertLiveEdge = (u: number, v: number) => {
-      const a = store.nodes[u];
-      const b = store.nodes[v];
       const edge = { u, v };
-      const minX = Math.min(a[0], b[0]);
-      const maxX = Math.max(a[0], b[0]);
-      const dx = b[0] - a[0];
-      const dy = b[1] - a[1];
-      const fromCx = Math.floor(minX / edgeCellSize);
-      const toCx = Math.floor(maxX / edgeCellSize);
-      for (let cx = fromCx; cx <= toCx; cx++) {
-        // y-extent of the segment within this column of cells, so a long
-        // diagonal edge occupies the cells it passes through rather than
-        // its full bounding box
-        let y0 = a[1];
-        let y1 = b[1];
-        if (dx !== 0) {
-          const t0 = (Math.max(minX, cx * edgeCellSize) - a[0]) / dx;
-          const t1 = (Math.min(maxX, (cx + 1) * edgeCellSize) - a[0]) / dx;
-          y0 = a[1] + t0 * dy;
-          y1 = a[1] + t1 * dy;
-        }
-        const fromCy = Math.floor(Math.min(y0, y1) / edgeCellSize);
-        const toCy = Math.floor(Math.max(y0, y1) / edgeCellSize);
-        for (let cy = fromCy; cy <= toCy; cy++) {
+      forEachCellAlongSegment(
+        store.nodes[u],
+        store.nodes[v],
+        0,
+        edgeCellSize,
+        (cx, cy) => {
           const key = `${cx}:${cy}`;
           const bucket = edgeGrid.get(key);
           if (bucket) {
@@ -959,8 +993,8 @@ const buildFaces = (
           } else {
             edgeGrid.set(key, [edge]);
           }
-        }
-      }
+        },
+      );
     };
     for (const key of edgeSet) {
       const [u, v] = key.split("-").map(Number);
