@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Пунктир",
     "strokeStyle_dotted": "Пунктирано",
     "sloppiness": "Небрежност",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Прозрачност",
     "textAlign": "Подравняване на текста",
     "edges": "Крайща",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "Лазерна показалка",
+    "autoshape": "",
     "hand": "",
     "extraTools": "Още инструменти",
     "mermaidToExcalidraw": "Mermaid към Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Натиснете и влачете, пуснете като сте готови",
     "text": "Подсказка: Можете също да добавите текст като натиснете някъде два път с инструмента за селекция",
     "embeddable": "Натисни-премести, за да създадеш вметка за уебсайт",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Цветове",
     "shades": "Нюанси",
     "hexCode": "Шестнадесетичен код",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
