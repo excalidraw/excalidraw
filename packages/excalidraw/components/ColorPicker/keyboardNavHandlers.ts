@@ -100,10 +100,13 @@ const hotkeyHandler = ({
     const r = Array.isArray(paletteValue)
       ? paletteValue[activeShade]
       : paletteValue;
-    // hotkeys of excluded (hidden) palette entries are dead, not remapped —
-    // this keeps every other color on its usual key
+    // hotkeys of excluded (hidden) or absent palette entries are dead, not
+    // remapped — this keeps every other color on its usual key. Still
+    // HANDLED: within the modal's keyboard scope the key is deliberately
+    // inert, and reporting it unhandled would let it escape to global
+    // shortcuts (`q` toggles the tool lock)
     if (r == null || excludedColors?.includes(r)) {
-      return false;
+      return true;
     }
     onChange(r);
     setActiveColorPickerSection("baseColors");

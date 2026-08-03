@@ -10,7 +10,13 @@ import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
-import { act, fireEvent, GlobalTestState, render } from "./test-utils";
+import {
+  act,
+  fireEvent,
+  GlobalTestState,
+  render,
+  togglePopover,
+} from "./test-utils";
 
 const { h } = window;
 
@@ -360,6 +366,31 @@ describe("bucket fill tool", () => {
     selectBucketFill();
     Keyboard.keyPress(KEYS.G);
     expect(h.state.openPopup).toBe("elementBackground");
+  });
+
+  it("swallows the hidden transparent entry's hotkey (q) inside the picker", () => {
+    // regression: the hidden transparent entry's `q` returned "unhandled",
+    // so the picker didn't stop propagation and App.onKeyDown toggled the
+    // global tool lock while the color dialog was open
+    seedRectangle();
+    selectBucketFill();
+    togglePopover("Background");
+
+    const picker = document.querySelector(".color-picker-content")!;
+    expect(picker).not.toBeNull();
+    expect(h.state.activeTool.locked).toBe(false);
+    const before = h.state.currentItemBackgroundColor;
+
+    // `q` maps to the hidden transparent swatch AND to the global tool-lock
+    // shortcut — inside the modal it must be dead, not leaked
+    fireEvent.keyDown(picker, { key: "q" });
+    expect(h.state.activeTool.locked).toBe(false);
+    expect(h.state.currentItemBackgroundColor).toBe(before);
+
+    // the other hotkeys keep working on their usual keys (w = white)
+    fireEvent.keyDown(picker, { key: "w" });
+    expect(h.state.currentItemBackgroundColor).not.toBe(before);
+    expect(h.state.currentItemBackgroundColor).not.toBe("transparent");
   });
 
   it("shift+f opens the font popup instead of switching to bucket fill", () => {
