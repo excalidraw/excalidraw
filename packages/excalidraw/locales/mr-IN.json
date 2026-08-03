@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "तुटित तुटित",
     "strokeStyle_dotted": "ठिपके ठिपके",
     "sloppiness": "गबाळेपणा",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "अपारदर्शक्ता",
     "textAlign": "मजकूर संरेखन",
     "edges": "किनारी",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "वायरफ़्रेम पासून सांकेतिक लिपि",
     "embeddable": "वेब रुतवा",
     "laser": "लेसर टॉर्च",
+    "autoshape": "",
     "hand": "हात ( सरकवण्या चे उपकरण)",
     "extraTools": "आणिक यंत्रे",
     "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
@@ -360,6 +367,7 @@
     "freeDraw": "क्लिक आणि ड्रैग करा, झालं तेव्हा सोडा",
     "text": "टीप: तुम्हीं निवड यंत्रानी कोठेही दुहेरी क्लिक करून टेक्स्ट जोडू शकता",
     "embeddable": "वेबसाइट रुतोण्या साठी दाबून-खेचा (क्लिक-ड्रैग करा)",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -590,12 +599,14 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "रंग",
     "mostUsedCustomColors": "सर्वात जास्त वापरणीस रंग",
     "colors": "रंग",
     "shades": "रंगछटा",
     "hexCode": "हेक्स कोड",
-    "noShades": "ह्या रंगाच्या छटा उपलब्ध नाहित"
+    "noShades": "ह्या रंगाच्या छटा उपलब्ध नाहित",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -649,7 +660,7 @@
     "role": {
       "user": "",
       "assistant": "",
-      "system": ""
+      "system": "प्रणाली"
     },
     "aiBeta": "",
     "label": "",
