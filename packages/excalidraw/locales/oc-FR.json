@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Tiret",
     "strokeStyle_dotted": "Puntilhat",
     "sloppiness": "Estil de traça",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Opacitat",
     "textAlign": "Alinhament tèxt",
     "edges": "Angles",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "Integracion Web",
     "laser": "Puntador laser",
+    "autoshape": "",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
     "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Colors",
     "shades": "Nuanças",
     "hexCode": "Còdi exadecimal",
-    "noShades": "Cap de nuança pas disponibla per aquesta color"
+    "noShades": "Cap de nuança pas disponibla per aquesta color",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
