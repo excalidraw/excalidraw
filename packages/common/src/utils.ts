@@ -17,6 +17,7 @@ import {
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
+  isCustomFontFamily,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
@@ -96,13 +97,13 @@ export const getFontFamilyString = ({
 }: {
   fontFamily: FontFamily;
 }) => {
-  // Custom font - use the string directly as CSS font-family with generic fallbacks
-  if (typeof fontFamily === "string") {
+  // Custom font - the qualified family is the CSS family name itself, quoted
+  // (":" is not an ident character), plus the generic fallbacks
+  if (isCustomFontFamily(fontFamily)) {
     const fallbacks = getFontFamilyFallbacks(fontFamily);
-    const cssFamily = `"${fontFamily
-      .replace(/\\/g, "\\\\")
-      .replace(/"/g, '\\"')}"`;
-    return `${cssFamily}${fallbacks.map((x) => `, ${x}`).join("")}`;
+    return `${JSON.stringify(fontFamily)}${fallbacks
+      .map((x) => `, ${x}`)
+      .join("")}`;
   }
 
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {

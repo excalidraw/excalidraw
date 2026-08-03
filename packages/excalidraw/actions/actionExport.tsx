@@ -327,6 +327,7 @@ export const actionSaveToActiveFile = register({
             exportedDataPromise,
             previousFileHandle,
             filename,
+            app.fonts.fontResolvers,
           )
         : await saveAsJSON({
             data: exportedDataPromise,
@@ -457,6 +458,7 @@ export const actionLoadScene = register({
         elements: loadedElements,
         appState: loadedAppState,
         files,
+        loadFonts: true,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
     } catch (error: any) {

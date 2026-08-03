@@ -3,9 +3,10 @@ import {
   KEYS,
   MOBILE_ACTION_BUTTON_BG,
   arrayToMap,
+  isCustomFontFamily,
 } from "@excalidraw/common";
 
-import { getNonDeletedElements } from "@excalidraw/element";
+import { getNonDeletedElements, isTextElement } from "@excalidraw/element";
 
 import { LinearElementEditor } from "@excalidraw/element";
 
@@ -23,6 +24,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 import { ToolButton } from "../components/ToolButton";
 import { DuplicateIcon } from "../components/icons";
 
+import { Fonts } from "../fonts";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 import { getShortcutKey } from "../shortcut";
@@ -90,6 +92,26 @@ export const actionDuplicateSelection = register({
       if (mappedElements) {
         elementsWithDuplicates = mappedElements;
       }
+    }
+
+    // `onDuplicate` may have swapped a duplicate to a custom family the page
+    // hasn't loaded yet (mirrors the paste path). TRADE-OFF: load-only - a
+    // swap to an already-loaded family keeps the original geometry, which the
+    // host owns (see the `onDuplicate` JSDoc)
+    const duplicatedIds = new Set(duplicatedElements.map(({ id }) => id));
+    const acceptedDuplicates = elementsWithDuplicates.filter(({ id }) =>
+      duplicatedIds.has(id),
+    );
+    if (
+      acceptedDuplicates.some(
+        (element) =>
+          isTextElement(element) && isCustomFontFamily(element.fontFamily),
+      )
+    ) {
+      const fonts = app.fonts;
+      Fonts.loadElementsFonts(acceptedDuplicates, fonts).then((fontFaces) =>
+        fonts.onLoaded(fontFaces),
+      );
     }
 
     return {

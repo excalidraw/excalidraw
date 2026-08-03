@@ -1,10 +1,12 @@
 import { ORIG_ID } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
+import { Fonts } from "../fonts";
 import { API } from "../tests/helpers/api";
 import {
   act,
   assertElements,
+  cleanup,
   getCloneByOrigId,
   render,
 } from "../tests/test-utils";
@@ -526,6 +528,67 @@ describe("actionDuplicateSelection", () => {
         { id: rect1.id, groupIds: ["A", "B"] },
         { id: rect2.id, groupIds: ["A", "B"] },
       ]);
+    });
+  });
+
+  describe("onDuplicate font swaps", () => {
+    it("leaves the geometry of host-swapped duplicates to the host", async () => {
+      // documents a deliberate contract (see the `onDuplicate` JSDoc in
+      // types.ts): replacing a duplicate's `fontFamily` in the hook leaves
+      // its measured geometry to the host - the editor loads the swapped
+      // family but does not re-measure the duplicate, even when the family
+      // was already processed by this editor
+      cleanup();
+      await render(
+        <Excalidraw
+          onDuplicate={(nextElements, prevElements) => {
+            const prevIds = new Set(prevElements.map(({ id }) => id));
+            return nextElements.map((element) =>
+              !prevIds.has(element.id) && element.type === "text"
+                ? { ...element, fontFamily: "dupcontract:Font" as const }
+                : element,
+            );
+          }}
+        />,
+      );
+
+      Fonts.registerCustomFont(
+        "dupcontract:Font",
+        {
+          metrics: {
+            unitsPerEm: 1000,
+            ascender: 800,
+            descender: -200,
+            lineHeight: 2,
+          },
+        },
+        { uri: "https://example.com/font.woff2" },
+      );
+      // the family was fully processed by this editor long ago
+      const { fontFace } =
+        Fonts.registered.get("dupcontract:Font")!.fontFaces[0];
+      act(() => {
+        window.h.app.fonts.onLoaded([fontFace]);
+      });
+
+      const text = API.createElement({ type: "text", text: "swap me" });
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionDuplicateSelection);
+      });
+
+      // let the async font load & onLoaded pass settle
+      await act(() => new Promise((resolve) => setTimeout(resolve, 20)));
+
+      const duplicate = h.elements.find(
+        (element) => element.type === "text" && element.id !== text.id,
+      ) as typeof text;
+      expect(duplicate.fontFamily).toBe("dupcontract:Font");
+      // geometry stays the original family's - the host owns it
+      expect(duplicate.lineHeight).toBe(text.lineHeight);
+      expect(duplicate.height).toBe(text.height);
     });
   });
 });

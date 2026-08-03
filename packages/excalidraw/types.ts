@@ -63,7 +63,7 @@ import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
 
-import type { ExcalidrawFontFaceDescriptor } from "./fonts";
+import type { FontResolver } from "./fonts";
 
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
@@ -615,30 +615,59 @@ export type OnExportProgress = {
   progress?: number;
 };
 
-/**
- * Definition of a custom font, returned by a FontProvider's resolve method.
- */
-export interface FontDefinition {
-  fontFaces: ExcalidrawFontFaceDescriptor[];
-  metrics: {
-    /** head.unitsPerEm metric */
-    unitsPerEm: 1000 | 1024 | 2048;
-    /** hhea.ascender metric */
-    ascender: number;
-    /** hhea.descender metric */
-    descender: number;
-    /** unitless line-height */
-    lineHeight: number;
-  };
-}
-
 export interface FontProvider {
   icon: React.JSX.Element;
-  resolve(fontFamily: string): Promise<FontDefinition>;
-  availableFonts: { value: string; text: string }[];
+  /**
+   * Resolve a bare font family name (i.e. "Roboto") into a loadable font
+   * definition.
+   *
+   * WARN: family names are treated as *exact* - reject a name you don't
+   * recognise verbatim rather than normalising it. Resolving both "Roboto" and
+   * "roboto" registers two families which then collide in a single browser
+   * bucket, and the name is persisted into `fontFamily`, so it has to mean one
+   * thing: the canonical spelling.
+   */
+  resolve: FontResolver;
+  /**
+   * Bare family names (i.e. "Roboto") to offer up front in the font picker.
+   *
+   * Taken as-is: keep them unique, and mind that a name shadowing a built-in
+   * font (i.e. "Nunito") shows up as a separate entry next to it.
+   */
+  availableFonts: readonly string[];
+  /**
+   * Called once when a family found by search - i.e. one outside
+   * `availableFonts` - is first used, on the provider that resolved it. A
+   * searched font is listed only while it's on an element, so a host wanting
+   * it listed across reloads should persist it here and surface it through
+   * `availableFonts`.
+   *
+   * @param fontFamily bare family name, i.e. "Roboto" - not the qualified
+   * "google:Roboto" - so it can be fed straight back into `availableFonts`
+   */
   onNewFontUsed?(fontFamily: string): void;
 }
 
+/**
+ * Provider keys are persisted as part of the font family id:
+ * `<provider>:<family>`. They must be non-empty, must not contain `:`, and
+ * must be lowercase - CSS font-family matching is ASCII case-insensitive, so
+ * `"google:Roboto"` and `"Google:Roboto"` would be distinct registry keys
+ * landing in the same browser family bucket. See
+ * {@link ExcalidrawProps.fontProviders} for how to pick one.
+ *
+ * A qualified family identifies exactly one font definition. It is resolved
+ * once, then cached and shared across every editor on the page until reload,
+ * so resolvers must return equivalent faces and metadata for the same key and
+ * family.
+ *
+ * A rejection is not retried automatically - the family is shown as failed in
+ * the picker until a deliberate user action, which keeps host code off the
+ * path of every scene update. Resolvers are expected to cache their
+ * definitions and to retry internally before rejecting. The verdict is
+ * page-scoped and clears as soon as the family resolves anywhere; image
+ * exports never record one, so a blip while rendering cannot disable a font.
+ */
 export type FontProviders = Record<string, FontProvider>;
 
 export interface ExcalidrawProps {
@@ -693,6 +722,10 @@ export interface ExcalidrawProps {
    * Returned elements will be used in place of the next elements
    * (you should return all elements, including deleted, and not mutate
    * the element if changes are made)
+   *
+   * NOTE: replacing a text element's `fontFamily` here leaves its measured
+   * geometry (width, wrapping, container size) to you - the editor does not
+   * re-measure host-swapped duplicates.
    */
   onDuplicate?: (
     nextElements: readonly ExcalidrawElement[],
@@ -761,14 +794,18 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   /**
-   * Font providers for custom font support.
+   * Font providers for custom font support, keyed by provider id. Custom fonts
+   * are identified by that id as a prefix in `fontFamily`, i.e.
+   * `"google:Roboto"`; built-in fonts are unaffected.
    *
-   * Note: font providers are currently treated as runtime-global by the
-   * internal font registry. Multiple editors with different provider configs
-   * are not isolated from each other.
+   * WARN: provider ids are a *global namespace*. They get persisted into
+   * element `fontFamily` and travel with the document - across collab, export
+   * and reload - so the same id has to denote the same font source everywhere.
+   * Pick something specific and stable (i.e. `"google"`, `"acme-brand"`), never
+   * a generic `"fonts"` or `"custom"`.
    *
-   * Custom fonts are identified by prefix in `fontFamily`, e.g. `"google:Roboto"`.
-   * Built-in fonts are unaffected; providers handle additional/custom fonts only.
+   * Providers are scoped to this editor; resolved font faces are shared
+   * page-wide, so a family any editor resolved renders in all of them.
    */
   fontProviders?: FontProviders;
   renderScrollbars?: boolean;

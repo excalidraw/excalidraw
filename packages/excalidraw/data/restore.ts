@@ -19,6 +19,8 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  isCustomFontFamily,
+  isProviderQualifiedFontFamily,
   STROKE_WIDTH,
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
@@ -272,13 +274,24 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
 
   // Keep only provider-qualified custom families.
   // Any other unknown name falls back to the default family for compatibility.
-  const separatorIndex = fontFamilyName.indexOf(":");
-  if (separatorIndex > 0 && separatorIndex < fontFamilyName.length - 1) {
-    return fontFamilyName as FontFamily;
+  if (isProviderQualifiedFontFamily(fontFamilyName)) {
+    return fontFamilyName;
   }
 
   return DEFAULT_FONT_FAMILY;
 };
+
+/**
+ * Normalize a restored `fontFamily`. Built-in (numeric) families pass through
+ * untouched, so a file written by a newer version keeps its id. String
+ * families are only kept when provider-qualified - a bare local font name
+ * would render with whatever the host's CSS resolves, which differs per
+ * machine and is nothing we can load or export.
+ */
+const restoreFontFamily = (
+  fontFamily: ExcalidrawTextElement["fontFamily"],
+): FontFamily =>
+  isCustomFontFamily(fontFamily) ? getFontFamilyByName(fontFamily) : fontFamily;
 
 const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,
@@ -513,7 +526,7 @@ export const restoreElement = (
       delete (element as any).rawText;
 
       let fontSize = element.fontSize;
-      let fontFamily = element.fontFamily;
+      let fontFamily = restoreFontFamily(element.fontFamily);
       if ("font" in element) {
         const [fontPx, _fontFamily]: [string, string] = (
           element as any
@@ -535,7 +548,7 @@ export const restoreElement = (
             detectLineHeight(element)
           : // no element height likely means programmatic use, so default
             // to a fixed line height
-            getLineHeight(element.fontFamily));
+            getLineHeight(fontFamily));
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -1121,6 +1134,11 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
+    // normalize the default font like element `fontFamily`, or a bare name
+    // from persisted data leaks into every newly created text element
+    currentItemFontFamily: restoreFontFamily(
+      nextAppState.currentItemFontFamily,
+    ),
     cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
     penDetected:

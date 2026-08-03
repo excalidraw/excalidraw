@@ -13,7 +13,7 @@ interface FontPickerKeyNavHandlerProps {
   onClose: () => void;
   onSelect: (value: FontFamily) => void;
   onHover: (value: FontFamily) => void;
-  onUseCustomFont?: () => void;
+  onResolve: () => void;
 }
 
 export const fontPickerKeyHandler = ({
@@ -24,7 +24,7 @@ export const fontPickerKeyHandler = ({
   onClose,
   onSelect,
   onHover,
-  onUseCustomFont,
+  onResolve,
 }: FontPickerKeyNavHandlerProps) => {
   if (
     !event[KEYS.CTRL_OR_CMD] &&
@@ -44,8 +44,8 @@ export const fontPickerKeyHandler = ({
   if (event.key === KEYS.ENTER) {
     if (hoveredFont?.value) {
       onSelect(hoveredFont.value);
-    } else if (onUseCustomFont) {
-      onUseCustomFont();
+    } else {
+      onResolve();
     }
 
     return true;

@@ -137,12 +137,74 @@ export const FONT_FAMILY = {
   Assistant: 10,
 };
 
+/** separates the provider id from the family name, i.e. "google:Roboto" */
+export const FONT_PROVIDER_SEPARATOR = ":";
+
 /**
- * Font family identifier type. Built-in fonts use numeric IDs (from
- * {@link FONT_FAMILY}), while custom fonts use their CSS font-family name
- * as a string.
+ * A custom font family, qualified by the provider able to resolve it.
+ *
+ * WARN: the type only enforces the separator's presence - either side may
+ * still be empty (i.e. ":Roboto"), so anything trusting the parts has to go
+ * through {@link parseProviderFontFamily} regardless.
  */
-export type FontFamily = number | string;
+export type CustomFontFamily =
+  `${string}${typeof FONT_PROVIDER_SEPARATOR}${string}`;
+
+/** numeric id for built-ins ({@link FONT_FAMILY}), qualified name for custom */
+export type FontFamily = number | CustomFontFamily;
+
+/**
+ * Whether the family is a custom one, i.e. "google:Roboto".
+ *
+ * WARN: only tells built-in from custom - not whether the family is
+ * well-formed, let alone resolvable. Use {@link parseProviderFontFamily} for
+ * anything which needs the provider.
+ */
+export const isCustomFontFamily = (
+  fontFamily: FontFamily,
+): fontFamily is CustomFontFamily => typeof fontFamily === "string";
+
+/** whether the family is a built-in one (see {@link FONT_FAMILY}) */
+export const isBuiltInFontFamily = (
+  fontFamily: FontFamily,
+): fontFamily is number => typeof fontFamily === "number";
+
+/**
+ * Parse a provider-qualified custom font family, i.e. "google:Roboto". Splits
+ * on the first separator, so family names may contain one themselves.
+ *
+ * @returns `null` when the separator is missing, leading (":Roboto") or
+ * trailing ("google:")
+ */
+export const parseProviderFontFamily = (
+  fontFamily: string,
+): { providerId: string; familyName: string } | null => {
+  const separatorIndex = fontFamily.indexOf(FONT_PROVIDER_SEPARATOR);
+
+  if (separatorIndex <= 0 || separatorIndex === fontFamily.length - 1) {
+    return null;
+  }
+
+  return {
+    providerId: fontFamily.slice(0, separatorIndex),
+    familyName: fontFamily.slice(separatorIndex + 1),
+  };
+};
+
+/**
+ * Type-guard flavor of {@link parseProviderFontFamily}, for narrowing plain
+ * strings at data boundaries (i.e. restored documents, DOM round-trips).
+ */
+export const isProviderQualifiedFontFamily = (
+  fontFamily: string,
+): fontFamily is CustomFontFamily =>
+  parseProviderFontFamily(fontFamily) !== null;
+
+/** build a provider-qualified custom font family from its parts */
+export const createProviderFontFamily = (
+  providerId: string,
+  familyName: string,
+): CustomFontFamily => `${providerId}${FONT_PROVIDER_SEPARATOR}${familyName}`;
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
 // so we need to have generic font fallback before it

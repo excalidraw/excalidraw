@@ -1,6 +1,6 @@
 import { pointFrom } from "@excalidraw/math";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
@@ -10,7 +10,6 @@ import {
   ARROW_TYPE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  FONT_FAMILY,
   ROUNDNESS,
   STROKE_WIDTH_KEYS,
   VERTICAL_ALIGN,
@@ -63,7 +62,10 @@ import {
   toggleLinePolygonState,
 } from "@excalidraw/element";
 
-import { deriveStylesPanelMode } from "@excalidraw/common";
+import {
+  deriveStylesPanelMode,
+  isFontMetadataAvailable,
+} from "@excalidraw/common";
 
 import type { FontFamily } from "@excalidraw/common";
 
@@ -141,7 +143,6 @@ import {
   strokeVariabilityVariableIcon,
 } from "../components/icons";
 
-import { Fonts } from "../fonts";
 import { getLanguage, t } from "../i18n";
 import {
   canHaveArrowheads,
@@ -1015,6 +1016,14 @@ type ChangeFontFamilyData = Partial<
   resetAll?: true;
   /** flag to reset all containers to their cached versions */
   resetContainers?: true;
+  /**
+   * re-snapshots the cache from the scene, once the elements have settled -
+   * called again after an async font load, whose redraw lands after the action.
+   *
+   * `activeHoveredFontFamily` is for callers knowing the hover state better
+   * than the (asynchronously committed) app state does.
+   */
+  refreshCache?: (activeHoveredFontFamily?: FontFamily | null) => void;
 };
 
 export const actionChangeFontFamily = register<{
@@ -1025,8 +1034,13 @@ export const actionChangeFontFamily = register<{
   label: "labels.fontFamily",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    const { cachedElements, resetAll, resetContainers, ...nextAppState } =
-      value as ChangeFontFamilyData;
+    const {
+      cachedElements,
+      resetAll,
+      resetContainers,
+      refreshCache,
+      ...nextAppState
+    } = value as ChangeFontFamilyData;
 
     if (resetAll) {
       const nextElements = changeProperty(
@@ -1115,24 +1129,21 @@ export const actionChangeFontFamily = register<{
       let uniqueChars = new Set<string>();
       let skipFontFaceCheck = false;
 
-      const fontsCache = Array.from(Fonts.loadedFontsCache.values());
-      // For string-based (custom) font families, use the string directly as the family name
-      // For numeric (built-in) font families, look up the name from FONT_FAMILY
-      const fontFamily =
-        typeof nextFontFamily === "string"
-          ? nextFontFamily
-          : Object.entries(FONT_FAMILY).find(
-              ([_, value]) => value === nextFontFamily,
-            )?.[0];
-
-      // skip `document.font.check` check on hover, if at least one font family has loaded as it's super slow (could result in slightly different bbox, which is fine)
+      // skip `document.fonts.check` on hover, if at least one font face of the
+      // family has loaded, as it's super slow (could result in slightly
+      // different bbox, which is fine)
       if (
         currentHoveredFontFamily &&
-        fontFamily &&
-        fontsCache.some((sig) => sig.startsWith(fontFamily))
+        app.fonts.isFamilyLoaded(nextFontFamily)
       ) {
         skipFontFaceCheck = true;
       }
+
+      // a custom family only has metrics once resolved - substituting the
+      // fallback's line height would bake a wrong value in permanently, so
+      // leave it to `onLoaded`'s `reconcileLineHeight` pass
+      const hasFontMetrics =
+        !nextFontFamily || isFontMetadataAvailable(nextFontFamily);
 
       // following causes re-render so make sure we changed the family
       // otherwise it could cause unexpected issues, such as preventing opening the popover when in wysiwyg
@@ -1150,7 +1161,9 @@ export const actionChangeFontFamily = register<{
                 oldElement,
                 {
                   fontFamily: nextFontFamily,
-                  lineHeight: getLineHeight(nextFontFamily!),
+                  ...(hasFontMetrics
+                    ? { lineHeight: getLineHeight(nextFontFamily!) }
+                    : null),
                 },
               );
 
@@ -1186,7 +1199,9 @@ export const actionChangeFontFamily = register<{
       const fontString = `10px ${getFontFamilyString({
         fontFamily: nextFontFamily,
       })}`;
-      const chars = Array.from(uniqueChars.values()).join();
+      // a family committed with no text selected still needs loading - an
+      // empty string makes `check` pass vacuously, so probe with a glyph
+      const chars = Array.from(uniqueChars.values()).join() || " ";
 
       if (skipFontFaceCheck || window.document.fonts.check(fontString, chars)) {
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
@@ -1196,27 +1211,47 @@ export const actionChangeFontFamily = register<{
         }
       } else {
         // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
-        window.document.fonts.load(fontString, chars).then((fontFaces) => {
-          for (const [element, container] of elementContainerMapping) {
-            // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
-            const latestElement = app.scene.getElement(element.id);
-            const latestContainer = container
-              ? app.scene.getElement(container.id)
-              : null;
+        window.document.fonts
+          .load(fontString, chars)
+          .then((fontFaces) => {
+            if (elementContainerMapping.size) {
+              app.fonts.runSceneRepair(() => {
+                for (const [element, container] of elementContainerMapping) {
+                  // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
+                  const latestElement = app.scene.getElement(element.id);
+                  const latestContainer = container
+                    ? app.scene.getElement(container.id)
+                    : null;
 
-            if (latestElement) {
-              // trigger async redraw
-              redrawTextBoundingBox(
-                latestElement as ExcalidrawTextElement,
-                latestContainer,
-                app.scene,
-              );
+                  if (
+                    latestElement &&
+                    isTextElement(latestElement) &&
+                    latestElement.fontFamily === nextFontFamily
+                  ) {
+                    // trigger async redraw
+                    redrawTextBoundingBox(
+                      latestElement,
+                      latestContainer,
+                      app.scene,
+                    );
+                  }
+                }
+              });
             }
-          }
 
-          // trigger update once we've mutated all the elements, which also updates our cache
-          app.fonts.onLoaded(fontFaces);
-        });
+            // trigger update once we've mutated all the elements, which also updates our cache
+            app.fonts.onLoaded(fontFaces);
+
+            // the redraw above happened after the action was applied, so the cache
+            // still holds the pre-redraw (fallback font) dimensions - re-snapshot it
+            refreshCache?.();
+          })
+          .catch((error) => {
+            // `load` rejects when any matched face fails to fetch - routine
+            // for custom families on host-resolver URLs, and it must not
+            // escape into the host page as an unhandled rejection
+            console.error(`Failed to load font "${fontString}"`, error);
+          });
       }
     }
 
@@ -1228,7 +1263,43 @@ export const actionChangeFontFamily = register<{
     // relying on state batching as multiple `FontPicker` handlers could be called in rapid succession and we want to combine them
     const [batchedData, setBatchedData] = useState<ChangeFontFamilyData>({});
     const isUnmounted = useRef(true);
-    const { stylesPanelMode, isCompact } = getStylesPanelInfo(app);
+    const pendingRefreshRef = useRef(false);
+    const { stylesPanelMode } = getStylesPanelInfo(app);
+
+    const refreshCachedElements = useCallback(
+      (activeHoveredFontFamily?: FontFamily | null) => {
+        if (isUnmounted.current) {
+          return;
+        }
+
+        // a live hover mutation must not leak into the snapshot: a font load
+        // settling mid-preview would make the later hover-leave reset
+        // "restore" the merely-hovered family permanently. Defer to the
+        // batched-data effect below, which runs once the hover clears.
+        // Committed app state lags the action by a React batch, so it's only
+        // a fallback for callers not passing the hover state
+        const hovered =
+          activeHoveredFontFamily !== undefined
+            ? activeHoveredFontFamily
+            : app.state.currentHoveredFontFamily;
+        if (hovered != null) {
+          pendingRefreshRef.current = true;
+          return;
+        }
+
+        for (const id of cachedElementsRef.current.keys()) {
+          const element = app.scene.getElement(id);
+          if (element) {
+            cachedElementsRef.current.set(
+              id,
+              newElementWith(element, {}, true),
+            );
+          }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      },
+      [app],
+    );
 
     const selectedFontFamily = useMemo(() => {
       const getFontFamily = (
@@ -1257,6 +1328,10 @@ export const actionChangeFontFamily = register<{
               : appState.currentItemFontFamily || DEFAULT_FONT_FAMILY,
         );
 
+      if (batchedData.currentItemFontFamily) {
+        return batchedData.currentItemFontFamily;
+      }
+
       // popup opened, use cached elements
       if (
         batchedData.openPopup === "fontFamily" &&
@@ -1275,7 +1350,13 @@ export const actionChangeFontFamily = register<{
 
       // popup props are not in sync, hence we are in the middle of an update, so keeping the previous value we've had
       return prevSelectedFontFamilyRef.current;
-    }, [batchedData.openPopup, appState, elements, app]);
+    }, [
+      batchedData.openPopup,
+      batchedData.currentItemFontFamily,
+      appState,
+      elements,
+      app,
+    ]);
 
     useEffect(() => {
       prevSelectedFontFamilyRef.current = selectedFontFamily;
@@ -1284,6 +1365,44 @@ export const actionChangeFontFamily = register<{
     useEffect(() => {
       if (Object.keys(batchedData).length) {
         updateData(batchedData);
+        // the async font load path re-runs this from within the action once it
+        // settles. Hover is passed explicitly - committed app state still
+        // holds the pre-action value here
+        batchedData.refreshCache?.(
+          batchedData.currentHoveredFontFamily ?? null,
+        );
+
+        // a refresh deferred while a hover preview was live (see
+        // `refreshCachedElements`) runs now that it cleared: the hover-leave
+        // reset just restored pre-load geometry, so redraw with the (by now
+        // loaded) faces first, then re-snapshot
+        if (
+          pendingRefreshRef.current &&
+          batchedData.currentHoveredFontFamily === null
+        ) {
+          pendingRefreshRef.current = false;
+
+          if (cachedElementsRef.current.size) {
+            // keep the repair out of the next action's undo delta. NOT via
+            // `runSceneRepair`: a hover-clear can't coincide with a gesture,
+            // and the re-snapshot below must follow synchronously
+            app.fonts.onBeforeSceneMutation();
+
+            for (const id of cachedElementsRef.current.keys()) {
+              const element = app.scene.getElement(id);
+              if (element && isTextElement(element)) {
+                redrawTextBoundingBox(
+                  element,
+                  app.scene.getContainerElement(element),
+                  app.scene,
+                );
+              }
+            }
+          }
+
+          refreshCachedElements(null);
+        }
+
         // reset the data after we've used the data
         setBatchedData({});
       }
@@ -1309,20 +1428,21 @@ export const actionChangeFontFamily = register<{
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
           compactMode={stylesPanelMode !== "full"}
-          onSelect={(fontFamily) => {
-            withCaretPositionPreservation(
-              () => {
-                setBatchedData({
-                  openPopup: null,
-                  currentHoveredFontFamily: null,
-                  currentItemFontFamily: fontFamily,
-                });
-                // defensive clear so immediate close won't abuse the cached elements
-                cachedElementsRef.current.clear();
-              },
-              isCompact,
-              !!appState.editingTextElement,
-            );
+          onSelect={(fontFamily, { keepOpen } = {}) => {
+            // caret preservation is owned by the picker (`useFontResolution`'s
+            // `select`) - wrapping again here would schedule a competing
+            // restore
+            setBatchedData({
+              openPopup: keepOpen ? "fontFamily" : null,
+              currentHoveredFontFamily: null,
+              currentItemFontFamily: fontFamily,
+              refreshCache: keepOpen ? refreshCachedElements : undefined,
+            });
+
+            if (!keepOpen) {
+              // defensive clear so immediate close won't abuse the cached elements
+              cachedElementsRef.current.clear();
+            }
           }}
           onHover={(fontFamily) => {
             setBatchedData({
@@ -1339,11 +1459,15 @@ export const actionChangeFontFamily = register<{
             });
           }}
           onPopupChange={(open) => {
+            // WARN: read state through the stable `app` handle, never the
+            // render-scoped `appState`/`elements` props - `FontPicker`'s memo
+            // skips re-renders, so this closure may be from an older render
+            // than the state it must act on
             if (open) {
               // open, populate the cache from scratch
               cachedElementsRef.current.clear();
 
-              const { editingTextElement } = appState;
+              const { editingTextElement } = app.state;
 
               // still check type to be safe
               if (editingTextElement?.type === "text") {
@@ -1363,8 +1487,8 @@ export const actionChangeFontFamily = register<{
                 );
               } else {
                 const selectedElements = getSelectedElements(
-                  elements,
-                  appState,
+                  app.scene.getNonDeletedElements(),
+                  app.state,
                   {
                     includeBoundTextElement: true,
                   },
@@ -1378,10 +1502,10 @@ export const actionChangeFontFamily = register<{
                 }
               }
 
-              setBatchedData({
-                ...batchedData,
+              setBatchedData((data) => ({
+                ...data,
                 openPopup: "fontFamily",
-              });
+              }));
             } else {
               const fontFamilyData = {
                 currentHoveredFontFamily: null,
@@ -1395,7 +1519,10 @@ export const actionChangeFontFamily = register<{
               cachedElementsRef.current.clear();
 
               // Refocus text editor when font picker closes if we were editing text
-              if (isCompact && appState.editingTextElement) {
+              if (
+                getStylesPanelInfo(app).isCompact &&
+                app.state.editingTextElement
+              ) {
                 restoreCaretPosition(null); // Just refocus without saved position
               }
             }

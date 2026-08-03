@@ -1,8 +1,12 @@
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
-import { FONT_FAMILY, FONT_FAMILY_FALLBACKS } from "./constants";
+import {
+  FONT_FAMILY,
+  FONT_FAMILY_FALLBACKS,
+  isCustomFontFamily,
+} from "./constants";
 
-import type { FontFamily } from "./constants";
+import type { CustomFontFamily, FontFamily } from "./constants";
 
 /**
  * Encapsulates font metrics with additional font metadata.
@@ -31,7 +35,12 @@ export interface FontMetadata {
   fallback?: true;
 }
 
-export const FONT_METADATA: Record<FontFamily, FontMetadata> = {
+/**
+ * Built-in font metadata, keyed by numeric family id. Frozen - runtime
+ * metadata for custom families goes through {@link setCustomFontMetadata},
+ * never into this record.
+ */
+export const FONT_METADATA: Readonly<Record<number, FontMetadata>> = {
   [FONT_FAMILY.Excalifont]: {
     metrics: {
       unitsPerEm: 1000,
@@ -132,6 +141,41 @@ export const FONT_METADATA: Record<FontFamily, FontMetadata> = {
   },
 };
 
+Object.freeze(FONT_METADATA);
+
+/**
+ * Metrics for custom (provider-qualified) families, registered at runtime by
+ * the editor's font registry - the single seam through which they reach the
+ * metric helpers below, keeping {@link FONT_METADATA} frozen. Those helpers
+ * must live in this package, as `@excalidraw/element` consumes them.
+ *
+ * Page-global, never per editor: a qualified family identifies exactly one
+ * definition, so its metrics are a fact about the family.
+ */
+const customFontMetadata = new Map<CustomFontFamily, FontMetadata>();
+
+export const setCustomFontMetadata = (
+  family: CustomFontFamily,
+  metadata: FontMetadata,
+) => {
+  customFontMetadata.set(family, metadata);
+};
+
+export const getFontMetadata = (
+  fontFamily: FontFamily,
+): FontMetadata | undefined =>
+  isCustomFontFamily(fontFamily)
+    ? customFontMetadata.get(fontFamily)
+    : FONT_METADATA[fontFamily];
+
+/**
+ * Whether real metrics exist for the family. Built-ins always count - even an
+ * unknown numeric id falls back to Excalifont metrics (forward compat with
+ * newer clients); a custom family has none until its provider resolves it.
+ */
+export const isFontMetadataAvailable = (fontFamily: FontFamily): boolean =>
+  !isCustomFontFamily(fontFamily) || customFontMetadata.has(fontFamily);
+
 /** Unicode ranges defined by google fonts */
 export const GOOGLE_FONTS_RANGES = {
   LATIN:
@@ -156,9 +200,9 @@ export const getVerticalOffset = (
   fontSize: ExcalidrawTextElement["fontSize"],
   lineHeightPx: number,
 ) => {
-  const { unitsPerEm, ascender, descender } =
-    FONT_METADATA[fontFamily]?.metrics ||
-    FONT_METADATA[FONT_FAMILY.Excalifont].metrics;
+  const { unitsPerEm, ascender, descender } = (
+    getFontMetadata(fontFamily) ?? FONT_METADATA[FONT_FAMILY.Excalifont]
+  ).metrics;
 
   const fontSizeEm = fontSize / unitsPerEm;
   const lineGap =
@@ -172,9 +216,39 @@ export const getVerticalOffset = (
  * Gets line height for a selected family.
  */
 export const getLineHeight = (fontFamily: FontFamily) => {
-  const { lineHeight } =
-    FONT_METADATA[fontFamily]?.metrics ||
-    FONT_METADATA[FONT_FAMILY.Excalifont].metrics;
+  const { lineHeight } = (
+    getFontMetadata(fontFamily) ?? FONT_METADATA[FONT_FAMILY.Excalifont]
+  ).metrics;
 
   return lineHeight as ExcalidrawTextElement["lineHeight"];
+};
+
+/**
+ * The correct `lineHeight` for the element's family, or `null` to leave the
+ * stored value alone.
+ *
+ * `lineHeight` is a snapshot of the family's metrics taken at write time, but
+ * a custom family's metrics only arrive once its provider resolves them - an
+ * element written before that carries the fallback's. This is the single place
+ * encoding when the snapshot may be corrected: custom families only (a
+ * built-in's value may be a legitimately divergent legacy `detectLineHeight`)
+ * and only once their real metrics are in.
+ *
+ * Callers scope the correction to just-loaded families, so it fires at most
+ * once per family. Two accepted consequences: a host-set value present while
+ * the faces are still arriving is corrected along with the baked-in ones, and
+ * a scene which never observes a load keeps its stored values.
+ */
+export const reconcileLineHeight = (
+  element: Pick<ExcalidrawTextElement, "fontFamily" | "lineHeight">,
+): ExcalidrawTextElement["lineHeight"] | null => {
+  if (
+    !isCustomFontFamily(element.fontFamily) ||
+    !isFontMetadataAvailable(element.fontFamily)
+  ) {
+    return null;
+  }
+
+  const lineHeight = getLineHeight(element.fontFamily);
+  return element.lineHeight === lineHeight ? null : lineHeight;
 };

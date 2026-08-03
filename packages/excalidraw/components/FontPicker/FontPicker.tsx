@@ -15,7 +15,7 @@ import {
   FreedrawIcon,
 } from "../icons";
 
-import { FontPickerList } from "./FontPickerList";
+import { FontPickerList, type FontSelectionOptions } from "./FontPickerList";
 import { FontPickerTrigger } from "./FontPickerTrigger";
 
 import "./FontPicker.scss";
@@ -55,7 +55,7 @@ interface FontPickerProps {
   isOpened: boolean;
   selectedFontFamily: FontFamily | null;
   hoveredFontFamily: FontFamily | null;
-  onSelect: (fontFamily: FontFamily) => void;
+  onSelect: (fontFamily: FontFamily, options?: FontSelectionOptions) => void;
   onHover: (fontFamily: FontFamily) => void;
   onLeave: () => void;
   onPopupChange: (open: boolean) => void;
@@ -112,7 +112,7 @@ export const FontPicker = React.memo(
             <FontPickerList
               selectedFontFamily={selectedFontFamily}
               hoveredFontFamily={hoveredFontFamily}
-              onSelect={onSelectCallback}
+              onSelect={onSelect}
               onHover={onHover}
               onLeave={onLeave}
               onOpen={() => onPopupChange(true)}
@@ -123,8 +123,14 @@ export const FontPicker = React.memo(
       </div>
     );
   },
+  // deliberately narrow: the parent re-renders on every canvas interaction,
+  // and only these props change what the picker shows. The price is that the
+  // callback props may be closures from an older render - they must read live
+  // state through stable handles (`app`, refs, setters), never render-scoped
+  // props. See `onPopupChange` in `actionChangeFontFamily`
   (prev, next) =>
     prev.isOpened === next.isOpened &&
     prev.selectedFontFamily === next.selectedFontFamily &&
-    prev.hoveredFontFamily === next.hoveredFontFamily,
+    prev.hoveredFontFamily === next.hoveredFontFamily &&
+    prev.compactMode === next.compactMode,
 );

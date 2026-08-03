@@ -7,6 +7,7 @@ import { getFileHandleType, isImageFileHandleType } from "./blob";
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { exportCanvas, prepareElementsForExport } from ".";
 
+import type { FontResolvers } from "../fonts";
 import type { AppState, BinaryFiles } from "../types";
 
 export const resaveAsImageWithScene = async (
@@ -17,6 +18,7 @@ export const resaveAsImageWithScene = async (
   }>,
   fileHandle: FileSystemFileHandle,
   filename: string,
+  fontResolvers: FontResolvers,
 ) => {
   const fileHandleType = getFileHandleType(fileHandle);
 
@@ -47,6 +49,7 @@ export const resaveAsImageWithScene = async (
     name: filename,
     fileHandle,
     exportingFrame,
+    fontResolvers,
   });
 
   return { fileHandle };
