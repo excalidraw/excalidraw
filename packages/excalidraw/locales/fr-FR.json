@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Tirets",
     "strokeStyle_dotted": "Pointillés",
     "sloppiness": "Style de tracé",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Transparence",
     "textAlign": "Alignement du texte",
     "edges": "Angles",
@@ -53,14 +56,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "Pied de Corde (un)",
     "arrowhead_crowfoot_one_or_many": "Pied du corbeau (un ou plusieurs)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "Cardinalité (une)",
+    "arrowhead_cardinality_many": "Cardinalité (plusieurs)",
+    "arrowhead_cardinality_one_or_many": "Cardinalité (une ou plusieurs)",
+    "arrowhead_cardinality_exactly_one": "Cardinalité (exactement une)",
+    "arrowhead_cardinality_zero_or_one": "Cardinalité (zéro ou une)",
+    "arrowhead_cardinality_zero_or_many": "Cardinalité (zéro ou plusieurs)",
     "more_options": "Plus d'options",
-    "cardinality": "",
+    "cardinality": "Cardinalité",
     "arrowtypes": "Type de flèche",
     "arrowtype_sharp": "Flèche pointue",
     "arrowtype_round": "Flèche incurvée",
@@ -185,6 +188,9 @@
     "shapeSwitch": "Changer de forme",
     "preferences": "Préférences",
     "preferences_toolLock": "Verrouillage de l'outil",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "Liaison de flèches",
     "midpointSnapping": "S'accrocher aux points intermédiaires"
   },
@@ -325,6 +331,7 @@
     "magicframe": "Modèle en fil de fer vers code",
     "embeddable": "Intégration Web",
     "laser": "Pointeur laser",
+    "autoshape": "",
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": "Plus d'outils",
     "mermaidToExcalidraw": "De Mermaid à Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "embeddable": "Cliquez et glissez pour créer une intégration de site web",
+    "autoshape": "",
     "text_selected": "Double-cliquez ou appuyez sur {{shortcut}} pour modifier le texte",
     "text_editing": "Appuyez sur {{shortcut_1}} ou {{shortcut_2}} pour terminer la modification",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur {{shortcut_1}} ou {{shortcut_2}} pour terminer",
@@ -367,6 +375,7 @@
     "resize": "Vous pouvez contraindre les proportions en maintenant {{shortcut_1}} pendant le redimensionnement,\nmaintenez {{shortcut_2}} enfoncé pour redimensionner depuis le centre",
     "resizeImage": "Vous pouvez redimensionner librement en maintenant {{shortcut_1}},\nmaintenez {{shortcut_2}} enfoncé pour redimensionner depuis le centre",
     "rotate": "Vous pouvez contraindre les angles en maintenant {{shortcut}} enfoncé pendant la rotation",
+    "toggleArrowhead": "",
     "lineEditor_info": "Maintenez {{shortcut_1}} et Double-cliquez ou appuyez sur {{shortcut_2}} pour modifier les points",
     "lineEditor_line_info": "Double-cliquez ou appuyez sur {{shortcut}} pour modifier le texte",
     "lineEditor_pointSelected": "Appuyez sur {{shortcut_1}} pour supprimer le(s) point(s),\n{{shortcut_2}} pour dupliquer, ou faites glisser pour déplacer",
@@ -411,8 +420,8 @@
     "title": "Erreur"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Enregistrement",
+    "defaultMessage": "Préparation de l'enregistrement..."
   },
   "exportDialog": {
     "disk_title": "Enregistrer sur le disque",
@@ -595,7 +604,9 @@
     "colors": "Couleurs",
     "shades": "Nuances",
     "hexCode": "Code hex",
-    "noShades": "Aucune nuance disponible pour cette couleur"
+    "noShades": "Aucune nuance disponible pour cette couleur",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -631,7 +642,7 @@
   "mermaid": {
     "title": "De Mermaid à Excalidraw",
     "button": "Insérer",
-    "description": "",
+    "description": "Actuellement seulement <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Séquence</sequenceLink>, Les diagrammes <classLink>Classe</classLink>et <erdLink>Entity Relationship</erdLink> sont pris en charge. Les autres types seront rendus en tant qu'image dans Excalidraw.",
     "syntax": "Syntaxe Mermaid",
     "preview": "Prévisualisation",
     "label": "Mermaid",
