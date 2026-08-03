@@ -8,8 +8,10 @@ import {
   pointDistance,
   pointFrom,
   pointRotateRads,
+  polygonArea,
   polygonIncludesPoint,
   polygonIncludesPointNonZero,
+  polygonSignedArea,
 } from "@excalidraw/math";
 
 import { isOpaqueColor, isTransparent } from "@excalidraw/common";
@@ -25,6 +27,7 @@ import type {
 import {
   doBoundsIntersect,
   elementCenterPoint,
+  getBoundsFromPoints,
   getElementBounds,
   getElementLineSegments,
 } from "./bounds";
@@ -222,29 +225,6 @@ const expandBounds = ([x1, y1, x2, y2]: Bounds, pad: number): Bounds => [
 
 const segmentLength = (s: LineSegment<GlobalPoint>): number =>
   pointDistance(s[0], s[1]);
-
-/** Standard shoelace signed area. Sign encodes ring orientation. */
-const signedArea = (pts: GlobalPoint[]): number => {
-  let area = 0;
-  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
-    area += (pts[j][0] + pts[i][0]) * (pts[j][1] - pts[i][1]);
-  }
-  return area / 2;
-};
-
-const ringBounds = (ring: readonly GlobalPoint[]): Bounds => {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const [x, y] of ring) {
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
-  }
-  return [minX, minY, maxX, maxY];
-};
 
 /** Parametric position of `q` projected onto the line through a-b. */
 const projectParam = (
@@ -1168,7 +1148,9 @@ const selectFaceFromArrangement = (
   const outerSign = 1;
   const areaOf = new Map<Face, number>();
   for (const face of faces) {
-    areaOf.set(face, signedArea(face.ring));
+    // negated: polygonSignedArea is CCW-positive, while the invariant above
+    // is stated in the opposite (bounded-faces-negative) convention
+    areaOf.set(face, -polygonSignedArea(face.ring, 0));
   }
 
   let best: Face | null = null;
@@ -1302,7 +1284,8 @@ const spliceHoleIntoRing = (
   // correct under the nonzero rule as well (defense against renderer or
   // export changes)
   const oriented =
-    Math.sign(signedArea(hole)) === Math.sign(signedArea(ring))
+    Math.sign(polygonSignedArea(hole, 0)) ===
+    Math.sign(polygonSignedArea(ring, 0))
       ? [...hole].reverse()
       : hole;
 
@@ -1353,10 +1336,7 @@ const finalizePolygon = (
   // largest first, so a tight point budget drops the least visible islands
   const byAreaDesc = holeRings
     .map((holeRing, index) => ({ holeRing, index }))
-    .sort(
-      (a, b) =>
-        Math.abs(signedArea(b.holeRing)) - Math.abs(signedArea(a.holeRing)),
-    );
+    .sort((a, b) => polygonArea(b.holeRing, 0) - polygonArea(a.holeRing, 0));
   const splicedHoleIndices: number[] = [];
   for (const { holeRing, index } of byAreaDesc) {
     // a spliced hole costs its own points + 2 bridge duplicates
@@ -1624,7 +1604,7 @@ export const computeBucketFillPolygon = (args: {
     return { ok: false, reason: "invalid_polygon" };
   }
   const { scenePoints, splicedHoleIndices } = finalized;
-  if (Math.abs(signedArea(scenePoints)) < options.minArea) {
+  if (polygonArea(scenePoints, 0) < options.minArea) {
     return { ok: false, reason: "too_small" };
   }
 
@@ -1674,7 +1654,7 @@ export const computeBucketFillPolygon = (args: {
 
   const fillRegion = scenePoints as unknown as Polygon<GlobalPoint>;
   const [regionMinX, regionMinY, regionMaxX, regionMaxY] =
-    ringBounds(scenePoints);
+    getBoundsFromPoints(scenePoints);
   const markInsideRegion = (element: ExcalidrawElement): boolean => {
     const [minX, minY, maxX, maxY] = getElementBounds(element, elementsMap);
     if (
@@ -1814,12 +1794,12 @@ export const isRestylableFill = (args: {
     ),
   );
   // same region? net areas (keyhole bridges cancel) and bounds must agree
-  const fillArea = Math.abs(signedArea(ring));
-  const regionArea = Math.abs(signedArea(scenePoints as GlobalPoint[]));
+  const fillArea = polygonArea(ring, 0);
+  const regionArea = polygonArea(scenePoints, 0);
   const sameArea =
     Math.abs(fillArea - regionArea) <= 0.05 * Math.max(fillArea, regionArea);
-  const [aMinX, aMinY, aMaxX, aMaxY] = ringBounds(ring);
-  const [bMinX, bMinY, bMaxX, bMaxY] = ringBounds(scenePoints);
+  const [aMinX, aMinY, aMaxX, aMaxY] = getBoundsFromPoints(ring);
+  const [bMinX, bMinY, bMaxX, bMaxY] = getBoundsFromPoints(scenePoints);
   const tolerance = BUCKET_FILL_REGION_MATCH_TOLERANCE;
   const sameBounds =
     Math.abs(aMinX - bMinX) <= tolerance &&
