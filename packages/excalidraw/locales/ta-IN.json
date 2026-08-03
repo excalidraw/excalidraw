@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "கோடிட்ட",
     "strokeStyle_dotted": "புள்ளியிட்ட",
     "sloppiness": "அசட்டுத்தனம்",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ஒளிபுகாவியல்பு",
     "textAlign": "உரைச் சீரமைப்பு",
     "edges": "விளிம்புகள்",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "வலை நுழைப்பு",
     "laser": "சீரொளி குறிமுள்",
+    "autoshape": "",
     "hand": "கை (பார்வை நகர்கும் கருவி)",
     "extraTools": "மற்ற கருவிகள்",
     "mermaidToExcalidraw": "",
@@ -360,6 +367,7 @@
     "freeDraw": "சொடுக்கி பிடித்திழு, முடித்ததும் விடுவி",
     "text": "துணுக்குதவி: தெரிவு கருவி கொண்டு எங்காவது இரு-சொடுக்கி உரையைச் சேர்க்கலாம்",
     "embeddable": "இழுத்து வலை நுழைப்பு உருவாக்கு",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "நிறங்கள்",
     "shades": "சாயல்கள்",
     "hexCode": "ஹெக்ஸ் குறியீடு",
-    "noShades": "இந்நிறத்திற்குச் சாயல்கள் இல்லை"
+    "noShades": "இந்நிறத்திற்குச் சாயல்கள் இல்லை",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
