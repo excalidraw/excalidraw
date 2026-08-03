@@ -3,6 +3,10 @@
     "paste": "Indsæt",
     "pasteAsPlaintext": "Indsæt som klartekst",
     "pasteCharts": "Indsæt diagrammer",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Marker alle",
     "multiSelect": "Tilføj element til markering",
     "moveCanvas": "Flyt lærred",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Kragefod (mange)",
     "arrowhead_crowfoot_one": "Kragefod (én)",
     "arrowhead_crowfoot_one_or_many": "Kragefod (én eller mange)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Flere muligheder",
+    "cardinality": "",
     "arrowtypes": "Pile type",
     "arrowtype_sharp": "Skarp pil",
     "arrowtype_round": "Buet pil",
@@ -171,7 +182,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Fejl"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Gem til disk",
     "disk_details": "",
@@ -616,7 +635,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

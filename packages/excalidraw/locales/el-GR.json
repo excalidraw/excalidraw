@@ -3,6 +3,10 @@
     "paste": "Επικόλληση",
     "pasteAsPlaintext": "Επικόλληση ως απλό κείμενο",
     "pasteCharts": "Επικόλληση γραφημάτων",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Επιλογή όλων",
     "multiSelect": "Προσθέστε το στοιχείο στην επιλογή",
     "moveCanvas": "Μετακίνηση καμβά",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "Τύπος βέλους",
     "arrowtype_sharp": "Αιχμηρό βέλος",
     "arrowtype_round": "Κυρτό βέλος",
@@ -171,7 +182,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Σφάλμα"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Αποθήκευση στο δίσκο",
     "disk_details": "Εξαγωγή δεδομένων σκηνής σε ένα αρχείο από το οποίο μπορείτε να εισάγετε αργότερα.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid σε Excalidraw",
     "button": "Εισαγωγή",
-    "description": "Επί του παρόντος υποστηρίζονται μόνο Διαγράμματα <flowchartLink>Ροής</flowchartLink>,<sequenceLink> Ακολουθίας, </sequenceLink> και <classLink>Κλάσεων</classLink>. Οι άλλοι τύποι θα αποδοθούν ως εικόνα στο Excalidraw.",
+    "description": "",
     "syntax": "Σύνταξη Mermaid",
     "preview": "Προεπισκόπηση",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

@@ -21,7 +21,7 @@ import { duplicateElements } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { DuplicateIcon } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -135,7 +135,7 @@ export const actionDuplicateSelection = register({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={DuplicateIcon}
         title={`${t("labels.duplicateSelection")} — ${getShortcutKey(

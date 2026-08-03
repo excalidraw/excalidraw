@@ -3,6 +3,7 @@ import { clamp, round } from "@excalidraw/math";
 import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   MINIMAL_CROP_SIZE,
+  getNonDeletedElements,
   getUncroppedWidthAndHeight,
 } from "@excalidraw/element";
 import { resizeSingleElement } from "@excalidraw/element";
@@ -11,7 +12,10 @@ import { isFrameLikeElement } from "@excalidraw/element";
 import { getElementsInResizingFrame } from "@excalidraw/element";
 import { replaceAllElementsInFrame } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
@@ -26,7 +30,7 @@ import type { AppState } from "../../types";
 
 interface DimensionDragInputProps {
   property: "width" | "height";
-  element: ExcalidrawElement;
+  element: NonDeletedExcalidrawElement;
   scene: Scene;
   appState: AppState;
 }
@@ -263,11 +267,13 @@ const handleDimensionChange: DragInputCallbackType<
 
       // Handle highlighting frame element candidates
       if (isFrameLikeElement(latestElement)) {
-        const nextElementsInFrame = getElementsInResizingFrame(
-          scene.getElementsIncludingDeleted(),
-          latestElement,
-          originalAppState,
-          scene.getNonDeletedElementsMap(),
+        const nextElementsInFrame = getNonDeletedElements(
+          getElementsInResizingFrame(
+            scene.getElementsIncludingDeleted(),
+            latestElement,
+            originalAppState,
+            scene.getNonDeletedElementsMap(),
+          ),
         );
 
         setAppState({

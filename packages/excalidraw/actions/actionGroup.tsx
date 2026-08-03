@@ -36,7 +36,7 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { UngroupIcon, GroupIcon } from "../components/icons";
 
 import { t } from "../i18n";
@@ -47,7 +47,7 @@ import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState } from "../types";
+import type { AppClassProperties, UIAppState } from "../types";
 
 const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   if (elements.length >= 2) {
@@ -68,7 +68,7 @@ const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
 
 const enableActionGroup = (
   elements: readonly ExcalidrawElement[],
-  appState: AppState,
+  appState: UIAppState,
   app: AppClassProperties,
 ) => {
   const selectedElements = app.scene.getSelectedElements({
@@ -199,7 +199,7 @@ export const actionGroup = register({
   keyTest: (event) =>
     !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!enableActionGroup(elements, appState, app)}
       type="button"
       icon={<GroupIcon theme={appState.theme} />}
@@ -207,7 +207,7 @@ export const actionGroup = register({
       title={`${t("labels.group")} — ${getShortcutKey("CtrlOrCmd+G")}`}
       aria-label={t("labels.group")}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    ></ToolButton>
+    ></IconButton>
   ),
 });
 
@@ -307,7 +307,7 @@ export const actionUngroup = register({
   predicate: (elements, appState) => getSelectedGroupIds(appState).length > 0,
 
   PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
+    <IconButton
       type="button"
       hidden={getSelectedGroupIds(appState).length === 0}
       icon={<UngroupIcon theme={appState.theme} />}
@@ -315,6 +315,6 @@ export const actionUngroup = register({
       title={`${t("labels.ungroup")} — ${getShortcutKey("CtrlOrCmd+Shift+G")}`}
       aria-label={t("labels.ungroup")}
       visible={isSomeElementSelected(getNonDeletedElements(elements), appState)}
-    ></ToolButton>
+    ></IconButton>
   ),
 });

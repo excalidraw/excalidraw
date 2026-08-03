@@ -67,8 +67,10 @@ const _renderNewElementScene = ({
         }
       }
 
+      const renderTargetElement = newElement;
+
       renderElement(
-        newElement,
+        renderTargetElement,
         elementsMap,
         allElementsMap,
         rc,

@@ -6,6 +6,7 @@ import {
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
+import { getNonDeletedElements } from "@excalidraw/element";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import {
   restoreAppState,
@@ -19,9 +20,9 @@ import { Fonts } from "@excalidraw/excalidraw/fonts";
 import { Scene } from "@excalidraw/element";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type { FontResolvers } from "@excalidraw/excalidraw/fonts";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
@@ -29,11 +30,11 @@ import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 export { MIME_TYPES };
 
 type ExportOpts = {
-  elements: readonly NonDeleted<ExcalidrawElement>[];
+  elements: readonly NonDeletedExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
-  exportingFrame?: ExcalidrawFrameLikeElement | null;
+  exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   getDimensions?: (
     width: number,
     height: number,
@@ -77,9 +78,11 @@ export const exportToCanvas = async ({
     );
   }
 
-  const restoredElements = restoreElements(elements, null, {
-    deleteInvisibleElements: true,
-  });
+  const restoredElements = getNonDeletedElements(
+    restoreElements(elements, null, {
+      deleteInvisibleElements: true,
+    }),
+  );
   const restoredAppState = restoreAppState(appState, null);
 
   const { exportBackground, viewBackgroundColor } = restoredAppState;
@@ -223,9 +226,11 @@ export const exportToSvg = async ({
     );
   }
 
-  const restoredElements = restoreElements(elements, null, {
-    deleteInvisibleElements: true,
-  });
+  const restoredElements = getNonDeletedElements(
+    restoreElements(elements, null, {
+      deleteInvisibleElements: true,
+    }),
+  );
   const restoredAppState = restoreAppState(appState, null);
 
   const exportAppState = {

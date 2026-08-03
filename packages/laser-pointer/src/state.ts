@@ -11,6 +11,7 @@ export type SizeMappingDetails = {
 };
 
 export type LaserPointerOptions = {
+  /** @default 2 */
   size: number;
 
   streamline: number;

@@ -17,6 +17,7 @@ import {
   FRAME_STYLE,
   getFeatureFlag,
   invariant,
+  shouldRotateWithDiscreteAngle,
   THEME,
 } from "@excalidraw/common";
 
@@ -42,16 +43,13 @@ import {
   isTextElement,
   LinearElementEditor,
   getActiveTextElement,
-} from "@excalidraw/element";
-
-import { renderSelectionElement } from "@excalidraw/element";
-
-import {
   getElementsInGroup,
   getSelectedGroupIds,
   isSelectedViaGroup,
   selectGroupsFromGivenElements,
 } from "@excalidraw/element";
+
+import { renderSelectionElement } from "@excalidraw/element";
 
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 import {
@@ -77,6 +75,7 @@ import type {
   ExcalidrawTextElement,
   GroupId,
   NonDeleted,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
@@ -122,12 +121,7 @@ const renderElbowArrowMidPointHighlight = (
 
   invariant(segmentMidPointHoveredCoords, "midPointCoords is null");
 
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(segmentMidPointHoveredCoords, context, appState);
-
-  context.restore();
 };
 
 const renderLinearElementPointHighlight = (
@@ -157,18 +151,18 @@ const renderLinearElementPointHighlight = (
     hoverPointIndex,
     elementsMap,
   );
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
   highlightPoint(point, context, appState);
-  context.restore();
 };
 
+/** draws the point marker in scene coordinates */
 const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
 ) => {
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+
   context.fillStyle = "rgba(105, 101, 219, 0.4)";
 
   fillCircle(
@@ -178,19 +172,43 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
-};
-
-const renderFocusPointHighlight = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  focusPoint: GlobalPoint,
-) => {
-  context.save();
-  context.translate(appState.scrollX, appState.scrollY);
-
-  highlightPoint(focusPoint, context, appState);
 
   context.restore();
+};
+
+/**
+ * Marks where on the hovered arrow the text tool would attach text — a free
+ * endpoint, or the midpoint the arrow's label would center on.
+ *
+ * Purely presentational: `AppArrowText` maintains the anchor at every event
+ * that can change it (pointermove, the ctrl/cmd binding toggle, pointerdown,
+ * tool switches, finalize). The element lookup below only guards against the
+ * arrow vanishing through channels no local event covers, e.g. a collaborator
+ * deleting it.
+ */
+const renderHoveredArrowTextAnchor = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  elementsMap: ElementsMap,
+) => {
+  const { elementId, anchor } = appState.hoveredArrowTextAnchor!;
+
+  const element = elementsMap.get(elementId);
+
+  if (!element || !isArrowElement(element) || element.isDeleted) {
+    return;
+  }
+
+  const point =
+    anchor === "label"
+      ? LinearElementEditor.getBoundTextElementCenter(element, elementsMap)
+      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          element,
+          anchor === "start" ? 0 : -1,
+          elementsMap,
+        );
+
+  highlightPoint(point, context, appState);
 };
 
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
@@ -229,6 +247,7 @@ const renderBindingHighlightForBindableElement_simple = (
   elementsMap: ElementsMap,
   appState: InteractiveCanvasAppState,
   pointerCoords: GlobalPoint | null,
+  angleLocked = false,
 ) => {
   const enclosingFrame =
     suggestedBinding.element.frameId &&
@@ -415,6 +434,8 @@ const renderBindingHighlightForBindableElement_simple = (
 
   if (
     appState.isMidpointSnappingEnabled &&
+    !appState.gridModeEnabled &&
+    !angleLocked &&
     (isFrameLikeElement(suggestedBinding.element) ||
       isBindableElement(suggestedBinding.element))
   ) {
@@ -807,7 +828,12 @@ const renderBindingHighlightForBindableElement_complex = (
 
     context.restore();
 
-    if (appState.isMidpointSnappingEnabled) {
+    if (
+      appState.isMidpointSnappingEnabled &&
+      !appState.gridModeEnabled &&
+      (!app.lastPointerMoveEvent ||
+        !shouldRotateWithDiscreteAngle(app.lastPointerMoveEvent))
+    ) {
       // Draw midpoint indicators
       context.save();
       context.translate(
@@ -920,12 +946,16 @@ const renderBindingHighlightForBindableElement = (
         app.lastPointerMoveCoords.y,
       )
     : null;
+  const angleLocked =
+    !!app.lastPointerMoveEvent &&
+    shouldRotateWithDiscreteAngle(app.lastPointerMoveEvent);
   renderBindingHighlightForBindableElement_simple(
     context,
     suggestedBinding,
     allElementsMap,
     appState,
     pointerCoords,
+    angleLocked,
   );
   context.restore();
 };
@@ -1032,7 +1062,7 @@ const renderFrameHighlight = (
 const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
-  elements: NonDeleted<ExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
   const { colors = ["rgb(0,118,255)"], dashed = false } = config || {};
@@ -1308,7 +1338,7 @@ const renderFocusPointIndicator = ({
     linearState?.hoveredFocusPointBinding === type &&
     !linearState.draggedFocusPointBinding
   ) {
-    renderFocusPointHighlight(context, appState, focusPoint);
+    highlightPoint(focusPoint, context, appState);
   }
 
   // render focus point
@@ -1491,7 +1521,7 @@ const renderCropHandles = (
 };
 
 const renderTextBox = (
-  text: NonDeleted<ExcalidrawTextElement>,
+  text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
@@ -1515,7 +1545,7 @@ const renderTextBox = (
 };
 
 const renderResetAutoResizeHandle = (
-  text: NonDeleted<ExcalidrawTextElement>,
+  text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
@@ -1564,12 +1594,10 @@ const _renderInteractiveScene = ({
   deltaTime,
 }: InteractiveSceneRenderConfig): {
   scrollBars?: ReturnType<typeof getScrollBars>;
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   animationState?: typeof animationState;
 } => {
   if (canvas === null) {
-    return { atLeastOneVisibleElement: false, elementsMap };
+    return {};
   }
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
@@ -1675,6 +1703,10 @@ const _renderInteractiveScene = ({
     };
   }
 
+  if (appState.hoveredArrowTextAnchor) {
+    renderHoveredArrowTextAnchor(context, appState, allElementsMap);
+  }
+
   if (appState.frameToHighlight) {
     renderFrameHighlight(
       context,
@@ -1693,10 +1725,15 @@ const _renderInteractiveScene = ({
     const elements = element
       ? [element]
       : getElementsInGroup(allElementsMap, appState.activeLockedId);
-    renderElementsBoxHighlight(context, appState, elements, {
-      colors: ["#ced4da"],
-      dashed: true,
-    });
+    renderElementsBoxHighlight(
+      context,
+      appState,
+      elements as NonDeletedExcalidrawElement[], // We don't typecheck runtime because of performance
+      {
+        colors: ["#ced4da"],
+        dashed: true,
+      },
+    );
   }
 
   const isFrameSelected = selectedElements.some((element) =>
@@ -1782,7 +1819,7 @@ const _renderInteractiveScene = ({
       renderLinearPointHandles(
         context,
         appState,
-        selectedElements[0] as ExcalidrawLinearElement,
+        selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
         elementsMap,
       );
     }
@@ -2069,8 +2106,6 @@ const _renderInteractiveScene = ({
 
   return {
     scrollBars,
-    atLeastOneVisibleElement: visibleElements.length > 0,
-    elementsMap,
     animationState: nextAnimationState,
   };
 };

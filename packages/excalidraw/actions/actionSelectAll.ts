@@ -8,7 +8,11 @@ import { selectGroupsForSelectedElements } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "@excalidraw/element/types";
 
 import { selectAllIcon } from "../components/icons";
 
@@ -53,7 +57,10 @@ export const actionSelectAll = register({
           // single linear element selected
           Object.keys(selectedElementIds).length === 1 &&
           isLinearElement(elements[0])
-            ? new LinearElementEditor(elements[0], arrayToMap(elements))
+            ? new LinearElementEditor(
+                elements[0] as NonDeleted<ExcalidrawLinearElement>,
+                arrayToMap(elements),
+              )
             : null,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,

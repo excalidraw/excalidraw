@@ -2,6 +2,8 @@ import React from "react";
 
 import { CODES, STROKE_WIDTH } from "@excalidraw/common";
 
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import { copiedStyles } from "../actions/actionStyles";
 import { Excalidraw } from "../index";
 import { API } from "../tests/helpers/api";
@@ -58,7 +60,7 @@ describe("actionStyles", () => {
 
     mouse.reset();
 
-    API.setSelectedElements([h.elements[1]]);
+    API.setSelectedElements([h.elements[1]] as NonDeletedExcalidrawElement[]);
 
     Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
       Keyboard.codeDown(CODES.C);
@@ -68,7 +70,7 @@ describe("actionStyles", () => {
 
     mouse.reset();
     // Paste styles to first rectangle
-    API.setSelectedElements([h.elements[0]]);
+    API.setSelectedElements([h.elements[0]] as NonDeletedExcalidrawElement[]);
     Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
       Keyboard.codeDown(CODES.V);
     });

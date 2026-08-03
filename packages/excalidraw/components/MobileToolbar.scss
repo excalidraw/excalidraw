@@ -31,17 +31,17 @@
       width: 2.25rem;
       height: 2.25rem;
 
+      // hover has no meaning on touch devices (and sticks to the last-tapped
+      // element), so suppress the hover background…
       &:hover {
         background-color: transparent;
       }
     }
 
-    &.active {
-      background: var(
-        --color-surface-primary-container,
-        var(--island-bg-color)
-      );
-      border-color: var(--button-active-border, var(--color-primary-darkest));
+    // …but not on checked buttons, where the sticky hover of the tap that
+    // checked them would otherwise suppress the checked highlight
+    &.ToolIcon--checked .ToolIcon__icon:hover {
+      background-color: var(--color-surface-primary-container);
     }
 
     svg {

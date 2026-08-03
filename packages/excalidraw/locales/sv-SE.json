@@ -3,6 +3,10 @@
     "paste": "Klistra in",
     "pasteAsPlaintext": "Klistra som oformaterad text",
     "pasteCharts": "Klistra in diagram",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Markera alla",
     "multiSelect": "Lägg till element till markering",
     "moveCanvas": "Flytta canvas",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Kråkfot (många)",
     "arrowhead_crowfoot_one": "Kråkfot (en)",
     "arrowhead_crowfoot_one_or_many": "Kråkfot (en eller många)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Fler alternativ",
+    "cardinality": "",
     "arrowtypes": "Piltyp",
     "arrowtype_sharp": "Rak",
     "arrowtype_round": "Böjd",
@@ -171,7 +182,11 @@
     "linkToElement": "Länk till objektet",
     "wrapSelectionInFrame": "Omslut urvaled i ram",
     "tab": "Flik",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Länk till objektet",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Fel"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Spara till disk",
     "disk_details": "Exportera skissdata till en fil som du kan importera från senare.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid till Excalidraw",
     "button": "Infoga",
-    "description": "För närvarande stöds endast <flowchartLink>Flödesdiagram</flowchartLink>,<sequenceLink> Sekvensdiagram </sequenceLink> och <classLink>Klassdiagram</classLink>. De andra typerna kommer att återges som bild i Excalidraw.",
+    "description": "",
     "syntax": "Mermaid-syntax",
     "preview": "Förhandsgranska",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

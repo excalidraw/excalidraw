@@ -3,6 +3,10 @@
     "paste": "අලවන්න",
     "pasteAsPlaintext": "සරල පෙළ ලෙස අලවන්න",
     "pasteCharts": "ප්‍රස්ථාරය",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "සියල්ලම",
     "multiSelect": "තෝරා ගැනීමට අංගය එකතු කරන්න",
     "moveCanvas": "කැන්වසය චලනය කරන්න",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -171,7 +182,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "දෝෂ සංවාද මාතෘකාව"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "තැටි මාතෘකාව",
     "disk_details": "තැටි විස්තර",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid මාතෘකාව",
     "button": "Mermaid බොත්තම",
-    "description": "Mermaid විස්තර",
+    "description": "",
     "syntax": "Mermaid වාක්‍ය ඛණ්ඩය",
     "preview": "Mermaid පූර්වදර්ශනය",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

@@ -3,6 +3,10 @@
     "paste": "पेस्ट",
     "pasteAsPlaintext": "सादे पाठ के रूप में चिपकाएं",
     "pasteCharts": "चार्ट चिपकाएँ",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "सेलेक्ट ऑल",
     "multiSelect": "अवयव को चयन में सम्मिलित करें",
     "moveCanvas": "चित्रपटल को स्थानांतरित करें",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "चिड़िया पैर (अनेक)",
     "arrowhead_crowfoot_one": "चिड़िया पैर (एक)",
     "arrowhead_crowfoot_one_or_many": "चिड़िया पैर (एक या अनेक)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "और विकल्प",
+    "cardinality": "",
     "arrowtypes": "तीर प्रकार",
     "arrowtype_sharp": "तीक्ष्ण तीर",
     "arrowtype_round": "गोलाकार तीर",
@@ -171,7 +182,11 @@
     "linkToElement": "वस्तु की कड़ी",
     "wrapSelectionInFrame": "चौकट में चुने हुवे को लपेटे",
     "tab": "",
-    "shapeSwitch": "आकार बदलें"
+    "shapeSwitch": "आकार बदलें",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "वस्तु की कड़ी",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "त्रुटि"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "डिस्क पर सुरक्षित करे",
     "disk_details": "दृश्य डेटा एक फ़ाइल में निर्यात करे, जहांसे आप उसे पुनः आयात कर सके",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "मर्मेड से एक्सकाली में",
     "button": "सन्निवेश करे",
-    "description": "वर्तमान में केवल <flowchartLink>बहाव चित्र</flowchartLink>, <sequenceLink> अनुक्रम चित्र </sequenceLink> और <classLink>वर्ग चित्र</classLink> का चित्रिकरण संभव हैं. अन्य चित्र प्रकार एक्सकाली प्रतिमा जैसे चित्रित किए जायेंगे.",
+    "description": "",
     "syntax": "मर्मेड विन्यास",
     "preview": "पूर्वावलोकन",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

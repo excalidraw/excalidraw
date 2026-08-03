@@ -1,40 +1,28 @@
 import clsx from "clsx";
 
-import "./ToolIcon.scss";
+import { IconButton } from "./IconButton";
 
-import type { ToolButtonSize } from "./ToolButton";
 import type { JSX } from "react";
-
-const DEFAULT_SIZE: ToolButtonSize = "small";
 
 export const ElementCanvasButton = (props: {
   title?: string;
   icon: JSX.Element;
-  name?: string;
   checked: boolean;
   onChange?(): void;
   isMobile?: boolean;
 }) => {
   return (
-    <label
-      className={clsx(
-        "ToolIcon ToolIcon__MagicButton",
-        `ToolIcon_size_${DEFAULT_SIZE}`,
-        {
-          "is-mobile": props.isMobile,
-        },
-      )}
+    <IconButton
+      className={clsx("ToolIcon__MagicButton", {
+        "is-mobile": props.isMobile,
+      })}
+      type="toggle"
+      size="small"
+      icon={props.icon}
+      checked={props.checked}
       title={`${props.title}`}
-    >
-      <input
-        className="ToolIcon_type_checkbox"
-        type="checkbox"
-        name={props.name}
-        onChange={props.onChange}
-        checked={props.checked}
-        aria-label={props.title}
-      />
-      <div className="ToolIcon__icon">{props.icon}</div>
-    </label>
+      aria-label={`${props.title}`}
+      onSelect={() => props.onChange?.()}
+    />
   );
 };

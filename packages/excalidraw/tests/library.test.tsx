@@ -6,7 +6,10 @@ import { MIME_TYPES, ORIG_ID } from "@excalidraw/common";
 
 import { getCommonBoundingBox } from "@excalidraw/element";
 
-import type { ExcalidrawGenericElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawGenericElement,
+  NonDeleted,
+} from "@excalidraw/element/types";
 
 import { parseLibraryJSON } from "../data/blob";
 import { serializeLibraryAsJSON } from "../data/json";
@@ -274,7 +277,7 @@ describe("library menu", () => {
 describe("distributeLibraryItemsOnSquareGrid()", () => {
   it("should distribute items on a grid", async () => {
     const createLibraryItem = (
-      elements: ExcalidrawGenericElement[],
+      elements: NonDeleted<ExcalidrawGenericElement>[],
     ): LibraryItem => {
       return {
         id: `id-${Date.now()}`,

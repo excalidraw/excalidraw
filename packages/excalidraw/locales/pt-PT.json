@@ -3,6 +3,10 @@
     "paste": "Colar",
     "pasteAsPlaintext": "Colar como texto simples",
     "pasteCharts": "Colar gráficos",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Selecionar tudo",
     "multiSelect": "Adicionar elemento à seleção",
     "moveCanvas": "Mover área de desenho",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Pé de coroa (muitos)",
     "arrowhead_crowfoot_one": "Pé de coroa (um)",
     "arrowhead_crowfoot_one_or_many": "Pé de coroa (um ou muitos)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Mais opções",
+    "cardinality": "",
     "arrowtypes": "Tipo de seta",
     "arrowtype_sharp": "Seta retilínea",
     "arrowtype_round": "Seta curva",
@@ -171,7 +182,11 @@
     "linkToElement": "Hiperligação para o objeto",
     "wrapSelectionInFrame": "Ajustar seleção no quadro",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Hiperligação para o objeto",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "Erro"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "Guardar no disco",
     "disk_details": "Exportar os dados da cena para um ficheiro do qual poderá importar mais tarde.",
@@ -612,11 +631,12 @@
   "mermaid": {
     "title": "Mermaid para Excalidraw",
     "button": "Inserir",
-    "description": "Atualmente apenas são suportados diagramas <flowchartLink>fluxo</flowchartLink>, <sequenceLink>sequência, </sequenceLink> e <classLink>classe</classLink>. Os outros tipos serão renderizados como imagem no Excalidraw.",
+    "description": "",
     "syntax": "Sintaxe Mermaid",
     "preview": "Pré-visualizar",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

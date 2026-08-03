@@ -7,7 +7,11 @@ import { deepCopyElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
@@ -23,7 +27,7 @@ import type { AppState } from "../../types";
 
 export type DragInputCallbackType<
   P extends StatsInputProperty,
-  E = ExcalidrawElement,
+  E = NonDeletedExcalidrawElement,
 > = (props: {
   accumulatedChange: number;
   instantChange: number;

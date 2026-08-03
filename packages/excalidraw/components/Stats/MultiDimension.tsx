@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { MIN_WIDTH_OR_HEIGHT } from "@excalidraw/common";
 import {
   getElementsInResizingFrame,
+  getNonDeletedElements,
   isFrameLikeElement,
   replaceAllElementsInFrame,
   updateBoundElements,
@@ -20,7 +21,7 @@ import { getCommonBounds } from "@excalidraw/utils";
 
 import type {
   ElementsMap,
-  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
@@ -39,7 +40,7 @@ import type { AppState } from "../../types";
 
 interface MultiDimensionProps {
   property: "width" | "height";
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   elementsMap: NonDeletedSceneElementsMap;
   atomicUnits: AtomicUnit[];
   scene: Scene;
@@ -52,7 +53,7 @@ const getResizedUpdates = (
   anchorX: number,
   anchorY: number,
   scale: number,
-  origElement: ExcalidrawElement,
+  origElement: NonDeletedExcalidrawElement,
 ) => {
   const offsetX = origElement.x - anchorX;
   const offsetY = origElement.y - anchorY;
@@ -78,8 +79,8 @@ const resizeElementInGroup = (
   anchorY: number,
   property: MultiDimensionProps["property"],
   scale: number,
-  latestElement: ExcalidrawElement,
-  origElement: ExcalidrawElement,
+  latestElement: NonDeletedExcalidrawElement,
+  origElement: NonDeletedExcalidrawElement,
   originalElementsMap: ElementsMap,
   scene: Scene,
 ) => {
@@ -117,8 +118,8 @@ const resizeGroup = (
   aspectRatio: number,
   anchor: GlobalPoint,
   property: MultiDimensionProps["property"],
-  latestElements: ExcalidrawElement[],
-  originalElements: ExcalidrawElement[],
+  latestElements: NonDeletedExcalidrawElement[],
+  originalElements: NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
 ) => {
@@ -276,7 +277,7 @@ const handleDimensionChange: DragInputCallbackType<
 
   const changeInWidth = property === "width" ? accumulatedChange : 0;
   const changeInHeight = property === "height" ? accumulatedChange : 0;
-  const elementsToHighlight: ExcalidrawElement[] = [];
+  const elementsToHighlight: NonDeletedExcalidrawElement[] = [];
 
   for (const atomicUnit of atomicUnits) {
     const elementsInUnit = getElementsInAtomicUnit(
@@ -372,11 +373,13 @@ const handleDimensionChange: DragInputCallbackType<
 
         // Handle highlighting frame element candidates
         if (isFrameLikeElement(latestElement)) {
-          const nextElementsInFrame = getElementsInResizingFrame(
-            scene.getElementsIncludingDeleted(),
-            latestElement,
-            originalAppState,
-            scene.getNonDeletedElementsMap(),
+          const nextElementsInFrame = getNonDeletedElements(
+            getElementsInResizingFrame(
+              scene.getElementsIncludingDeleted(),
+              latestElement,
+              originalAppState,
+              scene.getNonDeletedElementsMap(),
+            ),
           );
 
           elementsToHighlight.push(...nextElementsInFrame);

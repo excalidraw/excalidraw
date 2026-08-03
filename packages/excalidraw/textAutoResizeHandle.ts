@@ -25,15 +25,16 @@ export const getTextAutoResizeHandle = (
   zoomValue: number,
   formFactor: EditorInterface["formFactor"],
 ) => {
+  const padding = getTextBoxPadding(zoomValue);
+
   if (
     formFactor !== "desktop" ||
     TEXT_AUTO_RESIZE_HANDLE_LENGTH >
-      textElement.height * zoomValue * MAX_HANDLE_HEIGHT_RATIO
+      (textElement.height + padding * 2) * zoomValue * MAX_HANDLE_HEIGHT_RATIO
   ) {
     return null;
   }
 
-  const padding = getTextBoxPadding(zoomValue);
   const gap = TEXT_AUTO_RESIZE_HANDLE_GAP / zoomValue;
   const length = TEXT_AUTO_RESIZE_HANDLE_LENGTH / zoomValue;
   const center = pointFrom(

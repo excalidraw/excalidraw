@@ -1,27 +1,22 @@
 import clsx from "clsx";
 import { forwardRef } from "react";
 
-import "./ButtonIcon.scss";
-
 import type { JSX } from "react";
 
-interface ButtonIconProps {
+interface RadioButtonProps {
   icon: JSX.Element;
   title: string;
   className?: string;
   testId?: string;
   /** if not supplied, defaults to value identity check */
   active?: boolean;
-  /** include standalone style (could interfere with parent styles) */
-  standalone?: boolean;
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   style?: React.CSSProperties;
 }
 
-export const ButtonIcon = forwardRef<HTMLButtonElement, ButtonIconProps>(
+export const RadioButton = forwardRef<HTMLButtonElement, RadioButtonProps>(
   (props, ref) => {
-    const { title, className, testId, active, standalone, icon, onClick } =
-      props;
+    const { title, className, testId, active, icon, onClick } = props;
     return (
       <button
         type="button"
@@ -29,7 +24,7 @@ export const ButtonIcon = forwardRef<HTMLButtonElement, ButtonIconProps>(
         key={title}
         title={title}
         data-testid={testId}
-        className={clsx(className, { standalone, active })}
+        className={clsx(className, { active })}
         onClick={onClick}
         style={props.style}
       >

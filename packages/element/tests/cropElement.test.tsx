@@ -26,7 +26,11 @@ import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { duplicateElement } from "../src/duplicate";
 
-import type { ExcalidrawImageElement, ImageCrop } from "../src/types";
+import type {
+  ExcalidrawImageElement,
+  ImageCrop,
+  NonDeleted,
+} from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -313,7 +317,7 @@ describe("Cropping and other features", async () => {
   });
 
   it("Exports should preserve crops", async () => {
-    const image = h.elements[0] as ExcalidrawImageElement;
+    const image = h.elements[0] as NonDeleted<ExcalidrawImageElement>;
     const initialWidth = image.width;
     const initialHeight = image.height;
 

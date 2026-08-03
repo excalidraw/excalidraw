@@ -3,6 +3,10 @@
     "paste": "បិទភ្ជាប់",
     "pasteAsPlaintext": "បិទភ្ជាប់ជាអត្ថបទធម្មតា",
     "pasteCharts": "បិទភ្ជាប់តារាង",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "ជ្រើសរើស​ទាំងអស់",
     "multiSelect": "បន្ថែមធាតុទៅលើការជ្រើសរើស",
     "moveCanvas": "ផ្លាស់ទីបាវ",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -171,7 +182,11 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -395,6 +410,10 @@
   "errorDialog": {
     "title": "មានកំហុស"
   },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
+  },
   "exportDialog": {
     "disk_title": "រក្សាទុកទៅថាស",
     "disk_details": "នាំចេញទិន្នន័យរបស់ស៊ីនជាឯកសារដែលអ្នកអាចនាំចូលនៅពេលក្រោយ។",
@@ -616,7 +635,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

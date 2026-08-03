@@ -36,7 +36,7 @@ import "./ColorPicker.scss";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
-import type { AppState } from "../../types";
+import type { AppState, UIAppState } from "../../types";
 
 interface ColorPickerProps {
   type: ColorPickerType;
@@ -48,7 +48,7 @@ interface ColorPickerProps {
   onChange: (color: string) => void;
   label: string;
   elements: readonly ExcalidrawElement[];
-  appState: AppState;
+  appState: UIAppState;
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;

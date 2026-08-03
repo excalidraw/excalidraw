@@ -15,6 +15,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import { Excalidraw, getCommonBounds } from "../..";
@@ -364,7 +365,7 @@ describe("stats for a non-generic element", () => {
     Keyboard.exitTextEditor(editor);
 
     const text = h.elements[0] as ExcalidrawTextElement;
-    API.setSelectedElements([text]);
+    API.setSelectedElements([text] as NonDeletedExcalidrawElement[]);
 
     elementStats = stats?.querySelector("#elementStats");
 

@@ -25,11 +25,22 @@
     }
   }
 
-  .ToolIcon_type_radio,
-  .ToolIcon_type_checkbox {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
+  // a <button> replacement for the former radio/checkbox-input ToolIcon —
+  // resets the native button chrome; state styling lives on the inner
+  // .ToolIcon__icon (see toolbarButtonColorStates)
+  .ToolIcon_type_toggle {
+    appearance: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--focus-highlight-color);
+    }
   }
 
   .ToolIcon__icon {
@@ -85,14 +96,6 @@
 
     &:focus-visible {
       box-shadow: 0 0 0 2px var(--focus-highlight-color);
-    }
-
-    &.ToolIcon--selected {
-      background-color: var(--button-gray-2);
-
-      &:active {
-        background-color: var(--button-gray-3);
-      }
     }
 
     &:active {

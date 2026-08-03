@@ -22,13 +22,15 @@ import { isLinearElement } from "../src/typeChecks";
 import { resizeSingleElement } from "../src/resizeElements";
 import { LinearElementEditor } from "../src/linearElementEditor";
 import { getElementPointsCoords } from "../src/bounds";
+import { computeContainerDimensionForBoundText } from "../src/textElement";
 
 import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
+  NonDeleted,
 } from "../src/types";
-
+import type { TransformHandleDirection } from "../src/transformHandles";
 unmountComponent();
 
 const { h } = window;
@@ -226,6 +228,36 @@ describe("generic element", () => {
     expect(label.angle).toBeCloseTo(rectangle.angle);
     expect(label.fontSize).toEqual(20);
   });
+
+  it.each<{ handle: TransformHandleDirection; move: [number, number] }>([
+    { handle: "n", move: [0, 100] },
+    { handle: "s", move: [0, -100] },
+  ])(
+    "resizes from center with multi-line label from $handle handle, with respect to min height",
+    async ({ handle, move }) => {
+      const rectangle = UI.createElement("rectangle", {
+        width: 200,
+        height: 100, // height not enough for label fit, so it will be resized
+      });
+
+      const label = await UI.editText(
+        rectangle,
+        "hello\nhello\nhello\nhello\nhello",
+      );
+      const initCenterY = rectangle.y + rectangle.height / 2;
+      const minContainerHeight = computeContainerDimensionForBoundText(
+        label.height,
+        rectangle.type,
+      );
+
+      UI.resize(rectangle, handle, move, {
+        alt: true,
+      });
+      const newCenterY = rectangle.y + rectangle.height / 2;
+      expect(newCenterY).toBeCloseTo(initCenterY);
+      expect(rectangle.height).toBeCloseTo(minContainerHeight);
+    },
+  );
 });
 
 describe.each(["line", "freedraw"] as const)("%s element", (type) => {
@@ -315,7 +347,7 @@ describe("line element", () => {
   it("resizes", async () => {
     UI.createElement("line", { points });
 
-    const element = h.elements[0] as ExcalidrawLinearElement;
+    const element = h.elements[0] as NonDeleted<ExcalidrawLinearElement>;
 
     const {
       x: prevX,
@@ -352,7 +384,7 @@ describe("line element", () => {
 
   it("flips while resizing", async () => {
     UI.createElement("line", { points });
-    const element = h.elements[0] as ExcalidrawLinearElement;
+    const element = h.elements[0] as NonDeleted<ExcalidrawLinearElement>;
 
     const {
       width: prevWidth,
@@ -406,7 +438,7 @@ describe("line element", () => {
         pointFrom(-338.05644048727373, -180.4761618151104),
       ],
     });
-    const element = h.elements[0] as ExcalidrawLinearElement;
+    const element = h.elements[0] as NonDeleted<ExcalidrawLinearElement>;
 
     const {
       x: prevX,

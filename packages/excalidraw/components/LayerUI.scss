@@ -133,7 +133,7 @@
     }
 
     // no shadow while pen mode is active (the active fill is enough)
-    .ToolIcon_type_checkbox:checked + .ToolIcon__icon {
+    &.ToolIcon--checked .ToolIcon__icon {
       box-shadow: none;
     }
   }

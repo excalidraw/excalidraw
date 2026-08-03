@@ -107,6 +107,49 @@ describe("laser tool interactions", () => {
     handleIframeLikeCenterClickSpy.mockRestore();
   });
 
+  it("activates embeddables covered by a higher z-index canvas element", async () => {
+    await render(<Excalidraw />);
+
+    const embeddable = API.createElement({
+      type: "embeddable",
+      x: 40,
+      y: 40,
+      width: 300,
+      height: 180,
+    });
+    const coveringRectangle = API.createElement({
+      type: "rectangle",
+      x: 40,
+      y: 40,
+      width: 300,
+      height: 180,
+      backgroundColor: "#ff0000",
+      fillStyle: "solid",
+    });
+    API.setElements([embeddable, coveringRectangle]);
+    API.updateElement(embeddable, {
+      link: "https://www.youtube.com/watch?v=gkGMXY0wekg",
+    });
+
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+    });
+
+    const centerX = embeddable.x + embeddable.width / 2;
+    const centerY = embeddable.y + embeddable.height / 2;
+
+    mouse.moveTo(centerX, centerY);
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.POINTER,
+    );
+    mouse.clickAt(centerX, centerY);
+
+    await waitFor(() => {
+      expect(h.state.activeEmbeddable?.element.id).toBe(embeddable.id);
+      expect(h.state.activeEmbeddable?.state).toBe("active");
+    });
+  });
+
   it("doesn't pan in view mode when laser tool is active", async () => {
     await render(<Excalidraw />);
 
@@ -160,4 +203,84 @@ describe("laser tool interactions", () => {
 
     expect(svgLayer.querySelectorAll("path")).toHaveLength(0);
   });
+});
+
+describe("iframe-like element hit testing outside frame bounds", () => {
+  const h = window.h;
+  const mouse = new Pointer("mouse");
+  const iframeLikeTypes = ["embeddable", "iframe"] as const;
+
+  const addFramedIframeLikeElement = (type: typeof iframeLikeTypes[number]) => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 40,
+      y: 40,
+      width: 100,
+      height: 180,
+    });
+    const iframeLikeElement = API.createElement({
+      type,
+      x: 80,
+      y: 40,
+      width: 300,
+      height: 180,
+      frameId: frame.id,
+    });
+    API.setElements([frame, iframeLikeElement]);
+    if (type === "embeddable") {
+      API.updateElement(iframeLikeElement, {
+        link: "https://www.youtube.com/watch?v=gkGMXY0wekg",
+      });
+    }
+
+    return { frame, iframeLikeElement };
+  };
+
+  it.each(iframeLikeTypes)(
+    "activates the visible part of a %s outside its frame",
+    async (type) => {
+      await render(<Excalidraw />);
+      const { frame, iframeLikeElement } = addFramedIframeLikeElement(type);
+
+      act(() => {
+        h.app.setActiveTool({ type: "laser" });
+      });
+
+      const centerX = iframeLikeElement.x + iframeLikeElement.width / 2;
+      const centerY = iframeLikeElement.y + iframeLikeElement.height / 2;
+      expect(centerX).toBeGreaterThan(frame.x + frame.width);
+
+      mouse.moveTo(centerX, centerY);
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.POINTER,
+      );
+      mouse.clickAt(centerX, centerY);
+
+      await waitFor(() => {
+        expect(h.state.activeEmbeddable?.element.id).toBe(iframeLikeElement.id);
+        expect(h.state.activeEmbeddable?.state).toBe("active");
+      });
+    },
+  );
+
+  it.each(iframeLikeTypes)(
+    "drags a %s from its visible part outside its frame",
+    async (type) => {
+      await render(<Excalidraw />);
+      const { frame, iframeLikeElement } = addFramedIframeLikeElement(type);
+      const startX = frame.x + frame.width + 20;
+      const startY = iframeLikeElement.y + iframeLikeElement.height / 2;
+      const initialX = iframeLikeElement.x;
+      const initialY = iframeLikeElement.y;
+
+      mouse.moveTo(startX, startY);
+      mouse.downAt(startX, startY);
+      mouse.moveTo(startX + 30, startY + 20);
+      mouse.upAt(startX + 30, startY + 20);
+
+      const draggedElement = API.getElement(iframeLikeElement);
+      expect(draggedElement.x).toBe(initialX + 30);
+      expect(draggedElement.y).toBe(initialY + 20);
+    },
+  );
 });

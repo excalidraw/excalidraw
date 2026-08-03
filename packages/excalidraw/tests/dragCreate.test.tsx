@@ -311,9 +311,9 @@ describe("Test dragCreate", () => {
       });
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `6`,
+        `7`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({
@@ -345,9 +345,9 @@ describe("Test dragCreate", () => {
       });
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `6`,
+        `7`,
       );
-      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
+      expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
       expect(h.state.selectionElement).toBeNull();
       expect(h.elements).toEqual([
         expect.objectContaining({

@@ -71,6 +71,8 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   FixedSegment,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
@@ -79,7 +81,7 @@ import { trackEvent } from "../analytics";
 import { atom } from "../editor-jotai";
 
 import "./ConvertElementTypePopup.scss";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import {
   DiamondIcon,
   elbowArrowIcon,
@@ -190,7 +192,7 @@ const Panel = ({
   elements,
 }: {
   app: App;
-  elements: ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
 }) => {
   const conversionType = getConversionTypeFromElements(elements);
 
@@ -330,18 +332,19 @@ const Panel = ({
               getLinearElementSubType(linearElements[0]) === type));
 
         return (
-          <ToolButton
-            className="Shape"
+          <IconButton
             key={`${elements[0].id}${elements[0].version}_${type}`}
-            type="radio"
+            type="toggle"
             icon={icon}
             checked={isSelected}
-            name="convertElementType-option"
             title={type}
-            keyBindingLabel={""}
             aria-label={type}
             data-testid={`toolbar-${type}`}
-            onChange={() => {
+            onSelect={() => {
+              // selecting the already-selected type is a no-op
+              if (isSelected) {
+                return;
+              }
               if (app.state.activeTool.type !== type) {
                 trackEvent("convertElementType", type, "ui");
               }
@@ -452,7 +455,7 @@ export const convertElementTypes = (
       ];
 
     if (nextType && isConvertibleGenericType(nextType)) {
-      const convertedElements: Record<string, ExcalidrawElement> = {};
+      const convertedElements: Record<string, NonDeletedExcalidrawElement> = {};
 
       for (const element of convertibleGenericElements) {
         const convertedElement = convertElementType(element, nextType, app);
@@ -505,9 +508,8 @@ export const convertElementTypes = (
   }
 
   if (conversionType === "linear") {
-    const convertibleLinearElements = filterLinearConvertibleElements(
-      selectedElements,
-    ) as ExcalidrawLinearElement[];
+    const convertibleLinearElements =
+      filterLinearConvertibleElements(selectedElements);
 
     if (!nextType) {
       const commonSubType = reduceToCommonValue(
@@ -628,7 +630,7 @@ export const convertElementTypes = (
 };
 
 export const getConversionTypeFromElements = (
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
 ): ConversionType => {
   if (elements.length === 0) {
     return null;
@@ -667,17 +669,30 @@ const toCacheKey = (
   return `${elementId}:${convertitleType}` as CacheKey;
 };
 
-const filterGenericConvetibleElements = (elements: ExcalidrawElement[]) =>
+const filterGenericConvetibleElements = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+) =>
   elements.filter((element) => isConvertibleGenericType(element.type)) as Array<
-    | ExcalidrawRectangleElement
-    | ExcalidrawDiamondElement
-    | ExcalidrawEllipseElement
+    T extends NonDeletedExcalidrawElement
+      ? NonDeleted<
+          | ExcalidrawRectangleElement
+          | ExcalidrawDiamondElement
+          | ExcalidrawEllipseElement
+        >
+      :
+          | ExcalidrawRectangleElement
+          | ExcalidrawDiamondElement
+          | ExcalidrawEllipseElement
   >;
 
-const filterLinearConvertibleElements = (elements: ExcalidrawElement[]) =>
+const filterLinearConvertibleElements = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+) =>
   elements.filter((element) =>
     isEligibleLinearElement(element),
-  ) as ExcalidrawLinearElement[];
+  ) as (T extends NonDeletedExcalidrawElement
+    ? NonDeleted<ExcalidrawLinearElement>
+    : ExcalidrawLinearElement)[];
 
 const THRESHOLD = 20;
 const isVert = (a: LocalPoint, b: LocalPoint) => a[0] === b[0];
@@ -807,12 +822,15 @@ const sanitizePoints = (points: readonly LocalPoint[]): LocalPoint[] => {
  *   e.g. elbow arrow -> line
  */
 const convertElementType = <
-  TElement extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  TElement extends Exclude<
+    NonDeletedExcalidrawElement,
+    ExcalidrawSelectionElement
+  >,
 >(
   element: TElement,
   targetType: ConvertibleTypes,
   app: AppClassProperties,
-): ExcalidrawElement => {
+): NonDeletedExcalidrawElement => {
   if (!isValidConversion(element.type, targetType)) {
     if (!isProdEnv()) {
       throw Error(`Invalid conversion from ${element.type} to ${targetType}.`);

@@ -3,6 +3,10 @@
     "paste": "Yapıştır",
     "pasteAsPlaintext": "Düz metin olarak yapıştır",
     "pasteCharts": "Grafikleri yapıştır",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Tümünü seç",
     "multiSelect": "Seçime öge ekle",
     "moveCanvas": "Tuvali taşı",
@@ -49,7 +53,14 @@
     "arrowhead_crowfoot_many": "Karga ayak (çok)",
     "arrowhead_crowfoot_one": "Karga ayak (bir)",
     "arrowhead_crowfoot_one_or_many": "Karga ayak (bir veya çok sayıda)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Daha fazla seçenek",
+    "cardinality": "",
     "arrowtypes": "Ok şekli",
     "arrowtype_sharp": "Düz ok",
     "arrowtype_round": "Kavisli ok",
@@ -117,7 +128,7 @@
     "share": "Paylaş",
     "showStroke": "Kontur için renk seçiciyi göster",
     "showBackground": "Arka plan renk seçicisini göster",
-    "showFonts": "Yazı tipi seçici",
+    "showFonts": "Yazı tipi seçiciyi göster",
     "toggleTheme": "Aydınlık/karanlık mod",
     "theme": "Tema",
     "personalLib": "Kişisel Kitaplık",
@@ -171,7 +182,11 @@
     "linkToElement": "Nesneye bağlantıla",
     "wrapSelectionInFrame": "Seçimi karede kaydır",
     "tab": "Sekme",
-    "shapeSwitch": "Şekli başkasıyla değiştir"
+    "shapeSwitch": "Şekli başkasıyla değiştir",
+    "preferences": "Tercihler",
+    "preferences_toolLock": "Aracı Kilitle",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Nesneye bağlantıla",
@@ -341,7 +356,7 @@
     "canvasPanning": "Tuvali taşımak için {{shortcut_1}} kısayolunu basılı tutun, sürüklerken {{shortcut_2}} kısayolunu veya el aracını kullanın",
     "linearElement": "Birden fazla nokta için tıklayın, tek çizgi için sürükleyin",
     "arrowTool": "Birden çok nokta başlatmak için tıklayın, tek bir çizgi için sürükleyin. Ok türünü değiştirmek için {{shortcut}} kısayoluna basın.",
-    "arrowBindModifiers": "",
+    "arrowBindModifiers": "Bağlamayı (kenetlenmeyi) devre dışı bırakmak için {{shortcut_1}} tuşuna, sabit bir noktaya bağlamak için {{shortcut_2}} tuşuna basılı tutun.",
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "embeddable": "Web sitesi yerleştirmek için sürükle bırak",
@@ -349,22 +364,22 @@
     "text_editing": "Düzenlemeyi bitirmek için {{shortcut_1}} veya {{shortcut_2}} kısayoluna basın",
     "linearElementMulti": "Bitirmek için son noktaya tıklayın veya {{shortcut_1}} veya {{shortcut_2}} kısayolunu kullanın",
     "lockAngle": "{{shortcut}} kısayolunu basılı tutarak açıyı kısıtlayabilirsiniz",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "resize": "Yeniden boyutlandırırken {{shortcut_1}} tuşuna basılı tutarak oranları koruyabilir, merkezden boyutlandırmak için {{shortcut_2}} tuşuna basılı tutabilirsiniz.",
+    "resizeImage": "Serbestçe boyutlandırmak için {{shortcut_1}} tuşunu, merkez odaklı boyutlandırmak için {{shortcut_2}} tuşunu basılı tutun.",
+    "rotate": "Açıları sabitleyerek döndürmek için {{shortcut}} tuşuna basılı tutun.",
+    "lineEditor_info": "Noktaları düzenlemek için {{shortcut_1}} tuşuna basılı tutarak çift tıklayın veya {{shortcut_2}} tuşuna basın.",
+    "lineEditor_line_info": "Noktaları düzenlemek için çift tıklayın veya {{shortcut}} tuşuna basın.",
+    "lineEditor_pointSelected": "Noktaları (veya noktayı) silmek için {{shortcut_1}}, çoğaltmak için {{shortcut_2}} tuşuna basın veya taşımak için sürükleyin.",
+    "lineEditor_nothingSelected": "Düzenlemek için bir nokta seçin (çoklu seçim için {{shortcut_1}} tuşuna basılı tutun) veya yeni noktalar eklemek için {{shortcut_2}} tuşuna basarak tıklayın.",
     "publishLibrary": "Kendi kitaplığınızı yayınlayın",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "Metin eklemek için {{shortcut}} tuşuna basın",
+    "createFlowchart": "Akış şeması oluşturmak için {{shortcut}} tuşuna basın",
+    "deepBoxSelect": "Derin seçim yapmak ve sürüklemeyi engellemek için {{shortcut}} tuşuna basılı tutun.",
+    "eraserRevert": "Silinmek üzere işaretlenen öğeleri geri yüklemek (veya geri döndürmek) için {{shortcut}} tuşuna basılı tutun.",
     "firefox_clipboard_write": "Bu özelliği etkinleştirmek muhtemelen \"dom.events.asyncClipboard.clipboardItem\" bayrağını \"true\" olarak ayarlayarak yapılabilir. Firefox'ta tarayıcı bayraklarını değiştirmek için \"about:config\" sayfasını ziyaret edin.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Hizalamayı (kenetlenmeyi) devre dışı bırakmak için {{shortcut}} tuşuna basılı tutun.",
+    "enterCropEditor": "Görseli kırpmak için üzerine çift tıklayın veya {{shortcut}} tuşuna basın.",
+    "leaveCropEditor": "Kırpmayı tamamlamak için görselin dışına tıklayın veya {{shortcut_1}} ya da {{shortcut_2}} tuşuna basın."
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
@@ -394,6 +409,10 @@
   },
   "errorDialog": {
     "title": "Hata"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Belleğe kaydet",
@@ -436,8 +455,8 @@
     "toggleElementLock": "Seçimi Kilitle/çöz",
     "movePageUpDown": "Sayfayı yukarı/aşağı kaydır",
     "movePageLeftRight": "Sayfayı sola/sağa kaydır",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Görseli kırp",
+    "cropFinish": "Görsel kırpmayı tamamla"
   },
   "clearCanvasDialog": {
     "title": "Tuvali temizle"
@@ -528,7 +547,7 @@
     "copyStyles": "Stiller kopyalandı.",
     "copyToClipboard": "Panoya kopyalandı.",
     "copyToClipboardAsPng": "{{exportSelection}} panoya PNG olarak\n({{exportColorScheme}}) kopyalandı",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "{{exportSelection}} SVG olarak panoya kopyalandı ({{exportColorScheme}})",
     "fileSaved": "Dosya kaydedildi.",
     "fileSavedToFilename": "{filename} kaydedildi",
     "canvas": "tuval",
@@ -536,7 +555,7 @@
     "pasteAsSingleElement": "Tekil obje olarak yapıştırmak için veya var olan bir metin editörüne yapıştırmak için {{shortcut}} kullanın",
     "unableToEmbed": "Bu URL'i yerleştirmeye şu anda izin verilmiyor. URL'in beyaz listeye alınmasını istiyorsanız GitHub'da bir issue açın",
     "unrecognizedLinkFormat": "Yerleştirdiğiniz bağlantı beklenen biçime uymuyor. Lütfen kaynak sitenin sağladığı \"yerleştir\" dizesini yapıştırmayı deneyin",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Bağlantı panoya kopyalandı"
   },
   "colors": {
     "transparent": "Şeffaf",
@@ -557,9 +576,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Çizimleriniz tarayıcınızın depolama alanına kaydedilir.",
+      "center_heading_line2": "Tarayıcı depolama alanı beklenmedik bir şekilde silinebilir.",
+      "center_heading_line3": "Veri kaybını önlemek için çalışmanızı düzenli olarak bir dosyaya kaydedin.",
       "center_heading_plus": "Ecalidraw+'a mı gitmek istediniz?",
       "menuHint": "Dışa aktar, seçenekler, diller, ..."
     },
@@ -571,7 +590,7 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Renk",
     "mostUsedCustomColors": "En çok kullanılan özel renkler",
     "colors": "Renkler",
     "shades": "Tonlar",
@@ -612,40 +631,41 @@
   "mermaid": {
     "title": "Mermaid'den Excalidraw'a",
     "button": "Ekle",
-    "description": "Şu anda yalnızca <flowchartLink>Akış şeması</flowchartLink>,<sequenceLink> Dizi, </sequenceLink> ve <classLink>Sınıf </classLink>Diyagramları deskteklenmektedir. Diğer türler, Excalidraw'da görsel olarak çizilecektir.",
+    "description": "",
     "syntax": "Mermaid Sözdizimi",
     "preview": "Önizleme",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "\"Mermaid diyagram tanımını buraya yazın...",
+    "autoFixAvailable": ""
   },
   "ttd": {
-    "error": ""
+    "error": "Hata!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Diyagram fikrinizi buraya yazmaya başlayın... (Yeni satır için {{shortcut}})",
+    "inputPlaceholderWithMessages": "Diyagramınızı geliştirmeye devam edin...",
+    "generating": "Oluşturuluyor...",
+    "rateLimitRemaining": "Bugün için {{count}} hak kaldı",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Siz",
+      "assistant": "YZ Asistanı",
+      "system": "Sistem"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
+    "aiBeta": "YZ Beta",
+    "label": "Sohbet",
+    "menu": "Menü",
+    "newChat": "Yeni Sohbet",
+    "deleteChat": "Sohbeti sil",
+    "deleteMessage": "Mesajı sil",
     "viewAsMermaid": "",
     "placeholder": {
-      "title": "",
-      "description": "",
+      "title": "\"Hadi, diyagramınızı tasarlayalım",
+      "description": "Oluşturmak istediğiniz diyagramı tarif edin, sizin için biz hazırlayalım.",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Önizleme",
+    "insert": "Ekle",
+    "retry": "Yeniden dene",
     "errors": {
       "promptTooShort": "",
       "promptTooLong": "",

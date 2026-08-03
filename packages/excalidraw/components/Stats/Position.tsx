@@ -6,7 +6,10 @@ import {
 } from "@excalidraw/element";
 import { isImageElement } from "@excalidraw/element";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ElementsMap,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
@@ -18,7 +21,7 @@ import type { AppState } from "../../types";
 
 interface PositionProps {
   property: "x" | "y";
-  element: ExcalidrawElement;
+  element: NonDeletedExcalidrawElement;
   elementsMap: ElementsMap;
   scene: Scene;
   appState: AppState;
@@ -169,13 +172,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   );
 };
 
-const Position = ({
-  property,
-  element,
-  elementsMap,
-  scene,
-  appState,
-}: PositionProps) => {
+const Position = ({ property, element, scene, appState }: PositionProps) => {
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(element.x, element.y),
     pointFrom(element.x + element.width / 2, element.y + element.height / 2),
