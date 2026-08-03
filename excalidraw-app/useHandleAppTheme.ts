@@ -47,5 +47,15 @@ export const useHandleAppTheme = () => {
     }
   }, [appTheme]);
 
+  // Mirror the resolved theme onto the <html> element so app-shell chrome
+  // outside the Excalidraw root (e.g. the TabBar) can react to runtime theme
+  // toggles. The pre-mount script in index.html only sets this once on boot.
+  useLayoutEffect(() => {
+    document.documentElement.classList.toggle(
+      "dark",
+      editorTheme === THEME.DARK,
+    );
+  }, [editorTheme]);
+
   return { editorTheme, appTheme, setAppTheme };
 };
