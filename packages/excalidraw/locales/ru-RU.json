@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Пунктирная",
     "strokeStyle_dotted": "Точечная",
     "sloppiness": "Стиль обводки",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Непрозрачность",
     "textAlign": "Выравнивание текста",
     "edges": "Края",
@@ -53,14 +56,14 @@
     "arrowhead_crowfoot_many": "Морщинки (много)",
     "arrowhead_crowfoot_one": "Морщинки (одна)",
     "arrowhead_crowfoot_one_or_many": "Морщинки (одна или много)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "Кардинальность (одна)",
+    "arrowhead_cardinality_many": "Кардинальность (много)",
+    "arrowhead_cardinality_one_or_many": "Кардинальность (одна или много)",
+    "arrowhead_cardinality_exactly_one": "Кардинальность (ровно одна)",
+    "arrowhead_cardinality_zero_or_one": "Кардинальность (ноль или одна)",
+    "arrowhead_cardinality_zero_or_many": "Кардинальность (ноль или много)",
     "more_options": "Больше вариантов",
-    "cardinality": "",
+    "cardinality": "Кардинальность",
     "arrowtypes": "Тип стрелки",
     "arrowtype_sharp": "Острая стрелка",
     "arrowtype_round": "Изогнутая стрелка",
@@ -185,6 +188,9 @@
     "shapeSwitch": "Сменить форму",
     "preferences": "Настройки",
     "preferences_toolLock": "Закрепить инструмент",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "Привязка стрелкой",
     "midpointSnapping": "Привязка к средней точке"
   },
@@ -325,6 +331,7 @@
     "magicframe": "Каркас для кода",
     "embeddable": "Встроенная страница",
     "laser": "Лазерная указка",
+    "autoshape": "",
     "hand": "Рука (перемещение холста)",
     "extraTools": "Дополнительные инструменты",
     "mermaidToExcalidraw": "Mermaid в Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
     "embeddable": "Перетащите для встраивания веб-сайта",
+    "autoshape": "",
     "text_selected": "Дважды щёлкните или нажмите {{shortcut}}, чтобы отредактировать текст",
     "text_editing": "Нажмите {{shortcut_1}} или {{shortcut_2}}, чтобы завершить редактирование",
     "linearElementMulti": "Нажмите на последнюю точку или нажмите {{shortcut_1}} или {{shortcut_2}}, чтобы завершить",
@@ -367,6 +375,7 @@
     "resize": "Вы можете ограничить пропорции, удерживая {{shortcut_1}} во время изменения размера,\nудерживайте {{shortcut_2}}, чтобы изменить размер от центра",
     "resizeImage": "Вы можете свободно изменять размер, удерживая {{shortcut_1}},\nудерживайте {{shortcut_2}}, чтобы изменить размер от центра",
     "rotate": "Вы можете ограничить углы, удерживая {{shortcut}} во время поворота",
+    "toggleArrowhead": "",
     "lineEditor_info": "Удерживайте {{shortcut_1}} и дважды щёлкните или нажмите {{shortcut_2}}, чтобы отредактировать точки",
     "lineEditor_line_info": "Дважды щёлкните или нажмите {{shortcut}}, чтобы отредактировать точки",
     "lineEditor_pointSelected": "Нажмите {{shortcut_1}}, чтобы удалить точки,\n{{shortcut_2}} для дублирования или перетащите",
@@ -411,8 +420,8 @@
     "title": "Ошибка"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Сохранение",
+    "defaultMessage": "Подготовка к сохранению..."
   },
   "exportDialog": {
     "disk_title": "Сохранить на диск",
@@ -595,7 +604,9 @@
     "colors": "Цвета",
     "shades": "Оттенки",
     "hexCode": "Шестнадцатеричный код",
-    "noShades": "Нет доступных оттенков для этого цвета"
+    "noShades": "Нет доступных оттенков для этого цвета",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -631,7 +642,7 @@
   "mermaid": {
     "title": "Из Mermaid в Excalidraw",
     "button": "Вставить",
-    "description": "",
+    "description": "В настоящее время поддерживаются только <flowchartLink>блок-схемы</flowchartLink>, <sequenceLink>диаграммы последовательности</sequenceLink>, <classLink>диаграммы классов</classLink> и <erdLink>диаграммы взаимоотношений сущностей</erdLink>. Другие типы будут отображаться в виде изображения в Excalidraw.",
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр",
     "label": "Mermaid",
