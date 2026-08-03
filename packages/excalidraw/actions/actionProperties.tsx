@@ -158,6 +158,8 @@ import {
 import {
   withCaretPositionPreservation,
   restoreCaretPosition,
+  saveCaretPosition,
+  consumeCapturedSelection,
 } from "../hooks/useTextEditorFocus";
 
 import { getShortcutKey } from "../shortcut";
@@ -344,17 +346,98 @@ export const actionChangeStrokeColor = register<
   label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value) => {
+    // Check if we're editing text with a sub-selection.
+    // We use consumeCapturedSelection() instead of saveCaretPosition() because
+    // by the time perform() runs, the browser has already collapsed the
+    // textarea's selection (pointerdown on the color swatch moved focus away).
+    // captureSelectionNow() was called on pointerdown of the color button, so
+    // the real selection range is stored and retrievable here.
+    const editingTextId = appState.editingTextElement?.id;
+    const caretPos = editingTextId ? consumeCapturedSelection() : null;
+    const hasSubSelection =
+      caretPos !== null && caretPos.start !== caretPos.end;
+
     return {
       ...(value?.currentItemStrokeColor && {
         elements: changeProperty(
           elements,
           appState,
           (el) => {
-            return hasStrokeColor(el.type)
-              ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
-              : el;
+            if (!hasStrokeColor(el.type)) {
+              return el;
+            }
+
+            // If this is the text element being edited and there's
+            // a sub-selection, update rangeColors instead of strokeColor
+            if (
+              hasSubSelection &&
+              caretPos &&
+              el.id === editingTextId &&
+              isTextElement(el)
+            ) {
+              const newColor = value.currentItemStrokeColor;
+              const selStart = caretPos.start;
+              const selEnd = caretPos.end;
+
+              // Get existing rangeColors or start fresh
+              const existingRanges: {
+                start: number;
+                end: number;
+                color: string;
+              }[] = [
+                ...((el as ExcalidrawTextElement).rangeColors ?? []),
+              ];
+
+              // Remove/split any existing ranges that overlap with
+              // the new selection range
+              const updatedRanges: {
+                start: number;
+                end: number;
+                color: string;
+              }[] = [];
+
+              for (const range of existingRanges) {
+                if (range.end <= selStart || range.start >= selEnd) {
+                  // No overlap — keep as-is
+                  updatedRanges.push(range);
+                } else {
+                  // Overlap — split around the new selection
+                  if (range.start < selStart) {
+                    updatedRanges.push({
+                      start: range.start,
+                      end: selStart,
+                      color: range.color,
+                    });
+                  }
+                  if (range.end > selEnd) {
+                    updatedRanges.push({
+                      start: selEnd,
+                      end: range.end,
+                      color: range.color,
+                    });
+                  }
+                }
+              }
+
+              // Add the new range for the selection
+              updatedRanges.push({
+                start: selStart,
+                end: selEnd,
+                color: newColor,
+              });
+
+              // Sort by start position
+              updatedRanges.sort((a, b) => a.start - b.start);
+
+              return newElementWith(el, {
+                rangeColors: updatedRanges,
+              } as any);
+            }
+
+            // Default: change strokeColor for the entire element
+            return newElementWith(el, {
+              strokeColor: value.currentItemStrokeColor,
+            });
           },
           true,
         ),

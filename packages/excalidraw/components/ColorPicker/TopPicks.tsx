@@ -8,6 +8,8 @@ import {
   isColorDark,
 } from "@excalidraw/common";
 
+import { captureSelectionNow } from "../../hooks/useTextEditorFocus";
+
 import type { ColorPickerType } from "./colorPickerUtils";
 
 interface TopPicksProps {
@@ -62,6 +64,9 @@ export const TopPicks = ({
           key={color}
           type="button"
           title={color}
+          // Capture the textarea selection before the browser collapses it
+          // on pointerdown (focus leaves the textarea before onClick fires).
+          onPointerDown={captureSelectionNow}
           onClick={() => onChange(color)}
           data-testid={`color-top-pick-${color}`}
         >

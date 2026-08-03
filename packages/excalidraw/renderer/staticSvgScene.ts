@@ -677,25 +677,90 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
+        // Per-range color rendering support for SVG
+        const rangeColors = (element as any).rangeColors as
+          | readonly { start: number; end: number; color: string }[]
+          | undefined;
+        const defaultFill = applyDarkModeFilter(
+          element.strokeColor,
+          renderConfig.theme === THEME.DARK,
+        );
+
+        let charOffset = 0;
         for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          const lineStart = charOffset;
+          const lineEnd = charOffset + line.length;
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute(
-            "fill",
-            applyDarkModeFilter(
-              element.strokeColor,
-              renderConfig.theme === THEME.DARK,
-            ),
-          );
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
           text.setAttribute("dominant-baseline", "alphabetic");
+
+          if (rangeColors && rangeColors.length > 0) {
+            // Collect ranges that overlap this line
+            const lineRanges = rangeColors
+              .filter((r) => r.start < lineEnd && r.end > lineStart)
+              .map((r) => ({
+                start: Math.max(r.start - lineStart, 0),
+                end: Math.min(r.end - lineStart, line.length),
+                color: r.color,
+              }))
+              .sort((a, b) => a.start - b.start);
+
+            if (lineRanges.length === 0) {
+              text.setAttribute("fill", defaultFill);
+              text.textContent = line;
+            } else {
+              // Build tspans for colored segments
+              let pos = 0;
+              for (const range of lineRanges) {
+                if (range.start > pos) {
+                  const tspan = svgRoot.ownerDocument.createElementNS(
+                    SVG_NS,
+                    "tspan",
+                  );
+                  tspan.textContent = line.slice(pos, range.start);
+                  tspan.setAttribute("fill", defaultFill);
+                  text.appendChild(tspan);
+                }
+                const tspan = svgRoot.ownerDocument.createElementNS(
+                  SVG_NS,
+                  "tspan",
+                );
+                tspan.textContent = line.slice(range.start, range.end);
+                tspan.setAttribute(
+                  "fill",
+                  applyDarkModeFilter(
+                    range.color,
+                    renderConfig.theme === THEME.DARK,
+                  ),
+                );
+                text.appendChild(tspan);
+                pos = range.end;
+              }
+              if (pos < line.length) {
+                const tspan = svgRoot.ownerDocument.createElementNS(
+                  SVG_NS,
+                  "tspan",
+                );
+                tspan.textContent = line.slice(pos);
+                tspan.setAttribute("fill", defaultFill);
+                text.appendChild(tspan);
+              }
+            }
+          } else {
+            text.setAttribute("fill", defaultFill);
+            text.textContent = line;
+          }
+
           node.appendChild(text);
+          // +1 for the newline character
+          charOffset = lineEnd + 1;
         }
 
         const g = maybeWrapNodesInFrameClipPath(

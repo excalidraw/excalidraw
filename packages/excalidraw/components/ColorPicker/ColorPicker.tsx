@@ -24,6 +24,9 @@ import {
   saveCaretPosition,
   restoreCaretPosition,
   temporarilyDisableTextEditorBlur,
+  captureSelectionNow,
+  peekCapturedSelection,
+  consumeCapturedSelection,
 } from "../../hooks/useTextEditorFocus";
 
 import { ColorInput } from "./ColorInput";
@@ -153,9 +156,13 @@ const ColorPickerPopupContent = ({
           palette={palette}
           color={color}
           onChange={(changedColor) => {
-            // Save caret position before color change if editing text
+            // Use the pre-captured selection (stored at popup-open time via
+            // captureSelectionNow()) to restore the caret after the color change.
+            // saveCaretPosition() would read the collapsed DOM state here (popup
+            // is already open, textarea already lost focus).
+            // NOTE: peek (not consume) so perform() can still consume it.
             const savedSelection = appState.editingTextElement
-              ? saveCaretPosition()
+              ? peekCapturedSelection()
               : null;
 
             onChange(changedColor);
@@ -231,6 +238,12 @@ const ColorPickerTrigger = ({
     // use pointerdown so we run before outside-close logic
     e.preventDefault();
     e.stopPropagation();
+
+    // Capture the textarea selection NOW, before the browser moves focus
+    // to this button and collapses selectionStart/selectionEnd.
+    // This must run even if we're just opening the popup, because by the time
+    // a color is ultimately picked the selection will be gone.
+    captureSelectionNow();
 
     // If editing text, temporarily disable the wysiwyg blur event
     if (editingTextElement) {

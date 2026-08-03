@@ -513,12 +513,107 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
-        for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
+        // Per-range color rendering support
+        const rangeColors = (element as any).rangeColors as
+          | readonly { start: number; end: number; color: string }[]
+          | undefined;
+
+        if (rangeColors && rangeColors.length > 0) {
+          // Build a character offset map: for each line, track its start
+          // index in element.text
+          const defaultColor = applyDarkModeFilter(
+            element.strokeColor,
+            renderConfig.theme === THEME.DARK,
           );
+          let charOffset = 0;
+          // We need to force left-aligned text measurement for sub-range rendering
+          // so save and restore textAlign
+          const savedAlign = context.textAlign;
+          context.textAlign = "left" as CanvasTextAlign;
+
+          for (let index = 0; index < lines.length; index++) {
+            const line = lines[index];
+            const lineStart = charOffset;
+            const lineEnd = charOffset + line.length;
+            const y = index * lineHeightPx + verticalOffset;
+
+            // Compute the base x for left-aligned rendering
+            let baseX: number;
+            if (element.textAlign === "center") {
+              const lineWidth = context.measureText(line).width;
+              baseX = element.width / 2 - lineWidth / 2;
+            } else if (element.textAlign === "right") {
+              const lineWidth = context.measureText(line).width;
+              baseX = element.width - lineWidth;
+            } else {
+              baseX = 0;
+            }
+
+            // Build segments for this line with their colors
+            type Segment = { text: string; color: string };
+            const segments: Segment[] = [];
+            let pos = 0;
+
+            // Collect ranges that overlap this line
+            const lineRanges = rangeColors
+              .filter((r) => r.start < lineEnd && r.end > lineStart)
+              .map((r) => ({
+                start: Math.max(r.start - lineStart, 0),
+                end: Math.min(r.end - lineStart, line.length),
+                color: r.color,
+              }))
+              .sort((a, b) => a.start - b.start);
+
+            for (const range of lineRanges) {
+              if (range.start > pos) {
+                // Default-colored segment before this range
+                segments.push({
+                  text: line.slice(pos, range.start),
+                  color: defaultColor,
+                });
+              }
+              segments.push({
+                text: line.slice(range.start, range.end),
+                color: applyDarkModeFilter(
+                  range.color,
+                  renderConfig.theme === THEME.DARK,
+                ),
+              });
+              pos = range.end;
+            }
+            if (pos < line.length) {
+              segments.push({
+                text: line.slice(pos),
+                color: defaultColor,
+              });
+            }
+
+            // If no ranges affected this line, draw with default color
+            if (segments.length === 0) {
+              context.fillStyle = defaultColor;
+              context.fillText(line, baseX, y);
+            } else {
+              // Draw each segment, advancing x position
+              let x = baseX;
+              for (const seg of segments) {
+                context.fillStyle = seg.color;
+                context.fillText(seg.text, x, y);
+                x += context.measureText(seg.text).width;
+              }
+            }
+
+            // +1 for the newline character between lines
+            charOffset = lineEnd + 1;
+          }
+          context.textAlign = savedAlign;
+        } else {
+          for (let index = 0; index < lines.length; index++) {
+            context.fillText(
+              lines[index],
+              horizontalOffset,
+              index * lineHeightPx + verticalOffset,
+            );
+          }
         }
         context.restore();
         if (shouldTemporarilyAttach) {
