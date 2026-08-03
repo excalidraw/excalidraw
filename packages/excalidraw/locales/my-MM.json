@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "မျဉ်းပြတ်",
     "strokeStyle_dotted": "မျဉ်းစက်",
     "sloppiness": "သေသပ်မှု",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ထင်ရှားမှု",
     "textAlign": "စာသားညှိ",
     "edges": "အစွန်း",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
     "hand": "",
     "extraTools": "",
     "mermaidToExcalidraw": "",
@@ -360,6 +367,7 @@
     "freeDraw": "ကလစ်နှိပ်၍ တရွတ်ဆွဲပါ၊ ပြီးလျှင်လွှတ်ပါ။",
     "text": "မှတ်ချက်။ ။မည်သည့်ကိရိယာရွေးထားသည်ဖြစ်စေ ကလစ်နှစ်ချက်နှိပ်၍စာသားထည့်နိုင်သည်",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

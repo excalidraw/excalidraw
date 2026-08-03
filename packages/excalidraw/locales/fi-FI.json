@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Katkoviiva",
     "strokeStyle_dotted": "Pisteviiva",
     "sloppiness": "Viivan tarkkuus",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Peittävyys",
     "textAlign": "Tekstin tasaus",
     "edges": "Reunat",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "Verkkoupote",
     "laser": "Laserosoitin",
+    "autoshape": "",
     "hand": "Käsi (panning-työkalu)",
     "extraTools": "Lisää työkaluja",
     "mermaidToExcalidraw": "Mermaid Excalidrawiksi",
@@ -360,6 +367,7 @@
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Värit",
     "shades": "Varjot",
     "hexCode": "Hex koodi",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

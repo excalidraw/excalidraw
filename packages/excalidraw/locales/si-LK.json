@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "කඩකිරීම්",
     "strokeStyle_dotted": "තිත් සහිත",
     "sloppiness": "අනියම් බව",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "පාරදෘශ්‍යතාව",
     "textAlign": "පෙළ පෙළගැස්ම",
     "edges": "දාර",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "මැජික් රාමුව",
     "embeddable": "බිහිදැමිය හැකි",
     "laser": "ලේසර්",
+    "autoshape": "",
     "hand": "අත",
     "extraTools": "අමතර මෙවලම්",
     "mermaidToExcalidraw": "Mermaid වලින් Excalidraw වෙත",
@@ -360,6 +367,7 @@
     "freeDraw": "නිදහස් ඇඳීම",
     "text": "පෙළ",
     "embeddable": "බිහිදැමිය හැකි",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "පාට",
     "shades": "සෙවනැලි",
     "hexCode": "හෙක්ස් කේත",
-    "noShades": "සෙවනැලි නැත"
+    "noShades": "සෙවනැලි නැත",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

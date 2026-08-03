@@ -3,10 +3,10 @@
     "paste": "Tempel",
     "pasteAsPlaintext": "Tempel sebagai teks biasa",
     "pasteCharts": "Tempel diagram",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "Diagram batang",
+    "chartType_line": "Diagram garis",
+    "chartType_radar": "Diagram radar",
+    "chartType_plaintext": "Teks biasa",
     "selectAll": "Pilih semua",
     "multiSelect": "Tambah unsur ke seleksi",
     "moveCanvas": "Pindahkan kanvas",
@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Putus-putus",
     "strokeStyle_dotted": "Titik-titik",
     "sloppiness": "Kecerobohan",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Keburaman",
     "textAlign": "Perataan teks",
     "edges": "Tepi",
@@ -154,7 +157,7 @@
     },
     "polygon": {
       "breakPolygon": "",
-      "convertToPolygon": ""
+      "convertToPolygon": "Konversi ke poligon"
     },
     "elementLock": {
       "lock": "Kuncikan",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -201,7 +207,7 @@
       "inputPlaceholder": "",
       "heading": "",
       "noResults": "",
-      "clearSearch": ""
+      "clearSearch": "Hapus pencarian"
     }
   },
   "search": {
@@ -249,7 +255,7 @@
     "clear": "Hapus",
     "remove": "Hapus",
     "embed": "Mati/nyala penyematan",
-    "publishLibrary": "",
+    "publishLibrary": "Ubah nama atau publikasikan",
     "submit": "Kirimkan",
     "confirm": "Konfirmasi",
     "embeddableInteractionButton": "Pencet untuk interaksi"
@@ -276,7 +282,7 @@
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
     "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
     "collabOfflineWarning": "Tidak ada koneksi internet.\nPerubahan tidak akan disimpan!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Kuota penyimpanan browser telah terlampaui. Perubahan tidak akan disimpan."
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
@@ -325,6 +331,7 @@
     "magicframe": "Wireframe menjadi code",
     "embeddable": "Sematan Web",
     "laser": "Penunjuk laser",
+    "autoshape": "",
     "hand": "Tangan (alat panning)",
     "extraTools": "Alat-alat lain",
     "mermaidToExcalidraw": "Mermaid menjadi Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
     "embeddable": "Pencet-seret untuk membuat sematan situs",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -411,7 +420,7 @@
     "title": "Kesalahan"
   },
   "progressDialog": {
-    "title": "",
+    "title": "Menyimpan",
     "defaultMessage": ""
   },
   "exportDialog": {
@@ -576,9 +585,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Gambar anda disimpan di penyimpanan browser anda.",
+      "center_heading_line2": "Penyimpanan browser dapat terhapus secara tidak terduga.",
+      "center_heading_line3": "Simpan pekerjaan anda ke file secara berkala agar tidak hilang.",
       "center_heading_plus": "Apa Anda ingin berpindah ke Excalidraw+?",
       "menuHint": "Ekspor, preferensi, bahasa, ..."
     },
@@ -590,12 +599,14 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Warna",
     "mostUsedCustomColors": "Warna yang sering dipakai",
     "colors": "Warna",
     "shades": "Nuansa",
     "hexCode": "Kode hexa",
-    "noShades": "Tidak ada nuansa untuk warna ini"
+    "noShades": "Tidak ada nuansa untuk warna ini",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -634,12 +645,12 @@
     "description": "",
     "syntax": "Syntax Mermaid",
     "preview": "Pratinjau",
-    "label": "",
+    "label": "Mermaid",
     "inputPlaceholder": "",
     "autoFixAvailable": ""
   },
   "ttd": {
-    "error": ""
+    "error": "Terjadi kesalahan!"
   },
   "chat": {
     "inputPlaceholder": "",
@@ -647,40 +658,40 @@
     "generating": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
+      "user": "Kamu",
       "assistant": "",
-      "system": ""
+      "system": "Sistem"
     },
     "aiBeta": "",
-    "label": "",
+    "label": "Percakapan",
     "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
+    "newChat": "Percakapan baru",
+    "deleteChat": "Hapus percakapan",
+    "deleteMessage": "Hapus pesan",
     "viewAsMermaid": "",
     "placeholder": {
-      "title": "",
-      "description": "",
+      "title": "Mari rancang diagram anda",
+      "description": "Jelaskan diagram yang ingin dibuat, lalu kami akan membuatnya untuk Anda.",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Pratinjau",
+    "insert": "Sisipkan",
+    "retry": "Coba lagi",
     "errors": {
       "promptTooShort": "",
       "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
+      "generationFailed": "Pembuatan gagal",
+      "invalidDiagram": "Diagram yang dihasilkan tidak valid :(. Anda dapat mengeditnya secara manual, mencoba lagi dengan perbaikan otomatis, atau menggunakan prompt yang berbeda.",
       "fixInMermaid": "",
       "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
+      "requestAborted": "Permintaan dibatalkan",
+      "requestFailed": "Permintaan tidak berhasil",
       "mermaidParseError": ""
     },
     "rateLimit": {
       "messageLimit": "",
       "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimitInputPlaceholder": "Anda telah mencapai batas pesan anda"
     },
     "upsellBtnLabel": ""
   },
@@ -728,8 +739,8 @@
     "escape": "",
     "enter": "",
     "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "spacebar": "Spasi",
+    "delete": "Hapus",
+    "mmb": "Roda gulir"
   }
 }

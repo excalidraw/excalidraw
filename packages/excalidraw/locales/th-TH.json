@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "เส้นประ",
     "strokeStyle_dotted": "จุด",
     "sloppiness": "ความเลอะเทอะ",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ความทึบแสง",
     "textAlign": "จัดข้อความ",
     "edges": "ขอบ",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "การตั้งค่า",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "ไวร์เฟรมเป็นโค้ด",
     "embeddable": "ฝังเว็บ",
     "laser": "ตัวชี้เลเซอร์",
+    "autoshape": "",
     "hand": "มือ (เครื่องมือเลื่อน)",
     "extraTools": "เครื่องมืออื่นๆ",
     "mermaidToExcalidraw": "เมอร์เมดเป็นเอกซ์คาลิดรอว์",
@@ -360,6 +367,7 @@
     "freeDraw": "",
     "text": "",
     "embeddable": "คลิกและลากเพื่อสร้างการฝังสำหรับเว็บไซต์",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "สี",
     "shades": "รูปร่าง",
     "hexCode": "Hex code",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

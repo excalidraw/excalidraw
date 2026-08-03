@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "ដាច់ៗ",
     "strokeStyle_dotted": "ចំណុចៗ",
     "sloppiness": "រចនាប័ទ្មបន្ទាត់",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ភាពច្បាស់",
     "textAlign": "តម្រឹមអត្ថបទ",
     "edges": "គែម",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
     "hand": "ដៃ (panning tool)",
     "extraTools": "",
     "mermaidToExcalidraw": "",
@@ -360,6 +367,7 @@
     "freeDraw": "ចុច​ហើយ​អូស លែង​ពេល​រួចរាល់",
     "text": "គន្លឹះ៖ អ្នកក៏អាចបន្ថែមអត្ថបទដោយចុចពីរដងនៅកន្លែងណាមួយដោយប្រើឧបករណ៍ជ្រើសរើស",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "ពណ៌",
     "shades": "ស្រមោល",
     "hexCode": "លេខកូដ hex",
-    "noShades": "មិនមានស្រមោលសម្រាប់ពណ៌នេះទេ"
+    "noShades": "មិនមានស្រមោលសម្រាប់ពណ៌នេះទេ",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

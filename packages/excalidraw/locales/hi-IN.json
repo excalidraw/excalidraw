@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "डैश",
     "strokeStyle_dotted": "बिंदीदार",
     "sloppiness": "बेढ़ंगापन",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "अपारदर्शिता",
     "textAlign": "पाठ्य संरेखन",
     "edges": "किनारे",
@@ -185,6 +188,9 @@
     "shapeSwitch": "आकार बदलें",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "तारिक ढाँचें को सांकेतिक लिपि में",
     "embeddable": "वेब जड़ायें",
     "laser": "लेसर टॉर्च",
+    "autoshape": "",
     "hand": "हाथ ( खिसका के देखने का औज़ार)",
     "extraTools": "अधिक उपकरण",
     "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
@@ -360,6 +367,7 @@
     "freeDraw": "क्लिक करें और खींचें। समाप्त करने के लिए, छोडे",
     "text": "आप चयन उपकरण से कहीं भी डबल-क्लिक करके पाठ्य को जोड़ सकते हों",
     "embeddable": "वेबसाइट बनाकर जड़ने के लिए क्लिक-ड़्रैग करें",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "रंग",
     "shades": "छाया",
     "hexCode": "हेक्स कोड",
-    "noShades": "इस रंग की कोई छाया उपलब्ध नहीं हैं"
+    "noShades": "इस रंग की कोई छाया उपलब्ध नहीं हैं",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
