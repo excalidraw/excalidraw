@@ -796,9 +796,14 @@ export const MobileShapeActions = ({
             {renderAction("changeStrokeColor")}
           </div>
         )}
+        {/* Background Color (the bucket fill variant excludes `transparent`) */}
         {predicates.backgroundColor && (
           <div className="compact-action-item">
-            {renderAction("changeBackgroundColor")}
+            {renderAction(
+              appState.activeTool.type === "bucketFill"
+                ? "changeBucketFillBackgroundColor"
+                : "changeBackgroundColor",
+            )}
           </div>
         )}
         <CombinedShapeProperties
