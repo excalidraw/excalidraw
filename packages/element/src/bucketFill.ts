@@ -470,6 +470,32 @@ class NodeStore {
     }
     return idx;
   }
+
+  /**
+   * Visit the indices of all nodes within `radius` of `p`. Superset by cell
+   * granularity — nodes slightly beyond `radius` may be visited too, so
+   * callers must check distances themselves.
+   */
+  forEachInRadius(
+    p: GlobalPoint,
+    radius: number,
+    visit: (index: number) => void,
+  ): void {
+    const fromCx = Math.floor((p[0] - radius) / this.cellSize);
+    const toCx = Math.floor((p[0] + radius) / this.cellSize);
+    const fromCy = Math.floor((p[1] - radius) / this.cellSize);
+    const toCy = Math.floor((p[1] + radius) / this.cellSize);
+    for (let cx = fromCx; cx <= toCx; cx++) {
+      for (let cy = fromCy; cy <= toCy; cy++) {
+        const bucket = this.cells.get(this.cellKey(cx, cy));
+        if (bucket) {
+          for (const index of bucket) {
+            visit(index);
+          }
+        }
+      }
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -894,11 +920,51 @@ const buildFaces = (
     }
   }
   if (looseEnds.length > 0) {
-    // live edge list; updated as bridging splits edges / adds connectors
-    const liveEdges: { u: number; v: number }[] = [];
+    // spatial hash of live edges, updated as bridging splits edges / adds
+    // connectors. Cells are at least `bridgeRadius` wide so any edge within
+    // the radius of a query point lies in the point's 3×3 cell
+    // neighbourhood. Entries are never removed — edges deleted by `unlink`
+    // are filtered out on lookup via `edgeSet`
+    const edgeCellSize = Math.max(bridgeRadius, 1);
+    const edgeGrid = new Map<string, { u: number; v: number }[]>();
+    const insertLiveEdge = (u: number, v: number) => {
+      const a = store.nodes[u];
+      const b = store.nodes[v];
+      const edge = { u, v };
+      const minX = Math.min(a[0], b[0]);
+      const maxX = Math.max(a[0], b[0]);
+      const dx = b[0] - a[0];
+      const dy = b[1] - a[1];
+      const fromCx = Math.floor(minX / edgeCellSize);
+      const toCx = Math.floor(maxX / edgeCellSize);
+      for (let cx = fromCx; cx <= toCx; cx++) {
+        // y-extent of the segment within this column of cells, so a long
+        // diagonal edge occupies the cells it passes through rather than
+        // its full bounding box
+        let y0 = a[1];
+        let y1 = b[1];
+        if (dx !== 0) {
+          const t0 = (Math.max(minX, cx * edgeCellSize) - a[0]) / dx;
+          const t1 = (Math.min(maxX, (cx + 1) * edgeCellSize) - a[0]) / dx;
+          y0 = a[1] + t0 * dy;
+          y1 = a[1] + t1 * dy;
+        }
+        const fromCy = Math.floor(Math.min(y0, y1) / edgeCellSize);
+        const toCy = Math.floor(Math.max(y0, y1) / edgeCellSize);
+        for (let cy = fromCy; cy <= toCy; cy++) {
+          const key = `${cx}:${cy}`;
+          const bucket = edgeGrid.get(key);
+          if (bucket) {
+            bucket.push(edge);
+          } else {
+            edgeGrid.set(key, [edge]);
+          }
+        }
+      }
+    };
     for (const key of edgeSet) {
       const [u, v] = key.split("-").map(Number);
-      liveEdges.push({ u, v });
+      insertLiveEdge(u, v);
     }
     const unlink = (u: number, v: number) => {
       const key = edgeKey(u, v);
@@ -925,9 +991,9 @@ const buildFaces = (
       // same point and `addEdge` refuses such degenerate edges anyway
       let bestNode = -1;
       let bestNodeDistance = Infinity;
-      for (let n = 0; n < store.nodes.length; n++) {
+      store.forEachInRadius(p, bridgeRadius, (n) => {
         if (n === loose || neighbours.includes(n)) {
-          continue;
+          return;
         }
         const distance = pointDistance(p, store.nodes[n]);
         if (
@@ -938,40 +1004,46 @@ const buildFaces = (
           bestNodeDistance = distance;
           bestNode = n;
         }
-      }
+      });
 
       // nearest edge (not incident to the loose end) whose interior the
       // loose end projects onto, within the bridge radius
       let bestEdge: { u: number; v: number } | null = null;
       let bestEdgeDistance = Infinity;
       let bestEdgeT = 0;
-      for (const edge of liveEdges) {
-        if (
-          !edgeSet.has(edgeKey(edge.u, edge.v)) ||
-          edge.u === loose ||
-          edge.v === loose
-        ) {
-          continue;
-        }
-        const eu = store.nodes[edge.u];
-        const ev = store.nodes[edge.v];
-        if (
-          p[0] < Math.min(eu[0], ev[0]) - bridgeRadius ||
-          p[0] > Math.max(eu[0], ev[0]) + bridgeRadius ||
-          p[1] < Math.min(eu[1], ev[1]) - bridgeRadius ||
-          p[1] > Math.max(eu[1], ev[1]) + bridgeRadius
-        ) {
-          continue;
-        }
-        const t = projectParam(eu, ev, p);
-        if (t <= 0 || t >= 1) {
-          continue;
-        }
-        const distance = distanceToLineSegment(p, lineSegment(eu, ev));
-        if (distance <= bridgeRadius && distance < bestEdgeDistance) {
-          bestEdgeDistance = distance;
-          bestEdge = edge;
-          bestEdgeT = t;
+      const looseCx = Math.floor(p[0] / edgeCellSize);
+      const looseCy = Math.floor(p[1] / edgeCellSize);
+      // an edge spans multiple cells, so it can show up in several of the 9
+      // inspected buckets
+      const seenEdges = new Set<string>();
+      for (let dcx = -1; dcx <= 1; dcx++) {
+        for (let dcy = -1; dcy <= 1; dcy++) {
+          const bucket = edgeGrid.get(`${looseCx + dcx}:${looseCy + dcy}`);
+          if (!bucket) {
+            continue;
+          }
+          for (const edge of bucket) {
+            const key = edgeKey(edge.u, edge.v);
+            if (seenEdges.has(key)) {
+              continue;
+            }
+            seenEdges.add(key);
+            if (!edgeSet.has(key) || edge.u === loose || edge.v === loose) {
+              continue;
+            }
+            const eu = store.nodes[edge.u];
+            const ev = store.nodes[edge.v];
+            const t = projectParam(eu, ev, p);
+            if (t <= 0 || t >= 1) {
+              continue;
+            }
+            const distance = distanceToLineSegment(p, lineSegment(eu, ev));
+            if (distance <= bridgeRadius && distance < bestEdgeDistance) {
+              bestEdgeDistance = distance;
+              bestEdge = edge;
+              bestEdgeT = t;
+            }
+          }
         }
       }
 
@@ -987,7 +1059,7 @@ const buildFaces = (
         if (projection === bestEdge.u || projection === bestEdge.v) {
           // projection merged into an endpoint — plain node bridge
           addEdge(loose, projection, bridgeElement);
-          liveEdges.push({ u: loose, v: projection });
+          insertLiveEdge(loose, projection);
         } else {
           if (!nodeElement.has(projection)) {
             nodeElement.set(
@@ -1004,16 +1076,14 @@ const buildFaces = (
             addEdge(bestEdge.u, projection, owner);
             addEdge(projection, bestEdge.v, owner);
           }
-          liveEdges.push(
-            { u: bestEdge.u, v: projection },
-            { u: projection, v: bestEdge.v },
-          );
+          insertLiveEdge(bestEdge.u, projection);
+          insertLiveEdge(projection, bestEdge.v);
           addEdge(loose, projection, bridgeElement);
-          liveEdges.push({ u: loose, v: projection });
+          insertLiveEdge(loose, projection);
         }
       } else if (bestNode >= 0) {
         addEdge(loose, bestNode, bridgeElement);
-        liveEdges.push({ u: loose, v: bestNode });
+        insertLiveEdge(loose, bestNode);
       }
     }
   }
