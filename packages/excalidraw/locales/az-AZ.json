@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Kəsik",
     "strokeStyle_dotted": "Nöqtəli",
     "sloppiness": "Səliqəsizlik",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Şəffaflıq",
     "textAlign": "Mətni uyğunlaşdır",
     "edges": "Kənarlar",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
     "hand": "",
     "extraTools": "",
     "mermaidToExcalidraw": "",
@@ -360,6 +367,7 @@
     "freeDraw": "",
     "text": "",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
