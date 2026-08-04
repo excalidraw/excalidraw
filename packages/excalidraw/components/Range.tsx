@@ -42,8 +42,16 @@ export const Range = ({
       const progress = ((value - min) / (max - min || 1)) * 100;
       const position =
         (progress / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
-      valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${progress}%, var(--button-bg) ${progress}%, var(--button-bg) 100%)`;
+      const isRTL = document.documentElement.getAttribute("dir") === "rtl";
+      if (isRTL) {
+        valueElement.style.left = "";
+        valueElement.style.right = `${position}px`;
+        rangeElement.style.background = `linear-gradient(to left, var(--color-slider-track) 0%, var(--color-slider-track) ${progress}%, var(--button-bg) ${progress}%, var(--button-bg) 100%)`;
+      } else {
+        valueElement.style.right = "";
+        valueElement.style.left = `${position}px`;
+        rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${progress}%, var(--button-bg) ${progress}%, var(--button-bg) 100%)`;
+      }
     }
   }, [max, min, value]);
 
