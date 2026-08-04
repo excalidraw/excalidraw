@@ -1175,6 +1175,43 @@ describe("computeBucketFillPolygon", () => {
     expect(result).toEqual({ ok: false, reason: "too_complex" });
   });
 
+  it("does not re-enumerate dense segment pairs in every spatial cell", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    // Every divider occupies roughly 100 grid cells. Enumerating all pairs
+    // independently in every shared cell turns these 1,000 segments into
+    // ~50 million pair visits despite there being only ~500,000 pairs.
+    const dividers = Array.from({ length: 1000 }, () =>
+      API.createElement({
+        type: "line",
+        x: -10,
+        y: 50,
+        width: 120,
+        height: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(120, 0)],
+      }),
+    );
+    const { elements, elementsMap } = setup([rect, ...dividers]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 25),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(5000, -1);
+  }, 2000);
+
   it("fill-compatible paint never becomes the owner", () => {
     const rect = API.createElement({
       type: "rectangle",

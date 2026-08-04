@@ -772,11 +772,64 @@ const buildFaces = (
     });
   }
 
-  // broad phase shared by the intersection and T-junction passes: a segment
-  // grid, each segment inserted into the cells along its path inflated by
-  // `eps`. Cell size scales with the scene extent so even a scene-spanning
-  // segment walks a bounded number of cells; when everything crowds into a
-  // few cells this degrades toward all-pairs, which the segment cap bounds
+  const segLines = segments.map((s) => lineSegment(s.pa, s.pb));
+
+  // transversal intersections. Broad phase: sort by bbox minX and sweep, so
+  // every candidate pair is tested at most once. A segment grid is a poor fit
+  // here: dense overlapping segments share many consecutive cells, and even
+  // deduping the geometry test still re-enumerates every pair in every cell.
+  const byMinX = segments
+    .map((_, index) => index)
+    .sort((a, b) => segments[a].box[0] - segments[b].box[0]);
+  for (let oi = 0; oi < byMinX.length; oi++) {
+    const i = byMinX[oi];
+    const si = segments[i];
+    const sweepMaxX = si.box[2] + eps;
+    for (let oj = oi + 1; oj < byMinX.length; oj++) {
+      const j = byMinX[oj];
+      const sj = segments[j];
+      if (sj.box[0] > sweepMaxX) {
+        break;
+      }
+      if (!doBoundsIntersect(expandBounds(si.box, eps), sj.box)) {
+        continue;
+      }
+      const intersection = lineSegmentIntersectionPoints(
+        segLines[i],
+        segLines[j],
+        eps,
+      );
+      if (!intersection) {
+        continue;
+      }
+      const node = store.getOrCreate(intersection);
+      // intersection nodes need a source too — one may end up a loose end
+      // (after visibility clipping) and get bridged, and bridge attribution
+      // reads `nodeElement`
+      if (!nodeElement.has(node)) {
+        nodeElement.set(node, si.elementId);
+      }
+      si.splits.push({
+        node,
+        t: projectParam(si.pa, si.pb, store.nodes[node]),
+      });
+      sj.splits.push({
+        node,
+        t: projectParam(sj.pa, sj.pb, store.nodes[node]),
+      });
+    }
+  }
+
+  // safety: intersection splitting can inflate the node count quadratically
+  // in pathological scenes; bail before the downstream passes (T-junctions,
+  // edge emission, face extraction) turn a click into a multi-second freeze
+  if (store.nodes.length > options.maxBoundarySegments * 4) {
+    return null;
+  }
+
+  // Broad phase for the T-junction pass: insert each segment into the cells
+  // along its path inflated by `eps`. Cell size scales with the scene extent
+  // so even a scene-spanning segment walks a bounded number of cells.
   let sceneMinX = Infinity;
   let sceneMinY = Infinity;
   let sceneMaxX = -Infinity;
@@ -790,7 +843,6 @@ const buildFaces = (
   const sceneSpan = Math.max(sceneMaxX - sceneMinX, sceneMaxY - sceneMinY, 0);
   const segCellSize = Math.max(eps * 2, sceneSpan / 128);
   const segGrid = new Map<string, number[]>();
-  const segLines = segments.map((s) => lineSegment(s.pa, s.pb));
   segments.forEach((s, index) => {
     forEachCellAlongSegment(s.pa, s.pb, eps, segCellSize, (cx, cy) => {
       const key = `${cx}:${cy}`;
@@ -802,58 +854,6 @@ const buildFaces = (
       }
     });
   });
-
-  // transversal intersections, testing only pairs that share a grid cell
-  // (the eps-inflated insertion guarantees eps-near pairs always do)
-  const testedPairs = new Set<number>();
-  for (const bucket of segGrid.values()) {
-    for (let bi = 0; bi < bucket.length; bi++) {
-      for (let bj = bi + 1; bj < bucket.length; bj++) {
-        const i = Math.min(bucket[bi], bucket[bj]);
-        const j = Math.max(bucket[bi], bucket[bj]);
-        const pairKey = i * segments.length + j;
-        if (testedPairs.has(pairKey)) {
-          continue;
-        }
-        testedPairs.add(pairKey);
-        const si = segments[i];
-        const sj = segments[j];
-        if (!doBoundsIntersect(expandBounds(si.box, eps), sj.box)) {
-          continue;
-        }
-        const intersection = lineSegmentIntersectionPoints(
-          segLines[i],
-          segLines[j],
-          eps,
-        );
-        if (!intersection) {
-          continue;
-        }
-        const node = store.getOrCreate(intersection);
-        // intersection nodes need a source too — one may end up a loose end
-        // (after visibility clipping) and get bridged, and bridge attribution
-        // reads `nodeElement`
-        if (!nodeElement.has(node)) {
-          nodeElement.set(node, si.elementId);
-        }
-        si.splits.push({
-          node,
-          t: projectParam(si.pa, si.pb, store.nodes[node]),
-        });
-        sj.splits.push({
-          node,
-          t: projectParam(sj.pa, sj.pb, store.nodes[node]),
-        });
-      }
-    }
-  }
-
-  // safety: intersection splitting can inflate the node count quadratically
-  // in pathological scenes; bail before the downstream passes (T-junctions,
-  // edge emission, face extraction) turn a click into a multi-second freeze
-  if (store.nodes.length > options.maxBoundarySegments * 4) {
-    return null;
-  }
 
   // T-junctions: split any segment that passes through (within `eps` of) an
   // existing node. Deliberately tight — routing an edge through a node that
