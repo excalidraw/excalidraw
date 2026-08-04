@@ -332,10 +332,15 @@
     "embeddable": "Spletna vdelava",
     "laser": "Laserski kazalec",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij",
     "mermaidToExcalidraw": "Mermaid v Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Pravokotnik",
