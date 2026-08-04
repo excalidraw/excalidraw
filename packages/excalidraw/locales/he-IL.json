@@ -332,10 +332,15 @@
     "embeddable": "הטמעה באתר",
     "laser": "סמן לייזר",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "יד (כלי הזזה)",
     "extraTools": "כלים נוספים",
     "mermaidToExcalidraw": "Mermaid ל־Excalidraw",
     "convertElementType": "החלפת סוג צורה"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "מלבן",
