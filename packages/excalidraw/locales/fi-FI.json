@@ -332,10 +332,15 @@
     "embeddable": "Verkkoupote",
     "laser": "Laserosoitin",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Käsi (panning-työkalu)",
     "extraTools": "Lisää työkaluja",
     "mermaidToExcalidraw": "Mermaid Excalidrawiksi",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
