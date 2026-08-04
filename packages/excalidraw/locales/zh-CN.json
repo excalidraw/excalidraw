@@ -332,10 +332,15 @@
     "embeddable": "嵌入网页",
     "laser": "激光笔",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "抓手（平移工具）",
     "extraTools": "更多工具",
     "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
     "convertElementType": "切换形状种类"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "矩形",
