@@ -29,7 +29,10 @@
     pointer-events: none;
     padding: var(--userList-padding);
     display: flex;
-    flex-wrap: wrap;
+    // never wrap — the current user's pill is always the last item and its
+    // width is already carved out of the container's width up front (see
+    // UserList.tsx), so wrapping would only ever orphan it onto its own line
+    flex-wrap: nowrap;
     justify-content: flex-end;
     align-items: center;
     gap: var(--avatarList-gap);
@@ -53,6 +56,8 @@
   }
 
   .UserList_mobile {
+    flex-direction: column;
+    align-items: stretch;
     padding: 0;
     justify-content: normal;
     margin: 0.5rem 0;
@@ -60,24 +65,45 @@
     max-height: none;
   }
 
-  .UserList__more {
-    @include avatarStyles;
-
-    & {
-      background-color: var(--color-gray-20);
-      border: 0 !important;
-      font-size: 0.625rem;
-      font-weight: 400;
-      flex-shrink: 0;
-      color: var(--color-gray-100);
-      font-weight: bold;
-    }
+  .UserList_mobile__avatars {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--avatarList-gap);
   }
 
   .UserList__collaborator-name {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+  }
+
+  .UserList__pill {
+    display: flex;
+    align-items: center;
+    padding: 0 0.25rem 0 0;
+    border-radius: 1.25rem;
+    background-color: var(--color-surface-low);
+    border: 1px solid var(--color-gray-20);
+    cursor: pointer;
+    pointer-events: var(--ui-pointerEvents);
+
+    &:hover {
+      background-color: var(--color-surface-high);
+    }
+  }
+
+  .UserList__pill-chevron {
+    display: flex;
+    align-items: center;
+    color: var(--color-gray-50);
+    width: 15px;
+    height: 15px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .UserList__collaborator--avatar-only {
@@ -108,6 +134,12 @@
     gap: 0.25rem;
     justify-content: flex-end;
     display: flex;
+  }
+
+  // the current user's own row in the "who's here" list isn't clickable —
+  // no hover/active background, no focus ring, no pointer cursor
+  .UserList__collaborator.is-current-user {
+    pointer-events: none;
   }
 
   .UserList__collaborator.is-muted
@@ -159,5 +191,17 @@
   .UserList__collaborators {
     top: auto;
     max-height: 50vh;
+    // leave room for the focus/hover ring (box-shadow) on collaborator rows —
+    // without it, the list's overflow-y:auto (which also clips overflow-x)
+    // cuts the ring off flush against the container's edges: sideways for
+    // every row, and top/bottom for the first/last one
+    padding: 2px;
+    box-sizing: border-box;
+  }
+
+  .UserList__menu-divider {
+    height: 1px;
+    background-color: var(--userlist-collaborators-border-color);
+    margin: 0.25rem 0;
   }
 }
