@@ -332,10 +332,15 @@
     "embeddable": "वेब जड़ायें",
     "laser": "लेसर टॉर्च",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "हाथ ( खिसका के देखने का औज़ार)",
     "extraTools": "अधिक उपकरण",
     "mermaidToExcalidraw": "मर्मेड से एक्सकाली में",
     "convertElementType": "आकार प्रकार टॉगल करें"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "आयत",
