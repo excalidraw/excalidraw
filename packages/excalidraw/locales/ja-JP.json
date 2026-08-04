@@ -332,10 +332,15 @@
     "embeddable": "Web埋め込み",
     "laser": "レーザーポインター",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "手 (パンニングツール)",
     "extraTools": "その他のツール",
     "mermaidToExcalidraw": "Mermaid を Excalidraw に変換",
     "convertElementType": "図形タイプを切り替え"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "長方形",
