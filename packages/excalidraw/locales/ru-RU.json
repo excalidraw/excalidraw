@@ -332,10 +332,15 @@
     "embeddable": "Встроенная страница",
     "laser": "Лазерная указка",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Рука (перемещение холста)",
     "extraTools": "Дополнительные инструменты",
     "mermaidToExcalidraw": "Mermaid в Excalidraw",
     "convertElementType": "Переключение типа формы"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Прямоугольник",
