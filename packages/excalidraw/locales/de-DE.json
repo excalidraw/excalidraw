@@ -332,10 +332,15 @@
     "embeddable": "Web-Einbettung",
     "laser": "Laserpointer",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
     "mermaidToExcalidraw": "Mermaid zu Excalidraw",
     "convertElementType": "Formtyp umschalten"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rechteck",
