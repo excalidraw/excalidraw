@@ -51,7 +51,11 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { syncInvalidIndices } from "@excalidraw/element";
+import {
+  normalizeBoundElementsOrder,
+  syncInvalidIndices,
+  syncMovedIndices,
+} from "@excalidraw/element";
 
 import { refreshTextDimensions } from "@excalidraw/element";
 
@@ -799,6 +803,34 @@ const repairBoundElement = (
 };
 
 /**
+ * Places bound text directly after its container while preserving the
+ * container's fractional index.
+ *
+ * NOTE mutates indices of reordered bound text elements.
+ */
+const repairBoundTextElementOrder = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const originalPositions = new Map(
+    elements.map((element, index) => [element.id, index]),
+  );
+  const normalizedElements = normalizeBoundElementsOrder(elements);
+  const reorderedBoundTextElements = normalizedElements.filter(
+    (element, index) =>
+      isTextElement(element) &&
+      element.containerId &&
+      originalPositions.get(element.id) !== index,
+  );
+
+  return reorderedBoundTextElements.length
+    ? syncMovedIndices(
+        normalizedElements,
+        arrayToMap(reorderedBoundTextElements),
+      )
+    : normalizedElements;
+};
+
+/**
  * Remove an element's frameId if its containing frame is non-existent
  *
  * NOTE mutates elements.
@@ -931,9 +963,11 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }
   }
 
+  const repairedElements = repairBoundTextElementOrder(restoredElements);
+
   // NOTE (mtolmacs): Temporary fix for invalid/self-bound elbow arrows
   // Need to iterate again so we have attached text nodes in elementsMap
-  return restoredElements.map((element) => {
+  return repairedElements.map((element) => {
     if (
       isElbowArrow(element) &&
       !isArrowBoundToElement(element) &&
