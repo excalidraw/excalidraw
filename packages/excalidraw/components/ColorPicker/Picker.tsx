@@ -41,6 +41,7 @@ interface PickerProps {
   onEyeDropperToggle: (force?: boolean) => void;
   onEscape: (event: React.KeyboardEvent | KeyboardEvent) => void;
   showHotKey?: boolean;
+  excludedColors?: readonly string[];
 }
 
 export const Picker = React.forwardRef(
@@ -57,6 +58,7 @@ export const Picker = React.forwardRef(
       onEyeDropperToggle,
       onEscape,
       showHotKey = true,
+      excludedColors,
     }: PickerProps,
     ref,
   ) => {
@@ -155,6 +157,7 @@ export const Picker = React.forwardRef(
               updateData,
               activeShade,
               onEscape,
+              excludedColors,
             });
 
             if (handled) {
@@ -190,6 +193,7 @@ export const Picker = React.forwardRef(
               onChange={onChange}
               activeShade={activeShade}
               showHotKey={showHotKey}
+              excludedColors={excludedColors}
             />
           </div>
 

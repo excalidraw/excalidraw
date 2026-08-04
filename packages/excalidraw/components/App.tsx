@@ -432,6 +432,7 @@ import ConvertElementTypePopup, {
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppArrowText } from "./App.arrowText";
+import { AppBucketFill } from "./App.bucketFill";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
@@ -681,6 +682,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
+  public bucketFill: AppBucketFill = new AppBucketFill(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
@@ -3085,6 +3087,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
+  public scheduleCapture = () => this.store.scheduleCapture();
+
   // Lifecycle
 
   private onBlur = withBatchedUpdates(() => {
@@ -4981,6 +4985,12 @@ class App extends React.Component<AppProps, AppState> {
       this.resetContextMenuTimer();
     }
 
+    if (event.type === "pointercancel") {
+      // the browser took the pointer over (scroll, palm rejection) — no
+      // pointerup will follow, so the armed bucket fill must not commit
+      this.bucketFill.cancel();
+    }
+
     const wasMultiTouchGesture = gesture.pointers.size >= 2;
     gesture.pointers.delete(event.pointerId);
 
@@ -6427,7 +6437,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
-  getElementAtPosition(
+  public getElementAtPosition(
     x: number,
     y: number,
     opts?: (
@@ -7399,7 +7409,7 @@ class App extends React.Component<AppProps, AppState> {
    * finds candidate frame under cursor (when dragging frame children/elements
    * inside frames)
    */
-  private getTopLayerFrameAtSceneCoords = (
+  public getTopLayerFrameAtSceneCoords = (
     /**
      * should be already grid aligned (basically should be what the call site
      * sets the element's coords to, if applicable)
@@ -8716,6 +8726,17 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "autoshape") {
       this.drawShape.handlePointerDown(pointerDownState);
+    } else if (this.state.activeTool.type === TOOL_TYPE.bucketfill) {
+      // one-shot click tool: pointer down only ARMS the fill — it commits in
+      // the shared pointer-up teardown, and only when the interaction stayed
+      // a single-pointer click (a second finger, a context menu, or a
+      // pointercancel aborts it). Dispatched like any other tool (laser has
+      // the same shape) so the shared pointer lifecycle below — public
+      // onPointerDown/onPointerUp callbacks, pointer-up teardown,
+      // missing-pointer-up cleanup — runs for bucket clicks too. In view
+      // mode this branch is unreachable:
+      // `handleCanvasPanUsingWheelOrSpaceDrag` swallows the pointer-down.
+      this.bucketFill.handlePointerDown(scenePointer);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -11376,6 +11397,20 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
+
+      // an armed bucket fill commits only on a GENUINE pointer up. The
+      // missing-pointer-up cleanup replays this handler with the pointer
+      // DOWN event (e.g. when a second finger lands mid-press — pinch/pan
+      // intent), and a tool switch mid-press orphans the click — both must
+      // discard the fill instead of committing an unwanted edit.
+      if (
+        childEvent.type === "pointerup" &&
+        this.state.activeTool.type === TOOL_TYPE.bucketfill
+      ) {
+        this.bucketFill.handlePointerUp();
+      } else {
+        this.bucketFill.cancel();
+      }
       const {
         newElement,
         resizingElement,
@@ -12347,6 +12382,9 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !this.isToolLocked() &&
         activeTool.type !== "freedraw" &&
+        // bucket fill stays active for back-to-back fills regardless of the
+        // tool lock (paint-bucket UX)
+        activeTool.type !== TOOL_TYPE.bucketfill &&
         (activeTool.type !== "lasso" ||
           // if lasso is turned on but from selection => reset to selection
           (activeTool.type === "lasso" && activeTool.fromSelection))
@@ -13077,6 +13115,10 @@ class App extends React.Component<AppProps, AppState> {
     if (!this.isInteractionEnabled()) {
       return;
     }
+
+    // a context menu during a press (touch long-press) means the user is
+    // not committing a bucket click
+    this.bucketFill.cancel();
 
     if (
       (("pointerType" in event.nativeEvent &&

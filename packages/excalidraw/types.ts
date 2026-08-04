@@ -161,7 +161,8 @@ export type ToolType =
   | "magicframe"
   | "embeddable"
   | "laser"
-  | "autoshape";
+  | "autoshape"
+  | "bucketfill";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
