@@ -332,10 +332,15 @@
     "embeddable": "Sematan Web",
     "laser": "Penunjuk laser",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Tangan (alat panning)",
     "extraTools": "Alat-alat lain",
     "mermaidToExcalidraw": "Mermaid menjadi Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Persegi Panjang",
