@@ -938,43 +938,13 @@ const getLinearElementRotatedBounds = (
 ): Bounds => {
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
-  if (element.points.length < 2) {
-    const [pointX, pointY] = element.points[0];
-    const [x, y] = pointRotateRads(
-      pointFrom(element.x + pointX, element.y + pointY),
-      pointFrom(cx, cy),
-      element.angle,
-    );
-
-    let coords: Bounds = [x, y, x, y];
-    if (boundTextElement) {
-      const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
-        element,
-        elementsMap,
-        [x, y, x, y],
-        boundTextElement,
-      );
-      coords = [
-        coordsWithBoundText[0],
-        coordsWithBoundText[1],
-        coordsWithBoundText[2],
-        coordsWithBoundText[3],
-      ];
-    }
-    return coords;
-  }
-
-  // first element is always the curve
-  const cachedShape = ShapeCache.get(element, null)?.[0];
-  const shape = cachedShape ?? generateLinearElementShape(element);
-  const ops = getCurvePathOps(shape);
-  const transformXY = ([x, y]: GlobalPoint) =>
-    pointRotateRads<GlobalPoint>(
+  const transformXY = ([x, y]: LocalPoint) =>
+    pointRotateRads<LocalPoint>(
       pointFrom(element.x + x, element.y + y),
       pointFrom(cx, cy),
       element.angle,
     );
-  const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
+  const res = getBoundsFromPoints(element.points.map(transformXY));
   let coords: Bounds = [res[0], res[1], res[2], res[3]];
   if (boundTextElement) {
     const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
@@ -1062,26 +1032,7 @@ export const getResizedElementAbsoluteCoords = (
     normalizePoints,
   );
 
-  let bounds: Bounds;
-
-  if (isFreeDrawElement(element)) {
-    // Free Draw
-    bounds = getBoundsFromPoints(points);
-  } else {
-    // Line
-    const gen = rough.generator();
-    const curve = !element.roundness
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
-
-    const ops = getCurvePathOps(curve);
-    bounds = getMinMaxXYFromCurvePathOps(ops);
-  }
-
-  const [minX, minY, maxX, maxY] = bounds;
+  const [minX, minY, maxX, maxY] = getBoundsFromPoints(points);
   return [
     minX + element.x,
     minY + element.y,

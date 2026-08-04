@@ -54,7 +54,7 @@ import {
 import {
   getElementAbsoluteCoords,
   getElementPointsCoords,
-  getMinMaxXYFromCurvePathOps,
+  getBoundsFromPoints,
 } from "./bounds";
 
 import { headingIsHorizontal, vectorToHeading } from "./heading";
@@ -2018,12 +2018,7 @@ export class LinearElementEditor {
     elementsMap: ElementsMap,
     includeBoundText: boolean = false,
   ): [number, number, number, number, number, number] => {
-    const shape = ShapeCache.generateElementShape(element, null);
-
-    // first element is always the curve
-    const ops = getCurvePathOps(shape[0]);
-
-    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+    const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
     const x1 = minX + element.x;
     const y1 = minY + element.y;
     const x2 = maxX + element.x;
