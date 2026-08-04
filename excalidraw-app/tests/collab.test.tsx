@@ -249,4 +249,40 @@ describe("collaboration", () => {
       ]);
     });
   });
+
+  it("idle detector adds and removes the same document listeners", async () => {
+    await render(<ExcalidrawApp />);
+
+    // `window.collab` is the live Collab instance. `initializeIdleDetector` /
+    // `removeIdleDetector` are private, accessed here via index signature.
+    const collab = window.collab as any;
+
+    const addSpy = vi.spyOn(document, "addEventListener");
+    const removeSpy = vi.spyOn(document, "removeEventListener");
+
+    collab.initializeIdleDetector();
+
+    const pointerMove = addSpy.mock.calls.find(
+      ([type]) => type === "pointermove",
+    );
+    const visibilityChange = addSpy.mock.calls.find(
+      ([type]) => type === "visibilitychange",
+    );
+    expect(pointerMove).toBeDefined();
+    expect(visibilityChange).toBeDefined();
+
+    // regression for #10348: listeners must be removed from `document` (where
+    // they were added) using the same handler reference — the bug removed them
+    // from `window`, so they were never actually detached.
+    collab.removeIdleDetector();
+
+    expect(removeSpy).toHaveBeenCalledWith("pointermove", pointerMove![1]);
+    expect(removeSpy).toHaveBeenCalledWith(
+      "visibilitychange",
+      visibilityChange![1],
+    );
+
+    addSpy.mockRestore();
+    removeSpy.mockRestore();
+  });
 });
