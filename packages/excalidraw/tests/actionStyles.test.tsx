@@ -85,4 +85,106 @@ describe("actionStyles", () => {
     expect(firstRect.roughness).toBe(2); // Cartoonist: 2
     expect(firstRect.opacity).toBe(60);
   });
+
+  it("shows gradient controls when fill style is set to gradient, and hides them otherwise", async () => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    expect(screen.queryByTestId("gradient-angle")).toBeNull();
+
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    expect(screen.getByTestId("gradient-angle")).not.toBeNull();
+  });
+
+  it("seeds gradient defaults when switching fill style to gradient", async () => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    const rect = API.getSelectedElement();
+    expect(rect.gradient).toBeNull();
+
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    const updatedRect = API.getSelectedElement();
+    // color2 should default to a color visibly different from the background
+    // (blue here), not the background color itself, otherwise the gradient
+    // is invisible.
+    expect(updatedRect.gradient).toEqual({
+      color2: "#ffffff",
+      angle: 0,
+    });
+    expect(updatedRect.gradient?.color2).not.toEqual(rect.backgroundColor);
+  });
+
+  it("seeds gradient defaults when selecting gradient with no element selected, before drawing", async () => {
+    UI.clickTool("rectangle");
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    expect(screen.queryByTestId("fill-gradient")).not.toBeNull();
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    mouse.down(0, 0);
+    mouse.up(100, 100);
+
+    const rect = API.getSelectedElement();
+    expect(rect.fillStyle).toBe("gradient");
+    expect(rect.gradient).not.toBeNull();
+    expect(rect.gradient?.color2).not.toEqual(rect.backgroundColor);
+  });
+
+  it("preserves a previously chosen gradient when switching fill style away and back", async () => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    // Change the gradient angle away from the default seeded value.
+    fireEvent.change(screen.getByTestId("gradient-angle"), {
+      target: { value: "90" },
+    });
+
+    const gradientedRect = API.getSelectedElement();
+    expect(gradientedRect.gradient?.angle).toBe(90);
+
+    // Switch away from gradient, then back to it.
+    fireEvent.click(screen.getByTestId("fill-solid"));
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    const finalRect = API.getSelectedElement();
+    expect(finalRect.gradient).toEqual(gradientedRect.gradient);
+  });
+
+  it("does not offer the gradient fill option for line elements", async () => {
+    UI.createElement("line", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+
+    expect(screen.queryByTestId("fill-gradient")).toBeNull();
+    expect(screen.queryByTestId("gradient-angle")).toBeNull();
+  });
+
+  it("opens the gradient end color picker without clobbering the gradient", async () => {
+    UI.createElement("rectangle", { x: 0, y: 0, width: 100, height: 100 });
+    togglePopover("Background");
+    UI.clickOnTestId("color-blue");
+    togglePopover("Background"); // close it, so only the gradient-end popover can be open below
+
+    fireEvent.click(screen.getByTestId("fill-gradient"));
+
+    const seededGradient = API.getSelectedElement().gradient;
+
+    const trigger = screen.getByLabelText("Gradient end color");
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+
+    togglePopover("Gradient end color");
+
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByText("Hex code")).not.toBeNull();
+    expect(API.getSelectedElement().gradient).toEqual(seededGradient);
+  });
 });

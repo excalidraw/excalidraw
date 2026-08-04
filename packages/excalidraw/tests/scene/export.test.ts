@@ -5,7 +5,10 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  ROUNDNESS,
 } from "@excalidraw/common";
+
+import { getCornerRadius } from "@excalidraw/element";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -578,6 +581,50 @@ describe("exporting frames", () => {
       expect(svg.getAttribute("height")).toBe(
         (frame.height + getFrameNameHeight("svg")).toString(),
       );
+    });
+
+    it("exports a gradient-filled rectangle with a linearGradient def", async () => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        width: 100,
+        height: 50,
+        x: 0,
+        y: 0,
+        backgroundColor: "#ff0000",
+        fillStyle: "gradient",
+        gradient: { color2: "#0000ff", angle: 0 },
+        roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+      });
+
+      const svg = await exportToSvg({
+        elements: [rectangle],
+        files: null,
+        exportPadding: 0,
+      });
+
+      const gradientDef = svg.querySelector("defs linearGradient");
+      expect(gradientDef).not.toBeNull();
+      expect(gradientDef?.querySelectorAll("stop").length).toBe(2);
+      const stops = gradientDef?.querySelectorAll("stop");
+      expect(stops?.[0]?.getAttribute("stop-color")).toBe("#ff0000");
+      expect(stops?.[1]?.getAttribute("stop-color")).toBe("#0000ff");
+
+      const fillRect = svg.querySelector('rect[fill^="url(#"]');
+      expect(fillRect).not.toBeNull();
+
+      const parent = fillRect?.parentElement;
+      expect(parent).not.toBeNull();
+      const siblings = Array.from(parent?.children ?? []);
+      expect(siblings.indexOf(fillRect as Element)).toBe(0);
+
+      // gradient fill rect must be rounded to match the rectangle's own
+      // corner radius, otherwise gradient color spills past rounded corners
+      const expectedRadius = getCornerRadius(
+        Math.min(rectangle.width, rectangle.height),
+        rectangle,
+      );
+      expect(fillRect?.getAttribute("rx")).toBe(`${expectedRadius}`);
+      expect(fillRect?.getAttribute("ry")).toBe(`${expectedRadius}`);
     });
 
     it("should not export frame-overlapping elements belonging to different frame", async () => {

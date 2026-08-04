@@ -670,6 +670,34 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should default gradient to null when missing, and preserve it when present", () => {
+    const withoutGradient = API.createElement({
+      type: "rectangle",
+      id: "no-gradient",
+      x: 0,
+      y: 0,
+    });
+    // simulate a legacy scene file saved before the `gradient` field existed
+    // @ts-expect-error intentionally simulating a legacy element missing the field
+    delete withoutGradient.gradient;
+
+    const withGradient = API.createElement({
+      type: "rectangle",
+      id: "with-gradient",
+      x: 0,
+      y: 0,
+      gradient: { color2: "#ffffff", angle: 90 },
+    });
+
+    const [restoredWithout, restoredWith] = restore.restoreElements(
+      [withoutGradient, withGradient],
+      null,
+    );
+
+    expect(restoredWithout.gradient).toBeNull();
+    expect(restoredWith.gradient).toEqual({ color2: "#ffffff", angle: 90 });
+  });
+
   it("bump versions of local duplicate elements when supplied", () => {
     const rectangle = API.createElement({ type: "rectangle" }); // version=1
     const ellipse = API.createElement({ type: "ellipse" });
