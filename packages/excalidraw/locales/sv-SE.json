@@ -3,10 +3,10 @@
     "paste": "Klistra in",
     "pasteAsPlaintext": "Klistra som oformaterad text",
     "pasteCharts": "Klistra in diagram",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "Stapeldiagram",
+    "chartType_line": "Linjediagram",
+    "chartType_radar": "Radardiagram",
+    "chartType_plaintext": "Klartext",
     "selectAll": "Markera alla",
     "multiSelect": "Lägg till element till markering",
     "moveCanvas": "Flytta canvas",
@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Streckad",
     "strokeStyle_dotted": "Punktad",
     "sloppiness": "Slarvighet",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Genomskinlighet",
     "textAlign": "Textjustering",
     "edges": "Kanter",
@@ -53,14 +56,14 @@
     "arrowhead_crowfoot_many": "Kråkfot (många)",
     "arrowhead_crowfoot_one": "Kråkfot (en)",
     "arrowhead_crowfoot_one_or_many": "Kråkfot (en eller många)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "Kardinalitet (en)",
+    "arrowhead_cardinality_many": "Kardinalitet (flera)",
+    "arrowhead_cardinality_one_or_many": "Kardinalitet (en eller flera)",
+    "arrowhead_cardinality_exactly_one": "Kardinalitet (exakt en)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalitet (noll eller en)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalitet (noll eller flera)",
     "more_options": "Fler alternativ",
-    "cardinality": "",
+    "cardinality": "Kardinalitet",
     "arrowtypes": "Piltyp",
     "arrowtype_sharp": "Rak",
     "arrowtype_round": "Böjd",
@@ -182,11 +185,14 @@
     "linkToElement": "Länk till objektet",
     "wrapSelectionInFrame": "Omslut urvaled i ram",
     "tab": "Flik",
-    "shapeSwitch": "",
-    "preferences": "",
-    "preferences_toolLock": "",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "shapeSwitch": "Byt form",
+    "preferences": "Inställningar",
+    "preferences_toolLock": "Verktygslås",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "Pilbindning",
+    "midpointSnapping": "Fäst mot mittpunkter"
   },
   "elementLink": {
     "title": "Länk till objektet",
@@ -198,10 +204,10 @@
     "hint_emptyLibrary": "Välj ett objekt på canvasen för att lägga till det här, eller installera ett bibliotek från det publika arkivet, nedan.",
     "hint_emptyPrivateLibrary": "Välj ett objekt på canvasen för att lägga till det här.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Sök i biblioteket",
+      "heading": "Biblioteksträffar",
+      "noResults": "Inga matchande objekt hittade...",
+      "clearSearch": "Rensa sökning"
     }
   },
   "search": {
@@ -210,8 +216,8 @@
     "singleResult": "resultat",
     "multipleResults": "resultat",
     "placeholder": "Hitta text på canvas...",
-    "frames": "",
-    "texts": ""
+    "frames": "Ramar",
+    "texts": "Texter"
   },
   "buttons": {
     "clearReset": "Återställ canvasen",
@@ -245,11 +251,11 @@
     "objectsSnapMode": "Fäst mot objekt",
     "exitZenMode": "Gå ur zen-läge",
     "cancel": "Avbryt",
-    "saveLibNames": "",
+    "saveLibNames": "Spara namn och avsluta",
     "clear": "Rensa",
     "remove": "Ta bort",
     "embed": "Växla inbäddning",
-    "publishLibrary": "",
+    "publishLibrary": "Byt namn eller publicera",
     "submit": "Skicka",
     "confirm": "Bekräfta",
     "embeddableInteractionButton": "Klicka för att interagera"
@@ -276,7 +282,7 @@
     "removeItemsFromsLibrary": "Ta bort {{count}} objekt från biblioteket?",
     "invalidEncryptionKey": "Krypteringsnyckeln måste vara 22 tecken. Livesamarbetet är inaktiverat.",
     "collabOfflineWarning": "Ingen internetanslutning tillgänglig.\nDina ändringar kommer inte att sparas!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Lagringskvoten för webbläsaren har överskridits. Ändringarna sparas inte."
   },
   "errors": {
     "unsupportedFileType": "Filtypen stöds inte.",
@@ -307,7 +313,7 @@
   },
   "toolBar": {
     "selection": "Markering",
-    "lasso": "",
+    "lasso": "Lassomarkering",
     "image": "Infoga bild",
     "rectangle": "Rektangel",
     "diamond": "Diamant",
@@ -325,10 +331,11 @@
     "magicframe": "Trådram till kod",
     "embeddable": "Bädda in (web)",
     "laser": "Laserpekare",
+    "autoshape": "",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg",
     "mermaidToExcalidraw": "Mermaid till Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Växla formtyp"
   },
   "element": {
     "rectangle": "Rektangel",
@@ -352,34 +359,36 @@
     "shapes": "Former"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} för att avfärda sökningen",
+    "canvasPanning": "För att flytta canvasen, håll {{shortcut_1}} eller {{shortcut_2}} medan du drar eller använd handverktyget",
     "linearElement": "Klicka för att starta flera punkter, dra för en linje",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Klicka för att starta flera punkter, dra för en enskild linje. Tryck på {{shortcut}} igen för att ändra piltyp.",
+    "arrowBindModifiers": "Håll {{shortcut_1}} för att inaktivera bindning, eller {{shortcut_2}} för att binda till en fast punkt",
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
     "embeddable": "Klicka-dra för att skapa en webbplats-inbäddning",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "autoshape": "",
+    "text_selected": "Dubbelklicka eller tryck {{shortcut}} för att redigera text",
+    "text_editing": "Tryck på {{shortcut_1}} eller {{shortcut_2}} för att slutföra redigeringen",
+    "linearElementMulti": "Klicka på sista punkten eller tryck på {{shortcut_1}} eller {{shortcut_2}} för att avsluta",
+    "lockAngle": "Du kan begränsa vinkeln genom att hålla {{shortcut}}",
+    "resize": "Du kan behålla proportioner genom att hålla {{shortcut_1}} medan du ändrar storlek,\nhåller du {{shortcut_2}} ändras storlek relativt mitten",
+    "resizeImage": "Du kan ändra storlek fritt genom att hålla {{shortcut_1}},\nhåll {{shortcut_2}} för att ändra storlek från mitten",
+    "rotate": "Du kan begränsa vinklar genom att hålla {{shortcut}} medan du roterar",
+    "toggleArrowhead": "",
+    "lineEditor_info": "Håll {{shortcut_1}} och dubbelklicka eller tryck på {{shortcut_2}} för att redigera punkter",
+    "lineEditor_line_info": "Dubbelklicka eller tryck på {{shortcut}} för att redigera punkter",
+    "lineEditor_pointSelected": "Tryck på {{shortcut_1}} för att ta bort punkt(er),\n{{shortcut_2}} för att duplicera, eller dra för att flytta",
+    "lineEditor_nothingSelected": "Välj en punkt att redigera (håll {{shortcut_1}} för att välja flera),\neller håll ned {{shortcut_2}} och klicka för att lägga till nya punkter",
     "publishLibrary": "Publicera ditt eget bibliotek",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} för att lägga till text",
+    "createFlowchart": "{{shortcut}} för att skapa ett flödesschema",
+    "deepBoxSelect": "Håll {{shortcut}} för att djupvälja, och för att förhindra att dra",
+    "eraserRevert": "Håll {{shortcut}} för att återställa de element som är markerade för borttagning",
     "firefox_clipboard_write": "Denna funktion kan sannolikt aktiveras genom att ställa in \"dom.events.asyncClipboard.clipboardItem\" flaggan till \"true\". För att ändra webbläsarens flaggor i Firefox, besök \"about:config\" sidan.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Håll {{shortcut}} för att inaktivera fästning",
+    "enterCropEditor": "Dubbelklicka på bilden eller tryck på {{shortcut}} för att beskära bilden",
+    "leaveCropEditor": "Klicka utanför bilden eller tryck på {{shortcut_1}} eller {{shortcut_2}} för att avsluta beskärningen"
   },
   "canvasError": {
     "cannotShowPreview": "Kan inte visa förhandsgranskning",
@@ -411,8 +420,8 @@
     "title": "Fel"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Sparar",
+    "defaultMessage": "Förbereder att spara..."
   },
   "exportDialog": {
     "disk_title": "Spara till disk",
@@ -576,9 +585,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Dina teckningar sparas i webbläsarens lagring.",
+      "center_heading_line2": "Webbläsarens lagringsutrymme kan rensas oväntat.",
+      "center_heading_line3": "Spara ditt arbete till en fil regelbundet för att undvika att förlora det.",
       "center_heading_plus": "Ville du gå till Excalidraw+ istället?",
       "menuHint": "Exportera, inställningar, språk, ..."
     },
@@ -590,12 +599,14 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Färg",
     "mostUsedCustomColors": "Mest frekvent använda anpassade färger",
     "colors": "Färger",
     "shades": "Nyanser",
     "hexCode": "Hex-kod",
-    "noShades": "Inga nyanser tillgängliga för denna färg"
+    "noShades": "Inga nyanser tillgängliga för denna färg",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -631,58 +642,58 @@
   "mermaid": {
     "title": "Mermaid till Excalidraw",
     "button": "Infoga",
-    "description": "",
+    "description": "För närvarande stöds endast <flowchartLink>Flödesdiagram</flowchartLink>, <sequenceLink> Sekvensdiagram</sequenceLink>, <classLink>Klassdiagram</classLink> och <erdLink>Entitetsrelationsdiagram</erdLink>. De andra typerna kommer att återges som bild i Excalidraw.",
     "syntax": "Mermaid-syntax",
     "preview": "Förhandsgranska",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Skriv Mermaid-diagramdefinitionen här...",
+    "autoFixAvailable": "Auto-fix är tillgängligt"
   },
   "ttd": {
-    "error": ""
+    "error": "Fel!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Börja skriva din diagramidé här... ({{shortcut}} för ny rad)",
+    "inputPlaceholderWithMessages": "Fortsätt förfina ditt diagram...",
+    "generating": "Genererar...",
+    "rateLimitRemaining": "{{count}} förfrågningar kvar idag",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Du",
+      "assistant": "AI-assistent",
+      "system": "System"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AI-beta",
+    "label": "Chatt",
+    "menu": "Meny",
+    "newChat": "Ny chatt",
+    "deleteChat": "Radera chatt",
+    "deleteMessage": "Radera meddelande",
+    "viewAsMermaid": "Visa som Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
+      "title": "Låt oss designa ditt diagram",
+      "description": "Beskriv det diagram du vill skapa, och vi kommer att generera det åt dig.",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Förhandsgranska",
+    "insert": "Infoga",
+    "retry": "Försök igen",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "Fråga är för kort (minst {{min}} tecken)",
+      "promptTooLong": "Fråga är för lång (max {{max}} tecken)",
+      "generationFailed": "Generering misslyckades",
+      "invalidDiagram": "Genererade ett ogiltigt diagram :(. Du kan redigera manuellt, försöka igen med auto-fix eller prova en annan prompt.",
+      "fixInMermaid": "Redigera Mermaid manuellt →",
+      "aiRepair": "Regenerera (auto-fix) →",
+      "requestAborted": "Begäran avbröts",
+      "requestFailed": "Begäran misslyckades",
+      "mermaidParseError": "Mermaid syntax fel"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Du har nått din gräns på den fria AI-planen. Prova Excalidraw+ för mer eller kom tillbaka imorgon.",
+      "generalRateLimit": "Håll dina hästar, du är för snabb för oss! Vänligen vänta en stund innan du försöker igen.",
+      "messageLimitInputPlaceholder": "Du har nått din meddelandegräns"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Uppgradera till Plus"
   },
   "quickSearch": {
     "placeholder": "Snabbsök"
@@ -721,15 +732,15 @@
     "shortcutHint": "För kommandopalett, använd {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Skift",
+    "spacebar": "Mellanslag",
+    "delete": "Delete",
+    "mmb": "Scroll-hjul"
   }
 }

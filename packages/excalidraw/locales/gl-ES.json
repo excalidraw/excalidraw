@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Liña de trazos",
     "strokeStyle_dotted": "Liña de puntos",
     "sloppiness": "Estilo de trazo",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Opacidade",
     "textAlign": "Aliñar texto",
     "edges": "Bordos",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "Inserir na web",
     "laser": "Punteiro láser",
+    "autoshape": "",
     "hand": "Man (ferramenta de desprazamento)",
     "extraTools": "Máis ferramentas",
     "mermaidToExcalidraw": "",
@@ -360,6 +367,7 @@
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
     "embeddable": "Faga clic e arrastre para crear un sitio web embebido",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Cores",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

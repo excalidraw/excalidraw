@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Čárkovaný",
     "strokeStyle_dotted": "Tečkovaný",
     "sloppiness": "Stylizace",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Průhlednost",
     "textAlign": "Zarovnání textu",
     "edges": "Hrany",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "Z wireframu na kód",
     "embeddable": "Web Embed",
     "laser": "Laserové ukazovátko",
+    "autoshape": "",
     "hand": "Ruka (nástroj pro posouvání)",
     "extraTools": "Více nástrojů",
     "mermaidToExcalidraw": "",
@@ -360,6 +367,7 @@
     "freeDraw": "Klikněte a táhněte, pro ukončení pusťte",
     "text": "Tip: Text můžete také přidat dvojitým kliknutím kdekoli pomocí nástroje pro výběr",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Barvy",
     "shades": "Stíny",
     "hexCode": "Hex kód",
-    "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny"
+    "noShades": "Pro tuto barvu nejsou k dispozici žádné odstíny",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

@@ -3,10 +3,10 @@
     "paste": "Itsatsi",
     "pasteAsPlaintext": "Itsatsi testu arrunt gisa",
     "pasteCharts": "Itsatsi grafikoak",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "Barra-diagrama",
+    "chartType_line": "Lerro-diagrama",
+    "chartType_radar": "Radar-diagrama",
+    "chartType_plaintext": "Testu soila",
     "selectAll": "Hautatu dena",
     "multiSelect": "Gehitu elementua hautapenera",
     "moveCanvas": "Mugitu oihala",
@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Marratua",
     "strokeStyle_dotted": "Puntukatua",
     "sloppiness": "Marraren trazoa",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Opakotasuna",
     "textAlign": "Testuaren lerrokapena",
     "edges": "Ertzak",
@@ -50,21 +53,21 @@
     "arrowhead_triangle_outline": "Triangelua (eskema)",
     "arrowhead_diamond": "Erromboa",
     "arrowhead_diamond_outline": "Erromboa (eskema)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
-    "more_options": "",
-    "cardinality": "",
-    "arrowtypes": "",
-    "arrowtype_sharp": "",
-    "arrowtype_round": "",
-    "arrowtype_elbowed": "",
+    "arrowhead_crowfoot_many": "Bele oina (hainbat)",
+    "arrowhead_crowfoot_one": "Bele oina (bat)",
+    "arrowhead_crowfoot_one_or_many": "Bele oina (bat edo hainbat)",
+    "arrowhead_cardinality_one": "Kardinalitatea (bat)",
+    "arrowhead_cardinality_many": "Kardinalitatea (hainbat)",
+    "arrowhead_cardinality_one_or_many": "Kardinalitatea (bat edo hainbat)",
+    "arrowhead_cardinality_exactly_one": "Kardinalitatea (zehazki bat)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalitatea (zero edo bat)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalitatea (zero edo hainbat)",
+    "more_options": "Aukera gehiago",
+    "cardinality": "Kardinalitatea",
+    "arrowtypes": "Gezi mota",
+    "arrowtype_sharp": "Gezi zorrotza",
+    "arrowtype_round": "Gezi kurbaduna",
+    "arrowtype_elbowed": "Ukondo gezia",
     "fontSize": "Letra-tamaina",
     "fontFamily": "Letra-tipoa",
     "addWatermark": "Gehitu \"Excalidraw bidez egina\"",
@@ -128,7 +131,7 @@
     "share": "Partekatu",
     "showStroke": "Erakutsi marraren kolore-hautatzailea",
     "showBackground": "Erakutsi atzeko planoaren kolore-hautatzailea",
-    "showFonts": "",
+    "showFonts": "Erakutsi letra mota hautatzailea",
     "toggleTheme": "Gaia argia/iluna aktibatu",
     "theme": "Itxura",
     "personalLib": "Liburutegi pertsonala",
@@ -140,21 +143,21 @@
     "createContainerFromText": "Bilatu testua edukiontzi batean",
     "link": {
       "edit": "Editatu esteka",
-      "editEmbed": "",
-      "create": "",
+      "editEmbed": "Editatu esteka kapsulagarria",
+      "create": "Gehitu esteka",
       "label": "Esteka",
       "labelEmbed": "Esteka eta kapsula",
       "empty": "Ez da estekarik ezarri",
-      "hint": "",
-      "goToElement": ""
+      "hint": "Idatzi edo itsatsi zure eskeka hemen",
+      "goToElement": "Joan helburuko elementura"
     },
     "lineEditor": {
       "edit": "Editatu lerroa",
       "editArrow": "Gezia aldatu"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Ireki poligonoa",
+      "convertToPolygon": "Bihurtu poligono"
     },
     "elementLock": {
       "lock": "Blokeatu",
@@ -176,42 +179,45 @@
     "zoomToFit": "Egin zoom elementu guztiak ikusteko",
     "installPWA": "Instalatu Excalidraw lokalean (PWA)",
     "autoResize": "Textu zabalera automatikoa aktibatu",
-    "imageCropping": "",
-    "unCroppedDimension": "",
-    "copyElementLink": "",
-    "linkToElement": "",
-    "wrapSelectionInFrame": "",
-    "tab": "",
-    "shapeSwitch": "",
-    "preferences": "",
-    "preferences_toolLock": "",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "imageCropping": "Irudia moztea",
+    "unCroppedDimension": "Moztu gabeko dimentsioa",
+    "copyElementLink": "Kopiatu esteka objektura",
+    "linkToElement": "Estekatu objektura",
+    "wrapSelectionInFrame": "Bildu hautapena marko batean",
+    "tab": "Tab",
+    "shapeSwitch": "Aldatu forma",
+    "preferences": "Hobespenak",
+    "preferences_toolLock": "Erremintaren blokeoa",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "Gezi azala",
+    "midpointSnapping": "Lotu erdiko puntuetara"
   },
   "elementLink": {
-    "title": "",
-    "desc": "",
-    "notFound": ""
+    "title": "Estekatu objektura",
+    "desc": "Egin klik forma batean edo itsatsi esteka bat.",
+    "notFound": "Estekatutako objektua ez da aurkitu oihalean."
   },
   "library": {
     "noItems": "Oraindik ez da elementurik gehitu...",
     "hint_emptyLibrary": "Hautatu oihaleko elementu bat hemen gehitzeko, edo instalatu liburutegi bat beheko biltegi publikotik.",
     "hint_emptyPrivateLibrary": "Hautatu oihaleko elementu bat hemen gehitzeko.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Bilatu liburutegia",
+      "heading": "Liburutegian topatutakoak",
+      "noResults": "Ez da ezer aurkitu...",
+      "clearSearch": "Garbitu bilaketa"
     }
   },
   "search": {
-    "title": "",
-    "noMatch": "",
-    "singleResult": "",
-    "multipleResults": "",
-    "placeholder": "",
-    "frames": "",
-    "texts": ""
+    "title": "Bilatu oihalean",
+    "noMatch": "Ez da ezer aurkitu...",
+    "singleResult": "emaitza",
+    "multipleResults": "emaitzak",
+    "placeholder": "Bilatu testua oihalean...",
+    "frames": "Markoak",
+    "texts": "Testuak"
   },
   "buttons": {
     "clearReset": "Garbitu oihala",
@@ -219,7 +225,7 @@
     "exportImage": "Esportatu irudia...",
     "export": "Gorde hemen...",
     "copyToClipboard": "Kopiatu arbelera",
-    "copyLink": "",
+    "copyLink": "Kopiatu esteka",
     "save": "Gorde uneko fitxategian",
     "saveAs": "Gorde honela",
     "load": "Ireki",
@@ -240,16 +246,16 @@
     "fullScreen": "Pantaila osoa",
     "darkMode": "Modu iluna",
     "lightMode": "Modu argia",
-    "systemMode": "",
+    "systemMode": "Sistema modua",
     "zenMode": "Zen modua",
     "objectsSnapMode": "Atxiki objektuei",
     "exitZenMode": "Irten Zen modutik",
     "cancel": "Utzi",
-    "saveLibNames": "",
+    "saveLibNames": "Gorde izena(k) eta irten",
     "clear": "Garbitu",
     "remove": "Kendu",
     "embed": "Aldatu kapsulatzea",
-    "publishLibrary": "",
+    "publishLibrary": "Berrizendatu edo argitaratu",
     "submit": "Bidali",
     "confirm": "Bai",
     "embeddableInteractionButton": "Egin klik elkar eragiteko"
@@ -276,7 +282,7 @@
     "removeItemsFromsLibrary": "Liburutegitik {{count}} elementu ezabatu?",
     "invalidEncryptionKey": "Enkriptazio-gakoak 22 karaktere izan behar ditu. Zuzeneko lankidetza desgaituta dago.",
     "collabOfflineWarning": "Ez dago Interneteko konexiorik.\nZure aldaketak ez dira gordeko!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Nabigatzailearen biltegiratze muga bete da. Aldaketak ez dira gordeko."
   },
   "errors": {
     "unsupportedFileType": "Onartu gabeko fitxategi mota.",
@@ -307,7 +313,7 @@
   },
   "toolBar": {
     "selection": "Hautapena",
-    "lasso": "",
+    "lasso": "Lazo hautaketa",
     "image": "Txertatu irudia",
     "rectangle": "Laukizuzena",
     "diamond": "Diamantea",
@@ -325,26 +331,27 @@
     "magicframe": "Wireframetik kodera",
     "embeddable": "Web kapsulatzea",
     "laser": "Laser punteroa",
+    "autoshape": "",
     "hand": "Eskua (panoratze tresna)",
     "extraTools": "Tresna gehiago",
     "mermaidToExcalidraw": "Mermaid-etik Excalidraw-ra",
-    "convertElementType": ""
+    "convertElementType": "Aldatu forma mota"
   },
   "element": {
-    "rectangle": "",
-    "diamond": "",
-    "ellipse": "",
-    "arrow": "",
-    "line": "",
-    "freedraw": "",
-    "text": "",
-    "image": "",
-    "group": "",
-    "frame": "",
-    "magicframe": "",
-    "embeddable": "",
-    "selection": "",
-    "iframe": ""
+    "rectangle": "Laukizuzena",
+    "diamond": "Erromboa",
+    "ellipse": "Elipsea",
+    "arrow": "Gezia",
+    "line": "Lerroa",
+    "freedraw": "Marrazketa librea",
+    "text": "Testua",
+    "image": "Irudia",
+    "group": "Taldea",
+    "frame": "Markoa",
+    "magicframe": "Wireframetik kodera",
+    "embeddable": "Web kapsulatzea",
+    "selection": "Hautapena",
+    "iframe": "IFramea"
   },
   "headings": {
     "canvasActions": "Canvas ekintzak",
@@ -352,34 +359,36 @@
     "shapes": "Formak"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} bilaketa bertan behera uzteko",
+    "canvasPanning": "Oihala mugitzeko heldu {{shortcut_1}} edo {{shortcut_2}} arrastatu bitartean edo erabili esku-tresna",
     "linearElement": "Egin klik hainbat puntu hasteko, arrastatu lerro bakarrerako",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Egin klik puntuak egiteko, arrastatu lerro sinplea egiteko. Sakatu {{shortcut}} berriro gezi mota aldatzeko.",
+    "arrowBindModifiers": "Heldu {{shortcut_1}} inguraketa desgaitzeko, edo {{shortcut_2}} puntu finko batean biltzeko",
     "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
     "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
     "embeddable": "Egin klik eta arrastatu webgunea kapsulatzeko",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "autoshape": "",
+    "text_selected": "Klik bikoitza edo sakatu {{shortcut}} testua editatzeko",
+    "text_editing": "Sakatu {{shortcut_1}} edo {{shortcut_2}} edizioa amaitzeko",
+    "linearElementMulti": "Egin klik azken puntuan edo sakatu {{shortcut_1}} edo {{shortcut_2}} amaitzeko",
+    "lockAngle": "Angelua mugatu dezakezu {{shortcut}} helduta",
+    "resize": "Proportzioak mugatu ditzakezu {{shortcut_1}} helduta tamaina aldatzean, heldu {{shortcut_2}} erdigunetik tamaina aldatzeko",
+    "resizeImage": "Libreki alda dezakezu tamaina {{shortcut_1}} helduta, heldu {{shortcut_2}} tamaina erdigunetik aldatzeko",
+    "rotate": "Angeluak mugatu ditzakezu {{shortcut}} helduta biratzen duzun bitartean",
+    "toggleArrowhead": "",
+    "lineEditor_info": "Heldu {{shortcut_1}} eta egin klik bikoitza edo sakatu {{shortcut_2}} puntuak editatzeko",
+    "lineEditor_line_info": "Egin klik bikoitza edo sakatu {{shortcut}} puntuak editatzeko",
+    "lineEditor_pointSelected": "Sakatu {{shortcut_1}} puntua(k) kentzeko, {{shortcut_2}} bikoizteko edo arrastatu mugitzeko",
+    "lineEditor_nothingSelected": "Hautatu puntu bate editatzeko (heldu {{shortcut_1}} gehiago hautatzeko), edo heldu {{shortcut_2}} eta egin klik puntu berriak gehitzeko",
     "publishLibrary": "Argitaratu zure liburutegia",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} testua gehitzeko",
+    "createFlowchart": "{{shortcut}} fluxu-diagrama sortzeko",
+    "deepBoxSelect": "Heldu {{shortcut}} sakon hautatzeko eta arrastatzea saihesteko",
+    "eraserRevert": "Heldu {{shortcut}} leheneratzeko ezabatzeko markatutako elementuak",
     "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Heldu {{shortcut}} doiketa desgaitzeko",
+    "enterCropEditor": "Klik bikoitza irudian edo sakatu {{shortcut}} irudia mozteko",
+    "leaveCropEditor": "Egin klik irudi kanpoan edo sakatu {{shortcut_1}} edo {{shortcut_2}} mozketa amaitzeko"
   },
   "canvasError": {
     "cannotShowPreview": "Ezin da oihala aurreikusi",
@@ -411,8 +420,8 @@
     "title": "Errorea"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Gordetzen",
+    "defaultMessage": "Gordetzek prestatzen..."
   },
   "exportDialog": {
     "disk_title": "Gorde diskoan",
@@ -430,8 +439,8 @@
     "click": "sakatu",
     "deepSelect": "Hautapen sakona",
     "deepBoxSelect": "Hautapen sakona egin laukizuzen bidez, eta saihestu arrastatzea",
-    "createFlowchart": "",
-    "navigateFlowchart": "",
+    "createFlowchart": "Sortu diagrama-fluxu bat elementu generiko batetik abiatuta",
+    "navigateFlowchart": "Nabigatu fluxu-diagramatik",
     "curvedArrow": "Gezi kurbatua",
     "curvedLine": "Lerro kurbatua",
     "documentation": "Dokumentazioa",
@@ -455,8 +464,8 @@
     "toggleElementLock": "Blokeatu/desbloketatu hautapena",
     "movePageUpDown": "Mugitu orria gora/behera",
     "movePageLeftRight": "Mugitu orria ezker/eskuin",
-    "cropStart": "",
-    "cropFinish": ""
+    "cropStart": "Moztu irudia",
+    "cropFinish": "Amaitu irudia mozten"
   },
   "clearCanvasDialog": {
     "title": "Garbitu oihala"
@@ -527,15 +536,15 @@
   },
   "stats": {
     "angle": "Angelua",
-    "shapes": "",
+    "shapes": "Formak",
     "height": "Altuera",
     "scene": "Eszena",
     "selected": "Hautatua",
     "storage": "Biltegia",
-    "fullTitle": "",
-    "title": "",
-    "generalStats": "",
-    "elementProperties": "",
+    "fullTitle": "Oihal eta formen propietateak",
+    "title": "Propietateak",
+    "generalStats": "Orokorra",
+    "elementProperties": "Formaren propietateak",
     "total": "Guztira",
     "version": "Bertsioa",
     "versionCopy": "Klikatu kopiatzeko",
@@ -547,7 +556,7 @@
     "copyStyles": "Estiloak kopiatu dira.",
     "copyToClipboard": "Arbelean kopiatu da.",
     "copyToClipboardAsPng": "{{exportSelection}} kopiatu da arbelean PNG gisa\n({{exportColorScheme}})",
-    "copyToClipboardAsSvg": "",
+    "copyToClipboardAsSvg": "Kopiatuta {{exportSelection}} arbelean SVG gisa\n({{exportColorScheme}})",
     "fileSaved": "Fitxategia gorde da.",
     "fileSavedToFilename": "{filename}-n gorde da",
     "canvas": "oihala",
@@ -555,7 +564,7 @@
     "pasteAsSingleElement": "Erabili {{shortcut}} elementu bakar gisa itsasteko,\nedo itsatsi lehendik dagoen testu-editore batean",
     "unableToEmbed": "Url hau txertatzea ez da une honetan onartzen. Sortu issue bat GitHub-en Urla zerrenda zurian sartzea eskatzeko",
     "unrecognizedLinkFormat": "Kapsulatu duzun esteka ez dator bat espero den formatuarekin. Mesedez, saiatu iturburu-guneak emandako 'kapsulatu' katea itsasten",
-    "elementLinkCopied": ""
+    "elementLinkCopied": "Esteka arbelean kopiatu da"
   },
   "colors": {
     "transparent": "Gardena",
@@ -576,9 +585,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Zure marrazkiak zure nabigatzailearen biltegian gordetzen dira.",
+      "center_heading_line2": "Nabigatzailearen biltegia ustekabean hustu daiteke.",
+      "center_heading_line3": "Gorde zure lana maiz fitxategi batean, ez galtzeko.",
       "center_heading_plus": "Horren ordez Excalidraw+-era joan nahi al zenuen?",
       "menuHint": "Esportatu, hobespenak, hizkuntzak..."
     },
@@ -590,12 +599,14 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Kolorea",
     "mostUsedCustomColors": "Gehien erabilitako kolore pertsonalizatuak",
     "colors": "Koloreak",
     "shades": "Ñabardurak",
     "hexCode": "Hez kodea",
-    "noShades": "Kolore honetarako ez dago ñabardurarik eskuragarri"
+    "noShades": "Kolore honetarako ez dago ñabardurarik eskuragarri",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -631,105 +642,105 @@
   "mermaid": {
     "title": "Mermaid-etik Excalidraw-ra",
     "button": "Txertatu",
-    "description": "",
+    "description": "Momentu honetan <flowchartLink>Fluxu-diagrama</flowchartLink>, <sequenceLink>Sekuentzia</sequenceLink>, <classLink>Klasea</classLink> eta <erdLink>Entitate-erlazioa</erdLink> Diagramak onartzen dira. Beste motak irudi gisa errendatuko dira Excalidrawn.",
     "syntax": "Mermaid sintaxia",
     "preview": "Aurrebista",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Idatzi Mermaid diagramaren definizioa hemen...",
+    "autoFixAvailable": "Konponketa automatikoa eskuragarri dago"
   },
   "ttd": {
-    "error": ""
+    "error": "Errorea!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Hasi idazten hemen zure diagramaren ideia... ({{shortcut}} lerro berrira joateko)",
+    "inputPlaceholderWithMessages": "Jarraitu zure diagrama hobetzen...",
+    "generating": "Sortzen...",
+    "rateLimitRemaining": "{{count}} eskaera geratzen dira gaur",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Zu",
+      "assistant": "AA laguntzailea",
+      "system": "Sistema"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AA Beta",
+    "label": "Txat",
+    "menu": "Menua",
+    "newChat": "Txat berria",
+    "deleteChat": "Ezabatu txata",
+    "deleteMessage": "Ezabatu mezua",
+    "viewAsMermaid": "Ikusi Mermaid gisa",
     "placeholder": {
-      "title": "",
-      "description": "",
+      "title": "Diseina dezagun zure diagrama",
+      "description": "Deskribatu sortu nahi duzun diagrama eta guk sortuko dugu.",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Aurrebista",
+    "insert": "Txertatu",
+    "retry": "Saiatu berriro",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "Galdera laburregia da ({{min}} karaktere gutxienez)",
+      "promptTooLong": "Galdera luzeegia da ({{max}} karaktere gehienez)",
+      "generationFailed": "Ezin izan da sortu",
+      "invalidDiagram": "Baliogabeko diagrama sortu da :(. Eskuz editatu dezakezu, auto-zuzenketarekin saiatu edo probatu beste galdera batez.",
+      "fixInMermaid": "Editatu Mermaid eskuz →",
+      "aiRepair": "Birsortu (konponketa automatikoa) →",
+      "requestAborted": "Eskaera bertan behera utzi da",
+      "requestFailed": "Eskaerak huts egin du",
+      "mermaidParseError": "Mermaid sintaxi errorea"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Doako planean zure AA mugara iritsi zara. Probatu Excalidraw+ gehiago lortzeko edo itzuli bihar.",
+      "generalRateLimit": "Eutsi zaldiak, azkarregi zoaz guretzat! Mesedez, itxaron une bat berriro saiatu aurretik.",
+      "messageLimitInputPlaceholder": "Mezuen mugara iritsi zara"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Plus-era pasa"
   },
   "quickSearch": {
-    "placeholder": ""
+    "placeholder": "Bilaketa azkarra"
   },
   "fontList": {
     "badge": {
-      "old": ""
+      "old": "zaharra"
     },
-    "sceneFonts": "",
-    "availableFonts": "",
-    "empty": ""
+    "sceneFonts": "Eszena honetan",
+    "availableFonts": "Letra mota erabilgarriak",
+    "empty": "Ez da letra motarik aurkitu"
   },
   "userList": {
-    "empty": "",
+    "empty": "Ez da erabiltzailerik aurkitu",
     "hint": {
       "text": "Klik erabiltzailean jarraitzeko",
       "followStatus": "Dagoeneko erabiltzaile hau jarraitzen ari zara",
       "inCall": "Erabiltzailea dei batean dago",
       "micMuted": "Erabiltzailearen mikronofoa isildua dago",
-      "isSpeaking": ""
+      "isSpeaking": "Erabiltzailea hitz egiten ari da"
     }
   },
   "commandPalette": {
-    "title": "",
+    "title": "Komandoen paleta",
     "shortcuts": {
-      "select": "",
-      "confirm": "",
-      "close": ""
+      "select": "Hautatu",
+      "confirm": "Berretsi",
+      "close": "Itxi"
     },
-    "recents": "",
+    "recents": "Orain dela gutxi erabilia",
     "search": {
-      "placeholder": "",
-      "noMatch": ""
+      "placeholder": "Bilatu menuak, komandoak, eta aurkitu ezkutuko harribitxiak",
+      "noMatch": "Ez da komandorik aurkitu..."
     },
-    "itemNotAvailable": "",
-    "shortcutHint": ""
+    "itemNotAvailable": "Komandoak ez daude erabilgarri...",
+    "shortcutHint": "Komandoen paleterako erabili {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Aukera",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Sartu",
+    "shift": "Mayus",
+    "spacebar": "Zuriunea",
+    "delete": "Ezabatu",
+    "mmb": "Korritzeko gurpila"
   }
 }

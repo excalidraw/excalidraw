@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "পাতলা",
     "strokeStyle_dotted": "বিন্দুবিন্দু",
     "sloppiness": "ভ্রান্তি",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "দৃশ্যমানতা",
     "textAlign": "লেখ অনুভূমি",
     "edges": "কোণ",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
     "hand": "",
     "extraTools": "",
     "mermaidToExcalidraw": "",
@@ -360,6 +367,7 @@
     "freeDraw": "ক্লিক করুন এবং টেনে আনুন, আপনার কাজ শেষ হলে ছেড়ে দিন",
     "text": "বিশেষ্য: আপনি নির্বাচন টুলের সাথে যে কোনো জায়গায় ডাবল-ক্লিক করে পাঠ্য যোগ করতে পারেন",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

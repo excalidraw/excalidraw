@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Črtkana",
     "strokeStyle_dotted": "Pikasta",
     "sloppiness": "Površnost",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Prekrivnost",
     "textAlign": "Poravnava besedila",
     "edges": "Robovi",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "Žični okvir v kodo",
     "embeddable": "Spletna vdelava",
     "laser": "Laserski kazalec",
+    "autoshape": "",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij",
     "mermaidToExcalidraw": "Mermaid v Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
     "embeddable": "Kliknite in povlecite, da ustvarite spletno vdelavo",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Barve",
     "shades": "Odtenki",
     "hexCode": "Hex koda",
-    "noShades": "Odtenki za to barvo niso na voljo"
+    "noShades": "Odtenki za to barvo niso na voljo",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

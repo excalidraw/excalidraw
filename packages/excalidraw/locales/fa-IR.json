@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "خط چین",
     "strokeStyle_dotted": "نقطه چین",
     "sloppiness": "دقت",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "شفافیت",
     "textAlign": "تراز متن",
     "edges": "لبه ها",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "وایرفریم به کد",
     "embeddable": "افزونه وب",
     "laser": "اشاره گر لیزری",
+    "autoshape": "",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
     "mermaidToExcalidraw": "مرمید به excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
     "embeddable": "کلیک-درگ برای ساخت افزونه وب",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "رنگ‌ها",
     "shades": "جلوه‌ها",
     "hexCode": "کدِ هگز",
-    "noShades": "هیچ سایه ای برای این رنگ در دسترس نیست"
+    "noShades": "هیچ سایه ای برای این رنگ در دسترس نیست",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

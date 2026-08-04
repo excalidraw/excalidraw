@@ -3,10 +3,10 @@
     "paste": "Yapıştır",
     "pasteAsPlaintext": "Düz metin olarak yapıştır",
     "pasteCharts": "Grafikleri yapıştır",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "Çubuk grafiği",
+    "chartType_line": "Çizgi grafik",
+    "chartType_radar": "Radar grafik",
+    "chartType_plaintext": "Düz metin",
     "selectAll": "Tümünü seç",
     "multiSelect": "Seçime öge ekle",
     "moveCanvas": "Tuvali taşı",
@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Kesik çizgili",
     "strokeStyle_dotted": "Noktalı",
     "sloppiness": "Üstün körülük",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Opaklık",
     "textAlign": "Metin hizala",
     "edges": "Kenarlar",
@@ -185,6 +188,9 @@
     "shapeSwitch": "Şekli başkasıyla değiştir",
     "preferences": "Tercihler",
     "preferences_toolLock": "Aracı Kilitle",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -200,7 +206,7 @@
     "search": {
       "inputPlaceholder": "Kütüphanede ara",
       "heading": "Kütüphane eşleşmeleri",
-      "noResults": "Eşleşen öğe bulunamadı…",
+      "noResults": "Eşleşen öğe bulunamadı...",
       "clearSearch": "Aramayı temizle"
     }
   },
@@ -209,7 +215,7 @@
     "noMatch": "Sonuç bulunamadı...",
     "singleResult": "sonuç",
     "multipleResults": "sonuç",
-    "placeholder": "Tuvalde metin bul…",
+    "placeholder": "Tuvalde metin bul...",
     "frames": "Çerçeveler",
     "texts": "Metinler"
   },
@@ -268,7 +274,7 @@
     "collabStopOverridePrompt": "Oturumu sonlandırmak daha önceki, yerel olarak kaydedilmiş çizimin üzerine kaydedilmesine sebep olacak. Emin misiniz?\n\n(Yerel çiziminizi kaybetmemek için tarayıcı sekmesini kapatabilirsiniz.)",
     "errorAddingToLibrary": "Öğe kütüphaneye eklenemedi",
     "errorRemovingFromLibrary": "Öğe kütüphaneden silinemedi",
-    "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil ekleyecek. Emin misiniz?",
+    "confirmAddLibrary": "Bu, kitaplığınıza {{numShapes}} tane şekil(ler) ekleyecek. Emin misiniz?",
     "imageDoesNotContainScene": "Bu görüntü herhangi bir sahne verisi içermiyor gibi görünüyor. Dışa aktarma sırasında sahne yerleştirmeyi etkinleştirdiniz mi?",
     "cannotRestoreFromImage": "Sahne bu resim dosyasından geri yüklenemedi",
     "invalidSceneUrl": "Verilen bağlantıdan çalışma alanı yüklenemedi. Dosya bozuk olabilir veya geçerli bir Excalidraw JSON verisi bulundurmuyor olabilir.",
@@ -325,6 +331,7 @@
     "magicframe": "Wireframe'den koda",
     "embeddable": "Web Yerleştirme",
     "laser": "Lazer işaretçisi",
+    "autoshape": "",
     "hand": "El (hareket aracı)",
     "extraTools": "Daha fazla araç",
     "mermaidToExcalidraw": "Mermaid'den Excalidraw'a",
@@ -360,6 +367,7 @@
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "embeddable": "Web sitesi yerleştirmek için sürükle bırak",
+    "autoshape": "",
     "text_selected": "Metni düzenlemek için çift tıklayın veya {{shortcut}} kısayoluna basın",
     "text_editing": "Düzenlemeyi bitirmek için {{shortcut_1}} veya {{shortcut_2}} kısayoluna basın",
     "linearElementMulti": "Bitirmek için son noktaya tıklayın veya {{shortcut_1}} veya {{shortcut_2}} kısayolunu kullanın",
@@ -367,6 +375,7 @@
     "resize": "Yeniden boyutlandırırken {{shortcut_1}} tuşuna basılı tutarak oranları koruyabilir, merkezden boyutlandırmak için {{shortcut_2}} tuşuna basılı tutabilirsiniz.",
     "resizeImage": "Serbestçe boyutlandırmak için {{shortcut_1}} tuşunu, merkez odaklı boyutlandırmak için {{shortcut_2}} tuşunu basılı tutun.",
     "rotate": "Açıları sabitleyerek döndürmek için {{shortcut}} tuşuna basılı tutun.",
+    "toggleArrowhead": "",
     "lineEditor_info": "Noktaları düzenlemek için {{shortcut_1}} tuşuna basılı tutarak çift tıklayın veya {{shortcut_2}} tuşuna basın.",
     "lineEditor_line_info": "Noktaları düzenlemek için çift tıklayın veya {{shortcut}} tuşuna basın.",
     "lineEditor_pointSelected": "Noktaları (veya noktayı) silmek için {{shortcut_1}}, çoğaltmak için {{shortcut_2}} tuşuna basın veya taşımak için sürükleyin.",
@@ -374,12 +383,12 @@
     "publishLibrary": "Kendi kitaplığınızı yayınlayın",
     "bindTextToElement": "Metin eklemek için {{shortcut}} tuşuna basın",
     "createFlowchart": "Akış şeması oluşturmak için {{shortcut}} tuşuna basın",
-    "deepBoxSelect": "Derin seçim yapmak ve sürüklemeyi engellemek için {{shortcut}} tuşuna basılı tutun.",
-    "eraserRevert": "Silinmek üzere işaretlenen öğeleri geri yüklemek (veya geri döndürmek) için {{shortcut}} tuşuna basılı tutun.",
+    "deepBoxSelect": "Derin seçim yapmak ve sürüklemeyi engellemek için {{shortcut}} tuşuna basılı tutun",
+    "eraserRevert": "Silinmek üzere işaretlenen öğeleri geri döndürmek için {{shortcut}} tuşuna basılı tutun",
     "firefox_clipboard_write": "Bu özelliği etkinleştirmek muhtemelen \"dom.events.asyncClipboard.clipboardItem\" bayrağını \"true\" olarak ayarlayarak yapılabilir. Firefox'ta tarayıcı bayraklarını değiştirmek için \"about:config\" sayfasını ziyaret edin.",
-    "disableSnapping": "Hizalamayı (kenetlenmeyi) devre dışı bırakmak için {{shortcut}} tuşuna basılı tutun.",
-    "enterCropEditor": "Görseli kırpmak için üzerine çift tıklayın veya {{shortcut}} tuşuna basın.",
-    "leaveCropEditor": "Kırpmayı tamamlamak için görselin dışına tıklayın veya {{shortcut_1}} ya da {{shortcut_2}} tuşuna basın."
+    "disableSnapping": "Hizalamayı devre dışı bırakmak için {{shortcut}} tuşuna basılı tutun",
+    "enterCropEditor": "Görseli kırpmak için üzerine çift tıklayın veya {{shortcut}} tuşuna basın",
+    "leaveCropEditor": "Kırpmayı tamamlamak için görselin dışına tıklayın veya {{shortcut_1}} ya da {{shortcut_2}} tuşuna basın"
   },
   "canvasError": {
     "cannotShowPreview": "Önizleme gösterilemiyor",
@@ -387,7 +396,7 @@
     "canvasTooBigTip": "İpucu: En uzaktaki elemanları birbirine yakınlaştırmayı deneyin."
   },
   "errorSplash": {
-    "headingMain": "Hata oluştu. Lütfen <button>sayfayı yenilemeyi deneyin.</button>",
+    "headingMain": "Hata oluştu. Lütfen <button>sayfayı yenilemeyi deneyin.</button>.",
     "clearCanvasMessage": "Yenileme sonrası sorun sürüyorsa lütfen <button>tuvali temizlemeyi</button> deneyin.",
     "clearCanvasCaveat": " Bu, yaptığınız değişiklikleri sıfırlayacak ",
     "trackedToSentry": "Tanımlayıcı ile ilgili hata {{eventId}} sistemimize yakalandı.",
@@ -411,8 +420,8 @@
     "title": "Hata"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Kaydediliyor",
+    "defaultMessage": "Kaydetmek için hazırlanıyor..."
   },
   "exportDialog": {
     "disk_title": "Belleğe kaydet",
@@ -465,7 +474,7 @@
     "title": "Kitaplığı yayınla",
     "itemName": "Öğe adı",
     "authorName": "Yazar adı",
-    "githubUsername": "GıtHub kullanıcı adı",
+    "githubUsername": "GitHub kullanıcı adı",
     "twitterUsername": "Twitter kullanıcı adı",
     "libraryName": "Kitaplık adı",
     "libraryDesc": "Kitaplık açıklaması",
@@ -482,16 +491,16 @@
       "required": "Gerekli",
       "website": "Geçerli bir URL girin"
     },
-    "noteDescription": "Submit your library to be included in the <link>genel kütüphane reposu</link>diğer insanlar çizimlerinde kullanabilsin diye.",
-    "noteGuidelines": "Önce kütüphane elle onaylanmalı. şunu okuyun <link>yönergeler</link> onaylamadan önce. gerekli olması halinde iletişim kurmak için ve değişiklik için Github hesabı gerekli, ama çok da illaki olmalı değil.",
-    "noteLicense": "Bunu onaylayarak, kütüğhanenin şu lisansla yayınlanmasını onaylıyorsunuz <link>MIT Lisans, </link>ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir.",
+    "noteDescription": "Kütüphanenizi diğer insanların da kullanabilmesi için <link>Ortak kütüphane deposuna</link> yükleyin.",
+    "noteGuidelines": "Önce kütüphane elle onaylanmalı. şunu okuyun <link>yönergeler</link> onaylamadan önce. gerekli olması halinde iletişim kurmak için ve değişiklik için GitHub hesabı gerekli, ama çok da illaki olmalı değil.",
+    "noteLicense": "Bunu onaylayarak, kütüphanenin şu lisansla yayınlanmasını onaylıyorsunuz <link>MIT Lisans, </link>ki bu kısaca herkesin onu kısıtlama olmaksızın kullanabileceği anlamına gelmektedir.",
     "noteItems": "Her kütüphane kendi ismine sahip olmalı ki tarama yapabilelim. Şu kütüphane ögeleri dahil edilecek:",
     "atleastOneLibItem": "Lütfen başlamak için en az bir tane kütüphane ögesi seçin",
     "republishWarning": "Not: seçilen ögelerden bir kısmı zaten yayınlanmış/gönderilmiş. Yalnızca mevcut kütüphane ve gönderileri güncellerken yeniden gönderme işlemi yapmalısınız."
   },
   "publishSuccessDialog": {
     "title": "Kütüphane gönderildi",
-    "content": "Teşekkürler {{authorName}}. Kütüphaneniz gözden geçirme için alındı. Durumu takip edebilirsiniz<link>burada</link>"
+    "content": "Teşekkürler {{authorName}}. Kütüphaneniz gözden geçirme için alındı. Durumu takip edebilirsiniz <link>burada</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Kütüphaneyi sıfırla",
@@ -595,7 +604,9 @@
     "colors": "Renkler",
     "shades": "Tonlar",
     "hexCode": "Hex kodu",
-    "noShades": "Bu renk için ton mevcut değil"
+    "noShades": "Bu renk için ton mevcut değil",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -631,12 +642,12 @@
   "mermaid": {
     "title": "Mermaid'den Excalidraw'a",
     "button": "Ekle",
-    "description": "",
+    "description": "Şu anda yalnızca <flowchartLink>Akış şeması</flowchartLink>, <sequenceLink> Dizi, </sequenceLink>, <classLink>Sınıf </classLink> ve <erdLink> Varlık ilişkileri</erdLink> Diyagramları desteklenmektedir. Diğer türler, Excalidraw'da görsel olarak çizilecektir.",
     "syntax": "Mermaid Sözdizimi",
     "preview": "Önizleme",
     "label": "Mermaid",
     "inputPlaceholder": "\"Mermaid diyagram tanımını buraya yazın...",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "Otomatik düzeltme mevcut"
   },
   "ttd": {
     "error": "Hata!"
@@ -657,9 +668,9 @@
     "newChat": "Yeni Sohbet",
     "deleteChat": "Sohbeti sil",
     "deleteMessage": "Mesajı sil",
-    "viewAsMermaid": "",
+    "viewAsMermaid": "Mermaid olarak görüntüle",
     "placeholder": {
-      "title": "\"Hadi, diyagramınızı tasarlayalım",
+      "title": "Hadi, diyagramınızı tasarlayalım",
       "description": "Oluşturmak istediğiniz diyagramı tarif edin, sizin için biz hazırlayalım.",
       "hint": ""
     },
@@ -667,22 +678,22 @@
     "insert": "Ekle",
     "retry": "Yeniden dene",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
+      "promptTooShort": "Prompt çok kısa (en az {{min}} karakter)",
+      "promptTooLong": "Prompt çok uzun (en fazla {{max}} karakter)",
+      "generationFailed": "Oluşturma başarısız",
       "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "fixInMermaid": "Mermaid'i manuel düzenle →",
+      "aiRepair": "Yeniden oluştur (otomatik düzeltme) →",
+      "requestAborted": "İstek iptal edildi",
+      "requestFailed": "İstek başarısız oldu",
+      "mermaidParseError": "Mermaid sözdizim hatası"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Ücretsiz plan AI kullanım limitine ulaştın. Excalidraw+ planını deneyin ya da yarın tekrar gelin.",
+      "generalRateLimit": "Yavaş ol, bizim için çok hızlısın! Tekrar denemeden önce lütfen biraz bekle.",
+      "messageLimitInputPlaceholder": "Mesaj limitine ulaştın"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Plus'a Yükselt"
   },
   "quickSearch": {
     "placeholder": "Hızlı arama"
@@ -721,15 +732,15 @@
     "shortcutHint": "Komut paleti için {{shortcut}} kullanın"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Seçenek",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Üst karakter",
+    "spacebar": "Boşluk",
+    "delete": "Sil",
+    "mmb": "Kaydırma tekerleği"
   }
 }
