@@ -332,10 +332,15 @@
     "embeddable": "웹 임베드",
     "laser": "레이저 포인터",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "손 (패닝 도구)",
     "extraTools": "다른 도구",
     "mermaidToExcalidraw": "Mermaid를 Excalidraw로",
     "convertElementType": "도형 타입 전환"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "직사각형",
