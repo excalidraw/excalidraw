@@ -115,7 +115,7 @@ export class AppBucketFill {
       }
       if (result.reason === "too_complex") {
         this.app.setToast({
-          message: t("bucketFill.tooComplex"),
+          message: t("bucketfill.tooComplex"),
           duration: 3000,
         });
       } else if (
@@ -124,7 +124,7 @@ export class AppBucketFill {
         result.reason === "invalid_polygon"
       ) {
         this.app.setToast({
-          message: t("bucketFill.noRegion"),
+          message: t("bucketfill.noRegion"),
           duration: 3000,
         });
       }

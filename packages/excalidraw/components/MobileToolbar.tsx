@@ -77,7 +77,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
-  const bucketFillToolSelected = activeTool.type === "bucketFill";
+  const bucketFillToolSelected = activeTool.type === "bucketfill";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -117,7 +117,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       "frame",
       "embeddable",
       "laser",
-      "bucketFill",
+      "bucketfill",
       "magicframe",
     ] as const
   ).filter((tool) => {
@@ -141,7 +141,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       ? EmbedIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
-      : activeTool.type === "bucketFill"
+      : activeTool.type === "bucketfill"
       ? bucketFillIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
@@ -320,14 +320,14 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             {t("toolBar.laser")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "bucketFill" })}
+            onSelect={() => app.setActiveTool({ type: "bucketfill" })}
             icon={bucketFillIcon}
-            data-testid="toolbar-bucketFill"
+            data-testid="toolbar-bucketfill"
             selected={bucketFillToolSelected}
             shortcut={KEYS.B.toLocaleUpperCase()}
-            disabled={isToolButtonDisabled(app, "bucketFill")}
+            disabled={isToolButtonDisabled(app, "bucketfill")}
           >
-            {t("toolBar.bucketFill")}
+            {t("toolBar.bucketfill")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate

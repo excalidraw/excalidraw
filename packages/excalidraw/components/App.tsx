@@ -8797,7 +8797,7 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (this.state.activeTool.type === "autoshape") {
       this.drawShape.handlePointerDown(pointerDownState);
-    } else if (this.state.activeTool.type === TOOL_TYPE.bucketFill) {
+    } else if (this.state.activeTool.type === TOOL_TYPE.bucketfill) {
       // one-shot click tool: pointer down only ARMS the fill — it commits in
       // the shared pointer-up teardown, and only when the interaction stayed
       // a single-pointer click (a second finger, a context menu, or a
@@ -11476,7 +11476,7 @@ class App extends React.Component<AppProps, AppState> {
       // discard the fill instead of committing an unwanted edit.
       if (
         childEvent.type === "pointerup" &&
-        this.state.activeTool.type === TOOL_TYPE.bucketFill
+        this.state.activeTool.type === TOOL_TYPE.bucketfill
       ) {
         this.bucketFill.handlePointerUp();
       } else {
@@ -12455,7 +12455,7 @@ class App extends React.Component<AppProps, AppState> {
         activeTool.type !== "freedraw" &&
         // bucket fill stays active for back-to-back fills regardless of the
         // tool lock (paint-bucket UX)
-        activeTool.type !== TOOL_TYPE.bucketFill &&
+        activeTool.type !== TOOL_TYPE.bucketfill &&
         (activeTool.type !== "lasso" ||
           // if lasso is turned on but from selection => reset to selection
           (activeTool.type === "lasso" && activeTool.fromSelection))

@@ -144,7 +144,7 @@ export const TOOLS = defineTools({
     icon: laserPointerToolIcon,
     letterKey: KEYS.K,
   },
-  bucketFill: {
+  bucketfill: {
     icon: bucketFillIcon,
     letterKey: KEYS.B,
   },

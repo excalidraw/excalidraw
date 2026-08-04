@@ -162,7 +162,7 @@ export type ToolType =
   | "embeddable"
   | "laser"
   | "autoshape"
-  | "bucketFill";
+  | "bucketfill";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 

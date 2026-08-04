@@ -24,7 +24,7 @@ const mouse = new Pointer("mouse");
 
 const selectBucketFill = () => {
   act(() => {
-    h.app.setActiveTool({ type: "bucketFill" });
+    h.app.setActiveTool({ type: "bucketfill" });
   });
 };
 
@@ -98,7 +98,7 @@ describe("bucket fill tool", () => {
     // the fill is NOT selected and the tool stays active so the user can keep
     // filling regions back-to-back
     expect(h.state.selectedElementIds[fill!.id]).not.toBe(true);
-    expect(h.state.activeTool.type).toBe("bucketFill");
+    expect(h.state.activeTool.type).toBe("bucketfill");
   });
 
   it("fires the public onPointerDown/onPointerUp callbacks", async () => {
@@ -172,7 +172,7 @@ describe("bucket fill tool", () => {
     ).toHaveLength(1);
     expect(h.state.selectionElement).toBeNull();
     expect(Object.keys(h.state.selectedElementIds)).toHaveLength(0);
-    expect(h.state.activeTool.type).toBe("bucketFill");
+    expect(h.state.activeTool.type).toBe("bucketfill");
   });
 
   it("re-clicking a filled region does not stack a duplicate fill", () => {
@@ -310,14 +310,14 @@ describe("bucket fill tool", () => {
     selectBucketFill();
 
     mouse.clickAt(70, 60); // inside first
-    expect(h.state.activeTool.type).toBe("bucketFill");
+    expect(h.state.activeTool.type).toBe("bucketfill");
     mouse.clickAt(250, 60); // inside second, tool still active
 
     const fills = h.elements.filter(
       (el) => el.type === "line" && !el.isDeleted,
     );
     expect(fills).toHaveLength(2);
-    expect(h.state.activeTool.type).toBe("bucketFill");
+    expect(h.state.activeTool.type).toBe("bucketfill");
   });
 
   it("shows fill color, fill style and opacity in the panel when the tool is active", () => {
@@ -359,7 +359,7 @@ describe("bucket fill tool", () => {
   it("selects the tool with the b shortcut", () => {
     expect(h.state.activeTool.type).toBe("selection");
     Keyboard.keyPress(KEYS.B);
-    expect(h.state.activeTool.type).toBe("bucketFill");
+    expect(h.state.activeTool.type).toBe("bucketfill");
   });
 
   it("opens the background color popup with the g shortcut", () => {
@@ -409,7 +409,7 @@ describe("bucket fill tool", () => {
       Keyboard.keyPress("F");
     });
 
-    expect(h.state.activeTool.type).not.toBe("bucketFill");
+    expect(h.state.activeTool.type).not.toBe("bucketfill");
     expect(h.state.openPopup).toBe("fontFamily");
   });
 

@@ -66,7 +66,7 @@ const ExtraToolsDropdown = ({
   const frameToolSelected = activeTool.type === "frame";
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
-  const bucketFillToolSelected = activeTool.type === "bucketFill";
+  const bucketFillToolSelected = activeTool.type === "bucketfill";
   const lassoToolSelected =
     isFullStylesPanel &&
     activeTool.type === "lasso" &&
@@ -153,14 +153,14 @@ const ExtraToolsDropdown = ({
           {t("toolBar.laser")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
-          onSelect={() => app.setActiveTool({ type: "bucketFill" })}
+          onSelect={() => app.setActiveTool({ type: "bucketfill" })}
           icon={bucketFillIcon}
-          data-testid="toolbar-bucketFill"
+          data-testid="toolbar-bucketfill"
           selected={bucketFillToolSelected}
           shortcut={KEYS.B.toLocaleUpperCase()}
-          disabled={isToolButtonDisabled(app, "bucketFill")}
+          disabled={isToolButtonDisabled(app, "bucketfill")}
         >
-          {t("toolBar.bucketFill")}
+          {t("toolBar.bucketfill")}
         </DropdownMenu.Item>
         {isFullStylesPanel && (
           <DropdownMenu.Item

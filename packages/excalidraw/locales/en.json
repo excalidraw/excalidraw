@@ -332,13 +332,13 @@
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
     "autoshape": "Draw to shape",
-    "bucketFill": "Bucket fill",
+    "bucketfill": "Bucket fill",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "convertElementType": "Toggle shape type"
   },
-  "bucketFill": {
+  "bucketfill": {
     "noRegion": "Couldn't find an enclosed region to fill here.",
     "tooComplex": "This region is too complex to fill."
   },

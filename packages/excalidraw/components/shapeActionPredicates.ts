@@ -115,7 +115,7 @@ export const getShapeActionPredicates = (
     fill:
       // bucket fill never renders transparent (it falls back to a real
       // color), so its fill style stays relevant either way
-      activeToolType === "bucketFill" ||
+      activeToolType === "bucketfill" ||
       (hasBackground(activeToolType) &&
         !isTransparent(appState.currentItemBackgroundColor)) ||
       targetElements.some(

@@ -10,7 +10,7 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "freedraw" ||
   type === "autoshape" ||
   // tool-only type; makes the `G` background shortcut work for bucket fill
-  type === "bucketFill";
+  type === "bucketfill";
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "rectangle" ||
