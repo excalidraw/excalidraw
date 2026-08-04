@@ -332,10 +332,15 @@
     "embeddable": "Web kapsulatzea",
     "laser": "Laser punteroa",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Eskua (panoratze tresna)",
     "extraTools": "Tresna gehiago",
     "mermaidToExcalidraw": "Mermaid-etik Excalidraw-ra",
     "convertElementType": "Aldatu forma mota"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Laukizuzena",
