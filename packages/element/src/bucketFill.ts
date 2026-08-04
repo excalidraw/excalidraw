@@ -167,8 +167,8 @@ export const DEFAULT_BUCKET_FILL_OPTIONS: BucketFillOptions = {
   snapEpsilon: 0.5,
   gapTolerance: BUCKET_FILL_GAP_TOLERANCE,
   minArea: 4,
-  maxBoundarySegments: 2000,
-  maxGeneratedPoints: 512,
+  maxBoundarySegments: 2560,
+  maxGeneratedPoints: 1536,
   fallbackSearchRadius: 512,
 };
 
