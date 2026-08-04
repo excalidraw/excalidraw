@@ -332,10 +332,15 @@
     "embeddable": "Incrustar Web",
     "laser": "Puntero láser",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Mano (herramienta de panorama)",
     "extraTools": "Más herramientas",
     "mermaidToExcalidraw": "Mermaid a Excalidraw",
     "convertElementType": "Cambiar tipo de forma"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rectángulo",
