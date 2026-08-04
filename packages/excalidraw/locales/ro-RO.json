@@ -332,10 +332,15 @@
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
     "autoshape": "Desenează la formă",
+    "bucketfill": "",
     "hand": "Mână (instrument de panoramare)",
     "extraTools": "Mai multe instrumente",
     "mermaidToExcalidraw": "Mermaid la Excalidraw",
     "convertElementType": "Comutare tip formă"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Dreptunghi",
