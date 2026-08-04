@@ -11,8 +11,6 @@ import {
   curvePointAtLength,
 } from "@excalidraw/math";
 
-import { getCurvePathOps } from "@excalidraw/utils/shape";
-
 import {
   DRAGGING_THRESHOLD,
   KEYS,
@@ -62,7 +60,7 @@ import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
-import { ShapeCache, toggleLinePolygonState } from "./shape";
+import { toggleLinePolygonState } from "./shape";
 
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 

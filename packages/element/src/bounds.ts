@@ -25,10 +25,8 @@ import type {
   Radians,
 } from "@excalidraw/math";
 import type { AppState } from "@excalidraw/excalidraw/types";
-import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { generateRoughOptions } from "./shape";
-import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
@@ -50,7 +48,6 @@ import { intersectElementWithLineSegment } from "./collision";
 import { elementOverlapsWithFrame, getContainingFrame } from "./frame";
 
 import type { Drawable, Op } from "roughjs/bin/core";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type {
   Arrowhead,
   ElementsMap,
@@ -905,29 +902,6 @@ export const getArrowheadPoints = (
   }
 
   return [tx, ty, x3, y3, x4, y4];
-};
-
-// TODO reuse shape.ts
-const generateLinearElementShape = (
-  element: ExcalidrawLinearElement,
-): Drawable => {
-  const generator = rough.generator();
-  const options = generateRoughOptions(element);
-
-  const method = (() => {
-    if (element.roundness) {
-      return "curve";
-    }
-    if (options.fill) {
-      return "polygon";
-    }
-    return "linearPath";
-  })();
-
-  return generator[method](
-    element.points as Mutable<LocalPoint>[] as RoughPoint[],
-    options,
-  );
 };
 
 const getLinearElementRotatedBounds = (
