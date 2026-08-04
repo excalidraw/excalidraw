@@ -15,10 +15,12 @@
   }
 
   .color-picker__heading {
-    padding: 0 0.5rem;
-    font-size: 0.75rem;
-    text-align: left;
-  }
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  text-align: left;
+
+  color: var(--text-primary-color);
+}
 
   .color-picker-container {
     display: grid;
@@ -42,6 +44,17 @@
     justify-content: space-between;
     align-items: center;
   }
+  .color-picker__recent-colors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+}
+
+.color-picker__recent-colors .color-picker__top-picks {
+  justify-content: flex-start;
+  gap: 0.375rem;
+}
 
   .color-picker__button {
     --radius: 4px;
