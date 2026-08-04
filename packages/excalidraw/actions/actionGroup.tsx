@@ -49,9 +49,18 @@ import { register } from "./register";
 
 import type { AppClassProperties, UIAppState } from "../types";
 
-const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
+const allElementsInSameGroup = (
+  elements: readonly ExcalidrawElement[],
+  editingGroupId: UIAppState["editingGroupId"],
+) => {
   if (elements.length >= 2) {
-    const groupIds = elements[0].groupIds;
+    const editingGroupIndex = editingGroupId
+      ? elements[0].groupIds.indexOf(editingGroupId)
+      : -1;
+    const groupIds =
+      editingGroupIndex > -1
+        ? elements[0].groupIds.slice(0, editingGroupIndex)
+        : elements[0].groupIds;
     for (const groupId of groupIds) {
       if (
         elements.reduce(
@@ -74,7 +83,7 @@ const enableActionGroup = (appState: UIAppState, app: AppClassProperties) => {
 
   return (
     selectedElements.length >= 2 &&
-    !allElementsInSameGroup(selectedElements) &&
+    !allElementsInSameGroup(selectedElements, appState.editingGroupId) &&
     !frameAndChildrenSelectedTogether(selectedElements)
   );
 };
