@@ -260,6 +260,46 @@ describe("Test Linear Elements", () => {
     expect(h.state.selectedLinearElement?.elementId).toEqual(h.elements[0].id);
   });
 
+  it("should allow editing an arrow from the context menu when its bound text appears earlier in the elements array", () => {
+    const arrow = createTwoPointerLinearElement("arrow");
+
+    const textElement = API.createElement({
+      type: "text",
+      x: 0,
+      y: 0,
+      text: "abc",
+      containerId: arrow.id,
+      width: 30,
+      height: 20,
+    });
+    const updatedArrow = {
+      ...arrow,
+      boundElements: [{ type: "text" as const, id: textElement.id }],
+    };
+
+    // text element intentionally placed before its container in the array
+    API.setElements([textElement, updatedArrow]);
+
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: midpoint[0],
+      clientY: midpoint[1],
+    });
+    const contextMenu = document.querySelector(".context-menu");
+    fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+      button: 2,
+      clientX: midpoint[0],
+      clientY: midpoint[1],
+    });
+
+    expect(() =>
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Edit arrow")!),
+    ).not.toThrow();
+
+    expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+    expect(h.state.selectedLinearElement?.elementId).toEqual(updatedArrow.id);
+  });
+
   it("should enter line editor via enter (line)", () => {
     createTwoPointerLinearElement("line");
     expect(h.state.selectedLinearElement?.isEditing).toBe(false);
