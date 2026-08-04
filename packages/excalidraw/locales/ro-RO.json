@@ -332,15 +332,15 @@
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
     "autoshape": "Desenează la formă",
-    "bucketfill": "",
+    "bucketfill": "Umplere cu culoare",
     "hand": "Mână (instrument de panoramare)",
     "extraTools": "Mai multe instrumente",
     "mermaidToExcalidraw": "Mermaid la Excalidraw",
     "convertElementType": "Comutare tip formă"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "Nu s-a putut găsi o regiune închisă pentru a o umple aici.",
+    "tooComplex": "Această regiune este prea complexă pentru a fi umplută."
   },
   "element": {
     "rectangle": "Dreptunghi",
