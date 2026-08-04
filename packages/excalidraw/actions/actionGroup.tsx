@@ -73,7 +73,7 @@ const enableActionGroup = (
 ) => {
   const selectedElements = app.scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,
-    includeBoundTextElement: true,
+    includeBoundTextElement: false,
   });
 
   return (
