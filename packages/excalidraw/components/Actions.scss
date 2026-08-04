@@ -181,6 +181,8 @@
 .compact-shape-actions-island {
   width: fit-content;
   overflow-x: hidden;
+  // may shrink (and scroll) to fit its region
+  min-height: 0;
 }
 
 .mobile-shape-actions {

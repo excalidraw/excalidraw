@@ -4,6 +4,8 @@
     $closeButtonPadding: 0.4rem;
 
     animation: Toast-fade-in 0.5s;
+    // containing block for the close button
+    position: relative;
     min-width: 220px;
     max-width: min(360px, calc(100vw - 32px));
     border-radius: var(--border-radius-lg);

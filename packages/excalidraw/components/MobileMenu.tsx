@@ -67,10 +67,13 @@ export const MobileMenu = ({
       return null;
     }
 
+    const topRightHostUI = renderTopRightUI?.(true, appState);
     const topRightUI = (
-      <div className="excalidraw-ui-top-right">
-        {renderTopRightUI?.(true, appState) ??
-          (!appState.viewModeEnabled && (
+      <div className="exc-region-top-right-content">
+        {topRightHostUI != null ? (
+          <div className="exc-region-top-right-host-slot">{topRightHostUI}</div>
+        ) : (
+          !appState.viewModeEnabled && (
             <>
               {defaultUIEnabled && (
                 <PenModeButton
@@ -83,7 +86,8 @@ export const MobileMenu = ({
               )}
               <DefaultSidebarTriggerTunnel.Out />
             </>
-          ))}
+          )
+        )}
         {defaultUIEnabled &&
           appState.viewModeEnabled &&
           app.isInteractionEnabled() && (
@@ -93,8 +97,10 @@ export const MobileMenu = ({
     );
 
     const topLeftUI = (
-      <div className="excalidraw-ui-top-left">
-        {renderTopLeftUI?.(true, appState)}
+      <div className="exc-region-top-left-content">
+        <div className="exc-region-top-left-host-slot">
+          {renderTopLeftUI?.(true, appState)}
+        </div>
         <MainMenuTunnel.Out />
       </div>
     );

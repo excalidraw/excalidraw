@@ -732,6 +732,10 @@ describe("ui={{ enabled: ... }}", () => {
 
     const scrollBackButton = queryContainer(".scroll-back-to-content");
     expect(scrollBackButton).not.toBe(null);
+    expect(scrollBackButton!.parentElement).toHaveClass(
+      "floating-status-stack",
+    );
+    expect(scrollBackButton!.closest(".exc-region-bottom")).toBe(null);
     fireEvent.click(scrollBackButton!);
     await waitFor(() => expect(h.state.scrolledOutside).toBe(false));
   });

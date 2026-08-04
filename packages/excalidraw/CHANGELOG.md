@@ -15,6 +15,40 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+### UI layout regions (2026-07-27)
+
+The editor UI is now laid out as a grid of nine logical regions, replacing the top bar (`FixedSideContainer` > `.App-menu_top`) plus absolutely-positioned footer:
+
+```
+.exc-regions
+ |_ .exc-region-top-left      .exc-region-top-center      .exc-region-top-right
+ |_ .exc-region-center-left   .exc-region-center-center   .exc-region-center-right
+ |_ .exc-region-bottom
+     |_ .exc-region-bottom-left  .exc-region-bottom-center  .exc-region-bottom-right
+```
+
+Regions at the same height negotiate width with each other — the toolbar's space is exactly what's left between the top-left and the top-right UI, and at widths where nothing fits the top row overflows to the right rather than overlapping. Regions in the same column stack independently of the other columns — the styles panel hangs right below the top-left UI regardless of how far the toolbar or a tall top-right UI reach down, while the stats panel clears the top-left/top-right UI (but not the top-center toolbar). The full-width bottom wrapper uses an independent three-column grid, so its left/right controls cannot size the outer columns or displace the toolbar, while its center track prevents the footer regions from overlapping. Regions stretch to their cell(s) and stay `pointer-events: none`, with only their content interactive.
+
+#### Breaking changes
+
+If you style or query the editor DOM:
+
+- Removed class names: `.App-menu`, `.App-menu_top`, `.App-menu_top__left`, `.App-menu_bottom`, `.App-menu_left`, `.App-menu_right`, `.shapes-section`, `.layer-ui__wrapper__top-right` (+ `--compact`), `.layer-ui__wrapper__footer`, `.layer-ui__wrapper__footer-left` (+ `--transition-left`), `.layer-ui__wrapper__footer-right`. Target the region classes above instead — e.g. `.App-menu_top__left` → `.exc-region-top-left`, `.layer-ui__wrapper__top-right` → `.exc-region-top-right`, `.layer-ui__wrapper__footer-left` → `.exc-region-bottom-left`.
+- `.FixedSideContainer` (and `.FixedSideContainer_side_top`) is now only rendered by the mobile UI. The desktop UI area is `.exc-regions`.
+- The zen-mode modifier `.layer-ui__wrapper__footer-left--transition-bottom` is now `.transition-bottom`, alongside the existing `.transition-left` / `.transition-right`.
+- The styles panel (`.App-menu__left`) and the stats panel (`.exc-stats`) are no longer absolutely positioned — they are in flow inside `.exc-region-center-left` / `.exc-region-center-right`.
+- `<Footer>` content renders in the flexible `.exc-region-bottom-center` track between the zoom/undo controls and help button. `.footer-center` remains full-width flex content, so hosts can keep content beside the left controls, beside the right controls, or at both edges using flex alignment and auto margins.
+- The host-content containers `.excalidraw-ui-top-left` / `.excalidraw-ui-top-right` were split into two concepts: `.exc-region-top-left-content` / `.exc-region-top-right-content` are the mixed rows of editor + host content (shared with the mobile top bar), and the new `.exc-region-top-left-host-slot` / `.exc-region-top-right-host-slot` wrap _only_ the host-rendered output (`renderTopLeftUI` / `renderTopRightUI`). Slots are flex rows (`gap: 0.5rem`) and hide themselves when empty, so host content no longer needs its own flex wrapper — returning a fragment is enough.
+
+#### Behavior changes
+
+- The styles panel is bounded by its region — from below the top-left UI down to the footer band — and scrolls past it, instead of the hardcoded `height - 166px` max-height. Its default position is unchanged; it no longer shifts down when a host renders a tall top-right UI, and it is correctly bounded when the top-left UI is taller than the default menu button.
+- The styles panel's width no longer depends on the top-left UI's width — a wide `renderTopLeftUI` (e.g. a scene-name field) previously stretched the shared left column, inflating the panel's container and swallowing canvas clicks next to it.
+- The stats panel starts below the top-right UI (default position unchanged in full mode; in compact mode it aligns with the styles panel, 8px higher than before), so tall host UI in the top-right region pushes it down instead of overlapping it — while the toolbar's height doesn't affect it. (A top-left UI taller than the top-right also pushes it down, by design.)
+- In compact mode, the pen-mode button centers over the styles panel rather than over the top-left UI.
+- The toast and the scroll-back-to-content button sit in a separate full-width overlay on the bottom-row baseline (14px lower than the previous `bottom: 30px`), so they remain centered on the canvas rather than on the footer's asymmetric middle track.
+- At narrow widths the toolbar keeps a 1rem clearance from the top-left UI and pushes the top-right UI off-screen (as before), rather than sliding under its neighbors.
+
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
 
 - Added `activeTool` prop (`{ type: ToolType } | { type: "custom"; customType: string }`) for forcing the active editor tool (controlled). While set, user- and API-driven tool switching is ignored — `setActiveTool` refuses non-matching activations with a console warning, non-forced toolbar buttons render disabled, and the tool-lock toggle (`Q`) is inert — and the editor snaps back if internal flows reset the tool (e.g. `restore()` on scene load). The forced tool behaves as if locked — it doesn't revert to selection after use and drawn elements aren't auto-selected — without mutating `appState.activeTool.locked`, so the user's persisted padlock preference stays untouched. Unset the prop to return tool control to the editor (the current tool stays active). The forced tool must be activatable to take effect — not disabled via `UIOptions.tools`, and (while non-interactive) allowed via `interaction.enabled.tools`; otherwise the editor stays on the `selection` tool and applies the forced tool once it becomes activatable. `image` cannot be forced (its activation opens the file picker). Composes with `interaction.enabled.tools` for presentation-style hosts: force `laser` for the presenter, `selection` + `interaction={false}` for viewers.
