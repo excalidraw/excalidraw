@@ -1015,10 +1015,11 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * Whether the active tool captures the primary pointer instead of the
-   * view-mode drag-to-pan — the laser always does; while non-interactive,
-   * any tool allowed via `interaction.enabled.tools` does. (Editing tools
-   * capture the pointer trivially since view mode implies they're not
-   * active; this predicate only matters where view-mode gates apply.)
+   * view-mode drag-to-pan — the laser and host-implemented custom tools do;
+   * while non-interactive, any tool allowed via
+   * `interaction.enabled.tools` does. (Editing tools capture the pointer
+   * trivially since view mode implies they're not active; this predicate only
+   * matters where view-mode gates apply.)
    */
   public isActiveToolPointerCapturing(): boolean {
     if (!this.isInteractionEnabled()) {
@@ -1026,7 +1027,10 @@ class App extends React.Component<AppProps, AppState> {
       // is inert — including the laser
       return this.isToolSupported(this.state.activeTool.type);
     }
-    return this.state.activeTool.type === "laser";
+    return (
+      this.state.activeTool.type === "laser" ||
+      this.state.activeTool.type === "custom"
+    );
   }
 
   /** Whether Excalidraw's full default UI is rendered. */
