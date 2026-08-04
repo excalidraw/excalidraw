@@ -332,10 +332,15 @@
     "embeddable": "Web Embed",
     "laser": "Laseraanwijzer",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Hand (panning tool)",
     "extraTools": "Meer tools",
     "mermaidToExcalidraw": "Mermaid naar Excalidraw",
     "convertElementType": "Vorm type in-/uitschakelen"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rechthoek",
