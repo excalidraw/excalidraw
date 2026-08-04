@@ -332,10 +332,15 @@
     "embeddable": "Веб вкладення",
     "laser": "Лазерний вказівник",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
     "mermaidToExcalidraw": "Mermaid у Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Прямокутник",
