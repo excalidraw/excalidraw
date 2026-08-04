@@ -332,10 +332,15 @@
     "embeddable": "افزونه وب",
     "laser": "اشاره گر لیزری",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
     "mermaidToExcalidraw": "مرمید به excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "مستطیل",
