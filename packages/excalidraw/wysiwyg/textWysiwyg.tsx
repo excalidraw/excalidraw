@@ -627,6 +627,20 @@ export const textWysiwyg = ({
     };
   }
 
+  // Capture-phase Ctrl+S prevention needed because Firefox may not honor
+  // preventDefault() when the event target is removed from the DOM during
+  // event processing (which happens in handleSubmit -> cleanup -> editable.remove)
+  const preventBrowserSave = (e: KeyboardEvent) => {
+    if (
+      e.key === KEYS.S &&
+      !e.shiftKey &&
+      e[KEYS.CTRL_OR_CMD]
+    ) {
+      e.preventDefault();
+    }
+  };
+  window.addEventListener("keydown", preventBrowserSave, { capture: true });
+
   editable.onkeydown = (event) => {
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
@@ -650,6 +664,8 @@ export const textWysiwyg = ({
       handleSubmit();
     } else if (actionSaveToActiveFile.keyTest(event)) {
       event.preventDefault();
+      event.stopPropagation();
+      submittedViaKeyboard = true;
       handleSubmit();
       app.actionManager.executeAction(actionSaveToActiveFile);
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
@@ -844,6 +860,8 @@ export const textWysiwyg = ({
     editable.onblur = null;
     editable.oninput = null;
     editable.onkeydown = null;
+
+    window.removeEventListener("keydown", preventBrowserSave, { capture: true });
 
     if (observer) {
       observer.disconnect();

@@ -820,7 +820,7 @@ class App extends React.Component<AppProps, AppState> {
         console.warn(`"image" tool cannot be forced via "props.activeTool"`);
       } else if (!this.isToolSupported(props.activeTool.type, props)) {
         console.warn(
-          `"${props.activeTool.type}" tool ("props.activeTool") cannot be activated — disabled via "UIOptions.tools", or not enabled while non-interactive (see "interaction.enabled.tools")`,
+          `"${props.activeTool.type}" tool ("props.activeTool") cannot be activated â€” disabled via "UIOptions.tools", or not enabled while non-interactive (see "interaction.enabled.tools")`,
         );
       } else {
         forcedActiveTool = updateActiveTool(defaultAppState, props.activeTool);
@@ -921,7 +921,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   /**
-   * Whether canvas navigation — panning & zooming, view-mode style — is
+   * Whether canvas navigation â€” panning & zooming, view-mode style â€” is
    * enabled. True when fully interactive, or when `interaction: { enabled:
    * { navigation: true } }`. Respects `appState.scrollConstraints`.
    */
@@ -970,8 +970,8 @@ class App extends React.Component<AppProps, AppState> {
    * disabled via `UIOptions.tools`, or when the editor is non-interactive
    * and the tool isn't kept user-driven via `interaction.enabled.tools`.
    *
-   * (Once UI tool availability is split from input availability — e.g.
-   * `props.ui.tools` vs `interaction.disabled.tools` — the UI axis moves
+   * (Once UI tool availability is split from input availability â€” e.g.
+   * `props.ui.tools` vs `interaction.disabled.tools` â€” the UI axis moves
    * out into its own predicate.)
    *
    * We purposely widen the `tool` type so this helper can be called with
@@ -1005,7 +1005,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /**
-   * Whether the active tool is locked in place — via the tool lock
+   * Whether the active tool is locked in place â€” via the tool lock
    * (padlock / Q) or by being host-forced (`props.activeTool`). A locked
    * tool doesn't revert to the selection tool after use, and elements drawn
    * with it aren't selected. Forcing deliberately does not mutate
@@ -1017,7 +1017,7 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * Whether the active tool captures the primary pointer instead of the
-   * view-mode drag-to-pan — the laser always does; while non-interactive,
+   * view-mode drag-to-pan â€” the laser always does; while non-interactive,
    * any tool allowed via `interaction.enabled.tools` does. (Editing tools
    * capture the pointer trivially since view mode implies they're not
    * active; this predicate only matters where view-mode gates apply.)
@@ -1025,7 +1025,7 @@ class App extends React.Component<AppProps, AppState> {
   public isActiveToolPointerCapturing(): boolean {
     if (!this.isInteractionEnabled()) {
       // an active tool that isn't allowed via `interaction.enabled.tools`
-      // is inert — including the laser
+      // is inert â€” including the laser
       return this.isToolSupported(this.state.activeTool.type);
     }
     return this.state.activeTool.type === "laser";
@@ -3116,12 +3116,12 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // handles only the navigation keyboard: page-scroll keys and
-  // `navigation`-flagged action shortcuts (canvas zoom & zoom-to-fit — see
+  // `navigation`-flagged action shortcuts (canvas zoom & zoom-to-fit â€” see
   // `ActionManager.handleKeyDown` gates); the rest of the keyboard handling
   // stays disabled while non-interactive
   private handleNavigationModeKeyDown = (event: KeyboardEvent) => {
     if (this.maybeHandlePageScrollKeyDown(event)) {
-      // the editor consumes the input — the page must not scroll along
+      // the editor consumes the input â€” the page must not scroll along
       event.preventDefault();
       return;
     }
@@ -3129,7 +3129,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /**
-   * PageUp/PageDown scroll the canvas by a page — vertically, or
+   * PageUp/PageDown scroll the canvas by a page â€” vertically, or
    * horizontally with shift. Respects `appState.scrollConstraints`
    * (via `viewport.translate`).
    */
@@ -3320,7 +3320,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // invariant: while non-interactive, the active tool is either
-    // input-enabled (`interaction.enabled.tools`) or the neutral default —
+    // input-enabled (`interaction.enabled.tools`) or the neutral default â€”
     // reset stale tool state (e.g. a presenter's laser after handing off)
     // so it doesn't leak through `onChange` / collab pointer payloads or
     // linger until interaction is re-enabled
@@ -3873,10 +3873,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (!this.isInteractionEnabled()) {
       // NOTE by not attaching the wheel/touch/gesture listeners below (which
-      // preventDefault), the browser default behavior — such as scrolling the
-      // page over the editor — is retained while non-interactive
+      // preventDefault), the browser default behavior â€” such as scrolling the
+      // page over the editor â€” is retained while non-interactive
       if (this.isNavigationEnabled()) {
-        // wheel pan/zoom & pinch — the editor consumes these again, so the
+        // wheel pan/zoom & pinch â€” the editor consumes these again, so the
         // page no longer scrolls over the editor
         this.onRemoveEventListenersEmitter.once(
           addEventListener(
@@ -4250,7 +4250,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    // Forced false while a viewport animation runs — the scroll-back-to-content
+    // Forced false while a viewport animation runs â€” the scroll-back-to-content
     // button must not render mid-animation (clicking it would fight the
     // animation, which overwrites the viewport every frame). The animation's
     // final commit lands after the animation is unregistered, settling this
@@ -5002,7 +5002,7 @@ class App extends React.Component<AppProps, AppState> {
 
   toggleLock = (source: "keyboard" | "ui" = "ui") => {
     if (this.props.activeTool) {
-      // the active tool — including its lock state — is host-controlled
+      // the active tool â€” including its lock state â€” is host-controlled
       return;
     }
     if (!this.state.activeTool.locked) {
@@ -5437,6 +5437,9 @@ class App extends React.Component<AppProps, AppState> {
         if (event.code === CODES.MINUS || event.code === CODES.EQUAL) {
           event.preventDefault();
           return;
+        }
+        if (!event.shiftKey && event.key === KEYS.S) {
+          event.preventDefault();
         }
       }
 
@@ -5956,14 +5959,14 @@ class App extends React.Component<AppProps, AppState> {
       !this.isSameForcedTool(this.props.activeTool, tool)
     ) {
       console.warn(
-        `"${tool.type}" tool activation ignored — the active tool is controlled by the host via "props.activeTool"`,
+        `"${tool.type}" tool activation ignored â€” the active tool is controlled by the host via "props.activeTool"`,
       );
       return;
     }
 
     if (this.drawShape.hasPendingGesture()) {
       // switching tools mid-sketch (e.g. paste resets to the selection tool)
-      // must not strand the gesture — commit it through the finalize funnel
+      // must not strand the gesture â€” commit it through the finalize funnel
       // while the drawShape tool is still active
       this.actionManager.executeAction(actionFinalize);
     }
@@ -6013,7 +6016,7 @@ class App extends React.Component<AppProps, AppState> {
           : null,
         frameToHighlight: null,
         // only the text tool offers arrow-endpoint binding, and the highlight
-        // is refreshed on pointermove — don't leave a stale one behind
+        // is refreshed on pointermove â€” don't leave a stale one behind
         hoveredArrowTextAnchor: null,
       } as const;
 
@@ -6225,7 +6228,7 @@ class App extends React.Component<AppProps, AppState> {
         // keyboard-submit keeps focus on the edited object. For bound text, keep
         // the container selected even if the text becomes empty and is deleted.
         // The autoshape tool stays active through the editing session and never
-        // selects anything — don't fight the finalize action's selection reset.
+        // selects anything â€” don't fight the finalize action's selection reset.
         const elementIdToSelect =
           viaKeyboard &&
           !this.isToolLocked() &&
@@ -6706,7 +6709,7 @@ class App extends React.Component<AppProps, AppState> {
       );
 
     if (arrowEndpointBinding) {
-      // an arrow endpoint is not a text container — the text is a sibling the
+      // an arrow endpoint is not a text container â€” the text is a sibling the
       // arrow binds to, not a label inside it
       container = null;
       insertAtParentCenter = false;
@@ -6735,8 +6738,8 @@ class App extends React.Component<AppProps, AppState> {
     }
     // The endpoint flow always creates a fresh text: the lookups below would
     // otherwise adopt a currently selected text (wherever it sits on canvas)
-    // or one that happens to lie around the anchor — even a container-bound
-    // one — and bind the arrow to that instead.
+    // or one that happens to lie around the anchor â€” even a container-bound
+    // one â€” and bind the arrow to that instead.
     const existingTextElement = arrowEndpointBinding
       ? null
       : this.getSelectedTextElement(container) ||
@@ -7191,7 +7194,7 @@ class App extends React.Component<AppProps, AppState> {
         if (container) {
           if (
             // with autoshape, any hit inside a bindable shape means "type in
-            // this shape" — unlike selection mode, a transparent unfilled
+            // this shape" â€” unlike selection mode, a transparent unfilled
             // container binds even when its stroke wasn't hit (Alt keeps the
             // free-text-at-point escape hatch)
             this.state.activeTool.type === "autoshape" ||
@@ -7346,8 +7349,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /**
-   * Applies (or clears) the element-link hover affordances — pointer cursor
-   * and tooltip — based on the current `hitLinkElement`. Returns whether a
+   * Applies (or clears) the element-link hover affordances â€” pointer cursor
+   * and tooltip â€” based on the current `hitLinkElement`. Returns whether a
    * link is being hovered.
    */
   private applyElementLinkHoverAffordance = (): boolean => {
@@ -7405,7 +7408,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * Restricted pointer handling for the non-interactive editor with links
    * and/or embeds allowed (`interaction.enabled.links` / `.embeds` /
-   * `.interactiveContent`) — runs only the element-link & embed concerns
+   * `.interactiveContent`) â€” runs only the element-link & embed concerns
    * (shared with the full pointer handlers above) so they behave like in
    * view mode without the rest of the canvas pointer machinery.
    */
@@ -8368,7 +8371,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     // with the active tool allowed via `interaction.enabled.tools`, the
-    // pointer keeps driving it through the full flow below — safe while
+    // pointer keeps driving it through the full flow below â€” safe while
     // non-interactive because that implies view mode, whose gates constrain
     // everything except the tool-usage path (laser & custom tools)
 
@@ -8941,7 +8944,7 @@ class App extends React.Component<AppProps, AppState> {
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state)) &&
           // reachable while non-interactive when the active tool is allowed
-          // via `interaction.enabled.tools` — panning must remain gated on
+          // via `interaction.enabled.tools` â€” panning must remain gated on
           // `navigation` then
           (this.isInteractionEnabled() || this.isNavigationEnabled())) ||
           (this.state.viewModeEnabled && !this.isActiveToolPointerCapturing()))
@@ -9744,12 +9747,12 @@ class App extends React.Component<AppProps, AppState> {
     let sceneY = pointerDownState.origin.y;
 
     // the click transitions into text editing either way, consuming (or
-    // bypassing) whatever anchor was highlighted — don't leave it lingering
+    // bypassing) whatever anchor was highlighted â€” don't leave it lingering
     // under the editor, which outlives the hover when the tool is locked
     this.setState({ hoveredArrowTextAnchor: null });
 
     // a free arrow endpoint takes precedence over adding a label *to* the
-    // arrow — it's the smaller, more deliberate target
+    // arrow â€” it's the smaller, more deliberate target
     const arrowEndpoint = this.arrowText.getBindableEndpointAtPosition(
       sceneX,
       sceneY,
@@ -10117,7 +10120,7 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD;
 
-      // clicking inside commit zone → finalize arrow
+      // clicking inside commit zone â†’ finalize arrow
       if (
         boundOutsideFromElsewhere || // Outside -> orbit: Bind immediately
         endOutsideSameElement || // End outside the start's element: Bind immediately
@@ -12838,7 +12841,7 @@ class App extends React.Component<AppProps, AppState> {
     if (canvas !== null) {
       this.interactiveCanvas = canvas;
 
-      // reflect state that landed before the canvas existed — the cursor is
+      // reflect state that landed before the canvas existed â€” the cursor is
       // otherwise only set imperatively on *changes* (e.g. the host-forced
       // tool seeded from `props.activeTool`, or view-mode drag-to-pan)
       this.cursor.reset();
@@ -13800,7 +13803,7 @@ class App extends React.Component<AppProps, AppState> {
   private savePointer = (x: number, y: number, button: "up" | "down") => {
     // don't broadcast pointer updates (props.onPointerUpdate) when
     // non-interactive, unless the active tool stays user-driven via
-    // `interaction.enabled.tools` — collaborators render e.g. a presenter's
+    // `interaction.enabled.tools` â€” collaborators render e.g. a presenter's
     // laser through these updates
     if (
       !this.isInteractionEnabled() &&
@@ -13959,3 +13962,4 @@ export const createTestHook = () => {
 
 createTestHook();
 export default App;
+
