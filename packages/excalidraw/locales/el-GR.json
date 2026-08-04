@@ -332,10 +332,15 @@
     "embeddable": "Web Embed",
     "laser": "Δείκτης λέιζερ",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Χέρι (εργαλείο μετακίνησης)",
     "extraTools": "Περισσότερα εργαλεία",
     "mermaidToExcalidraw": "Mermaid σε Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Ορθογώνιο",
