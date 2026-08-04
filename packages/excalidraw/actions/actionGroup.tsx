@@ -62,12 +62,7 @@ const allElementsInSameGroup = (
         ? elements[0].groupIds.slice(0, editingGroupIndex)
         : elements[0].groupIds;
     for (const groupId of groupIds) {
-      if (
-        elements.reduce(
-          (acc, element) => acc && isElementInGroup(element, groupId),
-          true,
-        )
-      ) {
+      if (elements.every((element) => isElementInGroup(element, groupId))) {
         return true;
       }
     }
