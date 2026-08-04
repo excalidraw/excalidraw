@@ -332,10 +332,15 @@
     "embeddable": "Web Embed",
     "laser": "Laserové ukazovátko",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Ruka (nástroj pro posouvání)",
     "extraTools": "Více nástrojů",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Obdélník",
