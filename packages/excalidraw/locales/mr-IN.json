@@ -332,10 +332,15 @@
     "embeddable": "वेब रुतवा",
     "laser": "लेसर टॉर्च",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "हात ( सरकवण्या चे उपकरण)",
     "extraTools": "आणिक यंत्रे",
     "mermaidToExcalidraw": "मर्मेड पासून एक्सकाली मधे",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "आयत",
