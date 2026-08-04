@@ -109,6 +109,7 @@
     "group": "그룹 생성",
     "ungroup": "그룹 해제",
     "collaborators": "공동 작업자",
+    "you": "",
     "toggleGrid": "격자 켜기/끄기",
     "addToLibrary": "라이브러리에 추가",
     "removeFromLibrary": "라이브러리에서 제거",
