@@ -531,3 +531,148 @@ export const getTextFromElements = (
     .join(separator);
   return text;
 };
+
+export const updateRangeColorsOnTextEdit = (
+  oldText: string,
+  oldRanges:
+    | readonly {
+        readonly start: number;
+        readonly end: number;
+        readonly color: string;
+      }[]
+    | undefined,
+  oldStrokeColor: string,
+  newText: string,
+  activeColor: string,
+): { start: number; end: number; color: string }[] | undefined => {
+  if (oldText === newText) {
+    return oldRanges ? oldRanges.map((r) => ({ ...r })) : undefined;
+  }
+
+  if (newText.length === 0) {
+    return undefined;
+  }
+
+  if (oldText.length === 0) {
+    return [{ start: 0, end: newText.length, color: activeColor }];
+  }
+
+  // Materialize old ranges so every character in oldText has an explicit color
+  const existing: { start: number; end: number; color: string }[] = [];
+  const normalizedOld =
+    oldRanges && oldRanges.length > 0
+      ? oldRanges
+      : [{ start: 0, end: oldText.length, color: oldStrokeColor }];
+
+  let currentPos = 0;
+  for (const r of normalizedOld) {
+    if (r.start > currentPos) {
+      existing.push({
+        start: currentPos,
+        end: r.start,
+        color: oldStrokeColor,
+      });
+    }
+    existing.push({
+      start: Math.max(0, r.start),
+      end: Math.min(oldText.length, r.end),
+      color: r.color,
+    });
+    currentPos = Math.min(oldText.length, r.end);
+  }
+  if (currentPos < oldText.length) {
+    existing.push({
+      start: currentPos,
+      end: oldText.length,
+      color: oldStrokeColor,
+    });
+  }
+
+  // Find longest common prefix
+  let prefixLen = 0;
+  while (
+    prefixLen < oldText.length &&
+    prefixLen < newText.length &&
+    oldText[prefixLen] === newText[prefixLen]
+  ) {
+    prefixLen++;
+  }
+
+  // Find longest common suffix
+  let suffixLen = 0;
+  while (
+    suffixLen < oldText.length - prefixLen &&
+    suffixLen < newText.length - prefixLen &&
+    oldText[oldText.length - 1 - suffixLen] ===
+      newText[newText.length - 1 - suffixLen]
+  ) {
+    suffixLen++;
+  }
+
+  const delStart = prefixLen;
+  const delEnd = oldText.length - suffixLen;
+  const insStart = prefixLen;
+  const insEnd = newText.length - suffixLen;
+  const delta = insEnd - insStart - (delEnd - delStart);
+
+  const updatedRanges: { start: number; end: number; color: string }[] = [];
+
+  for (const range of existing) {
+    if (range.end <= delStart) {
+      // Entirely before edit zone
+      updatedRanges.push({ ...range });
+    } else if (range.start >= delEnd) {
+      // Entirely after edit zone
+      updatedRanges.push({
+        start: range.start + delta,
+        end: range.end + delta,
+        color: range.color,
+      });
+    } else {
+      // Overlaps edit zone — slice remaining parts
+      if (range.start < delStart) {
+        updatedRanges.push({
+          start: range.start,
+          end: delStart,
+          color: range.color,
+        });
+      }
+      if (range.end > delEnd) {
+        updatedRanges.push({
+          start: delEnd + delta,
+          end: range.end + delta,
+          color: range.color,
+        });
+      }
+    }
+  }
+
+  // Add range for newly inserted text
+  if (insEnd > insStart) {
+    updatedRanges.push({
+      start: insStart,
+      end: insEnd,
+      color: activeColor,
+    });
+  }
+
+  // Sort ranges by start position
+  updatedRanges.sort((a, b) => a.start - b.start);
+
+  // Merge adjacent ranges with identical colors & filter out empty ranges
+  const merged: { start: number; end: number; color: string }[] = [];
+  for (const range of updatedRanges) {
+    if (range.start >= range.end) {
+      continue;
+    }
+    const last = merged[merged.length - 1];
+    if (last && last.end === range.start && last.color === range.color) {
+      last.end = range.end;
+    } else {
+      merged.push({ ...range });
+    }
+  }
+
+  return merged.length > 0 ? merged : undefined;
+};
+

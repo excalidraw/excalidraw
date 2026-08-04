@@ -9,6 +9,7 @@ import {
   getBoundTextMaxWidth,
   getBoundTextMaxHeight,
   computeBoundTextPosition,
+  updateRangeColorsOnTextEdit,
 } from "../src/textElement";
 import { detectLineHeight, getLineHeightInPx } from "../src/textMeasurements";
 
@@ -374,6 +375,69 @@ describe("Test computeBoundTextPosition", () => {
 
       expect(result.x).toBeCloseTo(135, 1);
       expect(result.y).toBeCloseTo(185, 1);
+    });
+  });
+
+  describe("Test updateRangeColorsOnTextEdit", () => {
+    it("preserves previous text colors when appending new text", () => {
+      const oldText = "Hello";
+      const oldRanges = undefined;
+      const result = updateRangeColorsOnTextEdit(
+        oldText,
+        oldRanges,
+        "#red",
+        "Hello World",
+        "#blue",
+      );
+
+      expect(result).toEqual([
+        { start: 0, end: 5, color: "#red" },
+        { start: 5, end: 11, color: "#blue" },
+      ]);
+    });
+
+    it("preserves prefix and suffix colors when inserting text in middle", () => {
+      const oldText = "Hello World";
+      const oldRanges = [
+        { start: 0, end: 5, color: "#red" },
+        { start: 5, end: 11, color: "#blue" },
+      ];
+      const result = updateRangeColorsOnTextEdit(
+        oldText,
+        oldRanges,
+        "#red",
+        "Hello Beautiful World",
+        "#green",
+      );
+
+      expect(result).toEqual([
+        { start: 0, end: 5, color: "#red" },
+        { start: 5, end: 6, color: "#blue" },
+        { start: 6, end: 16, color: "#green" },
+        { start: 16, end: 21, color: "#blue" },
+      ]);
+    });
+
+    it("shifts and removes ranges correctly on backspace/delete", () => {
+      const oldText = "Hello Beautiful World";
+      const oldRanges = [
+        { start: 0, end: 5, color: "#red" },
+        { start: 5, end: 15, color: "#green" },
+        { start: 15, end: 21, color: "#blue" },
+      ];
+      const result = updateRangeColorsOnTextEdit(
+        oldText,
+        oldRanges,
+        "#red",
+        "Hello World",
+        "#green",
+      );
+
+      expect(result).toEqual([
+        { start: 0, end: 5, color: "#red" },
+        { start: 5, end: 6, color: "#green" },
+        { start: 6, end: 11, color: "#blue" },
+      ]);
     });
   });
 });

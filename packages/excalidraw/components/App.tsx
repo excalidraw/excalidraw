@@ -174,6 +174,7 @@ import {
   getContainerElement,
   isValidTextContainer,
   redrawTextBoundingBox,
+  updateRangeColorsOnTextEdit,
   hasBoundingBox,
   getCommonFrameId,
   getFrameChildren,
@@ -6178,9 +6179,18 @@ class App extends React.Component<AppProps, AppState> {
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
+            const updatedRangeColors = updateRangeColorsOnTextEdit(
+              _element.originalText,
+              _element.rangeColors,
+              _element.strokeColor,
+              nextOriginalText,
+              this.state.currentItemStrokeColor,
+            );
+
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
+              rangeColors: updatedRangeColors,
               // returns (wrapped) text and new dimensions
               ...refreshTextDimensions(
                 _element,
@@ -6188,7 +6198,7 @@ class App extends React.Component<AppProps, AppState> {
                 elementsMap,
                 nextOriginalText,
               ),
-            });
+            } as any);
           }
           return _element;
         }),

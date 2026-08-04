@@ -375,6 +375,22 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
+      let activeColor = updatedTextElement.strokeColor;
+      if (
+        editable.selectionStart !== editable.selectionEnd &&
+        updatedTextElement.rangeColors &&
+        updatedTextElement.rangeColors.length > 0
+      ) {
+        const selStart = editable.selectionStart ?? 0;
+        const selEnd = editable.selectionEnd ?? 0;
+        const activeRange = updatedTextElement.rangeColors.find(
+          (r) => selStart >= r.start && selEnd <= r.end,
+        );
+        if (activeRange) {
+          activeColor = activeRange.color;
+        }
+      }
+
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -394,7 +410,7 @@ export const textWysiwyg = ({
         textAlign,
         verticalAlign,
         color: applyDarkModeFilter(
-          updatedTextElement.strokeColor,
+          activeColor,
           appState.theme === THEME.DARK,
         ),
         opacity: updatedTextElement.opacity / 100,
@@ -1008,6 +1024,8 @@ export const textWysiwyg = ({
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
+  editable.onselect = updateWysiwygStyle;
+  editable.onkeyup = updateWysiwygStyle;
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg

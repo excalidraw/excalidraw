@@ -367,77 +367,127 @@ export const actionChangeStrokeColor = register<
               return el;
             }
 
-            // If this is the text element being edited and there's
-            // a sub-selection, update rangeColors instead of strokeColor
-            if (
-              hasSubSelection &&
-              caretPos &&
-              el.id === editingTextId &&
-              isTextElement(el)
-            ) {
-              const newColor = value.currentItemStrokeColor;
-              const selStart = caretPos.start;
-              const selEnd = caretPos.end;
+            const newColor = value.currentItemStrokeColor;
 
-              // Get existing rangeColors or start fresh
-              const existingRanges: {
-                start: number;
-                end: number;
-                color: string;
-              }[] = [
-                ...((el as ExcalidrawTextElement).rangeColors ?? []),
-              ];
+            if (isTextElement(el)) {
+              // If this is the text element being edited and there's a sub-selection
+              if (
+                hasSubSelection &&
+                caretPos &&
+                el.id === editingTextId
+              ) {
+                const selStart = caretPos.start;
+                const selEnd = caretPos.end;
 
-              // Remove/split any existing ranges that overlap with
-              // the new selection range
-              const updatedRanges: {
-                start: number;
-                end: number;
-                color: string;
-              }[] = [];
+                // If the user selected the entire text, change strokeColor for the element
+                // and clear rangeColors.
+                if (selStart === 0 && selEnd >= el.originalText.length) {
+                  return newElementWith(el, {
+                    strokeColor: newColor,
+                    rangeColors: undefined,
+                  } as any);
+                }
 
-              for (const range of existingRanges) {
-                if (range.end <= selStart || range.start >= selEnd) {
-                  // No overlap — keep as-is
-                  updatedRanges.push(range);
-                } else {
-                  // Overlap — split around the new selection
-                  if (range.start < selStart) {
-                    updatedRanges.push({
-                      start: range.start,
-                      end: selStart,
-                      color: range.color,
-                    });
-                  }
-                  if (range.end > selEnd) {
-                    updatedRanges.push({
-                      start: selEnd,
-                      end: range.end,
-                      color: range.color,
-                    });
+                // Get existing rangeColors or initialize with full text using current strokeColor
+                const existingRanges: {
+                  start: number;
+                  end: number;
+                  color: string;
+                }[] = el.rangeColors?.length
+                  ? [...el.rangeColors]
+                  : [
+                      {
+                        start: 0,
+                        end: el.originalText.length,
+                        color: el.strokeColor,
+                      },
+                    ];
+
+                // Remove/split any existing ranges that overlap with
+                // the new selection range
+                const updatedRanges: {
+                  start: number;
+                  end: number;
+                  color: string;
+                }[] = [];
+
+                for (const range of existingRanges) {
+                  if (range.end <= selStart || range.start >= selEnd) {
+                    // No overlap — keep as-is
+                    updatedRanges.push(range);
+                  } else {
+                    // Overlap — split around the new selection
+                    if (range.start < selStart) {
+                      updatedRanges.push({
+                        start: range.start,
+                        end: selStart,
+                        color: range.color,
+                      });
+                    }
+                    if (range.end > selEnd) {
+                      updatedRanges.push({
+                        start: selEnd,
+                        end: range.end,
+                        color: range.color,
+                      });
+                    }
                   }
                 }
+
+                // Add the new range for the selection
+                updatedRanges.push({
+                  start: selStart,
+                  end: selEnd,
+                  color: newColor,
+                });
+
+                // Sort by start position
+                updatedRanges.sort((a, b) => a.start - b.start);
+
+                // Merge adjacent ranges with identical colors
+                const merged: { start: number; end: number; color: string }[] = [];
+                for (const r of updatedRanges) {
+                  if (r.start >= r.end) {
+                    continue;
+                  }
+                  const last = merged[merged.length - 1];
+                  if (last && last.end === r.start && last.color === r.color) {
+                    last.end = r.end;
+                  } else {
+                    merged.push({ ...r });
+                  }
+                }
+
+                return newElementWith(el, {
+                  strokeColor: el.strokeColor,
+                  rangeColors: merged,
+                } as any);
               }
 
-              // Add the new range for the selection
-              updatedRanges.push({
-                start: selStart,
-                end: selEnd,
-                color: newColor,
-              });
-
-              // Sort by start position
-              updatedRanges.sort((a, b) => a.start - b.start);
-
-              return newElementWith(el, {
-                rangeColors: updatedRanges,
-              } as any);
+              // No sub-selection for this text element:
+              // Do NOT change existing text colors if text already exists!
+              if (el.originalText.length > 0) {
+                const currentRanges = el.rangeColors?.length
+                  ? el.rangeColors
+                  : [
+                      {
+                        start: 0,
+                        end: el.originalText.length,
+                        color: el.strokeColor,
+                      },
+                    ];
+                return newElementWith(el, {
+                  strokeColor: el.strokeColor,
+                  rangeColors: currentRanges,
+                } as any);
+              }
             }
 
-            // Default: change strokeColor for the entire element
+            // Default: change strokeColor for the element
             return newElementWith(el, {
               strokeColor: value.currentItemStrokeColor,
-            });
+              rangeColors: undefined,
+            } as any);
           },
           true,
         ),
