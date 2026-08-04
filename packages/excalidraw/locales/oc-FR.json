@@ -332,10 +332,15 @@
     "embeddable": "Integracion Web",
     "laser": "Puntador laser",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
     "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rectangle",
