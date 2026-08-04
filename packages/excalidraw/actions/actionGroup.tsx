@@ -66,11 +66,7 @@ const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   return false;
 };
 
-const enableActionGroup = (
-  elements: readonly ExcalidrawElement[],
-  appState: UIAppState,
-  app: AppClassProperties,
-) => {
+const enableActionGroup = (appState: UIAppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,
     includeBoundTextElement: false,
@@ -89,6 +85,10 @@ export const actionGroup = register({
   icon: (appState) => <GroupIcon theme={appState.theme} />,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
+    if (!enableActionGroup(appState, app)) {
+      return false;
+    }
+
     const selectedElements = getRootElements(
       app.scene.getSelectedElements({
         selectedElementIds: appState.selectedElementIds,
@@ -194,13 +194,12 @@ export const actionGroup = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  predicate: (elements, appState, _, app) =>
-    enableActionGroup(elements, appState, app),
+  predicate: (elements, appState, _, app) => enableActionGroup(appState, app),
   keyTest: (event) =>
     !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <IconButton
-      hidden={!enableActionGroup(elements, appState, app)}
+      hidden={!enableActionGroup(appState, app)}
       type="button"
       icon={<GroupIcon theme={appState.theme} />}
       onClick={() => updateData(null)}
