@@ -1,7 +1,12 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
-import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
+import {
+  arrayToMap,
+  DEFAULT_SIDEBAR,
+  FONT_FAMILY,
+  ROUNDNESS,
+} from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
@@ -1264,5 +1269,203 @@ describe("repairing bindings", () => {
         containerId: null,
       }),
     ]);
+  });
+});
+
+describe("repairing frame membership", () => {
+  const makeFrame = () =>
+    API.createElement({
+      type: "frame",
+      id: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+  it("keeps frameId for an element fully inside the frame", () => {
+    const frame = makeFrame();
+    const inside = API.createElement({
+      type: "rectangle",
+      id: "inside",
+      x: 10,
+      y: 10,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+
+    const restoredElementsMap = arrayToMap(
+      restore.restoreElements([frame, inside], null, { repairBindings: true }),
+    );
+    expect(restoredElementsMap.get("inside")?.frameId).toBe(frame.id);
+  });
+
+  it("keeps frameId for an element intersecting the frame border", () => {
+    const frame = makeFrame();
+    // spans x:[90,130] — crosses the frame's right edge (x=100)
+    const straddling = API.createElement({
+      type: "rectangle",
+      id: "straddling",
+      x: 90,
+      y: 10,
+      width: 40,
+      height: 20,
+      frameId: frame.id,
+    });
+
+    const restoredElementsMap = arrayToMap(
+      restore.restoreElements([frame, straddling], null, {
+        repairBindings: true,
+      }),
+    );
+    expect(restoredElementsMap.get("straddling")?.frameId).toBe(frame.id);
+  });
+
+  it("removes frameId for an element fully outside the frame", () => {
+    const frame = makeFrame();
+    const outside = API.createElement({
+      type: "rectangle",
+      id: "outside",
+      x: 200,
+      y: 200,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+
+    const restoredElementsMap = arrayToMap(
+      restore.restoreElements([frame, outside], null, { repairBindings: true }),
+    );
+    expect(restoredElementsMap.get("outside")?.frameId).toBe(null);
+  });
+
+  it("removes frameId when the containing frame no longer exists", () => {
+    const orphan = API.createElement({
+      type: "rectangle",
+      id: "orphan",
+      x: 10,
+      y: 10,
+      frameId: "non-existent-frame",
+    });
+
+    const restoredElementsMap = arrayToMap(
+      restore.restoreElements([orphan], null, { repairBindings: true }),
+    );
+    expect(restoredElementsMap.get("orphan")?.frameId).toBe(null);
+  });
+
+  it("does NOT touch frameId when repairBindings is off", () => {
+    const frame = makeFrame();
+    const outside = API.createElement({
+      type: "rectangle",
+      id: "outside",
+      x: 200,
+      y: 200,
+      width: 20,
+      height: 20,
+      frameId: frame.id,
+    });
+
+    const restoredElementsMap = arrayToMap(
+      restore.restoreElements([frame, outside], null, {
+        repairBindings: false,
+      }),
+    );
+    expect(restoredElementsMap.get("outside")?.frameId).toBe(frame.id);
+  });
+
+  it("keeps a group atomic: members stay if ANY group member overlaps", () => {
+    const frame = makeFrame();
+    const insideMember = API.createElement({
+      type: "rectangle",
+      id: "insideMember",
+      x: 10,
+      y: 10,
+      width: 20,
+      height: 20,
+      groupIds: ["g1"],
+      frameId: frame.id,
+    });
+    const outsideMember = API.createElement({
+      type: "rectangle",
+      id: "outsideMember",
+      x: 300,
+      y: 300,
+      width: 20,
+      height: 20,
+      groupIds: ["g1"],
+      frameId: frame.id,
+    });
+
+    const restoredElementsMap = arrayToMap(
+      restore.restoreElements([frame, insideMember, outsideMember], null, {
+        repairBindings: true,
+      }),
+    );
+    // the whole group overlaps (via insideMember), so neither is evicted
+    expect(restoredElementsMap.get("insideMember")?.frameId).toBe(frame.id);
+    expect(restoredElementsMap.get("outsideMember")?.frameId).toBe(frame.id);
+  });
+
+  it("removes frameId for a whole group when no member overlaps", () => {
+    const frame = makeFrame();
+    const a = API.createElement({
+      type: "rectangle",
+      id: "a",
+      x: 200,
+      y: 200,
+      width: 20,
+      height: 20,
+      groupIds: ["g1"],
+      frameId: frame.id,
+    });
+    const b = API.createElement({
+      type: "rectangle",
+      id: "b",
+      x: 300,
+      y: 300,
+      width: 20,
+      height: 20,
+      groupIds: ["g1"],
+      frameId: frame.id,
+    });
+
+    const restoredElementsMap = arrayToMap(
+      restore.restoreElements([frame, a, b], null, { repairBindings: true }),
+    );
+    expect(restoredElementsMap.get("a")?.frameId).toBe(null);
+    expect(restoredElementsMap.get("b")?.frameId).toBe(null);
+  });
+
+  it("bound text follows its container's frame membership", () => {
+    const frameOutside = makeFrame();
+    const container = API.createElement({
+      type: "rectangle",
+      id: "container",
+      x: 300,
+      y: 300,
+      width: 40,
+      height: 40,
+      frameId: frameOutside.id,
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      x: 305,
+      y: 305,
+      containerId: container.id,
+      frameId: frameOutside.id,
+    });
+
+    const restoredElementsMap = arrayToMap(
+      restore.restoreElements([frameOutside, container, label], null, {
+        repairBindings: true,
+      }),
+    );
+    // container is fully outside -> both it and its bound text leave the frame
+    expect(restoredElementsMap.get("container")?.frameId).toBe(null);
+    expect(restoredElementsMap.get("label")?.frameId).toBe(null);
   });
 });
