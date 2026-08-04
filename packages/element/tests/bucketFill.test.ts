@@ -1048,6 +1048,74 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeLessThan(5500);
   });
 
+  it("bounds bridge-grid indexing for scene-spanning edges", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    // The chord needs the bridge grid to reach both rectangle walls.
+    const chord = API.createElement({
+      type: "line",
+      x: 6,
+      y: 50,
+      width: 88,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(88, 0)],
+    });
+    // This open line's bounds touch the owner's local search area, so its full
+    // million-pixel span joins the arrangement even though it does not bound
+    // the clicked face.
+    const sceneSpanning = API.createElement({
+      type: "line",
+      x: -500_000,
+      y: 105,
+      width: 1_000_000,
+      height: 0,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(1_000_000, 0),
+      ],
+    });
+    const { elements, elementsMap } = setup([rect, chord, sceneSpanning]);
+
+    const originalSet = Map.prototype.set;
+    let spatialBucketSets = 0;
+    const setSpy = vi
+      .spyOn(Map.prototype, "set")
+      .mockImplementation(function (this: Map<unknown, unknown>, key, value) {
+        if (typeof key === "string" && /^-?\d+:-?\d+$/.test(key)) {
+          spatialBucketSets++;
+          if (spatialBucketSets > 512) {
+            throw new Error("spatial grid exceeded its bucket budget");
+          }
+        }
+        return originalSet.call(this, key, value);
+      });
+
+    const result = (() => {
+      try {
+        return computeBucketFillPolygon({
+          point: pointFrom<GlobalPoint>(50, 25),
+          elements,
+          elementsMap,
+        });
+      } finally {
+        setSpy.mockRestore();
+      }
+    })();
+
+    expect(result.ok).toBe(true);
+    expect(spatialBucketSets).toBeLessThanOrEqual(512);
+    if (result.ok) {
+      expect(polygonArea(result.scenePoints)).toBeGreaterThan(4500);
+      expect(polygonArea(result.scenePoints)).toBeLessThan(5500);
+    }
+  });
+
   const lineSquare = (half: number) => {
     const mkLine = (x: number, y: number, dx: number, dy: number) =>
       API.createElement({

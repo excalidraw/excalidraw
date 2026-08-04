@@ -976,7 +976,10 @@ const buildFaces = (
     // the radius of a query point lies in the point's 3×3 cell
     // neighbourhood. Entries are never removed — edges deleted by `unlink`
     // are filtered out on lookup via `edgeSet`
-    const edgeCellSize = Math.max(bridgeRadius, 1);
+    // Keep the arrangement's longest axis to roughly 128 cells. The cell size
+    // remains at least `bridgeRadius`, so every edge within that radius is
+    // still guaranteed to lie in the query point's 3×3 neighbourhood.
+    const edgeCellSize = Math.max(bridgeRadius, sceneSpan / 128, 1);
     const edgeGrid = new Map<string, { u: number; v: number }[]>();
     const insertLiveEdge = (u: number, v: number) => {
       const edge = { u, v };
