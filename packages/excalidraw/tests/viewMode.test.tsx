@@ -1,4 +1,5 @@
 import React from "react";
+import { vi } from "vitest";
 
 import { CURSOR_TYPE, KEYS } from "@excalidraw/common";
 
@@ -8,6 +9,7 @@ import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
 import {
+  act,
   fireEvent,
   render,
   GlobalTestState,
@@ -57,6 +59,48 @@ describe("view mode", () => {
         CURSOR_TYPE.GRAB,
       );
     });
+  });
+
+  it("dispatches pointer events to custom tools in view mode", () => {
+    const onPointerDown = vi.fn();
+    const onPointerUp = vi.fn();
+
+    GlobalTestState.renderResult.rerender(
+      <Excalidraw
+        handleKeyboardGlobally={true}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+      />,
+    );
+
+    API.setAppState({ viewModeEnabled: true });
+    act(() => {
+      h.app.setActiveTool({
+        type: "custom",
+        customType: "comment",
+        locked: true,
+      });
+    });
+    expect(h.app.isInteractionEnabled()).toBe(true);
+
+    const { scrollX, scrollY } = h.state;
+
+    mouse.reset();
+    mouse.downAt(50, 50);
+    mouse.moveTo(100, 100);
+    mouse.upAt(100, 100);
+
+    expect(onPointerDown).toHaveBeenCalledTimes(1);
+    expect(onPointerDown.mock.calls[0][0]).toMatchObject({
+      type: "custom",
+      customType: "comment",
+    });
+    expect(onPointerUp).toHaveBeenCalledTimes(1);
+    expect(onPointerUp.mock.calls[0][0]).toMatchObject({
+      type: "custom",
+      customType: "comment",
+    });
+    expect([h.state.scrollX, h.state.scrollY]).toEqual([scrollX, scrollY]);
   });
 
   it("cursor should stay as grabbing type when hovering over canvas elements", async () => {
