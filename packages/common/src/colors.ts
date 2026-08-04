@@ -202,6 +202,17 @@ export const DEFAULT_ELEMENT_BACKGROUND_PICKS = [
   COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
 ] as ColorTuple;
 
+// ORDER matters for positioning in quick picker.
+// Same as element background picks, with `transparent` (a no-op fill for the
+// bucket tool) swapped for white.
+export const BUCKET_FILL_BACKGROUND_PICKS = [
+  COLOR_PALETTE.white,
+  COLOR_PALETTE.red[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
+  COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
+  COLOR_PALETTE.blue[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
+  COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
+] as ColorTuple;
+
 // ORDER matters for positioning in quick picker
 export const DEFAULT_CANVAS_BACKGROUND_PICKS = [
   COLOR_PALETTE.white,
@@ -239,6 +250,17 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
 
   ...COMMON_ELEMENT_SHADES,
 } as const;
+
+/**
+ * The color the bucket fill tool actually fills with: the shared
+ * `currentItemBackgroundColor`, falling back to green when that is
+ * transparent (the tool's picker doesn't offer transparent, but the shared
+ * state can hold it from the generic shape picker).
+ */
+export const getBucketFillBackgroundColor = (backgroundColor: string) =>
+  isTransparent(backgroundColor)
+    ? COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX]
+    : backgroundColor;
 
 // color palette helpers
 // -----------------------------------------------------------------------------
@@ -297,6 +319,17 @@ export const colorToHex = (color: string): string | null => {
 
 export const isTransparent = (color: string) => {
   return tinycolor(color).getAlpha() === 0;
+};
+
+/**
+ * Whether the color is fully opaque (alpha exactly 1).
+ *
+ * NOT the negation of `isTransparent`, which is true only at alpha 0 — a
+ * partial-alpha color (`#RRGGBBAA`, `rgba(…, 0.5)`) is neither transparent
+ * (it renders) nor opaque (what's beneath shows through it).
+ */
+export const isOpaqueColor = (color: string) => {
+  return tinycolor(color).getAlpha() === 1;
 };
 
 // -----------------------------------------------------------------------------

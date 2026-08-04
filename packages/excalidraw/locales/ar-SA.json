@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "متقطع",
     "strokeStyle_dotted": "منقط",
     "sloppiness": "الإمالة",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "الشفافية",
     "textAlign": "محاذاة النص",
     "edges": "الحواف",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -201,7 +207,7 @@
       "inputPlaceholder": "",
       "heading": "",
       "noResults": "",
-      "clearSearch": ""
+      "clearSearch": "امحُ البحث"
     }
   },
   "search": {
@@ -210,8 +216,8 @@
     "singleResult": "نتيجة",
     "multipleResults": "نتائج",
     "placeholder": "ابحث عن نص على اللوحة...",
-    "frames": "",
-    "texts": ""
+    "frames": "إطارات",
+    "texts": "نصوص"
   },
   "buttons": {
     "clearReset": "إعادة تعيين اللوحة",
@@ -245,11 +251,11 @@
     "objectsSnapMode": "التقاط إلى العناصر",
     "exitZenMode": "إلغاء وضع التأمل",
     "cancel": "إلغاء",
-    "saveLibNames": "",
+    "saveLibNames": "احفظ الاسم(اء) واخرج",
     "clear": "مسح",
     "remove": "إزالة",
     "embed": "تبديل الإدراج",
-    "publishLibrary": "",
+    "publishLibrary": "أعد التسمية أو أُنشر",
     "submit": "إرسال",
     "confirm": "تأكيد",
     "embeddableInteractionButton": "اضغط للتفاعل"
@@ -276,7 +282,7 @@
     "removeItemsFromsLibrary": "حذف {{count}} عنصر (عناصر) من المكتبة؟",
     "invalidEncryptionKey": "مفتاح التشفير يجب أن يكون من 22 حرفًا. التعاون المباشر معطل.",
     "collabOfflineWarning": "لا يوجد اتصال بالإنترنت.\nلن يتم حفظ التغييرات التي قمت بها!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "تجاوز حصة تخزين المتصفح. لن تُحفظ التغييرات."
   },
   "errors": {
     "unsupportedFileType": "نوع الملف غير مدعوم.",
@@ -307,7 +313,7 @@
   },
   "toolBar": {
     "selection": "تحديد",
-    "lasso": "",
+    "lasso": "اختيار لاسو",
     "image": "إدراج صورة",
     "rectangle": "مستطيل",
     "diamond": "مضلع",
@@ -325,10 +331,11 @@
     "magicframe": "Wireframe إلى كود",
     "embeddable": "تضمين ويب",
     "laser": "مؤشر ليزر",
+    "autoshape": "",
     "hand": "يد (أداة الإزاحة)",
     "extraTools": "المزيد من الأدوات",
     "mermaidToExcalidraw": "من Mermaid إلى Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "تبديل نوع الشكل"
   },
   "element": {
     "rectangle": "مستطيل",
@@ -352,21 +359,23 @@
     "shapes": "الأشكال"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} لإلغاء البحث",
+    "canvasPanning": "لتحريك القماشة، اضغط مطولًا على {{shortcut_1}} أو {{shortcut_2}} أثناء السحب، أو استخدم الأداة اليدوية",
     "linearElement": "انقر لبدء نقاط متعددة، اسحب لخط واحد",
-    "arrowTool": "",
+    "arrowTool": "انقر لبدء نقاط متعدّدة، اسحب لخط واحد. اضغط {{shortcut}} مرة أخرى لتغيير نوع السهم.",
     "arrowBindModifiers": "",
     "freeDraw": "انقر واسحب، أفرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
     "embeddable": "اضغط مع السحب لإنشاء موقع ويب مضمّن",
+    "autoshape": "",
     "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
+    "text_editing": "اضغط {{shortcut_1}} أو {{shortcut_2}} لإنهاء التحرير",
+    "linearElementMulti": "انقر على النقطة الأخيرة أو اضغط {{shortcut_1}} أو {{shortcut_2}} للإنهاء",
+    "lockAngle": "يمكنك تقييد الزاوية بالضغط على {{shortcut}}",
+    "resize": "يمكنك تقييد النسب بالضغط على {{shortcut_1}} أثناء تغيير الحجم،\nاضغط مطولاً على {{shortcut_2}} لتغيير الحجم من المركز",
+    "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط مطولًا على {{shortcut_1}}،\nاضغط مطولًا على {{shortcut_2}} لتغيير الحجم من المركز",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -378,8 +387,8 @@
     "eraserRevert": "",
     "firefox_clipboard_write": "يمكن على الأرجح تمكين هذه الميزة عن طريق تعيين علم \"dom.events.asyncClipboard.clipboardItem\" إلى \"true\". لتغيير أعلام المتصفح في Firefox، قم بزيارة صفحة \"about:config\".",
     "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "enterCropEditor": "انقر نقرًا مزدوجًا على الصورة أو اضغط {{shortcut}} لقص الصورة",
+    "leaveCropEditor": "انقر خارج الصورة أو اضغط {{shortcut_1}} أو {{shortcut_2}} لإنهاء القص"
   },
   "canvasError": {
     "cannotShowPreview": "تعذر عرض المعاينة",
@@ -411,8 +420,8 @@
     "title": "خطأ"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "يحفظ",
+    "defaultMessage": "جارٍ الإعداد للحفظ..."
   },
   "exportDialog": {
     "disk_title": "حفظ الملف على الجهاز",
@@ -576,9 +585,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "رسوماتك محفوظة في تخزين متصفحك.",
+      "center_heading_line2": "يُمكن محُ تخزين المتصفح بشكل غير متوقع.",
+      "center_heading_line3": "احفظ عملك في ملف بانتظام لتجنب فقدانه.",
       "center_heading_plus": "هل تريد الانتقال إلى Excalidraw+ بدلاً من ذلك؟",
       "menuHint": "التصدير، التفضيلات، اللغات..."
     },
@@ -590,12 +599,14 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "اللون",
     "mostUsedCustomColors": "الألوان المخصصة الأكثر استخدامًا",
     "colors": "الألوان",
     "shades": "الدرجات",
     "hexCode": "رمز Hex",
-    "noShades": "لا تتوفر درجات لهذا اللون"
+    "noShades": "لا تتوفر درجات لهذا اللون",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -634,30 +645,30 @@
     "description": "",
     "syntax": "صيغة Mermaid",
     "preview": "معاينة",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "اكتب تعريف الرسم البياني لـ Mermaid هنا...",
+    "autoFixAvailable": "الإصلاح التلقائي متوفر"
   },
   "ttd": {
-    "error": ""
+    "error": "خطأ!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "ابدأ كتابة فكرة الرسم البياني هنا... ({{shortcut}} للسطر الجديد)",
+    "inputPlaceholderWithMessages": "استمر في تحسين رسمتك البيانية...",
+    "generating": "يُولّد...",
+    "rateLimitRemaining": "{{count}} طلبات متبقية اليوم",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "أنت",
+      "assistant": "مساعد الذكاء الاصطناعي",
+      "system": "النظام"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "الذكاء الاصطناعي تجريبي",
+    "label": "محادثة",
+    "menu": "القائمة",
+    "newChat": "محادثة جديدة",
+    "deleteChat": "احذف المحادثة",
+    "deleteMessage": "احذف الرسالة",
+    "viewAsMermaid": "عرض كـ Mermaid",
     "placeholder": {
       "title": "",
       "description": "",
@@ -728,8 +739,8 @@
     "escape": "",
     "enter": "",
     "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "spacebar": "مسافة",
+    "delete": "احذف",
+    "mmb": "عجلة التمرير"
   }
 }

@@ -6,7 +6,7 @@
     "chartType_bar": "",
     "chartType_line": "",
     "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_plaintext": "טקסט פשוט",
     "selectAll": "בחירה בהכול",
     "multiSelect": "הוספת רכיב לבחירה",
     "moveCanvas": "הזזת הקנבס",
@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "מקווקו",
     "strokeStyle_dotted": "מנוקד",
     "sloppiness": "רישול",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
     "edges": "קצוות",
@@ -68,7 +71,7 @@
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
     "addWatermark": "הוספת „נוצר באמצעות Excalidraw”",
-    "handDrawn": "ציור יד",
+    "handDrawn": "שרבוט",
     "normal": "רגיל",
     "code": "קוד",
     "small": "קטן",
@@ -154,7 +157,7 @@
     },
     "polygon": {
       "breakPolygon": "",
-      "convertToPolygon": ""
+      "convertToPolygon": "המרה למצולע"
     },
     "elementLock": {
       "lock": "נעילה",
@@ -171,9 +174,9 @@
     "prompt": "בקשה",
     "followUs": "לעקוב אחרינו",
     "discordChat": "צ׳אט ב־Discord",
-    "zoomToFitViewport": "התאמת התקריב לגודל המסך",
-    "zoomToFitSelection": "להתמקד בחלק הנבחר",
-    "zoomToFit": "להציג את כל הרכיבים",
+    "zoomToFitViewport": "שינוי מרחק התצוגה כך שיתאים לגודל המסך",
+    "zoomToFitSelection": "שינוי מרחק התצוגה כך שיתאים לבחירה",
+    "zoomToFit": "שינוי מרחק התצוגה כך שיוצגו כל הרכיבים",
     "installPWA": "התקנת Excalidraw לשימוש מקומי (PWA)",
     "autoResize": "לאפשר התאמה אוטומטית של גודל הכתב",
     "imageCropping": "חיתוך תמונה",
@@ -181,12 +184,15 @@
     "copyElementLink": "העתקת קישור לפריט",
     "linkToElement": "קישור לפריט",
     "wrapSelectionInFrame": "לעטוף את הבחירה במסגרת",
-    "tab": "",
-    "shapeSwitch": "",
-    "preferences": "",
-    "preferences_toolLock": "",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "tab": "לשונית",
+    "shapeSwitch": "החלפת צורה",
+    "preferences": "העדפות",
+    "preferences_toolLock": "נעילת כלים",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "קשירת חצים",
+    "midpointSnapping": "הצמדה לנקודות ביניים"
   },
   "elementLink": {
     "title": "קישור לפריט",
@@ -198,10 +204,10 @@
     "hint_emptyLibrary": "נא לבחור משהו בקנבס כדי להוסיף אותו לכאן, או להתקין ספרייה מהמאגר הציבורי שלמטה.",
     "hint_emptyPrivateLibrary": "נא לבחור משהו בקנבס כדי להוסיף אותו לכאן.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "חיפוש בספרייה",
+      "heading": "תוצאת הספרייה תואמת",
+      "noResults": "לא נמצאו פריטים תואמים...",
+      "clearSearch": "ניקוי החיפוש"
     }
   },
   "search": {
@@ -210,8 +216,8 @@
     "singleResult": "תוצאה",
     "multipleResults": "תוצאות",
     "placeholder": "איתור טקסט בלוח הציור…",
-    "frames": "",
-    "texts": ""
+    "frames": "מסגרות",
+    "texts": "טקסט"
   },
   "buttons": {
     "clearReset": "איפוס לוח הציור",
@@ -227,9 +233,9 @@
     "close": "סגירה",
     "selectLanguage": "בחירת שפה",
     "scrollBackToContent": "גלילה בחזרה לתוכן",
-    "zoomIn": "הגדלה",
-    "zoomOut": "הקטנה",
-    "resetZoom": "איפוס תקריב",
+    "zoomIn": "התקרבות",
+    "zoomOut": "התרחקות",
+    "resetZoom": "איפוס מרחק התצוגה",
     "menu": "תפריט",
     "done": "בוצע",
     "edit": "עריכה",
@@ -245,11 +251,11 @@
     "objectsSnapMode": "הצמדה לעצמים",
     "exitZenMode": "יציאה ממצב ריכוז",
     "cancel": "ביטול",
-    "saveLibNames": "",
+    "saveLibNames": "שמירת שמות ויציאה",
     "clear": "ניקוי",
     "remove": "הסרה",
     "embed": "להציג את ההטמעה",
-    "publishLibrary": "",
+    "publishLibrary": "שינוי שם או פרסום",
     "submit": "שליחה",
     "confirm": "אישור",
     "embeddableInteractionButton": "לחיצה לתפעול"
@@ -276,7 +282,7 @@
     "removeItemsFromsLibrary": "מחק {{count}} פריט(ים) מהספריה?",
     "invalidEncryptionKey": "מפתח ההצפנה חייב להיות בן 22 תוים. השיתוף החי מנוטרל.",
     "collabOfflineWarning": "אין חיבור זמין לאינטרנט.\nהשינויים שלך לא ישמרו!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "הגעת למכסת השימוש בזיכרון הדפדפן. השינויים לא יישמרו."
   },
   "errors": {
     "unsupportedFileType": "סוג הקובץ אינו נתמך.",
@@ -307,7 +313,7 @@
   },
   "toolBar": {
     "selection": "בחירה",
-    "lasso": "",
+    "lasso": "בחירת לאסו",
     "image": "הוספת תמונה",
     "rectangle": "מלבן",
     "diamond": "יהלום",
@@ -325,10 +331,11 @@
     "magicframe": "תרשים קווי מתאר לקוד",
     "embeddable": "הטמעה באתר",
     "laser": "סמן לייזר",
+    "autoshape": "",
     "hand": "יד (כלי הזזה)",
     "extraTools": "כלים נוספים",
     "mermaidToExcalidraw": "Mermaid ל־Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "החלפת סוג צורה"
   },
   "element": {
     "rectangle": "מלבן",
@@ -352,7 +359,7 @@
     "shapes": "צורות"
   },
   "hints": {
-    "dismissSearch": "",
+    "dismissSearch": "‏{{shortcut}} להתעלמות מהחיפוש",
     "canvasPanning": "",
     "linearElement": "לחץ להתחלת מספר נקודות, גרור לקו יחיד",
     "arrowTool": "",
@@ -360,20 +367,22 @@
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
     "embeddable": "לחצו וגררו כדי ליצור הטמעת אתר",
-    "text_selected": "",
-    "text_editing": "",
+    "autoshape": "",
+    "text_selected": "לחיצה כפולה או הקשה על {{shortcut}} יאפשרו לך לערוך את הטקסט",
+    "text_editing": "יש ללחוץ על {{shortcut_1}} או {{shortcut_2}} לסיום העריכה",
     "linearElementMulti": "",
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
+    "lineEditor_line_info": "לחיצה כפולה או הקשה על {{shortcut}} יאפשרו לך לערוך נקודות",
+    "lineEditor_pointSelected": "יש ללחוץ על {{shortcut_1}} כדי להסיר נקודות,\nעל {{shortcut_2}} כדי לשכפל, או לגרור בשביל להזיז",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "פרסם ספריה משלך",
-    "bindTextToElement": "",
-    "createFlowchart": "",
+    "bindTextToElement": "‏{{shortcut}} להוספת טקסט",
+    "createFlowchart": "‏{{shortcut}} ליצירת תרשים זרימה",
     "deepBoxSelect": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״.",
@@ -411,8 +420,8 @@
     "title": "שגיאה"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "שמירה",
+    "defaultMessage": "בהכנות לשמירה..."
   },
   "exportDialog": {
     "disk_title": "שמור לכונן",
@@ -450,8 +459,8 @@
     "textNewLine": "הוסף שורה חדשה (עורך טקסט)",
     "title": "עזרה",
     "view": "תצוגה",
-    "zoomToFit": "זום להתאמת כל האלמנטים למסך",
-    "zoomToSelection": "התמקד בבחירה",
+    "zoomToFit": "שינוי מרחק התצוגה כך שיוצגו כל הרכיבים",
+    "zoomToSelection": "שינוי מרחק התצוגה כך שיתאים לבחירה",
     "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים",
     "movePageUpDown": "זוז עמוד למעלה/למטה",
     "movePageLeftRight": "זוז עמוד שמאלה/ימינה",
@@ -577,8 +586,8 @@
   "welcomeScreen": {
     "app": {
       "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading_line2": "זיכרון הדפדפן יכול להתנקות באופן לא צפוי.",
+      "center_heading_line3": "כדאי לשמור את העבודה שלך תדיר בתור קובץ בשביל שהיא לא תיאבד.",
       "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+ במקום?",
       "menuHint": "ייצוא, העדפות, שפות, ..."
     },
@@ -590,12 +599,14 @@
     }
   },
   "colorPicker": {
-    "color": "",
-    "mostUsedCustomColors": "הצבעים המותאמים הכי נפוצים",
+    "color": "צבע",
+    "mostUsedCustomColors": "הצבעים הייחודיים שהכי נפוצים",
     "colors": "צבעים",
     "shades": "הצללות",
     "hexCode": "קוד הקסדצימלי",
-    "noShades": "אין הצללות זמינות לצבע הזה"
+    "noShades": "אין הצללות זמינות לצבע הזה",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -636,10 +647,10 @@
     "preview": "תצוגה מקדימה",
     "label": "",
     "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "התיקון האוטומטי זמין"
   },
   "ttd": {
-    "error": ""
+    "error": "שגיאה!"
   },
   "chat": {
     "inputPlaceholder": "",
@@ -647,42 +658,42 @@
     "generating": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "אני",
+      "assistant": "מסייע AI",
+      "system": "מערכת"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
+    "aiBeta": "AI Beta",
+    "label": "שיחה",
+    "menu": "תפריט",
+    "newChat": "שיחה חדשה",
+    "deleteChat": "מחיקת שיחה",
+    "deleteMessage": "מחיקת הודעה",
     "viewAsMermaid": "",
     "placeholder": {
       "title": "",
       "description": "",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "תצוגה מקדימה",
+    "insert": "הוספה",
+    "retry": "ניסיון חוזר",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
+      "promptTooShort": "ההנחיה קצרה מדי (נדרשים {{min}} תווים לכל הפחות)",
+      "promptTooLong": "ההנחיה ארוכה מדי (נדרשים {{max}} תווים לכל היותר)",
       "generationFailed": "",
       "invalidDiagram": "",
       "fixInMermaid": "",
       "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "requestAborted": "הבקשה בוטלה",
+      "requestFailed": "הבקשה נכשלה",
+      "mermaidParseError": "שגיאת תחביר Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
+      "messageLimit": "הגעת למכסת השימוש ב־AI של התוכנית החינמית. נא לנסות את ‎Excalidraw+‏ בשביל לקבל מכסה רחבה יותר, או לחזור מחר.",
       "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimitInputPlaceholder": "הגעת למכסת ההודעות היומית"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "שדרוג לגרסת Plus"
   },
   "quickSearch": {
     "placeholder": "חיפוש מהיר"
@@ -721,15 +732,15 @@
     "shortcutHint": "ללוח פקודות, יש להשתמש ב־{{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "רווח",
+    "delete": "מחיקה",
+    "mmb": "גלגלת העכבר"
   }
 }

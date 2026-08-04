@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "پچڕ پچڕ",
     "strokeStyle_dotted": "خاڵدار",
     "sloppiness": "لێژی",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ڕوونی",
     "textAlign": "ڕێکخستنی دەق",
     "edges": "لێوارەکان",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
     "hand": "دەست (ئامرازی پانکردن)",
     "extraTools": "ئامرازی زیاتر",
     "mermaidToExcalidraw": "",
@@ -360,6 +367,7 @@
     "freeDraw": "کرتە بکە و ڕایبکێشە، کاتێک تەواو بوویت دەست هەڵگرە",
     "text": "زانیاری: هەروەها دەتوانیت دەق زیادبکەیت بە دوو کرتەکردن لە هەر شوێنێک لەگەڵ ئامڕازی دەستنیشانکردن",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "ڕەنگەکان",
     "shades": "سێبەرەکان",
     "hexCode": "کۆدی هێکس",
-    "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە"
+    "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
