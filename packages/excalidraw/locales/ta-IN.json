@@ -332,10 +332,15 @@
     "embeddable": "வலை நுழைப்பு",
     "laser": "சீரொளி குறிமுள்",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "கை (பார்வை நகர்கும் கருவி)",
     "extraTools": "மற்ற கருவிகள்",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "செவ்வகம்",
