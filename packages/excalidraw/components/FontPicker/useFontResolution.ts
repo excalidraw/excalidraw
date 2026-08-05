@@ -87,7 +87,7 @@ export const useFontResolution = ({
   }, []);
 
   // a `fontProviders` change swaps the `fonts` instance (see
-  // `componentDidUpdate`) - an in-flight resolution belongs to the old
+  // `AppFonts.onPropsUpdated`) - an in-flight resolution belongs to the old
   // provider set and must not apply its selection (or call its provider
   // callbacks) under the new one
   useEffect(() => {

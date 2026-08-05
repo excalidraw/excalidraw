@@ -568,7 +568,7 @@ describe("actionDuplicateSelection", () => {
       const { fontFace } =
         Fonts.registered.get("dupcontract:Font")!.fontFaces[0];
       act(() => {
-        window.h.app.fonts.onLoaded([fontFace]);
+        window.h.app.fonts.instance.onLoaded([fontFace]);
       });
 
       const text = API.createElement({ type: "text", text: "swap me" });

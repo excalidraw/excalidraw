@@ -103,7 +103,6 @@ import {
   deriveStylesPanelMode,
   isIOS,
   isBrave,
-  isSafari,
   type EditorInterface,
   type StylesPanelMode,
   loadDesktopUIModePreference,
@@ -111,8 +110,6 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
-  isCustomFontFamily,
-  type FontFamily,
 } from "@excalidraw/common";
 
 import {
@@ -175,7 +172,6 @@ import {
   getContainerCenter,
   getContainerElement,
   isValidTextContainer,
-  redrawTextBoundingBox,
   hasBoundingBox,
   getCommonFrameId,
   getFrameChildren,
@@ -395,8 +391,6 @@ import {
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
 
-import { Fonts } from "../fonts";
-
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
@@ -439,6 +433,7 @@ import { AppArrowText } from "./App.arrowText";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
+import { AppFonts } from "./App.fonts";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -460,8 +455,6 @@ import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
 
-import type { FontResolvers } from "../fonts";
-
 import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
@@ -477,7 +470,6 @@ import type {
   AppClassProperties,
   AppProps,
   AppState,
-  FontProviders,
   BinaryFileData,
   ExcalidrawImperativeAPI,
   BinaryFiles,
@@ -610,22 +602,6 @@ const YOUTUBE_VIDEO_STATES = new Map<
 
 const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
 
-/**
- * Narrow the host-facing `FontProviders` down to what the font layer needs,
- * keeping it free of UI concerns. Bound, as a provider may legitimately be a
- * class instance resolving against its own `this`.
- */
-const toFontResolvers = (
-  fontProviders: FontProviders | undefined,
-): FontResolvers | undefined =>
-  fontProviders &&
-  Object.fromEntries(
-    Object.entries(fontProviders).map(([id, provider]) => [
-      id,
-      provider.resolve.bind(provider),
-    ]),
-  );
-
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
@@ -653,7 +629,7 @@ class App extends React.Component<AppProps, AppState> {
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
   public scene: Scene;
-  public fonts: Fonts;
+  public fonts: AppFonts;
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
   /** whether the last render had any renderable elements (excludes e.g. the
@@ -895,7 +871,12 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.fonts = this.createFonts();
+    this.fonts = new AppFonts(this, {
+      // font reflows must not get absorbed into the next user action's undo
+      // delta (same pattern as the image-cache error path)
+      onBeforeSceneMutation: () =>
+        this.store.scheduleAction(CaptureUpdateAction.NEVER),
+    });
     this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
@@ -2735,7 +2716,7 @@ class App extends React.Component<AppProps, AppState> {
         name: this.getName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
-        fontResolvers: this.fonts.fontResolvers,
+        fontResolvers: this.fonts.instance.fontResolvers,
       },
     )
       .catch(muteFSAbortError)
@@ -3043,16 +3024,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (actionResult.loadFonts) {
-      const fonts = this.fonts;
-      // the default font may not be used by any element yet, so the elements
-      // alone wouldn't get it registered
-      const currentItemFontFamily =
-        actionResult.appState?.currentItemFontFamily;
-      fonts
-        .loadSceneFonts(
-          currentItemFontFamily === undefined ? [] : [currentItemFontFamily],
-        )
-        .then((fontFaces) => fonts.onLoaded(fontFaces));
+      this.fonts.refreshSceneFonts(
+        actionResult.appState?.currentItemFontFamily,
+      );
     }
 
     if (actionResult.files) {
@@ -3605,13 +3579,7 @@ class App extends React.Component<AppProps, AppState> {
     this.clearImageShapeCache();
 
     // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
-    // the default font may not be used by any element yet - pass it along
-    const fonts = this.fonts;
-    fonts
-      .loadSceneFonts([restoredAppState.currentItemFontFamily])
-      .then((fontFaces) => {
-        fonts.onLoaded(fontFaces);
-      });
+    this.fonts.refreshSceneFonts(restoredAppState.currentItemFontFamily);
 
     if (isElementLink(window.location.href)) {
       this.viewport.setViewport({
@@ -3737,7 +3705,7 @@ class App extends React.Component<AppProps, AppState> {
         },
         fonts: {
           configurable: true,
-          value: this.fonts,
+          get: () => this.fonts.instance,
         },
       });
     }
@@ -3823,16 +3791,12 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
-    this.fonts = new Fonts(
-      this.scene,
-      toFontResolvers(this.props.fontProviders),
-    );
+    this.fonts.destroy();
     this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
-    this.loadUpdatedSceneFontsThrottled.cancel();
     this.viewport.destroy();
     this.removeEventListeners();
     this.library.destroy();
@@ -3892,14 +3856,10 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.POINTER_UP, this.removePointer, {
         passive: false,
       }), // #3553
-      // rerender text elements on font load to fix #637 && #1553
       addEventListener(
         document.fonts,
         "loadingdone",
-        (event) => {
-          const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-          this.fonts.onLoaded(fontFaces);
-        },
+        this.fonts.onDocumentFontsLoaded,
         { passive: false },
       ),
       addEventListener(
@@ -4115,62 +4075,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private isGestureInFlight = () =>
-    this.state.selectedElementsAreBeingDragged ||
-    this.state.isResizing ||
-    this.state.isRotating ||
-    this.state.cursorButton === "down";
-
-  private createFonts = () =>
-    new Fonts(
-      this.scene,
-      toFontResolvers(this.props.fontProviders),
-      undefined,
-      {
-        // font reflows must not get absorbed into the next user action's undo
-        // delta (same pattern as the image-cache error path)
-        onBeforeSceneMutation: () =>
-          this.store.scheduleAction(CaptureUpdateAction.NEVER),
-        // ...and must wait out any in-flight gesture: `NEVER` wins the commit
-        // over the gesture's `EVENTUALLY`, corrupting its undo entry (flushed
-        // from `componentDidUpdate` when the gesture ends)
-        shouldDeferSceneMutation: this.isGestureInFlight,
-      },
-    );
-
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
-    if (prevProps.fontProviders !== this.props.fontProviders) {
-      // per the `FontProviders` contract a key always denotes the same font
-      // source, so only the key set matters - which also keeps an inline
-      // `fontProviders` object from churning the instance every render
-      const prevProviders = prevProps.fontProviders ?? {};
-      const nextProviders = this.props.fontProviders ?? {};
-      const addedKeys = Object.keys(nextProviders).filter(
-        (key) => !Object.hasOwn(prevProviders, key),
-      );
-      const removedKeys = Object.keys(prevProviders).filter(
-        (key) => !Object.hasOwn(nextProviders, key),
-      );
-
-      if (addedKeys.length || removedKeys.length) {
-        // resolvers are captured by the instance, so swap the whole instance -
-        // the page-global registry & failure set are unaffected
-        this.fonts = this.createFonts();
-
-        // an instance-field mutation - force a render so readers of
-        // `app.fonts` (i.e. the picker) observe it
-        this.setState({});
-
-        if (addedKeys.length) {
-          // new providers may make previously-unsupported families resolvable;
-          // removals add nothing resolvable, so they need no pass
-          const fonts = this.fonts;
-          fonts
-            .loadSceneFonts([this.state.currentItemFontFamily])
-            .then((fontFaces) => fonts.onLoaded(fontFaces));
-        }
-      }
-    }
+    this.fonts.onPropsUpdated(prevProps);
 
     // must be updated *before* state change listeners are triggered below
     if (!this._initialized && !this.state.isLoading) {
@@ -4366,29 +4272,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.store.commit(elementsMap, this.state);
 
-    // deferred font repairs run once the gesture fully ends - and only after
-    // the whole pointer-up chain, which schedules the gesture's capture
-    // *later* than the flags observed here flip. A repair's `NEVER` commit
-    // running first would eat the uncaptured gesture delta into the snapshot
-    const wasGestureInFlight =
-      prevState.selectedElementsAreBeingDragged ||
-      prevState.isResizing ||
-      prevState.isRotating ||
-      prevState.cursorButton === "down";
-    if (
-      wasGestureInFlight &&
-      !this.isGestureInFlight() &&
-      // no timer per gesture end when nothing is pending - the common
-      // (no custom fonts) case must stay free
-      this.fonts.hasPendingSceneRepairs()
-    ) {
-      setTimeout(() => {
-        if (!this.unmounted) {
-          // no-ops if a new gesture started meanwhile - its end reschedules
-          this.fonts.flushDeferredSceneRepairs();
-        }
-      });
-    }
+    this.fonts.onStateUpdated(prevState);
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -4853,72 +4737,7 @@ class App extends React.Component<AppProps, AppState> {
       (element) => this.scene.getElement(element.id) ?? [],
     );
 
-    const deferredBoundTextElements = new Map<
-      ExcalidrawElement["id"],
-      FontFamily
-    >();
-    insertedElements.forEach((newElement) => {
-      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
-        if (isCustomFontFamily(newElement.fontFamily)) {
-          // measuring with an unresolved custom family would use the fallback
-          // font's metrics - defer the redraw until the font settles below
-          deferredBoundTextElements.set(newElement.id, newElement.fontFamily);
-          return;
-        }
-        const container = getContainerElement(
-          newElement,
-          this.scene.getElementsMapIncludingDeleted(),
-        );
-        redrawTextBoundingBox(newElement, container, this.scene);
-      }
-    });
-
-    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
-    // we also need to resolve & load custom fonts for pasted text elements,
-    // otherwise they would render with the fallback font indefinitely
-    if (
-      isSafari ||
-      insertedElements.some(
-        (element) =>
-          isTextElement(element) && isCustomFontFamily(element.fontFamily),
-      )
-    ) {
-      const fonts = this.fonts;
-      Fonts.loadElementsFonts(insertedElements, fonts).then((fontFaces) => {
-        // a `fontProviders` swap replaces `this.fonts` but keeps the scene, so
-        // the deferred redraws stay valid - only unmount bails
-        if (this.unmounted) {
-          return;
-        }
-
-        fonts.onLoaded(fontFaces);
-
-        if (deferredBoundTextElements.size) {
-          fonts.runSceneRepair(() => {
-            const elementsMap = this.scene.getNonDeletedElementsMap();
-            for (const [elementId, fontFamily] of deferredBoundTextElements) {
-              const latestElement = elementsMap.get(elementId);
-              // redraw whether or not the font resolved - the pasted
-              // dimensions came from the source scene, so leaving them be on
-              // a failure keeps the text overflowing indefinitely
-              if (
-                !latestElement ||
-                !isTextElement(latestElement) ||
-                !isBoundToContainer(latestElement) ||
-                latestElement.fontFamily !== fontFamily
-              ) {
-                continue;
-              }
-
-              const container = getContainerElement(latestElement, elementsMap);
-              if (container) {
-                redrawTextBoundingBox(latestElement, container, this.scene);
-              }
-            }
-          });
-        }
-      });
-    }
+    this.fonts.onElementsInserted(insertedElements);
 
     if (opts.files) {
       this.addMissingFiles(opts.files);
@@ -5357,28 +5176,6 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /**
-   * Families the scene walk alone would miss - i.e. an incoming default font
-   * no element uses yet - to pass along with the next throttled font load.
-   */
-  private pendingSceneFontFamilies = new Set<FontFamily>();
-
-  /**
-   * Throttled, as `updateScene` runs on every remote collab increment and a
-   * scene using custom fonts would otherwise pay the character walk +
-   * `document.fonts.check` per family on each call. Leading edge keeps the
-   * first update immediate, trailing edge keeps the last one correct.
-   */
-  private loadUpdatedSceneFontsThrottled = throttle(() => {
-    const additionalFamilies = Array.from(this.pendingSceneFontFamilies);
-    this.pendingSceneFontFamilies.clear();
-
-    const fonts = this.fonts;
-    fonts
-      .loadSceneFonts(additionalFamilies)
-      .then((fontFaces) => fonts.onLoaded(fontFaces));
-  }, 1000);
-
-  /**
    * Update the scene with new elements, appState or collaborators.
    */
   public updateScene = withBatchedUpdates(
@@ -5425,40 +5222,10 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.replaceAllElements(elements);
       }
 
-      // keeps `updateScene` (i.e. every collab increment) free of font work
-      // when no custom fonts can exist, matching master
-      if (this.fonts.mayHaveCustomFonts()) {
-        // the incoming default font may not be used by any element yet
-        const currentItemFontFamily = (
-          appState as Pick<AppState, "currentItemFontFamily"> | null
-        )?.currentItemFontFamily;
-        const additionalFontFamilies: FontFamily[] = [];
-        if (
-          currentItemFontFamily !== undefined &&
-          this.fonts.shouldLoadCustomFamily(currentItemFontFamily)
-        ) {
-          additionalFontFamilies.push(currentItemFontFamily);
-        }
-
-        let shouldLoadFonts = additionalFontFamilies.length > 0;
-        if (elements) {
-          // unlike built-ins, custom families aren't lazily loadable by the
-          // browser until resolved
-          shouldLoadFonts ||= elements.some(
-            (element) =>
-              isTextElement(element) &&
-              this.fonts.shouldLoadCustomFamily(element.fontFamily),
-          );
-        }
-
-        if (shouldLoadFonts) {
-          // accumulated, so the next (possibly leading-edge) pass picks it up
-          for (const family of additionalFontFamilies) {
-            this.pendingSceneFontFamilies.add(family);
-          }
-          this.loadUpdatedSceneFontsThrottled();
-        }
-      }
+      this.fonts.onSceneUpdated(
+        elements,
+        appState as Pick<AppState, "currentItemFontFamily"> | null,
+      );
 
       if (collaborators) {
         this.laserTrails.updateCollabTrails(collaborators);
@@ -11399,25 +11166,13 @@ class App extends React.Component<AppProps, AppState> {
               this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
             });
 
-            // `onDuplicate` may have swapped a duplicate to a custom family
-            // the page hasn't loaded yet (mirrors the paste path). TRADE-OFF:
-            // load-only - a swap to an already-loaded family keeps the
-            // original geometry, which the host owns (`onDuplicate` JSDoc)
-            const insertedElements = duplicatedElements.flatMap(
-              (element) => this.scene.getElement(element.id) ?? [],
+            // `onDuplicate` may have replaced the inserted elements - operate
+            // on what the scene accepted, not on the pre-hook instances
+            this.fonts.onElementsDuplicated(
+              duplicatedElements.flatMap(
+                (element) => this.scene.getElement(element.id) ?? [],
+              ),
             );
-            if (
-              insertedElements.some(
-                (element) =>
-                  isTextElement(element) &&
-                  isCustomFontFamily(element.fontFamily),
-              )
-            ) {
-              const fonts = this.fonts;
-              Fonts.loadElementsFonts(insertedElements, fonts).then(
-                (fontFaces) => fonts.onLoaded(fontFaces),
-              );
-            }
           }
 
           return;

@@ -187,7 +187,7 @@ describe("history", () => {
       const { fontFace } =
         Fonts.registered.get("historyrepair:Font")!.fontFaces[0];
       act(() => {
-        h.app.fonts.onLoaded([fontFace]);
+        h.app.fonts.instance.onLoaded([fontFace]);
       });
       expect((h.elements[0] as ExcalidrawTextElement).lineHeight).toBe(
         originalLineHeight,

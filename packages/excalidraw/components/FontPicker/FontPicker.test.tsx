@@ -123,15 +123,15 @@ describe("FontPicker", () => {
     const { rerender } = await render(
       <Excalidraw fontProviders={providers()} />,
     );
-    const fonts = window.h.app.fonts;
+    const fonts = window.h.app.fonts.instance;
 
     // fresh object, same keys - contractually interchangeable
     rerender(<Excalidraw fontProviders={providers()} />);
-    expect(window.h.app.fonts).toBe(fonts);
+    expect(window.h.app.fonts.instance).toBe(fonts);
 
     // an added key is the one realistic change - swap
     rerender(<Excalidraw fontProviders={providers("added")} />);
-    await waitFor(() => expect(window.h.app.fonts).not.toBe(fonts));
+    await waitFor(() => expect(window.h.app.fonts.instance).not.toBe(fonts));
   });
 
   it("does not offer custom resolution without providers", async () => {
@@ -609,9 +609,11 @@ describe("FontPicker", () => {
       await waitFor(() => expect(resolver).toHaveBeenCalledTimes(1));
 
       // an added provider key swaps the fonts instance mid-resolution
-      const fontsBefore = window.h.app.fonts;
+      const fontsBefore = window.h.app.fonts.instance;
       rerender(<Excalidraw fontProviders={providers("added")} />);
-      await waitFor(() => expect(window.h.app.fonts).not.toBe(fontsBefore));
+      await waitFor(() =>
+        expect(window.h.app.fonts.instance).not.toBe(fontsBefore),
+      );
 
       // the old instance's resolution settling must not apply its selection
       await act(async () => {

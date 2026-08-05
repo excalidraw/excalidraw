@@ -1147,7 +1147,7 @@ export const actionChangeFontFamily = register<{
       // different bbox, which is fine)
       if (
         currentHoveredFontFamily &&
-        app.fonts.isFamilyLoaded(nextFontFamily)
+        app.fonts.instance.isFamilyLoaded(nextFontFamily)
       ) {
         skipFontFaceCheck = true;
       }
@@ -1228,7 +1228,7 @@ export const actionChangeFontFamily = register<{
           .load(fontString, chars)
           .then((fontFaces) => {
             if (elementContainerMapping.size) {
-              app.fonts.runSceneRepair(() => {
+              app.fonts.instance.runSceneRepair(() => {
                 for (const [element, container] of elementContainerMapping) {
                   // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
                   const latestElement = app.scene.getElement(element.id);
@@ -1253,7 +1253,7 @@ export const actionChangeFontFamily = register<{
             }
 
             // trigger update once we've mutated all the elements, which also updates our cache
-            app.fonts.onLoaded(fontFaces);
+            app.fonts.instance.onLoaded(fontFaces);
 
             // the redraw above happened after the action was applied, so the cache
             // still holds the pre-redraw (fallback font) dimensions - re-snapshot it
@@ -1399,7 +1399,7 @@ export const actionChangeFontFamily = register<{
             // keep the repair out of the next action's undo delta. NOT via
             // `runSceneRepair`: a hover-clear can't coincide with a gesture,
             // and the re-snapshot below must follow synchronously
-            app.fonts.onBeforeSceneMutation();
+            app.fonts.instance.onBeforeSceneMutation();
 
             for (const id of cachedElementsRef.current.keys()) {
               const element = app.scene.getElement(id);

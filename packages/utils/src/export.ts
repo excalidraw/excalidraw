@@ -43,7 +43,7 @@ type ExportOpts = {
    * Required to embed custom (provider-qualified) fonts - without the matching
    * resolver that text falls back to a generic font in the exported image.
    * Pass the same resolvers given to `fontProviders`, or
-   * `app.fonts.fontResolvers` when exporting from a mounted editor.
+   * `app.fonts.instance.fontResolvers` when exporting from a mounted editor.
    *
    * Required even when an editor on the page has the fonts registered:
    * `@excalidraw/utils` ships its own copy of the font registry, so

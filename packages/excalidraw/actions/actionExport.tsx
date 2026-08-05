@@ -280,7 +280,7 @@ export const actionSaveToActiveFile = register({
             exportedDataPromise,
             previousFileHandle,
             filename,
-            app.fonts.fontResolvers,
+            app.fonts.instance.fontResolvers,
           )
         : await saveAsJSON({
             data: exportedDataPromise,
