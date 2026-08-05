@@ -1,3 +1,7 @@
+import { useId } from "react";
+
+import clsx from "clsx";
+
 import { t } from "../../i18n";
 import { CloseIcon } from "../icons";
 
@@ -11,6 +15,15 @@ interface ViewportStatusFrameProps {
 
 const ViewportStatusFrame = ({ status }: ViewportStatusFrameProps) => {
   const { border, label } = status;
+  const labelId = useId();
+  const labelContent = label && (
+    <>
+      {label.icon && (
+        <span className="viewport-status-frame__badge-icon">{label.icon}</span>
+      )}
+      {label.label}
+    </>
+  );
 
   return (
     <>
@@ -22,20 +35,29 @@ const ViewportStatusFrame = ({ status }: ViewportStatusFrameProps) => {
       )}
       {label && (
         <div
-          className="viewport-status-frame__badge"
+          className={clsx("viewport-status-frame__badge", {
+            "viewport-status-frame__badge--clickable": label.onClick,
+          })}
           role="status"
           style={{
-            backgroundColor: label.background || border || undefined,
+            ["--viewport-status-frame-badge-background" as string]:
+              label.background || border || "var(--color-primary)",
             color: label.color,
           }}
         >
-          <div className="viewport-status-frame__badge-label">
-            {label.icon && (
-              <span className="viewport-status-frame__badge-icon">
-                {label.icon}
-              </span>
-            )}
-            {label.label}
+          {label.onClick && (
+            <button
+              type="button"
+              className="viewport-status-frame__badge-action"
+              aria-labelledby={labelId}
+              onClick={label.onClick}
+            />
+          )}
+          <div
+            className="viewport-status-frame__badge-label"
+            id={label.onClick ? labelId : undefined}
+          >
+            {labelContent}
           </div>
           {label.onClose && (
             <button

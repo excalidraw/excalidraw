@@ -85,7 +85,7 @@ export type Collaborator = Readonly<{
   // The url of the collaborator's avatar, defaults to username initials
   // if not present
   avatarUrl?: string;
-  // user id. If supplied, we'll filter out duplicates when rendering user avatars.
+  // Stable user id. A user may have multiple collaborators, one per client.
   id?: string;
   socketId?: SocketId;
   isCurrentUser?: boolean;
@@ -683,6 +683,8 @@ export type ViewportStatusFrame = {
     background?: string;
     /** badge text color; defaults to var(--color-primary-light) */
     color?: string;
+    /** makes the badge label interactive */
+    onClick?: () => void;
     /** renders a close button when set */
     onClose?: () => void;
   };
@@ -805,6 +807,7 @@ export type UIConfig = {
 };
 
 export interface ExcalidrawProps {
+  className?: string;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
