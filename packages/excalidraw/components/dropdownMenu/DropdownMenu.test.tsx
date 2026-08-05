@@ -48,7 +48,7 @@ describe("Test <DropdownMenu/>", () => {
       clientY: 10,
     } as const;
 
-    it("activates the item when the browser suppresses the click (iOS momentum/rubber-band scroll)", async () => {
+    it("activates the item when no native click follows the tap", async () => {
       const { container } = await render(<Excalidraw />);
       await openMainMenu(container);
 
@@ -56,12 +56,13 @@ describe("Test <DropdownMenu/>", () => {
       const onClickSpy = vi.fn();
       item.addEventListener("click", onClickSpy);
 
-      // Simulate iOS: a tap (pointer down/up without movement) whose `click`
-      // event the browser suppresses because it interrupted a scroll animation.
+      // Simulate the event sequence produced on iOS when a tap interrupts a
+      // scroll animation: pointer down/up are delivered but the browser does
+      // not dispatch a `click` (WebKit suppresses it). The fallback should
+      // replay the click so the item activates.
       fireEvent.pointerDown(item, pointerEventInit);
       fireEvent.pointerUp(item, pointerEventInit);
 
-      // The tap should still activate the item (menu closes) via the fallback.
       await waitFor(() => {
         expect(window.h.state.openMenu).toBe(null);
       });
@@ -89,6 +90,30 @@ describe("Test <DropdownMenu/>", () => {
 
       // the native click wins and the fallback is cancelled
       expect(onClickSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not re-run the action when a native click arrives after the fallback fired", async () => {
+      const { container } = await render(<Excalidraw />);
+      await openMainMenu(container);
+
+      const item = getSearchMenuItem();
+
+      // tap without a native click → fallback activates the item and closes
+      // the menu (action ran exactly once)
+      fireEvent.pointerDown(item, pointerEventInit);
+      fireEvent.pointerUp(item, pointerEventInit);
+
+      await waitFor(() => {
+        expect(window.h.state.openMenu).toBe(null);
+      });
+
+      // a late native click (as if the browser finally delivered it) must not
+      // re-run the action — the menu stays closed
+      fireEvent.click(item);
+
+      await waitFor(() => {
+        expect(window.h.state.openMenu).toBe(null);
+      });
     });
 
     it("does not activate items when the pointer moved (real drag/scroll)", async () => {

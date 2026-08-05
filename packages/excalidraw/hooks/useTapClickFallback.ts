@@ -17,30 +17,66 @@ type TapGesture = {
   dispatchingFallback: boolean;
 };
 
+/** elements a replayed click is allowed to activate */
+const ACTIVATABLE_SELECTOR = [
+  "button",
+  "a[href]",
+  "input",
+  "select",
+  "textarea",
+  '[role^="menuitem"]',
+  '[role="button"]',
+  '[role="link"]',
+  '[role="switch"]',
+].join(", ");
+
+const DISABLED_SELECTOR = "[disabled], [aria-disabled='true'], [data-disabled]";
+
 /**
- * Recovers "ghost clicks" in scrollable menus on iOS (iPad/iPhone).
+ * Resolves the element a replayed click should be dispatched on, or `null`
+ * when the tap landed on something that must not be activated (disabled
+ * controls, separators, empty menu space, non-interactive content).
+ */
+const resolveActivationTarget = (target: Element): HTMLElement | null => {
+  const el = target.closest<HTMLElement>(ACTIVATABLE_SELECTOR);
+  if (!el || el.closest(DISABLED_SELECTOR)) {
+    return null;
+  }
+  return el;
+};
+
+/**
+ * Recovers "ghost clicks" in scrollable menus on touch devices (iPad/iPhone).
  *
  * When a tap interrupts an active scroll animation (momentum scroll or the
  * rubber-band/elastic overscroll at the edges), WebKit deliberately suppresses
  * the resulting `click` event so the tap is treated as "stop the scroll" and
- * not as an activation (see https://github.com/WebKit/WebKit/commit/21aada2).
- * Because Radix menu items are activated via `click`, the tap is silently
- * dropped even though the menu item is already visible under the finger —
- * the user has to wait for the scroll to settle and tap again.
+ * not as an activation (documented behavior, see
+ * https://github.com/WebKit/WebKit/commit/21aada2). Because Radix menu items
+ * are activated via `click`, the tap is silently dropped even though the menu
+ * item is already visible under the finger — the user has to wait for the
+ * scroll to settle and tap again.
  *
- * This hook observes pointer events inside the menu and, when a tap (pointer
- * up without significant movement) does not produce a native `click` within a
- * single event-loop turn, replays one click on the tapped element so the menu
- * item activates as intended.
+ * This hook observes pointer events inside the menu and, when a touch tap
+ * (pointer up without significant movement) does not produce a native `click`
+ * within a single event-loop turn, replays one click on the tapped element so
+ * the menu item activates as intended. It never inspects scroll state — it
+ * only reacts to the browser delivering (or not delivering) the `click`.
  *
  * Safety properties:
+ * - Only touch pointers are considered; mouse/trackpad/pen are left alone
+ *   (mouse clicks are dispatched synchronously and can never be suppressed).
+ * - Only interactive, non-disabled elements (`button`, `a[href]`, menu items,
+ *   inputs, etc.) are replayed onto — empty space, separators and other
+ *   non-interactive content are never activated.
  * - Real drags (movement > `DRAGGING_THRESHOLD`) never activate.
- * - When the browser delivers the native click (mouse, trackpad, settled
- *   touch), it wins: the fallback is cancelled, so there is no double
- *   activation and existing behavior is unchanged.
- * - If the fallback fires and a late native click still arrives, the native
- *   click is swallowed to avoid activating the item twice.
- * - Keyboard navigation is untouched (no pointer events involved).
+ * - When the browser delivers the native click (settled menu), it wins: the
+ *   fallback is cancelled, so there is no double activation.
+ * - If the fallback fires and a late native click still arrives, the late
+ *   click is swallowed (event-driven latch) so the item is not activated
+ *   twice; the latch is disarmed by any new pointer interaction or keydown on
+ *   the menu, so subsequent intentional clicks keep working.
+ * - Keyboard navigation is untouched.
  */
 export const useTapClickFallback = <T extends HTMLElement>() => {
   const [element, setElement] = useState<T | null>(null);
@@ -52,6 +88,11 @@ export const useTapClickFallback = <T extends HTMLElement>() => {
     }
 
     let gesture: TapGesture | null = null;
+    // Event-driven latch: after we replay a click, the next native click that
+    // arrives on the same element is the (late) one the browser suppressed —
+    // swallow it so the item isn't activated twice. Deliberately kept outside
+    // the gesture lifecycle: it must survive `reset()`.
+    let swallowTarget: HTMLElement | null = null;
 
     const clearFallbackTimer = () => {
       if (gesture?.fallbackTimer != null) {
@@ -66,10 +107,16 @@ export const useTapClickFallback = <T extends HTMLElement>() => {
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (event.isPrimary === false) {
+      // Any new pointer interaction supersedes a pending swallow, so the
+      // following real click is never eaten.
+      if (swallowTarget && swallowTarget.contains(event.target as Node)) {
+        swallowTarget = null;
+      }
+
+      if (event.pointerType !== "touch") {
         return;
       }
-      if (event.pointerType === "mouse" && event.button !== 0) {
+      if (event.isPrimary === false) {
         return;
       }
 
@@ -101,16 +148,16 @@ export const useTapClickFallback = <T extends HTMLElement>() => {
       if (!gesture || gesture.moved) {
         return;
       }
-      if (event.isPrimary === false) {
+      if (event.pointerType !== "touch") {
         return;
       }
-      if (event.pointerType === "mouse" && event.button !== 0) {
+      if (event.isPrimary === false) {
         return;
       }
 
       // `pointerup` target is hit-tested by the browser, i.e. the element the
-      // finger/cursor was over when released — exactly the element the browser
-      // would have clicked (and whose click it may have suppressed).
+      // finger was over when released — exactly the element the browser would
+      // have clicked (and whose click it may have suppressed).
       const target =
         event.target instanceof Element ? event.target : gesture.target;
       gesture.target = target;
@@ -132,16 +179,17 @@ export const useTapClickFallback = <T extends HTMLElement>() => {
           return;
         }
         const { nativeClickFired, target: tapTarget } = currentGesture;
-        if (!nativeClickFired && tapTarget instanceof HTMLElement) {
-          currentGesture.fallbackFired = true;
-          currentGesture.dispatchingFallback = true;
-          // Click the closest anchor when present so that its default
-          // navigation behavior runs, otherwise the tapped element itself
-          // (the click bubbles up to the containing menu item).
-          const clickTarget =
-            (tapTarget.closest("a[href]") as HTMLElement | null) ?? tapTarget;
-          clickTarget.click();
-          currentGesture.dispatchingFallback = false;
+        if (!nativeClickFired && tapTarget) {
+          const clickTarget = resolveActivationTarget(tapTarget);
+          if (clickTarget) {
+            currentGesture.fallbackFired = true;
+            currentGesture.dispatchingFallback = true;
+            clickTarget.click();
+            currentGesture.dispatchingFallback = false;
+            // arm the latch: a late native click on this element must not
+            // activate it a second time
+            swallowTarget = clickTarget;
+          }
         }
         reset();
       }, 0);
@@ -151,19 +199,29 @@ export const useTapClickFallback = <T extends HTMLElement>() => {
       reset();
     };
 
+    const onKeyDown = () => {
+      // a keyboard activation (Enter/Space on a focused item) dispatches a
+      // click without a pointerdown — disarm so it is never swallowed
+      swallowTarget = null;
+    };
+
     // Swallow a native click that arrives after we already replayed the click
     // (otherwise the menu item would be activated twice).
     const onClickCapture = (event: MouseEvent) => {
-      if (!gesture || gesture.dispatchingFallback) {
+      if (gesture?.dispatchingFallback) {
         return;
       }
       if (!element.contains(event.target as Node)) {
         return;
       }
-      if (gesture.fallbackFired) {
+      if (swallowTarget && swallowTarget.contains(event.target as Node)) {
+        swallowTarget = null;
         event.preventDefault();
         event.stopPropagation();
-      } else {
+        reset();
+        return;
+      }
+      if (gesture) {
         gesture.nativeClickFired = true;
       }
     };
@@ -173,6 +231,7 @@ export const useTapClickFallback = <T extends HTMLElement>() => {
     element.addEventListener("pointerup", onPointerUp, true);
     element.addEventListener("pointercancel", onPointerCancel, true);
     element.addEventListener("click", onClickCapture, true);
+    element.addEventListener("keydown", onKeyDown);
 
     return () => {
       reset();
@@ -181,6 +240,7 @@ export const useTapClickFallback = <T extends HTMLElement>() => {
       element.removeEventListener("pointerup", onPointerUp, true);
       element.removeEventListener("pointercancel", onPointerCancel, true);
       element.removeEventListener("click", onClickCapture, true);
+      element.removeEventListener("keydown", onKeyDown);
     };
   }, [element]);
 
