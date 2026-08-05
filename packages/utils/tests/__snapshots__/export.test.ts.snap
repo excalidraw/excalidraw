@@ -46,7 +46,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -108,7 +107,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "zenModeEnabled": false,

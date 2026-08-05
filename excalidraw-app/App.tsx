@@ -33,7 +33,7 @@ import {
   isDevEnv,
 } from "@excalidraw/common";
 import polyfill from "@excalidraw/excalidraw/polyfill";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { t } from "@excalidraw/excalidraw/i18n";
 
@@ -97,6 +97,7 @@ import Collab, {
   collabAPIAtom,
   isCollaboratingAtom,
   isOfflineAtom,
+  userToFollowAtom,
 } from "./collab/Collab";
 import { AppFooter } from "./components/AppFooter";
 import { AppMainMenu } from "./components/AppMainMenu";
@@ -139,6 +140,7 @@ import DebugCanvas, {
   isVisualDebuggerEnabled,
   loadSavedDebugState,
 } from "./components/DebugCanvas";
+import { useSimulatedCollaborators } from "./debugCollaborators";
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 
@@ -409,6 +411,37 @@ const ExcalidrawWrapper = () => {
     return isCollaborationLink(window.location.href);
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
+  const userToFollow = useAtomValue(userToFollowAtom);
+
+  const viewportStatusFrame = useMemo(
+    () =>
+      userToFollow
+        ? {
+            border: "var(--color-primary-hover)",
+            label: {
+              label: (
+                <>
+                  Following{" "}
+                  <span
+                    style={{
+                      display: "block",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: 100,
+                    }}
+                    title={userToFollow.username}
+                  >
+                    {userToFollow.username}
+                  </span>
+                </>
+              ),
+              onClose: () => collabAPI?.setUserToFollow(null),
+            },
+          }
+        : null,
+    [userToFollow, collabAPI],
+  );
 
   useHandleLibrary({
     excalidrawAPI,
@@ -433,6 +466,11 @@ const ExcalidrawWrapper = () => {
       forceRefresh((prev) => !prev);
     }
   }, [excalidrawAPI]);
+
+  // ?collaborators=<N> — populate the canvas with N static fake
+  // collaborators for exercising avatar/UserList UI without a real
+  // collab room
+  useSimulatedCollaborators(excalidrawAPI);
 
   // ---------------------------------------------------------------------------
   // Hoisted loadImages
@@ -908,6 +946,8 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
+        viewportStatusFrame={viewportStatusFrame}
+        userToFollow={userToFollow}
         onChange={onChange}
         onExport={onExport}
         initialData={initialStatePromiseRef.current.promise}

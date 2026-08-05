@@ -446,7 +446,7 @@ import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
-import FollowMode from "./FollowMode/FollowMode";
+import ViewportStatusFrame from "./ViewportStatusFrame/ViewportStatusFrame";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
@@ -1053,10 +1053,11 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * Whether the active tool captures the primary pointer instead of the
-   * view-mode drag-to-pan — the laser always does; while non-interactive,
-   * any tool allowed via `interaction.enabled.tools` does. (Editing tools
-   * capture the pointer trivially since view mode implies they're not
-   * active; this predicate only matters where view-mode gates apply.)
+   * view-mode drag-to-pan — the laser and host-implemented custom tools do;
+   * while non-interactive, any tool allowed via
+   * `interaction.enabled.tools` does. (Editing tools capture the pointer
+   * trivially since view mode implies they're not active; this predicate only
+   * matters where view-mode gates apply.)
    */
   public isActiveToolPointerCapturing(): boolean {
     if (!this.isInteractionEnabled()) {
@@ -1064,7 +1065,10 @@ class App extends React.Component<AppProps, AppState> {
       // is inert — including the laser
       return this.isToolSupported(this.state.activeTool.type);
     }
-    return this.state.activeTool.type === "laser";
+    return (
+      this.state.activeTool.type === "laser" ||
+      this.state.activeTool.type === "custom"
+    );
   }
 
   /** Whether Excalidraw's full default UI is rendered. */
@@ -2517,6 +2521,7 @@ class App extends React.Component<AppProps, AppState> {
                             generateLinkForSelection={
                               this.props.generateLinkForSelection
                             }
+                            currentUserControls={this.props.currentUserControls}
                           >
                             {this.props.children}
                           </LayerUI>
@@ -2749,15 +2754,11 @@ class App extends React.Component<AppProps, AppState> {
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
                           />
-                          {this.isDefaultUIEnabled() &&
-                            this.state.userToFollow && (
-                              <FollowMode
-                                width={this.state.width}
-                                height={this.state.height}
-                                userToFollow={this.state.userToFollow}
-                                onDisconnect={this.maybeUnfollowRemoteUser}
-                              />
-                            )}
+                          {this.props.viewportStatusFrame && (
+                            <ViewportStatusFrame
+                              status={this.props.viewportStatusFrame}
+                            />
+                          )}
                           {this.renderFrameNames()}
                           {this.state.activeEmbeddable?.state === "active" && //zsviczian
                             this.props.renderEmbeddableMenu?.(this.state)}
@@ -4307,14 +4308,6 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ showWelcomeScreen: true });
     }
 
-    const hasFollowedPersonLeft =
-      prevState.userToFollow &&
-      !this.state.collaborators.has(prevState.userToFollow.socketId);
-
-    if (hasFollowedPersonLeft) {
-      this.maybeUnfollowRemoteUser();
-    }
-
     if (
       prevState.zoom.value !== this.state.zoom.value ||
       prevState.scrollX !== this.state.scrollX ||
@@ -4330,22 +4323,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state.scrollY,
         this.state.zoom,
       );
-    }
-
-    if (prevState.userToFollow !== this.state.userToFollow) {
-      if (prevState.userToFollow) {
-        this.onUserFollowEmitter.trigger({
-          userToFollow: prevState.userToFollow,
-          action: "UNFOLLOW",
-        });
-      }
-
-      if (this.state.userToFollow) {
-        this.onUserFollowEmitter.trigger({
-          userToFollow: this.state.userToFollow,
-          action: "FOLLOW",
-        });
-      }
     }
 
     // zsviczian
@@ -4988,22 +4965,10 @@ class App extends React.Component<AppProps, AppState> {
           editorJotaiStore.get(isSidebarDockedAtom)
             ? this.state.openSidebar
             : null,
-        ...selectGroupsForSelectedElements(
-          {
-            editingGroupId: null,
-            selectedElementIds: nextElementsToSelect.reduce(
-              (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                if (!isBoundToContainer(element)) {
-                  acc[element.id] = true;
-                }
-                return acc;
-              },
-              {},
-            ),
-          },
+        ...getSelectionStateForElements(
+          nextElementsToSelect,
           this.scene.getNonDeletedElements(),
           this.state,
-          this,
         ),
       },
       () => {
@@ -5335,9 +5300,22 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private maybeUnfollowRemoteUser = () => {
-    if (this.state.userToFollow) {
-      this.setState({ userToFollow: null });
+  /** emits a follow/unfollow intent to the host (which owns the
+   *  `userToFollow` state) via both the `onUserFollow` prop and the
+   *  imperative API emitter */
+  public emitUserFollowIntent = (payload: OnUserFollowedPayload) => {
+    this.onUserFollowEmitter.trigger(payload);
+    this.props.onUserFollow?.(payload);
+  };
+
+  /** emits an UNFOLLOW intent if currently following someone — use on
+   *  user-initiated viewport changes which should break follow mode */
+  public requestUnfollow = () => {
+    if (this.props.userToFollow) {
+      this.emitUserFollowIntent({
+        userToFollow: this.props.userToFollow,
+        action: "UNFOLLOW",
+      });
     }
   };
 
@@ -9042,7 +9020,11 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
-    this.maybeUnfollowRemoteUser();
+    // laser pointer is a presentation aid, not an edit — using it while
+    // following someone shouldn't break follow
+    if (this.state.activeTool.type !== "laser") {
+      this.requestUnfollow();
+    }
 
     if (this.state.searchMatches) {
       this.setState((state) => {
@@ -11452,6 +11434,7 @@ class App extends React.Component<AppProps, AppState> {
                   initialState: ret.pointerDownState,
                   selectedPointsIndices: ret.selectedPointsIndices,
                   segmentMidPointHoveredCoords: null,
+                  isDragging: true,
                 },
               });
             }
