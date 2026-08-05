@@ -1,6 +1,7 @@
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import {
+  DEFAULT_FONT_FAMILY,
   FONT_FAMILY,
   FONT_FAMILY_FALLBACKS,
   isCustomFontFamily,
@@ -161,12 +162,10 @@ export const setCustomFontMetadata = (
   customFontMetadata.set(family, metadata);
 };
 
-export const getFontMetadata = (
-  fontFamily: FontFamily,
-): FontMetadata | undefined =>
-  isCustomFontFamily(fontFamily)
+export const getFontMetadata = (fontFamily: FontFamily): FontMetadata =>
+  (isCustomFontFamily(fontFamily)
     ? customFontMetadata.get(fontFamily)
-    : FONT_METADATA[fontFamily];
+    : FONT_METADATA[fontFamily]) ?? FONT_METADATA[DEFAULT_FONT_FAMILY];
 
 /**
  * Whether real metrics exist for the family. Built-ins always count - even an
@@ -200,9 +199,8 @@ export const getVerticalOffset = (
   fontSize: ExcalidrawTextElement["fontSize"],
   lineHeightPx: number,
 ) => {
-  const { unitsPerEm, ascender, descender } = (
-    getFontMetadata(fontFamily) ?? FONT_METADATA[FONT_FAMILY.Excalifont]
-  ).metrics;
+  const { unitsPerEm, ascender, descender } =
+    getFontMetadata(fontFamily).metrics;
 
   const fontSizeEm = fontSize / unitsPerEm;
   const lineGap =
@@ -216,9 +214,7 @@ export const getVerticalOffset = (
  * Gets line height for a selected family.
  */
 export const getLineHeight = (fontFamily: FontFamily) => {
-  const { lineHeight } = (
-    getFontMetadata(fontFamily) ?? FONT_METADATA[FONT_FAMILY.Excalifont]
-  ).metrics;
+  const { lineHeight } = getFontMetadata(fontFamily).metrics;
 
   return lineHeight as ExcalidrawTextElement["lineHeight"];
 };

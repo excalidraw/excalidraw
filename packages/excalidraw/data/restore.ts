@@ -19,7 +19,6 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
-  isCustomFontFamily,
   isProviderQualifiedFontFamily,
   STROKE_WIDTH,
   STROKE_WIDTH_KEYS,
@@ -291,10 +290,13 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
  * would render with whatever the host's CSS resolves, which differs per
  * machine and is nothing we can load or export.
  */
-const restoreFontFamily = (
-  fontFamily: ExcalidrawTextElement["fontFamily"],
-): FontFamily =>
-  isCustomFontFamily(fontFamily) ? getFontFamilyByName(fontFamily) : fontFamily;
+const restoreFontFamily = (fontFamily: unknown): FontFamily => {
+  if (typeof fontFamily === "string") {
+    return getFontFamilyByName(fontFamily);
+  }
+
+  return isFiniteNumber(fontFamily) ? fontFamily : DEFAULT_FONT_FAMILY;
+};
 
 const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,

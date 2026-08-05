@@ -112,16 +112,19 @@ describe("restoreElements", () => {
     const restoreFontFamily = (
       // wider than `FontFamily` on purpose - restore exists precisely to
       // normalize values the type doesn't admit (i.e. "Random Font")
-      fontFamily: string | number,
+      fontFamily: unknown,
     ) => {
-      const textElement = API.createElement({
-        type: "text",
-        text: "text",
-        fontFamily: fontFamily as ExcalidrawTextElement["fontFamily"],
-      });
+      // assigned post-creation - `API.createElement` would default it away
+      const textElement = {
+        ...API.createElement({ type: "text", text: "text" }),
+        fontFamily,
+      };
 
       return (
-        restore.restoreElements([textElement], null)[0] as ExcalidrawTextElement
+        restore.restoreElements(
+          [textElement as ExcalidrawTextElement],
+          null,
+        )[0] as ExcalidrawTextElement
       ).fontFamily;
     };
 
@@ -153,6 +156,13 @@ describe("restoreElements", () => {
       expect(restoreFontFamily("google:")).toBe(DEFAULT_FONT_FAMILY);
       expect(restoreFontFamily(":")).toBe(DEFAULT_FONT_FAMILY);
       expect(restoreFontFamily("")).toBe(DEFAULT_FONT_FAMILY);
+    });
+
+    it("should default values which aren't a family at all", () => {
+      expect(restoreFontFamily(undefined)).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily(null)).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily(NaN)).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily(Infinity)).toBe(DEFAULT_FONT_FAMILY);
     });
 
     it("should map legacy `font` names to built-in families", () => {

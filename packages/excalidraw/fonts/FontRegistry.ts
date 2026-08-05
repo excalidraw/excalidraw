@@ -3,7 +3,7 @@ import {
   FONT_FAMILY_FALLBACKS,
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
-  FONT_METADATA,
+  getFontMetadata,
   Emitter,
 } from "@excalidraw/common";
 
@@ -190,15 +190,11 @@ export class FontRegistry {
         FONT_FAMILY[family as keyof typeof FONT_FAMILY] ??
         FONT_FAMILY_FALLBACKS[family as keyof typeof FONT_FAMILY_FALLBACKS];
 
-      // default to Excalifont metrics
-      const metadata =
-        FONT_METADATA[fontFamily] ?? FONT_METADATA[FONT_FAMILY.Excalifont];
-
       FontRegistry.addTo(
         registered,
         fontFamily,
         family,
-        metadata,
+        getFontMetadata(fontFamily),
         fontFacesDescriptors,
       );
     };
