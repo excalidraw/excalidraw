@@ -140,6 +140,10 @@ export const UserList = React.memo(
         socketId,
       }),
     ).filter((collaborator) => collaborator.username?.trim());
+    const currentUser = collaboratorsArray.find((c) => c.isCurrentUser);
+    const otherCollaborators = collaboratorsArray.filter(
+      (c) => !c.isCurrentUser,
+    );
 
     const [searchTerm, setSearchTerm] = React.useState("");
     const filteredCollaborators = collaboratorsArray.filter((collaborator) =>
@@ -177,11 +181,6 @@ export const UserList = React.memo(
 
     const [wrapperWidth, setWrapperWidth] = React.useState(
       DEFAULT_MAX_AVATARS * AVATAR_SLOT_WIDTH,
-    );
-
-    const currentUser = collaboratorsArray.find((c) => c.isCurrentUser);
-    const otherCollaborators = collaboratorsArray.filter(
-      (c) => !c.isCurrentUser,
     );
 
     // the current user's avatar is always shown, reserved as the last

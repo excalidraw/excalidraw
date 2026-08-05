@@ -27,21 +27,21 @@ describe("UserList", () => {
       window.h.app.updateScene({
         collaborators: new Map<SocketId, Collaborator>([
           [
-            currentSocketId,
-            {
-              id: "user",
-              socketId: currentSocketId,
-              username: "Ada (2×)",
-              isCurrentUser: true,
-            },
-          ],
-          [
             otherSocketId,
             {
               id: "user",
               socketId: otherSocketId,
-              username: "Ada (2×)",
+              username: "Ada",
               isCurrentUser: false,
+            },
+          ],
+          [
+            currentSocketId,
+            {
+              id: "user",
+              socketId: currentSocketId,
+              username: "Ada",
+              isCurrentUser: true,
             },
           ],
         ]),
@@ -66,9 +66,10 @@ describe("UserList", () => {
 
     await waitFor(() => {
       const dropdown = document.querySelector(".UserList__collaborators");
-      expect(
-        dropdown?.querySelectorAll(".UserList__collaborator"),
-      ).toHaveLength(2);
+      const dropdownCollaborators = dropdown?.querySelectorAll(
+        ".UserList__collaborator",
+      );
+      expect(dropdownCollaborators).toHaveLength(2);
       expect(
         dropdown?.querySelectorAll(".UserList__collaborator.is-current-user"),
       ).toHaveLength(1);
