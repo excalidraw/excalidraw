@@ -12,6 +12,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import {
   elementsOverlappingBBox,
   getElementAbsoluteCoords,
+  getElementAbsoluteVisualCoords,
   getElementBounds,
 } from "../src/bounds";
 
@@ -103,6 +104,40 @@ describe("getElementAbsoluteCoords", () => {
     );
 
     expect(cleanCoords).toEqual(cartoonyCoords);
+  });
+});
+
+describe("getElementAbsoluteVisualCoords", () => {
+  it("takes roughness into account", () => {
+    const clean = {
+      ..._ce({
+        t: "line",
+        x: 449.58203125,
+        y: 186.0625,
+        w: 170.12890625,
+        h: 92.48828125,
+        a: 0.6447741904932416,
+      }),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(67.33984375, 92.48828125),
+        pointFrom<LocalPoint>(-102.7890625, 52.15625),
+      ],
+      roughness: ROUGHNESS.architect,
+    } as ExcalidrawElement;
+
+    const cartoony = {
+      ...clean,
+      roughness: ROUGHNESS.cartoonist,
+    } as ExcalidrawElement;
+
+    const cleanCoords = getElementAbsoluteVisualCoords(clean, arrayToMap([clean]));
+    const cartoonyCoords = getElementAbsoluteVisualCoords(
+      cartoony,
+      arrayToMap([cartoony]),
+    );
+
+    expect(cleanCoords).not.toEqual(cartoonyCoords);
   });
 });
 
