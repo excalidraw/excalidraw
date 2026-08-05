@@ -552,10 +552,6 @@ export interface AppState {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
-  /** the user's socket id & username who is being followed on the canvas */
-  userToFollow: UserToFollow | null;
-  /** the socket ids of the users following the current user */
-  followedBy: Set<SocketId>;
 
   /** image cropping */
   isCropping: boolean;
@@ -676,6 +672,22 @@ export type ExcalidrawInitialState = {
 export type OnUserFollowedPayload = {
   userToFollow: UserToFollow;
   action: "FOLLOW" | "UNFOLLOW";
+};
+
+export type ViewportStatusFrame = {
+  /** the badge (bottom-center pill) */
+  label?: {
+    label: React.ReactNode;
+    icon?: React.ReactNode;
+    /** badge background; defaults to var(--color-primary-hover) */
+    background?: string;
+    /** badge text color; defaults to var(--color-primary-light) */
+    color?: string;
+    /** renders a close button when set */
+    onClose?: () => void;
+  };
+  /** viewport-edge border: CSS color, or `false` for none */
+  border: false | string;
 };
 
 export type OnExportProgress = {
@@ -1006,6 +1018,23 @@ export interface ExcalidrawProps {
   showDeprecatedFonts?: boolean;
   insertLinkAction?: (linkVal: string) => void; //zsviczian
   renderScrollbars?: boolean;
+  viewportStatusFrame?: ViewportStatusFrame | null;
+  /**
+   * Rendered inside the UserList "who's here" dropdown (desktop) and inline
+   * in the mobile menu's collaborators section, below a divider. Accepts a
+   * render function — called with `isMobile` so hosts can render different
+   * UI for each surface — in addition to a plain node.
+   */
+  currentUserControls?:
+    | React.ReactNode
+    | ((isMobile: boolean) => React.ReactNode);
+  /**
+   * The user being followed on the canvas, if any. Controlled by the host —
+   * the editor never sets it; it emits follow/unfollow intents via
+   * `onUserFollow` (prop or imperative API) and renders the followed
+   * user's avatar highlight from this value.
+   */
+  userToFollow?: UserToFollow | null;
   /**
    * Called before exporting to a file.
    *
@@ -1175,6 +1204,9 @@ export type AppClassProperties = {
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
   lastPointerMoveEvent: App["lastPointerMoveEvent"];
   bindModeHandler: App["bindModeHandler"];
+
+  emitUserFollowIntent: App["emitUserFollowIntent"];
+  requestUnfollow: App["requestUnfollow"];
 
   setAppState: App["setAppState"];
 

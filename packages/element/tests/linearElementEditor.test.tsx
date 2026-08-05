@@ -26,7 +26,7 @@ import {
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
 
-import { wrapText } from "../src";
+import { hasBoundingBox, wrapText } from "../src";
 import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
@@ -220,7 +220,7 @@ describe("Test Linear Elements", () => {
     // drag line from midpoint
     drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`8`);
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
       [
@@ -238,6 +238,53 @@ describe("Test Linear Elements", () => {
         ],
       ]
     `);
+  });
+
+  it("should hide the bounding box while creating or dragging a point", () => {
+    const line = createTwoPointerLinearElement("line");
+    const editorInterface = {
+      userAgent: { isMobileDevice: false },
+    } as Parameters<typeof hasBoundingBox>[2];
+
+    fireEvent.pointerDown(interactiveCanvas, {
+      clientX: midpoint[0],
+      clientY: midpoint[1],
+    });
+    fireEvent.pointerMove(interactiveCanvas, {
+      clientX: midpoint[0] + delta,
+      clientY: midpoint[1] + delta,
+    });
+
+    expect(line.points.length).toBe(3);
+    expect(h.state.selectedLinearElement?.isDragging).toBe(true);
+    expect(hasBoundingBox([line], h.state, editorInterface)).toBe(false);
+
+    fireEvent.pointerUp(interactiveCanvas, {
+      clientX: midpoint[0] + delta,
+      clientY: midpoint[1] + delta,
+    });
+
+    const addedPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      line,
+      1,
+      h.scene.getNonDeletedElementsMap(),
+    );
+    fireEvent.pointerDown(interactiveCanvas, {
+      clientX: addedPoint[0],
+      clientY: addedPoint[1],
+    });
+    fireEvent.pointerMove(interactiveCanvas, {
+      clientX: addedPoint[0] + 1,
+      clientY: addedPoint[1] + 1,
+    });
+
+    expect(h.state.selectedLinearElement?.isDragging).toBe(true);
+    expect(hasBoundingBox([line], h.state, editorInterface)).toBe(false);
+
+    fireEvent.pointerUp(interactiveCanvas, {
+      clientX: addedPoint[0],
+      clientY: addedPoint[1],
+    });
   });
 
   it("should allow entering and exiting line editor via context menu", () => {

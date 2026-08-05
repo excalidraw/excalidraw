@@ -108,6 +108,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onPointerUp,
     onScrollChange,
+    onUserFollow,
+    userToFollow,
     onDuplicate,
     children,
     validateEmbeddable,
@@ -120,6 +122,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     showDeprecatedFonts,
     insertLinkAction, //zsviczian
     renderScrollbars,
+    viewportStatusFrame,
+    currentUserControls,
     imageOptions,
   } = props;
 
@@ -256,6 +260,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
+          onUserFollow={onUserFollow}
+          userToFollow={userToFollow}
           onDuplicate={onDuplicate}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
@@ -267,6 +273,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           showDeprecatedFonts={showDeprecatedFonts}
           insertLinkAction={insertLinkAction} //zsviczian
           renderScrollbars={renderScrollbars}
+          viewportStatusFrame={viewportStatusFrame}
+          currentUserControls={currentUserControls}
           imageOptions={normalizedImageOptions}
         >
           {children}
@@ -527,6 +535,8 @@ export type {
   SavedChat,
   SavedChats,
 } from "./components/TTDDialog/types";
+
+export type { ViewportStatusFrame } from "./types";
 
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
 

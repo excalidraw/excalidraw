@@ -749,9 +749,7 @@ export class AppViewport {
       AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
     }
     this.app.setState({ shouldCacheIgnoreZoom: false });
-    if (this.app.state.userToFollow) {
-      this.app.setState({ userToFollow: null });
-    }
+    this.app.requestUnfollow();
 
     const prevZoom = this.app.state.zoom.value;
     this.app.setState(state);

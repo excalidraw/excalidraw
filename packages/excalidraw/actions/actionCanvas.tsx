@@ -151,6 +151,7 @@ export const actionZoomIn = register({
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
+    app.requestUnfollow();
     const nextState = {
       ...appState,
       ...getViewportForZoomWithScrollConstraints(
@@ -161,7 +162,6 @@ export const actionZoomIn = register({
         },
         appState,
       ),
-      userToFollow: null,
     };
     return {
       appState: nextState,
@@ -198,6 +198,7 @@ export const actionZoomOut = register({
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
+    app.requestUnfollow();
     const nextState = {
       ...appState,
       ...getViewportForZoomWithScrollConstraints(
@@ -208,7 +209,6 @@ export const actionZoomOut = register({
         },
         appState,
       ),
-      userToFollow: null,
     };
     return {
       appState: nextState,
@@ -245,6 +245,7 @@ export const actionResetZoom = register({
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
+    app.requestUnfollow();
     // reset to 100%, unless a zoom lock floors the zoom higher — then reset to
     // the locked minimum zoom (the lock's resting zoom level)
     const nextZoom = appState.scrollConstraints?.lockZoom
@@ -260,7 +261,6 @@ export const actionResetZoom = register({
         },
         appState,
       ),
-      userToFollow: null,
     };
     return {
       appState: nextState,
@@ -318,6 +318,7 @@ export const actionZoomToFitSelectionInViewport = register({
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (elements, appState, _, app) => {
+    app.requestUnfollow();
     const selectedElements = app.scene.getSelectedElements(appState);
     const bounds = selectedElements.length
       ? getCommonBounds(getNonDeletedElements(selectedElements))
@@ -326,10 +327,7 @@ export const actionZoomToFitSelectionInViewport = register({
       : getCommonBounds(getNonDeletedElements(elements));
     const result = zoomToFitBounds({
       bounds,
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+      appState,
       fit: "scale-down",
       canvasOffsets: app.viewport.getOffsets(),
     });
@@ -363,6 +361,7 @@ export const actionZoomToFitSelection = register({
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (elements, appState, _, app) => {
+    app.requestUnfollow();
     const selectedElements = app.scene.getSelectedElements(appState);
     const bounds = selectedElements.length
       ? getCommonBounds(getNonDeletedElements(selectedElements))
@@ -371,10 +370,7 @@ export const actionZoomToFitSelection = register({
       : getCommonBounds(getNonDeletedElements(elements));
     const result = zoomToFitBounds({
       bounds,
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+      appState,
       fit: "contain",
       canvasOffsets: app.viewport.getOffsets(),
     });
@@ -404,16 +400,14 @@ export const actionZoomToFit = register({
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (elements, appState, _, app) => {
+    app.requestUnfollow();
     // under a viewport lock, fits the locked box rather than the elements
     const bounds = appState.scrollConstraints
       ? getScrollConstraintsBounds(appState.scrollConstraints)
       : getCommonBounds(getNonDeletedElements(elements));
     const result = zoomToFitBounds({
       bounds,
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+      appState,
       fit: "scale-down",
       canvasOffsets: app.viewport.getOffsets(),
     });
