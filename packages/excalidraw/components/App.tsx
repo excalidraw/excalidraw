@@ -2438,6 +2438,8 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--allow-browser-zoom":
             !this.isInteractionEnabled() && this.isBrowserZoomEnabled(),
           "excalidraw--ui-hidden": !this.isDefaultUIEnabled(),
+          "excalidraw--viewport-status-label":
+            !!this.props.viewportStatusFrame?.label,
         })}
         style={{
           //zsviczian
