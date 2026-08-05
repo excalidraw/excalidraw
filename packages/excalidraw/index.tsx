@@ -67,6 +67,7 @@ export const ExcalidrawAPIProvider = ({
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
     onExport,
+    className,
     onChange,
     onThemeChange,
     onIncrement,
@@ -207,6 +208,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       <InitializeApp langCode={langCode} theme={theme}>
         <App
           onExport={onExport}
+          className={className}
           onChange={onChange}
           onThemeChange={onThemeChange}
           onIncrement={onIncrement}

@@ -769,6 +769,7 @@ export type UIConfig = {
 };
 
 export interface ExcalidrawProps {
+  className?: string;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
