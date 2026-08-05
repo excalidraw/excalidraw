@@ -70,6 +70,10 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--avatarList-gap);
+
+    > .is-current-user {
+      order: -1;
+    }
   }
 
   .UserList__collaborator-name {
@@ -189,6 +193,8 @@
   }
 
   .UserList__collaborators {
+    display: flex;
+    flex-direction: column;
     top: auto;
     max-height: 50vh;
     // leave room for the focus/hover ring (box-shadow) on collaborator rows —
@@ -197,6 +203,14 @@
     // every row, and top/bottom for the first/last one
     padding: 2px;
     box-sizing: border-box;
+
+    > .hint {
+      order: -2;
+    }
+
+    > .is-current-user {
+      order: -1;
+    }
   }
 
   .UserList__menu-divider {
