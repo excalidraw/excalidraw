@@ -12205,12 +12205,17 @@ class App extends React.Component<AppProps, AppState> {
           } else {
             // add element to selection while keeping prev elements selected
             this.setState((_prevState) => ({
-              selectedElementIds: makeNextSelectedElementIds(
+              ...selectGroupsForSelectedElements(
                 {
-                  ..._prevState.selectedElementIds,
-                  [hitElement!.id]: true,
+                  editingGroupId: _prevState.editingGroupId,
+                  selectedElementIds: {
+                    ..._prevState.selectedElementIds,
+                    [hitElement!.id]: true,
+                  },
                 },
+                this.scene.getNonDeletedElements(),
                 _prevState,
+                this,
               ),
             }));
           }
