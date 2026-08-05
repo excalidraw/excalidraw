@@ -2339,31 +2339,36 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         translate="no"
-        className={clsx("excalidraw excalidraw-container notranslate", {
-          "excalidraw--view-mode":
-            this.state.viewModeEnabled ||
-            this.state.openDialog?.name === "elementLinkSelector",
-          "excalidraw--mobile": this.editorInterface.formFactor === "phone",
-          "excalidraw--non-interactive": !this.isInteractionEnabled(),
-          "excalidraw--navigation":
-            !this.isInteractionEnabled() && this.isNavigationEnabled(),
-          "excalidraw--tools":
-            !this.isInteractionEnabled() &&
-            this.isToolSupported(this.state.activeTool.type),
-          "excalidraw--embeds":
-            !this.isInteractionEnabled() && this.isEmbedsEnabled(),
-          "excalidraw--allow-browser-zoom":
-            !this.isInteractionEnabled() && this.isBrowserZoomEnabled(),
-          "excalidraw--ui-hidden": !this.isDefaultUIEnabled(),
-          "excalidraw--mobile-toolbar":
-            this.editorInterface.formFactor === "phone" &&
-            this.isDefaultUIEnabled() &&
-            !this.state.viewModeEnabled,
-          "excalidraw--viewport-status-border":
-            !!this.props.viewportStatusFrame?.border,
-          "excalidraw--viewport-status-label":
-            !!this.props.viewportStatusFrame?.label,
-        })}
+        className={clsx(
+          "excalidraw excalidraw-container notranslate",
+          this.props.className,
+          {
+            "excalidraw--view-mode":
+              this.state.viewModeEnabled ||
+              this.state.openDialog?.name === "elementLinkSelector",
+            "excalidraw--mobile": this.editorInterface.formFactor === "phone",
+            "excalidraw--non-interactive": !this.isInteractionEnabled(),
+            "excalidraw--navigation":
+              !this.isInteractionEnabled() && this.isNavigationEnabled(),
+            "excalidraw--tools":
+              !this.isInteractionEnabled() &&
+              this.isToolSupported(this.state.activeTool.type),
+            "excalidraw--embeds":
+              !this.isInteractionEnabled() && this.isEmbedsEnabled(),
+            "excalidraw--allow-browser-zoom":
+              !this.isInteractionEnabled() && this.isBrowserZoomEnabled(),
+            "excalidraw--ui-hidden": !this.isDefaultUIEnabled(),
+            "excalidraw--mobile-toolbar":
+              this.editorInterface.formFactor === "phone" &&
+              this.isDefaultUIEnabled() &&
+              !this.state.viewModeEnabled,
+            "excalidraw--viewport-status-border":
+              !!this.props.viewportStatusFrame?.border,
+            "excalidraw--viewport-status-label":
+              !!this.props.viewportStatusFrame?.label,
+            "excalidraw--zen-mode": this.state.zenModeEnabled,
+          },
+        )}
         style={{
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
             ? POINTER_EVENTS.disabled
