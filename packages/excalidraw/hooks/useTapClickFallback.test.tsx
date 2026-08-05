@@ -16,10 +16,12 @@ const TOUCH_POINTER = {
 
 const Harness = ({
   onButtonClick,
+  onSecondButtonClick,
   disabled = false,
   onNonInteractiveClick,
 }: {
   onButtonClick: () => void;
+  onSecondButtonClick?: () => void;
   disabled?: boolean;
   onNonInteractiveClick?: () => void;
 }) => {
@@ -35,6 +37,9 @@ const Harness = ({
       >
         button
       </button>
+      <button type="button" data-testid="btn-2" onClick={onSecondButtonClick}>
+        button 2
+      </button>
       <div data-testid="non-interactive" onClick={onNonInteractiveClick}>
         not interactive
       </div>
@@ -44,6 +49,8 @@ const Harness = ({
 
 const getBtn = () =>
   document.querySelector<HTMLButtonElement>('[data-testid="btn"]')!;
+const getSecondBtn = () =>
+  document.querySelector<HTMLButtonElement>('[data-testid="btn-2"]')!;
 const getNonInteractive = () =>
   document.querySelector<HTMLElement>('[data-testid="non-interactive"]')!;
 
@@ -139,6 +146,42 @@ describe("useTapClickFallback", () => {
     unmount();
   });
 
+  it("does not activate when pointerup is far from pointerdown even without a pointermove", async () => {
+    const onClick = vi.fn();
+    const { unmount } = render(<Harness onButtonClick={onClick} />);
+
+    // no pointermove is delivered, but the pointerup coordinates show the
+    // pointer moved well beyond the threshold
+    fireEvent.pointerDown(getBtn(), TOUCH_POINTER);
+    fireEvent.pointerUp(getBtn(), { ...TOUCH_POINTER, clientY: 60 });
+    await flushFallbackTimer();
+
+    expect(onClick).not.toHaveBeenCalled();
+
+    unmount();
+  });
+
+  it("does not activate when pointerdown and pointerup are on different interactive elements", async () => {
+    const onClick = vi.fn();
+    const onSecondButtonClick = vi.fn();
+    const { unmount } = render(
+      <Harness
+        onButtonClick={onClick}
+        onSecondButtonClick={onSecondButtonClick}
+      />,
+    );
+
+    // slide from button 1 to button 2 within the tap threshold
+    fireEvent.pointerDown(getBtn(), TOUCH_POINTER);
+    fireEvent.pointerUp(getSecondBtn(), TOUCH_POINTER);
+    await flushFallbackTimer();
+
+    expect(onClick).not.toHaveBeenCalled();
+    expect(onSecondButtonClick).not.toHaveBeenCalled();
+
+    unmount();
+  });
+
   it("ignores non-touch pointers (mouse/trackpad/pen are left alone)", async () => {
     const onClick = vi.fn();
     const { unmount } = render(<Harness onButtonClick={onClick} />);
@@ -214,6 +257,28 @@ describe("useTapClickFallback", () => {
     unmount();
   });
 
+  it("disarms the latch on a new pointerdown on another element", async () => {
+    const onClick = vi.fn();
+    const onSecondButtonClick = vi.fn();
+    const { unmount } = render(
+      <Harness
+        onButtonClick={onClick}
+        onSecondButtonClick={onSecondButtonClick}
+      />,
+    );
+
+    tap(getBtn());
+    await waitFor(() => expect(onClick).toHaveBeenCalledTimes(1));
+
+    // a new pointer interaction on a different element must disarm the old
+    // latch, so a subsequent legitimate click on the old target is not eaten
+    fireEvent.pointerDown(getSecondBtn(), TOUCH_POINTER);
+    fireEvent.click(getBtn());
+    expect(onClick).toHaveBeenCalledTimes(2);
+
+    unmount();
+  });
+
   it("disarms the latch on keydown (keyboard activation not swallowed)", async () => {
     const onClick = vi.fn();
     const { unmount } = render(<Harness onButtonClick={onClick} />);
@@ -227,6 +292,22 @@ describe("useTapClickFallback", () => {
       '[data-testid="container"]',
     )!;
     fireEvent.keyDown(container, { key: "Enter" });
+    fireEvent.click(getBtn());
+    expect(onClick).toHaveBeenCalledTimes(2);
+
+    unmount();
+  });
+
+  it("expires the latch so later legitimate clicks are never swallowed", async () => {
+    const onClick = vi.fn();
+    const { unmount } = render(<Harness onButtonClick={onClick} />);
+
+    tap(getBtn());
+    await waitFor(() => expect(onClick).toHaveBeenCalledTimes(1));
+
+    // wait past the latch's short self-expiry window
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     fireEvent.click(getBtn());
     expect(onClick).toHaveBeenCalledTimes(2);
 

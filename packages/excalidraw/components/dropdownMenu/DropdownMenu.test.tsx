@@ -92,30 +92,6 @@ describe("Test <DropdownMenu/>", () => {
       expect(onClickSpy).toHaveBeenCalledTimes(1);
     });
 
-    it("does not re-run the action when a native click arrives after the fallback fired", async () => {
-      const { container } = await render(<Excalidraw />);
-      await openMainMenu(container);
-
-      const item = getSearchMenuItem();
-
-      // tap without a native click → fallback activates the item and closes
-      // the menu (action ran exactly once)
-      fireEvent.pointerDown(item, pointerEventInit);
-      fireEvent.pointerUp(item, pointerEventInit);
-
-      await waitFor(() => {
-        expect(window.h.state.openMenu).toBe(null);
-      });
-
-      // a late native click (as if the browser finally delivered it) must not
-      // re-run the action — the menu stays closed
-      fireEvent.click(item);
-
-      await waitFor(() => {
-        expect(window.h.state.openMenu).toBe(null);
-      });
-    });
-
     it("does not activate items when the pointer moved (real drag/scroll)", async () => {
       const { container } = await render(<Excalidraw />);
       await openMainMenu(container);
