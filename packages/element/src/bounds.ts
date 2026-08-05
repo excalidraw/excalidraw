@@ -283,6 +283,22 @@ export const getElementAbsoluteCoords = (
   ];
 };
 
+export const getElementAbsoluteVisualCoords = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  includeBoundText: boolean = false,
+): [number, number, number, number, number, number] => {
+  if (isLinearElement(element)) {
+    return LinearElementEditor.getElementAbsoluteVisualCoords(
+      element,
+      elementsMap,
+      includeBoundText,
+    );
+  } else {
+    return getElementAbsoluteCoords(element, elementsMap, includeBoundText);
+  }
+};
+
 /*
  * for a given element, `getElementLineSegments` returns line segments
  * that can be used for visual collision detection (useful for frames)
@@ -1013,6 +1029,46 @@ export const getResizedElementAbsoluteCoords = (
     maxX + element.x,
     maxY + element.y,
   ];
+};
+
+export const getResizedElementAbsoluteVisualCoords = (
+  element: ExcalidrawElement,
+  nextWidth: number,
+  nextHeight: number,
+  normalizePoints: boolean,
+): Bounds => {
+  if (isLinearElement(element)) {
+    const points = rescalePoints(
+      0,
+      nextWidth,
+      rescalePoints(1, nextHeight, element.points, normalizePoints),
+      normalizePoints,
+    );
+
+    const gen = rough.generator();
+    const curve = !element.roundness
+      ? gen.linearPath(
+          points as [number, number][],
+          generateRoughOptions(element),
+        )
+      : gen.curve(points as [number, number][], generateRoughOptions(element));
+
+    const ops = getCurvePathOps(curve);
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+    return [
+      minX + element.x,
+      minY + element.y,
+      maxX + element.x,
+      maxY + element.y,
+    ];
+  } else {
+    return getResizedElementAbsoluteCoords(
+      element,
+      nextWidth,
+      nextHeight,
+      normalizePoints,
+    );
+  }
 };
 
 export const getElementPointsCoords = (

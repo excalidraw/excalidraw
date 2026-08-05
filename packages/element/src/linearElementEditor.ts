@@ -11,6 +11,8 @@ import {
   curvePointAtLength,
 } from "@excalidraw/math";
 
+import { getCurvePathOps } from "@excalidraw/utils/shape";
+
 import {
   DRAGGING_THRESHOLD,
   KEYS,
@@ -52,6 +54,7 @@ import {
 import {
   getElementAbsoluteCoords,
   getElementPointsCoords,
+  getMinMaxXYFromCurvePathOps,
   getBoundsFromPoints,
 } from "./bounds";
 
@@ -60,7 +63,7 @@ import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
-import { toggleLinePolygonState } from "./shape";
+import { ShapeCache, toggleLinePolygonState } from "./shape";
 
 import { getLockedLinearCursorAlignSize } from "./sizeHelpers";
 
@@ -2016,7 +2019,41 @@ export class LinearElementEditor {
     elementsMap: ElementsMap,
     includeBoundText: boolean = false,
   ): [number, number, number, number, number, number] => {
-    const [minX, minY, maxX, maxY] = getBoundsFromPoints(element.points);
+    const bounds = getBoundsFromPoints(element.points);
+    return LinearElementEditor.getElementAbsoluteCoordsFromBounds(
+      bounds,
+      element,
+      elementsMap,
+      includeBoundText,
+    );
+  };
+
+  static getElementAbsoluteVisualCoords = (
+    element: ExcalidrawLinearElement,
+    elementsMap: ElementsMap,
+    includeBoundText: boolean = false,
+  ): [number, number, number, number, number, number] => {
+    const shape = ShapeCache.generateElementShape(element, null);
+
+    // first element is always the curve
+    const ops = getCurvePathOps(shape[0]);
+
+    const bounds = getMinMaxXYFromCurvePathOps(ops);
+    return LinearElementEditor.getElementAbsoluteCoordsFromBounds(
+      bounds,
+      element,
+      elementsMap,
+      includeBoundText,
+    );
+  };
+
+  private static getElementAbsoluteCoordsFromBounds = (
+    bounds: Bounds,
+    element: ExcalidrawLinearElement,
+    elementsMap: ElementsMap,
+    includeBoundText: boolean = false,
+  ): [number, number, number, number, number, number] => {
+    const [minX, minY, maxX, maxY] = bounds;
     const x1 = minX + element.x;
     const y1 = minY + element.y;
     const x2 = maxX + element.x;
