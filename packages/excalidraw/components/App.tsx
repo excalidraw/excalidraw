@@ -2355,6 +2355,12 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--allow-browser-zoom":
             !this.isInteractionEnabled() && this.isBrowserZoomEnabled(),
           "excalidraw--ui-hidden": !this.isDefaultUIEnabled(),
+          "excalidraw--mobile-toolbar":
+            this.editorInterface.formFactor === "phone" &&
+            this.isDefaultUIEnabled() &&
+            !this.state.viewModeEnabled,
+          "excalidraw--viewport-status-border":
+            !!this.props.viewportStatusFrame?.border,
           "excalidraw--viewport-status-label":
             !!this.props.viewportStatusFrame?.label,
         })}

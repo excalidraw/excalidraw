@@ -39,10 +39,21 @@ body.excalidraw-cursor-resize * {
 .excalidraw {
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
     Roboto, Helvetica, Arial, sans-serif;
+  --viewport-status-frame-border-width: 0px;
   --viewport-status-label-offset: 0px;
+  --viewport-status-mobile-toolbar-offset: 0px;
+
+  &.excalidraw--viewport-status-border {
+    --viewport-status-frame-border-width: 4px;
+  }
 
   &.excalidraw--viewport-status-label {
     --viewport-status-label-offset: 0.75rem;
+  }
+
+  &.excalidraw--mobile.excalidraw--mobile-toolbar.excalidraw--viewport-status-label {
+    // 2.25rem toolbar control + 0.5rem island padding + 10px scrollbar gap.
+    --viewport-status-mobile-toolbar-offset: calc(2.75rem + 10px);
   }
 
   font-family: var(--ui-font);
@@ -518,6 +529,11 @@ body.excalidraw-cursor-resize * {
     left: 50%;
     bottom: calc(30px + var(--viewport-status-label-offset));
     transform: translateX(-50%);
+    box-sizing: border-box;
+    max-width: calc(
+      100% - var(--viewport-status-frame-border-width) -
+        var(--viewport-status-frame-border-width)
+    );
     pointer-events: var(--ui-pointerEvents);
     font-family: inherit;
 
@@ -532,9 +548,9 @@ body.excalidraw-cursor-resize * {
 
   .floating-status-stack {
     position: absolute;
-    left: 50%;
+    left: var(--viewport-status-frame-border-width);
+    right: var(--viewport-status-frame-border-width);
     bottom: calc(30px + var(--viewport-status-label-offset));
-    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -546,6 +562,7 @@ body.excalidraw-cursor-resize * {
       left: auto;
       bottom: auto;
       transform: none;
+      max-width: 100%;
       pointer-events: var(--ui-pointerEvents);
     }
   }
@@ -596,7 +613,10 @@ body.excalidraw-cursor-resize * {
     }
 
     .scroll-back-to-content {
-      bottom: calc(100px + var(--viewport-status-label-offset) + var(--sab, 0));
+      bottom: calc(
+        1.5rem + var(--viewport-status-label-offset) +
+          var(--viewport-status-mobile-toolbar-offset) + var(--sab, 0)
+      );
       z-index: -1;
     }
 

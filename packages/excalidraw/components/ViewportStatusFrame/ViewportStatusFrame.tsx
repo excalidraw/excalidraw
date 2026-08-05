@@ -40,7 +40,8 @@ const ViewportStatusFrame = ({ status }: ViewportStatusFrameProps) => {
           })}
           role="status"
           style={{
-            backgroundColor: label.background || border || undefined,
+            ["--viewport-status-frame-badge-background" as string]:
+              label.background || border || "var(--color-primary)",
             color: label.color,
           }}
         >

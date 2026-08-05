@@ -1,3 +1,5 @@
+@use "../../css/variables.module" as *;
+
 .excalidraw {
   .viewport-status-frame__border {
     position: absolute;
@@ -10,19 +12,31 @@
 
   .viewport-status-frame__badge {
     position: absolute;
-    bottom: 0.5rem;
+    bottom: calc(
+      0.5rem + var(--viewport-status-mobile-toolbar-offset) + var(--sab, 0)
+    );
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
     pointer-events: all;
 
-    background-color: var(--color-primary-hover);
+    background-color: var(--viewport-status-frame-badge-background);
     color: var(--color-primary-light);
     border-radius: 0.5rem;
     font-size: 0.75rem;
     display: flex;
     align-items: center;
     overflow: hidden;
+
+    @include isMobile {
+      // Flatten translucent host colors over an opaque canvas UI surface so
+      // the toolbar cannot show through the badge.
+      background: linear-gradient(
+          var(--viewport-status-frame-badge-background),
+          var(--viewport-status-frame-badge-background)
+        ),
+        var(--island-bg-color);
+    }
   }
 
   .viewport-status-frame__badge--clickable {
