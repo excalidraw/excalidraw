@@ -1458,4 +1458,45 @@ describe("deselecting", () => {
     expect(h.state.editingGroupId).toBeNull();
     expect(h.state.selectedGroupIds).toEqual({});
   });
+
+  it("shift deselecting one of multiple selected groups preserves other groups", () => {
+    const groupA1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      groupIds: ["A"],
+    });
+    const groupA2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      groupIds: ["A"],
+    });
+    const groupB1 = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 0,
+      groupIds: ["B"],
+    });
+    const groupB2 = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 0,
+      groupIds: ["B"],
+    });
+    const elements = [groupA1, groupA2, groupB1, groupB2];
+
+    API.setElements(elements);
+    API.setSelectedElements(elements);
+
+    assertSelectedElements(elements);
+    expect(h.state.selectedGroupIds).toEqual({ A: true, B: true });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupA1);
+    });
+
+    assertSelectedElements(groupB1, groupB2);
+    expect(h.state.selectedGroupIds).toEqual({ A: false, B: true });
+  });
 });
