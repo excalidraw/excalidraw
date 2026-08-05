@@ -645,6 +645,8 @@ export type ViewportStatusFrame = {
     background?: string;
     /** badge text color; defaults to var(--color-primary-light) */
     color?: string;
+    /** makes the badge label interactive */
+    onClick?: () => void;
     /** renders a close button when set */
     onClose?: () => void;
   };

@@ -4,7 +4,7 @@
     inset: 0;
     box-sizing: border-box;
     pointer-events: none;
-    border: 2px solid;
+    border: 4px solid;
     z-index: 9999;
   }
 
@@ -18,20 +18,46 @@
 
     background-color: var(--color-primary-hover);
     color: var(--color-primary-light);
-    padding: 0.25rem 0.5rem;
     border-radius: 0.5rem;
     font-size: 0.75rem;
     display: flex;
-    gap: 0.5rem;
     align-items: center;
+    overflow: hidden;
+  }
+
+  .viewport-status-frame__badge--clickable {
+    cursor: pointer;
+
+    &:active {
+      transform: translateX(-50%) scale(0.96);
+    }
+  }
+
+  .viewport-status-frame__badge-action {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: inherit;
+
+    &:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: -2px;
+      border-radius: 0.5rem;
+    }
   }
 
   .viewport-status-frame__badge-label {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
     white-space: pre-wrap;
     line-height: 1;
+    pointer-events: none;
   }
 
   .viewport-status-frame__badge-icon {
@@ -48,6 +74,8 @@
     all: unset;
     cursor: pointer;
     border-radius: 0.25rem;
+    margin-right: 0.5rem;
+    position: relative;
 
     &:hover {
       background-color: var(--color-primary-darker);

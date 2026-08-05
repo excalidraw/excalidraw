@@ -39,6 +39,12 @@ body.excalidraw-cursor-resize * {
 .excalidraw {
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
     Roboto, Helvetica, Arial, sans-serif;
+  --viewport-status-label-offset: 0px;
+
+  &.excalidraw--viewport-status-label {
+    --viewport-status-label-offset: 0.75rem;
+  }
+
   font-family: var(--ui-font);
 
   position: relative;
@@ -510,7 +516,7 @@ body.excalidraw-cursor-resize * {
     padding: 10px 20px;
     position: absolute;
     left: 50%;
-    bottom: 30px;
+    bottom: calc(30px + var(--viewport-status-label-offset));
     transform: translateX(-50%);
     pointer-events: var(--ui-pointerEvents);
     font-family: inherit;
@@ -527,7 +533,7 @@ body.excalidraw-cursor-resize * {
   .floating-status-stack {
     position: absolute;
     left: 50%;
-    bottom: 30px;
+    bottom: calc(30px + var(--viewport-status-label-offset));
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
@@ -585,12 +591,12 @@ body.excalidraw-cursor-resize * {
     }
 
     .floating-status-stack {
-      bottom: calc(30px + var(--sab, 0));
+      bottom: calc(30px + var(--viewport-status-label-offset) + var(--sab, 0));
       z-index: var(--zIndex-ui-bottom);
     }
 
     .scroll-back-to-content {
-      bottom: calc(100px + var(--sab, 0));
+      bottom: calc(100px + var(--viewport-status-label-offset) + var(--sab, 0));
       z-index: -1;
     }
 
