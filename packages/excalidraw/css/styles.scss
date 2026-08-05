@@ -51,7 +51,7 @@ body.excalidraw-cursor-resize * {
     --viewport-status-label-offset: 0.75rem;
   }
 
-  &.excalidraw--mobile.excalidraw--mobile-toolbar.excalidraw--viewport-status-label {
+  &.excalidraw--mobile.excalidraw--mobile-toolbar {
     // 2.25rem toolbar control + 0.5rem island padding + 10px scrollbar gap.
     --viewport-status-mobile-toolbar-offset: calc(2.75rem + 10px);
   }
@@ -622,6 +622,10 @@ body.excalidraw-cursor-resize * {
 
     .floating-status-stack .scroll-back-to-content {
       bottom: auto;
+      z-index: auto;
+    }
+
+    .App-toolbar .scroll-back-to-content {
       z-index: auto;
     }
   }
