@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Διακεκομμένη με παύλες",
     "strokeStyle_dotted": "Διακεκομμένη με τελείες",
     "sloppiness": "Ακαταστασία",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Διαφάνεια",
     "textAlign": "Στοίχιση κειμένου",
     "edges": "Άκρες",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "Wireframe σε κώδικα",
     "embeddable": "Web Embed",
     "laser": "Δείκτης λέιζερ",
+    "autoshape": "",
     "hand": "Χέρι (εργαλείο μετακίνησης)",
     "extraTools": "Περισσότερα εργαλεία",
     "mermaidToExcalidraw": "Mermaid σε Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Κάντε κλικ και σύρτε, απελευθερώσατε όταν έχετε τελειώσει",
     "text": "Tip: μπορείτε επίσης να προσθέστε κείμενο με διπλό-κλικ οπουδήποτε με το εργαλείο επιλογών",
     "embeddable": "Κάντε κλικ και σύρετε για να δημιουργήσετε μια ενσωματωμένη ιστοσελίδα",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Χρώματα",
     "shades": "Αποχρώσεις",
     "hexCode": "Κωδικός Hex",
-    "noShades": "Δεν υπάρχουν διαθέσιμες αποχρώσεις για αυτό το χρώμα"
+    "noShades": "Δεν υπάρχουν διαθέσιμες αποχρώσεις για αυτό το χρώμα",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

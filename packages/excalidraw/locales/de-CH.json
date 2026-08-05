@@ -3,18 +3,18 @@
     "paste": "Einfügen",
     "pasteAsPlaintext": "Als unformatierten Text einfügen",
     "pasteCharts": "Diagramme einfügen",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "Balkendiagramm",
+    "chartType_line": "Liniendiagramm",
+    "chartType_radar": "Netzdiagramm",
+    "chartType_plaintext": "Klartext",
     "selectAll": "Alle auswählen",
     "multiSelect": "Element zur Auswahl hinzufügen",
-    "moveCanvas": "Leinwand verschieben",
+    "moveCanvas": "Zeichenfläche verschieben",
     "cut": "Ausschneiden",
     "copy": "Kopieren",
     "copyAsPng": "In Zwischenablage kopieren (PNG)",
     "copyAsSvg": "In Zwischenablage kopieren (SVG)",
-    "copyText": "In die Zwischenablage als Text kopieren",
+    "copyText": "Als Text in Zwischenablage kopieren",
     "copySource": "Quelle in Zwischenablage kopieren",
     "convertToCode": "In Code konvertieren",
     "bringForward": "Nach vorne",
@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Gestrichelt",
     "strokeStyle_dotted": "Gepunktet",
     "sloppiness": "Sauberkeit",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Deckkraft",
     "textAlign": "Textausrichtung",
     "edges": "Kanten",
@@ -53,18 +56,18 @@
     "arrowhead_crowfoot_many": "Krähenfuß (viele)",
     "arrowhead_crowfoot_one": "Krähenfuß (einer)",
     "arrowhead_crowfoot_one_or_many": "Krähenfuß (einer oder viele)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "Kardinalität (eins)",
+    "arrowhead_cardinality_many": "Kardinalität (viele)",
+    "arrowhead_cardinality_one_or_many": "Kardinalität (eins oder viele)",
+    "arrowhead_cardinality_exactly_one": "Kardinalität (genau eins)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalität (null oder eins)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalität (null oder viele)",
     "more_options": "Weitere Optionen",
-    "cardinality": "",
+    "cardinality": "Kardinalität",
     "arrowtypes": "Pfeiltyp",
     "arrowtype_sharp": "Scharfer Pfeil",
     "arrowtype_round": "Gebogener Pfeil",
-    "arrowtype_elbowed": "Ellenbogen-Pfeil",
+    "arrowtype_elbowed": "Abgewinkelter Pfeil",
     "fontSize": "Schriftgröße",
     "fontFamily": "Schriftfamilie",
     "addWatermark": "\"Made with Excalidraw\" hinzufügen",
@@ -89,10 +92,10 @@
     "artist": "Künstler",
     "cartoonist": "Karikaturist",
     "fileTitle": "Dateiname",
-    "colorPicker": "Farbauswähler",
-    "canvasColors": "Auf Leinwand verwendet",
+    "colorPicker": "Farbwähler",
+    "canvasColors": "Auf Zeichenfläche verwendet",
     "canvasBackground": "Zeichenflächenhintergrund",
-    "drawingCanvas": "Leinwand",
+    "drawingCanvas": "Zeichenfläche",
     "clearCanvas": "Zeichenfläche löschen",
     "layers": "Ebenen",
     "actions": "Aktionen",
@@ -153,8 +156,8 @@
       "editArrow": "Pfeil bearbeiten"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Polygon auftrennen",
+      "convertToPolygon": "In Polygon umwandeln"
     },
     "elementLock": {
       "lock": "Sperren",
@@ -175,18 +178,21 @@
     "zoomToFitSelection": "Zoom auf Auswahl anpassen",
     "zoomToFit": "Zoom auf alle Elemente anpassen",
     "installPWA": "Excalidraw lokal installieren (PWA)",
-    "autoResize": "Aktiviere automatische Textgrößenanpassung",
+    "autoResize": "Automatische Textgrößenanpassung",
     "imageCropping": "Bild zuschneiden",
-    "unCroppedDimension": "Nicht zugeschnittene Dimension",
+    "unCroppedDimension": "Originalgröße",
     "copyElementLink": "Link zum Objekt kopieren",
     "linkToElement": "Link zum Objekt",
     "wrapSelectionInFrame": "Auswahl in Rahmen einbetten",
-    "tab": "",
-    "shapeSwitch": "",
-    "preferences": "",
-    "preferences_toolLock": "",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "tab": "Tab",
+    "shapeSwitch": "Form wechseln",
+    "preferences": "Einstellungen",
+    "preferences_toolLock": "Werkzeug sperren",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "Pfeilbindung",
+    "midpointSnapping": "An Mittelpunkten einrasten"
   },
   "elementLink": {
     "title": "Link zum Objekt",
@@ -198,10 +204,10 @@
     "hint_emptyLibrary": "Wähle ein Element auf der Zeichenfläche, um es hier hinzuzufügen. Oder installiere eine Bibliothek aus dem öffentlichen Verzeichnis.",
     "hint_emptyPrivateLibrary": "Wähle ein Element von der Zeichenfläche, um es hier hinzuzufügen.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Bibliothek durchsuchen",
+      "heading": "Bibliothekstreffer",
+      "noResults": "Keine passenden Elemente gefunden...",
+      "clearSearch": "Suche zurücksetzen"
     }
   },
   "search": {
@@ -210,13 +216,13 @@
     "singleResult": "Ergebnis",
     "multipleResults": "Ergebnisse",
     "placeholder": "Text auf Zeichenfläche suchen...",
-    "frames": "",
+    "frames": "Rahmen",
     "texts": "Texte"
   },
   "buttons": {
     "clearReset": "Zeichenfläche löschen & Hintergrundfarbe zurücksetzen",
     "exportJSON": "In Datei exportieren",
-    "exportImage": "Exportiere Bild...",
+    "exportImage": "Bild exportieren...",
     "export": "Speichern als...",
     "copyToClipboard": "In Zwischenablage kopieren",
     "copyLink": "Link kopieren",
@@ -245,11 +251,11 @@
     "objectsSnapMode": "Einrasten an Objekten",
     "exitZenMode": "Zen-Modus verlassen",
     "cancel": "Abbrechen",
-    "saveLibNames": "",
+    "saveLibNames": "Name(n) speichern und schließen",
     "clear": "Löschen",
     "remove": "Entfernen",
     "embed": "Einbettung umschalten",
-    "publishLibrary": "",
+    "publishLibrary": "Umbenennen oder veröffentlichen",
     "submit": "Absenden",
     "confirm": "Bestätigen",
     "embeddableInteractionButton": "Klicken, um zu interagieren"
@@ -269,14 +275,14 @@
     "errorAddingToLibrary": "Das Element konnte nicht zur Bibliothek hinzugefügt werden",
     "errorRemovingFromLibrary": "Das Element konnte nicht aus der Bibliothek entfernt werden",
     "confirmAddLibrary": "Dies fügt {{numShapes}} Form(en) zu deiner Bibliothek hinzu. Bist du dir sicher?",
-    "imageDoesNotContainScene": "Dieses Bild scheint keine Szenendaten zu enthalten. Hast Du das Einbetten der Szene während des Exports aktiviert?",
+    "imageDoesNotContainScene": "Dieses Bild scheint keine Szenendaten zu enthalten. Hast du das Einbetten der Szene beim Export aktiviert?",
     "cannotRestoreFromImage": "Die Zeichnung konnte aus dieser Bilddatei nicht wiederhergestellt werden",
-    "invalidSceneUrl": "Die Szene konnte nicht von der angegebenen URL importiert werden. Sie ist entweder fehlerhaft oder enthält keine gültigen Excalidraw JSON-Daten.",
-    "resetLibrary": "Dieses löscht deine Bibliothek. Bist du sicher?",
+    "invalidSceneUrl": "Die Szene konnte nicht von der angegebenen URL importiert werden. Die URL ist entweder fehlerhaft oder enthält keine gültigen Excalidraw-JSON-Daten.",
+    "resetLibrary": "Dies löscht deine Bibliothek. Bist du sicher?",
     "removeItemsFromsLibrary": "{{count}} Element(e) aus der Bibliothek löschen?",
     "invalidEncryptionKey": "Verschlüsselungsschlüssel muss 22 Zeichen lang sein. Die Live-Zusammenarbeit ist deaktiviert.",
     "collabOfflineWarning": "Keine Internetverbindung verfügbar.\nDeine Änderungen werden nicht gespeichert!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Browserspeicher voll. Änderungen werden nicht gespeichert."
   },
   "errors": {
     "unsupportedFileType": "Nicht unterstützter Dateityp.",
@@ -287,13 +293,13 @@
     "cannotResolveCollabServer": "Konnte keine Verbindung zum Collab-Server herstellen. Bitte lade die Seite neu und versuche es erneut.",
     "importLibraryError": "Bibliothek konnte nicht geladen werden",
     "saveLibraryError": "Bibliothek konnte nicht gespeichert werden. Bitte speichere deine Bibliothek lokal in einer Datei, um sicherzustellen, dass keine Änderungen verloren gehen.",
-    "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest Du Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
-    "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest Deine Datei lokal speichern, um sicherzustellen, dass Du Deine Arbeit nicht verlierst.",
+    "collabSaveFailed": "Keine Speicherung in der Backend-Datenbank möglich. Wenn die Probleme weiterhin bestehen, solltest du deine Datei lokal speichern, um sicherzustellen, dass du deine Arbeit nicht verlierst.",
+    "collabSaveFailed_sizeExceeded": "Keine Speicherung in der Backend-Datenbank möglich, die Zeichenfläche scheint zu groß zu sein. Du solltest deine Datei lokal speichern, um sicherzustellen, dass du deine Arbeit nicht verlierst.",
     "imageToolNotSupported": "Bilder sind deaktiviert.",
     "brave_measure_text_error": {
-      "line1": "Sieht so aus, als ob Du den Brave-Browser verwendest und die <bold>aggressive Blockierung von Fingerabdrücken</bold> aktiviert hast.",
-      "line2": "Dies könnte dazu führen, dass die <bold>Textelemente</bold> in Ihren Zeichnungen zerstört werden.",
-      "line3": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Dazu kannst Du <link>diesen Schritten</link> folgen.",
+      "line1": "Sieht so aus, als ob du den Brave-Browser verwendest und die <bold>aggressive Blockierung von Fingerabdrücken</bold> aktiviert hast.",
+      "line2": "Dies könnte dazu führen, dass die <bold>Textelemente</bold> in deinen Zeichnungen nicht korrekt dargestellt werden.",
+      "line3": "Wir empfehlen dringend, diese Einstellung zu deaktivieren. Dazu kannst du <link>diesen Schritten</link> folgen.",
       "line4": "Wenn die Deaktivierung dieser Einstellung die fehlerhafte Anzeige von Textelementen nicht behebt, öffne bitte ein <issueLink>Ticket</issueLink> auf unserem GitHub oder schreibe uns auf <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
@@ -307,7 +313,7 @@
   },
   "toolBar": {
     "selection": "Auswahl",
-    "lasso": "",
+    "lasso": "Lassoauswahl",
     "image": "Bild einfügen",
     "rectangle": "Rechteck",
     "diamond": "Raute",
@@ -325,10 +331,11 @@
     "magicframe": "Wireframe zu Code",
     "embeddable": "Web-Einbettung",
     "laser": "Laserpointer",
+    "autoshape": "",
     "hand": "Hand (Schwenkwerkzeug)",
     "extraTools": "Weitere Werkzeuge",
     "mermaidToExcalidraw": "Mermaid zu Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Formtyp umschalten"
   },
   "element": {
     "rectangle": "Rechteck",
@@ -352,38 +359,40 @@
     "shapes": "Formen"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} zum Schließen der Suche",
+    "canvasPanning": "Halte {{shortcut_1}} oder {{shortcut_2}} beim Ziehen gedrückt, um die Zeichenfläche zu verschieben, oder verwende das Handwerkzeug",
     "linearElement": "Klicken für Linie mit mehreren Punkten, Ziehen für einzelne Linie",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Klicken für mehrere Punkte, ziehen für eine einzelne Linie. Drücke erneut {{shortcut}}, um den Pfeiltyp zu wechseln.",
+    "arrowBindModifiers": "Halte {{shortcut_1}} gedrückt, um die Bindung zu deaktivieren, oder {{shortcut_2}} für einen festen Ankerpunkt",
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "autoshape": "",
+    "text_selected": "Doppelklicken oder {{shortcut}} drücken, um Text zu bearbeiten",
+    "text_editing": "Drücke {{shortcut_1}} oder {{shortcut_2}}, um die Bearbeitung abzuschließen",
+    "linearElementMulti": "Klicke auf den letzten Punkt oder drücke {{shortcut_1}} oder {{shortcut_2}} zum Abschließen",
+    "lockAngle": "Halte {{shortcut}} gedrückt, um den Winkel einzuschränken",
+    "resize": "Halte {{shortcut_1}} gedrückt, um die Proportionen beizubehalten.\n{{shortcut_2}} gedrückt halten, um von der Mitte aus zu skalieren",
+    "resizeImage": "Halte {{shortcut_1}} gedrückt, um frei zu skalieren.\n{{shortcut_2}} gedrückt halten, um von der Mitte aus zu skalieren",
+    "rotate": "Halte {{shortcut}} gedrückt, um den Winkel einzuschränken",
+    "toggleArrowhead": "",
+    "lineEditor_info": "Halte {{shortcut_1}} gedrückt und doppelklicke oder drücke {{shortcut_2}}, um Punkte zu bearbeiten",
+    "lineEditor_line_info": "Doppelklicken oder {{shortcut}} drücken, um Punkte zu bearbeiten",
+    "lineEditor_pointSelected": "Drücke {{shortcut_1}}, um Punkt(e) zu entfernen,\n{{shortcut_2}} zum Duplizieren, oder ziehe zum Verschieben",
+    "lineEditor_nothingSelected": "Wähle einen Punkt zum Bearbeiten (halte {{shortcut_1}} für Mehrfachauswahl),\noder halte {{shortcut_2}} gedrückt und klicke, um neue Punkte hinzuzufügen",
     "publishLibrary": "Veröffentliche deine eigene Bibliothek",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} zum Hinzufügen von Text",
+    "createFlowchart": "{{shortcut}} zum Erstellen eines Flussdiagramms",
+    "deepBoxSelect": "Halte {{shortcut}} gedrückt für Tiefenauswahl und um Ziehen zu verhindern",
+    "eraserRevert": "Halte {{shortcut}} gedrückt, um zum Löschen markierte Elemente wiederherzustellen",
     "firefox_clipboard_write": "Diese Funktion kann wahrscheinlich aktiviert werden, indem die Einstellung \"dom.events.asyncClipboard.clipboardItem\" auf \"true\" gesetzt wird. Um die Browsereinstellungen in Firefox zu ändern, besuche die Seite \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Halte {{shortcut}} gedrückt, um Einrasten zu deaktivieren",
+    "enterCropEditor": "Doppelklicke auf das Bild oder drücke {{shortcut}}, um das Bild zuzuschneiden",
+    "leaveCropEditor": "Klicke außerhalb des Bildes oder drücke {{shortcut_1}} oder {{shortcut_2}}, um das Zuschneiden abzuschließen"
   },
   "canvasError": {
     "cannotShowPreview": "Vorschau kann nicht angezeigt werden",
-    "canvasTooBig": "Die Leinwand ist möglicherweise zu groß.",
+    "canvasTooBig": "Die Zeichenfläche ist möglicherweise zu groß.",
     "canvasTooBigTip": "Tipp: Schiebe die am weitesten entfernten Elemente ein wenig näher zusammen."
   },
   "errorSplash": {
@@ -411,12 +420,12 @@
     "title": "Fehler"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Speichern",
+    "defaultMessage": "Speicherung wird vorbereitet..."
   },
   "exportDialog": {
     "disk_title": "Auf Festplatte speichern",
-    "disk_details": "Exportiere die Zeichnungsdaten in eine Datei, die Du später importieren kannst.",
+    "disk_details": "Exportiere die Zeichnungsdaten in eine Datei, aus der du später importieren kannst.",
     "disk_button": "Als Datei speichern",
     "link_title": "Teilbarer Link",
     "link_details": "Als schreibgeschützten Link exportieren.",
@@ -431,7 +440,7 @@
     "deepSelect": "Auswahl innerhalb der Gruppe",
     "deepBoxSelect": "Auswahl innerhalb der Gruppe, und Ziehen vermeiden",
     "createFlowchart": "Erstelle ein Flussdiagramm aus einem generischen Element",
-    "navigateFlowchart": "Durchsuche ein Flussdiagramm",
+    "navigateFlowchart": "Durch ein Flussdiagramm navigieren",
     "curvedArrow": "Gebogener Pfeil",
     "curvedLine": "Gebogene Linie",
     "documentation": "Dokumentation",
@@ -482,12 +491,12 @@
       "required": "Erforderlich",
       "website": "Gültige URL eingeben"
     },
-    "noteDescription": "Sende deine Bibliothek ein, um in die <link>öffentliche Bibliotheks-Repository aufgenommen zu werden</link>damit andere Nutzer sie in ihren Zeichnungen verwenden können.",
+    "noteDescription": "Sende deine Bibliothek ein, um in das <link>öffentliche Bibliotheksverzeichnis</link> aufgenommen zu werden, damit andere sie in ihren Zeichnungen verwenden können.",
     "noteGuidelines": "Die Bibliothek muss zuerst manuell freigegeben werden. Bitte lies die <link>Richtlinien</link> vor dem Absenden. Du benötigst ein GitHub-Konto, um zu kommunizieren und Änderungen vorzunehmen, falls erforderlich, aber es ist nicht unbedingt erforderlich.",
-    "noteLicense": "Mit dem Absenden stimmst du zu, dass die Bibliothek unter der <link>MIT-Lizenz, </link>die zusammengefasst beinhaltet, dass jeder sie ohne Einschränkungen nutzen kann.",
+    "noteLicense": "Mit dem Absenden stimmst du zu, dass die Bibliothek unter der <link>MIT-Lizenz</link> veröffentlicht wird. Das bedeutet, dass jeder sie ohne Einschränkungen nutzen kann.",
     "noteItems": "Jedes Bibliothekselement muss einen eigenen Namen haben, damit es gefiltert werden kann. Die folgenden Bibliothekselemente werden hinzugefügt:",
     "atleastOneLibItem": "Bitte wähle mindestens ein Bibliothekselement aus, um zu beginnen",
-    "republishWarning": "Hinweis: Einige der ausgewählten Elemente sind bereits als veröffentlicht/eingereicht markiert. Du solltest Elemente nur erneut einreichen, wenn Du eine existierende Bibliothek oder Einreichung aktualisierst."
+    "republishWarning": "Hinweis: Einige der ausgewählten Elemente sind bereits als veröffentlicht/eingereicht markiert. Du solltest Elemente nur erneut einreichen, wenn du eine bestehende Bibliothek oder Einreichung aktualisierst."
   },
   "publishSuccessDialog": {
     "title": "Bibliothek übermittelt",
@@ -508,7 +517,7 @@
       "padding": "Abstand"
     },
     "tooltip": {
-      "embedScene": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass das Dokument später weiter bearbeitet werden kann. \nDieses wird die exportierte Datei vergrößern."
+      "embedScene": "Die Zeichnungsdaten werden in der exportierten PNG/SVG-Datei gespeichert, sodass die Szene daraus wiederhergestellt werden kann.\nDadurch wird die exportierte Datei größer."
     },
     "title": {
       "exportToPng": "Als PNG exportieren",
@@ -554,7 +563,7 @@
     "selection": "Auswahl",
     "pasteAsSingleElement": "Verwende {{shortcut}} , um als einzelnes Element\neinzufügen oder in einen existierenden Texteditor einzufügen",
     "unableToEmbed": "Einbetten dieser URL ist derzeit nicht zulässig. Erstelle einen Issue auf GitHub, um die URL freigeben zu lassen",
-    "unrecognizedLinkFormat": "Der Link, den Du eingebettet hast, stimmt nicht mit dem erwarteten Format überein. Bitte versuche den 'embed' String einzufügen, der von der Quellseite zur Verfügung gestellt wird",
+    "unrecognizedLinkFormat": "Der eingebettete Link stimmt nicht mit dem erwarteten Format überein. Bitte versuche, den Einbettungs-Code der Quellseite einzufügen",
     "elementLinkCopied": "Link in Zwischenablage kopiert"
   },
   "colors": {
@@ -576,9 +585,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Deine Zeichnungen werden im Browserspeicher gespeichert.",
+      "center_heading_line2": "Der Browserspeicher kann unerwartet gelöscht werden.",
+      "center_heading_line3": "Speichere deine Arbeit regelmäßig in einer Datei, um Datenverlust zu vermeiden.",
       "center_heading_plus": "Möchtest du stattdessen zu Excalidraw+ gehen?",
       "menuHint": "Exportieren, Einstellungen, Sprachen, ..."
     },
@@ -595,19 +604,21 @@
     "colors": "Farben",
     "shades": "Schattierungen",
     "hexCode": "Hex-Code",
-    "noShades": "Keine Schattierungen für diese Farbe verfügbar"
+    "noShades": "Keine Schattierungen für diese Farbe verfügbar",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
       "exportToImage": {
         "title": "Als Bild exportieren",
         "button": "Als Bild exportieren",
-        "description": "Exportiere die Zeichnungsdaten als ein Bild, von dem Du später importieren kannst."
+        "description": "Exportiere die Zeichnungsdaten als Bild, aus dem du später importieren kannst."
       },
       "saveToDisk": {
         "title": "Auf Festplatte speichern",
         "button": "Auf Festplatte speichern",
-        "description": "Exportiere die Zeichnungsdaten in eine Datei, von der Du später importieren kannst."
+        "description": "Exportiere die Zeichnungsdaten in eine Datei, aus der du später importieren kannst."
       },
       "excalidrawPlus": {
         "title": "Excalidraw+",
@@ -619,70 +630,70 @@
       "loadFromFile": {
         "title": "Aus Datei laden",
         "button": "Aus Datei laden",
-        "description": "Das Laden aus einer Datei wird <bold>Deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst Deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
+        "description": "Das Laden aus einer Datei wird <bold>deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
       },
       "shareableLink": {
         "title": "Aus Link laden",
         "button": "Meinen Inhalt ersetzen",
-        "description": "Das Laden einer externen Zeichnung wird <bold>Deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst Deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
+        "description": "Das Laden einer externen Zeichnung wird <bold>deinen vorhandenen Inhalt ersetzen</bold>.<br></br>Du kannst deine Zeichnung zuerst mit einer der folgenden Optionen sichern."
       }
     }
   },
   "mermaid": {
     "title": "Mermaid zu Excalidraw",
     "button": "Einfügen",
-    "description": "",
+    "description": "Derzeit werden nur <flowchartLink>Flussdiagramme</flowchartLink>, <sequenceLink>Sequenzdiagramme</sequenceLink>, <classLink>Klassendiagramme</classLink> und <erdLink>Entity-Relationship-Diagramme</erdLink> unterstützt. Die anderen Typen werden als Bild in Excalidraw dargestellt.",
     "syntax": "Mermaid-Syntax",
     "preview": "Vorschau",
-    "label": "",
-    "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Mermaid-Diagrammdefinition hier eingeben...",
+    "autoFixAvailable": "Automatische Korrektur verfügbar"
   },
   "ttd": {
-    "error": ""
+    "error": "Fehler!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Beschreibe hier deine Diagrammidee... ({{shortcut}} für neue Zeile)",
+    "inputPlaceholderWithMessages": "Diagramm weiter verfeinern...",
+    "generating": "Wird erstellt...",
+    "rateLimitRemaining": "{{count}} Anfragen heute verbleibend",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Du",
+      "assistant": "KI-Assistent",
+      "system": "System"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "KI Beta",
+    "label": "Chat",
+    "menu": "Menü",
+    "newChat": "Neuer Chat",
+    "deleteChat": "Chat löschen",
+    "deleteMessage": "Nachricht löschen",
+    "viewAsMermaid": "Als Mermaid anzeigen",
     "placeholder": {
-      "title": "",
-      "description": "",
+      "title": "Gestalte dein Diagramm",
+      "description": "Beschreibe das Diagramm, das du erstellen möchtest, und wir generieren es für dich.",
       "hint": ""
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Vorschau",
+    "insert": "Einfügen",
+    "retry": "Erneut versuchen",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "Eingabe zu kurz (min. {{min}} Zeichen)",
+      "promptTooLong": "Eingabe zu lang (max. {{max}} Zeichen)",
+      "generationFailed": "Erstellung fehlgeschlagen",
+      "invalidDiagram": "Ungültiges Diagramm erstellt :(. Du kannst es manuell bearbeiten, mit automatischer Korrektur erneut versuchen oder eine andere Eingabe verwenden.",
+      "fixInMermaid": "Mermaid manuell bearbeiten →",
+      "aiRepair": "Neu generieren (Auto-Korrektur) →",
+      "requestAborted": "Anfrage abgebrochen",
+      "requestFailed": "Anfrage fehlgeschlagen",
+      "mermaidParseError": "Mermaid-Syntaxfehler"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Du hast dein KI-Limit im kostenlosen Tarif erreicht. Probiere Excalidraw+ für mehr oder komme morgen wieder.",
+      "generalRateLimit": "Nicht so schnell! Bitte warte einen Moment, bevor du es erneut versuchst.",
+      "messageLimitInputPlaceholder": "Nachrichtenlimit erreicht"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Auf Plus upgraden"
   },
   "quickSearch": {
     "placeholder": "Schnellsuche"
@@ -722,12 +733,12 @@
   },
   "keys": {
     "ctrl": "Strg",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Eingabe",
+    "shift": "Umschalt",
     "spacebar": "Leertaste",
     "delete": "Löschen",
     "mmb": "Mausrad"

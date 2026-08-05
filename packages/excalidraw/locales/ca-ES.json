@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Guions",
     "strokeStyle_dotted": "Punts",
     "sloppiness": "Estil del traç",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Opacitat",
     "textAlign": "Alineació del text",
     "edges": "Vores",
@@ -185,6 +188,9 @@
     "shapeSwitch": "",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,6 +331,7 @@
     "magicframe": "De Wireframe a codi",
     "embeddable": "Incrustació Web",
     "laser": "Punter làser",
+    "autoshape": "",
     "hand": "Mà (eina de desplaçament)",
     "extraTools": "Més eines",
     "mermaidToExcalidraw": "Mermaid a Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
     "embeddable": "Feu clic i arrossegueu per crear una Incrustació Web",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -367,6 +375,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -595,7 +604,9 @@
     "colors": "Colors",
     "shades": "Ombres",
     "hexCode": "Codi hexadecimal",
-    "noShades": "No hi ha ombres disponibles per a aquest color"
+    "noShades": "No hi ha ombres disponibles per a aquest color",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {

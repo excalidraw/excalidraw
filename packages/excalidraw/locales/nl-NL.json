@@ -3,10 +3,10 @@
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
     "pasteCharts": "Grafieken plakken",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "Staafdiagram",
+    "chartType_line": "Lijndiagram",
+    "chartType_radar": "Spinnenweb diagram",
+    "chartType_plaintext": "Tekst zonder opmaak",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
@@ -35,6 +35,9 @@
     "strokeStyle_dashed": "Gestreept",
     "strokeStyle_dotted": "Gestippeld",
     "sloppiness": "Slordigheid",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Doorzichtigheid",
     "textAlign": "Uitlijning",
     "edges": "Randen",
@@ -53,14 +56,14 @@
     "arrowhead_crowfoot_many": "Kraaienpoot (veel)",
     "arrowhead_crowfoot_one": "Kraaienpoot (enkel)",
     "arrowhead_crowfoot_one_or_many": "Kraaienpoot (enkel of veel)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "Kardinaliteit (één)",
+    "arrowhead_cardinality_many": "Kardinaliteit (Meerdere)",
+    "arrowhead_cardinality_one_or_many": "Kardinaliteit (één of meerdere)",
+    "arrowhead_cardinality_exactly_one": "Kardinaliteit (Precies één)",
+    "arrowhead_cardinality_zero_or_one": "Kardinaliteit (nul of één)",
+    "arrowhead_cardinality_zero_or_many": "Kardinaliteit (nul of meerdere)",
     "more_options": "Meer opties",
-    "cardinality": "",
+    "cardinality": "Kardinaliteit",
     "arrowtypes": "Pijl type",
     "arrowtype_sharp": "Scherpe pijl",
     "arrowtype_round": "Gebogen pijl",
@@ -140,7 +143,7 @@
     "createContainerFromText": "Tekst in een container laten doorlopen",
     "link": {
       "edit": "Wijzig link",
-      "editEmbed": "Embedbare link bewerken",
+      "editEmbed": "Bewerken van insluitbare link",
       "create": "Link toevoegen",
       "label": "Link",
       "labelEmbed": "Link toevoegen & embedden",
@@ -185,8 +188,11 @@
     "shapeSwitch": "Verander vorm",
     "preferences": "Voorkeuren",
     "preferences_toolLock": "Tool vergrendelen",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "Pijlverbinding",
+    "midpointSnapping": "Vastklikken op middelpunt"
   },
   "elementLink": {
     "title": "Link naar object",
@@ -325,6 +331,7 @@
     "magicframe": "Wireframe naar code",
     "embeddable": "Web Embed",
     "laser": "Laseraanwijzer",
+    "autoshape": "",
     "hand": "Hand (panning tool)",
     "extraTools": "Meer tools",
     "mermaidToExcalidraw": "Mermaid naar Excalidraw",
@@ -360,6 +367,7 @@
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "embeddable": "Klink-sleep om een website-insluiting te maken",
+    "autoshape": "",
     "text_selected": "Dubbelklik of druk op {{shortcut}} om de tekst te bewerken",
     "text_editing": "Druk op {{shortcut_1}} of {{shortcut_2}} om het bewerken te voltooien",
     "linearElementMulti": "Klik op het laatste punt of druk op {{shortcut_1}} of {{shortcut_2}} om te voltooien",
@@ -367,6 +375,7 @@
     "resize": "Je kunt de verhoudingen behouden door {{shortcut_1}} ingedrukt te houden tijdens het schalen,\nhoud {{shortcut_2}} ingedrukt om vanuit het midden te schalen",
     "resizeImage": "Je kunt vrij vergroten of verkleinen door {{shortcut_1}} ingedrukt te houden,\nhoud {{shortcut_2}} ingedrukt om vanuit het midden te schalen",
     "rotate": "Je kan hoeken beperken door {{shortcut}} ingedrukt te houden tijdens het draaien",
+    "toggleArrowhead": "",
     "lineEditor_info": "Houd {{shortcut_1}} en Dubbelklik of druk op {{shortcut_2}} om punten te bewerken",
     "lineEditor_line_info": "Dubbelklik of druk op {{shortcut}} om punten te bewerken",
     "lineEditor_pointSelected": "Druk op {{shortcut_1}} om punt(en) te verwijderen,\n{{shortcut_2}} om te dupliceren, of sleep om te verplaatsen",
@@ -411,8 +420,8 @@
     "title": "Fout"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Bezig met opslaan",
+    "defaultMessage": "Voorbereiden om op te slaan..."
   },
   "exportDialog": {
     "disk_title": "Opslaan op schijf",
@@ -491,7 +500,7 @@
   },
   "publishSuccessDialog": {
     "title": "Bibliotheek ingediend",
-    "content": "<link>Hier</link>"
+    "content": "Dank je {{authorName}}. Jouw bibliotheek is ingediend voor beoordeling. Je kunt de status <link>hier bijhouden</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reset bibliotheek",
@@ -502,7 +511,7 @@
     "label": {
       "withBackground": "Achtergrond",
       "onlySelected": "Alleen geselecteerd",
-      "darkMode": "Dark mode",
+      "darkMode": "Donkere modus",
       "embedScene": "Scène embedden",
       "scale": "Schaal",
       "padding": "Padding"
@@ -595,7 +604,9 @@
     "colors": "Kleuren",
     "shades": "Tinten",
     "hexCode": "HEX-code",
-    "noShades": "Geen tinten beschikbaar voor deze kleur"
+    "noShades": "Geen tinten beschikbaar voor deze kleur",
+    "invalidColor": "",
+    "invalidHexLength": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -631,12 +642,12 @@
   "mermaid": {
     "title": "Mermaid naar Excalidraw",
     "button": "Invoegen",
-    "description": "",
+    "description": "Momenteel worden alleen <flowchartLink>Stroomdiagram</flowchartLink>, <sequenceLink>Volgordediagram</sequenceLink>, <classLink>Klasse</classLink>, en <erdLink>Entiteitsrelatie</erdLink>diagrammen ondersteund. De andere typen worden weergegeven als afbeelding in Excalidraw.",
     "syntax": "Mermaid Syntaxis",
     "preview": "Voorbeeld",
     "label": "Mermaid",
     "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier...",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "Auto-correctie is beschikbaar"
   },
   "ttd": {
     "error": "Fout!"

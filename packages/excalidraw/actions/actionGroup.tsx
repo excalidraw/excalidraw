@@ -49,16 +49,20 @@ import { register } from "./register";
 
 import type { AppClassProperties, UIAppState } from "../types";
 
-const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
+const allElementsInSameGroup = (
+  elements: readonly ExcalidrawElement[],
+  editingGroupId: UIAppState["editingGroupId"],
+) => {
   if (elements.length >= 2) {
-    const groupIds = elements[0].groupIds;
+    const editingGroupIndex = editingGroupId
+      ? elements[0].groupIds.indexOf(editingGroupId)
+      : -1;
+    const groupIds =
+      editingGroupIndex > -1
+        ? elements[0].groupIds.slice(0, editingGroupIndex)
+        : elements[0].groupIds;
     for (const groupId of groupIds) {
-      if (
-        elements.reduce(
-          (acc, element) => acc && isElementInGroup(element, groupId),
-          true,
-        )
-      ) {
+      if (elements.every((element) => isElementInGroup(element, groupId))) {
         return true;
       }
     }
@@ -66,19 +70,15 @@ const allElementsInSameGroup = (elements: readonly ExcalidrawElement[]) => {
   return false;
 };
 
-const enableActionGroup = (
-  elements: readonly ExcalidrawElement[],
-  appState: UIAppState,
-  app: AppClassProperties,
-) => {
+const enableActionGroup = (appState: UIAppState, app: AppClassProperties) => {
   const selectedElements = app.scene.getSelectedElements({
     selectedElementIds: appState.selectedElementIds,
-    includeBoundTextElement: true,
+    includeBoundTextElement: false,
   });
 
   return (
     selectedElements.length >= 2 &&
-    !allElementsInSameGroup(selectedElements) &&
+    !allElementsInSameGroup(selectedElements, appState.editingGroupId) &&
     !frameAndChildrenSelectedTogether(selectedElements)
   );
 };
@@ -89,6 +89,10 @@ export const actionGroup = register({
   icon: (appState) => <GroupIcon theme={appState.theme} />,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
+    if (!enableActionGroup(appState, app)) {
+      return false;
+    }
+
     const selectedElements = getRootElements(
       app.scene.getSelectedElements({
         selectedElementIds: appState.selectedElementIds,
@@ -194,13 +198,12 @@ export const actionGroup = register({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  predicate: (elements, appState, _, app) =>
-    enableActionGroup(elements, appState, app),
+  predicate: (elements, appState, _, app) => enableActionGroup(appState, app),
   keyTest: (event) =>
     !event.shiftKey && event[KEYS.CTRL_OR_CMD] && event.key === KEYS.G,
   PanelComponent: ({ elements, appState, updateData, app }) => (
     <IconButton
-      hidden={!enableActionGroup(elements, appState, app)}
+      hidden={!enableActionGroup(appState, app)}
       type="button"
       icon={<GroupIcon theme={appState.theme} />}
       onClick={() => updateData(null)}
