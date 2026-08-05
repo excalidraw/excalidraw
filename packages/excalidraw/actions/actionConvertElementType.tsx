@@ -35,7 +35,10 @@ const makeConvert = (
       const selected = (elements as ExcalidrawElement[]).filter(
         (el) => appState.selectedElementIds[el.id] && !el.isDeleted,
       );
-      return getConversionTypeFromElements(selected) === conversionType;
+    return (
+      getConversionTypeFromElements(selected) === conversionType &&
+      selected.some((el) => el.type !== nextType)
+    );
     },
   });
 
