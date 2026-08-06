@@ -47,7 +47,10 @@ body.excalidraw-cursor-resize * {
     --viewport-status-frame-border-width: 4px;
   }
 
-  &.excalidraw--viewport-status-label {
+  // on desktop/tablet the badge is a flex sibling of scroll-back-to-content
+  // inside .floating-status-stack, so spacing comes from flex `gap` instead.
+  // only mobile still positions the badge independently of the stack.
+  &.excalidraw--mobile.excalidraw--viewport-status-label {
     --viewport-status-label-offset: 0.75rem;
   }
 
@@ -564,6 +567,20 @@ body.excalidraw-cursor-resize * {
       transform: none;
       max-width: 100%;
       pointer-events: var(--ui-pointerEvents);
+    }
+
+    .viewport-status-frame__badge {
+      // stays a positioning container (unlike scroll-back-to-content) so
+      // .viewport-status-frame__badge-action's inset:0 stays scoped to the
+      // pill instead of escaping to this (much larger) flex container.
+      position: relative;
+      left: auto;
+      bottom: auto;
+      transform: none;
+
+      &.viewport-status-frame__badge--clickable:active {
+        transform: scale(0.96);
+      }
     }
   }
 

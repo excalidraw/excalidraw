@@ -2654,11 +2654,12 @@ class App extends React.Component<AppProps, AppState> {
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
                           />
-                          {this.props.viewportStatusFrame && (
-                            <ViewportStatusFrame
-                              status={this.props.viewportStatusFrame}
-                            />
-                          )}
+                          {this.props.viewportStatusFrame &&
+                            this.editorInterface.formFactor === "phone" && (
+                              <ViewportStatusFrame
+                                status={this.props.viewportStatusFrame}
+                              />
+                            )}
                           {this.renderFrameNames()}
                           {this.isDefaultUIEnabled() &&
                             this.state.activeLockedId && (
