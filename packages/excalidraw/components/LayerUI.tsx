@@ -756,10 +756,19 @@ const LayerUI = ({
             />
           )}
           <div
-            className="layer-ui__wrapper"
+            className={clsx("layer-ui__wrapper", {
+              "layer-ui__wrapper--sidebar-docked": isSidebarDockedAndFits,
+            })}
             style={
               isSidebarDockedAndFits
-                ? { width: `calc(100% - var(--right-sidebar-width))` }
+                ? {
+                    // flush against the sidebar's visible edge (like the
+                    // canvas underneath), not the --right-sidebar-width
+                    // column it reserves — the 8px difference is the
+                    // sidebar's own outer margin, which would otherwise be
+                    // a dead gap between the UI area and the sidebar
+                    width: `calc(100% - (var(--right-sidebar-width) - var(--space-factor) * 2))`,
+                  }
                 : {}
             }
           >

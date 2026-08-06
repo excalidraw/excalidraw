@@ -571,6 +571,14 @@ body.excalidraw-cursor-resize * {
   //     (and usually r4 too), else its width would offset the toolbar.
   // ---------------------------------------------------------------------------
 
+  // the wrapper is flush with a docked sidebar's visible edge; keep the
+  // region content at the same visual clearance from the sidebar it had
+  // when the wrapper stopped at the reserved column instead (this also
+  // keeps the stack/toast center unchanged)
+  .layer-ui__wrapper--sidebar-docked .exc-regions {
+    right: calc(var(--editor-container-padding) + var(--space-factor) * 2);
+  }
+
   .exc-regions {
     position: absolute;
     inset: var(--editor-container-padding);
@@ -909,19 +917,6 @@ body.excalidraw-cursor-resize * {
     max-width: calc(100% - 2 * var(--viewport-status-frame-border-width));
   }
 
-  // on mobile, when the default bottom toolbar renders, the stack is a
-  // normal (in-flow) row above MobileShapeActions/the toolbar Island inside
-  // .App-bottom-bar instead of being independently viewport-positioned —
-  // self-sizing regardless of whether MobileShapeActions is showing, with
-  // no magic-number height math needed to clear the toolbar.
-  .App-bottom-bar > .floating-status-stack {
-    position: static;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    margin-bottom: 0.5rem;
-  }
-
   .help-icon {
     @include outlineButtonStyles;
     @include filledButtonOnCanvas;
@@ -964,15 +959,26 @@ body.excalidraw-cursor-resize * {
 
     // the base rule is grid-placed by `.exc-regions` (desktop only) — the
     // standalone mobile stack (view mode / no bottom bar) is positioned
-    // against the viewport instead, full-width so flex centers the children.
-    // (When the bottom bar renders, the `.App-bottom-bar >` in-flow rule
-    // above takes over.)
+    // against the viewport instead, full-width so flex centers the children
     .floating-status-stack {
       position: absolute;
       left: var(--viewport-status-frame-border-width);
       right: var(--viewport-status-frame-border-width);
       bottom: calc(30px + var(--sab, 0));
       z-index: var(--zIndex-ui-bottom);
+    }
+
+    // …but when the default bottom toolbar renders, the stack is a normal
+    // (in-flow) row above MobileShapeActions/the toolbar Island inside
+    // .App-bottom-bar instead of being independently viewport-positioned —
+    // self-sizing regardless of whether MobileShapeActions is showing, with
+    // no magic-number height math needed to clear the toolbar.
+    .App-bottom-bar > .floating-status-stack {
+      position: static;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      margin-bottom: 0.5rem;
     }
   }
 
