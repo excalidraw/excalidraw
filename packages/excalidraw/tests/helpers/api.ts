@@ -229,6 +229,9 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
+    createdBy?: ExcalidrawElement["createdBy"];
+    createdAt?: ExcalidrawElement["createdAt"];
+    updatedBy?: ExcalidrawElement["updatedBy"];
   }): NonDeleted<
     T extends "arrow" | "line"
       ? ExcalidrawLinearElement
@@ -290,6 +293,9 @@ export class API {
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
       locked: rest.locked ?? false,
+      createdBy: rest.createdBy ?? null,
+      createdAt: rest.createdAt ?? null,
+      updatedBy: rest.updatedBy ?? null,
     };
     switch (type) {
       case "rectangle":
