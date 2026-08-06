@@ -408,6 +408,33 @@ body.excalidraw-cursor-resize * {
   .App-menu_top > .App-menu_top__left {
     grid-column: 1;
     justify-self: start;
+
+    // App-menu_top__left is a single-column grid, so its track width is
+    // driven by the widest row — including the host-provided
+    // renderTopLeftUI content, which can be arbitrarily wide. Its
+    // (stretched) grid-item wrappers must stay pointer-events:none so that
+    // slack isn't a dead zone over the canvas; only the actual
+    // (content-sized, non-stretched) interactive pieces opt back in.
+    // Specificity (not source order) is why this beats `.App-menu_top > *`.
+    pointer-events: none;
+
+    .selected-shape-actions-container,
+    .ToolIcon__penMode {
+      pointer-events: var(--ui-pointerEvents);
+    }
+
+    // .excalidraw-ui-top-left is itself `display: flex` (block-level), so
+    // it *also* stretches to fill this track's width — its own box needs
+    // the same none-then-opt-in treatment, one level deeper, so its real
+    // (content-sized, unstretched) children stay clickable without
+    // resizing/repositioning the row itself.
+    .excalidraw-ui-top-left {
+      pointer-events: none;
+
+      > * {
+        pointer-events: var(--ui-pointerEvents);
+      }
+    }
   }
 
   .App-menu_top > .shapes-section {
