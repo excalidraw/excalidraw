@@ -392,12 +392,17 @@ export class Store {
 
   /**
    * Stamps authorship (`createdBy` / `createdAt` / `updatedBy`) onto elements
-   * which entered the document through local, undoable activity of this editor
-   * instance.
+   * which entered the document or got edited through local, undoable activity
+   * of this editor instance.
    *
    * An element which is not yet part of the snapshot at the time of a durable
    * capture could have entered the scene only locally, as remote or loaded
    * elements always enter the snapshot through `CaptureUpdateAction.NEVER`.
+   * Such an element is a "creation candidate" and receives all three fields.
+   *
+   * An element which is already part of the snapshot, but is changing within
+   * this very capture, is an "edit candidate" and receives just `updatedBy`
+   * (deletion counts as an edit as well).
    */
   private maybeStampAuthorship(
     params:
@@ -438,26 +443,61 @@ export class Store {
     const timestamp = getUpdatedTimestamp();
 
     for (const candidate of candidates) {
-      if (
-        // never overwrite an existing attribution
-        candidate.createdBy != null ||
-        // never stamp elements which are already part of the document
-        this.snapshot.elements.has(candidate.id)
-      ) {
-        continue;
-      }
+      const snapshotElement = this.snapshot.elements.get(candidate.id);
 
-      const authorship = {
-        createdBy: userId,
-        createdAt: timestamp,
-        updatedBy: userId,
+      let authorship: {
+        createdBy?: string;
+        createdAt?: number;
+        updatedBy: string;
       };
 
+      if (!snapshotElement) {
+        // creation candidate - not part of the document yet
+        if (candidate.createdBy != null) {
+          // never overwrite an existing attribution
+          continue;
+        }
+
+        authorship = {
+          createdBy: userId,
+          createdAt: timestamp,
+          updatedBy: userId,
+        };
+      } else {
+        // edit candidate - already part of the document, hence we only ever
+        // re-attribute the last editor, never the original author
+        if (!isMicroAction) {
+          // unlike the micro action's change, which contains exactly the
+          // changed elements, the macro action receives the whole scene,
+          // so we have to detect the changed elements ourselves, the very same
+          // way `StoreSnapshot.detectChangedElements` does
+          if (snapshotElement.version >= candidate.version) {
+            continue;
+          }
+
+          if (
+            isImageElement(candidate) &&
+            !isInitializedImageElement(candidate)
+          ) {
+            // ignore any updates on uninitialized image elements
+            continue;
+          }
+        }
+
+        authorship = { updatedBy: userId };
+      }
+
+      const isCreationCandidate = !snapshotElement;
       const liveElement = elements.get(candidate.id);
 
       if (!liveElement) {
         // the change might reference an element which is gone from the scene
         Object.assign(candidate, authorship);
+        continue;
+      }
+
+      if (!isCreationCandidate && liveElement.updatedBy === userId) {
+        // steady-state solo editing, don't churn the version for a no-op stamp
         continue;
       }
 
