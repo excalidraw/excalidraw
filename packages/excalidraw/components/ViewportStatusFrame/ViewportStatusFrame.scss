@@ -7,7 +7,7 @@
     box-sizing: border-box;
     pointer-events: none;
     border: 4px solid;
-    z-index: 9999;
+    z-index: var(--zIndex-viewportStatusFrame);
   }
 
   .viewport-status-frame__badge {
@@ -17,7 +17,7 @@
     );
     left: 50%;
     transform: translateX(-50%);
-    z-index: 9999;
+    z-index: var(--zIndex-viewportStatusFrame);
     pointer-events: all;
 
     background-color: var(--viewport-status-frame-badge-background);
