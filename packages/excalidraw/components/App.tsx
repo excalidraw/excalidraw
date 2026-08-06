@@ -209,10 +209,10 @@ import {
   getRenderOpacity,
   editGroupForSelectedElement,
   getElementsInGroup,
+  getSelectedGroupForElement,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
   isElementInGroup,
-  isSelectedViaGroup,
   selectGroupsForSelectedElements,
   syncInvalidIndices,
   syncMovedIndices,
@@ -12092,21 +12092,22 @@ class App extends React.Component<AppProps, AppState> {
           !this.state.selectedLinearElement?.isEditing
         ) {
           if (this.state.selectedElementIds[hitElement.id]) {
-            if (isSelectedViaGroup(this.state, hitElement)) {
+            const selectedGroupId = getSelectedGroupForElement(
+              this.state,
+              hitElement,
+            );
+            if (selectedGroupId) {
               this.setState((_prevState) => {
                 const nextSelectedElementIds = {
                   ..._prevState.selectedElementIds,
                 };
 
-                // We want to unselect all groups hitElement is part of
+                // We want to unselect the groups hitElement is part of
                 // as well as all elements that are part of the groups
                 // hitElement is part of
-                for (const groupedElement of hitElement.groupIds.flatMap(
-                  (groupId) =>
-                    getElementsInGroup(
-                      this.scene.getNonDeletedElements(),
-                      groupId,
-                    ),
+                for (const groupedElement of getElementsInGroup(
+                  this.scene.getNonDeletedElements(),
+                  selectedGroupId,
                 )) {
                   delete nextSelectedElementIds[groupedElement.id];
                 }
@@ -12114,9 +12115,7 @@ class App extends React.Component<AppProps, AppState> {
                 return {
                   selectedGroupIds: {
                     ..._prevState.selectedGroupIds,
-                    ...hitElement.groupIds
-                      .map((gId) => ({ [gId]: false }))
-                      .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
+                    [selectedGroupId]: false,
                   },
                   selectedElementIds: makeNextSelectedElementIds(
                     nextSelectedElementIds,

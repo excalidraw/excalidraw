@@ -1609,4 +1609,78 @@ describe("group selection", () => {
     assertSelectedElements(elements);
     expect(h.state.selectedGroupIds).toEqual({ A: true });
   });
+
+  it("shift selecting and deselecting a nested group preserves selected siblings", () => {
+    const groupA1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["inA", "out"],
+    });
+    const groupA2 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 100,
+      width: 50,
+      height: 50,
+      groupIds: ["inA", "out"],
+    });
+    const groupB1 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["inB", "out"],
+    });
+    const groupB2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 50,
+      height: 50,
+      groupIds: ["inB", "out"],
+    });
+
+    API.setElements([groupA1, groupA2, groupB1, groupB2]);
+
+    mouse.select(groupA1);
+    mouse.doubleClickOn(groupA1);
+
+    assertSelectedElements(groupA1, groupA2);
+    expect(h.state.editingGroupId).toBe("out");
+    expect(h.state.selectedGroupIds).toEqual({ inA: true });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupB1);
+    });
+
+    assertSelectedElements(groupA1, groupA2, groupB1, groupB2);
+    expect(h.state.selectedGroupIds).toEqual({
+      inA: true,
+      inB: true,
+    });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupA1);
+    });
+
+    assertSelectedElements(groupB1, groupB2);
+    expect(h.state.selectedGroupIds).toEqual({
+      inA: false,
+      inB: true,
+    });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupA1);
+    });
+
+    assertSelectedElements(groupA1, groupA2, groupB1, groupB2);
+    expect(h.state.selectedGroupIds).toEqual({
+      inA: true,
+      inB: true,
+    });
+  });
 });
