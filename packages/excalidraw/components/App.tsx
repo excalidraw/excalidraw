@@ -440,7 +440,7 @@ import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
-import ViewportStatusFrame from "./ViewportStatusFrame/ViewportStatusFrame";
+import { ViewportStatusBorder } from "./ViewportStatusFrame/ViewportStatusFrame";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
@@ -2654,10 +2654,10 @@ class App extends React.Component<AppProps, AppState> {
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
                           />
-                          {this.props.viewportStatusFrame &&
+                          {this.props.viewportStatusFrame?.border &&
                             this.editorInterface.formFactor === "phone" && (
-                              <ViewportStatusFrame
-                                status={this.props.viewportStatusFrame}
+                              <ViewportStatusBorder
+                                border={this.props.viewportStatusFrame.border}
                               />
                             )}
                           {this.renderFrameNames()}

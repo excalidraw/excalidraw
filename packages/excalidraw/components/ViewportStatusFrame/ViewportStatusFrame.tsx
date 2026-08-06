@@ -11,10 +11,6 @@ import type { CSSProperties } from "react";
 
 import type { ViewportStatusFrame as ViewportStatusFrameType } from "../../types";
 
-interface ViewportStatusFrameProps {
-  status: ViewportStatusFrameType;
-}
-
 export const ViewportStatusBorder = ({
   border,
   style,
@@ -84,16 +80,3 @@ export const ViewportStatusBadge = ({
     </div>
   );
 };
-
-const ViewportStatusFrame = ({ status }: ViewportStatusFrameProps) => {
-  const { border, label } = status;
-
-  return (
-    <>
-      {border && <ViewportStatusBorder border={border} />}
-      {label && <ViewportStatusBadge label={label} border={border} />}
-    </>
-  );
-};
-
-export default ViewportStatusFrame;
