@@ -1,5 +1,22 @@
 @use "../../css/variables.module" as *;
 
+.opacity-slider-container {
+  /* Estilos LTR padrão */
+  
+  &.is-rtl-fixed {
+    /* Estilos de correção RTL */
+    direction: rtl;
+    
+    /* Exemplo: Se os rótulos estavam à esquerda, agora devem ir para a direita */
+    /* Você precisará inspecionar o elemento para ver quais propriedades (margin, padding, float) precisam ser invertidas. */
+    
+    // Exemplo de correção de alinhamento de texto
+    text-align: right; 
+    
+    // Exemplo de espelhamento de margens (se necessário)
+    // margin-left: 10px; -> margin-right: 10px;
+  }
+}
 .excalidraw {
   .sidebar {
     display: flex;
