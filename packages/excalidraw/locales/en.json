@@ -193,7 +193,8 @@
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "midpointSnapping": "Snap to midpoints",
+    "viewportBasedFontSizing": "Viewport-based font sizing"
   },
   "elementLink": {
     "title": "Link to object",
