@@ -147,6 +147,7 @@ import {
   ArrowheadCardinalityZeroOrOneIcon,
   strokeVariabilityConstantIcon,
   strokeVariabilityVariableIcon,
+  arrowsExchangeIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1860,6 +1861,29 @@ const getArrowheadOptions = (flip: boolean) => {
   } as const;
 };
 
+export const actionFlipArrowDirection = register({
+  name: "flipArrowDirection",
+  label: "labels.flipArrowDirection",
+  trackEvent: { category: "element" },
+  perform: (elements, appState, value, app) => {
+    const updatedElements = changeProperty(elements, appState, (el) => {
+      if (isLinearElement(el) && canHaveArrowheads(el.type)) {
+        return newElementWith(el, {
+          startArrowhead: el.endArrowhead,
+          endArrowhead: el.startArrowhead,
+        });
+      }
+      return el;
+    });
+
+    return {
+      elements: updatedElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+});
+
 export const actionChangeArrowhead = register<{
   position: "start" | "end";
   type: Arrowhead;
@@ -1947,6 +1971,15 @@ export const actionChangeArrowhead = register<{
                 hasSelection ? null : appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
+          />
+          <IconButton
+            type="button"
+            icon={arrowsExchangeIcon}
+            title={t("labels.flipArrowDirection")}
+            aria-label={t("labels.flipArrowDirection")}
+            onClick={() => {
+              app.actionManager.executeAction(actionFlipArrowDirection);
+            }}
           />
         </div>
       </fieldset>
