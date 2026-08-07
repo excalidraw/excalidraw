@@ -1,4 +1,6 @@
 import {
+  BUCKET_FILL_BACKGROUND_PICKS,
+  COLOR_PALETTE,
   getBucketFillBackgroundColor,
   getSizeFromPoints,
 } from "@excalidraw/common";
@@ -15,6 +17,7 @@ import {
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
+import { actionChangeBucketFillBackgroundColor } from "../actions";
 import { t } from "../i18n";
 
 import type App from "./App";
@@ -23,6 +26,10 @@ type ScenePoint = {
   x: number;
   y: number;
 };
+
+const BUCKET_FILL_KEYBOARD_COLOR_PICKS = BUCKET_FILL_BACKGROUND_PICKS.filter(
+  (color) => color !== COLOR_PALETTE.white,
+);
 
 /** Owns bucket-fill interaction and App-bound scene mutations. */
 export class AppBucketFill {
@@ -57,6 +64,23 @@ export class AppBucketFill {
   /** Abort the armed fill (second finger, context menu, pointercancel). */
   cancel = () => {
     this.pending = null;
+  };
+
+  cycleBackgroundColor = () => {
+    const currentColor = getBucketFillBackgroundColor(
+      this.app.state.currentItemBackgroundColor,
+    );
+    const currentIndex = BUCKET_FILL_KEYBOARD_COLOR_PICKS.indexOf(currentColor);
+    const nextColor =
+      BUCKET_FILL_KEYBOARD_COLOR_PICKS[
+        (currentIndex + 1) % BUCKET_FILL_KEYBOARD_COLOR_PICKS.length
+      ];
+
+    this.app.actionManager.executeAction(
+      actionChangeBucketFillBackgroundColor,
+      "keyboard",
+      { currentItemBackgroundColor: nextColor },
+    );
   };
 
   /**
