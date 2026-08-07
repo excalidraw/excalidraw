@@ -889,7 +889,13 @@ export const textWysiwyg = ({
       }
 
       // Otherwise, re-enable submit on blur and refocus the editor.
-      editable.onblur = handleSubmit;
+      const handleBlur = () => {
+        if(!document.hasFocus()) {
+          return;
+        }
+        handleSubmit();
+      }
+      editable.onblur = handleBlur;
       editable.focus();
       if (pendingInitialSelection) {
         editable.setSelectionRange(
