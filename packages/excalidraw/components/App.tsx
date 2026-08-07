@@ -9520,6 +9520,21 @@ class App extends React.Component<AppProps, AppState> {
               });
             }
 
+            if (event.shiftKey) {
+              // eslint-disable-next-line no-console
+              console.log("[selection] pointer-down shift-add:", {
+                hitElementId: hitElement.id,
+                someHitElementIsSelected,
+                hasHitCommonBoundingBoxOfSelectedElements:
+                  pointerDownState.hit
+                    .hasHitCommonBoundingBoxOfSelectedElements,
+                willHandleOnPointerDown:
+                  !someHitElementIsSelected &&
+                  !pointerDownState.hit
+                    .hasHitCommonBoundingBoxOfSelectedElements,
+              });
+            }
+
             // Add hit element to selection. At this point if we're not holding
             // SHIFT the previously selected element(s) were deselected above
             // (make sure you use setState updater to use latest state)
@@ -12203,8 +12218,13 @@ class App extends React.Component<AppProps, AppState> {
             });
           } else {
             // add element to selection while keeping prev elements selected
-            this.setState((_prevState) => ({
-              ...selectGroupsForSelectedElements(
+            // handles deffered case when a group is selected within common bounding
+            // box of selectedElements, early return if no new frames were added
+            // but if new frame(s) exist, removal of it's children would be required.
+            this.setState((_prevState) => {
+              const elements = this.scene.getNonDeletedElements();
+
+              const targetSelection = selectGroupsForSelectedElements(
                 {
                   editingGroupId: _prevState.editingGroupId,
                   selectedElementIds: {
@@ -12212,11 +12232,103 @@ class App extends React.Component<AppProps, AppState> {
                     [hitElement!.id]: true,
                   },
                 },
-                this.scene.getNonDeletedElements(),
+                elements,
                 _prevState,
                 this,
-              ),
-            }));
+              );
+
+              const newSelectedFrameIds = new Set(
+                elements
+                  .filter(
+                    (element) =>
+                      isFrameLikeElement(element) &&
+                      targetSelection.selectedElementIds[element.id] &&
+                      !_prevState.selectedElementIds[element.id],
+                  )
+                  .map((frame) => frame.id),
+              );
+              // eslint-disable-next-line no-console
+              console.log("[selection] pointer-up deferred shift-add", {
+                hitElementId: hitElement!.id,
+                prevSelectedElementIds: Object.keys(
+                  _prevState.selectedElementIds,
+                ),
+                targetSelectedElementIds: Object.keys(
+                  targetSelection.selectedElementIds,
+                ),
+                newSelectedFrameIds: [...newSelectedFrameIds],
+              });
+
+              // early return, no frame addition via group selection
+              if (newSelectedFrameIds.size === 0) {
+                return targetSelection;
+              }
+
+              const nextSelectedElementIds = {
+                ...targetSelection.selectedElementIds,
+              };
+
+              const removedGroupIds = new Set<string>();
+              const removedElementIds = new Set<ExcalidrawElement["id"]>();
+
+              for (const elementId of Object.keys(
+                _prevState.selectedElementIds,
+              )) {
+                const element = this.scene.getElement(elementId);
+
+                if (
+                  !element?.frameId ||
+                  !newSelectedFrameIds.has(element.frameId)
+                ) {
+                  continue;
+                }
+
+                const selectedGroupId = getSelectedGroupForElement(
+                  _prevState,
+                  element,
+                );
+
+                if (selectedGroupId) {
+                  // skip elements that have already been removed
+                  if (removedGroupIds.has(selectedGroupId)) {
+                    continue;
+                  }
+
+                  removedGroupIds.add(selectedGroupId);
+                  getElementsInGroup(elements, selectedGroupId).forEach(
+                    (groupedElement) => {
+                      delete nextSelectedElementIds[groupedElement.id];
+                      removedElementIds.add(groupedElement.id);
+                    },
+                  );
+                } else {
+                  delete nextSelectedElementIds[element.id];
+                  removedElementIds.add(element.id);
+                }
+              }
+
+              // eslint-disable-next-line no-console
+              console.log("[selection] frame/group handling", {
+                hitElementId: hitElement!.id,
+                targetSelectedElementIds: Object.keys(
+                  targetSelection.selectedElementIds,
+                ),
+                newSelectedFrameIds: [...newSelectedFrameIds],
+                removedGroupIds: [...removedGroupIds],
+                removedElementIds: [...removedElementIds],
+                nextSelectedElementIds: Object.keys(nextSelectedElementIds),
+              });
+
+              return selectGroupsForSelectedElements(
+                {
+                  editingGroupId: _prevState.editingGroupId,
+                  selectedElementIds: nextSelectedElementIds,
+                },
+                elements,
+                _prevState,
+                this,
+              );
+            });
           }
         } else {
           this.setState((prevState) => ({
