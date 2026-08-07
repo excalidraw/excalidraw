@@ -21,7 +21,6 @@ import { ShareableLinkDialog } from "@excalidraw/excalidraw/components/Shareable
 import Trans from "@excalidraw/excalidraw/components/Trans";
 import {
   APP_NAME,
-  CODES,
   EVENT,
   VERSION_TIMEOUT,
   debounce,
@@ -377,7 +376,6 @@ const ExcalidrawWrapper = () => {
   const excalidrawAPI = useExcalidrawAPI();
 
   const [errorMessage, setErrorMessage] = useState("");
-  const [isFollowingPeter, setIsFollowingPeter] = useState(true);
   const isCollabDisabled = isRunningInIframe();
 
   const { editorTheme, appTheme, setAppTheme } = useHandleAppTheme();
@@ -444,27 +442,6 @@ const ExcalidrawWrapper = () => {
         : null,
     [userToFollow, collabAPI],
   );
-
-  useEffect(() => {
-    if (!isDevEnv()) {
-      return;
-    }
-
-    const togglePeterLabel = (event: KeyboardEvent) => {
-      if (event.code !== CODES.NUM_ADD || event.repeat) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-      setIsFollowingPeter((isFollowing) => !isFollowing);
-    };
-
-    window.addEventListener(EVENT.KEYDOWN, togglePeterLabel, true);
-    return () => {
-      window.removeEventListener(EVENT.KEYDOWN, togglePeterLabel, true);
-    };
-  }, []);
 
   useHandleLibrary({
     excalidrawAPI,
@@ -969,31 +946,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
-        viewportStatusFrame={
-          isFollowingPeter
-            ? isDevEnv()
-              ? {
-                  border: isFollowingPeter ? "lime" : false,
-                  label: {
-                    label: (
-                      <span
-                      // style={{
-                      //   color: isFollowingPeter ? undefined : "lime",
-                      // }}
-                      >
-                        {isFollowingPeter ? "following" : "follow"} Peter
-                        Pettigrew
-                      </span>
-                    ),
-                    onClick: () => {
-                      // eslint-disable-next-line no-console
-                      console.log("hello");
-                    },
-                  },
-                }
-              : viewportStatusFrame
-            : null
-        }
+        viewportStatusFrame={viewportStatusFrame}
         userToFollow={userToFollow}
         onChange={onChange}
         onExport={onExport}
