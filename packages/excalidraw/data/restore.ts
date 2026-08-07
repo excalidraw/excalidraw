@@ -19,10 +19,12 @@ import {
   getSizeFromPoints,
   normalizeLink,
   getLineHeight,
+  isProviderQualifiedFontFamily,
   STROKE_WIDTH,
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
 } from "@excalidraw/common";
+
 import {
   calculateFixedPointForNonElbowArrowBinding,
   getNonDeletedElements,
@@ -63,6 +65,8 @@ import { getNormalizedDimensions } from "@excalidraw/element";
 
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
+import type { FontFamily } from "@excalidraw/common";
+
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -76,7 +80,6 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FixedPointBinding,
-  FontFamilyValues,
   NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
@@ -269,13 +272,35 @@ const restoreFreedrawStrokeOptions = (
   };
 };
 
-const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
+const getFontFamilyByName = (fontFamilyName: string): FontFamily => {
   if (Object.keys(FONT_FAMILY).includes(fontFamilyName)) {
     return FONT_FAMILY[
       fontFamilyName as keyof typeof FONT_FAMILY
-    ] as FontFamilyValues;
+    ] as FontFamily;
   }
+
+  // Keep only provider-qualified custom families.
+  // Any other unknown name falls back to the default family for compatibility.
+  if (isProviderQualifiedFontFamily(fontFamilyName)) {
+    return fontFamilyName;
+  }
+
   return DEFAULT_FONT_FAMILY;
+};
+
+/**
+ * Normalize a restored `fontFamily`. Built-in (numeric) families pass through
+ * untouched, so a file written by a newer version keeps its id. String
+ * families are only kept when provider-qualified - a bare local font name
+ * would render with whatever the host's CSS resolves, which differs per
+ * machine and is nothing we can load or export.
+ */
+const restoreFontFamily = (fontFamily: unknown): FontFamily => {
+  if (typeof fontFamily === "string") {
+    return getFontFamilyByName(fontFamily);
+  }
+
+  return isFiniteNumber(fontFamily) ? fontFamily : DEFAULT_FONT_FAMILY;
 };
 
 const repairBinding = <T extends ExcalidrawArrowElement>(
@@ -516,7 +541,7 @@ export const restoreElement = (
       delete (element as any).rawText;
 
       let fontSize = element.fontSize;
-      let fontFamily = element.fontFamily;
+      let fontFamily = restoreFontFamily(element.fontFamily);
       if ("font" in element) {
         const [fontPx, _fontFamily]: [string, string] = (
           element as any
@@ -538,7 +563,7 @@ export const restoreElement = (
             detectLineHeight(element)
           : // no element height likely means programmatic use, so default
             // to a fixed line height
-            getLineHeight(element.fontFamily));
+            getLineHeight(fontFamily));
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -1154,6 +1179,11 @@ export const restoreAppState = (
 
   return {
     ...nextAppState,
+    // normalize the default font like element `fontFamily`, or a bare name
+    // from persisted data leaks into every newly created text element
+    currentItemFontFamily: restoreFontFamily(
+      nextAppState.currentItemFontFamily,
+    ),
     cursorButton: localAppState?.cursorButton || "up",
     // reset on fresh restore so as to hide the UI button if penMode not active
     penDetected:

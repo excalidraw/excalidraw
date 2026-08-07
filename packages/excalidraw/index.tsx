@@ -111,6 +111,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderEmbeddable,
     aiEnabled,
     showDeprecatedFonts,
+    fontProviders,
     renderScrollbars,
     viewportStatusFrame,
     currentUserControls,
@@ -252,6 +253,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderEmbeddable={renderEmbeddable}
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
+          fontProviders={fontProviders}
           renderScrollbars={renderScrollbars}
           viewportStatusFrame={viewportStatusFrame}
           currentUserControls={currentUserControls}
@@ -488,6 +490,22 @@ export type {
 export type { ViewportStatusFrame } from "./types";
 
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
+
+export type { FontProvider, FontProviders } from "./types";
+export type { CustomFontFamily, FontFamily } from "@excalidraw/common";
+export {
+  isCustomFontFamily,
+  isBuiltInFontFamily,
+  isProviderQualifiedFontFamily,
+} from "@excalidraw/common";
+export type {
+  FontDefinition,
+  FontRegistrationResult,
+  FontResolutionStatus,
+  FontResolver,
+  FontResolvers,
+  ExcalidrawFontFaceDescriptor,
+} from "./fonts";
 
 export {
   getCommonBounds,

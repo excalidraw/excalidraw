@@ -36,6 +36,7 @@ import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
 import type { ExportType } from "../scene/types";
+import type { FontResolvers } from "../fonts";
 import type { AppState, BinaryFiles } from "../types";
 
 export { loadFromBlob } from "./blob";
@@ -107,6 +108,7 @@ export const exportCanvas = async (
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
+    fontResolvers,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -115,6 +117,7 @@ export const exportCanvas = async (
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    fontResolvers?: FontResolvers;
   },
 ) => {
   if (elements.length === 0) {
@@ -132,7 +135,7 @@ export const exportCanvas = async (
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
-      { exportingFrame },
+      { exportingFrame, fontResolvers },
     );
 
     if (type === "svg") {
@@ -168,6 +171,7 @@ export const exportCanvas = async (
     viewBackgroundColor,
     exportPadding,
     exportingFrame,
+    fontResolvers,
   });
 
   if (type === "png") {

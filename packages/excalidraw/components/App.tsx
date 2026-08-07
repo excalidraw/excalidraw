@@ -103,7 +103,6 @@ import {
   deriveStylesPanelMode,
   isIOS,
   isBrave,
-  isSafari,
   type EditorInterface,
   type StylesPanelMode,
   loadDesktopUIModePreference,
@@ -173,7 +172,6 @@ import {
   getContainerCenter,
   getContainerElement,
   isValidTextContainer,
-  redrawTextBoundingBox,
   hasBoundingBox,
   getCommonFrameId,
   getFrameChildren,
@@ -392,7 +390,6 @@ import {
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
 
-import { Fonts } from "../fonts";
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
@@ -436,6 +433,7 @@ import { AppBucketFill } from "./App.bucketFill";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
+import { AppFonts } from "./App.fonts";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -631,7 +629,7 @@ class App extends React.Component<AppProps, AppState> {
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
   public scene: Scene;
-  public fonts: Fonts;
+  public fonts: AppFonts;
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
   /** whether the last render had any renderable elements (excludes e.g. the
@@ -871,7 +869,12 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.fonts = new Fonts(this.scene);
+    this.fonts = new AppFonts(this, {
+      // font reflows must not get absorbed into the next user action's undo
+      // delta (same pattern as the image-cache error path)
+      onBeforeSceneMutation: () =>
+        this.store.scheduleAction(CaptureUpdateAction.NEVER),
+    });
     this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
@@ -2726,6 +2729,7 @@ class App extends React.Component<AppProps, AppState> {
         name: this.getName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
+        fontResolvers: this.fonts.instance.fontResolvers,
       },
     )
       .catch(muteFSAbortError)
@@ -3030,6 +3034,12 @@ class App extends React.Component<AppProps, AppState> {
     if (actionResult.elements) {
       this.scene.replaceAllElements(actionResult.elements);
       didUpdate = true;
+    }
+
+    if (actionResult.loadFonts) {
+      this.fonts.refreshSceneFonts(
+        actionResult.appState?.currentItemFontFamily,
+      );
     }
 
     if (actionResult.files) {
@@ -3584,9 +3594,7 @@ class App extends React.Component<AppProps, AppState> {
     this.clearImageShapeCache();
 
     // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
-    this.fonts.loadSceneFonts().then((fontFaces) => {
-      this.fonts.onLoaded(fontFaces);
-    });
+    this.fonts.refreshSceneFonts(restoredAppState.currentItemFontFamily);
 
     if (isElementLink(window.location.href)) {
       this.viewport.setViewport({
@@ -3712,7 +3720,7 @@ class App extends React.Component<AppProps, AppState> {
         },
         fonts: {
           configurable: true,
-          value: this.fonts,
+          get: () => this.fonts.instance,
         },
       });
     }
@@ -3798,7 +3806,7 @@ class App extends React.Component<AppProps, AppState> {
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
-    this.fonts = new Fonts(this.scene);
+    this.fonts.destroy();
     this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
@@ -3863,14 +3871,10 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.POINTER_UP, this.removePointer, {
         passive: false,
       }), // #3553
-      // rerender text elements on font load to fix #637 && #1553
       addEventListener(
         document.fonts,
         "loadingdone",
-        (event) => {
-          const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-          this.fonts.onLoaded(fontFaces);
-        },
+        this.fonts.onDocumentFontsLoaded,
         { passive: false },
       ),
       addEventListener(
@@ -4087,6 +4091,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    this.fonts.onPropsUpdated(prevProps);
+
     // must be updated *before* state change listeners are triggered below
     if (!this._initialized && !this.state.isLoading) {
       this._initialized = true;
@@ -4256,6 +4262,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.store.commit(elementsMap, this.state);
+
+    this.fonts.onStateUpdated(prevState);
 
     // Do not notify consumers if we're still loading the scene. Among other
     // potential issues, this fixes a case where the tab isn't focused during
@@ -4714,22 +4722,13 @@ class App extends React.Component<AppProps, AppState> {
 
     this.scene.replaceAllElements(nextElements);
 
-    duplicatedElements.forEach((newElement) => {
-      if (isTextElement(newElement) && isBoundToContainer(newElement)) {
-        const container = getContainerElement(
-          newElement,
-          this.scene.getElementsMapIncludingDeleted(),
-        );
-        redrawTextBoundingBox(newElement, container, this.scene);
-      }
-    });
+    // `onDuplicate` may have replaced the inserted elements - operate on what
+    // the scene accepted, not on the pre-hook instances
+    const insertedElements = duplicatedElements.flatMap(
+      (element) => this.scene.getElement(element.id) ?? [],
+    );
 
-    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
-    if (isSafari) {
-      Fonts.loadElementsFonts(duplicatedElements).then((fontFaces) => {
-        this.fonts.onLoaded(fontFaces);
-      });
-    }
+    this.fonts.onElementsInserted(insertedElements);
 
     if (opts.files) {
       this.addMissingFiles(opts.files);
@@ -5174,6 +5173,9 @@ class App extends React.Component<AppProps, AppState> {
     return { addedFiles };
   };
 
+  /**
+   * Update the scene with new elements, appState or collaborators.
+   */
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
       elements?: SceneData["elements"];
@@ -5217,6 +5219,11 @@ class App extends React.Component<AppProps, AppState> {
       if (elements) {
         this.scene.replaceAllElements(elements);
       }
+
+      this.fonts.onSceneUpdated(
+        elements,
+        appState as Pick<AppState, "currentItemFontFamily"> | null,
+      );
 
       if (collaborators) {
         this.laserTrails.updateCollabTrails(collaborators);
@@ -11105,6 +11112,14 @@ class App extends React.Component<AppProps, AppState> {
               this.maybeCacheVisibleGaps(event, selectedElements, true);
               this.maybeCacheReferenceSnapPoints(event, selectedElements, true);
             });
+
+            // `onDuplicate` may have replaced the inserted elements - operate
+            // on what the scene accepted, not on the pre-hook instances
+            this.fonts.onElementsDuplicated(
+              duplicatedElements.flatMap(
+                (element) => this.scene.getElement(element.id) ?? [],
+              ),
+            );
           }
 
           return;
