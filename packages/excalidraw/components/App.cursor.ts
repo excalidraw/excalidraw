@@ -1,4 +1,9 @@
-import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
+import {
+  CURSOR_TYPE,
+  getBucketFillBackgroundColor,
+  MIME_TYPES,
+  THEME,
+} from "@excalidraw/common";
 
 import { isHandToolActive, isEraserActive } from "../appState";
 
@@ -22,12 +27,19 @@ const laserPointerCursorDataURL_darkMode = `data:${
   `${laserPointerCursorSVG_tag}${laserPointerCursorBackgroundSVG}${laserPointerCursorIconSVG}</svg>`,
 )}`;
 
-const bucketFillCursorPathsSVG = bucketFillIconSvgPaths
-  .map((path) => `<path d="${path}"/>`)
-  .join("");
-const bucketFillCursorDataURL = `data:${MIME_TYPES.svg},${encodeURIComponent(
-  `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><g stroke="#fff" fill="#fff" stroke-width="5">${bucketFillCursorPathsSVG}</g><g stroke="#1b1b1f" stroke-width="1.25">${bucketFillCursorPathsSVG}</g></svg>`,
-)}`;
+const getBucketFillCursorDataURL = (backgroundColor: string) => {
+  const color = getBucketFillBackgroundColor(backgroundColor);
+  const paths = bucketFillIconSvgPaths
+    .map(
+      (path, index) =>
+        `<path d="${path}" ${index < 2 ? `fill="${color}"` : ""} />`,
+    )
+    .join("");
+
+  return `data:${MIME_TYPES.svg},${encodeURIComponent(
+    `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><g stroke="#fff" fill="#fff" stroke-width="5">${paths}</g><g stroke="#1b1b1f" stroke-width="1.25">${paths}</g></svg>`,
+  )}`;
+};
 
 /**
  * Captures all cursor management for the interactive canvas.
@@ -97,7 +109,12 @@ export class AppCursor {
       this.set(CURSOR_TYPE.CROSSHAIR);
     } else if (activeTool.type === "bucketfill") {
       // The hotspot is the center of the paint droplet in the icon.
-      this.set(`url(${bucketFillCursorDataURL}) 5 18, auto`);
+      console.warn("x");
+      this.set(
+        `url(${getBucketFillCursorDataURL(
+          this.app.state.currentItemBackgroundColor,
+        )}) 5 18, auto`,
+      );
     } else if (activeTool.type === "laser") {
       const url =
         this.app.state.theme === THEME.LIGHT

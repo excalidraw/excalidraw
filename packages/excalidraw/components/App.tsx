@@ -18,6 +18,7 @@ import {
 } from "@excalidraw/math";
 
 import {
+  BUCKET_FILL_BACKGROUND_PICKS,
   COLOR_PALETTE,
   CODES,
   shouldResizeFromCenter,
@@ -111,6 +112,7 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
+  getBucketFillBackgroundColor,
 } from "@excalidraw/common";
 
 import {
@@ -318,6 +320,7 @@ import {
   actionToggleZenMode,
   actionUnbindText,
   actionBindText,
+  actionChangeBucketFillBackgroundColor,
   actionUngroup,
   actionLink,
   actionToggleElementLock,
@@ -603,6 +606,9 @@ const YOUTUBE_VIDEO_STATES = new Map<
 >();
 
 const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
+const BUCKET_FILL_KEYBOARD_COLOR_PICKS = BUCKET_FILL_BACKGROUND_PICKS.filter(
+  (color) => color !== COLOR_PALETTE.white,
+);
 
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
@@ -4145,6 +4151,14 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.cursor.applyForTool();
     }
+    if (
+      this.state.activeTool.type === "bucketfill" &&
+      prevState.currentItemBackgroundColor !==
+        this.state.currentItemBackgroundColor &&
+      !isHoldingSpace
+    ) {
+      this.cursor.applyForTool();
+    }
 
     // Hide hyperlink popup if shown when element type is not selection
     if (
@@ -5544,7 +5558,28 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
 
-          if (shape === "lasso" && this.state.activeTool.type === "laser") {
+          if (
+            shape === "bucketfill" &&
+            this.state.activeTool.type === "bucketfill"
+          ) {
+            const currentColor = getBucketFillBackgroundColor(
+              this.state.currentItemBackgroundColor,
+            );
+            const currentIndex =
+              BUCKET_FILL_KEYBOARD_COLOR_PICKS.indexOf(currentColor);
+            const nextColor =
+              BUCKET_FILL_KEYBOARD_COLOR_PICKS[
+                (currentIndex + 1) % BUCKET_FILL_KEYBOARD_COLOR_PICKS.length
+              ];
+            this.actionManager.executeAction(
+              actionChangeBucketFillBackgroundColor,
+              "keyboard",
+              { currentItemBackgroundColor: nextColor },
+            );
+          } else if (
+            shape === "lasso" &&
+            this.state.activeTool.type === "laser"
+          ) {
             this.setActiveTool({
               type: this.state.preferredSelectionTool.type,
             });

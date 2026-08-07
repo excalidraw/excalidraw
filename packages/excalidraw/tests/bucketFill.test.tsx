@@ -1,4 +1,9 @@
-import { KEYS } from "@excalidraw/common";
+import {
+  BUCKET_FILL_BACKGROUND_PICKS,
+  COLOR_PALETTE,
+  getBucketFillBackgroundColor,
+  KEYS,
+} from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
@@ -73,6 +78,56 @@ describe("bucket fill tool", () => {
     expect(GlobalTestState.interactiveCanvas.style.cursor).toMatch(
       /\) 5 18, auto$/,
     );
+  });
+
+  it("colorizes the cursor with the effective fill color and keeps it updated", () => {
+    act(() => {
+      API.setAppState({
+        currentItemBackgroundColor: COLOR_PALETTE.transparent,
+      });
+    });
+    selectBucketFill();
+
+    const fallbackColor = getBucketFillBackgroundColor(
+      COLOR_PALETTE.transparent,
+    );
+    const fallbackCursor = GlobalTestState.interactiveCanvas.style.cursor;
+    expect(decodeURIComponent(fallbackCursor)).toContain(
+      `fill="${fallbackColor}"`,
+    );
+
+    const nextColor = "#ffec99";
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: nextColor });
+    });
+
+    const updatedCursor = GlobalTestState.interactiveCanvas.style.cursor;
+    expect(updatedCursor).not.toBe(fallbackCursor);
+    expect(decodeURIComponent(updatedCursor)).toContain(`fill="${nextColor}"`);
+  });
+
+  it("cycles the non-white top picks on repeated B presses", () => {
+    const colorPicks = BUCKET_FILL_BACKGROUND_PICKS.filter(
+      (color) => color !== COLOR_PALETTE.white,
+    );
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: COLOR_PALETTE.white });
+    });
+
+    Keyboard.keyPress(KEYS.B);
+    expect(h.state.activeTool.type).toBe("bucketfill");
+    expect(h.state.currentItemBackgroundColor).toBe(COLOR_PALETTE.white);
+
+    for (const color of colorPicks) {
+      Keyboard.keyPress(KEYS.B);
+      expect(h.state.currentItemBackgroundColor).toBe(color);
+      expect(
+        decodeURIComponent(GlobalTestState.interactiveCanvas.style.cursor),
+      ).toContain(`fill="${color}"`);
+    }
+
+    Keyboard.keyPress(KEYS.B);
+    expect(h.state.currentItemBackgroundColor).toBe(colorPicks[0]);
   });
 
   it("clears the bucket fill cursor immediately when Escape exits the tool", () => {
