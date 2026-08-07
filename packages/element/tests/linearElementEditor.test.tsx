@@ -558,12 +558,12 @@ describe("Test Linear Elements", () => {
       expect(midPointsWithRoundEdge).toMatchInlineSnapshot(`
         [
           [
-            "54.27552",
-            "46.16120",
+            "51.36383",
+            "54.86323",
           ],
           [
-            "76.95494",
-            "44.56052",
+            "81.64884",
+            "43.04575",
           ],
         ]
       `);
@@ -623,12 +623,12 @@ describe("Test Linear Elements", () => {
       expect(newMidPoints).toMatchInlineSnapshot(`
         [
           [
-            "104.27552",
-            "66.16120",
+            "101.36383",
+            "74.86323",
           ],
           [
-            "126.95494",
-            "64.56052",
+            "131.64884",
+            "63.04575",
           ],
         ]
       `);
@@ -831,14 +831,8 @@ describe("Test Linear Elements", () => {
       // This is the expected midpoint for line with round edge
       // hence hardcoding it so if later some bug is introduced
       // this will fail and we can fix it
-      const firstSegmentMidpoint = pointFrom<GlobalPoint>(
-        55.9697848965255,
-        47.442326230998205,
-      );
-      const lastSegmentMidpoint = pointFrom<GlobalPoint>(
-        76.08587175006699,
-        43.294165939653226,
-      );
+      const firstSegmentMidpoint = pointFrom<GlobalPoint>(47.30521, 57.2734);
+      const lastSegmentMidpoint = pointFrom<GlobalPoint>(83.70877, 40.46424);
       let line: ExcalidrawLinearElement;
 
       beforeEach(() => {
@@ -883,16 +877,16 @@ describe("Test Linear Elements", () => {
                 0,
               ],
               [
-                "85.96978",
-                "77.44233",
+                "77.30521",
+                "87.27340",
               ],
               [
                 70,
                 50,
               ],
               [
-                "106.08587",
-                "73.29417",
+                "113.70877",
+                "70.46424",
               ],
               [
                 40,
@@ -939,12 +933,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "29.28349",
-              "20.91105",
+              "22.32088",
+              "37.43003",
             ],
             [
-              "78.86048",
-              "46.12277",
+              "81.55727",
+              "43.21091",
             ],
           ]
         `);
@@ -1028,12 +1022,12 @@ describe("Test Linear Elements", () => {
         expect(newMidPoints).toMatchInlineSnapshot(`
           [
             [
-              "54.27552",
-              "46.16120",
+              "51.36383",
+              "54.86323",
             ],
             [
-              "76.95494",
-              "44.56052",
+              "81.64884",
+              "43.04575",
             ],
           ]
         `);
@@ -1195,8 +1189,8 @@ describe("Test Linear Elements", () => {
         );
         expect(position).toMatchInlineSnapshot(`
           {
-            "x": "86.17305",
-            "y": "76.11251",
+            "x": "86.53100",
+            "y": "72.83556",
           }
         `);
       });
@@ -1315,8 +1309,8 @@ describe("Test Linear Elements", () => {
           20,
           105,
           80,
-          "55.45894",
-          45,
+          "56.68277",
+          "47.27188",
         ]
       `);
 
@@ -1326,7 +1320,7 @@ describe("Test Linear Elements", () => {
         .toMatchInlineSnapshot(`
           {
             "height": 130,
-            "width": "366.11716",
+            "width": "368.53316",
           }
         `);
 
@@ -1338,7 +1332,7 @@ describe("Test Linear Elements", () => {
         ),
       ).toMatchInlineSnapshot(`
         {
-          "x": "271.11716",
+          "x": "273.53316",
           "y": 45,
         }
       `);
@@ -1355,10 +1349,10 @@ describe("Test Linear Elements", () => {
         [
           20,
           35,
-          "501.11716",
-          95,
-          "205.45894",
-          "52.50000",
+          "503.53316",
+          "119.02540",
+          "204.47758",
+          "77.01270",
         ]
       `);
     });

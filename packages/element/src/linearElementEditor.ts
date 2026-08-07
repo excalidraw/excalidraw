@@ -806,9 +806,25 @@ export class LinearElementEditor {
       elementsMap,
     );
 
+    const [lines, segCurves] = deconstructLinearOrFreeDrawElement(
+      element,
+      elementsMap,
+    );
+    const segmentCount = lines.length + segCurves.length;
+
     let index = 0;
     const midpoints: (GlobalPoint | null)[] = [];
     while (index < points.length - 1) {
+      // Elbow arrows route around obstacles, so their deconstructed geometry
+      // can have fewer segments than there are point pairs. Suppress the
+      // midpoint handle for those extra pairs (no segment exists to place it
+      // on). For non-elbow lines/arrows segmentCount === points.length - 1, so
+      // this never fires.
+      if (segmentCount > 0 && index >= segmentCount) {
+        midpoints.push(null);
+        index++;
+        continue;
+      }
       if (
         LinearElementEditor.isSegmentTooShort(
           element,
@@ -939,7 +955,7 @@ export class LinearElementEditor {
         "Only linears built out of curves are supported",
       );
       invariant(
-        lines.length + curves.length >= index,
+        curves.length > index,
         "Invalid segment index while calculating mid point",
       );
 
