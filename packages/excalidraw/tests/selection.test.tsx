@@ -1683,4 +1683,113 @@ describe("group selection", () => {
       inB: true,
     });
   });
+
+  it("shift selecting a group containing a frame inside selected bounds, removes selected membership of the frames child", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      groupIds: ["frame-group"],
+    });
+    const frameChild = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 25,
+      width: 50,
+      height: 50,
+      frameId: frame.id,
+    });
+    const groupedElement = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 125,
+      width: 50,
+      height: 50,
+      groupIds: ["frame-group"],
+    });
+    const selectedElement = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 225,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([frameChild, frame, groupedElement, selectedElement]);
+    API.setSelectedElements([frameChild, selectedElement]);
+
+    assertSelectedElements(frameChild, selectedElement);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupedElement);
+    });
+
+    assertSelectedElements(frame, groupedElement, selectedElement);
+    expect(h.state.selectedGroupIds).toEqual({ "frame-group": true });
+  });
+
+  it("shift selecting a group containing a frame inside selected bounds, removes selected membership of the frames child group", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      groupIds: ["frame-group"],
+    });
+    const frameChildA = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 25,
+      width: 25,
+      height: 25,
+      frameId: frame.id,
+      groupIds: ["child-group"],
+    });
+    const frameChildB = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 25,
+      height: 25,
+      frameId: frame.id,
+      groupIds: ["child-group"],
+    });
+    const groupedElement = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 125,
+      width: 50,
+      height: 50,
+      groupIds: ["frame-group"],
+    });
+    const selectedElement = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 225,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([
+      frameChildA,
+      frameChildB,
+      frame,
+      groupedElement,
+      selectedElement,
+    ]);
+    API.setSelectedElements([frameChildA, frameChildB, selectedElement]);
+
+    assertSelectedElements(frameChildA, frameChildB, selectedElement);
+    expect(h.state.selectedGroupIds).toEqual({ "child-group": true });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupedElement);
+    });
+
+    assertSelectedElements(frame, groupedElement, selectedElement);
+    expect(h.state.selectedGroupIds).toEqual({ "frame-group": true });
+  });
 });
