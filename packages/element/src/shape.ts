@@ -1277,12 +1277,18 @@ const med = (A: number[], B: number[]) => {
   return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
 };
 
-// Trim SVG path data so number are each two decimal points. This
-// improves SVG exports, and prevents rendering errors on points
-// with long decimals.
-const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
+//Shape coordinates must be rounded to fixed precision arithmetically.
+//Truncation of excessive decimal values fails on numbers in exponential notation 
+const roundSvgCoordinate = (value: number) => {
+  const rounded = Math.round(value * 100) / 100;
+  return Object.is(rounded, -0) ? 0 : rounded;
+};
 
-const getSvgPathFromStroke = (points: number[][]): string => {
+const roundSvgPoint = ([x, y]: number[]) =>
+  [roundSvgCoordinate(x), roundSvgCoordinate(y)] as [number, number];
+
+//Function exported for testing purposes only
+export const getSvgPathFromStroke = (points: number[][]): string => {
   if (!points.length) {
     return "";
   }
@@ -1292,17 +1298,25 @@ const getSvgPathFromStroke = (points: number[][]): string => {
   return points
     .reduce(
       (acc, point, i, arr) => {
+        const roundedPoint = roundSvgPoint(point);
+
         if (i === max) {
-          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
+          acc.push(
+            roundedPoint,
+            roundSvgPoint(med(point, arr[0])),
+            "L",
+            roundSvgPoint(arr[0]),
+            "Z",
+          );
         } else {
-          acc.push(point, med(point, arr[i + 1]));
+          acc.push(roundedPoint, roundSvgPoint(med(point, arr[i + 1])));
         }
+
         return acc;
       },
-      ["M", points[0], "Q"],
+      ["M", roundSvgPoint(points[0]), "Q"] as (string | number[])[],
     )
-    .join(" ")
-    .replace(TO_FIXED_PRECISION, "$1");
+    .join(" ");
 };
 
 // -----------------------------------------------------------------------------
