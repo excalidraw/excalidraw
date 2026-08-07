@@ -20,8 +20,6 @@ import { resaveAsImageWithScene } from "../data/resave";
 
 import { t } from "../i18n";
 
-import "../components/ToolIcon.scss";
-
 import { register } from "./register";
 
 import type { JSONExportData } from "../data/json";
