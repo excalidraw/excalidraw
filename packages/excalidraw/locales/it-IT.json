@@ -109,6 +109,7 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
+    "you": "",
     "toggleGrid": "Attiva/disattiva griglia",
     "addToLibrary": "Aggiungi alla libreria",
     "removeFromLibrary": "Rimuovi dalla libreria",
@@ -332,10 +333,15 @@
     "embeddable": "Incorporamento Web",
     "laser": "Puntatore laser",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti",
     "mermaidToExcalidraw": "Da Mermaid a Excalidraw",
     "convertElementType": "Attiva tipo di forma"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rettangolo",

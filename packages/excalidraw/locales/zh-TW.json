@@ -109,6 +109,7 @@
     "group": "建立群組",
     "ungroup": "取消群組",
     "collaborators": "協作者",
+    "you": "",
     "toggleGrid": "切換網格",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
@@ -332,10 +333,15 @@
     "embeddable": "嵌入網站",
     "laser": "雷射筆",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "手形（平移工具）",
     "extraTools": "更多工具",
     "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
     "convertElementType": "切換形狀類型"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "矩形",

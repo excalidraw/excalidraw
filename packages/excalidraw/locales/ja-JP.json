@@ -109,6 +109,7 @@
     "group": "グループ化",
     "ungroup": "グループ化を解除",
     "collaborators": "共同編集者",
+    "you": "",
     "toggleGrid": "グリッドを切り替え",
     "addToLibrary": "ライブラリに追加",
     "removeFromLibrary": "ライブラリから削除",
@@ -332,10 +333,15 @@
     "embeddable": "Web埋め込み",
     "laser": "レーザーポインター",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "手 (パンニングツール)",
     "extraTools": "その他のツール",
     "mermaidToExcalidraw": "Mermaid を Excalidraw に変換",
     "convertElementType": "図形タイプを切り替え"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "長方形",

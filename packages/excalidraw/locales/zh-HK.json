@@ -109,6 +109,7 @@
     "group": "建立物件群組",
     "ungroup": "取消物件群組",
     "collaborators": "已連線的協作者",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "加入作品庫",
     "removeFromLibrary": "從作品庫中移除",
@@ -332,10 +333,15 @@
     "embeddable": "",
     "laser": "",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",

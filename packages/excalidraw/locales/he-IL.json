@@ -3,8 +3,8 @@
     "paste": "הדבקה",
     "pasteAsPlaintext": "הדבקה ללא עיצוב",
     "pasteCharts": "הדבקת תרשימים",
-    "chartType_bar": "",
-    "chartType_line": "",
+    "chartType_bar": "תרשים עמודות",
+    "chartType_line": "תרשים קווים",
     "chartType_radar": "",
     "chartType_plaintext": "טקסט פשוט",
     "selectAll": "בחירה בהכול",
@@ -35,9 +35,9 @@
     "strokeStyle_dashed": "מקווקו",
     "strokeStyle_dotted": "מנוקד",
     "sloppiness": "רישול",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "לחץ",
+    "pressure_constant": "קבוע",
+    "pressure_variable": "משתנה",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
     "edges": "קצוות",
@@ -109,6 +109,7 @@
     "group": "קיבוץ הבחירה",
     "ungroup": "פירוק קבוצה",
     "collaborators": "שותפים",
+    "you": "אני",
     "toggleGrid": "הצגת/הסתרת רשת",
     "addToLibrary": "הוספה לספרייה",
     "removeFromLibrary": "הסרה מהספרייה",
@@ -190,7 +191,7 @@
     "preferences_toolLock": "נעילת כלים",
     "boxSelectionMode": "",
     "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionOverlap": "חפיפה",
     "arrowBinding": "קשירת חצים",
     "midpointSnapping": "הצמדה לנקודות ביניים"
   },
@@ -332,10 +333,15 @@
     "embeddable": "הטמעה באתר",
     "laser": "סמן לייזר",
     "autoshape": "",
+    "bucketfill": "מילוי דלי",
     "hand": "יד (כלי הזזה)",
     "extraTools": "כלים נוספים",
     "mermaidToExcalidraw": "Mermaid ל־Excalidraw",
     "convertElementType": "החלפת סוג צורה"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": "המילוי של האזור הזה מסובך מכדי לקרות."
   },
   "element": {
     "rectangle": "מלבן",
@@ -605,7 +611,7 @@
     "shades": "הצללות",
     "hexCode": "קוד הקסדצימלי",
     "noShades": "אין הצללות זמינות לצבע הזה",
-    "invalidColor": "",
+    "invalidColor": "לא צבע תקני",
     "invalidHexLength": ""
   },
   "overwriteConfirm": {
@@ -645,8 +651,8 @@
     "description": "",
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
-    "label": "",
-    "inputPlaceholder": "",
+    "label": "Mermaid",
+    "inputPlaceholder": "נא לכתוב כאן הגדרת תרשים ל־Mermaid...",
     "autoFixAvailable": "התיקון האוטומטי זמין"
   },
   "ttd": {
@@ -654,9 +660,9 @@
   },
   "chat": {
     "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholderWithMessages": "נא להמשיך לתאר את התרשים...",
+    "generating": "בתהליך יצירה...",
+    "rateLimitRemaining": "נותרו {{count}} בקשות להיום",
     "role": {
       "user": "אני",
       "assistant": "מסייע AI",
@@ -668,10 +674,10 @@
     "newChat": "שיחה חדשה",
     "deleteChat": "מחיקת שיחה",
     "deleteMessage": "מחיקת הודעה",
-    "viewAsMermaid": "",
+    "viewAsMermaid": "הצגה בתור Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
+      "title": "הגיע הזמן לעצב את התרשים הראשון שלך",
+      "description": "נא לתאר איזה תרשים ברצונך ליצור, ואנחנו נייצר אותו בשבילך.",
       "hint": ""
     },
     "preview": "תצוגה מקדימה",
@@ -680,10 +686,10 @@
     "errors": {
       "promptTooShort": "ההנחיה קצרה מדי (נדרשים {{min}} תווים לכל הפחות)",
       "promptTooLong": "ההנחיה ארוכה מדי (נדרשים {{max}} תווים לכל היותר)",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
+      "generationFailed": "היצירה נכשלה",
+      "invalidDiagram": "נוצר תרשים לא תקני :(. אפשר לערוך אותו ידנית, לנסות שוב עם תיקון אוטומטי, או לנסות הנחיה אחרת.",
+      "fixInMermaid": "עריכה ידנית של Mermaid ←",
+      "aiRepair": "יצירה מחדש (תיקון אוטומטי) ←",
       "requestAborted": "הבקשה בוטלה",
       "requestFailed": "הבקשה נכשלה",
       "mermaidParseError": "שגיאת תחביר Mermaid"

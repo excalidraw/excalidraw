@@ -109,6 +109,7 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
+    "you": "",
     "toggleGrid": "Перемикати сітку",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
@@ -332,10 +333,15 @@
     "embeddable": "Веб вкладення",
     "laser": "Лазерний вказівник",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
     "mermaidToExcalidraw": "Mermaid у Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Прямокутник",
