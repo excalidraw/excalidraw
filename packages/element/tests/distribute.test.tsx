@@ -76,53 +76,53 @@ describe("distributing", () => {
 
   it("should distribute selected elements horizontally", async () => {
     createAndSelectThreeRectanglesWithGap();
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(10);
-    expect(API.getSelectedElements()[2].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(10);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(300);
 
     API.executeAction(distributeHorizontally);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(150);
-    expect(API.getSelectedElements()[2].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(300);
   });
 
   it("should distribute selected elements vertically", async () => {
     createAndSelectThreeRectanglesWithGap();
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(10);
-    expect(API.getSelectedElements()[2].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(10);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(300);
 
     API.executeAction(distributeVertically);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(150);
-    expect(API.getSelectedElements()[2].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(300);
   });
 
   it("should distribute selected elements horizontally based on their centers", async () => {
     createAndSelectThreeRectanglesWithoutGap();
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(10);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(10);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(distributeHorizontally);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(50);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(50);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
   });
 
   it("should distribute selected elements vertically with based on their centers", async () => {
     createAndSelectThreeRectanglesWithoutGap();
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(10);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(10);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(distributeVertically);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(50);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(50);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
   });
 });
