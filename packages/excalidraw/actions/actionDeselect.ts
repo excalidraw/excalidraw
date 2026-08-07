@@ -67,6 +67,7 @@ export const actionDeselect = register({
   trackEvent: false,
   perform: (_elements, appState, _, app) => {
     const activeTool = getNextActiveTool(appState, app);
+    app.cursor.applyForTool(activeTool);
 
     if (appState.editingGroupId) {
       const nonDeletedElements = app.scene.getNonDeletedElements();

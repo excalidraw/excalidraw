@@ -75,6 +75,16 @@ describe("bucket fill tool", () => {
     );
   });
 
+  it("clears the bucket fill cursor immediately when Escape exits the tool", () => {
+    selectBucketFill();
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toContain("url(");
+
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    expect(h.state.activeTool.type).toBe("selection");
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe("");
+  });
+
   it("creates a unselected line polygon with the current background color", () => {
     const rect = seedRectangle();
     act(() => {
