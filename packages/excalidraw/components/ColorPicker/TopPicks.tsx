@@ -8,6 +8,8 @@ import {
   isColorDark,
 } from "@excalidraw/common";
 
+import { t } from "../../i18n";
+
 import type { ColorPickerType } from "./colorPickerUtils";
 
 interface TopPicksProps {
@@ -62,6 +64,7 @@ export const TopPicks = ({
           key={color}
           type="button"
           title={color}
+          aria-label={`${t("colorPicker.color")}: ${color}`}
           onClick={() => onChange(color)}
           data-testid={`color-top-pick-${color}`}
         >

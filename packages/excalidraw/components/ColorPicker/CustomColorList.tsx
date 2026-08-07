@@ -51,7 +51,7 @@ export const CustomColorList = ({
               setActiveColorPickerSection("custom");
             }}
             title={c}
-            aria-label={label}
+            aria-label={`${label}: ${c}`}
             style={{ "--swatch-color": c }}
             key={i}
           >
