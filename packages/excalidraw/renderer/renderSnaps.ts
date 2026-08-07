@@ -9,6 +9,10 @@ const SNAP_COLOR_LIGHT = "#ff6b6b";
 const SNAP_COLOR_DARK = "#ff0000";
 const SNAP_WIDTH = 1;
 const SNAP_CROSS_SIZE = 2;
+const SNAP_LABEL_FONT_SIZE = 11;
+const SNAP_LABEL_PADDING_X = 4;
+const SNAP_LABEL_PADDING_Y = 2;
+const SNAP_LABEL_MARGIN = 7;
 
 export const renderSnaps = (
   context: CanvasRenderingContext2D,
@@ -49,6 +53,7 @@ export const renderSnaps = (
         snapLine.direction,
         appState,
         context,
+        snapColor,
       );
     } else if (snapLine.type === "points") {
       context.lineWidth = snapWidth;
@@ -126,6 +131,7 @@ const drawGapLine = <Point extends LocalPoint | GlobalPoint>(
   direction: "horizontal" | "vertical",
   appState: InteractiveCanvasAppState,
   context: CanvasRenderingContext2D,
+  snapColor: string,
 ) => {
   // a horizontal gap snap line
   // |–––––––||–––––––|
@@ -206,4 +212,61 @@ const drawGapLine = <Point extends LocalPoint | GlobalPoint>(
       drawLine(from, to, context);
     }
   }
+
+  drawGapDistanceLabel(from, to, direction, appState, context, snapColor);
+};
+
+const drawGapDistanceLabel = <Point extends LocalPoint | GlobalPoint>(
+  from: Point,
+  to: Point,
+  direction: "horizontal" | "vertical",
+  appState: InteractiveCanvasAppState,
+  context: CanvasRenderingContext2D,
+  snapColor: string,
+) => {
+  if (appState.zenModeEnabled) {
+    return;
+  }
+
+  const distance =
+    direction === "horizontal"
+      ? Math.abs(to[0] - from[0])
+      : Math.abs(to[1] - from[1]);
+  const roundedDistance = Math.round(distance);
+
+  if (!roundedDistance) {
+    return;
+  }
+
+  const zoom = appState.zoom.value;
+  const fontSize = SNAP_LABEL_FONT_SIZE / zoom;
+  const paddingX = SNAP_LABEL_PADDING_X / zoom;
+  const paddingY = SNAP_LABEL_PADDING_Y / zoom;
+  const margin = SNAP_LABEL_MARGIN / zoom;
+  const midX = (from[0] + to[0]) / 2;
+  const midY = (from[1] + to[1]) / 2;
+  const labelX = direction === "horizontal" ? midX : midX + margin;
+  const labelY = direction === "horizontal" ? midY - margin : midY;
+  const label = String(roundedDistance);
+
+  context.save();
+  context.font = `${fontSize}px sans-serif`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+
+  const textWidth = context.measureText(label).width;
+  const boxWidth = textWidth + paddingX * 2;
+  const boxHeight = fontSize + paddingY * 2;
+
+  context.fillStyle = snapColor;
+  context.fillRect(
+    labelX - boxWidth / 2,
+    labelY - boxHeight / 2,
+    boxWidth,
+    boxHeight,
+  );
+
+  context.fillStyle = "#ffffff";
+  context.fillText(label, labelX, labelY);
+  context.restore();
 };
