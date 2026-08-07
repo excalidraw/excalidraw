@@ -38,11 +38,13 @@ type IconButtonProps =
       type: "button";
       children?: React.ReactNode;
       onClick?(event: React.MouseEvent): void;
+      onDoubleClick?(event: React.MouseEvent): void;
     })
   | (IconButtonBaseProps & {
       type: "icon";
       children?: React.ReactNode;
       onClick?(): void;
+      onDoubleClick?(event: React.MouseEvent): void;
     })
   // a stateful (pressed/unpressed) tool button
   | (IconButtonBaseProps & {
@@ -128,6 +130,7 @@ export const IconButton = React.forwardRef(
           aria-label={props["aria-label"]}
           type="button"
           onClick={onClick}
+          onDoubleClick={props.onDoubleClick}
           ref={innerRef}
           disabled={isLoading || props.isLoading || !!props.disabled}
         >

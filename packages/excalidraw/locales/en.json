@@ -237,6 +237,7 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "resetZoom": "Reset zoom",
+    "setZoom": "Double-click to set zoom level",
     "menu": "Menu",
     "done": "Done",
     "edit": "Edit",
