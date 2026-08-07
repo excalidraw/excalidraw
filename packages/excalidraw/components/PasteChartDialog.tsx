@@ -1,6 +1,8 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { newTextElement } from "@excalidraw/element";
+import { randomId } from "@excalidraw/common";
+
+import { newElementWith, newTextElement } from "@excalidraw/element";
 
 import type { ChartType } from "@excalidraw/element/types";
 
@@ -196,7 +198,16 @@ export const PasteChartDialog = ({
   }, [onClose]);
 
   const handleChartClick = (chartType: ChartType, elements: ChartElements) => {
-    onInsertElements(elements);
+    // group the chart's elements so the chart behaves as a single unit;
+    // otherwise aligning the selection collapses the bars onto each other
+    const groupId = randomId();
+    onInsertElements(
+      elements.map((element) =>
+        newElementWith(element, {
+          groupIds: [...element.groupIds, groupId],
+        }),
+      ),
+    );
     trackEvent("paste", "chart", chartType);
     onClose();
     focusContainer();
