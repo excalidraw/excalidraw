@@ -789,6 +789,13 @@ export const textWysiwyg = ({
       return;
     }
 
+    // If the page is being hidden (e.g. tab switch via Alt+Tab), don't
+    // submit — keep the editor alive so the user can resume editing when
+    // they return. The visibilitychange listener below will refocus.
+    if (document.hidden) {
+      return;
+    }
+
     isDestroyed = true;
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
@@ -855,6 +862,7 @@ export const textWysiwyg = ({
     window.removeEventListener("pointerup", bindBlurEvent);
     window.removeEventListener("blur", handleSubmit);
     window.removeEventListener("beforeunload", handleSubmit);
+    document.removeEventListener("visibilitychange", onVisibilityChange);
     unbindUpdate();
     unsubOnChange();
     unbindOnScroll();
@@ -961,6 +969,16 @@ export const textWysiwyg = ({
       });
     }
   };
+
+  // Restore focus when the user returns after switching tabs so
+  // they can continue editing immediately.
+  const onVisibilityChange = () => {
+    if (!document.hidden && !isDestroyed) {
+      editable.onblur = handleSubmit;
+      editable.focus();
+    }
+  };
+  document.addEventListener("visibilitychange", onVisibilityChange);
 
   // FIXME after we start emitting updates from Store for appState.theme
   const unsubOnChange = app.onChangeEmitter.on((elements) => {
