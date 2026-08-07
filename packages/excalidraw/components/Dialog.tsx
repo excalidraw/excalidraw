@@ -119,7 +119,6 @@ export const Dialog = (props: DialogProps) => {
             <span className="Dialog__titleContent">{props.title}</span>
           </h2>
         )}
-        {isFullscreen && (
           <button
             className="Dialog__close"
             onClick={onClose}
@@ -129,7 +128,6 @@ export const Dialog = (props: DialogProps) => {
           >
             {CloseIcon}
           </button>
-        )}
         <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>
