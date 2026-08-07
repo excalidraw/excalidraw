@@ -21,8 +21,8 @@ import {
   isLineSegment,
   type GlobalPoint,
   type LineSegment,
+  isCurve,
 } from "@excalidraw/math";
-import { isCurve } from "@excalidraw/math/curve";
 
 import React from "react";
 
