@@ -361,6 +361,7 @@ import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
+import { TransactionManager } from "../transaction";
 
 import {
   getScrollToContentState,
@@ -641,7 +642,8 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
-  private store: Store;
+  public transactionManager: TransactionManager;
+  public store: Store;
   private history: History;
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -865,6 +867,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.store = new Store(this);
     this.history = new History(this.store);
+    this.transactionManager = new TransactionManager(this);
+    this.transactionManager.attachHistory(this.history);
 
     this.excalidrawContainerValue = {
       container: this.excalidrawContainerRef.current,
@@ -872,7 +876,6 @@ class App extends React.Component<AppProps, AppState> {
     };
 
     this.fonts = new Fonts(this.scene);
-    this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
@@ -5251,6 +5254,11 @@ class App extends React.Component<AppProps, AppState> {
       nextAppState,
       options,
     );
+  };
+
+  /** Creates a new transaction for batching mutations into a single undo entry. */
+  public createTransaction: TransactionManager["create"] = () => {
+    return this.transactionManager.create();
   };
 
   public mutateElement = <TElement extends Mutable<ExcalidrawElement>>(

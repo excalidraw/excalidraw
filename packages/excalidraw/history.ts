@@ -87,10 +87,22 @@ export class HistoryChangedEvent {
   ) {}
 }
 
+export type HistoryBeforeRecordListener = (delta: StoreDelta) => void;
+export type HistoryPerformDirection = "undo" | "redo";
+export type HistoryEffectiveDeltaResolverContext = {
+  direction: HistoryPerformDirection;
+};
+export type HistoryEffectiveDeltaResolver = (
+  delta: HistoryDelta,
+  context: HistoryEffectiveDeltaResolverContext,
+) => HistoryDelta;
+
 export class History {
   public readonly onHistoryChangedEmitter = new Emitter<
     [HistoryChangedEvent]
   >();
+  private readonly onBeforeRecordEmitter = new Emitter<[StoreDelta]>();
+  private effectiveDeltaResolver: HistoryEffectiveDeltaResolver | null = null;
 
   public readonly undoStack: HistoryDelta[] = [];
   public readonly redoStack: HistoryDelta[] = [];
@@ -104,6 +116,20 @@ export class History {
   }
 
   constructor(private readonly store: Store) {}
+
+  /**
+   * Registers a hook that runs before a durable delta is converted
+   * into a history entry.
+   */
+  public onBeforeRecord(callback: HistoryBeforeRecordListener) {
+    return this.onBeforeRecordEmitter.on(callback);
+  }
+
+  public setEffectiveDeltaResolver(
+    resolver: HistoryEffectiveDeltaResolver | null,
+  ) {
+    this.effectiveDeltaResolver = resolver;
+  }
 
   public clear() {
     this.undoStack.length = 0;
@@ -119,6 +145,8 @@ export class History {
       return;
     }
 
+    this.onBeforeRecordEmitter.trigger(delta);
+
     // construct history entry, so once it's emitted, it's not recorded again
     const historyDelta = HistoryDelta.inverse(delta);
 
@@ -131,15 +159,14 @@ export class History {
       this.redoStack.length = 0;
     }
 
-    this.onHistoryChangedEmitter.trigger(
-      new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
-    );
+    this.emitHistoryChanged();
   }
 
   public undo(elements: SceneElementsMap, appState: AppState) {
     return this.perform(
       elements,
       appState,
+      "undo",
       () => History.pop(this.undoStack),
       (entry: HistoryDelta) => History.push(this.redoStack, entry),
     );
@@ -149,6 +176,7 @@ export class History {
     return this.perform(
       elements,
       appState,
+      "redo",
       () => History.pop(this.redoStack),
       (entry: HistoryDelta) => History.push(this.undoStack, entry),
     );
@@ -157,6 +185,7 @@ export class History {
   private perform(
     elements: SceneElementsMap,
     appState: AppState,
+    direction: HistoryPerformDirection,
     pop: () => HistoryDelta | null,
     push: (entry: HistoryDelta) => void,
   ): [SceneElementsMap, AppState] | void {
@@ -177,9 +206,15 @@ export class History {
 
       // iterate through the history entries in case they result in no visible changes
       while (historyDelta) {
+        // Roundtrip invariant: whichever delta we execute must be the one that
+        // continues through applyLatestChanges -> inverse -> opposite stack.
+        let entryToPush = historyDelta;
         try {
+          const effectiveDelta = this.resolveEffectiveDelta(historyDelta, {
+            direction,
+          });
           [nextElements, nextAppState, containsVisibleChange] =
-            historyDelta.applyTo(nextElements, nextAppState, prevSnapshot);
+            effectiveDelta.applyTo(nextElements, nextAppState, prevSnapshot);
 
           const prevElements = prevSnapshot.elements;
           const nextSnapshot = prevSnapshot.maybeClone(
@@ -190,7 +225,7 @@ export class History {
 
           const change = StoreChange.create(prevSnapshot, nextSnapshot);
           const delta = HistoryDelta.applyLatestChanges(
-            historyDelta,
+            effectiveDelta,
             prevElements,
             nextElements,
           );
@@ -203,12 +238,12 @@ export class History {
               delta,
             });
 
-            historyDelta = delta;
+            entryToPush = delta;
           }
 
           prevSnapshot = nextSnapshot;
         } finally {
-          push(historyDelta);
+          push(entryToPush);
         }
 
         if (containsVisibleChange) {
@@ -222,10 +257,14 @@ export class History {
     } finally {
       // trigger the history change event before returning completely
       // also trigger it just once, no need doing so on each entry
-      this.onHistoryChangedEmitter.trigger(
-        new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
-      );
+      this.emitHistoryChanged();
     }
+  }
+
+  private emitHistoryChanged() {
+    this.onHistoryChangedEmitter.trigger(
+      new HistoryChangedEvent(this.isUndoStackEmpty, this.isRedoStackEmpty),
+    );
   }
 
   private static pop(stack: HistoryDelta[]): HistoryDelta | null {
@@ -245,5 +284,16 @@ export class History {
   private static push(stack: HistoryDelta[], entry: HistoryDelta) {
     const inversedEntry = HistoryDelta.inverse(entry);
     return stack.push(inversedEntry);
+  }
+
+  private resolveEffectiveDelta(
+    delta: HistoryDelta,
+    context: HistoryEffectiveDeltaResolverContext,
+  ): HistoryDelta {
+    if (!this.effectiveDeltaResolver) {
+      return delta;
+    }
+
+    return this.effectiveDeltaResolver(delta, context);
   }
 }

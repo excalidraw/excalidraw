@@ -1,0 +1,125 @@
+# Transactions
+
+Transactions let many live scene updates render immediately while still committing a single durable history entry.
+
+Typical use case:
+
+- AI streaming emits many `NEVER` updates for real-time feedback.
+- Those updates advance the live scene and store snapshot, but do not create undo history.
+- A transaction records the intended logical delta separately, then commits one synthetic durable increment at the end.
+
+## Key Files
+
+### `packages/excalidraw/transaction/`
+
+- `transaction.ts`
+  - `Transaction` is the per-tx instance.
+  - `updateScene()` applies live updates with `captureUpdate: NEVER`.
+  - `updateElements()` is a typed partial-patch helper over `updateScene()`.
+  - `commit()` builds synthetic snapshots and commits one durable entry.
+  - `cancel()` ends the tx without committing history.
+- `ledger.ts`
+  - `TransactionLedger` keeps per-element baseline, target, and touched props across tx steps.
+  - `buildSyntheticSnapshots()` reconciles tx intent with the live scene using `live-wins-per-prop`.
+- `undoOverridePlanner.ts`
+  - Tracks tx intermediate values.
+  - Produces undo override candidates for regular user history entries that were recorded while a tx was active.
+- `manager.ts`
+  - Owns tx lifecycle state and active-tx priority.
+  - Injects tx undo markers into durable deltas at record time.
+  - Resolves effective history deltas at undo/redo time.
+- `diff.ts` / `types.ts`
+  - Shared diff helpers and transaction-specific types.
+
+### `packages/element/src/store.ts`
+
+- `store.commitSyntheticIncrement()`
+  - Builds `StoreSnapshot -> StoreChange -> StoreDelta` from logical before/after snapshots.
+  - Commits the synthetic durable increment immediately through an isolated path.
+  - Does not flush unrelated pending micro actions.
+- `StoreDelta.markers`
+  - Carries extra history markers such as `txUndoOverrides`.
+
+### `packages/excalidraw/history.ts`
+
+- `onBeforeRecord()`
+  - Lets the transaction manager attach markers before a durable delta becomes a history entry.
+- `setEffectiveDeltaResolver()`
+  - Lets the transaction manager rewrite a history delta at undo/redo time before it is applied.
+
+## Flow
+
+1. Caller creates a transaction.
+2. `tx.updateScene()` applies live updates with `NEVER`.
+3. The ledger records net element changes; appState intent is accumulated separately.
+4. Regular user durable edits that happen while the tx is active may receive tx undo markers.
+5. `tx.commit()` asks the ledger for logical before/after snapshots and calls `store.commitSyntheticIncrement()`.
+6. Undo/redo later uses the manager's effective-delta resolver to decide whether ended tx markers should patch the baseline of a regular history entry.
+
+Result:
+
+- live rendering stays immediate;
+- one tx still produces one durable history entry;
+- interleaved regular edits can undo back to the correct pre-tx baseline.
+
+## Undo Examples
+
+### Interleaved Regular Edit
+
+1. Baseline: `rect = (x: 0, stroke: black)`
+2. Tx updates it live to `(x: 200, stroke: red)` with `NEVER`
+3. User makes a regular durable edit: `(x: 200, stroke: purple)`
+4. Tx commits; live stays purple
+
+The user history entry was recorded while the tx was active, so its local baseline is `red`.
+If undo later runs after the tx has ended, restoring `red` is wrong: the correct pre-tx baseline is `black`.
+
+To fix this:
+
+- record-time attaches a tx undo marker to the user history entry
+- perform-time checks whether the tx has already ended
+- if ended, the effective delta is patched so undo restores `black` instead of `red`
+
+### Active Tx vs Ended Tx
+
+Using the same example:
+
+- if the user undoes while the tx is still active, the marker stays inactive and undo restores the tx intermediate value (`red`)
+- if the user undoes after the tx has ended, the marker becomes active and undo restores the pre-tx baseline (`black`)
+
+So markers are recorded early, but applied conditionally.
+
+## AppState
+
+Elements use ledger snapshots. AppState does not.
+
+The transaction instead keeps:
+
+- `initialAppState`: observed appState at tx start
+- `accumulatedAppState`: merged caller intent from `tx.updateScene({ appState })`
+
+At commit, the transaction computes the final appState patch and passes it into `store.commitSyntheticIncrement()`.
+
+## Example
+
+```ts
+const tx = app.transactionManager.create();
+
+tx.updateScene({ elements: updatedElementsA });
+tx.updateScene({ elements: updatedElementsB });
+tx.updateElements({
+  elements: [
+    { id: "rect-1", type: "rectangle", updates: { strokeColor: "#f00" } },
+    { id: "rect-2", type: "rectangle", updates: { x: 120 } },
+  ],
+});
+
+tx.commit();
+```
+
+## Notes
+
+- `commit()` and `cancel()` are idempotent.
+- `updateScene()` and `updateElements()` throw after the tx has ended.
+- Conflict handling inside synthetic snapshots is fixed to `live-wins-per-prop`.
+- Multi-tx interleaving is supported through manager-owned lifecycle tracking and active-tx priority.
