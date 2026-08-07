@@ -36,6 +36,7 @@ import type {
   BindMode,
   ExcalidrawTextElement,
   StrokeVariability,
+  AnimatedImage,
 } from "@excalidraw/element/types";
 
 import type {
@@ -1094,6 +1095,7 @@ export type AppClassProperties = {
     {
       image: HTMLImageElement | Promise<HTMLImageElement>;
       mimeType: ValueOf<typeof IMAGE_MIME_TYPES>;
+      animation?: AnimatedImage;
     }
   >;
   files: BinaryFiles;
