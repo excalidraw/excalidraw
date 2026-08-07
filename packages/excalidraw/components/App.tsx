@@ -13432,28 +13432,6 @@ class App extends React.Component<AppProps, AppState> {
       event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
     );
 
-    const frameElementsOffsetsMap = new Map<
-      string,
-      {
-        x: number;
-        y: number;
-      }
-    >();
-
-    selectedFrames.forEach((frame) => {
-      const elementsInFrame = getFrameChildren(
-        this.scene.getNonDeletedElements(),
-        frame.id,
-      );
-
-      elementsInFrame.forEach((element) => {
-        frameElementsOffsetsMap.set(frame.id + element.id, {
-          x: element.x - frame.x,
-          y: element.y - frame.y,
-        });
-      });
-    });
-
     // check needed for avoiding flickering when a key gets pressed
     // during dragging
     if (!this.state.selectedElementsAreBeingDragged) {
