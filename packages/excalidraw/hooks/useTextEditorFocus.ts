@@ -11,7 +11,60 @@ const getTextEditor = (): HTMLTextAreaElement | null => {
   return document.querySelector(".excalidraw-wysiwyg") as HTMLTextAreaElement;
 };
 
+// ---------------------------------------------------------------------------
+// Module-level selection capture
+//
+// The browser collapses a textarea's text selection the moment it loses focus,
+// which happens on pointerdown on any element outside the textarea — including
+// color swatches. By the time an onClick handler or the action's perform()
+// runs, selectionStart === selectionEnd and the range is gone.
+//
+// Solution: call captureSelectionNow() from onPointerDown on color buttons
+// (before focus moves). The result is stored here and retrieved once by
+// consumeCapturedSelection() inside perform().
+// ---------------------------------------------------------------------------
+
+/** Module-level store for the last eagerly-captured selection. */
+let _lastCapturedSelection: CaretPosition | null = null;
+
+/**
+ * Read and store the textarea's current selection immediately.
+ * Call this from `onPointerDown` on any UI control that will steal focus
+ * from the wysiwyg editor (e.g. color swatches, color picker trigger).
+ */
+export const captureSelectionNow = (): void => {
+  const textEditor = getTextEditor();
+  if (textEditor) {
+    _lastCapturedSelection = {
+      start: textEditor.selectionStart,
+      end: textEditor.selectionEnd,
+    };
+  }
+};
+
+/**
+ * Return the last captured selection WITHOUT clearing it.
+ * Use this when you need to read the selection for UI purposes (e.g. caret
+ * restoration) but the value must still be available for perform() to consume.
+ */
+export const peekCapturedSelection = (): CaretPosition | null => {
+  return _lastCapturedSelection;
+};
+
+/**
+ * Return the last captured selection and clear the store.
+ * Returns null if nothing was captured or if the editor wasn't active.
+ */
+export const consumeCapturedSelection = (): CaretPosition | null => {
+  const captured = _lastCapturedSelection;
+  _lastCapturedSelection = null;
+  return captured;
+};
+
+// ---------------------------------------------------------------------------
 // Utility functions for caret position management
+// ---------------------------------------------------------------------------
+
 export const saveCaretPosition = (): CaretPosition | null => {
   const textEditor = getTextEditor();
   if (textEditor) {

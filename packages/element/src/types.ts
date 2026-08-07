@@ -232,6 +232,16 @@ export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
 
+/** Represents a color applied to a specific character range within a text element */
+export type TextColorRange = {
+  /** Start character index (inclusive, 0-based in originalText) */
+  start: number;
+  /** End character index (exclusive, 0-based in originalText) */
+  end: number;
+  /** CSS color string */
+  color: string;
+};
+
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
@@ -254,6 +264,12 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      *  with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+    /**
+     * Per-range text colors for sub-text coloring.
+     * When set, characters in each range are rendered with their specified color
+     * instead of the element-level strokeColor.
+     */
+    rangeColors?: readonly TextColorRange[];
   }>;
 
 export type ExcalidrawBindableElement =
