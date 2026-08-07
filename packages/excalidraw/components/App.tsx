@@ -12134,7 +12134,7 @@ class App extends React.Component<AppProps, AppState> {
 
                 return {
                   selectedGroupIds: {
-                    ..._prevState.selectedElementIds,
+                    ..._prevState.selectedGroupIds,
                     ...hitElement.groupIds
                       .map((gId) => ({ [gId]: false }))
                       .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
