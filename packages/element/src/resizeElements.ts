@@ -10,6 +10,7 @@ import {
 import {
   MIN_FONT_SIZE,
   SHIFT_LOCKING_ANGLE,
+  GRID_LOCKING_ANGLE,
   rescalePoints,
   getFontString,
 } from "@excalidraw/common";
@@ -96,6 +97,7 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
+  gridModeEnabled: boolean,
 ): boolean => {
   const elementsMap = scene.getNonDeletedElementsMap();
   if (selectedElements.length === 1) {
@@ -108,6 +110,7 @@ export const transformElements = (
           pointerX,
           pointerY,
           shouldRotateWithDiscreteAngle,
+          gridModeEnabled,
         );
         updateBoundElements(element, scene);
       }
@@ -160,6 +163,7 @@ export const transformElements = (
         shouldRotateWithDiscreteAngle,
         centerX,
         centerY,
+        gridModeEnabled,
       );
       return true;
     } else if (transformHandleType) {
@@ -206,6 +210,7 @@ const rotateSingleElement = (
   pointerX: number,
   pointerY: number,
   shouldRotateWithDiscreteAngle: boolean,
+  gridModeEnabled: boolean,
 ) => {
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(
     element,
@@ -219,7 +224,10 @@ const rotateSingleElement = (
   } else {
     angle = ((5 * Math.PI) / 2 +
       Math.atan2(pointerY - cy, pointerX - cx)) as Radians;
-    if (shouldRotateWithDiscreteAngle) {
+    if (gridModeEnabled) {
+      angle = (angle + GRID_LOCKING_ANGLE / 2) as Radians;
+      angle = (angle - (angle % GRID_LOCKING_ANGLE)) as Radians;
+    } else if (shouldRotateWithDiscreteAngle) {
       angle = (angle + SHIFT_LOCKING_ANGLE / 2) as Radians;
       angle = (angle - (angle % SHIFT_LOCKING_ANGLE)) as Radians;
     }
@@ -410,11 +418,15 @@ const rotateMultipleElements = (
   shouldRotateWithDiscreteAngle: boolean,
   centerX: number,
   centerY: number,
+  gridModeEnabled: boolean,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   let centerAngle =
     (5 * Math.PI) / 2 + Math.atan2(pointerY - centerY, pointerX - centerX);
-  if (shouldRotateWithDiscreteAngle) {
+  if (gridModeEnabled) {
+    centerAngle += GRID_LOCKING_ANGLE / 2;
+    centerAngle -= centerAngle % GRID_LOCKING_ANGLE;
+  } else if (shouldRotateWithDiscreteAngle) {
     centerAngle += SHIFT_LOCKING_ANGLE / 2;
     centerAngle -= centerAngle % SHIFT_LOCKING_ANGLE;
   }
