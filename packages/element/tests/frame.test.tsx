@@ -1182,4 +1182,56 @@ describe("adding elements to frames", () => {
       expect(h.elements.length).toBe(4);
     });
   });
+
+  describe("alt-dragging group members out of the frame", () => {
+    it("should ungroup bound text of a container dragged out of the frame", () => {
+      const groupFrame = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 150,
+        height: 150,
+      });
+      const [container, label] = API.createTextContainer({
+        frameId: groupFrame.id,
+        groupIds: ["group1"],
+      });
+      const other = API.createElement({
+        type: "rectangle",
+        x: 110,
+        y: 110,
+        width: 30,
+        height: 30,
+        frameId: groupFrame.id,
+        groupIds: ["group1"],
+      });
+
+      API.setElements([groupFrame, container, label, other]);
+
+      mouse.select(other);
+      mouse.doubleClickOn(other);
+      expect(h.state.editingGroupId).toBe("group1");
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.downAt(
+          container.x + container.width / 2,
+          container.y + container.height / 2,
+        );
+        mouse.moveTo(500, 500);
+        mouse.up();
+      });
+
+      const containerClone = getCloneByOrigId(container.id);
+      const labelClone = getCloneByOrigId(label.id);
+      expect(containerClone.frameId).toBe(null);
+      expect(containerClone.groupIds).toEqual([]);
+      expect(labelClone.frameId).toBe(null);
+      expect(labelClone.groupIds).toEqual([]);
+
+      expect(container.frameId).toBe(groupFrame.id);
+      expect(container.groupIds).toEqual(["group1"]);
+      expect(label.frameId).toBe(groupFrame.id);
+      expect(label.groupIds).toEqual(["group1"]);
+    });
+  });
 });
