@@ -1326,7 +1326,9 @@ const renderFocusPointIndicator = ({
   }
 
   const linearState = appState.selectedLinearElement;
+  const isMultiarrow = !!linearState && !!appState.multiElement;
   const isDragging = !!linearState?.isDragging;
+  const orbitBindOverrideEnabled = appState.orbitBindOverrideEnabled;
   const pointIndex = type === "start" ? 0 : arrow.points.length - 1;
   const pointSelected =
     !!linearState?.selectedPointsIndices?.includes(pointIndex);
@@ -1344,7 +1346,12 @@ const renderFocusPointIndicator = ({
   // render focus point
   // ----------------------------
 
-  if (!(pointSelected && isDragging)) {
+  if (
+    !(
+      pointSelected &&
+      !((isDragging || isMultiarrow) && orbitBindOverrideEnabled)
+    )
+  ) {
     const focusPoint = getGlobalFixedPointForBindableElement(
       binding.fixedPoint,
       bindableElement,
