@@ -14,7 +14,10 @@ import { Tooltip } from "../components/Tooltip";
 import { ExportIcon, questionCircle, saveAs } from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { isImageFileHandle } from "../data/blob";
-import { nativeFileSystemSupported } from "../data/filesystem";
+import {
+  isFilesystemPermissionError,
+  nativeFileSystemSupported,
+} from "../data/filesystem";
 
 import { resaveAsImageWithScene } from "../data/resave";
 
@@ -311,10 +314,14 @@ export const actionSaveToActiveFile = register({
       } else {
         console.warn(error);
       }
+
       return {
         captureUpdate: CaptureUpdateAction.NEVER,
         appState: {
           toast: null,
+          ...(isFilesystemPermissionError(error) && {
+            errorMessage: t("errors.filesystemPermissionError"),
+          }),
         },
       };
     } finally {
@@ -362,10 +369,14 @@ export const actionSaveFileToDisk = register({
       } else {
         console.warn(error);
       }
+
       return {
         captureUpdate: CaptureUpdateAction.NEVER,
         appState: {
           toast: null,
+          ...(isFilesystemPermissionError(error) && {
+            errorMessage: t("errors.filesystemPermissionError"),
+          }),
         },
       };
     } finally {
