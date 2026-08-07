@@ -15,7 +15,6 @@ import {
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
   ROUNDNESS,
-  STROKE_WIDTH_KEYS,
   VERTICAL_ALIGN,
   KEYS,
   randomInteger,
@@ -28,6 +27,7 @@ import {
   invariant,
   FONT_SIZES,
   type StrokeWidthKey,
+  getStrokeWidthKeyForElement,
 } from "@excalidraw/common";
 
 import {
@@ -620,23 +620,6 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
   },
 });
 
-const getStrokeWidthKeyForElement = (
-  element: ExcalidrawElement,
-): StrokeWidthKey | null => {
-  return (
-    STROKE_WIDTH_KEYS.find(
-      (key) => getStrokeWidthByKey(element.type, key) === element.strokeWidth,
-    ) ?? null
-  );
-};
-
-const getStrokeWidthForElement = (
-  element: ExcalidrawElement,
-  strokeWidthKey: StrokeWidthKey,
-): ExcalidrawElement["strokeWidth"] => {
-  return getStrokeWidthByKey(element.type, strokeWidthKey);
-};
-
 export const actionChangeStrokeWidth = register<StrokeWidthKey>({
   name: "changeStrokeWidth",
   label: "labels.strokeWidth",
@@ -647,7 +630,7 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
-          strokeWidth: getStrokeWidthForElement(el, value),
+          strokeWidth: getStrokeWidthByKey(el.type, value),
         }),
       ),
       appState: { ...appState, currentItemStrokeWidthKey: value },
