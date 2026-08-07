@@ -1,4 +1,6 @@
 import {
+  BUCKET_FILL_BACKGROUND_PICKS,
+  COLOR_PALETTE,
   getBucketFillBackgroundColor,
   getSizeFromPoints,
 } from "@excalidraw/common";
@@ -15,7 +17,11 @@ import {
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
+import { actionChangeBucketFillBackgroundColor } from "../actions";
+import { editorJotaiStore } from "../editor-jotai";
 import { t } from "../i18n";
+
+import { activeEyeDropperAtom, type EyeDropperProperties } from "./EyeDropper";
 
 import type App from "./App";
 
@@ -24,9 +30,15 @@ type ScenePoint = {
   y: number;
 };
 
+const BUCKET_FILL_KEYBOARD_COLOR_PICKS = BUCKET_FILL_BACKGROUND_PICKS.filter(
+  (color) => color !== COLOR_PALETTE.white,
+);
+
 /** Owns bucket-fill interaction and App-bound scene mutations. */
 export class AppBucketFill {
   constructor(private app: App) {}
+
+  private temporaryEyeDropper: EyeDropperProperties | null = null;
 
   /**
    * The click armed on pointer down, committed on pointer up. Deferring the
@@ -57,6 +69,54 @@ export class AppBucketFill {
   /** Abort the armed fill (second finger, context menu, pointercancel). */
   cancel = () => {
     this.pending = null;
+  };
+
+  cycleBackgroundColor = () => {
+    const currentColor = getBucketFillBackgroundColor(
+      this.app.state.currentItemBackgroundColor,
+    );
+    const currentIndex = BUCKET_FILL_KEYBOARD_COLOR_PICKS.indexOf(currentColor);
+    const nextColor =
+      BUCKET_FILL_KEYBOARD_COLOR_PICKS[
+        (currentIndex + 1) % BUCKET_FILL_KEYBOARD_COLOR_PICKS.length
+      ];
+
+    this.app.actionManager.executeAction(
+      actionChangeBucketFillBackgroundColor,
+      "keyboard",
+      { currentItemBackgroundColor: nextColor },
+    );
+  };
+
+  openTemporaryEyeDropper = () => {
+    if (editorJotaiStore.get(activeEyeDropperAtom)) {
+      return;
+    }
+
+    const eyeDropper: EyeDropperProperties = {
+      colorPickerType: "elementBackground",
+      keepOpenOnAlt: true,
+      onSelect: (color) => {
+        this.app.actionManager.executeAction(
+          actionChangeBucketFillBackgroundColor,
+          "ui",
+          { currentItemBackgroundColor: color },
+        );
+      },
+    };
+    this.temporaryEyeDropper = eyeDropper;
+    this.app.updateEditorAtom(activeEyeDropperAtom, eyeDropper);
+  };
+
+  closeTemporaryEyeDropper = () => {
+    const eyeDropper = this.temporaryEyeDropper;
+    this.temporaryEyeDropper = null;
+    if (
+      eyeDropper &&
+      editorJotaiStore.get(activeEyeDropperAtom) === eyeDropper
+    ) {
+      this.app.updateEditorAtom(activeEyeDropperAtom, null);
+    }
   };
 
   /**

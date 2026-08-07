@@ -1,4 +1,9 @@
-import { KEYS } from "@excalidraw/common";
+import {
+  BUCKET_FILL_BACKGROUND_PICKS,
+  COLOR_PALETTE,
+  getBucketFillBackgroundColor,
+  KEYS,
+} from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
@@ -7,6 +12,8 @@ import type { LocalPoint } from "@excalidraw/math";
 import type { ExcalidrawLineElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+import { activeEyeDropperAtom } from "../components/EyeDropper";
+import { editorJotaiStore } from "../editor-jotai";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
@@ -16,6 +23,7 @@ import {
   GlobalTestState,
   render,
   togglePopover,
+  waitFor,
 } from "./test-utils";
 
 const { h } = window;
@@ -63,6 +71,131 @@ describe("bucket fill tool", () => {
     });
     return rect;
   };
+
+  it("uses the paint droplet as the bucket fill cursor hotspot", () => {
+    selectBucketFill();
+
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toMatch(
+      /^url\(data:image\/svg\+xml/,
+    );
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toMatch(
+      /\) 5 18, auto$/,
+    );
+  });
+
+  it("colorizes the cursor with the effective fill color and keeps it updated", () => {
+    act(() => {
+      API.setAppState({
+        currentItemBackgroundColor: COLOR_PALETTE.transparent,
+      });
+    });
+    selectBucketFill();
+
+    const fallbackColor = getBucketFillBackgroundColor(
+      COLOR_PALETTE.transparent,
+    );
+    const fallbackCursor = GlobalTestState.interactiveCanvas.style.cursor;
+    expect(decodeURIComponent(fallbackCursor)).toContain(
+      `fill="${fallbackColor}"`,
+    );
+
+    const nextColor = "#ffec99";
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: nextColor });
+    });
+
+    const updatedCursor = GlobalTestState.interactiveCanvas.style.cursor;
+    expect(updatedCursor).not.toBe(fallbackCursor);
+    expect(decodeURIComponent(updatedCursor)).toContain(`fill="${nextColor}"`);
+  });
+
+  it("does not rebuild or reapply an unchanged bucket fill cursor", () => {
+    selectBucketFill();
+    const encodeURIComponentSpy = vi.spyOn(globalThis, "encodeURIComponent");
+    const cursorSetterSpy = vi.spyOn(
+      GlobalTestState.interactiveCanvas.style,
+      "cursor",
+      "set",
+    );
+
+    h.app.cursor.applyForTool();
+
+    expect(encodeURIComponentSpy).not.toHaveBeenCalled();
+    expect(cursorSetterSpy).not.toHaveBeenCalled();
+    encodeURIComponentSpy.mockRestore();
+    cursorSetterSpy.mockRestore();
+  });
+
+  it("cycles the non-white top picks on repeated B presses", () => {
+    const colorPicks = BUCKET_FILL_BACKGROUND_PICKS.filter(
+      (color) => color !== COLOR_PALETTE.white,
+    );
+    act(() => {
+      API.setAppState({ currentItemBackgroundColor: COLOR_PALETTE.white });
+    });
+
+    Keyboard.keyPress(KEYS.B);
+    expect(h.state.activeTool.type).toBe("bucketfill");
+    expect(h.state.currentItemBackgroundColor).toBe(COLOR_PALETTE.white);
+
+    for (const color of colorPicks) {
+      Keyboard.keyPress(KEYS.B);
+      expect(h.state.currentItemBackgroundColor).toBe(color);
+      expect(
+        decodeURIComponent(GlobalTestState.interactiveCanvas.style.cursor),
+      ).toContain(`fill="${color}"`);
+    }
+
+    Keyboard.keyPress(KEYS.B);
+    expect(h.state.currentItemBackgroundColor).toBe(colorPicks[0]);
+  });
+
+  it("temporarily activates the background eye dropper while Alt is held", async () => {
+    selectBucketFill();
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.keyDown(KEYS.ALT);
+    });
+
+    const eyeDropper = editorJotaiStore.get(activeEyeDropperAtom);
+    expect(eyeDropper).not.toBeNull();
+    expect(eyeDropper!.colorPickerType).toBe("elementBackground");
+    expect(eyeDropper!.keepOpenOnAlt).toBe(true);
+    expect(eyeDropper!.swapPreviewOnAlt).toBeUndefined();
+    await waitFor(() => {
+      expect(
+        GlobalTestState.renderResult.container.querySelector(
+          ".excalidraw-eye-dropper-preview",
+        ),
+      ).not.toBeNull();
+    });
+
+    const color = "#ff8787";
+    act(() => {
+      eyeDropper!.onSelect(color, { altKey: true } as PointerEvent);
+    });
+    expect(h.state.currentItemBackgroundColor).toBe(color);
+
+    Keyboard.keyUp(KEYS.ALT);
+    expect(editorJotaiStore.get(activeEyeDropperAtom)).toBeNull();
+    await waitFor(() => {
+      expect(
+        GlobalTestState.renderResult.container.querySelector(
+          ".excalidraw-eye-dropper-preview",
+        ),
+      ).toBeNull();
+    });
+  });
+
+  it("clears the bucket fill cursor immediately when Escape exits the tool", () => {
+    selectBucketFill();
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toContain("url(");
+
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    expect(h.state.activeTool.type).toBe("selection");
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe("");
+  });
 
   it("creates a unselected line polygon with the current background color", () => {
     const rect = seedRectangle();
