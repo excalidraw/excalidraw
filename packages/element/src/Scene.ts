@@ -176,7 +176,7 @@ export class Scene {
   }
 
   getSelectedElements(opts: {
-    // NOTE can be ommitted by making Scene constructor require App instance
+    // NOTE can be omitted by making Scene constructor require App instance
     selectedElementIds: AppState["selectedElementIds"];
     /**
      * for specific cases where you need to use elements not from current
