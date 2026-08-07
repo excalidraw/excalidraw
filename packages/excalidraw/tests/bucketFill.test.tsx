@@ -64,6 +64,17 @@ describe("bucket fill tool", () => {
     return rect;
   };
 
+  it("uses the paint droplet as the bucket fill cursor hotspot", () => {
+    selectBucketFill();
+
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toMatch(
+      /^url\(data:image\/svg\+xml/,
+    );
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toMatch(
+      /\) 5 18, auto$/,
+    );
+  });
+
   it("creates a unselected line polygon with the current background color", () => {
     const rect = seedRectangle();
     act(() => {

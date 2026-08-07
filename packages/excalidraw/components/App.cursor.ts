@@ -2,8 +2,10 @@ import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
 
 import { isHandToolActive, isEraserActive } from "../appState";
 
-import type App from "./App";
+import { bucketFillIconSvgPaths } from "./icons";
+
 import type { AppState, DataURL } from "../types";
+import type App from "./App";
 
 const laserPointerCursorSVG_tag = `<svg viewBox="0 0 24 24" stroke-width="1" width="28" height="28" xmlns="http://www.w3.org/2000/svg">`;
 const laserPointerCursorBackgroundSVG = `<path d="M6.164 11.755a5.314 5.314 0 0 1-4.932-5.298 5.314 5.314 0 0 1 5.311-5.311 5.314 5.314 0 0 1 5.307 5.113l8.773 8.773a3.322 3.322 0 0 1 0 4.696l-.895.895a3.322 3.322 0 0 1-4.696 0l-8.868-8.868Z" style="fill:#fff"/>`;
@@ -18,6 +20,13 @@ const laserPointerCursorDataURL_darkMode = `data:${
   MIME_TYPES.svg
 },${encodeURIComponent(
   `${laserPointerCursorSVG_tag}${laserPointerCursorBackgroundSVG}${laserPointerCursorIconSVG}</svg>`,
+)}`;
+
+const bucketFillCursorPathsSVG = bucketFillIconSvgPaths
+  .map((path) => `<path d="${path}"/>`)
+  .join("");
+const bucketFillCursorDataURL = `data:${MIME_TYPES.svg},${encodeURIComponent(
+  `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><g stroke="#fff" fill="#fff" stroke-width="5">${bucketFillCursorPathsSVG}</g><g stroke="#1b1b1f" stroke-width="1.25">${bucketFillCursorPathsSVG}</g></svg>`,
 )}`;
 
 /**
@@ -86,6 +95,9 @@ export class AppCursor {
       this.applyEraser();
     } else if (activeTool.type === "autoshape") {
       this.set(CURSOR_TYPE.CROSSHAIR);
+    } else if (activeTool.type === "bucketfill") {
+      // The hotspot is the center of the paint droplet in the icon.
+      this.set(`url(${bucketFillCursorDataURL}) 5 18, auto`);
     } else if (activeTool.type === "laser") {
       const url =
         this.app.state.theme === THEME.LIGHT
