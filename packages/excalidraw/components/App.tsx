@@ -7941,6 +7941,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.selectedLinearElement,
           scenePointerX,
           scenePointerY,
+          event.altKey,
         );
       }
 
@@ -8108,6 +8109,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.selectedLinearElement,
           scenePointerX,
           scenePointerY,
+          event.altKey,
         );
       }
     }
@@ -8165,6 +8167,10 @@ class App extends React.Component<AppProps, AppState> {
     linearElementEditor: LinearElementEditor,
     scenePointerX: number,
     scenePointerY: number,
+    // when true, bend-point (segment midpoint) hit-testing is allowed even
+    // for arrows that already have 3+ points and are not in full edit mode —
+    // used for the alt-drag "add bend point" shortcut
+    force = false,
   ) {
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -8200,6 +8206,7 @@ class App extends React.Component<AppProps, AppState> {
             { x: scenePointerX, y: scenePointerY },
             this.state,
             this.scene.getNonDeletedElementsMap(),
+            force,
           );
         const isHoveringAPointHandle = isElbowArrow(element)
           ? hoverPointIndex === 0 ||
