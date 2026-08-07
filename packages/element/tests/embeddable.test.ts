@@ -1,4 +1,8 @@
-import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
+import {
+  embeddableURLValidator,
+  getEmbedLink,
+  maybeParseEmbedSrc,
+} from "../src/embeddable";
 
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
@@ -229,5 +233,64 @@ describe("Google Drive video embedding", () => {
         undefined,
       ),
     ).toBe(true);
+  });
+});
+
+describe("Google Maps embedding", () => {
+  const regularUrl =
+    "https://www.google.com/maps/place/26-432+Jab%C5%82onica,+Poland/@51.356302,20.797168,1921m/data=!3m2!1e3!4b1!4m15!1m8!3m7!1s0x47186c0e0e7578fd:0xe80d19a1ef6ad853!2zMjctMTAwIEnFgsW8YSwgUG9sYW5k!3b1!8m2!3d51.16305!4d21.23991!16zL20vMGM1ZnJ3!3m5!1s0x47184db43a4a5df9:0x6a2b8e648f9dc694!8m2!3d51.3562959!4d20.8023178!16s%2Fm%2F04q6t9r?entry=ttu";
+  const officialEmbedSrc =
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8363.540754033738!2d20.79716795156659!3d51.356301987021546!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47184db43a4a5df9%3A0x6a2b8e648f9dc694!2s26-432%20Jab%C5%82onica%2C%20Poland!5e1!3m2!1sen!2scz!4v1778159513974!5m2!1sen!2scz";
+
+  it("should preserve official Google Maps embed links", () => {
+    const parsedSrc = maybeParseEmbedSrc(
+      `<iframe src="${officialEmbedSrc}" width="600" height="450"></iframe>`,
+    );
+    const result = getEmbedLink(parsedSrc);
+
+    expect(embeddableURLValidator(parsedSrc, undefined)).toBe(true);
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("generic");
+    if (result?.type === "generic") {
+      expect(result.link).toBe(officialEmbedSrc);
+    }
+    expect(result?.intrinsicSize).toEqual({ w: 600, h: 450 });
+  });
+
+  it("should normalize regular Google Maps place links", () => {
+    const result = getEmbedLink(regularUrl);
+
+    expect(embeddableURLValidator(regularUrl, undefined)).toBe(true);
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("generic");
+    if (result?.type !== "generic") {
+      return;
+    }
+
+    const embedURL = new URL(result.link);
+    expect(embedURL.origin).toBe("https://www.google.com");
+    expect(embedURL.pathname).toBe("/maps");
+    expect(embedURL.searchParams.get("q")).toBe(
+      decodeURIComponent("26-432%20Jab%C5%82onica%2C%20Poland"),
+    );
+    expect(embedURL.searchParams.get("output")).toBe("embed");
+    expect(embedURL.searchParams.get("ll")).toBe("51.356302,20.797168");
+    expect(embedURL.searchParams.get("z")).toBe("14");
+    expect(result.intrinsicSize).toEqual({ w: 600, h: 450 });
+  });
+
+  it("should reject non-Maps Google pages and fail closed for unsupported Maps pages", () => {
+    expect(
+      embeddableURLValidator("https://www.google.com/search?q=maps", undefined),
+    ).toBe(false);
+
+    const unsupportedMapsUrl = "https://www.google.com/maps/about/";
+    expect(embeddableURLValidator(unsupportedMapsUrl, undefined)).toBe(true);
+    expect(getEmbedLink(unsupportedMapsUrl)).toBe(null);
+
+    const malformedMapsUrl = `https://www.google.com/maps/@${"0,0,".repeat(
+      1000,
+    )}`;
+    expect(embeddableURLValidator(malformedMapsUrl, undefined)).toBe(true);
   });
 });

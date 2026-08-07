@@ -130,6 +130,86 @@ const parseGoogleDriveVideoLink = (
   }
 };
 
+const isGoogleMapsURL = (url: string): boolean => {
+  try {
+    const { hostname, pathname } = new URL(
+      url.startsWith("http") ? url : `https://${url}`,
+    );
+    const bareHostname = hostname.replace(/^www\./, "");
+
+    return (
+      (bareHostname === "google.com" || bareHostname === "maps.google.com") &&
+      (pathname === "/maps" || pathname.startsWith("/maps/"))
+    );
+  } catch (error) {
+    return false;
+  }
+};
+
+const getGoogleMapsZoom = (zoomOrDistance: string): string | null => {
+  const match = zoomOrDistance.match(/^(\d+(?:\.\d+)?)(z|km|m)$/);
+  if (!match) {
+    return null;
+  }
+  const value = Number(match[1]);
+  if (match[2] === "z") {
+    return `${Math.round(value)}`;
+  }
+  const meters = value * (match[2] === "km" ? 1000 : 1);
+  return `${Math.max(
+    3,
+    Math.min(21, Math.round(16 - Math.log2(meters / 500))),
+  )}`;
+};
+
+const parseGoogleMapsLink = (url: string): string | null => {
+  if (!isGoogleMapsURL(url)) {
+    return null;
+  }
+
+  try {
+    const urlObj = new URL(url.startsWith("http") ? url : `https://${url}`);
+
+    if (
+      urlObj.pathname.startsWith("/maps/embed") ||
+      urlObj.searchParams.get("output") === "embed"
+    ) {
+      return urlObj.toString();
+    }
+
+    const [, lat, lng, zoomOrDistance] =
+      urlObj.pathname.match(
+        /@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?),([^/?#,]+)/,
+      ) || [];
+    const place = urlObj.pathname.match(/^\/maps\/place\/([^/]+)/)?.[1];
+    const query =
+      urlObj.searchParams.get("q") ||
+      (place ? decodeURIComponent(place).replace(/\+/g, " ") : null) ||
+      (lat && lng ? `${lat},${lng}` : null);
+
+    if (!query) {
+      return null;
+    }
+
+    const embedURL = new URL("https://www.google.com/maps");
+    embedURL.searchParams.set("q", query);
+    embedURL.searchParams.set("output", "embed");
+
+    if (lat && lng) {
+      embedURL.searchParams.set("ll", `${lat},${lng}`);
+    }
+
+    const zoom = zoomOrDistance ? getGoogleMapsZoom(zoomOrDistance) : null;
+    if (zoom) {
+      embedURL.searchParams.set("z", zoom);
+    }
+
+    return embedURL.toString();
+  } catch (error) {
+    return null;
+  }
+};
+
 const ALLOWED_DOMAINS = new Set([
   "youtube.com",
   "youtu.be",
@@ -147,6 +227,8 @@ const ALLOWED_DOMAINS = new Set([
   "giphy.com",
   "reddit.com",
   "forms.microsoft.com",
+  "wikipedia.org",
+  "*.wikipedia.org",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
@@ -276,6 +358,27 @@ export const getEmbedLink = (
       type,
       sandbox: { allowSameOrigin },
     };
+  }
+
+  if (isGoogleMapsURL(link)) {
+    const googleMapsLink = parseGoogleMapsLink(link);
+    if (googleMapsLink) {
+      link = googleMapsLink;
+      aspectRatio = { w: 600, h: 450 };
+      embeddedLinkCache.set(originalLink, {
+        link,
+        intrinsicSize: aspectRatio,
+        type,
+        sandbox: { allowSameOrigin },
+      });
+      return {
+        link,
+        intrinsicSize: aspectRatio,
+        type,
+        sandbox: { allowSameOrigin },
+      };
+    }
+    return null;
   }
 
   const figmaLink = link.match(RE_FIGMA);
@@ -506,6 +609,7 @@ export const embeddableURLValidator = (
   if (!url) {
     return false;
   }
+
   if (validateEmbeddable != null) {
     if (typeof validateEmbeddable === "function") {
       const ret = validateEmbeddable(url);
@@ -531,5 +635,5 @@ export const embeddableURLValidator = (
     }
   }
 
-  return !!matchHostname(url, ALLOWED_DOMAINS);
+  return isGoogleMapsURL(url) || !!matchHostname(url, ALLOWED_DOMAINS);
 };
