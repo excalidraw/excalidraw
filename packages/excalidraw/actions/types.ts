@@ -68,6 +68,7 @@ export type ActionName =
   | "changeFillStyle"
   | "changeStrokeWidth"
   | "changeSloppiness"
+  | "changeChalk"
   | "changeFreedrawMode"
   | "changeStrokeStyle"
   | "changeArrowhead"

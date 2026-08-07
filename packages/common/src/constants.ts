@@ -138,6 +138,7 @@ export const FONT_FAMILY = {
   "Comic Shanns": 8,
   "Liberation Sans": 9,
   Assistant: 10,
+  Neucha: 13,
 };
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
@@ -454,6 +455,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   strokeWidth: ExcalidrawElement["strokeWidth"];
   strokeStyle: ExcalidrawElement["strokeStyle"];
   roughness: ExcalidrawElement["roughness"];
+  chalk: NonNullable<ExcalidrawElement["chalk"]>;
   opacity: ExcalidrawElement["opacity"];
   locked: ExcalidrawElement["locked"];
 } = {
@@ -463,6 +465,7 @@ export const DEFAULT_ELEMENT_PROPS: {
   strokeWidth: STROKE_WIDTH[DEFAULT_ELEMENT_STROKE_WIDTH_KEY],
   strokeStyle: "solid",
   roughness: ROUGHNESS.artist,
+  chalk: false,
   opacity: 100,
   locked: false,
 };

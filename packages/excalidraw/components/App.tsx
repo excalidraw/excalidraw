@@ -9799,6 +9799,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeWidth: this.getCurrentItemStrokeWidth("freedraw"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
+      chalk: this.state.currentItemChalk,
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
@@ -10145,6 +10146,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
+              chalk: this.state.currentItemChalk,
               opacity: this.state.currentItemOpacity,
               roundness:
                 this.state.currentItemArrowType === ARROW_TYPE.round
@@ -10172,6 +10174,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
+              chalk: this.state.currentItemChalk,
               opacity: this.state.currentItemOpacity,
               roundness:
                 this.state.currentItemRoundness === "round"
@@ -10338,6 +10341,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeWidth: this.getCurrentItemStrokeWidth(elementType),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
+      chalk: this.state.currentItemChalk,
       opacity: this.state.currentItemOpacity,
       roundness: this.getCurrentItemRoundness(elementType),
       locked: false,

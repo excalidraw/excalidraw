@@ -359,6 +359,7 @@ describe("Basic lasso selection tests", () => {
           ...e,
           angle: e.angle as Radians,
           index: null,
+          chalk: false,
         } as ExcalidrawElement),
     );
 
@@ -1043,6 +1044,7 @@ describe("Special cases", () => {
       ].map((e) => ({
         ...e,
         index: null,
+        chalk: false,
         angle: e.angle as Radians,
       })) as ExcalidrawElement[];
 
@@ -1762,6 +1764,7 @@ describe("Special cases", () => {
       ].map((e) => ({
         ...e,
         index: null,
+        chalk: false,
         angle: e.angle as Radians,
       })) as ExcalidrawElement[];
 
