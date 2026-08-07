@@ -191,7 +191,7 @@
     "preferences_toolLock": "נעילת כלים",
     "boxSelectionMode": "",
     "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionOverlap": "חפיפה",
     "arrowBinding": "קשירת חצים",
     "midpointSnapping": "הצמדה לנקודות ביניים"
   },
@@ -341,7 +341,7 @@
   },
   "bucketfill": {
     "noRegion": "",
-    "tooComplex": ""
+    "tooComplex": "המילוי של האזור הזה מסובך מכדי לקרות."
   },
   "element": {
     "rectangle": "מלבן",
@@ -652,7 +652,7 @@
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
     "label": "Mermaid",
-    "inputPlaceholder": "",
+    "inputPlaceholder": "נא לכתוב כאן הגדרת תרשים ל־Mermaid...",
     "autoFixAvailable": "התיקון האוטומטי זמין"
   },
   "ttd": {
@@ -687,7 +687,7 @@
       "promptTooShort": "ההנחיה קצרה מדי (נדרשים {{min}} תווים לכל הפחות)",
       "promptTooLong": "ההנחיה ארוכה מדי (נדרשים {{max}} תווים לכל היותר)",
       "generationFailed": "היצירה נכשלה",
-      "invalidDiagram": "",
+      "invalidDiagram": "נוצר תרשים לא תקני :(. אפשר לערוך אותו ידנית, לנסות שוב עם תיקון אוטומטי, או לנסות הנחיה אחרת.",
       "fixInMermaid": "עריכה ידנית של Mermaid ←",
       "aiRepair": "יצירה מחדש (תיקון אוטומטי) ←",
       "requestAborted": "הבקשה בוטלה",
