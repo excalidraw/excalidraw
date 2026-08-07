@@ -153,6 +153,12 @@
         overflow: hidden;
         white-space: nowrap;
         gap: 0.75rem;
+
+        span {
+          display: flex;
+          align-items: center;
+          gap: 0.2rem;
+        }
       }
 
       &__shortcut {
