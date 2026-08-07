@@ -318,7 +318,18 @@ export const resizeSingleTextElement = (
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
-  const metricsWidth = element.width * (nextHeight / element.height);
+  const isCornerHandle = transformHandleType.length === 2;
+  let metricsWidth = element.width * (nextHeight / element.height);
+  let metricsHeight = nextHeight;
+
+  if (isCornerHandle) {
+    const widthRatio = Math.abs(nextWidth) / element.width;
+    const heightRatio = Math.abs(nextHeight) / element.height;
+    const ratio = Math.max(widthRatio, heightRatio);
+    const sign = Math.sign(nextHeight) || 1;
+    metricsWidth = element.width * ratio * sign;
+    metricsHeight = element.height * ratio * sign;
+  }
 
   const metrics = measureFontSizeFromWidth(element, elementsMap, metricsWidth);
   if (metrics === null) {
@@ -333,7 +344,7 @@ export const resizeSingleTextElement = (
       origElement.width,
       origElement.height,
       metricsWidth,
-      nextHeight,
+      metricsHeight,
       origElement.angle,
       transformHandleType,
       false,
@@ -343,7 +354,7 @@ export const resizeSingleTextElement = (
     scene.mutateElement(element, {
       fontSize: metrics.size,
       width: metricsWidth,
-      height: nextHeight,
+      height: metricsHeight,
       x: newOrigin.x,
       y: newOrigin.y,
     });
