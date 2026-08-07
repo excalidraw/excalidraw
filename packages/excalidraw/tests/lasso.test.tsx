@@ -359,9 +359,6 @@ describe("Basic lasso selection tests", () => {
           ...e,
           angle: e.angle as Radians,
           index: null,
-          createdBy: null,
-          createdAt: null,
-          updatedBy: null,
         } as ExcalidrawElement),
     );
 
@@ -1047,9 +1044,6 @@ describe("Special cases", () => {
         ...e,
         index: null,
         angle: e.angle as Radians,
-        createdBy: null,
-        createdAt: null,
-        updatedBy: null,
       })) as ExcalidrawElement[];
 
       h.elements = elements;
@@ -1769,9 +1763,6 @@ describe("Special cases", () => {
         ...e,
         index: null,
         angle: e.angle as Radians,
-        createdBy: null,
-        createdAt: null,
-        updatedBy: null,
       })) as ExcalidrawElement[];
 
       h.elements = elements;

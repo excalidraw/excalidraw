@@ -74,9 +74,6 @@ export type ElementConstructorOpts = MarkOptional<
   | "locked"
   | "opacity"
   | "customData"
-  | "createdBy"
-  | "createdAt"
-  | "updatedBy"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -126,6 +123,26 @@ const _newElementBase = <T extends ExcalidrawElement>(
     });
   }
 
+  // authorship is only ever present when known - an absent attribute means
+  // unknown authorship, so we never store (nor spread) `null` / `undefined`
+  const authorship: {
+    createdBy?: string;
+    createdAt?: number;
+    updatedBy?: string;
+  } = {};
+
+  if (rest.createdBy != null) {
+    authorship.createdBy = rest.createdBy;
+  }
+
+  if (rest.createdAt != null) {
+    authorship.createdAt = rest.createdAt;
+  }
+
+  if (rest.updatedBy != null) {
+    authorship.updatedBy = rest.updatedBy;
+  }
+
   // assign type to guard against excess properties
   const element: Merge<
     ExcalidrawGenericElement,
@@ -158,9 +175,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     link,
     locked,
     customData: rest.customData,
-    createdBy: rest.createdBy ?? null,
-    createdAt: rest.createdAt ?? null,
-    updatedBy: rest.updatedBy ?? null,
+    ...authorship,
   };
   return element;
 };

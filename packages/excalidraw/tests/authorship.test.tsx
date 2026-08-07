@@ -55,13 +55,12 @@ describe("element authorship", () => {
 
     UI.createElement("rectangle", { x: 10, y: 10 });
 
-    expect(h.elements).toEqual([
-      expect.objectContaining({
-        createdBy: null,
-        createdAt: null,
-        updatedBy: null,
-      }),
-    ]);
+    expect(h.elements.length).toBe(1);
+    // unknown authorship is expressed by the very absence of the attributes,
+    // never by a `null` placeholder
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0]).not.toHaveProperty("updatedBy");
   });
 
   it("should not attribute the creation of elements which entered through a non-durable capture", async () => {
@@ -74,7 +73,7 @@ describe("element authorship", () => {
       captureUpdate: CaptureUpdateAction.NEVER,
     });
 
-    expect(h.elements[0].createdBy).toBe(null);
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
 
     // a subsequent local, durable update must not attribute the creation of the
     // element, as it was already part of the document - only the last editor
@@ -84,13 +83,9 @@ describe("element authorship", () => {
     });
 
     expect(h.elements[0].x).toBe(100);
-    expect(h.elements[0]).toEqual(
-      expect.objectContaining({
-        createdBy: null,
-        createdAt: null,
-        updatedBy: "user-a",
-      }),
-    );
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].updatedBy).toBe("user-a");
   });
 
   it("should not overwrite an existing authorship", async () => {
@@ -106,13 +101,9 @@ describe("element authorship", () => {
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
 
-    expect(h.elements[0]).toEqual(
-      expect.objectContaining({
-        createdBy: "someone-else",
-        createdAt: null,
-        updatedBy: null,
-      }),
-    );
+    expect(h.elements[0].createdBy).toBe("someone-else");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0]).not.toHaveProperty("updatedBy");
   });
 
   it("should not leave the snapshot behind, resulting in a phantom history entry", async () => {
@@ -218,28 +209,20 @@ describe("element authorship", () => {
       captureUpdate: CaptureUpdateAction.NEVER,
     });
 
-    expect(h.elements[0]).toEqual(
-      expect.objectContaining({
-        createdBy: null,
-        createdAt: null,
-        updatedBy: null,
-      }),
-    );
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0]).not.toHaveProperty("updatedBy");
 
     API.updateScene({
       elements: [newElementWith(h.elements[0], { x: 100 })],
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
 
-    expect(h.elements[0]).toEqual(
-      expect.objectContaining({
-        x: 100,
-        // the creation attribution is never overwritten by an edit
-        createdBy: null,
-        createdAt: null,
-        updatedBy: "user-b",
-      }),
-    );
+    expect(h.elements[0].x).toBe(100);
+    // the creation attribution is never overwritten by an edit
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
   it("should not churn the version when `updatedBy` is already up to date", async () => {
@@ -313,14 +296,10 @@ describe("element authorship", () => {
 
     Keyboard.keyPress(KEYS.DELETE);
 
-    expect(h.elements[0]).toEqual(
-      expect.objectContaining({
-        isDeleted: true,
-        createdBy: null,
-        createdAt: null,
-        updatedBy: "user-b",
-      }),
-    );
+    expect(h.elements[0].isDeleted).toBe(true);
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
   it("should restore the previous `updatedBy` on undo and re-stamp on redo", async () => {
@@ -346,25 +325,22 @@ describe("element authorship", () => {
 
     Keyboard.undo();
 
-    expect(h.elements[0]).toEqual(
-      expect.objectContaining({
-        x: 0,
-        createdBy: null,
-        createdAt: null,
-        updatedBy: null,
-      }),
+    expect(h.elements[0].x).toBe(0);
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    // undoing a stamp writes back the previous (absent) value, which the delta
+    // carries as `undefined` - never as `null`, so it serializes away
+    expect(h.elements[0].updatedBy).toBeUndefined();
+    expect(JSON.parse(JSON.stringify(h.elements[0]))).not.toHaveProperty(
+      "updatedBy",
     );
 
     Keyboard.redo();
 
-    expect(h.elements[0]).toEqual(
-      expect.objectContaining({
-        x: 100,
-        createdBy: null,
-        createdAt: null,
-        updatedBy: "user-b",
-      }),
-    );
+    expect(h.elements[0].x).toBe(100);
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
   it("should not leave the snapshot behind when stamping `updatedBy` on the micro path", async () => {
@@ -434,27 +410,19 @@ describe("element authorship", () => {
       h.app.scene.mutateElement(editedElement, { x: 100 });
     });
 
-    expect(h.elements[0]).toEqual(
-      expect.objectContaining({
-        x: 100,
-        createdBy: null,
-        createdAt: null,
-        updatedBy: "user-a",
-      }),
-    );
+    expect(h.elements[0].x).toBe(100);
+    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].updatedBy).toBe("user-a");
 
     // the clone is intentionally left behind, so that the interim content
     // gets re-detected by the next capture
     const snapshottedElement = h.store.snapshot.elements.get(rect.id)!;
 
-    expect(snapshottedElement).toEqual(
-      expect.objectContaining({
-        x: 50,
-        createdBy: null,
-        createdAt: null,
-        updatedBy: "user-a",
-      }),
-    );
+    expect(snapshottedElement.x).toBe(50);
+    expect(snapshottedElement).not.toHaveProperty("createdBy");
+    expect(snapshottedElement).not.toHaveProperty("createdAt");
+    expect(snapshottedElement.updatedBy).toBe("user-a");
     expect(snapshottedElement.version).toBeLessThan(h.elements[0].version);
 
     const stampedVersion = h.elements[0].version;

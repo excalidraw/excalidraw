@@ -80,15 +80,17 @@ type _ExcalidrawElementBase = Readonly<{
   locked: boolean;
   customData?: Record<string, any>;
   /** id of the user whose editor instance created the element.
-      Null when the authorship is unknown, i.e. when the element was created
-      before this was introduced or without a current user being set. */
-  createdBy: string | null;
+      Absent when the authorship is unknown, i.e. when the element was created
+      before this was introduced or without a current user being set.
+      Never stored as `null`. */
+  createdBy?: string;
   /** epoch (ms) timestamp of the element creation, stamped once the creation
-      gets captured as a durable (undoable) change. Null when unknown. */
-  createdAt: number | null;
+      gets captured as a durable (undoable) change.
+      Absent when unknown, never stored as `null`. */
+  createdAt?: number;
   /** id of the user whose editor instance last updated the element.
-      Null when the authorship is unknown. */
-  updatedBy: string | null;
+      Absent when the authorship is unknown, never stored as `null`. */
+  updatedBy?: string;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {

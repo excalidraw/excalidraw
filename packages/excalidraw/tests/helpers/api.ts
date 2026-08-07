@@ -293,9 +293,11 @@ export class API {
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
       locked: rest.locked ?? false,
-      createdBy: rest.createdBy ?? null,
-      createdAt: rest.createdAt ?? null,
-      updatedBy: rest.updatedBy ?? null,
+      // nullish values are filtered out by the element constructors, so the
+      // created element doesn't carry the authorship attributes at all
+      createdBy: rest.createdBy,
+      createdAt: rest.createdAt,
+      updatedBy: rest.updatedBy,
     };
     switch (type) {
       case "rectangle":
