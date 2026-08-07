@@ -8,12 +8,14 @@ import {
   KEYS,
 } from "@excalidraw/common";
 
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { ColorPaletteCustom } from "@excalidraw/common";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
+import { ColorPaletteTable } from "./ColorPaletteTable";
 
 import { CustomColorList } from "./CustomColorList";
 import PickerColorList from "./PickerColorList";
