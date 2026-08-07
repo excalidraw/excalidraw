@@ -7,13 +7,17 @@ import { MIME_TYPES, ORIG_ID } from "@excalidraw/common";
 import { getCommonBoundingBox } from "@excalidraw/element";
 
 import type {
+  ExcalidrawElement,
   ExcalidrawGenericElement,
   NonDeleted,
 } from "@excalidraw/element/types";
 
 import { parseLibraryJSON } from "../data/blob";
 import { serializeLibraryAsJSON } from "../data/json";
-import { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import {
+  distributeLibraryItemsOnSquareGrid,
+  mergeLibraryItems,
+} from "../data/library";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -26,6 +30,14 @@ const { h } = window;
 
 const libraryJSONPromise = API.readFile(
   "./fixtures/fixture_library.excalidrawlib",
+  "utf8",
+);
+const extendedLibraryJSONPromise = API.readFile(
+  "./fixtures/fixture_library_ext_v2.excalidrawlib",
+  "utf8",
+);
+const extendedLegacyLibraryJSONPromise = API.readFile(
+  "./fixtures/fixture_library_ext_v1.excalidrawlib",
   "utf8",
 );
 
@@ -142,6 +154,159 @@ describe("library items inserting", () => {
 });
 
 describe("library", () => {
+  describe("mergeLibraryItems", () => {
+    it("rejects an item with the same library-item id", async () => {
+      const existingItems = parseLibraryJSON(
+        await extendedLibraryJSONPromise,
+        "published",
+      );
+      const importedItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      ).map((item) => ({ ...item, id: existingItems[0]!.id }));
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual(
+        existingItems,
+      );
+    });
+
+    it("adds an item with a different number of elements", async () => {
+      const existingItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+      const importedItems = parseLibraryJSON(
+        await extendedLibraryJSONPromise,
+        "published",
+      );
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual([
+        ...importedItems,
+        ...existingItems,
+      ]);
+    });
+
+    it("rejects an item with the same element ids and version nonces", async () => {
+      const existingItems = parseLibraryJSON(
+        await extendedLibraryJSONPromise,
+        "published",
+      );
+      const importedItems = existingItems.map((item) => ({
+        ...item,
+        id: `${item.id}-different-item`,
+      }));
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual(
+        existingItems,
+      );
+    });
+
+    it("does not duplicate a non-trivial legacy library when re-imported", async () => {
+      const firstImport = parseLibraryJSON(
+        await extendedLegacyLibraryJSONPromise,
+        "published",
+      );
+      const secondImport = parseLibraryJSON(
+        await extendedLegacyLibraryJSONPromise,
+        "published",
+      );
+
+      expect(firstImport).toHaveLength(2);
+      expect(firstImport.map((item) => item.elements)).toHaveLength(2);
+      expect(firstImport[0]?.elements).toHaveLength(2);
+      expect(firstImport[1]?.elements).toHaveLength(1);
+      expect(firstImport.map((item) => item.id)).not.toEqual(
+        secondImport.map((item) => item.id),
+      );
+      expect(mergeLibraryItems(firstImport, secondImport)).toEqual(firstImport);
+    });
+
+    it("rejects identical elements with different version nonces", async () => {
+      const existingItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+      const importedItems = existingItems.map((item) => ({
+        ...item,
+        id: `${item.id}-different-item`,
+        elements: item.elements.map((element) => ({
+          ...element,
+          versionNonce: element.versionNonce + 1,
+        })),
+      }));
+
+      // Restoring legacy libraries can regenerate version nonces. The
+      // fingerprint fallback must still recognize the imported item.
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual(
+        existingItems,
+      );
+    });
+
+    it("rejects matching element fingerprints with different element ids", async () => {
+      const existingItems = parseLibraryJSON(
+        await libraryJSONPromise,
+        "published",
+      );
+      const importedItems = existingItems.map((item) => ({
+        ...item,
+        id: `${item.id}-different-item`,
+        elements: item.elements.map((element) => ({
+          ...element,
+          id: `${element.id}-different-element`,
+        })),
+      }));
+
+      expect(mergeLibraryItems(existingItems, importedItems)).toEqual(
+        existingItems,
+      );
+    });
+
+    it.each([
+      [
+        "type",
+        (element: ExcalidrawElement) => ({ ...element, type: "ellipse" }),
+      ],
+      ["x", (element: ExcalidrawElement) => ({ ...element, x: element.x + 1 })],
+      ["y", (element: ExcalidrawElement) => ({ ...element, y: element.y + 1 })],
+      [
+        "width",
+        (element: ExcalidrawElement) => ({
+          ...element,
+          width: element.width + 1,
+        }),
+      ],
+      [
+        "height",
+        (element: ExcalidrawElement) => ({
+          ...element,
+          height: element.height + 1,
+        }),
+      ],
+    ] as const)(
+      "prepends an item when its element fingerprint's %s differs",
+      async (_property, mutateElement) => {
+        const existingItems = parseLibraryJSON(
+          await libraryJSONPromise,
+          "published",
+        );
+        const importedItems = existingItems.map((item) => ({
+          ...item,
+          id: `${item.id}-different-item`,
+          elements: item.elements.map((element) => ({
+            ...mutateElement(element),
+            // Avoid the element id + versionNonce fast path so this test
+            // exercises the fingerprint fallback.
+            id: `${element.id}-different-element`,
+          })),
+        }));
+
+        expect(
+          mergeLibraryItems(existingItems, importedItems as LibraryItems),
+        ).toEqual([...importedItems, ...existingItems]);
+      },
+    );
+  });
+
   beforeEach(async () => {
     await render(<Excalidraw />);
     await act(() => {
