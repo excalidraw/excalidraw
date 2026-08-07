@@ -91,6 +91,8 @@ export const isWritableElement = (
       target.type === "search")) ||
   (target instanceof HTMLElement && target.closest(".cm-editor") !== null);
 
+const CSS_QUOTABLE = /[\s#'.()]/;
+
 export const getFontFamilyString = ({
   fontFamily,
 }: {
@@ -98,7 +100,10 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      return `${fontFamilyString}${getFontFamilyFallbacks(id)
+      const family = CSS_QUOTABLE.test(fontFamilyString)
+        ? `"${fontFamilyString}"`
+        : fontFamilyString;
+      return `${family}${getFontFamilyFallbacks(id)
         .map((x) => `, ${x}`)
         .join("")}`;
     }

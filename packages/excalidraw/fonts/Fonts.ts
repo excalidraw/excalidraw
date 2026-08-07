@@ -31,14 +31,20 @@ import type { ValueOf } from "@excalidraw/common/utility-types";
 
 import type { Scene } from "@excalidraw/element";
 
+import { BalooBhaijaan2FontFaces } from "./BalooBhaijaan2";
+import { CairoPlayFontFaces } from "./CairoPlay";
 import { CascadiaFontFaces } from "./Cascadia";
+import { ChangaFontFaces } from "./Changa";
 import { ComicShannsFontFaces } from "./ComicShanns";
 import { EmojiFontFaces } from "./Emoji";
 import { ExcalidrawFontFace } from "./ExcalidrawFontFace";
 import { ExcalifontFontFaces } from "./Excalifont";
 import { HelveticaFontFaces } from "./Helvetica";
+
+import { LemonadaFontFaces } from "./Lemonada";
 import { LiberationFontFaces } from "./Liberation";
 import { LilitaFontFaces } from "./Lilita";
+import { NotoNaskhArabicFontFaces } from "./NotoNaskhArabic";
 import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
@@ -382,15 +388,20 @@ export class Fonts {
       Fonts.register.call(fonts, family, metadata, ...fontFacesDescriptors);
     };
 
+    init("Baloo Bhaijaan 2", ...BalooBhaijaan2FontFaces);
+    init("Cairo Play", ...CairoPlayFontFaces);
     init("Cascadia", ...CascadiaFontFaces);
+    init("Changa", ...ChangaFontFaces);
     init("Comic Shanns", ...ComicShannsFontFaces);
     init("Excalifont", ...ExcalifontFontFaces);
     // keeping for backwards compatibility reasons, uses system font (Helvetica on MacOS, Arial on Win)
     init("Helvetica", ...HelveticaFontFaces);
+    init("Lemonada", ...LemonadaFontFaces);
     // used for server-side pdf & png export instead of helvetica (technically does not need metrics, but kept in for consistency)
     init("Liberation Sans", ...LiberationFontFaces);
     init("Lilita One", ...LilitaFontFaces);
     init("Nunito", ...NunitoFontFaces);
+    init("Noto Naskh Arabic", ...NotoNaskhArabicFontFaces);
     init("Virgil", ...VirgilFontFaces);
 
     // fallback font faces

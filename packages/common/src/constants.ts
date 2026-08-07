@@ -138,6 +138,11 @@ export const FONT_FAMILY = {
   "Comic Shanns": 8,
   "Liberation Sans": 9,
   Assistant: 10,
+  "Noto Naskh Arabic": 11,
+  Lemonada: 12,
+  "Baloo Bhaijaan 2": 13,
+  "Cairo Play": 14,
+  Changa: 15,
 };
 
 // Segoe UI Emoji fails to properly fallback for some glyphs: ∞, ∫, ≠
@@ -208,6 +213,28 @@ export const FRAME_STYLE = {
   nameFontSize: 14,
   nameLineHeight: 1.25,
 };
+
+export const ARABIC_FONT_FAMILIES: ReadonlySet<number> = new Set([
+  FONT_FAMILY["Noto Naskh Arabic"],
+  FONT_FAMILY.Lemonada,
+  FONT_FAMILY["Baloo Bhaijaan 2"],
+  FONT_FAMILY["Cairo Play"],
+  FONT_FAMILY.Changa,
+]);
+
+export const isArabicFont = (fontFamily: number) =>
+  ARABIC_FONT_FAMILIES.has(fontFamily);
+
+export const DEFAULT_ARABIC_FONT_FAMILY: FontFamilyValues =
+  FONT_FAMILY.Lemonada;
+export const DEFAULT_LATIN_FONT_FAMILY: FontFamilyValues =
+  FONT_FAMILY.Excalifont;
+
+const RS_ARABIC_CHARS =
+  "\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFC";
+const RE_ARABIC_CHECK = new RegExp(`[${RS_ARABIC_CHARS}]`);
+
+export const containsArabic = (text: string) => RE_ARABIC_CHECK.test(text);
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;

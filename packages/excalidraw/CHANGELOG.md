@@ -208,6 +208,9 @@ The toolbar UI was rewritten from hidden radio/checkbox inputs to real `<button>
 
 ## Excalidraw Library
 
+### Features
+
+- Arabic font support. Added 5 Arabic fonts (Noto Naskh Arabic, Lemonada, Baloo Bhaijaan 2, Cairo Play, Changa) with auto-switch between Arabic and English fonts based on text input script. Font picker now groups fonts into Arabic and English sections. Lemonada is the default Arabic font.
 ### Breaking changes
 
 - `updateActiveTool` (from `@excalidraw/common`): the `lastActiveToolBeforeEraser` property of the `data` parameter was renamed to `lastActiveTool` (it was already stored under that name on `appState.activeTool`, and is no longer eraser-specific).
