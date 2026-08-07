@@ -86,29 +86,25 @@ export const Picker = React.forwardRef(
       palette,
     });
 
+    // On open, always land on a palette section (not a leftover "hex" section).
+    // A stale "hex" active section re-focused the hex input and broke the
+    // S → I eyedropper shortcut after a few uses (#9410).
     useEffect(() => {
-      if (!activeColorPickerSection) {
-        const isCustom = !!color && isCustomColor({ color, palette });
-        const isCustomButNotInList = isCustom && !customColors.includes(color);
+      const isCustom = !!color && isCustomColor({ color, palette });
+      const isCustomButNotInList = isCustom && !customColors.includes(color);
 
-        setActiveColorPickerSection(
-          isCustomButNotInList
-            ? null
-            : isCustom
-            ? "custom"
-            : colorObj?.shade != null
-            ? "shades"
-            : "baseColors",
-        );
-      }
-    }, [
-      activeColorPickerSection,
-      color,
-      palette,
-      setActiveColorPickerSection,
-      colorObj,
-      customColors,
-    ]);
+      setActiveColorPickerSection(
+        isCustomButNotInList
+          ? null
+          : isCustom
+          ? "custom"
+          : colorObj?.shade != null
+          ? "shades"
+          : "baseColors",
+      );
+      // Only when the picker mounts (popup opens)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const [activeShade, setActiveShade] = useState(
       colorObj?.shade ??
