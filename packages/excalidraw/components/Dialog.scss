@@ -46,9 +46,22 @@
   }
 
   .Dialog--fullscreen {
+    .Dialog__title {
+      // Push the title below the iOS notch / status bar. The `--sat` CSS
+      // variable resolves to `env(safe-area-inset-top)` and is `0` on
+      // devices without a notch. See #4833.
+      padding-top: var(--sat);
+    }
+
     .Dialog__close {
-      top: 1.25rem;
-      right: 1.25rem;
+      top: calc(1.25rem + var(--sat));
+      right: calc(1.25rem + var(--sar));
+    }
+
+    .Dialog__content {
+      // Keep bottom controls (e.g. "Save"/"Cancel" buttons) above the
+      // iOS home indicator. `--sab` resolves to `env(safe-area-inset-bottom)`.
+      padding-bottom: var(--sab);
     }
   }
 }
