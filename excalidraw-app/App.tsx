@@ -767,6 +767,7 @@ const ExcalidrawWrapper = () => {
   const [latestShareableLink, setLatestShareableLink] = useState<string | null>(
     null,
   );
+  const [showSecretPanel, setShowSecretPanel] = useState(false);
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
@@ -1013,6 +1014,25 @@ const ExcalidrawWrapper = () => {
                 }
                 editorInterface={editorInterface}
               />
+              <button
+                type="button"
+                style={{ marginLeft: 8, fontSize: 12 }}
+                onClick={() => setShowSecretPanel((prev) => !prev)}
+              >
+                Secret
+              </button>
+              {showSecretPanel && (
+                <div
+                  style={{
+                    padding: 8,
+                    marginTop: 8,
+                    background: "rgba(255,255,255,0.9)",
+                    border: "1px solid #ccc",
+                  }}
+                >
+                  secret panel is active
+                </div>
+              )}
             </div>
           );
         }}
