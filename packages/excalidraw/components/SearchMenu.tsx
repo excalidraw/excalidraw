@@ -287,12 +287,13 @@ export const SearchMenu = () => {
       }
 
       if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
-        event.preventDefault();
-        event.stopPropagation();
-
+        // Allow browser's native find to work when a dialog is open
         if (app.state.openDialog) {
           return;
         }
+
+        event.preventDefault();
+        event.stopPropagation();
 
         if (!searchInputRef.current?.matches(":focus")) {
           if (app.state.openDialog) {
