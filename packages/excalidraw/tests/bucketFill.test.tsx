@@ -12,6 +12,8 @@ import type { LocalPoint } from "@excalidraw/math";
 import type { ExcalidrawLineElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+import { activeEyeDropperAtom } from "../components/EyeDropper";
+import { editorJotaiStore } from "../editor-jotai";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
@@ -21,6 +23,7 @@ import {
   GlobalTestState,
   render,
   togglePopover,
+  waitFor,
 } from "./test-utils";
 
 const { h } = window;
@@ -145,6 +148,43 @@ describe("bucket fill tool", () => {
 
     Keyboard.keyPress(KEYS.B);
     expect(h.state.currentItemBackgroundColor).toBe(colorPicks[0]);
+  });
+
+  it("temporarily activates the background eye dropper while Alt is held", async () => {
+    selectBucketFill();
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.keyDown(KEYS.ALT);
+    });
+
+    const eyeDropper = editorJotaiStore.get(activeEyeDropperAtom);
+    expect(eyeDropper).not.toBeNull();
+    expect(eyeDropper!.colorPickerType).toBe("elementBackground");
+    expect(eyeDropper!.keepOpenOnAlt).toBe(true);
+    expect(eyeDropper!.swapPreviewOnAlt).toBeUndefined();
+    await waitFor(() => {
+      expect(
+        GlobalTestState.renderResult.container.querySelector(
+          ".excalidraw-eye-dropper-preview",
+        ),
+      ).not.toBeNull();
+    });
+
+    const color = "#ff8787";
+    act(() => {
+      eyeDropper!.onSelect(color, { altKey: true } as PointerEvent);
+    });
+    expect(h.state.currentItemBackgroundColor).toBe(color);
+
+    Keyboard.keyUp(KEYS.ALT);
+    expect(editorJotaiStore.get(activeEyeDropperAtom)).toBeNull();
+    await waitFor(() => {
+      expect(
+        GlobalTestState.renderResult.container.querySelector(
+          ".excalidraw-eye-dropper-preview",
+        ),
+      ).toBeNull();
+    });
   });
 
   it("clears the bucket fill cursor immediately when Escape exits the tool", () => {
