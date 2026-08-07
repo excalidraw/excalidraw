@@ -258,6 +258,8 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
+  CURRENT_SCHEMA_VERSION,
+  getSchemaVersion,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -3501,6 +3503,7 @@ class App extends React.Component<AppProps, AppState> {
     const restoredElements = restoreElements(initialData?.elements, null, {
       repairBindings: true,
       deleteInvisibleElements: true,
+      schemaVersion: getSchemaVersion(initialData),
     });
     let restoredAppState = restoreAppState(initialData?.appState, null);
     const activeTool = restoredAppState.activeTool;
@@ -4498,6 +4501,7 @@ class App extends React.Component<AppProps, AppState> {
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
         preserveFrameChildrenOrder: true,
+        schemaVersion: data.programmaticAPI ? undefined : data.schemaVersion,
       });
       return;
     }
@@ -4646,9 +4650,11 @@ class App extends React.Component<AppProps, AppState> {
     retainSeed?: boolean;
     fit?: SetViewportOptions["fit"];
     preserveFrameChildrenOrder?: boolean;
+    schemaVersion?: number;
   }) => {
     const elements = restoreElements(opts.elements, null, {
       deleteInvisibleElements: true,
+      schemaVersion: opts.schemaVersion ?? CURRENT_SCHEMA_VERSION,
     });
     const [minX, minY, maxX, maxY] = getCommonBounds(elements);
 
