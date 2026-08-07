@@ -520,6 +520,18 @@ export const convertToExcalidrawElements = (
     return [];
   }
   const elements = cloneJSON(elementsSkeleton);
+  
+  // 预处理：将文本节点和容器标签中的 HTML 换行标签 <br> / <br/> 替换为标准换行符 \n
+  for (const element of elements) {
+    if (element.type === "text" && typeof element.text === "string") {
+      element.text = element.text.replace(/<br\s*\/?>/gi, "\n");
+    }
+    const anyElement = element as any;
+    if (anyElement.label && typeof anyElement.label.text === "string") {
+      anyElement.label.text = anyElement.label.text.replace(/<br\s*\/?>/gi, "\n");
+    }
+  }
+
   const elementStore = new ElementStore();
   const elementsWithIds = new Map<string, ExcalidrawElementSkeleton>();
   const oldToNewElementIdMap = new Map<string, string>();
