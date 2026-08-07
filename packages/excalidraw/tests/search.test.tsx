@@ -161,6 +161,37 @@ describe("search", () => {
     });
   });
 
+  it("should maintain stable search results order when elements are repositioned", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    const el1 = API.createElement({ type: "text", text: "test alpha", y: 100 });
+    const el2 = API.createElement({ type: "text", text: "test beta", y: 200 });
+
+    API.setElements([el1, el2]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+    updateTextEditor(searchInput, "test");
+
+    let firstResultId: string;
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+      firstResultId = h.app.state.searchMatches!.matches[0].id;
+    });
+
+    API.updateElement(el2 as ExcalidrawTextElement, { y: 0 });
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+      expect(h.app.state.searchMatches!.matches[0].id).toBe(firstResultId!);
+    });
+  });
+
   it("should match frame names", async () => {
     const scrollIntoViewMock = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
