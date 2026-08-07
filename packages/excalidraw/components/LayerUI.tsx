@@ -24,6 +24,9 @@ import { TunnelsContext, useInitializeTunnels } from "../context/tunnels";
 import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
+import { ExportIcon } from "./icons"; 
+import { IconButton } from "./IconButton";
+
 import { t } from "../i18n";
 import { getScrollToContentState } from "../scene";
 
@@ -233,7 +236,7 @@ const LayerUI = ({
 
   const renderCanvasActions = () => (
     <div style={{ position: "relative" }}>
-      <div className="excalidraw-ui-top-left">
+    <div className="excalidraw-ui-top-left">
         {renderTopLeftUI?.(false, appState)}
         <tunnels.MainMenuTunnel.Out />
       </div>
@@ -401,6 +404,19 @@ const LayerUI = ({
               },
             )}
           >
+            {UIOptions.canvasActions.saveAsImage && (
+              <IconButton
+                className="QuickExport-button"
+                type="button"
+                icon={ExportIcon}
+                title={t("buttons.exportImage")}
+                aria-label={t("buttons.exportImage")}
+                onClick={() => {
+                  setAppState({ openDialog: { name: "imageExport" } });
+                }}
+              />
+            )}
+
             {defaultUIEnabled && appState.collaborators.size > 0 && (
               <UserList
                 collaborators={appState.collaborators}
