@@ -1,11 +1,32 @@
 {
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
           "value": "https://excalidraw.com"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Feature-Policy",
+          "value": "*"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "origin"
+        }
+      ]
+    },
+    {
+      "source": "/plus/",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://plus.excalidraw.com"
         },
         {
           "key": "X-Content-Type-Options",
@@ -47,6 +68,9 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {"source": "/plus/", "destination": "https://plus.excalidraw.com/"}
   ],
   "redirects": [
     {
