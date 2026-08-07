@@ -57,6 +57,11 @@ import type {
 import { actionSaveToActiveFile } from "../actions";
 
 import {
+  isHtmlInCanvasSupported,
+  drawTextEditorInCanvas,
+} from "../htmlcanvas";
+
+import {
   parseClipboard,
   parseDataTransferEvent,
   parseDataTransferEventMimeTypes,
@@ -1019,5 +1024,44 @@ export const textWysiwyg = ({
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
 
-  return handleSubmit;
+  // --------------------------------------------------------------------------
+  // HTML-in-Canvas progressive enhancement (Chromium origin trial)
+  // When the API is available, hide the absolute-positioned overlay and paint
+  // the live textarea directly into the canvas on every animation frame.
+  // On unsupported browsers this block is never entered and the existing
+  // overlay behaviour is fully preserved.
+  // --------------------------------------------------------------------------
+  let htmlInCanvasRafId = 0;
+  if (isHtmlInCanvasSupported()) {
+    // Make overlay invisible but keep it in the DOM so that native focus,
+    // IME composition, browser translation and the a11y tree keep working.
+    editable.style.opacity = "0";
+    editable.style.pointerEvents = "auto";
+
+    const paintLoop = () => {
+      const ctx = canvas.getContext("2d");
+      if (ctx && currentTextLayout) {
+        drawTextEditorInCanvas(ctx, editable, {
+          x: currentTextLayout.x,
+          y: currentTextLayout.y,
+          angle: currentTextLayout.angle,
+          scale: app.state.zoom.value * window.devicePixelRatio,
+          opacity: (element.opacity ?? 100) / 100,
+        });
+      }
+      htmlInCanvasRafId = requestAnimationFrame(paintLoop);
+    };
+    htmlInCanvasRafId = requestAnimationFrame(paintLoop);
+  }
+  // Store a reference to the cleanup so handleSubmit can cancel the RAF loop.
+  const _origHandleSubmit = handleSubmit;
+  const handleSubmitWithCleanup: SubmitHandler = () => {
+    cancelAnimationFrame(htmlInCanvasRafId);
+    if (isHtmlInCanvasSupported()) {
+      editable.style.opacity = "";
+    }
+    _origHandleSubmit();
+  };
+
+  return handleSubmitWithCleanup;
 };
