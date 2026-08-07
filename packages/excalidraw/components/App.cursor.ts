@@ -27,8 +27,7 @@ const laserPointerCursorDataURL_darkMode = `data:${
   `${laserPointerCursorSVG_tag}${laserPointerCursorBackgroundSVG}${laserPointerCursorIconSVG}</svg>`,
 )}`;
 
-const getBucketFillCursorDataURL = (backgroundColor: string) => {
-  const color = getBucketFillBackgroundColor(backgroundColor);
+const createBucketFillCursorDataURL = (color: string) => {
   const paths = bucketFillIconSvgPaths
     .map(
       (path, index) =>
@@ -50,15 +49,17 @@ const getBucketFillCursorDataURL = (backgroundColor: string) => {
  * cursors set here.
  */
 export class AppCursor {
+  private toolCursorMemo: {
+    canvas: HTMLCanvasElement;
+    type: AppState["activeTool"]["type"];
+    bucketFillColor?: string;
+    theme?: AppState["theme"];
+  } | null = null;
+
   private eraserCanvasCache:
     | (HTMLCanvasElement & { theme?: AppState["theme"] })
     | null = null;
   private eraserPreviewDataURL: DataURL | null = null;
-
-  private drawShapeCanvasCache:
-    | (HTMLCanvasElement & { theme?: AppState["theme"] })
-    | null = null;
-  private drawShapePreviewDataURL: DataURL | null = null;
 
   constructor(private app: App) {}
 
@@ -67,6 +68,9 @@ export class AppCursor {
   }
 
   set = (cursor: string) => {
+    // Hover and interaction cursors override the resting tool cursor. The
+    // next applyForTool() must restore it even if the tool itself is unchanged.
+    this.toolCursorMemo = null;
     if (this.canvas) {
       this.canvas.style.cursor = cursor;
     }
@@ -96,9 +100,31 @@ export class AppCursor {
   applyForTool = (
     activeTool: AppState["activeTool"] = this.app.state.activeTool,
   ) => {
-    if (!this.canvas) {
+    const canvas = this.canvas;
+    if (!canvas) {
       return;
     }
+
+    const bucketFillColor =
+      activeTool.type === "bucketfill"
+        ? getBucketFillBackgroundColor(
+            this.app.state.currentItemBackgroundColor,
+          )
+        : undefined;
+    const theme =
+      activeTool.type === "eraser" || activeTool.type === "laser"
+        ? this.app.state.theme
+        : undefined;
+    const memo = this.toolCursorMemo;
+    if (
+      memo?.canvas === canvas &&
+      memo.type === activeTool.type &&
+      memo.bucketFillColor === bucketFillColor &&
+      memo.theme === theme
+    ) {
+      return;
+    }
+
     if (activeTool.type === "selection") {
       this.clear();
     } else if (isHandToolActive({ activeTool })) {
@@ -109,11 +135,8 @@ export class AppCursor {
       this.set(CURSOR_TYPE.CROSSHAIR);
     } else if (activeTool.type === "bucketfill") {
       // The hotspot is the center of the paint droplet in the icon.
-      console.warn("x");
       this.set(
-        `url(${getBucketFillCursorDataURL(
-          this.app.state.currentItemBackgroundColor,
-        )}) 5 18, auto`,
+        `url(${createBucketFillCursorDataURL(bucketFillColor!)}) 5 18, auto`,
       );
     } else if (activeTool.type === "laser") {
       const url =
@@ -129,13 +152,18 @@ export class AppCursor {
     } else if (activeTool.type !== "image") {
       this.set(CURSOR_TYPE.AUTO);
     }
+
+    this.toolCursorMemo = {
+      canvas,
+      type: activeTool.type,
+      bucketFillColor,
+      theme,
+    };
   };
 
   /** clears the inline cursor so the environment default (CSS) applies */
   private clear = () => {
-    if (this.canvas) {
-      this.canvas.style.cursor = "";
-    }
+    this.set("");
   };
 
   private applyEraser = () => {

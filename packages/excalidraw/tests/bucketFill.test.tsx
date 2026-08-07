@@ -106,6 +106,23 @@ describe("bucket fill tool", () => {
     expect(decodeURIComponent(updatedCursor)).toContain(`fill="${nextColor}"`);
   });
 
+  it("does not rebuild or reapply an unchanged bucket fill cursor", () => {
+    selectBucketFill();
+    const encodeURIComponentSpy = vi.spyOn(globalThis, "encodeURIComponent");
+    const cursorSetterSpy = vi.spyOn(
+      GlobalTestState.interactiveCanvas.style,
+      "cursor",
+      "set",
+    );
+
+    h.app.cursor.applyForTool();
+
+    expect(encodeURIComponentSpy).not.toHaveBeenCalled();
+    expect(cursorSetterSpy).not.toHaveBeenCalled();
+    encodeURIComponentSpy.mockRestore();
+    cursorSetterSpy.mockRestore();
+  });
+
   it("cycles the non-white top picks on repeated B presses", () => {
     const colorPicks = BUCKET_FILL_BACKGROUND_PICKS.filter(
       (color) => color !== COLOR_PALETTE.white,
