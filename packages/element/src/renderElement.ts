@@ -42,7 +42,7 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+import { getElementAbsoluteVisualCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -165,7 +165,7 @@ const cappedElementCanvasSize = (
 
   const padding = getCanvasPadding(element);
 
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+  const [x1, y1, x2, y2] = getElementAbsoluteVisualCoords(element, elementsMap);
   const elementWidth =
     isLinearElement(element) || isFreeDrawElement(element)
       ? distance(x1, x2)
@@ -227,7 +227,7 @@ const generateElementCanvas = (
   let canvasOffsetY = 0;
 
   if (isLinearElement(element) || isFreeDrawElement(element)) {
-    const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
+    const [x1, y1] = getElementAbsoluteVisualCoords(element, elementsMap);
 
     canvasOffsetX =
       element.x > x1
@@ -592,7 +592,7 @@ const drawElementFromCanvas = (
 ) => {
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
+  const [x1, y1, x2, y2] = getElementAbsoluteVisualCoords(element, allElementsMap);
   const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
   const cy = ((y1 + y2) / 2 + appState.scrollY) * window.devicePixelRatio;
 
@@ -606,7 +606,7 @@ const drawElementFromCanvas = (
     // rect (even-odd) instead of baking a rotated arrow copy with a cleared
     // hole into a separate (`maxDim`-squared!) canvas. The hole stays
     // axis-aligned in scene space while the blit below rotates.
-    const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
+    const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteVisualCoords(
       boundTextElement,
       allElementsMap,
     );
@@ -780,7 +780,7 @@ export const renderElement = (
     }
     case "freedraw": {
       if (renderConfig.isExporting) {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+        const [x1, y1, x2, y2] = getElementAbsoluteVisualCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
         const cy = (y1 + y2) / 2 + appState.scrollY;
         const shiftX = (x2 - x1) / 2 - (element.x - x1);
@@ -823,7 +823,7 @@ export const renderElement = (
     case "iframe":
     case "embeddable": {
       if (renderConfig.isExporting) {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+        const [x1, y1, x2, y2] = getElementAbsoluteVisualCoords(element, elementsMap);
         const centerX = (x1 + x2) / 2;
         const centerY = (y1 + y2) / 2;
         const cx = centerX + appState.scrollX;
@@ -857,7 +857,7 @@ export const renderElement = (
           shiftX = element.width / 2 - (element.x - x1);
           shiftY = element.height / 2 - (element.y - y1);
 
-          const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
+          const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteVisualCoords(
             boundTextElement,
             elementsMap,
           );
