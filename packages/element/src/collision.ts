@@ -46,6 +46,7 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
+  isElementVisible,
 } from "./typeChecks";
 import {
   deconstructDiamondElement,
@@ -776,6 +777,9 @@ export const isPointInElement = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
 ) => {
+  if (!isElementVisible(element, elementsMap)) {
+    return false;
+  }
   if (
     (isLinearElement(element) || isFreeDrawElement(element)) &&
     !isPathALoop(element.points)

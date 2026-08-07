@@ -411,8 +411,12 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Required<
+    Omit<ExcalidrawElement, "customData" | "isVisible" | "layerId">
+  > & {
     customData?: ExcalidrawElement["customData"];
+    isVisible?: ExcalidrawElement["isVisible"];
+    layerId?: ExcalidrawElement["layerId"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
@@ -472,6 +476,8 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
+    isVisible: element.isVisible ?? true,
+    layerId: element.layerId ?? null,
   };
 
   if ("customData" in element || "customData" in extra) {

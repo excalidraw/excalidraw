@@ -38,6 +38,7 @@ export type ShortcutName =
       | "flipVertical"
       | "hyperlink"
       | "toggleElementLock"
+      | "toggleElementVisibility"
       | "resetZoom"
       | "zoomOut"
       | "zoomIn"
@@ -101,6 +102,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   viewMode: [getShortcutKey("Alt+R")],
   hyperlink: [getShortcutKey("CtrlOrCmd+K")],
   toggleElementLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
+  toggleElementVisibility: [getShortcutKey("CtrlOrCmd+Shift+H")],
   resetZoom: [getShortcutKey("CtrlOrCmd+0")],
   zoomOut: [getShortcutKey("CtrlOrCmd+-")],
   zoomIn: [getShortcutKey("CtrlOrCmd++")],

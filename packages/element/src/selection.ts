@@ -13,6 +13,7 @@ import {
   isFrameLikeElement,
   isLinearElement,
   isTextElement,
+  isElementVisible,
 } from "./typeChecks";
 import { getFrameChildren } from "./frame";
 
@@ -31,7 +32,7 @@ import type {
 } from "./types";
 
 const shouldIgnoreElementFromSelection = (element: ExcalidrawElement) =>
-  element.locked || isBoundToContainer(element);
+  element.locked || isBoundToContainer(element) || !isElementVisible(element);
 
 const excludeElementsFromFrames = <T extends ExcalidrawElement>(
   selectedElements: readonly T[],

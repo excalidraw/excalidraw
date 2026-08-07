@@ -1,6 +1,7 @@
 import { toIterable } from "@excalidraw/common";
 
 import { isInvisiblySmallElement } from "./sizeHelpers";
+import { isElementVisible } from "./typeChecks";
 
 import type {
   ExcalidrawElement,
@@ -49,7 +50,7 @@ export const getVisibleElements = (
 ): readonly NonDeletedExcalidrawElement[] =>
   elements.filter(
     (el): el is NonDeletedExcalidrawElement =>
-      isNonDeletedElement(el) && !isInvisiblySmallElement(el),
+      isNonDeletedElement(el) && !isInvisiblySmallElement(el) && isElementVisible(el),
   );
 
 export const getNonDeletedElements = <T extends ExcalidrawElement>(
