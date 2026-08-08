@@ -1,9 +1,13 @@
 import React from "react";
 
+import { KEYS, THEME } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
 
 import { Keyboard } from "./helpers/ui";
 import { fireEvent, GlobalTestState, render, waitFor } from "./test-utils";
+
+const { h } = window;
 
 describe("eye dropper", () => {
   it("keeps the color preview within the editor container", async () => {
@@ -50,5 +54,38 @@ describe("eye dropper", () => {
 
     expect(preview.style.left).toBe("325px");
     expect(preview.style.top).toBe("225px");
+  });
+
+  it("applies the unfiltered color in dark mode", async () => {
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        theme={THEME.DARK}
+      />,
+    );
+
+    const ctx = h.app.canvas.getContext("2d")!;
+    vi.spyOn(ctx, "getImageData").mockReturnValue({
+      data: new Uint8ClampedArray([18, 18, 18, 255]),
+    } as ImageData);
+
+    Keyboard.keyPress(KEYS.I);
+
+    const eyeDropperContainer = await waitFor(() => {
+      const element =
+        GlobalTestState.renderResult.container.querySelector<HTMLDivElement>(
+          ".excalidraw-eye-dropper-backdrop",
+        );
+      expect(element).not.toBeNull();
+      return element!;
+    });
+
+    fireEvent.pointerUp(eyeDropperContainer, {
+      clientX: 50,
+      clientY: 50,
+    });
+
+    expect(h.state.currentItemBackgroundColor).toBe("#ffffff");
   });
 });
