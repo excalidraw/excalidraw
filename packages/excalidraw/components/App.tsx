@@ -12233,53 +12233,35 @@ class App extends React.Component<AppProps, AppState> {
                   .map((frame) => frame.id),
               );
 
-              // early return, no frame addition via group selection
+              // early return, no new frame introduced
               if (newSelectedFrameIds.size === 0) {
                 return targetSelection;
               }
 
-              const nextSelectedElementIds = {
-                ...targetSelection.selectedElementIds,
-              };
+              const targetSelectedElements = this.scene.getSelectedElements({
+                selectedElementIds: targetSelection.selectedElementIds,
+                elements,
+              });
 
-              const removedGroupIds = new Set<string>();
-              const removedElementIds = new Set<ExcalidrawElement["id"]>();
+              const nextSelectedElements = excludeElementsInFramesFromSelection(
+                targetSelectedElements,
+              );
 
-              for (const elementId of Object.keys(
-                _prevState.selectedElementIds,
-              )) {
-                const element = this.scene.getElement(elementId);
-
-                if (
-                  !element?.frameId ||
-                  !newSelectedFrameIds.has(element.frameId)
-                ) {
-                  continue;
-                }
-
-                const selectedGroupId = getSelectedGroupForElement(
-                  _prevState,
-                  element,
-                );
-
-                if (selectedGroupId) {
-                  // skip elements that have already been removed
-                  if (removedGroupIds.has(selectedGroupId)) {
-                    continue;
-                  }
-
-                  removedGroupIds.add(selectedGroupId);
-                  getElementsInGroup(elements, selectedGroupId).forEach(
-                    (groupedElement) => {
-                      delete nextSelectedElementIds[groupedElement.id];
-                      removedElementIds.add(groupedElement.id);
-                    },
-                  );
-                } else {
-                  delete nextSelectedElementIds[element.id];
-                  removedElementIds.add(element.id);
-                }
+              // if a new frame was introduced and none of it's children were
+              // previously selected, we return targetSelection
+              if (
+                nextSelectedElements.length === targetSelectedElements.length
+              ) {
+                return targetSelection;
               }
+
+              const nextSelectedElementIds = nextSelectedElements.reduce(
+                (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                  acc[element.id] = true;
+                  return acc;
+                },
+                {},
+              );
 
               return selectGroupsForSelectedElements(
                 {
