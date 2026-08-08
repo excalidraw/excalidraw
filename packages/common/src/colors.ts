@@ -13,6 +13,9 @@ import type { Degrees } from "@excalidraw/math";
 const DARK_MODE_COLORS_CACHE: Map<string, string> | null =
   typeof window !== "undefined" ? new Map() : null;
 
+const DARK_MODE_FILTER_INVERT_PERCENT = 93;
+const DARK_MODE_FILTER_HUE_ROTATE_DEGREES = 180 as Degrees;
+
 function cssHueRotate(
   red: number,
   green: number,
@@ -96,12 +99,17 @@ export const applyDarkModeFilter = (color: string, enable = true): string => {
   // order of operations matters
   // (corresponds to "filter: invert(invertPercent) hue-rotate(hueDegrees)" in css)
   const rgb = tc.toRgb();
-  const inverted = cssInvert(rgb.r, rgb.g, rgb.b, 93);
+  const inverted = cssInvert(
+    rgb.r,
+    rgb.g,
+    rgb.b,
+    DARK_MODE_FILTER_INVERT_PERCENT,
+  );
   const rotated = cssHueRotate(
     inverted.r,
     inverted.g,
     inverted.b,
-    180 as Degrees,
+    DARK_MODE_FILTER_HUE_ROTATE_DEGREES,
   );
 
   const result = rgbToHex(rotated.r, rotated.g, rotated.b, alpha);
@@ -111,6 +119,44 @@ export const applyDarkModeFilter = (color: string, enable = true): string => {
   }
 
   return result;
+};
+
+const _reverseDarkModeInvert = (
+  r: number,
+  g: number,
+  b: number,
+): { r: number; g: number; b: number } => {
+  const p = DARK_MODE_FILTER_INVERT_PERCENT / 100;
+  const denominator = 1 - 2 * p;
+  const restore = (color: number) =>
+    Math.round(clamp((color - 255 * p) / denominator, 0, 255));
+
+  return {
+    r: restore(r),
+    g: restore(g),
+    b: restore(b),
+  };
+};
+
+export const removeDarkModeFilter = (color: string): string => {
+  const tc = tinycolor(color);
+  const alpha = tc.getAlpha();
+  const rgb = tc.toRgb();
+
+  // 180deg hue rotation is its own inverse, so undo it before the inversion.
+  const rotatedBack = cssHueRotate(
+    rgb.r,
+    rgb.g,
+    rgb.b,
+    DARK_MODE_FILTER_HUE_ROTATE_DEGREES,
+  );
+  const restored = _reverseDarkModeInvert(
+    rotatedBack.r,
+    rotatedBack.g,
+    rotatedBack.b,
+  );
+
+  return rgbToHex(restored.r, restored.g, restored.b, alpha);
 };
 
 // ---------------------------------------------------------------------------
@@ -250,17 +296,6 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
 
   ...COMMON_ELEMENT_SHADES,
 } as const;
-
-/**
- * The color the bucket fill tool actually fills with: the shared
- * `currentItemBackgroundColor`, falling back to green when that is
- * transparent (the tool's picker doesn't offer transparent, but the shared
- * state can hold it from the generic shape picker).
- */
-export const getBucketFillBackgroundColor = (backgroundColor: string) =>
-  isTransparent(backgroundColor)
-    ? COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX]
-    : backgroundColor;
 
 // color palette helpers
 // -----------------------------------------------------------------------------

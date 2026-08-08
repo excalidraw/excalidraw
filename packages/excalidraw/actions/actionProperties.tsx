@@ -7,7 +7,6 @@ import {
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
-  getBucketFillBackgroundColor,
   DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
   ARROW_TYPE,
@@ -523,7 +522,7 @@ export const actionChangeBucketFillBackgroundColor = register<
           excludedColors={[COLOR_PALETTE.transparent]}
           type="elementBackground"
           label={t("labels.background")}
-          color={getBucketFillBackgroundColor(
+          color={app.bucketFill.getBucketFillBackgroundColor(
             appState.currentItemBackgroundColor,
           )}
           onChange={(color) =>

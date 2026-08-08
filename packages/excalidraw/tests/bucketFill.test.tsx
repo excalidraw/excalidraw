@@ -1,7 +1,6 @@
 import {
   BUCKET_FILL_BACKGROUND_PICKS,
   COLOR_PALETTE,
-  getBucketFillBackgroundColor,
   KEYS,
 } from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
@@ -91,7 +90,7 @@ describe("bucket fill tool", () => {
     });
     selectBucketFill();
 
-    const fallbackColor = getBucketFillBackgroundColor(
+    const fallbackColor = h.app.bucketFill.getBucketFillBackgroundColor(
       COLOR_PALETTE.transparent,
     );
     const fallbackCursor = GlobalTestState.interactiveCanvas.style.cursor;
