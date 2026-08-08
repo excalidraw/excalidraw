@@ -18,6 +18,7 @@ import {
 
 import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type { BoxSelectionMode } from "@excalidraw/excalidraw/types";
 
 export const getLassoSelectedElementIds = (input: {
   lassoPath: GlobalPoint[];
@@ -27,6 +28,7 @@ export const getLassoSelectedElementIds = (input: {
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
   simplifyDistance?: number;
+  boxSelectionMode: BoxSelectionMode;
 }): {
   selectedElementIds: string[];
 } => {
@@ -38,6 +40,7 @@ export const getLassoSelectedElementIds = (input: {
     intersectedElements,
     enclosedElements,
     simplifyDistance,
+    boxSelectionMode,
   } = input;
   // simplify the path to reduce the number of points
   let path: GlobalPoint[] = lassoPath;
@@ -82,7 +85,9 @@ export const getLassoSelectedElementIds = (input: {
     }
   }
 
-  const results = [...intersectedElements, ...enclosedElements];
+  const results = boxSelectionMode === "contain"
+    ? [...enclosedElements]
+    : [...intersectedElements, ...enclosedElements];
 
   return {
     selectedElementIds: results,
