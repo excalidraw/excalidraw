@@ -209,10 +209,10 @@ import {
   getRenderOpacity,
   editGroupForSelectedElement,
   getElementsInGroup,
+  getSelectedGroupForElement,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
   isElementInGroup,
-  isSelectedViaGroup,
   selectGroupsForSelectedElements,
   syncInvalidIndices,
   syncMovedIndices,
@@ -12113,31 +12113,30 @@ class App extends React.Component<AppProps, AppState> {
           !this.state.selectedLinearElement?.isEditing
         ) {
           if (this.state.selectedElementIds[hitElement.id]) {
-            if (isSelectedViaGroup(this.state, hitElement)) {
+            const selectedGroupId = getSelectedGroupForElement(
+              this.state,
+              hitElement,
+            );
+            if (selectedGroupId) {
               this.setState((_prevState) => {
                 const nextSelectedElementIds = {
                   ..._prevState.selectedElementIds,
                 };
 
-                // We want to unselect all groups hitElement is part of
+                // We want to unselect the groups hitElement is part of
                 // as well as all elements that are part of the groups
                 // hitElement is part of
-                for (const groupedElement of hitElement.groupIds.flatMap(
-                  (groupId) =>
-                    getElementsInGroup(
-                      this.scene.getNonDeletedElements(),
-                      groupId,
-                    ),
+                for (const groupedElement of getElementsInGroup(
+                  this.scene.getNonDeletedElements(),
+                  selectedGroupId,
                 )) {
                   delete nextSelectedElementIds[groupedElement.id];
                 }
 
                 return {
                   selectedGroupIds: {
-                    ..._prevState.selectedElementIds,
-                    ...hitElement.groupIds
-                      .map((gId) => ({ [gId]: false }))
-                      .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
+                    ..._prevState.selectedGroupIds,
+                    [selectedGroupId]: false,
                   },
                   selectedElementIds: makeNextSelectedElementIds(
                     nextSelectedElementIds,
@@ -12225,15 +12224,94 @@ class App extends React.Component<AppProps, AppState> {
             });
           } else {
             // add element to selection while keeping prev elements selected
-            this.setState((_prevState) => ({
-              selectedElementIds: makeNextSelectedElementIds(
+            // handles deffered case when a group is selected within common bounding
+            // box of selectedElements, early return if no new frames were added
+            // but if new frame(s) exist, removal of it's children would be required.
+            this.setState((_prevState) => {
+              const elements = this.scene.getNonDeletedElements();
+
+              const targetSelection = selectGroupsForSelectedElements(
                 {
-                  ..._prevState.selectedElementIds,
-                  [hitElement!.id]: true,
+                  editingGroupId: _prevState.editingGroupId,
+                  selectedElementIds: {
+                    ..._prevState.selectedElementIds,
+                    [hitElement!.id]: true,
+                  },
                 },
+                elements,
                 _prevState,
-              ),
-            }));
+                this,
+              );
+
+              const newSelectedFrameIds = new Set(
+                elements
+                  .filter(
+                    (element) =>
+                      isFrameLikeElement(element) &&
+                      targetSelection.selectedElementIds[element.id] &&
+                      !_prevState.selectedElementIds[element.id],
+                  )
+                  .map((frame) => frame.id),
+              );
+
+              // early return, no frame addition via group selection
+              if (newSelectedFrameIds.size === 0) {
+                return targetSelection;
+              }
+
+              const nextSelectedElementIds = {
+                ...targetSelection.selectedElementIds,
+              };
+
+              const removedGroupIds = new Set<string>();
+              const removedElementIds = new Set<ExcalidrawElement["id"]>();
+
+              for (const elementId of Object.keys(
+                _prevState.selectedElementIds,
+              )) {
+                const element = this.scene.getElement(elementId);
+
+                if (
+                  !element?.frameId ||
+                  !newSelectedFrameIds.has(element.frameId)
+                ) {
+                  continue;
+                }
+
+                const selectedGroupId = getSelectedGroupForElement(
+                  _prevState,
+                  element,
+                );
+
+                if (selectedGroupId) {
+                  // skip elements that have already been removed
+                  if (removedGroupIds.has(selectedGroupId)) {
+                    continue;
+                  }
+
+                  removedGroupIds.add(selectedGroupId);
+                  getElementsInGroup(elements, selectedGroupId).forEach(
+                    (groupedElement) => {
+                      delete nextSelectedElementIds[groupedElement.id];
+                      removedElementIds.add(groupedElement.id);
+                    },
+                  );
+                } else {
+                  delete nextSelectedElementIds[element.id];
+                  removedElementIds.add(element.id);
+                }
+              }
+
+              return selectGroupsForSelectedElements(
+                {
+                  editingGroupId: _prevState.editingGroupId,
+                  selectedElementIds: nextSelectedElementIds,
+                },
+                elements,
+                _prevState,
+                this,
+              );
+            });
           }
         } else {
           this.setState((prevState) => ({
