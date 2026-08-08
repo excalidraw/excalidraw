@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 
 import {
   EVENT,
+  isColorDark,
   KEYS,
   MIME_TYPES,
   THEME,
@@ -156,6 +157,10 @@ export const EyeDropper: React.FC<{
       }
 
       colorPreviewDiv.style.background = currentColor;
+      colorPreviewDiv.style.setProperty(
+        "--eye-dropper-preview-border-color",
+        isColorDark(currentColor) ? "#fff" : "#222",
+      );
     };
 
     const onCancel = () => {

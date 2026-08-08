@@ -88,4 +88,37 @@ describe("eye dropper", () => {
 
     expect(h.state.currentItemBackgroundColor).toBe("#ffffff");
   });
+
+  it("contrasts the preview border with the sampled color", async () => {
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+
+    const ctx = h.app.canvas.getContext("2d")!;
+    const getImageDataSpy = vi.spyOn(ctx, "getImageData").mockReturnValue({
+      data: new Uint8ClampedArray([18, 18, 18, 255]),
+    } as ImageData);
+
+    Keyboard.keyPress(KEYS.I);
+
+    const preview = await waitFor(() => {
+      const element =
+        GlobalTestState.renderResult.container.querySelector<HTMLDivElement>(
+          ".excalidraw-eye-dropper-preview",
+        );
+      expect(element).not.toBeNull();
+      return element!;
+    });
+
+    expect(
+      preview.style.getPropertyValue("--eye-dropper-preview-border-color"),
+    ).toBe("#fff");
+
+    getImageDataSpy.mockReturnValue({
+      data: new Uint8ClampedArray([237, 237, 237, 255]),
+    } as ImageData);
+    fireEvent.pointerMove(window, { clientX: 50, clientY: 50 });
+
+    expect(
+      preview.style.getPropertyValue("--eye-dropper-preview-border-color"),
+    ).toBe("#222");
+  });
 });
