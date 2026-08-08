@@ -22,7 +22,7 @@ import { STORAGE_KEYS } from "../../../excalidraw-app/app_constants";
 import { Pointer, UI } from "./helpers/ui";
 import * as toolQueries from "./queries/toolQueries";
 
-import type { History } from "../history";
+import type { History } from "../editorHistory";
 
 import type { RenderResult, RenderOptions } from "@testing-library/react";
 
