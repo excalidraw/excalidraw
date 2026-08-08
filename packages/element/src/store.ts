@@ -6,6 +6,7 @@ import {
   randomId,
   Emitter,
   toIterable,
+  getUpdatedTimestamp,
 } from "@excalidraw/common";
 
 import type App from "@excalidraw/excalidraw/components/App";
@@ -339,6 +340,10 @@ export class Store {
       return;
     }
 
+    // stamp authorship before the next snapshot is computed, so that both the
+    // snapshot clones and the calculated delta pick up the authorship fields
+    this.maybeStampAuthorship(params);
+
     let nextSnapshot: StoreSnapshot | null;
 
     if ("change" in params) {
@@ -381,6 +386,150 @@ export class Store {
         case CaptureUpdateAction.NEVER:
           this.snapshot = nextSnapshot;
           break;
+      }
+    }
+  }
+
+  /**
+   * Stamps authorship (`createdBy` / `created` / `updatedBy`) onto elements
+   * which entered the document or got edited through local, undoable activity
+   * of this editor instance.
+   *
+   * An element which is not yet part of the snapshot at the time of a durable
+   * capture could have entered the scene only locally, as remote or loaded
+   * elements always enter the snapshot through `CaptureUpdateAction.NEVER`.
+   * Such an element is a "creation candidate" and receives all three fields.
+   *
+   * An element which is already part of the snapshot, but is changing within
+   * this very capture, is an "edit candidate" and receives just `updatedBy`
+   * (deletion counts as an edit as well).
+   */
+  private maybeStampAuthorship(
+    params:
+      | {
+          action: CaptureUpdateActionType;
+          elements: SceneElementsMap | undefined;
+          appState: AppState | ObservedAppState | undefined;
+        }
+      | {
+          action: CaptureUpdateActionType;
+          change: StoreChange;
+          delta: StoreDelta | undefined;
+        },
+  ) {
+    if (params.action !== CaptureUpdateAction.IMMEDIATELY) {
+      return;
+    }
+
+    if ("delta" in params && params.delta) {
+      // history replay re-applies an existing delta, it never authors anything
+      return;
+    }
+
+    const userId = this.app.props.currentUser?.id;
+
+    if (!userId) {
+      return;
+    }
+
+    const isMicroAction = "change" in params;
+    const candidates = isMicroAction
+      ? Object.values(params.change.elements)
+      : params.elements
+      ? toIterable(params.elements)
+      : [];
+
+    const elements = this.app.scene.getElementsMapIncludingDeleted();
+    const timestamp = getUpdatedTimestamp();
+
+    for (const candidate of candidates) {
+      const snapshotElement = this.snapshot.elements.get(candidate.id);
+
+      let authorship: {
+        createdBy?: string;
+        created?: number;
+        updatedBy: string;
+      };
+
+      if (!snapshotElement) {
+        // creation candidate - not part of the document yet
+        if (candidate.createdBy != null) {
+          // never overwrite an existing attribution
+          continue;
+        }
+
+        authorship = {
+          createdBy: userId,
+          created: timestamp,
+          updatedBy: userId,
+        };
+      } else {
+        // edit candidate - already part of the document, hence we only ever
+        // re-attribute the last editor, never the original author
+        if (!isMicroAction) {
+          // unlike the micro action's change, which contains exactly the
+          // changed elements, the macro action receives the whole scene,
+          // so we have to detect the changed elements ourselves, the very same
+          // way `StoreSnapshot.detectChangedElements` does
+          if (snapshotElement.version >= candidate.version) {
+            continue;
+          }
+
+          if (
+            isImageElement(candidate) &&
+            !isInitializedImageElement(candidate)
+          ) {
+            // ignore any updates on uninitialized image elements
+            continue;
+          }
+        }
+
+        // `created` is deliberately left alone - it's stamped once, at creation
+        authorship = { updatedBy: userId };
+      }
+
+      const isCreationCandidate = !snapshotElement;
+      const liveElement = elements.get(candidate.id);
+
+      if (!liveElement) {
+        // the change might reference an element which is gone from the scene
+        Object.assign(candidate, authorship);
+        continue;
+      }
+
+      if (!isCreationCandidate && liveElement.updatedBy === userId) {
+        // steady-state solo editing, don't churn the version for a no-op stamp
+        continue;
+      }
+
+      const preStampVersion = liveElement.version;
+
+      this.app.scene.mutateElement(liveElement, authorship, {
+        informMutation: false,
+        isDragging: false,
+      });
+
+      if (!isMicroAction) {
+        // the mutated element is the one inside `params.elements`, hence it
+        // makes it into the snapshot on its own
+        continue;
+      }
+
+      // the micro action operates on a private clone, which has to be patched
+      // manually. Patching the authorship alone would leave the snapshot behind
+      // the live element, so the next durable capture would detect a
+      // version-only change and push a phantom (visually empty) undo entry
+      if (preStampVersion === candidate.version) {
+        // the clone is in sync with the live element, keep it that way
+        Object.assign(candidate, authorship, {
+          version: liveElement.version,
+          versionNonce: liveElement.versionNonce,
+        });
+      } else {
+        // there are interim edits which are not part of this change, so we keep
+        // the clone's version stale on purpose, letting the next capture
+        // legitimately re-detect the element and capture the interim content
+        Object.assign(candidate, authorship);
       }
     }
   }

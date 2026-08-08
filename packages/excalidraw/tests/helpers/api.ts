@@ -9,6 +9,7 @@ import {
   ROUNDNESS,
   assertNever,
   getStrokeWidthByKey,
+  getUpdatedTimestamp,
 } from "@excalidraw/common";
 
 import {
@@ -229,6 +230,9 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
+    createdBy?: ExcalidrawElement["createdBy"];
+    created?: ExcalidrawElement["created"];
+    updatedBy?: ExcalidrawElement["updatedBy"];
   }): NonDeleted<
     T extends "arrow" | "line"
       ? ExcalidrawLinearElement
@@ -290,6 +294,12 @@ export class API {
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
       locked: rest.locked ?? false,
+      // nullish values are filtered out by the element constructors, so the
+      // created element doesn't carry the `createdBy` / `updatedBy` attributes
+      // at all (`created` is always present, `null` when unknown)
+      createdBy: rest.createdBy,
+      created: rest.created ?? getUpdatedTimestamp(),
+      updatedBy: rest.updatedBy,
     };
     switch (type) {
       case "rectangle":
@@ -432,8 +442,7 @@ export class API {
           : opts?.label?.frameId ?? null,
       groupIds: opts?.label?.groupIds === undefined
       ? opts?.groupIds
-      : opts?.label?.groupIds ,
-
+      : opts?.label?.groupIds,
     });
 
     h.app.scene.mutateElement(

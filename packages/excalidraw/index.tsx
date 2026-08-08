@@ -114,6 +114,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderScrollbars,
     viewportStatusFrame,
     currentUserControls,
+    currentUser,
     imageOptions,
   } = props;
 
@@ -255,6 +256,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderScrollbars={renderScrollbars}
           viewportStatusFrame={viewportStatusFrame}
           currentUserControls={currentUserControls}
+          currentUser={currentUser}
           imageOptions={normalizedImageOptions}
         >
           {children}

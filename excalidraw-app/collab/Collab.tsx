@@ -99,6 +99,15 @@ import type {
 export const collabAPIAtom = atom<CollabAPI | null>(null);
 export const isCollaboratingAtom = atom(false);
 export const isOfflineAtom = atom(false);
+/**
+ * identity of the local client during a collab session, keyed by the socket id
+ * so that peers can resolve it against their collaborators map. `null` when
+ * not collaborating (or before the socket connects).
+ */
+export const collabCurrentUserAtom = atom<{
+  id: string;
+  name: string;
+} | null>(null);
 
 interface CollabState {
   errorMessage: string | null;
@@ -292,6 +301,20 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     appJotaiStore.set(isCollaboratingAtom, isCollaborating);
   };
 
+  /**
+   * (re)computes the local client identity. Called whenever the socket
+   * (re)connects — reconnecting assigns a new socket id — and whenever the
+   * username changes.
+   */
+  private setCurrentUser = (username: string = this.state.username) => {
+    const socketId = this.portal.socket?.id;
+
+    appJotaiStore.set(
+      collabCurrentUserAtom,
+      socketId ? { id: socketId, name: username } : null,
+    );
+  };
+
   private onUnload = () => {
     this.destroySocketClient({ isUnload: true });
   };
@@ -419,6 +442,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       this.setIsCollaborating(false);
       this.setActiveRoomLink(null);
       appJotaiStore.set(userToFollowAtom, null);
+      appJotaiStore.set(collabCurrentUserAtom, null);
       this.collaborators = new Map();
       this.excalidrawAPI.updateScene({
         collaborators: this.collaborators,
@@ -539,6 +563,12 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       );
 
       this.portal.socket.once("connect_error", fallbackInitializationHandler);
+
+      // fires on the initial connection and on every reconnect, which is
+      // when the socket id (our identity during the session) is (re)assigned
+      this.portal.socket.on("connect", () => this.setCurrentUser());
+      // in case we're already connected by the time we subscribe
+      this.setCurrentUser();
     } catch (error: any) {
       console.error(error);
       this.setErrorDialog(error.message);
@@ -1032,6 +1062,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     if (socketId && this.collaborators.has(socketId)) {
       this.updateCollaborator(socketId, { username });
     }
+
+    this.setCurrentUser(username);
   };
 
   getUsername = () => this.state.username;

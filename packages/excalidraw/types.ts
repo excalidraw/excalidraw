@@ -961,6 +961,15 @@ export interface ExcalidrawProps {
     | React.ReactNode
     | ((isMobile: boolean) => React.ReactNode);
   /**
+   * The user this editor instance belongs to. Used to encode authorship
+   * (`createdBy` / `updatedBy`) onto elements created or updated locally.
+   *
+   * Only `id` is ever written into elements — `name` and `picture` are
+   * display-only and never persisted. While the prop is undefined, elements
+   * keep their authorship fields `null`.
+   */
+  currentUser?: { id: string; name: string; picture?: string };
+  /**
    * The user being followed on the canvas, if any. Controlled by the host —
    * the editor never sets it; it emits follow/unfollow intents via
    * `onUserFollow` (prop or imperative API) and renders the followed
