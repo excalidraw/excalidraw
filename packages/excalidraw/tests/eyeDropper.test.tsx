@@ -24,6 +24,10 @@ describe("eye dropper", () => {
       GlobalTestState.renderResult.container.querySelector<HTMLDivElement>(
         ".excalidraw-eye-dropper-backdrop",
       )!;
+    expect(eyeDropperContainer.style.cursor).toMatch(
+      /^url\(data:image\/svg\+xml/,
+    );
+    expect(eyeDropperContainer.style.cursor).toMatch(/\) 2 21, auto$/);
 
     eyeDropperContainer.getBoundingClientRect = () => ({
       left: 100,
@@ -44,7 +48,7 @@ describe("eye dropper", () => {
     // This position fits within the viewport, but not within the editor.
     fireEvent.pointerMove(window, { clientX: 480, clientY: 330 });
 
-    expect(preview.style.left).toBe("312px");
-    expect(preview.style.top).toBe("212px");
+    expect(preview.style.left).toBe("325px");
+    expect(preview.style.top).toBe("225px");
   });
 });

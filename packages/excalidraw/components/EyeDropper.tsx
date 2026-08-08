@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
-import { EVENT, KEYS, rgbToHex } from "@excalidraw/common";
+import { EVENT, KEYS, MIME_TYPES, rgbToHex } from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
@@ -13,11 +13,19 @@ import { useStable } from "../hooks/useStable";
 import { getSelectedElements } from "../scene";
 
 import { useApp, useExcalidrawContainer, useExcalidrawElements } from "./App";
+import { eyeDropperIconSvgPaths } from "./icons";
 import { positionElementBesideCursor } from "./positionElementBesideCursor";
 
 import "./EyeDropper.scss";
 
 import type { ColorPickerType } from "./ColorPicker/colorPickerUtils";
+
+const eyeDropperCursorPaths = eyeDropperIconSvgPaths
+  .map((path, idx) => `<path fill="${idx === 0 ? `#fff` : ``}" d="${path}" />`)
+  .join("");
+const eyeDropperCursor = `url(data:${MIME_TYPES.svg},${encodeURIComponent(
+  `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round"><g stroke="#fff" stroke-width="5">${eyeDropperCursorPaths}</g><g stroke="#1b1b1f" stroke-width="1.25">${eyeDropperCursorPaths}</g></svg>`,
+)}) 2 21, auto`;
 
 export type EyeDropperProperties = {
   keepOpenOnAlt: boolean;
@@ -66,6 +74,16 @@ export const EyeDropper: React.FC<{
 
   const { container: excalidrawContainer } = useExcalidrawContainer();
 
+  useLayoutEffect(() => {
+    if (!eyeDropperContainer) {
+      return;
+    }
+    eyeDropperContainer.style.cursor = eyeDropperCursor;
+    return () => {
+      eyeDropperContainer.style.cursor = "";
+    };
+  }, [eyeDropperContainer]);
+
   useEffect(() => {
     const colorPreviewDiv = ref.current;
 
@@ -110,7 +128,7 @@ export const EyeDropper: React.FC<{
           height: colorPreviewDiv.offsetHeight,
         },
         container: eyeDropperContainer.getBoundingClientRect(),
-        gap: 20,
+        gap: 7,
       });
 
       colorPreviewDiv.style.top = `${top}px`;
