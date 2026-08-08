@@ -297,17 +297,6 @@ export const DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE = {
   ...COMMON_ELEMENT_SHADES,
 } as const;
 
-/**
- * The color the bucket fill tool actually fills with: the shared
- * `currentItemBackgroundColor`, falling back to green when that is
- * transparent (the tool's picker doesn't offer transparent, but the shared
- * state can hold it from the generic shape picker).
- */
-export const getBucketFillBackgroundColor = (backgroundColor: string) =>
-  isTransparent(backgroundColor)
-    ? COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX]
-    : backgroundColor;
-
 // color palette helpers
 // -----------------------------------------------------------------------------
 

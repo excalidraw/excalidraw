@@ -1,8 +1,11 @@
 import {
+  applyDarkModeFilter,
   BUCKET_FILL_BACKGROUND_PICKS,
   COLOR_PALETTE,
-  getBucketFillBackgroundColor,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   getSizeFromPoints,
+  isTransparent,
+  THEME,
 } from "@excalidraw/common";
 import { pointFrom, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
 
@@ -15,7 +18,10 @@ import {
   ShapeCache,
 } from "@excalidraw/element";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  NonDeletedExcalidrawElement,
+  Theme,
+} from "@excalidraw/element/types";
 
 import { actionChangeBucketFillBackgroundColor } from "../actions";
 import { editorJotaiStore } from "../editor-jotai";
@@ -72,7 +78,7 @@ export class AppBucketFill {
   };
 
   cycleBackgroundColor = () => {
-    const currentColor = getBucketFillBackgroundColor(
+    const currentColor = this.getBucketFillBackgroundColor(
       this.app.state.currentItemBackgroundColor,
     );
     const currentIndex = BUCKET_FILL_KEYBOARD_COLOR_PICKS.indexOf(currentColor);
@@ -124,7 +130,7 @@ export class AppBucketFill {
    * element (no-op when nothing would change). One undoable step.
    */
   private restyle = (element: NonDeletedExcalidrawElement) => {
-    const backgroundColor = getBucketFillBackgroundColor(
+    const backgroundColor = this.getBucketFillBackgroundColor(
       this.app.state.currentItemBackgroundColor,
     );
     if (
@@ -149,7 +155,7 @@ export class AppBucketFill {
   private fill = (scenePointer: ScenePoint) => {
     // shared with the generic shape background, but a transparent fill would
     // be invisible, so fall back to a real color (appState is not mutated)
-    const backgroundColor = getBucketFillBackgroundColor(
+    const backgroundColor = this.getBucketFillBackgroundColor(
       this.app.state.currentItemBackgroundColor,
     );
 
@@ -277,4 +283,19 @@ export class AppBucketFill {
     // (even when the tool isn't locked).
     this.app.scheduleCapture();
   };
+
+  /**
+   * The color the bucket fill tool actually fills with: the shared
+   * `currentItemBackgroundColor`, falling back to green when that is
+   * transparent (the tool's picker doesn't offer transparent, but the shared
+   * state can hold it from the generic shape picker).
+   */
+  public getBucketFillBackgroundColor = (
+    backgroundColor: string,
+    /** supply only for display purposes such as when applying to the cursor */
+    theme?: Theme,
+  ) =>
+    isTransparent(backgroundColor)
+      ? COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX]
+      : applyDarkModeFilter(backgroundColor, theme === THEME.DARK);
 }

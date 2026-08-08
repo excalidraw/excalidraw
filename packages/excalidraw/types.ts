@@ -1119,6 +1119,7 @@ export type AppClassProperties = {
   flowchart: App["flowchart"];
   drawShape: App["drawShape"];
   cursor: App["cursor"];
+  bucketFill: App["bucketFill"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];

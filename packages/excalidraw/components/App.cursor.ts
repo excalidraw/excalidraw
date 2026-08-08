@@ -1,9 +1,4 @@
-import {
-  CURSOR_TYPE,
-  getBucketFillBackgroundColor,
-  MIME_TYPES,
-  THEME,
-} from "@excalidraw/common";
+import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
 
 import { isHandToolActive, isEraserActive } from "../appState";
 
@@ -105,15 +100,19 @@ export class AppCursor {
       return;
     }
 
+    const theme =
+      activeTool.type === "eraser" ||
+      activeTool.type === "laser" ||
+      activeTool.type === "bucketfill"
+        ? this.app.state.theme
+        : undefined;
+
     const bucketFillColor =
       activeTool.type === "bucketfill"
-        ? getBucketFillBackgroundColor(
+        ? this.app.bucketFill.getBucketFillBackgroundColor(
             this.app.state.currentItemBackgroundColor,
+            theme,
           )
-        : undefined;
-    const theme =
-      activeTool.type === "eraser" || activeTool.type === "laser"
-        ? this.app.state.theme
         : undefined;
     const memo = this.toolCursorMemo;
     if (
