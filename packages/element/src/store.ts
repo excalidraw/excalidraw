@@ -447,7 +447,7 @@ export class Store {
 
       let authorship: {
         createdBy?: string;
-        created: number | null;
+        created?: number;
         updatedBy: string;
       };
 
@@ -484,7 +484,8 @@ export class Store {
           }
         }
 
-        authorship = { updatedBy: userId, created: null };
+        // `created` is deliberately left alone - it's stamped once, at creation
+        authorship = { updatedBy: userId };
       }
 
       const isCreationCandidate = !snapshotElement;

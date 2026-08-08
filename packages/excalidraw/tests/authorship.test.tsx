@@ -84,7 +84,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(100);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0].created).toBeNull();
+    expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-a");
   });
 
@@ -221,7 +221,7 @@ describe("element authorship", () => {
     expect(h.elements[0].x).toBe(100);
     // the creation attribution is never overwritten by an edit
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0].created).toBeNull();
+    expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
@@ -298,7 +298,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].isDeleted).toBe(true);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0].created).toBeNull();
+    expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
@@ -339,7 +339,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(100);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0].created).toBeNull();
+    expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
@@ -412,7 +412,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(100);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0].created).toBeNull();
+    expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-a");
 
     // the clone is intentionally left behind, so that the interim content
@@ -421,7 +421,7 @@ describe("element authorship", () => {
 
     expect(snapshottedElement.x).toBe(50);
     expect(snapshottedElement).not.toHaveProperty("createdBy");
-    expect(snapshottedElement.created).toBeNull();
+    expect(snapshottedElement.created).not.toBeNull();
     expect(snapshottedElement.updatedBy).toBe("user-a");
     expect(snapshottedElement.version).toBeLessThan(h.elements[0].version);
 

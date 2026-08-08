@@ -171,8 +171,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     link,
     locked,
     customData: rest.customData,
-    created:
-      rest.created ?? (new Date().getTime() as ExcalidrawElement["created"]),
+    created: rest.created ?? getUpdatedTimestamp(),
     ...authorship,
   };
   return element;

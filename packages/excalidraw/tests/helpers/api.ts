@@ -9,6 +9,7 @@ import {
   ROUNDNESS,
   assertNever,
   getStrokeWidthByKey,
+  getUpdatedTimestamp,
 } from "@excalidraw/common";
 
 import {
@@ -297,7 +298,7 @@ export class API {
       // created element doesn't carry the `createdBy` / `updatedBy` attributes
       // at all (`created` is always present, `null` when unknown)
       createdBy: rest.createdBy,
-      created: rest.created ?? new Date().getTime() as ExcalidrawElement["created"],
+      created: rest.created ?? getUpdatedTimestamp(),
       updatedBy: rest.updatedBy,
     };
     switch (type) {
