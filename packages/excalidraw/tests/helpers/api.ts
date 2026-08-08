@@ -230,7 +230,7 @@ export class API {
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
     createdBy?: ExcalidrawElement["createdBy"];
-    createdAt?: ExcalidrawElement["createdAt"];
+    created?: ExcalidrawElement["created"];
     updatedBy?: ExcalidrawElement["updatedBy"];
   }): NonDeleted<
     T extends "arrow" | "line"
@@ -294,9 +294,10 @@ export class API {
       boundElements: rest.boundElements ?? null,
       locked: rest.locked ?? false,
       // nullish values are filtered out by the element constructors, so the
-      // created element doesn't carry the authorship attributes at all
+      // created element doesn't carry the `createdBy` / `updatedBy` attributes
+      // at all (`created` is always present, `null` when unknown)
       createdBy: rest.createdBy,
-      createdAt: rest.createdAt,
+      created: rest.created ?? new Date().getTime() as ExcalidrawElement["created"],
       updatedBy: rest.updatedBy,
     };
     switch (type) {
@@ -440,8 +441,7 @@ export class API {
           : opts?.label?.frameId ?? null,
       groupIds: opts?.label?.groupIds === undefined
       ? opts?.groupIds
-      : opts?.label?.groupIds ,
-
+      : opts?.label?.groupIds,
     });
 
     h.app.scene.mutateElement(

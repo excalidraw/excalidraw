@@ -74,6 +74,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "locked"
   | "opacity"
   | "customData"
+  | "created"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -127,16 +128,11 @@ const _newElementBase = <T extends ExcalidrawElement>(
   // unknown authorship, so we never store (nor spread) `null` / `undefined`
   const authorship: {
     createdBy?: string;
-    createdAt?: number;
     updatedBy?: string;
   } = {};
 
   if (rest.createdBy != null) {
     authorship.createdBy = rest.createdBy;
-  }
-
-  if (rest.createdAt != null) {
-    authorship.createdAt = rest.createdAt;
   }
 
   if (rest.updatedBy != null) {
@@ -175,6 +171,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     link,
     locked,
     customData: rest.customData,
+    created:
+      rest.created ?? (new Date().getTime() as ExcalidrawElement["created"]),
     ...authorship,
   };
   return element;

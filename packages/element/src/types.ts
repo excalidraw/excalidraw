@@ -85,9 +85,8 @@ type _ExcalidrawElementBase = Readonly<{
       Never stored as `null`. */
   createdBy?: string;
   /** epoch (ms) timestamp of the element creation, stamped once the creation
-      gets captured as a durable (undoable) change.
-      Absent when unknown, never stored as `null`. */
-  createdAt?: number;
+      gets captured as a durable (undoable) change. */
+  created: number | null;
   /** id of the user whose editor instance last updated the element.
       Absent when the authorship is unknown, never stored as `null`. */
   updatedBy?: string;

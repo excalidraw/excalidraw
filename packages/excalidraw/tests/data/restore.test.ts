@@ -676,7 +676,7 @@ describe("restoreElements", () => {
     const legacy = {
       ...API.createElement({ type: "rectangle", id: "legacy" }),
       createdBy: null,
-      createdAt: null,
+      created: null,
       updatedBy: null,
     } as unknown as ExcalidrawElement;
 
@@ -684,7 +684,7 @@ describe("restoreElements", () => {
       type: "rectangle",
       id: "authored",
       createdBy: "user-a",
-      createdAt: 1234,
+      created: 1234,
       updatedBy: "user-b",
     });
 
@@ -694,11 +694,11 @@ describe("restoreElements", () => {
     );
 
     expect(restoredLegacy).not.toHaveProperty("createdBy");
-    expect(restoredLegacy).not.toHaveProperty("createdAt");
+    expect(restoredLegacy.created).toBeNull();
     expect(restoredLegacy).not.toHaveProperty("updatedBy");
 
     expect(restoredAuthored.createdBy).toBe("user-a");
-    expect(restoredAuthored.createdAt).toBe(1234);
+    expect(restoredAuthored.created).toBe(1234);
     expect(restoredAuthored.updatedBy).toBe("user-b");
   });
 

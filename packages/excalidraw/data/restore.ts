@@ -412,14 +412,10 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
 
 const restoreElementWithProperties = <
   T extends Required<
-    Omit<
-      ExcalidrawElement,
-      "customData" | "createdBy" | "createdAt" | "updatedBy"
-    >
+    Omit<ExcalidrawElement, "customData" | "createdBy" | "updatedBy">
   > & {
     customData?: ExcalidrawElement["customData"];
     createdBy?: ExcalidrawElement["createdBy"];
-    createdAt?: ExcalidrawElement["createdAt"];
     updatedBy?: ExcalidrawElement["updatedBy"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
@@ -480,6 +476,7 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
+    created: element.created ?? null,
   };
 
   if ("customData" in element || "customData" in extra) {
@@ -506,10 +503,6 @@ const restoreElementWithProperties = <
   // saved by earlier revisions)
   if (ret.createdBy == null) {
     delete ret.createdBy;
-  }
-
-  if (ret.createdAt == null) {
-    delete ret.createdAt;
   }
 
   if (ret.updatedBy == null) {

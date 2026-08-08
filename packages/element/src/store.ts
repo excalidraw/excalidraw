@@ -391,7 +391,7 @@ export class Store {
   }
 
   /**
-   * Stamps authorship (`createdBy` / `createdAt` / `updatedBy`) onto elements
+   * Stamps authorship (`createdBy` / `created` / `updatedBy`) onto elements
    * which entered the document or got edited through local, undoable activity
    * of this editor instance.
    *
@@ -447,7 +447,7 @@ export class Store {
 
       let authorship: {
         createdBy?: string;
-        createdAt?: number;
+        created: number | null;
         updatedBy: string;
       };
 
@@ -460,7 +460,7 @@ export class Store {
 
         authorship = {
           createdBy: userId,
-          createdAt: timestamp,
+          created: timestamp,
           updatedBy: userId,
         };
       } else {
@@ -484,7 +484,7 @@ export class Store {
           }
         }
 
-        authorship = { updatedBy: userId };
+        authorship = { updatedBy: userId, created: null };
       }
 
       const isCreationCandidate = !snapshotElement;

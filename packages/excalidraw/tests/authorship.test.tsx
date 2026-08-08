@@ -32,7 +32,7 @@ describe("element authorship", () => {
     expect(h.elements).toEqual([
       expect.objectContaining({
         createdBy: "user-a",
-        createdAt: 1,
+        created: 1,
         updatedBy: "user-a",
       }),
     ]);
@@ -44,7 +44,7 @@ describe("element authorship", () => {
       expect.objectContaining({
         isDeleted: false,
         createdBy: "user-a",
-        createdAt: 1,
+        created: 1,
         updatedBy: "user-a",
       }),
     ]);
@@ -59,7 +59,7 @@ describe("element authorship", () => {
     // unknown authorship is expressed by the very absence of the attributes,
     // never by a `null` placeholder
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0]).not.toHaveProperty("updatedBy");
   });
 
@@ -84,7 +84,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(100);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-a");
   });
 
@@ -102,7 +102,7 @@ describe("element authorship", () => {
     });
 
     expect(h.elements[0].createdBy).toBe("someone-else");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0]).not.toHaveProperty("updatedBy");
   });
 
@@ -168,7 +168,7 @@ describe("element authorship", () => {
       expect.objectContaining({
         x: 100,
         createdBy: "user-a",
-        createdAt: 1,
+        created: 1,
         updatedBy: "user-a",
       }),
     );
@@ -181,7 +181,7 @@ describe("element authorship", () => {
       expect.objectContaining({
         x: 0,
         createdBy: "user-a",
-        createdAt: 1,
+        created: 1,
         updatedBy: "user-a",
       }),
     );
@@ -210,7 +210,7 @@ describe("element authorship", () => {
     });
 
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0]).not.toHaveProperty("updatedBy");
 
     API.updateScene({
@@ -221,7 +221,7 @@ describe("element authorship", () => {
     expect(h.elements[0].x).toBe(100);
     // the creation attribution is never overwritten by an edit
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
@@ -298,7 +298,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].isDeleted).toBe(true);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
@@ -327,7 +327,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(0);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).not.toBeNull();
     // undoing a stamp writes back the previous (absent) value, which the delta
     // carries as `undefined` - never as `null`, so it serializes away
     expect(h.elements[0].updatedBy).toBeUndefined();
@@ -339,7 +339,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(100);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
 
@@ -412,7 +412,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(100);
     expect(h.elements[0]).not.toHaveProperty("createdBy");
-    expect(h.elements[0]).not.toHaveProperty("createdAt");
+    expect(h.elements[0].created).toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-a");
 
     // the clone is intentionally left behind, so that the interim content
@@ -421,7 +421,7 @@ describe("element authorship", () => {
 
     expect(snapshottedElement.x).toBe(50);
     expect(snapshottedElement).not.toHaveProperty("createdBy");
-    expect(snapshottedElement).not.toHaveProperty("createdAt");
+    expect(snapshottedElement.created).toBeNull();
     expect(snapshottedElement.updatedBy).toBe("user-a");
     expect(snapshottedElement.version).toBeLessThan(h.elements[0].version);
 
