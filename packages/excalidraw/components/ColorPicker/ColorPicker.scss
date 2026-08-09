@@ -25,6 +25,14 @@
     text-align: left;
   }
 
+  .color-picker__tip {
+    padding: 0 0.5rem;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    text-align: left;
+    color: var(--color-gray-60);
+  }
+
   .color-picker-container {
     display: grid;
     grid-template-columns: 1fr 20px 1.625rem;

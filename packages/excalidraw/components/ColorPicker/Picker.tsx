@@ -26,6 +26,7 @@ import {
   isCustomColor,
 } from "./colorPickerUtils";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
+import { useColorPickerDnD } from "./topPicksDnD";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
@@ -82,6 +83,7 @@ export const Picker = React.forwardRef(
     const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
       activeColorPickerSectionAtom,
     );
+    const dnd = useColorPickerDnD();
 
     const colorObj = getColorNameAndShadeFromColor({
       color,
@@ -212,6 +214,12 @@ export const Picker = React.forwardRef(
             />
           </div>
           {children}
+          {/* dnd context is only provided when top picks are customizable */}
+          {dnd && (
+            <div className="color-picker__tip">
+              {t("colorPicker.topPicksTip")}
+            </div>
+          )}
         </div>
       </div>
     );
