@@ -2,6 +2,7 @@ import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 
 import {
   colorToHex,
+  COLOR_TOP_PICKS_SLOTS,
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
   DEFAULT_STROKE_STREAMLINE,
@@ -1117,8 +1118,9 @@ const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
     if (!colors.has(normalized)) {
       colors.set(normalized, color);
     }
-    // top picks are a short strip — cap to a sane size
-    if (colors.size >= 10) {
+    // the strip layout fits exactly this many slots — longer lists (hostile
+    // or hand-edited storage) would overflow the properties island
+    if (colors.size >= COLOR_TOP_PICKS_SLOTS) {
       break;
     }
   }
