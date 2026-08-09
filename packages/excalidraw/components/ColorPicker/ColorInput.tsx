@@ -82,7 +82,8 @@ export const ColorInput = ({
     }
 
     const alpha = tc.getAlpha();
-    opacity = alpha < 1
+    opacity =
+      alpha < 1
         ? Math.round(alpha * 255)
             .toString(16)
             .padStart(2, "0")
@@ -167,24 +168,24 @@ export const ColorInput = ({
             </div>
           </>
         )}
+        <input //zsviczian
+          type="color"
+          onChange={(event) => changeColor(event.target.value + opacity)}
+          value={hexColor(innerValue || "")}
+          onBlur={() => setInnerValue(color)}
+          style={{
+            marginTop: "auto",
+            marginLeft: "4px",
+            marginBottom: "auto",
+            marginRight: "-0.625rem",
+          }}
+        />
       </div>
       {errorMessage && (
         <div className="color-picker__error-message" role="alert">
           {errorMessage}
         </div>
       )}
-      <input //zsviczian
-        type="color"
-        onChange={(event) => changeColor(event.target.value + opacity)}
-        value={hexColor(innerValue || "")}
-        onBlur={() => setInnerValue(color)}
-        style={{
-          marginTop: "auto",
-          marginLeft: "4px",
-          marginBottom: "auto",
-          marginRight: "-0.625rem",
-        }}
-      />
     </div>
   );
 };

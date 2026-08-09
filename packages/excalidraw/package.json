@@ -1,7 +1,8 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.18.118",
-  "main": "main.js",
+  "version": "0.18.119",
+  "type": "module",
+  "main": "./dist/prod/index.js",
   "module": "./dist/prod/index.js",
   "source": "./index.tsx",
   "types": "types/excalidraw/index.d.ts",
@@ -29,8 +30,7 @@
       "types": "./dist/types/excalidraw/index.d.ts",
       "development": "./dist/dev/index.js",
       "production": "./dist/prod/index.js",
-      "default": "./dist/prod/index.js",
-      "require": "./main.js"
+      "default": "./dist/prod/index.js"
     }
   },
   "files": [
@@ -129,34 +129,8 @@
     "fonteditor-core": "2.4.1",
     "harfbuzzjs": "0.3.6",
     "jest-diff": "29.7.0",
-    "mini-css-extract-plugin": "2.6.1",
-    "postcss-loader": "7.0.1",
-    "sass-loader": "13.0.2",
-    "size-limit": "9.0.0",
-    "style-loader": "3.3.3",
-    "ts-loader": "9.3.1",
     "typescript": "5.9.3",
     "rimraf": "^5.0.5",
-    "webpack": "^5.98.0",
-    "terser-webpack-plugin": "5.3.3",
-    "webpack-bundle-analyzer": "4.5.0",
-    "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^5.2.0",
-    "webpack-merge": "^6.0.1",
-    "copy-webpack-plugin": "12.0.2",
-    "import-meta-loader": "1.1.0",
-    "@babel/core": "^7.26.9",
-    "@babel/plugin-transform-arrow-functions": "^7.25.9",
-    "@babel/plugin-transform-async-to-generator": "^7.25.9",
-    "@babel/plugin-transform-runtime": "^7.26.9",
-    "@babel/plugin-transform-typescript": "^7.26.8",
-    "@babel/plugin-transform-class-properties": "^7.25.9",
-    "@babel/preset-env": "^7.26.9",
-    "@babel/preset-react": "^7.26.3",
-    "@babel/preset-typescript": "^7.26.0",
-    "babel-loader": "^10.0.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "css-loader": "^7.1.2",
     "esbuild-plugin-external-global": "^1.0.1"
   },
   "repository": {
@@ -179,11 +153,10 @@
   "scripts": {
     "gen:types": "rimraf ./types && tsc --project tsconfig-types.json",
     "build:esm": "rimraf ./dist && node ../../scripts/buildPackage.js && yarn gen:types",
-    "pack": "yarn build:umd && yarn pack",
+    "build:obsidian": "node ../../scripts/buildObsidianPackage.js",
+    "prepack": "yarn build:esm && yarn build:obsidian",
     "start": "node ../../scripts/buildExample.mjs && vite",
     "build:example": "node ../../scripts/buildExample.mjs",
-    "size": "yarn build:umd && size-limit",
-    "build:umd": "rimraf ./dist && cross-env NODE_ENV=production webpack --config webpack.prod.config.js && cross-env NODE_ENV=development webpack --config webpack.dev.config.js && yarn gen:types",
     "prepublishOnly": "node ./scripts/ensure-npm-auth.cjs"
   }
 }
