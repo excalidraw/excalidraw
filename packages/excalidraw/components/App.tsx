@@ -446,7 +446,7 @@ import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
-import ViewportStatusFrame from "./ViewportStatusFrame/ViewportStatusFrame";
+import { ViewportStatusBorder } from "./ViewportStatusFrame/ViewportStatusFrame";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
@@ -2766,11 +2766,12 @@ class App extends React.Component<AppProps, AppState> {
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
                           />
-                          {this.props.viewportStatusFrame && (
-                            <ViewportStatusFrame
-                              status={this.props.viewportStatusFrame}
-                            />
-                          )}
+                          {this.props.viewportStatusFrame?.border &&
+                            this.editorInterface.formFactor === "phone" && (
+                              <ViewportStatusBorder
+                                border={this.props.viewportStatusFrame.border}
+                              />
+                            )}
                           {this.renderFrameNames()}
                           {this.state.activeEmbeddable?.state === "active" && //zsviczian
                             this.props.renderEmbeddableMenu?.(this.state)}
@@ -4359,6 +4360,13 @@ class App extends React.Component<AppProps, AppState> {
     if (
       this.state.activeTool.type === "eraser" &&
       prevState.theme !== this.state.theme
+    ) {
+      this.cursor.applyForTool();
+    }
+    if (
+      this.state.activeTool.type === "bucketfill" &&
+      prevState.currentItemBackgroundColor !==
+        this.state.currentItemBackgroundColor
     ) {
       this.cursor.applyForTool();
     }
@@ -5996,7 +6004,11 @@ class App extends React.Component<AppProps, AppState> {
 
       // Handle Alt key for bind mode
       if (event.key === KEYS.ALT) {
-        if (getFeatureFlag("COMPLEX_BINDINGS")) {
+        if (this.state.activeTool.type === "bucketfill") {
+          this.bucketFill.openTemporaryEyeDropper();
+          event.preventDefault();
+          return;
+        } else if (getFeatureFlag("COMPLEX_BINDINGS")) {
           this.handleSkipBindMode();
         } else {
           maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -6062,7 +6074,15 @@ class App extends React.Component<AppProps, AppState> {
             );
           }
 
-          if (shape === "lasso" && this.state.activeTool.type === "laser") {
+          if (
+            shape === "bucketfill" &&
+            this.state.activeTool.type === "bucketfill"
+          ) {
+            this.bucketFill.cycleBackgroundColor();
+          } else if (
+            shape === "lasso" &&
+            this.state.activeTool.type === "laser"
+          ) {
             this.setActiveTool({
               type: this.state.preferredSelectionTool.type,
             });
@@ -6342,6 +6362,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (event.key === KEYS.ALT) {
+      this.bucketFill.closeTemporaryEyeDropper();
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
 

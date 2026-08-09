@@ -14,6 +14,7 @@ import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 
 import { PenModeButton } from "./PenModeButton";
+import { ViewportStatusBadge } from "./ViewportStatusFrame/ViewportStatusFrame";
 
 import type { ActionManager } from "../actions/manager";
 import type {
@@ -157,6 +158,14 @@ export const MobileMenu = ({
       </button>
     ) : null;
 
+  const viewportStatusLabel = app.props.viewportStatusFrame?.label;
+  const viewportStatusBadge = viewportStatusLabel ? (
+    <ViewportStatusBadge
+      label={viewportStatusLabel}
+      border={app.props.viewportStatusFrame?.border}
+    />
+  ) : null;
+
   return (
     <>
       {renderSidebars()}
@@ -174,6 +183,12 @@ export const MobileMenu = ({
           }}
           data-viewport-ui="bottom"
         >
+          {scrollBackToContentButton && (
+            <div className="floating-status-stack">
+              {scrollBackToContentButton}
+            </div>
+          )}
+
           <MobileShapeActions
             appState={appState}
             elementsMap={app.scene.getNonDeletedElementsMap()}
@@ -185,13 +200,18 @@ export const MobileMenu = ({
           <Island className="App-toolbar">
             {appState.openDialog?.name !== "elementLinkSelector" &&
               renderToolbar()}
-            {scrollBackToContentButton}
           </Island>
         </div>
       )}
 
       {!shouldRenderDefaultBottomBar && scrollBackToContentButton && (
         <div className="floating-status-stack">{scrollBackToContentButton}</div>
+      )}
+
+      {viewportStatusBadge && (
+        <div className="viewport-status-frame__badge-row">
+          {viewportStatusBadge}
+        </div>
       )}
 
       <FixedSideContainer side="top" className="App-top-bar">
