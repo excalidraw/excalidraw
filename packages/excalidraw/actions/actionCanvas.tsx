@@ -85,6 +85,33 @@ export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
   },
 });
 
+/** Updates the decorative paper style (blank / dot / square / lined). */
+export const actionChangeViewBackgroundStyle = register<
+  AppState["viewBackgroundStyle"]
+>({
+  name: "changeViewBackgroundStyle",
+  label: "labels.canvasBackgroundStyle",
+  trackEvent: false,
+  predicate: (elements, appState, props, app) => {
+    return (
+      !!app.props.UIOptions.canvasActions.changeViewBackgroundColor &&
+      !appState.viewModeEnabled
+    );
+  },
+  perform: (_, appState, value) => {
+    if (!value) {
+      return false;
+    }
+    return {
+      appState: {
+        ...appState,
+        viewBackgroundStyle: value,
+      },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+});
+
 export const actionClearCanvas = register({
   name: "clearCanvas",
   label: "labels.clearCanvas",
@@ -114,6 +141,7 @@ export const actionClearCanvas = register({
         gridSize: appState.gridSize,
         gridStep: appState.gridStep,
         gridModeEnabled: appState.gridModeEnabled,
+        viewBackgroundStyle: appState.viewBackgroundStyle,
         stats: appState.stats,
         activeTool:
           appState.activeTool.type === "image"

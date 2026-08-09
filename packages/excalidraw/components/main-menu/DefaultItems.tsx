@@ -6,6 +6,7 @@ import type { Theme } from "@excalidraw/element/types";
 
 import {
   actionClearCanvas,
+  actionChangeViewBackgroundStyle,
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
@@ -348,6 +349,63 @@ export const ChangeCanvasBackground = () => {
   );
 };
 ChangeCanvasBackground.displayName = "ChangeCanvasBackground";
+
+/** Main-menu radio for blank / dot / square / lined paper styles. */
+export const ChangeCanvasBackgroundStyle = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const actionManager = useExcalidrawActionManager();
+  const appProps = useAppProps();
+
+  if (
+    appState.viewModeEnabled ||
+    !appProps.UIOptions.canvasActions.changeViewBackgroundColor ||
+    !actionManager.isActionEnabled(actionChangeViewBackgroundStyle)
+  ) {
+    return null;
+  }
+
+  return (
+    <div style={{ marginTop: "0.5rem" }} data-testid="canvas-background-style">
+      <DropdownMenuItemContentRadio
+        name="viewBackgroundStyle"
+        value={appState.viewBackgroundStyle}
+        onChange={(value) => {
+          actionManager.executeAction(
+            actionChangeViewBackgroundStyle,
+            "ui",
+            value,
+          );
+        }}
+        choices={[
+          {
+            value: "blank" as const,
+            label: t("labels.canvasBackgroundStyleBlank"),
+            ariaLabel: t("labels.canvasBackgroundStyleBlank"),
+          },
+          {
+            value: "dot" as const,
+            label: t("labels.canvasBackgroundStyleDot"),
+            ariaLabel: t("labels.canvasBackgroundStyleDot"),
+          },
+          {
+            value: "square" as const,
+            label: t("labels.canvasBackgroundStyleSquare"),
+            ariaLabel: t("labels.canvasBackgroundStyleSquare"),
+          },
+          {
+            value: "lined" as const,
+            label: t("labels.canvasBackgroundStyleLined"),
+            ariaLabel: t("labels.canvasBackgroundStyleLined"),
+          },
+        ]}
+      >
+        {t("labels.canvasBackgroundStyle")}
+      </DropdownMenuItemContentRadio>
+    </div>
+  );
+};
+ChangeCanvasBackgroundStyle.displayName = "ChangeCanvasBackgroundStyle";
 
 export const Export = () => {
   const { t } = useI18n();

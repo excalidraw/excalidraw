@@ -108,6 +108,7 @@ export const getDefaultAppState = (): Omit<
     elementsToHighlight: null,
     toast: null,
     viewBackgroundColor: "#f8f9fa",
+    viewBackgroundStyle: "blank",
     zenModeEnabled: false,
     focusModeEnabled: false,
     zoom: {
@@ -246,6 +247,7 @@ const APP_STATE_STORAGE_CONF = (<
   elementsToHighlight: { browser: false, export: false, server: false },
   toast: { browser: false, export: false, server: false },
   viewBackgroundColor: { browser: true, export: true, server: true },
+  viewBackgroundStyle: { browser: true, export: true, server: true },
   width: { browser: false, export: false, server: false },
   zenModeEnabled: { browser: true, export: false, server: false },
   focusModeEnabled: { browser: false, export: false, server: false },

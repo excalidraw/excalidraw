@@ -57,6 +57,7 @@ import { FixedSideContainer } from "./FixedSideContainer";
 import { HelpDialog } from "./HelpDialog";
 import { HintViewer } from "./HintViewer";
 import { ImageExportDialog } from "./ImageExportDialog";
+import { FocusTimer } from "./FocusTimer";
 import { InspirationPanel } from "./InspirationPanel";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
@@ -124,6 +125,7 @@ const DefaultMainMenu: React.FC<{
       </MainMenu.Group>
       <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme allowSystemTheme={false} />
+      <MainMenu.DefaultItems.ChangeCanvasBackgroundStyle />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
   );
@@ -439,6 +441,7 @@ const LayerUI = ({
               appState,
             )}
             <InspirationPanel />
+            <FocusTimer />
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked

@@ -41,7 +41,11 @@ import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
-import type { StaticCanvasAppState, Zoom } from "../types";
+import type {
+  StaticCanvasAppState,
+  ViewBackgroundStyle,
+  Zoom,
+} from "../types";
 
 const GridLineColor = {
   [THEME.LIGHT]: {
@@ -53,6 +57,84 @@ const GridLineColor = {
     regular: applyDarkModeFilter("#e5e5e5"),
   },
 } as const;
+
+/**
+ * Paints decorative paper patterns behind scene elements.
+ * Independent of snap grid mode — Square Grid style is visual-only.
+ */
+export const strokeBackgroundPattern = (
+  context: CanvasRenderingContext2D,
+  style: ViewBackgroundStyle,
+  gridSize: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  theme: StaticCanvasRenderConfig["theme"],
+  width: number,
+  height: number,
+) => {
+  if (style === "blank") {
+    return;
+  }
+
+  const offsetX = (scrollX % gridSize) - gridSize;
+  const offsetY = (scrollY % gridSize) - gridSize;
+  const color = GridLineColor[theme].regular;
+
+  context.save();
+
+  if (zoom.value === 1) {
+    context.translate(offsetX % 1 ? 0 : 0.5, offsetY % 1 ? 0 : 0.5);
+  }
+
+  if (style === "dot") {
+    const radius = Math.min(1.25 / zoom.value, 1.5);
+    context.fillStyle = color;
+    for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+      for (
+        let y = offsetY;
+        y < offsetY + height + gridSize * 2;
+        y += gridSize
+      ) {
+        context.beginPath();
+        context.arc(x, y, radius, 0, Math.PI * 2);
+        context.fill();
+      }
+    }
+  } else if (style === "square") {
+    const lineWidth = Math.min(1 / zoom.value, 1);
+    context.lineWidth = lineWidth;
+    context.strokeStyle = color;
+    context.setLineDash([]);
+
+    for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+      context.beginPath();
+      context.moveTo(x, offsetY - gridSize);
+      context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
+      context.stroke();
+    }
+    for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+      context.beginPath();
+      context.moveTo(offsetX - gridSize, y);
+      context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
+      context.stroke();
+    }
+  } else if (style === "lined") {
+    const lineWidth = Math.min(1 / zoom.value, 1);
+    context.lineWidth = lineWidth;
+    context.strokeStyle = color;
+    context.setLineDash([]);
+
+    for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+      context.beginPath();
+      context.moveTo(offsetX - gridSize, y);
+      context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
+      context.stroke();
+    }
+  }
+
+  context.restore();
+};
 
 const strokeGrid = (
   context: CanvasRenderingContext2D,
@@ -267,8 +349,21 @@ const _renderStaticScene = ({
   // Apply zoom
   context.scale(appState.zoom.value, appState.zoom.value);
 
-  // Grid
-  if (renderGrid) {
+  // Decorative paper pattern (behind elements; independent of snap grid)
+  strokeBackgroundPattern(
+    context,
+    appState.viewBackgroundStyle,
+    appState.gridSize,
+    appState.scrollX,
+    appState.scrollY,
+    appState.zoom,
+    renderConfig.theme,
+    normalizedWidth / appState.zoom.value,
+    normalizedHeight / appState.zoom.value,
+  );
+
+  // Snap-mode grid overlay — skip when Square paper already draws cells
+  if (renderGrid && appState.viewBackgroundStyle !== "square") {
     strokeGrid(
       context,
       appState.gridSize,

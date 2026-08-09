@@ -24,6 +24,7 @@ export {
 
 export {
   actionChangeViewBackgroundColor,
+  actionChangeViewBackgroundStyle,
   actionClearCanvas,
   actionZoomIn,
   actionZoomOut,

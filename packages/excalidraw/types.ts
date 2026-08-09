@@ -203,6 +203,7 @@ export type StaticCanvasAppState = Readonly<
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     /** null indicates transparent bg */
     viewBackgroundColor: AppState["viewBackgroundColor"] | null;
+    viewBackgroundStyle: AppState["viewBackgroundStyle"];
     exportScale: AppState["exportScale"];
     selectedElementsAreBeingDragged: AppState["selectedElementsAreBeingDragged"];
     gridSize: AppState["gridSize"];
@@ -274,6 +275,16 @@ export type ObservedElementsAppState = {
 };
 
 export type BoxSelectionMode = "contain" | "overlap";
+
+/** Decorative canvas paper style (independent of snap grid mode). */
+export type ViewBackgroundStyle = "blank" | "dot" | "square" | "lined";
+
+export const VIEW_BACKGROUND_STYLES = [
+  "blank",
+  "dot",
+  "square",
+  "lined",
+] as const satisfies readonly ViewBackgroundStyle[];
 
 /**
  * A box, in scene coordinates, that pan & zoom are constrained to.
@@ -416,6 +427,8 @@ export interface AppState {
   currentItemRoundness: StrokeRoundness;
   currentItemArrowType: "sharp" | "round" | "elbow";
   viewBackgroundColor: string;
+  /** Decorative paper pattern behind elements (not the snap grid). */
+  viewBackgroundStyle: ViewBackgroundStyle;
   scrollX: number;
   scrollY: number;
   scrollConstraints: ScrollConstraints | null;

@@ -89,6 +89,7 @@ export type ActionName =
   | "duplicateSelection"
   | "deleteSelectedElements"
   | "changeViewBackgroundColor"
+  | "changeViewBackgroundStyle"
   | "clearCanvas"
   | "zoomIn"
   | "zoomOut"

@@ -93,13 +93,21 @@ import type {
   BinaryFiles,
   LibraryItem,
   NormalizedZoomValue,
+  ViewBackgroundStyle,
 } from "../types";
+import { VIEW_BACKGROUND_STYLES } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
   AppState,
   "offsetTop" | "offsetLeft" | "width" | "height"
 >;
+
+const isValidViewBackgroundStyle = (
+  value: unknown,
+): value is ViewBackgroundStyle =>
+  typeof value === "string" &&
+  (VIEW_BACKGROUND_STYLES as readonly string[]).includes(value);
 
 const MAX_LINEAR_PX = 75_000;
 
@@ -1146,6 +1154,11 @@ export const restoreAppState = (
     gridStep: getNormalizedGridStep(
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
     ),
+    viewBackgroundStyle: isValidViewBackgroundStyle(
+      nextAppState.viewBackgroundStyle,
+    )
+      ? nextAppState.viewBackgroundStyle
+      : defaultAppState.viewBackgroundStyle,
     editingFrame: null,
   };
 };
