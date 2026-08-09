@@ -20,7 +20,10 @@ import { isTransparent } from "@excalidraw/common";
 
 const GHOST_CLASS = "excalidraw-color-dnd-ghost";
 const BODY_CLASS = "excalidraw-color-dnd-active";
-const DRAG_THRESHOLD = 4;
+const DRAG_THRESHOLD = 10;
+/** a fast sloppy click can travel many px — releases faster than this stay
+ * clicks; the drag only starts once the pointer is held this long */
+const DRAG_TIME_THRESHOLD_MS = 100;
 
 const isSameColor = (a: string, b: string) =>
   a.toLowerCase() === b.toLowerCase();
@@ -45,6 +48,12 @@ type DragSession = {
   pointerId: number;
   startX: number;
   startY: number;
+  startTime: number;
+  lastX: number;
+  lastY: number;
+  /** pending delayed activation (spatial threshold crossed before the
+   * temporal one) */
+  activationTimer: number | null;
   color: string;
   origin: DragOrigin;
   sourceEl: HTMLElement;
@@ -164,7 +173,7 @@ export const useTopPicksDnD = ({
       }
     };
 
-    const activate = (event: PointerEvent) => {
+    const activate = (x: number, y: number) => {
       if (!session) {
         return;
       }
@@ -193,7 +202,7 @@ export const useTopPicksDnD = ({
       session.ghostH = sourceRect.height;
       ghost.style.width = `${sourceRect.width}px`;
       ghost.style.height = `${sourceRect.height}px`;
-      positionGhost(event.clientX, event.clientY);
+      positionGhost(x, y);
       // let the spawn frame paint at rest, then "lift" (scale-up transition)
       requestAnimationFrame(() => {
         ghost.classList.add(`${GHOST_CLASS}--lifted`);
@@ -204,11 +213,10 @@ export const useTopPicksDnD = ({
       publish();
     };
 
-    const hitTest = (event: PointerEvent) => {
+    const hitTest = (x: number, y: number) => {
       if (!session?.hitRect) {
         return;
       }
-      const { clientX: x, clientY: y } = event;
       const { hitRect, slotRects } = session;
       let overIndex: number | null = null;
       let duplicateIndex: number | null = null;
@@ -311,6 +319,9 @@ export const useTopPicksDnD = ({
     const dispose = () => {
       removeListeners();
       document.body.classList.remove(BODY_CLASS);
+      if (session?.activationTimer != null) {
+        window.clearTimeout(session.activationTimer);
+      }
       session = null;
       setDragState(null);
     };
@@ -330,10 +341,24 @@ export const useTopPicksDnD = ({
       dispose();
     };
 
+    const tryActivate = (x: number, y: number) => {
+      if (!session || session.activated) {
+        return;
+      }
+      if (!measureStrip()) {
+        dispose();
+        return;
+      }
+      activate(x, y);
+      hitTest(x, y);
+    };
+
     const onPointerMove = (event: PointerEvent) => {
       if (!session || event.pointerId !== session.pointerId) {
         return;
       }
+      session.lastX = event.clientX;
+      session.lastY = event.clientY;
       if (!session.activated) {
         if (
           Math.hypot(
@@ -343,15 +368,29 @@ export const useTopPicksDnD = ({
         ) {
           return;
         }
-        if (!measureStrip()) {
-          dispose();
+        const elapsed = performance.now() - session.startTime;
+        if (elapsed < DRAG_TIME_THRESHOLD_MS) {
+          // spatial threshold crossed, temporal not yet — likely a fast
+          // sloppy click. Wait out the rest of the grace period; the timeout
+          // covers "flick then hold still", where no further moves fire
+          if (session.activationTimer === null) {
+            session.activationTimer = window.setTimeout(() => {
+              if (session) {
+                session.activationTimer = null;
+                tryActivate(session.lastX, session.lastY);
+              }
+            }, DRAG_TIME_THRESHOLD_MS - elapsed);
+          }
           return;
         }
-        activate(event);
+        tryActivate(event.clientX, event.clientY);
+        if (!session?.activated) {
+          return;
+        }
       }
       event.preventDefault();
       positionGhost(event.clientX, event.clientY);
-      hitTest(event);
+      hitTest(event.clientX, event.clientY);
     };
 
     const onPointerUp = (event: PointerEvent) => {
@@ -421,6 +460,10 @@ export const useTopPicksDnD = ({
         pointerId: event.pointerId,
         startX: event.clientX,
         startY: event.clientY,
+        startTime: performance.now(),
+        lastX: event.clientX,
+        lastY: event.clientY,
+        activationTimer: null,
         color,
         origin,
         sourceEl: event.currentTarget as HTMLElement,
