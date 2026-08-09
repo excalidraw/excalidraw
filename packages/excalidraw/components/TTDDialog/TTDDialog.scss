@@ -117,8 +117,8 @@ $fullScreenModalBreakpoint: 600px;
     }
   }
 
-  .ttd-dialog-panel__header .dropdown-menu {
-    z-index: 2;
+  .dropdown-menu.ttd-chat-history-dropdown { // zsviczian -- portal-safe replacement for the former TTD-header descendant selector
+    z-index: calc(var(--zIndex-modal) + 1); // zsviczian -- keep the body-portaled history menu above the TTD modal
     margin: 0;
     right: 0;
     left: auto;

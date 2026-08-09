@@ -52,7 +52,12 @@ export const ChatHistoryMenu = ({
             >
               {historyIcon}
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content onClickOutside={onClose} onSelect={onClose}>
+            {/* zsviczian -- the class must survive the Obsidian body portal; ancestor-scoped TTD styles do not */}
+            <DropdownMenu.Content
+              className="ttd-chat-history-dropdown"
+              onClickOutside={onClose}
+              onSelect={onClose}
+            >
               <>
                 {savedChats.map((chat) => (
                   <DropdownMenu.ItemCustom
