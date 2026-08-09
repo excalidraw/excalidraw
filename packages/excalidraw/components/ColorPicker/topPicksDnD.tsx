@@ -297,6 +297,34 @@ export const useTopPicksDnD = ({
       }, 340);
     };
 
+    // kill any in-flight (or retargetable) reorder-preview transitions before
+    // the drag state is torn down. Running CSS transitions survive both the
+    // removal of the `transition` property (spec: transition-* changes don't
+    // affect running transitions) and React's keyed DOM reorder on commit —
+    // the browser retargets them, which made the picks visibly re-shift on
+    // drop. Clearing the transforms with transitions disabled (+ forced
+    // reflow) cancels them for good, so the commit paints the final order
+    // directly.
+    const settleStripInstantly = () => {
+      const strip = stripRef.current;
+      if (!strip || !session?.activated) {
+        return;
+      }
+      const buttons = Array.from(
+        strip.querySelectorAll<HTMLElement>("[data-top-pick-index]"),
+      );
+      for (const button of buttons) {
+        button.style.transition = "none";
+        button.style.transform = "none";
+      }
+      // flush the non-animated state...
+      void strip.offsetWidth;
+      // ...then let the stylesheet govern transitions again (next drag)
+      for (const button of buttons) {
+        button.style.transition = "";
+      }
+    };
+
     const suppressNextClick = () => {
       const suppress = (event: MouseEvent) => {
         event.preventDefault();
@@ -329,6 +357,7 @@ export const useTopPicksDnD = ({
       if (!session) {
         return;
       }
+      settleStripInstantly();
       if (session.ghost) {
         if (animate) {
           releaseGhost({ rect: session.sourceRect });
@@ -407,6 +436,8 @@ export const useTopPicksDnD = ({
 
       const { overIndex, origin, color, slotRects } = session;
       const { picks, onPicksChange } = latestRef.current;
+
+      settleStripInstantly();
 
       if (overIndex !== null) {
         if (origin.kind === "swatch") {
