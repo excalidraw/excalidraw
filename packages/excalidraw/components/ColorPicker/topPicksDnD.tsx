@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { isTransparent } from "@excalidraw/common";
+import { colorToHex, isTransparent } from "@excalidraw/common";
 
 /**
  * Custom (non-native) drag & drop for pinning colors to the color-picker
@@ -25,8 +25,15 @@ const DRAG_THRESHOLD = 10;
  * clicks; the drag only starts once the pointer is held this long */
 const DRAG_TIME_THRESHOLD_MS = 100;
 
-const isSameColor = (a: string, b: string) =>
-  a.toLowerCase() === b.toLowerCase();
+/** value-equality of colors — normalizes notation (`#fff` vs `#ffffff` vs
+ * `white`) so visually identical colors can't occupy multiple pick slots */
+const isSameColor = (a: string, b: string) => {
+  if (a.toLowerCase() === b.toLowerCase()) {
+    return true;
+  }
+  const aHex = colorToHex(a);
+  return aHex !== null && aHex === colorToHex(b);
+};
 
 type DragOrigin =
   | { kind: "swatch" } // a pick dragged from the top-picks strip itself (reorder)
