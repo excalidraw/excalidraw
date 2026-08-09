@@ -1,17 +1,29 @@
-## 🚀 Focus Timer for Workshops
+## 🚀 Adobe Whiteboard — Focus Mode, Inspiration Panel & Adobe rebrand
 
 ### What's changed
-A workshop focus timer is now available in the top-right whiteboard chrome (next to Inspiration). Facilitators can pick a 1 / 5 / 10 / 15 minute preset or enter a custom duration, then Start, Pause, Resume, and Reset a single countdown. Remaining time shows as `MM:SS` on the button while active; when time expires, the UI marks “Done” / “Time's up” and a toast confirms the timer finished.
+
+- **Focus Mode** — a new spotlight view that dims every canvas element except the current selection. Toggle it with `Alt+F` or from Main menu → Preferences. It works in view mode, is hidden on phones, and is off by default (the setting is not persisted between sessions).
+- **Inspiration Panel** — a new "✨ Inspiration" button in the top-right UI opens a popover with three static suggestion cards. This is a cosmetic prototype only.
+- **Adobe rebrand** — the app is now "Adobe Whiteboard": Adobe red (`#EB1000`) replaces the purple accent throughout, the logo is the Adobe "A" mark and wordmark, and the favicon, page title, social meta tags and user-facing strings were updated to match. The logo also now appears in the top-left once the welcome screen is dismissed.
+- **UI typography** — interface chrome (menus, dialogs, tooltips, frame labels) now renders in Century Gothic.
+- **Toolbar and canvas polish** — the arrow and ellipse tools swapped positions (arrow is now `4`, ellipse `5`), the shape toolbar background matches the hamburger menu grey, and the default canvas background is off-white (`#f8f9fa`) instead of pure white.
 
 ### User impact
-Facilitators can run timed brainstorming, voting, and ideation exercises without leaving the whiteboard for a separate timer app, keeping the session focused in one place.
+
+Focus Mode is the substantive addition: on a busy board it removes the visual noise around whatever you're working on, which helps during reviews and screen-shares without needing to hide or move anything. The rebrand and toolbar changes give the app a consistent Adobe identity, and the arrow tool moving one slot left puts a more frequently used tool in easier reach.
 
 ### Technical notes
-Implemented as local Layer UI state (`FocusTimer` + SCSS, mounted from `LayerUI`) following the Inspiration Panel pattern. Countdown uses a wall-clock `endsAt` so background-tab drift is avoided. Timer state does not touch the scene or persisted appState, so canvas editing and undo are unaffected. Only one timer can run per session (singleton guard).
+
+Focus Mode adds a `focusModeEnabled` flag to app state and reuses the existing `reduceAlphaForSelection` path in `renderElement`, so dimming only kicks in when there is an active selection and no new render pass was introduced. It is registered as a standard action with a menu checkbox and shortcut entry, so it picks up command palette and help dialog integration for free. The font change is applied centrally via a new `UI_FONT_FAMILY` constant that `getFontFamilyString` returns for the Assistant font family, meaning it applies without touching individual components. The Inspiration Panel is self-contained and deliberately has no API calls, persistence or canvas side-effects.
 
 ### Testing
-Manual validation against the Notion acceptance criteria (toolbar entry, presets, custom duration, controls, remaining time, expiry indication, no edit interference, singleton). No automated tests were added for this change; coverage gap noted in the Aug 9 testing report canvas.
+
+Full suite run: **1461 passed, 2 failed, 48 skipped** across 107 test files. Existing snapshot suites were regenerated to absorb the branding, colour and toolbar-ordering changes. No new automated tests were added for Focus Mode, the Inspiration Panel or the rebrand, so those features are covered by manual checks only.
 
 ### Known limitations
-- Countdown is local to the current browser session — not broadcast to collaborators and not persisted across reload.
-- No expiry sound (visual + toast only).
+
+- **Two regression tests are failing.** `key 4 selects ellipse tool` and `key 5 selects arrow tool` in `regressionTests.test.tsx` still assert the old tool order; the arrow/ellipse swap changed the numeric keys but the test table was never updated. The letter shortcuts (`O`, `A`) are unaffected. This is a stale test, not a product defect, but it leaves `master` red.
+- **Typecheck is failing on `master`.** `excalidraw-app/components/BrainstormMode.tsx` imports `useAdobeWhiteboardAPI` from `@excalidraw/excalidraw`, but the package exports `useExcalidrawAPI`. `yarn test:typecheck` exits with `TS2305`.
+- **Brainstorm Mode is not shipping.** The component exists but is never rendered anywhere in the app, so the advertised `Cmd/Ctrl+Shift+B` sticky-note capture is unreachable. It is excluded from this release.
+- Focus Mode is deliberately unavailable on phone form factors and its state resets on reload.
+- The Inspiration Panel suggestions are hardcoded and do nothing when clicked beyond closing the popover.
