@@ -1,6 +1,6 @@
 import { Popover } from "radix-ui";
 import clsx from "clsx";
-import { useRef, useEffect } from "react";
+import { memo, useRef, useEffect } from "react";
 
 import {
   applyDarkModeFilter,
@@ -322,7 +322,7 @@ const ColorPickerTrigger = ({
   );
 };
 
-export const ColorPicker = ({
+const ColorPickerComponent = ({
   type,
   color,
   onChange,
@@ -442,3 +442,45 @@ export const ColorPicker = ({
     </ColorPickerDnDContext.Provider>
   );
 };
+
+/**
+ * ColorPicker renders on every styles-panel render (selection churn during
+ * box-select and the like), while its actual inputs are a handful of resolved
+ * primitives and reference-stable objects — cheap `===` checks, no deep
+ * comparisons:
+ * - `palette` / `topPicks` / `excludedColors` are module constants,
+ * - `appState.colorTopPicks` identity changes exactly when its content does.
+ *
+ * Function props (`onChange`, `updateData`) are deliberately ignored — they
+ * are recreated every render but semantically stable (they read fresh state
+ * at call time). Same for `elements`, which is only sampled once when the
+ * popup opens (most-used custom colors).
+ */
+const areColorPickerPropsEqual = (
+  prev: ColorPickerProps,
+  next: ColorPickerProps,
+) => {
+  // the open popup is interactive (hotkeys, eye dropper, most-used custom
+  // colors) — never memoize it, including the open/close transitions
+  if (
+    prev.appState.openPopup === prev.type ||
+    next.appState.openPopup === next.type
+  ) {
+    return false;
+  }
+  return (
+    prev.type === next.type &&
+    prev.color === next.color &&
+    prev.label === next.label &&
+    prev.palette === next.palette &&
+    prev.topPicks === next.topPicks &&
+    prev.excludedColors === next.excludedColors &&
+    prev.customizableTopPicks === next.customizableTopPicks &&
+    prev.appState.theme === next.appState.theme &&
+    prev.appState.colorTopPicks === next.appState.colorTopPicks &&
+    // the trigger tweaks its click behavior while a text element is edited
+    !!prev.appState.editingTextElement === !!next.appState.editingTextElement
+  );
+};
+
+export const ColorPicker = memo(ColorPickerComponent, areColorPickerPropsEqual);
