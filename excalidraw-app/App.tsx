@@ -1288,6 +1288,9 @@ const ExcalidrawApp = () => {
     return <ExcalidrawPlusIframeExport />;
   }
 
+  // #region agent log
+  fetch('http://127.0.0.1:7593/ingest/9bf2aae7-3da4-4585-9525-b80866c1ecc1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'bb91c7'},body:JSON.stringify({sessionId:'bb91c7',runId:'pre-fix',hypothesisId:'B',location:'excalidraw-app/App.tsx:ExcalidrawApp',message:'ExcalidrawApp render path reached',data:{pathname:typeof window!=='undefined'?window.location.pathname:null,isCloudExportWindow},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   return (
     <TopErrorBoundary>
       <Provider store={appJotaiStore}>

@@ -5,6 +5,10 @@ import {
 } from "@excalidraw/excalidraw";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+// #region agent log
+fetch('http://127.0.0.1:7593/ingest/9bf2aae7-3da4-4585-9525-b80866c1ecc1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'bb91c7'},body:JSON.stringify({sessionId:'bb91c7',runId:'pre-fix',hypothesisId:'C',location:'excalidraw-app/components/BrainstormMode.tsx:module',message:'BrainstormMode module evaluated',data:{useAdobeWhiteboardAPIType:typeof useAdobeWhiteboardAPI},timestamp:Date.now()})}).catch(()=>{});
+// #endregion
+
 const STICKY_PALETTE = ["#fff3bf", "#ffc9c9", "#a5d8ff", "#b2f2bb"];
 const STICKY_WIDTH = 180;
 const STICKY_HEIGHT = 120;
