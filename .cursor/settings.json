@@ -1,0 +1,7 @@
+{
+  "plugins": {
+    "slack": {
+      "enabled": true
+    }
+  }
+}
