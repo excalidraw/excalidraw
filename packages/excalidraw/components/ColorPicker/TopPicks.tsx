@@ -87,6 +87,14 @@ export const TopPicks = ({
       })}
       ref={dnd?.setStripEl}
     >
+      {dragState && (
+        <svg
+          className="color-picker__top-picks__dnd-outline"
+          aria-hidden="true"
+        >
+          <rect />
+        </svg>
+      )}
       {colors.map((color: string, index: number) => {
         const reorderOffset = getReorderOffset(index);
         return (

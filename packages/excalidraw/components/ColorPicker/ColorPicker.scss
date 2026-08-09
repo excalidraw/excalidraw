@@ -519,23 +519,59 @@
   // top-picks drag & drop (pinning + reordering)
   // ---------------------------------------------------------------------------
 
+  .color-picker__top-picks {
+    // anchor for the animated drop-target outline
+    position: relative;
+  }
+
   .color-picker__top-picks .color-picker__button {
     // the strip is tiny and never scrolls — allow touch-dragging picks
     touch-action: none;
   }
 
   .color-picker__top-picks.is-dnd-active {
-    // hint that the strip accepts the drop
-    outline: 1px dashed var(--color-gray-40);
-    outline-offset: 5px;
-    border-radius: 4px;
-
     .color-picker__button {
       // no hover/tooltips while a drag is in flight; hit-testing is
       // coordinate-based so this doesn't affect dropping
       pointer-events: none;
       transition: transform 0.14s ease, opacity 0.14s ease,
         box-shadow 0.14s ease;
+    }
+  }
+
+  // "marching ants" outline hinting that the strip accepts the drop —
+  // SVG because CSS dashed outlines/borders can't animate their dash offset
+  .color-picker__top-picks__dnd-outline {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: calc(100% + 10px);
+    height: calc(100% + 10px);
+    pointer-events: none;
+    overflow: visible;
+
+    rect {
+      x: 0.5px;
+      y: 0.5px;
+      rx: 6px;
+      width: calc(100% - 1px);
+      height: calc(100% - 1px);
+      fill: none;
+      stroke: var(--color-primary);
+      stroke-width: 1;
+      stroke-dasharray: 4 4;
+      animation: excalidraw-color-dnd-march 0.8s linear infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+
+  @keyframes excalidraw-color-dnd-march {
+    to {
+      // one full dash+gap period per cycle → seamless loop
+      stroke-dashoffset: -8;
     }
   }
 
