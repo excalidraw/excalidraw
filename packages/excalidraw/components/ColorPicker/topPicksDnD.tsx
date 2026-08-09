@@ -36,7 +36,10 @@ const isSameColor = (a: string, b: string) => {
 };
 
 type DragOrigin =
-  | { kind: "swatch" } // a pick dragged from the top-picks strip itself (reorder)
+  // a color dragged from the picker popup (palette/shades/custom) or the
+  // active-color trigger — dropping replaces the hovered pick
+  | { kind: "swatch" }
+  // a pick dragged from the top-picks strip itself — dropping reorders
   | { kind: "pick"; index: number };
 
 export type TopPicksDragState = {
