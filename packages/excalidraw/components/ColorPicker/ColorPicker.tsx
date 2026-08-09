@@ -131,7 +131,20 @@ const ColorPickerPopupContent = ({
       onFocusOutside={(event) => {
         // refocus due to eye dropper
         if (!isWritableElement(event.target)) {
-          focusPickerContent();
+          if (
+            event.target instanceof HTMLElement &&
+            event.target.matches(":active")
+          ) {
+            // the focus escaped because a button outside is being pressed
+            // (e.g. a top pick) — stealing focus mid-press makes the browser
+            // drop the button's activation (`:active` styling), so wait for
+            // the release
+            window.addEventListener("pointerup", focusPickerContent, {
+              once: true,
+            });
+          } else {
+            focusPickerContent();
+          }
         }
         event.preventDefault();
       }}
