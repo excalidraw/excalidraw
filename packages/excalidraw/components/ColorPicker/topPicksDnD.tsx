@@ -214,7 +214,11 @@ export const useTopPicksDnD = ({
       positionGhost(x, y);
       // let the spawn frame paint at rest, then "lift" (scale-up transition)
       requestAnimationFrame(() => {
-        ghost.classList.add(`${GHOST_CLASS}--lifted`);
+        // unless the drag already ended — don't restyle a ghost that's
+        // mid-flight in its release animation (or already removed)
+        if (session?.ghost === ghost) {
+          ghost.classList.add(`${GHOST_CLASS}--lifted`);
+        }
       });
 
       document.body.classList.add(BODY_CLASS);
