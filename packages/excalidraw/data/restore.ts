@@ -1,6 +1,7 @@
 import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 
 import {
+  colorToHex,
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
   DEFAULT_STROKE_STREAMLINE,
@@ -1103,11 +1104,25 @@ const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
   if (!Array.isArray(value)) {
     return null;
   }
-  const colors = value
-    .filter((color): color is string => typeof color === "string")
+  // keyed by normalized color value so notation variants (`#fff` vs
+  // `#ffffff` vs `white`) dedupe, while the value keeps the original
+  // notation — normalizing the output would break e.g. `transparent`
+  // (→ `#00000000`), which the picker matches by literal value
+  const colors = new Map<string, string>();
+  for (const color of value) {
+    if (typeof color !== "string") {
+      continue;
+    }
+    const normalized = colorToHex(color) ?? color.toLowerCase();
+    if (!colors.has(normalized)) {
+      colors.set(normalized, color);
+    }
     // top picks are a short strip — cap to a sane size
-    .slice(0, 10);
-  return colors.length ? colors : null;
+    if (colors.size >= 10) {
+      break;
+    }
+  }
+  return colors.size ? [...colors.values()] : null;
 };
 
 export const restoreAppState = (
