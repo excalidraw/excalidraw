@@ -401,6 +401,13 @@ export const useTopPicksDnD = ({
             event.clientY - session.startY,
           ) < DRAG_THRESHOLD
         ) {
+          // back inside the click tolerance — a delayed activation scheduled
+          // while we were beyond it no longer applies (wiggle-and-return
+          // must stay a click)
+          if (session.activationTimer !== null) {
+            window.clearTimeout(session.activationTimer);
+            session.activationTimer = null;
+          }
           return;
         }
         const elapsed = performance.now() - session.startTime;
@@ -412,7 +419,16 @@ export const useTopPicksDnD = ({
             session.activationTimer = window.setTimeout(() => {
               if (session) {
                 session.activationTimer = null;
-                tryActivate(session.lastX, session.lastY);
+                // the pointer may have returned inside the tolerance after
+                // the last event we saw — never activate from within it
+                if (
+                  Math.hypot(
+                    session.lastX - session.startX,
+                    session.lastY - session.startY,
+                  ) >= DRAG_THRESHOLD
+                ) {
+                  tryActivate(session.lastX, session.lastY);
+                }
               }
             }, DRAG_TIME_THRESHOLD_MS - elapsed);
           }
