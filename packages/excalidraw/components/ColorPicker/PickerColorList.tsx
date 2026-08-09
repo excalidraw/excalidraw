@@ -1,7 +1,14 @@
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
 
-import type { ColorPaletteCustom } from "@excalidraw/common";
+import {
+  applyDarkModeFilter,
+  isColorDark,
+  THEME,
+  type ColorPaletteCustom,
+} from "@excalidraw/common";
+
+import type { Theme } from "@excalidraw/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
@@ -17,6 +24,7 @@ import { useColorPickerDnD } from "./topPicksDnD";
 import type { TranslationKeys } from "../../i18n";
 
 interface PickerColorListProps {
+  theme: Theme;
   palette: ColorPaletteCustom;
   color: string | null;
   onChange: (color: string) => void;
@@ -30,6 +38,7 @@ interface PickerColorListProps {
 }
 
 const PickerColorList = ({
+  theme,
   palette,
   color,
   onChange,
@@ -74,6 +83,7 @@ const PickerColorList = ({
         }
 
         const keybinding = colorPickerHotkeyBindings[index];
+        const displayColor = applyDarkModeFilter(color, theme === THEME.DARK);
         const label = t(
           `colors.${key.replace(/\d+/, "")}` as unknown as TranslationKeys,
           null,
@@ -86,8 +96,9 @@ const PickerColorList = ({
             tabIndex={-1}
             type="button"
             className={clsx(
-              "color-picker__button color-picker__button--large has-outline",
+              "color-picker__button color-picker__button--large",
               {
+                "has-outline": !isColorDark(color, 255),
                 active: colorObj?.colorName === key,
                 "is-transparent": color === "transparent" || !color,
               },
@@ -103,12 +114,14 @@ const PickerColorList = ({
               color.startsWith("#") ? ` ${color}` : ""
             } — ${keybinding}`}
             aria-label={`${label} — ${keybinding}`}
-            style={color ? { "--swatch-color": color } : undefined}
+            style={color ? { "--swatch-color": displayColor } : undefined}
             data-testid={`color-${key}`}
             key={key}
           >
             <div className="color-picker__button-outline" />
-            {showHotKey && <HotkeyLabel color={color} keyLabel={keybinding} />}
+            {showHotKey && (
+              <HotkeyLabel color={displayColor} keyLabel={keybinding} />
+            )}
           </button>
         );
       })}

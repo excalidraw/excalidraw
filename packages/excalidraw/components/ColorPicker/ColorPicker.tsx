@@ -3,17 +3,19 @@ import clsx from "clsx";
 import { useRef, useEffect } from "react";
 
 import {
+  applyDarkModeFilter,
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_PICKS,
   isColorDark,
   isWritableElement,
+  THEME,
 } from "@excalidraw/common";
 
 import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
@@ -167,6 +169,7 @@ const ColorPickerPopupContent = ({
           palette={palette}
           excludedColors={excludedColors}
           color={color}
+          theme={appState.theme}
           onChange={(changedColor) => {
             // Save caret position before color change if editing text
             const savedSelection = appState.editingTextElement
@@ -228,6 +231,7 @@ const ColorPickerTrigger = ({
   label,
   color,
   type,
+  theme,
   mode = "background",
   onToggle,
   editingTextElement,
@@ -235,6 +239,7 @@ const ColorPickerTrigger = ({
   color: string | null;
   label: string;
   type: ColorPickerType;
+  theme: Theme;
   mode?: "background" | "stroke";
   onToggle: () => void;
   editingTextElement?: boolean;
@@ -243,6 +248,9 @@ const ColorPickerTrigger = ({
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
   const dnd = useColorPickerDnD();
+  const displayColor = color
+    ? applyDarkModeFilter(color, theme === THEME.DARK)
+    : null;
   const handleClick = (e: React.MouseEvent) => {
     // use pointerdown so we run before outside-close logic
     e.preventDefault();
@@ -267,7 +275,7 @@ const ColorPickerTrigger = ({
         "mobile-border": isMobileMode,
       })}
       aria-label={label}
-      style={color ? { "--swatch-color": color } : undefined}
+      style={displayColor ? { "--swatch-color": displayColor } : undefined}
       title={
         type === "elementStroke"
           ? t("labels.showStroke")
@@ -287,7 +295,8 @@ const ColorPickerTrigger = ({
           <span
             style={{
               color:
-                color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                displayColor &&
+                isColorDark(displayColor, COLOR_OUTLINE_CONTRAST_THRESHOLD)
                   ? "#fff"
                   : "#111",
             }}
@@ -363,6 +372,7 @@ export const ColorPicker = ({
       >
         {!isCompactMode && (
           <TopPicks
+            theme={appState.theme}
             activeColor={color}
             onChange={onChange}
             type={type}
@@ -383,6 +393,7 @@ export const ColorPicker = ({
             color={color}
             label={label}
             type={type}
+            theme={appState.theme}
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
             onToggle={() => {

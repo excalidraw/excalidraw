@@ -186,13 +186,12 @@ export const useTopPicksDnD = ({
       if (isTransparent(color)) {
         swatch.classList.add("is-transparent");
       } else {
-        swatch.style.backgroundColor = color;
-      }
-      // match the source swatch's theme filter (dark-mode inversion) — the
-      // ghost lives on document.body, outside the .excalidraw scope
-      const filter = getComputedStyle(sourceEl).filter;
-      if (filter && filter !== "none") {
-        swatch.style.filter = filter;
+        // swatches render the theme-adjusted color (dark mode remaps colors
+        // rather than CSS-filtering them) — sample the rendered color so the
+        // ghost matches what the user picked up
+        const rendered = getComputedStyle(sourceEl).backgroundColor;
+        swatch.style.backgroundColor =
+          rendered && rendered !== "rgba(0, 0, 0, 0)" ? rendered : color;
       }
       ghost.appendChild(swatch);
       document.body.appendChild(ghost);

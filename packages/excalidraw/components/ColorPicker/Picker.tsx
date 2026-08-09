@@ -8,7 +8,7 @@ import {
   KEYS,
 } from "@excalidraw/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
 import type { ColorPaletteCustom } from "@excalidraw/common";
 
@@ -30,6 +30,7 @@ import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
 import type { ColorPickerType } from "./colorPickerUtils";
 
 interface PickerProps {
+  theme: Theme;
   color: string | null;
   onChange: (color: string) => void;
   type: ColorPickerType;
@@ -47,6 +48,7 @@ interface PickerProps {
 export const Picker = React.forwardRef(
   (
     {
+      theme,
       color,
       onChange,
       type,
@@ -177,6 +179,7 @@ export const Picker = React.forwardRef(
                 {t("colorPicker.mostUsedCustomColors")}
               </PickerHeading>
               <CustomColorList
+                theme={theme}
                 colors={customColors}
                 color={color}
                 label={t("colorPicker.mostUsedCustomColors")}
@@ -188,6 +191,7 @@ export const Picker = React.forwardRef(
           <div>
             <PickerHeading>{t("colorPicker.colors")}</PickerHeading>
             <PickerColorList
+              theme={theme}
               color={color}
               palette={palette}
               onChange={onChange}
@@ -200,6 +204,7 @@ export const Picker = React.forwardRef(
           <div>
             <PickerHeading>{t("colorPicker.shades")}</PickerHeading>
             <ShadeList
+              theme={theme}
               color={color}
               onChange={onChange}
               palette={palette}

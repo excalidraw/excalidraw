@@ -1,18 +1,23 @@
 import clsx from "clsx";
 
 import {
+  applyDarkModeFilter,
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_PICKS,
   isColorDark,
+  THEME,
 } from "@excalidraw/common";
+
+import type { Theme } from "@excalidraw/element/types";
 
 import { useColorPickerDnD } from "./topPicksDnD";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
 interface TopPicksProps {
+  theme: Theme;
   onChange: (color: string) => void;
   type: ColorPickerType;
   activeColor: string | null;
@@ -20,6 +25,7 @@ interface TopPicksProps {
 }
 
 export const TopPicks = ({
+  theme,
   onChange,
   type,
   activeColor,
@@ -97,6 +103,7 @@ export const TopPicks = ({
       )}
       {colors.map((color: string, index: number) => {
         const reorderOffset = getReorderOffset(index);
+        const displayColor = applyDarkModeFilter(color, theme === THEME.DARK);
         return (
           <button
             className={clsx("color-picker__button", {
@@ -115,7 +122,7 @@ export const TopPicks = ({
               "is-dnd-duplicate": dragState?.duplicateIndex === index,
             })}
             style={{
-              "--swatch-color": color,
+              "--swatch-color": displayColor,
               transform: reorderOffset
                 ? `translateX(${reorderOffset}px)`
                 : undefined,
