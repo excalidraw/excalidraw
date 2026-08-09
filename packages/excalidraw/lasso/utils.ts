@@ -27,6 +27,7 @@ export const getLassoSelectedElementIds = (input: {
   intersectedElements: Set<ExcalidrawElement["id"]>;
   enclosedElements: Set<ExcalidrawElement["id"]>;
   simplifyDistance?: number;
+  mode?: "contain" | "overlap";
 }): {
   selectedElementIds: string[];
 } => {
@@ -38,6 +39,7 @@ export const getLassoSelectedElementIds = (input: {
     intersectedElements,
     enclosedElements,
     simplifyDistance,
+    mode = "overlap",
   } = input;
   // simplify the path to reduce the number of points
   let path: GlobalPoint[] = lassoPath;
@@ -70,10 +72,10 @@ export const getLassoSelectedElementIds = (input: {
       !intersectedElements.has(element.id) &&
       !enclosedElements.has(element.id)
     ) {
-      const enclosed = enclosureTest(path, element, elementsSegments);
+      const enclosed = enclosureTest(path, element, elementsSegments, mode);
       if (enclosed) {
         enclosedElements.add(element.id);
-      } else {
+      } else if (mode === "overlap") {
         const intersects = intersectionTest(path, element, elementsMap);
         if (intersects) {
           intersectedElements.add(element.id);
@@ -82,7 +84,10 @@ export const getLassoSelectedElementIds = (input: {
     }
   }
 
-  const results = [...intersectedElements, ...enclosedElements];
+  const results =
+    mode === "contain"
+      ? [...enclosedElements]
+      : [...intersectedElements, ...enclosedElements];
 
   return {
     selectedElementIds: results,
@@ -93,11 +98,20 @@ const enclosureTest = (
   lassoPath: GlobalPoint[],
   element: ExcalidrawElement,
   elementsSegments: ElementsSegmentsMap,
+  mode: "contain" | "overlap" = "overlap",
 ): boolean => {
   const lassoPolygon = polygonFromPoints(lassoPath);
   const segments = elementsSegments.get(element.id);
-  if (!segments) {
+  if (!segments || segments.length === 0) {
     return false;
+  }
+
+  if (mode === "contain") {
+    return segments.every((segment) => {
+      return segment.every((point) =>
+        polygonIncludesPointNonZero(point, lassoPolygon),
+      );
+    });
   }
 
   return segments.some((segment) => {

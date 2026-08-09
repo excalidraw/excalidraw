@@ -24,7 +24,7 @@ import {
 
 import { getElementLineSegments } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement, FractionalIndex } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 
@@ -38,7 +38,12 @@ const { h } = window;
 
 beforeEach(async () => {
   localStorage.clear();
-  await render(<Excalidraw handleKeyboardGlobally={true} />);
+  await render(
+    <Excalidraw
+      handleKeyboardGlobally={true}
+      initialData={{ appState: { boxSelectionMode: "overlap" } }}
+    />,
+  );
   h.state.width = 1000;
   h.state.height = 1000;
 });
@@ -74,6 +79,7 @@ const updatePath = (startPoint: GlobalPoint, points: LocalPoint[]) => {
       elementsSegments,
       intersectedElements: new Set(),
       enclosedElements: new Set(),
+      mode: h.state.boxSelectionMode,
     });
 
     act(() =>
@@ -1800,5 +1806,92 @@ describe("Special cases", () => {
     const selectedElements = getSelectedElements(h.elements, h.state);
     expect(selectedElements.length).toBe(16);
     expect(h.app.state.selectedGroupIds["-9NzH7Fa5JaHu4ArEFpa_"]).toBe(true);
+  });
+
+  it("respects boxSelectionMode ('contain' vs 'overlap') during lasso selection", () => {
+    const rect1: ExcalidrawElement = {
+      id: "rect1",
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 50,
+      height: 50,
+      angle: 0 as Radians,
+      strokeColor: "#000000",
+      backgroundColor: "transparent",
+      fillStyle: "solid",
+      strokeWidth: 1,
+      strokeStyle: "solid",
+      roughness: 0,
+      opacity: 100,
+      groupIds: [],
+      frameId: null,
+      index: "a1" as FractionalIndex,
+      roundness: null,
+      seed: 1,
+      version: 1,
+      versionNonce: 1,
+      isDeleted: false,
+      boundElements: [],
+      updated: 1,
+      link: null,
+      locked: false,
+    };
+
+    const rect2: ExcalidrawElement = {
+      id: "rect2",
+      type: "rectangle",
+      x: 300,
+      y: 300,
+      width: 50,
+      height: 50,
+      angle: 0 as Radians,
+      strokeColor: "#000000",
+      backgroundColor: "transparent",
+      fillStyle: "solid",
+      strokeWidth: 1,
+      strokeStyle: "solid",
+      roughness: 0,
+      opacity: 100,
+      groupIds: [],
+      frameId: null,
+      index: "a2" as FractionalIndex,
+      roundness: null,
+      seed: 2,
+      version: 1,
+      versionNonce: 2,
+      isDeleted: false,
+      boundElements: [],
+      updated: 1,
+      link: null,
+      locked: false,
+    };
+
+    h.elements = [rect1, rect2];
+
+    // Lasso path enclosing rect1 fully, and intersecting rect2 partially
+    const startPoint = pointFrom<GlobalPoint>(80, 80);
+    const lassoPoints = [
+      [0, 0],
+      [100, 0],
+      [240, 240],
+      [240, 320],
+      [0, 320],
+      [0, 0],
+    ] as LocalPoint[];
+
+    // 1) Test 'overlap' mode -> should select both rect1 (enclosed) and rect2 (intersected)
+    act(() => h.app.setState({ boxSelectionMode: "overlap" }));
+    updatePath(startPoint, lassoPoints);
+    let selected = getSelectedElements(h.elements, h.state);
+    expect(selected.map((el) => el.id)).toContain("rect1");
+    expect(selected.map((el) => el.id)).toContain("rect2");
+
+    // 2) Test 'contain' mode -> should select ONLY rect1 (enclosed), not rect2 (only intersected)
+    act(() => h.app.setState({ boxSelectionMode: "contain" }));
+    updatePath(startPoint, lassoPoints);
+    selected = getSelectedElements(h.elements, h.state);
+    expect(selected.map((el) => el.id)).toContain("rect1");
+    expect(selected.map((el) => el.id)).not.toContain("rect2");
   });
 });
