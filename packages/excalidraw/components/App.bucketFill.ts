@@ -1,6 +1,11 @@
 import {
-  getBucketFillBackgroundColor,
+  applyDarkModeFilter,
+  BUCKET_FILL_BACKGROUND_PICKS,
+  COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   getSizeFromPoints,
+  isTransparent,
+  THEME,
 } from "@excalidraw/common";
 import { pointFrom, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
 
@@ -13,9 +18,16 @@ import {
   ShapeCache,
 } from "@excalidraw/element";
 
-import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  NonDeletedExcalidrawElement,
+  Theme,
+} from "@excalidraw/element/types";
 
+import { actionChangeBucketFillBackgroundColor } from "../actions";
+import { editorJotaiStore } from "../editor-jotai";
 import { t } from "../i18n";
+
+import { activeEyeDropperAtom, type EyeDropperProperties } from "./EyeDropper";
 
 import type App from "./App";
 
@@ -24,9 +36,15 @@ type ScenePoint = {
   y: number;
 };
 
+const BUCKET_FILL_KEYBOARD_COLOR_PICKS = BUCKET_FILL_BACKGROUND_PICKS.filter(
+  (color) => color !== COLOR_PALETTE.white,
+);
+
 /** Owns bucket-fill interaction and App-bound scene mutations. */
 export class AppBucketFill {
   constructor(private app: App) {}
+
+  private temporaryEyeDropper: EyeDropperProperties | null = null;
 
   /**
    * The click armed on pointer down, committed on pointer up. Deferring the
@@ -59,12 +77,60 @@ export class AppBucketFill {
     this.pending = null;
   };
 
+  cycleBackgroundColor = () => {
+    const currentColor = this.getBucketFillBackgroundColor(
+      this.app.state.currentItemBackgroundColor,
+    );
+    const currentIndex = BUCKET_FILL_KEYBOARD_COLOR_PICKS.indexOf(currentColor);
+    const nextColor =
+      BUCKET_FILL_KEYBOARD_COLOR_PICKS[
+        (currentIndex + 1) % BUCKET_FILL_KEYBOARD_COLOR_PICKS.length
+      ];
+
+    this.app.actionManager.executeAction(
+      actionChangeBucketFillBackgroundColor,
+      "keyboard",
+      { currentItemBackgroundColor: nextColor },
+    );
+  };
+
+  openTemporaryEyeDropper = () => {
+    if (editorJotaiStore.get(activeEyeDropperAtom)) {
+      return;
+    }
+
+    const eyeDropper: EyeDropperProperties = {
+      colorPickerType: "elementBackground",
+      keepOpenOnAlt: true,
+      onSelect: (color) => {
+        this.app.actionManager.executeAction(
+          actionChangeBucketFillBackgroundColor,
+          "ui",
+          { currentItemBackgroundColor: color },
+        );
+      },
+    };
+    this.temporaryEyeDropper = eyeDropper;
+    this.app.updateEditorAtom(activeEyeDropperAtom, eyeDropper);
+  };
+
+  closeTemporaryEyeDropper = () => {
+    const eyeDropper = this.temporaryEyeDropper;
+    this.temporaryEyeDropper = null;
+    if (
+      eyeDropper &&
+      editorJotaiStore.get(activeEyeDropperAtom) === eyeDropper
+    ) {
+      this.app.updateEditorAtom(activeEyeDropperAtom, null);
+    }
+  };
+
   /**
    * Apply the current bucket fill settings to an existing fill-compatible
    * element (no-op when nothing would change). One undoable step.
    */
   private restyle = (element: NonDeletedExcalidrawElement) => {
-    const backgroundColor = getBucketFillBackgroundColor(
+    const backgroundColor = this.getBucketFillBackgroundColor(
       this.app.state.currentItemBackgroundColor,
     );
     if (
@@ -89,7 +155,7 @@ export class AppBucketFill {
   private fill = (scenePointer: ScenePoint) => {
     // shared with the generic shape background, but a transparent fill would
     // be invisible, so fall back to a real color (appState is not mutated)
-    const backgroundColor = getBucketFillBackgroundColor(
+    const backgroundColor = this.getBucketFillBackgroundColor(
       this.app.state.currentItemBackgroundColor,
     );
 
@@ -217,4 +283,19 @@ export class AppBucketFill {
     // (even when the tool isn't locked).
     this.app.scheduleCapture();
   };
+
+  /**
+   * The color the bucket fill tool actually fills with: the shared
+   * `currentItemBackgroundColor`, falling back to green when that is
+   * transparent (the tool's picker doesn't offer transparent, but the shared
+   * state can hold it from the generic shape picker).
+   */
+  public getBucketFillBackgroundColor = (
+    backgroundColor: string,
+    /** supply only for display purposes such as when applying to the cursor */
+    theme?: Theme,
+  ) =>
+    isTransparent(backgroundColor)
+      ? COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX]
+      : applyDarkModeFilter(backgroundColor, theme === THEME.DARK);
 }

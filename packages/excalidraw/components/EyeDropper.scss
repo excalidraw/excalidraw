@@ -20,13 +20,13 @@
 
   .excalidraw-eye-dropper-preview {
     pointer-events: none;
-    width: 3rem;
-    height: 3rem;
+    width: 2rem;
+    height: 2rem;
     position: absolute;
     z-index: var(--zIndex-eyeDropperPreview);
-    border-radius: 1rem;
-    border: 1px solid var(--default-border-color);
-    filter: var(--theme-filter);
+    border-radius: 50%;
+    border: 1px solid var(--eye-dropper-preview-border-color, #222);
+    box-shadow: 2px 2px 0 0 #4949497c;
   }
 
   .excalidraw-eye-dropper-trigger {

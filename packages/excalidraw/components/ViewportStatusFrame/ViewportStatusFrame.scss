@@ -7,17 +7,15 @@
     box-sizing: border-box;
     pointer-events: none;
     border: 4px solid;
-    z-index: 9999;
+    z-index: var(--zIndex-viewportStatusFrame);
   }
 
   .viewport-status-frame__badge {
-    position: absolute;
-    bottom: calc(
-      0.5rem + var(--viewport-status-mobile-toolbar-offset) + var(--sab, 0)
-    );
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
+    // always rendered as a flex child of .floating-status-stack, which
+    // handles its position — this stays `relative` only so it remains the
+    // containing block for .viewport-status-frame__badge-action's inset:0.
+    position: relative;
+    z-index: var(--zIndex-viewportStatusFrame);
     pointer-events: all;
 
     background-color: var(--viewport-status-frame-badge-background);
@@ -43,7 +41,7 @@
     cursor: pointer;
 
     &:active {
-      transform: translateX(-50%) scale(0.96);
+      transform: scale(0.96);
     }
   }
 

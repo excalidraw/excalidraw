@@ -57,6 +57,10 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
 import { Toolbar } from "./Toolbar";
+import {
+  ViewportStatusBadge,
+  ViewportStatusBorder,
+} from "./ViewportStatusFrame/ViewportStatusFrame";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -479,6 +483,11 @@ const LayerUI = ({
   };
 
   const isSidebarDocked = useAtomValue(isSidebarDockedAtom);
+  const isSidebarDockedAndFits = !!(
+    appState.openSidebar &&
+    isSidebarDocked &&
+    editorInterface.canFitSidebar
+  );
 
   const layerUIJSX = (
     <>
@@ -650,13 +659,26 @@ const LayerUI = ({
 
       {!isTrayModeOrMobile && ( //zsviczian changed from !device.editor.isMobile
         <>
+          {appProps.viewportStatusFrame?.border && (
+            <ViewportStatusBorder
+              border={appProps.viewportStatusFrame.border}
+              style={
+                isSidebarDockedAndFits
+                  ? {
+                      // flush against the sidebar's own visible edge, not
+                      // just the --right-sidebar-width column it reserves
+                      // (which includes the sidebar's own outer margin)
+                      right: `calc(var(--right-sidebar-width) - var(--space-factor) * 2)`,
+                    }
+                  : undefined
+              }
+            />
+          )}
           <div
             className="layer-ui__wrapper"
 //            style={ //zsviczian remove (calc(100% - var(--right-sidebar-width))
-//              appState.openSidebar &&
-//              isSidebarDocked &&
-//              editorInterface.canFitSidebar
-//                ? {width: `calc(100% - var(--right-sidebar-width))` } //zsviczian
+//              isSidebarDockedAndFits
+//                ? { width: `calc(100% - var(--right-sidebar-width))` }
 //                : {}
 //            }
           >
@@ -671,7 +693,8 @@ const LayerUI = ({
               zoomUIEnabled={zoomUIEnabled}
             />
             {(appState.toast ||
-              (scrollBackToContentUIEnabled && appState.scrolledOutside)) && (
+              (scrollBackToContentUIEnabled && appState.scrolledOutside) ||
+              appProps.viewportStatusFrame?.label) && (
               <div className="floating-status-stack">
                 {appState.toast && (
                   <Toast
@@ -696,6 +719,12 @@ const LayerUI = ({
                       {t("buttons.scrollBackToContent")}
                     </button>
                   )}
+                {appProps.viewportStatusFrame?.label && (
+                  <ViewportStatusBadge
+                    label={appProps.viewportStatusFrame.label}
+                    border={appProps.viewportStatusFrame.border}
+                  />
+                )}
               </div>
             )}
           </div>
