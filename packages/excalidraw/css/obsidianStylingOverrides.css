@@ -58,8 +58,9 @@
 }
 
 .excalidraw .color-picker-content {
+  /* zsviczian: use Radix's real collision space instead of a fixed 10rem cap. */
+  max-height: var(--radix-popover-content-available-height);
   overflow-y: auto;
-  max-height: 10rem;
 }
 
 .excalidraw .ToolIcon__keybinding {
