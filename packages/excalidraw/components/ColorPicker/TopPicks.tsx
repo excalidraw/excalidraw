@@ -8,6 +8,8 @@ import {
   isColorDark,
 } from "@excalidraw/common";
 
+import { useColorPickerDnD } from "./topPicksDnD";
+
 import type { ColorPickerType } from "./colorPickerUtils";
 
 interface TopPicksProps {
@@ -23,6 +25,9 @@ export const TopPicks = ({
   activeColor,
   topPicks,
 }: TopPicksProps) => {
+  const dnd = useColorPickerDnD();
+  const dragState = dnd?.dragState ?? null;
+
   let colors;
   if (type === "elementStroke") {
     colors = DEFAULT_ELEMENT_STROKE_PICKS;
@@ -46,28 +51,83 @@ export const TopPicks = ({
     return null;
   }
 
+  // live preview of the reorder result — every pick translates to the slot
+  // it would occupy if dropped right now
+  const getReorderOffset = (index: number) => {
+    if (
+      !dragState ||
+      dragState.origin.kind !== "pick" ||
+      dragState.overIndex === null
+    ) {
+      return 0;
+    }
+    const from = dragState.origin.index;
+    const to = dragState.overIndex;
+    if (from === to) {
+      return 0;
+    }
+    let newIndex = index;
+    if (index === from) {
+      newIndex = to;
+    } else {
+      if (index > from) {
+        newIndex -= 1;
+      }
+      if (newIndex >= to) {
+        newIndex += 1;
+      }
+    }
+    return (newIndex - index) * dragState.slotSpan;
+  };
+
   return (
-    <div className="color-picker__top-picks">
-      {colors.map((color: string) => (
-        <button
-          className={clsx("color-picker__button", {
-            active: color === activeColor,
-            "is-transparent": color === "transparent" || !color,
-            "has-outline": !isColorDark(
-              color,
-              COLOR_OUTLINE_CONTRAST_THRESHOLD,
-            ),
-          })}
-          style={{ "--swatch-color": color }}
-          key={color}
-          type="button"
-          title={color}
-          onClick={() => onChange(color)}
-          data-testid={`color-top-pick-${color}`}
-        >
-          <div className="color-picker__button-outline" />
-        </button>
-      ))}
+    <div
+      className={clsx("color-picker__top-picks", {
+        "is-dnd-active": !!dragState,
+      })}
+      ref={dnd?.setStripEl}
+    >
+      {colors.map((color: string, index: number) => {
+        const reorderOffset = getReorderOffset(index);
+        return (
+          <button
+            className={clsx("color-picker__button", {
+              active: color === activeColor,
+              "is-transparent": color === "transparent" || !color,
+              "has-outline": !isColorDark(
+                color,
+                COLOR_OUTLINE_CONTRAST_THRESHOLD,
+              ),
+              "is-dnd-source":
+                dragState?.origin.kind === "pick" &&
+                dragState.origin.index === index,
+              "is-dnd-target":
+                dragState?.origin.kind === "swatch" &&
+                dragState.overIndex === index,
+              "is-dnd-duplicate": dragState?.duplicateIndex === index,
+            })}
+            style={{
+              "--swatch-color": color,
+              transform: reorderOffset
+                ? `translateX(${reorderOffset}px)`
+                : undefined,
+            }}
+            key={color}
+            type="button"
+            title={color}
+            onClick={() => onChange(color)}
+            onPointerDown={
+              dnd
+                ? (event) => dnd.startPickDrag(event, index, color)
+                : undefined
+            }
+            data-testid={`color-top-pick-${color}`}
+            data-top-pick-index={index}
+          >
+            <div className="color-picker__button-outline" />
+          </button>
+        );
+      })}
     </div>
   );
 };

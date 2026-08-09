@@ -1099,6 +1099,17 @@ const LegacyAppStateMigrations: {
   },
 };
 
+const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+  const colors = value
+    .filter((color): color is string => typeof color === "string")
+    // top picks are a short strip — cap to a sane size
+    .slice(0, 10);
+  return colors.length ? colors : null;
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -1144,6 +1155,16 @@ export const restoreAppState = (
   if (boxSelectionMode !== undefined) {
     nextAppState.boxSelectionMode = boxSelectionMode;
   }
+
+  // drop malformed persisted custom top picks (imported data is untrusted)
+  nextAppState.colorTopPicks = {
+    elementStroke: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.elementStroke,
+    ),
+    elementBackground: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.elementBackground,
+    ),
+  };
 
   // legacy
   if ((appState as any).currentItemStrokeWidth !== undefined) {

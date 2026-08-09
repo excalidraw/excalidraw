@@ -5,6 +5,8 @@ import { useRef, useEffect } from "react";
 import {
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_STROKE_PICKS,
   isColorDark,
   isWritableElement,
 } from "@excalidraw/common";
@@ -31,6 +33,11 @@ import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
 import { TopPicks } from "./TopPicks";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import {
+  ColorPickerDnDContext,
+  useColorPickerDnD,
+  useTopPicksDnD,
+} from "./topPicksDnD";
 
 import "./ColorPicker.scss";
 
@@ -54,6 +61,9 @@ interface ColorPickerProps {
   updateData: (formData?: any) => void;
   /** palette colors to hide from the popup, keeping hotkey positions */
   excludedColors?: readonly string[];
+  /** allow users to customize the top picks strip by drag & dropping colors
+   * from the picker popup onto it (persisted in `appState.colorTopPicks`) */
+  customizableTopPicks?: boolean;
 }
 
 const ColorPickerPopupContent = ({
@@ -232,6 +242,7 @@ const ColorPickerTrigger = ({
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
+  const dnd = useColorPickerDnD();
   const handleClick = (e: React.MouseEvent) => {
     // use pointerdown so we run before outside-close logic
     e.preventDefault();
@@ -264,6 +275,11 @@ const ColorPickerTrigger = ({
       }
       data-openpopup={type}
       onClick={handleClick}
+      // the active-color swatch can be dragged onto the top-picks strip to
+      // pin the current (possibly custom) color
+      onPointerDown={
+        dnd ? (event) => dnd.startSwatchDrag(event, color) : undefined
+      }
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
       {isCompactMode && color && mode === "stroke" && (
@@ -295,6 +311,7 @@ export const ColorPicker = ({
   updateData,
   appState,
   excludedColors,
+  customizableTopPicks,
 }: ColorPickerProps) => {
   const openRef = useRef(appState.openPopup);
   useEffect(() => {
@@ -303,8 +320,40 @@ export const ColorPicker = ({
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
 
+  const isTopPicksCustomizable =
+    !!customizableTopPicks &&
+    !isCompactMode &&
+    (type === "elementStroke" || type === "elementBackground");
+
+  // user-pinned picks trump the (host-provided or default) baseline
+  const customTopPicks = isTopPicksCustomizable
+    ? appState.colorTopPicks?.[type as "elementStroke" | "elementBackground"]
+    : null;
+
+  // fully-resolved picks currently displayed in the strip — the baseline the
+  // drag & drop customization starts from
+  const effectiveTopPicks = customTopPicks?.length
+    ? customTopPicks
+    : topPicks ??
+      (type === "elementStroke"
+        ? DEFAULT_ELEMENT_STROKE_PICKS
+        : DEFAULT_ELEMENT_BACKGROUND_PICKS);
+
+  const dnd = useTopPicksDnD({
+    enabled: isTopPicksCustomizable,
+    picks: effectiveTopPicks,
+    onPicksChange: (picks) => {
+      updateData({
+        colorTopPicks: {
+          ...appState.colorTopPicks,
+          [type]: picks,
+        },
+      });
+    },
+  });
+
   return (
-    <div>
+    <ColorPickerDnDContext.Provider value={isTopPicksCustomizable ? dnd : null}>
       <div
         role="dialog"
         aria-modal="true"
@@ -317,7 +366,7 @@ export const ColorPicker = ({
             activeColor={color}
             onChange={onChange}
             type={type}
-            topPicks={topPicks}
+            topPicks={customTopPicks?.length ? customTopPicks : topPicks}
           />
         )}
         {!isCompactMode && <ButtonSeparator />}
@@ -366,6 +415,6 @@ export const ColorPicker = ({
           )}
         </Popover.Root>
       </div>
-    </div>
+    </ColorPickerDnDContext.Provider>
   );
 };

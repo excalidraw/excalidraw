@@ -381,6 +381,7 @@ export const actionChangeStrokeColor = register<
         <ColorPicker
           topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
           palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
+          customizableTopPicks
           type="elementStroke"
           label={t("labels.stroke")}
           color={getFormValue(
@@ -466,6 +467,7 @@ export const actionChangeBackgroundColor = register<
         <ColorPicker
           topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
           palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          customizableTopPicks
           type="elementBackground"
           label={t("labels.background")}
           color={getFormValue(

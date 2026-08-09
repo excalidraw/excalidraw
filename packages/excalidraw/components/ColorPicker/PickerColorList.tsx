@@ -12,6 +12,7 @@ import {
   colorPickerHotkeyBindings,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
+import { useColorPickerDnD } from "./topPicksDnD";
 
 import type { TranslationKeys } from "../../i18n";
 
@@ -43,6 +44,7 @@ const PickerColorList = ({
   const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
+  const dnd = useColorPickerDnD();
 
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -94,6 +96,9 @@ const PickerColorList = ({
               onChange(color);
               setActiveColorPickerSection("baseColors");
             }}
+            onPointerDown={
+              dnd ? (event) => dnd.startSwatchDrag(event, color) : undefined
+            }
             title={`${label}${
               color.startsWith("#") ? ` ${color}` : ""
             } — ${keybinding}`}

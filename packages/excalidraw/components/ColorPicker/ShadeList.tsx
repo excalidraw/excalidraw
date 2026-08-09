@@ -11,6 +11,7 @@ import {
   activeColorPickerSectionAtom,
   getColorNameAndShadeFromColor,
 } from "./colorPickerUtils";
+import { useColorPickerDnD } from "./topPicksDnD";
 
 interface ShadeListProps {
   color: string | null;
@@ -33,6 +34,7 @@ export const ShadeList = ({
   const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
+  const dnd = useColorPickerDnD();
 
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -71,6 +73,9 @@ export const ShadeList = ({
                 onChange(color);
                 setActiveColorPickerSection("shades");
               }}
+              onPointerDown={
+                dnd ? (event) => dnd.startSwatchDrag(event, color) : undefined
+              }
             >
               <div className="color-picker__button-outline" />
               {showHotKey && (
