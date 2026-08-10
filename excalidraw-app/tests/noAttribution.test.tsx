@@ -1,10 +1,9 @@
+import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
 import { vi } from "vitest";
 
 import ExcalidrawApp from "../App";
-import { appJotaiStore } from "../app-jotai";
 import { STORAGE_KEYS } from "../app_constants";
-import { collabCurrentUserAtom } from "../collab/Collab";
 
 const { h } = window;
 
@@ -77,20 +76,30 @@ vi.mock("socket.io-client", () => {
   };
 });
 
-describe("collab currentUser", () => {
+describe("no authorship attribution in the app", () => {
   beforeEach(() => {
     socketMock.reset();
-    appJotaiStore.set(collabCurrentUserAtom, null);
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_COLLAB,
       JSON.stringify({ username: "Test User" }),
     );
   });
 
-  it("should pass the socket id & username as currentUser while collaborating", async () => {
+  it("should not stamp authorship onto locally created elements", async () => {
     await render(<ExcalidrawApp />);
 
-    expect(appJotaiStore.get(collabCurrentUserAtom)).toBe(null);
+    UI.createElement("rectangle", { x: 10, y: 10 });
+
+    expect(h.elements.length).toBe(1);
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBeNull();
+  });
+
+  // authorship is a host-app concern - excalidraw.com never identifies the
+  // local user to the editor, so nothing it does may ever author an element
+  it("should never pass a currentUser, not even while collaborating", async () => {
+    await render(<ExcalidrawApp />);
+
     expect(h.app.props.currentUser).toBe(undefined);
 
     // returns a promise resolved on scene init, hence not awaited
@@ -100,57 +109,25 @@ describe("collab currentUser", () => {
       expect(window.collab.portal.socket).toBeTruthy();
     });
 
-    // no identity until the socket connects
-    expect(appJotaiStore.get(collabCurrentUserAtom)).toBe(null);
+    expect(h.app.props.currentUser).toBe(undefined);
 
     await act(async () => {
       socketMock.id = "socket_1";
       socketMock.trigger("connect");
     });
 
-    await waitFor(() => {
-      expect(appJotaiStore.get(collabCurrentUserAtom)).toEqual({
-        id: "socket_1",
-        name: "Test User",
-      });
-      expect(h.app.props.currentUser).toEqual({
-        id: "socket_1",
-        name: "Test User",
-      });
-    });
+    expect(h.app.props.currentUser).toBe(undefined);
 
-    // username changes are reflected
     await act(async () => {
       window.collab.setUsername("Renamed User");
     });
 
-    await waitFor(() => {
-      expect(h.app.props.currentUser).toEqual({
-        id: "socket_1",
-        name: "Renamed User",
-      });
-    });
-
-    // reconnecting assigns a new socket id
-    await act(async () => {
-      socketMock.id = "socket_2";
-      socketMock.trigger("connect");
-    });
-
-    await waitFor(() => {
-      expect(h.app.props.currentUser).toEqual({
-        id: "socket_2",
-        name: "Renamed User",
-      });
-    });
+    expect(h.app.props.currentUser).toBe(undefined);
 
     await act(async () => {
       window.collab.stopCollaboration(false);
     });
 
-    await waitFor(() => {
-      expect(appJotaiStore.get(collabCurrentUserAtom)).toBe(null);
-      expect(h.app.props.currentUser).toBe(undefined);
-    });
+    expect(h.app.props.currentUser).toBe(undefined);
   });
 });

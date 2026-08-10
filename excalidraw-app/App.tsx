@@ -96,7 +96,6 @@ import {
 } from "./app_constants";
 import Collab, {
   collabAPIAtom,
-  collabCurrentUserAtom,
   isCollaboratingAtom,
   isOfflineAtom,
   userToFollowAtom,
@@ -414,7 +413,6 @@ const ExcalidrawWrapper = () => {
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
   const userToFollow = useAtomValue(userToFollowAtom);
-  const collabCurrentUser = useAtomValue(collabCurrentUserAtom);
 
   const viewportStatusFrame = useMemo(
     () =>
@@ -956,7 +954,6 @@ const ExcalidrawWrapper = () => {
         onExport={onExport}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
-        currentUser={collabCurrentUser ?? undefined}
         onPointerUpdate={collabAPI?.onPointerUpdate}
         UIOptions={{
           canvasActions: {
