@@ -6,6 +6,7 @@ import {
   pointFrom,
   pointOnLineSegment,
   polygonIncludesPointNonZero,
+  PRECISION,
 } from "@excalidraw/math";
 
 import { type Bounds } from "@excalidraw/common";
@@ -78,6 +79,14 @@ export const getLassoSelectedElementIds = (input: {
     },
     [Infinity, Infinity, -Infinity, -Infinity],
   ) as Bounds;
+  const lassoPolygon = polygonFromPoints(path);
+  const containBounds: Bounds = [
+    lassoBounds[0] - PRECISION,
+    lassoBounds[1] - PRECISION,
+    lassoBounds[2] + PRECISION,
+    lassoBounds[3] + PRECISION,
+  ];
+
   for (const element of selectableElements) {
     // Only the visible (frame-clipped) portion of an element is relevant for
     // selection, so everything outside of its frame is disregarded below
@@ -94,13 +103,25 @@ export const getLassoSelectedElementIds = (input: {
       !intersectedElements.has(element.id) &&
       !enclosedElements.has(element.id)
     ) {
+      if (
+        mode === "contain" &&
+        !boundsContainBounds(containBounds, elementBounds)
+      ) {
+        continue;
+      }
+
       const segments = getSelectionSegments(
         element,
         elementsMap,
         elementsSegments,
         clipBounds,
       );
-      const enclosed = enclosureTest(path, segments, elementBounds, mode);
+      const enclosed = enclosureTest(
+        lassoPolygon,
+        segments,
+        elementBounds,
+        mode,
+      );
       if (mode === "contain") {
         if (
           enclosed &&
@@ -295,12 +316,11 @@ const excludeIncompleteGroups = (
 };
 
 const enclosureTest = (
-  lassoPath: GlobalPoint[],
+  lassoPolygon: Polygon<GlobalPoint>,
   segments: LineSegment<GlobalPoint>[],
   elementBounds: Bounds,
   mode: BoxSelectionMode,
 ): boolean => {
-  const lassoPolygon = polygonFromPoints(lassoPath);
   const quantifier = mode === "contain" ? "every" : "some";
 
   const includesPoint = (point: GlobalPoint) =>
