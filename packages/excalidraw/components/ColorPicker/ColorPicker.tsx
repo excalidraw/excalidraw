@@ -64,8 +64,9 @@ interface ColorPickerProps {
   /** palette colors to hide from the popup, keeping hotkey positions */
   excludedColors?: readonly string[];
   /** allow users to customize the top picks strip by drag & dropping colors
-   * from the picker popup onto it (persisted in `appState.colorTopPicks`) */
-  customizableTopPicks?: boolean;
+   * from the picker popup onto it. The value names the
+   * `appState.colorTopPicks` slot the customization is stored in */
+  customizableTopPicks?: keyof AppState["colorTopPicks"];
 }
 
 const ColorPickerPopupContent = ({
@@ -342,15 +343,13 @@ const ColorPickerComponent = ({
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
 
-  const isTopPicksCustomizable =
-    !!customizableTopPicks &&
-    !isCompactMode &&
-    (type === "elementStroke" || type === "elementBackground");
+  const isTopPicksCustomizable = !!customizableTopPicks && !isCompactMode;
 
   // user-pinned picks trump the (host-provided or default) baseline
-  const customTopPicks = isTopPicksCustomizable
-    ? appState.colorTopPicks?.[type as "elementStroke" | "elementBackground"]
-    : null;
+  const customTopPicks =
+    isTopPicksCustomizable && customizableTopPicks
+      ? appState.colorTopPicks?.[customizableTopPicks]
+      : null;
 
   // fully-resolved picks currently displayed in the strip — the baseline the
   // drag & drop customization starts from
@@ -365,10 +364,15 @@ const ColorPickerComponent = ({
     enabled: isTopPicksCustomizable,
     picks: effectiveTopPicks,
     onPicksChange: (picks) => {
+      if (!customizableTopPicks) {
+        return;
+      }
+      // NOTE the comparator comparing `appState.colorTopPicks` is what keeps
+      // this captured spread fresh — see `areColorPickerPropsEqual`
       updateData({
         colorTopPicks: {
           ...appState.colorTopPicks,
-          [type]: picks,
+          [customizableTopPicks]: picks,
         },
       });
     },

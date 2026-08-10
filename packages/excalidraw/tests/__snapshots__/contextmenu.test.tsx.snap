@@ -16,6 +16,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -1094,6 +1095,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -1313,6 +1315,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -1649,6 +1652,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -1985,6 +1989,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -2204,6 +2209,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -2450,6 +2456,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -2753,6 +2760,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -3130,6 +3138,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -3655,6 +3664,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -3983,6 +3993,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -4311,6 +4322,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -4727,6 +4739,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -5949,6 +5962,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -7222,6 +7236,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -7916,6 +7931,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -8912,6 +8928,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },

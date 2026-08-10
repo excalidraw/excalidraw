@@ -133,6 +133,7 @@ export const getDefaultAppState = (): Omit<
     colorTopPicks: {
       elementStroke: null,
       elementBackground: null,
+      bucketFill: null,
     },
   };
 };

@@ -16,6 +16,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -654,6 +655,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -1220,6 +1222,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -1585,6 +1588,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -1952,6 +1956,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -2220,6 +2225,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -2678,6 +2684,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -2986,6 +2993,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -3310,6 +3318,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -3609,6 +3618,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -3900,6 +3910,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -4140,6 +4151,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -4402,6 +4414,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -4678,6 +4691,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -4912,6 +4926,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -5146,6 +5161,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -5398,6 +5414,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -5659,6 +5676,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -5922,6 +5940,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -6256,6 +6275,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -6688,6 +6708,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -7067,6 +7088,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -7384,6 +7406,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -7681,6 +7704,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -7916,6 +7940,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -8273,6 +8298,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -8630,6 +8656,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -9041,6 +9068,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -9333,6 +9361,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -9602,6 +9631,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -9872,6 +9902,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -10109,6 +10140,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -10411,6 +10443,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -10733,6 +10766,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -10974,6 +11008,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -11904,6 +11939,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -12169,6 +12205,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -12409,6 +12446,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -12651,6 +12689,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -13059,6 +13098,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -13274,6 +13314,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -13486,6 +13527,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -13792,6 +13834,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -14095,6 +14138,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -14345,6 +14389,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -14587,6 +14632,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -14829,6 +14875,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -15081,6 +15128,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -15417,6 +15465,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -15592,6 +15641,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -15881,6 +15931,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -16149,6 +16200,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -16307,6 +16359,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -16594,6 +16647,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -16761,6 +16815,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -17514,6 +17569,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -18165,6 +18221,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -18816,6 +18873,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -19570,6 +19628,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -20343,6 +20402,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -20828,6 +20888,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -21344,6 +21405,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },
@@ -21808,6 +21870,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },

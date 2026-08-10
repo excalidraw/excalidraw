@@ -1181,6 +1181,9 @@ export const restoreAppState = (
     elementBackground: restoreColorTopPicksList(
       nextAppState.colorTopPicks?.elementBackground,
     ),
+    bucketFill: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.bucketFill,
+    ),
   };
 
   // legacy

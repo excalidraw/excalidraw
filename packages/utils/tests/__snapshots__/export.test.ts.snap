@@ -16,6 +16,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "boxSelectionMode": "contain",
   "collaborators": Map {},
   "colorTopPicks": {
+    "bucketFill": null,
     "elementBackground": null,
     "elementStroke": null,
   },

@@ -381,7 +381,7 @@ export const actionChangeStrokeColor = register<
         <ColorPicker
           topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
           palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
-          customizableTopPicks
+          customizableTopPicks="elementStroke"
           type="elementStroke"
           label={t("labels.stroke")}
           color={getFormValue(
@@ -467,7 +467,7 @@ export const actionChangeBackgroundColor = register<
         <ColorPicker
           topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
           palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
-          customizableTopPicks
+          customizableTopPicks="elementBackground"
           type="elementBackground"
           label={t("labels.background")}
           color={getFormValue(
@@ -522,6 +522,10 @@ export const actionChangeBucketFillBackgroundColor = register<
           // hidden rather than removed from the palette so the remaining
           // colors keep their usual hotkeys (w for white etc.)
           excludedColors={[COLOR_PALETTE.transparent]}
+          // customized independently of the background picker's picks even
+          // though both drive `currentItemBackgroundColor` — the bucket
+          // strip's defaults and use case differ (no transparent)
+          customizableTopPicks="bucketFill"
           type="elementBackground"
           label={t("labels.background")}
           color={app.bucketFill.getBucketFillBackgroundColor(
