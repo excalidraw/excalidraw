@@ -1,7 +1,12 @@
 import React from "react";
 
 import { KEYS } from "@excalidraw/common";
-import { newElementWith } from "@excalidraw/element";
+import {
+  newElementWith,
+  ChangeOrigin,
+  StoreChange,
+  StoreDelta,
+} from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import "@excalidraw/utils/test-utils";
@@ -616,5 +621,130 @@ describe("element authorship", () => {
     expect(snapshottedElement.updatedBy).toBe("user-a");
     expect(snapshottedElement.version).toBe(stampedElement.version);
     expect(snapshottedElement.versionNonce).toBe(stampedElement.versionNonce);
+  });
+
+  it("should stamp new content arriving through a pre-computed durable package", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const rect = API.createElement({ type: "rectangle", x: 0 });
+
+    // the element enters the scene silently, without a scheduled capture,
+    // the same way a programmatic transaction would stream it in
+    act(() => {
+      h.elements = [rect];
+    });
+
+    expect(h.store.snapshot.elements.get(rect.id)).toBeUndefined();
+
+    // the package is pre-computed by the caller, instead of letting the store
+    // diff the whole scene at commit time
+    const prevSnapshot = h.store.snapshot;
+    const nextSnapshot = prevSnapshot.maybeClone(
+      CaptureUpdateAction.IMMEDIATELY,
+      h.app.scene.getElementsMapIncludingDeleted(),
+      h.state,
+    );
+    const change = StoreChange.create(prevSnapshot, nextSnapshot);
+    const delta = StoreDelta.calculate(prevSnapshot, nextSnapshot);
+
+    h.store.scheduleMicroAction({
+      action: CaptureUpdateAction.IMMEDIATELY,
+      change,
+      delta,
+      origin: ChangeOrigin.COMMIT,
+    });
+
+    act(() => {
+      h.app.scene.triggerUpdate();
+    });
+
+    // carrying a pre-made delta alone must not suppress the authorship
+    expect(h.elements[0]).toEqual(
+      expect.objectContaining({
+        createdBy: "user-a",
+        created: 1,
+        updatedBy: "user-a",
+      }),
+    );
+
+    // the snapshot has to be in sync with the live element, otherwise the next
+    // capture would detect a version-only change
+    const snapshottedElement = h.store.snapshot.elements.get(rect.id)!;
+
+    expect(snapshottedElement.createdBy).toBe("user-a");
+    expect(snapshottedElement.version).toBe(h.elements[0].version);
+    expect(snapshottedElement.versionNonce).toBe(h.elements[0].versionNonce);
+  });
+
+  it("should not author anything when replaying a pre-computed durable package", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const rect = API.createElement({ type: "rectangle", x: 0 });
+
+    act(() => {
+      h.elements = [rect];
+    });
+
+    const prevSnapshot = h.store.snapshot;
+    const nextSnapshot = prevSnapshot.maybeClone(
+      CaptureUpdateAction.IMMEDIATELY,
+      h.app.scene.getElementsMapIncludingDeleted(),
+      h.state,
+    );
+    const change = StoreChange.create(prevSnapshot, nextSnapshot);
+    const delta = StoreDelta.calculate(prevSnapshot, nextSnapshot);
+
+    h.store.scheduleMicroAction({
+      action: CaptureUpdateAction.IMMEDIATELY,
+      change,
+      delta,
+      origin: ChangeOrigin.HISTORY,
+    });
+
+    act(() => {
+      h.app.scene.triggerUpdate();
+    });
+
+    // a replay re-applies an already authored change as-is
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBeNull();
+  });
+
+  it("should keep the pre-stamped attribution of a pre-computed durable package", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    // the caller attributed the content itself (i.e. to an agent / service id)
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 0,
+      createdBy: "agent-service",
+    });
+
+    act(() => {
+      h.elements = [rect];
+    });
+
+    const prevSnapshot = h.store.snapshot;
+    const nextSnapshot = prevSnapshot.maybeClone(
+      CaptureUpdateAction.IMMEDIATELY,
+      h.app.scene.getElementsMapIncludingDeleted(),
+      h.state,
+    );
+    const change = StoreChange.create(prevSnapshot, nextSnapshot);
+    const delta = StoreDelta.calculate(prevSnapshot, nextSnapshot);
+
+    h.store.scheduleMicroAction({
+      action: CaptureUpdateAction.IMMEDIATELY,
+      change,
+      delta,
+      origin: ChangeOrigin.COMMIT,
+    });
+
+    act(() => {
+      h.app.scene.triggerUpdate();
+    });
+
+    expect(h.elements[0].createdBy).toBe("agent-service");
+    expect(h.elements[0].updatedBy).toBeNull();
   });
 });

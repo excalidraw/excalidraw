@@ -71,6 +71,31 @@ export const CaptureUpdateAction = {
 
 export type CaptureUpdateActionType = ValueOf<typeof CaptureUpdateAction>;
 
+/**
+ * Declares why a pre-computed package (change & delta) got scheduled, as the
+ * package's shape alone cannot tell a replayed change apart from new content.
+ */
+export const ChangeOrigin = {
+  /**
+   * Replay of an already recorded change (i.e. history undo / redo).
+   *
+   * The store never (re)authors such a package, as its authorship attributes
+   * round-trip like any other element attributes.
+   */
+  HISTORY: "history",
+  /**
+   * A commit of new content (i.e. a programmatic transaction).
+   *
+   * The store stamps authorship as with any other local durable capture,
+   * except for elements entering the document with `createdBy` already set,
+   * which are left untouched - a caller wanting a different attribution
+   * (i.e. an agent / service id) is hence expected to pre-stamp its elements.
+   */
+  COMMIT: "commit",
+} as const;
+
+export type ChangeOriginType = ValueOf<typeof ChangeOrigin>;
+
 type MicroActionsQueue = (() => void)[];
 
 type ElementAuthorship = {
@@ -138,6 +163,7 @@ export class Store {
           action: typeof CaptureUpdateAction.IMMEDIATELY;
           change: StoreChange;
           delta: StoreDelta;
+          origin: ChangeOriginType;
         }
       | {
           action:
@@ -177,12 +203,14 @@ export class Store {
     }
 
     const delta = "delta" in params ? params.delta : undefined;
+    const origin = "origin" in params ? params.origin : ChangeOrigin.COMMIT;
 
     this.scheduledMicroActions.push(() =>
       this.processAction({
         action,
         change,
         delta,
+        origin,
       }),
     );
   }
@@ -343,6 +371,7 @@ export class Store {
           action: CaptureUpdateActionType;
           change: StoreChange;
           delta: StoreDelta | undefined;
+          origin: ChangeOriginType;
         },
   ) {
     const { action } = params;
@@ -436,10 +465,13 @@ export class Store {
           action: CaptureUpdateActionType;
           change: StoreChange;
           delta: StoreDelta | undefined;
+          origin: ChangeOriginType;
         },
   ) {
-    if ("delta" in params && params.delta) {
-      // history replay re-applies an existing delta, it never authors anything
+    if ("origin" in params && params.origin === ChangeOrigin.HISTORY) {
+      // a history replay re-applies an already authored change, hence it
+      // never authors anything - carrying a pre-computed delta alone does not
+      // make a package a replay, only its explicitly declared origin does
       return;
     }
 

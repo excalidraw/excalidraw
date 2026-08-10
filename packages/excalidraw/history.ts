@@ -2,6 +2,7 @@ import { Emitter } from "@excalidraw/common";
 
 import {
   CaptureUpdateAction,
+  ChangeOrigin,
   StoreChange,
   StoreDelta,
 } from "@excalidraw/element";
@@ -201,6 +202,7 @@ export class History {
               action,
               change,
               delta,
+              origin: ChangeOrigin.HISTORY,
             });
 
             historyDelta = delta;
