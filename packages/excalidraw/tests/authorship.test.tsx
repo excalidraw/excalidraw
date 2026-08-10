@@ -56,9 +56,7 @@ describe("element authorship", () => {
     UI.createElement("rectangle", { x: 10, y: 10 });
 
     expect(h.elements.length).toBe(1);
-    // unknown authorship is expressed by the very absence of the attributes,
-    // never by a `null` placeholder
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0]).not.toHaveProperty("updatedBy");
   });
@@ -73,7 +71,7 @@ describe("element authorship", () => {
       captureUpdate: CaptureUpdateAction.NEVER,
     });
 
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
 
     // a subsequent local, durable update must not attribute the creation of the
     // element, as it was already part of the document - only the last editor
@@ -83,7 +81,7 @@ describe("element authorship", () => {
     });
 
     expect(h.elements[0].x).toBe(100);
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-a");
   });
@@ -209,7 +207,7 @@ describe("element authorship", () => {
       captureUpdate: CaptureUpdateAction.NEVER,
     });
 
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0]).not.toHaveProperty("updatedBy");
 
@@ -220,7 +218,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(100);
     // the creation attribution is never overwritten by an edit
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
@@ -297,7 +295,7 @@ describe("element authorship", () => {
     Keyboard.keyPress(KEYS.DELETE);
 
     expect(h.elements[0].isDeleted).toBe(true);
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
@@ -326,7 +324,7 @@ describe("element authorship", () => {
     Keyboard.undo();
 
     expect(h.elements[0].x).toBe(0);
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
     // undoing a stamp writes back the previous (absent) value, which the delta
     // carries as `undefined` - never as `null`, so it serializes away
@@ -338,7 +336,7 @@ describe("element authorship", () => {
     Keyboard.redo();
 
     expect(h.elements[0].x).toBe(100);
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-b");
   });
@@ -411,7 +409,7 @@ describe("element authorship", () => {
     });
 
     expect(h.elements[0].x).toBe(100);
-    expect(h.elements[0]).not.toHaveProperty("createdBy");
+    expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
     expect(h.elements[0].updatedBy).toBe("user-a");
 
@@ -420,7 +418,7 @@ describe("element authorship", () => {
     const snapshottedElement = h.store.snapshot.elements.get(rect.id)!;
 
     expect(snapshottedElement.x).toBe(50);
-    expect(snapshottedElement).not.toHaveProperty("createdBy");
+    expect(snapshottedElement.createdBy).toBeNull();
     expect(snapshottedElement.created).not.toBeNull();
     expect(snapshottedElement.updatedBy).toBe("user-a");
     expect(snapshottedElement.version).toBeLessThan(h.elements[0].version);

@@ -693,7 +693,7 @@ describe("restoreElements", () => {
       null,
     );
 
-    expect(restoredLegacy).not.toHaveProperty("createdBy");
+    expect(restoredLegacy.createdBy).toBeNull();
     expect(restoredLegacy.created).toBeNull();
     expect(restoredLegacy).not.toHaveProperty("updatedBy");
 

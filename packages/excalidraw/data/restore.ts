@@ -411,11 +411,8 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
 };
 
 const restoreElementWithProperties = <
-  T extends Required<
-    Omit<ExcalidrawElement, "customData" | "createdBy" | "updatedBy">
-  > & {
+  T extends Required<Omit<ExcalidrawElement, "customData" | "updatedBy">> & {
     customData?: ExcalidrawElement["customData"];
-    createdBy?: ExcalidrawElement["createdBy"];
     updatedBy?: ExcalidrawElement["updatedBy"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
@@ -476,6 +473,7 @@ const restoreElementWithProperties = <
     updated: element.updated ?? getUpdatedTimestamp(),
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
+    createdBy: element.createdBy ?? null,
     created: element.created ?? null,
   };
 
@@ -497,13 +495,6 @@ const restoreElementWithProperties = <
   // strip legacy props (migrated in previous steps)
   delete ret.strokeSharpness;
   delete ret.boundElementIds;
-
-  // authorship is optional - an absent attribute means unknown authorship,
-  // so we never keep around a nullish value (i.e. `null` coming from files
-  // saved by earlier revisions)
-  if (ret.createdBy == null) {
-    delete ret.createdBy;
-  }
 
   if (ret.updatedBy == null) {
     delete ret.updatedBy;

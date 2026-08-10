@@ -74,6 +74,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "locked"
   | "opacity"
   | "customData"
+  | "createdBy"
   | "created"
 >;
 
@@ -124,16 +125,10 @@ const _newElementBase = <T extends ExcalidrawElement>(
     });
   }
 
-  // authorship is only ever present when known - an absent attribute means
-  // unknown authorship, so we never store (nor spread) `null` / `undefined`
+  // `updatedBy` is only ever present when known
   const authorship: {
-    createdBy?: string;
     updatedBy?: string;
   } = {};
-
-  if (rest.createdBy != null) {
-    authorship.createdBy = rest.createdBy;
-  }
 
   if (rest.updatedBy != null) {
     authorship.updatedBy = rest.updatedBy;
@@ -171,6 +166,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     link,
     locked,
     customData: rest.customData,
+    createdBy: rest.createdBy ?? null,
     created: rest.created ?? getUpdatedTimestamp(),
     ...authorship,
   };

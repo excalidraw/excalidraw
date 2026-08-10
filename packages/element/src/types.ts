@@ -80,10 +80,8 @@ type _ExcalidrawElementBase = Readonly<{
   locked: boolean;
   customData?: Record<string, any>;
   /** id of the user whose editor instance created the element.
-      Absent when the authorship is unknown, i.e. when the element was created
-      before this was introduced or without a current user being set.
-      Never stored as `null`. */
-  createdBy?: string;
+      Always present, `null` when the authorship is unknown. */
+  createdBy: string | null;
   /** epoch (ms) timestamp of the element creation, stamped once the creation
       gets captured as a durable (undoable) change. */
   created: number | null;

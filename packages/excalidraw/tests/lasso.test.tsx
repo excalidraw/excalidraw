@@ -357,6 +357,7 @@ describe("Basic lasso selection tests", () => {
       (e) =>
         ({
           ...e,
+          createdBy: null,
           created: null,
           angle: e.angle as Radians,
           index: null,
@@ -1043,6 +1044,7 @@ describe("Special cases", () => {
         },
       ].map((e) => ({
         ...e,
+        createdBy: null,
         created: null,
         index: null,
         angle: e.angle as Radians,
@@ -1763,6 +1765,7 @@ describe("Special cases", () => {
         },
       ].map((e) => ({
         ...e,
+        createdBy: null,
         created: null,
         index: null,
         angle: e.angle as Radians,

@@ -294,10 +294,7 @@ export class API {
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
       locked: rest.locked ?? false,
-      // nullish values are filtered out by the element constructors, so the
-      // created element doesn't carry the `createdBy` / `updatedBy` attributes
-      // at all (`created` is always present, `null` when unknown)
-      createdBy: rest.createdBy,
+      createdBy: rest.createdBy ?? null,
       created: rest.created ?? getUpdatedTimestamp(),
       updatedBy: rest.updatedBy,
     };
