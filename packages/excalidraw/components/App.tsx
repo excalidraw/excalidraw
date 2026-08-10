@@ -12101,7 +12101,19 @@ class App extends React.Component<AppProps, AppState> {
                 const nextSelectedElementIds = {
                   ..._prevState.selectedElementIds,
                 };
-
+                // eslint-disable-next-line no-console
+                console.log(
+                  "[deselection] pointer-up deselect-group",
+                  {
+                    branch:
+                      "selectedElementIds[hitElement.id] && selectedGroupId",
+                    hitElementId: hitElement.id,
+                    selectedGroupId,
+                    selectedElementIds: Object.keys(
+                      this.state.selectedElementIds,
+                    ),
+                  },
+                );
                 // We want to unselect the groups hitElement is part of
                 // as well as all elements that are part of the groups
                 // hitElement is part of
@@ -12208,60 +12220,113 @@ class App extends React.Component<AppProps, AppState> {
             // but if new frame(s) exist, removal of it's children would be required.
             this.setState((_prevState) => {
               const elements = this.scene.getNonDeletedElements();
+              const elementsMap = this.scene.getNonDeletedElementsMap();
+              const editingGroupIndex = _prevState.editingGroupId
+                ? hitElement.groupIds.indexOf(_prevState.editingGroupId)
+                : -1;
 
-              const targetSelection = selectGroupsForSelectedElements(
-                {
-                  editingGroupId: _prevState.editingGroupId,
-                  selectedElementIds: {
-                    ..._prevState.selectedElementIds,
-                    [hitElement!.id]: true,
-                  },
-                },
-                elements,
-                _prevState,
-                this,
-              );
+              // we can determine if and which group is to be selected
+              // by it's groupIds index relative to _prevState.editingGroupId
+              const targetGroupId =
+                hitElement.groupIds[
+                  editingGroupIndex > -1
+                    ? editingGroupIndex - 1
+                    : hitElement.groupIds.length - 1
+                ];
 
-              const newSelectedFrameIds = new Set(
-                elements
-                  .filter(
-                    (element) =>
-                      isFrameLikeElement(element) &&
-                      targetSelection.selectedElementIds[element.id] &&
-                      !_prevState.selectedElementIds[element.id],
-                  )
-                  .map((frame) => frame.id),
-              );
+              // get the elements of the group, otherwise it's not in a group
+              const targetElements = targetGroupId
+                ? getElementsInGroup<NonDeletedExcalidrawElement>(
+                  elements,
+                  targetGroupId,
+                )
+                : [hitElement];
 
-              // early return, no new frame introduced
-              if (newSelectedFrameIds.size === 0) {
-                return targetSelection;
-              }
+              const nextSelectedElementIds: Record<
+                ExcalidrawElement["id"],
+                true
+              > = {
+                  ..._prevState.selectedElementIds,
+              };
 
-              const targetSelectedElements = this.scene.getSelectedElements({
-                selectedElementIds: targetSelection.selectedElementIds,
-                elements,
+              const newSelectedFrameIds = new Set<ExcalidrawElement["id"]>();
+              targetElements.forEach((element) => {
+                nextSelectedElementIds[element.id] = true;
+
+                if (
+                  isFrameLikeElement(element) &&
+                  !_prevState.selectedElementIds[element.id]
+                ) {
+                  newSelectedFrameIds.add(element.id);
+                }
               });
 
-              const nextSelectedElements = excludeElementsInFramesFromSelection(
-                targetSelectedElements,
-              );
+              const removedFrameChildIds: ExcalidrawElement["id"][] = [];
 
-              // if a new frame was introduced and none of it's children were
-              // previously selected, we return targetSelection
-              if (
-                nextSelectedElements.length === targetSelectedElements.length
-              ) {
-                return targetSelection;
+              // if there are new frames to be added, we need to remove it's children
+              if (newSelectedFrameIds.size > 0) {
+                for (const selectedElementId of Object.keys(
+                  nextSelectedElementIds,
+                )) {
+                  const selectedElement = elementsMap.get(selectedElementId);
+                  if (
+                    selectedElement?.frameId &&
+                    newSelectedFrameIds.has(selectedElement.frameId)
+                  ) {
+                    delete nextSelectedElementIds[selectedElementId];
+                    removedFrameChildIds.push(selectedElementId);
+                  }
+                }
+
+                if (removedFrameChildIds.length === 0) {
+                  // eslint-disable-next-line no-console
+                  console.log(
+                    "[selection] pointer-up guard:frame-reconciliation-noop",
+                    {
+                      phase: "pointerup",
+                      edgeCase:
+                        "new selected frame(s) but no simultaneous selected children",
+                      hitElementId: hitElement.id,
+                      newSelectedFrameIds: [...newSelectedFrameIds],
+                      nextSelectedElementIds: Object.keys(
+                        nextSelectedElementIds,
+                      ),
+                    },
+                  );
+                } else {
+                  // eslint-disable-next-line no-console
+                  console.log(
+                    "[selection] pointer-up conflict:frame-selected-with-children",
+                    {
+                      phase: "pointerup",
+                      edgeCase:
+                        "new selected frame(s) and children are simultaneously selected",
+                      hitElementId: hitElement.id,
+                      newSelectedFrameIds: [...newSelectedFrameIds],
+                      removedFrameChildIds,
+                      nextSelectedElementIds: Object.keys(
+                        nextSelectedElementIds,
+                      ),
+                    },
+                  );
+                }
+              } else {
+                // eslint-disable-next-line no-console
+                console.log(
+                  "[selection] pointer-up guard:no-newly-selected-frames",
+                  {
+                    phase: "pointer-up",
+                    edgeCase:
+                      "the group or standalone element, adds no new frame, frame-child scan skipped",
+                    hitElementId: hitElement.id,
+                    targetGroupId: targetGroupId ?? null,
+                    targetElementIds: targetElements.map(
+                      (element) => element.id,
+                    ),
+                    nextSelectedElementIds: Object.keys(nextSelectedElementIds),
+                  },
+                );
               }
-
-              const nextSelectedElementIds = nextSelectedElements.reduce(
-                (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                  acc[element.id] = true;
-                  return acc;
-                },
-                {},
-              );
 
               return selectGroupsForSelectedElements(
                 {
