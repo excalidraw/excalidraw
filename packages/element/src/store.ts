@@ -73,6 +73,17 @@ export type CaptureUpdateActionType = ValueOf<typeof CaptureUpdateAction>;
 
 type MicroActionsQueue = (() => void)[];
 
+type ElementAuthorship = {
+  createdBy?: string;
+  created?: number;
+  updatedBy: string;
+};
+
+type ElementStamp = {
+  preStampVersion: number;
+  authorship: ElementAuthorship;
+};
+
 /**
  * Store which captures the observed changes and emits them as `StoreIncrement` events.
  */
@@ -86,6 +97,7 @@ export class Store {
 
   private scheduledMacroActions: Set<CaptureUpdateActionType> = new Set();
   private scheduledMicroActions: MicroActionsQueue = [];
+  private stampedElements: Map<string, ElementStamp> = new Map();
 
   private _snapshot = StoreSnapshot.empty();
 
@@ -185,6 +197,10 @@ export class Store {
     elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined,
   ): void {
+    // authorship is stamped at most once per element within a single commit,
+    // while all the packages flushed within it reconcile against those stamps
+    this.stampedElements.clear();
+
     // execute all scheduled micro actions first
     // similar to microTasks, there can be many
     this.flushMicroActions();
@@ -207,6 +223,7 @@ export class Store {
   public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
+    this.stampedElements = new Map();
   }
 
   /**
@@ -403,6 +420,10 @@ export class Store {
    * An element which is already part of the snapshot, but is changing within
    * this very capture, is an "edit candidate" and receives just `updatedBy`
    * (deletion counts as an edit as well).
+   *
+   * Only a durable capture ever authors anything, but every package flushed
+   * within the same commit gets its private clones reconciled against the
+   * stamps applied by the earlier ones, as all the clones were frozen upfront.
    */
   private maybeStampAuthorship(
     params:
@@ -417,10 +438,6 @@ export class Store {
           delta: StoreDelta | undefined;
         },
   ) {
-    if (params.action !== CaptureUpdateAction.IMMEDIATELY) {
-      return;
-    }
-
     if ("delta" in params && params.delta) {
       // history replay re-applies an existing delta, it never authors anything
       return;
@@ -433,6 +450,14 @@ export class Store {
     }
 
     const isMicroAction = "change" in params;
+    const isDurableAction = params.action === CaptureUpdateAction.IMMEDIATELY;
+
+    if (!isDurableAction && !isMicroAction) {
+      // NOTE: a non-durable macro action neither authors anything, nor does it
+      // hold any private clone which would need a reconciliation
+      return;
+    }
+
     const candidates = isMicroAction
       ? Object.values(params.change.elements)
       : params.elements
@@ -443,13 +468,23 @@ export class Store {
     const timestamp = getUpdatedTimestamp();
 
     for (const candidate of candidates) {
+      const liveElement = elements.get(candidate.id);
+      // NOTE: an earlier package of this very commit might have stamped the
+      // element already, leaving this (upfront frozen) clone behind the live
+      // element
+      const previousStamp = this.stampedElements.get(candidate.id);
+
+      if (!isDurableAction) {
+        if (previousStamp && liveElement) {
+          this.reconcileStampedClone(candidate, liveElement, previousStamp);
+        }
+
+        continue;
+      }
+
       const snapshotElement = this.snapshot.elements.get(candidate.id);
 
-      let authorship: {
-        createdBy?: string;
-        created?: number;
-        updatedBy: string;
-      };
+      let authorship: ElementAuthorship;
 
       if (!snapshotElement) {
         // creation candidate - not part of the document yet
@@ -488,8 +523,11 @@ export class Store {
         authorship = { updatedBy: userId };
       }
 
+      if (previousStamp) {
+        authorship = { ...authorship, ...previousStamp.authorship };
+      }
+
       const isCreationCandidate = !snapshotElement;
-      const liveElement = elements.get(candidate.id);
 
       if (!liveElement) {
         // the change might reference an element which is gone from the scene
@@ -497,12 +535,20 @@ export class Store {
         continue;
       }
 
+      if (previousStamp) {
+        if (isMicroAction) {
+          this.reconcileStampedClone(candidate, liveElement, {
+            preStampVersion: previousStamp.preStampVersion,
+            authorship,
+          });
+        }
+
+        continue;
+      }
+
       if (!isCreationCandidate && liveElement.updatedBy === userId) {
-        // steady-state solo editing, reconcile the version only
-        Object.assign(candidate, authorship, {
-          version: liveElement.version,
-          versionNonce: liveElement.versionNonce,
-        });
+        // steady-state solo editing, just ensure authorship
+        Object.assign(candidate, authorship);
         continue;
       }
 
@@ -513,28 +559,43 @@ export class Store {
         isDragging: false,
       });
 
+      this.stampedElements.set(candidate.id, { preStampVersion, authorship });
+
       if (!isMicroAction) {
         // the mutated element is the one inside `params.elements`, hence it
         // makes it into the snapshot on its own
         continue;
       }
 
-      // the micro action operates on a private clone, which has to be patched
-      // manually. Patching the authorship alone would leave the snapshot behind
-      // the live element, so the next durable capture would detect a
-      // version-only change and push a phantom (visually empty) undo entry
-      if (preStampVersion === candidate.version) {
-        // the clone is in sync with the live element, keep it that way
-        Object.assign(candidate, authorship, {
-          version: liveElement.version,
-          versionNonce: liveElement.versionNonce,
-        });
-      } else {
-        // there are interim edits which are not part of this change, so we keep
-        // the clone's version stale on purpose, letting the next capture
-        // legitimately re-detect the element and capture the interim content
-        Object.assign(candidate, authorship);
-      }
+      this.reconcileStampedClone(candidate, liveElement, {
+        preStampVersion,
+        authorship,
+      });
+    }
+  }
+
+  /**
+   * Patches the private clone of a scheduled change with the authorship which
+   * got stamped onto the live element within this very commit.
+   *
+   * Patching the authorship alone would leave the snapshot behind the live
+   * element, so the next durable capture would detect a version-only change and
+   * push a phantom (visually empty) undo entry.
+   */
+  private reconcileStampedClone(
+    clone: ExcalidrawElement,
+    liveElement: ExcalidrawElement,
+    stamp: ElementStamp,
+  ) {
+    if (stamp.preStampVersion === clone.version) {
+      // NOTE: The clone was in sync with the live element, keep it that way
+      Object.assign(clone, stamp.authorship, {
+        version: liveElement.version,
+        versionNonce: liveElement.versionNonce,
+      });
+    } else {
+      // NOTE: There are interim edits which are not part of this change yet
+      Object.assign(clone, stamp.authorship);
     }
   }
 

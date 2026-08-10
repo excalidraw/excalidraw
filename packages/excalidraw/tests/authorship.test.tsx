@@ -432,4 +432,189 @@ describe("element authorship", () => {
     expect(h.store.snapshot.elements.get(rect.id)!.x).toBe(100);
     expect(h.elements[0].version).toBe(stampedVersion);
   });
+
+  it("should keep the interim content capturable when the element is attributed already", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const rect = API.createElement({ type: "rectangle", x: 0 });
+
+    // the element is attributed to the current user already, so that the very
+    // next capture has nothing left to stamp
+    API.updateScene({
+      elements: [rect],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    expect(h.elements[0].updatedBy).toBe("user-a");
+
+    const undoStackLength = API.getUndoStack().length;
+    const editedElement = newElementWith(h.elements[0], { x: 50 });
+
+    // the change (including its element clone) is computed eagerly, here,
+    // while the scheduled action itself gets flushed with the next commit
+    h.store.scheduleMicroAction({
+      action: CaptureUpdateAction.IMMEDIATELY,
+      elements: [editedElement],
+      appState: undefined,
+    });
+
+    act(() => {
+      h.elements = [editedElement];
+      // interim edit, landing before the scheduled action gets flushed
+      h.app.scene.mutateElement(editedElement, { x: 100 });
+    });
+
+    expect(h.elements[0].x).toBe(100);
+
+    // even though nothing got stamped, the clone must not be pulled up to the
+    // live version, otherwise the interim content would never be captured
+    const snapshottedElement = h.store.snapshot.elements.get(rect.id)!;
+
+    expect(snapshottedElement.x).toBe(50);
+    expect(snapshottedElement.version).toBeLessThan(h.elements[0].version);
+
+    act(() => {
+      h.store.scheduleCapture();
+      h.app.scene.triggerUpdate();
+    });
+
+    // interim content captured, as an entry of its own
+    expect(h.store.snapshot.elements.get(rect.id)!.x).toBe(100);
+    expect(API.getUndoStack().length).toBe(undoStackLength + 2);
+  });
+
+  it("should reconcile the clones of all the packages flushed within one commit", async () => {
+    await render(
+      <Excalidraw handleKeyboardGlobally={true} currentUser={currentUser} />,
+    );
+
+    const rect = API.createElement({ type: "rectangle", x: 0, y: 0 });
+
+    API.updateScene({
+      elements: [rect],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    const undoStackLength = API.getUndoStack().length;
+
+    // two durable updates within a single tick - both of them froze their own
+    // element clones upfront, before either of them got flushed
+    act(() => {
+      h.app.updateScene({
+        elements: [newElementWith(h.elements[0], { x: 100 })],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      h.app.updateScene({
+        elements: [newElementWith(h.elements[0], { y: 100 })],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    });
+
+    const stampedElement = h.elements[0];
+    const snapshottedElement = h.store.snapshot.elements.get(rect.id)!;
+
+    expect(stampedElement).toEqual(
+      expect.objectContaining({ x: 100, y: 100, updatedBy: "user-a" }),
+    );
+    // the snapshot has to be in sync with the live element, otherwise the next
+    // capture would detect a version-only change
+    expect(snapshottedElement.updatedBy).toBe("user-a");
+    expect(snapshottedElement.version).toBe(stampedElement.version);
+    expect(snapshottedElement.versionNonce).toBe(stampedElement.versionNonce);
+
+    // neither of the two updates got swallowed by the stamping
+    expect(API.getUndoStack().length).toBe(undoStackLength + 2);
+
+    // a durable capture without any other change must not push an entry
+    act(() => {
+      h.store.scheduleCapture();
+      h.app.scene.triggerUpdate();
+    });
+
+    expect(API.getUndoStack().length).toBe(undoStackLength + 2);
+
+    Keyboard.undo();
+    expect(h.elements[0]).toEqual(
+      expect.objectContaining({ x: 100, y: 0, updatedBy: "user-a" }),
+    );
+
+    Keyboard.undo();
+    expect(h.elements[0]).toEqual(
+      expect.objectContaining({ x: 0, y: 0, updatedBy: "user-a" }),
+    );
+  });
+
+  it("should stamp the clone of a non-durable package flushed within the same commit", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const rect = API.createElement({ type: "rectangle", x: 0, y: 0 });
+
+    API.updateScene({
+      elements: [rect],
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+
+    const undoStackLength = API.getUndoStack().length;
+
+    // a durable and a non-durable update within a single tick - the latter
+    // froze its clone before the former stamped the live element, yet it is
+    // the one which ends up in the snapshot
+    act(() => {
+      h.app.updateScene({
+        elements: [newElementWith(h.elements[0], { x: 100 })],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      h.app.updateScene({
+        elements: [newElementWith(h.elements[0], { y: 100 })],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+    });
+
+    const stampedElement = h.elements[0];
+    const snapshottedElement = h.store.snapshot.elements.get(rect.id)!;
+
+    expect(stampedElement.updatedBy).toBe("user-a");
+    expect(snapshottedElement.updatedBy).toBe("user-a");
+    expect(snapshottedElement.version).toBe(stampedElement.version);
+    expect(snapshottedElement.versionNonce).toBe(stampedElement.versionNonce);
+
+    // a durable capture without any other change must not push a phantom entry
+    act(() => {
+      h.store.scheduleCapture();
+      h.app.scene.triggerUpdate();
+    });
+
+    expect(API.getUndoStack().length).toBe(undoStackLength + 1);
+  });
+
+  it("should keep the creation attribution of an element edited within the same commit", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const rect = API.createElement({ type: "rectangle", x: 0, y: 0 });
+
+    // the element enters the document and gets edited within a single tick,
+    // hence the second package froze its clone before the creation was stamped
+    act(() => {
+      h.app.updateScene({
+        elements: [rect],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+      h.app.updateScene({
+        elements: [newElementWith(h.elements[0], { y: 100 })],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    });
+
+    const stampedElement = h.elements[0];
+    const snapshottedElement = h.store.snapshot.elements.get(rect.id)!;
+
+    expect(stampedElement.createdBy).toBe("user-a");
+    expect(stampedElement.updatedBy).toBe("user-a");
+    // the creation attribution must not be dropped by the second package
+    expect(snapshottedElement.createdBy).toBe("user-a");
+    expect(snapshottedElement.created).toBe(stampedElement.created);
+    expect(snapshottedElement.updatedBy).toBe("user-a");
+    expect(snapshottedElement.version).toBe(stampedElement.version);
+    expect(snapshottedElement.versionNonce).toBe(stampedElement.versionNonce);
+  });
 });
