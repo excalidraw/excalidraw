@@ -75,13 +75,14 @@ export const getLassoSelectedElementIds = (input: {
       !enclosedElements.has(element.id)
     ) {
       const enclosed = enclosureTest(path, element, elementsSegments, mode);
-      if (enclosed) {
-        enclosedElements.add(element.id);
-      } else if (mode === "overlap") {
-        const intersects = intersectionTest(path, element, elementsMap);
-        if (intersects) {
-          intersectedElements.add(element.id);
+      if (mode === "contain") {
+        if (enclosed && !intersectionTest(path, element, elementsMap)) {
+          enclosedElements.add(element.id);
         }
+      } else if (enclosed) {
+        enclosedElements.add(element.id);
+      } else if (intersectionTest(path, element, elementsMap)) {
+        intersectedElements.add(element.id);
       }
     }
   }

@@ -1856,4 +1856,44 @@ describe("Special cases", () => {
     expect(selected.map((el) => el.id)).toContain("rect1");
     expect(selected.map((el) => el.id)).not.toContain("rect2");
   });
+
+  it("does not treat an element as contained when the lasso cuts through it", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      id: "rect",
+      x: 100,
+      y: 100,
+      width: 50,
+      height: 50,
+    });
+
+    h.elements = [rect];
+
+    // EX: lasso surrounding the rectangle, but with a spike poking through its
+    // top edge into its interior: all four corners are inside the lasso polygon,
+    // yet the rectangle is not fully contained
+    const startPoint = pointFrom<GlobalPoint>(80, 80);
+    const lassoPoints = [
+      [0, 0],
+      [40, 0],
+      [40, 45],
+      [50, 45],
+      [50, 0],
+      [90, 0],
+      [90, 90],
+      [0, 90],
+      [0, 0],
+    ] as LocalPoint[];
+
+    act(() => h.app.setState({ boxSelectionMode: "contain" }));
+    updatePath(startPoint, lassoPoints);
+    expect(getSelectedElements(h.elements, h.state).length).toBe(0);
+
+    // NOTE: the same lasso still selects it in 'overlap' mode
+    act(() => h.app.setState({ boxSelectionMode: "overlap" }));
+    updatePath(startPoint, lassoPoints);
+    expect(getSelectedElements(h.elements, h.state).map((el) => el.id)).toEqual(
+      ["rect"],
+    );
+  });
 });
