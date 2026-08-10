@@ -40,12 +40,7 @@ const { h } = window;
 
 beforeEach(async () => {
   localStorage.clear();
-  await render(
-    <Excalidraw
-      handleKeyboardGlobally={true}
-      initialData={{ appState: { boxSelectionMode: "overlap" } }}
-    />,
-  );
+  await render(<Excalidraw handleKeyboardGlobally={true} />);
   h.state.width = 1000;
   h.state.height = 1000;
 });
@@ -373,6 +368,7 @@ describe("Basic lasso selection tests", () => {
     act(() => {
       h.elements = elements;
       h.app.setActiveTool({ type: "lasso" });
+      h.app.setState({ boxSelectionMode: "overlap" });
     });
   });
 
@@ -1055,6 +1051,7 @@ describe("Special cases", () => {
       })) as ExcalidrawElement[];
 
       h.elements = elements;
+      h.app.setState({ boxSelectionMode: "overlap" });
     });
 
     const startPoint = pointFrom<GlobalPoint>(-352, -64);
@@ -1774,6 +1771,7 @@ describe("Special cases", () => {
       })) as ExcalidrawElement[];
 
       h.elements = elements;
+      h.app.setState({ boxSelectionMode: "overlap" });
     });
 
     const startPoint = pointFrom<GlobalPoint>(117, 463);
@@ -1856,44 +1854,169 @@ describe("Special cases", () => {
     expect(selected.map((el) => el.id)).toContain("rect1");
     expect(selected.map((el) => el.id)).not.toContain("rect2");
   });
+});
 
-  it("does not treat an element as contained when the lasso cuts through it", () => {
-    const rect = API.createElement({
-      type: "rectangle",
-      id: "rect",
-      x: 100,
-      y: 100,
-      width: 50,
-      height: 50,
+describe("Box selection mode (through the lasso tool)", () => {
+  const drawLasso = (points: GlobalPoint[]) => {
+    act(() => {
+      h.app.lassoTrail.startPath(points[0][0], points[0][1]);
+      points
+        .slice(1)
+        .forEach(([x, y]) => h.app.lassoTrail.addPointToPath(x, y));
+      h.app.lassoTrail.endPath();
+    });
+  };
+
+  const selectedIds = () => Object.keys(h.state.selectedElementIds).sort();
+
+  describe("lasso enclosing one element and cutting through another", () => {
+    // NOTE: the lasso wraps around `enclosed`, while its right edge (x = 320) cuts
+    // through `crossed` (x = 300 to 350)
+    const LASSO: GlobalPoint[] = (
+      [
+        [80, 80],
+        [320, 80],
+        [320, 220],
+        [80, 220],
+        [80, 80],
+      ] as [number, number][]
+    ).map(([x, y]) => pointFrom<GlobalPoint>(x, y));
+
+    beforeEach(() => {
+      act(() => {
+        h.elements = [
+          API.createElement({
+            type: "rectangle",
+            id: "enclosed",
+            x: 100,
+            y: 100,
+            width: 50,
+            height: 50,
+          }),
+          API.createElement({
+            type: "rectangle",
+            id: "crossed",
+            x: 300,
+            y: 100,
+            width: 50,
+            height: 50,
+          }),
+        ];
+      });
     });
 
-    h.elements = [rect];
+    it("selects only enclosed elements with the default mode ('contain')", () => {
+      expect(h.state.boxSelectionMode).toBe("contain");
 
-    // EX: lasso surrounding the rectangle, but with a spike poking through its
-    // top edge into its interior: all four corners are inside the lasso polygon,
-    // yet the rectangle is not fully contained
-    const startPoint = pointFrom<GlobalPoint>(80, 80);
-    const lassoPoints = [
-      [0, 0],
-      [40, 0],
-      [40, 45],
-      [50, 45],
-      [50, 0],
-      [90, 0],
-      [90, 90],
-      [0, 90],
-      [0, 0],
-    ] as LocalPoint[];
+      drawLasso(LASSO);
 
-    act(() => h.app.setState({ boxSelectionMode: "contain" }));
-    updatePath(startPoint, lassoPoints);
-    expect(getSelectedElements(h.elements, h.state).length).toBe(0);
+      expect(selectedIds()).toEqual(["enclosed"]);
+    });
 
-    // NOTE: the same lasso still selects it in 'overlap' mode
+    it("selects intersected elements as well in 'overlap' mode", () => {
+      act(() => h.app.setState({ boxSelectionMode: "overlap" }));
+
+      drawLasso(LASSO);
+
+      expect(selectedIds()).toEqual(["crossed", "enclosed"]);
+    });
+  });
+
+  it("does not treat an element as contained when the lasso cuts through it", () => {
+    act(() => {
+      h.elements = [
+        API.createElement({
+          type: "rectangle",
+          id: "rect",
+          x: 100,
+          y: 100,
+          width: 50,
+          height: 50,
+        }),
+      ];
+    });
+
+    // NOTE: the lasso surrounding the rectangle, but with a spike poking through
+    // its top edge into its interior: all four corners are inside the lasso
+    // polygon, yet the rectangle is not fully contained
+    const LASSO: GlobalPoint[] = (
+      [
+        [80, 80],
+        [120, 80],
+        [120, 125],
+        [130, 125],
+        [130, 80],
+        [170, 80],
+        [170, 170],
+        [80, 170],
+        [80, 80],
+      ] as [number, number][]
+    ).map(([x, y]) => pointFrom<GlobalPoint>(x, y));
+
+    drawLasso(LASSO);
+
+    expect(h.state.boxSelectionMode).toBe("contain");
+    expect(selectedIds()).toEqual([]);
+
+    // NOTE: the very same lasso still selects it in "overlap" mode
     act(() => h.app.setState({ boxSelectionMode: "overlap" }));
-    updatePath(startPoint, lassoPoints);
-    expect(getSelectedElements(h.elements, h.state).map((el) => el.id)).toEqual(
-      ["rect"],
-    );
+
+    drawLasso(LASSO);
+
+    expect(selectedIds()).toEqual(["rect"]);
+  });
+
+  it("contains elements whose outline lies exactly on the lasso path", () => {
+    act(() => {
+      h.elements = [
+        API.createElement({
+          type: "rectangle",
+          id: "rect",
+          x: 100,
+          y: 100,
+          width: 50,
+          height: 50,
+        }),
+      ];
+    });
+
+    // NOTE: a lasso running exactly along one edge of the rectangle, from each
+    // of the four sides in turn. Which side it is may not decide the outcome.
+    const LASSOS = {
+      right: [
+        [80, 80],
+        [150, 80],
+        [150, 200],
+        [80, 200],
+      ],
+      left: [
+        [100, 80],
+        [200, 80],
+        [200, 200],
+        [100, 200],
+      ],
+      top: [
+        [80, 100],
+        [200, 100],
+        [200, 200],
+        [80, 200],
+      ],
+      bottom: [
+        [80, 50],
+        [200, 50],
+        [200, 150],
+        [80, 150],
+      ],
+    } as Record<string, [number, number][]>;
+
+    expect(h.state.boxSelectionMode).toBe("contain");
+
+    for (const [side, lasso] of Object.entries(LASSOS)) {
+      drawLasso(
+        [...lasso, lasso[0]].map(([x, y]) => pointFrom<GlobalPoint>(x, y)),
+      );
+
+      expect([side, selectedIds()]).toEqual([side, ["rect"]]);
+    }
   });
 });

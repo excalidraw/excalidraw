@@ -3,6 +3,7 @@ import { simplify } from "points-on-curve";
 import {
   polygonFromPoints,
   lineSegment,
+  pointOnLineSegment,
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
@@ -16,7 +17,11 @@ import {
   intersectElementWithLineSegment,
 } from "@excalidraw/element";
 
-import type { ElementsSegmentsMap, GlobalPoint } from "@excalidraw/math/types";
+import type {
+  ElementsSegmentsMap,
+  GlobalPoint,
+  Polygon,
+} from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { BoxSelectionMode } from "../types";
@@ -111,12 +116,22 @@ const enclosureTest = (
 
   const quantifier = mode === "contain" ? "every" : "some";
 
-  return segments[quantifier]((segment) =>
-    segment[quantifier]((point) =>
-      polygonIncludesPointNonZero(point, lassoPolygon),
-    ),
-  );
+  const includesPoint = (point: GlobalPoint) =>
+    polygonIncludesPointNonZero(point, lassoPolygon) ||
+    (mode === "contain" && isPointOnPolygon(point, lassoPolygon));
+
+  return segments[quantifier]((segment) => segment[quantifier](includesPoint));
 };
+
+const isPointOnPolygon = (
+  point: GlobalPoint,
+  polygon: Polygon<GlobalPoint>,
+): boolean =>
+  polygon.some(
+    (vertex, index) =>
+      index > 0 &&
+      pointOnLineSegment(point, lineSegment(polygon[index - 1], vertex)),
+  );
 
 const intersectionTest = (
   lassoPath: GlobalPoint[],
