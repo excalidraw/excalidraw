@@ -1966,6 +1966,203 @@ describe("Box selection mode (through the lasso tool)", () => {
     expect(selectedIds()).toEqual(["rect"]);
   });
 
+  it("does not select a container whose label alone is enclosed", () => {
+    act(() => {
+      h.elements = [
+        API.createElement({
+          type: "rectangle",
+          id: "container",
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 100,
+          boundElements: [{ type: "text", id: "label" }],
+        }),
+        API.createElement({
+          type: "text",
+          id: "label",
+          x: 140,
+          y: 130,
+          width: 80,
+          height: 25,
+          containerId: "container",
+        }),
+      ];
+    });
+
+    // NOTE: the lasso wraps around the label only, staying well inside the
+    // container it is bound to
+    const LASSO: GlobalPoint[] = (
+      [
+        [130, 120],
+        [230, 120],
+        [230, 165],
+        [130, 165],
+        [130, 120],
+      ] as [number, number][]
+    ).map(([x, y]) => pointFrom<GlobalPoint>(x, y));
+
+    expect(h.state.boxSelectionMode).toBe("contain");
+
+    drawLasso(LASSO);
+
+    expect(selectedIds()).toEqual([]);
+
+    // NOTE: reaching the label is enough to select the container in "overlap"
+    act(() => h.app.setState({ boxSelectionMode: "overlap" }));
+
+    drawLasso(LASSO);
+
+    expect(selectedIds()).toEqual(["container"]);
+  });
+
+  describe("lasso enclosing a single member of a group", () => {
+    const LASSO: GlobalPoint[] = (
+      [
+        [80, 80],
+        [200, 80],
+        [200, 200],
+        [80, 200],
+        [80, 80],
+      ] as [number, number][]
+    ).map(([x, y]) => pointFrom<GlobalPoint>(x, y));
+
+    beforeEach(() => {
+      act(() => {
+        h.elements = [
+          API.createElement({
+            type: "rectangle",
+            id: "member1",
+            x: 100,
+            y: 100,
+            width: 50,
+            height: 50,
+            groupIds: ["group"],
+          }),
+          API.createElement({
+            type: "rectangle",
+            id: "member2",
+            x: 300,
+            y: 100,
+            width: 50,
+            height: 50,
+            groupIds: ["group"],
+          }),
+        ];
+      });
+    });
+
+    it("selects nothing in 'contain' mode, as the group isn't complete", () => {
+      expect(h.state.boxSelectionMode).toBe("contain");
+
+      drawLasso(LASSO);
+
+      expect(selectedIds()).toEqual([]);
+    });
+
+    it("selects the whole group in 'overlap' mode", () => {
+      act(() => h.app.setState({ boxSelectionMode: "overlap" }));
+
+      drawLasso(LASSO);
+
+      expect(selectedIds()).toEqual(["member1", "member2"]);
+    });
+
+    it("selects the whole group once all its members are enclosed", () => {
+      expect(h.state.boxSelectionMode).toBe("contain");
+
+      drawLasso(
+        (
+          [
+            [80, 80],
+            [400, 80],
+            [400, 200],
+            [80, 200],
+            [80, 80],
+          ] as [number, number][]
+        ).map(([x, y]) => pointFrom<GlobalPoint>(x, y)),
+      );
+
+      expect(selectedIds()).toEqual(["member1", "member2"]);
+    });
+  });
+
+  it("contains an element whose frame-clipped part is enclosed", () => {
+    act(() => {
+      h.elements = [
+        API.createElement({
+          type: "frame",
+          id: "frame",
+          x: 0,
+          y: 0,
+          width: 200,
+          height: 200,
+        }),
+        // NOTE: overflows the frame to the right, so only the x = 150 to 200
+        // part of it is visible
+        API.createElement({
+          type: "rectangle",
+          id: "overflowing",
+          x: 150,
+          y: 50,
+          width: 100,
+          height: 50,
+          frameId: "frame",
+        }),
+      ];
+    });
+
+    // NOTE: wraps the visible part of the rectangle, while its right edge cuts
+    // through the clipped-away part of it
+    const LASSO: GlobalPoint[] = (
+      [
+        [140, 40],
+        [210, 40],
+        [210, 110],
+        [140, 110],
+        [140, 40],
+      ] as [number, number][]
+    ).map(([x, y]) => pointFrom<GlobalPoint>(x, y));
+
+    expect(h.state.boxSelectionMode).toBe("contain");
+
+    drawLasso(LASSO);
+
+    expect(selectedIds()).toEqual(["overflowing"]);
+  });
+
+  it("contains elements without an outline, such as a freedraw dot", () => {
+    act(() => {
+      h.elements = [
+        API.createElement({
+          type: "freedraw",
+          id: "dot",
+          x: 100,
+          y: 100,
+          width: 0,
+          height: 0,
+          points: [pointFrom<LocalPoint>(0, 0)],
+        }),
+      ];
+    });
+
+    const LASSO: GlobalPoint[] = (
+      [
+        [80, 80],
+        [120, 80],
+        [120, 120],
+        [80, 120],
+        [80, 80],
+      ] as [number, number][]
+    ).map(([x, y]) => pointFrom<GlobalPoint>(x, y));
+
+    expect(h.state.boxSelectionMode).toBe("contain");
+
+    drawLasso(LASSO);
+
+    expect(selectedIds()).toEqual(["dot"]);
+  });
+
   it("contains elements whose outline lies exactly on the lasso path", () => {
     act(() => {
       h.elements = [
