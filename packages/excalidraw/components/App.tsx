@@ -12101,19 +12101,7 @@ class App extends React.Component<AppProps, AppState> {
                 const nextSelectedElementIds = {
                   ..._prevState.selectedElementIds,
                 };
-                // eslint-disable-next-line no-console
-                console.log(
-                  "[deselection] pointer-up deselect-group",
-                  {
-                    branch:
-                      "selectedElementIds[hitElement.id] && selectedGroupId",
-                    hitElementId: hitElement.id,
-                    selectedGroupId,
-                    selectedElementIds: Object.keys(
-                      this.state.selectedElementIds,
-                    ),
-                  },
-                );
+
                 // We want to unselect the groups hitElement is part of
                 // as well as all elements that are part of the groups
                 // hitElement is part of
@@ -12237,16 +12225,16 @@ class App extends React.Component<AppProps, AppState> {
               // get the elements of the group, otherwise it's not in a group
               const targetElements = targetGroupId
                 ? getElementsInGroup<NonDeletedExcalidrawElement>(
-                  elements,
-                  targetGroupId,
-                )
+                    elements,
+                    targetGroupId,
+                  )
                 : [hitElement];
 
               const nextSelectedElementIds: Record<
                 ExcalidrawElement["id"],
                 true
               > = {
-                  ..._prevState.selectedElementIds,
+                ..._prevState.selectedElementIds,
               };
 
               const newSelectedFrameIds = new Set<ExcalidrawElement["id"]>();
@@ -12261,82 +12249,32 @@ class App extends React.Component<AppProps, AppState> {
                 }
               });
 
-              const removedFrameChildIds: ExcalidrawElement["id"][] = [];
-
               // if there are new frames to be added, we need to remove it's children
               if (newSelectedFrameIds.size > 0) {
-                for (const selectedElementId of Object.keys(
-                  nextSelectedElementIds,
-                )) {
-                  const selectedElement = elementsMap.get(selectedElementId);
-                  if (
-                    selectedElement?.frameId &&
-                    newSelectedFrameIds.has(selectedElement.frameId)
-                  ) {
-                    delete nextSelectedElementIds[selectedElementId];
-                    removedFrameChildIds.push(selectedElementId);
-                  }
-                }
-
-                if (removedFrameChildIds.length === 0) {
-                  // eslint-disable-next-line no-console
-                  console.log(
-                    "[selection] pointer-up guard:frame-reconciliation-noop",
-                    {
-                      phase: "pointerup",
-                      edgeCase:
-                        "new selected frame(s) but no simultaneous selected children",
-                      hitElementId: hitElement.id,
-                      newSelectedFrameIds: [...newSelectedFrameIds],
-                      nextSelectedElementIds: Object.keys(
-                        nextSelectedElementIds,
-                      ),
-                    },
-                  );
-                } else {
-                  // eslint-disable-next-line no-console
-                  console.log(
-                    "[selection] pointer-up conflict:frame-selected-with-children",
-                    {
-                      phase: "pointerup",
-                      edgeCase:
-                        "new selected frame(s) and children are simultaneously selected",
-                      hitElementId: hitElement.id,
-                      newSelectedFrameIds: [...newSelectedFrameIds],
-                      removedFrameChildIds,
-                      nextSelectedElementIds: Object.keys(
-                        nextSelectedElementIds,
-                      ),
-                    },
-                  );
-                }
-              } else {
-                // eslint-disable-next-line no-console
-                console.log(
-                  "[selection] pointer-up guard:no-newly-selected-frames",
-                  {
-                    phase: "pointer-up",
-                    edgeCase:
-                      "the group or standalone element, adds no new frame, frame-child scan skipped",
-                    hitElementId: hitElement.id,
-                    targetGroupId: targetGroupId ?? null,
-                    targetElementIds: targetElements.map(
-                      (element) => element.id,
-                    ),
-                    nextSelectedElementIds: Object.keys(nextSelectedElementIds),
+                Object.keys(nextSelectedElementIds).forEach(
+                  (selectedElementId) => {
+                    const selectedElement = elementsMap.get(selectedElementId);
+                    if (
+                      selectedElement?.frameId &&
+                      newSelectedFrameIds.has(selectedElement.frameId)
+                    ) {
+                      delete nextSelectedElementIds[selectedElementId];
+                    }
                   },
                 );
               }
 
-              return selectGroupsForSelectedElements(
-                {
-                  editingGroupId: _prevState.editingGroupId,
-                  selectedElementIds: nextSelectedElementIds,
-                },
-                elements,
-                _prevState,
-                this,
-              );
+              return {
+                ...selectGroupsForSelectedElements(
+                  {
+                    editingGroupId: _prevState.editingGroupId,
+                    selectedElementIds: nextSelectedElementIds,
+                  },
+                  elements,
+                  _prevState,
+                  this,
+                ),
+              };
             });
           }
         } else {
