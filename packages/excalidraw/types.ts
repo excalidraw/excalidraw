@@ -46,6 +46,7 @@ import type {
 } from "@excalidraw/common/utility-types";
 
 import type {
+  AttributionType,
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
@@ -1009,6 +1010,7 @@ export type SceneData = {
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
   captureUpdate?: CaptureUpdateActionType;
+  attribution?: AttributionType;
 };
 
 export type ExportOpts = {

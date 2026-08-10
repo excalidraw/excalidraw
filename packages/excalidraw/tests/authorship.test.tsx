@@ -3,6 +3,7 @@ import React from "react";
 import { KEYS } from "@excalidraw/common";
 import {
   newElementWith,
+  Attribution,
   ChangeOrigin,
   StoreChange,
   StoreDelta,
@@ -746,5 +747,93 @@ describe("element authorship", () => {
 
     expect(h.elements[0].createdBy).toBe("agent-service");
     expect(h.elements[0].updatedBy).toBeNull();
+  });
+
+  it("should not credit an explicitly unattributed, immediately undoable insertion", async () => {
+    await render(
+      <Excalidraw handleKeyboardGlobally={true} currentUser={currentUser} />,
+    );
+
+    const rect = API.createElement({ type: "rectangle", x: 0 });
+
+    // i.e. a host inserting AI / import / system content as undoable
+    API.updateScene({
+      elements: [rect],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      attribution: Attribution.NONE,
+    });
+
+    // undoable, yet author-unknown
+    expect(API.getUndoStack().length).toBe(1);
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBeNull();
+
+    // a subsequent local edit is credited as usual, while the creation
+    // attribution stays unknown for good
+    API.updateScene({
+      elements: [newElementWith(h.elements[0], { x: 100 })],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    expect(h.elements[0].x).toBe(100);
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBe("user-a");
+  });
+
+  it("should keep an explicitly unattributed insertion unattributed when folded into the next capture", async () => {
+    await render(
+      <Excalidraw handleKeyboardGlobally={true} currentUser={currentUser} />,
+    );
+
+    const rect = API.createElement({ type: "rectangle", x: 0 });
+
+    // default capture ("eventually") - the content folds into whatever
+    // durable capture comes next
+    API.updateScene({
+      elements: [rect],
+      attribution: Attribution.NONE,
+    });
+
+    expect(h.elements[0].createdBy).toBeNull();
+
+    // the user's next durable action folds the insertion in
+    UI.createElement("rectangle", { x: 100, y: 100 });
+
+    expect(h.elements.length).toBe(2);
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBeNull();
+    expect(h.elements[1].createdBy).toBe("user-a");
+    expect(h.elements[1].updatedBy).toBe("user-a");
+  });
+
+  it("should not credit an explicitly unattributed, immediately undoable edit", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const rect = API.createElement({ type: "rectangle", x: 0 });
+
+    API.updateScene({
+      elements: [rect],
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+
+    // i.e. a host applying a programmatic, yet undoable edit
+    API.updateScene({
+      elements: [newElementWith(h.elements[0], { x: 100 })],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      attribution: Attribution.NONE,
+    });
+
+    expect(API.getUndoStack().length).toBe(1);
+    expect(h.elements[0].x).toBe(100);
+    expect(h.elements[0].updatedBy).toBeNull();
+
+    // a subsequent local edit is credited as usual
+    API.updateScene({
+      elements: [newElementWith(h.elements[0], { x: 200 })],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    expect(h.elements[0].x).toBe(200);
+    expect(h.elements[0].updatedBy).toBe("user-a");
   });
 });

@@ -65,6 +65,9 @@ export const CaptureUpdateAction = {
    * or internally by the editor.
    *
    * These updates will _eventually_ make it to the local undo / redo stacks.
+   *
+   * NOTE: as such updates fold into a future durable capture, the same
+   * authorship stamping applies to them at that point - see `Attribution`.
    */
   EVENTUALLY: "EVENTUALLY",
 } as const;
@@ -96,6 +99,16 @@ export const ChangeOrigin = {
 
 export type ChangeOriginType = ValueOf<typeof ChangeOrigin>;
 
+/**
+ * Declares who gets credited for an update passed to `updateScene`.
+ */
+export const Attribution = {
+  CURRENT_USER: "currentUser",
+  NONE: "none",
+} as const;
+
+export type AttributionType = ValueOf<typeof Attribution>;
+
 type MicroActionsQueue = (() => void)[];
 
 type ElementAuthorship = {
@@ -123,6 +136,7 @@ export class Store {
   private scheduledMacroActions: Set<CaptureUpdateActionType> = new Set();
   private scheduledMicroActions: MicroActionsQueue = [];
   private stampedElements: Map<string, ElementStamp> = new Map();
+  private unattributedElements: Set<string> = new Set();
 
   private _snapshot = StoreSnapshot.empty();
 
@@ -150,6 +164,19 @@ export class Store {
   }
 
   /**
+   * Marks the passed elements as explicitly unattributed
+   * (`Attribution.NONE`), so that no durable capture credits their creation
+   * to the local user.
+   */
+  public markUnattributed(elements: readonly { id: string }[]) {
+    for (const element of elements) {
+      if (!this.snapshot.elements.has(element.id)) {
+        this.unattributedElements.add(element.id);
+      }
+    }
+  }
+
+  /**
    * Schedule special "micro" actions, to-be executed before the next commit, before it executes a scheduled "macro" action.
    */
   public scheduleMicroAction(
@@ -158,6 +185,7 @@ export class Store {
           action: CaptureUpdateActionType;
           elements: readonly ExcalidrawElement[] | undefined;
           appState: AppState | ObservedAppState | undefined;
+          attribution?: AttributionType;
         }
       | {
           action: typeof CaptureUpdateAction.IMMEDIATELY;
@@ -204,6 +232,10 @@ export class Store {
 
     const delta = "delta" in params ? params.delta : undefined;
     const origin = "origin" in params ? params.origin : ChangeOrigin.COMMIT;
+    const attribution =
+      "attribution" in params && params.attribution
+        ? params.attribution
+        : Attribution.CURRENT_USER;
 
     this.scheduledMicroActions.push(() =>
       this.processAction({
@@ -211,6 +243,7 @@ export class Store {
         change,
         delta,
         origin,
+        attribution,
       }),
     );
   }
@@ -252,6 +285,7 @@ export class Store {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
     this.stampedElements = new Map();
+    this.unattributedElements = new Set();
   }
 
   /**
@@ -372,6 +406,7 @@ export class Store {
           change: StoreChange;
           delta: StoreDelta | undefined;
           origin: ChangeOriginType;
+          attribution: AttributionType;
         },
   ) {
     const { action } = params;
@@ -466,6 +501,7 @@ export class Store {
           change: StoreChange;
           delta: StoreDelta | undefined;
           origin: ChangeOriginType;
+          attribution: AttributionType;
         },
   ) {
     if ("origin" in params && params.origin === ChangeOrigin.HISTORY) {
@@ -490,6 +526,10 @@ export class Store {
       return;
     }
 
+    const isAuthoringAction =
+      isDurableAction &&
+      !("attribution" in params && params.attribution === Attribution.NONE);
+
     const candidates = isMicroAction
       ? Object.values(params.change.elements)
       : params.elements
@@ -506,7 +546,7 @@ export class Store {
       // element
       const previousStamp = this.stampedElements.get(candidate.id);
 
-      if (!isDurableAction) {
+      if (!isAuthoringAction) {
         if (previousStamp && liveElement) {
           this.reconcileStampedClone(candidate, liveElement, previousStamp);
         }
@@ -525,12 +565,22 @@ export class Store {
           continue;
         }
 
+        if (this.unattributedElements.has(candidate.id)) {
+          // the content entered through an explicitly unattributed update -
+          // keep it that way, even when folded into this durable capture
+          continue;
+        }
+
         authorship = {
           createdBy: userId,
           created: timestamp,
           updatedBy: userId,
         };
       } else {
+        // the unattributed mark settles once the element became part of the
+        // document - from now on the element is subject to `updatedBy`
+        this.unattributedElements.delete(candidate.id);
+
         // edit candidate - already part of the document, hence we only ever
         // re-attribute the last editor, never the original author
         if (!isMicroAction) {
