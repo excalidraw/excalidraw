@@ -41,7 +41,7 @@ export const getLassoSelectedElementIds = (input: {
     intersectedElements,
     enclosedElements,
     simplifyDistance,
-    mode = "overlap",
+    mode = "contain",
   } = input;
   // simplify the path to reduce the number of points
   let path: GlobalPoint[] = lassoPath;
