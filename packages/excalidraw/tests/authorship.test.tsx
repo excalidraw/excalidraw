@@ -1,6 +1,6 @@
 import React from "react";
 
-import { KEYS } from "@excalidraw/common";
+import { EXPORT_DATA_TYPES, KEYS, MIME_TYPES } from "@excalidraw/common";
 import {
   newElementWith,
   Attribution,
@@ -12,11 +12,16 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import "@excalidraw/utils/test-utils";
 
+import { actionLoadScene } from "../actions";
+import { encodePngMetadata } from "../data/image";
+import { serializeAsJSON } from "../data/json";
 import { Excalidraw } from "../index";
+
+import * as filesystemModule from "../data/filesystem";
 
 import { API } from "./helpers/api";
 import { Keyboard, UI } from "./helpers/ui";
-import { act, render, unmountComponent } from "./test-utils";
+import { act, render, unmountComponent, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -835,5 +840,158 @@ describe("element authorship", () => {
 
     expect(h.elements[0].x).toBe(200);
     expect(h.elements[0].updatedBy).toBe("user-a");
+  });
+
+  it("should not credit an explicitly unattributed action result", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const rect = API.createElement({ type: "rectangle", x: 0 });
+
+    // i.e. an action loading content authored elsewhere
+    act(() => {
+      h.app.syncActionResult({
+        elements: [rect],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        attribution: Attribution.NONE,
+      });
+    });
+
+    expect(API.getUndoStack().length).toBe(1);
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBeNull();
+
+    // the very same result without the attribution opt-out is credited
+    const other = API.createElement({ type: "rectangle", x: 100 });
+
+    act(() => {
+      h.app.syncActionResult({
+        elements: [...h.elements, other],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    });
+
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[1].createdBy).toBe("user-a");
+  });
+
+  it("should not credit an explicitly unattributed action result for an edit", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const rect = API.createElement({ type: "rectangle", x: 0 });
+
+    API.updateScene({
+      elements: [rect],
+      captureUpdate: CaptureUpdateAction.NEVER,
+    });
+
+    act(() => {
+      h.app.syncActionResult({
+        elements: [newElementWith(h.elements[0], { x: 100 })],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        attribution: Attribution.NONE,
+      });
+    });
+
+    expect(h.elements[0].x).toBe(100);
+    expect(h.elements[0].updatedBy).toBeNull();
+  });
+
+  it("should not credit the local user for a dropped scene file", async () => {
+    await render(
+      <Excalidraw handleKeyboardGlobally={true} currentUser={currentUser} />,
+    );
+
+    UI.createElement("rectangle", { x: 10, y: 10 });
+
+    const undoStackLength = API.getUndoStack().length;
+
+    await API.drop([
+      {
+        kind: "file",
+        file: new Blob(
+          [
+            JSON.stringify({
+              type: EXPORT_DATA_TYPES.excalidraw,
+              elements: [API.createElement({ type: "rectangle", id: "A" })],
+              appState: {},
+            }),
+          ],
+          { type: MIME_TYPES.json },
+        ),
+      },
+    ]);
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+    });
+
+    // the file was authored elsewhere, the local user merely opened it
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBeNull();
+
+    // ...yet the import is undoable
+    expect(API.getUndoStack().length).toBe(undoStackLength + 1);
+
+    Keyboard.undo();
+
+    expect(h.elements).toEqual([
+      expect.objectContaining({ createdBy: "user-a", isDeleted: false }),
+      expect.objectContaining({ id: "A", isDeleted: true }),
+    ]);
+  });
+
+  it("should not credit the local user for a scene opened through the file picker", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const fileOpenSpy = vi.spyOn(filesystemModule, "fileOpen");
+    fileOpenSpy.mockImplementation(
+      async () =>
+        new File(
+          [
+            JSON.stringify({
+              type: EXPORT_DATA_TYPES.excalidraw,
+              elements: [API.createElement({ type: "rectangle", id: "A" })],
+              appState: {},
+            }),
+          ],
+          "scene.excalidraw",
+          { type: MIME_TYPES.excalidraw },
+        ) as any,
+    );
+
+    API.executeAction(actionLoadScene);
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+    });
+
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBeNull();
+    expect(API.getUndoStack().length).toBe(1);
+
+    fileOpenSpy.mockRestore();
+  });
+
+  it("should not credit the local user for a scene embedded in a dropped png", async () => {
+    await render(<Excalidraw currentUser={currentUser} />);
+
+    const pngBlob = await encodePngMetadata({
+      blob: await API.loadFile("./fixtures/smiley.png"),
+      metadata: serializeAsJSON(
+        [API.createElement({ type: "rectangle", id: "A" })],
+        h.state,
+        {},
+        "local",
+      ),
+    });
+
+    await API.drop([{ kind: "file", file: pngBlob }]);
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([expect.objectContaining({ id: "A" })]);
+    });
+
+    expect(h.elements[0].createdBy).toBeNull();
+    expect(h.elements[0].updatedBy).toBeNull();
   });
 });

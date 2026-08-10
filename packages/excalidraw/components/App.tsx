@@ -3022,7 +3022,19 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.store.scheduleAction(actionResult.captureUpdate);
+    if (
+      actionResult.elements &&
+      actionResult.attribution === Attribution.NONE
+    ) {
+      // mark before the capture, so that the exemption also survives the
+      // folding of this update into a later durable capture
+      this.store.markUnattributed(actionResult.elements);
+    }
+
+    this.store.scheduleAction(
+      actionResult.captureUpdate,
+      actionResult.attribution,
+    );
 
     let didUpdate = false;
 
@@ -12948,6 +12960,7 @@ class App extends React.Component<AppProps, AppState> {
             },
             replaceFiles: true,
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+            attribution: Attribution.NONE,
           });
           return;
         } catch (error: any) {
@@ -13103,6 +13116,7 @@ class App extends React.Component<AppProps, AppState> {
           },
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          attribution: Attribution.NONE,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library

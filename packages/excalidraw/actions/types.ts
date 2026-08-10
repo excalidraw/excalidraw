@@ -3,7 +3,10 @@ import type {
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { CaptureUpdateActionType } from "@excalidraw/element";
+import type {
+  AttributionType,
+  CaptureUpdateActionType,
+} from "@excalidraw/element";
 
 import type {
   AppClassProperties,
@@ -28,6 +31,7 @@ export type ActionResult =
       appState?: Partial<AppState> | null;
       files?: BinaryFiles | null;
       captureUpdate: CaptureUpdateActionType;
+      attribution?: AttributionType;
       replaceFiles?: boolean;
     }
   | false;

@@ -1,6 +1,6 @@
 import { KEYS, THEME } from "@excalidraw/common";
 
-import { CaptureUpdateAction } from "@excalidraw/element";
+import { Attribution, CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
@@ -411,6 +411,7 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        attribution: Attribution.NONE,
       };
     } catch (error: any) {
       if (error?.name === "AbortError") {

@@ -100,11 +100,12 @@ export const ChangeOrigin = {
 export type ChangeOriginType = ValueOf<typeof ChangeOrigin>;
 
 /**
- * Declares who gets credited for an update passed to `updateScene`.
+ * Declares who gets credited for an update, whether it comes in through
+ * `updateScene` (micro action) or through an action result (macro action).
  */
 export const Attribution = {
   CURRENT_USER: "currentUser",
-  NONE: "none",
+  NONE: "none", // Undoable and not from currentUser
 } as const;
 
 export type AttributionType = ValueOf<typeof Attribution>;
@@ -134,6 +135,7 @@ export class Store {
   >();
 
   private scheduledMacroActions: Set<CaptureUpdateActionType> = new Set();
+  private scheduledMacroAttribution: AttributionType = Attribution.CURRENT_USER;
   private scheduledMicroActions: MicroActionsQueue = [];
   private stampedElements: Map<string, ElementStamp> = new Map();
   private unattributedElements: Set<string> = new Set();
@@ -150,8 +152,20 @@ export class Store {
 
   constructor(private readonly app: App) {}
 
-  public scheduleAction(action: CaptureUpdateActionType) {
+  public scheduleAction(
+    action: CaptureUpdateActionType,
+    attribution: AttributionType = Attribution.CURRENT_USER,
+  ) {
     this.scheduledMacroActions.add(action);
+
+    if (attribution === Attribution.NONE) {
+      // there is only one macro action per commit, so an explicitly
+      // unattributed update makes the whole of it unattributed - crediting
+      // nobody is the safer of the two failure modes, as the alternative
+      // would credit the local user for the loaded / imported content
+      this.scheduledMacroAttribution = Attribution.NONE;
+    }
+
     this.satisfiesScheduledActionsInvariant();
   }
 
@@ -270,11 +284,17 @@ export class Store {
       // execute a single scheduled "macro" function
       // similar to macro tasks, there can be only one within a single commit (loop)
       const action = this.getScheduledMacroAction();
-      this.processAction({ action, elements, appState });
+      this.processAction({
+        action,
+        elements,
+        appState,
+        attribution: this.scheduledMacroAttribution,
+      });
     } finally {
       this.satisfiesScheduledActionsInvariant();
       // defensively reset all scheduled "macro" actions, possibly cleans up other runtime garbage
       this.scheduledMacroActions = new Set();
+      this.scheduledMacroAttribution = Attribution.CURRENT_USER;
     }
   }
 
@@ -284,6 +304,7 @@ export class Store {
   public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
+    this.scheduledMacroAttribution = Attribution.CURRENT_USER;
     this.stampedElements = new Map();
     this.unattributedElements = new Set();
   }
@@ -400,6 +421,7 @@ export class Store {
           action: CaptureUpdateActionType;
           elements: SceneElementsMap | undefined;
           appState: AppState | ObservedAppState | undefined;
+          attribution: AttributionType;
         }
       | {
           action: CaptureUpdateActionType;
@@ -477,9 +499,11 @@ export class Store {
    * of this editor instance.
    *
    * An element which is not yet part of the snapshot at the time of a durable
-   * capture could have entered the scene only locally, as remote or loaded
-   * elements always enter the snapshot through `CaptureUpdateAction.NEVER`.
-   * Such an element is a "creation candidate" and receives all three fields.
+   * capture could have entered the scene only locally, as remote elements
+   * always enter the snapshot through `CaptureUpdateAction.NEVER` and loaded
+   * content (file open / drop / import) enters through an update explicitly
+   * marked as `Attribution.NONE`. Such an element is a "creation candidate"
+   * and receives all three fields.
    *
    * An element which is already part of the snapshot, but is changing within
    * this very capture, is an "edit candidate" and receives just `updatedBy`
@@ -495,6 +519,7 @@ export class Store {
           action: CaptureUpdateActionType;
           elements: SceneElementsMap | undefined;
           appState: AppState | ObservedAppState | undefined;
+          attribution: AttributionType;
         }
       | {
           action: CaptureUpdateActionType;
@@ -519,16 +544,15 @@ export class Store {
 
     const isMicroAction = "change" in params;
     const isDurableAction = params.action === CaptureUpdateAction.IMMEDIATELY;
+    const isAuthoringAction =
+      isDurableAction && params.attribution !== Attribution.NONE;
 
-    if (!isDurableAction && !isMicroAction) {
-      // NOTE: a non-durable macro action neither authors anything, nor does it
-      // hold any private clone which would need a reconciliation
+    if (!isAuthoringAction && !isMicroAction) {
+      // NOTE: a macro action which does not author anything (non-durable or
+      // explicitly unattributed) holds no private clone which would need a
+      // reconciliation - it operates on the live elements themselves
       return;
     }
-
-    const isAuthoringAction =
-      isDurableAction &&
-      !("attribution" in params && params.attribution === Attribution.NONE);
 
     const candidates = isMicroAction
       ? Object.values(params.change.elements)

@@ -3,6 +3,7 @@ import {
   LiveCollaborationTrigger,
   TTDDialogTrigger,
   CaptureUpdateAction,
+  Attribution,
   reconcileElements,
   useEditorInterface,
   ExcalidrawAPIProvider,
@@ -590,6 +591,7 @@ const ExcalidrawWrapper = () => {
               }),
               appState: restoreAppState(data.scene.appState, null),
               captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+              attribution: Attribution.NONE,
             });
           }
         });
