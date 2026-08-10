@@ -1,10 +1,15 @@
-Here's a CONTRIBUTING.md draft that reflects the philosophy you've described.
-
 # Contributing to @zsviczian/excalidraw
 
 Thank you for your interest in contributing.
 
 Before opening a pull request, please understand that this repository is **not the primary place for Excalidraw development**. This repository is a fork maintained for the Obsidian Excalidraw plugin and follows a very conservative approach to code changes.
+
+## Development Environment
+
+- Use Node.js 22 or newer. Verify `node --version` before diagnosing Yarn or Corepack failures; a shell that combines a different Node binary with another installation's Corepack can fail before a repository command starts.
+- This monorepo uses Yarn. Do not run npm install commands here or replace `yarn.lock` with an npm lockfile.
+- Read `CLAUDE.md` for the upstream monorepo layout and commands.
+- The main consumer for fork-only behavior is the sibling `zsviczian/obsidian-excalidraw-plugin` repository. Treat the repositories as separate Git histories and check the branch, status, and diff in each one before building or handing off changes.
 
 ## First: Can This Be Added Upstream?
 
@@ -43,17 +48,19 @@ When evaluating a PR, maintainability during future upstream merges is often a m
 
 ## Document Every Modification
 
-If you modify a single existing line, annotate the change directly on that line.
+Every fork-specific change must be easy to find during a future upstream merge. Use the exact `zsviczian` fingerprint even when another contributor or agent authors the patch.
+
+If you modify a single existing line, annotate the change directly on that line with `// zsviczian` for TypeScript/JavaScript or `/* zsviczian */` for CSS-family files. Include the reason and a relevant issue, pull request, or discussion when available.
 
 Example:
 
 ```ts
-const value = getValue(); //github-user --reason for change, #issue-or-pr
+const value = getValue(); // zsviczian -- reason for the fork difference, #issue-or-pr
 ```
 
 The comment should include:
 
-* Your GitHub username
+* the `zsviczian` fingerprint
 * The reason for the modification
 * Relevant issue number, PR number, or discussion reference
 
@@ -111,11 +118,11 @@ In those rare cases, clearly mark the inserted section.
 Example:
 
 ```ts
-//github-user START --reason, description, links
+// zsviczian START -- reason, description, links
 
 ...
 
-//github-user END
+// zsviczian END
 ```
 
 The marker should explain:
@@ -125,6 +132,74 @@ The marker should explain:
 * Relevant issue, PR, discussion, or reference links
 
 This makes future merge conflicts substantially easier to understand and resolve.
+
+## Obsidian Package Contract
+
+The normal upstream ESM package and the Obsidian consumer artifact serve different purposes. Keep the Obsidian build isolated and semantically named; do not restore the retired UMD/webpack path.
+
+From `packages/excalidraw`, run:
+
+```bash
+yarn build:obsidian
+```
+
+This produces four generated files under `packages/excalidraw/dist/obsidian/`:
+
+- `excalidraw.production.min.js`
+- `excalidraw.production.min.css`
+- `excalidraw.development.js`
+- `excalidraw.development.css`
+
+The JavaScript artifact must remain a single function-evaluable browser bundle with no runtime chunks. The Obsidian plugin compresses it into its single CommonJS `main.js` and evaluates it separately in the main application window and popouts.
+
+The following boundaries are mandatory:
+
+- React, ReactDOM/client, `react/jsx-runtime`, and `react/jsx-dev-runtime` remain external. The consuming plugin supplies one private matching runtime per Obsidian window. Do not bundle React into this artifact and do not depend on `window.React` or `window.ReactDOM`.
+- Preserve the documented `window.ExcalidrawLib` compatibility surface used by scripts and companion plugins.
+- Mermaid remains external and is obtained lazily through `getSharedMermaidInstance()` from Excalidraw Extras. Do not bundle Mermaid or add a network loader.
+- The component must run offline. Bundle required fonts and assets, including Assistant UI. CJK font subsets are the deliberate exception and remain lazy package-relative paths that the plugin can resolve when required.
+- Production output is minified and map-free. Development JavaScript retains readable source information for DevTools; development CSS should not carry a redundant nested source map.
+- Generated `dist/` output is validation evidence, not the place to make or review source fixes.
+
+`yarn prepack` builds both the normal ESM package and the Obsidian artifact. A package intended for the plugin is incomplete if the four `dist/obsidian` files are absent from the npm tarball.
+
+## Obsidian Portals And Popouts
+
+`packages/excalidraw/components/ObsidianRadixPortal.tsx` places selected Radix floating content under the owning document's body to avoid fixed-position displacement in Obsidian popout windows.
+
+Body portals have two important consequences:
+
+- Portaled content is no longer a descendant of the component that triggered it. Ancestor-dependent selectors will stop matching. Give specialized content a class that travels through the portal and style that class directly.
+- Portaled content leaves modal stacking contexts. Ensure a dropdown or popover that opens from a modal is stacked above that modal, then verify click-outside and Escape handling.
+
+When changing Radix menus, popovers, or `ObsidianRadixPortal`, test the main window, a new and restored popout, narrow/mobile viewports, collision boundaries, theme variables, stacking, focus, click-outside, and Escape behavior. A visible trigger does not imply its portaled content is visible.
+
+## Cross-Repository Integration Testing
+
+The plugin consumes these files from `node_modules/@zsviczian/excalidraw/dist/obsidian/`. Before publishing a new package, the four locally generated files may be copied temporarily into the sibling plugin's ignored installed package for integration testing. Keep the plugin's declared dependency unchanged during this temporary handoff; `npm install` restores the published artifact.
+
+After a component version is published:
+
+1. Update `@zsviczian/excalidraw` in the plugin repository.
+2. Run `npm install` there.
+3. Run the plugin production build and any relevant development build.
+4. Test cold startup, normal editing, plugin reload, popouts, offline behavior, Mermaid loading, and the feature changed by the component patch.
+5. Check the final plugin `main.js` byte size because small component changes can reduce release headroom.
+
+Do not bump package versions, publish packages, commit either repository, or modify the consumer's dependency unless the maintainer explicitly requests that action.
+
+## Validation
+
+For Obsidian-specific component changes, the minimum source validation is:
+
+```bash
+yarn build:obsidian
+yarn test:typecheck
+```
+
+Run focused tests and lint/format checks for the files touched. The monorepo can occasionally have unrelated baseline failures; record them accurately, confirm the changed files are absent from those diagnostics, and do not claim a clean pass when the command failed. After refreshing the local consumer artifacts, run `npm run build` in the plugin repository as the integration gate.
+
+Every handoff should include a risk-based manual test list identifying the most likely failure and which combinations of main window, popout, desktop, mobile, and offline mode matter.
 
 ## Pull Request Expectations
 
