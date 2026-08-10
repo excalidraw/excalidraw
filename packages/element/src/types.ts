@@ -86,8 +86,9 @@ type _ExcalidrawElementBase = Readonly<{
       gets captured as a durable (undoable) change. */
   created: number | null;
   /** id of the user whose editor instance last updated the element.
-      Absent when the authorship is unknown, never stored as `null`. */
-  updatedBy?: string;
+      Always present, `null` when the element was never updated or when the
+      authorship is unknown. */
+  updatedBy: string | null;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {

@@ -411,9 +411,8 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData" | "updatedBy">> & {
+  T extends Required<Omit<ExcalidrawElement, "customData">> & {
     customData?: ExcalidrawElement["customData"];
-    updatedBy?: ExcalidrawElement["updatedBy"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
@@ -475,6 +474,7 @@ const restoreElementWithProperties = <
     locked: element.locked ?? false,
     createdBy: element.createdBy ?? null,
     created: element.created ?? null,
+    updatedBy: element.updatedBy ?? null,
   };
 
   if ("customData" in element || "customData" in extra) {
@@ -495,10 +495,6 @@ const restoreElementWithProperties = <
   // strip legacy props (migrated in previous steps)
   delete ret.strokeSharpness;
   delete ret.boundElementIds;
-
-  if (ret.updatedBy == null) {
-    delete ret.updatedBy;
-  }
 
   return ret;
 };

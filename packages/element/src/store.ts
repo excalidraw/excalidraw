@@ -498,7 +498,11 @@ export class Store {
       }
 
       if (!isCreationCandidate && liveElement.updatedBy === userId) {
-        // steady-state solo editing, don't churn the version for a no-op stamp
+        // steady-state solo editing, reconcile the version only
+        Object.assign(candidate, authorship, {
+          version: liveElement.version,
+          versionNonce: liveElement.versionNonce,
+        });
         continue;
       }
 

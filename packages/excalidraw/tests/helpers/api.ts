@@ -296,7 +296,7 @@ export class API {
       locked: rest.locked ?? false,
       createdBy: rest.createdBy ?? null,
       created: rest.created ?? getUpdatedTimestamp(),
-      updatedBy: rest.updatedBy,
+      updatedBy: rest.updatedBy ?? null,
     };
     switch (type) {
       case "rectangle":

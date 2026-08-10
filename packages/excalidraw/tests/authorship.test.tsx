@@ -58,7 +58,7 @@ describe("element authorship", () => {
     expect(h.elements.length).toBe(1);
     expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
-    expect(h.elements[0]).not.toHaveProperty("updatedBy");
+    expect(h.elements[0].updatedBy).toBeNull();
   });
 
   it("should not attribute the creation of elements which entered through a non-durable capture", async () => {
@@ -101,7 +101,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].createdBy).toBe("someone-else");
     expect(h.elements[0].created).not.toBeNull();
-    expect(h.elements[0]).not.toHaveProperty("updatedBy");
+    expect(h.elements[0].updatedBy).toBeNull();
   });
 
   it("should not leave the snapshot behind, resulting in a phantom history entry", async () => {
@@ -209,7 +209,7 @@ describe("element authorship", () => {
 
     expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
-    expect(h.elements[0]).not.toHaveProperty("updatedBy");
+    expect(h.elements[0].updatedBy).toBeNull();
 
     API.updateScene({
       elements: [newElementWith(h.elements[0], { x: 100 })],
@@ -326,12 +326,10 @@ describe("element authorship", () => {
     expect(h.elements[0].x).toBe(0);
     expect(h.elements[0].createdBy).toBeNull();
     expect(h.elements[0].created).not.toBeNull();
-    // undoing a stamp writes back the previous (absent) value, which the delta
-    // carries as `undefined` - never as `null`, so it serializes away
-    expect(h.elements[0].updatedBy).toBeUndefined();
-    expect(JSON.parse(JSON.stringify(h.elements[0]))).not.toHaveProperty(
-      "updatedBy",
-    );
+    // undoing a stamp writes back the previous value - `null`, as the element
+    // had never been updated before, which round-trips like any other attribute
+    expect(h.elements[0].updatedBy).toBeNull();
+    expect(JSON.parse(JSON.stringify(h.elements[0])).updatedBy).toBeNull();
 
     Keyboard.redo();
 

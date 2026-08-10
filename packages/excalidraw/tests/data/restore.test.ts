@@ -695,7 +695,7 @@ describe("restoreElements", () => {
 
     expect(restoredLegacy.createdBy).toBeNull();
     expect(restoredLegacy.created).toBeNull();
-    expect(restoredLegacy).not.toHaveProperty("updatedBy");
+    expect(restoredLegacy.updatedBy).toBeNull();
 
     expect(restoredAuthored.createdBy).toBe("user-a");
     expect(restoredAuthored.created).toBe(1234);

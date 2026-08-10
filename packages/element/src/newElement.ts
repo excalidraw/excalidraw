@@ -76,6 +76,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "customData"
   | "createdBy"
   | "created"
+  | "updatedBy"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -125,15 +126,6 @@ const _newElementBase = <T extends ExcalidrawElement>(
     });
   }
 
-  // `updatedBy` is only ever present when known
-  const authorship: {
-    updatedBy?: string;
-  } = {};
-
-  if (rest.updatedBy != null) {
-    authorship.updatedBy = rest.updatedBy;
-  }
-
   // assign type to guard against excess properties
   const element: Merge<
     ExcalidrawGenericElement,
@@ -168,7 +160,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     customData: rest.customData,
     createdBy: rest.createdBy ?? null,
     created: rest.created ?? getUpdatedTimestamp(),
-    ...authorship,
+    updatedBy: rest.updatedBy ?? null,
   };
   return element;
 };
