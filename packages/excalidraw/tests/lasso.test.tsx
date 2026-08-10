@@ -24,13 +24,15 @@ import {
 
 import { getElementLineSegments } from "@excalidraw/element";
 
-import type { ExcalidrawElement, FractionalIndex } from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 
 import { getSelectedElements } from "../scene";
 
 import { getLassoSelectedElementIds } from "../lasso/utils";
+
+import { API } from "./helpers/api";
 
 import { act, render } from "./test-utils";
 
@@ -1809,63 +1811,23 @@ describe("Special cases", () => {
   });
 
   it("respects boxSelectionMode ('contain' vs 'overlap') during lasso selection", () => {
-    const rect1: ExcalidrawElement = {
-      id: "rect1",
+    const rect1 = API.createElement({
       type: "rectangle",
+      id: "rect1",
       x: 100,
       y: 100,
       width: 50,
       height: 50,
-      angle: 0 as Radians,
-      strokeColor: "#000000",
-      backgroundColor: "transparent",
-      fillStyle: "solid",
-      strokeWidth: 1,
-      strokeStyle: "solid",
-      roughness: 0,
-      opacity: 100,
-      groupIds: [],
-      frameId: null,
-      index: "a1" as FractionalIndex,
-      roundness: null,
-      seed: 1,
-      version: 1,
-      versionNonce: 1,
-      isDeleted: false,
-      boundElements: [],
-      updated: 1,
-      link: null,
-      locked: false,
-    };
+    });
 
-    const rect2: ExcalidrawElement = {
-      id: "rect2",
+    const rect2 = API.createElement({
       type: "rectangle",
+      id: "rect2",
       x: 300,
       y: 300,
       width: 50,
       height: 50,
-      angle: 0 as Radians,
-      strokeColor: "#000000",
-      backgroundColor: "transparent",
-      fillStyle: "solid",
-      strokeWidth: 1,
-      strokeStyle: "solid",
-      roughness: 0,
-      opacity: 100,
-      groupIds: [],
-      frameId: null,
-      index: "a2" as FractionalIndex,
-      roundness: null,
-      seed: 2,
-      version: 1,
-      versionNonce: 2,
-      isDeleted: false,
-      boundElements: [],
-      updated: 1,
-      link: null,
-      locked: false,
-    };
+    });
 
     h.elements = [rect1, rect2];
 
