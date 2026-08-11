@@ -612,7 +612,9 @@
     "hexCode": "हेक्स कोड",
     "noShades": "इस रंग की कोई छाया उपलब्ध नहीं हैं",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
