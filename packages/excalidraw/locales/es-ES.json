@@ -612,7 +612,9 @@
     "hexCode": "Código Hexadecimal",
     "noShades": "No hay sombras disponibles para este color",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
