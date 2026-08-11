@@ -612,7 +612,9 @@
     "hexCode": "Hex kodu",
     "noShades": "Bu renk için ton mevcut değil",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
