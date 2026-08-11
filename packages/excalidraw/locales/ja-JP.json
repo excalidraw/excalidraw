@@ -612,7 +612,9 @@
     "hexCode": "16進コード",
     "noShades": "この色で利用できる影はありません",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
