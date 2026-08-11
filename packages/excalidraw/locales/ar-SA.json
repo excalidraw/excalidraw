@@ -612,7 +612,9 @@
     "hexCode": "رمز Hex",
     "noShades": "لا تتوفر درجات لهذا اللون",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
