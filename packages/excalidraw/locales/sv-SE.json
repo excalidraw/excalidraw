@@ -612,7 +612,9 @@
     "hexCode": "Hex-kod",
     "noShades": "Inga nyanser tillgängliga för denna färg",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
