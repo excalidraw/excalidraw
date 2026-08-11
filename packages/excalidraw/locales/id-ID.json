@@ -612,7 +612,9 @@
     "hexCode": "Kode hexa",
     "noShades": "Tidak ada nuansa untuk warna ini",
     "invalidColor": "Bukan warna yang valid",
-    "invalidHexLength": "Kode Hex harus 3, 4, 6, atau 8 karakter"
+    "invalidHexLength": "Kode Hex harus 3, 4, 6, atau 8 karakter",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
