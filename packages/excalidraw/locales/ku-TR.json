@@ -612,7 +612,9 @@
     "hexCode": "کۆدی هێکس",
     "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
