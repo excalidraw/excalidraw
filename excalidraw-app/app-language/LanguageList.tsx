@@ -8,7 +8,6 @@ import { appLangCodeAtom } from "./language-state";
 export const LanguageList = ({ style }: { style?: React.CSSProperties }) => {
   const { t, langCode } = useI18n();
   const setLangCode = useSetAtom(appLangCodeAtom);
-
   return (
     <select
       className="dropdown-select dropdown-select__language"
