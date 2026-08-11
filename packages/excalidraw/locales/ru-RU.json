@@ -612,7 +612,9 @@
     "hexCode": "Шестнадцатеричный код",
     "noShades": "Нет доступных оттенков для этого цвета",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
