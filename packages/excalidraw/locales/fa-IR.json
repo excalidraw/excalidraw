@@ -612,7 +612,9 @@
     "hexCode": "کدِ هگز",
     "noShades": "هیچ سایه ای برای این رنگ در دسترس نیست",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
