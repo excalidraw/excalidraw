@@ -251,6 +251,13 @@ const ColorPickerPopupContent = ({
   );
 };
 
+const isColorPickerPopup = (
+  popup: AppState["openPopup"],
+): popup is ColorPickerType =>
+  popup === "elementStroke" ||
+  popup === "elementBackground" ||
+  popup === "canvasBackground";
+
 const ColorPickerTrigger = ({
   label,
   color,
@@ -401,7 +408,20 @@ const ColorPickerComponent = ({
           <TopPicks
             theme={appState.theme}
             activeColor={color}
-            onChange={onChange}
+            onChange={(pickedColor) => {
+              onChange(pickedColor);
+              // if another color-picker popup is open, follow the user's
+              // focus over to this picker (same as clicking its trigger)
+              if (
+                isColorPickerPopup(appState.openPopup) &&
+                appState.openPopup !== type
+              ) {
+                // deferred: each updateData spreads the full pre-commit
+                // appState, so issuing this in the same task would clobber
+                // the color change committed by `onChange` above
+                setTimeout(() => updateData({ openPopup: type }), 0);
+              }
+            }}
             type={type}
             topPicks={customTopPicks?.length ? customTopPicks : topPicks}
             isCustomized={!!customTopPicks?.length}
@@ -499,6 +519,9 @@ const areColorPickerPropsEqual = (
     prev.type === next.type &&
     prev.color === next.color &&
     prev.label === next.label &&
+    // popup open/close is rare, and the strip's click handler branches on
+    // which popup is open (popup-switching) — keep its closure fresh
+    prev.appState.openPopup === next.appState.openPopup &&
     prev.palette === next.palette &&
     prev.topPicks === next.topPicks &&
     prev.excludedColors === next.excludedColors &&
