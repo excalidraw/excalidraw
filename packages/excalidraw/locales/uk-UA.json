@@ -612,7 +612,9 @@
     "hexCode": "Hex-код",
     "noShades": "Немає доступних відтінків цього кольору",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
