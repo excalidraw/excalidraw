@@ -76,7 +76,11 @@ export const ShadeList = ({
                 key={i}
                 type="button"
                 className={clsx(
-                  "color-picker__button color-picker__button--large",
+                  // zsviczian -- upstream's #11872 refactor dropped
+                  // has-outline (previously unconditional here), leaving
+                  // light shades borderless/invisible against the popup
+                  // background; restored to match pre-merge behavior
+                  "color-picker__button color-picker__button--large has-outline",
                   {
                     active: i === shade,
                   },
