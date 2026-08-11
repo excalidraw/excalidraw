@@ -78,8 +78,6 @@ export const ShadeList = ({
                 className={clsx(
                   "color-picker__button color-picker__button--large",
                   {
-                    // "has-outline": !isColorDark(color, 240),
-
                     active: i === shade,
                   },
                 )}
