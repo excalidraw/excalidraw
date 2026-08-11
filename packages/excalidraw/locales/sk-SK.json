@@ -612,7 +612,9 @@
     "hexCode": "Hex kód",
     "noShades": "Pre túto farbu nie sú dostupné žiadne odtiene",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
