@@ -612,7 +612,9 @@
     "hexCode": "Hex 碼",
     "noShades": "沒有此顏色的漸變色",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
