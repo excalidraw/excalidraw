@@ -612,7 +612,9 @@
     "hexCode": "Hex koodi",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
