@@ -612,7 +612,9 @@
     "hexCode": "十六进制值",
     "noShades": "此颜色没有可用的明暗变化",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
