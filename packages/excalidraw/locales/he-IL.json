@@ -612,7 +612,9 @@
     "hexCode": "קוד הקסדצימלי",
     "noShades": "אין הצללות זמינות לצבע הזה",
     "invalidColor": "לא צבע תקני",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
