@@ -612,7 +612,9 @@
     "hexCode": "Hez kodea",
     "noShades": "Kolore honetarako ez dago ñabardurarik eskuragarri",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
