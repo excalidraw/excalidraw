@@ -153,7 +153,7 @@
   "scripts": {
     "gen:types": "rimraf ./types && tsc --project tsconfig-types.json",
     "build:esm": "rimraf ./dist && node ../../scripts/buildPackage.js && yarn gen:types",
-    "build:obsidian": "node ../../scripts/buildObsidianPackage.js",
+    "build:obsidian": "node ../../scripts/buildObsidianPackage.js && yarn gen:types",
     "prepack": "yarn build:esm && yarn build:obsidian",
     "start": "node ../../scripts/buildExample.mjs && vite",
     "build:example": "node ../../scripts/buildExample.mjs",
