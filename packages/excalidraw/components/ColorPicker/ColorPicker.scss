@@ -2,6 +2,11 @@
 @use "../../css/variables.module" as *;
 
 .excalidraw {
+  --color-outline: var(--color-gray-20);
+  &.theme--dark {
+    --color-outline: var(--color-gray-80);
+  }
+
   .focus-visible-none {
     &:focus-visible {
       outline: none !important;
@@ -18,6 +23,44 @@
     padding: 0 0.5rem;
     font-size: 0.75rem;
     text-align: left;
+  }
+
+  .color-picker__context-menu {
+    background: var(--popup-bg-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-island);
+    padding: 0.25rem;
+  }
+
+  .color-picker__context-menu-item {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary-color);
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+
+    // :hover as well — radix only sets data-highlighted once the item gets
+    // focus via pointermove, which leaves dead frames (e.g. menu opening
+    // under a stationary cursor)
+    &[data-highlighted],
+    &:not([data-disabled]):hover {
+      background: var(--button-hover-bg);
+    }
+
+    &[data-disabled] {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+
+  .color-picker__tip {
+    padding: 0 0.5rem;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    text-align: left;
+    color: var(--color-gray-60);
   }
 
   .color-picker-container {
@@ -48,7 +91,7 @@
     --size: 1.375rem;
 
     &.has-outline {
-      box-shadow: inset 0 0 0 1px #d9d9d9;
+      box-shadow: 0 0 0 1px var(--color-outline);
     }
 
     padding: 0;
@@ -57,28 +100,22 @@
     height: var(--size);
     border: 0;
     border-radius: var(--radius);
-    filter: var(--theme-filter);
     background-color: var(--swatch-color);
     background-position: left center;
     position: relative;
     font-family: inherit;
     box-sizing: border-box;
 
-    &:hover:not(.active):not(.color-picker__button--large) {
-      transform: scale(1.075);
-    }
-
     &:hover:not(.active).color-picker__button--large {
-      &::after {
-        content: "";
-        position: absolute;
-        top: -1px;
-        left: -1px;
-        right: -1px;
-        bottom: -1px;
-        box-shadow: 0 0 0 1px var(--color-gray-30);
-        border-radius: var(--radius);
-        filter: var(--theme-filter);
+      box-shadow: inset 0 0 0 1px var(--color-primary);
+    }
+    &:active {
+      box-shadow: 0 0 0 1px var(--color-primary) !important;
+    }
+    &:active.color-picker__button--large {
+      box-shadow: none !important;
+      &.has-outline {
+        box-shadow: 0 0 0 1px var(--color-outline) !important;
       }
     }
 
@@ -103,7 +140,7 @@
       }
     }
 
-    &.active {
+    &.active:not(:active) {
       .color-picker__button-outline {
         position: absolute;
         --offset: -1px;
@@ -114,7 +151,6 @@
         box-shadow: 0 0 0 1px var(--color-primary-darkest);
         z-index: 1; // due hover state so this has preference
         border-radius: var(--radius);
-        filter: var(--theme-filter);
       }
     }
 
@@ -140,7 +176,7 @@
     }
 
     &--large {
-      --radius: 0.5rem;
+      --radius: 6px;
       width: 1.875rem;
       height: 1.875rem;
     }
@@ -177,10 +213,10 @@
 
   .color-picker__button__hotkey-label {
     position: absolute;
-    right: 5px;
-    bottom: 3px;
-    filter: none;
-    font-size: 11px;
+    right: 4px;
+    bottom: 2px;
+    font-size: 10px;
+    font-family: monospace;
     font-weight: 500;
   }
 
@@ -288,50 +324,11 @@
 
     &-colors {
       padding: 0.5rem 0;
-
-      .color-picker-swatch {
-        margin: 0 0.25rem;
-      }
     }
   }
 
   .color-picker-content .color-input-container {
     grid-column: 1 / span 5;
-  }
-
-  .color-picker-swatch {
-    position: relative;
-    height: 1.875rem;
-    width: 1.875rem;
-    cursor: pointer;
-    border-radius: 4px;
-    margin: 0;
-    box-sizing: border-box;
-    border: 1px solid #ddd;
-    background-color: currentColor !important;
-    filter: var(--theme-filter);
-
-    &:focus {
-      /* TODO: only show the border when the color is too light to see as a shadow */
-      box-shadow: 0 0 4px 1px currentColor;
-      border-color: var(--select-highlight-color);
-    }
-  }
-
-  .color-picker-transparent {
-    border-radius: 4px;
-    box-shadow: color.adjust(#000, $alpha: -0.9) 0 0 0 1px inset;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-
-  .color-picker-transparent,
-  .color-picker-label-swatch {
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==")
-      left center;
   }
 
   .color-picker-hash {
@@ -445,74 +442,157 @@
     }
   }
 
-  .color-picker-label-swatch-container {
-    border: 1px solid var(--default-border-color);
-    border-radius: var(--border-radius-lg);
-    width: var(--default-button-size);
-    height: var(--default-button-size);
-    box-sizing: border-box;
-    overflow: hidden;
-  }
+  // top-picks drag & drop (pinning + reordering)
+  // ---------------------------------------------------------------------------
 
-  .color-picker-label-swatch {
-    @include outlineButtonStyles;
-    background-color: var(--swatch-color) !important;
-    overflow: hidden;
+  .color-picker__top-picks {
+    // anchor for the animated drop-target outline
     position: relative;
-    filter: var(--theme-filter);
-    border: 0 !important;
+  }
 
-    &:after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--swatch-color);
+  .color-picker__top-picks .color-picker__button {
+    // the strip is tiny and never scrolls — allow touch-dragging picks
+    touch-action: none;
+  }
+
+  .color-picker__top-picks.is-dnd-active {
+    .color-picker__button {
+      // no hover/tooltips while a drag is in flight; hit-testing is
+      // coordinate-based so this doesn't affect dropping
+      pointer-events: none;
+      transition: transform 0.14s ease, opacity 0.14s ease,
+        box-shadow 0.14s ease;
     }
   }
 
-  .color-picker-keybinding {
+  // "marching ants" outline hinting that the strip accepts the drop —
+  // SVG because CSS dashed outlines/borders can't animate their dash offset
+  .color-picker__top-picks__dnd-outline {
     position: absolute;
-    bottom: 2px;
-    font-size: 0.7em;
+    top: -5px;
+    left: -5px;
+    width: calc(100% + 10px);
+    height: calc(100% + 10px);
+    pointer-events: none;
+    overflow: visible;
 
-    :root[dir="ltr"] & {
-      right: 2px;
-    }
+    rect {
+      x: 0.5px;
+      y: 0.5px;
+      rx: 6px;
+      width: calc(100% - 1px);
+      height: calc(100% - 1px);
+      fill: none;
+      stroke: var(--color-primary);
+      stroke-width: 1;
+      stroke-dasharray: 4 4;
+      animation: excalidraw-color-dnd-march 0.8s linear infinite;
 
-    :root[dir="rtl"] & {
-      left: 2px;
-    }
-
-    @include isMobile {
-      display: none;
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
     }
   }
 
-  .color-picker-type-canvasBackground .color-picker-keybinding {
-    color: #aaa;
-  }
-
-  .color-picker-type-elementBackground .color-picker-keybinding {
-    color: #fff;
-  }
-
-  .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
-    color: #aaa;
-  }
-
-  .color-picker-type-elementStroke .color-picker-keybinding {
-    color: #d4d4d4;
-  }
-
-  &.theme--dark {
-    .color-picker-type-elementBackground .color-picker-keybinding {
-      color: #000;
+  @keyframes excalidraw-color-dnd-march {
+    to {
+      // one full dash+gap period per cycle → seamless loop
+      stroke-dashoffset: -8;
     }
-    .color-picker-swatch[aria-label="transparent"] .color-picker-keybinding {
-      color: #000;
+  }
+
+  // the pick being reordered — its ghost is following the pointer
+  .color-picker__button.is-dnd-source {
+    opacity: 0.3;
+  }
+
+  // slot a dragged swatch would replace
+  .color-picker__button.is-dnd-target {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 1px var(--color-primary-darkest);
+  }
+
+  // this color is already pinned — drop not allowed
+  .color-picker__button.is-dnd-duplicate {
+    animation: excalidraw-color-dnd-duplicate 0.45s ease-in-out infinite
+      alternate;
+  }
+
+  @keyframes excalidraw-color-dnd-duplicate {
+    from {
+      box-shadow: 0 0 0 2px var(--color-danger, #e03131);
+      transform: scale(1);
     }
+    to {
+      box-shadow: 0 0 0 3px var(--color-danger, #e03131);
+      transform: scale(1.12);
+    }
+  }
+}
+
+// drag & drop ghost — appended to document.body (outside the .excalidraw
+// scope) so it can follow the pointer without overflow clipping
+.excalidraw-color-dnd-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  pointer-events: none;
+  will-change: transform;
+  // NOTE transform is deliberately not transitioned here (tracks the pointer
+  // every frame); --dropping adds it for the fly-to-target animation
+  transition: width 0.15s ease, height 0.15s ease;
+
+  &__swatch {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+
+    &.is-transparent {
+      background-color: #fff;
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==");
+      background-position: left center;
+    }
+  }
+
+  &--lifted &__swatch {
+    transform: scale(1.2);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+
+  &--over &__swatch {
+    transform: scale(1.05);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+
+  &--blocked &__swatch {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+
+  &--dropping {
+    transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.3, 1), width 0.18s ease,
+      height 0.18s ease;
+  }
+
+  &--dropping &__swatch {
+    transform: scale(1);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+
+  &--fade &__swatch {
+    opacity: 0;
+  }
+}
+
+body.excalidraw-color-dnd-active {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+
+  &,
+  * {
+    cursor: grabbing !important;
   }
 }

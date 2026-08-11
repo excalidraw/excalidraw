@@ -536,6 +536,17 @@ export interface AppState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+  /** user-customized color-picker top picks (pinned via drag & drop from the
+   * color picker popup). `null` means no customization (defaults, or
+   * host-supplied `topPicks`, are used). Kept per picker. */
+  colorTopPicks: {
+    elementStroke: readonly string[] | null;
+    elementBackground: readonly string[] | null;
+    /** the bucket-fill tool keeps a list separate from `elementBackground`
+     * even though both drive `currentItemBackgroundColor` (its defaults and
+     * use case differ — no transparent) */
+    bucketFill: readonly string[] | null;
+  };
 }
 
 export type SearchMatch = {
