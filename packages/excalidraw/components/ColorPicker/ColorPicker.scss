@@ -25,6 +25,36 @@
     text-align: left;
   }
 
+  .color-picker__context-menu {
+    background: var(--popup-bg-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-island);
+    padding: 0.25rem;
+  }
+
+  .color-picker__context-menu-item {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary-color);
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+
+    // :hover as well — radix only sets data-highlighted once the item gets
+    // focus via pointermove, which leaves dead frames (e.g. menu opening
+    // under a stationary cursor)
+    &[data-highlighted],
+    &:not([data-disabled]):hover {
+      background: var(--button-hover-bg);
+    }
+
+    &[data-disabled] {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+
   .color-picker__tip {
     padding: 0 0.5rem;
     font-size: 0.6875rem;

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { ContextMenu } from "radix-ui";
 
 import {
   applyDarkModeFilter,
@@ -12,6 +13,9 @@ import {
 
 import type { Theme } from "@excalidraw/element/types";
 
+import { t } from "../../i18n";
+import { useExcalidrawContainer } from "../App";
+
 import { useColorPickerDnD } from "./topPicksDnD";
 
 import type { ColorPickerType } from "./colorPickerUtils";
@@ -22,6 +26,11 @@ interface TopPicksProps {
   type: ColorPickerType;
   activeColor: string | null;
   topPicks?: readonly string[];
+  /** present when the strip is user-customizable — enables the right-click
+   * context menu resetting the strip to its default picks */
+  onReset?: () => void;
+  /** whether custom picks are currently applied (enables the reset item) */
+  isCustomized?: boolean;
 }
 
 export const TopPicks = ({
@@ -30,9 +39,12 @@ export const TopPicks = ({
   type,
   activeColor,
   topPicks,
+  onReset,
+  isCustomized,
 }: TopPicksProps) => {
   const dnd = useColorPickerDnD();
   const dragState = dnd?.dragState ?? null;
+  const { container } = useExcalidrawContainer();
 
   let colors;
   if (type === "elementStroke") {
@@ -86,7 +98,7 @@ export const TopPicks = ({
     return (newIndex - index) * dragState.slotSpan;
   };
 
-  return (
+  const strip = (
     <div
       className={clsx("color-picker__top-picks", {
         "is-dnd-active": !!dragState,
@@ -144,5 +156,29 @@ export const TopPicks = ({
         );
       })}
     </div>
+  );
+
+  if (!onReset) {
+    return strip;
+  }
+
+  return (
+    <ContextMenu.Root>
+      <ContextMenu.Trigger asChild>{strip}</ContextMenu.Trigger>
+      <ContextMenu.Portal container={container}>
+        <ContextMenu.Content
+          className="color-picker__context-menu"
+          style={{ zIndex: "var(--zIndex-ui-styles-popup)" }}
+        >
+          <ContextMenu.Item
+            className="color-picker__context-menu-item"
+            disabled={!isCustomized}
+            onSelect={onReset}
+          >
+            {t("colorPicker.resetTopPicks")}
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Portal>
+    </ContextMenu.Root>
   );
 };

@@ -130,6 +130,16 @@ const ColorPickerPopupContent = ({
       // Improve focus handling for text editing scenarios
       preventAutoFocusOnTouch={!!appState.editingTextElement}
       onFocusOutside={(event) => {
+        // focus moving into the top-picks context menu — let the menu keep
+        // it (stealing it back would clear the menu's focus-driven
+        // `data-highlighted` styling and break its keyboard navigation)
+        if (
+          event.target instanceof HTMLElement &&
+          event.target.closest(".color-picker__context-menu")
+        ) {
+          event.preventDefault();
+          return;
+        }
         // refocus due to eye dropper
         if (!isWritableElement(event.target)) {
           if (
@@ -394,6 +404,19 @@ const ColorPickerComponent = ({
             onChange={onChange}
             type={type}
             topPicks={customTopPicks?.length ? customTopPicks : topPicks}
+            isCustomized={!!customTopPicks?.length}
+            onReset={
+              isTopPicksCustomizable && customizableTopPicks
+                ? () => {
+                    updateData({
+                      colorTopPicks: {
+                        ...appState.colorTopPicks,
+                        [customizableTopPicks]: null,
+                      },
+                    });
+                  }
+                : undefined
+            }
           />
         )}
         {!isCompactMode && <ButtonSeparator />}
