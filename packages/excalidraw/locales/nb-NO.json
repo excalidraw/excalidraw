@@ -612,7 +612,9 @@
     "hexCode": "Heksadesimal kode",
     "noShades": "Ingen toner tilgjengelig for denne fargen",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
