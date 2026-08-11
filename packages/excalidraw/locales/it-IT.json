@@ -35,9 +35,9 @@
     "strokeStyle_dashed": "Tratteggiato",
     "strokeStyle_dotted": "Punteggiato",
     "sloppiness": "Imprecisione",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Pressione",
+    "pressure_constant": "Costante",
+    "pressure_variable": "Variabile",
     "opacity": "Opacità",
     "textAlign": "Allineamento del testo",
     "edges": "Bordi",
@@ -109,7 +109,7 @@
     "group": "Crea gruppo da selezione",
     "ungroup": "Dividi gruppo da selezione",
     "collaborators": "Collaboratori",
-    "you": "",
+    "you": "Tu",
     "toggleGrid": "Attiva/disattiva griglia",
     "addToLibrary": "Aggiungi alla libreria",
     "removeFromLibrary": "Rimuovi dalla libreria",
@@ -189,9 +189,9 @@
     "shapeSwitch": "Cambia forma",
     "preferences": "Preferenze",
     "preferences_toolLock": "Blocco strumento",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "Seleziona su",
+    "boxSelectionContain": "Avvolgi",
+    "boxSelectionOverlap": "Sovrapponi",
     "arrowBinding": "Legatura a freccia",
     "midpointSnapping": "Aggancia ai punti medi"
   },
@@ -332,16 +332,16 @@
     "magicframe": "Dal wireframe al codice",
     "embeddable": "Incorporamento Web",
     "laser": "Puntatore laser",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "Disegna per la forma",
+    "bucketfill": "Secchiello riempimento",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti",
     "mermaidToExcalidraw": "Da Mermaid a Excalidraw",
     "convertElementType": "Attiva tipo di forma"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "Impossibile trovare una regione racchiusa da riempire qui.",
+    "tooComplex": "Questa regione è troppo complessa da riempire."
   },
   "element": {
     "rectangle": "Rettangolo",
@@ -373,7 +373,7 @@
     "freeDraw": "Clicca e trascina, rilascia quando avrai finito",
     "text": "Suggerimento: puoi anche aggiungere del testo facendo doppio clic ovunque con lo strumento di selezione",
     "embeddable": "Fare click e trascina per creare un incorporamento web",
-    "autoshape": "",
+    "autoshape": "Disegna rettangoli, cerchi, diamanti, linee e frecce",
     "text_selected": "Fare doppio clic o premere {{shortcut}} per modificare il testo",
     "text_editing": "Premi {{shortcut_1}} o {{shortcut_2}} per terminare la modifica",
     "linearElementMulti": "Clicca sull'ultimo punto o premi {{shortcut_1}} o {{shortcut_2}} per terminare",
@@ -381,7 +381,7 @@
     "resize": "Puoi limitare le proporzioni tenendo premuto {{shortcut_1}} durante il ridimensionamento,\ntenendo premuto {{shortcut_2}} per ridimensionare dal centro",
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto {{shortcut_1}},\ntenendo premuto {{shortcut_2}} per ridimensionare dal centro",
     "rotate": "Puoi limitare gli angoli tenendo premuto {{shortcut}} durante la rotazione",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "Doppio clic per attivare o disattivare la freccia",
     "lineEditor_info": "Tieni premuto {{shortcut_1}} e fai doppio clic oppure premi {{shortcut_2}} per modificare i punti",
     "lineEditor_line_info": "Fare doppio clic o premere {{shortcut}} per modificare i punti",
     "lineEditor_pointSelected": "Premi {{shortcut_1}} per rimuovere punto(i),\n{{shortcut_2}} per duplicare, o trascinare per spostare",
@@ -611,8 +611,10 @@
     "shades": "Sfumature",
     "hexCode": "Codice esadecimale",
     "noShades": "Nessuna sfumatura disponibile per questo colore",
-    "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidColor": "Colore non valido",
+    "invalidHexLength": "Il codice esadecimale deve essere di 3, 4, 6 o 8 caratteri",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -678,7 +680,7 @@
     "placeholder": {
       "title": "Progettiamo il tuo diagramma",
       "description": "Descrivi il diagramma che vuoi creare e noi lo genereremo per te.",
-      "hint": ""
+      "hint": "Al momento conosciamo diagrammi di flusso, Sequenza, Classe, Stato e Relazioni tra diagrammi."
     },
     "preview": "Anteprima",
     "insert": "Inserisci",
