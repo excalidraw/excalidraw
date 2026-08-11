@@ -612,7 +612,9 @@
     "hexCode": "Code hex",
     "noShades": "Aucune nuance disponible pour cette couleur",
     "invalidColor": "Pas une couleur valide",
-    "invalidHexLength": "Le code hexadécimal doit être de 3, 4, 6 ou 8 caractères"
+    "invalidHexLength": "Le code hexadécimal doit être de 3, 4, 6 ou 8 caractères",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
