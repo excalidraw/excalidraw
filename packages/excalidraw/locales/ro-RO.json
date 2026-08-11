@@ -613,8 +613,8 @@
     "noShades": "Nu este disponibilă nicio nuanță pentru această culoare",
     "invalidColor": "Nu este o culoare validă",
     "invalidHexLength": "Codul hexazecimal trebuie să fie alcătuit din 3, 4, 6 sau 8 caractere",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "Sfat: trage orice culoare la alegerile tale principale pentru a o fixa",
+    "resetTopPicks": "Resetare la alegerile principale implicite"
   },
   "overwriteConfirm": {
     "action": {
