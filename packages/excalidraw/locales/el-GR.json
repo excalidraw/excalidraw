@@ -612,7 +612,9 @@
     "hexCode": "Κωδικός Hex",
     "noShades": "Δεν υπάρχουν διαθέσιμες αποχρώσεις για αυτό το χρώμα",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
