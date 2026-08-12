@@ -64,6 +64,11 @@ import type { ImportedDataState } from "./data/types";
 import type { SetViewportOptions } from "./viewport";
 
 import type { Language } from "./i18n";
+import type {
+  ObsidianPenOptions,
+  ObsidianPenStyle,
+  ObsidianResetCustomPenState,
+} from "./obsidianTypes"; //zsviczian
 import type { isOverScrollBars } from "./scene/scrollbars";
 import type React from "react";
 import type { JSX } from "react";
@@ -537,9 +542,16 @@ export interface AppState {
   allowPinchZoom?: boolean; //zsviczian
   disableContextMenu: boolean; //zsviczian
   pinnedScripts?: string[]; //zsviczian
-  customPens?: any[]; //zsviczian
-  currentStrokeOptions?: any; //zsviczian
-  resetCustomPen?: any; //zsviczian
+  /** Obsidian host-defined custom pen presets (see actionCanvas.tsx's
+   * clear-canvas action, which passes this through untouched). */
+  customPens?: ObsidianPenStyle[]; //zsviczian
+  /** Obsidian host-defined freedraw stroke-shaping options for the active
+   * custom pen; the editor itself only reads `constantPressure` (App.tsx)
+   * to gate simulated pressure. */
+  currentStrokeOptions?: ObsidianPenOptions | null; //zsviczian
+  /** Snapshot of current-item stroke properties captured before a custom
+   * pen overrides them, restored when the pen is deselected. */
+  resetCustomPen?: ObsidianResetCustomPenState | null; //zsviczian
   gridColor: { Bold: string; Regular: string }; //zsviczian
   gridDirection: { horizontal: boolean; vertical: boolean }; //zsviczian
   highlightSearchResult: boolean; //zsviczian
