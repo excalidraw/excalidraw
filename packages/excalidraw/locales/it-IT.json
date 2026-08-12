@@ -613,8 +613,8 @@
     "noShades": "Nessuna sfumatura disponibile per questo colore",
     "invalidColor": "Colore non valido",
     "invalidHexLength": "Il codice esadecimale deve essere di 3, 4, 6 o 8 caratteri",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "Suggerimento: trascina qualsiasi colore sulle tue selezioni superiori per bloccarlo",
+    "resetTopPicks": "Ripristina le selezioni superiori predefinite"
   },
   "overwriteConfirm": {
     "action": {
