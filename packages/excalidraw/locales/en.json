@@ -322,6 +322,7 @@
     "line": "Line",
     "freedraw": "Draw",
     "text": "Text",
+    "emoji": "Emoji",
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
     "penMode": "Pen mode - prevent touch",

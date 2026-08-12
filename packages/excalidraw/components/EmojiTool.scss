@@ -1,0 +1,59 @@
+.excalidraw {
+  .EmojiTool-picker__content {
+    width: 18rem;
+  }
+
+  .EmojiTool-picker__grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 0.25rem;
+  }
+
+  .EmojiTool-picker__emoji {
+    border: 0;
+    border-radius: var(--border-radius-lg);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 2rem;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--button-gray-2);
+      outline: none;
+    }
+  }
+
+  .EmojiTool-picker__custom {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+    color: var(--text-primary-color);
+    font-size: 0.75rem;
+
+    > div {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    input {
+      min-width: 0;
+      flex: 1;
+    }
+
+    button {
+      border: 0;
+      border-radius: var(--border-radius-lg);
+      background: var(--button-gray-2);
+      color: var(--text-primary-color);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+
+      &:disabled {
+        cursor: default;
+        opacity: 0.5;
+      }
+    }
+  }
+}

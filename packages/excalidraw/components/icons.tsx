@@ -123,6 +123,17 @@ export const DotsIcon = createIcon(
 );
 
 // tabler-icons: dots-horizontal (horizontal equivalent of dots-vertical)
+
+// tabler-icons: mood-smile
+export const EmojiIcon = createIcon(
+  <g>
+    <path d="M12 21a9 9 0 1 0 0 -18a9 9 0 0 0 0 18" />
+    <path d="M9 10h.01" />
+    <path d="M15 10h.01" />
+    <path d="M8 14s1.5 2 4 2s4 -2 4 -2" />
+  </g>,
+  tablerIconProps,
+);
 export const DotsHorizontalIcon = createIcon(
   <g strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />

@@ -154,6 +154,7 @@ export type ToolType =
   | "line"
   | "freedraw"
   | "text"
+  | "emoji"
   | "image"
   | "eraser"
   | "hand"
@@ -1012,6 +1013,7 @@ export type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
   canvasActions: CanvasActions;
   tools: {
+    emoji: boolean;
     image: boolean;
   };
   /**
@@ -1076,6 +1078,7 @@ export type AppClassProperties = {
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   togglePenMode: App["togglePenMode"];
+  setEmoji: App["setEmoji"];
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
   setOpenDialog: App["setOpenDialog"];

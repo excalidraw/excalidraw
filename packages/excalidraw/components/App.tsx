@@ -694,6 +694,7 @@ class App extends React.Component<AppProps, AppState> {
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
   private textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null =
     null;
+  private selectedEmoji: string | null = null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
@@ -5923,6 +5924,15 @@ class App extends React.Component<AppProps, AppState> {
     this.flowchart.handleKeyEvent(event);
   });
 
+  setEmoji = (emoji: string) => {
+    const nextEmoji = emoji.trim();
+    if (!nextEmoji) {
+      return;
+    }
+    this.selectedEmoji = nextEmoji;
+    this.setActiveTool({ type: "emoji" });
+  };
+
   setActiveTool = (
     tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
       locked?: boolean;
@@ -8755,6 +8765,8 @@ class App extends React.Component<AppProps, AppState> {
       }
     } else if (this.state.activeTool.type === "text") {
       this.handleTextOnPointerDown(event, pointerDownState);
+    } else if (this.state.activeTool.type === "emoji") {
+      this.handleEmojiOnPointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
@@ -9729,6 +9741,67 @@ class App extends React.Component<AppProps, AppState> {
       point.y < y2 + boundsPadding + threshold
     );
   }
+
+  private handleEmojiOnPointerDown = (
+    event: React.PointerEvent<HTMLElement>,
+    pointerDownState: PointerDownState,
+  ) => {
+    const emoji = this.selectedEmoji;
+    if (!emoji) {
+      this.setActiveTool({ type: this.state.preferredSelectionTool.type });
+      return;
+    }
+
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+    );
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+    const fontFamily = this.state.currentItemFontFamily;
+    const element = newTextElement({
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.getCurrentItemStrokeWidth("text"),
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      text: emoji,
+      fontSize: this.state.currentItemFontSize,
+      fontFamily,
+      textAlign: this.state.currentItemTextAlign,
+      verticalAlign: DEFAULT_VERTICAL_ALIGN,
+      lineHeight: getLineHeight(fontFamily),
+      frameId: topLayerFrame?.id ?? null,
+    });
+
+    this.insertNewElement(element);
+    this.store.scheduleCapture();
+
+    this.setState(
+      (prevState) => {
+        const isLocked = this.isToolLocked();
+        return {
+          activeTool: isLocked
+            ? prevState.activeTool
+            : updateActiveTool(prevState, {
+                type: prevState.preferredSelectionTool.type,
+              }),
+          selectedElementIds: isLocked
+            ? prevState.selectedElementIds
+            : makeNextSelectedElementIds({ [element.id]: true }, prevState),
+          newElement: null,
+        };
+      },
+      () => this.cursor.reset(),
+    );
+  };
 
   private handleTextOnPointerDown = (
     event: React.PointerEvent<HTMLElement>,

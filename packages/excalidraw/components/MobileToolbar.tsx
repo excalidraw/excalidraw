@@ -22,6 +22,7 @@ import {
   TOOLS,
 } from "./Tools";
 
+import { EmojiTool } from "./EmojiTool";
 import {
   TextIcon,
   ImageIcon,
@@ -334,6 +335,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
           )}
         </DropdownMenu.Content>
       </DropdownMenu>
+      <EmojiTool {...toolProps} />
     </div>
   );
 };

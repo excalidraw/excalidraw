@@ -8,6 +8,7 @@ import { t } from "../i18n";
 
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { HintViewer } from "./HintViewer";
+import { EmojiTool } from "./EmojiTool";
 import { Island } from "./Island";
 import { LockButton } from "./LockButton";
 import { PenModeButton } from "./PenModeButton";
@@ -285,6 +286,7 @@ export const Toolbar = ({
           activeTool={activeTool}
           setAppState={setAppState}
         />
+        <EmojiTool {...toolProps} />
       </Stack.Row>
     </Island>
   );
