@@ -1,5 +1,5 @@
-import { loginIcon } from "@excalidraw/excalidraw/components/icons";
 import { POINTER_EVENTS } from "@excalidraw/common";
+import { loginIcon } from "@excalidraw/excalidraw/components/icons";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { WelcomeScreen } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -72,7 +72,7 @@ export const AppWelcomeScreen: React.FC<{
               shortcut={null}
               icon={loginIcon}
             >
-              Sign up
+              {t("labels.signUp")}
             </WelcomeScreen.Center.MenuItemLink>
           )}
         </WelcomeScreen.Center.Menu>
