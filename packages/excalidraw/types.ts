@@ -849,6 +849,13 @@ export interface ExcalidrawProps {
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   /**
+   * Whether to draw the link indicator next to linked elements. Disabling the
+   * indicator does not disable link hit-testing or navigation.
+   *
+   * @default true
+   */
+  showLinkIcons?: boolean;
+  /**
    * Whether the editor accepts user input (pointer, keyboard, wheel, touch,
    * clipboard, drag&drop). When `false`, the scene still renders and reacts
    * to programmatic updates (imperative API), but the user cannot affect it

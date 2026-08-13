@@ -189,6 +189,7 @@
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
     "preferences_toolLock": "Tool lock",
+    "showLinkIcons": "Show link icons",
     "boxSelectionMode": "Select on",
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",

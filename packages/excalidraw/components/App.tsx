@@ -2586,7 +2586,9 @@ class App extends React.Component<AppProps, AppState> {
                               imageCache: this.imageCache,
                               isExporting: false,
                               renderGrid: isGridModeEnabled(this),
-                              renderLinks: this.isLinksEnabled(),
+                              renderLinks:
+                                this.isLinksEnabled() &&
+                                this.props.showLinkIcons !== false,
                               canvasBackgroundColor:
                                 this.state.viewBackgroundColor,
                               embedsValidationStatus:
@@ -7196,6 +7198,7 @@ class App extends React.Component<AppProps, AppState> {
   private getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
     hitElementMightBeLocked: NonDeletedExcalidrawElement | null,
+    openTextLinkOnModifierClick = false,
   ): NonDeletedExcalidrawElement | undefined => {
     if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
       return undefined;
@@ -7221,6 +7224,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
           pointFrom(scenePointer.x, scenePointer.y),
           this.editorInterface.formFactor === "phone",
+          openTextLinkOnModifierClick,
         )
       ) {
         return element;
@@ -7255,6 +7259,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
       pointFrom(lastPointerDownCoords.x, lastPointerDownCoords.y),
       this.editorInterface.formFactor === "phone",
+      this.lastPointerDownEvent![KEYS.CTRL_OR_CMD],
     );
     const lastPointerUpCoords = viewportCoordsToSceneCoords(
       this.lastPointerUpEvent!,
@@ -7266,6 +7271,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
       pointFrom(lastPointerUpCoords.x, lastPointerUpCoords.y),
       this.editorInterface.formFactor === "phone",
+      this.lastPointerUpEvent![KEYS.CTRL_OR_CMD],
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       hideHyperlinkToolip();
@@ -8034,6 +8040,7 @@ class App extends React.Component<AppProps, AppState> {
       this.hitLinkElement = this.getElementLinkAtPosition(
         scenePointer,
         hitElementMightBeLocked,
+        event[KEYS.CTRL_OR_CMD],
       );
     }
 
@@ -9425,6 +9432,7 @@ class App extends React.Component<AppProps, AppState> {
         this.hitLinkElement = this.getElementLinkAtPosition(
           pointerDownState.origin,
           hitElementMightBeLocked,
+          event[KEYS.CTRL_OR_CMD],
         );
 
         if (this.hitLinkElement) {
@@ -9446,6 +9454,7 @@ class App extends React.Component<AppProps, AppState> {
               y: pointerDownState.origin.y,
             },
             pointerDownState.hit.element,
+            event[KEYS.CTRL_OR_CMD],
           );
           if (hitLinkElement) {
             return false;
