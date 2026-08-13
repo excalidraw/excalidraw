@@ -188,11 +188,11 @@
     "tab": "Tab",
     "shapeSwitch": "図形形状を変更",
     "preferences": "環境設定",
-    "preferences_toolLock": "",
+    "preferences_toolLock": "ツールの固定",
     "boxSelectionMode": "",
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
-    "arrowBinding": "",
+    "arrowBinding": "矢印の結合",
     "midpointSnapping": ""
   },
   "elementLink": {
