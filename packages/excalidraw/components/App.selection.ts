@@ -1,3 +1,30 @@
+// Existing in-process selection dependencies are imported directly. This
+// replaces one-callback-per-function dependency wrappers.
+import { KEYS, isSelectionLikeTool, tupleToCoors } from "@excalidraw/common";
+import {
+  LinearElementEditor,
+  editGroupForSelectedElement,
+  getCommonBounds,
+  getElementWithTransformHandleType,
+  getElementsInGroup,
+  getFrameChildren,
+  getResizeArrowDirection,
+  getResizeOffsetXY,
+  getTransformHandleTypeFromCoords,
+  handleFocusPointPointerDown,
+  isBindingElement,
+  isElbowArrow,
+  isElementInGroup,
+  isEmbeddableElement,
+  isFrameLikeElement,
+  isLinearElement,
+  makeNextSelectedElementIds,
+  selectGroupsForSelectedElements,
+  type Store,
+} from "@excalidraw/element";
+
+import type { ExcalidrawElement } from "@excalidraw/element/types";
+
 import type React from "react";
 
 import type { PointerDownState } from "../types";
