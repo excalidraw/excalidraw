@@ -283,7 +283,7 @@
     "removeItemsFromsLibrary": "Видалити {{count}} елемент(ів) з бібліотеки?",
     "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено.",
     "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Перевищено ліміт сховища браузера. Зміни не буде збережено."
   },
   "errors": {
     "unsupportedFileType": "Непідтримуваний тип файлу.",
@@ -314,7 +314,7 @@
   },
   "toolBar": {
     "selection": "Виділення",
-    "lasso": "",
+    "lasso": "Ласо",
     "image": "Вставити зображення",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
@@ -333,14 +333,14 @@
     "embeddable": "Веб вкладення",
     "laser": "Лазерний вказівник",
     "autoshape": "",
-    "bucketfill": "",
+    "bucketfill": "Заливка",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
     "mermaidToExcalidraw": "Mermaid у Excalidraw",
     "convertElementType": ""
   },
   "bucketfill": {
-    "noRegion": "",
+    "noRegion": "Не вдалося знайти замкнену область для заливки.",
     "tooComplex": ""
   },
   "element": {
