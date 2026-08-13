@@ -436,6 +436,7 @@ import { AppBucketFill } from "./App.bucketFill";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
+import { AppSelection } from "./App.selection";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -686,6 +687,7 @@ class App extends React.Component<AppProps, AppState> {
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
+  public selection: AppSelection = new AppSelection(this);
   public viewport: AppViewport = new AppViewport(this, {
     getContainer: () => this.excalidrawContainerRef.current,
     getStylesPanelMode: () => this.stylesPanelMode,
@@ -6509,7 +6511,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
-  private getElementsAtPosition(
+  public getElementsAtPosition(
     x: number,
     y: number,
     opts?: {
@@ -6925,7 +6927,8 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private finishImageCropping = () => {
+  // TODO: Temporary public, change back after App.selection extraction
+  public finishImageCropping = () => {
     if (this.state.croppingElementId) {
       this.store.scheduleCapture();
       this.setState({
@@ -7193,7 +7196,7 @@ class App extends React.Component<AppProps, AppState> {
     ];
   };
 
-  private getElementLinkAtPosition = (
+  public getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
     hitElementMightBeLocked: NonDeletedExcalidrawElement | null,
   ): NonDeletedExcalidrawElement | undefined => {
@@ -8572,7 +8575,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.clearSelectionIfNotUsingSelection();
 
-    if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
+    if (this.selection.handlePointerDown(event, pointerDownState)) {
       return;
     }
 
@@ -9230,7 +9233,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * @returns whether the pointer event has been completely handled
    */
-  private handleSelectionOnPointerDown = (
+  public handleSelectionOnPointerDown = (
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
@@ -9668,7 +9671,7 @@ class App extends React.Component<AppProps, AppState> {
     return false;
   };
 
-  private isASelectedElement(hitElement: ExcalidrawElement | null): boolean {
+  public isASelectedElement(hitElement: ExcalidrawElement | null): boolean {
     return hitElement != null && this.state.selectedElementIds[hitElement.id];
   }
 
