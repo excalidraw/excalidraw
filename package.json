@@ -3,6 +3,7 @@
   "name": "excalidraw-monorepo",
   "packageManager": "yarn@1.22.22",
   "workspaces": [
+    "backend",
     "excalidraw-app",
     "packages/*",
     "examples/*"

@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: excalidraw
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.prod}
       POSTGRES_DB: excalidraw
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -28,8 +28,8 @@ services:
         condition: service_healthy
     environment:
       PORT: 3010
-      DATABASE_URL: postgresql://excalidraw:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/excalidraw
-      GCS_BUCKET: ${GCS_BUCKET:?Set GCS_BUCKET in .env}
+      DATABASE_URL: postgresql://excalidraw:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env.prod}@postgres:5432/excalidraw
+      GCS_BUCKET: ${GCS_BUCKET:?Set GCS_BUCKET in .env.prod}
       GOOGLE_APPLICATION_CREDENTIALS: /secrets/gcs-key.json
     volumes:
       - type: bind
@@ -56,7 +56,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "${HTTP_PORT:-3000}:80"
+      - "${HTTP_PORT:-80}:80"
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health"]
       interval: 10s

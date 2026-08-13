@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Scene {
+  roomId     String   @id
+  ciphertext Bytes
+  iv         Bytes
+  revision   Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model SceneFile {
+  id        String
+  roomId    String
+  gcsPath   String
+  createdAt DateTime @default(now())
+
+  @@id([roomId, id])
+  @@index([roomId])
+}

@@ -1,11 +1,15 @@
 .DS_Store
 .env.development.local
+.env
 .env.local
 .env.production.local
 .env.test.local
 .envrc
 .eslintcache
 .history
+gcs-key.json
+*-key.json
+.env.prod
 .idea
 .vercel
 .vscode
