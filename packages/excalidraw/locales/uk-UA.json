@@ -205,9 +205,9 @@
     "hint_emptyLibrary": "Виберіть об'єкт на полотні, щоб додати його сюди або встановіть бібліотеку з публічного репозиторію, що нижче.",
     "hint_emptyPrivateLibrary": "Виберіть елемент на полотні, щоб додати його сюди.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
+      "inputPlaceholder": "Шукати в бібліотеці",
+      "heading": "Збіги в бібліотеці",
+      "noResults": "Збігів не знайдено...",
       "clearSearch": "Очистити пошук"
     }
   },
@@ -217,8 +217,8 @@
     "singleResult": "результат",
     "multipleResults": "результати",
     "placeholder": "Знайти текст на полотні...",
-    "frames": "",
-    "texts": ""
+    "frames": "Рамки",
+    "texts": "Тексти"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
