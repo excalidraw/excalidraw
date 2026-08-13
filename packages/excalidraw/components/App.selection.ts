@@ -1,4 +1,4 @@
-// Existing in-process selection dependencies are imported directly. This
+// Existing in-process selection dependencies are imported directly. this.app
 // replaces one-callback-per-function dependency wrappers.
 import { KEYS, isSelectionLikeTool, tupleToCoors } from "@excalidraw/common";
 import {
@@ -31,7 +31,7 @@ import type { PointerDownState } from "../types";
 import type App from "./App";
 
 export class AppSelection {
-  constructor(private readonly app: App) {}
+  constructor(private readonly app: App, private readonly store: Store) {}
 
   /**
    * @returns whether the pointer event has been completely handled and the
@@ -41,61 +41,52 @@ export class AppSelection {
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): boolean => {
-    return this.app.handleSelectionOnPointerDown(event, pointerDownState);
-  };
-
-
-  /**
-   * @returns whether the pointer event has been completely handled
-   */
-  public handleSelectionOnPointerDown = (
-    event: React.PointerEvent<HTMLElement>,
-    pointerDownState: PointerDownState,
-  ): boolean => {
-    if (isSelectionLikeTool(this.state.activeTool.type)) {
-      const elements = this.scene.getNonDeletedElements();
-      const elementsMap = this.scene.getNonDeletedElementsMap();
-      const selectedElements = this.scene.getSelectedElements(this.state);
+    if (isSelectionLikeTool(this.app.state.activeTool.type)) {
+      const elements = this.app.scene.getNonDeletedElements();
+      const elementsMap = this.app.scene.getNonDeletedElementsMap();
+      const selectedElements = this.app.scene.getSelectedElements(
+        this.app.state,
+      );
 
       if (
         selectedElements.length === 1 &&
-        !this.state.selectedLinearElement?.isEditing &&
+        !this.app.state.selectedLinearElement?.isEditing &&
         !isElbowArrow(selectedElements[0]) &&
         !(
           isLinearElement(selectedElements[0]) &&
-          (this.editorInterface.userAgent.isMobileDevice ||
+          (this.app.editorInterface.userAgent.isMobileDevice ||
             selectedElements[0].points.length === 2)
         ) &&
         !(
-          this.state.selectedLinearElement &&
-          this.state.selectedLinearElement.hoverPointIndex !== -1
+          this.app.state.selectedLinearElement &&
+          this.app.state.selectedLinearElement.hoverPointIndex !== -1
         )
       ) {
         const elementWithTransformHandleType =
           getElementWithTransformHandleType(
             elements,
-            this.state,
+            this.app.state,
             pointerDownState.origin.x,
             pointerDownState.origin.y,
-            this.state.zoom,
+            this.app.state.zoom,
             event.pointerType,
-            this.scene.getNonDeletedElementsMap(),
-            this.editorInterface,
+            this.app.scene.getNonDeletedElementsMap(),
+            this.app.editorInterface,
           );
         if (elementWithTransformHandleType != null) {
           if (
             elementWithTransformHandleType.transformHandleType === "rotation"
           ) {
-            this.setState({
+            this.app.setState({
               resizingElement: elementWithTransformHandleType.element,
             });
             pointerDownState.resize.handleType =
               elementWithTransformHandleType.transformHandleType;
-          } else if (this.state.croppingElementId) {
+          } else if (this.app.state.croppingElementId) {
             pointerDownState.resize.handleType =
               elementWithTransformHandleType.transformHandleType;
           } else {
-            this.setState({
+            this.app.setState({
               resizingElement: elementWithTransformHandleType.element,
             });
             pointerDownState.resize.handleType =
@@ -107,9 +98,9 @@ export class AppSelection {
           getCommonBounds(selectedElements),
           pointerDownState.origin.x,
           pointerDownState.origin.y,
-          this.state.zoom,
+          this.app.state.zoom,
           event.pointerType,
-          this.editorInterface,
+          this.app.editorInterface,
         );
       }
       if (pointerDownState.resize.handleType) {
@@ -134,21 +125,23 @@ export class AppSelection {
           );
         }
       } else {
-        if (this.state.selectedLinearElement) {
-          const linearElementEditor = this.state.selectedLinearElement;
+        if (this.app.state.selectedLinearElement) {
+          const linearElementEditor = this.app.state.selectedLinearElement;
           const ret = LinearElementEditor.handlePointerDown(
             event,
-            this,
+            this.app,
             this.store,
             pointerDownState.origin,
             linearElementEditor,
-            this.scene,
+            this.app.scene,
           );
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
           }
           if (ret.linearElementEditor) {
-            this.setState({ selectedLinearElement: ret.linearElementEditor });
+            this.app.setState({
+              selectedLinearElement: ret.linearElementEditor,
+            });
           }
           if (ret.didAddPoint) {
             return true;
@@ -156,7 +149,7 @@ export class AppSelection {
 
           // Also check at current pointer position if focus point is being hovered
           // (in case we're clicking directly without a prior move event)
-          const elementsMap = this.scene.getNonDeletedElementsMap();
+          const elementsMap = this.app.scene.getNonDeletedElementsMap();
           const arrow = LinearElementEditor.getElement(
             linearElementEditor.elementId,
             elementsMap,
@@ -171,12 +164,12 @@ export class AppSelection {
               arrow,
               pointerDownState,
               elementsMap,
-              this.state,
+              this.app.state,
             );
 
             // If focus point is hit, update state and prevent element selection
             if (hitFocusPoint) {
-              this.setState({
+              this.app.setState({
                 selectedLinearElement: {
                   ...linearElementEditor,
                   hoveredFocusPointBinding: hitFocusPoint,
@@ -193,7 +186,7 @@ export class AppSelection {
           }
         }
 
-        const allHitElements = this.getElementsAtPosition(
+        const allHitElements = this.app.getElementsAtPosition(
           pointerDownState.origin.x,
           pointerDownState.origin.y,
           {
@@ -205,7 +198,7 @@ export class AppSelection {
         // Cannot set preferSelected in getElementAtPosition as we do in pointer move; consider:
         // A & B: both unlocked, A selected, B on top, A & B overlaps in some way
         // we want to select B when clicking on the overlapping area
-        const hitElementMightBeLocked = this.getElementAtPosition(
+        const hitElementMightBeLocked = this.app.getElementAtPosition(
           pointerDownState.origin.x,
           pointerDownState.origin.y,
           {
@@ -215,9 +208,9 @@ export class AppSelection {
 
         if (
           !hitElementMightBeLocked ||
-          hitElementMightBeLocked.id !== this.state.activeLockedId
+          hitElementMightBeLocked.id !== this.app.state.activeLockedId
         ) {
-          this.setState({
+          this.app.setState({
             activeLockedId: null,
           });
         }
@@ -226,7 +219,7 @@ export class AppSelection {
           hitElementMightBeLocked &&
           hitElementMightBeLocked.locked &&
           !unlockedHitElements.some(
-            (el) => this.state.selectedElementIds[el.id],
+            (el) => this.app.state.selectedElementIds[el.id],
           )
         ) {
           pointerDownState.hit.element = null;
@@ -234,31 +227,31 @@ export class AppSelection {
           // hitElement may already be set above, so check first
           pointerDownState.hit.element =
             pointerDownState.hit.element ??
-            this.getElementAtPosition(
+            this.app.getElementAtPosition(
               pointerDownState.origin.x,
               pointerDownState.origin.y,
             );
         }
 
-        this.hitLinkElement = this.getElementLinkAtPosition(
+        this.app.hitLinkElement = this.app.getElementLinkAtPosition(
           pointerDownState.origin,
           hitElementMightBeLocked,
         );
 
-        if (this.hitLinkElement) {
+        if (this.app.hitLinkElement) {
           return true;
         }
 
         if (
-          this.state.croppingElementId &&
-          pointerDownState.hit.element?.id !== this.state.croppingElementId
+          this.app.state.croppingElementId &&
+          pointerDownState.hit.element?.id !== this.app.state.croppingElementId
         ) {
-          this.finishImageCropping();
+          this.app.finishImageCropping();
         }
 
         if (pointerDownState.hit.element) {
           // Early return if pointer is hitting link icon
-          const hitLinkElement = this.getElementLinkAtPosition(
+          const hitLinkElement = this.app.getElementLinkAtPosition(
             {
               x: pointerDownState.origin.x,
               y: pointerDownState.origin.y,
@@ -277,28 +270,29 @@ export class AppSelection {
         const hitElement = pointerDownState.hit.element;
         const someHitElementIsSelected =
           pointerDownState.hit.allHitElements.some((element) =>
-            this.isASelectedElement(element),
+            this.app.isASelectedElement(element),
           );
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
           !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
-          (!this.state.selectedLinearElement?.isEditing ||
+          (!this.app.state.selectedLinearElement?.isEditing ||
             (hitElement &&
-              hitElement?.id !== this.state.selectedLinearElement?.elementId))
+              hitElement?.id !==
+                this.app.state.selectedLinearElement?.elementId))
         ) {
           this.clearSelection(hitElement);
         }
 
-        if (this.state.selectedLinearElement?.isEditing) {
-          this.setState((prevState) => ({
+        if (this.app.state.selectedLinearElement?.isEditing) {
+          this.app.setState((prevState) => ({
             selectedLinearElement: prevState.selectedLinearElement
               ? {
                   ...prevState.selectedLinearElement,
                   isEditing:
                     !!hitElement &&
                     hitElement.id ===
-                      this.state.selectedLinearElement?.elementId,
+                      this.app.state.selectedLinearElement?.elementId,
                 }
               : null,
             selectedElementIds: prevState.selectedLinearElement
@@ -306,7 +300,7 @@ export class AppSelection {
                   {
                     [prevState.selectedLinearElement.elementId]: true,
                   },
-                  this.state,
+                  this.app.state,
                 )
               : makeNextSelectedElementIds({}, prevState),
           }));
@@ -319,47 +313,50 @@ export class AppSelection {
               // ctrl + alt means we're lasso selecting - start lasso trail and switch to lasso tool
 
               // Close any open dialogs that might interfere with lasso selection
-              if (this.state.openDialog?.name === "elementLinkSelector") {
-                this.setOpenDialog(null);
+              if (this.app.state.openDialog?.name === "elementLinkSelector") {
+                this.app.setOpenDialog(null);
               }
-              this.lassoTrail.startPath(
+              this.app.lassoTrail.startPath(
                 pointerDownState.origin.x,
                 pointerDownState.origin.y,
                 event.shiftKey,
               );
-              this.setActiveTool({ type: "lasso", fromSelection: true });
+              this.app.setActiveTool({ type: "lasso", fromSelection: true });
               return false;
             }
-            if (!this.state.selectedElementIds[hitElement.id]) {
+            if (!this.app.state.selectedElementIds[hitElement.id]) {
               pointerDownState.hit.wasAddedToSelection = true;
             }
-            this.setState((prevState) => ({
+            this.app.setState((prevState) => ({
               ...editGroupForSelectedElement(prevState, hitElement),
-              previousSelectedElementIds: this.state.selectedElementIds,
+              previousSelectedElementIds: this.app.state.selectedElementIds,
             }));
             // mark as not completely handled so as to allow dragging etc.
             return false;
           }
 
           // deselect if item is selected
-          // if shift is not clicked, this will always return true
+          // if shift is not clicked, this.app will always return true
           // otherwise, it will trigger selection based on current
           // state of the box
-          if (!this.state.selectedElementIds[hitElement.id]) {
+          if (!this.app.state.selectedElementIds[hitElement.id]) {
             // if we are currently editing a group, exiting editing mode and deselect the group.
             if (
-              this.state.editingGroupId &&
-              !isElementInGroup(hitElement, this.state.editingGroupId)
+              this.app.state.editingGroupId &&
+              !isElementInGroup(hitElement, this.app.state.editingGroupId)
             ) {
-              this.setState({
-                selectedElementIds: makeNextSelectedElementIds({}, this.state),
+              this.app.setState({
+                selectedElementIds: makeNextSelectedElementIds(
+                  {},
+                  this.app.state,
+                ),
                 selectedGroupIds: {},
                 editingGroupId: null,
                 activeEmbeddable: null,
               });
             }
 
-            // Add hit element to selection. At this point if we're not holding
+            // Add hit element to selection. At this.app point if we're not holding
             // SHIFT the previously selected element(s) were deselected above
             // (make sure you use setState updater to use latest state)
             // With shift-selection, we want to make sure that frames and their containing
@@ -368,7 +365,7 @@ export class AppSelection {
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
-              this.setState((prevState) => {
+              this.app.setState((prevState) => {
                 let nextSelectedElementIds: { [id: string]: true } = {
                   ...prevState.selectedElementIds,
                   [hitElement.id]: true,
@@ -377,7 +374,7 @@ export class AppSelection {
                 const previouslySelectedElements: ExcalidrawElement[] = [];
 
                 Object.keys(prevState.selectedElementIds).forEach((id) => {
-                  const element = this.scene.getElement(id);
+                  const element = this.app.scene.getElement(id);
                   element && previouslySelectedElements.push(element);
                 });
 
@@ -399,7 +396,7 @@ export class AppSelection {
                 } else {
                   // hitElement is neither a frame nor an element in a frame
                   // but since hitElement could be in a group with some frames
-                  // this means selecting hitElement will have the frames selected as well
+                  // this.app means selecting hitElement will have the frames selected as well
                   // because we want to keep the invariant:
                   // - frames and their elements are not selected at the same time
                   // we deselect elements in those frames that were previously selected
@@ -409,7 +406,7 @@ export class AppSelection {
                     groupIds
                       .flatMap((gid) =>
                         getElementsInGroup(
-                          this.scene.getNonDeletedElements(),
+                          this.app.scene.getNonDeletedElements(),
                           gid,
                         ),
                       )
@@ -428,7 +425,7 @@ export class AppSelection {
                         element.groupIds
                           .flatMap((gid) =>
                             getElementsInGroup(
-                              this.scene.getNonDeletedElements(),
+                              this.app.scene.getNonDeletedElements(),
                               gid,
                             ),
                           )
@@ -442,7 +439,7 @@ export class AppSelection {
 
                 // Finally, in shape selection mode, we'd like to
                 // keep only one shape or group selected at a time.
-                // This means, if the hitElement is a different shape or group
+                // this.app means, if the hitElement is a different shape or group
                 // than the previously selected ones, we deselect the previous ones
                 // and select the hitElement
                 if (prevState.openDialog?.name === "elementLinkSelector") {
@@ -463,9 +460,9 @@ export class AppSelection {
                       editingGroupId: prevState.editingGroupId,
                       selectedElementIds: nextSelectedElementIds,
                     },
-                    this.scene.getNonDeletedElements(),
+                    this.app.scene.getNonDeletedElements(),
                     prevState,
-                    this,
+                    this.app,
                   ),
                   showHyperlinkPopup:
                     hitElement.link || isEmbeddableElement(hitElement)
@@ -478,11 +475,33 @@ export class AppSelection {
           }
         }
 
-        this.setState({
-          previousSelectedElementIds: this.state.selectedElementIds,
+        this.app.setState({
+          previousSelectedElementIds: this.app.state.selectedElementIds,
         });
       }
     }
     return false;
   };
+
+  private clearSelection(hitElement: ExcalidrawElement | null): void {
+    this.app.setState((prevState) => ({
+      selectedElementIds: makeNextSelectedElementIds({}, prevState),
+      activeEmbeddable: null,
+      selectedGroupIds: {},
+      // Continue editing the same group if the user selected a different
+      // element from it
+      editingGroupId:
+        prevState.editingGroupId &&
+        hitElement != null &&
+        isElementInGroup(hitElement, prevState.editingGroupId)
+          ? prevState.editingGroupId
+          : null,
+    }));
+    this.app.setState({
+      selectedElementIds: makeNextSelectedElementIds({}, this.app.state),
+      activeEmbeddable: null,
+      previousSelectedElementIds: this.app.state.selectedElementIds,
+      selectedLinearElement: null,
+    });
+  }
 }

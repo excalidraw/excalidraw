@@ -207,11 +207,9 @@ import {
   getMinTextElementWidth,
   ShapeCache,
   getRenderOpacity,
-  editGroupForSelectedElement,
   getElementsInGroup,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
-  isElementInGroup,
   isSelectedViaGroup,
   selectGroupsForSelectedElements,
   syncInvalidIndices,
@@ -219,8 +217,6 @@ import {
   excludeElementsInFramesFromSelection,
   getSelectionStateForElements,
   makeNextSelectedElementIds,
-  getResizeOffsetXY,
-  getResizeArrowDirection,
   transformElements,
   getCursorForResizingElement,
   getElementWithTransformHandleType,
@@ -250,7 +246,6 @@ import {
   getSnapOutlineMidPoint,
   handleFocusPointDrag,
   handleFocusPointHover,
-  handleFocusPointPointerDown,
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
@@ -687,7 +682,7 @@ class App extends React.Component<AppProps, AppState> {
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
-  public selection: AppSelection = new AppSelection(this);
+  public selection: AppSelection;
   public viewport: AppViewport = new AppViewport(this, {
     getContainer: () => this.excalidrawContainerRef.current,
     getStylesPanelMode: () => this.stylesPanelMode,
@@ -866,6 +861,7 @@ class App extends React.Component<AppProps, AppState> {
     this.visibleElements = [];
 
     this.store = new Store(this);
+    this.selection = new AppSelection(this, this.store);
     this.history = new History(this.store);
 
     this.excalidrawContainerValue = {
@@ -12356,28 +12352,6 @@ class App extends React.Component<AppProps, AppState> {
   private scheduleImageRefresh = throttle(() => {
     this.addNewImagesToImageCache();
   }, IMAGE_RENDER_TIMEOUT);
-
-  private clearSelection(hitElement: ExcalidrawElement | null): void {
-    this.setState((prevState) => ({
-      selectedElementIds: makeNextSelectedElementIds({}, prevState),
-      activeEmbeddable: null,
-      selectedGroupIds: {},
-      // Continue editing the same group if the user selected a different
-      // element from it
-      editingGroupId:
-        prevState.editingGroupId &&
-        hitElement != null &&
-        isElementInGroup(hitElement, prevState.editingGroupId)
-          ? prevState.editingGroupId
-          : null,
-    }));
-    this.setState({
-      selectedElementIds: makeNextSelectedElementIds({}, this.state),
-      activeEmbeddable: null,
-      previousSelectedElementIds: this.state.selectedElementIds,
-      selectedLinearElement: null,
-    });
-  }
 
   private handleInteractiveCanvasRef = (canvas: HTMLCanvasElement | null) => {
     // canvas is null when unmounting
