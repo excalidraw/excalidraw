@@ -293,10 +293,15 @@ const ImageExportModal = ({
               setExportScale(scale);
               actionManager.executeAction(actionChangeExportScale, "ui", scale);
             }}
-            choices={EXPORT_SCALES.map((scale) => ({
-              value: scale,
-              label: `${scale}\u00d7`,
-            }))}
+            choices={EXPORT_SCALES.map((scale) => {
+              const label = `${scale}\u00d7`;
+
+              return {
+                value: scale,
+                label,
+                ariaLabel: label,
+              };
+            })}
           />
         </ExportSetting>
 

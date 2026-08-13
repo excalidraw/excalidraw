@@ -1,4 +1,4 @@
-import { queryByText, queryByTestId } from "@testing-library/react";
+import { getByRole, queryByText, queryByTestId } from "@testing-library/react";
 import { useMemo } from "react";
 
 import { THEME } from "@excalidraw/common";
@@ -496,5 +496,26 @@ describe("<Excalidraw/>", () => {
     expect(container.querySelector(".excalidraw")).toHaveClass(
       "custom-excalidraw",
     );
+  });
+
+  describe("Test image export dialog", () => {
+    it("exposes accessible names for the export scale options", async () => {
+      const { container } = await render(<Excalidraw />);
+
+      toggleMenu(container);
+      fireEvent.click(queryByTestId(container, "image-export-button")!);
+
+      const imageExportModal = document.querySelector(
+        ".ImageExportModal",
+      ) as HTMLElement;
+
+      for (const scale of [1, 2, 3]) {
+        expect(
+          getByRole(imageExportModal, "radio", {
+            name: `${scale}\u00d7`,
+          }),
+        ).toBeInTheDocument();
+      }
+    });
   });
 });
