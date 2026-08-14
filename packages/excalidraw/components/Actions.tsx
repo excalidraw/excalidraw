@@ -907,6 +907,9 @@ export const UndoRedoActions = ({
     <div className="redo-button-container">
       <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
     </div>
+    <div className="duplicate-button-container">
+      {renderAction("duplicateSelection")}
+    </div>
   </div>
 );
 
