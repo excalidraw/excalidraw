@@ -341,7 +341,7 @@
   },
   "bucketfill": {
     "noRegion": "Не вдалося знайти замкнену область для заливки.",
-    "tooComplex": ""
+    "tooComplex": "Ця область занадто складна для заливки."
   },
   "element": {
     "rectangle": "Прямокутник",
@@ -426,8 +426,8 @@
     "title": "Помилка"
   },
   "progressDialog": {
-    "title": "",
-    "defaultMessage": ""
+    "title": "Збереження",
+    "defaultMessage": "Підготовка до збереження..."
   },
   "exportDialog": {
     "disk_title": "Зберегти на диск",
@@ -591,9 +591,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Ваші малюнки зберігаються у сховищі браузера.",
+      "center_heading_line2": "Дані, збережені в браузері, можуть бути несподівано видалені.",
+      "center_heading_line3": "Регулярно зберігайте свою роботу у файл, щоб не втратити її.",
       "center_heading_plus": "Чи бажаєте перейти до Excalidraw+?",
       "menuHint": "Експорт, налаштування, мови, ..."
     },
@@ -611,8 +611,8 @@
     "shades": "Тіні",
     "hexCode": "Hex-код",
     "noShades": "Немає доступних відтінків цього кольору",
-    "invalidColor": "",
-    "invalidHexLength": "",
+    "invalidColor": "Некоректний колір",
+    "invalidHexLength": "Код Hex має містити 3, 4, 6 або 8 символів",
     "topPicksTip": "",
     "resetTopPicks": ""
   },
