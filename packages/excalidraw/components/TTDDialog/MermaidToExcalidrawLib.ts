@@ -6,6 +6,7 @@ import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 import { getSharedMermaidInstance } from "../../obsidianUtils";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
+import { BinaryFiles } from "@excalidraw/excalidraw/types";
 
 let mermaidToExcalidrawLib: MermaidToExcalidrawLibProps | null = null;
 let queue: Promise<any> = Promise.resolve();
@@ -46,7 +47,7 @@ export const mermaidToExcalidraw = async (
 ): Promise<
   | {
       elements?: ExcalidrawElement[];
-      files?: any;
+      files?: BinaryFiles;
       error?: string;
     }
   | undefined
