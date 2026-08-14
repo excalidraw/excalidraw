@@ -8719,10 +8719,13 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
-    } else if (this.state.activeTool.type === "freedraw") {
+    } else if (
+      this.state.activeTool.type === "freedraw" ||
+      this.state.activeTool.type === "highlighter"
+    ) {
       this.handleFreeDrawElementOnPointerDown(
         event,
-        this.state.activeTool.type,
+        "freedraw",
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
@@ -9789,17 +9792,26 @@ class App extends React.Component<AppProps, AppState> {
 
     const strokeVariability = this.state.currentItemStrokeVariability;
 
+    const isHighlighter = this.state.activeTool.type === "highlighter";
+    const strokeColor =
+      isHighlighter &&
+      (this.state.currentItemStrokeColor === "#1e1e1e" ||
+        this.state.currentItemStrokeColor === "#000000" ||
+        !this.state.currentItemStrokeColor)
+        ? "#ffd500"
+        : this.state.currentItemStrokeColor;
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
       y: gridY,
-      strokeColor: this.state.currentItemStrokeColor,
+      strokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.getCurrentItemStrokeWidth("freedraw"),
+      strokeWidth: isHighlighter ? 20 : this.getCurrentItemStrokeWidth("freedraw"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
-      opacity: this.state.currentItemOpacity,
+      opacity: isHighlighter ? 40 : this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
       strokeOptions: {
@@ -12338,6 +12350,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !this.isToolLocked() &&
         activeTool.type !== "freedraw" &&
+        activeTool.type !== "highlighter" &&
         newElement
       ) {
         this.setState((prevState) => ({
@@ -12399,6 +12412,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !this.isToolLocked() &&
         activeTool.type !== "freedraw" &&
+        activeTool.type !== "highlighter" &&
         // bucket fill stays active for back-to-back fills regardless of the
         // tool lock (paint-bucket UX)
         activeTool.type !== TOOL_TYPE.bucketfill &&

@@ -19,6 +19,7 @@ import {
   ArrowIcon,
   LineIcon,
   FreedrawIcon,
+  HighlighterIcon,
   drawShapeToolIcon,
   TextIcon,
   ImageIcon,
@@ -111,6 +112,10 @@ export const TOOLS = defineTools({
     icon: FreedrawIcon,
     letterKey: [KEYS.P, KEYS.X],
     numericKey: KEYS["7"],
+  },
+  highlighter: {
+    icon: HighlighterIcon,
+    letterKey: KEYS.H,
   },
   text: {
     icon: TextIcon,
@@ -322,6 +327,7 @@ export const EllipseToolButton = createToolButton("ellipse");
 export const ArrowToolButton = createToolButton("arrow");
 export const LineToolButton = createToolButton("line");
 export const FreedrawToolButton = createToolButton("freedraw");
+export const HighlighterToolButton = createToolButton("highlighter");
 export const TextToolButton = createToolButton("text");
 export const ImageToolButton = createToolButton("image");
 export const EraserToolButton = createToolButton("eraser");
