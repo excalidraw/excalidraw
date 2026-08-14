@@ -153,6 +153,7 @@ export type ToolType =
   | "arrow"
   | "line"
   | "freedraw"
+  | "highlighter"
   | "text"
   | "image"
   | "eraser"
