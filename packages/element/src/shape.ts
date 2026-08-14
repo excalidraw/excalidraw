@@ -108,6 +108,21 @@ export class ShapeCache {
     elementWithCanvasCache.delete(element);
   };
 
+  /**
+   * Copies a cached shape from one element instance to another, without
+   * regenerating it. Since the cache is a WeakMap keyed by object identity,
+   * every element instance normally needs its own entry — this lets a
+   * caller that knows two instances are shape-equivalent (e.g. the same
+   * element re-received from a remote peer with only its position changed)
+   * carry the cache forward instead of paying for a full regeneration.
+   */
+  public static copy = (from: ExcalidrawElement, to: ExcalidrawElement) => {
+    const cached = ShapeCache.cache.get(from);
+    if (cached) {
+      ShapeCache.cache.set(to, cached);
+    }
+  };
+
   public static destroy = () => {
     ShapeCache.cache = new WeakMap();
   };
