@@ -678,17 +678,17 @@
     "deleteMessage": "Видалити повідомлення",
     "viewAsMermaid": "",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Створімо вашу діаграму",
+      "description": "Опишіть діаграму, яку хочете створити, — ми згенеруємо її для вас.",
+      "hint": "Наразі можна створювати блок-схеми, діаграми послідовностей, класів, станів і зв'язків між сутностями."
     },
     "preview": "",
     "insert": "Вставити",
     "retry": "Спробувати знову",
     "errors": {
       "promptTooShort": "Запит надто короткий (мін. {{min}} символів)",
-      "promptTooLong": "",
-      "generationFailed": "",
+      "promptTooLong": "Запит задовгий (максимум {{max}} символів)",
+      "generationFailed": "Не вдалося згенерувати",
       "invalidDiagram": "",
       "fixInMermaid": "",
       "aiRepair": "",
