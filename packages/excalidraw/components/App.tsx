@@ -6039,6 +6039,15 @@ class App extends React.Component<AppProps, AppState> {
         this.store.scheduleCapture();
       }
 
+      if (nextActiveTool.type === "highlighter") {
+        this.store.scheduleCapture();
+        if (this.state.activeTool.type !== "highlighter") {
+          this.setState({ currentItemOpacity: 40 });
+        }
+      } else if (this.state.activeTool.type === "highlighter") {
+        this.setState({ currentItemOpacity: 100 });
+      }
+
       if (nextActiveTool.type === "lasso") {
         return {
           ...prevState,
@@ -9801,6 +9810,15 @@ class App extends React.Component<AppProps, AppState> {
         ? "#ffd500"
         : this.state.currentItemStrokeColor;
 
+    const baseStrokeWidth = this.getCurrentItemStrokeWidth("freedraw");
+    const strokeWidth = isHighlighter
+      ? baseStrokeWidth <= 0.5
+        ? 2
+        : baseStrokeWidth <= 1.0
+        ? 4
+        : 6.6
+      : baseStrokeWidth;
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -9808,10 +9826,10 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: isHighlighter ? 20 : this.getCurrentItemStrokeWidth("freedraw"),
+      strokeWidth,
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
-      opacity: isHighlighter ? 40 : this.state.currentItemOpacity,
+      opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
       strokeOptions: {
