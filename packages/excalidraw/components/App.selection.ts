@@ -496,171 +496,167 @@ export class AppSelection {
   ): void => {
     const hitElement = pointerDownState.hit.element;
 
-      if (
-        hitElement &&
-        !pointerDownState.drag.hasOccurred &&
-        !pointerDownState.hit.wasAddedToSelection &&
-        // if we're editing a line, pointerup shouldn't switch selection if
-        // box selected
-        (!this.state.selectedLinearElement?.isEditing ||
-          !pointerDownState.boxSelection.hasOccurred) &&
-        // hitElement can be set when alt + ctrl to toggle lasso and we will
-        // just respect the selected elements from lasso instead
-        this.state.activeTool.type !== "lasso"
-      ) {
-        // when inside line editor, shift selects points instead
-        if (
-          childEvent.shiftKey &&
-          !this.state.selectedLinearElement?.isEditing
-        ) {
-          if (this.state.selectedElementIds[hitElement.id]) {
-            if (isSelectedViaGroup(this.state, hitElement)) {
-              this.setState((_prevState) => {
-                const nextSelectedElementIds = {
-                  ..._prevState.selectedElementIds,
-                };
-
-                // We want to unselect all groups hitElement is part of
-                // as well as all elements that are part of the groups
-                // hitElement is part of
-                for (const groupedElement of hitElement.groupIds.flatMap(
-                  (groupId) =>
-                    getElementsInGroup(
-                      this.scene.getNonDeletedElements(),
-                      groupId,
-                    ),
-                )) {
-                  delete nextSelectedElementIds[groupedElement.id];
-                }
-
-                return {
-                  selectedGroupIds: {
-                    ..._prevState.selectedElementIds,
-                    ...hitElement.groupIds
-                      .map((gId) => ({ [gId]: false }))
-                      .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
-                  },
-                  selectedElementIds: makeNextSelectedElementIds(
-                    nextSelectedElementIds,
-                    _prevState,
-                  ),
-                };
-              });
-              // if not dragging a linear element point (outside editor)
-            } else if (!this.state.selectedLinearElement?.isDragging) {
-              // remove element from selection while
-              // keeping prev elements selected
-
-              this.setState((prevState) => {
-                const newSelectedElementIds = {
-                  ...prevState.selectedElementIds,
-                };
-                delete newSelectedElementIds[hitElement!.id];
-                const newSelectedElements = getSelectedElements(
-                  this.scene.getNonDeletedElements(),
-                  { selectedElementIds: newSelectedElementIds },
-                );
-
-                return {
-                  ...selectGroupsForSelectedElements(
-                    {
-                      editingGroupId: prevState.editingGroupId,
-                      selectedElementIds: newSelectedElementIds,
-                    },
-                    this.scene.getNonDeletedElements(),
-                    prevState,
-                    this,
-                  ),
-                  // set selectedLinearElement only if thats the only element selected
-                  selectedLinearElement:
-                    newSelectedElements.length === 1 &&
-                    isLinearElement(newSelectedElements[0])
-                      ? new LinearElementEditor(
-                          newSelectedElements[0],
-                          this.scene.getNonDeletedElementsMap(),
-                        )
-                      : prevState.selectedLinearElement,
-                };
-              });
-            }
-          } else if (
-            hitElement.frameId &&
-            this.state.selectedElementIds[hitElement.frameId]
-          ) {
-            // when hitElement is part of a selected frame, deselect the frame
-            // to avoid frame and containing elements selected simultaneously
-            this.setState((prevState) => {
-              const nextSelectedElementIds: {
-                [id: string]: true;
-              } = {
-                ...prevState.selectedElementIds,
-                [hitElement.id]: true,
+    if (
+      hitElement &&
+      !pointerDownState.drag.hasOccurred &&
+      !pointerDownState.hit.wasAddedToSelection &&
+      // if we're editing a line, pointerup shouldn't switch selection if
+      // box selected
+      (!this.app.state.selectedLinearElement?.isEditing ||
+        !pointerDownState.boxSelection.hasOccurred) &&
+      // hitElement can be set when alt + ctrl to toggle lasso and we will
+      // just respect the selected elements from lasso instead
+      this.app.state.activeTool.type !== "lasso"
+    ) {
+      // when inside line editor, shift selects points instead
+      if (event.shiftKey && !this.app.state.selectedLinearElement?.isEditing) {
+        if (this.app.state.selectedElementIds[hitElement.id]) {
+          if (isSelectedViaGroup(this.app.state, hitElement)) {
+            this.app.setState((_prevState) => {
+              const nextSelectedElementIds = {
+                ..._prevState.selectedElementIds,
               };
-              // deselect the frame
-              delete nextSelectedElementIds[hitElement.frameId!];
 
-              // deselect groups containing the frame
-              (this.scene.getElement(hitElement.frameId!)?.groupIds ?? [])
-                .flatMap((gid) =>
-                  getElementsInGroup(this.scene.getNonDeletedElements(), gid),
-                )
-                .forEach((element) => {
-                  delete nextSelectedElementIds[element.id];
-                });
+              // We want to unselect all groups hitElement is part of
+              // as well as all elements that are part of the groups
+              // hitElement is part of
+              for (const groupedElement of hitElement.groupIds.flatMap(
+                (groupId) =>
+                  getElementsInGroup(
+                    this.app.scene.getNonDeletedElements(),
+                    groupId,
+                  ),
+              )) {
+                delete nextSelectedElementIds[groupedElement.id];
+              }
+
+              return {
+                selectedGroupIds: {
+                  ..._prevState.selectedElementIds,
+                  ...hitElement.groupIds
+                    .map((gId) => ({ [gId]: false }))
+                    .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
+                },
+                selectedElementIds: makeNextSelectedElementIds(
+                  nextSelectedElementIds,
+                  _prevState,
+                ),
+              };
+            });
+            // if not dragging a linear element point (outside editor)
+          } else if (!this.app.state.selectedLinearElement?.isDragging) {
+            // remove element from selection while
+            // keeping prev elements selected
+
+            this.app.setState((prevState) => {
+              const newSelectedElementIds = {
+                ...prevState.selectedElementIds,
+              };
+              delete newSelectedElementIds[hitElement!.id];
+              const newSelectedElements = getSelectedElements(
+                this.app.scene.getNonDeletedElements(),
+                { selectedElementIds: newSelectedElementIds },
+              );
 
               return {
                 ...selectGroupsForSelectedElements(
                   {
                     editingGroupId: prevState.editingGroupId,
-                    selectedElementIds: nextSelectedElementIds,
+                    selectedElementIds: newSelectedElementIds,
                   },
-                  this.scene.getNonDeletedElements(),
+                  this.app.scene.getNonDeletedElements(),
                   prevState,
-                  this,
+                  this.app,
                 ),
-                showHyperlinkPopup:
-                  hitElement.link || isEmbeddableElement(hitElement)
-                    ? "info"
-                    : false,
+                // set selectedLinearElement only if thats the only element selected
+                selectedLinearElement:
+                  newSelectedElements.length === 1 &&
+                  isLinearElement(newSelectedElements[0])
+                    ? new LinearElementEditor(
+                        newSelectedElements[0],
+                        this.app.scene.getNonDeletedElementsMap(),
+                      )
+                    : prevState.selectedLinearElement,
               };
             });
-          } else {
-            // add element to selection while keeping prev elements selected
-            this.setState((_prevState) => ({
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  ..._prevState.selectedElementIds,
-                  [hitElement!.id]: true,
-                },
-                _prevState,
-              ),
-            }));
           }
+        } else if (
+          hitElement.frameId &&
+          this.app.state.selectedElementIds[hitElement.frameId]
+        ) {
+          // when hitElement is part of a selected frame, deselect the frame
+          // to avoid frame and containing elements selected simultaneously
+          this.app.setState((prevState) => {
+            const nextSelectedElementIds: {
+              [id: string]: true;
+            } = {
+              ...prevState.selectedElementIds,
+              [hitElement.id]: true,
+            };
+            // deselect the frame
+            delete nextSelectedElementIds[hitElement.frameId!];
+
+            // deselect groups containing the frame
+            (this.app.scene.getElement(hitElement.frameId!)?.groupIds ?? [])
+              .flatMap((gid) =>
+                getElementsInGroup(this.app.scene.getNonDeletedElements(), gid),
+              )
+              .forEach((element) => {
+                delete nextSelectedElementIds[element.id];
+              });
+
+            return {
+              ...selectGroupsForSelectedElements(
+                {
+                  editingGroupId: prevState.editingGroupId,
+                  selectedElementIds: nextSelectedElementIds,
+                },
+                this.app.scene.getNonDeletedElements(),
+                prevState,
+                this.app,
+              ),
+              showHyperlinkPopup:
+                hitElement.link || isEmbeddableElement(hitElement)
+                  ? "info"
+                  : false,
+            };
+          });
         } else {
-          this.setState((prevState) => ({
-            ...selectGroupsForSelectedElements(
+          // add element to selection while keeping prev elements selected
+          this.app.setState((_prevState) => ({
+            selectedElementIds: makeNextSelectedElementIds(
               {
-                editingGroupId: prevState.editingGroupId,
-                selectedElementIds: { [hitElement.id]: true },
+                ..._prevState.selectedElementIds,
+                [hitElement!.id]: true,
               },
-              this.scene.getNonDeletedElements(),
-              prevState,
-              this,
+              _prevState,
             ),
-            selectedLinearElement:
-              isLinearElement(hitElement) &&
-              // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
-              // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
-              prevState.selectedLinearElement?.elementId !== hitElement.id
-                ? new LinearElementEditor(
-                    hitElement,
-                    this.scene.getNonDeletedElementsMap(),
-                  )
-                : prevState.selectedLinearElement,
           }));
         }
+      } else {
+        this.app.setState((prevState) => ({
+          ...selectGroupsForSelectedElements(
+            {
+              editingGroupId: prevState.editingGroupId,
+              selectedElementIds: { [hitElement.id]: true },
+            },
+            this.app.scene.getNonDeletedElements(),
+            prevState,
+            this.app,
+          ),
+          selectedLinearElement:
+            isLinearElement(hitElement) &&
+            // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
+            // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
+            prevState.selectedLinearElement?.elementId !== hitElement.id
+              ? new LinearElementEditor(
+                  hitElement,
+                  this.app.scene.getNonDeletedElementsMap(),
+                )
+              : prevState.selectedLinearElement,
+        }));
       }
-
+    }
   };
 
   private clearSelection(hitElement: ExcalidrawElement | null): void {

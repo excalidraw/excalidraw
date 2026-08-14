@@ -210,7 +210,6 @@ import {
   getElementsInGroup,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
-  isSelectedViaGroup,
   selectGroupsForSelectedElements,
   syncInvalidIndices,
   syncMovedIndices,
