@@ -18,12 +18,15 @@ import {
   isEmbeddableElement,
   isFrameLikeElement,
   isLinearElement,
+  isSelectedViaGroup,
   makeNextSelectedElementIds,
   selectGroupsForSelectedElements,
   type Store,
 } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+
+import { getSelectedElements } from "../scene";
 
 import type React from "react";
 
@@ -482,6 +485,15 @@ export class AppSelection {
     }
     return false;
   };
+
+  /**
+   * Resolves click-selection decisions that pointer-down intentionally defers
+   * so the same interaction can still become a drag.
+   */
+  handlePointerUp = (
+    event: PointerEvent,
+    pointerDownState: PointerDownState,
+  ): void => {};
 
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.app.setState((prevState) => ({

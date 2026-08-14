@@ -11817,6 +11817,7 @@ class App extends React.Component<AppProps, AppState> {
           }));
         }
       }
+      this.selection.handlePointerUp(childEvent, pointerDownState);
 
       if (
         // do not clear selection if lasso is active
