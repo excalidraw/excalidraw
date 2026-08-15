@@ -691,17 +691,17 @@
       "generationFailed": "Не вдалося згенерувати",
       "invalidDiagram": "",
       "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "aiRepair": "Згенерувати знову (автовиправлення)",
+      "requestAborted": "Запит перервано",
+      "requestFailed": "Не вдалося виконати запит",
+      "mermaidParseError": "Помилка синтаксису Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
+      "messageLimit": "Ви вичерпали ліміт AI на безплатному плані. Спробуйте Excalidraw+ або поверніться завтра.",
+      "generalRateLimit": "Притримайте коней, ви надто поспішаєте! Зачекайте трохи, перш ніж спробувати ще раз.",
       "messageLimitInputPlaceholder": "Ви досягли вашого ліміту повідомлень"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Перейти на Plus"
   },
   "quickSearch": {
     "placeholder": "Швидкий пошук"
