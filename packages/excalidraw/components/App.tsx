@@ -5479,6 +5479,19 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (this.state.viewModeEnabled && isArrowKey(event.key)) {
+        const PAN_STEP = 20;
+        let scrollX = this.state.scrollX;
+        let scrollY = this.state.scrollY;
+        if (event.key === KEYS.ARROW_LEFT) scrollX += PAN_STEP;
+        if (event.key === KEYS.ARROW_RIGHT) scrollX -= PAN_STEP;
+        if (event.key === KEYS.ARROW_UP) scrollY += PAN_STEP;
+        if (event.key === KEYS.ARROW_DOWN) scrollY -= PAN_STEP;
+        this.viewport.translate({ scrollX, scrollY });
+        event.preventDefault();
+        return;
+      }
+
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
       }
