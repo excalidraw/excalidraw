@@ -710,6 +710,47 @@ class App extends React.Component<AppProps, AppState> {
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
   private heldArrowKeys = new Set<string>();
+  private panVelocity = { x: 0, y: 0 };
+  private panAnimationId: number | null = null;
+
+  private animatePanning = () => {
+    if (!this.state.viewModeEnabled) {
+      this.panAnimationId = null;
+      return;
+    }
+
+    const MAX_SPEED = 20;
+    const ACCELERATION = 0.15;
+    const DECAY = 0.15;
+
+    let targetVx = 0;
+    let targetVy = 0;
+
+    if (this.heldArrowKeys.has(KEYS.ARROW_LEFT)) targetVx += MAX_SPEED;
+    if (this.heldArrowKeys.has(KEYS.ARROW_RIGHT)) targetVx -= MAX_SPEED;
+    if (this.heldArrowKeys.has(KEYS.ARROW_UP)) targetVy += MAX_SPEED;
+    if (this.heldArrowKeys.has(KEYS.ARROW_DOWN)) targetVy -= MAX_SPEED;
+
+    this.panVelocity.x += (targetVx - this.panVelocity.x) * (targetVx ? ACCELERATION : DECAY);
+    this.panVelocity.y += (targetVy - this.panVelocity.y) * (targetVy ? ACCELERATION : DECAY);
+
+    if (
+      Math.abs(this.panVelocity.x) < 0.1 &&
+      Math.abs(this.panVelocity.y) < 0.1 &&
+      this.heldArrowKeys.size === 0
+    ) {
+      this.panVelocity = { x: 0, y: 0 };
+      this.panAnimationId = null;
+      return;
+    }
+
+    this.viewport.translate(({ scrollX, scrollY }) => ({
+      scrollX: scrollX + this.panVelocity.x,
+      scrollY: scrollY + this.panVelocity.y,
+    }));
+
+    this.panAnimationId = requestAnimationFrame(this.animatePanning);
+  };
   /** previous frame pointer coords */
   previousPointerMoveCoords: { x: number; y: number } | null = null;
 
@@ -5482,14 +5523,9 @@ class App extends React.Component<AppProps, AppState> {
 
       if (this.state.viewModeEnabled && isArrowKey(event.key)) {
         this.heldArrowKeys.add(event.key);
-        const PAN_STEP = 20;
-        let scrollX = this.state.scrollX;
-        let scrollY = this.state.scrollY;
-        if (this.heldArrowKeys.has(KEYS.ARROW_LEFT)) scrollX += PAN_STEP;
-        if (this.heldArrowKeys.has(KEYS.ARROW_RIGHT)) scrollX -= PAN_STEP;
-        if (this.heldArrowKeys.has(KEYS.ARROW_UP)) scrollY += PAN_STEP;
-        if (this.heldArrowKeys.has(KEYS.ARROW_DOWN)) scrollY -= PAN_STEP;
-        this.viewport.translate({ scrollX, scrollY });
+        if (this.panAnimationId === null) {
+          this.panAnimationId = requestAnimationFrame(this.animatePanning);
+        }
         event.preventDefault();
         return;
       }
