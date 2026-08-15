@@ -600,3 +600,8 @@ export function useExcalidrawStateValue(
 export { _useOnAppStateChange as useOnExcalidrawStateChange };
 
 export { applyDarkModeFilter, getStrokeWidthByKey };
+
+export {
+  configureObsidianExcalidrawHost,
+  OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION,
+} from "./obsidianExcalidrawHost"; //zsviczian

@@ -47,6 +47,7 @@ import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidra
 
 import { Fonts } from "./fonts";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
+import { getObsidianExcalidrawHost } from "./obsidianExcalidrawHost";
 
 import type { AppClassProperties, AppState } from "./types";
 
@@ -61,12 +62,20 @@ interface MermaidToExcalidrawLibProps {
 }
 
 export function allowDoubleTapEraser() {
+  const host = getObsidianExcalidrawHost();
+  if (host) {
+    return host.isDoubleTapEraserEnabled();
+  }
   return getHostPlugin().settings.penModeDoubleTapEraser;
 }
 
 //mfuria #329. Enable panning with right mouse button if host plugin setting allows
 export function isPanWithRightMouseEnabled(): boolean {
   try {
+    const host = getObsidianExcalidrawHost();
+    if (host) {
+      return !!host.isRightClickPanEnabled();
+    }
     return !!getHostPlugin().settings?.panWithRightMouseButton;
   } catch (e) {
     return false;
@@ -74,6 +83,10 @@ export function isPanWithRightMouseEnabled(): boolean {
 }
 
 export function getMaxZoom(): number {
+  const host = getObsidianExcalidrawHost();
+  if (host) {
+    return host.getZoomToFitMaxLevel() ?? 1;
+  }
   return getHostPlugin().settings.zoomToFitMaxLevel ?? 1;
 }
 
@@ -97,6 +110,10 @@ export function getExcalidrawContentEl(): HTMLElement {
 }
 
 export function hideFreedrawPenmodeCursor() {
+  const host = getObsidianExcalidrawHost();
+  if (host) {
+    return !host.isPenModeCrosshairVisible();
+  }
   return !getHostPlugin().settings.penModeCrosshairVisible;
 }
 
@@ -270,7 +287,11 @@ export function isTouchInPenMode(
   appState: AppState,
   event: React.PointerEvent<HTMLElement> | MouseEvent,
 ) {
-  if (!getHostPlugin().settings.penModeSingleFingerPanning) {
+  const host = getObsidianExcalidrawHost();
+  const isSingleFingerPanningEnabled = host
+    ? host.isSingleFingerPanningEnabled()
+    : getHostPlugin().settings.penModeSingleFingerPanning;
+  if (!isSingleFingerPanningEnabled) {
     return false;
   }
   //isReactPointerEvent typecheck is here only to please typescript, else event.pointerType === "touch" should be enough
@@ -311,15 +332,34 @@ export const intersectElementWithLine = (
 
 //disable double click
 export const disableDoubleClickTextEditing = () => {
+  const host = getObsidianExcalidrawHost();
+  if (host) {
+    return host.isDoubleClickTextEditingDisabled() ?? false;
+  }
   return getHostPlugin().settings.disableDoubleClickTextEditing ?? false;
 };
 
 // zoomStep: number;        // % increment per zoom action (e.g. mouse wheel)
 //  zoomMin: number;         // minimum zoom percentage
 //  zoomMax: number;         // maximum zoom percentage
-export const getZoomStep = () => getHostPlugin().settings.zoomStep ?? ZOOM_STEP;
-export const getZoomMin = () => getHostPlugin().settings.zoomMin ?? MIN_ZOOM;
-export const getZoomMax = () => getHostPlugin().settings.zoomMax ?? MAX_ZOOM;
+export const getZoomStep = () => {
+  const host = getObsidianExcalidrawHost();
+  return host
+    ? host.getZoomStep() ?? ZOOM_STEP
+    : getHostPlugin().settings.zoomStep ?? ZOOM_STEP;
+};
+export const getZoomMin = () => {
+  const host = getObsidianExcalidrawHost();
+  return host
+    ? host.getZoomMin() ?? MIN_ZOOM
+    : getHostPlugin().settings.zoomMin ?? MIN_ZOOM;
+};
+export const getZoomMax = () => {
+  const host = getObsidianExcalidrawHost();
+  return host
+    ? host.getZoomMax() ?? MAX_ZOOM
+    : getHostPlugin().settings.zoomMax ?? MAX_ZOOM;
+};
 
 export const runAction = (action: string): void => {
   getHostPlugin()?.runAction(action);
@@ -348,6 +388,10 @@ export const isFullPanelMode = (app: AppClassProperties): boolean => {
 };
 
 export const isContextMenuDisabled = (): boolean => {
+  const host = getObsidianExcalidrawHost();
+  if (host) {
+    return host.isContextMenuDisabled() ?? false;
+  }
   return getHostPlugin().settings.disableContextMenu ?? false;
 };
 
@@ -463,5 +507,9 @@ export const attachInlineLinkSuggester = (
   );
 
 export const syncElementLinkWithText = (): boolean => {
+  const host = getObsidianExcalidrawHost();
+  if (host) {
+    return host.shouldSyncElementLinkWithText() ?? true;
+  }
   return getHostPlugin().settings.syncElementLinkWithText ?? true;
 };
