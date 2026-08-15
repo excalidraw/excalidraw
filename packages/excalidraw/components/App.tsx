@@ -429,6 +429,20 @@ import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
+import {
+  allowDoubleTapEraser,
+  disableDoubleClickTextEditing,
+  getMaxZoom,
+  getZoomStep,
+  hideFreedrawPenmodeCursor,
+  isTouchInPenMode,
+  isPanWithRightMouseEnabled,
+  shouldDisableZoom,
+  isContextMenuDisabled,
+  refreshAllArrows,
+  syncElementLinkWithText,
+  getSharedMermaidInstance,
+} from "../obsidianUtils";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -503,8 +517,6 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled, refreshAllArrows, syncElementLinkWithText, getSharedMermaidInstance } from "../obsidianUtils";
-import { initializeObsidianUtils } from "@excalidraw/common";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
 
@@ -883,7 +895,6 @@ class App extends React.Component<AppProps, AppState> {
     this.stylesPanelMode = deriveStylesPanelMode(this.editorInterface);
 
     this.id = nanoid();
-    initializeObsidianUtils();
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -2283,9 +2294,10 @@ class App extends React.Component<AppProps, AppState> {
                 : FRAME_STYLE.nameColorLightTheme,
               overflow: "hidden",
               maxWidth: `${
-                getExcalidrawContentEl().clientWidth -
+                (this.excalidrawContainerRef.current?.clientWidth ??
+                  document.body.clientWidth) -
                 x1 -
-                FRAME_NAME_EDIT_PADDING //zsviczian was document.body
+                FRAME_NAME_EDIT_PADDING //zsviczian -- use this editor's container in multi-view/popout layouts
               }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}

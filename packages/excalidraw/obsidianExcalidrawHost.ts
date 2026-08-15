@@ -3,19 +3,27 @@
  * package layer.
  *
  * @remarks
- * This fork-only boundary intentionally exposes semantic scalar capabilities,
- * not the plugin instance or its settings object. View-scoped services belong
- * in a separate editor adapter and must not be added here.
+ * This fork-only boundary intentionally exposes semantic capabilities, not the
+ * plugin instance or its settings object. View-scoped state must not be added
+ * here.
  *
  * Author: zsviczian
  *
  * @see https://github.com/zsviczian/obsidian-excalidraw-plugin
  */
 
-/** Runtime protocol understood by this version of the Excalidraw package. */
-export const OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION = 1 as const;
+import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/types";
 
-/** Plugin-wide settings capabilities consumed by the Excalidraw package. */
+/** Runtime protocol understood by this version of the Excalidraw package. */
+export const OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION = 2 as const;
+
+/** Keyboard-blocking lifecycle returned by the host's inline suggester. */
+export interface ObsidianKeyBlocker {
+  isBlockingKeys(): boolean;
+  close(): void;
+}
+
+/** Plugin-wide capabilities consumed by the Excalidraw package. */
 export interface ObsidianExcalidrawHostAdapter {
   readonly protocolVersion: typeof OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION;
 
@@ -30,6 +38,17 @@ export interface ObsidianExcalidrawHostAdapter {
   getZoomMax(): number;
   isContextMenuDisabled(): boolean;
   shouldSyncElementLinkWithText(): boolean;
+
+  loadFontFromFile(filename: string): Promise<ArrayBuffer | undefined>;
+  getMermaid(): Promise<MermaidToExcalidrawLibProps>;
+  runAction(action: "anyFile" | "LaTeX" | "card"): void;
+  getLabel(key: string): string;
+  attachInlineLinkSuggester(
+    inputEl: HTMLInputElement | HTMLTextAreaElement,
+    widthWrapper?: HTMLElement,
+    container?: HTMLDivElement | null,
+    suppressPlaceholder?: boolean,
+  ): ObsidianKeyBlocker;
 }
 
 /** Idempotent cleanup returned when a package host is configured. */

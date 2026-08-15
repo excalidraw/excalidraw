@@ -498,7 +498,6 @@ export {
   safelyParseJSON, //zsviczian
   configureObsidianCommonHost, //zsviczian
   OBSIDIAN_COMMON_HOST_PROTOCOL_VERSION, //zsviczian
-  destroyObsidianUtils, //zsviczian
   throttleRAF,
 } from "@excalidraw/common";
 

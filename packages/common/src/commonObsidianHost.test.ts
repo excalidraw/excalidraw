@@ -65,6 +65,16 @@ describe("Obsidian common host registry", () => {
     expect(hasObsidianCommonHost()).toBe(false);
   });
 
+  it("uses safe defaults when no host is configured", () => {
+    expect(getObsidianDeviceInfo()).toBeNull();
+    expect(getDesktopUIMode()).toBe("tray");
+    expect(getPreferredUIMode("phone")).toBe("mobile");
+    expect(getPreferredUIMode("tablet")).toBe("tray");
+    expect(getAreaLimit()).toBe(16_777_216);
+    expect(getWidthHeightLimit()).toBe(32_767);
+    expect(getHighlightColor("#ffffff", 0.5)).toBe("rgba(0,118,255,0.5)");
+  });
+
   it("exposes capabilities from a configured structural fake", () => {
     configure(createFakeHost(123));
 

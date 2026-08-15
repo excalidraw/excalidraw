@@ -15,7 +15,6 @@ import { FONT_METADATA } from "@excalidraw/common";
 import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
 import { lineSegment } from "@excalidraw/math";
 
-
 import {
   getLineHeightInPx,
   isArrowElement,
@@ -24,8 +23,6 @@ import {
   ShapeCache,
   updateBoundPoint,
 } from "@excalidraw/element";
-
-import { getHostPlugin } from "@excalidraw/common/commonObsidianUtils";
 
 import type { Scene, Store } from "@excalidraw/element";
 
@@ -41,84 +38,34 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
-
-import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
-
 import { Fonts } from "./fonts";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 import { getObsidianExcalidrawHost } from "./obsidianExcalidrawHost";
 
+import type { ObsidianKeyBlocker } from "./obsidianExcalidrawHost";
+import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/types";
+
 import type { AppClassProperties, AppState } from "./types";
 
-interface MermaidToExcalidrawLibProps {
-  loaded: boolean;
-  api: Promise<{
-    parseMermaidToExcalidraw: (
-      definition: string,
-      config?: MermaidConfig,
-    ) => Promise<MermaidToExcalidrawResult>;
-  }>;
-}
-
 export function allowDoubleTapEraser() {
-  const host = getObsidianExcalidrawHost();
-  if (host) {
-    return host.isDoubleTapEraserEnabled();
-  }
-  return getHostPlugin().settings.penModeDoubleTapEraser;
+  return getObsidianExcalidrawHost()?.isDoubleTapEraserEnabled() ?? false;
 }
 
 //mfuria #329. Enable panning with right mouse button if host plugin setting allows
 export function isPanWithRightMouseEnabled(): boolean {
   try {
-    const host = getObsidianExcalidrawHost();
-    if (host) {
-      return !!host.isRightClickPanEnabled();
-    }
-    return !!getHostPlugin().settings?.panWithRightMouseButton;
+    return !!getObsidianExcalidrawHost()?.isRightClickPanEnabled();
   } catch (e) {
     return false;
   }
 }
 
 export function getMaxZoom(): number {
-  const host = getObsidianExcalidrawHost();
-  if (host) {
-    return host.getZoomToFitMaxLevel() ?? 1;
-  }
-  return getHostPlugin().settings.zoomToFitMaxLevel ?? 1;
-}
-
-export function isExcaliBrainView() {
-  const excalidrawView = getHostPlugin().activeExcalidrawView;
-  if (!excalidrawView) {
-    return false;
-  }
-  return (
-    excalidrawView.linksAlwaysOpenInANewPane &&
-    excalidrawView.allowFrameButtonsInViewMode
-  );
-}
-
-export function getExcalidrawContentEl(): HTMLElement {
-  const excalidrawView = getHostPlugin().activeExcalidrawView;
-  if (!excalidrawView) {
-    return document.body;
-  }
-  return excalidrawView.contentEl as HTMLElement;
+  return getObsidianExcalidrawHost()?.getZoomToFitMaxLevel() ?? 1;
 }
 
 export function hideFreedrawPenmodeCursor() {
-  const host = getObsidianExcalidrawHost();
-  if (host) {
-    return !host.isPenModeCrosshairVisible();
-  }
-  return !getHostPlugin().settings.penModeCrosshairVisible;
-}
-
-export function getOpenAIDefaultVisionModel() {
-  return getHostPlugin().settings.openAIDefaultVisionModel;
+  return !(getObsidianExcalidrawHost()?.isPenModeCrosshairVisible() ?? true);
 }
 
 export function getFontMetrics(
@@ -275,7 +222,9 @@ export async function fetchFontFromVault(
     const filename = decodeURIComponent(
       url.substring(url.lastIndexOf("/") + 1),
     );
-    const arrayBuffer = await getHostPlugin().loadFontFromFile(filename);
+    const arrayBuffer = await getObsidianExcalidrawHost()?.loadFontFromFile(
+      filename,
+    );
     if (arrayBuffer) {
       return arrayBuffer;
     }
@@ -287,10 +236,8 @@ export function isTouchInPenMode(
   appState: AppState,
   event: React.PointerEvent<HTMLElement> | MouseEvent,
 ) {
-  const host = getObsidianExcalidrawHost();
-  const isSingleFingerPanningEnabled = host
-    ? host.isSingleFingerPanningEnabled()
-    : getHostPlugin().settings.penModeSingleFingerPanning;
+  const isSingleFingerPanningEnabled =
+    getObsidianExcalidrawHost()?.isSingleFingerPanningEnabled() ?? false;
   if (!isSingleFingerPanningEnabled) {
     return false;
   }
@@ -304,7 +251,11 @@ export function isTouchInPenMode(
 }
 
 export async function getSharedMermaidInstance(): Promise<MermaidToExcalidrawLibProps> {
-  return await getHostPlugin().getMermaid();
+  const host = getObsidianExcalidrawHost();
+  if (!host) {
+    throw new Error("Obsidian Excalidraw host is not configured");
+  }
+  return await host.getMermaid();
 }
 
 export async function loadMermaid(): Promise<MermaidToExcalidrawLibProps> {
@@ -332,41 +283,30 @@ export const intersectElementWithLine = (
 
 //disable double click
 export const disableDoubleClickTextEditing = () => {
-  const host = getObsidianExcalidrawHost();
-  if (host) {
-    return host.isDoubleClickTextEditingDisabled() ?? false;
-  }
-  return getHostPlugin().settings.disableDoubleClickTextEditing ?? false;
+  return (
+    getObsidianExcalidrawHost()?.isDoubleClickTextEditingDisabled() ?? false
+  );
 };
 
 // zoomStep: number;        // % increment per zoom action (e.g. mouse wheel)
 //  zoomMin: number;         // minimum zoom percentage
 //  zoomMax: number;         // maximum zoom percentage
 export const getZoomStep = () => {
-  const host = getObsidianExcalidrawHost();
-  return host
-    ? host.getZoomStep() ?? ZOOM_STEP
-    : getHostPlugin().settings.zoomStep ?? ZOOM_STEP;
+  return getObsidianExcalidrawHost()?.getZoomStep() ?? ZOOM_STEP;
 };
 export const getZoomMin = () => {
-  const host = getObsidianExcalidrawHost();
-  return host
-    ? host.getZoomMin() ?? MIN_ZOOM
-    : getHostPlugin().settings.zoomMin ?? MIN_ZOOM;
+  return getObsidianExcalidrawHost()?.getZoomMin() ?? MIN_ZOOM;
 };
 export const getZoomMax = () => {
-  const host = getObsidianExcalidrawHost();
-  return host
-    ? host.getZoomMax() ?? MAX_ZOOM
-    : getHostPlugin().settings.zoomMax ?? MAX_ZOOM;
+  return getObsidianExcalidrawHost()?.getZoomMax() ?? MAX_ZOOM;
 };
 
-export const runAction = (action: string): void => {
-  getHostPlugin()?.runAction(action);
+export const runAction = (action: "anyFile" | "LaTeX" | "card"): void => {
+  getObsidianExcalidrawHost()?.runAction(action);
 };
 
 export const t2 = (key: string): string => {
-  return getHostPlugin()?.getLabel(key) ?? key;
+  return getObsidianExcalidrawHost()?.getLabel(key) ?? key;
 };
 
 export const shouldDisableZoom = (appState: AppState): boolean => {
@@ -388,11 +328,7 @@ export const isFullPanelMode = (app: AppClassProperties): boolean => {
 };
 
 export const isContextMenuDisabled = (): boolean => {
-  const host = getObsidianExcalidrawHost();
-  if (host) {
-    return host.isContextMenuDisabled() ?? false;
-  }
-  return getHostPlugin().settings.disableContextMenu ?? false;
+  return getObsidianExcalidrawHost()?.isContextMenuDisabled() ?? false;
 };
 
 export const refreshAllArrows = (scene: Scene, store: Store) => {
@@ -467,7 +403,8 @@ export const refreshAllArrows = (scene: Scene, store: Store) => {
 
     LinearElementEditor.movePoints(el, scene, pointUpdates, {
       moveMidPointsWithElement:
-        !!startBindingElement && startBindingElement?.id === endBindingElement?.id,
+        !!startBindingElement &&
+        startBindingElement?.id === endBindingElement?.id,
     });
 
     ShapeCache.delete(el);
@@ -480,36 +417,32 @@ export const refreshAllArrows = (scene: Scene, store: Store) => {
   }
 };
 
-interface KeyBlocker {
-  isBlockingKeys(): boolean;
-  close(): void;
-}
-
 /**
-   * Attaches an inline link suggester to the specified input element.
-   * @param inputEl The HTML input element to attach the suggester to.
-   * @param widthWrapper Optional HTML element to wrap the width of suggester element.
-   * @param containerEl Optional container element used as collision boundary.
-   * @param surpessPlaceholder Whether to suppress the placeholder text. Defaults to true.
-   * @returns A KeyBlocker instance for managing keyboard input.
-   */
+ * Attaches an inline link suggester to the specified input element.
+ * @param inputEl The HTML input element to attach the suggester to.
+ * @param widthWrapper Optional HTML element to wrap the width of suggester element.
+ * @param container Optional container element used as collision boundary.
+ * @param surpessPlaceholder Whether to suppress the placeholder text. Defaults to true.
+ * @returns A keyboard-blocking lifecycle for managing keyboard input.
+ */
 export const attachInlineLinkSuggester = (
-  inputEl: HTMLInputElement|HTMLTextAreaElement,
+  inputEl: HTMLInputElement | HTMLTextAreaElement,
   widthWrapper?: HTMLElement,
   container: HTMLDivElement | null = null,
   surpessPlaceholder: boolean = true,
-): KeyBlocker =>
-  getHostPlugin().attachInlineLinkSuggester(
+): ObsidianKeyBlocker => {
+  const host = getObsidianExcalidrawHost();
+  if (!host) {
+    throw new Error("Obsidian Excalidraw host is not configured");
+  }
+  return host.attachInlineLinkSuggester(
     inputEl,
     widthWrapper,
     container,
     surpessPlaceholder,
   );
+};
 
 export const syncElementLinkWithText = (): boolean => {
-  const host = getObsidianExcalidrawHost();
-  if (host) {
-    return host.shouldSyncElementLinkWithText() ?? true;
-  }
-  return getHostPlugin().settings.syncElementLinkWithText ?? true;
+  return getObsidianExcalidrawHost()?.shouldSyncElementLinkWithText() ?? true;
 };
