@@ -6,7 +6,11 @@ import {
   type ObsidianCommonHostAdapter,
   type ObsidianCommonHostDisposer,
 } from "./commonObsidianHost";
-import { getAreaLimit, getWidthHeightLimit } from "./commonObsidianUtils";
+import {
+  getAreaLimit,
+  getObsidianDeviceInfo,
+  getWidthHeightLimit,
+} from "./commonObsidianUtils";
 
 const createFakeHost = (
   areaLimit: number,
@@ -70,6 +74,22 @@ describe("Obsidian common host registry", () => {
 
     expect(getAreaLimit()).toBe(12_345);
     expect(getWidthHeightLimit()).toBe(6_789);
+  });
+
+  it("supplies device capabilities without loading the plugin", () => {
+    configure(createFakeHost(123));
+
+    expect(getObsidianDeviceInfo()).toEqual({
+      isDesktop: true,
+      isPhone: false,
+      isTablet: false,
+      isMobile: false,
+      isLinux: false,
+      isMacOS: true,
+      isWindows: false,
+      isIOS: false,
+      isAndroid: false,
+    });
   });
 
   it("disposes the active registration idempotently", () => {

@@ -30,6 +30,11 @@ export function getHostPlugin() {
 }
 
 export const getObsidianDeviceInfo = () => {
+  const host = getObsidianCommonHost();
+  if (host) {
+    return host.getDeviceInfo();
+  }
+
   if (ObsidianDevice) {
     return ObsidianDevice;
   }
