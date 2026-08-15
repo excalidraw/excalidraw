@@ -481,6 +481,8 @@ export interface AppState {
     closable?: boolean;
     duration?: number;
   } | null;
+  /** set when Esc deactivates a drawing shape tool; cleared on re-selecting one */
+  shapeToolExitedViaEscape: boolean;
   zenModeEnabled: boolean;
   theme: Theme;
   /** grid cell px size */

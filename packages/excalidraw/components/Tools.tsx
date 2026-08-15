@@ -156,6 +156,21 @@ export const TOOLS = defineTools({
 
 export type ToolbarToolType = keyof typeof TOOLS;
 
+/** shape tools that create new elements on the canvas (see issue #9541) */
+export const DRAWING_SHAPE_TOOL_TYPES = [
+  "rectangle",
+  "diamond",
+  "ellipse",
+  "arrow",
+  "line",
+  "freedraw",
+] as const satisfies readonly ToolType[];
+
+export const isDrawingShapeTool = (
+  type: ToolType | "custom",
+): type is (typeof DRAWING_SHAPE_TOOL_TYPES)[number] =>
+  (DRAWING_SHAPE_TOOL_TYPES as readonly string[]).includes(type);
+
 /**
  * tools that, when activated while already active, switch back to the
  * previously active tool (see `setActiveTool`'s `toggle` option)

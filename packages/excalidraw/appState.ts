@@ -109,6 +109,7 @@ export const getDefaultAppState = (): Omit<
     editingFrame: null,
     elementsToHighlight: null,
     toast: null,
+    shapeToolExitedViaEscape: false,
     viewBackgroundColor: COLOR_PALETTE.white,
     zenModeEnabled: false,
     zoom: {

@@ -453,7 +453,7 @@ import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
-import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
+import { findShapeByKey, TOGGLE_TOOLS, isDrawingShapeTool } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
 
@@ -6033,6 +6033,9 @@ class App extends React.Component<AppProps, AppState> {
         // only the text tool offers arrow-endpoint binding, and the highlight
         // is refreshed on pointermove — don't leave a stale one behind
         hoveredArrowTextAnchor: null,
+        shapeToolExitedViaEscape: isDrawingShapeTool(nextActiveTool.type)
+          ? false
+          : prevState.shapeToolExitedViaEscape,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {

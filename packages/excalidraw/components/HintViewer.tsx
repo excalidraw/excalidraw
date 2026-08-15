@@ -180,6 +180,14 @@ const getHints = ({
       });
     }
 
+    if (
+      appState.shapeToolExitedViaEscape &&
+      !selectedElements.length &&
+      !isMobile
+    ) {
+      return t("hints.selectShapeToolToDraw");
+    }
+
     if (!selectedElements.length && !isMobile) {
       return t("hints.canvasPanning", {
         shortcut_1: getTaggedShortcutKey(t("keys.mmb")),
