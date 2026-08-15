@@ -252,18 +252,24 @@ export const actionResetZoom = register({
   },
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
+    // The button's own visible text is the current zoom percentage, not just its
+    // action — axe-core's label-content-name-mismatch rule (WCAG 2.5.3) correctly
+    // flagged that "Reset zoom" alone doesn't contain it. Folding the value into the
+    // name means a screen-reader user hears the same current-zoom information a
+    // sighted user already sees on the button, not just what clicking it does.
+    const zoomPercent = `${(zoomValue * 100).toFixed(0)}%`;
     return (
       <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
         <IconButton
           type="button"
           className="reset-zoom-button zoom-button"
           title={t("buttons.resetZoom")}
-          aria-label={t("buttons.resetZoom")}
+          aria-label={`${t("buttons.resetZoom")} — ${zoomPercent}`}
           onClick={() => {
             updateData(null);
           }}
         >
-          {(zoomValue * 100).toFixed(0)}%
+          {zoomPercent}
         </IconButton>
       </Tooltip>
     );
