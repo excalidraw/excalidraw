@@ -141,6 +141,8 @@
     "increaseFontSize": "Increase font size",
     "unbindText": "Unbind text",
     "bindText": "Bind text to the container",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
     "createContainerFromText": "Wrap text in a container",
     "link": {
       "edit": "Edit link",
