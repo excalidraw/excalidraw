@@ -259,7 +259,9 @@
     "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
-    "embeddableInteractionButton": "Click to interact"
+    "embeddableInteractionButton": "Click to interact",
+    "signUp": "Sign up",
+    "signIn": "Sign in"
   },
   "alerts": {
     "clearReset": "This will clear the whole canvas. Are you sure?",

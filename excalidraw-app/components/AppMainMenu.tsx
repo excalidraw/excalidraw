@@ -3,6 +3,7 @@ import {
   ExcalLogo,
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
@@ -22,6 +23,8 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   refresh: () => void;
 }> = React.memo((props) => {
+  const { t } = useI18n();
+
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -56,7 +59,7 @@ export const AppMainMenu: React.FC<{
         }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
         className="highlighted"
       >
-        {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
+        {isExcalidrawPlusSignedUser ? t("buttons.signIn") : t("buttons.signUp")}
       </MainMenu.ItemLink>
       {isDevEnv() && (
         <MainMenu.Item
