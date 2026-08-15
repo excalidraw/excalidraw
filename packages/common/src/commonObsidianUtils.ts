@@ -1,18 +1,13 @@
+import {
+  getObsidianCommonHost,
+  type ObsidianDeviceType,
+} from "./commonObsidianHost";
+
 import type { EditorInterface, StylesPanelMode } from "./editorInterface";
 
-//zsviczian, my dirty little secrets. These are hacks I am not proud of...
-export type ObsidianDeviceType = {
-  isDesktop: boolean;
-  isPhone: boolean;
-  isTablet: boolean;
-  isMobile: boolean;
-  isLinux: boolean;
-  isMacOS: boolean;
-  isWindows: boolean;
-  isIOS: boolean;
-  isAndroid: boolean;
-};
+export type { ObsidianDeviceType } from "./commonObsidianHost";
 
+//zsviczian, my dirty little secrets. These are hacks I am not proud of...
 let ObsidianDevice: ObsidianDeviceType | null = null;
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
@@ -76,11 +71,19 @@ export const getPreferredUIMode = (
 };
 
 export function getAreaLimit() {
-  return getHostPlugin().excalidrawConfig.areaLimit ?? 16777216;
+  return (
+    getObsidianCommonHost()?.getCanvasLimits().areaLimit ??
+    getHostPlugin().excalidrawConfig.areaLimit ??
+    16777216
+  );
 }
 
 export function getWidthHeightLimit() {
-  return getHostPlugin().excalidrawConfig.widthHeightLimit ?? 32767;
+  return (
+    getObsidianCommonHost()?.getCanvasLimits().widthHeightLimit ??
+    getHostPlugin().excalidrawConfig.widthHeightLimit ??
+    32767
+  );
 }
 
 export function getHighlightColor(

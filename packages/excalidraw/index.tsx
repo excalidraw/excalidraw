@@ -448,7 +448,6 @@ export {
   exportToClipboard,
 } from "@excalidraw/utils/export";
 
-
 export { getCommonBoundingBox } from "@excalidraw/element/bounds"; //zsviczian
 export { getMaximumGroups } from "@excalidraw/element/groups"; //zsviczian
 export { measureText } from "@excalidraw/element/textMeasurements"; //zsviczian
@@ -497,6 +496,8 @@ export {
   viewportCoordsToSceneCoords,
   getFormFactor,
   safelyParseJSON, //zsviczian
+  configureObsidianCommonHost, //zsviczian
+  OBSIDIAN_COMMON_HOST_PROTOCOL_VERSION, //zsviczian
   destroyObsidianUtils, //zsviczian
   throttleRAF,
 } from "@excalidraw/common";
