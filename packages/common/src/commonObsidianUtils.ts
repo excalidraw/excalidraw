@@ -7,6 +7,12 @@ import type { EditorInterface, StylesPanelMode } from "./editorInterface";
 
 export type { ObsidianDeviceType } from "./commonObsidianHost";
 
+const normalizeStylesPanelMode = (mode: unknown): StylesPanelMode =>
+  typeof mode === "string" &&
+  ["tray", "full", "compact", "mobile"].includes(mode)
+    ? (mode as StylesPanelMode)
+    : "tray";
+
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 let ObsidianDevice: ObsidianDeviceType | null = null;
 
@@ -49,16 +55,18 @@ export const getObsidianDeviceInfo = () => {
 };
 
 export const getDesktopUIMode = () => {
+  const host = getObsidianCommonHost();
+  if (host) {
+    return normalizeStylesPanelMode(host.getDesktopUIMode());
+  }
+
   //@ts-ignore
   const obsidianPlugin = app.plugins.plugins["obsidian-excalidraw-plugin"];
   if (!obsidianPlugin) {
     return "tray";
   }
 
-  const desktopUIMode = obsidianPlugin.getPreferredUIMode();
-  return ["tray", "full", "compact", "mobile"].includes(desktopUIMode)
-    ? desktopUIMode
-    : "tray";
+  return normalizeStylesPanelMode(obsidianPlugin.getPreferredUIMode());
 };
 
 export const getPreferredUIMode = (

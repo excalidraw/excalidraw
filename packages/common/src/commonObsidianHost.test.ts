@@ -8,6 +8,7 @@ import {
 } from "./commonObsidianHost";
 import {
   getAreaLimit,
+  getDesktopUIMode,
   getObsidianDeviceInfo,
   getWidthHeightLimit,
 } from "./commonObsidianUtils";
@@ -90,6 +91,20 @@ describe("Obsidian common host registry", () => {
       isIOS: false,
       isAndroid: false,
     });
+  });
+
+  it("supplies and normalizes the desktop UI mode without loading the plugin", () => {
+    configure({
+      ...createFakeHost(123),
+      getDesktopUIMode: () => "compact",
+    });
+    expect(getDesktopUIMode()).toBe("compact");
+
+    configure({
+      ...createFakeHost(123),
+      getDesktopUIMode: () => "unsupported",
+    } as unknown as ObsidianCommonHostAdapter);
+    expect(getDesktopUIMode()).toBe("tray");
   });
 
   it("disposes the active registration idempotently", () => {
