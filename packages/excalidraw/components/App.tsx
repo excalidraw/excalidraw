@@ -709,6 +709,7 @@ class App extends React.Component<AppProps, AppState> {
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
+  private heldArrowKeys = new Set<string>();
   /** previous frame pointer coords */
   previousPointerMoveCoords: { x: number; y: number } | null = null;
 
@@ -5480,13 +5481,14 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.viewModeEnabled && isArrowKey(event.key)) {
+        this.heldArrowKeys.add(event.key);
         const PAN_STEP = 20;
         let scrollX = this.state.scrollX;
         let scrollY = this.state.scrollY;
-        if (event.key === KEYS.ARROW_LEFT) scrollX += PAN_STEP;
-        if (event.key === KEYS.ARROW_RIGHT) scrollX -= PAN_STEP;
-        if (event.key === KEYS.ARROW_UP) scrollY += PAN_STEP;
-        if (event.key === KEYS.ARROW_DOWN) scrollY -= PAN_STEP;
+        if (this.heldArrowKeys.has(KEYS.ARROW_LEFT)) scrollX += PAN_STEP;
+        if (this.heldArrowKeys.has(KEYS.ARROW_RIGHT)) scrollX -= PAN_STEP;
+        if (this.heldArrowKeys.has(KEYS.ARROW_UP)) scrollY += PAN_STEP;
+        if (this.heldArrowKeys.has(KEYS.ARROW_DOWN)) scrollY -= PAN_STEP;
         this.viewport.translate({ scrollX, scrollY });
         event.preventDefault();
         return;
@@ -5824,6 +5826,9 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (!this.isInteractionEnabled()) {
       return;
+    }
+    if (isArrowKey(event.key)) {
+      this.heldArrowKeys.delete(event.key);
     }
     if (event.key === KEYS.SPACE) {
       if (
