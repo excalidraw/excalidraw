@@ -9,9 +9,17 @@ import {
 import {
   getAreaLimit,
   getDesktopUIMode,
+  getHighlightColor,
   getObsidianDeviceInfo,
+  getPreferredUIMode,
   getWidthHeightLimit,
 } from "./commonObsidianUtils";
+
+const preferredModes = {
+  phone: "mobile",
+  tablet: "compact",
+  desktop: "full",
+} as const;
 
 const createFakeHost = (
   areaLimit: number,
@@ -105,6 +113,33 @@ describe("Obsidian common host registry", () => {
       getDesktopUIMode: () => "unsupported",
     } as unknown as ObsidianCommonHostAdapter);
     expect(getDesktopUIMode()).toBe("tray");
+  });
+
+  it("supplies preferred UI modes for every form factor without loading the plugin", () => {
+    configure({
+      ...createFakeHost(123),
+      getPreferredUIMode: (formFactor) => preferredModes[formFactor],
+    });
+
+    expect(getPreferredUIMode("phone")).toBe("mobile");
+    expect(getPreferredUIMode("tablet")).toBe("compact");
+    expect(getPreferredUIMode("desktop")).toBe("full");
+  });
+
+  it("forwards highlight inputs and default opacity without loading the plugin", () => {
+    const highlight = vi.fn(
+      (sceneBackgroundColor: string, opacity: number) =>
+        `${sceneBackgroundColor}:${opacity}`,
+    );
+    configure({
+      ...createFakeHost(123),
+      getHighlightColor: highlight,
+    });
+
+    expect(getHighlightColor("#ffffff", 0.4)).toBe("#ffffff:0.4");
+    expect(getHighlightColor("#000000")).toBe("#000000:1");
+    expect(highlight).toHaveBeenNthCalledWith(1, "#ffffff", 0.4);
+    expect(highlight).toHaveBeenNthCalledWith(2, "#000000", 1);
   });
 
   it("disposes the active registration idempotently", () => {

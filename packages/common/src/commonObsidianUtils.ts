@@ -72,6 +72,11 @@ export const getDesktopUIMode = () => {
 export const getPreferredUIMode = (
   formFactor: EditorInterface["formFactor"],
 ): StylesPanelMode => {
+  const host = getObsidianCommonHost();
+  if (host) {
+    return host.getPreferredUIMode(formFactor);
+  }
+
   if (formFactor === "phone") {
     return getHostPlugin().settings.phoneUIMode;
   }
@@ -103,8 +108,13 @@ export function getHighlightColor(
   sceneBgColor: string,
   opacity: number = 1,
 ): string {
+  const fallbackColor = `rgba(0,118,255,${opacity})`;
+  const host = getObsidianCommonHost();
+  if (host) {
+    return host.getHighlightColor(sceneBgColor, opacity) ?? fallbackColor;
+  }
+
   return (
-    getHostPlugin().getHighlightColor(sceneBgColor, opacity) ??
-    `rgba(0,118,255,${opacity})`
+    getHostPlugin().getHighlightColor(sceneBgColor, opacity) ?? fallbackColor
   );
 }
