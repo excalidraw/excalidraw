@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "ஒட்டு",
     "pasteAsPlaintext": "அலங்காரமின்றி ஒட்டு",
     "pasteCharts": "விளக்கப்படங்களை ஒட்டு",
