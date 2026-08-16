@@ -4,7 +4,7 @@ export type StylesPanelMode = "compact" | "full" | "mobile" | "tray"; //zsviczia
 
 export type EditorInterface = Readonly<{
   formFactor: "phone" | "tablet" | "desktop";
-  desktopUIMode: "compact" | "full" | "tray" | "mobile"; //zsviczian
+  desktopUIMode: StylesPanelMode; //zsviczian
   userAgent: Readonly<{
     isMobileDevice: boolean;
     platform: "ios" | "android" | "other" | "unknown";
