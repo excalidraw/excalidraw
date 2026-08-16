@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "ஒட்டு",
     "pasteAsPlaintext": "அலங்காரமின்றி ஒட்டு",
     "pasteCharts": "விளக்கப்படங்களை ஒட்டு",
@@ -109,6 +111,7 @@
     "group": "தேர்ந்ததை ஒன்றிணை",
     "ungroup": "தேர்ந்ததைப் பிரி",
     "collaborators": "கூட்டுப்பணியினர்",
+    "you": "",
     "toggleGrid": "கட்டத்தை இருநிலைமாற்று",
     "addToLibrary": "நூலகத்தில் சேர்",
     "removeFromLibrary": "நூலகத்திலிருந்து நீக்கு",
@@ -332,10 +335,15 @@
     "embeddable": "வலை நுழைப்பு",
     "laser": "சீரொளி குறிமுள்",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "கை (பார்வை நகர்கும் கருவி)",
     "extraTools": "மற்ற கருவிகள்",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "செவ்வகம்",
@@ -606,7 +614,9 @@
     "hexCode": "ஹெக்ஸ் குறியீடு",
     "noShades": "இந்நிறத்திற்குச் சாயல்கள் இல்லை",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
