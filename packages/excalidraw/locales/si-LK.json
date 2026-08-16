@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "අලවන්න",
     "pasteAsPlaintext": "සරල පෙළ ලෙස අලවන්න",
     "pasteCharts": "ප්‍රස්ථාරය",
