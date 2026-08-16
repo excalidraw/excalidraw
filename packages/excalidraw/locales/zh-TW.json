@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "貼上",
     "pasteAsPlaintext": "以純文字貼上",
     "pasteCharts": "貼上圖表",
