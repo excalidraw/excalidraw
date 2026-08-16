@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Επικόλληση",
     "pasteAsPlaintext": "Επικόλληση ως απλό κείμενο",
     "pasteCharts": "Επικόλληση γραφημάτων",
