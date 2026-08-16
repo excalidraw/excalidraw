@@ -8,7 +8,9 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "line" ||
   type === "freedraw" ||
-  type === "autoshape";
+  type === "autoshape" ||
+  // tool-only type; makes the `G` background shortcut work for bucket fill
+  type === "bucketfill";
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "rectangle" ||

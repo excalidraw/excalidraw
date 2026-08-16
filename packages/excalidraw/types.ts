@@ -84,7 +84,7 @@ export type Collaborator = Readonly<{
   // The url of the collaborator's avatar, defaults to username initials
   // if not present
   avatarUrl?: string;
-  // user id. If supplied, we'll filter out duplicates when rendering user avatars.
+  // Stable user id. A user may have multiple collaborators, one per client.
   id?: string;
   socketId?: SocketId;
   isCurrentUser?: boolean;
@@ -161,7 +161,8 @@ export type ToolType =
   | "magicframe"
   | "embeddable"
   | "laser"
-  | "autoshape";
+  | "autoshape"
+  | "bucketfill";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -513,10 +514,6 @@ export interface AppState {
     y: number;
   } | null;
   objectsSnapModeEnabled: boolean;
-  /** the user's socket id & username who is being followed on the canvas */
-  userToFollow: UserToFollow | null;
-  /** the socket ids of the users following the current user */
-  followedBy: Set<SocketId>;
 
   /** image cropping */
   isCropping: boolean;
@@ -539,6 +536,17 @@ export interface AppState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+  /** user-customized color-picker top picks (pinned via drag & drop from the
+   * color picker popup). `null` means no customization (defaults, or
+   * host-supplied `topPicks`, are used). Kept per picker. */
+  colorTopPicks: {
+    elementStroke: readonly string[] | null;
+    elementBackground: readonly string[] | null;
+    /** the bucket-fill tool keeps a list separate from `elementBackground`
+     * even though both drive `currentItemBackgroundColor` (its defaults and
+     * use case differ — no transparent) */
+    bucketFill: readonly string[] | null;
+  };
 }
 
 export type SearchMatch = {
@@ -637,6 +645,24 @@ export type ExcalidrawInitialState = {
 export type OnUserFollowedPayload = {
   userToFollow: UserToFollow;
   action: "FOLLOW" | "UNFOLLOW";
+};
+
+export type ViewportStatusFrame = {
+  /** the badge (bottom-center pill) */
+  label?: {
+    label: React.ReactNode;
+    icon?: React.ReactNode;
+    /** badge background; defaults to var(--color-primary-hover) */
+    background?: string;
+    /** badge text color; defaults to var(--color-primary-light) */
+    color?: string;
+    /** makes the badge label interactive */
+    onClick?: () => void;
+    /** renders a close button when set */
+    onClose?: () => void;
+  };
+  /** viewport-edge border: CSS color, or `false` for none */
+  border: false | string;
 };
 
 export type OnExportProgress = {
@@ -754,6 +780,7 @@ export type UIConfig = {
 };
 
 export interface ExcalidrawProps {
+  className?: string;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -934,6 +961,23 @@ export interface ExcalidrawProps {
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
+  viewportStatusFrame?: ViewportStatusFrame | null;
+  /**
+   * Rendered inside the UserList "who's here" dropdown (desktop) and inline
+   * in the mobile menu's collaborators section, below a divider. Accepts a
+   * render function — called with `isMobile` so hosts can render different
+   * UI for each surface — in addition to a plain node.
+   */
+  currentUserControls?:
+    | React.ReactNode
+    | ((isMobile: boolean) => React.ReactNode);
+  /**
+   * The user being followed on the canvas, if any. Controlled by the host —
+   * the editor never sets it; it emits follow/unfollow intents via
+   * `onUserFollow` (prop or imperative API) and renders the followed
+   * user's avatar highlight from this value.
+   */
+  userToFollow?: UserToFollow | null;
   /**
    * Called before exporting to a file.
    *
@@ -1086,6 +1130,7 @@ export type AppClassProperties = {
   flowchart: App["flowchart"];
   drawShape: App["drawShape"];
   cursor: App["cursor"];
+  bucketFill: App["bucketFill"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
@@ -1102,6 +1147,9 @@ export type AppClassProperties = {
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
   lastPointerMoveEvent: App["lastPointerMoveEvent"];
   bindModeHandler: App["bindModeHandler"];
+
+  emitUserFollowIntent: App["emitUserFollowIntent"];
+  requestUnfollow: App["requestUnfollow"];
 
   setAppState: App["setAppState"];
 

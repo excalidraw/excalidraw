@@ -123,8 +123,6 @@ export const getDefaultAppState = (): Omit<
       y: 0,
     },
     objectsSnapModeEnabled: false,
-    userToFollow: null,
-    followedBy: new Set(),
     isCropping: false,
     croppingElementId: null,
     searchMatches: null,
@@ -132,6 +130,11 @@ export const getDefaultAppState = (): Omit<
     activeLockedId: null,
     bindMode: "orbit",
     boxSelectionMode: "contain",
+    colorTopPicks: {
+      elementStroke: null,
+      elementBackground: null,
+      bucketFill: null,
+    },
   };
 };
 
@@ -257,14 +260,13 @@ const APP_STATE_STORAGE_CONF = (<
   snapLines: { browser: false, export: false, server: false },
   originSnapOffset: { browser: false, export: false, server: false },
   objectsSnapModeEnabled: { browser: true, export: false, server: false },
-  userToFollow: { browser: false, export: false, server: false },
-  followedBy: { browser: false, export: false, server: false },
   isCropping: { browser: false, export: false, server: false },
   croppingElementId: { browser: false, export: false, server: false },
   searchMatches: { browser: false, export: false, server: false },
   lockedMultiSelections: { browser: true, export: true, server: true },
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
+  colorTopPicks: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

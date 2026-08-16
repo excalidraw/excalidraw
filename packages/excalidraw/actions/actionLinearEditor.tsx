@@ -53,20 +53,16 @@ export const actionToggleLinearEditor = register({
     return false;
   },
   perform(elements, appState, _, app) {
-    const selectedElement = app.scene.getSelectedElements({
-      selectedElementIds: appState.selectedElementIds,
-      includeBoundTextElement: true,
-    })[0] as ExcalidrawLinearElement;
-
-    invariant(selectedElement, "No selected element found");
     invariant(
       appState.selectedLinearElement,
       "No selected linear element found",
     );
-    invariant(
-      selectedElement.id === appState.selectedLinearElement.elementId,
-      "Selected element ID and linear editor elementId does not match",
-    );
+
+    const selectedElement = app.scene.getElement(
+      appState.selectedLinearElement.elementId,
+    ) as ExcalidrawLinearElement | null;
+
+    invariant(selectedElement, "No selected element found");
 
     const selectedLinearElement = {
       ...appState.selectedLinearElement,

@@ -1,6 +1,8 @@
 import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 
 import {
+  colorToHex,
+  COLOR_TOP_PICKS_SLOTS,
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
   DEFAULT_STROKE_STREAMLINE,
@@ -51,7 +53,11 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { syncInvalidIndices } from "@excalidraw/element";
+import {
+  normalizeBoundElementsOrder,
+  syncInvalidIndices,
+  syncMovedIndices,
+} from "@excalidraw/element";
 
 import { refreshTextDimensions } from "@excalidraw/element";
 
@@ -219,6 +225,7 @@ export const AllowedExcalidrawActiveTools: Record<
   laser: false,
   autoshape: false,
   magicframe: false,
+  bucketfill: true,
 };
 
 export type RestoredDataState = {
@@ -798,6 +805,34 @@ const repairBoundElement = (
 };
 
 /**
+ * Places bound text directly after its container while preserving the
+ * container's fractional index.
+ *
+ * NOTE mutates indices of reordered bound text elements.
+ */
+const repairBoundTextElementOrder = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  const originalPositions = new Map(
+    elements.map((element, index) => [element.id, index]),
+  );
+  const normalizedElements = normalizeBoundElementsOrder(elements);
+  const reorderedBoundTextElements = normalizedElements.filter(
+    (element, index) =>
+      isTextElement(element) &&
+      element.containerId &&
+      originalPositions.get(element.id) !== index,
+  );
+
+  return reorderedBoundTextElements.length
+    ? syncMovedIndices(
+        normalizedElements,
+        arrayToMap(reorderedBoundTextElements),
+      )
+    : normalizedElements;
+};
+
+/**
  * Remove an element's frameId if its containing frame is non-existent
  *
  * NOTE mutates elements.
@@ -930,9 +965,11 @@ export const restoreElements = <T extends ExcalidrawElement>(
     }
   }
 
+  const repairedElements = repairBoundTextElementOrder(restoredElements);
+
   // NOTE (mtolmacs): Temporary fix for invalid/self-bound elbow arrows
   // Need to iterate again so we have attached text nodes in elementsMap
-  return restoredElements.map((element) => {
+  return repairedElements.map((element) => {
     if (
       isElbowArrow(element) &&
       !isArrowBoundToElement(element) &&
@@ -1064,6 +1101,32 @@ const LegacyAppStateMigrations: {
   },
 };
 
+const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+  // keyed by normalized color value so notation variants (`#fff` vs
+  // `#ffffff` vs `white`) dedupe, while the value keeps the original
+  // notation — normalizing the output would break e.g. `transparent`
+  // (→ `#00000000`), which the picker matches by literal value
+  const colors = new Map<string, string>();
+  for (const color of value) {
+    if (typeof color !== "string") {
+      continue;
+    }
+    const normalized = colorToHex(color) ?? color.toLowerCase();
+    if (!colors.has(normalized)) {
+      colors.set(normalized, color);
+    }
+    // the strip layout fits exactly this many slots — longer lists (hostile
+    // or hand-edited storage) would overflow the properties island
+    if (colors.size >= COLOR_TOP_PICKS_SLOTS) {
+      break;
+    }
+  }
+  return colors.size ? [...colors.values()] : null;
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -1109,6 +1172,19 @@ export const restoreAppState = (
   if (boxSelectionMode !== undefined) {
     nextAppState.boxSelectionMode = boxSelectionMode;
   }
+
+  // drop malformed persisted custom top picks (imported data is untrusted)
+  nextAppState.colorTopPicks = {
+    elementStroke: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.elementStroke,
+    ),
+    elementBackground: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.elementBackground,
+    ),
+    bucketFill: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.bucketFill,
+    ),
+  };
 
   // legacy
   if ((appState as any).currentItemStrokeWidth !== undefined) {
