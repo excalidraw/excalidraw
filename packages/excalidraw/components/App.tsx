@@ -6922,7 +6922,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  // TODO: Temporary public, change back after App.selection extraction
+  // TODO: Temporarily public, used in App.selection during extraction
   public finishImageCropping = () => {
     if (this.state.croppingElementId) {
       this.store.scheduleCapture();
@@ -9869,7 +9869,8 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private createGenericElementOnPointerDown = (
+  // TODO: Temporarily public, used in App.selection during extraction
+  public createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
     pointerDownState: PointerDownState,
   ): void => {
@@ -10686,6 +10687,16 @@ class App extends React.Component<AppProps, AppState> {
 
           return;
         }
+      }
+
+      const didSelectionHandlePointerMove = this.selection.handlePointerMove(
+        event,
+        pointerDownState,
+        pointerCoords,
+      );
+
+      if (didSelectionHandlePointerMove) {
+        return;
       }
 
       if (this.state.selectionElement) {
@@ -12576,7 +12587,8 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  private maybeDragNewGenericElement = (
+  // TODO: Temporarily public, used in App.selection during extraction
+  public maybeDragNewGenericElement = (
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
     informMutation = true,

@@ -25,8 +25,13 @@ import {
 } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { GlobalCoord } from "@excalidraw/math";
 
-import { getSelectedElements } from "../scene";
+import {
+  getElementsWithinSelection,
+  getSelectedElements,
+  isSomeElementSelected,
+} from "../scene";
 
 import type React from "react";
 
@@ -657,6 +662,18 @@ export class AppSelection {
         }));
       }
     }
+  };
+
+  /**
+   * @returns whether the pointer move belongs to a box or lasso selection
+   * gesture element dragging and resizing still need coverage
+   */
+  handlePointerMove = (
+    event: PointerEvent,
+    pointerDownState: PointerDownState,
+    pointerCoords: GlobalCoord,
+  ): boolean => {
+    return false;
   };
 
   private clearSelection(hitElement: ExcalidrawElement | null): void {
