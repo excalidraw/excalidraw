@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Dán",
     "pasteAsPlaintext": "Dán kiểu văn bản thuần",
     "pasteCharts": "Dán biểu đồ",
