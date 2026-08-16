@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "لصق",
     "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
