@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Wklej",
     "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
