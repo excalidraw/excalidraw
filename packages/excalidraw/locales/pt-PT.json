@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Colar",
     "pasteAsPlaintext": "Colar como texto simples",
     "pasteCharts": "Colar gráficos",
