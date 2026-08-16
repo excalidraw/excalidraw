@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Klistra in",
     "pasteAsPlaintext": "Klistra som oformaterad text",
     "pasteCharts": "Klistra in diagram",
