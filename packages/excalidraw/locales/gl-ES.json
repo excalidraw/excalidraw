@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar coma texto sen formato",
     "pasteCharts": "Pegar gráficos",
