@@ -10,6 +10,7 @@ import {
   getVerticalOffset,
   applyDarkModeFilter,
   MIME_TYPES,
+  rewriteTextForFontFamily,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
 import { hashString } from "@excalidraw/element";
@@ -654,7 +655,10 @@ const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lines = rewriteTextForFontFamily(
+          element.text.replace(/\r\n?/g, "\n"),
+          element.fontFamily,
+        ).split("\n");
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
           element.lineHeight,
