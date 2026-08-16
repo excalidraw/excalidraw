@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "วาง",
     "pasteAsPlaintext": "วางโดยไม่มีการจัดรูปแบบ",
     "pasteCharts": "วางแผนภูมิ",
