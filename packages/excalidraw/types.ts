@@ -1369,7 +1369,17 @@ export interface ExcalidrawImperativeAPI {
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
-  addFiles: (data: BinaryFileData[]) => void;
+  // zsviczian START -- let the Obsidian host identify trusted, already-normalized SVGs without persisting a marker
+  addFiles: (
+    data:
+      | BinaryFileData[]
+      | {
+          files: BinaryFileData[];
+          /** IDs of host-generated SVGs that already satisfy Excalidraw's normalization contract. */
+          skipSvgNormalization?: ReadonlySet<FileId>;
+        },
+  ) => void;
+  // zsviczian END
   updateContainerSize: InstanceType<typeof App>["updateContainerSize"]; //zsviczian
   id: string;
   selectElements: (
