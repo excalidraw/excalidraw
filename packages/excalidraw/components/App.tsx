@@ -5521,14 +5521,25 @@ class App extends React.Component<AppProps, AppState> {
    * NOTE if file already exists in editor state, the file data is not updated
    * */
   public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
-    (files) => {
-      const { addedFiles } = this.addMissingFiles(files, undefined, true); //zsviczian
+    // zsviczian START -- accept caller-certified SVGs without repeat normalization
+    (data) => {
+      const files = Array.isArray(data) ? data : data.files;
+      const skipSvgNormalization = Array.isArray(data)
+        ? undefined
+        : data.skipSvgNormalization;
+      const { addedFiles } = this.addMissingFiles(
+        files,
+        undefined,
+        true,
+        skipSvgNormalization,
+      );
 
       this.clearImageShapeCache(addedFiles);
       this.scene.triggerUpdate();
 
       this.addNewImagesToImageCache();
     },
+    // zsviczian END
   );
 
   //zsviczian https://github.com/zsviczian/excalibrain/issues/9
@@ -5624,6 +5635,7 @@ class App extends React.Component<AppProps, AppState> {
     files: BinaryFiles | BinaryFileData[],
     replace = false,
     force = false, //zsviczian
+    skipSvgNormalization?: ReadonlySet<FileId>, // zsviczian -- caller-certified SVG IDs
   ) => {
     const nextFiles = replace ? {} : { ...this.files };
     const addedFiles: BinaryFiles = {};
@@ -5639,7 +5651,8 @@ class App extends React.Component<AppProps, AppState> {
       addedFiles[fileData.id] = fileData;
       nextFiles[fileData.id] = fileData;
 
-      if (fileData.mimeType === MIME_TYPES.svg) {
+      const shouldNormalizeSVG = !skipSvgNormalization?.has(fileData.id); // zsviczian -- caller-certified SVG bypass
+      if (fileData.mimeType === MIME_TYPES.svg && shouldNormalizeSVG) {
         try {
           const restoredDataURL = getDataURL_sync(
             normalizeSVG(dataURLToString(fileData.dataURL)),

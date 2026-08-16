@@ -151,6 +151,12 @@ These adapters form an internal protocol paired with the plugin's exact package 
 
 The normal upstream ESM package and the Obsidian consumer artifact serve different purposes. Keep the Obsidian build isolated and semantically named; do not restore the retired UMD/webpack path.
 
+An optimization that bypasses normal validation or normalization must be
+explicitly authorized for each call. Keep the safe behavior as the default,
+let the host identify only the inputs it generated or verified, and do not
+persist trust markers in scene or binary-file data. Preserve the legacy call
+form when practical and test both the authorized and ordinary paths.
+
 From `packages/excalidraw`, run:
 
 ```bash
@@ -191,6 +197,12 @@ When changing Radix menus, popovers, or `ObsidianRadixPortal`, test the main win
 ## Cross-Repository Integration Testing
 
 The plugin consumes these files from `node_modules/@zsviczian/excalidraw/dist/obsidian/`. Before publishing a new package, the four locally generated files may be copied temporarily into the sibling plugin's ignored installed package for integration testing. Keep the plugin's declared dependency unchanged during this temporary handoff; `npm install` restores the published artifact.
+
+Treat three states separately: the component source may be ready to commit; a
+local artifact copy may prove cross-repository integration; and the consumer
+handoff becomes durable only after the published package is installed and the
+plugin dependency and lockfile reference that version. Do not describe the
+second state as a release-ready plugin commit.
 
 Host-boundary unit tests do not load Obsidian or the plugin. Use structural fake adapters to test standalone defaults or required-service errors, capability forwarding, protocol rejection, idempotent cleanup, and stale-disposer safety. Cross-repository testing is the separate integration gate for actual plugin registration, reload, main-window and popout lifecycle, and live settings reads.
 

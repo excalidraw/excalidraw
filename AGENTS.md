@@ -155,6 +155,25 @@ When changing a menu or popover:
 - Search all imports, callers, styles, tests, and package exports before changing a shared component or type.
 - Do not add network dependencies or remote code loading. The host-provided Mermaid integration is not a network loader; lazy CJK asset fetching is the narrowly scoped network exception and is not precedent for other assets.
 
+### Trusted Optimization Bypasses
+
+An optimization that skips normal validation, normalization, or sanitization
+must retain the safe path as the default.
+
+- Make authorization call-scoped and ephemeral. Do not persist a `trusted`,
+  `normalized`, or equivalent marker in scene data or `BinaryFileData` merely
+  to avoid repeated work.
+- Require the host that produced or inspected the payload to identify the
+  eligible inputs. Inputs absent from that explicit authorization must execute
+  the unchanged safe path.
+- Preserve the existing API call form when doing so is inexpensive. Add an
+  options form rather than forcing unrelated consumers to change.
+- Keep the bypass narrow enough that its complete data flow can be reviewed:
+  who certifies it, how identity is matched, how long authorization lives, and
+  where the normal path remains intact.
+- Test both a certified input and an ordinary/untrusted input. A faster trusted
+  case is not sufficient evidence that the fallback still works.
+
 ## Validation
 
 Use Node.js 22 or newer and Yarn. If `yarn` invokes a different Node installation through Corepack, fix the toolchain before attributing the failure to source code.
@@ -186,6 +205,13 @@ For integration validation:
 2. Run `npm run build` in the plugin repository. Run `npm run dev` too when debugger payloads or development CSS changed.
 3. Test cold startup, plugin reload, normal editing, main-window and popout behavior, popout teardown, offline operation, and the feature-specific workflow. For adapter settings, confirm a setting changed after registration is observed without recreating the runtime.
 4. Record the plugin `dist/main.js` byte size after component or packaging changes.
+
+Copying local artifacts proves only the unpublished integration checkpoint. If
+the plugin source consumes a new fork API, the plugin's durable handoff is not
+commit-ready until the published package containing that API is installed and
+the plugin's exact dependency and lockfile are updated. A maintainer may still
+request an explicitly paired intermediate commit, but it must not be described
+as release-ready.
 
 End every handoff with a risk-based manual test list. State the most likely regression and which platforms/windows require separate testing.
 
