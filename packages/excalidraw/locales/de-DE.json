@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Einfügen",
     "pasteAsPlaintext": "Als unformatierten Text einfügen",
     "pasteCharts": "Diagramme einfügen",
