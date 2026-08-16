@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Вставить",
     "pasteAsPlaintext": "Вставить как обычный текст",
     "pasteCharts": "Вставить диаграммы",
