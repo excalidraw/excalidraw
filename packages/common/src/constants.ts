@@ -31,6 +31,7 @@ export const CURSOR_TYPE = {
   GRAB: "grab",
   POINTER: "pointer",
   MOVE: "move",
+  COPY: "copy",
   AUTO: "",
 };
 export const POINTER_BUTTON = {

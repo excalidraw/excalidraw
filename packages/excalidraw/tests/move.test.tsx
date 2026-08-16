@@ -1,6 +1,6 @@
 import React from "react";
 import { vi } from "vitest";
-import { KEYS, reseed } from "@excalidraw/common";
+import { CURSOR_TYPE, KEYS, reseed } from "@excalidraw/common";
 import { bindBindingElement } from "@excalidraw/element";
 import "@excalidraw/utils/test-utils";
 
@@ -15,7 +15,7 @@ import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
 import { UI, Pointer, Keyboard } from "./helpers/ui";
-import { render, fireEvent, act, unmountComponent } from "./test-utils";
+import { render, fireEvent, act, unmountComponent, GlobalTestState } from "./test-utils";
 
 unmountComponent();
 
@@ -188,5 +188,99 @@ describe("duplicate element on move when ALT is clicked", () => {
     expect([h.elements[1].x, h.elements[1].y]).toEqual([-10, 60]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
+  });
+});
+
+describe("copy cursor on Alt/Option held for duplication", () => {
+  it("shows copy cursor on hover when Alt is held over a selected element", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    const canvas = container.querySelector("canvas.interactive")!;
+
+    // create and select a rectangle
+    const tool = getByToolName("rectangle");
+    fireEvent.click(tool);
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerMove(canvas, { clientX: 80, clientY: 70 });
+    fireEvent.pointerUp(canvas);
+
+    // hover over the element without Alt — expect move cursor
+    fireEvent.pointerMove(canvas, { clientX: 55, clientY: 45 });
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.MOVE,
+    );
+
+    // hover over the element with Alt held — expect copy cursor
+    fireEvent.pointerMove(canvas, { clientX: 55, clientY: 45, altKey: true });
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.COPY,
+    );
+
+    // release Alt (simulate keyup) — cursor reverts to move
+    fireEvent.keyUp(document, { key: KEYS.ALT });
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.MOVE,
+    );
+  });
+
+  it("shows copy cursor during active drag when Alt is held", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    const canvas = container.querySelector("canvas.interactive")!;
+
+    // create and select a rectangle
+    const tool = getByToolName("rectangle");
+    fireEvent.click(tool);
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerMove(canvas, { clientX: 80, clientY: 70 });
+    fireEvent.pointerUp(canvas);
+
+    // start dragging with Alt held — should show copy cursor
+    fireEvent.pointerDown(canvas, { clientX: 55, clientY: 45 });
+    fireEvent.pointerMove(canvas, { clientX: 65, clientY: 55, altKey: true });
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.COPY,
+    );
+
+    // continue drag without Alt — cursor reverts to move
+    fireEvent.pointerMove(canvas, { clientX: 70, clientY: 60, altKey: false });
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.MOVE,
+    );
+
+    fireEvent.pointerUp(canvas);
+  });
+
+  it("does not show copy cursor when no elements are selected", async () => {
+    const { container } = await render(<Excalidraw />);
+    const canvas = container.querySelector("canvas.interactive")!;
+
+    // move over empty canvas with Alt held — should NOT show copy cursor
+    fireEvent.pointerMove(canvas, { clientX: 100, clientY: 100, altKey: true });
+    expect(GlobalTestState.interactiveCanvas.style.cursor).not.toBe(
+      CURSOR_TYPE.COPY,
+    );
+  });
+
+  it("pressing Alt while hovering over a selected element switches cursor to copy immediately", async () => {
+    const { getByToolName, container } = await render(<Excalidraw />);
+    const canvas = container.querySelector("canvas.interactive")!;
+
+    // create and select a rectangle
+    const tool = getByToolName("rectangle");
+    fireEvent.click(tool);
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 20 });
+    fireEvent.pointerMove(canvas, { clientX: 80, clientY: 70 });
+    fireEvent.pointerUp(canvas);
+
+    // hover over the element (no Alt) to establish move cursor
+    fireEvent.pointerMove(canvas, { clientX: 55, clientY: 45 });
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.MOVE,
+    );
+
+    // press Alt key while already hovering — cursor should switch to copy
+    fireEvent.keyDown(document, { key: KEYS.ALT });
+    expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+      CURSOR_TYPE.COPY,
+    );
   });
 });
