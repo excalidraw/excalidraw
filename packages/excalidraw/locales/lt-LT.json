@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Įklijuoti",
     "pasteAsPlaintext": "Įklijuoti kaip paprastą tekstą",
     "pasteCharts": "Įklijuoti diagramas",
