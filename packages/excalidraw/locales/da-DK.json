@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Indsæt",
     "pasteAsPlaintext": "Indsæt som klartekst",
     "pasteCharts": "Indsæt diagrammer",
