@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Beillesztés",
     "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
     "pasteCharts": "Grafikon beillesztése",
