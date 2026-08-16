@@ -73,8 +73,10 @@ If a change affects a block of code, do not directly modify the existing Excalid
 Instead:
 
 1. Create a dedicated function.
-2. Prefer placing the function in `ObsidianUtils.ts` whenever possible.
+2. Prefer placing an Obsidian-specific utility in the existing lowerCamelCase `obsidianUtils.ts` or `commonObsidianUtils.ts` module when appropriate.
 3. Keep Obsidian-specific logic isolated from Excalidraw logic.
+
+The utility modules consume the typed host boundary; they are not a place to store or discover the plugin. New host capabilities belong in the narrow adapter contracts described below.
 
 This approach makes future merges significantly easier because modifications become easy to identify and review.
 
@@ -133,6 +135,18 @@ The marker should explain:
 
 This makes future merge conflicts substantially easier to understand and resolve.
 
+## Typed Obsidian Host Boundary
+
+The plugin supplies Obsidian-specific capabilities to the evaluated component through `ObsidianCommonHostAdapter` and `ObsidianExcalidrawHostAdapter`.
+
+- Expose small semantic operations, never the plugin instance, its complete settings object, or an active view.
+- Do not pass those host objects through component props or `appState`, and do not discover them through browser or Obsidian globals.
+- Common- and element-layer capabilities belong in `commonObsidianHost.ts`; Excalidraw-package-only capabilities belong in `obsidianExcalidrawHost.ts`. View-scoped state does not belong in either registry.
+- The plugin owns registration and deterministic disposal for each evaluated window runtime. Component instances only consume the registered capabilities.
+- The fork's generated declarations are the type source of truth. Reuse existing Excalidraw types and export host contracts rather than duplicating unions or structural interfaces in the consumer.
+
+These adapters form an internal protocol paired with the plugin's exact package dependency. A breaking change must increment the relevant protocol version and be coordinated across both repositories. The plugin should reject a missing or incompatible boundary; do not retain a legacy `hostPlugin` or global-discovery fallback merely to support mismatched historical versions. This exception does not apply to serialized scene compatibility or public Excalidraw APIs.
+
 ## Obsidian Package Contract
 
 The normal upstream ESM package and the Obsidian consumer artifact serve different purposes. Keep the Obsidian build isolated and semantically named; do not restore the retired UMD/webpack path.
@@ -178,6 +192,8 @@ When changing Radix menus, popovers, or `ObsidianRadixPortal`, test the main win
 
 The plugin consumes these files from `node_modules/@zsviczian/excalidraw/dist/obsidian/`. Before publishing a new package, the four locally generated files may be copied temporarily into the sibling plugin's ignored installed package for integration testing. Keep the plugin's declared dependency unchanged during this temporary handoff; `npm install` restores the published artifact.
 
+Host-boundary unit tests do not load Obsidian or the plugin. Use structural fake adapters to test standalone defaults or required-service errors, capability forwarding, protocol rejection, idempotent cleanup, and stale-disposer safety. Cross-repository testing is the separate integration gate for actual plugin registration, reload, main-window and popout lifecycle, and live settings reads.
+
 After a component version is published:
 
 1. Update `@zsviczian/excalidraw` in the plugin repository.
@@ -187,6 +203,19 @@ After a component version is published:
 5. Check the final plugin `main.js` byte size because small component changes can reduce release headroom.
 
 Do not bump package versions, publish packages, commit either repository, or modify the consumer's dependency unless the maintainer explicitly requests that action.
+
+### Maintainer-coordinated package release
+
+When the maintainer explicitly requests an Obsidian-fork package release:
+
+1. Commit the implementation checkpoint.
+2. Bump only `packages/excalidraw/package.json` in a separate release checkpoint.
+3. Run package-local `yarn prepack`.
+4. Create and inspect the npm tarball, including its version, declarations, protocol exports, and all four Obsidian artifacts.
+5. Publish only `@zsviczian/excalidraw`.
+6. Update the plugin's exact dependency, run `npm install`, and build and smoke-test against the published package before committing the plugin handoff.
+
+Do not use the monorepo-root `yarn release` command for this workflow. It rewrites and publishes the upstream package set (`common`, `fractional-indexing`, `math`, `element`, and `excalidraw`), not only this fork package.
 
 ## Validation
 

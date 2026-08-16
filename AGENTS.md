@@ -40,7 +40,9 @@ Every fork-specific difference in an upstream-owned file must carry the exact `z
 
 Prefer the ringfenced files when suitable:
 
+- `packages/common/src/commonObsidianHost.ts`
 - `packages/excalidraw/obsidianUtils.ts`
+- `packages/excalidraw/obsidianExcalidrawHost.ts`
 - `packages/common/src/commonObsidianUtils.ts`
 - `packages/excalidraw/css/obsidianStylingOverrides.css`
 - `scripts/buildObsidianPackage.js`
@@ -78,6 +80,21 @@ Runtime requirements:
 
 `yarn prepack` must continue to include both the normal ESM outputs/types and the four Obsidian files in the npm tarball.
 
+### Maintainer-Coordinated Package Release
+
+Do not use the monorepo-root `yarn release` workflow for an Obsidian-fork-only release. That script rewrites and publishes the upstream package set (`common`, `fractional-indexing`, `math`, `element`, and `excalidraw`), not only `@zsviczian/excalidraw`.
+
+When the maintainer explicitly requests a fork package release:
+
+1. Commit the implementation checkpoint before changing the package version.
+2. Bump only `packages/excalidraw/package.json` in a separate release checkpoint.
+3. Run the package-local `yarn prepack` so both ESM/types and Obsidian artifacts are rebuilt.
+4. Create and inspect the package-local npm tarball. Verify its version, generated host declarations and protocol exports, and all four `dist/obsidian` artifacts.
+5. Publish only `@zsviczian/excalidraw`.
+6. In the plugin repository, update the exact dependency, run `npm install`, build, and smoke-test against the published artifact before committing the consumer handoff.
+
+The normal rule remains unchanged: do not bump, package, publish, or update the consumer dependency without explicit maintainer authorization.
+
 ## React And Window Ownership
 
 The component is evaluated independently with the consuming plugin's React packages in each Obsidian window.
@@ -85,7 +102,37 @@ The component is evaluated independently with the consuming plugin's React packa
 - Avoid module assumptions that require one browser-window singleton.
 - DOM, portals, document events, and layout measurements must use the owning Excalidraw container/document where relevant.
 - Do not implement plugin-level persistence here merely because a UI is rendered in a popout. Persistent plugin state is owned by the host adapter and, for existing Obsidian plugin storage, remains in the main application window.
-- Keep host-provided adapters such as text-to-diagram persistence backward compatible unless the task explicitly changes their contract.
+- Keep public or independently consumed host-provided adapters such as text-to-diagram persistence backward compatible unless the task explicitly changes their contract.
+
+## Typed Obsidian Host Boundary
+
+The evaluated fork runtime receives Obsidian-specific capabilities through `ObsidianCommonHostAdapter` and `ObsidianExcalidrawHostAdapter`. This is the only supported plugin-access mechanism inside the fork.
+
+- Do not discover or store the plugin through `window`, `globalThis`, a global Obsidian `app`, `app.plugins`, or a fork-side `hostPlugin` variable.
+- Do not add the plugin, its settings object, or an active view to Excalidraw component props or `appState`.
+- Keep contracts semantic and minimal. The adapter may answer a question or perform a named operation, but it must not expose the host object graph.
+- Put capabilities needed by common or element layers in `commonObsidianHost.ts`. Put Excalidraw-package-only capabilities in `obsidianExcalidrawHost.ts`. Keep view-scoped state out of both registries.
+- The host registers adapters once per evaluated window runtime. Components and editor instances consume them but must not configure or dispose them.
+- Registration must validate the protocol version and return an idempotent, stale-registration-safe disposer so teardown from an older runtime cannot clear a newer registration.
+- Utilities may provide an explicit safe standalone default when the behavior is meaningful outside Obsidian. Required host services must fail with a descriptive error rather than use plugin discovery or an implicit compatibility bridge.
+
+A strong reference held by an adapter is acceptable only for the lifetime of its registered window runtime. Memory safety comes from deterministic host-owned disposal, not from weakening the adapter type or hiding the reference in a global.
+
+### Internal Protocol Compatibility
+
+The two Obsidian host adapters are internal protocols paired with the consuming plugin's exact package dependency. They are not required to support arbitrary mismatches between historical plugin and fork versions.
+
+- A breaking contract change must increment the affected protocol constant and update fork behavior, focused tests, generated declarations, the plugin adapter, and its ambient runtime declaration in one coordinated checkpoint.
+- The consuming plugin should fail fast when the required boundary is missing or incompatible. Do not preserve `hostPlugin` or other legacy discovery fallbacks solely for cross-version mismatches.
+- This exception does not weaken compatibility requirements for serialized scenes, public Excalidraw exports, documented scripting surfaces, or independently consumed adapters.
+
+### Host Boundary Type Ownership
+
+The fork declarations are the canonical source for host contracts and related Excalidraw concepts.
+
+- Export adapter interfaces, disposer types, and protocol constants through generated package declarations.
+- Reuse existing types such as `EditorInterface["formFactor"]` and `StylesPanelMode`; do not repeat equivalent string unions or structural interfaces.
+- When the plugin models the evaluated `window.ExcalidrawLib` surface, it should import or derive these published types rather than maintain a second property list.
 
 ## Radix Portals
 
@@ -103,7 +150,7 @@ When changing a menu or popover:
 
 - Follow upstream TypeScript, React, Sass, import, and formatting conventions in the touched area.
 - Use TSDoc/high-signal comments for exported APIs, new fork helpers, package-loading logic, and non-obvious compatibility workarounds.
-- Preserve public Excalidraw exports, serialized scene compatibility, and host adapter contracts.
+- Preserve public Excalidraw exports, serialized scene compatibility, and independently consumed host adapter contracts. Apply the coordinated internal-protocol rule above to the paired Obsidian host adapters.
 - Avoid broad file moves or naming cleanup in behavior fixes.
 - Search all imports, callers, styles, tests, and package exports before changing a shared component or type.
 - Do not add network dependencies or remote code loading. The host-provided Mermaid integration is not a network loader; lazy CJK asset fetching is the narrowly scoped network exception and is not precedent for other assets.
@@ -124,6 +171,8 @@ Also run the most relevant focused tests, formatting/lint checks, and:
 yarn test:typecheck
 ```
 
+Host-boundary unit tests must run without Obsidian or the plugin. Configure small structural fake adapters and cover standalone defaults or required-service errors, capability forwarding, protocol rejection, idempotent disposal, and protection against a stale disposer clearing a newer registration. Plugin-dependent behavior belongs in the cross-repository integration pass, not in these unit tests.
+
 If a repo-wide command fails because of unrelated baseline errors:
 
 - report the failure accurately;
@@ -135,7 +184,7 @@ For integration validation:
 
 1. Temporarily copy the four local `dist/obsidian` artifacts into the sibling plugin's ignored `node_modules/@zsviczian/excalidraw/dist/obsidian/` directory without changing its dependency declaration.
 2. Run `npm run build` in the plugin repository. Run `npm run dev` too when debugger payloads or development CSS changed.
-3. Test cold startup, plugin reload, normal editing, main-window and popout behavior, offline operation, and the feature-specific workflow.
+3. Test cold startup, plugin reload, normal editing, main-window and popout behavior, popout teardown, offline operation, and the feature-specific workflow. For adapter settings, confirm a setting changed after registration is observed without recreating the runtime.
 4. Record the plugin `dist/main.js` byte size after component or packaging changes.
 
 End every handoff with a risk-based manual test list. State the most likely regression and which platforms/windows require separate testing.
