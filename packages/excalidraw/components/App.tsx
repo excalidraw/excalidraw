@@ -433,7 +433,7 @@ import ConvertElementTypePopup, {
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppArrowText } from "./App.arrowText";
 import { AppBucketFill } from "./App.bucketFill";
-import { AppCursor } from "./App.cursor";
+import { AppCursor, isThemeDependentToolCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
@@ -4140,7 +4140,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
     if (
-      this.state.activeTool.type === "eraser" &&
+      isThemeDependentToolCursor(this.state.activeTool.type) &&
       prevState.theme !== this.state.theme
     ) {
       this.cursor.applyForTool();

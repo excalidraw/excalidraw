@@ -1,7 +1,10 @@
 import {
+  applyDarkModeFilter,
   BUCKET_FILL_BACKGROUND_PICKS,
   COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   KEYS,
+  THEME,
 } from "@excalidraw/common";
 import { CaptureUpdateAction } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
@@ -106,6 +109,64 @@ describe("bucket fill tool", () => {
     const updatedCursor = GlobalTestState.interactiveCanvas.style.cursor;
     expect(updatedCursor).not.toBe(fallbackCursor);
     expect(decodeURIComponent(updatedCursor)).toContain(`fill="${nextColor}"`);
+  });
+
+  it("re-applies the cursor when the theme changes", () => {
+    act(() => {
+      API.setAppState({
+        theme: THEME.LIGHT,
+        currentItemBackgroundColor: COLOR_PALETTE.transparent,
+      });
+    });
+    selectBucketFill();
+
+    const fallback = COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
+    const lightCursor = GlobalTestState.interactiveCanvas.style.cursor;
+    expect(decodeURIComponent(lightCursor)).toContain(`fill="${fallback}"`);
+
+    act(() => {
+      API.setAppState({ theme: THEME.DARK });
+    });
+
+    // the refresh used to be gated on the eraser tool only, so the bucket-fill
+    // (and laser) cursor kept the previous theme's colors
+    const darkCursor = GlobalTestState.interactiveCanvas.style.cursor;
+    expect(darkCursor).not.toBe(lightCursor);
+    expect(decodeURIComponent(darkCursor)).toContain(
+      `fill="${applyDarkModeFilter(fallback, true)}"`,
+    );
+  });
+
+  it("dark-mode filters the transparent fallback color, same as an explicit one", () => {
+    const { bucketFill } = h.app;
+    const fallback = COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX];
+    const explicit = "#e03131";
+
+    // an explicit color has always been filtered for display
+    expect(
+      bucketFill.getBucketFillBackgroundColor(explicit, THEME.DARK),
+    ).toBe(applyDarkModeFilter(explicit, true));
+
+    // the transparent fallback must be too, or the cursor swatch advertises a
+    // color the canvas won't paint once the dark filter is applied on render
+    expect(
+      bucketFill.getBucketFillBackgroundColor(
+        COLOR_PALETTE.transparent,
+        THEME.DARK,
+      ),
+    ).toBe(applyDarkModeFilter(fallback, true));
+
+    expect(
+      bucketFill.getBucketFillBackgroundColor(
+        COLOR_PALETTE.transparent,
+        THEME.LIGHT,
+      ),
+    ).toBe(fallback);
+
+    // no theme = the color actually written to the element; stays unfiltered
+    expect(
+      bucketFill.getBucketFillBackgroundColor(COLOR_PALETTE.transparent),
+    ).toBe(fallback);
   });
 
   it("does not rebuild or reapply an unchanged bucket fill cursor", () => {
