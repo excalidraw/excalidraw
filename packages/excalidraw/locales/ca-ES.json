@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Enganxa",
     "pasteAsPlaintext": "Enganxar com a text pla",
     "pasteCharts": "Enganxa els diagrames",
