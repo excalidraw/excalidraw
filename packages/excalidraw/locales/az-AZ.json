@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Yapışdır",
     "pasteAsPlaintext": "Düz mətn kimi yapışdırın",
     "pasteCharts": "Diaqramları yapışdırın",
