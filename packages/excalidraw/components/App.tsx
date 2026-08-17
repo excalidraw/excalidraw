@@ -358,7 +358,6 @@ import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
   getScrollToContentState,
-  getElementsWithinSelection,
   getNormalizedZoom,
   getSelectedElements,
   hasBackground,
@@ -10699,104 +10698,100 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-        // It is very important to read this.state within each move event,
-        // otherwise we would read a stale one!
-        const newElement = this.state.newElement;
+      // It is very important to read this.state within each move event,
+      // otherwise we would read a stale one!
+      const newElement = this.state.newElement;
 
-        if (!newElement) {
-          return;
-        }
+      if (!newElement) {
+        return;
+      }
 
-        if (newElement.type === "freedraw") {
-          const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+      if (newElement.type === "freedraw") {
+        const points = newElement.points;
+        const dx = pointerCoords.x - newElement.x;
+        const dy = pointerCoords.y - newElement.y;
 
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+        const lastPoint = points.length > 0 && points[points.length - 1];
+        const discardPoint =
+          lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
-          if (!discardPoint) {
-            const pressures = newElement.simulatePressure
-              ? newElement.pressures
-              : [...newElement.pressures, event.pressure];
+        if (!discardPoint) {
+          const pressures = newElement.simulatePressure
+            ? newElement.pressures
+            : [...newElement.pressures, event.pressure];
 
-            this.scene.mutateElement(
-              newElement,
-              {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
-                pressures,
-              },
-              {
-                informMutation: false,
-                isDragging: false,
-              },
-            );
-
-            this.setState({
-              newElement,
-            });
-          }
-        } else if (isLinearElement(newElement) && !newElement.isDeleted) {
-          pointerDownState.drag.hasOccurred = true;
-          const points = newElement.points;
-
-          invariant(
-            points.length > 1,
-            "Do not create linear elements with less than 2 points",
+          this.scene.mutateElement(
+            newElement,
+            {
+              points: [...points, pointFrom<LocalPoint>(dx, dy)],
+              pressures,
+            },
+            {
+              informMutation: false,
+              isDragging: false,
+            },
           );
-
-          let linearElementEditor = this.state.selectedLinearElement;
-
-          if (
-            !linearElementEditor ||
-            linearElementEditor.elementId !== newElement.id
-          ) {
-            linearElementEditor = new LinearElementEditor(
-              newElement,
-              this.scene.getNonDeletedElementsMap(),
-            );
-          }
-
-          const lastClickedPointOutOfBounds =
-            linearElementEditor &&
-            (linearElementEditor.initialState.lastClickedPoint < 0 ||
-              linearElementEditor.initialState.lastClickedPoint >=
-                points.length);
-          if (lastClickedPointOutOfBounds) {
-            console.warn(
-              "Last clicked point is out of bounds. Attempting to fix it.",
-            );
-            linearElementEditor = {
-              ...linearElementEditor,
-              selectedPointsIndices: [points.length - 1],
-              initialState: {
-                ...linearElementEditor.initialState,
-                prevSelectedPointsIndices: null,
-                lastClickedPoint: points.length - 1,
-              },
-              hoverPointIndex: points.length - 1,
-            };
-          }
 
           this.setState({
             newElement,
-            ...LinearElementEditor.handlePointDragging(
-              event,
-              this,
-              gridX,
-              gridY,
-              linearElementEditor,
-            )!,
           });
-        } else {
-          pointerDownState.lastCoords.x = pointerCoords.x;
-          pointerDownState.lastCoords.y = pointerCoords.y;
-          this.maybeDragNewGenericElement(pointerDownState, event, false);
         }
+      } else if (isLinearElement(newElement) && !newElement.isDeleted) {
+        pointerDownState.drag.hasOccurred = true;
+        const points = newElement.points;
+
+        invariant(
+          points.length > 1,
+          "Do not create linear elements with less than 2 points",
+        );
+
+        let linearElementEditor = this.state.selectedLinearElement;
+
+        if (
+          !linearElementEditor ||
+          linearElementEditor.elementId !== newElement.id
+        ) {
+          linearElementEditor = new LinearElementEditor(
+            newElement,
+            this.scene.getNonDeletedElementsMap(),
+          );
+        }
+
+        const lastClickedPointOutOfBounds =
+          linearElementEditor &&
+          (linearElementEditor.initialState.lastClickedPoint < 0 ||
+            linearElementEditor.initialState.lastClickedPoint >= points.length);
+        if (lastClickedPointOutOfBounds) {
+          console.warn(
+            "Last clicked point is out of bounds. Attempting to fix it.",
+          );
+          linearElementEditor = {
+            ...linearElementEditor,
+            selectedPointsIndices: [points.length - 1],
+            initialState: {
+              ...linearElementEditor.initialState,
+              prevSelectedPointsIndices: null,
+              lastClickedPoint: points.length - 1,
+            },
+            hoverPointIndex: points.length - 1,
+          };
+        }
+
+        this.setState({
+          newElement,
+          ...LinearElementEditor.handlePointDragging(
+            event,
+            this,
+            gridX,
+            gridY,
+            linearElementEditor,
+          )!,
+        });
+      } else {
+        pointerDownState.lastCoords.x = pointerCoords.x;
+        pointerDownState.lastCoords.y = pointerCoords.y;
+        this.maybeDragNewGenericElement(pointerDownState, event, false);
       }
-
-
     });
   }
 

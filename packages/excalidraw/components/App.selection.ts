@@ -1,5 +1,3 @@
-// Existing in-process selection dependencies are imported directly. this.app
-// replaces one-callback-per-function dependency wrappers.
 import { KEYS, isSelectionLikeTool, tupleToCoors } from "@excalidraw/common";
 import {
   LinearElementEditor,
@@ -493,7 +491,7 @@ export class AppSelection {
 
   /**
    * Resolves click-selection decisions that pointer-down intentionally defers
-   * so the same interaction can still become a drag.
+   * dragging and resizing finalization still need coverage
    */
   handlePointerUp = (
     event: PointerEvent,
@@ -673,147 +671,152 @@ export class AppSelection {
     pointerDownState: PointerDownState,
     pointerCoords: GlobalCoord,
   ): boolean => {
-
-      if (this.state.selectionElement) {
+    if (this.app.state.selectionElement) {
+      pointerDownState.lastCoords.x = pointerCoords.x;
+      pointerDownState.lastCoords.y = pointerCoords.y;
+      if (event.altKey) {
+        this.app.setActiveTool(
+          { type: "lasso", fromSelection: true },
+          { keepSelection: event.shiftKey },
+        );
+        this.app.lassoTrail.startPath(
+          pointerDownState.origin.x,
+          pointerDownState.origin.y,
+          event.shiftKey,
+        );
+        this.app.setAppState({
+          selectionElement: null,
+        });
+        return true;
+      }
+      this.app.maybeDragNewGenericElement(pointerDownState, event);
+    } else if (this.app.state.activeTool.type === "lasso") {
+      if (!event.altKey && this.app.state.activeTool.fromSelection) {
+        this.app.setActiveTool({ type: "selection" });
+        this.app.createGenericElementOnPointerDown(
+          "selection",
+          pointerDownState,
+        );
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
-        if (event.altKey) {
-          this.setActiveTool(
-            { type: "lasso", fromSelection: true },
-            { keepSelection: event.shiftKey },
-          );
-          this.lassoTrail.startPath(
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            event.shiftKey,
-          );
-          this.setAppState({
-            selectionElement: null,
-          });
-          return;
-        }
-        this.maybeDragNewGenericElement(pointerDownState, event);
-      } else if (this.state.activeTool.type === "lasso") {
-        if (!event.altKey && this.state.activeTool.fromSelection) {
-          this.setActiveTool({ type: "selection" });
-          this.createGenericElementOnPointerDown("selection", pointerDownState);
-          pointerDownState.lastCoords.x = pointerCoords.x;
-          pointerDownState.lastCoords.y = pointerCoords.y;
-          this.maybeDragNewGenericElement(pointerDownState, event);
-          this.lassoTrail.endPath();
-        } else {
-          this.lassoTrail.addPointToPath(
-            pointerCoords.x,
-            pointerCoords.y,
-            event.shiftKey,
-          );
-        }
-      } else {;
+        this.app.maybeDragNewGenericElement(pointerDownState, event);
+        this.app.lassoTrail.endPath();
+      } else {
+        this.app.lassoTrail.addPointToPath(
+          pointerCoords.x,
+          pointerCoords.y,
+          event.shiftKey,
+        );
+      }
+    } else {
+      return false;
+    }
 
-      if (this.state.activeTool.type === "selection") {
-        pointerDownState.boxSelection.hasOccurred = true;
+    if (this.app.state.activeTool.type === "selection") {
+      pointerDownState.boxSelection.hasOccurred = true;
 
-        const elements = this.scene.getNonDeletedElements();
+      const elements = this.app.scene.getNonDeletedElements();
 
-        // box-select line editor points
-        if (this.state.selectedLinearElement?.isEditing) {
-          LinearElementEditor.handleBoxSelection(
-            event,
-            this.state,
-            this.setState.bind(this),
-            this.scene.getNonDeletedElementsMap(),
-          );
-          // regular box-select
-        } else {
-          let shouldReuseSelection = true;
+      // box-select line editor points
+      if (this.app.state.selectedLinearElement?.isEditing) {
+        LinearElementEditor.handleBoxSelection(
+          event,
+          this.app.state,
+          this.app.setState.bind(this.app),
+          this.app.scene.getNonDeletedElementsMap(),
+        );
+        // regular box-select
+      } else {
+        let shouldReuseSelection = true;
 
-          if (!event.shiftKey && isSomeElementSelected(elements, this.state)) {
-            if (
-              pointerDownState.withCmdOrCtrl &&
-              pointerDownState.hit.element
-            ) {
-              this.setState((prevState) =>
-                selectGroupsForSelectedElements(
-                  {
-                    ...prevState,
-                    selectedElementIds: {
-                      [pointerDownState.hit.element!.id]: true,
-                    },
+        if (
+          !event.shiftKey &&
+          isSomeElementSelected(elements, this.app.state)
+        ) {
+          if (pointerDownState.withCmdOrCtrl && pointerDownState.hit.element) {
+            this.app.setState((prevState) =>
+              selectGroupsForSelectedElements(
+                {
+                  ...prevState,
+                  selectedElementIds: {
+                    [pointerDownState.hit.element!.id]: true,
                   },
-                  this.scene.getNonDeletedElements(),
-                  prevState,
-                  this,
-                ),
-              );
+                },
+                this.app.scene.getNonDeletedElements(),
+                prevState,
+                this.app,
+              ),
+            );
+          } else {
+            shouldReuseSelection = false;
+          }
+        }
+        const elementsWithinSelection = this.app.state.selectionElement
+          ? getElementsWithinSelection(
+              elements,
+              this.app.state.selectionElement,
+              this.app.scene.getNonDeletedElementsMap(),
+              false,
+              this.app.state.boxSelectionMode,
+            )
+          : [];
+
+        this.app.setState((prevState) => {
+          const nextSelectedElementIds = {
+            ...(shouldReuseSelection && prevState.selectedElementIds),
+            ...elementsWithinSelection.reduce(
+              (acc: Record<ExcalidrawElement["id"], true>, element) => {
+                acc[element.id] = true;
+                return acc;
+              },
+              {},
+            ),
+          };
+
+          if (pointerDownState.hit.element) {
+            // if using ctrl/cmd, select the hitElement only if we
+            // haven't box-selected anything else
+            if (!elementsWithinSelection.length) {
+              nextSelectedElementIds[pointerDownState.hit.element.id] = true;
             } else {
-              shouldReuseSelection = false;
+              delete nextSelectedElementIds[pointerDownState.hit.element.id];
             }
           }
-          const elementsWithinSelection = this.state.selectionElement
-            ? getElementsWithinSelection(
-                elements,
-                this.state.selectionElement,
-                this.scene.getNonDeletedElementsMap(),
-                false,
-                this.state.boxSelectionMode,
-              )
-            : [];
 
-          this.setState((prevState) => {
-            const nextSelectedElementIds = {
-              ...(shouldReuseSelection && prevState.selectedElementIds),
-              ...elementsWithinSelection.reduce(
-                (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                  acc[element.id] = true;
-                  return acc;
-                },
-                {},
-              ),
-            };
+          prevState = !shouldReuseSelection
+            ? { ...prevState, selectedGroupIds: {}, editingGroupId: null }
+            : prevState;
 
-            if (pointerDownState.hit.element) {
-              // if using ctrl/cmd, select the hitElement only if we
-              // haven't box-selected anything else
-              if (!elementsWithinSelection.length) {
-                nextSelectedElementIds[pointerDownState.hit.element.id] = true;
-              } else {
-                delete nextSelectedElementIds[pointerDownState.hit.element.id];
-              }
-            }
-
-            prevState = !shouldReuseSelection
-              ? { ...prevState, selectedGroupIds: {}, editingGroupId: null }
-              : prevState;
-
-            return {
-              ...selectGroupsForSelectedElements(
-                {
-                  editingGroupId: prevState.editingGroupId,
-                  selectedElementIds: nextSelectedElementIds,
-                },
-                this.scene.getNonDeletedElements(),
-                prevState,
-                this,
-              ),
-              // select linear element only when we haven't box-selected anything else
-              selectedLinearElement:
-                elementsWithinSelection.length === 1 &&
-                isLinearElement(elementsWithinSelection[0])
-                  ? new LinearElementEditor(
-                      elementsWithinSelection[0],
-                      this.scene.getNonDeletedElementsMap(),
-                    )
-                  : null,
-              showHyperlinkPopup:
-                elementsWithinSelection.length === 1 &&
-                (elementsWithinSelection[0].link ||
-                  isEmbeddableElement(elementsWithinSelection[0]))
-                  ? "info"
-                  : false,
-            };
-          });
-        }
+          return {
+            ...selectGroupsForSelectedElements(
+              {
+                editingGroupId: prevState.editingGroupId,
+                selectedElementIds: nextSelectedElementIds,
+              },
+              this.app.scene.getNonDeletedElements(),
+              prevState,
+              this.app,
+            ),
+            // select linear element only when we haven't box-selected anything else
+            selectedLinearElement:
+              elementsWithinSelection.length === 1 &&
+              isLinearElement(elementsWithinSelection[0])
+                ? new LinearElementEditor(
+                    elementsWithinSelection[0],
+                    this.app.scene.getNonDeletedElementsMap(),
+                  )
+                : null,
+            showHyperlinkPopup:
+              elementsWithinSelection.length === 1 &&
+              (elementsWithinSelection[0].link ||
+                isEmbeddableElement(elementsWithinSelection[0]))
+                ? "info"
+                : false,
+          };
+        });
       }
+    }
+    return true;
   };
 
   private clearSelection(hitElement: ExcalidrawElement | null): void {
