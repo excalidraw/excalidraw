@@ -24,6 +24,21 @@ interface NewElementCanvasProps {
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+
+    return () => {
+      // Releasing the backing store explicitly is necessary on older Safari
+      // versions, which may otherwise retain detached canvases until the
+      // browser-wide canvas memory limit is exhausted.
+      if (canvas && !canvas.isConnected) {
+        canvas.width = 0;
+        canvas.height = 0;
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (!canvasRef.current) {
       return;
