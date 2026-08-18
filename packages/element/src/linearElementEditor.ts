@@ -1172,6 +1172,7 @@ export class LinearElementEditor {
               },
               arrowStartIsInside: false,
               altFocusPoint: null,
+              arrowOtherEndpointInitialBinding: null,
             },
             selectedPointsIndices: null,
             pointerOffset: { x: 0, y: 0 },
@@ -1957,7 +1958,10 @@ export class LinearElementEditor {
       return null;
     }
     const pointerGlobalPoint = pointFrom<GlobalPoint>(pointerX, pointerY);
-    const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+    const [lines, curves] = deconstructLinearOrFreeDrawElement(
+      element,
+      elementsMap,
+    );
     const isLine = lines.length > 0;
     const count = isLine ? lines.length : curves.length;
 
@@ -2007,13 +2011,17 @@ export class LinearElementEditor {
   }
 
   static getPointAtPathProps(
-    container: NonDeleted<ExcalidrawLinearElement>,
+    container: ExcalidrawLinearElement,
     pathProps: {
       segmentIndex: number;
       segmentParameter: number;
     },
+    elementsMap: ElementsMap,
   ): GlobalPoint {
-    const [lines, curves] = deconstructLinearOrFreeDrawElement(container);
+    const [lines, curves] = deconstructLinearOrFreeDrawElement(
+      container,
+      elementsMap,
+    );
     const idx = clamp(
       pathProps.segmentIndex,
       0,
@@ -2046,6 +2054,7 @@ export class LinearElementEditor {
       const pathPoint = LinearElementEditor.getPointAtPathProps(
         element,
         boundTextElement.pathProps,
+        elementsMap,
       );
 
       return {
