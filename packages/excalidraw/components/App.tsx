@@ -4774,7 +4774,6 @@ class App extends React.Component<AppProps, AppState> {
             // Light background: shift white text to closest light grey
             newColor = "#f8f9fa";
           }
-          console.log(`[Smart Contrast - Library Drop] Changing text element ${newElement.id} color to ${newColor} (background was ${targetBgColor}, text was ${renderedColor})`);
           this.scene.mutateElement(newElement, { strokeColor: newColor });
           ShapeCache.delete(newElement);
         }
@@ -11541,7 +11540,6 @@ class App extends React.Component<AppProps, AppState> {
               const originalRendered = applyDarkModeFilter(savedOriginalColor, isDarkTheme);
               if (tinycolor.readability(originalRendered, targetBgColor) >= 1.3) {
                 // Original color is now readable again — restore it
-                console.log(`[Smart Contrast - Restore] Restoring element ${element.id} to original color ${savedOriginalColor}`);
                 this.scene.mutateElement(element, { strokeColor: savedOriginalColor });
                 ShapeCache.delete(element);
                 originalTextColors.delete(element.id);
@@ -11563,7 +11561,6 @@ class App extends React.Component<AppProps, AppState> {
               if (!originalTextColors.has(element.id)) {
                 originalTextColors.set(element.id, element.strokeColor);
               }
-              console.log(`[Smart Contrast - Drag Drop] Changing text element ${element.id} color to ${newColor} (background was ${targetBgColor}, text was ${renderedColor})`);
               this.scene.mutateElement(element, { strokeColor: newColor });
               ShapeCache.delete(element);
             }
