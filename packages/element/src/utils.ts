@@ -59,7 +59,13 @@ import type {
   ExcalidrawRectanguloidElement,
 } from "./types";
 
-type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
+export type LinearPathSegment = LineSegment<GlobalPoint> | Curve<GlobalPoint>;
+
+type ElementShape = [
+  LineSegment<GlobalPoint>[],
+  Curve<GlobalPoint>[],
+  LinearPathSegment[]?,
+];
 
 const ElementShapesCache = new WeakMap<
   ExcalidrawElement,
@@ -125,7 +131,7 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 
   if (cachedShape) {
@@ -135,6 +141,7 @@ export function deconstructLinearOrFreeDrawElement(
   const ops = generateLinearCollisionShape(element, elementsMap);
   const lines = [];
   const curves = [];
+  const orderedSegments: LinearPathSegment[] = [];
 
   for (let idx = 0; idx < ops.length; idx += 1) {
     const op = ops[idx];
@@ -143,60 +150,79 @@ export function deconstructLinearOrFreeDrawElement(
     switch (op.op) {
       case "move":
         continue;
-      case "lineTo":
+      case "lineTo": {
         if (!prevPoint) {
           throw new Error("prevPoint is undefined");
         }
 
-        lines.push(
-          lineSegment<GlobalPoint>(
-            pointFrom<GlobalPoint>(
-              element.x + prevPoint[0],
-              element.y + prevPoint[1],
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + op.data[0],
-              element.y + op.data[1],
-            ),
+        const segment = lineSegment<GlobalPoint>(
+          pointFrom<GlobalPoint>(
+            element.x + prevPoint[0],
+            element.y + prevPoint[1],
+          ),
+          pointFrom<GlobalPoint>(
+            element.x + op.data[0],
+            element.y + op.data[1],
           ),
         );
+        lines.push(segment);
+        orderedSegments.push(segment);
         continue;
-      case "bcurveTo":
+      }
+      case "bcurveTo": {
         if (!prevPoint) {
           throw new Error("prevPoint is undefined");
         }
 
-        curves.push(
-          curve<GlobalPoint>(
-            pointFrom<GlobalPoint>(
-              element.x + prevPoint[0],
-              element.y + prevPoint[1],
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + op.data[0],
-              element.y + op.data[1],
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + op.data[2],
-              element.y + op.data[3],
-            ),
-            pointFrom<GlobalPoint>(
-              element.x + op.data[4],
-              element.y + op.data[5],
-            ),
+        const segment = curve<GlobalPoint>(
+          pointFrom<GlobalPoint>(
+            element.x + prevPoint[0],
+            element.y + prevPoint[1],
+          ),
+          pointFrom<GlobalPoint>(
+            element.x + op.data[0],
+            element.y + op.data[1],
+          ),
+          pointFrom<GlobalPoint>(
+            element.x + op.data[2],
+            element.y + op.data[3],
+          ),
+          pointFrom<GlobalPoint>(
+            element.x + op.data[4],
+            element.y + op.data[5],
           ),
         );
+        curves.push(segment);
+        orderedSegments.push(segment);
         continue;
+      }
       default: {
         console.error("Unknown op type", op.op);
       }
     }
   }
 
-  const shape = [lines, curves] as ElementShape;
+  const shape = [lines, curves, orderedSegments] as ElementShape;
   setElementShapesCacheEntry(element, shape, 0);
 
   return shape;
+}
+
+/**
+ * Returns the **rotated** components of a freedraw, line or arrow element
+ * interleaved in path order, so the path can be walked from start to end
+ * (e.g. for arc-length parameterization).
+ */
+export function getLinearElementPathSegments(
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
+): LinearPathSegment[] {
+  const [lines, curves, orderedSegments] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
+
+  return orderedSegments ?? [...lines, ...curves];
 }
 
 /**
@@ -210,7 +236,7 @@ export function deconstructLinearOrFreeDrawElement(
 export function deconstructRectanguloidElement(
   element: ExcalidrawRectanguloidElement,
   offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
   if (cachedShape) {
@@ -422,7 +448,7 @@ export function getDiamondBaseCorners(
 export function deconstructDiamondElement(
   element: ExcalidrawDiamondElement,
   offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
   if (cachedShape) {

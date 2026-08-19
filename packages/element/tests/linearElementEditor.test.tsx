@@ -31,6 +31,8 @@ import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
 import { newArrowElement } from "../src";
+import { distanceToElement } from "../src/distance";
+import { getLinearElementPathSegments } from "../src/utils";
 
 import {
   getTextEditor,
@@ -1199,6 +1201,101 @@ describe("Test Linear Elements", () => {
             "y": "76.11251",
           }
         `);
+      });
+    });
+
+    describe("Test getPointAtPathParameter", () => {
+      it("should survive midpoint insertion", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 0,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+          roundness: null,
+        });
+        API.setElements([arrow]);
+
+        const before = LinearElementEditor.getPointAtPathParameter(
+          arrow,
+          0.25,
+          arrayToMap(h.elements),
+        )!;
+        expect(before[0]).toBeCloseTo(25);
+        expect(before[1]).toBeCloseTo(0);
+
+        // inserting a midpoint re-segments the path but must not move the
+        // point at the same normalized arc-length parameter
+        act(() => {
+          h.app.scene.mutateElement(arrow, {
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(50, 0),
+              pointFrom<LocalPoint>(100, 0),
+            ],
+          });
+        });
+
+        const after = LinearElementEditor.getPointAtPathParameter(
+          arrow,
+          0.25,
+          arrayToMap(h.elements),
+        )!;
+        expect(after[0]).toBeCloseTo(before[0]);
+        expect(after[1]).toBeCloseTo(before[1]);
+      });
+
+      it("should reach the corner curves of elbow arrows", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 0),
+            pointFrom<LocalPoint>(100, 100),
+          ],
+          elbowed: true,
+        });
+        API.setElements([arrow]);
+        const elementsMap = arrayToMap(h.elements);
+
+        // elbow arrows deconstruct into straight runs and rounded corner
+        // curves, chained start-to-end in path order
+        const segments = getLinearElementPathSegments(arrow, elementsMap);
+        expect(segments.length).toBeGreaterThan(1);
+        for (let i = 1; i < segments.length; i++) {
+          const prevEnd = segments[i - 1][segments[i - 1].length - 1];
+          expect(segments[i][0][0]).toBeCloseTo(prevEnd[0]);
+          expect(segments[i][0][1]).toBeCloseTo(prevEnd[1]);
+        }
+
+        // the whole parameter range maps onto the path
+        for (const parameter of [0, 0.25, 0.5, 0.75, 1]) {
+          const point = LinearElementEditor.getPointAtPathParameter(
+            arrow,
+            parameter,
+            elementsMap,
+          )!;
+          expect(distanceToElement(arrow, elementsMap, point)).toBeLessThan(
+            0.5,
+          );
+        }
+
+        // for this symmetric elbow the arc-length middle sits on the rounded
+        // corner itself, which segment-indexed positioning could never reach
+        const middle = LinearElementEditor.getPointAtPathParameter(
+          arrow,
+          0.5,
+          elementsMap,
+        )!;
+        expect(middle[0]).toBeGreaterThan(84);
+        expect(middle[0]).toBeLessThan(100);
+        expect(middle[1]).toBeGreaterThan(0);
+        expect(middle[1]).toBeLessThan(16);
       });
     });
 

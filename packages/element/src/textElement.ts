@@ -533,31 +533,16 @@ export const getTextFromElements = (
   return text;
 };
 
-export const getBoundTextPathProps = (
+/**
+ * Returns the normalized arc-length parameter (0–1) at which the bound text
+ * sits along its arrow container's path, defaulting to the path midpoint.
+ */
+export const getBoundTextPathParameter = (
   element: ExcalidrawTextElement,
   container: ExcalidrawLinearElement,
-) => {
-  if (isArrowElement(container)) {
-    if (element.pathProps != null) {
-      return element.pathProps;
-    }
-    // default to middle point or middle seg midpoint for backward compatibility
-    let segmentIndex;
-    let segmentParameter;
-    if (container.elbowed) {
-      segmentIndex = container.points.length - 2;
-      segmentParameter = 0.5;
-    } else {
-      segmentIndex =
-        container.points.length % 2 === 1
-          ? Math.floor(container.points.length / 2)
-          : container.points.length / 2 - 1;
-      segmentParameter = container.points.length % 2 === 1 ? 0.0 : 0.5;
-    }
-    return {
-      segmentIndex,
-      segmentParameter,
-    };
+): number | null => {
+  if (!isArrowElement(container)) {
+    return null;
   }
-  return null;
+  return element.pathParameter ?? 0.5;
 };

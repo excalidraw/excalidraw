@@ -20,6 +20,7 @@ import type { LocalPoint } from "@excalidraw/math";
 
 import { isLinearElement } from "../src/typeChecks";
 import { resizeSingleElement } from "../src/resizeElements";
+import { distanceToElement } from "../src/distance";
 import { LinearElementEditor } from "../src/linearElementEditor";
 import { getElementPointsCoords } from "../src/bounds";
 import { computeContainerDimensionForBoundText } from "../src/textElement";
@@ -490,35 +491,40 @@ describe("arrow element", () => {
     });
     const label = await UI.editText(arrow, "Hello");
     const elementsMap = arrayToMap(h.elements);
-    UI.resize(arrow, "se", [50, 30]);
-    let labelPos = LinearElementEditor.getBoundTextElementPosition(
-      arrow,
-      label,
-      elementsMap,
-    );
 
-    expect(labelPos.x + label.width / 2).toBeCloseTo(
-      arrow.x + arrow.points[2][0],
-    );
-    expect(labelPos.y + label.height / 2).toBeCloseTo(
-      arrow.y + arrow.points[2][1],
-    );
+    // the label defaults to the arc-length midpoint of the arrow's path and
+    // keeps that normalized position through resizes
+    const expectLabelAtPathMidpoint = () => {
+      const labelPos = LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        elementsMap,
+      );
+      const centerX = labelPos.x + label.width / 2;
+      const centerY = labelPos.y + label.height / 2;
+      const pathMidpoint = LinearElementEditor.getPointAtPathParameter(
+        arrow,
+        0.5,
+        elementsMap,
+      )!;
+
+      expect(label.pathParameter).toBe(0.5);
+      expect(centerX).toBeCloseTo(pathMidpoint[0]);
+      expect(centerY).toBeCloseTo(pathMidpoint[1]);
+      expect(
+        distanceToElement(arrow, elementsMap, pointFrom(centerX, centerY)),
+      ).toBeLessThan(0.5);
+    };
+
+    expectLabelAtPathMidpoint();
+
+    UI.resize(arrow, "se", [50, 30]);
+    expectLabelAtPathMidpoint();
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
 
     UI.resize(arrow, "w", [20, 0]);
-    labelPos = LinearElementEditor.getBoundTextElementPosition(
-      arrow,
-      label,
-      elementsMap,
-    );
-
-    expect(labelPos.x + label.width / 2).toBeCloseTo(
-      arrow.x + arrow.points[2][0],
-    );
-    expect(labelPos.y + label.height / 2).toBeCloseTo(
-      arrow.y + arrow.points[2][1],
-    );
+    expectLabelAtPathMidpoint();
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
   });

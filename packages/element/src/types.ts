@@ -255,12 +255,12 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
     /**
-     * Positional properties for text bound to a linear element, such as an arrow.
+     * Position of text bound to a linear element (such as an arrow),
+     * expressed as a normalized arc-length parameter (0–1) along the
+     * container's whole path. Independent of how the path is segmented,
+     * so it survives midpoint insertion and other geometry changes.
      * */
-    pathProps?: {
-      segmentIndex: number;
-      segmentParameter: number;
-    } | null;
+    pathParameter?: number | null;
   }>;
 
 export type ExcalidrawBindableElement =
@@ -282,10 +282,6 @@ export type ExcalidrawTextContainer =
 
 export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];
-  pathProps?: {
-    segmentIndex: number;
-    segmentParameter: number;
-  } | null;
 } & ExcalidrawTextElement;
 
 export type FixedPoint = [number, number];

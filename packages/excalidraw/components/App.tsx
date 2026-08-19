@@ -258,7 +258,7 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
-  getBoundTextPathProps,
+  getBoundTextPathParameter,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6877,9 +6877,8 @@ class App extends React.Component<AppProps, AppState> {
     if (!existingTextElement && shouldBindToContainer && container) {
       if (isArrowElement(container)) {
         // default positioning for bound text on arrows
-        const boundTextPathProps = getBoundTextPathProps(element, container);
         this.scene.mutateElement(element, {
-          pathProps: boundTextPathProps,
+          pathParameter: getBoundTextPathParameter(element, container),
         });
       }
 
@@ -10648,7 +10647,7 @@ class App extends React.Component<AppProps, AppState> {
         // Here is where we could potentially account for dragging of bound text elements
         if (
           linearElementEditor.isDragging &&
-          linearElementEditor.lastBoundTextPathProps
+          linearElementEditor.lastBoundTextPathParameter != null
         ) {
           const updatedEditor = LinearElementEditor.handleBoundTextDragging(
             linearElementEditor,
@@ -11578,7 +11577,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement?.isEditing &&
         !this.state.newElement &&
         this.state.selectedLinearElement.draggedFocusPointBinding === null &&
-        !this.state.selectedLinearElement.lastBoundTextPathProps
+        this.state.selectedLinearElement.lastBoundTextPathParameter == null
       ) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
@@ -11635,11 +11634,13 @@ class App extends React.Component<AppProps, AppState> {
               },
             },
           });
-        } else if (this.state.selectedLinearElement.lastBoundTextPathProps) {
+        } else if (
+          this.state.selectedLinearElement.lastBoundTextPathParameter != null
+        ) {
           this.setState({
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
-              lastBoundTextPathProps: null,
+              lastBoundTextPathParameter: null,
               isDragging: false,
             },
           });
