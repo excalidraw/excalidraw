@@ -2098,3 +2098,54 @@ describe("textWysiwyg", () => {
     });
   });
 });
+
+describe("save shortcuts while editing text", () => {
+  const { h } = window;
+
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    API.setElements([]);
+  });
+
+  const startEditing = async () => {
+    const text = API.createElement({
+      type: "text",
+      text: "ola",
+      x: 60,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+    UI.clickTool("selection");
+    Keyboard.keyPress(KEYS.ENTER);
+
+    const editor = await getTextEditor();
+    expect(h.state.editingTextElement?.id).toBe(text.id);
+    return editor;
+  };
+
+  // `actionSaveToActiveFile.keyTest` requires `!event.shiftKey`, so the "save
+  // as" variant matched no branch in the wysiwyg keydown handler: the editor
+  // stayed open and nothing was saved.
+  it("commits the editor on Cmd/Ctrl+Shift+S", async () => {
+    const editor = await startEditing();
+
+    fireEvent.keyDown(editor, {
+      key: KEYS.S,
+      ctrlKey: true,
+      shiftKey: true,
+    });
+
+    expect(h.state.editingTextElement).toBe(null);
+  });
+
+  it("still commits the editor on plain Cmd/Ctrl+S", async () => {
+    const editor = await startEditing();
+
+    fireEvent.keyDown(editor, { key: KEYS.S, ctrlKey: true });
+
+    expect(h.state.editingTextElement).toBe(null);
+  });
+});
