@@ -4,6 +4,7 @@ import { Excalidraw } from "../index";
 import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../components/App.viewport";
 import { AnimationController } from "../renderer/animation";
 import { getNormalizedZoom } from "../scene";
+import { actionZoomToFitSelection } from "../actions/actionCanvas";
 
 import { API } from "./helpers/api";
 import { act, render } from "./test-utils";
@@ -365,5 +366,48 @@ describe("scale-down animated", () => {
     await waitForAnimationProgress();
     expect(h.state.scrollX).toBe(settledScrollX);
     expect(h.state.scrollY).toBe(settledScrollY);
+  });
+});
+
+describe("contain", () => {
+  // `fit: "contain"` divides the viewport by the bounds. `getCommonBounds([])`
+  // returns [0, 0, 0, 0], so with nothing to fit both ratios are Infinity and
+  // the zoom clamped to MAX_ZOOM (3000%) instead of staying put.
+  it("keeps the current zoom when there is nothing to fit", async () => {
+    await render(<Excalidraw />);
+
+    API.setElements([]);
+    expect(h.state.zoom.value).toBe(1);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionZoomToFitSelection);
+    });
+
+    expect(h.state.zoom.value).toBe(1);
+    expect(h.state.zoom.value).not.toBe(getNormalizedZoom(Infinity));
+  });
+
+  it("still fits a real selection", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 100;
+    h.state.height = 100;
+
+    const rectElement = API.createElement({
+      width: 500,
+      height: 500,
+      x: 0,
+      y: 0,
+    });
+    API.setElements([rectElement]);
+    API.setSelectedElements([rectElement]);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionZoomToFitSelection);
+    });
+
+    // 500px of content into a 100px viewport — zoomed out, not slammed to max
+    expect(h.state.zoom.value).toBeLessThan(1);
+    expect(h.state.zoom.value).toBeGreaterThan(0);
   });
 });

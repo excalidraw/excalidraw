@@ -322,6 +322,15 @@ export const zoomToFitBounds = ({
       effectiveCanvasWidth / commonBoundsWidth,
       effectiveCanvasHeight / commonBoundsHeight,
     );
+
+    // Degenerate bounds divide by zero. `getCommonBounds([])` returns
+    // [0, 0, 0, 0], so fitting an empty scene makes both ratios Infinity,
+    // which then clamps to MAX_ZOOM (3000%). Keep the current zoom instead —
+    // there is nothing to fit. The "scale-down" path is already immune because
+    // it ends in `Math.min(smallestZoomValue, 1)`.
+    if (!Number.isFinite(adjustedZoomValue)) {
+      adjustedZoomValue = appState.zoom.value;
+    }
   } else {
     adjustedZoomValue = zoomValueToFitBoundsOnViewport(bounds, {
       width: effectiveCanvasWidth,
