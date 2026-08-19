@@ -4,6 +4,7 @@ import React, { useContext } from "react";
 import { flushSync } from "react-dom";
 import rough from "roughjs/bin/rough";
 import { nanoid } from "nanoid";
+import tinycolor from "tinycolor2";
 
 import {
   clamp,
@@ -593,6 +594,10 @@ let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
 let invalidateContextMenu = false;
+
+// Stores the original stroke color of text elements before auto-contrast changed them
+// so we can restore the original when the text is moved back onto a contrasting background.
+const originalTextColors = new Map<string, string>();
 
 /**
  * Map of youtube embed video states
@@ -4731,12 +4736,55 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
 
+    // Auto-adjust text contrast for loose text elements from library/paste
+    duplicatedElements.forEach((newElement) => {
+      if (isTextElement(newElement) && !isBoundToContainer(newElement)) {
+        const [tx1, ty1, tx2, ty2] = getElementBounds(newElement, this.scene.getNonDeletedElementsMap());
+        let bgElementColor: string | null = null;
+
+        for (const otherElement of duplicatedElements) {
+          if (otherElement.id === newElement.id) {
+            continue;
+          }
+          if (hasBackground(otherElement.type) || isImageElement(otherElement)) {
+            const [ox1, oy1, ox2, oy2] = getElementBounds(otherElement, this.scene.getNonDeletedElementsMap());
+            // AABB intersection check
+            if (tx1 <= ox2 && tx2 >= ox1 && ty1 <= oy2 && ty2 >= oy1) {
+              bgElementColor = otherElement.backgroundColor;
+              break;
+            }
+          }
+        }
+
+        const isDarkTheme = this.state.theme === THEME.DARK;
+        const renderedColor = applyDarkModeFilter(newElement.strokeColor, isDarkTheme);
+        let targetBgColor = applyDarkModeFilter(this.state.viewBackgroundColor, isDarkTheme);
+        
+        if (bgElementColor && bgElementColor !== "transparent") {
+          targetBgColor = applyDarkModeFilter(bgElementColor, isDarkTheme);
+        }
+
+        if (tinycolor.readability(renderedColor, targetBgColor) < 1.3) {
+          const bgIsDark = tinycolor(targetBgColor).isDark();
+          let newColor;
+          if (bgIsDark) {
+            // Dark background: shift white text to light grey (slightly off-white stays visible on dark)
+            newColor = isDarkTheme ? "#d0d0d0" : "#d0d0d0";
+          } else {
+            // Light background: shift white text to closest light grey
+            newColor = "#f8f9fa";
+          }
+          console.log(`[Smart Contrast - Library Drop] Changing text element ${newElement.id} color to ${newColor} (background was ${targetBgColor}, text was ${renderedColor})`);
+          this.scene.mutateElement(newElement, { strokeColor: newColor });
+          ShapeCache.delete(newElement);
+        }
+      }
+    });
+
     // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
-    if (isSafari) {
-      Fonts.loadElementsFonts(duplicatedElements).then((fontFaces) => {
-        this.fonts.onLoaded(fontFaces);
-      });
-    }
+    Fonts.loadElementsFonts(duplicatedElements).then((fontFaces) => {
+      this.fonts.onLoaded(fontFaces);
+    });
 
     if (opts.files) {
       this.addMissingFiles(opts.files);
@@ -11408,6 +11456,7 @@ class App extends React.Component<AppProps, AppState> {
   ): (event: PointerEvent) => void {
     return withBatchedUpdates((childEvent: PointerEvent) => {
       const elementsMap = this.scene.getNonDeletedElementsMap();
+      const didDrag = pointerDownState.drag.hasOccurred;
 
       this.removePointer(childEvent);
       pointerDownState.drag.blockDragging = false;
@@ -11451,6 +11500,77 @@ class App extends React.Component<AppProps, AppState> {
         snapLines: updateStable(prevState.snapLines, []),
         originSnapOffset: null,
       }));
+
+      // --- Custom Auto-Contrast Logic on Drag Drop ---
+      if (didDrag) {
+        const selectedElements = this.scene.getSelectedElements(this.state);
+        selectedElements.forEach((element) => {
+          if (isTextElement(element) && !isBoundToContainer(element)) {
+            let bgElementColor: string | null = null;
+            const textBounds = getElementBounds(element, elementsMap);
+
+            for (const bgElement of this.scene.getNonDeletedElements()) {
+              if (
+                bgElement.id !== element.id &&
+                (bgElement.backgroundColor !== "transparent" || bgElement.type === "image")
+              ) {
+                const bgBounds = getElementBounds(bgElement, elementsMap);
+                if (
+                  textBounds[0] < bgBounds[2] &&
+                  textBounds[2] > bgBounds[0] &&
+                  textBounds[1] < bgBounds[3] &&
+                  textBounds[3] > bgBounds[1]
+                ) {
+                  bgElementColor = bgElement.backgroundColor;
+                  break;
+                }
+              }
+            }
+
+            const isDarkTheme = this.state.theme === THEME.DARK;
+            const renderedColor = applyDarkModeFilter(element.strokeColor, isDarkTheme);
+            let targetBgColor = applyDarkModeFilter(this.state.viewBackgroundColor, isDarkTheme);
+            
+            if (bgElementColor && bgElementColor !== "transparent") {
+              targetBgColor = applyDarkModeFilter(bgElementColor, isDarkTheme);
+            }
+
+            // If element has a saved original color, try to restore it first
+            const savedOriginalColor = originalTextColors.get(element.id);
+            if (savedOriginalColor) {
+              const originalRendered = applyDarkModeFilter(savedOriginalColor, isDarkTheme);
+              if (tinycolor.readability(originalRendered, targetBgColor) >= 1.3) {
+                // Original color is now readable again — restore it
+                console.log(`[Smart Contrast - Restore] Restoring element ${element.id} to original color ${savedOriginalColor}`);
+                this.scene.mutateElement(element, { strokeColor: savedOriginalColor });
+                ShapeCache.delete(element);
+                originalTextColors.delete(element.id);
+                return;
+              }
+            }
+
+            if (tinycolor.readability(renderedColor, targetBgColor) < 1.3) {
+              const bgIsDark = tinycolor(targetBgColor).isDark();
+              let newColor;
+              if (bgIsDark) {
+                // Dark background: shift white/light text to a visible light grey
+                newColor = isDarkTheme ? "#d0d0d0" : "#d0d0d0";
+              } else {
+                // Light background: shift white text to closest light grey
+                newColor = "#f8f9fa";
+              }
+              // Save original color before overwriting it (only if not already saved)
+              if (!originalTextColors.has(element.id)) {
+                originalTextColors.set(element.id, element.strokeColor);
+              }
+              console.log(`[Smart Contrast - Drag Drop] Changing text element ${element.id} color to ${newColor} (background was ${targetBgColor}, text was ${renderedColor})`);
+              this.scene.mutateElement(element, { strokeColor: newColor });
+              ShapeCache.delete(element);
+            }
+          }
+        });
+      }
+      // -----------------------------------------------
 
       // just in case, tool changes mid drag, always clean up
       this.lassoTrail.endPath();
