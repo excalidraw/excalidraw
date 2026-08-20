@@ -81,6 +81,44 @@ describe("restoreElements", () => {
     ).toEqual([expect.objectContaining({ isDeleted: true })]);
   });
 
+  // `isInvisiblySmallElement` used to be called on the RAW element, outside the
+  // try/catch that wraps `restoreElement`. Malformed geometry therefore threw
+  // out of the reduce and rejected the whole import — defeating the #11321
+  // fallback, which every real entry point made unreachable by passing
+  // `deleteInvisibleElements: true`.
+  it("keeps the rest of the scene when one element has malformed geometry", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      id: "keep-me",
+      width: 100,
+      height: 100,
+    });
+    const broken = {
+      ...API.createElement({ type: "freedraw", id: "broken" }),
+      points: null,
+    } as any;
+
+    const restored = restore.restoreElements([broken, rect], null, {
+      deleteInvisibleElements: true,
+    });
+
+    expect(restored.map((element) => element.id)).toContain("keep-me");
+  });
+
+  it("still marks a genuinely invisible element as deleted", () => {
+    const tiny = API.createElement({
+      type: "freedraw",
+      id: "tiny",
+      points: [pointFrom<LocalPoint>(0, 0)],
+    });
+
+    const restored = restore.restoreElements([tiny], null, {
+      deleteInvisibleElements: true,
+    });
+
+    expect(restored).toEqual([expect.objectContaining({ isDeleted: true })]);
+  });
+
   it("should restore text element correctly passing value for each attribute", () => {
     const textElement = API.createElement({
       type: "text",
