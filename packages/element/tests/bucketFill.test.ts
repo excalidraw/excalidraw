@@ -59,6 +59,61 @@ const isClosed = (pts: GlobalPoint[]): boolean =>
   pts[0][1] === pts[pts.length - 1][1];
 
 describe("computeBucketFillPolygon", () => {
+  // Frames are containers, not drawn shapes. Before this was fixed, "frame"
+  // and "magicframe" sat in FILL_BOUNDARY_TYPES, so an empty frame qualified
+  // as a closed owner and a click on blank canvas inside it produced a fill
+  // covering the frame's full bounds.
+  it("does not fill an empty frame from a click on blank canvas", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 520,
+      height: 400,
+    });
+    const { elements, elementsMap } = setup([frame]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(260, 200),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(false);
+  });
+
+  it("still fills a real shape that sits inside a frame", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 520,
+      height: 400,
+    });
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    const { elements, elementsMap } = setup([frame, rect]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(150, 150),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    expect(result.ownerId).toBe(rect.id);
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -1);
+  });
+
   it("fills a simple rectangle and returns a closed polygon", () => {
     const rect = API.createElement({
       type: "rectangle",
