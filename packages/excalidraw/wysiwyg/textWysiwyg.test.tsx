@@ -1,4 +1,5 @@
 import { queryByText } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
 import {
@@ -38,7 +39,9 @@ import {
   fireEvent,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
+  waitFor,
 } from "../tests/test-utils";
+import * as dataModule from "../data";
 import { actionBindText } from "../actions";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 
@@ -2129,16 +2132,55 @@ describe("save shortcuts while editing text", () => {
   // `actionSaveToActiveFile.keyTest` requires `!event.shiftKey`, so the "save
   // as" variant matched no branch in the wysiwyg keydown handler: the editor
   // stayed open and nothing was saved.
-  it("commits the editor on Cmd/Ctrl+Shift+S", async () => {
-    const editor = await startEditing();
+  //
+  // Asserting only that editing ended is not enough — `handleSubmit()` alone
+  // satisfies that, so the test would still pass with the
+  // `executeAction(actionSaveFileToDisk)` call deleted. Spy on `saveAsJSON`,
+  // which is what the action ultimately reaches, and capture the editing state
+  // at the moment it runs so the ordering (commit, then save) is pinned too.
+  it("commits the editor and saves on Cmd/Ctrl+Shift+S", async () => {
+    let editingWhenSaveRan: unknown = "never ran";
+    const saveSpy = vi
+      .spyOn(dataModule, "saveAsJSON")
+      .mockImplementation((async () => {
+        editingWhenSaveRan = h.state.editingTextElement;
+        return { fileHandle: null };
+      }) as unknown as typeof dataModule.saveAsJSON);
 
-    fireEvent.keyDown(editor, {
-      key: KEYS.S,
-      ctrlKey: true,
-      shiftKey: true,
-    });
+    try {
+      const editor = await startEditing();
 
-    expect(h.state.editingTextElement).toBe(null);
+      fireEvent.keyDown(editor, {
+        key: KEYS.S,
+        ctrlKey: true,
+        shiftKey: true,
+      });
+
+      await waitFor(() => expect(saveSpy).toHaveBeenCalledTimes(1));
+
+      expect(h.state.editingTextElement).toBe(null);
+      // the text was committed before the save was dispatched
+      expect(editingWhenSaveRan).toBe(null);
+    } finally {
+      saveSpy.mockRestore();
+    }
+  });
+
+  it("does not save on Cmd/Ctrl+Shift+S when the editor is closed by other means", async () => {
+    const saveSpy = vi
+      .spyOn(dataModule, "saveAsJSON")
+      .mockImplementation((async () => ({ fileHandle: null })) as never);
+
+    try {
+      const editor = await startEditing();
+
+      fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
+
+      expect(h.state.editingTextElement).toBe(null);
+      expect(saveSpy).not.toHaveBeenCalled();
+    } finally {
+      saveSpy.mockRestore();
+    }
   });
 
   it("still commits the editor on plain Cmd/Ctrl+S", async () => {
