@@ -1175,7 +1175,10 @@ export class LinearElementEditor {
               arrowOtherEndpointInitialBinding: null,
             },
             selectedPointsIndices: null,
-            pointerOffset: { x: 0, y: 0 },
+            pointerOffset: {
+              x: scenePointer.x - (textX + boundTextElement.width / 2),
+              y: scenePointer.y - (textY + boundTextElement.height / 2),
+            },
           };
           return ret;
         }
@@ -1957,7 +1960,10 @@ export class LinearElementEditor {
     if (!element || !isArrowElement(element) || !boundTextElement) {
       return null;
     }
-    const pointerGlobalPoint = pointFrom<GlobalPoint>(pointerX, pointerY);
+    const pointerGlobalPoint = pointFrom<GlobalPoint>(
+      pointerX - linearElementEditor.pointerOffset.x,
+      pointerY - linearElementEditor.pointerOffset.y,
+    );
     const segments = getLinearElementPathSegments(element, elementsMap);
     if (segments.length === 0) {
       return null;
