@@ -13,6 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Fixes
+
+- Zoom to selection (`Shift+3`) and `zoomToFitBounds({ fit: "contain" })` no longer jump to maximum zoom when the scene or target bounds are empty.
+
 ## Excalidraw API
 
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
