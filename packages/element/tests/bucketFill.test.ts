@@ -63,24 +63,30 @@ describe("computeBucketFillPolygon", () => {
   // and "magicframe" sat in FILL_BOUNDARY_TYPES, so an empty frame qualified
   // as a closed owner and a click on blank canvas inside it produced a fill
   // covering the frame's full bounds.
-  it("does not fill an empty frame from a click on blank canvas", () => {
-    const frame = API.createElement({
-      type: "frame",
-      x: 0,
-      y: 0,
-      width: 520,
-      height: 400,
-    });
-    const { elements, elementsMap } = setup([frame]);
+  // both frame types must be covered: they were removed from
+  // FILL_BOUNDARY_TYPES together, and testing only one leaves the other free to
+  // regress unnoticed
+  it.each(["frame", "magicframe"] as const)(
+    "does not fill an empty %s from a click on blank canvas",
+    (type) => {
+      const frame = API.createElement({
+        type,
+        x: 0,
+        y: 0,
+        width: 520,
+        height: 400,
+      });
+      const { elements, elementsMap } = setup([frame]);
 
-    const result = computeBucketFillPolygon({
-      point: pointFrom<GlobalPoint>(260, 200),
-      elements,
-      elementsMap,
-    });
+      const result = computeBucketFillPolygon({
+        point: pointFrom<GlobalPoint>(260, 200),
+        elements,
+        elementsMap,
+      });
 
-    expect(result.ok).toBe(false);
-  });
+      expect(result.ok).toBe(false);
+    },
+  );
 
   it("still fills a real shape that sits inside a frame", () => {
     const frame = API.createElement({
