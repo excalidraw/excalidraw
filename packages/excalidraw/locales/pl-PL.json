@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Wklej",
     "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
@@ -109,6 +111,7 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
+    "you": "",
     "toggleGrid": "Przełącz widoczność siatki",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
@@ -332,10 +335,15 @@
     "embeddable": "Osadzenie z internetu",
     "laser": "Wskaźnik laserowy",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
     "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
     "convertElementType": "Przełącz typ kształtu"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Prostokąt",
@@ -606,7 +614,9 @@
     "hexCode": "Kod HEX",
     "noShades": "Brak dostępnych odcieni dla tego koloru",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

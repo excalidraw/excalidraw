@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "دانانەوە",
     "pasteAsPlaintext": "دایبنێ وەک دەقی سادە",
     "pasteCharts": "دانانەوەی خشتەکان",
@@ -109,6 +111,7 @@
     "group": "دیاریکردنی گروپ",
     "ungroup": "گروپی دیاریکراوەکان لابەرە",
     "collaborators": "هاوکارەکان",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "زیادکردن بۆ کتێبخانە",
     "removeFromLibrary": "لابردن لە کتێبخانە",
@@ -332,10 +335,15 @@
     "embeddable": "",
     "laser": "",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "دەست (ئامرازی پانکردن)",
     "extraTools": "ئامرازی زیاتر",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -606,7 +614,9 @@
     "hexCode": "کۆدی هێکس",
     "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

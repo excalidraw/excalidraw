@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "جایگذاری",
     "pasteAsPlaintext": "جایگذاری به عنوان متن ساده",
     "pasteCharts": "جایگذاری نمودارها",
@@ -109,6 +111,7 @@
     "group": "گروهبندی انتخابها",
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
+    "you": "",
     "toggleGrid": "تغییر وضعیت خطوط شطرنجی",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
@@ -332,10 +335,15 @@
     "embeddable": "افزونه وب",
     "laser": "اشاره گر لیزری",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
     "mermaidToExcalidraw": "مرمید به excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "مستطیل",
@@ -606,7 +614,9 @@
     "hexCode": "کدِ هگز",
     "noShades": "هیچ سایه ای برای این رنگ در دسترس نیست",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

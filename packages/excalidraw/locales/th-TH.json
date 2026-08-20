@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "วาง",
     "pasteAsPlaintext": "วางโดยไม่มีการจัดรูปแบบ",
     "pasteCharts": "วางแผนภูมิ",
@@ -109,6 +111,7 @@
     "group": "จัดกลุ่ม",
     "ungroup": "ยกเลิกการจัดกลุ่ม",
     "collaborators": "ผู้ทำงานร่วมกัน",
+    "you": "",
     "toggleGrid": "แสดงกริด",
     "addToLibrary": "เพิ่มไปในคลัง",
     "removeFromLibrary": "นำออกจากคลัง",
@@ -332,10 +335,15 @@
     "embeddable": "ฝังเว็บ",
     "laser": "ตัวชี้เลเซอร์",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "มือ (เครื่องมือเลื่อน)",
     "extraTools": "เครื่องมืออื่นๆ",
     "mermaidToExcalidraw": "เมอร์เมดเป็นเอกซ์คาลิดรอว์",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "สี่เหลี่ยม",
@@ -606,7 +614,9 @@
     "hexCode": "Hex code",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
