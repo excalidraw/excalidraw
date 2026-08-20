@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Yapıştır",
     "pasteAsPlaintext": "Düz metin olarak yapıştır",
     "pasteCharts": "Grafikleri yapıştır",
@@ -109,6 +111,7 @@
     "group": "Seçimi grup yap",
     "ungroup": "Seçilen grubu dağıt",
     "collaborators": "Ortaklar",
+    "you": "",
     "toggleGrid": "Izgarayı aç/kapat",
     "addToLibrary": "Kütüphaneye ekle",
     "removeFromLibrary": "Kütüphaneden kaldır",
@@ -332,10 +335,15 @@
     "embeddable": "Web Yerleştirme",
     "laser": "Lazer işaretçisi",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "El (hareket aracı)",
     "extraTools": "Daha fazla araç",
     "mermaidToExcalidraw": "Mermaid'den Excalidraw'a",
     "convertElementType": "Şekil türünü aç/kapat"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Dikdörtgen",
@@ -606,7 +614,9 @@
     "hexCode": "Hex kodu",
     "noShades": "Bu renk için ton mevcut değil",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

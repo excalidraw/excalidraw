@@ -1,11 +1,13 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "הדבקה",
     "pasteAsPlaintext": "הדבקה ללא עיצוב",
     "pasteCharts": "הדבקת תרשימים",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
+    "chartType_bar": "תרשים עמודות",
+    "chartType_line": "תרשים קווים",
+    "chartType_radar": "תרשים רדאר",
     "chartType_plaintext": "טקסט פשוט",
     "selectAll": "בחירה בהכול",
     "multiSelect": "הוספת רכיב לבחירה",
@@ -35,9 +37,9 @@
     "strokeStyle_dashed": "מקווקו",
     "strokeStyle_dotted": "מנוקד",
     "sloppiness": "רישול",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "לחץ",
+    "pressure_constant": "קבוע",
+    "pressure_variable": "משתנה",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
     "edges": "קצוות",
@@ -56,14 +58,14 @@
     "arrowhead_crowfoot_many": "רגל עורב (הרבה)",
     "arrowhead_crowfoot_one": "רגל עורב (אחת)",
     "arrowhead_crowfoot_one_or_many": "רגל עורב (אחת או הרבה)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "קרדינליות (אחד)",
+    "arrowhead_cardinality_many": "קרדינליות (רבות)",
+    "arrowhead_cardinality_one_or_many": "קרדינליות (אחד או רבים)",
+    "arrowhead_cardinality_exactly_one": "קרדינליות (בדיוק אחד)",
+    "arrowhead_cardinality_zero_or_one": "קרדינליות (אפס או אחד)",
+    "arrowhead_cardinality_zero_or_many": "קרדינליות (אפס או רבים)",
     "more_options": "אפשרויות נוספות",
-    "cardinality": "",
+    "cardinality": "קרדינליות",
     "arrowtypes": "סוג החץ",
     "arrowtype_sharp": "חץ מחודד",
     "arrowtype_round": "חץ מעוקל",
@@ -109,6 +111,7 @@
     "group": "קיבוץ הבחירה",
     "ungroup": "פירוק קבוצה",
     "collaborators": "שותפים",
+    "you": "אני",
     "toggleGrid": "הצגת/הסתרת רשת",
     "addToLibrary": "הוספה לספרייה",
     "removeFromLibrary": "הסרה מהספרייה",
@@ -156,7 +159,7 @@
       "editArrow": "עריכת חץ"
     },
     "polygon": {
-      "breakPolygon": "",
+      "breakPolygon": "שבירת מצולע",
       "convertToPolygon": "המרה למצולע"
     },
     "elementLock": {
@@ -188,9 +191,9 @@
     "shapeSwitch": "החלפת צורה",
     "preferences": "העדפות",
     "preferences_toolLock": "נעילת כלים",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "בחר",
+    "boxSelectionContain": "עטיפה",
+    "boxSelectionOverlap": "חפיפה",
     "arrowBinding": "קשירת חצים",
     "midpointSnapping": "הצמדה לנקודות ביניים"
   },
@@ -331,11 +334,16 @@
     "magicframe": "תרשים קווי מתאר לקוד",
     "embeddable": "הטמעה באתר",
     "laser": "סמן לייזר",
-    "autoshape": "",
+    "autoshape": "ציור אל צורה",
+    "bucketfill": "מילוי דלי",
     "hand": "יד (כלי הזזה)",
     "extraTools": "כלים נוספים",
     "mermaidToExcalidraw": "Mermaid ל־Excalidraw",
     "convertElementType": "החלפת סוג צורה"
+  },
+  "bucketfill": {
+    "noRegion": "לא נמצא אזור סגור למילוי כאן.",
+    "tooComplex": "המילוי של האזור הזה מסובך מכדי לקרות."
   },
   "element": {
     "rectangle": "מלבן",
@@ -360,35 +368,35 @@
   },
   "hints": {
     "dismissSearch": "‏{{shortcut}} להתעלמות מהחיפוש",
-    "canvasPanning": "",
+    "canvasPanning": "כדי להזיז את הקנבס, החזק את {{shortcut_1}} או {{shortcut_2}} תוך כדי גרירה, או השתמש בכלי היד",
     "linearElement": "לחץ להתחלת מספר נקודות, גרור לקו יחיד",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "לחץ להפעלת נקודות מרובות, גרור עבור קו יחיד. לחץ שוב על {{shortcut}} כדי לשנות את סוג החץ.",
+    "arrowBindModifiers": "החזק את {{shortcut_1}} כדי לבטל את הצירוף, או את {{shortcut_2}} כדי לצרף בנקודה קבועה",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
     "embeddable": "לחצו וגררו כדי ליצור הטמעת אתר",
-    "autoshape": "",
+    "autoshape": "צייר מלבנים, עיגולים, יהלומים, קווים וחצים",
     "text_selected": "לחיצה כפולה או הקשה על {{shortcut}} יאפשרו לך לערוך את הטקסט",
     "text_editing": "יש ללחוץ על {{shortcut_1}} או {{shortcut_2}} לסיום העריכה",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "toggleArrowhead": "",
-    "lineEditor_info": "",
+    "linearElementMulti": "לחץ על הנקודה האחרונה או הקש על {{shortcut_1}} או {{shortcut_2}} כדי לסיים",
+    "lockAngle": "ניתן להגביל את הזווית על ידי החזקת {{shortcut}}",
+    "resize": "ניתן להגביל פרופורציות על ידי החזקת {{shortcut_1}} בזמן שינוי הגודל, החזק את {{shortcut_2}} כדי לשנות גודל מהמרכז",
+    "resizeImage": "ניתן לשנות גודל חופשי על ידי החזקת {{shortcut_1}}, החזק את {{shortcut_2}} כדי לשנות גודל מהמרכז",
+    "rotate": "ניתן להגביל זוויות על ידי החזקת {{shortcut}} בזמן סיבוב",
+    "toggleArrowhead": "לחץ לחיצה כפולה כדי להחליף בין צורות ראש החץ",
+    "lineEditor_info": "החזק את {{shortcut_1}} ולחץ לחיצה כפולה או לחץ על {{shortcut_2}} כדי לערוך נקודות",
     "lineEditor_line_info": "לחיצה כפולה או הקשה על {{shortcut}} יאפשרו לך לערוך נקודות",
     "lineEditor_pointSelected": "יש ללחוץ על {{shortcut_1}} כדי להסיר נקודות,\nעל {{shortcut_2}} כדי לשכפל, או לגרור בשביל להזיז",
-    "lineEditor_nothingSelected": "",
+    "lineEditor_nothingSelected": "בחר נקודה לעריכה (החזק את {{shortcut_1}} כדי לבחור מספר נקודות), או החזק את {{shortcut_2}} ולחץ להוספת נקודות חדשות",
     "publishLibrary": "פרסם ספריה משלך",
     "bindTextToElement": "‏{{shortcut}} להוספת טקסט",
     "createFlowchart": "‏{{shortcut}} ליצירת תרשים זרימה",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "deepBoxSelect": "החזק את {{shortcut}} לבחירה עמוקה ולמניעת גרירה",
+    "eraserRevert": "החזק את {{shortcut}} כדי לשחזר את הרכיבים המסומנים למחיקה",
     "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "החזק את {{shortcut}} כדי לבטל את ההצמדה",
+    "enterCropEditor": "לחץ לחיצה כפולה על התמונה או לחץ על {{shortcut}} כדי לחתוך אותה",
+    "leaveCropEditor": "לחץ מחוץ לתמונה או לחץ על {{shortcut_1}} או {{shortcut_2}} כדי לסיים את החיתוך"
   },
   "canvasError": {
     "cannotShowPreview": "לא ניתן להראות תצוגה מקדימה",
@@ -585,7 +593,7 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
+      "center_heading": "השרטוטים שלך נשמרים באחסון הדפדפן שלך.",
       "center_heading_line2": "זיכרון הדפדפן יכול להתנקות באופן לא צפוי.",
       "center_heading_line3": "כדאי לשמור את העבודה שלך תדיר בתור קובץ בשביל שהיא לא תיאבד.",
       "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+ במקום?",
@@ -605,8 +613,10 @@
     "shades": "הצללות",
     "hexCode": "קוד הקסדצימלי",
     "noShades": "אין הצללות זמינות לצבע הזה",
-    "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidColor": "לא צבע תקני",
+    "invalidHexLength": "הקוד ההקסדצימאלי חייב להיות בן 3, 4, 6 או 8 תווים",
+    "topPicksTip": "טיפ: גררו כל צבע אל הבחירות המובילות שלכם כדי להצמיד אותו",
+    "resetTopPicks": "איפוס לבחירות המומלצות כברירת מחדל"
   },
   "overwriteConfirm": {
     "action": {
@@ -642,21 +652,21 @@
   "mermaid": {
     "title": "Mermaid ל־Excalidraw",
     "button": "הוספה",
-    "description": "",
+    "description": "נכון לעכשיו, רק דיאגרמות <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink> ו-<erdLink>Entity Relationship</erdLink> נתמכות. שאר הסוגים יוצגו כתמונה ב-Excalidraw.",
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
-    "label": "",
-    "inputPlaceholder": "",
+    "label": "Mermaid",
+    "inputPlaceholder": "נא לכתוב כאן הגדרת תרשים ל־Mermaid...",
     "autoFixAvailable": "התיקון האוטומטי זמין"
   },
   "ttd": {
     "error": "שגיאה!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "התחל להקליד את רעיון הדיאגרמה שלך כאן... ({{shortcut}} לשורה חדשה)",
+    "inputPlaceholderWithMessages": "נא להמשיך לתאר את התרשים...",
+    "generating": "בתהליך יצירה...",
+    "rateLimitRemaining": "נותרו {{count}} בקשות להיום",
     "role": {
       "user": "אני",
       "assistant": "מסייע AI",
@@ -668,11 +678,11 @@
     "newChat": "שיחה חדשה",
     "deleteChat": "מחיקת שיחה",
     "deleteMessage": "מחיקת הודעה",
-    "viewAsMermaid": "",
+    "viewAsMermaid": "הצגה בתור Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "הגיע הזמן לעצב את התרשים הראשון שלך",
+      "description": "נא לתאר איזה תרשים ברצונך ליצור, ואנחנו נייצר אותו בשבילך.",
+      "hint": "כרגע אנו מכירים דיאגרמות של תרשימי זרימה, רצף, מחלקה, מצב וקשרי ישויות."
     },
     "preview": "תצוגה מקדימה",
     "insert": "הוספה",
@@ -680,17 +690,17 @@
     "errors": {
       "promptTooShort": "ההנחיה קצרה מדי (נדרשים {{min}} תווים לכל הפחות)",
       "promptTooLong": "ההנחיה ארוכה מדי (נדרשים {{max}} תווים לכל היותר)",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
+      "generationFailed": "היצירה נכשלה",
+      "invalidDiagram": "נוצר תרשים לא תקני :(. אפשר לערוך אותו ידנית, לנסות שוב עם תיקון אוטומטי, או לנסות הנחיה אחרת.",
+      "fixInMermaid": "עריכה ידנית של Mermaid ←",
+      "aiRepair": "יצירה מחדש (תיקון אוטומטי) ←",
       "requestAborted": "הבקשה בוטלה",
       "requestFailed": "הבקשה נכשלה",
       "mermaidParseError": "שגיאת תחביר Mermaid"
     },
     "rateLimit": {
       "messageLimit": "הגעת למכסת השימוש ב־AI של התוכנית החינמית. נא לנסות את ‎Excalidraw+‏ בשביל לקבל מכסה רחבה יותר, או לחזור מחר.",
-      "generalRateLimit": "",
+      "generalRateLimit": "נא להאט את הקצב, אתה מהיר מדי עבורנו! אנא המתן רגע לפני שתנסה שוב.",
       "messageLimitInputPlaceholder": "הגעת למכסת ההודעות היומית"
     },
     "upsellBtnLabel": "שדרוג לגרסת Plus"
