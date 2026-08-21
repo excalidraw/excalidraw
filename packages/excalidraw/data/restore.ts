@@ -1,4 +1,9 @@
-import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
+import {
+  clamp,
+  isFiniteNumber,
+  isValidPoint,
+  pointFrom,
+} from "@excalidraw/math";
 
 import {
   colorToHex,
@@ -551,6 +556,9 @@ export const restoreElement = (
         originalText: element.originalText || text,
         autoResize: element.autoResize ?? true,
         lineHeight,
+        pathParameter: isFiniteNumber(element.pathParameter)
+          ? clamp(element.pathParameter, 0, 1)
+          : null,
       });
 
       // if empty text, mark as deleted. We keep in array
