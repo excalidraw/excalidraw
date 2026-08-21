@@ -624,16 +624,6 @@ export class LinearElementEditor {
       ? newSelectedPointsIndices[0]
       : lastClickedPoint;
 
-    const newSelectedMidPointHoveredCoords =
-      !startIsSelected && !endIsSelected
-        ? LinearElementEditor.getPointGlobalCoordinates(
-            element,
-            draggingPoint,
-            elementsMap,
-          )
-        : null;
-
-    const newHoverPointIndex = newLastClickedPoint;
     const startBindingElement =
       isBindingElement(element) &&
       element.startBinding &&
@@ -680,8 +670,6 @@ export class LinearElementEditor {
               )
             : linearElementEditor.initialState.altFocusPoint,
       },
-      segmentMidPointHoveredCoords: newSelectedMidPointHoveredCoords,
-      hoverPointIndex: newHoverPointIndex,
       isDragging: true,
       customLineAngle,
     };
@@ -870,42 +858,44 @@ export class LinearElementEditor {
 
     const threshold =
       (LinearElementEditor.POINT_HANDLE_SIZE + 1) / appState.zoom.value;
-
-    const existingSegmentMidpointHitCoords =
-      linearElementEditor.segmentMidPointHoveredCoords;
-    if (existingSegmentMidpointHitCoords) {
-      const distance = pointDistance(
-        pointFrom(
-          existingSegmentMidpointHitCoords[0],
-          existingSegmentMidpointHitCoords[1],
-        ),
-        pointFrom(scenePointer.x, scenePointer.y),
-      );
-      if (distance <= threshold) {
-        return existingSegmentMidpointHitCoords;
-      }
-    }
-    let index = 0;
+    const pointer = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
     const midPoints = LinearElementEditor.getEditorMidPoints(
       element,
       elementsMap,
       appState,
     );
 
-    while (index < midPoints.length) {
-      if (midPoints[index] !== null) {
-        const distance = pointDistance(
-          midPoints[index]!,
-          pointFrom(scenePointer.x, scenePointer.y),
-        );
-        if (distance <= threshold) {
-          return midPoints[index];
+    const findHitMidpoint = (from: GlobalPoint) => {
+      for (const midPoint of midPoints) {
+        if (midPoint && pointDistance(midPoint, from) <= threshold) {
+          return midPoint;
         }
       }
+      return null;
+    };
 
-      index++;
+    const existingSegmentMidpointHitCoords =
+      linearElementEditor.segmentMidPointHoveredCoords;
+    if (
+      existingSegmentMidpointHitCoords &&
+      pointDistance(existingSegmentMidpointHitCoords, pointer) <= threshold
+    ) {
+      // Keep hover sticky while the pointer stays near the last hit, but always
+      // return a *current* midpoint. Cached global coords go stale after a
+      // point or the whole line is moved (#9500, #9510).
+      const currentNearPointer = findHitMidpoint(pointer);
+      if (currentNearPointer) {
+        return currentNearPointer;
+      }
+      const currentNearCache = findHitMidpoint(
+        existingSegmentMidpointHitCoords,
+      );
+      if (currentNearCache) {
+        return currentNearCache;
+      }
     }
-    return null;
+
+    return findHitMidpoint(pointer);
   };
 
   static isSegmentTooShort<P extends GlobalPoint | LocalPoint>(
@@ -1105,6 +1095,8 @@ export class LinearElementEditor {
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
+        hoverPointIndex: element.points.length - 1,
+        segmentMidPointHoveredCoords: null,
       };
 
       ret.didAddPoint = true;
@@ -1175,6 +1167,8 @@ export class LinearElementEditor {
             y: scenePointer.y - targetPoint[1],
           }
         : { x: 0, y: 0 },
+      hoverPointIndex: clickedPointIndex,
+      segmentMidPointHoveredCoords: segmentMidpoint,
     };
 
     return ret;

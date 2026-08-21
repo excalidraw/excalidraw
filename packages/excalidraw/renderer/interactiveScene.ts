@@ -1765,7 +1765,21 @@ const _renderInteractiveScene = ({
   if (selectedLinearElement) {
     if (!appState.selectedLinearElement.isDragging) {
       if (linearState.segmentMidPointHoveredCoords) {
-        renderElbowArrowMidPointHighlight(context, appState);
+        const midPoints = LinearElementEditor.getEditorMidPoints(
+          selectedLinearElement,
+          allElementsMap,
+          appState,
+        );
+        const threshold =
+          (LinearElementEditor.POINT_HANDLE_SIZE + 1) / appState.zoom.value;
+        const cached = linearState.segmentMidPointHoveredCoords;
+        const cacheIsCurrent = midPoints.some(
+          (midPoint) =>
+            midPoint != null && pointDistance(midPoint, cached) <= threshold,
+        );
+        if (cacheIsCurrent) {
+          renderElbowArrowMidPointHighlight(context, appState);
+        }
       } else if (
         isElbowArrow(selectedLinearElement)
           ? linearState.hoverPointIndex === 0 ||
