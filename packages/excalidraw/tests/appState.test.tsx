@@ -4,7 +4,12 @@ import { EXPORT_DATA_TYPES, MIME_TYPES } from "@excalidraw/common";
 
 import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
-import { getDefaultAppState } from "../appState";
+import {
+  clearAppStateForDatabase,
+  clearAppStateForLocalStorage,
+  cleanAppStateForExport,
+  getDefaultAppState,
+} from "../appState";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -14,6 +19,21 @@ import { fireEvent, queryByTestId, render, waitFor } from "./test-utils";
 const { h } = window;
 
 describe("appState", () => {
+  it("persists laser preference only in browser storage", () => {
+    const appState = {
+      ...getDefaultAppState(),
+      laserPersistent: true,
+    };
+
+    expect(clearAppStateForLocalStorage(appState).laserPersistent).toBe(true);
+    expect(cleanAppStateForExport(appState)).not.toHaveProperty(
+      "laserPersistent",
+    );
+    expect(clearAppStateForDatabase(appState)).not.toHaveProperty(
+      "laserPersistent",
+    );
+  });
+
   it("drag&drop file doesn't reset non-persisted appState", async () => {
     const defaultAppState = getDefaultAppState();
     const exportBackground = !defaultAppState.exportBackground;

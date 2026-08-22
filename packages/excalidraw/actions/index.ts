@@ -80,6 +80,10 @@ export {
 export { actionToggleGridMode } from "./actionToggleGridMode";
 export { actionToggleZenMode } from "./actionToggleZenMode";
 export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
+export {
+  actionClearLaserTrails,
+  actionToggleLaserPersistent,
+} from "./actionLaser";
 export { actionToggleArrowBinding } from "./actionToggleArrowBinding";
 export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";
 

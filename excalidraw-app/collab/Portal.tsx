@@ -199,10 +199,13 @@ class Portal {
     }
   };
 
-  broadcastMouseLocation = (payload: {
-    pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
-    button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
-  }) => {
+  broadcastMouseLocation = (
+    payload: {
+      pointer: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["pointer"];
+      button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
+    },
+    volatile = true,
+  ) => {
     if (this.socket?.id) {
       const data: SocketUpdateDataSource["MOUSE_LOCATION"] = {
         type: WS_SUBTYPES.MOUSE_LOCATION,
@@ -216,10 +219,7 @@ class Portal {
         },
       };
 
-      return this._broadcastSocketData(
-        data as SocketUpdateData,
-        true, // volatile
-      );
+      return this._broadcastSocketData(data as SocketUpdateData, volatile);
     }
   };
 

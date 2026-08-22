@@ -59,6 +59,8 @@ export type ActionName =
   | "gridMode"
   | "zenMode"
   | "objectsSnapMode"
+  | "laserPersistentMode"
+  | "clearLaserTrails"
   | "arrowBinding"
   | "midpointSnapping"
   | "stats"

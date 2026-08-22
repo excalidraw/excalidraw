@@ -382,6 +382,7 @@ const LayerUI = ({
                               onChange={() =>
                                 app.setActiveTool({ type: TOOL_TYPE.laser })
                               }
+                              persistent={appState.laserPersistent}
                               isMobile
                             />
                           </Island>

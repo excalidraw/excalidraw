@@ -326,6 +326,8 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionClearLaserTrails,
+  actionToggleLaserPersistent,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionPaste } from "../actions/actionClipboard";
@@ -4097,6 +4099,15 @@ class App extends React.Component<AppProps, AppState> {
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
 
+    if (
+      prevState.laserPersistent !== this.state.laserPersistent ||
+      (prevState.laserPersistent &&
+        prevState.activeTool.type === "laser" &&
+        this.state.activeTool.type !== "laser")
+    ) {
+      this.clearLaserTrails();
+    }
+
     this.appStateObserver.flush(prevState);
 
     this.updateEmbeddables();
@@ -4119,6 +4130,7 @@ class App extends React.Component<AppProps, AppState> {
       prevState.scrollX !== this.state.scrollX ||
       prevState.scrollY !== this.state.scrollY
     ) {
+      this.laserTrails.refresh();
       this.props?.onScrollChange?.(
         this.state.scrollX,
         this.state.scrollY,
@@ -6074,6 +6086,27 @@ class App extends React.Component<AppProps, AppState> {
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {
     this.setState({ openDialog: dialogType });
+  };
+
+  clearLaserTrails = () => {
+    this.laserTrails.clearLocalTrails();
+
+    if (!this.lastPointerMoveCoords) {
+      return;
+    }
+
+    const isLaser = this.state.activeTool.type === "laser";
+    this.props.onPointerUpdate?.({
+      pointer: {
+        x: this.lastPointerMoveCoords.x,
+        y: this.lastPointerMoveCoords.y,
+        tool: isLaser ? "laser" : "pointer",
+        laserPersistent: isLaser && this.state.laserPersistent,
+        laserTrailGeneration: this.laserTrails.generation,
+      },
+      button: "up",
+      pointersMap: gesture.pointers,
+    });
   };
 
   /**
@@ -13568,6 +13601,8 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.viewModeEnabled) {
         return [
           ...options,
+          actionToggleLaserPersistent,
+          actionClearLaserTrails,
           actionToggleGridMode,
           actionToggleZenMode,
           actionToggleViewMode,
@@ -13585,6 +13620,8 @@ class App extends React.Component<AppProps, AppState> {
         actionSelectAll,
         actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
+        actionToggleLaserPersistent,
+        actionClearLaserTrails,
         actionToggleGridMode,
         actionToggleObjectsSnapMode,
         actionToggleArrowBinding,
@@ -13812,6 +13849,9 @@ class App extends React.Component<AppProps, AppState> {
       x: sceneX,
       y: sceneY,
       tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
+      laserPersistent:
+        this.state.activeTool.type === "laser" && this.state.laserPersistent,
+      laserTrailGeneration: this.laserTrails.generation,
     };
 
     this.props.onPointerUpdate?.({

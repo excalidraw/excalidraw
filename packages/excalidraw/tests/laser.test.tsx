@@ -16,6 +16,51 @@ describe("laser tool interactions", () => {
   const h = window.h;
   const mouse = new Pointer("mouse");
 
+  it("retains persistent trails without keeping the animation running", async () => {
+    await render(<Excalidraw />);
+
+    API.setAppState({ laserPersistent: true });
+    act(() => {
+      h.app.setActiveTool({ type: "laser" });
+      h.app.laserTrails.startPath(20, 20);
+      h.app.laserTrails.addPointToPath(80, 80);
+      h.app.laserTrails.endPath();
+    });
+
+    const path = document.querySelector<SVGPathElement>(".SVGLayer path")!;
+    await waitFor(() => expect(path.getAttribute("d")).not.toBe(""));
+    await waitFor(() =>
+      expect(h.app.laserTrails.localTrail.isAnimating).toBe(false),
+    );
+
+    API.setAppState({ scrollX: 10 });
+    await waitFor(() => expect(path.getAttribute("d")).not.toBe(""));
+
+    API.setAppState({ laserPersistent: false });
+    await waitFor(() => expect(path.getAttribute("d")).toBe(""));
+  });
+
+  it("clears persistent trails and broadcasts a new generation", async () => {
+    const onPointerUpdate = vi.fn();
+    await render(<Excalidraw onPointerUpdate={onPointerUpdate} />);
+
+    API.setAppState({ laserPersistent: true });
+    act(() => h.app.setActiveTool({ type: "laser" }));
+    mouse.downAt(20, 20);
+    mouse.moveTo(80, 80);
+    mouse.upAt(80, 80);
+
+    const previousGeneration = h.app.laserTrails.generation;
+    act(() => h.app.clearLaserTrails());
+
+    expect(h.app.laserTrails.generation).toBe(previousGeneration + 1);
+    expect(onPointerUpdate.mock.calls.at(-1)![0].pointer).toMatchObject({
+      tool: "laser",
+      laserPersistent: true,
+      laserTrailGeneration: previousGeneration + 1,
+    });
+  });
+
   it("opens links while using the laser tool", async () => {
     const onLinkOpenSpy = vi.fn();
     const onLinkOpen: NonNullable<ExcalidrawProps["onLinkOpen"]> = (
@@ -202,6 +247,37 @@ describe("laser tool interactions", () => {
     });
 
     expect(svgLayer.querySelectorAll("path")).toHaveLength(0);
+  });
+
+  it("retains and generation-clears remote persistent laser trails", async () => {
+    await render(<Excalidraw />);
+
+    const socketId = "persistent-socket-id" as SocketId;
+    const collaborator = (button: "up" | "down", generation: number) =>
+      new Map<SocketId, Collaborator>([
+        [
+          socketId,
+          {
+            pointer: {
+              x: button === "down" ? 10 : 80,
+              y: button === "down" ? 10 : 80,
+              tool: "laser",
+              laserPersistent: true,
+              laserTrailGeneration: generation,
+            },
+            button,
+          },
+        ],
+      ]);
+
+    act(() => h.app.updateScene({ collaborators: collaborator("down", 0) }));
+    act(() => h.app.updateScene({ collaborators: collaborator("up", 0) }));
+
+    const path = document.querySelector<SVGPathElement>(".SVGLayer path")!;
+    await waitFor(() => expect(path.getAttribute("d")).not.toBe(""));
+
+    act(() => h.app.updateScene({ collaborators: collaborator("up", 1) }));
+    await waitFor(() => expect(path.getAttribute("d")).toBe(""));
   });
 });
 

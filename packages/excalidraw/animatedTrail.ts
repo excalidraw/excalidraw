@@ -25,6 +25,8 @@ export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
   stroke?: (trail: AnimatedTrail) => string;
   animateTrail?: boolean;
+  /** Retain completed paths without keeping the animation loop running. */
+  keepTrailAlive?: () => boolean;
 }
 
 export class AnimatedTrail implements Trail {
@@ -62,6 +64,10 @@ export class AnimatedTrail implements Trail {
     return !!this.currentTrail;
   }
 
+  get isAnimating() {
+    return AnimationController.running(this.key);
+  }
+
   hasLastPoint(x: number, y: number) {
     if (this.currentTrail) {
       const len = this.currentTrail.originalPoints.length;
@@ -96,6 +102,9 @@ export class AnimatedTrail implements Trail {
       AnimationController.start(this.key, () => {
         const needsNext = this.onFrame();
         if (needsNext) {
+          if (this.options.keepTrailAlive?.() && !this.currentTrail) {
+            return null;
+          }
           return { keep: true };
         }
 
@@ -144,6 +153,12 @@ export class AnimatedTrail implements Trail {
     this.pastTrails = [];
     this.currentTrail = undefined;
     this.update();
+  }
+
+  refresh() {
+    if (!this.onFrame()) {
+      this.cleanup();
+    }
   }
 
   private update() {

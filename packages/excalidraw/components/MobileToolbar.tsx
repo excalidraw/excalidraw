@@ -3,6 +3,10 @@ import clsx from "clsx";
 
 import { KEYS, capitalizeString } from "@excalidraw/common";
 
+import {
+  actionClearLaserTrails,
+  actionToggleLaserPersistent,
+} from "../actions";
 import { t } from "../i18n";
 
 import { useTunnels } from "../context/tunnels";
@@ -229,6 +233,8 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
           className={clsx(
             "App-toolbar__extra-tools-trigger App-toolbar__extra-tools-trigger--mobile",
             {
+              "App-toolbar__extra-tools-trigger--laser-persistent":
+                laserToolSelected && app.state.laserPersistent,
               "App-toolbar__extra-tools-trigger--selected":
                 extraToolSelected || isOtherShapesMenuOpen,
             },
@@ -319,6 +325,27 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
           >
             {t("toolBar.laser")}
           </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() =>
+              app.actionManager.executeAction(actionToggleLaserPersistent)
+            }
+            data-testid="toolbar-laser-persistent"
+            selected={app.state.laserPersistent}
+            disabled={isToolButtonDisabled(app, "laser")}
+          >
+            {t("toolBar.laserPersistent")}
+          </DropdownMenu.Item>
+          {app.state.laserPersistent && (
+            <DropdownMenu.Item
+              onSelect={() =>
+                app.actionManager.executeAction(actionClearLaserTrails)
+              }
+              data-testid="toolbar-clear-laser-trails"
+              disabled={isToolButtonDisabled(app, "laser")}
+            >
+              {t("buttons.clearLaserTrails")}
+            </DropdownMenu.Item>
+          )}
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "bucketfill" })}
             icon={bucketFillIcon}

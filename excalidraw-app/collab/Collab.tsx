@@ -141,6 +141,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
   private socketInitializationTimer?: number;
   private lastBroadcastedOrReceivedSceneVersion: number = -1;
+  private lastBroadcastedLaserState = "";
   private collaborators = new Map<SocketId, Collaborator>();
   /** the socket ids of the users following the current user */
   private followedBy = new Set<SocketId>();
@@ -935,9 +936,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       button: SocketUpdateDataSource["MOUSE_LOCATION"]["payload"]["button"];
       pointersMap: Gesture["pointers"];
     }) => {
-      payload.pointersMap.size < 2 &&
-        this.portal.socket &&
-        this.portal.broadcastMouseLocation(payload);
+      if (payload.pointersMap.size < 2 && this.portal.socket) {
+        const laserState = `${payload.pointer.tool}:${
+          payload.pointer.laserPersistent ? 1 : 0
+        }:${payload.pointer.laserTrailGeneration ?? 0}`;
+        const laserStateChanged = laserState !== this.lastBroadcastedLaserState;
+        this.lastBroadcastedLaserState = laserState;
+        this.portal.broadcastMouseLocation(payload, !laserStateChanged);
+      }
     },
     CURSOR_SYNC_TIMEOUT,
   );

@@ -11,21 +11,34 @@ import type { SocketId } from "./types";
 
 export class LaserTrails implements Trail {
   public localTrail: AnimatedTrail;
-  private collabTrails = new Map<SocketId, AnimatedTrail>();
+  private collabTrails = new Map<
+    SocketId,
+    {
+      trail: AnimatedTrail;
+      persistent: { value: boolean };
+      generation: number;
+    }
+  >();
   private container?: SVGSVGElement;
+  private localGeneration = 0;
 
   constructor(private app: App) {
     this.localTrail = new AnimatedTrail(app, {
-      ...this.getTrailOptions(),
+      ...this.getTrailOptions(() => this.app.state.laserPersistent),
       fill: () => DEFAULT_LASER_COLOR,
     });
   }
 
-  private getTrailOptions() {
+  private getTrailOptions(isPersistent: () => boolean) {
     return {
       simplify: 0,
       streamline: 0.4,
+      keepTrailAlive: isPersistent,
       sizeMapping: (c) => {
+        if (isPersistent()) {
+          return 1;
+        }
+
         const DECAY_TIME = 1000;
         const DECAY_LENGTH = 50;
         const t = Math.max(
@@ -39,7 +52,25 @@ export class LaserTrails implements Trail {
 
         return Math.min(easeOut(l), easeOut(t));
       },
-    } as Partial<LaserPointerOptions>;
+    } as Partial<LaserPointerOptions> & {
+      keepTrailAlive: () => boolean;
+    };
+  }
+
+  get generation() {
+    return this.localGeneration;
+  }
+
+  clearLocalTrails() {
+    this.localGeneration++;
+    this.localTrail.clearTrails();
+  }
+
+  refresh() {
+    this.localTrail.refresh();
+    for (const { trail } of this.collabTrails.values()) {
+      trail.refresh();
+    }
   }
 
   startPath(x: number, y: number): void {
@@ -66,7 +97,7 @@ export class LaserTrails implements Trail {
   }
 
   private stopCollabTrails(collaborators?: App["state"]["collaborators"]) {
-    for (const [key, trail] of this.collabTrails) {
+    for (const [key, { trail }] of this.collabTrails) {
       const collaborator = collaborators?.get(key);
 
       if (!collaborator) {
@@ -92,18 +123,40 @@ export class LaserTrails implements Trail {
       // IDEA: Use the collaborator pointer coordinates to trace out the
       // laser pointer trail when 1) the selected collab tool is the laser
       // pointer and 2) the collab pointer button is in the "down" state.
-      let trail = this.collabTrails.get(key);
-      if (!trail) {
-        trail = new AnimatedTrail(this.app, {
-          ...this.getTrailOptions(),
+      let trailState = this.collabTrails.get(key);
+      if (!trailState) {
+        const persistent = {
+          value: !!collaborator.pointer?.laserPersistent,
+        };
+        const trail = new AnimatedTrail(this.app, {
+          ...this.getTrailOptions(() => persistent.value),
           fill: () =>
             collaborator.pointer?.laserColor ||
             getClientColor(key, collaborator),
         });
+        trailState = {
+          persistent,
+          generation: collaborator.pointer?.laserTrailGeneration ?? 0,
+          trail,
+        };
         trail.start(this.container);
 
-        this.collabTrails.set(key, trail);
+        this.collabTrails.set(key, trailState);
       }
+
+      const trail = trailState.trail;
+      const persistent = !!collaborator.pointer?.laserPersistent;
+      const generation = collaborator.pointer?.laserTrailGeneration ?? 0;
+
+      if (
+        generation !== trailState.generation ||
+        trailState.persistent.value !== persistent ||
+        collaborator.pointer?.tool !== "laser"
+      ) {
+        trail.clearTrails();
+      }
+      trailState.generation = generation;
+      trailState.persistent.value = persistent;
 
       if (collaborator.pointer && collaborator.pointer.tool === "laser") {
         const buttonDown = collaborator.button === "down";

@@ -197,5 +197,16 @@
       width: var(--default-button-size);
       height: var(--default-button-size);
     }
+
+    .ToolIcon__LaserPointer.is-persistent .ToolIcon__icon::after {
+      content: "";
+      position: absolute;
+      right: 0.2rem;
+      bottom: 0.2rem;
+      width: 0.4rem;
+      height: 0.4rem;
+      border-radius: 50%;
+      background: var(--color-primary);
+    }
   }
 }

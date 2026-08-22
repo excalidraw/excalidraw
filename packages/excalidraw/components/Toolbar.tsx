@@ -3,6 +3,10 @@ import { useState } from "react";
 
 import { KEYS } from "@excalidraw/common";
 
+import {
+  actionClearLaserTrails,
+  actionToggleLaserPersistent,
+} from "../actions";
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
 
@@ -77,6 +81,8 @@ const ExtraToolsDropdown = ({
     <DropdownMenu open={isExtraToolsMenuOpen}>
       <DropdownMenu.Trigger
         className={clsx("App-toolbar__extra-tools-trigger", {
+          "App-toolbar__extra-tools-trigger--laser-persistent":
+            laserToolSelected && app.state.laserPersistent,
           "App-toolbar__extra-tools-trigger--selected":
             frameToolSelected ||
             embeddableToolSelected ||
@@ -152,6 +158,27 @@ const ExtraToolsDropdown = ({
         >
           {t("toolBar.laser")}
         </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onSelect={() =>
+            app.actionManager.executeAction(actionToggleLaserPersistent)
+          }
+          data-testid="toolbar-laser-persistent"
+          selected={app.state.laserPersistent}
+          disabled={isToolButtonDisabled(app, "laser")}
+        >
+          {t("toolBar.laserPersistent")}
+        </DropdownMenu.Item>
+        {app.state.laserPersistent && (
+          <DropdownMenu.Item
+            onSelect={() =>
+              app.actionManager.executeAction(actionClearLaserTrails)
+            }
+            data-testid="toolbar-clear-laser-trails"
+            disabled={isToolButtonDisabled(app, "laser")}
+          >
+            {t("buttons.clearLaserTrails")}
+          </DropdownMenu.Item>
+        )}
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "bucketfill" })}
           icon={bucketFillIcon}

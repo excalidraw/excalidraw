@@ -97,6 +97,10 @@ export type CollaboratorPointer = {
   x: number;
   y: number;
   tool: "pointer" | "laser";
+  /** Whether this collaborator's completed laser trails should be retained. */
+  laserPersistent?: boolean;
+  /** Monotonic id used to clear this collaborator's retained trails. */
+  laserTrailGeneration?: number;
   /**
    * Whether to render cursor + username. Useful when you only want to render
    * laser trail.
@@ -536,6 +540,8 @@ export interface AppState {
   // a drag operation (like pointer position vs bindable element) but needed
   // globally for calculating the binding strategy
   bindMode: BindMode;
+  /** Whether completed laser trails stay visible until explicitly cleared. */
+  laserPersistent: boolean;
   /** user-customized color-picker top picks (pinned via drag & drop from the
    * color picker popup). `null` means no customization (defaults, or
    * host-supplied `topPicks`, are used). Kept per picker. */
@@ -814,7 +820,7 @@ export interface ExcalidrawProps {
   onInitialize?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
-    pointer: { x: number; y: number; tool: "pointer" | "laser" };
+    pointer: CollaboratorPointer;
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
@@ -1122,6 +1128,8 @@ export type AppClassProperties = {
   togglePenMode: App["togglePenMode"];
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
+  clearLaserTrails: App["clearLaserTrails"];
+  actionManager: App["actionManager"];
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
@@ -1155,6 +1163,7 @@ export type AppClassProperties = {
 
   isInteractionEnabled: App["isInteractionEnabled"];
   isNavigationEnabled: App["isNavigationEnabled"];
+  isToolSupported: App["isToolSupported"];
 };
 
 export type PointerDownState = Readonly<{

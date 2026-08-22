@@ -105,6 +105,35 @@ describe("contextMenu element", () => {
     });
   });
 
+  it("toggles and clears persistent laser trails from the canvas menu", () => {
+    const openContextMenu = () =>
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+        button: 2,
+        clientX: 1,
+        clientY: 1,
+      });
+
+    openContextMenu();
+    let contextMenu = UI.queryContextMenu()!;
+    expect(
+      contextMenu.querySelector('[data-testid="laserPersistentMode"]'),
+    ).not.toBeNull();
+    expect(
+      contextMenu.querySelector('[data-testid="clearLaserTrails"]'),
+    ).toBeNull();
+
+    fireEvent.click(
+      contextMenu.querySelector('[data-testid="laserPersistentMode"]')!,
+    );
+    expect(h.state.laserPersistent).toBe(true);
+
+    openContextMenu();
+    contextMenu = UI.queryContextMenu()!;
+    expect(
+      contextMenu.querySelector('[data-testid="clearLaserTrails"]'),
+    ).not.toBeNull();
+  });
+
   it("shows context menu for element", () => {
     UI.clickTool("rectangle");
     mouse.down(0, 0);

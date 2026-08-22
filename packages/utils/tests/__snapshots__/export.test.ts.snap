@@ -69,6 +69,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "isMidpointSnappingEnabled": true,
   "isResizing": false,
   "isRotating": false,
+  "laserPersistent": false,
   "lastPointerDownWith": "mouse",
   "lockedMultiSelections": {},
   "multiElement": null,
