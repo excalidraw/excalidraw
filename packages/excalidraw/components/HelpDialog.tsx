@@ -2,7 +2,7 @@ import React from "react";
 
 import { isDarwin, isFirefox, isWindows } from "@excalidraw/common";
 
-import { KEYS } from "@excalidraw/common";
+import { KEYS, EVENT, addEventListener } from "@excalidraw/common";
 
 import { actionToggleTheme } from "../actions";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
@@ -12,7 +12,8 @@ import { getShortcutKey } from "../shortcut";
 
 import { useExcalidrawActionManager } from "./App";
 import { Dialog } from "./Dialog";
-import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+import { TextField } from "./TextField";
+import { ExternalLinkIcon, GithubIcon, searchIcon, youtubeIcon } from "./icons";
 
 import "./HelpDialog.scss";
 
@@ -59,23 +60,63 @@ const Header = () => (
   </div>
 );
 
-const Section = (props: { title: string; children: React.ReactNode }) => (
-  <>
-    <h3>{props.title}</h3>
-    <div className="HelpDialog__islands-container">{props.children}</div>
-  </>
-);
+const SearchQueryContext = React.createContext("");
+
+// shortcuts are authored as JSX rather than data, so matching reads the
+// `label` prop off each child instead of filtering a list
+const getMatchingShortcuts = (children: React.ReactNode, query: string) =>
+  React.Children.toArray(children).filter(
+    (child) =>
+      React.isValidElement<{ label?: string }>(child) &&
+      (!query || !!child.props.label?.toLowerCase().includes(query)),
+  );
+
+const Section = (props: {
+  title: string;
+  query: string;
+  children: React.ReactNode;
+}) => {
+  const islands = React.Children.toArray(props.children).filter(
+    (island) =>
+      React.isValidElement<{ children?: React.ReactNode }>(island) &&
+      getMatchingShortcuts(island.props.children, props.query).length > 0,
+  );
+
+  if (!islands.length) {
+    return (
+      <div className="HelpDialog__no-results">
+        {t("helpDialog.searchNoResults")}
+      </div>
+    );
+  }
+
+  return (
+    <SearchQueryContext.Provider value={props.query}>
+      <h3>{props.title}</h3>
+      <div className="HelpDialog__islands-container">{islands}</div>
+    </SearchQueryContext.Provider>
+  );
+};
 
 const ShortcutIsland = (props: {
   caption: string;
   children: React.ReactNode;
   className?: string;
-}) => (
-  <div className={`HelpDialog__island ${props.className}`}>
-    <h4 className="HelpDialog__island-title">{props.caption}</h4>
-    <div className="HelpDialog__island-content">{props.children}</div>
-  </div>
-);
+}) => {
+  const query = React.useContext(SearchQueryContext);
+  const shortcuts = getMatchingShortcuts(props.children, query);
+
+  if (!shortcuts.length) {
+    return null;
+  }
+
+  return (
+    <div className={`HelpDialog__island ${props.className}`}>
+      <h4 className="HelpDialog__island-title">{props.caption}</h4>
+      <div className="HelpDialog__island-content">{shortcuts}</div>
+    </div>
+  );
+};
 
 function* intersperse(as: JSX.Element[][], delim: string | null) {
   let first = true;
@@ -127,11 +168,33 @@ const ShortcutKey = (props: { children: React.ReactNode }) => (
 
 export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
   const actionManager = useExcalidrawActionManager();
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const [searchQuery, setSearchQuery] = React.useState("");
+
   const handleClose = React.useCallback(() => {
     if (onClose) {
       onClose();
     }
   }, [onClose]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    // `capture` needed to claim the shortcut before the editor's global
+    // keydown handler consumes it
+    return addEventListener(window, EVENT.KEYDOWN, handleKeyDown, {
+      capture: true,
+      passive: false,
+    });
+  }, []);
 
   return (
     <>
@@ -141,7 +204,19 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
         className={"HelpDialog"}
       >
         <Header />
-        <Section title={t("helpDialog.shortcuts")}>
+        <TextField
+          ref={searchInputRef}
+          className="HelpDialog__search"
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder={t("helpDialog.searchPlaceholder")}
+          icon={searchIcon}
+          fullWidth
+        />
+        <Section
+          title={t("helpDialog.shortcuts")}
+          query={searchQuery.trim().toLowerCase()}
+        >
           <ShortcutIsland
             className="HelpDialog__island--tools"
             caption={t("helpDialog.tools")}
