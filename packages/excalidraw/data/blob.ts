@@ -190,7 +190,12 @@ export const loadSceneOrLibraryFromBlob = async (
     if (error instanceof ImageSceneDataError) {
       throw error;
     }
-    throw new Error("Error: invalid file");
+    // Preserve what actually went wrong. Every failure in here — a JSON parse
+    // error, a throw from `restoreElements`, anything — was collapsed into this
+    // one message with the original discarded and nothing logged, so an import
+    // failure was indistinguishable from any other and left no trace in the
+    // console either. `cause` is already the idiom used elsewhere in this file.
+    throw new Error("Error: invalid file", { cause: error });
   }
 };
 
