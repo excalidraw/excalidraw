@@ -158,20 +158,28 @@ export const loadSceneOrLibraryFromBlob = async (
       throw error;
     }
     if (isValidExcalidrawData(data)) {
+      const restoredElements = restoreElements(data.elements, localElements, {
+        repairBindings: true,
+        deleteInvisibleElements: true,
+      });
+
       return {
         type: MIME_TYPES.excalidraw,
         data: {
-          elements: restoreElements(data.elements, localElements, {
-            repairBindings: true,
-            deleteInvisibleElements: true,
-          }),
+          elements: restoredElements,
           appState: restoreAppState(
             {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
+              // must be the restored elements, not the raw ones:
+              // `getScrollToContentState` filters through
+              // `isInvisiblySmallElement`, which dereferences geometry and
+              // throws on malformed input — rejecting the whole import from
+              // inside the same try/catch. App.tsx already passes restored
+              // elements here.
               ...(localAppState
-                ? getScrollToContentState(data.elements || [], localAppState)
+                ? getScrollToContentState(restoredElements, localAppState)
                 : {}),
             },
             localAppState,

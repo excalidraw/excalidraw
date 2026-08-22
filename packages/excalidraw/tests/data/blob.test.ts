@@ -1,7 +1,11 @@
 import { vi } from "vitest";
 
+import { getDefaultAppState } from "../../appState";
+
 import { loadSceneOrLibraryFromBlob } from "../../data/blob";
 import * as restoreModule from "../../data/restore";
+
+import type { AppState } from "../../types";
 
 const sceneBlob = (elements: unknown[] = []) =>
   new Blob(
@@ -43,6 +47,59 @@ describe("loadSceneOrLibraryFromBlob", () => {
     } finally {
       spy.mockRestore();
     }
+  });
+
+  // The end-to-end path, which the restore.test.ts unit tests never traverse:
+  // they call `restoreElements` directly. Fixing the raw-element call inside
+  // `restoreElements` is not sufficient on its own, because
+  // `getScrollToContentState` was handed the *raw* array three lines later and
+  // filters it through `isInvisiblySmallElement`, throwing inside the same
+  // try/catch. `localAppState` is non-null on the real open/drop path
+  // (App.tsx passes `this.state`), so that branch does run in production.
+  it("imports a scene containing a malformed element, with localAppState set", async () => {
+    const localAppState = {
+      ...getDefaultAppState(),
+      width: 800,
+      height: 600,
+      offsetLeft: 0,
+      offsetTop: 0,
+    } as AppState;
+
+    const result: any = await loadSceneOrLibraryFromBlob(
+      sceneBlob([
+        {
+          type: "freedraw",
+          id: "broken",
+          x: 0,
+          y: 0,
+          width: 10,
+          height: 10,
+          points: null,
+          version: 1,
+          versionNonce: 1,
+          seed: 1,
+          isDeleted: false,
+        },
+        {
+          type: "rectangle",
+          id: "keep-me",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+          version: 1,
+          versionNonce: 1,
+          seed: 1,
+          isDeleted: false,
+        },
+      ]),
+      localAppState,
+      null,
+    );
+
+    expect(result.data.elements.map((element: any) => element.id)).toContain(
+      "keep-me",
+    );
   });
 
   it("still rejects with the same message for genuinely unrecognized data", async () => {
