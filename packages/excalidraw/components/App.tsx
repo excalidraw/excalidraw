@@ -5222,7 +5222,14 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (elements) {
-        this.scene.replaceAllElements(elements);
+        // `CaptureUpdateAction.NEVER` marks remote updates (see docs above) —
+        // elements coming from outside the editor are authoritative, so
+        // healing their indices must not re-version them, otherwise the local
+        // copies outrace the source of truth and version-based reconciliation
+        // starts discarding genuine remote edits
+        this.scene.replaceAllElements(elements, {
+          preserveVersions: captureUpdate === CaptureUpdateAction.NEVER,
+        });
       }
 
       if (collaborators) {
