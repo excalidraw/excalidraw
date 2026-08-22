@@ -19,8 +19,8 @@ import {
   updateOriginalContainerCache,
 } from "./containerCache";
 import { LinearElementEditor } from "./linearElementEditor";
+import { getRenderableMathText, measureTextContent } from "./mathText";
 
-import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
   isBoundToContainer,
@@ -74,7 +74,12 @@ export const redrawTextBoundingBox = (
 
   boundTextUpdates.text = textElement.text;
 
-  if (container || !textElement.autoResize) {
+  const isMath = !!getRenderableMathText(textElement.originalText, textElement);
+
+  if (isMath) {
+    // math is never wrapped
+    boundTextUpdates.text = textElement.originalText;
+  } else if (container || !textElement.autoResize) {
     maxWidth = container
       ? getBoundTextMaxWidth(container, textElement)
       : textElement.width;
@@ -85,14 +90,10 @@ export const redrawTextBoundingBox = (
     );
   }
 
-  const metrics = measureText(
-    boundTextUpdates.text,
-    getFontString(textElement),
-    textElement.lineHeight,
-  );
+  const metrics = measureTextContent(boundTextUpdates.text, textElement);
 
   // Note: only update width for unwrapped text and bound texts (which always have autoResize set to true)
-  if (textElement.autoResize) {
+  if (textElement.autoResize || metrics.isMath) {
     boundTextUpdates.width = metrics.width;
   }
   boundTextUpdates.height = metrics.height;
@@ -113,7 +114,10 @@ export const redrawTextBoundingBox = (
       updateOriginalContainerCache(container.id, nextHeight);
     }
 
-    if (metrics.width > maxContainerWidth) {
+    // (plain text never gets here for arrows since it's wrapped to the max
+    // width; unwrappable math must not resize the arrow — mirrors the height
+    // guard above)
+    if (!isArrowElement(container) && metrics.width > maxContainerWidth) {
       const nextWidth = computeContainerDimensionForBoundText(
         metrics.width,
         container.type,
@@ -164,27 +168,31 @@ export const handleBindTextResize = (
     const maxWidth = getBoundTextMaxWidth(container, textElement);
     const maxHeight = getBoundTextMaxHeight(container, textElement);
     let containerHeight = container.height;
+    const isMath = !!getRenderableMathText(
+      textElement.originalText,
+      textElement,
+    );
     if (
       shouldMaintainAspectRatio ||
       (transformHandleType !== "n" && transformHandleType !== "s")
     ) {
       if (text) {
-        text = wrapText(
-          textElement.originalText,
-          getFontString(textElement),
-          maxWidth,
-        );
+        text = isMath
+          ? // math is never wrapped
+            textElement.originalText
+          : wrapText(
+              textElement.originalText,
+              getFontString(textElement),
+              maxWidth,
+            );
       }
-      const metrics = measureText(
-        text,
-        getFontString(textElement),
-        textElement.lineHeight,
-      );
+      const metrics = measureTextContent(text, textElement);
       nextHeight = metrics.height;
       nextWidth = metrics.width;
     }
     // increase height in case text element height exceeds
-    if (nextHeight > maxHeight) {
+    // (unwrappable math must not resize an arrow)
+    if (nextHeight > maxHeight && !(isMath && isArrowElement(container))) {
       containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,

@@ -121,6 +121,11 @@ export default defineConfig(({ mode }) => {
               return "mermaid-to-excalidraw";
             }
 
+            // MathJax (LaTeX math text rendering) is only loaded on demand
+            if (id.includes("mathjax-full")) {
+              return "mathjax.chunk";
+            }
+
             if (id.includes("@codemirror/") || id.includes("@lezer/")) {
               return "codemirror.chunk";
             }

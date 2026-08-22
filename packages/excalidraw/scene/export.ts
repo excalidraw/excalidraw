@@ -54,6 +54,7 @@ import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
 
 import { Fonts } from "../fonts";
+import { prerenderMathText } from "../mathjax";
 
 import { renderStaticScene } from "../renderer/staticScene";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
@@ -207,6 +208,13 @@ export const exportToCanvas = async (
 ) => {
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
   await loadFonts();
+
+  // typeset math text elements (canvas rendering is synchronous, so the
+  // equation images must be ready beforehand)
+  await prerenderMathText(elements, {
+    theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+    images: true,
+  });
 
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
@@ -431,6 +439,15 @@ export const exportToSvg = async (
       defsElement.appendChild(clipPath);
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // typeset math text elements (needs the TeX engine loaded)
+  // ---------------------------------------------------------------------------
+
+  await prerenderMathText(elements, {
+    theme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+    images: false,
+  });
 
   // ---------------------------------------------------------------------------
   // inline font faces

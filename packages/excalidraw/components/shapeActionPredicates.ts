@@ -139,6 +139,12 @@ export const getShapeActionPredicates = (
       activeToolType === "text" ||
       suppportsHorizontalAlign(targetElements, elementsMap),
     verticalAlign: shouldAllowVerticalAlign(targetElements, elementsMap),
+    // LaTeX math toggle: acts on selected texts / bound texts of selected containers
+    mathText:
+      !appState.editingTextElement &&
+      targetElements.some(
+        (element) => isTextElement(element) || hasBoundTextElement(element),
+      ),
 
     opacity: activeToolType !== "autoshape" || hasSelection,
 

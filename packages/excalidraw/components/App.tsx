@@ -88,6 +88,7 @@ import {
   isShallowEqual,
   arrayToMap,
   applyDarkModeFilter,
+  throttleRAF,
   AppEventBus,
   type EXPORT_IMAGE_TYPES,
   randomInteger,
@@ -135,6 +136,11 @@ import {
   newLinearElement,
   newTextElement,
   refreshTextDimensions,
+  isMathText,
+  isMathTextElement,
+  measureTextContent,
+  onMathTextUpdate,
+  setMathTextEditingElementId,
   deepCopyElement,
   duplicateElements,
   hasBoundTextElement,
@@ -393,6 +399,7 @@ import {
 } from "../components/hyperlink/Hyperlink";
 
 import { Fonts } from "../fonts";
+import { registerMathJaxProvider } from "../mathjax";
 import { editorJotaiStore, type WritableAtom } from "../editor-jotai";
 import { ImageSceneDataError } from "../errors";
 import {
@@ -632,6 +639,11 @@ class App extends React.Component<AppProps, AppState> {
 
   public scene: Scene;
   public fonts: Fonts;
+  private unsubscribeMathTextUpdates: (() => void) | null = null;
+  /** rasterized equations may become ready in bursts → batch the rerenders */
+  private rerenderMathTextThrottled = throttleRAF(() => {
+    this.handleMathTextUpdate(false);
+  });
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
   /** whether the last render had any renderable elements (excludes e.g. the
@@ -873,6 +885,9 @@ class App extends React.Component<AppProps, AppState> {
 
     this.fonts = new Fonts(this.scene);
     this.history = new History(this.store);
+
+    // LaTeX math text rendering (lazy-loaded engine)
+    registerMathJaxProvider();
 
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
@@ -3680,6 +3695,17 @@ class App extends React.Component<AppProps, AppState> {
     this.unmounted = false;
     this.api = this.createExcalidrawAPI();
 
+    // re-measure / re-render math text elements once the TeX engine or the
+    // rasterized equations are ready
+    this.unsubscribeMathTextUpdates?.();
+    this.unsubscribeMathTextUpdates = onMathTextUpdate((event) => {
+      if (event.type === "loaded") {
+        this.handleMathTextUpdate(true);
+      } else if (event.type === "image-ready") {
+        this.rerenderMathTextThrottled();
+      }
+    });
+
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
@@ -3794,6 +3820,11 @@ class App extends React.Component<AppProps, AppState> {
     this.props.onExcalidrawAPI?.(null);
 
     (window as any).launchQueue?.setConsumer(() => {});
+
+    this.unsubscribeMathTextUpdates?.();
+    this.unsubscribeMathTextUpdates = null;
+    this.rerenderMathTextThrottled.cancel();
+    setMathTextEditingElementId(null);
 
     this.renderer.destroy();
     this.scene.destroy();
@@ -4878,7 +4909,12 @@ class App extends React.Component<AppProps, AppState> {
     const LINE_GAP = 10;
     let currentY = y;
 
-    const lines = isPlainPaste ? [text] : text.split("\n");
+    // a pasted LaTeX block (`$…$` / `$$…$$`, possibly multi-line) becomes a
+    // single math text element
+    const lines =
+      isPlainPaste || isMathText(normalizeText(text).trim())
+        ? [text]
+        : text.split("\n");
     const textElements = lines.reduce(
       (acc: ExcalidrawTextElement[], line, idx) => {
         const originalText = normalizeText(line).trim();
@@ -4888,15 +4924,22 @@ class App extends React.Component<AppProps, AppState> {
             y: currentY,
           });
 
-          let metrics = measureText(originalText, fontString, lineHeight);
-          const isTextUnwrapped = metrics.width > maxTextWidth;
+          const textMetricsProps = {
+            fontSize: textElementProps.fontSize,
+            fontFamily: textElementProps.fontFamily,
+            lineHeight,
+          };
+          let metrics = measureTextContent(originalText, textMetricsProps);
+          // math is never wrapped
+          const isTextUnwrapped =
+            !metrics.isMath && metrics.width > maxTextWidth;
 
           const text = isTextUnwrapped
             ? wrapText(originalText, fontString, maxTextWidth)
             : originalText;
 
           metrics = isTextUnwrapped
-            ? measureText(text, fontString, lineHeight)
+            ? measureTextContent(text, textMetricsProps)
             : metrics;
 
           const startX = x - metrics.width / 2;
@@ -6199,7 +6242,8 @@ class App extends React.Component<AppProps, AppState> {
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
-              // returns (wrapped) text and new dimensions
+              // returns (wrapped) text and new dimensions (and `autoResize`
+              // for math text, whose box is always the equation box)
               ...refreshTextDimensions(
                 _element,
                 getContainerElement(_element, elementsMap),
@@ -6297,7 +6341,11 @@ class App extends React.Component<AppProps, AppState> {
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
       app: this,
-      initialCaretSceneCoords,
+      // for a typeset equation the click position can't be mapped to a caret
+      // position in the LaTeX source → select all instead
+      initialCaretSceneCoords: isMathText(element.text)
+        ? null
+        : initialCaretSceneCoords,
       // when text is selected, it's hard (at least on iOS) to re-position the
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
@@ -6311,6 +6359,64 @@ class App extends React.Component<AppProps, AppState> {
     // modifying element's x/y for sake of editor (case: syncing to remote)
     updateElement(element.originalText, false);
   }
+
+  /**
+   * Math (`$…$`) text elements are typeset asynchronously (lazy-loaded engine,
+   * then rasterized images). Mirrors `Fonts.onLoaded`: invalidates the
+   * cached element canvases and, once the engine is loaded, re-measures the
+   * elements that were laid out with fallback plain-text metrics.
+   */
+  private handleMathTextUpdate = (remeasure: boolean) => {
+    if (this.unmounted) {
+      return;
+    }
+
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    // candidates: elements whose *source* is math (they may have been laid
+    // out as plain text while the engine was loading)
+    const mathElements = this.scene
+      .getNonDeletedElements()
+      .filter((element) => isMathTextElement(element));
+
+    if (!mathElements.length) {
+      return;
+    }
+
+    if (remeasure) {
+      // derived update (like image error statuses) — must not create an undo
+      // entry nor be folded into the next user action
+      this.store.scheduleAction(CaptureUpdateAction.NEVER);
+    }
+
+    for (const element of mathElements) {
+      ShapeCache.delete(element);
+
+      if (!remeasure || element.id === this.state.editingTextElement?.id) {
+        continue;
+      }
+
+      // re-lay-out from the source (the laid-out `text` may have been
+      // wrapped as plain text)
+      const container = getContainerElement(element, elementsMap);
+      if (container) {
+        ShapeCache.delete(container);
+        redrawTextBoundingBox(element, container, this.scene);
+      } else {
+        const dimensions = refreshTextDimensions(
+          element,
+          null,
+          elementsMap,
+          element.originalText,
+        );
+        if (dimensions) {
+          this.scene.mutateElement(element, dimensions);
+          updateBoundElements(element, this.scene);
+        }
+      }
+    }
+
+    this.scene.triggerUpdate();
+  };
 
   private deselectElements() {
     this.setState({

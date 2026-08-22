@@ -44,7 +44,7 @@ import {
   updateActiveTool,
 } from "@excalidraw/common";
 
-import { measureText } from "@excalidraw/element";
+import { getRenderableMathText, measureTextContent } from "@excalidraw/element";
 
 import { LinearElementEditor } from "@excalidraw/element";
 
@@ -371,33 +371,44 @@ export const adjustBoundTextSize = (
   const maxWidth = getBoundTextMaxWidth(container, boundText);
   const maxHeight = getBoundTextMaxHeight(container, boundText);
 
-  const wrappedText = wrapText(
-    boundText.text,
-    getFontString(boundText),
-    maxWidth,
-  );
+  // math is never wrapped
+  const isMath = !!getRenderableMathText(boundText.originalText, boundText);
+  const textToMeasure = isMath ? boundText.originalText : boundText.text;
 
-  let metrics = measureText(
-    wrappedText,
-    getFontString(boundText),
-    boundText.lineHeight,
-  );
+  const wrappedText = isMath
+    ? textToMeasure
+    : wrapText(textToMeasure, getFontString(boundText), maxWidth);
+
+  let metrics = measureTextContent(wrappedText, boundText);
 
   let nextFontSize = boundText.fontSize;
-  while (
-    (metrics.width > maxWidth || metrics.height > maxHeight) &&
-    nextFontSize > 0
-  ) {
-    nextFontSize -= 1;
-    const _updatedTextElement = {
-      ...boundText,
-      fontSize: nextFontSize,
-    };
-    metrics = measureText(
-      boundText.text,
-      getFontString(_updatedTextElement),
-      boundText.lineHeight,
-    );
+  if (isMath) {
+    // math dimensions scale linearly with the font size → closed form
+    if (metrics.width > maxWidth || metrics.height > maxHeight) {
+      nextFontSize = Math.max(
+        1,
+        Math.floor(
+          boundText.fontSize *
+            Math.min(maxWidth / metrics.width, maxHeight / metrics.height),
+        ),
+      );
+      metrics = measureTextContent(textToMeasure, {
+        ...boundText,
+        fontSize: nextFontSize,
+      });
+    }
+  } else {
+    while (
+      (metrics.width > maxWidth || metrics.height > maxHeight) &&
+      nextFontSize > 0
+    ) {
+      nextFontSize -= 1;
+      const _updatedTextElement = {
+        ...boundText,
+        fontSize: nextFontSize,
+      };
+      metrics = measureTextContent(textToMeasure, _updatedTextElement);
+    }
   }
 
   mutateElement(boundText, scene.getNonDeletedElementsMap(), {

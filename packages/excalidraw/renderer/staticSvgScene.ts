@@ -21,6 +21,7 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
+import { getMathTextSvg } from "@excalidraw/element";
 import {
   isArrowElement,
   isIframeLikeElement,
@@ -654,6 +655,46 @@ const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
+
+        // math mode: inline the typeset equation (standalone svg, glyphs as
+        // paths, no ids) instead of <text> nodes
+        const mathSvg = getMathTextSvg(
+          element,
+          applyDarkModeFilter(
+            element.strokeColor,
+            renderConfig.theme === THEME.DARK,
+          ),
+        );
+        if (mathSvg) {
+          const mathDocument = new DOMParser().parseFromString(
+            mathSvg,
+            MIME_TYPES.svg,
+          );
+          const mathRoot = mathDocument.documentElement;
+          if (
+            mathRoot.nodeName.toLowerCase() === "svg" &&
+            !mathDocument.querySelector("parsererror")
+          ) {
+            const mathNode = svgRoot.ownerDocument.importNode(mathRoot, true);
+            // (nested <svg> with a viewBox: default preserveAspectRatio keeps
+            // the equation undistorted should the box not match)
+            mathNode.setAttribute("width", `${element.width}`);
+            mathNode.setAttribute("height", `${element.height}`);
+            node.appendChild(mathNode);
+
+            const g = maybeWrapNodesInFrameClipPath(
+              element,
+              root,
+              [node],
+              renderConfig.frameRendering,
+              elementsMap,
+            );
+
+            addToRoot(g || node, element);
+            break;
+          }
+        }
+
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
