@@ -1276,4 +1276,77 @@ describe("rubberband overscroll (integration)", () => {
     install(25);
     expect(h.state.scrollConstraints?.overscroll).toBe(25);
   });
+
+  // The escape this guards against needs React's setState batching window and
+  // does not manifest under jsdom — `act()` flushes synchronously, so a rigid
+  // lock holds here even with the bug present (verified). What *is* observable
+  // is the contract the fix establishes: every drag-driven translate must pass
+  // an updater function. A plain object read from `this.state` re-bases each
+  // throttled pointermove on the pre-clamp scroll, so the clamp never
+  // compounds and the viewport walks out of the locked box.
+  it("drives drag-panning through the updater form so clamps compound", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: false },
+      });
+      h.app.setActiveTool({ type: "hand" });
+    });
+
+    // spy after setViewport so only drag-driven calls are captured
+    const translateSpy = vi.spyOn(h.app.viewport, "translate");
+
+    try {
+      const mouse = new Pointer("mouse");
+      window.EXCALIDRAW_THROTTLE_RENDER = true;
+      try {
+        mouse.downAt(50, 2);
+        mouse.move(0, 20);
+        mouse.move(0, 20);
+        mouse.up();
+      } finally {
+        window.EXCALIDRAW_THROTTLE_RENDER = false;
+      }
+
+      expect(translateSpy).toHaveBeenCalled();
+      for (const [arg] of translateSpy.mock.calls) {
+        expect(typeof arg).toBe("function");
+      }
+    } finally {
+      translateSpy.mockRestore();
+    }
+  });
+
+  // the rigid lock must hold across a sustained drag. This passes with the bug
+  // present under jsdom, but pins the user-visible guarantee for any future
+  // environment that does reproduce the batching window.
+  it("keeps a rigid lock while drag-panning", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: false },
+      });
+      h.app.setActiveTool({ type: "hand" });
+    });
+
+    const mouse = new Pointer("mouse");
+    mouse.downAt(50, 2);
+    for (let i = 0; i < 12; i++) {
+      mouse.move(0, 20);
+    }
+    mouse.up();
+
+    // hard lock: no give at all past the top edge
+    expect(h.state.scrollY).toBeCloseTo(0);
+  });
 });
