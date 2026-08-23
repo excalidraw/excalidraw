@@ -111,6 +111,7 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
+  matchKey,
 } from "@excalidraw/common";
 
 import {
@@ -3172,6 +3173,56 @@ class App extends React.Component<AppProps, AppState> {
     return true;
   };
 
+  /** #7016: Ctrl/Cmd+Z during multi-point drawing removes the last
+   * committed waypoint instead of hitting history (which is blocked
+   * mid-gesture); cancels the shape once only the origin remains. */
+  private undoMultiElementDraw = (): void => {
+    const multiElement = this.state.multiElement;
+    const selectedLinearElement = this.state.selectedLinearElement;
+    if (!multiElement || !selectedLinearElement) {
+      return;
+    }
+    const { points } = multiElement;
+    const { lastCommittedPoint } = selectedLinearElement;
+    const lastCommittedIdx = lastCommittedPoint
+      ? points.findIndex((point) => point === lastCommittedPoint)
+      : -1;
+
+    // no waypoints beyond the origin → undoing cancels the whole shape
+    // (same cleanup as Escape)
+    if (lastCommittedIdx <= 0) {
+      this.actionManager.executeAction(actionFinalize);
+      return;
+    }
+
+    const nextPoints = points.slice(0, lastCommittedIdx);
+    this.scene.mutateElement(
+      multiElement,
+      { points: nextPoints },
+      { informMutation: false, isDragging: false },
+    );
+    const newLastIdx = nextPoints.length - 1;
+    this.setState({
+      selectedLinearElement: {
+        ...selectedLinearElement,
+        selectedPointsIndices: selectedLinearElement.selectedPointsIndices
+          ? [
+              ...new Set(
+                selectedLinearElement.selectedPointsIndices.map((idx) =>
+                  Math.min(idx, newLastIdx),
+                ),
+              ),
+            ]
+          : selectedLinearElement.selectedPointsIndices,
+        lastCommittedPoint: nextPoints[newLastIdx],
+        initialState: {
+          ...selectedLinearElement.initialState,
+          lastClickedPoint: newLastIdx,
+        },
+      },
+    });
+  };
+
   private preventBrowserZoomKeyDown = (event: KeyboardEvent) => {
     if (
       event[KEYS.CTRL_OR_CMD] &&
@@ -5494,6 +5545,19 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           maybeHandleArrowPointlikeDrag({ app: this, event });
         }
+      }
+
+      // intercept undo during multi-point drawing before the history
+      // action runs (it is blocked mid-gesture) — #7016
+      if (
+        this.state.multiElement &&
+        event[KEYS.CTRL_OR_CMD] &&
+        !event.shiftKey &&
+        matchKey(event, KEYS.Z)
+      ) {
+        event.preventDefault();
+        this.undoMultiElementDraw();
+        return;
       }
 
       if (this.actionManager.handleKeyDown(event)) {
