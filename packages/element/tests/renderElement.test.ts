@@ -107,12 +107,9 @@ describe("drawRoughShapeWithClippedFill", () => {
     ]);
     expect(rc.draw).toHaveBeenCalledTimes(2);
     expect(vi.mocked(rc.draw).mock.calls[0][0].sets[0].type).toBe("fillSketch");
-    expect(
-      vi.mocked(rc.draw).mock.calls[0][0].sets[0].ops[0].data[0],
-    ).toBeCloseTo(13.6);
-    expect(
-      vi.mocked(rc.draw).mock.calls[0][0].sets[0].ops[0].data[1],
-    ).toBeCloseTo(15.2);
+    // fill geometry must reach the canvas untouched - the clip constrains what
+    // is visible, it must not move the strokes
+    expect(vi.mocked(rc.draw).mock.calls[0][0].sets[0]).toEqual(fillSketchSet);
     expect(vi.mocked(rc.draw).mock.calls[1][0].sets).toEqual([outlineSet]);
   });
 
@@ -136,12 +133,9 @@ describe("drawRoughShapeWithClippedFill", () => {
     ]);
     expect(rc.draw).toHaveBeenCalledTimes(2);
     expect(vi.mocked(rc.draw).mock.calls[0][0].sets[0].type).toBe("fillPath");
-    expect(
-      vi.mocked(rc.draw).mock.calls[0][0].sets[0].ops[0].data[0],
-    ).toBeCloseTo(13.6);
-    expect(
-      vi.mocked(rc.draw).mock.calls[0][0].sets[0].ops[0].data[1],
-    ).toBeCloseTo(15.2);
+    // fill geometry must reach the canvas untouched - the clip constrains what
+    // is visible, it must not move the strokes
+    expect(vi.mocked(rc.draw).mock.calls[0][0].sets[0]).toEqual(fillPathSet);
     expect(vi.mocked(rc.draw).mock.calls[1][0].sets).toEqual([outlineSet]);
   });
 
