@@ -477,48 +477,6 @@ const applyRoughOutlineClip = (
   return didDrawPath;
 };
 
-const getFillExpansionPadding = (
-  shape: Drawable,
-  element: NonDeletedExcalidrawElement,
-) => {
-  const hachureGap =
-    typeof shape.options.hachureGap === "number" && shape.options.hachureGap > 0
-      ? shape.options.hachureGap
-      : 0;
-
-  const strokeWidth =
-    typeof element.strokeWidth === "number" ? element.strokeWidth : 1;
-
-  return Math.max(hachureGap, strokeWidth * 4, 8);
-};
-
-const expandFillSet = (
-  set: OpSet,
-  element: NonDeletedExcalidrawElement,
-  padding: number,
-) => {
-  if (!element.width || !element.height) {
-    return set;
-  }
-
-  const centerX = element.width / 2;
-  const centerY = element.height / 2;
-  const scaleX = (element.width + padding * 2) / element.width;
-  const scaleY = (element.height + padding * 2) / element.height;
-
-  return {
-    ...set,
-    ops: set.ops.map((op) => ({
-      ...op,
-      data: op.data.map((value, index) =>
-        index % 2 === 0
-          ? centerX + (value - centerX) * scaleX
-          : centerY + (value - centerY) * scaleY,
-      ),
-    })),
-  };
-};
-
 export const drawRoughShapeWithClippedFill = (
   shape: Drawable,
   element: NonDeletedExcalidrawElement,
@@ -538,10 +496,6 @@ export const drawRoughShapeWithClippedFill = (
     (set) => set.type !== "fillSketch" && set.type !== "fillPath",
   );
 
-  const expandedFillSets = fillSets.map((set) =>
-    expandFillSet(set, element, getFillExpansionPadding(shape, element)),
-  );
-
   context.save();
   if (element.type === "ellipse") {
     if (!applyRoughOutlineClip(nonFillSets, context)) {
@@ -550,7 +504,7 @@ export const drawRoughShapeWithClippedFill = (
   } else {
     applyShapeFillClip(element, context);
   }
-  rc.draw({ ...shape, sets: expandedFillSets });
+  rc.draw({ ...shape, sets: fillSets });
   context.restore();
 
   if (nonFillSets.length) {
