@@ -13,8 +13,9 @@ import {
 } from "@excalidraw/excalidraw/tests/test-utils";
 
 import { getSelectedElements } from "@excalidraw/excalidraw/scene";
+import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 
-import { elementOverlapsWithFrame } from "../src/frame";
+import { elementOverlapsWithFrame, shouldApplyFrameClip } from "../src/frame";
 
 import type {
   ExcalidrawElement,
@@ -1181,5 +1182,90 @@ describe("adding elements to frames", () => {
       dragElementIntoFrame(frame2, rectangle1);
       expect(h.elements.length).toBe(4);
     });
+  });
+});
+
+describe("shouldApplyFrameClip", () => {
+  const appState = getDefaultAppState();
+
+  it("clips a standalone text element whose logical bounds sit fully inside the frame but whose rendered glyph padding (fontSize / 2) bleeds past the frame edge", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+    });
+
+    // fontSize 40 => canvas render padding of 20px on each side (see
+    // `getCanvasPadding` in renderElement.ts). Logical bounds (x: 185-195)
+    // sit fully inside the frame (right edge at x=200), but the padded
+    // render bounds (x: 165-215) cross the frame's right edge.
+    const text = API.createElement({
+      type: "text",
+      x: 185,
+      y: 90,
+      width: 10,
+      height: 45,
+      fontSize: 40,
+      frameId: frame.id,
+    });
+
+    const elementsMap = arrayToMap([frame, text]);
+
+    expect(shouldApplyFrameClip(text, frame, appState, elementsMap)).toBe(true);
+  });
+
+  it("does not clip a standalone text element whose logical AND padded render bounds sit fully inside the frame", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+    });
+
+    // fontSize 20 => 10px render padding. Logical bounds (x: 50-90) and
+    // padded bounds (x: 40-100) both sit well within the frame.
+    const text = API.createElement({
+      type: "text",
+      x: 50,
+      y: 50,
+      width: 40,
+      height: 25,
+      fontSize: 20,
+      frameId: frame.id,
+    });
+
+    const elementsMap = arrayToMap([frame, text]);
+
+    expect(shouldApplyFrameClip(text, frame, appState, elementsMap)).toBe(
+      false,
+    );
+  });
+
+  it("does not apply render padding to non-text elements whose logical bounds sit fully inside the frame", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+    });
+
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 185,
+      y: 90,
+      width: 10,
+      height: 45,
+      frameId: frame.id,
+    });
+
+    const elementsMap = arrayToMap([frame, rectangle]);
+
+    expect(shouldApplyFrameClip(rectangle, frame, appState, elementsMap)).toBe(
+      false,
+    );
   });
 });

@@ -908,6 +908,16 @@ export const isElementInFrame = (
   return false;
 };
 
+// text elements are rasterized onto an offscreen canvas padded by
+// `fontSize / 2` on each side, to avoid clipping ascenders/descenders and
+// anti-aliased glyph edges (see `getCanvasPadding` in `renderElement.ts`).
+// That padding means the actually-rendered pixels can extend past the
+// element's logical bounds, so the frame-clip decision needs to account for
+// it or text sitting close to (but not crossing) the frame's logical edge
+// can bleed past the frame boundary unclipped.
+const getFrameClipRenderPadding = (element: ExcalidrawElement): number =>
+  isTextElement(element) ? element.fontSize / 2 : 0;
+
 export const shouldApplyFrameClip = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
@@ -919,12 +929,24 @@ export const shouldApplyFrameClip = (
     return false;
   }
 
+  const renderPadding = getFrameClipRenderPadding(element);
+  const elementWithRenderPadding =
+    renderPadding > 0
+      ? {
+          ...element,
+          x: element.x - renderPadding,
+          y: element.y - renderPadding,
+          width: element.width + renderPadding * 2,
+          height: element.height + renderPadding * 2,
+        }
+      : element;
+
   // for individual elements, only clip when the element is
   // a. overlapping with the frame, or
   // b. containing the frame, for example when an element is used as a background
   //    and is therefore bigger than the frame and completely contains the frame
   const shouldClipElementItself =
-    isElementIntersectingFrame(element, frame, elementsMap) ||
+    isElementIntersectingFrame(elementWithRenderPadding, frame, elementsMap) ||
     isElementContainingFrame(element, frame, elementsMap);
 
   if (shouldClipElementItself) {
