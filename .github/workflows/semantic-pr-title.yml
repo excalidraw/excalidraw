@@ -61,26 +61,7 @@ jobs:
 
           scope_labels=(s-app s-editor s-package)
 
-          readarray -t desired_labels < <(
-            node <<'NODE'
-          const title = process.env.PR_TITLE;
-          const match = title.match(/^[a-z]+(?:\(([^)]+)\))?!?:/i);
-          const scopes = match?.[1]?.split(",").map((scope) => scope.trim()) ?? [];
-          const labels = new Set();
-
-          for (const scope of scopes) {
-            if (scope === "app") {
-              labels.add("s-app");
-            } else if (scope === "editor") {
-              labels.add("s-editor");
-            } else if (scope.startsWith("packages/")) {
-              labels.add("s-package");
-            }
-          }
-
-          process.stdout.write([...labels].join("\n"));
-          NODE
-          )
+          readarray -t desired_labels < <(node "$GITHUB_WORKSPACE/.github/scripts/pr-scope-labels.mjs")
 
           should_apply_label() {
             local label="$1"
