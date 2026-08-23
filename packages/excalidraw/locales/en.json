@@ -45,6 +45,8 @@
     "edges": "Edges",
     "sharp": "Sharp",
     "round": "Round",
+    "cornerRadius": "Corner radius",
+    "adaptiveCornerRadius": "Adaptive",
     "arrowheads": "Arrowheads",
     "arrowhead_none": "None",
     "arrowhead_arrow": "Arrow",
