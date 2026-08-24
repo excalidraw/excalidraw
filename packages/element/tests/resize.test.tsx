@@ -5,8 +5,6 @@ import {
   pointFrom,
 } from "@excalidraw/math";
 
-import type { GlobalPoint } from "@excalidraw/math";
-
 import { Excalidraw } from "@excalidraw/excalidraw";
 import {
   type Bounds,
@@ -22,6 +20,8 @@ import {
   render,
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
+
+import type { GlobalPoint } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
 
