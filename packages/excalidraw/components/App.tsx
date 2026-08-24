@@ -8220,14 +8220,6 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
       let segmentMidPointHoveredCoords = null;
-      // an arrow's bound text is draggable along the arrow, so it shows the
-      // drag cursor and takes precedence over the segment midpoint handle
-      // sitting underneath it (but not over the point handles)
-      const hoveredBoundText = this.isBoundTextGrabbable(
-        element,
-        scenePointerX,
-        scenePointerY,
-      );
 
       if (
         hitElementItself({
@@ -8249,7 +8241,7 @@ class App extends React.Component<AppProps, AppState> {
             hoverPointIndex === element.points.length - 1
           : hoverPointIndex >= 0;
 
-        if (!isHoveringAPointHandle && !hoveredBoundText) {
+        if (!isHoveringAPointHandle) {
           segmentMidPointHoveredCoords =
             LinearElementEditor.getSegmentMidpointHitCoords(
               linearElementEditor,
@@ -8258,6 +8250,14 @@ class App extends React.Component<AppProps, AppState> {
               this.scene.getNonDeletedElementsMap(),
             );
         }
+
+        // an arrow's bound text is draggable along the arrow, but the point
+        // handles and the segment midpoint knob sitting under the label keep
+        // precedence, so a labeled arrow can still be bent at its middle
+        const hoveredBoundText =
+          !isHoveringAPointHandle &&
+          !segmentMidPointHoveredCoords &&
+          this.isBoundTextGrabbable(element, scenePointerX, scenePointerY);
 
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           this.cursor.set(CURSOR_TYPE.POINTER);
@@ -8277,7 +8277,10 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
         }
-      } else if (hoveredBoundText) {
+      } else if (
+        // the label can extend beyond the arrow's own hit area
+        this.isBoundTextGrabbable(element, scenePointerX, scenePointerY)
+      ) {
         this.cursor.set(CURSOR_TYPE.GRAB);
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
@@ -8354,17 +8357,15 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  /**
-   * Replays a `pointermove` at the last known pointer position through the
-   * real canvas event path, so every hover affordance (cursor, handle
-   * highlights, link hover, …) is recomputed by the actual pointermove
-   * handler after a state change invalidated it (e.g. a tool revert after
-   * finalize), rather than duplicating slices of that logic here.
-   */
   private refreshHoverCursor = () => {
     const lastEvent = this.lastPointerMoveEvent ?? this.lastPointerUpEvent;
 
     if (!lastEvent || !this.interactiveCanvas) {
+      return;
+    }
+
+    const pointerType = (lastEvent as PointerEvent).pointerType;
+    if (pointerType && pointerType !== "mouse") {
       return;
     }
 

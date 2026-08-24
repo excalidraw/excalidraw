@@ -209,11 +209,6 @@ export function deconstructLinearOrFreeDrawElement(
   return shape;
 }
 
-/**
- * Returns the **rotated** components of a freedraw, line or arrow element
- * interleaved in path order, so the path can be walked from start to end
- * (e.g. for arc-length parameterization).
- */
 export function getLinearElementPathSegments(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,

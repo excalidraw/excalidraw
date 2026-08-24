@@ -1753,6 +1753,29 @@ describe("Test Linear Elements", () => {
         ).toBe(0.5);
       });
 
+      it("gives the segment midpoint handle precedence over the label on top of it", () => {
+        const { arrow, label } = createArrowWithTallLabel();
+        API.setElements([arrow, label]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+        expect((h.elements[0] as ExcalidrawLinearElement).points.length).toBe(
+          2,
+        );
+
+        // the label sits centered on the midpoint knob; dragging there must
+        // bend the arrow, not slide the label
+        drag(midpoint, pointFrom<GlobalPoint>(midpoint[0], midpoint[1] + 40));
+
+        expect((h.elements[0] as ExcalidrawLinearElement).points.length).toBe(
+          3,
+        );
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).toBe(0.5);
+      });
+
       it("leaves the segment midpoint handle grabbable under a covered label", () => {
         const { arrow, label } = createArrowWithTallLabel();
         API.setElements([arrow, label, createOccluder()]);

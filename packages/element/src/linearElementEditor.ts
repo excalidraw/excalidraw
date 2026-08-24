@@ -1137,6 +1137,9 @@ export class LinearElementEditor {
     let boundTextGrabOffset: { x: number; y: number } | null = null;
     if (
       clickedPointIndex < 0 &&
+      // the segment midpoint knob keeps precedence over the label sitting
+      // on top of it, so a labeled arrow can still be bent at its middle
+      !segmentMidpoint &&
       boundTextElement &&
       isArrowElement(element) &&
       app.isBoundTextGrabbable(element, scenePointer.x, scenePointer.y)
@@ -1188,9 +1191,8 @@ export class LinearElementEditor {
         lastClickedPoint: clickedPointIndex,
         origin: point,
         segmentMidpoint: {
-          // the label covers the midpoint handle underneath it
-          value: boundTextGrabOffset ? null : segmentMidpoint,
-          index: boundTextGrabOffset ? null : segmentMidpointIndex,
+          value: segmentMidpoint,
+          index: segmentMidpointIndex,
           added: false,
         },
         hitBoundText: !!boundTextGrabOffset,
@@ -2007,6 +2009,10 @@ export class LinearElementEditor {
     pathParameter: number,
     elementsMap: ElementsMap,
   ): GlobalPoint | null {
+    if (!Number.isFinite(pathParameter)) {
+      return null;
+    }
+
     const { segments, lengths, prefixSums, totalLength } =
       getLinearElementPathMetrics(container, elementsMap);
     if (segments.length === 0) {
