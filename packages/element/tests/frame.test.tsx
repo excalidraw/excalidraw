@@ -15,6 +15,8 @@ import {
 import { getSelectedElements } from "@excalidraw/excalidraw/scene";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 
+import type { AppState } from "@excalidraw/excalidraw/types";
+
 import { elementOverlapsWithFrame, shouldApplyFrameClip } from "../src/frame";
 
 import type {
@@ -1186,7 +1188,81 @@ describe("adding elements to frames", () => {
 });
 
 describe("shouldApplyFrameClip", () => {
-  const appState = getDefaultAppState();
+  const appState = getDefaultAppState() as AppState;
+
+  afterEach(() => {
+    // avoid leaking a mocked DPR into unrelated tests
+    window.devicePixelRatio = 1;
+  });
+
+  it("does not over-clip at DPR 2, where the device-pixel render padding converts to a smaller scene-unit margin", () => {
+    window.devicePixelRatio = 2;
+
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+    });
+
+    // fontSize 40 => 20 device-pixel canvas padding, which is 10 scene
+    // units at DPR 2 (20 / devicePixelRatio). The text's right edge sits
+    // 15 scene units from the frame's right edge (x: 145-185, frame edge at
+    // x=200), so the 10-unit padded bounds (right edge at x=195) stay
+    // fully inside the frame and no clip is needed. A DPR-blind formula
+    // (flat `fontSize / 2` = 20 scene units) would incorrectly push the
+    // padded right edge to x=205, past the frame edge, and trigger a
+    // needless clip.
+    const text = API.createElement({
+      type: "text",
+      x: 145,
+      y: 90,
+      width: 40,
+      height: 45,
+      fontSize: 40,
+      frameId: frame.id,
+    });
+
+    const elementsMap = arrayToMap([frame, text]);
+
+    expect(shouldApplyFrameClip(text, frame, appState, elementsMap)).toBe(
+      false,
+    );
+  });
+
+  it("clips at DPR 0.5, where the device-pixel render padding converts to a larger scene-unit margin", () => {
+    window.devicePixelRatio = 0.5;
+
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+    });
+
+    // fontSize 40 => 20 device-pixel canvas padding, which is 40 scene
+    // units at DPR 0.5 (20 / devicePixelRatio). The text's right edge sits
+    // 30 scene units from the frame's right edge (x: 140-170, frame edge at
+    // x=200), so the 40-unit padded bounds (right edge at x=210) cross the
+    // frame edge and a clip is required. A DPR-blind formula (flat
+    // `fontSize / 2` = 20 scene units) would only reach x=190 and miss this
+    // real overflow, letting glyph pixels bleed past the frame unclipped.
+    const text = API.createElement({
+      type: "text",
+      x: 140,
+      y: 90,
+      width: 30,
+      height: 45,
+      fontSize: 40,
+      frameId: frame.id,
+    });
+
+    const elementsMap = arrayToMap([frame, text]);
+
+    expect(shouldApplyFrameClip(text, frame, appState, elementsMap)).toBe(true);
+  });
 
   it("clips a standalone text element whose logical bounds sit fully inside the frame but whose rendered glyph padding (fontSize / 2) bleeds past the frame edge", () => {
     const frame = API.createElement({

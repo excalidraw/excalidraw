@@ -43,6 +43,7 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+import { getCanvasPadding } from "./canvasPadding";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -89,22 +90,6 @@ const isPendingImageElement = (
 ) =>
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
-
-const getCanvasPadding = (element: ExcalidrawElement) => {
-  switch (element.type) {
-    case "freedraw":
-      return element.strokeWidth * 12;
-    case "text":
-      return element.fontSize / 2;
-    case "arrow":
-      if (element.endArrowhead || element.endArrowhead) {
-        return 40;
-      }
-      return 20;
-    default:
-      return 20;
-  }
-};
 
 export const getRenderOpacity = (
   element: ExcalidrawElement,
