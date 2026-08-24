@@ -1695,7 +1695,7 @@ describe("Test Linear Elements", () => {
             width: 30,
             height: 60,
           }),
-          pathParameter: 0.5,
+          labelPosition: 0.5,
         } as ExcalidrawTextElementWithContainer;
 
         return {
@@ -1734,7 +1734,7 @@ describe("Test Linear Elements", () => {
         drag(labelOnlyPoint, pointFrom<GlobalPoint>(50, 45));
 
         expect(
-          (h.elements[2] as ExcalidrawTextElementWithContainer).pathParameter,
+          (h.elements[2] as ExcalidrawTextElementWithContainer).labelPosition,
         ).toBeCloseTo(0.75);
       });
 
@@ -1749,7 +1749,7 @@ describe("Test Linear Elements", () => {
         drag(labelOnlyPoint, pointFrom<GlobalPoint>(50, 45));
 
         expect(
-          (h.elements[1] as ExcalidrawTextElementWithContainer).pathParameter,
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
         ).toBe(0.5);
       });
 
@@ -1774,7 +1774,7 @@ describe("Test Linear Elements", () => {
           3,
         );
         expect(
-          (h.elements[1] as ExcalidrawTextElementWithContainer).pathParameter,
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
         ).toBe(0.5);
       });
     });

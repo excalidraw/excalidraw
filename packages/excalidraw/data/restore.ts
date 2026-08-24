@@ -556,8 +556,8 @@ export const restoreElement = (
         originalText: element.originalText || text,
         autoResize: element.autoResize ?? true,
         lineHeight,
-        pathParameter: isFiniteNumber(element.pathParameter)
-          ? clamp(element.pathParameter, 0, 1)
+        labelPosition: isFiniteNumber(element.labelPosition)
+          ? clamp(element.labelPosition, 0, 1)
           : null,
       });
 

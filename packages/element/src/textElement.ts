@@ -532,4 +532,4 @@ export const getTextFromElements = (
   return text;
 };
 
-export const DEFAULT_BOUND_TEXT_PATH_PARAMETER = 0.5;
+export const DEFAULT_BOUND_TEXT_LABEL_POSITION = 0.5;

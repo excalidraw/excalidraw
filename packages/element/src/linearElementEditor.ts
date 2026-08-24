@@ -1976,14 +1976,14 @@ export class LinearElementEditor {
       ? curveLengthAtParameter(segment, bestParameter)
       : bestParameter * lengths[bestSegmentIndex];
 
-    const pathParameter = clamp(
+    const labelPosition = clamp(
       (prefixSums[bestSegmentIndex] + lengthWithinSegment) / totalLength,
       0,
       1,
     );
     const pathPoint = LinearElementEditor.getPointAtPathParameter(
       element,
-      pathParameter,
+      labelPosition,
       elementsMap,
     );
     if (!pathPoint) {
@@ -1991,7 +1991,7 @@ export class LinearElementEditor {
     }
 
     scene.mutateElement(boundTextElement, {
-      pathParameter,
+      labelPosition,
       x: pathPoint[0] - boundTextElement.width / 2,
       y: pathPoint[1] - boundTextElement.height / 2,
     });
@@ -2050,11 +2050,11 @@ export class LinearElementEditor {
       mutateElement(boundTextElement, elementsMap, { isDeleted: true });
     } else if (
       isArrowElement(element) &&
-      boundTextElement.pathParameter != null
+      boundTextElement.labelPosition != null
     ) {
       const pathPoint = LinearElementEditor.getPointAtPathParameter(
         element,
-        boundTextElement.pathParameter,
+        boundTextElement.labelPosition,
         elementsMap,
       );
 

@@ -258,7 +258,7 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
-  DEFAULT_BOUND_TEXT_PATH_PARAMETER,
+  DEFAULT_BOUND_TEXT_LABEL_POSITION,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6907,7 +6907,7 @@ class App extends React.Component<AppProps, AppState> {
       if (isArrowElement(container)) {
         // default positioning for bound text on arrows
         this.scene.mutateElement(element, {
-          pathParameter: DEFAULT_BOUND_TEXT_PATH_PARAMETER,
+          labelPosition: DEFAULT_BOUND_TEXT_LABEL_POSITION,
         });
       }
 

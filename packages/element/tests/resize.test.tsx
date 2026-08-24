@@ -540,7 +540,7 @@ describe("arrow element", () => {
       const centerY = labelPos.y + label.height / 2;
       const pathMidpoint = sampledPathMidpoint();
 
-      expect(label.pathParameter).toBe(0.5);
+      expect(label.labelPosition).toBe(0.5);
       expect(centerX).toBeCloseTo(pathMidpoint[0], 0);
       expect(centerY).toBeCloseTo(pathMidpoint[1], 0);
       expect(

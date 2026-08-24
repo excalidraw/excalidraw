@@ -260,7 +260,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      * container's whole path. Independent of how the path is segmented,
      * so it survives midpoint insertion and other geometry changes.
      * */
-    pathParameter?: number | null;
+    labelPosition?: number | null;
   }>;
 
 export type ExcalidrawBindableElement =
