@@ -38,7 +38,7 @@ import {
   isPathALoop,
   moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
-  getBoundTextPathParameter,
+  hitElementBoundText,
   type LinearPathSegment,
   type Store,
 } from "@excalidraw/element";
@@ -150,6 +150,7 @@ export class LinearElementEditor {
       index: number | null;
       added: boolean;
     };
+    hitBoundText: boolean;
     arrowStartIsInside: boolean;
     altFocusPoint: Readonly<GlobalPoint> | null;
     arrowOtherEndpointInitialBinding: FixedPointBinding | null;
@@ -167,7 +168,6 @@ export class LinearElementEditor {
   public readonly elbowed: boolean;
   public readonly customLineAngle: number | null;
   public readonly isEditing: boolean;
-  public readonly lastBoundTextPathParameter: number | null;
 
   // @deprecated renamed to initialState because the data is used during linear
   // element click creation as well (with multiple pointer down events)
@@ -205,6 +205,7 @@ export class LinearElementEditor {
         index: null,
         added: false,
       },
+      hitBoundText: false,
       arrowStartIsInside: false,
       arrowOtherEndpointInitialBinding: null,
       altFocusPoint: null,
@@ -216,7 +217,6 @@ export class LinearElementEditor {
     this.elbowed = isElbowArrow(element) && element.elbowed;
     this.customLineAngle = null;
     this.isEditing = isEditing;
-    this.lastBoundTextPathParameter = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -791,6 +791,7 @@ export class LinearElementEditor {
       initialState: {
         ...editingLinearElement.initialState,
         origin: null,
+        hitBoundText: false,
         arrowStartIsInside: false,
         arrowOtherEndpointInitialBinding: null,
       },
@@ -1110,6 +1111,7 @@ export class LinearElementEditor {
             index: segmentMidpointIndex,
             added: false,
           },
+          hitBoundText: false,
           arrowStartIsInside:
             !!app.state.newElement &&
             (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
@@ -1133,46 +1135,27 @@ export class LinearElementEditor {
       scenePointer.y,
     );
 
-    const boundTextHit =
-      clickedPointIndex < 0
-        ? getBoundTextHit(element, elementsMap, scenePointer)
-        : null;
-
-    if (boundTextHit) {
-      const { boundTextElement, x: textX, y: textY } = boundTextHit;
-
-      ret.hitElement = element;
-      ret.linearElementEditor = {
-        ...linearElementEditor,
-        isDragging: true,
-        lastBoundTextPathParameter: getBoundTextPathParameter(
-          boundTextElement,
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+    let boundTextGrabOffset: { x: number; y: number } | null = null;
+    if (
+      clickedPointIndex < 0 &&
+      boundTextElement &&
+      isArrowElement(element) &&
+      hitElementBoundText(point, element, elementsMap)
+    ) {
+      const { x: textX, y: textY } =
+        LinearElementEditor.getBoundTextElementPosition(
           element,
-        ),
-        initialState: {
-          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
-          lastClickedPoint: -1,
-          origin: point,
-          segmentMidpoint: {
-            value: null,
-            index: null,
-            added: false,
-          },
-          arrowStartIsInside: false,
-          altFocusPoint: null,
-          arrowOtherEndpointInitialBinding: null,
-        },
-        selectedPointsIndices: null,
-        pointerOffset: {
-          x: scenePointer.x - (textX + boundTextElement.width / 2),
-          y: scenePointer.y - (textY + boundTextElement.height / 2),
-        },
+          boundTextElement,
+          elementsMap,
+        );
+      boundTextGrabOffset = {
+        x: scenePointer.x - (textX + boundTextElement.width / 2),
+        y: scenePointer.y - (textY + boundTextElement.height / 2),
       };
-
-      return ret;
     }
 
-    if (clickedPointIndex >= 0 || segmentMidpoint) {
+    if (clickedPointIndex >= 0 || segmentMidpoint || boundTextGrabOffset) {
       ret.hitElement = element;
     }
 
@@ -1207,10 +1190,12 @@ export class LinearElementEditor {
         lastClickedPoint: clickedPointIndex,
         origin: point,
         segmentMidpoint: {
-          value: segmentMidpoint,
-          index: segmentMidpointIndex,
+          // the label covers the midpoint handle underneath it
+          value: boundTextGrabOffset ? null : segmentMidpoint,
+          index: boundTextGrabOffset ? null : segmentMidpointIndex,
           added: false,
         },
+        hitBoundText: !!boundTextGrabOffset,
         arrowStartIsInside:
           !!app.state.newElement &&
           (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
@@ -1225,7 +1210,7 @@ export class LinearElementEditor {
             x: scenePointer.x - targetPoint[0],
             y: scenePointer.y - targetPoint[1],
           }
-        : { x: 0, y: 0 },
+        : boundTextGrabOffset ?? { x: 0, y: 0 },
     };
 
     return ret;
@@ -2015,7 +2000,6 @@ export class LinearElementEditor {
     return {
       ...linearElementEditor,
       isDragging: true,
-      lastBoundTextPathParameter: pathParameter,
     };
   }
 
@@ -2729,40 +2713,3 @@ const pathSegmentLength = (segment: LinearPathSegment): number =>
   isCurve(segment)
     ? curveLength(segment)
     : pointDistance(segment[0], segment[1]);
-
-/**
- * Returns the bound text of an arrow together with its rendered position if
- * the scene pointer is over it, `null` otherwise.
- */
-export const getBoundTextHit = (
-  element: NonDeleted<ExcalidrawElement>,
-  elementsMap: ElementsMap,
-  scenePointer: { x: number; y: number },
-): {
-  boundTextElement: ExcalidrawTextElementWithContainer;
-  x: number;
-  y: number;
-} | null => {
-  if (!isArrowElement(element)) {
-    return null;
-  }
-
-  const boundTextElement = getBoundTextElement(element, elementsMap);
-
-  if (!boundTextElement) {
-    return null;
-  }
-
-  const { x, y } = LinearElementEditor.getBoundTextElementPosition(
-    element,
-    boundTextElement,
-    elementsMap,
-  );
-
-  return scenePointer.x >= x &&
-    scenePointer.x <= x + boundTextElement.width &&
-    scenePointer.y >= y &&
-    scenePointer.y <= y + boundTextElement.height
-    ? { boundTextElement, x, y }
-    : null;
-};

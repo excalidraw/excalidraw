@@ -86,7 +86,8 @@ export const actionFinalize = register<FormData>({
 
       if (
         isBindingElement(element) &&
-        !appState.selectedLinearElement.segmentMidPointHoveredCoords
+        !appState.selectedLinearElement.segmentMidPointHoveredCoords &&
+        !appState.selectedLinearElement.initialState.hitBoundText
       ) {
         const newArrow = !!appState.newElement;
 

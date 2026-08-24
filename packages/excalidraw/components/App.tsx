@@ -259,7 +259,6 @@ import {
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
   getBoundTextPathParameter,
-  getBoundTextHit,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6753,13 +6752,15 @@ class App extends React.Component<AppProps, AppState> {
         shouldBindToContainer = true;
       }
     }
-    // The endpoint flow always creates a fresh text: the lookups below would
-    // otherwise adopt a currently selected text (wherever it sits on canvas)
-    // or one that happens to lie around the anchor — even a container-bound
-    // one — and bind the arrow to that instead.
     const existingTextElement = arrowEndpointBinding
       ? null
       : this.getSelectedTextElement(container) ||
+        (container && isArrowElement(container)
+          ? getBoundTextElement(
+              container,
+              this.scene.getNonDeletedElementsMap(),
+            )
+          : null) ||
         this.getTextElementAtPosition(sceneX, sceneY);
 
     const fontFamily =
@@ -8170,10 +8171,19 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = true;
   };
 
+  /**
+   * Applies the hover affordances of a selected linear element: the cursor,
+   * plus the hovered-handle state that renders them highlighted.
+   *
+   * `cursorOnly` skips the state updates (and the rerender they cost) for
+   * callers that only need the cursor restored — the handle highlights
+   * follow on the next pointermove anyway.
+   */
   handleHoverSelectedLinearElement(
     linearElementEditor: LinearElementEditor,
     scenePointerX: number,
     scenePointerY: number,
+    { cursorOnly = false }: { cursorOnly?: boolean } = {},
   ) {
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -8191,10 +8201,13 @@ class App extends React.Component<AppProps, AppState> {
       // an arrow's bound text is draggable along the arrow, so it shows the
       // drag cursor and takes precedence over the segment midpoint handle
       // sitting underneath it (but not over the point handles)
-      const hoveredBoundText = getBoundTextHit(element, elementsMap, {
-        x: scenePointerX,
-        y: scenePointerY,
-      });
+      const hoveredBoundText =
+        isArrowElement(element) &&
+        hitElementBoundText(
+          pointFrom(scenePointerX, scenePointerY),
+          element,
+          elementsMap,
+        );
 
       if (
         hitElementItself({
@@ -8229,7 +8242,7 @@ class App extends React.Component<AppProps, AppState> {
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           this.cursor.set(CURSOR_TYPE.POINTER);
         } else if (hoveredBoundText) {
-          this.cursor.set(CURSOR_TYPE.MOVE);
+          this.cursor.set(CURSOR_TYPE.GRAB);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           if (
             // Elbow arrows can only be moved when unconnected
@@ -8245,7 +8258,7 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
       } else if (hoveredBoundText) {
-        this.cursor.set(CURSOR_TYPE.MOVE);
+        this.cursor.set(CURSOR_TYPE.GRAB);
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
           // Elbow arrow can only be moved when unconnected
@@ -8262,6 +8275,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        !cursorOnly &&
         this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
       ) {
         this.setState({
@@ -8273,6 +8287,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        !cursorOnly &&
         !LinearElementEditor.arePointsEqual(
           this.state.selectedLinearElement.segmentMidPointHoveredCoords,
           segmentMidPointHoveredCoords,
@@ -8300,8 +8315,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        !cursorOnly &&
         this.state.selectedLinearElement.hoveredFocusPointBinding !==
-        hoveredFocusPointBinding
+          hoveredFocusPointBinding
       ) {
         this.setState({
           selectedLinearElement: {
@@ -8320,6 +8336,37 @@ class App extends React.Component<AppProps, AppState> {
       this.cursor.set(CURSOR_TYPE.AUTO);
     }
   }
+
+  private refreshHoverCursor = () => {
+    const event = this.lastPointerUpEvent;
+
+    if (
+      !event ||
+      this.state.viewModeEnabled ||
+      (this.state.activeTool.type !== "selection" &&
+        this.state.activeTool.type !== "lasso")
+    ) {
+      return;
+    }
+
+    const scenePointer = viewportCoordsToSceneCoords(event, this.state);
+
+    if (this.state.selectedLinearElement) {
+      this.handleHoverSelectedLinearElement(
+        this.state.selectedLinearElement,
+        scenePointer.x,
+        scenePointer.y,
+        { cursorOnly: true },
+      );
+    } else if (
+      this.isHittingCommonBoundingBoxOfSelectedElements(
+        scenePointer,
+        this.scene.getSelectedElements(this.state),
+      )
+    ) {
+      this.cursor.set(CURSOR_TYPE.MOVE);
+    }
+  };
 
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
@@ -9351,6 +9398,27 @@ class App extends React.Component<AppProps, AppState> {
             linearElementEditor,
             this.scene,
           );
+
+          if (ret.linearElementEditor?.initialState.hitBoundText) {
+            const topHitElement = this.getElementAtPosition(
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+            );
+            if (
+              topHitElement &&
+              topHitElement.id !== linearElementEditor.elementId
+            ) {
+              ret.hitElement = null;
+              ret.linearElementEditor = {
+                ...ret.linearElementEditor,
+                initialState: {
+                  ...ret.linearElementEditor.initialState,
+                  hitBoundText: false,
+                },
+                pointerOffset: { x: 0, y: 0 },
+              };
+            }
+          }
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
           }
@@ -9765,8 +9833,20 @@ class App extends React.Component<AppProps, AppState> {
 
       if (hasBoundTextElement(element)) {
         container = element as NonDeleted<ExcalidrawTextContainer>;
-        sceneX = element.x + element.width / 2;
-        sceneY = element.y + element.height / 2;
+        const elementsMap = this.scene.getNonDeletedElementsMap();
+        const boundTextElement = getBoundTextElement(element, elementsMap);
+        if (boundTextElement && isArrowElement(element)) {
+          const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+            element,
+            boundTextElement,
+            elementsMap,
+          );
+          sceneX = x + boundTextElement.width / 2;
+          sceneY = y + boundTextElement.height / 2;
+        } else {
+          sceneX = element.x + element.width / 2;
+          sceneY = element.y + element.height / 2;
+        }
       }
       this.startTextEditing({
         sceneX,
@@ -10652,22 +10732,29 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        // Here is where we could potentially account for dragging of bound text elements
-        if (
-          linearElementEditor.isDragging &&
-          linearElementEditor.lastBoundTextPathParameter != null
-        ) {
-          const updatedEditor = LinearElementEditor.handleBoundTextDragging(
-            linearElementEditor,
-            this.scene,
-            pointerCoords.x,
-            pointerCoords.y,
-          );
-          if (updatedEditor) {
-            pointerDownState.drag.hasOccurred = true;
-            this.setState({
-              selectedLinearElement: updatedEditor,
-            });
+        if (linearElementEditor.initialState.hitBoundText) {
+          this.cursor.set(CURSOR_TYPE.GRABBING);
+
+          if (
+            linearElementEditor.isDragging ||
+            pointDistance(
+              pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+              pointFrom(pointerCoords.x, pointerCoords.y),
+            ) >=
+              DRAGGING_THRESHOLD / this.state.zoom.value
+          ) {
+            const updatedEditor = LinearElementEditor.handleBoundTextDragging(
+              linearElementEditor,
+              this.scene,
+              pointerCoords.x,
+              pointerCoords.y,
+            );
+            if (updatedEditor) {
+              pointerDownState.drag.hasOccurred = true;
+              this.setState({
+                selectedLinearElement: updatedEditor,
+              });
+            }
           }
           return;
         }
@@ -11584,8 +11671,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         this.state.selectedLinearElement?.isEditing &&
         !this.state.newElement &&
-        this.state.selectedLinearElement.draggedFocusPointBinding === null &&
-        this.state.selectedLinearElement.lastBoundTextPathParameter == null
+        this.state.selectedLinearElement.draggedFocusPointBinding === null
       ) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
@@ -11643,16 +11729,6 @@ class App extends React.Component<AppProps, AppState> {
             },
           });
         } else if (
-          this.state.selectedLinearElement.lastBoundTextPathParameter != null
-        ) {
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              lastBoundTextPathParameter: null,
-              isDragging: false,
-            },
-          });
-        } else if (
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
         ) {
@@ -11666,11 +11742,25 @@ class App extends React.Component<AppProps, AppState> {
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
               isDragging: false,
+              initialState: {
+                ...this.state.selectedLinearElement.initialState,
+                hitBoundText: false,
+              },
             },
           });
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
+          });
+        } else if (this.state.selectedLinearElement.initialState.hitBoundText) {
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              initialState: {
+                ...this.state.selectedLinearElement.initialState,
+                hitBoundText: false,
+              },
+            },
           });
         }
 
@@ -12471,13 +12561,19 @@ class App extends React.Component<AppProps, AppState> {
             }),
           },
           // reset once the tool revert has settled
-          () => this.cursor.reset(),
+          () => {
+            this.cursor.reset();
+            this.refreshHoverCursor();
+          },
         );
       } else {
-        this.setState({
-          newElement: null,
-          suggestedBinding: null,
-        });
+        this.setState(
+          {
+            newElement: null,
+            suggestedBinding: null,
+          },
+          () => this.refreshHoverCursor(),
+        );
       }
     });
   }
