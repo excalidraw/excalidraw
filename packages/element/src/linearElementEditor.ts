@@ -1132,57 +1132,48 @@ export class LinearElementEditor {
       scenePointer.x,
       scenePointer.y,
     );
-    // if we clicked on a point, set the element as hitElement otherwise
-    // it would get deselected if the point is outside the hitbox area
+
+    const boundTextHit =
+      clickedPointIndex < 0
+        ? getBoundTextHit(element, elementsMap, scenePointer)
+        : null;
+
+    if (boundTextHit) {
+      const { boundTextElement, x: textX, y: textY } = boundTextHit;
+
+      ret.hitElement = element;
+      ret.linearElementEditor = {
+        ...linearElementEditor,
+        isDragging: true,
+        lastBoundTextPathParameter: getBoundTextPathParameter(
+          boundTextElement,
+          element,
+        ),
+        initialState: {
+          prevSelectedPointsIndices: linearElementEditor.selectedPointsIndices,
+          lastClickedPoint: -1,
+          origin: point,
+          segmentMidpoint: {
+            value: null,
+            index: null,
+            added: false,
+          },
+          arrowStartIsInside: false,
+          altFocusPoint: null,
+          arrowOtherEndpointInitialBinding: null,
+        },
+        selectedPointsIndices: null,
+        pointerOffset: {
+          x: scenePointer.x - (textX + boundTextElement.width / 2),
+          y: scenePointer.y - (textY + boundTextElement.height / 2),
+        },
+      };
+
+      return ret;
+    }
+
     if (clickedPointIndex >= 0 || segmentMidpoint) {
       ret.hitElement = element;
-    } else if (isArrowElement(element)) {
-      // if the element has bound text, hitTest, if valid maintain hit element as linear element
-      const boundTextElement = getBoundTextElement(element, elementsMap);
-      if (boundTextElement) {
-        const { x: textX, y: textY } = this.getBoundTextElementPosition(
-          element,
-          boundTextElement,
-          elementsMap,
-        );
-        if (
-          scenePointer.x >= textX &&
-          scenePointer.x <= textX + boundTextElement.width &&
-          scenePointer.y >= textY &&
-          scenePointer.y <= textY + boundTextElement.height
-        ) {
-          ret.hitElement = element;
-          // alter ret for the the case of dragging the bound text of an arrow element
-          ret.linearElementEditor = {
-            ...linearElementEditor,
-            isDragging: true,
-            lastBoundTextPathParameter: getBoundTextPathParameter(
-              boundTextElement,
-              element,
-            ),
-            initialState: {
-              prevSelectedPointsIndices:
-                linearElementEditor.selectedPointsIndices,
-              lastClickedPoint: -1,
-              origin: point,
-              segmentMidpoint: {
-                value: null,
-                index: null,
-                added: false,
-              },
-              arrowStartIsInside: false,
-              altFocusPoint: null,
-              arrowOtherEndpointInitialBinding: null,
-            },
-            selectedPointsIndices: null,
-            pointerOffset: {
-              x: scenePointer.x - (textX + boundTextElement.width / 2),
-              y: scenePointer.y - (textY + boundTextElement.height / 2),
-            },
-          };
-          return ret;
-        }
-      }
     }
 
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -2738,3 +2729,40 @@ const pathSegmentLength = (segment: LinearPathSegment): number =>
   isCurve(segment)
     ? curveLength(segment)
     : pointDistance(segment[0], segment[1]);
+
+/**
+ * Returns the bound text of an arrow together with its rendered position if
+ * the scene pointer is over it, `null` otherwise.
+ */
+export const getBoundTextHit = (
+  element: NonDeleted<ExcalidrawElement>,
+  elementsMap: ElementsMap,
+  scenePointer: { x: number; y: number },
+): {
+  boundTextElement: ExcalidrawTextElementWithContainer;
+  x: number;
+  y: number;
+} | null => {
+  if (!isArrowElement(element)) {
+    return null;
+  }
+
+  const boundTextElement = getBoundTextElement(element, elementsMap);
+
+  if (!boundTextElement) {
+    return null;
+  }
+
+  const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+    element,
+    boundTextElement,
+    elementsMap,
+  );
+
+  return scenePointer.x >= x &&
+    scenePointer.x <= x + boundTextElement.width &&
+    scenePointer.y >= y &&
+    scenePointer.y <= y + boundTextElement.height
+    ? { boundTextElement, x, y }
+    : null;
+};

@@ -259,6 +259,7 @@ import {
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
   getBoundTextPathParameter,
+  getBoundTextHit,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -8187,6 +8188,14 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
       let segmentMidPointHoveredCoords = null;
+      // an arrow's bound text is draggable along the arrow, so it shows the
+      // drag cursor and takes precedence over the segment midpoint handle
+      // sitting underneath it (but not over the point handles)
+      const hoveredBoundText = getBoundTextHit(element, elementsMap, {
+        x: scenePointerX,
+        y: scenePointerY,
+      });
+
       if (
         hitElementItself({
           point: pointFrom(scenePointerX, scenePointerY),
@@ -8202,27 +8211,24 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        segmentMidPointHoveredCoords =
-          LinearElementEditor.getSegmentMidpointHitCoords(
-            linearElementEditor,
-            { x: scenePointerX, y: scenePointerY },
-            this.state,
-            this.scene.getNonDeletedElementsMap(),
-          );
         const isHoveringAPointHandle = isElbowArrow(element)
           ? hoverPointIndex === 0 ||
             hoverPointIndex === element.points.length - 1
           : hoverPointIndex >= 0;
+
+        if (!isHoveringAPointHandle && !hoveredBoundText) {
+          segmentMidPointHoveredCoords =
+            LinearElementEditor.getSegmentMidpointHitCoords(
+              linearElementEditor,
+              { x: scenePointerX, y: scenePointerY },
+              this.state,
+              this.scene.getNonDeletedElementsMap(),
+            );
+        }
+
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           this.cursor.set(CURSOR_TYPE.POINTER);
-        } else if (
-          isArrowElement(element) &&
-          hitElementBoundText(
-            pointFrom(scenePointerX, scenePointerY),
-            element,
-            elementsMap,
-          )
-        ) {
+        } else if (hoveredBoundText) {
           this.cursor.set(CURSOR_TYPE.MOVE);
         } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
           if (
@@ -8238,6 +8244,8 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
         }
+      } else if (hoveredBoundText) {
+        this.cursor.set(CURSOR_TYPE.MOVE);
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
         if (
           // Elbow arrow can only be moved when unconnected
