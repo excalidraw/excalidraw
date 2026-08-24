@@ -1153,6 +1153,7 @@ export type AppClassProperties = {
 
   setAppState: App["setAppState"];
 
+  isBoundTextGrabbable: App["isBoundTextGrabbable"];
   isInteractionEnabled: App["isInteractionEnabled"];
   isNavigationEnabled: App["isNavigationEnabled"];
 };

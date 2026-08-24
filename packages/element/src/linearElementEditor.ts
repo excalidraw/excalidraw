@@ -33,15 +33,15 @@ import {
 
 import {
   deconstructLinearOrFreeDrawElement,
-  getLinearElementPathSegments,
   getSnapOutlineMidPoint,
   isPathALoop,
   moveArrowAboveBindable,
   projectFixedPointOntoDiagonal,
-  hitElementBoundText,
-  type LinearPathSegment,
   type Store,
+  getLinearElementPathSegments,
 } from "@excalidraw/element";
+
+import type { LinearPathSegment } from "@excalidraw/element";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -1141,7 +1141,7 @@ export class LinearElementEditor {
       clickedPointIndex < 0 &&
       boundTextElement &&
       isArrowElement(element) &&
-      hitElementBoundText(point, element, elementsMap)
+      app.isBoundTextGrabbable(element, scenePointer.x, scenePointer.y)
     ) {
       const { x: textX, y: textY } =
         LinearElementEditor.getBoundTextElementPosition(
@@ -1940,8 +1940,9 @@ export class LinearElementEditor {
       pointerX - linearElementEditor.pointerOffset.x,
       pointerY - linearElementEditor.pointerOffset.y,
     );
-    const segments = getLinearElementPathSegments(element, elementsMap);
-    if (segments.length === 0) {
+    const { segments, lengths, prefixSums, totalLength } =
+      getLinearElementPathMetrics(element, elementsMap);
+    if (segments.length === 0 || totalLength === 0) {
       return null;
     }
 
@@ -1961,11 +1962,6 @@ export class LinearElementEditor {
     }
 
     const segment = segments[bestSegmentIndex];
-    const lengths = segments.map(pathSegmentLength);
-    const totalLength = lengths.reduce((sum, length) => sum + length, 0);
-    if (totalLength === 0) {
-      return null;
-    }
 
     let lengthWithinSegment;
     let pathPoint: GlobalPoint;
@@ -1982,9 +1978,7 @@ export class LinearElementEditor {
       );
     }
 
-    const lengthBeforeSegment = lengths
-      .slice(0, bestSegmentIndex)
-      .reduce((sum, length) => sum + length, 0);
+    const lengthBeforeSegment = prefixSums[bestSegmentIndex];
     const pathParameter = clamp(
       (lengthBeforeSegment + lengthWithinSegment) / totalLength,
       0,
@@ -2008,24 +2002,22 @@ export class LinearElementEditor {
     pathParameter: number,
     elementsMap: ElementsMap,
   ): GlobalPoint | null {
-    const segments = getLinearElementPathSegments(container, elementsMap);
+    const { segments, lengths, prefixSums, totalLength } =
+      getLinearElementPathMetrics(container, elementsMap);
     if (segments.length === 0) {
       return null;
     }
 
-    const lengths = segments.map(pathSegmentLength);
-    const totalLength = lengths.reduce((sum, length) => sum + length, 0);
     const targetLength = clamp(pathParameter, 0, 1) * totalLength;
 
-    let lengthBeforeSegment = 0;
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       const isLast = i === segments.length - 1;
-      if (targetLength <= lengthBeforeSegment + lengths[i] || isLast) {
+      if (targetLength <= prefixSums[i + 1] || isLast) {
         const lengthFraction =
           lengths[i] === 0
             ? 0
-            : clamp((targetLength - lengthBeforeSegment) / lengths[i], 0, 1);
+            : clamp((targetLength - prefixSums[i]) / lengths[i], 0, 1);
 
         if (isCurve(segment)) {
           return curvePointAtLength(segment, lengthFraction);
@@ -2035,7 +2027,6 @@ export class LinearElementEditor {
           segment[0][1] + lengthFraction * (segment[1][1] - segment[0][1]),
         );
       }
-      lengthBeforeSegment += lengths[i];
     }
 
     return null;
@@ -2708,6 +2699,56 @@ const determineCustomLinearAngle = (
   draggedPoint: LocalPoint,
 ) =>
   Math.atan2(draggedPoint[1] - pivotPoint[1], draggedPoint[0] - pivotPoint[0]);
+
+type LinearElementPathMetrics = {
+  segments: LinearPathSegment[];
+  lengths: number[];
+  prefixSums: number[];
+  totalLength: number;
+};
+
+const LinearElementPathMetricsCache = new WeakMap<
+  ExcalidrawElement,
+  { version: ExcalidrawElement["version"]; metrics: LinearElementPathMetrics }
+>();
+
+function getLinearElementPathMetrics(
+  element: ExcalidrawLinearElement,
+  elementsMap: ElementsMap,
+): LinearElementPathMetrics {
+  const cached = LinearElementPathMetricsCache.get(element);
+
+  if (cached) {
+    if (cached.version === element.version) {
+      return cached.metrics;
+    }
+
+    LinearElementPathMetricsCache.delete(element);
+  }
+
+  const segments = getLinearElementPathSegments(element, elementsMap);
+  const lengths = segments.map(pathSegmentLength);
+  const prefixSums = new Array<number>(lengths.length + 1);
+
+  prefixSums[0] = 0;
+  for (let i = 0; i < lengths.length; i++) {
+    prefixSums[i + 1] = prefixSums[i] + lengths[i];
+  }
+
+  const metrics: LinearElementPathMetrics = {
+    segments,
+    lengths,
+    prefixSums,
+    totalLength: prefixSums[lengths.length],
+  };
+
+  LinearElementPathMetricsCache.set(element, {
+    version: element.version,
+    metrics,
+  });
+
+  return metrics;
+}
 
 const pathSegmentLength = (segment: LinearPathSegment): number =>
   isCurve(segment)

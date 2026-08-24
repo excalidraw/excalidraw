@@ -47,6 +47,7 @@ import type { AppState } from "../types";
 type FormData = {
   event: PointerEvent;
   sceneCoords: { x: number; y: number };
+  hitBoundText?: boolean;
 };
 
 export const actionFinalize = register<FormData>({
@@ -84,10 +85,14 @@ export const actionFinalize = register<FormData>({
         app.scene,
       );
 
+      const hitBoundText =
+        data.hitBoundText ??
+        appState.selectedLinearElement.initialState.hitBoundText;
+
       if (
         isBindingElement(element) &&
         !appState.selectedLinearElement.segmentMidPointHoveredCoords &&
-        !appState.selectedLinearElement.initialState.hitBoundText
+        !hitBoundText
       ) {
         const newArrow = !!appState.newElement;
 

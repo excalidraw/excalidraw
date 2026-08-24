@@ -533,6 +533,8 @@ export const getTextFromElements = (
   return text;
 };
 
+export const DEFAULT_BOUND_TEXT_PATH_PARAMETER = 0.5;
+
 /**
  * Returns the normalized arc-length parameter (0–1) at which the bound text
  * sits along its arrow container's path, defaulting to the path midpoint.
@@ -544,5 +546,5 @@ export const getBoundTextPathParameter = (
   if (!isArrowElement(container)) {
     return null;
   }
-  return element.pathParameter ?? 0.5;
+  return element.pathParameter ?? DEFAULT_BOUND_TEXT_PATH_PARAMETER;
 };

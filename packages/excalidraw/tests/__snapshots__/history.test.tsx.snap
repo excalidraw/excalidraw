@@ -16982,6 +16982,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "locked": false,
   "opacity": 100,
   "originalText": "ola",
+  "pathParameter": null,
   "roughness": 1,
   "roundness": null,
   "strokeColor": "#1e1e1e",
@@ -17407,6 +17408,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "containerId": "id0",
             "height": 25,
+            "pathParameter": null,
             "textAlign": "center",
             "version": 4,
             "verticalAlign": "middle",
@@ -17417,6 +17419,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "inserted": {
             "containerId": null,
             "height": 100,
+            "pathParameter": undefined,
             "textAlign": "left",
             "version": 2,
             "verticalAlign": "top",
@@ -17736,6 +17739,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "locked": false,
   "opacity": 100,
   "originalText": "ola",
+  "pathParameter": null,
   "roughness": 1,
   "roundness": null,
   "strokeColor": "#1e1e1e",
@@ -18051,6 +18055,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "containerId": "id0",
             "height": 25,
+            "pathParameter": null,
             "textAlign": "center",
             "version": 4,
             "verticalAlign": "middle",
@@ -18061,6 +18066,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "inserted": {
             "containerId": null,
             "height": 100,
+            "pathParameter": undefined,
             "textAlign": "left",
             "version": 2,
             "verticalAlign": "top",
@@ -18388,6 +18394,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "locked": false,
   "opacity": 100,
   "originalText": "ola",
+  "pathParameter": null,
   "roughness": 1,
   "roundness": null,
   "strokeColor": "#1e1e1e",
@@ -18703,6 +18710,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "containerId": "id0",
             "height": 25,
+            "pathParameter": null,
             "textAlign": "center",
             "version": 9,
             "verticalAlign": "middle",
@@ -18713,6 +18721,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "inserted": {
             "containerId": null,
             "height": 100,
+            "pathParameter": undefined,
             "textAlign": "left",
             "version": 8,
             "verticalAlign": "top",
@@ -19038,6 +19047,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "locked": false,
   "opacity": 100,
   "originalText": "ola",
+  "pathParameter": null,
   "roughness": 1,
   "roundness": null,
   "strokeColor": "#1e1e1e",
@@ -19439,6 +19449,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "containerId": "id0",
             "height": 25,
+            "pathParameter": null,
             "textAlign": "center",
             "version": 4,
             "verticalAlign": "middle",
@@ -19449,6 +19460,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "inserted": {
             "containerId": null,
             "height": 100,
+            "pathParameter": undefined,
             "textAlign": "left",
             "version": 2,
             "verticalAlign": "top",
@@ -19796,6 +19808,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "locked": false,
   "opacity": 100,
   "originalText": "ola",
+  "pathParameter": null,
   "roughness": 1,
   "roundness": null,
   "strokeColor": "#1e1e1e",
@@ -20193,6 +20206,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "deleted": {
             "containerId": "id0",
             "height": 25,
+            "pathParameter": null,
             "textAlign": "center",
             "version": 4,
             "verticalAlign": "middle",
@@ -20203,6 +20217,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
           "inserted": {
             "containerId": null,
             "height": 100,
+            "pathParameter": undefined,
             "textAlign": "left",
             "version": 2,
             "verticalAlign": "top",

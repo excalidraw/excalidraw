@@ -61,21 +61,22 @@ import type {
 
 export type LinearPathSegment = LineSegment<GlobalPoint> | Curve<GlobalPoint>;
 
-type ElementShape = [
-  LineSegment<GlobalPoint>[],
-  Curve<GlobalPoint>[],
-  LinearPathSegment[]?,
-];
+type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
+type LinearElementShape = [...ElementShape, LinearPathSegment[]];
+type CachedElementShape = ElementShape | LinearElementShape;
 
 const ElementShapesCache = new WeakMap<
   ExcalidrawElement,
-  { version: ExcalidrawElement["version"]; shapes: Map<number, ElementShape> }
+  {
+    version: ExcalidrawElement["version"];
+    shapes: Map<number, CachedElementShape>;
+  }
 >();
 
 const getElementShapesCacheEntry = <T extends ExcalidrawElement>(
   element: T,
   offset: number,
-): ElementShape | undefined => {
+): CachedElementShape | undefined => {
   const record = ElementShapesCache.get(element);
 
   if (!record) {
@@ -94,7 +95,7 @@ const getElementShapesCacheEntry = <T extends ExcalidrawElement>(
 
 const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
   element: T,
-  shape: ElementShape,
+  shape: CachedElementShape,
   offset: number,
 ) => {
   const record = ElementShapesCache.get(element);
@@ -131,16 +132,16 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
-): ElementShape {
+): LinearElementShape {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 
-  if (cachedShape) {
+  if (cachedShape?.length === 3) {
     return cachedShape;
   }
 
   const ops = generateLinearCollisionShape(element, elementsMap);
-  const lines = [];
-  const curves = [];
+  const lines: LineSegment<GlobalPoint>[] = [];
+  const curves: Curve<GlobalPoint>[] = [];
   const orderedSegments: LinearPathSegment[] = [];
 
   for (let idx = 0; idx < ops.length; idx += 1) {
@@ -202,7 +203,7 @@ export function deconstructLinearOrFreeDrawElement(
     }
   }
 
-  const shape = [lines, curves, orderedSegments] as ElementShape;
+  const shape: LinearElementShape = [lines, curves, orderedSegments];
   setElementShapesCacheEntry(element, shape, 0);
 
   return shape;
@@ -217,12 +218,12 @@ export function getLinearElementPathSegments(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
 ): LinearPathSegment[] {
-  const [lines, curves, orderedSegments] = deconstructLinearOrFreeDrawElement(
+  const [, , orderedSegments] = deconstructLinearOrFreeDrawElement(
     element,
     elementsMap,
   );
 
-  return orderedSegments ?? [...lines, ...curves];
+  return orderedSegments;
 }
 
 /**
@@ -239,7 +240,7 @@ export function deconstructRectanguloidElement(
 ): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
-  if (cachedShape) {
+  if (cachedShape?.length === 2) {
     return cachedShape;
   }
 
@@ -451,7 +452,7 @@ export function deconstructDiamondElement(
 ): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
-  if (cachedShape) {
+  if (cachedShape?.length === 2) {
     return cachedShape;
   }
 

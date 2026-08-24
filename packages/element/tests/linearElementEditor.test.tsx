@@ -1674,6 +1674,110 @@ describe("Test Linear Elements", () => {
       expect(label.x).toBe(0);
       expect(label.y).toBe(0);
     });
+
+    describe("dragging the label along the arrow", () => {
+      // a tall label, so its lower half is beyond the arrow's hit threshold:
+      // there the pointer is over the label but not over the arrow's path
+      const createArrowWithTallLabel = () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: p1[0],
+          y: p1[1],
+          width: p2[0] - p1[0],
+          height: 0,
+          points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], 0)],
+        });
+        const label = {
+          ...API.createElement({
+            type: "text",
+            text: "label",
+            containerId: arrow.id,
+            width: 30,
+            height: 60,
+          }),
+          pathParameter: 0.5,
+        } as ExcalidrawTextElementWithContainer;
+
+        return {
+          label,
+          arrow: {
+            ...arrow,
+            boundElements: [{ type: "text", id: label.id } as const],
+          },
+        };
+      };
+
+      // covers the label and the arrow's segment midpoint handle, but not the
+      // arrow's start point, so the arrow can still be selected by clicking it
+      const createOccluder = () =>
+        API.createElement({
+          type: "rectangle",
+          x: 30,
+          y: 5,
+          width: 30,
+          height: 50,
+          backgroundColor: "#ff0000",
+          fillStyle: "solid",
+        });
+
+      // inside the label, off the arrow's path
+      const labelOnlyPoint = pointFrom<GlobalPoint>(40, 45);
+
+      it("grabs the label when the covering element is below the arrow", () => {
+        const { arrow, label } = createArrowWithTallLabel();
+        API.setElements([createOccluder(), arrow, label]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        drag(labelOnlyPoint, pointFrom<GlobalPoint>(50, 45));
+
+        expect(
+          (h.elements[2] as ExcalidrawTextElementWithContainer).pathParameter,
+        ).toBeCloseTo(0.75);
+      });
+
+      it("does not grab the label when it is covered by an element above the arrow", () => {
+        const { arrow, label } = createArrowWithTallLabel();
+        API.setElements([arrow, label, createOccluder()]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        drag(labelOnlyPoint, pointFrom<GlobalPoint>(50, 45));
+
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).pathParameter,
+        ).toBe(0.5);
+      });
+
+      it("leaves the segment midpoint handle grabbable under a covered label", () => {
+        const { arrow, label } = createArrowWithTallLabel();
+        API.setElements([arrow, label, createOccluder()]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+        expect((h.elements[0] as ExcalidrawLinearElement).points.length).toBe(
+          2,
+        );
+
+        // the midpoint handle sits under the label, which is itself covered
+        drag(midpoint, pointFrom<GlobalPoint>(midpoint[0], midpoint[1] + 40));
+
+        expect(
+          h.state.selectedLinearElement?.initialState.segmentMidpoint.value,
+        ).not.toBeNull();
+        expect((h.elements[0] as ExcalidrawLinearElement).points.length).toBe(
+          3,
+        );
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).pathParameter,
+        ).toBe(0.5);
+      });
+    });
   });
 
   describe("Test moving linear element points", () => {

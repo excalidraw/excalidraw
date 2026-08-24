@@ -267,6 +267,22 @@ export function curveClosestParameter<Point extends GlobalPoint | LocalPoint>(
 }
 
 /**
+ * Finds the closest point on the Bezier curve from another point
+ *
+ * @param c The curve to test
+ * @param p The point to measure from
+ * @param tolerance The width of the search window under which the bisection
+ *   stops refining the parameter
+ */
+export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
+  c: Curve<Point>,
+  p: Point,
+  tolerance: number = 1e-3,
+): Point {
+  return bezierEquation(c, curveClosestParameter(c, p, tolerance));
+}
+
+/**
  * Determines the distance between a point and the closest point on the
  * Bezier curve.
  *
@@ -278,10 +294,7 @@ export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
   p: Point,
   tolerance: number = 1e-3,
 ) {
-  return pointDistance(
-    p,
-    bezierEquation(c, curveClosestParameter(c, p, tolerance)),
-  );
+  return pointDistance(p, curveClosestPoint(c, p, tolerance));
 }
 
 /**
