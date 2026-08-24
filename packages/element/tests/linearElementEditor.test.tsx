@@ -221,7 +221,9 @@ describe("Test Linear Elements", () => {
 
     // drag line from midpoint
     drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`10`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+      `10`,
+    );
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
@@ -1751,6 +1753,59 @@ describe("Test Linear Elements", () => {
         expect(
           (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
         ).toBe(0.5);
+      });
+
+      it("grabs an elbow arrow's label lying over an intermediate route point", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 0),
+            pointFrom<LocalPoint>(100, 100),
+          ],
+          elbowed: true,
+        });
+        const label = {
+          ...API.createElement({
+            type: "text",
+            text: "label",
+            containerId: arrow.id,
+            width: 30,
+            height: 30,
+          }),
+          // the arc-length middle of this symmetric elbow sits on the
+          // rounded corner, right next to the route point at (100, 0)
+          labelPosition: 0.5,
+        } as ExcalidrawTextElementWithContainer;
+        API.setElements([
+          {
+            ...arrow,
+            boundElements: [{ type: "text", id: label.id } as const],
+          },
+          label,
+        ]);
+
+        mouse.reset();
+        mouse.clickAt(0, 0);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        // inside the label AND within the hit radius of the route point at
+        // (100, 0) — pre-fix the route point swallowed this pointerdown and
+        // the label never moved
+        const grabPoint = pointFrom<GlobalPoint>(97, 3);
+
+        drag(
+          grabPoint,
+          pointFrom<GlobalPoint>(grabPoint[0] - 40, grabPoint[1]),
+        );
+
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).not.toBe(0.5);
       });
 
       it("gives the segment midpoint handle precedence over the label on top of it", () => {

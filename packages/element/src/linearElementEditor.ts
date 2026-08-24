@@ -1125,18 +1125,22 @@ export class LinearElementEditor {
       return ret;
     }
 
-    const clickedPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+    const pointIndexUnderCursor = LinearElementEditor.getPointIndexUnderCursor(
       element,
       elementsMap,
       appState.zoom,
       scenePointer.x,
       scenePointer.y,
     );
+    const clickedPointIsHandle = isElbowArrow(element)
+      ? pointIndexUnderCursor === 0 ||
+        pointIndexUnderCursor === element.points.length - 1
+      : pointIndexUnderCursor >= 0;
 
     const boundTextElement = getBoundTextElement(element, elementsMap);
     let boundTextGrabOffset: { x: number; y: number } | null = null;
     if (
-      clickedPointIndex < 0 &&
+      !clickedPointIsHandle &&
       // the segment midpoint knob keeps precedence over the label sitting
       // on top of it, so a labeled arrow can still be bent at its middle
       !segmentMidpoint &&
@@ -1155,6 +1159,10 @@ export class LinearElementEditor {
         y: scenePointer.y - (textY + boundTextElement.height / 2),
       };
     }
+
+    // when the label grab wins (possible over a non-interactive elbow route
+    // point), the click must not double as a point click
+    const clickedPointIndex = boundTextGrabOffset ? -1 : pointIndexUnderCursor;
 
     if (clickedPointIndex >= 0 || segmentMidpoint || boundTextGrabOffset) {
       ret.hitElement = element;
@@ -2053,11 +2061,9 @@ export class LinearElementEditor {
       elementsMap,
     );
     if (points.length < 2) {
-      mutateElement(boundTextElement, elementsMap, { isDeleted: true });
-    } else if (
-      isArrowElement(element) &&
-      boundTextElement.labelPosition != null
-    ) {
+      return { x: boundTextElement.x, y: boundTextElement.y };
+    }
+    if (isArrowElement(element) && boundTextElement.labelPosition != null) {
       const pathPoint = LinearElementEditor.getPointAtPathParameter(
         element,
         boundTextElement.labelPosition,

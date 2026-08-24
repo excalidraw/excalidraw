@@ -34,7 +34,10 @@ import { isArrowElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
-import { redrawTextBoundingBox } from "./textElement";
+import {
+  DEFAULT_BOUND_TEXT_LABEL_POSITION,
+  redrawTextBoundingBox,
+} from "./textElement";
 
 import { LinearElementEditor } from "./linearElementEditor";
 
@@ -232,6 +235,12 @@ const bindTextToContainer = (
     containerId: container.id,
     strokeColor: textProps.strokeColor || container.strokeColor,
   });
+
+  if (isArrowElement(container)) {
+    Object.assign(textElement, {
+      labelPosition: DEFAULT_BOUND_TEXT_LABEL_POSITION,
+    });
+  }
 
   Object.assign(container, {
     boundElements: (container.boundElements || []).concat({
