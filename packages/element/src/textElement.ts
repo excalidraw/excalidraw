@@ -37,7 +37,6 @@ import type {
   ElementsMap,
   ExcalidrawElement,
   ExcalidrawElementType,
-  ExcalidrawLinearElement,
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
@@ -534,17 +533,3 @@ export const getTextFromElements = (
 };
 
 export const DEFAULT_BOUND_TEXT_PATH_PARAMETER = 0.5;
-
-/**
- * Returns the normalized arc-length parameter (0–1) at which the bound text
- * sits along its arrow container's path, defaulting to the path midpoint.
- */
-export const getBoundTextPathParameter = (
-  element: ExcalidrawTextElement,
-  container: ExcalidrawLinearElement,
-): number | null => {
-  if (!isArrowElement(container)) {
-    return null;
-  }
-  return element.pathParameter ?? DEFAULT_BOUND_TEXT_PATH_PARAMETER;
-};

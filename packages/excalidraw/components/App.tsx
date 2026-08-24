@@ -258,7 +258,7 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
-  getBoundTextPathParameter,
+  DEFAULT_BOUND_TEXT_PATH_PARAMETER,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6907,7 +6907,7 @@ class App extends React.Component<AppProps, AppState> {
       if (isArrowElement(container)) {
         // default positioning for bound text on arrows
         this.scene.mutateElement(element, {
-          pathParameter: getBoundTextPathParameter(element, container),
+          pathParameter: DEFAULT_BOUND_TEXT_PATH_PARAMETER,
         });
       }
 
@@ -8201,16 +8201,11 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * Applies the hover affordances of a selected linear element: the cursor,
    * plus the hovered-handle state that renders them highlighted.
-   *
-   * `cursorOnly` skips the state updates (and the rerender they cost) for
-   * callers that only need the cursor restored — the handle highlights
-   * follow on the next pointermove anyway.
    */
   handleHoverSelectedLinearElement(
     linearElementEditor: LinearElementEditor,
     scenePointerX: number,
     scenePointerY: number,
-    { cursorOnly = false }: { cursorOnly?: boolean } = {},
   ) {
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -8300,7 +8295,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        !cursorOnly &&
         this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
       ) {
         this.setState({
@@ -8312,7 +8306,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        !cursorOnly &&
         !LinearElementEditor.arePointsEqual(
           this.state.selectedLinearElement.segmentMidPointHoveredCoords,
           segmentMidPointHoveredCoords,
@@ -8340,9 +8333,8 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        !cursorOnly &&
         this.state.selectedLinearElement.hoveredFocusPointBinding !==
-          hoveredFocusPointBinding
+        hoveredFocusPointBinding
       ) {
         this.setState({
           selectedLinearElement: {
@@ -8362,35 +8354,33 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  /**
+   * Replays a `pointermove` at the last known pointer position through the
+   * real canvas event path, so every hover affordance (cursor, handle
+   * highlights, link hover, …) is recomputed by the actual pointermove
+   * handler after a state change invalidated it (e.g. a tool revert after
+   * finalize), rather than duplicating slices of that logic here.
+   */
   private refreshHoverCursor = () => {
-    const event = this.lastPointerUpEvent;
+    const lastEvent = this.lastPointerMoveEvent ?? this.lastPointerUpEvent;
 
-    if (
-      !event ||
-      this.state.viewModeEnabled ||
-      (this.state.activeTool.type !== "selection" &&
-        this.state.activeTool.type !== "lasso")
-    ) {
+    if (!lastEvent || !this.interactiveCanvas) {
       return;
     }
 
-    const scenePointer = viewportCoordsToSceneCoords(event, this.state);
+    // jsdom has no PointerEvent; a MouseEvent of type "pointermove" walks
+    // the identical dispatch path
+    const EventConstructor =
+      typeof PointerEvent !== "undefined" ? PointerEvent : MouseEvent;
 
-    if (this.state.selectedLinearElement) {
-      this.handleHoverSelectedLinearElement(
-        this.state.selectedLinearElement,
-        scenePointer.x,
-        scenePointer.y,
-        { cursorOnly: true },
-      );
-    } else if (
-      this.isHittingCommonBoundingBoxOfSelectedElements(
-        scenePointer,
-        this.scene.getSelectedElements(this.state),
-      )
-    ) {
-      this.cursor.set(CURSOR_TYPE.MOVE);
-    }
+    this.interactiveCanvas.dispatchEvent(
+      new EventConstructor("pointermove", {
+        bubbles: true,
+        cancelable: true,
+        clientX: lastEvent.clientX,
+        clientY: lastEvent.clientY,
+      }),
+    );
   };
 
   private handleCanvasPointerDown = (

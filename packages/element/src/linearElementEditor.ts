@@ -11,9 +11,7 @@ import {
   curveLengthAtParameter,
   curvePointAtLength,
   lineSegmentClosestParameter,
-  distanceToLineSegment,
   curveClosestParameter,
-  curvePointDistance,
   clamp,
   bezierEquation,
   isCurve,
@@ -1948,42 +1946,49 @@ export class LinearElementEditor {
 
     let bestDistance = Infinity;
     let bestSegmentIndex = 0;
+    let bestParameter = 0;
 
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
-      const distance = isCurve(segment)
-        ? curvePointDistance(segment, pointerGlobalPoint)
-        : distanceToLineSegment(pointerGlobalPoint, segment);
+      let t: number;
+      let closestPoint: GlobalPoint;
+      if (isCurve(segment)) {
+        t = curveClosestParameter(segment, pointerGlobalPoint);
+        closestPoint = bezierEquation(segment, t);
+      } else {
+        t = lineSegmentClosestParameter(pointerGlobalPoint, segment);
+        closestPoint = pointFrom<GlobalPoint>(
+          segment[0][0] + t * (segment[1][0] - segment[0][0]),
+          segment[0][1] + t * (segment[1][1] - segment[0][1]),
+        );
+      }
+      const distance = pointDistance(pointerGlobalPoint, closestPoint);
 
       if (distance < bestDistance) {
         bestDistance = distance;
         bestSegmentIndex = i;
+        bestParameter = t;
       }
     }
 
     const segment = segments[bestSegmentIndex];
+    const lengthWithinSegment = isCurve(segment)
+      ? curveLengthAtParameter(segment, bestParameter)
+      : bestParameter * lengths[bestSegmentIndex];
 
-    let lengthWithinSegment;
-    let pathPoint: GlobalPoint;
-    if (isCurve(segment)) {
-      const t = clamp(curveClosestParameter(segment, pointerGlobalPoint), 0, 1);
-      lengthWithinSegment = curveLengthAtParameter(segment, t);
-      pathPoint = bezierEquation(segment, t);
-    } else {
-      const t = lineSegmentClosestParameter(pointerGlobalPoint, segment);
-      lengthWithinSegment = t * lengths[bestSegmentIndex];
-      pathPoint = pointFrom<GlobalPoint>(
-        segment[0][0] + t * (segment[1][0] - segment[0][0]),
-        segment[0][1] + t * (segment[1][1] - segment[0][1]),
-      );
-    }
-
-    const lengthBeforeSegment = prefixSums[bestSegmentIndex];
     const pathParameter = clamp(
-      (lengthBeforeSegment + lengthWithinSegment) / totalLength,
+      (prefixSums[bestSegmentIndex] + lengthWithinSegment) / totalLength,
       0,
       1,
     );
+    const pathPoint = LinearElementEditor.getPointAtPathParameter(
+      element,
+      pathParameter,
+      elementsMap,
+    );
+    if (!pathPoint) {
+      return null;
+    }
 
     scene.mutateElement(boundTextElement, {
       pathParameter,

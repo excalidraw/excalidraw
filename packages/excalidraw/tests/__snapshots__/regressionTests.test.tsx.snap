@@ -11598,7 +11598,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
 
 exports[`regression tests > pinch-to-zoom works > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > pinch-to-zoom works > [end of test] number of renders 1`] = `7`;
+exports[`regression tests > pinch-to-zoom works > [end of test] number of renders 1`] = `8`;
 
 exports[`regression tests > pinch-to-zoom works > [end of test] redo stack 1`] = `[]`;
 
@@ -14723,7 +14723,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
 
 exports[`regression tests > two-finger scroll works > [end of test] number of elements 1`] = `0`;
 
-exports[`regression tests > two-finger scroll works > [end of test] number of renders 1`] = `8`;
+exports[`regression tests > two-finger scroll works > [end of test] number of renders 1`] = `9`;
 
 exports[`regression tests > two-finger scroll works > [end of test] redo stack 1`] = `[]`;
 
