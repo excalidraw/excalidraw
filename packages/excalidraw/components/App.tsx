@@ -6510,7 +6510,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
-  private getElementsAtPosition(
+  getElementsAtPosition(
     x: number,
     y: number,
     opts?: {
@@ -6580,7 +6580,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private hitElement(
+  hitElement(
     x: number,
     y: number,
     element: NonDeletedExcalidrawElement,
@@ -6625,33 +6625,6 @@ class App extends React.Component<AppProps, AppState> {
         ? this.frameNameBoundsCache.get(element)
         : null,
     });
-  }
-
-  public isBoundTextGrabbable(
-    element: NonDeletedExcalidrawElement,
-    x: number,
-    y: number,
-  ): boolean {
-    if (
-      !isArrowElement(element) ||
-      !hitElementBoundText(
-        pointFrom(x, y),
-        element,
-        this.scene.getNonDeletedElementsMap(),
-      )
-    ) {
-      return false;
-    }
-
-    const hitElements = this.getElementsAtPosition(x, y);
-    const arrowIndex = hitElements.findIndex((el) => el.id === element.id);
-
-    return (
-      arrowIndex !== -1 &&
-      !hitElements
-        .slice(arrowIndex + 1)
-        .some((el) => this.hitElement(x, y, el, false))
-    );
   }
 
   getTextBindableContainerAtPosition(x: number, y: number) {
@@ -8257,7 +8230,11 @@ class App extends React.Component<AppProps, AppState> {
         const hoveredBoundText =
           !isHoveringAPointHandle &&
           !segmentMidPointHoveredCoords &&
-          this.isBoundTextGrabbable(element, scenePointerX, scenePointerY);
+          this.arrowText.isBoundTextGrabbable(
+            element,
+            scenePointerX,
+            scenePointerY,
+          );
 
         if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
           this.cursor.set(CURSOR_TYPE.POINTER);
@@ -8279,7 +8256,11 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (
         // the label can extend beyond the arrow's own hit area
-        this.isBoundTextGrabbable(element, scenePointerX, scenePointerY)
+        this.arrowText.isBoundTextGrabbable(
+          element,
+          scenePointerX,
+          scenePointerY,
+        )
       ) {
         this.cursor.set(CURSOR_TYPE.GRAB);
       } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
@@ -8356,33 +8337,6 @@ class App extends React.Component<AppProps, AppState> {
       this.cursor.set(CURSOR_TYPE.AUTO);
     }
   }
-
-  private refreshHoverCursor = () => {
-    const lastEvent = this.lastPointerMoveEvent ?? this.lastPointerUpEvent;
-
-    if (!lastEvent || !this.interactiveCanvas) {
-      return;
-    }
-
-    const pointerType = (lastEvent as PointerEvent).pointerType;
-    if (pointerType && pointerType !== "mouse") {
-      return;
-    }
-
-    // jsdom has no PointerEvent; a MouseEvent of type "pointermove" walks
-    // the identical dispatch path
-    const EventConstructor =
-      typeof PointerEvent !== "undefined" ? PointerEvent : MouseEvent;
-
-    this.interactiveCanvas.dispatchEvent(
-      new EventConstructor("pointermove", {
-        bubbles: true,
-        cancelable: true,
-        clientX: lastEvent.clientX,
-        clientY: lastEvent.clientY,
-      }),
-    );
-  };
 
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
@@ -9829,16 +9783,10 @@ class App extends React.Component<AppProps, AppState> {
 
       if (hasBoundTextElement(element)) {
         container = element as NonDeleted<ExcalidrawTextContainer>;
-        const elementsMap = this.scene.getNonDeletedElementsMap();
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-        if (boundTextElement && isArrowElement(element)) {
-          const { x, y } = LinearElementEditor.getBoundTextElementPosition(
-            element,
-            boundTextElement,
-            elementsMap,
-          );
-          sceneX = x + boundTextElement.width / 2;
-          sceneY = y + boundTextElement.height / 2;
+        const labelCenter = this.arrowText.getLabelCenter(element);
+        if (labelCenter) {
+          sceneX = labelCenter.x;
+          sceneY = labelCenter.y;
         } else {
           sceneX = element.x + element.width / 2;
           sceneY = element.y + element.height / 2;
@@ -10728,30 +10676,13 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        if (linearElementEditor.initialState.hitBoundText) {
-          this.cursor.set(CURSOR_TYPE.GRABBING);
-
-          if (
-            linearElementEditor.isDragging ||
-            pointDistance(
-              pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
-              pointFrom(pointerCoords.x, pointerCoords.y),
-            ) >=
-              DRAGGING_THRESHOLD / this.state.zoom.value
-          ) {
-            const updatedEditor = LinearElementEditor.handleBoundTextDragging(
-              linearElementEditor,
-              this.scene,
-              pointerCoords.x,
-              pointerCoords.y,
-            );
-            if (updatedEditor) {
-              pointerDownState.drag.hasOccurred = true;
-              this.setState({
-                selectedLinearElement: updatedEditor,
-              });
-            }
-          }
+        if (
+          this.arrowText.maybeDragLabel(
+            linearElementEditor,
+            pointerDownState,
+            pointerCoords,
+          )
+        ) {
           return;
         }
 
@@ -11734,34 +11665,17 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({ selectedLinearElement: null });
           }
         } else if (this.state.selectedLinearElement.isDragging) {
-          const { hitBoundText } =
-            this.state.selectedLinearElement.initialState;
-
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              isDragging: false,
-              initialState: {
-                ...this.state.selectedLinearElement.initialState,
-                hitBoundText: false,
-              },
-            },
+          const hitBoundText = this.arrowText.consumeHitBoundText({
+            stopDragging: true,
           });
+
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
             hitBoundText,
           });
-        } else if (this.state.selectedLinearElement.initialState.hitBoundText) {
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              initialState: {
-                ...this.state.selectedLinearElement.initialState,
-                hitBoundText: false,
-              },
-            },
-          });
+        } else {
+          this.arrowText.consumeHitBoundText();
         }
 
         if (
@@ -12563,7 +12477,7 @@ class App extends React.Component<AppProps, AppState> {
           // reset once the tool revert has settled
           () => {
             this.cursor.reset();
-            this.refreshHoverCursor();
+            this.cursor.refreshHover();
           },
         );
       } else {
@@ -12572,7 +12486,7 @@ class App extends React.Component<AppProps, AppState> {
             newElement: null,
             suggestedBinding: null,
           },
-          () => this.refreshHoverCursor(),
+          () => this.cursor.refreshHover(),
         );
       }
     });

@@ -1129,6 +1129,7 @@ export type AppClassProperties = {
   dismissLinearEditor: App["dismissLinearEditor"];
   flowchart: App["flowchart"];
   drawShape: App["drawShape"];
+  arrowText: App["arrowText"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
   isToolLocked: App["isToolLocked"];
@@ -1153,7 +1154,6 @@ export type AppClassProperties = {
 
   setAppState: App["setAppState"];
 
-  isBoundTextGrabbable: App["isBoundTextGrabbable"];
   isInteractionEnabled: App["isInteractionEnabled"];
   isNavigationEnabled: App["isNavigationEnabled"];
 };

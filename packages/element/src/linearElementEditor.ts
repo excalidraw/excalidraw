@@ -1146,7 +1146,11 @@ export class LinearElementEditor {
       !segmentMidpoint &&
       boundTextElement &&
       isArrowElement(element) &&
-      app.isBoundTextGrabbable(element, scenePointer.x, scenePointer.y)
+      app.arrowText.isBoundTextGrabbable(
+        element,
+        scenePointer.x,
+        scenePointer.y,
+      )
     ) {
       const { x: textX, y: textY } =
         LinearElementEditor.getBoundTextElementPosition(
