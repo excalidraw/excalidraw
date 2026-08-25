@@ -1,14 +1,14 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "ثبت‌نام",
+    "signIn": "ورود",
     "paste": "جایگذاری",
     "pasteAsPlaintext": "جایگذاری به عنوان متن ساده",
     "pasteCharts": "جایگذاری نمودارها",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "نمودار میله‌ای",
+    "chartType_line": "نمودار خطی",
+    "chartType_radar": "نمودار راداری",
+    "chartType_plaintext": "متن ساده",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید",
     "moveCanvas": "جابجایی بوم",
@@ -37,9 +37,9 @@
     "strokeStyle_dashed": "خط چین",
     "strokeStyle_dotted": "نقطه چین",
     "sloppiness": "دقت",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "فشار",
+    "pressure_constant": "ثابت",
+    "pressure_variable": "متغیر",
     "opacity": "شفافیت",
     "textAlign": "تراز متن",
     "edges": "لبه ها",
@@ -58,14 +58,14 @@
     "arrowhead_crowfoot_many": "پای کلاغی (بسیار)",
     "arrowhead_crowfoot_one": "پای کلاغی (یک)",
     "arrowhead_crowfoot_one_or_many": "پای کلاغی (یک یا بسیار)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "کاردینالیتی (یک)",
+    "arrowhead_cardinality_many": "کاردینالیتی (چند)",
+    "arrowhead_cardinality_one_or_many": "کاردینالیتی (یک یا چند)",
+    "arrowhead_cardinality_exactly_one": "کاردینالیتی (دقیقا یک)",
+    "arrowhead_cardinality_zero_or_one": "کاردینالیتی (صفر یا یک)",
+    "arrowhead_cardinality_zero_or_many": "کاردینالیتی (صفر یا چند)",
     "more_options": "امکانات بیشتر",
-    "cardinality": "",
+    "cardinality": "کاردینالیتی",
     "arrowtypes": "نوع پیکان",
     "arrowtype_sharp": "پیکان تیز",
     "arrowtype_round": "پیکان منحنی",
@@ -111,7 +111,7 @@
     "group": "گروهبندی انتخابها",
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
-    "you": "",
+    "you": "شما",
     "toggleGrid": "تغییر وضعیت خطوط شطرنجی",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
@@ -159,8 +159,8 @@
       "editArrow": "ویرایش پیکان"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "شکستن چندضلعی",
+      "convertToPolygon": "تبدیل به چندضلعی"
     },
     "elementLock": {
       "lock": "قفل",
@@ -187,15 +187,15 @@
     "copyElementLink": "کپی لینک به آیتم",
     "linkToElement": "لینک به آیتم",
     "wrapSelectionInFrame": "انتخاب را در قاب قرار دهید",
-    "tab": "",
-    "shapeSwitch": "",
-    "preferences": "",
-    "preferences_toolLock": "",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
-    "arrowBinding": "",
-    "midpointSnapping": ""
+    "tab": "Tab",
+    "shapeSwitch": "تعویض شکل",
+    "preferences": "ترجیحات",
+    "preferences_toolLock": "قفل ابزار",
+    "boxSelectionMode": "انتخاب بر اساس",
+    "boxSelectionContain": "دربرگیری",
+    "boxSelectionOverlap": "هم‌پوشانی",
+    "arrowBinding": "اتصال پیکان",
+    "midpointSnapping": "چسبیدن به نقاط میانی"
   },
   "elementLink": {
     "title": "لینک به آیتم",
@@ -207,10 +207,10 @@
     "hint_emptyLibrary": "یک آیتم روی بوم را برای اضافه شده به اینجا انتخاب کنید، یا یک کتابخانه از مخزن عمومی در بخش پایین را نصب کنید.",
     "hint_emptyPrivateLibrary": "یک آیتم روی بوم را برای اضافه شدن به اینجا انتخاب کنید.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "جستجوی کتابخانه",
+      "heading": "موارد یافت‌شده در کتابخانه",
+      "noResults": "هیچ مورد مطابقی یافت نشد...",
+      "clearSearch": "پاک کردن جستجو"
     }
   },
   "search": {
@@ -219,7 +219,7 @@
     "singleResult": "نتیجه",
     "multipleResults": "نتایج",
     "placeholder": "جستجوی متن در بوم...",
-    "frames": "",
+    "frames": "فریم‌ها",
     "texts": "متن"
   },
   "buttons": {
@@ -254,11 +254,11 @@
     "objectsSnapMode": "به اشیاء بچسبد",
     "exitZenMode": "خروج از حالت تمرکز",
     "cancel": "لغو",
-    "saveLibNames": "",
+    "saveLibNames": "ذخیرهٔ نام‌(ها) و خروج",
     "clear": "پاکسازی",
     "remove": "پاک کردن",
     "embed": "تغییر افزونه",
-    "publishLibrary": "",
+    "publishLibrary": "تغییر نام یا انتشار",
     "submit": "ارسال",
     "confirm": "تایید",
     "embeddableInteractionButton": "کلیک برای تعامل"
