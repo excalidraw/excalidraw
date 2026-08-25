@@ -478,7 +478,11 @@ export { Stats } from "./components/Stats";
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
-export { TTDStreamFetch } from "./components/TTDDialog/utils/TTDStreamFetch";
+export {
+  TTDStreamFetch,
+  parseSSEStream,
+} from "./components/TTDDialog/utils/TTDStreamFetch";
+export type { StreamChunk } from "./components/TTDDialog/utils/TTDStreamFetch";
 export type {
   TTDPersistenceAdapter,
   SavedChat,

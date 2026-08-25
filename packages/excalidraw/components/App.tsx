@@ -444,6 +444,7 @@ import { ViewportStatusBorder } from "./ViewportStatusFrame/ViewportStatusFrame"
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
+import Spinner from "./Spinner";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
@@ -1482,6 +1483,20 @@ class App extends React.Component<AppProps, AppState> {
     return this.iFrameRefs.get(element.id);
   }
 
+  /**
+   * AI-generated iframe elements aren't interactive while their generation
+   * is still in progress (the partial content is render-only).
+   */
+  private isIframeLikeInteractive(element: ExcalidrawElement): boolean {
+    if (isIframeElement(element)) {
+      const data =
+        element.customData?.generationData ??
+        this.magicGenerations.get(element.id);
+      return data?.status !== "pending";
+    }
+    return true;
+  }
+
   private handleIframeLikeElementHover = ({
     hitElement,
     scenePointer,
@@ -1494,6 +1509,7 @@ class App extends React.Component<AppProps, AppState> {
     if (
       hitElement &&
       isIframeLikeElement(hitElement) &&
+      this.isIframeLikeInteractive(hitElement) &&
       (this.state.viewModeEnabled ||
         this.state.activeTool.type === "laser" ||
         this.isIframeLikeElementCenter(
@@ -1568,6 +1584,7 @@ class App extends React.Component<AppProps, AppState> {
         300 &&
       gesture.pointers.size < 2 &&
       isIframeLikeElement(hitElement) &&
+      this.isIframeLikeInteractive(hitElement) &&
       (this.state.viewModeEnabled ||
         this.state.activeTool.type === "laser" ||
         this.isIframeLikeElementCenter(
@@ -1787,6 +1804,7 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           let src: IframeData | null;
+          let isPendingGeneration = false;
 
           if (isIframeElement(el)) {
             src = null;
@@ -1817,78 +1835,46 @@ class App extends React.Component<AppProps, AppState> {
                       html, body {
                         width: 100%;
                         height: 100%;
-                        color: ${
-                          this.state.theme === THEME.DARK ? "white" : "black"
-                        };
-                      }
-                      body {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        flex-direction: column;
-                        gap: 1rem;
-                      }
-
-                      .Spinner {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin-left: auto;
-                        margin-right: auto;
-                      }
-
-                      .Spinner svg {
-                        animation: rotate 1.6s linear infinite;
-                        transform-origin: center center;
-                        width: 40px;
-                        height: 40px;
-                      }
-
-                      .Spinner circle {
-                        stroke: currentColor;
-                        animation: dash 1.6s linear 0s infinite;
-                        stroke-linecap: round;
-                      }
-
-                      @keyframes rotate {
-                        100% {
-                          transform: rotate(360deg);
-                        }
-                      }
-
-                      @keyframes dash {
-                        0% {
-                          stroke-dasharray: 1, 300;
-                          stroke-dashoffset: 0;
-                        }
-                        50% {
-                          stroke-dasharray: 150, 300;
-                          stroke-dashoffset: -200;
-                        }
-                        100% {
-                          stroke-dasharray: 1, 300;
-                          stroke-dashoffset: -280;
-                        }
+                        margin: 0;
                       }
                     </style>
-                    <div class="Spinner">
-                      <svg
-                        viewBox="0 0 100 100"
-                      >
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="46"
-                          stroke-width="8"
-                          fill="none"
-                          stroke-miter-limit="10"
-                        />
-                      </svg>
-                    </div>
-                    <div>Generating...</div>
+                    <script>
+                      // progressively renders the partial HTML snapshots the
+                      // editor streams in during generation by document.write-
+                      // ing them into this very document — feeding the
+                      // browser's incremental HTML parser, so incomplete
+                      // markup renders progressively
+                      // (see App.onMagicFrameGenerate)
+                      let writtenLength = 0;
+                      let opened = false;
+
+                      const onPartialMessage = (event) => {
+                        const data = event.data;
+                        if (
+                          !data ||
+                          data.type !== "excalidraw:diagramToCode:partial" ||
+                          typeof data.html !== "string" ||
+                          data.html.length <= writtenLength
+                        ) {
+                          return;
+                        }
+                        if (!opened) {
+                          opened = true;
+                          document.open();
+                          // document.open() wipes all listeners from both the
+                          // document and the window, so re-register
+                          window.addEventListener("message", onPartialMessage);
+                        }
+                        document.write(data.html.slice(writtenLength));
+                        writtenLength = data.html.length;
+                      };
+
+                      window.addEventListener("message", onPartialMessage);
+                    </script>
                   `);
                 },
               } as const;
+              isPendingGeneration = true;
             } else {
               let message: string;
               if (data.code === "ERR_GENERATION_INTERRUPTED") {
@@ -2049,6 +2035,12 @@ class App extends React.Component<AppProps, AppState> {
                     )}
                   </div>
                 </div>
+                {isPendingGeneration && (
+                  <div className="excalidraw__embeddable__generating">
+                    <Spinner size="1em" />
+                    Generating…
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -2844,6 +2836,30 @@ class App extends React.Component<AppProps, AppState> {
       const { html } = await generateDiagramToCode({
         frame: magicFrame,
         children: magicFrameChildren,
+        onPartial: (partialResponse) => {
+          // only stream into the frame while this generation is still pending
+          if (
+            this.magicGenerations.get(frameElement.id)?.status !== "pending"
+          ) {
+            return;
+          }
+          const htmlStartIndex = partialResponse.search(
+            /<!doctype html|<html[\s>]/i,
+          );
+          if (htmlStartIndex === -1) {
+            return;
+          }
+          // the pending iframe document renders the partial html itself
+          // (see the streaming shell in `renderEmbeddables`) — we only feed
+          // it snapshots of the html received so far
+          this.getHTMLIFrameElement(frameElement)?.contentWindow?.postMessage(
+            {
+              type: "excalidraw:diagramToCode:partial",
+              html: partialResponse.slice(htmlStartIndex),
+            },
+            "*",
+          );
+        },
       });
 
       trackEvent("ai", "generate (success)", "d2c");
@@ -7125,9 +7141,11 @@ class App extends React.Component<AppProps, AppState> {
       const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
       if (isIframeLikeElement(hitElement)) {
-        this.setState({
-          activeEmbeddable: { element: hitElement, state: "active" },
-        });
+        if (this.isIframeLikeInteractive(hitElement)) {
+          this.setState({
+            activeEmbeddable: { element: hitElement, state: "active" },
+          });
+        }
         return;
       }
 
