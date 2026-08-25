@@ -333,13 +333,17 @@ const renderElementToSvg = (
         maskPath.appendChild(maskRectInvisible);
       }
       const group = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+      const maskedGroup = boundText
+        ? svgRoot.ownerDocument.createElementNS(SVG_NS, "g")
+        : group;
       if (boundText) {
-        group.setAttribute("mask", `url(#mask-${element.id})`);
+        maskedGroup.setAttribute("mask", `url(#mask-${element.id})`);
+        group.appendChild(maskedGroup);
       }
       group.setAttribute("stroke-linecap", "round");
 
       const shapes = ShapeCache.generateElementShape(element, renderConfig);
-      shapes.forEach((shape) => {
+      shapes.forEach((shape, index) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
           shape,
@@ -362,7 +366,13 @@ const renderElementToSvg = (
         ) {
           node.setAttribute("fill-rule", "evenodd");
         }
-        group.appendChild(node);
+        // A label masks only the linear body. Arrowheads must remain outside
+        // the mask so moving a label near an endpoint cannot clip them.
+        if (boundText && element.type === "arrow" && index > 0) {
+          group.appendChild(node);
+        } else {
+          maskedGroup.appendChild(node);
+        }
       });
 
       const g = maybeWrapNodesInFrameClipPath(

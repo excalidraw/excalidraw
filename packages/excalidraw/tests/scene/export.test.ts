@@ -237,6 +237,41 @@ describe("exportToSvg", () => {
     // the masked arrow group still renders its line (not clipped away)
     expect(svgElement.querySelector("g[mask] path")).not.toBeNull();
   });
+
+  it("does not include arrowheads in the bound-label mask", async () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow-with-endpoint-label",
+      width: 200,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+      startArrowhead: "triangle",
+      endArrowhead: "diamond",
+      boundElements: [{ type: "text", id: "endpoint-label" }],
+    });
+    const label = {
+      ...API.createElement({
+        type: "text",
+        id: "endpoint-label",
+        text: "label",
+        width: 50,
+        height: 20,
+        containerId: arrow.id,
+      }),
+      labelPosition: 1,
+    };
+
+    const svgElement = await exportUtils.exportToSvg(
+      [arrow, label] as NonDeletedExcalidrawElement[],
+      DEFAULT_OPTIONS,
+      null,
+    );
+
+    const maskedGroup = svgElement.querySelector("g[mask]");
+    expect(maskedGroup).not.toBeNull();
+    expect(maskedGroup?.children).toHaveLength(1);
+    expect(maskedGroup?.parentElement?.children.length).toBeGreaterThan(1);
+  });
 });
 
 describe("exportToCanvas", () => {
@@ -259,6 +294,7 @@ describe("exportToCanvas", () => {
       width: 300,
       height: 0,
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+      endArrowhead: "triangle",
       boundElements: [{ type: "text", id: "label-11591" }],
     });
     const label = API.createElement({
@@ -302,6 +338,41 @@ describe("exportToCanvas", () => {
           event.props.height === holeHeight,
       ),
     ).toEqual([]);
+
+    const clipIndex = events.findIndex((event: any) => event.type === "clip");
+    let depth = 0;
+    for (let index = 0; index <= clipIndex; index++) {
+      if (events[index].type === "save") {
+        depth++;
+      } else if (events[index].type === "restore") {
+        depth--;
+      }
+    }
+
+    const clipDepth = depth;
+    let clipRestoreIndex = -1;
+    for (let index = clipIndex + 1; index < events.length; index++) {
+      if (events[index].type === "save") {
+        depth++;
+      } else if (events[index].type === "restore") {
+        depth--;
+        if (depth < clipDepth) {
+          clipRestoreIndex = index;
+          break;
+        }
+      }
+    }
+
+    const labelIndex = events.findIndex(
+      (event: any, index: number) =>
+        index > clipRestoreIndex && event.type === "fillText",
+    );
+    expect(clipRestoreIndex).toBeGreaterThan(clipIndex);
+    expect(
+      events
+        .slice(clipRestoreIndex + 1, labelIndex)
+        .some((event: any) => event.type === "stroke"),
+    ).toBe(true);
   });
 });
 
