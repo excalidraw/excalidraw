@@ -7,8 +7,12 @@ import type {
   ExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { convertElementTypes } from "../components/ConvertElementTypePopup";
+import {
+  convertElementTypes,
+  convertElementTypePopupAtom,
+} from "../components/ConvertElementTypePopup";
 import { Excalidraw } from "../index";
+import { editorJotaiStore } from "../editor-jotai";
 
 import { API } from "./helpers/api";
 import { act, render } from "./test-utils";
@@ -186,6 +190,54 @@ describe("convert element type", () => {
 
       expect(result).toBe(false);
       expect(labeledArrow.type).toBe("arrow");
+    });
+  });
+
+  describe("shape switcher popup (#9656)", () => {
+    const openShapeSwitchPanel = () => {
+      act(() => {
+        editorJotaiStore.set(convertElementTypePopupAtom, { type: "panel" });
+        h.app.setState({});
+      });
+    };
+
+    const getPopupButtonTypes = () => {
+      const popup = document.querySelector(".ConvertElementTypePopup");
+      expect(popup).not.toBeNull();
+      const buttons = popup!.querySelectorAll<HTMLElement>(
+        "[data-testid^='toolbar-']",
+      );
+      return Array.from(buttons).map((button) =>
+        button.dataset.testid!.replace("toolbar-", ""),
+      );
+    };
+
+    it("offers only arrow sub-types for a bound arrow (no line)", () => {
+      const { arrow } = createBoundArrow();
+      API.setSelectedElements([arrow]);
+
+      openShapeSwitchPanel();
+
+      expect(getPopupButtonTypes().sort()).toEqual([
+        "curvedArrow",
+        "elbowArrow",
+        "sharpArrow",
+      ]);
+    });
+
+    it("offers all types including line for an unbound line", () => {
+      const line = API.createElement({ type: "line" });
+      API.setElements([line]);
+      API.setSelectedElements([line]);
+
+      openShapeSwitchPanel();
+
+      expect(getPopupButtonTypes().sort()).toEqual([
+        "curvedArrow",
+        "elbowArrow",
+        "line",
+        "sharpArrow",
+      ]);
     });
   });
 });
