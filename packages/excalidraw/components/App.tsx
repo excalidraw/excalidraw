@@ -288,6 +288,7 @@ import type {
   SceneElementsMap,
   NonDeletedSceneElementsMap,
   ExcalidrawBindableElement,
+  PointsPositionUpdates,
 } from "@excalidraw/element/types";
 
 import type { ArrowEndpoint } from "@excalidraw/element";
@@ -3177,19 +3178,38 @@ class App extends React.Component<AppProps, AppState> {
    * committed waypoint instead of hitting history (which is blocked
    * mid-gesture); cancels the shape once only the origin remains. */
   private undoMultiElementDraw = (): void => {
-    const multiElement = this.state.multiElement;
     const selectedLinearElement = this.state.selectedLinearElement;
-    if (!multiElement || !selectedLinearElement) {
+    if (!this.state.multiElement || !selectedLinearElement) {
+      return;
+    }
+    // resolve against the live scene — appState.multiElement can be
+    // detached if an API/collab update replaced the element mid-draw
+    const multiElement = this.scene
+      .getNonDeletedElementsMap()
+      .get(selectedLinearElement.elementId) as
+      | NonDeleted<ExcalidrawLinearElement>
+      | undefined;
+    if (!multiElement) {
       return;
     }
     const { points } = multiElement;
     const { lastCommittedPoint } = selectedLinearElement;
-    const lastCommittedIdx = lastCommittedPoint
+    let lastCommittedIdx = lastCommittedPoint
       ? points.findIndex((point) => point === lastCommittedPoint)
       : -1;
+    if (lastCommittedIdx === -1 && lastCommittedPoint) {
+      // remote/API updates may have cloned point objects — fall back to
+      // value identity so we still locate the committed waypoint
+      lastCommittedIdx = points.findIndex(
+        (point) =>
+          point[0] === lastCommittedPoint[0] &&
+          point[1] === lastCommittedPoint[1],
+      );
+    }
 
-    // no waypoints beyond the origin → undoing cancels the whole shape
-    // (same cleanup as Escape)
+    // no waypoints beyond the origin (or the draw state can't be matched to
+    // the scene anymore) → undoing cancels the whole shape (same cleanup
+    // as Escape)
     if (lastCommittedIdx <= 0) {
       this.actionManager.executeAction(actionFinalize);
       return;
@@ -3201,6 +3221,42 @@ class App extends React.Component<AppProps, AppState> {
       { points: nextPoints },
       { informMutation: false, isDragging: false },
     );
+
+    // recompute the end binding from the new last point (same trailing-point
+    // cleanup as actionFinalize), so removing a bound endpoint doesn't leave
+    // a stale endBinding / boundElements pair behind
+    if (
+      isBindingElement(multiElement) &&
+      multiElement.endBinding &&
+      nextPoints.length > 1
+    ) {
+      const draggedPoints: PointsPositionUpdates = new Map([
+        [
+          nextPoints.length - 1,
+          {
+            point: nextPoints[nextPoints.length - 1],
+            isDragging: false,
+          },
+        ],
+      ]);
+      const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        multiElement,
+        -1,
+        this.scene.getNonDeletedElementsMap(),
+      );
+      bindOrUnbindBindingElement(
+        multiElement,
+        draggedPoints,
+        globalPoint[0],
+        globalPoint[1],
+        this.scene,
+        this.state,
+        {
+          newArrow: Boolean(this.state.newElement),
+        },
+      );
+    }
+
     const newLastIdx = nextPoints.length - 1;
     this.setState({
       selectedLinearElement: {
