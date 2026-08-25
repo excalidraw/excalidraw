@@ -13582,6 +13582,15 @@ class App extends React.Component<AppProps, AppState> {
       files,
     });
 
+    // zsviczian START -- an Obsidian popout may unmount while image decoding is pending
+    if (this.unmounted) {
+      return {
+        updatedFiles: new Map<FileId, true>(),
+        erroredFiles: new Map<FileId, true>(),
+      };
+    }
+    // zsviczian END
+
     if (erroredFiles.size) {
       this.store.scheduleAction(CaptureUpdateAction.NEVER);
       this.scene.replaceAllElements(
