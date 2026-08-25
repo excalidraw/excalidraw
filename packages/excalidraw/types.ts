@@ -1375,6 +1375,12 @@ export type NullableGridSize =
 export type GenerateDiagramToCode = (props: {
   frame: NonDeleted<ExcalidrawMagicFrameElement>;
   children: readonly NonDeletedExcalidrawElement[];
+  /**
+   * Optional streaming hook. Call with the accumulated response text as it
+   * streams in so the editor can progressively render the partial HTML
+   * inside the generated frame.
+   */
+  onPartial?: (html: string) => void;
 }) => MaybePromise<{ html: string }>;
 
 export type Offsets = Partial<{
