@@ -29,9 +29,18 @@ export const useCreatePortalContainer = (opts?: {
   }, [div, theme, editorInterface.formFactor, opts?.className]);
 
   useLayoutEffect(() => {
-    const container = opts?.parentSelector
-      ? excalidrawContainer?.querySelector(opts.parentSelector)
-      : document.body;
+    let container: Element | ShadowRoot | null | undefined;
+
+    if (opts?.parentSelector) {
+      container = excalidrawContainer?.querySelector(opts.parentSelector);
+    } else {
+      // If Excalidraw is rendered inside a shadow root (e.g. a web component or
+      // anywidget/marimo), portal into that shadow root so modals stay within
+      // the same styling scope. In a regular document, fall back to document.body.
+      const rootNode = excalidrawContainer?.getRootNode();
+      container =
+        rootNode instanceof ShadowRoot ? rootNode : document.body;
+    }
 
     if (!container) {
       return;
@@ -44,7 +53,7 @@ export const useCreatePortalContainer = (opts?: {
     setDiv(div);
 
     return () => {
-      container.removeChild(div);
+      container!.removeChild(div);
     };
   }, [excalidrawContainer, opts?.parentSelector]);
 
