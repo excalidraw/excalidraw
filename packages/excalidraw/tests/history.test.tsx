@@ -251,6 +251,48 @@ describe("history", () => {
       ]);
     });
 
+    it("should allow undoing the first element drawn after resetScene()", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const stale = API.createElement({ type: "rectangle" });
+
+      // `updateScene` schedules a micro action (a captured elements snapshot)
+      // that is only flushed on the *next* store commit, not synchronously.
+      // Calling `resetScene` before that commit happens must not let the
+      // stale, pre-reset micro action leak into the post-reset store/history.
+      act(() => {
+        h.app.updateScene({
+          elements: [stale],
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
+        (h.app as any).resetScene();
+      });
+
+      expect(h.elements.filter((el) => !el.isDeleted)).toHaveLength(0);
+      expect(API.getUndoStack().length).toBe(0);
+
+      const rect1 = UI.createElement("rectangle");
+      const rect2 = UI.createElement("rectangle");
+
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: false }),
+      ]);
+
+      const undoAction = createUndoAction(h.history);
+      API.executeAction(undoAction);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: false }),
+        expect.objectContaining({ id: rect2.id, isDeleted: true }),
+      ]);
+
+      API.executeAction(undoAction);
+      expect(h.elements).toEqual([
+        expect.objectContaining({ id: rect1.id, isDeleted: true }),
+        expect.objectContaining({ id: rect2.id, isDeleted: true }),
+      ]);
+    });
+
     it("should not modify anything on unrelated appstate change", async () => {
       const rect = API.createElement({ type: "rectangle" });
       await render(
