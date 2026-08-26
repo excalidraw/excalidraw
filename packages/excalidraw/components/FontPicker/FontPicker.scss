@@ -17,4 +17,42 @@
       grid-template-columns: none;
     }
   }
+
+  .FontPicker__font--failed,
+  .FontPicker__font--loading {
+    background: var(--color-danger-background);
+
+    .dropdown-menu-item__text {
+      color: var(--color-danger);
+    }
+  }
+
+  .FontPicker__font--unsupported {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .FontPicker__retry-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--color-danger);
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &--loading svg {
+      animation: FontPicker-retry-spin 0.8s linear infinite;
+    }
+  }
+
+  @keyframes FontPicker-retry-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }

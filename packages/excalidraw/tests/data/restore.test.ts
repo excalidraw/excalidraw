@@ -1,7 +1,12 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
-import { DEFAULT_SIDEBAR, FONT_FAMILY, ROUNDNESS } from "@excalidraw/common";
+import {
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_SIDEBAR,
+  FONT_FAMILY,
+  ROUNDNESS,
+} from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
@@ -100,6 +105,96 @@ describe("restoreElements", () => {
     expect(restoredText).toMatchSnapshot({
       seed: expect.any(Number),
       versionNonce: expect.any(Number),
+    });
+  });
+
+  describe("fontFamily normalization", () => {
+    const restoreFontFamily = (
+      // wider than `FontFamily` on purpose - restore exists precisely to
+      // normalize values the type doesn't admit (i.e. "Random Font")
+      fontFamily: unknown,
+    ) => {
+      // assigned post-creation - `API.createElement` would default it away
+      const textElement = {
+        ...API.createElement({ type: "text", text: "text" }),
+        fontFamily,
+      };
+
+      return (
+        restore.restoreElements(
+          [textElement as ExcalidrawTextElement],
+          null,
+        )[0] as ExcalidrawTextElement
+      ).fontFamily;
+    };
+
+    it("should preserve built-in (numeric) families", () => {
+      expect(restoreFontFamily(FONT_FAMILY.Virgil)).toBe(FONT_FAMILY.Virgil);
+      expect(restoreFontFamily(FONT_FAMILY.Excalifont)).toBe(
+        FONT_FAMILY.Excalifont,
+      );
+    });
+
+    it("should preserve unknown numeric families for forward compatibility", () => {
+      // a file written by a newer version may reference a family we don't know
+      expect(restoreFontFamily(9999)).toBe(9999);
+    });
+
+    it("should preserve provider-qualified custom families", () => {
+      expect(restoreFontFamily("google:Roboto")).toBe("google:Roboto");
+      expect(restoreFontFamily("google:Lilita One")).toBe("google:Lilita One");
+    });
+
+    it("should default non-prefixed unknown font names", () => {
+      // would otherwise render with whatever the host's CSS resolves locally
+      expect(restoreFontFamily("Random Font")).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily("Comic Sans MS")).toBe(DEFAULT_FONT_FAMILY);
+    });
+
+    it("should default malformed provider prefixes", () => {
+      expect(restoreFontFamily(":Roboto")).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily("google:")).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily(":")).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily("")).toBe(DEFAULT_FONT_FAMILY);
+    });
+
+    it("should default values which aren't a family at all", () => {
+      expect(restoreFontFamily(undefined)).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily(null)).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily(NaN)).toBe(DEFAULT_FONT_FAMILY);
+      expect(restoreFontFamily(Infinity)).toBe(DEFAULT_FONT_FAMILY);
+    });
+
+    it("should map legacy `font` names to built-in families", () => {
+      const legacyElement = {
+        ...API.createElement({ type: "text", text: "text" }),
+        font: "20px Virgil",
+      };
+
+      expect(
+        (
+          restore.restoreElements(
+            [legacyElement as any],
+            null,
+          )[0] as ExcalidrawTextElement
+        ).fontFamily,
+      ).toBe(FONT_FAMILY.Virgil);
+    });
+
+    it("should default unknown legacy `font` names", () => {
+      const legacyElement = {
+        ...API.createElement({ type: "text", text: "text" }),
+        font: "20px Random",
+      };
+
+      expect(
+        (
+          restore.restoreElements(
+            [legacyElement as any],
+            null,
+          )[0] as ExcalidrawTextElement
+        ).fontFamily,
+      ).toBe(DEFAULT_FONT_FAMILY);
     });
   });
 
@@ -736,6 +831,32 @@ describe("restoreElements", () => {
 });
 
 describe("restoreAppState", () => {
+  it("should normalize currentItemFontFamily like element fontFamily", () => {
+    // valid values pass through untouched
+    expect(
+      restore.restoreAppState({ currentItemFontFamily: "google:Roboto" }, null)
+        .currentItemFontFamily,
+    ).toBe("google:Roboto");
+    expect(
+      restore.restoreAppState({ currentItemFontFamily: 9999 }, null)
+        .currentItemFontFamily,
+    ).toBe(9999);
+
+    // persisted data isn't bound by our types - a bare font name defaults,
+    // whichever source it comes from
+    expect(
+      restore.restoreAppState(
+        { currentItemFontFamily: "Random Font" as any },
+        null,
+      ).currentItemFontFamily,
+    ).toBe(DEFAULT_FONT_FAMILY);
+    expect(
+      restore.restoreAppState(null, {
+        currentItemFontFamily: "Random Font" as any,
+      }).currentItemFontFamily,
+    ).toBe(DEFAULT_FONT_FAMILY);
+  });
+
   it("should restore freedraw mode app state values", () => {
     expect(
       restore.restoreAppState(
