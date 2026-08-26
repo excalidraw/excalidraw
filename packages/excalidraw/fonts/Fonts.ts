@@ -81,9 +81,11 @@ export class Fonts {
   }
 
   private readonly scene: Scene;
+  private readonly ownerDocument: Document;
 
-  constructor(scene: Scene) {
+  constructor(scene: Scene, ownerDocument: Document = document) {
     this.scene = scene;
+    this.ownerDocument = ownerDocument;
   }
 
   /**
@@ -165,7 +167,11 @@ export class Fonts {
       this.scene.getNonDeletedElements(),
     );
 
-    return Fonts.loadFontFaces(sceneFamilies, charsPerFamily);
+    return Fonts.loadFontFaces(
+      sceneFamilies,
+      charsPerFamily,
+      this.ownerDocument,
+    );
   };
 
   /**
@@ -173,11 +179,12 @@ export class Fonts {
    */
   public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
+    ownerDocument: Document = document,
   ): Promise<FontFace[]> => {
     const fontFamilies = Fonts.getUniqueFamilies(elements);
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
-    return Fonts.loadFontFaces(fontFamilies, charsPerFamily);
+    return Fonts.loadFontFaces(fontFamilies, charsPerFamily, ownerDocument);
   };
 
   /**
@@ -224,6 +231,7 @@ export class Fonts {
   public static async loadFontFaces(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
     charsPerFamily: Record<number, Set<string>>,
+    ownerDocument: Document,
   ) {
     // add all registered font faces into the `document.fonts` (if not added already)
     for (const { fontFaces, metadata } of Fonts.registered.values()) {
@@ -234,16 +242,20 @@ export class Fonts {
 
       for (const { fontFace } of fontFaces) {
         if (
-          !window.document.fonts.has(fontFace) &&
+          !ownerDocument.fonts.has(fontFace) &&
           fontFace.family !== "Local Font" //zsviczian if Local Font is registered I can't change it dymamically
         ) {
-          window.document.fonts.add(fontFace);
+          ownerDocument.fonts.add(fontFace);
         }
       }
     }
 
     // loading 10 font faces at a time, in a controlled manner
-    const iterator = Fonts.fontFacesLoader(fontFamilies, charsPerFamily);
+    const iterator = Fonts.fontFacesLoader(
+      fontFamilies,
+      charsPerFamily,
+      ownerDocument,
+    );
     const concurrency = 10;
     const fontFaces = await new PromisePool(iterator, concurrency).all();
     return fontFaces.flat().filter(Boolean);
@@ -252,6 +264,7 @@ export class Fonts {
   private static *fontFacesLoader(
     fontFamilies: Array<ExcalidrawTextElement["fontFamily"]>,
     charsPerFamily: Record<number, Set<string>>,
+    ownerDocument: Document,
   ): Generator<Promise<void | readonly [number, FontFace[]]>> {
     for (const [index, fontFamily] of fontFamilies.entries()) {
       const font = getFontString({
@@ -264,7 +277,7 @@ export class Fonts {
       const text = Fonts.getCharacters(charsPerFamily, fontFamily);
 
       if (
-        !window.document.fonts.check(font, text) &&
+        !ownerDocument.fonts.check(font, text) &&
         !font.startsWith("16px Local Font") && //zsviczian if Local Font is registered I can't change it dymamically
         !font.startsWith("16px Helvetica") //zsviczian there is an error loading Helvetica font (need to validate the error still exists)
       ) {
@@ -272,7 +285,7 @@ export class Fonts {
           try {
             // WARN: browser prioritizes loading only font faces with unicode ranges for characters which are present in the document (html & canvas), other font faces could stay unloaded
             // we might want to retry here, i.e.  in case CDN is down, but so far I didn't experience any issues - maybe it handles retry-like logic under the hood
-            const fontFaces = await window.document.fonts.load(font, text);
+            const fontFaces = await ownerDocument.fonts.load(font, text);
 
             return [index, fontFaces];
           } catch (e) {

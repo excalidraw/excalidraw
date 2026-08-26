@@ -72,7 +72,7 @@ Runtime requirements:
 - JavaScript is one browser-compatible, function-evaluable artifact with no runtime chunks.
 - Production is minified and map-free.
 - Development JavaScript retains debugger-friendly original sources; development CSS omits the redundant nested source map.
-- React, ReactDOM/client, and both JSX runtime entry points stay external. The plugin provides private matching packages for the main window and each popout.
+- React, ReactDOM/client, and both JSX runtime entry points stay external. The host provides matching private packages and may render roots in multiple documents when it supplies each editor's stable `ownerDocument`.
 - Never depend on or assign `window.React` or `window.ReactDOM`.
 - Preserve `window.ExcalidrawLib`; it is a documented compatibility API.
 - Mermaid stays external and is loaded lazily through `getSharedMermaidInstance()` and Excalidraw Extras.
@@ -97,9 +97,10 @@ The normal rule remains unchanged: do not bump, package, publish, or update the 
 
 ## React And Window Ownership
 
-The component is evaluated independently with the consuming plugin's React packages in each Obsidian window.
+The component may be evaluated per window or once and used to create independent React roots in multiple Obsidian windows. Each mounted editor receives a stable `ownerDocument`; the React root remains owned by the document in which it was created.
 
-- Avoid module assumptions that require one browser-window singleton.
+- Avoid module assumptions that require one browser-window singleton or a mutable "current document".
+- For new DOM/browser API usage, use `app.ownerDocument` and `app.ownerWindow` instead of globals; without `app`, derive them from the mounted node's `ownerDocument` and its `defaultView`.
 - DOM, portals, document events, and layout measurements must use the owning Excalidraw container/document where relevant.
 - Do not implement plugin-level persistence here merely because a UI is rendered in a popout. Persistent plugin state is owned by the host adapter and, for existing Obsidian plugin storage, remains in the main application window.
 - Keep public or independently consumed host-provided adapters such as text-to-diagram persistence backward compatible unless the task explicitly changes their contract.

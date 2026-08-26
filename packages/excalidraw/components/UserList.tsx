@@ -2,7 +2,7 @@ import { Popover } from "radix-ui";
 import clsx from "clsx";
 import React, { useLayoutEffect } from "react";
 
-import { supportsResizeObserver, isShallowEqual } from "@excalidraw/common";
+import { isShallowEqual } from "@excalidraw/common";
 
 import { t } from "../i18n";
 
@@ -154,17 +154,18 @@ export const UserList = React.memo(
 
     useLayoutEffect(() => {
       if (userListWrapper.current) {
+        const ownerWindow = userListWrapper.current.ownerDocument.defaultView;
         const updateWrapperWidth = (width: number) => {
           setWrapperWidth(width);
         };
 
         updateWrapperWidth(userListWrapper.current.clientWidth);
 
-        if (!supportsResizeObserver) {
+        if (!ownerWindow || typeof ownerWindow.ResizeObserver !== "function") {
           return;
         }
 
-        const resizeObserver = new ResizeObserver((entries) => {
+        const resizeObserver = new ownerWindow.ResizeObserver((entries) => {
           for (const entry of entries) {
             const { width } = entry.contentRect;
             updateWrapperWidth(width);

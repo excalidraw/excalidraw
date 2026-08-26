@@ -202,9 +202,7 @@ export const actionFinalize = register<FormData>({
       }
     }
 
-    if (window.document.activeElement instanceof HTMLElement) {
-      focusContainer();
-    }
+    focusContainer();
 
     // clean up pending gesture even if active tool is already not drawShape
     const hadPendingSketch = app.drawShape.hasPendingGesture();
