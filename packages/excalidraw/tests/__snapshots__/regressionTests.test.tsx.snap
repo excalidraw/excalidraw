@@ -536,10 +536,7 @@ exports[`given element A and group of elements B and given both are selected whe
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {
-    "id0": true,
     "id12": false,
-    "id3": true,
-    "id6": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -827,10 +824,7 @@ exports[`given element A and group of elements B and given both are selected whe
         "deleted": {
           "selectedElementIds": {},
           "selectedGroupIds": {
-            "id0": true,
             "id12": false,
-            "id3": true,
-            "id6": true,
           },
         },
         "inserted": {

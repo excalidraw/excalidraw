@@ -1461,4 +1461,338 @@ describe("deselecting", () => {
     expect(h.state.editingGroupId).toBeNull();
     expect(h.state.selectedGroupIds).toEqual({});
   });
+
+  it("shift deselecting one of multiple selected groups preserves other groups", () => {
+    const groupA1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      groupIds: ["A"],
+    });
+    const groupA2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      groupIds: ["A"],
+    });
+    const groupB1 = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 0,
+      groupIds: ["B"],
+    });
+    const groupB2 = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 0,
+      groupIds: ["B"],
+    });
+    const elements = [groupA1, groupA2, groupB1, groupB2];
+
+    API.setElements(elements);
+    API.setSelectedElements(elements);
+
+    assertSelectedElements(elements);
+    expect(h.state.selectedGroupIds).toEqual({ A: true, B: true });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupA1);
+    });
+
+    assertSelectedElements(groupB1, groupB2);
+    expect(h.state.selectedGroupIds).toEqual({ A: false, B: true });
+  });
+});
+
+describe("group selection", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("shift-selects a whole group inside common bounds of a current selected groups", () => {
+    const groupA1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const groupA2 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 100,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const groupB1 = API.createElement({
+      type: "rectangle",
+      x: 400,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["B"],
+    });
+    const groupB2 = API.createElement({
+      type: "rectangle",
+      x: 400,
+      y: 100,
+      width: 50,
+      height: 50,
+      groupIds: ["B"],
+    });
+    const groupC1 = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["C"],
+    });
+    const groupC2 = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 100,
+      width: 50,
+      height: 50,
+      groupIds: ["C"],
+    });
+    const selectedElements = [groupA1, groupA2, groupB1, groupB2];
+    const elements = [...selectedElements, groupC1, groupC2];
+
+    API.setElements(elements);
+    API.setSelectedElements(selectedElements);
+
+    assertSelectedElements(selectedElements);
+    expect(h.state.selectedGroupIds).toEqual({ A: true, B: true });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupC1);
+    });
+
+    assertSelectedElements(elements);
+    expect(h.state.selectedGroupIds).toEqual({ A: true, B: true, C: true });
+  });
+
+  it("shift-selects a group inside common bounds of current selected element", () => {
+    const element = API.createElement({
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+    const groupA1 = API.createElement({
+      x: 10,
+      y: 10,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const groupA2 = API.createElement({
+      x: 20,
+      y: 20,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+    });
+    const selectedElements = [element];
+    const elements = [...selectedElements, groupA1, groupA2];
+
+    API.setElements(elements);
+    API.setSelectedElements(selectedElements);
+
+    assertSelectedElements(selectedElements);
+    expect(h.state.selectedGroupIds).toEqual({});
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickAt(10, 10);
+    });
+
+    assertSelectedElements(elements);
+    expect(h.state.selectedGroupIds).toEqual({ A: true });
+  });
+
+  it("shift selecting and deselecting a nested group preserves selected siblings", () => {
+    const groupA1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["inA", "out"],
+    });
+    const groupA2 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 100,
+      width: 50,
+      height: 50,
+      groupIds: ["inA", "out"],
+    });
+    const groupB1 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["inB", "out"],
+    });
+    const groupB2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 50,
+      height: 50,
+      groupIds: ["inB", "out"],
+    });
+
+    API.setElements([groupA1, groupA2, groupB1, groupB2]);
+
+    mouse.select(groupA1);
+    mouse.doubleClickOn(groupA1);
+
+    assertSelectedElements(groupA1, groupA2);
+    expect(h.state.editingGroupId).toBe("out");
+    expect(h.state.selectedGroupIds).toEqual({ inA: true });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupB1);
+    });
+
+    assertSelectedElements(groupA1, groupA2, groupB1, groupB2);
+    expect(h.state.selectedGroupIds).toEqual({
+      inA: true,
+      inB: true,
+    });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupA1);
+    });
+
+    assertSelectedElements(groupB1, groupB2);
+    expect(h.state.selectedGroupIds).toEqual({
+      inA: false,
+      inB: true,
+    });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupA1);
+    });
+
+    assertSelectedElements(groupA1, groupA2, groupB1, groupB2);
+    expect(h.state.selectedGroupIds).toEqual({
+      inA: true,
+      inB: true,
+    });
+  });
+
+  it("shift selecting a group containing a frame inside selected bounds, removes selected membership of the frames child", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      groupIds: ["frame-group"],
+    });
+    const frameChild = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 25,
+      width: 50,
+      height: 50,
+      frameId: frame.id,
+    });
+    const groupedElement = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 125,
+      width: 50,
+      height: 50,
+      groupIds: ["frame-group"],
+    });
+    const selectedElement = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 225,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([frameChild, frame, groupedElement, selectedElement]);
+    API.setSelectedElements([frameChild, selectedElement]);
+
+    assertSelectedElements(frameChild, selectedElement);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupedElement);
+    });
+
+    assertSelectedElements(frame, groupedElement, selectedElement);
+    expect(h.state.selectedGroupIds).toEqual({ "frame-group": true });
+  });
+
+  it("shift selecting a group containing a frame inside selected bounds, removes selected membership of the frames child group", () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      groupIds: ["frame-group"],
+    });
+    const frameChildA = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 25,
+      width: 25,
+      height: 25,
+      frameId: frame.id,
+      groupIds: ["child-group"],
+    });
+    const frameChildB = API.createElement({
+      type: "rectangle",
+      x: 50,
+      y: 50,
+      width: 25,
+      height: 25,
+      frameId: frame.id,
+      groupIds: ["child-group"],
+    });
+    const groupedElement = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 125,
+      width: 50,
+      height: 50,
+      groupIds: ["frame-group"],
+    });
+    const selectedElement = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 225,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([
+      frameChildA,
+      frameChildB,
+      frame,
+      groupedElement,
+      selectedElement,
+    ]);
+    API.setSelectedElements([frameChildA, frameChildB, selectedElement]);
+
+    assertSelectedElements(frameChildA, frameChildB, selectedElement);
+    expect(h.state.selectedGroupIds).toEqual({ "child-group": true });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(groupedElement);
+    });
+
+    assertSelectedElements(frame, groupedElement, selectedElement);
+    expect(h.state.selectedGroupIds).toEqual({ "frame-group": true });
+  });
 });
