@@ -54,7 +54,6 @@ import {
   MIN_ZOOM,
   POINTER_EVENTS,
   TOOL_TYPE,
-  supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
@@ -631,7 +630,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
-  private get ownerDocument(): Document {
+  public get ownerDocument(): Document {
     return (
       this.props.ownerDocument ??
       this.excalidrawContainerRef.current?.ownerDocument ??
@@ -639,7 +638,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private get ownerWindow(): Window & typeof globalThis {
+  public get ownerWindow(): Window & typeof globalThis {
     return (this.ownerDocument.defaultView ?? window) as Window &
       typeof globalThis;
   }
@@ -1074,7 +1073,7 @@ class App extends React.Component<AppProps, AppState> {
     return result;
   };
 
-  private onWindowMessage(event: MessageEvent) {
+  private onWindowMessage = (event: MessageEvent) => {
     if (
       event.origin !== "https://player.vimeo.com" &&
       event.origin !== "https://www.youtube.com"
@@ -1135,7 +1134,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         break;
     }
-  }
+  };
 
   private handleSkipBindMode() {
     if (
@@ -2285,12 +2284,12 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private toggleOverscrollBehavior(event: React.PointerEvent) {
+  private toggleOverscrollBehavior = (event: React.PointerEvent) => {
     // when pointer inside editor, disable overscroll behavior to prevent
     // panning to trigger history back/forward on MacOS Chrome
     this.ownerDocument.documentElement.style.overscrollBehaviorX =
       event.type === "pointerenter" ? "none" : "auto";
-  }
+  };
 
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
@@ -2328,7 +2327,7 @@ class App extends React.Component<AppProps, AppState> {
     const shouldBlockPointerEvents =
       // default back to `--ui-pointerEvents` flow if setPointerCapture
       // not supported
-      "setPointerCapture" in HTMLElement.prototype
+      "setPointerCapture" in this.ownerWindow.HTMLElement.prototype
         ? false
         : this.state.selectionElement ||
           this.state.newElement ||
@@ -3769,7 +3768,10 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
-    if (supportsResizeObserver && this.excalidrawContainerRef.current) {
+    if (
+      typeof this.ownerWindow.ResizeObserver === "function" &&
+      this.excalidrawContainerRef.current
+    ) {
       this.resizeObserver = new this.ownerWindow.ResizeObserver(() => {
         this.refreshEditorInterface();
         this.updateDOMRect();

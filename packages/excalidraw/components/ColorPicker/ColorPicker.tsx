@@ -19,7 +19,7 @@ import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { useExcalidrawContainer, useStylesPanelMode } from "../App";
+import { useApp, useExcalidrawContainer, useStylesPanelMode } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
@@ -95,6 +95,7 @@ const ColorPickerPopupContent = ({
   getOpenPopup: () => AppState["openPopup"];
 }) => {
   const { container } = useExcalidrawContainer();
+  const app = useApp();
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
@@ -130,12 +131,13 @@ const ColorPickerPopupContent = ({
       // Improve focus handling for text editing scenarios
       preventAutoFocusOnTouch={!!appState.editingTextElement}
       onFocusOutside={(event) => {
+        const target = event.target;
         // focus moving into the top-picks context menu — let the menu keep
         // it (stealing it back would clear the menu's focus-driven
         // `data-highlighted` styling and break its keyboard navigation)
         if (
-          event.target instanceof HTMLElement &&
-          event.target.closest(".color-picker__context-menu")
+          target instanceof app.ownerWindow.HTMLElement &&
+          target.closest(".color-picker__context-menu")
         ) {
           event.preventDefault();
           return;
@@ -143,14 +145,14 @@ const ColorPickerPopupContent = ({
         // refocus due to eye dropper
         if (!isWritableElement(event.target)) {
           if (
-            event.target instanceof HTMLElement &&
-            event.target.matches(":active")
+            target instanceof app.ownerWindow.HTMLElement &&
+            target.matches(":active")
           ) {
             // the focus escaped because a button outside is being pressed
             // (e.g. a top pick) — stealing focus mid-press makes the browser
             // drop the button's activation (`:active` styling), so wait for
             // the release
-            window.addEventListener("pointerup", focusPickerContent, {
+            app.ownerWindow.addEventListener("pointerup", focusPickerContent, {
               once: true,
             });
           } else {
@@ -176,8 +178,8 @@ const ColorPickerPopupContent = ({
 
         // Refocus text editor when popover closes if we were editing text
         if (appState.editingTextElement) {
-          setTimeout(() => {
-            const textEditor = document.querySelector(
+          app.ownerWindow.setTimeout(() => {
+            const textEditor = app.ownerDocument.querySelector(
               ".excalidraw-wysiwyg",
             ) as HTMLTextAreaElement;
             if (textEditor) {
@@ -197,14 +199,14 @@ const ColorPickerPopupContent = ({
           onChange={(changedColor) => {
             // Save caret position before color change if editing text
             const savedSelection = appState.editingTextElement
-              ? saveCaretPosition()
+              ? saveCaretPosition(app.ownerDocument)
               : null;
 
             onChange(changedColor);
 
             // Restore caret position after color change if editing text
             if (appState.editingTextElement && savedSelection) {
-              restoreCaretPosition(savedSelection);
+              restoreCaretPosition(savedSelection, app.ownerDocument);
             }
           }}
           onEyeDropperToggle={(force) => {
@@ -275,6 +277,7 @@ const ColorPickerTrigger = ({
   onToggle: () => void;
   editingTextElement?: boolean;
 }) => {
+  const app = useApp();
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
@@ -289,7 +292,7 @@ const ColorPickerTrigger = ({
 
     // If editing text, temporarily disable the wysiwyg blur event
     if (editingTextElement) {
-      temporarilyDisableTextEditorBlur();
+      temporarilyDisableTextEditorBlur(app.ownerDocument);
     }
 
     onToggle();

@@ -1,5 +1,10 @@
 import React from "react";
-import { render as renderReact, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render as renderReact,
+  waitFor,
+} from "@testing-library/react";
 import { vi } from "vitest";
 
 import { Excalidraw } from "../index";
@@ -7,7 +12,7 @@ import { Excalidraw } from "../index";
 import type { ExcalidrawImperativeAPI } from "../types";
 
 describe("cross-document rendering", () => {
-  it("registers input and font listeners in ownerDocument", async () => {
+  it("scopes listeners, fonts, and portals to ownerDocument", async () => {
     const iframe = document.createElement("iframe");
     document.body.append(iframe);
 
@@ -89,10 +94,50 @@ describe("cross-document rendering", () => {
           ([eventName]) => eventName === "message",
         ),
       ).toBe(true);
+      const messageHandler = addEventListener.mock.calls.find(
+        ([eventName]) => eventName === "message",
+      )?.[1] as EventListener | undefined;
+      expect(typeof messageHandler).toBe("function");
+      expect(() =>
+        messageHandler!(
+          new ownerWindow.MessageEvent("message", {
+            data: JSON.stringify({ method: "paused", value: true }),
+            origin: "https://player.vimeo.com",
+          }),
+        ),
+      ).not.toThrow();
+
+      const excalidrawContainer = container.querySelector(".excalidraw")!;
+      fireEvent.pointerEnter(excalidrawContainer);
+      expect(ownerDocument.documentElement.style.overscrollBehaviorX).toBe(
+        "none",
+      );
+      fireEvent.pointerLeave(excalidrawContainer);
+      expect(ownerDocument.documentElement.style.overscrollBehaviorX).toBe(
+        "auto",
+      );
+
       expect(fonts.addEventListener).toHaveBeenCalledWith(
         "loadingdone",
         expect.any(Function),
         { passive: false },
+      );
+
+      ownerDocument.body.classList.add("excalidraw-animations-disabled");
+      act(() => {
+        api!.updateScene({
+          appState: { openDialog: { name: "imageExport" } },
+        });
+      });
+
+      await waitFor(() =>
+        expect(
+          ownerDocument.querySelector(".excalidraw-modal-container"),
+        ).not.toBeNull(),
+      );
+      expect(document.querySelector(".excalidraw-modal-container")).toBeNull();
+      expect(ownerDocument.querySelector(".Modal")).toHaveClass(
+        "animations-disabled",
       );
     } finally {
       unmount?.();

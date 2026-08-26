@@ -1461,7 +1461,7 @@ export const actionChangeFontFamily = register<{
 
               // Refocus text editor when font picker closes if we were editing text
               if (isCompact && appState.editingTextElement) {
-                restoreCaretPosition(null); // Just refocus without saved position
+                restoreCaretPosition(null, app.ownerDocument); // Just refocus without saved position
               }
             }
           }}
