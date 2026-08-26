@@ -9,7 +9,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { MaybePromise } from "@excalidraw/common/utility-types";
 
-import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
+import { clearAppStateForExport, clearAppStateForDatabase } from "../appState";
 
 import { isImageFileHandle, loadFromBlob } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
@@ -62,7 +62,7 @@ export const serializeAsJSON = (
     elements,
     appState:
       type === "local"
-        ? cleanAppStateForExport(appState)
+        ? clearAppStateForExport(appState)
         : clearAppStateForDatabase(appState),
     files:
       type === "local"
