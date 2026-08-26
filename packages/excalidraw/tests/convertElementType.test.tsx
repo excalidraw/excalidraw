@@ -5,6 +5,7 @@ import { getLinearElementSubType } from "@excalidraw/element";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
+  ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
 import {
@@ -190,6 +191,45 @@ describe("convert element type", () => {
 
       expect(result).toBe(false);
       expect(labeledArrow.type).toBe("arrow");
+    });
+
+    it("keeps the bound text attached across sub-type switches", () => {
+      const [labeledArrow, labelText] = API.createLabeledArrow();
+      API.setElements([
+        labeledArrow as ExcalidrawElement,
+        labelText as ExcalidrawElement,
+      ]);
+      API.setSelectedElements([labeledArrow]);
+
+      act(() => {
+        convertElementTypes(h.app, {
+          conversionType: "linear",
+          nextType: "curvedArrow",
+        });
+      });
+      act(() => {
+        convertElementTypes(h.app, {
+          conversionType: "linear",
+          nextType: "elbowArrow",
+        });
+      });
+
+      const converted = h.elements.find(
+        (el) => el.id === labeledArrow.id,
+      ) as ExcalidrawArrowElement;
+      expect(getLinearElementSubType(converted)).toBe("elbowArrow");
+
+      // the label must survive as a bound, non-deleted child of the arrow
+      const label = h.elements.find(
+        (el) =>
+          el.type === "text" &&
+          (el as ExcalidrawTextElement).containerId === labeledArrow.id,
+      ) as ExcalidrawTextElement | undefined;
+      expect(label).toBeDefined();
+      expect(label!.isDeleted).toBe(false);
+      expect(converted.boundElements?.some((be) => be.id === label!.id)).toBe(
+        true,
+      );
     });
   });
 
