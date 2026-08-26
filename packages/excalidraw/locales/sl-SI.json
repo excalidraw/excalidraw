@@ -1,14 +1,14 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "Registriraj se",
+    "signIn": "Prijavi se",
     "paste": "Prilepi",
     "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
-    "chartType_bar": "",
-    "chartType_line": "",
-    "chartType_radar": "",
-    "chartType_plaintext": "",
+    "chartType_bar": "Palični grafikon",
+    "chartType_line": "Črtni grafikon",
+    "chartType_radar": "Grafikon radarja",
+    "chartType_plaintext": "Navadno besedilo",
     "selectAll": "Izberi vse",
     "multiSelect": "Dodaj element v izbor",
     "moveCanvas": "Premakni platno",
@@ -37,9 +37,9 @@
     "strokeStyle_dashed": "Črtkana",
     "strokeStyle_dotted": "Pikasta",
     "sloppiness": "Površnost",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Pritisk",
+    "pressure_constant": "Konstanten",
+    "pressure_variable": "Spremenljiv",
     "opacity": "Prekrivnost",
     "textAlign": "Poravnava besedila",
     "edges": "Robovi",
@@ -58,14 +58,14 @@
     "arrowhead_crowfoot_many": "Vranja noga (več)",
     "arrowhead_crowfoot_one": "Vranja noga (ena)",
     "arrowhead_crowfoot_one_or_many": "Vranja noga (ena ali več)",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "Kardinalnost (ena)",
+    "arrowhead_cardinality_many": "Kardinalnost (več)",
+    "arrowhead_cardinality_one_or_many": "Kardinalnost (ena ali več)",
+    "arrowhead_cardinality_exactly_one": "Kardinalnost (natančno ena)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalnost (nič ali ena)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalnost (nič ali več)",
     "more_options": "Več možnosti",
-    "cardinality": "",
+    "cardinality": "Kardinalnost",
     "arrowtypes": "Vrsta puščice",
     "arrowtype_sharp": "Ostra puščica",
     "arrowtype_round": "Ukrivljena puščica",
@@ -111,7 +111,7 @@
     "group": "Združi izbor",
     "ungroup": "Razdruži izbor",
     "collaborators": "Sodelavci",
-    "you": "",
+    "you": "Ti",
     "toggleGrid": "Preklopi mrežo",
     "addToLibrary": "Dodaj v knjižnico",
     "removeFromLibrary": "Odstrani iz knjižnice",
@@ -159,8 +159,8 @@
       "editArrow": "Uredi puščico"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Prekini poligon",
+      "convertToPolygon": "Pretvori v poligon"
     },
     "elementLock": {
       "lock": "Zakleni",
@@ -187,10 +187,10 @@
     "copyElementLink": "Kopiraj povezavo do objekta",
     "linkToElement": "Povezava do objekta",
     "wrapSelectionInFrame": "Zavij izbor v okvir",
-    "tab": "",
-    "shapeSwitch": "",
-    "preferences": "",
-    "preferences_toolLock": "",
+    "tab": "Zavihek",
+    "shapeSwitch": "Spremeni obliko",
+    "preferences": "Nastavitve",
+    "preferences_toolLock": "Zaklep orodja",
     "boxSelectionMode": "",
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
@@ -613,10 +613,10 @@
     "shades": "Odtenki",
     "hexCode": "Hex koda",
     "noShades": "Odtenki za to barvo niso na voljo",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "Ni veljavna barva",
+    "invalidHexLength": "Šestnajstiška koda mora imeti 3, 4, 6 ali 8 znakov",
+    "topPicksTip": "Nasvet: povlecite katero koli barvo med svoje najljubše, da jo pripnete",
+    "resetTopPicks": "Ponastavi na privzete najboljše izbire"
   },
   "overwriteConfirm": {
     "action": {
@@ -655,7 +655,7 @@
     "description": "",
     "syntax": "Sintaksa Mermaid",
     "preview": "Predogled",
-    "label": "",
+    "label": "Mermaid",
     "inputPlaceholder": "",
     "autoFixAvailable": ""
   },
@@ -695,15 +695,15 @@
       "fixInMermaid": "",
       "aiRepair": "",
       "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "requestFailed": "Zahteva ni uspela",
+      "mermaidParseError": "Sintaktična napaka Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Dosegli ste omejitev uporabe umetne inteligence v brezplačnem paketu. Za več informacij preizkusite Excalidraw+ ali se vrnite jutri.",
+      "generalRateLimit": "Počakaj malo, prehiter si za nas! Prosim, počakaj trenutek, preden poskusiš znova.",
+      "messageLimitInputPlaceholder": "Dosegli ste omejitev števila sporočil"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Nadgradi na Plus"
   },
   "quickSearch": {
     "placeholder": "Hitro iskanje"
@@ -742,15 +742,15 @@
     "shortcutHint": "Za paleto ukazov uporabi {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Možnost",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Presledek",
+    "delete": "Izbriši",
+    "mmb": "Kolesce za pomikanje"
   }
 }
