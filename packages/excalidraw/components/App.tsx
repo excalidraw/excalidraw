@@ -5623,9 +5623,9 @@ class App extends React.Component<AppProps, AppState> {
     //zsviczian
     if (highlightSearchResult) {
       this.debounceClearHighlightSearchResults = true;
-      setTimeout(() => {
+      this.ownerWindow.setTimeout(() => {
         this.debounceClearHighlightSearchResults = false;
-      }, 500);
+      }, 500); // zsviczian -- schedule the fork debounce in the editor window
     }
     this.updateScene({
       appState: {
@@ -6055,7 +6055,7 @@ class App extends React.Component<AppProps, AppState> {
             button: POINTER_BUTTON.MAIN,
             clientX: this.viewport.lastPosition.x,
             clientY: this.viewport.lastPosition.y,
-            nativeEvent: new MouseEvent("contextmenu"),
+            nativeEvent: new this.ownerWindow.MouseEvent("contextmenu"), // zsviczian -- construct the fork event in the editor realm
             preventDefault: () => event.preventDefault(),
           } as unknown as React.MouseEvent<
             HTMLElement | HTMLCanvasElement
@@ -6639,7 +6639,7 @@ class App extends React.Component<AppProps, AppState> {
       this.onImageToolbarButtonClick();
     }
 
-    setTimeout(() => {
+    this.ownerWindow.setTimeout(() => {
       this.setState((prevState) => {
         const commonResets = {
           snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
@@ -6694,7 +6694,7 @@ class App extends React.Component<AppProps, AppState> {
           activeTool: nextActiveTool,
         };
       });
-    }); //zsviczian added timeout because button won't select otherwise
+    }); // zsviczian -- schedule the fork button-selection reset in the editor window
   };
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {

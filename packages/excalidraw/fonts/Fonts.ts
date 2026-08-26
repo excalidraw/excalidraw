@@ -163,9 +163,15 @@ export class Fonts {
    */
   public loadSceneFonts = async (): Promise<FontFace[]> => {
     const sceneFamilies = this.getSceneFamilies();
-    const charsPerFamily = Fonts.getCharsPerFamily(
-      this.scene.getNonDeletedElements(),
-    );
+    const elements = this.scene.getNonDeletedElements();
+    const charsPerFamily = Fonts.getCharsPerFamily(elements);
+
+    // zsviczian START -- load the empty-scene Welcome UI font in the editor document
+    if (!elements.length) {
+      sceneFamilies.push(FONT_FAMILY.Excalifont);
+      charsPerFamily[FONT_FAMILY.Excalifont] = new Set("Excalidraw");
+    }
+    // zsviczian END
 
     return Fonts.loadFontFaces(
       sceneFamilies,

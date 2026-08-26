@@ -23,7 +23,7 @@ describe("cross-document rendering", () => {
 
     const fonts = {
       load: vi.fn().mockResolvedValue([]),
-      check: vi.fn().mockReturnValue(true),
+      check: vi.fn().mockReturnValue(false), // zsviczian -- force the empty-scene UI font load path
       has: vi.fn().mockReturnValue(true),
       add: vi.fn(),
       addEventListener: vi.fn(),
@@ -122,6 +122,14 @@ describe("cross-document rendering", () => {
         expect.any(Function),
         { passive: false },
       );
+      // zsviczian START -- verify the empty-scene UI font targets the editor document
+      await waitFor(() =>
+        expect(fonts.load).toHaveBeenCalledWith(
+          expect.stringContaining("Excalifont"),
+          expect.stringContaining("Excalid"),
+        ),
+      );
+      // zsviczian END
 
       ownerDocument.body.classList.add("excalidraw-animations-disabled");
       act(() => {
