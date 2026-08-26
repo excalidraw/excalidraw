@@ -3122,11 +3122,28 @@ class App extends React.Component<AppProps, AppState> {
 
   // Lifecycle
 
+  /** whether an Alt keydown was actually received by us; OS-initiated
+   * window switches (e.g. Alt+Tab) can flip `altKey` on pointer events
+   * without a real keystroke reaching the page (#8508) */
+  private isAltKeyReceived = false;
+
+  /** pointerDownState of the in-progress pointer gesture, if any */
+  private activePointerDownState: PointerDownState | null = null;
+
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
     this.setState({
       isBindingEnabled: this.state.bindingPreference === "enabled",
     });
+    // #8508: losing focus mid-drag (Alt+Tab on Windows, window switching on
+    // Linux) registers as an alt-drag even though the user never intended
+    // to duplicate. Revert a duplication that happened during this gesture.
+    if (
+      this.activePointerDownState?.hit.hasBeenDuplicated &&
+      this.activePointerDownState.hit.revertAltDuplication
+    ) {
+      this.activePointerDownState.hit.revertAltDuplication();
+    }
   });
 
   private onUnload = () => {
@@ -5340,6 +5357,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (event.key === KEYS.ALT) {
+        this.isAltKeyReceived = true;
+      }
+
       // normalize `event.key` when CapsLock is pressed #2372
 
       if (
@@ -5827,6 +5848,9 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
     if (!this.isInteractionEnabled()) {
       return;
+    }
+    if (event.key === KEYS.ALT) {
+      this.isAltKeyReceived = false;
     }
     if (event.key === KEYS.SPACE) {
       if (
@@ -8570,6 +8594,7 @@ class App extends React.Component<AppProps, AppState> {
     // State for the duration of a pointer interaction, which starts with a
     // pointerDown event, ends with a pointerUp event (or another pointerDown)
     const pointerDownState = this.initialPointerDownState(event);
+    this.activePointerDownState = pointerDownState;
 
     this.setState({
       selectedElementsAreBeingDragged: false,
@@ -10999,7 +11024,14 @@ class App extends React.Component<AppProps, AppState> {
           });
 
           // We duplicate the selected element if alt is pressed on pointer move
-          if (event.altKey && !pointerDownState.hit.hasBeenDuplicated) {
+          // (#8508) but only when we actually received an Alt keydown —
+          // OS-initiated window switches (Alt+Tab) can report `altKey` on
+          // pointer events without a real keystroke reaching the page
+          if (
+            event.altKey &&
+            this.isAltKeyReceived &&
+            !pointerDownState.hit.hasBeenDuplicated
+          ) {
             // Move the currently selected elements to the top of the z index stack, and
             // put the duplicates where the selected elements used to be.
             // (the origin point where the dragging started)
@@ -11058,6 +11090,36 @@ class App extends React.Component<AppProps, AppState> {
                 deepCopyElement(element),
               );
             });
+
+            // If this gesture turns out to be an OS-level Alt+Tab rather
+            // than an intentional alt-drag, onBlur reverts the duplication:
+            // remove the duplicates, restore the hit pointers / drag origin,
+            // and re-select the original elements
+            const originalHitElement = pointerDownState.hit.element;
+            const originalHitAllElements = [
+              ...pointerDownState.hit.allHitElements,
+            ];
+            const originalDragOrigin = { ...pointerDownState.drag.origin };
+            pointerDownState.hit.revertAltDuplication = () => {
+              const duplicateIds = new Set(
+                duplicatedElements.map((element) => element.id),
+              );
+              this.scene.replaceAllElements(
+                this.scene
+                  .getElementsIncludingDeleted()
+                  .filter((element) => !duplicateIds.has(element.id)),
+              );
+              pointerDownState.hit.element = originalHitElement;
+              pointerDownState.hit.allHitElements = originalHitAllElements;
+              pointerDownState.drag.origin = originalDragOrigin;
+              this.setState((prevState) => ({
+                ...getSelectionStateForElements(
+                  selectedElements,
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                ),
+              }));
+            };
 
             const mappedClonedElements = elementsWithDuplicates.map((el) => {
               if (idsOfElementsToDuplicate.has(el.id)) {
@@ -11427,6 +11489,7 @@ class App extends React.Component<AppProps, AppState> {
     return withBatchedUpdates((childEvent: PointerEvent) => {
       const elementsMap = this.scene.getNonDeletedElementsMap();
 
+      this.activePointerDownState = null;
       this.removePointer(childEvent);
       pointerDownState.drag.blockDragging = false;
       if (pointerDownState.eventListeners.onMove) {
