@@ -781,6 +781,16 @@ export type UIConfig = {
 
 export interface ExcalidrawProps {
   className?: string;
+  /**
+   * Document in which the editor is rendered.
+   *
+   * Set this when the React runtime and the editor are evaluated in a
+   * different browsing context than the rendered Excalidraw root.
+   * The value must remain stable for the lifetime of the mounted editor.
+   *
+   * @default document
+   */
+  ownerDocument?: Document;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
