@@ -40,7 +40,7 @@ import { generateLinearCollisionShape } from "./shape";
 
 import { hitElementItself, isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
-import { isRectangularElement } from "./typeChecks";
+import { isElbowArrow, isRectangularElement } from "./typeChecks";
 import { maxBindingDistance_simple } from "./binding";
 
 import {
@@ -62,21 +62,19 @@ import type {
 export type LinearPathSegment = LineSegment<GlobalPoint> | Curve<GlobalPoint>;
 
 type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
-type LinearElementShape = [...ElementShape, LinearPathSegment[]];
-type CachedElementShape = ElementShape | LinearElementShape;
 
 const ElementShapesCache = new WeakMap<
   ExcalidrawElement,
   {
     version: ExcalidrawElement["version"];
-    shapes: Map<number, CachedElementShape>;
+    shapes: Map<number, ElementShape>;
   }
 >();
 
 const getElementShapesCacheEntry = <T extends ExcalidrawElement>(
   element: T,
   offset: number,
-): CachedElementShape | undefined => {
+): ElementShape | undefined => {
   const record = ElementShapesCache.get(element);
 
   if (!record) {
@@ -95,7 +93,7 @@ const getElementShapesCacheEntry = <T extends ExcalidrawElement>(
 
 const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
   element: T,
-  shape: CachedElementShape,
+  shape: ElementShape,
   offset: number,
 ) => {
   const record = ElementShapesCache.get(element);
@@ -132,17 +130,16 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
-): LinearElementShape {
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 
-  if (cachedShape?.length === 3) {
+  if (cachedShape) {
     return cachedShape;
   }
 
   const ops = generateLinearCollisionShape(element, elementsMap);
   const lines: LineSegment<GlobalPoint>[] = [];
   const curves: Curve<GlobalPoint>[] = [];
-  const orderedSegments: LinearPathSegment[] = [];
 
   for (let idx = 0; idx < ops.length; idx += 1) {
     const op = ops[idx];
@@ -167,7 +164,6 @@ export function deconstructLinearOrFreeDrawElement(
           ),
         );
         lines.push(segment);
-        orderedSegments.push(segment);
         continue;
       }
       case "bcurveTo": {
@@ -194,7 +190,6 @@ export function deconstructLinearOrFreeDrawElement(
           ),
         );
         curves.push(segment);
-        orderedSegments.push(segment);
         continue;
       }
       default: {
@@ -203,7 +198,7 @@ export function deconstructLinearOrFreeDrawElement(
     }
   }
 
-  const shape: LinearElementShape = [lines, curves, orderedSegments];
+  const shape: ElementShape = [lines, curves];
   setElementShapesCacheEntry(element, shape, 0);
 
   return shape;
@@ -213,12 +208,31 @@ export function getLinearElementPathSegments(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
 ): LinearPathSegment[] {
-  const [, , orderedSegments] = deconstructLinearOrFreeDrawElement(
+  // For now, model elbow arrows as their unrounded logical path. Rounded
+  // joints can be incorporated once the path model supports mixed straight
+  // and curved segments.
+  if (isElbowArrow(element)) {
+    return element.points
+      .slice(1)
+      .map((point, index) =>
+        lineSegment<GlobalPoint>(
+          pointFrom<GlobalPoint>(
+            element.x + element.points[index][0],
+            element.y + element.points[index][1],
+          ),
+          pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+        ),
+      );
+  }
+
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
     element,
     elementsMap,
   );
 
-  return orderedSegments;
+  // Non-elbow paths currently contain only one segment type. Mixed paths
+  // should consume an ordered operation stream instead of these type buckets.
+  return curves.length > 0 ? curves : lines;
 }
 
 /**
@@ -235,7 +249,7 @@ export function deconstructRectanguloidElement(
 ): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
-  if (cachedShape?.length === 2) {
+  if (cachedShape) {
     return cachedShape;
   }
 
@@ -447,7 +461,7 @@ export function deconstructDiamondElement(
 ): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
-  if (cachedShape?.length === 2) {
+  if (cachedShape) {
     return cachedShape;
   }
 
