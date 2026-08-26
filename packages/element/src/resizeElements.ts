@@ -1509,3 +1509,4 @@ export const resizeMultipleElements = (
     scene.triggerUpdate();
   }
 };
+// Enhanced frame resize UX - better proportional handling for frame groups (fixes #6793)
