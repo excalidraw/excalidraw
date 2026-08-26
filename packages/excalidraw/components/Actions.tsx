@@ -420,7 +420,9 @@ const CombinedTextProperties = ({
   predicates: ShapeActionPredicates;
   container: HTMLDivElement | null;
 }) => {
-  const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus();
+  const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus(
+    container?.ownerDocument,
+  );
   const isOpen = appState.openPopup === "compactTextProperties";
 
   return (

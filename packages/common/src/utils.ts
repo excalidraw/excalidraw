@@ -48,10 +48,23 @@ export const getDateTime = () => {
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
+const getTargetWindow = (
+  target: Element | EventTarget | null,
+): (Window & typeof globalThis) | null =>
+  (target as (EventTarget & { ownerDocument?: Document | null }) | null)
+    ?.ownerDocument?.defaultView ??
+  (typeof window === "undefined" ? null : window);
+
 export const isToolIcon = (
   target: Element | EventTarget | null,
-): target is HTMLElement =>
-  target instanceof HTMLElement && target.className.includes("ToolIcon");
+): target is HTMLElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    target instanceof targetWindow.HTMLElement &&
+    target.className.includes("ToolIcon")
+  );
+};
 
 export const isInputLike = (
   target: Element | EventTarget | null,
@@ -60,17 +73,26 @@ export const isInputLike = (
   | HTMLTextAreaElement
   | HTMLSelectElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLInputElement ||
-  target instanceof HTMLTextAreaElement ||
-  target instanceof HTMLSelectElement;
+  | HTMLDivElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    ((target instanceof targetWindow.HTMLElement &&
+      target.dataset.type === "wysiwyg") ||
+      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+      target instanceof targetWindow.HTMLInputElement ||
+      target instanceof targetWindow.HTMLTextAreaElement ||
+      target instanceof targetWindow.HTMLSelectElement)
+  );
+};
 
 export const isInteractive = (target: Element | EventTarget | null) => {
+  const targetWindow = getTargetWindow(target);
   return (
     isInputLike(target) ||
-    (target instanceof Element && !!target.closest("label, button"))
+    (!!targetWindow &&
+      target instanceof targetWindow.Element &&
+      !!target.closest("label, button"))
   );
 };
 
@@ -80,16 +102,23 @@ export const isWritableElement = (
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLTextAreaElement ||
-  (target instanceof HTMLInputElement &&
-    (target.type === "text" ||
-      target.type === "number" ||
-      target.type === "password" ||
-      target.type === "search")) ||
-  (target instanceof HTMLElement && target.closest(".cm-editor") !== null);
+  | HTMLDivElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    ((target instanceof targetWindow.HTMLElement &&
+      target.dataset.type === "wysiwyg") ||
+      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+      target instanceof targetWindow.HTMLTextAreaElement ||
+      (target instanceof targetWindow.HTMLInputElement &&
+        (target.type === "text" ||
+          target.type === "number" ||
+          target.type === "password" ||
+          target.type === "search")) ||
+      (target instanceof targetWindow.HTMLElement &&
+        target.closest(".cm-editor") !== null))
+  );
+};
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -475,12 +504,14 @@ export const supportsEmoji = () => {
 export const getNearestScrollableContainer = (
   element: HTMLElement,
 ): HTMLElement | Document => {
+  const ownerDocument = element.ownerDocument;
+  const ownerWindow = ownerDocument.defaultView ?? window;
   let parent = element.parentElement;
   while (parent) {
-    if (parent === document.body) {
-      return document;
+    if (parent === ownerDocument.body) {
+      return ownerDocument;
     }
-    const { overflowY } = window.getComputedStyle(parent);
+    const { overflowY } = ownerWindow.getComputedStyle(parent);
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
     if (
       hasScrollableContent &&
@@ -492,7 +523,7 @@ export const getNearestScrollableContainer = (
     }
     parent = parent.parentElement;
   }
-  return document;
+  return ownerDocument;
 };
 
 export const focusNearestParent = (element: HTMLInputElement) => {

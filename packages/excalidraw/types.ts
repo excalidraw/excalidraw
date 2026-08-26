@@ -781,6 +781,16 @@ export type UIConfig = {
 
 export interface ExcalidrawProps {
   className?: string;
+  /**
+   * Document that owns Excalidraw's mounted DOM.
+   *
+   * Set only when it differs from the global `document`, such as when code
+   * executing in a parent window mounts Excalidraw into an iframe document.
+   * The value must remain stable for the editor's lifetime.
+   *
+   * @default document
+   */
+  ownerDocument?: Document;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -1093,6 +1103,8 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   state: AppState;
+  readonly ownerDocument: Document;
+  readonly ownerWindow: Window & typeof globalThis;
   api: App["api"];
   sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;

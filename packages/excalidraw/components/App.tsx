@@ -54,7 +54,6 @@ import {
   MIN_ZOOM,
   POINTER_EVENTS,
   TOOL_TYPE,
-  supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
@@ -631,6 +630,19 @@ class App extends React.Component<AppProps, AppState> {
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
+  public get ownerDocument(): Document {
+    return (
+      this.props.ownerDocument ??
+      this.excalidrawContainerRef.current?.ownerDocument ??
+      document
+    );
+  }
+
+  public get ownerWindow(): Window & typeof globalThis {
+    return (this.ownerDocument.defaultView ?? window) as Window &
+      typeof globalThis;
+  }
+
   public scene: Scene;
   public fonts: Fonts;
   public renderer: Renderer;
@@ -842,8 +854,8 @@ class App extends React.Component<AppProps, AppState> {
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
       name,
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: this.ownerWindow.innerWidth,
+      height: this.ownerWindow.innerHeight,
     };
 
     this.refreshEditorInterface();
@@ -859,7 +871,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     this.scene = new Scene();
 
-    this.canvas = document.createElement("canvas");
+    this.canvas = this.ownerDocument.createElement("canvas");
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
     this.visibleElements = [];
@@ -872,7 +884,7 @@ class App extends React.Component<AppProps, AppState> {
       id: this.id,
     };
 
-    this.fonts = new Fonts(this.scene);
+    this.fonts = new Fonts(this.scene, this.ownerDocument);
     this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
@@ -1061,7 +1073,7 @@ class App extends React.Component<AppProps, AppState> {
     return result;
   };
 
-  private onWindowMessage(event: MessageEvent) {
+  private onWindowMessage = (event: MessageEvent) => {
     if (
       event.origin !== "https://player.vimeo.com" &&
       event.origin !== "https://www.youtube.com"
@@ -1082,7 +1094,7 @@ class App extends React.Component<AppProps, AppState> {
         //Allowing for multiple instances of Excalidraw running in the window
         if (data.method === "paused") {
           let source: Window | null = null;
-          const iframes = document.body.querySelectorAll(
+          const iframes = this.ownerDocument.body.querySelectorAll(
             "iframe.excalidraw__embeddable",
           );
           if (!iframes) {
@@ -1122,7 +1134,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         break;
     }
-  }
+  };
 
   private handleSkipBindMode() {
     if (
@@ -2061,7 +2073,7 @@ class App extends React.Component<AppProps, AppState> {
         bounds.zoom !== this.state.zoom.value ||
         bounds.versionNonce !== frameElement.versionNonce
       ) {
-        const frameNameDiv = document.getElementById(
+        const frameNameDiv = this.ownerDocument.getElementById(
           this.getFrameNameDOMId(frameElement),
         );
 
@@ -2132,8 +2144,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !isElementInViewport(
           f,
-          this.canvas.width / window.devicePixelRatio,
-          this.canvas.height / window.devicePixelRatio,
+          this.canvas.width / this.ownerWindow.devicePixelRatio,
+          this.canvas.height / this.ownerWindow.devicePixelRatio,
           {
             offsetLeft: this.state.offsetLeft,
             offsetTop: this.state.offsetTop,
@@ -2203,7 +2215,9 @@ class App extends React.Component<AppProps, AppState> {
                 : FRAME_STYLE.nameColorLightTheme,
               overflow: "hidden",
               maxWidth: `${
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
+                this.ownerDocument.body.clientWidth -
+                x1 -
+                FRAME_NAME_EDIT_PADDING
               }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
@@ -2270,12 +2284,12 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private toggleOverscrollBehavior(event: React.PointerEvent) {
+  private toggleOverscrollBehavior = (event: React.PointerEvent) => {
     // when pointer inside editor, disable overscroll behavior to prevent
     // panning to trigger history back/forward on MacOS Chrome
-    document.documentElement.style.overscrollBehaviorX =
+    this.ownerDocument.documentElement.style.overscrollBehaviorX =
       event.type === "pointerenter" ? "none" : "auto";
-  }
+  };
 
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
@@ -2313,7 +2327,7 @@ class App extends React.Component<AppProps, AppState> {
     const shouldBlockPointerEvents =
       // default back to `--ui-pointerEvents` flow if setPointerCapture
       // not supported
-      "setPointerCapture" in HTMLElement.prototype
+      "setPointerCapture" in this.ownerWindow.HTMLElement.prototype
         ? false
         : this.state.selectionElement ||
           this.state.newElement ||
@@ -2572,7 +2586,7 @@ class App extends React.Component<AppProps, AppState> {
                             selectionNonce={
                               this.state.selectionElement?.versionNonce
                             }
-                            scale={window.devicePixelRatio}
+                            scale={this.ownerWindow.devicePixelRatio}
                             appState={this.state}
                             renderConfig={{
                               imageCache: this.imageCache,
@@ -2594,7 +2608,7 @@ class App extends React.Component<AppProps, AppState> {
                             <NewElementCanvas
                               appState={this.state}
                               newElement={newElementCanvasElement}
-                              scale={window.devicePixelRatio}
+                              scale={this.ownerWindow.devicePixelRatio}
                               rc={this.rc}
                               elementsMap={renderableElementsMap}
                               allElementsMap={allElementsMap}
@@ -2625,7 +2639,7 @@ class App extends React.Component<AppProps, AppState> {
                             selectionNonce={
                               this.state.selectionElement?.versionNonce
                             }
-                            scale={window.devicePixelRatio}
+                            scale={this.ownerWindow.devicePixelRatio}
                             appState={this.state}
                             renderScrollbars={
                               this.props.renderScrollbars === true
@@ -3465,8 +3479,11 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private initializeScene = async () => {
-    if ("launchQueue" in window && "LaunchParams" in window) {
-      (window as any).launchQueue.setConsumer(
+    if (
+      "launchQueue" in this.ownerWindow &&
+      "LaunchParams" in this.ownerWindow
+    ) {
+      (this.ownerWindow as any).launchQueue.setConsumer(
         async (launchParams: { files: any[] }) => {
           if (!launchParams.files.length) {
             return;
@@ -3604,9 +3621,9 @@ class App extends React.Component<AppProps, AppState> {
       this.fonts.onLoaded(fontFaces);
     });
 
-    if (isElementLink(window.location.href)) {
+    if (isElementLink(this.ownerWindow.location.href)) {
       this.viewport.setViewport({
-        target: window.location.href,
+        target: this.ownerWindow.location.href,
         fit: "scale-down",
         animation: false,
       });
@@ -3751,15 +3768,20 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
-    if (supportsResizeObserver && this.excalidrawContainerRef.current) {
-      this.resizeObserver = new ResizeObserver(() => {
+    if (
+      typeof this.ownerWindow.ResizeObserver === "function" &&
+      this.excalidrawContainerRef.current
+    ) {
+      this.resizeObserver = new this.ownerWindow.ResizeObserver(() => {
         this.refreshEditorInterface();
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
 
-    const searchParams = new URLSearchParams(window.location.search.slice(1));
+    const searchParams = new URLSearchParams(
+      this.ownerWindow.location.search.slice(1),
+    );
 
     if (searchParams.has("web-share-target")) {
       // Obtain a file that was shared via the Web Share Target API.
@@ -3809,12 +3831,12 @@ class App extends React.Component<AppProps, AppState> {
     this.props.onUnmount?.();
     this.props.onExcalidrawAPI?.(null);
 
-    (window as any).launchQueue?.setConsumer(() => {});
+    (this.ownerWindow as any).launchQueue?.setConsumer(() => {});
 
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
-    this.fonts = new Fonts(this.scene);
+    this.fonts = new Fonts(this.scene, this.ownerDocument);
     this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
@@ -3837,7 +3859,7 @@ class App extends React.Component<AppProps, AppState> {
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
-    document.documentElement.style.overscrollBehaviorX = "";
+    this.ownerDocument.documentElement.style.overscrollBehaviorX = "";
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -3853,7 +3875,7 @@ class App extends React.Component<AppProps, AppState> {
   private onFullscreenChange = () => {
     if (
       // points to the iframe element we fullscreened
-      !document.fullscreenElement &&
+      !this.ownerDocument.fullscreenElement &&
       this.state.activeEmbeddable?.state === "active"
     ) {
       this.setState({
@@ -3875,13 +3897,23 @@ class App extends React.Component<AppProps, AppState> {
     // -------------------------------------------------------------------------
 
     this.onRemoveEventListenersEmitter.once(
-      addEventListener(window, EVENT.MESSAGE, this.onWindowMessage, false),
-      addEventListener(document, EVENT.POINTER_UP, this.removePointer, {
-        passive: false,
-      }), // #3553
+      addEventListener(
+        this.ownerWindow,
+        EVENT.MESSAGE,
+        this.onWindowMessage,
+        false,
+      ),
+      addEventListener(
+        this.ownerDocument,
+        EVENT.POINTER_UP,
+        this.removePointer,
+        {
+          passive: false,
+        },
+      ), // #3553
       // rerender text elements on font load to fix #637 && #1553
       addEventListener(
-        document.fonts,
+        this.ownerDocument.fonts,
         "loadingdone",
         (event) => {
           const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
@@ -3890,7 +3922,7 @@ class App extends React.Component<AppProps, AppState> {
         { passive: false },
       ),
       addEventListener(
-        window,
+        this.ownerWindow,
         EVENT.FOCUS,
         () => {
           this.maybeCleanupAfterMissingPointerUp(null);
@@ -3919,7 +3951,7 @@ class App extends React.Component<AppProps, AppState> {
           // navigation action shortcuts (canvas zoom & zoom-to-fit)
           addEventListener(
             this.props.handleKeyboardGlobally
-              ? document
+              ? this.ownerDocument
               : this.excalidrawContainerRef.current,
             EVENT.KEYDOWN,
             this.handleNavigationModeKeyDown as EventListener,
@@ -3927,26 +3959,26 @@ class App extends React.Component<AppProps, AppState> {
           ),
           // wheel zoom is anchored on `viewport.lastPosition`
           addEventListener(
-            document,
+            this.ownerDocument,
             EVENT.POINTER_MOVE,
             this.updateCurrentCursorPosition,
             { passive: false },
           ),
           // Safari-only desktop pinch
           addEventListener(
-            document,
+            this.ownerDocument,
             EVENT.GESTURE_START,
             this.onGestureStart as any,
             false,
           ),
           addEventListener(
-            document,
+            this.ownerDocument,
             EVENT.GESTURE_CHANGE,
             this.onGestureChange as any,
             false,
           ),
           addEventListener(
-            document,
+            this.ownerDocument,
             EVENT.GESTURE_END,
             this.onGestureEnd as any,
             false,
@@ -3991,7 +4023,7 @@ class App extends React.Component<AppProps, AppState> {
         this.onRemoveEventListenersEmitter.once(
           addEventListener(
             this.props.handleKeyboardGlobally
-              ? document
+              ? this.ownerDocument
               : this.excalidrawContainerRef.current,
             EVENT.KEYDOWN,
             this.preventBrowserZoomKeyDown as EventListener,
@@ -4008,7 +4040,12 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.props.handleKeyboardGlobally) {
       this.onRemoveEventListenersEmitter.once(
-        addEventListener(document, EVENT.KEYDOWN, this.onKeyDown, false),
+        addEventListener(
+          this.ownerDocument,
+          EVENT.KEYDOWN,
+          this.onKeyDown,
+          false,
+        ),
       );
     }
 
@@ -4019,29 +4056,33 @@ class App extends React.Component<AppProps, AppState> {
         this.handleWheel,
         { passive: false },
       ),
-      addEventListener(document, EVENT.COPY, this.onCopy, { passive: false }),
-      addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
+      addEventListener(this.ownerDocument, EVENT.COPY, this.onCopy, {
+        passive: false,
+      }),
+      addEventListener(this.ownerDocument, EVENT.KEYUP, this.onKeyUp, {
+        passive: true,
+      }),
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
         { passive: false },
       ),
       // Safari-only desktop pinch zoom
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.GESTURE_START,
         this.onGestureStart as any,
         false,
       ),
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.GESTURE_CHANGE,
         this.onGestureChange as any,
         false,
       ),
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.GESTURE_END,
         this.onGestureEnd as any,
         false,
@@ -4058,18 +4099,25 @@ class App extends React.Component<AppProps, AppState> {
 
     this.onRemoveEventListenersEmitter.once(
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.FULLSCREENCHANGE,
         this.onFullscreenChange,
         { passive: false },
       ),
-      addEventListener(document, EVENT.PASTE, this.pasteFromClipboard, {
+      addEventListener(
+        this.ownerDocument,
+        EVENT.PASTE,
+        this.pasteFromClipboard,
+        {
+          passive: false,
+        },
+      ),
+      addEventListener(this.ownerDocument, EVENT.CUT, this.onCut, {
         passive: false,
       }),
-      addEventListener(document, EVENT.CUT, this.onCut, { passive: false }),
-      addEventListener(window, EVENT.RESIZE, this.onResize, false),
-      addEventListener(window, EVENT.UNLOAD, this.onUnload, false),
-      addEventListener(window, EVENT.BLUR, this.onBlur, false),
+      addEventListener(this.ownerWindow, EVENT.RESIZE, this.onResize, false),
+      addEventListener(this.ownerWindow, EVENT.UNLOAD, this.onUnload, false),
+      addEventListener(this.ownerWindow, EVENT.BLUR, this.onBlur, false),
       addEventListener(
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
@@ -4317,7 +4365,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
-      document.activeElement,
+      this.ownerDocument.activeElement,
     );
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
@@ -4332,7 +4380,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
-      document.activeElement,
+      this.ownerDocument.activeElement,
     );
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
@@ -4367,7 +4415,7 @@ class App extends React.Component<AppProps, AppState> {
         };
       }
       clearTimeout(tappedTwiceTimer);
-      tappedTwiceTimer = window.setTimeout(
+      tappedTwiceTimer = this.ownerWindow.setTimeout(
         App.resetTapTwice,
         TAP_TWICE_TIMEOUT,
       );
@@ -4607,20 +4655,20 @@ class App extends React.Component<AppProps, AppState> {
       const isPlainPaste = !!IS_PLAIN_PASTE;
 
       // #686
-      const target = document.activeElement;
+      const target = this.ownerDocument.activeElement;
       const isExcalidrawActive =
         this.excalidrawContainerRef.current?.contains(target);
       if (event && !isExcalidrawActive) {
         return;
       }
 
-      const elementUnderCursor = document.elementFromPoint(
+      const elementUnderCursor = this.ownerDocument.elementFromPoint(
         this.viewport.lastPosition.x,
         this.viewport.lastPosition.y,
       );
       if (
         event &&
-        (!(elementUnderCursor instanceof HTMLCanvasElement) ||
+        (!(elementUnderCursor instanceof this.ownerWindow.HTMLCanvasElement) ||
           isWritableElement(target))
       ) {
         return;
@@ -4749,9 +4797,11 @@ class App extends React.Component<AppProps, AppState> {
 
     // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
     if (isSafari) {
-      Fonts.loadElementsFonts(duplicatedElements).then((fontFaces) => {
-        this.fonts.onLoaded(fontFaces);
-      });
+      Fonts.loadElementsFonts(duplicatedElements, this.ownerDocument).then(
+        (fontFaces) => {
+          this.fonts.onLoaded(fontFaces);
+        },
+      );
     }
 
     if (opts.files) {
@@ -5079,8 +5129,8 @@ class App extends React.Component<AppProps, AppState> {
       !elements.length ||
       isElementCompletelyInViewport(
         elements,
-        this.canvas.width / window.devicePixelRatio,
-        this.canvas.height / window.devicePixelRatio,
+        this.canvas.width / this.ownerWindow.devicePixelRatio,
+        this.canvas.height / this.ownerWindow.devicePixelRatio,
         {
           offsetLeft: this.state.offsetLeft,
           offsetTop: this.state.offsetTop,
@@ -5136,7 +5186,11 @@ class App extends React.Component<AppProps, AppState> {
         const file = new File([blob], blob.name || "", { type: blob.type });
         this.loadFileToCanvas(file, null);
         await webShareTargetCache.delete("shared-file");
-        window.history.replaceState(null, APP_NAME, window.location.pathname);
+        this.ownerWindow.history.replaceState(
+          null,
+          APP_NAME,
+          this.ownerWindow.location.pathname,
+        );
       }
     } catch (error: any) {
       this.setState({ errorMessage: error.message });
@@ -5343,7 +5397,7 @@ class App extends React.Component<AppProps, AppState> {
       // normalize `event.key` when CapsLock is pressed #2372
 
       if (
-        "Proxy" in window &&
+        "Proxy" in this.ownerWindow &&
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
           (event.shiftKey && /^[a-z]$/.test(event.key)))
       ) {
@@ -5393,8 +5447,9 @@ class App extends React.Component<AppProps, AppState> {
           this.updateEditorAtom(convertElementTypePopupAtom, null);
         } else if (
           event.key === KEYS.TAB &&
-          (document.activeElement === this.excalidrawContainerRef?.current ||
-            document.activeElement?.classList.contains(
+          (this.ownerDocument.activeElement ===
+            this.excalidrawContainerRef?.current ||
+            this.ownerDocument.activeElement?.classList.contains(
               CLASSES.CONVERT_ELEMENT_TYPE_POPUP,
             ))
         ) {
@@ -5448,7 +5503,7 @@ class App extends React.Component<AppProps, AppState> {
         // reset (100ms to be safe that we it runs after the ensuing
         // paste event). Though, technically unnecessary to reset since we
         // (re)set the flag before each paste event.
-        IS_PLAIN_PASTE_TIMER = window.setTimeout(() => {
+        IS_PLAIN_PASTE_TIMER = this.ownerWindow.setTimeout(() => {
           IS_PLAIN_PASTE = false;
         }, 100);
       }
@@ -6027,7 +6082,7 @@ class App extends React.Component<AppProps, AppState> {
     } else if (!isHoldingSpace) {
       this.cursor.applyForTool(nextActiveTool);
     }
-    if (isToolIcon(document.activeElement)) {
+    if (isToolIcon(this.ownerDocument.activeElement)) {
       this.focusContainer();
     }
     if (!isLinearElementType(nextActiveTool.type)) {
@@ -7303,7 +7358,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         if (!customEvent?.defaultPrevented) {
           const target = isLocalLink(url) ? "_self" : "_blank";
-          const newWindow = window.open(undefined, target);
+          const newWindow = this.ownerWindow.open(undefined, target);
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {
             newWindow.opener = null;
@@ -8453,7 +8508,7 @@ class App extends React.Component<AppProps, AppState> {
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
-    const selection = document.getSelection();
+    const selection = this.ownerDocument.getSelection();
     if (selection?.anchorNode) {
       selection.removeAllRanges();
     }
@@ -8533,7 +8588,7 @@ class App extends React.Component<AppProps, AppState> {
           };
 
           const unsubPointerUp = addEventListener(
-            window,
+            this.ownerWindow,
             EVENT.POINTER_UP,
             onPointerUp,
             {
@@ -8544,7 +8599,7 @@ class App extends React.Component<AppProps, AppState> {
           // subscribe inside rAF lest it'd be triggered on the same pointerdown
           // if we start erasing while coming from blurred document since
           // we cleanup pointer events on focus
-          requestAnimationFrame(() => {
+          this.ownerWindow.requestAnimationFrame(() => {
             unsubCleanup =
               this.missingPointerEventCleanupEmitter.once(onPointerUp);
           });
@@ -8810,10 +8865,10 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (!this.state.viewModeEnabled || this.isActiveToolPointerCapturing()) {
-      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
-      window.addEventListener(EVENT.KEYDOWN, onKeyDown);
-      window.addEventListener(EVENT.KEYUP, onKeyUp);
+      this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      this.ownerWindow.addEventListener(EVENT.POINTER_UP, onPointerUp);
+      this.ownerWindow.addEventListener(EVENT.KEYDOWN, onKeyDown);
+      this.ownerWindow.addEventListener(EVENT.KEYUP, onKeyUp);
       pointerDownState.eventListeners.onMove = onPointerMove;
       pointerDownState.eventListeners.onUp = onPointerUp;
       pointerDownState.eventListeners.onKeyUp = onKeyUp;
@@ -8888,7 +8943,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         // open the context menu with the first touch's clientX and clientY
         // if the touch is not moving
-        touchTimeout = window.setTimeout(() => {
+        touchTimeout = this.ownerWindow.setTimeout(() => {
           touchTimeout = 0;
           if (!invalidateContextMenu) {
             this.handleCanvasContextMenu(event);
@@ -8949,10 +9004,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let nextPastePrevented = false;
-    const isLinux =
-      typeof window === undefined
-        ? false
-        : /Linux/.test(window.navigator.platform);
+    const isLinux = /Linux/.test(this.ownerWindow.navigator.platform);
 
     this.cursor.set(CURSOR_TYPE.GRABBING);
     let { clientX: lastX, clientY: lastY } = event;
@@ -8975,7 +9027,10 @@ class App extends React.Component<AppProps, AppState> {
 
         /* Prevent the next paste event */
         const preventNextPaste = (event: ClipboardEvent) => {
-          document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+          this.ownerDocument.body.removeEventListener(
+            EVENT.PASTE,
+            preventNextPaste,
+          );
           event.stopPropagation();
         };
 
@@ -8987,13 +9042,19 @@ class App extends React.Component<AppProps, AppState> {
          */
         const enableNextPaste = () => {
           setTimeout(() => {
-            document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
-            window.removeEventListener(EVENT.POINTER_UP, enableNextPaste);
+            this.ownerDocument.body.removeEventListener(
+              EVENT.PASTE,
+              preventNextPaste,
+            );
+            this.ownerWindow.removeEventListener(
+              EVENT.POINTER_UP,
+              enableNextPaste,
+            );
           }, 100);
         };
 
-        document.body.addEventListener(EVENT.PASTE, preventNextPaste);
-        window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
+        this.ownerDocument.body.addEventListener(EVENT.PASTE, preventNextPaste);
+        this.ownerWindow.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
       this.viewport.translate({
@@ -9017,17 +9078,17 @@ class App extends React.Component<AppProps, AppState> {
           this.viewport.releaseOverscroll,
         );
         this.savePointer(event.clientX, event.clientY, "up");
-        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-        window.removeEventListener(EVENT.POINTER_UP, teardown);
-        window.removeEventListener(EVENT.BLUR, teardown);
+        this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        this.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
+        this.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
         onPointerMove.flush();
       }),
     );
-    window.addEventListener(EVENT.BLUR, teardown);
-    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+    this.ownerWindow.addEventListener(EVENT.BLUR, teardown);
+    this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
       passive: true,
     });
-    window.addEventListener(EVENT.POINTER_UP, teardown);
+    this.ownerWindow.addEventListener(EVENT.POINTER_UP, teardown);
     return true;
   };
 
@@ -9208,7 +9269,7 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState.lastCoords.y = event.clientY;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const target = event.target;
-      if (!(target instanceof HTMLElement)) {
+      if (!(target instanceof this.ownerWindow.HTMLElement)) {
         return;
       }
 
@@ -9222,15 +9283,15 @@ class App extends React.Component<AppProps, AppState> {
         cursorButton: "up",
       });
       this.savePointer(event.clientX, event.clientY, "up");
-      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
+      this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      this.ownerWindow.removeEventListener(EVENT.POINTER_UP, onPointerUp);
       onPointerMove.flush();
     });
 
     lastPointerUp = onPointerUp;
 
-    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+    this.ownerWindow.addEventListener(EVENT.POINTER_UP, onPointerUp);
     return true;
   }
 
@@ -10578,7 +10639,7 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
       const target = event.target;
-      if (!(target instanceof HTMLElement)) {
+      if (!(target instanceof this.ownerWindow.HTMLElement)) {
         return;
       }
 
@@ -11656,19 +11717,19 @@ class App extends React.Component<AppProps, AppState> {
 
       this.missingPointerEventCleanupEmitter.clear();
 
-      window.removeEventListener(
+      this.ownerWindow.removeEventListener(
         EVENT.POINTER_MOVE,
         pointerDownState.eventListeners.onMove!,
       );
-      window.removeEventListener(
+      this.ownerWindow.removeEventListener(
         EVENT.POINTER_UP,
         pointerDownState.eventListeners.onUp!,
       );
-      window.removeEventListener(
+      this.ownerWindow.removeEventListener(
         EVENT.KEYDOWN,
         pointerDownState.eventListeners.onKeyDown!,
       );
-      window.removeEventListener(
+      this.ownerWindow.removeEventListener(
         EVENT.KEYUP,
         pointerDownState.eventListeners.onKeyUp!,
       );
@@ -13685,10 +13746,10 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (
         !(
-          event.target instanceof HTMLCanvasElement ||
-          event.target instanceof HTMLTextAreaElement ||
-          event.target instanceof HTMLIFrameElement ||
-          (event.target instanceof HTMLElement &&
+          event.target instanceof this.ownerWindow.HTMLCanvasElement ||
+          event.target instanceof this.ownerWindow.HTMLTextAreaElement ||
+          event.target instanceof this.ownerWindow.HTMLIFrameElement ||
+          (event.target instanceof this.ownerWindow.HTMLElement &&
             event.target.classList.contains(CLASSES.FRAME_NAME))
         )
       ) {
