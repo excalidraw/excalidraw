@@ -223,6 +223,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -615,6 +616,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -855,6 +857,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -1182,6 +1185,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -1366,6 +1370,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   ],
   "roughness": 1,
   "roundness": null,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -1732,6 +1737,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   ],
   "roughness": 1,
   "roundness": null,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -1878,6 +1884,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             ],
             "roughness": 1,
             "roundness": null,
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -2440,6 +2447,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -2606,6 +2614,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -7541,6 +7550,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -7617,6 +7627,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -10592,6 +10603,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -10667,6 +10679,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -11217,6 +11230,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   ],
   "roughness": 1,
   "roundness": null,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "KPrBI4g_v9qUB1XxYLgSz",
@@ -11301,6 +11315,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
             ],
             "roughness": 1,
             "roundness": null,
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "KPrBI4g_v9qUB1XxYLgSz",
@@ -17075,6 +17090,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -17491,6 +17507,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -17829,6 +17846,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -18135,6 +18153,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -18481,6 +18500,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -18787,6 +18807,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -19131,6 +19152,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -19523,6 +19545,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -19889,6 +19912,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id0",
@@ -20277,6 +20301,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": {
               "elementId": "id0",
@@ -22013,6 +22038,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "roundness": {
     "type": 2,
   },
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -22088,6 +22114,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",

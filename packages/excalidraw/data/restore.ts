@@ -167,6 +167,26 @@ const restoreLinearElementPoints = (
     : restoredPoints;
 };
 
+const restoreSplitPoints = (
+  splitPoints: unknown,
+  pointsLength: number,
+): readonly number[] | null => {
+  if (!Array.isArray(splitPoints)) {
+    return null;
+  }
+
+  const restored = Array.from(
+    new Set(
+      splitPoints.filter(
+        (index): index is number =>
+          Number.isInteger(index) && index > 0 && index < pointsLength - 1,
+      ),
+    ),
+  ).sort((a, b) => a - b);
+
+  return restored.length ? restored : null;
+};
+
 const restoreFreedrawPoints = (
   points: unknown,
   pressures: unknown,
@@ -676,6 +696,7 @@ export const restoreElement = (
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
             ...base,
             elbowed: true,
+            splitPoints: null,
             fixedSegments:
               element.fixedSegments?.length && base.points.length >= 4
                 ? element.fixedSegments
@@ -683,7 +704,13 @@ export const restoreElement = (
             startIsSpecial: element.startIsSpecial,
             endIsSpecial: element.endIsSpecial,
           })
-        : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
+        : restoreElementWithProperties(element as ExcalidrawArrowElement, {
+            ...base,
+            splitPoints: restoreSplitPoints(
+              (element as ExcalidrawArrowElement).splitPoints,
+              points.length,
+            ),
+          });
 
       const normalizedRestoredElement = {
         ...restoredElement,

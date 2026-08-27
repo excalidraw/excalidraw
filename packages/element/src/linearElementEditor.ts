@@ -60,6 +60,10 @@ import {
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import {
+  shiftSplitPointsOnDelete,
+  shiftSplitPointsOnInsert,
+} from "./splitPoints";
 import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
 import { ShapeCache, toggleLinePolygonState } from "./shape";
@@ -1512,6 +1516,14 @@ export class LinearElementEditor {
       return !pointIndices.includes(idx);
     });
 
+    if (isArrowElement(element)) {
+      const splitPoints = shiftSplitPointsOnDelete(element, pointIndices);
+
+      if (splitPoints !== undefined) {
+        app.scene.mutateElement(element, { splitPoints });
+      }
+    }
+
     const isPolygon = isLineElement(element) && element.polygon;
 
     // keep polygon intact if deleting start/end point or uncommitted point
@@ -1740,7 +1752,15 @@ export class LinearElementEditor {
       ...element.points.slice(segmentMidpoint.index!),
     ];
 
-    scene.mutateElement(element, { points });
+    const splitPoints = shiftSplitPointsOnInsert(
+      element,
+      segmentMidpoint.index!,
+    );
+
+    scene.mutateElement(element, {
+      points,
+      ...(splitPoints !== undefined ? { splitPoints } : {}),
+    });
 
     ret.pointerDownState = {
       ...linearElementEditor.initialState,

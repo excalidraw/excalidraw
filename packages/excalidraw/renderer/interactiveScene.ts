@@ -45,6 +45,7 @@ import {
   getActiveTextElement,
   getElementsInGroup,
   getSelectedGroupIds,
+  getSplitPoints,
   isSelectedViaGroup,
   selectGroupsFromGivenElements,
 } from "@excalidraw/element";
@@ -96,6 +97,7 @@ import {
 import {
   bootstrapCanvas,
   fillCircle,
+  fillSquare,
   getNormalizedCanvasDimensions,
   strokeRectWithRotation_simple,
 } from "./helpers";
@@ -219,6 +221,7 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   isSelected: boolean,
   isPhantomPoint: boolean,
   isOverlappingPoint: boolean,
+  isSplitPoint = false,
 ) => {
   context.strokeStyle = "#5e5ad8";
   context.setLineDash([]);
@@ -229,7 +232,9 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
     context.fillStyle = "rgba(177, 151, 252, 0.7)";
   }
 
-  fillCircle(
+  const draw = isSplitPoint ? fillSquare : fillCircle;
+
+  draw(
     context,
     point[0],
     point[1],
@@ -1131,6 +1136,7 @@ const renderLinearPointHandles = (
 
   const _isElbowArrow = isElbowArrow(element);
   const _isLineElement = isLineElement(element);
+  const splitPoints = getSplitPoints(element);
 
   points.forEach((point, idx) => {
     if (_isElbowArrow && idx !== 0 && idx !== points.length - 1) {
@@ -1171,6 +1177,7 @@ const renderLinearPointHandles = (
       isSelected,
       false,
       isOverlappingPoint,
+      splitPoints.includes(idx),
     );
   });
 

@@ -36,6 +36,7 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
     "type": 2,
   },
   "seed": 1278240551,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",

@@ -47,6 +47,7 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 import { intersectElementWithLineSegment } from "./collision";
+import { getSplitPointGroups, getSplitPoints } from "./splitPoints";
 import { elementOverlapsWithFrame, getContainingFrame } from "./frame";
 
 import type { Drawable, Op } from "roughjs/bin/core";
@@ -924,6 +925,32 @@ const generateLinearElementShape = (
     return "linearPath";
   })();
 
+  if (method === "curve") {
+    const splitPoints = getSplitPoints(element);
+
+    if (splitPoints.length) {
+      // a split arrow is several curves; merge their ops into a single
+      // drawable so bounds are computed over the whole shape
+      const drawables = getSplitPointGroups(element.points, splitPoints).map(
+        (group) =>
+          generator.curve(
+            group as Mutable<LocalPoint>[] as RoughPoint[],
+            options,
+          ),
+      );
+
+      return {
+        ...drawables[0],
+        sets: drawables[0].sets.map((set, setIdx) => ({
+          ...set,
+          ops: drawables.flatMap(
+            (drawable) => drawable.sets[setIdx]?.ops ?? [],
+          ),
+        })),
+      };
+    }
+  }
+
   return generator[method](
     element.points as Mutable<LocalPoint>[] as RoughPoint[],
     options,
@@ -1096,14 +1123,17 @@ export const getElementPointsCoords = (
 ): Bounds => {
   // This might be computationally heavey
   const gen = rough.generator();
-  const curve =
+  const options = generateRoughOptions(element);
+  const splitPoints = getSplitPoints(element).filter(
+    (index) => index < points.length - 1,
+  );
+  const curves =
     element.roundness == null
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
-  const ops = getCurvePathOps(curve);
+      ? [gen.linearPath(points as [number, number][], options)]
+      : getSplitPointGroups(points, splitPoints).map((group) =>
+          gen.curve(group as [number, number][], options),
+        );
+  const ops = curves.flatMap((curve) => getCurvePathOps(curve));
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
     minX + element.x,
