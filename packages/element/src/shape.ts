@@ -55,6 +55,7 @@ import {
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
+import { getSplitPointGroups, getSplitPoints } from "./splitPoints";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -575,6 +576,41 @@ const getArrowheadShapes = (
   }
 };
 
+const mergeDrawables = (drawables: Drawable[]): Drawable => {
+  if (drawables.length === 1) {
+    return drawables[0];
+  }
+
+  const [first] = drawables;
+
+  return {
+    ...first,
+    sets: first.sets.map((set, setIdx) => ({
+      ...set,
+      ops: drawables.flatMap((drawable) => drawable.sets[setIdx]?.ops ?? []),
+    })),
+  };
+};
+
+const generateSplittableCurve = (
+  generator: RoughGenerator,
+  element: ExcalidrawElement,
+  points: readonly LocalPoint[],
+  options: Options,
+): Drawable => {
+  const splitPoints = getSplitPoints(element);
+
+  if (!splitPoints.length) {
+    return generator.curve(points as unknown as RoughPoint[], options);
+  }
+
+  return mergeDrawables(
+    getSplitPointGroups(points, splitPoints).map((group) =>
+      generator.curve(group as unknown as RoughPoint[], options),
+    ),
+  );
+};
+
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
@@ -619,11 +655,14 @@ export const generateLinearCollisionShape = (
         });
       }
 
-      return generator
-        .curve(points as unknown as RoughPoint[], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i) => {
-          if (i === 0) {
+      return getSplitPointGroups(points, getSplitPoints(element))
+        .flatMap((group) =>
+          generator
+            .curve(group as unknown as RoughPoint[], options)
+            .sets[0].ops.slice(0, group.length),
+        )
+        .map((op) => {
+          if (op.op === "move") {
             const p = pointRotateRads<GlobalPoint>(
               pointFrom<GlobalPoint>(
                 element.x + op.data[0],
@@ -914,7 +953,7 @@ const _generateElementShape = (
           ];
         }
       } else {
-        shape = [generator.curve(points as unknown as RoughPoint[], options)];
+        shape = [generateSplittableCurve(generator, element, points, options)];
       }
 
       // add lines only in arrow
