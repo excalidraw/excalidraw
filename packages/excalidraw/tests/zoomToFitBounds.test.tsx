@@ -75,4 +75,53 @@ describe("actionZoomToFitSelection", () => {
     expect(h.state.scrollX).toBe(scrollX);
     expect(h.state.scrollY).toBe(scrollY);
   });
+
+  it("empty scene scrolled away from origin keeps zoom and scroll", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 800;
+    h.state.height = 600;
+
+    API.setAppState({
+      zoom: { value: getNormalizedZoom(1) },
+      scrollX: -400,
+      scrollY: -250,
+    });
+
+    expect(h.elements).toHaveLength(0);
+    expect(API.getSelectedElements()).toHaveLength(0);
+    expect(h.state.zoom.value).toBe(1);
+    expect(h.state.scrollX).toBe(-400);
+    expect(h.state.scrollY).toBe(-250);
+
+    API.executeAction(actionZoomToFitSelection);
+
+    expect(h.state.zoom.value).toBe(1);
+    expect(h.state.zoom.value).not.toBe(MAX_ZOOM);
+    expect(h.state.scrollX).toBe(-400);
+    expect(h.state.scrollY).toBe(-250);
+  });
+
+  it("still fits a real selection", async () => {
+    await render(<Excalidraw />);
+
+    h.state.width = 100;
+    h.state.height = 100;
+
+    const rectElement = API.createElement({
+      width: 500,
+      height: 500,
+      x: 0,
+      y: 0,
+    });
+    API.setElements([rectElement]);
+    API.setSelectedElements([rectElement]);
+
+    API.executeAction(actionZoomToFitSelection);
+
+    // 500px of content into a 100px viewport — zoomed out, not slammed to max
+    expect(h.state.zoom.value).toBeLessThan(1);
+    expect(h.state.zoom.value).toBeGreaterThan(0);
+    expect(h.state.zoom.value).not.toBe(MAX_ZOOM);
+  });
 });
