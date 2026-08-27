@@ -55,6 +55,7 @@ import {
 } from "@excalidraw/excalidraw/data/restore";
 import { newElementWith } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
+import { CURRENT_SCHEMA_VERSION, getSchemaVersion } from "@excalidraw/element";
 import clsx from "clsx";
 import {
   parseLibraryTokensFromUrl,
@@ -243,6 +244,7 @@ const initializeScene = async (opts: {
     elements: restoreElements(localDataState?.elements, null, {
       repairBindings: true,
       deleteInvisibleElements: true,
+      schemaVersion: localDataState?.schemaVersion,
     }),
     appState: restoreAppState(localDataState?.appState, null),
   };
@@ -269,6 +271,7 @@ const initializeScene = async (opts: {
             restoreElements(imported.elements, null, {
               repairBindings: true,
               deleteInvisibleElements: true,
+              schemaVersion: getSchemaVersion(imported),
             }),
             localDataState?.elements,
           ),
@@ -583,8 +586,12 @@ const ExcalidrawWrapper = () => {
           loadImages(data);
           if (data.scene) {
             excalidrawAPI.updateScene({
+              // NOTE: scene elements passed through restore during
+              // initialization, so they are already at the current
+              // schema version
               elements: restoreElements(data.scene.elements, null, {
                 repairBindings: true,
+                schemaVersion: CURRENT_SCHEMA_VERSION,
               }),
               appState: restoreAppState(data.scene.appState, null),
               captureUpdate: CaptureUpdateAction.IMMEDIATELY,

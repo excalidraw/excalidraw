@@ -10,6 +10,7 @@ import {
 
 import { mutateElement } from "@excalidraw/element";
 import { deepCopyElement } from "@excalidraw/element";
+import { CURRENT_SCHEMA_VERSION, getSchemaVersion } from "@excalidraw/element";
 import {
   isFrameLikeElement,
   isInitializedImageElement,
@@ -38,6 +39,7 @@ import type { BinaryFiles } from "./types";
 
 type ElementsClipboard = {
   type: typeof EXPORT_DATA_TYPES.excalidrawClipboard;
+  schemaVersion: number;
   elements: readonly NonDeletedExcalidrawElement[];
   files: BinaryFiles | undefined;
 };
@@ -46,6 +48,7 @@ export type PastedMixedContent = { type: "text" | "imageUrl"; value: string }[];
 
 export interface ClipboardData {
   elements?: readonly ExcalidrawElement[];
+  schemaVersion?: number;
   files?: BinaryFiles;
   text?: string;
   mixedContent?: PastedMixedContent;
@@ -172,6 +175,7 @@ export const serializeAsClipboardJSON = ({
   // select bound text elements when copying
   const contents: ElementsClipboard = {
     type: EXPORT_DATA_TYPES.excalidrawClipboard,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
     elements: elements.map((element) => {
       if (
         getContainingFrame(element, elementsMap) &&
@@ -542,6 +546,7 @@ export const parseClipboard = async (
     if (clipboardContainsElements(systemClipboardData)) {
       return {
         elements: systemClipboardData.elements,
+        schemaVersion: getSchemaVersion(systemClipboardData),
         files: systemClipboardData.files,
         text: isPlainPaste
           ? JSON.stringify(systemClipboardData.elements, null, 2)

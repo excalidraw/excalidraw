@@ -36,6 +36,8 @@ import type {
 
 import { getObservedAppState } from "./store";
 
+import { CURRENT_SCHEMA_VERSION, migrateElementPartial } from "./versioning";
+
 import {
   BoundElement,
   BindableElement,
@@ -1084,9 +1086,33 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     return delta;
   }
 
-  public static restore(elementsDeltaDTO: DTO<ElementsDelta>): ElementsDelta {
+  public static restore(
+    elementsDeltaDTO: DTO<ElementsDelta>,
+    schemaVersion: number = CURRENT_SCHEMA_VERSION,
+  ): ElementsDelta {
     const { added, removed, updated } = elementsDeltaDTO;
-    return ElementsDelta.create(added, removed, updated);
+    return ElementsDelta.create(
+      ElementsDelta.migratePartialDeltas(added, schemaVersion),
+      ElementsDelta.migratePartialDeltas(removed, schemaVersion),
+      ElementsDelta.migratePartialDeltas(updated, schemaVersion),
+    );
+  }
+
+  private static migratePartialDeltas(
+    deltas: Record<string, Delta<ElementPartial>>,
+    fromVersion: number,
+  ): Record<string, Delta<ElementPartial>> {
+    if (fromVersion >= CURRENT_SCHEMA_VERSION) {
+      return deltas;
+    }
+
+    return Object.entries(deltas).reduce((acc, [id, delta]) => {
+      acc[id] = Delta.create(
+        migrateElementPartial(delta.deleted, fromVersion),
+        migrateElementPartial(delta.inserted, fromVersion),
+      );
+      return acc;
+    }, {} as Record<string, Delta<ElementPartial>>);
   }
 
   private static satisfiesAddition = ({
