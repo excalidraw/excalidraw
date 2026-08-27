@@ -19,13 +19,16 @@ import type {
 } from "./types";
 
 //zsviczian: added promise.cancel to handle the case when ExcalidrawView is terminated before the image is loaded, leading to a memory leak.
-export const loadHTMLImageElement = (dataURL: DataURL) => {
+export const loadHTMLImageElement = (
+  dataURL: DataURL,
+  createImage: () => HTMLImageElement = () => new Image(), // zsviczian -- let cross-document editors construct images in their owner realm, upstream #11974 follow-up
+) => {
   let rejectPromise: (reason?: any) => void; //zsviczian
   let image: HTMLImageElement; //zsviczian
 
   const promise = new Promise<HTMLImageElement>((resolve, reject) => {
     rejectPromise = reject;
-    image = new Image();
+    image = createImage(); // zsviczian -- honor the caller's editor realm, upstream #11974 follow-up
     image.onload = () => {
       resolve(image);
     };
@@ -55,10 +58,12 @@ export const updateImageCache = async ({
   fileIds,
   files,
   imageCache,
+  createImage, // zsviczian -- forward the editor-owned image factory, upstream #11974 follow-up
 }: {
   fileIds: FileId[];
   files: BinaryFiles;
   imageCache: AppClassProperties["imageCache"];
+  createImage?: () => HTMLImageElement; // zsviczian -- preserve standalone callers through the default factory, upstream #11974 follow-up
 }) => {
   const updatedFiles = new Map<FileId, true>();
   const erroredFiles = new Map<FileId, true>();
@@ -75,7 +80,10 @@ export const updateImageCache = async ({
                 throw new Error("Only images can be added to ImageCache");
               }
 
-              const imagePromise = loadHTMLImageElement(fileData.dataURL);
+              const imagePromise = loadHTMLImageElement(
+                fileData.dataURL,
+                createImage,
+              ); // zsviczian -- decode in the requesting editor realm, upstream #11974 follow-up
               const data = {
                 image: imagePromise,
                 mimeType: fileData.mimeType,

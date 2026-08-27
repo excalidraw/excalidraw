@@ -13,6 +13,7 @@ import { newImageElement } from "@excalidraw/element"; // zsviczian -- construct
 import type { FileId } from "@excalidraw/element/types"; // zsviczian -- type the migration image fixture
 
 import { Excalidraw } from "../index";
+import { Tooltip } from "../components/Tooltip"; // zsviczian -- exercise document-local tooltips, upstream #11974 follow-up
 
 import type {
   BinaryFileData, // zsviczian -- type the migration image fixture
@@ -29,6 +30,12 @@ describe("cross-document rendering", () => {
     const ownerWindow = iframe.contentWindow! as Window & typeof globalThis;
     const mountNode = ownerDocument.createElement("div");
     ownerDocument.body.append(mountNode);
+    const ownerImages: HTMLImageElement[] = []; // zsviczian -- record image construction in the editor realm, upstream #11974 follow-up
+    const OwnerImage = function () {
+      const image = ownerDocument.createElement("img");
+      ownerImages.push(image);
+      return image;
+    } as unknown as typeof Image; // zsviczian -- minimal cross-document Image constructor double, upstream #11974 follow-up
 
     const fonts = {
       load: vi.fn().mockResolvedValue([]),
@@ -47,6 +54,7 @@ describe("cross-document rendering", () => {
         value: window.requestAnimationFrame.bind(window),
       },
       ResizeObserver: { value: window.ResizeObserver },
+      Image: { value: OwnerImage }, // zsviczian -- expose the editor-realm constructor to App, upstream #11974 follow-up
     });
     Object.defineProperty(ownerDocument, "defaultView", {
       value: ownerWindow,
@@ -131,6 +139,35 @@ describe("cross-document rendering", () => {
         expect.any(Function),
         { passive: false },
       );
+
+      // zsviczian START -- verify image decoding starts in the editor window
+      const ownerImageFileId = "owner-window-image" as FileId;
+      act(() => {
+        api!.updateScene({
+          elements: [
+            newImageElement({
+              type: "image",
+              x: 0,
+              y: 0,
+              fileId: ownerImageFileId,
+              status: "saved",
+              scale: [1, 1],
+            }),
+          ],
+        });
+        api!.addFiles([
+          {
+            id: ownerImageFileId,
+            dataURL: `data:${MIME_TYPES.png};base64,AA==` as DataURL,
+            mimeType: MIME_TYPES.png,
+            created: Date.now(),
+            lastRetrieved: Date.now(),
+          },
+        ]);
+      });
+      await waitFor(() => expect(ownerImages).toHaveLength(1));
+      expect(ownerImages[0].ownerDocument).toBe(ownerDocument);
+      // zsviczian END
       // zsviczian START -- verify the empty-scene UI font targets the editor document
       await waitFor(() =>
         expect(fonts.load).toHaveBeenCalledWith(
@@ -161,6 +198,36 @@ describe("cross-document rendering", () => {
       iframe.remove();
     }
   });
+
+  // zsviczian START -- keep tooltip nodes and viewport ownership in the trigger document
+  it("renders tooltips in the trigger document", () => {
+    const iframe = document.createElement("iframe");
+    document.body.append(iframe);
+    const ownerDocument = iframe.contentDocument!;
+    const mountNode = ownerDocument.createElement("div");
+    ownerDocument.body.append(mountNode);
+
+    try {
+      const renderResult = renderReact(
+        <Tooltip label="Owner document tooltip">
+          <span>Tooltip trigger</span>
+        </Tooltip>,
+        { container: mountNode, baseElement: ownerDocument.body },
+      );
+      fireEvent.pointerEnter(
+        renderResult.getByText("Tooltip trigger").parentElement!,
+      );
+
+      expect(
+        ownerDocument.querySelector(".excalidraw-tooltip")?.textContent,
+      ).toBe("Owner document tooltip");
+      expect(document.querySelector(".excalidraw-tooltip")).toBeNull();
+      renderResult.unmount();
+    } finally {
+      iframe.remove();
+    }
+  });
+  // zsviczian END
 
   // zsviczian START -- keep the Obsidian migration decode boundary in a focused test that runs in this fork
   it("awaits image decoding started by addFiles", async () => {

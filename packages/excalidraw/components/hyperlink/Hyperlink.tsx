@@ -61,6 +61,8 @@ const SPACE_BOTTOM = 85;
 const AUTO_HIDE_TIMEOUT = 500;
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
+let HYPERLINK_TOOLTIP_OWNER_DOCUMENT: Document | null = null; // zsviczian -- retain the active tooltip's editor document, upstream #11974 follow-up
+let HYPERLINK_TOOLTIP_OWNER_WINDOW: Window | null = null; // zsviczian -- clear its timer through the creating realm, upstream #11974 follow-up
 
 const embeddableLinkCache = new Map<
   ExcalidrawEmbeddableElement["id"],
@@ -446,14 +448,23 @@ export const showHyperlinkTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
+  ownerDocument: Document, // zsviczian -- render the tooltip in the mounted editor document, upstream #11974 follow-up
 ) => {
   if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
-    clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+    HYPERLINK_TOOLTIP_OWNER_WINDOW?.clearTimeout(
+      HYPERLINK_TOOLTIP_TIMEOUT_ID, // zsviczian -- clear through the realm that scheduled the tooltip, upstream #11974 follow-up
+    );
   }
-  HYPERLINK_TOOLTIP_TIMEOUT_ID = window.setTimeout(
-    () => renderTooltip(element, appState, elementsMap),
+  const ownerWindow = ownerDocument.defaultView; // zsviczian -- schedule through the mounted editor window, upstream #11974 follow-up
+  if (!ownerWindow) {
+    return;
+  }
+  HYPERLINK_TOOLTIP_OWNER_DOCUMENT = ownerDocument; // zsviczian -- retain the document for render and cleanup, upstream #11974 follow-up
+  HYPERLINK_TOOLTIP_OWNER_WINDOW = ownerWindow; // zsviczian -- retain the timer realm for cleanup, upstream #11974 follow-up
+  HYPERLINK_TOOLTIP_TIMEOUT_ID = ownerWindow.setTimeout(
+    () => renderTooltip(element, appState, elementsMap, ownerDocument),
     HYPERLINK_TOOLTIP_DELAY,
-  );
+  ); // zsviczian -- keep delayed rendering in the mounted editor realm, upstream #11974 follow-up
 };
 
 //zsviczian
@@ -469,12 +480,13 @@ const renderTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
+  ownerDocument: Document, // zsviczian -- resolve the document-local tooltip singleton, upstream #11974 follow-up
 ) => {
   if (!(element.link || element.hasTextLink)) {//zsviczian
     return;
   }
 
-  const tooltipDiv = getTooltipDiv();
+  const tooltipDiv = getTooltipDiv(ownerDocument); // zsviczian -- render in the mounted editor document, upstream #11974 follow-up
 
   tooltipDiv.classList.add("excalidraw-tooltip--visible");
   tooltipDiv.style.maxWidth = "20rem";
@@ -512,12 +524,19 @@ const renderTooltip = (
 };
 export const hideHyperlinkToolip = () => {
   if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
-    clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+    HYPERLINK_TOOLTIP_OWNER_WINDOW?.clearTimeout(
+      HYPERLINK_TOOLTIP_TIMEOUT_ID, // zsviczian -- clear through the realm that scheduled the tooltip, upstream #11974 follow-up
+    );
+    HYPERLINK_TOOLTIP_TIMEOUT_ID = null; // zsviczian -- release the completed/cancelled timer, upstream #11974 follow-up
   }
-  if (IS_HYPERLINK_TOOLTIP_VISIBLE) {
+  if (IS_HYPERLINK_TOOLTIP_VISIBLE && HYPERLINK_TOOLTIP_OWNER_DOCUMENT) {
     IS_HYPERLINK_TOOLTIP_VISIBLE = false;
-    getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    getTooltipDiv(HYPERLINK_TOOLTIP_OWNER_DOCUMENT).classList.remove(
+      "excalidraw-tooltip--visible",
+    ); // zsviczian -- hide only the active editor document's tooltip, upstream #11974 follow-up
   }
+  HYPERLINK_TOOLTIP_OWNER_DOCUMENT = null; // zsviczian -- release the detached document after cleanup, upstream #11974 follow-up
+  HYPERLINK_TOOLTIP_OWNER_WINDOW = null; // zsviczian -- release the detached window after cleanup, upstream #11974 follow-up
 };
 
 const shouldHideLinkPopup = (

@@ -8097,6 +8097,7 @@ class App extends React.Component<AppProps, AppState> {
         this.hitLinkElement,
         this.state,
         this.scene.getNonDeletedElementsMap(),
+        this.ownerDocument, // zsviczian -- scope shared-runtime tooltips to this editor document, upstream #11974 follow-up
       );
       if (this.props.onLinkHover) {
         this.props.onLinkHover(this.hitLinkElement, event);
@@ -13683,6 +13684,7 @@ class App extends React.Component<AppProps, AppState> {
       imageCache: this.imageCache,
       fileIds: elements.map((element) => element.fileId),
       files,
+      createImage: () => new this.ownerWindow.Image(), // zsviczian -- decode images in the mounted editor realm, upstream #11974 follow-up
     });
 
     // zsviczian START -- an Obsidian popout may unmount while image decoding is pending
