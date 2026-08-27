@@ -97,6 +97,22 @@ export const convertMermaidToExcalidraw = async ({
     const { elements, files = {} } = ret;
     setError(null);
 
+    // Sanitize HTML <br> tags in element text that mermaid may produce
+    for (const el of elements) {
+      if ("text" in el && typeof el.text === "string") {
+        el.text = el.text.replace(/<br\s*\/?>/gi, "\n");
+      }
+      if (
+        "label" in el &&
+        el.label &&
+        typeof el.label === "object" &&
+        "text" in el.label &&
+        typeof el.label.text === "string"
+      ) {
+        el.label.text = el.label.text.replace(/<br\s*\/?>/gi, "\n");
+      }
+    }
+
     data.current = {
       elements: convertToExcalidrawElements(elements, {
         regenerateIds: true,
