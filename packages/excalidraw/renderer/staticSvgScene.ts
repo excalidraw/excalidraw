@@ -717,11 +717,8 @@ const renderElementToSvg = (
   }
 };
 
-/**
- * Renders the background grid into the SVG, mirroring the on-canvas grid
- * (`strokeGrid`) so that SVG exports are WYSIWYG-consistent with PNG exports and
- * the editor. Export always renders at zoom 1, so line widths/dashes are fixed.
- */
+// Used only when exporting an SVG while "Grid" is checked. Mimic the on-screen grid
+// settings as much as possible.
 export const renderGridToSvg = ({
   svgRoot,
   gridSize,
@@ -735,7 +732,6 @@ export const renderGridToSvg = ({
   svgRoot: SVGElement;
   gridSize: number;
   gridStep: number;
-  /** SVG-space offset applied to world coords (`-min + padding`) */
   offsetX: number;
   offsetY: number;
   width: number;
@@ -775,8 +771,6 @@ export const renderGridToSvg = ({
     group.appendChild(line);
   };
 
-  // grid lines are aligned to the world origin (world coord === multiple of
-  // gridSize), so we start at the first such line visible in the SVG viewport
   const startX = ((offsetX % gridSize) + gridSize) % gridSize;
   for (let x = startX; x <= width; x += gridSize) {
     const worldX = Math.round(x - offsetX);
