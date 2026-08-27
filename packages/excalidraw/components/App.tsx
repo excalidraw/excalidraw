@@ -1081,18 +1081,18 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    let data = null;
+    let data: any = null;
     try {
       data = JSON.parse(event.data);
     } catch (e) {}
-    if (!data) {
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
       return;
     }
 
     switch (event.origin) {
       case "https://player.vimeo.com":
         //Allowing for multiple instances of Excalidraw running in the window
-        if (data.method === "paused") {
+        if ("method" in data && data.method === "paused") {
           let source: Window | null = null;
           const iframes = this.ownerDocument.body.querySelectorAll(
             "iframe.excalidraw__embeddable",
@@ -1105,9 +1105,10 @@ class App extends React.Component<AppProps, AppState> {
               source = iframe.contentWindow;
             }
           }
+          const playOrPause = "value" in data && data.value ? "play" : "pause";
           source?.postMessage(
             JSON.stringify({
-              method: data.value ? "play" : "pause",
+              method: playOrPause,
               value: true,
             }),
             "*",
@@ -1116,13 +1117,19 @@ class App extends React.Component<AppProps, AppState> {
         break;
       case "https://www.youtube.com":
         if (
+          "event" in data &&
           data.event === "infoDelivery" &&
+          "info" in data &&
           data.info &&
-          data.id &&
-          typeof data.info.playerState === "number"
+          typeof data.info === "object" &&
+          !Array.isArray(data.info) &&
+          "playerState" in data.info &&
+          typeof data.info.playerState === "number" &&
+          "id" in data &&
+          typeof data.id === "string"
         ) {
           const id = data.id;
-          const playerState = data.info.playerState as number;
+          const playerState = data.info.playerState;
           if (
             (Object.values(YOUTUBE_STATES) as number[]).includes(playerState)
           ) {
