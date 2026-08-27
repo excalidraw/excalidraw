@@ -323,7 +323,14 @@ const ColorPickerTrigger = ({
         dnd ? (event) => dnd.startSwatchDrag(event, color) : undefined
       }
     >
-      <div className="color-picker__button-outline">{!color && slashIcon}</div>
+      <div className="color-picker__button-outline">
+        {color === "transparent" ? (
+          slashIcon
+        ) : color === null ? (
+          <span className="mixed-color-placeholder">/</span>
+        ) : null}
+      </div>
+
       {isCompactMode && color && mode === "stroke" && (
         <div className="color-picker__button-background">
           <span
