@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Вставить",
     "pasteAsPlaintext": "Вставить как обычный текст",
     "pasteCharts": "Вставить диаграммы",
@@ -109,6 +111,7 @@
     "group": "Сгруппировать выделение",
     "ungroup": "Разделить выделение",
     "collaborators": "Участники",
+    "you": "",
     "toggleGrid": "Переключить сетку",
     "addToLibrary": "Добавить в библиотеку",
     "removeFromLibrary": "Удалить из библиотеки",
@@ -332,10 +335,15 @@
     "embeddable": "Встроенная страница",
     "laser": "Лазерная указка",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Рука (перемещение холста)",
     "extraTools": "Дополнительные инструменты",
     "mermaidToExcalidraw": "Mermaid в Excalidraw",
     "convertElementType": "Переключение типа формы"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Прямоугольник",
@@ -606,7 +614,9 @@
     "hexCode": "Шестнадцатеричный код",
     "noShades": "Нет доступных оттенков для этого цвета",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

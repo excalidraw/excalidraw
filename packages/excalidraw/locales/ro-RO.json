@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "Înscrie-te",
+    "signIn": "Conectează-te",
     "paste": "Lipire",
     "pasteAsPlaintext": "Inserare ca text simplu",
     "pasteCharts": "Lipire diagrame",
@@ -35,9 +37,9 @@
     "strokeStyle_dashed": "Liniuțe",
     "strokeStyle_dotted": "Punctat",
     "sloppiness": "Aspectul trasării",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Presiune",
+    "pressure_constant": "Constantă",
+    "pressure_variable": "Variabilă",
     "opacity": "Opacitate",
     "textAlign": "Alinierea textului",
     "edges": "Margini",
@@ -109,6 +111,7 @@
     "group": "Grupare selecție",
     "ungroup": "Degrupare selecție",
     "collaborators": "Colaboratori",
+    "you": "Tu",
     "toggleGrid": "Comutare grilă",
     "addToLibrary": "Adăugare la bibliotecă",
     "removeFromLibrary": "Eliminare din bibliotecă",
@@ -188,9 +191,9 @@
     "shapeSwitch": "Comutare formă",
     "preferences": "Preferințe",
     "preferences_toolLock": "Blocare instrument",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "Selectare pe",
+    "boxSelectionContain": "Încapsulare",
+    "boxSelectionOverlap": "Suprapunere",
     "arrowBinding": "Legare săgeată",
     "midpointSnapping": "Ancorare la punctele medii"
   },
@@ -331,11 +334,16 @@
     "magicframe": "Structură-de-fire la cod",
     "embeddable": "Încorporare web",
     "laser": "Indicator laser",
-    "autoshape": "",
+    "autoshape": "Desenează la formă",
+    "bucketfill": "Umplere cu culoare",
     "hand": "Mână (instrument de panoramare)",
     "extraTools": "Mai multe instrumente",
     "mermaidToExcalidraw": "Mermaid la Excalidraw",
     "convertElementType": "Comutare tip formă"
+  },
+  "bucketfill": {
+    "noRegion": "Nu s-a putut găsi o regiune închisă pentru a o umple aici.",
+    "tooComplex": "Această regiune este prea complexă pentru a fi umplută."
   },
   "element": {
     "rectangle": "Dreptunghi",
@@ -367,7 +375,7 @@
     "freeDraw": "Dă clic pe pânză și glisează cursorul, apoi eliberează-l când ai terminat",
     "text": "Sfat: poți adăuga text și dând dublu clic oriunde cu instrumentul de selecție",
     "embeddable": "Dă clic și trage pentru a crea un cod de încorporare de pagină web",
-    "autoshape": "",
+    "autoshape": "Desenează dreptunghiuri, cercuri, romburi, linii și săgeți",
     "text_selected": "Dă dublu clic sau apasă {{shortcut}} pentru a edita textul",
     "text_editing": "Apasă {{shortcut_1}} sau {{shortcut_2}} pentru a finaliza editarea",
     "linearElementMulti": "Dă clic pe ultimul punct sau apasă {{shortcut_1}} sau {{shortcut_2}} pentru a finaliza",
@@ -375,7 +383,7 @@
     "resize": "Poți constrânge proporțiile, ținând apăsat {{shortcut_1}} în timp ce redimensionezi,\nține apăsat {{shortcut_2}} pentru a redimensiona de la centru",
     "resizeImage": "Poți constrânge proporțiile, ținând apăsat {{shortcut_1}},\nține apăsat {{shortcut_2}} pentru a redimensiona de la centru",
     "rotate": "Poți constrânge unghiurile, ținând apăsat {{shortcut}} în timp ce rotești",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "Dă dublu clic pentru a comuta săgeta",
     "lineEditor_info": "Ține apăsat {{shortcut_1}} și dă dublu clic sau apasă {{shortcut_2}} pentru a edita punctele",
     "lineEditor_line_info": "Dă dublu clic sau apasă {{shortcut}} pentru a edita punctele",
     "lineEditor_pointSelected": "Apasă {{shortcut_1}} pentru a elimina punctele,\n{{shortcut_2}} pentru a duplica sau glisează pentru a muta",
@@ -605,8 +613,10 @@
     "shades": "Nuanțe",
     "hexCode": "Cod hexa",
     "noShades": "Nu este disponibilă nicio nuanță pentru această culoare",
-    "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidColor": "Nu este o culoare validă",
+    "invalidHexLength": "Codul hexazecimal trebuie să fie alcătuit din 3, 4, 6 sau 8 caractere",
+    "topPicksTip": "Sfat: trage orice culoare la alegerile tale principale pentru a o fixa",
+    "resetTopPicks": "Resetare la alegerile principale implicite"
   },
   "overwriteConfirm": {
     "action": {
@@ -672,7 +682,7 @@
     "placeholder": {
       "title": "Hai să-ți proiectăm diagrama",
       "description": "Descrie diagrama pe care vrei să o creezi și o vom genera pentru tine.",
-      "hint": ""
+      "hint": "În prezent, cunoaștem schemele logice și diagramele de secvență, stare, clasă și entitate-asociere."
     },
     "preview": "Previzualizare",
     "insert": "Introducere",

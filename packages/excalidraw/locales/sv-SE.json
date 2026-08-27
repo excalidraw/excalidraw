@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Klistra in",
     "pasteAsPlaintext": "Klistra som oformaterad text",
     "pasteCharts": "Klistra in diagram",
@@ -109,6 +111,7 @@
     "group": "Gruppera markering",
     "ungroup": "Avgruppera markering",
     "collaborators": "Medarbetare",
+    "you": "",
     "toggleGrid": "Visa/dölj rutnät",
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
@@ -332,10 +335,15 @@
     "embeddable": "Bädda in (web)",
     "laser": "Laserpekare",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg",
     "mermaidToExcalidraw": "Mermaid till Excalidraw",
     "convertElementType": "Växla formtyp"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rektangel",
@@ -606,7 +614,9 @@
     "hexCode": "Hex-kod",
     "noShades": "Inga nyanser tillgängliga för denna färg",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

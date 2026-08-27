@@ -381,6 +381,7 @@ export const actionChangeStrokeColor = register<
         <ColorPicker
           topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
           palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
+          customizableTopPicks="elementStroke"
           type="elementStroke"
           label={t("labels.stroke")}
           color={getFormValue(
@@ -466,6 +467,7 @@ export const actionChangeBackgroundColor = register<
         <ColorPicker
           topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
           palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          customizableTopPicks="elementBackground"
           type="elementBackground"
           label={t("labels.background")}
           color={getFormValue(
@@ -520,6 +522,10 @@ export const actionChangeBucketFillBackgroundColor = register<
           // hidden rather than removed from the palette so the remaining
           // colors keep their usual hotkeys (w for white etc.)
           excludedColors={[COLOR_PALETTE.transparent]}
+          // customized independently of the background picker's picks even
+          // though both drive `currentItemBackgroundColor` — the bucket
+          // strip's defaults and use case differ (no transparent)
+          customizableTopPicks="bucketFill"
           type="elementBackground"
           label={t("labels.background")}
           color={app.bucketFill.getBucketFillBackgroundColor(
@@ -1245,8 +1251,9 @@ export const actionChangeFontFamily = register<{
         fontFamily: nextFontFamily,
       })}`;
       const chars = Array.from(uniqueChars.values()).join();
+      const ownerDocument = app.props.ownerDocument ?? document;
 
-      if (skipFontFaceCheck || window.document.fonts.check(fontString, chars)) {
+      if (skipFontFaceCheck || ownerDocument.fonts.check(fontString, chars)) {
         // we either skip the check (have at least one font face loaded) or do the check and find out all the font faces have loaded
         for (const [element, container] of elementContainerMapping) {
           // trigger synchronous redraw
@@ -1254,7 +1261,7 @@ export const actionChangeFontFamily = register<{
         }
       } else {
         // otherwise try to load all font faces for the given chars and redraw elements once our font faces loaded
-        window.document.fonts.load(fontString, chars).then((fontFaces) => {
+        ownerDocument.fonts.load(fontString, chars).then((fontFaces) => {
           for (const [element, container] of elementContainerMapping) {
             // use latest element state to ensure we don't have closure over an old instance in order to avoid possible race conditions (i.e. font faces load out-of-order while rapidly switching fonts)
             const latestElement = app.scene.getElement(element.id);
@@ -1454,7 +1461,7 @@ export const actionChangeFontFamily = register<{
 
               // Refocus text editor when font picker closes if we were editing text
               if (isCompact && appState.editingTextElement) {
-                restoreCaretPosition(null); // Just refocus without saved position
+                restoreCaretPosition(null, app.ownerDocument); // Just refocus without saved position
               }
             }
           }}

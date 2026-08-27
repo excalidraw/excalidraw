@@ -1,6 +1,8 @@
 import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
 
 import {
+  colorToHex,
+  COLOR_TOP_PICKS_SLOTS,
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
   DEFAULT_STROKE_STREAMLINE,
@@ -1099,6 +1101,32 @@ const LegacyAppStateMigrations: {
   },
 };
 
+const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+  // keyed by normalized color value so notation variants (`#fff` vs
+  // `#ffffff` vs `white`) dedupe, while the value keeps the original
+  // notation — normalizing the output would break e.g. `transparent`
+  // (→ `#00000000`), which the picker matches by literal value
+  const colors = new Map<string, string>();
+  for (const color of value) {
+    if (typeof color !== "string") {
+      continue;
+    }
+    const normalized = colorToHex(color) ?? color.toLowerCase();
+    if (!colors.has(normalized)) {
+      colors.set(normalized, color);
+    }
+    // the strip layout fits exactly this many slots — longer lists (hostile
+    // or hand-edited storage) would overflow the properties island
+    if (colors.size >= COLOR_TOP_PICKS_SLOTS) {
+      break;
+    }
+  }
+  return colors.size ? [...colors.values()] : null;
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -1144,6 +1172,19 @@ export const restoreAppState = (
   if (boxSelectionMode !== undefined) {
     nextAppState.boxSelectionMode = boxSelectionMode;
   }
+
+  // drop malformed persisted custom top picks (imported data is untrusted)
+  nextAppState.colorTopPicks = {
+    elementStroke: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.elementStroke,
+    ),
+    elementBackground: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.elementBackground,
+    ),
+    bucketFill: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.bucketFill,
+    ),
+  };
 
   // legacy
   if ((appState as any).currentItemStrokeWidth !== undefined) {

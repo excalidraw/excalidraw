@@ -230,6 +230,11 @@ const COMMON_ELEMENT_SHADES = pick(COLOR_PALETTE, [
 // quick picks defaults
 // -----------------------------------------------------------------------------
 
+/** number of slots in the color-picker top-picks strip — the strip layout is
+ * sized for exactly this many swatches, and pick customization (replace /
+ * reorder) preserves it */
+export const COLOR_TOP_PICKS_SLOTS = 5;
+
 // ORDER matters for positioning in quick picker
 export const DEFAULT_ELEMENT_STROKE_PICKS = [
   COLOR_PALETTE.black,

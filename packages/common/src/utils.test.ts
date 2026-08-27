@@ -1,5 +1,10 @@
 import {
+  getNearestScrollableContainer,
+  isInputLike,
+  isInteractive,
+  isToolIcon,
   isTransparent,
+  isWritableElement,
   mapFind,
   reduceToCommonValue,
 } from "@excalidraw/common";
@@ -11,6 +16,34 @@ import { throttleRAF } from "./utils";
 type RafCallback = FrameRequestCallback;
 
 describe("@excalidraw/common/utils", () => {
+  describe("cross-document element guards", () => {
+    it("uses constructors from the target element's window", () => {
+      const iframe = document.createElement("iframe");
+      document.body.append(iframe);
+
+      const iframeDocument = iframe.contentDocument!;
+      const iframeWindow = iframe.contentWindow!;
+      const textarea = iframeDocument.createElement("textarea");
+      const button = iframeDocument.createElement("button");
+      const toolIcon = iframeDocument.createElement("div");
+      toolIcon.className = "ToolIcon__icon";
+
+      expect(textarea).not.toBeInstanceOf(HTMLTextAreaElement);
+      expect(textarea).toBeInstanceOf(
+        (iframeWindow as Window & typeof globalThis).HTMLTextAreaElement,
+      );
+      expect(isInputLike(textarea)).toBe(true);
+      expect(isWritableElement(textarea)).toBe(true);
+      expect(isInteractive(button)).toBe(true);
+      expect(isToolIcon(toolIcon)).toBe(true);
+
+      iframeDocument.body.append(textarea);
+      expect(getNearestScrollableContainer(textarea)).toBe(iframeDocument);
+
+      iframe.remove();
+    });
+  });
+
   describe("isTransparent()", () => {
     it("should return true when color is rgb transparent", () => {
       expect(isTransparent("#ff00")).toEqual(true);
