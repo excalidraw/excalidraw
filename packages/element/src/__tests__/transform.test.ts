@@ -965,4 +965,43 @@ describe("Test Transform", () => {
       });
     });
   });
+
+  it("should preserve explicit zero dimensions for linear elements", () => {
+    const [arrow, line] = convertToExcalidrawElements(
+      [
+        {
+          type: "arrow",
+          x: 100,
+          y: 20,
+          width: 0,
+          height: 80,
+        },
+        {
+          type: "line",
+          x: 200,
+          y: 20,
+          width: 0,
+          height: 80,
+        },
+      ] as ExcalidrawElementSkeleton[],
+      opts,
+    );
+
+    expect(arrow).toMatchObject({
+      width: 0,
+      height: 80,
+      points: [
+        [0, 0],
+        [0, expect.any(Number)],
+      ],
+    });
+    expect(line).toMatchObject({
+      width: 0,
+      height: 80,
+      points: [
+        [0, 0],
+        [0, expect.any(Number)],
+      ],
+    });
+  });
 });
