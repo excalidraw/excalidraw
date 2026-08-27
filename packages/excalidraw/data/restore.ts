@@ -893,8 +893,15 @@ export const restoreElements = <T extends ExcalidrawElement>(
       if (migratedElement) {
         const localElement = existingElementsMap?.get(element.id);
 
+        // Must be evaluated on `migratedElement`, not the raw input. The raw
+        // element can carry malformed geometry (e.g. a freedraw with null
+        // `points`), and `isInvisiblySmallElement` dereferences it — throwing
+        // out here, outside the try/catch above, which rejects the *entire*
+        // import rather than the one bad element. `migratedElement` has been
+        // through `restoreElement` and is always normalized.
         const shouldMarkAsDeleted =
-          opts?.deleteInvisibleElements && isInvisiblySmallElement(element);
+          opts?.deleteInvisibleElements &&
+          isInvisiblySmallElement(migratedElement);
 
         if (shouldMarkAsDeleted) {
           migratedElement = bumpVersion(migratedElement, localElement?.version);
