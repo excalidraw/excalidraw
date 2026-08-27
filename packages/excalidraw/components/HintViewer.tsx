@@ -74,6 +74,7 @@ const getHints = ({
     return t("hints.arrowBindModifiers", {
       shortcut_1: getTaggedShortcutKey("Ctrl"),
       shortcut_2: getTaggedShortcutKey("Alt"),
+      shortcut_3: getTaggedShortcutKey("F"),
     });
   }
 
