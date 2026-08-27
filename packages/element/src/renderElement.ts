@@ -63,6 +63,7 @@ import {
   isMagicFrameElement,
   isImageElement,
 } from "./typeChecks";
+import { applyChalkTexture } from "./chalk";
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
@@ -254,6 +255,19 @@ const generateElementCanvas = (
   drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
+
+  // chalk texture: when enabled per-element, erode strokes/fills (and text
+  // glyphs) for a chalkboard look, so any clean font renders chalky. Skipped
+  // for images (we don't grain raster content). Text erodes a touch lighter so
+  // small strokes survive.
+  if (element.chalk && !isImageElement(element)) {
+    applyChalkTexture(
+      context,
+      canvas.width,
+      canvas.height,
+      isTextElement(element) ? 0.8 : 1,
+    );
+  }
 
   return {
     element,
@@ -531,6 +545,63 @@ const drawElementOnCanvas = (
   }
 };
 
+/**
+ * Draws an element directly onto `context` (the export path, where elements are
+ * painted straight onto the shared export canvas rather than cached per-element
+ * bitmaps). When the element has chalk enabled, the grain must be applied in
+ * isolation — a plain `destination-out` on the shared context would also erode
+ * whatever was already painted underneath. So we render the element onto a
+ * throwaway canvas that mirrors the current transform, grain that, then blit it
+ * back, which confines the erosion to this element's own pixels.
+ */
+const drawElementOnCanvasMaybeChalk = (
+  element: NonDeletedExcalidrawElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+  renderConfig: StaticCanvasRenderConfig,
+) => {
+  if (
+    !element.chalk ||
+    isImageElement(element) ||
+    typeof document === "undefined"
+  ) {
+    drawElementOnCanvas(element, rc, context, renderConfig);
+    return;
+  }
+
+  const target = context.canvas;
+  const temp = document.createElement("canvas");
+  temp.width = target.width;
+  temp.height = target.height;
+  const tempContext = temp.getContext("2d");
+  if (!tempContext) {
+    drawElementOnCanvas(element, rc, context, renderConfig);
+    return;
+  }
+
+  // mirror the export context's current transform so the element lands in the
+  // same place on the temp canvas
+  tempContext.setTransform(context.getTransform());
+  // element opacity was set on the shared context's globalAlpha; draw fully
+  // opaque here and re-apply it when compositing so grain isn't skewed by it
+  const opacity = context.globalAlpha;
+  drawElementOnCanvas(element, rough.canvas(temp), tempContext, renderConfig);
+  applyChalkTexture(
+    tempContext,
+    temp.width,
+    temp.height,
+    isTextElement(element) ? 0.8 : 1,
+  );
+
+  context.save();
+  context.setTransform(1, 0, 0, 1, 0, 0);
+  context.globalAlpha = opacity;
+  // blit within any clip currently active on the export context (e.g. the
+  // arrow-label hole), so those export optimizations are preserved
+  context.drawImage(temp, 0, 0);
+  context.restore();
+};
+
 export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElement,
   ExcalidrawElementWithCanvas
@@ -789,7 +860,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig);
+        drawElementOnCanvasMaybeChalk(element, rc, context, renderConfig);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -887,7 +958,7 @@ export const renderElement = (
           context.clip("evenodd");
           context.rotate(element.angle);
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
+          drawElementOnCanvasMaybeChalk(element, rc, context, renderConfig);
           context.restore();
         } else {
           context.rotate(element.angle);
@@ -898,7 +969,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
+          drawElementOnCanvasMaybeChalk(element, rc, context, renderConfig);
         }
 
         context.restore();

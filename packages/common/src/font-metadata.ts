@@ -65,6 +65,14 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       lineHeight: 1.25,
     },
   },
+  [FONT_FAMILY.Neucha]: {
+    metrics: {
+      unitsPerEm: 1024,
+      ascender: 787,
+      descender: -292,
+      lineHeight: 1.25,
+    },
+  },
   [FONT_FAMILY.Virgil]: {
     metrics: {
       unitsPerEm: 1000,
