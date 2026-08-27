@@ -581,6 +581,7 @@ export const restoreElement = (
         fileId: element.fileId,
         scale: element.scale || [1, 1],
         crop: element.crop ?? null,
+        isAnimated: element.isAnimated,
       });
     case "line":
     // @ts-ignore LEGACY type
