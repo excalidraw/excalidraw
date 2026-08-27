@@ -8,7 +8,7 @@
 
   .Dialog__title {
     margin: 0;
-    text-align: left;
+    text-align: start;
     font-size: 1.25rem;
     border-bottom: 1px solid var(--dialog-border-color);
     padding: 0 0 0.75rem;
@@ -20,7 +20,7 @@
     margin: 0;
     position: absolute;
     top: 0.75rem;
-    right: 0.5rem;
+    inset-inline-end: 0.5rem;
     border: 0;
     background-color: transparent;
     line-height: 0;
@@ -48,7 +48,7 @@
   .Dialog--fullscreen {
     .Dialog__close {
       top: 1.25rem;
-      right: 1.25rem;
+      inset-inline-end: 1.25rem;
     }
   }
 }
