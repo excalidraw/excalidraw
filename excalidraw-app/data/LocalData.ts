@@ -109,7 +109,24 @@ const saveDataStateToLocalStorage = (
 };
 
 const isQuotaExceededError = (error: any) => {
-  return error instanceof DOMException && error.name === "QuotaExceededError";
+  if (!(error instanceof DOMException)) {
+    return false;
+  }
+  // Chromium
+  if (error.name === "QuotaExceededError") {
+    return true;
+  }
+  // Firefox
+  if (error.name === "NS_ERROR_DOM_QUOTA_REACHED") {
+    return true;
+  }
+  // Older WebKit / Safari
+  if (error.name === "QUOTA_EXCEEDED_ERR") {
+    return true;
+  }
+  // Fallback: check DOMException.code for quota errors
+  // code 22 = QUOTA_EXCEEDED_ERR, code 1014 = NS_ERROR_DOM_QUOTA_REACHED
+  return error.code === 22 || error.code === 1014;
 };
 
 type SavingLockTypes = "collaboration";
