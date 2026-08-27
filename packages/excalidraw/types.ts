@@ -176,6 +176,8 @@ export type ActiveTool =
       customType: string;
     };
 
+export type FontSizePreset = "sm" | "md" | "lg" | "xl";
+
 export type SidebarName = string;
 export type SidebarTabName = string;
 
@@ -425,6 +427,8 @@ export interface AppState {
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
+  currentItemFontSizePreset: FontSizePreset | null;
+  viewportBasedFontSizingEnabled: boolean;
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;

@@ -149,6 +149,7 @@ import {
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
+import { getFontSizePreset, getViewportBasedFontSizes } from "../fontSize";
 import { getLanguage, t } from "../i18n";
 import {
   canHaveArrowheads,
@@ -161,12 +162,18 @@ import {
   withCaretPositionPreservation,
   restoreCaretPosition,
 } from "../hooks/useTextEditorFocus";
+import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
-import type { AppClassProperties, AppState, Primitive } from "../types";
+import type {
+  AppClassProperties,
+  AppState,
+  FontSizePreset,
+  Primitive,
+} from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
 
@@ -933,100 +940,130 @@ export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
   },
 });
 
-export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
-  {
-    name: "changeFontSize",
-    label: "labels.fontSize",
-    trackEvent: false,
-    perform: (elements, appState, value, app) => {
-      return changeFontSize(
-        elements,
-        appState,
-        app,
-        () => {
-          invariant(value, "actionChangeFontSize: Expected a font size value");
-          return value;
-        },
-        value,
-      );
-    },
-    PanelComponent: ({ elements, appState, updateData, app, data }) => {
-      const { isCompact } = getStylesPanelInfo(app);
+type ChangeFontSizeData =
+  | ExcalidrawTextElement["fontSize"]
+  | {
+      fontSize: ExcalidrawTextElement["fontSize"];
+      preset: FontSizePreset | null;
+    };
 
-      return (
-        <fieldset>
-          <legend>{t("labels.fontSize")}</legend>
-          <div className="buttonList">
-            <RadioSelection
-              group="font-size"
-              options={[
-                {
-                  value: FONT_SIZES.sm,
-                  text: t("labels.small"),
-                  icon: FontSizeSmallIcon,
-                  testId: "fontSize-small",
-                },
-                {
-                  value: FONT_SIZES.md,
-                  text: t("labels.medium"),
-                  icon: FontSizeMediumIcon,
-                  testId: "fontSize-medium",
-                },
-                {
-                  value: FONT_SIZES.lg,
-                  text: t("labels.large"),
-                  icon: FontSizeLargeIcon,
-                  testId: "fontSize-large",
-                },
-                {
-                  value: FONT_SIZES.xl,
-                  text: t("labels.veryLarge"),
-                  icon: FontSizeExtraLargeIcon,
-                  testId: "fontSize-veryLarge",
-                },
-              ]}
-              value={getFormValue(
-                elements,
-                app,
-                (element) => {
-                  if (isTextElement(element)) {
-                    return element.fontSize;
-                  }
-                  const boundTextElement = getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  );
-                  if (boundTextElement) {
-                    return boundTextElement.fontSize;
-                  }
-                  return null;
-                },
-                (element) =>
-                  isTextElement(element) ||
-                  getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  ) !== null,
-                (hasSelection) =>
-                  hasSelection
-                    ? null
-                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-              )}
-              onChange={(value) => {
-                withCaretPositionPreservation(
-                  () => updateData(value),
-                  isCompact,
-                  !!appState.editingTextElement,
-                  data?.onPreventClose,
-                );
-              }}
-            />
-          </div>
-        </fieldset>
-      );
-    },
+export const actionChangeFontSize = register<ChangeFontSizeData>({
+  name: "changeFontSize",
+  label: "labels.fontSize",
+  trackEvent: false,
+  perform: (elements, appState, value, app) => {
+    const fontSize = typeof value === "number" ? value : value?.fontSize;
+    const preset = typeof value === "number" ? null : value?.preset ?? null;
+
+    invariant(fontSize, "actionChangeFontSize: Expected a font size value");
+
+    const result = changeFontSize(
+      elements,
+      appState,
+      app,
+      () => fontSize,
+      fontSize,
+    );
+
+    return {
+      ...result,
+      appState: {
+        ...result.appState,
+        currentItemFontSizePreset: preset,
+      },
+    };
   },
-);
+  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+    const { isCompact } = getStylesPanelInfo(app);
+    const zoom = useAppStateValue((appState) => appState.zoom.value);
+    const fontSizes = appState.viewportBasedFontSizingEnabled
+      ? getViewportBasedFontSizes(appState.height, zoom)
+      : FONT_SIZES;
+    const hasSelection =
+      !!appState.editingTextElement ||
+      isSomeElementSelected(getNonDeletedElements(elements), appState);
+    const selectedFontSize = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isTextElement(element)) {
+          return element.fontSize;
+        }
+        const boundTextElement = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        if (boundTextElement) {
+          return boundTextElement.fontSize;
+        }
+        return null;
+      },
+      (element) =>
+        isTextElement(element) ||
+        getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !==
+          null,
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+    );
+    const selectedPreset = appState.viewportBasedFontSizingEnabled
+      ? hasSelection
+        ? null
+        : appState.currentItemFontSizePreset
+      : getFontSizePreset(selectedFontSize, FONT_SIZES);
+
+    return (
+      <fieldset>
+        <legend>{t("labels.fontSize")}</legend>
+        <div className="buttonList">
+          <RadioSelection<FontSizePreset>
+            group="font-size"
+            options={[
+              {
+                value: "sm",
+                text: t("labels.small"),
+                icon: FontSizeSmallIcon,
+                testId: "fontSize-small",
+              },
+              {
+                value: "md",
+                text: t("labels.medium"),
+                icon: FontSizeMediumIcon,
+                testId: "fontSize-medium",
+              },
+              {
+                value: "lg",
+                text: t("labels.large"),
+                icon: FontSizeLargeIcon,
+                testId: "fontSize-large",
+              },
+              {
+                value: "xl",
+                text: t("labels.veryLarge"),
+                icon: FontSizeExtraLargeIcon,
+                testId: "fontSize-veryLarge",
+              },
+            ]}
+            value={selectedPreset}
+            onChange={(preset) => {
+              withCaretPositionPreservation(
+                () =>
+                  updateData({
+                    fontSize: fontSizes[preset],
+                    preset: appState.viewportBasedFontSizingEnabled
+                      ? preset
+                      : null,
+                  }),
+                isCompact,
+                !!appState.editingTextElement,
+                data?.onPreventClose,
+              );
+            }}
+          />
+        </div>
+      </fieldset>
+    );
+  },
+});
 
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
