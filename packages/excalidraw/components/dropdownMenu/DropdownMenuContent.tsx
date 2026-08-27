@@ -5,6 +5,7 @@ import { CLASSES, EVENT, KEYS } from "@excalidraw/common";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
+import { useTapClickFallback } from "../../hooks/useTapClickFallback";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
 import { useEditorInterface } from "../App";
@@ -35,6 +36,18 @@ const MenuContent = ({
 }) => {
   const editorInterface = useEditorInterface();
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // recover taps whose `click` got suppressed by an in-flight scroll animation
+  // (momentum / rubber-band on iOS) — see issue #9204
+  const tapClickFallbackRef = useTapClickFallback<HTMLDivElement>();
+
+  const setMenuRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      menuRef.current = node;
+      tapClickFallbackRef(node);
+    },
+    [tapClickFallbackRef],
+  );
 
   const callbacksRef = useStable({ onClickOutside });
 
@@ -86,7 +99,7 @@ const MenuContent = ({
   return (
     <DropdownMenuContentPropsContext.Provider value={{ onSelect }}>
       <DropdownMenuPrimitive.Content
-        ref={menuRef}
+        ref={setMenuRefs}
         className={classNames}
         style={style}
         data-testid="dropdown-menu"
