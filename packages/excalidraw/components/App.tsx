@@ -724,6 +724,8 @@ class App extends React.Component<AppProps, AppState> {
   private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
   /** previous frame pointer coords */
   previousPointerMoveCoords: { x: number; y: number } | null = null;
+  /** id of the most recently finalized freedraw stroke, so a modifier-click can continue it */
+  private lastFreedrawElementId: string | null = null;
 
   drawShape = new AppDrawShape(this);
   laserTrails = new LaserTrails(this);
@@ -8793,11 +8795,15 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "freedraw") {
-      this.handleFreeDrawElementOnPointerDown(
-        event,
-        this.state.activeTool.type,
-        pointerDownState,
-      );
+      if (event[KEYS.CTRL_OR_CMD] && this.lastFreedrawElementId) {
+        this.handleFreeDrawContinuationOnPointerDown(event, pointerDownState);
+      } else {
+        this.handleFreeDrawElementOnPointerDown(
+          event,
+          this.state.activeTool.type,
+          pointerDownState,
+        );
+      }
     } else if (this.state.activeTool.type === "custom") {
       this.cursor.applyForTool();
     } else if (
@@ -9909,6 +9915,72 @@ class App extends React.Component<AppProps, AppState> {
           prevState,
         ),
       };
+    });
+
+    this.setState({
+      newElement: element,
+      suggestedBinding: null,
+    });
+  };
+
+  // Cmd/Ctrl+click with the pencil tool continues the last finished stroke
+  // with a straight segment, mirroring Illustrator's modifier-click behavior.
+  private handleFreeDrawContinuationOnPointerDown = (
+    event: React.PointerEvent<HTMLElement>,
+    pointerDownState: PointerDownState,
+  ) => {
+    const previousElement = this.lastFreedrawElementId
+      ? this.scene.getElement<ExcalidrawFreeDrawElement>(
+          this.lastFreedrawElementId,
+        )
+      : null;
+
+    if (!previousElement || previousElement.isDeleted) {
+      this.handleFreeDrawElementOnPointerDown(
+        event,
+        "freedraw",
+        pointerDownState,
+      );
+      return;
+    }
+
+    const element = previousElement as NonDeleted<ExcalidrawFreeDrawElement>;
+
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      null,
+    );
+
+    // perfect-freehand's streamline smoothing assumes closely-spaced points
+    // like a real hand-drawn stroke, so a single distant point undershoots
+    // the target. Interpolate the straight segment densely to match.
+    const lastPoint = element.points[element.points.length - 1];
+    const target = pointFrom<LocalPoint>(gridX - element.x, gridY - element.y);
+    const STEP_SIZE = 4;
+    const steps = Math.max(
+      1,
+      Math.round(pointDistance(lastPoint, target) / STEP_SIZE),
+    );
+    const interpolatedPoints: LocalPoint[] = [];
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      interpolatedPoints.push(
+        pointFrom<LocalPoint>(
+          lastPoint[0] + (target[0] - lastPoint[0]) * t,
+          lastPoint[1] + (target[1] - lastPoint[1]) * t,
+        ),
+      );
+    }
+
+    this.scene.mutateElement(element, {
+      points: [...element.points, ...interpolatedPoints],
+      pressures: element.simulatePressure
+        ? element.pressures
+        : [
+            ...element.pressures,
+            ...interpolatedPoints.map(() => event.pressure),
+          ],
     });
 
     this.setState({
@@ -11765,6 +11837,8 @@ class App extends React.Component<AppProps, AppState> {
           points: [...points, pointFrom<LocalPoint>(dx, dy)],
           pressures,
         });
+
+        this.lastFreedrawElementId = newElement.id;
 
         this.actionManager.executeAction(actionFinalize);
 
