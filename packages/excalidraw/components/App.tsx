@@ -9864,7 +9864,7 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const simulatePressure = event.pressure === 0.5;
+    const simulatePressure = event.pointerType !== "pen";
 
     const strokeVariability = this.state.currentItemStrokeVariability;
 
