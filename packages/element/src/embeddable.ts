@@ -13,6 +13,7 @@ import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
 
 import type {
+  ExcalidrawIframeElement,
   ExcalidrawIframeLikeElement,
   IframeData,
   NonDeletedExcalidrawElement,
@@ -532,4 +533,51 @@ export const embeddableURLValidator = (
   }
 
   return !!matchHostname(url, ALLOWED_DOMAINS);
+};
+
+export const iframeValidator = (
+  element: ExcalidrawIframeElement,
+  validateIframe: ExcalidrawProps["validateIframe"],
+): boolean => {
+  // AI-generated content is always allowed (it's local HTML, not external URL)
+  if (element.customData?.generationData?.status === "done") {
+    return true;
+  }
+
+  // If no validateIframe prop, use default: block all iframe (secure default)
+  if (validateIframe == null) {
+    return false;
+  }
+
+  // Boolean: allow all or block all
+  if (typeof validateIframe === "boolean") {
+    return validateIframe;
+  }
+
+  // Function: custom validation
+  if (typeof validateIframe === "function") {
+    const result = validateIframe(element);
+    return typeof result === "boolean" ? result : false;
+  }
+
+  // RegExp: test against element's src
+  if (validateIframe instanceof RegExp) {
+    const src = (element as any).src || "";
+    return validateIframe.test(src);
+  }
+
+  // Array of RegExp or domain strings
+  if (Array.isArray(validateIframe)) {
+    const src = (element as any).src || "";
+    for (const pattern of validateIframe) {
+      if (pattern instanceof RegExp) {
+        if (pattern.test(src)) return true;
+      } else if (typeof pattern === "string") {
+        if (matchHostname(src, pattern)) return true;
+      }
+    }
+    return false;
+  }
+
+  return false;
 };

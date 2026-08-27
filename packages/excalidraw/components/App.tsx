@@ -163,6 +163,7 @@ import {
   isPathALoop,
   createSrcDoc,
   embeddableURLValidator,
+  iframeValidator,
   maybeParseEmbedSrc,
   getEmbedLink,
   getInitializedImageElements,
@@ -1733,7 +1734,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private updateEmbedValidationStatus = (
-    element: ExcalidrawEmbeddableElement,
+    element: ExcalidrawIframeLikeElement,
     status: boolean,
   ) => {
     this.embedsValidationStatus.set(element.id, status);
@@ -1759,6 +1760,14 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (isIframeElement(element)) {
         iframeLikes.add(element.id);
+        if (!this.embedsValidationStatus.has(element.id)) {
+          updated = true;
+          const validated = iframeValidator(
+            element,
+            this.props.validateIframe,
+          );
+          this.updateEmbedValidationStatus(element, validated);
+        }
       }
       return false;
     });
@@ -1784,9 +1793,8 @@ class App extends React.Component<AppProps, AppState> {
       .getNonDeletedElements()
       .filter(
         (el): el is Ordered<NonDeleted<ExcalidrawIframeLikeElement>> =>
-          (isEmbeddableElement(el) &&
-            this.embedsValidationStatus.get(el.id) === true) ||
-          isIframeElement(el),
+          (isEmbeddableElement(el) || isIframeElement(el)) &&
+          this.embedsValidationStatus.get(el.id) === true,
       );
 
     return (

@@ -1,0 +1,193 @@
+import { describe, it, expect } from "vitest";
+import { iframeValidator } from "../embeddable";
+import type { ExcalidrawIframeElement } from "../types";
+
+const createIframeElement = (
+  overrides: Partial<ExcalidrawIframeElement> = {},
+): ExcalidrawIframeElement =>
+  ({
+    id: "test-iframe-1",
+    type: "iframe",
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100,
+    angle: 0,
+    strokeColor: "#000000",
+    backgroundColor: "transparent",
+    fillStyle: "solid",
+    strokeWidth: 2,
+    strokeStyle: "solid",
+    roughness: 0,
+    opacity: 100,
+    groupIds: [],
+    frameId: null,
+    roundness: null,
+    seed: 12345,
+    version: 1,
+    versionNonce: 12345,
+    index: null,
+    isDeleted: false,
+    boundElements: null,
+    updated: Date.now(),
+    link: null,
+    locked: false,
+    customData: undefined,
+    ...overrides,
+  }) as ExcalidrawIframeElement;
+
+describe("iframeValidator", () => {
+  describe("AI-generated content", () => {
+    it("returns true for AI-generated content with status 'done'", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+      });
+      expect(iframeValidator(element, undefined)).toBe(true);
+    });
+
+    it("returns true for AI-generated content even with validateIframe: false", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+      });
+      expect(iframeValidator(element, false)).toBe(true);
+    });
+
+    it("returns true for AI-generated content with no validateIframe prop", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+      });
+      expect(iframeValidator(element, null)).toBe(true);
+    });
+  });
+
+  describe("default behavior (no validateIframe prop)", () => {
+    it("returns false when validateIframe is undefined", () => {
+      const element = createIframeElement();
+      expect(iframeValidator(element, undefined)).toBe(false);
+    });
+
+    it("returns false when validateIframe is null", () => {
+      const element = createIframeElement();
+      expect(iframeValidator(element, null)).toBe(false);
+    });
+  });
+
+  describe("boolean validateIframe", () => {
+    it("returns true when validateIframe is true", () => {
+      const element = createIframeElement();
+      expect(iframeValidator(element, true)).toBe(true);
+    });
+
+    it("returns false when validateIframe is false", () => {
+      const element = createIframeElement();
+      expect(iframeValidator(element, false)).toBe(false);
+    });
+  });
+
+  describe("function validateIframe", () => {
+    it("returns the function's return value", () => {
+      const element = createIframeElement();
+      expect(iframeValidator(element, () => true)).toBe(true);
+      expect(iframeValidator(element, () => false)).toBe(false);
+    });
+
+    it("returns false if function returns non-boolean", () => {
+      const element = createIframeElement();
+      expect(
+        iframeValidator(element, () => undefined as unknown as boolean),
+      ).toBe(false);
+    });
+  });
+
+  describe("RegExp validateIframe", () => {
+    it("returns true when src matches the regex", () => {
+      const element = createIframeElement({
+        src: "https://example.com/embed",
+      } as any);
+      expect(iframeValidator(element, /example\.com/)).toBe(true);
+    });
+
+    it("returns false when src does not match the regex", () => {
+      const element = createIframeElement({
+        src: "https://evil.com/phish",
+      } as any);
+      expect(iframeValidator(element, /example\.com/)).toBe(false);
+    });
+
+    it("returns false when element has no src", () => {
+      const element = createIframeElement();
+      expect(iframeValidator(element, /example\.com/)).toBe(false);
+    });
+  });
+
+  describe("Array validateIframe", () => {
+    it("returns true when src matches a domain string", () => {
+      const element = createIframeElement({
+        src: "https://example.com/embed",
+      } as any);
+      expect(iframeValidator(element, ["example.com"])).toBe(true);
+    });
+
+    it("returns true when src matches a RegExp in array", () => {
+      const element = createIframeElement({
+        src: "https://example.com/embed",
+      } as any);
+      expect(iframeValidator(element, [/example\.com/])).toBe(true);
+    });
+
+    it("returns false when src matches nothing in array", () => {
+      const element = createIframeElement({
+        src: "https://evil.com/phish",
+      } as any);
+      expect(iframeValidator(element, ["example.com", /trusted\.com/])).toBe(
+        false,
+      );
+    });
+
+    it("returns false when element has no src", () => {
+      const element = createIframeElement();
+      expect(iframeValidator(element, ["example.com"])).toBe(false);
+    });
+  });
+
+  describe("AI-generated content takes precedence", () => {
+    it("returns true for AI content even with empty allowlist", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+      });
+      expect(iframeValidator(element, [])).toBe(true);
+    });
+
+    it("returns true for AI content with function that would reject", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+      });
+      expect(iframeValidator(element, () => false)).toBe(true);
+    });
+  });
+});
