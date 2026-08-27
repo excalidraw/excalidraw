@@ -857,6 +857,7 @@ export interface ExcalidrawProps {
     appState: UIAppState,
   ) => JSX.Element | null;
   langCode?: Language["code"];
+  applyLanguageToDocument?: boolean;
   viewModeEnabled?: boolean;
   /**
    * Whether the editor accepts user input (pointer, keyboard, wheel, touch,
