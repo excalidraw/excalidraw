@@ -7385,6 +7385,7 @@ class App extends React.Component<AppProps, AppState> {
         this.hitLinkElement,
         this.state,
         this.scene.getNonDeletedElementsMap(),
+        this.ownerDocument,
       );
       return true;
     }
@@ -12815,6 +12816,7 @@ class App extends React.Component<AppProps, AppState> {
       imageCache: this.imageCache,
       fileIds: elements.map((element) => element.fileId),
       files,
+      createImage: () => new this.ownerWindow.Image(),
     });
 
     if (erroredFiles.size) {

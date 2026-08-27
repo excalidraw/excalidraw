@@ -7,9 +7,16 @@ import {
 } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { Excalidraw } from "../index";
+import { MIME_TYPES } from "@excalidraw/common";
 
-import type { ExcalidrawImperativeAPI } from "../types";
+import { newImageElement } from "@excalidraw/element";
+
+import type { FileId } from "@excalidraw/element/types";
+
+import { Excalidraw } from "../index";
+import { Tooltip } from "../components/Tooltip";
+
+import type { DataURL, ExcalidrawImperativeAPI } from "../types";
 
 describe("cross-document rendering", () => {
   it("scopes listeners, fonts, and portals to ownerDocument", async () => {
@@ -20,10 +27,16 @@ describe("cross-document rendering", () => {
     const ownerWindow = iframe.contentWindow! as Window & typeof globalThis;
     const mountNode = ownerDocument.createElement("div");
     ownerDocument.body.append(mountNode);
+    const ownerImages: HTMLImageElement[] = [];
+    const OwnerImage = function () {
+      const image = ownerDocument.createElement("img");
+      ownerImages.push(image);
+      return image;
+    } as unknown as typeof Image;
 
     const fonts = {
       load: vi.fn().mockResolvedValue([]),
-      check: vi.fn().mockReturnValue(true),
+      check: vi.fn().mockReturnValue(false),
       has: vi.fn().mockReturnValue(true),
       add: vi.fn(),
       addEventListener: vi.fn(),
@@ -38,6 +51,7 @@ describe("cross-document rendering", () => {
         value: window.requestAnimationFrame.bind(window),
       },
       ResizeObserver: { value: window.ResizeObserver },
+      Image: { value: OwnerImage },
     });
     Object.defineProperty(ownerDocument, "defaultView", {
       value: ownerWindow,
@@ -122,6 +136,39 @@ describe("cross-document rendering", () => {
         expect.any(Function),
         { passive: false },
       );
+      await waitFor(() =>
+        expect(fonts.load).toHaveBeenCalledWith(
+          expect.stringContaining("Excalifont"),
+          expect.stringContaining("Excalid"),
+        ),
+      );
+
+      const ownerImageFileId = "owner-window-image" as FileId;
+      act(() => {
+        api!.updateScene({
+          elements: [
+            newImageElement({
+              type: "image",
+              x: 0,
+              y: 0,
+              fileId: ownerImageFileId,
+              status: "saved",
+              scale: [1, 1],
+            }),
+          ],
+        });
+        api!.addFiles([
+          {
+            id: ownerImageFileId,
+            dataURL: `data:${MIME_TYPES.png};base64,AA==` as DataURL,
+            mimeType: MIME_TYPES.png,
+            created: Date.now(),
+            lastRetrieved: Date.now(),
+          },
+        ]);
+      });
+      await waitFor(() => expect(ownerImages).toHaveLength(1));
+      expect(ownerImages[0].ownerDocument).toBe(ownerDocument);
 
       ownerDocument.body.classList.add("excalidraw-animations-disabled");
       act(() => {
@@ -141,6 +188,34 @@ describe("cross-document rendering", () => {
       );
     } finally {
       unmount?.();
+      iframe.remove();
+    }
+  });
+
+  it("renders tooltips in the trigger document", () => {
+    const iframe = document.createElement("iframe");
+    document.body.append(iframe);
+    const ownerDocument = iframe.contentDocument!;
+    const mountNode = ownerDocument.createElement("div");
+    ownerDocument.body.append(mountNode);
+
+    try {
+      const renderResult = renderReact(
+        <Tooltip label="Owner document tooltip">
+          <span>Tooltip trigger</span>
+        </Tooltip>,
+        { container: mountNode, baseElement: ownerDocument.body },
+      );
+      fireEvent.pointerEnter(
+        renderResult.getByText("Tooltip trigger").parentElement!,
+      );
+
+      expect(
+        ownerDocument.querySelector(".excalidraw-tooltip")?.textContent,
+      ).toBe("Owner document tooltip");
+      expect(document.querySelector(".excalidraw-tooltip")).toBeNull();
+      renderResult.unmount();
+    } finally {
       iframe.remove();
     }
   });
