@@ -61,7 +61,9 @@ jobs:
 
           scope_labels=(s-app s-editor s-package)
 
-          readarray -t desired_labels < <(node "$GITHUB_WORKSPACE/.github/scripts/pr-scope-labels.mjs")
+          # pr-scope-labels.mjs reads PR_TITLE from the environment above — keep it exported
+          # into whichever step calls this script.
+          readarray -t desired_labels < <(node "${{ github.workspace }}/.github/scripts/pr-scope-labels.mjs")
 
           should_apply_label() {
             local label="$1"
