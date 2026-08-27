@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 import "./Tooltip.scss";
 
-export const getTooltipDiv = () => {
-  const existingDiv = document.querySelector<HTMLDivElement>(
+export const getTooltipDiv = (ownerDocument: Document) => {
+  const existingDiv = ownerDocument.querySelector<HTMLDivElement>(
     ".excalidraw-tooltip",
   );
   if (existingDiv) {
     return existingDiv;
   }
-  const div = document.createElement("div");
-  document.body.appendChild(div);
+  const div = ownerDocument.createElement("div");
+  ownerDocument.body.appendChild(div);
   div.classList.add("excalidraw-tooltip");
   return div;
 };
@@ -26,9 +26,13 @@ export const updateTooltipPosition = (
   position: "bottom" | "top" = "bottom",
 ) => {
   const tooltipRect = tooltip.getBoundingClientRect();
+  const ownerWindow = tooltip.ownerDocument.defaultView;
+  if (!ownerWindow) {
+    return;
+  }
 
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+  const viewportWidth = ownerWindow.innerWidth;
+  const viewportHeight = ownerWindow.innerHeight;
 
   const margin = 5;
 
@@ -90,26 +94,34 @@ export const Tooltip = ({
   style,
   disabled,
 }: TooltipProps) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    return () =>
-      getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    const ownerDocument = wrapperRef.current?.ownerDocument;
+    return () => {
+      ownerDocument
+        ?.querySelector(".excalidraw-tooltip")
+        ?.classList.remove("excalidraw-tooltip--visible");
+    };
   }, []);
   if (disabled) {
     return null;
   }
   return (
     <div
+      ref={wrapperRef}
       className="excalidraw-tooltip-wrapper"
       onPointerEnter={(event) =>
         updateTooltip(
           event.currentTarget as HTMLDivElement,
-          getTooltipDiv(),
+          getTooltipDiv(event.currentTarget.ownerDocument),
           label,
           long,
         )
       }
-      onPointerLeave={() =>
-        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
+      onPointerLeave={(event) =>
+        getTooltipDiv(event.currentTarget.ownerDocument).classList.remove(
+          "excalidraw-tooltip--visible",
+        )
       }
       style={style}
     >
