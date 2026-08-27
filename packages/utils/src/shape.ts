@@ -196,7 +196,7 @@ export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
 
 export const getCurvePathOps = (shape: Drawable): Op[] => {
   // NOTE (mtolmacs): Temporary fix for extremely large elements
-  if (!shape) {
+  if (!shape || shape.sets.length === 0) {
     return [];
   }
 
@@ -316,25 +316,28 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
     };
   }
 
-  const ops = getCurvePathOps(roughShape);
+  // Prefer the fillPath set
+  const fillPathSet = roughShape.sets.find((s) => s.type === "fillPath");
+  const ops = fillPathSet ? fillPathSet.ops : getCurvePathOps(roughShape);
 
   const points: Point[] = [];
   let odd = false;
   for (const operation of ops) {
     if (operation.op === "move") {
-      odd = !odd;
-      if (odd) {
+      if (fillPathSet) {
+        // fillPath is always a single run, no odd/even skipping needed
         points.push(pointFrom(operation.data[0], operation.data[1]));
+      } else {
+        odd = !odd;
+        if (odd) {
+          points.push(pointFrom(operation.data[0], operation.data[1]));
+        }
       }
     } else if (operation.op === "bcurveTo") {
-      if (odd) {
+      if (fillPathSet || odd) {
         points.push(pointFrom(operation.data[0], operation.data[1]));
         points.push(pointFrom(operation.data[2], operation.data[3]));
         points.push(pointFrom(operation.data[4], operation.data[5]));
-      }
-    } else if (operation.op === "lineTo") {
-      if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
       }
     }
   }
