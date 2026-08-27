@@ -4392,8 +4392,8 @@ describe("history", () => {
           expect.objectContaining({
             ...textProps,
             // text element got redrawn!
-            x: 241.295259647664,
-            y: 247.59240920619527,
+            x: 241.3,
+            y: 247.59,
             angle: 90,
             id: text.id,
             containerId: container.id,
@@ -4436,8 +4436,8 @@ describe("history", () => {
           }),
           expect.objectContaining({
             ...textProps,
-            x: 241.295259647664,
-            y: 247.59240920619527,
+            x: 241.3,
+            y: 247.59,
             angle: 90,
             id: text.id,
             containerId: container.id,

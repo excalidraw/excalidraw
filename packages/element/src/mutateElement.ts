@@ -5,13 +5,11 @@ import {
 } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
-
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { ShapeCache } from "./shape";
-
 import { updateElbowArrowPoints } from "./elbowArrow";
-
+import { roundElementGeometry } from "./utils";
 import { isElbowArrow } from "./typeChecks";
 
 import type {
@@ -74,6 +72,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     updates = { ...getSizeFromPoints(points), ...updates };
   }
 
+  updates = roundElementGeometry(updates);
+
   for (const key in updates) {
     const value = (updates as any)[key];
     if (typeof value !== "undefined") {
@@ -93,6 +93,21 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
         const prevScale = (element as any)[key];
         const nextScale = value;
         if (prevScale[0] === nextScale[0] && prevScale[1] === nextScale[1]) {
+          continue;
+        }
+      } else if (key === "crop") {
+        const prevCrop = (element as any)[key];
+        const nextCrop = value;
+        if (
+          prevCrop &&
+          nextCrop &&
+          prevCrop.x === nextCrop.x &&
+          prevCrop.y === nextCrop.y &&
+          prevCrop.width === nextCrop.width &&
+          prevCrop.height === nextCrop.height &&
+          prevCrop.naturalWidth === nextCrop.naturalWidth &&
+          prevCrop.naturalHeight === nextCrop.naturalHeight
+        ) {
           continue;
         }
       } else if (key === "points") {
@@ -149,6 +164,8 @@ export const newElementWith = <TElement extends ExcalidrawElement>(
   /** pass `true` to always regenerate */
   force = false,
 ): TElement => {
+  updates = roundElementGeometry(updates);
+
   let didChange = false;
   for (const key in updates) {
     const value = (updates as any)[key];

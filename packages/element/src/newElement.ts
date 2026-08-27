@@ -21,6 +21,7 @@ import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
+import { roundElementGeometry } from "./utils";
 import { newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
@@ -156,7 +157,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     locked,
     customData: rest.customData,
   };
-  return element;
+  return roundElementGeometry(element);
 };
 
 export const newElement = (
@@ -285,22 +286,23 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElementProps: NonDeleted<ExcalidrawTextElement> = {
-    ..._newElementBase<ExcalidrawTextElement>("text", opts),
-    text,
-    fontSize,
-    fontFamily,
-    textAlign,
-    verticalAlign,
-    x: opts.x - offsets.x,
-    y: opts.y - offsets.y,
-    width: metrics.width,
-    height: metrics.height,
-    containerId: opts.containerId || null,
-    originalText: opts.originalText ?? text,
-    autoResize: opts.autoResize ?? true,
-    lineHeight,
-  };
+  const textElementProps: NonDeleted<ExcalidrawTextElement> =
+    roundElementGeometry({
+      ..._newElementBase<ExcalidrawTextElement>("text", opts),
+      text,
+      fontSize,
+      fontFamily,
+      textAlign,
+      verticalAlign,
+      x: opts.x - offsets.x,
+      y: opts.y - offsets.y,
+      width: metrics.width,
+      height: metrics.height,
+      containerId: opts.containerId || null,
+      originalText: opts.originalText ?? text,
+      autoResize: opts.autoResize ?? true,
+      lineHeight,
+    });
 
   const textElement: NonDeleted<ExcalidrawTextElement> = newElementWith(
     textElementProps,
@@ -477,7 +479,7 @@ export const newFreeDrawElement = (
     pressures?: ExcalidrawFreeDrawElement["pressures"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
-  return {
+  return roundElementGeometry({
     ..._newElementBase<ExcalidrawFreeDrawElement>(opts.type, opts),
     points: opts.points || [],
     pressures: opts.pressures || [],
@@ -486,7 +488,7 @@ export const newFreeDrawElement = (
       variability: "variable",
       streamline: DEFAULT_STROKE_STREAMLINE,
     },
-  };
+  });
 };
 
 export const newLinearElement = (
@@ -496,7 +498,7 @@ export const newLinearElement = (
     polygon?: ExcalidrawLineElement["polygon"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
-  const element = {
+  const element = roundElementGeometry({
     ..._newElementBase<ExcalidrawLinearElement>(opts.type, opts),
     points: opts.points || [],
 
@@ -504,7 +506,7 @@ export const newLinearElement = (
     endBinding: null,
     startArrowhead: null,
     endArrowhead: null,
-  };
+  });
 
   if (isLineElement(element)) {
     const lineElement: NonDeleted<ExcalidrawLineElement> = {
@@ -531,7 +533,7 @@ export const newArrowElement = <T extends boolean>(
   ? NonDeleted<ExcalidrawElbowArrowElement>
   : NonDeleted<ExcalidrawArrowElement> => {
   if (opts.elbowed) {
-    return {
+    return roundElementGeometry({
       ..._newElementBase<ExcalidrawElbowArrowElement>(opts.type, opts),
       points: opts.points || [],
       startBinding: null,
@@ -542,10 +544,10 @@ export const newArrowElement = <T extends boolean>(
       fixedSegments: opts.fixedSegments || [],
       startIsSpecial: false,
       endIsSpecial: false,
-    } as NonDeleted<ExcalidrawElbowArrowElement>;
+    }) as NonDeleted<ExcalidrawElbowArrowElement>;
   }
 
-  return {
+  return roundElementGeometry({
     ..._newElementBase<ExcalidrawArrowElement>(opts.type, opts),
     points: opts.points || [],
     startBinding: null,
@@ -553,7 +555,7 @@ export const newArrowElement = <T extends boolean>(
     startArrowhead: opts.startArrowhead || null,
     endArrowhead: opts.endArrowhead || null,
     elbowed: false,
-  } as T extends true
+  }) as T extends true
     ? NonDeleted<ExcalidrawElbowArrowElement>
     : NonDeleted<ExcalidrawArrowElement>;
 };
@@ -567,7 +569,7 @@ export const newImageElement = (
     crop?: ExcalidrawImageElement["crop"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawImageElement> => {
-  return {
+  return roundElementGeometry({
     ..._newElementBase<ExcalidrawImageElement>("image", opts),
     // in the future we'll support changing stroke color for some SVG elements,
     // and `transparent` will likely mean "use original colors of the image"
@@ -576,5 +578,5 @@ export const newImageElement = (
     fileId: opts.fileId ?? null,
     scale: opts.scale ?? [1, 1],
     crop: opts.crop ?? null,
-  };
+  });
 };

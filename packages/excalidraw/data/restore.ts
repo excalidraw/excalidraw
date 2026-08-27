@@ -40,7 +40,7 @@ import {
   validateElbowPoints,
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
-import { bumpVersion } from "@excalidraw/element";
+import { bumpVersion, roundElementGeometry } from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
@@ -481,7 +481,7 @@ const restoreElementWithProperties = <
       "customData" in extra ? extra.customData : element.customData;
   }
 
-  const ret = {
+  const ret = roundElementGeometry({
     // spread the original element properties to not lose unknown ones
     // for forward-compatibility
     ...element,
@@ -489,7 +489,7 @@ const restoreElementWithProperties = <
     ...base,
     ...getNormalizedDimensions(base),
     ...extra,
-  } as unknown as T;
+  }) as unknown as T;
 
   // strip legacy props (migrated in previous steps)
   delete ret.strokeSharpness;
