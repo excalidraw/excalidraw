@@ -104,8 +104,6 @@ interface CollabState {
   errorMessage: string | null;
   /** errors related to saving */
   dialogNotifiedErrors: Record<string, boolean>;
-  /** last error type shown, to avoid re-triggering */
-  lastCollabErrorMessage: string | null;
   username: string;
   activeRoomLink: string | null;
 }
@@ -152,7 +150,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     this.state = {
       errorMessage: null,
       dialogNotifiedErrors: {},
-      lastCollabErrorMessage: null,
       username: importUsernameFromLocalStorage() || "",
       activeRoomLink: null,
     };
@@ -340,8 +337,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         this.handleRemoteSceneUpdate(this._reconcileElements(storedElements));
       }
     } catch (error: any) {
-      const isSizeExceeded = /is longer than.*?bytes/.test(error.message);
-      const errorMessage = isSizeExceeded
+      const errorMessage = /is longer than.*?bytes/.test(error.message)
         ? t("errors.collabSaveFailed_sizeExceeded")
         : t("errors.collabSaveFailed");
 
@@ -355,12 +351,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         });
       }
 
-      if (
-        this.isCollaborating() &&
-        this.state.lastCollabErrorMessage !== errorMessage
-      ) {
+      if (this.isCollaborating()) {
         this.setErrorIndicator(errorMessage);
-        this.setState({ lastCollabErrorMessage: errorMessage });
       }
 
       console.error(error);
@@ -1060,7 +1052,6 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     if (resetDialogNotifiedErrors) {
       this.setState({
         dialogNotifiedErrors: {},
-        lastCollabErrorMessage: null,
       });
     }
   };

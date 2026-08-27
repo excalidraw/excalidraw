@@ -7,7 +7,7 @@ import { atom } from "../app-jotai";
 
 import "./CollabError.scss";
 
-type ErrorIndicator = {
+export type ErrorIndicator = {
   message: string | null;
   /** used to rerun the useEffect responsible for animation */
   nonce: number;
