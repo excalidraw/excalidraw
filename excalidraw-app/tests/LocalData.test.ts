@@ -16,11 +16,20 @@ describe("Test isQuotaExceededError", () => {
     expect(isQuotaExceededError(error)).toBe(true);
   });
 
-  it("should return true for the legacy WebKit code", () => {
-    const error = new DOMException("quota exceeded", "QUOTA_EXCEEDED_ERR");
+  it("should return true for the legacy WebKit code 22", () => {
+    const error = new DOMException("quota exceeded", "SomeUnknownError");
     // jsdom's DOMException doesn't set `code` from an unrecognized name,
     // so we assert the legacy numeric code path explicitly too
     Object.defineProperty(error, "code", { value: 22 });
+
+    expect(isQuotaExceededError(error)).toBe(true);
+  });
+
+  it("should return true for the legacy WebKit code 1014", () => {
+    const error = new DOMException("quota exceeded", "SomeUnknownError");
+    // jsdom's DOMException doesn't set `code` from an unrecognized name,
+    // so we assert the legacy numeric code path explicitly too
+    Object.defineProperty(error, "code", { value: 1014 });
 
     expect(isQuotaExceededError(error)).toBe(true);
   });
