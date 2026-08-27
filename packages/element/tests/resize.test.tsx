@@ -7,6 +7,7 @@ import {
   getSizeFromPoints,
   reseed,
   arrayToMap,
+  ROUGHNESS,
 } from "@excalidraw/common";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
@@ -474,6 +475,25 @@ describe("line element", () => {
 
     expect(prevSmallestX - smallestX).toBeCloseTo(10);
     expect(biggestX - prevBiggestX).toBeCloseTo(10);
+  });
+
+  it("ignores roughness when resizing", () => {
+    const clean = UI.createElement("line", {
+      points,
+      roughness: ROUGHNESS.architect,
+    });
+    const cartoony = UI.createElement("line", {
+      points,
+      roughness: ROUGHNESS.cartoonist,
+    });
+
+    UI.resize(clean, "se", [30, 30]);
+    UI.resize(cartoony, "se", [30, 30]);
+
+    expect(clean.x).toBe(cartoony.x);
+    expect(clean.y).toBe(cartoony.y);
+    expect(clean.width).toBe(cartoony.width);
+    expect(clean.height).toBe(cartoony.height);
   });
 });
 

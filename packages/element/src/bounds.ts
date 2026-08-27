@@ -25,10 +25,8 @@ import type {
   Radians,
 } from "@excalidraw/math";
 import type { AppState } from "@excalidraw/excalidraw/types";
-import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { generateRoughOptions } from "./shape";
-import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
@@ -50,7 +48,6 @@ import { intersectElementWithLineSegment } from "./collision";
 import { elementOverlapsWithFrame, getContainingFrame } from "./frame";
 
 import type { Drawable, Op } from "roughjs/bin/core";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type {
   Arrowhead,
   ElementsMap,
@@ -284,6 +281,22 @@ export const getElementAbsoluteCoords = (
     element.x + element.width / 2,
     element.y + element.height / 2,
   ];
+};
+
+export const getElementAbsoluteVisualCoords = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  includeBoundText: boolean = false,
+): [number, number, number, number, number, number] => {
+  if (isLinearElement(element)) {
+    return LinearElementEditor.getElementAbsoluteVisualCoords(
+      element,
+      elementsMap,
+      includeBoundText,
+    );
+  } else {
+    return getElementAbsoluteCoords(element, elementsMap, includeBoundText);
+  }
 };
 
 /*
@@ -907,29 +920,6 @@ export const getArrowheadPoints = (
   return [tx, ty, x3, y3, x4, y4];
 };
 
-// TODO reuse shape.ts
-const generateLinearElementShape = (
-  element: ExcalidrawLinearElement,
-): Drawable => {
-  const generator = rough.generator();
-  const options = generateRoughOptions(element);
-
-  const method = (() => {
-    if (element.roundness) {
-      return "curve";
-    }
-    if (options.fill) {
-      return "polygon";
-    }
-    return "linearPath";
-  })();
-
-  return generator[method](
-    element.points as Mutable<LocalPoint>[] as RoughPoint[],
-    options,
-  );
-};
-
 const getLinearElementRotatedBounds = (
   element: ExcalidrawLinearElement,
   cx: number,
@@ -938,43 +928,13 @@ const getLinearElementRotatedBounds = (
 ): Bounds => {
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
-  if (element.points.length < 2) {
-    const [pointX, pointY] = element.points[0];
-    const [x, y] = pointRotateRads(
-      pointFrom(element.x + pointX, element.y + pointY),
-      pointFrom(cx, cy),
-      element.angle,
-    );
-
-    let coords: Bounds = [x, y, x, y];
-    if (boundTextElement) {
-      const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
-        element,
-        elementsMap,
-        [x, y, x, y],
-        boundTextElement,
-      );
-      coords = [
-        coordsWithBoundText[0],
-        coordsWithBoundText[1],
-        coordsWithBoundText[2],
-        coordsWithBoundText[3],
-      ];
-    }
-    return coords;
-  }
-
-  // first element is always the curve
-  const cachedShape = ShapeCache.get(element, null)?.[0];
-  const shape = cachedShape ?? generateLinearElementShape(element);
-  const ops = getCurvePathOps(shape);
-  const transformXY = ([x, y]: GlobalPoint) =>
-    pointRotateRads<GlobalPoint>(
+  const transformXY = ([x, y]: LocalPoint) =>
+    pointRotateRads<LocalPoint>(
       pointFrom(element.x + x, element.y + y),
       pointFrom(cx, cy),
       element.angle,
     );
-  const res = getMinMaxXYFromCurvePathOps(ops, transformXY);
+  const res = getBoundsFromPoints(element.points.map(transformXY));
   let coords: Bounds = [res[0], res[1], res[2], res[3]];
   if (boundTextElement) {
     const coordsWithBoundText = LinearElementEditor.getMinMaxXYWithBoundText(
@@ -1062,13 +1022,29 @@ export const getResizedElementAbsoluteCoords = (
     normalizePoints,
   );
 
-  let bounds: Bounds;
+  const [minX, minY, maxX, maxY] = getBoundsFromPoints(points);
+  return [
+    minX + element.x,
+    minY + element.y,
+    maxX + element.x,
+    maxY + element.y,
+  ];
+};
 
-  if (isFreeDrawElement(element)) {
-    // Free Draw
-    bounds = getBoundsFromPoints(points);
-  } else {
-    // Line
+export const getResizedElementAbsoluteVisualCoords = (
+  element: ExcalidrawElement,
+  nextWidth: number,
+  nextHeight: number,
+  normalizePoints: boolean,
+): Bounds => {
+  if (isLinearElement(element)) {
+    const points = rescalePoints(
+      0,
+      nextWidth,
+      rescalePoints(1, nextHeight, element.points, normalizePoints),
+      normalizePoints,
+    );
+
     const gen = rough.generator();
     const curve = !element.roundness
       ? gen.linearPath(
@@ -1078,16 +1054,21 @@ export const getResizedElementAbsoluteCoords = (
       : gen.curve(points as [number, number][], generateRoughOptions(element));
 
     const ops = getCurvePathOps(curve);
-    bounds = getMinMaxXYFromCurvePathOps(ops);
+    const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
+    return [
+      minX + element.x,
+      minY + element.y,
+      maxX + element.x,
+      maxY + element.y,
+    ];
+  } else {
+    return getResizedElementAbsoluteCoords(
+      element,
+      nextWidth,
+      nextHeight,
+      normalizePoints,
+    );
   }
-
-  const [minX, minY, maxX, maxY] = bounds;
-  return [
-    minX + element.x,
-    minY + element.y,
-    maxX + element.x,
-    maxY + element.y,
-  ];
 };
 
 export const getElementPointsCoords = (
