@@ -1245,8 +1245,18 @@ export const restoreLibraryItems = (
   libraryItems: ImportedDataState["libraryItems"] = [],
   defaultStatus: LibraryItem["status"],
 ) => {
+  // `.excalidrawlib` files are untrusted input, and the default parameter only
+  // covers `undefined`, so anything else non-iterable would throw here
+  if (!Array.isArray(libraryItems)) {
+    return [];
+  }
+
   const restoredItems: LibraryItem[] = [];
   for (const item of libraryItems) {
+    if (!item || typeof item !== "object") {
+      continue;
+    }
+
     // migrate older libraries
     if (Array.isArray(item)) {
       const restoredItem = restoreLibraryItem({
