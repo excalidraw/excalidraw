@@ -798,8 +798,14 @@ const handleSearch = debounce(
       isFrameLikeElement(el),
     ) as ExcalidrawFrameLikeElement[];
 
-    texts.sort((a, b) => a.y - b.y);
-    frames.sort((a, b) => a.y - b.y);
+    // Snapshot y-positions at search time so dragging elements
+    // doesn't reorder the results list (fix #9503).
+    const yPositions = new Map<string, number>();
+    for (const el of [...texts, ...frames]) {
+      yPositions.set(el.id, el.y);
+    }
+    texts.sort((a, b) => (yPositions.get(a.id) ?? a.y) - (yPositions.get(b.id) ?? b.y));
+    frames.sort((a, b) => (yPositions.get(a.id) ?? a.y) - (yPositions.get(b.id) ?? b.y));
 
     const textMatches: SearchMatchItem[] = [];
 
