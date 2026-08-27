@@ -9552,6 +9552,7 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (this.state.selectedLinearElement?.isEditing) {
+          this.store.scheduleCapture();
           this.setState((prevState) => ({
             selectedLinearElement: prevState.selectedLinearElement
               ? {
