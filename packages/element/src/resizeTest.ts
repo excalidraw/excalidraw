@@ -76,6 +76,11 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
     return "rotation" as TransformHandleType;
   }
 
+  // do not resize from the sides for linear elements with only two points
+  if(isLinearElement(element) && element.points.length <= 2) {
+    return false;
+  }
+
   const filter = Object.keys(transformHandles).filter((key) => {
     const transformHandle =
       transformHandles[key as Exclude<TransformHandleType, "rotation">]!;
@@ -95,31 +100,28 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       elementsMap,
     );
 
-    // do not resize from the sides for linear elements with only two points
-    if (!(isLinearElement(element) && element.points.length <= 2)) {
-      const SPACING = isImageElement(element)
-        ? 0
-        : SIDE_RESIZING_THRESHOLD / zoom.value;
-      const ZOOMED_SIDE_RESIZING_THRESHOLD =
-        SIDE_RESIZING_THRESHOLD / zoom.value;
-      const sides = getSelectionBorders(
-        pointFrom(x1 - SPACING, y1 - SPACING),
-        pointFrom(x2 + SPACING, y2 + SPACING),
-        pointFrom(cx, cy),
-        element.angle,
-      );
+    const SPACING = isImageElement(element)
+      ? 0
+      : SIDE_RESIZING_THRESHOLD / zoom.value;
+    const ZOOMED_SIDE_RESIZING_THRESHOLD =
+      SIDE_RESIZING_THRESHOLD / zoom.value;
+    const sides = getSelectionBorders(
+      pointFrom(x1 - SPACING, y1 - SPACING),
+      pointFrom(x2 + SPACING, y2 + SPACING),
+      pointFrom(cx, cy),
+      element.angle,
+    );
 
-      for (const [dir, side] of Object.entries(sides)) {
-        // test to see if x, y are on the line segment
-        if (
-          pointOnLineSegment(
-            pointFrom(x, y),
-            side as LineSegment<Point>,
-            ZOOMED_SIDE_RESIZING_THRESHOLD,
-          )
-        ) {
-          return dir as TransformHandleType;
-        }
+    for (const [dir, side] of Object.entries(sides)) {
+      // test to see if x, y are on the line segment
+      if (
+        pointOnLineSegment(
+          pointFrom(x, y),
+          side as LineSegment<Point>,
+          ZOOMED_SIDE_RESIZING_THRESHOLD,
+        )
+      ) {
+        return dir as TransformHandleType;
       }
     }
   }
