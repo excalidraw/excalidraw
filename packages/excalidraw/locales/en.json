@@ -447,6 +447,7 @@
     "click": "click",
     "deepSelect": "Deep select",
     "deepBoxSelect": "Deep select within box, and prevent dragging",
+    "constrainedDrag": "Constrain dragging to horizontal / vertical axis",
     "createFlowchart": "Create a flowchart from a generic element",
     "navigateFlowchart": "Navigate a flowchart",
     "curvedArrow": "Curved arrow",
