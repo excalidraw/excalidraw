@@ -4,7 +4,6 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
   arrayToMap,
-  getFontString,
   getStrokeWidthByKey,
 } from "@excalidraw/common";
 import {
@@ -29,7 +28,7 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { measureText } from "@excalidraw/element";
+import { measureTextContent } from "@excalidraw/element";
 
 import { syncMovedIndices } from "@excalidraw/element";
 
@@ -67,10 +66,9 @@ export const actionUnbindText = register({
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        const { width, height } = measureText(
+        const { width, height } = measureTextContent(
           boundTextElement.originalText,
-          getFontString(boundTextElement),
-          boundTextElement.lineHeight,
+          boundTextElement,
         );
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,

@@ -21,6 +21,11 @@ import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
+import {
+  getRenderableMathText,
+  isMathText,
+  measureTextContent,
+} from "./mathText";
 import { newElementWith } from "./mutateElement";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
@@ -273,11 +278,11 @@ export const newTextElement = (
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
   const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
   const text = normalizeText(opts.text);
-  const metrics = measureText(
-    text,
-    getFontString({ fontFamily, fontSize }),
+  const metrics = measureTextContent(text, {
+    fontFamily,
+    fontSize,
     lineHeight,
-  );
+  });
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
   const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
   const offsets = getTextElementPositionOffsets(
@@ -319,15 +324,17 @@ const getAdjustedDimensions = (
   y: number;
   width: number;
   height: number;
+  /** whether the dimensions are the typeset equation box (math mode) */
+  isMath: boolean;
 } => {
-  let { width: nextWidth, height: nextHeight } = measureText(
-    nextText,
-    getFontString(element),
-    element.lineHeight,
-  );
+  let {
+    width: nextWidth,
+    height: nextHeight,
+    isMath,
+  } = measureTextContent(nextText, element);
 
-  // wrapped text
-  if (!element.autoResize) {
+  // wrapped text (math is never wrapped: its box is always the equation box)
+  if (!element.autoResize && !isMath) {
     nextWidth = element.width;
   }
 
@@ -340,11 +347,13 @@ const getAdjustedDimensions = (
     !element.containerId &&
     element.autoResize
   ) {
-    const prevMetrics = measureText(
-      element.text,
-      getFontString(element),
-      element.lineHeight,
-    );
+    // for math-looking text the stored box is the reference (it's either the
+    // equation box, or the plain-text box while being edited) — re-measuring
+    // `element.text` as plain text would break the anchor when switching
+    // between the two
+    const prevMetrics = isMathText(element.text)
+      ? { width: element.width, height: element.height }
+      : measureText(element.text, getFontString(element), element.lineHeight);
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
       height: nextHeight - prevMetrics.height,
@@ -396,6 +405,7 @@ const getAdjustedDimensions = (
     height: nextHeight,
     x: Number.isFinite(x) ? x : element.x,
     y: Number.isFinite(y) ? y : element.y,
+    isMath,
   };
 };
 
@@ -455,7 +465,11 @@ export const refreshTextDimensions = (
   if (textElement.isDeleted) {
     return;
   }
-  if (container || !textElement.autoResize) {
+  if (
+    (container || !textElement.autoResize) &&
+    // math is never wrapped
+    !getRenderableMathText(text, textElement)
+  ) {
     text = wrapText(
       text,
       getFontString(textElement),
@@ -464,8 +478,18 @@ export const refreshTextDimensions = (
         : textElement.width,
     );
   }
-  const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
-  return { text, ...dimensions };
+  const { isMath, ...dimensions } = getAdjustedDimensions(
+    textElement,
+    elementsMap,
+    text,
+  );
+  return {
+    text,
+    ...dimensions,
+    // a math element's box is always the equation box — never a fixed-width
+    // wrapped box — so make sure it's flagged as auto-resizing
+    ...(isMath ? { autoResize: true as const } : {}),
+  };
 };
 
 export const newFreeDrawElement = (

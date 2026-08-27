@@ -47,6 +47,7 @@ import {
   getApproxMinLineWidth,
   getApproxMinLineHeight,
 } from "./textMeasurements";
+import { getRenderableMathText } from "./mathText";
 import { wrapText } from "./textWrapping";
 import {
   isArrowElement,
@@ -325,15 +326,47 @@ export const resizeSingleTextElement = (
     return;
   }
 
-  if (transformHandleType.includes("n") || transformHandleType.includes("s")) {
+  const isEastWestHandle =
+    transformHandleType === "e" || transformHandleType === "w";
+  // math is never wrapped — e/w handles scale it proportionally (like the
+  // corner handles) instead of turning it into a fixed-width wrapped box
+  const isMath =
+    isEastWestHandle && !!getRenderableMathText(element.originalText, element);
+
+  if (
+    transformHandleType.includes("n") ||
+    transformHandleType.includes("s") ||
+    isMath
+  ) {
+    let newWidth = metricsWidth;
+    let newHeight = nextHeight;
+    let fontSize = metrics.size;
+
+    if (isMath) {
+      if (!element.width) {
+        return;
+      }
+      newWidth = Math.max(nextWidth, 1);
+      newHeight = element.height * (newWidth / element.width);
+      const mathMetrics = measureFontSizeFromWidth(
+        element,
+        elementsMap,
+        newWidth,
+      );
+      if (mathMetrics === null) {
+        return;
+      }
+      fontSize = mathMetrics.size;
+    }
+
     const previousOrigin = pointFrom<GlobalPoint>(origElement.x, origElement.y);
 
     const newOrigin = getResizedOrigin(
       previousOrigin,
       origElement.width,
       origElement.height,
-      metricsWidth,
-      nextHeight,
+      newWidth,
+      newHeight,
       origElement.angle,
       transformHandleType,
       false,
@@ -341,16 +374,16 @@ export const resizeSingleTextElement = (
     );
 
     scene.mutateElement(element, {
-      fontSize: metrics.size,
-      width: metricsWidth,
-      height: nextHeight,
+      fontSize,
+      width: newWidth,
+      height: newHeight,
       x: newOrigin.x,
       y: newOrigin.y,
     });
     return;
   }
 
-  if (transformHandleType === "e" || transformHandleType === "w") {
+  if (isEastWestHandle) {
     const minWidth = getMinTextElementWidth(
       getFontString({
         fontSize: element.fontSize,

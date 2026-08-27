@@ -23,6 +23,7 @@ import {
 
 import { LinearElementEditor } from "@excalidraw/element";
 import { bumpVersion } from "@excalidraw/element";
+import { setMathTextEditingElementId } from "@excalidraw/element";
 import {
   getBoundTextElementId,
   getContainerElement,
@@ -468,6 +469,9 @@ export const textWysiwyg = ({
     overflowWrap: "break-word",
     boxSizing: "content-box",
   });
+  // while editing, a math (`$…$`) text element is laid out as plain text so
+  // the textarea fits the LaTeX source — math dimensions are applied on submit
+  setMathTextEditingElementId(element.id);
   editable.value = element.originalText;
   updateWysiwygStyle();
 
@@ -849,6 +853,9 @@ export const textWysiwyg = ({
   };
 
   const cleanup = () => {
+    // editing is over → math text elements get their equation dimensions back
+    setMathTextEditingElementId(null);
+
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.oninput = null;

@@ -97,7 +97,7 @@ const getHints = ({
   }
 
   if (activeTool.type === "text") {
-    return t("hints.text");
+    return `${t("hints.text")} ${t("hints.textMath")}`;
   }
 
   if (activeTool.type === "embeddable") {
