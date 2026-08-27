@@ -1,23 +1,16 @@
 import { isDevEnv } from "@excalidraw/common";
-
 import type { NestedKeyOf } from "@excalidraw/common/utility-types";
-
 import { useAtomValue, editorJotaiStore, atom } from "./editor-jotai";
 import fallbackLangData from "./locales/en.json";
 import percentages from "./locales/percentages.json";
-
 const COMPLETION_THRESHOLD = 85;
-
 export interface Language {
   code: string;
   label: string;
   rtl?: boolean;
 }
-
 export type TranslationKeys = NestedKeyOf<typeof fallbackLangData>;
-
 export const defaultLang = { code: "en", label: "English" };
-
 export const languages: Language[] = [
   defaultLang,
   ...[
@@ -45,9 +38,21 @@ export const languages: Language[] = [
     { code: "ku-TR", label: "Kurdî" },
     { code: "lt-LT", label: "Lietuvių" },
     { code: "lv-LV", label: "Latviešu" },
+    { code: "mn-MN", label: "Монгол" },
     { code: "my-MM", label: "Burmese" },
     { code: "nb-NO", label: "Norsk bokmål" },
     { code: "nl-NL", label: "Nederlands" },
+
+    
+          
+            
+    
+
+          
+          Expand Down
+    
+    
+  
     { code: "nn-NO", label: "Norsk nynorsk" },
     { code: "oc-FR", label: "Occitan" },
     { code: "pa-IN", label: "ਪੰਜਾਬੀ" },
@@ -73,7 +78,6 @@ export const languages: Language[] = [
     )
     .sort((left, right) => (left.label > right.label ? 1 : -1)),
 ];
-
 const TEST_LANG_CODE = "__test__";
 if (isDevEnv()) {
   languages.unshift(
@@ -85,15 +89,12 @@ if (isDevEnv()) {
     },
   );
 }
-
 let currentLang: Language = defaultLang;
 let currentLangData = {};
-
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
   document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
   document.documentElement.lang = currentLang.code;
-
   if (lang.code.startsWith(TEST_LANG_CODE)) {
     currentLangData = {};
   } else {
@@ -104,12 +105,9 @@ export const setLanguage = async (lang: Language) => {
       currentLangData = fallbackLangData;
     }
   }
-
   editorJotaiStore.set(editorLangCodeAtom, lang.code);
 };
-
 export const getLanguage = () => currentLang;
-
 const findPartsForData = (data: any, parts: string[]) => {
   for (let index = 0; index < parts.length; ++index) {
     const part = parts[index];
@@ -123,7 +121,6 @@ const findPartsForData = (data: any, parts: string[]) => {
   }
   return data;
 };
-
 export const t = (
   path: NestedKeyOf<typeof fallbackLangData>,
   replacement?: { [key: string]: string | number } | null,
@@ -135,7 +132,6 @@ export const t = (
       : path;
     return `\u{202a}[[${name}]]\u{202c}`;
   }
-
   const parts = path.split(".");
   let translation =
     findPartsForData(currentLangData, parts) ||
@@ -150,7 +146,6 @@ export const t = (
     }
     throw new Error(errorMessage);
   }
-
   if (replacement) {
     for (const key in replacement) {
       translation = translation.replace(`{{${key}}}`, String(replacement[key]));
@@ -158,10 +153,8 @@ export const t = (
   }
   return translation;
 };
-
 /** @private atom used solely to rerender components using `useI18n` hook */
 const editorLangCodeAtom = atom(defaultLang.code);
-
 // Should be used in components that fall under these cases:
 // - component is rendered as an <Excalidraw> child
 // - component is rendered internally by <Excalidraw>, but the component
