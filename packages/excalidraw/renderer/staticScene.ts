@@ -43,7 +43,7 @@ import type {
 } from "../scene/types";
 import type { StaticCanvasAppState, Zoom } from "../types";
 
-const GridLineColor = {
+export const GridLineColor = {
   [THEME.LIGHT]: {
     bold: "#dddddd",
     regular: "#e5e5e5",
