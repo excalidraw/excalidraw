@@ -1407,6 +1407,7 @@ export interface ExcalidrawImperativeAPI {
   resetCursor: InstanceType<typeof App>["cursor"]["reset"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
   getHTMLIFrameElement: InstanceType<typeof App>["getHTMLIFrameElement"]; //zsviczian
+  awaitImageFiles: InstanceType<typeof App>["awaitImageFiles"]; // zsviczian -- pace Obsidian migration image batches
   getEditorInterface: () => EditorInterface;
   /**
    * Disables rendering of frames (including element clipping), but currently

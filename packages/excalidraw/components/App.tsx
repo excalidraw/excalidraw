@@ -850,6 +850,7 @@ class App extends React.Component<AppProps, AppState> {
       sendToBack: this.sendToBack, //zsviczian
       bringToFront: this.bringToFront, //zsviczian
       getHTMLIFrameElement: (id: string) => this.getHTMLIFrameElement(id), //zsviczian
+      awaitImageFiles: this.awaitImageFiles, // zsviczian -- let the Obsidian migration publisher pace decoded batches
     };
     return api;
   }
@@ -5605,6 +5606,33 @@ class App extends React.Component<AppProps, AppState> {
     },
     // zsviczian END
   );
+
+  // zsviczian START -- let Obsidian pace in-memory migration files without exporting DOM-owned cache entries
+  /**
+   * Waits for image-cache work already started by `addFiles()` for the given
+   * file IDs. Obsidian recreates the editor across popout documents and uses
+   * this completion boundary to publish transferred `BinaryFiles` in bounded
+   * batches while retaining the component's ordinary decoding path.
+   *
+   * Author: zsviczian
+   * Reference: obsidian-excalidraw-plugin performance refactor Phase 1C.2c.
+   */
+  public awaitImageFiles = async (
+    fileIds: readonly FileId[],
+  ): Promise<void> => {
+    const pendingImages = fileIds.flatMap((fileId) => {
+      const image = this.imageCache.get(fileId)?.image;
+      return image &&
+        typeof (image as Promise<HTMLImageElement>).then === "function"
+        ? [image as Promise<HTMLImageElement>]
+        : [];
+    });
+    await Promise.allSettled(pendingImages);
+    // Let addNewImagesToImageCache() publish its scene update before the host
+    // waits for the next paint and starts another batch.
+    await Promise.resolve();
+  };
+  // zsviczian END
 
   //zsviczian https://github.com/zsviczian/excalibrain/issues/9
   public setMobileModeAllowed = (allow: boolean) => {

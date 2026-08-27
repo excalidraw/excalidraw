@@ -7,9 +7,18 @@ import {
 } from "@testing-library/react";
 import { vi } from "vitest";
 
+import { MIME_TYPES } from "@excalidraw/common"; // zsviczian -- construct the migration image fixture
+import { newImageElement } from "@excalidraw/element"; // zsviczian -- construct the migration image fixture
+
+import type { FileId } from "@excalidraw/element/types"; // zsviczian -- type the migration image fixture
+
 import { Excalidraw } from "../index";
 
-import type { ExcalidrawImperativeAPI } from "../types";
+import type {
+  BinaryFileData, // zsviczian -- type the migration image fixture
+  DataURL, // zsviczian -- type the migration image fixture
+  ExcalidrawImperativeAPI,
+} from "../types";
 
 describe("cross-document rendering", () => {
   it("scopes listeners, fonts, and portals to ownerDocument", async () => {
@@ -152,4 +161,74 @@ describe("cross-document rendering", () => {
       iframe.remove();
     }
   });
+
+  // zsviczian START -- keep the Obsidian migration decode boundary in a focused test that runs in this fork
+  it("awaits image decoding started by addFiles", async () => {
+    let api: ExcalidrawImperativeAPI | null = null;
+    const renderResult = renderReact(
+      <Excalidraw
+        onExcalidrawAPI={(nextApi) => {
+          api = nextApi;
+        }}
+      />,
+    );
+    const NativeImage = window.Image;
+    const pendingImages: HTMLImageElement[] = [];
+    try {
+      await waitFor(() => expect(api).not.toBeNull());
+      await waitFor(() => expect(api!.getAppState().isLoading).toBe(false));
+
+      const fileId = "migration-image" as FileId;
+      act(() => {
+        api!.updateScene({
+          elements: [
+            newImageElement({
+              type: "image",
+              x: 0,
+              y: 0,
+              fileId,
+              status: "saved",
+              scale: [1, 1],
+            }),
+          ],
+        });
+      });
+      vi.stubGlobal(
+        "Image",
+        class extends NativeImage {
+          constructor() {
+            super();
+            pendingImages.push(this);
+          }
+        },
+      );
+      const file: BinaryFileData = {
+        id: fileId,
+        dataURL: `data:${MIME_TYPES.png};base64,AA==` as DataURL,
+        mimeType: MIME_TYPES.png,
+        created: Date.now(),
+        lastRetrieved: Date.now(),
+      };
+
+      act(() => api!.addFiles([file]));
+      expect(pendingImages).toHaveLength(1);
+      let settled = false;
+      const waitForImages = api!.awaitImageFiles([fileId]).then(() => {
+        settled = true;
+      });
+      await Promise.resolve();
+      expect(settled).toBe(false);
+
+      await act(async () => {
+        pendingImages[0].onload?.(new Event("load"));
+        await waitForImages;
+      });
+      expect(settled).toBe(true);
+      expect(api!.getFiles()[fileId]).toBe(file);
+    } finally {
+      renderResult.unmount();
+      vi.unstubAllGlobals();
+    }
+  });
+  // zsviczian END
 });
