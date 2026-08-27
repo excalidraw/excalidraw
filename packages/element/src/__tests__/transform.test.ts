@@ -3,6 +3,8 @@ import { vi } from "vitest";
 
 import {
   convertToExcalidrawElements,
+  hasStaleTextMetrics,
+  clearStaleTextMetrics,
   type ExcalidrawElementSkeleton,
 } from "../transform";
 
@@ -963,6 +965,52 @@ describe("Test Transform", () => {
         versionNonce: expect.any(Number),
         id: expect.any(String),
       });
+    });
+  });
+
+  describe("Test stale text metrics", () => {
+    const elements: ExcalidrawElementSkeleton[] = [
+      { type: "text", x: 0, y: 0, text: "HELLO EXCALIDRAW" },
+      {
+        type: "rectangle",
+        x: 0,
+        y: 100,
+        width: 200,
+        label: { text: "HELLO WORLD!!" },
+      },
+    ];
+
+    it("should mark text elements as stale when fonts are not loaded", () => {
+      const checkSpy = vi.spyOn(document.fonts, "check").mockReturnValue(false);
+
+      const excalidrawElements = convertToExcalidrawElements(elements, opts);
+      const textElements = excalidrawElements.filter(
+        (element) => element.type === "text",
+      );
+
+      expect(textElements.length).toBe(2);
+      textElements.forEach((element) => {
+        expect(hasStaleTextMetrics(element.id)).toBe(true);
+        clearStaleTextMetrics(element.id);
+      });
+
+      checkSpy.mockRestore();
+    });
+
+    it("should not mark text elements as stale when fonts are loaded", () => {
+      const checkSpy = vi.spyOn(document.fonts, "check").mockReturnValue(true);
+
+      const excalidrawElements = convertToExcalidrawElements(elements, opts);
+      const textElements = excalidrawElements.filter(
+        (element) => element.type === "text",
+      );
+
+      expect(textElements.length).toBe(2);
+      textElements.forEach((element) => {
+        expect(hasStaleTextMetrics(element.id)).toBe(false);
+      });
+
+      checkSpy.mockRestore();
     });
   });
 });
