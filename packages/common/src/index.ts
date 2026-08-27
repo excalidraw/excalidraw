@@ -3,6 +3,7 @@ export * from "./bounds";
 export * from "./colors";
 export * from "./constants";
 export * from "./font-metadata";
+export * from "./font-glyphs";
 export * from "./queue";
 export * from "./keys";
 export * from "./points";

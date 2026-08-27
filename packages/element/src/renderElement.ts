@@ -24,6 +24,7 @@ import {
   invariant,
   applyDarkModeFilter,
   isSafari,
+  rewriteTextForFontFamily,
 } from "@excalidraw/common";
 
 import type {
@@ -493,7 +494,10 @@ const drawElementOnCanvas = (
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const lines = rewriteTextForFontFamily(
+          element.text.replace(/\r\n?/g, "\n"),
+          element.fontFamily,
+        ).split("\n");
 
         const horizontalOffset =
           element.textAlign === "center"
