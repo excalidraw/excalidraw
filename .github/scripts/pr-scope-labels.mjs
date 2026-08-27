@@ -1,4 +1,4 @@
-const title = process.env.PR_TITLE;
+const title = process.env.PR_TITLE ?? "";
 const match = title.match(/^[a-z]+(?:\(([^)]+)\))?!?:/i);
 const scopes = match?.[1]?.split(",").map((scope) => scope.trim()) ?? [];
 const labels = new Set();
