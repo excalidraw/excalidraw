@@ -4,7 +4,9 @@ import {
   presentationIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { LinkButton } from "@excalidraw/excalidraw/components/LinkButton";
+import { Tooltip } from "@excalidraw/excalidraw/components/Tooltip";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
+import { t } from "@excalidraw/excalidraw/i18n";
 
 import "./AppSidebar.scss";
 
@@ -71,18 +73,24 @@ export const AppSidebar = () => {
   return (
     <DefaultSidebar>
       <DefaultSidebar.TabTriggers>
-        <Sidebar.TabTrigger
-          tab="comments"
-          style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
-        >
-          {messageCircleIcon}
-        </Sidebar.TabTrigger>
-        <Sidebar.TabTrigger
-          tab="presentation"
-          style={{ opacity: openSidebar?.tab === "presentation" ? 1 : 0.4 }}
-        >
-          {presentationIcon}
-        </Sidebar.TabTrigger>
+        <Tooltip label={t("sidebar.comments")}>
+          <Sidebar.TabTrigger
+            tab="comments"
+            style={{ opacity: openSidebar?.tab === "comments" ? 1 : 0.4 }}
+            aria-label={t("sidebar.comments")}
+          >
+            {messageCircleIcon}
+          </Sidebar.TabTrigger>
+        </Tooltip>
+        <Tooltip label={t("sidebar.presentation")}>
+          <Sidebar.TabTrigger
+            tab="presentation"
+            style={{ opacity: openSidebar?.tab === "presentation" ? 1 : 0.4 }}
+            aria-label={t("sidebar.presentation")}
+          >
+            {presentationIcon}
+          </Sidebar.TabTrigger>
+        </Tooltip>
       </DefaultSidebar.TabTriggers>
       <Sidebar.Tab tab="comments">
         <div className="app-sidebar-promo-container">

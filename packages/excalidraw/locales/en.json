@@ -752,5 +752,9 @@
     "spacebar": "Space",
     "delete": "Delete",
     "mmb": "Scroll wheel"
+  },
+  "sidebar": {
+    "comments": "Comments",
+    "presentation": "Presentation"
   }
 }
