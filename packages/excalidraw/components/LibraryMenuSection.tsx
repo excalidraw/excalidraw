@@ -1,12 +1,16 @@
-import type { ReactNode } from "react";
 import React, { memo, useEffect, useState } from "react";
-import { EmptyLibraryUnit, LibraryUnit } from "./LibraryUnit";
-import type { LibraryItem } from "../types";
-import type { ExcalidrawElement, NonDeleted } from "../element/types";
-import type { SvgCache } from "../hooks/useLibraryItemSvg";
+
+import type { ExcalidrawElement, NonDeleted } from "@excalidraw/element/types";
+
 import { useTransition } from "../hooks/useTransition";
 
-type LibraryOrPendingItem = (
+import { EmptyLibraryUnit, LibraryUnit } from "./LibraryUnit";
+
+import type { SvgCache } from "../hooks/useLibraryItemSvg";
+import type { LibraryItem } from "../types";
+import type { ReactNode } from "react";
+
+type LibraryOrPendingItem = readonly (
   | LibraryItem
   | /* pending library item */ {
       id: null;

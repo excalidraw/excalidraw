@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+
 import { t } from "../i18n";
 
-import { Dialog } from "./Dialog";
 import { useExcalidrawContainer } from "./App";
+import { Dialog } from "./Dialog";
 
 export const ErrorDialog = ({
   children,

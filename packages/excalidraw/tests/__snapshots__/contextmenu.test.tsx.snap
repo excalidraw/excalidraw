@@ -3,8 +3,10 @@
 exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -97,6 +99,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -114,6 +117,59 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "trackEvent": {
           "category": "history",
         },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -684,6 +740,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -718,6 +775,42 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -794,6 +887,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "left": 30,
     "top": 40,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -804,7 +898,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -814,7 +908,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -835,11 +928,14 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -860,13 +956,12 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
     "id1": true,
@@ -886,6 +981,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -919,17 +1015,15 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1278240551,
+  "roundness": null,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 453191,
+  "versionNonce": 1278240551,
   "width": 100,
   "x": 0,
   "y": 0,
@@ -955,33 +1049,18 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 449462985,
+  "roundness": null,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 401146281,
+  "versionNonce": 449462985,
   "width": 100,
   "x": 0,
   "y": 0,
-}
-`;
-
-exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [],
 }
 `;
 
@@ -989,17 +1068,24 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
 
 exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] number of renders 1`] = `5`;
 
+exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > right-clicking on a group should select whole group > [end of test] undo stack 1`] = `[]`;
+
 exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1010,7 +1096,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -1020,7 +1106,6 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -1041,11 +1126,14 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -1063,13 +1151,12 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "scrolledOutside": false,
-  "searchMatches": [],
+  "scrolledOutside": true,
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
   },
@@ -1086,6 +1173,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": {
@@ -1111,7 +1199,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 20,
+  "height": 10,
   "id": "id0",
   "index": "a0",
   "isDeleted": false,
@@ -1119,85 +1207,18 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 449462985,
+  "roundness": null,
+  "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 1150084233,
-  "width": 20,
-  "x": -10,
-  "y": 0,
-}
-`;
-
-exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-  ],
+  "versionNonce": 2019559783,
+  "width": 10,
+  "x": -20,
+  "y": -10,
 }
 `;
 
@@ -1205,17 +1226,79 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
 
 exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] number of renders 1`] = `5`;
 
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Add to library' in context menu adds element to library > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": -20,
+            "y": -10,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1226,7 +1309,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -1236,7 +1319,6 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -1257,11 +1339,14 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -1279,13 +1364,12 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
   },
@@ -1302,6 +1386,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -1326,24 +1411,22 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id1",
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1014066025,
+  "roundness": null,
+  "seed": 238820263,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 1604849351,
+  "versionNonce": 1505387817,
   "width": 20,
   "x": 20,
   "y": 30,
@@ -1367,9 +1450,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -1377,158 +1458,10 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 23633383,
+  "versionNonce": 915032327,
   "width": 20,
   "x": -10,
   "y": 0,
-}
-`;
-
-exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": 20,
-              "y": 30,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "index": "a2",
-            },
-            "inserted": {
-              "index": "a0",
-            },
-          },
-        },
-      },
-    },
-  ],
 }
 `;
 
@@ -1536,17 +1469,166 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
 
 exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] number of renders 1`] = `10`;
 
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Bring forward' in context menu brings element forward > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": 20,
+            "y": 30,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "index": "a2",
+            "version": 4,
+          },
+          "inserted": {
+            "index": "a0",
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id7",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1557,7 +1639,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -1567,7 +1649,6 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -1588,11 +1669,14 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -1610,13 +1694,12 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
   },
@@ -1633,6 +1716,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -1657,24 +1741,22 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id1",
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1014066025,
+  "roundness": null,
+  "seed": 238820263,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 1604849351,
+  "versionNonce": 1505387817,
   "width": 20,
   "x": 20,
   "y": 30,
@@ -1698,9 +1780,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -1708,158 +1788,10 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 23633383,
+  "versionNonce": 915032327,
   "width": 20,
   "x": -10,
   "y": 0,
-}
-`;
-
-exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": 20,
-              "y": 30,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "index": "a2",
-            },
-            "inserted": {
-              "index": "a0",
-            },
-          },
-        },
-      },
-    },
-  ],
 }
 `;
 
@@ -1867,17 +1799,166 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
 
 exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] number of renders 1`] = `10`;
 
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Bring to front' in context menu brings element to front > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": 20,
+            "y": 30,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "index": "a2",
+            "version": 4,
+          },
+          "inserted": {
+            "index": "a0",
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id7",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -1888,7 +1969,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -1898,7 +1979,6 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -1919,11 +1999,14 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -1941,13 +2024,12 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "scrolledOutside": false,
-  "searchMatches": [],
+  "scrolledOutside": true,
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
   },
@@ -1964,6 +2046,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": {
@@ -1989,7 +2072,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 20,
+  "height": 10,
   "id": "id0",
   "index": "a0",
   "isDeleted": false,
@@ -1997,85 +2080,18 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 449462985,
+  "roundness": null,
+  "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 1150084233,
-  "width": 20,
-  "x": -10,
-  "y": 0,
-}
-`;
-
-exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-  ],
+  "versionNonce": 2019559783,
+  "width": 10,
+  "x": -20,
+  "y": -10,
 }
 `;
 
@@ -2083,17 +2099,79 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
 
 exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] number of renders 1`] = `5`;
 
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Copy styles' in context menu copies styles > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": -20,
+            "y": -10,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2104,7 +2182,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -2114,7 +2192,6 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -2135,11 +2212,14 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -2157,13 +2237,12 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2178,6 +2257,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2201,7 +2281,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 20,
+  "height": 10,
   "id": "id0",
   "index": "a0",
   "isDeleted": true,
@@ -2209,10 +2289,8 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 449462985,
+  "roundness": null,
+  "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
@@ -2220,102 +2298,9 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "updated": 1,
   "version": 4,
   "versionNonce": 1014066025,
-  "width": 20,
-  "x": -10,
-  "y": 0,
-}
-`;
-
-exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {},
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {
-          "id0" => Delta {
-            "deleted": {
-              "isDeleted": true,
-            },
-            "inserted": {
-              "isDeleted": false,
-            },
-          },
-        },
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-  ],
+  "width": 10,
+  "x": -20,
+  "y": -10,
 }
 `;
 
@@ -2323,17 +2308,110 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
 
 exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] number of renders 1`] = `6`;
 
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Delete' in context menu deletes element > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": -20,
+            "y": -10,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {},
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {
+        "id0": {
+          "deleted": {
+            "isDeleted": true,
+            "version": 4,
+          },
+          "inserted": {
+            "isDeleted": false,
+            "version": 3,
+          },
+        },
+      },
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id4",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2344,7 +2422,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -2354,7 +2432,6 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -2375,11 +2452,14 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -2397,15 +2477,14 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
-    "id0_copy": true,
+    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -2420,6 +2499,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2443,7 +2523,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 20,
+  "height": 10,
   "id": "id0",
   "index": "a0",
   "isDeleted": false,
@@ -2451,20 +2531,18 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 449462985,
+  "roundness": null,
+  "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 1150084233,
-  "width": 20,
-  "x": -10,
-  "y": 0,
+  "versionNonce": 2019559783,
+  "width": 10,
+  "x": -20,
+  "y": -10,
 }
 `;
 
@@ -2477,146 +2555,26 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 20,
-  "id": "id0_copy",
+  "height": 10,
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1014066025,
+  "roundness": null,
+  "seed": 238820263,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
-  "version": 4,
-  "versionNonce": 238820263,
-  "width": 20,
-  "x": 0,
-  "y": 10,
-}
-`;
-
-exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0_copy": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0_copy" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": 0,
-              "y": 10,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-  ],
+  "version": 5,
+  "versionNonce": 1604849351,
+  "width": 10,
+  "x": -10,
+  "y": 0,
 }
 `;
 
@@ -2624,17 +2582,133 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
 
 exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] number of renders 1`] = `6`;
 
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates element > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": -20,
+            "y": -10,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 5,
+            "width": 10,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 4,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -2645,7 +2719,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -2655,7 +2729,6 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -2676,11 +2749,14 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -2698,22 +2774,21 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id1": true,
+    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
-    "id1": true,
+    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {
-    "id3": true,
+    "id9": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -2726,6 +2801,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -2749,7 +2825,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [
-    "id3",
+    "id9",
   ],
   "height": 20,
   "id": "id0",
@@ -2759,9 +2835,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -2769,7 +2843,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 493213705,
+  "versionNonce": 81784553,
   "width": 20,
   "x": -10,
   "y": 0,
@@ -2785,207 +2859,28 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [
-    "id3",
+    "id9",
   ],
   "height": 20,
-  "id": "id1",
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1014066025,
+  "roundness": null,
+  "seed": 238820263,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 915032327,
+  "versionNonce": 747212839,
   "width": 20,
   "x": 20,
   "y": 30,
-}
-`;
-
-exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": 20,
-              "y": 30,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedGroupIds": {
-              "id3": true,
-            },
-          },
-          "inserted": {
-            "selectedGroupIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "groupIds": [
-                "id3",
-              ],
-            },
-            "inserted": {
-              "groupIds": [],
-            },
-          },
-          "id1" => Delta {
-            "deleted": {
-              "groupIds": [
-                "id3",
-              ],
-            },
-            "inserted": {
-              "groupIds": [],
-            },
-          },
-        },
-      },
-    },
-  ],
 }
 `;
 
@@ -2993,17 +2888,198 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
 
 exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] number of renders 1`] = `10`;
 
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Group selection' in context menu groups selected elements > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": 20,
+            "y": 30,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id8",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedGroupIds": {
+            "id9": true,
+          },
+        },
+        "inserted": {
+          "selectedGroupIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "groupIds": [
+              "id9",
+            ],
+            "version": 4,
+          },
+          "inserted": {
+            "groupIds": [],
+            "version": 3,
+          },
+        },
+        "id3": {
+          "deleted": {
+            "groupIds": [
+              "id9",
+            ],
+            "version": 4,
+          },
+          "inserted": {
+            "groupIds": [],
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id11",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3014,7 +3090,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "currentItemFontSize": 20,
   "currentItemOpacity": 60,
   "currentItemRoughness": 2,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#e03131",
   "currentItemStrokeStyle": "dotted",
@@ -3024,7 +3100,6 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -3045,11 +3120,14 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -3067,13 +3145,12 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
   },
@@ -3090,6 +3167,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": {
@@ -3123,9 +3201,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "locked": false,
   "opacity": 60,
   "roughness": 2,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 449462985,
   "strokeColor": "#e03131",
   "strokeStyle": "dotted",
@@ -3133,7 +3209,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 941653321,
+  "versionNonce": 1359939303,
   "width": 20,
   "x": -10,
   "y": 0,
@@ -3150,317 +3226,25 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id1",
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 60,
   "roughness": 2,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 289600103,
+  "roundness": null,
+  "seed": 640725609,
   "strokeColor": "#e03131",
   "strokeStyle": "dotted",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 9,
-  "versionNonce": 640725609,
+  "versionNonce": 908564423,
   "width": 20,
   "x": 20,
   "y": 30,
-}
-`;
-
-exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": 20,
-              "y": 30,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id1" => Delta {
-            "deleted": {
-              "strokeColor": "#e03131",
-            },
-            "inserted": {
-              "strokeColor": "#1e1e1e",
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id1" => Delta {
-            "deleted": {
-              "backgroundColor": "#a5d8ff",
-            },
-            "inserted": {
-              "backgroundColor": "transparent",
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id1" => Delta {
-            "deleted": {
-              "fillStyle": "cross-hatch",
-            },
-            "inserted": {
-              "fillStyle": "solid",
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id1" => Delta {
-            "deleted": {
-              "strokeStyle": "dotted",
-            },
-            "inserted": {
-              "strokeStyle": "solid",
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id1" => Delta {
-            "deleted": {
-              "roughness": 2,
-            },
-            "inserted": {
-              "roughness": 1,
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id1" => Delta {
-            "deleted": {
-              "opacity": 60,
-            },
-            "inserted": {
-              "opacity": 100,
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "backgroundColor": "#a5d8ff",
-              "fillStyle": "cross-hatch",
-              "opacity": 60,
-              "roughness": 2,
-              "strokeColor": "#e03131",
-              "strokeStyle": "dotted",
-            },
-            "inserted": {
-              "backgroundColor": "transparent",
-              "fillStyle": "solid",
-              "opacity": 100,
-              "roughness": 1,
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-            },
-          },
-        },
-      },
-    },
-  ],
 }
 `;
 
@@ -3468,17 +3252,326 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
 
 exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] number of renders 1`] = `16`;
 
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Paste styles' in context menu pastes styles > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": 20,
+            "y": 30,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "strokeColor": "#e03131",
+            "version": 4,
+          },
+          "inserted": {
+            "strokeColor": "#1e1e1e",
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id7",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "backgroundColor": "#a5d8ff",
+            "version": 5,
+          },
+          "inserted": {
+            "backgroundColor": "transparent",
+            "version": 4,
+          },
+        },
+      },
+    },
+    "id": "id9",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "fillStyle": "cross-hatch",
+            "version": 6,
+          },
+          "inserted": {
+            "fillStyle": "solid",
+            "version": 5,
+          },
+        },
+      },
+    },
+    "id": "id11",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "strokeStyle": "dotted",
+            "version": 7,
+          },
+          "inserted": {
+            "strokeStyle": "solid",
+            "version": 6,
+          },
+        },
+      },
+    },
+    "id": "id13",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "roughness": 2,
+            "version": 8,
+          },
+          "inserted": {
+            "roughness": 1,
+            "version": 7,
+          },
+        },
+      },
+    },
+    "id": "id15",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "opacity": 60,
+            "version": 9,
+          },
+          "inserted": {
+            "opacity": 100,
+            "version": 8,
+          },
+        },
+      },
+    },
+    "id": "id17",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "backgroundColor": "#a5d8ff",
+            "fillStyle": "cross-hatch",
+            "opacity": 60,
+            "roughness": 2,
+            "strokeColor": "#e03131",
+            "strokeStyle": "dotted",
+            "version": 4,
+          },
+          "inserted": {
+            "backgroundColor": "transparent",
+            "fillStyle": "solid",
+            "opacity": 100,
+            "roughness": 1,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id19",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3489,7 +3582,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -3499,7 +3592,6 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -3520,11 +3612,14 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -3542,15 +3637,14 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
-    "id1": true,
+    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3565,6 +3659,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -3589,24 +3684,22 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id1",
+  "id": "id3",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1014066025,
+  "roundness": null,
+  "seed": 400692809,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 23633383,
+  "versionNonce": 81784553,
   "width": 20,
   "x": 20,
   "y": 30,
@@ -3630,9 +3723,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -3647,161 +3738,162 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
 }
 `;
 
-exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": 20,
-              "y": 30,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id1" => Delta {
-            "deleted": {
-              "index": "Zz",
-            },
-            "inserted": {
-              "index": "a1",
-            },
-          },
-        },
-      },
-    },
-  ],
-}
-`;
-
 exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of elements 1`] = `2`;
 
 exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] number of renders 1`] = `9`;
 
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Send backward' in context menu sends element backward > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": 20,
+            "y": 30,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "index": "Zz",
+            "version": 4,
+          },
+          "inserted": {
+            "index": "a1",
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id7",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -3812,7 +3904,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -3822,7 +3914,6 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -3843,11 +3934,14 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -3865,15 +3959,14 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
-    "id1": true,
+    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -3888,6 +3981,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -3912,24 +4006,22 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id1",
+  "id": "id3",
   "index": "Zz",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1014066025,
+  "roundness": null,
+  "seed": 238820263,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 23633383,
+  "versionNonce": 915032327,
   "width": 20,
   "x": 20,
   "y": 30,
@@ -3953,9 +4045,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -3970,161 +4060,162 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
 }
 `;
 
-exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": 20,
-              "y": 30,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {},
-          "inserted": {},
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id1" => Delta {
-            "deleted": {
-              "index": "Zz",
-            },
-            "inserted": {
-              "index": "a1",
-            },
-          },
-        },
-      },
-    },
-  ],
-}
-`;
-
 exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of elements 1`] = `2`;
 
 exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] number of renders 1`] = `9`;
 
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Send to back' in context menu sends element to back > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": 20,
+            "y": 30,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {},
+        "inserted": {},
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id3": {
+          "deleted": {
+            "index": "Zz",
+            "version": 4,
+          },
+          "inserted": {
+            "index": "a1",
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id7",
+  },
+]
+`;
+
 exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
   },
   "collaborators": Map {},
   "contextMenu": null,
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -4135,7 +4226,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -4145,7 +4236,6 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -4166,11 +4256,14 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -4188,18 +4281,17 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {
-    "id1": true,
+    "id3": true,
   },
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
-    "id1": true,
+    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -4214,6 +4306,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -4245,9 +4338,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -4255,7 +4346,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "type": "rectangle",
   "updated": 1,
   "version": 5,
-  "versionNonce": 1723083209,
+  "versionNonce": 1006504105,
   "width": 20,
   "x": -10,
   "y": 0,
@@ -4272,244 +4363,25 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "frameId": null,
   "groupIds": [],
   "height": 20,
-  "id": "id1",
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 238820263,
+  "roundness": null,
+  "seed": 400692809,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 5,
-  "versionNonce": 760410951,
+  "versionNonce": 289600103,
   "width": 20,
   "x": 20,
   "y": 30,
-}
-`;
-
-exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": 20,
-              "y": 30,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedGroupIds": {
-              "id3": true,
-            },
-          },
-          "inserted": {
-            "selectedGroupIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "groupIds": [
-                "id3",
-              ],
-            },
-            "inserted": {
-              "groupIds": [],
-            },
-          },
-          "id1" => Delta {
-            "deleted": {
-              "groupIds": [
-                "id3",
-              ],
-            },
-            "inserted": {
-              "groupIds": [],
-            },
-          },
-        },
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedGroupIds": {},
-          },
-          "inserted": {
-            "selectedGroupIds": {
-              "id3": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "groupIds": [],
-            },
-            "inserted": {
-              "groupIds": [
-                "id3",
-              ],
-            },
-          },
-          "id1" => Delta {
-            "deleted": {
-              "groupIds": [],
-            },
-            "inserted": {
-              "groupIds": [
-                "id3",
-              ],
-            },
-          },
-        },
-      },
-    },
-  ],
 }
 `;
 
@@ -4517,11 +4389,236 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
 
 exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] number of renders 1`] = `11`;
 
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > selecting 'Ungroup selection' in context menu ungroups selected group > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 20,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 20,
+            "x": 20,
+            "y": 30,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id8",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedGroupIds": {
+            "id9": true,
+          },
+        },
+        "inserted": {
+          "selectedGroupIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "groupIds": [
+              "id9",
+            ],
+            "version": 4,
+          },
+          "inserted": {
+            "groupIds": [],
+            "version": 3,
+          },
+        },
+        "id3": {
+          "deleted": {
+            "groupIds": [
+              "id9",
+            ],
+            "version": 4,
+          },
+          "inserted": {
+            "groupIds": [],
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id11",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedGroupIds": {},
+        },
+        "inserted": {
+          "selectedGroupIds": {
+            "id9": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "groupIds": [],
+            "version": 5,
+          },
+          "inserted": {
+            "groupIds": [
+              "id9",
+            ],
+            "version": 4,
+          },
+        },
+        "id3": {
+          "deleted": {
+            "groupIds": [],
+            "version": 5,
+          },
+          "inserted": {
+            "groupIds": [
+              "id9",
+            ],
+            "version": 4,
+          },
+        },
+      },
+    },
+    "id": "id13",
+  },
+]
+`;
+
 exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -4614,6 +4711,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -4631,6 +4729,59 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "trackEvent": {
           "category": "history",
         },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -5201,6 +5352,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -5235,6 +5387,42 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -5311,6 +5499,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -5321,7 +5510,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -5331,7 +5520,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -5352,11 +5540,14 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -5374,7 +5565,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -5382,10 +5572,10 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
-    "id1": true,
+    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -5400,6 +5590,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -5431,9 +5622,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 453191,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -5458,185 +5647,25 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "frameId": null,
   "groupIds": [],
   "height": 10,
-  "id": "id1",
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 400692809,
+  "roundness": null,
+  "seed": 1505387817,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 23633383,
+  "versionNonce": 915032327,
   "width": 10,
   "x": 12,
   "y": 0,
-}
-`;
-
-exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 10,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 10,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 10,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 10,
-              "x": 12,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-  ],
 }
 `;
 
@@ -5644,11 +5673,168 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
 
 exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] number of renders 1`] = `10`;
 
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > shows 'Group selection' in context menu for multiple selected elements > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": 12,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id8",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id11",
+  },
+]
+`;
+
 exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -5741,6 +5927,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -5758,6 +5945,59 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "trackEvent": {
           "category": "history",
         },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -6328,6 +6568,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -6362,6 +6603,42 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -6438,6 +6715,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -6448,7 +6726,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -6458,7 +6736,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -6479,11 +6756,14 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -6501,7 +6781,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -6509,14 +6788,14 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
-    "id1": true,
+    "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {
-    "id4": true,
+    "id12": true,
   },
   "selectedLinearElement": null,
   "selectionElement": null,
@@ -6529,6 +6808,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -6552,7 +6832,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [
-    "id4",
+    "id12",
   ],
   "height": 10,
   "id": "id0",
@@ -6562,9 +6842,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
+  "roundness": null,
   "seed": 449462985,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
@@ -6572,7 +6850,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 81784553,
+  "versionNonce": 1723083209,
   "width": 10,
   "x": -10,
   "y": 0,
@@ -6588,228 +6866,28 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [
-    "id4",
+    "id12",
   ],
   "height": 10,
-  "id": "id1",
+  "id": "id3",
   "index": "a1",
   "isDeleted": false,
   "link": null,
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 238820263,
+  "roundness": null,
+  "seed": 400692809,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 4,
-  "versionNonce": 747212839,
+  "versionNonce": 760410951,
   "width": 10,
   "x": 12,
   "y": 0,
-}
-`;
-
-exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 10,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 10,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id1" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 10,
-              "index": "a1",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 10,
-              "x": 12,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id1": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {},
-      },
-    },
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedGroupIds": {
-              "id4": true,
-            },
-          },
-          "inserted": {
-            "selectedGroupIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {},
-        "updated": Map {
-          "id0" => Delta {
-            "deleted": {
-              "groupIds": [
-                "id4",
-              ],
-            },
-            "inserted": {
-              "groupIds": [],
-            },
-          },
-          "id1" => Delta {
-            "deleted": {
-              "groupIds": [
-                "id4",
-              ],
-            },
-            "inserted": {
-              "groupIds": [],
-            },
-          },
-        },
-      },
-    },
-  ],
 }
 `;
 
@@ -6817,11 +6895,213 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
 
 exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] number of renders 1`] = `11`;
 
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > shows 'Ungroup selection' in context menu for group inside selected elements > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": -10,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id3": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a1",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": 12,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id5",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id8",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id3": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id11",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedGroupIds": {
+            "id12": true,
+          },
+        },
+        "inserted": {
+          "selectedGroupIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {
+        "id0": {
+          "deleted": {
+            "groupIds": [
+              "id12",
+            ],
+            "version": 4,
+          },
+          "inserted": {
+            "groupIds": [],
+            "version": 3,
+          },
+        },
+        "id3": {
+          "deleted": {
+            "groupIds": [
+              "id12",
+            ],
+            "version": 4,
+          },
+          "inserted": {
+            "groupIds": [],
+            "version": 3,
+          },
+        },
+      },
+    },
+    "id": "id14",
+  },
+]
+`;
+
 exports[`contextMenu element > shows context menu for canvas > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7093,7 +7373,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         </svg>,
         "label": "labels.elementLock.unlockAll",
         "name": "unlockAllElements",
-        "paletteName": "Unlock all elements",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7244,7 +7523,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "keyTest": [Function],
         "label": "buttons.zenMode",
         "name": "zenMode",
-        "paletteName": "Toggle zen mode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7288,7 +7566,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "keyTest": [Function],
         "label": "labels.viewMode",
         "name": "viewMode",
-        "paletteName": "Toggle view mode",
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
@@ -7362,7 +7639,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         ],
         "label": "stats.fullTitle",
         "name": "stats",
-        "paletteName": "Toggle stats",
         "perform": [Function],
         "trackEvent": {
           "category": "menu",
@@ -7373,6 +7649,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "left": -19,
     "top": -9,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -7383,7 +7660,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -7393,7 +7670,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -7414,11 +7690,14 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -7439,13 +7718,12 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {},
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -7460,6 +7738,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -7474,28 +7753,21 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
 }
 `;
 
-exports[`contextMenu element > shows context menu for canvas > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [],
-}
-`;
-
 exports[`contextMenu element > shows context menu for canvas > [end of test] number of elements 1`] = `0`;
 
 exports[`contextMenu element > shows context menu for canvas > [end of test] number of renders 1`] = `3`;
 
+exports[`contextMenu element > shows context menu for canvas > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > shows context menu for canvas > [end of test] undo stack 1`] = `[]`;
+
 exports[`contextMenu element > shows context menu for element > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -7588,6 +7860,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -7605,6 +7878,59 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "category": "history",
         },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -8175,6 +8501,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -8209,6 +8536,42 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -8285,6 +8648,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "left": -17,
     "top": -7,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -8295,7 +8659,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -8305,7 +8669,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -8326,11 +8689,14 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -8348,13 +8714,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
-  "scrolledOutside": false,
-  "searchMatches": [],
+  "scrolledOutside": true,
+  "searchMatches": null,
   "selectedElementIds": {
     "id0": true,
   },
@@ -8371,6 +8736,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -8388,8 +8754,10 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
 exports[`contextMenu element > shows context menu for element > [end of test] appState 2`] = `
 {
   "activeEmbeddable": null,
+  "activeLockedId": null,
   "activeTool": {
     "customType": null,
+    "fromSelection": false,
     "lastActiveTool": null,
     "locked": false,
     "type": "selection",
@@ -8482,6 +8850,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "label": "labels.selectAllElementsInFrame",
         "name": "selectAllElementsInFrame",
@@ -8499,6 +8868,59 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "category": "history",
         },
+      },
+      {
+        "label": "labels.wrapSelectionInFrame",
+        "name": "wrapSelectionInFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
+      {
+        "PanelComponent": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 5v10a1 1 0 0 0 1 1h10"
+            />
+            <path
+              d="M5 8h10a1 1 0 0 1 1 1v10"
+            />
+          </g>
+        </svg>,
+        "keywords": [
+          "image",
+          "crop",
+        ],
+        "label": "helpDialog.cropStart",
+        "name": "cropEditor",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "menu",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -9069,6 +9491,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "element",
         },
       },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -9103,6 +9526,42 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
           "category": "hyperlink",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <React.Fragment>
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z"
+            />
+            <path
+              d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"
+            />
+          </React.Fragment>
+        </svg>,
+        "label": "labels.copyElementLink",
+        "name": "copyElementLink",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "element",
+        },
+      },
+      "separator",
       {
         "PanelComponent": [Function],
         "icon": <svg
@@ -9179,6 +9638,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "left": 80,
     "top": 90,
   },
+  "croppingElementId": null,
   "currentChartType": "bar",
   "currentHoveredFontFamily": null,
   "currentItemArrowType": "round",
@@ -9189,7 +9649,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "currentItemFontSize": 20,
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
-  "currentItemRoundness": "round",
+  "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",
@@ -9199,7 +9659,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "defaultSidebarDockedPreference": false,
   "editingFrame": null,
   "editingGroupId": null,
-  "editingLinearElement": null,
   "editingTextElement": null,
   "elementsToHighlight": null,
   "errorMessage": null,
@@ -9220,11 +9679,14 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "gridSize": 20,
   "gridStep": 5,
   "height": 100,
+  "hoveredElementIds": {},
   "isBindingEnabled": true,
+  "isCropping": false,
   "isLoading": false,
   "isResizing": false,
   "isRotating": false,
   "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
   "multiElement": null,
   "name": "Untitled-201933152653",
   "newElement": null,
@@ -9245,13 +9707,12 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   },
   "penDetected": false,
   "penMode": false,
-  "pendingImageElementId": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollX": 0,
   "scrollY": 0,
   "scrolledOutside": false,
-  "searchMatches": [],
+  "searchMatches": null,
   "selectedElementIds": {
     "id1": true,
   },
@@ -9268,6 +9729,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "open": false,
     "panels": 3,
   },
+  "stylesPanelMode": "full",
   "suggestedBindings": [],
   "theme": "light",
   "toast": null,
@@ -9291,7 +9753,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "fillStyle": "solid",
   "frameId": null,
   "groupIds": [],
-  "height": 20,
+  "height": 10,
   "id": "id0",
   "index": "a0",
   "isDeleted": false,
@@ -9299,20 +9761,18 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 449462985,
+  "roundness": null,
+  "seed": 1278240551,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 3,
-  "versionNonce": 1150084233,
-  "width": 20,
-  "x": -10,
-  "y": 0,
+  "versionNonce": 2019559783,
+  "width": 10,
+  "x": -20,
+  "y": -10,
 }
 `;
 
@@ -9333,17 +9793,15 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 1278240551,
+  "roundness": null,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 453191,
+  "versionNonce": 1278240551,
   "width": 200,
   "x": 0,
   "y": 0,
@@ -9367,98 +9825,18 @@ exports[`contextMenu element > shows context menu for element > [end of test] el
   "locked": false,
   "opacity": 100,
   "roughness": 1,
-  "roundness": {
-    "type": 3,
-  },
-  "seed": 449462985,
+  "roundness": null,
+  "seed": 1,
   "strokeColor": "#1e1e1e",
   "strokeStyle": "solid",
   "strokeWidth": 2,
   "type": "rectangle",
   "updated": 1,
   "version": 2,
-  "versionNonce": 401146281,
+  "versionNonce": 449462985,
   "width": 200,
   "x": 0,
   "y": 0,
-}
-`;
-
-exports[`contextMenu element > shows context menu for element > [end of test] history 1`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [
-    HistoryEntry {
-      "appStateChange": AppStateChange {
-        "delta": Delta {
-          "deleted": {
-            "selectedElementIds": {
-              "id0": true,
-            },
-          },
-          "inserted": {
-            "selectedElementIds": {},
-          },
-        },
-      },
-      "elementsChange": ElementsChange {
-        "added": Map {},
-        "removed": Map {
-          "id0" => Delta {
-            "deleted": {
-              "angle": 0,
-              "backgroundColor": "transparent",
-              "boundElements": null,
-              "customData": undefined,
-              "fillStyle": "solid",
-              "frameId": null,
-              "groupIds": [],
-              "height": 20,
-              "index": "a0",
-              "isDeleted": false,
-              "link": null,
-              "locked": false,
-              "opacity": 100,
-              "roughness": 1,
-              "roundness": {
-                "type": 3,
-              },
-              "strokeColor": "#1e1e1e",
-              "strokeStyle": "solid",
-              "strokeWidth": 2,
-              "type": "rectangle",
-              "width": 20,
-              "x": -10,
-              "y": 0,
-            },
-            "inserted": {
-              "isDeleted": true,
-            },
-          },
-        },
-        "updated": Map {},
-      },
-    },
-  ],
-}
-`;
-
-exports[`contextMenu element > shows context menu for element > [end of test] history 2`] = `
-History {
-  "onHistoryChangedEmitter": Emitter {
-    "subscribers": [
-      [Function],
-      [Function],
-    ],
-  },
-  "redoStack": [],
-  "undoStack": [],
 }
 `;
 
@@ -9469,3 +9847,66 @@ exports[`contextMenu element > shows context menu for element > [end of test] nu
 exports[`contextMenu element > shows context menu for element > [end of test] number of renders 1`] = `5`;
 
 exports[`contextMenu element > shows context menu for element > [end of test] number of renders 2`] = `6`;
+
+exports[`contextMenu element > shows context menu for element > [end of test] redo stack 1`] = `[]`;
+
+exports[`contextMenu element > shows context menu for element > [end of test] redo stack 2`] = `[]`;
+
+exports[`contextMenu element > shows context menu for element > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 10,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "roughness": 1,
+            "roundness": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "rectangle",
+            "version": 3,
+            "width": 10,
+            "x": -20,
+            "y": -10,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 2,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+]
+`;
+
+exports[`contextMenu element > shows context menu for element > [end of test] undo stack 2`] = `[]`;

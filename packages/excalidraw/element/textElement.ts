@@ -1,5 +1,3 @@
-import type { SubtypeMethods } from "./subtypes";
-import { getSubtypeMethods } from "./subtypes";
 import { getFontString, arrayToMap, isTestEnv, normalizeEOL } from "../utils";
 import type {
   ElementsMap,
@@ -31,30 +29,6 @@ import {
   updateOriginalContainerCache,
 } from "./containerCache";
 import type { ExtractSetType } from "../utility-types";
-
-export const measureTextElement = function (element, next) {
-  const map = getSubtypeMethods(element.subtype);
-  if (map?.measureText) {
-    return map.measureText(element, next);
-  }
-
-  const fontSize = next?.fontSize ?? element.fontSize;
-  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
-  const text = next?.text ?? element.text;
-  return measureText(text, font, element.lineHeight);
-} as SubtypeMethods["measureText"];
-
-export const wrapTextElement = function (element, containerWidth, next) {
-  const map = getSubtypeMethods(element.subtype);
-  if (map?.wrapText) {
-    return map.wrapText(element, containerWidth, next);
-  }
-
-  const fontSize = next?.fontSize ?? element.fontSize;
-  const font = getFontString({ fontSize, fontFamily: element.fontFamily });
-  const text = next?.text ?? element.originalText;
-  return wrapText(text, font, containerWidth);
-} as SubtypeMethods["wrapText"];
 
 export const normalizeText = (text: string) => {
   return (

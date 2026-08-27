@@ -1,4 +1,15 @@
 import React from "react";
+
+import { isPromiseLike } from "@excalidraw/common";
+
+import type {
+  ExcalidrawElement,
+  OrderedExcalidrawElement,
+} from "@excalidraw/element/types";
+
+import { trackEvent } from "../analytics";
+
+import type { AppClassProperties, AppState } from "../types";
 import type {
   Action,
   UpdaterFn,
@@ -8,13 +19,6 @@ import type {
   ActionSource,
   ActionPredicateFn,
 } from "./types";
-import type {
-  ExcalidrawElement,
-  OrderedExcalidrawElement,
-} from "../element/types";
-import type { AppClassProperties, AppState } from "../types";
-import { trackEvent } from "../analytics";
-import { isPromiseLike } from "../utils";
 
 const trackAction = (
   action: Action,
@@ -209,6 +213,7 @@ export class ActionManager {
           appProps={this.app.props}
           app={this.app}
           data={data}
+          renderAction={this.renderAction}
         />
       );
     }

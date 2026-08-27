@@ -1,7 +1,7 @@
-import React from "react";
+import Trans from "@excalidraw/excalidraw/components/Trans";
+import { t } from "@excalidraw/excalidraw/i18n";
 import * as Sentry from "@sentry/browser";
-import { t } from "../../packages/excalidraw/i18n";
-import Trans from "../../packages/excalidraw/components/Trans";
+import React from "react";
 
 interface TopErrorBoundaryState {
   hasError: boolean;

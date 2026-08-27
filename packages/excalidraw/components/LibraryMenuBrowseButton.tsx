@@ -1,5 +1,7 @@
-import { VERSIONS } from "../constants";
+import { VERSIONS } from "@excalidraw/common";
+
 import { t } from "../i18n";
+
 import type { ExcalidrawProps, UIAppState } from "../types";
 
 const LibraryMenuBrowseButton = ({

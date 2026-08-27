@@ -1,5 +1,5 @@
-import { atom } from "jotai";
-import { jotaiStore } from "../../jotai";
+import { atom, editorJotaiStore } from "../../editor-jotai";
+
 import type React from "react";
 
 export type OverwriteConfirmState =
@@ -32,7 +32,7 @@ export async function openConfirmModal({
   color: "danger" | "warning";
 }) {
   return new Promise<boolean>((resolve) => {
-    jotaiStore.set(overwriteConfirmStateAtom, {
+    editorJotaiStore.set(overwriteConfirmStateAtom, {
       active: true,
       onConfirm: () => resolve(true),
       onClose: () => resolve(false),

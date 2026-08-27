@@ -1,9 +1,11 @@
-import decodePng from "png-chunks-extract";
 import tEXt from "png-chunk-text";
 import encodePng from "png-chunks-encode";
-import { stringToBase64, encode, decode, base64ToString } from "./encode";
-import { EXPORT_DATA_TYPES, MIME_TYPES } from "../constants";
+import decodePng from "png-chunks-extract";
+
+import { EXPORT_DATA_TYPES, MIME_TYPES } from "@excalidraw/common";
+
 import { blobToArrayBuffer } from "./blob";
+import { encode, decode } from "./encode";
 
 // -----------------------------------------------------------------------------
 // PNG
@@ -32,7 +34,7 @@ export const encodePngMetadata = async ({
   const metadataChunk = tEXt.encode(
     MIME_TYPES.excalidraw,
     JSON.stringify(
-      await encode({
+      encode({
         text: metadata,
         compress: true,
       }),
@@ -59,60 +61,7 @@ export const decodePngMetadata = async (blob: Blob) => {
         }
         throw new Error("FAILED");
       }
-      return await decode(encodedData);
-    } catch (error: any) {
-      console.error(error);
-      throw new Error("FAILED");
-    }
-  }
-  throw new Error("INVALID");
-};
-
-// -----------------------------------------------------------------------------
-// SVG
-// -----------------------------------------------------------------------------
-
-export const encodeSvgMetadata = async ({ text }: { text: string }) => {
-  const base64 = await stringToBase64(
-    JSON.stringify(await encode({ text })),
-    true /* is already byte string */,
-  );
-
-  let metadata = "";
-  metadata += `<!-- payload-type:${MIME_TYPES.excalidraw} -->`;
-  metadata += `<!-- payload-version:2 -->`;
-  metadata += "<!-- payload-start -->";
-  metadata += base64;
-  metadata += "<!-- payload-end -->";
-  return metadata;
-};
-
-export const decodeSvgMetadata = async ({ svg }: { svg: string }) => {
-  if (svg.includes(`payload-type:${MIME_TYPES.excalidraw}`)) {
-    const match = svg.match(
-      /<!-- payload-start -->\s*(.+?)\s*<!-- payload-end -->/,
-    );
-    if (!match) {
-      throw new Error("INVALID");
-    }
-    const versionMatch = svg.match(/<!-- payload-version:(\d+) -->/);
-    const version = versionMatch?.[1] || "1";
-    const isByteString = version !== "1";
-
-    try {
-      const json = await base64ToString(match[1], isByteString);
-      const encodedData = JSON.parse(json);
-      if (!("encoded" in encodedData)) {
-        // legacy, un-encoded scene JSON
-        if (
-          "type" in encodedData &&
-          encodedData.type === EXPORT_DATA_TYPES.excalidraw
-        ) {
-          return json;
-        }
-        throw new Error("FAILED");
-      }
-      return await decode(encodedData);
+      return decode(encodedData);
     } catch (error: any) {
       console.error(error);
       throw new Error("FAILED");

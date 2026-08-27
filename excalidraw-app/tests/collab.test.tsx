@@ -1,17 +1,18 @@
-import { vi } from "vitest";
-import {
-  act,
-  render,
-  waitFor,
-} from "../../packages/excalidraw/tests/test-utils";
-import ExcalidrawApp from "../App";
-import { API } from "../../packages/excalidraw/tests/helpers/api";
-import { syncInvalidIndices } from "../../packages/excalidraw/fractionalIndex";
+import { CaptureUpdateAction, newElementWith } from "@excalidraw/excalidraw";
 import {
   createRedoAction,
   createUndoAction,
-} from "../../packages/excalidraw/actions/actionHistory";
-import { StoreAction, newElementWith } from "../../packages/excalidraw";
+} from "@excalidraw/excalidraw/actions/actionHistory";
+import { syncInvalidIndices } from "@excalidraw/element";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { act, render, waitFor } from "@excalidraw/excalidraw/tests/test-utils";
+import { vi } from "vitest";
+
+import { StoreIncrement } from "@excalidraw/element";
+
+import type { DurableIncrement, EphemeralIncrement } from "@excalidraw/element";
+
+import ExcalidrawApp from "../App";
 
 const { h } = window;
 
@@ -68,6 +69,79 @@ vi.mock("socket.io-client", () => {
  * i.e. multiplayer history tests could be a good first candidate, as we could test both history stacks simultaneously.
  */
 describe("collaboration", () => {
+  it("should emit two ephemeral increments even though updates get batched", async () => {
+    const durableIncrements: DurableIncrement[] = [];
+    const ephemeralIncrements: EphemeralIncrement[] = [];
+
+    await render(<ExcalidrawApp />);
+
+    h.store.onStoreIncrementEmitter.on((increment) => {
+      if (StoreIncrement.isDurable(increment)) {
+        durableIncrements.push(increment);
+      } else {
+        ephemeralIncrements.push(increment);
+      }
+    });
+
+    // eslint-disable-next-line dot-notation
+    expect(h.store["scheduledMicroActions"].length).toBe(0);
+    expect(durableIncrements.length).toBe(0);
+    expect(ephemeralIncrements.length).toBe(0);
+
+    const rectProps = {
+      type: "rectangle",
+      id: "A",
+      height: 200,
+      width: 100,
+      x: 0,
+      y: 0,
+    } as const;
+
+    const rect = API.createElement({ ...rectProps });
+
+    API.updateScene({
+      elements: [rect],
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    });
+
+    await waitFor(() => {
+      // expect(commitSpy).toHaveBeenCalledTimes(1);
+      expect(durableIncrements.length).toBe(1);
+    });
+
+    // simulate two batched remote updates
+    act(() => {
+      h.app.updateScene({
+        elements: [newElementWith(h.elements[0], { x: 100 })],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+      h.app.updateScene({
+        elements: [newElementWith(h.elements[0], { x: 200 })],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+
+      // we scheduled two micro actions,
+      // which confirms they are going to be executed as part of one batched component update
+      // eslint-disable-next-line dot-notation
+      expect(h.store["scheduledMicroActions"].length).toBe(2);
+    });
+
+    await waitFor(() => {
+      // altough the updates get batched,
+      // we expect two ephemeral increments for each update,
+      // and each such update should have the expected change
+      expect(ephemeralIncrements.length).toBe(2);
+      expect(ephemeralIncrements[0].change.elements.A).toEqual(
+        expect.objectContaining({ x: 100 }),
+      );
+      expect(ephemeralIncrements[1].change.elements.A).toEqual(
+        expect.objectContaining({ x: 200 }),
+      );
+      // eslint-disable-next-line dot-notation
+      expect(h.store["scheduledMicroActions"].length).toBe(0);
+    });
+  });
+
   it("should allow to undo / redo even on force-deleted elements", async () => {
     await render(<ExcalidrawApp />);
     const rect1Props = {
@@ -89,7 +163,7 @@ describe("collaboration", () => {
 
     API.updateScene({
       elements: syncInvalidIndices([rect1, rect2]),
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
 
     API.updateScene({
@@ -97,7 +171,7 @@ describe("collaboration", () => {
         rect1,
         newElementWith(h.elements[1], { isDeleted: true }),
       ]),
-      storeAction: StoreAction.CAPTURE,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     });
 
     await waitFor(() => {
@@ -125,12 +199,13 @@ describe("collaboration", () => {
       expect(h.elements).toEqual([expect.objectContaining(rect1Props)]);
     });
 
-    const undoAction = createUndoAction(h.history, h.store);
+    const undoAction = createUndoAction(h.history);
     act(() => h.app.actionManager.executeAction(undoAction));
 
     // with explicit undo (as addition) we expect our item to be restored from the snapshot!
     await waitFor(() => {
       expect(API.getUndoStack().length).toBe(1);
+      expect(API.getRedoStack().length).toBe(1);
       expect(API.getSnapshot()).toEqual([
         expect.objectContaining(rect1Props),
         expect.objectContaining({ ...rect2Props, isDeleted: false }),
@@ -144,7 +219,7 @@ describe("collaboration", () => {
     // simulate force deleting the element remotely
     API.updateScene({
       elements: syncInvalidIndices([rect1]),
-      storeAction: StoreAction.UPDATE,
+      captureUpdate: CaptureUpdateAction.NEVER,
     });
 
     await waitFor(() => {
@@ -157,7 +232,7 @@ describe("collaboration", () => {
       expect(h.elements).toEqual([expect.objectContaining(rect1Props)]);
     });
 
-    const redoAction = createRedoAction(h.history, h.store);
+    const redoAction = createRedoAction(h.history);
     act(() => h.app.actionManager.executeAction(redoAction));
 
     // with explicit redo (as removal) we again restore the element from the snapshot!
@@ -171,80 +246,6 @@ describe("collaboration", () => {
       expect(h.elements).toEqual([
         expect.objectContaining(rect1Props),
         expect.objectContaining({ ...rect2Props, isDeleted: true }),
-      ]);
-    });
-
-    act(() => h.app.actionManager.executeAction(undoAction));
-
-    // simulate local update
-    API.updateScene({
-      elements: syncInvalidIndices([
-        h.elements[0],
-        newElementWith(h.elements[1], { x: 100 }),
-      ]),
-      storeAction: StoreAction.CAPTURE,
-    });
-
-    await waitFor(() => {
-      expect(API.getUndoStack().length).toBe(2);
-      expect(API.getRedoStack().length).toBe(0);
-      expect(API.getSnapshot()).toEqual([
-        expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: false, x: 100 }),
-      ]);
-      expect(h.elements).toEqual([
-        expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: false, x: 100 }),
-      ]);
-    });
-
-    act(() => h.app.actionManager.executeAction(undoAction));
-
-    // we expect to iterate the stack to the first visible change
-    await waitFor(() => {
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(1);
-      expect(API.getSnapshot()).toEqual([
-        expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: false, x: 0 }),
-      ]);
-      expect(h.elements).toEqual([
-        expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: false, x: 0 }),
-      ]);
-    });
-
-    // simulate force deleting the element remotely
-    API.updateScene({
-      elements: syncInvalidIndices([rect1]),
-      storeAction: StoreAction.UPDATE,
-    });
-
-    // snapshot was correctly updated and marked the element as deleted
-    await waitFor(() => {
-      expect(API.getUndoStack().length).toBe(1);
-      expect(API.getRedoStack().length).toBe(1);
-      expect(API.getSnapshot()).toEqual([
-        expect.objectContaining(rect1Props),
-        expect.objectContaining({ ...rect2Props, isDeleted: true, x: 0 }),
-      ]);
-      expect(h.elements).toEqual([expect.objectContaining(rect1Props)]);
-    });
-
-    act(() => h.app.actionManager.executeAction(redoAction));
-
-    // with explicit redo (as update) we again restored the element from the snapshot!
-    await waitFor(() => {
-      expect(API.getUndoStack().length).toBe(2);
-      expect(API.getRedoStack().length).toBe(0);
-      expect(API.getSnapshot()).toEqual([
-        expect.objectContaining({ id: "A", isDeleted: false }),
-        expect.objectContaining({ id: "B", isDeleted: true, x: 100 }),
-      ]);
-      expect(h.history.isRedoStackEmpty).toBeTruthy();
-      expect(h.elements).toEqual([
-        expect.objectContaining({ id: "A", isDeleted: false }),
-        expect.objectContaining({ id: "B", isDeleted: true, x: 100 }),
       ]);
     });
   });

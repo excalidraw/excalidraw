@@ -1,12 +1,13 @@
 import oc from "open-color";
 import React, { useLayoutEffect, useRef, useState } from "react";
+
+import type { ChartType, ElementsMap } from "@excalidraw/element/types";
+
 import { trackEvent } from "../analytics";
-import type { ChartElements, Spreadsheet } from "../charts";
 import { renderSpreadsheet } from "../charts";
-import type { ChartType, ElementsMap } from "../element/types";
 import { t } from "../i18n";
 import { exportToSvg } from "../scene/export";
-import type { UIAppState } from "../types";
+
 import { useApp } from "./App";
 import { Dialog } from "./Dialog";
 
@@ -17,6 +18,9 @@ import {
   getContainerElement,
   redrawTextBoundingBox,
 } from "../element/textElement";
+
+import type { ChartElements, Spreadsheet } from "../charts";
+import type { UIAppState } from "../types";
 
 type OnInsertChart = (chartType: ChartType, elements: ChartElements) => void;
 
@@ -75,6 +79,9 @@ const ChartPreviewBtn = (props: {
               viewBackgroundColor: oc.white,
             },
             null, // files
+            {
+              skipInliningFonts: true,
+            },
           );
           svg.querySelector(".style-fonts")?.remove();
           previewNode.replaceChildren();

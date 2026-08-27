@@ -4,14 +4,15 @@ const pkg = require("./package.json");
 const parseEnvVariables = (filepath) => {
   const envVars = Object.entries(dotenv.parse(readFileSync(filepath))).reduce(
     (env, [key, value]) => {
-      env[key] = JSON.stringify(value);
+      env[key] = value;
       return env;
     },
     {},
   );
-  envVars.VITE_PKG_NAME = JSON.stringify(pkg.name);
-  envVars.VITE_PKG_VERSION = JSON.stringify(pkg.version);
-  envVars.VITE_IS_EXCALIDRAW_NPM_PACKAGE = JSON.stringify(true);
+
+  envVars.PKG_NAME = pkg.name;
+  envVars.PKG_VERSION = pkg.version;
+
   return envVars;
 };
 

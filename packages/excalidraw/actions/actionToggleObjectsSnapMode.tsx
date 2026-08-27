@@ -1,6 +1,9 @@
+import { CODES, KEYS } from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import { magnetIcon } from "../components/icons";
-import { CODES, KEYS } from "../keys";
-import { StoreAction } from "../store";
+
 import { register } from "./register";
 
 export const actionToggleObjectsSnapMode = register({
@@ -19,7 +22,7 @@ export const actionToggleObjectsSnapMode = register({
         objectsSnapModeEnabled: !this.checked!(appState),
         gridModeEnabled: false,
       },
-      storeAction: StoreAction.NONE,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   checked: (appState) => appState.objectsSnapModeEnabled,

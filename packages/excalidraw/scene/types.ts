@@ -1,11 +1,13 @@
-import type { RoughCanvas } from "roughjs/bin/canvas";
-import type { Drawable } from "roughjs/bin/core";
+import type { UserIdleState } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-} from "../element/types";
+} from "@excalidraw/element/types";
+
+import type { MakeBrand } from "@excalidraw/common/utility-types";
+
 import type {
   AppClassProperties,
   AppState,
@@ -14,11 +16,11 @@ import type {
   InteractiveCanvasAppState,
   StaticCanvasAppState,
   SocketId,
-  UserIdleState,
   Device,
   PendingExcalidrawElements,
 } from "../types";
-import type { MakeBrand } from "../utility-types";
+import type { RoughCanvas } from "roughjs/bin/canvas";
+import type { Drawable } from "roughjs/bin/core";
 
 export type RenderableElementsMap = NonDeletedElementsMap &
   MakeBrand<"RenderableElementsMap">;
@@ -46,6 +48,13 @@ export type SVGRenderConfig = {
   frameRendering: AppState["frameRendering"];
   canvasBackgroundColor: AppState["viewBackgroundColor"];
   embedsValidationStatus: EmbedsValidationStatus;
+  /**
+   * whether to attempt to reuse images as much as possible through symbols
+   * (reduces SVG size, but may be incompoatible with some SVG renderers)
+   *
+   * @default true
+   */
+  reuseImages: boolean;
 };
 
 export type InteractiveCanvasRenderConfig = {
@@ -121,12 +130,14 @@ export type ScrollBars = {
     y: number;
     width: number;
     height: number;
+    deltaMultiplier: number;
   } | null;
   vertical: {
     x: number;
     y: number;
     width: number;
     height: number;
+    deltaMultiplier: number;
   } | null;
 };
 

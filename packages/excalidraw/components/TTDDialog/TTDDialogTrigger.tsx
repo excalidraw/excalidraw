@@ -1,10 +1,12 @@
-import type { ReactNode } from "react";
-import { useTunnels } from "../../context/tunnels";
-import DropdownMenu from "../dropdownMenu/DropdownMenu";
-import { useExcalidrawSetAppState } from "../App";
-import { brainIcon } from "../icons";
-import { t } from "../../i18n";
 import { trackEvent } from "../../analytics";
+import { useTunnels } from "../../context/tunnels";
+import { t } from "../../i18n";
+import { useExcalidrawSetAppState } from "../App";
+import DropdownMenu from "../dropdownMenu/DropdownMenu";
+import { brainIcon } from "../icons";
+
+import type { ReactNode } from "react";
+import type { JSX } from "react";
 
 export const TTDDialogTrigger = ({
   children,

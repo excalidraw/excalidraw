@@ -1,15 +1,20 @@
 import clsx from "clsx";
-import type { ColorPickerType } from "./colorPickerUtils";
+
 import {
+  COLOR_OUTLINE_CONTRAST_THRESHOLD,
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_BACKGROUND_PICKS,
   DEFAULT_ELEMENT_STROKE_PICKS,
-} from "../../colors";
+} from "@excalidraw/common";
+
+import { isColorDark } from "./colorPickerUtils";
+
+import type { ColorPickerType } from "./colorPickerUtils";
 
 interface TopPicksProps {
   onChange: (color: string) => void;
   type: ColorPickerType;
-  activeColor: string;
+  activeColor: string | null;
   topPicks?: readonly string[];
 }
 
@@ -49,6 +54,10 @@ export const TopPicks = ({
           className={clsx("color-picker__button", {
             active: color === activeColor,
             "is-transparent": color === "transparent" || !color,
+            "has-outline": !isColorDark(
+              color,
+              COLOR_OUTLINE_CONTRAST_THRESHOLD,
+            ),
           })}
           style={{ "--swatch-color": color }}
           key={color}
