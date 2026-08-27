@@ -788,13 +788,18 @@ export class LinearElementEditor {
     element: ExcalidrawLinearElement,
     elementsMap: ElementsMap,
     appState: InteractiveCanvasAppState,
+    force = false,
   ): (GlobalPoint | null)[] => {
     const boundText = getBoundTextElement(element, elementsMap);
 
-    // Since its not needed outside editor unless 2 pointer lines or bound text
+    // Since its not needed outside editor unless 2 pointer lines, bound
+    // text, or the caller explicitly asked to bypass this (e.g. the user
+    // is holding the "add bend point" modifier on a selected-but-not-
+    // editing arrow)
     if (
       !isElbowArrow(element) &&
       !appState.selectedLinearElement?.isEditing &&
+      !force &&
       element.points.length > 2 &&
       !boundText
     ) {
@@ -840,6 +845,7 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
     appState: AppState,
     elementsMap: ElementsMap,
+    force = false,
   ): GlobalPoint | null => {
     const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
@@ -863,6 +869,7 @@ export class LinearElementEditor {
     if (
       points.length >= 3 &&
       !appState.selectedLinearElement?.isEditing &&
+      !force &&
       !isElbowArrow(element)
     ) {
       return null;
@@ -890,6 +897,7 @@ export class LinearElementEditor {
       element,
       elementsMap,
       appState,
+      force,
     );
 
     while (index < midPoints.length) {
@@ -998,6 +1006,7 @@ export class LinearElementEditor {
     appState: AppState,
     midPoint: GlobalPoint,
     elementsMap: ElementsMap,
+    force = false,
   ) {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
@@ -1010,6 +1019,7 @@ export class LinearElementEditor {
       element,
       elementsMap,
       appState,
+      force,
     );
     let index = 0;
     while (index < midPoints.length) {
@@ -1058,6 +1068,7 @@ export class LinearElementEditor {
       scenePointer,
       appState,
       elementsMap,
+      event.altKey,
     );
     const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
     let segmentMidpointIndex = null;
@@ -1068,6 +1079,7 @@ export class LinearElementEditor {
         appState,
         segmentMidpoint,
         elementsMap,
+        event.altKey,
       );
     } else if (event.altKey && appState.selectedLinearElement?.isEditing) {
       if (linearElementEditor.lastUncommittedPoint == null) {
