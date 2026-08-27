@@ -54,7 +54,7 @@ import type {
   ExcalidrawTextContainer,
 } from "@excalidraw/element/types";
 
-import { actionSaveToActiveFile } from "../actions";
+import { actionSaveFileToDisk, actionSaveToActiveFile } from "../actions";
 
 import {
   parseClipboard,
@@ -661,6 +661,14 @@ export const textWysiwyg = ({
       event.preventDefault();
       handleSubmit();
       app.actionManager.executeAction(actionSaveToActiveFile);
+    } else if (actionSaveFileToDisk.keyTest(event)) {
+      // `actionSaveToActiveFile` above only matches the plain shortcut (its
+      // keyTest requires `!event.shiftKey`), so without this branch the "save
+      // as" variant was swallowed while editing text: no save, and the editor
+      // stayed open.
+      event.preventDefault();
+      handleSubmit();
+      app.actionManager.executeAction(actionSaveFileToDisk);
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
