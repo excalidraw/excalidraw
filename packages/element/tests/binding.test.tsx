@@ -16,7 +16,11 @@ import {
 
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
-import { bindBindingElement, updateBoundElements } from "../src/binding";
+import {
+  bindBindingElement,
+  updateBoundElements,
+  unbindBindingElement,
+} from "../src/binding";
 import { getTransformHandles } from "../src/transformHandles";
 import {
   getTextEditor,
@@ -811,4 +815,52 @@ describe("binding to a point-like (sub-pixel) element", () => {
       expect(Math.abs(arrow.height)).toBeLessThan(1000);
     },
   );
+});
+
+describe("unbindBindingElement safety", () => {
+  beforeEach(async () => {
+    mouse.reset();
+    await act(() => setLanguage(defaultLang));
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("should not throw when unbinding from a bound element that no longer exists", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      x: 200,
+      y: 50,
+      width: 100,
+      height: 100,
+    }) as NonDeleted<ExcalidrawBindableElement>;
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 0,
+      y: 50,
+      width: 195,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(195, 0)],
+    }) as NonDeleted<ExcalidrawArrowElement>;
+    API.setElements([rect, arrow]);
+
+    bindBindingElement(arrow, rect, "orbit", "end", h.scene);
+    expect(arrow.endBinding?.elementId).toBe(rect.id);
+
+    // Simulate the bound element having been deleted out from under the
+    // arrow (collab delete-race, undo/redo, or stale paste bindings).
+    // A plain isDeleted flip isn't enough to reproduce this: mutateElement
+    // updates the element in place but does not rebuild the scene's
+    // non-deleted elements map, so the stale reference would still resolve.
+    // Re-running it through setElements forces that rebuild, which is what
+    // actually removes it from getNonDeletedElementsMap().
+    (rect as any).isDeleted = true;
+    API.setElements(h.elements);
+
+    expect(h.scene.getNonDeletedElementsMap().get(rect.id)).toBeUndefined();
+
+    expect(() => {
+      unbindBindingElement(arrow, "end", h.scene);
+    }).not.toThrow();
+
+    expect(arrow.endBinding).toBeNull();
+  });
 });
