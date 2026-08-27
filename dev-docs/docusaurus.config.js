@@ -120,7 +120,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © 2023 Excalidraw community. Built with Docusaurus ❤️`,
+        copyright: `Copyright © 2026 Excalidraw community. Built with Docusaurus ❤️`,
       },
       prism: {
         theme: require("prism-react-renderer/themes/dracula"),
