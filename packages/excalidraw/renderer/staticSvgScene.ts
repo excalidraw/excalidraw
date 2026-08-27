@@ -42,6 +42,8 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
+import { GridLineColor } from "./staticScene";
+
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 import type { Drawable } from "roughjs/bin/core";
@@ -713,6 +715,83 @@ const renderElementToSvg = (
       }
     }
   }
+};
+
+/**
+ * Renders the background grid into the SVG, mirroring the on-canvas grid
+ * (`strokeGrid`) so that SVG exports are WYSIWYG-consistent with PNG exports and
+ * the editor. Export always renders at zoom 1, so line widths/dashes are fixed.
+ */
+export const renderGridToSvg = ({
+  svgRoot,
+  gridSize,
+  gridStep,
+  offsetX,
+  offsetY,
+  width,
+  height,
+  theme,
+}: {
+  svgRoot: SVGElement;
+  gridSize: number;
+  gridStep: number;
+  /** SVG-space offset applied to world coords (`-min + padding`) */
+  offsetX: number;
+  offsetY: number;
+  width: number;
+  height: number;
+  theme: SVGRenderConfig["theme"];
+}) => {
+  if (gridSize <= 0) {
+    return;
+  }
+
+  const doc = svgRoot.ownerDocument;
+  const group = doc.createElementNS(SVG_NS, "g");
+  group.setAttribute("class", "grid");
+
+  const boldColor = GridLineColor[theme].bold;
+  const regularColor = GridLineColor[theme].regular;
+  const boldModulus = gridStep * gridSize;
+
+  const appendLine = (
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    isBold: boolean,
+  ) => {
+    const line = doc.createElementNS(SVG_NS, "line");
+    line.setAttribute("x1", `${x1}`);
+    line.setAttribute("y1", `${y1}`);
+    line.setAttribute("x2", `${x2}`);
+    line.setAttribute("y2", `${y2}`);
+    line.setAttribute("stroke", isBold ? boldColor : regularColor);
+    line.setAttribute("stroke-width", "1");
+    if (!isBold) {
+      // matches strokeGrid's dashed regular lines at zoom 1 ([3, 3])
+      line.setAttribute("stroke-dasharray", "3 3");
+    }
+    group.appendChild(line);
+  };
+
+  // grid lines are aligned to the world origin (world coord === multiple of
+  // gridSize), so we start at the first such line visible in the SVG viewport
+  const startX = ((offsetX % gridSize) + gridSize) % gridSize;
+  for (let x = startX; x <= width; x += gridSize) {
+    const worldX = Math.round(x - offsetX);
+    const isBold = gridStep > 1 && worldX % boldModulus === 0;
+    appendLine(x, 0, x, height, isBold);
+  }
+
+  const startY = ((offsetY % gridSize) + gridSize) % gridSize;
+  for (let y = startY; y <= height; y += gridSize) {
+    const worldY = Math.round(y - offsetY);
+    const isBold = gridStep > 1 && worldY % boldModulus === 0;
+    appendLine(0, y, width, y, isBold);
+  }
+
+  svgRoot.appendChild(group);
 };
 
 export const renderSceneToSvg = (
