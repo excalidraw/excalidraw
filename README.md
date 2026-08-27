@@ -80,6 +80,10 @@ The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase
 
 We'll be adding these features as drop-in plugins for the npm package in the future.
 
+You can also run this app on your own infrastructure. The repository ships a `Dockerfile` and a `docker-compose.yml`, or you can have a managed instance set up for you in one click, with storage, backups and a free subdomain included:
+
+[![Deploy with Zenith](https://cdn.zenith.hosting/buttons/deploy-with-zenith.svg)](https://zenith.hosting/host/excalidraw)
+
 ## Quick start
 
 **Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
