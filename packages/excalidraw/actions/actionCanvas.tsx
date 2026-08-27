@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
   MAX_ZOOM,
@@ -250,27 +252,143 @@ export const actionResetZoom = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  PanelComponent: ({ updateData }) => {
+  PanelComponent: ({ updateData }) => (
+    <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
+      <IconButton
+        type="button"
+        className="reset-zoom-button zoom-button"
+        icon={ZoomResetIcon}
+        title={`${t("buttons.resetZoom")} — ${getShortcutKey("CtrlOrCmd+0")}`}
+        aria-label={t("buttons.resetZoom")}
+        onClick={() => {
+          updateData(null);
+        }}
+      />
+    </Tooltip>
+  ),
+  keyTest: (event) =>
+    (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
+    (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
+});
+
+export const actionSetZoom = register<number>({
+  name: "setZoom",
+  label: "buttons.setZoom",
+  viewMode: true,
+  navigation: true,
+  trackEvent: { category: "canvas" },
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
+  // `value` is a zoom percentage as typed by the user (e.g. 150 for 150%).
+  // Anchored to the viewport center like the other discrete zoom actions —
+  // the pointer is over the zoom widget when the value is committed, so
+  // anchoring there would throw the viewport off at high zoom.
+  perform: (_elements, appState, value, app) => {
+    if (value == null || isNaN(value)) {
+      return false;
+    }
+    const nextState = {
+      ...appState,
+      ...getViewportForZoomWithScrollConstraints(
+        {
+          viewportX: appState.width / 2 + appState.offsetLeft,
+          viewportY: appState.height / 2 + appState.offsetTop,
+          nextZoom: getNormalizedZoom(value / 100),
+        },
+        appState,
+      ),
+      userToFollow: null,
+    };
+    return {
+      appState: nextState,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ updateData, app }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
+    const zoomPercentage = (zoomValue * 100).toFixed(0);
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [inputValue, setInputValue] = useState(zoomPercentage);
+    const inputRef = useRef<HTMLInputElement>(null);
+    // guards against the edit being finished twice: returning focus to the
+    // canvas blurs the input, so Enter/Escape would otherwise be followed by
+    // the blur handler finishing the same edit again
+    const isEditPendingRef = useRef(false);
+
+    useEffect(() => {
+      if (isEditing) {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }
+    }, [isEditing]);
+
+    const startEditing = () => {
+      setInputValue(zoomPercentage);
+      isEditPendingRef.current = true;
+      setIsEditing(true);
+    };
+
+    const finishEditing = (shouldCommit: boolean) => {
+      if (!isEditPendingRef.current) {
+        return;
+      }
+      isEditPendingRef.current = false;
+
+      if (shouldCommit) {
+        const nextZoomPercentage = parseFloat(inputValue);
+        // out-of-range values are clamped by `getNormalizedZoom`, but a value
+        // that isn't a number at all is discarded
+        if (!isNaN(nextZoomPercentage)) {
+          updateData(nextZoomPercentage);
+        }
+      }
+
+      setIsEditing(false);
+      app.focusContainer();
+    };
+
+    if (isEditing) {
+      return (
+        <input
+          ref={inputRef}
+          className="zoom-value-input zoom-button"
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          spellCheck="false"
+          aria-label={t("buttons.setZoom")}
+          value={inputValue}
+          onChange={(event) => setInputValue(event.target.value)}
+          onBlur={() => finishEditing(true)}
+          onKeyDown={(event) => {
+            if (event.key === KEYS.ENTER) {
+              finishEditing(true);
+            } else if (event.key === KEYS.ESCAPE) {
+              // Escape is the one key the global handler doesn't ignore for
+              // inputs (see App's onKeyDown), so it would also reach the
+              // canvas and e.g. reset the active tool
+              event.stopPropagation();
+              finishEditing(false);
+            }
+          }}
+        />
+      );
+    }
+
     return (
-      <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
+      <Tooltip label={t("buttons.setZoom")} style={{ height: "100%" }}>
         <IconButton
           type="button"
-          className="reset-zoom-button zoom-button"
-          title={t("buttons.resetZoom")}
-          aria-label={t("buttons.resetZoom")}
-          onClick={() => {
-            updateData(null);
-          }}
+          className="zoom-value-button zoom-button"
+          title={t("buttons.setZoom")}
+          aria-label={t("buttons.setZoom")}
+          onDoubleClick={startEditing}
         >
-          {(zoomValue * 100).toFixed(0)}%
+          {zoomPercentage}%
         </IconButton>
       </Tooltip>
     );
   },
-  keyTest: (event) =>
-    (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
-    (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
 // under a viewport lock, zoom-to-fit targets the locked box rather than the
