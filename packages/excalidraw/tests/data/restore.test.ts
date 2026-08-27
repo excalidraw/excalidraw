@@ -670,6 +670,38 @@ describe("restoreElements", () => {
     });
   });
 
+  it("should strip nullish authorship, but keep the genuine one", () => {
+    // as saved by an earlier revision, which stored `null` for the unknown
+    // authorship instead of leaving the attributes out
+    const legacy = {
+      ...API.createElement({ type: "rectangle", id: "legacy" }),
+      createdBy: null,
+      created: null,
+      updatedBy: null,
+    } as unknown as ExcalidrawElement;
+
+    const authored = API.createElement({
+      type: "rectangle",
+      id: "authored",
+      createdBy: "user-a",
+      created: 1234,
+      updatedBy: "user-b",
+    });
+
+    const [restoredLegacy, restoredAuthored] = restore.restoreElements(
+      [legacy, authored],
+      null,
+    );
+
+    expect(restoredLegacy.createdBy).toBeNull();
+    expect(restoredLegacy.created).toBeNull();
+    expect(restoredLegacy.updatedBy).toBeNull();
+
+    expect(restoredAuthored.createdBy).toBe("user-a");
+    expect(restoredAuthored.created).toBe(1234);
+    expect(restoredAuthored.updatedBy).toBe("user-b");
+  });
+
   it("bump versions of local duplicate elements when supplied", () => {
     const rectangle = API.createElement({ type: "rectangle" }); // version=1
     const ellipse = API.createElement({ type: "ellipse" });

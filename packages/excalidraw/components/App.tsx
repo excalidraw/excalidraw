@@ -229,6 +229,7 @@ import {
   getDragOffsetXY,
   Scene,
   Store,
+  Attribution,
   CaptureUpdateAction,
   type ElementUpdate,
   hitElementBoundingBox,
@@ -3052,7 +3053,19 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.store.scheduleAction(actionResult.captureUpdate);
+    if (
+      actionResult.elements &&
+      actionResult.attribution === Attribution.NONE
+    ) {
+      // mark before the capture, so that the exemption also survives the
+      // folding of this update into a later durable capture
+      this.store.markUnattributed(actionResult.elements);
+    }
+
+    this.store.scheduleAction(
+      actionResult.captureUpdate,
+      actionResult.attribution,
+    );
 
     let didUpdate = false;
 
@@ -5268,8 +5281,25 @@ class App extends React.Component<AppProps, AppState> {
        * @default CaptureUpdateAction.EVENTUALLY
        */
       captureUpdate?: SceneData["captureUpdate"];
+      /**
+       * Controls who gets credited for this update once it's captured (see
+       * `captureUpdate`).
+       *
+       * - `Attribution.CURRENT_USER`: Default. The update is authored by the local user (`props.currentUser.id`).
+       * - `Attribution.NONE`: The update is undoable, yet deliberately not credited to the local user (i.e. programmatic import / AI / system content). Elements entering the document stay unattributed - even when the update folds into a later capture - unless pre-stamped with `createdBy` (i.e. an agent / service id).
+       *
+       * @default Attribution.CURRENT_USER
+       */
+      attribution?: SceneData["attribution"];
     }) => {
-      const { elements, appState, collaborators, captureUpdate } = sceneData;
+      const { elements, appState, collaborators, captureUpdate, attribution } =
+        sceneData;
+
+      if (elements && attribution === Attribution.NONE) {
+        // mark before the capture, so that the exemption also survives the
+        // folding of this update into a later durable capture
+        this.store.markUnattributed(elements);
+      }
 
       if (captureUpdate) {
         const nextElements = elements ? elements : undefined;
@@ -5284,6 +5314,7 @@ class App extends React.Component<AppProps, AppState> {
           action: captureUpdate,
           elements: nextElements,
           appState: observedAppState,
+          attribution,
         });
       }
 
@@ -13029,6 +13060,7 @@ class App extends React.Component<AppProps, AppState> {
             },
             replaceFiles: true,
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+            attribution: Attribution.NONE,
           });
           return;
         } catch (error: any) {
@@ -13184,6 +13216,7 @@ class App extends React.Component<AppProps, AppState> {
           },
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          attribution: Attribution.NONE,
         });
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library

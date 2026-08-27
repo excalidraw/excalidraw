@@ -115,6 +115,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderScrollbars,
     viewportStatusFrame,
     currentUserControls,
+    currentUser,
     imageOptions,
   } = props;
 
@@ -257,6 +258,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderScrollbars={renderScrollbars}
           viewportStatusFrame={viewportStatusFrame}
           currentUserControls={currentUserControls}
+          currentUser={currentUser}
           imageOptions={normalizedImageOptions}
         >
           {children}
@@ -457,7 +459,7 @@ export {
   bumpVersion,
 } from "@excalidraw/element";
 
-export { CaptureUpdateAction } from "@excalidraw/element";
+export { CaptureUpdateAction, Attribution } from "@excalidraw/element";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
 

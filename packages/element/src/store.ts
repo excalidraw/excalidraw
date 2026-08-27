@@ -6,6 +6,7 @@ import {
   randomId,
   Emitter,
   toIterable,
+  getUpdatedTimestamp,
 } from "@excalidraw/common";
 
 import type App from "@excalidraw/excalidraw/components/App";
@@ -64,13 +65,63 @@ export const CaptureUpdateAction = {
    * or internally by the editor.
    *
    * These updates will _eventually_ make it to the local undo / redo stacks.
+   *
+   * NOTE: as such updates fold into a future durable capture, the same
+   * authorship stamping applies to them at that point - see `Attribution`.
    */
   EVENTUALLY: "EVENTUALLY",
 } as const;
 
 export type CaptureUpdateActionType = ValueOf<typeof CaptureUpdateAction>;
 
+/**
+ * Declares why a pre-computed package (change & delta) got scheduled, as the
+ * package's shape alone cannot tell a replayed change apart from new content.
+ */
+export const ChangeOrigin = {
+  /**
+   * Replay of an already recorded change (i.e. history undo / redo).
+   *
+   * The store never (re)authors such a package, as its authorship attributes
+   * round-trip like any other element attributes.
+   */
+  HISTORY: "history",
+  /**
+   * A commit of new content (i.e. a programmatic transaction).
+   *
+   * The store stamps authorship as with any other local durable capture,
+   * except for elements entering the document with `createdBy` already set,
+   * which are left untouched - a caller wanting a different attribution
+   * (i.e. an agent / service id) is hence expected to pre-stamp its elements.
+   */
+  COMMIT: "commit",
+} as const;
+
+export type ChangeOriginType = ValueOf<typeof ChangeOrigin>;
+
+/**
+ * Declares who gets credited for an update, whether it comes in through
+ * `updateScene` (micro action) or through an action result (macro action).
+ */
+export const Attribution = {
+  CURRENT_USER: "currentUser",
+  NONE: "none", // Undoable and not from currentUser
+} as const;
+
+export type AttributionType = ValueOf<typeof Attribution>;
+
 type MicroActionsQueue = (() => void)[];
+
+type ElementAuthorship = {
+  createdBy?: string;
+  created?: number;
+  updatedBy: string;
+};
+
+type ElementStamp = {
+  preStampVersion: number;
+  authorship: ElementAuthorship;
+};
 
 /**
  * Store which captures the observed changes and emits them as `StoreIncrement` events.
@@ -84,7 +135,10 @@ export class Store {
   >();
 
   private scheduledMacroActions: Set<CaptureUpdateActionType> = new Set();
+  private scheduledMacroAttribution: AttributionType = Attribution.CURRENT_USER;
   private scheduledMicroActions: MicroActionsQueue = [];
+  private stampedElements: Map<string, ElementStamp> = new Map();
+  private unattributedElements: Set<string> = new Set();
 
   private _snapshot = StoreSnapshot.empty();
 
@@ -98,8 +152,20 @@ export class Store {
 
   constructor(private readonly app: App) {}
 
-  public scheduleAction(action: CaptureUpdateActionType) {
+  public scheduleAction(
+    action: CaptureUpdateActionType,
+    attribution: AttributionType = Attribution.CURRENT_USER,
+  ) {
     this.scheduledMacroActions.add(action);
+
+    if (attribution === Attribution.NONE) {
+      // there is only one macro action per commit, so an explicitly
+      // unattributed update makes the whole of it unattributed - crediting
+      // nobody is the safer of the two failure modes, as the alternative
+      // would credit the local user for the loaded / imported content
+      this.scheduledMacroAttribution = Attribution.NONE;
+    }
+
     this.satisfiesScheduledActionsInvariant();
   }
 
@@ -112,6 +178,19 @@ export class Store {
   }
 
   /**
+   * Marks the passed elements as explicitly unattributed
+   * (`Attribution.NONE`), so that no durable capture credits their creation
+   * to the local user.
+   */
+  public markUnattributed(elements: readonly { id: string }[]) {
+    for (const element of elements) {
+      if (!this.snapshot.elements.has(element.id)) {
+        this.unattributedElements.add(element.id);
+      }
+    }
+  }
+
+  /**
    * Schedule special "micro" actions, to-be executed before the next commit, before it executes a scheduled "macro" action.
    */
   public scheduleMicroAction(
@@ -120,11 +199,13 @@ export class Store {
           action: CaptureUpdateActionType;
           elements: readonly ExcalidrawElement[] | undefined;
           appState: AppState | ObservedAppState | undefined;
+          attribution?: AttributionType;
         }
       | {
           action: typeof CaptureUpdateAction.IMMEDIATELY;
           change: StoreChange;
           delta: StoreDelta;
+          origin: ChangeOriginType;
         }
       | {
           action:
@@ -164,12 +245,19 @@ export class Store {
     }
 
     const delta = "delta" in params ? params.delta : undefined;
+    const origin = "origin" in params ? params.origin : ChangeOrigin.COMMIT;
+    const attribution =
+      "attribution" in params && params.attribution
+        ? params.attribution
+        : Attribution.CURRENT_USER;
 
     this.scheduledMicroActions.push(() =>
       this.processAction({
         action,
         change,
         delta,
+        origin,
+        attribution,
       }),
     );
   }
@@ -184,6 +272,10 @@ export class Store {
     elements: SceneElementsMap | undefined,
     appState: AppState | ObservedAppState | undefined,
   ): void {
+    // authorship is stamped at most once per element within a single commit,
+    // while all the packages flushed within it reconcile against those stamps
+    this.stampedElements.clear();
+
     // execute all scheduled micro actions first
     // similar to microTasks, there can be many
     this.flushMicroActions();
@@ -192,11 +284,17 @@ export class Store {
       // execute a single scheduled "macro" function
       // similar to macro tasks, there can be only one within a single commit (loop)
       const action = this.getScheduledMacroAction();
-      this.processAction({ action, elements, appState });
+      this.processAction({
+        action,
+        elements,
+        appState,
+        attribution: this.scheduledMacroAttribution,
+      });
     } finally {
       this.satisfiesScheduledActionsInvariant();
       // defensively reset all scheduled "macro" actions, possibly cleans up other runtime garbage
       this.scheduledMacroActions = new Set();
+      this.scheduledMacroAttribution = Attribution.CURRENT_USER;
     }
   }
 
@@ -206,6 +304,9 @@ export class Store {
   public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
+    this.scheduledMacroAttribution = Attribution.CURRENT_USER;
+    this.stampedElements = new Map();
+    this.unattributedElements = new Set();
   }
 
   /**
@@ -320,11 +421,14 @@ export class Store {
           action: CaptureUpdateActionType;
           elements: SceneElementsMap | undefined;
           appState: AppState | ObservedAppState | undefined;
+          attribution: AttributionType;
         }
       | {
           action: CaptureUpdateActionType;
           change: StoreChange;
           delta: StoreDelta | undefined;
+          origin: ChangeOriginType;
+          attribution: AttributionType;
         },
   ) {
     const { action } = params;
@@ -338,6 +442,10 @@ export class Store {
     ) {
       return;
     }
+
+    // stamp authorship before the next snapshot is computed, so that both the
+    // snapshot clones and the calculated delta pick up the authorship fields
+    this.maybeStampAuthorship(params);
 
     let nextSnapshot: StoreSnapshot | null;
 
@@ -382,6 +490,218 @@ export class Store {
           this.snapshot = nextSnapshot;
           break;
       }
+    }
+  }
+
+  /**
+   * Stamps authorship (`createdBy` / `created` / `updatedBy`) onto elements
+   * which entered the document or got edited through local, undoable activity
+   * of this editor instance.
+   *
+   * An element which is not yet part of the snapshot at the time of a durable
+   * capture could have entered the scene only locally, as remote elements
+   * always enter the snapshot through `CaptureUpdateAction.NEVER` and loaded
+   * content (file open / drop / import) enters through an update explicitly
+   * marked as `Attribution.NONE`. Such an element is a "creation candidate"
+   * and receives all three fields.
+   *
+   * An element which is already part of the snapshot, but is changing within
+   * this very capture, is an "edit candidate" and receives just `updatedBy`
+   * (deletion counts as an edit as well).
+   *
+   * Only a durable capture ever authors anything, but every package flushed
+   * within the same commit gets its private clones reconciled against the
+   * stamps applied by the earlier ones, as all the clones were frozen upfront.
+   */
+  private maybeStampAuthorship(
+    params:
+      | {
+          action: CaptureUpdateActionType;
+          elements: SceneElementsMap | undefined;
+          appState: AppState | ObservedAppState | undefined;
+          attribution: AttributionType;
+        }
+      | {
+          action: CaptureUpdateActionType;
+          change: StoreChange;
+          delta: StoreDelta | undefined;
+          origin: ChangeOriginType;
+          attribution: AttributionType;
+        },
+  ) {
+    if ("origin" in params && params.origin === ChangeOrigin.HISTORY) {
+      // a history replay re-applies an already authored change, hence it
+      // never authors anything - carrying a pre-computed delta alone does not
+      // make a package a replay, only its explicitly declared origin does
+      return;
+    }
+
+    const userId = this.app.props.currentUser?.id;
+
+    if (!userId) {
+      return;
+    }
+
+    const isMicroAction = "change" in params;
+    const isDurableAction = params.action === CaptureUpdateAction.IMMEDIATELY;
+    const isAuthoringAction =
+      isDurableAction && params.attribution !== Attribution.NONE;
+
+    if (!isAuthoringAction && !isMicroAction) {
+      // NOTE: a macro action which does not author anything (non-durable or
+      // explicitly unattributed) holds no private clone which would need a
+      // reconciliation - it operates on the live elements themselves
+      return;
+    }
+
+    const candidates = isMicroAction
+      ? Object.values(params.change.elements)
+      : params.elements
+      ? toIterable(params.elements)
+      : [];
+
+    const elements = this.app.scene.getElementsMapIncludingDeleted();
+    const timestamp = getUpdatedTimestamp();
+
+    for (const candidate of candidates) {
+      const liveElement = elements.get(candidate.id);
+      // NOTE: an earlier package of this very commit might have stamped the
+      // element already, leaving this (upfront frozen) clone behind the live
+      // element
+      const previousStamp = this.stampedElements.get(candidate.id);
+
+      if (!isAuthoringAction) {
+        if (previousStamp && liveElement) {
+          this.reconcileStampedClone(candidate, liveElement, previousStamp);
+        }
+
+        continue;
+      }
+
+      const snapshotElement = this.snapshot.elements.get(candidate.id);
+
+      let authorship: ElementAuthorship;
+
+      if (!snapshotElement) {
+        // creation candidate - not part of the document yet
+        if (candidate.createdBy != null) {
+          // never overwrite an existing attribution
+          continue;
+        }
+
+        if (this.unattributedElements.has(candidate.id)) {
+          // the content entered through an explicitly unattributed update -
+          // keep it that way, even when folded into this durable capture
+          continue;
+        }
+
+        authorship = {
+          createdBy: userId,
+          created: timestamp,
+          updatedBy: userId,
+        };
+      } else {
+        // the unattributed mark settles once the element became part of the
+        // document - from now on the element is subject to `updatedBy`
+        this.unattributedElements.delete(candidate.id);
+
+        // edit candidate - already part of the document, hence we only ever
+        // re-attribute the last editor, never the original author
+        if (!isMicroAction) {
+          // unlike the micro action's change, which contains exactly the
+          // changed elements, the macro action receives the whole scene,
+          // so we have to detect the changed elements ourselves, the very same
+          // way `StoreSnapshot.detectChangedElements` does
+          if (snapshotElement.version >= candidate.version) {
+            continue;
+          }
+
+          if (
+            isImageElement(candidate) &&
+            !isInitializedImageElement(candidate)
+          ) {
+            // ignore any updates on uninitialized image elements
+            continue;
+          }
+        }
+
+        // `created` is deliberately left alone - it's stamped once, at creation
+        authorship = { updatedBy: userId };
+      }
+
+      if (previousStamp) {
+        authorship = { ...authorship, ...previousStamp.authorship };
+      }
+
+      const isCreationCandidate = !snapshotElement;
+
+      if (!liveElement) {
+        // the change might reference an element which is gone from the scene
+        Object.assign(candidate, authorship);
+        continue;
+      }
+
+      if (previousStamp) {
+        if (isMicroAction) {
+          this.reconcileStampedClone(candidate, liveElement, {
+            preStampVersion: previousStamp.preStampVersion,
+            authorship,
+          });
+        }
+
+        continue;
+      }
+
+      if (!isCreationCandidate && liveElement.updatedBy === userId) {
+        // steady-state solo editing, just ensure authorship
+        Object.assign(candidate, authorship);
+        continue;
+      }
+
+      const preStampVersion = liveElement.version;
+
+      this.app.scene.mutateElement(liveElement, authorship, {
+        informMutation: false,
+        isDragging: false,
+      });
+
+      this.stampedElements.set(candidate.id, { preStampVersion, authorship });
+
+      if (!isMicroAction) {
+        // the mutated element is the one inside `params.elements`, hence it
+        // makes it into the snapshot on its own
+        continue;
+      }
+
+      this.reconcileStampedClone(candidate, liveElement, {
+        preStampVersion,
+        authorship,
+      });
+    }
+  }
+
+  /**
+   * Patches the private clone of a scheduled change with the authorship which
+   * got stamped onto the live element within this very commit.
+   *
+   * Patching the authorship alone would leave the snapshot behind the live
+   * element, so the next durable capture would detect a version-only change and
+   * push a phantom (visually empty) undo entry.
+   */
+  private reconcileStampedClone(
+    clone: ExcalidrawElement,
+    liveElement: ExcalidrawElement,
+    stamp: ElementStamp,
+  ) {
+    if (stamp.preStampVersion === clone.version) {
+      // NOTE: The clone was in sync with the live element, keep it that way
+      Object.assign(clone, stamp.authorship, {
+        version: liveElement.version,
+        versionNonce: liveElement.versionNonce,
+      });
+    } else {
+      // NOTE: There are interim edits which are not part of this change yet
+      Object.assign(clone, stamp.authorship);
     }
   }
 

@@ -74,6 +74,9 @@ export type ElementConstructorOpts = MarkOptional<
   | "locked"
   | "opacity"
   | "customData"
+  | "createdBy"
+  | "created"
+  | "updatedBy"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -155,6 +158,9 @@ const _newElementBase = <T extends ExcalidrawElement>(
     link,
     locked,
     customData: rest.customData,
+    createdBy: rest.createdBy ?? null,
+    created: rest.created ?? getUpdatedTimestamp(),
+    updatedBy: rest.updatedBy ?? null,
   };
   return element;
 };
