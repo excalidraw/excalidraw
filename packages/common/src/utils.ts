@@ -681,15 +681,38 @@ export const isPromiseLike = (
   );
 };
 
+const FOCUSABLE_SELECTOR = [
+  "button",
+  "a[href]",
+  "input",
+  "select",
+  "textarea",
+  "summary",
+  // any element made focusable via tabindex, not just div/label
+  "[tabindex]",
+].join(", ");
+
+const isHiddenFromFocus = (element: HTMLElement) => {
+  if (element.closest("[hidden]") || element.closest('[aria-hidden="true"]')) {
+    return true;
+  }
+
+  const { display, visibility } = getComputedStyle(element);
+
+  return display === "none" || visibility === "hidden";
+};
+
 export const queryFocusableElements = (container: HTMLElement | null) => {
-  const focusableElements = container?.querySelectorAll<HTMLElement>(
-    "button, a, input, select, textarea, div[tabindex], label[tabindex]",
-  );
+  const focusableElements =
+    container?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
 
   return focusableElements
     ? Array.from(focusableElements).filter(
         (element) =>
-          element.tabIndex > -1 && !(element as HTMLInputElement).disabled,
+          element.tabIndex > -1 &&
+          !(element as HTMLInputElement).disabled &&
+          element.getAttribute("aria-disabled") !== "true" &&
+          !isHiddenFromFocus(element),
       )
     : [];
 };
