@@ -59,6 +59,8 @@ const SPACE_BOTTOM = 85;
 const AUTO_HIDE_TIMEOUT = 500;
 
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
+let HYPERLINK_TOOLTIP_OWNER_DOCUMENT: Document | null = null;
+let HYPERLINK_TOOLTIP_OWNER_WINDOW: Window | null = null;
 
 const embeddableLinkCache = new Map<
   ExcalidrawEmbeddableElement["id"],
@@ -386,12 +388,19 @@ export const showHyperlinkTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
+  ownerDocument: Document,
 ) => {
   if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
-    clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+    HYPERLINK_TOOLTIP_OWNER_WINDOW?.clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
   }
-  HYPERLINK_TOOLTIP_TIMEOUT_ID = window.setTimeout(
-    () => renderTooltip(element, appState, elementsMap),
+  const ownerWindow = ownerDocument.defaultView;
+  if (!ownerWindow) {
+    return;
+  }
+  HYPERLINK_TOOLTIP_OWNER_DOCUMENT = ownerDocument;
+  HYPERLINK_TOOLTIP_OWNER_WINDOW = ownerWindow;
+  HYPERLINK_TOOLTIP_TIMEOUT_ID = ownerWindow.setTimeout(
+    () => renderTooltip(element, appState, elementsMap, ownerDocument),
     HYPERLINK_TOOLTIP_DELAY,
   );
 };
@@ -400,12 +409,13 @@ const renderTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
+  ownerDocument: Document,
 ) => {
   if (!element.link) {
     return;
   }
 
-  const tooltipDiv = getTooltipDiv();
+  const tooltipDiv = getTooltipDiv(ownerDocument);
 
   tooltipDiv.classList.add("excalidraw-tooltip--visible");
   tooltipDiv.style.maxWidth = "20rem";
@@ -442,12 +452,17 @@ const renderTooltip = (
 };
 export const hideHyperlinkToolip = () => {
   if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
-    clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+    HYPERLINK_TOOLTIP_OWNER_WINDOW?.clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+    HYPERLINK_TOOLTIP_TIMEOUT_ID = null;
   }
-  if (IS_HYPERLINK_TOOLTIP_VISIBLE) {
+  if (IS_HYPERLINK_TOOLTIP_VISIBLE && HYPERLINK_TOOLTIP_OWNER_DOCUMENT) {
     IS_HYPERLINK_TOOLTIP_VISIBLE = false;
-    getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    getTooltipDiv(HYPERLINK_TOOLTIP_OWNER_DOCUMENT).classList.remove(
+      "excalidraw-tooltip--visible",
+    );
   }
+  HYPERLINK_TOOLTIP_OWNER_DOCUMENT = null;
+  HYPERLINK_TOOLTIP_OWNER_WINDOW = null;
 };
 
 const shouldHideLinkPopup = (
