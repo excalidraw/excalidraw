@@ -1,11 +1,9 @@
 import {
   DEFAULT_CANVAS_BACKGROUND_PICKS,
-  CURSOR_TYPE,
   MAX_ZOOM,
   MIN_ZOOM,
   THEME,
   ZOOM_STEP,
-  updateActiveTool,
   CODES,
   KEYS,
 } from "@excalidraw/common";
@@ -16,19 +14,13 @@ import { getCommonBounds } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { Bounds } from "@excalidraw/common";
 
-import {
-  getDefaultAppState,
-  isEraserActive,
-  isHandToolActive,
-} from "../appState";
+import { getDefaultAppState } from "../appState";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { Tooltip } from "../components/Tooltip";
 import {
-  handIcon,
-  LassoIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -37,13 +29,15 @@ import {
   ZoomOutIcon,
   ZoomResetIcon,
 } from "../components/icons";
-import { setCursor } from "../cursor";
 import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
-import { getStateForZoom } from "../scene/zoom";
-import { constrainScrollState, zoomToFitBounds } from "../viewport";
+import {
+  constrainScrollState,
+  getViewportForZoomWithScrollConstraints,
+  zoomToFitBounds,
+} from "../viewport";
 import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
@@ -117,6 +111,7 @@ export const actionClearCanvas = register({
         gridStep: appState.gridStep,
         gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
+        colorTopPicks: appState.colorTopPicks,
         activeTool:
           appState.activeTool.type === "image"
             ? {
@@ -134,12 +129,15 @@ export const actionZoomIn = register({
   name: "zoomIn",
   label: "buttons.zoomIn",
   viewMode: true,
+  navigation: true,
   icon: ZoomInIcon,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
+    app.requestUnfollow();
     const nextState = {
       ...appState,
-      ...getStateForZoom(
+      ...getViewportForZoomWithScrollConstraints(
         {
           viewportX: appState.width / 2 + appState.offsetLeft,
           viewportY: appState.height / 2 + appState.offsetTop,
@@ -147,17 +145,16 @@ export const actionZoomIn = register({
         },
         appState,
       ),
-      userToFollow: null,
     };
     return {
-      appState: { ...nextState, ...constrainScrollState(nextState) },
+      appState: nextState,
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <ToolButton
+      <IconButton
         type="button"
         className="zoom-in-button zoom-button"
         icon={ZoomInIcon}
@@ -180,11 +177,14 @@ export const actionZoomOut = register({
   label: "buttons.zoomOut",
   icon: ZoomOutIcon,
   viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
+    app.requestUnfollow();
     const nextState = {
       ...appState,
-      ...getStateForZoom(
+      ...getViewportForZoomWithScrollConstraints(
         {
           viewportX: appState.width / 2 + appState.offsetLeft,
           viewportY: appState.height / 2 + appState.offsetTop,
@@ -192,17 +192,16 @@ export const actionZoomOut = register({
         },
         appState,
       ),
-      userToFollow: null,
     };
     return {
-      appState: { ...nextState, ...constrainScrollState(nextState) },
+      appState: nextState,
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <ToolButton
+      <IconButton
         type="button"
         className="zoom-out-button zoom-button"
         icon={ZoomOutIcon}
@@ -225,8 +224,11 @@ export const actionResetZoom = register({
   label: "buttons.resetZoom",
   icon: ZoomResetIcon,
   viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
+    app.requestUnfollow();
     // reset to 100%, unless a zoom lock floors the zoom higher — then reset to
     // the locked minimum zoom (the lock's resting zoom level)
     const nextZoom = appState.scrollConstraints?.lockZoom
@@ -234,7 +236,7 @@ export const actionResetZoom = register({
       : 1;
     const nextState = {
       ...appState,
-      ...getStateForZoom(
+      ...getViewportForZoomWithScrollConstraints(
         {
           viewportX: appState.width / 2 + appState.offsetLeft,
           viewportY: appState.height / 2 + appState.offsetTop,
@@ -242,11 +244,9 @@ export const actionResetZoom = register({
         },
         appState,
       ),
-      userToFollow: null,
     };
     return {
-      // re-clamp so the reset can't escape an active scroll/zoom lock
-      appState: { ...nextState, ...constrainScrollState(nextState) },
+      appState: nextState,
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
@@ -254,7 +254,7 @@ export const actionResetZoom = register({
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
       <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
-        <ToolButton
+        <IconButton
           type="button"
           className="reset-zoom-button zoom-button"
           title={t("buttons.resetZoom")}
@@ -264,7 +264,7 @@ export const actionResetZoom = register({
           }}
         >
           {(zoomValue * 100).toFixed(0)}%
-        </ToolButton>
+        </IconButton>
       </Tooltip>
     );
   },
@@ -273,6 +273,19 @@ export const actionResetZoom = register({
     (event[KEYS.CTRL_OR_CMD] || event.shiftKey),
 });
 
+// under a viewport lock, zoom-to-fit targets the locked box rather than the
+// scene elements
+const getScrollConstraintsBounds = (
+  scrollConstraints: NonNullable<AppState["scrollConstraints"]>,
+) => {
+  return [
+    scrollConstraints.x,
+    scrollConstraints.y,
+    scrollConstraints.x + scrollConstraints.width,
+    scrollConstraints.y + scrollConstraints.height,
+  ] as Bounds;
+};
+
 // Note, this action differs from actionZoomToFitSelection in that it doesn't
 // zoom beyond 100%. In other words, if the content is smaller than viewport
 // size, it won't be zoomed in.
@@ -280,29 +293,39 @@ export const actionZoomToFitSelectionInViewport = register({
   name: "zoomToFitSelectionInViewport",
   label: "labels.zoomToFitViewport",
   icon: zoomAreaIcon,
+  // with no selection (as is always the case in view mode & when
+  // non-interactive), fits all elements, or the locked viewport box when
+  // a viewport lock is active
+  viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState) => !appState.scrollConstraints,
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (elements, appState, _, app) => {
+    app.requestUnfollow();
     const selectedElements = app.scene.getSelectedElements(appState);
-    const nonDeletedSelectedElements = getNonDeletedElements(
-      (selectedElements.length
-        ? selectedElements
-        : elements) as ExcalidrawElement[],
-    );
-    return zoomToFitBounds({
-      bounds: getCommonBounds(nonDeletedSelectedElements),
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+    const bounds = selectedElements.length
+      ? getCommonBounds(getNonDeletedElements(selectedElements))
+      : appState.scrollConstraints
+      ? getScrollConstraintsBounds(appState.scrollConstraints)
+      : getCommonBounds(getNonDeletedElements(elements));
+    const result = zoomToFitBounds({
+      bounds,
+      appState,
       fit: "scale-down",
-      canvasOffsets: app.getViewportOffsets(),
+      canvasOffsets: app.viewport.getOffsets(),
     });
+    return {
+      ...result,
+      // re-clamp so the fit can't escape an active scroll/zoom lock
+      appState: {
+        ...result.appState,
+        ...constrainScrollState(result.appState),
+      },
+    };
   },
   // NOTE shift-2 should have been assigned actionZoomToFitSelection.
   // TBD on how proceed
-  keyTest: (event, appState) =>
-    !appState.scrollConstraints &&
+  keyTest: (event) =>
     event.code === CODES.TWO &&
     event.shiftKey &&
     !event.altKey &&
@@ -313,28 +336,38 @@ export const actionZoomToFitSelection = register({
   name: "zoomToFitSelection",
   label: "helpDialog.zoomToSelection",
   icon: zoomAreaIcon,
+  // with no selection (as is always the case in view mode & when
+  // non-interactive), fits all elements, or the locked viewport box when
+  // a viewport lock is active
+  viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState) => !appState.scrollConstraints,
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (elements, appState, _, app) => {
+    app.requestUnfollow();
     const selectedElements = app.scene.getSelectedElements(appState);
-    const nonDeletedSelectedElements = getNonDeletedElements(
-      (selectedElements.length
-        ? selectedElements
-        : elements) as ExcalidrawElement[],
-    );
-    return zoomToFitBounds({
-      bounds: getCommonBounds(nonDeletedSelectedElements),
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+    const bounds = selectedElements.length
+      ? getCommonBounds(getNonDeletedElements(selectedElements))
+      : appState.scrollConstraints
+      ? getScrollConstraintsBounds(appState.scrollConstraints)
+      : getCommonBounds(getNonDeletedElements(elements));
+    const result = zoomToFitBounds({
+      bounds,
+      appState,
       fit: "contain",
-      canvasOffsets: app.getViewportOffsets(),
+      canvasOffsets: app.viewport.getOffsets(),
     });
+    return {
+      ...result,
+      // re-clamp so the fit can't escape an active scroll/zoom lock
+      appState: {
+        ...result.appState,
+        ...constrainScrollState(result.appState),
+      },
+    };
   },
   // NOTE this action should use shift-2 per figma, alas
-  keyTest: (event, appState) =>
-    !appState.scrollConstraints &&
+  keyTest: (event) =>
     event.code === CODES.THREE &&
     event.shiftKey &&
     !event.altKey &&
@@ -346,20 +379,31 @@ export const actionZoomToFit = register({
   label: "helpDialog.zoomToFit",
   icon: zoomAreaIcon,
   viewMode: true,
+  navigation: true,
   trackEvent: { category: "canvas" },
-  predicate: (elements, appState) => !appState.scrollConstraints,
-  perform: (elements, appState, _, app) =>
-    zoomToFitBounds({
-      bounds: getCommonBounds(getNonDeletedElements(elements)),
-      appState: {
-        ...appState,
-        userToFollow: null,
-      },
+  predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
+  perform: (elements, appState, _, app) => {
+    app.requestUnfollow();
+    // under a viewport lock, fits the locked box rather than the elements
+    const bounds = appState.scrollConstraints
+      ? getScrollConstraintsBounds(appState.scrollConstraints)
+      : getCommonBounds(getNonDeletedElements(elements));
+    const result = zoomToFitBounds({
+      bounds,
+      appState,
       fit: "scale-down",
-      canvasOffsets: app.getViewportOffsets(),
-    }),
-  keyTest: (event, appState) =>
-    !appState.scrollConstraints &&
+      canvasOffsets: app.viewport.getOffsets(),
+    });
+    return {
+      ...result,
+      // re-clamp so the fit can't escape an active scroll/zoom lock
+      appState: {
+        ...result.appState,
+        ...constrainScrollState(result.appState),
+      },
+    };
+  },
+  keyTest: (event) =>
     event.code === CODES.ONE &&
     event.shiftKey &&
     !event.altKey &&
@@ -403,118 +447,4 @@ export const actionToggleTheme = register<AppState["theme"]>({
   predicate: (elements, appState, props, app) => {
     return !!app.props.UIOptions.canvasActions.toggleTheme;
   },
-});
-
-export const actionToggleEraserTool = register({
-  name: "toggleEraserTool",
-  label: "toolBar.eraser",
-  trackEvent: { category: "toolbar" },
-  perform: (elements, appState, _, app) => {
-    let activeTool: AppState["activeTool"];
-
-    if (isEraserActive(appState)) {
-      activeTool = updateActiveTool(appState, {
-        ...(appState.activeTool.lastActiveTool || {
-          type: app.state.preferredSelectionTool.type,
-        }),
-        lastActiveToolBeforeEraser: null,
-      });
-    } else {
-      activeTool = updateActiveTool(appState, {
-        type: "eraser",
-        lastActiveToolBeforeEraser: appState.activeTool,
-      });
-    }
-
-    return {
-      appState: {
-        ...appState,
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        activeEmbeddable: null,
-        activeTool,
-      },
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    };
-  },
-  keyTest: (event, appState) =>
-    event.key === KEYS.E &&
-    !appState.newElement &&
-    !appState.selectedLinearElement?.isEditing &&
-    !appState.selectedLinearElement?.isDragging,
-});
-
-export const actionToggleLassoTool = register({
-  name: "toggleLassoTool",
-  label: "toolBar.lasso",
-  icon: LassoIcon,
-  trackEvent: { category: "toolbar" },
-  predicate: (elements, appState, props, app) => {
-    return app.state.preferredSelectionTool.type !== "lasso";
-  },
-  perform: (elements, appState, _, app) => {
-    let activeTool: AppState["activeTool"];
-
-    if (appState.activeTool.type !== "lasso") {
-      activeTool = updateActiveTool(appState, {
-        type: "lasso",
-        fromSelection: false,
-      });
-      setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
-    } else {
-      activeTool = updateActiveTool(appState, {
-        type: "selection",
-      });
-    }
-
-    return {
-      appState: {
-        ...appState,
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        activeEmbeddable: null,
-        activeTool,
-      },
-      captureUpdate: CaptureUpdateAction.NEVER,
-    };
-  },
-});
-
-export const actionToggleHandTool = register({
-  name: "toggleHandTool",
-  label: "toolBar.hand",
-  trackEvent: { category: "toolbar" },
-  icon: handIcon,
-  viewMode: false,
-  perform: (elements, appState, _, app) => {
-    let activeTool: AppState["activeTool"];
-
-    if (isHandToolActive(appState)) {
-      activeTool = updateActiveTool(appState, {
-        ...(appState.activeTool.lastActiveTool || {
-          type: "selection",
-        }),
-        lastActiveToolBeforeEraser: null,
-      });
-    } else {
-      activeTool = updateActiveTool(appState, {
-        type: "hand",
-        lastActiveToolBeforeEraser: appState.activeTool,
-      });
-      setCursor(app.interactiveCanvas, CURSOR_TYPE.GRAB);
-    }
-
-    return {
-      appState: {
-        ...appState,
-        selectedElementIds: {},
-        selectedGroupIds: {},
-        activeEmbeddable: null,
-        activeTool,
-      },
-      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-    };
-  },
-  keyTest: (event) =>
-    !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
 });

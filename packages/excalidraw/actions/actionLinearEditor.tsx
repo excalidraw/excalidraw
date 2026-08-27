@@ -16,11 +16,9 @@ import type {
 } from "@excalidraw/element/types";
 
 import { DEFAULT_CATEGORIES } from "../components/CommandPalette/CommandPalette";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { lineEditorIcon, polygonIcon } from "../components/icons";
 import { t } from "../i18n";
-
-import { ButtonIcon } from "../components/ButtonIcon";
 
 import { newElementWith } from "../../element/src/mutateElement";
 
@@ -55,20 +53,16 @@ export const actionToggleLinearEditor = register({
     return false;
   },
   perform(elements, appState, _, app) {
-    const selectedElement = app.scene.getSelectedElements({
-      selectedElementIds: appState.selectedElementIds,
-      includeBoundTextElement: true,
-    })[0] as ExcalidrawLinearElement;
-
-    invariant(selectedElement, "No selected element found");
     invariant(
       appState.selectedLinearElement,
       "No selected linear element found",
     );
-    invariant(
-      selectedElement.id === appState.selectedLinearElement.elementId,
-      "Selected element ID and linear editor elementId does not match",
-    );
+
+    const selectedElement = app.scene.getElement(
+      appState.selectedLinearElement.elementId,
+    ) as ExcalidrawLinearElement | null;
+
+    invariant(selectedElement, "No selected element found");
 
     const selectedLinearElement = {
       ...appState.selectedLinearElement,
@@ -98,7 +92,7 @@ export const actionToggleLinearEditor = register({
         : "labels.lineEditor.edit",
     );
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={lineEditorIcon}
         title={label}
@@ -204,12 +198,13 @@ export const actionTogglePolygon = register({
     );
 
     return (
-      <ButtonIcon
+      <IconButton
+        type="toggle"
         icon={polygonIcon}
         title={label}
         aria-label={label}
-        active={allPolygon}
-        onClick={() => updateData(null)}
+        checked={allPolygon}
+        onSelect={() => updateData(null)}
         style={{ marginLeft: "auto" }}
       />
     );

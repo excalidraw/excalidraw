@@ -2,6 +2,7 @@ import { exportToCanvas, exportToSvg } from "@excalidraw/utils";
 
 import {
   applyDarkModeFilter,
+  BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
 } from "@excalidraw/common";
@@ -235,6 +236,72 @@ describe("exportToSvg", () => {
 
     // the masked arrow group still renders its line (not clipped away)
     expect(svgElement.querySelector("g[mask] path")).not.toBeNull();
+  });
+});
+
+describe("exportToCanvas", () => {
+  it("does not paint over elements beneath a labeled arrow's label (#11591)", async () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      id: "rect-11591",
+      x: 0,
+      y: -50,
+      width: 200,
+      height: 100,
+      backgroundColor: "#ffc9c9",
+      fillStyle: "solid",
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow-11591",
+      x: -50,
+      y: 0,
+      width: 300,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+      boundElements: [{ type: "text", id: "label-11591" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label-11591",
+      text: "label",
+      x: 75,
+      y: -10,
+      width: 50,
+      height: 20,
+      containerId: "arrow-11591",
+    });
+
+    const canvas = await exportToCanvas({
+      elements: [rectangle, arrow, label],
+      files: null,
+      appState: { exportBackground: true, viewBackgroundColor: "#ffffff" },
+    });
+
+    const context = canvas.getContext("2d") as any;
+    const events = context.__getEvents();
+
+    // the label "hole" must be cut out of the arrow's own strokes via an
+    // even-odd clip — erasing (clearRect) or painting the background color
+    // (fillRect) over the hole rect would destroy elements rendered beneath
+    // the arrow
+    expect(
+      events.some(
+        (event: any) =>
+          event.type === "clip" && event.props.fillRule === "evenodd",
+      ),
+    ).toBe(true);
+
+    const holeWidth = label.width + BOUND_TEXT_PADDING * 2;
+    const holeHeight = label.height + BOUND_TEXT_PADDING * 2;
+    expect(
+      events.filter(
+        (event: any) =>
+          (event.type === "fillRect" || event.type === "clearRect") &&
+          event.props.width === holeWidth &&
+          event.props.height === holeHeight,
+      ),
+    ).toEqual([]);
   });
 });
 

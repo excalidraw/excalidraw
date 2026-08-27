@@ -7,7 +7,7 @@ import { KEYS } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
 import { LinkIcon } from "../components/icons";
 import { t } from "../i18n";
@@ -46,8 +46,8 @@ export const actionLink = register({
     const selectedElements = getSelectedElements(elements, appState);
 
     return (
-      <ToolButton
-        type="button"
+      <IconButton
+        type="toggle"
         icon={LinkIcon}
         aria-label={t(
           getContextMenuLabel(getNonDeletedElements(elements), appState),
@@ -57,8 +57,8 @@ export const actionLink = register({
             ? t("labels.link.labelEmbed")
             : t("labels.link.label")
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
-        onClick={() => updateData(null)}
-        selected={selectedElements.length === 1 && !!selectedElements[0].link}
+        onSelect={() => updateData(null)}
+        checked={selectedElements.length === 1 && !!selectedElements[0].link}
       />
     );
   },

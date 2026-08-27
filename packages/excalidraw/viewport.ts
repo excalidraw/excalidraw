@@ -1,7 +1,10 @@
+// this file contains viewport-related utilities that are stateless or
+// reused throughout the codebase not just directly by App.tsx or AppViewport
+//
+// for editor instance specific, see App.viewport.ts
+
 import {
   arrayToMap,
-  easeOut,
-  isBounds,
   MAX_ZOOM,
   MIN_ZOOM,
   viewportCoordsToSceneCoords,
@@ -13,23 +16,14 @@ import {
   CaptureUpdateAction,
   getCommonBounds,
   getElementBounds,
-  getElementsInGroup,
   getVisibleElements,
-  isElementLink,
-  isExcalidrawElement,
-  parseElementLinkFromURL,
 } from "@excalidraw/element";
 
 import type { SceneBounds } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
-import type {
-  ExcalidrawElement,
-  NonDeleted,
-  NonDeletedSceneElementsMap,
-} from "@excalidraw/element/types";
+import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { AnimationController } from "./renderer/animation";
 import { getNormalizedZoom } from "./scene";
 
 import type {
@@ -42,16 +36,14 @@ import type {
   Zoom,
 } from "./types";
 
-export const SCROLL_TO_CONTENT_ANIMATION_KEY = "animateScrollToContent";
-
-const DEFAULT_SCROLL_ANIMATION_DURATION = 500;
-
-/** rubberband snap-back animation duration, in ms — kept snappier than the
- * default scroll animation so releasing an overscroll feels responsive */
-const SNAP_BACK_ANIMATION_DURATION = 250;
-
 /** default rubberband overscroll give for scroll locks, in viewport px */
 export const DEFAULT_OVERSCROLL = 150;
+
+type ZoomOptions = {
+  viewportX: number;
+  viewportY: number;
+  nextZoom: NormalizedZoomValue;
+};
 
 export type AnimationOptions = {
   duration?: number;
@@ -62,22 +54,6 @@ export type SetViewportRect = {
   y: number;
   width?: number;
   height?: number;
-};
-
-export const isSetViewportRect = (
-  target: unknown,
-): target is SetViewportRect => {
-  if (!target || typeof target !== "object" || Array.isArray(target)) {
-    return false;
-  }
-
-  const rect = target as Partial<SetViewportRect>;
-  return (
-    typeof rect.x === "number" &&
-    typeof rect.y === "number" &&
-    (rect.width == null || typeof rect.width === "number") &&
-    (rect.height == null || typeof rect.height === "number")
-  );
 };
 
 export type SetViewportOptions = {
@@ -131,30 +107,6 @@ export type SetViewportOptions = {
 };
 
 type Viewport = Pick<AppState, "scrollX" | "scrollY" | "zoom">;
-
-const resolveAnimationDuration = (
-  animation: AnimationOptions | boolean | undefined,
-): number | null => {
-  if (animation === false) {
-    return null;
-  }
-  if (animation === true || animation == null) {
-    return DEFAULT_SCROLL_ANIMATION_DURATION;
-  }
-  return animation.duration ?? DEFAULT_SCROLL_ANIMATION_DURATION;
-};
-
-const resolveOverscroll = (
-  overscroll: boolean | number | undefined,
-): number => {
-  if (overscroll === false) {
-    return 0;
-  }
-  if (overscroll === true || overscroll == null) {
-    return DEFAULT_OVERSCROLL;
-  }
-  return Math.max(overscroll, 0);
-};
 
 /**
  * Clamps a single scroll axis so the visible scene span stays inside the box.
@@ -248,89 +200,68 @@ export const constrainScrollState = (
   };
 };
 
-export const isViewportOverscrolled = (
-  state: Pick<
-    AppState,
-    "scrollX" | "scrollY" | "zoom" | "width" | "height" | "scrollConstraints"
-  >,
-): boolean => {
-  if (!state.scrollConstraints) {
-    return false;
-  }
+/** private helper. Use {@link getViewportForZoomWithScrollConstraints} instead */
+const getViewportForZoom = (
+  { viewportX, viewportY, nextZoom }: ZoomOptions,
+  appState: AppState,
+): Viewport => {
+  const appLayerX = viewportX - appState.offsetLeft;
+  const appLayerY = viewportY - appState.offsetTop;
 
-  const target = constrainScrollState(state); // hard clamp (no overscroll give)
+  const currentZoom = appState.zoom.value;
 
-  return (
-    target.scrollX !== state.scrollX ||
-    target.scrollY !== state.scrollY ||
-    target.zoom.value !== state.zoom.value
-  );
+  // get original scroll position without zoom
+  const baseScrollX = appState.scrollX + (appLayerX - appLayerX / currentZoom);
+  const baseScrollY = appState.scrollY + (appLayerY - appLayerY / currentZoom);
+
+  // get scroll offsets for target zoom level
+  const zoomOffsetScrollX = -(appLayerX - appLayerX / nextZoom);
+  const zoomOffsetScrollY = -(appLayerY - appLayerY / nextZoom);
+
+  return {
+    scrollX: baseScrollX + zoomOffsetScrollX,
+    scrollY: baseScrollY + zoomOffsetScrollY,
+    zoom: {
+      value: nextZoom,
+    },
+  };
 };
 
 /**
- * Rubberband snap-back: animates the viewport from its current (possibly
- * overscrolled) position back inside the lock box via the shared
- * AnimationController. No-op when already within the hard bounds (or when there
- * is no lock).
+ * Resolves a focal-point zoom against the active scroll constraints while
+ * preserving the current rubberband displacement in screen pixels. This lets
+ * zoom and scroll-constraint snap-back compose without either visually
+ * cancelling the other.
  */
-export const animateToConstraints = (
-  state: Pick<
-    AppState,
-    "scrollX" | "scrollY" | "zoom" | "width" | "height" | "scrollConstraints"
-  >,
-  onFrame: (
-    viewport: Pick<
-      AppState,
-      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
-    >,
-  ) => void,
-  duration = SNAP_BACK_ANIMATION_DURATION,
-) => {
-  const target = constrainScrollState(state); // hard clamp (no overscroll give)
-
-  if (
-    target.scrollX === state.scrollX &&
-    target.scrollY === state.scrollY &&
-    target.zoom.value === state.zoom.value
-  ) {
-    return;
-  }
-
-  animateToViewport(state, target, duration, onFrame);
-};
-
-/**
- * Scrolls (and, per `fit`, zooms) the viewport so the given target box is in
- * view, optionally animating the transition. `onComplete` runs once the
- * viewport has settled on the target.
- */
-export const setViewportToBounds = (
+export const getViewportForZoomWithScrollConstraints = (
+  opts: ZoomOptions,
   state: AppState,
-  bounds: Bounds,
-  // NOTE offsets must be resolved (see `App.resolveViewportOffsets`)
-  opts: Pick<SetViewportOptions, "fit" | "animation"> & { offsets?: Offsets },
-  onFrame: (
-    state: Pick<
-      AppState,
-      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
-    >,
-  ) => void,
-  onComplete?: () => void,
-) => {
-  AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
+): Viewport => {
+  const restingViewport = constrainScrollState(state);
+  const overscrollX =
+    (state.scrollX - restingViewport.scrollX) * state.zoom.value;
+  const overscrollY =
+    (state.scrollY - restingViewport.scrollY) * state.zoom.value;
 
-  const viewport = getTargetViewport(state, bounds, opts.fit, opts.offsets);
+  const zoomedViewport = constrainScrollState({
+    ...state,
+    ...getViewportForZoom(opts, state),
+  });
 
-  const duration = resolveAnimationDuration(opts.animation);
-
-  if (duration === null) {
-    // no animation: jump straight to the target. Re-enable zoom caching in
-    // case we just cancelled an in-flight animation that had suppressed it.
-    onFrame({ ...viewport, shouldCacheIgnoreZoom: false });
-    onComplete?.();
-  } else {
-    animateToViewport(state, viewport, duration, onFrame, onComplete);
+  if (!state.scrollConstraints?.lockScroll || (!overscrollX && !overscrollY)) {
+    return zoomedViewport;
   }
+
+  const zoom = zoomedViewport.zoom.value;
+  return constrainScrollState(
+    {
+      ...state,
+      ...zoomedViewport,
+      scrollX: zoomedViewport.scrollX + overscrollX / zoom,
+      scrollY: zoomedViewport.scrollY + overscrollY / zoom,
+    },
+    state.scrollConstraints.overscroll,
+  );
 };
 
 const zoomValueToFitBoundsOnViewport = (
@@ -426,246 +357,6 @@ export const zoomToFitBounds = ({
     },
     captureUpdate: CaptureUpdateAction.EVENTUALLY,
   };
-};
-
-/** Computes the viewport (scroll + zoom) that brings the target box into view,
- * based on the requested fit behavior. */
-export const getTargetViewport = (
-  state: AppState,
-  bounds: Bounds,
-  fit: SetViewportOptions["fit"] = "scale-down",
-  offsets?: Offsets,
-): Viewport => {
-  const { appState } = zoomToFitBounds({
-    bounds,
-    appState: state,
-    fit,
-    canvasOffsets: offsets,
-    steppedZoom: false,
-  });
-
-  return {
-    scrollX: appState.scrollX,
-    scrollY: appState.scrollY,
-    zoom: appState.zoom,
-  };
-};
-
-const getElementsFromId = (
-  id: string,
-  elementsMap: NonDeletedSceneElementsMap,
-) => {
-  const element = elementsMap.get(id);
-  if (element) {
-    return [element];
-  }
-
-  return getElementsInGroup(elementsMap, id);
-};
-
-export type ResolvedViewportTarget = {
-  /** null when the target couldn't be resolved (unknown id/link, or all
-   * supplied elements deleted) */
-  bounds: Bounds | null;
-  /** how the target was specified, so callers can react to unresolved
-   * targets themselves (e.g. toast on a broken element link) */
-  type: "element" | "area" | "link";
-};
-
-/** Resolves a `setViewport` target to a scene-coordinate box. */
-export const resolveViewportTarget = (
-  target: SetViewportOptions["target"],
-  elementsMap: NonDeletedSceneElementsMap,
-  appState: Pick<AppState, "width" | "height">,
-): ResolvedViewportTarget => {
-  if (typeof target === "string") {
-    const isLink = isElementLink(target);
-    const type = isLink ? ("link" as const) : ("element" as const);
-    const id = isLink ? parseElementLinkFromURL(target) : target;
-    const resolved = id ? getElementsFromId(id, elementsMap) : [];
-
-    if (!resolved.length) {
-      return { bounds: null, type };
-    }
-
-    return { bounds: getCommonBounds(resolved, elementsMap), type };
-  }
-
-  if (isBounds(target)) {
-    return { bounds: target, type: "area" };
-  }
-
-  if (isSetViewportRect(target) && !isExcalidrawElement(target)) {
-    const width = target.width ?? appState.width;
-    const height = target.height ?? appState.height;
-    return {
-      bounds: [target.x, target.y, target.x + width, target.y + height],
-      type: "area",
-    };
-  }
-
-  // widening to null values in case the host app doesn't have
-  // noUncheckedIndexedAccess enabled
-  const targetElements: (ExcalidrawElement | undefined | null)[] =
-    Array.isArray(target) ? target : [target];
-  const elements = targetElements.reduce<NonDeleted<ExcalidrawElement>[]>(
-    (acc, element) => {
-      if (element && !element.isDeleted) {
-        const sceneElement = elementsMap.get(element.id);
-        if (sceneElement) {
-          acc.push(sceneElement);
-        }
-      }
-      return acc;
-    },
-    [],
-  );
-
-  const hasNoElements = !elements.length;
-  if (elements.length !== targetElements.length || hasNoElements) {
-    console.warn(
-      "supplied element target(s) for setViewport contain deleted or non-existent elements which have been filtered out",
-    );
-  }
-
-  if (hasNoElements) {
-    return { bounds: null, type: "element" };
-  }
-
-  return { bounds: getCommonBounds(elements, elementsMap), type: "element" };
-};
-
-/** Computes the viewport patch for landing on `bounds`: the target
- * scroll/zoom, plus the scroll lock to install — or `scrollConstraints: null`
- * to clear a previous lock when none is requested. */
-export const getConstrainedTargetViewport = (
-  appState: AppState,
-  bounds: Bounds,
-  // NOTE offsets must be resolved (see `App.resolveViewportOffsets`)
-  {
-    fit,
-    offsets,
-    lock,
-  }: Pick<SetViewportOptions, "fit" | "lock"> & { offsets?: Offsets },
-): Viewport & { scrollConstraints: ScrollConstraints | null } => {
-  const viewport = getTargetViewport(appState, bounds, fit, offsets);
-
-  if (!lock?.scroll && !lock?.zoom) {
-    return { ...viewport, scrollConstraints: null };
-  }
-
-  const [x1, y1, x2, y2] = bounds;
-  const scrollConstraints: ScrollConstraints = {
-    x: x1,
-    y: y1,
-    width: x2 - x1,
-    height: y2 - y1,
-    lockScroll: !!lock.scroll,
-    lockZoom: !!lock.zoom,
-    zoom: viewport.zoom.value,
-    overscroll: resolveOverscroll(lock.overscroll),
-    offsets,
-  };
-
-  return {
-    ...constrainScrollState({ ...appState, ...viewport, scrollConstraints }),
-    scrollConstraints,
-  };
-};
-
-/**
- * Interpolates the viewport from `from` to `target` at the (already-eased)
- * blend amount `factor` (0 = `from`, 1 = `target`).
- *
- * Zoom is interpolated geometrically (so it feels uniform), but the pan can't
- * simply lerp alongside it: pairing a geometric zoom with a linear scroll (or
- * a linearly-tweened focal point) makes scene points swoop along curved,
- * non-monotone screen paths once the zoom ratio exceeds ~e (the destination
- * visibly drifts away before converging). Instead we interpolate the view
- * transform affinely — a scene point maps to screen as
- * `(scenePt + scroll) * zoom`, and requiring every point to travel a straight
- * screen line forces `zoom` to be a convex blend `(1-m)*z0 + m*z1` with
- * `scroll * zoom` lerped by that same weight. Deriving `m` from the geometric
- * zoom keeps its pacing while making all screen trajectories straight and
- * monotone.
- */
-export const interpolateViewport = ({
-  from,
-  target,
-  factor,
-}: {
-  from: Viewport;
-  target: Viewport;
-  factor: number;
-}): Viewport => {
-  if (factor >= 1) {
-    // land bit-exactly on the target (`z0 * (z1/z0)^1` can be off by an ulp)
-    return { ...target };
-  }
-
-  const zoom = (from.zoom.value *
-    Math.pow(
-      target.zoom.value / from.zoom.value,
-      factor,
-    )) as NormalizedZoomValue;
-
-  // pan blend weight derived from the zoom blend (0/0 for pure pans, hence
-  // the `factor` fallback; near-equal zooms are fine — the ratio limits to
-  // `factor` smoothly)
-  const m =
-    target.zoom.value === from.zoom.value
-      ? factor
-      : (zoom - from.zoom.value) / (target.zoom.value - from.zoom.value);
-
-  return {
-    scrollX:
-      ((1 - m) * from.scrollX * from.zoom.value +
-        m * target.scrollX * target.zoom.value) /
-      zoom,
-    scrollY:
-      ((1 - m) * from.scrollY * from.zoom.value +
-        m * target.scrollY * target.zoom.value) /
-      zoom,
-    zoom: { value: zoom },
-  };
-};
-
-/** Eases the viewport from its current position to `target` over `duration`,
- * driving the transition through the shared AnimationController so it doesn't
- * slow down other processes. */
-const animateToViewport = (
-  from: Viewport,
-  target: Viewport,
-  duration: number,
-  onFrame: (
-    state: Pick<
-      AppState,
-      "scrollX" | "scrollY" | "zoom" | "shouldCacheIgnoreZoom"
-    >,
-  ) => void,
-  onComplete?: () => void,
-) => {
-  AnimationController.start<{ elapsed: number }>(
-    SCROLL_TO_CONTENT_ANIMATION_KEY,
-    ({ deltaTime, state }) => {
-      const elapsed = (state?.elapsed ?? 0) + deltaTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const factor = easeOut(clamp(progress, 0, 1));
-
-      onFrame({
-        ...interpolateViewport({ from, target, factor }),
-        shouldCacheIgnoreZoom: progress < 1, // ignore zoom caching while animating
-      });
-
-      if (progress < 1) {
-        return { elapsed };
-      }
-
-      onComplete?.();
-
-      return null;
-    },
-  );
 };
 
 const doBoundsExceedViewport = (appState: AppState, bounds: Bounds) => {

@@ -6,16 +6,10 @@ import {
 
 import { getElementLineSegments } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
-import {
-  isFrameLikeElement,
-  isLinearElement,
-  isTextElement,
-} from "@excalidraw/element";
+import { isFrameLikeElement, isLinearElement } from "@excalidraw/element";
 
 import { getFrameChildren } from "@excalidraw/element";
 import { selectGroupsForSelectedElements } from "@excalidraw/element";
-
-import { getContainerElement } from "@excalidraw/element";
 
 import { arrayToMap, easeOut, isShallowEqual } from "@excalidraw/common";
 
@@ -97,21 +91,6 @@ export class LassoTrail extends AnimatedTrail {
       if (this.keepPreviousSelection) {
         for (const id of Object.keys(prevState.selectedElementIds)) {
           nextSelectedElementIds[id] = true;
-        }
-      }
-
-      for (const [id] of Object.entries(nextSelectedElementIds)) {
-        const element = this.app.scene.getNonDeletedElement(id);
-
-        if (element && isTextElement(element)) {
-          const container = getContainerElement(
-            element,
-            this.app.scene.getNonDeletedElementsMap(),
-          );
-          if (container) {
-            nextSelectedElementIds[container.id] = true;
-            delete nextSelectedElementIds[element.id];
-          }
         }
       }
 
@@ -202,6 +181,7 @@ export class LassoTrail extends AnimatedTrail {
         intersectedElements: this.intersectedElements,
         enclosedElements: this.enclosedElements,
         simplifyDistance: 5 / this.app.state.zoom.value,
+        mode: this.app.state.boxSelectionMode,
       });
 
       this.selectElementsFromIds(selectedElementIds);

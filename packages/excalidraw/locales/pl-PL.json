@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Wklej",
     "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
@@ -35,6 +37,9 @@
     "strokeStyle_dashed": "Linia przerywana",
     "strokeStyle_dotted": "Kropkowany",
     "sloppiness": "Styl kreski",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Przezroczystość",
     "textAlign": "Wyrównanie tekstu",
     "edges": "Krawędzie",
@@ -106,6 +111,7 @@
     "group": "Zgrupuj wybrane",
     "ungroup": "Rozgrupuj wybrane",
     "collaborators": "Współtwórcy",
+    "you": "",
     "toggleGrid": "Przełącz widoczność siatki",
     "addToLibrary": "Dodaj do biblioteki",
     "removeFromLibrary": "Usuń z biblioteki",
@@ -185,6 +191,9 @@
     "shapeSwitch": "Wybór kształtu",
     "preferences": "",
     "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
     "arrowBinding": "",
     "midpointSnapping": ""
   },
@@ -325,10 +334,16 @@
     "magicframe": "Wireframe do kodu",
     "embeddable": "Osadzenie z internetu",
     "laser": "Wskaźnik laserowy",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Ręka (narzędzie do przesuwania)",
     "extraTools": "Więcej narzędzi",
     "mermaidToExcalidraw": "Konwertuj diagram Mermaid do Excalidraw",
     "convertElementType": "Przełącz typ kształtu"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Prostokąt",
@@ -360,6 +375,7 @@
     "freeDraw": "Naciśnij i przeciągnij by rysować, puść kiedy skończysz",
     "text": "Wskazówka: możesz również dodać tekst klikając dwukrotnie gdziekolwiek za pomocą narzędzia zaznaczania",
     "embeddable": "Kliknij i przeciągnij, aby stworzyć osadzenie strony",
+    "autoshape": "",
     "text_selected": "Kliknij dwukrotnie lub naciśnij {{shortcut}}, aby edytować tekst",
     "text_editing": "Naciśnij {{shortcut_1}} lub {{shortcut_2}}, aby zakończyć edycję",
     "linearElementMulti": "Kliknij ostatni punkt lub naciśnij {{shortcut_1}} lub {{shortcut_2}}, aby zakończyć",
@@ -367,6 +383,7 @@
     "resize": "Możesz zachować proporcje, przytrzymując {{shortcut_1}} podczas zmiany rozmiaru;\nprzytrzymaj {{shortcut_2}}, aby zmienić rozmiar względem środka",
     "resizeImage": "Możesz dowolnie zmieniać rozmiar, przytrzymując {{shortcut_1}};\nprzytrzymaj {{shortcut_2}}, aby zmienić rozmiar względem środka.",
     "rotate": "Możesz ograniczyć kąty, przytrzymując {{shortcut}} podczas obracania",
+    "toggleArrowhead": "",
     "lineEditor_info": "Przytrzymaj {{shortcut_1}} i kliknij dwukrotnie lub naciśnij {{shortcut_2}}, aby edytować punkty",
     "lineEditor_line_info": "Kliknij dwukrotnie lub naciśnij {{shortcut}}, aby edytować punkty",
     "lineEditor_pointSelected": "Naciśnij {{shortcut_1}}, aby usunąć punkty,\n{{shortcut_2}}, aby je powielić, lub przeciągnij, aby je przenieść",
@@ -595,7 +612,11 @@
     "colors": "Kolory",
     "shades": "Odcienie",
     "hexCode": "Kod HEX",
-    "noShades": "Brak dostępnych odcieni dla tego koloru"
+    "noShades": "Brak dostępnych odcieni dla tego koloru",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
