@@ -79,6 +79,10 @@ type _ExcalidrawElementBase = Readonly<{
   link: string | null;
   locked: boolean;
   customData?: Record<string, any>;
+  /** Visibility flag. When false, element is skipped in rendering and hit-testing. */
+  isVisible?: boolean;
+  /** Optional layer identifier linking this element to a specific Frame Layer. */
+  layerId?: string | null;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {
@@ -160,14 +164,23 @@ export type InitializedExcalidrawImageElement = MarkNonNullable<
   "fileId"
 >;
 
+export type FrameLayer = {
+  id: string;
+  name: string;
+  isVisible: boolean;
+  color?: string;
+};
+
 export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
   type: "frame";
   name: string | null;
+  layers?: readonly FrameLayer[];
 };
 
 export type ExcalidrawMagicFrameElement = _ExcalidrawElementBase & {
   type: "magicframe";
   name: string | null;
+  layers?: readonly FrameLayer[];
 };
 
 export type ExcalidrawFrameLikeElement =

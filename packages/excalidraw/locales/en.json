@@ -168,6 +168,10 @@
       "lockAll": "Lock all",
       "unlockAll": "Unlock all"
     },
+    "elementVisibility": {
+      "hide": "Hide selection",
+      "show": "Show selection"
+    },
     "statusPublished": "Published",
     "sidebarLock": "Keep sidebar open",
     "selectAllElementsInFrame": "Select all elements in frame",
