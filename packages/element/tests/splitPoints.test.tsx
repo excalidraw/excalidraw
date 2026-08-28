@@ -15,10 +15,9 @@ import {
   render,
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
+import { RoughGenerator } from "roughjs/bin/generator";
 
 import type { LocalPoint } from "@excalidraw/math";
-
-import { RoughGenerator } from "roughjs/bin/generator";
 
 import {
   canSplitPoints,
