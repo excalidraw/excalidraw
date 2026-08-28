@@ -1,6 +1,6 @@
 import { isArrowElement, isElbowArrow } from "./typeChecks";
 
-import type { Drawable, Options } from "roughjs/bin/core";
+import type { Drawable, Op, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { RoughGenerator } from "roughjs/bin/generator";
 import type { ExcalidrawArrowElement, ExcalidrawElement } from "./types";
@@ -175,6 +175,40 @@ export const getSplitPointGroups = <P>(
 };
 
 /**
+ * rough.js' `curve()` ignores `preserveVertices` (only `line`/`linearPath`
+ * and `svgPath` honor it) and instead offsets every input point — endpoints
+ * included — by a random amount scaled with `roughness`. Two curves meeting
+ * at a split vertex therefore each wander off that vertex independently and
+ * visibly miss each other at any non-zero roughness. This snaps the start
+ * and end of every stroke (rough.js draws two per curve unless multi-stroke
+ * is disabled) back onto the exact boundary vertex so consecutive curves
+ * touch.
+ */
+const snapStrokeEndpoints = (
+  ops: readonly Op[],
+  start: readonly [number, number] | null,
+  end: readonly [number, number] | null,
+): Op[] =>
+  ops.map((op, i) => {
+    if (op.op === "move" && start) {
+      return { ...op, data: [start[0], start[1]] };
+    }
+
+    // a stroke ends on the op right before the next `move` (or on the very
+    // last op); its final coordinate pair is the stroke's endpoint
+    if (end && (i === ops.length - 1 || ops[i + 1].op === "move")) {
+      const data = op.data.slice();
+
+      data[data.length - 2] = end[0];
+      data[data.length - 1] = end[1];
+
+      return { ...op, data };
+    }
+
+    return op;
+  });
+
+/**
  * Generates one rough.js curve per split group and merges their ops into a
  * single drawable, so a split arrow is treated as one continuous shape for
  * both rendering and bounds computation.
@@ -185,14 +219,33 @@ export const generateSplitCurves = <P extends readonly [number, number]>(
   splitPoints: readonly number[],
   options: Options,
 ): Drawable => {
-  const drawables = getSplitPointGroups(points, splitPoints).map((group) =>
-    generator.curve(
+  const groups = getSplitPointGroups(points, splitPoints);
+  const drawables = groups.map((group, groupIdx) => {
+    const drawable = generator.curve(
       // SAFETY: point pairs are finite [x, y] numbers, exactly the shape
       // rough.js consumes; the cast only drops readonly
       group as unknown as RoughPoint[],
       options,
-    ),
-  );
+    );
+
+    if (groups.length === 1) {
+      return drawable;
+    }
+
+    // pin curve boundaries that fall on a split vertex onto that exact
+    // vertex; the arrow's own endpoints (first group start, last group end)
+    // keep their sketchy random offset
+    const start = groupIdx > 0 ? group[0] : null;
+    const end = groupIdx < groups.length - 1 ? group[group.length - 1] : null;
+
+    return {
+      ...drawable,
+      sets: drawable.sets.map((set) => ({
+        ...set,
+        ops: snapStrokeEndpoints(set.ops, start, end),
+      })),
+    };
+  });
 
   if (drawables.length === 1) {
     return drawables[0];
