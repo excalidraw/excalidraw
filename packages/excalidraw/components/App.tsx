@@ -162,6 +162,7 @@ import {
   getCornerRadius,
   isPathALoop,
   createSrcDoc,
+  sanitizeHtml,
   embeddableURLValidator,
   iframeValidator,
   maybeParseEmbedSrc,
@@ -679,6 +680,9 @@ class App extends React.Component<AppProps, AppState> {
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
   private _initialized = false;
+
+  /** One-time warning flag for missing validateIframe prop with iframes present */
+  private _iframeValidationWarningShown = false;
 
   private readonly editorLifecycleEvents = new AppEventBus<
     ExcalidrawImperativeAPIEventMap,
@@ -1743,6 +1747,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateEmbeddables = () => {
     const iframeLikes = new Set<ExcalidrawIframeLikeElement["id"]>();
+    let hasIframeElements = false;
 
     let updated = false;
     this.scene.getNonDeletedElements().filter((element) => {
@@ -1760,17 +1765,31 @@ class App extends React.Component<AppProps, AppState> {
         }
       } else if (isIframeElement(element)) {
         iframeLikes.add(element.id);
+        hasIframeElements = true;
         if (!this.embedsValidationStatus.has(element.id)) {
           updated = true;
-          const validated = iframeValidator(
-            element,
-            this.props.validateIframe,
-          );
+          const validated = iframeValidator(element, this.props.validateIframe);
           this.updateEmbedValidationStatus(element, validated);
         }
       }
       return false;
     });
+
+    // Item 4: One-time warning when iframes exist but validateIframe prop is not set.
+    // TTD (text-to-diagram) generates iframe elements; without validateIframe: true
+    // from the host, all iframes are silently blocked.
+    if (
+      hasIframeElements &&
+      this.props.validateIframe == null &&
+      !this._iframeValidationWarningShown
+    ) {
+      this._iframeValidationWarningShown = true;
+      console.warn(
+        "[Excalidraw] Iframe elements detected but validateIframe prop is not set. " +
+          "All iframes are blocked by default. If you want to allow iframes (e.g. for " +
+          "AI text-to-diagram output), pass validateIframe={true} or a validation function.",
+      );
+    }
 
     if (updated) {
       this.scene.triggerUpdate();
@@ -1837,7 +1856,7 @@ class App extends React.Component<AppProps, AppState> {
             };
 
             if (data.status === "done") {
-              const html = data.html;
+              const html = sanitizeHtml(data.html);
               src = {
                 intrinsicSize: { w: el.width, h: el.height },
                 type: "document",
@@ -2050,7 +2069,7 @@ class App extends React.Component<AppProps, AppState> {
                           src?.sandbox?.allowSameOrigin
                             ? "allow-same-origin"
                             : ""
-                        } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
+                        } allow-scripts allow-forms allow-popups allow-presentation allow-downloads`}
                       />
                     )}
                   </div>
@@ -4170,6 +4189,15 @@ class App extends React.Component<AppProps, AppState> {
     this.handleForcedToolChange(prevProps, prevState);
 
     this.appStateObserver.flush(prevState);
+
+    // Item 5: Invalidate embeds validation cache when validateIframe prop changes.
+    // When the host switches validateIframe from true->false (or vice versa),
+    // cached validation results become stale and must be recomputed.
+    if (prevProps.validateIframe !== this.props.validateIframe) {
+      for (const [id] of this.embedsValidationStatus) {
+        this.embedsValidationStatus.delete(id);
+      }
+    }
 
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
