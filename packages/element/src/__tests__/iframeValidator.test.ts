@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
+
 import { iframeValidator } from "../embeddable";
+
 import type { ExcalidrawIframeElement } from "../types";
 
 const createIframeElement = (
@@ -34,7 +36,7 @@ const createIframeElement = (
     locked: false,
     customData: undefined,
     ...overrides,
-  }) as ExcalidrawIframeElement;
+  } as ExcalidrawIframeElement);
 
 describe("iframeValidator", () => {
   describe("AI-generated content", () => {
@@ -103,11 +105,10 @@ describe("iframeValidator", () => {
         customData: {
           generationData: {
             status: "done",
-            html: "<html><body>AI content</body></html>",
+            html: '<html><body><iframe src="https://example.com/embed"></iframe></body></html>',
           },
         },
-        src: "https://example.com/embed",
-      } as any);
+      });
       expect(iframeValidator(element, ["example.com"])).toBe(true);
     });
 
@@ -116,11 +117,10 @@ describe("iframeValidator", () => {
         customData: {
           generationData: {
             status: "done",
-            html: "<html><body>AI content</body></html>",
+            html: '<html><body><iframe src="https://evil.com/phish"></iframe></body></html>',
           },
         },
-        src: "https://evil.com/phish",
-      } as any);
+      });
       expect(iframeValidator(element, ["example.com"])).toBe(false);
     });
   });
@@ -133,7 +133,9 @@ describe("iframeValidator", () => {
 
     it("returns false when validateIframe is null", () => {
       const element = createIframeElement();
-      expect(iframeValidator(element, null)).toBe(false);
+      expect(iframeValidator(element, null as unknown as undefined)).toBe(
+        false,
+      );
     });
   });
 
@@ -165,51 +167,76 @@ describe("iframeValidator", () => {
   });
 
   describe("RegExp validateIframe", () => {
-    it("returns true when src matches the regex", () => {
+    it("returns true when HTML content matches the regex", () => {
       const element = createIframeElement({
-        src: "https://example.com/embed",
-      } as any);
+        customData: {
+          generationData: {
+            status: "done",
+            html: '<html><body><iframe src="https://example.com/embed"></iframe></body></html>',
+          },
+        },
+      });
       expect(iframeValidator(element, /example\.com/)).toBe(true);
     });
 
-    it("returns false when src does not match the regex", () => {
+    it("returns false when HTML content does not match the regex", () => {
       const element = createIframeElement({
-        src: "https://evil.com/phish",
-      } as any);
+        customData: {
+          generationData: {
+            status: "done",
+            html: '<html><body><iframe src="https://evil.com/phish"></iframe></body></html>',
+          },
+        },
+      });
       expect(iframeValidator(element, /example\.com/)).toBe(false);
     });
 
-    it("returns false when element has no src", () => {
+    it("returns false when element has no HTML content", () => {
       const element = createIframeElement();
       expect(iframeValidator(element, /example\.com/)).toBe(false);
     });
   });
 
   describe("Array validateIframe", () => {
-    it("returns true when src matches a domain string", () => {
+    it("returns true when HTML content matches a domain string", () => {
       const element = createIframeElement({
-        src: "https://example.com/embed",
-      } as any);
+        customData: {
+          generationData: {
+            status: "done",
+            html: '<html><body><iframe src="https://example.com/embed"></iframe></body></html>',
+          },
+        },
+      });
       expect(iframeValidator(element, ["example.com"])).toBe(true);
     });
 
-    it("returns true when src matches a RegExp in array", () => {
+    it("returns true when HTML content matches a RegExp in array", () => {
       const element = createIframeElement({
-        src: "https://example.com/embed",
-      } as any);
+        customData: {
+          generationData: {
+            status: "done",
+            html: '<html><body><iframe src="https://example.com/embed"></iframe></body></html>',
+          },
+        },
+      });
       expect(iframeValidator(element, [/example\.com/])).toBe(true);
     });
 
-    it("returns false when src matches nothing in array", () => {
+    it("returns false when HTML content matches nothing in array", () => {
       const element = createIframeElement({
-        src: "https://evil.com/phish",
-      } as any);
-      expect(iframeValidator(element, ["example.com", /trusted\.com/])).toBe(
+        customData: {
+          generationData: {
+            status: "done",
+            html: '<html><body><iframe src="https://evil.com/phish"></iframe></body></html>',
+          },
+        },
+      });
+      expect(iframeValidator(element, ["example.com", "trusted.com"])).toBe(
         false,
       );
     });
 
-    it("returns false when element has no src", () => {
+    it("returns false when element has no HTML content", () => {
       const element = createIframeElement();
       expect(iframeValidator(element, ["example.com"])).toBe(false);
     });
