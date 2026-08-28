@@ -286,23 +286,32 @@ const ImageExportModal = ({
           label={t("imageExportDialog.label.scale")}
           name="exportScale"
         >
-          <RadioGroup
-            name="exportScale"
-            value={exportScale}
-            onChange={(scale) => {
-              setExportScale(scale);
-              actionManager.executeAction(actionChangeExportScale, "ui", scale);
-            }}
-            choices={EXPORT_SCALES.map((scale) => {
-              const label = `${scale}\u00d7`;
+          <div
+            role="radiogroup"
+            aria-label={t("imageExportDialog.label.scale")}
+          >
+            <RadioGroup
+              name="exportScale"
+              value={exportScale}
+              onChange={(scale) => {
+                setExportScale(scale);
+                actionManager.executeAction(
+                  actionChangeExportScale,
+                  "ui",
+                  scale,
+                );
+              }}
+              choices={EXPORT_SCALES.map((scale) => {
+                const label = `${scale}\u00d7`;
 
-              return {
-                value: scale,
-                label,
-                ariaLabel: label,
-              };
-            })}
-          />
+                return {
+                  value: scale,
+                  label,
+                  ariaLabel: label,
+                };
+              })}
+            />
+          </div>
         </ExportSetting>
 
         <div className="ImageExportModal__settings__buttons">

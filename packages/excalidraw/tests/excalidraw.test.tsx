@@ -499,7 +499,7 @@ describe("<Excalidraw/>", () => {
   });
 
   describe("Test image export dialog", () => {
-    it("exposes accessible names for the export scale options", async () => {
+    it("exposes the export scale options as an accessible radio group", async () => {
       const { container } = await render(<Excalidraw />);
 
       toggleMenu(container);
@@ -508,10 +508,13 @@ describe("<Excalidraw/>", () => {
       const imageExportModal = document.querySelector(
         ".ImageExportModal",
       ) as HTMLElement;
+      const scaleRadioGroup = getByRole(imageExportModal, "radiogroup", {
+        name: "Scale",
+      });
 
       for (const scale of [1, 2, 3]) {
         expect(
-          getByRole(imageExportModal, "radio", {
+          getByRole(scaleRadioGroup, "radio", {
             name: `${scale}\u00d7`,
           }),
         ).toBeInTheDocument();
