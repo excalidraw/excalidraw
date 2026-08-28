@@ -110,6 +110,10 @@ export const SearchMenu = () => {
     matchItems: SearchMatchItem[],
     query: SearchQuery,
   ) => {
+    // `SearchQuery` is a branded string (`string & { _brand: "SearchQuery" }`),
+    // so identity equality here is really string equality. This only carries
+    // intent while that stays true — if it ever became an object, it would
+    // silently stop matching and the order snapshot would reset on every pass.
     if (
       stableOrderQueryRef.current === query &&
       stableOrderRef.current.size > 0
@@ -117,6 +121,11 @@ export const SearchMenu = () => {
       const orderMap = stableOrderRef.current;
       const positionOf = (item: SearchMatchItem) => {
         const position = orderMap.get(getStableKey(item));
+        // Matches that weren't part of the captured order yet (new elements
+        // added mid-search) all fall back to this sentinel key, so they sort
+        // to the end. Their relative order is then whatever `Array.prototype
+        // .sort`'s stability gives us — i.e. natural incoming order — rather
+        // than a derived key. That's the intended behaviour.
         return position === undefined ? Number.MAX_SAFE_INTEGER : position;
       };
 
@@ -127,6 +136,11 @@ export const SearchMenu = () => {
       stableOrderQueryRef.current = query;
     }
 
+    // Renumbering the snapshot on every pass (including the reuse branch) is
+    // deliberate: newly-appeared matches get real positions here instead of
+    // staying pinned at MAX_SAFE_INTEGER forever. Because the key is scoped to
+    // the element id + match offset — stable while elements move — already
+    // captured matches keep their original slots.
     stableOrderRef.current = new Map(
       matchItems.map((item, itemIndex) => [getStableKey(item), itemIndex]),
     );
