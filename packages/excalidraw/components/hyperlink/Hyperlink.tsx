@@ -8,7 +8,12 @@ import {
   useState,
 } from "react";
 
-import { EVENT, HYPERLINK_TOOLTIP_DELAY, KEYS } from "@excalidraw/common";
+import {
+  EVENT,
+  HYPERLINK_TOOLTIP_DELAY,
+  KEYS,
+  getTargetWindow,
+} from "@excalidraw/common";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -37,11 +42,21 @@ import type {
 } from "@excalidraw/element/types";
 
 import { trackEvent } from "../../analytics";
-import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
+import {
+  TOOLTIP_VISIBLE_CLASS,
+  getTooltipDiv,
+  hideTooltip,
+  updateTooltipPosition,
+} from "../../components/Tooltip";
 
 import { t } from "../../i18n";
 
-import { useAppProps, useEditorInterface, useExcalidrawAppState } from "../App";
+import {
+  useApp,
+  useAppProps,
+  useEditorInterface,
+  useExcalidrawAppState,
+} from "../App";
 import { IconButton } from "../IconButton";
 import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
 import { getSelectedElements } from "../../scene";
@@ -89,6 +104,7 @@ export const Hyperlink = ({
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const appState = useExcalidrawAppState();
+  const app = useApp();
   const appProps = useAppProps();
   const editorInterface = useEditorInterface();
 
@@ -200,12 +216,16 @@ export const Hyperlink = ({
   useEffect(() => {
     let timeoutId: number | null = null;
 
+    // the editor may be rendered into another document, in which case pointer
+    // events never reach the module-realm window
+    const ownerWindow = app.ownerWindow;
+
     const handlePointerMove = (event: PointerEvent) => {
       if (isEditing) {
         return;
       }
       if (timeoutId) {
-        clearTimeout(timeoutId);
+        ownerWindow.clearTimeout(timeoutId);
       }
       const shouldHide = shouldHideLinkPopup(
         element,
@@ -214,19 +234,23 @@ export const Hyperlink = ({
         pointFrom(event.clientX, event.clientY),
       ) as boolean;
       if (shouldHide) {
-        timeoutId = window.setTimeout(() => {
+        timeoutId = ownerWindow.setTimeout(() => {
           setAppState({ showHyperlinkPopup: false });
         }, AUTO_HIDE_TIMEOUT);
       }
     };
-    window.addEventListener(EVENT.POINTER_MOVE, handlePointerMove, false);
+    ownerWindow.addEventListener(EVENT.POINTER_MOVE, handlePointerMove, false);
     return () => {
-      window.removeEventListener(EVENT.POINTER_MOVE, handlePointerMove, false);
+      ownerWindow.removeEventListener(
+        EVENT.POINTER_MOVE,
+        handlePointerMove,
+        false,
+      );
       if (timeoutId) {
-        clearTimeout(timeoutId);
+        ownerWindow.clearTimeout(timeoutId);
       }
     };
-  }, [appState, element, isEditing, setAppState, elementsMap]);
+  }, [app, appState, element, isEditing, setAppState, elementsMap]);
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
@@ -390,12 +414,24 @@ export const showHyperlinkTooltip = (
   elementsMap: ElementsMap,
   ownerDocument: Document,
 ) => {
-  if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
-    HYPERLINK_TOOLTIP_OWNER_WINDOW?.clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
-  }
-  const ownerWindow = ownerDocument.defaultView;
+  const ownerWindow = getTargetWindow(ownerDocument);
   if (!ownerWindow) {
     return;
+  }
+  // there's only ever one tooltip visible, so take over the ownership from
+  // whichever document currently holds it. Without this, a tooltip shown in
+  // another document would stay visible forever, as that document no longer
+  // receives the pointer events that would hide it.
+  if (
+    HYPERLINK_TOOLTIP_OWNER_DOCUMENT &&
+    HYPERLINK_TOOLTIP_OWNER_DOCUMENT !== ownerDocument
+  ) {
+    clearHyperlinkTooltip();
+  } else if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
+    // same document -> only restart the timer, leaving an already visible
+    // tooltip alone (this runs on every pointer move over a link)
+    HYPERLINK_TOOLTIP_OWNER_WINDOW?.clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
+    HYPERLINK_TOOLTIP_TIMEOUT_ID = null;
   }
   HYPERLINK_TOOLTIP_OWNER_DOCUMENT = ownerDocument;
   HYPERLINK_TOOLTIP_OWNER_WINDOW = ownerWindow;
@@ -417,7 +453,7 @@ const renderTooltip = (
 
   const tooltipDiv = getTooltipDiv(ownerDocument);
 
-  tooltipDiv.classList.add("excalidraw-tooltip--visible");
+  tooltipDiv.classList.add(TOOLTIP_VISIBLE_CLASS);
   tooltipDiv.style.maxWidth = "20rem";
   tooltipDiv.textContent = isElementLink(element.link)
     ? t("labels.link.goToElement")
@@ -450,19 +486,28 @@ const renderTooltip = (
 
   IS_HYPERLINK_TOOLTIP_VISIBLE = true;
 };
-export const hideHyperlinkToolip = () => {
+const clearHyperlinkTooltip = () => {
   if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
     HYPERLINK_TOOLTIP_OWNER_WINDOW?.clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
     HYPERLINK_TOOLTIP_TIMEOUT_ID = null;
   }
   if (IS_HYPERLINK_TOOLTIP_VISIBLE && HYPERLINK_TOOLTIP_OWNER_DOCUMENT) {
     IS_HYPERLINK_TOOLTIP_VISIBLE = false;
-    getTooltipDiv(HYPERLINK_TOOLTIP_OWNER_DOCUMENT).classList.remove(
-      "excalidraw-tooltip--visible",
-    );
+    hideTooltip(HYPERLINK_TOOLTIP_OWNER_DOCUMENT);
   }
   HYPERLINK_TOOLTIP_OWNER_DOCUMENT = null;
   HYPERLINK_TOOLTIP_OWNER_WINDOW = null;
+};
+
+export const hideHyperlinkToolip = (ownerDocument: Document) => {
+  // another document owns the tooltip -> it's not ours to hide
+  if (
+    HYPERLINK_TOOLTIP_OWNER_DOCUMENT &&
+    HYPERLINK_TOOLTIP_OWNER_DOCUMENT !== ownerDocument
+  ) {
+    return;
+  }
+  clearHyperlinkTooltip();
 };
 
 const shouldHideLinkPopup = (
