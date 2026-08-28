@@ -1,5 +1,6 @@
 import {
   FONT_FAMILY,
+  DEFAULT_FONT_FAMILY,
   FONT_FAMILY_FALLBACKS,
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
@@ -150,14 +151,18 @@ export class Fonts {
   /**
    * Load font faces for a given scene and trigger scene update.
    */
-  public loadSceneFonts = async (): Promise<FontFace[]> => {
-    const sceneFamilies = this.getSceneFamilies();
+  public loadSceneFonts = async (
+    defaultFontFamily: ExcalidrawTextElement["fontFamily"] = DEFAULT_FONT_FAMILY,
+  ): Promise<FontFace[]> => {
     const elements = this.scene.getNonDeletedElements();
+    const sceneFamilies = Fonts.getUniqueFamilies(elements);
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
-    if (!elements.length) {
-      sceneFamilies.push(FONT_FAMILY.Excalifont);
-      charsPerFamily[FONT_FAMILY.Excalifont] = new Set("Excalidraw");
+    // prewarm the default font so that the first text element is not
+    // rendered with a fallback font
+    if (!sceneFamilies.includes(defaultFontFamily)) {
+      sceneFamilies.push(defaultFontFamily);
+      charsPerFamily[defaultFontFamily] = new Set("Excalidraw");
     }
 
     return Fonts.loadFontFaces(
@@ -471,13 +476,6 @@ export class Fonts {
     return charsPerFamily[family]
       ? Array.from(charsPerFamily[family]).join("")
       : "";
-  }
-
-  /**
-   * Get all registered font families.
-   */
-  private static getAllFamilies() {
-    return Array.from(Fonts.registered.keys());
   }
 }
 
