@@ -3343,7 +3343,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isLinksEnabled(prevProps) !== this.isLinksEnabled()) {
       if (!this.isLinksEnabled()) {
         this.hitLinkElement = undefined;
-        hideHyperlinkToolip();
+        hideHyperlinkToolip(this.ownerDocument);
         this.cursor.reset();
       }
     }
@@ -3840,6 +3840,10 @@ class App extends React.Component<AppProps, AppState> {
     this.props.onExcalidrawAPI?.(null);
 
     (this.ownerWindow as any).launchQueue?.setConsumer(() => {});
+
+    // release the tooltip ownership so we don't retain this (soon detached)
+    // document/window, or leave a pending tooltip timer around
+    hideHyperlinkToolip(this.ownerDocument);
 
     this.renderer.destroy();
     this.scene.destroy();
@@ -7350,7 +7354,7 @@ class App extends React.Component<AppProps, AppState> {
       this.editorInterface.formFactor === "phone",
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      hideHyperlinkToolip();
+      hideHyperlinkToolip(this.ownerDocument);
       let url = this.hitLinkElement.link;
       if (url) {
         url = normalizeLink(url);
@@ -7398,7 +7402,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       return true;
     }
-    hideHyperlinkToolip();
+    hideHyperlinkToolip(this.ownerDocument);
     return false;
   };
 

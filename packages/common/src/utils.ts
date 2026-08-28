@@ -48,12 +48,26 @@ export const getDateTime = () => {
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
-const getTargetWindow = (
-  target: Element | EventTarget | null,
-): (Window & typeof globalThis) | null =>
-  (target as (EventTarget & { ownerDocument?: Document | null }) | null)
-    ?.ownerDocument?.defaultView ??
-  (typeof window === "undefined" ? null : window);
+/**
+ * Resolves the window owning `target`, so that we keep working when the editor
+ * is rendered into another document. Accepts a `Document` as well, in which
+ * case its `defaultView` is used. Falls back to the module realm's window.
+ */
+export const getTargetWindow = (
+  target: Element | EventTarget | Document | null,
+): (Window & typeof globalThis) | null => {
+  const owner = target as
+    | (EventTarget & {
+        ownerDocument?: Document | null;
+        defaultView?: (Window & typeof globalThis) | null;
+      })
+    | null;
+  return (
+    owner?.ownerDocument?.defaultView ??
+    owner?.defaultView ??
+    (typeof window === "undefined" ? null : window)
+  );
+};
 
 export const isToolIcon = (
   target: Element | EventTarget | null,
