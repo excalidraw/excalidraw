@@ -221,8 +221,16 @@ export const generateRoughOptions = (
     hachureGap: element.strokeWidth * 4,
     roughness: adjustRoughness(element),
     stroke: applyDarkModeFilter(element.strokeColor, isDarkMode),
+    // force preserveVertices when the element has split points, because
+    // each split segment is an independent curve and, without preserved
+    // vertices, both curves would offset their shared boundary vertex
+    // independently, rendering a visible gap or overlap instead of a
+    // sharp joint (roughjs has no per-vertex option, so it is forced for
+    // the whole shape)
     preserveVertices:
-      continuousPath || element.roughness < ROUGHNESS.cartoonist,
+      continuousPath ||
+      element.roughness < ROUGHNESS.cartoonist ||
+      getSplitPoints(element).length > 0,
   };
 
   switch (element.type) {
@@ -601,12 +609,21 @@ const generateSplittableCurve = (
   const splitPoints = getSplitPoints(element);
 
   if (!splitPoints.length) {
-    return generator.curve(points as unknown as RoughPoint[], options);
+    return generator.curve(
+      // SAFETY: LocalPoint pairs are readonly finite [x, y] numbers, exactly
+      // the shape roughjs consumes as RoughPoint; the cast only drops readonly
+      points as unknown as RoughPoint[],
+      options,
+    );
   }
 
   return mergeDrawables(
     getSplitPointGroups(points, splitPoints).map((group) =>
-      generator.curve(group as unknown as RoughPoint[], options),
+      generator.curve(
+        // SAFETY: LocalPoint -> RoughPoint; the cast only drops readonly
+        group as unknown as RoughPoint[],
+        options,
+      ),
     ),
   );
 };
@@ -655,6 +672,9 @@ export const generateLinearCollisionShape = (
         });
       }
 
+      // SAFETY: LocalPoint pairs are readonly finite [x, y] numbers, exactly
+      // the shape roughjs consumes as RoughPoint; the cast only drops
+      // readonly
       return getSplitPointGroups(points, getSplitPoints(element))
         .flatMap((group) =>
           generator
@@ -945,11 +965,21 @@ const _generateElementShape = (
         // this simplifies finding the curve for an element
         if (options.fill) {
           shape = [
-            generator.polygon(points as unknown as RoughPoint[], options),
+            generator.polygon(
+              // SAFETY: LocalPoint -> RoughPoint; the cast only drops
+              // readonly
+              points as unknown as RoughPoint[],
+              options,
+            ),
           ];
         } else {
           shape = [
-            generator.linearPath(points as unknown as RoughPoint[], options),
+            generator.linearPath(
+              // SAFETY: LocalPoint -> RoughPoint; the cast only drops
+              // readonly
+              points as unknown as RoughPoint[],
+              options,
+            ),
           ];
         }
       } else {
@@ -1306,11 +1336,17 @@ export const getFreedrawOutlinePoints = (
 export const getFreedrawStrokeCenterPoints = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number][] =>
-  getStrokePoints(element.points as unknown as number[][], {
-    size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
-    streamline: getFreedrawStreamline(element),
-    last: true,
-  }).map((strokePoint) => strokePoint.point as [number, number]);
+  getStrokePoints(
+    // SAFETY: freedraw points are [x, y] coordinate pairs, which is all
+    // perfect-freehand's getStrokePoints reads; the cast only widens the
+    // tuple to number[]
+    element.points as unknown as number[][],
+    {
+      size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
+      streamline: getFreedrawStreamline(element),
+      last: true,
+    },
+  ).map((strokePoint) => strokePoint.point as [number, number]);
 
 const med = (A: number[], B: number[]) => {
   return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
