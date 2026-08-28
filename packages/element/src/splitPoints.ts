@@ -1,5 +1,8 @@
 import { isArrowElement, isElbowArrow } from "./typeChecks";
 
+import type { Drawable, Options } from "roughjs/bin/core";
+import type { Point as RoughPoint } from "roughjs/bin/geometry";
+import type { RoughGenerator } from "roughjs/bin/generator";
 import type { ExcalidrawArrowElement, ExcalidrawElement } from "./types";
 
 /**
@@ -169,4 +172,37 @@ export const getSplitPointGroups = <P>(
   groups.push(points.slice(start));
 
   return groups;
+};
+
+/**
+ * Generates one rough.js curve per split group and merges their ops into a
+ * single drawable, so a split arrow is treated as one continuous shape for
+ * both rendering and bounds computation.
+ */
+export const generateSplitCurves = <P extends readonly [number, number]>(
+  generator: RoughGenerator,
+  points: readonly P[],
+  splitPoints: readonly number[],
+  options: Options,
+): Drawable => {
+  const drawables = getSplitPointGroups(points, splitPoints).map((group) =>
+    generator.curve(
+      // SAFETY: point pairs are finite [x, y] numbers, exactly the shape
+      // rough.js consumes; the cast only drops readonly
+      group as unknown as RoughPoint[],
+      options,
+    ),
+  );
+
+  if (drawables.length === 1) {
+    return drawables[0];
+  }
+
+  return {
+    ...drawables[0],
+    sets: drawables[0].sets.map((set, setIdx) => ({
+      ...set,
+      ops: drawables.flatMap((drawable) => drawable.sets[setIdx]?.ops ?? []),
+    })),
+  };
 };

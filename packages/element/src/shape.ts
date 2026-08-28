@@ -55,7 +55,11 @@ import {
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
-import { getSplitPointGroups, getSplitPoints } from "./splitPoints";
+import {
+  generateSplitCurves,
+  getSplitPointGroups,
+  getSplitPoints,
+} from "./splitPoints";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -584,49 +588,13 @@ const getArrowheadShapes = (
   }
 };
 
-const mergeDrawables = (drawables: Drawable[]): Drawable => {
-  if (drawables.length === 1) {
-    return drawables[0];
-  }
-
-  const [first] = drawables;
-
-  return {
-    ...first,
-    sets: first.sets.map((set, setIdx) => ({
-      ...set,
-      ops: drawables.flatMap((drawable) => drawable.sets[setIdx]?.ops ?? []),
-    })),
-  };
-};
-
 const generateSplittableCurve = (
   generator: RoughGenerator,
   element: ExcalidrawElement,
   points: readonly LocalPoint[],
   options: Options,
-): Drawable => {
-  const splitPoints = getSplitPoints(element);
-
-  if (!splitPoints.length) {
-    return generator.curve(
-      // SAFETY: LocalPoint pairs are readonly finite [x, y] numbers, exactly
-      // the shape roughjs consumes as RoughPoint; the cast only drops readonly
-      points as unknown as RoughPoint[],
-      options,
-    );
-  }
-
-  return mergeDrawables(
-    getSplitPointGroups(points, splitPoints).map((group) =>
-      generator.curve(
-        // SAFETY: LocalPoint -> RoughPoint; the cast only drops readonly
-        group as unknown as RoughPoint[],
-        options,
-      ),
-    ),
-  );
-};
+): Drawable =>
+  generateSplitCurves(generator, points, getSplitPoints(element), options);
 
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
