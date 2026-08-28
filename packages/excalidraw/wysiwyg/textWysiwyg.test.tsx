@@ -672,7 +672,7 @@ describe("textWysiwyg", () => {
       textarea.value = `Line#1\n   Line#2`;
       textarea.selectionStart = 9;
       textarea.selectionEnd = 9;
-      
+
       fireEvent.keyDown(textarea, {
         key: KEYS.TAB,
         shiftKey: true,
