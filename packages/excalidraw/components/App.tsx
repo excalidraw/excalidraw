@@ -1085,7 +1085,9 @@ class App extends React.Component<AppProps, AppState> {
     let data = null;
     try {
       data = JSON.parse(event.data);
-    } catch (e) {}
+    } catch (e) {
+      // ignore: window messages from non-Excalidraw senders are not JSON
+    }
     if (!data) {
       return;
     }
@@ -3617,10 +3619,16 @@ class App extends React.Component<AppProps, AppState> {
     // can be loaded fresh
     this.clearImageShapeCache();
 
-    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
-    this.fonts.loadSceneFonts().then((fontFaces) => {
-      this.fonts.onLoaded(fontFaces);
-    });
+    // manually loading the font faces seems faster even in browsers that do
+    // fire the loadingdone event. Prewarming the default font family, so that
+    // the first text element is not rendered with a fallback font.
+    // NOTE: reading from `restoredAppState` instead of `this.state`, as the
+    // `syncActionResult` above sets the state asynchronously
+    this.fonts
+      .loadSceneFonts(restoredAppState.currentItemFontFamily)
+      .then((fontFaces) => {
+        this.fonts.onLoaded(fontFaces);
+      });
 
     if (isElementLink(this.ownerWindow.location.href)) {
       this.viewport.setViewport({
@@ -3682,7 +3690,7 @@ class App extends React.Component<AppProps, AppState> {
     this.viewport.invalidateUIOffset("stylesPanel");
 
     if (prevStylesPanelMode !== "full" && nextStylesPanelMode === "full") {
-      this.setState((prevState) => ({
+      this.setState(() => ({
         preferredSelectionTool: {
           type: "selection",
           initialized: true,
@@ -4268,8 +4276,9 @@ class App extends React.Component<AppProps, AppState> {
         // execute only if the condition still holds when the deferred callback
         // executes (it can be scheduled multiple times depending on how
         // many times the component renders)
-        this.state.selectedLinearElement?.isEditing &&
+        if (this.state.selectedLinearElement?.isEditing) {
           this.actionManager.executeAction(actionFinalize);
+        }
       });
     }
 
@@ -8235,7 +8244,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // set touch moving for mobile context menu
-  private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
+  private handleTouchMove = (_event: React.TouchEvent<HTMLCanvasElement>) => {
     if (!this.isInteractionEnabled()) {
       return;
     }
@@ -8521,7 +8530,7 @@ class App extends React.Component<AppProps, AppState> {
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
     if (!this.state.penDetected && event.pointerType === "pen") {
-      this.setState((prevState) => {
+      this.setState(() => {
         return {
           penMode: true,
           penDetected: true,
@@ -8710,7 +8719,9 @@ class App extends React.Component<AppProps, AppState> {
 
           Object.keys(prevState.selectedElementIds).forEach((id) => {
             const element = this.scene.getElement(id);
-            element && previouslySelectedElements.push(element);
+            if (element) {
+              previouslySelectedElements.push(element);
+            }
           });
 
           const hitElement = pointerDownState.hit.element!;
@@ -9651,7 +9662,9 @@ class App extends React.Component<AppProps, AppState> {
 
                 Object.keys(prevState.selectedElementIds).forEach((id) => {
                   const element = this.scene.getElement(id);
-                  element && previouslySelectedElements.push(element);
+                  if (element) {
+                    previouslySelectedElements.push(element);
+                  }
                 });
 
                 // if hitElement is frame-like, deselect all of its elements
@@ -10564,7 +10577,9 @@ class App extends React.Component<AppProps, AppState> {
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
       // Prevents focus from escaping excalidraw tab
-      event.key === KEYS.ALT && event.preventDefault();
+      if (event.key === KEYS.ALT) {
+        event.preventDefault();
+      }
       if (this.maybeHandleResize(pointerDownState, event)) {
         return;
       }
@@ -11636,7 +11651,9 @@ class App extends React.Component<AppProps, AppState> {
             .map((e) => elementsMap.get(e.id))
             .filter((e) => isElbowArrow(e))
             .forEach((e) => {
-              !!e && this.scene.mutateElement(e, {});
+              if (e) {
+                this.scene.mutateElement(e, {});
+              }
             });
         }
       }
@@ -13979,7 +13996,9 @@ class App extends React.Component<AppProps, AppState> {
           offsetTop,
         },
         () => {
-          cb && cb();
+          if (cb) {
+            cb();
+          }
         },
       );
       // a smaller viewport may push the min zoom up / shrink the pan range

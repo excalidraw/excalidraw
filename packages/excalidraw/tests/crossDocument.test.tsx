@@ -7,9 +7,9 @@ import {
 } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { MIME_TYPES } from "@excalidraw/common";
+import { FONT_FAMILY, MIME_TYPES } from "@excalidraw/common";
 
-import { newImageElement } from "@excalidraw/element";
+import { newImageElement, newTextElement } from "@excalidraw/element";
 
 import type { FileId } from "@excalidraw/element/types";
 
@@ -20,6 +20,12 @@ import type { DataURL, ExcalidrawImperativeAPI } from "../types";
 
 describe("cross-document rendering", () => {
   it("scopes listeners, fonts, and portals to ownerDocument", async () => {
+    const sceneTextElement = newTextElement({
+      x: 0,
+      y: 0,
+      text: "Code",
+      fontFamily: FONT_FAMILY.Virgil,
+    });
     const iframe = document.createElement("iframe");
     document.body.append(iframe);
 
@@ -73,6 +79,7 @@ describe("cross-document rendering", () => {
       const renderResult = renderReact(
         <Excalidraw
           ownerDocument={ownerDocument}
+          initialData={{ elements: [sceneTextElement] }}
           handleKeyboardGlobally={true}
           onExcalidrawAPI={(nextApi) => {
             api = nextApi;
@@ -136,10 +143,19 @@ describe("cross-document rendering", () => {
         expect.any(Function),
         { passive: false },
       );
+      // the scene text element's font is loaded with its unique characters
+      await waitFor(() =>
+        expect(fonts.load).toHaveBeenCalledWith(
+          expect.stringContaining("Virgil"),
+          expect.stringContaining("Code"),
+        ),
+      );
+      // the default font family is prewarmed even though the scene
+      // does not use it (chars are deduped, so "Excalidraw" -> "Excalidr")
       await waitFor(() =>
         expect(fonts.load).toHaveBeenCalledWith(
           expect.stringContaining("Excalifont"),
-          expect.stringContaining("Excalid"),
+          expect.stringContaining("Excalidr"),
         ),
       );
 
