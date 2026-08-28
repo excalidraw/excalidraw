@@ -225,16 +225,12 @@ export const generateRoughOptions = (
     hachureGap: element.strokeWidth * 4,
     roughness: adjustRoughness(element),
     stroke: applyDarkModeFilter(element.strokeColor, isDarkMode),
-    // force preserveVertices when the element has split points, because
-    // each split segment is an independent curve and, without preserved
-    // vertices, both curves would offset their shared boundary vertex
-    // independently, rendering a visible gap or overlap instead of a
-    // sharp joint (roughjs has no per-vertex option, so it is forced for
-    // the whole shape)
+    // note that rough.js only honors preserveVertices for lines/linear
+    // paths and svg paths. Curves always offset their vertices with
+    // roughness, so split arrows instead pin their shared boundary
+    // vertices in `generateSplitCurves()`
     preserveVertices:
-      continuousPath ||
-      element.roughness < ROUGHNESS.cartoonist ||
-      getSplitPoints(element).length > 0,
+      continuousPath || element.roughness < ROUGHNESS.cartoonist,
   };
 
   switch (element.type) {

@@ -18,8 +18,11 @@ import {
 
 import type { LocalPoint } from "@excalidraw/math";
 
+import { RoughGenerator } from "roughjs/bin/generator";
+
 import {
   canSplitPoints,
+  generateSplitCurves,
   getSplitPointGroups,
   getSplitPoints,
   isSplitPoint,
@@ -258,6 +261,48 @@ describe("arrow split points", () => {
       expect(firstCurveEnd[1]).toBeCloseTo(100, 5);
       expect(secondCurveStart[0]).toBeCloseTo(100, 5);
       expect(secondCurveStart[1]).toBeCloseTo(100, 5);
+    });
+
+    it("makes consecutive curves touch at any roughness", () => {
+      // rough.js `curve()` randomly offsets endpoints proportionally to
+      // roughness (it ignores `preserveVertices`), so without pinning, each
+      // multi-stroke pass of both curves would miss the shared vertex
+      // independently
+      const arrow = createArrow({ splitPoints: [1], roughness: 1 });
+      const drawable = generateSplitCurves(
+        new RoughGenerator(),
+        arrow.points,
+        getSplitPoints(arrow),
+        { seed: arrow.seed, roughness: arrow.roughness },
+      );
+      const ops = drawable.sets[0].ops;
+
+      // two curves × two multi-stroke passes
+      const moveIndices = ops
+        .map((op, idx) => (op.op === "move" ? idx : -1))
+        .filter((idx) => idx !== -1);
+
+      expect(moveIndices).toHaveLength(4);
+
+      const strokeEndsAt = (startIdx: number) => {
+        let idx = startIdx;
+        while (idx + 1 < ops.length && ops[idx + 1].op !== "move") {
+          idx++;
+        }
+        return ops[idx].data.slice(-2);
+      };
+
+      // both passes of the first curve end exactly on the split vertex, and
+      // both passes of the second curve start exactly there too
+      for (const [strokeIdx, moveIdx] of moveIndices.entries()) {
+        const firstCurve = strokeIdx < 2;
+
+        if (firstCurve) {
+          expect(strokeEndsAt(moveIdx)).toEqual([100, 100]);
+        } else {
+          expect(ops[moveIdx].data).toEqual([100, 100]);
+        }
+      }
     });
   });
 
