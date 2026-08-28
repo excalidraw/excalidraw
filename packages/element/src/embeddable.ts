@@ -539,12 +539,8 @@ export const iframeValidator = (
   element: ExcalidrawIframeElement,
   validateIframe: ExcalidrawProps["validateIframe"],
 ): boolean => {
-  // AI-generated content is always allowed (it's local HTML, not external URL)
-  if (element.customData?.generationData?.status === "done") {
-    return true;
-  }
-
   // If no validateIframe prop, use default: block all iframe (secure default)
+  // This prevents phishing attacks via collab where attacker sets status="done"
   if (validateIframe == null) {
     return false;
   }

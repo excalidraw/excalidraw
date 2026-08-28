@@ -38,7 +38,7 @@ const createIframeElement = (
 
 describe("iframeValidator", () => {
   describe("AI-generated content", () => {
-    it("returns true for AI-generated content with status 'done'", () => {
+    it("returns false for AI-generated content when no validateIframe prop (secure default)", () => {
       const element = createIframeElement({
         customData: {
           generationData: {
@@ -47,10 +47,10 @@ describe("iframeValidator", () => {
           },
         },
       });
-      expect(iframeValidator(element, undefined)).toBe(true);
+      expect(iframeValidator(element, undefined)).toBe(false);
     });
 
-    it("returns true for AI-generated content even with validateIframe: false", () => {
+    it("returns false for AI-generated content with validateIframe: false", () => {
       const element = createIframeElement({
         customData: {
           generationData: {
@@ -59,10 +59,10 @@ describe("iframeValidator", () => {
           },
         },
       });
-      expect(iframeValidator(element, false)).toBe(true);
+      expect(iframeValidator(element, false)).toBe(false);
     });
 
-    it("returns true for AI-generated content with no validateIframe prop", () => {
+    it("returns true for AI-generated content only when validateIframe: true", () => {
       const element = createIframeElement({
         customData: {
           generationData: {
@@ -71,7 +71,57 @@ describe("iframeValidator", () => {
           },
         },
       });
-      expect(iframeValidator(element, null)).toBe(true);
+      expect(iframeValidator(element, true)).toBe(true);
+    });
+
+    it("returns false for AI-generated content with function that rejects", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+      });
+      expect(iframeValidator(element, () => false)).toBe(false);
+    });
+
+    it("returns true for AI-generated content with function that accepts", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+      });
+      expect(iframeValidator(element, () => true)).toBe(true);
+    });
+
+    it("returns true for AI content when in allowlist", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+        src: "https://example.com/embed",
+      } as any);
+      expect(iframeValidator(element, ["example.com"])).toBe(true);
+    });
+
+    it("returns false for AI content not in allowlist", () => {
+      const element = createIframeElement({
+        customData: {
+          generationData: {
+            status: "done",
+            html: "<html><body>AI content</body></html>",
+          },
+        },
+        src: "https://evil.com/phish",
+      } as any);
+      expect(iframeValidator(element, ["example.com"])).toBe(false);
     });
   });
 
@@ -165,8 +215,8 @@ describe("iframeValidator", () => {
     });
   });
 
-  describe("AI-generated content takes precedence", () => {
-    it("returns true for AI content even with empty allowlist", () => {
+  describe("AI-generated content follows same rules as regular iframes", () => {
+    it("returns false for AI content with empty allowlist", () => {
       const element = createIframeElement({
         customData: {
           generationData: {
@@ -175,10 +225,10 @@ describe("iframeValidator", () => {
           },
         },
       });
-      expect(iframeValidator(element, [])).toBe(true);
+      expect(iframeValidator(element, [])).toBe(false);
     });
 
-    it("returns true for AI content with function that would reject", () => {
+    it("returns false for AI content with function that rejects", () => {
       const element = createIframeElement({
         customData: {
           generationData: {
@@ -187,7 +237,7 @@ describe("iframeValidator", () => {
           },
         },
       });
-      expect(iframeValidator(element, () => false)).toBe(true);
+      expect(iframeValidator(element, () => false)).toBe(false);
     });
   });
 });
