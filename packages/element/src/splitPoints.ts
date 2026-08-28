@@ -87,6 +87,32 @@ export const shiftSplitPointsOnInsert = (
 };
 
 /**
+ * Keeps split indices pointing at the same points after a copy of each point in
+ * `duplicatedIndices` has been inserted directly after it (as `Cmd+D` does in
+ * the line editor). A split on a duplicated point stays on the original.
+ */
+export const shiftSplitPointsOnDuplicate = (
+  element: ExcalidrawElement,
+  duplicatedIndices: readonly number[],
+): ExcalidrawArrowElement["splitPoints"] | undefined => {
+  const current = getSplitPoints(element);
+
+  if (!current.length || !duplicatedIndices.length) {
+    return undefined;
+  }
+
+  const duplicated = new Set(duplicatedIndices);
+
+  return normalizeSplitPoints(
+    current.map(
+      (index) =>
+        index +
+        Array.from(duplicated).filter((dupIndex) => dupIndex < index).length,
+    ),
+  );
+};
+
+/**
  * Keeps split indices pointing at the same points after the points at
  * `deletedIndices` have been removed. Splits on deleted points are dropped.
  */
