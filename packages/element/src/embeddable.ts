@@ -169,6 +169,53 @@ export const createSrcDoc = (body: string) => {
   return `<html><body>${body}</body></html>`;
 };
 
+/**
+ * Sanitize HTML for use in iframe srcdoc.
+ *
+ * Strips elements and attributes that could execute code outside the sandbox:
+ * - `<script>` elements
+ * - Event-handler attributes (`on*`)
+ * - `javascript:` URLs in href/src/action/formaction attributes
+ *
+ * The rest of the HTML is preserved so that diagram rendering is unaffected.
+ */
+export const sanitizeHtml = (html: string): string => {
+  const doc = new DOMParser().parseFromString(html, "text/html");
+
+  // 1. Remove <script> elements
+  const scripts = doc.querySelectorAll("script");
+  for (const el of scripts) {
+    el.remove();
+  }
+
+  // 2. Remove event-handler attributes (on*) from every element
+  const allElements = doc.querySelectorAll("*");
+  for (const el of allElements) {
+    const attrs = [...el.attributes];
+    for (const attr of attrs) {
+      if (attr.name.startsWith("on")) {
+        el.removeAttribute(attr.name);
+      }
+    }
+  }
+
+  // 3. Neutralise javascript: URLs in common attributes
+  const URL_ATTRS = ["href", "src", "action", "formaction"];
+  for (const el of allElements) {
+    for (const attrName of URL_ATTRS) {
+      const val = el.getAttribute(attrName);
+      if (val && /^\s*javascript\s*:/i.test(val)) {
+        el.removeAttribute(attrName);
+      }
+    }
+  }
+
+  // Serialize back to a string.
+  // documentElement.outerHTML keeps the original structure (including <html>,
+  // <head>, <body>, etc.) that the parser inferred.
+  return doc.documentElement.outerHTML;
+};
+
 export const getEmbedLink = (
   link: string | null | undefined,
 ): IframeDataWithSandbox | null => {
@@ -556,20 +603,27 @@ export const iframeValidator = (
     return typeof result === "boolean" ? result : false;
   }
 
-  // RegExp: test against element's src
+  // RegExp: test against element's HTML content (ExcalidrawIframeElement has no
+  // src property; the actual content lives in customData.generationData.html)
   if (validateIframe instanceof RegExp) {
-    const src = (element as any).src || "";
-    return validateIframe.test(src);
+    const genData = element.customData?.generationData;
+    const content = genData && "html" in genData ? genData.html : "";
+    return validateIframe.test(content);
   }
 
   // Array of RegExp or domain strings
   if (Array.isArray(validateIframe)) {
-    const src = (element as any).src || "";
+    const genData = element.customData?.generationData;
+    const content = genData && "html" in genData ? genData.html : "";
     for (const pattern of validateIframe) {
       if (pattern instanceof RegExp) {
-        if (pattern.test(src)) return true;
+        if (pattern.test(content)) {
+          return true;
+        }
       } else if (typeof pattern === "string") {
-        if (matchHostname(src, pattern)) return true;
+        if (content.includes(pattern)) {
+          return true;
+        }
       }
     }
     return false;
