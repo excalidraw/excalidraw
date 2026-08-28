@@ -62,6 +62,7 @@ import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
 import {
   shiftSplitPointsOnDelete,
+  shiftSplitPointsOnDuplicate,
   shiftSplitPointsOnInsert,
 } from "./splitPoints";
 import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
@@ -1475,7 +1476,14 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    scene.mutateElement(element, { points: nextPoints });
+    const splitPoints = isArrowElement(element)
+      ? shiftSplitPointsOnDuplicate(element, selectedPointsIndices)
+      : undefined;
+
+    scene.mutateElement(element, {
+      points: nextPoints,
+      ...(splitPoints !== undefined ? { splitPoints } : {}),
+    });
 
     // temp hack to ensure the line doesn't move when adding point to the end,
     // potentially expanding the bounding box

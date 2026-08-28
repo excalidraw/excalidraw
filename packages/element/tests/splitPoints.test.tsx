@@ -7,6 +7,7 @@ import {
   exportToCanvas,
   exportToSvg,
 } from "@excalidraw/excalidraw";
+import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
@@ -23,6 +24,7 @@ import {
   getSplitPoints,
   isSplitPoint,
   shiftSplitPointsOnDelete,
+  shiftSplitPointsOnDuplicate,
   shiftSplitPointsOnInsert,
   toggleSplitPoint,
 } from "../src/splitPoints";
@@ -153,6 +155,29 @@ describe("arrow split points", () => {
       expect(shiftSplitPointsOnDelete(arrow, [0])).toEqual([2]);
     });
 
+    it("shifts split indices when points are duplicated", () => {
+      const arrow = createArrow({
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(50, 50),
+          pointFrom<LocalPoint>(100, 0),
+          pointFrom<LocalPoint>(150, 50),
+          pointFrom<LocalPoint>(200, 0),
+        ],
+        splitPoints: [3],
+      });
+
+      // a copy lands after point 1, pushing the split one along
+      expect(shiftSplitPointsOnDuplicate(arrow, [1])).toEqual([4]);
+      // copies after two earlier points push it two along
+      expect(shiftSplitPointsOnDuplicate(arrow, [0, 2])).toEqual([5]);
+      // duplicating the split point itself keeps the split on the original
+      expect(shiftSplitPointsOnDuplicate(arrow, [3])).toEqual([3]);
+      // later points don't affect it
+      expect(shiftSplitPointsOnDuplicate(arrow, [4])).toEqual([3]);
+      expect(shiftSplitPointsOnDuplicate(arrow, [])).toBeUndefined();
+    });
+
     it("groups points into overlapping runs", () => {
       const points = [0, 1, 2, 3, 4];
 
@@ -233,6 +258,78 @@ describe("arrow split points", () => {
       expect(firstCurveEnd[1]).toBeCloseTo(100, 5);
       expect(secondCurveStart[0]).toBeCloseTo(100, 5);
       expect(secondCurveStart[1]).toBeCloseTo(100, 5);
+    });
+  });
+
+  describe("duplicating points", () => {
+    beforeEach(async () => {
+      unmountComponent();
+      localStorage.clear();
+      reseed(7);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      h.state.width = 1000;
+      h.state.height = 1000;
+    });
+
+    const fivePointArrow = () =>
+      createArrow({
+        x: 0,
+        y: 0,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(50, 50),
+          pointFrom<LocalPoint>(100, 0),
+          pointFrom<LocalPoint>(150, 50),
+          pointFrom<LocalPoint>(200, 0),
+        ],
+        splitPoints: [3],
+      });
+
+    const editWithSelectedPoint = (
+      arrow: NonDeleted<ExcalidrawArrowElement>,
+      pointIndex: number,
+    ) => {
+      API.setElements([arrow]);
+      API.setSelectedElements([arrow]);
+      act(() => {
+        h.setState({
+          selectedLinearElement: {
+            ...new LinearElementEditor(arrow, arrayToMap(h.elements), true),
+            selectedPointsIndices: [pointIndex],
+          },
+        });
+      });
+    };
+
+    it("keeps the split on the same point when an earlier point is duplicated", () => {
+      const arrow = fivePointArrow();
+      const splitPointBefore = arrow.points[3];
+      editWithSelectedPoint(arrow, 1);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionDuplicateSelection);
+      });
+
+      const updated = h.elements[0] as ExcalidrawArrowElement;
+
+      expect(updated.points).toHaveLength(6);
+      expect(updated.splitPoints).toEqual([4]);
+      // the corner is still on the very same point, not its neighbour
+      expect(updated.points[4]).toEqual(splitPointBefore);
+    });
+
+    it("keeps the split on the original when the split point itself is duplicated", () => {
+      const arrow = fivePointArrow();
+      editWithSelectedPoint(arrow, 3);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionDuplicateSelection);
+      });
+
+      const updated = h.elements[0] as ExcalidrawArrowElement;
+
+      expect(updated.points).toHaveLength(6);
+      expect(updated.splitPoints).toEqual([3]);
     });
   });
 
