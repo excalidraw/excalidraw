@@ -1413,6 +1413,38 @@ describe("deselecting", () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
+  it("enter edits a selected group", () => {
+    const rectA = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+    const rectB = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+    });
+
+    API.setElements([rectA, rectB]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.A);
+      Keyboard.keyPress(KEYS.G);
+    });
+
+    expect(h.state.selectedGroupIds).not.toEqual({});
+    expect(h.state.editingGroupId).toBeNull();
+
+    Keyboard.keyPress(KEYS.ENTER);
+
+    expect(h.state.editingGroupId).not.toBeNull();
+    expect(API.getSelectedElements().length).toBeGreaterThanOrEqual(1);
+  });
+
   it("esc unwinds nested group editing before deselecting", () => {
     const rectA = API.createElement({
       type: "rectangle",
