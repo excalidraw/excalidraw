@@ -200,5 +200,32 @@ describe("@excalidraw/common/utils", () => {
 
       expect(fn).not.toHaveBeenCalled();
     });
+
+    it("should schedule and cancel through the supplied window", () => {
+      const fn = vi.fn();
+      const ownerWindow = {
+        requestAnimationFrame: vi.fn((callback: FrameRequestCallback) => {
+          const frameId = ++nextFrameId;
+          frameCallbacks.set(frameId, callback);
+          return frameId;
+        }),
+        cancelAnimationFrame: vi.fn((frameId: number) => {
+          frameCallbacks.delete(frameId);
+        }),
+      };
+      const throttled = throttleRAF(fn, ownerWindow);
+
+      throttled("popout");
+
+      expect(ownerWindow.requestAnimationFrame).toHaveBeenCalledTimes(1);
+      expect(window.requestAnimationFrame).not.toHaveBeenCalled();
+
+      throttled.cancel();
+
+      expect(ownerWindow.cancelAnimationFrame).toHaveBeenCalledTimes(1);
+      expect(window.cancelAnimationFrame).not.toHaveBeenCalled();
+      runScheduledFrame();
+      expect(fn).not.toHaveBeenCalled();
+    });
   });
 });

@@ -16,6 +16,7 @@ describe("AnimationController", () => {
     AnimationController.cancel(SECOND_KEY);
     window.EXCALIDRAW_THROTTLE_RENDER = undefined;
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it("starts a new animation after the previous last animation was cancelled", async () => {
@@ -163,5 +164,72 @@ describe("AnimationController", () => {
     expect(originalFrames).toBe(1);
     expect(replacementFrames).toBe(2);
     expect(AnimationController.running(FIRST_KEY)).toBe(false);
+  });
+
+  it("advances an animation on its supplied window while the main frame is stalled", () => {
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+
+    let mainFrame: FrameRequestCallback | undefined;
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback) => {
+      mainFrame = callback;
+      return 1;
+    });
+    vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+
+    let popoutFrame: FrameRequestCallback | undefined;
+    const popoutWindow = {
+      requestAnimationFrame: vi.fn((callback: FrameRequestCallback) => {
+        popoutFrame = callback;
+        return 2;
+      }),
+      cancelAnimationFrame: vi.fn(),
+      setTimeout: vi.fn(),
+      clearTimeout: vi.fn(),
+    };
+
+    let mainFrames = 0;
+    AnimationController.start(FIRST_KEY, () => {
+      mainFrames++;
+      return { keep: true };
+    });
+
+    let popoutFrames = 0;
+    AnimationController.start(
+      SECOND_KEY,
+      ({ state }) => {
+        popoutFrames++;
+        return state ? null : { keep: true };
+      },
+      popoutWindow,
+    );
+
+    expect(mainFrames).toBe(1);
+    expect(popoutFrames).toBe(1);
+    expect(mainFrame).toBeTypeOf("function");
+    expect(popoutFrame).toBeTypeOf("function");
+
+    popoutFrame!(16);
+
+    expect(popoutFrames).toBe(2);
+    expect(mainFrames).toBe(1);
+    expect(AnimationController.running(SECOND_KEY)).toBe(false);
+  });
+
+  it("schedules and cancels a timer through the supplied window", () => {
+    const popoutWindow = {
+      requestAnimationFrame: vi.fn(),
+      cancelAnimationFrame: vi.fn(),
+      setTimeout: vi.fn(() => 3),
+      clearTimeout: vi.fn(),
+    };
+
+    AnimationController.start(SECOND_KEY, () => ({ keep: true }), popoutWindow);
+
+    expect(popoutWindow.setTimeout).toHaveBeenCalledTimes(1);
+
+    AnimationController.cancel(SECOND_KEY);
+
+    expect(popoutWindow.clearTimeout).toHaveBeenCalledWith(3);
+    expect(AnimationController.running(SECOND_KEY)).toBe(false);
   });
 });

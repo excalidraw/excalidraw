@@ -181,12 +181,18 @@ export const debounce = <T extends any[]>(
 };
 
 // throttle callback to execute once per animation frame using the latest args
-export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
+export const throttleRAF = <T extends any[]>(
+  fn: (...args: T) => void,
+  ownerWindow: Pick<
+    Window,
+    "requestAnimationFrame" | "cancelAnimationFrame"
+  > = window,
+) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
 
   const scheduleFunc = () => {
-    timerId = window.requestAnimationFrame(() => {
+    timerId = ownerWindow.requestAnimationFrame(() => {
       timerId = null;
       const args = lastArgs;
       lastArgs = null;
@@ -205,7 +211,7 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   };
   ret.flush = () => {
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      ownerWindow.cancelAnimationFrame(timerId);
       timerId = null;
     }
     if (lastArgs) {
@@ -216,7 +222,7 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   ret.cancel = () => {
     lastArgs = null;
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      ownerWindow.cancelAnimationFrame(timerId);
       timerId = null;
     }
   };
