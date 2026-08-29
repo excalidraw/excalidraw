@@ -9,16 +9,33 @@ type AnimationRecord = {
   animation: Animation<any>;
   lastTime: number;
   state: any;
+  scheduler: AnimationScheduler;
 };
 
+type AnimationScheduler = Pick<
+  Window,
+  | "requestAnimationFrame"
+  | "cancelAnimationFrame"
+  | "setTimeout"
+  | "clearTimeout"
+>;
+
+type ScheduledFrame =
+  | { id: number; type: "raf" }
+  | { id: number; type: "timeout" };
+
 export class AnimationController {
-  private static scheduledFrame:
-    | { id: ReturnType<typeof requestAnimationFrame>; type: "raf" }
-    | { id: ReturnType<typeof setTimeout>; type: "timeout" }
-    | null = null;
+  private static scheduledFrames = new Map<
+    AnimationScheduler,
+    ScheduledFrame
+  >();
   private static animations = new Map<string, AnimationRecord>();
 
-  static start<R extends object>(key: string, animation: Animation<R>) {
+  static start<R extends object>(
+    key: string,
+    animation: Animation<R>,
+    scheduler: AnimationScheduler = window,
+  ) {
     if (AnimationController.animations.has(key)) {
       return;
     }
@@ -27,6 +44,7 @@ export class AnimationController {
       animation,
       lastTime: 0,
       state: undefined,
+      scheduler,
     };
     AnimationController.animations.set(key, record);
 
@@ -39,7 +57,7 @@ export class AnimationController {
     } catch (error) {
       if (AnimationController.animations.get(key) === record) {
         AnimationController.animations.delete(key);
-        AnimationController.cancelScheduledFrameIfIdle();
+        AnimationController.cancelScheduledFrameIfIdle(record.scheduler);
       }
       throw error;
     }
@@ -53,63 +71,73 @@ export class AnimationController {
 
     if (!initialState) {
       AnimationController.animations.delete(key);
-      AnimationController.cancelScheduledFrameIfIdle();
+      AnimationController.cancelScheduledFrameIfIdle(record.scheduler);
       return;
     }
 
     record.state = initialState;
-    AnimationController.scheduleNextFrame();
+    AnimationController.scheduleNextFrame(record.scheduler);
   }
 
-  private static scheduleNextFrame() {
-    if (AnimationController.scheduledFrame) {
+  private static scheduleNextFrame(scheduler: AnimationScheduler) {
+    if (AnimationController.scheduledFrames.has(scheduler)) {
       return;
     }
 
     if (isRenderThrottlingEnabled()) {
-      AnimationController.scheduledFrame = {
-        id: requestAnimationFrame(AnimationController.tick),
+      AnimationController.scheduledFrames.set(scheduler, {
+        id: scheduler.requestAnimationFrame(() =>
+          AnimationController.tick(scheduler),
+        ),
         type: "raf",
-      };
+      });
     } else {
-      AnimationController.scheduledFrame = {
-        id: setTimeout(AnimationController.tick, 0),
+      AnimationController.scheduledFrames.set(scheduler, {
+        id: scheduler.setTimeout(() => AnimationController.tick(scheduler), 0),
         type: "timeout",
-      };
+      });
     }
   }
 
-  private static cancelScheduledFrame() {
-    if (!AnimationController.scheduledFrame) {
+  private static cancelScheduledFrame(scheduler: AnimationScheduler) {
+    const scheduledFrame = AnimationController.scheduledFrames.get(scheduler);
+    if (!scheduledFrame) {
       return;
     }
 
-    if (AnimationController.scheduledFrame.type === "raf") {
-      cancelAnimationFrame(AnimationController.scheduledFrame.id);
+    if (scheduledFrame.type === "raf") {
+      scheduler.cancelAnimationFrame(scheduledFrame.id);
     } else {
-      clearTimeout(AnimationController.scheduledFrame.id);
+      scheduler.clearTimeout(scheduledFrame.id);
     }
 
-    AnimationController.scheduledFrame = null;
+    AnimationController.scheduledFrames.delete(scheduler);
   }
 
-  private static cancelScheduledFrameIfIdle() {
-    if (AnimationController.animations.size > 0) {
+  private static cancelScheduledFrameIfIdle(scheduler: AnimationScheduler) {
+    if (
+      [...AnimationController.animations.values()].some(
+        (animation) => animation.scheduler === scheduler,
+      )
+    ) {
       return false;
     }
 
-    AnimationController.cancelScheduledFrame();
+    AnimationController.cancelScheduledFrame(scheduler);
     return true;
   }
 
-  private static tick() {
-    AnimationController.scheduledFrame = null;
+  private static tick(scheduler: AnimationScheduler) {
+    AnimationController.scheduledFrames.delete(scheduler);
 
-    if (AnimationController.animations.size > 0) {
+    const animations = [...AnimationController.animations].filter(
+      ([, animation]) => animation.scheduler === scheduler,
+    );
+
+    if (animations.length > 0) {
       // A callback may synchronously add, cancel, or replace animations. Work
       // from the frame's starting set so newly started animations begin on the
       // next frame and every record runs at most once per tick.
-      const animations = [...AnimationController.animations];
       for (const [key, animation] of animations) {
         if (AnimationController.animations.get(key) !== animation) {
           continue;
@@ -133,7 +161,7 @@ export class AnimationController {
         if (!state) {
           AnimationController.animations.delete(key);
 
-          if (AnimationController.cancelScheduledFrameIfIdle()) {
+          if (AnimationController.cancelScheduledFrameIfIdle(scheduler)) {
             return;
           }
         } else {
@@ -142,11 +170,11 @@ export class AnimationController {
         }
       }
 
-      if (AnimationController.cancelScheduledFrameIfIdle()) {
+      if (AnimationController.cancelScheduledFrameIfIdle(scheduler)) {
         return;
       }
 
-      AnimationController.scheduleNextFrame();
+      AnimationController.scheduleNextFrame(scheduler);
     }
   }
 
@@ -155,12 +183,17 @@ export class AnimationController {
   }
 
   static cancel(key: string) {
+    const record = AnimationController.animations.get(key);
     AnimationController.animations.delete(key);
-    AnimationController.cancelScheduledFrameIfIdle();
+    if (record) {
+      AnimationController.cancelScheduledFrameIfIdle(record.scheduler);
+    }
   }
 
   static reset() {
     AnimationController.animations.clear();
-    AnimationController.cancelScheduledFrame();
+    for (const scheduler of [...AnimationController.scheduledFrames.keys()]) {
+      AnimationController.cancelScheduledFrame(scheduler);
+    }
   }
 }

@@ -9065,7 +9065,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
         scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
-    });
+    }, this.ownerWindow);
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
@@ -9279,7 +9279,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.handlePointerMoveOverScrollbars(event, pointerDownState);
-    });
+    }, this.ownerWindow);
     const onPointerUp = withBatchedUpdates(() => {
       lastPointerUp = null;
       isDraggingScrollBar = false;
@@ -11474,7 +11474,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-    });
+    }, this.ownerWindow);
   }
 
   // Returns whether the pointer move happened over either scrollbar
