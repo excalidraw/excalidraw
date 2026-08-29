@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Lim inn",
     "pasteAsPlaintext": "Lim inn som klartekst",
     "pasteCharts": "Lim inn diagrammer",
@@ -109,6 +111,7 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
+    "you": "",
     "toggleGrid": "Vis/skjul rutenett",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
@@ -332,10 +335,15 @@
     "embeddable": "Nettinnbygging",
     "laser": "Laserpeker",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Hånd (panoreringsverktøy)",
     "extraTools": "Flere verktøy",
     "mermaidToExcalidraw": "Mermaid til Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rektangel",
@@ -606,7 +614,9 @@
     "hexCode": "Heksadesimal kode",
     "noShades": "Ingen toner tilgjengelig for denne fargen",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

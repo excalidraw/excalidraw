@@ -936,11 +936,37 @@ body.excalidraw-cursor-resize * {
 
 .excalidraw__embeddable-container {
   .excalidraw__embeddable-container__inner {
+    position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--embeddable-radius);
+  }
+
+  .excalidraw__embeddable__generating {
+    position: absolute;
+    z-index: 1;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 0.875rem;
+    font-family: "Assistant";
+    pointer-events: none;
+
+    .Spinner {
+      --spinner-color: #fff;
+
+      flex: 0 0 auto;
+      height: auto;
+      margin: 0;
+    }
   }
 
   .excalidraw__embeddable__outer {

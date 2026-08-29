@@ -72,7 +72,7 @@ export const AppWelcomeScreen: React.FC<{
               shortcut={null}
               icon={loginIcon}
             >
-              {t("buttons.signUp")}
+              {t("labels.signUp")}
             </WelcomeScreen.Center.MenuItemLink>
           )}
         </WelcomeScreen.Center.Menu>
