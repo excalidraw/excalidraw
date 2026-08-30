@@ -1783,7 +1783,30 @@ class App extends React.Component<AppProps, AppState> {
       } else if (isIframeElement(element)) {
         iframeLikes.add(element.id);
         hasIframeElements = true;
-        if (!this.embedsValidationStatus.has(element.id)) {
+
+        // Re-validate when there is no cache entry OR the cached result is
+        // `false`. A `false` entry means "failed validation" — but a freshly
+        // re-injected element with the same id (e.g. a scene update that
+        // re-adds the iframe) must be re-checked, not silently skipped by the
+        // cache. Skipping it would leave the re-injected iframe in the active
+        // scene views (and in export) while only hiding it from render.
+        // `true` entries are skipped: a validated element doesn't change
+        // between updates, and re-running the host's validateIframe function
+        // on every render cycle would be wasteful.
+        //
+        // The `cached === false` re-validation is gated on
+        // `this.props.validateIframe != null` (the same condition that gates
+        // quarantine below). When validateIframe is unset, a `false` cache
+        // entry means "host hasn't opted in yet" — the element is NOT
+        // quarantined, so it stays in the non-deleted view and re-validating
+        // it on every cycle would set updated=true forever: an infinite
+        // React update loop (Maximum update depth exceeded). With the gate,
+        // the unset case validates once, caches `false`, and never re-fires.
+        const cached = this.embedsValidationStatus.get(element.id);
+        if (
+          cached === undefined ||
+          (cached === false && this.props.validateIframe != null)
+        ) {
           updated = true;
           const validated = iframeValidator(element, this.props.validateIframe);
           this.updateEmbedValidationStatus(element, validated);
@@ -1797,17 +1820,36 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     if (toQuarantine.length > 0) {
+      // Item 2: remove failed-iframe elements from the *active* scene views,
+      // not just mark them isDeleted. scene.mutateElement() mutates the
+      // element object in place but never refreshes the scene's non-deleted
+      // views — the element would keep sitting in getNonDeletedElements()/
+      // getNonDeletedElementsMap(), still get drawn by the static canvas, and
+      // still show up to binding/selection/export code. Normal deletion
+      // (newElementWith + replaceAllElements) is the canonical path and
+      // rebuilds those views.
+      //
+      // BUGFIX (found via live testing): do NOT delete the validation-status
+      // cache entry here. The `cached === false` re-validation guard above is
+      // what stops an already-quarantined element from being re-processed on
+      // the next update cycle — replaceAllElements() removes the element from
+      // the non-deleted view, so the next updateEmbeddables() pass never sees
+      // it. Without the entry intact, the element would get re-validated,
+      // re-queued for deletion, and re-processed on every single cycle — an
+      // infinite React update loop. The entry is already `false` from the
+      // validation above, which is exactly the value that should stay cached
+      // for this id.
+      const quarantineIds = new Set(toQuarantine.map((el) => el.id));
+      const nextElements = this.scene
+        .getElementsIncludingDeleted()
+        .map((el) =>
+          quarantineIds.has(el.id)
+            ? newElementWith(el, { isDeleted: true })
+            : el,
+        );
+      this.scene.replaceAllElements(nextElements);
+
       for (const element of toQuarantine) {
-        this.scene.mutateElement(element, { isDeleted: true });
-        // BUGFIX (found via live testing): do NOT delete the validation-status
-        // cache entry here. The `!this.embedsValidationStatus.has(element.id)`
-        // guard at the top of this method is what stops an already-quarantined
-        // element from being re-processed on the next update cycle. mutateElement()
-        // itself triggers componentDidUpdate → updateEmbeddables() again; without
-        // this cache entry intact, the element gets re-validated, re-queued for
-        // deletion, and re-mutated on every single cycle — an infinite React
-        // update loop. The entry is already `false` from the validation above,
-        // which is exactly the value that should stay cached for this id.
         iframeLikes.delete(element.id);
       }
       updated = true;
