@@ -1,12 +1,13 @@
 import React from "react";
 import { vi } from "vitest";
 
+import type { ExcalidrawIframeElement } from "@excalidraw/element/types";
+
 import { serializeAsJSON } from "../data/json";
 import { Excalidraw } from "../index";
+
 import { API } from "./helpers/api";
 import { render, waitFor } from "./test-utils";
-
-import type { ExcalidrawIframeElement } from "@excalidraw/element/types";
 
 const { h } = window;
 
@@ -56,9 +57,11 @@ describe("iframe security", () => {
     const nonDeletedMap = h.app.scene.getNonDeletedElementsMap();
     expect(nonDeletedMap.has(iframeEl.id)).toBe(false);
 
-    // (c) no iframe DOM nodes rendered (jsdom does create them for validated
-    //     iframes — see probe-iframe.test.tsx)
-    const iframeNodes = document.querySelectorAll("iframe.excalidraw__embeddable");
+    // (c) no iframe DOM nodes rendered (jsdom does create DOM nodes for
+    //     validated iframes with class `excalidraw__embeddable`)
+    const iframeNodes = document.querySelectorAll(
+      "iframe.excalidraw__embeddable",
+    );
     expect(iframeNodes.length).toBe(0);
 
     warnSpy.mockRestore();
@@ -110,7 +113,9 @@ describe("iframe security", () => {
     expect(errors).toEqual([]);
 
     // No iframe DOM nodes rendered
-    expect(document.querySelectorAll("iframe.excalidraw__embeddable").length).toBe(0);
+    expect(
+      document.querySelectorAll("iframe.excalidraw__embeddable").length,
+    ).toBe(0);
 
     window.removeEventListener("error", errorHandler);
     warnSpy.mockRestore();
@@ -160,7 +165,9 @@ describe("iframe security", () => {
     });
 
     // No iframe DOM nodes should be rendered
-    expect(document.querySelectorAll("iframe.excalidraw__embeddable").length).toBe(0);
+    expect(
+      document.querySelectorAll("iframe.excalidraw__embeddable").length,
+    ).toBe(0);
 
     // Non-deleted map must not contain it
     expect(h.app.scene.getNonDeletedElementsMap().has(iframeEl.id)).toBe(false);
@@ -189,12 +196,7 @@ describe("iframe security", () => {
     });
 
     // Serialize the scene (h.elements = getElementsIncludingDeleted)
-    const jsonStr = serializeAsJSON(
-      h.elements,
-      h.state,
-      {},
-      "local",
-    );
+    const jsonStr = serializeAsJSON(h.elements, h.state, {}, "local");
     const parsed = JSON.parse(jsonStr);
 
     // The exported scene must contain the element (it's in the full scene)
