@@ -1750,6 +1750,23 @@ class App extends React.Component<AppProps, AppState> {
     let hasIframeElements = false;
 
     let updated = false;
+
+    // Item 2: an iframe element that fails an EXPLICITLY-configured
+    // validateIframe check is removed from the scene outright (isDeleted: true),
+    // not just hidden from render. Otherwise a rejected element would keep
+    // sitting in scene.elements — ready to re-render on remount, viewport
+    // scroll, a later prop change, or to leak into export/serialization.
+    //
+    // This only fires when `validateIframe` is explicitly set (boolean, regexp,
+    // array, or function) — i.e. the host made a real validation decision and
+    // this element failed it. When `validateIframe` is unset (null/undefined),
+    // failure just means "host hasn't opted in yet" (the TTD/default-block
+    // case handled by the warning below) and must stay recoverable: deleting
+    // those would silently destroy legitimate AI-generated content the moment
+    // a host forgets to set the prop, with no way back once validateIframe is
+    // set later.
+    const toQuarantine: ExcalidrawIframeElement[] = [];
+
     this.scene.getNonDeletedElements().filter((element) => {
       if (isEmbeddableElement(element)) {
         iframeLikes.add(element.id);
@@ -1770,10 +1787,31 @@ class App extends React.Component<AppProps, AppState> {
           updated = true;
           const validated = iframeValidator(element, this.props.validateIframe);
           this.updateEmbedValidationStatus(element, validated);
+
+          if (!validated && this.props.validateIframe != null) {
+            toQuarantine.push(element);
+          }
         }
       }
       return false;
     });
+
+    if (toQuarantine.length > 0) {
+      for (const element of toQuarantine) {
+        this.scene.mutateElement(element, { isDeleted: true });
+        // BUGFIX (found via live testing): do NOT delete the validation-status
+        // cache entry here. The `!this.embedsValidationStatus.has(element.id)`
+        // guard at the top of this method is what stops an already-quarantined
+        // element from being re-processed on the next update cycle. mutateElement()
+        // itself triggers componentDidUpdate → updateEmbeddables() again; without
+        // this cache entry intact, the element gets re-validated, re-queued for
+        // deletion, and re-mutated on every single cycle — an infinite React
+        // update loop. The entry is already `false` from the validation above,
+        // which is exactly the value that should stay cached for this id.
+        iframeLikes.delete(element.id);
+      }
+      updated = true;
+    }
 
     // Item 4: One-time warning when iframes exist but validateIframe prop is not set.
     // TTD (text-to-diagram) generates iframe elements; without validateIframe: true
