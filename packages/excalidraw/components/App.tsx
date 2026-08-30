@@ -422,6 +422,7 @@ import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
+import { convertMarkdownToElements, isMaybeMarkdown } from "../markdown";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -4519,6 +4520,22 @@ class App extends React.Component<AppProps, AppState> {
             data: result.data,
             rawText: data.text,
           },
+        });
+        return;
+      }
+    }
+
+    // ------------------- Markdown -------------------
+    if (!isPlainPaste && data.text && isMaybeMarkdown(data.text)) {
+      // anchor the flow at the origin; addElementsFromPasteOrLibrary centers
+      // the whole column at the paste cursor
+      const markdownElements = convertMarkdownToElements(data.text, 0, 0);
+      if (markdownElements.length > 0) {
+        this.addElementsFromPasteOrLibrary({
+          elements: markdownElements,
+          files: null,
+          position: "cursor",
+          retainSeed: false,
         });
         return;
       }
