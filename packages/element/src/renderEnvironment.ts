@@ -1,15 +1,17 @@
 /**
  * Host environment used by the renderer and export pipeline.
  *
- * Defaults to browser globals. Override it to run the export pipeline where
- * `document`/`window` don't exist (Node with `node-canvas` / `@napi-rs/canvas`),
- * mirroring the escape hatch `setCustomTextMetricsProvider` already provides
- * for text measurement.
+ * The default is the browser's. An explicit environment (see
+ * `StaticCanvasRenderConfig["renderEnvironment"]`) scopes canvas and image
+ * creation to one render target -- e.g. the editor's owner window, so that
+ * one process can host editors in multiple realms (popouts, multi-tenant
+ * embeds). `setRenderEnvironment` overrides the default process-wide, for
+ * the export pipeline running where `document`/`window` don't exist (Node
+ * with `node-canvas` / `@napi-rs/canvas`).
  *
- * SCOPE: canvas export only (`exportToCanvas`, `exportToBlob`). `exportToSvg`
- * builds its output through `document.createElementNS` / `createTextNode` /
- * `createComment` and stays browser-only -- this abstraction does not make it
- * importable-and-runnable under Node.
+ * `exportToSvg` builds its output through `document.createElementNS` /
+ * `createTextNode` / `createComment` and stays browser-only -- this
+ * abstraction does not make it importable-and-runnable under Node.
  */
 export type RenderEnvironment = {
   /** Creates a blank canvas. Callers set `width`/`height` themselves. */
@@ -44,9 +46,14 @@ const environment: RenderEnvironment = {
 };
 
 /**
- * Overrides the host environment process-wide. Partial overrides fall back to
- * the browser defaults, so a Node caller that only needs canvas and image
- * factories can supply just those.
+ * Overrides the default host environment process-wide. Partial overrides fall
+ * back to the browser defaults, so a Node caller that only needs canvas and
+ * image factories can supply just those.
+ *
+ * Per-instance environments are passed explicitly via
+ * `StaticCanvasRenderConfig["renderEnvironment"]` or the `env` argument of
+ * `getRenderEnvironment`; this override only affects code paths that don't
+ * have an instance to scope to (headless export).
  */
 export const setRenderEnvironment = (env: Partial<RenderEnvironment>) => {
   overrides = { ...env };
@@ -61,8 +68,11 @@ export const resetRenderEnvironment = () => {
 
 /**
  * Modules that lazily build and cache host objects (canvases, images) register
- * a clearer here, so that swapping the environment doesn't silently leave
- * objects from the previous one in place.
+ * a clearer here, so that swapping the default environment doesn't silently
+ * leave objects from the previous one in place. Caches are keyed by
+ * environment identity (see e.g. `placeholderImgCache` in
+ * `renderElement.ts`), so the registered clearer should drop only the entry
+ * for the default environment (`getRenderEnvironment()`).
  */
 const cacheInvalidators = new Set<() => void>();
 
@@ -75,4 +85,11 @@ const invalidateCaches = () => {
   cacheInvalidators.forEach((invalidate) => invalidate());
 };
 
-export const getRenderEnvironment = (): RenderEnvironment => environment;
+/**
+ * Resolves the host environment for a render. An explicitly scoped
+ * environment (e.g. the editor's owner window) takes precedence over the
+ * process-wide default.
+ */
+export const getRenderEnvironment = (
+  env?: RenderEnvironment,
+): RenderEnvironment => env ?? environment;

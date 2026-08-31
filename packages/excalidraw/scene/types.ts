@@ -7,6 +7,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MakeBrand } from "@excalidraw/common/utility-types";
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type {
   AppClassProperties,
@@ -33,6 +34,12 @@ export type StaticCanvasRenderConfig = {
    * be the same value passed as `StaticSceneRenderConfig["scale"]`.
    */
   scale: number;
+  /**
+   * Host environment that creates the canvases and images this render
+   * rasterizes (per-editor owner window in the app; the process-wide default
+   * for headless export).
+   */
+  renderEnvironment?: RenderEnvironment;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];

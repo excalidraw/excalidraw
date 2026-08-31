@@ -46,6 +46,7 @@ import {
   getRenderEnvironment,
   onRenderEnvironmentChange,
 } from "./renderEnvironment";
+
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -71,6 +72,8 @@ import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 
 import type {
   ExcalidrawElement,
@@ -214,7 +217,9 @@ const generateElementCanvas = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ): ExcalidrawElementWithCanvas | null => {
-  const canvas = getRenderEnvironment().createCanvas();
+  const canvas = getRenderEnvironment(
+    renderConfig.renderEnvironment,
+  ).createCanvas();
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
 
@@ -287,16 +292,28 @@ const IMAGE_ERROR_PLACEHOLDER_SRC = `data:${
 /**
  * Built lazily (and cached) so that importing this module never touches
  * `document`, and so that a custom render environment supplies the element.
+ * Keyed by environment identity so that each editor (owner window) keeps its
+ * own placeholder images.
  */
-const placeholderImgCache = new Map<string, HTMLImageElement>();
-onRenderEnvironmentChange(() => placeholderImgCache.clear());
+const placeholderImgCache = new WeakMap<
+  RenderEnvironment,
+  Map<string, HTMLImageElement>
+>();
+onRenderEnvironmentChange(() =>
+  placeholderImgCache.delete(getRenderEnvironment()),
+);
 
-const getPlaceholderImg = (src: string) => {
-  let img = placeholderImgCache.get(src);
+const getPlaceholderImg = (src: string, env: RenderEnvironment) => {
+  let cache = placeholderImgCache.get(env);
+  let img = cache?.get(src);
   if (!img) {
-    img = getRenderEnvironment().createImage();
+    img = env.createImage();
     img.src = src;
-    placeholderImgCache.set(src, img);
+    if (!cache) {
+      cache = new Map();
+      placeholderImgCache.set(env, cache);
+    }
+    cache.set(src, img);
   }
   return img;
 };
@@ -305,6 +322,7 @@ const drawImagePlaceholder = (
   element: ExcalidrawImageElement,
   context: CanvasRenderingContext2D,
   theme: StaticCanvasRenderConfig["theme"],
+  env: RenderEnvironment,
 ) => {
   context.fillStyle = theme === THEME.DARK ? "#2E2E2E" : "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
@@ -321,6 +339,7 @@ const drawImagePlaceholder = (
       element.status === "error"
         ? IMAGE_ERROR_PLACEHOLDER_SRC
         : IMAGE_PLACEHOLDER_SRC,
+      env,
     ),
     element.width / 2 - size / 2,
     element.height / 2 - size / 2,
@@ -418,7 +437,9 @@ const drawElementOnCanvas = (
 
         if (shouldInvertImage && isSafari) {
           const devicePixelRatio = renderConfig.scale || 1;
-          const tempCanvas = getRenderEnvironment().createCanvas();
+          const tempCanvas = getRenderEnvironment(
+            renderConfig.renderEnvironment,
+          ).createCanvas();
           tempCanvas.width = element.width * devicePixelRatio;
           tempCanvas.height = element.height * devicePixelRatio;
           const tempContext = tempCanvas.getContext("2d");
@@ -483,7 +504,12 @@ const drawElementOnCanvas = (
           );
         }
       } else {
-        drawImagePlaceholder(element, context, renderConfig.theme);
+        drawImagePlaceholder(
+          element,
+          context,
+          renderConfig.theme,
+          getRenderEnvironment(renderConfig.renderEnvironment),
+        );
       }
       context.restore();
       break;
@@ -551,9 +577,16 @@ const drawElementOnCanvas = (
   }
 };
 
+/**
+ * Keyed by element, then environment identity, so that each editor (owner
+ * window) keeps its own baked canvases: the canvas objects live in the
+ * environment's realm, and the same element object must not serve one
+ * realm's bitmap to another. Deleting by element identity (e.g.
+ * `ShapeCache.delete`) drops every environment's entry for that element.
+ */
 export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElement,
-  ExcalidrawElementWithCanvas
+  WeakMap<RenderEnvironment, ExcalidrawElementWithCanvas>
 >();
 
 const generateElementWithCanvas = (
@@ -567,7 +600,12 @@ const generateElementWithCanvas = (
     : {
         value: 1 as NormalizedZoomValue,
       };
-  const prevElementWithCanvas = elementWithCanvasCache.get(element);
+  const renderEnvironment = getRenderEnvironment(
+    renderConfig.renderEnvironment,
+  );
+  const prevElementWithCanvas = elementWithCanvasCache
+    .get(element)
+    ?.get(renderEnvironment);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
@@ -597,7 +635,12 @@ const generateElementWithCanvas = (
       return null;
     }
 
-    elementWithCanvasCache.set(element, elementWithCanvas);
+    let envCache = elementWithCanvasCache.get(element);
+    if (!envCache) {
+      envCache = new WeakMap();
+      elementWithCanvasCache.set(element, envCache);
+    }
+    envCache.set(renderEnvironment, elementWithCanvas);
 
     return elementWithCanvas;
   }

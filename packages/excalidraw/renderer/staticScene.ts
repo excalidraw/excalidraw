@@ -28,6 +28,8 @@ import {
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
+
 import type {
   ElementsMap,
   ExcalidrawFrameLikeElement,
@@ -167,7 +169,10 @@ export const frameClip = (
 // instance's canvas to another at the wrong resolution.
 type LinkIconCanvasCacheType = "regularLink" | "elementLink";
 
-const linkIconCanvasCache = new Map<string, HTMLCanvasElement>();
+const linkIconCanvasCache = new WeakMap<
+  RenderEnvironment,
+  Map<string, HTMLCanvasElement>
+>();
 const LINK_ICON_CACHE_MAX_ENTRIES = 8;
 
 const getLinkIconCacheKey = (
@@ -177,16 +182,28 @@ const getLinkIconCacheKey = (
 ) => `${type}:${zoom}:${scale}`;
 
 onRenderEnvironmentChange(() => {
-  linkIconCanvasCache.clear();
+  linkIconCanvasCache.delete(getRenderEnvironment());
 });
 
-let lastSceneConfig: StaticSceneRenderConfig | null = null;
+// One live-config pointer per environment, so a settle in one environment
+// only re-renders its own scene. A single shared pointer would re-render the
+// last-rendered scene on any settle, leaving other environments with blank
+// cached icons (e.g. main editor + popout).
+const lastSceneConfigs = new WeakMap<
+  RenderEnvironment,
+  StaticSceneRenderConfig
+>();
+onRenderEnvironmentChange(() =>
+  lastSceneConfigs.delete(getRenderEnvironment()),
+);
 
 // Icons bake into the cache in the same task the images start decoding, so
-// the first bake is blank. Drop the caches and repaint once the images settle.
-onLinkImgSettle(() => {
-  linkIconCanvasCache.clear();
+// the first bake is blank. Drop that environment's cache and repaint its own
+// scene once one of its images settles.
+onLinkImgSettle((renderEnvironment) => {
+  const lastSceneConfig = lastSceneConfigs.get(renderEnvironment);
   if (lastSceneConfig) {
+    linkIconCanvasCache.delete(renderEnvironment);
     renderStaticScene(lastSceneConfig);
   }
 });
@@ -198,6 +215,7 @@ const renderLinkIcon = (
   elementsMap: ElementsMap,
   /** backing-store scale, see StaticCanvasRenderConfig["scale"] */
   scale: number,
+  renderEnvironment: RenderEnvironment,
 ) => {
   if (element.link && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -218,17 +236,22 @@ const renderLinkIcon = (
 
     const cacheKey = getLinkIconCacheKey(canvasKey, appState.zoom.value, scale);
 
-    let linkCanvas = linkIconCanvasCache.get(cacheKey);
+    let cache = linkIconCanvasCache.get(renderEnvironment);
+    let linkCanvas = cache?.get(cacheKey);
 
     if (!linkCanvas) {
-      linkCanvas = getRenderEnvironment().createCanvas();
+      linkCanvas = renderEnvironment.createCanvas();
       linkCanvas.width = width * scale * appState.zoom.value;
       linkCanvas.height = height * scale * appState.zoom.value;
-      linkIconCanvasCache.set(cacheKey, linkCanvas);
-      if (linkIconCanvasCache.size > LINK_ICON_CACHE_MAX_ENTRIES) {
-        const oldestKey = linkIconCanvasCache.keys().next().value;
+      if (!cache) {
+        cache = new Map();
+        linkIconCanvasCache.set(renderEnvironment, cache);
+      }
+      cache.set(cacheKey, linkCanvas);
+      if (cache.size > LINK_ICON_CACHE_MAX_ENTRIES) {
+        const oldestKey = cache.keys().next().value;
         if (oldestKey !== undefined) {
-          linkIconCanvasCache.delete(oldestKey);
+          cache.delete(oldestKey);
         }
       }
 
@@ -248,8 +271,8 @@ const renderLinkIcon = (
 
       const linkImg =
         canvasKey === "elementLink"
-          ? getElementLinkImg()
-          : getExternalLinkImg();
+          ? getElementLinkImg(renderEnvironment)
+          : getExternalLinkImg(renderEnvironment);
       // undecoded images are silently skipped by drawImage
       if (linkImg.drawReady) {
         linkCanvasCacheContext.drawImage(linkImg.img, 0, 0, width, height);
@@ -276,7 +299,7 @@ const _renderStaticScene = ({
     return;
   }
 
-  lastSceneConfig = {
+  lastSceneConfigs.set(getRenderEnvironment(renderConfig.renderEnvironment), {
     canvas,
     rc,
     elementsMap,
@@ -285,7 +308,7 @@ const _renderStaticScene = ({
     scale,
     appState,
     renderConfig,
-  };
+  });
 
   const { renderGrid = true, isExporting } = renderConfig;
 
@@ -417,7 +440,14 @@ const _renderStaticScene = ({
         context.restore();
 
         if (!isExporting && renderConfig.renderLinks !== false) {
-          renderLinkIcon(element, context, appState, elementsMap, scale);
+          renderLinkIcon(
+            element,
+            context,
+            appState,
+            elementsMap,
+            scale,
+            getRenderEnvironment(renderConfig.renderEnvironment),
+          );
         }
       } catch (error: any) {
         console.error(
@@ -468,7 +498,14 @@ const _renderStaticScene = ({
             );
           }
           if (!isExporting && renderConfig.renderLinks !== false) {
-            renderLinkIcon(element, context, appState, elementsMap, scale);
+            renderLinkIcon(
+              element,
+              context,
+              appState,
+              elementsMap,
+              scale,
+              getRenderEnvironment(renderConfig.renderEnvironment),
+            );
           }
         };
         // - when exporting the whole canvas, we DO NOT apply clipping

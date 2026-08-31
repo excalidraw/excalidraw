@@ -12,6 +12,8 @@ import {
   onRenderEnvironmentChange,
 } from "./renderEnvironment";
 
+import type { RenderEnvironment } from "./renderEnvironment";
+
 import type { FontString, ExcalidrawTextElement } from "./types";
 
 export const measureText = (
@@ -108,18 +110,20 @@ export const getApproxMinLineHeight = (
   return getLineHeightInPx(fontSize, lineHeight) + BOUND_TEXT_PADDING * 2;
 };
 
-let textMetricsProvider: TextMetricsProvider | undefined;
-/** whether `textMetricsProvider` is the lazily-built canvas-backed default */
-let usingDefaultTextMetricsProvider = false;
-
-// the default provider holds a canvas from whichever environment was active
-// when it was built; a custom provider is the caller's and is left alone
-onRenderEnvironmentChange(() => {
-  if (usingDefaultTextMetricsProvider) {
-    textMetricsProvider = undefined;
-    usingDefaultTextMetricsProvider = false;
-  }
-});
+let customTextMetricsProvider: TextMetricsProvider | undefined;
+/**
+ * The lazily-built canvas-backed default provider per environment -- each
+ * environment (e.g. each editor's owner window) measures on a canvas of its
+ * own. A custom provider (see `setCustomTextMetricsProvider`) is the caller's
+ * and is left alone.
+ */
+const defaultTextMetricsProviders = new WeakMap<
+  RenderEnvironment,
+  TextMetricsProvider
+>();
+onRenderEnvironmentChange(() =>
+  defaultTextMetricsProviders.delete(getRenderEnvironment()),
+);
 
 /**
  * Set a custom text metrics provider.
@@ -127,8 +131,7 @@ onRenderEnvironmentChange(() => {
  * Useful for overriding the width calculation algorithm where canvas API is not available / desired.
  */
 export const setCustomTextMetricsProvider = (provider: TextMetricsProvider) => {
-  textMetricsProvider = provider;
-  usingDefaultTextMetricsProvider = false;
+  customTextMetricsProvider = provider;
 };
 
 export interface TextMetricsProvider {
@@ -138,8 +141,8 @@ export interface TextMetricsProvider {
 class CanvasTextMetricsProvider implements TextMetricsProvider {
   private canvas: HTMLCanvasElement;
 
-  constructor() {
-    this.canvas = getRenderEnvironment().createCanvas();
+  constructor(env: RenderEnvironment) {
+    this.canvas = getRenderEnvironment(env).createCanvas();
   }
 
   /**
@@ -166,13 +169,26 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
   }
 }
 
-export const getLineWidth = (text: string, font: FontString) => {
-  if (!textMetricsProvider) {
-    textMetricsProvider = new CanvasTextMetricsProvider();
-    usingDefaultTextMetricsProvider = true;
+const getDefaultTextMetricsProvider = (
+  env: RenderEnvironment | undefined,
+): TextMetricsProvider => {
+  const resolvedEnv = getRenderEnvironment(env);
+  let provider = defaultTextMetricsProviders.get(resolvedEnv);
+  if (!provider) {
+    provider = new CanvasTextMetricsProvider(resolvedEnv);
+    defaultTextMetricsProviders.set(resolvedEnv, provider);
   }
+  return provider;
+};
 
-  return textMetricsProvider.getLineWidth(text, font);
+export const getLineWidth = (
+  text: string,
+  font: FontString,
+  env?: RenderEnvironment,
+) => {
+  const provider =
+    customTextMetricsProvider ?? getDefaultTextMetricsProvider(env);
+  return provider.getLineWidth(text, font);
 };
 
 export const getTextWidth = (text: string, font: FontString) => {

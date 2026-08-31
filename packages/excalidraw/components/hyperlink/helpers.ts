@@ -6,7 +6,10 @@ import {
   getRenderEnvironment,
   onRenderEnvironmentChange,
 } from "@excalidraw/element";
+
 import { hitElementBoundingBox } from "@excalidraw/element";
+
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
@@ -43,49 +46,66 @@ export type LinkImg = {
  * the `src` set silently draws nothing. Callers must check `drawReady` and
  * repaint once `onLinkImgSettle` fires.
  */
-const linkImgCache = new Map<string, LinkImg>();
-onRenderEnvironmentChange(() => linkImgCache.clear());
+const linkImgCache = new WeakMap<RenderEnvironment, Map<string, LinkImg>>();
+onRenderEnvironmentChange(() => linkImgCache.delete(getRenderEnvironment()));
 
-const settleListeners = new Set<() => void>();
+type LinkImgSettleListener = (renderEnvironment: RenderEnvironment) => void;
+
+const settleListeners = new Set<LinkImgSettleListener>();
 
 /**
  * Invoked when a lazily-created image becomes draw-ready or its load fails.
+ * The argument is the environment the image was created in, so listeners
+ * with per-environment state can repair only that environment.
  * Fired at most once per image per environment.
  */
-export const onLinkImgSettle = (listener: () => void) => {
+export const onLinkImgSettle = (listener: LinkImgSettleListener) => {
   settleListeners.add(listener);
   return () => settleListeners.delete(listener);
 };
 
-const settleLinkImg = (entry: LinkImg) => {
+const settleLinkImg = (
+  entry: LinkImg,
+  renderEnvironment: RenderEnvironment,
+) => {
   if (entry.drawReady) {
     return;
   }
   entry.drawReady = true;
-  settleListeners.forEach((listener) => listener());
+  settleListeners.forEach((listener) => listener(renderEnvironment));
 };
 
-const getLinkImg = (src: string): LinkImg => {
-  const cached = linkImgCache.get(src);
+/** Keyed by environment identity so that each editor (owner window) keeps
+ * its own link images. */
+const getLinkImg = (src: string, env?: RenderEnvironment): LinkImg => {
+  const renderEnvironment = getRenderEnvironment(env);
+  let cache = linkImgCache.get(renderEnvironment);
+  const cached = cache?.get(src);
   if (cached) {
     return cached;
   }
-  const img = getRenderEnvironment().createImage();
+  const img = renderEnvironment.createImage();
   const entry: LinkImg = {
     img,
     drawReady: img.complete && img.naturalWidth > 0,
   };
   if (!entry.drawReady) {
-    img.onload = () => settleLinkImg(entry);
-    img.onerror = () => settleLinkImg(entry);
+    img.onload = () => settleLinkImg(entry, renderEnvironment);
+    img.onerror = () => settleLinkImg(entry, renderEnvironment);
   }
   img.src = src;
-  linkImgCache.set(src, entry);
+  if (!cache) {
+    cache = new Map();
+    linkImgCache.set(renderEnvironment, cache);
+  }
+  cache.set(src, entry);
   return entry;
 };
 
-export const getExternalLinkImg = () => getLinkImg(EXTERNAL_LINK_SRC);
-export const getElementLinkImg = () => getLinkImg(ELEMENT_LINK_SRC);
+export const getExternalLinkImg = (env?: RenderEnvironment) =>
+  getLinkImg(EXTERNAL_LINK_SRC, env);
+export const getElementLinkImg = (env?: RenderEnvironment) =>
+  getLinkImg(ELEMENT_LINK_SRC, env);
 
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,

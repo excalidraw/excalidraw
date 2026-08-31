@@ -10,6 +10,8 @@ import {
 
 import { vi } from "vitest";
 
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
+
 import type {
   ElementsMap,
   NonDeletedExcalidrawElement,
@@ -117,5 +119,73 @@ describe("elementWithCanvasCache deviceScale", () => {
     // the stale scale-1 canvas must be regenerated, not reused
     expect(createdCanvases).toHaveLength(2);
     expect(createdCanvases[1].width).toBe(100 * 2 + 40);
+  });
+
+  it("keeps one canvas per environment for the same element identity", () => {
+    const rect = newElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 50,
+    }) as NonDeletedExcalidrawElement;
+    const elements = [rect];
+    const elementsMap = new Map(
+      elements.map((element) => [element.id, element]),
+    ) as unknown as ElementsMap;
+
+    const envCanvases: [HTMLCanvasElement[], HTMLCanvasElement[]] = [[], []];
+    const makeEnv = (index: 0 | 1): RenderEnvironment => ({
+      createCanvas: () => {
+        const canvas = document.createElement("canvas");
+        envCanvases[index].push(canvas);
+        return canvas;
+      },
+      createImage: () => document.createElement("img"),
+    });
+    const envA = makeEnv(0);
+    const envB = makeEnv(1);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 1000;
+    canvas.height = 1000;
+
+    const appState = {
+      ...getDefaultAppState(),
+      width: 1000,
+      height: 1000,
+      offsetLeft: 0,
+      offsetTop: 0,
+    } as StaticCanvasAppState;
+
+    const makeConfig = (
+      renderEnvironment: RenderEnvironment,
+    ): StaticSceneRenderConfig => ({
+      canvas,
+      rc: new RoughCanvas(canvas),
+      elementsMap: elementsMap as unknown as RenderableElementsMap,
+      allElementsMap: elementsMap as unknown as NonDeletedSceneElementsMap,
+      visibleElements: elements,
+      scale: 1,
+      appState,
+      renderConfig: {
+        ...makeRenderConfig(appState, 1),
+        renderEnvironment,
+      },
+    });
+
+    renderStaticScene(makeConfig(envA));
+    expect(envCanvases[0]).toHaveLength(1);
+
+    // a second instance (e.g. a popout) renders the very same element object
+    // in its own environment: it must get its own canvas, not env A's bitmap
+    renderStaticScene(makeConfig(envB));
+    expect(envCanvases[1]).toHaveLength(1);
+    expect(envCanvases[0]).toHaveLength(1);
+
+    // env A re-renders the same element: its own canvas is reused
+    renderStaticScene(makeConfig(envA));
+    expect(envCanvases[0]).toHaveLength(1);
+    expect(envCanvases[1]).toHaveLength(1);
   });
 });

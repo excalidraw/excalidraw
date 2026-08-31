@@ -288,7 +288,7 @@ import type {
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
 
-import type { ArrowEndpoint } from "@excalidraw/element";
+import type { ArrowEndpoint, RenderEnvironment } from "@excalidraw/element";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -642,6 +642,31 @@ class App extends React.Component<AppProps, AppState> {
   public get ownerWindow(): Window & typeof globalThis {
     return (this.ownerDocument.defaultView ?? window) as Window &
       typeof globalThis;
+  }
+
+  /**
+   * Render environment scoped to this editor's owner window, so that the
+   * canvases and images created during rendering live in the owner document
+   * (cross-document runtime ownership). Memoized keyed on the resolved
+   * document because render caches are keyed by environment identity: the
+   * identity must not survive a document switch, or caches would mix
+   * canvases and images from two realms under one bucket.
+   */
+  private _renderEnvironment: RenderEnvironment | null = null;
+  private _renderEnvironmentDocument: Document | null = null;
+  public get renderEnvironment(): RenderEnvironment {
+    const ownerDocument = this.ownerDocument;
+    if (
+      !this._renderEnvironment ||
+      this._renderEnvironmentDocument !== ownerDocument
+    ) {
+      this._renderEnvironmentDocument = ownerDocument;
+      this._renderEnvironment = {
+        createCanvas: () => this.ownerDocument.createElement("canvas"),
+        createImage: () => new this.ownerWindow.Image(),
+      };
+    }
+    return this._renderEnvironment;
   }
 
   public scene: Scene;
@@ -2594,6 +2619,7 @@ class App extends React.Component<AppProps, AppState> {
                               imageCache: this.imageCache,
                               isExporting: false,
                               scale: this.ownerWindow.devicePixelRatio,
+                              renderEnvironment: this.renderEnvironment,
                               renderGrid: isGridModeEnabled(this),
                               renderLinks: this.isLinksEnabled(),
                               canvasBackgroundColor:
@@ -2619,6 +2645,7 @@ class App extends React.Component<AppProps, AppState> {
                                 imageCache: this.imageCache,
                                 isExporting: false,
                                 scale: this.ownerWindow.devicePixelRatio,
+                                renderEnvironment: this.renderEnvironment,
                                 renderGrid: false,
                                 canvasBackgroundColor:
                                   this.state.viewBackgroundColor,

@@ -9,6 +9,8 @@ import {
 
 import { vi } from "vitest";
 
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
+
 import type {
   ElementsMap,
   NonDeletedExcalidrawElement,
@@ -239,5 +241,128 @@ describe("static scene link icons", () => {
     expect(secondBake).not.toBe(firstBake);
     expect(secondBake!.width).toBe(firstBake!.width * 2);
     expect(secondBake!.height).toBe(firstBake!.height * 2);
+  });
+
+  it("repairs only the scene of the environment whose image settled", () => {
+    const makeEnv = () => {
+      const canvases: HTMLCanvasElement[] = [];
+      const images: HTMLImageElement[] = [];
+      const env: RenderEnvironment = {
+        createCanvas: () => {
+          const canvas = document.createElement("canvas");
+          canvases.push(canvas);
+          return canvas;
+        },
+        createImage: () => {
+          const image = document.createElement("img");
+          let src = "";
+          Object.defineProperty(image, "src", {
+            get: () => src,
+            set: (value: string) => {
+              src = value;
+            },
+          });
+          images.push(image);
+          return image;
+        },
+      };
+      return { env, canvases, images };
+    };
+
+    const rect = newElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 50,
+      link: "https://excalidraw.com",
+    }) as NonDeletedExcalidrawElement;
+    const elementsMap = new Map([[rect.id, rect]]) as unknown as ElementsMap;
+    const appState = {
+      ...getDefaultAppState(),
+      width: 1000,
+      height: 1000,
+      offsetLeft: 0,
+      offsetTop: 0,
+    } as StaticCanvasAppState;
+
+    const makeConfig = (
+      env: RenderEnvironment,
+      scene: HTMLCanvasElement,
+    ): StaticSceneRenderConfig => ({
+      canvas: scene,
+      rc: new RoughCanvas(scene),
+      elementsMap: elementsMap as unknown as RenderableElementsMap,
+      allElementsMap: elementsMap as unknown as NonDeletedSceneElementsMap,
+      visibleElements: [rect],
+      scale: 1,
+      appState,
+      renderConfig: {
+        canvasBackgroundColor: "",
+        scale: 1,
+        imageCache: new Map(),
+        renderGrid: false,
+        renderLinks: true,
+        isExporting: false,
+        embedsValidationStatus: new Map(),
+        elementsPendingErasure: new Set(),
+        pendingFlowchartNodes: null,
+        theme: appState.theme,
+        renderEnvironment: env,
+      },
+    });
+
+    const sceneA = Object.assign(document.createElement("canvas"), {
+      width: 1000,
+      height: 1000,
+    });
+    const sceneB = Object.assign(document.createElement("canvas"), {
+      width: 1000,
+      height: 1000,
+    });
+    const envA = makeEnv();
+    const envB = makeEnv();
+    const configA = makeConfig(envA.env, sceneA);
+    const configB = makeConfig(envB.env, sceneB);
+
+    // icon canvases created by each environment, blitted onto its scene
+    // the icon canvas bakes at the fixed link icon size while the element
+    // bitmap is element-width + padding, so filter on width to isolate the
+    // icon blits
+    const iconBlits = (
+      scene: HTMLCanvasElement,
+      { canvases }: { canvases: HTMLCanvasElement[] },
+    ) =>
+      getDrawImageSources(scene).filter(
+        (source): source is HTMLCanvasElement =>
+          canvases.includes(source as HTMLCanvasElement) &&
+          (source as HTMLCanvasElement).width < 64,
+      );
+
+    renderStaticScene(configA);
+    renderStaticScene(configB);
+    expect(envA.images).toHaveLength(1);
+    expect(envB.images).toHaveLength(1);
+    const firstABake = iconBlits(sceneA, envA).pop()!;
+    const firstBBake = iconBlits(sceneB, envB).pop()!;
+    // first bakes are blank in both environments (images not decoded yet)
+    expect(getDrawImageSources(firstABake)).toHaveLength(0);
+    expect(getDrawImageSources(firstBBake)).toHaveLength(0);
+
+    // environment A's image decodes; environment B's does not
+    envA.images[0].onload?.({} as Event);
+
+    // A re-renders from a fresh bake that contains the decoded image
+    expect(iconBlits(sceneA, envA).length).toBeGreaterThan(1);
+    const secondABake = iconBlits(sceneA, envA).pop()!;
+    expect(secondABake).not.toBe(firstABake);
+    expect(getDrawImageSources(secondABake)).toContain(envA.images[0]);
+
+    // B is untouched by A's settle: no re-render happened, and B's blank
+    // bake was not evicted, so B's next render reuses it
+    renderStaticScene(configB);
+    expect(iconBlits(sceneB, envB).length).toBe(2);
+    expect(iconBlits(sceneB, envB).pop()).toBe(firstBBake);
+    expect(getDrawImageSources(firstBBake)).not.toContain(envB.images[0]);
   });
 });
