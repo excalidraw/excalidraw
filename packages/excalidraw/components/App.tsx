@@ -12840,6 +12840,7 @@ class App extends React.Component<AppProps, AppState> {
       imageCache: this.imageCache,
       fileIds: elements.map((element) => element.fileId),
       files,
+      createImage: () => new this.ownerWindow.Image(),
     });
 
     if (erroredFiles.size) {
