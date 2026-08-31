@@ -339,7 +339,8 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "convertElementType": "Toggle shape type"
+    "convertElementType": "Toggle shape type",
+    "table": "Table"
   },
   "bucketfill": {
     "noRegion": "Couldn't find an enclosed region to fill here.",
@@ -359,7 +360,8 @@
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
     "selection": "Selection",
-    "iframe": "IFrame"
+    "iframe": "IFrame",
+    "table": "Table"
   },
   "headings": {
     "canvasActions": "Canvas actions",

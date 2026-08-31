@@ -501,6 +501,7 @@ export const TOOL_TYPE = {
   laser: "laser",
   autoshape: "autoshape",
   bucketfill: "bucketfill",
+  table: "table",
 } as const;
 
 export const EDITOR_LS_KEYS = {

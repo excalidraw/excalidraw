@@ -422,6 +422,7 @@ import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
+import { createTableElements } from "../table";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -8826,6 +8827,10 @@ class App extends React.Component<AppProps, AppState> {
       // mode this branch is unreachable:
       // `handleCanvasPanUsingWheelOrSpaceDrag` swallows the pointer-down.
       this.bucketFill.handlePointerDown(scenePointer);
+    } else if (this.state.activeTool.type === "table") {
+      // For the table tool we reuse the rectangle drag-preview.
+      // On pointer-up we'll replace it with the full set of table elements.
+      this.createGenericElementOnPointerDown("rectangle", pointerDownState);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -11885,6 +11890,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (
         activeTool.type !== "selection" &&
+        activeTool.type !== "table" &&
         newElement &&
         isInvisiblySmallElement(newElement)
       ) {
@@ -11900,6 +11906,77 @@ class App extends React.Component<AppProps, AppState> {
           captureUpdate: CaptureUpdateAction.NEVER,
         });
 
+        return;
+      }
+
+      // ── Table finalisation ──────────────────────────────────────────────
+      // When the table tool was active, `newElement` is the temporary drag
+      // preview rectangle. Replace it with the full set of table elements.
+      if (activeTool.type === "table" && newElement) {
+        // Remove the temporary rectangle from the scene
+        this.updateScene({
+          elements: this.scene
+            .getElementsIncludingDeleted()
+            .filter((el) => el.id !== newElement.id),
+          appState: { newElement: null },
+          captureUpdate: CaptureUpdateAction.NEVER,
+        });
+
+        // Normalise dimensions (handle negative width/height from dragging
+        // up-left)
+        const normalised = getNormalizedDimensions(newElement);
+        const tableX = normalised.x ?? newElement.x;
+        const tableY = normalised.y ?? newElement.y;
+        const tableW = Math.abs(newElement.width) || 300;
+        const tableH = Math.abs(newElement.height) || 200;
+
+        const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+          x: tableX,
+          y: tableY,
+        });
+
+        const tableElements = createTableElements({
+          x: tableX,
+          y: tableY,
+          width: tableW,
+          height: tableH,
+          rows: 3,
+          cols: 3,
+          appState: this.state,
+          frameId: topLayerFrame ? topLayerFrame.id : null,
+        });
+
+        this.insertNewElements(tableElements);
+
+        // Select all the new elements
+        const selectedElementIds = tableElements.reduce(
+          (acc, el) => {
+            acc[el.id] = true as const;
+            return acc;
+          },
+          {} as Record<string, true>,
+        );
+
+        if (!this.isToolLocked()) {
+          this.setState(
+            {
+              newElement: null,
+              activeTool: updateActiveTool(this.state, {
+                type: this.state.preferredSelectionTool.type,
+              }),
+              selectedElementIds: makeNextSelectedElementIds(
+                selectedElementIds,
+                this.state,
+              ),
+            },
+            () => this.cursor.reset(),
+          );
+        } else {
+          this.setState({ newElement: null, selectedElementIds: makeNextSelectedElementIds(selectedElementIds, this.state) });
+        }
+
+        this.store.scheduleCapture();
+        this.scene.triggerUpdate();
         return;
       }
 

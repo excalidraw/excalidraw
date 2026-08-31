@@ -23,6 +23,7 @@ import {
   MagicIcon,
   mermaidLogoIcon,
   DotsIcon,
+  TableIcon,
 } from "./icons";
 import {
   ArrowToolButton,
@@ -40,6 +41,7 @@ import {
   RectangleToolButton,
   SelectionToolButton,
   SelectionToolPopover,
+  TableToolButton,
   TextToolButton,
 } from "./Tools";
 
@@ -67,6 +69,7 @@ const ExtraToolsDropdown = ({
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
   const bucketFillToolSelected = activeTool.type === "bucketfill";
+  const tableToolSelected = activeTool.type === "table";
   const lassoToolSelected =
     isFullStylesPanel &&
     activeTool.type === "lasso" &&
@@ -83,6 +86,7 @@ const ExtraToolsDropdown = ({
             (isFullStylesPanel && drawShapeToolSelected) ||
             lassoToolSelected ||
             bucketFillToolSelected ||
+            tableToolSelected ||
             // in collab we're already highlighting the laser button
             // outside toolbar, so let's not highlight extra-tools button
             // on top of it
@@ -106,6 +110,8 @@ const ExtraToolsDropdown = ({
           ? LassoIcon
           : bucketFillToolSelected
           ? bucketFillIcon
+          : tableToolSelected
+          ? TableIcon
           : DotsIcon}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
@@ -173,6 +179,16 @@ const ExtraToolsDropdown = ({
             {t("toolBar.lasso")}
           </DropdownMenu.Item>
         )}
+        <DropdownMenu.Item
+          onSelect={() => app.setActiveTool({ type: "table" })}
+          icon={TableIcon}
+          shortcut={"G"}
+          data-testid="toolbar-table"
+          selected={tableToolSelected}
+          disabled={isToolButtonDisabled(app, "table")}
+        >
+          {t("toolBar.table")}
+        </DropdownMenu.Item>
         <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
           Generate
         </div>
