@@ -141,6 +141,8 @@ export interface ExcalidrawElementWithCanvas {
   canvas: HTMLCanvasElement;
   theme: AppState["theme"];
   scale: number;
+  /** backing-store scale the bitmap was rasterized at, see StaticCanvasRenderConfig["scale"] */
+  deviceScale: number;
   zoomValue: AppState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -260,6 +262,7 @@ const generateElementCanvas = (
     canvas,
     theme: appState.theme,
     scale,
+    deviceScale: renderConfig.scale,
     zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
@@ -578,6 +581,7 @@ const generateElementWithCanvas = (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
+    prevElementWithCanvas.deviceScale !== renderConfig.scale ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
