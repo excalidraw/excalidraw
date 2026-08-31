@@ -86,6 +86,8 @@ export const getDefaultAppState = (): Omit<
     openPopup: null,
     openSidebar: null,
     openDialog: null,
+    tableNumRows: 3,
+    tableNumCols: 3,
     previousSelectedElementIds: {},
     resizingElement: null,
     scrolledOutside: false,
@@ -267,6 +269,8 @@ const APP_STATE_STORAGE_CONF = (<
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
   colorTopPicks: { browser: true, export: false, server: false },
+  tableNumRows: { browser: true, export: false, server: false },
+  tableNumCols: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

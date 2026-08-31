@@ -325,6 +325,12 @@ import {
   actionToggleArrowBinding,
   actionToggleMidpointSnapping,
   actionToggleCropEditor,
+  actionTableAddRowAbove,
+  actionTableAddRowBelow,
+  actionTableAddColLeft,
+  actionTableAddColRight,
+  actionTableDeleteRow,
+  actionTableDeleteCol,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
 import { actionPaste } from "../actions/actionClipboard";
@@ -11940,8 +11946,8 @@ class App extends React.Component<AppProps, AppState> {
           y: tableY,
           width: tableW,
           height: tableH,
-          rows: 3,
-          cols: 3,
+          rows: this.state.tableNumRows || 3,
+          cols: this.state.tableNumCols || 3,
           appState: this.state,
           frameId: topLayerFrame ? topLayerFrame.id : null,
         });
@@ -13789,6 +13795,12 @@ class App extends React.Component<AppProps, AppState> {
       actionPasteStyles,
       CONTEXT_MENU_SEPARATOR,
       actionGroup,
+      actionTableAddRowAbove,
+      actionTableAddRowBelow,
+      actionTableAddColLeft,
+      actionTableAddColRight,
+      actionTableDeleteRow,
+      actionTableDeleteCol,
       actionTextAutoResize,
       actionUnbindText,
       actionBindText,

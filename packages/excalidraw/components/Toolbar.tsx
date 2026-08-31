@@ -180,11 +180,11 @@ const ExtraToolsDropdown = ({
           </DropdownMenu.Item>
         )}
         <DropdownMenu.Item
-          onSelect={() => app.setActiveTool({ type: "table" })}
+          onSelect={() => app.setAppState({ openDialog: { name: "table" } })}
           icon={TableIcon}
           shortcut={"G"}
           data-testid="toolbar-table"
-          selected={tableToolSelected}
+          selected={tableToolSelected || app.state.openDialog?.name === "table"}
           disabled={isToolButtonDisabled(app, "table")}
         >
           {t("toolBar.table")}
