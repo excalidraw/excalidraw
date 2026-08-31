@@ -38,6 +38,7 @@ import {
   getExternalLinkImg,
   getElementLinkImg,
   getLinkHandleFromCoords,
+  onLinkImgSettle,
 } from "../components/hyperlink/helpers";
 
 import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
@@ -176,6 +177,18 @@ onRenderEnvironmentChange(() => {
   linkIconCanvasCache.elementLink = null;
 });
 
+let lastSceneConfig: StaticSceneRenderConfig | null = null;
+
+// Icons bake into the cache in the same task the images start decoding, so
+// the first bake is blank. Drop the caches and repaint once the images settle.
+onLinkImgSettle(() => {
+  linkIconCanvasCache.regularLink = null;
+  linkIconCanvasCache.elementLink = null;
+  if (lastSceneConfig) {
+    renderStaticScene(lastSceneConfig);
+  }
+});
+
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
@@ -225,22 +238,13 @@ const renderLinkIcon = (
 
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
-      if (canvasKey === "elementLink") {
-        linkCanvasCacheContext.drawImage(
-          getElementLinkImg(),
-          0,
-          0,
-          width,
-          height,
-        );
-      } else {
-        linkCanvasCacheContext.drawImage(
-          getExternalLinkImg(),
-          0,
-          0,
-          width,
-          height,
-        );
+      const linkImg =
+        canvasKey === "elementLink"
+          ? getElementLinkImg()
+          : getExternalLinkImg();
+      // undecoded images are silently skipped by drawImage
+      if (linkImg.drawReady) {
+        linkCanvasCacheContext.drawImage(linkImg.img, 0, 0, width, height);
       }
 
       linkCanvasCacheContext.restore();
@@ -263,6 +267,17 @@ const _renderStaticScene = ({
   if (canvas === null) {
     return;
   }
+
+  lastSceneConfig = {
+    canvas,
+    rc,
+    elementsMap,
+    allElementsMap,
+    visibleElements,
+    scale,
+    appState,
+    renderConfig,
+  };
 
   const { renderGrid = true, isExporting } = renderConfig;
 
