@@ -8,6 +8,7 @@
   --zIndex-wysiwyg: 3;
   --zIndex-canvasButtons: 3;
   --zIndex-layerUI: 4;
+  --zIndex-viewportStatusFrame: 5;
   --zIndex-eyeDropperBackdrop: 5;
   --zIndex-eyeDropperPreview: 6;
   --zIndex-hyperlinkContainer: 7;
@@ -39,6 +40,12 @@ body.excalidraw-cursor-resize * {
 .excalidraw {
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
     Roboto, Helvetica, Arial, sans-serif;
+  --viewport-status-frame-border-width: 0px;
+
+  &.excalidraw--viewport-status-border {
+    --viewport-status-frame-border-width: 4px;
+  }
+
   font-family: var(--ui-font);
 
   position: relative;
@@ -277,6 +284,20 @@ body.excalidraw-cursor-resize * {
     flex-direction: column;
   }
 
+  // mobile-only: pinned near the very top of the viewport (just below the
+  // viewport-status-frame border), independent of the top icon row's
+  // height, rather than competing for space with the bottom toolbar.
+  .viewport-status-frame__badge-row {
+    position: absolute;
+    top: calc(var(--viewport-status-frame-border-width) + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    // explicit (not auto) so it participates correctly against the
+    // interactive canvas's own explicit z-index, regardless of value.
+    z-index: var(--zIndex-viewportStatusFrame);
+    pointer-events: none;
+  }
+
   .App-welcome-screen {
     z-index: var(--zIndex-layerUI);
   }
@@ -387,6 +408,33 @@ body.excalidraw-cursor-resize * {
   .App-menu_top > .App-menu_top__left {
     grid-column: 1;
     justify-self: start;
+
+    // App-menu_top__left is a single-column grid, so its track width is
+    // driven by the widest row — including the host-provided
+    // renderTopLeftUI content, which can be arbitrarily wide. Its
+    // (stretched) grid-item wrappers must stay pointer-events:none so that
+    // slack isn't a dead zone over the canvas; only the actual
+    // (content-sized, non-stretched) interactive pieces opt back in.
+    // Specificity (not source order) is why this beats `.App-menu_top > *`.
+    pointer-events: none;
+
+    .selected-shape-actions-container,
+    .ToolIcon__penMode {
+      pointer-events: var(--ui-pointerEvents);
+    }
+
+    // .excalidraw-ui-top-left is itself `display: flex` (block-level), so
+    // it *also* stretches to fill this track's width — its own box needs
+    // the same none-then-opt-in treatment, one level deeper, so its real
+    // (content-sized, unstretched) children stay clickable without
+    // resizing/repositioning the row itself.
+    .excalidraw-ui-top-left {
+      pointer-events: none;
+
+      > * {
+        pointer-events: var(--ui-pointerEvents);
+      }
+    }
   }
 
   .App-menu_top > .shapes-section {
@@ -512,6 +560,11 @@ body.excalidraw-cursor-resize * {
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);
+    box-sizing: border-box;
+    max-width: calc(
+      100% - var(--viewport-status-frame-border-width) -
+        var(--viewport-status-frame-border-width)
+    );
     pointer-events: var(--ui-pointerEvents);
     font-family: inherit;
 
@@ -524,11 +577,13 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  // always rendered as a flex column of [scroll-back-to-content, badge] —
+  // this positions the stack itself; children are centered/spaced via flex.
   .floating-status-stack {
     position: absolute;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
+    left: var(--viewport-status-frame-border-width);
+    right: var(--viewport-status-frame-border-width);
+    bottom: calc(0.5rem + var(--viewport-status-frame-border-width));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -540,8 +595,22 @@ body.excalidraw-cursor-resize * {
       left: auto;
       bottom: auto;
       transform: none;
+      max-width: 100%;
       pointer-events: var(--ui-pointerEvents);
     }
+  }
+
+  // on mobile, when the default bottom toolbar renders, the stack is a
+  // normal (in-flow) row above MobileShapeActions/the toolbar Island inside
+  // .App-bottom-bar instead of being independently viewport-positioned —
+  // self-sizing regardless of whether MobileShapeActions is showing, with
+  // no magic-number height math needed to clear the toolbar.
+  .App-bottom-bar > .floating-status-stack {
+    position: static;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    margin-bottom: 0.5rem;
   }
 
   .help-icon {
@@ -587,16 +656,6 @@ body.excalidraw-cursor-resize * {
     .floating-status-stack {
       bottom: calc(30px + var(--sab, 0));
       z-index: var(--zIndex-ui-bottom);
-    }
-
-    .scroll-back-to-content {
-      bottom: calc(100px + var(--sab, 0));
-      z-index: -1;
-    }
-
-    .floating-status-stack .scroll-back-to-content {
-      bottom: auto;
-      z-index: auto;
     }
   }
 
@@ -877,11 +936,37 @@ body.excalidraw-cursor-resize * {
 
 .excalidraw__embeddable-container {
   .excalidraw__embeddable-container__inner {
+    position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--embeddable-radius);
+  }
+
+  .excalidraw__embeddable__generating {
+    position: absolute;
+    z-index: 1;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 0.875rem;
+    font-family: "Assistant";
+    pointer-events: none;
+
+    .Spinner {
+      --spinner-color: #fff;
+
+      flex: 0 0 auto;
+      height: auto;
+      margin: 0;
+    }
   }
 
   .excalidraw__embeddable__outer {

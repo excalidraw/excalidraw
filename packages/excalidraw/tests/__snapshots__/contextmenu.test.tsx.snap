@@ -15,6 +15,11 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": {
     "items": [
       "separator",
@@ -919,7 +924,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -989,7 +993,6 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -1091,6 +1094,11 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -1121,7 +1129,6 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -1187,7 +1194,6 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "toast": {
     "message": "Added to library",
   },
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -1308,6 +1314,11 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -1338,7 +1349,6 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -1402,7 +1412,6 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -1642,6 +1651,11 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -1672,7 +1686,6 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -1736,7 +1749,6 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -1976,6 +1988,11 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -2006,7 +2023,6 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -2072,7 +2088,6 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "toast": {
     "message": "Copied styles.",
   },
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -2193,6 +2208,11 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -2223,7 +2243,6 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -2285,7 +2304,6 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -2437,6 +2455,11 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -2467,7 +2490,6 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -2531,7 +2553,6 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -2738,6 +2759,11 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -2768,7 +2794,6 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -2837,7 +2862,6 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -3113,6 +3137,11 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -3143,7 +3172,6 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -3209,7 +3237,6 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "toast": {
     "message": "Copied styles.",
   },
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -3636,6 +3663,11 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -3666,7 +3698,6 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -3730,7 +3761,6 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -3962,6 +3992,11 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -3992,7 +4027,6 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -4056,7 +4090,6 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -4288,6 +4321,11 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
@@ -4318,7 +4356,6 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -4385,7 +4422,6 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -4702,6 +4738,11 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": {
     "items": [
       "separator",
@@ -5606,7 +5647,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -5673,7 +5713,6 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -5922,6 +5961,11 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": {
     "items": [
       "separator",
@@ -6826,7 +6870,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -6895,7 +6938,6 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -7193,6 +7235,11 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": {
     "items": [
       {
@@ -7786,7 +7833,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -7851,7 +7897,6 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -7885,6 +7930,11 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": {
     "items": [
       "separator",
@@ -8789,7 +8839,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -8853,7 +8902,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,
@@ -8879,6 +8927,11 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "bindingPreference": "enabled",
   "boxSelectionMode": "contain",
   "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
   "contextMenu": {
     "items": [
       "separator",
@@ -9783,7 +9836,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
-  "followedBy": Set {},
   "frameRendering": {
     "clip": true,
     "enabled": true,
@@ -9850,7 +9902,6 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
-  "userToFollow": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "width": 200,

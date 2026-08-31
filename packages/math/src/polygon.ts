@@ -87,12 +87,15 @@ export function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
  * The signed area of a polygon via the shoelace formula. Positive when the
  * vertices wind counter-clockwise in a y-down coordinate system.
  *
- * The polygon may be given open or closed; a closing vertex is ignored.
+ * The polygon may be given open or closed; a closing vertex
  */
 export function polygonSignedArea<Point extends LocalPoint | GlobalPoint>(
   polygon: readonly Point[],
+  tolerance: number = PRECISION,
 ): number {
-  const pts = polygonIsClosed(polygon) ? polygon.slice(0, -1) : polygon;
+  const pts = polygonIsClosed(polygon, tolerance)
+    ? polygon.slice(0, -1)
+    : polygon;
   let sum = 0;
   for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
     sum += pts[j][0] * pts[i][1] - pts[i][0] * pts[j][1];
@@ -102,8 +105,9 @@ export function polygonSignedArea<Point extends LocalPoint | GlobalPoint>(
 
 export function polygonArea<Point extends LocalPoint | GlobalPoint>(
   polygon: readonly Point[],
+  tolerance: number = PRECISION,
 ): number {
-  return Math.abs(polygonSignedArea(polygon));
+  return Math.abs(polygonSignedArea(polygon, tolerance));
 }
 
 /**

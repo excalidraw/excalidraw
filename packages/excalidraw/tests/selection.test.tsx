@@ -182,14 +182,17 @@ describe("lasso reselection", () => {
       h.app.setActiveTool({ type: "lasso" });
     });
 
+    // NOTE: the lasso starts inside the common bounds of the selection, and
+    // encloses rectA only (the default box selection mode being "contain")
     Keyboard.withModifierKeys({ ctrl: true, alt: true }, () => {
       mouse.downAt(110, 50);
-      mouse.moveTo(50, -20);
+      mouse.moveTo(110, -50);
 
       expect(h.app.lassoTrail.hasCurrentTrail).toBe(true);
 
-      mouse.moveTo(-20, 50);
-      mouse.moveTo(50, 120);
+      mouse.moveTo(-50, -50);
+      mouse.moveTo(-50, 150);
+      mouse.moveTo(110, 150);
       mouse.moveTo(110, 50);
       mouse.up();
     });
@@ -1351,7 +1354,8 @@ describe("tool locking & selection", () => {
         // no top-level toolbar button (rendered in the extra-tools dropdown)
         value !== "frame" &&
         value !== "embeddable" &&
-        value !== "autoshape"
+        value !== "autoshape" &&
+        value !== "bucketfill"
       ) {
         const element = UI.createElement(value);
         expect(h.state.selectedElementIds[element.id]).not.toBe(true);
