@@ -232,4 +232,29 @@ describe("AnimationController", () => {
     expect(popoutWindow.clearTimeout).toHaveBeenCalledWith(3);
     expect(AnimationController.running(SECOND_KEY)).toBe(false);
   });
+
+  it("drops the registration when the owning window is hidden", () => {
+    let pagehide: EventListener | undefined;
+    const popoutWindow = {
+      requestAnimationFrame: vi.fn(),
+      cancelAnimationFrame: vi.fn(),
+      setTimeout: vi.fn(() => 3),
+      clearTimeout: vi.fn(),
+      addEventListener: (type: string, listener: EventListener) => {
+        if (type === "pagehide") {
+          pagehide = listener;
+        }
+      },
+    };
+
+    AnimationController.start(FIRST_KEY, () => ({ keep: true }), popoutWindow);
+    expect(AnimationController.running(FIRST_KEY)).toBe(true);
+
+    // pagehide fires on window close even when blur is skipped (e.g.
+    // programmatic close), so the records and their callback closures
+    // must not persist in the same realm
+    pagehide?.call(window, new Event("pagehide"));
+
+    expect(AnimationController.running(FIRST_KEY)).toBe(false);
+  });
 });
