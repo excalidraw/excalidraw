@@ -26,6 +26,13 @@ export type RenderableElementsMap = NonDeletedElementsMap &
 
 export type StaticCanvasRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];
+  /**
+   * Backing-store scale the target canvas was bootstrapped with -- the owner
+   * window's devicePixelRatio when rendering into the editor, exportScale when
+   * exporting. Element caches are built and blitted at this ratio, so it must
+   * be the same value passed as `StaticSceneRenderConfig["scale"]`.
+   */
+  scale: number;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];

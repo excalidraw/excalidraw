@@ -34,24 +34,32 @@ export const MQ_RIGHT_SIDEBAR_MIN_WIDTH = 1229;
 // -----------------------------------------------------------------------------
 
 // user agent detections
-export const isDarwin = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
-export const isWindows = /^Win/.test(navigator.platform);
-export const isAndroid = /\b(android)\b/i.test(navigator.userAgent);
+//
+// evaluated at module scope, so they must tolerate a non-browser realm --
+// these modules are imported by the export pipeline, which is expected to be
+// loadable under Node
+const ua = typeof navigator === "undefined" ? undefined : navigator;
+const uaPlatform = ua?.platform ?? "";
+const uaString = ua?.userAgent ?? "";
+
+export const isDarwin = /Mac|iPod|iPhone|iPad/.test(uaPlatform);
+export const isWindows = /^Win/.test(uaPlatform);
+export const isAndroid = /\b(android)\b/i.test(uaString);
 export const isFirefox =
   typeof window !== "undefined" &&
   "netscape" in window &&
-  navigator.userAgent.indexOf("rv:") > 1 &&
-  navigator.userAgent.indexOf("Gecko") > 1;
-export const isChrome = navigator.userAgent.indexOf("Chrome") !== -1;
-export const isSafari =
-  !isChrome && navigator.userAgent.indexOf("Safari") !== -1;
+  uaString.indexOf("rv:") > 1 &&
+  uaString.indexOf("Gecko") > 1;
+export const isChrome = uaString.indexOf("Chrome") !== -1;
+export const isSafari = !isChrome && uaString.indexOf("Safari") !== -1;
 export const isIOS =
-  /iPad|iPhone/i.test(navigator.platform) ||
+  /iPad|iPhone/i.test(uaPlatform) ||
   // iPadOS 13+
-  (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+  (uaString.includes("Mac") &&
+    typeof document !== "undefined" &&
+    "ontouchend" in document);
 // keeping function so it can be mocked in test
-export const isBrave = () =>
-  (navigator as any).brave?.isBrave?.name === "isBrave";
+export const isBrave = () => (ua as any)?.brave?.isBrave?.name === "isBrave";
 
 // export const isMobile =
 //   isIOS ||

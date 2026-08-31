@@ -10,6 +10,7 @@ import type {
   BinaryFiles,
 } from "@excalidraw/excalidraw/types";
 
+import { getRenderEnvironment } from "./renderEnvironment";
 import { isInitializedImageElement } from "./typeChecks";
 
 import type {
@@ -18,12 +19,9 @@ import type {
   InitializedExcalidrawImageElement,
 } from "./types";
 
-export const loadHTMLImageElement = (
-  dataURL: DataURL,
-  createImage: () => HTMLImageElement = () => new Image(),
-) => {
+export const loadHTMLImageElement = (dataURL: DataURL) => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = createImage();
+    const image = getRenderEnvironment().createImage();
     image.onload = () => {
       resolve(image);
     };
@@ -40,12 +38,10 @@ export const updateImageCache = async ({
   fileIds,
   files,
   imageCache,
-  createImage,
 }: {
   fileIds: FileId[];
   files: BinaryFiles;
   imageCache: AppClassProperties["imageCache"];
-  createImage?: () => HTMLImageElement;
 }) => {
   const updatedFiles = new Map<FileId, true>();
   const erroredFiles = new Map<FileId, true>();
@@ -62,10 +58,7 @@ export const updateImageCache = async ({
                 throw new Error("Only images can be added to ImageCache");
               }
 
-              const imagePromise = loadHTMLImageElement(
-                fileData.dataURL,
-                createImage,
-              );
+              const imagePromise = loadHTMLImageElement(fileData.dataURL);
               const data = {
                 image: imagePromise,
                 mimeType: fileData.mimeType,

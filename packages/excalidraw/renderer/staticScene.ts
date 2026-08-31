@@ -21,6 +21,11 @@ import {
 
 import { renderElement } from "@excalidraw/element";
 
+import {
+  getRenderEnvironment,
+  onRenderEnvironmentChange,
+} from "@excalidraw/element/renderEnvironment";
+
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
@@ -30,8 +35,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import {
-  EXTERNAL_LINK_IMG,
-  ELEMENT_LINK_IMG,
+  getExternalLinkImg,
+  getElementLinkImg,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 
@@ -166,11 +171,18 @@ const linkIconCanvasCache: {
   elementLink: null,
 };
 
+onRenderEnvironmentChange(() => {
+  linkIconCanvasCache.regularLink = null;
+  linkIconCanvasCache.elementLink = null;
+});
+
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,
+  /** backing-store scale, see StaticCanvasRenderConfig["scale"] */
+  scale: number,
 ) => {
   if (element.link && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -192,18 +204,17 @@ const renderLinkIcon = (
     let linkCanvas = linkIconCanvasCache[canvasKey];
 
     if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
-      linkCanvas = Object.assign(document.createElement("canvas"), {
+      linkCanvas = Object.assign(getRenderEnvironment().createCanvas(), {
         zoom: appState.zoom.value,
       });
-      linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
-      linkCanvas.height =
-        height * window.devicePixelRatio * appState.zoom.value;
+      linkCanvas.width = width * scale * appState.zoom.value;
+      linkCanvas.height = height * scale * appState.zoom.value;
       linkIconCanvasCache[canvasKey] = linkCanvas;
 
       const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
       linkCanvasCacheContext.scale(
-        window.devicePixelRatio * appState.zoom.value,
-        window.devicePixelRatio * appState.zoom.value,
+        scale * appState.zoom.value,
+        scale * appState.zoom.value,
       );
 
       // Seed a sane default so a corrupted color (silently rejected by the
@@ -215,10 +226,16 @@ const renderLinkIcon = (
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
       if (canvasKey === "elementLink") {
-        linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
+        linkCanvasCacheContext.drawImage(
+          getElementLinkImg(),
+          0,
+          0,
+          width,
+          height,
+        );
       } else {
         linkCanvasCacheContext.drawImage(
-          EXTERNAL_LINK_IMG,
+          getExternalLinkImg(),
           0,
           0,
           width,
@@ -377,7 +394,7 @@ const _renderStaticScene = ({
         context.restore();
 
         if (!isExporting && renderConfig.renderLinks !== false) {
-          renderLinkIcon(element, context, appState, elementsMap);
+          renderLinkIcon(element, context, appState, elementsMap, scale);
         }
       } catch (error: any) {
         console.error(
@@ -428,7 +445,7 @@ const _renderStaticScene = ({
             );
           }
           if (!isExporting && renderConfig.renderLinks !== false) {
-            renderLinkIcon(element, context, appState, elementsMap);
+            renderLinkIcon(element, context, appState, elementsMap, scale);
           }
         };
         // - when exporting the whole canvas, we DO NOT apply clipping

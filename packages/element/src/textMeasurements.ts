@@ -7,6 +7,11 @@ import {
   normalizeEOL,
 } from "@excalidraw/common";
 
+import {
+  getRenderEnvironment,
+  onRenderEnvironmentChange,
+} from "./renderEnvironment";
+
 import type { FontString, ExcalidrawTextElement } from "./types";
 
 export const measureText = (
@@ -104,6 +109,17 @@ export const getApproxMinLineHeight = (
 };
 
 let textMetricsProvider: TextMetricsProvider | undefined;
+/** whether `textMetricsProvider` is the lazily-built canvas-backed default */
+let usingDefaultTextMetricsProvider = false;
+
+// the default provider holds a canvas from whichever environment was active
+// when it was built; a custom provider is the caller's and is left alone
+onRenderEnvironmentChange(() => {
+  if (usingDefaultTextMetricsProvider) {
+    textMetricsProvider = undefined;
+    usingDefaultTextMetricsProvider = false;
+  }
+});
 
 /**
  * Set a custom text metrics provider.
@@ -112,6 +128,7 @@ let textMetricsProvider: TextMetricsProvider | undefined;
  */
 export const setCustomTextMetricsProvider = (provider: TextMetricsProvider) => {
   textMetricsProvider = provider;
+  usingDefaultTextMetricsProvider = false;
 };
 
 export interface TextMetricsProvider {
@@ -122,7 +139,7 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
   private canvas: HTMLCanvasElement;
 
   constructor() {
-    this.canvas = document.createElement("canvas");
+    this.canvas = getRenderEnvironment().createCanvas();
   }
 
   /**
@@ -152,6 +169,7 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
 export const getLineWidth = (text: string, font: FontString) => {
   if (!textMetricsProvider) {
     textMetricsProvider = new CanvasTextMetricsProvider();
+    usingDefaultTextMetricsProvider = true;
   }
 
   return textMetricsProvider.getLineWidth(text, font);

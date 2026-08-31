@@ -2593,6 +2593,7 @@ class App extends React.Component<AppProps, AppState> {
                             renderConfig={{
                               imageCache: this.imageCache,
                               isExporting: false,
+                              scale: this.ownerWindow.devicePixelRatio,
                               renderGrid: isGridModeEnabled(this),
                               renderLinks: this.isLinksEnabled(),
                               canvasBackgroundColor:
@@ -2617,6 +2618,7 @@ class App extends React.Component<AppProps, AppState> {
                               renderConfig={{
                                 imageCache: this.imageCache,
                                 isExporting: false,
+                                scale: this.ownerWindow.devicePixelRatio,
                                 renderGrid: false,
                                 canvasBackgroundColor:
                                   this.state.viewBackgroundColor,
@@ -12837,7 +12839,6 @@ class App extends React.Component<AppProps, AppState> {
       imageCache: this.imageCache,
       fileIds: elements.map((element) => element.fileId),
       files,
-      createImage: () => new this.ownerWindow.Image(),
     });
 
     if (erroredFiles.size) {

@@ -510,6 +510,11 @@ export { isElementLink } from "@excalidraw/element";
 export { Fonts } from "./fonts/Fonts";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
+export {
+  setRenderEnvironment,
+  resetRenderEnvironment,
+} from "@excalidraw/element";
+export type { RenderEnvironment } from "@excalidraw/element";
 
 export { CommandPalette } from "./components/CommandPalette/CommandPalette";
 

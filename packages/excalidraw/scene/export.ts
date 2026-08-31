@@ -19,6 +19,7 @@ import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
+  getRenderEnvironment,
   updateImageCache,
 } from "@excalidraw/element";
 
@@ -69,7 +70,7 @@ const truncateText = (
   if (element.width <= maxWidth) {
     return element;
   }
-  const canvas = document.createElement("canvas");
+  const canvas = getRenderEnvironment().createCanvas();
   const ctx = canvas.getContext("2d")!;
   ctx.font = getFontString({
     fontFamily: element.fontFamily,
@@ -196,7 +197,7 @@ export const exportToCanvas = async (
     width: number,
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
-    const canvas = document.createElement("canvas");
+    const canvas = getRenderEnvironment().createCanvas();
     canvas.width = width * appState.exportScale;
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
@@ -272,6 +273,7 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
+      scale,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),

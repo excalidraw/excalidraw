@@ -6,7 +6,10 @@ import {
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
-import { getNonDeletedElements } from "@excalidraw/element";
+import {
+  getNonDeletedElements,
+  getRenderEnvironment,
+} from "@excalidraw/element";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import {
   restoreAppState,
@@ -63,7 +66,7 @@ export const exportToCanvas = ({
     files || {},
     { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
     (width: number, height: number) => {
-      const canvas = document.createElement("canvas");
+      const canvas = getRenderEnvironment().createCanvas();
 
       if (maxWidthOrHeight) {
         if (typeof getDimensions === "function") {
