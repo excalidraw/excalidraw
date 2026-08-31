@@ -162,19 +162,22 @@ export const frameClip = (
   );
 };
 
-type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
+// Backing-store scale is per static scene instance (e.g. per-window DPR),
+// so key on it with zoom; a shared single-slot cache would serve one
+// instance's canvas to another at the wrong resolution.
+type LinkIconCanvasCacheType = "regularLink" | "elementLink";
 
-const linkIconCanvasCache: {
-  regularLink: LinkIconCanvas | null;
-  elementLink: LinkIconCanvas | null;
-} = {
-  regularLink: null,
-  elementLink: null,
-};
+const linkIconCanvasCache = new Map<string, HTMLCanvasElement>();
+const LINK_ICON_CACHE_MAX_ENTRIES = 8;
+
+const getLinkIconCacheKey = (
+  type: LinkIconCanvasCacheType,
+  zoom: number,
+  scale: number,
+) => `${type}:${zoom}:${scale}`;
 
 onRenderEnvironmentChange(() => {
-  linkIconCanvasCache.regularLink = null;
-  linkIconCanvasCache.elementLink = null;
+  linkIconCanvasCache.clear();
 });
 
 let lastSceneConfig: StaticSceneRenderConfig | null = null;
@@ -182,8 +185,7 @@ let lastSceneConfig: StaticSceneRenderConfig | null = null;
 // Icons bake into the cache in the same task the images start decoding, so
 // the first bake is blank. Drop the caches and repaint once the images settle.
 onLinkImgSettle(() => {
-  linkIconCanvasCache.regularLink = null;
-  linkIconCanvasCache.elementLink = null;
+  linkIconCanvasCache.clear();
   if (lastSceneConfig) {
     renderStaticScene(lastSceneConfig);
   }
@@ -210,19 +212,25 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    const canvasKey = isElementLink(element.link)
+    const canvasKey: LinkIconCanvasCacheType = isElementLink(element.link)
       ? "elementLink"
       : "regularLink";
 
-    let linkCanvas = linkIconCanvasCache[canvasKey];
+    const cacheKey = getLinkIconCacheKey(canvasKey, appState.zoom.value, scale);
 
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
-      linkCanvas = Object.assign(getRenderEnvironment().createCanvas(), {
-        zoom: appState.zoom.value,
-      });
+    let linkCanvas = linkIconCanvasCache.get(cacheKey);
+
+    if (!linkCanvas) {
+      linkCanvas = getRenderEnvironment().createCanvas();
       linkCanvas.width = width * scale * appState.zoom.value;
       linkCanvas.height = height * scale * appState.zoom.value;
-      linkIconCanvasCache[canvasKey] = linkCanvas;
+      linkIconCanvasCache.set(cacheKey, linkCanvas);
+      if (linkIconCanvasCache.size > LINK_ICON_CACHE_MAX_ENTRIES) {
+        const oldestKey = linkIconCanvasCache.keys().next().value;
+        if (oldestKey !== undefined) {
+          linkIconCanvasCache.delete(oldestKey);
+        }
+      }
 
       const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
       linkCanvasCacheContext.scale(

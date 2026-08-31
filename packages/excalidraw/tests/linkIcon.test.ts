@@ -160,4 +160,84 @@ describe("static scene link icons", () => {
       imageDraws().filter((source) => source === elementLinkImg).length,
     ).toBeGreaterThan(0);
   });
+
+  it("bakes a separate icon canvas per backing-store scale", () => {
+    const rect = newElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 50,
+      link: "https://excalidraw.com",
+    }) as NonDeletedExcalidrawElement;
+    const elementsMap = new Map([[rect.id, rect]]) as unknown as ElementsMap;
+
+    setRenderEnvironment({
+      createCanvas: () => {
+        const canvas = document.createElement("canvas");
+        createdCanvases.push(canvas);
+        return canvas;
+      },
+    });
+
+    const appState = {
+      ...getDefaultAppState(),
+      width: 1000,
+      height: 1000,
+      offsetLeft: 0,
+      offsetTop: 0,
+    } as StaticCanvasAppState;
+
+    const makeConfig = (scale: number): StaticSceneRenderConfig => {
+      const scene = Object.assign(document.createElement("canvas"), {
+        width: 1000,
+        height: 1000,
+      });
+      return {
+        canvas: scene,
+        rc: new RoughCanvas(scene),
+        elementsMap: elementsMap as unknown as RenderableElementsMap,
+        allElementsMap: elementsMap as unknown as NonDeletedSceneElementsMap,
+        visibleElements: [rect],
+        scale,
+        appState,
+        renderConfig: {
+          canvasBackgroundColor: "",
+          scale,
+          imageCache: new Map(),
+          renderGrid: false,
+          renderLinks: true,
+          isExporting: false,
+          embedsValidationStatus: new Map(),
+          elementsPendingErasure: new Set(),
+          pendingFlowchartNodes: null,
+          theme: appState.theme,
+        },
+      };
+    };
+
+    // the link icon is blitted after the element's own canvas, so it is
+    // the last cached-canvas source
+    const blitSource = (scene: HTMLCanvasElement) =>
+      getDrawImageSources(scene)
+        .filter((source) =>
+          createdCanvases.includes(source as HTMLCanvasElement),
+        )
+        .pop() as HTMLCanvasElement | undefined;
+
+    const config1 = makeConfig(1);
+    renderStaticScene(config1);
+    const firstBake = blitSource(config1.canvas);
+    expect(firstBake).toBeDefined();
+
+    // a second instance (e.g. another window) with the same zoom but a
+    // different backing-store scale must not reuse the first bake
+    const config2 = makeConfig(2);
+    renderStaticScene(config2);
+    const secondBake = blitSource(config2.canvas);
+    expect(secondBake).toBeDefined();
+    expect(secondBake).not.toBe(firstBake);
+    expect(secondBake!.width).toBe(firstBake!.width * 2);
+    expect(secondBake!.height).toBe(firstBake!.height * 2);
+  });
 });

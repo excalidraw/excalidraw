@@ -417,7 +417,7 @@ const drawElementOnCanvas = (
           cacheEntry?.mimeType === MIME_TYPES.svg;
 
         if (shouldInvertImage && isSafari) {
-          const devicePixelRatio = renderConfig.scale;
+          const devicePixelRatio = renderConfig.scale || 1;
           const tempCanvas = getRenderEnvironment().createCanvas();
           tempCanvas.width = element.width * devicePixelRatio;
           tempCanvas.height = element.height * devicePixelRatio;
