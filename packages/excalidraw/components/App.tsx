@@ -428,7 +428,7 @@ import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
-import { createTableElements } from "../table";
+import { createTableElements, isTableElement } from "../table";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -7194,6 +7194,22 @@ class App extends React.Component<AppProps, AppState> {
             this,
           ),
         }));
+
+        if (
+          isTableElement(hitElement) ||
+          isTextBindableContainer(hitElement, false)
+        ) {
+          const midPoint = getContainerCenter(
+            hitElement,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          this.startTextEditing({
+            sceneX: midPoint.x,
+            sceneY: midPoint.y,
+            insertAtParentCenter: true,
+            container: hitElement as ExcalidrawTextContainer,
+          });
+        }
         return;
       }
     }

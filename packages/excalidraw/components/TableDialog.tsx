@@ -78,8 +78,8 @@ export const TableDialog = ({
       size="small"
       onCloseRequest={onClose}
       title={
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          {TableIcon}
+        <div className="TableDialog__title">
+          <span className="TableDialog__title-icon">{TableIcon}</span>
           <span>{t("labels.table_insertTable")}</span>
         </div>
       }
