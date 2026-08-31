@@ -28,21 +28,18 @@ export type RenderEnvironment = {
   createImage: () => HTMLImageElement;
 };
 
-let overrides: Partial<RenderEnvironment> = {};
+const defaultCreateCanvas = () => document.createElement("canvas");
+const defaultCreateImage = () => new Image();
 
 /**
- * Resolved lazily on every access so that importing this module never touches
- * `document`/`window`.
- *
  * NOTE: deliberately does NOT carry a devicePixelRatio. The backing-store scale
  * is per-canvas, not per-process -- it is threaded through
  * `StaticCanvasRenderConfig["scale"]`, which already carries the owner window's
  * ratio (editor) or exportScale (export).
  */
-const environment: RenderEnvironment = {
-  createCanvas: () =>
-    (overrides.createCanvas ?? (() => document.createElement("canvas")))(),
-  createImage: () => (overrides.createImage ?? (() => new Image()))(),
+let environment: RenderEnvironment = {
+  createCanvas: defaultCreateCanvas,
+  createImage: defaultCreateImage,
 };
 
 /**
@@ -54,35 +51,26 @@ const environment: RenderEnvironment = {
  * `StaticCanvasRenderConfig["renderEnvironment"]` or the `env` argument of
  * `getRenderEnvironment`; this override only affects code paths that don't
  * have an instance to scope to (headless export).
+ *
+ * Each call installs a fresh environment object. Caches of host objects are
+ * keyed by environment identity (see e.g. `elementWithCanvasCache` in
+ * `renderElement.ts`), so the fresh identity invalidates them without any
+ * invalidator registry: a lookup under the new default never hits an entry
+ * built under the old one, and the orphaned entries are GC-eligible.
  */
 export const setRenderEnvironment = (env: Partial<RenderEnvironment>) => {
-  overrides = { ...env };
-  invalidateCaches();
+  environment = {
+    createCanvas: env.createCanvas ?? defaultCreateCanvas,
+    createImage: env.createImage ?? defaultCreateImage,
+  };
 };
 
 /** Restores the browser defaults. */
 export const resetRenderEnvironment = () => {
-  overrides = {};
-  invalidateCaches();
-};
-
-/**
- * Modules that lazily build and cache host objects (canvases, images) register
- * a clearer here, so that swapping the default environment doesn't silently
- * leave objects from the previous one in place. Caches are keyed by
- * environment identity (see e.g. `placeholderImgCache` in
- * `renderElement.ts`), so the registered clearer should drop only the entry
- * for the default environment (`getRenderEnvironment()`).
- */
-const cacheInvalidators = new Set<() => void>();
-
-export const onRenderEnvironmentChange = (invalidate: () => void) => {
-  cacheInvalidators.add(invalidate);
-  return () => cacheInvalidators.delete(invalidate);
-};
-
-const invalidateCaches = () => {
-  cacheInvalidators.forEach((invalidate) => invalidate());
+  environment = {
+    createCanvas: defaultCreateCanvas,
+    createImage: defaultCreateImage,
+  };
 };
 
 /**

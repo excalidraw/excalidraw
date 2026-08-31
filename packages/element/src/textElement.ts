@@ -22,6 +22,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
+
 import {
   isBoundToContainer,
   isArrowElement,
@@ -29,6 +30,8 @@ import {
 } from "./typeChecks";
 
 import { isNonDeletedElement } from ".";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 
 import type { Scene } from "./Scene";
 
@@ -47,6 +50,7 @@ export const redrawTextBoundingBox = (
   textElement: ExcalidrawTextElement,
   container: ExcalidrawElement | null,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -82,6 +86,7 @@ export const redrawTextBoundingBox = (
       textElement.originalText,
       getFontString(textElement),
       maxWidth,
+      renderEnvironment,
     );
   }
 
@@ -89,6 +94,7 @@ export const redrawTextBoundingBox = (
     boundTextUpdates.text,
     getFontString(textElement),
     textElement.lineHeight,
+    renderEnvironment,
   );
 
   // Note: only update width for unwrapped text and bound texts (which always have autoResize set to true)
@@ -145,6 +151,7 @@ export const handleBindTextResize = (
   transformHandleType: MaybeTransformHandleType,
   shouldMaintainAspectRatio = false,
   shouldResizeFromCenter = false,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElementId = getBoundTextElementId(container);
@@ -173,12 +180,14 @@ export const handleBindTextResize = (
           textElement.originalText,
           getFontString(textElement),
           maxWidth,
+          renderEnvironment,
         );
       }
       const metrics = measureText(
         text,
         getFontString(textElement),
         textElement.lineHeight,
+        renderEnvironment,
       );
       nextHeight = metrics.height;
       nextWidth = metrics.width;

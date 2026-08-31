@@ -655,6 +655,9 @@ class App extends React.Component<AppProps, AppState> {
   private _renderEnvironment: RenderEnvironment | null = null;
   private _renderEnvironmentDocument: Document | null = null;
   public get renderEnvironment(): RenderEnvironment {
+    if (this.props.renderEnvironment) {
+      return this.props.renderEnvironment;
+    }
     const ownerDocument = this.ownerDocument;
     if (
       !this._renderEnvironment ||
@@ -2763,6 +2766,7 @@ class App extends React.Component<AppProps, AppState> {
         name: this.getName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
+        renderEnvironment: this.renderEnvironment,
       },
     )
       .catch(muteFSAbortError)
@@ -3874,7 +3878,7 @@ class App extends React.Component<AppProps, AppState> {
     // document/window, or leave a pending tooltip timer around
     hideHyperlinkToolip(this.hyperlinkTooltipOwner);
 
-    this.renderer.destroy();
+    this.renderer.destroy(this.canvas);
     this.scene.destroy();
     this.scene = new Scene();
     this.fonts = new Fonts(this.scene, this.ownerDocument);
@@ -4593,6 +4597,7 @@ class App extends React.Component<AppProps, AppState> {
         data.programmaticAPI
           ? convertToExcalidrawElements(
               data.elements as ExcalidrawElementSkeleton[],
+              { renderEnvironment: this.renderEnvironment },
             )
           : data.elements
       ) as readonly ExcalidrawElement[];
@@ -4622,6 +4627,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const elements = convertToExcalidrawElements(skeletonElements, {
           regenerateIds: true,
+          renderEnvironment: this.renderEnvironment,
         });
 
         this.addElementsFromPasteOrLibrary({
@@ -4833,7 +4839,12 @@ class App extends React.Component<AppProps, AppState> {
           newElement,
           this.scene.getElementsMapIncludingDeleted(),
         );
-        redrawTextBoundingBox(newElement, container, this.scene);
+        redrawTextBoundingBox(
+          newElement,
+          container,
+          this.scene,
+          this.renderEnvironment,
+        );
       }
     });
 
@@ -4996,15 +5007,25 @@ class App extends React.Component<AppProps, AppState> {
             y: currentY,
           });
 
-          let metrics = measureText(originalText, fontString, lineHeight);
+          let metrics = measureText(
+            originalText,
+            fontString,
+            lineHeight,
+            this.renderEnvironment,
+          );
           const isTextUnwrapped = metrics.width > maxTextWidth;
 
           const text = isTextUnwrapped
-            ? wrapText(originalText, fontString, maxTextWidth)
+            ? wrapText(
+                originalText,
+                fontString,
+                maxTextWidth,
+                this.renderEnvironment,
+              )
             : originalText;
 
           metrics = isTextUnwrapped
-            ? measureText(text, fontString, lineHeight)
+            ? measureText(text, fontString, lineHeight, this.renderEnvironment)
             : metrics;
 
           const startX = x - metrics.width / 2;
@@ -5019,6 +5040,7 @@ class App extends React.Component<AppProps, AppState> {
             lineHeight,
             autoResize: !isTextUnwrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
+            renderEnvironment: this.renderEnvironment,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -6318,6 +6340,7 @@ class App extends React.Component<AppProps, AppState> {
                 getContainerElement(_element, elementsMap),
                 elementsMap,
                 nextOriginalText,
+                this.renderEnvironment,
               ),
             });
           }
@@ -6984,6 +7007,7 @@ class App extends React.Component<AppProps, AppState> {
             : container.angle
           : (0 as Radians),
         frameId,
+        renderEnvironment: this.renderEnvironment,
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -13656,6 +13680,7 @@ class App extends React.Component<AppProps, AppState> {
         resizeY,
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
+        this.renderEnvironment,
       )
     ) {
       const elementsToHighlight = new Set<NonDeletedExcalidrawElement>();

@@ -7,10 +7,7 @@ import {
   normalizeEOL,
 } from "@excalidraw/common";
 
-import {
-  getRenderEnvironment,
-  onRenderEnvironmentChange,
-} from "./renderEnvironment";
+import { getRenderEnvironment } from "./renderEnvironment";
 
 import type { RenderEnvironment } from "./renderEnvironment";
 
@@ -20,6 +17,7 @@ export const measureText = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  env?: RenderEnvironment,
 ) => {
   const _text = text
     .split("\n")
@@ -29,7 +27,7 @@ export const measureText = (
     .join("\n");
   const fontSize = parseFloat(font);
   const height = getTextHeight(_text, fontSize, lineHeight);
-  const width = getTextWidth(_text, font);
+  const width = getTextWidth(_text, font, env);
   return { width, height };
 };
 
@@ -39,11 +37,13 @@ const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 export const getApproxMinLineWidth = (
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  env?: RenderEnvironment,
 ) => {
   const maxCharWidth = getMaxCharWidth(font);
   if (maxCharWidth === 0) {
     return (
-      measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight).width +
+      measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight, env)
+        .width +
       BOUND_TEXT_PADDING * 2
     );
   }
@@ -53,8 +53,9 @@ export const getApproxMinLineWidth = (
 export const getMinTextElementWidth = (
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  env?: RenderEnvironment,
 ) => {
-  return measureText("", font, lineHeight).width + BOUND_TEXT_PADDING * 2;
+  return measureText("", font, lineHeight, env).width + BOUND_TEXT_PADDING * 2;
 };
 
 export const isMeasureTextSupported = () => {
@@ -121,9 +122,6 @@ const defaultTextMetricsProviders = new WeakMap<
   RenderEnvironment,
   TextMetricsProvider
 >();
-onRenderEnvironmentChange(() =>
-  defaultTextMetricsProviders.delete(getRenderEnvironment()),
-);
 
 /**
  * Set a custom text metrics provider.
@@ -191,11 +189,15 @@ export const getLineWidth = (
   return provider.getLineWidth(text, font);
 };
 
-export const getTextWidth = (text: string, font: FontString) => {
+export const getTextWidth = (
+  text: string,
+  font: FontString,
+  env?: RenderEnvironment,
+) => {
   const lines = splitIntoLines(text);
   let width = 0;
   lines.forEach((line) => {
-    width = Math.max(width, getLineWidth(line, font));
+    width = Math.max(width, getLineWidth(line, font, env));
   });
 
   return width;
@@ -211,27 +213,42 @@ export const getTextHeight = (
 };
 
 export const charWidth = (() => {
-  const cachedCharWidth: { [key: FontString]: Array<number> } = {};
+  // per-env: two realms can measure the same font string differently
+  // (each measures with its own document's font set)
+  const cachedCharWidth: {
+    [font: FontString]: Map<RenderEnvironment, Array<number>>;
+  } = {};
 
-  const calculate = (char: string, font: FontString) => {
+  const calculate = (
+    char: string,
+    font: FontString,
+    env?: RenderEnvironment,
+  ) => {
     const unicode = char.charCodeAt(0);
-    if (!cachedCharWidth[font]) {
-      cachedCharWidth[font] = [];
+    const resolvedEnv = getRenderEnvironment(env);
+    let perEnv = cachedCharWidth[font];
+    if (!perEnv) {
+      perEnv = new Map();
+      cachedCharWidth[font] = perEnv;
     }
-    if (!cachedCharWidth[font][unicode]) {
-      const width = getLineWidth(char, font);
-      cachedCharWidth[font][unicode] = width;
+    let widths = perEnv.get(resolvedEnv);
+    if (!widths) {
+      widths = [];
+      perEnv.set(resolvedEnv, widths);
     }
-
-    return cachedCharWidth[font][unicode];
+    if (widths[unicode] === undefined) {
+      widths[unicode] = getLineWidth(char, font, env);
+    }
+    return widths[unicode];
   };
 
-  const getCache = (font: FontString) => {
-    return cachedCharWidth[font];
+  const getCache = (font: FontString, env?: RenderEnvironment) => {
+    return cachedCharWidth[font]?.get(getRenderEnvironment(env));
   };
 
   const clearCache = (font: FontString) => {
-    cachedCharWidth[font] = [];
+    // clears every env: a font load invalidates metrics in all realms
+    delete cachedCharWidth[font];
   };
 
   return {

@@ -21,10 +21,7 @@ import {
 
 import { renderElement } from "@excalidraw/element";
 
-import {
-  getRenderEnvironment,
-  onRenderEnvironmentChange,
-} from "@excalidraw/element/renderEnvironment";
+import { getRenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -181,10 +178,6 @@ const getLinkIconCacheKey = (
   scale: number,
 ) => `${type}:${zoom}:${scale}`;
 
-onRenderEnvironmentChange(() => {
-  linkIconCanvasCache.delete(getRenderEnvironment());
-});
-
 // One live-config pointer per environment, so a settle in one environment
 // only re-renders its own scene. A single shared pointer would re-render the
 // last-rendered scene on any settle, leaving other environments with blank
@@ -193,9 +186,6 @@ const lastSceneConfigs = new WeakMap<
   RenderEnvironment,
   StaticSceneRenderConfig
 >();
-onRenderEnvironmentChange(() =>
-  lastSceneConfigs.delete(getRenderEnvironment()),
-);
 
 // Icons bake into the cache in the same task the images start decoding, so
 // the first bake is blank. Drop that environment's cache and repaint its own
@@ -562,12 +552,41 @@ const _renderStaticScene = ({
   });
 };
 
-/** throttled to animation framerate */
-export const renderStaticSceneThrottled = throttleRAF(
-  (config: StaticSceneRenderConfig) => {
-    _renderStaticScene(config);
-  },
-);
+type StaticSceneThrottle = ReturnType<typeof throttleRAF>;
+
+const staticSceneThrottles = new WeakMap<
+  HTMLCanvasElement,
+  StaticSceneThrottle
+>();
+
+const getStaticSceneThrottle = (canvas: HTMLCanvasElement) => {
+  let throttle = staticSceneThrottles.get(canvas);
+  if (!throttle) {
+    const ownerWindow = canvas.ownerDocument.defaultView ?? window;
+    throttle = throttleRAF((config: StaticSceneRenderConfig) => {
+      _renderStaticScene(config);
+    }, ownerWindow);
+    staticSceneThrottles.set(canvas, throttle);
+  }
+  return throttle;
+};
+
+/**
+ * Throttled to animation framerate, one throttle per canvas. A shared
+ * throttle drops all but the last caller's pending frame when multiple
+ * editors render in the same frame, and a module-realm scheduler would run
+ * popout renders on the main window's rAF, which freezes while that window
+ * is hidden.
+ */
+export const renderStaticSceneThrottled = (config: StaticSceneRenderConfig) => {
+  getStaticSceneThrottle(config.canvas)(config);
+};
+
+/** Drops the canvas' pending frame; the throttle itself is dropped with the
+ * canvas. */
+export const cancelStaticSceneThrottle = (canvas: HTMLCanvasElement) => {
+  staticSceneThrottles.get(canvas)?.cancel();
+};
 
 /**
  * Static scene is the non-ui canvas where we render elements.

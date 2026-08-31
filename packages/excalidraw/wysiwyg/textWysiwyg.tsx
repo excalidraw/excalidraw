@@ -499,7 +499,11 @@ export const textWysiwyg = ({
     );
     const line = lines[lineIndex];
     const direction = getLineDirection(editable.value, line.start);
-    const lineWidth = getLineWidth(line.text, layout.font);
+    const lineWidth = getLineWidth(
+      line.text,
+      layout.font,
+      app.renderEnvironment,
+    );
     const lineStartX =
       layout.textAlign === "center"
         ? (layout.width - lineWidth) / 2
@@ -616,8 +620,9 @@ export const textWysiwyg = ({
           `${editable.value}${text}`,
           font,
           getBoundTextMaxWidth(container, boundTextElement),
+          app.renderEnvironment,
         );
-        const width = getTextWidth(wrappedText, font);
+        const width = getTextWidth(wrappedText, font, app.renderEnvironment);
         editable.style.width = `${width}px`;
       }
     };
@@ -839,7 +844,12 @@ export const textWysiwyg = ({
         });
       }
 
-      redrawTextBoundingBox(updateElement, container, app.scene);
+      redrawTextBoundingBox(
+        updateElement,
+        container,
+        app.scene,
+        app.renderEnvironment,
+      );
     }
 
     onSubmit({

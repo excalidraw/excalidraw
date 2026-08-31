@@ -82,11 +82,22 @@ type InteractiveCanvasProps = {
   >;
 };
 
-export const INTERACTIVE_SCENE_ANIMATION_KEY = "animateInteractiveScene";
-
 const InteractiveCanvas = (props: InteractiveCanvasProps) => {
   const isComponentMounted = useRef(false);
   const rendererParams = useRef(null as InteractiveSceneRenderConfig | null);
+  // Unique per mounted instance so concurrent editors don't share the
+  // interactive scene animation slot.
+  const animationKeyRef = useRef<symbol | null>(null);
+  if (animationKeyRef.current === null) {
+    animationKeyRef.current = Symbol("interactiveSceneAnimation");
+  }
+  const animationKey = animationKeyRef.current;
+
+  useEffect(() => {
+    return () => {
+      AnimationController.cancel(animationKey);
+    };
+  }, [animationKey]);
 
   useEffect(() => {
     if (!isComponentMounted.current) {
@@ -171,9 +182,9 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       deltaTime: 0,
     };
 
-    if (!AnimationController.running(INTERACTIVE_SCENE_ANIMATION_KEY)) {
+    if (!AnimationController.running(animationKey)) {
       AnimationController.start<InteractiveSceneRenderAnimationState>(
-        INTERACTIVE_SCENE_ANIMATION_KEY,
+        animationKey,
         ({ deltaTime, state }) => {
           const nextAnimationState = renderInteractiveScene({
             ...rendererParams.current!,
@@ -195,6 +206,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
 
           return undefined;
         },
+        props.app.ownerWindow,
       );
     }
   });

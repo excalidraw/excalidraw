@@ -25,6 +25,7 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+import type { RenderEnvironment } from "@excalidraw/element";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 
 export { MIME_TYPES };
@@ -39,6 +40,7 @@ type ExportOpts = {
     width: number,
     height: number,
   ) => { width: number; height: number; scale?: number };
+  renderEnvironment?: RenderEnvironment;
 };
 
 export const exportToCanvas = ({
@@ -49,6 +51,7 @@ export const exportToCanvas = ({
   getDimensions,
   exportPadding,
   exportingFrame,
+  renderEnvironment,
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
@@ -64,9 +67,15 @@ export const exportToCanvas = ({
     restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
+    {
+      exportBackground,
+      exportPadding,
+      viewBackgroundColor,
+      exportingFrame,
+      renderEnvironment,
+    },
     (width: number, height: number) => {
-      const canvas = getRenderEnvironment().createCanvas();
+      const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
 
       if (maxWidthOrHeight) {
         if (typeof getDimensions === "function") {

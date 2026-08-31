@@ -2,10 +2,7 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { MIME_TYPES } from "@excalidraw/common";
 import { getElementAbsoluteCoords } from "@excalidraw/element";
-import {
-  getRenderEnvironment,
-  onRenderEnvironmentChange,
-} from "@excalidraw/element";
+import { getRenderEnvironment } from "@excalidraw/element";
 
 import { hitElementBoundingBox } from "@excalidraw/element";
 
@@ -47,7 +44,6 @@ export type LinkImg = {
  * repaint once `onLinkImgSettle` fires.
  */
 const linkImgCache = new WeakMap<RenderEnvironment, Map<string, LinkImg>>();
-onRenderEnvironmentChange(() => linkImgCache.delete(getRenderEnvironment()));
 
 type LinkImgSettleListener = (renderEnvironment: RenderEnvironment) => void;
 

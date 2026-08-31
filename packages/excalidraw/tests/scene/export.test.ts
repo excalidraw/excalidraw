@@ -17,6 +17,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { LocalPoint } from "@excalidraw/math";
+import type { RenderEnvironment } from "@excalidraw/element";
 
 import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";
@@ -302,6 +303,83 @@ describe("exportToCanvas", () => {
           event.props.height === holeHeight,
       ),
     ).toEqual([]);
+  });
+
+  it("creates all canvases via the supplied renderEnvironment", async () => {
+    const created: HTMLCanvasElement[] = [];
+    const env: RenderEnvironment = {
+      createCanvas: () => {
+        const canvas = document.createElement("canvas");
+        created.push(canvas);
+        return canvas;
+      },
+      createImage: () => new Image(),
+    };
+    const createElementSpy = vi.spyOn(document, "createElement");
+
+    const canvas = await exportToCanvas({
+      elements: [
+        API.createElement({ type: "rectangle", width: 100, height: 100 }),
+      ],
+      files: null,
+      appState: { exportBackground: true, viewBackgroundColor: "#ffffff" },
+      renderEnvironment: env,
+    });
+
+    expect(created).toContain(canvas);
+    // every canvas created during the export went through the env --
+    // nothing fell back to the document's default environment
+    expect(
+      createElementSpy.mock.calls.filter(([tag]) => tag === "canvas").length,
+    ).toBe(created.length);
+    createElementSpy.mockRestore();
+  });
+
+  it("decodes images via the supplied renderEnvironment.createImage", async () => {
+    const image = API.createElement({
+      type: "image",
+      width: 100,
+      height: 100,
+      fileId: "img-1",
+      status: "initialized",
+    } as any);
+
+    const images: any[] = [];
+    const createImage = () => {
+      const fake: any = {
+        naturalWidth: 100,
+        naturalHeight: 100,
+        onload: null,
+        onerror: null,
+      };
+      Object.defineProperty(fake, "src", {
+        set(value: string) {
+          fake._src = value;
+          queueMicrotask(() => fake.onload?.());
+        },
+      });
+      images.push(fake);
+      return fake as HTMLImageElement;
+    };
+
+    await exportToCanvas({
+      elements: [image],
+      files: {
+        "img-1": {
+          id: "img-1",
+          dataURL: "data:image/png;base64,iVBORw0KGgo=",
+          mimeType: "image/png",
+        } as any,
+      },
+      appState: { exportBackground: true, viewBackgroundColor: "#ffffff" },
+      renderEnvironment: {
+        createCanvas: () => document.createElement("canvas"),
+        createImage,
+      },
+    });
+
+    expect(images).toHaveLength(1);
+    expect(images[0]._src).toBe("data:image/png;base64,iVBORw0KGgo=");
   });
 });
 

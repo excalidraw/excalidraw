@@ -12,17 +12,13 @@ import {
   actionZoomToFitSelection,
 } from "../actions/actionCanvas";
 import { getNormalizedZoom } from "../scene";
-import {
-  snapBackToConstraints,
-  SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
-  SCROLL_TO_CONTENT_ANIMATION_KEY,
-} from "../components/App.viewport";
+import { snapBackToConstraints } from "../components/App.viewport";
 import {
   constrainScrollState,
   DEFAULT_OVERSCROLL,
   getViewportForZoomWithScrollConstraints,
 } from "../viewport";
-import { AnimationController } from "../renderer/animation";
+import { AnimationController, type AnimationKey } from "../renderer/animation";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer } from "./helpers/ui";
@@ -71,7 +67,7 @@ const makeLock = (
   ...overrides,
 });
 
-const waitForAnimationToStop = (key: string, maxFrames = 200) => {
+const waitForAnimationToStop = (key: AnimationKey, maxFrames = 200) => {
   return React.act(
     () =>
       new Promise<void>((resolve) => {
@@ -360,6 +356,13 @@ describe("animateToConstraints (rubberband snap-back)", () => {
     AnimationController.reset();
   });
 
+  // Animation keys are instance-owned in production; the pure function takes
+  // them as a parameter so tests supply their own
+  const keys = {
+    scrollToContent: "test-scrollToContent",
+    snapBack: "test-snapBack",
+  };
+
   const lock = makeLock({
     x: 0,
     y: 0,
@@ -374,10 +377,9 @@ describe("animateToConstraints (rubberband snap-back)", () => {
     snapBackToConstraints(
       makeState({ scrollX: 200, scrollConstraints: lock }),
       onFrame,
+      keys,
     );
-    expect(
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
-    ).toBe(true);
+    expect(AnimationController.running(keys.snapBack)).toBe(true);
     expect(onFrame).toHaveBeenCalled();
   });
 
@@ -386,27 +388,23 @@ describe("animateToConstraints (rubberband snap-back)", () => {
     snapBackToConstraints(
       makeState({ scrollX: -100, scrollConstraints: lock }),
       onFrame,
+      keys,
     );
-    expect(
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
-    ).toBe(false);
+    expect(AnimationController.running(keys.snapBack)).toBe(false);
     expect(onFrame).not.toHaveBeenCalled();
   });
 
   it("does not supersede an active viewport navigation", () => {
-    AnimationController.start(SCROLL_TO_CONTENT_ANIMATION_KEY, () => ({}));
+    AnimationController.start(keys.scrollToContent, () => ({}));
 
     snapBackToConstraints(
       makeState({ scrollX: 200, scrollConstraints: lock }),
       vi.fn(),
+      keys,
     );
 
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      true,
-    );
-    expect(
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
-    ).toBe(false);
+    expect(AnimationController.running(keys.scrollToContent)).toBe(true);
+    expect(AnimationController.running(keys.snapBack)).toBe(false);
   });
 });
 
@@ -522,9 +520,9 @@ describe("setViewport lock (integration)", () => {
 
       // the animation is in flight and the lock has NOT been installed yet —
       // it's chained to run once the scroll settles
-      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-        true,
-      );
+      expect(
+        AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+      ).toBe(true);
       // The previous active lock is superseded immediately; the destination
       // lock is held internally until the animation lands.
       expect(h.state.scrollConstraints).toBe(null);
@@ -551,20 +549,20 @@ describe("setViewport lock (integration)", () => {
         h.app.actionManager.executeAction(actionZoomToFitSelection, "ui");
       });
 
-      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-        true,
-      );
+      expect(
+        AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+      ).toBe(true);
       expect({
         scrollX: h.state.scrollX,
         scrollY: h.state.scrollY,
         zoom: h.state.zoom.value,
       }).toEqual(viewportDuringTransition);
 
-      await waitForAnimationToStop(SCROLL_TO_CONTENT_ANIMATION_KEY);
+      await waitForAnimationToStop(h.app.viewport.scrollToContentAnimationKey);
 
-      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-        false,
-      );
+      expect(
+        AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+      ).toBe(false);
       expect(h.app.viewport.isLockedTransitionPending).toBe(false);
       expect(h.state.scrollConstraints).toMatchObject({
         x: rect.x,
@@ -618,12 +616,12 @@ describe("setViewport lock (integration)", () => {
         });
       });
 
-      expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-        true,
-      );
+      expect(
+        AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+      ).toBe(true);
       expect(h.app.viewport.isLockedTransitionPending).toBe(true);
 
-      await waitForAnimationToStop(SCROLL_TO_CONTENT_ANIMATION_KEY);
+      await waitForAnimationToStop(h.app.viewport.scrollToContentAnimationKey);
 
       expect(h.app.viewport.isLockedTransitionPending).toBe(false);
       expect(h.state.scrollConstraints).toMatchObject({
@@ -668,9 +666,9 @@ describe("setViewport lock (integration)", () => {
       h.app.viewport.setViewport(null);
     });
 
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
+    expect(
+      AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+    ).toBe(false);
     expect(h.app.viewport.isLockedTransitionPending).toBe(false);
     expect(h.state.scrollConstraints).toBe(null);
     expect(h.state.shouldCacheIgnoreZoom).toBe(false);
@@ -687,18 +685,18 @@ describe("setViewport lock (integration)", () => {
       });
     });
 
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      true,
-    );
+    expect(
+      AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+    ).toBe(true);
     expect(h.app.viewport.isLockedTransitionPending).toBe(false);
 
     React.act(() => {
       h.app.viewport.translate({ scrollX: 123, scrollY: 456 });
     });
 
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
+    expect(
+      AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+    ).toBe(false);
     expect(h.state.scrollX).toBe(123);
     expect(h.state.scrollY).toBe(456);
   });
@@ -1132,14 +1130,14 @@ describe("rubberband overscroll (integration)", () => {
       h.app.viewport["snapBackDebounced"].flush();
     });
     expect(
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      AnimationController.running(h.app.viewport.snapBackAnimationKey),
     ).toBe(false);
     expect(h.state.scrollY).toBe(heldScrollY);
 
     // lifting one finger ends the gesture → the rubberband releases
     finger1.up();
     expect(
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      AnimationController.running(h.app.viewport.snapBackAnimationKey),
     ).toBe(true);
 
     finger2.up();
@@ -1174,20 +1172,20 @@ describe("rubberband overscroll (integration)", () => {
       h.app.viewport["snapBackDebounced"].flush();
     });
     expect(
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      AnimationController.running(h.app.viewport.snapBackAnimationKey),
     ).toBe(false);
     expect(h.state.scrollY).toBe(heldScrollY);
 
     mouse.up();
     expect(
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      AnimationController.running(h.app.viewport.snapBackAnimationKey),
     ).toBe(true);
 
     // Direct manipulation takes ownership of the viewport again.
     mouse.downAt(50, 7);
     mouse.move(0, 1);
     expect(
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+      AnimationController.running(h.app.viewport.snapBackAnimationKey),
     ).toBe(false);
     mouse.up();
   });
@@ -1214,7 +1212,7 @@ describe("rubberband overscroll (integration)", () => {
       mouse.up();
 
       expect(
-        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+        AnimationController.running(h.app.viewport.snapBackAnimationKey),
       ).toBe(true);
       expect(h.state.scrollY).toBeGreaterThan(
         constrainScrollState(h.state).scrollY,
@@ -1231,13 +1229,13 @@ describe("rubberband overscroll (integration)", () => {
         constrainScrollState(h.state).scrollY,
       );
       expect(
-        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+        AnimationController.running(h.app.viewport.snapBackAnimationKey),
       ).toBe(true);
 
-      await waitForAnimationToStop(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+      await waitForAnimationToStop(h.app.viewport.snapBackAnimationKey);
 
       expect(
-        AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
+        AnimationController.running(h.app.viewport.snapBackAnimationKey),
       ).toBe(false);
       expect(h.state.zoom.value).toBeGreaterThan(zoomBefore);
       const restingViewport = constrainScrollState(h.state);

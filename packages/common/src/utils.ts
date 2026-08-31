@@ -197,16 +197,20 @@ export const debounce = <T extends any[]>(
 // throttle callback to execute once per animation frame using the latest args
 export const throttleRAF = <T extends any[]>(
   fn: (...args: T) => void,
-  ownerWindow: Pick<
+  ownerWindow?: Pick<
     Window,
     "requestAnimationFrame" | "cancelAnimationFrame"
-  > = window,
+  >,
 ) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
 
+  // resolved lazily so module-scope callers work in environments without
+  // a global window (headless import)
+  const getOwnerWindow = () => ownerWindow ?? window;
+
   const scheduleFunc = () => {
-    timerId = ownerWindow.requestAnimationFrame(() => {
+    timerId = getOwnerWindow().requestAnimationFrame(() => {
       timerId = null;
       const args = lastArgs;
       lastArgs = null;
@@ -225,7 +229,7 @@ export const throttleRAF = <T extends any[]>(
   };
   ret.flush = () => {
     if (timerId !== null) {
-      ownerWindow.cancelAnimationFrame(timerId);
+      getOwnerWindow().cancelAnimationFrame(timerId);
       timerId = null;
     }
     if (lastArgs) {
@@ -236,7 +240,7 @@ export const throttleRAF = <T extends any[]>(
   ret.cancel = () => {
     lastArgs = null;
     if (timerId !== null) {
-      ownerWindow.cancelAnimationFrame(timerId);
+      getOwnerWindow().cancelAnimationFrame(timerId);
       timerId = null;
     }
   };

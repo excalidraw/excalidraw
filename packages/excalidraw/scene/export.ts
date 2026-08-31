@@ -61,6 +61,8 @@ import { renderSceneToSvg } from "../renderer/staticSvgScene";
 
 import type { RenderableElementsMap } from "./types";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import type { AppState, BinaryFiles } from "../types";
 
 const truncateText = (
@@ -187,17 +189,19 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    renderEnvironment,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    renderEnvironment?: RenderEnvironment;
   },
   createCanvas: (
     width: number,
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
-    const canvas = getRenderEnvironment().createCanvas();
+    const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
     canvas.width = width * appState.exportScale;
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
@@ -245,6 +249,7 @@ export const exportToCanvas = async (
       (element) => element.fileId,
     ),
     files,
+    createImage: renderEnvironment?.createImage,
   });
 
   renderStaticScene({
@@ -274,6 +279,7 @@ export const exportToCanvas = async (
       renderGrid: false,
       isExporting: true,
       scale,
+      renderEnvironment,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),

@@ -49,6 +49,7 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
+  RenderEnvironment,
 } from "@excalidraw/element";
 import type { GlobalPoint } from "@excalidraw/math";
 
@@ -791,6 +792,16 @@ export interface ExcalidrawProps {
    * @default document
    */
   ownerDocument?: Document;
+  /**
+   * Host environment used by the renderer and export pipeline to create
+   * canvases and images. Supply a custom implementation to redirect canvas
+   * creation and image decoding to e.g. a host canvas pool, an
+   * `OffscreenCanvas`, or a non-DOM image decoder. When omitted, canvas and
+   * image creation fall back to `ownerDocument` / `ownerWindow`.
+   *
+   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image() }
+   */
+  renderEnvironment?: RenderEnvironment;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -1105,6 +1116,7 @@ export type AppClassProperties = {
   state: AppState;
   readonly ownerDocument: Document;
   readonly ownerWindow: Window & typeof globalThis;
+  renderEnvironment: RenderEnvironment;
   api: App["api"];
   sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;

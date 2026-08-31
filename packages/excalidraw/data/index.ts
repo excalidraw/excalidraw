@@ -35,6 +35,8 @@ import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
 
@@ -107,6 +109,7 @@ export const exportCanvas = async (
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
+    renderEnvironment,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -115,6 +118,7 @@ export const exportCanvas = async (
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    renderEnvironment?: RenderEnvironment;
   },
 ) => {
   if (elements.length === 0) {
@@ -168,6 +172,7 @@ export const exportCanvas = async (
     viewBackgroundColor,
     exportPadding,
     exportingFrame,
+    renderEnvironment,
   });
 
   if (type === "png") {

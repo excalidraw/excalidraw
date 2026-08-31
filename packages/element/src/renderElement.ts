@@ -42,10 +42,7 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import {
-  getRenderEnvironment,
-  onRenderEnvironmentChange,
-} from "./renderEnvironment";
+import { getRenderEnvironment } from "./renderEnvironment";
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
@@ -299,9 +296,6 @@ const placeholderImgCache = new WeakMap<
   RenderEnvironment,
   Map<string, HTMLImageElement>
 >();
-onRenderEnvironmentChange(() =>
-  placeholderImgCache.delete(getRenderEnvironment()),
-);
 
 const getPlaceholderImg = (src: string, env: RenderEnvironment) => {
   let cache = placeholderImgCache.get(env);
