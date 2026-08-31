@@ -30,6 +30,7 @@ export class AnimationController {
     ScheduledFrame
   >();
   private static animations = new Map<string, AnimationRecord>();
+  private static readonly schedulerCleanups = new WeakMap<Window, void>();
 
   static start<R extends object>(
     key: string,
@@ -83,6 +84,7 @@ export class AnimationController {
     if (AnimationController.scheduledFrames.has(scheduler)) {
       return;
     }
+    AnimationController.registerSchedulerCleanup(scheduler);
 
     if (isRenderThrottlingEnabled()) {
       AnimationController.scheduledFrames.set(scheduler, {
@@ -125,6 +127,27 @@ export class AnimationController {
 
     AnimationController.cancelScheduledFrame(scheduler);
     return true;
+  }
+
+  private static registerSchedulerCleanup(scheduler: AnimationScheduler) {
+    const win = scheduler as Window;
+    if (typeof win.addEventListener !== "function") {
+      return;
+    }
+    if (AnimationController.schedulerCleanups.has(win)) {
+      return;
+    }
+    const drop = () => {
+      for (const [key, record] of AnimationController.animations) {
+        if (record.scheduler === scheduler) {
+          AnimationController.animations.delete(key);
+        }
+      }
+      // The scheduled frame lives in the closing window and never fires
+      AnimationController.scheduledFrames.delete(scheduler);
+    };
+    win.addEventListener("pagehide", drop);
+    AnimationController.schedulerCleanups.set(win, undefined);
   }
 
   private static tick(scheduler: AnimationScheduler) {

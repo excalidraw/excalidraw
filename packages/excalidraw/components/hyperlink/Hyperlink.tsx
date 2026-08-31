@@ -73,9 +73,42 @@ const POPUP_PADDING = 5;
 const SPACE_BOTTOM = 85;
 const AUTO_HIDE_TIMEOUT = 500;
 
+export type HyperlinkTooltipOwner = Record<string, unknown>;
+
 let IS_HYPERLINK_TOOLTIP_VISIBLE = false;
+let HYPERLINK_TOOLTIP_OWNER: HyperlinkTooltipOwner | null = null;
 let HYPERLINK_TOOLTIP_OWNER_DOCUMENT: Document | null = null;
 let HYPERLINK_TOOLTIP_OWNER_WINDOW: Window | null = null;
+
+// When the owning window loses focus, the pointer leaves it, or it is
+// hidden (pagehide on close/navigation), no in-window event will ever
+// call hideHyperlinkToolip again, and a sibling window's hide call is a
+// no-op due to the ownership guard, so the owning window itself must
+// drop the tooltip in that case.
+const TOOLTIP_WINDOW_CLEANUPS = new WeakMap<Window, void>();
+
+const registerTooltipWindowCleanup = (ownerWindow: Window) => {
+  if (TOOLTIP_WINDOW_CLEANUPS.has(ownerWindow)) {
+    return;
+  }
+  const dropIfOwned = () => {
+    if (HYPERLINK_TOOLTIP_OWNER_WINDOW === ownerWindow) {
+      clearHyperlinkTooltip();
+    }
+  };
+  const onPointerOut = (event: MouseEvent) => {
+    // relatedTarget is null only when the pointer left the window
+    if (event.relatedTarget === null) {
+      dropIfOwned();
+    }
+  };
+  ownerWindow.addEventListener("blur", dropIfOwned);
+  ownerWindow.addEventListener("mouseout", onPointerOut);
+  // covers window close/navigation that skips blur, so the globals
+  // never retain the detached document/window
+  ownerWindow.addEventListener("pagehide", dropIfOwned);
+  TOOLTIP_WINDOW_CLEANUPS.set(ownerWindow, undefined);
+};
 
 const embeddableLinkCache = new Map<
   ExcalidrawEmbeddableElement["id"],
@@ -413,30 +446,30 @@ export const showHyperlinkTooltip = (
   appState: AppState,
   elementsMap: ElementsMap,
   ownerDocument: Document,
+  owner: HyperlinkTooltipOwner,
 ) => {
   const ownerWindow = getTargetWindow(ownerDocument);
   if (!ownerWindow) {
     return;
   }
   // there's only ever one tooltip visible, so take over the ownership from
-  // whichever document currently holds it. Without this, a tooltip shown in
-  // another document would stay visible forever, as that document no longer
-  // receives the pointer events that would hide it.
-  if (
-    HYPERLINK_TOOLTIP_OWNER_DOCUMENT &&
-    HYPERLINK_TOOLTIP_OWNER_DOCUMENT !== ownerDocument
-  ) {
+  // whichever App currently holds it. Without this, a tooltip shown by
+  // another App would stay visible forever, as that App no longer receives
+  // the pointer events that would hide it.
+  if (HYPERLINK_TOOLTIP_OWNER && HYPERLINK_TOOLTIP_OWNER !== owner) {
     clearHyperlinkTooltip();
   } else if (HYPERLINK_TOOLTIP_TIMEOUT_ID) {
-    // same document -> only restart the timer, leaving an already visible
+    // same owner -> only restart the timer, leaving an already visible
     // tooltip alone (this runs on every pointer move over a link)
     HYPERLINK_TOOLTIP_OWNER_WINDOW?.clearTimeout(HYPERLINK_TOOLTIP_TIMEOUT_ID);
     HYPERLINK_TOOLTIP_TIMEOUT_ID = null;
   }
+  HYPERLINK_TOOLTIP_OWNER = owner;
   HYPERLINK_TOOLTIP_OWNER_DOCUMENT = ownerDocument;
   HYPERLINK_TOOLTIP_OWNER_WINDOW = ownerWindow;
+  registerTooltipWindowCleanup(ownerWindow);
   HYPERLINK_TOOLTIP_TIMEOUT_ID = ownerWindow.setTimeout(
-    () => renderTooltip(element, appState, elementsMap, ownerDocument),
+    () => renderTooltip(element, appState, elementsMap, ownerDocument, owner),
     HYPERLINK_TOOLTIP_DELAY,
   );
 };
@@ -446,7 +479,15 @@ const renderTooltip = (
   appState: AppState,
   elementsMap: ElementsMap,
   ownerDocument: Document,
+  owner: HyperlinkTooltipOwner,
 ) => {
+  HYPERLINK_TOOLTIP_TIMEOUT_ID = null;
+  // ownership may have been cleared or taken over while the timer was
+  // pending (pointer left the window or another App showed its own
+  // tooltip) -> don't render a stale tooltip in an unfocused window
+  if (HYPERLINK_TOOLTIP_OWNER !== owner) {
+    return;
+  }
   if (!element.link) {
     return;
   }
@@ -495,16 +536,15 @@ const clearHyperlinkTooltip = () => {
     IS_HYPERLINK_TOOLTIP_VISIBLE = false;
     hideTooltip(HYPERLINK_TOOLTIP_OWNER_DOCUMENT);
   }
+  HYPERLINK_TOOLTIP_OWNER = null;
   HYPERLINK_TOOLTIP_OWNER_DOCUMENT = null;
   HYPERLINK_TOOLTIP_OWNER_WINDOW = null;
 };
 
-export const hideHyperlinkToolip = (ownerDocument: Document) => {
-  // another document owns the tooltip -> it's not ours to hide
-  if (
-    HYPERLINK_TOOLTIP_OWNER_DOCUMENT &&
-    HYPERLINK_TOOLTIP_OWNER_DOCUMENT !== ownerDocument
-  ) {
+export const hideHyperlinkToolip = (owner?: HyperlinkTooltipOwner) => {
+  // another App owns the tooltip (possibly a sibling App in the same
+  // document) -> it's not ours to hide
+  if (HYPERLINK_TOOLTIP_OWNER && HYPERLINK_TOOLTIP_OWNER !== owner) {
     return;
   }
   clearHyperlinkTooltip();

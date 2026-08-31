@@ -396,6 +396,7 @@ import { fileOpen } from "../data/filesystem";
 import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
+  type HyperlinkTooltipOwner,
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
 
@@ -733,6 +734,7 @@ class App extends React.Component<AppProps, AppState> {
     null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
+  readonly hyperlinkTooltipOwner: HyperlinkTooltipOwner = {};
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   /**
    * the handle of the resize in progress while `state.isResizing` — for UI
@@ -1114,9 +1116,7 @@ class App extends React.Component<AppProps, AppState> {
     let data = null;
     try {
       data = JSON.parse(event.data);
-    } catch (e) {
-      // ignore: window messages from non-Excalidraw senders are not JSON
-    }
+    } catch {}
     if (!data) {
       return;
     }
@@ -3393,7 +3393,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isLinksEnabled(prevProps) !== this.isLinksEnabled()) {
       if (!this.isLinksEnabled()) {
         this.hitLinkElement = undefined;
-        hideHyperlinkToolip(this.ownerDocument);
+        hideHyperlinkToolip(this.hyperlinkTooltipOwner);
         this.cursor.reset();
       }
     }
@@ -3893,7 +3893,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // release the tooltip ownership so we don't retain this (soon detached)
     // document/window, or leave a pending tooltip timer around
-    hideHyperlinkToolip(this.ownerDocument);
+    hideHyperlinkToolip(this.hyperlinkTooltipOwner);
 
     this.renderer.destroy();
     this.scene.destroy();
@@ -7456,7 +7456,7 @@ class App extends React.Component<AppProps, AppState> {
       this.editorInterface.formFactor === "phone",
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      hideHyperlinkToolip(this.ownerDocument);
+      hideHyperlinkToolip(this.hyperlinkTooltipOwner);
       let url = this.hitLinkElement.link;
       if (url) {
         url = normalizeLink(url);
@@ -7501,10 +7501,11 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
         this.scene.getNonDeletedElementsMap(),
         this.ownerDocument,
+        this.hyperlinkTooltipOwner,
       );
       return true;
     }
-    hideHyperlinkToolip(this.ownerDocument);
+    hideHyperlinkToolip(this.hyperlinkTooltipOwner);
     return false;
   };
 
