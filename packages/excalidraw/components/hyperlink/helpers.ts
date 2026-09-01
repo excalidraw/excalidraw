@@ -2,7 +2,11 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { MIME_TYPES } from "@excalidraw/common";
 import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { getRenderEnvironment } from "@excalidraw/element";
+
 import { hitElementBoundingBox } from "@excalidraw/element";
+
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
@@ -16,15 +20,88 @@ import type { AppState } from "../../types";
 
 export const DEFAULT_LINK_SIZE = 12;
 
-export const EXTERNAL_LINK_IMG = document.createElement("img");
-EXTERNAL_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
+const EXTERNAL_LINK_SRC = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1971c2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`,
 )}`;
 
-export const ELEMENT_LINK_IMG = document.createElement("img");
-ELEMENT_LINK_IMG.src = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
+const ELEMENT_LINK_SRC = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
   `<svg  xmlns="http://www.w3.org/2000/svg"  width="16"  height="16"  viewBox="0 0 24 24"  fill="none"  stroke="#1971c2"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-big-right-line"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v-3.586a1 1 0 0 1 1.707 -.707l6.586 6.586a1 1 0 0 1 0 1.414l-6.586 6.586a1 1 0 0 1 -1.707 -.707v-3.586h-6v-6h6z" /><path d="M3 9v6" /></svg>`,
 )}`;
+
+export type LinkImg = {
+  /** Only safe as a `drawImage` source once `drawReady` is true. */
+  img: HTMLImageElement;
+  /** true once `src` has finished loading (success or failure). */
+  drawReady: boolean;
+};
+
+/**
+ * Built lazily (and cached) so that importing this module never touches
+ * `document` — the export pipeline pulls it in even in headless environments.
+ *
+ * Browsers decode `src` asynchronously, so a `drawImage` in the same task as
+ * the `src` set silently draws nothing. Callers must check `drawReady` and
+ * repaint once `onLinkImgSettle` fires.
+ */
+const linkImgCache = new WeakMap<RenderEnvironment, Map<string, LinkImg>>();
+
+type LinkImgSettleListener = (renderEnvironment: RenderEnvironment) => void;
+
+const settleListeners = new Set<LinkImgSettleListener>();
+
+/**
+ * Invoked when a lazily-created image becomes draw-ready or its load fails.
+ * The argument is the environment the image was created in, so listeners
+ * with per-environment state can repair only that environment.
+ * Fired at most once per image per environment.
+ */
+export const onLinkImgSettle = (listener: LinkImgSettleListener) => {
+  settleListeners.add(listener);
+  return () => settleListeners.delete(listener);
+};
+
+const settleLinkImg = (
+  entry: LinkImg,
+  renderEnvironment: RenderEnvironment,
+) => {
+  if (entry.drawReady) {
+    return;
+  }
+  entry.drawReady = true;
+  settleListeners.forEach((listener) => listener(renderEnvironment));
+};
+
+/** Keyed by environment identity so that each editor (owner window) keeps
+ * its own link images. */
+const getLinkImg = (src: string, env?: RenderEnvironment): LinkImg => {
+  const renderEnvironment = getRenderEnvironment(env);
+  let cache = linkImgCache.get(renderEnvironment);
+  const cached = cache?.get(src);
+  if (cached) {
+    return cached;
+  }
+  const img = renderEnvironment.createImage();
+  const entry: LinkImg = {
+    img,
+    drawReady: img.complete && img.naturalWidth > 0,
+  };
+  if (!entry.drawReady) {
+    img.onload = () => settleLinkImg(entry, renderEnvironment);
+    img.onerror = () => settleLinkImg(entry, renderEnvironment);
+  }
+  img.src = src;
+  if (!cache) {
+    cache = new Map();
+    linkImgCache.set(renderEnvironment, cache);
+  }
+  cache.set(src, entry);
+  return entry;
+};
+
+export const getExternalLinkImg = (env?: RenderEnvironment) =>
+  getLinkImg(EXTERNAL_LINK_SRC, env);
+export const getElementLinkImg = (env?: RenderEnvironment) =>
+  getLinkImg(ELEMENT_LINK_SRC, env);
 
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,

@@ -80,6 +80,13 @@ export default defineConfig({
       hooks: "parallel",
     },
     setupFiles: ["./setupTests.ts"],
+    // node-environment tests have their own config (vitest.config.node.mts);
+    // they must not run under jsdom, where browser globals always exist
+    exclude: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "packages/excalidraw/tests/node/**",
+    ],
     globals: true,
     environment: "jsdom",
     // don't list skipped tests in the failure tree — keeps output readable

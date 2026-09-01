@@ -7,6 +7,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { MakeBrand } from "@excalidraw/common/utility-types";
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type {
   AppClassProperties,
@@ -26,6 +27,19 @@ export type RenderableElementsMap = NonDeletedElementsMap &
 
 export type StaticCanvasRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];
+  /**
+   * Backing-store scale the target canvas was bootstrapped with -- the owner
+   * window's devicePixelRatio when rendering into the editor, exportScale when
+   * exporting. Element caches are built and blitted at this ratio, so it must
+   * be the same value passed as `StaticSceneRenderConfig["scale"]`.
+   */
+  scale: number;
+  /**
+   * Host environment that creates the canvases and images this render
+   * rasterizes (per-editor owner window in the app; the process-wide default
+   * for headless export).
+   */
+  renderEnvironment?: RenderEnvironment;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];

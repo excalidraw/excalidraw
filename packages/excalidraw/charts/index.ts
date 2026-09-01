@@ -1,5 +1,7 @@
 import type { ChartType } from "@excalidraw/element/types";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import { renderBarChart } from "./charts.bar";
 import { renderLineChart } from "./charts.line";
 import {
@@ -27,12 +29,13 @@ export const renderSpreadsheet = (
   x: number,
   y: number,
   colorSeed?: number,
+  renderEnvironment?: RenderEnvironment,
 ): ChartElements | null => {
   if (chartType === "line") {
-    return renderLineChart(spreadsheet, x, y, colorSeed);
+    return renderLineChart(spreadsheet, x, y, colorSeed, renderEnvironment);
   }
   if (chartType === "radar") {
-    return renderRadarChart(spreadsheet, x, y, colorSeed);
+    return renderRadarChart(spreadsheet, x, y, colorSeed, renderEnvironment);
   }
-  return renderBarChart(spreadsheet, x, y, colorSeed);
+  return renderBarChart(spreadsheet, x, y, colorSeed, renderEnvironment);
 };

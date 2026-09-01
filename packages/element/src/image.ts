@@ -10,6 +10,7 @@ import type {
   BinaryFiles,
 } from "@excalidraw/excalidraw/types";
 
+import { getRenderEnvironment } from "./renderEnvironment";
 import { isInitializedImageElement } from "./typeChecks";
 
 import type {
@@ -20,7 +21,8 @@ import type {
 
 export const loadHTMLImageElement = (
   dataURL: DataURL,
-  createImage: () => HTMLImageElement = () => new Image(),
+  createImage: () => HTMLImageElement = () =>
+    getRenderEnvironment().createImage(),
 ) => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = createImage();
@@ -45,6 +47,8 @@ export const updateImageCache = async ({
   fileIds: FileId[];
   files: BinaryFiles;
   imageCache: AppClassProperties["imageCache"];
+  /** creates images in the owner window so cross-document scenes keep
+   * runtime ownership of their HTMLImageElements */
   createImage?: () => HTMLImageElement;
 }) => {
   const updatedFiles = new Map<FileId, true>();

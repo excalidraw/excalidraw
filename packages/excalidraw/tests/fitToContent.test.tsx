@@ -1,7 +1,6 @@
 import React from "react";
 
 import { Excalidraw } from "../index";
-import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../components/App.viewport";
 import { AnimationController } from "../renderer/animation";
 import { getNormalizedZoom } from "../scene";
 
@@ -49,7 +48,9 @@ const waitForAnimationToStop = (maxFrames = 200) => {
         let remaining = maxFrames;
         const check = () => {
           if (
-            !AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
+            !AnimationController.running(
+              h.app.viewport.scrollToContentAnimationKey,
+            ) ||
             --remaining <= 0
           ) {
             resolve();
@@ -350,9 +351,9 @@ describe("scale-down animated", () => {
 
     // the animation must remove itself from the controller rather than keep
     // ticking forever after reaching the target
-    expect(AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)).toBe(
-      false,
-    );
+    expect(
+      AnimationController.running(h.app.viewport.scrollToContentAnimationKey),
+    ).toBe(false);
 
     // it should have settled on the target viewport (moved off the origin)
     const settledScrollX = h.state.scrollX;
@@ -365,5 +366,77 @@ describe("scale-down animated", () => {
     await waitForAnimationProgress();
     expect(h.state.scrollX).toBe(settledScrollX);
     expect(h.state.scrollY).toBe(settledScrollY);
+  });
+});
+
+describe("concurrent editors (per-instance animation keys)", () => {
+  it("runs both editors' scroll-to-content animations independently", async () => {
+    await render(<Excalidraw />);
+    const appA = h.app;
+
+    await render(<Excalidraw />);
+    const appB = h.app;
+    expect(appA).not.toBe(appB);
+
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+    try {
+      act(() => {
+        appA.viewport.setViewport({
+          target: [0, 0, 1000, 1000],
+          fit: "scale-down",
+          animation: { duration: 1000 },
+        });
+        appB.viewport.setViewport({
+          target: [2000, 2000, 3000, 3000],
+          fit: "scale-down",
+          animation: { duration: 1000 },
+        });
+      });
+
+      // With process-global keys the second start was a silent no-op; each
+      // editor must own its animation slot
+      expect(
+        AnimationController.running(appA.viewport.scrollToContentAnimationKey),
+      ).toBe(true);
+      expect(
+        AnimationController.running(appB.viewport.scrollToContentAnimationKey),
+      ).toBe(true);
+
+      const aStart = {
+        scrollX: appA.state.scrollX,
+        scrollY: appA.state.scrollY,
+        zoom: appA.state.zoom.value,
+      };
+      const bStart = {
+        scrollX: appB.state.scrollX,
+        scrollY: appB.state.scrollY,
+        zoom: appB.state.zoom.value,
+      };
+
+      // both viewports must make progress toward their own targets
+      await waitForAnimationProgress(8);
+      const moved = (
+        start: { scrollX: number; scrollY: number; zoom: number },
+        app: typeof appA,
+      ) =>
+        app.state.scrollX !== start.scrollX ||
+        app.state.scrollY !== start.scrollY ||
+        app.state.zoom.value !== start.zoom;
+      expect(moved(aStart, appA)).toBe(true);
+      expect(moved(bStart, appB)).toBe(true);
+
+      // cancelling one editor's transition must not touch the other's
+      act(() => {
+        appA.viewport.setViewport(null);
+      });
+      expect(
+        AnimationController.running(appA.viewport.scrollToContentAnimationKey),
+      ).toBe(false);
+      expect(
+        AnimationController.running(appB.viewport.scrollToContentAnimationKey),
+      ).toBe(true);
+    } finally {
+      window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    }
   });
 });

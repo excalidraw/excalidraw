@@ -295,6 +295,7 @@ import type {
 
 import type {
   ArrowEndpoint,
+  RenderEnvironment,
   TransformHandleDirection,
 } from "@excalidraw/element";
 
@@ -660,6 +661,75 @@ class App extends React.Component<AppProps, AppState> {
   public get ownerWindow(): Window & typeof globalThis {
     return (this.ownerDocument.defaultView ?? window) as Window &
       typeof globalThis;
+  }
+
+  /**
+   * Render environment scoped to this editor's owner window, so that the
+   * canvases, images and paths created during rendering live in the owner
+   * document (cross-document runtime ownership). Memoized keyed on the resolved
+   * document because render caches are keyed by environment identity: the
+   * identity must not survive a document switch, or caches would mix
+   * canvases and images from two realms under one bucket.
+   */
+  private _renderEnvironment: RenderEnvironment | null = null;
+  private _renderEnvironmentDocument: Document | null = null;
+  public get renderEnvironment(): RenderEnvironment {
+    if (this.props.renderEnvironment) {
+      return this.props.renderEnvironment;
+    }
+    const ownerDocument = this.ownerDocument;
+    if (
+      !this._renderEnvironment ||
+      this._renderEnvironmentDocument !== ownerDocument
+    ) {
+      this._renderEnvironmentDocument = ownerDocument;
+      this._renderEnvironment = {
+        createCanvas: () => this.ownerDocument.createElement("canvas"),
+        createImage: () => new this.ownerWindow.Image(),
+        // Browsers accept a `Path2D` minted in another realm, but taking it
+        // from the owner window keeps runtime ownership complete. Falls back
+        // to the global for realms without one (e.g. jsdom iframes).
+        createPath: (svgPath: string) =>
+          new (this.ownerWindow.Path2D ?? Path2D)(svgPath),
+      };
+    }
+    return this._renderEnvironment;
+  }
+
+  /**
+   * Every render cache is keyed by environment identity, so a host passing an
+   * inline `renderEnvironment` literal re-mints the identity on each render
+   * and re-rasterizes everything, with no visible symptom other than being
+   * slow. Detected by the factories' source being unchanged across the swap:
+   * a genuine environment switch (e.g. a document change) reads differently.
+   */
+  private _warnedUnstableRenderEnvironment = false;
+  private warnOnUnstableRenderEnvironment(prevProps: AppProps) {
+    if (
+      (!isDevEnv() && !isTestEnv()) ||
+      this._warnedUnstableRenderEnvironment
+    ) {
+      return;
+    }
+    const prev = prevProps.renderEnvironment;
+    const next = this.props.renderEnvironment;
+    if (
+      !prev ||
+      !next ||
+      prev === next ||
+      String(prev.createCanvas) !== String(next.createCanvas) ||
+      String(prev.createImage) !== String(next.createImage)
+    ) {
+      return;
+    }
+    this._warnedUnstableRenderEnvironment = true;
+    console.warn(
+      "Excalidraw: the `renderEnvironment` prop changed identity while its " +
+        "implementation stayed the same. Render caches are keyed by this " +
+        "object's identity, so a new identity per render defeats all of them " +
+        "(elements are re-rasterized every frame). Hoist the object to a " +
+        "module constant or memoize it (e.g. `useMemo`).",
+    );
   }
 
   public scene: Scene;
@@ -2626,6 +2696,8 @@ class App extends React.Component<AppProps, AppState> {
                             renderConfig={{
                               imageCache: this.imageCache,
                               isExporting: false,
+                              scale: this.ownerWindow.devicePixelRatio,
+                              renderEnvironment: this.renderEnvironment,
                               renderGrid: isGridModeEnabled(this),
                               renderLinks: this.isLinksEnabled(),
                               canvasBackgroundColor:
@@ -2650,6 +2722,8 @@ class App extends React.Component<AppProps, AppState> {
                               renderConfig={{
                                 imageCache: this.imageCache,
                                 isExporting: false,
+                                scale: this.ownerWindow.devicePixelRatio,
+                                renderEnvironment: this.renderEnvironment,
                                 renderGrid: false,
                                 canvasBackgroundColor:
                                   this.state.viewBackgroundColor,
@@ -2775,6 +2849,7 @@ class App extends React.Component<AppProps, AppState> {
         name: this.getName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
+        renderEnvironment: this.renderEnvironment,
       },
     )
       .catch(muteFSAbortError)
@@ -3895,7 +3970,7 @@ class App extends React.Component<AppProps, AppState> {
     // document/window, or leave a pending tooltip timer around
     hideHyperlinkToolip(this.hyperlinkTooltipOwner);
 
-    this.renderer.destroy();
+    this.renderer.destroy(this.canvas);
     this.scene.destroy();
     this.scene = new Scene();
     this.fonts = new Fonts(this.scene, this.ownerDocument);
@@ -4223,6 +4298,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
+    this.warnOnUnstableRenderEnvironment(prevProps);
 
     this.appStateObserver.flush(prevState);
 
@@ -4615,6 +4691,7 @@ class App extends React.Component<AppProps, AppState> {
         data.programmaticAPI
           ? convertToExcalidrawElements(
               data.elements as ExcalidrawElementSkeleton[],
+              { renderEnvironment: this.renderEnvironment },
             )
           : data.elements
       ) as readonly ExcalidrawElement[];
@@ -4644,6 +4721,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const elements = convertToExcalidrawElements(skeletonElements, {
           regenerateIds: true,
+          renderEnvironment: this.renderEnvironment,
         });
 
         this.addElementsFromPasteOrLibrary({
@@ -4855,7 +4933,12 @@ class App extends React.Component<AppProps, AppState> {
           newElement,
           this.scene.getElementsMapIncludingDeleted(),
         );
-        redrawTextBoundingBox(newElement, container, this.scene);
+        redrawTextBoundingBox(
+          newElement,
+          container,
+          this.scene,
+          this.renderEnvironment,
+        );
       }
     });
 
@@ -5018,15 +5101,25 @@ class App extends React.Component<AppProps, AppState> {
             y: currentY,
           });
 
-          let metrics = measureText(originalText, fontString, lineHeight);
+          let metrics = measureText(
+            originalText,
+            fontString,
+            lineHeight,
+            this.renderEnvironment,
+          );
           const isTextUnwrapped = metrics.width > maxTextWidth;
 
           const text = isTextUnwrapped
-            ? wrapText(originalText, fontString, maxTextWidth)
+            ? wrapText(
+                originalText,
+                fontString,
+                maxTextWidth,
+                this.renderEnvironment,
+              )
             : originalText;
 
           metrics = isTextUnwrapped
-            ? measureText(text, fontString, lineHeight)
+            ? measureText(text, fontString, lineHeight, this.renderEnvironment)
             : metrics;
 
           const startX = x - metrics.width / 2;
@@ -5041,6 +5134,7 @@ class App extends React.Component<AppProps, AppState> {
             lineHeight,
             autoResize: !isTextUnwrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
+            renderEnvironment: this.renderEnvironment,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -6366,6 +6460,7 @@ class App extends React.Component<AppProps, AppState> {
                   getContainerElement(_element, elementsMap),
                   elementsMap,
                   nextOriginalText,
+                  this.renderEnvironment,
                 )),
             });
           }
@@ -7057,6 +7152,7 @@ class App extends React.Component<AppProps, AppState> {
             : container.angle
           : (0 as Radians),
         frameId,
+        renderEnvironment: this.renderEnvironment,
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -13074,7 +13170,7 @@ class App extends React.Component<AppProps, AppState> {
       imageCache: this.imageCache,
       fileIds: elements.map((element) => element.fileId),
       files,
-      createImage: () => new this.ownerWindow.Image(),
+      createImage: () => this.renderEnvironment.createImage(),
     });
 
     if (erroredFiles.size) {
@@ -13880,6 +13976,7 @@ class App extends React.Component<AppProps, AppState> {
         resizeY,
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
+        this.renderEnvironment,
       )
     ) {
       const elementsToHighlight = new Set<NonDeletedExcalidrawElement>();

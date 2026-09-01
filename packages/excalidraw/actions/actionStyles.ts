@@ -171,7 +171,12 @@ export const actionPasteStyles = register({
               } else {
                 // sticky labels are laid out together with their (possibly
                 // also restyled) note in the post-pass below
-                redrawTextBoundingBox(newTextElement, container, app.scene);
+                redrawTextBoundingBox(
+                  newTextElement,
+                  container,
+                  app.scene,
+                  app.renderEnvironment,
+                );
               }
             }
 

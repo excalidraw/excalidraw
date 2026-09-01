@@ -1,5 +1,10 @@
 import { isRenderThrottlingEnabled } from "../reactUtils";
 
+/** String keys are shared process-wide; symbols are created per owning
+ * instance, which lets concurrent instances run the same named animation
+ * independently. */
+export type AnimationKey = string | symbol;
+
 export type Animation<R extends object> = (params: {
   deltaTime: number;
   state?: R;
@@ -12,7 +17,7 @@ type AnimationRecord = {
   scheduler: AnimationScheduler;
 };
 
-type AnimationScheduler = Pick<
+export type AnimationScheduler = Pick<
   Window,
   | "requestAnimationFrame"
   | "cancelAnimationFrame"
@@ -29,11 +34,11 @@ export class AnimationController {
     AnimationScheduler,
     ScheduledFrame
   >();
-  private static animations = new Map<string, AnimationRecord>();
+  private static animations = new Map<AnimationKey, AnimationRecord>();
   private static readonly schedulerCleanups = new WeakMap<Window, void>();
 
   static start<R extends object>(
-    key: string,
+    key: AnimationKey,
     animation: Animation<R>,
     scheduler: AnimationScheduler = window,
   ) {
@@ -201,11 +206,11 @@ export class AnimationController {
     }
   }
 
-  static running(key: string) {
+  static running(key: AnimationKey) {
     return AnimationController.animations.has(key);
   }
 
-  static cancel(key: string) {
+  static cancel(key: AnimationKey) {
     const record = AnimationController.animations.get(key);
     AnimationController.animations.delete(key);
     if (record) {
