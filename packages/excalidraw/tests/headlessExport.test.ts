@@ -1,5 +1,7 @@
 import { MIME_TYPES } from "@excalidraw/common";
 import {
+  newElement,
+  newFreeDrawElement,
   newImageElement,
   newTextElement,
   getRenderEnvironment,
@@ -8,7 +10,10 @@ import {
 } from "@excalidraw/element";
 import { vi } from "vitest";
 
-import type { FileId } from "@excalidraw/element/types";
+import type {
+  ExcalidrawFreeDrawElement,
+  FileId,
+} from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
 import { exportToCanvas } from "../scene/export";
@@ -156,6 +161,203 @@ describe("headless export environment", () => {
     // the canvas from the first one
     expect(secondEnvCanvases).toHaveLength(1);
     expect(firstEnvCanvases).toHaveLength(1);
+  });
+
+  it("skips font loading when there is no document (i.e. node)", async () => {
+    // built before `document` goes away
+    const target = document.createElement("canvas");
+    const image = document.createElement("img");
+    const rectangle = newElement({ type: "rectangle", x: 0, y: 0 });
+
+    vi.stubGlobal("document", undefined);
+
+    try {
+      const canvas = await exportToCanvas(
+        [rectangle],
+        { ...getDefaultAppState(), width: 100, height: 100 } as AppState,
+        {},
+        {
+          exportBackground: true,
+          viewBackgroundColor: "#ffffff",
+          renderEnvironment: {
+            createCanvas: () => target,
+            createImage: () => image,
+          },
+        },
+        (width, height) => {
+          target.width = width;
+          target.height = height;
+          return { canvas: target, scale: 1 };
+        },
+      );
+
+      expect(canvas).toBe(target);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("renders text on canvases without DOM methods (i.e. OffscreenCanvas)", async () => {
+    const strip = (canvas: HTMLCanvasElement) => {
+      // node-canvas / OffscreenCanvas have no DOM element methods
+      Object.defineProperty(canvas, "setAttribute", { value: undefined });
+      Object.defineProperty(canvas, "isConnected", { value: undefined });
+      return canvas;
+    };
+
+    const context = document.createElement("canvas").getContext("2d")!;
+    const fillTextSpy = vi.spyOn(
+      Object.getPrototypeOf(context) as CanvasRenderingContext2D,
+      "fillText",
+    );
+
+    const target = strip(document.createElement("canvas"));
+    setRenderEnvironment({
+      createCanvas: () => strip(document.createElement("canvas")),
+    });
+
+    const text = newTextElement({ x: 0, y: 0, text: "headless", fontSize: 20 });
+
+    await exportToCanvas(
+      [text],
+      { ...getDefaultAppState(), width: 100, height: 100 } as AppState,
+      {},
+      {
+        exportBackground: true,
+        viewBackgroundColor: "#ffffff",
+      },
+      (width, height) => {
+        target.width = width;
+        target.height = height;
+        return { canvas: target, scale: 1 };
+      },
+      async () => {},
+    );
+
+    // the text was actually painted, not swallowed by the renderer's
+    // per-element try/catch
+    expect(fillTextSpy).toHaveBeenCalledWith("headless", 0, expect.any(Number));
+  });
+
+  it("fills freedraw strokes through the environment's `createPath`", async () => {
+    // node has no global `Path2D`, so the environment has to be able to
+    // supply one -- stubbed away to prove nothing reaches for the global
+    const Path2DCtor = globalThis.Path2D;
+    vi.stubGlobal("Path2D", undefined);
+
+    const paths: string[] = [];
+    const createPath = vi.fn((svgPath: string) => {
+      paths.push(svgPath);
+      return new Path2DCtor(svgPath);
+    });
+
+    const target = document.createElement("canvas");
+    const createdCanvases: HTMLCanvasElement[] = [];
+    // the stroke may land on the export canvas or on the element's own cached
+    // canvas, depending on the caching path -- look at both
+    const fillCalls = () =>
+      [target, ...createdCanvases].flatMap(
+        (canvas) =>
+          (
+            canvas.getContext("2d") as unknown as {
+              fill: { mock: { calls: unknown[][] } };
+            }
+          ).fill.mock.calls,
+      );
+
+    const freedraw = newFreeDrawElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      simulatePressure: true,
+      points: [
+        [0, 0],
+        [10, 10],
+        [20, 5],
+      ] as ExcalidrawFreeDrawElement["points"],
+    });
+
+    try {
+      await exportToCanvas(
+        [freedraw],
+        { ...getDefaultAppState(), width: 100, height: 100 } as AppState,
+        {},
+        {
+          exportBackground: true,
+          viewBackgroundColor: "#ffffff",
+          renderEnvironment: {
+            createCanvas: () => {
+              const canvas = document.createElement("canvas");
+              createdCanvases.push(canvas);
+              return canvas;
+            },
+            createImage: () => document.createElement("img"),
+            createPath,
+          },
+        },
+        (width, height) => {
+          target.width = width;
+          target.height = height;
+          return { canvas: target, scale: 1 };
+        },
+        async () => {},
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+
+    expect(createPath).toHaveBeenCalledTimes(1);
+    expect(paths[0]).toMatch(/^M/);
+    // and the path it built is what got filled
+    expect(fillCalls().map(([path]) => path)).toContain(
+      createPath.mock.results[0].value,
+    );
+  });
+
+  it("fails the export when an element cannot be rendered", async () => {
+    // the node case: no global `Path2D` and no `createPath` to stand in
+    vi.stubGlobal("Path2D", undefined);
+
+    const target = document.createElement("canvas");
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    const freedraw = newFreeDrawElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      simulatePressure: true,
+      points: [
+        [0, 0],
+        [10, 10],
+        [20, 5],
+      ] as ExcalidrawFreeDrawElement["points"],
+    });
+
+    try {
+      // must reject rather than resolve with a blank/partial canvas
+      await expect(
+        exportToCanvas(
+          [freedraw],
+          { ...getDefaultAppState(), width: 100, height: 100 } as AppState,
+          {},
+          {
+            exportBackground: true,
+            viewBackgroundColor: "#ffffff",
+          },
+          (width, height) => {
+            target.width = width;
+            target.height = height;
+            return { canvas: target, scale: 1 };
+          },
+          async () => {},
+        ),
+      ).rejects.toThrow(/Path2D/);
+      expect(consoleError).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it("falls back to browser defaults for keys that are not overridden", () => {

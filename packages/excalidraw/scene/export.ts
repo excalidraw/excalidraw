@@ -261,7 +261,8 @@ export const exportToCanvas = async (
       (element) => element.fileId,
     ),
     files,
-    createImage: renderEnvironment?.createImage,
+    createImage:
+      renderEnvironment && (() => renderEnvironment.createImage()),
   });
 
   renderStaticScene({

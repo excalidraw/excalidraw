@@ -12928,7 +12928,7 @@ class App extends React.Component<AppProps, AppState> {
       imageCache: this.imageCache,
       fileIds: elements.map((element) => element.fileId),
       files,
-      createImage: this.renderEnvironment.createImage,
+      createImage: () => this.renderEnvironment.createImage(),
     });
 
     if (erroredFiles.size) {

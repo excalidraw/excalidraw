@@ -806,7 +806,11 @@ export interface ExcalidrawProps {
    * which silently re-rasterizes every element on every frame; hoist it to a
    * module constant or memoize it (e.g. `useMemo`) instead.
    *
-   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image() }
+   * Only `createCanvas` and `createImage` are required. `createPath` (used to
+   * fill freedraw strokes) falls back to the global `Path2D`, which every
+   * browser has -- a non-browser host without one must supply it.
+   *
+   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image(), createPath: (d) => new Path2D(d) }
    */
   renderEnvironment?: RenderEnvironment;
   onChange?: (

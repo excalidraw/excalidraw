@@ -48,6 +48,30 @@ import type {
 } from "../scene/types";
 import type { StaticCanvasAppState, Zoom } from "../types";
 
+/**
+ * A render failure is per-element on purpose in the editor: one bad element
+ * must not blank the whole canvas. On export the same tolerance is a trap --
+ * the caller gets a silently blank or partial image with nothing but a
+ * `console.error` as evidence, so exports fail loudly instead.
+ */
+const handleElementRenderError = (
+  error: unknown,
+  element: NonDeletedExcalidrawElement,
+  isExporting: boolean,
+) => {
+  if (isExporting) {
+    throw error;
+  }
+  console.error(
+    error,
+    element.id,
+    element.x,
+    element.y,
+    element.width,
+    element.height,
+  );
+};
+
 const GridLineColor = {
   [THEME.LIGHT]: {
     bold: "#dddddd",
@@ -440,14 +464,7 @@ const _renderStaticScene = ({
           );
         }
       } catch (error: any) {
-        console.error(
-          error,
-          element.id,
-          element.x,
-          element.y,
-          element.width,
-          element.height,
-        );
+        handleElementRenderError(error, element, isExporting);
       }
     });
 
@@ -530,7 +547,7 @@ const _renderStaticScene = ({
           render();
         }
       } catch (error: any) {
-        console.error(error);
+        handleElementRenderError(error, element, isExporting);
       }
     });
 
@@ -547,7 +564,7 @@ const _renderStaticScene = ({
         appState,
       );
     } catch (error) {
-      console.error(error);
+      handleElementRenderError(error, element, isExporting);
     }
   });
 };

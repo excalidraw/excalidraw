@@ -42,7 +42,7 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { getRenderEnvironment } from "./renderEnvironment";
+import { getCreatePath, getRenderEnvironment } from "./renderEnvironment";
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
@@ -377,6 +377,7 @@ const drawElementOnCanvas = (
       context.save();
 
       const shapes = ShapeCache.generateElementShape(element, renderConfig);
+      const createPath = getCreatePath(renderConfig.renderEnvironment);
 
       for (const shape of shapes) {
         if (typeof shape === "string") {
@@ -384,7 +385,7 @@ const drawElementOnCanvas = (
             element.strokeColor,
             renderConfig.theme === THEME.DARK,
           );
-          context.fill(new Path2D(shape));
+          context.fill(createPath(shape));
         } else {
           rc.draw(shape);
         }
@@ -523,7 +524,9 @@ const drawElementOnCanvas = (
           // to the DOM
           document.body.appendChild(context.canvas);
         }
-        context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
+        if (typeof context.canvas.setAttribute === "function") {
+          context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
+        }
         context.save();
         context.font = getFontString(element);
         context.fillStyle = applyDarkModeFilter(

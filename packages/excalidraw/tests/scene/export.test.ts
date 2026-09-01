@@ -356,20 +356,20 @@ describe("exportToCanvas", () => {
 
     const images: any[] = [];
     const createImage = () => {
-      const fake: any = {
-        naturalWidth: 100,
-        naturalHeight: 100,
-        onload: null,
-        onerror: null,
-      };
-      Object.defineProperty(fake, "src", {
+      // a real <img>: the renderer hands it to `drawImage`, which rejects
+      // anything else -- and the export now fails loudly when it does
+      const stub: any = document.createElement("img");
+      Object.defineProperty(stub, "naturalWidth", { value: 100 });
+      Object.defineProperty(stub, "naturalHeight", { value: 100 });
+      Object.defineProperty(stub, "src", {
         set(value: string) {
-          fake._src = value;
-          queueMicrotask(() => fake.onload?.());
+          stub._src = value;
+          // jsdom never decodes, so settle the way a browser would
+          queueMicrotask(() => stub.onload?.());
         },
       });
-      images.push(fake);
-      return fake as HTMLImageElement;
+      images.push(stub);
+      return stub as HTMLImageElement;
     };
 
     await exportToCanvas({

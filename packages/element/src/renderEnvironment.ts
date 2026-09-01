@@ -26,10 +26,31 @@ export type RenderEnvironment = {
    * `naturalHeight` and be accepted by their canvas' `drawImage`.
    */
   createImage: () => HTMLImageElement;
+  /**
+   * Creates a fillable path from an SVG path string -- freedraw elements are
+   * filled through one.
+   *
+   * Optional, because browsers always have the global `Path2D` this falls back
+   * to. A Node host MUST supply it (e.g. `@napi-rs/canvas`'s `Path2D`) or
+   * install `globalThis.Path2D` itself: Node has no such global, and without
+   * one every freedraw element fails to render.
+   */
+  createPath?: (svgPath: string) => Path2D;
 };
 
 const defaultCreateCanvas = () => document.createElement("canvas");
 const defaultCreateImage = () => new Image();
+const defaultCreatePath = (svgPath: string) => {
+  if (typeof Path2D === "undefined") {
+    throw new Error(
+      "Excalidraw: rendering a freedraw element needs a `Path2D` " +
+        "implementation, and this environment has no global one. Pass " +
+        "`createPath` in the render environment (e.g. `@napi-rs/canvas`'s " +
+        "`Path2D`) or assign `globalThis.Path2D`.",
+    );
+  }
+  return new Path2D(svgPath);
+};
 
 /**
  * NOTE: deliberately does NOT carry a devicePixelRatio. The backing-store scale
@@ -40,12 +61,15 @@ const defaultCreateImage = () => new Image();
 let environment: RenderEnvironment = {
   createCanvas: defaultCreateCanvas,
   createImage: defaultCreateImage,
+  createPath: defaultCreatePath,
 };
 
 /**
  * Overrides the default host environment process-wide. Partial overrides fall
- * back to the browser defaults, so a Node caller that only needs canvas and
- * image factories can supply just those.
+ * back to the browser defaults, so a caller that only needs canvas and image
+ * factories can supply just those. NOTE: under Node the `createPath` default
+ * (the global `Path2D`) throws, so a Node caller drawing freedraw elements has
+ * to supply `createPath` too -- see the field's docs.
  *
  * Per-instance environments are passed explicitly via
  * `StaticCanvasRenderConfig["renderEnvironment"]` or the `env` argument of
@@ -62,6 +86,7 @@ export const setRenderEnvironment = (env: Partial<RenderEnvironment>) => {
   environment = {
     createCanvas: env.createCanvas ?? defaultCreateCanvas,
     createImage: env.createImage ?? defaultCreateImage,
+    createPath: env.createPath ?? defaultCreatePath,
   };
 };
 
@@ -70,6 +95,7 @@ export const resetRenderEnvironment = () => {
   environment = {
     createCanvas: defaultCreateCanvas,
     createImage: defaultCreateImage,
+    createPath: defaultCreatePath,
   };
 };
 
@@ -81,3 +107,13 @@ export const resetRenderEnvironment = () => {
 export const getRenderEnvironment = (
   env?: RenderEnvironment,
 ): RenderEnvironment => env ?? environment;
+
+/**
+ * Resolves the path factory for a render. `createPath` is the one optional
+ * member of the contract, so this fills in the global-`Path2D` default for
+ * environments (e.g. an editor's per-window one) that omit it.
+ */
+export const getCreatePath = (
+  env?: RenderEnvironment,
+): ((svgPath: string) => Path2D) =>
+  getRenderEnvironment(env).createPath ?? defaultCreatePath;
