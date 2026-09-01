@@ -17,7 +17,7 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { updateTextEditor } from "./queries/dom";
-import { act, render, waitFor } from "./test-utils";
+import { act, fireEvent, render, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -192,6 +192,72 @@ describe("search", () => {
 
     await waitFor(() => {
       expect(h.app.state.searchMatches?.matches.length).toBe(3);
+    });
+  });
+
+  it("should not steal cmd+f while a dialog is open", async () => {
+    API.setAppState({ openDialog: { name: "help" } });
+    expect(h.app.state.openSidebar).toBeNull();
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    // the search action should not have intercepted the shortcut, leaving
+    // the browser's native find-in-page behavior (and the help dialog) intact
+    expect(h.app.state.openSidebar).toBeNull();
+    expect(h.app.state.openDialog?.name).toBe("help");
+  });
+
+  it("should not block cmd+s while a text input is focused", async () => {
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+    const searchInput = await querySearchInput();
+
+    const notCancelled = fireEvent.keyDown(searchInput, {
+      key: "s",
+      ctrlKey: true,
+    });
+
+    // returns false when a handler called preventDefault(), which is what we
+    // want here so the app's save action runs instead of the browser's
+    // native "save page" dialog
+    expect(notCancelled).toBe(false);
+  });
+
+  it("should not reorder search matches while dragging", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    API.setElements([
+      API.createElement({ type: "text", text: "test one", y: 0 }),
+      API.createElement({ type: "text", text: "test two", y: 100 }),
+    ]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+    const searchInput = await querySearchInput();
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+    const firstMatchId = h.app.state.searchMatches!.matches[0].id;
+    expect(firstMatchId).toBe(h.elements[0].id);
+
+    API.setAppState({ selectedElementsAreBeingDragged: true });
+    // move the second element above the first, as if it were being dragged
+    API.updateElement(h.elements[1] as ExcalidrawTextElement, { y: -100 });
+
+    // give the debounced search a chance to run if it were going to
+    await act(() => new Promise((resolve) => setTimeout(resolve, 500)));
+    expect(h.app.state.searchMatches?.matches[0].id).toBe(firstMatchId);
+
+    API.setAppState({ selectedElementsAreBeingDragged: false });
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches[0].id).toBe(h.elements[1].id);
     });
   });
 });

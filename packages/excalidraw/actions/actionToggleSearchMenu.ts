@@ -54,5 +54,11 @@ export const actionToggleSearchMenu = register({
   predicate: (element, appState, props) => {
     return props.gridModeEnabled === undefined;
   },
-  keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.F,
+  keyTest: (event, appState) =>
+    event[KEYS.CTRL_OR_CMD] &&
+    event.key === KEYS.F &&
+    // don't swallow Ctrl/Cmd+F while a dialog (e.g. help) is open: `perform`
+    // bails out in that case, so intercepting the event here would block the
+    // browser's native find-in-page without opening canvas search instead
+    !appState.openDialog,
 });
