@@ -24,9 +24,8 @@ describe("shape tool deactivation hint", () => {
     expect(h.state.activeTool.type).toBe("selection");
     expect(h.state.shapeToolExitedViaEscape).toBe(true);
 
-    const hint = GlobalTestState.renderResult.container.querySelector(
-      ".HintViewer",
-    );
+    const hint =
+      GlobalTestState.renderResult.container.querySelector(".HintViewer");
     expect(hint?.textContent).toContain("Drawing tool deactivated");
   });
 

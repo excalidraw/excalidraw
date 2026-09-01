@@ -5,7 +5,12 @@ import {
   selectGroupsForSelectedElements,
 } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
-import { KEYS, isSelectionLikeTool, isWritableElement, updateActiveTool } from "@excalidraw/common";
+import {
+  KEYS,
+  isSelectionLikeTool,
+  isWritableElement,
+  updateActiveTool,
+} from "@excalidraw/common";
 
 import type { GroupId } from "@excalidraw/element/types";
 
