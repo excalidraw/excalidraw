@@ -810,7 +810,7 @@ export interface ExcalidrawProps {
    * fill freedraw strokes) falls back to the global `Path2D`, which every
    * browser has -- a non-browser host without one must supply it.
    *
-   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image(), createPath: (d) => new Path2D(d) }
+   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image(), createPath: (d) => new ownerWindow.Path2D(d) }
    */
   renderEnvironment?: RenderEnvironment;
   onChange?: (

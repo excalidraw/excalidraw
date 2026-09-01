@@ -111,7 +111,7 @@ export const getRenderEnvironment = (
 /**
  * Resolves the path factory for a render. `createPath` is the one optional
  * member of the contract, so this fills in the global-`Path2D` default for
- * environments (e.g. an editor's per-window one) that omit it.
+ * environments that omit it.
  */
 export const getCreatePath = (
   env?: RenderEnvironment,

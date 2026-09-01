@@ -8,12 +8,12 @@ import {
   resetRenderEnvironment,
   setRenderEnvironment,
 } from "@excalidraw/element";
+import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
-import type {
-  ExcalidrawFreeDrawElement,
-  FileId,
-} from "@excalidraw/element/types";
+import { type LocalPoint } from "@excalidraw/math";
+
+import type { FileId } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
 import { exportToCanvas } from "../scene/export";
@@ -271,10 +271,10 @@ describe("headless export environment", () => {
       y: 0,
       simulatePressure: true,
       points: [
-        [0, 0],
-        [10, 10],
-        [20, 5],
-      ] as ExcalidrawFreeDrawElement["points"],
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(10, 10),
+        pointFrom<LocalPoint>(20, 5),
+      ],
     });
 
     try {
@@ -329,10 +329,10 @@ describe("headless export environment", () => {
       y: 0,
       simulatePressure: true,
       points: [
-        [0, 0],
-        [10, 10],
-        [20, 5],
-      ] as ExcalidrawFreeDrawElement["points"],
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(10, 10),
+        pointFrom<LocalPoint>(20, 5),
+      ],
     });
 
     try {

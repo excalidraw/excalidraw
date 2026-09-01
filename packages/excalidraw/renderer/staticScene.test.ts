@@ -1,5 +1,6 @@
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { newElement, newFreeDrawElement } from "@excalidraw/element";
+import { pointFrom } from "@excalidraw/math";
 import { describe, expect, it, vi } from "vitest";
 
 import type {
@@ -7,6 +8,8 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
+
+import type { LocalPoint } from "@excalidraw/math";
 
 import { getDefaultAppState } from "../appState";
 
@@ -92,10 +95,7 @@ describe("static scene element render errors", () => {
       x: 0,
       y: 0,
       simulatePressure: true,
-      points: [
-        [0, 0],
-        [10, 10],
-      ],
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(10, 10)],
     } as Parameters<typeof newFreeDrawElement>[0]);
     const survivor = newElement({
       type: "rectangle",

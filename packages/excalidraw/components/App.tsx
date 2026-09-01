@@ -646,8 +646,8 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * Render environment scoped to this editor's owner window, so that the
-   * canvases and images created during rendering live in the owner document
-   * (cross-document runtime ownership). Memoized keyed on the resolved
+   * canvases, images and paths created during rendering live in the owner
+   * document (cross-document runtime ownership). Memoized keyed on the resolved
    * document because render caches are keyed by environment identity: the
    * identity must not survive a document switch, or caches would mix
    * canvases and images from two realms under one bucket.
@@ -667,6 +667,11 @@ class App extends React.Component<AppProps, AppState> {
       this._renderEnvironment = {
         createCanvas: () => this.ownerDocument.createElement("canvas"),
         createImage: () => new this.ownerWindow.Image(),
+        // Browsers accept a `Path2D` minted in another realm, but taking it
+        // from the owner window keeps runtime ownership complete. Falls back
+        // to the global for realms without one (e.g. jsdom iframes).
+        createPath: (svgPath: string) =>
+          new (this.ownerWindow.Path2D ?? Path2D)(svgPath),
       };
     }
     return this._renderEnvironment;
