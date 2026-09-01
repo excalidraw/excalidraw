@@ -89,6 +89,7 @@ const TTDDialogBase = withInternalFallback(
         }}
         size={1520}
         title={false}
+        ariaLabel={t("labels.textToDiagram")}
         {...rest}
         autofocus={false}
       >
