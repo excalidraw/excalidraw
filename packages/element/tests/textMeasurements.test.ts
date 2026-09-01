@@ -75,6 +75,8 @@ describe("text measurement env threading", () => {
     expect(charWidth.calculate("A", FONT, env)).toBe(30);
     // clearing a font drops the cache in every env
     charWidth.clearCache(FONT);
+    expect(charWidth.getCache(FONT, env)).toBeUndefined();
+    expect(charWidth.getCache(FONT)).toBeUndefined();
     expect(charWidth.calculate("A", FONT, env)).toBe(30);
     expect(charWidth.calculate("A", FONT)).toBe(10);
   });

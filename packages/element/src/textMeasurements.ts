@@ -214,10 +214,46 @@ export const getTextHeight = (
 
 export const charWidth = (() => {
   // per-env: two realms can measure the same font string differently
-  // (each measures with its own document's font set)
-  const cachedCharWidth: {
-    [font: FontString]: Map<RenderEnvironment, Array<number>>;
-  } = {};
+  // (each measures with its own document's font set).
+  //
+  // keyed weakly by env: a per-instance env's factories close over the editor
+  // instance, so a strong key would pin an unmounted editor (and its scene)
+  // for the process' lifetime, and a Node exporter calling
+  // `setRenderEnvironment` per export would accumulate one entry per call.
+  const cachedCharWidth = new WeakMap<
+    RenderEnvironment,
+    Map<FontString, { generation: number; widths: Array<number> }>
+  >();
+
+  // a font load invalidates that font's metrics in every realm, but a WeakMap
+  // can't be iterated -- bump the font's generation instead and let each env's
+  // stale entry be dropped lazily, on its next lookup
+  const generations = new Map<FontString, number>();
+
+  const getWidths = (
+    font: FontString,
+    env: RenderEnvironment,
+    create: boolean,
+  ) => {
+    const generation = generations.get(font) ?? 0;
+    let perFont = cachedCharWidth.get(env);
+    if (!perFont) {
+      if (!create) {
+        return undefined;
+      }
+      perFont = new Map();
+      cachedCharWidth.set(env, perFont);
+    }
+    let entry = perFont.get(font);
+    if (!entry || entry.generation !== generation) {
+      if (!create) {
+        return undefined;
+      }
+      entry = { generation, widths: [] };
+      perFont.set(font, entry);
+    }
+    return entry.widths;
+  };
 
   const calculate = (
     char: string,
@@ -225,17 +261,7 @@ export const charWidth = (() => {
     env?: RenderEnvironment,
   ) => {
     const unicode = char.charCodeAt(0);
-    const resolvedEnv = getRenderEnvironment(env);
-    let perEnv = cachedCharWidth[font];
-    if (!perEnv) {
-      perEnv = new Map();
-      cachedCharWidth[font] = perEnv;
-    }
-    let widths = perEnv.get(resolvedEnv);
-    if (!widths) {
-      widths = [];
-      perEnv.set(resolvedEnv, widths);
-    }
+    const widths = getWidths(font, getRenderEnvironment(env), true)!;
     if (widths[unicode] === undefined) {
       widths[unicode] = getLineWidth(char, font, env);
     }
@@ -243,12 +269,12 @@ export const charWidth = (() => {
   };
 
   const getCache = (font: FontString, env?: RenderEnvironment) => {
-    return cachedCharWidth[font]?.get(getRenderEnvironment(env));
+    return getWidths(font, getRenderEnvironment(env), false);
   };
 
   const clearCache = (font: FontString) => {
     // clears every env: a font load invalidates metrics in all realms
-    delete cachedCharWidth[font];
+    generations.set(font, (generations.get(font) ?? 0) + 1);
   };
 
   return {

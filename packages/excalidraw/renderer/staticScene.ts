@@ -556,19 +556,30 @@ type StaticSceneThrottle = ReturnType<typeof throttleRAF>;
 
 const staticSceneThrottles = new WeakMap<
   HTMLCanvasElement,
-  StaticSceneThrottle
+  { throttle: StaticSceneThrottle; ownerWindow: Window }
 >();
 
 const getStaticSceneThrottle = (canvas: HTMLCanvasElement) => {
-  let throttle = staticSceneThrottles.get(canvas);
-  if (!throttle) {
-    const ownerWindow = canvas.ownerDocument.defaultView ?? window;
-    throttle = throttleRAF((config: StaticSceneRenderConfig) => {
-      _renderStaticScene(config);
-    }, ownerWindow);
-    staticSceneThrottles.set(canvas, throttle);
+  const ownerWindow = canvas.ownerDocument.defaultView ?? window;
+  let entry = staticSceneThrottles.get(canvas);
+  // the owner window is captured when the throttle is built, so a canvas
+  // adopted into another document (moved rather than remounted) would keep
+  // scheduling on the old window's rAF -- which never fires once that window
+  // is closed. rebuild whenever the owner window no longer matches.
+  if (entry && entry.ownerWindow !== ownerWindow) {
+    entry.throttle.cancel();
+    entry = undefined;
   }
-  return throttle;
+  if (!entry) {
+    entry = {
+      throttle: throttleRAF((config: StaticSceneRenderConfig) => {
+        _renderStaticScene(config);
+      }, ownerWindow),
+      ownerWindow,
+    };
+    staticSceneThrottles.set(canvas, entry);
+  }
+  return entry.throttle;
 };
 
 /**
@@ -585,7 +596,7 @@ export const renderStaticSceneThrottled = (config: StaticSceneRenderConfig) => {
 /** Drops the canvas' pending frame; the throttle itself is dropped with the
  * canvas. */
 export const cancelStaticSceneThrottle = (canvas: HTMLCanvasElement) => {
-  staticSceneThrottles.get(canvas)?.cancel();
+  staticSceneThrottles.get(canvas)?.throttle.cancel();
 };
 
 /**

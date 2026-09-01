@@ -799,6 +799,13 @@ export interface ExcalidrawProps {
    * `OffscreenCanvas`, or a non-DOM image decoder. When omitted, canvas and
    * image creation fall back to `ownerDocument` / `ownerWindow`.
    *
+   * The value must be referentially stable -- every render cache (element
+   * canvases, text metrics, char widths, link icons) is keyed by this
+   * object's identity, so a new identity is a full cache miss. Passing an
+   * inline object literal mints a fresh identity on every React render,
+   * which silently re-rasterizes every element on every frame; hoist it to a
+   * module constant or memoize it (e.g. `useMemo`) instead.
+   *
    * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image() }
    */
   renderEnvironment?: RenderEnvironment;

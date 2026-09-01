@@ -69,6 +69,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onExport,
     className,
     ownerDocument = document,
+    renderEnvironment,
     onChange,
     onThemeChange,
     onIncrement,
@@ -211,6 +212,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onExport={onExport}
           className={className}
           ownerDocument={ownerDocument}
+          renderEnvironment={renderEnvironment}
           onChange={onChange}
           onThemeChange={onThemeChange}
           onIncrement={onIncrement}

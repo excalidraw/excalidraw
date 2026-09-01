@@ -672,6 +672,42 @@ class App extends React.Component<AppProps, AppState> {
     return this._renderEnvironment;
   }
 
+  /**
+   * Every render cache is keyed by environment identity, so a host passing an
+   * inline `renderEnvironment` literal re-mints the identity on each render
+   * and re-rasterizes everything, with no visible symptom other than being
+   * slow. Detected by the factories' source being unchanged across the swap:
+   * a genuine environment switch (e.g. a document change) reads differently.
+   */
+  private _warnedUnstableRenderEnvironment = false;
+  private warnOnUnstableRenderEnvironment(prevProps: AppProps) {
+    if (
+      (!isDevEnv() && !isTestEnv()) ||
+      this._warnedUnstableRenderEnvironment
+    ) {
+      return;
+    }
+    const prev = prevProps.renderEnvironment;
+    const next = this.props.renderEnvironment;
+    if (
+      !prev ||
+      !next ||
+      prev === next ||
+      String(prev.createCanvas) !== String(next.createCanvas) ||
+      String(prev.createImage) !== String(next.createImage)
+    ) {
+      return;
+    }
+    this._warnedUnstableRenderEnvironment = true;
+    console.warn(
+      "Excalidraw: the `renderEnvironment` prop changed identity while its " +
+        "implementation stayed the same. Render caches are keyed by this " +
+        "object's identity, so a new identity per render defeats all of them " +
+        "(elements are re-rasterized every frame). Hoist the object to a " +
+        "module constant or memoize it (e.g. `useMemo`).",
+    );
+  }
+
   public scene: Scene;
   public fonts: Fonts;
   public renderer: Renderer;
@@ -4205,6 +4241,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
+    this.warnOnUnstableRenderEnvironment(prevProps);
 
     this.appStateObserver.flush(prevState);
 
@@ -12891,7 +12928,7 @@ class App extends React.Component<AppProps, AppState> {
       imageCache: this.imageCache,
       fileIds: elements.map((element) => element.fileId),
       files,
-      createImage: () => new this.ownerWindow.Image(),
+      createImage: this.renderEnvironment.createImage,
     });
 
     if (erroredFiles.size) {

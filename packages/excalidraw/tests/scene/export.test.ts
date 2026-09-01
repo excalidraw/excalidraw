@@ -7,6 +7,8 @@ import {
   FRAME_STYLE,
 } from "@excalidraw/common";
 
+import { newElementWith } from "@excalidraw/element";
+
 import { pointFrom } from "@excalidraw/math";
 
 import type {
@@ -320,6 +322,14 @@ describe("exportToCanvas", () => {
     const canvas = await exportToCanvas({
       elements: [
         API.createElement({ type: "rectangle", width: 100, height: 100 }),
+        // a named frame: its label is measured and truncated during export,
+        // which is its own canvas-creating path
+        newElementWith(
+          API.createElement({ type: "frame", width: 100, height: 100 }),
+          {
+            name: "a frame name long enough to be truncated to the frame width",
+          },
+        ),
       ],
       files: null,
       appState: { exportBackground: true, viewBackgroundColor: "#ffffff" },
