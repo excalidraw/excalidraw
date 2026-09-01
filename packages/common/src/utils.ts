@@ -197,10 +197,7 @@ export const debounce = <T extends any[]>(
 // throttle callback to execute once per animation frame using the latest args
 export const throttleRAF = <T extends any[]>(
   fn: (...args: T) => void,
-  ownerWindow?: Pick<
-    Window,
-    "requestAnimationFrame" | "cancelAnimationFrame"
-  >,
+  ownerWindow?: Pick<Window, "requestAnimationFrame" | "cancelAnimationFrame">,
 ) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;

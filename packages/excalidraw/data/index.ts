@@ -21,6 +21,7 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+import type { RenderEnvironment } from "@excalidraw/element";
 
 import {
   copyBlobToClipboardAsPng,
@@ -34,8 +35,6 @@ import { exportToCanvas, exportToSvg } from "../scene/export";
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
 import { serializeAsJSON } from "./json";
-
-import type { RenderEnvironment } from "@excalidraw/element";
 
 import type { ExportType } from "../scene/types";
 import type { AppState, BinaryFiles } from "../types";
