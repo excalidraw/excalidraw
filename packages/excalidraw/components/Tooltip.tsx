@@ -116,6 +116,14 @@ export const Tooltip = ({
       tooltipRef.current = null;
     };
   }, []);
+  useEffect(() => {
+    // the wrapper is unmounted while disabled, so its onPointerLeave never
+    // fires and the shared tooltip div must be cleared here instead
+    if (disabled) {
+      tooltipRef.current?.classList.remove(TOOLTIP_VISIBLE_CLASS);
+      tooltipRef.current = null;
+    }
+  }, [disabled]);
   if (disabled) {
     return null;
   }

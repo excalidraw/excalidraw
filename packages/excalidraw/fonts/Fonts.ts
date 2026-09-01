@@ -177,12 +177,20 @@ export class Fonts {
    */
   public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
-    ownerDocument: Document = document,
+    ownerDocument?: Document,
   ): Promise<FontFace[]> => {
+    const doc =
+      ownerDocument ?? (typeof document !== "undefined" ? document : null);
+
+    // NOTE: headless environments should register fonts prior to rendering
+    if (!doc?.fonts) {
+      return [];
+    }
+
     const fontFamilies = Fonts.getUniqueFamilies(elements);
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
-    return Fonts.loadFontFaces(fontFamilies, charsPerFamily, ownerDocument);
+    return Fonts.loadFontFaces(fontFamilies, charsPerFamily, doc);
   };
 
   /**
