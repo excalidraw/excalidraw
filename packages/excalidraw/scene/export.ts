@@ -19,6 +19,7 @@ import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
+  getRenderEnvironment,
   updateImageCache,
 } from "@excalidraw/element";
 
@@ -49,6 +50,8 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import { getDefaultAppState } from "../appState";
 import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
@@ -65,11 +68,12 @@ import type { AppState, BinaryFiles } from "../types";
 const truncateText = (
   element: NonDeleted<ExcalidrawTextElement>,
   maxWidth: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (element.width <= maxWidth) {
     return element;
   }
-  const canvas = document.createElement("canvas");
+  const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
   const ctx = canvas.getContext("2d")!;
   ctx.font = getFontString({
     fontFamily: element.fontFamily,
@@ -104,7 +108,9 @@ const truncateText = (
  */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  opts: Pick<AppState, "exportWithDarkMode">,
+  opts: Pick<AppState, "exportWithDarkMode"> & {
+    renderEnvironment?: RenderEnvironment;
+  },
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements) {
@@ -121,10 +127,15 @@ const addFrameLabelsAsTextElements = (
             ? FRAME_STYLE.nameColorDarkTheme
             : FRAME_STYLE.nameColorLightTheme,
           text: getFrameLikeTitle(element),
+          renderEnvironment: opts.renderEnvironment,
         });
       textElement.y -= textElement.height;
 
-      textElement = truncateText(textElement, element.width);
+      textElement = truncateText(
+        textElement,
+        element.width,
+        opts.renderEnvironment,
+      );
 
       nextElements.push(textElement);
     }
@@ -152,11 +163,13 @@ const prepareElementsForRender = ({
   exportingFrame,
   frameRendering,
   exportWithDarkMode,
+  renderEnvironment,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
   frameRendering: AppState["frameRendering"];
   exportWithDarkMode: AppState["exportWithDarkMode"];
+  renderEnvironment?: RenderEnvironment;
 }) => {
   let nextElements: readonly NonDeletedExcalidrawElement[];
 
@@ -169,6 +182,7 @@ const prepareElementsForRender = ({
   } else if (frameRendering.enabled && frameRendering.name) {
     nextElements = addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode,
+      renderEnvironment,
     });
   } else {
     nextElements = elements;
@@ -186,17 +200,19 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    renderEnvironment,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    renderEnvironment?: RenderEnvironment;
   },
   createCanvas: (
     width: number,
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
-    const canvas = document.createElement("canvas");
+    const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
     canvas.width = width * appState.exportScale;
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
@@ -223,6 +239,7 @@ export const exportToCanvas = async (
     exportingFrame,
     exportWithDarkMode: appState.exportWithDarkMode,
     frameRendering,
+    renderEnvironment,
   });
 
   if (exportingFrame) {
@@ -244,6 +261,7 @@ export const exportToCanvas = async (
       (element) => element.fileId,
     ),
     files,
+    createImage: renderEnvironment && (() => renderEnvironment.createImage()),
   });
 
   renderStaticScene({
@@ -272,6 +290,8 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
+      scale,
+      renderEnvironment,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),

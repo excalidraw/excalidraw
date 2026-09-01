@@ -49,6 +49,7 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
+  RenderEnvironment,
 } from "@excalidraw/element";
 import type { GlobalPoint } from "@excalidraw/math";
 
@@ -791,6 +792,27 @@ export interface ExcalidrawProps {
    * @default document
    */
   ownerDocument?: Document;
+  /**
+   * Host environment used by the renderer and export pipeline to create
+   * canvases and images. Supply a custom implementation to redirect canvas
+   * creation and image decoding to e.g. a host canvas pool, an
+   * `OffscreenCanvas`, or a non-DOM image decoder. When omitted, canvas and
+   * image creation fall back to `ownerDocument` / `ownerWindow`.
+   *
+   * The value must be referentially stable -- every render cache (element
+   * canvases, text metrics, char widths, link icons) is keyed by this
+   * object's identity, so a new identity is a full cache miss. Passing an
+   * inline object literal mints a fresh identity on every React render,
+   * which silently re-rasterizes every element on every frame; hoist it to a
+   * module constant or memoize it (e.g. `useMemo`) instead.
+   *
+   * Only `createCanvas` and `createImage` are required. `createPath` (used to
+   * fill freedraw strokes) falls back to the global `Path2D`, which every
+   * browser has -- a non-browser host without one must supply it.
+   *
+   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image(), createPath: (d) => new ownerWindow.Path2D(d) }
+   */
+  renderEnvironment?: RenderEnvironment;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -1105,6 +1127,7 @@ export type AppClassProperties = {
   state: AppState;
   readonly ownerDocument: Document;
   readonly ownerWindow: Window & typeof globalThis;
+  renderEnvironment: RenderEnvironment;
   api: App["api"];
   sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;

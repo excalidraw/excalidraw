@@ -2,6 +2,8 @@ import { isDevEnv } from "@excalidraw/common";
 
 import { newElement } from "@excalidraw/element";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import { commonProps } from "./charts.constants";
 import {
   chartBaseElements,
@@ -22,6 +24,7 @@ export const renderBarChart = (
   x: number,
   y: number,
   colorSeed?: number,
+  renderEnvironment?: RenderEnvironment,
 ): ChartElements => {
   const series = spreadsheet.series;
   const layout = getCartesianChartLayout("bar", series.length);
@@ -83,8 +86,16 @@ export const renderBarChart = (
     layout,
     max,
     isDevEnv(),
+    renderEnvironment,
   );
-  const xLabels = chartXLabels(spreadsheet, x, y, backgroundColor, layout);
+  const xLabels = chartXLabels(
+    spreadsheet,
+    x,
+    y,
+    backgroundColor,
+    layout,
+    renderEnvironment,
+  );
   const xLabelsBottomY = Math.max(
     y + layout.gap / 2,
     ...xLabels.map((label) => getRotatedTextElementBottom(label)),
@@ -97,6 +108,7 @@ export const renderBarChart = (
     xLabelsBottomY,
     y + layout.gap * 5,
     backgroundColor,
+    renderEnvironment,
   );
 
   return [...baseElements, ...bars, ...seriesLegend];
