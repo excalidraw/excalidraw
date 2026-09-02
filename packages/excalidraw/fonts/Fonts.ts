@@ -45,8 +45,6 @@ import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 
 export class Fonts {
-  // it's ok to track fonts across multiple instances only once, so let's use
-  // a static member to reduce memory footprint
   public static readonly loadedFontsCache = new Set<string>();
 
   private static _registered:
@@ -83,6 +81,7 @@ export class Fonts {
 
   private readonly scene: Scene;
   private readonly ownerDocument: Document;
+  private readonly loadedFonts = new Set<string>();
 
   constructor(scene: Scene, ownerDocument: Document = document) {
     this.scene = scene;
@@ -105,17 +104,19 @@ export class Fonts {
    * of the supplied fontFaces has not already been processed.
    */
   public onLoaded = (fontFaces: readonly FontFace[]): void => {
-    // bail if all fonts with have been processed. We're checking just a
-    // subset of the font properties (though it should be enough), so it
-    // can technically bail on a false positive.
+    // bail if all fonts with have been processed by THIS instance. We're
+    // checking just a subset of the font properties (though it should be
+    // enough), so it can technically bail on a false positive.
     let shouldBail = true;
 
     for (const fontFace of fontFaces) {
       const sig = `${fontFace.family}-${fontFace.style}-${fontFace.weight}-${fontFace.unicodeRange}`;
 
       // make sure to update our cache with all the loaded font faces
-      if (!Fonts.loadedFontsCache.has(sig)) {
-        Fonts.loadedFontsCache.add(sig);
+      Fonts.loadedFontsCache.add(sig);
+
+      if (!this.loadedFonts.has(sig)) {
+        this.loadedFonts.add(sig);
         shouldBail = false;
       }
     }

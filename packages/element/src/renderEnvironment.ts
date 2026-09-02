@@ -64,24 +64,7 @@ let environment: RenderEnvironment = {
   createPath: defaultCreatePath,
 };
 
-/**
- * Overrides the default host environment process-wide. Partial overrides fall
- * back to the browser defaults, so a caller that only needs canvas and image
- * factories can supply just those. NOTE: under Node the `createPath` default
- * (the global `Path2D`) throws, so a Node caller drawing freedraw elements has
- * to supply `createPath` too -- see the field's docs.
- *
- * Per-instance environments are passed explicitly via
- * `StaticCanvasRenderConfig["renderEnvironment"]` or the `env` argument of
- * `getRenderEnvironment`; this override only affects code paths that don't
- * have an instance to scope to (headless export).
- *
- * Each call installs a fresh environment object. Caches of host objects are
- * keyed by environment identity (see e.g. `elementWithCanvasCache` in
- * `renderElement.ts`), so the fresh identity invalidates them without any
- * invalidator registry: a lookup under the new default never hits an entry
- * built under the old one, and the orphaned entries are GC-eligible.
- */
+/** Overrides the default process-wide render environment. */
 export const setRenderEnvironment = (env: Partial<RenderEnvironment>) => {
   environment = {
     createCanvas: env.createCanvas ?? defaultCreateCanvas,

@@ -2,7 +2,6 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { MIME_TYPES } from "@excalidraw/common";
 import { getElementAbsoluteCoords } from "@excalidraw/element";
-import { getRenderEnvironment } from "@excalidraw/element";
 
 import { hitElementBoundingBox } from "@excalidraw/element";
 
@@ -28,80 +27,81 @@ const ELEMENT_LINK_SRC = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
   `<svg  xmlns="http://www.w3.org/2000/svg"  width="16"  height="16"  viewBox="0 0 24 24"  fill="none"  stroke="#1971c2"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-big-right-line"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v-3.586a1 1 0 0 1 1.707 -.707l6.586 6.586a1 1 0 0 1 0 1.414l-6.586 6.586a1 1 0 0 1 -1.707 -.707v-3.586h-6v-6h6z" /><path d="M3 9v6" /></svg>`,
 )}`;
 
+type LinkImgSlot = "external" | "element";
+
+export type LinkImgStatus = "decoding" | "decoded" | "failed";
+
 export type LinkImg = {
-  /** Only safe as a `drawImage` source once `drawReady` is true. */
+  /** Only safe as a `drawImage` source while `status` is `decoded`. */
   img: HTMLImageElement;
-  /** true once `src` has finished loading (success or failure). */
-  drawReady: boolean;
+  status: LinkImgStatus;
 };
 
 /**
- * Built lazily (and cached) so that importing this module never touches
- * `document` — the export pipeline pulls it in even in headless environments.
+ * Built lazily so that importing this module never touches `document`. The
+ * export pipeline pulls it in even in headless environments.
  *
  * Browsers decode `src` asynchronously, so a `drawImage` in the same task as
- * the `src` set silently draws nothing. Callers must check `drawReady` and
- * repaint once `onLinkImgSettle` fires.
+ * the `src` set silently draws nothing. Callers must check `status` and skip
+ * the icon until the decode lands; `startLinkImgDecoding` kicks the decode off
+ * on mount so it is settled long before a link icon is drawn.
  */
-const linkImgCache = new WeakMap<RenderEnvironment, Map<string, LinkImg>>();
-
-type LinkImgSettleListener = (renderEnvironment: RenderEnvironment) => void;
-
-const settleListeners = new Set<LinkImgSettleListener>();
-
-/**
- * Invoked when a lazily-created image becomes draw-ready or its load fails.
- * The argument is the environment the image was created in, so listeners
- * with per-environment state can repair only that environment.
- * Fired at most once per image per environment.
- */
-export const onLinkImgSettle = (listener: LinkImgSettleListener) => {
-  settleListeners.add(listener);
-  return () => settleListeners.delete(listener);
-};
+const linkImgs = new WeakMap<
+  RenderEnvironment,
+  Partial<Record<LinkImgSlot, LinkImg>>
+>();
 
 const settleLinkImg = (
   entry: LinkImg,
-  renderEnvironment: RenderEnvironment,
+  status: Exclude<LinkImgStatus, "decoding">,
 ) => {
-  if (entry.drawReady) {
+  // a host `createImage` may fire both handlers; the first settle wins, so a
+  // late `onerror` can't undo a successful decode
+  if (entry.status !== "decoding") {
     return;
   }
-  entry.drawReady = true;
-  settleListeners.forEach((listener) => listener(renderEnvironment));
+  entry.status = status;
 };
 
-/** Keyed by environment identity so that each editor (owner window) keeps
- * its own link images. */
-const getLinkImg = (src: string, env?: RenderEnvironment): LinkImg => {
-  const renderEnvironment = getRenderEnvironment(env);
-  let cache = linkImgCache.get(renderEnvironment);
-  const cached = cache?.get(src);
-  if (cached) {
-    return cached;
+const getLinkImg = (
+  slot: LinkImgSlot,
+  src: string,
+  env: RenderEnvironment,
+): LinkImg => {
+  let slots = linkImgs.get(env);
+  const existing = slots?.[slot];
+  if (existing) {
+    return existing;
   }
-  const img = renderEnvironment.createImage();
+  const img = env.createImage();
   const entry: LinkImg = {
     img,
-    drawReady: img.complete && img.naturalWidth > 0,
+    status: img.complete && img.naturalWidth > 0 ? "decoded" : "decoding",
   };
-  if (!entry.drawReady) {
-    img.onload = () => settleLinkImg(entry, renderEnvironment);
-    img.onerror = () => settleLinkImg(entry, renderEnvironment);
+  if (entry.status === "decoding") {
+    img.onload = () => settleLinkImg(entry, "decoded");
+    img.onerror = () => settleLinkImg(entry, "failed");
   }
+  if (!slots) {
+    slots = {};
+    linkImgs.set(env, slots);
+  }
+  // registered before `src` so that a host firing `onload` synchronously
+  // re-enters into the slot rather than starting another image
+  slots[slot] = entry;
   img.src = src;
-  if (!cache) {
-    cache = new Map();
-    linkImgCache.set(renderEnvironment, cache);
-  }
-  cache.set(src, entry);
   return entry;
 };
 
-export const getExternalLinkImg = (env?: RenderEnvironment) =>
-  getLinkImg(EXTERNAL_LINK_SRC, env);
-export const getElementLinkImg = (env?: RenderEnvironment) =>
-  getLinkImg(ELEMENT_LINK_SRC, env);
+export const getExternalLinkImg = (renderEnvironment: RenderEnvironment) =>
+  getLinkImg("external", EXTERNAL_LINK_SRC, renderEnvironment);
+export const getElementLinkImg = (renderEnvironment: RenderEnvironment) =>
+  getLinkImg("element", ELEMENT_LINK_SRC, renderEnvironment);
+
+export const startLinkImgDecoding = (renderEnvironment: RenderEnvironment) => {
+  getExternalLinkImg(renderEnvironment);
+  getElementLinkImg(renderEnvironment);
+};
 
 export const getLinkHandleFromCoords = (
   [x1, y1, x2, y2]: Bounds,

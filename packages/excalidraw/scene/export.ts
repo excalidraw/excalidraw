@@ -331,6 +331,7 @@ export const exportToSvg = async (
     skipInliningFonts?: true;
     reuseImages?: boolean;
     ownerDocument?: Document;
+    renderEnvironment?: RenderEnvironment;
   },
 ): Promise<SVGSVGElement> => {
   const ownerDocument =
@@ -363,6 +364,7 @@ export const exportToSvg = async (
     exportingFrame,
     exportWithDarkMode,
     frameRendering,
+    renderEnvironment: opts?.renderEnvironment,
   });
 
   if (exportingFrame) {
@@ -513,6 +515,7 @@ export const exportToSvg = async (
       offsetX,
       offsetY,
       isExporting: true,
+      renderEnvironment: opts?.renderEnvironment,
       exportWithDarkMode,
       renderEmbeddables,
       frameRendering,

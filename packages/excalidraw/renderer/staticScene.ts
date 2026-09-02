@@ -37,7 +37,6 @@ import {
   getExternalLinkImg,
   getElementLinkImg,
   getLinkHandleFromCoords,
-  onLinkImgSettle,
 } from "../components/hyperlink/helpers";
 
 import {
@@ -210,9 +209,6 @@ export const frameClip = (
   );
 };
 
-// Backing-store scale is per static scene instance (e.g. per-window DPR),
-// so key on it with zoom; a shared single-slot cache would serve one
-// instance's canvas to another at the wrong resolution.
 type LinkIconCanvasCacheType = "regularLink" | "elementLink";
 
 const linkIconCanvasCache = new WeakMap<
@@ -223,29 +219,10 @@ const LINK_ICON_CACHE_MAX_ENTRIES = 8;
 
 const getLinkIconCacheKey = (
   type: LinkIconCanvasCacheType,
-  zoom: number,
-  scale: number,
-) => `${type}:${zoom}:${scale}`;
-
-// One live-config pointer per environment, so a settle in one environment
-// only re-renders its own scene. A single shared pointer would re-render the
-// last-rendered scene on any settle, leaving other environments with blank
-// cached icons (e.g. main editor + popout).
-const lastSceneConfigs = new WeakMap<
-  RenderEnvironment,
-  StaticSceneRenderConfig
->();
-
-// Icons bake into the cache in the same task the images start decoding, so
-// the first bake is blank. Drop that environment's cache and repaint its own
-// scene once one of its images settles.
-onLinkImgSettle((renderEnvironment) => {
-  const lastSceneConfig = lastSceneConfigs.get(renderEnvironment);
-  if (lastSceneConfig) {
-    linkIconCanvasCache.delete(renderEnvironment);
-    renderStaticScene(lastSceneConfig);
-  }
-});
+  canvasWidth: number,
+  canvasHeight: number,
+  backgroundColor: string,
+) => `${type}:${canvasWidth}x${canvasHeight}:${backgroundColor}`;
 
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
@@ -273,24 +250,52 @@ const renderLinkIcon = (
       ? "elementLink"
       : "regularLink";
 
-    const cacheKey = getLinkIconCacheKey(canvasKey, appState.zoom.value, scale);
+    const linkImg =
+      canvasKey === "elementLink"
+        ? getElementLinkImg(renderEnvironment)
+        : getExternalLinkImg(renderEnvironment);
+
+    if (linkImg.status !== "decoded") {
+      context.restore();
+      return;
+    }
+
+    const canvasWidth = Math.max(
+      1,
+      Math.floor(width * scale * appState.zoom.value),
+    );
+    const canvasHeight = Math.max(
+      1,
+      Math.floor(height * scale * appState.zoom.value),
+    );
+    const backgroundColor = appState.viewBackgroundColor || COLOR_WHITE;
+    const cacheKey = getLinkIconCacheKey(
+      canvasKey,
+      canvasWidth,
+      canvasHeight,
+      backgroundColor,
+    );
 
     let cache = linkIconCanvasCache.get(renderEnvironment);
-    let linkCanvas = cache?.get(cacheKey);
+    if (!cache) {
+      cache = new Map();
+      linkIconCanvasCache.set(renderEnvironment, cache);
+    }
 
-    if (!linkCanvas) {
+    let linkCanvas = cache.get(cacheKey);
+
+    if (linkCanvas) {
+      cache.delete(cacheKey);
+      cache.set(cacheKey, linkCanvas);
+    } else {
       linkCanvas = renderEnvironment.createCanvas();
-      linkCanvas.width = width * scale * appState.zoom.value;
-      linkCanvas.height = height * scale * appState.zoom.value;
-      if (!cache) {
-        cache = new Map();
-        linkIconCanvasCache.set(renderEnvironment, cache);
-      }
+      linkCanvas.width = canvasWidth;
+      linkCanvas.height = canvasHeight;
       cache.set(cacheKey, linkCanvas);
       if (cache.size > LINK_ICON_CACHE_MAX_ENTRIES) {
-        const oldestKey = cache.keys().next().value;
-        if (oldestKey !== undefined) {
-          cache.delete(oldestKey);
+        const lruKey = cache.keys().next().value;
+        if (lruKey !== undefined) {
+          cache.delete(lruKey);
         }
       }
 
@@ -303,19 +308,11 @@ const renderLinkIcon = (
       // Seed a sane default so a corrupted color (silently rejected by the
       // canvas) falls back to white instead of a stale fillStyle.
       linkCanvasCacheContext.fillStyle = COLOR_WHITE;
-      linkCanvasCacheContext.fillStyle =
-        appState.viewBackgroundColor || COLOR_WHITE;
+      linkCanvasCacheContext.fillStyle = backgroundColor;
 
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
-      const linkImg =
-        canvasKey === "elementLink"
-          ? getElementLinkImg(renderEnvironment)
-          : getExternalLinkImg(renderEnvironment);
-      // undecoded images are silently skipped by drawImage
-      if (linkImg.drawReady) {
-        linkCanvasCacheContext.drawImage(linkImg.img, 0, 0, width, height);
-      }
+      linkCanvasCacheContext.drawImage(linkImg.img, 0, 0, width, height);
 
       linkCanvasCacheContext.restore();
     }
@@ -337,17 +334,6 @@ const _renderStaticScene = ({
   if (canvas === null) {
     return;
   }
-
-  lastSceneConfigs.set(getRenderEnvironment(renderConfig.renderEnvironment), {
-    canvas,
-    rc,
-    elementsMap,
-    allElementsMap,
-    visibleElements,
-    scale,
-    appState,
-    renderConfig,
-  });
 
   const { renderGrid = true, isExporting } = renderConfig;
   // export draws vectors, not cached bitmaps — nothing to keep on the grid
@@ -523,7 +509,10 @@ const _renderStaticScene = ({
             element.width &&
             element.height
           ) {
-            const label = createPlaceholderEmbeddableLabel(element);
+            const label = createPlaceholderEmbeddableLabel(
+              element,
+              renderConfig.renderEnvironment,
+            );
             renderElement(
               label,
               elementsMap,

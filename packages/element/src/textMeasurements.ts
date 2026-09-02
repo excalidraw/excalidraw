@@ -39,7 +39,7 @@ export const getApproxMinLineWidth = (
   lineHeight: ExcalidrawTextElement["lineHeight"],
   env?: RenderEnvironment,
 ) => {
-  const maxCharWidth = getMaxCharWidth(font);
+  const maxCharWidth = getMaxCharWidth(font, env);
   if (maxCharWidth === 0) {
     return (
       measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight, env)
@@ -112,6 +112,10 @@ export const getApproxMinLineHeight = (
 };
 
 let customTextMetricsProvider: TextMetricsProvider | undefined;
+const customTextMetricsProviders = new WeakMap<
+  RenderEnvironment,
+  TextMetricsProvider
+>();
 /**
  * The lazily-built canvas-backed default provider per environment -- each
  * environment (e.g. each editor's owner window) measures on a canvas of its
@@ -128,7 +132,18 @@ const defaultTextMetricsProviders = new WeakMap<
  *
  * Useful for overriding the width calculation algorithm where canvas API is not available / desired.
  */
-export const setCustomTextMetricsProvider = (provider: TextMetricsProvider) => {
+export const setCustomTextMetricsProvider = (
+  provider: TextMetricsProvider | undefined,
+  env?: RenderEnvironment,
+) => {
+  if (env) {
+    if (provider) {
+      customTextMetricsProviders.set(env, provider);
+    } else {
+      customTextMetricsProviders.delete(env);
+    }
+    return;
+  }
   customTextMetricsProvider = provider;
 };
 
@@ -184,8 +199,11 @@ export const getLineWidth = (
   font: FontString,
   env?: RenderEnvironment,
 ) => {
+  const resolvedEnv = getRenderEnvironment(env);
   const provider =
-    customTextMetricsProvider ?? getDefaultTextMetricsProvider(env);
+    customTextMetricsProviders.get(resolvedEnv) ??
+    customTextMetricsProvider ??
+    getDefaultTextMetricsProvider(resolvedEnv);
   return provider.getLineWidth(text, font);
 };
 
@@ -213,46 +231,22 @@ export const getTextHeight = (
 };
 
 export const charWidth = (() => {
-  // per-env: two realms can measure the same font string differently
-  // (each measures with its own document's font set).
+  // the cache holds one env's metrics at a time: two realms can measure the
+  // same font string differently (each measures with its own document's font
+  // set), so measuring in a different env drops the cache rather than mixing
+  // the two realms' widths under one key.
   //
-  // keyed weakly by env: a per-instance env's factories close over the editor
-  // instance, so a strong key would pin an unmounted editor (and its scene)
-  // for the process' lifetime, and a Node exporter calling
-  // `setRenderEnvironment` per export would accumulate one entry per call.
-  const cachedCharWidth = new WeakMap<
-    RenderEnvironment,
-    Map<FontString, { generation: number; widths: Array<number> }>
-  >();
+  // realms measuring in an interleaved fashion therefore keep re-measuring,
+  // which is fine -- wrapping runs on edit/resize/restore, not per frame.
+  let cachedEnv: RenderEnvironment | undefined;
+  let cachedCharWidth: { [key: FontString]: Array<number> } = {};
 
-  // a font load invalidates that font's metrics in every realm, but a WeakMap
-  // can't be iterated -- bump the font's generation instead and let each env's
-  // stale entry be dropped lazily, on its next lookup
-  const generations = new Map<FontString, number>();
-
-  const getWidths = (
-    font: FontString,
-    env: RenderEnvironment,
-    create: boolean,
-  ) => {
-    const generation = generations.get(font) ?? 0;
-    let perFont = cachedCharWidth.get(env);
-    if (!perFont) {
-      if (!create) {
-        return undefined;
-      }
-      perFont = new Map();
-      cachedCharWidth.set(env, perFont);
+  const useEnv = (env: RenderEnvironment | undefined) => {
+    const resolvedEnv = getRenderEnvironment(env);
+    if (resolvedEnv !== cachedEnv) {
+      cachedEnv = resolvedEnv;
+      cachedCharWidth = {};
     }
-    let entry = perFont.get(font);
-    if (!entry || entry.generation !== generation) {
-      if (!create) {
-        return undefined;
-      }
-      entry = { generation, widths: [] };
-      perFont.set(font, entry);
-    }
-    return entry.widths;
   };
 
   const calculate = (
@@ -260,21 +254,24 @@ export const charWidth = (() => {
     font: FontString,
     env?: RenderEnvironment,
   ) => {
+    useEnv(env);
     const unicode = char.charCodeAt(0);
-    const widths = getWidths(font, getRenderEnvironment(env), true)!;
-    if (widths[unicode] === undefined) {
-      widths[unicode] = getLineWidth(char, font, env);
+    if (!cachedCharWidth[font]) {
+      cachedCharWidth[font] = [];
     }
-    return widths[unicode];
+    if (cachedCharWidth[font][unicode] === undefined) {
+      cachedCharWidth[font][unicode] = getLineWidth(char, font, env);
+    }
+    return cachedCharWidth[font][unicode];
   };
 
-  const getCache = (font: FontString, env?: RenderEnvironment) => {
-    return getWidths(font, getRenderEnvironment(env), false);
-  };
+  const getCache = (font: FontString, env?: RenderEnvironment) =>
+    getRenderEnvironment(env) === cachedEnv ? cachedCharWidth[font] : undefined;
 
+  // dropped rather than emptied, so that the approximation helpers fall back
+  // to measuring instead of reducing over an empty array
   const clearCache = (font: FontString) => {
-    // clears every env: a font load invalidates metrics in all realms
-    generations.set(font, (generations.get(font) ?? 0) + 1);
+    delete cachedCharWidth[font];
   };
 
   return {
@@ -284,8 +281,8 @@ export const charWidth = (() => {
   };
 })();
 
-export const getMinCharWidth = (font: FontString) => {
-  const cache = charWidth.getCache(font);
+export const getMinCharWidth = (font: FontString, env?: RenderEnvironment) => {
+  const cache = charWidth.getCache(font, env);
   if (!cache) {
     return 0;
   }
@@ -294,8 +291,8 @@ export const getMinCharWidth = (font: FontString) => {
   return Math.min(...cacheWithOutEmpty);
 };
 
-export const getMaxCharWidth = (font: FontString) => {
-  const cache = charWidth.getCache(font);
+export const getMaxCharWidth = (font: FontString, env?: RenderEnvironment) => {
+  const cache = charWidth.getCache(font, env);
   if (!cache) {
     return 0;
   }

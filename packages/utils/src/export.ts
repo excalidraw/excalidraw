@@ -189,6 +189,7 @@ export const exportToSvg = async ({
   skipInliningFonts,
   reuseImages,
   ownerDocument,
+  renderEnvironment,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
@@ -214,6 +215,7 @@ export const exportToSvg = async ({
     skipInliningFonts,
     reuseImages,
     ownerDocument,
+    renderEnvironment,
   });
 };
 
