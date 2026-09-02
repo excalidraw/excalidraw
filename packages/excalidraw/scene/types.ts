@@ -58,9 +58,11 @@ export type StaticCanvasRenderConfig = {
 
 export type SVGRenderConfig = {
   /**
-   * Host environment used for the text measurements this render needs (the
-   * SVG itself is built through `exportToSvg`'s owner document). Defaults to
-   * the process-wide environment.
+   * Host environment for the one thing this render still measures text for:
+   * embeddable placeholder labels (`createPlaceholderEmbeddableLabel`). The
+   * SVG itself is built through `exportToSvg`'s owner document, and frame
+   * labels are drawn without measuring. Defaults to the process-wide
+   * environment.
    */
   renderEnvironment?: RenderEnvironment;
   offsetX: number;

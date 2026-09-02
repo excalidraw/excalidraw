@@ -7,6 +7,12 @@ import {
   FRAME_STYLE,
 } from "@excalidraw/common";
 
+import {
+  newElementWith,
+  resetRenderEnvironment,
+  setRenderEnvironment,
+} from "@excalidraw/element";
+
 import { pointFrom } from "@excalidraw/math";
 
 import type {
@@ -632,6 +638,66 @@ describe("exporting frames", () => {
       expect(svg.getAttribute("height")).toBe(
         (frame.height + getFrameNameHeight("svg")).toString(),
       );
+    });
+
+    it("renders frame labels without measuring text (no canvas needed)", async () => {
+      const createElementSpy = vi.spyOn(document, "createElement");
+      // any text measurement would build a metrics canvas through the
+      // environment; SVG export must not need one
+      setRenderEnvironment({
+        createCanvas: () => {
+          throw new Error("exportToSvg must not create a canvas");
+        },
+      });
+
+      try {
+        const frame = newElementWith(
+          API.createElement({
+            type: "frame",
+            width: 100,
+            height: 100,
+            x: 0,
+            y: 0,
+          }),
+          { name: "a frame name long enough to overflow the frame width" },
+        );
+
+        const svg = await exportToSvg({
+          elements: [frame],
+          files: null,
+          exportPadding: 0,
+        });
+
+        expect(
+          createElementSpy.mock.calls.filter(([tag]) => tag === "canvas"),
+        ).toHaveLength(0);
+
+        // the full title stays in the document -- clipped to the frame
+        // rather than ellipsis-truncated like the canvas export
+        const label = svg.querySelector("text");
+        expect(label?.textContent).toBe(frame.name);
+        const clipRect = svg.querySelector(
+          `clipPath[id="${frame.id}-label"] rect`,
+        );
+        expect(clipRect?.getAttribute("width")).toBe(`${frame.width}`);
+        expect(label?.closest("g[clip-path]")?.getAttribute("clip-path")).toBe(
+          `url(#${frame.id}-label)`,
+        );
+
+        // the label sits above the frame: at the top of the export, with
+        // the export grown by the label's height
+        expect(
+          svg
+            .querySelector(`clipPath[id="${frame.id}-label"]`)
+            ?.parentElement?.getAttribute("transform"),
+        ).toBe("translate(0 0)");
+        expect(svg.getAttribute("height")).toBe(
+          (frame.height + getFrameNameHeight("svg")).toString(),
+        );
+      } finally {
+        resetRenderEnvironment();
+        createElementSpy.mockRestore();
+      }
     });
 
     it("should not export frame-overlapping elements belonging to different frame", async () => {
