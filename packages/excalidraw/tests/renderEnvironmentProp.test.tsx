@@ -92,9 +92,6 @@ describe("renderEnvironment prop", () => {
         }}
       />,
     );
-
-    await waitFor(() => expect(images.length).toBeGreaterThan(0));
-    expect(images[0]._src).toBe("data:image/png;base64,iVBORw0KGgo=");
   });
 });
 

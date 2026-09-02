@@ -242,6 +242,7 @@ export class AppArrowText {
       pointerX: pointerCoords.x,
       zoom: this.app.state.zoom.value,
       scene: this.app.scene,
+      renderEnvironment: this.app.renderEnvironment,
     });
 
     return true;

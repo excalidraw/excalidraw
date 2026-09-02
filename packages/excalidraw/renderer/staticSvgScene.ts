@@ -201,7 +201,10 @@ const renderElementToSvg = (
       );
       addToRoot(node, element);
 
-      const label = createPlaceholderEmbeddableLabel(element);
+      const label = createPlaceholderEmbeddableLabel(
+        element,
+        renderConfig.renderEnvironment,
+      );
       renderElementToSvg(
         label,
         elementsMap,

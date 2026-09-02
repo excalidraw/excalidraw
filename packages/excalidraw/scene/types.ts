@@ -57,6 +57,12 @@ export type StaticCanvasRenderConfig = {
 };
 
 export type SVGRenderConfig = {
+  /**
+   * Host environment used for the text measurements this render needs (the
+   * SVG itself is built through `exportToSvg`'s owner document). Defaults to
+   * the process-wide environment.
+   */
+  renderEnvironment?: RenderEnvironment;
   offsetX: number;
   offsetY: number;
   isExporting: boolean;

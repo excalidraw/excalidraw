@@ -4,6 +4,7 @@ import { getRenderEnvironment } from "../src/renderEnvironment";
 import {
   charWidth,
   getLineWidth,
+  getMaxCharWidth,
   getTextWidth,
   measureText,
 } from "../src/textMeasurements";
@@ -67,17 +68,33 @@ describe("text measurement env threading", () => {
     ]);
   });
 
-  it("charWidth cache is isolated per env", () => {
+  it("charWidth cache never serves one env's widths to another", () => {
     const env = makeEnv(3);
     expect(charWidth.calculate("A", FONT, env)).toBe(30);
+    // switching env drops the cache rather than reusing the other env's width
     expect(charWidth.calculate("A", FONT)).toBe(10);
-    // cached per env on subsequent calls
+    expect(charWidth.getCache(FONT, env)).toBeUndefined();
     expect(charWidth.calculate("A", FONT, env)).toBe(30);
-    // clearing a font drops the cache in every env
+    // cached while the env stays put
+    expect(charWidth.getCache(FONT, env)?.["A".charCodeAt(0)]).toBe(30);
+
+    // clearing a font drops it rather than emptying it, so the approximation
+    // helpers fall back to measuring
     charWidth.clearCache(FONT);
     expect(charWidth.getCache(FONT, env)).toBeUndefined();
     expect(charWidth.getCache(FONT)).toBeUndefined();
     expect(charWidth.calculate("A", FONT, env)).toBe(30);
     expect(charWidth.calculate("A", FONT)).toBe(10);
+  });
+
+  it("getMaxCharWidth reads the cache of the env it is asked about", () => {
+    const env = makeEnv(3);
+    charWidth.calculate("A", FONT, env);
+    charWidth.calculate("A", FONT);
+    expect(getMaxCharWidth(FONT)).toBe(10);
+    // no entry for `env` any more -- 0 means "unmeasured", so callers measure
+    expect(getMaxCharWidth(FONT, env)).toBe(0);
+    charWidth.calculate("A", FONT, env);
+    expect(getMaxCharWidth(FONT, env)).toBe(30);
   });
 });

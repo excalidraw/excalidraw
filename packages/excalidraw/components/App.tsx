@@ -450,7 +450,10 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import { isPointHittingLink } from "./hyperlink/helpers";
+import {
+  isPointHittingLink,
+  startLinkImgDecoding,
+} from "./hyperlink/helpers";
 import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
@@ -676,6 +679,25 @@ class App extends React.Component<AppProps, AppState> {
       };
     }
     return this._renderEnvironment;
+  }
+
+  /**
+   * Link icons decode asynchronously and the static scene skips an icon that
+   * is not decoded yet, so start the decode on mount rather than on the
+   * first render that happens to have a link, so the decode is settled long
+   * before there is a link element to draw an icon for.
+   *
+   * Re-run on an environment swap: the images are keyed by env identity, so
+   * a new environment starts with none.
+   */
+  private _linkImgDecodingEnvironment: RenderEnvironment | null = null;
+  private ensureLinkImgDecoding() {
+    const renderEnvironment = this.renderEnvironment;
+    if (this._linkImgDecodingEnvironment === renderEnvironment) {
+      return;
+    }
+    this._linkImgDecodingEnvironment = renderEnvironment;
+    startLinkImgDecoding(renderEnvironment);
   }
 
   /**
@@ -3796,6 +3818,7 @@ class App extends React.Component<AppProps, AppState> {
   public async componentDidMount() {
     this.unmounted = false;
     this.api = this.createExcalidrawAPI();
+    this.ensureLinkImgDecoding();
 
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
@@ -4249,6 +4272,7 @@ class App extends React.Component<AppProps, AppState> {
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
     this.warnOnUnstableRenderEnvironment(prevProps);
+    this.ensureLinkImgDecoding();
 
     this.appStateObserver.flush(prevState);
 
@@ -6962,6 +6986,7 @@ class App extends React.Component<AppProps, AppState> {
       const minWidth = getApproxMinLineWidth(
         getFontString(fontString),
         lineHeight,
+        this.renderEnvironment,
       );
       const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
       const newHeight = Math.max(container.height, minHeight);
@@ -12016,6 +12041,7 @@ class App extends React.Component<AppProps, AppState> {
             fontFamily: newElement.fontFamily,
           }),
           newElement.lineHeight,
+          this.renderEnvironment,
         );
 
         if (newElement.width < minWidth) {
@@ -13463,6 +13489,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter: false,
         scene: this.scene,
         zoom: this.state.zoom.value,
+        renderEnvironment: this.renderEnvironment,
         informMutation: false,
       });
       return;
@@ -13533,6 +13560,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter: shouldResizeFromCenter(event),
         zoom: this.state.zoom.value,
         scene: this.scene,
+        renderEnvironment: this.renderEnvironment,
         widthAspectRatio: aspectRatio,
         originOffset: this.state.originSnapOffset,
         informMutation,

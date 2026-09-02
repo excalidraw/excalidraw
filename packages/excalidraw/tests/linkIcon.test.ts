@@ -41,6 +41,14 @@ const makeAsyncImage = () => {
   return image;
 };
 
+/** already decoded, so the icon bakes in the first render with no tick */
+const makeDecodedImage = () => {
+  const image = document.createElement("img");
+  Object.defineProperty(image, "complete", { value: true });
+  Object.defineProperty(image, "naturalWidth", { value: 16 });
+  return image;
+};
+
 const getDrawImageSources = (canvas: HTMLCanvasElement) =>
   (
     canvas.getContext("2d") as unknown as {
@@ -138,15 +146,17 @@ describe("static scene link icons", () => {
 
     renderStaticScene(config);
 
-    // the first bake runs in the same task that starts decoding, where a
-    // browser's drawImage would silently skip the undecoded image
+    // the first render runs in the same task that starts decoding, so the
+    // icons are skipped rather than baked blank
     expect(imageDraws()).toHaveLength(0);
     expect(createdImages).toHaveLength(2);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    // settling invalidates the icon caches and re-renders, so the decoded
-    // images end up baked in
+    // once decoded, the next render bakes the images in -- nothing was
+    // memoized while they were undecoded, so there is no stale blank icon
+    renderStaticScene(config);
+
     const externalImg = createdImages.find((img) =>
       img.src.includes("external-link"),
     );
@@ -180,6 +190,9 @@ describe("static scene link icons", () => {
         createdCanvases.push(canvas);
         return canvas;
       },
+      // the backing-store scale behaviour under test is independent of
+      // decode timing, and an undecoded icon bakes nothing at all
+      createImage: makeDecodedImage,
     });
 
     const appState = {
@@ -243,7 +256,7 @@ describe("static scene link icons", () => {
     expect(secondBake!.height).toBe(firstBake!.height * 2);
   });
 
-  it("repairs only the scene of the environment whose image settled", () => {
+  it("bakes an icon only for the environment whose image decoded", () => {
     const makeEnv = () => {
       const canvases: HTMLCanvasElement[] = [];
       const images: HTMLImageElement[] = [];
@@ -343,26 +356,23 @@ describe("static scene link icons", () => {
     renderStaticScene(configB);
     expect(envA.images).toHaveLength(1);
     expect(envB.images).toHaveLength(1);
-    const firstABake = iconBlits(sceneA, envA).pop()!;
-    const firstBBake = iconBlits(sceneB, envB).pop()!;
-    // first bakes are blank in both environments (images not decoded yet)
-    expect(getDrawImageSources(firstABake)).toHaveLength(0);
-    expect(getDrawImageSources(firstBBake)).toHaveLength(0);
+    // nothing is baked while the image is undecoded -- the bake is memoized
+    // under a key with no notion of load state, so a blank one would stick
+    expect(iconBlits(sceneA, envA)).toHaveLength(0);
+    expect(iconBlits(sceneB, envB)).toHaveLength(0);
 
     // environment A's image decodes; environment B's does not
     envA.images[0].onload?.({} as Event);
 
-    // A re-renders from a fresh bake that contains the decoded image
-    expect(iconBlits(sceneA, envA).length).toBeGreaterThan(1);
-    const secondABake = iconBlits(sceneA, envA).pop()!;
-    expect(secondABake).not.toBe(firstABake);
-    expect(getDrawImageSources(secondABake)).toContain(envA.images[0]);
+    // A's next render bakes an icon containing its decoded image
+    renderStaticScene(configA);
+    const aBlits = iconBlits(sceneA, envA);
+    expect(aBlits).toHaveLength(1);
+    expect(getDrawImageSources(aBlits[0])).toContain(envA.images[0]);
 
-    // B is untouched by A's settle: no re-render happened, and B's blank
-    // bake was not evicted, so B's next render reuses it
+    // decode state is per environment: B still bakes nothing because its own
+    // image is still undecoded
     renderStaticScene(configB);
-    expect(iconBlits(sceneB, envB).length).toBe(2);
-    expect(iconBlits(sceneB, envB).pop()).toBe(firstBBake);
-    expect(getDrawImageSources(firstBBake)).not.toContain(envB.images[0]);
+    expect(iconBlits(sceneB, envB)).toHaveLength(0);
   });
 });

@@ -121,7 +121,7 @@ describe("elementWithCanvasCache deviceScale", () => {
     expect(createdCanvases[1].width).toBe(100 * 2 + 40);
   });
 
-  it("keeps one canvas per environment for the same element identity", () => {
+  it("regenerates the cached canvas when the environment changes", () => {
     const rect = newElement({
       type: "rectangle",
       x: 0,
@@ -178,14 +178,23 @@ describe("elementWithCanvasCache deviceScale", () => {
     expect(envCanvases[0]).toHaveLength(1);
 
     // a second instance (e.g. a popout) renders the very same element object
-    // in its own environment: it must get its own canvas, not env A's bitmap
+    // in its own environment: it must mint its own canvas rather than blit a
+    // bitmap belonging to env A's realm
     renderStaticScene(makeConfig(envB));
     expect(envCanvases[1]).toHaveLength(1);
     expect(envCanvases[0]).toHaveLength(1);
 
-    // env A re-renders the same element: its own canvas is reused
+    // re-rendering under the same environment reuses the cached canvas
+    renderStaticScene(makeConfig(envB));
+    expect(envCanvases[1]).toHaveLength(1);
+
+    // NOTE going back to env A regenerates rather than restoring env A's
+    // earlier bitmap: the cache holds one entry per element, not one per
+    // element per environment. An element object alternating between two
+    // editors frame after frame does not happen in practice, so the extra
+    // per-element map is not worth its allocation and lookup.
     renderStaticScene(makeConfig(envA));
-    expect(envCanvases[0]).toHaveLength(1);
+    expect(envCanvases[0]).toHaveLength(2);
     expect(envCanvases[1]).toHaveLength(1);
   });
 });

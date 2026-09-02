@@ -492,6 +492,7 @@ export const textWysiwyg = ({
       editable.value,
       layout.font,
       whiteSpace === "pre-wrap" ? layout.width : Infinity,
+      app.renderEnvironment,
     );
     const lineIndex = Math.max(
       0,
