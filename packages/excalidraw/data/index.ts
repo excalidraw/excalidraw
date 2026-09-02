@@ -109,6 +109,7 @@ export const exportCanvas = async (
     fileHandle = null,
     exportingFrame = null,
     renderEnvironment,
+    ownerDocument,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -118,6 +119,7 @@ export const exportCanvas = async (
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
     renderEnvironment?: RenderEnvironment;
+    ownerDocument?: Document;
   },
 ) => {
   if (elements.length === 0) {
@@ -135,7 +137,7 @@ export const exportCanvas = async (
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
-      { exportingFrame },
+      { exportingFrame, ownerDocument },
     );
 
     if (type === "svg") {

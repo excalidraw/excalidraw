@@ -743,7 +743,7 @@ const renderElementToSvg = (
         renderConfig.frameRendering.enabled &&
         renderConfig.frameRendering.outline
       ) {
-        const rect = document.createElementNS(SVG_NS, "rect");
+        const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
 
         rect.setAttribute(
           "transform",
