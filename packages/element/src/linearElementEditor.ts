@@ -823,6 +823,20 @@ export class LinearElementEditor {
     return midpoints;
   };
 
+  static getCurrentSegmentMidpointNearPoint(
+    midPoints: readonly (GlobalPoint | null)[],
+    point: GlobalPoint,
+    zoomValue: number,
+  ): GlobalPoint | null {
+    const threshold = (LinearElementEditor.POINT_HANDLE_SIZE + 1) / zoomValue;
+    for (const midPoint of midPoints) {
+      if (midPoint && pointDistance(midPoint, point) <= threshold) {
+        return midPoint;
+      }
+    }
+    return null;
+  }
+
   static getSegmentMidpointHitCoords = (
     linearElementEditor: LinearElementEditor,
     scenePointer: { x: number; y: number },
@@ -865,14 +879,12 @@ export class LinearElementEditor {
       appState,
     );
 
-    const findHitMidpoint = (from: GlobalPoint) => {
-      for (const midPoint of midPoints) {
-        if (midPoint && pointDistance(midPoint, from) <= threshold) {
-          return midPoint;
-        }
-      }
-      return null;
-    };
+    const findHitMidpoint = (from: GlobalPoint) =>
+      LinearElementEditor.getCurrentSegmentMidpointNearPoint(
+        midPoints,
+        from,
+        appState.zoom.value,
+      );
 
     const existingSegmentMidpointHitCoords =
       linearElementEditor.segmentMidPointHoveredCoords;

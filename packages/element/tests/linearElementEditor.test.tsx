@@ -1,4 +1,4 @@
-import { pointCenter, pointFrom } from "@excalidraw/math";
+import { pointCenter, pointDistance, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -551,6 +551,51 @@ describe("Test Linear Elements", () => {
       );
 
       expect(hit).toBeNull();
+    });
+
+    it("should snap a slightly moved hovered midpoint to the current handle (#9510)", () => {
+      createThreePointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      enterLineEditingMode(line);
+
+      const elementsMap = h.app.scene.getNonDeletedElementsMap();
+      const midPoints = LinearElementEditor.getEditorMidPoints(
+        line,
+        elementsMap,
+        h.state,
+      );
+      expect(midPoints[0]).not.toBeNull();
+
+      const threshold =
+        (LinearElementEditor.POINT_HANDLE_SIZE + 1) / h.state.zoom.value;
+      const subThresholdOffset = threshold / 2;
+
+      act(() => {
+        h.app.scene.mutateElement(line, {
+          x: line.x + subThresholdOffset,
+          y: line.y,
+        });
+      });
+
+      const currentMidPoints = LinearElementEditor.getEditorMidPoints(
+        line,
+        h.app.scene.getNonDeletedElementsMap(),
+        h.state,
+      );
+      expect(currentMidPoints[0]).not.toBeNull();
+      expect(pointDistance(midPoints[0]!, currentMidPoints[0]!)).toBeLessThan(
+        threshold,
+      );
+      expect(currentMidPoints[0]).not.toEqual(midPoints[0]);
+
+      const resolved = LinearElementEditor.getCurrentSegmentMidpointNearPoint(
+        currentMidPoints,
+        midPoints[0]!,
+        h.state.zoom.value,
+      );
+
+      expect(resolved).toEqual(currentMidPoints[0]);
+      expect(resolved).not.toEqual(midPoints[0]);
     });
 
     it("should not drag line and add midpoint when dragged irrespective of threshold", () => {
