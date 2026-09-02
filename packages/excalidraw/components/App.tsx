@@ -8309,31 +8309,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (
-        this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
-      ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
-            hoverPointIndex,
-          },
-        });
-      }
-
-      if (
-        !LinearElementEditor.arePointsEqual(
-          this.state.selectedLinearElement.segmentMidPointHoveredCoords,
-          segmentMidPointHoveredCoords,
-        )
-      ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
-            segmentMidPointHoveredCoords,
-          },
-        });
-      }
-
       // Check for focus point hover
       let hoveredFocusPointBinding: "start" | "end" | null = null;
       const arrow = element as any;
@@ -8347,15 +8322,30 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (
+      const hoverPointIndexChanged =
+        this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex;
+      const segmentMidPointChanged = !LinearElementEditor.arePointsEqual(
+        this.state.selectedLinearElement.segmentMidPointHoveredCoords,
+        segmentMidPointHoveredCoords,
+      );
+      const focusPointChanged =
         this.state.selectedLinearElement.hoveredFocusPointBinding !==
-        hoveredFocusPointBinding
+        hoveredFocusPointBinding;
+
+      // Single setState so hover index / midpoint coords cannot clobber each
+      // other (separate updates used `this.state` and the last write won).
+      if (
+        hoverPointIndexChanged ||
+        segmentMidPointChanged ||
+        focusPointChanged
       ) {
         this.setState({
           selectedLinearElement: {
             ...this.state.selectedLinearElement,
-            isDragging: false,
+            hoverPointIndex,
+            segmentMidPointHoveredCoords,
             hoveredFocusPointBinding,
+            ...(focusPointChanged ? { isDragging: false } : {}),
           },
         });
       }
@@ -11689,6 +11679,8 @@ class App extends React.Component<AppProps, AppState> {
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
               isDragging: false,
+              hoverPointIndex: -1,
+              segmentMidPointHoveredCoords: null,
             },
           });
           this.actionManager.executeAction(actionFinalize, "ui", {

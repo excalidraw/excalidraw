@@ -16,7 +16,6 @@ import {
   DEFAULT_TRANSFORM_HANDLE_SPACING,
   FRAME_STYLE,
   getFeatureFlag,
-  invariant,
   shouldRotateWithDiscreteAngle,
   THEME,
 } from "@excalidraw/common";
@@ -114,14 +113,9 @@ import type {
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  midPointCoords: GlobalPoint,
 ) => {
-  invariant(appState.selectedLinearElement, "selectedLinearElement is null");
-
-  const { segmentMidPointHoveredCoords } = appState.selectedLinearElement;
-
-  invariant(segmentMidPointHoveredCoords, "midPointCoords is null");
-
-  highlightPoint(segmentMidPointHoveredCoords, context, appState);
+  highlightPoint(midPointCoords, context, appState);
 };
 
 const renderLinearElementPointHighlight = (
@@ -1765,7 +1759,20 @@ const _renderInteractiveScene = ({
   if (selectedLinearElement) {
     if (!appState.selectedLinearElement.isDragging) {
       if (linearState.segmentMidPointHoveredCoords) {
-        renderElbowArrowMidPointHighlight(context, appState);
+        const midPoints = LinearElementEditor.getEditorMidPoints(
+          selectedLinearElement,
+          allElementsMap,
+          appState,
+        );
+        const currentMidPoint =
+          LinearElementEditor.getCurrentSegmentMidpointNearPoint(
+            midPoints,
+            linearState.segmentMidPointHoveredCoords,
+            appState.zoom.value,
+          );
+        if (currentMidPoint) {
+          renderElbowArrowMidPointHighlight(context, appState, currentMidPoint);
+        }
       } else if (
         isElbowArrow(selectedLinearElement)
           ? linearState.hoverPointIndex === 0 ||

@@ -1,4 +1,4 @@
-import { pointCenter, pointFrom } from "@excalidraw/math";
+import { pointCenter, pointDistance, pointFrom } from "@excalidraw/math";
 import { act, queryByTestId, queryByText } from "@testing-library/react";
 import { vi } from "vitest";
 
@@ -474,6 +474,130 @@ describe("Test Linear Elements", () => {
   });
 
   describe("Inside editor", () => {
+    it("should not keep a stale point highlight after dragging a point then the line (#9510)", () => {
+      createThreePointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      enterLineEditingMode(line);
+
+      const points = LinearElementEditor.getPointsGlobalCoordinates(
+        line,
+        h.app.scene.getNonDeletedElementsMap(),
+      );
+      const middlePoint = points[1];
+
+      drag(
+        middlePoint,
+        pointFrom(middlePoint[0] + delta, middlePoint[1] + delta),
+      );
+
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+      expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(-1);
+      expect(
+        h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+      ).toBeNull();
+
+      // macOS often fires a pointermove at the release point after pointerup
+      const movedPoints = LinearElementEditor.getPointsGlobalCoordinates(
+        line,
+        h.app.scene.getNonDeletedElementsMap(),
+      );
+      fireEvent.pointerMove(interactiveCanvas, {
+        clientX: movedPoints[1][0],
+        clientY: movedPoints[1][1],
+      });
+
+      const lineBody = pointFrom<GlobalPoint>(
+        movedPoints[0][0] + (movedPoints[1][0] - movedPoints[0][0]) * 0.25,
+        movedPoints[0][1] + (movedPoints[1][1] - movedPoints[0][1]) * 0.25,
+      );
+      drag(
+        pointFrom(lineBody[0], lineBody[1]),
+        pointFrom(lineBody[0] + 40, lineBody[1] + 30),
+      );
+
+      expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(-1);
+      expect(
+        h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+      ).toBeNull();
+    });
+
+    it("should not return stale midpoint hover coords after the line moves (#9510)", () => {
+      createThreePointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      enterLineEditingMode(line);
+
+      const elementsMap = h.app.scene.getNonDeletedElementsMap();
+      const midPoints = LinearElementEditor.getEditorMidPoints(
+        line,
+        elementsMap,
+        h.state,
+      );
+      expect(midPoints[0]).not.toBeNull();
+
+      const editorWithStaleCache = {
+        ...h.state.selectedLinearElement!,
+        segmentMidPointHoveredCoords: midPoints[0],
+      };
+
+      act(() => {
+        h.app.scene.mutateElement(line, { x: line.x + 100, y: line.y + 80 });
+      });
+
+      const hit = LinearElementEditor.getSegmentMidpointHitCoords(
+        editorWithStaleCache,
+        { x: midPoints[0]![0], y: midPoints[0]![1] },
+        { ...h.state, selectedLinearElement: editorWithStaleCache },
+        h.app.scene.getNonDeletedElementsMap(),
+      );
+
+      expect(hit).toBeNull();
+    });
+
+    it("should snap a slightly moved hovered midpoint to the current handle (#9510)", () => {
+      createThreePointerLinearElement("line");
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      enterLineEditingMode(line);
+
+      const elementsMap = h.app.scene.getNonDeletedElementsMap();
+      const midPoints = LinearElementEditor.getEditorMidPoints(
+        line,
+        elementsMap,
+        h.state,
+      );
+      expect(midPoints[0]).not.toBeNull();
+
+      const threshold =
+        (LinearElementEditor.POINT_HANDLE_SIZE + 1) / h.state.zoom.value;
+      const subThresholdOffset = threshold / 2;
+
+      act(() => {
+        h.app.scene.mutateElement(line, {
+          x: line.x + subThresholdOffset,
+          y: line.y,
+        });
+      });
+
+      const currentMidPoints = LinearElementEditor.getEditorMidPoints(
+        line,
+        h.app.scene.getNonDeletedElementsMap(),
+        h.state,
+      );
+      expect(currentMidPoints[0]).not.toBeNull();
+      expect(pointDistance(midPoints[0]!, currentMidPoints[0]!)).toBeLessThan(
+        threshold,
+      );
+      expect(currentMidPoints[0]).not.toEqual(midPoints[0]);
+
+      const resolved = LinearElementEditor.getCurrentSegmentMidpointNearPoint(
+        currentMidPoints,
+        midPoints[0]!,
+        h.state.zoom.value,
+      );
+
+      expect(resolved).toEqual(currentMidPoints[0]);
+      expect(resolved).not.toEqual(midPoints[0]);
+    });
+
     it("should not drag line and add midpoint when dragged irrespective of threshold", () => {
       createTwoPointerLinearElement("line");
       const line = h.elements[0] as ExcalidrawLinearElement;
