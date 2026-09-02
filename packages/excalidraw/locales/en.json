@@ -473,7 +473,9 @@
     "movePageUpDown": "Move page up/down",
     "movePageLeftRight": "Move page left/right",
     "cropStart": "Crop image",
-    "cropFinish": "Finish image cropping"
+    "cropFinish": "Finish image cropping",
+    "searchShortcuts": "Search shortcuts...",
+    "noShortcutResults": "No matching shortcuts found"
   },
   "clearCanvasDialog": {
     "title": "Clear canvas"
