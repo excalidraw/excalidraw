@@ -149,6 +149,7 @@ export const actionCopyAsSvg = register({
           ...appState,
           exportingFrame,
           name: app.getName(),
+          ownerDocument: app.ownerDocument,
         },
       );
 

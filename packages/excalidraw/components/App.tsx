@@ -2809,6 +2809,7 @@ class App extends React.Component<AppProps, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
         renderEnvironment: this.renderEnvironment,
+        ownerDocument: this.ownerDocument,
       },
     )
       .catch(muteFSAbortError)

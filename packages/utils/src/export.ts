@@ -187,11 +187,13 @@ export const exportToSvg = async ({
   exportingFrame,
   skipInliningFonts,
   reuseImages,
+  ownerDocument,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
   skipInliningFonts?: true;
   reuseImages?: boolean;
+  ownerDocument?: Document;
 }): Promise<SVGSVGElement> => {
   const restoredElements = getNonDeletedElements(
     restoreElements(elements, null, {
@@ -210,6 +212,7 @@ export const exportToSvg = async ({
     renderEmbeddables,
     skipInliningFonts,
     reuseImages,
+    ownerDocument,
   });
 };
 
