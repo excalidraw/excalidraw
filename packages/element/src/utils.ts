@@ -65,10 +65,7 @@ type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
 
 const ElementShapesCache = new WeakMap<
   ExcalidrawElement,
-  {
-    version: ExcalidrawElement["version"];
-    shapes: Map<number, ElementShape>;
-  }
+  { version: ExcalidrawElement["version"]; shapes: Map<number, ElementShape> }
 >();
 
 const getElementShapesCacheEntry = <T extends ExcalidrawElement>(
@@ -148,50 +145,50 @@ export function deconstructLinearOrFreeDrawElement(
     switch (op.op) {
       case "move":
         continue;
-      case "lineTo": {
+      case "lineTo":
         if (!prevPoint) {
           throw new Error("prevPoint is undefined");
         }
 
-        const segment = lineSegment<GlobalPoint>(
-          pointFrom<GlobalPoint>(
-            element.x + prevPoint[0],
-            element.y + prevPoint[1],
-          ),
-          pointFrom<GlobalPoint>(
-            element.x + op.data[0],
-            element.y + op.data[1],
+        lines.push(
+          lineSegment<GlobalPoint>(
+            pointFrom<GlobalPoint>(
+              element.x + prevPoint[0],
+              element.y + prevPoint[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[0],
+              element.y + op.data[1],
+            ),
           ),
         );
-        lines.push(segment);
         continue;
-      }
-      case "bcurveTo": {
+      case "bcurveTo":
         if (!prevPoint) {
           throw new Error("prevPoint is undefined");
         }
 
-        const segment = curve<GlobalPoint>(
-          pointFrom<GlobalPoint>(
-            element.x + prevPoint[0],
-            element.y + prevPoint[1],
-          ),
-          pointFrom<GlobalPoint>(
-            element.x + op.data[0],
-            element.y + op.data[1],
-          ),
-          pointFrom<GlobalPoint>(
-            element.x + op.data[2],
-            element.y + op.data[3],
-          ),
-          pointFrom<GlobalPoint>(
-            element.x + op.data[4],
-            element.y + op.data[5],
+        curves.push(
+          curve<GlobalPoint>(
+            pointFrom<GlobalPoint>(
+              element.x + prevPoint[0],
+              element.y + prevPoint[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[0],
+              element.y + op.data[1],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[2],
+              element.y + op.data[3],
+            ),
+            pointFrom<GlobalPoint>(
+              element.x + op.data[4],
+              element.y + op.data[5],
+            ),
           ),
         );
-        curves.push(segment);
         continue;
-      }
       default: {
         console.error("Unknown op type", op.op);
       }
