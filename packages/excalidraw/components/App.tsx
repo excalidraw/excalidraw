@@ -389,7 +389,6 @@ import { fileOpen } from "../data/filesystem";
 import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
-  type HyperlinkTooltipOwner,
   Hyperlink,
 } from "../components/hyperlink/Hyperlink";
 
@@ -450,7 +449,8 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import { isPointHittingLink, startLinkImgDecoding } from "./hyperlink/helpers";
+import { isPointHittingLink } from "./hyperlink/helpers";
+import { AppHost } from "./App.host";
 import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
@@ -646,91 +646,15 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   /**
-   * Render environment scoped to this editor's owner window, so that the
-   * canvases, images and paths created during rendering live in the owner
-   * document (cross-document runtime ownership). Memoized keyed on the resolved
-   * document because render caches are keyed by environment identity: the
-   * identity must not survive a document switch, or caches would mix
-   * canvases and images from two realms under one bucket.
+   * Everything binding this editor to the document/window it renders into
+   * (render environment, hyperlink tooltip ownership). Delegated to so the
+   * cross-document ownership rules live in one place.
    */
-  private _renderEnvironment: RenderEnvironment | null = null;
-  private _renderEnvironmentDocument: Document | null = null;
+  public host: AppHost = new AppHost(this);
+
+  /** @see AppHost.renderEnvironment */
   public get renderEnvironment(): RenderEnvironment {
-    if (this.props.renderEnvironment) {
-      return this.props.renderEnvironment;
-    }
-    const ownerDocument = this.ownerDocument;
-    if (
-      !this._renderEnvironment ||
-      this._renderEnvironmentDocument !== ownerDocument
-    ) {
-      this._renderEnvironmentDocument = ownerDocument;
-      this._renderEnvironment = {
-        createCanvas: () => this.ownerDocument.createElement("canvas"),
-        createImage: () => new this.ownerWindow.Image(),
-        // Browsers accept a `Path2D` minted in another realm, but taking it
-        // from the owner window keeps runtime ownership complete. Falls back
-        // to the global for realms without one (e.g. jsdom iframes).
-        createPath: (svgPath: string) =>
-          new (this.ownerWindow.Path2D ?? Path2D)(svgPath),
-      };
-    }
-    return this._renderEnvironment;
-  }
-
-  /**
-   * Link icons decode asynchronously and the static scene skips an icon that
-   * is not decoded yet, so start the decode on mount rather than on the
-   * first render that happens to have a link, so the decode is settled long
-   * before there is a link element to draw an icon for.
-   *
-   * Re-run on an environment swap: the images are keyed by env identity, so
-   * a new environment starts with none.
-   */
-  private _linkImgDecodingEnvironment: RenderEnvironment | null = null;
-  private ensureLinkImgDecoding() {
-    const renderEnvironment = this.renderEnvironment;
-    if (this._linkImgDecodingEnvironment === renderEnvironment) {
-      return;
-    }
-    this._linkImgDecodingEnvironment = renderEnvironment;
-    startLinkImgDecoding(renderEnvironment);
-  }
-
-  /**
-   * Every render cache is keyed by environment identity, so a host passing an
-   * inline `renderEnvironment` literal re-mints the identity on each render
-   * and re-rasterizes everything, with no visible symptom other than being
-   * slow. Detected by the factories' source being unchanged across the swap:
-   * a genuine environment switch (e.g. a document change) reads differently.
-   */
-  private _warnedUnstableRenderEnvironment = false;
-  private warnOnUnstableRenderEnvironment(prevProps: AppProps) {
-    if (
-      (!isDevEnv() && !isTestEnv()) ||
-      this._warnedUnstableRenderEnvironment
-    ) {
-      return;
-    }
-    const prev = prevProps.renderEnvironment;
-    const next = this.props.renderEnvironment;
-    if (
-      !prev ||
-      !next ||
-      prev === next ||
-      String(prev.createCanvas) !== String(next.createCanvas) ||
-      String(prev.createImage) !== String(next.createImage)
-    ) {
-      return;
-    }
-    this._warnedUnstableRenderEnvironment = true;
-    console.warn(
-      "Excalidraw: the `renderEnvironment` prop changed identity while its " +
-        "implementation stayed the same. Render caches are keyed by this " +
-        "object's identity, so a new identity per render defeats all of them " +
-        "(elements are re-rasterized every frame). Hoist the object to a " +
-        "module constant or memoize it (e.g. `useMemo`).",
-    );
+    return this.host.renderEnvironment;
   }
 
   public scene: Scene;
@@ -800,7 +724,6 @@ class App extends React.Component<AppProps, AppState> {
     null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
-  readonly hyperlinkTooltipOwner: HyperlinkTooltipOwner = {};
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
@@ -3438,7 +3361,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isLinksEnabled(prevProps) !== this.isLinksEnabled()) {
       if (!this.isLinksEnabled()) {
         this.hitLinkElement = undefined;
-        hideHyperlinkToolip(this.hyperlinkTooltipOwner);
+        hideHyperlinkToolip(this.host.hyperlinkTooltipOwner);
         this.cursor.reset();
       }
     }
@@ -3815,7 +3738,7 @@ class App extends React.Component<AppProps, AppState> {
   public async componentDidMount() {
     this.unmounted = false;
     this.api = this.createExcalidrawAPI();
-    this.ensureLinkImgDecoding();
+    this.host.sync();
 
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
@@ -3937,9 +3860,7 @@ class App extends React.Component<AppProps, AppState> {
 
     (this.ownerWindow as any).launchQueue?.setConsumer(() => {});
 
-    // release the tooltip ownership so we don't retain this (soon detached)
-    // document/window, or leave a pending tooltip timer around
-    hideHyperlinkToolip(this.hyperlinkTooltipOwner);
+    this.host.destroy();
 
     this.renderer.destroy(this.canvas);
     this.scene.destroy();
@@ -4268,8 +4189,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
-    this.warnOnUnstableRenderEnvironment(prevProps);
-    this.ensureLinkImgDecoding();
+    this.host.sync(prevProps);
 
     this.appStateObserver.flush(prevState);
 
@@ -7479,7 +7399,7 @@ class App extends React.Component<AppProps, AppState> {
       this.editorInterface.formFactor === "phone",
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      hideHyperlinkToolip(this.hyperlinkTooltipOwner);
+      hideHyperlinkToolip(this.host.hyperlinkTooltipOwner);
       let url = this.hitLinkElement.link;
       if (url) {
         url = normalizeLink(url);
@@ -7524,11 +7444,11 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
         this.scene.getNonDeletedElementsMap(),
         this.ownerDocument,
-        this.hyperlinkTooltipOwner,
+        this.host.hyperlinkTooltipOwner,
       );
       return true;
     }
-    hideHyperlinkToolip(this.hyperlinkTooltipOwner);
+    hideHyperlinkToolip(this.host.hyperlinkTooltipOwner);
     return false;
   };
 
