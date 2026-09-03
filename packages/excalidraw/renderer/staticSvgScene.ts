@@ -32,7 +32,7 @@ import { getContainingFrame } from "@excalidraw/element";
 
 import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
-import { ShapeCache } from "@excalidraw/element";
+import { ShapeCache, selectLinearElementShapes } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -343,7 +343,8 @@ const renderElementToSvg = (
       group.setAttribute("stroke-linecap", "round");
 
       const shapes = ShapeCache.generateElementShape(element, renderConfig);
-      shapes.forEach((shape, index) => {
+      const arrowheadShapes = selectLinearElementShapes(shapes, "arrowheads");
+      shapes.forEach((shape) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
           shape,
@@ -368,7 +369,7 @@ const renderElementToSvg = (
         }
         // A label masks only the linear body. Arrowheads must remain outside
         // the mask so moving a label near an endpoint cannot clip them.
-        if (boundText && element.type === "arrow" && index > 0) {
+        if (boundText && arrowheadShapes.includes(shape)) {
           group.appendChild(node);
         } else {
           maskedGroup.appendChild(node);

@@ -66,7 +66,9 @@ import {
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
-import { ShapeCache } from "./shape";
+import { ShapeCache, selectLinearElementShapes } from "./shape";
+
+import type { LinearElementPart } from "./shape";
 
 import type {
   ExcalidrawElement,
@@ -325,9 +327,6 @@ const drawImagePlaceholder = (
   );
 };
 
-/** which of an arrow's shapes to paint; non-arrows always paint everything */
-type LinearElementPart = "all" | "body" | "arrowheads";
-
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -352,16 +351,10 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      const shapes = ShapeCache.generateElementShape(element, renderConfig);
-      const shapesToDraw = isArrowElement(element)
-        ? linearElementPart === "body"
-          ? shapes.slice(0, 1)
-          : linearElementPart === "arrowheads"
-          ? shapes.slice(1)
-          : shapes
-        : shapes;
-
-      shapesToDraw.forEach((shape) => {
+      selectLinearElementShapes(
+        ShapeCache.generateElementShape(element, renderConfig),
+        linearElementPart,
+      ).forEach((shape) => {
         rc.draw(shape);
       });
       break;
