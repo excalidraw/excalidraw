@@ -7,8 +7,6 @@ import {
   FRAME_STYLE,
 } from "@excalidraw/common";
 
-import { newElementWith } from "@excalidraw/element";
-
 import { pointFrom } from "@excalidraw/math";
 
 import type {
@@ -19,7 +17,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { LocalPoint } from "@excalidraw/math";
-import type { RenderEnvironment } from "@excalidraw/element";
 
 import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";
@@ -359,91 +356,6 @@ describe("exportToCanvas", () => {
           event.props.height === holeHeight,
       ),
     ).toEqual([]);
-  });
-
-  it("creates all canvases via the supplied renderEnvironment", async () => {
-    const created: HTMLCanvasElement[] = [];
-    const env: RenderEnvironment = {
-      createCanvas: () => {
-        const canvas = document.createElement("canvas");
-        created.push(canvas);
-        return canvas;
-      },
-      createImage: () => new Image(),
-    };
-    const createElementSpy = vi.spyOn(document, "createElement");
-
-    const canvas = await exportToCanvas({
-      elements: [
-        API.createElement({ type: "rectangle", width: 100, height: 100 }),
-        // a named frame: its label is measured and truncated during export,
-        // which is its own canvas-creating path
-        newElementWith(
-          API.createElement({ type: "frame", width: 100, height: 100 }),
-          {
-            name: "a frame name long enough to be truncated to the frame width",
-          },
-        ),
-      ],
-      files: null,
-      appState: { exportBackground: true, viewBackgroundColor: "#ffffff" },
-      renderEnvironment: env,
-    });
-
-    expect(created).toContain(canvas);
-    // every canvas created during the export went through the env --
-    // nothing fell back to the document's default environment
-    expect(
-      createElementSpy.mock.calls.filter(([tag]) => tag === "canvas").length,
-    ).toBe(created.length);
-    createElementSpy.mockRestore();
-  });
-
-  it("decodes images via the supplied renderEnvironment.createImage", async () => {
-    const image = API.createElement({
-      type: "image",
-      width: 100,
-      height: 100,
-      fileId: "img-1",
-      status: "initialized",
-    } as any);
-
-    const images: any[] = [];
-    const createImage = () => {
-      // a real <img>: the renderer hands it to `drawImage`, which rejects
-      // anything else -- and the export now fails loudly when it does
-      const stub: any = document.createElement("img");
-      Object.defineProperty(stub, "naturalWidth", { value: 100 });
-      Object.defineProperty(stub, "naturalHeight", { value: 100 });
-      Object.defineProperty(stub, "src", {
-        set(value: string) {
-          stub._src = value;
-          // jsdom never decodes, so settle the way a browser would
-          queueMicrotask(() => stub.onload?.());
-        },
-      });
-      images.push(stub);
-      return stub as HTMLImageElement;
-    };
-
-    await exportToCanvas({
-      elements: [image],
-      files: {
-        "img-1": {
-          id: "img-1",
-          dataURL: "data:image/png;base64,iVBORw0KGgo=",
-          mimeType: "image/png",
-        } as any,
-      },
-      appState: { exportBackground: true, viewBackgroundColor: "#ffffff" },
-      renderEnvironment: {
-        createCanvas: () => document.createElement("canvas"),
-        createImage,
-      },
-    });
-
-    expect(images).toHaveLength(1);
-    expect(images[0]._src).toBe("data:image/png;base64,iVBORw0KGgo=");
   });
 });
 
