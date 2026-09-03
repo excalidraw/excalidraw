@@ -11,6 +11,7 @@ import {
   curveLengthAtParameter,
   curvePointAtLength,
   lineSegmentClosestParameter,
+  lineSegmentPointAt,
   curveClosestParameter,
   clamp,
   bezierEquation,
@@ -1972,20 +1973,10 @@ export class LinearElementEditor {
     let bestParameter = 0;
 
     for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-      let t: number;
-      let closestPoint: GlobalPoint;
-      if (isCurve(segment)) {
-        t = curveClosestParameter(segment, pointerGlobalPoint);
-        closestPoint = bezierEquation(segment, t);
-      } else {
-        t = lineSegmentClosestParameter(pointerGlobalPoint, segment);
-        closestPoint = pointFrom<GlobalPoint>(
-          segment[0][0] + t * (segment[1][0] - segment[0][0]),
-          segment[0][1] + t * (segment[1][1] - segment[0][1]),
-        );
-      }
-      const distance = pointDistance(pointerGlobalPoint, closestPoint);
+      const { t, distance } = pathSegmentClosestParameter(
+        segments[i],
+        pointerGlobalPoint,
+      );
 
       if (distance < bestDistance) {
         bestDistance = distance;
@@ -1994,10 +1985,11 @@ export class LinearElementEditor {
       }
     }
 
-    const segment = segments[bestSegmentIndex];
-    const lengthWithinSegment = isCurve(segment)
-      ? curveLengthAtParameter(segment, bestParameter)
-      : bestParameter * lengths[bestSegmentIndex];
+    const lengthWithinSegment = pathSegmentLengthAtParameter(
+      segments[bestSegmentIndex],
+      bestParameter,
+      lengths[bestSegmentIndex],
+    );
 
     const labelPosition = clamp(
       (prefixSums[bestSegmentIndex] + lengthWithinSegment) / totalLength,
@@ -2042,26 +2034,18 @@ export class LinearElementEditor {
 
     const targetLength = clamp(pathParameter, 0, 1) * totalLength;
 
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-      const isLast = i === segments.length - 1;
-      if (targetLength <= prefixSums[i + 1] || isLast) {
-        const lengthFraction =
-          lengths[i] === 0
-            ? 0
-            : clamp((targetLength - prefixSums[i]) / lengths[i], 0, 1);
+    // the first segment whose end lies at or beyond the target; the last one
+    // catches a target that floating point pushed past the total length
+    const found = segments.findIndex(
+      (_, i) => targetLength <= prefixSums[i + 1],
+    );
+    const i = found === -1 ? segments.length - 1 : found;
+    const lengthFraction =
+      lengths[i] === 0
+        ? 0
+        : clamp((targetLength - prefixSums[i]) / lengths[i], 0, 1);
 
-        if (isCurve(segment)) {
-          return curvePointAtLength(segment, lengthFraction, lengths[i]);
-        }
-        return pointFrom<GlobalPoint>(
-          segment[0][0] + lengthFraction * (segment[1][0] - segment[0][0]),
-          segment[0][1] + lengthFraction * (segment[1][1] - segment[0][1]),
-        );
-      }
-    }
-
-    return null;
+    return pathSegmentPointAtLength(segments[i], lengthFraction, lengths[i]);
   }
 
   static getBoundTextElementPosition = (
@@ -2811,3 +2795,38 @@ const pathSegmentLength = (segment: LinearPathSegment): number =>
   isCurve(segment)
     ? curveLength(segment)
     : pointDistance(segment[0], segment[1]);
+
+/**
+ * The segment's parameter `t` (`0..1`) at the point closest to `point`, and
+ * how far that point is from `point`.
+ */
+const pathSegmentClosestParameter = (
+  segment: LinearPathSegment,
+  point: GlobalPoint,
+): { t: number; distance: number } => {
+  if (isCurve(segment)) {
+    const t = curveClosestParameter(segment, point);
+    return { t, distance: pointDistance(point, bezierEquation(segment, t)) };
+  }
+
+  const t = lineSegmentClosestParameter(point, segment);
+  return { t, distance: pointDistance(point, lineSegmentPointAt(segment, t)) };
+};
+
+/** arc length from the segment's start to its parameter `t` */
+const pathSegmentLengthAtParameter = (
+  segment: LinearPathSegment,
+  t: number,
+  segmentLength: number,
+): number =>
+  isCurve(segment) ? curveLengthAtParameter(segment, t) : t * segmentLength;
+
+/** point at `fraction` (`0..1`) of the segment's arc length */
+const pathSegmentPointAtLength = (
+  segment: LinearPathSegment,
+  fraction: number,
+  segmentLength: number,
+): GlobalPoint =>
+  isCurve(segment)
+    ? curvePointAtLength(segment, fraction, segmentLength)
+    : lineSegmentPointAt(segment, fraction);

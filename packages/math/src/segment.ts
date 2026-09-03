@@ -3,6 +3,8 @@ import { line, linesIntersectAt } from "./line";
 import {
   isPoint,
   pointCenter,
+  pointDistance,
+  pointFrom,
   pointFromVector,
   pointRotateRads,
 } from "./point";
@@ -118,14 +120,24 @@ export const distanceToLineSegment = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   line: LineSegment<Point>,
 ) => {
-  const [x, y] = point;
+  return pointDistance(
+    point,
+    lineSegmentPointAt(line, lineSegmentClosestParameter(point, line)),
+  );
+};
+
+/**
+ * Returns the point at parameter `t` along the segment, where `t = 0` is the
+ * segment's start and `t = 1` its end. Not clamped.
+ */
+export function lineSegmentPointAt<Point extends GlobalPoint | LocalPoint>(
+  line: LineSegment<Point>,
+  t: number,
+): Point {
   const [[x1, y1], [x2, y2]] = line;
 
-  const param = lineSegmentClosestParameter(point, line);
-  const dx = x - (x1 + param * (x2 - x1));
-  const dy = y - (y1 + param * (y2 - y1));
-  return Math.sqrt(dx * dx + dy * dy);
-};
+  return pointFrom<Point>(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+}
 
 /**
  * Returns the intersection point of a segment and a line
