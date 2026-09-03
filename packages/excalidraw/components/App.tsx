@@ -8189,8 +8189,11 @@ class App extends React.Component<AppProps, AppState> {
     }
     if (this.state.selectedLinearElement) {
       let hoverPointIndex = -1;
+      let isHoveringAPointHandle = false;
       let segmentMidPointHoveredCoords = null;
 
+      // the point handles and segment midpoint knobs only count when the
+      // pointer is on the element itself
       if (
         hitElementItself({
           point: pointFrom(scenePointerX, scenePointerY),
@@ -8206,7 +8209,7 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerX,
           scenePointerY,
         );
-        const isHoveringAPointHandle = isElbowArrow(element)
+        isHoveringAPointHandle = isElbowArrow(element)
           ? hoverPointIndex === 0 ||
             hoverPointIndex === element.points.length - 1
           : hoverPointIndex >= 0;
@@ -8217,42 +8220,19 @@ class App extends React.Component<AppProps, AppState> {
               linearElementEditor,
               { x: scenePointerX, y: scenePointerY },
               this.state,
-              this.scene.getNonDeletedElementsMap(),
+              elementsMap,
             );
         }
+      }
 
-        // an arrow's bound text is draggable along the arrow, but the point
-        // handles and the segment midpoint knob sitting under the label keep
-        // precedence, so a labeled arrow can still be bent at its middle
-        const hoveredBoundText =
-          !isHoveringAPointHandle &&
-          !segmentMidPointHoveredCoords &&
-          this.arrowText.isBoundTextGrabbable(
-            element,
-            scenePointerX,
-            scenePointerY,
-          );
-
-        if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
-          this.cursor.set(CURSOR_TYPE.POINTER);
-        } else if (hoveredBoundText) {
-          this.cursor.set(CURSOR_TYPE.GRAB);
-        } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-          if (
-            // Elbow arrows can only be moved when unconnected
-            !isElbowArrow(element) ||
-            !(element.startBinding || element.endBinding)
-          ) {
-            if (
-              this.state.activeTool.type !== "lasso" ||
-              Object.keys(this.state.selectedElementIds).length > 0
-            ) {
-              this.cursor.set(CURSOR_TYPE.MOVE);
-            }
-          }
-        }
+      if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
+        this.cursor.set(CURSOR_TYPE.POINTER);
       } else if (
-        // the label can extend beyond the arrow's own hit area
+        // an arrow's bound text is draggable along the arrow. The handles
+        // and the midpoint knob sitting under the label keep precedence so a
+        // labeled arrow can still be bent at its middle, while the label
+        // itself is grabbable even where it extends beyond the arrow's own
+        // hit area.
         this.arrowText.isBoundTextGrabbable(
           element,
           scenePointerX,
@@ -8260,19 +8240,15 @@ class App extends React.Component<AppProps, AppState> {
         )
       ) {
         this.cursor.set(CURSOR_TYPE.GRAB);
-      } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-        if (
-          // Elbow arrow can only be moved when unconnected
-          !isElbowArrow(element) ||
-          !(element.startBinding || element.endBinding)
-        ) {
-          if (
-            this.state.activeTool.type !== "lasso" ||
-            Object.keys(this.state.selectedElementIds).length > 0
-          ) {
-            this.cursor.set(CURSOR_TYPE.MOVE);
-          }
-        }
+      } else if (
+        this.hitElement(scenePointerX, scenePointerY, element) &&
+        // Elbow arrows can only be moved when unconnected
+        (!isElbowArrow(element) ||
+          !(element.startBinding || element.endBinding)) &&
+        (this.state.activeTool.type !== "lasso" ||
+          Object.keys(this.state.selectedElementIds).length > 0)
+      ) {
+        this.cursor.set(CURSOR_TYPE.MOVE);
       }
 
       if (
