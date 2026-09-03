@@ -575,23 +575,6 @@ const getArrowheadShapes = (
   }
 };
 
-/** which of a linear element's shapes to use; only arrows have arrowheads */
-export type LinearElementPart = "all" | "body" | "arrowheads";
-
-/**
- * Splits a linear element's generated shapes by part. Relies on
- * `generateElementShape` emitting the body first and arrowheads after it.
- */
-export const selectLinearElementShapes = <T>(
-  shapes: readonly T[],
-  part: LinearElementPart,
-): readonly T[] =>
-  part === "body"
-    ? shapes.slice(0, 1)
-    : part === "arrowheads"
-    ? shapes.slice(1)
-    : shapes;
-
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
@@ -934,8 +917,7 @@ const _generateElementShape = (
         shape = [generator.curve(points as unknown as RoughPoint[], options)];
       }
 
-      // add lines only in arrow; the arrowhead shapes follow the body, which
-      // `selectLinearElementShapes` relies on
+      // add lines only in arrow
       if (element.type === "arrow") {
         const { startArrowhead = null, endArrowhead = "arrow" } = element;
 

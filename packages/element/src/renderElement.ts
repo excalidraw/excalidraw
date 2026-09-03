@@ -66,9 +66,7 @@ import {
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
-import { ShapeCache, selectLinearElementShapes } from "./shape";
-
-import type { LinearElementPart } from "./shape";
+import { ShapeCache } from "./shape";
 
 import type {
   ExcalidrawElement,
@@ -142,7 +140,6 @@ export interface ExcalidrawElementWithCanvas {
   zoomValue: AppState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
-  isArrowBodyOnly: boolean;
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
 }
@@ -208,8 +205,6 @@ const generateElementCanvas = (
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
-  /** arrows with a label cache only their body; see `drawElementFromCanvas` */
-  isArrowBodyOnly = false,
 ): ExcalidrawElementWithCanvas | null => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -256,13 +251,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(
-    element,
-    rc,
-    context,
-    renderConfig,
-    isArrowBodyOnly ? "body" : "all",
-  );
+  drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
 
@@ -274,7 +263,6 @@ const generateElementCanvas = (
     zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
-    isArrowBodyOnly,
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     imageCrop: isImageElement(element) ? element.crop : null,
@@ -332,7 +320,6 @@ const drawElementOnCanvas = (
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  linearElementPart: LinearElementPart = "all",
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -351,12 +338,11 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      selectLinearElementShapes(
-        ShapeCache.generateElementShape(element, renderConfig),
-        linearElementPart,
-      ).forEach((shape) => {
-        rc.draw(shape);
-      });
+      ShapeCache.generateElementShape(element, renderConfig).forEach(
+        (shape) => {
+          rc.draw(shape);
+        },
+      );
       break;
     }
     case "freedraw": {
@@ -570,15 +556,12 @@ const generateElementWithCanvas = (
 
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
-  const isArrowBodyOnly =
-    isArrowElement(element) && !!getBoundTextElement(element, elementsMap);
 
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
-    prevElementWithCanvas.isArrowBodyOnly !== isArrowBodyOnly ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
     const elementWithCanvas = generateElementCanvas(
@@ -587,7 +570,6 @@ const generateElementWithCanvas = (
       zoom,
       renderConfig,
       appState,
-      isArrowBodyOnly,
     );
 
     if (!elementWithCanvas) {
@@ -603,13 +585,12 @@ const generateElementWithCanvas = (
 
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
-  rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
   allElementsMap: NonDeletedSceneElementsMap,
 ) => {
-  const element = elementWithCanvas.element as NonDeletedExcalidrawElement;
+  const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
   const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
@@ -620,49 +601,11 @@ const drawElementFromCanvas = (
 
   const boundTextElement = getBoundTextElement(element, allElementsMap);
 
-  /**
-   * Runs `draw` with the element's rotation (and an image's scale) applied
-   * about the element center, leaving the context as it found it.
-   */
-  const withElementTransform = (draw: () => void) => {
-    context.save();
-
-    // we translate context to element center so that rotation and scale
-    // originates from the element center
-    context.translate(cx, cy);
-    context.rotate(element.angle);
-
-    if (
-      "scale" in elementWithCanvas.element &&
-      !isPendingImageElement(element, renderConfig)
-    ) {
-      context.scale(
-        elementWithCanvas.element.scale[0],
-        elementWithCanvas.element.scale[1],
-      );
-    }
-
-    // revert afterwards we don't have account for it during drawing
-    context.translate(-cx, -cy);
-    draw();
-    context.restore();
-  };
-
-  const drawCachedCanvas = (canvas: HTMLCanvasElement) =>
-    withElementTransform(() => {
-      context.drawImage(
-        canvas,
-        (x1 + appState.scrollX) * window.devicePixelRatio - padding,
-        (y1 + appState.scrollY) * window.devicePixelRatio - padding,
-        canvas.width / elementWithCanvas.scale,
-        canvas.height / elementWithCanvas.scale,
-      );
-    });
-
   if (isArrowElement(element) && boundTextElement) {
-    // Punch the label "hole" only out of the cached arrow body. Arrowhead
-    // shapes are painted afterwards, outside the clip, so a label moved near
-    // an endpoint cannot cut them off.
+    // punch the label "hole" by clipping the arrow's blit out of the label
+    // rect (even-odd) instead of baking a rotated arrow copy with a cleared
+    // hole into a separate (`maxDim`-squared!) canvas. The hole stays
+    // axis-aligned in scene space while the blit below rotates.
     const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
       boundTextElement,
       allElementsMap,
@@ -671,8 +614,6 @@ const drawElementFromCanvas = (
     const outerHalf =
       Math.max(distance(x1, x2), distance(y1, y2)) * window.devicePixelRatio +
       padding * 10;
-
-    context.save();
     context.beginPath();
     context.rect(cx - outerHalf, cy - outerHalf, outerHalf * 2, outerHalf * 2);
     context.rect(
@@ -692,20 +633,36 @@ const drawElementFromCanvas = (
         window.devicePixelRatio,
     );
     context.clip("evenodd");
-    drawCachedCanvas(elementWithCanvas.canvas);
-    context.restore();
-
-    withElementTransform(() => {
-      context.translate(
-        (element.x + appState.scrollX) * window.devicePixelRatio,
-        (element.y + appState.scrollY) * window.devicePixelRatio,
-      );
-      context.scale(window.devicePixelRatio, window.devicePixelRatio);
-      drawElementOnCanvas(element, rc, context, renderConfig, "arrowheads");
-    });
-  } else {
-    drawCachedCanvas(elementWithCanvas.canvas);
   }
+
+  // we translate context to element center so that rotation and scale
+  // originates from the element center
+  context.translate(cx, cy);
+
+  context.rotate(element.angle);
+
+  if (
+    "scale" in elementWithCanvas.element &&
+    !isPendingImageElement(element, renderConfig)
+  ) {
+    context.scale(
+      elementWithCanvas.element.scale[0],
+      elementWithCanvas.element.scale[1],
+    );
+  }
+
+  // revert afterwards we don't have account for it during drawing
+  context.translate(-cx, -cy);
+
+  context.drawImage(
+    elementWithCanvas.canvas!,
+    (x1 + appState.scrollX) * window.devicePixelRatio -
+      (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+    (y1 + appState.scrollY) * window.devicePixelRatio -
+      (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+    elementWithCanvas.canvas!.width / elementWithCanvas.scale,
+    elementWithCanvas.canvas!.height / elementWithCanvas.scale,
+  );
 
   if (
     import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===
@@ -847,7 +804,6 @@ export const renderElement = (
 
         drawElementFromCanvas(
           elementWithCanvas,
-          rc,
           context,
           renderConfig,
           appState,
@@ -892,26 +848,12 @@ export const renderElement = (
 
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
-        // draws the element (or a part of an arrow) rotated about its center
-        const drawPart = (part: LinearElementPart) => {
-          context.save();
-          context.rotate(element.angle);
-
-          if (element.type === "image") {
-            // note: scale must be applied *after* rotating
-            context.scale(element.scale[0], element.scale[1]);
-          }
-
-          context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, part);
-          context.restore();
-        };
-
         if (isArrowElement(element) && boundTextElement) {
           // Draw arrow directly as vector (no temp-canvas bitmap blit which
-          // introduces resampling blur). The label "hole" is cut only out of
-          // the arrow body (even-odd clip), then arrowheads are painted outside
-          // that clip so labels near endpoints cannot cut them off.
+          // introduces resampling blur). The label "hole" is cut by clipping
+          // the arrow's own strokes out of the label rect (even-odd clip)
+          // so that elements rendered beneath the arrow keep showing through
+          // the gap.
           shiftX = element.width / 2 - (element.x - x1);
           shiftY = element.height / 2 - (element.y - y1);
 
@@ -943,12 +885,20 @@ export const renderElement = (
           context.rect(-outerHalf, -outerHalf, outerHalf * 2, outerHalf * 2);
           context.rect(holeX, holeY, holeWidth, holeHeight);
           context.clip("evenodd");
-          drawPart("body");
+          context.rotate(element.angle);
+          context.translate(-shiftX, -shiftY);
+          drawElementOnCanvas(element, rc, context, renderConfig);
           context.restore();
-
-          drawPart("arrowheads");
         } else {
-          drawPart("all");
+          context.rotate(element.angle);
+
+          if (element.type === "image") {
+            // note: scale must be applied *after* rotating
+            context.scale(element.scale[0], element.scale[1]);
+          }
+
+          context.translate(-shiftX, -shiftY);
+          drawElementOnCanvas(element, rc, context, renderConfig);
         }
 
         context.restore();
@@ -1011,7 +961,6 @@ export const renderElement = (
           if (uncroppedElementCanvas) {
             drawElementFromCanvas(
               uncroppedElementCanvas,
-              rc,
               context,
               renderConfig,
               appState,
@@ -1024,7 +973,6 @@ export const renderElement = (
 
         drawElementFromCanvas(
           elementWithCanvas,
-          rc,
           context,
           renderConfig,
           appState,

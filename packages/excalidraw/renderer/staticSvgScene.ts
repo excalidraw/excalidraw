@@ -32,7 +32,7 @@ import { getContainingFrame } from "@excalidraw/element";
 
 import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
-import { ShapeCache, selectLinearElementShapes } from "@excalidraw/element";
+import { ShapeCache } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -333,17 +333,12 @@ const renderElementToSvg = (
         maskPath.appendChild(maskRectInvisible);
       }
       const group = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
-      const maskedGroup = boundText
-        ? svgRoot.ownerDocument.createElementNS(SVG_NS, "g")
-        : group;
       if (boundText) {
-        maskedGroup.setAttribute("mask", `url(#mask-${element.id})`);
-        group.appendChild(maskedGroup);
+        group.setAttribute("mask", `url(#mask-${element.id})`);
       }
       group.setAttribute("stroke-linecap", "round");
 
       const shapes = ShapeCache.generateElementShape(element, renderConfig);
-      const arrowheadShapes = selectLinearElementShapes(shapes, "arrowheads");
       shapes.forEach((shape) => {
         const node = roughSVGDrawWithPrecision(
           rsvg,
@@ -367,13 +362,7 @@ const renderElementToSvg = (
         ) {
           node.setAttribute("fill-rule", "evenodd");
         }
-        // A label masks only the linear body. Arrowheads must remain outside
-        // the mask so moving a label near an endpoint cannot clip them.
-        if (boundText && arrowheadShapes.includes(shape)) {
-          group.appendChild(node);
-        } else {
-          maskedGroup.appendChild(node);
-        }
+        group.appendChild(node);
       });
 
       const g = maybeWrapNodesInFrameClipPath(
