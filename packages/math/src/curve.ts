@@ -516,6 +516,8 @@ export function curveLengthAtParameter<P extends GlobalPoint | LocalPoint>(
 export function curvePointAtLength<P extends GlobalPoint | LocalPoint>(
   c: Curve<P>,
   percent: number,
+  /** pass the curve's total length when already known to skip recomputing it */
+  totalLength: number = curveLength(c),
 ): P {
   if (percent <= 0) {
     return bezierEquation(c, 0);
@@ -525,7 +527,6 @@ export function curvePointAtLength<P extends GlobalPoint | LocalPoint>(
     return bezierEquation(c, 1);
   }
 
-  const totalLength = curveLength(c);
   const targetLength = totalLength * percent;
 
   // Binary search to find parameter t where length at t equals target length

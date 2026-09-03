@@ -2043,7 +2043,7 @@ export class LinearElementEditor {
             : clamp((targetLength - prefixSums[i]) / lengths[i], 0, 1);
 
         if (isCurve(segment)) {
-          return curvePointAtLength(segment, lengthFraction);
+          return curvePointAtLength(segment, lengthFraction, lengths[i]);
         }
         return pointFrom<GlobalPoint>(
           segment[0][0] + lengthFraction * (segment[1][0] - segment[0][0]),
