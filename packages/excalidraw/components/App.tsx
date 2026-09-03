@@ -8188,42 +8188,30 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     if (this.state.selectedLinearElement) {
-      let hoverPointIndex = -1;
-      let isHoveringAPointHandle = false;
-      let segmentMidPointHoveredCoords = null;
-
-      // the point handles and segment midpoint knobs only count when the
-      // pointer is on the element itself
-      if (
-        hitElementItself({
-          point: pointFrom(scenePointerX, scenePointerY),
-          element,
-          elementsMap,
-          threshold: this.getElementHitThreshold(element),
-        })
-      ) {
-        hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-          element,
-          elementsMap,
-          this.state.zoom,
-          scenePointerX,
-          scenePointerY,
-        );
-        isHoveringAPointHandle = isElbowArrow(element)
-          ? hoverPointIndex === 0 ||
-            hoverPointIndex === element.points.length - 1
-          : hoverPointIndex >= 0;
-
-        if (!isHoveringAPointHandle) {
-          segmentMidPointHoveredCoords =
-            LinearElementEditor.getSegmentMidpointHitCoords(
-              linearElementEditor,
-              { x: scenePointerX, y: scenePointerY },
-              this.state,
-              elementsMap,
-            );
-        }
-      }
+      // the same hit tests, in the same precedence, as
+      // `LinearElementEditor.handlePointerDown`, so the cursor never promises
+      // an interaction (e.g. grabbing the label) that pointer down won't
+      // deliver. Both handle radii exceed the element's own hit threshold,
+      // so these must not be gated on hitting the element itself.
+      const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+        element,
+        elementsMap,
+        this.state.zoom,
+        scenePointerX,
+        scenePointerY,
+      );
+      const isHoveringAPointHandle = LinearElementEditor.isPointHandle(
+        element,
+        hoverPointIndex,
+      );
+      const segmentMidPointHoveredCoords = isHoveringAPointHandle
+        ? null
+        : LinearElementEditor.getSegmentMidpointHitCoords(
+            linearElementEditor,
+            { x: scenePointerX, y: scenePointerY },
+            this.state,
+            elementsMap,
+          );
 
       if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
         this.cursor.set(CURSOR_TYPE.POINTER);

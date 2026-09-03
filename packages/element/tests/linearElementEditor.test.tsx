@@ -3,6 +3,7 @@ import { act, queryByTestId, queryByText } from "@testing-library/react";
 import { vi } from "vitest";
 
 import {
+  CURSOR_TYPE,
   ROUNDNESS,
   VERTICAL_ALIGN,
   KEYS,
@@ -767,7 +768,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `13`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -971,7 +972,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `13`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -1715,6 +1716,58 @@ describe("Test Linear Elements", () => {
 
       // inside the label, off the arrow's path
       const labelOnlyPoint = pointFrom<GlobalPoint>(40, 45);
+
+      it("treats a point handle under the label as the handle, on hover and on pointer down", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: p1[0],
+          y: p1[1],
+          width: p2[0] - p1[0],
+          height: 0,
+          points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], 0)],
+        });
+        const label = {
+          ...API.createElement({
+            type: "text",
+            text: "label",
+            containerId: arrow.id,
+            width: 30,
+            height: 30,
+          }),
+          // centered on the end point
+          labelPosition: 1,
+        } as ExcalidrawTextElementWithContainer;
+        API.setElements([
+          {
+            ...arrow,
+            boundElements: [{ type: "text", id: label.id } as const],
+          },
+          label,
+        ]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        // inside the label and within the end point's handle radius, but
+        // farther from the arrow's path than the arrow's own hit threshold
+        const point = pointFrom<GlobalPoint>(p2[0], p2[1] + 9);
+
+        mouse.moveTo(point[0], point[1]);
+        expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(1);
+        expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+          CURSOR_TYPE.POINTER,
+        );
+
+        drag(point, pointFrom<GlobalPoint>(point[0] + 40, point[1]));
+
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).toBe(1);
+        expect(
+          (h.elements[0] as ExcalidrawLinearElement).points[1][0],
+        ).toBeCloseTo(p2[0] - p1[0] + 40);
+      });
 
       it("grabs the label when the covering element is below the arrow", () => {
         const { arrow, label } = createArrowWithTallLabel();

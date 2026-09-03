@@ -1141,10 +1141,10 @@ export class LinearElementEditor {
       scenePointer.x,
       scenePointer.y,
     );
-    const clickedPointIsHandle = isElbowArrow(element)
-      ? pointIndexUnderCursor === 0 ||
-        pointIndexUnderCursor === element.points.length - 1
-      : pointIndexUnderCursor >= 0;
+    const clickedPointIsHandle = LinearElementEditor.isPointHandle(
+      element,
+      pointIndexUnderCursor,
+    );
 
     const boundTextElement = getBoundTextElement(element, elementsMap);
     let boundTextGrabOffset: { x: number; y: number } | null = null;
@@ -1410,6 +1410,19 @@ export class LinearElementEditor {
       -element.angle as Radians,
     );
     return pointFrom(x - element.x, y - element.y);
+  }
+
+  /**
+   * Whether the point at `index` is an interactive handle. Elbow arrows only
+   * expose their endpoints; their intermediate route points are not draggable.
+   */
+  static isPointHandle(element: ExcalidrawLinearElement, index: number) {
+    return (
+      index >= 0 &&
+      (!isElbowArrow(element) ||
+        index === 0 ||
+        index === element.points.length - 1)
+    );
   }
 
   static getPointIndexUnderCursor(
