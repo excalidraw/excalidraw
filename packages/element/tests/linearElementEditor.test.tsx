@@ -3,6 +3,7 @@ import { act, queryByTestId, queryByText } from "@testing-library/react";
 import { vi } from "vitest";
 
 import {
+  CURSOR_TYPE,
   ROUNDNESS,
   VERTICAL_ALIGN,
   KEYS,
@@ -31,6 +32,7 @@ import * as textElementUtils from "../src/textElement";
 import { getBoundTextElementPosition, getBoundTextMaxWidth } from "../src";
 import { LinearElementEditor } from "../src";
 import { newArrowElement } from "../src";
+import { getLinearElementPathSegments } from "../src/utils";
 
 import {
   getTextEditor,
@@ -213,13 +215,15 @@ describe("Test Linear Elements", () => {
     createTwoPointerLinearElement("line");
     const line = h.elements[0] as ExcalidrawLinearElement;
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`5`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`6`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`5`);
     expect((h.elements[0] as ExcalidrawLinearElement).points.length).toEqual(2);
 
     // drag line from midpoint
     drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`8`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
+      `10`,
+    );
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
     expect(line.points.length).toEqual(3);
     expect(line.points).toMatchInlineSnapshot(`
@@ -502,7 +506,7 @@ describe("Test Linear Elements", () => {
       // drag line from midpoint
       drag(midpoint, pointFrom(midpoint[0] + delta, midpoint[1] + delta));
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `12`,
+        `14`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -543,7 +547,7 @@ describe("Test Linear Elements", () => {
       fireEvent.click(screen.getByTitle("Round"));
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `10`,
+        `11`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`6`);
 
@@ -604,7 +608,7 @@ describe("Test Linear Elements", () => {
       drag(startPoint, endPoint);
 
       expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-        `12`,
+        `13`,
       );
       expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -672,7 +676,7 @@ describe("Test Linear Elements", () => {
         );
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `15`,
+          `18`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
 
@@ -723,7 +727,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] - delta, hitCoords[1] - delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -764,7 +768,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -812,7 +816,7 @@ describe("Test Linear Elements", () => {
         deletePoint(points[2]);
         expect(line.points.length).toEqual(3);
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `18`,
+          `22`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`10`);
 
@@ -870,7 +874,7 @@ describe("Test Linear Elements", () => {
           ),
         );
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `15`,
+          `18`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`9`);
         expect(line.points.length).toEqual(5);
@@ -968,7 +972,7 @@ describe("Test Linear Elements", () => {
         drag(hitCoords, pointFrom(hitCoords[0] + delta, hitCoords[1] + delta));
 
         expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-          `12`,
+          `14`,
         );
         expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`7`);
 
@@ -1199,6 +1203,93 @@ describe("Test Linear Elements", () => {
             "y": "76.11251",
           }
         `);
+      });
+    });
+
+    describe("Test getPointAtPathParameter", () => {
+      it("should survive midpoint insertion", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 0,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+          roundness: null,
+        });
+        API.setElements([arrow]);
+
+        const before = LinearElementEditor.getPointAtPathParameter(
+          arrow,
+          0.25,
+          arrayToMap(h.elements),
+        )!;
+        expect(before[0]).toBeCloseTo(25);
+        expect(before[1]).toBeCloseTo(0);
+
+        // inserting a midpoint re-segments the path but must not move the
+        // point at the same normalized arc-length parameter
+        act(() => {
+          h.app.scene.mutateElement(arrow, {
+            points: [
+              pointFrom<LocalPoint>(0, 0),
+              pointFrom<LocalPoint>(50, 0),
+              pointFrom<LocalPoint>(100, 0),
+            ],
+          });
+        });
+
+        const after = LinearElementEditor.getPointAtPathParameter(
+          arrow,
+          0.25,
+          arrayToMap(h.elements),
+        )!;
+        expect(after[0]).toBeCloseTo(before[0]);
+        expect(after[1]).toBeCloseTo(before[1]);
+      });
+
+      it("should use the unrounded logical path of elbow arrows", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 0),
+            pointFrom<LocalPoint>(100, 100),
+          ],
+          elbowed: true,
+        });
+        API.setElements([arrow]);
+        const elementsMap = arrayToMap(h.elements);
+
+        // Until mixed paths are supported, elbow arrows are treated as the
+        // straight segments between their logical points.
+        const segments = getLinearElementPathSegments(arrow, elementsMap);
+        expect(segments).toHaveLength(2);
+        for (let i = 1; i < segments.length; i++) {
+          const prevEnd = segments[i - 1][segments[i - 1].length - 1];
+          expect(segments[i][0][0]).toBeCloseTo(prevEnd[0]);
+          expect(segments[i][0][1]).toBeCloseTo(prevEnd[1]);
+        }
+
+        const expectedPoints = [
+          pointFrom<GlobalPoint>(0, 0),
+          pointFrom<GlobalPoint>(50, 0),
+          pointFrom<GlobalPoint>(100, 0),
+          pointFrom<GlobalPoint>(100, 50),
+          pointFrom<GlobalPoint>(100, 100),
+        ];
+        for (const [index, parameter] of [0, 0.25, 0.5, 0.75, 1].entries()) {
+          const point = LinearElementEditor.getPointAtPathParameter(
+            arrow,
+            parameter,
+            elementsMap,
+          );
+          expect(point).toEqual(expectedPoints[index]);
+        }
       });
     });
 
@@ -1576,6 +1667,270 @@ describe("Test Linear Elements", () => {
       expect(arrow.y).toBe(100);
       expect(label.x).toBe(0);
       expect(label.y).toBe(0);
+    });
+
+    describe("dragging the label along the arrow", () => {
+      // a tall label, so its lower half is beyond the arrow's hit threshold:
+      // there the pointer is over the label but not over the arrow's path
+      const createArrowWithTallLabel = () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: p1[0],
+          y: p1[1],
+          width: p2[0] - p1[0],
+          height: 0,
+          points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], 0)],
+        });
+        const label = {
+          ...API.createElement({
+            type: "text",
+            text: "label",
+            containerId: arrow.id,
+            width: 30,
+            height: 60,
+          }),
+          labelPosition: 0.5,
+        } as ExcalidrawTextElementWithContainer;
+
+        return {
+          label,
+          arrow: {
+            ...arrow,
+            boundElements: [{ type: "text", id: label.id } as const],
+          },
+        };
+      };
+
+      // covers the label and the arrow's segment midpoint handle, but not the
+      // arrow's start point, so the arrow can still be selected by clicking it
+      const createOccluder = () =>
+        API.createElement({
+          type: "rectangle",
+          x: 30,
+          y: 5,
+          width: 30,
+          height: 50,
+          backgroundColor: "#ff0000",
+          fillStyle: "solid",
+        });
+
+      // inside the label, off the arrow's path
+      const labelOnlyPoint = pointFrom<GlobalPoint>(40, 45);
+
+      it("treats a point handle under the label as the handle, on hover and on pointer down", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: p1[0],
+          y: p1[1],
+          width: p2[0] - p1[0],
+          height: 0,
+          points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], 0)],
+        });
+        const label = {
+          ...API.createElement({
+            type: "text",
+            text: "label",
+            containerId: arrow.id,
+            width: 30,
+            height: 30,
+          }),
+          // centered on the end point
+          labelPosition: 1,
+        } as ExcalidrawTextElementWithContainer;
+        API.setElements([
+          {
+            ...arrow,
+            boundElements: [{ type: "text", id: label.id } as const],
+          },
+          label,
+        ]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        // inside the label and within the end point's handle radius, but
+        // farther from the arrow's path than the arrow's own hit threshold
+        const point = pointFrom<GlobalPoint>(p2[0], p2[1] + 9);
+
+        mouse.moveTo(point[0], point[1]);
+        expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(1);
+        expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+          CURSOR_TYPE.POINTER,
+        );
+
+        drag(point, pointFrom<GlobalPoint>(point[0] + 40, point[1]));
+
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).toBe(1);
+        expect(
+          (h.elements[0] as ExcalidrawLinearElement).points[1][0],
+        ).toBeCloseTo(p2[0] - p1[0] + 40);
+      });
+
+      it("keeps the arrow selected when a point handle is grabbed beyond the arrow's tip", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: p1[0],
+          y: p1[1],
+          width: p2[0] - p1[0],
+          height: 0,
+          points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], 0)],
+        });
+        API.setElements([arrow]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        // past the end point along the arrow: inside the handle radius, but
+        // outside the arrow's own hit area
+        const point = pointFrom<GlobalPoint>(p2[0] + 9, p2[1]);
+
+        mouse.moveTo(point[0], point[1]);
+        expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(1);
+
+        drag(point, pointFrom<GlobalPoint>(point[0] + 40, point[1]));
+
+        expect(h.state.selectionElement).toBeNull();
+        expect(h.state.selectedElementIds[arrow.id]).toBe(true);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+        expect(
+          (h.elements[0] as ExcalidrawLinearElement).points[1][0],
+        ).toBeCloseTo(p2[0] - p1[0] + 40);
+      });
+
+      it("grabs the label when the covering element is below the arrow", () => {
+        const { arrow, label } = createArrowWithTallLabel();
+        API.setElements([createOccluder(), arrow, label]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        drag(labelOnlyPoint, pointFrom<GlobalPoint>(50, 45));
+
+        expect(
+          (h.elements[2] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).toBeCloseTo(0.75);
+      });
+
+      it("does not grab the label when it is covered by an element above the arrow", () => {
+        const { arrow, label } = createArrowWithTallLabel();
+        API.setElements([arrow, label, createOccluder()]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        drag(labelOnlyPoint, pointFrom<GlobalPoint>(50, 45));
+
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).toBe(0.5);
+      });
+
+      it("grabs an elbow arrow's label lying over an intermediate route point", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 0),
+            pointFrom<LocalPoint>(100, 100),
+          ],
+          elbowed: true,
+        });
+        const label = {
+          ...API.createElement({
+            type: "text",
+            text: "label",
+            containerId: arrow.id,
+            width: 30,
+            height: 30,
+          }),
+          // the arc-length middle of this symmetric elbow sits on the
+          // rounded corner, right next to the route point at (100, 0)
+          labelPosition: 0.5,
+        } as ExcalidrawTextElementWithContainer;
+        API.setElements([
+          {
+            ...arrow,
+            boundElements: [{ type: "text", id: label.id } as const],
+          },
+          label,
+        ]);
+
+        mouse.reset();
+        mouse.clickAt(0, 0);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        // inside the label AND within the hit radius of the route point at
+        // (100, 0) — pre-fix the route point swallowed this pointerdown and
+        // the label never moved
+        const grabPoint = pointFrom<GlobalPoint>(97, 3);
+
+        drag(
+          grabPoint,
+          pointFrom<GlobalPoint>(grabPoint[0] - 40, grabPoint[1]),
+        );
+
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).not.toBe(0.5);
+      });
+
+      it("gives the segment midpoint handle precedence over the label on top of it", () => {
+        const { arrow, label } = createArrowWithTallLabel();
+        API.setElements([arrow, label]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+        expect((h.elements[0] as ExcalidrawLinearElement).points.length).toBe(
+          2,
+        );
+
+        // the label sits centered on the midpoint knob; dragging there must
+        // bend the arrow, not slide the label
+        drag(midpoint, pointFrom<GlobalPoint>(midpoint[0], midpoint[1] + 40));
+
+        expect((h.elements[0] as ExcalidrawLinearElement).points.length).toBe(
+          3,
+        );
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).toBe(0.5);
+      });
+
+      it("leaves the segment midpoint handle grabbable under a covered label", () => {
+        const { arrow, label } = createArrowWithTallLabel();
+        API.setElements([arrow, label, createOccluder()]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+        expect((h.elements[0] as ExcalidrawLinearElement).points.length).toBe(
+          2,
+        );
+
+        // the midpoint handle sits under the label, which is itself covered
+        drag(midpoint, pointFrom<GlobalPoint>(midpoint[0], midpoint[1] + 40));
+
+        expect(
+          h.state.selectedLinearElement?.initialState.segmentMidpoint.value,
+        ).not.toBeNull();
+        expect((h.elements[0] as ExcalidrawLinearElement).points.length).toBe(
+          3,
+        );
+        expect(
+          (h.elements[1] as ExcalidrawTextElementWithContainer).labelPosition,
+        ).toBe(0.5);
+      });
     });
   });
 

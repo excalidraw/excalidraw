@@ -257,6 +257,7 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
+  DEFAULT_BOUND_TEXT_LABEL_POSITION,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6580,7 +6581,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
-  private getElementsAtPosition(
+  getElementsAtPosition(
     x: number,
     y: number,
     opts?: {
@@ -6650,7 +6651,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private hitElement(
+  hitElement(
     x: number,
     y: number,
     element: NonDeletedExcalidrawElement,
@@ -6822,13 +6823,15 @@ class App extends React.Component<AppProps, AppState> {
         shouldBindToContainer = true;
       }
     }
-    // The endpoint flow always creates a fresh text: the lookups below would
-    // otherwise adopt a currently selected text (wherever it sits on canvas)
-    // or one that happens to lie around the anchor — even a container-bound
-    // one — and bind the arrow to that instead.
     const existingTextElement = arrowEndpointBinding
       ? null
       : this.getSelectedTextElement(container) ||
+        (container && isArrowElement(container)
+          ? getBoundTextElement(
+              container,
+              this.scene.getNonDeletedElementsMap(),
+            )
+          : null) ||
         this.getTextElementAtPosition(sceneX, sceneY);
 
     const fontFamily =
@@ -6934,6 +6937,10 @@ class App extends React.Component<AppProps, AppState> {
             ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN),
         containerId: shouldBindToContainer ? container?.id : undefined,
+        labelPosition:
+          shouldBindToContainer && container && isArrowElement(container)
+            ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+            : null,
         groupIds: container?.groupIds ?? [],
         lineHeight,
         angle: container
@@ -8234,6 +8241,10 @@ class App extends React.Component<AppProps, AppState> {
     invalidateContextMenu = true;
   };
 
+  /**
+   * Applies the hover affordances of a selected linear element: the cursor,
+   * plus the hovered-handle state that renders them highlighted.
+   */
   handleHoverSelectedLinearElement(
     linearElementEditor: LinearElementEditor,
     scenePointerX: number,
@@ -8250,63 +8261,55 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     if (this.state.selectedLinearElement) {
-      let hoverPointIndex = -1;
-      let segmentMidPointHoveredCoords = null;
-      if (
-        hitElementItself({
-          point: pointFrom(scenePointerX, scenePointerY),
-          element,
-          elementsMap,
-          threshold: this.getElementHitThreshold(element),
-        })
-      ) {
-        hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-          element,
-          elementsMap,
-          this.state.zoom,
-          scenePointerX,
-          scenePointerY,
-        );
-        segmentMidPointHoveredCoords =
-          LinearElementEditor.getSegmentMidpointHitCoords(
+      // the same hit tests, in the same precedence, as
+      // `LinearElementEditor.handlePointerDown`, so the cursor never promises
+      // an interaction (e.g. grabbing the label) that pointer down won't
+      // deliver. Both handle radii exceed the element's own hit threshold,
+      // so these must not be gated on hitting the element itself.
+      const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+        element,
+        elementsMap,
+        this.state.zoom,
+        scenePointerX,
+        scenePointerY,
+      );
+      const isHoveringAPointHandle = LinearElementEditor.isPointHandle(
+        element,
+        hoverPointIndex,
+      );
+      const segmentMidPointHoveredCoords = isHoveringAPointHandle
+        ? null
+        : LinearElementEditor.getSegmentMidpointHitCoords(
             linearElementEditor,
             { x: scenePointerX, y: scenePointerY },
             this.state,
-            this.scene.getNonDeletedElementsMap(),
+            elementsMap,
           );
-        const isHoveringAPointHandle = isElbowArrow(element)
-          ? hoverPointIndex === 0 ||
-            hoverPointIndex === element.points.length - 1
-          : hoverPointIndex >= 0;
-        if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
-          this.cursor.set(CURSOR_TYPE.POINTER);
-        } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-          if (
-            // Elbow arrows can only be moved when unconnected
-            !isElbowArrow(element) ||
-            !(element.startBinding || element.endBinding)
-          ) {
-            if (
-              this.state.activeTool.type !== "lasso" ||
-              Object.keys(this.state.selectedElementIds).length > 0
-            ) {
-              this.cursor.set(CURSOR_TYPE.MOVE);
-            }
-          }
-        }
-      } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-        if (
-          // Elbow arrow can only be moved when unconnected
-          !isElbowArrow(element) ||
-          !(element.startBinding || element.endBinding)
-        ) {
-          if (
-            this.state.activeTool.type !== "lasso" ||
-            Object.keys(this.state.selectedElementIds).length > 0
-          ) {
-            this.cursor.set(CURSOR_TYPE.MOVE);
-          }
-        }
+
+      if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
+        this.cursor.set(CURSOR_TYPE.POINTER);
+      } else if (
+        // an arrow's bound text is draggable along the arrow. The handles
+        // and the midpoint knob sitting under the label keep precedence so a
+        // labeled arrow can still be bent at its middle, while the label
+        // itself is grabbable even where it extends beyond the arrow's own
+        // hit area.
+        this.arrowText.isBoundTextGrabbable(
+          element,
+          scenePointerX,
+          scenePointerY,
+        )
+      ) {
+        this.cursor.set(CURSOR_TYPE.GRAB);
+      } else if (
+        this.hitElement(scenePointerX, scenePointerY, element) &&
+        // Elbow arrows can only be moved when unconnected
+        (!isElbowArrow(element) ||
+          !(element.startBinding || element.endBinding)) &&
+        (this.state.activeTool.type !== "lasso" ||
+          Object.keys(this.state.selectedElementIds).length > 0)
+      ) {
+        this.cursor.set(CURSOR_TYPE.MOVE);
       }
 
       if (
@@ -9230,6 +9233,7 @@ class App extends React.Component<AppProps, AppState> {
         allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
+        arrowLabel: false,
         hasHitCommonBoundingBoxOfSelectedElements:
           this.isHittingCommonBoundingBoxOfSelectedElements(
             origin,
@@ -9405,9 +9409,11 @@ class App extends React.Component<AppProps, AppState> {
             linearElementEditor,
             this.scene,
           );
+
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
           }
+          pointerDownState.hit.arrowLabel = ret.hitBoundText;
           if (ret.linearElementEditor) {
             this.setState({ selectedLinearElement: ret.linearElementEditor });
           }
@@ -9539,7 +9545,12 @@ class App extends React.Component<AppProps, AppState> {
         const someHitElementIsSelected =
           pointerDownState.hit.allHitElements.some((element) =>
             this.isASelectedElement(element),
-          );
+          ) ||
+          // the selected linear element's point handles, midpoint knob and
+          // label extend beyond its own hit area, so a hit reported by
+          // `LinearElementEditor.handlePointerDown` counts even when the
+          // position-based hit test above missed the element
+          (hitElement !== null && this.isASelectedElement(hitElement));
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
@@ -9819,8 +9830,14 @@ class App extends React.Component<AppProps, AppState> {
 
       if (hasBoundTextElement(element)) {
         container = element as NonDeleted<ExcalidrawTextContainer>;
-        sceneX = element.x + element.width / 2;
-        sceneY = element.y + element.height / 2;
+        const labelCenter = this.arrowText.getLabelCenter(element);
+        if (labelCenter) {
+          sceneX = labelCenter.x;
+          sceneY = labelCenter.y;
+        } else {
+          sceneX = element.x + element.width / 2;
+          sceneY = element.y + element.height / 2;
+        }
       }
       this.startTextEditing({
         sceneX,
@@ -10703,6 +10720,16 @@ class App extends React.Component<AppProps, AppState> {
               },
             },
           });
+          return;
+        }
+
+        if (
+          this.arrowText.maybeDragLabel(
+            linearElementEditor,
+            pointerDownState,
+            pointerCoords,
+          )
+        ) {
           return;
         }
 
@@ -11637,6 +11664,7 @@ class App extends React.Component<AppProps, AppState> {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
+            hitBoundText: pointerDownState.hit.arrowLabel,
           });
           if (editingLinearElement !== this.state.selectedLinearElement) {
             this.setState({
@@ -11694,6 +11722,7 @@ class App extends React.Component<AppProps, AppState> {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
+            hitBoundText: pointerDownState.hit.arrowLabel,
           });
         }
 
@@ -12494,13 +12523,19 @@ class App extends React.Component<AppProps, AppState> {
             }),
           },
           // reset once the tool revert has settled
-          () => this.cursor.reset(),
+          () => {
+            this.cursor.reset();
+            this.cursor.refreshHover();
+          },
         );
       } else {
-        this.setState({
-          newElement: null,
-          suggestedBinding: null,
-        });
+        this.setState(
+          {
+            newElement: null,
+            suggestedBinding: null,
+          },
+          () => this.cursor.refreshHover(),
+        );
       }
     });
   }

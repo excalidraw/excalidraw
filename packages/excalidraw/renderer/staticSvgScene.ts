@@ -1,4 +1,5 @@
 import {
+  BOUND_TEXT_PADDING,
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   SVG_NS,
@@ -321,14 +322,23 @@ const renderElementToSvg = (
           elementsMap,
         );
 
-        const maskX = offsetX + boundTextCoords.x - element.x;
-        const maskY = offsetY + boundTextCoords.y - element.y;
+        // the same padded hole the canvas renderers cut around the label
+        const maskX =
+          offsetX + boundTextCoords.x - element.x - BOUND_TEXT_PADDING;
+        const maskY =
+          offsetY + boundTextCoords.y - element.y - BOUND_TEXT_PADDING;
 
         maskRectInvisible.setAttribute("x", maskX.toString());
         maskRectInvisible.setAttribute("y", maskY.toString());
         maskRectInvisible.setAttribute("fill", "#000");
-        maskRectInvisible.setAttribute("width", `${boundText.width}`);
-        maskRectInvisible.setAttribute("height", `${boundText.height}`);
+        maskRectInvisible.setAttribute(
+          "width",
+          `${boundText.width + BOUND_TEXT_PADDING * 2}`,
+        );
+        maskRectInvisible.setAttribute(
+          "height",
+          `${boundText.height + BOUND_TEXT_PADDING * 2}`,
+        );
         maskRectInvisible.setAttribute("opacity", "1");
         maskPath.appendChild(maskRectInvisible);
       }

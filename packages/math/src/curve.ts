@@ -212,23 +212,19 @@ export function curveIntersectLineSegment<
 }
 
 /**
- * Finds the closest point on the Bezier curve from another point
+ * Finds the parameter on the Bezier curve whose point is closest to another
+ * point
  *
- * @param x
- * @param y
- * @param P0
- * @param P1
- * @param P2
- * @param P3
- * @param tolerance
- * @param maxLevel
- * @returns
+ * @param c The curve to test
+ * @param p The point to measure from
+ * @param tolerance The width of the search window under which the bisection
+ *   stops refining the parameter
  */
-export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
+export function curveClosestParameter<Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
   p: Point,
   tolerance: number = 1e-3,
-): Point | null {
+): number {
   const localMinimum = (
     min: number,
     max: number,
@@ -253,7 +249,7 @@ export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
 
   const maxSteps = 30;
   let closestStep = 0;
-  for (let min = Infinity, step = 0; step < maxSteps; step++) {
+  for (let min = Infinity, step = 0; step <= maxSteps; step++) {
     const d = pointDistance(p, bezierEquation(c, step / maxSteps));
     if (d < min) {
       min = d;
@@ -263,18 +259,27 @@ export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
 
   const t0 = Math.max((closestStep - 1) / maxSteps, 0);
   const t1 = Math.min((closestStep + 1) / maxSteps, 1);
-  const solution = localMinimum(t0, t1, (t) =>
+  const param = localMinimum(t0, t1, (t) =>
     pointDistance(p, bezierEquation(c, t)),
   );
 
-  // `solution` is only nullish when the search window is narrower than the
-  // tolerance (e.g. a caller-supplied tolerance larger than the window). A
-  // legitimate solution of `t = 0` must not be treated as a failure.
-  if (solution == null) {
-    return null;
-  }
+  return param ?? closestStep / maxSteps;
+}
 
-  return bezierEquation(c, solution);
+/**
+ * Finds the closest point on the Bezier curve from another point
+ *
+ * @param c The curve to test
+ * @param p The point to measure from
+ * @param tolerance The width of the search window under which the bisection
+ *   stops refining the parameter
+ */
+export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
+  c: Curve<Point>,
+  p: Point,
+  tolerance: number = 1e-3,
+): Point {
+  return bezierEquation(c, curveClosestParameter(c, p, tolerance));
 }
 
 /**
@@ -287,16 +292,9 @@ export function curveClosestPoint<Point extends GlobalPoint | LocalPoint>(
 export function curvePointDistance<Point extends GlobalPoint | LocalPoint>(
   c: Curve<Point>,
   p: Point,
+  tolerance: number = 1e-3,
 ) {
-  const closest = curveClosestPoint(c, p);
-
-  // No closest point found: report an "infinitely far" distance so this curve
-  // is never mistaken for the nearest component when fed into `Math.min`.
-  if (!closest) {
-    return Infinity;
-  }
-
-  return pointDistance(p, closest);
+  return pointDistance(p, curveClosestPoint(c, p, tolerance));
 }
 
 /**
@@ -518,6 +516,8 @@ export function curveLengthAtParameter<P extends GlobalPoint | LocalPoint>(
 export function curvePointAtLength<P extends GlobalPoint | LocalPoint>(
   c: Curve<P>,
   percent: number,
+  /** pass the curve's total length when already known to skip recomputing it */
+  totalLength: number = curveLength(c),
 ): P {
   if (percent <= 0) {
     return bezierEquation(c, 0);
@@ -527,7 +527,6 @@ export function curvePointAtLength<P extends GlobalPoint | LocalPoint>(
     return bezierEquation(c, 1);
   }
 
-  const totalLength = curveLength(c);
   const targetLength = totalLength * percent;
 
   // Binary search to find parameter t where length at t equals target length

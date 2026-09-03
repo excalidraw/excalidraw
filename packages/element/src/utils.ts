@@ -40,7 +40,7 @@ import { generateLinearCollisionShape } from "./shape";
 
 import { hitElementItself, isPointInElement } from "./collision";
 import { LinearElementEditor } from "./linearElementEditor";
-import { isRectangularElement } from "./typeChecks";
+import { isElbowArrow, isRectangularElement } from "./typeChecks";
 import { maxBindingDistance_simple } from "./binding";
 
 import {
@@ -58,6 +58,8 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+
+export type LinearPathSegment = LineSegment<GlobalPoint> | Curve<GlobalPoint>;
 
 type ElementShape = [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]];
 
@@ -125,7 +127,7 @@ const setElementShapesCacheEntry = <T extends ExcalidrawElement>(
 export function deconstructLinearOrFreeDrawElement(
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, 0);
 
   if (cachedShape) {
@@ -133,8 +135,8 @@ export function deconstructLinearOrFreeDrawElement(
   }
 
   const ops = generateLinearCollisionShape(element, elementsMap);
-  const lines = [];
-  const curves = [];
+  const lines: LineSegment<GlobalPoint>[] = [];
+  const curves: Curve<GlobalPoint>[] = [];
 
   for (let idx = 0; idx < ops.length; idx += 1) {
     const op = ops[idx];
@@ -193,10 +195,41 @@ export function deconstructLinearOrFreeDrawElement(
     }
   }
 
-  const shape = [lines, curves] as ElementShape;
+  const shape: ElementShape = [lines, curves];
   setElementShapesCacheEntry(element, shape, 0);
 
   return shape;
+}
+
+export function getLinearElementPathSegments(
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
+): LinearPathSegment[] {
+  // For now, model elbow arrows as their unrounded logical path. Rounded
+  // joints can be incorporated once the path model supports mixed straight
+  // and curved segments.
+  if (isElbowArrow(element)) {
+    return element.points
+      .slice(1)
+      .map((point, index) =>
+        lineSegment<GlobalPoint>(
+          pointFrom<GlobalPoint>(
+            element.x + element.points[index][0],
+            element.y + element.points[index][1],
+          ),
+          pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+        ),
+      );
+  }
+
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
+
+  // Non-elbow paths currently contain only one segment type. Mixed paths
+  // should consume an ordered operation stream instead of these type buckets.
+  return curves.length > 0 ? curves : lines;
 }
 
 /**
@@ -210,7 +243,7 @@ export function deconstructLinearOrFreeDrawElement(
 export function deconstructRectanguloidElement(
   element: ExcalidrawRectanguloidElement,
   offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
   if (cachedShape) {
@@ -422,7 +455,7 @@ export function getDiamondBaseCorners(
 export function deconstructDiamondElement(
   element: ExcalidrawDiamondElement,
   offset: number = 0,
-): [LineSegment<GlobalPoint>[], Curve<GlobalPoint>[]] {
+): ElementShape {
   const cachedShape = getElementShapesCacheEntry(element, offset);
 
   if (cachedShape) {
