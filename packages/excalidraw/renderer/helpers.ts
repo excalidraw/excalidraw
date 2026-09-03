@@ -21,6 +21,24 @@ export const fillCircle = (
   }
 };
 
+export const fillSquare = (
+  context: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  radius: number,
+  stroke: boolean,
+  fill = true,
+) => {
+  context.beginPath();
+  context.rect(cx - radius, cy - radius, radius * 2, radius * 2);
+  if (fill) {
+    context.fill();
+  }
+  if (stroke) {
+    context.stroke();
+  }
+};
+
 export const getNormalizedCanvasDimensions = (
   canvas: HTMLCanvasElement,
   scale: number,

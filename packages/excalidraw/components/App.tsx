@@ -234,6 +234,8 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  canSplitPoints,
+  toggleSplitPoint,
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
@@ -7081,6 +7083,32 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       const selectedLinearElement: ExcalidrawLinearElement =
         selectedElements[0];
+
+      // NOTE: double-clicking an interior point handle of a curved simple arrow
+      // toggles a split there, breaking the curve into two separate curves
+      // (i.e. a sharp transition), or restoring continuity if already split
+      if (
+        !event[KEYS.CTRL_OR_CMD] &&
+        this.state.selectedLinearElement?.elementId ===
+          selectedLinearElement.id &&
+        canSplitPoints(selectedLinearElement)
+      ) {
+        const pointIndex = LinearElementEditor.getPointIndexUnderCursor(
+          selectedLinearElement,
+          this.scene.getNonDeletedElementsMap(),
+          this.state.zoom,
+          sceneX,
+          sceneY,
+        );
+        const splitPoints = toggleSplitPoint(selectedLinearElement, pointIndex);
+
+        if (splitPoints !== undefined) {
+          this.store.scheduleCapture();
+          this.scene.mutateElement(selectedLinearElement, { splitPoints });
+
+          return;
+        }
+      }
 
       if (
         ((event[KEYS.CTRL_OR_CMD] && isSimpleArrow(selectedLinearElement)) ||

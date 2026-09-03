@@ -70,6 +70,11 @@ import {
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import {
+  shiftSplitPointsOnDelete,
+  shiftSplitPointsOnDuplicate,
+  shiftSplitPointsOnInsert,
+} from "./splitPoints";
 import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
 import { ShapeCache, toggleLinePolygonState } from "./shape";
@@ -1541,7 +1546,14 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    scene.mutateElement(element, { points: nextPoints });
+    const splitPoints = isArrowElement(element)
+      ? shiftSplitPointsOnDuplicate(element, selectedPointsIndices)
+      : undefined;
+
+    scene.mutateElement(element, {
+      points: nextPoints,
+      ...(splitPoints !== undefined ? { splitPoints } : {}),
+    });
 
     // temp hack to ensure the line doesn't move when adding point to the end,
     // potentially expanding the bounding box
@@ -1581,6 +1593,14 @@ export class LinearElementEditor {
     const nextPoints = element.points.filter((_, idx) => {
       return !pointIndices.includes(idx);
     });
+
+    if (isArrowElement(element)) {
+      const splitPoints = shiftSplitPointsOnDelete(element, pointIndices);
+
+      if (splitPoints !== undefined) {
+        app.scene.mutateElement(element, { splitPoints });
+      }
+    }
 
     const isPolygon = isLineElement(element) && element.polygon;
 
@@ -1810,7 +1830,15 @@ export class LinearElementEditor {
       ...element.points.slice(segmentMidpoint.index!),
     ];
 
-    scene.mutateElement(element, { points });
+    const splitPoints = shiftSplitPointsOnInsert(
+      element,
+      segmentMidpoint.index!,
+    );
+
+    scene.mutateElement(element, {
+      points,
+      ...(splitPoints !== undefined ? { splitPoints } : {}),
+    });
 
     ret.pointerDownState = {
       ...linearElementEditor.initialState,

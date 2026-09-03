@@ -25,7 +25,6 @@ import type {
   Radians,
 } from "@excalidraw/math";
 import type { AppState } from "@excalidraw/excalidraw/types";
-import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { generateRoughOptions } from "./shape";
 import { ShapeCache } from "./shape";
@@ -47,10 +46,10 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 import { intersectElementWithLineSegment } from "./collision";
+import { generateSplitCurves, getSplitPoints } from "./splitPoints";
 import { elementOverlapsWithFrame, getContainingFrame } from "./frame";
 
 import type { Drawable, Op } from "roughjs/bin/core";
-import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type {
   Arrowhead,
   ElementsMap,
@@ -907,7 +906,6 @@ export const getArrowheadPoints = (
   return [tx, ty, x3, y3, x4, y4];
 };
 
-// TODO reuse shape.ts
 const generateLinearElementShape = (
   element: ExcalidrawLinearElement,
 ): Drawable => {
@@ -924,8 +922,21 @@ const generateLinearElementShape = (
     return "linearPath";
   })();
 
+  if (method === "curve") {
+    // unsplit arrows are a single curve; split arrows are several curves
+    // with their ops merged into one drawable
+    return generateSplitCurves(
+      generator,
+      element.points,
+      getSplitPoints(element),
+      options,
+    );
+  }
+
   return generator[method](
-    element.points as Mutable<LocalPoint>[] as RoughPoint[],
+    // SAFETY: LocalPoint pairs are readonly finite [x, y] numbers, exactly
+    // the shape rough.js consumes; the cast only drops readonly
+    element.points as unknown as [number, number][],
     options,
   );
 };
@@ -1096,14 +1107,15 @@ export const getElementPointsCoords = (
 ): Bounds => {
   // This might be computationally heavey
   const gen = rough.generator();
-  const curve =
+  const options = generateRoughOptions(element);
+  const splitPoints = getSplitPoints(element).filter(
+    (index) => index < points.length - 1,
+  );
+  const curves =
     element.roundness == null
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
-  const ops = getCurvePathOps(curve);
+      ? [gen.linearPath(points as [number, number][], options)]
+      : [generateSplitCurves(gen, points, splitPoints, options)];
+  const ops = curves.flatMap((curve) => getCurvePathOps(curve));
   const [minX, minY, maxX, maxY] = getMinMaxXYFromCurvePathOps(ops);
   return [
     minX + element.x,

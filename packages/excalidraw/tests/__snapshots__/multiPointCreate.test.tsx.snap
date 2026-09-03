@@ -38,6 +38,7 @@ exports[`multi point mode in linear elements > arrow 3`] = `
     "type": 2,
   },
   "seed": 1278240551,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",

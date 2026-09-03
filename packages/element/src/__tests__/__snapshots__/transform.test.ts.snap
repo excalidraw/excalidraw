@@ -117,6 +117,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id49",
@@ -178,6 +179,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing s
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "diamond-1",
@@ -375,6 +377,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "text-1",
@@ -483,6 +486,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to shapes whe
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id41",
@@ -665,6 +669,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to text when 
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "id45",
@@ -887,6 +892,7 @@ exports[`Test Transform > should transform linear elements 1`] = `
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -934,6 +940,7 @@ exports[`Test Transform > should transform linear elements 2`] = `
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": "dot",
   "startBinding": null,
   "strokeColor": "#1971c2",
@@ -1537,6 +1544,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
     "type": 2,
   },
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "Bob",
@@ -1601,6 +1609,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
     "type": 2,
   },
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": {
     "elementId": "Bob",
@@ -1920,6 +1929,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -1972,6 +1982,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",
@@ -2024,6 +2035,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1098ad",
@@ -2076,6 +2088,7 @@ exports[`Test Transform > should transform to labelled arrows when label provide
   "roughness": 1,
   "roundness": null,
   "seed": Any<Number>,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1098ad",
