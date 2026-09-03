@@ -131,6 +131,15 @@ type PointMoveOtherUpdates = {
   suggestedBinding?: AppState["suggestedBinding"] | null;
 };
 
+const BoundTextPositionCache = new WeakMap<
+  ExcalidrawTextElementWithContainer,
+  {
+    containerVersion: ExcalidrawElement["version"];
+    textVersion: ExcalidrawElement["version"];
+    position: { x: number; y: number };
+  }
+>();
+
 export class LinearElementEditor {
   public readonly elementId: ExcalidrawElement["id"] & {
     _brand: "excalidrawLinearElementId";
@@ -2060,11 +2069,38 @@ export class LinearElementEditor {
     boundTextElement: ExcalidrawTextElementWithContainer,
     elementsMap: ElementsMap,
   ): { x: number; y: number } => {
-    const points = LinearElementEditor.getPointsGlobalCoordinates(
+    // derived on every hit test, bounds query and render of the label, so
+    // memoize on the pair of versions the result depends on
+    const cached = BoundTextPositionCache.get(boundTextElement);
+    if (
+      cached &&
+      cached.containerVersion === element.version &&
+      cached.textVersion === boundTextElement.version
+    ) {
+      return cached.position;
+    }
+
+    const position = LinearElementEditor.computeBoundTextElementPosition(
       element,
+      boundTextElement,
       elementsMap,
     );
-    if (points.length < 2) {
+
+    BoundTextPositionCache.set(boundTextElement, {
+      containerVersion: element.version,
+      textVersion: boundTextElement.version,
+      position,
+    });
+
+    return position;
+  };
+
+  private static computeBoundTextElementPosition = (
+    element: ExcalidrawLinearElement,
+    boundTextElement: ExcalidrawTextElementWithContainer,
+    elementsMap: ElementsMap,
+  ): { x: number; y: number } => {
+    if (element.points.length < 2) {
       return { x: boundTextElement.x, y: boundTextElement.y };
     }
     if (isArrowElement(element) && boundTextElement.labelPosition != null) {
