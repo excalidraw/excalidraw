@@ -186,11 +186,16 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    ownerDocument = document,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    // Document the elements' fonts should be resolved against — matters when
+    // exporting from a scene mounted in a different document (e.g. an
+    // iframe) than the one this module was loaded into. See #11974.
+    ownerDocument?: Document;
   },
   createCanvas: (
     width: number,
@@ -202,7 +207,7 @@ export const exportToCanvas = async (
     return { canvas, scale: appState.exportScale };
   },
   loadFonts: () => Promise<void> = async () => {
-    await Fonts.loadElementsFonts(elements);
+    await Fonts.loadElementsFonts(elements, ownerDocument);
   },
 ) => {
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
