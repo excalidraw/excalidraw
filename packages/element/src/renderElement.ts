@@ -206,6 +206,8 @@ const generateElementCanvas = (
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  /** arrows with a label cache only their body; see `drawElementFromCanvas` */
+  isArrowBodyOnly = false,
 ): ExcalidrawElementWithCanvas | null => {
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d")!;
@@ -251,15 +253,13 @@ const generateElementCanvas = (
   );
 
   const rc = rough.canvas(canvas);
-  const shouldRenderBodyOnly =
-    isArrowElement(element) && !!getBoundTextElement(element, elementsMap);
 
   drawElementOnCanvas(
     element,
     rc,
     context,
     renderConfig,
-    shouldRenderBodyOnly ? "body" : "all",
+    isArrowBodyOnly ? "body" : "all",
   );
 
   context.restore();
@@ -272,7 +272,7 @@ const generateElementCanvas = (
     zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
-    isArrowBodyOnly: shouldRenderBodyOnly,
+    isArrowBodyOnly,
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     imageCrop: isImageElement(element) ? element.crop : null,
@@ -325,12 +325,15 @@ const drawImagePlaceholder = (
   );
 };
 
+/** which of an arrow's shapes to paint; non-arrows always paint everything */
+type LinearElementPart = "all" | "body" | "arrowheads";
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
-  linearElementPart: "all" | "body" | "arrowheads" = "all",
+  linearElementPart: LinearElementPart = "all",
 ) => {
   switch (element.type) {
     case "rectangle":
@@ -574,7 +577,7 @@ const generateElementWithCanvas = (
 
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
-  const shouldRenderArrowBodyOnly =
+  const isArrowBodyOnly =
     isArrowElement(element) && !!getBoundTextElement(element, elementsMap);
 
   if (
@@ -582,7 +585,7 @@ const generateElementWithCanvas = (
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
-    prevElementWithCanvas.isArrowBodyOnly !== shouldRenderArrowBodyOnly ||
+    prevElementWithCanvas.isArrowBodyOnly !== isArrowBodyOnly ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
     const elementWithCanvas = generateElementCanvas(
@@ -591,6 +594,7 @@ const generateElementWithCanvas = (
       zoom,
       renderConfig,
       appState,
+      isArrowBodyOnly,
     );
 
     if (!elementWithCanvas) {
@@ -623,7 +627,11 @@ const drawElementFromCanvas = (
 
   const boundTextElement = getBoundTextElement(element, allElementsMap);
 
-  const drawCachedCanvas = (canvas: HTMLCanvasElement) => {
+  /**
+   * Runs `draw` with the element's rotation (and an image's scale) applied
+   * about the element center, leaving the context as it found it.
+   */
+  const withElementTransform = (draw: () => void) => {
     context.save();
 
     // we translate context to element center so that rotation and scale
@@ -643,15 +651,20 @@ const drawElementFromCanvas = (
 
     // revert afterwards we don't have account for it during drawing
     context.translate(-cx, -cy);
-    context.drawImage(
-      canvas,
-      (x1 + appState.scrollX) * window.devicePixelRatio - padding,
-      (y1 + appState.scrollY) * window.devicePixelRatio - padding,
-      canvas.width / elementWithCanvas.scale,
-      canvas.height / elementWithCanvas.scale,
-    );
+    draw();
     context.restore();
   };
+
+  const drawCachedCanvas = (canvas: HTMLCanvasElement) =>
+    withElementTransform(() => {
+      context.drawImage(
+        canvas,
+        (x1 + appState.scrollX) * window.devicePixelRatio - padding,
+        (y1 + appState.scrollY) * window.devicePixelRatio - padding,
+        canvas.width / elementWithCanvas.scale,
+        canvas.height / elementWithCanvas.scale,
+      );
+    });
 
   if (isArrowElement(element) && boundTextElement) {
     // Punch the label "hole" only out of the cached arrow body. Arrowhead
@@ -689,17 +702,14 @@ const drawElementFromCanvas = (
     drawCachedCanvas(elementWithCanvas.canvas);
     context.restore();
 
-    context.save();
-    context.translate(cx, cy);
-    context.rotate(element.angle);
-    context.translate(-cx, -cy);
-    context.translate(
-      (element.x + appState.scrollX) * window.devicePixelRatio,
-      (element.y + appState.scrollY) * window.devicePixelRatio,
-    );
-    context.scale(window.devicePixelRatio, window.devicePixelRatio);
-    drawElementOnCanvas(element, rc, context, renderConfig, "arrowheads");
-    context.restore();
+    withElementTransform(() => {
+      context.translate(
+        (element.x + appState.scrollX) * window.devicePixelRatio,
+        (element.y + appState.scrollY) * window.devicePixelRatio,
+      );
+      context.scale(window.devicePixelRatio, window.devicePixelRatio);
+      drawElementOnCanvas(element, rc, context, renderConfig, "arrowheads");
+    });
   } else {
     drawCachedCanvas(elementWithCanvas.canvas);
   }
@@ -889,6 +899,21 @@ export const renderElement = (
 
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
+        // draws the element (or a part of an arrow) rotated about its center
+        const drawPart = (part: LinearElementPart) => {
+          context.save();
+          context.rotate(element.angle);
+
+          if (element.type === "image") {
+            // note: scale must be applied *after* rotating
+            context.scale(element.scale[0], element.scale[1]);
+          }
+
+          context.translate(-shiftX, -shiftY);
+          drawElementOnCanvas(element, rc, context, renderConfig, part);
+          context.restore();
+        };
+
         if (isArrowElement(element) && boundTextElement) {
           // Draw arrow directly as vector (no temp-canvas bitmap blit which
           // introduces resampling blur). The label "hole" is cut only out of
@@ -925,26 +950,12 @@ export const renderElement = (
           context.rect(-outerHalf, -outerHalf, outerHalf * 2, outerHalf * 2);
           context.rect(holeX, holeY, holeWidth, holeHeight);
           context.clip("evenodd");
-          context.rotate(element.angle);
-          context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, "body");
+          drawPart("body");
           context.restore();
 
-          context.save();
-          context.rotate(element.angle);
-          context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig, "arrowheads");
-          context.restore();
+          drawPart("arrowheads");
         } else {
-          context.rotate(element.angle);
-
-          if (element.type === "image") {
-            // note: scale must be applied *after* rotating
-            context.scale(element.scale[0], element.scale[1]);
-          }
-
-          context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
+          drawPart("all");
         }
 
         context.restore();
