@@ -234,13 +234,10 @@ const bindTextToContainer = (
     ...textProps,
     containerId: container.id,
     strokeColor: textProps.strokeColor || container.strokeColor,
+    labelPosition: isArrowElement(container)
+      ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+      : null,
   });
-
-  if (isArrowElement(container)) {
-    Object.assign(textElement, {
-      labelPosition: DEFAULT_BOUND_TEXT_LABEL_POSITION,
-    });
-  }
 
   Object.assign(container, {
     boundElements: (container.boundElements || []).concat({

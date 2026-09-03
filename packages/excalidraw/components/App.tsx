@@ -6866,6 +6866,10 @@ class App extends React.Component<AppProps, AppState> {
             ? VERTICAL_ALIGN.MIDDLE
             : DEFAULT_VERTICAL_ALIGN),
         containerId: shouldBindToContainer ? container?.id : undefined,
+        labelPosition:
+          shouldBindToContainer && container && isArrowElement(container)
+            ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+            : null,
         groupIds: container?.groupIds ?? [],
         lineHeight,
         angle: container
@@ -6877,13 +6881,6 @@ class App extends React.Component<AppProps, AppState> {
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
-      if (isArrowElement(container)) {
-        // default positioning for bound text on arrows
-        this.scene.mutateElement(element, {
-          labelPosition: DEFAULT_BOUND_TEXT_LABEL_POSITION,
-        });
-      }
-
       this.scene.mutateElement(container, {
         boundElements: (container.boundElements || []).concat({
           type: "text",
