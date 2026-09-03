@@ -31,6 +31,7 @@ import {
   EraserToolButton,
   FreedrawToolPopover,
   FreedrawToolButton,
+  HighlighterToolButton,
   getToolShortcut,
   HandToolButton,
   ImageToolButton,
@@ -284,7 +285,10 @@ export const Toolbar = ({
         {isCompactStylesPanel ? (
           <FreedrawToolPopover {...toolProps} />
         ) : (
-          <FreedrawToolButton {...toolProps} />
+          <>
+            <FreedrawToolButton {...toolProps} />
+            <HighlighterToolButton {...toolProps} />
+          </>
         )}
         <TextToolButton {...toolProps} />
         {UIOptions.tools?.image !== false && <ImageToolButton {...toolProps} />}

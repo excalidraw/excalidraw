@@ -222,6 +222,7 @@ export const AllowedExcalidrawActiveTools: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  highlighter: true,
   eraser: false,
   custom: true,
   frame: true,
