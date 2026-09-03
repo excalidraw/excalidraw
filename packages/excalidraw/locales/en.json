@@ -110,6 +110,16 @@
     "madeWithExcalidraw": "Made with Excalidraw",
     "group": "Group selection",
     "ungroup": "Ungroup selection",
+    "table_insertTable": "Insert table",
+    "table_addRowAbove": "Insert row above",
+    "table_addRowBelow": "Insert row below",
+    "table_addColLeft": "Insert column left",
+    "table_addColRight": "Insert column right",
+    "table_deleteRow": "Delete row",
+    "table_deleteCol": "Delete column",
+    "table_rows": "Rows",
+    "table_cols": "Columns",
+    "table_drawOnCanvas": "Draw on canvas",
     "collaborators": "Collaborators",
     "you": "You",
     "toggleGrid": "Toggle grid",
@@ -339,7 +349,8 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
-    "convertElementType": "Toggle shape type"
+    "convertElementType": "Toggle shape type",
+    "table": "Table"
   },
   "bucketfill": {
     "noRegion": "Couldn't find an enclosed region to fill here.",
@@ -359,7 +370,8 @@
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
     "selection": "Selection",
-    "iframe": "IFrame"
+    "iframe": "IFrame",
+    "table": "Table"
   },
   "headings": {
     "canvasActions": "Canvas actions",

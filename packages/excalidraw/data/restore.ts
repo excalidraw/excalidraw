@@ -231,6 +231,7 @@ export const AllowedExcalidrawActiveTools: Record<
   autoshape: false,
   magicframe: false,
   bucketfill: true,
+  table: true,
 };
 
 export type RestoredDataState = {
@@ -1238,6 +1239,14 @@ export const restoreAppState = (
     gridStep: getNormalizedGridStep(
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
     ),
+    tableNumRows:
+      typeof appState.tableNumRows === "number"
+        ? appState.tableNumRows
+        : defaultAppState.tableNumRows,
+    tableNumCols:
+      typeof appState.tableNumCols === "number"
+        ? appState.tableNumCols
+        : defaultAppState.tableNumCols,
     editingFrame: null,
   };
 };

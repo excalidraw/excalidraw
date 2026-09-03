@@ -29,6 +29,7 @@ import {
   handIcon,
   frameToolIcon,
   EmbedIcon,
+  TableIcon,
 } from "./icons";
 
 import type {
@@ -151,6 +152,11 @@ export const TOOLS = defineTools({
   lasso: {
     icon: LassoIcon,
     fillable: false,
+  },
+  table: {
+    icon: TableIcon,
+    letterKey: KEYS.G,
+    fillable: true,
   },
 });
 
@@ -326,6 +332,7 @@ export const TextToolButton = createToolButton("text");
 export const ImageToolButton = createToolButton("image");
 export const EraserToolButton = createToolButton("eraser");
 export const FrameToolButton = createToolButton("frame");
+export const TableToolButton = createToolButton("table");
 
 /**
  * The selection tool button — pointer-clicking it while the selection tool
