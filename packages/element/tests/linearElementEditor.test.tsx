@@ -1769,6 +1769,38 @@ describe("Test Linear Elements", () => {
         ).toBeCloseTo(p2[0] - p1[0] + 40);
       });
 
+      it("keeps the arrow selected when a point handle is grabbed beyond the arrow's tip", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: p1[0],
+          y: p1[1],
+          width: p2[0] - p1[0],
+          height: 0,
+          points: [pointFrom(0, 0), pointFrom(p2[0] - p1[0], 0)],
+        });
+        API.setElements([arrow]);
+
+        mouse.reset();
+        mouse.clickAt(p1[0], p1[1]);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+        // past the end point along the arrow: inside the handle radius, but
+        // outside the arrow's own hit area
+        const point = pointFrom<GlobalPoint>(p2[0] + 9, p2[1]);
+
+        mouse.moveTo(point[0], point[1]);
+        expect(h.state.selectedLinearElement?.hoverPointIndex).toBe(1);
+
+        drag(point, pointFrom<GlobalPoint>(point[0] + 40, point[1]));
+
+        expect(h.state.selectionElement).toBeNull();
+        expect(h.state.selectedElementIds[arrow.id]).toBe(true);
+        expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+        expect(
+          (h.elements[0] as ExcalidrawLinearElement).points[1][0],
+        ).toBeCloseTo(p2[0] - p1[0] + 40);
+      });
+
       it("grabs the label when the covering element is below the arrow", () => {
         const { arrow, label } = createArrowWithTallLabel();
         API.setElements([createOccluder(), arrow, label]);

@@ -9466,7 +9466,12 @@ class App extends React.Component<AppProps, AppState> {
         const someHitElementIsSelected =
           pointerDownState.hit.allHitElements.some((element) =>
             this.isASelectedElement(element),
-          );
+          ) ||
+          // the selected linear element's point handles, midpoint knob and
+          // label extend beyond its own hit area, so a hit reported by
+          // `LinearElementEditor.handlePointerDown` counts even when the
+          // position-based hit test above missed the element
+          (hitElement !== null && this.isASelectedElement(hitElement));
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
