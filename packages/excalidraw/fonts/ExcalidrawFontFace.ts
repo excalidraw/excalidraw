@@ -46,7 +46,7 @@ export class ExcalidrawFontFace {
 
     return this.getContent(codepoints).then(
       (content) =>
-        `@font-face { font-family: ${this.fontFace.family}; src: url(${content}); }`,
+        `@font-face { font-family: "${this.fontFace.family}"; src: url(${content}); }`,
     );
   }
 

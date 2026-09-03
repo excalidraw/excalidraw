@@ -30,6 +30,8 @@ export interface FontMetadata {
   local?: true;
   /** flag to indicate a fallback font */
   fallback?: true;
+  /** script category for grouping fonts in the picker */
+  script?: "arabic";
 }
 
 export const FONT_METADATA: Record<number, FontMetadata> = {
@@ -111,6 +113,51 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     },
     private: true,
   },
+  [FONT_FAMILY["Noto Naskh Arabic"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 1068,
+      descender: -492,
+      lineHeight: 1.4,
+    },
+    script: "arabic",
+  },
+  [FONT_FAMILY.Lemonada]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 1017,
+      descender: -584,
+      lineHeight: 1.4,
+    },
+    script: "arabic",
+  },
+  [FONT_FAMILY["Baloo Bhaijaan 2"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 1020,
+      descender: -500,
+      lineHeight: 1.3,
+    },
+    script: "arabic",
+  },
+  [FONT_FAMILY["Cairo Play"]]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 1056,
+      descender: -520,
+      lineHeight: 1.35,
+    },
+    script: "arabic",
+  },
+  [FONT_FAMILY.Changa]: {
+    metrics: {
+      unitsPerEm: 1000,
+      ascender: 932,
+      descender: -450,
+      lineHeight: 1.3,
+    },
+    script: "arabic",
+  },
   [FONT_FAMILY_FALLBACKS.Xiaolai]: {
     metrics: {
       unitsPerEm: 1000,
@@ -144,6 +191,8 @@ export const GOOGLE_FONTS_RANGES = {
   CYRILIC: "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116",
   VIETNAMESE:
     "U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB",
+  ARABIC:
+    "U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1",
 };
 
 /** local protocol to skip the local font from registering or inlining */
