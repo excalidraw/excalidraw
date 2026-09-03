@@ -391,7 +391,7 @@ export const ROUNDNESS = {
 
   // Current default algorithm for rectangles, using fixed pixel radius.
   // It's working similarly to a regular border-radius, but attemps to make
-  // radius visually similar across differnt element sizes, especially
+  // radius visually similar across different element sizes, especially
   // very large and very small elements.
   //
   // NOTE right now we don't allow configuration and use a constant radius
