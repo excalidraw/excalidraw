@@ -241,7 +241,7 @@ export const charWidth = (() => {
   let cachedEnv: RenderEnvironment | undefined;
   let cachedCharWidth: { [key: FontString]: Array<number> } = {};
 
-  const useEnv = (env: RenderEnvironment | undefined) => {
+  const selectEnv = (env: RenderEnvironment | undefined) => {
     const resolvedEnv = getRenderEnvironment(env);
     if (resolvedEnv !== cachedEnv) {
       cachedEnv = resolvedEnv;
@@ -254,7 +254,7 @@ export const charWidth = (() => {
     font: FontString,
     env?: RenderEnvironment,
   ) => {
-    useEnv(env);
+    selectEnv(env);
     const unicode = char.charCodeAt(0);
     if (!cachedCharWidth[font]) {
       cachedCharWidth[font] = [];
