@@ -296,6 +296,21 @@ export const zoomToFitBounds = ({
   steppedZoom?: boolean;
 }) => {
   const [x1, y1, x2, y2] = bounds;
+  const commonBoundsWidth = x2 - x1;
+  const commonBoundsHeight = y2 - y1;
+
+  // empty selection/scene: getCommonBounds([]) returns [0, 0, 0, 0]
+  if (
+    !Number.isFinite(commonBoundsWidth) ||
+    !Number.isFinite(commonBoundsHeight) ||
+    (commonBoundsWidth === 0 && commonBoundsHeight === 0)
+  ) {
+    return {
+      appState,
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  }
+
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
 
@@ -315,9 +330,6 @@ export const zoomToFitBounds = ({
     // pan-only: keep the current zoom, just center the target
     adjustedZoomValue = appState.zoom.value;
   } else if (fit === "contain") {
-    const commonBoundsWidth = x2 - x1;
-    const commonBoundsHeight = y2 - y1;
-
     adjustedZoomValue = Math.min(
       effectiveCanvasWidth / commonBoundsWidth,
       effectiveCanvasHeight / commonBoundsHeight,
