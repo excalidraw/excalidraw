@@ -9166,6 +9166,7 @@ class App extends React.Component<AppProps, AppState> {
         allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
+        arrowLabel: false,
         hasHitCommonBoundingBoxOfSelectedElements:
           this.isHittingCommonBoundingBoxOfSelectedElements(
             origin,
@@ -9345,6 +9346,7 @@ class App extends React.Component<AppProps, AppState> {
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
           }
+          pointerDownState.hit.arrowLabel = ret.hitBoundText;
           if (ret.linearElementEditor) {
             this.setState({ selectedLinearElement: ret.linearElementEditor });
           }
@@ -11590,6 +11592,7 @@ class App extends React.Component<AppProps, AppState> {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
+            hitBoundText: pointerDownState.hit.arrowLabel,
           });
           if (editingLinearElement !== this.state.selectedLinearElement) {
             this.setState({
@@ -11638,17 +11641,17 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({ selectedLinearElement: null });
           }
         } else if (this.state.selectedLinearElement.isDragging) {
-          const hitBoundText = this.arrowText.consumeHitBoundText({
-            stopDragging: true,
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              isDragging: false,
+            },
           });
-
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
-            hitBoundText,
+            hitBoundText: pointerDownState.hit.arrowLabel,
           });
-        } else {
-          this.arrowText.consumeHitBoundText();
         }
 
         if (

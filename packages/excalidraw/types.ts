@@ -1198,6 +1198,9 @@ export type PointerDownState = Readonly<{
     // elements, which is useful for discriminating between selecitng
     // the entire selection vs a specific element
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
+    // Whether the pointer went down on the selected arrow's label, which
+    // makes the gesture a label drag along the arrow rather than a point drag
+    arrowLabel: boolean;
   };
   // This is determined on the initial pointer down event to
   // set various interaction modalities

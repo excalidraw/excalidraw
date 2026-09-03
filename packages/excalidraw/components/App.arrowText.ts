@@ -281,7 +281,7 @@ export class AppArrowText {
 
   /**
    * The pointer-move half of dragging a label along its arrow. Owns the move
-   * whenever the gesture started on the label (`initialState.hitBoundText`),
+   * whenever the gesture started on the label (`pointerDownState.hit.arrowLabel`),
    * dragging only once past the threshold. Returns whether it owned it.
    */
   maybeDragLabel(
@@ -289,7 +289,7 @@ export class AppArrowText {
     pointerDownState: PointerDownState,
     pointerCoords: { x: number; y: number },
   ): boolean {
-    if (!linearElementEditor.initialState.hitBoundText) {
+    if (!pointerDownState.hit.arrowLabel) {
       return false;
     }
 
@@ -318,37 +318,6 @@ export class AppArrowText {
     }
 
     return true;
-  }
-
-  /**
-   * The pointer-up half: clears the "gesture started on the label" flag,
-   * returning whether it was set so finalize can tell a label drag from a
-   * point drag. `stopDragging` ends the editor's drag state in the same
-   * update.
-   */
-  consumeHitBoundText(opts: { stopDragging?: boolean } = {}): boolean {
-    const editor = this.app.state.selectedLinearElement;
-
-    if (!editor) {
-      return false;
-    }
-
-    const { hitBoundText } = editor.initialState;
-
-    if (hitBoundText || opts.stopDragging) {
-      this.app.setState({
-        selectedLinearElement: {
-          ...editor,
-          ...(opts.stopDragging ? { isDragging: false } : null),
-          initialState: {
-            ...editor.initialState,
-            hitBoundText: false,
-          },
-        },
-      });
-    }
-
-    return hitBoundText;
   }
 
   /**

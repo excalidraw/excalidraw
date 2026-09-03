@@ -158,7 +158,6 @@ export class LinearElementEditor {
       index: number | null;
       added: boolean;
     };
-    hitBoundText: boolean;
     arrowStartIsInside: boolean;
     altFocusPoint: Readonly<GlobalPoint> | null;
     arrowOtherEndpointInitialBinding: FixedPointBinding | null;
@@ -213,7 +212,6 @@ export class LinearElementEditor {
         index: null,
         added: false,
       },
-      hitBoundText: false,
       arrowStartIsInside: false,
       arrowOtherEndpointInitialBinding: null,
       altFocusPoint: null,
@@ -799,7 +797,6 @@ export class LinearElementEditor {
       initialState: {
         ...editingLinearElement.initialState,
         origin: null,
-        hitBoundText: false,
         arrowStartIsInside: false,
         arrowOtherEndpointInitialBinding: null,
       },
@@ -1053,6 +1050,8 @@ export class LinearElementEditor {
   ): {
     didAddPoint: boolean;
     hitElement: NonDeleted<ExcalidrawElement> | null;
+    /** the pointer went down on the arrow's label, grabbing it for a drag */
+    hitBoundText: boolean;
     linearElementEditor: LinearElementEditor | null;
   } {
     const appState = app.state;
@@ -1061,6 +1060,7 @@ export class LinearElementEditor {
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
       didAddPoint: false,
       hitElement: null,
+      hitBoundText: false,
       linearElementEditor: null,
     };
 
@@ -1119,7 +1119,6 @@ export class LinearElementEditor {
             index: segmentMidpointIndex,
             added: false,
           },
-          hitBoundText: false,
           arrowStartIsInside:
             !!app.state.newElement &&
             (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
@@ -1177,6 +1176,7 @@ export class LinearElementEditor {
     // when the label grab wins (possible over a non-interactive elbow route
     // point), the click must not double as a point click
     const clickedPointIndex = boundTextGrabOffset ? -1 : pointIndexUnderCursor;
+    ret.hitBoundText = !!boundTextGrabOffset;
 
     if (clickedPointIndex >= 0 || segmentMidpoint || boundTextGrabOffset) {
       ret.hitElement = element;
@@ -1217,7 +1217,6 @@ export class LinearElementEditor {
           index: segmentMidpointIndex,
           added: false,
         },
-        hitBoundText: !!boundTextGrabOffset,
         arrowStartIsInside:
           !!app.state.newElement &&
           (app.state.bindMode === "inside" || app.state.bindMode === "skip"),

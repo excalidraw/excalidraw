@@ -85,14 +85,12 @@ export const actionFinalize = register<FormData>({
         app.scene,
       );
 
-      const hitBoundText =
-        data.hitBoundText ??
-        appState.selectedLinearElement.initialState.hitBoundText;
-
       if (
         isBindingElement(element) &&
         !appState.selectedLinearElement.segmentMidPointHoveredCoords &&
-        !hitBoundText
+        // a label drag along the arrow moves no endpoint, so it must not
+        // rebind either of them
+        !data.hitBoundText
       ) {
         const newArrow = !!appState.newElement;
 
