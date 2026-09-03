@@ -188,6 +188,55 @@ body.excalidraw-cursor-resize * {
       position: relative;
     }
 
+    .corner-radius-control {
+      // CheckboxItem is sized for the export dialog and hardcodes its blues as
+      // SCSS literals, so it neither fits this narrow panel nor follows the
+      // theme. Both are corrected here rather than in CheckboxItem.scss: that
+      // component is stock upstream and shared with the dialogs, so restyling
+      // it globally would be a far larger diff to carry across rebases.
+      .corner-radius-adaptive-toggle {
+        margin: 0 0 0.5rem;
+
+        .Checkbox-box {
+          width: 16px;
+          height: 16px;
+          margin: 0 0.5em 0 0;
+          // --color-primary* are theme-aware and are what the panel's active
+          // radio buttons (Edges, Sloppiness) already use, so the checkbox
+          // reads as part of the same control set in both themes.
+          box-shadow: 0 0 0 2px var(--color-primary);
+          color: var(--color-primary);
+
+          &:focus {
+            box-shadow: 0 0 0 3px var(--color-primary);
+          }
+
+          svg {
+            width: 12px;
+            height: 12px;
+          }
+        }
+
+        &:hover .Checkbox-box {
+          background-color: var(--color-primary-light);
+        }
+
+        &.is-checked {
+          .Checkbox-box {
+            background-color: var(--color-primary-light);
+          }
+
+          &:hover .Checkbox-box {
+            background-color: var(--color-primary-light-darker);
+          }
+        }
+
+        .Checkbox-label {
+          font-size: 0.75rem;
+        }
+      }
+    }
+
     .buttonList {
       flex-wrap: wrap;
       display: flex;

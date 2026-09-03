@@ -14,6 +14,7 @@ import {
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
   ROUNDNESS,
+  DEFAULT_ADAPTIVE_RADIUS,
   STROKE_WIDTH_KEYS,
   VERTICAL_ALIGN,
   KEYS,
@@ -40,6 +41,8 @@ import {
   calculateFixedPointForElbowArrowBinding,
   updateBoundElements,
 } from "@excalidraw/element";
+
+import { getCornerRadius } from "@excalidraw/element/utils";
 
 import { LinearElementEditor } from "@excalidraw/element";
 
@@ -94,6 +97,7 @@ import type { ElementUpdate, Scene } from "@excalidraw/element";
 import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import { trackEvent } from "../analytics";
+import { CheckboxItem } from "../components/CheckboxItem";
 import { RadioSelection } from "../components/RadioSelection";
 import { IconButton } from "../components/IconButton";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
@@ -1711,6 +1715,20 @@ export const actionChangeRoundness = register<"sharp" | "round">({
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
 
+    const roundnessValue = getFormValue(
+      elements,
+      app,
+      (element) =>
+        hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
+      (element) =>
+        !isArrowElement(element) && element.hasOwnProperty("roundness"),
+      (hasSelection) => (hasSelection ? null : appState.currentItemRoundness),
+    );
+
+    const showRadiusSlider =
+      roundnessValue === "round" &&
+      targetElements.some((el) => isUsingAdaptiveRadius(el.type));
+
     return (
       <fieldset>
         <legend>{t("labels.edges")}</legend>
@@ -1729,25 +1747,99 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                 icon: EdgeRoundIcon,
               },
             ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) =>
-                hasLegacyRoundness
-                  ? null
-                  : element.roundness
-                  ? "round"
-                  : "sharp",
-              (element) =>
-                !isArrowElement(element) && element.hasOwnProperty("roundness"),
-              (hasSelection) =>
-                hasSelection ? null : appState.currentItemRoundness,
-            )}
+            value={roundnessValue}
             onChange={(value) => updateData(value)}
           />
           {renderAction("togglePolygon")}
         </div>
+        {showRadiusSlider && renderAction("changeCornerRadius")}
       </fieldset>
+    );
+  },
+});
+
+export const actionChangeCornerRadius = register<number | null>({
+  name: "changeCornerRadius",
+  label: "Change corner radius",
+  trackEvent: false,
+  // `null` clears the explicit radius, returning the element to the adaptive
+  // sizing that scales the radius with the shape.
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (!el.roundness || !isUsingAdaptiveRadius(el.type)) {
+          return el;
+        }
+
+        return newElementWith(el, {
+          roundness:
+            value === null
+              ? { type: ROUNDNESS.ADAPTIVE_RADIUS }
+              : { type: ROUNDNESS.ADAPTIVE_RADIUS, value },
+        });
+      }),
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, app, updateData }) => {
+    const selectedElements = app.scene.getSelectedElements(app.state);
+
+    const adaptiveElements = selectedElements.filter(
+      (el) => el.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS,
+    );
+
+    // "adaptive" is derived rather than stored: an element is adaptive exactly
+    // when it carries no explicit radius. Dragging the slider therefore
+    // unchecks the box on its own, with no extra bookkeeping.
+    const isAdaptive =
+      adaptiveElements.length > 0 &&
+      adaptiveElements.every((el) => el.roundness?.value == null);
+
+    // Show what the canvas is currently rendering, so unchecking "adaptive"
+    // hands the slider the number the user already sees.
+    const currentRadius = Math.round(
+      adaptiveElements.reduce((acc, element) => {
+        const radius = getCornerRadius(
+          Math.min(element.width, element.height),
+          element,
+        );
+        return acc === null ? radius : Math.min(acc, radius);
+      }, null as number | null) ?? DEFAULT_ADAPTIVE_RADIUS,
+    );
+
+    // Calculate max radius (pill shape is when radius = height/2)
+    const maxRadius = Math.min(
+      200,
+      ...selectedElements.map((el) => Math.min(el.width, el.height) / 2),
+    );
+
+    // One value for both the slider bound and the label under it, rounded
+    // because the step is 1 — deriving them separately is how the number a
+    // user reads drifts from the one the track actually stops at.
+    const sliderMax = Math.round(Math.max(maxRadius, currentRadius));
+
+    return (
+      <div className="corner-radius-control">
+        <label className="control-label">{t("labels.cornerRadius")}</label>
+        <CheckboxItem
+          className="corner-radius-adaptive-toggle"
+          checked={isAdaptive}
+          onChange={(checked) => updateData(checked ? null : currentRadius)}
+        >
+          {t("labels.adaptiveCornerRadius")}
+        </CheckboxItem>
+        <Range
+          label=""
+          value={currentRadius}
+          onChange={(value) => updateData(value)}
+          min={0}
+          max={sliderMax}
+          maxLabel={sliderMax}
+          step={1}
+          testId="cornerRadius"
+        />
+      </div>
     );
   },
 });

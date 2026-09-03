@@ -532,7 +532,15 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
   }
 
   if (element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS) {
-    const fixedRadiusSize = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
+    // an explicitly chosen radius (corner radius slider) is honored as-is, so
+    // that a full pill shape stays reachable. Only clamp it to a half-circle,
+    // beyond which the corners would overlap. Elements without an explicit
+    // value keep the adaptive behavior below.
+    if (element.roundness.value != null) {
+      return Math.min(element.roundness.value, x / 2);
+    }
+
+    const fixedRadiusSize = DEFAULT_ADAPTIVE_RADIUS;
 
     const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
 
