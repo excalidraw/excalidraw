@@ -16,6 +16,7 @@ import {
   actionChangeExportBackground,
   actionChangeExportEmbedScene,
   actionChangeExportScale,
+  actionChangeExportWithGrid,
   actionChangeProjectName,
 } from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
@@ -84,6 +85,9 @@ const ImageExportModal = ({
   const [embedScene, setEmbedScene] = useState(
     appStateSnapshot.exportEmbedScene,
   );
+  const [exportWithGrid, setExportWithGrid] = useState(
+    appStateSnapshot.exportWithGrid,
+  );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
 
   const previewRef = useRef<HTMLDivElement>(null);
@@ -100,6 +104,7 @@ const ImageExportModal = ({
     projectName,
     exportWithBackground,
     exportWithDarkMode,
+    exportWithGrid,
     exportScale,
     embedScene,
     resetCopyStatus,
@@ -134,6 +139,7 @@ const ImageExportModal = ({
         name: projectName,
         exportBackground: exportWithBackground,
         exportWithDarkMode,
+        exportWithGrid,
         exportScale,
         exportEmbedScene: embedScene,
       },
@@ -185,6 +191,7 @@ const ImageExportModal = ({
     projectName,
     exportWithBackground,
     exportWithDarkMode,
+    exportWithGrid,
     exportScale,
     embedScene,
   ]);
@@ -258,6 +265,23 @@ const ImageExportModal = ({
             onChange={(checked) => {
               actionManager.executeAction(
                 actionExportWithDarkMode,
+                "ui",
+                checked,
+              );
+            }}
+          />
+        </ExportSetting>
+        <ExportSetting
+          label={t("imageExportDialog.label.withGrid")}
+          name="exportGridSwitch"
+        >
+          <Switch
+            name="exportGridSwitch"
+            checked={exportWithGrid}
+            onChange={(checked) => {
+              setExportWithGrid(checked);
+              actionManager.executeAction(
+                actionChangeExportWithGrid,
                 "ui",
                 checked,
               );
