@@ -111,7 +111,7 @@ export class AppBucketFill {
       },
     };
     this.temporaryEyeDropper = eyeDropper;
-    this.app.updateEditorAtom(activeEyeDropperAtom, eyeDropper);
+    this.app.host.setActiveEyeDropper(eyeDropper);
   };
 
   closeTemporaryEyeDropper = () => {
@@ -121,7 +121,7 @@ export class AppBucketFill {
       eyeDropper &&
       editorJotaiStore.get(activeEyeDropperAtom) === eyeDropper
     ) {
-      this.app.updateEditorAtom(activeEyeDropperAtom, null);
+      this.app.host.setActiveEyeDropper(null);
     }
   };
 

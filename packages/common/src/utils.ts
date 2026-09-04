@@ -48,12 +48,26 @@ export const getDateTime = () => {
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
-const getTargetWindow = (
-  target: Element | EventTarget | null,
-): (Window & typeof globalThis) | null =>
-  (target as (EventTarget & { ownerDocument?: Document | null }) | null)
-    ?.ownerDocument?.defaultView ??
-  (typeof window === "undefined" ? null : window);
+/**
+ * Resolves the window owning `target`, so that we keep working when the editor
+ * is rendered into another document. Accepts a `Document` as well, in which
+ * case its `defaultView` is used. Falls back to the module realm's window.
+ */
+export const getTargetWindow = (
+  target: Element | EventTarget | Document | null,
+): (Window & typeof globalThis) | null => {
+  const owner = target as
+    | (EventTarget & {
+        ownerDocument?: Document | null;
+        defaultView?: (Window & typeof globalThis) | null;
+      })
+    | null;
+  return (
+    owner?.ownerDocument?.defaultView ??
+    owner?.defaultView ??
+    (typeof window === "undefined" ? null : window)
+  );
+};
 
 export const isToolIcon = (
   target: Element | EventTarget | null,
@@ -181,12 +195,19 @@ export const debounce = <T extends any[]>(
 };
 
 // throttle callback to execute once per animation frame using the latest args
-export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
+export const throttleRAF = <T extends any[]>(
+  fn: (...args: T) => void,
+  ownerWindow?: Pick<Window, "requestAnimationFrame" | "cancelAnimationFrame">,
+) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
 
+  // resolved lazily so module-scope callers work in environments without
+  // a global window (headless import)
+  const getOwnerWindow = () => ownerWindow ?? window;
+
   const scheduleFunc = () => {
-    timerId = window.requestAnimationFrame(() => {
+    timerId = getOwnerWindow().requestAnimationFrame(() => {
       timerId = null;
       const args = lastArgs;
       lastArgs = null;
@@ -205,7 +226,7 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   };
   ret.flush = () => {
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      getOwnerWindow().cancelAnimationFrame(timerId);
       timerId = null;
     }
     if (lastArgs) {
@@ -216,7 +237,7 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   ret.cancel = () => {
     lastArgs = null;
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      getOwnerWindow().cancelAnimationFrame(timerId);
       timerId = null;
     }
   };

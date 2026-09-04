@@ -140,7 +140,12 @@ export const actionPasteStyles = register({
                 ) || null;
             }
 
-            redrawTextBoundingBox(newTextElement, container, app.scene);
+            redrawTextBoundingBox(
+              newTextElement,
+              container,
+              app.scene,
+              app.renderEnvironment,
+            );
           }
 
           if (

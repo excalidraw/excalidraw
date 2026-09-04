@@ -7,6 +7,8 @@ import {
   isPromiseLike,
 } from "@excalidraw/common";
 
+import { getRenderEnvironment } from "@excalidraw/element/renderEnvironment";
+
 import type { ValueOf } from "@excalidraw/common/utility-types";
 import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 
@@ -326,7 +328,7 @@ const getImageFileDimensions = async (file: File) => {
   }
 
   return new Promise<{ width: number; height: number }>((resolve, reject) => {
-    const image = new Image();
+    const image = getRenderEnvironment().createImage();
 
     const cleanup = () => {
       image.onload = null;

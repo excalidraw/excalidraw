@@ -42,6 +42,8 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
+import { getCreatePath, getRenderEnvironment } from "./renderEnvironment";
+
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
@@ -67,6 +69,8 @@ import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 
 import type {
   ExcalidrawElement,
@@ -137,6 +141,9 @@ export interface ExcalidrawElementWithCanvas {
   canvas: HTMLCanvasElement;
   theme: AppState["theme"];
   scale: number;
+  /** backing-store scale the bitmap was rasterized at, see StaticCanvasRenderConfig["scale"] */
+  deviceScale: number;
+  environment: RenderEnvironment;
   zoomValue: AppState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
@@ -148,6 +155,8 @@ const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   zoom: Zoom,
+  /** backing-store scale, see StaticCanvasRenderConfig["scale"] */
+  deviceScale: number,
 ): {
   width: number;
   height: number;
@@ -175,8 +184,8 @@ const cappedElementCanvasSize = (
       ? distance(y1, y2)
       : element.height;
 
-  let width = elementWidth * window.devicePixelRatio + padding * 2;
-  let height = elementHeight * window.devicePixelRatio + padding * 2;
+  let width = elementWidth * deviceScale + padding * 2;
+  let height = elementHeight * deviceScale + padding * 2;
 
   let scale: number = zoom.value;
 
@@ -206,7 +215,8 @@ const generateElementCanvas = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ): ExcalidrawElementWithCanvas | null => {
-  const canvas = document.createElement("canvas");
+  const environment = getRenderEnvironment(renderConfig.renderEnvironment);
+  const canvas = environment.createCanvas();
   const context = canvas.getContext("2d")!;
   const padding = getCanvasPadding(element);
 
@@ -214,6 +224,7 @@ const generateElementCanvas = (
     element,
     elementsMap,
     zoom,
+    renderConfig.scale,
   );
 
   if (!width || !height) {
@@ -230,24 +241,17 @@ const generateElementCanvas = (
     const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
 
     canvasOffsetX =
-      element.x > x1
-        ? distance(element.x, x1) * window.devicePixelRatio * scale
-        : 0;
+      element.x > x1 ? distance(element.x, x1) * renderConfig.scale * scale : 0;
 
     canvasOffsetY =
-      element.y > y1
-        ? distance(element.y, y1) * window.devicePixelRatio * scale
-        : 0;
+      element.y > y1 ? distance(element.y, y1) * renderConfig.scale * scale : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
   }
 
   context.save();
   context.translate(padding * scale, padding * scale);
-  context.scale(
-    window.devicePixelRatio * scale,
-    window.devicePixelRatio * scale,
-  );
+  context.scale(renderConfig.scale * scale, renderConfig.scale * scale);
 
   const rc = rough.canvas(canvas);
 
@@ -260,6 +264,8 @@ const generateElementCanvas = (
     canvas,
     theme: appState.theme,
     scale,
+    deviceScale: renderConfig.scale,
+    environment,
     zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
@@ -271,28 +277,31 @@ const generateElementCanvas = (
 
 export const DEFAULT_LINK_SIZE = 14;
 
-const IMAGE_PLACEHOLDER_IMG =
-  typeof document !== "undefined"
-    ? document.createElement("img")
-    : ({ src: "" } as HTMLImageElement); // mock image element outside of browser
-
-IMAGE_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
+const IMAGE_PLACEHOLDER_SRC = `data:${MIME_TYPES.svg},${encodeURIComponent(
   `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="image" class="svg-inline--fa fa-image fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="#888" d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48zM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56zM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48z"></path></svg>`,
 )}`;
 
-const IMAGE_ERROR_PLACEHOLDER_IMG =
-  typeof document !== "undefined"
-    ? document.createElement("img")
-    : ({ src: "" } as HTMLImageElement); // mock image element outside of browser
-
-IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
+const IMAGE_ERROR_PLACEHOLDER_SRC = `data:${
+  MIME_TYPES.svg
+},${encodeURIComponent(
   `<svg viewBox="0 0 668 668" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2"><path d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48ZM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56ZM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48Z" style="fill:#888;fill-rule:nonzero" transform="matrix(.81709 0 0 .81709 124.825 145.825)"/><path d="M256 8C119.034 8 8 119.033 8 256c0 136.967 111.034 248 248 248s248-111.034 248-248S392.967 8 256 8Zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676ZM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676Z" style="fill:#888;fill-rule:nonzero" transform="matrix(.30366 0 0 .30366 506.822 60.065)"/></svg>`,
 )}`;
+
+/**
+ * Built lazily so that importing this module never touches `document`, and so
+ * that a custom render environment supplies the element.
+ */
+const getPlaceholderImg = (src: string, env: RenderEnvironment) => {
+  const img = env.createImage();
+  img.src = src;
+  return img;
+};
 
 const drawImagePlaceholder = (
   element: ExcalidrawImageElement,
   context: CanvasRenderingContext2D,
   theme: StaticCanvasRenderConfig["theme"],
+  env: RenderEnvironment,
 ) => {
   context.fillStyle = theme === THEME.DARK ? "#2E2E2E" : "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
@@ -305,9 +314,12 @@ const drawImagePlaceholder = (
   );
 
   context.drawImage(
-    element.status === "error"
-      ? IMAGE_ERROR_PLACEHOLDER_IMG
-      : IMAGE_PLACEHOLDER_IMG,
+    getPlaceholderImg(
+      element.status === "error"
+        ? IMAGE_ERROR_PLACEHOLDER_SRC
+        : IMAGE_PLACEHOLDER_SRC,
+      env,
+    ),
     element.width / 2 - size / 2,
     element.height / 2 - size / 2,
     size,
@@ -350,6 +362,7 @@ const drawElementOnCanvas = (
       context.save();
 
       const shapes = ShapeCache.generateElementShape(element, renderConfig);
+      const createPath = getCreatePath(renderConfig.renderEnvironment);
 
       for (const shape of shapes) {
         if (typeof shape === "string") {
@@ -357,7 +370,7 @@ const drawElementOnCanvas = (
             element.strokeColor,
             renderConfig.theme === THEME.DARK,
           );
-          context.fill(new Path2D(shape));
+          context.fill(createPath(shape));
         } else {
           rc.draw(shape);
         }
@@ -403,8 +416,10 @@ const drawElementOnCanvas = (
           cacheEntry?.mimeType === MIME_TYPES.svg;
 
         if (shouldInvertImage && isSafari) {
-          const devicePixelRatio = window.devicePixelRatio || 1;
-          const tempCanvas = document.createElement("canvas");
+          const devicePixelRatio = renderConfig.scale || 1;
+          const tempCanvas = getRenderEnvironment(
+            renderConfig.renderEnvironment,
+          ).createCanvas();
           tempCanvas.width = element.width * devicePixelRatio;
           tempCanvas.height = element.height * devicePixelRatio;
           const tempContext = tempCanvas.getContext("2d");
@@ -469,7 +484,12 @@ const drawElementOnCanvas = (
           );
         }
       } else {
-        drawImagePlaceholder(element, context, renderConfig.theme);
+        drawImagePlaceholder(
+          element,
+          context,
+          renderConfig.theme,
+          getRenderEnvironment(renderConfig.renderEnvironment),
+        );
       }
       context.restore();
       break;
@@ -477,13 +497,21 @@ const drawElementOnCanvas = (
     default: {
       if (isTextElement(element)) {
         const rtl = isRTL(element.text);
-        const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
+        // NOTE: `isConnected === false` rather than `!isConnected` -- a
+        // non-DOM canvas (node-canvas et al) has no such property, and must
+        // not be handed to `document.body`
+        const shouldTemporarilyAttach =
+          rtl &&
+          context.canvas.isConnected === false &&
+          typeof document !== "undefined";
         if (shouldTemporarilyAttach) {
           // to correctly render RTL text mixed with LTR, we have to append it
           // to the DOM
           document.body.appendChild(context.canvas);
         }
-        context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
+        if (typeof context.canvas.setAttribute === "function") {
+          context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
+        }
         context.save();
         context.font = getFontString(element);
         context.fillStyle = applyDarkModeFilter(
@@ -547,6 +575,9 @@ const generateElementWithCanvas = (
     : {
         value: 1 as NormalizedZoomValue,
       };
+  const renderEnvironment = getRenderEnvironment(
+    renderConfig.renderEnvironment,
+  );
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
@@ -561,6 +592,8 @@ const generateElementWithCanvas = (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
+    prevElementWithCanvas.deviceScale !== renderConfig.scale ||
+    prevElementWithCanvas.environment !== renderEnvironment ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
     prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
   ) {
@@ -593,11 +626,11 @@ const drawElementFromCanvas = (
   const element = elementWithCanvas.element;
   const padding = getCanvasPadding(element);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
-  const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + appState.scrollY) * window.devicePixelRatio;
+  const cx = ((x1 + x2) / 2 + appState.scrollX) * renderConfig.scale;
+  const cy = ((y1 + y2) / 2 + appState.scrollY) * renderConfig.scale;
 
   context.save();
-  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+  context.scale(1 / renderConfig.scale, 1 / renderConfig.scale);
 
   const boundTextElement = getBoundTextElement(element, allElementsMap);
 
@@ -612,7 +645,7 @@ const drawElementFromCanvas = (
     );
     // generously covers the arrow's blit at any rotation
     const outerHalf =
-      Math.max(distance(x1, x2), distance(y1, y2)) * window.devicePixelRatio +
+      Math.max(distance(x1, x2), distance(y1, y2)) * renderConfig.scale +
       padding * 10;
     context.beginPath();
     context.rect(cx - outerHalf, cy - outerHalf, outerHalf * 2, outerHalf * 2);
@@ -621,16 +654,14 @@ const drawElementFromCanvas = (
         boundTextElement.width / 2 -
         BOUND_TEXT_PADDING +
         appState.scrollX) *
-        window.devicePixelRatio,
+        renderConfig.scale,
       (boundTextCy -
         boundTextElement.height / 2 -
         BOUND_TEXT_PADDING +
         appState.scrollY) *
-        window.devicePixelRatio,
-      (boundTextElement.width + BOUND_TEXT_PADDING * 2) *
-        window.devicePixelRatio,
-      (boundTextElement.height + BOUND_TEXT_PADDING * 2) *
-        window.devicePixelRatio,
+        renderConfig.scale,
+      (boundTextElement.width + BOUND_TEXT_PADDING * 2) * renderConfig.scale,
+      (boundTextElement.height + BOUND_TEXT_PADDING * 2) * renderConfig.scale,
     );
     context.clip("evenodd");
   }
@@ -656,9 +687,9 @@ const drawElementFromCanvas = (
 
   context.drawImage(
     elementWithCanvas.canvas!,
-    (x1 + appState.scrollX) * window.devicePixelRatio -
+    (x1 + appState.scrollX) * renderConfig.scale -
       (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-    (y1 + appState.scrollY) * window.devicePixelRatio -
+    (y1 + appState.scrollY) * renderConfig.scale -
       (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
     elementWithCanvas.canvas!.width / elementWithCanvas.scale,
     elementWithCanvas.canvas!.height / elementWithCanvas.scale,
@@ -677,10 +708,10 @@ const drawElementFromCanvas = (
     context.strokeStyle = "#c92a2a";
     context.lineWidth = 3;
     context.strokeRect(
-      (coords.x + appState.scrollX) * window.devicePixelRatio,
-      (coords.y + appState.scrollY) * window.devicePixelRatio,
-      getBoundTextMaxWidth(element, textElement) * window.devicePixelRatio,
-      getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
+      (coords.x + appState.scrollX) * renderConfig.scale,
+      (coords.y + appState.scrollY) * renderConfig.scale,
+      getBoundTextMaxWidth(element, textElement) * renderConfig.scale,
+      getBoundTextMaxHeight(element, textElement) * renderConfig.scale,
     );
   }
   context.restore();

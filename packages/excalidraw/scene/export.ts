@@ -19,6 +19,7 @@ import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
+  getRenderEnvironment,
   updateImageCache,
 } from "@excalidraw/element";
 
@@ -49,6 +50,8 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import { getDefaultAppState } from "../appState";
 import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
@@ -65,11 +68,12 @@ import type { AppState, BinaryFiles } from "../types";
 const truncateText = (
   element: NonDeleted<ExcalidrawTextElement>,
   maxWidth: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (element.width <= maxWidth) {
     return element;
   }
-  const canvas = document.createElement("canvas");
+  const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
   const ctx = canvas.getContext("2d")!;
   ctx.font = getFontString({
     fontFamily: element.fontFamily,
@@ -104,7 +108,9 @@ const truncateText = (
  */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  opts: Pick<AppState, "exportWithDarkMode">,
+  opts: Pick<AppState, "exportWithDarkMode"> & {
+    renderEnvironment?: RenderEnvironment;
+  },
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements) {
@@ -121,10 +127,15 @@ const addFrameLabelsAsTextElements = (
             ? FRAME_STYLE.nameColorDarkTheme
             : FRAME_STYLE.nameColorLightTheme,
           text: getFrameLikeTitle(element),
+          renderEnvironment: opts.renderEnvironment,
         });
       textElement.y -= textElement.height;
 
-      textElement = truncateText(textElement, element.width);
+      textElement = truncateText(
+        textElement,
+        element.width,
+        opts.renderEnvironment,
+      );
 
       nextElements.push(textElement);
     }
@@ -152,11 +163,13 @@ const prepareElementsForRender = ({
   exportingFrame,
   frameRendering,
   exportWithDarkMode,
+  renderEnvironment,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
   frameRendering: AppState["frameRendering"];
   exportWithDarkMode: AppState["exportWithDarkMode"];
+  renderEnvironment?: RenderEnvironment;
 }) => {
   let nextElements: readonly NonDeletedExcalidrawElement[];
 
@@ -169,6 +182,7 @@ const prepareElementsForRender = ({
   } else if (frameRendering.enabled && frameRendering.name) {
     nextElements = addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode,
+      renderEnvironment,
     });
   } else {
     nextElements = elements;
@@ -186,17 +200,19 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    renderEnvironment,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    renderEnvironment?: RenderEnvironment;
   },
   createCanvas: (
     width: number,
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
-    const canvas = document.createElement("canvas");
+    const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
     canvas.width = width * appState.exportScale;
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
@@ -223,6 +239,7 @@ export const exportToCanvas = async (
     exportingFrame,
     exportWithDarkMode: appState.exportWithDarkMode,
     frameRendering,
+    renderEnvironment,
   });
 
   if (exportingFrame) {
@@ -244,6 +261,7 @@ export const exportToCanvas = async (
       (element) => element.fileId,
     ),
     files,
+    createImage: renderEnvironment && (() => renderEnvironment.createImage()),
   });
 
   renderStaticScene({
@@ -272,6 +290,8 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
+      scale,
+      renderEnvironment,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
@@ -283,11 +303,11 @@ export const exportToCanvas = async (
   return canvas;
 };
 
-const createHTMLComment = (text: string) => {
+const createHTMLComment = (ownerDocument: Document, text: string) => {
   // surrounding with spaces to maintain prettified consistency with previous
   // iterations
   // <!-- comment -->
-  return document.createComment(` ${text} `);
+  return ownerDocument.createComment(` ${text} `);
 };
 
 export const exportToSvg = async (
@@ -310,8 +330,20 @@ export const exportToSvg = async (
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
+    ownerDocument?: Document;
+    renderEnvironment?: RenderEnvironment;
   },
 ): Promise<SVGSVGElement> => {
+  const ownerDocument =
+    opts?.ownerDocument ?? (typeof document !== "undefined" ? document : null);
+
+  if (!ownerDocument) {
+    throw new Error(
+      "exportToSvg: no ownerDocument available. Pass opts.ownerDocument when " +
+        "running in a non-browser environment.",
+    );
+  }
+
   const frameRendering = getFrameRenderingConfig(
     opts?.exportingFrame ?? null,
     appState.frameRendering ?? null,
@@ -332,6 +364,7 @@ export const exportToSvg = async (
     exportingFrame,
     exportWithDarkMode,
     frameRendering,
+    renderEnvironment: opts?.renderEnvironment,
   });
 
   if (exportingFrame) {
@@ -350,7 +383,7 @@ export const exportToSvg = async (
   // initialize SVG root element
   // ---------------------------------------------------------------------------
 
-  const svgRoot = document.createElementNS(SVG_NS, "svg");
+  const svgRoot = ownerDocument.createElementNS(SVG_NS, "svg");
 
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
@@ -358,14 +391,13 @@ export const exportToSvg = async (
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
 
-  const defsElement = svgRoot.ownerDocument.createElementNS(SVG_NS, "defs");
+  const defsElement = ownerDocument.createElementNS(SVG_NS, "defs");
 
-  const metadataElement = svgRoot.ownerDocument.createElementNS(
-    SVG_NS,
-    "metadata",
+  const metadataElement = ownerDocument.createElementNS(SVG_NS, "metadata");
+
+  svgRoot.appendChild(
+    createHTMLComment(ownerDocument, "svg-source:excalidraw"),
   );
-
-  svgRoot.appendChild(createHTMLComment("svg-source:excalidraw"));
   svgRoot.appendChild(metadataElement);
   svgRoot.appendChild(defsElement);
 
@@ -400,10 +432,7 @@ export const exportToSvg = async (
     const elementsMap = arrayToMap(elements);
 
     for (const frame of frameElements) {
-      const clipPath = svgRoot.ownerDocument.createElementNS(
-        SVG_NS,
-        "clipPath",
-      );
+      const clipPath = ownerDocument.createElementNS(SVG_NS, "clipPath");
 
       clipPath.setAttribute("id", frame.id);
 
@@ -411,7 +440,7 @@ export const exportToSvg = async (
       const cx = (x2 - x1) / 2 - (frame.x - x1);
       const cy = (y2 - y1) / 2 - (frame.y - y1);
 
-      const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      const rect = ownerDocument.createElementNS(SVG_NS, "rect");
       rect.setAttribute(
         "transform",
         `translate(${frame.x + offsetX} ${frame.y + offsetY}) rotate(${
@@ -442,10 +471,10 @@ export const exportToSvg = async (
 
   const delimiter = "\n      "; // 6 spaces
 
-  const style = svgRoot.ownerDocument.createElementNS(SVG_NS, "style");
+  const style = ownerDocument.createElementNS(SVG_NS, "style");
   style.classList.add("style-fonts");
   style.appendChild(
-    document.createTextNode(`${delimiter}${fontFaces.join(delimiter)}`),
+    ownerDocument.createTextNode(`${delimiter}${fontFaces.join(delimiter)}`),
   );
 
   defsElement.appendChild(style);
@@ -456,7 +485,7 @@ export const exportToSvg = async (
 
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
-    const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+    const rect = ownerDocument.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
     rect.setAttribute("y", "0");
     rect.setAttribute("width", `${width}`);
@@ -486,6 +515,7 @@ export const exportToSvg = async (
       offsetX,
       offsetY,
       isExporting: true,
+      renderEnvironment: opts?.renderEnvironment,
       exportWithDarkMode,
       renderEmbeddables,
       frameRendering,
@@ -519,13 +549,19 @@ export const encodeSvgBase64Payload = ({
     true /* is already byte string */,
   );
 
+  const ownerDocument = metadataElement.ownerDocument;
+
   metadataElement.appendChild(
-    createHTMLComment(`payload-type:${MIME_TYPES.excalidraw}`),
+    createHTMLComment(ownerDocument, `payload-type:${MIME_TYPES.excalidraw}`),
   );
-  metadataElement.appendChild(createHTMLComment("payload-version:2"));
-  metadataElement.appendChild(createHTMLComment("payload-start"));
-  metadataElement.appendChild(document.createTextNode(base64));
-  metadataElement.appendChild(createHTMLComment("payload-end"));
+  metadataElement.appendChild(
+    createHTMLComment(ownerDocument, "payload-version:2"),
+  );
+  metadataElement.appendChild(
+    createHTMLComment(ownerDocument, "payload-start"),
+  );
+  metadataElement.appendChild(ownerDocument.createTextNode(base64));
+  metadataElement.appendChild(createHTMLComment(ownerDocument, "payload-end"));
 };
 
 export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
