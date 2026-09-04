@@ -625,7 +625,6 @@ let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
-let lastPointerUp: (() => void) | null = null;
 /** applies the pointer movement the active drag-pan is holding back for its
  * next frame, if any */
 let flushPanMove: (() => void) | null = null;
@@ -3052,7 +3051,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private openEyeDropper = ({ type }: { type: "stroke" | "background" }) => {
-    this.updateEditorAtom(activeEyeDropperAtom, {
+    this.host.setActiveEyeDropper({
       swapPreviewOnAlt: true,
       colorPickerType:
         type === "stroke" ? "elementStroke" : "elementBackground",
@@ -3296,7 +3295,7 @@ class App extends React.Component<AppProps, AppState> {
     isHoldingSpace = false;
     isPanning = false;
     isDraggingScrollBar = false;
-    lastPointerUp = null;
+    this.host.setPointerUp(null);
 
     gesture.pointers.clear();
     gesture.lastCenter = null;
@@ -3322,6 +3321,7 @@ class App extends React.Component<AppProps, AppState> {
     // These components install their own DOM listeners rather than going
     // through App's input handlers, so they must be explicitly unmounted.
     editorJotaiStore.set(activeEyeDropperAtom, null);
+    this.host.releaseEyeDropperOwnership();
     editorJotaiStore.set(convertElementTypePopupAtom, null);
 
     if (this.state.editingFrame) {
@@ -9119,7 +9119,7 @@ class App extends React.Component<AppProps, AppState> {
    * pointerup handlers manually
    */
   private maybeCleanupAfterMissingPointerUp = (event: PointerEvent | null) => {
-    lastPointerUp?.();
+    this.host.runPendingPointerUp();
     this.missingPointerEventCleanupEmitter.trigger(event).clear();
   };
 
@@ -9220,29 +9220,29 @@ class App extends React.Component<AppProps, AppState> {
       }));
     }, this.ownerWindow);
     flushPanMove = onPointerMove.flush;
-    const teardown = withBatchedUpdates(
-      (lastPointerUp = () => {
-        lastPointerUp = null;
-        flushPanMove = null;
-        isPanning = false;
-        if (!isHoldingSpace) {
-          this.cursor.reset();
-        }
-        this.setState(
-          {
-            cursorButton: "up",
-          },
-          // Runs after the trailing throttled pointer move has committed, so
-          // the snap-back starts from the pan's actual final viewport.
-          this.viewport.releaseOverscroll,
-        );
-        this.savePointer(event.clientX, event.clientY, "up");
-        this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-        this.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
-        this.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
-        onPointerMove.flush();
-      }),
-    );
+    const onPointerUp = () => {
+      this.host.setPointerUp(null);
+      flushPanMove = null;
+      isPanning = false;
+      if (!isHoldingSpace) {
+        this.cursor.reset();
+      }
+      this.setState(
+        {
+          cursorButton: "up",
+        },
+        // Runs after the trailing throttled pointer move has committed, so
+        // the snap-back starts from the pan's actual final viewport.
+        this.viewport.releaseOverscroll,
+      );
+      this.savePointer(event.clientX, event.clientY, "up");
+      this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      this.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
+      this.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
+      onPointerMove.flush();
+    };
+    this.host.setPointerUp(onPointerUp);
+    const teardown = withBatchedUpdates(onPointerUp);
     this.ownerWindow.addEventListener(EVENT.BLUR, teardown);
     this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
       passive: true,
@@ -9436,7 +9436,7 @@ class App extends React.Component<AppProps, AppState> {
       this.handlePointerMoveOverScrollbars(event, pointerDownState);
     }, this.ownerWindow);
     const onPointerUp = withBatchedUpdates(() => {
-      lastPointerUp = null;
+      this.host.setPointerUp(null);
       isDraggingScrollBar = false;
       this.cursor.applyForTool();
       this.setState({
@@ -9448,7 +9448,7 @@ class App extends React.Component<AppProps, AppState> {
       onPointerMove.flush();
     });
 
-    lastPointerUp = onPointerUp;
+    this.host.setPointerUp(onPointerUp);
 
     this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
     this.ownerWindow.addEventListener(EVENT.POINTER_UP, onPointerUp);
