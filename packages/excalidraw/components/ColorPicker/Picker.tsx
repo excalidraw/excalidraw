@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle, useState } from "react";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { EVENT } from "@excalidraw/common";
 
@@ -90,21 +90,30 @@ export const Picker = React.forwardRef(
       palette,
     });
 
-    useEffect(() => {
-      if (!activeColorPickerSection) {
-        const isCustom = !!color && isCustomColor({ color, palette });
-        const isCustomButNotInList = isCustom && !customColors.includes(color);
+    const didMount = useRef(false);
 
-        setActiveColorPickerSection(
-          isCustomButNotInList
-            ? null
-            : isCustom
-            ? "custom"
-            : colorObj?.shade != null
-            ? "shades"
-            : "baseColors",
-        );
+    useEffect(() => {
+      // On mount, always derive the section fresh: the section atom is shared
+      // across picker instances, so a leftover "hex" from a previous popup
+      // would re-focus the hex field and swallow I / Alt (#9410).
+      // After mount, fill in only when nothing is active.
+      if (didMount.current && activeColorPickerSection) {
+        return;
       }
+      didMount.current = true;
+
+      const isCustom = !!color && isCustomColor({ color, palette });
+      const isCustomButNotInList = isCustom && !customColors.includes(color);
+
+      setActiveColorPickerSection(
+        isCustomButNotInList
+          ? null
+          : isCustom
+          ? "custom"
+          : colorObj?.shade != null
+          ? "shades"
+          : "baseColors",
+      );
     }, [
       activeColorPickerSection,
       color,
