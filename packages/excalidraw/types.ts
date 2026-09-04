@@ -1206,6 +1206,11 @@ export type PointerDownState = Readonly<{
     // Whether selected element(s) were duplicated, might change during the
     // pointer interaction
     hasBeenDuplicated: boolean;
+    // Reverts an alt-drag duplication performed during this interaction.
+    // Used when the gesture turns out to have been interrupted by an
+    // OS-level window switch (e.g. Alt+Tab) rather than an intentional
+    // duplication
+    revertAltDuplication?: () => void;
     // Whether the pointer is hitting the common bounding box of selected
     // elements, which is useful for discriminating between selecitng
     // the entire selection vs a specific element
