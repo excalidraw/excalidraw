@@ -11,6 +11,11 @@ import { describe, expect, it, vi, afterEach, beforeEach } from "vitest";
  */
 describe("subsetWoff2GlyphsByCodepoints", () => {
   beforeEach(() => {
+    // load-bearing: subset-main caches whether workers are usable in module
+    // scope, so the module has to be re-evaluated after the Worker stub is in
+    // place. This is also why the import below is dynamic — hoisting it to a
+    // static import at the top of the file would evaluate the module before
+    // the stub exists, and the test would pass whatever the code did.
     vi.resetModules();
   });
 
@@ -49,7 +54,7 @@ describe("subsetWoff2GlyphsByCodepoints", () => {
     expect(error).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalledWith(
       "Failed to use workers for subsetting, falling back to the main thread.",
-      expect.anything(),
+      expect.any(DOMException),
     );
   });
 });
