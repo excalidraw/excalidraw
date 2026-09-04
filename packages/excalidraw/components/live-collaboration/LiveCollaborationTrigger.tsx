@@ -33,6 +33,7 @@ const LiveCollaborationTrigger = ({
       onSelect={onSelect}
       style={{ position: "relative", width: showIconOnly ? undefined : "auto" }}
       title={t("labels.liveCollaboration")}
+      aria-label={t("labels.share")}
     >
       {showIconOnly ? share : t("labels.share")}
       {appState.collaborators.size > 0 && (
