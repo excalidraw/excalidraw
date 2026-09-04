@@ -12447,6 +12447,311 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
 
 exports[`history > singleplayer undo/redo > remounting undo/redo buttons should initialize undo/redo state correctly > [end of test] undo stack 1`] = `[]`;
 
+exports[`history > singleplayer undo/redo > should allow undo/redo after exiting linear element editor by clicking outside (#9495) > [end of test] appState 1`] = `
+{
+  "activeEmbeddable": null,
+  "activeLockedId": null,
+  "activeTool": {
+    "customType": null,
+    "fromSelection": false,
+    "lastActiveTool": null,
+    "locked": false,
+    "type": "selection",
+  },
+  "bindMode": "orbit",
+  "bindingPreference": "enabled",
+  "boxSelectionMode": "contain",
+  "collaborators": Map {},
+  "colorTopPicks": {
+    "bucketFill": null,
+    "elementBackground": null,
+    "elementStroke": null,
+  },
+  "contextMenu": null,
+  "croppingElementId": null,
+  "currentHoveredFontFamily": null,
+  "currentItemArrowType": "round",
+  "currentItemBackgroundColor": "transparent",
+  "currentItemEndArrowhead": "arrow",
+  "currentItemFillStyle": "solid",
+  "currentItemFontFamily": 5,
+  "currentItemFontSize": 20,
+  "currentItemOpacity": 100,
+  "currentItemRoughness": 1,
+  "currentItemRoundness": "sharp",
+  "currentItemStartArrowhead": null,
+  "currentItemStrokeColor": "#1e1e1e",
+  "currentItemStrokeStyle": "solid",
+  "currentItemStrokeVariability": "constant",
+  "currentItemStrokeWidthKey": "medium",
+  "currentItemTextAlign": "left",
+  "cursorButton": "up",
+  "defaultSidebarDockedPreference": false,
+  "editingFrame": null,
+  "editingGroupId": null,
+  "editingTextElement": null,
+  "elementsToHighlight": null,
+  "errorMessage": null,
+  "exportBackground": true,
+  "exportEmbedScene": false,
+  "exportScale": 1,
+  "exportWithDarkMode": false,
+  "fileHandle": null,
+  "frameRendering": {
+    "clip": true,
+    "enabled": true,
+    "name": true,
+    "outline": true,
+  },
+  "frameToHighlight": null,
+  "gridModeEnabled": false,
+  "gridSize": 20,
+  "gridStep": 5,
+  "height": 0,
+  "hoveredArrowTextAnchor": null,
+  "hoveredElementIds": {},
+  "isBindingEnabled": true,
+  "isCropping": false,
+  "isLoading": false,
+  "isMidpointSnappingEnabled": true,
+  "isResizing": false,
+  "isRotating": false,
+  "lastPointerDownWith": "mouse",
+  "lockedMultiSelections": {},
+  "multiElement": null,
+  "newElement": null,
+  "objectsSnapModeEnabled": false,
+  "offsetLeft": 0,
+  "offsetTop": 0,
+  "openDialog": null,
+  "openMenu": null,
+  "openPopup": null,
+  "openSidebar": null,
+  "originSnapOffset": null,
+  "penDetected": false,
+  "penMode": false,
+  "preferredSelectionTool": {
+    "initialized": true,
+    "type": "selection",
+  },
+  "previousSelectedElementIds": {
+    "id0": true,
+  },
+  "resizingElement": null,
+  "scrollConstraints": null,
+  "scrollX": 0,
+  "scrollY": 0,
+  "searchMatches": null,
+  "selectedElementIds": {
+    "id0": true,
+  },
+  "selectedElementsAreBeingDragged": false,
+  "selectedGroupIds": {},
+  "selectionElement": null,
+  "shouldCacheIgnoreZoom": false,
+  "showHyperlinkPopup": false,
+  "showWelcomeScreen": true,
+  "snapLines": [],
+  "stats": {
+    "open": false,
+    "panels": 3,
+  },
+  "suggestedBinding": null,
+  "theme": "light",
+  "toast": null,
+  "viewBackgroundColor": "#ffffff",
+  "viewModeEnabled": false,
+  "width": 0,
+  "zenModeEnabled": false,
+  "zoom": {
+    "value": 1,
+  },
+}
+`;
+
+exports[`history > singleplayer undo/redo > should allow undo/redo after exiting linear element editor by clicking outside (#9495) > [end of test] element 0 1`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "customData": undefined,
+  "elbowed": false,
+  "endArrowhead": "arrow",
+  "endBinding": null,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 50,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "points": [
+    [
+      0,
+      0,
+    ],
+    [
+      50,
+      50,
+    ],
+  ],
+  "roughness": 1,
+  "roundness": {
+    "type": 2,
+  },
+  "startArrowhead": null,
+  "startBinding": null,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "arrow",
+  "updated": 1,
+  "version": 4,
+  "width": 50,
+  "x": 0,
+  "y": 0,
+}
+`;
+
+exports[`history > singleplayer undo/redo > should allow undo/redo after exiting linear element editor by clicking outside (#9495) > [end of test] number of elements 1`] = `1`;
+
+exports[`history > singleplayer undo/redo > should allow undo/redo after exiting linear element editor by clicking outside (#9495) > [end of test] number of renders 1`] = `8`;
+
+exports[`history > singleplayer undo/redo > should allow undo/redo after exiting linear element editor by clicking outside (#9495) > [end of test] redo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": true,
+          },
+        },
+        "inserted": {
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id8",
+  },
+]
+`;
+
+exports[`history > singleplayer undo/redo > should allow undo/redo after exiting linear element editor by clicking outside (#9495) > [end of test] undo stack 1`] = `
+[
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedElementIds": {
+            "id0": true,
+          },
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
+        },
+        "inserted": {
+          "selectedElementIds": {},
+          "selectedLinearElement": null,
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {
+        "id0": {
+          "deleted": {
+            "angle": 0,
+            "backgroundColor": "transparent",
+            "boundElements": null,
+            "customData": undefined,
+            "elbowed": false,
+            "endArrowhead": "arrow",
+            "endBinding": null,
+            "fillStyle": "solid",
+            "frameId": null,
+            "groupIds": [],
+            "height": 50,
+            "index": "a0",
+            "isDeleted": false,
+            "link": null,
+            "locked": false,
+            "opacity": 100,
+            "points": [
+              [
+                0,
+                0,
+              ],
+              [
+                50,
+                50,
+              ],
+            ],
+            "roughness": 1,
+            "roundness": {
+              "type": 2,
+            },
+            "startArrowhead": null,
+            "startBinding": null,
+            "strokeColor": "#1e1e1e",
+            "strokeStyle": "solid",
+            "strokeWidth": 2,
+            "type": "arrow",
+            "version": 4,
+            "width": 50,
+            "x": 0,
+            "y": 0,
+          },
+          "inserted": {
+            "isDeleted": true,
+            "version": 3,
+          },
+        },
+      },
+      "updated": {},
+    },
+    "id": "id2",
+  },
+  {
+    "appState": AppStateDelta {
+      "delta": Delta {
+        "deleted": {
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": true,
+          },
+        },
+        "inserted": {
+          "selectedLinearElement": {
+            "elementId": "id0",
+            "isEditing": false,
+          },
+        },
+      },
+    },
+    "elements": {
+      "added": {},
+      "removed": {},
+      "updated": {},
+    },
+    "id": "id4",
+  },
+]
+`;
+
 exports[`history > singleplayer undo/redo > should clear the redo stack on elements change > [end of test] appState 1`] = `
 {
   "activeEmbeddable": null,

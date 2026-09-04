@@ -1246,6 +1246,33 @@ describe("history", () => {
       ]);
     });
 
+    it("should allow undo/redo after exiting linear element editor by clicking outside (#9495)", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      // create arrow
+      UI.clickTool("arrow");
+      mouse.click(0, 0);
+      mouse.click(50, 50);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      // open editor
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress(KEYS.ENTER);
+      });
+      expect(h.state.selectedLinearElement?.isEditing).toBe(true);
+
+      // click outside to exit editor
+      mouse.click(200, 200);
+
+      expect(h.state.selectedLinearElement?.isEditing ?? false).toBe(false);
+
+      // undo should work
+      const undoStackLength = API.getUndoStack().length;
+      expect(undoStackLength).toBeGreaterThan(0);
+      Keyboard.undo();
+      expect(API.getUndoStack().length).toBe(undoStackLength - 1);
+    });
+
     it("should create entry when selecting freedraw", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
 
