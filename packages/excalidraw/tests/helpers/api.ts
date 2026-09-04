@@ -71,6 +71,11 @@ export class API {
       h.app.updateScene(...args);
     });
   };
+  static resetScene = (opts?: { resetLoadingState: boolean }) => {
+    act(() => {
+      (h.app as any).resetScene(opts);
+    });
+  };
   static setAppState: React.Component<any, AppState>["setState"] = (
     state,
     cb,
