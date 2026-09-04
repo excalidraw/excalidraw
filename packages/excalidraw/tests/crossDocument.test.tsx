@@ -9,9 +9,9 @@ import { vi } from "vitest";
 
 import { FONT_FAMILY } from "@excalidraw/common";
 
-import { Excalidraw } from "../index";
-
 import type { FontFamilyValues } from "@excalidraw/element/types";
+
+import { Excalidraw } from "../index";
 
 import type { ExcalidrawImperativeAPI } from "../types";
 
