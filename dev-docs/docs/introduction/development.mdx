@@ -16,6 +16,30 @@ These instructions will get you a copy of the project up and running on your loc
 - [Yarn](https://yarnpkg.com/getting-started/install) (v1 or v2.4.2+)
 - [Git](https://git-scm.com/downloads)
 
+### Installing Yarn on macOS
+
+On macOS, installing Yarn globally with `npm install -g yarn` can fail with a permissions error (`EACCES`). To avoid this, you can enable Yarn through Corepack (which comes with Node.js), installing it into a folder you own:
+
+```bash
+export COREPACK_HOME="$HOME/.corepack"
+mkdir -p "$HOME/.local/bin"
+corepack enable --install-directory "$HOME/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+To confirm Yarn is installed, run:
+
+```bash
+yarn --version
+```
+
+The `export PATH` line above only applies to your current terminal session. To make Yarn available in every new terminal, add it to your shell profile:
+
+```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+```
+
+
 ### Clone the repo
 
 ```bash
