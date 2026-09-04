@@ -33,6 +33,7 @@ import {
   bucketFillIcon,
   mermaidLogoIcon,
   MagicIcon,
+  tableIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -298,6 +299,14 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             disabled={isToolButtonDisabled(app, "embeddable")}
           >
             {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setOpenDialog({ name: "createTable" })}
+            icon={tableIcon}
+            data-testid="toolbar-table"
+            selected={app.state.openDialog?.name === "createTable"}
+          >
+            {t("toolBar.table")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "autoshape" })}

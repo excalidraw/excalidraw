@@ -5,6 +5,9 @@
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
+    "createTable": "Create table",
+    "tableRows": "Rows",
+    "tableColumns": "Columns",
     "chartType_bar": "Bar chart",
     "chartType_line": "Line chart",
     "chartType_radar": "Radar chart",
@@ -261,6 +264,7 @@
     "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
+    "insertTable": "Insert table",
     "embeddableInteractionButton": "Click to interact"
   },
   "alerts": {
@@ -338,6 +342,7 @@
     "bucketfill": "Bucket fill",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
+    "table": "Table",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "convertElementType": "Toggle shape type"
   },

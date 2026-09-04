@@ -23,6 +23,7 @@ import {
   MagicIcon,
   mermaidLogoIcon,
   DotsIcon,
+  tableIcon,
 } from "./icons";
 import {
   ArrowToolButton,
@@ -40,6 +41,7 @@ import {
   RectangleToolButton,
   SelectionToolButton,
   SelectionToolPopover,
+  TableToolButton,
   TextToolButton,
 } from "./Tools";
 
@@ -131,6 +133,14 @@ const ExtraToolsDropdown = ({
           disabled={isToolButtonDisabled(app, "embeddable")}
         >
           {t("toolBar.embeddable")}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onSelect={() => app.setOpenDialog({ name: "createTable" })}
+          icon={tableIcon}
+          data-testid="toolbar-table-extra"
+          selected={app.state.openDialog?.name === "createTable"}
+        >
+          {t("toolBar.table")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "autoshape" })}
@@ -289,6 +299,7 @@ export const Toolbar = ({
         <TextToolButton {...toolProps} />
         {UIOptions.tools?.image !== false && <ImageToolButton {...toolProps} />}
         <EraserToolButton {...toolProps} />
+        <TableToolButton app={app} appState={appState} />
 
         <div
           className="App-toolbar__divider"

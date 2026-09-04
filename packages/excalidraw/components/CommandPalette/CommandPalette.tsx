@@ -48,6 +48,7 @@ import {
   bucketFillIcon,
   ExportImageIcon,
   mermaidLogoIcon,
+  tableIcon,
   brainIconThin,
   LibraryIcon,
   historyCommandIcon,
@@ -551,6 +552,19 @@ function CommandPaletteInner({
           viewMode: false,
           perform: () => {
             app.toggleLock();
+          },
+        },
+        {
+          label: `${t("toolBar.table")}...`,
+          category: DEFAULT_CATEGORIES.tools,
+          icon: tableIcon,
+          keywords: ["toolbar", "grid"],
+          viewMode: false,
+          perform: () => {
+            setAppState((state) => ({
+              ...state,
+              openDialog: { name: "createTable" },
+            }));
           },
         },
         {
