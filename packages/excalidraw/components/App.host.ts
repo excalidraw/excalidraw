@@ -147,9 +147,11 @@ export class AppHost {
    * (soon detached) document/window, or leave a pending tooltip timer around.
    */
   public destroy() {
+    this._destroyed = true;
     hideHyperlinkToolip(this.hyperlinkTooltipOwner);
     this.releaseOwnedInteractionState();
   }
+  private _destroyed = false;
 
   /**
    * Link icons decode asynchronously and the static scene skips an icon that
@@ -159,6 +161,13 @@ export class AppHost {
    *
    * Re-run on an environment swap: the images are keyed by env identity, so
    * a new environment starts with none.
+   *
+   * The decode landing only flips a status, which invalidates nothing, so the
+   * scene is nudged once when an icon becomes drawable -- otherwise a scene
+   * that paints before the decode settles and is then left alone (an initial
+   * scene with links, never scrolled or edited) keeps its icons missing until
+   * something unrelated repaints. Same shape as a font or an image file
+   * landing: repaint only when there is something new to draw.
    */
   private _linkImgDecodingEnvironment: RenderEnvironment | null = null;
   private ensureLinkImgDecoding() {
@@ -167,7 +176,23 @@ export class AppHost {
       return;
     }
     this._linkImgDecodingEnvironment = renderEnvironment;
-    startLinkImgDecoding(renderEnvironment);
+    startLinkImgDecoding(renderEnvironment).then((didDecode) => {
+      if (
+        !didDecode ||
+        this._destroyed ||
+        // the environment was swapped while we waited; that swap started its
+        // own decode, and this one's images are no longer the ones drawn
+        this._linkImgDecodingEnvironment !== renderEnvironment ||
+        // nothing in the scene draws a link icon, so there is nothing to
+        // repaint for; an element gaining a link repaints on its own
+        !this.app.scene
+          .getNonDeletedElements()
+          .some((element) => !!element.link)
+      ) {
+        return;
+      }
+      this.app.scene.triggerUpdate();
+    });
   }
 
   /**

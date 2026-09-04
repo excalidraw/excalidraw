@@ -28,6 +28,7 @@ const ELEMENT_LINK_SRC = `data:${MIME_TYPES.svg}, ${encodeURIComponent(
 )}`;
 
 type LinkImgSlot = "external" | "element";
+type SettledLinkImgStatus = Exclude<LinkImgStatus, "decoding">;
 
 export type LinkImgStatus = "decoding" | "decoded" | "failed";
 
@@ -35,6 +36,7 @@ export type LinkImg = {
   /** Only safe as a `drawImage` source while `status` is `decoded`. */
   img: HTMLImageElement;
   status: LinkImgStatus;
+  settled: Promise<SettledLinkImgStatus>;
 };
 
 /**
@@ -53,7 +55,8 @@ const linkImgs = new WeakMap<
 
 const settleLinkImg = (
   entry: LinkImg,
-  status: Exclude<LinkImgStatus, "decoding">,
+  status: SettledLinkImgStatus,
+  resolve: (status: SettledLinkImgStatus) => void,
 ) => {
   // a host `createImage` may fire both handlers; the first settle wins, so a
   // late `onerror` can't undo a successful decode
@@ -61,6 +64,7 @@ const settleLinkImg = (
     return;
   }
   entry.status = status;
+  resolve(status);
 };
 
 const getLinkImg = (
@@ -74,13 +78,20 @@ const getLinkImg = (
     return existing;
   }
   const img = env.createImage();
+  const decoded = img.complete && img.naturalWidth > 0;
+  let settle: (status: SettledLinkImgStatus) => void = () => {};
   const entry: LinkImg = {
     img,
-    status: img.complete && img.naturalWidth > 0 ? "decoded" : "decoding",
+    status: decoded ? "decoded" : "decoding",
+    settled: decoded
+      ? Promise.resolve("decoded")
+      : new Promise((resolve) => {
+          settle = resolve;
+        }),
   };
   if (entry.status === "decoding") {
-    img.onload = () => settleLinkImg(entry, "decoded");
-    img.onerror = () => settleLinkImg(entry, "failed");
+    img.onload = () => settleLinkImg(entry, "decoded", settle);
+    img.onerror = () => settleLinkImg(entry, "failed", settle);
   }
   if (!slots) {
     slots = {};
@@ -98,9 +109,21 @@ export const getExternalLinkImg = (renderEnvironment: RenderEnvironment) =>
 export const getElementLinkImg = (renderEnvironment: RenderEnvironment) =>
   getLinkImg("element", ELEMENT_LINK_SRC, renderEnvironment);
 
-export const startLinkImgDecoding = (renderEnvironment: RenderEnvironment) => {
-  getExternalLinkImg(renderEnvironment);
-  getElementLinkImg(renderEnvironment);
+export const startLinkImgDecoding = async (
+  renderEnvironment: RenderEnvironment,
+) => {
+  const pending = [
+    getExternalLinkImg(renderEnvironment),
+    getElementLinkImg(renderEnvironment),
+  ].filter((entry) => entry.status === "decoding");
+
+  if (!pending.length) {
+    return false;
+  }
+
+  const statuses = await Promise.all(pending.map((entry) => entry.settled));
+
+  return statuses.includes("decoded");
 };
 
 export const getLinkHandleFromCoords = (
