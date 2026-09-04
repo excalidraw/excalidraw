@@ -12,6 +12,55 @@
       font-size: 1.125rem;
     }
 
+    &__search-input {
+      box-sizing: border-box;
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.625rem 1rem;
+      border: 1px solid var(--dialog-border-color);
+      border-radius: var(--border-radius-lg);
+      background-color: var(--color-surface-mid);
+      color: var(--text-primary-color);
+      font-size: 0.875rem;
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+      }
+
+      &::placeholder {
+        color: var(--text-primary-color);
+        opacity: 0.5;
+      }
+    }
+
+    &__no-results {
+      margin: 1.5rem 0;
+      font-size: 0.875rem;
+      opacity: 0.75;
+    }
+
+    // the `hidden` attribute must be enforced explicitly because several
+    // of these nodes set their own `display` value
+    &__section[hidden],
+    &__island[hidden],
+    &__shortcut[hidden],
+    &__no-results[hidden] {
+      display: none;
+    }
+
+    // while searching, islands flow naturally instead of occupying their
+    // fixed grid areas (which would leave gaps when some are hidden)
+    @media screen and (min-width: 1024px) {
+      .HelpDialog__content--searching {
+        .HelpDialog__island--tools,
+        .HelpDialog__island--view,
+        .HelpDialog__island--editor {
+          grid-area: auto;
+        }
+      }
+    }
+
     &__header {
       display: flex;
       flex-wrap: wrap;
