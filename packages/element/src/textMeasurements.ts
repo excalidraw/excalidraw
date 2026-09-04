@@ -231,20 +231,20 @@ export const getTextHeight = (
 };
 
 export const charWidth = (() => {
-  // the cache holds one env's metrics at a time: two realms can measure the
-  // same font string differently (each measures with its own document's font
-  // set), so measuring in a different env drops the cache rather than mixing
-  // the two realms' widths under one key.
-  //
-  // realms measuring in an interleaved fashion therefore keep re-measuring,
-  // which is fine -- wrapping runs on edit/resize/restore, not per frame.
-  let cachedEnv: RenderEnvironment | undefined;
+  // one env's metrics at a time: two realms measure the same font string
+  // differently, so a different env drops the cache rather than mixing them.
+  // Held weakly -- an editor's env closes over its owner window, and a strong
+  // ref here would pin a closed popout's realm for the life of the process.
+  let cachedEnv: WeakRef<RenderEnvironment> | undefined;
   let cachedCharWidth: { [key: FontString]: Array<number> } = {};
+
+  const isCachedEnv = (resolvedEnv: RenderEnvironment) =>
+    cachedEnv?.deref() === resolvedEnv;
 
   const selectEnv = (env: RenderEnvironment | undefined) => {
     const resolvedEnv = getRenderEnvironment(env);
-    if (resolvedEnv !== cachedEnv) {
-      cachedEnv = resolvedEnv;
+    if (!isCachedEnv(resolvedEnv)) {
+      cachedEnv = new WeakRef(resolvedEnv);
       cachedCharWidth = {};
     }
   };
@@ -266,7 +266,7 @@ export const charWidth = (() => {
   };
 
   const getCache = (font: FontString, env?: RenderEnvironment) =>
-    getRenderEnvironment(env) === cachedEnv ? cachedCharWidth[font] : undefined;
+    isCachedEnv(getRenderEnvironment(env)) ? cachedCharWidth[font] : undefined;
 
   // dropped rather than emptied, so that the approximation helpers fall back
   // to measuring instead of reducing over an empty array

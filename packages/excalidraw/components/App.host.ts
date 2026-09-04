@@ -2,6 +2,9 @@ import { isDevEnv, isTestEnv } from "@excalidraw/common";
 
 import type { RenderEnvironment } from "@excalidraw/element";
 
+import { editorJotaiStore } from "../editor-jotai";
+
+import { activeEyeDropperAtom, type EyeDropperProperties } from "./EyeDropper";
 import {
   hideHyperlinkToolip,
   type HyperlinkTooltipOwner,
@@ -10,6 +13,12 @@ import { startLinkImgDecoding } from "./hyperlink/helpers";
 
 import type { AppProps } from "../types";
 import type App from "./App";
+
+/**
+ * The pointerup handler of whichever editor is mid-interaction. Shared by
+ * every editor in the process; `AppHost.ownedPointerUp` says whose it is.
+ */
+let activePointerUp: (() => void) | null = null;
 
 /**
  * Owns everything that ties this editor to the document/window it renders
@@ -27,6 +36,67 @@ export class AppHost {
    * hides (or leaks a timer into) another's tooltip.
    */
   readonly hyperlinkTooltipOwner: HyperlinkTooltipOwner = {};
+
+  /**
+   * The process-wide interaction slots this editor currently owns: the
+   * pointerup handler of the interaction in flight, and the eye dropper (one
+   * atom in the editor-wide store). Both hold closures over this editor, so a
+   * teardown that leaves one set retains the editor -- and with it its owner
+   * window and document, e.g. a closed popout.
+   *
+   * @see releaseOwnedInteractionState
+   */
+  private ownedPointerUp: (() => void) | null = null;
+  private ownedEyeDropper: EyeDropperProperties | null = null;
+
+  /** Takes over the pointerup slot (or clears it, on `null`). */
+  public setPointerUp(handler: (() => void) | null) {
+    activePointerUp = handler;
+    this.ownedPointerUp = handler;
+  }
+
+  /**
+   * Runs the pending pointerup, whoever owns it -- pointerup does not always
+   * fire (the user tabs away), so interactions are settled manually.
+   */
+  public runPendingPointerUp() {
+    activePointerUp?.();
+  }
+
+  /** Opens the eye dropper (or closes it, on `null`), taking ownership. */
+  public setActiveEyeDropper(eyeDropper: EyeDropperProperties | null) {
+    this.ownedEyeDropper = eyeDropper;
+    this.app.updateEditorAtom(activeEyeDropperAtom, eyeDropper);
+  }
+
+  /**
+   * Drops the ownership token without touching the atom -- for callers that
+   * have just closed the eye dropper themselves.
+   */
+  public releaseEyeDropperOwnership() {
+    this.ownedEyeDropper = null;
+  }
+
+  /**
+   * Releases the process-wide slots this editor owns, so nothing outside it
+   * keeps it alive once it is torn down. Ownership-checked: a sibling
+   * editor's in-flight interaction must survive our teardown.
+   */
+  private releaseOwnedInteractionState() {
+    // an unmount mid-drag never reaches the pointerup that would clear this
+    if (this.ownedPointerUp && activePointerUp === this.ownedPointerUp) {
+      activePointerUp = null;
+    }
+    this.ownedPointerUp = null;
+
+    if (
+      this.ownedEyeDropper &&
+      editorJotaiStore.get(activeEyeDropperAtom) === this.ownedEyeDropper
+    ) {
+      editorJotaiStore.set(activeEyeDropperAtom, null);
+    }
+    this.ownedEyeDropper = null;
+  }
 
   /**
    * Render environment scoped to this editor's owner window, so that the
@@ -73,11 +143,12 @@ export class AppHost {
   }
 
   /**
-   * Releases the tooltip ownership so we don't retain the (soon detached)
-   * document/window, or leave a pending tooltip timer around.
+   * Releases what this editor owns outside itself, so we don't retain the
+   * (soon detached) document/window, or leave a pending tooltip timer around.
    */
   public destroy() {
     hideHyperlinkToolip(this.hyperlinkTooltipOwner);
+    this.releaseOwnedInteractionState();
   }
 
   /**
