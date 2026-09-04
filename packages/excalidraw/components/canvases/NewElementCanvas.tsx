@@ -24,13 +24,16 @@ interface NewElementCanvasProps {
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
   useEffect(() => {
-    if (!canvasRef.current) {
+    const canvas = canvasRef.current;
+    if (!canvas) {
       return;
     }
+
     renderNewElementScene(
       {
-        canvas: canvasRef.current,
+        canvas,
         scale: props.scale,
         newElement: props.newElement,
         elementsMap: props.elementsMap,
@@ -41,6 +44,20 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
       },
       isRenderThrottlingEnabled(),
     );
+
+    return () => {
+      // Use the node captured by this effect because React may clear the ref
+      // before unmount cleanup. This component keeps the same canvas node
+      // throughout its mounted lifetime.
+      //
+      // Releasing the backing store explicitly is necessary on older Safari
+      // versions, which may otherwise retain detached canvases until the
+      // browser-wide canvas memory limit is exhausted.
+      if (!canvas.isConnected) {
+        canvas.width = 0;
+        canvas.height = 0;
+      }
+    };
   });
 
   return (
