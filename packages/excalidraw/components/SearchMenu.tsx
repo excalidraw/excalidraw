@@ -104,6 +104,13 @@ export const SearchMenu = () => {
     if (isSearching) {
       return;
     }
+    // skip re-searching while an element is actively being dragged: matches
+    // are sorted by canvas position, so re-running here would reorder the
+    // results list on every pointer-move frame of the drag. The scene nonce
+    // stays dirty and is picked up on the next effect run once the drag ends.
+    if (app.state.selectedElementsAreBeingDragged) {
+      return;
+    }
     if (
       searchQuery !== searchedQueryRef.current ||
       app.scene.getSceneNonce() !== lastSceneNonceRef.current
@@ -135,6 +142,7 @@ export const SearchMenu = () => {
     searchQuery,
     elementsMap,
     app,
+    app.state.selectedElementsAreBeingDragged,
     setAppState,
     setFocusIndex,
     lastSceneNonceRef,
