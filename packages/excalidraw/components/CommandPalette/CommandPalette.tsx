@@ -878,6 +878,7 @@ function CommandPaletteInner({
       onCloseRequest={() => closeCommandPalette()}
       closeOnClickOutside
       title={false}
+      ariaLabel={t("commandPalette.title")}
       size={720}
       autofocus
       className="command-palette-dialog"
