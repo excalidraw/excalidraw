@@ -461,6 +461,8 @@
     "howto": "Follow our guides",
     "or": "or",
     "preventBinding": "Prevent arrow binding",
+    "searchPlaceholder": "Search shortcuts",
+    "searchNoResults": "No matching shortcuts",
     "tools": "Tools",
     "shortcuts": "Keyboard shortcuts",
     "textFinish": "Finish editing (text editor)",
