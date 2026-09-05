@@ -89,6 +89,7 @@ import type {
   OrderedExcalidrawElement,
   StrokeVariability,
   StrokeRoundness,
+  TextColorRange,
 } from "@excalidraw/element/types";
 
 import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
@@ -417,6 +418,29 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
   return null;
 };
 
+const sanitizeColorRanges = (
+  colorRanges: unknown,
+  textLength: number,
+): TextColorRange[] | null => {
+  if (!Array.isArray(colorRanges)) {
+    return null;
+  }
+
+  const valid = colorRanges.filter(
+    (range): range is TextColorRange =>
+      range &&
+      typeof range === "object" &&
+      isFiniteNumber(range.start) &&
+      isFiniteNumber(range.end) &&
+      range.start >= 0 &&
+      range.end <= textLength &&
+      range.start < range.end &&
+      typeof range.color === "string",
+  );
+
+  return valid.length ? valid : null;
+};
+
 const restoreElementWithProperties = <
   T extends Required<Omit<ExcalidrawElement, "customData">> & {
     customData?: ExcalidrawElement["customData"];
@@ -532,6 +556,7 @@ export const restoreElement = (
         fontFamily = getFontFamilyByName(_fontFamily);
       }
       const text = (typeof element.text === "string" && element.text) || "";
+      const originalText = element.originalText || text;
 
       // line-height might not be specified either when creating elements
       // programmatically, or when importing old diagrams.
@@ -553,12 +578,16 @@ export const restoreElement = (
         textAlign: element.textAlign || DEFAULT_TEXT_ALIGN,
         verticalAlign: element.verticalAlign || DEFAULT_VERTICAL_ALIGN,
         containerId: element.containerId ?? null,
-        originalText: element.originalText || text,
+        originalText,
         autoResize: element.autoResize ?? true,
         lineHeight,
         labelPosition: isFiniteNumber(element.labelPosition)
           ? clamp(element.labelPosition, 0, 1)
           : null,
+        colorRanges: sanitizeColorRanges(
+          element.colorRanges,
+          originalText.length,
+        ),
       });
 
       // if empty text, mark as deleted. We keep in array
