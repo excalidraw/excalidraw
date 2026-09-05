@@ -678,6 +678,59 @@ describe("Test Transform", () => {
       });
     });
 
+    it("should position start/end bound text correctly when the referenced elements have no explicit x/y (#7003)", () => {
+      const elements = [
+        {
+          type: "text",
+          id: "start-text",
+          text: "input",
+        },
+        {
+          type: "text",
+          id: "end-text",
+          text: "result",
+        },
+        {
+          type: "arrow",
+          x: 200,
+          y: 200,
+          label: {
+            text: "=deno",
+          },
+          start: {
+            id: "start-text",
+          },
+          end: {
+            id: "end-text",
+          },
+        },
+      ];
+
+      const excalidrawElements = convertToExcalidrawElements(
+        elements as ExcalidrawElementSkeleton[],
+        opts,
+      );
+
+      const arrow = excalidrawElements.find(
+        (el) => el.type === "arrow",
+      ) as ExcalidrawArrowElement;
+      const startText = excalidrawElements.find(
+        (el) => el.id === "start-text",
+      )!;
+      const endText = excalidrawElements.find((el) => el.id === "end-text")!;
+
+      expect(typeof startText.x).toBe("number");
+      expect(Number.isNaN(startText.x)).toBe(false);
+      expect(typeof endText.x).toBe("number");
+      expect(Number.isNaN(endText.x)).toBe(false);
+
+      // the start-bound text sits before the arrow's start, the
+      // end-bound text sits at (within a sub-pixel binding-overlap
+      // adjustment) or after the arrow's end
+      expect(startText.x).toBeLessThan(arrow.x);
+      expect(endText.x).toBeGreaterThan(arrow.x + arrow.width - 1);
+    });
+
     it("should bind arrows to existing elements if ids are correct", () => {
       const consoleErrorSpy = vi
         .spyOn(console, "error")

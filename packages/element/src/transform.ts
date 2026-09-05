@@ -386,6 +386,7 @@ const bindLinearElementToElement = (
         });
         // to position the text correctly when coordinates not provided
         Object.assign(endBoundElement, {
+          x: end.x || linearElement.x + linearElement.width,
           y: end.y || linearElement.y - endBoundElement.height / 2,
         });
       } else {
