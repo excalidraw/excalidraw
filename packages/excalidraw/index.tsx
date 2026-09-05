@@ -84,6 +84,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderTopRightUI,
     langCode = defaultLang.code,
     viewModeEnabled,
+    showLinkIcons,
     interaction,
     ui,
     activeTool,
@@ -226,6 +227,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
+          showLinkIcons={showLinkIcons}
           interaction={interaction}
           ui={ui}
           activeTool={activeTool}
