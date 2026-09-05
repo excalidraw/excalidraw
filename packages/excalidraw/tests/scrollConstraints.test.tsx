@@ -12,6 +12,7 @@ import {
   actionZoomToFitSelection,
 } from "../actions/actionCanvas";
 import { getNormalizedZoom } from "../scene";
+import { getScrollBars } from "../scene/scrollbars";
 import {
   snapBackToConstraints,
   SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
@@ -1275,5 +1276,190 @@ describe("rubberband overscroll (integration)", () => {
 
     install(25);
     expect(h.state.scrollConstraints?.overscroll).toBe(25);
+  });
+
+  // The escape this guards against needs React's setState batching window and
+  // does not manifest under jsdom — `act()` flushes synchronously, so a rigid
+  // lock holds here even with the bug present (verified). What *is* observable
+  // is the contract the fix establishes: every drag-driven translate must pass
+  // an updater function. A plain object read from `this.state` re-bases each
+  // throttled pointermove on the pre-clamp scroll, so the clamp never
+  // compounds and the viewport walks out of the locked box.
+  it("drives drag-panning through the updater form so clamps compound", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: false },
+      });
+      h.app.setActiveTool({ type: "hand" });
+    });
+
+    // spy after setViewport so only drag-driven calls are captured
+    const translateSpy = vi.spyOn(h.app.viewport, "translate");
+
+    try {
+      const mouse = new Pointer("mouse");
+      window.EXCALIDRAW_THROTTLE_RENDER = true;
+      try {
+        mouse.downAt(50, 2);
+        mouse.move(0, 20);
+        mouse.move(0, 20);
+        mouse.up();
+      } finally {
+        window.EXCALIDRAW_THROTTLE_RENDER = false;
+      }
+
+      expect(translateSpy).toHaveBeenCalled();
+      for (const [arg] of translateSpy.mock.calls) {
+        expect(typeof arg).toBe("function");
+      }
+    } finally {
+      translateSpy.mockRestore();
+    }
+  });
+
+  // the rigid lock must hold across a sustained drag. This passes with the bug
+  // present under jsdom, but pins the user-visible guarantee for any future
+  // environment that does reproduce the batching window.
+  it("keeps a rigid lock while drag-panning", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: false },
+      });
+      h.app.setActiveTool({ type: "hand" });
+    });
+
+    const mouse = new Pointer("mouse");
+    mouse.downAt(50, 2);
+    for (let i = 0; i < 12; i++) {
+      mouse.move(0, 20);
+    }
+    mouse.up();
+
+    // hard lock: no give at all past the top edge
+    expect(h.state.scrollY).toBeCloseTo(0);
+  });
+
+  // Dragging a scrollbar reaches `viewport.translate` through
+  // `handlePointerMoveOverScrollbars`, a different pair of call sites from
+  // drag-panning above. They had the same object-form bug and carry the same
+  // requirement, so they get the same coverage rather than being taken on
+  // trust because the pan case is green.
+  //
+  // Two things make this path awkward to reach and are worth stating, because
+  // getting either wrong yields a test that passes while touching nothing:
+  // the scrollbar rects are only computed when the canvas renders them, so
+  // `renderScrollbars` must be on; and the hit test runs in canvas space,
+  // so the pointer has to be offset by `offsetLeft` / `offsetTop`.
+  const dragScrollBar = async (axis: "horizontal" | "vertical") => {
+    await render(
+      <Excalidraw handleKeyboardGlobally={true} renderScrollbars={true} />,
+    );
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    // content wider and taller than the viewport, so both bars exist
+    API.setElements([
+      API.createElement({
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 40,
+        height: 40,
+      }),
+      API.createElement({
+        type: "rectangle",
+        x: 900,
+        y: 400,
+        width: 40,
+        height: 40,
+      }),
+    ]);
+
+    React.act(() => {
+      h.app.setActiveTool({ type: "selection" });
+    });
+
+    // The hit test reads the scrollbar rects cached by the last interactive
+    // render, so the pointer must not go down before that render has happened
+    // — otherwise the rects are still null, the drag is treated as a canvas
+    // drag, and this test silently exercises nothing.
+    await waitFor(() =>
+      expect(h.app.scene.getNonDeletedElements().length).toBe(2),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const bar = getScrollBars(
+      h.app.scene.getNonDeletedElementsMap(),
+      h.state.width,
+      h.state.height,
+      h.state,
+    )[axis];
+
+    expect(bar).not.toBeNull();
+
+    // spy after setup so only drag-driven calls are captured
+    const translateSpy = vi.spyOn(h.app.viewport, "translate");
+    const before = axis === "horizontal" ? h.state.scrollX : h.state.scrollY;
+
+    try {
+      const mouse = new Pointer("mouse");
+      mouse.downAt(
+        bar!.x + bar!.width / 2 + h.state.offsetLeft,
+        bar!.y + bar!.height / 2 + h.state.offsetTop,
+      );
+      if (axis === "horizontal") {
+        mouse.move(15, 0);
+        mouse.move(15, 0);
+      } else {
+        mouse.move(0, 15);
+        mouse.move(0, 15);
+      }
+      mouse.up();
+
+      const after = axis === "horizontal" ? h.state.scrollX : h.state.scrollY;
+
+      // read the recorded calls out BEFORE restoring: `mockRestore` clears
+      // them, so returning the spy itself would hand the test an empty list
+      // and every assertion over it would vacuously pass
+      return {
+        argTypes: translateSpy.mock.calls.map(([arg]) => typeof arg),
+        before,
+        after,
+      };
+    } finally {
+      translateSpy.mockRestore();
+    }
+  };
+
+  it("drives horizontal scrollbar dragging through the updater form", async () => {
+    const { argTypes, before, after } = await dragScrollBar("horizontal");
+
+    // the drag has to have actually reached the scrollbar handler and moved
+    // the viewport, or the contract assertion below would pass over an empty
+    // list and pin nothing
+    expect(argTypes.length).toBeGreaterThan(0);
+    expect(after).not.toBe(before);
+
+    expect(argTypes.every((type) => type === "function")).toBe(true);
+  });
+
+  it("drives vertical scrollbar dragging through the updater form", async () => {
+    const { argTypes, before, after } = await dragScrollBar("vertical");
+
+    expect(argTypes.length).toBeGreaterThan(0);
+    expect(after).not.toBe(before);
+
+    expect(argTypes.every((type) => type === "function")).toBe(true);
   });
 });

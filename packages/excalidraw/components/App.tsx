@@ -9060,10 +9060,14 @@ class App extends React.Component<AppProps, AppState> {
         this.ownerWindow.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
-      this.viewport.translate({
-        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
-        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
-      });
+      // Updater form is required: `translate` applies the scroll constraints in
+      // a second, function-form `setState`, so reading `this.state` here would
+      // re-base each throttled move on the pre-clamp scroll and let a locked
+      // viewport drift out of its box.
+      this.viewport.translate((state) => ({
+        scrollX: state.scrollX - deltaX / state.zoom.value,
+        scrollY: state.scrollY - deltaY / state.zoom.value,
+      }));
     });
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
@@ -11484,12 +11488,12 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverHorizontal) {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
-      this.viewport.translate({
+      this.viewport.translate((state) => ({
         scrollX:
-          this.state.scrollX -
+          state.scrollX -
           (dx * (currentScrollBars.horizontal?.deltaMultiplier || 1)) /
-            this.state.zoom.value,
-      });
+            state.zoom.value,
+      }));
       pointerDownState.lastCoords.x = x;
       return true;
     }
@@ -11497,12 +11501,12 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverVertical) {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
-      this.viewport.translate({
+      this.viewport.translate((state) => ({
         scrollY:
-          this.state.scrollY -
+          state.scrollY -
           (dy * (currentScrollBars.vertical?.deltaMultiplier || 1)) /
-            this.state.zoom.value,
-      });
+            state.zoom.value,
+      }));
       pointerDownState.lastCoords.y = y;
       return true;
     }
