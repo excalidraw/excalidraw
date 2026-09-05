@@ -158,13 +158,7 @@ export const frameClip = (
 
 type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
 
-const linkIconCanvasCache: {
-  regularLink: LinkIconCanvas | null;
-  elementLink: LinkIconCanvas | null;
-} = {
-  regularLink: null,
-  elementLink: null,
-};
+const linkIconCanvasCache = new Map<string, LinkIconCanvas>();
 
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
@@ -185,20 +179,26 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    const canvasKey = isElementLink(element.link)
-      ? "elementLink"
-      : "regularLink";
+    const linkType = isElementLink(element.link) ? "elementLink" : "regularLink";
+    const backgroundColor = appState.viewBackgroundColor || COLOR_WHITE;
+    const isDark = appState.theme === THEME.DARK;
 
-    let linkCanvas = linkIconCanvasCache[canvasKey];
+    // Key by every dimension that affects the rendered chip, so a theme or
+    // background-color change yields a fresh canvas instead of a stale one
+    // (https://github.com/excalidraw/excalidraw/issues/11867)
+    const cacheKey =
+      `${linkType}:${appState.zoom.value}:${backgroundColor}:${isDark}`;
 
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
+    let linkCanvas = linkIconCanvasCache.get(cacheKey);
+
+    if (!linkCanvas) {
       linkCanvas = Object.assign(document.createElement("canvas"), {
         zoom: appState.zoom.value,
       });
       linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
       linkCanvas.height =
         height * window.devicePixelRatio * appState.zoom.value;
-      linkIconCanvasCache[canvasKey] = linkCanvas;
+      linkIconCanvasCache.set(cacheKey, linkCanvas);
 
       const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
       linkCanvasCacheContext.scale(
@@ -209,12 +209,16 @@ const renderLinkIcon = (
       // Seed a sane default so a corrupted color (silently rejected by the
       // canvas) falls back to white instead of a stale fillStyle.
       linkCanvasCacheContext.fillStyle = COLOR_WHITE;
-      linkCanvasCacheContext.fillStyle =
-        appState.viewBackgroundColor || COLOR_WHITE;
+      // Route the background through the same dark-mode filter every other
+      // part of the renderer uses, so the chip matches the canvas in both themes
+      linkCanvasCacheContext.fillStyle = applyDarkModeFilter(
+        backgroundColor,
+        isDark,
+      );
 
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
-      if (canvasKey === "elementLink") {
+      if (linkType === "elementLink") {
         linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
       } else {
         linkCanvasCacheContext.drawImage(
