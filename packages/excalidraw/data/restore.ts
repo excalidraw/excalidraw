@@ -1219,12 +1219,24 @@ export const restoreAppState = (
       lastActiveTool: null,
       locked: nextAppState.activeTool.locked ?? false,
     },
+    // the viewport is untrusted input, and a non-finite value here leaves the
+    // canvas unrenderable with no way for the user to recover
+    scrollX: isFiniteNumber(nextAppState.scrollX)
+      ? nextAppState.scrollX
+      : defaultAppState.scrollX,
+    scrollY: isFiniteNumber(nextAppState.scrollY)
+      ? nextAppState.scrollY
+      : defaultAppState.scrollY,
     // Migrates from previous version where appState.zoom was a number
     zoom: {
+      // `getNormalizedZoom` clamps with Math.min/Math.max, which pass NaN
+      // straight through, so the value has to be checked before it gets there
       value: getNormalizedZoom(
         isFiniteNumber(appState.zoom)
           ? appState.zoom
-          : appState.zoom?.value ?? defaultAppState.zoom.value,
+          : isFiniteNumber(appState.zoom?.value)
+          ? appState.zoom.value
+          : defaultAppState.zoom.value,
       ),
     },
     openSidebar:
