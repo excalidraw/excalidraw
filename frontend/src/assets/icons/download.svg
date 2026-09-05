@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72.62 98.42" width="24" height="24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" role="img" aria-label="Download">
+  <!-- Shaft -->
+  <g transform="translate(36.13 10.81)">
+    <path d="M-3.26 -0.81 C0.77 28.77, 4.59 54.55, -1.51 70.94 M1.47 0.06 C-0.34 14.43, 0.6 30.58, -0.42 76.54"/>
+  </g>
+  <!-- Arrowhead, left stroke -->
+  <g transform="translate(10.68 64.76)">
+    <path d="M0.06 0.78 C9.93 7.87, 15.19 13.63, 22.55 23.66 M-0.68 -0.74 C8.83 7.71, 17.4 17.59, 24.18 23.17"/>
+  </g>
+  <!-- Arrowhead, right stroke -->
+  <g transform="translate(35.72 86.76)">
+    <path d="M1.78 0.07 C5.84 -6.99, 12.52 -8.99, 26.9 -16.32 M-0.33 -0.64 C7.11 -4.32, 15.47 -10.02, 25.57 -17.7"/>
+  </g>
+</svg>
