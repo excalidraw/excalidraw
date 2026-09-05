@@ -158,13 +158,7 @@ export const frameClip = (
 
 type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
 
-const linkIconCanvasCache: {
-  regularLink: LinkIconCanvas | null;
-  elementLink: LinkIconCanvas | null;
-} = {
-  regularLink: null,
-  elementLink: null,
-};
+const linkIconCanvasCache = new Map<string, LinkIconCanvas>();
 
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
@@ -185,20 +179,21 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    const canvasKey = isElementLink(element.link)
-      ? "elementLink"
-      : "regularLink";
+    const linkType = isElementLink(element.link) ? "elementLink" : "regularLink";
+    const bgColor = appState.viewBackgroundColor || COLOR_WHITE;
+    const isDark = appState.theme === THEME.DARK;
+    const cacheKey = `${linkType}:${appState.zoom.value}:${bgColor}:${isDark}`;
 
-    let linkCanvas = linkIconCanvasCache[canvasKey];
+    let linkCanvas = linkIconCanvasCache.get(cacheKey);
 
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
+    if (!linkCanvas) {
       linkCanvas = Object.assign(document.createElement("canvas"), {
         zoom: appState.zoom.value,
       });
       linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
       linkCanvas.height =
         height * window.devicePixelRatio * appState.zoom.value;
-      linkIconCanvasCache[canvasKey] = linkCanvas;
+      linkIconCanvasCache.set(cacheKey, linkCanvas);
 
       const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
       linkCanvasCacheContext.scale(
@@ -209,12 +204,11 @@ const renderLinkIcon = (
       // Seed a sane default so a corrupted color (silently rejected by the
       // canvas) falls back to white instead of a stale fillStyle.
       linkCanvasCacheContext.fillStyle = COLOR_WHITE;
-      linkCanvasCacheContext.fillStyle =
-        appState.viewBackgroundColor || COLOR_WHITE;
+      linkCanvasCacheContext.fillStyle = applyDarkModeFilter(bgColor, isDark);
 
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
-      if (canvasKey === "elementLink") {
+      if (linkType === "elementLink") {
         linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
       } else {
         linkCanvasCacheContext.drawImage(
