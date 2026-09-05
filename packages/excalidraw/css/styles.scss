@@ -520,7 +520,7 @@ body.excalidraw-cursor-resize * {
     background-position: right 0.7rem top 50%, 0 0;
 
     :root[dir="rtl"] & {
-      background-position: left 0.7rem top 50%, 0 0;
+      background-position: right 0.7rem top 50%, 0 0;
     }
 
     background-size: 0.65em auto, 100%;
