@@ -417,6 +417,10 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
   return null;
 };
 
+/** geometry from imported data, falling back when it is not a usable number */
+const coerceFiniteNumber = (value: unknown, fallback = 0) =>
+  isFiniteNumber(value) ? value : fallback;
+
 const restoreElementWithProperties = <
   T extends Required<Omit<ExcalidrawElement, "customData">> & {
     customData?: ExcalidrawElement["customData"];
@@ -452,13 +456,15 @@ const restoreElementWithProperties = <
     opacity:
       element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
     angle: element.angle || (0 as Radians),
-    x: extra.x ?? element.x ?? 0,
-    y: extra.y ?? element.y ?? 0,
+    // geometry comes from untrusted data, and `??` lets NaN/Infinity through
+    x: coerceFiniteNumber(extra.x ?? element.x),
+    y: coerceFiniteNumber(extra.y ?? element.y),
     strokeColor: element.strokeColor || DEFAULT_ELEMENT_PROPS.strokeColor,
     backgroundColor:
       element.backgroundColor || DEFAULT_ELEMENT_PROPS.backgroundColor,
-    width: element.width || 0,
-    height: element.height || 0,
+    // `||` happens to catch NaN but not Infinity
+    width: coerceFiniteNumber(element.width),
+    height: coerceFiniteNumber(element.height),
     seed: element.seed ?? 1,
     groupIds: element.groupIds ?? [],
     frameId: element.frameId ?? null,
