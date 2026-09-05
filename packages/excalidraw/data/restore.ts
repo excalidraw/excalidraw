@@ -870,15 +870,22 @@ export const restoreElements = <T extends ExcalidrawElement>(
       }
     | undefined,
 ): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
+  // imported data is untrusted, and a malformed entry would otherwise throw
+  // before it ever reaches the per-element try/catch below, rejecting the
+  // whole scene over one bad element
+  const sourceElements = (targetElements || []).filter(
+    (element): element is T => !!element && typeof element === "object",
+  );
+
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const targetElementsMap = arrayToMap(targetElements || []);
+  const targetElementsMap = arrayToMap(sourceElements);
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
 
   const restoredElements = syncInvalidIndices(
-    (targetElements || []).reduce((elements, element) => {
+    sourceElements.reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {
