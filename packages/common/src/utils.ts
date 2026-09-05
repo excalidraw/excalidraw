@@ -360,11 +360,26 @@ export const sceneCoordsToViewportCoords = (
 export const getGlobalCSSVariable = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(`--${name}`);
 
-const RS_LTR_CHARS =
-  "A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02B8\u0300-\u0590\u0800-\u1FFF" +
-  "\u2C00-\uFB1C\uFDFE-\uFE6F\uFEFD-\uFFFF";
-const RS_RTL_CHARS = "\u0591-\u07FF\uFB1D-\uFDFD\uFE70-\uFEFC";
-const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
+/** scripts written right-to-left */
+const RS_RTL_SCRIPTS = [
+  "Hebrew",
+  "Arabic",
+  "Syriac",
+  "Thaana",
+  "Nko",
+  "Samaritan",
+  "Mandaic",
+  "Adlam",
+]
+  .map((script) => `\\p{Script=${script}}`)
+  .join("");
+
+// skip over everything that carries no direction of its own (digits,
+// punctuation, symbols, emoji), then look at the first actual letter.
+// the `u` flag matters: without it astral characters are matched as separate
+// surrogate halves, and the high surrogate range overlaps the letter ranges.
+const RE_RTL_CHECK = new RegExp(`^\\P{L}*[${RS_RTL_SCRIPTS}]`, "u");
+
 /**
  * Checks whether first directional character is RTL. Meaning whether it starts
  *  with RTL characters, or indeterminate (numbers etc.) characters followed by
