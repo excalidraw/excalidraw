@@ -274,6 +274,10 @@ const createToolButton = (
   }: ToolButtonComponentProps) => {
     const label = capitalizeString(t(`toolBar.${type}`));
     const shortcut = hideShortcut ? null : getToolShortcut(shortcutType);
+    const keyBindingLabel =
+      hideKeyBinding || hideShortcut
+        ? undefined
+        : TOOLS[shortcutType].numericKey || getToolLetter(shortcutType);
 
     return (
       <IconButton
@@ -283,12 +287,15 @@ const createToolButton = (
         checked={activeTool.type === type}
         disabled={isToolButtonDisabled(app, type)}
         title={shortcut ? `${label} — ${shortcut}` : label}
-        keyBindingLabel={
-          hideKeyBinding || hideShortcut
-            ? undefined
-            : TOOLS[shortcutType].numericKey || getToolLetter(shortcutType)
-        }
-        aria-label={label}
+        keyBindingLabel={keyBindingLabel}
+        // The keybinding badge (e.g. "2") is real visible text on the button, and
+        // axe-core's label-content-name-mismatch rule (WCAG 2.5.3) correctly flags
+        // that "Rectangle" alone doesn't contain it — a speech-input user who says
+        // what they see on the button has no reason to expect that to fail. Appending
+        // it keeps the announcement short (aria-keyshortcuts already carries the full
+        // "R or 2" form for AT that surfaces it) while satisfying the actual rule,
+        // which checks what's visually rendered, not what's exposed to a screen reader.
+        aria-label={keyBindingLabel ? `${label} ${keyBindingLabel}` : label}
         aria-keyshortcuts={shortcut ?? undefined}
         data-testid={`toolbar-${type}`}
         onSelect={({ pointerType }) => {
