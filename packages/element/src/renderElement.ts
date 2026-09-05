@@ -42,7 +42,11 @@ import type {
   InteractiveCanvasRenderConfig,
 } from "@excalidraw/excalidraw/scene/types";
 
-import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
+import {
+  getDiamondPoints,
+  getElementAbsoluteCoords,
+  getElementBounds,
+} from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -82,6 +86,7 @@ import type {
 } from "./types";
 
 import type { RoughCanvas } from "roughjs/bin/canvas";
+import type { Drawable, OpSet } from "roughjs/bin/core";
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -315,6 +320,198 @@ const drawImagePlaceholder = (
   );
 };
 
+const applyShapeFillClip = (
+  element: NonDeletedExcalidrawElement,
+  context: CanvasRenderingContext2D,
+) => {
+  context.beginPath();
+
+  switch (element.type) {
+    case "rectangle":
+    case "iframe":
+    case "embeddable": {
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element,
+      );
+      if (radius && context.roundRect) {
+        context.roundRect(0, 0, element.width, element.height, radius);
+      } else {
+        context.rect(0, 0, element.width, element.height);
+      }
+      break;
+    }
+    case "diamond": {
+      const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
+        getDiamondPoints(element);
+
+      if (element.roundness) {
+        const verticalRadius = getCornerRadius(Math.abs(topX - leftX), element);
+        const horizontalRadius = getCornerRadius(
+          Math.abs(rightY - topY),
+          element,
+        );
+
+        context.moveTo(topX + verticalRadius, topY + horizontalRadius);
+        context.lineTo(rightX - verticalRadius, rightY - horizontalRadius);
+        context.bezierCurveTo(
+          rightX,
+          rightY,
+          rightX,
+          rightY,
+          rightX - verticalRadius,
+          rightY + horizontalRadius,
+        );
+        context.lineTo(bottomX + verticalRadius, bottomY - horizontalRadius);
+        context.bezierCurveTo(
+          bottomX,
+          bottomY,
+          bottomX,
+          bottomY,
+          bottomX - verticalRadius,
+          bottomY - horizontalRadius,
+        );
+        context.lineTo(leftX + verticalRadius, leftY + horizontalRadius);
+        context.bezierCurveTo(
+          leftX,
+          leftY,
+          leftX,
+          leftY,
+          leftX + verticalRadius,
+          leftY - horizontalRadius,
+        );
+        context.lineTo(topX - verticalRadius, topY + horizontalRadius);
+        context.bezierCurveTo(
+          topX,
+          topY,
+          topX,
+          topY,
+          topX + verticalRadius,
+          topY + horizontalRadius,
+        );
+        context.closePath();
+        break;
+      }
+
+      context.moveTo(topX, topY);
+      context.lineTo(rightX, rightY);
+      context.lineTo(bottomX, bottomY);
+      context.lineTo(leftX, leftY);
+      context.closePath();
+      break;
+    }
+    case "ellipse": {
+      context.ellipse(
+        element.width / 2,
+        element.height / 2,
+        Math.abs(element.width / 2),
+        Math.abs(element.height / 2),
+        0,
+        0,
+        Math.PI * 2,
+      );
+      break;
+    }
+    default:
+      return;
+  }
+
+  context.clip();
+};
+
+const applyRoughOutlineClip = (
+  sets: OpSet[],
+  context: CanvasRenderingContext2D,
+) => {
+  let didDrawPath = false;
+
+  context.beginPath();
+
+  for (const set of sets) {
+    if (set.type !== "path") {
+      continue;
+    }
+
+    let pathStarted = false;
+
+    for (const item of set.ops) {
+      const data = item.data;
+
+      switch (item.op) {
+        case "move": {
+          if (pathStarted) {
+            context.closePath();
+          }
+          context.moveTo(data[0], data[1]);
+          pathStarted = true;
+          didDrawPath = true;
+          break;
+        }
+        case "lineTo": {
+          context.lineTo(data[0], data[1]);
+          break;
+        }
+        case "bcurveTo": {
+          context.bezierCurveTo(
+            data[0],
+            data[1],
+            data[2],
+            data[3],
+            data[4],
+            data[5],
+          );
+          break;
+        }
+      }
+    }
+
+    if (pathStarted) {
+      context.closePath();
+    }
+  }
+
+  if (didDrawPath) {
+    context.clip();
+  }
+
+  return didDrawPath;
+};
+
+export const drawRoughShapeWithClippedFill = (
+  shape: Drawable,
+  element: NonDeletedExcalidrawElement,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+) => {
+  const fillSets = shape.sets.filter(
+    (set) => set.type === "fillSketch" || set.type === "fillPath",
+  );
+
+  if (!fillSets.length) {
+    rc.draw(shape);
+    return;
+  }
+
+  const nonFillSets = shape.sets.filter(
+    (set) => set.type !== "fillSketch" && set.type !== "fillPath",
+  );
+
+  context.save();
+  if (element.type === "ellipse") {
+    if (!applyRoughOutlineClip(nonFillSets, context)) {
+      applyShapeFillClip(element, context);
+    }
+  } else {
+    applyShapeFillClip(element, context);
+  }
+  rc.draw({ ...shape, sets: fillSets });
+  context.restore();
+
+  if (nonFillSets.length) {
+    rc.draw({ ...shape, sets: nonFillSets });
+  }
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -330,7 +527,12 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      rc.draw(ShapeCache.generateElementShape(element, renderConfig));
+      drawRoughShapeWithClippedFill(
+        ShapeCache.generateElementShape(element, renderConfig),
+        element,
+        rc,
+        context,
+      );
       break;
     }
     case "arrow":
