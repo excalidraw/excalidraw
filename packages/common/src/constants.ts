@@ -491,6 +491,7 @@ export const TOOL_TYPE = {
   arrow: "arrow",
   line: "line",
   freedraw: "freedraw",
+  highlighter: "highlighter",
   text: "text",
   image: "image",
   eraser: "eraser",
