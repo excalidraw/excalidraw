@@ -23,6 +23,10 @@ import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
 import {
+  mapWrappedLinesToOriginalOffsets,
+  splitLineIntoColorSegments,
+} from "@excalidraw/element";
+import {
   isArrowElement,
   isIframeLikeElement,
   isInitializedImageElement,
@@ -687,9 +691,12 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
+        const lineOffsets = element.colorRanges?.length
+          ? mapWrappedLinesToOriginalOffsets(element.text, element.originalText)
+          : null;
+
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
@@ -705,6 +712,36 @@ const renderElementToSvg = (
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
           text.setAttribute("dominant-baseline", "alphabetic");
+
+          const segments = lineOffsets
+            ? splitLineIntoColorSegments(
+                lines[i],
+                lineOffsets[i]?.start ?? 0,
+                element.colorRanges,
+                element.strokeColor,
+              )
+            : [{ text: lines[i], color: element.strokeColor }];
+
+          if (segments.length === 1) {
+            text.textContent = segments[0].text;
+          } else {
+            for (const segment of segments) {
+              const tspan = svgRoot.ownerDocument.createElementNS(
+                SVG_NS,
+                "tspan",
+              );
+              tspan.textContent = segment.text;
+              tspan.setAttribute(
+                "fill",
+                applyDarkModeFilter(
+                  segment.color,
+                  renderConfig.theme === THEME.DARK,
+                ),
+              );
+              text.appendChild(tspan);
+            }
+          }
+
           node.appendChild(text);
         }
 

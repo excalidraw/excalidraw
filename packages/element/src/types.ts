@@ -232,6 +232,15 @@ export type NonDeleted<TElement extends ExcalidrawElement> = TElement & {
 
 export type NonDeletedExcalidrawElement = NonDeleted<ExcalidrawElement>;
 
+/**
+ * Offsets are into `originalText`, not the wrapped `text`, end-exclusive.
+ */
+export type TextColorRange = Readonly<{
+  start: number;
+  end: number;
+  color: string;
+}>;
+
 export type ExcalidrawTextElement = _ExcalidrawElementBase &
   Readonly<{
     type: "text";
@@ -261,6 +270,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      * so it survives midpoint insertion and other geometry changes.
      * */
     labelPosition?: number | null;
+    colorRanges?: readonly TextColorRange[] | null;
   }>;
 
 export type ExcalidrawBindableElement =

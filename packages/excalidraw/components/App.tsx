@@ -171,6 +171,7 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
+  rebaseColorRanges,
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
@@ -6271,6 +6272,13 @@ class App extends React.Component<AppProps, AppState> {
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
+              ...(_element.colorRanges?.length && {
+                colorRanges: rebaseColorRanges(
+                  _element.originalText,
+                  nextOriginalText,
+                  _element.colorRanges,
+                ),
+              }),
               // returns (wrapped) text and new dimensions
               ...refreshTextDimensions(
                 _element,

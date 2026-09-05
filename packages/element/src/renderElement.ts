@@ -46,6 +46,10 @@ import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
+  mapWrappedLinesToOriginalOffsets,
+  splitLineIntoColorSegments,
+} from "./textColorRanges";
+import {
   getBoundTextElement,
   getContainerCoords,
   getContainerElement,
@@ -513,12 +517,65 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
-        for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
+        if (!rtl && element.colorRanges?.length) {
+          const lineOffsets = mapWrappedLinesToOriginalOffsets(
+            element.text,
+            element.originalText,
           );
+
+          for (let index = 0; index < lines.length; index++) {
+            const segments = splitLineIntoColorSegments(
+              lines[index],
+              lineOffsets[index]?.start ?? 0,
+              element.colorRanges,
+              element.strokeColor,
+            );
+
+            if (segments.length === 1) {
+              context.fillStyle = applyDarkModeFilter(
+                segments[0].color,
+                renderConfig.theme === THEME.DARK,
+              );
+              context.fillText(
+                segments[0].text,
+                horizontalOffset,
+                index * lineHeightPx + verticalOffset,
+              );
+              continue;
+            }
+
+            const totalWidth = context.measureText(lines[index]).width;
+            const startX =
+              element.textAlign === "center"
+                ? element.width / 2 - totalWidth / 2
+                : element.textAlign === "right"
+                ? element.width - totalWidth
+                : 0;
+
+            context.textAlign = "left";
+            let cursorX = startX;
+            for (const segment of segments) {
+              context.fillStyle = applyDarkModeFilter(
+                segment.color,
+                renderConfig.theme === THEME.DARK,
+              );
+              context.fillText(
+                segment.text,
+                cursorX,
+                index * lineHeightPx + verticalOffset,
+              );
+              cursorX += context.measureText(segment.text).width;
+            }
+            context.textAlign = element.textAlign as CanvasTextAlign;
+          }
+        } else {
+          for (let index = 0; index < lines.length; index++) {
+            context.fillText(
+              lines[index],
+              horizontalOffset,
+              index * lineHeightPx + verticalOffset,
+            );
+          }
         }
         context.restore();
         if (shouldTemporarilyAttach) {

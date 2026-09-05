@@ -40,6 +40,8 @@ import { getLineWidth } from "@excalidraw/element";
 import { normalizeText } from "@excalidraw/element";
 import { wrapText } from "@excalidraw/element";
 import { getWrappedTextLines } from "@excalidraw/element";
+import { splitLineIntoColorSegments } from "@excalidraw/element";
+import { resolveColorAtPosition } from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
@@ -201,6 +203,24 @@ const getLineCaretOffsetFromNativeLayout = ({
 };
 
 type SubmitHandler = () => void;
+
+let activeEditSession: {
+  elementId: string;
+  textarea: HTMLTextAreaElement;
+} | null = null;
+
+export const getActiveTextEditSelection = (
+  elementId: string,
+): { start: number; end: number } | null => {
+  if (!activeEditSession || activeEditSession.elementId !== elementId) {
+    return null;
+  }
+  const { selectionStart, selectionEnd } = activeEditSession.textarea;
+  if (selectionStart === selectionEnd) {
+    return null;
+  }
+  return { start: selectionStart, end: selectionEnd };
+};
 
 export const textWysiwyg = ({
   onChange,
@@ -383,6 +403,27 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
+      const transform = getTransform(
+        width,
+        height,
+        angle,
+        appState,
+        maxWidth,
+        editorMaxHeight,
+      );
+      const resolvedStrokeColor = applyDarkModeFilter(
+        updatedTextElement.strokeColor,
+        appState.theme === THEME.DARK,
+      );
+      const hasColorRanges = !!updatedTextElement.colorRanges?.length;
+      const caretColor = hasColorRanges
+        ? resolveColorAtPosition(
+            updatedTextElement.colorRanges,
+            editable.selectionStart,
+            resolvedStrokeColor,
+          )
+        : resolvedStrokeColor;
+
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -391,23 +432,32 @@ export const textWysiwyg = ({
         height: `${height}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
-        transform: getTransform(
-          width,
-          height,
-          angle,
-          appState,
-          maxWidth,
-          editorMaxHeight,
-        ),
+        transform,
         textAlign,
         verticalAlign,
-        color: applyDarkModeFilter(
-          updatedTextElement.strokeColor,
-          appState.theme === THEME.DARK,
-        ),
+        color: hasColorRanges ? "transparent" : resolvedStrokeColor,
+        caretColor,
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
+      Object.assign(highlightOverlay.style, {
+        font,
+        lineHeight: updatedTextElement.lineHeight,
+        width: `${width}px`,
+        height: `${height}px`,
+        left: `${viewportX}px`,
+        top: `${viewportY}px`,
+        transform,
+        textAlign,
+        verticalAlign,
+        opacity: updatedTextElement.opacity / 100,
+        maxHeight: `${editorMaxHeight}px`,
+      });
+      renderHighlightOverlay(
+        editable.value,
+        updatedTextElement.colorRanges,
+        resolvedStrokeColor,
+      );
       currentTextLayout = {
         angle: angle as Radians,
         font,
@@ -422,6 +472,8 @@ export const textWysiwyg = ({
         y: coordY,
       };
       editable.scrollTop = 0;
+      highlightOverlay.scrollTop = 0;
+      highlightOverlay.scrollLeft = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
@@ -433,6 +485,8 @@ export const textWysiwyg = ({
   };
 
   const editable = ownerDocument.createElement("textarea");
+
+  activeEditSession = { elementId: element.id, textarea: editable };
 
   editable.dir = "auto";
   editable.tabIndex = 0;
@@ -448,6 +502,79 @@ export const textWysiwyg = ({
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }
+
+  const highlightOverlay = ownerDocument.createElement("div");
+  highlightOverlay.classList.add("excalidraw-wysiwyg-color-overlay");
+  Object.assign(highlightOverlay.style, {
+    position: "absolute",
+    pointerEvents: "none",
+    margin: 0,
+    padding: 0,
+    border: 0,
+    background: "transparent",
+    overflow: "hidden",
+    zIndex: "var(--zIndex-wysiwyg)",
+    wordBreak,
+    whiteSpace,
+    overflowWrap: "break-word",
+    boxSizing: "content-box",
+    visibility: "hidden",
+  });
+
+  const renderHighlightOverlay = (
+    text: string,
+    colorRanges: ExcalidrawTextElement["colorRanges"],
+    baseColor: string,
+  ) => {
+    if (!colorRanges?.length) {
+      highlightOverlay.style.visibility = "hidden";
+      return;
+    }
+
+    highlightOverlay.style.visibility = "visible";
+    highlightOverlay.textContent = "";
+    for (const segment of splitLineIntoColorSegments(
+      text,
+      0,
+      colorRanges,
+      baseColor,
+    )) {
+      const span = ownerDocument.createElement("span");
+      span.textContent = segment.text;
+      span.style.color = segment.color;
+      highlightOverlay.appendChild(span);
+    }
+  };
+
+  editable.onscroll = () => {
+    highlightOverlay.scrollTop = editable.scrollTop;
+    highlightOverlay.scrollLeft = editable.scrollLeft;
+  };
+
+  const updateCaretColor = () => {
+    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(
+      element.id,
+    );
+    if (!updatedTextElement?.colorRanges?.length) {
+      return;
+    }
+    editable.style.caretColor = resolveColorAtPosition(
+      updatedTextElement.colorRanges,
+      editable.selectionStart,
+      applyDarkModeFilter(
+        updatedTextElement.strokeColor,
+        app.state.theme === THEME.DARK,
+      ),
+    );
+  };
+
+  const onSelectionChange = () => {
+    if (ownerDocument.activeElement === editable) {
+      updateCaretColor();
+    }
+  };
+  ownerDocument.addEventListener("selectionchange", onSelectionChange);
+
   Object.assign(editable.style, {
     position: "absolute",
     display: "inline-block",
@@ -849,6 +976,10 @@ export const textWysiwyg = ({
   };
 
   const cleanup = () => {
+    if (activeEditSession?.textarea === editable) {
+      activeEditSession = null;
+    }
+
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.oninput = null;
@@ -864,11 +995,13 @@ export const textWysiwyg = ({
     ownerWindow.removeEventListener("pointerup", bindBlurEvent);
     ownerWindow.removeEventListener("blur", handleSubmit);
     ownerWindow.removeEventListener("beforeunload", handleSubmit);
+    ownerDocument.removeEventListener("selectionchange", onSelectionChange);
     unbindUpdate();
     unsubOnChange();
     unbindOnScroll();
 
     editable.remove();
+    highlightOverlay.remove();
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
@@ -1029,9 +1162,11 @@ export const textWysiwyg = ({
     });
   });
   ownerWindow.addEventListener("beforeunload", handleSubmit);
-  excalidrawContainer
-    ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(editable);
+  const textEditorContainer = excalidrawContainer?.querySelector(
+    ".excalidraw-textEditorContainer",
+  )!;
+  textEditorContainer.appendChild(highlightOverlay);
+  textEditorContainer.appendChild(editable);
 
   return handleSubmit;
 };
