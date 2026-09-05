@@ -1,7 +1,7 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "Registrera dig",
+    "signIn": "Logga in",
     "paste": "Klistra in",
     "pasteAsPlaintext": "Klistra som oformaterad text",
     "pasteCharts": "Klistra in diagram",
@@ -37,9 +37,9 @@
     "strokeStyle_dashed": "Streckad",
     "strokeStyle_dotted": "Punktad",
     "sloppiness": "Slarvighet",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Tryck",
+    "pressure_constant": "Konstant",
+    "pressure_variable": "Variabel",
     "opacity": "Genomskinlighet",
     "textAlign": "Textjustering",
     "edges": "Kanter",
@@ -111,7 +111,7 @@
     "group": "Gruppera markering",
     "ungroup": "Avgruppera markering",
     "collaborators": "Medarbetare",
-    "you": "",
+    "you": "Du",
     "toggleGrid": "Visa/dölj rutnät",
     "addToLibrary": "Lägg till i biblioteket",
     "removeFromLibrary": "Ta bort från bibliotek",
@@ -191,9 +191,9 @@
     "shapeSwitch": "Byt form",
     "preferences": "Inställningar",
     "preferences_toolLock": "Verktygslås",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "Välj på",
+    "boxSelectionContain": "Slå in",
+    "boxSelectionOverlap": "Överlappande",
     "arrowBinding": "Pilbindning",
     "midpointSnapping": "Fäst mot mittpunkter"
   },
@@ -334,16 +334,16 @@
     "magicframe": "Trådram till kod",
     "embeddable": "Bädda in (web)",
     "laser": "Laserpekare",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "Rita utefter form",
+    "bucketfill": "Färglägg",
     "hand": "Hand (panoreringsverktyg)",
     "extraTools": "Fler verktyg",
     "mermaidToExcalidraw": "Mermaid till Excalidraw",
     "convertElementType": "Växla formtyp"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "Det gick inte att hitta en sluten region att färglägga här.",
+    "tooComplex": "Denna region är för komplex för att färglägga."
   },
   "element": {
     "rectangle": "Rektangel",
@@ -375,7 +375,7 @@
     "freeDraw": "Klicka och dra, släpp när du är klar",
     "text": "Tips: du kan också lägga till text genom att dubbelklicka var som helst med markeringsverktyget",
     "embeddable": "Klicka-dra för att skapa en webbplats-inbäddning",
-    "autoshape": "",
+    "autoshape": "Rita rektanglar, cirklar, diamanter, linjer och pilar",
     "text_selected": "Dubbelklicka eller tryck {{shortcut}} för att redigera text",
     "text_editing": "Tryck på {{shortcut_1}} eller {{shortcut_2}} för att slutföra redigeringen",
     "linearElementMulti": "Klicka på sista punkten eller tryck på {{shortcut_1}} eller {{shortcut_2}} för att avsluta",
@@ -383,7 +383,7 @@
     "resize": "Du kan behålla proportioner genom att hålla {{shortcut_1}} medan du ändrar storlek,\nhåller du {{shortcut_2}} ändras storlek relativt mitten",
     "resizeImage": "Du kan ändra storlek fritt genom att hålla {{shortcut_1}},\nhåll {{shortcut_2}} för att ändra storlek från mitten",
     "rotate": "Du kan begränsa vinklar genom att hålla {{shortcut}} medan du roterar",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "Dubbelklicka för att växla pilspets",
     "lineEditor_info": "Håll {{shortcut_1}} och dubbelklicka eller tryck på {{shortcut_2}} för att redigera punkter",
     "lineEditor_line_info": "Dubbelklicka eller tryck på {{shortcut}} för att redigera punkter",
     "lineEditor_pointSelected": "Tryck på {{shortcut_1}} för att ta bort punkt(er),\n{{shortcut_2}} för att duplicera, eller dra för att flytta",
@@ -613,10 +613,10 @@
     "shades": "Nyanser",
     "hexCode": "Hex-kod",
     "noShades": "Inga nyanser tillgängliga för denna färg",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "Inte en giltig färg",
+    "invalidHexLength": "Hex-koden måste vara 3, 4, 6 eller 8 tecken",
+    "topPicksTip": "Tips: dra valfri färg på dina toppval för att fästa den",
+    "resetTopPicks": "Återställ till standard toppval"
   },
   "overwriteConfirm": {
     "action": {
@@ -682,7 +682,7 @@
     "placeholder": {
       "title": "Låt oss designa ditt diagram",
       "description": "Beskriv det diagram du vill skapa, och vi kommer att generera det åt dig.",
-      "hint": ""
+      "hint": "Just nu känner vi till Flowchart, sekvens-, klass-, läges- och Entitetsrelationsdiagram."
     },
     "preview": "Förhandsgranska",
     "insert": "Infoga",
