@@ -2021,7 +2021,7 @@ class App extends React.Component<AppProps, AppState> {
                   >
                     {(isEmbeddableElement(el)
                       ? this.props.renderEmbeddable?.(el, this.state)
-                      : null) ?? (
+                      : this.props.renderIframe?.(el, this.state)) ?? (
                       <iframe
                         ref={(ref) => this.cacheEmbeddableRef(el, ref)}
                         className="excalidraw__embeddable"
