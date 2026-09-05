@@ -570,15 +570,15 @@ export const rendersOpaqueFill = (element: ExcalidrawElement): boolean => {
 
 /**
  * Element types whose outlines can participate in a fill — as the owner
- * (when closed) and as boundaries. Text, image, embeddable, iframe and
- * arrows are excluded in v1.
+ * (when closed) and as boundaries. Frames are containers rather than
+ * fillable shapes: their outline must not turn otherwise empty frame space
+ * into a bucket-fill region. Text, image, embeddable, iframe and arrows are
+ * also excluded in v1.
  */
 const FILL_BOUNDARY_TYPES = new Set<ExcalidrawElement["type"]>([
   "rectangle",
   "diamond",
   "ellipse",
-  "frame",
-  "magicframe",
   "line",
   "freedraw",
 ]);
