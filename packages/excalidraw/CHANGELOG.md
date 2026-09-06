@@ -13,6 +13,14 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Sticky notes (2026-09-06) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- New `stickynote` element type and toolbar tool (`N`): an always-filled, flat-rendered note whose label auto-fits — the font shrinks from the user's size down to a minimum, and only then does the note grow in height (it never shrinks below the height the user gave it). Click to place a 250×250 note, drag to size it (previewed at the dragged size, snapped to a font-aware minimum on release); text editing starts right away.
+- Element model: the note carries `baseHeight` (the user's height; `height ≥ baseHeight`), its label carries `fontSizeMax` (the user's font ceiling, `null`/absent on any other text) while `fontSize` holds the fitted size. Read a text element's user-facing size through `getUserFontSize(text, elementsMap)`.
+- Sticky notes are their own color domain: new `appState.currentItemStickynoteStrokeColor` (the note's text color) and `appState.currentItemStickynoteBackgroundColor` defaults, and new customizable top-pick slots `appState.colorTopPicks.stickyNoteStroke` / `stickyNoteBackground`. The stroke and background pickers, both eyedroppers and paste-styles resolve their target (regular / sticky / mixed) at execution time.
+- Skeleton API: `convertToExcalidrawElements([{ type: "stickynote", x, y, label?: { text, fontSize? } }])` creates a note (and fitted label); see the element-skeleton docs.
+- Resize semantics: width-only gestures keep the base height, height gestures set it, proportional gestures (Shift on any handle, aspect-locked multi-select, Stats group) also scale the label's font ceiling; flips preserve everything. Arrows bound to a note follow it as it grows.
+
 ## Excalidraw API
 
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)

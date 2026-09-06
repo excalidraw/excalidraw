@@ -104,6 +104,10 @@ const getHints = ({
     return t("hints.embeddable");
   }
 
+  if (activeTool.type === "stickynote") {
+    return t("hints.stickynote");
+  }
+
   if (activeTool.type === "autoshape") {
     return t("hints.autoshape");
   }

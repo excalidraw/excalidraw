@@ -15,6 +15,7 @@ import {
   isDevEnv,
   toBrandedType,
   getLineHeight,
+  DEFAULT_STICKY_NOTE_SIZE,
 } from "@excalidraw/common";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
@@ -32,6 +33,8 @@ import {
   newMagicFrameElement,
   newTextElement,
   type ElementConstructorOpts,
+  newStickyNoteElement,
+  normalizeStickyNoteGeometry,
 } from "./newElement";
 import { measureText, normalizeText } from "./textMeasurements";
 import { isArrowElement } from "./typeChecks";
@@ -70,6 +73,7 @@ import type {
   Ordered,
   TextAlign,
   VerticalAlign,
+  ExcalidrawStickyNoteElement,
 } from "./types";
 
 /**
@@ -192,6 +196,18 @@ export type ValidContainer =
       } & FragmentConstructorOpts;
     } & ElementConstructorOpts;
 
+/**
+ * A sticky note: an always-filled note whose label auto-fits. `label.fontSize`
+ * is the font ceiling the fit shrinks from; the note grows past its height
+ * (kept as `baseHeight`) only once the label hits the minimum font size.
+ */
+export type ValidStickyNote = {
+  type: "stickynote";
+  id?: ExcalidrawStickyNoteElement["id"];
+  label?: Extract<ValidContainer, { label?: unknown }>["label"];
+} & ElementConstructorOpts &
+  Partial<Pick<ExcalidrawStickyNoteElement, "baseHeight">>;
+
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
@@ -203,6 +219,7 @@ export type ExcalidrawElementSkeleton =
       y: number;
     } & Partial<ExcalidrawLinearElement>)
   | ValidContainer
+  | ValidStickyNote
   | ValidLinearElement
   | ({
       type: "text";
@@ -659,18 +676,28 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newIframeElement({ ...element });
         break;
       }
+      case "stickynote": {
+        const width = element.width || DEFAULT_STICKY_NOTE_SIZE;
+        const height = element.height || DEFAULT_STICKY_NOTE_SIZE;
+        // finalized geometry (min size, baseHeight ≤ height) — only a
+        // pointer-down draft is exempt from it
+        excalidrawElement = normalizeStickyNoteGeometry(
+          newStickyNoteElement({
+            ...element,
+            type: "stickynote",
+            width,
+            height,
+            baseHeight: element.baseHeight ?? height,
+          }),
+        );
+        break;
+      }
       case "embeddable": {
         excalidrawElement = newEmbeddableElement({ ...element });
         break;
       }
 
       default: {
-        if ((element as { type?: string }).type === "stickynote") {
-          console.error(
-            'ExcalidrawElementSkeleton type "stickynote" is not supported yet.',
-          );
-          continue;
-        }
         excalidrawElement = element;
         assertNever(
           element,
@@ -703,8 +730,11 @@ export const convertToExcalidrawElements = (
       case "rectangle":
       case "ellipse":
       case "diamond":
+      case "stickynote":
       case "arrow": {
         if (element.label?.text) {
+          // for a sticky note this runs the sticky fit (via
+          // `redrawTextBoundingBox`): the label's font size becomes its ceiling
           let [container, text] = bindTextToContainer(
             excalidrawElement,
             element?.label,
