@@ -103,10 +103,7 @@ describe("restoreElements", () => {
       strokeColor: COLOR_PALETTE.transparent,
     };
 
-    const restoredElement = restore.restoreElements(
-      [stickyNote],
-      null,
-    )[0];
+    const restoredElement = restore.restoreElements([stickyNote], null)[0];
 
     expect(restoredElement.strokeColor).toBe(COLOR_PALETTE.black);
   });

@@ -596,7 +596,9 @@ export const getBoundTextMaxWidth = (
   }
   return (
     width -
-    (isStickyNoteElement(container) ? STICKY_NOTE_PADDING : BOUND_TEXT_PADDING) *
+    (isStickyNoteElement(container)
+      ? STICKY_NOTE_PADDING
+      : BOUND_TEXT_PADDING) *
       2
   );
 };
@@ -626,7 +628,9 @@ export const getBoundTextMaxHeight = (
   }
   return (
     height -
-    (isStickyNoteElement(container) ? STICKY_NOTE_PADDING : BOUND_TEXT_PADDING) *
+    (isStickyNoteElement(container)
+      ? STICKY_NOTE_PADDING
+      : BOUND_TEXT_PADDING) *
       2
   );
 };

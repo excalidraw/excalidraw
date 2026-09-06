@@ -10495,10 +10495,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createGenericElementOnPointerDown = (
-    elementType:
-      | ExcalidrawGenericElement["type"]
-      | "embeddable"
-      | "stickynote",
+    elementType: ExcalidrawGenericElement["type"] | "embeddable" | "stickynote",
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -13561,20 +13558,18 @@ class App extends React.Component<AppProps, AppState> {
       isDraggingStickyNote &&
       (gridX !== pointerDownState.originInGrid.x ||
         gridY !== pointerDownState.originInGrid.y);
-    const nextWidth =
-      hasDraggedStickyNote
-        ? Math.max(
-            distance(pointerDownState.originInGrid.x, gridX),
-            STICKY_NOTE_MIN_BASE_WIDTH,
-          )
-        : distance(pointerDownState.originInGrid.x, gridX);
-    const nextHeight =
-      hasDraggedStickyNote
-        ? Math.max(
-            distance(pointerDownState.originInGrid.y, gridY),
-            STICKY_NOTE_MIN_BASE_HEIGHT,
-          )
-        : distance(pointerDownState.originInGrid.y, gridY);
+    const nextWidth = hasDraggedStickyNote
+      ? Math.max(
+          distance(pointerDownState.originInGrid.x, gridX),
+          STICKY_NOTE_MIN_BASE_WIDTH,
+        )
+      : distance(pointerDownState.originInGrid.x, gridX);
+    const nextHeight = hasDraggedStickyNote
+      ? Math.max(
+          distance(pointerDownState.originInGrid.y, gridY),
+          STICKY_NOTE_MIN_BASE_HEIGHT,
+        )
+      : distance(pointerDownState.originInGrid.y, gridY);
 
     if (hasDraggedStickyNote) {
       pointerDownState.drag.hasOccurred = true;

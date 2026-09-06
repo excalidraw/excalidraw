@@ -35,10 +35,7 @@ import { computeBoundTextPosition } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
-import {
-  isLineElement,
-  isStickyNoteElement,
-} from "./typeChecks";
+import { isLineElement, isStickyNoteElement } from "./typeChecks";
 
 import type {
   ExcalidrawElement,
@@ -214,10 +211,7 @@ export const newStickyNoteElement = (
     baseHeight?: number;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawStickyNoteElement> => {
-  const base = _newElementBase<ExcalidrawStickyNoteElement>(
-    "stickynote",
-    opts,
-  );
+  const base = _newElementBase<ExcalidrawStickyNoteElement>("stickynote", opts);
   const baseHeight =
     opts.baseHeight ?? (base.height || DEFAULT_STICKY_NOTE_SIZE);
 
@@ -523,11 +517,7 @@ export const refreshTextDimensions = (
   }
   if (container || !textElement.autoResize) {
     if (container && isStickyNoteElement(container)) {
-      const layout = computeStickyNoteTextLayout(
-        container,
-        textElement,
-        text,
-      );
+      const layout = computeStickyNoteTextLayout(container, textElement, text);
       const updatedContainer = {
         ...container,
         ...layout.container,

@@ -268,9 +268,9 @@ export const colorPickerKeyNavHandler = ({
   if (activeColorPickerSection === "baseColors") {
     if (colorObj) {
       const { colorName } = colorObj;
-      const colorNames = (Object.keys(palette) as (keyof ColorPalette)[]).filter(
-        (colorName) => !hiddenPaletteColorNames.includes(colorName),
-      );
+      const colorNames = (
+        Object.keys(palette) as (keyof ColorPalette)[]
+      ).filter((colorName) => !hiddenPaletteColorNames.includes(colorName));
       const indexOfColorName = colorNames.indexOf(colorName);
 
       let newColorIndex = arrowHandler(

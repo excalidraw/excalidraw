@@ -223,7 +223,7 @@ export const getStickyNotePathCommands = (
   return commands;
 };
 
-// clamping the ceiling: the fit loop's `fontSize - STEP` descent stalls in 
+// clamping the ceiling: the fit loop's `fontSize - STEP` descent stalls in
 // for values >= ~2^56 (1e20 - 2 === 1e20) and would hang the editor
 export const normalizeStickyNoteFontSize = (fontSize: number) => {
   if (!Number.isFinite(fontSize)) {

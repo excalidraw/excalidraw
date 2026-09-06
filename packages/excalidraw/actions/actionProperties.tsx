@@ -320,11 +320,7 @@ const changeFontSize = (
             ? { fontSizeMax: normalizeStickyNoteFontSize(newFontSize) }
             : { fontSize: newFontSize }),
         });
-        redrawTextBoundingBox(
-          newElement,
-          container,
-          app.scene,
-        );
+        redrawTextBoundingBox(newElement, container, app.scene);
 
         newElement = offsetElementAfterFontResize(
           oldElement,
@@ -402,7 +398,9 @@ export const actionChangeStrokeColor = register<
 
             const strokeColor = isStickyNoteStrokeColorElement(el, elementsMap)
               ? nextValue?.currentItemStickynoteStrokeColor ??
-                normalizeStickyNoteStrokeColor(nextValue!.currentItemStrokeColor)
+                normalizeStickyNoteStrokeColor(
+                  nextValue!.currentItemStrokeColor,
+                )
               : nextValue?.currentItemStrokeColor ??
                 nextValue!.currentItemStickynoteStrokeColor;
 
@@ -535,8 +533,8 @@ export const actionChangeBackgroundColor = register<
               }),
             )
           : newElementWith(el, {
-          backgroundColor: value.currentItemBackgroundColor,
-        }),
+              backgroundColor: value.currentItemBackgroundColor,
+            }),
       );
     }
 
@@ -1852,8 +1850,7 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                   ? "round"
                   : "sharp",
               (element) =>
-                !isArrowElement(element) &&
-                element.hasOwnProperty("roundness"),
+                !isArrowElement(element) && element.hasOwnProperty("roundness"),
               (hasSelection) =>
                 hasSelection ? null : appState.currentItemRoundness,
             )}

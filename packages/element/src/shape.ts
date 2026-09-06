@@ -775,8 +775,7 @@ const _generateElementShape = (
         | "rectangle"
         | "stickynote"
         | "iframe"
-        | "embeddable"
-      ];
+        | "embeddable"];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
 

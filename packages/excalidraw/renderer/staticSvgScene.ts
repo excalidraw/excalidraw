@@ -180,10 +180,7 @@ const renderElementToSvg = (
         fill: string,
         fillOpacity?: number,
       ) => {
-        const path = svgRoot.ownerDocument.createElementNS(
-          SVG_NS,
-          "path",
-        );
+        const path = svgRoot.ownerDocument.createElementNS(SVG_NS, "path");
         path.setAttribute("d", getPathData(elementPoints));
         path.setAttribute("fill", fill);
         if (typeof fillOpacity !== "undefined") {

@@ -122,8 +122,7 @@ export const getShapeActionPredicates = (
         !isTransparent(appState.currentItemBackgroundColor)) ||
       targetElements.some(
         (element) =>
-          hasFillStyle(element.type) &&
-          !isTransparent(element.backgroundColor),
+          hasFillStyle(element.type) && !isTransparent(element.backgroundColor),
       ),
 
     // stroke / shape properties
