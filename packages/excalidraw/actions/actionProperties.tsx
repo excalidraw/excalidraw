@@ -184,6 +184,13 @@ const getStylesPanelInfo = (app: AppClassProperties) => {
   } as const;
 };
 
+// transparent is hidden rather than removed from the palette so the remaining
+// colors keep their usual hotkeys (same mechanism as the bucket fill picker);
+// a module constant so the memoized picker's identity comparison holds
+const STICKY_NOTE_EXCLUDED_COLORS: readonly string[] = [
+  COLOR_PALETTE.transparent,
+];
+
 const isStickyNoteStrokeColorElement = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
@@ -478,8 +485,8 @@ export const actionChangeStrokeColor = register<
           elements={elements}
           appState={appState}
           updateData={updateData}
-          hiddenPaletteColorNames={
-            isStickyNoteStrokePicker ? ["transparent"] : undefined
+          excludedColors={
+            isStickyNoteStrokePicker ? STICKY_NOTE_EXCLUDED_COLORS : undefined
           }
         />
       </>

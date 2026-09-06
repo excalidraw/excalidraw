@@ -51,7 +51,6 @@ interface HotkeyHandlerProps {
   onChange: (color: string) => void;
   palette: ColorPaletteCustom;
   customColors: string[];
-  hiddenPaletteColorNames: string[];
   setActiveColorPickerSection: (
     update: React.SetStateAction<ActiveColorPickerSectionAtomType>,
   ) => void;
@@ -68,7 +67,6 @@ const hotkeyHandler = ({
   onChange,
   palette,
   customColors,
-  hiddenPaletteColorNames,
   setActiveColorPickerSection,
   activeShade,
   excludedColors,
@@ -98,10 +96,6 @@ const hotkeyHandler = ({
   if (colorPickerHotkeyBindings.includes(e.key)) {
     const index = colorPickerHotkeyBindings.indexOf(e.key);
     const paletteKey = Object.keys(palette)[index] as keyof ColorPalette;
-    if (hiddenPaletteColorNames.includes(paletteKey)) {
-      setActiveColorPickerSection("baseColors");
-      return true;
-    }
     const paletteValue = palette[paletteKey];
     const r = Array.isArray(paletteValue)
       ? paletteValue[activeShade]
@@ -128,7 +122,6 @@ interface ColorPickerKeyNavHandlerProps {
   color: string | null;
   onChange: (color: string) => void;
   customColors: string[];
-  hiddenPaletteColorNames?: string[];
   setActiveColorPickerSection: (
     update: React.SetStateAction<ActiveColorPickerSectionAtomType>,
   ) => void;
@@ -149,7 +142,6 @@ export const colorPickerKeyNavHandler = ({
   color,
   onChange,
   customColors,
-  hiddenPaletteColorNames = [],
   setActiveColorPickerSection,
   updateData,
   activeShade,
@@ -244,7 +236,6 @@ export const colorPickerKeyNavHandler = ({
       onChange,
       palette,
       customColors,
-      hiddenPaletteColorNames,
       setActiveColorPickerSection,
       activeShade,
       excludedColors,
@@ -268,9 +259,7 @@ export const colorPickerKeyNavHandler = ({
   if (activeColorPickerSection === "baseColors") {
     if (colorObj) {
       const { colorName } = colorObj;
-      const colorNames = (
-        Object.keys(palette) as (keyof ColorPalette)[]
-      ).filter((colorName) => !hiddenPaletteColorNames.includes(colorName));
+      const colorNames = Object.keys(palette) as (keyof ColorPalette)[];
       const indexOfColorName = colorNames.indexOf(colorName);
 
       let newColorIndex = arrowHandler(

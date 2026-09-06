@@ -29,7 +29,6 @@ interface PickerColorListProps {
   color: string | null;
   onChange: (color: string) => void;
   activeShade: number;
-  hiddenPaletteColorNames?: string[];
   showHotKey?: boolean;
   /**
    * palette colors to hide. Hidden entries keep their position in the hotkey
@@ -44,7 +43,6 @@ const PickerColorList = ({
   color,
   onChange,
   activeShade,
-  hiddenPaletteColorNames = [],
   showHotKey = true,
   excludedColors,
 }: PickerColorListProps) => {
@@ -68,7 +66,6 @@ const PickerColorList = ({
   return (
     <div className="color-picker-content--default">
       {Object.entries(palette).map(([key, value], index) => {
-        const isHidden = hiddenPaletteColorNames.includes(key);
         const color =
           (Array.isArray(value) ? value[activeShade] : value) || "transparent";
 
@@ -93,13 +90,7 @@ const PickerColorList = ({
           "",
         );
 
-        return isHidden ? (
-          <span
-            className="color-picker__button color-picker__button--large color-picker__button--hidden"
-            aria-hidden="true"
-            key={key}
-          />
-        ) : (
+        return (
           <button
             ref={colorObj?.colorName === key ? btnRef : undefined}
             tabIndex={-1}

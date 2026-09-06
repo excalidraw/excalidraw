@@ -37,7 +37,6 @@ interface PickerProps {
   type: ColorPickerType;
   elements: readonly ExcalidrawElement[];
   palette: ColorPaletteCustom;
-  hiddenPaletteColorNames?: string[];
   updateData: (formData?: any) => void;
   children?: React.ReactNode;
   showTitle?: boolean;
@@ -56,7 +55,6 @@ export const Picker = React.forwardRef(
       type,
       elements,
       palette,
-      hiddenPaletteColorNames,
       updateData,
       children,
       showTitle,
@@ -155,7 +153,6 @@ export const Picker = React.forwardRef(
               event,
               activeColorPickerSection,
               palette,
-              hiddenPaletteColorNames,
               color,
               onChange,
               onEyeDropperToggle,
@@ -199,7 +196,6 @@ export const Picker = React.forwardRef(
               theme={theme}
               color={color}
               palette={palette}
-              hiddenPaletteColorNames={hiddenPaletteColorNames}
               onChange={onChange}
               activeShade={activeShade}
               showHotKey={showHotKey}

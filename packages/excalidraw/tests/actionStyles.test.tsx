@@ -126,10 +126,35 @@ describe("actionStyles", () => {
 
     togglePopover("Stroke");
 
+    // hidden via `excludedColors` (same mechanism as bucket fill): the swatch
+    // is gone, but an invisible placeholder keeps the grid so the remaining
+    // colors stay on their usual positions and hotkeys
     expect(screen.queryByTestId("color-transparent")).toBeNull();
-    expect(document.querySelector(".color-picker__button--hidden")).not.toBe(
-      null,
-    );
+    expect(
+      document.querySelector(
+        '.color-picker-content--default [aria-hidden="true"]',
+      ),
+    ).not.toBeNull();
+    expect(screen.queryByTestId("color-black")).not.toBeNull();
+  });
+
+  it("keeps the transparent hotkey dead and the others intact for sticky notes", async () => {
+    UI.clickTool("stickynote");
+
+    togglePopover("Stroke");
+
+    const picker = document.querySelector(".color-picker-content")!;
+    const before = h.state.currentItemStickynoteStrokeColor;
+
+    // `q` maps to the hidden transparent swatch (and to the global tool-lock
+    // shortcut) — inside the popup it must be inert, not leaked
+    fireEvent.keyDown(picker, { key: "q" });
+    expect(h.state.currentItemStickynoteStrokeColor).toBe(before);
+    expect(h.state.activeTool.locked).toBe(false);
+
+    // the remaining colors keep their usual keys (w = white)
+    fireEvent.keyDown(picker, { key: "w" });
+    expect(h.state.currentItemStickynoteStrokeColor).toBe(COLOR_PALETTE.white);
   });
 
   it("should track sticky note stroke color separately", async () => {

@@ -60,7 +60,6 @@ interface ColorPickerProps {
   appState: UIAppState;
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
-  hiddenPaletteColorNames?: string[];
   updateData: (formData?: any) => void;
   /** palette colors to hide from the popup, keeping hotkey positions */
   excludedColors?: readonly string[];
@@ -77,7 +76,6 @@ const ColorPickerPopupContent = ({
   label,
   elements,
   palette = COLOR_PALETTE,
-  hiddenPaletteColorNames,
   updateData,
   getOpenPopup,
   appState,
@@ -90,7 +88,6 @@ const ColorPickerPopupContent = ({
   | "label"
   | "elements"
   | "palette"
-  | "hiddenPaletteColorNames"
   | "updateData"
   | "appState"
   | "excludedColors"
@@ -197,7 +194,6 @@ const ColorPickerPopupContent = ({
           ref={colorPickerContentRef}
           palette={palette}
           excludedColors={excludedColors}
-          hiddenPaletteColorNames={hiddenPaletteColorNames}
           color={color}
           theme={appState.theme}
           onChange={(changedColor) => {
@@ -355,7 +351,6 @@ const ColorPickerComponent = ({
   elements,
   palette = COLOR_PALETTE,
   topPicks,
-  hiddenPaletteColorNames,
   updateData,
   appState,
   excludedColors,
@@ -487,7 +482,6 @@ const ColorPickerComponent = ({
               elements={elements}
               palette={palette}
               excludedColors={excludedColors}
-              hiddenPaletteColorNames={hiddenPaletteColorNames}
               updateData={updateData}
               getOpenPopup={() => openRef.current}
               appState={appState}

@@ -2,7 +2,7 @@ import {
   DEFAULT_STICKY_NOTE_SIZE,
   MIN_FONT_SIZE,
   ROUNDNESS,
-  STICKY_NOTE_DEFAULT_FONT_SIZE,
+  STICKY_NOTE_FALLBACK_FONT_SIZE,
   STICKY_NOTE_MAX_FONT_SIZE,
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
@@ -154,13 +154,13 @@ describe("sticky note text layout", () => {
 
   it("normalizes non-finite and out-of-range font ceilings", () => {
     expect(normalizeStickyNoteFontSize(NaN)).toBe(
-      STICKY_NOTE_DEFAULT_FONT_SIZE,
+      STICKY_NOTE_FALLBACK_FONT_SIZE,
     );
     expect(normalizeStickyNoteFontSize(Infinity)).toBe(
-      STICKY_NOTE_DEFAULT_FONT_SIZE,
+      STICKY_NOTE_FALLBACK_FONT_SIZE,
     );
     expect(normalizeStickyNoteFontSize(-Infinity)).toBe(
-      STICKY_NOTE_DEFAULT_FONT_SIZE,
+      STICKY_NOTE_FALLBACK_FONT_SIZE,
     );
     expect(normalizeStickyNoteFontSize(1e20)).toBe(STICKY_NOTE_MAX_FONT_SIZE);
     expect(normalizeStickyNoteFontSize(0)).toBe(MIN_FONT_SIZE);

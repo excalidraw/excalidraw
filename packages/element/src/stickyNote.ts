@@ -1,7 +1,7 @@
 import {
   DEFAULT_ELEMENT_PROPS,
   MIN_FONT_SIZE,
-  STICKY_NOTE_DEFAULT_FONT_SIZE,
+  STICKY_NOTE_FALLBACK_FONT_SIZE,
   STICKY_NOTE_FONT_STEP,
   STICKY_NOTE_MAX_FONT_SIZE,
   STICKY_NOTE_MIN_BASE_HEIGHT,
@@ -227,7 +227,7 @@ export const getStickyNotePathCommands = (
 // for values >= ~2^56 (1e20 - 2 === 1e20) and would hang the editor
 export const normalizeStickyNoteFontSize = (fontSize: number) => {
   if (!Number.isFinite(fontSize)) {
-    return STICKY_NOTE_DEFAULT_FONT_SIZE;
+    return STICKY_NOTE_FALLBACK_FONT_SIZE;
   }
   return Math.min(STICKY_NOTE_MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize));
 };
