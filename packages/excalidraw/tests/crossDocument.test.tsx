@@ -13,6 +13,7 @@ import { newImageElement } from "@excalidraw/element"; // zsviczian -- construct
 import type { FileId } from "@excalidraw/element/types"; // zsviczian -- type the migration image fixture
 
 import { Excalidraw } from "../index";
+import { useTopPicksDnD } from "../components/ColorPicker/topPicksDnD"; // zsviczian -- cover popout top-picks drag ownership, upstream #11997
 import { Tooltip } from "../components/Tooltip"; // zsviczian -- exercise document-local tooltips, upstream #11974 follow-up
 
 import type {
@@ -22,6 +23,89 @@ import type {
 } from "../types";
 
 describe("cross-document rendering", () => {
+  // zsviczian START -- verify top-picks drag stays in its source document, upstream #11997
+  it("binds top-picks drag interactions to the source window", () => {
+    const iframe = document.createElement("iframe");
+    document.body.append(iframe);
+    const ownerDocument = iframe.contentDocument!;
+    const ownerWindow = iframe.contentWindow!;
+    const mountNode = ownerDocument.createElement("div");
+    ownerDocument.body.append(mountNode);
+    const onPicksChange = vi.fn();
+    const ownerAddEventListener = vi.fn();
+    const ownerRemoveEventListener = vi.fn();
+    Object.defineProperties(ownerWindow, {
+      addEventListener: { value: ownerAddEventListener },
+      removeEventListener: { value: ownerRemoveEventListener },
+    });
+    let startPickDrag:
+      | ReturnType<typeof useTopPicksDnD>["startPickDrag"]
+      | null = null;
+
+    const Harness = () => {
+      const drag = useTopPicksDnD({
+        enabled: true,
+        picks: ["#000000", "#ffffff"],
+        onPicksChange,
+      });
+      startPickDrag = drag.startPickDrag;
+      return (
+        <div ref={drag.setStripEl}>
+          <button data-top-pick-index="0" />
+          <button data-top-pick-index="1" />
+        </div>
+      );
+    };
+
+    const renderResult = renderReact(<Harness />, {
+      container: mountNode,
+      baseElement: ownerDocument.body,
+    });
+    const mainAddEventListener = vi.spyOn(window, "addEventListener");
+
+    try {
+      const sourceEl = ownerDocument.querySelector<HTMLElement>(
+        "[data-top-pick-index='0']",
+      )!;
+      act(() =>
+        startPickDrag!(
+          {
+            button: 0,
+            pointerId: 1,
+            clientX: 0,
+            clientY: 0,
+            currentTarget: sourceEl,
+          } as unknown as React.PointerEvent,
+          0,
+          "#000000",
+        ),
+      );
+
+      for (const eventName of [
+        "pointermove",
+        "pointerup",
+        "pointercancel",
+        "keydown",
+      ]) {
+        expect(ownerAddEventListener).toHaveBeenCalledWith(
+          eventName,
+          expect.any(Function),
+          true,
+        );
+        expect(mainAddEventListener).not.toHaveBeenCalledWith(
+          eventName,
+          expect.any(Function),
+          true,
+        );
+      }
+    } finally {
+      renderResult.unmount();
+      mainAddEventListener.mockRestore();
+      iframe.remove();
+    }
+  });
+  // zsviczian END
+
   it("scopes listeners, fonts, and portals to ownerDocument", async () => {
     const iframe = document.createElement("iframe");
     document.body.append(iframe);
