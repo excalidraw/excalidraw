@@ -38,8 +38,28 @@ export type RenderEnvironment = {
   createPath?: (svgPath: string) => Path2D;
 };
 
-const defaultCreateCanvas = () => document.createElement("canvas");
-const defaultCreateImage = () => new Image();
+const defaultCreateCanvas = () => {
+  if (typeof document === "undefined") {
+    throw new Error(
+      "Excalidraw: creating a canvas needs a `document`, and this " +
+        "environment has none. Install a host environment with " +
+        "`setRenderEnvironment({ createCanvas, createImage })` (e.g. backed " +
+        "by `@napi-rs/canvas`), or, if the canvas was only needed to measure " +
+        "text, a provider via `setCustomTextMetricsProvider`.",
+    );
+  }
+  return document.createElement("canvas");
+};
+const defaultCreateImage = () => {
+  if (typeof Image === "undefined") {
+    throw new Error(
+      "Excalidraw: decoding an image needs a global `Image`, and this " +
+        "environment has none. Pass `createImage` in " +
+        "`setRenderEnvironment` (e.g. `@napi-rs/canvas`'s `Image`).",
+    );
+  }
+  return new Image();
+};
 const defaultCreatePath = (svgPath: string) => {
   if (typeof Path2D === "undefined") {
     throw new Error(

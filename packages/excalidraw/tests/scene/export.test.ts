@@ -8,6 +8,7 @@ import {
 } from "@excalidraw/common";
 
 import {
+  getPlaceholderLinkText,
   newElementWith,
   resetRenderEnvironment,
   setRenderEnvironment,
@@ -761,5 +762,65 @@ describe("exporting frames", () => {
       expect(svg.getAttribute("width")).toBe(frame1.width.toString());
       expect(svg.getAttribute("height")).toBe(frame1.height.toString());
     });
+  });
+});
+
+describe("embed placeholders", () => {
+  it("renders them in SVG without measuring text (no canvas needed)", async () => {
+    const createElementSpy = vi.spyOn(document, "createElement");
+    setRenderEnvironment({
+      createCanvas: () => {
+        throw new Error("exportToSvg must not create a canvas");
+      },
+    });
+
+    try {
+      const iframe = API.createElement({
+        type: "iframe",
+        x: 0,
+        y: 0,
+        width: 300,
+        height: 200,
+      });
+      const link =
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL0123456789abcdefghijklmnopqrstuv";
+      const embed = newElementWith(
+        API.createElement({
+          type: "embeddable",
+          x: 400,
+          y: 0,
+          width: 560,
+          height: 315,
+        }),
+        { link },
+      );
+
+      const svg = await exportToSvg({
+        elements: [iframe, embed],
+        files: null,
+        exportPadding: 0,
+      });
+
+      expect(
+        createElementSpy.mock.calls.filter(([tag]) => tag === "canvas"),
+      ).toHaveLength(0);
+
+      const texts = Array.from(svg.querySelectorAll("text")).map(
+        (node) => node.textContent,
+      );
+      expect(texts).toContain("IFrame element");
+
+      // the link is shown capped to a single line; the full link lives on
+      // the element's anchor
+      expect(texts).toContain(getPlaceholderLinkText(link));
+      expect(
+        Array.from(svg.querySelectorAll("a[href]")).some((anchor) =>
+          anchor.getAttribute("href")?.includes("youtube.com/watch?v="),
+        ),
+      ).toBe(true);
+    } finally {
+      resetRenderEnvironment();
+      createElementSpy.mockRestore();
+    }
   });
 });
