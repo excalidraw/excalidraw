@@ -31,7 +31,7 @@ import {
 
 import {
   canBecomePolygon,
-  clampStickyNoteProps,
+  normalizeStickyNote,
   getNonDeletedElements,
   isNonDeletedElement,
 } from "@excalidraw/element";
@@ -50,8 +50,9 @@ import { getArrowheadForPicker } from "@excalidraw/element";
 import {
   getBoundTextElement,
   getContainerElement,
+  getUserFontSize,
+  getUserFontSizeUpdate,
   normalizeStickyNoteStrokeColor,
-  normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 
@@ -310,6 +311,7 @@ const changeFontSize = (
   fallbackValue?: ExcalidrawTextElement["fontSize"],
 ) => {
   const newFontSizes = new Set<number>();
+  const elementsMap = app.scene.getNonDeletedElementsMap();
 
   const updatedElements = changeProperty(
     elements,
@@ -319,14 +321,11 @@ const changeFontSize = (
         const newFontSize = getNewFontSize(oldElement);
         newFontSizes.add(newFontSize);
         const container = app.scene.getContainerElement(oldElement);
-        const isStickyBoundText =
-          container !== null && isStickyNoteElement(container);
 
-        let newElement: ExcalidrawTextElement = newElementWith(oldElement, {
-          ...(isStickyBoundText
-            ? { fontSizeMax: normalizeStickyNoteFontSize(newFontSize) }
-            : { fontSize: newFontSize }),
-        });
+        let newElement: ExcalidrawTextElement = newElementWith(
+          oldElement,
+          getUserFontSizeUpdate(oldElement, newFontSize, elementsMap),
+        );
         redrawTextBoundingBox(newElement, container, app.scene);
 
         newElement = offsetElementAfterFontResize(
@@ -534,7 +533,7 @@ export const actionChangeBackgroundColor = register<
     } else {
       nextElements = changeProperty(elements, appState, (el) =>
         isStickyNoteElement(el)
-          ? clampStickyNoteProps(
+          ? normalizeStickyNote(
               newElementWith(el, {
                 backgroundColor: value.currentItemBackgroundColor,
               }),
@@ -809,7 +808,7 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
     return {
       elements: changeProperty(elements, appState, (el) =>
         isStickyNoteElement(el)
-          ? clampStickyNoteProps(
+          ? normalizeStickyNote(
               newElementWith(el, {
                 seed: randomInteger(),
                 roughness: value,
@@ -1097,17 +1096,16 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
                 elements,
                 app,
                 (element) => {
+                  const elementsMap = app.scene.getNonDeletedElementsMap();
                   if (isTextElement(element)) {
-                    return element.fontSizeMax ?? element.fontSize;
+                    return getUserFontSize(element, elementsMap);
                   }
                   const boundTextElement = getBoundTextElement(
                     element,
-                    app.scene.getNonDeletedElementsMap(),
+                    elementsMap,
                   );
                   if (boundTextElement) {
-                    return (
-                      boundTextElement.fontSizeMax ?? boundTextElement.fontSize
-                    );
+                    return getUserFontSize(boundTextElement, elementsMap);
                   }
                   return null;
                 },
@@ -1149,7 +1147,7 @@ export const actionDecreaseFontSize = register({
         // get previous value before relative increase (doesn't work fully
         // due to rounding and float precision issues)
         (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) *
-          (element.fontSizeMax ?? element.fontSize),
+          getUserFontSize(element, app.scene.getNonDeletedElementsMap()),
       ),
     );
   },
@@ -1171,7 +1169,7 @@ export const actionIncreaseFontSize = register({
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>
       Math.round(
-        (element.fontSizeMax ?? element.fontSize) *
+        getUserFontSize(element, app.scene.getNonDeletedElementsMap()) *
           (1 + FONT_SIZE_RELATIVE_INCREASE_STEP),
       ),
     );
@@ -1809,7 +1807,7 @@ export const actionChangeRoundness = register<"sharp" | "round">({
         });
 
         return isStickyNoteElement(nextElement)
-          ? clampStickyNoteProps(nextElement)
+          ? normalizeStickyNote(nextElement)
           : nextElement;
       }),
       appState: {

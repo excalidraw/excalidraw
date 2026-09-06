@@ -21,6 +21,7 @@ import {
   getBoundTextElement,
   normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
+  updateStickyNoteLayout,
 } from "@excalidraw/element";
 
 import {
@@ -89,7 +90,7 @@ export const actionUnbindText = register({
           width,
           height,
           text: boundTextElement.originalText,
-          fontSizeMax: undefined,
+          fontSizeMax: null,
           x,
           y,
           labelPosition: null,
@@ -98,10 +99,17 @@ export const actionUnbindText = register({
           boundElements: element.boundElements?.filter(
             (ele) => ele.id !== boundTextElement.id,
           ),
-          height: originalContainerHeight
-            ? originalContainerHeight
-            : element.height,
         });
+        if (isStickyNoteElement(element)) {
+          // an empty note sits at its base height; bound arrows follow
+          updateStickyNoteLayout(element, app.scene);
+        } else {
+          app.scene.mutateElement(element, {
+            height: originalContainerHeight
+              ? originalContainerHeight
+              : element.height,
+          });
+        }
       }
     });
     return {

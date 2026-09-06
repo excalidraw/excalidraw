@@ -251,7 +251,13 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     type: "text";
     fontSize: number;
     fontFamily: FontFamilyValues;
-    fontSizeMax?: number;
+    /**
+     * Sticky note labels only: the font size the user picked, which the
+     * auto-fit shrinks `fontSize` from. `null`/absent for every other text.
+     * Read it through `getUserFontSize` — generic binding repair can detach a
+     * label without clearing this, so the container decides its meaning.
+     */
+    fontSizeMax?: number | null;
     text: string;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;

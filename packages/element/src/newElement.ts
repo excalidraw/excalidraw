@@ -26,16 +26,12 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
-import {
-  computeStickyNoteTextLayout,
-  normalizeStickyNoteStrokeColor,
-} from "./stickyNote";
+import { normalizeStickyNoteStrokeColor } from "./stickyNote";
 import { getBoundTextMaxWidth } from "./textElement";
-import { computeBoundTextPosition } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
-import { isLineElement, isStickyNoteElement } from "./typeChecks";
+import { isLineElement } from "./typeChecks";
 
 import type {
   ExcalidrawElement,
@@ -59,7 +55,6 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
   ExcalidrawStickyNoteElement,
-  ExcalidrawTextElementWithContainer,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -182,7 +177,12 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
-export const clampStickyNoteProps = <T extends ExcalidrawStickyNoteElement>(
+/**
+ * Enforces the sticky note data invariants (minimum size, `baseHeight` ≤
+ * `height`, never-transparent colors, solid fill). Returns the same object
+ * when nothing needs fixing, so post-passes never churn identity or version.
+ */
+export const normalizeStickyNote = <T extends ExcalidrawStickyNoteElement>(
   element: T,
 ): T => {
   const width = Math.max(element.width, STICKY_NOTE_MIN_BASE_WIDTH);
@@ -191,8 +191,7 @@ export const clampStickyNoteProps = <T extends ExcalidrawStickyNoteElement>(
     STICKY_NOTE_MIN_BASE_HEIGHT,
   );
 
-  return {
-    ...element,
+  return newElementWith(element as ExcalidrawStickyNoteElement, {
     width,
     height: Math.max(element.height, baseHeight),
     baseHeight,
@@ -202,7 +201,7 @@ export const clampStickyNoteProps = <T extends ExcalidrawStickyNoteElement>(
         : element.backgroundColor,
     strokeColor: normalizeStickyNoteStrokeColor(element.strokeColor),
     fillStyle: "solid",
-  };
+  }) as T;
 };
 
 export const newStickyNoteElement = (
@@ -215,7 +214,7 @@ export const newStickyNoteElement = (
   const baseHeight =
     opts.baseHeight ?? (base.height || DEFAULT_STICKY_NOTE_SIZE);
 
-  return clampStickyNoteProps({
+  return normalizeStickyNote({
     ...base,
     baseHeight,
     height: Math.max(base.height || baseHeight, baseHeight),
@@ -516,35 +515,6 @@ export const refreshTextDimensions = (
     return;
   }
   if (container || !textElement.autoResize) {
-    if (container && isStickyNoteElement(container)) {
-      const layout = computeStickyNoteTextLayout(container, textElement, text);
-      const updatedContainer = {
-        ...container,
-        ...layout.container,
-      };
-      const updatedTextElement = {
-        ...textElement,
-        text: layout.text,
-        fontSize: layout.fontSize,
-        width: layout.width,
-        height: layout.height,
-      } as ExcalidrawTextElementWithContainer;
-      const { x, y } = computeBoundTextPosition(
-        updatedContainer,
-        updatedTextElement,
-        elementsMap,
-      );
-
-      return {
-        text: layout.text,
-        fontSize: layout.fontSize,
-        width: layout.width,
-        height: layout.height,
-        x,
-        y,
-      };
-    }
-
     text = wrapText(
       text,
       getFontString(textElement),

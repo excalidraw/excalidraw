@@ -21,10 +21,7 @@ import {
 } from "./containerCache";
 import { LinearElementEditor } from "./linearElementEditor";
 
-import {
-  computeStickyNoteTextLayout,
-  getStickyNoteAutoResizePosition,
-} from "./stickyNote";
+import { updateStickyNoteLayout } from "./stickyNote";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
@@ -55,6 +52,14 @@ export const redrawTextBoundingBox = (
   scene: Scene,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+
+  if (container && isStickyNoteElement(container)) {
+    // the sticky fit owns both halves (label + note geometry). `textElement`
+    // may be an uncommitted clone (font actions clone before install), so it
+    // is passed explicitly instead of looked up in the scene
+    updateStickyNoteLayout(container, scene, { text: textElement });
+    return;
+  }
 
   let maxWidth = undefined;
 
@@ -104,39 +109,6 @@ export const redrawTextBoundingBox = (
   boundTextUpdates.height = metrics.height;
 
   if (container) {
-    if (isStickyNoteElement(container)) {
-      const layout = computeStickyNoteTextLayout(container, textElement);
-      const updatedContainer = {
-        ...container,
-        ...layout.container,
-      };
-      const updatedTextElement = {
-        ...textElement,
-        ...boundTextUpdates,
-        text: layout.text,
-        fontSize: layout.fontSize,
-        width: layout.width,
-        height: layout.height,
-      } as ExcalidrawTextElementWithContainer;
-      const { x, y } = computeBoundTextPosition(
-        updatedContainer,
-        updatedTextElement,
-        elementsMap,
-      );
-
-      scene.mutateElement(container, layout.container);
-      scene.mutateElement(textElement, {
-        ...boundTextUpdates,
-        text: layout.text,
-        fontSize: layout.fontSize,
-        width: layout.width,
-        height: layout.height,
-        x,
-        y,
-      });
-      return;
-    }
-
     const maxContainerHeight = getBoundTextMaxHeight(
       container,
       textElement as ExcalidrawTextElementWithContainer,
@@ -185,79 +157,21 @@ export const handleBindTextResize = (
   shouldMaintainAspectRatio = false,
   shouldResizeFromCenter = false,
 ) => {
+  if (isStickyNoteElement(container)) {
+    // resize callers pass their intents to `updateStickyNoteLayout` directly
+    // and own the bound-arrow pass; this is the fallback for generic callers
+    updateStickyNoteLayout(container, scene, { bindings: false });
+    return;
+  }
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElementId = getBoundTextElementId(container);
   if (!boundTextElementId) {
-    if (isStickyNoteElement(container)) {
-      scene.mutateElement(container, {
-        baseHeight: container.height,
-        height: container.height,
-      });
-    }
     return;
   }
   resetOriginalContainerCache(container.id);
   const textElement = getBoundTextElement(container, elementsMap);
   if (textElement && textElement.text) {
     if (!container) {
-      return;
-    }
-
-    if (isStickyNoteElement(container)) {
-      const explicitHeightResize =
-        typeof transformHandleType === "string" &&
-        (transformHandleType.includes("n") ||
-          transformHandleType.includes("s"));
-      const layoutContainer = {
-        ...container,
-        baseHeight: explicitHeightResize
-          ? container.height
-          : container.baseHeight,
-      };
-      const layout = computeStickyNoteTextLayout(layoutContainer, textElement);
-      const containerUpdates = { ...layout.container };
-      // the layout's auto-grow is top-anchored; when resizing from a north
-      // handle the bottom edge must stay fixed or the note walks down the
-      // canvas on every content-pinned shrink attempt
-      if (
-        typeof transformHandleType === "string" &&
-        transformHandleType.includes("n") &&
-        layout.container.height !== container.height
-      ) {
-        const position = getStickyNoteAutoResizePosition(
-          container,
-          layout.container.height,
-          "bottom",
-        );
-        containerUpdates.x = position.x;
-        containerUpdates.y = position.y;
-      }
-      const updatedContainer = {
-        ...container,
-        ...containerUpdates,
-      };
-      const updatedTextElement = {
-        ...textElement,
-        text: layout.text,
-        fontSize: layout.fontSize,
-        width: layout.width,
-        height: layout.height,
-      } as ExcalidrawTextElementWithContainer;
-      const { x, y } = computeBoundTextPosition(
-        updatedContainer,
-        updatedTextElement,
-        elementsMap,
-      );
-
-      scene.mutateElement(container, containerUpdates);
-      scene.mutateElement(textElement, {
-        text: layout.text,
-        fontSize: layout.fontSize,
-        width: layout.width,
-        height: layout.height,
-        x,
-        y,
-      });
       return;
     }
 

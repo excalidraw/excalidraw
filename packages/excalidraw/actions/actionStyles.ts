@@ -5,21 +5,27 @@ import {
   CODES,
   KEYS,
   getLineHeight,
+  arrayToMap,
 } from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
 
 import {
-  clampStickyNoteProps,
+  normalizeStickyNote,
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
   isExcalidrawElement,
+  isNonDeletedElement,
+  isStickyNoteBoundText,
   isStickyNoteElement,
   isTextElement,
-  normalizeStickyNoteFontSize,
+  getUserFontSize,
+  getUserFontSizeUpdate,
+  relayoutStickyNotes,
+  updateBoundElements,
 } from "@excalidraw/element";
 
 import {
@@ -89,8 +95,14 @@ export const actionPasteStyles = register({
       includeBoundTextElement: true,
     });
     const selectedElementIds = selectedElements.map((element) => element.id);
-    return {
-      elements: elements.map((element) => {
+    const elementsMap = arrayToMap(elements);
+    // whether the copied text was a sticky label is decided by the copied
+    // snapshot — its container may be gone from the live scene by now
+    const copiedElementsMap = arrayToMap(
+      (elementsCopied as unknown[]).filter(isExcalidrawElement),
+    );
+    const nextElements = relayoutStickyNotes(
+      elements.map((element) => {
         if (selectedElementIds.includes(element.id)) {
           let elementStylesToCopyFrom = pastedElement;
           if (isTextElement(element) && element.containerId) {
@@ -118,12 +130,12 @@ export const actionPasteStyles = register({
           });
 
           if (isTextElement(newElement)) {
+            const sourceText = elementStylesToCopyFrom as ExcalidrawTextElement;
             const fontSize =
-              (elementStylesToCopyFrom as ExcalidrawTextElement).fontSize ||
-              DEFAULT_FONT_SIZE;
-            const fontFamily =
-              (elementStylesToCopyFrom as ExcalidrawTextElement).fontFamily ||
-              DEFAULT_FONT_FAMILY;
+              (isTextElement(elementStylesToCopyFrom)
+                ? getUserFontSize(elementStylesToCopyFrom, copiedElementsMap)
+                : sourceText.fontSize) || DEFAULT_FONT_SIZE;
+            const fontFamily = sourceText.fontFamily || DEFAULT_FONT_FAMILY;
             let container = null;
             const containerId = newElement.containerId;
             if (containerId) {
@@ -132,23 +144,19 @@ export const actionPasteStyles = register({
                   (element) => element.id === containerId,
                 ) || null;
             }
-            const isStickyBoundText =
-              container !== null && isStickyNoteElement(container);
             const newTextElement = newElementWith(newElement, {
-              ...(isStickyBoundText
-                ? { fontSizeMax: normalizeStickyNoteFontSize(fontSize) }
-                : { fontSize }),
+              ...getUserFontSizeUpdate(newElement, fontSize, elementsMap),
               fontFamily,
-              textAlign:
-                (elementStylesToCopyFrom as ExcalidrawTextElement).textAlign ||
-                DEFAULT_TEXT_ALIGN,
-              lineHeight:
-                (elementStylesToCopyFrom as ExcalidrawTextElement).lineHeight ||
-                getLineHeight(fontFamily),
+              textAlign: sourceText.textAlign || DEFAULT_TEXT_ALIGN,
+              lineHeight: sourceText.lineHeight || getLineHeight(fontFamily),
             });
             newElement = newTextElement;
 
-            redrawTextBoundingBox(newTextElement, container, app.scene);
+            if (!isStickyNoteBoundText(newTextElement, elementsMap)) {
+              // sticky labels are laid out together with their (possibly
+              // also restyled) note in the post-pass below
+              redrawTextBoundingBox(newTextElement, container, app.scene);
+            }
           }
 
           if (
@@ -169,13 +177,34 @@ export const actionPasteStyles = register({
           }
 
           if (isStickyNoteElement(newElement)) {
-            newElement = clampStickyNoteProps(newElement);
+            newElement = normalizeStickyNote(newElement);
           }
 
           return newElement;
         }
         return element;
       }),
+      new Set(selectedElementIds),
+      { prevElementsMap: elementsMap },
+    );
+
+    // a restyled note may have grown or shrunk — arrows bound to it follow
+    for (const element of nextElements) {
+      const prev = elementsMap.get(element.id);
+      if (
+        isStickyNoteElement(element) &&
+        isNonDeletedElement(element) &&
+        prev &&
+        (prev.height !== element.height ||
+          prev.x !== element.x ||
+          prev.y !== element.y)
+      ) {
+        updateBoundElements(element, app.scene);
+      }
+    }
+
+    return {
+      elements: nextElements,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },

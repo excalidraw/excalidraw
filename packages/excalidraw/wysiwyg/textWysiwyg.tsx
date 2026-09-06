@@ -306,7 +306,15 @@ export const textWysiwyg = ({
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
         }
+        maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
+        maxHeight = getBoundTextMaxHeight(
+          container,
+          updatedTextElement as ExcalidrawTextElementWithContainer,
+        );
+
         if (isStickyNoteElement(container)) {
+          // the sticky fit (App.updateElement) owns the note's height; the
+          // editor only mirrors the fitted label's position
           const { x, y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -314,11 +322,6 @@ export const textWysiwyg = ({
           );
           coordX = x;
           coordY = y;
-          maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
-          maxHeight = getBoundTextMaxHeight(
-            container,
-            updatedTextElement as ExcalidrawTextElementWithContainer,
-          );
         } else {
           const propertiesUpdated = textPropertiesUpdated(
             updatedTextElement,
@@ -340,12 +343,6 @@ export const textWysiwyg = ({
               );
             }
           }
-
-          maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
-          maxHeight = getBoundTextMaxHeight(
-            container,
-            updatedTextElement as ExcalidrawTextElementWithContainer,
-          );
 
           // autogrow container height if text exceeds
           if (!isArrowElement(container) && height > maxHeight) {

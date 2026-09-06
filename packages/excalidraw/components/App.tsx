@@ -176,8 +176,7 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
-  computeBoundTextPosition,
-  computeStickyNoteTextLayout,
+  getStickyNoteLayout,
   normalizeStickyNoteStrokeColor,
   isValidTextContainer,
   redrawTextBoundingBox,
@@ -282,7 +281,6 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
-  ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeLikeElement,
@@ -6299,36 +6297,21 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const container = getContainerElement(latestTextElement, elementsMap);
-      const stickyLayout =
-        container && isStickyNoteElement(container)
-          ? computeStickyNoteTextLayout(
-              container,
-              latestTextElement,
-              nextOriginalText,
-            )
-          : null;
-      const stickyTextPosition =
-        stickyLayout && container && isStickyNoteElement(container)
-          ? computeBoundTextPosition(
-              { ...container, ...stickyLayout.container },
-              {
-                ...latestTextElement,
-                text: stickyLayout.text,
-                fontSize: stickyLayout.fontSize,
-                width: stickyLayout.width,
-                height: stickyLayout.height,
-              } as ExcalidrawTextElementWithContainer,
-              elementsMap,
-            )
-          : null;
+      const stickyContainer =
+        container && isStickyNoteElement(container) ? container : null;
+      // sticky notes: the fit owns both the label and the note geometry
+      const stickyLayout = stickyContainer
+        ? getStickyNoteLayout(stickyContainer, latestTextElement, {
+            originalText: nextOriginalText,
+          })
+        : null;
 
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (
             stickyLayout &&
-            container &&
-            _element.id === container.id &&
+            _element.id === stickyContainer?.id &&
             isStickyNoteElement(_element)
           ) {
             return newElementWith(_element, stickyLayout.container);
@@ -6337,29 +6320,29 @@ class App extends React.Component<AppProps, AppState> {
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
-              ...(stickyLayout && stickyTextPosition
-                ? {
-                    text: stickyLayout.text,
-                    fontSize: stickyLayout.fontSize,
-                    width: stickyLayout.width,
-                    height: stickyLayout.height,
-                    ...stickyTextPosition,
-                  }
-                : {}),
-              // returns (wrapped) text and new dimensions
-              ...(stickyLayout
-                ? {}
-                : refreshTextDimensions(
-                    _element,
-                    getContainerElement(_element, elementsMap),
-                    elementsMap,
-                    nextOriginalText,
-                  )),
+              ...(stickyLayout?.text ??
+                // returns (wrapped) text and new dimensions
+                refreshTextDimensions(
+                  _element,
+                  getContainerElement(_element, elementsMap),
+                  elementsMap,
+                  nextOriginalText,
+                )),
             });
           }
           return _element;
         }),
       ]);
+
+      if (stickyContainer) {
+        // the note may have grown or shrunk — arrows bound to it must follow
+        const latestContainer = this.scene.getNonDeletedElement(
+          stickyContainer.id,
+        );
+        if (latestContainer) {
+          updateBoundElements(latestContainer, this.scene);
+        }
+      }
     };
 
     this.textWysiwygSubmitHandler = textWysiwyg({

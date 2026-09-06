@@ -48,11 +48,14 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 import {
   bumpVersion,
-  clampStickyNoteProps,
+  getStickyNoteLayout,
+  isStickyNoteBoundText,
+  normalizeStickyNote,
   normalizeStickyNoteFontSize,
   normalizeStickyNoteStrokeColor,
 } from "@excalidraw/element";
-import { getContainerElement } from "@excalidraw/element";
+import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
+import { isStickyNoteElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
   isArrowBoundToElement,
@@ -570,9 +573,11 @@ export const restoreElement = (
         labelPosition: isFiniteNumber(element.labelPosition)
           ? clamp(element.labelPosition, 0, 1)
           : null,
+        // only meaningful for sticky note labels; reconciled against the
+        // container in `restoreStickyNotes` once bindings are repaired
         fontSizeMax: isFiniteNumber(element.fontSizeMax)
           ? normalizeStickyNoteFontSize(element.fontSizeMax)
-          : undefined,
+          : null,
       });
 
       // if empty text, mark as deleted. We keep in array
@@ -725,7 +730,7 @@ export const restoreElement = (
     case "embeddable":
       return restoreElementWithProperties(element, {});
     case "stickynote":
-      return clampStickyNoteProps(
+      return normalizeStickyNote(
         restoreElementWithProperties(element, {
           baseHeight:
             element.baseHeight ??
@@ -881,6 +886,50 @@ const repairFrameMembership = (
   }
 };
 
+/**
+ * Sticky note invariants that need both halves of the pair present, so they
+ * run after binding repair. Mutates elements (like the repair helpers).
+ * - a label's `fontSizeMax` is meaningful only while bound to a sticky note:
+ *   seeded from `fontSize` when missing, cleared everywhere else
+ * - a sticky label's stroke is never transparent (it is the visible text)
+ * - with `refreshDimensions`, the note and its label are refitted together
+ */
+const restoreStickyNotes = (
+  elements: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
+  opts: { refreshDimensions: boolean },
+) => {
+  for (const element of elements) {
+    if (!isTextElement(element) || element.isDeleted) {
+      continue;
+    }
+    if (isStickyNoteBoundText(element, elementsMap)) {
+      Object.assign(element, {
+        fontSizeMax: normalizeStickyNoteFontSize(
+          element.fontSizeMax ?? element.fontSize,
+        ),
+        strokeColor: normalizeStickyNoteStrokeColor(element.strokeColor),
+      });
+    } else if (element.fontSizeMax != null) {
+      Object.assign(element, { fontSizeMax: null });
+    }
+  }
+
+  if (opts.refreshDimensions) {
+    for (const element of elements) {
+      if (!isStickyNoteElement(element) || element.isDeleted) {
+        continue;
+      }
+      const textElement = getBoundTextElement(element, elementsMap);
+      const layout = getStickyNoteLayout(element, textElement);
+      Object.assign(element, layout.container);
+      if (textElement && layout.text) {
+        Object.assign(textElement, layout.text);
+      }
+    }
+  }
+};
+
 export const restoreElements = <T extends ExcalidrawElement>(
   targetElements: readonly T[] | undefined | null,
   /** used for additional context (e.g. repairing arrow bindings) */
@@ -967,7 +1016,12 @@ export const restoreElements = <T extends ExcalidrawElement>(
       repairContainerElement(element, restoredElementsMap);
     }
 
-    if (opts.refreshDimensions && isTextElement(element)) {
+    if (
+      opts.refreshDimensions &&
+      isTextElement(element) &&
+      // sticky labels are refitted together with their note below
+      !isStickyNoteBoundText(element, restoredElementsMap)
+    ) {
       Object.assign(
         element,
         refreshTextDimensions(
@@ -995,6 +1049,10 @@ export const restoreElements = <T extends ExcalidrawElement>(
       }
     }
   }
+
+  restoreStickyNotes(restoredElements, restoredElementsMap, {
+    refreshDimensions: !!opts.refreshDimensions,
+  });
 
   const repairedElements = repairBoundTextElementOrder(restoredElements);
 

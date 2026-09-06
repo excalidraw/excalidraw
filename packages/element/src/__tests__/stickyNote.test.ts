@@ -9,15 +9,24 @@ import {
   VERTICAL_ALIGN,
   arrayToMap,
 } from "@excalidraw/common";
-import { lineSegment, pointFrom, type GlobalPoint } from "@excalidraw/math";
+import {
+  lineSegment,
+  pointFrom,
+  type GlobalPoint,
+  type Radians,
+} from "@excalidraw/math";
 
 import { Scene } from "../Scene";
 import { intersectElementWithLineSegment } from "../collision";
 import { newElementWith } from "../mutateElement";
-import { newStickyNoteElement, newTextElement } from "../newElement";
-import { resizeSingleElement } from "../resizeElements";
 import {
-  computeStickyNoteTextLayout,
+  newElement,
+  newStickyNoteElement,
+  newTextElement,
+} from "../newElement";
+import { resizeMultipleElements, resizeSingleElement } from "../resizeElements";
+import {
+  getStickyNoteLayout,
   getStickyNoteCornerRadius,
   normalizeStickyNoteFontSize,
 } from "../stickyNote";
@@ -144,12 +153,12 @@ describe("sticky note text layout", () => {
       fontSizeMax: fontSize,
     });
 
-    const layout = computeStickyNoteTextLayout(
+    const layout = getStickyNoteLayout(
       getSticky(scene, text.containerId),
       text,
     );
 
-    expect(layout.fontSize).toBe(fontSize);
+    expect(layout.text!.fontSize).toBe(fontSize);
   });
 
   it("normalizes non-finite and out-of-range font ceilings", () => {
@@ -176,13 +185,15 @@ describe("sticky note text layout", () => {
     for (const fontSizeMax of [1e20, Infinity, NaN]) {
       scene.mutateElement(text, { fontSizeMax });
 
-      const layout = computeStickyNoteTextLayout(
+      const layout = getStickyNoteLayout(
         getSticky(scene, text.containerId),
         text,
       );
 
-      expect(Number.isFinite(layout.fontSize)).toBe(true);
-      expect(layout.fontSize).toBeLessThanOrEqual(STICKY_NOTE_MAX_FONT_SIZE);
+      expect(Number.isFinite(layout.text!.fontSize)).toBe(true);
+      expect(layout.text!.fontSize).toBeLessThanOrEqual(
+        STICKY_NOTE_MAX_FONT_SIZE,
+      );
       expect(Number.isFinite(layout.container.height)).toBe(true);
     }
   });
@@ -261,7 +272,7 @@ describe("sticky note text layout", () => {
     expect(updatedSticky.baseHeight).toBeCloseTo(originalSticky.height - 100);
   });
 
-  it("clamps corner resize height while still resizing width", () => {
+  it("keeps the requested height as the base when a corner drag is content-pinned", () => {
     const overflowingText = Array(40)
       .fill("abcdefghijklmnopqrstuvwx")
       .join("\n");
@@ -273,7 +284,7 @@ describe("sticky note text layout", () => {
     const originalElementsMap = arrayToMap([originalSticky, originalText]);
     const nextWidth = 120;
     const nextHeight = DEFAULT_STICKY_NOTE_SIZE;
-    const expectedLayout = computeStickyNoteTextLayout(
+    const expectedLayout = getStickyNoteLayout(
       {
         ...sticky,
         width: nextWidth,
@@ -297,11 +308,195 @@ describe("sticky note text layout", () => {
     const updatedText = getBoundText(scene, textId);
 
     expect(updatedSticky.width).toBe(nextWidth);
+    // the note refuses to shrink below its content, but the user's intent is
+    // remembered as the base: delete the text later and it snaps to 250
+    expect(updatedSticky.baseHeight).toBe(nextHeight);
     expect(updatedSticky.height).toBeCloseTo(expectedLayout.container.height);
-    expect(updatedSticky.baseHeight).toBeCloseTo(
-      expectedLayout.container.height,
-    );
     expect(updatedSticky.height).toBeGreaterThan(nextHeight);
+    // "se" holds the top-left corner
+    expect(updatedSticky.y).toBeCloseTo(originalSticky.y);
     expect(updatedText.fontSize).toBe(originalText.fontSize);
+    expect(updatedText.fontSizeMax).toBe(originalText.fontSizeMax);
+  });
+
+  it("scales the note, its base height and its font ceiling on a proportional resize", () => {
+    const { scene, stickyId, textId } = createStickyWithText("short");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const originalSticky = { ...sticky };
+    const originalElementsMap = arrayToMap([originalSticky, { ...text }]);
+
+    // Shift + east handle: both axes scale, and the label with them
+    resizeSingleElement(
+      500,
+      500,
+      sticky,
+      originalSticky,
+      originalElementsMap,
+      scene,
+      "e",
+      { shouldMaintainAspectRatio: true },
+    );
+
+    const updatedSticky = getSticky(scene, stickyId);
+    const updatedText = getBoundText(scene, textId);
+
+    expect(updatedSticky.width).toBe(500);
+    expect(updatedSticky.height).toBe(500);
+    expect(updatedSticky.baseHeight).toBe(500);
+    expect(updatedText.fontSizeMax).toBe(STICKY_FONT_SIZE * 2);
+    expect(updatedText.fontSize).toBe(STICKY_FONT_SIZE * 2);
+  });
+
+  it("keeps the base height on a width-only drag of a content-grown note", () => {
+    const overflowingText = Array(40)
+      .fill("abcdefghijklmnopqrstuvwx")
+      .join("\n");
+    const { scene, stickyId, textId } = createStickyWithText(overflowingText);
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const originalSticky = { ...sticky };
+    const originalElementsMap = arrayToMap([originalSticky, { ...text }]);
+
+    expect(sticky.height).toBeGreaterThan(sticky.baseHeight);
+
+    resizeSingleElement(
+      400,
+      sticky.height,
+      sticky,
+      originalSticky,
+      originalElementsMap,
+      scene,
+      "e",
+    );
+
+    const updatedSticky = getSticky(scene, stickyId);
+
+    expect(updatedSticky.width).toBe(400);
+    expect(updatedSticky.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+    expect(updatedSticky.height).toBeGreaterThan(updatedSticky.baseHeight);
+    expect(updatedSticky.y).toBe(100);
+  });
+
+  it("restores the gesture-start base height and ceiling when Shift is released mid-gesture", () => {
+    const { scene, stickyId, textId } = createStickyWithText("short");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const originalSticky = { ...sticky };
+    const originalElementsMap = arrayToMap([originalSticky, { ...text }]);
+
+    // first pointer-move with Shift: everything scales ×2
+    resizeSingleElement(
+      500,
+      500,
+      sticky,
+      originalSticky,
+      originalElementsMap,
+      scene,
+      "se",
+      { shouldMaintainAspectRatio: true },
+    );
+    expect(getSticky(scene, stickyId).baseHeight).toBe(500);
+    expect(getBoundText(scene, textId).fontSizeMax).toBe(STICKY_FONT_SIZE * 2);
+
+    // Shift released, same gesture: the ceiling goes back to the
+    // gesture-start value instead of compounding from the live 56
+    resizeSingleElement(
+      400,
+      300,
+      getSticky(scene, stickyId),
+      originalSticky,
+      originalElementsMap,
+      scene,
+      "se",
+    );
+    expect(getSticky(scene, stickyId).width).toBe(400);
+    expect(getSticky(scene, stickyId).baseHeight).toBe(300);
+    expect(getBoundText(scene, textId).fontSizeMax).toBe(STICKY_FONT_SIZE);
+    expect(getBoundText(scene, textId).fontSize).toBe(STICKY_FONT_SIZE);
+
+    // and a width-only move restores the gesture-start base height too
+    resizeSingleElement(
+      350,
+      DEFAULT_STICKY_NOTE_SIZE,
+      getSticky(scene, stickyId),
+      originalSticky,
+      originalElementsMap,
+      scene,
+      "e",
+    );
+    expect(getSticky(scene, stickyId).baseHeight).toBe(
+      DEFAULT_STICKY_NOTE_SIZE,
+    );
+  });
+
+  it("flips a rotated note without promoting its grown height or losing the label's angle", () => {
+    const overflowingText = Array(40)
+      .fill("abcdefghijklmnopqrstuvwx")
+      .join("\n");
+    const { scene, stickyId, textId } = createStickyWithText(overflowingText);
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    scene.mutateElement(sticky, { angle: 0.5 as Radians });
+    scene.mutateElement(text, { angle: 0.5 as Radians });
+    const grownHeight = sticky.height;
+    expect(grownHeight).toBeGreaterThan(sticky.baseHeight);
+    const originalElementsMap = arrayToMap([{ ...sticky }, { ...text }]);
+
+    resizeMultipleElements(
+      [sticky, text],
+      scene.getNonDeletedElementsMap(),
+      "nw",
+      scene,
+      originalElementsMap,
+      {
+        flipByX: true,
+        shouldResizeFromCenter: true,
+        shouldMaintainAspectRatio: true,
+      },
+    );
+
+    const updatedSticky = getSticky(scene, stickyId);
+    const updatedText = getBoundText(scene, textId);
+
+    expect(updatedSticky.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+    expect(updatedSticky.height).toBeCloseTo(grownHeight);
+    expect(updatedText.fontSizeMax).toBe(STICKY_FONT_SIZE);
+    expect(updatedSticky.angle).not.toBeCloseTo(0.5);
+    expect(updatedText.angle).toBeCloseTo(updatedSticky.angle);
+  });
+
+  it("syncs the base height of an empty note on a multi-select resize", () => {
+    const sticky = newStickyNoteElement({
+      type: "stickynote",
+      x: 0,
+      y: 0,
+      width: DEFAULT_STICKY_NOTE_SIZE,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+      baseHeight: DEFAULT_STICKY_NOTE_SIZE,
+    });
+    const rectangle = newElement({
+      type: "rectangle",
+      x: 300,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    const scene = new Scene([sticky, rectangle], { skipValidation: true });
+    const originalElementsMap = arrayToMap([{ ...sticky }, { ...rectangle }]);
+
+    resizeMultipleElements(
+      scene.getNonDeletedElements(),
+      scene.getNonDeletedElementsMap(),
+      "se",
+      scene,
+      originalElementsMap,
+      { nextWidth: 800, nextHeight: 500 },
+    );
+
+    const updatedSticky = getSticky(scene, sticky.id);
+
+    expect(updatedSticky.height).toBe(500);
+    expect(updatedSticky.baseHeight).toBe(500);
   });
 });

@@ -64,7 +64,10 @@ import {
 } from "./typeChecks";
 
 import { isInGroup } from "./groups";
-import { computeStickyNoteTextLayout } from "./stickyNote";
+import {
+  getStickyNoteResizeIntent,
+  updateStickyNoteLayout,
+} from "./stickyNote";
 
 import type { Scene } from "./Scene";
 
@@ -84,30 +87,8 @@ import type {
   ElementsMap,
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
-  ExcalidrawStickyNoteElement,
 } from "./types";
 import type { ElementUpdate } from "./mutateElement";
-
-const getStickyNoteCornerResizeHeight = (
-  container: ExcalidrawStickyNoteElement,
-  textElement: ExcalidrawTextElement,
-  width: number,
-  height: number,
-) => {
-  const proposedContainer = {
-    ...container,
-    width: Math.abs(width),
-    height: Math.abs(height),
-    baseHeight: Math.abs(height),
-  };
-  const layout = computeStickyNoteTextLayout(proposedContainer, textElement);
-
-  if (layout.container.height > layout.container.baseHeight + 0.5) {
-    return layout.container.height;
-  }
-
-  return Math.abs(height);
-};
 
 // Returns true when transform (resizing/rotation) happened
 export const transformElements = (
@@ -827,19 +808,6 @@ export const resizeSingleElement = (
     nextHeight = Math.max(nextHeight, STICKY_NOTE_MIN_BASE_HEIGHT);
   }
 
-  if (
-    isResizingStickyNote &&
-    boundTextElement &&
-    handleDirection.length === 2
-  ) {
-    nextHeight = getStickyNoteCornerResizeHeight(
-      latestElement,
-      boundTextElement,
-      nextWidth,
-      nextHeight,
-    );
-  }
-
   const rescaledPoints = rescalePointsInElement(
     origElement,
     nextWidth,
@@ -955,22 +923,34 @@ export const resizeSingleElement = (
       isDragging: false,
     });
 
-    if (
-      boundTextElement &&
-      boundTextFont != null &&
-      !isStickyNoteElement(latestElement)
-    ) {
-      scene.mutateElement(boundTextElement, {
-        fontSize: boundTextFont.fontSize,
+    if (isStickyNoteElement(latestElement)) {
+      updateStickyNoteLayout(latestElement, scene, {
+        ...getStickyNoteResizeIntent(
+          latestElement,
+          originalElementsMap,
+          handleDirection,
+          {
+            proportional: shouldMaintainAspectRatio,
+            fromCenter: shouldResizeFromCenter,
+          },
+        ),
+        // the arrow pass below is this function's — keep it single
+        bindings: false,
       });
+    } else {
+      if (boundTextElement && boundTextFont != null) {
+        scene.mutateElement(boundTextElement, {
+          fontSize: boundTextFont.fontSize,
+        });
+      }
+      handleBindTextResize(
+        latestElement,
+        scene,
+        handleDirection,
+        shouldMaintainAspectRatio,
+        shouldResizeFromCenter,
+      );
     }
-    handleBindTextResize(
-      latestElement,
-      scene,
-      handleDirection,
-      shouldMaintainAspectRatio,
-      shouldResizeFromCenter,
-    );
 
     updateBoundElements(latestElement, scene);
   }
@@ -1491,10 +1471,9 @@ export const resizeMultipleElements = (
         getBoundTextElementId(orig) ?? "",
       ) as ExcalidrawTextElementWithContainer | undefined;
 
-      if (boundTextElement) {
-        if (isStickyNoteElement(orig)) {
-          update.boundTextFontSize = boundTextElement.fontSize;
-        } else if (keepAspectRatio) {
+      // sticky notes derive their label's size from the layout below
+      if (boundTextElement && !isStickyNoteElement(orig)) {
+        if (keepAspectRatio) {
           const newFontSize = boundTextElement.fontSize * scale;
           if (newFontSize < MIN_FONT_SIZE) {
             return;
@@ -1502,28 +1481,6 @@ export const resizeMultipleElements = (
           update.boundTextFontSize = newFontSize;
         } else {
           update.boundTextFontSize = boundTextElement.fontSize;
-        }
-      }
-
-      if (
-        isStickyNoteElement(orig) &&
-        boundTextElement &&
-        handleDirection.length === 2
-      ) {
-        const proposedContainer = {
-          ...latest,
-          ...update,
-          width: Math.abs(update.width),
-          height: Math.abs(update.height),
-          baseHeight: Math.abs(update.height),
-        } as ExcalidrawStickyNoteElement;
-        const layout = computeStickyNoteTextLayout(
-          proposedContainer,
-          boundTextElement,
-        );
-
-        if (layout.container.height > layout.container.baseHeight + 0.5) {
-          return;
         }
       }
 
@@ -1547,9 +1504,27 @@ export const resizeMultipleElements = (
 
       scene.mutateElement(element, update);
 
-      updateBoundElements(element, scene, {
-        simultaneouslyUpdated: elementsToUpdate,
-      });
+      if (isStickyNoteElement(element)) {
+        // the content correction runs before the (single) arrow pass, which
+        // must still skip arrows resized in the same gesture
+        updateStickyNoteLayout(element, scene, {
+          ...getStickyNoteResizeIntent(
+            element,
+            originalElementsMap,
+            handleDirection,
+            {
+              proportional: keepAspectRatio,
+              fromCenter: shouldResizeFromCenter,
+              flip: flipByX || flipByY,
+            },
+          ),
+          bindings: { simultaneouslyUpdated: elementsToUpdate },
+        });
+      } else {
+        updateBoundElements(element, scene, {
+          simultaneouslyUpdated: elementsToUpdate,
+        });
+      }
 
       if (isBindingElement(element)) {
         if (element.startBinding) {
@@ -1565,13 +1540,15 @@ export const resizeMultipleElements = (
       }
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
-      if (boundTextElement && boundTextFontSize) {
-        if (!isStickyNoteElement(element)) {
-          scene.mutateElement(boundTextElement, {
-            fontSize: boundTextFontSize,
-            angle: isLinearElement(element) ? undefined : angle,
-          });
-        }
+      if (
+        boundTextElement &&
+        boundTextFontSize &&
+        !isStickyNoteElement(element)
+      ) {
+        scene.mutateElement(boundTextElement, {
+          fontSize: boundTextFontSize,
+          angle: isLinearElement(element) ? undefined : angle,
+        });
         handleBindTextResize(
           element,
           scene,

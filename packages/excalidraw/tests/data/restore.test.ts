@@ -221,7 +221,7 @@ describe("restoreElements", () => {
     )[0] as ExcalidrawTextElement;
 
     expect(restoredText.fontSize).toBe(DEFAULT_FONT_SIZE);
-    expect(restoredText.fontSizeMax).toBe(undefined);
+    expect(restoredText.fontSizeMax).toBe(null);
   });
 
   it("should clamp restored font ceilings to the sticky note maximum", () => {
