@@ -546,8 +546,16 @@ export const actionChangeBucketFillBackgroundColor = register<
           <h3 aria-hidden="true">{t("labels.background")}</h3>
         )}
         <ColorPicker
-          topPicks={BUCKET_FILL_BACKGROUND_PICKS}
-          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
+          topPicks={
+            //zsviczian
+            appState.colorPalette?.topPicks?.elementBackground ??
+            BUCKET_FILL_BACKGROUND_PICKS
+          }
+          palette={
+            //zsviczian
+            appState.colorPalette?.elementBackground ??
+            DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE
+          }
           // hidden rather than removed from the palette so the remaining
           // colors keep their usual hotkeys (w for white etc.)
           excludedColors={[COLOR_PALETTE.transparent]}
