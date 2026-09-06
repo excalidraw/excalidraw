@@ -115,9 +115,6 @@ body.excalidraw-cursor-resize * {
 
     &.interactive {
       z-index: var(--zIndex-interactiveCanvas);
-      // Apply theme filter only to interactive canvas for UI elements
-      // (resize handles, selection boxes, etc.)
-      filter: var(--theme-filter);
     }
 
     // Remove the main canvas from document flow to avoid resizeObserver

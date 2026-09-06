@@ -20,6 +20,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
+import { getSelectionColor } from "../../renderer/helpers";
 import { renderInteractiveScene } from "../../renderer/interactiveScene";
 
 import { AnimationController } from "../../renderer/animation";
@@ -136,12 +137,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       remotePointerButton.set(socketId, user.button);
     });
 
-    const selectionColor =
-      (props.containerRef?.current &&
-        getComputedStyle(props.containerRef.current).getPropertyValue(
-          "--color-selection",
-        )) ||
-      "#6965db";
+    const selectionColor = getSelectionColor(props.containerRef?.current);
 
     rendererParams.current = {
       app: props.app,
