@@ -226,7 +226,6 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
-    case "stickynote":
     case "iframe":
     case "embeddable":
     case "diamond":
@@ -768,14 +767,9 @@ const _generateElementShape = (
   const isDarkMode = theme === THEME.DARK;
   switch (element.type) {
     case "rectangle":
-    case "stickynote":
     case "iframe":
     case "embeddable": {
-      let shape: ElementShapes[
-        | "rectangle"
-        | "stickynote"
-        | "iframe"
-        | "embeddable"];
+      let shape: ElementShapes[typeof element.type];
       // this is for rendering the stroke/bg of the embeddable, especially
       // when the src url is not set
 
@@ -985,6 +979,9 @@ const _generateElementShape = (
 
       return shapes;
     }
+    // sticky notes are painted directly (canvas + SVG) from
+    // `getStickyNoteRenderPoints`, never through roughjs
+    case "stickynote":
     case "frame":
     case "magicframe":
     case "text":

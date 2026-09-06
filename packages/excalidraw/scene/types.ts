@@ -162,7 +162,6 @@ export type ElementShape =
 
 export type ElementShapes = {
   rectangle: Drawable;
-  stickynote: Drawable;
   ellipse: Drawable;
   diamond: Drawable;
   iframe: Drawable;
@@ -171,6 +170,7 @@ export type ElementShapes = {
   arrow: Drawable[];
   line: Drawable[];
   text: null;
+  stickynote: null;
   image: null;
   frame: null;
   magicframe: null;
