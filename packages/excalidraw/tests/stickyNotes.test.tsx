@@ -5,11 +5,16 @@ import {
   DEFAULT_STICKY_NOTE_SIZE,
   KEYS,
   STICKY_NOTE_MIN_FONT_SIZE,
+  arrayToMap,
 } from "@excalidraw/common";
+import { queryByTestId } from "@testing-library/react";
 import { pointFrom } from "@excalidraw/math";
 
 import {
   getStickyNoteLayout,
+  getUserFontSize,
+  resizeMultipleElements,
+  resizeSingleElement,
   updateStickyNoteLayout,
 } from "@excalidraw/element";
 
@@ -20,10 +25,12 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 
-import { actionBindText, actionUnbindText } from "../actions";
+import { actionBindText, actionGroup, actionUnbindText } from "../actions";
 import {
   actionChangeBackgroundColor,
+  actionChangeFontSize,
   actionChangeRoundness,
+  actionIncreaseFontSize,
 } from "../actions/actionProperties";
 import { actionCopyStyles, actionPasteStyles } from "../actions/actionStyles";
 import { activeEyeDropperAtom } from "../components/EyeDropper";
@@ -33,12 +40,20 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
-import { act, render } from "./test-utils";
+import {
+  act,
+  fireEvent,
+  GlobalTestState,
+  mockBoundingClientRect,
+  render,
+  restoreOriginalGetBoundingClientRect,
+} from "./test-utils";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
 
 const LONG_TEXT = Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n");
+const RED = COLOR_PALETTE.red[4];
 
 const getElement = <
   T extends
@@ -164,7 +179,7 @@ describe("sticky notes", () => {
     const endDelta = arrowEndY(arrow.id) - endYBefore;
     expect(Math.abs(endDelta - growth)).toBeLessThan(10);
 
-    Keyboard.keyPress(KEYS.ESCAPE);
+    Keyboard.keyPress(KEYS.ESCAPE, editor);
     expect(getElement<ExcalidrawTextElement>(label.id).fontSize).toBe(
       STICKY_NOTE_MIN_FONT_SIZE,
     );
@@ -300,8 +315,6 @@ describe("sticky notes", () => {
   });
 
   describe("colors", () => {
-    const RED = COLOR_PALETTE.red[4];
-
     it("routes a closed-popup top pick to the sticky default after switching tools", () => {
       // regression: the memoized picker kept a stale `onChange` that had
       // captured the rectangle tool's target, so the top pick wrote the
@@ -344,7 +357,7 @@ describe("sticky notes", () => {
       expect(h.state.currentItemStickynoteStrokeColor).toBe(RED);
     });
 
-    it("creates notes from the sticky defaults, not the shape defaults", () => {
+    it("creates notes from the sticky defaults, not the shape defaults", async () => {
       API.setAppState({
         currentItemBackgroundColor: COLOR_PALETTE.transparent,
         currentItemStrokeColor: COLOR_PALETTE.blue[4],
@@ -360,7 +373,7 @@ describe("sticky notes", () => {
       ) as ExcalidrawStickyNoteElement;
       expect(note.backgroundColor).toBe(COLOR_PALETTE.pink[1]);
       expect(note.strokeColor).toBe(COLOR_PALETTE.black);
-      Keyboard.keyPress(KEYS.ESCAPE);
+      Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
     });
 
     it("binding a transparent text to a note gives it the note's text color", () => {
@@ -417,6 +430,358 @@ describe("sticky notes", () => {
       expect(getElement(note.id).strokeColor).toBe(RED);
       expect(getElement(label.id).strokeColor).toBe(RED);
       expect(getElement(note.id).backgroundColor).toBe(backgroundBefore);
+    });
+  });
+
+  describe("bound arrows", () => {
+    const createNoteWithArrow = (text: string, fontSize = 28) => {
+      const { note, label } = createNote({
+        id: "note",
+        text,
+        fontSize,
+        boundArrowIds: ["arrow"],
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        x: note.x + note.width / 2,
+        y: 900,
+        width: 0,
+        height: -500,
+        points: [pointFrom(0, 0), pointFrom(0, -500)],
+        endBinding: {
+          elementId: note.id,
+          fixedPoint: [0.5, 1],
+          mode: "orbit",
+        },
+      });
+      API.setElements([note, label, arrow]);
+      layoutNotes(note.id);
+      return { note, label, arrow };
+    };
+    const noteBottom = (id: string) => {
+      const note = getElement<ExcalidrawStickyNoteElement>(id);
+      return note.y + note.height;
+    };
+
+    it("follow the note back to its base height on unbind", () => {
+      const { note, arrow } = createNoteWithArrow(LONG_TEXT);
+      expect(getElement(note.id).height).toBeGreaterThan(
+        DEFAULT_STICKY_NOTE_SIZE,
+      );
+      const gap = arrowEndY(arrow.id) - noteBottom(note.id);
+
+      API.setSelectedElements([getElement(note.id)]);
+      API.executeAction(actionUnbindText);
+
+      expect(getElement(note.id).height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      // the orbit ring re-solves the contact point, hence the tolerance
+      expect(
+        Math.abs(arrowEndY(arrow.id) - noteBottom(note.id) - gap),
+      ).toBeLessThan(10);
+    });
+
+    it("stay at the content bottom after a content-constrained resize", () => {
+      const { note, arrow } = createNoteWithArrow(LONG_TEXT);
+      const grown = getElement<ExcalidrawStickyNoteElement>(note.id);
+      const heightBefore = grown.height;
+      const gap = arrowEndY(arrow.id) - noteBottom(note.id);
+      const originalElementsMap = arrayToMap(
+        h.elements.map((element) => ({ ...element })),
+      );
+
+      act(() => {
+        resizeSingleElement(
+          grown.width,
+          DEFAULT_STICKY_NOTE_SIZE,
+          grown,
+          { ...grown },
+          originalElementsMap,
+          h.app.scene,
+          "s",
+        );
+      });
+
+      const after = getElement<ExcalidrawStickyNoteElement>(note.id);
+      expect(after.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(after.height).toBeCloseTo(heightBefore);
+      // the arrow pass ran after the content correction, not before it
+      expect(arrowEndY(arrow.id) - noteBottom(note.id)).toBeCloseTo(gap, 0);
+    });
+
+    it("follow a font-size change that grows the note", () => {
+      // 12 lines at a 12px ceiling fit the base height; at 20 they don't
+      const twelveLines = Array(12).fill("abcdefghij").join("\n");
+      const { note, label, arrow } = createNoteWithArrow(twelveLines, 12);
+      expect(getElement(note.id).height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      const gap = arrowEndY(arrow.id) - noteBottom(note.id);
+
+      API.setSelectedElements([getElement(note.id)]);
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeFontSize, "ui", 20);
+      });
+
+      expect(getElement<ExcalidrawTextElement>(label.id).fontSizeMax).toBe(20);
+      expect(getElement(note.id).height).toBeGreaterThan(
+        DEFAULT_STICKY_NOTE_SIZE,
+      );
+      expect(arrowEndY(arrow.id) - noteBottom(note.id)).toBeCloseTo(gap, 0);
+    });
+
+    it("are not moved twice when they are part of a multi-select resize", () => {
+      const { note, arrow } = createNoteWithArrow("short");
+      const gap = arrowEndY(arrow.id) - noteBottom(note.id);
+      const originalElementsMap = arrayToMap(
+        h.elements.map((element) => ({ ...element })),
+      );
+
+      // selection bbox: note (100..350) + arrow down to y=900 → 250×800
+      act(() => {
+        resizeMultipleElements(
+          h.app.scene.getNonDeletedElements(),
+          h.app.scene.getNonDeletedElementsMap(),
+          "se",
+          h.app.scene,
+          originalElementsMap,
+          { nextWidth: 500, nextHeight: 1600, shouldMaintainAspectRatio: true },
+        );
+      });
+
+      // the arrow was scaled with the selection (gap doubled); had the note's
+      // arrow pass re-snapped it, the gap would be back at its ring distance
+      expect(getElement(note.id).width).toBe(500);
+      expect(arrowEndY(arrow.id) - noteBottom(note.id)).toBeCloseTo(gap * 2, 0);
+    });
+  });
+
+  describe("editing", () => {
+    it("routes a top pick to the label and the sticky default while editing a note", async () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: "hi",
+        fontSize: 28,
+      });
+      API.setElements([note, label]);
+      layoutNotes(note.id);
+      const shapeDefault = h.state.currentItemStrokeColor;
+
+      mouse.doubleClickAt(note.x + note.width / 2, note.y + note.height / 2);
+      await getTextEditor();
+      UI.clickOnTestId(`color-top-pick-${RED}`);
+
+      expect(getElement(label.id).strokeColor).toBe(RED);
+      expect(h.state.currentItemStickynoteStrokeColor).toBe(RED);
+      expect(h.state.currentItemStrokeColor).toBe(shapeDefault);
+      Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
+    });
+
+    it("colors a selected note's label with the preview eyedropper", () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: "hi",
+        fontSize: 28,
+      });
+      API.setElements([note, label]);
+      layoutNotes(note.id);
+      API.setSelectedElements([getElement(note.id)]);
+
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        Keyboard.keyPress("s");
+      });
+      // the preview samples the canvas under the pointer (the mock yields
+      // black) and applies it live — to the label as well as the note
+      const backdrop = document.querySelector(
+        ".excalidraw-eye-dropper-backdrop",
+      )!;
+      expect(backdrop).not.toBeNull();
+      // the pick applies live only while the pointer is held down
+      fireEvent.pointerDown(backdrop, { clientX: 150, clientY: 150 });
+      fireEvent.pointerMove(window, { clientX: 150, clientY: 150 });
+
+      const picked = getElement(label.id).strokeColor;
+      expect(picked).not.toBe(COLOR_PALETTE.black);
+      expect(getElement(note.id).strokeColor).toBe(picked);
+      fireEvent.keyDown(backdrop, { key: KEYS.ESCAPE });
+    });
+  });
+
+  describe("paste styles", () => {
+    it("resolves the source ceiling from the copied snapshot after the source is gone", () => {
+      const source = createNote({
+        id: "source",
+        x: 600,
+        text: LONG_TEXT,
+        fontSize: 28,
+      });
+      const target = createNote({ id: "target", text: "hi", fontSize: 10 });
+      API.setElements([source.note, source.label, target.note, target.label]);
+      layoutNotes(source.note.id, target.note.id);
+
+      API.setSelectedElements([getElement(source.note.id)]);
+      API.executeAction(actionCopyStyles);
+      API.setElements([
+        getElement(target.note.id),
+        getElement(target.label.id),
+      ]);
+      API.setSelectedElements([getElement(target.note.id)]);
+      API.executeAction(actionPasteStyles);
+
+      expect(
+        getElement<ExcalidrawTextElement>(target.label.id).fontSizeMax,
+      ).toBe(28);
+    });
+  });
+
+  describe("ceiling lifecycle", () => {
+    it("ignores a stale ceiling on text that is no longer bound to a note", () => {
+      const text = API.createElement({
+        type: "text",
+        id: "text",
+        x: 100,
+        y: 100,
+        text: "plain",
+        fontSize: 20,
+      });
+      API.setElements([text]);
+      // what generic binding repair can leave behind
+      act(() => {
+        h.app.scene.mutateElement(getElement<ExcalidrawTextElement>(text.id), {
+          fontSizeMax: 28,
+        });
+      });
+      expect(
+        getUserFontSize(
+          getElement<ExcalidrawTextElement>(text.id),
+          h.app.scene.getNonDeletedElementsMap(),
+        ),
+      ).toBe(20);
+
+      API.setSelectedElements([getElement(text.id)]);
+      API.executeAction(actionIncreaseFontSize);
+
+      const after = getElement<ExcalidrawTextElement>(text.id);
+      expect(after.fontSize).toBe(22);
+      expect(after.fontSizeMax).toBe(28);
+    });
+
+    it("duplicates a note with its label's ceiling and base height", () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: LONG_TEXT,
+        fontSize: 28,
+      });
+      API.setElements([note, label]);
+      layoutNotes(note.id);
+      API.setSelectedElements([getElement(note.id)]);
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyPress("d");
+      });
+
+      const notes = h.elements.filter(
+        (element) => element.type === "stickynote" && !element.isDeleted,
+      ) as ExcalidrawStickyNoteElement[];
+      expect(notes).toHaveLength(2);
+      const copy = notes.find((candidate) => candidate.id !== note.id)!;
+      const copyLabel = h.elements.find(
+        (element) =>
+          element.type === "text" &&
+          (element as ExcalidrawTextElement).containerId === copy.id,
+      ) as ExcalidrawTextElement;
+      expect(copy.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(copy.height).toBeCloseTo(getElement(note.id).height);
+      expect(copyLabel.fontSizeMax).toBe(28);
+      expect(
+        getUserFontSize(copyLabel, h.app.scene.getNonDeletedElementsMap()),
+      ).toBe(28);
+    });
+  });
+
+  describe("creation", () => {
+    it("keeps an empty note escaped from editing and removes it on undo", async () => {
+      UI.clickTool("stickynote");
+      mouse.downAt(300, 300);
+      mouse.up();
+      expect(h.state.editingTextElement).not.toBeNull();
+
+      // the editor owns Escape (a document-level keypress would not end
+      // editing, and undo is suppressed while editing)
+      Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
+      expect(h.state.editingTextElement).toBeNull();
+      const note = h.elements.find(
+        (element) => element.type === "stickynote" && !element.isDeleted,
+      ) as ExcalidrawStickyNoteElement;
+      expect(note.width).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+
+      // the placement is one entry; the empty editing session may add another
+      const liveNotes = () =>
+        h.elements.filter(
+          (element) => element.type === "stickynote" && !element.isDeleted,
+        );
+      Keyboard.undo();
+      if (liveNotes().length) {
+        Keyboard.undo();
+      }
+      expect(liveNotes()).toHaveLength(0);
+    });
+  });
+
+  describe("Stats", () => {
+    beforeAll(() => {
+      mockBoundingClientRect();
+    });
+    afterAll(() => {
+      restoreOriginalGetBoundingClientRect();
+    });
+
+    const openStats = () => {
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+        button: 2,
+        clientX: 1,
+        clientY: 1,
+      });
+      const contextMenu = UI.queryContextMenu();
+      fireEvent.click(queryByTestId(contextMenu!, "stats")!);
+    };
+    const statsInput = (label: string) =>
+      UI.queryStatsProperty(label)?.querySelector(
+        ".drag-input",
+      ) as HTMLInputElement;
+
+    it("keeps the base height on a width edit and scales the ceiling on a group edit", () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: LONG_TEXT,
+        fontSize: 28,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        id: "rectangle",
+        x: 400,
+        y: 100,
+        width: 100,
+        height: DEFAULT_STICKY_NOTE_SIZE,
+      });
+      API.setElements([note, label, rectangle]);
+      layoutNotes(note.id);
+      openStats();
+
+      API.setSelectedElements([getElement(note.id)]);
+      UI.updateInput(statsInput("W"), "400");
+      let updated = getElement<ExcalidrawStickyNoteElement>(note.id);
+      expect(updated.width).toBe(400);
+      expect(updated.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+
+      API.setSelectedElements([getElement(note.id), getElement(rectangle.id)]);
+      // a group is one atomic unit with a common width (an ungrouped pair
+      // shows "Mixed"); group scaling is uniform
+      API.executeAction(actionGroup);
+      const groupWidth = statsInput("W");
+      UI.updateInput(groupWidth, String(Number(groupWidth.value) * 2));
+      updated = getElement<ExcalidrawStickyNoteElement>(note.id);
+      expect(updated.width).toBe(800);
+      expect(getElement<ExcalidrawTextElement>(label.id).fontSizeMax).toBe(56);
     });
   });
 });

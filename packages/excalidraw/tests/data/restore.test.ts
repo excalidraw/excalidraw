@@ -8,14 +8,19 @@ import {
   FONT_FAMILY,
   ROUNDNESS,
   STICKY_NOTE_MAX_FONT_SIZE,
+  DEFAULT_STICKY_NOTE_BG,
+  STICKY_NOTE_MIN_FONT_SIZE,
 } from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
 
+import { getStickyNoteLayout } from "@excalidraw/element";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import type {
+  ExcalidrawStickyNoteElement,
   ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
@@ -283,6 +288,66 @@ describe("restoreElements", () => {
 
     expect(restoredLabel.fontSizeMax).toBe(20);
     expect(restoredLabel.strokeColor).toBe(COLOR_PALETTE.black);
+  });
+
+  it("should restore the sticky note defaults and top-pick slots", () => {
+    const restored = restore.restoreAppState(
+      {
+        currentItemStickynoteBackgroundColor: COLOR_PALETTE.transparent,
+        currentItemStickynoteStrokeColor: COLOR_PALETTE.transparent,
+        colorTopPicks: { stickyNoteBackground: ["#fcc2d7", "#b2f2bb"] },
+      } as any,
+      null,
+    );
+
+    expect(restored.currentItemStickynoteBackgroundColor).toBe(
+      DEFAULT_STICKY_NOTE_BG,
+    );
+    expect(restored.currentItemStickynoteStrokeColor).toBe(COLOR_PALETTE.black);
+    expect(restored.colorTopPicks.stickyNoteBackground).toEqual([
+      "#fcc2d7",
+      "#b2f2bb",
+    ]);
+    expect(restored.colorTopPicks.stickyNoteStroke).toBe(null);
+  });
+
+  it("should refit a sticky note together with its label when refreshing dimensions", () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      id: "sticky",
+      width: 250,
+      height: 250,
+      baseHeight: 250,
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      text: Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n"),
+      fontSize: 28,
+      containerId: "sticky",
+    });
+
+    const restored = restore.restoreElements([stickyNote, label], null, {
+      repairBindings: true,
+      refreshDimensions: true,
+    });
+    const note = restored.find(
+      (element) => element.id === "sticky",
+    ) as ExcalidrawStickyNoteElement;
+    const text = restored.find(
+      (element) => element.id === "label",
+    ) as ExcalidrawTextElement;
+
+    // both halves: the note grew for the text at the minimum font, the base
+    // is untouched, and the pair agrees with the layout
+    expect(note.baseHeight).toBe(250);
+    expect(note.height).toBeGreaterThan(250);
+    expect(text.fontSize).toBe(STICKY_NOTE_MIN_FONT_SIZE);
+    expect(text.fontSizeMax).toBe(28);
+    expect(note.height).toBeCloseTo(
+      getStickyNoteLayout(note, text).container.height,
+    );
   });
 
   it("should restore freedraw element correctly", () => {

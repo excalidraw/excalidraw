@@ -146,11 +146,20 @@ const StatsDragInput = <
     // reason: idempotent to avoid unnecessary
     if (isNaN(original) || Math.abs(rounded - original) >= SMALLEST_DELTA) {
       stateRef.current.lastUpdatedValue = updatedValue;
+      // a real snapshot (copies), like the pointer-drag path builds: the
+      // callbacks derive gesture-start values from it — e.g. a sticky note's
+      // width and its label's font ceiling — and the live map would already
+      // carry the change they apply. A typed value is applied once, so the
+      // scene at this point still is the original.
+      const originalElementsMap: ElementsMap = new Map();
+      for (const element of app.scene.getNonDeletedElements()) {
+        originalElementsMap.set(element.id, deepCopyElement(element));
+      }
       dragInputCallback({
         accumulatedChange: 0,
         instantChange: 0,
         originalElements: elements,
-        originalElementsMap: app.scene.getNonDeletedElementsMap(),
+        originalElementsMap,
         shouldKeepAspectRatio: shouldKeepAspectRatio!!,
         shouldChangeByStepSize: false,
         scene,

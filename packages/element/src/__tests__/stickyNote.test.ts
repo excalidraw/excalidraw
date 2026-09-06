@@ -1,5 +1,6 @@
 import {
   DEFAULT_STICKY_NOTE_SIZE,
+  FONT_FAMILY,
   MIN_FONT_SIZE,
   ROUNDNESS,
   STICKY_NOTE_FALLBACK_FONT_SIZE,
@@ -12,9 +13,11 @@ import {
 import {
   lineSegment,
   pointFrom,
+  pointRotateRads,
   type GlobalPoint,
   type Radians,
 } from "@excalidraw/math";
+import { vi } from "vitest";
 
 import { Scene } from "../Scene";
 import { intersectElementWithLineSegment } from "../collision";
@@ -28,11 +31,15 @@ import { resizeMultipleElements, resizeSingleElement } from "../resizeElements";
 import {
   getStickyNoteLayout,
   getStickyNoteCornerRadius,
+  getStickyNoteMinSize,
   normalizeStickyNoteFontSize,
+  updateStickyNoteLayout,
 } from "../stickyNote";
+import * as textMeasurements from "../textMeasurements";
 import { redrawTextBoundingBox } from "../textElement";
 
 import type {
+  ExcalidrawElement,
   ExcalidrawStickyNoteElement,
   ExcalidrawTextElementWithContainer,
   NonDeleted,
@@ -48,7 +55,10 @@ const getBoundText = (scene: Scene, id: string) =>
     id,
   ) as NonDeleted<ExcalidrawTextElementWithContainer>;
 
-const createStickyWithText = (originalText: string) => {
+const createStickyWithText = (
+  originalText: string,
+  extraElements: ExcalidrawElement[] = [],
+) => {
   const baseSticky = newStickyNoteElement({
     type: "stickynote",
     x: 100,
@@ -72,7 +82,9 @@ const createStickyWithText = (originalText: string) => {
   const sticky = newElementWith(baseSticky, {
     boundElements: [{ type: "text", id: text.id }],
   });
-  const scene = new Scene([sticky, text], { skipValidation: true });
+  const scene = new Scene([sticky, text, ...extraElements], {
+    skipValidation: true,
+  });
   const sceneSticky = getSticky(scene, sticky.id);
   const sceneText = getBoundText(scene, text.id);
 
@@ -498,5 +510,245 @@ describe("sticky note text layout", () => {
 
     expect(updatedSticky.height).toBe(500);
     expect(updatedSticky.baseHeight).toBe(500);
+  });
+
+  it("keeps the center on an Alt (center) resize that is content-pinned", () => {
+    const overflowingText = Array(40)
+      .fill("abcdefghijklmnopqrstuvwx")
+      .join("\n");
+    const { scene, stickyId, textId } = createStickyWithText(overflowingText);
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const originalSticky = { ...sticky };
+    const originalElementsMap = arrayToMap([originalSticky, { ...text }]);
+    const centerY = sticky.y + sticky.height / 2;
+
+    for (const handle of ["n", "s"] as const) {
+      resizeSingleElement(
+        sticky.width,
+        originalSticky.height - 100,
+        getSticky(scene, stickyId),
+        originalSticky,
+        originalElementsMap,
+        scene,
+        handle,
+        { shouldResizeFromCenter: true },
+      );
+      const updated = getSticky(scene, stickyId);
+      // content-pinned: the height springs back, but around the center
+      expect(updated.height).toBeCloseTo(originalSticky.height);
+      expect(updated.y + updated.height / 2).toBeCloseTo(centerY);
+      expect(updated.baseHeight).toBeCloseTo(originalSticky.height - 100);
+    }
+  });
+
+  it("scales the label's ceiling on a proportional multi-select resize", () => {
+    const rectangle = newElement({
+      type: "rectangle",
+      x: 400,
+      y: 100,
+      width: 100,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+    });
+    const { scene, stickyId, textId } = createStickyWithText("short", [
+      rectangle,
+    ]);
+    const originalElementsMap = arrayToMap(
+      scene.getNonDeletedElements().map((element) => ({ ...element })),
+    );
+
+    // selection bbox is 400×250; a labeled note forces aspect lock anyway
+    resizeMultipleElements(
+      scene.getNonDeletedElements(),
+      scene.getNonDeletedElementsMap(),
+      "se",
+      scene,
+      originalElementsMap,
+      { nextWidth: 800, nextHeight: 500, shouldMaintainAspectRatio: true },
+    );
+
+    const updatedSticky = getSticky(scene, stickyId);
+    const updatedText = getBoundText(scene, textId);
+    expect(updatedSticky.width).toBe(500);
+    expect(updatedSticky.height).toBe(500);
+    expect(updatedSticky.baseHeight).toBe(500);
+    expect(updatedText.fontSizeMax).toBe(STICKY_FONT_SIZE * 2);
+    expect(updatedText.fontSize).toBe(STICKY_FONT_SIZE * 2);
+  });
+
+  it("uses the requested height as the base on a free multi-select resize of an empty note", () => {
+    const sticky = newStickyNoteElement({
+      type: "stickynote",
+      x: 0,
+      y: 0,
+      width: DEFAULT_STICKY_NOTE_SIZE,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+      baseHeight: DEFAULT_STICKY_NOTE_SIZE,
+    });
+    const rectangle = newElement({
+      type: "rectangle",
+      x: 300,
+      y: 0,
+      width: 100,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+    });
+    const scene = new Scene([sticky, rectangle], { skipValidation: true });
+    const originalElementsMap = arrayToMap([{ ...sticky }, { ...rectangle }]);
+
+    // 2× wide, 1.5× tall — nothing in the selection forces aspect lock
+    resizeMultipleElements(
+      scene.getNonDeletedElements(),
+      scene.getNonDeletedElementsMap(),
+      "se",
+      scene,
+      originalElementsMap,
+      { nextWidth: 800, nextHeight: 375 },
+    );
+
+    const updated = getSticky(scene, sticky.id);
+    expect(updated.width).toBe(500);
+    expect(updated.height).toBe(375);
+    expect(updated.baseHeight).toBe(375);
+  });
+
+  it("restores everything when a proportional gesture returns to scale 1", () => {
+    const { scene, stickyId, textId } = createStickyWithText("short");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const originalSticky = { ...sticky };
+    const originalElementsMap = arrayToMap([originalSticky, { ...text }]);
+
+    resizeSingleElement(
+      500,
+      500,
+      sticky,
+      originalSticky,
+      originalElementsMap,
+      scene,
+      "se",
+      {
+        shouldMaintainAspectRatio: true,
+      },
+    );
+    resizeSingleElement(
+      DEFAULT_STICKY_NOTE_SIZE,
+      DEFAULT_STICKY_NOTE_SIZE,
+      getSticky(scene, stickyId),
+      originalSticky,
+      originalElementsMap,
+      scene,
+      "se",
+      { shouldMaintainAspectRatio: true },
+    );
+
+    const updatedSticky = getSticky(scene, stickyId);
+    const updatedText = getBoundText(scene, textId);
+    expect(updatedSticky.width).toBe(DEFAULT_STICKY_NOTE_SIZE);
+    expect(updatedSticky.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+    expect(updatedText.fontSizeMax).toBe(STICKY_FONT_SIZE);
+    expect(updatedText.fontSize).toBe(STICKY_FONT_SIZE);
+  });
+
+  it("keeps the rotated top edge in place while the note grows", () => {
+    const { scene, stickyId, textId } = createStickyWithText("short");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    scene.mutateElement(sticky, { angle: 0.6 as Radians });
+    scene.mutateElement(text, { angle: 0.6 as Radians });
+    const topEdgeMidpoint = (element: ExcalidrawStickyNoteElement) =>
+      pointRotateRads(
+        pointFrom(element.x + element.width / 2, element.y),
+        pointFrom(
+          element.x + element.width / 2,
+          element.y + element.height / 2,
+        ),
+        element.angle,
+      );
+    const before = topEdgeMidpoint(sticky);
+    const heightBefore = sticky.height;
+
+    updateStickyNoteLayout(sticky, scene, {
+      originalText: Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n"),
+    });
+
+    const after = getSticky(scene, stickyId);
+    expect(after.height).toBeGreaterThan(heightBefore);
+    const [x, y] = topEdgeMidpoint(after);
+    expect(x).toBeCloseTo(before[0]);
+    expect(y).toBeCloseTo(before[1]);
+  });
+
+  it("fits in a handful of measurements: a warm keystroke in ≤ 2, a cold search in ≤ 12", () => {
+    const { scene, stickyId, textId } = createStickyWithText("hello world");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const measure = vi.spyOn(textMeasurements, "measureText");
+
+    measure.mockClear();
+    getStickyNoteLayout(sticky, text, { originalText: "hello world!" });
+    expect(measure.mock.calls.length).toBeLessThanOrEqual(2);
+
+    // nothing fits at a 512 ceiling: the descent used to take ~250 passes
+    measure.mockClear();
+    getStickyNoteLayout(
+      sticky,
+      { ...text, fontSize: STICKY_NOTE_MAX_FONT_SIZE },
+      {
+        originalText: Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n"),
+        fontSizeMax: STICKY_NOTE_MAX_FONT_SIZE,
+      },
+    );
+    expect(measure.mock.calls.length).toBeLessThanOrEqual(12);
+    measure.mockRestore();
+  });
+
+  it("honors a lowered ceiling even when the old fitted size still fits", () => {
+    const { scene, stickyId, textId } = createStickyWithText("short");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    expect(text.fontSize).toBe(STICKY_FONT_SIZE);
+
+    const layout = getStickyNoteLayout(sticky, text, { fontSizeMax: 20 });
+
+    expect(layout.text!.fontSize).toBe(20);
+    expect(layout.text!.fontSizeMax).toBe(20);
+  });
+
+  it("keeps odd and fractional ceilings reachable and stays on the ceiling-anchored grid", () => {
+    const { scene, stickyId, textId } = createStickyWithText("short");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+
+    expect(
+      getStickyNoteLayout(sticky, text, { fontSizeMax: 27 }).text!.fontSize,
+    ).toBe(27);
+    expect(
+      getStickyNoteLayout(sticky, text, { fontSizeMax: 27.5 }).text!.fontSize,
+    ).toBe(27.5);
+
+    const overflowing = Array(7).fill("abcdefghij").join("\n");
+    const fitted = getStickyNoteLayout(sticky, text, {
+      originalText: overflowing,
+      fontSizeMax: 27,
+    }).text!.fontSize;
+    expect(fitted).toBeLessThan(27);
+    expect(
+      fitted === STICKY_NOTE_MIN_FONT_SIZE || (27 - fitted) % 2 === 0,
+    ).toBe(true);
+  });
+
+  it("sizes the minimum note to fit one line at the ceiling", () => {
+    expect(
+      getStickyNoteMinSize({
+        fontSize: 20,
+        fontFamily: FONT_FAMILY.Excalifont,
+      }),
+    ).toBe(75);
+    expect(
+      getStickyNoteMinSize({
+        fontSize: 48,
+        fontFamily: FONT_FAMILY.Excalifont,
+      }),
+    ).toBe(92);
   });
 });
