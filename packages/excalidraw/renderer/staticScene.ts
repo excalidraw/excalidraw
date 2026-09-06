@@ -479,10 +479,7 @@ const _renderStaticScene = ({
             element.width &&
             element.height
           ) {
-            const label = createPlaceholderEmbeddableLabel(
-              element,
-              renderConfig.renderEnvironment,
-            );
+            const label = createPlaceholderEmbeddableLabel(element);
             renderElement(
               label,
               elementsMap,
