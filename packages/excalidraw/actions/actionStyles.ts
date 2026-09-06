@@ -18,6 +18,7 @@ import {
   isFrameLikeElement,
   isArrowElement,
   isExcalidrawElement,
+  getColorUpdate,
   isNonDeletedElement,
   isStickyNoteBoundText,
   isStickyNoteElement,
@@ -152,7 +153,18 @@ export const actionPasteStyles = register({
             });
             newElement = newTextElement;
 
-            if (!isStickyNoteBoundText(newTextElement, elementsMap)) {
+            if (isStickyNoteBoundText(newTextElement, elementsMap)) {
+              // the copied stroke may be transparent; a note's label never is
+              newElement = newElementWith(
+                newTextElement,
+                getColorUpdate(
+                  newTextElement,
+                  "strokeColor",
+                  newTextElement.strokeColor,
+                  elementsMap,
+                ),
+              );
+            } else {
               // sticky labels are laid out together with their (possibly
               // also restyled) note in the post-pass below
               redrawTextBoundingBox(newTextElement, container, app.scene);

@@ -6,9 +6,6 @@ import {
   BUCKET_FILL_BACKGROUND_PICKS,
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
-  DEFAULT_ELEMENT_BACKGROUND_PICKS,
-  DEFAULT_ELEMENT_STROKE_COLOR_PALETTE,
-  DEFAULT_ELEMENT_STROKE_PICKS,
   ARROW_TYPE,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -49,10 +46,8 @@ import { getArrowheadForPicker } from "@excalidraw/element";
 
 import {
   getBoundTextElement,
-  getContainerElement,
   getUserFontSize,
   getUserFontSizeUpdate,
-  normalizeStickyNoteStrokeColor,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 
@@ -67,7 +62,11 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { hasFillStyle, hasStrokeColor } from "@excalidraw/element";
+import {
+  getColorUpdate,
+  hasFillStyle,
+  hasStrokeColor,
+} from "@excalidraw/element";
 
 import {
   updateElbowArrowPoints,
@@ -170,6 +169,10 @@ import {
 
 import { getShortcutKey } from "../shortcut";
 
+import {
+  getColorTargetAppStateUpdates,
+  resolveColorTarget,
+} from "./colorTargets";
 import { register } from "./register";
 
 import type { AppClassProperties, AppState, Primitive } from "../types";
@@ -183,29 +186,6 @@ const getStylesPanelInfo = (app: AppClassProperties) => {
     isCompact: stylesPanelMode !== "full",
     isMobile: stylesPanelMode === "mobile",
   } as const;
-};
-
-// transparent is hidden rather than removed from the palette so the remaining
-// colors keep their usual hotkeys (same mechanism as the bucket fill picker);
-// a module constant so the memoized picker's identity comparison holds
-const STICKY_NOTE_EXCLUDED_COLORS: readonly string[] = [
-  COLOR_PALETTE.transparent,
-];
-
-const isStickyNoteStrokeColorElement = (
-  element: ExcalidrawElement,
-  elementsMap: ElementsMap,
-) => {
-  if (isStickyNoteElement(element)) {
-    return true;
-  }
-
-  if (isTextElement(element) && isBoundToContainer(element)) {
-    const container = getContainerElement(element, elementsMap);
-    return isStickyNoteElement(container);
-  }
-
-  return false;
 };
 
 export const changeProperty = (
@@ -374,78 +354,48 @@ const changeFontSize = (
 // -----------------------------------------------------------------------------
 
 export const actionChangeStrokeColor = register<
-  Pick<AppState, "currentItemStrokeColor" | "currentItemStickynoteStrokeColor">
+  Partial<AppState> & { color?: string }
 >({
   name: "changeStrokeColor",
   label: "labels.stroke",
   trackEvent: false,
   perform: (elements, appState, value) => {
-    const nextValue = value
-      ? {
-          ...value,
-          ...(value.currentItemStickynoteStrokeColor
-            ? {
-                currentItemStickynoteStrokeColor:
-                  normalizeStickyNoteStrokeColor(
-                    value.currentItemStickynoteStrokeColor,
-                  ),
-              }
-            : null),
-        }
-      : null;
-    const hasStrokeColorValue =
-      nextValue?.currentItemStrokeColor ||
-      nextValue?.currentItemStickynoteStrokeColor;
+    const { color, ...appStateUpdates } = value ?? {};
+    if (color === undefined) {
+      return {
+        appState: { ...appState, ...appStateUpdates },
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
+    // resolved from the state the action runs against — never from the
+    // render-time closure of the memoized picker (see `resolveColorTarget`)
+    const target = resolveColorTarget(appState, elements, "strokeColor");
     const elementsMap = arrayToMap(elements);
 
     return {
-      ...(hasStrokeColorValue && {
-        elements: changeProperty(
-          elements,
-          appState,
-          (el) => {
-            if (!hasStrokeColor(el.type)) {
-              return el;
-            }
-
-            const strokeColor = isStickyNoteStrokeColorElement(el, elementsMap)
-              ? nextValue?.currentItemStickynoteStrokeColor ??
-                normalizeStickyNoteStrokeColor(
-                  nextValue!.currentItemStrokeColor,
-                )
-              : nextValue?.currentItemStrokeColor ??
-                nextValue!.currentItemStickynoteStrokeColor;
-
-            return newElementWith(el, { strokeColor });
-          },
-          true,
-        ),
-      }),
+      elements: changeProperty(
+        elements,
+        appState,
+        (el) =>
+          hasStrokeColor(el.type)
+            ? newElementWith(
+                el,
+                getColorUpdate(el, "strokeColor", color, elementsMap),
+              )
+            : el,
+        true,
+      ),
       appState: {
         ...appState,
-        ...nextValue,
+        ...appStateUpdates,
+        ...getColorTargetAppStateUpdates(target, color),
       },
-      captureUpdate: !!hasStrokeColorValue
-        ? CaptureUpdateAction.IMMEDIATELY
-        : CaptureUpdateAction.EVENTUALLY,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
-    const elementsMap = arrayToMap(elements);
-    const selectedStrokeElements = getSelectedElements(elements, appState, {
-      includeBoundTextElement: true,
-    }).filter((element) => hasStrokeColor(element.type));
-    const hasSelectedStickyNoteStrokeElement = selectedStrokeElements.some(
-      (element) => isStickyNoteStrokeColorElement(element, elementsMap),
-    );
-    const hasSelectedNonStickyStrokeElement = selectedStrokeElements.some(
-      (element) => !isStickyNoteStrokeColorElement(element, elementsMap),
-    );
-    const isStickyNoteStrokePicker =
-      hasSelectedStickyNoteStrokeElement ||
-      (!selectedStrokeElements.length &&
-        appState.activeTool.type === "stickynote");
+    const target = resolveColorTarget(appState, elements, "strokeColor");
 
     return (
       <>
@@ -453,9 +403,10 @@ export const actionChangeStrokeColor = register<
           <h3 aria-hidden="true">{t("labels.stroke")}</h3>
         )}
         <ColorPicker
-          topPicks={DEFAULT_ELEMENT_STROKE_PICKS}
-          palette={DEFAULT_ELEMENT_STROKE_COLOR_PALETTE}
-          customizableTopPicks="elementStroke"
+          topPicks={target.topPicks}
+          palette={target.palette}
+          customizableTopPicks={target.customizableTopPicks}
+          excludedColors={target.excludedColors}
           type="elementStroke"
           label={t("labels.stroke")}
           color={getFormValue(
@@ -463,36 +414,12 @@ export const actionChangeStrokeColor = register<
             app,
             (element) => element.strokeColor,
             true,
-            (hasSelection) =>
-              !hasSelection
-                ? appState.activeTool.type === "stickynote"
-                  ? appState.currentItemStickynoteStrokeColor
-                  : appState.currentItemStrokeColor
-                : null,
+            (hasSelection) => (!hasSelection ? target.currentValue : null),
           )}
-          onChange={(color) =>
-            updateData({
-              ...(selectedStrokeElements.length
-                ? hasSelectedNonStickyStrokeElement
-                  ? { currentItemStrokeColor: color }
-                  : null
-                : appState.activeTool.type !== "stickynote"
-                ? { currentItemStrokeColor: color }
-                : null),
-              ...(isStickyNoteStrokePicker
-                ? {
-                    currentItemStickynoteStrokeColor:
-                      normalizeStickyNoteStrokeColor(color),
-                  }
-                : null),
-            })
-          }
+          onChange={(color) => updateData({ color })}
           elements={elements}
           appState={appState}
           updateData={updateData}
-          excludedColors={
-            isStickyNoteStrokePicker ? STICKY_NOTE_EXCLUDED_COLORS : undefined
-          }
         />
       </>
     );
@@ -500,27 +427,27 @@ export const actionChangeStrokeColor = register<
 });
 
 export const actionChangeBackgroundColor = register<
-  Pick<AppState, "currentItemBackgroundColor" | "viewBackgroundColor">
+  Partial<AppState> & { color?: string }
 >({
   name: "changeBackgroundColor",
   label: "labels.changeBackground",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    if (!value?.currentItemBackgroundColor) {
+    const { color, ...appStateUpdates } = value ?? {};
+    if (color === undefined) {
       return {
-        appState: {
-          ...appState,
-          ...value,
-        },
+        appState: { ...appState, ...appStateUpdates },
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
+    const target = resolveColorTarget(appState, elements, "backgroundColor");
+    const elementsMap = arrayToMap(elements);
 
     let nextElements;
 
     const selectedElements = app.scene.getSelectedElements(appState);
     const shouldEnablePolygon =
-      !isTransparent(value.currentItemBackgroundColor) &&
+      !isTransparent(color) &&
       selectedElements.every(
         (el) => isLineElement(el) && canBecomePolygon(el.points),
       );
@@ -530,7 +457,7 @@ export const actionChangeBackgroundColor = register<
       nextElements = elements.map((el) => {
         if (selectedElementsMap.has(el.id) && isLineElement(el)) {
           return newElementWith(el, {
-            backgroundColor: value.currentItemBackgroundColor,
+            backgroundColor: color,
             ...toggleLinePolygonState(el, true),
           });
         }
@@ -538,9 +465,10 @@ export const actionChangeBackgroundColor = register<
       });
     } else {
       nextElements = changeProperty(elements, appState, (el) =>
-        newElementWith(el, {
-          backgroundColor: value.currentItemBackgroundColor,
-        }),
+        newElementWith(
+          el,
+          getColorUpdate(el, "backgroundColor", color, elementsMap),
+        ),
       );
     }
 
@@ -548,13 +476,15 @@ export const actionChangeBackgroundColor = register<
       elements: nextElements,
       appState: {
         ...appState,
-        ...value,
+        ...appStateUpdates,
+        ...getColorTargetAppStateUpdates(target, color),
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+  PanelComponent: ({ elements, appState, updateData, app }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
+    const target = resolveColorTarget(appState, elements, "backgroundColor");
 
     return (
       <>
@@ -562,9 +492,10 @@ export const actionChangeBackgroundColor = register<
           <h3 aria-hidden="true">{t("labels.background")}</h3>
         )}
         <ColorPicker
-          topPicks={DEFAULT_ELEMENT_BACKGROUND_PICKS}
-          palette={DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE}
-          customizableTopPicks="elementBackground"
+          topPicks={target.topPicks}
+          palette={target.palette}
+          customizableTopPicks={target.customizableTopPicks}
+          excludedColors={target.excludedColors}
           type="elementBackground"
           label={t("labels.background")}
           color={getFormValue(
@@ -572,12 +503,9 @@ export const actionChangeBackgroundColor = register<
             app,
             (element) => element.backgroundColor,
             true,
-            (hasSelection) =>
-              !hasSelection ? appState.currentItemBackgroundColor : null,
+            (hasSelection) => (!hasSelection ? target.currentValue : null),
           )}
-          onChange={(color) =>
-            updateData({ currentItemBackgroundColor: color })
-          }
+          onChange={(color) => updateData({ color })}
           elements={elements}
           appState={appState}
           updateData={updateData}

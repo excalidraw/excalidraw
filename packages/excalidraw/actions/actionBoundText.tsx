@@ -6,6 +6,7 @@ import {
   arrayToMap,
   getFontString,
   getStrokeWidthByKey,
+  isTransparent,
 } from "@excalidraw/common";
 import {
   getOriginalContainerHeightFromCache,
@@ -181,6 +182,10 @@ export const actionBindText = register({
             fontSizeMax: normalizeStickyNoteFontSize(
               textElement.fontSizeMax ?? textElement.fontSize,
             ),
+            // the label is the note's visible text — never transparent
+            strokeColor: isTransparent(textElement.strokeColor)
+              ? container.strokeColor
+              : textElement.strokeColor,
           }
         : null),
     });

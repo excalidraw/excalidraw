@@ -1,9 +1,18 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { KEYS, reseed } from "@excalidraw/common";
+import {
+  DEFAULT_STICKY_NOTE_SIZE,
+  KEYS,
+  STICKY_NOTE_MIN_BASE_HEIGHT,
+  STICKY_NOTE_MIN_BASE_WIDTH,
+  reseed,
+} from "@excalidraw/common";
 
-import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawLinearElement,
+  ExcalidrawStickyNoteElement,
+} from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
 import * as InteractiveScene from "../renderer/interactiveScene";
@@ -270,6 +279,73 @@ describe("Test dragCreate", () => {
       expect(h.state.activeTool.type).toBe("stickynote");
       expect(h.state.activeTool.locked).toBe(true);
       expect(h.state.selectedElementIds).toEqual({});
+    });
+
+    it("treats a wobble under the drag threshold as a click", async () => {
+      const { getByToolName, container } = await render(<Excalidraw />);
+      fireEvent.click(getByToolName("stickynote"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+      fireEvent.pointerDown(canvas, { clientX: 300, clientY: 300 });
+      fireEvent.pointerMove(canvas, { clientX: 306, clientY: 305 });
+      fireEvent.pointerUp(canvas, { clientX: 306, clientY: 305 });
+
+      await getTextEditor();
+
+      const stickyNote = h.elements.find(
+        (element) => element.type === "stickynote",
+      ) as ExcalidrawStickyNoteElement;
+      expect(stickyNote.width).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(stickyNote.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(stickyNote.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+    });
+
+    it("previews a drag at its true size and snaps to the minimum on release", async () => {
+      const { getByToolName, container } = await render(<Excalidraw />);
+      fireEvent.click(getByToolName("stickynote"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+      fireEvent.pointerDown(canvas, { clientX: 300, clientY: 300 });
+      fireEvent.pointerMove(canvas, { clientX: 320, clientY: 320 });
+
+      // mid-gesture: no clamp, the note is exactly what was dragged
+      const draft = h.elements.find(
+        (element) => element.type === "stickynote",
+      ) as ExcalidrawStickyNoteElement;
+      expect(draft.width).toBe(20);
+      expect(draft.height).toBe(20);
+
+      fireEvent.pointerUp(canvas, { clientX: 320, clientY: 320 });
+      await getTextEditor();
+
+      // on release it grows to the minimum, away from the origin corner
+      const stickyNote = h.elements.find(
+        (element) => element.type === "stickynote",
+      ) as ExcalidrawStickyNoteElement;
+      expect(stickyNote.x).toBe(300);
+      expect(stickyNote.y).toBe(300);
+      expect(stickyNote.width).toBe(STICKY_NOTE_MIN_BASE_WIDTH);
+      expect(stickyNote.height).toBe(STICKY_NOTE_MIN_BASE_HEIGHT);
+      expect(stickyNote.baseHeight).toBe(STICKY_NOTE_MIN_BASE_HEIGHT);
+    });
+
+    it("keeps the origin corner fixed when a drag toward the top-left snaps to the minimum", async () => {
+      const { getByToolName, container } = await render(<Excalidraw />);
+      fireEvent.click(getByToolName("stickynote"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+      fireEvent.pointerDown(canvas, { clientX: 300, clientY: 300 });
+      fireEvent.pointerMove(canvas, { clientX: 280, clientY: 280 });
+      fireEvent.pointerUp(canvas, { clientX: 280, clientY: 280 });
+      await getTextEditor();
+
+      const stickyNote = h.elements.find(
+        (element) => element.type === "stickynote",
+      ) as ExcalidrawStickyNoteElement;
+      // the bottom-right corner is where the pointer went down
+      expect(stickyNote.x + stickyNote.width).toBe(300);
+      expect(stickyNote.y + stickyNote.height).toBe(300);
+      expect(stickyNote.width).toBe(STICKY_NOTE_MIN_BASE_WIDTH);
     });
   });
 

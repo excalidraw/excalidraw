@@ -418,6 +418,7 @@ export interface AppState {
   exportScale: number;
   currentItemStrokeColor: string;
   currentItemStickynoteStrokeColor: string;
+  currentItemStickynoteBackgroundColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidthKey: StrokeWidthKey;
@@ -548,6 +549,9 @@ export interface AppState {
      * even though both drive `currentItemBackgroundColor` (its defaults and
      * use case differ — no transparent) */
     bucketFill: readonly string[] | null;
+    /** sticky notes are their own color domain (own defaults, own picks) */
+    stickyNoteStroke: readonly string[] | null;
+    stickyNoteBackground: readonly string[] | null;
   };
 }
 

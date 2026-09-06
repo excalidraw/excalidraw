@@ -1,5 +1,6 @@
 import {
   DEFAULT_ELEMENT_PROPS,
+  DEFAULT_STICKY_NOTE_BG,
   MIN_FONT_SIZE,
   arrayToMap,
   STICKY_NOTE_FALLBACK_FONT_SIZE,
@@ -65,6 +66,49 @@ export const normalizeStickyNoteStrokeColor = (
   return !strokeColor || isTransparent(strokeColor)
     ? DEFAULT_ELEMENT_PROPS.strokeColor
     : strokeColor;
+};
+
+export const normalizeStickyNoteBackgroundColor = (
+  backgroundColor: string | null | undefined,
+) => {
+  return !backgroundColor || isTransparent(backgroundColor)
+    ? DEFAULT_STICKY_NOTE_BG
+    : backgroundColor;
+};
+
+/**
+ * The update that applies a picked color to an element under the sticky
+ * note policy: a note is always filled and its label — the visible text,
+ * which the note's own `strokeColor` seeds — never goes transparent. Every
+ * color surface (actions, both eyedroppers, paste styles, bind) routes
+ * through this instead of re-deriving the rule.
+ */
+export const getColorUpdate = (
+  element: ExcalidrawElement,
+  property: "strokeColor" | "backgroundColor",
+  color: string,
+  elementsMap: ElementsMap,
+): { strokeColor: string } | { backgroundColor: string } => {
+  if (isStickyNoteElement(element)) {
+    return property === "backgroundColor"
+      ? { backgroundColor: normalizeStickyNoteBackgroundColor(color) }
+      : { strokeColor: normalizeStickyNoteStrokeColor(color) };
+  }
+  if (
+    property === "strokeColor" &&
+    isTextElement(element) &&
+    isStickyNoteBoundText(element, elementsMap)
+  ) {
+    const container = elementsMap.get(element.containerId!);
+    return {
+      strokeColor: isTransparent(color)
+        ? normalizeStickyNoteStrokeColor(container?.strokeColor)
+        : color,
+    };
+  }
+  return property === "backgroundColor"
+    ? { backgroundColor: color }
+    : { strokeColor: color };
 };
 
 const seededRandom = (seed: number) => {

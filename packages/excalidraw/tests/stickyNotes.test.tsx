@@ -1,6 +1,7 @@
 import React from "react";
 
 import {
+  COLOR_PALETTE,
   DEFAULT_STICKY_NOTE_SIZE,
   KEYS,
   STICKY_NOTE_MIN_FONT_SIZE,
@@ -25,10 +26,12 @@ import {
   actionChangeRoundness,
 } from "../actions/actionProperties";
 import { actionCopyStyles, actionPasteStyles } from "../actions/actionStyles";
+import { activeEyeDropperAtom } from "../components/EyeDropper";
+import { editorJotaiStore } from "../editor-jotai";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
-import { Keyboard, Pointer } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { act, render } from "./test-utils";
 
@@ -266,8 +269,7 @@ describe("sticky notes", () => {
     API.setSelectedElements([getElement(rectangle.id)]);
     act(() => {
       h.app.actionManager.executeAction(actionChangeBackgroundColor, "ui", {
-        currentItemBackgroundColor: "#ffc9c9",
-        viewBackgroundColor: h.state.viewBackgroundColor,
+        color: "#ffc9c9",
       });
       h.app.actionManager.executeAction(actionChangeRoundness, "ui", "sharp");
     });
@@ -289,12 +291,132 @@ describe("sticky notes", () => {
 
     act(() => {
       h.app.actionManager.executeAction(actionChangeBackgroundColor, "ui", {
-        currentItemBackgroundColor: "transparent",
-        viewBackgroundColor: h.state.viewBackgroundColor,
+        color: "transparent",
       });
     });
 
     // never transparent — the normalization runs inside `changeProperty`
     expect(getElement(note.id).backgroundColor).not.toBe("transparent");
+  });
+
+  describe("colors", () => {
+    const RED = COLOR_PALETTE.red[4];
+
+    it("routes a closed-popup top pick to the sticky default after switching tools", () => {
+      // regression: the memoized picker kept a stale `onChange` that had
+      // captured the rectangle tool's target, so the top pick wrote the
+      // shape default while the sticky tool was active
+      UI.clickTool("rectangle");
+      UI.clickTool("stickynote");
+      const shapeDefault = h.state.currentItemStrokeColor;
+
+      UI.clickOnTestId(`color-top-pick-${RED}`);
+
+      expect(h.state.currentItemStickynoteStrokeColor).toBe(RED);
+      expect(h.state.currentItemStrokeColor).toBe(shapeDefault);
+    });
+
+    it("writes both defaults and colors both domains for a mixed selection", () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: "hi",
+        fontSize: 28,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        id: "rectangle",
+        x: 600,
+        y: 100,
+        width: 100,
+        height: 100,
+      });
+      API.setElements([note, label, rectangle]);
+      layoutNotes(note.id);
+      API.setSelectedElements([getElement(note.id), getElement(rectangle.id)]);
+
+      UI.clickOnTestId(`color-top-pick-${RED}`);
+
+      expect(getElement(rectangle.id).strokeColor).toBe(RED);
+      expect(getElement(note.id).strokeColor).toBe(RED);
+      // the note's visible text is its label
+      expect(getElement(label.id).strokeColor).toBe(RED);
+      expect(h.state.currentItemStrokeColor).toBe(RED);
+      expect(h.state.currentItemStickynoteStrokeColor).toBe(RED);
+    });
+
+    it("creates notes from the sticky defaults, not the shape defaults", () => {
+      API.setAppState({
+        currentItemBackgroundColor: COLOR_PALETTE.transparent,
+        currentItemStrokeColor: COLOR_PALETTE.blue[4],
+        currentItemStickynoteBackgroundColor: COLOR_PALETTE.pink[1],
+        currentItemStickynoteStrokeColor: COLOR_PALETTE.black,
+      });
+      UI.clickTool("stickynote");
+      mouse.downAt(300, 300);
+      mouse.up();
+
+      const note = h.elements.find(
+        (element) => element.type === "stickynote",
+      ) as ExcalidrawStickyNoteElement;
+      expect(note.backgroundColor).toBe(COLOR_PALETTE.pink[1]);
+      expect(note.strokeColor).toBe(COLOR_PALETTE.black);
+      Keyboard.keyPress(KEYS.ESCAPE);
+    });
+
+    it("binding a transparent text to a note gives it the note's text color", () => {
+      const note = API.createElement({
+        type: "stickynote",
+        id: "note",
+        x: 100,
+        y: 100,
+        width: DEFAULT_STICKY_NOTE_SIZE,
+        height: DEFAULT_STICKY_NOTE_SIZE,
+        baseHeight: DEFAULT_STICKY_NOTE_SIZE,
+        strokeColor: COLOR_PALETTE.blue[4],
+      });
+      const text = API.createElement({
+        type: "text",
+        id: "text",
+        x: 600,
+        y: 100,
+        text: "hello",
+        fontSize: 20,
+        strokeColor: COLOR_PALETTE.transparent,
+      });
+      API.setElements([note, text]);
+      API.setSelectedElements([note, text]);
+
+      API.executeAction(actionBindText);
+
+      expect(getElement<ExcalidrawTextElement>(text.id).strokeColor).toBe(
+        COLOR_PALETTE.blue[4],
+      );
+    });
+
+    it("colors a selected note's label with the keyboard eyedropper", () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: "hi",
+        fontSize: 28,
+      });
+      API.setElements([note, label]);
+      layoutNotes(note.id);
+      API.setSelectedElements([getElement(note.id)]);
+
+      const backgroundBefore = getElement(note.id).backgroundColor;
+      // Shift+S opens the stroke eyedropper (`I` would pick the background)
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        Keyboard.keyPress("s");
+      });
+      const eyeDropper = editorJotaiStore.get(activeEyeDropperAtom);
+      expect(eyeDropper).not.toBeNull();
+      act(() => {
+        eyeDropper!.onSelect(RED, { altKey: false } as PointerEvent);
+      });
+
+      expect(getElement(note.id).strokeColor).toBe(RED);
+      expect(getElement(label.id).strokeColor).toBe(RED);
+      expect(getElement(note.id).backgroundColor).toBe(backgroundBefore);
+    });
   });
 });

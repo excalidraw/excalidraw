@@ -10,11 +10,7 @@ import {
   isShallowEqual,
 } from "@excalidraw/common";
 
-import {
-  isStickyNoteElement,
-  mutateElement,
-  normalizeStickyNoteStrokeColor,
-} from "@excalidraw/element";
+import { getColorUpdate, mutateElement } from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
@@ -29,7 +25,12 @@ import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
 import { t } from "../i18n";
-import { getScrollToContentState } from "../scene";
+import { getScrollToContentState, getSelectedElements } from "../scene";
+import {
+  getColorTargetAppStateUpdates,
+  resolveColorTarget,
+  type ColorDefaultKey,
+} from "../actions/colorTargets";
 
 import { SelectedShapeActions, CompactShapeActions } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
@@ -531,44 +532,37 @@ const LayerUI = ({
                 return;
               }
 
+              const property =
+                altKey && eyeDropperState.swapPreviewOnAlt
+                  ? colorPickerType === "elementBackground"
+                    ? "strokeColor"
+                    : "backgroundColor"
+                  : colorPickerType === "elementBackground"
+                  ? "backgroundColor"
+                  : "strokeColor";
+
               if (selectedElements.length) {
-                for (const element of selectedElements) {
-                  const colorProperty =
-                    altKey && eyeDropperState.swapPreviewOnAlt
-                      ? colorPickerType === "elementBackground"
-                        ? "strokeColor"
-                        : "backgroundColor"
-                      : colorPickerType === "elementBackground"
-                      ? "backgroundColor"
-                      : "strokeColor";
-                  const nextColor =
-                    colorProperty === "strokeColor" &&
-                    isStickyNoteElement(element)
-                      ? normalizeStickyNoteStrokeColor(color)
-                      : color;
-                  mutateElement(element, arrayToMap(elements), {
-                    [colorProperty]: nextColor,
-                  });
+                const elementsMap = arrayToMap(elements);
+                // a note's visible text is its label, so stroke picks
+                // include bound labels
+                const targets = getSelectedElements(elements, appState, {
+                  includeBoundTextElement: property === "strokeColor",
+                });
+                for (const element of targets) {
+                  mutateElement(
+                    element,
+                    elementsMap,
+                    getColorUpdate(element, property, color, elementsMap),
+                  );
                   ShapeCache.delete(element);
                 }
                 app.scene.triggerUpdate();
-              } else if (colorPickerType === "elementBackground") {
-                setAppState({
-                  currentItemBackgroundColor: color,
-                });
               } else {
                 setAppState(
-                  appState.activeTool.type === "stickynote"
-                    ? {
-                        currentItemStrokeColor: appState.currentItemStrokeColor,
-                        currentItemStickynoteStrokeColor:
-                          normalizeStickyNoteStrokeColor(color),
-                      }
-                    : {
-                        currentItemStrokeColor: color,
-                        currentItemStickynoteStrokeColor:
-                          appState.currentItemStickynoteStrokeColor,
-                      },
+                  getColorTargetAppStateUpdates(
+                    resolveColorTarget(appState, elements, property),
+                    color,
+                  ) as Pick<AppState, ColorDefaultKey>,
                 );
               }
             }}

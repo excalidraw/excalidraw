@@ -51,6 +51,7 @@ import {
   getStickyNoteLayout,
   isStickyNoteBoundText,
   normalizeStickyNote,
+  normalizeStickyNoteBackgroundColor,
   normalizeStickyNoteFontSize,
   normalizeStickyNoteStrokeColor,
 } from "@excalidraw/element";
@@ -1273,6 +1274,12 @@ export const restoreAppState = (
     bucketFill: restoreColorTopPicksList(
       nextAppState.colorTopPicks?.bucketFill,
     ),
+    stickyNoteStroke: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.stickyNoteStroke,
+    ),
+    stickyNoteBackground: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.stickyNoteBackground,
+    ),
   };
 
   // legacy
@@ -1321,6 +1328,9 @@ export const restoreAppState = (
     ),
     currentItemStickynoteStrokeColor: normalizeStickyNoteStrokeColor(
       nextAppState.currentItemStickynoteStrokeColor,
+    ),
+    currentItemStickynoteBackgroundColor: normalizeStickyNoteBackgroundColor(
+      nextAppState.currentItemStickynoteBackgroundColor,
     ),
     editingFrame: null,
   };

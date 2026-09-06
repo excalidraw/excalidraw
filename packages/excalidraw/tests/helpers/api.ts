@@ -282,7 +282,10 @@ export class API {
           ? appState.currentItemStickynoteStrokeColor
           : appState.currentItemStrokeColor),
       backgroundColor:
-        rest.backgroundColor ?? appState.currentItemBackgroundColor,
+        rest.backgroundColor ??
+        (type === "stickynote"
+          ? appState.currentItemStickynoteBackgroundColor
+          : appState.currentItemBackgroundColor),
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
       strokeWidth:
         rest.strokeWidth ??

@@ -176,8 +176,8 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
+  getColorUpdate,
   getStickyNoteLayout,
-  normalizeStickyNoteStrokeColor,
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
@@ -430,6 +430,11 @@ import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
+
+import {
+  getColorTargetAppStateUpdates,
+  resolveColorTarget,
+} from "../actions/colorTargets";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -684,7 +689,6 @@ class App extends React.Component<AppProps, AppState> {
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
-  private shouldSuppressStickyNoteCreationPreview = false;
 
   private _initialized = false;
 
@@ -2322,11 +2326,7 @@ class App extends React.Component<AppProps, AppState> {
       height: this.state.height,
       width: this.state.width,
       editingTextElement: this.state.editingTextElement,
-      newElement:
-        this.shouldSuppressStickyNoteCreationPreview &&
-        isStickyNoteElement(this.state.newElement)
-          ? null
-          : this.state.newElement,
+      newElement: this.state.newElement,
       selectedElements,
       selectedElementsAreBeingDragged:
         this.state.selectedElementsAreBeingDragged,
@@ -3009,48 +3009,54 @@ class App extends React.Component<AppProps, AppState> {
       colorPickerType:
         type === "stroke" ? "elementStroke" : "elementBackground",
       onSelect: (color, event) => {
-        const shouldUpdateStrokeColor =
+        const property =
           (type === "background" && event.altKey) ||
-          (type === "stroke" && !event.altKey);
+          (type === "stroke" && !event.altKey)
+            ? "strokeColor"
+            : "backgroundColor";
         const selectedElements = this.scene.getSelectedElements(this.state);
         if (
           !selectedElements.length ||
           this.state.activeTool.type !== "selection"
         ) {
-          if (shouldUpdateStrokeColor) {
-            this.syncActionResult({
-              appState: {
-                ...this.state,
-                ...(this.state.activeTool.type === "stickynote"
-                  ? {
-                      currentItemStickynoteStrokeColor:
-                        normalizeStickyNoteStrokeColor(color),
-                    }
-                  : { currentItemStrokeColor: color }),
-              },
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
-          } else {
-            this.syncActionResult({
-              appState: { ...this.state, currentItemBackgroundColor: color },
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
-          }
+          // no target: the pick becomes the default of whichever color
+          // domain (regular / sticky note) the active tool draws in
+          this.syncActionResult({
+            appState: {
+              ...this.state,
+              ...getColorTargetAppStateUpdates(
+                resolveColorTarget(
+                  this.state,
+                  this.scene.getNonDeletedElements(),
+                  property,
+                ),
+                color,
+              ),
+            },
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          });
         } else {
+          const elementsMap = this.scene.getNonDeletedElementsMap();
+          // a note's visible text is its label, so stroke picks include it
+          const targetIds = new Set(
+            this.scene
+              .getSelectedElements({
+                selectedElementIds: this.state.selectedElementIds,
+                includeBoundTextElement: property === "strokeColor",
+              })
+              .map((element) => element.id),
+          );
           this.updateScene({
-            elements: this.scene.getElementsIncludingDeleted().map((el) => {
-              if (this.state.selectedElementIds[el.id]) {
-                const nextColor =
-                  shouldUpdateStrokeColor && isStickyNoteElement(el)
-                    ? normalizeStickyNoteStrokeColor(color)
-                    : color;
-                return newElementWith(el, {
-                  [shouldUpdateStrokeColor ? "strokeColor" : "backgroundColor"]:
-                    nextColor,
-                });
-              }
-              return el;
-            }),
+            elements: this.scene
+              .getElementsIncludingDeleted()
+              .map((el) =>
+                targetIds.has(el.id)
+                  ? newElementWith(
+                      el,
+                      getColorUpdate(el, property, color, elementsMap),
+                    )
+                  : el,
+              ),
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
         }
@@ -6979,9 +6985,10 @@ class App extends React.Component<AppProps, AppState> {
       newTextElement({
         x: newTextElementPosition.x,
         y: newTextElementPosition.y,
+        // a note's stroke color is its text color: the label inherits it
         strokeColor:
           shouldBindToContainer && isStickyNoteElement(container)
-            ? this.state.currentItemStickynoteStrokeColor
+            ? container.strokeColor
             : this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
@@ -10501,7 +10508,10 @@ class App extends React.Component<AppProps, AppState> {
         elementType === "stickynote"
           ? this.state.currentItemStickynoteStrokeColor
           : this.state.currentItemStrokeColor,
-      backgroundColor: this.state.currentItemBackgroundColor,
+      backgroundColor:
+        elementType === "stickynote"
+          ? this.state.currentItemStickynoteBackgroundColor
+          : this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.getCurrentItemStrokeWidth(elementType),
       strokeStyle: this.state.currentItemStrokeStyle,
@@ -10533,12 +10543,6 @@ class App extends React.Component<AppProps, AppState> {
     if (element.type === "selection") {
       this.setState({
         selectionElement: element,
-      });
-    } else if (element.type === "stickynote") {
-      this.shouldSuppressStickyNoteCreationPreview = true;
-      this.setState({
-        multiElement: null,
-        newElement: element,
       });
     } else {
       this.insertNewElement(element);
@@ -11996,38 +12000,53 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (newElement && isStickyNoteElement(newElement)) {
-        const shouldUseDefaultSize = !pointerDownState.drag.hasOccurred;
-        const size = DEFAULT_STICKY_NOTE_SIZE;
-        const nextWidth = shouldUseDefaultSize ? size : newElement.width;
-        const nextHeight = shouldUseDefaultSize ? size : newElement.height;
-        const nextX = shouldUseDefaultSize
-          ? pointerDownState.origin.x - size / 2
-          : newElement.x;
-        const nextY = shouldUseDefaultSize
-          ? pointerDownState.origin.y - size / 2
-          : newElement.y;
+        // a gesture under the drag threshold is a click: the default square,
+        // centered on the pointer. A drag keeps its size — previewed
+        // unclamped while the pointer is down — and snaps to the minimum
+        // only now, growing away from the origin corner like the drag did
+        const zoom = this.state.zoom.value;
+        const isClick =
+          newElement.width * zoom < DRAGGING_THRESHOLD &&
+          newElement.height * zoom < DRAGGING_THRESHOLD;
+        let nextGeometry;
+        if (isClick) {
+          const size = DEFAULT_STICKY_NOTE_SIZE;
+          nextGeometry = {
+            x: pointerDownState.origin.x - size / 2,
+            y: pointerDownState.origin.y - size / 2,
+            width: size,
+            height: size,
+          };
+        } else {
+          const width = Math.max(newElement.width, STICKY_NOTE_MIN_BASE_WIDTH);
+          const height = Math.max(
+            newElement.height,
+            STICKY_NOTE_MIN_BASE_HEIGHT,
+          );
+          const { originInGrid } = pointerDownState;
+          nextGeometry = {
+            // a drag toward the top/left put the note's origin before the
+            // pointer origin; that far edge stays put when the size grows
+            x:
+              newElement.x < originInGrid.x
+                ? originInGrid.x - width
+                : newElement.x,
+            y:
+              newElement.y < originInGrid.y
+                ? originInGrid.y - height
+                : newElement.y,
+            width,
+            height,
+          };
+        }
 
         this.scene.mutateElement(
           newElement,
-          {
-            x: nextX,
-            y: nextY,
-            width: nextWidth,
-            height: nextHeight,
-            baseHeight: nextHeight,
-          },
-          {
-            informMutation: false,
-            isDragging: false,
-          },
+          { ...nextGeometry, baseHeight: nextGeometry.height },
+          { informMutation: false, isDragging: false },
         );
 
-        this.shouldSuppressStickyNoteCreationPreview = false;
-
-        if (!this.scene.getElement(newElement.id)) {
-          this.insertNewElement(newElement);
-        }
-
+        this.store.scheduleCapture();
         this.store.scheduleCapture();
         this.scene.triggerUpdate();
 
@@ -13536,28 +13555,6 @@ class App extends React.Component<AppProps, AppState> {
     gridX += snapOffset.x;
     gridY += snapOffset.y;
 
-    const isDraggingStickyNote = isStickyNoteElement(newElement);
-    const hasDraggedStickyNote =
-      isDraggingStickyNote &&
-      (gridX !== pointerDownState.originInGrid.x ||
-        gridY !== pointerDownState.originInGrid.y);
-    const nextWidth = hasDraggedStickyNote
-      ? Math.max(
-          distance(pointerDownState.originInGrid.x, gridX),
-          STICKY_NOTE_MIN_BASE_WIDTH,
-        )
-      : distance(pointerDownState.originInGrid.x, gridX);
-    const nextHeight = hasDraggedStickyNote
-      ? Math.max(
-          distance(pointerDownState.originInGrid.y, gridY),
-          STICKY_NOTE_MIN_BASE_HEIGHT,
-        )
-      : distance(pointerDownState.originInGrid.y, gridY);
-
-    if (hasDraggedStickyNote) {
-      pointerDownState.drag.hasOccurred = true;
-    }
-
     this.setState({
       snapLines,
     });
@@ -13570,8 +13567,8 @@ class App extends React.Component<AppProps, AppState> {
         originY: pointerDownState.originInGrid.y,
         x: gridX,
         y: gridY,
-        width: nextWidth,
-        height: nextHeight,
+        width: distance(pointerDownState.originInGrid.x, gridX),
+        height: distance(pointerDownState.originInGrid.y, gridY),
         shouldMaintainAspectRatio: isImageElement(newElement)
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
@@ -13582,10 +13579,6 @@ class App extends React.Component<AppProps, AppState> {
         originOffset: this.state.originSnapOffset,
         informMutation,
       });
-    }
-
-    if (hasDraggedStickyNote) {
-      this.shouldSuppressStickyNoteCreationPreview = false;
     }
 
     this.setState({
