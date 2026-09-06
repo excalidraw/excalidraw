@@ -473,6 +473,39 @@ const PreferencesBoxSelectionModeItem = () => {
   );
 };
 
+const PreferencesWheelBehaviorItem = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  return (
+    <DropdownMenuItemContentRadio<"scroll" | "zoom">
+      name="wheelBehavior"
+      icon={emptyIcon}
+      value={appState.wheelBehavior}
+      onChange={(value) => {
+        setAppState({
+          wheelBehavior: value,
+        });
+      }}
+      choices={[
+        {
+          value: "scroll",
+          label: t("labels.wheelBehaviorScroll"),
+          ariaLabel: t("labels.wheelBehaviorScroll"),
+        },
+        {
+          value: "zoom",
+          label: t("labels.wheelBehaviorZoom"),
+          ariaLabel: t("labels.wheelBehaviorZoom"),
+        },
+      ]}
+    >
+      {t("labels.wheelBehavior")}
+    </DropdownMenuItemContentRadio>
+  );
+};
+
 const PreferencesToggleSnapModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -618,6 +651,7 @@ export const Preferences = ({
         {children || (
           <>
             <PreferencesBoxSelectionModeItem />
+            <PreferencesWheelBehaviorItem />
             <PreferencesToggleToolLockItem />
             <PreferencesToggleSnapModeItem />
             <PreferencesToggleGridModeItem />
@@ -636,6 +670,7 @@ export const Preferences = ({
 
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.BoxSelectionMode = PreferencesBoxSelectionModeItem;
+Preferences.WheelBehavior = PreferencesWheelBehaviorItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;

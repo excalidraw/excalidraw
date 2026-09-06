@@ -114,6 +114,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -753,6 +754,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -1319,6 +1321,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -1685,6 +1688,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -2053,6 +2057,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -2321,6 +2326,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -2781,6 +2787,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -3092,6 +3099,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -3420,6 +3428,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -3722,6 +3731,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -4015,6 +4025,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -4257,6 +4268,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -4521,6 +4533,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -4800,6 +4813,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -5036,6 +5050,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -5272,6 +5287,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -5526,6 +5542,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -5790,6 +5807,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -6053,6 +6071,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -6388,6 +6407,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -6824,6 +6844,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -7210,6 +7231,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -7517,6 +7539,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -7815,6 +7838,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -8051,6 +8075,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -8409,6 +8434,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -8773,6 +8799,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -9179,6 +9206,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -9474,6 +9502,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -9744,6 +9773,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -10015,6 +10045,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -10254,6 +10285,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -10556,6 +10588,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -10877,6 +10910,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -11122,6 +11156,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -12052,6 +12087,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -12316,6 +12352,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -12559,6 +12596,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -12800,6 +12838,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -13214,6 +13253,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -13427,6 +13467,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -13644,6 +13685,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -13948,6 +13990,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -14252,6 +14295,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "toast": null,
   "viewBackgroundColor": "#000",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -14502,6 +14546,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -14745,6 +14790,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": true,
   "zoom": {
@@ -14988,6 +15034,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -15241,6 +15288,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -15579,6 +15627,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -15757,6 +15806,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -16045,6 +16095,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -16314,6 +16365,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": true,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -16474,6 +16526,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -16761,6 +16814,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "toast": null,
   "viewBackgroundColor": "#000",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -16930,6 +16984,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -17686,6 +17741,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -18340,6 +18396,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -18992,6 +19049,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -19752,6 +19810,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -20528,6 +20587,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -21016,6 +21076,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -21528,6 +21589,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {
@@ -21995,6 +22057,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "toast": null,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
+  "wheelBehavior": "scroll",
   "width": 0,
   "zenModeEnabled": false,
   "zoom": {

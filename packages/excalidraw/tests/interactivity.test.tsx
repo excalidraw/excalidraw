@@ -1646,3 +1646,83 @@ describe("interaction={{ enabled: { tools } }}", () => {
     expect(h.app.laserTrails.localTrail.hasCurrentTrail).toBe(false);
   });
 });
+
+describe("wheelBehavior preference", () => {
+  const plainWheel = (deltas: { deltaX?: number; deltaY?: number }) =>
+    fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+      deltaX: 0,
+      deltaY: 0,
+      ...deltas,
+    });
+
+  const setWheelBehavior = (wheelBehavior: "scroll" | "zoom") => {
+    API.updateScene({ appState: { wheelBehavior } });
+  };
+
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("defaults to `scroll` — plain wheel pans, ctrl+wheel zooms", () => {
+    expect(h.state.wheelBehavior).toBe("scroll");
+
+    plainWheel({ deltaX: 30, deltaY: 40 });
+    expect(h.state.zoom.value).toBe(1);
+    expect([h.state.scrollX, h.state.scrollY]).not.toEqual([0, 0]);
+
+    wheelZoom();
+    expect(h.state.zoom.value).toBeGreaterThan(1);
+  });
+
+  it("`zoom` — plain wheel zooms instead of panning", () => {
+    setWheelBehavior("zoom");
+
+    plainWheel({ deltaY: -100 });
+    expect(h.state.zoom.value).toBeGreaterThan(1);
+
+    const zoomedIn = h.state.zoom.value;
+    plainWheel({ deltaY: 100 });
+    expect(h.state.zoom.value).toBeLessThan(zoomedIn);
+  });
+
+  it("`zoom` — ctrl/cmd+wheel still zooms (trackpad pinch arrives as ctrl+wheel)", () => {
+    setWheelBehavior("zoom");
+
+    wheelZoom();
+    expect(h.state.zoom.value).toBeGreaterThan(1);
+  });
+
+  it("`zoom` — shift+wheel remains horizontal panning", () => {
+    setWheelBehavior("zoom");
+
+    fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+      shiftKey: true,
+      deltaY: 40,
+    });
+
+    expect(h.state.zoom.value).toBe(1);
+    expect(h.state.scrollX).not.toBe(0);
+    expect(h.state.scrollY).toBe(0);
+  });
+
+  it("`zoom` — alt+wheel remains vertical panning", () => {
+    setWheelBehavior("zoom");
+
+    fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+      altKey: true,
+      deltaY: 40,
+    });
+
+    expect(h.state.zoom.value).toBe(1);
+    expect(h.state.scrollY).not.toBe(0);
+  });
+
+  it("`zoom` — horizontal-dominant deltas pan (tilt wheel / trackpad swipe)", () => {
+    setWheelBehavior("zoom");
+
+    plainWheel({ deltaX: 40, deltaY: -2 });
+
+    expect(h.state.zoom.value).toBe(1);
+    expect(h.state.scrollX).not.toBe(0);
+  });
+});

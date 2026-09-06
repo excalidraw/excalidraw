@@ -279,6 +279,8 @@ export type ObservedElementsAppState = {
 
 export type BoxSelectionMode = "contain" | "overlap";
 
+export type WheelBehavior = "scroll" | "zoom";
+
 /**
  * A box, in scene coordinates, that pan & zoom are constrained to.
  *
@@ -355,6 +357,13 @@ export interface AppState {
   isBindingEnabled: boolean;
   /** user box selection preference; defaults to "contain" when unset */
   boxSelectionMode: BoxSelectionMode;
+  /**
+   * user mouse wheel preference; defaults to "scroll" when unset
+   * - "scroll": wheel pans the canvas, ctrl/cmd+wheel zooms
+   * - "zoom": wheel zooms the canvas (ctrl/cmd+wheel keeps zooming too, as
+   *   trackpad pinch is delivered as ctrl+wheel)
+   */
+  wheelBehavior: WheelBehavior;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
   /** user preference whether arrow snap to midpoints while binding */
