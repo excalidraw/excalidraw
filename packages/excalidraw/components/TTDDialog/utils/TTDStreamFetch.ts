@@ -1,9 +1,6 @@
-import { RequestError } from "@excalidraw/excalidraw/errors";
+import { RequestError } from "../../../errors";
 
-import type {
-  LLMMessage,
-  TTTDDialog,
-} from "@excalidraw/excalidraw/components/TTDDialog/types";
+import type { LLMMessage, TTTDDialog } from "../types";
 
 interface RateLimitInfo {
   rateLimit?: number;
@@ -48,7 +45,7 @@ function extractRateLimitHeaders(headers: Headers): RateLimitInfo {
   };
 }
 
-async function* parseSSEStream(
+export async function* parseSSEStream(
   reader: ReadableStreamDefaultReader<Uint8Array>,
 ): AsyncGenerator<string, void, unknown> {
   const decoder = new TextDecoder();

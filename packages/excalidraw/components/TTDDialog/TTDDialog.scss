@@ -219,6 +219,49 @@ $fullScreenModalBreakpoint: 600px;
     }
   }
 
+  .ttd-dialog-input--loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ttd-dialog-input--codemirror {
+    padding: 0;
+    overflow: hidden;
+    // Override height:100% from .ttd-dialog-input — use flex sizing
+    // so the editor fills remaining space without overflowing the panel
+    height: 0;
+    flex: 1 1 0;
+    min-height: 0;
+
+    .cm-editor {
+      height: 100%;
+      font-family: monospace;
+
+      &.cm-focused {
+        outline: none;
+      }
+    }
+
+    .cm-scroller {
+      padding: 0.85rem 0;
+      overflow: auto;
+    }
+
+    .cm-gutters {
+      padding-left: 0.25rem;
+    }
+
+    .cm-content {
+      padding: 0;
+    }
+
+    .cm-placeholder {
+      color: var(--color-gray-40);
+      font-style: italic;
+    }
+  }
+
   .ttd-dialog-output-wrapper {
     display: flex;
     flex-direction: column;
@@ -331,14 +374,55 @@ $fullScreenModalBreakpoint: 600px;
       margin-top: 0.25rem;
     }
 
+    .ttd-dialog-output-error-summary {
+      width: 100%;
+      max-width: 640px;
+      color: var(--color-gray-50);
+      font-size: 0.9rem;
+      text-align: left;
+
+      &__headline {
+        font-weight: 600;
+        color: var(--color-gray-60);
+      }
+
+      &__label {
+        margin-top: 0.35rem;
+        font-weight: 500;
+      }
+
+      &__causes {
+        margin: 0.35rem 0 0;
+        padding-left: 2rem;
+      }
+    }
+
     .ttd-dialog-output-error-message {
       text-align: left;
       font-weight: 400;
       color: var(--color-gray-50);
       word-break: break-word;
       white-space: pre-wrap;
-      max-width: 100%;
+      max-width: 640px;
+      width: 100%;
       font-family: monospace;
+
+      &__caret {
+        color: var(--color-danger);
+      }
+    }
+
+    .ttd-dialog-output-error-autofix-slot {
+      align-self: flex-start;
+      margin-top: 0.35rem;
+      min-height: 2.5rem;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .ttd-dialog-output-error-autofix {
+      margin-top: 0;
+      white-space: nowrap;
     }
   }
 

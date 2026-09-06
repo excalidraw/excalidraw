@@ -5,7 +5,11 @@ import { isTextElement } from "@excalidraw/element";
 
 import { getCommonBounds } from "@excalidraw/element";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
@@ -24,7 +28,7 @@ import type { AppState } from "../../types";
 
 interface MultiPositionProps {
   property: "x" | "y";
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   elementsMap: ElementsMap;
   atomicUnits: AtomicUnit[];
   scene: Scene;
@@ -35,7 +39,7 @@ const moveElements = (
   property: MultiPositionProps["property"],
   changeInTopX: number,
   changeInTopY: number,
-  originalElements: readonly ExcalidrawElement[],
+  originalElements: readonly NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
   appState: AppState,
@@ -74,7 +78,7 @@ const moveElements = (
 const moveGroupTo = (
   nextX: number,
   nextY: number,
-  originalElements: ExcalidrawElement[],
+  originalElements: readonly NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
   appState: AppState,

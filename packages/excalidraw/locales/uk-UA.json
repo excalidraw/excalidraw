@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Вставити",
     "pasteAsPlaintext": "Вставити як текст",
     "pasteCharts": "Вставити діаграми",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Вибрати все",
     "multiSelect": "Додати елемент до вибраного",
     "moveCanvas": "Перемістити полотно",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "Пунктир",
     "strokeStyle_dotted": "Крапки",
     "sloppiness": "Охайність",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Прозорість",
     "textAlign": "Вирівнювання тексту",
     "edges": "Краї",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Інші опції",
+    "cardinality": "",
     "arrowtypes": "Тип стрілки",
     "arrowtype_sharp": "Гостра стрілка",
     "arrowtype_round": "Вигнута стрілка",
@@ -95,6 +111,7 @@
     "group": "Групувати виділене",
     "ungroup": "Розгрупувати виділене",
     "collaborators": "Співавтори",
+    "you": "",
     "toggleGrid": "Перемикати сітку",
     "addToLibrary": "Додати до бібліотеки",
     "removeFromLibrary": "Видалити з бібліотеки",
@@ -171,7 +188,14 @@
     "linkToElement": "Посилання на об’єкт",
     "wrapSelectionInFrame": "Обтікання виділеного фрагмента рамкою",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Посилання на об’єкт",
@@ -183,10 +207,10 @@
     "hint_emptyLibrary": "Виберіть об'єкт на полотні, щоб додати його сюди або встановіть бібліотеку з публічного репозиторію, що нижче.",
     "hint_emptyPrivateLibrary": "Виберіть елемент на полотні, щоб додати його сюди.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Шукати в бібліотеці",
+      "heading": "Збіги в бібліотеці",
+      "noResults": "Збігів не знайдено...",
+      "clearSearch": "Очистити пошук"
     }
   },
   "search": {
@@ -195,8 +219,8 @@
     "singleResult": "результат",
     "multipleResults": "результати",
     "placeholder": "Знайти текст на полотні...",
-    "frames": "",
-    "texts": ""
+    "frames": "Рамки",
+    "texts": "Тексти"
   },
   "buttons": {
     "clearReset": "Очистити полотно",
@@ -234,7 +258,7 @@
     "clear": "Очистити",
     "remove": "Видалити",
     "embed": "Перемкнути вкладення",
-    "publishLibrary": "",
+    "publishLibrary": "Перейменувати або опублікувати",
     "submit": "Надіслати",
     "confirm": "Підтвердити",
     "embeddableInteractionButton": "Натисніть для взаємодії"
@@ -261,7 +285,7 @@
     "removeItemsFromsLibrary": "Видалити {{count}} елемент(ів) з бібліотеки?",
     "invalidEncryptionKey": "Ключ шифрування повинен бути довжиною до 22 символів. Спільну роботу вимкнено.",
     "collabOfflineWarning": "Немає підключення до Інтернету.\nВаші зміни не будуть збережені!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Перевищено ліміт сховища браузера. Зміни не буде збережено."
   },
   "errors": {
     "unsupportedFileType": "Непідтримуваний тип файлу.",
@@ -292,7 +316,7 @@
   },
   "toolBar": {
     "selection": "Виділення",
-    "lasso": "",
+    "lasso": "Ласо",
     "image": "Вставити зображення",
     "rectangle": "Прямокутник",
     "diamond": "Ромб",
@@ -310,10 +334,16 @@
     "magicframe": "Перетворити у код",
     "embeddable": "Веб вкладення",
     "laser": "Лазерний вказівник",
+    "autoshape": "",
+    "bucketfill": "Заливка",
     "hand": "Рука (інструмент для панорамування)",
     "extraTools": "Інші інструменти",
     "mermaidToExcalidraw": "Mermaid у Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "Не вдалося знайти замкнену область для заливки.",
+    "tooComplex": "Ця область занадто складна для заливки."
   },
   "element": {
     "rectangle": "Прямокутник",
@@ -345,6 +375,7 @@
     "freeDraw": "Натисніть і потягніть, відпустіть коли завершите",
     "text": "Порада: можна також додати текст, двічі клацнувши по будь-якому місці інструментом вибору",
     "embeddable": "Клікніть та перетягніть для створення вбудованого вебсайту",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,12 +383,13 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
     "lineEditor_nothingSelected": "",
     "publishLibrary": "Опублікувати свою власну бібліотеку",
-    "bindTextToElement": "",
+    "bindTextToElement": "{{shortcut}} щоб додати текст",
     "createFlowchart": "",
     "deepBoxSelect": "",
     "eraserRevert": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Помилка"
+  },
+  "progressDialog": {
+    "title": "Збереження",
+    "defaultMessage": "Підготовка до збереження..."
   },
   "exportDialog": {
     "disk_title": "Зберегти на диск",
@@ -557,9 +593,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Ваші малюнки зберігаються у сховищі браузера.",
+      "center_heading_line2": "Дані, збережені в браузері, можуть бути несподівано видалені.",
+      "center_heading_line3": "Регулярно зберігайте свою роботу у файл, щоб не втратити її.",
       "center_heading_plus": "Чи бажаєте перейти до Excalidraw+?",
       "menuHint": "Експорт, налаштування, мови, ..."
     },
@@ -571,12 +607,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Колір",
     "mostUsedCustomColors": "Найбільш використовувані користувацькі кольори",
     "colors": "Кольори",
     "shades": "Тіні",
     "hexCode": "Hex-код",
-    "noShades": "Немає доступних відтінків цього кольору"
+    "noShades": "Немає доступних відтінків цього кольору",
+    "invalidColor": "Некоректний колір",
+    "invalidHexLength": "Код Hex має містити 3, 4, 6 або 8 символів",
+    "topPicksTip": "",
+    "resetTopPicks": "Скинути до стандартного набору кольорів"
   },
   "overwriteConfirm": {
     "action": {
@@ -612,57 +652,58 @@
   "mermaid": {
     "title": "Mermaid у Excalidraw",
     "button": "Вставити",
-    "description": "Наразі підтримується тільки <flowchartLink>блок-схеми</flowchartLink><sequenceLink>діаграми послідовностей</sequenceLink> та <classLink>діаграми класів</classLink>. Інші типи будуть відображатися як зображення в Excalidraw.",
+    "description": "Наразі підтримуються лише діаграми типів <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink> та <erdLink>Entity Relationship</erdLink>. Інші типи будуть показані в Excalidraw як зображення.",
     "syntax": "Синтаксис Mermaid",
     "preview": "Попередній перегляд",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Напишіть визначення діаграми Mermaid тут...",
+    "autoFixAvailable": "Доступне автовиправлення"
   },
   "ttd": {
-    "error": ""
+    "error": "Помилка!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Почніть описувати ідею діаграми... ({{shortcut}} для нового рядка)",
+    "inputPlaceholderWithMessages": "Продовжити редагувати діаграму...",
+    "generating": "Генерація...",
+    "rateLimitRemaining": "Сьогодні залишилося {{count}} запитів",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Ви",
+      "assistant": "ШІ-асистент",
+      "system": "Система"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AI бета-версія",
+    "label": "Чат",
+    "menu": "Меню",
+    "newChat": "Новий чат",
+    "deleteChat": "Видалити чат",
+    "deleteMessage": "Видалити повідомлення",
+    "viewAsMermaid": "Переглянути як Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Створімо вашу діаграму",
+      "description": "Опишіть діаграму, яку хочете створити, — ми згенеруємо її для вас.",
+      "hint": "Наразі можна створювати блок-схеми, діаграми послідовностей, класів, станів і зв'язків між сутностями."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Попередній перегляд",
+    "insert": "Вставити",
+    "retry": "Спробувати знову",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "Запит надто короткий (мін. {{min}} символів)",
+      "promptTooLong": "Запит задовгий (максимум {{max}} символів)",
+      "generationFailed": "Не вдалося згенерувати",
+      "invalidDiagram": "Не вдалося створити коректну діаграму :(. Ви можете відредагувати її вручну, повторити спробу з автовиправленням або спробувати інший запит.",
+      "fixInMermaid": "Редагувати Mermaid вручну",
+      "aiRepair": "Згенерувати знову (автовиправлення)",
+      "requestAborted": "Запит перервано",
+      "requestFailed": "Не вдалося виконати запит",
+      "mermaidParseError": "Помилка синтаксису Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Ви вичерпали ліміт AI на безплатному плані. Спробуйте Excalidraw+ або поверніться завтра.",
+      "generalRateLimit": "Притримайте коней, ви надто поспішаєте! Зачекайте трохи, перш ніж спробувати ще раз.",
+      "messageLimitInputPlaceholder": "Ви досягли вашого ліміту повідомлень"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Перейти на Plus"
   },
   "quickSearch": {
     "placeholder": "Швидкий пошук"
@@ -701,15 +742,15 @@
     "shortcutHint": "Для панелі команд використовуйте {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "Коліщатко"
   }
 }

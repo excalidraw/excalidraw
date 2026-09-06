@@ -24,6 +24,12 @@ export function useOutsideClick<T extends HTMLElement>(
   ) => boolean | undefined,
 ) {
   useEffect(() => {
+    const refOwnerDocument = ref.current?.ownerDocument;
+    if (!refOwnerDocument) {
+      return;
+    }
+    const ownerDocument: Document = refOwnerDocument;
+
     function onOutsideClick(event: Event) {
       const _event = event as Event & { target: T };
 
@@ -45,7 +51,7 @@ export function useOutsideClick<T extends HTMLElement>(
         // target is detached from DOM (happens when the element is removed
         // on a pointerup event fired *before* this handler's pointerup is
         // dispatched)
-        !document.documentElement.contains(_event.target)
+        !ownerDocument.documentElement.contains(_event.target)
       ) {
         return;
       }
@@ -56,8 +62,8 @@ export function useOutsideClick<T extends HTMLElement>(
         // the `body` element, so the target element is going to be the `html`
         // (note: this won't work if we selectively re-enable pointer events on
         // specific elements as we do with navbar or excalidraw UI elements)
-        (_event.target === document.documentElement &&
-          document.body.style.pointerEvents === "none");
+        (_event.target === ownerDocument.documentElement &&
+          ownerDocument.body.style.pointerEvents === "none");
 
       // if clicking on radix portal, assume it's a popup that
       // should be considered as part of the UI. Obviously this is a terrible
@@ -76,12 +82,12 @@ export function useOutsideClick<T extends HTMLElement>(
     }
 
     // note: don't use `click` because it often reports incorrect `event.target`
-    document.addEventListener(EVENT.POINTER_DOWN, onOutsideClick);
-    document.addEventListener(EVENT.TOUCH_START, onOutsideClick);
+    ownerDocument.addEventListener(EVENT.POINTER_DOWN, onOutsideClick);
+    ownerDocument.addEventListener(EVENT.TOUCH_START, onOutsideClick);
 
     return () => {
-      document.removeEventListener(EVENT.POINTER_DOWN, onOutsideClick);
-      document.removeEventListener(EVENT.TOUCH_START, onOutsideClick);
+      ownerDocument.removeEventListener(EVENT.POINTER_DOWN, onOutsideClick);
+      ownerDocument.removeEventListener(EVENT.TOUCH_START, onOutsideClick);
     };
   }, [ref, callback, isInside]);
 }

@@ -6,6 +6,7 @@ import {
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
+import { getNonDeletedElements } from "@excalidraw/element";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import {
   restoreAppState,
@@ -17,20 +18,20 @@ import {
 } from "@excalidraw/excalidraw/scene/export";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 
 export { MIME_TYPES };
 
 type ExportOpts = {
-  elements: readonly NonDeleted<ExcalidrawElement>[];
+  elements: readonly NonDeletedExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
-  exportingFrame?: ExcalidrawFrameLikeElement | null;
+  exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   getDimensions?: (
     width: number,
     height: number,
@@ -48,9 +49,11 @@ export const exportToCanvas = ({
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
-  const restoredElements = restoreElements(elements, null, {
-    deleteInvisibleElements: true,
-  });
+  const restoredElements = getNonDeletedElements(
+    restoreElements(elements, null, {
+      deleteInvisibleElements: true,
+    }),
+  );
   const restoredAppState = restoreAppState(appState, null);
 
   const { exportBackground, viewBackgroundColor } = restoredAppState;
@@ -178,9 +181,11 @@ export const exportToSvg = async ({
   skipInliningFonts?: true;
   reuseImages?: boolean;
 }): Promise<SVGSVGElement> => {
-  const restoredElements = restoreElements(elements, null, {
-    deleteInvisibleElements: true,
-  });
+  const restoredElements = getNonDeletedElements(
+    restoreElements(elements, null, {
+      deleteInvisibleElements: true,
+    }),
+  );
   const restoredAppState = restoreAppState(appState, null);
 
   const exportAppState = {

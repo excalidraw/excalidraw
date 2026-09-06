@@ -1,5 +1,4 @@
 import rough from "roughjs/bin/rough";
-
 import {
   arrayToMap,
   type Bounds,
@@ -7,18 +6,14 @@ import {
   rescalePoints,
   sizeOf,
 } from "@excalidraw/common";
-
 import {
   degreesToRadians,
   lineSegment,
-  pointDistance,
   pointFrom,
   pointFromArray,
   pointRotateRads,
 } from "@excalidraw/math";
-
 import { getCurvePathOps } from "@excalidraw/utils/shape";
-
 import { pointsOnBezierCurves } from "points-on-curve";
 
 import type {
@@ -29,9 +24,7 @@ import type {
   LocalPoint,
   Radians,
 } from "@excalidraw/math";
-
 import type { AppState } from "@excalidraw/excalidraw/types";
-
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import { generateRoughOptions } from "./shape";
@@ -41,18 +34,20 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 import {
   isArrowElement,
   isBoundToContainer,
+  isFrameLikeElement,
   isFreeDrawElement,
   isLinearElement,
   isLineElement,
   isTextElement,
+  isExcalidrawElement,
 } from "./typeChecks";
-
 import { getElementShape } from "./shape";
-
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
 } from "./utils";
+import { intersectElementWithLineSegment } from "./collision";
+import { elementOverlapsWithFrame, getContainingFrame } from "./frame";
 
 import type { Drawable, Op } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
@@ -67,6 +62,7 @@ import type {
   ExcalidrawRectanguloidElement,
   ExcalidrawTextElementWithContainer,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "./types";
 
 export type RectangleBox = {
@@ -680,8 +676,9 @@ export const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getBoundsFromPoints = (
-  points: ExcalidrawFreeDrawElement["points"],
+export const getBoundsFromPoints = <P extends GlobalPoint | LocalPoint>(
+  points: readonly P[],
+  padding: number = 0,
 ): Bounds => {
   let minX = Infinity;
   let minY = Infinity;
@@ -695,7 +692,7 @@ export const getBoundsFromPoints = (
     maxY = Math.max(maxY, y);
   }
 
-  return [minX, minY, maxX, maxY];
+  return [minX - padding, minY - padding, maxX + padding, maxY + padding];
 };
 
 const getFreeDrawElementAbsoluteCoords = (
@@ -709,6 +706,9 @@ const getFreeDrawElementAbsoluteCoords = (
   return [x1, y1, x2, y2, (x1 + x2) / 2, (y1 + y2) / 2];
 };
 
+const CARDINALITY_MARKER_SIZE = 20;
+const CROWFOOT_ARROWHEAD_SIZE = 15;
+
 /** @returns number in pixels */
 export const getArrowheadSize = (arrowhead: Arrowhead): number => {
   switch (arrowhead) {
@@ -717,10 +717,14 @@ export const getArrowheadSize = (arrowhead: Arrowhead): number => {
     case "diamond":
     case "diamond_outline":
       return 12;
-    case "crowfoot_many":
-    case "crowfoot_one":
-    case "crowfoot_one_or_many":
-      return 20;
+    case "cardinality_many":
+    case "cardinality_one_or_many":
+    case "cardinality_zero_or_many":
+      return CROWFOOT_ARROWHEAD_SIZE;
+    case "cardinality_one":
+    case "cardinality_exactly_one":
+    case "cardinality_zero_or_one":
+      return CARDINALITY_MARKER_SIZE;
     default:
       return 15;
   }
@@ -743,7 +747,12 @@ export const getArrowheadPoints = (
   shape: Drawable[],
   position: "start" | "end",
   arrowhead: Arrowhead,
+  offsetMultiplier = 0,
 ) => {
+  if (arrowhead === null) {
+    return null;
+  }
+
   if (shape.length < 1) {
     return null;
   }
@@ -824,29 +833,30 @@ export const getArrowheadPoints = (
   const lengthMultiplier =
     arrowhead === "diamond" || arrowhead === "diamond_outline" ? 0.25 : 0.5;
   const minSize = Math.min(size, length * lengthMultiplier);
-  const xs = x2 - nx * minSize;
-  const ys = y2 - ny * minSize;
+  const tx = x2 - nx * minSize * offsetMultiplier;
+  const ty = y2 - ny * minSize * offsetMultiplier;
+  const xs = tx - nx * minSize;
+  const ys = ty - ny * minSize;
 
-  if (
-    arrowhead === "dot" ||
-    arrowhead === "circle" ||
-    arrowhead === "circle_outline"
-  ) {
-    const diameter = Math.hypot(ys - y2, xs - x2) + element.strokeWidth - 2;
-    return [x2, y2, diameter];
+  if (arrowhead === "circle" || arrowhead === "circle_outline") {
+    const diameter = Math.hypot(ys - ty, xs - tx) + element.strokeWidth - 2;
+    return [tx, ty, diameter];
   }
 
   const angle = getArrowheadAngle(arrowhead);
 
-  if (arrowhead === "crowfoot_many" || arrowhead === "crowfoot_one_or_many") {
+  if (
+    arrowhead === "cardinality_many" ||
+    arrowhead === "cardinality_one_or_many"
+  ) {
     // swap (xs, ys) with (x2, y2)
     const [x3, y3] = pointRotateRads(
-      pointFrom(x2, y2),
+      pointFrom(tx, ty),
       pointFrom(xs, ys),
       degreesToRadians(-angle as Degrees),
     );
     const [x4, y4] = pointRotateRads(
-      pointFrom(x2, y2),
+      pointFrom(tx, ty),
       pointFrom(xs, ys),
       degreesToRadians(angle),
     );
@@ -856,12 +866,12 @@ export const getArrowheadPoints = (
   // Return points
   const [x3, y3] = pointRotateRads(
     pointFrom(xs, ys),
-    pointFrom(x2, y2),
+    pointFrom(tx, ty),
     ((-angle * Math.PI) / 180) as Radians,
   );
   const [x4, y4] = pointRotateRads(
     pointFrom(xs, ys),
-    pointFrom(x2, y2),
+    pointFrom(tx, ty),
     degreesToRadians(angle),
   );
 
@@ -874,9 +884,9 @@ export const getArrowheadPoints = (
       const [px, py] = element.points.length > 1 ? element.points[1] : [0, 0];
 
       [ox, oy] = pointRotateRads(
-        pointFrom(x2 + minSize * 2, y2),
-        pointFrom(x2, y2),
-        Math.atan2(py - y2, px - x2) as Radians,
+        pointFrom(tx + minSize * 2, ty),
+        pointFrom(tx, ty),
+        Math.atan2(py - ty, px - tx) as Radians,
       );
     } else {
       const [px, py] =
@@ -885,16 +895,16 @@ export const getArrowheadPoints = (
           : [0, 0];
 
       [ox, oy] = pointRotateRads(
-        pointFrom(x2 - minSize * 2, y2),
-        pointFrom(x2, y2),
-        Math.atan2(y2 - py, x2 - px) as Radians,
+        pointFrom(tx - minSize * 2, ty),
+        pointFrom(tx, ty),
+        Math.atan2(ty - py, tx - px) as Radians,
       );
     }
 
-    return [x2, y2, x3, y3, ox, oy, x4, y4];
+    return [tx, ty, x3, y3, ox, oy, x4, y4];
   }
 
-  return [x2, y2, x3, y3, x4, y4];
+  return [tx, ty, x3, y3, x4, y4];
 };
 
 // TODO reuse shape.ts
@@ -1018,7 +1028,7 @@ export const getCommonBounds = (
 };
 
 export const getDraggedElementsBounds = (
-  elements: ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   dragOffset: { x: number; y: number },
 ) => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
@@ -1101,33 +1111,6 @@ export const getElementPointsCoords = (
     maxX + element.x,
     maxY + element.y,
   ];
-};
-
-export const getClosestElementBounds = (
-  elements: readonly ExcalidrawElement[],
-  from: { x: number; y: number },
-): Bounds => {
-  if (!elements.length) {
-    return [0, 0, 0, 0];
-  }
-
-  let minDistance = Infinity;
-  let closestElement = elements[0];
-  const elementsMap = arrayToMap(elements);
-  elements.forEach((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
-    const distance = pointDistance(
-      pointFrom((x1 + x2) / 2, (y1 + y2) / 2),
-      pointFrom(from.x, from.y),
-    );
-
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestElement = element;
-    }
-  });
-
-  return getElementBounds(closestElement, elementsMap);
 };
 
 export interface BoundingBox {
@@ -1248,6 +1231,17 @@ export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
 ): boolean =>
   p[0] > bounds[0] && p[0] < bounds[2] && p[1] > bounds[1] && p[1] < bounds[3];
 
+// TODO make pointInsideBounds inclusive and remove this function once we
+// test nothing is breaking
+export const pointInsideBoundsInclusive = <P extends GlobalPoint | LocalPoint>(
+  p: P,
+  bounds: Bounds,
+): boolean =>
+  p[0] >= bounds[0] &&
+  p[0] <= bounds[2] &&
+  p[1] >= bounds[1] &&
+  p[1] <= bounds[3];
+
 export const doBoundsIntersect = (
   bounds1: Bounds | null,
   bounds2: Bounds | null,
@@ -1262,13 +1256,308 @@ export const doBoundsIntersect = (
   return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
 };
 
+export const boundsContainBounds = (outerBounds: Bounds, innerBounds: Bounds) =>
+  [
+    pointFrom<GlobalPoint>(innerBounds[0], innerBounds[1]),
+    pointFrom<GlobalPoint>(innerBounds[0], innerBounds[3]),
+    pointFrom<GlobalPoint>(innerBounds[2], innerBounds[1]),
+    pointFrom<GlobalPoint>(innerBounds[2], innerBounds[3]),
+  ].every((point) => pointInsideBoundsInclusive(point, outerBounds));
+
+/**
+ * High level helper to get elements overlapping a bounding box.
+ * It can be used to get elements overlapping a selection box, for example.
+ *
+ */
+export const elementsOverlappingBBox = <T extends ExcalidrawElement>({
+  elements,
+  elementsMap,
+  bounds,
+  type,
+  excludeElementsInFrames,
+  shouldIgnoreElementFromSelection,
+}: {
+  elements: readonly T[];
+  elementsMap?: ElementsMap;
+  bounds: Bounds | ExcalidrawElement;
+  /**
+   * - overlap: elements overlapping or inside bounds
+   * - contain: elements inside bounds
+   **/
+  type: "contain" | "overlap";
+  excludeElementsInFrames?: boolean;
+  shouldIgnoreElementFromSelection?: (element: T) => boolean;
+}) => {
+  if (!elementsMap) {
+    elementsMap = arrayToMap(elements) as ElementsMap;
+  }
+  const selectionBounds = isExcalidrawElement(bounds)
+    ? getElementBounds(bounds, elementsMap)
+    : bounds;
+  const [selectionX1, selectionY1, selectionX2, selectionY2] = selectionBounds;
+  const selectionEdges = [
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX1, selectionY1),
+      pointFrom(selectionX2, selectionY1),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX2, selectionY1),
+      pointFrom(selectionX2, selectionY2),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX2, selectionY2),
+      pointFrom(selectionX1, selectionY2),
+    ),
+    lineSegment<GlobalPoint>(
+      pointFrom(selectionX1, selectionY2),
+      pointFrom(selectionX1, selectionY1),
+    ),
+  ];
+
+  const framesInSelection = excludeElementsInFrames
+    ? new Set<ExcalidrawElement["id"]>()
+    : null;
+  const groups: Record<string, T[]> = {};
+  const elementsInSelection: Set<T> = new Set();
+
+  for (const element of elements) {
+    if (shouldIgnoreElementFromSelection?.(element)) {
+      continue;
+    }
+
+    // Track only selectable top-level group members, so ignored elements such
+    // as bound text and locked elements don't affect group selection.
+    const groupId = element.groupIds.at(-1);
+    if (groupId) {
+      if (!groups[groupId]) {
+        groups[groupId] = [];
+      }
+      groups[groupId].push(element);
+    }
+
+    const strokeWidth = element.strokeWidth;
+    let labelAABB: Bounds | null = null;
+    let elementAABB = getElementBounds(element, elementsMap);
+
+    elementAABB = [
+      elementAABB[0] - strokeWidth / 2,
+      elementAABB[1] - strokeWidth / 2,
+      elementAABB[2] + strokeWidth / 2,
+      elementAABB[3] + strokeWidth / 2,
+    ] as Bounds;
+
+    // Whether the element bounds should include the bound text element bounds
+    const boundTextElement =
+      isArrowElement(element) && getBoundTextElement(element, elementsMap);
+    if (boundTextElement) {
+      const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+        element,
+        boundTextElement,
+        elementsMap,
+      );
+      labelAABB = [
+        x,
+        y,
+        x + boundTextElement.width,
+        y + boundTextElement.height,
+      ] as Bounds;
+    }
+
+    // Clip element bounds by its containing frame (if any), since only the
+    // visible (frame-clipped) portion of the element is relevant for selection.
+    const associatedFrame = getContainingFrame(element, elementsMap);
+    if (
+      associatedFrame &&
+      elementOverlapsWithFrame(element, associatedFrame, elementsMap)
+    ) {
+      const frameAABB = getElementBounds(associatedFrame, elementsMap);
+      elementAABB = [
+        Math.max(elementAABB[0], frameAABB[0]),
+        Math.max(elementAABB[1], frameAABB[1]),
+        Math.min(elementAABB[2], frameAABB[2]),
+        Math.min(elementAABB[3], frameAABB[3]),
+      ] as Bounds;
+
+      labelAABB = labelAABB
+        ? ([
+            Math.max(labelAABB[0], frameAABB[0]),
+            Math.max(labelAABB[1], frameAABB[1]),
+            Math.min(labelAABB[2], frameAABB[2]),
+            Math.min(labelAABB[3], frameAABB[3]),
+          ] as Bounds)
+        : null;
+    }
+
+    const commonAABB = labelAABB
+      ? ([
+          Math.min(labelAABB[0], elementAABB[0]),
+          Math.min(labelAABB[1], elementAABB[1]),
+          Math.max(labelAABB[2], elementAABB[2]),
+          Math.max(labelAABB[3], elementAABB[3]),
+        ] as Bounds)
+      : elementAABB;
+
+    // ============== Evaluation ==============
+
+    // 1. If the selection box WRAPs the element's AABB, then add it to the
+    //    selection and move on, regardless of the selection mode.
+    //
+    //    PERF: This trick only works with axis-aligned box selection and the
+    //          current convex element shapes!
+    if (boundsContainBounds(selectionBounds, commonAABB)) {
+      if (framesInSelection && isFrameLikeElement(element)) {
+        framesInSelection.add(element.id);
+      }
+      elementsInSelection.add(element);
+      continue;
+    }
+
+    // 2. Handle the case where the label is overlapped by the selection box
+    if (
+      type === "overlap" &&
+      labelAABB &&
+      doBoundsIntersect(selectionBounds, labelAABB)
+    ) {
+      elementsInSelection.add(element);
+      continue;
+    }
+
+    // 3. Handle the case where the selection is not wrapping the element, but
+    //    it does intersect the element's outline (non-AABB).
+    if (type === "overlap" && doBoundsIntersect(selectionBounds, elementAABB)) {
+      let hasIntersection = false;
+
+      // Preliminary check potential intersection imprecision
+      if (isLinearElement(element) || isFreeDrawElement(element)) {
+        const center = elementCenterPoint(element, elementsMap);
+        hasIntersection = element.points.some((point) => {
+          const rotatedPoint = pointRotateRads(
+            pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+            center,
+            element.angle,
+          );
+
+          return pointInsideBounds(rotatedPoint, selectionBounds);
+        });
+      } else {
+        const nonRotatedElementBounds = getElementBounds(
+          element,
+          elementsMap,
+          true,
+        );
+        const center = elementCenterPoint(element, elementsMap);
+        hasIntersection = [
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              (nonRotatedElementBounds[0] + nonRotatedElementBounds[2]) / 2,
+              nonRotatedElementBounds[1],
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              nonRotatedElementBounds[2],
+              (nonRotatedElementBounds[1] + nonRotatedElementBounds[3]) / 2,
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              (nonRotatedElementBounds[0] + nonRotatedElementBounds[2]) / 2,
+              nonRotatedElementBounds[3],
+            ),
+            center,
+            element.angle,
+          ),
+          pointRotateRads(
+            pointFrom<GlobalPoint>(
+              nonRotatedElementBounds[0],
+              (nonRotatedElementBounds[1] + nonRotatedElementBounds[3]) / 2,
+            ),
+            center,
+            element.angle,
+          ),
+        ].some((point) => {
+          return pointInsideBounds(
+            pointRotateRads(point, center, element.angle),
+            selectionBounds,
+          );
+        });
+      }
+
+      if (!hasIntersection) {
+        hasIntersection = selectionEdges.some(
+          (selectionEdge) =>
+            intersectElementWithLineSegment(
+              element,
+              elementsMap,
+              selectionEdge,
+              strokeWidth / 2,
+              true, // Stop at first hit for better performance
+            ).length > 0,
+        );
+      }
+
+      if (hasIntersection) {
+        if (framesInSelection && isFrameLikeElement(element)) {
+          framesInSelection.add(element.id);
+        }
+
+        elementsInSelection.add(element);
+        continue;
+      }
+    }
+
+    // 4. We don't need to handle when the selection is inside the element
+    //    as it is separately handled in App.
+  }
+
+  if (framesInSelection) {
+    elementsInSelection.forEach((element) => {
+      if (element.frameId && framesInSelection.has(element.frameId)) {
+        elementsInSelection.delete(element);
+      }
+    });
+  }
+
+  if (type === "overlap") {
+    Array.from(elementsInSelection).forEach((element) => {
+      const groupId = element.groupIds.at(-1);
+      const group = groupId ? groups[groupId] : null;
+
+      group?.forEach((groupElement) => elementsInSelection.add(groupElement));
+    });
+  } else if (type === "contain") {
+    elementsInSelection.forEach((element) => {
+      // note: currently we only support top-level group handling since
+      // we don't support box selecting while editing the group/subgroup
+      // see https://github.com/excalidraw/excalidraw/pull/11234#issuecomment-4387654451
+      const groupId = element.groupIds.at(-1);
+
+      const group = groupId ? groups[groupId] : null;
+
+      if (
+        group &&
+        !group.every((groupElement) => elementsInSelection.has(groupElement))
+      ) {
+        elementsInSelection.delete(element);
+      }
+    });
+  }
+
+  // to maintain original order elements (namely for group selection)
+  return elements.filter((element) => elementsInSelection.has(element));
+};
+
 export const elementCenterPoint = (
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   xOffset: number = 0,
   yOffset: number = 0,
 ) => {
-  if (isLinearElement(element)) {
+  if (isLinearElement(element) || isFreeDrawElement(element)) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const [x, y] = pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2);
 

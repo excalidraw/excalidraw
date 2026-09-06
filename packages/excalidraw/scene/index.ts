@@ -4,11 +4,12 @@ export {
   getSelectedElements,
   getTargetElements,
 } from "@excalidraw/element";
-export { calculateScrollCenter } from "./scroll";
+export { getScrollToContentState } from "../viewport";
 export {
   hasBackground,
   hasStrokeWidth,
   hasStrokeStyle,
+  hasFreedrawMode,
   canHaveArrowheads,
   canChangeRoundness,
 } from "@excalidraw/element";

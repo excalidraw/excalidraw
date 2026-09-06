@@ -33,9 +33,7 @@ import type { Bounds } from "@excalidraw/common";
 import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
-import { AnimatedTrail } from "../animated-trail";
-
-import type { AnimationFrameHandler } from "../animation-frame-handler";
+import { AnimatedTrail } from "../animatedTrail";
 
 import type App from "../components/App";
 
@@ -43,8 +41,8 @@ export class EraserTrail extends AnimatedTrail {
   private elementsToErase: Set<ExcalidrawElement["id"]> = new Set();
   private groupsToErase: Set<ExcalidrawElement["id"]> = new Set();
 
-  constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
-    super(animationFrameHandler, app, {
+  constructor(app: App) {
+    super(app, {
       streamline: 0.2,
       size: 5,
       keepHead: true,

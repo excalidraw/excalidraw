@@ -1009,4 +1009,89 @@ describe("aligning", () => {
     expect(API.getSelectedElements()[1].x).toEqual(150);
     expect(API.getSelectedElements()[2].x).toEqual(100);
   });
+
+  const createAndSelectGroupWithBoundTextAndRectangle = () => {
+    const groupId = "group-with-bound-text";
+
+    // container is vertically/horizontally centered around its bound text
+    const container = API.createElement({
+      type: "rectangle",
+      id: "container",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+      groupIds: [groupId],
+      boundElements: [{ type: "text", id: "bound-text" }],
+    });
+
+    const boundText = API.createElement({
+      type: "text",
+      id: "bound-text",
+      x: 120,
+      y: 140,
+      width: 60,
+      height: 20,
+      containerId: container.id,
+      groupIds: [groupId],
+    });
+
+    const groupedRectangle = API.createElement({
+      type: "rectangle",
+      id: "grouped-rectangle",
+      x: 100,
+      y: 200,
+      width: 100,
+      height: 100,
+      groupIds: [groupId],
+    });
+
+    const standaloneRectangle = API.createElement({
+      type: "rectangle",
+      id: "standalone-rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+
+    API.setElements([
+      container,
+      boundText,
+      groupedRectangle,
+      standaloneRectangle,
+    ]);
+
+    API.setSelectedElements([container, groupedRectangle, standaloneRectangle]);
+
+    return { container, boundText, groupedRectangle, standaloneRectangle };
+  };
+
+  it("keeps a bound text within its container when aligning a group to the top", () => {
+    const { container, boundText, groupedRectangle, standaloneRectangle } =
+      createAndSelectGroupWithBoundTextAndRectangle();
+
+    API.executeAction(actionAlignTop);
+
+    expect(API.getElement(standaloneRectangle).y).toEqual(0);
+    expect(API.getElement(container).y).toEqual(0);
+    expect(API.getElement(groupedRectangle).y).toEqual(100);
+
+    expect(API.getElement(boundText).y).toEqual(40);
+    expect(API.getElement(boundText).x).toEqual(120);
+  });
+
+  it("keeps a bound text within its container when aligning a group to the left", () => {
+    const { container, boundText, groupedRectangle, standaloneRectangle } =
+      createAndSelectGroupWithBoundTextAndRectangle();
+
+    API.executeAction(actionAlignLeft);
+
+    expect(API.getElement(standaloneRectangle).x).toEqual(0);
+    expect(API.getElement(container).x).toEqual(0);
+    expect(API.getElement(groupedRectangle).x).toEqual(0);
+
+    expect(API.getElement(boundText).x).toEqual(20);
+    expect(API.getElement(boundText).y).toEqual(140);
+  });
 });

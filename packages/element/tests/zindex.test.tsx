@@ -8,7 +8,7 @@ import {
   actionDuplicateSelection,
 } from "@excalidraw/excalidraw/actions";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw, getNonDeletedElements } from "@excalidraw/excalidraw";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import {
@@ -116,7 +116,7 @@ const populateElements = (
     h.setState({
       ...selectGroupsForSelectedElements(
         { ...h.state, ...appState, selectedElementIds },
-        h.elements,
+        getNonDeletedElements(h.elements),
         h.state,
         null,
       ),
@@ -1507,6 +1507,192 @@ describe("z-indexing with frames", () => {
         // +1
         [actionBringToFront, ["R1", "R2", "R3", "F1_1", "F1", "F1_2"]],
       ],
+    });
+  });
+
+  it("bringing to front / sending to back children of MULTIPLE frames at once moves all of them", () => {
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1", isSelected: true },
+        { id: "F1_2", frameId: "F1" },
+        { id: "F1", type: "frame" },
+        { id: "F2_1", frameId: "F2", isSelected: true },
+        { id: "F2_2", frameId: "F2" },
+        { id: "F2", type: "frame" },
+      ],
+      operations: [
+        // +∞: each selected child moves to the front of its own frame
+        [actionBringToFront, ["F1_2", "F1", "F1_1", "F2_2", "F2", "F2_1"]],
+        // -∞: each selected child moves to the back of its own frame
+        [actionSendToBack, ["F1_1", "F1_2", "F1", "F2_1", "F2_2", "F2"]],
+      ],
+    });
+  });
+
+  it("send to back / bring to front of a grouped frame child (in group-editing mode) must not duplicate elements", () => {
+    assertZindex({
+      elements: [
+        { id: "F1_1", frameId: "F1", groupIds: ["g1"] },
+        { id: "F1_2", frameId: "F1", groupIds: ["g1"], isSelected: true },
+        { id: "F1", type: "frame" },
+        { id: "F2_1", frameId: "F2", groupIds: ["g2"] },
+        { id: "F2_2", frameId: "F2", groupIds: ["g2"] },
+        { id: "F2", type: "frame" },
+      ],
+      appState: { editingGroupId: "g1" },
+      operations: [
+        // -∞ (send to back, within the frame)
+        [actionSendToBack, ["F1_2", "F1_1", "F1", "F2_1", "F2_2", "F2"]],
+        // +∞ (bring to front, within the frame)
+        [actionBringToFront, ["F1_1", "F1", "F1_2", "F2_1", "F2_2", "F2"]],
+      ],
+    });
+  });
+});
+
+/**
+ * The inputs in this block intentionally VIOLATE the (soft) invariant that a
+ * frame's children — and a group's members — are contiguous in the elements
+ * array. Such states shouldn't occur in normal use, but they CAN arise from
+ * bugs or broken input, because nothing re-defragments element order during
+ * a reorder (`normalizeElementOrder` only runs on duplication). We keep these
+ * tests so the reordering ops stay exercised against malformed order.
+ *
+ * HARD CONTRACT (a failure here is a real bug): a reorder must never throw,
+ * duplicate, or drop elements. `assertReorderPreservesElements` checks this.
+ *
+ * SOFT SNAPSHOT (read before "fixing"): the exact resulting ORDER is NOT a
+ * contract for invalid input — it's whatever the slice math happens to
+ * produce. If a future change alters an `expected` order below, that is NOT
+ * necessarily a functional regression. First confirm from the diff that the
+ * hard contract still holds (nothing duplicated/lost), then update the
+ * expected order to match, provided it's deemed an improvement over the
+ * previous order, or it's an acceptable change given the underlying logic
+ * change.
+ */
+describe("z-index reordering with broken contiguity (invariant-violating input)", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  const assertReorderPreservesElements = (
+    elements: Parameters<typeof populateElements>[0],
+    appState: Parameters<typeof populateElements>[1],
+    // each op is applied to a freshly-populated (broken) state
+    cases: [Actions, string[]][],
+  ) => {
+    for (const [action, expected] of cases) {
+      populateElements(elements, appState);
+      const before = h.elements.map((el) => el.id);
+
+      expect(() => API.executeAction(action)).not.toThrow();
+
+      const after = h.elements.map((el) => el.id);
+      // hard contract:
+      expect(after.length).toBe(before.length); // no loss
+      expect(new Set(after).size).toBe(after.length); // no duplication
+      // soft snapshot (see block comment before changing):
+      expect(after).toEqual(expected);
+    }
+  };
+
+  it("discontiguous frame children (foreign frame's child interleaved in span)", () => {
+    // F2_1 (a child of frame F2) sits INSIDE frame F1's z-span. Reordering F1's
+    // child sweeps F2_1 along (span-based frame handling) — wrong ordering, but
+    // never a duplication/loss, and the op does not throw.
+    const elements: Parameters<typeof populateElements>[0] = [
+      { id: "F1_1", frameId: "F1", isSelected: true },
+      { id: "F2_1", frameId: "F2" },
+      { id: "F1_2", frameId: "F1" },
+      { id: "F1", type: "frame" },
+      { id: "F2", type: "frame" },
+    ];
+    assertReorderPreservesElements(elements, undefined, [
+      [actionBringForward, ["F2_1", "F1_2", "F1_1", "F1", "F2"]],
+      [actionSendBackward, ["F1_1", "F2_1", "F1_2", "F1", "F2"]],
+      [actionBringToFront, ["F2_1", "F1_2", "F1", "F1_1", "F2"]],
+      [actionSendToBack, ["F1_1", "F2_1", "F1_2", "F1", "F2"]],
+    ]);
+  });
+
+  it("discontiguous group, whole group selected", () => {
+    // g1 = {A, C}, scattered by the loose elements B and D.
+    const elements: Parameters<typeof populateElements>[0] = [
+      { id: "A", groupIds: ["g1"], isSelected: true },
+      { id: "B" },
+      { id: "C", groupIds: ["g1"], isSelected: true },
+      { id: "D" },
+    ];
+    assertReorderPreservesElements(elements, undefined, [
+      // move-by-one leaves the group scattered (each run moves independently)
+      [actionBringForward, ["B", "A", "D", "C"]],
+      [actionSendBackward, ["A", "C", "B", "D"]],
+      // to-front / to-back gather the scattered members back into one block
+      [actionBringToFront, ["B", "D", "A", "C"]],
+      [actionSendToBack, ["A", "C", "B", "D"]],
+    ]);
+  });
+
+  it("discontiguous group, single member selected in group-editing mode", () => {
+    const elements: Parameters<typeof populateElements>[0] = [
+      { id: "A", groupIds: ["g1"] },
+      { id: "B" },
+      { id: "C", groupIds: ["g1"], isSelected: true },
+      { id: "D" },
+    ];
+    assertReorderPreservesElements(elements, { editingGroupId: "g1" }, [
+      [actionBringForward, ["A", "B", "C", "D"]],
+      [actionSendBackward, ["C", "A", "B", "D"]],
+      [actionBringToFront, ["A", "B", "C", "D"]],
+      [actionSendToBack, ["C", "A", "B", "D"]],
+    ]);
+  });
+
+  it("two interleaved groups, both fully selected", () => {
+    const elements: Parameters<typeof populateElements>[0] = [
+      { id: "A", groupIds: ["g1"], isSelected: true },
+      { id: "X", groupIds: ["g2"], isSelected: true },
+      { id: "C", groupIds: ["g1"], isSelected: true },
+      { id: "Y", groupIds: ["g2"], isSelected: true },
+      { id: "Z" },
+    ];
+    assertReorderPreservesElements(elements, undefined, [
+      [actionBringForward, ["Z", "A", "X", "C", "Y"]],
+      [actionSendBackward, ["A", "X", "C", "Y", "Z"]],
+      [actionBringToFront, ["Z", "A", "X", "C", "Y"]],
+      [actionSendToBack, ["A", "X", "C", "Y", "Z"]],
+    ]);
+  });
+});
+
+describe("z-index reordering with inconsistent group-editing state", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("does not duplicate or drop elements when selected elements fall outside the edited group scope", () => {
+    assertZindex({
+      elements: [
+        { id: "A", groupIds: ["g1"], isSelected: true },
+        { id: "C", groupIds: ["g1"] },
+        { id: "X", groupIds: ["g2"] },
+        { id: "Y", groupIds: ["g2"] },
+        { id: "R" },
+      ],
+      appState: { editingGroupId: "g2" },
+      operations: [[actionSendToBack, ["A", "C", "X", "Y", "R"]]],
+    });
+
+    assertZindex({
+      elements: [
+        { id: "A", groupIds: ["g1"] },
+        { id: "C", groupIds: ["g1"] },
+        { id: "X", groupIds: ["g2"], isSelected: true },
+        { id: "Y", groupIds: ["g2"] },
+        { id: "R" },
+      ],
+      appState: { editingGroupId: "g1" },
+      operations: [[actionBringToFront, ["A", "C", "X", "Y", "R"]]],
     });
   });
 });

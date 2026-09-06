@@ -34,7 +34,10 @@ import { isArrowElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
-import { redrawTextBoundingBox } from "./textElement";
+import {
+  DEFAULT_BOUND_TEXT_LABEL_POSITION,
+  redrawTextBoundingBox,
+} from "./textElement";
 
 import { LinearElementEditor } from "./linearElementEditor";
 
@@ -57,7 +60,10 @@ import type {
   ExcalidrawTextElement,
   FileId,
   FontFamilyValues,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
+  Ordered,
   TextAlign,
   VerticalAlign,
 } from "./types";
@@ -228,6 +234,9 @@ const bindTextToContainer = (
     ...textProps,
     containerId: container.id,
     strokeColor: textProps.strokeColor || container.strokeColor,
+    labelPosition: isArrowElement(container)
+      ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+      : null,
   });
 
   Object.assign(container, {
@@ -243,7 +252,7 @@ const bindTextToContainer = (
 };
 
 const bindLinearElementToElement = (
-  linearElement: ExcalidrawArrowElement,
+  linearElement: NonDeleted<ExcalidrawArrowElement>,
   start: ValidLinearElement["start"],
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
@@ -331,7 +340,7 @@ const bindLinearElementToElement = (
 
       bindBindingElement(
         linearElement,
-        startBoundElement as ExcalidrawBindableElement,
+        startBoundElement as NonDeleted<ExcalidrawBindableElement>,
         "orbit",
         "start",
         scene,
@@ -407,7 +416,7 @@ const bindLinearElementToElement = (
 
       bindBindingElement(
         linearElement,
-        endBoundElement as ExcalidrawBindableElement,
+        endBoundElement as NonDeleted<ExcalidrawBindableElement>,
         "orbit",
         "end",
         scene,
@@ -492,7 +501,10 @@ class ElementStore {
   };
 
   getElements = () => {
-    return syncInvalidIndices(Array.from(this.excalidrawElements.values()));
+    // programmatically created elements are always non-deleted
+    return syncInvalidIndices(
+      Array.from(this.excalidrawElements.values()),
+    ) as Ordered<NonDeletedExcalidrawElement>[];
   };
 
   getElementsMap = () => {
@@ -691,7 +703,7 @@ export const convertToExcalidrawElements = (
             }
             const { linearElement, startBoundElement, endBoundElement } =
               bindLinearElementToElement(
-                container,
+                container as NonDeleted<ExcalidrawArrowElement>,
                 originalStart,
                 originalEnd,
                 elementStore,
@@ -716,7 +728,7 @@ export const convertToExcalidrawElements = (
               }
               const { linearElement, startBoundElement, endBoundElement } =
                 bindLinearElementToElement(
-                  excalidrawElement as ExcalidrawArrowElement,
+                  excalidrawElement as NonDeleted<ExcalidrawArrowElement>,
                   start,
                   end,
                   elementStore,

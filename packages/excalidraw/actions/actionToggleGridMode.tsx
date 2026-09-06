@@ -6,8 +6,6 @@ import { gridIcon } from "../components/icons";
 
 import { register } from "./register";
 
-import type { AppState } from "../types";
-
 export const actionToggleGridMode = register({
   name: "gridMode",
   icon: gridIcon,
@@ -28,7 +26,7 @@ export const actionToggleGridMode = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  checked: (appState: AppState) => appState.gridModeEnabled,
+  checked: (appState) => appState.gridModeEnabled,
   predicate: (element, appState, props) => {
     return props.gridModeEnabled === undefined;
   },

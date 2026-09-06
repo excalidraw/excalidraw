@@ -13,7 +13,7 @@ import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
 import { cleanAppStateForExport } from "../appState";
 
 import { CanvasError, ImageSceneDataError } from "../errors";
-import { calculateScrollCenter } from "../scene";
+import { getScrollToContentState } from "../scene";
 import { decodeSvgBase64Payload } from "../scene/export";
 
 import { base64ToString, stringToBase64, toByteString } from "./encode";
@@ -27,7 +27,6 @@ import {
 
 import type { AppState, DataURL, LibraryItem } from "../types";
 
-import type { FileSystemHandle } from "browser-fs-access";
 import type { ImportedLibraryData } from "./types";
 
 const parseFileContents = async (blob: Blob | File): Promise<string> => {
@@ -104,7 +103,7 @@ export const getMimeType = (blob: Blob | string): string => {
   return "";
 };
 
-export const getFileHandleType = (handle: FileSystemHandle | null) => {
+export const getFileHandleType = (handle: FileSystemFileHandle | null) => {
   if (!handle) {
     return null;
   }
@@ -118,7 +117,9 @@ export const isImageFileHandleType = (
   return type === "png" || type === "svg";
 };
 
-export const isImageFileHandle = (handle: FileSystemHandle | null) => {
+export const isImageFileHandle = (
+  handle: FileSystemFileHandle | null,
+): handle is FileSystemFileHandle => {
   const type = getFileHandleType(handle);
   return type === "png" || type === "svg";
 };
@@ -139,8 +140,8 @@ export const loadSceneOrLibraryFromBlob = async (
   /** @see restore.localAppState */
   localAppState: AppState | null,
   localElements: readonly ExcalidrawElement[] | null,
-  /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
-  fileHandle?: FileSystemHandle | null,
+  /** FileSystemFileHandle. Defaults to `blob.handle` if defined, otherwise null. */
+  fileHandle?: FileSystemFileHandle | null,
 ) => {
   const contents = await parseFileContents(blob);
   let data;
@@ -170,7 +171,7 @@ export const loadSceneOrLibraryFromBlob = async (
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
               ...(localAppState
-                ? calculateScrollCenter(data.elements || [], localAppState)
+                ? getScrollToContentState(data.elements || [], localAppState)
                 : {}),
             },
             localAppState,
@@ -198,8 +199,8 @@ export const loadFromBlob = async (
   /** @see restore.localAppState */
   localAppState: AppState | null,
   localElements: readonly ExcalidrawElement[] | null,
-  /** FileSystemHandle. Defaults to `blob.handle` if defined, otherwise null. */
-  fileHandle?: FileSystemHandle | null,
+  /** FileSystemFileHandle. Defaults to `blob.handle` if defined, otherwise null. */
+  fileHandle?: FileSystemFileHandle | null,
 ) => {
   const ret = await loadSceneOrLibraryFromBlob(
     blob,
@@ -310,6 +311,48 @@ export const dataURLToString = (dataURL: DataURL) => {
   return base64ToString(dataURL.slice(dataURL.indexOf(",") + 1));
 };
 
+const getImageFileDimensions = async (file: File) => {
+  const browserURL = typeof window !== "undefined" ? window.URL : undefined;
+  let objectURL: string | null = null;
+  let imageSource: string;
+
+  try {
+    imageSource = browserURL?.createObjectURL
+      ? (objectURL = browserURL.createObjectURL(file))
+      : await getDataURL(file);
+  } catch {
+    objectURL = null;
+    imageSource = await getDataURL(file);
+  }
+
+  return new Promise<{ width: number; height: number }>((resolve, reject) => {
+    const image = new Image();
+
+    const cleanup = () => {
+      image.onload = null;
+      image.onerror = null;
+
+      if (objectURL && browserURL?.revokeObjectURL) {
+        browserURL.revokeObjectURL(objectURL);
+      }
+    };
+
+    image.onload = () => {
+      cleanup();
+      resolve({
+        width: image.naturalWidth || image.width,
+        height: image.naturalHeight || image.height,
+      });
+    };
+    image.onerror = (error) => {
+      cleanup();
+      reject(error);
+    };
+
+    image.src = imageSource;
+  });
+};
+
 export const resizeImageFile = async (
   file: File,
   opts: {
@@ -321,6 +364,20 @@ export const resizeImageFile = async (
   // SVG files shouldn't a can't be resized
   if (file.type === MIME_TYPES.svg) {
     return file;
+  }
+
+  if (!isSupportedImageFile(file)) {
+    throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
+  }
+
+  if (!opts.outputType || opts.outputType === file.type) {
+    const dimensions = await getImageFileDimensions(file);
+
+    if (
+      Math.max(dimensions.width, dimensions.height) <= opts.maxWidthOrHeight
+    ) {
+      return file;
+    }
   }
 
   const [pica, imageBlobReduce] = await Promise.all([
@@ -344,10 +401,6 @@ export const resizeImageFile = async (
         return env;
       });
     };
-  }
-
-  if (!isSupportedImageFile(file)) {
-    throw new Error("Error: unsupported file type", { cause: "UNSUPPORTED" });
   }
 
   return new File(
@@ -392,7 +445,7 @@ export const ImageURLToFile = async (
 
 export const getFileHandle = async (
   event: DragEvent | React.DragEvent | DataTransferItem,
-): Promise<FileSystemHandle | null> => {
+): Promise<FileSystemFileHandle | null> => {
   if (nativeFileSystemSupported) {
     try {
       const dataTransferItem =
@@ -400,7 +453,7 @@ export const getFileHandle = async (
           ? event
           : (event as DragEvent).dataTransfer?.items?.[0];
 
-      const handle: FileSystemHandle | null =
+      const handle: FileSystemFileHandle | null =
         (await (dataTransferItem as any).getAsFileSystemHandle()) || null;
 
       return handle;

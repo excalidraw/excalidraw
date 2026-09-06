@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "ਪੇਸਟ ਕਰੋ",
     "pasteAsPlaintext": "ਸਾਦੇ ਪਾਠ ਵਜੋਂ ਪੇਸਟ ਕਰੋ",
     "pasteCharts": "ਚਾਰਟ ਪੇਸਟ ਕਰੋ",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "ਸਾਰੇ ਚੁਣੋ",
     "multiSelect": "ਐਲੀਮੈਂਟ ਨੂੰ ਚੋਣ ਵਿੱਚ ਜੋੜੋ",
     "moveCanvas": "ਕੈਨਵਸ ਹਿਲਾਓ",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "ਡੈਸ਼ ਵਾਲੀ",
     "strokeStyle_dotted": "ਬਿੰਦੀਆਂ ਵਾਲੀ",
     "sloppiness": "ਬੇਤਰਤੀਬੀ",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ਅਪਾਰਦਰਸ਼ਤਾ",
     "textAlign": "ਲਿਖਤ ਇਕਸਾਰਤਾ",
     "edges": "ਕਿਨਾਰੇ",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -95,6 +111,7 @@
     "group": "ਚੋਣ ਦਾ ਗਰੁੱਪ ਬਣਾਓ",
     "ungroup": "ਚੋਣ ਦਾ ਗਰੁੱਪ ਤੋੜੋ",
     "collaborators": "ਸਹਿਯੋਗੀ",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਜੋੜੋ",
     "removeFromLibrary": "ਲਾਇਬ੍ਰੇਰੀ 'ਚੋਂ ਹਟਾਓ",
@@ -171,7 +188,14 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -310,10 +334,16 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -345,6 +375,7 @@
     "freeDraw": "ਕਲਿੱਕ ਕਰਕੇ ਘਸੀਟੋ, ਪੂਰਾ ਹੋਣ 'ਤੇ ਛੱਡ ਦਿਉ",
     "text": "ਨੁਸਖਾ: ਤੁਸੀਂ ਚੋਣਕਾਰ ਸੰਦ ਰਾਹੀਂ ਕਿਤੇ ਵੀ ਡਬਲ-ਕਲਿੱਕ ਕਰਕੇ ਵੀ ਪਾਠ ਜੋੜ ਸਕਦੇ ਹੋ",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "ਗਲਤੀ"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "ਡਿਸਕ ਵਿੱਚ ਸਾਂਭੋ",
@@ -576,7 +612,11 @@
     "colors": "ਰੰਗ",
     "shades": "ਸ਼ੇਡਾਂ",
     "hexCode": "ਹੈਕਸ ਕੋਡ",
-    "noShades": "ਇਸ ਰੰਗ ਦੀ ਕੋਈ ਸ਼ੇਡ ਉਪਲਬਧ ਨਹੀਂ ਹੈ"
+    "noShades": "ਇਸ ਰੰਗ ਦੀ ਕੋਈ ਸ਼ੇਡ ਉਪਲਬਧ ਨਹੀਂ ਹੈ",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -616,7 +656,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

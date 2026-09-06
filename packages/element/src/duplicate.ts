@@ -38,10 +38,13 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 
 import { fixDuplicatedBindingsAfterDuplication } from "./binding";
 
+import { isNonDeletedElement } from ".";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
   GroupId,
+  NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "./types";
 
@@ -111,6 +114,9 @@ export const duplicateElements = (
          * user interaction.
          */
         type: "everything";
+        // TODO remove/review this once we add frame children order migration
+        // and invariant checks
+        preserveFrameChildrenOrder?: boolean;
       }
     | {
         /**
@@ -154,7 +160,7 @@ export const duplicateElements = (
   // loop over them.
   const processedIds = new Map<ExcalidrawElement["id"], true>();
   const groupIdMap = new Map();
-  const duplicatedElements: ExcalidrawElement[] = [];
+  const duplicatedElements: NonDeletedExcalidrawElement[] = [];
   const origElements: ExcalidrawElement[] = [];
   const origIdToDuplicateId = new Map<
     ExcalidrawElement["id"],
@@ -164,12 +170,14 @@ export const duplicateElements = (
     ExcalidrawElement["id"],
     ExcalidrawElement
   >();
-  const duplicateElementsMap = new Map<string, ExcalidrawElement>();
+  const duplicateElementsMap = new Map<string, NonDeletedExcalidrawElement>();
   const elementsMap = arrayToMap(elements) as ElementsMap;
   const _idsOfElementsToDuplicate =
     opts.type === "in-place"
       ? opts.idsOfElementsToDuplicate
       : new Map(elements.map((el) => [el.id, el]));
+  const preserveFrameChildrenOrder =
+    opts.type === "everything" && opts.preserveFrameChildrenOrder;
 
   // For sanity
   if (opts.type === "in-place") {
@@ -204,12 +212,20 @@ export const duplicateElements = (
 
         processedIds.set(element.id, true);
 
+        // SAFETY: this should never happen, but we
+        // want to make sure we log it if it does
+        if (!isNonDeletedElement(element)) {
+          console.error(
+            "[NONDELETED][INVARIANT] Element to duplicate should be non-deleted",
+          );
+        }
+
         const newElement = duplicateElement(
           appState.editingGroupId,
           groupIdMap,
           element,
           opts.randomizeSeed,
-        );
+        ) as NonDeletedExcalidrawElement;
 
         processedIds.set(newElement.id, true);
 
@@ -250,6 +266,9 @@ export const duplicateElements = (
     elementsWithDuplicates.splice(index + 1, 0, ...castArray(elements));
   };
 
+  // main
+  // ---------------------------------------------------------------------------
+
   const frameIdsToDuplicate = new Set(
     elements
       .filter(
@@ -274,7 +293,7 @@ export const duplicateElements = (
     if (groupId) {
       const groupElements = getElementsInGroup(elements, groupId).flatMap(
         (element) =>
-          isFrameLikeElement(element)
+          isFrameLikeElement(element) && !preserveFrameChildrenOrder
             ? [...getFrameChildren(elements, element.id), element]
             : [element],
       );
@@ -290,12 +309,24 @@ export const duplicateElements = (
     // frame duplication
     // -------------------------------------------------------------------------
 
-    if (element.frameId && frameIdsToDuplicate.has(element.frameId)) {
+    if (
+      !preserveFrameChildrenOrder &&
+      element.frameId &&
+      frameIdsToDuplicate.has(element.frameId)
+    ) {
       continue;
     }
 
     if (isFrameLikeElement(element)) {
       const frameId = element.id;
+
+      if (preserveFrameChildrenOrder) {
+        insertBeforeOrAfterIndex(
+          findLastIndex(elementsWithDuplicates, (el) => el.id === frameId),
+          copyElements(element),
+        );
+        continue;
+      }
 
       const frameChildren = getFrameChildren(elements, frameId);
 

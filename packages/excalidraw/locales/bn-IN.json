@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "পেস্ট করুন",
     "pasteAsPlaintext": "প্লেইনটেক্সট হিসাবে পেস্ট করুন",
     "pasteCharts": "চার্ট পেস্ট করুন",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "সবটা সিলেক্ট করুন",
     "multiSelect": "একাধিক সিলেক্ট করুন",
     "moveCanvas": "ক্যানভাস সরান",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "পাতলা",
     "strokeStyle_dotted": "বিন্দুবিন্দু",
     "sloppiness": "ভ্রান্তি",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "দৃশ্যমানতা",
     "textAlign": "লেখ অনুভূমি",
     "edges": "কোণ",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -95,6 +111,7 @@
     "group": "দল গঠন করুন",
     "ungroup": "দল বিভেদ করুন",
     "collaborators": "সহযোগী",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "সংগ্রহে যোগ করুন",
     "removeFromLibrary": "সংগ্রহ থেকে বের করুন",
@@ -171,7 +188,14 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -310,10 +334,16 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -345,6 +375,7 @@
     "freeDraw": "ক্লিক করুন এবং টেনে আনুন, আপনার কাজ শেষ হলে ছেড়ে দিন",
     "text": "বিশেষ্য: আপনি নির্বাচন টুলের সাথে যে কোনো জায়গায় ডাবল-ক্লিক করে পাঠ্য যোগ করতে পারেন",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "ত্রুটি"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "",
@@ -576,7 +612,11 @@
     "colors": "",
     "shades": "",
     "hexCode": "",
-    "noShades": ""
+    "noShades": "",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -616,7 +656,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

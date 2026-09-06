@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Lim inn",
     "pasteAsPlaintext": "Lim inn som klartekst",
     "pasteCharts": "Lim inn diagrammer",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Velg alt",
     "multiSelect": "Legg til element i utvalg",
     "moveCanvas": "Flytt lerretet",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "Stiplet",
     "strokeStyle_dotted": "Prikket",
     "sloppiness": "Ujevnhet",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Synlighet",
     "textAlign": "Tekstjustering",
     "edges": "Kanter",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "Kråkefot (mange)",
     "arrowhead_crowfoot_one": "Kråkefot (én)",
     "arrowhead_crowfoot_one_or_many": "Kråkefot (én eller mange)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Flere alternativer",
+    "cardinality": "",
     "arrowtypes": "Type pil",
     "arrowtype_sharp": "Skarp pil",
     "arrowtype_round": "Buet pil",
@@ -95,6 +111,7 @@
     "group": "Gruppér utvalg",
     "ungroup": "Avgruppér utvalg",
     "collaborators": "Samarbeidspartnere",
+    "you": "",
     "toggleGrid": "Vis/skjul rutenett",
     "addToLibrary": "Legg til i bibliotek",
     "removeFromLibrary": "Fjern fra bibliotek",
@@ -171,7 +188,14 @@
     "linkToElement": "Lenke til objekt",
     "wrapSelectionInFrame": "Brekk om utvalg i ramme",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Lenke til objekt",
@@ -310,10 +334,16 @@
     "magicframe": "Wireframe til kode",
     "embeddable": "Nettinnbygging",
     "laser": "Laserpeker",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Hånd (panoreringsverktøy)",
     "extraTools": "Flere verktøy",
     "mermaidToExcalidraw": "Mermaid til Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rektangel",
@@ -345,6 +375,7 @@
     "freeDraw": "Klikk og dra, slipp når du er ferdig",
     "text": "Tips: du kan også legge til tekst ved å dobbeltklikke hvor som helst med utvalgsverktøyet",
     "embeddable": "Klikk og dra for å opprette en nettside innebygd",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Feil"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Lagre til disk",
@@ -576,7 +612,11 @@
     "colors": "Farger",
     "shades": "Toner",
     "hexCode": "Heksadesimal kode",
-    "noShades": "Ingen toner tilgjengelig for denne fargen"
+    "noShades": "Ingen toner tilgjengelig for denne fargen",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -612,11 +652,12 @@
   "mermaid": {
     "title": "Mermaid til Excalidraw",
     "button": "Sett inn",
-    "description": "Foreløpig er bare <flowchartLink>Flowchart</flowchartLink>-,<sequenceLink> Sequence</sequenceLink>- og <classLink>klasse </classLink>-diagrammer støttet. De andre typene vil bli gjengitt som bilde i Excalidraw.",
+    "description": "",
     "syntax": "Mermaid-syntaks",
     "preview": "Forhåndsvisning",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

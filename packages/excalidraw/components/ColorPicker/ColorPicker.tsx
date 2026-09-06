@@ -1,21 +1,25 @@
 import { Popover } from "radix-ui";
 import clsx from "clsx";
-import { useRef, useEffect } from "react";
+import { memo, useRef, useEffect } from "react";
 
 import {
+  applyDarkModeFilter,
   COLOR_OUTLINE_CONTRAST_THRESHOLD,
   COLOR_PALETTE,
+  DEFAULT_ELEMENT_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_STROKE_PICKS,
   isColorDark,
   isWritableElement,
+  THEME,
 } from "@excalidraw/common";
 
 import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
 import { useAtom } from "../../editor-jotai";
 import { t } from "../../i18n";
-import { useExcalidrawContainer, useStylesPanelMode } from "../App";
+import { useApp, useExcalidrawContainer, useStylesPanelMode } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import { activeEyeDropperAtom } from "../EyeDropper";
 import { PropertiesPopover } from "../PropertiesPopover";
@@ -31,12 +35,17 @@ import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
 import { TopPicks } from "./TopPicks";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import {
+  ColorPickerDnDContext,
+  useColorPickerDnD,
+  useTopPicksDnD,
+} from "./topPicksDnD";
 
 import "./ColorPicker.scss";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
-import type { AppState } from "../../types";
+import type { AppState, UIAppState } from "../../types";
 
 interface ColorPickerProps {
   type: ColorPickerType;
@@ -48,10 +57,16 @@ interface ColorPickerProps {
   onChange: (color: string) => void;
   label: string;
   elements: readonly ExcalidrawElement[];
-  appState: AppState;
+  appState: UIAppState;
   palette?: ColorPaletteCustom | null;
   topPicks?: ColorTuple;
   updateData: (formData?: any) => void;
+  /** palette colors to hide from the popup, keeping hotkey positions */
+  excludedColors?: readonly string[];
+  /** allow users to customize the top picks strip by drag & dropping colors
+   * from the picker popup onto it. The value names the
+   * `appState.colorTopPicks` slot the customization is stored in */
+  customizableTopPicks?: keyof AppState["colorTopPicks"];
 }
 
 const ColorPickerPopupContent = ({
@@ -64,6 +79,7 @@ const ColorPickerPopupContent = ({
   updateData,
   getOpenPopup,
   appState,
+  excludedColors,
 }: Pick<
   ColorPickerProps,
   | "type"
@@ -74,10 +90,12 @@ const ColorPickerPopupContent = ({
   | "palette"
   | "updateData"
   | "appState"
+  | "excludedColors"
 > & {
   getOpenPopup: () => AppState["openPopup"];
 }) => {
   const { container } = useExcalidrawContainer();
+  const app = useApp();
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
@@ -113,9 +131,33 @@ const ColorPickerPopupContent = ({
       // Improve focus handling for text editing scenarios
       preventAutoFocusOnTouch={!!appState.editingTextElement}
       onFocusOutside={(event) => {
+        const target = event.target;
+        // focus moving into the top-picks context menu — let the menu keep
+        // it (stealing it back would clear the menu's focus-driven
+        // `data-highlighted` styling and break its keyboard navigation)
+        if (
+          target instanceof app.ownerWindow.HTMLElement &&
+          target.closest(".color-picker__context-menu")
+        ) {
+          event.preventDefault();
+          return;
+        }
         // refocus due to eye dropper
         if (!isWritableElement(event.target)) {
-          focusPickerContent();
+          if (
+            target instanceof app.ownerWindow.HTMLElement &&
+            target.matches(":active")
+          ) {
+            // the focus escaped because a button outside is being pressed
+            // (e.g. a top pick) — stealing focus mid-press makes the browser
+            // drop the button's activation (`:active` styling), so wait for
+            // the release
+            app.ownerWindow.addEventListener("pointerup", focusPickerContent, {
+              once: true,
+            });
+          } else {
+            focusPickerContent();
+          }
         }
         event.preventDefault();
       }}
@@ -136,8 +178,8 @@ const ColorPickerPopupContent = ({
 
         // Refocus text editor when popover closes if we were editing text
         if (appState.editingTextElement) {
-          setTimeout(() => {
-            const textEditor = document.querySelector(
+          app.ownerWindow.setTimeout(() => {
+            const textEditor = app.ownerDocument.querySelector(
               ".excalidraw-wysiwyg",
             ) as HTMLTextAreaElement;
             if (textEditor) {
@@ -151,18 +193,20 @@ const ColorPickerPopupContent = ({
         <Picker
           ref={colorPickerContentRef}
           palette={palette}
+          excludedColors={excludedColors}
           color={color}
+          theme={appState.theme}
           onChange={(changedColor) => {
             // Save caret position before color change if editing text
             const savedSelection = appState.editingTextElement
-              ? saveCaretPosition()
+              ? saveCaretPosition(app.ownerDocument)
               : null;
 
             onChange(changedColor);
 
             // Restore caret position after color change if editing text
             if (appState.editingTextElement && savedSelection) {
-              restoreCaretPosition(savedSelection);
+              restoreCaretPosition(savedSelection, app.ownerDocument);
             }
           }}
           onEyeDropperToggle={(force) => {
@@ -209,10 +253,18 @@ const ColorPickerPopupContent = ({
   );
 };
 
+const isColorPickerPopup = (
+  popup: AppState["openPopup"],
+): popup is ColorPickerType =>
+  popup === "elementStroke" ||
+  popup === "elementBackground" ||
+  popup === "canvasBackground";
+
 const ColorPickerTrigger = ({
   label,
   color,
   type,
+  theme,
   mode = "background",
   onToggle,
   editingTextElement,
@@ -220,13 +272,19 @@ const ColorPickerTrigger = ({
   color: string | null;
   label: string;
   type: ColorPickerType;
+  theme: Theme;
   mode?: "background" | "stroke";
   onToggle: () => void;
   editingTextElement?: boolean;
 }) => {
+  const app = useApp();
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
+  const dnd = useColorPickerDnD();
+  const displayColor = color
+    ? applyDarkModeFilter(color, theme === THEME.DARK)
+    : null;
   const handleClick = (e: React.MouseEvent) => {
     // use pointerdown so we run before outside-close logic
     e.preventDefault();
@@ -234,7 +292,7 @@ const ColorPickerTrigger = ({
 
     // If editing text, temporarily disable the wysiwyg blur event
     if (editingTextElement) {
-      temporarilyDisableTextEditorBlur();
+      temporarilyDisableTextEditorBlur(app.ownerDocument);
     }
 
     onToggle();
@@ -251,7 +309,7 @@ const ColorPickerTrigger = ({
         "mobile-border": isMobileMode,
       })}
       aria-label={label}
-      style={color ? { "--swatch-color": color } : undefined}
+      style={displayColor ? { "--swatch-color": displayColor } : undefined}
       title={
         type === "elementStroke"
           ? t("labels.showStroke")
@@ -259,6 +317,11 @@ const ColorPickerTrigger = ({
       }
       data-openpopup={type}
       onClick={handleClick}
+      // the active-color swatch can be dragged onto the top-picks strip to
+      // pin the current (possibly custom) color
+      onPointerDown={
+        dnd ? (event) => dnd.startSwatchDrag(event, color) : undefined
+      }
     >
       <div className="color-picker__button-outline">{!color && slashIcon}</div>
       {isCompactMode && color && mode === "stroke" && (
@@ -266,7 +329,8 @@ const ColorPickerTrigger = ({
           <span
             style={{
               color:
-                color && isColorDark(color, COLOR_OUTLINE_CONTRAST_THRESHOLD)
+                displayColor &&
+                isColorDark(displayColor, COLOR_OUTLINE_CONTRAST_THRESHOLD)
                   ? "#fff"
                   : "#111",
             }}
@@ -279,7 +343,7 @@ const ColorPickerTrigger = ({
   );
 };
 
-export const ColorPicker = ({
+const ColorPickerComponent = ({
   type,
   color,
   onChange,
@@ -289,6 +353,8 @@ export const ColorPicker = ({
   topPicks,
   updateData,
   appState,
+  excludedColors,
+  customizableTopPicks,
 }: ColorPickerProps) => {
   const openRef = useRef(appState.openPopup);
   useEffect(() => {
@@ -297,8 +363,43 @@ export const ColorPicker = ({
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
 
+  const isTopPicksCustomizable = !!customizableTopPicks && !isCompactMode;
+
+  // user-pinned picks trump the (host-provided or default) baseline
+  const customTopPicks =
+    isTopPicksCustomizable && customizableTopPicks
+      ? appState.colorTopPicks?.[customizableTopPicks]
+      : null;
+
+  // fully-resolved picks currently displayed in the strip — the baseline the
+  // drag & drop customization starts from
+  const effectiveTopPicks = customTopPicks?.length
+    ? customTopPicks
+    : topPicks ??
+      (type === "elementStroke"
+        ? DEFAULT_ELEMENT_STROKE_PICKS
+        : DEFAULT_ELEMENT_BACKGROUND_PICKS);
+
+  const dnd = useTopPicksDnD({
+    enabled: isTopPicksCustomizable,
+    picks: effectiveTopPicks,
+    onPicksChange: (picks) => {
+      if (!customizableTopPicks) {
+        return;
+      }
+      // NOTE the comparator comparing `appState.colorTopPicks` is what keeps
+      // this captured spread fresh — see `areColorPickerPropsEqual`
+      updateData({
+        colorTopPicks: {
+          ...appState.colorTopPicks,
+          [customizableTopPicks]: picks,
+        },
+      });
+    },
+  });
+
   return (
-    <div>
+    <ColorPickerDnDContext.Provider value={isTopPicksCustomizable ? dnd : null}>
       <div
         role="dialog"
         aria-modal="true"
@@ -308,10 +409,37 @@ export const ColorPicker = ({
       >
         {!isCompactMode && (
           <TopPicks
+            theme={appState.theme}
             activeColor={color}
-            onChange={onChange}
+            onChange={(pickedColor) => {
+              onChange(pickedColor);
+              // if another color-picker popup is open, follow the user's
+              // focus over to this picker (same as clicking its trigger)
+              if (
+                isColorPickerPopup(appState.openPopup) &&
+                appState.openPopup !== type
+              ) {
+                // deferred: each updateData spreads the full pre-commit
+                // appState, so issuing this in the same task would clobber
+                // the color change committed by `onChange` above
+                setTimeout(() => updateData({ openPopup: type }), 0);
+              }
+            }}
             type={type}
-            topPicks={topPicks}
+            topPicks={customTopPicks?.length ? customTopPicks : topPicks}
+            isCustomized={!!customTopPicks?.length}
+            onReset={
+              isTopPicksCustomizable && customizableTopPicks
+                ? () => {
+                    updateData({
+                      colorTopPicks: {
+                        ...appState.colorTopPicks,
+                        [customizableTopPicks]: null,
+                      },
+                    });
+                  }
+                : undefined
+            }
           />
         )}
         {!isCompactMode && <ButtonSeparator />}
@@ -328,6 +456,7 @@ export const ColorPicker = ({
             color={color}
             label={label}
             type={type}
+            theme={appState.theme}
             mode={type === "elementStroke" ? "stroke" : "background"}
             editingTextElement={!!appState.editingTextElement}
             onToggle={() => {
@@ -352,6 +481,7 @@ export const ColorPicker = ({
               label={label}
               elements={elements}
               palette={palette}
+              excludedColors={excludedColors}
               updateData={updateData}
               getOpenPopup={() => openRef.current}
               appState={appState}
@@ -359,6 +489,51 @@ export const ColorPicker = ({
           )}
         </Popover.Root>
       </div>
-    </div>
+    </ColorPickerDnDContext.Provider>
   );
 };
+
+/**
+ * ColorPicker renders on every styles-panel render (selection churn during
+ * box-select and the like), while its actual inputs are a handful of resolved
+ * primitives and reference-stable objects — cheap `===` checks, no deep
+ * comparisons:
+ * - `palette` / `topPicks` / `excludedColors` are module constants,
+ * - `appState.colorTopPicks` identity changes exactly when its content does.
+ *
+ * Function props (`onChange`, `updateData`) are deliberately ignored — they
+ * are recreated every render but semantically stable (they read fresh state
+ * at call time). Same for `elements`, which is only sampled once when the
+ * popup opens (most-used custom colors).
+ */
+const areColorPickerPropsEqual = (
+  prev: ColorPickerProps,
+  next: ColorPickerProps,
+) => {
+  // the open popup is interactive (hotkeys, eye dropper, most-used custom
+  // colors) — never memoize it, including the open/close transitions
+  if (
+    prev.appState.openPopup === prev.type ||
+    next.appState.openPopup === next.type
+  ) {
+    return false;
+  }
+  return (
+    prev.type === next.type &&
+    prev.color === next.color &&
+    prev.label === next.label &&
+    // popup open/close is rare, and the strip's click handler branches on
+    // which popup is open (popup-switching) — keep its closure fresh
+    prev.appState.openPopup === next.appState.openPopup &&
+    prev.palette === next.palette &&
+    prev.topPicks === next.topPicks &&
+    prev.excludedColors === next.excludedColors &&
+    prev.customizableTopPicks === next.customizableTopPicks &&
+    prev.appState.theme === next.appState.theme &&
+    prev.appState.colorTopPicks === next.appState.colorTopPicks &&
+    // the trigger tweaks its click behavior while a text element is edited
+    !!prev.appState.editingTextElement === !!next.appState.editingTextElement
+  );
+};
+
+export const ColorPicker = memo(ColorPickerComponent, areColorPickerPropsEqual);

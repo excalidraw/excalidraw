@@ -5,6 +5,7 @@ import {
   VERTICAL_ALIGN,
   arrayToMap,
   getFontString,
+  getStrokeWidthByKey,
 } from "@excalidraw/common";
 import {
   getOriginalContainerHeightFromCache,
@@ -14,6 +15,7 @@ import {
 } from "@excalidraw/element";
 
 import {
+  DEFAULT_BOUND_TEXT_LABEL_POSITION,
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
   getBoundTextElement,
@@ -87,6 +89,7 @@ export const actionUnbindText = register({
           text: boundTextElement.originalText,
           x,
           y,
+          labelPosition: null,
         });
         app.scene.mutateElement(element, {
           boundElements: element.boundElements?.filter(
@@ -159,6 +162,9 @@ export const actionBindText = register({
       textAlign: TEXT_ALIGN.CENTER,
       autoResize: true,
       angle: (isArrowElement(container) ? 0 : container?.angle ?? 0) as Radians,
+      labelPosition: isArrowElement(container)
+        ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+        : null,
     });
     app.scene.mutateElement(container, {
       boundElements: (container.boundElements || []).concat({
@@ -249,7 +255,10 @@ export const actionWrapTextInContainer = register({
           fillStyle: appState.currentItemFillStyle,
           strokeColor: appState.currentItemStrokeColor,
           roughness: appState.currentItemRoughness,
-          strokeWidth: appState.currentItemStrokeWidth,
+          strokeWidth: getStrokeWidthByKey(
+            "rectangle",
+            appState.currentItemStrokeWidthKey,
+          ),
           strokeStyle: appState.currentItemStrokeStyle,
           roundness:
             appState.currentItemRoundness === "round"

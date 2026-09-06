@@ -7,7 +7,11 @@ import { deepCopyElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ElementsMap,
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import type { Scene } from "@excalidraw/element";
 
@@ -23,7 +27,7 @@ import type { AppState } from "../../types";
 
 export type DragInputCallbackType<
   P extends StatsInputProperty,
-  E = ExcalidrawElement,
+  E = NonDeletedExcalidrawElement,
 > = (props: {
   accumulatedChange: number;
   instantChange: number;
@@ -84,6 +88,8 @@ const StatsDragInput = <
   dragFinishedCallback,
 }: StatsDragInputProps<T, E>) => {
   const app = useApp();
+  const ownerDocument = app.ownerDocument;
+  const ownerWindow = app.ownerWindow;
   const setAppState = useExcalidrawSetAppState();
   const inputRef = useRef<HTMLInputElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -185,12 +191,12 @@ const StatsDragInput = <
       // generally not needed, but in case `pointerup` doesn't fire and
       // we don't remove the listeners that way, we should at least remove
       // on unmount
-      window.removeEventListener(
+      ownerWindow.removeEventListener(
         EVENT.POINTER_MOVE,
         callbacks.onPointerMove!,
         false,
       );
-      window.removeEventListener(
+      ownerWindow.removeEventListener(
         EVENT.POINTER_UP,
         callbacks.onPointerUp!,
         false,
@@ -204,6 +210,7 @@ const StatsDragInput = <
     // to an element that has a given property as non-editable would not trigger
     // blur/unmount and wouldn't update the value.
     editable,
+    ownerWindow,
   ]);
 
   if (!editable) {
@@ -220,7 +227,7 @@ const StatsDragInput = <
         ref={labelRef}
         onPointerDown={(event) => {
           if (inputRef.current && editable) {
-            document.body.classList.add("excalidraw-cursor-resize");
+            ownerDocument.body.classList.add("excalidraw-cursor-resize");
 
             let startValue = Number(inputRef.current.value);
             if (isNaN(startValue)) {
@@ -293,7 +300,7 @@ const StatsDragInput = <
             };
 
             const onPointerUp = () => {
-              window.removeEventListener(
+              ownerWindow.removeEventListener(
                 EVENT.POINTER_MOVE,
                 onPointerMove,
                 false,
@@ -317,16 +324,24 @@ const StatsDragInput = <
               originalElements = null;
               originalElementsMap = null;
 
-              document.body.classList.remove("excalidraw-cursor-resize");
+              ownerDocument.body.classList.remove("excalidraw-cursor-resize");
 
-              window.removeEventListener(EVENT.POINTER_UP, onPointerUp, false);
+              ownerWindow.removeEventListener(
+                EVENT.POINTER_UP,
+                onPointerUp,
+                false,
+              );
             };
 
             callbacksRef.current.onPointerMove = onPointerMove;
             callbacksRef.current.onPointerUp = onPointerUp;
 
-            window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, false);
-            window.addEventListener(EVENT.POINTER_UP, onPointerUp, false);
+            ownerWindow.addEventListener(
+              EVENT.POINTER_MOVE,
+              onPointerMove,
+              false,
+            );
+            ownerWindow.addEventListener(EVENT.POINTER_UP, onPointerUp, false);
           }
         }}
         onPointerEnter={() => {
@@ -343,9 +358,9 @@ const StatsDragInput = <
         spellCheck="false"
         onKeyDown={(event) => {
           if (editable) {
-            const eventTarget = event.target;
+            const eventTarget = event.currentTarget;
             if (
-              eventTarget instanceof HTMLInputElement &&
+              eventTarget instanceof ownerWindow.HTMLInputElement &&
               event.key === KEYS.ENTER
             ) {
               handleInputValue(eventTarget.value, elements, appState);

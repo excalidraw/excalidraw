@@ -2,7 +2,7 @@
 
 .excalidraw {
   .dropdown-menu {
-    max-width: 16rem;
+    max-width: 20rem;
     z-index: 1;
 
     &--placement-top {
@@ -179,6 +179,21 @@
       &:active {
         background-color: var(--button-hover-bg);
         box-shadow: 0 0 0 1px var(--color-brand-active);
+      }
+
+      &[disabled] {
+        cursor: not-allowed;
+        opacity: 0.5;
+        pointer-events: none;
+
+        &:hover {
+          background-color: transparent;
+        }
+
+        &:active {
+          background-color: transparent;
+          box-shadow: none;
+        }
       }
 
       svg {

@@ -3,6 +3,25 @@ import React from "react";
 import { vi } from "vitest";
 
 import type { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
+import type { throttleRAF as throttleRAFType } from "@excalidraw/common";
+
+type ThrottledFn<T extends unknown[]> = ((...args: T) => void) & {
+  flush: () => void;
+  cancel: () => void;
+};
+
+export const mockThrottleRAF: typeof throttleRAFType = <T extends unknown[]>(
+  fn: (...args: T) => void,
+) => {
+  const ret = ((...args: T) => {
+    fn(...args);
+  }) as ThrottledFn<T>;
+
+  ret.flush = () => {};
+  ret.cancel = () => {};
+
+  return ret;
+};
 
 export const mockMermaidToExcalidraw = (opts: {
   parseMermaidToExcalidraw: typeof parseMermaidToExcalidraw;

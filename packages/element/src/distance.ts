@@ -48,7 +48,7 @@ export const distanceToElement = (
     case "line":
     case "arrow":
     case "freedraw":
-      return distanceToLinearOrFreeDraElement(element, p);
+      return distanceToLinearOrFreeDraElement(element, elementsMap, p);
   }
 };
 
@@ -75,9 +75,7 @@ const distanceToRectanguloidElement = (
 
   return Math.min(
     ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
-    ...corners
-      .map((a) => curvePointDistance(a, rotatedPoint))
-      .filter((d): d is number => d !== null),
+    ...corners.map((a) => curvePointDistance(a, rotatedPoint)),
   );
 };
 
@@ -104,9 +102,7 @@ const distanceToDiamondElement = (
 
   return Math.min(
     ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
-    ...curves
-      .map((a) => curvePointDistance(a, rotatedPoint))
-      .filter((d): d is number => d !== null),
+    ...curves.map((a) => curvePointDistance(a, rotatedPoint)),
   );
 };
 
@@ -133,9 +129,13 @@ const distanceToEllipseElement = (
 
 const distanceToLinearOrFreeDraElement = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ) => {
-  const [lines, curves] = deconstructLinearOrFreeDrawElement(element);
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
   return Math.min(
     ...lines.map((s) => distanceToLineSegment(p, s)),
     ...curves.map((a) => curvePointDistance(a, p)),

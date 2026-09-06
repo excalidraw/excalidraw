@@ -23,7 +23,7 @@ export const actionGoToCollaborator = register<Collaborator>({
   label: "Go to a collaborator",
   viewMode: true,
   trackEvent: { category: "collab" },
-  perform: (_elements, appState, collaborator) => {
+  perform: (_elements, appState, collaborator, app) => {
     invariant(
       collaborator,
       "actionGoToCollaborator: collaborator should be defined when actionGoToCollaborator is called",
@@ -31,25 +31,27 @@ export const actionGoToCollaborator = register<Collaborator>({
 
     if (
       !collaborator.socketId ||
-      appState.userToFollow?.socketId === collaborator.socketId ||
+      app.props.userToFollow?.socketId === collaborator.socketId ||
       collaborator.isCurrentUser
     ) {
+      app.requestUnfollow();
       return {
-        appState: {
-          ...appState,
-          userToFollow: null,
-        },
+        appState,
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
       };
     }
 
+    app.emitUserFollowIntent({
+      userToFollow: {
+        socketId: collaborator.socketId,
+        username: collaborator.username || "",
+      },
+      action: "FOLLOW",
+    });
+
     return {
       appState: {
         ...appState,
-        userToFollow: {
-          socketId: collaborator.socketId,
-          username: collaborator.username || "",
-        },
         // Close mobile menu
         openMenu: appState.openMenu === "canvas" ? null : appState.openMenu,
       },
@@ -96,7 +98,11 @@ export const actionGoToCollaborator = register<Collaborator>({
       <div
         className={`dropdown-menu-item dropdown-menu-item-base UserList__collaborator ${statusClassNames}`}
         style={{ [`--avatar-size` as any]: "1.5rem" }}
-        onClick={() => updateData<Collaborator>(collaborator)}
+        onClick={
+          collaborator.isCurrentUser
+            ? undefined
+            : () => updateData<Collaborator>(collaborator)
+        }
       >
         <Avatar
           color={background}
@@ -117,6 +123,7 @@ export const actionGoToCollaborator = register<Collaborator>({
               {eyeIcon}
             </div>
           )}
+          {collaborator.isCurrentUser && ` (${t("labels.you")})`}
           {statusIconJSX}
         </div>
       </div>

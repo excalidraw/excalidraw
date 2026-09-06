@@ -1,7 +1,10 @@
 import { queryByText } from "@testing-library/react";
 
 import { pointFrom } from "@excalidraw/math";
-import { getOriginalContainerHeightFromCache } from "@excalidraw/element";
+import {
+  getLineHeightInPx,
+  getOriginalContainerHeightFromCache,
+} from "@excalidraw/element";
 
 import {
   CODES,
@@ -17,6 +20,7 @@ import {
 import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
@@ -36,11 +40,36 @@ import {
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
 import { actionBindText } from "../actions";
+import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+
+const { h } = window;
 
 unmountComponent();
 
 const tab = "    ";
 const mouse = new Pointer("mouse");
+
+const exitTextEditorAndAssertSelection = async ({
+  editor,
+  selectedIds,
+  nextText,
+}: {
+  editor: HTMLTextAreaElement;
+  selectedIds: string[];
+  nextText?: string;
+}) => {
+  if (nextText !== undefined) {
+    updateTextEditor(editor, nextText);
+  }
+
+  Keyboard.exitTextEditor(editor);
+
+  expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+  expect(window.h.state.editingTextElement).toBeNull();
+  expect(API.getSelectedElements().map((element) => element.id)).toEqual(
+    selectedIds,
+  );
+};
 
 describe("textWysiwyg", () => {
   describe("start text editing", () => {
@@ -210,6 +239,42 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(1);
     });
 
+    it("should vertically center newly created text on the cursor when clicked with text tool", async () => {
+      API.setAppState({
+        currentItemFontFamily: FONT_FAMILY.Cascadia,
+        currentItemFontSize: 40,
+      });
+      UI.clickTool("text");
+
+      mouse.clickAt(120, 80);
+
+      const editor = await getTextEditor();
+      const text = h.elements[0] as ExcalidrawTextElement;
+      const lineHeightPx = getLineHeightInPx(text.fontSize, text.lineHeight);
+
+      expect(editor).not.toBe(null);
+      expect(text.y + lineHeightPx / 2).toBe(80);
+    });
+
+    it("should snap newly created text top-left to the current grid cell when clicked with text tool in grid mode", async () => {
+      API.setAppState({
+        currentItemFontFamily: FONT_FAMILY.Cascadia,
+        currentItemFontSize: 40,
+        gridModeEnabled: true,
+        gridSize: 24,
+      });
+      UI.clickTool("text");
+
+      mouse.clickAt(113, 86);
+
+      const editor = await getTextEditor();
+      const text = h.elements[0] as ExcalidrawTextElement;
+
+      expect(editor).not.toBe(null);
+      expect(text.x).toBe(96);
+      expect(text.y).toBe(72);
+    });
+
     it("should edit text under cursor when double-clicked with selection tool", async () => {
       const text = API.createElement({
         type: "text",
@@ -230,6 +295,94 @@ describe("textWysiwyg", () => {
       expect(editor).not.toBe(null);
       expect(h.state.editingTextElement?.id).toBe(text.id);
       expect(h.elements.length).toBe(1);
+    });
+
+    it("should reselect text after exiting wysiwyg with escape", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "ola",
+        x: 60,
+        y: 0,
+        width: 100,
+        height: 100,
+      });
+
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+      UI.clickTool("selection");
+
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = await getTextEditor();
+
+      expect(editor).not.toBe(null);
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+
+      await exitTextEditorAndAssertSelection({
+        editor,
+        selectedIds: [text.id],
+      });
+    });
+
+    it("should edit selected bound text on single click", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        width: 160,
+        height: 70,
+        boundElements: [],
+      });
+      const text = API.createElement({
+        type: "text",
+        text: "Hello World!",
+        x: container.x + 20,
+        y: container.y + 20,
+        width: 120,
+        height: 25,
+        containerId: container.id,
+      });
+
+      API.setElements([container, text]);
+      API.updateElement(container, {
+        boundElements: [{ type: "text", id: text.id }],
+      });
+      API.setSelectedElements([container]);
+      UI.clickTool("selection");
+
+      mouse.clickAt(text.x + 26, text.y + 10);
+
+      const editor = await getTextEditor();
+
+      expect(editor).not.toBe(null);
+    });
+
+    it("should not edit selected bound text container when only the container was single-clicked", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        width: 160,
+        height: 70,
+        boundElements: [],
+      });
+      const text = API.createElement({
+        type: "text",
+        text: "Hello World!",
+        x: container.x + 20,
+        y: container.y + 20,
+        width: 120,
+        height: 25,
+        containerId: container.id,
+      });
+
+      API.setElements([container, text]);
+      API.updateElement(container, {
+        boundElements: [{ type: "text", id: text.id }],
+      });
+      API.setSelectedElements([container]);
+      UI.clickTool("selection");
+
+      mouse.clickAt(container.x + 5, container.y + 10);
+
+      expect(h.state.editingTextElement).toBe(null);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
     });
 
     // FIXME too flaky. No one knows why.
@@ -620,6 +773,63 @@ describe("textWysiwyg", () => {
       ]);
     });
 
+    it("should not add bound text to a frame when its container is not a frame child", async () => {
+      const frame = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "red",
+      });
+      API.setElements([frame, rectangle]);
+
+      mouse.doubleClickAt(rectangle.x + 10, rectangle.y + 10);
+
+      const text = h.elements[2] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      expect(text.frameId).toBe(null);
+    });
+
+    it("should bind text to a frame child container when single clicking its center", async () => {
+      const frame = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        backgroundColor: "red",
+        frameId: frame.id,
+      });
+      API.setElements([rectangle, frame]);
+
+      UI.clickTool("text");
+      mouse.clickAt(
+        rectangle.x + rectangle.width / 2,
+        rectangle.y + rectangle.height / 2,
+      );
+
+      const text = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(text.type).toBe("text");
+      expect(text.containerId).toBe(rectangle.id);
+      expect(text.frameId).toBe(frame.id);
+    });
+
     it("should set the text element angle to same as container angle when binding to rotated container", async () => {
       const rectangle = API.createElement({
         type: "rectangle",
@@ -805,7 +1015,7 @@ describe("textWysiwyg", () => {
           width: 100,
           height: 50,
         });
-        API.setSelectedElements([element]);
+        API.setSelectedElements([element] as NonDeletedExcalidrawElement[]);
         Keyboard.keyPress(KEYS.ENTER);
         expect(h.elements.length).toBe(1);
       });
@@ -846,7 +1056,10 @@ describe("textWysiwyg", () => {
       expect(h.elements.length).toBe(2);
       expect(h.elements[1].type).toBe("text");
 
-      API.setSelectedElements([h.elements[0], h.elements[1]]);
+      API.setSelectedElements([
+        h.elements[0],
+        h.elements[1],
+      ] as NonDeletedExcalidrawElement[]);
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 20,
@@ -1205,6 +1418,40 @@ describe("textWysiwyg", () => {
       );
     });
 
+    it.each([
+      {
+        label: "container",
+        createElements: () => API.createTextContainer(),
+      },
+      {
+        label: "arrow",
+        createElements: () => API.createLabeledArrow(),
+      },
+    ])(
+      "should reselect $label after deleting bound text with escape",
+      async ({ createElements }) => {
+        const [selectedElement, text] = createElements();
+        API.setElements([selectedElement, text]);
+        API.setSelectedElements([selectedElement]);
+
+        Keyboard.keyPress(KEYS.ENTER);
+        const editor = await getTextEditor();
+
+        await exitTextEditorAndAssertSelection({
+          editor,
+          nextText: "",
+          selectedIds: [selectedElement.id],
+        });
+
+        expect(selectedElement.boundElements).toStrictEqual([]);
+        expect(h.elements[1]).toEqual(
+          expect.objectContaining({
+            isDeleted: true,
+          }),
+        );
+      },
+    );
+
     it("should restore original container height and clear cache once text is unbind", async () => {
       const container = API.createElement({
         type: "rectangle",
@@ -1470,7 +1717,7 @@ describe("textWysiwyg", () => {
         "Excalidraw is an opensource virtual collaborative whiteboard",
       );
 
-      API.setSelectedElements([textElement]);
+      API.setSelectedElements([textElement] as NonDeletedExcalidrawElement[]);
 
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
@@ -1511,7 +1758,7 @@ describe("textWysiwyg", () => {
           version: 2,
           width: 610,
           x: 15,
-          y: 25,
+          y: 12.5,
         }),
       );
       expect(h.elements[2] as ExcalidrawTextElement).toEqual(
@@ -1719,6 +1966,135 @@ describe("textWysiwyg", () => {
         h.app.scene.mutateElement(textElement, {});
       });
       expect(colorsAreEqual(editor.style.color, originalColor)).toBe(true);
+    });
+  });
+
+  describe("autoResize handle", () => {
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      API.setElements([]);
+    });
+
+    /**
+     * a fixed-width text wrapped onto two lines. `originalText`/`autoResize`
+     * are set after the fact — `API.createElement` accepts neither, and would
+     * otherwise leave an autogrowing element whose `originalText` still holds
+     * the line break.
+     */
+    const wrappedText = (
+      overrides: Partial<ExcalidrawTextElement> = {},
+    ): ExcalidrawTextElement =>
+      ({
+        ...API.createElement({
+          type: "text",
+          id: "text",
+          x: 100,
+          y: 100,
+          width: 300,
+          height: 50,
+          text: "this is it my friends\nald aksdl askdlasdk",
+        }),
+        originalText: "this is it my friends ald aksdl askdlasdk",
+        autoResize: false,
+        ...overrides,
+      } as ExcalidrawTextElement);
+
+    // unwrapping resizes the box, so whichever edge the alignment pins has to
+    // stay put — otherwise the text slides out from under itself
+    it.each([
+      { textAlign: "left" as const, edge: (t: ExcalidrawTextElement) => t.x },
+      {
+        textAlign: "right" as const,
+        edge: (t: ExcalidrawTextElement) => t.x + t.width,
+      },
+      {
+        textAlign: "center" as const,
+        edge: (t: ExcalidrawTextElement) => t.x + t.width / 2,
+      },
+    ])("keeps the $textAlign anchor when unwrapping", ({ textAlign, edge }) => {
+      API.setElements([wrappedText({ textAlign })]);
+      API.setAppState({ selectedElementIds: { text: true } });
+      expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(false);
+      const before = edge(h.elements[0] as ExcalidrawTextElement);
+
+      API.executeAction(actionTextAutoResize);
+
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      // the box really did change size, so the assertion isn't vacuous
+      expect(text.width).not.toBeCloseTo(300, 0);
+      expect(edge(text)).toBeCloseTo(before, 4);
+    });
+
+    it.each([
+      {
+        verticalAlign: "top" as const,
+        edge: (t: ExcalidrawTextElement) => t.y,
+      },
+      {
+        verticalAlign: "bottom" as const,
+        edge: (t: ExcalidrawTextElement) => t.y + t.height,
+      },
+      {
+        verticalAlign: "middle" as const,
+        edge: (t: ExcalidrawTextElement) => t.y + t.height / 2,
+      },
+    ])(
+      "keeps the $verticalAlign anchor when unwrapping",
+      ({ verticalAlign, edge }) => {
+        API.setElements([wrappedText({ verticalAlign })]);
+        API.setAppState({ selectedElementIds: { text: true } });
+        expect((h.elements[0] as ExcalidrawTextElement).autoResize).toBe(false);
+        const before = edge(h.elements[0] as ExcalidrawTextElement);
+
+        API.executeAction(actionTextAutoResize);
+
+        const text = h.elements[0] as ExcalidrawTextElement;
+        expect(edge(text)).toBeCloseTo(before, 4);
+      },
+    );
+  });
+
+  describe("history", () => {
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      API.setElements([]);
+    });
+
+    // Creating a text used to land in two history entries — the empty element,
+    // then its content — so the first undo restored a live, zero-content
+    // element. For a text bound to an arrow endpoint that also left the
+    // endpoint occupied by something invisible.
+    //
+    // The invariant behind the single-undo behaviour is that creating the
+    // element must not be captured on its own. Pointerup has more than one
+    // capture site and they don't all fire in every environment, so assert the
+    // stack directly rather than only the observable undo.
+    it("does not open a history entry until the text is submitted", async () => {
+      const stackSize = () => (h.history as any).undoStack.length;
+
+      UI.clickTool("text");
+      const before = stackSize();
+
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+      expect(stackSize()).toBe(before);
+
+      updateTextEditor(editor, "plain");
+      Keyboard.exitTextEditor(editor);
+      expect(stackSize()).toBe(before + 1);
+    });
+
+    it("removes a plain text in a single undo", async () => {
+      UI.clickTool("text");
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "plain");
+      Keyboard.exitTextEditor(editor);
+
+      Keyboard.undo();
+
+      expect(h.elements.filter((el) => !el.isDeleted)).toHaveLength(0);
     });
   });
 });

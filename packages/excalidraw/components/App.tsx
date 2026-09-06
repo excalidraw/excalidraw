@@ -27,7 +27,9 @@ import {
   KEYS,
   APP_NAME,
   CURSOR_TYPE,
-  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+  DEFAULT_STROKE_STREAMLINE,
+  DEFAULT_STROKE_STREAMLINE_PRECISE,
+  DEFAULT_TRANSFORM_HANDLE_SPACING,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
@@ -37,7 +39,6 @@ import {
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
   LINE_CONFIRM_THRESHOLD,
-  MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
   MQ_RIGHT_SIDEBAR_MIN_WIDTH,
   POINTER_BUTTON,
@@ -50,9 +51,9 @@ import {
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
   ZOOM_STEP,
+  MIN_ZOOM,
   POINTER_EVENTS,
   TOOL_TYPE,
-  supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
@@ -76,11 +77,9 @@ import {
   updateObject,
   updateActiveTool,
   isTransparent,
-  easeToValuesRAF,
   muteFSAbortError,
   isTestEnv,
   isDevEnv,
-  easeOut,
   updateStable,
   addEventListener,
   normalizeEOL,
@@ -88,6 +87,7 @@ import {
   isShallowEqual,
   arrayToMap,
   applyDarkModeFilter,
+  AppEventBus,
   type EXPORT_IMAGE_TYPES,
   randomInteger,
   CLASSES,
@@ -108,6 +108,8 @@ import {
   loadDesktopUIModePreference,
   setDesktopUIMode,
   isSelectionLikeTool,
+  oneOf,
+  getStrokeWidthByKey,
 } from "@excalidraw/common";
 
 import {
@@ -118,7 +120,6 @@ import {
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
   isBindingEnabled,
-  shouldEnableBindingForPointerEvent,
   updateBoundElements,
   LinearElementEditor,
   newElementWith,
@@ -152,7 +153,6 @@ import {
   isMagicFrameElement,
   isTextBindableContainer,
   isElbowArrow,
-  isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
   getNormalizedDimensions,
@@ -174,7 +174,9 @@ import {
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
+  getCommonFrameId,
   getFrameChildren,
+  getFrameChildrenInsertionIndex,
   isCursorInFrame,
   addElementsToFrame,
   replaceAllElementsInFrame,
@@ -192,13 +194,9 @@ import {
   hitElementBoundingBoxOnly,
   hitElementItself,
   getVisibleSceneBounds,
-  FlowChartCreator,
-  FlowChartNavigator,
-  getLinkDirectionFromKey,
   cropElement,
   wrapText,
   isElementLink,
-  parseElementLinkFromURL,
   isMeasureTextSupported,
   normalizeText,
   measureText,
@@ -229,7 +227,6 @@ import {
   dragNewElement,
   dragSelectedElements,
   getDragOffsetXY,
-  isNonDeletedElement,
   Scene,
   Store,
   CaptureUpdateAction,
@@ -256,6 +253,11 @@ import {
   handleFocusPointPointerUp,
   maybeHandleArrowPointlikeDrag,
   getUncroppedWidthAndHeight,
+  getActiveTextElement,
+  isEligibleFrameChildType,
+  getBindingStrategyForDraggingBindingElementEndpoints,
+  isNonDeletedElement,
+  DEFAULT_BOUND_TEXT_LABEL_POSITION,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -283,8 +285,11 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   SceneElementsMap,
+  NonDeletedSceneElementsMap,
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
+
+import type { ArrowEndpoint } from "@excalidraw/element";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -318,10 +323,11 @@ import {
   actionToggleElementLock,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
+  actionToggleArrowBinding,
+  actionToggleMidpointSnapping,
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
 import { actionPaste } from "../actions/actionClipboard";
 import { actionCopyElementLink } from "../actions/actionElementLink";
 import { actionUnlockAllElements } from "../actions/actionElementLock";
@@ -337,7 +343,6 @@ import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { trackEvent } from "../analytics";
-import { AnimationFrameHandler } from "../animation-frame-handler";
 import {
   getDefaultAppState,
   isEraserActive,
@@ -358,14 +363,13 @@ import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
-  calculateScrollCenter,
+  getScrollToContentState,
   getElementsWithinSelection,
   getNormalizedZoom,
   getSelectedElements,
   hasBackground,
   isSomeElementSelected,
 } from "../scene";
-import { getStateForZoom } from "../scene/zoom";
 import {
   dataURLToString,
   generateIdFromFile,
@@ -405,24 +409,20 @@ import {
 } from "../snapping";
 import { Renderer } from "../scene/Renderer";
 import {
-  setEraserCursor,
-  setCursor,
-  resetCursor,
-  setCursorForShape,
-} from "../cursor";
+  type SetViewportOptions,
+  getViewportForZoomWithScrollConstraints,
+} from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
-import { LaserTrails } from "../laser-trails";
+import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
+import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
-
 import { isMaybeMermaidDefinition } from "../mermaid";
-
 import { LassoTrail } from "../lasso";
-
 import { EraserTrail } from "../eraser";
-
 import { getShortcutKey } from "../shortcut";
+import { tryParseSpreadsheet } from "../charts";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -431,25 +431,30 @@ import ConvertElementTypePopup, {
 } from "./ConvertElementTypePopup";
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
+import { AppArrowText } from "./App.arrowText";
+import { AppBucketFill } from "./App.bucketFill";
+import { AppCursor } from "./App.cursor";
+import { AppDrawShape } from "./App.drawshape";
+import { AppFlowchart } from "./App.flowchart";
+import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
-import FollowMode from "./FollowMode/FollowMode";
+import { ViewportStatusBorder } from "./ViewportStatusFrame/ViewportStatusFrame";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
+import Spinner from "./Spinner";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
-import {
-  isPointHittingLink,
-  isPointHittingLinkIcon,
-} from "./hyperlink/helpers";
+import { isPointHittingLink } from "./hyperlink/helpers";
+import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
-import { Toast } from "./Toast";
+import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
-import { findShapeByKey } from "./shapes";
+import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
 
@@ -463,7 +468,6 @@ import type {
 import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
-import type { FileSystemHandle } from "../data/filesystem";
 
 import type {
   AppClassProperties,
@@ -487,9 +491,10 @@ import type {
   UnsubscribeCallback,
   EmbedsValidationStatus,
   ElementsPendingErasure,
+  ExcalidrawImperativeAPIEventMap,
   GenerateDiagramToCode,
   NullableGridSize,
-  Offsets,
+  UIConfig,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -511,6 +516,12 @@ const EditorInterfaceContext = React.createContext<EditorInterface>(
   editorInterfaceContextInitialValue,
 );
 EditorInterfaceContext.displayName = "EditorInterfaceContext";
+
+const editorLifecycleEventBehavior = {
+  "editor:mount": { cardinality: "once", replay: "last" },
+  "editor:initialize": { cardinality: "once", replay: "last" },
+  "editor:unmount": { cardinality: "once", replay: "last" },
+} as const;
 
 export const ExcalidrawContainerContext = React.createContext<{
   container: HTMLDivElement | null;
@@ -544,6 +555,15 @@ const ExcalidrawActionManagerContext = React.createContext<ActionManager>(
 );
 ExcalidrawActionManagerContext.displayName = "ExcalidrawActionManagerContext";
 
+export const ExcalidrawAPIContext =
+  React.createContext<ExcalidrawImperativeAPI | null>(null);
+ExcalidrawAPIContext.displayName = "ExcalidrawAPIContext";
+
+export const ExcalidrawAPISetContext = React.createContext<
+  ((api: ExcalidrawImperativeAPI | null) => void) | null
+>(null);
+ExcalidrawAPISetContext.displayName = "ExcalidrawAPISetContext";
+
 export const useApp = () => useContext(AppContext);
 export const useAppProps = () => useContext(AppPropsContext);
 export const useEditorInterface = () =>
@@ -560,6 +580,10 @@ export const useExcalidrawSetAppState = () =>
   useContext(ExcalidrawSetAppStateContext);
 export const useExcalidrawActionManager = () =>
   useContext(ExcalidrawActionManagerContext);
+/**
+ * Requires wrapping your component in <ExcalidrawAPIContext.Provider>
+ */
+export const useExcalidrawAPI = () => useContext(ExcalidrawAPIContext);
 
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
@@ -579,6 +603,8 @@ const YOUTUBE_VIDEO_STATES = new Map<
   ValueOf<typeof YOUTUBE_STATES>
 >();
 
+const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
+
 let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
@@ -594,6 +620,7 @@ const gesture: Gesture = {
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
+  public sessionExportThemeOverride: AppState["theme"] | undefined;
   rc: RoughCanvas;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -604,10 +631,26 @@ class App extends React.Component<AppProps, AppState> {
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
 
+  public get ownerDocument(): Document {
+    return (
+      this.props.ownerDocument ??
+      this.excalidrawContainerRef.current?.ownerDocument ??
+      document
+    );
+  }
+
+  public get ownerWindow(): Window & typeof globalThis {
+    return (this.ownerDocument.defaultView ?? window) as Window &
+      typeof globalThis;
+  }
+
   public scene: Scene;
   public fonts: Fonts;
   public renderer: Renderer;
   public visibleElements: readonly NonDeletedExcalidrawElement[];
+  /** whether the last render had any renderable elements (excludes e.g. the
+   * in-progress `newElement` and the edited text element) */
+  private hasRenderableElements: boolean = false;
   private resizeObserver: ResizeObserver | undefined;
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
@@ -633,33 +676,61 @@ class App extends React.Component<AppProps, AppState> {
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
 
-  private handleToastClose = () => {
-    this.setToast(null);
-  };
-
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
-  public flowChartCreator: FlowChartCreator = new FlowChartCreator();
-  private flowChartNavigator: FlowChartNavigator = new FlowChartNavigator();
+  private _initialized = false;
+
+  private readonly editorLifecycleEvents = new AppEventBus<
+    ExcalidrawImperativeAPIEventMap,
+    typeof editorLifecycleEventBehavior
+  >(editorLifecycleEventBehavior);
+
+  public onEvent = this.editorLifecycleEvents.on.bind(
+    this.editorLifecycleEvents,
+  ) as AppEventBus<
+    ExcalidrawImperativeAPIEventMap,
+    typeof editorLifecycleEventBehavior
+  >["on"];
+
+  private appStateObserver = new AppStateObserver(() => this.state);
+
+  public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
+
+  public bucketFill: AppBucketFill = new AppBucketFill(this);
+  public flowchart: AppFlowchart = new AppFlowchart(this);
+  public cursor: AppCursor = new AppCursor(this);
+  public arrowText: AppArrowText = new AppArrowText(this);
+  public viewport: AppViewport = new AppViewport(this, {
+    getContainer: () => this.excalidrawContainerRef.current,
+    getStylesPanelMode: () => this.stylesPanelMode,
+    isGestureActive: () => gesture.pointers.size >= 2 || isPanning,
+  });
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
+  private textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null =
+    null;
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
+  // TODO this is a hack and we should ideally unify touch and pointer events
+  // and implement our own double click handling end-to-end (currently we're
+  // using a mix of native browser for click events and manual for touch -
+  // and browser doubleClick sucks to begin with)
+  lastPointerUpIsDoubleClick: boolean = false;
   lastPointerMoveEvent: PointerEvent | null = null;
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
+  private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
   /** previous frame pointer coords */
   previousPointerMoveCoords: { x: number; y: number } | null = null;
-  lastViewportPosition = { x: 0, y: 0 };
 
-  animationFrameHandler = new AnimationFrameHandler();
-
-  laserTrails = new LaserTrails(this.animationFrameHandler, this);
-  eraserTrail = new EraserTrail(this.animationFrameHandler, this);
-  lassoTrail = new LassoTrail(this.animationFrameHandler, this);
+  drawShape = new AppDrawShape(this);
+  laserTrails = new LaserTrails(this);
+  eraserTrail = new EraserTrail(this);
+  lassoTrail = new LassoTrail(this);
+  cursorHints = new CursorHints(this);
 
   onChangeEmitter = new Emitter<
     [
@@ -694,11 +765,57 @@ class App extends React.Component<AppProps, AppState> {
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
+  api: ExcalidrawImperativeAPI;
+
+  private createExcalidrawAPI(): ExcalidrawImperativeAPI {
+    const api: ExcalidrawImperativeAPI = {
+      isDestroyed: false,
+      updateScene: this.updateScene,
+      applyDeltas: this.applyDeltas,
+      mutateElement: this.mutateElement,
+      updateLibrary: this.library.updateLibrary,
+      addFiles: this.addFiles,
+      resetScene: this.resetScene,
+      getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
+      getSceneElementsMapIncludingDeleted:
+        this.getSceneElementsMapIncludingDeleted,
+      history: {
+        clear: this.resetHistory,
+      },
+      setViewport: this.viewport.setViewport,
+      getViewportOffsets: this.viewport.getOffsets,
+      getSceneElements: this.getSceneElements,
+      getAppState: () => this.state,
+      getFiles: () => this.files,
+      getName: this.getName,
+      registerAction: (action: Action) => {
+        this.actionManager.registerAction(action);
+      },
+      refresh: this.refresh,
+      setToast: this.setToast,
+      id: this.id,
+      setActiveTool: this.setActiveTool,
+      setCursor: this.cursor.set,
+      resetCursor: this.cursor.reset,
+      getEditorInterface: () => this.editorInterface,
+      updateFrameRendering: this.updateFrameRendering,
+      toggleSidebar: this.toggleSidebar,
+      onChange: (cb) => this.onChangeEmitter.on(cb),
+      onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
+      onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
+      onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
+      onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
+      onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
+      onStateChange: this.onStateChange,
+      onEvent: this.onEvent,
+    };
+    return api;
+  }
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
     const {
-      excalidrawAPI,
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
@@ -706,18 +823,40 @@ class App extends React.Component<AppProps, AppState> {
       theme = defaultAppState.theme,
       name = `${t("labels.untitled")}-${getDateTime()}`,
     } = props;
+
+    // seed the host-forced tool so the first render already has it
+    // (`handleForcedToolChange` keeps it in sync from then on)
+    let forcedActiveTool: AppState["activeTool"] | null = null;
+    if (props.activeTool) {
+      if ((props.activeTool.type as string) === "image") {
+        console.warn(`"image" tool cannot be forced via "props.activeTool"`);
+      } else if (!this.isToolSupported(props.activeTool.type, props)) {
+        console.warn(
+          `"${props.activeTool.type}" tool ("props.activeTool") cannot be activated — disabled via "UIOptions.tools", or not enabled while non-interactive (see "interaction.enabled.tools")`,
+        );
+      } else {
+        forcedActiveTool = updateActiveTool(defaultAppState, props.activeTool);
+      }
+    }
+
     this.state = {
       ...defaultAppState,
       theme,
+      exportWithDarkMode: theme === THEME.DARK,
       isLoading: true,
       ...this.getCanvasOffsets(),
-      viewModeEnabled,
+      // non-interactive editor implies view mode so that all edit-mode
+      // gates apply
+      viewModeEnabled: this.isInteractionEnabled(props)
+        ? viewModeEnabled
+        : true,
+      activeTool: forcedActiveTool ?? defaultAppState.activeTool,
       zenModeEnabled,
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
       name,
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: this.ownerWindow.innerWidth,
+      height: this.ownerWindow.innerHeight,
     };
 
     this.refreshEditorInterface();
@@ -733,7 +872,7 @@ class App extends React.Component<AppProps, AppState> {
     );
     this.scene = new Scene();
 
-    this.canvas = document.createElement("canvas");
+    this.canvas = this.ownerDocument.createElement("canvas");
     this.rc = rough.canvas(this.canvas);
     this.renderer = new Renderer(this.scene);
     this.visibleElements = [];
@@ -741,62 +880,189 @@ class App extends React.Component<AppProps, AppState> {
     this.store = new Store(this);
     this.history = new History(this.store);
 
-    if (excalidrawAPI) {
-      const api: ExcalidrawImperativeAPI = {
-        updateScene: this.updateScene,
-        applyDeltas: this.applyDeltas,
-        mutateElement: this.mutateElement,
-        updateLibrary: this.library.updateLibrary,
-        addFiles: this.addFiles,
-        resetScene: this.resetScene,
-        getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
-        getSceneElementsMapIncludingDeleted:
-          this.getSceneElementsMapIncludingDeleted,
-        history: {
-          clear: this.resetHistory,
-        },
-        scrollToContent: this.scrollToContent,
-        getSceneElements: this.getSceneElements,
-        getAppState: () => this.state,
-        getFiles: () => this.files,
-        getName: this.getName,
-        registerAction: (action: Action) => {
-          this.actionManager.registerAction(action);
-        },
-        refresh: this.refresh,
-        setToast: this.setToast,
-        id: this.id,
-        setActiveTool: this.setActiveTool,
-        setCursor: this.setCursor,
-        resetCursor: this.resetCursor,
-        getEditorInterface: () => this.editorInterface,
-        updateFrameRendering: this.updateFrameRendering,
-        toggleSidebar: this.toggleSidebar,
-        onChange: (cb) => this.onChangeEmitter.on(cb),
-        onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
-        onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
-        onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
-        onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
-        onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
-      } as const;
-      if (typeof excalidrawAPI === "function") {
-        excalidrawAPI(api);
-      } else {
-        console.error("excalidrawAPI should be a function!");
-      }
-    }
-
     this.excalidrawContainerValue = {
       container: this.excalidrawContainerRef.current,
       id: this.id,
     };
 
-    this.fonts = new Fonts(this.scene);
+    this.fonts = new Fonts(this.scene, this.ownerDocument);
     this.history = new History(this.store);
 
     this.actionManager.registerAll(actions);
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
+
+    // in case internal editor APIs call this early, otherwise we need
+    // to construct this in componentDidMount because componentWillUnmount
+    // will invalidate it (so in StrictMode, doing this in constructor alone
+    // would be a problem)
+    this.api = this.createExcalidrawAPI();
+  }
+
+  /**
+   * Whether the editor accepts user input (pointer, keyboard, wheel, touch,
+   * clipboard, drag&drop). When `false`, the editor is fully inert for the
+   * user, but remains controllable through the imperative API.
+   *
+   * All user-input entry points must consult this getter (directly or by
+   * not being attached/rendered at all).
+   */
+  public isInteractionEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    return props.interaction !== false && typeof props.interaction !== "object";
+  }
+
+  /**
+   * Whether element links render their link icon and are clickable.
+   * True when fully interactive, or when `interaction: { enabled: { links:
+   * true } }`
+   * (in which case clicking anywhere on a linked element opens the link,
+   * same as in view mode).
+   */
+  public isLinksEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    if (typeof props.interaction === "object" && props.interaction !== null) {
+      return (
+        props.interaction.enabled?.links === true ||
+        props.interaction.enabled?.interactiveContent === true
+      );
+    }
+    return props.interaction !== false;
+  }
+
+  /**
+   * Whether canvas navigation — panning & zooming, view-mode style — is
+   * enabled. True when fully interactive, or when `interaction: { enabled:
+   * { navigation: true } }`. Respects `appState.scrollConstraints`.
+   */
+  public isNavigationEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    if (typeof props.interaction === "object" && props.interaction !== null) {
+      return props.interaction.enabled?.navigation === true;
+    }
+    return props.interaction !== false;
+  }
+
+  /**
+   * Whether embeddable & iframe elements are interactive (hover & click to
+   * activate, view-mode style). True when fully interactive, or when
+   * allowed via `interaction.enabled.embeds` / `.interactiveContent`.
+   */
+  public isEmbedsEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    if (typeof props.interaction === "object" && props.interaction !== null) {
+      return (
+        props.interaction.enabled?.embeds === true ||
+        props.interaction.enabled?.interactiveContent === true
+      );
+    }
+    return props.interaction !== false;
+  }
+
+  /**
+   * Whether the browser's own zoom (ctrl/cmd + wheel, pinch, keyboard
+   * shortcuts) stays available over the non-interactive editor.
+   * Prevented by default.
+   */
+  public isBrowserZoomEnabled(
+    props: Pick<AppProps, "interaction"> = this.props,
+  ): boolean {
+    if (typeof props.interaction === "object" && props.interaction !== null) {
+      return props.interaction.enabled?.browserZoom === true;
+    }
+    return false;
+  }
+
+  /**
+   * Whether the tool can be activated & driven by user input. False when
+   * disabled via `UIOptions.tools`, or when the editor is non-interactive
+   * and the tool isn't kept user-driven via `interaction.enabled.tools`.
+   *
+   * (Once UI tool availability is split from input availability — e.g.
+   * `props.ui.tools` vs `interaction.disabled.tools` — the UI axis moves
+   * out into its own predicate.)
+   *
+   * We purposely widen the `tool` type so this helper can be called with
+   * any tool without having to type check it.
+   */
+  public isToolSupported = <T extends ToolType | "custom">(
+    tool: T,
+    props: Pick<AppProps, "interaction" | "UIOptions"> = this.props,
+  ): boolean => {
+    if (
+      props.UIOptions.tools?.[
+        tool as Extract<T, keyof AppProps["UIOptions"]["tools"]>
+      ] === false
+    ) {
+      return false;
+    }
+    if (this.isInteractionEnabled(props)) {
+      return true;
+    }
+    const tools =
+      typeof props.interaction === "object" && props.interaction !== null
+        ? props.interaction.enabled?.tools
+        : undefined;
+    if (tool === "laser") {
+      return tools?.laser === true;
+    }
+    if (tool === "custom") {
+      return tools?.custom === true;
+    }
+    return false;
+  };
+
+  /**
+   * Whether the active tool is locked in place — via the tool lock
+   * (padlock / Q) or by being host-forced (`props.activeTool`). A locked
+   * tool doesn't revert to the selection tool after use, and elements drawn
+   * with it aren't selected. Forcing deliberately does not mutate
+   * `activeTool.locked`, which is the user's persisted padlock preference.
+   */
+  public isToolLocked(): boolean {
+    return this.state.activeTool.locked || this.props.activeTool != null;
+  }
+
+  /**
+   * Whether the active tool captures the primary pointer instead of the
+   * view-mode drag-to-pan — the laser and host-implemented custom tools do;
+   * while non-interactive, any tool allowed via
+   * `interaction.enabled.tools` does. (Editing tools capture the pointer
+   * trivially since view mode implies they're not active; this predicate only
+   * matters where view-mode gates apply.)
+   */
+  public isActiveToolPointerCapturing(): boolean {
+    if (!this.isInteractionEnabled()) {
+      // an active tool that isn't allowed via `interaction.enabled.tools`
+      // is inert — including the laser
+      return this.isToolSupported(this.state.activeTool.type);
+    }
+    return (
+      this.state.activeTool.type === "laser" ||
+      this.state.activeTool.type === "custom"
+    );
+  }
+
+  /** Whether Excalidraw's full default UI is rendered. */
+  public isDefaultUIEnabled(props: Pick<AppProps, "ui"> = this.props): boolean {
+    return (
+      props.ui !== false && (typeof props.ui !== "object" || props.ui === null)
+    );
+  }
+
+  /** Whether an individual default UI control is rendered. */
+  public isUIControlEnabled(
+    control: keyof UIConfig["enabled"],
+    props: Pick<AppProps, "ui"> = this.props,
+  ): boolean {
+    if (typeof props.ui === "object" && props.ui !== null) {
+      return props.ui.enabled?.[control] === true;
+    }
+    return props.ui !== false;
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
@@ -808,7 +1074,7 @@ class App extends React.Component<AppProps, AppState> {
     return result;
   };
 
-  private onWindowMessage(event: MessageEvent) {
+  private onWindowMessage = (event: MessageEvent) => {
     if (
       event.origin !== "https://player.vimeo.com" &&
       event.origin !== "https://www.youtube.com"
@@ -829,7 +1095,7 @@ class App extends React.Component<AppProps, AppState> {
         //Allowing for multiple instances of Excalidraw running in the window
         if (data.method === "paused") {
           let source: Window | null = null;
-          const iframes = document.body.querySelectorAll(
+          const iframes = this.ownerDocument.body.querySelectorAll(
             "iframe.excalidraw__embeddable",
           );
           if (!iframes) {
@@ -869,7 +1135,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         break;
     }
-  }
+  };
 
   private handleSkipBindMode() {
     if (
@@ -1204,18 +1470,154 @@ class App extends React.Component<AppProps, AppState> {
     ) as NullableGridSize;
   };
 
+  private getTextCreationGridPoint = (x: number, y: number) => {
+    const effectiveGridSize = this.getEffectiveGridSize();
+
+    if (effectiveGridSize === null) {
+      return null;
+    }
+
+    const getTextCreationGridCoordinate = (coordinate: number) => {
+      const topLeftGridPoint =
+        Math.floor(coordinate / effectiveGridSize) * effectiveGridSize;
+
+      return topLeftGridPoint;
+    };
+
+    return {
+      x: getTextCreationGridCoordinate(x),
+      y: getTextCreationGridCoordinate(y),
+    };
+  };
+
   private getHTMLIFrameElement(
     element: ExcalidrawIframeLikeElement,
   ): HTMLIFrameElement | undefined {
     return this.iFrameRefs.get(element.id);
   }
 
-  private handleEmbeddableCenterClick(element: ExcalidrawIframeLikeElement) {
+  /**
+   * AI-generated iframe elements aren't interactive while their generation
+   * is still in progress (the partial content is render-only).
+   */
+  private isIframeLikeInteractive(element: ExcalidrawElement): boolean {
+    if (isIframeElement(element)) {
+      const data =
+        element.customData?.generationData ??
+        this.magicGenerations.get(element.id);
+      return data?.status !== "pending";
+    }
+    return true;
+  }
+
+  private handleIframeLikeElementHover = ({
+    hitElement,
+    scenePointer,
+    moveEvent,
+  }: {
+    hitElement: NonDeleted<ExcalidrawElement> | null;
+    scenePointer: { x: number; y: number };
+    moveEvent: React.PointerEvent<HTMLCanvasElement>;
+  }): boolean => {
     if (
-      this.state.activeEmbeddable?.element === element &&
+      hitElement &&
+      isIframeLikeElement(hitElement) &&
+      this.isIframeLikeInteractive(hitElement) &&
+      (this.state.viewModeEnabled ||
+        this.state.activeTool.type === "laser" ||
+        this.isIframeLikeElementCenter(
+          hitElement,
+          moveEvent,
+          scenePointer.x,
+          scenePointer.y,
+        ))
+    ) {
+      this.cursor.set(CURSOR_TYPE.POINTER);
+      this.setState({
+        activeEmbeddable: { element: hitElement, state: "hover" },
+      });
+      return true;
+    } else if (this.state.activeEmbeddable?.state === "hover") {
+      this.setState({ activeEmbeddable: null });
+    }
+    return false;
+  };
+
+  /** @returns true if iframe-like element click handled */
+  private handleIframeLikeCenterClick(): boolean {
+    if (
+      !this.lastPointerDownEvent ||
+      !this.lastPointerUpEvent ||
+      // middle-click or something other than primary
+      this.lastPointerDownEvent.button !== POINTER_BUTTON.MAIN ||
+      // panning
+      isHoldingSpace ||
+      // wrong tool
+      !oneOf(this.state.activeTool.type, ["laser", "selection", "lasso"])
+    ) {
+      return false;
+    }
+
+    const viewportClickStart_scenePoint = pointFrom(
+      viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastPointerDownEvent.clientX,
+          clientY: this.lastPointerDownEvent.clientY,
+        },
+        this.state,
+      ),
+    );
+    const viewportClickEnd_scenePoint = pointFrom(
+      viewportCoordsToSceneCoords(
+        {
+          clientX: this.lastPointerUpEvent.clientX,
+          clientY: this.lastPointerUpEvent.clientY,
+        },
+        this.state,
+      ),
+    );
+
+    const draggedDistance = pointDistance(
+      viewportClickStart_scenePoint,
+      viewportClickEnd_scenePoint,
+    );
+
+    if (draggedDistance > DRAGGING_THRESHOLD) {
+      return false;
+    }
+
+    const hitElement = this.getElementAtPosition(
+      viewportClickStart_scenePoint[0],
+      viewportClickStart_scenePoint[1],
+    );
+
+    const shouldActivate =
+      hitElement &&
+      this.lastPointerUpEvent.timeStamp - this.lastPointerDownEvent.timeStamp <=
+        300 &&
+      gesture.pointers.size < 2 &&
+      isIframeLikeElement(hitElement) &&
+      this.isIframeLikeInteractive(hitElement) &&
+      (this.state.viewModeEnabled ||
+        this.state.activeTool.type === "laser" ||
+        this.isIframeLikeElementCenter(
+          hitElement,
+          this.lastPointerUpEvent,
+          viewportClickEnd_scenePoint[0],
+          viewportClickEnd_scenePoint[1],
+        ));
+
+    if (!shouldActivate) {
+      return false;
+    }
+
+    const iframeLikeElement = hitElement;
+
+    if (
+      this.state.activeEmbeddable?.element === iframeLikeElement &&
       this.state.activeEmbeddable?.state === "active"
     ) {
-      return;
+      return true;
     }
 
     // The delay serves two purposes
@@ -1226,31 +1628,34 @@ class App extends React.Component<AppProps, AppState> {
     //    in fullscreen mode
     setTimeout(() => {
       this.setState({
-        activeEmbeddable: { element, state: "active" },
-        selectedElementIds: { [element.id]: true },
+        activeEmbeddable: { element: iframeLikeElement, state: "active" },
+        selectedElementIds: { [iframeLikeElement.id]: true },
         newElement: null,
         selectionElement: null,
       });
     }, 100);
 
-    if (isIframeElement(element)) {
-      return;
+    if (isIframeElement(iframeLikeElement)) {
+      return true;
     }
 
-    const iframe = this.getHTMLIFrameElement(element);
+    const iframe = this.getHTMLIFrameElement(iframeLikeElement);
 
     if (!iframe?.contentWindow) {
-      return;
+      return true;
     }
 
     if (iframe.src.includes("youtube")) {
-      const state = YOUTUBE_VIDEO_STATES.get(element.id);
+      const state = YOUTUBE_VIDEO_STATES.get(iframeLikeElement.id);
       if (!state) {
-        YOUTUBE_VIDEO_STATES.set(element.id, YOUTUBE_STATES.UNSTARTED);
+        YOUTUBE_VIDEO_STATES.set(
+          iframeLikeElement.id,
+          YOUTUBE_STATES.UNSTARTED,
+        );
         iframe.contentWindow.postMessage(
           JSON.stringify({
             event: "listening",
-            id: element.id,
+            id: iframeLikeElement.id,
           }),
           "*",
         );
@@ -1287,7 +1692,24 @@ class App extends React.Component<AppProps, AppState> {
         "*",
       );
     }
+
+    return true;
   }
+
+  private isDoubleClick = (
+    lastPointerEvent:
+      | PointerEvent
+      | React.PointerEvent<HTMLElement>
+      | undefined
+      | null,
+    currentPointerEvent: PointerEvent | React.PointerEvent<HTMLElement>,
+  ) => {
+    return (
+      lastPointerEvent != null &&
+      currentPointerEvent.timeStamp - lastPointerEvent.timeStamp <=
+        TAP_TWICE_TIMEOUT
+    );
+  };
 
   private isIframeLikeElementCenter(
     el: ExcalidrawIframeLikeElement | null,
@@ -1395,6 +1817,7 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           let src: IframeData | null;
+          let isPendingGeneration = false;
 
           if (isIframeElement(el)) {
             src = null;
@@ -1425,78 +1848,46 @@ class App extends React.Component<AppProps, AppState> {
                       html, body {
                         width: 100%;
                         height: 100%;
-                        color: ${
-                          this.state.theme === THEME.DARK ? "white" : "black"
-                        };
-                      }
-                      body {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        flex-direction: column;
-                        gap: 1rem;
-                      }
-
-                      .Spinner {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin-left: auto;
-                        margin-right: auto;
-                      }
-
-                      .Spinner svg {
-                        animation: rotate 1.6s linear infinite;
-                        transform-origin: center center;
-                        width: 40px;
-                        height: 40px;
-                      }
-
-                      .Spinner circle {
-                        stroke: currentColor;
-                        animation: dash 1.6s linear 0s infinite;
-                        stroke-linecap: round;
-                      }
-
-                      @keyframes rotate {
-                        100% {
-                          transform: rotate(360deg);
-                        }
-                      }
-
-                      @keyframes dash {
-                        0% {
-                          stroke-dasharray: 1, 300;
-                          stroke-dashoffset: 0;
-                        }
-                        50% {
-                          stroke-dasharray: 150, 300;
-                          stroke-dashoffset: -200;
-                        }
-                        100% {
-                          stroke-dasharray: 1, 300;
-                          stroke-dashoffset: -280;
-                        }
+                        margin: 0;
                       }
                     </style>
-                    <div class="Spinner">
-                      <svg
-                        viewBox="0 0 100 100"
-                      >
-                        <circle
-                          cx="50"
-                          cy="50"
-                          r="46"
-                          stroke-width="8"
-                          fill="none"
-                          stroke-miter-limit="10"
-                        />
-                      </svg>
-                    </div>
-                    <div>Generating...</div>
+                    <script>
+                      // progressively renders the partial HTML snapshots the
+                      // editor streams in during generation by document.write-
+                      // ing them into this very document — feeding the
+                      // browser's incremental HTML parser, so incomplete
+                      // markup renders progressively
+                      // (see App.onMagicFrameGenerate)
+                      let writtenLength = 0;
+                      let opened = false;
+
+                      const onPartialMessage = (event) => {
+                        const data = event.data;
+                        if (
+                          !data ||
+                          data.type !== "excalidraw:diagramToCode:partial" ||
+                          typeof data.html !== "string" ||
+                          data.html.length <= writtenLength
+                        ) {
+                          return;
+                        }
+                        if (!opened) {
+                          opened = true;
+                          document.open();
+                          // document.open() wipes all listeners from both the
+                          // document and the window, so re-register
+                          window.addEventListener("message", onPartialMessage);
+                        }
+                        document.write(data.html.slice(writtenLength));
+                        writtenLength = data.html.length;
+                      };
+
+                      window.addEventListener("message", onPartialMessage);
+                    </script>
                   `);
                 },
               } as const;
+              isPendingGeneration = true;
             } else {
               let message: string;
               if (data.code === "ERR_GENERATION_INTERRUPTED") {
@@ -1541,6 +1932,18 @@ class App extends React.Component<AppProps, AppState> {
           const isHovered =
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "hover";
+
+          // scale video embeds based on zoom (capped) so that smaller embeds
+          // on canvas when zoomed are still of legible quality
+          // (note: for some embed types like gdrive, the quality is poor when
+          // scaling mid playback and works only when you initially start the
+          // playback at the higher zoom level)
+          const shouldScaleEmbeddableViewport = src?.type === "video";
+          const embeddableViewportScale = clamp(
+            shouldScaleEmbeddableViewport ? scale : 1,
+            0.75,
+            MAX_EMBEDDABLE_VIEWPORT_SCALE,
+          );
 
           return (
             <div
@@ -1608,32 +2011,49 @@ class App extends React.Component<AppProps, AppState> {
                     padding: `${el.strokeWidth}px`,
                   }}
                 >
-                  {(isEmbeddableElement(el)
-                    ? this.props.renderEmbeddable?.(el, this.state)
-                    : null) ?? (
-                    <iframe
-                      ref={(ref) => this.cacheEmbeddableRef(el, ref)}
-                      className="excalidraw__embeddable"
-                      srcDoc={
-                        src?.type === "document"
-                          ? src.srcdoc(this.state.theme)
-                          : undefined
-                      }
-                      src={
-                        src?.type !== "document" ? src?.link ?? "" : undefined
-                      }
-                      // https://stackoverflow.com/q/18470015
-                      scrolling="no"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="Excalidraw Embedded Content"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen={true}
-                      sandbox={`${
-                        src?.sandbox?.allowSameOrigin ? "allow-same-origin" : ""
-                      } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
-                    />
-                  )}
+                  <div
+                    className="excalidraw__embeddable__content"
+                    style={{
+                      width: `${embeddableViewportScale * 100}%`,
+                      height: `${embeddableViewportScale * 100}%`,
+                      transform: `scale(${1 / embeddableViewportScale})`,
+                    }}
+                  >
+                    {(isEmbeddableElement(el)
+                      ? this.props.renderEmbeddable?.(el, this.state)
+                      : null) ?? (
+                      <iframe
+                        ref={(ref) => this.cacheEmbeddableRef(el, ref)}
+                        className="excalidraw__embeddable"
+                        srcDoc={
+                          src?.type === "document"
+                            ? src.srcdoc(this.state.theme)
+                            : undefined
+                        }
+                        src={
+                          src?.type !== "document" ? src?.link ?? "" : undefined
+                        }
+                        // https://stackoverflow.com/q/18470015
+                        scrolling="no"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Excalidraw Embedded Content"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen={true}
+                        sandbox={`${
+                          src?.sandbox?.allowSameOrigin
+                            ? "allow-same-origin"
+                            : ""
+                        } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
+                      />
+                    )}
+                  </div>
                 </div>
+                {isPendingGeneration && (
+                  <div className="excalidraw__embeddable__generating">
+                    <Spinner size="1em" />
+                    Generating…
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -1654,7 +2074,7 @@ class App extends React.Component<AppProps, AppState> {
         bounds.zoom !== this.state.zoom.value ||
         bounds.versionNonce !== frameElement.versionNonce
       ) {
-        const frameNameDiv = document.getElementById(
+        const frameNameDiv = this.ownerDocument.getElementById(
           this.getFrameNameDOMId(frameElement),
         );
 
@@ -1674,7 +2094,6 @@ class App extends React.Component<AppProps, AppState> {
             y: boxSceneTopLeft.y,
             width: boxSceneBottomRight.x - boxSceneTopLeft.x,
             height: boxSceneBottomRight.y - boxSceneTopLeft.y,
-            angle: 0,
             zoom: this.state.zoom.value,
             versionNonce: frameElement.versionNonce,
           };
@@ -1726,8 +2145,8 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !isElementInViewport(
           f,
-          this.canvas.width / window.devicePixelRatio,
-          this.canvas.height / window.devicePixelRatio,
+          this.canvas.width / this.ownerWindow.devicePixelRatio,
+          this.canvas.height / this.ownerWindow.devicePixelRatio,
           {
             offsetLeft: this.state.offsetLeft,
             offsetTop: this.state.offsetTop,
@@ -1779,9 +2198,10 @@ class App extends React.Component<AppProps, AppState> {
               }
             }}
             style={{
-              background: isDarkTheme
-                ? applyDarkModeFilter(this.state.viewBackgroundColor)
-                : this.state.viewBackgroundColor,
+              background: applyDarkModeFilter(
+                this.state.viewBackgroundColor,
+                isDarkTheme,
+              ),
               zIndex: 2,
               border: "none",
               display: "block",
@@ -1796,7 +2216,9 @@ class App extends React.Component<AppProps, AppState> {
                 : FRAME_STYLE.nameColorLightTheme,
               overflow: "hidden",
               maxWidth: `${
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
+                this.ownerDocument.body.clientWidth -
+                x1 -
+                FRAME_NAME_EDIT_PADDING
               }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
@@ -1863,39 +2285,50 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private toggleOverscrollBehavior(event: React.PointerEvent) {
+  private toggleOverscrollBehavior = (event: React.PointerEvent) => {
     // when pointer inside editor, disable overscroll behavior to prevent
     // panning to trigger history back/forward on MacOS Chrome
-    document.documentElement.style.overscrollBehaviorX =
+    this.ownerDocument.documentElement.style.overscrollBehaviorX =
       event.type === "pointerenter" ? "none" : "auto";
-  }
+  };
 
   public render() {
     const selectedElements = this.scene.getSelectedElements(this.state);
     const { renderTopRightUI, renderTopLeftUI, renderCustomStats } = this.props;
 
-    const sceneNonce = this.scene.getSceneNonce();
-    const { elementsMap, visibleElements } =
-      this.renderer.getRenderableElements({
-        sceneNonce,
-        zoom: this.state.zoom,
-        offsetLeft: this.state.offsetLeft,
-        offsetTop: this.state.offsetTop,
-        scrollX: this.state.scrollX,
-        scrollY: this.state.scrollY,
-        height: this.state.height,
-        width: this.state.width,
-        editingTextElement: this.state.editingTextElement,
-        newElementId: this.state.newElement?.id,
-      });
+    const {
+      elementsMap: renderableElementsMap,
+      visibleElements,
+      canvasNonce,
+      /**
+       * element to draw on the <NewElementCanvas> for optimization purposes.
+       * Can be null even if this.state.newElement defined
+       * (e.g. when its zIndex isn't on top) */
+      newElementCanvasElement,
+    } = this.renderer.getRenderableElements({
+      zoom: this.state.zoom,
+      offsetLeft: this.state.offsetLeft,
+      offsetTop: this.state.offsetTop,
+      scrollX: this.state.scrollX,
+      scrollY: this.state.scrollY,
+      height: this.state.height,
+      width: this.state.width,
+      editingTextElement: this.state.editingTextElement,
+      newElement: this.state.newElement,
+      selectedElements,
+      selectedElementsAreBeingDragged:
+        this.state.selectedElementsAreBeingDragged,
+      frameToHighlight: this.state.frameToHighlight,
+    });
     this.visibleElements = visibleElements;
+    this.hasRenderableElements = renderableElementsMap.size > 0;
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
     const shouldBlockPointerEvents =
       // default back to `--ui-pointerEvents` flow if setPointerCapture
       // not supported
-      "setPointerCapture" in HTMLElement.prototype
+      "setPointerCapture" in this.ownerWindow.HTMLElement.prototype
         ? false
         : this.state.selectionElement ||
           this.state.newElement ||
@@ -1913,303 +2346,349 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         translate="no"
-        className={clsx("excalidraw excalidraw-container notranslate", {
-          "excalidraw--view-mode":
-            this.state.viewModeEnabled ||
-            this.state.openDialog?.name === "elementLinkSelector",
-          "excalidraw--mobile": this.editorInterface.formFactor === "phone",
-        })}
+        className={clsx(
+          "excalidraw excalidraw-container notranslate",
+          this.props.className,
+          {
+            "excalidraw--view-mode":
+              this.state.viewModeEnabled ||
+              this.state.openDialog?.name === "elementLinkSelector",
+            "excalidraw--mobile": this.editorInterface.formFactor === "phone",
+            "excalidraw--non-interactive": !this.isInteractionEnabled(),
+            "excalidraw--navigation":
+              !this.isInteractionEnabled() && this.isNavigationEnabled(),
+            "excalidraw--tools":
+              !this.isInteractionEnabled() &&
+              this.isToolSupported(this.state.activeTool.type),
+            "excalidraw--embeds":
+              !this.isInteractionEnabled() && this.isEmbedsEnabled(),
+            "excalidraw--allow-browser-zoom":
+              !this.isInteractionEnabled() && this.isBrowserZoomEnabled(),
+            "excalidraw--ui-hidden": !this.isDefaultUIEnabled(),
+            "excalidraw--mobile-toolbar":
+              this.editorInterface.formFactor === "phone" &&
+              this.isDefaultUIEnabled() &&
+              !this.state.viewModeEnabled,
+            "excalidraw--viewport-status-border":
+              !!this.props.viewportStatusFrame?.border,
+            "excalidraw--viewport-status-label":
+              !!this.props.viewportStatusFrame?.label,
+            "excalidraw--zen-mode": this.state.zenModeEnabled,
+          },
+        )}
         style={{
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
             ? POINTER_EVENTS.disabled
             : POINTER_EVENTS.enabled,
-          ["--right-sidebar-width" as any]: "302px",
+          ["--right-sidebar-width" as any]: `${RIGHT_SIDEBAR_WIDTH}px`,
         }}
         ref={this.excalidrawContainerRef}
-        onDrop={this.handleAppOnDrop}
+        onDrop={this.isInteractionEnabled() ? this.handleAppOnDrop : undefined}
         tabIndex={0}
         onKeyDown={
-          this.props.handleKeyboardGlobally ? undefined : this.onKeyDown
+          this.props.handleKeyboardGlobally || !this.isInteractionEnabled()
+            ? undefined
+            : this.onKeyDown
         }
-        onPointerEnter={this.toggleOverscrollBehavior}
-        onPointerLeave={this.toggleOverscrollBehavior}
+        onPointerEnter={
+          this.isInteractionEnabled()
+            ? this.toggleOverscrollBehavior
+            : undefined
+        }
+        onPointerLeave={
+          this.isInteractionEnabled()
+            ? this.toggleOverscrollBehavior
+            : undefined
+        }
       >
-        <AppContext.Provider value={this}>
-          <AppPropsContext.Provider value={this.props}>
-            <ExcalidrawContainerContext.Provider
-              value={this.excalidrawContainerValue}
-            >
-              <EditorInterfaceContext.Provider value={this.editorInterface}>
-                <ExcalidrawSetAppStateContext.Provider value={this.setAppState}>
-                  <ExcalidrawAppStateContext.Provider value={this.state}>
-                    <ExcalidrawElementsContext.Provider
-                      value={this.scene.getNonDeletedElements()}
-                    >
-                      <ExcalidrawActionManagerContext.Provider
-                        value={this.actionManager}
+        <ExcalidrawAPIContext.Provider value={this.api}>
+          <AppContext.Provider value={this}>
+            <AppPropsContext.Provider value={this.props}>
+              <ExcalidrawContainerContext.Provider
+                value={this.excalidrawContainerValue}
+              >
+                <EditorInterfaceContext.Provider value={this.editorInterface}>
+                  <ExcalidrawSetAppStateContext.Provider
+                    value={this.setAppState}
+                  >
+                    <ExcalidrawAppStateContext.Provider value={this.state}>
+                      <ExcalidrawElementsContext.Provider
+                        value={this.scene.getNonDeletedElements()}
                       >
-                        <LayerUI
-                          canvas={this.canvas}
-                          appState={this.state}
-                          files={this.files}
-                          setAppState={this.setAppState}
-                          actionManager={this.actionManager}
-                          elements={this.scene.getNonDeletedElements()}
-                          onLockToggle={this.toggleLock}
-                          onPenModeToggle={this.togglePenMode}
-                          onHandToolToggle={this.onHandToolToggle}
-                          langCode={getLanguage().code}
-                          renderTopLeftUI={renderTopLeftUI}
-                          renderTopRightUI={renderTopRightUI}
-                          renderCustomStats={renderCustomStats}
-                          showExitZenModeBtn={
-                            typeof this.props?.zenModeEnabled === "undefined" &&
-                            this.state.zenModeEnabled
-                          }
-                          UIOptions={this.props.UIOptions}
-                          onExportImage={this.onExportImage}
-                          renderWelcomeScreen={
-                            !this.state.isLoading &&
-                            this.state.showWelcomeScreen &&
-                            this.state.activeTool.type ===
-                              this.state.preferredSelectionTool.type &&
-                            !this.state.zenModeEnabled &&
-                            !this.scene.getElementsIncludingDeleted().length
-                          }
-                          app={this}
-                          isCollaborating={this.props.isCollaborating}
-                          generateLinkForSelection={
-                            this.props.generateLinkForSelection
-                          }
+                        <ExcalidrawActionManagerContext.Provider
+                          value={this.actionManager}
                         >
-                          {this.props.children}
-                        </LayerUI>
+                          <LayerUI
+                            canvas={this.canvas}
+                            appState={this.state}
+                            defaultUIEnabled={this.isDefaultUIEnabled()}
+                            zoomUIEnabled={this.isUIControlEnabled("zoom")}
+                            scrollBackToContentUIEnabled={this.isUIControlEnabled(
+                              "scrollBackToContent",
+                            )}
+                            files={this.files}
+                            setAppState={this.setAppState}
+                            actionManager={this.actionManager}
+                            elements={this.scene.getNonDeletedElements()}
+                            onLockToggle={this.toggleLock}
+                            onPenModeToggle={this.togglePenMode}
+                            langCode={getLanguage().code}
+                            renderTopLeftUI={renderTopLeftUI}
+                            renderTopRightUI={renderTopRightUI}
+                            renderCustomStats={renderCustomStats}
+                            showExitZenModeBtn={
+                              typeof this.props?.zenModeEnabled ===
+                                "undefined" && this.state.zenModeEnabled
+                            }
+                            UIOptions={this.props.UIOptions}
+                            onExportImage={this.onExportImage}
+                            renderWelcomeScreen={
+                              !this.state.isLoading &&
+                              this.state.showWelcomeScreen &&
+                              this.state.activeTool.type ===
+                                this.state.preferredSelectionTool.type &&
+                              !this.state.zenModeEnabled &&
+                              !this.scene.getElementsIncludingDeleted().length
+                            }
+                            app={this}
+                            isCollaborating={this.props.isCollaborating}
+                            generateLinkForSelection={
+                              this.props.generateLinkForSelection
+                            }
+                            currentUserControls={this.props.currentUserControls}
+                          >
+                            {this.props.children}
+                          </LayerUI>
 
-                        <div className="excalidraw-textEditorContainer" />
-                        <div className="excalidraw-contextMenuContainer" />
-                        <div className="excalidraw-eye-dropper-container" />
-                        <SVGLayer
-                          trails={[
-                            this.laserTrails,
-                            this.lassoTrail,
-                            this.eraserTrail,
-                          ]}
-                        />
-                        {selectedElements.length === 1 &&
-                          this.state.openDialog?.name !==
-                            "elementLinkSelector" &&
-                          this.state.showHyperlinkPopup && (
-                            <Hyperlink
-                              key={firstSelectedElement.id}
-                              element={firstSelectedElement}
-                              scene={this.scene}
-                              setAppState={this.setAppState}
-                              onLinkOpen={this.props.onLinkOpen}
-                              setToast={this.setToast}
-                              updateEmbedValidationStatus={
-                                this.updateEmbedValidationStatus
-                              }
+                          <div className="excalidraw-textEditorContainer" />
+                          <div className="excalidraw-contextMenuContainer" />
+                          <div className="excalidraw-eye-dropper-container" />
+                          <SVGLayer
+                            trails={[
+                              this.laserTrails,
+                              this.lassoTrail,
+                              this.eraserTrail,
+                              this.drawShape.trail,
+                            ]}
+                          />
+                          {this.isDefaultUIEnabled() && <CursorHint />}
+                          {this.isDefaultUIEnabled() &&
+                            selectedElements.length === 1 &&
+                            this.state.openDialog?.name !==
+                              "elementLinkSelector" &&
+                            this.state.showHyperlinkPopup && (
+                              <Hyperlink
+                                key={firstSelectedElement.id}
+                                element={firstSelectedElement}
+                                scene={this.scene}
+                                setAppState={this.setAppState}
+                                onLinkOpen={this.props.onLinkOpen}
+                                setToast={this.setToast}
+                                updateEmbedValidationStatus={
+                                  this.updateEmbedValidationStatus
+                                }
+                              />
+                            )}
+                          {this.isDefaultUIEnabled() &&
+                            this.props.aiEnabled !== false &&
+                            selectedElements.length === 1 &&
+                            isMagicFrameElement(firstSelectedElement) && (
+                              <ElementCanvasButtons
+                                element={firstSelectedElement}
+                                elementsMap={renderableElementsMap}
+                              >
+                                <ElementCanvasButton
+                                  title={t("labels.convertToCode")}
+                                  icon={MagicIcon}
+                                  checked={false}
+                                  onChange={() =>
+                                    this.onMagicFrameGenerate(
+                                      firstSelectedElement,
+                                      "button",
+                                    )
+                                  }
+                                />
+                              </ElementCanvasButtons>
+                            )}
+                          {this.isDefaultUIEnabled() &&
+                            selectedElements.length === 1 &&
+                            isIframeElement(firstSelectedElement) &&
+                            firstSelectedElement.customData?.generationData
+                              ?.status === "done" && (
+                              <ElementCanvasButtons
+                                element={firstSelectedElement}
+                                elementsMap={renderableElementsMap}
+                              >
+                                <ElementCanvasButton
+                                  title={t("labels.copySource")}
+                                  icon={copyIcon}
+                                  checked={false}
+                                  onChange={() =>
+                                    this.onIframeSrcCopy(firstSelectedElement)
+                                  }
+                                />
+                                <ElementCanvasButton
+                                  title="Enter fullscreen"
+                                  icon={fullscreenIcon}
+                                  checked={false}
+                                  onChange={() => {
+                                    const iframe =
+                                      this.getHTMLIFrameElement(
+                                        firstSelectedElement,
+                                      );
+                                    if (iframe) {
+                                      try {
+                                        iframe.requestFullscreen();
+                                        this.setState({
+                                          activeEmbeddable: {
+                                            element: firstSelectedElement,
+                                            state: "active",
+                                          },
+                                          selectedElementIds: {
+                                            [firstSelectedElement.id]: true,
+                                          },
+                                          newElement: null,
+                                          selectionElement: null,
+                                        });
+                                      } catch (err: any) {
+                                        console.warn(err);
+                                        this.setState({
+                                          errorMessage:
+                                            "Couldn't enter fullscreen",
+                                        });
+                                      }
+                                    }
+                                  }}
+                                />
+                              </ElementCanvasButtons>
+                            )}
+
+                          {this.isDefaultUIEnabled() && this.state.contextMenu && (
+                            <ContextMenu
+                              items={this.state.contextMenu.items}
+                              top={this.state.contextMenu.top}
+                              left={this.state.contextMenu.left}
+                              actionManager={this.actionManager}
+                              onClose={(callback) => {
+                                this.setState({ contextMenu: null }, () => {
+                                  this.focusContainer();
+                                  callback?.();
+                                });
+                              }}
                             />
                           )}
-                        {this.props.aiEnabled !== false &&
-                          selectedElements.length === 1 &&
-                          isMagicFrameElement(firstSelectedElement) && (
-                            <ElementCanvasButtons
-                              element={firstSelectedElement}
-                              elementsMap={elementsMap}
-                            >
-                              <ElementCanvasButton
-                                title={t("labels.convertToCode")}
-                                icon={MagicIcon}
-                                checked={false}
-                                onChange={() =>
-                                  this.onMagicFrameGenerate(
-                                    firstSelectedElement,
-                                    "button",
-                                  )
-                                }
-                              />
-                            </ElementCanvasButtons>
-                          )}
-                        {selectedElements.length === 1 &&
-                          isIframeElement(firstSelectedElement) &&
-                          firstSelectedElement.customData?.generationData
-                            ?.status === "done" && (
-                            <ElementCanvasButtons
-                              element={firstSelectedElement}
-                              elementsMap={elementsMap}
-                            >
-                              <ElementCanvasButton
-                                title={t("labels.copySource")}
-                                icon={copyIcon}
-                                checked={false}
-                                onChange={() =>
-                                  this.onIframeSrcCopy(firstSelectedElement)
-                                }
-                              />
-                              <ElementCanvasButton
-                                title="Enter fullscreen"
-                                icon={fullscreenIcon}
-                                checked={false}
-                                onChange={() => {
-                                  const iframe =
-                                    this.getHTMLIFrameElement(
-                                      firstSelectedElement,
-                                    );
-                                  if (iframe) {
-                                    try {
-                                      iframe.requestFullscreen();
-                                      this.setState({
-                                        activeEmbeddable: {
-                                          element: firstSelectedElement,
-                                          state: "active",
-                                        },
-                                        selectedElementIds: {
-                                          [firstSelectedElement.id]: true,
-                                        },
-                                        newElement: null,
-                                        selectionElement: null,
-                                      });
-                                    } catch (err: any) {
-                                      console.warn(err);
-                                      this.setState({
-                                        errorMessage:
-                                          "Couldn't enter fullscreen",
-                                      });
-                                    }
-                                  }
-                                }}
-                              />
-                            </ElementCanvasButtons>
-                          )}
-
-                        {this.state.toast !== null && (
-                          <Toast
-                            message={this.state.toast.message}
-                            onClose={this.handleToastClose}
-                            duration={this.state.toast.duration}
-                            closable={this.state.toast.closable}
-                          />
-                        )}
-
-                        {this.state.contextMenu && (
-                          <ContextMenu
-                            items={this.state.contextMenu.items}
-                            top={this.state.contextMenu.top}
-                            left={this.state.contextMenu.left}
-                            actionManager={this.actionManager}
-                            onClose={(callback) => {
-                              this.setState({ contextMenu: null }, () => {
-                                this.focusContainer();
-                                callback?.();
-                              });
-                            }}
-                          />
-                        )}
-                        <StaticCanvas
-                          canvas={this.canvas}
-                          rc={this.rc}
-                          elementsMap={elementsMap}
-                          allElementsMap={allElementsMap}
-                          visibleElements={visibleElements}
-                          sceneNonce={sceneNonce}
-                          selectionNonce={
-                            this.state.selectionElement?.versionNonce
-                          }
-                          scale={window.devicePixelRatio}
-                          appState={this.state}
-                          renderConfig={{
-                            imageCache: this.imageCache,
-                            isExporting: false,
-                            renderGrid: isGridModeEnabled(this),
-                            canvasBackgroundColor:
-                              this.state.viewBackgroundColor,
-                            embedsValidationStatus: this.embedsValidationStatus,
-                            elementsPendingErasure: this.elementsPendingErasure,
-                            pendingFlowchartNodes:
-                              this.flowChartCreator.pendingNodes,
-                            theme: this.state.theme,
-                          }}
-                        />
-                        {this.state.newElement && (
-                          <NewElementCanvas
-                            appState={this.state}
-                            scale={window.devicePixelRatio}
+                          <StaticCanvas
+                            canvas={this.canvas}
                             rc={this.rc}
-                            elementsMap={elementsMap}
+                            elementsMap={renderableElementsMap}
                             allElementsMap={allElementsMap}
+                            visibleElements={visibleElements}
+                            canvasNonce={canvasNonce}
+                            selectionNonce={
+                              this.state.selectionElement?.versionNonce
+                            }
+                            scale={this.ownerWindow.devicePixelRatio}
+                            appState={this.state}
                             renderConfig={{
                               imageCache: this.imageCache,
                               isExporting: false,
-                              renderGrid: false,
+                              renderGrid: isGridModeEnabled(this),
+                              renderLinks: this.isLinksEnabled(),
                               canvasBackgroundColor:
                                 this.state.viewBackgroundColor,
                               embedsValidationStatus:
                                 this.embedsValidationStatus,
                               elementsPendingErasure:
                                 this.elementsPendingErasure,
-                              pendingFlowchartNodes: null,
+                              pendingFlowchartNodes:
+                                this.flowchart.pendingNodes,
                               theme: this.state.theme,
                             }}
                           />
-                        )}
-                        <InteractiveCanvas
-                          app={this}
-                          containerRef={this.excalidrawContainerRef}
-                          canvas={this.interactiveCanvas}
-                          elementsMap={elementsMap}
-                          visibleElements={visibleElements}
-                          allElementsMap={allElementsMap}
-                          selectedElements={selectedElements}
-                          sceneNonce={sceneNonce}
-                          selectionNonce={
-                            this.state.selectionElement?.versionNonce
-                          }
-                          scale={window.devicePixelRatio}
-                          appState={this.state}
-                          renderScrollbars={
-                            this.props.renderScrollbars === true
-                          }
-                          editorInterface={this.editorInterface}
-                          renderInteractiveSceneCallback={
-                            this.renderInteractiveSceneCallback
-                          }
-                          handleCanvasRef={this.handleInteractiveCanvasRef}
-                          onContextMenu={this.handleCanvasContextMenu}
-                          onPointerMove={this.handleCanvasPointerMove}
-                          onPointerUp={this.handleCanvasPointerUp}
-                          onPointerCancel={this.removePointer}
-                          onTouchMove={this.handleTouchMove}
-                          onPointerDown={this.handleCanvasPointerDown}
-                          onDoubleClick={this.handleCanvasDoubleClick}
-                        />
-                        {this.state.userToFollow && (
-                          <FollowMode
-                            width={this.state.width}
-                            height={this.state.height}
-                            userToFollow={this.state.userToFollow}
-                            onDisconnect={this.maybeUnfollowRemoteUser}
-                          />
-                        )}
-                        {this.renderFrameNames()}
-                        {this.state.activeLockedId && (
-                          <UnlockPopup
+                          {newElementCanvasElement && (
+                            <NewElementCanvas
+                              appState={this.state}
+                              newElement={newElementCanvasElement}
+                              scale={this.ownerWindow.devicePixelRatio}
+                              rc={this.rc}
+                              elementsMap={renderableElementsMap}
+                              allElementsMap={allElementsMap}
+                              renderConfig={{
+                                imageCache: this.imageCache,
+                                isExporting: false,
+                                renderGrid: false,
+                                canvasBackgroundColor:
+                                  this.state.viewBackgroundColor,
+                                embedsValidationStatus:
+                                  this.embedsValidationStatus,
+                                elementsPendingErasure:
+                                  this.elementsPendingErasure,
+                                pendingFlowchartNodes: null,
+                                theme: this.state.theme,
+                              }}
+                            />
+                          )}
+                          <InteractiveCanvas
                             app={this}
-                            activeLockedId={this.state.activeLockedId}
+                            containerRef={this.excalidrawContainerRef}
+                            canvas={this.interactiveCanvas}
+                            elementsMap={renderableElementsMap}
+                            visibleElements={visibleElements}
+                            allElementsMap={allElementsMap}
+                            selectedElements={selectedElements}
+                            canvasNonce={canvasNonce}
+                            selectionNonce={
+                              this.state.selectionElement?.versionNonce
+                            }
+                            scale={this.ownerWindow.devicePixelRatio}
+                            appState={this.state}
+                            renderScrollbars={
+                              this.props.renderScrollbars === true
+                            }
+                            editorInterface={this.editorInterface}
+                            interactionEnabled={this.isInteractionEnabled()}
+                            navigationEnabled={this.isNavigationEnabled()}
+                            renderInteractiveSceneCallback={
+                              this.renderInteractiveSceneCallback
+                            }
+                            handleCanvasRef={this.handleInteractiveCanvasRef}
+                            onContextMenu={this.handleCanvasContextMenu}
+                            onClick={this.handleCanvasClick}
+                            onPointerMove={this.handleCanvasPointerMove}
+                            onPointerUp={this.handleCanvasPointerUp}
+                            onPointerCancel={this.removePointer}
+                            onTouchMove={this.handleTouchMove}
+                            onPointerDown={this.handleCanvasPointerDown}
+                            onDoubleClick={this.handleCanvasDoubleClick}
                           />
-                        )}
-                        {showShapeSwitchPanel && (
-                          <ConvertElementTypePopup app={this} />
-                        )}
-                      </ExcalidrawActionManagerContext.Provider>
-                      {this.renderEmbeddables()}
-                    </ExcalidrawElementsContext.Provider>
-                  </ExcalidrawAppStateContext.Provider>
-                </ExcalidrawSetAppStateContext.Provider>
-              </EditorInterfaceContext.Provider>
-            </ExcalidrawContainerContext.Provider>
-          </AppPropsContext.Provider>
-        </AppContext.Provider>
+                          {this.props.viewportStatusFrame?.border &&
+                            this.editorInterface.formFactor === "phone" && (
+                              <ViewportStatusBorder
+                                border={this.props.viewportStatusFrame.border}
+                              />
+                            )}
+                          {this.renderFrameNames()}
+                          {this.isDefaultUIEnabled() &&
+                            this.state.activeLockedId && (
+                              <UnlockPopup
+                                app={this}
+                                activeLockedId={this.state.activeLockedId}
+                              />
+                            )}
+                          {this.isDefaultUIEnabled() &&
+                            showShapeSwitchPanel && (
+                              <ConvertElementTypePopup app={this} />
+                            )}
+                        </ExcalidrawActionManagerContext.Provider>
+                        {this.renderEmbeddables()}
+                      </ExcalidrawElementsContext.Provider>
+                    </ExcalidrawAppStateContext.Provider>
+                  </ExcalidrawSetAppStateContext.Provider>
+                </EditorInterfaceContext.Provider>
+              </ExcalidrawContainerContext.Provider>
+            </AppPropsContext.Provider>
+          </AppContext.Provider>
+        </ExcalidrawAPIContext.Provider>
       </div>
     );
   }
@@ -2241,7 +2720,7 @@ class App extends React.Component<AppProps, AppState> {
   public onExportImage = async (
     type: keyof typeof EXPORT_IMAGE_TYPES,
     elements: ExportedElements,
-    opts: { exportingFrame: ExcalidrawFrameLikeElement | null },
+    opts: { exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null },
   ) => {
     trackEvent("export", type, "ui");
     const fileHandle = await exportCanvas(
@@ -2319,7 +2798,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private async onMagicFrameGenerate(
-    magicFrame: ExcalidrawMagicFrameElement,
+    magicFrame: Readonly<NonDeleted<ExcalidrawMagicFrameElement>>,
     source: "button" | "upstream",
   ) {
     const generateDiagramToCode = this.plugins.diagramToCode?.generate;
@@ -2334,6 +2813,7 @@ class App extends React.Component<AppProps, AppState> {
     const magicFrameChildren = getElementsOverlappingFrame(
       this.scene.getNonDeletedElements(),
       magicFrame,
+      this.scene.getNonDeletedElementsMap(),
     ).filter((el) => !isMagicFrameElement(el));
 
     if (!magicFrameChildren.length) {
@@ -2371,6 +2851,30 @@ class App extends React.Component<AppProps, AppState> {
       const { html } = await generateDiagramToCode({
         frame: magicFrame,
         children: magicFrameChildren,
+        onPartial: (partialResponse) => {
+          // only stream into the frame while this generation is still pending
+          if (
+            this.magicGenerations.get(frameElement.id)?.status !== "pending"
+          ) {
+            return;
+          }
+          const htmlStartIndex = partialResponse.search(
+            /<!doctype html|<html[\s>]/i,
+          );
+          if (htmlStartIndex === -1) {
+            return;
+          }
+          // the pending iframe document renders the partial html itself
+          // (see the streaming shell in `renderEmbeddables`) — we only feed
+          // it snapshots of the html received so far
+          this.getHTMLIFrameElement(frameElement)?.contentWindow?.postMessage(
+            {
+              type: "excalidraw:diagramToCode:partial",
+              html: partialResponse.slice(htmlStartIndex),
+            },
+            "*",
+          );
+        },
       });
 
       trackEvent("ai", "generate (success)", "d2c");
@@ -2432,7 +2936,9 @@ class App extends React.Component<AppProps, AppState> {
       this.setActiveTool({ type: TOOL_TYPE.magicframe });
       trackEvent("ai", "tool-select (empty-selection)", "d2c");
     } else {
-      const selectedMagicFrame: ExcalidrawMagicFrameElement | false =
+      const selectedMagicFrame:
+        | NonDeleted<ExcalidrawMagicFrameElement>
+        | false =
         selectedElements.length === 1 &&
         isMagicFrameElement(selectedElements[0]) &&
         selectedElements[0];
@@ -2450,7 +2956,7 @@ class App extends React.Component<AppProps, AppState> {
 
       trackEvent("ai", "tool-select (existing selection)", "d2c");
 
-      let frame: ExcalidrawMagicFrameElement;
+      let frame: NonDeleted<ExcalidrawMagicFrameElement>;
       if (selectedMagicFrame) {
         // a single magicframe already selected -> use it
         frame = selectedMagicFrame;
@@ -2470,7 +2976,7 @@ class App extends React.Component<AppProps, AppState> {
           locked: false,
         });
 
-        this.scene.insertElement(frame);
+        this.insertNewElement(frame);
 
         for (const child of selectedElements) {
           this.scene.mutateElement(child, { frameId: frame.id });
@@ -2574,6 +3080,12 @@ class App extends React.Component<AppProps, AppState> {
         viewModeEnabled = this.props.viewModeEnabled;
       }
 
+      // non-interactive editor implies view mode (overrides both the action
+      // result and the host-supplied `viewModeEnabled` prop)
+      if (!this.isInteractionEnabled()) {
+        viewModeEnabled = true;
+      }
+
       if (typeof this.props.zenModeEnabled !== "undefined") {
         zenModeEnabled = this.props.zenModeEnabled;
       }
@@ -2582,20 +3094,16 @@ class App extends React.Component<AppProps, AppState> {
 
       // make sure editingTextElement points to latest element reference
       if (actionResult.elements && editingTextElement) {
-        actionResult.elements.forEach((element) => {
-          if (
-            editingTextElement?.id === element.id &&
-            editingTextElement !== element &&
-            isNonDeletedElement(element) &&
-            isTextElement(element)
-          ) {
-            editingTextElement = element;
-          }
-        });
-      }
-
-      if (editingTextElement?.isDeleted) {
-        editingTextElement = null;
+        const editingTextElementId = editingTextElement.id;
+        const nextElement = actionResult.elements.find(
+          (element) => element.id === editingTextElementId,
+        );
+        editingTextElement =
+          nextElement &&
+          isNonDeletedElement(nextElement) &&
+          isTextElement(nextElement)
+            ? nextElement
+            : null;
       }
 
       this.setState((prevAppState) => {
@@ -2625,11 +3133,15 @@ class App extends React.Component<AppProps, AppState> {
     }
   });
 
+  public scheduleCapture = () => this.store.scheduleCapture();
+
   // Lifecycle
 
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
-    this.setState({ isBindingEnabled: true });
+    this.setState({
+      isBindingEnabled: this.state.bindingPreference === "enabled",
+    });
   });
 
   private onUnload = () => {
@@ -2638,6 +3150,308 @@ class App extends React.Component<AppProps, AppState> {
 
   private disableEvent: EventListener = (event) => {
     event.preventDefault();
+  };
+
+  // prevent the browser's own zoom over the non-interactive editor while
+  // letting regular scroll through (trackpad pinch is delivered as
+  // ctrl+wheel)
+  private preventBrowserZoomWheel = (event: WheelEvent) => {
+    if (event[KEYS.CTRL_OR_CMD]) {
+      event.preventDefault();
+    }
+  };
+
+  // handles only the navigation keyboard: page-scroll keys and
+  // `navigation`-flagged action shortcuts (canvas zoom & zoom-to-fit — see
+  // `ActionManager.handleKeyDown` gates); the rest of the keyboard handling
+  // stays disabled while non-interactive
+  private handleNavigationModeKeyDown = (event: KeyboardEvent) => {
+    if (this.maybeHandlePageScrollKeyDown(event)) {
+      // the editor consumes the input — the page must not scroll along
+      event.preventDefault();
+      return;
+    }
+    this.actionManager.handleKeyDown(event);
+  };
+
+  /**
+   * PageUp/PageDown scroll the canvas by a page — vertically, or
+   * horizontally with shift. Respects `appState.scrollConstraints`
+   * (via `viewport.translate`).
+   */
+  private maybeHandlePageScrollKeyDown = (
+    event: KeyboardEvent | React.KeyboardEvent,
+  ): boolean => {
+    if (event.key !== KEYS.PAGE_UP && event.key !== KEYS.PAGE_DOWN) {
+      return false;
+    }
+    let offset =
+      (event.shiftKey ? this.state.width : this.state.height) /
+      this.state.zoom.value;
+    if (event.key === KEYS.PAGE_DOWN) {
+      offset = -offset;
+    }
+    if (event.shiftKey) {
+      this.viewport.translate((state) => ({
+        scrollX: state.scrollX + offset,
+      }));
+    } else {
+      this.viewport.translate((state) => ({
+        scrollY: state.scrollY + offset,
+      }));
+    }
+    return true;
+  };
+
+  private preventBrowserZoomKeyDown = (event: KeyboardEvent) => {
+    if (
+      event[KEYS.CTRL_OR_CMD] &&
+      (event.code === CODES.EQUAL ||
+        event.code === CODES.MINUS ||
+        event.code === CODES.ZERO ||
+        event.code === CODES.NUM_ADD ||
+        event.code === CODES.NUM_SUBTRACT ||
+        event.code === CODES.NUM_ZERO)
+    ) {
+      event.preventDefault();
+    }
+  };
+
+  /** Ends active input sessions before switching to a view-mode/non-interactive
+   *  mode. */
+  private terminateActiveInteraction = () => {
+    // Complete any active pointer interaction before clearing the state it
+    // relies on. Among other things this tears down window-level listeners.
+    this.maybeCleanupAfterMissingPointerUp(null);
+
+    isHoldingSpace = false;
+    isPanning = false;
+    isDraggingScrollBar = false;
+    lastPointerUp = null;
+
+    gesture.pointers.clear();
+    gesture.lastCenter = null;
+    gesture.initialDistance = null;
+    gesture.initialScale = null;
+
+    clearTimeout(tappedTwiceTimer);
+    tappedTwiceTimer = 0;
+    App.resetTapTwice();
+    this.resetContextMenuTimer();
+
+    clearTimeout(IS_PLAIN_PASTE_TIMER);
+    IS_PLAIN_PASTE_TIMER = 0;
+    IS_PLAIN_PASTE = false;
+
+    if (this.bindModeHandler) {
+      clearTimeout(this.bindModeHandler);
+      this.bindModeHandler = null;
+    }
+
+    this.flowchart.clear();
+
+    // These components install their own DOM listeners rather than going
+    // through App's input handlers, so they must be explicitly unmounted.
+    editorJotaiStore.set(activeEyeDropperAtom, null);
+    editorJotaiStore.set(convertElementTypePopupAtom, null);
+
+    if (this.state.editingFrame) {
+      const frame = this.scene.getNonDeletedElement(this.state.editingFrame);
+      this.resetEditingFrame(frame && isFrameLikeElement(frame) ? frame : null);
+    }
+
+    // textWysiwyg's submit path uses flushSync. Defer until after the current
+    // componentDidUpdate lifecycle, then submit whichever text-editing session
+    // is active if editing is still disabled.
+    queueMicrotask(() => {
+      if (!this.isInteractionEnabled() || this.state.viewModeEnabled) {
+        this.textWysiwygSubmitHandler?.();
+      }
+    });
+
+    this.setState({
+      contextMenu: null,
+      openMenu: null,
+      openPopup: null,
+      cursorButton: "up",
+      bindMode: "orbit",
+      activeEmbeddable: null,
+      activeLockedId: null,
+      selectedElementsAreBeingDragged: false,
+      selectionElement: null,
+      resizingElement: null,
+      isResizing: false,
+      isRotating: false,
+      isCropping: false,
+      croppingElementId: null,
+      suggestedBinding: null,
+      frameToHighlight: null,
+      elementsToHighlight: null,
+      snapLines: [],
+      showHyperlinkPopup: false,
+    });
+    this.deselectElements();
+    if (!this.isInteractionEnabled()) {
+      this.setState({ originSnapOffset: null });
+      this.cursor.reset();
+    }
+  };
+
+  private handleInteractionStateChange = (
+    prevProps: AppProps,
+    prevState: AppState,
+  ) => {
+    const wasInteractionEnabled = this.isInteractionEnabled(prevProps);
+    const interactionEnabledChanged =
+      wasInteractionEnabled !== this.isInteractionEnabled();
+    const viewModePropChanged =
+      prevProps.viewModeEnabled !== this.props.viewModeEnabled;
+
+    // Preserve internally toggled view mode while interactive and
+    // uncontrolled. Synchronize it when its prop changes, when interaction is
+    // re-enabled, or when non-interactive mode needs to force it on.
+    let nextViewModeEnabled = this.state.viewModeEnabled;
+    if (!this.isInteractionEnabled()) {
+      nextViewModeEnabled = true;
+    } else if (viewModePropChanged || interactionEnabledChanged) {
+      nextViewModeEnabled = !!this.props.viewModeEnabled;
+    }
+    if (nextViewModeEnabled !== this.state.viewModeEnabled) {
+      this.setState({ viewModeEnabled: nextViewModeEnabled });
+    }
+
+    const editingWasEnabled =
+      wasInteractionEnabled && !prevState.viewModeEnabled;
+    const editingEnabled =
+      this.isInteractionEnabled() && !this.state.viewModeEnabled;
+    const becameNonInteractive =
+      interactionEnabledChanged && !this.isInteractionEnabled();
+
+    if (becameNonInteractive || (editingWasEnabled && !editingEnabled)) {
+      this.terminateActiveInteraction();
+    }
+
+    if (interactionEnabledChanged) {
+      // listener tiers depend on `props.interaction` even when
+      // `state.viewModeEnabled` ends up unchanged
+      this.addEventListeners();
+    }
+
+    // NOTE link icons appearing/disappearing is handled by the re-render
+    // itself (`renderConfig.renderLinks`)
+    if (this.isLinksEnabled(prevProps) !== this.isLinksEnabled()) {
+      if (!this.isLinksEnabled()) {
+        this.hitLinkElement = undefined;
+        hideHyperlinkToolip();
+        this.cursor.reset();
+      }
+    }
+
+    if (this.isEmbedsEnabled(prevProps) !== this.isEmbedsEnabled()) {
+      if (!this.isEmbedsEnabled()) {
+        this.setState({ activeEmbeddable: null });
+      }
+    }
+
+    if (
+      this.isToolSupported(prevState.activeTool.type, prevProps) !==
+      this.isToolSupported(this.state.activeTool.type)
+    ) {
+      if (!this.isToolSupported(this.state.activeTool.type)) {
+        // end a possibly mid-stroke laser trail (the stroke's own window
+        // listeners tear down on the next pointerup)
+        this.laserTrails.endPath();
+      }
+      this.cursor.reset();
+    }
+
+    // invariant: while non-interactive, the active tool is either
+    // input-enabled (`interaction.enabled.tools`) or the neutral default —
+    // reset stale tool state (e.g. a presenter's laser after handing off)
+    // so it doesn't leak through `onChange` / collab pointer payloads or
+    // linger until interaction is re-enabled
+    if (
+      !this.isInteractionEnabled() &&
+      !this.isToolSupported(this.state.activeTool.type) &&
+      this.state.activeTool.type !== "selection"
+    ) {
+      this.setState({
+        activeTool: updateActiveTool(this.state, { type: "selection" }),
+      });
+    }
+
+    if (
+      this.isBrowserZoomEnabled(prevProps) !== this.isBrowserZoomEnabled() ||
+      this.isNavigationEnabled(prevProps) !== this.isNavigationEnabled()
+    ) {
+      this.addEventListeners();
+      this.cursor.reset();
+    }
+
+    if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
+      if (this.isInteractionEnabled()) {
+        this.addEventListeners();
+      }
+      if (!this.state.viewModeEnabled) {
+        this.deselectElements();
+      }
+      this.cursor.reset();
+    }
+  };
+
+  /** whether the two values reference the same tool (incl. custom subtype) */
+  private isSameForcedTool = (
+    a: { type: string; customType?: string | null } | null | undefined,
+    b: { type: string; customType?: string | null } | null | undefined,
+  ) =>
+    a?.type === b?.type &&
+    (a?.type === "custom" ? a.customType ?? null : null) ===
+      (b?.type === "custom" ? b.customType ?? null : null);
+
+  /**
+   * Keeps `state.activeTool` synced to the host-controlled
+   * `props.activeTool`. `setActiveTool` refuses non-matching activations
+   * while forced (user input, API); this backstop covers the writers that
+   * bypass the funnel (`actionFinalize`/`actionDeselect`, `restore()` on
+   * scene load, ...) and re-applies the tool once it becomes activatable
+   * (e.g. `interaction` config changes).
+   */
+  private handleForcedToolChange = (
+    prevProps: AppProps,
+    prevState: AppState,
+  ) => {
+    const forcedTool = this.props.activeTool;
+    if (!forcedTool) {
+      return;
+    }
+
+    const forcedToolChanged = !this.isSameForcedTool(
+      prevProps.activeTool,
+      forcedTool,
+    );
+
+    if ((forcedTool.type as string) === "image") {
+      if (forcedToolChanged) {
+        console.warn(`"image" tool cannot be forced via "props.activeTool"`);
+      }
+      return;
+    }
+
+    if (this.isSameForcedTool(forcedTool, this.state.activeTool)) {
+      return;
+    }
+
+    // (re)force only on relevant changes so that a standing refusal (tool
+    // disabled, or not enabled while non-interactive) warns once instead of
+    // on every update
+    if (
+      forcedToolChanged ||
+      prevState.activeTool !== this.state.activeTool ||
+      this.isToolSupported(forcedTool.type, prevProps) !==
+        this.isToolSupported(forcedTool.type, this.props)
+    ) {
+      this.setActiveTool(forcedTool);
+    }
   };
 
   private resetHistory = () => {
@@ -2666,8 +3480,11 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private initializeScene = async () => {
-    if ("launchQueue" in window && "LaunchParams" in window) {
-      (window as any).launchQueue.setConsumer(
+    if (
+      "launchQueue" in this.ownerWindow &&
+      "LaunchParams" in this.ownerWindow
+    ) {
+      (this.ownerWindow as any).launchQueue.setConsumer(
         async (launchParams: { files: any[] }) => {
           if (!launchParams.files.length) {
             return;
@@ -2751,16 +3568,39 @@ class App extends React.Component<AppProps, AppState> {
       toast: this.state.toast,
     };
 
-    if (initialData?.scrollToContent) {
+    const viewportAppState = {
+      ...restoredAppState,
+      width: this.state.width,
+      height: this.state.height,
+      offsetTop: this.state.offsetTop,
+      offsetLeft: this.state.offsetLeft,
+    };
+    const initialViewport = this.props.initialState?.viewport;
+
+    if (initialViewport) {
+      const restoredNonDeletedElements = restoredElements.filter(
+        (element) => !element.isDeleted,
+      ) as readonly NonDeletedExcalidrawElement[];
+      const restoredElementsMap = arrayToMap(
+        restoredNonDeletedElements,
+      ) as NonDeletedSceneElementsMap;
+
+      const initialViewportState = this.viewport.resolveInitialViewport(
+        initialViewport,
+        restoredElementsMap,
+        viewportAppState,
+      );
+
+      if (initialViewportState) {
+        restoredAppState = {
+          ...restoredAppState,
+          ...initialViewportState,
+        };
+      }
+    } else if (initialData?.scrollToContent) {
       restoredAppState = {
         ...restoredAppState,
-        ...calculateScrollCenter(restoredElements, {
-          ...restoredAppState,
-          width: this.state.width,
-          height: this.state.height,
-          offsetTop: this.state.offsetTop,
-          offsetLeft: this.state.offsetLeft,
-        }),
+        ...getScrollToContentState(restoredElements, viewportAppState),
       };
     }
 
@@ -2782,8 +3622,12 @@ class App extends React.Component<AppProps, AppState> {
       this.fonts.onLoaded(fontFaces);
     });
 
-    if (isElementLink(window.location.href)) {
-      this.scrollToContent(window.location.href, { animate: false });
+    if (isElementLink(this.ownerWindow.location.href)) {
+      this.viewport.setViewport({
+        target: this.ownerWindow.location.href,
+        fit: "scale-down",
+        animation: false,
+      });
     }
   };
 
@@ -2833,6 +3677,10 @@ class App extends React.Component<AppProps, AppState> {
     const prevStylesPanelMode = this.stylesPanelMode;
     this.stylesPanelMode = nextStylesPanelMode;
 
+    // the panel footprint differs between modes (compact vs full), so a
+    // measurement taken in the previous mode no longer applies
+    this.viewport.invalidateUIOffset("stylesPanel");
+
     if (prevStylesPanelMode !== "full" && nextStylesPanelMode === "full") {
       this.setState((prevState) => ({
         preferredSelectionTool: {
@@ -2864,6 +3712,8 @@ class App extends React.Component<AppProps, AppState> {
 
   public async componentDidMount() {
     this.unmounted = false;
+    this.api = this.createExcalidrawAPI();
+
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
@@ -2905,12 +3755,10 @@ class App extends React.Component<AppProps, AppState> {
       this.history.record(increment.delta);
     });
 
-    const { onIncrement } = this.props;
-
     // per. optimmisation, only subscribe if there is the `onIncrement` prop registered, to avoid unnecessary computation
-    if (onIncrement) {
+    if (this.props.onIncrement) {
       this.store.onStoreIncrementEmitter.on((increment) => {
-        onIncrement(increment);
+        this.props.onIncrement?.(increment);
       });
     }
 
@@ -2921,15 +3769,20 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
-    if (supportsResizeObserver && this.excalidrawContainerRef.current) {
-      this.resizeObserver = new ResizeObserver(() => {
+    if (
+      typeof this.ownerWindow.ResizeObserver === "function" &&
+      this.excalidrawContainerRef.current
+    ) {
+      this.resizeObserver = new this.ownerWindow.ResizeObserver(() => {
         this.refreshEditorInterface();
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
 
-    const searchParams = new URLSearchParams(window.location.search.slice(1));
+    const searchParams = new URLSearchParams(
+      this.ownerWindow.location.search.slice(1),
+    );
 
     if (searchParams.has("web-share-target")) {
       // Obtain a file that was shared via the Web Share Target API.
@@ -2944,33 +3797,70 @@ class App extends React.Component<AppProps, AppState> {
         errorMessage: <BraveMeasureTextError />,
       });
     }
+
+    const mountPayload = {
+      excalidrawAPI: this.api,
+      container: this.excalidrawContainerRef.current,
+    };
+
+    this.editorLifecycleEvents.emit("editor:mount", mountPayload);
+    this.props.onMount?.(mountPayload);
+    this.props.onExcalidrawAPI?.(this.api);
   }
 
   public componentWillUnmount() {
-    (window as any).launchQueue?.setConsumer(() => {});
+    // we're recreating the api object reference so that the
+    // <ExcalidrawAPIContext.Provider/> picks up on it
+    this.api = { ...this.api, isDestroyed: true };
+
+    for (const key of Object.keys(this.api) as (keyof typeof this.api)[]) {
+      if (
+        (key.startsWith("get") ||
+          key === "onStateChange" ||
+          key === "onEvent") &&
+        typeof this.api[key] === "function"
+      ) {
+        (this.api as any)[key] = () => {
+          throw new Error(
+            "ExcalidrawAPI is no longer usable after the editor has been unmounted and will return invalid/empty data. You should check for `ExcalidrawAPI.isDestroyed` before calling get* methods on subscribing to state/event changes.",
+          );
+        };
+      }
+    }
+
+    this.editorLifecycleEvents.emit("editor:unmount");
+    this.props.onUnmount?.();
+    this.props.onExcalidrawAPI?.(null);
+
+    (this.ownerWindow as any).launchQueue?.setConsumer(() => {});
+
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
-    this.fonts = new Fonts(this.scene);
+    this.fonts = new Fonts(this.scene, this.ownerDocument);
     this.renderer = new Renderer(this.scene);
     this.files = {};
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;
+    this.viewport.destroy();
     this.removeEventListeners();
     this.library.destroy();
     this.laserTrails.stop();
+    this.drawShape.stop();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
     this.store.onDurableIncrementEmitter.clear();
+    this.appStateObserver.clear();
+    this.editorLifecycleEvents.clear();
     ShapeCache.destroy();
     SnapCache.destroy();
     clearTimeout(touchTimeout);
     isSomeElementSelected.clearCache();
     selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
-    document.documentElement.style.overscrollBehaviorX = "";
+    this.ownerDocument.documentElement.style.overscrollBehaviorX = "";
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -2986,7 +3876,7 @@ class App extends React.Component<AppProps, AppState> {
   private onFullscreenChange = () => {
     if (
       // points to the iframe element we fullscreened
-      !document.fullscreenElement &&
+      !this.ownerDocument.fullscreenElement &&
       this.state.activeEmbeddable?.state === "active"
     ) {
       this.setState({
@@ -3004,12 +3894,159 @@ class App extends React.Component<AppProps, AppState> {
     this.removeEventListeners();
 
     // -------------------------------------------------------------------------
+    //          listeners active even when the editor is non-interactive
+    // -------------------------------------------------------------------------
+
+    this.onRemoveEventListenersEmitter.once(
+      addEventListener(
+        this.ownerWindow,
+        EVENT.MESSAGE,
+        this.onWindowMessage,
+        false,
+      ),
+      addEventListener(
+        this.ownerDocument,
+        EVENT.POINTER_UP,
+        this.removePointer,
+        {
+          passive: false,
+        },
+      ), // #3553
+      // rerender text elements on font load to fix #637 && #1553
+      addEventListener(
+        this.ownerDocument.fonts,
+        "loadingdone",
+        (event) => {
+          const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+          this.fonts.onLoaded(fontFaces);
+        },
+        { passive: false },
+      ),
+      addEventListener(
+        this.ownerWindow,
+        EVENT.FOCUS,
+        () => {
+          this.maybeCleanupAfterMissingPointerUp(null);
+          // browsers (chrome?) tend to free up memory a lot, which results
+          // in canvas context being cleared. Thus re-render on focus.
+          this.triggerRender(true);
+        },
+        { passive: false },
+      ),
+    );
+
+    if (!this.isInteractionEnabled()) {
+      // NOTE by not attaching the wheel/touch/gesture listeners below (which
+      // preventDefault), the browser default behavior — such as scrolling the
+      // page over the editor — is retained while non-interactive
+      if (this.isNavigationEnabled()) {
+        // wheel pan/zoom & pinch — the editor consumes these again, so the
+        // page no longer scrolls over the editor
+        this.onRemoveEventListenersEmitter.once(
+          addEventListener(
+            this.excalidrawContainerRef.current,
+            EVENT.WHEEL,
+            this.handleWheel,
+            { passive: false },
+          ),
+          // navigation action shortcuts (canvas zoom & zoom-to-fit)
+          addEventListener(
+            this.props.handleKeyboardGlobally
+              ? this.ownerDocument
+              : this.excalidrawContainerRef.current,
+            EVENT.KEYDOWN,
+            this.handleNavigationModeKeyDown as EventListener,
+            false,
+          ),
+          // wheel zoom is anchored on `viewport.lastPosition`
+          addEventListener(
+            this.ownerDocument,
+            EVENT.POINTER_MOVE,
+            this.updateCurrentCursorPosition,
+            { passive: false },
+          ),
+          // Safari-only desktop pinch
+          addEventListener(
+            this.ownerDocument,
+            EVENT.GESTURE_START,
+            this.onGestureStart as any,
+            false,
+          ),
+          addEventListener(
+            this.ownerDocument,
+            EVENT.GESTURE_CHANGE,
+            this.onGestureChange as any,
+            false,
+          ),
+          addEventListener(
+            this.ownerDocument,
+            EVENT.GESTURE_END,
+            this.onGestureEnd as any,
+            false,
+          ),
+        );
+      }
+      if (!this.isBrowserZoomEnabled()) {
+        // the browser's own zoom is prevented over the editor by default,
+        // mirroring the interactive editor (opt out via
+        // `interaction: { enabled: { browserZoom: true } }`)
+        if (!this.isNavigationEnabled()) {
+          // with navigation enabled, wheel & pinch are consumed by the
+          // editor's own handlers above instead
+          this.onRemoveEventListenersEmitter.once(
+            addEventListener(
+              this.excalidrawContainerRef.current,
+              EVENT.WHEEL,
+              this.preventBrowserZoomWheel,
+              { passive: false },
+            ),
+            // Safari-only desktop pinch
+            addEventListener(
+              this.excalidrawContainerRef.current,
+              EVENT.GESTURE_START as any,
+              this.disableEvent,
+              false,
+            ),
+            addEventListener(
+              this.excalidrawContainerRef.current,
+              EVENT.GESTURE_CHANGE as any,
+              this.disableEvent,
+              false,
+            ),
+            addEventListener(
+              this.excalidrawContainerRef.current,
+              EVENT.GESTURE_END as any,
+              this.disableEvent,
+              false,
+            ),
+          );
+        }
+        this.onRemoveEventListenersEmitter.once(
+          addEventListener(
+            this.props.handleKeyboardGlobally
+              ? this.ownerDocument
+              : this.excalidrawContainerRef.current,
+            EVENT.KEYDOWN,
+            this.preventBrowserZoomKeyDown as EventListener,
+            false,
+          ),
+        );
+      }
+      return;
+    }
+
+    // -------------------------------------------------------------------------
     //                        view+edit mode listeners
     // -------------------------------------------------------------------------
 
     if (this.props.handleKeyboardGlobally) {
       this.onRemoveEventListenersEmitter.once(
-        addEventListener(document, EVENT.KEYDOWN, this.onKeyDown, false),
+        addEventListener(
+          this.ownerDocument,
+          EVENT.KEYDOWN,
+          this.onKeyDown,
+          false,
+        ),
       );
     }
 
@@ -3020,57 +4057,36 @@ class App extends React.Component<AppProps, AppState> {
         this.handleWheel,
         { passive: false },
       ),
-      addEventListener(window, EVENT.MESSAGE, this.onWindowMessage, false),
-      addEventListener(document, EVENT.POINTER_UP, this.removePointer, {
+      addEventListener(this.ownerDocument, EVENT.COPY, this.onCopy, {
         passive: false,
-      }), // #3553
-      addEventListener(document, EVENT.COPY, this.onCopy, { passive: false }),
-      addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
+      }),
+      addEventListener(this.ownerDocument, EVENT.KEYUP, this.onKeyUp, {
+        passive: true,
+      }),
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
         { passive: false },
       ),
-      // rerender text elements on font load to fix #637 && #1553
-      addEventListener(
-        document.fonts,
-        "loadingdone",
-        (event) => {
-          const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-          this.fonts.onLoaded(fontFaces);
-        },
-        { passive: false },
-      ),
       // Safari-only desktop pinch zoom
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.GESTURE_START,
         this.onGestureStart as any,
         false,
       ),
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.GESTURE_CHANGE,
         this.onGestureChange as any,
         false,
       ),
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.GESTURE_END,
         this.onGestureEnd as any,
         false,
-      ),
-      addEventListener(
-        window,
-        EVENT.FOCUS,
-        () => {
-          this.maybeCleanupAfterMissingPointerUp(null);
-          // browsers (chrome?) tend to free up memory a lot, which results
-          // in canvas context being cleared. Thus re-render on focus.
-          this.triggerRender(true);
-        },
-        { passive: false },
       ),
     );
 
@@ -3084,18 +4100,25 @@ class App extends React.Component<AppProps, AppState> {
 
     this.onRemoveEventListenersEmitter.once(
       addEventListener(
-        document,
+        this.ownerDocument,
         EVENT.FULLSCREENCHANGE,
         this.onFullscreenChange,
         { passive: false },
       ),
-      addEventListener(document, EVENT.PASTE, this.pasteFromClipboard, {
+      addEventListener(
+        this.ownerDocument,
+        EVENT.PASTE,
+        this.pasteFromClipboard,
+        {
+          passive: false,
+        },
+      ),
+      addEventListener(this.ownerDocument, EVENT.CUT, this.onCut, {
         passive: false,
       }),
-      addEventListener(document, EVENT.CUT, this.onCut, { passive: false }),
-      addEventListener(window, EVENT.RESIZE, this.onResize, false),
-      addEventListener(window, EVENT.UNLOAD, this.onUnload, false),
-      addEventListener(window, EVENT.BLUR, this.onBlur, false),
+      addEventListener(this.ownerWindow, EVENT.RESIZE, this.onResize, false),
+      addEventListener(this.ownerWindow, EVENT.UNLOAD, this.onUnload, false),
+      addEventListener(this.ownerWindow, EVENT.BLUR, this.onBlur, false),
       addEventListener(
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
@@ -3129,20 +4152,31 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    // must be updated *before* state change listeners are triggered below
+    if (!this._initialized && !this.state.isLoading) {
+      this._initialized = true;
+      this.editorLifecycleEvents.emit("editor:initialize", this.api);
+      this.props.onInitialize?.(this.api);
+    }
+
+    this.handleInteractionStateChange(prevProps, prevState);
+    this.handleForcedToolChange(prevProps, prevState);
+
+    this.appStateObserver.flush(prevState);
+
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
-    if (!this.state.showWelcomeScreen && !elements.length) {
-      this.setState({ showWelcomeScreen: true });
+    const shouldExportWithDarkMode =
+      (this.sessionExportThemeOverride ?? this.state.theme) === THEME.DARK;
+
+    if (this.state.exportWithDarkMode !== shouldExportWithDarkMode) {
+      this.setState({ exportWithDarkMode: shouldExportWithDarkMode });
     }
 
-    const hasFollowedPersonLeft =
-      prevState.userToFollow &&
-      !this.state.collaborators.has(prevState.userToFollow.socketId);
-
-    if (hasFollowedPersonLeft) {
-      this.maybeUnfollowRemoteUser();
+    if (!this.state.showWelcomeScreen && !elements.length) {
+      this.setState({ showWelcomeScreen: true });
     }
 
     if (
@@ -3162,22 +4196,6 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    if (prevState.userToFollow !== this.state.userToFollow) {
-      if (prevState.userToFollow) {
-        this.onUserFollowEmitter.trigger({
-          userToFollow: prevState.userToFollow,
-          action: "UNFOLLOW",
-        });
-      }
-
-      if (this.state.userToFollow) {
-        this.onUserFollowEmitter.trigger({
-          userToFollow: this.state.userToFollow,
-          action: "FOLLOW",
-        });
-      }
-    }
-
     if (
       Object.keys(this.state.selectedElementIds).length &&
       isEraserActive(this.state)
@@ -3190,7 +4208,14 @@ class App extends React.Component<AppProps, AppState> {
       this.state.activeTool.type === "eraser" &&
       prevState.theme !== this.state.theme
     ) {
-      setEraserCursor(this.interactiveCanvas, this.state.theme);
+      this.cursor.applyForTool();
+    }
+    if (
+      this.state.activeTool.type === "bucketfill" &&
+      prevState.currentItemBackgroundColor !==
+        this.state.currentItemBackgroundColor
+    ) {
+      this.cursor.applyForTool();
     }
 
     // Hide hyperlink popup if shown when element type is not selection
@@ -3207,15 +4232,6 @@ class App extends React.Component<AppProps, AppState> {
 
     if (isEraserActive(prevState) && !isEraserActive(this.state)) {
       this.eraserTrail.endPath();
-    }
-
-    if (prevProps.viewModeEnabled !== this.props.viewModeEnabled) {
-      this.setState({ viewModeEnabled: !!this.props.viewModeEnabled });
-    }
-
-    if (prevState.viewModeEnabled !== this.state.viewModeEnabled) {
-      this.addEventListeners();
-      this.deselectElements();
     }
 
     // cleanup
@@ -3257,10 +4273,58 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
+    // selection may only contain non-deleted elements. Resolved post-commit,
+    // so the elements we filter against are the latest.
+    const selectedElementIds = Object.keys(this.state.selectedElementIds);
+    if (selectedElementIds.length) {
+      const staleSelectedElementIds = selectedElementIds.filter((id) => {
+        const element = this.scene.getElement(id);
+        return !element || element.isDeleted;
+      });
+
+      // only update when actually stale, so we retain the object identity
+      // `selectedElementIds` is cached on (e.g. `Scene.getSelectedElements`)
+      if (staleSelectedElementIds.length) {
+        this.setState((prevState) => {
+          const nextSelectedElementIds = { ...prevState.selectedElementIds };
+          for (const id of staleSelectedElementIds) {
+            delete nextSelectedElementIds[id];
+          }
+          return {
+            selectedElementIds: makeNextSelectedElementIds(
+              nextSelectedElementIds,
+              prevState,
+            ),
+          };
+        });
+      }
+    }
+
     // failsafe in case the state is being updated in incorrect order resulting
-    // in the editingTextElement being now a deleted element
-    if (this.state.editingTextElement?.isDeleted) {
-      this.setState({ editingTextElement: null });
+    // in the editingTextElement being now a deleted element. Resolved against
+    // the scene by id, since the state holds an immutable snapshot whose
+    // `isDeleted` never flips once the element is deleted.
+    if (this.state.editingTextElement) {
+      const sceneElement = this.scene.getElement(
+        this.state.editingTextElement.id,
+      );
+      if (!sceneElement || sceneElement.isDeleted) {
+        this.setState({ editingTextElement: null });
+      }
+    }
+
+    // Forced false while a viewport animation runs — the scroll-back-to-content
+    // button must not render mid-animation (clicking it would fight the
+    // animation, which overwrites the viewport every frame). The animation's
+    // final commit lands after the animation is unregistered, settling this
+    // on the target viewport.
+    const scrolledOutside =
+      // hide when editing text
+      this.state.editingTextElement || this.viewport.isAnimating
+        ? false
+        : !this.visibleElements.length && this.hasRenderableElements;
+    if (this.state.scrolledOutside !== scrolledOutside) {
+      this.setState({ scrolledOutside });
     }
 
     this.store.commit(elementsMap, this.state);
@@ -3276,20 +4340,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderInteractiveSceneCallback = ({
-    atLeastOneVisibleElement,
     scrollBars,
-    elementsMap,
   }: RenderInteractiveSceneCallback) => {
     if (scrollBars) {
       currentScrollBars = scrollBars;
-    }
-    const scrolledOutside =
-      // hide when editing text
-      this.state.editingTextElement
-        ? false
-        : !atLeastOneVisibleElement && elementsMap.size > 0;
-    if (this.state.scrolledOutside !== scrolledOutside) {
-      this.setState({ scrolledOutside });
     }
 
     this.scheduleImageRefresh();
@@ -3308,8 +4362,11 @@ class App extends React.Component<AppProps, AppState> {
   // Copy/paste
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
-      document.activeElement,
+      this.ownerDocument.activeElement,
     );
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
@@ -3320,8 +4377,11 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
-      document.activeElement,
+      this.ownerDocument.activeElement,
     );
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
@@ -3337,6 +4397,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private onTouchStart = (event: TouchEvent) => {
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
+
     // fix for Apple Pencil Scribble (do not prevent for other devices)
     if (isIOS) {
       event.preventDefault();
@@ -3352,7 +4416,7 @@ class App extends React.Component<AppProps, AppState> {
         };
       }
       clearTimeout(tappedTwiceTimer);
-      tappedTwiceTimer = window.setTimeout(
+      tappedTwiceTimer = this.ownerWindow.setTimeout(
         App.resetTapTwice,
         TAP_TWICE_TIMEOUT,
       );
@@ -3375,10 +4439,14 @@ class App extends React.Component<AppProps, AppState> {
         this.lassoTrail.endPath();
         this.deselectElements();
 
-        // @ts-ignore
         this.handleCanvasDoubleClick({
           clientX: touch.clientX,
           clientY: touch.clientY,
+          type: "touch",
+          altKey: false,
+          ctrlKey: false,
+          metaKey: false,
+          shiftKey: false,
         });
       }
       didTapTwice = false;
@@ -3394,6 +4462,9 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private onTouchEnd = (event: TouchEvent) => {
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
     this.resetContextMenuTimer();
     if (event.touches.length > 0) {
       this.setState({
@@ -3416,8 +4487,8 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       {
-        clientX: this.lastViewportPosition.x,
-        clientY: this.lastViewportPosition.y,
+        clientX: this.viewport.lastPosition.x,
+        clientY: this.viewport.lastPosition.y,
       },
       this.state,
     );
@@ -3439,14 +4510,19 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // ------------------- Spreadsheet -------------------
-    if (data.spreadsheet && !isPlainPaste) {
-      this.setState({
-        pasteDialog: {
-          data: data.spreadsheet,
-          shown: true,
-        },
-      });
-      return;
+
+    if (!isPlainPaste && data.text) {
+      const result = tryParseSpreadsheet(data.text);
+      if (result.ok) {
+        this.setState({
+          openDialog: {
+            name: "charts",
+            data: result.data,
+            rawText: data.text,
+          },
+        });
+        return;
+      }
     }
 
     // ------------------- Images or SVG code -------------------
@@ -3486,6 +4562,7 @@ class App extends React.Component<AppProps, AppState> {
         position:
           this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
         retainSeed: isPlainPaste,
+        preserveFrameChildrenOrder: true,
       });
       return;
     }
@@ -3499,7 +4576,7 @@ class App extends React.Component<AppProps, AppState> {
     if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
       const api = await import("@excalidraw/mermaid-to-excalidraw");
       try {
-        const { elements: skeletonElements, files } =
+        const { elements: skeletonElements, files = {} } =
           await api.parseMermaidToExcalidraw(data.text);
 
         const elements = convertToExcalidrawElements(skeletonElements, {
@@ -3572,23 +4649,27 @@ class App extends React.Component<AppProps, AppState> {
 
   public pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent) => {
+      if (!this.isInteractionEnabled()) {
+        return;
+      }
+
       const isPlainPaste = !!IS_PLAIN_PASTE;
 
       // #686
-      const target = document.activeElement;
+      const target = this.ownerDocument.activeElement;
       const isExcalidrawActive =
         this.excalidrawContainerRef.current?.contains(target);
       if (event && !isExcalidrawActive) {
         return;
       }
 
-      const elementUnderCursor = document.elementFromPoint(
-        this.lastViewportPosition.x,
-        this.lastViewportPosition.y,
+      const elementUnderCursor = this.ownerDocument.elementFromPoint(
+        this.viewport.lastPosition.x,
+        this.viewport.lastPosition.y,
       );
       if (
         event &&
-        (!(elementUnderCursor instanceof HTMLCanvasElement) ||
+        (!(elementUnderCursor instanceof this.ownerWindow.HTMLCanvasElement) ||
           isWritableElement(target))
       ) {
         return;
@@ -3617,7 +4698,7 @@ class App extends React.Component<AppProps, AppState> {
 
       this.setActiveTool(
         { type: this.state.preferredSelectionTool.type },
-        true,
+        { keepSelection: true },
       );
       event?.preventDefault();
     },
@@ -3628,7 +4709,8 @@ class App extends React.Component<AppProps, AppState> {
     files: BinaryFiles | null;
     position: { clientX: number; clientY: number } | "cursor" | "center";
     retainSeed?: boolean;
-    fitToContent?: boolean;
+    fit?: SetViewportOptions["fit"];
+    preserveFrameChildrenOrder?: boolean;
   }) => {
     const elements = restoreElements(opts.elements, null, {
       deleteInvisibleElements: true,
@@ -3642,13 +4724,13 @@ class App extends React.Component<AppProps, AppState> {
       typeof opts.position === "object"
         ? opts.position.clientX
         : opts.position === "cursor"
-        ? this.lastViewportPosition.x
+        ? this.viewport.lastPosition.x
         : this.state.width / 2 + this.state.offsetLeft;
     const clientY =
       typeof opts.position === "object"
         ? opts.position.clientY
         : opts.position === "cursor"
-        ? this.lastViewportPosition.y
+        ? this.viewport.lastPosition.y
         : this.state.height / 2 + this.state.offsetTop;
 
     const { x, y } = viewportCoordsToSceneCoords(
@@ -3670,10 +4752,14 @@ class App extends React.Component<AppProps, AppState> {
         });
       }),
       randomizeSeed: !opts.retainSeed,
+      preserveFrameChildrenOrder: opts.preserveFrameChildrenOrder,
     });
 
     const prevElements = this.scene.getElementsIncludingDeleted();
-    let nextElements = [...prevElements, ...duplicatedElements];
+    let nextElements: ExcalidrawElement[] = [
+      ...prevElements,
+      ...duplicatedElements,
+    ];
 
     const mappedNewSceneElements = this.props.onDuplicate?.(
       nextElements,
@@ -3691,11 +4777,10 @@ class App extends React.Component<AppProps, AppState> {
         duplicatedElements,
         topLayerFrame,
       );
-      addElementsToFrame(
+      nextElements = addElementsToFrame(
         nextElements,
         eligibleElements,
         topLayerFrame,
-        this.state,
       );
     }
 
@@ -3713,9 +4798,11 @@ class App extends React.Component<AppProps, AppState> {
 
     // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
     if (isSafari) {
-      Fonts.loadElementsFonts(duplicatedElements).then((fontFaces) => {
-        this.fonts.onLoaded(fontFaces);
-      });
+      Fonts.loadElementsFonts(duplicatedElements, this.ownerDocument).then(
+        (fontFaces) => {
+          this.fonts.onLoaded(fontFaces);
+        },
+      );
     }
 
     if (opts.files) {
@@ -3740,22 +4827,10 @@ class App extends React.Component<AppProps, AppState> {
           editorJotaiStore.get(isSidebarDockedAtom)
             ? this.state.openSidebar
             : null,
-        ...selectGroupsForSelectedElements(
-          {
-            editingGroupId: null,
-            selectedElementIds: nextElementsToSelect.reduce(
-              (acc: Record<ExcalidrawElement["id"], true>, element) => {
-                if (!isBoundToContainer(element)) {
-                  acc[element.id] = true;
-                }
-                return acc;
-              },
-              {},
-            ),
-          },
+        ...getSelectionStateForElements(
+          nextElementsToSelect,
           this.scene.getNonDeletedElements(),
           this.state,
-          this,
         ),
       },
       () => {
@@ -3764,12 +4839,17 @@ class App extends React.Component<AppProps, AppState> {
         }
       },
     );
-    this.setActiveTool({ type: this.state.preferredSelectionTool.type }, true);
+    this.setActiveTool(
+      { type: this.state.preferredSelectionTool.type },
+      { keepSelection: true },
+    );
 
-    if (opts.fitToContent) {
-      this.scrollToContent(duplicatedElements, {
-        fitToContent: true,
-        canvasOffsets: this.getEditorUIOffsets(),
+    if (opts.fit) {
+      this.viewport.setViewport({
+        target: duplicatedElements,
+        fit: opts.fit,
+        animation: false,
+        offsets: { ui: true },
       });
     }
   };
@@ -3830,8 +4910,8 @@ class App extends React.Component<AppProps, AppState> {
   private addTextFromPaste(text: string, isPlainPaste = false) {
     const { x, y } = viewportCoordsToSceneCoords(
       {
-        clientX: this.lastViewportPosition.x,
-        clientY: this.lastViewportPosition.y,
+        clientX: this.viewport.lastPosition.x,
+        clientY: this.viewport.lastPosition.y,
       },
       this.state,
     );
@@ -3842,7 +4922,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("text"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roundness: null,
       roughness: this.state.currentItemRoughness,
@@ -3921,7 +5001,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    this.scene.insertElements(textElements);
+    this.insertNewElements(textElements);
     this.store.scheduleCapture();
     this.setState({
       selectedElementIds: makeNextSelectedElementIds(
@@ -3958,10 +5038,32 @@ class App extends React.Component<AppProps, AppState> {
       this.resetContextMenuTimer();
     }
 
+    if (event.type === "pointercancel") {
+      // the browser took the pointer over (scroll, palm rejection) — no
+      // pointerup will follow, so the armed bucket fill must not commit
+      this.bucketFill.cancel();
+    }
+
+    const wasMultiTouchGesture = gesture.pointers.size >= 2;
     gesture.pointers.delete(event.pointerId);
+
+    // the multi-touch viewport gesture just disengaged: release the
+    // rubberband that was withheld while it was active
+    // (see `snapBackToScrollConstraints`)
+    if (
+      wasMultiTouchGesture &&
+      gesture.pointers.size < 2 &&
+      this.state.scrollConstraints
+    ) {
+      this.viewport.releaseOverscroll();
+    }
   };
 
   toggleLock = (source: "keyboard" | "ui" = "ui") => {
+    if (this.props.activeTool) {
+      // the active tool — including its lock state — is host-controlled
+      return;
+    }
     if (!this.state.activeTool.locked) {
       trackEvent(
         "toolbar",
@@ -4013,202 +5115,65 @@ class App extends React.Component<AppProps, AppState> {
       return {
         penMode: force ?? !prevState.penMode,
         penDetected: true,
+        currentItemStrokeVariability: !prevState.penDetected
+          ? "variable"
+          : prevState.currentItemStrokeVariability,
       };
     });
   };
 
-  onHandToolToggle = () => {
-    this.actionManager.executeAction(actionToggleHandTool);
-  };
-
-  /**
-   * Zooms on canvas viewport center
-   */
-  zoomCanvas = (
-    /**
-     * Decimal fraction, auto-clamped between MIN_ZOOM and MAX_ZOOM.
-     * 1 = 100% zoom, 2 = 200% zoom, 0.5 = 50% zoom
-     */
-    value: number,
-  ) => {
-    this.setState({
-      ...getStateForZoom(
+  // scroll `elements` into view only if they aren't already fully visible.
+  // Targets their bounds rather than the elements so it also works for
+  // elements not yet committed to the canvas.
+  revealIfHidden = (elements: NonDeletedExcalidrawElement[]) => {
+    if (
+      !elements.length ||
+      isElementCompletelyInViewport(
+        elements,
+        this.canvas.width / this.ownerWindow.devicePixelRatio,
+        this.canvas.height / this.ownerWindow.devicePixelRatio,
         {
-          viewportX: this.state.width / 2 + this.state.offsetLeft,
-          viewportY: this.state.height / 2 + this.state.offsetTop,
-          nextZoom: getNormalizedZoom(value),
+          offsetLeft: this.state.offsetLeft,
+          offsetTop: this.state.offsetTop,
+          scrollX: this.state.scrollX,
+          scrollY: this.state.scrollY,
+          zoom: this.state.zoom,
         },
-        this.state,
-      ),
-    });
-  };
-
-  private cancelInProgressAnimation: (() => void) | null = null;
-
-  scrollToContent = (
-    /**
-     * target to scroll to
-     *
-     * - string - id of element or group, or url containing elementLink
-     * - ExcalidrawElement | ExcalidrawElement[] - element(s) objects
-     */
-    target:
-      | string
-      | ExcalidrawElement
-      | readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
-    opts?: (
-      | {
-          fitToContent?: boolean;
-          fitToViewport?: never;
-          viewportZoomFactor?: number;
-          animate?: boolean;
-          duration?: number;
-        }
-      | {
-          fitToContent?: never;
-          fitToViewport?: boolean;
-          /** when fitToViewport=true, how much screen should the content cover,
-           * between 0.1 (10%) and 1 (100%)
-           */
-          viewportZoomFactor?: number;
-          animate?: boolean;
-          duration?: number;
-        }
-    ) & {
-      minZoom?: number;
-      maxZoom?: number;
-      canvasOffsets?: Offsets;
-    },
-  ) => {
-    if (typeof target === "string") {
-      let id: string | null;
-      if (isElementLink(target)) {
-        id = parseElementLinkFromURL(target);
-      } else {
-        id = target;
-      }
-      if (id) {
-        const elements = this.scene.getElementsFromId(id);
-
-        if (elements?.length) {
-          this.scrollToContent(elements, {
-            fitToContent: opts?.fitToContent ?? true,
-            animate: opts?.animate ?? true,
-          });
-        } else if (isElementLink(target)) {
-          this.setState({
-            toast: {
-              message: t("elementLink.notFound"),
-              duration: 3000,
-              closable: true,
-            },
-          });
-        }
-      }
+        this.scene.getNonDeletedElementsMap(),
+        this.viewport.getOffsets(),
+      )
+    ) {
       return;
     }
 
-    this.cancelInProgressAnimation?.();
+    this.viewport.setViewport({
+      target: getCommonBounds(elements),
+      fit: "scale-down",
+      animation: { duration: 300 },
+      offsets: { ui: true },
+    });
+  };
 
-    // convert provided target into ExcalidrawElement[] if necessary
-    const targetElements = Array.isArray(target) ? target : [target];
+  /** emits a follow/unfollow intent to the host (which owns the
+   *  `userToFollow` state) via both the `onUserFollow` prop and the
+   *  imperative API emitter */
+  public emitUserFollowIntent = (payload: OnUserFollowedPayload) => {
+    this.onUserFollowEmitter.trigger(payload);
+    this.props.onUserFollow?.(payload);
+  };
 
-    let zoom = this.state.zoom;
-    let scrollX = this.state.scrollX;
-    let scrollY = this.state.scrollY;
-
-    if (opts?.fitToContent || opts?.fitToViewport) {
-      const { appState } = zoomToFit({
-        canvasOffsets: opts.canvasOffsets,
-        targetElements,
-        appState: this.state,
-        fitToViewport: !!opts?.fitToViewport,
-        viewportZoomFactor: opts?.viewportZoomFactor,
-        minZoom: opts?.minZoom,
-        maxZoom: opts?.maxZoom,
+  /** emits an UNFOLLOW intent if currently following someone — use on
+   *  user-initiated viewport changes which should break follow mode */
+  public requestUnfollow = () => {
+    if (this.props.userToFollow) {
+      this.emitUserFollowIntent({
+        userToFollow: this.props.userToFollow,
+        action: "UNFOLLOW",
       });
-      zoom = appState.zoom;
-      scrollX = appState.scrollX;
-      scrollY = appState.scrollY;
-    } else {
-      // compute only the viewport location, without any zoom adjustment
-      const scroll = calculateScrollCenter(targetElements, this.state);
-      scrollX = scroll.scrollX;
-      scrollY = scroll.scrollY;
-    }
-
-    // when animating, we use RequestAnimationFrame to prevent the animation
-    // from slowing down other processes
-    if (opts?.animate) {
-      const origScrollX = this.state.scrollX;
-      const origScrollY = this.state.scrollY;
-      const origZoom = this.state.zoom.value;
-
-      const cancel = easeToValuesRAF({
-        fromValues: {
-          scrollX: origScrollX,
-          scrollY: origScrollY,
-          zoom: origZoom,
-        },
-        toValues: { scrollX, scrollY, zoom: zoom.value },
-        interpolateValue: (from, to, progress, key) => {
-          // for zoom, use different easing
-          if (key === "zoom") {
-            return from * Math.pow(to / from, easeOut(progress));
-          }
-          // handle using default
-          return undefined;
-        },
-        onStep: ({ scrollX, scrollY, zoom }) => {
-          this.setState({
-            scrollX,
-            scrollY,
-            zoom: { value: zoom },
-          });
-        },
-        onStart: () => {
-          this.setState({ shouldCacheIgnoreZoom: true });
-        },
-        onEnd: () => {
-          this.setState({ shouldCacheIgnoreZoom: false });
-        },
-        onCancel: () => {
-          this.setState({ shouldCacheIgnoreZoom: false });
-        },
-        duration: opts?.duration ?? 500,
-      });
-
-      this.cancelInProgressAnimation = () => {
-        cancel();
-        this.cancelInProgressAnimation = null;
-      };
-    } else {
-      this.setState({ scrollX, scrollY, zoom });
     }
   };
 
-  private maybeUnfollowRemoteUser = () => {
-    if (this.state.userToFollow) {
-      this.setState({ userToFollow: null });
-    }
-  };
-
-  /** use when changing scrollX/scrollY/zoom based on user interaction */
-  private translateCanvas: React.Component<any, AppState>["setState"] = (
-    state,
-  ) => {
-    this.cancelInProgressAnimation?.();
-    this.maybeUnfollowRemoteUser();
-    this.setState(state);
-  };
-
-  setToast = (
-    toast: {
-      message: string;
-      closable?: boolean;
-      duration?: number;
-    } | null,
-  ) => {
+  setToast = (toast: AppState["toast"]) => {
     this.setState({ toast });
   };
 
@@ -4222,7 +5187,11 @@ class App extends React.Component<AppProps, AppState> {
         const file = new File([blob], blob.name || "", { type: blob.type });
         this.loadFileToCanvas(file, null);
         await webShareTargetCache.delete("shared-file");
-        window.history.replaceState(null, APP_NAME, window.location.pathname);
+        this.ownerWindow.history.replaceState(
+          null,
+          APP_NAME,
+          this.ownerWindow.location.pathname,
+        );
       }
     } catch (error: any) {
       this.setState({ errorMessage: error.message });
@@ -4328,6 +5297,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (collaborators) {
+        this.laserTrails.updateCollabTrails(collaborators);
         this.setState({ collaborators });
       }
     },
@@ -4365,7 +5335,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private triggerRender = (
+  public triggerRender = (
     /** force always re-renders canvas even if no change */
     force?: boolean,
   ) => {
@@ -4413,57 +5383,22 @@ class App extends React.Component<AppProps, AppState> {
 
   private updateCurrentCursorPosition = withBatchedUpdates(
     (event: MouseEvent) => {
-      this.lastViewportPosition.x = event.clientX;
-      this.lastViewportPosition.y = event.clientY;
+      this.viewport.lastPosition.x = event.clientX;
+      this.viewport.lastPosition.y = event.clientY;
     },
   );
-
-  public getEditorUIOffsets = (): Offsets => {
-    const toolbarBottom =
-      this.excalidrawContainerRef?.current
-        ?.querySelector(".App-toolbar")
-        ?.getBoundingClientRect()?.bottom ?? 0;
-    const sidebarRect = this.excalidrawContainerRef?.current
-      ?.querySelector(".sidebar")
-      ?.getBoundingClientRect();
-    const propertiesPanelRect = this.excalidrawContainerRef?.current
-      ?.querySelector(".App-menu__left")
-      ?.getBoundingClientRect();
-
-    const PADDING = 16;
-
-    return getLanguage().rtl
-      ? {
-          top: toolbarBottom + PADDING,
-          right:
-            Math.max(
-              this.state.width -
-                (propertiesPanelRect?.left ?? this.state.width),
-              0,
-            ) + PADDING,
-          bottom: PADDING,
-          left: Math.max(sidebarRect?.right ?? 0, 0) + PADDING,
-        }
-      : {
-          top: toolbarBottom + PADDING,
-          right: Math.max(
-            this.state.width -
-              (sidebarRect?.left ?? this.state.width) +
-              PADDING,
-            0,
-          ),
-          bottom: PADDING,
-          left: Math.max(propertiesPanelRect?.right ?? 0, 0) + PADDING,
-        };
-  };
 
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      if (!this.isInteractionEnabled()) {
+        return;
+      }
+
       // normalize `event.key` when CapsLock is pressed #2372
 
       if (
-        "Proxy" in window &&
+        "Proxy" in this.ownerWindow &&
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
           (event.shiftKey && /^[a-z]$/.test(event.key)))
       ) {
@@ -4513,8 +5448,9 @@ class App extends React.Component<AppProps, AppState> {
           this.updateEditorAtom(convertElementTypePopupAtom, null);
         } else if (
           event.key === KEYS.TAB &&
-          (document.activeElement === this.excalidrawContainerRef?.current ||
-            document.activeElement?.classList.contains(
+          (this.ownerDocument.activeElement ===
+            this.excalidrawContainerRef?.current ||
+            this.ownerDocument.activeElement?.classList.contains(
               CLASSES.CONVERT_ELEMENT_TYPE_POPUP,
             ))
         ) {
@@ -4542,120 +5478,8 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (
-          event.key === KEYS.ESCAPE &&
-          this.flowChartCreator.isCreatingChart
-        ) {
-          this.flowChartCreator.clear();
-          this.triggerRender(true);
+        if (this.flowchart.handleKeyEvent(event)) {
           return;
-        }
-
-        const arrowKeyPressed = isArrowKey(event.key);
-
-        if (event[KEYS.CTRL_OR_CMD] && arrowKeyPressed && !event.shiftKey) {
-          event.preventDefault();
-
-          const selectedElements = getSelectedElements(
-            this.scene.getNonDeletedElementsMap(),
-            this.state,
-          );
-
-          if (
-            selectedElements.length === 1 &&
-            isFlowchartNodeElement(selectedElements[0])
-          ) {
-            this.flowChartCreator.createNodes(
-              selectedElements[0],
-              this.state,
-              getLinkDirectionFromKey(event.key),
-              this.scene,
-            );
-          }
-
-          if (
-            this.flowChartCreator.pendingNodes?.length &&
-            !isElementCompletelyInViewport(
-              this.flowChartCreator.pendingNodes,
-              this.canvas.width / window.devicePixelRatio,
-              this.canvas.height / window.devicePixelRatio,
-              {
-                offsetLeft: this.state.offsetLeft,
-                offsetTop: this.state.offsetTop,
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY,
-                zoom: this.state.zoom,
-              },
-              this.scene.getNonDeletedElementsMap(),
-              this.getEditorUIOffsets(),
-            )
-          ) {
-            this.scrollToContent(this.flowChartCreator.pendingNodes, {
-              animate: true,
-              duration: 300,
-              fitToContent: true,
-              canvasOffsets: this.getEditorUIOffsets(),
-            });
-          }
-
-          return;
-        }
-
-        if (event.altKey) {
-          const selectedElements = getSelectedElements(
-            this.scene.getNonDeletedElementsMap(),
-            this.state,
-          );
-
-          if (selectedElements.length === 1 && arrowKeyPressed) {
-            event.preventDefault();
-
-            const nextId = this.flowChartNavigator.exploreByDirection(
-              selectedElements[0],
-              this.scene.getNonDeletedElementsMap(),
-              getLinkDirectionFromKey(event.key),
-            );
-
-            if (nextId) {
-              this.setState((prevState) => ({
-                selectedElementIds: makeNextSelectedElementIds(
-                  {
-                    [nextId]: true,
-                  },
-                  prevState,
-                ),
-              }));
-
-              const nextNode = this.scene
-                .getNonDeletedElementsMap()
-                .get(nextId);
-
-              if (
-                nextNode &&
-                !isElementCompletelyInViewport(
-                  [nextNode],
-                  this.canvas.width / window.devicePixelRatio,
-                  this.canvas.height / window.devicePixelRatio,
-                  {
-                    offsetLeft: this.state.offsetLeft,
-                    offsetTop: this.state.offsetTop,
-                    scrollX: this.state.scrollX,
-                    scrollY: this.state.scrollY,
-                    zoom: this.state.zoom,
-                  },
-                  this.scene.getNonDeletedElementsMap(),
-                  this.getEditorUIOffsets(),
-                )
-              ) {
-                this.scrollToContent(nextNode, {
-                  animate: true,
-                  duration: 300,
-                  canvasOffsets: this.getEditorUIOffsets(),
-                });
-              }
-            }
-            return;
-          }
         }
       }
 
@@ -4680,7 +5504,7 @@ class App extends React.Component<AppProps, AppState> {
         // reset (100ms to be safe that we it runs after the ensuing
         // paste event). Though, technically unnecessary to reset since we
         // (re)set the flag before each paste event.
-        IS_PLAIN_PASTE_TIMER = window.setTimeout(() => {
+        IS_PLAIN_PASTE_TIMER = this.ownerWindow.setTimeout(() => {
           IS_PLAIN_PASTE = false;
         }, 100);
       }
@@ -4720,22 +5544,11 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event.key === KEYS.PAGE_UP || event.key === KEYS.PAGE_DOWN) {
-        let offset =
-          (event.shiftKey ? this.state.width : this.state.height) /
-          this.state.zoom.value;
-        if (event.key === KEYS.PAGE_DOWN) {
-          offset = -offset;
-        }
-        if (event.shiftKey) {
-          this.translateCanvas((state) => ({
-            scrollX: state.scrollX + offset,
-          }));
-        } else {
-          this.translateCanvas((state) => ({
-            scrollY: state.scrollY + offset,
-          }));
-        }
+      if (this.maybeHandlePageScrollKeyDown(event)) {
+        // Page navigation belongs to the canvas even when a pending locked
+        // viewport transition is temporarily withholding the mutation.
+        event.preventDefault();
+        return;
       }
 
       if (this.state.openDialog?.name === "elementLinkSelector") {
@@ -4744,7 +5557,11 @@ class App extends React.Component<AppProps, AppState> {
 
       // Handle Alt key for bind mode
       if (event.key === KEYS.ALT) {
-        if (getFeatureFlag("COMPLEX_BINDINGS")) {
+        if (this.state.activeTool.type === "bucketfill") {
+          this.bucketFill.openTemporaryEyeDropper();
+          event.preventDefault();
+          return;
+        } else if (getFeatureFlag("COMPLEX_BINDINGS")) {
           this.handleSkipBindMode();
         } else {
           maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -4755,18 +5572,105 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      // view mode hardcoded from upstream -> disable tool switching for now
+      const shouldPreventToolSwitching = this.props.viewModeEnabled === true;
+
+      if (
+        !shouldPreventToolSwitching &&
+        this.state.viewModeEnabled &&
+        event.key === KEYS.ESCAPE
+      ) {
+        this.setActiveTool({ type: "selection" });
+        return;
+      }
+
+      if (
+        !shouldPreventToolSwitching &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        !event.metaKey &&
+        !this.state.newElement &&
+        !this.state.selectionElement &&
+        !this.state.selectedElementsAreBeingDragged
+      ) {
+        const shape = findShapeByKey(event.key, this, event.shiftKey);
+
+        if (this.state.viewModeEnabled && !oneOf(shape, ["laser", "hand"])) {
+          return;
+        }
+
+        if (shape) {
+          if (this.state.activeTool.type !== shape) {
+            trackEvent(
+              "toolbar",
+              shape,
+              `keyboard (${
+                this.editorInterface.formFactor === "phone"
+                  ? "mobile"
+                  : "desktop"
+              })`,
+            );
+          }
+          if (shape === "arrow" && this.state.activeTool.type === "arrow") {
+            const nextArrowType =
+              this.state.currentItemArrowType === ARROW_TYPE.sharp
+                ? ARROW_TYPE.round
+                : this.state.currentItemArrowType === ARROW_TYPE.round
+                ? ARROW_TYPE.elbow
+                : ARROW_TYPE.sharp;
+            this.setState({ currentItemArrowType: nextArrowType });
+            this.cursorHints.onArrowTypeCycled(nextArrowType);
+          } else if (shape === "arrow" || shape === "line") {
+            this.cursorHints.onToolShortcut(
+              shape,
+              /^\d$/.test(event.key) ? "digit" : "letter",
+            );
+          }
+
+          if (
+            shape === "bucketfill" &&
+            this.state.activeTool.type === "bucketfill"
+          ) {
+            this.bucketFill.cycleBackgroundColor();
+          } else if (
+            shape === "lasso" &&
+            this.state.activeTool.type === "laser"
+          ) {
+            this.setActiveTool({
+              type: this.state.preferredSelectionTool.type,
+            });
+          } else {
+            this.setActiveTool({ type: shape }, { toggle: true });
+          }
+
+          event.stopPropagation();
+
+          return;
+        } else if (event.key === KEYS.Q) {
+          this.toggleLock("keyboard");
+          event.stopPropagation();
+          return;
+        }
+      }
+
       if (this.state.viewModeEnabled) {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
+      if (event[KEYS.CTRL_OR_CMD] && !event.repeat) {
         if (getFeatureFlag("COMPLEX_BINDINGS")) {
           this.resetDelayedBindMode();
         }
 
         flushSync(() => {
-          this.setState({ isBindingEnabled: false });
+          this.setState({
+            isBindingEnabled: this.state.bindingPreference !== "enabled",
+          });
         });
+
+        // the toggle changes what a text-tool click at the current position
+        // would do, with no pointermove to refresh the affordance
+        this.arrowText.refresh();
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
       }
@@ -4870,7 +5774,6 @@ class App extends React.Component<AppProps, AppState> {
             }
             const midPoint = getContainerCenter(
               selectedElement,
-              this.state,
               this.scene.getNonDeletedElementsMap(),
             );
             const sceneX = midPoint.x;
@@ -4888,47 +5791,11 @@ class App extends React.Component<AppProps, AppState> {
             });
           }
         }
-      } else if (
-        !event.ctrlKey &&
-        !event.altKey &&
-        !event.metaKey &&
-        !this.state.newElement &&
-        !this.state.selectionElement &&
-        !this.state.selectedElementsAreBeingDragged
-      ) {
-        const shape = findShapeByKey(event.key, this);
-        if (shape) {
-          if (this.state.activeTool.type !== shape) {
-            trackEvent(
-              "toolbar",
-              shape,
-              `keyboard (${
-                this.editorInterface.formFactor === "phone"
-                  ? "mobile"
-                  : "desktop"
-              })`,
-            );
-          }
-          if (shape === "arrow" && this.state.activeTool.type === "arrow") {
-            this.setState((prevState) => ({
-              currentItemArrowType:
-                prevState.currentItemArrowType === ARROW_TYPE.sharp
-                  ? ARROW_TYPE.round
-                  : prevState.currentItemArrowType === ARROW_TYPE.round
-                  ? ARROW_TYPE.elbow
-                  : ARROW_TYPE.sharp,
-            }));
-          }
-          this.setActiveTool({ type: shape });
-          event.stopPropagation();
-        } else if (event.key === KEYS.Q) {
-          this.toggleLock("keyboard");
-          event.stopPropagation();
-        }
       }
+
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+        this.cursor.set(CURSOR_TYPE.GRAB);
         event.preventDefault();
       }
 
@@ -4989,15 +5856,6 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
-        if (this.state.activeTool.type === "laser") {
-          this.setActiveTool({ type: this.state.preferredSelectionTool.type });
-        } else {
-          this.setActiveTool({ type: "laser" });
-        }
-        return;
-      }
-
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
@@ -5008,7 +5866,8 @@ class App extends React.Component<AppProps, AppState> {
       // eye dropper
       // -----------------------------------------------------------------------
       const lowerCased = event.key.toLocaleLowerCase();
-      const isPickingStroke = lowerCased === KEYS.S && event.shiftKey;
+      const isPickingStroke =
+        lowerCased === KEYS.S && event.shiftKey && !event[KEYS.CTRL_OR_CMD];
       const isPickingBackground =
         event.key === KEYS.I || (lowerCased === KEYS.G && event.shiftKey);
 
@@ -5022,16 +5881,20 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
     if (event.key === KEYS.SPACE) {
       if (
-        this.state.viewModeEnabled ||
+        (this.state.viewModeEnabled &&
+          this.state.activeTool.type !== "laser") ||
         this.state.openDialog?.name === "elementLinkSelector"
       ) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+        this.cursor.set(CURSOR_TYPE.GRAB);
       } else if (isSelectionLikeTool(this.state.activeTool.type)) {
-        resetCursor(this.interactiveCanvas);
+        this.cursor.reset();
       } else {
-        setCursorForShape(this.interactiveCanvas, this.state);
+        this.cursor.applyForTool();
         this.setState({
           selectedElementIds: makeNextSelectedElementIds({}, this.state),
           selectedGroupIds: {},
@@ -5043,6 +5906,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (event.key === KEYS.ALT) {
+      this.bucketFill.closeTemporaryEyeDropper();
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
 
@@ -5083,10 +5947,15 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
-    if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
-      flushSync(() => {
-        this.setState({ isBindingEnabled: true });
-      });
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        flushSync(() => {
+          this.setState({ isBindingEnabled: preferenceEnabled });
+        });
+
+        this.arrowText.refresh();
+      }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
@@ -5114,7 +5983,7 @@ class App extends React.Component<AppProps, AppState> {
                   element,
                   elementsMap.get(
                     element.startBinding.elementId,
-                  ) as ExcalidrawBindableElement,
+                  ) as NonDeleted<ExcalidrawBindableElement>,
                   "start",
                   elementsMap,
                 ),
@@ -5129,7 +5998,7 @@ class App extends React.Component<AppProps, AppState> {
                   element,
                   elementsMap.get(
                     element.endBinding.elementId,
-                  ) as ExcalidrawBindableElement,
+                  ) as NonDeleted<ExcalidrawBindableElement>,
                   "end",
                   elementsMap,
                 ),
@@ -5141,99 +6010,80 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ suggestedBinding: null });
     }
 
-    if (!event.altKey) {
-      if (this.flowChartNavigator.isExploring) {
-        this.flowChartNavigator.clear();
-        this.syncActionResult({
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        });
-      }
-    }
-
-    if (!event[KEYS.CTRL_OR_CMD]) {
-      if (this.flowChartCreator.isCreatingChart) {
-        if (this.flowChartCreator.pendingNodes?.length) {
-          this.scene.insertElements(this.flowChartCreator.pendingNodes);
-        }
-
-        const firstNode = this.flowChartCreator.pendingNodes?.[0];
-
-        if (firstNode) {
-          this.setState((prevState) => ({
-            selectedElementIds: makeNextSelectedElementIds(
-              {
-                [firstNode.id]: true,
-              },
-              prevState,
-            ),
-          }));
-
-          if (
-            !isElementCompletelyInViewport(
-              [firstNode],
-              this.canvas.width / window.devicePixelRatio,
-              this.canvas.height / window.devicePixelRatio,
-              {
-                offsetLeft: this.state.offsetLeft,
-                offsetTop: this.state.offsetTop,
-                scrollX: this.state.scrollX,
-                scrollY: this.state.scrollY,
-                zoom: this.state.zoom,
-              },
-              this.scene.getNonDeletedElementsMap(),
-              this.getEditorUIOffsets(),
-            )
-          ) {
-            this.scrollToContent(firstNode, {
-              animate: true,
-              duration: 300,
-              canvasOffsets: this.getEditorUIOffsets(),
-            });
-          }
-        }
-
-        this.flowChartCreator.clear();
-        this.syncActionResult({
-          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-        });
-      }
-    }
+    this.flowchart.handleKeyEvent(event);
   });
-
-  // We purposely widen the `tool` type so this helper can be called with
-  // any tool without having to type check it
-  private isToolSupported = <T extends ToolType | "custom">(tool: T) => {
-    return (
-      this.props.UIOptions.tools?.[
-        tool as Extract<T, keyof AppProps["UIOptions"]["tools"]>
-      ] !== false
-    );
-  };
 
   setActiveTool = (
     tool: ({ type: ToolType } | { type: "custom"; customType: string }) & {
       locked?: boolean;
       fromSelection?: boolean;
     },
-    keepSelection = false,
+    opts: {
+      keepSelection?: boolean;
+      /**
+       * When `true`, re-activating an already-active toggle tool (see
+       * `TOGGLE_TOOLS`) switches back to the previously active tool.
+       * Activation is idempotent by default; toggle tools always record the
+       * previously active tool regardless (so ESC and the next `toggle`
+       * activation can switch back to it).
+       */
+      toggle?: boolean;
+    } = {},
   ) => {
+    const { keepSelection = false } = opts;
+
     if (!this.isToolSupported(tool.type)) {
       console.warn(
-        `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`,
+        this.isInteractionEnabled()
+          ? `"${tool.type}" tool is disabled via "UIOptions.canvasActions.tools.${tool.type}"`
+          : `"${tool.type}" tool cannot be activated while the editor is non-interactive (see "interaction.enabled.tools")`,
       );
       return;
     }
 
-    const nextActiveTool = updateActiveTool(this.state, tool);
-    if (nextActiveTool.type === "hand") {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-    } else if (!isHoldingSpace) {
-      setCursorForShape(this.interactiveCanvas, {
-        ...this.state,
-        activeTool: nextActiveTool,
-      });
+    if (
+      this.props.activeTool &&
+      !this.isSameForcedTool(this.props.activeTool, tool)
+    ) {
+      console.warn(
+        `"${tool.type}" tool activation ignored — the active tool is controlled by the host via "props.activeTool"`,
+      );
+      return;
     }
-    if (isToolIcon(document.activeElement)) {
+
+    if (this.drawShape.hasPendingGesture()) {
+      // switching tools mid-sketch (e.g. paste resets to the selection tool)
+      // must not strand the gesture — commit it through the finalize funnel
+      // while the drawShape tool is still active
+      this.actionManager.executeAction(actionFinalize);
+    }
+
+    const isToggleTool = TOGGLE_TOOLS.includes(tool.type);
+    const toggle = opts.toggle === true && isToggleTool;
+
+    const nextActiveTool =
+      toggle && this.state.activeTool.type === tool.type
+        ? // toggle back to the tool that was active before this one
+          updateActiveTool(this.state, {
+            ...(this.state.activeTool.lastActiveTool || {
+              type: this.state.preferredSelectionTool.type,
+            }),
+            lastActiveTool: null,
+          })
+        : isToggleTool && this.state.activeTool.type !== tool.type
+        ? // activating a toggle tool records the currently active tool so
+          // ESC and the next `toggle` activation can switch back to it
+          updateActiveTool(this.state, {
+            ...tool,
+            lastActiveTool: this.state.activeTool,
+          })
+        : updateActiveTool(this.state, tool);
+    if (nextActiveTool.type === "hand") {
+      this.cursor.set(CURSOR_TYPE.GRAB);
+    } else if (!isHoldingSpace) {
+      this.cursor.applyForTool(nextActiveTool);
+    }
+    if (isToolIcon(this.ownerDocument.activeElement)) {
       this.focusContainer();
     }
     if (!isLinearElementType(nextActiveTool.type)) {
@@ -5251,6 +6101,10 @@ class App extends React.Component<AppProps, AppState> {
         selectedLinearElement: isSelectionLikeTool(nextActiveTool.type)
           ? prevState.selectedLinearElement
           : null,
+        frameToHighlight: null,
+        // only the text tool offers arrow-endpoint binding, and the highlight
+        // is refreshed on pointermove — don't leave a stale one behind
+        hoveredArrowTextAnchor: null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -5294,13 +6148,6 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ openDialog: dialogType });
   };
 
-  private setCursor = (cursor: string) => {
-    setCursor(this.interactiveCanvas, cursor);
-  };
-
-  private resetCursor = () => {
-    resetCursor(this.interactiveCanvas);
-  };
   /**
    * returns whether user is making a gesture with >= 2 fingers (points)
    * on o touch screen (not on a trackpad). Currently only relates to Darwin
@@ -5324,6 +6171,9 @@ class App extends React.Component<AppProps, AppState> {
 
   // fires only on Safari
   private onGestureStart = withBatchedUpdates((event: GestureEvent) => {
+    if (!this.isNavigationEnabled()) {
+      return;
+    }
     event.preventDefault();
 
     // we only want to deselect on touch screens because user may have selected
@@ -5339,6 +6189,9 @@ class App extends React.Component<AppProps, AppState> {
 
   // fires only on Safari
   private onGestureChange = withBatchedUpdates((event: GestureEvent) => {
+    if (!this.isNavigationEnabled()) {
+      return;
+    }
     event.preventDefault();
 
     // onGestureChange only has zoom factor but not the center.
@@ -5356,21 +6209,30 @@ class App extends React.Component<AppProps, AppState> {
 
     const initialScale = gesture.initialScale;
     if (initialScale) {
-      this.setState((state) => ({
-        ...getStateForZoom(
-          {
-            viewportX: this.lastViewportPosition.x,
-            viewportY: this.lastViewportPosition.y,
-            nextZoom: getNormalizedZoom(initialScale * event.scale),
-          },
-          state,
-        ),
-      }));
+      this.viewport.translate(
+        (state) => ({
+          ...getViewportForZoomWithScrollConstraints(
+            {
+              viewportX: this.viewport.lastPosition.x,
+              viewportY: this.viewport.lastPosition.y,
+              nextZoom: getNormalizedZoom(initialScale * event.scale),
+            },
+            state,
+          ),
+        }),
+        {
+          zoomPreConstrained: true,
+          preserveScrollConstraintsSnapBack: true,
+        },
+      );
     }
   });
 
   // fires only on Safari
   private onGestureEnd = withBatchedUpdates((event: GestureEvent) => {
+    if (!this.isNavigationEnabled()) {
+      return;
+    }
     event.preventDefault();
     // reselect elements only on touch screens (see onGestureStart)
     if (this.isTouchScreenMultiTouchGesture()) {
@@ -5386,11 +6248,17 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private handleTextWysiwyg(
-    element: ExcalidrawTextElement,
+    element: NonDeleted<ExcalidrawTextElement>,
     {
       isExistingElement = false,
+      initialCaretSceneCoords = null,
     }: {
       isExistingElement?: boolean;
+      /**
+       * supply null if no caret positioning is desired, and instead
+       * text should be auto-selected
+       */
+      initialCaretSceneCoords?: { x: number; y: number } | null;
     },
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
@@ -5417,8 +6285,7 @@ class App extends React.Component<AppProps, AppState> {
       ]);
     };
 
-    textWysiwyg({
-      id: element.id,
+    this.textWysiwygSubmitHandler = textWysiwyg({
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
         const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
@@ -5440,16 +6307,23 @@ class App extends React.Component<AppProps, AppState> {
         }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
+        this.textWysiwygSubmitHandler = null;
+
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
 
-        // select the created text element only if submitting via keyboard
-        // (when submitting via click it should act as signal to deselect)
-        if (!isDeleted && viaKeyboard) {
-          const elementIdToSelect = element.containerId
-            ? element.containerId
-            : element.id;
+        // keyboard-submit keeps focus on the edited object. For bound text, keep
+        // the container selected even if the text becomes empty and is deleted.
+        // The autoshape tool stays active through the editing session and never
+        // selects anything — don't fight the finalize action's selection reset.
+        const elementIdToSelect =
+          viaKeyboard &&
+          !this.isToolLocked() &&
+          this.state.activeTool.type !== "autoshape"
+            ? element.containerId || (!isDeleted ? element.id : null)
+            : null;
 
+        if (elementIdToSelect) {
           // needed to ensure state is updated before "finalize" action
           // that's invoked on keyboard-submit as well
           // TODO either move this into finalize as well, or handle all state
@@ -5484,8 +6358,10 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
 
-        if (this.state.activeTool.locked) {
-          setCursorForShape(this.interactiveCanvas, this.state);
+        // tools that survive the submit (locked, or autoshape's
+        // double-click-to-type flow) need their cursor back
+        if (this.isToolLocked() || this.state.activeTool.type === "autoshape") {
+          this.cursor.applyForTool();
         }
 
         this.focusContainer();
@@ -5493,6 +6369,7 @@ class App extends React.Component<AppProps, AppState> {
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
       app: this,
+      initialCaretSceneCoords,
       // when text is selected, it's hard (at least on iOS) to re-position the
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
@@ -5516,7 +6393,69 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private getTextElementAtPosition(
+  private getSelectedTextElement(
+    container?: ExcalidrawTextContainer | null,
+  ): NonDeleted<ExcalidrawTextElement> | null {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (selectedElements.length !== 1) {
+      return null;
+    }
+
+    const selectedElement = selectedElements[0]!;
+
+    if (isTextElement(selectedElement)) {
+      return selectedElement;
+    }
+
+    if (!container) {
+      return null;
+    }
+
+    return getBoundTextElement(
+      selectedElement,
+      this.scene.getNonDeletedElementsMap(),
+    ) as NonDeleted<ExcalidrawTextElement> | null;
+  }
+
+  private getSelectedTextEditingContainerAtPosition(
+    hitElement: NonDeletedExcalidrawElement | null,
+    sceneCoords: { x: number; y: number },
+  ): ExcalidrawTextContainer | null | undefined {
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (
+      selectedElements.length !== 1 ||
+      !hitElement ||
+      hitElement.id !== selectedElements[0]!.id
+    ) {
+      return null;
+    }
+
+    const selectedElement = selectedElements[0]!;
+
+    if (isTextElement(selectedElement)) {
+      return null;
+    }
+
+    if (!isValidTextContainer(selectedElement)) {
+      return undefined;
+    }
+
+    const textElement = this.getSelectedTextElement(selectedElement);
+    const hitTextElement = this.getTextElementAtPosition(
+      sceneCoords.x,
+      sceneCoords.y,
+    );
+
+    if (!textElement || hitTextElement?.id !== textElement.id) {
+      return undefined;
+    }
+
+    return selectedElement;
+  }
+
+  getTextElementAtPosition(
     x: number,
     y: number,
   ): NonDeleted<ExcalidrawTextElement> | null {
@@ -5529,8 +6468,60 @@ class App extends React.Component<AppProps, AppState> {
     return null;
   }
 
+  private isHittingTextAutoResizeHandle = (
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+    point: Readonly<{ x: number; y: number }>,
+  ): boolean => {
+    const activeTextElement = getActiveTextElement(
+      selectedElements,
+      this.state,
+    );
+
+    if (
+      activeTextElement &&
+      !activeTextElement.isDeleted &&
+      !activeTextElement.autoResize &&
+      isPointHittingTextAutoResizeHandle(
+        point,
+        activeTextElement,
+        this.state.zoom.value,
+        this.editorInterface.formFactor,
+      )
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  private handleTextAutoResizeHandlePointerDown = (
+    selectedElements: NonDeleted<ExcalidrawElement>[],
+    point: Readonly<{ x: number; y: number }>,
+  ) => {
+    const activeTextElement = getActiveTextElement(
+      selectedElements,
+      this.state,
+    );
+    if (
+      !activeTextElement ||
+      !this.isHittingTextAutoResizeHandle(selectedElements, point)
+    ) {
+      return false;
+    }
+
+    this.actionManager.executeAction(
+      actionTextAutoResize,
+      "ui",
+      // we need to pass down the element since it may already be deselected
+      // due to the pointerdown
+      activeTextElement,
+    );
+    this.cursor.reset();
+    return true;
+  };
+
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
-  private getElementAtPosition(
+  public getElementAtPosition(
     x: number,
     y: number,
     opts?: (
@@ -5590,7 +6581,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   // NOTE: Hot path for hit testing, so avoid unnecessary computations
-  private getElementsAtPosition(
+  getElementsAtPosition(
     x: number,
     y: number,
     opts?: {
@@ -5598,7 +6589,7 @@ class App extends React.Component<AppProps, AppState> {
       includeLockedElements?: boolean;
     },
   ): NonDeleted<ExcalidrawElement>[] {
-    const iframeLikes: Ordered<ExcalidrawIframeElement>[] = [];
+    const iframeLikes: Ordered<NonDeleted<ExcalidrawIframeLikeElement>>[] = [];
 
     const elementsMap = this.scene.getNonDeletedElementsMap();
 
@@ -5618,10 +6609,20 @@ class App extends React.Component<AppProps, AppState> {
       .filter((element) => {
         // hitting a frame's element from outside the frame is not considered a hit
         const containingFrame = getContainingFrame(element, elementsMap);
+        if (containingFrame && !isNonDeletedElement(containingFrame)) {
+          console.error("[NONDELETED][INVARIANT] Containing frame is deleted");
+        }
         return containingFrame &&
           this.state.frameRendering.enabled &&
-          this.state.frameRendering.clip
-          ? isCursorInFrame({ x, y }, containingFrame, elementsMap)
+          this.state.frameRendering.clip &&
+          // iframe-like elements are rendered as DOM overlays and are not
+          // visually clipped by their containing frames
+          !isIframeLikeElement(element)
+          ? isCursorInFrame(
+              { x, y },
+              containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
+              elementsMap,
+            )
           : true;
       })
       .filter((el) => {
@@ -5629,7 +6630,7 @@ class App extends React.Component<AppProps, AppState> {
         // We want to preserve that order on the returned array.
         // Exception being embeddables which should be on top of everything else in
         // terms of hit testing.
-        if (isIframeElement(el)) {
+        if (isIframeLikeElement(el)) {
           iframeLikes.push(el);
           return false;
         }
@@ -5650,10 +6651,10 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private hitElement(
+  hitElement(
     x: number,
     y: number,
-    element: ExcalidrawElement,
+    element: NonDeletedExcalidrawElement,
     considerBoundingBox = true,
   ) {
     // if the element is selected, then hit test is done against its bounding box
@@ -5697,7 +6698,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private getTextBindableContainerAtPosition(x: number, y: number) {
+  getTextBindableContainerAtPosition(x: number, y: number) {
     const elements = this.scene.getNonDeletedElements();
     const selectedElements = this.scene.getSelectedElements(this.state);
     if (selectedElements.length === 1) {
@@ -5727,6 +6728,12 @@ class App extends React.Component<AppProps, AppState> {
         hitElement = elements[index];
         break;
       } else if (x1 < x && x < x2 && y1 < y && y < y2) {
+        // to allow binding to containers within frames,
+        // ignore frames in hit testing
+        if (isFrameLikeElement(elements[index])) {
+          continue;
+        }
+
         hitElement = elements[index];
         break;
       }
@@ -5735,12 +6742,31 @@ class App extends React.Component<AppProps, AppState> {
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
   }
 
+  /**
+   * Whether a text element's content is still being authored.
+   *
+   * Creating a text reverts the tool to selection during pointerdown, so the
+   * pointerup that follows looks like an ordinary canvas click and would
+   * capture the still-empty element as a history entry of its own. Undo would
+   * then rewind only the typing, restoring an invisible, zero-content element
+   * (and, for an endpoint label, leaving the arrow bound to it) rather than
+   * removing it. The editor's own submit captures the finished text instead,
+   * so the whole create-and-type lands in a single entry.
+   */
+  private isEditingTextContent() {
+    return (
+      !!this.state.editingTextElement || isTextElement(this.state.newElement)
+    );
+  }
+
   private startTextEditing = ({
     sceneX,
     sceneY,
     insertAtParentCenter = true,
     container,
     autoEdit = true,
+    initialCaretSceneCoords,
+    arrowEndpoint,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -5750,8 +6776,35 @@ class App extends React.Component<AppProps, AppState> {
     insertAtParentCenter?: boolean;
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
+    initialCaretSceneCoords?: { x: number; y: number };
+    /**
+     * creates the text as a label for this arrow endpoint: the binding then
+     * dictates the text's position and alignment, overriding (sceneX, sceneY)
+     */
+    arrowEndpoint?: ArrowEndpoint | null;
   }) => {
     let shouldBindToContainer = false;
+
+    // Resolved here rather than by the caller so that the stroke width the
+    // binding gap derives from (see `getBindingGap`) is, by construction, the
+    // one the text is created with below.
+    const arrowEndpointBinding =
+      arrowEndpoint &&
+      this.arrowText.getTextBinding(
+        arrowEndpoint,
+        this.getCurrentItemStrokeWidth("text"),
+      );
+
+    if (arrowEndpointBinding) {
+      // an arrow endpoint is not a text container — the text is a sibling the
+      // arrow binds to, not a label inside it
+      container = null;
+      insertAtParentCenter = false;
+      // the scene position of the text's bound side midpoint, not a caret
+      // position
+      sceneX = arrowEndpointBinding.anchor[0];
+      sceneY = arrowEndpointBinding.anchor[1];
+    }
 
     let parentCenterPosition =
       insertAtParentCenter &&
@@ -5770,24 +6823,16 @@ class App extends React.Component<AppProps, AppState> {
         shouldBindToContainer = true;
       }
     }
-    let existingTextElement: NonDeleted<ExcalidrawTextElement> | null = null;
-
-    const selectedElements = this.scene.getSelectedElements(this.state);
-
-    if (selectedElements.length === 1) {
-      if (isTextElement(selectedElements[0])) {
-        existingTextElement = selectedElements[0];
-      } else if (container) {
-        existingTextElement = getBoundTextElement(
-          selectedElements[0],
-          this.scene.getNonDeletedElementsMap(),
-        );
-      } else {
-        existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-      }
-    } else {
-      existingTextElement = this.getTextElementAtPosition(sceneX, sceneY);
-    }
+    const existingTextElement = arrowEndpointBinding
+      ? null
+      : this.getSelectedTextElement(container) ||
+        (container && isArrowElement(container)
+          ? getBoundTextElement(
+              container,
+              this.scene.getNonDeletedElementsMap(),
+            )
+          : null) ||
+        this.getTextElementAtPosition(sceneX, sceneY);
 
     const fontFamily =
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
@@ -5829,33 +6874,73 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    const textCreationGridPoint = this.getTextCreationGridPoint(sceneX, sceneY);
+
+    const newTextElementPosition = arrowEndpointBinding
+      ? // the anchor is dictated by the arrow, so neither the grid nor the
+        // caret-centering fudge may nudge it
+        { x: sceneX, y: sceneY }
+      : parentCenterPosition
+      ? {
+          x: parentCenterPosition.elementCenterX,
+          y: parentCenterPosition.elementCenterY,
+        }
+      : !existingTextElement
+      ? {
+          x: textCreationGridPoint?.x ?? sceneX,
+          y:
+            textCreationGridPoint === null
+              ? // Free text starts from a point cursor, so center the first line box on it.
+                sceneY - getLineHeightInPx(fontSize, lineHeight) / 2
+              : textCreationGridPoint.y,
+        }
+      : {
+          x: sceneX,
+          y: sceneY,
+        };
+
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
-      x: sceneX,
-      y: sceneY,
+      x: newTextElementPosition.x,
+      y: newTextElementPosition.y,
     });
+
+    // container has higher priority. Only add to frame if container is in the same frame.
+    const frameId =
+      topLayerFrame &&
+      (!shouldBindToContainer ||
+        !container ||
+        container.frameId === topLayerFrame.id)
+        ? topLayerFrame.id
+        : null;
 
     const element =
       existingTextElement ||
       newTextElement({
-        x: parentCenterPosition ? parentCenterPosition.elementCenterX : sceneX,
-        y: parentCenterPosition ? parentCenterPosition.elementCenterY : sceneY,
+        x: newTextElementPosition.x,
+        y: newTextElementPosition.y,
         strokeColor: this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
-        strokeWidth: this.state.currentItemStrokeWidth,
+        strokeWidth: this.getCurrentItemStrokeWidth("text"),
         strokeStyle: this.state.currentItemStrokeStyle,
         roughness: this.state.currentItemRoughness,
         opacity: this.state.currentItemOpacity,
         text: "",
         fontSize,
         fontFamily,
-        textAlign: parentCenterPosition
-          ? "center"
-          : this.state.currentItemTextAlign,
-        verticalAlign: parentCenterPosition
-          ? VERTICAL_ALIGN.MIDDLE
-          : DEFAULT_VERTICAL_ALIGN,
+        textAlign:
+          arrowEndpointBinding?.textAlign ??
+          (parentCenterPosition ? "center" : this.state.currentItemTextAlign),
+        verticalAlign:
+          arrowEndpointBinding?.verticalAlign ??
+          (parentCenterPosition
+            ? VERTICAL_ALIGN.MIDDLE
+            : DEFAULT_VERTICAL_ALIGN),
         containerId: shouldBindToContainer ? container?.id : undefined,
+        labelPosition:
+          shouldBindToContainer && container && isArrowElement(container)
+            ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+            : null,
         groupIds: container?.groupIds ?? [],
         lineHeight,
         angle: container
@@ -5863,7 +6948,7 @@ class App extends React.Component<AppProps, AppState> {
             ? (0 as Radians)
             : container.angle
           : (0 as Radians),
-        frameId: topLayerFrame ? topLayerFrame.id : null,
+        frameId,
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -5879,15 +6964,29 @@ class App extends React.Component<AppProps, AppState> {
     if (!existingTextElement) {
       if (container && shouldBindToContainer) {
         const containerIndex = this.scene.getElementIndex(container.id);
-        this.scene.insertElementAtIndex(element, containerIndex + 1);
+        // TODO should use insertNewElement, after we update it to handle
+        // elements with containerId + frameId at the same time (containerId
+        // should take precedence when it comes to z-index)
+        this.scene.insertElementsAtIndex([element], containerIndex + 1);
       } else {
-        this.scene.insertElement(element);
+        this.insertNewElement(element);
       }
+    }
+
+    if (arrowEndpoint && arrowEndpointBinding) {
+      this.arrowText.bindText(
+        arrowEndpoint,
+        element,
+        arrowEndpointBinding.fixedPoint,
+      );
     }
 
     if (autoEdit || existingTextElement || container) {
       this.handleTextWysiwyg(element, {
         isExistingElement: !!existingTextElement,
+        initialCaretSceneCoords: existingTextElement
+          ? initialCaretSceneCoords
+          : null,
       });
     } else {
       this.setState({
@@ -5913,16 +7012,62 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private shouldHandleBrowserCanvasDoubleClick = (type: string) => {
+    // TODO remove this once we consolidate double-click logic and handle
+    // ourselves for all event types together
+    if (type === "touch") {
+      return true;
+    }
+    if (this.lastCompletedCanvasClicks.length === 0) {
+      return true;
+    }
+
+    if (this.lastCompletedCanvasClicks.length < 2) {
+      return false;
+    }
+
+    const [firstClick, secondClick] = this.lastCompletedCanvasClicks;
+
+    return (
+      pointDistance(
+        pointFrom(firstClick.x, firstClick.y),
+        pointFrom(secondClick.x, secondClick.y),
+      ) <= DOUBLE_TAP_POSITION_THRESHOLD
+    );
+  };
+
   private handleCanvasDoubleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
+    event: Pick<
+      React.MouseEvent<HTMLCanvasElement>,
+      | "type"
+      | "clientX"
+      | "clientY"
+      | "altKey"
+      | "ctrlKey"
+      | "metaKey"
+      | "shiftKey"
+    >,
   ) => {
+    if (
+      !this.isInteractionEnabled() ||
+      this.state.editingTextElement ||
+      !this.shouldHandleBrowserCanvasDoubleClick(event.type)
+    ) {
+      return;
+    }
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
     if (this.state.multiElement) {
       return;
     }
-    // we should only be able to double click when mode is selection
-    if (this.state.activeTool.type !== this.state.preferredSelectionTool.type) {
+    // double click only creates/edits text in selection mode, or with the
+    // autoshape tool (double-click-to-type without leaving the tool; all the
+    // selection-dependent branches below are inert there since autoshape
+    // never selects anything)
+    if (
+      this.state.activeTool.type !== this.state.preferredSelectionTool.type &&
+      this.state.activeTool.type !== "autoshape"
+    ) {
       return;
     }
 
@@ -5936,6 +7081,7 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       const selectedLinearElement: ExcalidrawLinearElement =
         selectedElements[0];
+
       if (
         ((event[KEYS.CTRL_OR_CMD] && isSimpleArrow(selectedLinearElement)) ||
           isLineElement(selectedLinearElement)) &&
@@ -6023,7 +7169,7 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    resetCursor(this.interactiveCanvas);
+    this.cursor.reset();
 
     const selectedGroupIds = getSelectedGroupIds(this.state);
 
@@ -6052,27 +7198,34 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    resetCursor(this.interactiveCanvas);
-    if (!event[KEYS.CTRL_OR_CMD] && !this.state.viewModeEnabled) {
+    this.cursor.reset();
+    if (!this.state.viewModeEnabled) {
       const hitElement = this.getElementAtPosition(sceneX, sceneY);
 
       if (isIframeLikeElement(hitElement)) {
-        this.setState({
-          activeEmbeddable: { element: hitElement, state: "active" },
-        });
+        if (this.isIframeLikeInteractive(hitElement)) {
+          this.setState({
+            activeEmbeddable: { element: hitElement, state: "active" },
+          });
+        }
         return;
       }
 
       // shouldn't edit/create text when inside line editor (often false positive)
 
       if (!this.state.selectedLinearElement?.isEditing) {
-        const container = this.getTextBindableContainerAtPosition(
-          sceneX,
-          sceneY,
-        );
+        const container =
+          // skip binding to container on dblclick when holding ctrl
+          !event[KEYS.CTRL_OR_CMD] &&
+          this.getTextBindableContainerAtPosition(sceneX, sceneY);
 
         if (container) {
           if (
+            // with autoshape, any hit inside a bindable shape means "type in
+            // this shape" — unlike selection mode, a transparent unfilled
+            // container binds even when its stroke wasn't hit (Alt keeps the
+            // free-text-at-point escape hatch)
+            this.state.activeTool.type === "autoshape" ||
             hasBoundTextElement(container) ||
             !isTransparent(container.backgroundColor) ||
             hitElementItself({
@@ -6084,7 +7237,6 @@ class App extends React.Component<AppProps, AppState> {
           ) {
             const midPoint = getContainerCenter(
               container,
-              this.state,
               this.scene.getNonDeletedElementsMap(),
             );
 
@@ -6097,16 +7249,34 @@ class App extends React.Component<AppProps, AppState> {
           sceneX,
           sceneY,
           insertAtParentCenter: !event.altKey,
-          container,
+          container: container || null,
         });
       }
     }
   };
 
+  private handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
+    if (event.button !== POINTER_BUTTON.MAIN) {
+      this.lastCompletedCanvasClicks = [];
+      return;
+    }
+
+    this.lastCompletedCanvasClicks = [
+      ...this.lastCompletedCanvasClicks.slice(-1),
+      {
+        x: event.clientX,
+        y: event.clientY,
+      },
+    ];
+  };
+
   private getElementLinkAtPosition = (
     scenePointer: Readonly<{ x: number; y: number }>,
     hitElementMightBeLocked: NonDeletedExcalidrawElement | null,
-  ): ExcalidrawElement | undefined => {
+  ): NonDeletedExcalidrawElement | undefined => {
     if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
       return undefined;
     }
@@ -6138,9 +7308,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private redirectToLink = (
+  private handleElementLinkClick = (
     event: React.PointerEvent<HTMLCanvasElement>,
-    isTouchScreen: boolean,
   ) => {
     const draggedDistance = pointDistance(
       pointFrom(
@@ -6196,7 +7365,7 @@ class App extends React.Component<AppProps, AppState> {
         }
         if (!customEvent?.defaultPrevented) {
           const target = isLocalLink(url) ? "_self" : "_blank";
-          const newWindow = window.open(undefined, target);
+          const newWindow = this.ownerWindow.open(undefined, target);
           // https://mathiasbynens.github.io/rel-noopener/
           if (newWindow) {
             newWindow.opener = null;
@@ -6207,24 +7376,304 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getTopLayerFrameAtSceneCoords = (sceneCoords: {
-    x: number;
-    y: number;
-  }) => {
+  /**
+   * Applies (or clears) the element-link hover affordances — pointer cursor
+   * and tooltip — based on the current `hitLinkElement`. Returns whether a
+   * link is being hovered.
+   */
+  private applyElementLinkHoverAffordance = (): boolean => {
+    if (
+      this.hitLinkElement &&
+      !this.state.selectedElementIds[this.hitLinkElement.id]
+    ) {
+      this.cursor.set(CURSOR_TYPE.POINTER);
+
+      showHyperlinkTooltip(
+        this.hitLinkElement,
+        this.state,
+        this.scene.getNonDeletedElementsMap(),
+      );
+      return true;
+    }
+    hideHyperlinkToolip();
+    return false;
+  };
+
+  /**
+   * On touchscreens (where no hover precedes the tap) re-derives
+   * `hitLinkElement`, then opens the hit element link, if any.
+   * Returns whether a link click was handled.
+   */
+  private maybeHandleElementLinkClick = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+    scenePointer: { x: number; y: number },
+  ): boolean => {
+    if (this.editorInterface.isTouchScreen) {
+      const hitElement = this.getElementAtPosition(
+        scenePointer.x,
+        scenePointer.y,
+        {
+          includeLockedElements: true,
+        },
+      );
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElement,
+      );
+    }
+
+    if (
+      this.hitLinkElement &&
+      this.lastPointerDownEvent &&
+      !this.state.selectedElementIds[this.hitLinkElement.id]
+    ) {
+      this.handleElementLinkClick(event);
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Restricted pointer handling for the non-interactive editor with links
+   * and/or embeds allowed (`interaction.enabled.links` / `.embeds` /
+   * `.interactiveContent`) — runs only the element-link & embed concerns
+   * (shared with the full pointer handlers above) so they behave like in
+   * view mode without the rest of the canvas pointer machinery.
+   */
+  private handleInteractiveContentPointerMove = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    const scenePointer = viewportCoordsToSceneCoords(event, this.state);
+    const hitElementMightBeLocked = this.getElementAtPosition(
+      scenePointer.x,
+      scenePointer.y,
+      { includeLockedElements: true },
+    );
+
+    if (this.isEmbedsEnabled()) {
+      const hitElement = hitElementMightBeLocked?.locked
+        ? null
+        : hitElementMightBeLocked;
+      if (
+        this.handleIframeLikeElementHover({
+          hitElement,
+          scenePointer,
+          moveEvent: event,
+        })
+      ) {
+        return;
+      }
+    }
+
+    this.hitLinkElement = this.isLinksEnabled()
+      ? this.getElementLinkAtPosition(scenePointer, hitElementMightBeLocked)
+      : undefined;
+    if (!this.applyElementLinkHoverAffordance()) {
+      this.cursor.reset();
+    }
+  };
+
+  private handleInteractiveContentPointerUp = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    this.lastPointerUpEvent = event;
+
+    if (this.isEmbedsEnabled() && this.handleIframeLikeCenterClick()) {
+      return;
+    }
+
+    const scenePointer = viewportCoordsToSceneCoords(event, this.state);
+    if (
+      this.isLinksEnabled() &&
+      this.maybeHandleElementLinkClick(event, scenePointer)
+    ) {
+      return;
+    }
+
+    // clicking outside an active embed deactivates it (view-mode style;
+    // clicks inside it are consumed by the embed itself)
+    if (this.state.activeEmbeddable?.state === "active") {
+      this.setState({ activeEmbeddable: null });
+    }
+  };
+
+  /**
+   * finds candidate frame under cursor (when dragging frame children/elements
+   * inside frames)
+   */
+  public getTopLayerFrameAtSceneCoords = (
+    /**
+     * should be already grid aligned (basically should be what the call site
+     * sets the element's coords to, if applicable)
+     */
+    sceneCoords: {
+      x: number;
+      y: number;
+    },
+    opts?: {
+      /** to exclude selected elements when dragging, etc. */
+      excludeElementIds?: AppState["selectedElementIds"];
+      currentFrameId?: ExcalidrawElement["frameId"];
+    },
+  ) => {
     const elementsMap = this.scene.getNonDeletedElementsMap();
-    const frames = this.scene
+    const framesUnderCursor = this.scene
       .getNonDeletedFramesLikes()
       .filter(
-        (frame): frame is ExcalidrawFrameLikeElement =>
+        (frame) =>
           !frame.locked && isCursorInFrame(sceneCoords, frame, elementsMap),
       );
 
-    return frames.length ? frames[frames.length - 1] : null;
+    if (!framesUnderCursor.length) {
+      return null;
+    }
+
+    const topLayerFrame = framesUnderCursor.at(-1)!;
+
+    const hitElement = this.getElementsAtPosition(
+      sceneCoords.x,
+      sceneCoords.y,
+      {
+        includeLockedElements: true,
+      },
+    ).findLast((element) => !opts?.excludeElementIds?.[element.id]);
+
+    if (hitElement) {
+      if (
+        isFrameLikeElement(hitElement) &&
+        // case: we're hitting a locked frame itself (frame's outline
+        // or later its bg once implemented)
+        !hitElement.locked
+      ) {
+        return topLayerFrame;
+      }
+
+      const hitElementIndex = this.scene.getElementIndex(hitElement.id);
+      const topLayerFrameIndex = this.scene.getElementIndex(topLayerFrame.id);
+
+      if (
+        hitElementIndex !== -1 &&
+        topLayerFrameIndex !== -1 &&
+        hitElementIndex <= topLayerFrameIndex
+      ) {
+        return topLayerFrame;
+      }
+
+      // to support a case of dragging a pre-existing frame child underneath
+      // a non-frame element covering the cursor
+      const currentFrame = opts?.currentFrameId
+        ? framesUnderCursor.find((frame) => frame.id === opts.currentFrameId) ??
+          null
+        : null;
+
+      if (currentFrame) {
+        return currentFrame;
+      }
+
+      return hitElement.frameId
+        ? framesUnderCursor.find((frame) => frame.id === hitElement.frameId) ??
+            null
+        : null;
+    }
+
+    return topLayerFrame;
+  };
+
+  private updateFrameToHighlight = (
+    frameToHighlight: AppState["frameToHighlight"],
+  ) => {
+    if (this.state.frameToHighlight !== frameToHighlight) {
+      this.setState({ frameToHighlight });
+    }
+  };
+
+  private maybeUpdateFrameToHighlightOnPointerMove = (
+    sceneCoords: { x: number; y: number },
+    isOverScrollBar: boolean,
+  ) => {
+    // currently this function is being called even during pointerdown so we
+    // need to make sure we don't re-set the state when dragging and similar
+    //
+    // But, we still want to reset on pointermove in case the state is stale
+    // so we updte even for non-eligible tool types
+    if (
+      this.state.newElement ||
+      this.state.multiElement ||
+      this.state.selectionElement ||
+      this.state.selectedElementsAreBeingDragged
+    ) {
+      return;
+    }
+
+    this.updateFrameToHighlight(
+      !isOverScrollBar && isEligibleFrameChildType(this.state.activeTool.type)
+        ? this.getTopLayerFrameAtSceneCoords(sceneCoords)
+        : null,
+    );
+  };
+
+  public insertNewElements = (elements: readonly ExcalidrawElement[]) => {
+    if (!elements.length) {
+      return;
+    }
+
+    const chunkedElements: ExcalidrawElement[][] = [];
+
+    for (const element of elements) {
+      const currentChunk = chunkedElements[chunkedElements.length - 1];
+
+      if (currentChunk?.[0].frameId === element.frameId) {
+        currentChunk.push(element);
+      } else {
+        chunkedElements.push([element]);
+      }
+    }
+
+    for (const chunk of chunkedElements) {
+      const frameId = chunk[0].frameId;
+
+      const insertionIndex = frameId
+        ? getFrameChildrenInsertionIndex(
+            this.scene.getElementsIncludingDeleted(),
+            frameId,
+          )
+        : null;
+      this.scene.insertElementsAtIndex(chunk, insertionIndex);
+    }
+  };
+
+  public insertNewElement = (element: ExcalidrawElement) => {
+    this.insertNewElements([element]);
+
+    const frame = element.frameId
+      ? this.scene.getNonDeletedElement(element.frameId)
+      : null;
+
+    this.updateFrameToHighlight(
+      frame && isFrameLikeElement(frame) ? frame : null,
+    );
   };
 
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (!this.isInteractionEnabled()) {
+      if (this.isToolSupported(this.state.activeTool.type)) {
+        // keep broadcasting the pointer (`props.onPointerUpdate`) between
+        // strokes of the enabled tool, so e.g. a presenter's cursor stays
+        // visible to collaborators while the laser isn't drawing
+        this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
+      }
+      if (this.isNavigationEnabled()) {
+        // two-finger pinch zoom/pan (single-pointer panning is handled by
+        // the pan session set up on pointerdown)
+        this.updateMultiTouchGesture(event);
+      }
+      if ((this.isLinksEnabled() || this.isEmbedsEnabled()) && !isPanning) {
+        this.handleInteractiveContentPointerMove(event);
+      }
+      return;
+    }
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
     this.lastPointerMoveEvent = event.nativeEvent;
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
@@ -6234,64 +7683,7 @@ class App extends React.Component<AppProps, AppState> {
       y: scenePointerY,
     };
 
-    if (gesture.pointers.has(event.pointerId)) {
-      gesture.pointers.set(event.pointerId, {
-        x: event.clientX,
-        y: event.clientY,
-      });
-    }
-
-    const initialScale = gesture.initialScale;
-    if (
-      gesture.pointers.size === 2 &&
-      gesture.lastCenter &&
-      initialScale &&
-      gesture.initialDistance
-    ) {
-      const center = getCenter(gesture.pointers);
-      const deltaX = center.x - gesture.lastCenter.x;
-      const deltaY = center.y - gesture.lastCenter.y;
-      gesture.lastCenter = center;
-
-      const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor =
-        this.state.activeTool.type === "freedraw" && this.state.penMode
-          ? 1
-          : distance / gesture.initialDistance;
-
-      const nextZoom = scaleFactor
-        ? getNormalizedZoom(initialScale * scaleFactor)
-        : this.state.zoom.value;
-
-      this.setState((state) => {
-        const zoomState = getStateForZoom(
-          {
-            viewportX: center.x,
-            viewportY: center.y,
-            nextZoom,
-          },
-          state,
-        );
-
-        this.translateCanvas({
-          zoom: zoomState.zoom,
-          // 2x multiplier is just a magic number that makes this work correctly
-          // on touchscreen devices (note: if we get report that panning is slower/faster
-          // than actual movement, consider swapping with devicePixelRatio)
-          scrollX: zoomState.scrollX + 2 * (deltaX / nextZoom),
-          scrollY: zoomState.scrollY + 2 * (deltaY / nextZoom),
-          shouldCacheIgnoreZoom: true,
-        });
-
-        return null;
-      });
-      this.resetShouldCacheIgnoreZoomDebounced();
-    } else {
-      gesture.lastCenter =
-        gesture.initialDistance =
-        gesture.initialScale =
-          null;
-    }
+    this.updateMultiTouchGesture(event);
 
     if (
       isHoldingSpace ||
@@ -6315,11 +7707,19 @@ class App extends React.Component<AppProps, AppState> {
       !this.state.multiElement
     ) {
       if (isOverScrollBar) {
-        resetCursor(this.interactiveCanvas);
+        this.cursor.set(CURSOR_TYPE.AUTO);
       } else {
-        setCursorForShape(this.interactiveCanvas, this.state);
+        this.cursor.applyForTool();
       }
     }
+
+    this.maybeUpdateFrameToHighlightOnPointerMove(
+      {
+        x: scenePointerX,
+        y: scenePointerY,
+      },
+      isOverScrollBar,
+    );
 
     if (
       !this.state.newElement &&
@@ -6439,48 +7839,10 @@ class App extends React.Component<AppProps, AppState> {
 
       const { lastCommittedPoint } = selectedLinearElement;
 
-      setCursorForShape(this.interactiveCanvas, this.state);
+      this.cursor.applyForTool();
 
       if (lastPoint === lastCommittedPoint) {
-        const hoveredElement =
-          isArrowElement(this.state.newElement) &&
-          isBindingEnabled(this.state) &&
-          getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            maxBindingDistance_simple(this.state.zoom),
-          );
-        if (hoveredElement) {
-          this.actionManager.executeAction(actionFinalize, "ui", {
-            event: event.nativeEvent,
-            sceneCoords: {
-              x: scenePointerX,
-              y: scenePointerY,
-            },
-          });
-          this.setState({ suggestedBinding: null, startBoundElement: null });
-          if (!this.state.activeTool.locked) {
-            resetCursor(this.interactiveCanvas);
-            this.setState((prevState) => ({
-              newElement: null,
-              activeTool: updateActiveTool(this.state, {
-                type: this.state.preferredSelectionTool.type,
-              }),
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  ...prevState.selectedElementIds,
-                  [multiElement.id]: true,
-                },
-                prevState,
-              ),
-              selectedLinearElement: new LinearElementEditor(
-                multiElement,
-                this.scene.getNonDeletedElementsMap(),
-              ),
-            }));
-          }
-        } else if (
+        if (
           // if we haven't yet created a temp point and we're beyond commit-zone
           // threshold, add a point
           pointDistance(
@@ -6488,6 +7850,24 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
+          this.store.scheduleCapture();
+          flushSync(() => {
+            invariant(
+              this.state.selectedLinearElement?.initialState,
+              "initialState must be set",
+            );
+            this.setState({
+              selectedLinearElement: {
+                ...this.state.selectedLinearElement,
+                lastCommittedPoint: points[points.length - 1],
+                selectedPointsIndices: [multiElement.points.length],
+                initialState: {
+                  ...this.state.selectedLinearElement.initialState,
+                  lastClickedPoint: multiElement.points.length,
+                },
+              },
+            });
+          });
           this.scene.mutateElement(
             multiElement,
             {
@@ -6498,23 +7878,8 @@ class App extends React.Component<AppProps, AppState> {
             },
             { informMutation: false, isDragging: false },
           );
-          invariant(
-            this.state.selectedLinearElement?.initialState,
-            "initialState must be set",
-          );
-          this.setState({
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              lastCommittedPoint: points[points.length - 1],
-              selectedPointsIndices: [multiElement.points.length - 1],
-              initialState: {
-                ...this.state.selectedLinearElement.initialState,
-                lastClickedPoint: multiElement.points.length - 1,
-              },
-            },
-          });
         } else {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+          this.cursor.set(CURSOR_TYPE.POINTER);
           // in this branch, we're inside the commit zone, and no uncommitted
           // point exists. Thus do nothing (don't add/remove points).
         }
@@ -6526,7 +7891,7 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        this.cursor.set(CURSOR_TYPE.POINTER);
         this.scene.mutateElement(
           multiElement,
           {
@@ -6534,33 +7899,29 @@ class App extends React.Component<AppProps, AppState> {
           },
           { informMutation: false, isDragging: false },
         );
+        const newLastIdx = multiElement.points.length - 1;
         this.setState({
           selectedLinearElement: {
             ...selectedLinearElement,
-            selectedPointsIndices:
-              selectedLinearElement.selectedPointsIndices?.includes(
-                multiElement.points.length,
-              )
-                ? [
-                    ...selectedLinearElement.selectedPointsIndices.filter(
-                      (idx) =>
-                        idx !== multiElement.points.length &&
-                        idx !== multiElement.points.length - 1,
+            selectedPointsIndices: selectedLinearElement.selectedPointsIndices
+              ? [
+                  ...new Set(
+                    selectedLinearElement.selectedPointsIndices.map((idx) =>
+                      Math.min(idx, newLastIdx),
                     ),
-                    multiElement.points.length - 1,
-                  ]
-                : selectedLinearElement.selectedPointsIndices,
-            lastCommittedPoint:
-              multiElement.points[multiElement.points.length - 1],
+                  ),
+                ]
+              : selectedLinearElement.selectedPointsIndices,
+            lastCommittedPoint: multiElement.points[newLastIdx],
             initialState: {
               ...selectedLinearElement.initialState,
-              lastClickedPoint: multiElement.points.length - 1,
+              lastClickedPoint: newLastIdx,
             },
           },
         });
       } else {
         if (isPathALoop(points, this.state.zoom.value)) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+          this.cursor.set(CURSOR_TYPE.POINTER);
         }
 
         // Update arrow points
@@ -6598,14 +7959,16 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (this.state.activeTool.type === "arrow") {
+    // Set suggested binding if we're hovering with an arrow tool
+    // and not dragging out a new element
+    if (this.state.activeTool.type === "arrow" && !this.state.newElement) {
+      const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
       const hit = getHoveredElementForBinding(
-        pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+        scenePointer,
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
         maxBindingDistance_simple(this.state.zoom),
       );
-      const scenePointer = pointFrom<GlobalPoint>(scenePointerX, scenePointerY);
       const elementsMap = this.scene.getNonDeletedElementsMap();
       if (hit && !isPointInElement(scenePointer, hit, elementsMap)) {
         this.setState({
@@ -6622,10 +7985,14 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    const hasDeselectedButton = Boolean(event.buttons);
+    const isPressingAnyButton = Boolean(event.buttons);
+    const isLaserTool = this.state.activeTool.type === "laser";
     if (
-      hasDeselectedButton ||
-      (this.state.activeTool.type !== "selection" &&
+      isPressingAnyButton ||
+      // checking against laser so that if you mouseover with a laser tool
+      // over a link/embeddable, we change the cursor
+      (!isLaserTool &&
+        this.state.activeTool.type !== "selection" &&
         this.state.activeTool.type !== "lasso" &&
         this.state.activeTool.type !== "text" &&
         this.state.activeTool.type !== "eraser")
@@ -6636,6 +8003,12 @@ class App extends React.Component<AppProps, AppState> {
     const elements = this.scene.getNonDeletedElements();
 
     const selectedElements = this.scene.getSelectedElements(this.state);
+
+    if (this.isHittingTextAutoResizeHandle(selectedElements, scenePointer)) {
+      this.cursor.set(CURSOR_TYPE.POINTER);
+      return;
+    }
+
     if (
       selectedElements.length === 1 &&
       !isOverScrollBar &&
@@ -6679,8 +8052,7 @@ class App extends React.Component<AppProps, AppState> {
           elementWithTransformHandleType &&
           elementWithTransformHandleType.transformHandleType
         ) {
-          setCursor(
-            this.interactiveCanvas,
+          this.cursor.set(
             getCursorForResizingElement(elementWithTransformHandleType),
           );
           return;
@@ -6700,14 +8072,17 @@ class App extends React.Component<AppProps, AppState> {
         this.editorInterface,
       );
       if (transformHandleType) {
-        setCursor(
-          this.interactiveCanvas,
+        this.cursor.set(
           getCursorForResizingElement({
             transformHandleType,
           }),
         );
         return;
       }
+    }
+
+    if (isEraserActive(this.state)) {
+      return;
     }
 
     const hitElementMightBeLocked = this.getElementAtPosition(
@@ -6719,32 +8094,33 @@ class App extends React.Component<AppProps, AppState> {
       },
     );
 
-    let hitElement: ExcalidrawElement | null = null;
+    let hitElement: NonDeleted<ExcalidrawElement> | null = null;
     if (hitElementMightBeLocked && hitElementMightBeLocked.locked) {
       hitElement = null;
     } else {
       hitElement = hitElementMightBeLocked;
     }
 
-    this.hitLinkElement = this.getElementLinkAtPosition(
-      scenePointer,
-      hitElementMightBeLocked,
-    );
-    if (isEraserActive(this.state)) {
-      return;
-    }
+    const hoveredArrowTextAnchor =
+      this.arrowText.updateHoveredAnchor(scenePointer);
+
     if (
-      this.hitLinkElement &&
-      !this.state.selectedElementIds[this.hitLinkElement.id]
+      !this.handleIframeLikeElementHover({
+        hitElement,
+        scenePointer,
+        moveEvent: event,
+      })
     ) {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-      showHyperlinkTooltip(
-        this.hitLinkElement,
-        this.state,
-        this.scene.getNonDeletedElementsMap(),
+      this.hitLinkElement = this.getElementLinkAtPosition(
+        scenePointer,
+        hitElementMightBeLocked,
       );
-    } else {
-      hideHyperlinkToolip();
+    }
+
+    if (!this.applyElementLinkHoverAffordance()) {
+      if (isLaserTool) {
+        return;
+      }
       if (
         hitElement &&
         (hitElement.link || isEmbeddableElement(hitElement)) &&
@@ -6754,19 +8130,32 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (this.state.activeTool.type === "text") {
-        setCursor(
-          this.interactiveCanvas,
-          isTextElement(hitElement) ? CURSOR_TYPE.TEXT : CURSOR_TYPE.CROSSHAIR,
+        this.cursor.set(
+          hoveredArrowTextAnchor
+            ? CURSOR_TYPE.POINTER
+            : isTextElement(hitElement)
+            ? CURSOR_TYPE.TEXT
+            : CURSOR_TYPE.CROSSHAIR,
         );
+      } else if (
+        !event[KEYS.CTRL_OR_CMD] &&
+        this.isHittingCommonBoundingBoxOfSelectedElements(
+          scenePointer,
+          selectedElements,
+        )
+      ) {
+        this.cursor.set(CURSOR_TYPE.MOVE);
       } else if (this.state.viewModeEnabled) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
+        this.cursor.set(CURSOR_TYPE.GRAB);
       } else if (this.state.openDialog?.name === "elementLinkSelector") {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        this.cursor.set(CURSOR_TYPE.AUTO);
       } else if (isOverScrollBar) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        this.cursor.set(CURSOR_TYPE.AUTO);
       } else if (
         // if using cmd/ctrl, we're not dragging
-        !event[KEYS.CTRL_OR_CMD]
+        !event[KEYS.CTRL_OR_CMD] &&
+        // editing text -> don't show move cursor when hovering over its bbox
+        hitElement?.id !== this.state.editingTextElement?.id
       ) {
         if (
           (hitElement ||
@@ -6777,20 +8166,6 @@ class App extends React.Component<AppProps, AppState> {
           !hitElement?.locked
         ) {
           if (
-            hitElement &&
-            isIframeLikeElement(hitElement) &&
-            this.isIframeLikeElementCenter(
-              hitElement,
-              event,
-              scenePointerX,
-              scenePointerY,
-            )
-          ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-            this.setState({
-              activeEmbeddable: { element: hitElement, state: "hover" },
-            });
-          } else if (
             !hitElement ||
             // Elbow arrows can only be moved when unconnected
             !isElbowArrow(hitElement) ||
@@ -6800,15 +8175,12 @@ class App extends React.Component<AppProps, AppState> {
               this.state.activeTool.type !== "lasso" ||
               selectedElements.length > 0
             ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-            }
-            if (this.state.activeEmbeddable?.state === "hover") {
-              this.setState({ activeEmbeddable: null });
+              this.cursor.set(CURSOR_TYPE.MOVE);
             }
           }
         }
       } else {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        this.cursor.set(CURSOR_TYPE.AUTO);
       }
 
       if (this.state.selectedLinearElement) {
@@ -6863,9 +8235,16 @@ class App extends React.Component<AppProps, AppState> {
 
   // set touch moving for mobile context menu
   private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
     invalidateContextMenu = true;
   };
 
+  /**
+   * Applies the hover affordances of a selected linear element: the cursor,
+   * plus the hovered-handle state that renders them highlighted.
+   */
   handleHoverSelectedLinearElement(
     linearElementEditor: LinearElementEditor,
     scenePointerX: number,
@@ -6882,63 +8261,55 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     if (this.state.selectedLinearElement) {
-      let hoverPointIndex = -1;
-      let segmentMidPointHoveredCoords = null;
-      if (
-        hitElementItself({
-          point: pointFrom(scenePointerX, scenePointerY),
-          element,
-          elementsMap,
-          threshold: this.getElementHitThreshold(element),
-        })
-      ) {
-        hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
-          element,
-          elementsMap,
-          this.state.zoom,
-          scenePointerX,
-          scenePointerY,
-        );
-        segmentMidPointHoveredCoords =
-          LinearElementEditor.getSegmentMidpointHitCoords(
+      // the same hit tests, in the same precedence, as
+      // `LinearElementEditor.handlePointerDown`, so the cursor never promises
+      // an interaction (e.g. grabbing the label) that pointer down won't
+      // deliver. Both handle radii exceed the element's own hit threshold,
+      // so these must not be gated on hitting the element itself.
+      const hoverPointIndex = LinearElementEditor.getPointIndexUnderCursor(
+        element,
+        elementsMap,
+        this.state.zoom,
+        scenePointerX,
+        scenePointerY,
+      );
+      const isHoveringAPointHandle = LinearElementEditor.isPointHandle(
+        element,
+        hoverPointIndex,
+      );
+      const segmentMidPointHoveredCoords = isHoveringAPointHandle
+        ? null
+        : LinearElementEditor.getSegmentMidpointHitCoords(
             linearElementEditor,
             { x: scenePointerX, y: scenePointerY },
             this.state,
-            this.scene.getNonDeletedElementsMap(),
+            elementsMap,
           );
-        const isHoveringAPointHandle = isElbowArrow(element)
-          ? hoverPointIndex === 0 ||
-            hoverPointIndex === element.points.length - 1
-          : hoverPointIndex >= 0;
-        if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
-          setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
-        } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-          if (
-            // Elbow arrows can only be moved when unconnected
-            !isElbowArrow(element) ||
-            !(element.startBinding || element.endBinding)
-          ) {
-            if (
-              this.state.activeTool.type !== "lasso" ||
-              Object.keys(this.state.selectedElementIds).length > 0
-            ) {
-              setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-            }
-          }
-        }
-      } else if (this.hitElement(scenePointerX, scenePointerY, element)) {
-        if (
-          // Elbow arrow can only be moved when unconnected
-          !isElbowArrow(element) ||
-          !(element.startBinding || element.endBinding)
-        ) {
-          if (
-            this.state.activeTool.type !== "lasso" ||
-            Object.keys(this.state.selectedElementIds).length > 0
-          ) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.MOVE);
-          }
-        }
+
+      if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
+        this.cursor.set(CURSOR_TYPE.POINTER);
+      } else if (
+        // an arrow's bound text is draggable along the arrow. The handles
+        // and the midpoint knob sitting under the label keep precedence so a
+        // labeled arrow can still be bent at its middle, while the label
+        // itself is grabbable even where it extends beyond the arrow's own
+        // hit area.
+        this.arrowText.isBoundTextGrabbable(
+          element,
+          scenePointerX,
+          scenePointerY,
+        )
+      ) {
+        this.cursor.set(CURSOR_TYPE.GRAB);
+      } else if (
+        this.hitElement(scenePointerX, scenePointerY, element) &&
+        // Elbow arrows can only be moved when unconnected
+        (!isElbowArrow(element) ||
+          !(element.startBinding || element.endBinding)) &&
+        (this.state.activeTool.type !== "lasso" ||
+          Object.keys(this.state.selectedElementIds).length > 0)
+      ) {
+        this.cursor.set(CURSOR_TYPE.MOVE);
       }
 
       if (
@@ -6994,16 +8365,50 @@ class App extends React.Component<AppProps, AppState> {
 
       // Set cursor to pointer when hovering over a focus point
       if (hoveredFocusPointBinding) {
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        this.cursor.set(CURSOR_TYPE.POINTER);
       }
     } else {
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+      this.cursor.set(CURSOR_TYPE.AUTO);
     }
   }
 
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    if (
+      !this.isInteractionEnabled() &&
+      !this.isToolSupported(this.state.activeTool.type)
+    ) {
+      if (this.isLinksEnabled() || this.isEmbedsEnabled()) {
+        // needed by handleElementLinkClick & handleIframeLikeCenterClick
+        // (drag-distance & hit checks)
+        this.lastPointerDownEvent = event;
+      }
+      if (this.isNavigationEnabled()) {
+        this.updateGestureOnPointerDown(event);
+        if (!isPanning) {
+          // pans on drag same as view mode (the pan session manages its own
+          // window listeners & teardown)
+          this.handleCanvasPanUsingWheelOrSpaceDrag(event);
+        }
+      }
+      return;
+    }
+    // with the active tool allowed via `interaction.enabled.tools`, the
+    // pointer keeps driving it through the full flow below — safe while
+    // non-interactive because that implies view mode, whose gates constrain
+    // everything except the tool-usage path (laser & custom tools)
+
+    const selectedElements = this.scene.getSelectedElements(this.state);
+
+    // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
+    if (!event.ctrlKey) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        this.setState({ isBindingEnabled: preferenceEnabled });
+      }
+    }
+
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
     this.lastPointerMoveCoords = {
@@ -7019,7 +8424,11 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
-    this.maybeUnfollowRemoteUser();
+    // laser pointer is a presentation aid, not an edit — using it while
+    // following someone shouldn't break follow
+    if (this.state.activeTool.type !== "laser") {
+      this.requestUnfollow();
+    }
 
     if (this.state.searchMatches) {
       this.setState((state) => {
@@ -7080,7 +8489,6 @@ class App extends React.Component<AppProps, AppState> {
         appState: {
           newElement: null,
           editingTextElement: null,
-          startBoundElement: null,
           suggestedBinding: null,
           selectedElementIds: makeNextSelectedElementIds(
             Object.keys(this.state.selectedElementIds)
@@ -7103,7 +8511,7 @@ class App extends React.Component<AppProps, AppState> {
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
-    const selection = document.getSelection();
+    const selection = this.ownerDocument.getSelection();
     if (selection?.anchorNode) {
       selection.removeAllRanges();
     }
@@ -7116,6 +8524,7 @@ class App extends React.Component<AppProps, AppState> {
         return {
           penMode: true,
           penDetected: true,
+          currentItemStrokeVariability: "variable",
         };
       });
     }
@@ -7150,13 +8559,18 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       event.button === POINTER_BUTTON.ERASER &&
+      // must not switch tools while non-interactive (reachable when the
+      // active tool is allowed via `interaction.enabled.tools`) or while
+      // the active tool is host-controlled
+      this.isInteractionEnabled() &&
+      !this.props.activeTool &&
       this.state.activeTool.type !== TOOL_TYPE.eraser
     ) {
       this.setState(
         {
           activeTool: updateActiveTool(this.state, {
             type: TOOL_TYPE.eraser,
-            lastActiveToolBeforeEraser: this.state.activeTool,
+            lastActiveTool: this.state.activeTool,
           }),
         },
         () => {
@@ -7170,14 +8584,14 @@ class App extends React.Component<AppProps, AppState> {
                   ...(this.state.activeTool.lastActiveTool || {
                     type: TOOL_TYPE.selection,
                   }),
-                  lastActiveToolBeforeEraser: null,
+                  lastActiveTool: null,
                 }),
               });
             }
           };
 
           const unsubPointerUp = addEventListener(
-            window,
+            this.ownerWindow,
             EVENT.POINTER_UP,
             onPointerUp,
             {
@@ -7188,7 +8602,7 @@ class App extends React.Component<AppProps, AppState> {
           // subscribe inside rAF lest it'd be triggered on the same pointerdown
           // if we start erasing while coming from blurred document since
           // we cleanup pointer events on focus
-          requestAnimationFrame(() => {
+          this.ownerWindow.requestAnimationFrame(() => {
             unsubCleanup =
               this.missingPointerEventCleanupEmitter.once(onPointerUp);
           });
@@ -7219,12 +8633,20 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementsAreBeingDragged: false,
     });
 
+    if (
+      this.handleTextAutoResizeHandlePointerDown(
+        selectedElements,
+        pointerDownState.origin,
+      )
+    ) {
+      return;
+    }
+
     if (this.handleDraggingScrollBar(event, pointerDownState)) {
       return;
     }
 
     this.clearSelectionIfNotUsingSelection();
-    this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
       return;
@@ -7246,17 +8668,24 @@ class App extends React.Component<AppProps, AppState> {
       const hitSelectedElement =
         pointerDownState.hit.element &&
         this.isASelectedElement(pointerDownState.hit.element);
+      const shouldForceLassoReselect =
+        event.altKey &&
+        event[KEYS.CTRL_OR_CMD] &&
+        !pointerDownState.resize.handleType;
+      const shouldStartLassoSelection =
+        shouldForceLassoReselect ||
+        (!pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
+          !pointerDownState.resize.handleType &&
+          !hitSelectedElement);
 
-      if (
-        !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements &&
-        !pointerDownState.resize.handleType &&
-        !hitSelectedElement
-      ) {
-        this.lassoTrail.startPath(
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          event.shiftKey,
-        );
+      if (shouldStartLassoSelection) {
+        if (!this.lassoTrail.hasCurrentTrail) {
+          this.lassoTrail.startPath(
+            pointerDownState.origin.x,
+            pointerDownState.origin.y,
+            event.shiftKey,
+          );
+        }
 
         // block dragging after lasso selection on PCs until the next pointer down
         // (on mobile or tablet, we want to allow user to drag immediately)
@@ -7373,7 +8802,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState,
       );
     } else if (this.state.activeTool.type === "custom") {
-      setCursorForShape(this.interactiveCanvas, this.state);
+      this.cursor.applyForTool();
     } else if (
       this.state.activeTool.type === TOOL_TYPE.frame ||
       this.state.activeTool.type === TOOL_TYPE.magicframe
@@ -7387,6 +8816,19 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+    } else if (this.state.activeTool.type === "autoshape") {
+      this.drawShape.handlePointerDown(pointerDownState);
+    } else if (this.state.activeTool.type === TOOL_TYPE.bucketfill) {
+      // one-shot click tool: pointer down only ARMS the fill — it commits in
+      // the shared pointer-up teardown, and only when the interaction stayed
+      // a single-pointer click (a second finger, a context menu, or a
+      // pointercancel aborts it). Dispatched like any other tool (laser has
+      // the same shape) so the shared pointer lifecycle below — public
+      // onPointerDown/onPointerUp callbacks, pointer-up teardown,
+      // missing-pointer-up cleanup — runs for bucket clicks too. In view
+      // mode this branch is unreachable:
+      // `handleCanvasPanUsingWheelOrSpaceDrag` swallows the pointer-down.
+      this.bucketFill.handlePointerDown(scenePointer);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
@@ -7425,11 +8867,11 @@ class App extends React.Component<AppProps, AppState> {
       onPointerUp(_event || event.nativeEvent),
     );
 
-    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
-      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
-      window.addEventListener(EVENT.KEYDOWN, onKeyDown);
-      window.addEventListener(EVENT.KEYUP, onKeyUp);
+    if (!this.state.viewModeEnabled || this.isActiveToolPointerCapturing()) {
+      this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      this.ownerWindow.addEventListener(EVENT.POINTER_UP, onPointerUp);
+      this.ownerWindow.addEventListener(EVENT.KEYDOWN, onKeyDown);
+      this.ownerWindow.addEventListener(EVENT.KEYUP, onKeyUp);
       pointerDownState.eventListeners.onMove = onPointerMove;
       pointerDownState.eventListeners.onUp = onPointerUp;
       pointerDownState.eventListeners.onKeyUp = onKeyUp;
@@ -7440,12 +8882,29 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (!this.isInteractionEnabled()) {
+      if (this.isLinksEnabled() || this.isEmbedsEnabled()) {
+        this.handleInteractiveContentPointerUp(event);
+      }
+      return;
+    }
     if (getFeatureFlag("COMPLEX_BINDINGS")) {
       this.resetDelayedBindMode();
     }
 
     this.removePointer(event);
+    this.lastPointerUpIsDoubleClick = this.isDoubleClick(
+      this.lastPointerUpEvent,
+      event,
+    );
     this.lastPointerUpEvent = event;
+
+    if (!event.ctrlKey) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        this.setState({ isBindingEnabled: preferenceEnabled });
+      }
+    }
 
     const scenePointer = viewportCoordsToSceneCoords(
       { clientX: event.clientX, clientY: event.clientY },
@@ -7456,61 +8915,15 @@ class App extends React.Component<AppProps, AppState> {
       x: scenePointerX,
       y: scenePointerY,
     };
-    const clicklength =
-      event.timeStamp - (this.lastPointerDownEvent?.timeStamp ?? 0);
 
-    if (this.editorInterface.formFactor === "phone" && clicklength < 300) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-      );
-      if (
-        isIframeLikeElement(hitElement) &&
-        this.isIframeLikeElementCenter(
-          hitElement,
-          event,
-          scenePointer.x,
-          scenePointer.y,
-        )
-      ) {
-        this.handleEmbeddableCenterClick(hitElement);
-        return;
-      }
-    }
-
-    if (this.editorInterface.isTouchScreen) {
-      const hitElement = this.getElementAtPosition(
-        scenePointer.x,
-        scenePointer.y,
-        {
-          includeLockedElements: true,
-        },
-      );
-      this.hitLinkElement = this.getElementLinkAtPosition(
-        scenePointer,
-        hitElement,
-      );
+    if (this.handleIframeLikeCenterClick()) {
+      return;
     }
 
     if (
-      this.hitLinkElement &&
-      !this.state.selectedElementIds[this.hitLinkElement.id]
+      !this.maybeHandleElementLinkClick(event, scenePointer) &&
+      this.state.viewModeEnabled
     ) {
-      if (
-        clicklength < 300 &&
-        isIframeLikeElement(this.hitLinkElement) &&
-        !isPointHittingLinkIcon(
-          this.hitLinkElement,
-          this.scene.getNonDeletedElementsMap(),
-          this.state,
-          pointFrom(scenePointer.x, scenePointer.y),
-        )
-      ) {
-        this.handleEmbeddableCenterClick(this.hitLinkElement);
-      } else {
-        this.redirectToLink(event, this.editorInterface.isTouchScreen);
-      }
-    } else if (this.state.viewModeEnabled) {
       this.setState({
         activeEmbeddable: null,
         selectedElementIds: {},
@@ -7533,7 +8946,7 @@ class App extends React.Component<AppProps, AppState> {
       } else {
         // open the context menu with the first touch's clientX and clientY
         // if the touch is not moving
-        touchTimeout = window.setTimeout(() => {
+        touchTimeout = this.ownerWindow.setTimeout(() => {
           touchTimeout = 0;
           if (!invalidateContextMenu) {
             this.handleCanvasContextMenu(event);
@@ -7566,10 +8979,14 @@ class App extends React.Component<AppProps, AppState> {
     if (
       !(
         gesture.pointers.size <= 1 &&
-        (event.button === POINTER_BUTTON.WHEEL ||
+        (((event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
-          isHandToolActive(this.state) ||
-          this.state.viewModeEnabled)
+          isHandToolActive(this.state)) &&
+          // reachable while non-interactive when the active tool is allowed
+          // via `interaction.enabled.tools` — panning must remain gated on
+          // `navigation` then
+          (this.isInteractionEnabled() || this.isNavigationEnabled())) ||
+          (this.state.viewModeEnabled && !this.isActiveToolPointerCapturing()))
       )
     ) {
       return false;
@@ -7590,12 +9007,9 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     let nextPastePrevented = false;
-    const isLinux =
-      typeof window === undefined
-        ? false
-        : /Linux/.test(window.navigator.platform);
+    const isLinux = /Linux/.test(this.ownerWindow.navigator.platform);
 
-    setCursor(this.interactiveCanvas, CURSOR_TYPE.GRABBING);
+    this.cursor.set(CURSOR_TYPE.GRABBING);
     let { clientX: lastX, clientY: lastY } = event;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const deltaX = lastX - event.clientX;
@@ -7616,7 +9030,10 @@ class App extends React.Component<AppProps, AppState> {
 
         /* Prevent the next paste event */
         const preventNextPaste = (event: ClipboardEvent) => {
-          document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+          this.ownerDocument.body.removeEventListener(
+            EVENT.PASTE,
+            preventNextPaste,
+          );
           event.stopPropagation();
         };
 
@@ -7628,16 +9045,22 @@ class App extends React.Component<AppProps, AppState> {
          */
         const enableNextPaste = () => {
           setTimeout(() => {
-            document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
-            window.removeEventListener(EVENT.POINTER_UP, enableNextPaste);
+            this.ownerDocument.body.removeEventListener(
+              EVENT.PASTE,
+              preventNextPaste,
+            );
+            this.ownerWindow.removeEventListener(
+              EVENT.POINTER_UP,
+              enableNextPaste,
+            );
           }, 100);
         };
 
-        document.body.addEventListener(EVENT.PASTE, preventNextPaste);
-        window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
+        this.ownerDocument.body.addEventListener(EVENT.PASTE, preventNextPaste);
+        this.ownerWindow.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
-      this.translateCanvas({
+      this.viewport.translate({
         scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
         scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
@@ -7647,27 +9070,28 @@ class App extends React.Component<AppProps, AppState> {
         lastPointerUp = null;
         isPanning = false;
         if (!isHoldingSpace) {
-          if (this.state.viewModeEnabled) {
-            setCursor(this.interactiveCanvas, CURSOR_TYPE.GRAB);
-          } else {
-            setCursorForShape(this.interactiveCanvas, this.state);
-          }
+          this.cursor.reset();
         }
-        this.setState({
-          cursorButton: "up",
-        });
+        this.setState(
+          {
+            cursorButton: "up",
+          },
+          // Runs after the trailing throttled pointer move has committed, so
+          // the snap-back starts from the pan's actual final viewport.
+          this.viewport.releaseOverscroll,
+        );
         this.savePointer(event.clientX, event.clientY, "up");
-        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-        window.removeEventListener(EVENT.POINTER_UP, teardown);
-        window.removeEventListener(EVENT.BLUR, teardown);
+        this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        this.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
+        this.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
         onPointerMove.flush();
       }),
     );
-    window.addEventListener(EVENT.BLUR, teardown);
-    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+    this.ownerWindow.addEventListener(EVENT.BLUR, teardown);
+    this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
       passive: true,
     });
-    window.addEventListener(EVENT.POINTER_UP, teardown);
+    this.ownerWindow.addEventListener(EVENT.POINTER_UP, teardown);
     return true;
   };
 
@@ -7687,6 +9111,82 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
   }
+
+  /**
+   * Tracks the pointer within the ongoing multi-touch gesture and applies
+   * the two-finger pinch zoom/pan, if any.
+   */
+  private updateMultiTouchGesture = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    if (gesture.pointers.has(event.pointerId)) {
+      gesture.pointers.set(event.pointerId, {
+        x: event.clientX,
+        y: event.clientY,
+      });
+    }
+
+    const initialScale = gesture.initialScale;
+    if (
+      gesture.pointers.size === 2 &&
+      gesture.lastCenter &&
+      initialScale &&
+      gesture.initialDistance
+    ) {
+      const center = getCenter(gesture.pointers);
+      const deltaX = center.x - gesture.lastCenter.x;
+      const deltaY = center.y - gesture.lastCenter.y;
+      gesture.lastCenter = center;
+
+      const distance = getDistance(Array.from(gesture.pointers.values()));
+      const scaleFactor =
+        this.state.activeTool.type === "freedraw" && this.state.penMode
+          ? 1
+          : distance / gesture.initialDistance;
+
+      const nextZoom = scaleFactor
+        ? getNormalizedZoom(initialScale * scaleFactor)
+        : this.state.zoom.value;
+
+      this.setState((state) => {
+        // Preserve any existing screen-space overscroll through the zoom,
+        // then apply this frame's pan delta on top. `viewport.translate`
+        // rubberband-clamps the combined result against the scroll lock.
+        const zoomedViewport = getViewportForZoomWithScrollConstraints(
+          {
+            viewportX: center.x,
+            viewportY: center.y,
+            nextZoom,
+          },
+          state,
+        );
+        const zoomValue = zoomedViewport.zoom.value;
+
+        this.viewport.translate(
+          {
+            zoom: zoomedViewport.zoom,
+            // 2x multiplier is just a magic number that makes this work correctly
+            // on touchscreen devices (note: if we get report that panning is slower/faster
+            // than actual movement, consider swapping with devicePixelRatio)
+            scrollX: zoomedViewport.scrollX + (2 * deltaX) / zoomValue,
+            scrollY: zoomedViewport.scrollY + (2 * deltaY) / zoomValue,
+            shouldCacheIgnoreZoom: true,
+          },
+          { zoomPreConstrained: true },
+        );
+
+        return null;
+      });
+      if (!this.viewport.isLockedTransitionPending) {
+        this.resetShouldCacheIgnoreZoomDebounced();
+      }
+    } else {
+      gesture.lastCenter =
+        gesture.initialDistance =
+        gesture.initialScale =
+          null;
+    }
+  };
 
   private initialPointerDownState(
     event: React.PointerEvent<HTMLElement>,
@@ -7733,6 +9233,7 @@ class App extends React.Component<AppProps, AppState> {
         allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
+        arrowLabel: false,
         hasHitCommonBoundingBoxOfSelectedElements:
           this.isHittingCommonBoundingBoxOfSelectedElements(
             origin,
@@ -7772,7 +9273,7 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState.lastCoords.y = event.clientY;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
       const target = event.target;
-      if (!(target instanceof HTMLElement)) {
+      if (!(target instanceof this.ownerWindow.HTMLElement)) {
         return;
       }
 
@@ -7781,20 +9282,20 @@ class App extends React.Component<AppProps, AppState> {
     const onPointerUp = withBatchedUpdates(() => {
       lastPointerUp = null;
       isDraggingScrollBar = false;
-      setCursorForShape(this.interactiveCanvas, this.state);
+      this.cursor.applyForTool();
       this.setState({
         cursorButton: "up",
       });
       this.savePointer(event.clientX, event.clientY, "up");
-      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
+      this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      this.ownerWindow.removeEventListener(EVENT.POINTER_UP, onPointerUp);
       onPointerMove.flush();
     });
 
     lastPointerUp = onPointerUp;
 
-    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
+    this.ownerWindow.addEventListener(EVENT.POINTER_UP, onPointerUp);
     return true;
   }
 
@@ -7908,9 +9409,11 @@ class App extends React.Component<AppProps, AppState> {
             linearElementEditor,
             this.scene,
           );
+
           if (ret.hitElement) {
             pointerDownState.hit.element = ret.hitElement;
           }
+          pointerDownState.hit.arrowLabel = ret.hitBoundText;
           if (ret.linearElementEditor) {
             this.setState({ selectedLinearElement: ret.linearElementEditor });
           }
@@ -7927,13 +9430,16 @@ class App extends React.Component<AppProps, AppState> {
           ) as any;
 
           if (arrow && isBindingElement(arrow)) {
-            const { hitFocusPoint, pointerOffset } =
-              handleFocusPointPointerDown(
-                arrow,
-                pointerDownState,
-                elementsMap,
-                this.state,
-              );
+            const {
+              hitFocusPoint,
+              pointerOffset,
+              arrowOtherEndpointInitialBinding,
+            } = handleFocusPointPointerDown(
+              arrow,
+              pointerDownState,
+              elementsMap,
+              this.state,
+            );
 
             // If focus point is hit, update state and prevent element selection
             if (hitFocusPoint) {
@@ -7943,6 +9449,10 @@ class App extends React.Component<AppProps, AppState> {
                   hoveredFocusPointBinding: hitFocusPoint,
                   draggedFocusPointBinding: hitFocusPoint,
                   pointerOffset,
+                  initialState: {
+                    ...linearElementEditor.initialState,
+                    arrowOtherEndpointInitialBinding,
+                  },
                 },
               });
               return false;
@@ -8035,7 +9545,12 @@ class App extends React.Component<AppProps, AppState> {
         const someHitElementIsSelected =
           pointerDownState.hit.allHitElements.some((element) =>
             this.isASelectedElement(element),
-          );
+          ) ||
+          // the selected linear element's point handles, midpoint knob and
+          // label extend beyond its own hit area, so a hit reported by
+          // `LinearElementEditor.handlePointerDown` counts even when the
+          // position-based hit test above missed the element
+          (hitElement !== null && this.isASelectedElement(hitElement));
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
@@ -8260,12 +9775,14 @@ class App extends React.Component<AppProps, AppState> {
       DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value,
       1,
     );
+    const boundsPadding =
+      (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / this.state.zoom.value;
     const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
     return (
-      point.x > x1 - threshold &&
-      point.x < x2 + threshold &&
-      point.y > y1 - threshold &&
-      point.y < y2 + threshold
+      point.x > x1 - boundsPadding - threshold &&
+      point.x < x2 + boundsPadding + threshold &&
+      point.y > y1 - boundsPadding - threshold &&
+      point.y < y2 + boundsPadding + threshold
     );
   }
 
@@ -8282,33 +9799,68 @@ class App extends React.Component<AppProps, AppState> {
     let sceneX = pointerDownState.origin.x;
     let sceneY = pointerDownState.origin.y;
 
-    const element = this.getElementAtPosition(sceneX, sceneY, {
-      includeBoundTextElement: true,
-    });
+    // the click transitions into text editing either way, consuming (or
+    // bypassing) whatever anchor was highlighted — don't leave it lingering
+    // under the editor, which outlives the hover when the tool is locked
+    this.setState({ hoveredArrowTextAnchor: null });
 
-    // FIXME
-    let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
-
-    if (hasBoundTextElement(element)) {
-      container = element as ExcalidrawTextContainer;
-      sceneX = element.x + element.width / 2;
-      sceneY = element.y + element.height / 2;
-    }
-    this.startTextEditing({
+    // a free arrow endpoint takes precedence over adding a label *to* the
+    // arrow — it's the smaller, more deliberate target
+    const arrowEndpoint = this.arrowText.getBindableEndpointAtPosition(
       sceneX,
       sceneY,
-      insertAtParentCenter: !event.altKey,
-      container,
-      autoEdit: false,
-    });
+    );
 
-    resetCursor(this.interactiveCanvas);
-    if (!this.state.activeTool.locked) {
-      this.setState({
-        activeTool: updateActiveTool(this.state, {
-          type: this.state.preferredSelectionTool.type,
-        }),
+    if (arrowEndpoint) {
+      this.startTextEditing({
+        sceneX,
+        sceneY,
+        // the binding fixes the position, but the width is still the user's
+        // to drag out (see `getEndpointBoundTextDragAnchor`)
+        autoEdit: false,
+        arrowEndpoint,
       });
+    } else {
+      const element = this.getElementAtPosition(sceneX, sceneY, {
+        includeBoundTextElement: true,
+      });
+
+      // FIXME
+      let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
+
+      if (hasBoundTextElement(element)) {
+        container = element as NonDeleted<ExcalidrawTextContainer>;
+        const labelCenter = this.arrowText.getLabelCenter(element);
+        if (labelCenter) {
+          sceneX = labelCenter.x;
+          sceneY = labelCenter.y;
+        } else {
+          sceneX = element.x + element.width / 2;
+          sceneY = element.y + element.height / 2;
+        }
+      }
+      this.startTextEditing({
+        sceneX,
+        sceneY,
+        insertAtParentCenter: !event.altKey,
+        container,
+        autoEdit: false,
+        initialCaretSceneCoords: { x: sceneX, y: sceneY },
+      });
+    }
+
+    if (!this.isToolLocked()) {
+      this.setState(
+        {
+          activeTool: updateActiveTool(this.state, {
+            type: this.state.preferredSelectionTool.type,
+          }),
+        },
+        // reset once the tool revert has settled
+        () => this.cursor.reset(),
+      );
+    } else {
+      this.cursor.reset();
     }
   };
 
@@ -8331,6 +9883,8 @@ class App extends React.Component<AppProps, AppState> {
 
     const simulatePressure = event.pressure === 0.5;
 
+    const strokeVariability = this.state.currentItemStrokeVariability;
+
     const element = newFreeDrawElement({
       type: elementType,
       x: gridX,
@@ -8338,19 +9892,28 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("freedraw"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       roundness: null,
       simulatePressure,
+      strokeOptions: {
+        variability: strokeVariability,
+        streamline:
+          event.pointerType !== "mouse"
+            ? DEFAULT_STROKE_STREAMLINE_PRECISE
+            : DEFAULT_STROKE_STREAMLINE,
+      },
       locked: false,
       frameId: topLayerFrame ? topLayerFrame.id : null,
       points: [pointFrom<LocalPoint>(0, 0)],
+      // pressures are only consumed when rendering a real-pressure stroke, so
+      // skip persisting them while pressure is being simulated
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
-    this.scene.insertElement(element);
+    this.insertNewElement(element);
 
     this.setState((prevState) => {
       const nextSelectedElementIds = {
@@ -8365,18 +9928,8 @@ class App extends React.Component<AppProps, AppState> {
       };
     });
 
-    const boundElement = getHoveredElementForBinding(
-      pointFrom<GlobalPoint>(
-        pointerDownState.origin.x,
-        pointerDownState.origin.y,
-      ),
-      this.scene.getNonDeletedElements(),
-      this.scene.getNonDeletedElementsMap(),
-    );
-
     this.setState({
       newElement: element,
-      startBoundElement: boundElement,
       suggestedBinding: null,
     });
   };
@@ -8407,7 +9960,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("iframe"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("iframe"),
@@ -8417,7 +9970,7 @@ class App extends React.Component<AppProps, AppState> {
       height,
     });
 
-    this.scene.insertElement(element);
+    this.insertNewElement(element);
 
     return element;
   };
@@ -8460,7 +10013,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("embeddable"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("embeddable"),
@@ -8471,7 +10024,7 @@ class App extends React.Component<AppProps, AppState> {
       link,
     });
 
-    this.scene.insertElement(element);
+    this.insertNewElement(element);
 
     return element;
   };
@@ -8507,7 +10060,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth("image"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: null,
@@ -8528,7 +10081,9 @@ class App extends React.Component<AppProps, AppState> {
   ): void => {
     if (event.ctrlKey) {
       flushSync(() => {
-        this.setState({ isBindingEnabled: false });
+        this.setState({
+          isBindingEnabled: this.state.bindingPreference !== "enabled",
+        });
       });
     }
 
@@ -8577,32 +10132,58 @@ class App extends React.Component<AppProps, AppState> {
 
       const { x: rx, y: ry } = multiElement;
       const { lastCommittedPoint } = selectedLinearElement;
+      const sceneCoords = viewportCoordsToSceneCoords(event, this.state);
+      const { start, end } =
+        isBindingElement(multiElement) && isBindingEnabled(this.state)
+          ? getBindingStrategyForDraggingBindingElementEndpoints(
+              multiElement,
+              new Map([
+                [
+                  multiElement.points.length - 1,
+                  {
+                    point: multiElement.points[multiElement.points.length - 1],
+                    isDragging: false,
+                  },
+                ],
+              ]),
+              sceneCoords.x,
+              sceneCoords.y,
+              this.scene.getNonDeletedElementsMap(),
+              this.scene.getNonDeletedElements(),
+              this.state,
+              {
+                newArrow: Boolean(this.state.newElement),
+                zoom: this.state.zoom,
+              },
+            )
+          : { end: { mode: undefined } };
 
-      const hoveredElementForBinding =
-        isBindingEnabled(this.state) &&
-        getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(
-            this.lastPointerMoveCoords?.x ??
-              rx + multiElement.points[multiElement.points.length - 1][0],
-            this.lastPointerMoveCoords?.y ??
-              ry + multiElement.points[multiElement.points.length - 1][1],
+      const elementsMap = this.scene.getNonDeletedElementsMap();
+      // Auto-confirm when both ends bind to the SAME element and the end point
+      // lands on the outline rather than inside it
+      const endOutsideSameElement =
+        start?.mode != null &&
+        end.mode != null &&
+        start.element.id === end.element.id &&
+        !isPointInElement(end.focusPoint, end.element, elementsMap);
+      const boundOutsideFromElsewhere =
+        end.mode === "orbit" &&
+        multiElement.startBinding?.elementId !== end.element?.id;
+      const lastCommittedPointIsInsideCommitZone =
+        lastCommittedPoint &&
+        pointDistance(
+          pointFrom(
+            pointerDownState.origin.x - rx,
+            pointerDownState.origin.y - ry,
           ),
-          this.scene.getNonDeletedElements(),
-          this.scene.getNonDeletedElementsMap(),
-        );
+          lastCommittedPoint,
+        ) < LINE_CONFIRM_THRESHOLD;
 
       // clicking inside commit zone → finalize arrow
       if (
-        (isBindingElement(multiElement) && hoveredElementForBinding) ||
-        (multiElement.points.length > 1 &&
-          lastCommittedPoint &&
-          pointDistance(
-            pointFrom(
-              pointerDownState.origin.x - rx,
-              pointerDownState.origin.y - ry,
-            ),
-            lastCommittedPoint,
-          ) < LINE_CONFIRM_THRESHOLD)
+        boundOutsideFromElsewhere || // Outside -> orbit: Bind immediately
+        endOutsideSameElement || // End outside the start's element: Bind immediately
+        (multiElement.points.length > 1 && lastCommittedPointIsInsideCommitZone)
       ) {
         this.actionManager.executeAction(actionFinalize, "ui", {
           event: event.nativeEvent,
@@ -8624,7 +10205,7 @@ class App extends React.Component<AppProps, AppState> {
         ),
       }));
 
-      setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+      this.cursor.set(CURSOR_TYPE.POINTER);
     } else {
       const [gridX, gridY] = getGridPoint(
         pointerDownState.origin.x,
@@ -8657,7 +10238,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -8684,7 +10265,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.state.currentItemStrokeWidth,
+              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -8713,7 +10294,7 @@ class App extends React.Component<AppProps, AppState> {
         points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
       });
 
-      this.scene.insertElement(element);
+      this.insertNewElement(element);
 
       if (isBindingElement(element)) {
         // Do the initial binding so the binding strategy has the initial state
@@ -8770,7 +10351,7 @@ class App extends React.Component<AppProps, AppState> {
             };
           }
 
-          nextSelectedElementIds = !this.state.activeTool.locked
+          nextSelectedElementIds = !this.isToolLocked()
             ? makeNextSelectedElementIds({ [element.id]: true }, prevState)
             : prevState.selectedElementIds;
 
@@ -8778,7 +10359,6 @@ class App extends React.Component<AppProps, AppState> {
             ...prevState,
             bindMode: "orbit",
             newElement: element,
-            startBoundElement: boundElement,
             suggestedBinding:
               boundElement && isBindingElement(element)
                 ? {
@@ -8821,6 +10401,13 @@ class App extends React.Component<AppProps, AppState> {
       : null;
   }
 
+  private getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
+    return getStrokeWidthByKey(
+      elementType,
+      this.state.currentItemStrokeWidthKey,
+    );
+  }
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
     pointerDownState: PointerDownState,
@@ -8844,7 +10431,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeWidth: this.getCurrentItemStrokeWidth(elementType),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
@@ -8871,7 +10458,7 @@ class App extends React.Component<AppProps, AppState> {
         selectionElement: element,
       });
     } else {
-      this.scene.insertElement(element);
+      this.insertNewElement(element);
       this.setState({
         multiElement: null,
         newElement: element,
@@ -8904,7 +10491,7 @@ class App extends React.Component<AppProps, AppState> {
         ? newMagicFrameElement(constructorOpts)
         : newFrameElement(constructorOpts);
 
-    this.scene.insertElement(frame);
+    this.insertNewElement(frame);
 
     this.setState({
       multiElement: null,
@@ -8914,7 +10501,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private maybeCacheReferenceSnapPoints(
     event: KeyboardModifiersObject,
-    selectedElements: ExcalidrawElement[],
+    selectedElements: readonly NonDeletedExcalidrawElement[],
     recomputeAnyways: boolean = false,
   ) {
     if (
@@ -8938,7 +10525,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private maybeCacheVisibleGaps(
     event: KeyboardModifiersObject,
-    selectedElements: ExcalidrawElement[],
+    selectedElements: readonly NonDeletedExcalidrawElement[],
     recomputeAnyways: boolean = false,
   ) {
     if (
@@ -9069,7 +10656,7 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
       const target = event.target;
-      if (!(target instanceof HTMLElement)) {
+      if (!(target instanceof this.ownerWindow.HTMLElement)) {
         return;
       }
 
@@ -9084,6 +10671,10 @@ class App extends React.Component<AppProps, AppState> {
 
       if (this.state.activeTool.type === "laser") {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
+      }
+
+      if (this.drawShape.handlePointerMove(pointerCoords)) {
+        return;
       }
 
       const [gridX, gridY] = getGridPoint(
@@ -9133,6 +10724,16 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (
+          this.arrowText.maybeDragLabel(
+            linearElementEditor,
+            pointerDownState,
+            pointerCoords,
+          )
+        ) {
+          return;
+        }
+
+        if (
           LinearElementEditor.shouldAddMidpoint(
             this.state.selectedLinearElement,
             pointerCoords,
@@ -9163,6 +10764,7 @@ class App extends React.Component<AppProps, AppState> {
                   initialState: ret.pointerDownState,
                   selectedPointsIndices: ret.selectedPointsIndices,
                   segmentMidPointHoveredCoords: null,
+                  isDragging: true,
                 },
               });
             }
@@ -9272,18 +10874,17 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const selectedElementsHasAFrame = selectedElements.find((e) =>
+        const selectedElementsHasAFrame = selectedElements.some((e) =>
           isFrameLikeElement(e),
         );
-        const topLayerFrame = this.getTopLayerFrameAtSceneCoords(pointerCoords);
-        const frameToHighlight =
-          topLayerFrame && !selectedElementsHasAFrame ? topLayerFrame : null;
+        const frameToHighlight = selectedElementsHasAFrame
+          ? null
+          : this.getTopLayerFrameAtSceneCoords(pointerCoords, {
+              currentFrameId: getCommonFrameId(selectedElements),
+              excludeElementIds: this.state.selectedElementIds,
+            });
         // Only update the state if there is a difference
-        if (this.state.frameToHighlight !== frameToHighlight) {
-          flushSync(() => {
-            this.setState({ frameToHighlight });
-          });
-        }
+        this.updateFrameToHighlight(frameToHighlight);
 
         // Marking that click was used for dragging to check
         // if elements should be deselected on pointerup
@@ -9642,7 +11243,7 @@ class App extends React.Component<AppProps, AppState> {
         if (event.altKey) {
           this.setActiveTool(
             { type: "lasso", fromSelection: true },
-            event.shiftKey,
+            { keepSelection: event.shiftKey },
           );
           this.lassoTrail.startPath(
             pointerDownState.origin.x,
@@ -9719,20 +11320,38 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           let linearElementEditor = this.state.selectedLinearElement;
-          if (!linearElementEditor) {
+
+          if (
+            !linearElementEditor ||
+            linearElementEditor.elementId !== newElement.id
+          ) {
             linearElementEditor = new LinearElementEditor(
               newElement,
               this.scene.getNonDeletedElementsMap(),
             );
+          }
+
+          const lastClickedPointOutOfBounds =
+            linearElementEditor &&
+            (linearElementEditor.initialState.lastClickedPoint < 0 ||
+              linearElementEditor.initialState.lastClickedPoint >=
+                points.length);
+          if (lastClickedPointOutOfBounds) {
+            console.warn(
+              "Last clicked point is out of bounds. Attempting to fix it.",
+            );
             linearElementEditor = {
               ...linearElementEditor,
-              selectedPointsIndices: [1],
+              selectedPointsIndices: [points.length - 1],
               initialState: {
                 ...linearElementEditor.initialState,
-                lastClickedPoint: 1,
+                prevSelectedPointsIndices: null,
+                lastClickedPoint: points.length - 1,
               },
+              hoverPointIndex: points.length - 1,
             };
           }
+
           this.setState({
             newElement,
             ...LinearElementEditor.handlePointDragging(
@@ -9795,6 +11414,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state.selectionElement,
                 this.scene.getNonDeletedElementsMap(),
                 false,
+                this.state.boxSelectionMode,
               )
             : [];
 
@@ -9864,7 +11484,7 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverHorizontal) {
       const x = event.clientX;
       const dx = x - pointerDownState.lastCoords.x;
-      this.translateCanvas({
+      this.viewport.translate({
         scrollX:
           this.state.scrollX -
           (dx * (currentScrollBars.horizontal?.deltaMultiplier || 1)) /
@@ -9877,7 +11497,7 @@ class App extends React.Component<AppProps, AppState> {
     if (pointerDownState.scrollbars.isOverVertical) {
       const y = event.clientY;
       const dy = y - pointerDownState.lastCoords.y;
-      this.translateCanvas({
+      this.viewport.translate({
         scrollY:
           this.state.scrollY -
           (dy * (currentScrollBars.vertical?.deltaMultiplier || 1)) /
@@ -9899,6 +11519,20 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.drag.blockDragging = false;
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
+      }
+
+      // an armed bucket fill commits only on a GENUINE pointer up. The
+      // missing-pointer-up cleanup replays this handler with the pointer
+      // DOWN event (e.g. when a second finger lands mid-press — pinch/pan
+      // intent), and a tool switch mid-press orphans the click — both must
+      // discard the fill instead of committing an unwanted edit.
+      if (
+        childEvent.type === "pointerup" &&
+        this.state.activeTool.type === TOOL_TYPE.bucketfill
+      ) {
+        this.bucketFill.handlePointerUp();
+      } else {
+        this.bucketFill.cancel();
       }
       const {
         newElement,
@@ -9958,7 +11592,9 @@ class App extends React.Component<AppProps, AppState> {
           },
         );
 
-        this.store.scheduleCapture();
+        if (!this.isEditingTextContent()) {
+          this.store.scheduleCapture();
+        }
 
         if (hitLockedElement?.locked) {
           this.setState({
@@ -10028,6 +11664,7 @@ class App extends React.Component<AppProps, AppState> {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
+            hitBoundText: pointerDownState.hit.arrowLabel,
           });
           if (editingLinearElement !== this.state.selectedLinearElement) {
             this.setState({
@@ -10060,6 +11697,10 @@ class App extends React.Component<AppProps, AppState> {
             selectedLinearElement: {
               ...this.state.selectedLinearElement,
               draggedFocusPointBinding: null,
+              initialState: {
+                ...this.state.selectedLinearElement.initialState,
+                arrowOtherEndpointInitialBinding: null,
+              },
             },
           });
         } else if (
@@ -10081,6 +11722,7 @@ class App extends React.Component<AppProps, AppState> {
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
+            hitBoundText: pointerDownState.hit.arrowLabel,
           });
         }
 
@@ -10104,19 +11746,19 @@ class App extends React.Component<AppProps, AppState> {
 
       this.missingPointerEventCleanupEmitter.clear();
 
-      window.removeEventListener(
+      this.ownerWindow.removeEventListener(
         EVENT.POINTER_MOVE,
         pointerDownState.eventListeners.onMove!,
       );
-      window.removeEventListener(
+      this.ownerWindow.removeEventListener(
         EVENT.POINTER_UP,
         pointerDownState.eventListeners.onUp!,
       );
-      window.removeEventListener(
+      this.ownerWindow.removeEventListener(
         EVENT.KEYDOWN,
         pointerDownState.eventListeners.onKeyDown!,
       );
-      window.removeEventListener(
+      this.ownerWindow.removeEventListener(
         EVENT.KEYUP,
         pointerDownState.eventListeners.onKeyUp!,
       );
@@ -10158,14 +11800,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (isLinearElement(newElement)) {
-        if (
-          newElement!.points.length > 1 &&
-          newElement.points[1][0] !== 0 &&
-          newElement.points[1][1] !== 0
-        ) {
-          this.store.scheduleCapture();
-        }
+      if (
+        isLinearElement(newElement) &&
+        this.state.activeTool.type !== "autoshape"
+      ) {
         const pointerCoords = viewportCoordsToSceneCoords(
           childEvent,
           this.state,
@@ -10203,53 +11841,48 @@ class App extends React.Component<AppProps, AppState> {
 
             this.actionManager.executeAction(actionFinalize);
           } else {
-            const dx = pointerCoords.x - newElement.x;
-            const dy = pointerCoords.y - newElement.y;
-
-            this.scene.mutateElement(
-              newElement,
-              {
-                points: [newElement.points[0], pointFrom<LocalPoint>(dx, dy)],
-              },
-              { informMutation: false, isDragging: false },
-            );
-
+            // Movement out of commit area will create the point
             this.setState({
               multiElement: newElement,
               newElement,
             });
           }
         } else if (pointerDownState.drag.hasOccurred && !multiElement) {
+          this.store.scheduleCapture();
+
           if (isLinearElement(newElement)) {
             this.actionManager.executeAction(actionFinalize, "ui", {
               event: childEvent,
               sceneCoords,
             });
           }
-          this.setState({ suggestedBinding: null, startBoundElement: null });
-          if (!activeTool.locked) {
-            resetCursor(this.interactiveCanvas);
-            this.setState((prevState) => ({
-              newElement: null,
-              activeTool: updateActiveTool(this.state, {
-                type: this.state.preferredSelectionTool.type,
+          this.setState({ suggestedBinding: null });
+          if (!this.isToolLocked()) {
+            this.setState(
+              (prevState) => ({
+                newElement: null,
+                activeTool: updateActiveTool(this.state, {
+                  type: this.state.preferredSelectionTool.type,
+                }),
+                selectedElementIds: makeNextSelectedElementIds(
+                  {
+                    ...prevState.selectedElementIds,
+                    [newElement.id]: true,
+                  },
+                  prevState,
+                ),
+                selectedLinearElement: new LinearElementEditor(
+                  newElement,
+                  this.scene.getNonDeletedElementsMap(),
+                ),
               }),
-              selectedElementIds: makeNextSelectedElementIds(
-                {
-                  ...prevState.selectedElementIds,
-                  [newElement.id]: true,
-                },
-                prevState,
-              ),
-              selectedLinearElement: new LinearElementEditor(
-                newElement,
-                this.scene.getNonDeletedElementsMap(),
-              ),
-            }));
+              // reset once the tool revert has settled
+              () => this.cursor.reset(),
+            );
           } else {
-            this.setState((prevState) => ({
+            this.setState({
               newElement: null,
-            }));
+            });
           }
           // so that the scene gets rendered again to display the newly drawn linear as well
           this.scene.triggerUpdate();
@@ -10272,7 +11905,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
 
-        this.resetCursor();
+        this.cursor.reset();
 
         this.handleTextWysiwyg(newElement, {
           isExistingElement: true,
@@ -10311,7 +11944,6 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getElementsMapIncludingDeleted(),
             elementsInsideFrame,
             newElement,
-            this.state,
           ),
         );
       }
@@ -10371,9 +12003,14 @@ class App extends React.Component<AppProps, AppState> {
           }
         } else {
           // update the relationships between selected elements and frames
-          const topLayerFrame = this.getTopLayerFrameAtSceneCoords(sceneCoords);
-
           const selectedElements = this.scene.getSelectedElements(this.state);
+          const topLayerFrame = this.getTopLayerFrameAtSceneCoords(
+            sceneCoords,
+            {
+              currentFrameId: getCommonFrameId(selectedElements),
+              excludeElementIds: this.state.selectedElementIds,
+            },
+          );
           let nextElements = this.scene.getElementsMapIncludingDeleted();
 
           const updateGroupIdsAfterEditingGroup = (
@@ -10422,10 +12059,8 @@ class App extends React.Component<AppProps, AppState> {
             topLayerFrame &&
             !this.state.selectedElementIds[topLayerFrame.id]
           ) {
-            const elementsToAdd = selectedElements.filter(
-              (element) =>
-                element.frameId !== topLayerFrame.id &&
-                isElementInFrame(element, nextElements, this.state),
+            const elementsToAdd = selectedElements.filter((element) =>
+              isElementInFrame(element, nextElements, this.state),
             );
 
             if (this.state.editingGroupId) {
@@ -10436,7 +12071,6 @@ class App extends React.Component<AppProps, AppState> {
               nextElements,
               elementsToAdd,
               topLayerFrame,
-              this.state,
             );
           } else if (!topLayerFrame) {
             if (this.state.editingGroupId) {
@@ -10484,9 +12118,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const selectedFrames = this.scene
           .getSelectedElements(this.state)
-          .filter((element): element is ExcalidrawFrameLikeElement =>
-            isFrameLikeElement(element),
-          );
+          .filter(isFrameLikeElement);
 
         for (const frame of selectedFrames) {
           nextElements = replaceAllElementsInFrame(
@@ -10498,7 +12130,6 @@ class App extends React.Component<AppProps, AppState> {
               elementsMap,
             ),
             frame,
-            this,
           );
         }
 
@@ -10779,11 +12410,44 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
         // reset cursor
-        setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
+        this.cursor.set(CURSOR_TYPE.AUTO);
         return;
       }
 
-      if (!activeTool.locked && activeTool.type !== "freedraw" && newElement) {
+      const selectedTextEditingContainer =
+        this.getSelectedTextEditingContainerAtPosition(hitElement, sceneCoords);
+
+      if (
+        activeTool.type === this.state.preferredSelectionTool.type &&
+        !this.state.editingTextElement &&
+        !pointerDownState.drag.hasOccurred &&
+        !pointerDownState.hit.wasAddedToSelection &&
+        !childEvent.shiftKey &&
+        !childEvent[KEYS.CTRL_OR_CMD] &&
+        !childEvent.altKey &&
+        childEvent.pointerType !== "touch" &&
+        hitElement &&
+        ((isTextElement(hitElement) &&
+          this.state.selectedElementIds[hitElement.id] &&
+          this.scene.getSelectedElements(this.state).length === 1) ||
+          selectedTextEditingContainer)
+      ) {
+        this.startTextEditing({
+          sceneX: sceneCoords.x,
+          sceneY: sceneCoords.y,
+          container: selectedTextEditingContainer,
+          initialCaretSceneCoords: this.lastPointerUpIsDoubleClick
+            ? undefined
+            : sceneCoords,
+        });
+        return;
+      }
+
+      if (
+        !this.isToolLocked() &&
+        activeTool.type !== "freedraw" &&
+        newElement
+      ) {
         this.setState((prevState) => ({
           selectedElementIds: makeNextSelectedElementIds(
             {
@@ -10800,12 +12464,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
-        activeTool.type !== "selection" ||
-        isSomeElementSelected(this.scene.getNonDeletedElements(), this.state) ||
-        !isShallowEqual(
-          this.state.previousSelectedElementIds,
-          this.state.selectedElementIds,
-        )
+        !this.isEditingTextContent() &&
+        (activeTool.type !== "selection" ||
+          isSomeElementSelected(
+            this.scene.getNonDeletedElements(),
+            this.state,
+          ) ||
+          !isShallowEqual(
+            this.state.previousSelectedElementIds,
+            this.state.selectedElementIds,
+          ))
       ) {
         this.store.scheduleCapture();
       }
@@ -10831,45 +12499,43 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (activeTool.type === "autoshape") {
+        this.actionManager.executeAction(actionFinalize);
+        return;
+      }
+
       if (
-        !activeTool.locked &&
+        !this.isToolLocked() &&
         activeTool.type !== "freedraw" &&
+        // bucket fill stays active for back-to-back fills regardless of the
+        // tool lock (paint-bucket UX)
+        activeTool.type !== TOOL_TYPE.bucketfill &&
         (activeTool.type !== "lasso" ||
           // if lasso is turned on but from selection => reset to selection
           (activeTool.type === "lasso" && activeTool.fromSelection))
       ) {
-        resetCursor(this.interactiveCanvas);
-        this.setState({
-          newElement: null,
-          suggestedBinding: null,
-          activeTool: updateActiveTool(this.state, {
-            type: this.state.preferredSelectionTool.type,
-          }),
-        });
+        this.setState(
+          {
+            newElement: null,
+            suggestedBinding: null,
+            activeTool: updateActiveTool(this.state, {
+              type: this.state.preferredSelectionTool.type,
+            }),
+          },
+          // reset once the tool revert has settled
+          () => {
+            this.cursor.reset();
+            this.cursor.refreshHover();
+          },
+        );
       } else {
-        this.setState({
-          newElement: null,
-          suggestedBinding: null,
-        });
-      }
-
-      if (
-        hitElement &&
-        this.lastPointerUpEvent &&
-        this.lastPointerDownEvent &&
-        this.lastPointerUpEvent.timeStamp -
-          this.lastPointerDownEvent.timeStamp <
-          300 &&
-        gesture.pointers.size <= 1 &&
-        isIframeLikeElement(hitElement) &&
-        this.isIframeLikeElementCenter(
-          hitElement,
-          this.lastPointerUpEvent,
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-        )
-      ) {
-        this.handleEmbeddableCenterClick(hitElement);
+        this.setState(
+          {
+            newElement: null,
+            suggestedBinding: null,
+          },
+          () => this.cursor.refreshHover(),
+        );
       }
     });
   }
@@ -10974,7 +12640,7 @@ class App extends React.Component<AppProps, AppState> {
     }
     const mimeType = imageFile.type;
 
-    setCursor(this.interactiveCanvas, "wait");
+    this.cursor.set("wait");
 
     if (mimeType === MIME_TYPES.svg) {
       try {
@@ -11003,9 +12669,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const existingFileData = this.files[fileId];
     if (!existingFileData?.dataURL) {
+      const { maxWidthOrHeight, maxFileSizeBytes } = this.props.imageOptions;
+
       try {
         imageFile = await resizeImageFile(imageFile, {
-          maxWidthOrHeight: DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+          maxWidthOrHeight,
         });
       } catch (error: any) {
         console.error(
@@ -11014,10 +12682,10 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
+      if (imageFile.size > maxFileSizeBytes) {
         throw new Error(
           t("errors.fileTooBig", {
-            maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
+            maxSize: `${Math.trunc(maxFileSizeBytes / 1024 / 1024)}MB`,
           }),
         );
       }
@@ -11098,7 +12766,7 @@ class App extends React.Component<AppProps, AppState> {
       this.scene.getElement(imagePlaceholder.id) ?? imagePlaceholder;
 
     return newElementWith(
-      latestImageElement as InitializedExcalidrawImageElement,
+      latestImageElement as NonDeleted<InitializedExcalidrawImageElement>,
       {
         fileId,
       },
@@ -11241,15 +12909,6 @@ class App extends React.Component<AppProps, AppState> {
     this.addNewImagesToImageCache();
   }, IMAGE_RENDER_TIMEOUT);
 
-  private updateBindingEnabledOnPointerMove = (
-    event: React.PointerEvent<HTMLElement>,
-  ) => {
-    const shouldEnableBinding = shouldEnableBindingForPointerEvent(event);
-    if (this.state.isBindingEnabled !== shouldEnableBinding) {
-      this.setState({ isBindingEnabled: shouldEnableBinding });
-    }
-  };
-
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
@@ -11276,6 +12935,11 @@ class App extends React.Component<AppProps, AppState> {
     // canvas is null when unmounting
     if (canvas !== null) {
       this.interactiveCanvas = canvas;
+
+      // reflect state that landed before the canvas existed — the cursor is
+      // otherwise only set imperatively on *changes* (e.g. the host-forced
+      // tool seeded from `props.activeTool`, or view-mode drag-to-pan)
+      this.cursor.reset();
 
       // -----------------------------------------------------------------------
       // NOTE wheel, touchstart, touchend events must be registered outside
@@ -11313,7 +12977,7 @@ class App extends React.Component<AppProps, AppState> {
       sceneY,
       gridPadding,
     );
-    placeholders.forEach((el) => this.scene.insertElement(el));
+    this.insertNewElements(placeholders);
 
     // Create, position, insert and select initialized (replacing placeholders)
     const initialized = await Promise.all(
@@ -11327,7 +12991,9 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
           });
-          return newElementWith(placeholder, { isDeleted: true });
+          return newElementWith(placeholder as ExcalidrawImageElement, {
+            isDeleted: true,
+          });
         }
       }),
     );
@@ -11363,6 +13029,10 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    // NOTE no preventDefault so the host page can handle the drop itself
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
@@ -11441,6 +13111,7 @@ class App extends React.Component<AppProps, AppState> {
               type: "everything",
               elements: item.elements,
               randomizeSeed: true,
+              preserveFrameChildrenOrder: true,
             }).duplicatedElements,
           }));
 
@@ -11489,7 +13160,7 @@ class App extends React.Component<AppProps, AppState> {
 
   loadFileToCanvas = async (
     file: File,
-    fileHandle: FileSystemHandle | null,
+    fileHandle: FileSystemFileHandle | null,
   ) => {
     file = await normalizeFile(file);
     try {
@@ -11569,7 +13240,16 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasContextMenu = (
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
   ) => {
+    // Always suppress the native menu over the canvas. In non-interactive
+    // mode we stop here so it cannot be mistaken for Excalidraw's own menu.
     event.preventDefault();
+    if (!this.isInteractionEnabled()) {
+      return;
+    }
+
+    // a context menu during a press (touch long-press) means the user is
+    // not committing a bucket click
+    this.bucketFill.cancel();
 
     if (
       (("pointerType" in event.nativeEvent &&
@@ -11673,6 +13353,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
+    if (this.arrowText.maybeDragNewText(newElement, pointerCoords)) {
+      return;
+    }
+
     let [gridX, gridY] = getGridPoint(
       pointerCoords.x,
       pointerCoords.y,
@@ -11750,7 +13434,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement as ExcalidrawFrameLikeElement,
           this.state,
           this.scene.getNonDeletedElementsMap(),
-        ),
+        ) as NonDeletedExcalidrawElement[], // Obvious typecast, no need to runtime typecheck
       });
     }
   };
@@ -11852,10 +13536,7 @@ class App extends React.Component<AppProps, AppState> {
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
     const selectedElements = this.scene.getSelectedElements(this.state);
-    const selectedFrames = selectedElements.filter(
-      (element): element is ExcalidrawFrameLikeElement =>
-        isFrameLikeElement(element),
-    );
+    const selectedFrames = selectedElements.filter(isFrameLikeElement);
 
     const transformHandleType = pointerDownState.resize.handleType;
 
@@ -11959,14 +13640,23 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.resize.center.y,
       )
     ) {
-      const elementsToHighlight = new Set<ExcalidrawElement>();
+      const elementsToHighlight = new Set<NonDeletedExcalidrawElement>();
       selectedFrames.forEach((frame) => {
         getElementsInResizingFrame(
           this.scene.getNonDeletedElements(),
           frame,
           this.state,
           this.scene.getNonDeletedElementsMap(),
-        ).forEach((element) => elementsToHighlight.add(element));
+        ).forEach((element) => {
+          if (isNonDeletedElement(element)) {
+            elementsToHighlight.add(element);
+          } else {
+            // SAFETY: This should never happen, but log it just in case
+            console.error(
+              "[NONDELETED][INVARIANT] Skipped highlighting deleted element in resizing frame",
+            );
+          }
+        });
       });
 
       this.setState({
@@ -12011,6 +13701,8 @@ class App extends React.Component<AppProps, AppState> {
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
         actionToggleObjectsSnapMode,
+        actionToggleArrowBinding,
+        actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,
@@ -12083,12 +13775,16 @@ class App extends React.Component<AppProps, AppState> {
     (
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
     ) => {
+      // NOTE no preventDefault so the page can scroll over the editor
+      if (!this.isNavigationEnabled()) {
+        return;
+      }
       if (
         !(
-          event.target instanceof HTMLCanvasElement ||
-          event.target instanceof HTMLTextAreaElement ||
-          event.target instanceof HTMLIFrameElement ||
-          (event.target instanceof HTMLElement &&
+          event.target instanceof this.ownerWindow.HTMLCanvasElement ||
+          event.target instanceof this.ownerWindow.HTMLTextAreaElement ||
+          event.target instanceof this.ownerWindow.HTMLIFrameElement ||
+          (event.target instanceof this.ownerWindow.HTMLElement &&
             event.target.classList.contains(CLASSES.FRAME_NAME))
         )
       ) {
@@ -12125,38 +13821,51 @@ class App extends React.Component<AppProps, AppState> {
           // reduced amplification for small deltas (small movements on a trackpad)
           Math.min(1, absDelta / 20);
 
-        this.translateCanvas((state) => ({
-          ...getStateForZoom(
-            {
-              viewportX: this.lastViewportPosition.x,
-              viewportY: this.lastViewportPosition.y,
-              nextZoom: getNormalizedZoom(newZoom),
-            },
-            state,
-          ),
-          shouldCacheIgnoreZoom: true,
-        }));
-        this.resetShouldCacheIgnoreZoomDebounced();
+        const minZoom = this.state.scrollConstraints?.lockZoom
+          ? this.state.scrollConstraints.zoom
+          : MIN_ZOOM;
+        newZoom = Math.max(newZoom, minZoom);
+
+        const didTranslate = this.viewport.translate(
+          (state) => ({
+            ...getViewportForZoomWithScrollConstraints(
+              {
+                viewportX: this.viewport.lastPosition.x,
+                viewportY: this.viewport.lastPosition.y,
+                nextZoom: getNormalizedZoom(newZoom),
+              },
+              state,
+            ),
+            shouldCacheIgnoreZoom: true,
+          }),
+          {
+            zoomPreConstrained: true,
+            preserveScrollConstraintsSnapBack: true,
+          },
+        );
+        if (didTranslate) {
+          this.resetShouldCacheIgnoreZoomDebounced();
+        }
         return;
       }
 
       // scroll horizontally when shift pressed
       if (event.shiftKey) {
-        this.translateCanvas(({ zoom, scrollX }) => ({
+        this.viewport.translate(({ zoom, scrollX }) => ({
           // on Mac, shift+wheel tends to result in deltaX
           scrollX: scrollX - (deltaY || deltaX) / zoom.value,
         }));
         return;
       }
 
-      this.translateCanvas(({ zoom, scrollX, scrollY }) => ({
+      this.viewport.translate(({ zoom, scrollX, scrollY }) => ({
         scrollX: scrollX - deltaX / zoom.value,
         scrollY: scrollY - deltaY / zoom.value,
       }));
     },
   );
 
-  private getTextWysiwygSnappedToCenterPosition(
+  getTextWysiwygSnappedToCenterPosition(
     x: number,
     y: number,
     appState: AppState,
@@ -12168,7 +13877,6 @@ class App extends React.Component<AppProps, AppState> {
 
       const elementCenter = getContainerCenter(
         container,
-        appState,
         this.scene.getNonDeletedElementsMap(),
       );
       if (elementCenter) {
@@ -12192,6 +13900,16 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private savePointer = (x: number, y: number, button: "up" | "down") => {
+    // don't broadcast pointer updates (props.onPointerUpdate) when
+    // non-interactive, unless the active tool stays user-driven via
+    // `interaction.enabled.tools` — collaborators render e.g. a presenter's
+    // laser through these updates
+    if (
+      !this.isInteractionEnabled() &&
+      !this.isToolSupported(this.state.activeTool.type)
+    ) {
+      return;
+    }
     if (!x || !y) {
       return;
     }
@@ -12262,6 +13980,8 @@ class App extends React.Component<AppProps, AppState> {
           cb && cb();
         },
       );
+      // a smaller viewport may push the min zoom up / shrink the pan range
+      this.viewport.constrain();
     }
   };
 

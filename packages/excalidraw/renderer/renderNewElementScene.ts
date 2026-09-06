@@ -67,8 +67,10 @@ const _renderNewElementScene = ({
         }
       }
 
+      const renderTargetElement = newElement;
+
       renderElement(
-        newElement,
+        renderTargetElement,
         elementsMap,
         allElementsMap,
         rc,
@@ -88,7 +90,6 @@ export const renderNewElementSceneThrottled = throttleRAF(
   (config: NewElementSceneRenderConfig) => {
     _renderNewElementScene(config);
   },
-  { trailing: true },
 );
 
 export const renderNewElementScene = (

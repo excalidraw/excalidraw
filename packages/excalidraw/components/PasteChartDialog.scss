@@ -2,6 +2,40 @@
 
 .excalidraw {
   .PasteChartDialog {
+    .PasteChartDialog__title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .PasteChartDialog__titleText {
+      min-width: 0;
+    }
+
+    .PasteChartDialog__reshuffleBtn {
+      margin-left: auto;
+      flex: 0 0 auto;
+      width: 1rem;
+      height: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--text-primary-color);
+      transition: transform 120ms ease, background-color 120ms ease,
+        color 120ms ease;
+      user-select: none;
+
+      &:hover {
+        color: $color-blue-6;
+      }
+
+      &:active {
+        transform: scale(0.94);
+      }
+    }
+
     @include isMobile {
       .Island {
         display: flex;
@@ -11,35 +45,61 @@
     .container {
       display: flex;
       align-items: center;
-      justify-content: space-around;
+      justify-content: center;
       flex-wrap: wrap;
+      gap: 1rem;
       @include isMobile {
         flex-direction: column;
         justify-content: center;
+        align-items: stretch;
       }
     }
     .ChartPreview {
-      margin: 8px;
-      text-align: center;
-      width: 192px;
-      height: 128px;
-      border-radius: 2px;
-      padding: 1px;
+      width: 260px;
+      min-height: 190px;
+      border-radius: 8px;
+      padding: 10px;
       border: 1px solid $color-gray-4;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: flex-start;
+      gap: 10px;
       background: transparent;
-      div {
-        display: inline-block;
+      .ChartPreview__canvas {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .ChartPreview__label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        line-height: 1;
+        text-align: center;
+        color: var(--text-primary-color);
       }
       svg {
-        max-height: 120px;
-        max-width: 186px;
+        max-height: 144px;
+        max-width: 100%;
       }
       &:hover {
-        padding: 0;
-        border: 2px solid $color-blue-5;
+        border-color: $color-blue-5;
+      }
+      &:active {
+        border-color: $color-blue-5;
+        box-shadow: 0 0 0 1px $color-blue-5;
+        transform: scale(0.98);
+      }
+      &:focus-visible {
+        border-color: $color-blue-5;
+        box-shadow: 0 0 0 1px $color-blue-5;
+      }
+
+      @include isMobile {
+        width: 100%;
+        min-height: 200px;
       }
     }
   }

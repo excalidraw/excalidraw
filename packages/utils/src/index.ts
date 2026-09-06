@@ -1,4 +1,3 @@
 export * from "./export";
-export * from "./withinBounds";
-export * from "./bbox";
+export { elementsOverlappingBBox } from "@excalidraw/element";
 export { getCommonBounds } from "@excalidraw/element";

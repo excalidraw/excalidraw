@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Tempel",
     "pasteAsPlaintext": "Tempel sebagai teks biasa",
     "pasteCharts": "Tempel diagram",
+    "chartType_bar": "Diagram batang",
+    "chartType_line": "Diagram garis",
+    "chartType_radar": "Diagram radar",
+    "chartType_plaintext": "Teks biasa",
     "selectAll": "Pilih semua",
     "multiSelect": "Tambah unsur ke seleksi",
     "moveCanvas": "Pindahkan kanvas",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "Putus-putus",
     "strokeStyle_dotted": "Titik-titik",
     "sloppiness": "Kecerobohan",
+    "pressure": "Tekanan",
+    "pressure_constant": "Konstan",
+    "pressure_variable": "Variabel",
     "opacity": "Keburaman",
     "textAlign": "Perataan teks",
     "edges": "Tepi",
@@ -46,10 +55,17 @@
     "arrowhead_triangle_outline": "Segitiga (garis)",
     "arrowhead_diamond": "Diamond",
     "arrowhead_diamond_outline": "Diamond (garis)",
-    "arrowhead_crowfoot_many": "",
-    "arrowhead_crowfoot_one": "",
-    "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_crowfoot_many": "Notasi kaki gagak (banyak)",
+    "arrowhead_crowfoot_one": "Notasi kaki gagak (satu)",
+    "arrowhead_crowfoot_one_or_many": "Notasi kaki gagak (satu atau banyak)",
+    "arrowhead_cardinality_one": "kardinalitas (satu)",
+    "arrowhead_cardinality_many": "kardinalitas (banyak)",
+    "arrowhead_cardinality_one_or_many": "kardinalitas (satu atau banyak)",
+    "arrowhead_cardinality_exactly_one": "kardinalitas (tepat satu)",
+    "arrowhead_cardinality_zero_or_one": "kardinalitas (nol atau tidak ada)",
+    "arrowhead_cardinality_zero_or_many": "kardinalitas (nol atau banyak)",
     "more_options": "Pilihan lain",
+    "cardinality": "kardinalitas ",
     "arrowtypes": "Jenis panah",
     "arrowtype_sharp": "Panah runcing",
     "arrowtype_round": "Panah melengkung",
@@ -95,6 +111,7 @@
     "group": "Kelompokan pilihan",
     "ungroup": "Pisahkan pilihan",
     "collaborators": "Kolaborator",
+    "you": "Kamu",
     "toggleGrid": "Toggle grid",
     "addToLibrary": "Tambahkan ke pustaka",
     "removeFromLibrary": "Hapus dari pustaka",
@@ -142,8 +159,8 @@
       "editArrow": "Ubah Panah"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "Pecah poligon",
+      "convertToPolygon": "Konversi ke poligon"
     },
     "elementLock": {
       "lock": "Kuncikan",
@@ -170,8 +187,15 @@
     "copyElementLink": "Salin tautan ke objek",
     "linkToElement": "Taut ke objek",
     "wrapSelectionInFrame": "Bungkus pilihan dalam bingkai",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "Tab",
+    "shapeSwitch": "Keputusan",
+    "preferences": "Preferensi",
+    "preferences_toolLock": "Kunci alat",
+    "boxSelectionMode": "Pilih pada",
+    "boxSelectionContain": "Cakup penuh",
+    "boxSelectionOverlap": "Tumpang tindih",
+    "arrowBinding": "Pengikatan anak panah",
+    "midpointSnapping": "Rapatkan ke titik tengah"
   },
   "elementLink": {
     "title": "Taut ke objek",
@@ -183,10 +207,10 @@
     "hint_emptyLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini, atau pasang pustaka dari gudang di bawah ini.",
     "hint_emptyPrivateLibrary": "Pilih item pada kanvas untuk menambahkan nya di sini.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "Cari pustaka",
+      "heading": "Hasil pustaka",
+      "noResults": "Tidak ada item yang cocok...",
+      "clearSearch": "Hapus pencarian"
     }
   },
   "search": {
@@ -195,8 +219,8 @@
     "singleResult": "hasil",
     "multipleResults": "semua hasil",
     "placeholder": "Temukan teks di kanvas...",
-    "frames": "",
-    "texts": ""
+    "frames": "Bingkai",
+    "texts": "Teks"
   },
   "buttons": {
     "clearReset": "Setel Ulang Kanvas",
@@ -230,11 +254,11 @@
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Keluar dari mode zen",
     "cancel": "Batal",
-    "saveLibNames": "",
+    "saveLibNames": "Simpan nama dan keluar",
     "clear": "Hapus",
     "remove": "Hapus",
     "embed": "Mati/nyala penyematan",
-    "publishLibrary": "",
+    "publishLibrary": "Ubah nama atau publikasikan",
     "submit": "Kirimkan",
     "confirm": "Konfirmasi",
     "embeddableInteractionButton": "Pencet untuk interaksi"
@@ -261,7 +285,7 @@
     "removeItemsFromsLibrary": "Hapus {{count}} item dari pustaka?",
     "invalidEncryptionKey": "Sandi enkripsi harus 22 karakter. Kolaborasi langsung dinonaktifkan.",
     "collabOfflineWarning": "Tidak ada koneksi internet.\nPerubahan tidak akan disimpan!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "Kuota penyimpanan browser telah terlampaui. Perubahan tidak akan disimpan."
   },
   "errors": {
     "unsupportedFileType": "Tipe file tidak didukung.",
@@ -292,7 +316,7 @@
   },
   "toolBar": {
     "selection": "Pilihan",
-    "lasso": "",
+    "lasso": "Seleksi lasso",
     "image": "Sisipkan gambar",
     "rectangle": "Persegi",
     "diamond": "Berlian",
@@ -310,10 +334,16 @@
     "magicframe": "Wireframe menjadi code",
     "embeddable": "Sematan Web",
     "laser": "Penunjuk laser",
+    "autoshape": "Gambar ke bentuk",
+    "bucketfill": "Isi warna (Ember)",
     "hand": "Tangan (alat panning)",
     "extraTools": "Alat-alat lain",
     "mermaidToExcalidraw": "Mermaid menjadi Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "Beralih jenis bentuk"
+  },
+  "bucketfill": {
+    "noRegion": "Tidak dapat menemukan area tertutup untuk diisi",
+    "tooComplex": "Area ini terlalu rumit untuk diisi"
   },
   "element": {
     "rectangle": "Persegi Panjang",
@@ -337,34 +367,36 @@
     "shapes": "Bentuk"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "{{shortcut}} untuk menutup pencarian.",
+    "canvasPanning": "Untuk menggeser kanvas, tahan {{shortcut_1}} atau {{shortcut_2}} sambil menyeret, atau gunakan alat tangan",
     "linearElement": "Pencet untuk membuat titik-titik, seret untuk satu garis",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "Klik untuk memulai banyak titik, seret untuk satu garis. Tekan {{shortcut}} lagi untuk mengubah jenis anak panah.",
+    "arrowBindModifiers": "Tahan {{shortcut_1}} untuk menonaktifkan pengikatan, atau {{shortcut_2}} untuk mengikat pada titik tetap",
     "freeDraw": "Klik dan seret, lepaskan jika Anda selesai",
     "text": "Tip: Anda juga dapat menambahkan teks dengan klik ganda di mana saja dengan alat pemilihan",
     "embeddable": "Pencet-seret untuk membuat sematan situs",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "autoshape": "Gambar persegi panjang, lingkaran, belah ketupat, garis, dan anak panah",
+    "text_selected": "Klik dua kali atau tekan {{shortcut}} untuk mengedit teks",
+    "text_editing": "Tekan {{shortcut_1}} atau {{shortcut_2}} untuk menyelesaikan pengeditan",
+    "linearElementMulti": "Klik pada titik terakhir atau tekan {{shortcut_1}} atau {{shortcut_2}} untuk selesai",
+    "lockAngle": "Anda dapat mengunci sudut dengan menahan {{shortcut}}",
+    "resize": "Anda dapat menjaga proporsi dengan menahan {{shortcut_1}} saat mengubah ukuran, tahan {{shortcut_2}} untuk mengubah ukuran dari pusat",
+    "resizeImage": "Anda dapat mengubah ukuran secara bebas dengan menahan {{shortcut_1}} , tahan {{shortcut_2}} untuk mengubah ukuran dari pusat",
+    "rotate": "Anda dapat mengunci sudut dengan menahan {{shortcut}} saat memutar",
+    "toggleArrowhead": "Klik dua kali untuk beralih mata panah",
+    "lineEditor_info": "Tahan {{shortcut_1}} lalu klik dua kali atau tekan {{shortcut_2}} untuk mengedit titik",
+    "lineEditor_line_info": "Klik dua kali atau tekan {{shortcut}} untuk mengedit titik",
+    "lineEditor_pointSelected": "Tekan {{shortcut_1}} untuk menghapus titik, {{shortcut_2}} untuk menggandakan, atau seret untuk memindahkan",
+    "lineEditor_nothingSelected": "Pilih titik untuk mengedit (tahan {{shortcut_1}} untuk memilih beberapa), atau tahan {{shortcut_2}} dan klik untuk menambahkan titik baru",
     "publishLibrary": "Terbitkan pustaka Anda",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "{{shortcut}} untuk menambahkan teks",
+    "createFlowchart": "{{shortcut}} untuk membuat diagram alir",
+    "deepBoxSelect": "Tahan {{shortcut}} untuk memilih tingkat dalam, dan untuk mencegah pergeseran",
+    "eraserRevert": "Tahan {{shortcut}} untuk mengembalikan elemen yang ditandai untuk dihapus",
     "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\".",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "Tahan {{shortcut}} untuk menonaktifkan penambatan (snapping)",
+    "enterCropEditor": "Klik dua kali gambar atau tekan {{shortcut}} untuk memotong gambar",
+    "leaveCropEditor": "Klik di luar gambar atau tekan {{shortcut_1}} atau {{shortcut_2}} untuk menyelesaikan pemotongan"
   },
   "canvasError": {
     "cannotShowPreview": "Tidak dapat menampilkan pratinjau",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Kesalahan"
+  },
+  "progressDialog": {
+    "title": "Menyimpan",
+    "defaultMessage": "Menyiapkan untuk menyimpan..."
   },
   "exportDialog": {
     "disk_title": "Simpan ke disk",
@@ -557,9 +593,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Gambar anda disimpan di penyimpanan browser anda.",
+      "center_heading_line2": "Penyimpanan browser dapat terhapus secara tidak terduga.",
+      "center_heading_line3": "Simpan pekerjaan anda ke file secara berkala agar tidak hilang.",
       "center_heading_plus": "Apa Anda ingin berpindah ke Excalidraw+?",
       "menuHint": "Ekspor, preferensi, bahasa, ..."
     },
@@ -571,12 +607,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "Warna",
     "mostUsedCustomColors": "Warna yang sering dipakai",
     "colors": "Warna",
     "shades": "Nuansa",
     "hexCode": "Kode hexa",
-    "noShades": "Tidak ada nuansa untuk warna ini"
+    "noShades": "Tidak ada nuansa untuk warna ini",
+    "invalidColor": "Bukan warna yang valid",
+    "invalidHexLength": "Kode Hex harus 3, 4, 6, atau 8 karakter",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -612,57 +652,58 @@
   "mermaid": {
     "title": "Mermaid menjadi Excalidraw",
     "button": "Sisipkan",
-    "description": "Saat ini hanya <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sekuen, </sequenceLink>, dan <classLink>Kelas</classLink>Diagram yang didukung. Jenis lainnya akan dirender sebagai gambar di Excalidraw.",
+    "description": "Saat ini hanya Diagram  Diagram Alir  ,  Urutan  ,  Kelas  , dan  Hubungan Entitas  yang didukung. Jenis lainnya akan dirender sebagai gambar di Excalidraw .",
     "syntax": "Syntax Mermaid",
     "preview": "Pratinjau",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "Tulis definisi diagram Mermaid di sini...",
+    "autoFixAvailable": "Perbaikan otomatis tersedia"
   },
   "ttd": {
-    "error": ""
+    "error": "Terjadi kesalahan!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "Mulai ketik ide diagram Anda di sini... ( {{shortcut}} untuk baris baru)",
+    "inputPlaceholderWithMessages": "Lanjutkan menyempurnakan diagram Anda...",
+    "generating": "Membuat...",
+    "rateLimitRemaining": "Sisa {{count}} permintaan hari ini",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "Kamu",
+      "assistant": "Asisten AI",
+      "system": "Sistem"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AI Beta",
+    "label": "Percakapan",
+    "menu": "Menu",
+    "newChat": "Percakapan baru",
+    "deleteChat": "Hapus percakapan",
+    "deleteMessage": "Hapus pesan",
+    "viewAsMermaid": "Tampilkan sebagai diagram Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "Mari rancang diagram anda",
+      "description": "Jelaskan diagram yang ingin dibuat, lalu kami akan membuatnya untuk Anda.",
+      "hint": "Saat ini kami mendukung diagram Diagram Alir, Urutan, Kelas, Keadaan, dan Hubungan Entitas."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "Pratinjau",
+    "insert": "Sisipkan",
+    "retry": "Coba lagi",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "Prompt terlalu pendek (min {{min}} karakter)",
+      "promptTooLong": "Prompt terlalu panjang (maks {{max}} karakter)",
+      "generationFailed": "Pembuatan gagal",
+      "invalidDiagram": "Diagram yang dihasilkan tidak valid :(. Anda dapat mengeditnya secara manual, mencoba lagi dengan perbaikan otomatis, atau menggunakan prompt yang berbeda.",
+      "fixInMermaid": "Edit diagram Mermaid secara manual →",
+      "aiRepair": "Buat ulang (perbaikan otomatis) →",
+      "requestAborted": "Permintaan dibatalkan",
+      "requestFailed": "Permintaan tidak berhasil",
+      "mermaidParseError": "Kesalahan sintaks Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "Anda telah mencapai batas AI pada paket gratis. Coba Excalidraw + untuk akses lebih atau kembali lagi besok.",
+      "generalRateLimit": "Tunggu sebentar, Anda terlalu cepat! Harap tunggu sejenak sebelum mencoba lagi.",
+      "messageLimitInputPlaceholder": "Anda telah mencapai batas pesan anda"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "Tingkatkan ke Plus"
   },
   "quickSearch": {
     "placeholder": "Pencarian Cepat"
@@ -701,15 +742,15 @@
     "shortcutHint": "Untuk palet perintah, gunakan {{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Spasi",
+    "delete": "Hapus",
+    "mmb": "Roda gulir"
   }
 }

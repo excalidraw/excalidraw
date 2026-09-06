@@ -29,15 +29,16 @@ export const useCreatePortalContainer = (opts?: {
   }, [div, theme, editorInterface.formFactor, opts?.className]);
 
   useLayoutEffect(() => {
+    const ownerDocument = excalidrawContainer?.ownerDocument;
     const container = opts?.parentSelector
       ? excalidrawContainer?.querySelector(opts.parentSelector)
-      : document.body;
+      : ownerDocument?.body;
 
-    if (!container) {
+    if (!container || !ownerDocument) {
       return;
     }
 
-    const div = document.createElement("div");
+    const div = ownerDocument.createElement("div");
 
     container.appendChild(div);
 

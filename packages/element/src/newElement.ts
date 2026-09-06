@@ -4,6 +4,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
+  DEFAULT_STROKE_STREAMLINE,
   VERTICAL_ALIGN,
   randomInteger,
   randomId,
@@ -123,7 +124,10 @@ const _newElementBase = <T extends ExcalidrawElement>(
   }
 
   // assign type to guard against excess properties
-  const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
+  const element: Merge<
+    ExcalidrawGenericElement,
+    { type: T["type"]; isDeleted: false }
+  > = {
     id: rest.id || randomId(),
     type,
     x,
@@ -214,6 +218,25 @@ export const newMagicFrameElement = (
   return frameElement;
 };
 
+/**
+ * The point of the text box its alignment pins, as ratios of width/height.
+ *
+ * This is the point that stays put as the text grows — see the sides passed to
+ * `adjustXYWithRotation` in `getAdjustedDimensions`.
+ */
+export const getTextAnchorRatios = (opts: {
+  textAlign: ExcalidrawTextElement["textAlign"];
+  verticalAlign: ExcalidrawTextElement["verticalAlign"];
+}) => ({
+  x: opts.textAlign === "center" ? 0.5 : opts.textAlign === "right" ? 1 : 0,
+  y:
+    opts.verticalAlign === VERTICAL_ALIGN.MIDDLE
+      ? 0.5
+      : opts.verticalAlign === VERTICAL_ALIGN.BOTTOM
+      ? 1
+      : 0,
+});
+
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (
   opts: {
@@ -225,14 +248,11 @@ const getTextElementPositionOffsets = (
     height: number;
   },
 ) => {
+  const ratios = getTextAnchorRatios(opts);
+
   return {
-    x:
-      opts.textAlign === "center"
-        ? metrics.width / 2
-        : opts.textAlign === "right"
-        ? metrics.width
-        : 0,
-    y: opts.verticalAlign === "middle" ? metrics.height / 2 : 0,
+    x: metrics.width * ratios.x,
+    y: metrics.height * ratios.y,
   };
 };
 
@@ -247,6 +267,7 @@ export const newTextElement = (
     containerId?: ExcalidrawTextContainer["id"] | null;
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
+    labelPosition?: ExcalidrawTextElement["labelPosition"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -265,7 +286,7 @@ export const newTextElement = (
     metrics,
   );
 
-  const textElementProps: ExcalidrawTextElement = {
+  const textElementProps: NonDeleted<ExcalidrawTextElement> = {
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
     fontSize,
@@ -280,9 +301,10 @@ export const newTextElement = (
     originalText: opts.originalText ?? text,
     autoResize: opts.autoResize ?? true,
     lineHeight,
+    labelPosition: opts.labelPosition ?? null,
   };
 
-  const textElement: ExcalidrawTextElement = newElementWith(
+  const textElement: NonDeleted<ExcalidrawTextElement> = newElementWith(
     textElementProps,
     {},
   );
@@ -346,9 +368,18 @@ const getAdjustedDimensions = (
     const deltaX2 = (x2 - nextX2) / 2;
     const deltaY2 = (y2 - nextY2) / 2;
 
+    // grow away from the edge(s) the alignment anchors the text to, so that
+    // the anchor stays put as the text is edited. `verticalAlign` has no
+    // visual effect on unbound text, but standalone text bound to an arrow
+    // endpoint uses it to pin the side the arrow attaches to.
     [x, y] = adjustXYWithRotation(
       {
-        s: true,
+        n:
+          verticalAlign === VERTICAL_ALIGN.MIDDLE ||
+          verticalAlign === VERTICAL_ALIGN.BOTTOM,
+        s:
+          verticalAlign === VERTICAL_ALIGN.MIDDLE ||
+          verticalAlign === VERTICAL_ALIGN.TOP,
         e: textAlign === "center" || textAlign === "left",
         w: textAlign === "center" || textAlign === "right",
       },
@@ -444,6 +475,7 @@ export const newFreeDrawElement = (
     type: "freedraw";
     points?: ExcalidrawFreeDrawElement["points"];
     simulatePressure: boolean;
+    strokeOptions?: ExcalidrawFreeDrawElement["strokeOptions"];
     pressures?: ExcalidrawFreeDrawElement["pressures"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawFreeDrawElement> => {
@@ -452,6 +484,10 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
+    strokeOptions: opts.strokeOptions ?? {
+      variability: "variable",
+      streamline: DEFAULT_STROKE_STREAMLINE,
+    },
   };
 };
 

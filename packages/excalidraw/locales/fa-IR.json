@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "جایگذاری",
     "pasteAsPlaintext": "جایگذاری به عنوان متن ساده",
     "pasteCharts": "جایگذاری نمودارها",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "انتخاب همه",
     "multiSelect": "یک ایتم به انتخاب شده ها اضافه کنید",
     "moveCanvas": "جابجایی بوم",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "خط چین",
     "strokeStyle_dotted": "نقطه چین",
     "sloppiness": "دقت",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "شفافیت",
     "textAlign": "تراز متن",
     "edges": "لبه ها",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "پای کلاغی (بسیار)",
     "arrowhead_crowfoot_one": "پای کلاغی (یک)",
     "arrowhead_crowfoot_one_or_many": "پای کلاغی (یک یا بسیار)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "امکانات بیشتر",
+    "cardinality": "",
     "arrowtypes": "نوع پیکان",
     "arrowtype_sharp": "پیکان تیز",
     "arrowtype_round": "پیکان منحنی",
@@ -95,6 +111,7 @@
     "group": "گروهبندی انتخابها",
     "ungroup": "حذف گروهبندی انتخابها",
     "collaborators": "همکاران",
+    "you": "",
     "toggleGrid": "تغییر وضعیت خطوط شطرنجی",
     "addToLibrary": "افزودن به کتابخانه",
     "removeFromLibrary": "حذف از کتابخانه",
@@ -171,7 +188,14 @@
     "linkToElement": "لینک به آیتم",
     "wrapSelectionInFrame": "انتخاب را در قاب قرار دهید",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "لینک به آیتم",
@@ -196,7 +220,7 @@
     "multipleResults": "نتایج",
     "placeholder": "جستجوی متن در بوم...",
     "frames": "",
-    "texts": ""
+    "texts": "متن"
   },
   "buttons": {
     "clearReset": "پاکسازی بوم نقاشی",
@@ -310,10 +334,16 @@
     "magicframe": "وایرفریم به کد",
     "embeddable": "افزونه وب",
     "laser": "اشاره گر لیزری",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "دست (ابزار پانینگ)",
     "extraTools": "ابزارهای بیشتر",
     "mermaidToExcalidraw": "مرمید به excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "مستطیل",
@@ -345,6 +375,7 @@
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
     "embeddable": "کلیک-درگ برای ساخت افزونه وب",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "خطا"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "ذخیره در دیسک",
@@ -571,12 +607,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
+    "color": "رنگ",
     "mostUsedCustomColors": "رنگ های به‌تازگی به‌کار گرفته شده",
     "colors": "رنگ‌ها",
     "shades": "جلوه‌ها",
     "hexCode": "کدِ هگز",
-    "noShades": "هیچ سایه ای برای این رنگ در دسترس نیست"
+    "noShades": "هیچ سایه ای برای این رنگ در دسترس نیست",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -612,14 +652,15 @@
   "mermaid": {
     "title": "مرمید به excalidraw",
     "button": "درج",
-    "description": "فعلا فقط <flowchartLink> فلوچارت </flowchartLink> ، <sequenceLink> توالی </sequenceLink> و <classLink> کلاس </classLink> نمودارها پشتیبانی می شوند. انواع دیگر به صورت تصویر در Excalidraw ارائه خواهند شد.",
+    "description": "",
     "syntax": "مرمید syntax",
     "preview": "پیشنمایش",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
-    "error": ""
+    "error": "خطا!"
   },
   "chat": {
     "inputPlaceholder": "",
@@ -627,8 +668,8 @@
     "generating": "",
     "rateLimitRemaining": "",
     "role": {
-      "user": "",
-      "assistant": "",
+      "user": "شما",
+      "assistant": "دستیار هوش مصنوعی",
       "system": ""
     },
     "aiBeta": "",
@@ -707,9 +748,9 @@
     "alt": "",
     "escape": "",
     "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
+    "shift": "Shift",
+    "spacebar": "فاصله",
+    "delete": "حذف",
     "mmb": ""
   }
 }

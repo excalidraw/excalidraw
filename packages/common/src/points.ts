@@ -1,4 +1,5 @@
 import {
+  pointFrom,
   pointFromPair,
   type GlobalPoint,
   type LocalPoint,
@@ -69,12 +70,12 @@ export const getGridPoint = (
   x: number,
   y: number,
   gridSize: NullableGridSize,
-): [number, number] => {
+): GlobalPoint => {
   if (gridSize) {
-    return [
+    return pointFrom<GlobalPoint>(
       Math.round(x / gridSize) * gridSize,
       Math.round(y / gridSize) * gridSize,
-    ];
+    );
   }
-  return [x, y];
+  return pointFrom<GlobalPoint>(x, y);
 };

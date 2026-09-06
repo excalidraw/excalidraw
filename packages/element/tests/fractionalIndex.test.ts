@@ -1,9 +1,8 @@
 /* eslint-disable no-lone-blocks */
-import { generateKeyBetween } from "fractional-indexing";
-
 import { arrayToMap } from "@excalidraw/common";
 
 import {
+  InvalidFractionalIndexError,
   syncInvalidIndices,
   syncMovedIndices,
   validateFractionalIndices,
@@ -13,13 +12,34 @@ import { deepCopyElement } from "@excalidraw/element";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
+import {
+  generateKeyBetween,
+  validateOrderKey,
+} from "@excalidraw/fractional-indexing";
+
 import type {
   ElementsMap,
   ExcalidrawElement,
   FractionalIndex,
 } from "@excalidraw/element/types";
 
-import { InvalidFractionalIndexError } from "../src/fractionalIndex";
+describe("fractional index format validation", () => {
+  it("should reject malformed base62 order keys", () => {
+    expect(() => validateOrderKey("a!")).toThrow();
+    expect(() => validateOrderKey("a_")).toThrow();
+    expect(() => validateOrderKey("a1!")).toThrow();
+    expect(() => validateOrderKey("a1_")).toThrow();
+    expect(() => validateOrderKey("zd0032")).toThrow();
+  });
+
+  it("should accept valid base62 order keys", () => {
+    expect(() => validateOrderKey("Zz")).not.toThrow();
+    expect(() => validateOrderKey("a0")).not.toThrow();
+    expect(() => validateOrderKey("a1")).not.toThrow();
+    expect(() => validateOrderKey("a1V")).not.toThrow();
+    expect(() => validateOrderKey("z".padEnd(28, "z"))).not.toThrow();
+  });
+});
 
 describe("sync invalid indices with array order", () => {
   describe("should NOT sync empty array", () => {
@@ -100,6 +120,46 @@ describe("sync invalid indices with array order", () => {
       elements: [{ id: "A" }],
       expect: {
         unchangedElements: [],
+      },
+    });
+  });
+
+  describe("should sync when fractional index is malformed", () => {
+    // "zd0032" has head "z" which requires length 28 per getIntegerLength,
+    // but the string is far too short, so validateOrderKey throws for it
+    testInvalidIndicesSync({
+      elements: [{ id: "A", index: "zd0032" }],
+      expect: {
+        unchangedElements: [],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "zd0032" },
+        { id: "C", index: "a3" },
+      ],
+      expect: {
+        unchangedElements: ["A", "C"],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [{ id: "A", index: "a!" }],
+      expect: {
+        unchangedElements: [],
+      },
+    });
+
+    testInvalidIndicesSync({
+      elements: [
+        { id: "A", index: "a1" },
+        { id: "B", index: "a!" },
+        { id: "C", index: "a2" },
+      ],
+      expect: {
+        unchangedElements: ["A", "C"],
       },
     });
   });

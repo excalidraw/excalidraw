@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "הדבקה",
     "pasteAsPlaintext": "הדבקה ללא עיצוב",
     "pasteCharts": "הדבקת תרשימים",
+    "chartType_bar": "תרשים עמודות",
+    "chartType_line": "תרשים קווים",
+    "chartType_radar": "תרשים רדאר",
+    "chartType_plaintext": "טקסט פשוט",
     "selectAll": "בחירה בהכול",
     "multiSelect": "הוספת רכיב לבחירה",
     "moveCanvas": "הזזת הקנבס",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "מקווקו",
     "strokeStyle_dotted": "מנוקד",
     "sloppiness": "רישול",
+    "pressure": "לחץ",
+    "pressure_constant": "קבוע",
+    "pressure_variable": "משתנה",
     "opacity": "אטימות",
     "textAlign": "יישור טקסט",
     "edges": "קצוות",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "רגל עורב (הרבה)",
     "arrowhead_crowfoot_one": "רגל עורב (אחת)",
     "arrowhead_crowfoot_one_or_many": "רגל עורב (אחת או הרבה)",
+    "arrowhead_cardinality_one": "קרדינליות (אחד)",
+    "arrowhead_cardinality_many": "קרדינליות (רבות)",
+    "arrowhead_cardinality_one_or_many": "קרדינליות (אחד או רבים)",
+    "arrowhead_cardinality_exactly_one": "קרדינליות (בדיוק אחד)",
+    "arrowhead_cardinality_zero_or_one": "קרדינליות (אפס או אחד)",
+    "arrowhead_cardinality_zero_or_many": "קרדינליות (אפס או רבים)",
     "more_options": "אפשרויות נוספות",
+    "cardinality": "קרדינליות",
     "arrowtypes": "סוג החץ",
     "arrowtype_sharp": "חץ מחודד",
     "arrowtype_round": "חץ מעוקל",
@@ -57,7 +73,7 @@
     "fontSize": "גודל גופן",
     "fontFamily": "גופן",
     "addWatermark": "הוספת „נוצר באמצעות Excalidraw”",
-    "handDrawn": "ציור יד",
+    "handDrawn": "שרבוט",
     "normal": "רגיל",
     "code": "קוד",
     "small": "קטן",
@@ -95,6 +111,7 @@
     "group": "קיבוץ הבחירה",
     "ungroup": "פירוק קבוצה",
     "collaborators": "שותפים",
+    "you": "אני",
     "toggleGrid": "הצגת/הסתרת רשת",
     "addToLibrary": "הוספה לספרייה",
     "removeFromLibrary": "הסרה מהספרייה",
@@ -142,8 +159,8 @@
       "editArrow": "עריכת חץ"
     },
     "polygon": {
-      "breakPolygon": "",
-      "convertToPolygon": ""
+      "breakPolygon": "שבירת מצולע",
+      "convertToPolygon": "המרה למצולע"
     },
     "elementLock": {
       "lock": "נעילה",
@@ -160,9 +177,9 @@
     "prompt": "בקשה",
     "followUs": "לעקוב אחרינו",
     "discordChat": "צ׳אט ב־Discord",
-    "zoomToFitViewport": "התאמת התקריב לגודל המסך",
-    "zoomToFitSelection": "להתמקד בחלק הנבחר",
-    "zoomToFit": "להציג את כל הרכיבים",
+    "zoomToFitViewport": "שינוי מרחק התצוגה כך שיתאים לגודל המסך",
+    "zoomToFitSelection": "שינוי מרחק התצוגה כך שיתאים לבחירה",
+    "zoomToFit": "שינוי מרחק התצוגה כך שיוצגו כל הרכיבים",
     "installPWA": "התקנת Excalidraw לשימוש מקומי (PWA)",
     "autoResize": "לאפשר התאמה אוטומטית של גודל הכתב",
     "imageCropping": "חיתוך תמונה",
@@ -170,8 +187,15 @@
     "copyElementLink": "העתקת קישור לפריט",
     "linkToElement": "קישור לפריט",
     "wrapSelectionInFrame": "לעטוף את הבחירה במסגרת",
-    "tab": "",
-    "shapeSwitch": ""
+    "tab": "לשונית",
+    "shapeSwitch": "החלפת צורה",
+    "preferences": "העדפות",
+    "preferences_toolLock": "נעילת כלים",
+    "boxSelectionMode": "בחר",
+    "boxSelectionContain": "עטיפה",
+    "boxSelectionOverlap": "חפיפה",
+    "arrowBinding": "קשירת חצים",
+    "midpointSnapping": "הצמדה לנקודות ביניים"
   },
   "elementLink": {
     "title": "קישור לפריט",
@@ -183,10 +207,10 @@
     "hint_emptyLibrary": "נא לבחור משהו בקנבס כדי להוסיף אותו לכאן, או להתקין ספרייה מהמאגר הציבורי שלמטה.",
     "hint_emptyPrivateLibrary": "נא לבחור משהו בקנבס כדי להוסיף אותו לכאן.",
     "search": {
-      "inputPlaceholder": "",
-      "heading": "",
-      "noResults": "",
-      "clearSearch": ""
+      "inputPlaceholder": "חיפוש בספרייה",
+      "heading": "תוצאת הספרייה תואמת",
+      "noResults": "לא נמצאו פריטים תואמים...",
+      "clearSearch": "ניקוי החיפוש"
     }
   },
   "search": {
@@ -195,8 +219,8 @@
     "singleResult": "תוצאה",
     "multipleResults": "תוצאות",
     "placeholder": "איתור טקסט בלוח הציור…",
-    "frames": "",
-    "texts": ""
+    "frames": "מסגרות",
+    "texts": "טקסט"
   },
   "buttons": {
     "clearReset": "איפוס לוח הציור",
@@ -212,9 +236,9 @@
     "close": "סגירה",
     "selectLanguage": "בחירת שפה",
     "scrollBackToContent": "גלילה בחזרה לתוכן",
-    "zoomIn": "הגדלה",
-    "zoomOut": "הקטנה",
-    "resetZoom": "איפוס תקריב",
+    "zoomIn": "התקרבות",
+    "zoomOut": "התרחקות",
+    "resetZoom": "איפוס מרחק התצוגה",
     "menu": "תפריט",
     "done": "בוצע",
     "edit": "עריכה",
@@ -230,11 +254,11 @@
     "objectsSnapMode": "הצמדה לעצמים",
     "exitZenMode": "יציאה ממצב ריכוז",
     "cancel": "ביטול",
-    "saveLibNames": "",
+    "saveLibNames": "שמירת שמות ויציאה",
     "clear": "ניקוי",
     "remove": "הסרה",
     "embed": "להציג את ההטמעה",
-    "publishLibrary": "",
+    "publishLibrary": "שינוי שם או פרסום",
     "submit": "שליחה",
     "confirm": "אישור",
     "embeddableInteractionButton": "לחיצה לתפעול"
@@ -261,7 +285,7 @@
     "removeItemsFromsLibrary": "מחק {{count}} פריט(ים) מהספריה?",
     "invalidEncryptionKey": "מפתח ההצפנה חייב להיות בן 22 תוים. השיתוף החי מנוטרל.",
     "collabOfflineWarning": "אין חיבור זמין לאינטרנט.\nהשינויים שלך לא ישמרו!",
-    "localStorageQuotaExceeded": ""
+    "localStorageQuotaExceeded": "הגעת למכסת השימוש בזיכרון הדפדפן. השינויים לא יישמרו."
   },
   "errors": {
     "unsupportedFileType": "סוג הקובץ אינו נתמך.",
@@ -292,7 +316,7 @@
   },
   "toolBar": {
     "selection": "בחירה",
-    "lasso": "",
+    "lasso": "בחירת לאסו",
     "image": "הוספת תמונה",
     "rectangle": "מלבן",
     "diamond": "יהלום",
@@ -310,10 +334,16 @@
     "magicframe": "תרשים קווי מתאר לקוד",
     "embeddable": "הטמעה באתר",
     "laser": "סמן לייזר",
+    "autoshape": "ציור אל צורה",
+    "bucketfill": "מילוי דלי",
     "hand": "יד (כלי הזזה)",
     "extraTools": "כלים נוספים",
     "mermaidToExcalidraw": "Mermaid ל־Excalidraw",
-    "convertElementType": ""
+    "convertElementType": "החלפת סוג צורה"
+  },
+  "bucketfill": {
+    "noRegion": "לא נמצא אזור סגור למילוי כאן.",
+    "tooComplex": "המילוי של האזור הזה מסובך מכדי לקרות."
   },
   "element": {
     "rectangle": "מלבן",
@@ -337,34 +367,36 @@
     "shapes": "צורות"
   },
   "hints": {
-    "dismissSearch": "",
-    "canvasPanning": "",
+    "dismissSearch": "‏{{shortcut}} להתעלמות מהחיפוש",
+    "canvasPanning": "כדי להזיז את הקנבס, החזק את {{shortcut_1}} או {{shortcut_2}} תוך כדי גרירה, או השתמש בכלי היד",
     "linearElement": "לחץ להתחלת מספר נקודות, גרור לקו יחיד",
-    "arrowTool": "",
-    "arrowBindModifiers": "",
+    "arrowTool": "לחץ להפעלת נקודות מרובות, גרור עבור קו יחיד. לחץ שוב על {{shortcut}} כדי לשנות את סוג החץ.",
+    "arrowBindModifiers": "החזק את {{shortcut_1}} כדי לבטל את הצירוף, או את {{shortcut_2}} כדי לצרף בנקודה קבועה",
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
     "embeddable": "לחצו וגררו כדי ליצור הטמעת אתר",
-    "text_selected": "",
-    "text_editing": "",
-    "linearElementMulti": "",
-    "lockAngle": "",
-    "resize": "",
-    "resizeImage": "",
-    "rotate": "",
-    "lineEditor_info": "",
-    "lineEditor_line_info": "",
-    "lineEditor_pointSelected": "",
-    "lineEditor_nothingSelected": "",
+    "autoshape": "צייר מלבנים, עיגולים, יהלומים, קווים וחצים",
+    "text_selected": "לחיצה כפולה או הקשה על {{shortcut}} יאפשרו לך לערוך את הטקסט",
+    "text_editing": "יש ללחוץ על {{shortcut_1}} או {{shortcut_2}} לסיום העריכה",
+    "linearElementMulti": "לחץ על הנקודה האחרונה או הקש על {{shortcut_1}} או {{shortcut_2}} כדי לסיים",
+    "lockAngle": "ניתן להגביל את הזווית על ידי החזקת {{shortcut}}",
+    "resize": "ניתן להגביל פרופורציות על ידי החזקת {{shortcut_1}} בזמן שינוי הגודל, החזק את {{shortcut_2}} כדי לשנות גודל מהמרכז",
+    "resizeImage": "ניתן לשנות גודל חופשי על ידי החזקת {{shortcut_1}}, החזק את {{shortcut_2}} כדי לשנות גודל מהמרכז",
+    "rotate": "ניתן להגביל זוויות על ידי החזקת {{shortcut}} בזמן סיבוב",
+    "toggleArrowhead": "לחץ לחיצה כפולה כדי להחליף בין צורות ראש החץ",
+    "lineEditor_info": "החזק את {{shortcut_1}} ולחץ לחיצה כפולה או לחץ על {{shortcut_2}} כדי לערוך נקודות",
+    "lineEditor_line_info": "לחיצה כפולה או הקשה על {{shortcut}} יאפשרו לך לערוך נקודות",
+    "lineEditor_pointSelected": "יש ללחוץ על {{shortcut_1}} כדי להסיר נקודות,\nעל {{shortcut_2}} כדי לשכפל, או לגרור בשביל להזיז",
+    "lineEditor_nothingSelected": "בחר נקודה לעריכה (החזק את {{shortcut_1}} כדי לבחור מספר נקודות), או החזק את {{shortcut_2}} ולחץ להוספת נקודות חדשות",
     "publishLibrary": "פרסם ספריה משלך",
-    "bindTextToElement": "",
-    "createFlowchart": "",
-    "deepBoxSelect": "",
-    "eraserRevert": "",
+    "bindTextToElement": "‏{{shortcut}} להוספת טקסט",
+    "createFlowchart": "‏{{shortcut}} ליצירת תרשים זרימה",
+    "deepBoxSelect": "החזק את {{shortcut}} לבחירה עמוקה ולמניעת גרירה",
+    "eraserRevert": "החזק את {{shortcut}} כדי לשחזר את הרכיבים המסומנים למחיקה",
     "firefox_clipboard_write": "יכולות זה ניתנת להפעלה על ידי שינוי הדגל של \"dom.events.asyncClipboard.clipboardItem\" למצב \"true\". כדי לשנות את הדגל בדפדפן Firefox, בקר בעמוד ״about:config״.",
-    "disableSnapping": "",
-    "enterCropEditor": "",
-    "leaveCropEditor": ""
+    "disableSnapping": "החזק את {{shortcut}} כדי לבטל את ההצמדה",
+    "enterCropEditor": "לחץ לחיצה כפולה על התמונה או לחץ על {{shortcut}} כדי לחתוך אותה",
+    "leaveCropEditor": "לחץ מחוץ לתמונה או לחץ על {{shortcut_1}} או {{shortcut_2}} כדי לסיים את החיתוך"
   },
   "canvasError": {
     "cannotShowPreview": "לא ניתן להראות תצוגה מקדימה",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "שגיאה"
+  },
+  "progressDialog": {
+    "title": "שמירה",
+    "defaultMessage": "בהכנות לשמירה..."
   },
   "exportDialog": {
     "disk_title": "שמור לכונן",
@@ -431,8 +467,8 @@
     "textNewLine": "הוסף שורה חדשה (עורך טקסט)",
     "title": "עזרה",
     "view": "תצוגה",
-    "zoomToFit": "זום להתאמת כל האלמנטים למסך",
-    "zoomToSelection": "התמקד בבחירה",
+    "zoomToFit": "שינוי מרחק התצוגה כך שיוצגו כל הרכיבים",
+    "zoomToSelection": "שינוי מרחק התצוגה כך שיתאים לבחירה",
     "toggleElementLock": "נעילה/ביטול הנעילה של הרכיבים הנבחרים",
     "movePageUpDown": "זוז עמוד למעלה/למטה",
     "movePageLeftRight": "זוז עמוד שמאלה/ימינה",
@@ -557,9 +593,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "השרטוטים שלך נשמרים באחסון הדפדפן שלך.",
+      "center_heading_line2": "זיכרון הדפדפן יכול להתנקות באופן לא צפוי.",
+      "center_heading_line3": "כדאי לשמור את העבודה שלך תדיר בתור קובץ בשביל שהיא לא תיאבד.",
       "center_heading_plus": "אתה רוצה ללכת אל Excalidraw+ במקום?",
       "menuHint": "ייצוא, העדפות, שפות, ..."
     },
@@ -571,12 +607,16 @@
     }
   },
   "colorPicker": {
-    "color": "",
-    "mostUsedCustomColors": "הצבעים המותאמים הכי נפוצים",
+    "color": "צבע",
+    "mostUsedCustomColors": "הצבעים הייחודיים שהכי נפוצים",
     "colors": "צבעים",
     "shades": "הצללות",
     "hexCode": "קוד הקסדצימלי",
-    "noShades": "אין הצללות זמינות לצבע הזה"
+    "noShades": "אין הצללות זמינות לצבע הזה",
+    "invalidColor": "לא צבע תקני",
+    "invalidHexLength": "הקוד ההקסדצימאלי חייב להיות בן 3, 4, 6 או 8 תווים",
+    "topPicksTip": "טיפ: גררו כל צבע אל הבחירות המובילות שלכם כדי להצמיד אותו",
+    "resetTopPicks": "איפוס לבחירות המומלצות כברירת מחדל"
   },
   "overwriteConfirm": {
     "action": {
@@ -612,57 +652,58 @@
   "mermaid": {
     "title": "Mermaid ל־Excalidraw",
     "button": "הוספה",
-    "description": "לעת עתה נתמכים רק <flowchartLink>תרשימי זרימה</flowchartLink>, <sequenceLink>תהליכים</sequenceLink>, <classLink>ודיאגרמת מחלקה</classLink>. שאר הסוגים ייוצרו כתמונות ב-Excalidraw.",
+    "description": "נכון לעכשיו, רק דיאגרמות <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink> ו-<erdLink>Entity Relationship</erdLink> נתמכות. שאר הסוגים יוצגו כתמונה ב-Excalidraw.",
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
-    "label": "",
-    "inputPlaceholder": ""
+    "label": "Mermaid",
+    "inputPlaceholder": "נא לכתוב כאן הגדרת תרשים ל־Mermaid...",
+    "autoFixAvailable": "התיקון האוטומטי זמין"
   },
   "ttd": {
-    "error": ""
+    "error": "שגיאה!"
   },
   "chat": {
-    "inputPlaceholder": "",
-    "inputPlaceholderWithMessages": "",
-    "generating": "",
-    "rateLimitRemaining": "",
+    "inputPlaceholder": "התחל להקליד את רעיון הדיאגרמה שלך כאן... ({{shortcut}} לשורה חדשה)",
+    "inputPlaceholderWithMessages": "נא להמשיך לתאר את התרשים...",
+    "generating": "בתהליך יצירה...",
+    "rateLimitRemaining": "נותרו {{count}} בקשות להיום",
     "role": {
-      "user": "",
-      "assistant": "",
-      "system": ""
+      "user": "אני",
+      "assistant": "מסייע AI",
+      "system": "מערכת"
     },
-    "aiBeta": "",
-    "label": "",
-    "menu": "",
-    "newChat": "",
-    "deleteChat": "",
-    "deleteMessage": "",
-    "viewAsMermaid": "",
+    "aiBeta": "AI Beta",
+    "label": "שיחה",
+    "menu": "תפריט",
+    "newChat": "שיחה חדשה",
+    "deleteChat": "מחיקת שיחה",
+    "deleteMessage": "מחיקת הודעה",
+    "viewAsMermaid": "הצגה בתור Mermaid",
     "placeholder": {
-      "title": "",
-      "description": "",
-      "hint": ""
+      "title": "הגיע הזמן לעצב את התרשים הראשון שלך",
+      "description": "נא לתאר איזה תרשים ברצונך ליצור, ואנחנו נייצר אותו בשבילך.",
+      "hint": "כרגע אנו מכירים דיאגרמות של תרשימי זרימה, רצף, מחלקה, מצב וקשרי ישויות."
     },
-    "preview": "",
-    "insert": "",
-    "retry": "",
+    "preview": "תצוגה מקדימה",
+    "insert": "הוספה",
+    "retry": "ניסיון חוזר",
     "errors": {
-      "promptTooShort": "",
-      "promptTooLong": "",
-      "generationFailed": "",
-      "invalidDiagram": "",
-      "fixInMermaid": "",
-      "aiRepair": "",
-      "requestAborted": "",
-      "requestFailed": "",
-      "mermaidParseError": ""
+      "promptTooShort": "ההנחיה קצרה מדי (נדרשים {{min}} תווים לכל הפחות)",
+      "promptTooLong": "ההנחיה ארוכה מדי (נדרשים {{max}} תווים לכל היותר)",
+      "generationFailed": "היצירה נכשלה",
+      "invalidDiagram": "נוצר תרשים לא תקני :(. אפשר לערוך אותו ידנית, לנסות שוב עם תיקון אוטומטי, או לנסות הנחיה אחרת.",
+      "fixInMermaid": "עריכה ידנית של Mermaid ←",
+      "aiRepair": "יצירה מחדש (תיקון אוטומטי) ←",
+      "requestAborted": "הבקשה בוטלה",
+      "requestFailed": "הבקשה נכשלה",
+      "mermaidParseError": "שגיאת תחביר Mermaid"
     },
     "rateLimit": {
-      "messageLimit": "",
-      "generalRateLimit": "",
-      "messageLimitInputPlaceholder": ""
+      "messageLimit": "הגעת למכסת השימוש ב־AI של התוכנית החינמית. נא לנסות את ‎Excalidraw+‏ בשביל לקבל מכסה רחבה יותר, או לחזור מחר.",
+      "generalRateLimit": "נא להאט את הקצב, אתה מהיר מדי עבורנו! אנא המתן רגע לפני שתנסה שוב.",
+      "messageLimitInputPlaceholder": "הגעת למכסת ההודעות היומית"
     },
-    "upsellBtnLabel": ""
+    "upsellBtnLabel": "שדרוג לגרסת Plus"
   },
   "quickSearch": {
     "placeholder": "חיפוש מהיר"
@@ -701,15 +742,15 @@
     "shortcutHint": "ללוח פקודות, יש להשתמש ב־{{shortcut}}"
   },
   "keys": {
-    "ctrl": "",
-    "option": "",
-    "cmd": "",
-    "alt": "",
-    "escape": "",
-    "enter": "",
-    "shift": "",
-    "spacebar": "",
-    "delete": "",
-    "mmb": ""
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "רווח",
+    "delete": "מחיקה",
+    "mmb": "גלגלת העכבר"
   }
 }

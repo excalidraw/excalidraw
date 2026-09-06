@@ -1,4 +1,5 @@
 import {
+  BOUND_TEXT_PADDING,
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   SVG_NS,
@@ -64,7 +65,7 @@ const roughSVGDrawWithPrecision = (
 };
 
 const maybeWrapNodesInFrameClipPath = (
-  element: NonDeletedExcalidrawElement,
+  element: Readonly<NonDeletedExcalidrawElement>,
   root: SVGElement,
   nodes: SVGElement[],
   frameRendering: AppState["frameRendering"],
@@ -85,7 +86,7 @@ const maybeWrapNodesInFrameClipPath = (
 };
 
 const renderElementToSvg = (
-  element: NonDeletedExcalidrawElement,
+  element: Readonly<NonDeletedExcalidrawElement>,
   elementsMap: RenderableElementsMap,
   rsvg: RoughSVG,
   svgRoot: SVGElement,
@@ -200,8 +201,7 @@ const renderElementToSvg = (
       );
       addToRoot(node, element);
 
-      const label: ExcalidrawElement =
-        createPlaceholderEmbeddableLabel(element);
+      const label = createPlaceholderEmbeddableLabel(element);
       renderElementToSvg(
         label,
         elementsMap,
@@ -291,6 +291,14 @@ const renderElementToSvg = (
         );
         offsetX = offsetX || 0;
         offsetY = offsetY || 0;
+        // Pin the mask to user space; the default maskUnits="objectBoundingBox"
+        // collapses to zero area for axis-aligned arrows (zero-size bbox),
+        // hiding the whole line from SVG exports (#11439).
+        maskPath.setAttribute("maskUnits", "userSpaceOnUse");
+        maskPath.setAttribute("x", "0");
+        maskPath.setAttribute("y", "0");
+        maskPath.setAttribute("width", `${element.width + 100 + offsetX}`);
+        maskPath.setAttribute("height", `${element.height + 100 + offsetY}`);
         maskRectVisible.setAttribute("x", "0");
         maskRectVisible.setAttribute("y", "0");
         maskRectVisible.setAttribute("fill", "#fff");
@@ -314,14 +322,23 @@ const renderElementToSvg = (
           elementsMap,
         );
 
-        const maskX = offsetX + boundTextCoords.x - element.x;
-        const maskY = offsetY + boundTextCoords.y - element.y;
+        // the same padded hole the canvas renderers cut around the label
+        const maskX =
+          offsetX + boundTextCoords.x - element.x - BOUND_TEXT_PADDING;
+        const maskY =
+          offsetY + boundTextCoords.y - element.y - BOUND_TEXT_PADDING;
 
         maskRectInvisible.setAttribute("x", maskX.toString());
         maskRectInvisible.setAttribute("y", maskY.toString());
         maskRectInvisible.setAttribute("fill", "#000");
-        maskRectInvisible.setAttribute("width", `${boundText.width}`);
-        maskRectInvisible.setAttribute("height", `${boundText.height}`);
+        maskRectInvisible.setAttribute(
+          "width",
+          `${boundText.width + BOUND_TEXT_PADDING * 2}`,
+        );
+        maskRectInvisible.setAttribute(
+          "height",
+          `${boundText.height + BOUND_TEXT_PADDING * 2}`,
+        );
         maskRectInvisible.setAttribute("opacity", "1");
         maskPath.appendChild(maskRectInvisible);
       }
@@ -386,9 +403,10 @@ const renderElementToSvg = (
           const path = svgRoot.ownerDocument.createElementNS(SVG_NS, "path");
           path.setAttribute(
             "fill",
-            renderConfig.theme === THEME.DARK
-              ? applyDarkModeFilter(element.strokeColor)
-              : element.strokeColor,
+            applyDarkModeFilter(
+              element.strokeColor,
+              renderConfig.theme === THEME.DARK,
+            ),
           );
           path.setAttribute("d", shape);
           wrapper.appendChild(path);
@@ -621,9 +639,10 @@ const renderElementToSvg = (
         rect.setAttribute("fill", "none");
         rect.setAttribute(
           "stroke",
-          renderConfig.theme === THEME.DARK
-            ? applyDarkModeFilter(FRAME_STYLE.strokeColor)
-            : FRAME_STYLE.strokeColor,
+          applyDarkModeFilter(
+            FRAME_STYLE.strokeColor,
+            renderConfig.theme === THEME.DARK,
+          ),
         );
         rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
 
@@ -677,9 +696,10 @@ const renderElementToSvg = (
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute(
             "fill",
-            renderConfig.theme === THEME.DARK
-              ? applyDarkModeFilter(element.strokeColor)
-              : element.strokeColor,
+            applyDarkModeFilter(
+              element.strokeColor,
+              renderConfig.theme === THEME.DARK,
+            ),
           );
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
@@ -744,9 +764,9 @@ export const renderSceneToSvg = (
           );
 
           const boundTextElement = getBoundTextElement(element, elementsMap);
-          if (boundTextElement) {
+          if (boundTextElement?.isDeleted === false) {
             renderElementToSvg(
-              boundTextElement,
+              boundTextElement as Readonly<NonDeletedExcalidrawElement>,
               elementsMap,
               rsvg,
               svgRoot,
@@ -754,6 +774,11 @@ export const renderSceneToSvg = (
               boundTextElement.x + renderConfig.offsetX,
               boundTextElement.y + renderConfig.offsetY,
               renderConfig,
+            );
+          } else if (boundTextElement) {
+            // SAFETY: This should never happen, but log it just in case
+            console.error(
+              "[NONDELETED][INVARIANT] Skipped rendering deleted bound text element",
             );
           }
         } catch (error: any) {

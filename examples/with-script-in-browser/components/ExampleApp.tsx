@@ -102,6 +102,12 @@ export default function ExampleApp({
   } = excalidrawLib;
   const appRef = useRef<any>(null);
   const [viewModeEnabled, setViewModeEnabled] = useState(false);
+  const [interactive, setInteractive] = useState(true);
+  const [interactiveLinks, setInteractiveLinks] = useState(false);
+  const [interactiveEmbeds, setInteractiveEmbeds] = useState(false);
+  const [interactiveNavigation, setInteractiveNavigation] = useState(false);
+  const [interactiveBrowserZoom, setInteractiveBrowserZoom] = useState(false);
+  const [ui, setUi] = useState(true);
   const [zenModeEnabled, setZenModeEnabled] = useState(false);
   const [gridModeEnabled, setGridModeEnabled] = useState(false);
   const [renderScrollbars, setRenderScrollbars] = useState(false);
@@ -192,6 +198,17 @@ export default function ExampleApp({
           pointersMap: Gesture["pointers"];
         }) => setPointerData(payload),
         viewModeEnabled,
+        interaction: interactive
+          ? true
+          : {
+              enabled: {
+                links: interactiveLinks,
+                embeds: interactiveEmbeds,
+                navigation: interactiveNavigation,
+                browserZoom: interactiveBrowserZoom,
+              },
+            },
+        ui,
         zenModeEnabled,
         renderScrollbars,
         gridModeEnabled,
@@ -699,6 +716,52 @@ export default function ExampleApp({
           <label>
             <input
               type="checkbox"
+              checked={!interactive}
+              onChange={() => setInteractive(!interactive)}
+            />
+            Non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveLinks}
+              onChange={() => setInteractiveLinks(!interactiveLinks)}
+            />
+            Links when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveEmbeds}
+              onChange={() => setInteractiveEmbeds(!interactiveEmbeds)}
+            />
+            Embeds when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveNavigation}
+              onChange={() => setInteractiveNavigation(!interactiveNavigation)}
+            />
+            Navigation when non-interactive
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={interactiveBrowserZoom}
+              onChange={() =>
+                setInteractiveBrowserZoom(!interactiveBrowserZoom)
+              }
+            />
+            Browser zoom when non-interactive
+          </label>
+          <label>
+            <input type="checkbox" checked={!ui} onChange={() => setUi(!ui)} />
+            Hide UI
+          </label>
+          <label>
+            <input
+              type="checkbox"
               checked={zenModeEnabled}
               onChange={() => setZenModeEnabled(!zenModeEnabled)}
             />
@@ -917,8 +980,9 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToViewport: true,
+              excalidrawAPI.setViewport({
+                target: elements[0],
+                fit: "contain",
               });
             }}
           >
@@ -932,33 +996,13 @@ export default function ExampleApp({
               }
 
               const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
-              });
-
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
+              excalidrawAPI.setViewport({
+                target: elements[0],
+                fit: "scale-down",
               });
             }}
           >
             Fit to content, first element
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (!excalidrawAPI) {
-                return;
-              }
-
-              const elements = excalidrawAPI.getSceneElements();
-              excalidrawAPI.scrollToContent(elements[0], {
-                fitToContent: true,
-              });
-
-              excalidrawAPI.scrollToContent(elements[0]);
-            }}
-          >
-            Scroll to first element, no fitToContent, no fitToViewport
           </button>
           <div className="export export-canvas">
             <img src={canvasUrl} alt="" />
