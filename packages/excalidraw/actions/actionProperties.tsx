@@ -232,7 +232,13 @@ export const changeProperty = (
           "[NONDELETED][INVARIANT] changeProperty(): skipping deleted selected/editing element",
         );
       }
-      return callback(element as NonDeletedExcalidrawElement);
+      const nextElement = callback(element as NonDeletedExcalidrawElement);
+      // sticky notes keep their data invariants (never-transparent colors,
+      // solid fill, minimum size) whatever property was written; a no-op
+      // normalization returns the same object
+      return isStickyNoteElement(nextElement)
+        ? normalizeStickyNote(nextElement)
+        : nextElement;
     }
     return element;
   });
@@ -532,15 +538,9 @@ export const actionChangeBackgroundColor = register<
       });
     } else {
       nextElements = changeProperty(elements, appState, (el) =>
-        isStickyNoteElement(el)
-          ? normalizeStickyNote(
-              newElementWith(el, {
-                backgroundColor: value.currentItemBackgroundColor,
-              }),
-            )
-          : newElementWith(el, {
-              backgroundColor: value.currentItemBackgroundColor,
-            }),
+        newElementWith(el, {
+          backgroundColor: value.currentItemBackgroundColor,
+        }),
       );
     }
 
@@ -807,17 +807,10 @@ export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
   perform: (elements, appState, value) => {
     return {
       elements: changeProperty(elements, appState, (el) =>
-        isStickyNoteElement(el)
-          ? normalizeStickyNote(
-              newElementWith(el, {
-                seed: randomInteger(),
-                roughness: value,
-              }),
-            )
-          : newElementWith(el, {
-              seed: randomInteger(),
-              roughness: value,
-            }),
+        newElementWith(el, {
+          seed: randomInteger(),
+          roughness: value,
+        }),
       ),
       appState: { ...appState, currentItemRoughness: value },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -1806,9 +1799,7 @@ export const actionChangeRoundness = register<"sharp" | "round">({
               : null,
         });
 
-        return isStickyNoteElement(nextElement)
-          ? normalizeStickyNote(nextElement)
-          : nextElement;
+        return nextElement;
       }),
       appState: {
         ...appState,

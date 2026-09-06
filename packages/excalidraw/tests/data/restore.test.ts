@@ -239,6 +239,52 @@ describe("restoreElements", () => {
     expect(restoredText.fontSizeMax).toBe(STICKY_NOTE_MAX_FONT_SIZE);
   });
 
+  it("should clear a font ceiling on text that is not bound to a sticky note", () => {
+    // generic binding repair (duplication, history) can detach a label without
+    // touching its ceiling; restore reconciles it against the container
+    const textElement: any = API.createElement({
+      type: "text",
+      text: "text",
+      fontSize: 20,
+    });
+    textElement.fontSizeMax = 28;
+
+    const restoredText = restore.restoreElements([textElement], null, {
+      repairBindings: true,
+    })[0] as ExcalidrawTextElement;
+
+    expect(restoredText.fontSizeMax).toBe(null);
+  });
+
+  it("should seed the font ceiling and a visible stroke on a sticky note label", () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      id: "sticky",
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label: any = {
+      ...API.createElement({
+        type: "text",
+        id: "label",
+        text: "text",
+        fontSize: 20,
+        containerId: "sticky",
+      }),
+      strokeColor: COLOR_PALETTE.transparent,
+    };
+    delete label.fontSizeMax;
+
+    const restored = restore.restoreElements([stickyNote, label], null, {
+      repairBindings: true,
+    });
+    const restoredLabel = restored.find(
+      (element) => element.id === "label",
+    ) as ExcalidrawTextElement;
+
+    expect(restoredLabel.fontSizeMax).toBe(20);
+    expect(restoredLabel.strokeColor).toBe(COLOR_PALETTE.black);
+  });
+
   it("should restore freedraw element correctly", () => {
     const freedrawElement = API.createElement({
       type: "freedraw",
