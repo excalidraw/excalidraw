@@ -217,8 +217,9 @@ export const STICKY_NOTE_FALLBACK_FONT_SIZE = 28;
 export const STICKY_NOTE_FONT_STEP = 2;
 export const STICKY_NOTE_PADDING = 16;
 export const DEFAULT_STICKY_NOTE_SIZE = 250;
-export const STICKY_NOTE_MIN_BASE_WIDTH = 40;
-export const STICKY_NOTE_MIN_BASE_HEIGHT = 40;
+// floor for a finalized note's width and base height; the UI floor is font-aware
+// on top of it (see `getStickyNoteMinSize`)
+export const STICKY_NOTE_MIN_SIZE = 75;
 export const DEFAULT_STICKY_NOTE_BG = "#ffd43b";
 export const STICKY_NOTE_SHADOW_OFFSET = 3;
 export const STICKY_NOTE_SHADOW_OPACITY = 0.16;

@@ -4,8 +4,7 @@ import { vi } from "vitest";
 import {
   DEFAULT_STICKY_NOTE_SIZE,
   KEYS,
-  STICKY_NOTE_MIN_BASE_HEIGHT,
-  STICKY_NOTE_MIN_BASE_WIDTH,
+  STICKY_NOTE_MIN_SIZE,
   reseed,
 } from "@excalidraw/common";
 
@@ -15,8 +14,11 @@ import type {
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+
 import * as InteractiveScene from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
+
+import { API } from "./helpers/api";
 
 import {
   render,
@@ -26,7 +28,11 @@ import {
   restoreOriginalGetBoundingClientRect,
   unmountComponent,
 } from "./test-utils";
-import { getTextEditor, TEXT_EDITOR_SELECTOR } from "./queries/dom";
+import {
+  getTextEditor,
+  TEXT_EDITOR_SELECTOR,
+  updateTextEditor,
+} from "./queries/dom";
 
 unmountComponent();
 
@@ -319,14 +325,44 @@ describe("Test dragCreate", () => {
       await getTextEditor();
 
       // on release it grows to the minimum, away from the origin corner
+      // (the default 20px ceiling fits one line inside the constant floor)
       const stickyNote = h.elements.find(
         (element) => element.type === "stickynote",
       ) as ExcalidrawStickyNoteElement;
       expect(stickyNote.x).toBe(300);
       expect(stickyNote.y).toBe(300);
-      expect(stickyNote.width).toBe(STICKY_NOTE_MIN_BASE_WIDTH);
-      expect(stickyNote.height).toBe(STICKY_NOTE_MIN_BASE_HEIGHT);
-      expect(stickyNote.baseHeight).toBe(STICKY_NOTE_MIN_BASE_HEIGHT);
+      expect(stickyNote.width).toBe(STICKY_NOTE_MIN_SIZE);
+      expect(stickyNote.height).toBe(STICKY_NOTE_MIN_SIZE);
+      expect(stickyNote.baseHeight).toBe(STICKY_NOTE_MIN_SIZE);
+    });
+
+    it("sizes the minimum note to fit one line at a large font ceiling", async () => {
+      const { getByToolName, container } = await render(<Excalidraw />);
+      // 48 × 1.25 line height + 2 × 16 padding = 92 > the 75 floor
+      API.setAppState({ currentItemFontSize: 48 });
+      fireEvent.click(getByToolName("stickynote"));
+
+      const canvas = container.querySelector("canvas.interactive")!;
+      fireEvent.pointerDown(canvas, { clientX: 300, clientY: 300 });
+      fireEvent.pointerMove(canvas, { clientX: 320, clientY: 320 });
+      fireEvent.pointerUp(canvas, { clientX: 320, clientY: 320 });
+      const editor = await getTextEditor();
+
+      const stickyNote = h.elements.find(
+        (element) => element.type === "stickynote",
+      ) as ExcalidrawStickyNoteElement;
+      expect(stickyNote.width).toBe(92);
+      expect(stickyNote.height).toBe(92);
+
+      // one line fits without growing the note
+      updateTextEditor(editor, "A");
+      expect(
+        (
+          h.elements.find(
+            (element) => element.type === "stickynote",
+          ) as ExcalidrawStickyNoteElement
+        ).height,
+      ).toBe(92);
     });
 
     it("keeps the origin corner fixed when a drag toward the top-left snaps to the minimum", async () => {
@@ -345,7 +381,7 @@ describe("Test dragCreate", () => {
       // the bottom-right corner is where the pointer went down
       expect(stickyNote.x + stickyNote.width).toBe(300);
       expect(stickyNote.y + stickyNote.height).toBe(300);
-      expect(stickyNote.width).toBe(STICKY_NOTE_MIN_BASE_WIDTH);
+      expect(stickyNote.width).toBe(STICKY_NOTE_MIN_SIZE);
     });
   });
 

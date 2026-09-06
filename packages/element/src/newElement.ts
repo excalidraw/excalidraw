@@ -4,8 +4,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_STICKY_NOTE_SIZE,
-  STICKY_NOTE_MIN_BASE_HEIGHT,
-  STICKY_NOTE_MIN_BASE_WIDTH,
+  STICKY_NOTE_MIN_SIZE,
   DEFAULT_VERTICAL_ALIGN,
   DEFAULT_STROKE_STREAMLINE,
   VERTICAL_ALIGN,
@@ -208,10 +207,10 @@ export const normalizeStickyNoteGeometry = <
 >(
   element: T,
 ): T => {
-  const width = Math.max(element.width, STICKY_NOTE_MIN_BASE_WIDTH);
+  const width = Math.max(element.width, STICKY_NOTE_MIN_SIZE);
   const baseHeight = Math.max(
     element.baseHeight || element.height || DEFAULT_STICKY_NOTE_SIZE,
-    STICKY_NOTE_MIN_BASE_HEIGHT,
+    STICKY_NOTE_MIN_SIZE,
   );
 
   return newElementWith(element as ExcalidrawStickyNoteElement, {

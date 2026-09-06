@@ -6,11 +6,11 @@ import {
   STICKY_NOTE_FALLBACK_FONT_SIZE,
   STICKY_NOTE_FONT_STEP,
   STICKY_NOTE_MAX_FONT_SIZE,
-  STICKY_NOTE_MIN_BASE_HEIGHT,
-  STICKY_NOTE_MIN_BASE_WIDTH,
+  STICKY_NOTE_MIN_SIZE,
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
   getFontString,
+  getLineHeight,
   isTransparent,
 } from "@excalidraw/common";
 
@@ -319,6 +319,25 @@ export const getUserFontSizeUpdate = (
     : { fontSize };
 };
 
+/**
+ * The smallest note the UI lets a user create or resize to: a square that
+ * fits one line at the label's font ceiling (plus padding), never below
+ * `STICKY_NOTE_MIN_SIZE`. Without the font term a fresh note would grow on
+ * the very first keystroke. Data-level passes (restore, action post-passes)
+ * only enforce the constant floor — the layout grows a note as needed.
+ */
+export const getStickyNoteMinSize = ({
+  fontSize,
+  fontFamily,
+}: Pick<ExcalidrawTextElement, "fontSize" | "fontFamily">) => {
+  const lineHeightPx =
+    normalizeStickyNoteFontSize(fontSize) * getLineHeight(fontFamily);
+  return Math.max(
+    STICKY_NOTE_MIN_SIZE,
+    Math.round(lineHeightPx) + STICKY_NOTE_PADDING * 2,
+  );
+};
+
 // -----------------------------------------------------------------------------
 // layout — one pure calculation, two ways of applying it
 // -----------------------------------------------------------------------------
@@ -373,7 +392,7 @@ type FontFit = {
 const NO_ELEMENTS: ElementsMap = new Map();
 
 const getStickyNoteBaseWidth = (container: ExcalidrawStickyNoteElement) => {
-  return Math.max(container.width, STICKY_NOTE_MIN_BASE_WIDTH);
+  return Math.max(container.width, STICKY_NOTE_MIN_SIZE);
 };
 
 /**
@@ -506,7 +525,7 @@ export const getStickyNoteLayout = (
   const baseWidth = getStickyNoteBaseWidth(container);
   const baseHeight = Math.max(
     opts.baseHeight ?? (container.baseHeight || container.height),
-    STICKY_NOTE_MIN_BASE_HEIGHT,
+    STICKY_NOTE_MIN_SIZE,
   );
   const anchor = opts.anchor ?? "top";
 

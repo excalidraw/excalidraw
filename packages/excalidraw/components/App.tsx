@@ -59,8 +59,6 @@ import {
   ARROW_TYPE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   DEFAULT_STICKY_NOTE_SIZE,
-  STICKY_NOTE_MIN_BASE_HEIGHT,
-  STICKY_NOTE_MIN_BASE_WIDTH,
   isLocalLink,
   normalizeLink,
   toValidURL,
@@ -178,6 +176,7 @@ import {
   getContainerElement,
   getColorUpdate,
   getStickyNoteLayout,
+  getStickyNoteMinSize,
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
@@ -12018,11 +12017,14 @@ class App extends React.Component<AppProps, AppState> {
             height: size,
           };
         } else {
-          const width = Math.max(newElement.width, STICKY_NOTE_MIN_BASE_WIDTH);
-          const height = Math.max(
-            newElement.height,
-            STICKY_NOTE_MIN_BASE_HEIGHT,
-          );
+          // one line at the current font ceiling must fit, or the note would
+          // grow on the first keystroke
+          const minSize = getStickyNoteMinSize({
+            fontSize: this.state.currentItemFontSize,
+            fontFamily: this.state.currentItemFontFamily,
+          });
+          const width = Math.max(newElement.width, minSize);
+          const height = Math.max(newElement.height, minSize);
           const { originInGrid } = pointerDownState;
           nextGeometry = {
             // a drag toward the top/left put the note's origin before the

@@ -10,8 +10,7 @@ import {
 import {
   MIN_FONT_SIZE,
   SHIFT_LOCKING_ANGLE,
-  STICKY_NOTE_MIN_BASE_HEIGHT,
-  STICKY_NOTE_MIN_BASE_WIDTH,
+  STICKY_NOTE_MIN_SIZE,
   rescalePoints,
   getFontString,
 } from "@excalidraw/common";
@@ -65,6 +64,7 @@ import {
 
 import { isInGroup } from "./groups";
 import {
+  getStickyNoteMinSize,
   getStickyNoteResizeIntent,
   updateStickyNoteLayout,
 } from "./stickyNote";
@@ -760,6 +760,16 @@ export const resizeSingleElement = (
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElement = getBoundTextElement(latestElement, elementsMap);
   const isResizingStickyNote = isStickyNoteElement(latestElement);
+  // a note never shrinks below one line at its label's ceiling (an empty note
+  // gets the constant floor; the layout grows it once it has a label)
+  const stickyNoteMinSize = isResizingStickyNote
+    ? boundTextElement
+      ? getStickyNoteMinSize({
+          fontSize: boundTextElement.fontSizeMax ?? boundTextElement.fontSize,
+          fontFamily: boundTextElement.fontFamily,
+        })
+      : STICKY_NOTE_MIN_SIZE
+    : 0;
 
   if (boundTextElement) {
     const stateOfBoundTextElementAtResize = originalElementsMap.get(
@@ -771,8 +781,8 @@ export const resizeSingleElement = (
       };
     }
     if (isResizingStickyNote) {
-      nextWidth = Math.max(nextWidth, STICKY_NOTE_MIN_BASE_WIDTH);
-      nextHeight = Math.max(nextHeight, STICKY_NOTE_MIN_BASE_HEIGHT);
+      nextWidth = Math.max(nextWidth, stickyNoteMinSize);
+      nextHeight = Math.max(nextHeight, stickyNoteMinSize);
     } else if (shouldMaintainAspectRatio) {
       const updatedElement = {
         ...latestElement,
@@ -804,8 +814,8 @@ export const resizeSingleElement = (
       nextHeight = Math.max(nextHeight, minHeight);
     }
   } else if (isResizingStickyNote) {
-    nextWidth = Math.max(nextWidth, STICKY_NOTE_MIN_BASE_WIDTH);
-    nextHeight = Math.max(nextHeight, STICKY_NOTE_MIN_BASE_HEIGHT);
+    nextWidth = Math.max(nextWidth, stickyNoteMinSize);
+    nextHeight = Math.max(nextHeight, stickyNoteMinSize);
   }
 
   const rescaledPoints = rescalePointsInElement(
