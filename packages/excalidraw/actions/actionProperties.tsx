@@ -21,6 +21,7 @@ import {
   arrayToMap,
   getFontFamilyString,
   getLineHeight,
+  isArabicFont,
   isTransparent,
   getStrokeWidthByKey,
   reduceToCommonValue,
@@ -1172,6 +1173,11 @@ export const actionChangeFontFamily = register<{
       appState: {
         ...appState,
         ...nextAppState,
+        ...(nextFontFamily
+          ? isArabicFont(nextFontFamily)
+            ? { lastArabicFontFamily: nextFontFamily }
+            : { lastLatinFontFamily: nextFontFamily }
+          : {}),
       },
       captureUpdate: nextCaptureUpdateAction,
     };
