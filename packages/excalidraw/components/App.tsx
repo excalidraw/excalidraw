@@ -428,7 +428,7 @@ import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
-import { createTableElements, isTableElement } from "../table";
+import { createTableElements, isTableElement, syncTableLayout } from "../table";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -6311,12 +6311,31 @@ class App extends React.Component<AppProps, AppState> {
         if (isNonDeletedElement(element)) {
           updateBoundElements(element, this.scene);
         }
+        if (element.containerId) {
+          const container = getContainerElement(
+            element,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          if (container && isTableElement(container)) {
+            syncTableLayout(container, this.scene);
+          }
+        }
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         this.textWysiwygSubmitHandler = null;
 
         const isDeleted = !nextOriginalText.trim();
         updateElement(nextOriginalText, isDeleted);
+
+        if (element.containerId) {
+          const container = getContainerElement(
+            element,
+            this.scene.getNonDeletedElementsMap(),
+          );
+          if (container && isTableElement(container)) {
+            syncTableLayout(container, this.scene);
+          }
+        }
 
         // keyboard-submit keeps focus on the edited object. For bound text, keep
         // the container selected even if the text becomes empty and is deleted.

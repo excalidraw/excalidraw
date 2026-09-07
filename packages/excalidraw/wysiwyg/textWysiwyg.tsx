@@ -54,6 +54,8 @@ import type {
   ExcalidrawTextContainer,
 } from "@excalidraw/element/types";
 
+import { isTableElement, syncTableLayout } from "../table";
+
 import { actionSaveToActiveFile } from "../actions";
 
 import {
@@ -339,6 +341,15 @@ export const textWysiwyg = ({
             container.type,
           );
 
+          if (isTableElement(container)) {
+            syncTableLayout(container, app.scene, {
+              targetCellId: container.id,
+              targetCellHeight: targetContainerHeight,
+            });
+            updateBoundElements(container, app.scene);
+            return;
+          }
+
           app.scene.mutateElement(container, { height: targetContainerHeight });
           updateBoundElements(container, app.scene);
           return;
@@ -346,13 +357,25 @@ export const textWysiwyg = ({
           // autoshrink container height until original container height
           // is reached when text is removed
           !isArrowElement(container) &&
-          container.height > originalContainerData.height &&
+          container.height >
+            ((container.customData?.baseHeight as number | undefined) ??
+              originalContainerData.height) &&
           height < maxHeight
         ) {
           const targetContainerHeight = computeContainerDimensionForBoundText(
             height,
             container.type,
           );
+
+          if (isTableElement(container)) {
+            syncTableLayout(container, app.scene, {
+              targetCellId: container.id,
+              targetCellHeight: targetContainerHeight,
+            });
+            updateBoundElements(container, app.scene);
+            return;
+          }
+
           app.scene.mutateElement(container, { height: targetContainerHeight });
           updateBoundElements(container, app.scene);
         } else {
@@ -840,6 +863,9 @@ export const textWysiwyg = ({
       }
 
       redrawTextBoundingBox(updateElement, container, app.scene);
+      if (isTableElement(container)) {
+        syncTableLayout(container, app.scene);
+      }
     }
 
     onSubmit({

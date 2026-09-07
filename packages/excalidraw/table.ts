@@ -14,6 +14,11 @@ import { nanoid } from "nanoid";
 import {
   newElement,
   newElementWith,
+  computeContainerDimensionForBoundText,
+  computeBoundTextPosition,
+  updateOriginalContainerCache,
+  syncInvalidIndices,
+  Scene,
 } from "@excalidraw/element";
 
 import type { AppState, UIAppState } from "./types";
@@ -22,6 +27,7 @@ import type {
   NonDeleted,
   ExcalidrawRectangleElement,
   ExcalidrawTextElement,
+  ExcalidrawTextElementWithContainer,
   OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -34,6 +40,8 @@ export type TableCustomData = {
   col?: number;
   rows: number;
   cols: number;
+  baseWidth?: number;
+  baseHeight?: number;
 };
 
 export type CreateTableOptions = {
@@ -126,13 +134,15 @@ export const createTableElements = ({
           col,
           rows: numRows,
           cols: numCols,
+          baseWidth: cellWidth,
+          baseHeight: cellHeight,
         },
       }) as NonDeleted<ExcalidrawRectangleElement>;
       elements.push(cellRect);
     }
   }
 
-  return elements;
+  return syncInvalidIndices(elements);
 };
 
 /**
@@ -217,6 +227,17 @@ export const getTableStructure = (
           texts.set(`${data.row}_${data.col}`, boundText as ExcalidrawTextElement);
         }
       }
+      if (!texts.has(`${data.row}_${data.col}`)) {
+        const boundText = allTableElements.find(
+          (t) =>
+            !t.isDeleted &&
+            t.type === "text" &&
+            (t as ExcalidrawTextElement).containerId === el.id,
+        );
+        if (boundText) {
+          texts.set(`${data.row}_${data.col}`, boundText as ExcalidrawTextElement);
+        }
+      }
     }
   }
 
@@ -243,6 +264,477 @@ export const getTableStructure = (
     cellHeight,
     allTableElements,
   };
+};
+
+/**
+ * Synchronizes the visual layout of a table so that:
+ * - All cells in a given row share the same height:
+ *   Math.max(baseHeight, max(needed cell heights in this row))
+ * - All cells in a given column share the same width:
+ *   Math.max(baseWidth, max(needed cell widths in this column))
+ * - Lower rows are shifted down/up to match row heights without gaps or overlap.
+ * - Bound text elements are repositioned to stay centered in their updated cells.
+ */
+export const syncTableLayout = (
+  targetElement: ExcalidrawElement,
+  scene: Scene,
+  options?: {
+    targetCellId?: string;
+    targetCellHeight?: number;
+    targetCellWidth?: number;
+  },
+): boolean => {
+  let cellElement: ExcalidrawElement | null = targetElement;
+  if (!cellElement.customData?.isTableCell && (cellElement as any).containerId) {
+    const container = scene.getElement((cellElement as any).containerId);
+    if (container && isTableElement(container)) {
+      cellElement = container;
+    }
+  }
+
+  if (!isTableElement(cellElement)) {
+    return false;
+  }
+
+  const tableId = cellElement.customData?.tableId;
+  if (!tableId) {
+    return false;
+  }
+
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const allElements = scene.getNonDeletedElements();
+
+  const cells = new Map<string, ExcalidrawRectangleElement>();
+  const texts = new Map<string, ExcalidrawTextElement>();
+  const allTableCells: ExcalidrawRectangleElement[] = [];
+
+  let maxRow = 0;
+  let maxCol = 0;
+
+  for (const el of allElements) {
+    if (
+      el.customData?.tableId === tableId &&
+      el.customData?.isTableCell &&
+      el.type === "rectangle"
+    ) {
+      const data = el.customData as TableCustomData;
+      if (data.row !== undefined && data.col !== undefined) {
+        cells.set(`${data.row}_${data.col}`, el as ExcalidrawRectangleElement);
+        allTableCells.push(el as ExcalidrawRectangleElement);
+        maxRow = Math.max(maxRow, data.row);
+        maxCol = Math.max(maxCol, data.col);
+      }
+    }
+  }
+
+  if (allTableCells.length === 0) {
+    return false;
+  }
+
+  const numRows = maxRow + 1;
+  const numCols = maxCol + 1;
+
+  // Find bound text elements for each cell
+  for (let r = 0; r < numRows; r++) {
+    for (let c = 0; c < numCols; c++) {
+      const cell = cells.get(`${r}_${c}`);
+      if (!cell) {
+        continue;
+      }
+
+      const boundTextId = cell.boundElements?.find((b) => b.type === "text")?.id;
+      if (boundTextId) {
+        const textEl = elementsMap.get(boundTextId);
+        if (textEl && !textEl.isDeleted && textEl.type === "text") {
+          texts.set(`${r}_${c}`, textEl as ExcalidrawTextElement);
+          continue;
+        }
+      }
+
+      const boundText = allElements.find(
+        (el) =>
+          !el.isDeleted &&
+          el.type === "text" &&
+          (el as ExcalidrawTextElement).containerId === cell.id,
+      );
+      if (boundText) {
+        texts.set(`${r}_${c}`, boundText as ExcalidrawTextElement);
+      }
+    }
+  }
+
+  // Determine origin (x, y)
+  let originX = Infinity;
+  let originY = Infinity;
+  for (const cell of allTableCells) {
+    if (cell.customData?.col === 0) {
+      originX = Math.min(originX, cell.x);
+    }
+    if (cell.customData?.row === 0) {
+      originY = Math.min(originY, cell.y);
+    }
+  }
+  if (!Number.isFinite(originX)) {
+    originX = Math.min(...allTableCells.map((c) => c.x));
+  }
+  if (!Number.isFinite(originY)) {
+    originY = Math.min(...allTableCells.map((c) => c.y));
+  }
+
+  // Calculate column widths
+  const colWidths: number[] = new Array(numCols).fill(0);
+  for (let c = 0; c < numCols; c++) {
+    let maxW = 40;
+    for (let r = 0; r < numRows; r++) {
+      const cell = cells.get(`${r}_${c}`);
+      if (cell) {
+        const baseW =
+          (cell.customData?.baseWidth as number | undefined) ?? cell.width ?? 80;
+        maxW = Math.max(maxW, baseW);
+        if (
+          options?.targetCellId === cell.id &&
+          options.targetCellWidth !== undefined
+        ) {
+          maxW = Math.max(maxW, options.targetCellWidth);
+        }
+      }
+    }
+    colWidths[c] = maxW;
+  }
+
+  // Calculate row heights
+  const rowHeights: number[] = new Array(numRows).fill(0);
+  for (let r = 0; r < numRows; r++) {
+    let maxH = 30;
+    for (let c = 0; c < numCols; c++) {
+      const cell = cells.get(`${r}_${c}`);
+      if (!cell) {
+        continue;
+      }
+      const baseH =
+        (cell.customData?.baseHeight as number | undefined) ?? 40;
+      let neededH = baseH;
+
+      if (
+        options?.targetCellId === cell.id &&
+        options.targetCellHeight !== undefined
+      ) {
+        neededH = Math.max(neededH, options.targetCellHeight);
+      } else {
+        const text = texts.get(`${r}_${c}`);
+        if (text && !text.isDeleted && text.text) {
+          const dimension = computeContainerDimensionForBoundText(
+            text.height,
+            "rectangle",
+          );
+          neededH = Math.max(neededH, dimension);
+        }
+      }
+      maxH = Math.max(maxH, neededH);
+    }
+    rowHeights[r] = maxH;
+  }
+
+  // Cumulative positions
+  const colPositions: number[] = new Array(numCols).fill(0);
+  let curX = originX;
+  for (let c = 0; c < numCols; c++) {
+    colPositions[c] = curX;
+    curX += colWidths[c];
+  }
+
+  const rowPositions: number[] = new Array(numRows).fill(0);
+  let curY = originY;
+  for (let r = 0; r < numRows; r++) {
+    rowPositions[r] = curY;
+    curY += rowHeights[r];
+  }
+
+  let hasChanged = false;
+
+  for (let r = 0; r < numRows; r++) {
+    for (let c = 0; c < numCols; c++) {
+      const cell = cells.get(`${r}_${c}`);
+      if (!cell) {
+        continue;
+      }
+
+      const targetX = colPositions[c];
+      const targetY = rowPositions[r];
+      const targetW = colWidths[c];
+      const targetH = rowHeights[r];
+
+      const cellChanged =
+        Math.abs(cell.x - targetX) > 0.01 ||
+        Math.abs(cell.y - targetY) > 0.01 ||
+        Math.abs(cell.width - targetW) > 0.01 ||
+        Math.abs(cell.height - targetH) > 0.01;
+
+      if (cellChanged) {
+        hasChanged = true;
+        scene.mutateElement(
+          cell,
+          {
+            x: targetX,
+            y: targetY,
+            width: targetW,
+            height: targetH,
+            customData: {
+              ...cell.customData,
+              row: r,
+              col: c,
+              rows: numRows,
+              cols: numCols,
+              baseWidth: cell.customData?.baseWidth ?? targetW,
+              baseHeight: cell.customData?.baseHeight ?? targetH,
+            },
+          },
+          { informMutation: false, isDragging: false },
+        );
+        updateOriginalContainerCache(cell.id, targetH);
+      }
+
+      const text = texts.get(`${r}_${c}`);
+      if (text) {
+        const boundPos = computeBoundTextPosition(
+          cell,
+          text as ExcalidrawTextElementWithContainer,
+          elementsMap,
+        );
+        const textChanged =
+          Math.abs(text.x - boundPos.x) > 0.01 ||
+          Math.abs(text.y - boundPos.y) > 0.01;
+
+        if (textChanged) {
+          hasChanged = true;
+          scene.mutateElement(
+            text,
+            {
+              x: boundPos.x,
+              y: boundPos.y,
+            },
+            { informMutation: false, isDragging: false },
+          );
+        }
+      }
+    }
+  }
+
+  if (hasChanged) {
+    scene.triggerUpdate();
+  }
+
+  return hasChanged;
+};
+
+/**
+ * Pure helper to synchronize an immutable array of elements for a table.
+ */
+export const syncTableElements = <T extends readonly ExcalidrawElement[]>(
+  elements: T,
+  tableId: string,
+): T => {
+  const elementsMap = new Map(elements.map((el) => [el.id, el]));
+  const tableCells: ExcalidrawRectangleElement[] = [];
+  const cellMap = new Map<string, ExcalidrawRectangleElement>();
+  const textMap = new Map<string, ExcalidrawTextElement>();
+
+  let maxRow = 0;
+  let maxCol = 0;
+
+  for (const el of elements) {
+    if (
+      !el.isDeleted &&
+      el.customData?.tableId === tableId &&
+      el.customData?.isTableCell &&
+      el.type === "rectangle"
+    ) {
+      const data = el.customData as TableCustomData;
+      if (data.row !== undefined && data.col !== undefined) {
+        tableCells.push(el as ExcalidrawRectangleElement);
+        cellMap.set(`${data.row}_${data.col}`, el as ExcalidrawRectangleElement);
+        maxRow = Math.max(maxRow, data.row);
+        maxCol = Math.max(maxCol, data.col);
+      }
+    }
+  }
+
+  if (tableCells.length === 0) {
+    return elements;
+  }
+
+  const numRows = maxRow + 1;
+  const numCols = maxCol + 1;
+
+  for (let r = 0; r < numRows; r++) {
+    for (let c = 0; c < numCols; c++) {
+      const cell = cellMap.get(`${r}_${c}`);
+      if (!cell) {
+        continue;
+      }
+
+      const boundTextId = cell.boundElements?.find((b) => b.type === "text")?.id;
+      if (boundTextId) {
+        const textEl = elementsMap.get(boundTextId);
+        if (textEl && !textEl.isDeleted && textEl.type === "text") {
+          textMap.set(`${r}_${c}`, textEl as ExcalidrawTextElement);
+          continue;
+        }
+      }
+      const boundText = elements.find(
+        (el) =>
+          !el.isDeleted &&
+          el.type === "text" &&
+          (el as ExcalidrawTextElement).containerId === cell.id,
+      );
+      if (boundText) {
+        textMap.set(`${r}_${c}`, boundText as ExcalidrawTextElement);
+      }
+    }
+  }
+
+  let originX = Infinity;
+  let originY = Infinity;
+  for (const cell of tableCells) {
+    if (cell.customData?.col === 0) {
+      originX = Math.min(originX, cell.x);
+    }
+    if (cell.customData?.row === 0) {
+      originY = Math.min(originY, cell.y);
+    }
+  }
+  if (!Number.isFinite(originX)) {
+    originX = Math.min(...tableCells.map((c) => c.x));
+  }
+  if (!Number.isFinite(originY)) {
+    originY = Math.min(...tableCells.map((c) => c.y));
+  }
+
+  const colWidths: number[] = new Array(numCols).fill(0);
+  for (let c = 0; c < numCols; c++) {
+    let maxW = 40;
+    for (let r = 0; r < numRows; r++) {
+      const cell = cellMap.get(`${r}_${c}`);
+      if (cell) {
+        const baseW =
+          (cell.customData?.baseWidth as number | undefined) ?? cell.width ?? 80;
+        maxW = Math.max(maxW, baseW);
+      }
+    }
+    colWidths[c] = maxW;
+  }
+
+  const rowHeights: number[] = new Array(numRows).fill(0);
+  for (let r = 0; r < numRows; r++) {
+    let maxH = 30;
+    for (let c = 0; c < numCols; c++) {
+      const cell = cellMap.get(`${r}_${c}`);
+      if (!cell) {
+        continue;
+      }
+
+      const baseH =
+        (cell.customData?.baseHeight as number | undefined) ?? 40;
+      let neededH = baseH;
+
+      const text = textMap.get(`${r}_${c}`);
+      if (text && !text.isDeleted && text.text) {
+        const dimension = computeContainerDimensionForBoundText(
+          text.height,
+          "rectangle",
+        );
+        neededH = Math.max(neededH, dimension);
+      }
+      maxH = Math.max(maxH, neededH);
+    }
+    rowHeights[r] = maxH;
+  }
+
+  const colPositions: number[] = new Array(numCols).fill(0);
+  let curX = originX;
+  for (let c = 0; c < numCols; c++) {
+    colPositions[c] = curX;
+    curX += colWidths[c];
+  }
+
+  const rowPositions: number[] = new Array(numRows).fill(0);
+  let curY = originY;
+  for (let r = 0; r < numRows; r++) {
+    rowPositions[r] = curY;
+    curY += rowHeights[r];
+  }
+
+  const mutatedMap = new Map<string, ExcalidrawElement>();
+
+  for (let r = 0; r < numRows; r++) {
+    for (let c = 0; c < numCols; c++) {
+      const cell = cellMap.get(`${r}_${c}`);
+      if (!cell) {
+        continue;
+      }
+
+      const targetX = colPositions[c];
+      const targetY = rowPositions[r];
+      const targetW = colWidths[c];
+      const targetH = rowHeights[r];
+
+      const cellChanged =
+        Math.abs(cell.x - targetX) > 0.01 ||
+        Math.abs(cell.y - targetY) > 0.01 ||
+        Math.abs(cell.width - targetW) > 0.01 ||
+        Math.abs(cell.height - targetH) > 0.01;
+
+      const updatedCell = cellChanged
+        ? newElementWith(cell, {
+            x: targetX,
+            y: targetY,
+            width: targetW,
+            height: targetH,
+            customData: {
+              ...cell.customData,
+              row: r,
+              col: c,
+              rows: numRows,
+              cols: numCols,
+              baseWidth: cell.customData?.baseWidth ?? targetW,
+              baseHeight: cell.customData?.baseHeight ?? targetH,
+            },
+          })
+        : cell;
+
+      if (cellChanged) {
+        mutatedMap.set(cell.id, updatedCell);
+      }
+
+      const text = textMap.get(`${r}_${c}`);
+      if (text) {
+        const boundPos = computeBoundTextPosition(
+          updatedCell,
+          text as ExcalidrawTextElementWithContainer,
+          elementsMap as any,
+        );
+        const textChanged =
+          Math.abs(text.x - boundPos.x) > 0.01 ||
+          Math.abs(text.y - boundPos.y) > 0.01;
+
+        if (textChanged) {
+          mutatedMap.set(
+            text.id,
+            newElementWith(text, {
+              x: boundPos.x,
+              y: boundPos.y,
+            }),
+          );
+        }
+      }
+    }
+  }
+
+  if (mutatedMap.size === 0) {
+    return elements;
+  }
+
+  return elements.map((el) => mutatedMap.get(el.id) || el) as unknown as T;
 };
 
 /**
@@ -377,6 +869,8 @@ export const insertTableRow = (
         col: c,
         rows: newRows,
         cols,
+        baseWidth: cellWidth,
+        baseHeight: cellHeight,
       },
     }) as NonDeleted<ExcalidrawRectangleElement>;
 
@@ -387,8 +881,13 @@ export const insertTableRow = (
     return mutatedElementsMap.get(el.id) || el;
   }) as OrderedExcalidrawElement[];
 
+  const allElements = [
+    ...nextElements,
+    ...(newElementsToAdd as OrderedExcalidrawElement[]),
+  ];
+
   return {
-    elements: [...nextElements, ...(newElementsToAdd as OrderedExcalidrawElement[])],
+    elements: syncTableElements(allElements, tableId),
     appState,
   };
 };
@@ -525,6 +1024,8 @@ export const insertTableColumn = (
         col: insertIndex,
         rows,
         cols: newCols,
+        baseWidth: cellWidth,
+        baseHeight: cellHeight,
       },
     }) as NonDeleted<ExcalidrawRectangleElement>;
 
@@ -535,8 +1036,13 @@ export const insertTableColumn = (
     return mutatedElementsMap.get(el.id) || el;
   }) as OrderedExcalidrawElement[];
 
+  const allElements = [
+    ...nextElements,
+    ...(newElementsToAdd as OrderedExcalidrawElement[]),
+  ];
+
   return {
-    elements: [...nextElements, ...(newElementsToAdd as OrderedExcalidrawElement[])],
+    elements: syncTableElements(allElements, tableId),
     appState,
   };
 };
@@ -555,6 +1061,7 @@ export const deleteTableRow = (
   }
 
   const {
+    tableId,
     cells,
     texts,
     rows,
@@ -650,7 +1157,7 @@ export const deleteTableRow = (
     .map((el) => mutatedElementsMap.get(el.id) || el) as OrderedExcalidrawElement[];
 
   return {
-    elements: nextElements,
+    elements: syncTableElements(nextElements, tableId),
     appState,
   };
 };
@@ -669,6 +1176,7 @@ export const deleteTableColumn = (
   }
 
   const {
+    tableId,
     cells,
     texts,
     rows,
@@ -764,7 +1272,7 @@ export const deleteTableColumn = (
     .map((el) => mutatedElementsMap.get(el.id) || el) as OrderedExcalidrawElement[];
 
   return {
-    elements: nextElements,
+    elements: syncTableElements(nextElements, tableId),
     appState,
   };
 };
