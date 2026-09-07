@@ -36,6 +36,10 @@ type ExportOpts = {
     width: number,
     height: number,
   ) => { width: number; height: number; scale?: number };
+  // Document the elements' fonts should be resolved against — matters when
+  // exporting a scene mounted in a different document (e.g. an iframe) than
+  // the one this module was loaded into. See #11974.
+  ownerDocument?: Document;
 };
 
 export const exportToCanvas = ({
@@ -46,6 +50,7 @@ export const exportToCanvas = ({
   getDimensions,
   exportPadding,
   exportingFrame,
+  ownerDocument,
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
@@ -61,7 +66,13 @@ export const exportToCanvas = ({
     restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
+    {
+      exportBackground,
+      exportPadding,
+      viewBackgroundColor,
+      exportingFrame,
+      ownerDocument,
+    },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 

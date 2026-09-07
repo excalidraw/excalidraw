@@ -1,4 +1,5 @@
 import { MIME_TYPES } from "@excalidraw/common";
+import { Fonts } from "@excalidraw/excalidraw/fonts";
 import * as mockedSceneExportUtils from "@excalidraw/excalidraw/scene/export";
 import { diagramFactory } from "@excalidraw/excalidraw/tests/fixtures/diagramFixture";
 import { vi } from "vitest";
@@ -27,6 +28,42 @@ describe("exportToCanvas", async () => {
 
     expect(canvas.width).toBe(200);
     expect(canvas.height).toBe(200);
+  });
+
+  it("resolves fonts against the given ownerDocument (#12027)", async () => {
+    const loadElementsFontsSpy = vi
+      .spyOn(Fonts, "loadElementsFonts")
+      .mockResolvedValue([]);
+    const iframeDocument = document.implementation.createHTMLDocument();
+
+    await utils.exportToCanvas({
+      ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      ownerDocument: iframeDocument,
+    });
+
+    expect(loadElementsFontsSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      iframeDocument,
+    );
+
+    loadElementsFontsSpy.mockRestore();
+  });
+
+  it("defaults to the global document when no ownerDocument is given (#12027)", async () => {
+    const loadElementsFontsSpy = vi
+      .spyOn(Fonts, "loadElementsFonts")
+      .mockResolvedValue([]);
+
+    await utils.exportToCanvas({
+      ...diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+    });
+
+    expect(loadElementsFontsSpy).toHaveBeenCalledWith(
+      expect.anything(),
+      document,
+    );
+
+    loadElementsFontsSpy.mockRestore();
   });
 });
 
