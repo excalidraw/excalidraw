@@ -345,6 +345,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endBinding: FixedPointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
+    splitPoints: readonly number[] | null;
   }>;
 
 export type ExcalidrawLineElement = ExcalidrawLinearElement &
@@ -369,6 +370,7 @@ export type ExcalidrawElbowArrowElement = Merge<
   ExcalidrawArrowElement,
   {
     elbowed: true;
+    splitPoints: null;
     fixedSegments: readonly FixedSegment[] | null;
     startBinding: FixedPointBinding | null;
     endBinding: FixedPointBinding | null;

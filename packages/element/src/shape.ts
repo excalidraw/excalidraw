@@ -55,6 +55,11 @@ import {
   isLinearElement,
 } from "./typeChecks";
 import { getCornerRadius, isPathALoop } from "./utils";
+import {
+  generateSplitCurves,
+  getSplitPointGroups,
+  getSplitPoints,
+} from "./splitPoints";
 import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
@@ -220,6 +225,10 @@ export const generateRoughOptions = (
     hachureGap: element.strokeWidth * 4,
     roughness: adjustRoughness(element),
     stroke: applyDarkModeFilter(element.strokeColor, isDarkMode),
+    // note that rough.js only honors preserveVertices for lines/linear
+    // paths and svg paths. Curves always offset their vertices with
+    // roughness, so split arrows instead pin their shared boundary
+    // vertices in `generateSplitCurves()`
     preserveVertices:
       continuousPath || element.roughness < ROUGHNESS.cartoonist,
   };
@@ -575,6 +584,14 @@ const getArrowheadShapes = (
   }
 };
 
+const generateSplittableCurve = (
+  generator: RoughGenerator,
+  element: ExcalidrawElement,
+  points: readonly LocalPoint[],
+  options: Options,
+): Drawable =>
+  generateSplitCurves(generator, points, getSplitPoints(element), options);
+
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
@@ -619,11 +636,17 @@ export const generateLinearCollisionShape = (
         });
       }
 
-      return generator
-        .curve(points as unknown as RoughPoint[], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i) => {
-          if (i === 0) {
+      // SAFETY: LocalPoint pairs are readonly finite [x, y] numbers, exactly
+      // the shape roughjs consumes as RoughPoint; the cast only drops
+      // readonly
+      return getSplitPointGroups(points, getSplitPoints(element))
+        .flatMap((group) =>
+          generator
+            .curve(group as unknown as RoughPoint[], options)
+            .sets[0].ops.slice(0, group.length),
+        )
+        .map((op) => {
+          if (op.op === "move") {
             const p = pointRotateRads<GlobalPoint>(
               pointFrom<GlobalPoint>(
                 element.x + op.data[0],
@@ -906,15 +929,25 @@ const _generateElementShape = (
         // this simplifies finding the curve for an element
         if (options.fill) {
           shape = [
-            generator.polygon(points as unknown as RoughPoint[], options),
+            generator.polygon(
+              // SAFETY: LocalPoint -> RoughPoint; the cast only drops
+              // readonly
+              points as unknown as RoughPoint[],
+              options,
+            ),
           ];
         } else {
           shape = [
-            generator.linearPath(points as unknown as RoughPoint[], options),
+            generator.linearPath(
+              // SAFETY: LocalPoint -> RoughPoint; the cast only drops
+              // readonly
+              points as unknown as RoughPoint[],
+              options,
+            ),
           ];
         }
       } else {
-        shape = [generator.curve(points as unknown as RoughPoint[], options)];
+        shape = [generateSplittableCurve(generator, element, points, options)];
       }
 
       // add lines only in arrow
@@ -1267,11 +1300,17 @@ export const getFreedrawOutlinePoints = (
 export const getFreedrawStrokeCenterPoints = (
   element: ExcalidrawFreeDrawElement,
 ): [number, number][] =>
-  getStrokePoints(element.points as unknown as number[][], {
-    size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
-    streamline: getFreedrawStreamline(element),
-    last: true,
-  }).map((strokePoint) => strokePoint.point as [number, number]);
+  getStrokePoints(
+    // SAFETY: freedraw points are [x, y] coordinate pairs, which is all
+    // perfect-freehand's getStrokePoints reads; the cast only widens the
+    // tuple to number[]
+    element.points as unknown as number[][],
+    {
+      size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
+      streamline: getFreedrawStreamline(element),
+      last: true,
+    },
+  ).map((strokePoint) => strokePoint.point as [number, number]);
 
 const med = (A: number[], B: number[]) => {
   return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];

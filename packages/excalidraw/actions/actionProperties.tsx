@@ -2010,6 +2010,8 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
             : null,
         elbowed: value === ARROW_TYPE.elbow,
         angle: value === ARROW_TYPE.elbow ? (0 as Radians) : el.angle,
+        splitPoints:
+          value === ARROW_TYPE.elbow || el.elbowed ? null : el.splitPoints,
         points:
           value === ARROW_TYPE.elbow || el.elbowed
             ? [

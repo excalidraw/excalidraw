@@ -229,6 +229,9 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
+    splitPoints?: T extends "arrow" | "line"
+      ? ExcalidrawLinearElement["splitPoints"]
+      : never;
   }): NonDeleted<
     T extends "arrow" | "line"
       ? ExcalidrawLinearElement
@@ -347,6 +350,7 @@ export class API {
             pointFrom<LocalPoint>(100, 100),
           ],
           elbowed: rest.elbowed ?? false,
+          splitPoints: rest.splitPoints ?? null,
         });
         break;
       case "line":
@@ -360,6 +364,7 @@ export class API {
             pointFrom<LocalPoint>(100, 100),
           ],
           polygon: rest.polygon,
+          splitPoints: rest.splitPoints ?? null,
         });
         break;
       case "image":
