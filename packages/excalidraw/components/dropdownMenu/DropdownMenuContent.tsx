@@ -1,10 +1,11 @@
 import clsx from "clsx";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 
 import { CLASSES, EVENT, KEYS } from "@excalidraw/common";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
+import { useCallbackRefState } from "../../hooks/useCallbackRefState";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
 import { useEditorInterface } from "../App";
@@ -34,7 +35,10 @@ const MenuContent = ({
   align?: "start" | "center" | "end";
 }) => {
   const editorInterface = useEditorInterface();
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuNode, setMenuNode] = useCallbackRefState<HTMLDivElement>();
+  // Radix mounts the content lazily. Rebind outside-click listeners when the
+  // node becomes available so they attach to its owner document.
+  const menuRef = useMemo(() => ({ current: menuNode }), [menuNode]);
 
   const callbacksRef = useStable({ onClickOutside });
 
@@ -51,12 +55,12 @@ const MenuContent = ({
           callbacksRef.onClickOutside?.();
         }
       },
-      [callbacksRef],
+      [callbacksRef, menuRef],
     ),
   );
 
   useEffect(() => {
-    if (!open) {
+    if (!open || !menuNode) {
       return;
     }
     const onKeyDown = (event: KeyboardEvent) => {
@@ -73,11 +77,12 @@ const MenuContent = ({
       capture: true,
     };
 
-    document.addEventListener(EVENT.KEYDOWN, onKeyDown, option);
+    const ownerDocument = menuNode.ownerDocument;
+    ownerDocument.addEventListener(EVENT.KEYDOWN, onKeyDown, option);
     return () => {
-      document.removeEventListener(EVENT.KEYDOWN, onKeyDown, option);
+      ownerDocument.removeEventListener(EVENT.KEYDOWN, onKeyDown, option);
     };
-  }, [callbacksRef, open]);
+  }, [callbacksRef, open, menuNode]);
 
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": editorInterface.formFactor === "phone",
@@ -86,7 +91,7 @@ const MenuContent = ({
   return (
     <DropdownMenuContentPropsContext.Provider value={{ onSelect }}>
       <DropdownMenuPrimitive.Content
-        ref={menuRef}
+        ref={setMenuNode}
         className={classNames}
         style={style}
         data-testid="dropdown-menu"
