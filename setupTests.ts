@@ -88,8 +88,10 @@ Object.defineProperty(window, "FontFace", {
 Object.defineProperty(document, "fonts", {
   value: {
     load: vi.fn().mockResolvedValue([]),
-    check: vi.fn().mockResolvedValue(true),
-    has: vi.fn().mockResolvedValue(true),
+    // `check` and `has` are synchronous booleans in the browser - a promise
+    // here would be always-truthy and silently skip loading branches
+    check: vi.fn().mockReturnValue(true),
+    has: vi.fn().mockReturnValue(true),
     add: vi.fn(),
   },
 });

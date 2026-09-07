@@ -51,6 +51,35 @@ export const mockMermaidToExcalidraw = (opts: {
   }
 };
 
+/** logged on purpose by tests exercising the font failure paths */
+const EXPECTED_FONT_ERRORS = [
+  "Failed to resolve custom font", // the resolver rejected
+  "Failed to load font", // the font file didn't fetch
+];
+
+/**
+ * Keep the errors above out of the test output, so that a passing run doesn't
+ * read as a broken one. Scoped to them - anything else (i.e. React's act()
+ * warning) still surfaces.
+ *
+ * Returns the spy, which records the muted calls too, so a test can still
+ * assert the failure was reported.
+ */
+export const muteExpectedFontErrors = () => {
+  const consoleError = console.error;
+
+  return vi.spyOn(console, "error").mockImplementation((...args: unknown[]) => {
+    const [message] = args;
+    if (
+      typeof message === "string" &&
+      EXPECTED_FONT_ERRORS.some((expected) => message.startsWith(expected))
+    ) {
+      return;
+    }
+    consoleError(...args);
+  });
+};
+
 // Mock for HTMLImageElement (use with `vi.unstubAllGlobals()`)
 // as jsdom.resources: "usable" throws an error on image load
 export const mockHTMLImageElement = (

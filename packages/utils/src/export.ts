@@ -16,12 +16,15 @@ import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
 } from "@excalidraw/excalidraw/scene/export";
+import { Fonts } from "@excalidraw/excalidraw/fonts";
+import { Scene } from "@excalidraw/element";
 
 import type {
   ExcalidrawFrameLikeElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+import type { FontResolvers } from "@excalidraw/excalidraw/fonts";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 
 export { MIME_TYPES };
@@ -36,9 +39,23 @@ type ExportOpts = {
     width: number,
     height: number,
   ) => { width: number; height: number; scale?: number };
+  /**
+   * Required to embed custom (provider-qualified) fonts - without the matching
+   * resolver that text falls back to a generic font in the exported image.
+   * Pass the same resolvers given to `fontProviders`, or
+   * `app.fonts.instance.fontResolvers` when exporting from a mounted editor.
+   *
+   * Required even when an editor on the page has the fonts registered:
+   * `@excalidraw/utils` ships its own copy of the font registry, so
+   * registrations made elsewhere are not visible here.
+   *
+   * Exports render persisted geometry as-is - text measured before its font
+   * loaded keeps those (fallback-derived) measurements.
+   */
+  fontResolvers?: FontResolvers;
 };
 
-export const exportToCanvas = ({
+export const exportToCanvas = async ({
   elements,
   appState,
   files,
@@ -46,9 +63,21 @@ export const exportToCanvas = ({
   getDimensions,
   exportPadding,
   exportingFrame,
+  fontResolvers,
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
+  // resolve custom families before `restore` - a programmatic text element
+  // (one without `lineHeight`/`height`) derives its line height from the
+  // family metrics, which only exist once registered
+  if (fontResolvers) {
+    await Fonts.registerElementsFonts(
+      elements,
+      new Fonts(new Scene(), fontResolvers),
+      { recordFailure: false },
+    );
+  }
+
   const restoredElements = getNonDeletedElements(
     restoreElements(elements, null, {
       deleteInvisibleElements: true,
@@ -61,7 +90,13 @@ export const exportToCanvas = ({
     restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
+    {
+      exportBackground,
+      exportPadding,
+      viewBackgroundColor,
+      exportingFrame,
+      fontResolvers,
+    },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 
@@ -175,12 +210,22 @@ export const exportToSvg = async ({
   exportingFrame,
   skipInliningFonts,
   reuseImages,
+  fontResolvers,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
   skipInliningFonts?: true;
   reuseImages?: boolean;
 }): Promise<SVGSVGElement> => {
+  // see the note in `exportToCanvas` - metadata must precede restore
+  if (fontResolvers) {
+    await Fonts.registerElementsFonts(
+      elements,
+      new Fonts(new Scene(), fontResolvers),
+      { recordFailure: false },
+    );
+  }
+
   const restoredElements = getNonDeletedElements(
     restoreElements(elements, null, {
       deleteInvisibleElements: true,
@@ -198,6 +243,7 @@ export const exportToSvg = async ({
     renderEmbeddables,
     skipInliningFonts,
     reuseImages,
+    fontResolvers,
   });
 };
 

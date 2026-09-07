@@ -15,7 +15,11 @@ import {
   applyDarkModeFilter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  Scene,
+} from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
@@ -57,6 +61,8 @@ import { Fonts } from "../fonts";
 
 import { renderStaticScene } from "../renderer/staticScene";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
+
+import type { FontResolvers } from "../fonts";
 
 import type { RenderableElementsMap } from "./types";
 
@@ -186,11 +192,18 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    fontResolvers,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    /**
+     * Resolvers for custom font families, keyed by provider id - needed only
+     * when exporting headlessly; families already registered page-wide get
+     * loaded regardless. Ignored when `loadFonts` is supplied.
+     */
+    fontResolvers?: FontResolvers;
   },
   createCanvas: (
     width: number,
@@ -201,8 +214,15 @@ export const exportToCanvas = async (
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
   },
+  /** low-level override, replacing font loading entirely - prefer `fontResolvers` */
   loadFonts: () => Promise<void> = async () => {
-    await Fonts.loadElementsFonts(elements);
+    // headless render - a transient resolver failure here must not mark the
+    // family failed for a live editor sharing the page-scoped failure set
+    await Fonts.loadElementsFonts(
+      elements,
+      new Fonts(new Scene(), fontResolvers),
+      { recordFailure: false },
+    );
   },
 ) => {
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
@@ -310,8 +330,16 @@ export const exportToSvg = async (
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
+    /**
+     * Resolvers for custom font families, keyed by provider id - needed only
+     * when exporting headlessly; families already registered page-wide get
+     * inlined regardless.
+     */
+    fontResolvers?: FontResolvers;
   },
 ): Promise<SVGSVGElement> => {
+  const fonts = new Fonts(new Scene(), opts?.fontResolvers);
+
   const frameRendering = getFrameRenderingConfig(
     opts?.exportingFrame ?? null,
     appState.frameRendering ?? null,
@@ -437,7 +465,11 @@ export const exportToSvg = async (
   // ---------------------------------------------------------------------------
 
   const fontFaces = !opts?.skipInliningFonts
-    ? await Fonts.generateFontFaceDeclarations(elements)
+    ? // see the note in exportToCanvas' loadFonts - exports never record
+      // failures. Resolution happens inside, so headless callers get it too
+      await Fonts.generateFontFaceDeclarations(elements, fonts, {
+        recordFailure: false,
+      })
     : [];
 
   const delimiter = "\n      "; // 6 spaces

@@ -242,25 +242,12 @@ export const textWysiwyg = ({
     y: number;
   } | null = null;
 
-  const textPropertiesUpdated = (
-    updatedTextElement: ExcalidrawTextElement,
-    editable: HTMLTextAreaElement,
-  ) => {
-    if (!editable.style.fontFamily || !editable.style.fontSize) {
-      return false;
-    }
-    const currentFont = editable.style.fontFamily.replace(/"/g, "");
-    if (
-      getFontFamilyString({ fontFamily: updatedTextElement.fontFamily }) !==
-      currentFont
-    ) {
-      return true;
-    }
-    if (`${updatedTextElement.fontSize}px` !== editable.style.fontSize) {
-      return true;
-    }
-    return false;
-  };
+  // compare against the last layout we set, not against the DOM style - the
+  // browser re-serializes `style.fontFamily` (quoting is engine-specific),
+  // so a string comparison against it breaks for quoted custom families
+  const textPropertiesUpdated = (updatedTextElement: ExcalidrawTextElement) =>
+    currentTextLayout !== null &&
+    currentTextLayout.font !== getFontString(updatedTextElement);
 
   let LAST_THEME = app.state.theme;
 
@@ -305,10 +292,7 @@ export const textWysiwyg = ({
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
         }
-        const propertiesUpdated = textPropertiesUpdated(
-          updatedTextElement,
-          editable,
-        );
+        const propertiesUpdated = textPropertiesUpdated(updatedTextElement);
 
         let originalContainerData;
         if (propertiesUpdated) {

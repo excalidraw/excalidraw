@@ -15,12 +15,14 @@ import { API } from "./helpers/api";
 import { mockMermaidToExcalidraw } from "./helpers/mocks";
 import { Pointer, Keyboard } from "./helpers/ui";
 import {
+  act,
   render,
   waitFor,
   GlobalTestState,
   unmountComponent,
 } from "./test-utils";
 
+import type { FontResolver } from "../fonts";
 import type { NormalizedZoomValue } from "../types";
 
 const { h } = window;
@@ -278,6 +280,76 @@ describe("Paste bound text container", () => {
       expect(container.height).toBe(770);
       expect(container.width).toBe(166);
     });
+  });
+
+  it("should preserve custom-font geometry until the font loads", async () => {
+    unmountComponent();
+    let resolveFont!: (font: Awaited<ReturnType<FontResolver>>) => void;
+    const resolve: FontResolver = vi.fn(
+      () =>
+        new Promise<Awaited<ReturnType<FontResolver>>>((resolvePromise) => {
+          resolveFont = resolvePromise;
+        }),
+    );
+    const check = vi.spyOn(document.fonts, "check").mockReturnValue(true);
+
+    try {
+      await render(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          initialData={{
+            appState: { zoom: { value: 1 as NormalizedZoomValue } },
+          }}
+          fontProviders={{
+            paste: {
+              icon: <span />,
+              availableFonts: ["Deferred"],
+              resolve,
+            },
+          }}
+        />,
+      );
+      Object.assign(document, {
+        elementFromPoint: () => GlobalTestState.canvas,
+      });
+
+      pasteWithCtrlCmdShiftV(
+        JSON.stringify({
+          type: "excalidraw/clipboard",
+          elements: [
+            container,
+            { ...textElement, fontFamily: "paste:Deferred" },
+          ],
+        }),
+      );
+
+      await waitFor(() => {
+        expect(resolve).toHaveBeenCalledWith("Deferred");
+        expect(h.elements).toHaveLength(2);
+      });
+      expect(h.elements[0].height).toBe(187.01953125);
+      expect(h.elements[1].width).toBe(154);
+      expect(h.elements[1].height).toBe(175);
+
+      await act(async () => {
+        resolveFont({
+          fontFaces: [{ uri: "https://example.com/font.woff2" }],
+          metadata: {
+            metrics: {
+              unitsPerEm: 1000,
+              ascender: 800,
+              descender: -200,
+              lineHeight: 1.2,
+            },
+          },
+        });
+      });
+
+      await waitFor(() => expect(h.elements[0].height).toBe(368));
+    } finally {
+      check.mockRestore();
+    }
   });
 });
 

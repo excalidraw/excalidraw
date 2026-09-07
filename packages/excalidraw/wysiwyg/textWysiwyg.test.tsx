@@ -890,6 +890,29 @@ describe("textWysiwyg", () => {
       expect(diamond.height).toBe(70);
     });
 
+    it("should shrink a bound-text container using a custom font", async () => {
+      API.setAppState({ currentItemFontFamily: "provider:Custom" });
+      const diamond = API.createElement({
+        type: "diamond",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+      });
+      API.setElements([diamond]);
+      API.setSelectedElements([diamond]);
+      Keyboard.keyPress(KEYS.ENTER);
+
+      const editor = await getTextEditor();
+      const value = new Array(1000).fill("1").join("\n");
+
+      fireEvent.input(editor, { target: { value } });
+      expect(diamond.height).toBe(50020);
+
+      updateTextEditor(editor, "");
+      expect(diamond.height).toBe(70);
+    });
+
     it("should bind text to container when double clicked inside of the transparent container", async () => {
       const rectangle = API.createElement({
         type: "rectangle",

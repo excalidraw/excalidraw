@@ -92,6 +92,14 @@ export const actionDuplicateSelection = register({
       }
     }
 
+    // `onDuplicate` may have replaced the duplicates - operate on what it
+    // returned, not on the pre-hook instances
+    const duplicatedIds = new Set(duplicatedElements.map(({ id }) => id));
+    const acceptedDuplicates = elementsWithDuplicates.filter(({ id }) =>
+      duplicatedIds.has(id),
+    );
+    app.fonts.onElementsDuplicated(acceptedDuplicates);
+
     return {
       elements: syncMovedIndices(
         elementsWithDuplicates,

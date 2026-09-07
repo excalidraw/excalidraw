@@ -132,6 +132,10 @@ describe("Test <MermaidToExcalidraw/>", () => {
 
     expect(dialog.querySelector('[data-testid="mermaid-error"]')).toBeNull();
 
+    // the sample definition is populated asynchronously after the editor
+    // mounts - asserting straight away races it (and under `--update` a lost
+    // race silently rewrites the snapshot to the empty interim state)
+    await waitFor(() => expect(editor.textContent).not.toBe(""));
     expect(editor.textContent).toMatchSnapshot();
 
     updateTextEditor(editor, "flowchart TD1");
