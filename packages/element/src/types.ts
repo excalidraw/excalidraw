@@ -338,6 +338,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endBinding: FixedPointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
+    splitPoints: readonly number[] | null;
   }>;
 
 export type ExcalidrawLineElement = ExcalidrawLinearElement &
@@ -356,15 +357,6 @@ export type ExcalidrawArrowElement = ExcalidrawLinearElement &
   Readonly<{
     type: "arrow";
     elbowed: boolean;
-    /**
-     * Sorted indices of interior points at which the arrow's curve is broken
-     * into separate curves, producing a sharp transition at that point while
-     * the remaining points keep their curvature.
-     *
-     * Only meaningful for curved simple (i.e. non-elbow, `roundness !== null`)
-     * arrows. `null` means no splits.
-     */
-    splitPoints: readonly number[] | null;
   }>;
 
 export type ExcalidrawElbowArrowElement = Merge<

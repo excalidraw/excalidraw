@@ -7077,12 +7077,10 @@ class App extends React.Component<AppProps, AppState> {
       const selectedLinearElement: ExcalidrawLinearElement =
         selectedElements[0];
 
-      // NOTE: double-clicking an interior point handle of a curved simple arrow
-      // toggles a split there, breaking the curve into two separate curves
-      // (i.e. a sharp transition), or restoring continuity if already split
       if (
         !event[KEYS.CTRL_OR_CMD] &&
-        this.state.selectedLinearElement?.elementId ===
+        this.state.selectedLinearElement?.isEditing &&
+        this.state.selectedLinearElement.elementId ===
           selectedLinearElement.id &&
         canSplitPoints(selectedLinearElement)
       ) {

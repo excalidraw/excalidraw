@@ -635,6 +635,10 @@ export const restoreElement = (
         points,
         x,
         y,
+        splitPoints: restoreSplitPoints(
+          (element as ExcalidrawLinearElement).splitPoints,
+          points.length,
+        ),
         ...(isLineElement(element)
           ? {
               polygon: isValidPolygon(points)
@@ -707,7 +711,7 @@ export const restoreElement = (
         : restoreElementWithProperties(element as ExcalidrawArrowElement, {
             ...base,
             splitPoints: restoreSplitPoints(
-              (element as ExcalidrawArrowElement).splitPoints,
+              (element as ExcalidrawLinearElement).splitPoints,
               points.length,
             ),
           });

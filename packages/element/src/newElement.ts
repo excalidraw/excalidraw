@@ -494,6 +494,7 @@ export const newLinearElement = (
     type: ExcalidrawLinearElement["type"];
     points?: ExcalidrawLinearElement["points"];
     polygon?: ExcalidrawLineElement["polygon"];
+    splitPoints?: ExcalidrawLinearElement["splitPoints"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawLinearElement> => {
   const element = {
@@ -504,6 +505,7 @@ export const newLinearElement = (
     endBinding: null,
     startArrowhead: null,
     endArrowhead: null,
+    splitPoints: opts.splitPoints ?? null,
   };
 
   if (isLineElement(element)) {
@@ -526,7 +528,7 @@ export const newArrowElement = <T extends boolean>(
     points?: ExcalidrawArrowElement["points"];
     elbowed?: T;
     fixedSegments?: ExcalidrawElbowArrowElement["fixedSegments"] | null;
-    splitPoints?: ExcalidrawArrowElement["splitPoints"];
+    splitPoints?: ExcalidrawLinearElement["splitPoints"];
   } & ElementConstructorOpts,
 ): T extends true
   ? NonDeleted<ExcalidrawElbowArrowElement>

@@ -90,6 +90,7 @@ exports[`multi point mode in linear elements > line 3`] = `
   "roughness": 1,
   "roundness": null,
   "seed": 1278240551,
+  "splitPoints": null,
   "startArrowhead": null,
   "startBinding": null,
   "strokeColor": "#1e1e1e",

@@ -1,27 +1,27 @@
-import { isArrowElement, isElbowArrow } from "./typeChecks";
+import { isElbowArrow, isLinearElement } from "./typeChecks";
 
-import type { Drawable, Op, Options } from "roughjs/bin/core";
+import type { Drawable, Op, OpSet, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { RoughGenerator } from "roughjs/bin/generator";
-import type { ExcalidrawArrowElement, ExcalidrawElement } from "./types";
+import type { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
 
 /**
- * Split points break a curved simple arrow into several independent curves.
- * The arrow still has a single, continuous `points` array and the split index
- * simply marks the point where one curve ends and the next one begins, which
- * renders as a sharp transition instead of a smooth one.
+ * Split points break a curved arrow or line into several independent curves.
+ * The element still has a single, continuous `points` array and the split
+ * index simply marks the point where one curve ends and the next one begins,
+ * which renders as a sharp transition instead of a smooth one.
  *
  * Only interior points (i.e. neither the first nor the last one) can be split,
- * and only on curved, non-elbow arrows.
+ * and only on curved, non-elbow arrows and lines.
  */
 
 export const canSplitPoints = <T extends ExcalidrawElement>(
   element: T,
-): element is T & ExcalidrawArrowElement =>
-  isArrowElement(element) && !isElbowArrow(element) && !!element.roundness;
+): element is T & ExcalidrawLinearElement =>
+  isLinearElement(element) && !isElbowArrow(element) && !!element.roundness;
 
 export const isValidSplitPointIndex = (
-  element: ExcalidrawArrowElement,
+  element: ExcalidrawLinearElement,
   index: number,
 ) => Number.isInteger(index) && index > 0 && index < element.points.length - 1;
 
@@ -53,9 +53,9 @@ const normalizeSplitPoints = (
  * the point cannot be split (so the caller can skip the mutation).
  */
 export const toggleSplitPoint = (
-  element: ExcalidrawArrowElement,
+  element: ExcalidrawLinearElement,
   index: number,
-): ExcalidrawArrowElement["splitPoints"] | undefined => {
+): ExcalidrawLinearElement["splitPoints"] | undefined => {
   if (!canSplitPoints(element) || !isValidSplitPointIndex(element, index)) {
     return undefined;
   }
@@ -77,7 +77,7 @@ export const shiftSplitPointsOnInsert = (
   element: ExcalidrawElement,
   insertIndex: number,
   count = 1,
-): ExcalidrawArrowElement["splitPoints"] | undefined => {
+): ExcalidrawLinearElement["splitPoints"] | undefined => {
   const current = getSplitPoints(element);
 
   if (!current.length) {
@@ -97,7 +97,7 @@ export const shiftSplitPointsOnInsert = (
 export const shiftSplitPointsOnDuplicate = (
   element: ExcalidrawElement,
   duplicatedIndices: readonly number[],
-): ExcalidrawArrowElement["splitPoints"] | undefined => {
+): ExcalidrawLinearElement["splitPoints"] | undefined => {
   const current = getSplitPoints(element);
 
   if (!current.length || !duplicatedIndices.length) {
@@ -122,7 +122,7 @@ export const shiftSplitPointsOnDuplicate = (
 export const shiftSplitPointsOnDelete = (
   element: ExcalidrawElement,
   deletedIndices: readonly number[],
-): ExcalidrawArrowElement["splitPoints"] | undefined => {
+): ExcalidrawLinearElement["splitPoints"] | undefined => {
   const current = getSplitPoints(element);
 
   if (!current.length) {
@@ -131,7 +131,7 @@ export const shiftSplitPointsOnDelete = (
 
   const deleted = new Set(deletedIndices);
   const nextLastIndex =
-    (element as ExcalidrawArrowElement).points.length - deleted.size - 1;
+    (element as ExcalidrawLinearElement).points.length - deleted.size - 1;
 
   return normalizeSplitPoints(
     current
@@ -209,9 +209,9 @@ const snapStrokeEndpoints = (
   });
 
 /**
- * Generates one rough.js curve per split group and merges their ops into a
- * single drawable, so a split arrow is treated as one continuous shape for
- * both rendering and bounds computation.
+ * Generates one rough.js curve per split group and merges their stroke ops
+ * into a single drawable, so a split element is treated as one continuous
+ * shape for both rendering and bounds computation.
  */
 export const generateSplitCurves = <P extends readonly [number, number]>(
   generator: RoughGenerator,
@@ -220,42 +220,36 @@ export const generateSplitCurves = <P extends readonly [number, number]>(
   options: Options,
 ): Drawable => {
   const groups = getSplitPointGroups(points, splitPoints);
-  const drawables = groups.map((group, groupIdx) => {
-    const drawable = generator.curve(
+  const curve = (group: readonly P[]) =>
+    generator.curve(
       // SAFETY: point pairs are finite [x, y] numbers, exactly the shape
       // rough.js consumes; the cast only drops readonly
       group as unknown as RoughPoint[],
       options,
     );
+  const whole = curve(points);
 
-    if (groups.length === 1) {
-      return drawable;
-    }
+  if (groups.length === 1) {
+    return whole;
+  }
 
+  const isStroke = (set: OpSet) => set.type === "path";
+  const strokeOps = groups.flatMap((group, groupIdx) => {
     // pin curve boundaries that fall on a split vertex onto that exact
-    // vertex; the arrow's own endpoints (first group start, last group end)
+    // vertex; the element's own endpoints (first group start, last group end)
     // keep their sketchy random offset
     const start = groupIdx > 0 ? group[0] : null;
     const end = groupIdx < groups.length - 1 ? group[group.length - 1] : null;
 
-    return {
-      ...drawable,
-      sets: drawable.sets.map((set) => ({
-        ...set,
-        ops: snapStrokeEndpoints(set.ops, start, end),
-      })),
-    };
+    return curve(group)
+      .sets.filter(isStroke)
+      .flatMap((set) => snapStrokeEndpoints(set.ops, start, end));
   });
 
-  if (drawables.length === 1) {
-    return drawables[0];
-  }
-
   return {
-    ...drawables[0],
-    sets: drawables[0].sets.map((set, setIdx) => ({
-      ...set,
-      ops: drawables.flatMap((drawable) => drawable.sets[setIdx]?.ops ?? []),
-    })),
+    ...whole,
+    sets: whole.sets.map((set) =>
+      isStroke(set) ? { ...set, ops: strokeOps } : set,
+    ),
   };
 };
