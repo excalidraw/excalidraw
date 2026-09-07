@@ -160,6 +160,41 @@ export class AppCursor {
     };
   };
 
+  /**
+   * Re-runs the hover cursor logic at the last known pointer position by
+   * re-dispatching a synthetic pointermove — for state changes that alter
+   * what hovering means without the pointer moving (e.g. the tool reverting
+   * to selection after an element is created). Mouse only: touch and pen
+   * have no resting hover to restore.
+   */
+  refreshHover = () => {
+    const lastEvent =
+      this.app.lastPointerMoveEvent ?? this.app.lastPointerUpEvent;
+
+    if (!lastEvent || !this.canvas) {
+      return;
+    }
+
+    const pointerType = (lastEvent as PointerEvent).pointerType;
+    if (pointerType && pointerType !== "mouse") {
+      return;
+    }
+
+    // jsdom has no PointerEvent; a MouseEvent of type "pointermove" walks
+    // the identical dispatch path
+    const EventConstructor =
+      typeof PointerEvent !== "undefined" ? PointerEvent : MouseEvent;
+
+    this.canvas.dispatchEvent(
+      new EventConstructor("pointermove", {
+        bubbles: true,
+        cancelable: true,
+        clientX: lastEvent.clientX,
+        clientY: lastEvent.clientY,
+      }),
+    );
+  };
+
   /** clears the inline cursor so the environment default (CSS) applies */
   private clear = () => {
     this.set("");

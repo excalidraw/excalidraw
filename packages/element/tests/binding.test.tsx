@@ -480,6 +480,9 @@ describe("binding for simple arrows", () => {
 
       const elX = handles[0] + handles[2] / 2;
       const elY = handles[1] + handles[3] / 2;
+      // move first, as a real pointer would — the hover state from the spot
+      // where arrow creation finished must clear before the pointerdown
+      mouse.moveTo(elX, elY);
       mouse.downAt(elX, elY);
       mouse.moveTo(300, 400);
       mouse.up();

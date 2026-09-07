@@ -781,6 +781,16 @@ export type UIConfig = {
 
 export interface ExcalidrawProps {
   className?: string;
+  /**
+   * Document that owns Excalidraw's mounted DOM.
+   *
+   * Set only when it differs from the global `document`, such as when code
+   * executing in a parent window mounts Excalidraw into an iframe document.
+   * The value must remain stable for the editor's lifetime.
+   *
+   * @default document
+   */
+  ownerDocument?: Document;
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
@@ -1093,6 +1103,8 @@ export type AppProps = Merge<
 export type AppClassProperties = {
   props: AppProps;
   state: AppState;
+  readonly ownerDocument: Document;
+  readonly ownerWindow: Window & typeof globalThis;
   api: App["api"];
   sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
@@ -1129,6 +1141,7 @@ export type AppClassProperties = {
   dismissLinearEditor: App["dismissLinearEditor"];
   flowchart: App["flowchart"];
   drawShape: App["drawShape"];
+  arrowText: App["arrowText"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
   isToolLocked: App["isToolLocked"];
@@ -1197,6 +1210,9 @@ export type PointerDownState = Readonly<{
     // elements, which is useful for discriminating between selecitng
     // the entire selection vs a specific element
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
+    // Whether the pointer went down on the selected arrow's label, which
+    // makes the gesture a label drag along the arrow rather than a point drag
+    arrowLabel: boolean;
   };
   // This is determined on the initial pointer down event to
   // set various interaction modalities
@@ -1375,6 +1391,12 @@ export type NullableGridSize =
 export type GenerateDiagramToCode = (props: {
   frame: NonDeleted<ExcalidrawMagicFrameElement>;
   children: readonly NonDeletedExcalidrawElement[];
+  /**
+   * Optional streaming hook. Call with the accumulated response text as it
+   * streams in so the editor can progressively render the partial HTML
+   * inside the generated frame.
+   */
+  onPartial?: (html: string) => void;
 }) => MaybePromise<{ html: string }>;
 
 export type Offsets = Partial<{
