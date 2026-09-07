@@ -12,6 +12,7 @@ import { FONT_FAMILY } from "@excalidraw/common";
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+import { useTopPicksDnD } from "../components/ColorPicker/topPicksDnD";
 
 import type { ExcalidrawImperativeAPI } from "../types";
 
@@ -74,6 +75,85 @@ const mountEditorInOwnDocument = (currentItemFontFamily?: FontFamilyValues) => {
 };
 
 describe("cross-document rendering", () => {
+  it("binds top-picks drag interactions to the source window", () => {
+    const iframe = document.createElement("iframe");
+    document.body.append(iframe);
+    const ownerDocument = iframe.contentDocument!;
+    const ownerWindow = iframe.contentWindow!;
+    const mountNode = ownerDocument.createElement("div");
+    ownerDocument.body.append(mountNode);
+    const ownerAddEventListener = vi.fn();
+    Object.defineProperties(ownerWindow, {
+      addEventListener: { value: ownerAddEventListener },
+      removeEventListener: { value: vi.fn() },
+    });
+    let startPickDrag:
+      | ReturnType<typeof useTopPicksDnD>["startPickDrag"]
+      | null = null;
+
+    const Harness = () => {
+      const drag = useTopPicksDnD({
+        enabled: true,
+        picks: ["#000000", "#ffffff"],
+        onPicksChange: vi.fn(),
+      });
+      startPickDrag = drag.startPickDrag;
+      return (
+        <div ref={drag.setStripEl}>
+          <button data-top-pick-index="0" />
+          <button data-top-pick-index="1" />
+        </div>
+      );
+    };
+
+    const renderResult = renderReact(<Harness />, {
+      container: mountNode,
+      baseElement: ownerDocument.body,
+    });
+    const mainAddEventListener = vi.spyOn(window, "addEventListener");
+
+    try {
+      const sourceEl = ownerDocument.querySelector<HTMLElement>(
+        "[data-top-pick-index='0']",
+      )!;
+      act(() =>
+        startPickDrag!(
+          {
+            button: 0,
+            pointerId: 1,
+            clientX: 0,
+            clientY: 0,
+            currentTarget: sourceEl,
+          } as unknown as React.PointerEvent,
+          0,
+          "#000000",
+        ),
+      );
+
+      for (const eventName of [
+        "pointermove",
+        "pointerup",
+        "pointercancel",
+        "keydown",
+      ]) {
+        expect(ownerAddEventListener).toHaveBeenCalledWith(
+          eventName,
+          expect.any(Function),
+          true,
+        );
+        expect(mainAddEventListener).not.toHaveBeenCalledWith(
+          eventName,
+          expect.any(Function),
+          true,
+        );
+      }
+    } finally {
+      renderResult.unmount();
+      mainAddEventListener.mockRestore();
+      iframe.remove();
+    }
+  });
+
   it("scopes listeners, fonts, and portals to ownerDocument", async () => {
     const iframe = document.createElement("iframe");
     document.body.append(iframe);
