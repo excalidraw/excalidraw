@@ -1546,9 +1546,10 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    const splitPoints = isArrowElement(element)
-      ? shiftSplitPointsOnDuplicate(element, selectedPointsIndices)
-      : undefined;
+    const splitPoints = shiftSplitPointsOnDuplicate(
+      element,
+      selectedPointsIndices,
+    );
 
     scene.mutateElement(element, {
       points: nextPoints,
@@ -1594,12 +1595,10 @@ export class LinearElementEditor {
       return !pointIndices.includes(idx);
     });
 
-    if (isArrowElement(element)) {
-      const splitPoints = shiftSplitPointsOnDelete(element, pointIndices);
+    const splitPoints = shiftSplitPointsOnDelete(element, pointIndices);
 
-      if (splitPoints !== undefined) {
-        app.scene.mutateElement(element, { splitPoints });
-      }
+    if (splitPoints !== undefined) {
+      app.scene.mutateElement(element, { splitPoints });
     }
 
     const isPolygon = isLineElement(element) && element.polygon;

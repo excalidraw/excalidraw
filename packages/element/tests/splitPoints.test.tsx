@@ -33,10 +33,21 @@ import {
 import { generateLinearCollisionShape } from "../src/shape";
 import { LinearElementEditor } from "../src/linearElementEditor";
 
-import type { ExcalidrawArrowElement, NonDeleted } from "../src/types";
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawLineElement,
+  ExcalidrawLinearElement,
+  NonDeleted,
+} from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
+
+const basePoints = () => [
+  pointFrom<LocalPoint>(0, 0),
+  pointFrom<LocalPoint>(100, 100),
+  pointFrom<LocalPoint>(200, 0),
+];
 
 const createArrow = (
   overrides: Partial<ExcalidrawArrowElement> = {},
@@ -49,19 +60,37 @@ const createArrow = (
     height: 100,
     roughness: 0,
     roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
-    points: [
-      pointFrom<LocalPoint>(0, 0),
-      pointFrom<LocalPoint>(100, 100),
-      pointFrom<LocalPoint>(200, 0),
-    ],
+    points: basePoints(),
     ...overrides,
   }) as NonDeleted<ExcalidrawArrowElement>;
 
-describe("arrow split points", () => {
+const createLine = (
+  overrides: Partial<
+    Pick<
+      ExcalidrawLineElement,
+      "x" | "y" | "points" | "roundness" | "splitPoints" | "polygon"
+    >
+  > = {},
+): NonDeleted<ExcalidrawLineElement> =>
+  API.createElement({
+    type: "line",
+    x: 0,
+    y: 0,
+    width: 200,
+    height: 100,
+    roughness: 0,
+    roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+    points: basePoints(),
+    ...overrides,
+  }) as NonDeleted<ExcalidrawLineElement>;
+
+describe("arrow and line split points", () => {
   describe("helpers", () => {
-    it("only curved simple arrows can be split", () => {
+    it("only curved, non-elbow arrows and lines can be split", () => {
       expect(canSplitPoints(createArrow())).toBe(true);
+      expect(canSplitPoints(createLine())).toBe(true);
       expect(canSplitPoints(createArrow({ roundness: null }))).toBe(false);
+      expect(canSplitPoints(createLine({ roundness: null }))).toBe(false);
       expect(
         canSplitPoints(
           API.createElement({
@@ -74,11 +103,19 @@ describe("arrow split points", () => {
       expect(
         canSplitPoints(
           API.createElement({
-            type: "line",
+            type: "rectangle",
             roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
           }),
         ),
       ).toBe(false);
+    });
+
+    it("toggles a split on a curved line", () => {
+      expect(toggleSplitPoint(createLine(), 1)).toEqual([1]);
+      expect(toggleSplitPoint(createLine({ splitPoints: [1] }), 1)).toBe(null);
+      expect(
+        toggleSplitPoint(createLine({ roundness: null }), 1),
+      ).toBeUndefined();
     });
 
     it("toggles a split on and off", () => {
@@ -212,6 +249,52 @@ describe("arrow split points", () => {
       // the number of segments is unchanged, only their continuity
       expect(unsplit.filter((op) => op.op === "bcurveTo")).toHaveLength(2);
       expect(split.filter((op) => op.op === "bcurveTo")).toHaveLength(2);
+    });
+
+    it("renders a split line as separate curves", () => {
+      const elementsMap = arrayToMap([]);
+      const unsplit = generateLinearCollisionShape(createLine(), elementsMap);
+      const split = generateLinearCollisionShape(
+        createLine({ splitPoints: [1] }),
+        elementsMap,
+      );
+
+      expect(unsplit.filter((op) => op.op === "move")).toHaveLength(1);
+      expect(split.filter((op) => op.op === "move")).toHaveLength(2);
+      expect(split.filter((op) => op.op === "bcurveTo")).toHaveLength(2);
+    });
+
+    it("fills a split polygon as a single region", () => {
+      // the fill comes from the whole, unsplit curve — filling each split
+      // group on its own would seam the polygon along the split
+      const options = {
+        seed: 1,
+        roughness: 0,
+        fill: "#000",
+        fillStyle: "solid",
+      };
+      const points = [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 100),
+        pointFrom<LocalPoint>(200, 0),
+        pointFrom<LocalPoint>(0, 0),
+      ];
+      const drawable = generateSplitCurves(
+        new RoughGenerator(),
+        points,
+        [1],
+        options,
+      );
+      const countMoves = (type: string) =>
+        drawable.sets
+          .filter((set) => set.type === type)
+          .flatMap((set) => set.ops)
+          .filter((op) => op.op === "move").length;
+
+      // one filled region, but two separate stroked curves (rough.js draws
+      // each of them twice)
+      expect(countMoves("fillPath")).toBe(1);
+      expect(countMoves("path")).toBe(4);
     });
 
     it("breaks tangent continuity only at the split point", () => {
@@ -451,22 +534,26 @@ describe("arrow split points", () => {
       h.state.height = 1000;
     });
 
-    const selectArrow = (arrow: NonDeleted<ExcalidrawArrowElement>) => {
-      API.setElements([arrow]);
-      API.setSelectedElements([arrow]);
+    const edit = (
+      element: NonDeleted<ExcalidrawLinearElement>,
+      isEditing = true,
+    ) => {
+      API.setElements([element]);
+      API.setSelectedElements([element]);
       act(() => {
         h.setState({
           selectedLinearElement: new LinearElementEditor(
-            arrow,
+            element,
             arrayToMap(h.elements),
+            isEditing,
           ),
         });
       });
     };
 
-    it("toggles a split on the point under the cursor", () => {
+    it("toggles a split on the arrow point under the cursor", () => {
       const arrow = createArrow({ x: 100, y: 100 });
-      selectArrow(arrow);
+      edit(arrow);
 
       // point 1 is at (200, 200) in scene coords
       mouse.doubleClickAt(200, 200);
@@ -480,9 +567,22 @@ describe("arrow split points", () => {
       );
     });
 
+    it("toggles a split on the line point under the cursor", () => {
+      const line = createLine({ x: 100, y: 100 });
+      edit(line);
+
+      mouse.doubleClickAt(200, 200);
+      expect((h.elements[0] as ExcalidrawLineElement).splitPoints).toEqual([1]);
+
+      mouse.doubleClickAt(200, 200);
+      expect((h.elements[0] as ExcalidrawLineElement).splitPoints).toEqual(
+        null,
+      );
+    });
+
     it("does not split sharp arrows", () => {
       const arrow = createArrow({ x: 100, y: 100, roundness: null });
-      selectArrow(arrow);
+      edit(arrow);
 
       mouse.doubleClickAt(200, 200);
       expect((h.elements[0] as ExcalidrawArrowElement).splitPoints).toEqual(
@@ -490,14 +590,29 @@ describe("arrow split points", () => {
       );
     });
 
-    it("does not split arrow endpoints", () => {
+    it("does not split endpoints", () => {
       const arrow = createArrow({ x: 100, y: 100 });
-      selectArrow(arrow);
+      edit(arrow);
 
       mouse.doubleClickAt(100, 100);
       expect((h.elements[0] as ExcalidrawArrowElement).splitPoints).toEqual(
         null,
       );
+    });
+
+    it("does not split outside the editor", () => {
+      // a double-click keeps its usual meaning until the element is edited
+      for (const element of [
+        createArrow({ x: 100, y: 100 }),
+        createLine({ x: 100, y: 100 }),
+      ]) {
+        edit(element, false);
+
+        mouse.doubleClickAt(200, 200);
+        expect(
+          (h.elements[0] as NonDeleted<ExcalidrawLinearElement>).splitPoints,
+        ).toEqual(null);
+      }
     });
   });
 });
