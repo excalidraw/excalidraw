@@ -124,7 +124,7 @@ describe("actionStyles", () => {
   it("should hide transparent stroke color for sticky notes", async () => {
     UI.clickTool("stickynote");
 
-    togglePopover("Stroke");
+    togglePopover("Text color");
 
     // hidden via `excludedColors` (same mechanism as bucket fill): the swatch
     // is gone, but an invisible placeholder keeps the grid so the remaining
@@ -141,7 +141,7 @@ describe("actionStyles", () => {
   it("keeps the transparent hotkey dead and the others intact for sticky notes", async () => {
     UI.clickTool("stickynote");
 
-    togglePopover("Stroke");
+    togglePopover("Text color");
 
     const picker = document.querySelector(".color-picker-content")!;
     const before = h.state.currentItemStickynoteStrokeColor;
@@ -170,7 +170,7 @@ describe("actionStyles", () => {
     API.setElements([stickyNote]);
     API.setSelectedElements([stickyNote]);
 
-    togglePopover("Stroke");
+    togglePopover("Text color");
     UI.clickOnTestId("color-blue");
 
     expect(API.getSelectedElement().strokeColor).toBe(COLOR_PALETTE.blue[4]);

@@ -408,6 +408,35 @@ describe("sticky notes", () => {
       );
     });
 
+    it("binding a colored text to a note gives the note the text's color", () => {
+      const note = API.createElement({
+        type: "stickynote",
+        id: "note",
+        x: 100,
+        y: 100,
+        width: DEFAULT_STICKY_NOTE_SIZE,
+        height: DEFAULT_STICKY_NOTE_SIZE,
+        baseHeight: DEFAULT_STICKY_NOTE_SIZE,
+        strokeColor: COLOR_PALETTE.blue[4],
+      });
+      const text = API.createElement({
+        type: "text",
+        id: "text",
+        x: 600,
+        y: 100,
+        text: "hello",
+        fontSize: 20,
+        strokeColor: RED,
+      });
+      API.setElements([note, text]);
+      API.setSelectedElements([note, text]);
+
+      API.executeAction(actionBindText);
+
+      expect(getElement(note.id).strokeColor).toBe(RED);
+      expect(getElement<ExcalidrawTextElement>(text.id).strokeColor).toBe(RED);
+    });
+
     it("colors a selected note's label with the keyboard eyedropper", () => {
       const { note, label } = createNote({
         id: "note",
@@ -572,6 +601,8 @@ describe("sticky notes", () => {
       UI.clickOnTestId(`color-top-pick-${RED}`);
 
       expect(getElement(label.id).strokeColor).toBe(RED);
+      // one ink: the note (and so its footer) follows the label
+      expect(getElement(note.id).strokeColor).toBe(RED);
       expect(h.state.currentItemStickynoteStrokeColor).toBe(RED);
       expect(h.state.currentItemStrokeColor).toBe(shapeDefault);
       Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
@@ -631,6 +662,42 @@ describe("sticky notes", () => {
       expect(
         getElement<ExcalidrawTextElement>(target.label.id).fontSizeMax,
       ).toBe(28);
+    });
+
+    it("gives a note one ink when the copied styles carry two colors", () => {
+      // a rectangle with a differently colored label: the label's color is
+      // the visible text color, so it becomes the note's ink
+      const rectangle = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 600,
+        y: 100,
+        width: 200,
+        height: 100,
+        strokeColor: COLOR_PALETTE.blue[4],
+        boundElements: [{ type: "text", id: "rect-label" }],
+      });
+      const rectangleLabel = API.createElement({
+        type: "text",
+        id: "rect-label",
+        x: 650,
+        y: 130,
+        text: "hi",
+        fontSize: 20,
+        containerId: "rect",
+        strokeColor: RED,
+      });
+      const target = createNote({ id: "target", text: "hi", fontSize: 20 });
+      API.setElements([rectangle, rectangleLabel, target.note, target.label]);
+      layoutNotes(target.note.id);
+
+      API.setSelectedElements([getElement(rectangle.id)]);
+      API.executeAction(actionCopyStyles);
+      API.setSelectedElements([getElement(target.note.id)]);
+      API.executeAction(actionPasteStyles);
+
+      expect(getElement(target.label.id).strokeColor).toBe(RED);
+      expect(getElement(target.note.id).strokeColor).toBe(RED);
     });
   });
 

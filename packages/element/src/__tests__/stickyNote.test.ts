@@ -37,6 +37,7 @@ import {
   getStickyNoteDateLabel,
   getStickyNoteFooter,
   getStickyNoteMinSize,
+  syncStickyNoteInk,
   normalizeStickyNoteFontSize,
   updateStickyNoteLayout,
 } from "../stickyNote";
@@ -887,5 +888,78 @@ describe("sticky note creation date", () => {
       sticky.height - STICKY_NOTE_BODY_INSET_Y,
     );
     scene.destroy();
+  });
+});
+
+describe("sticky note ink", () => {
+  const RED = "#e03131";
+  const BLUE = "#1971c2";
+  const pair = (containerInk: string, labelInk: string) => {
+    const container = newStickyNoteElement({
+      type: "stickynote",
+      x: 0,
+      y: 0,
+      width: DEFAULT_STICKY_NOTE_SIZE,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+      baseHeight: DEFAULT_STICKY_NOTE_SIZE,
+      strokeColor: containerInk,
+    });
+    const label = newTextElement({
+      x: 0,
+      y: 0,
+      text: "hi",
+      originalText: "hi",
+      containerId: container.id,
+      strokeColor: labelInk,
+    });
+    return [
+      newElementWith(container, {
+        boundElements: [{ type: "text", id: label.id }],
+      }),
+      label,
+    ] as const;
+  };
+  const inks = (elements: readonly ExcalidrawElement[]) =>
+    elements.map((element) => element.strokeColor);
+
+  it("is a no-op when the note and its label agree", () => {
+    const elements = pair(RED, RED);
+    expect(syncStickyNoteInk(elements, arrayToMap(elements))).toBe(elements);
+  });
+
+  it("follows whichever side changed", () => {
+    const [container, label] = pair(RED, RED);
+    const prev = arrayToMap([container, label]);
+    // the note was recolored (selection): the label follows
+    expect(
+      inks(
+        syncStickyNoteInk(
+          [newElementWith(container, { strokeColor: BLUE }), label],
+          prev,
+        ),
+      ),
+    ).toEqual([BLUE, BLUE]);
+    // the label was recolored (editing): the note follows
+    expect(
+      inks(
+        syncStickyNoteInk(
+          [container, newElementWith(label, { strokeColor: BLUE })],
+          prev,
+        ),
+      ),
+    ).toEqual([BLUE, BLUE]);
+  });
+
+  it("lets the label win when both changed or the data drifted", () => {
+    expect(inks(syncStickyNoteInk(pair(RED, BLUE), new Map()))).toEqual([
+      BLUE,
+      BLUE,
+    ]);
+  });
+
+  it("gives a transparent label the note's color", () => {
+    expect(
+      inks(syncStickyNoteInk(pair(RED, "transparent"), new Map())),
+    ).toEqual([RED, RED]);
   });
 });

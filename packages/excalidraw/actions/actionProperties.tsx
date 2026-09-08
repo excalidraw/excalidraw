@@ -31,6 +31,7 @@ import {
   normalizeStickyNote,
   getNonDeletedElements,
   isNonDeletedElement,
+  syncStickyNoteInk,
 } from "@excalidraw/element";
 
 import {
@@ -373,17 +374,22 @@ export const actionChangeStrokeColor = register<
     const elementsMap = arrayToMap(elements);
 
     return {
-      elements: changeProperty(
-        elements,
-        appState,
-        (el) =>
-          hasStrokeColor(el.type)
-            ? newElementWith(
-                el,
-                getColorUpdate(el, "strokeColor", color, elementsMap),
-              )
-            : el,
-        true,
+      // a note and its label share one ink: coloring the label while editing
+      // it (no selection) colors the note too — the footer paints with it
+      elements: syncStickyNoteInk(
+        changeProperty(
+          elements,
+          appState,
+          (el) =>
+            hasStrokeColor(el.type)
+              ? newElementWith(
+                  el,
+                  getColorUpdate(el, "strokeColor", color, elementsMap),
+                )
+              : el,
+          true,
+        ),
+        elementsMap,
       ),
       appState: {
         ...appState,
@@ -396,19 +402,20 @@ export const actionChangeStrokeColor = register<
   PanelComponent: ({ elements, appState, updateData, app }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
     const target = resolveColorTarget(appState, elements, "strokeColor");
+    // a note has no stroke: its "stroke" is the ink of its text and footer
+    const label =
+      target.kind === "sticky" ? t("labels.textColor") : t("labels.stroke");
 
     return (
       <>
-        {stylesPanelMode === "full" && (
-          <h3 aria-hidden="true">{t("labels.stroke")}</h3>
-        )}
+        {stylesPanelMode === "full" && <h3 aria-hidden="true">{label}</h3>}
         <ColorPicker
           topPicks={target.topPicks}
           palette={target.palette}
           customizableTopPicks={target.customizableTopPicks}
           excludedColors={target.excludedColors}
           type="elementStroke"
-          label={t("labels.stroke")}
+          label={label}
           color={getFormValue(
             elements,
             app,

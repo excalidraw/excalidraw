@@ -114,6 +114,58 @@ export const getColorUpdate = (
     : { strokeColor: color };
 };
 
+/**
+ * A note's ink is one color: the container's `strokeColor` — the seed for a
+ * new label and what the creation-date footer paints with — and its label's.
+ * Run after a property write to copy the side that changed onto the other;
+ * when both changed, or neither (data that drifted), the label wins: it is
+ * the text the user styled. A transparent label always takes the note's
+ * color. Returns the same array when nothing needs to change.
+ */
+export const syncStickyNoteInk = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+  prevElementsMap: ElementsMap,
+): readonly T[] => {
+  const elementsMap = arrayToMap(elements);
+  const inkById = new Map<string, string>();
+  for (const container of elements) {
+    if (!isStickyNoteElement(container) || container.isDeleted) {
+      continue;
+    }
+    const label = getBoundTextElement(container, elementsMap);
+    if (!label || label.strokeColor === container.strokeColor) {
+      continue;
+    }
+    const containerChanged =
+      prevElementsMap.get(container.id)?.strokeColor !== container.strokeColor;
+    const labelChanged =
+      prevElementsMap.get(label.id)?.strokeColor !== label.strokeColor;
+    if (
+      isTransparent(label.strokeColor) ||
+      (containerChanged && !labelChanged)
+    ) {
+      inkById.set(
+        label.id,
+        normalizeStickyNoteStrokeColor(container.strokeColor),
+      );
+    } else {
+      inkById.set(
+        container.id,
+        normalizeStickyNoteStrokeColor(label.strokeColor),
+      );
+    }
+  }
+  if (!inkById.size) {
+    return elements;
+  }
+  return elements.map((element) => {
+    const strokeColor = inkById.get(element.id);
+    return strokeColor === undefined
+      ? element
+      : (newElementWith(element as ExcalidrawElement, { strokeColor }) as T);
+  });
+};
+
 const jitter = (random: () => number, amount: number) =>
   (random() * 2 - 1) * amount;
 

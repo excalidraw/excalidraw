@@ -30,6 +30,7 @@ import {
   STROKE_WIDTH,
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
+  isTransparent,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -893,6 +894,7 @@ const repairFrameMembership = (
  * - a label's `fontSizeMax` is meaningful only while bound to a sticky note:
  *   seeded from `fontSize` when missing, cleared everywhere else
  * - a sticky label's stroke is never transparent (it is the visible text)
+ * - a note's stroke — its ink, which the footer paints with — equals its label's
  * - with `refreshDimensions`, the note and its label are refitted together
  */
 const restoreStickyNotes = (
@@ -905,12 +907,24 @@ const restoreStickyNotes = (
       continue;
     }
     if (isStickyNoteBoundText(element, elementsMap)) {
+      const container = elementsMap.get(element.containerId!);
+      // one ink per note: a transparent label takes the note's color;
+      // otherwise the label — the visible text — wins over a note that
+      // drifted (edit-mode coloring on older builds)
+      const strokeColor = normalizeStickyNoteStrokeColor(
+        isTransparent(element.strokeColor)
+          ? container?.strokeColor
+          : element.strokeColor,
+      );
       Object.assign(element, {
         fontSizeMax: normalizeStickyNoteFontSize(
           element.fontSizeMax ?? element.fontSize,
         ),
-        strokeColor: normalizeStickyNoteStrokeColor(element.strokeColor),
+        strokeColor,
       });
+      if (container && container.strokeColor !== strokeColor) {
+        Object.assign(container, { strokeColor });
+      }
     } else if (element.fontSizeMax != null) {
       Object.assign(element, { fontSizeMax: null });
     }

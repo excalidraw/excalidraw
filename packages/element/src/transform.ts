@@ -16,6 +16,7 @@ import {
   toBrandedType,
   getLineHeight,
   DEFAULT_STICKY_NOTE_SIZE,
+  isTransparent,
 } from "@excalidraw/common";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
@@ -36,8 +37,9 @@ import {
   newStickyNoteElement,
   normalizeStickyNoteGeometry,
 } from "./newElement";
+import { normalizeStickyNoteStrokeColor } from "./stickyNote";
 import { measureText, normalizeText } from "./textMeasurements";
-import { isArrowElement } from "./typeChecks";
+import { isArrowElement, isStickyNoteElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
@@ -257,6 +259,16 @@ const bindTextToContainer = (
   textProps: { text: string } & FragmentConstructorOpts,
   scene: Scene,
 ) => {
+  // a note and its label share one ink: a label that sets its own color
+  // gives it to the note (the footer paints with it); transparent falls
+  // back to the note's
+  const stickyInk = isStickyNoteElement(container)
+    ? normalizeStickyNoteStrokeColor(
+        textProps.strokeColor && !isTransparent(textProps.strokeColor)
+          ? textProps.strokeColor
+          : container.strokeColor,
+      )
+    : null;
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
     y: 0,
@@ -264,7 +276,7 @@ const bindTextToContainer = (
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     ...textProps,
     containerId: container.id,
-    strokeColor: textProps.strokeColor || container.strokeColor,
+    strokeColor: stickyInk ?? (textProps.strokeColor || container.strokeColor),
     labelPosition: isArrowElement(container)
       ? DEFAULT_BOUND_TEXT_LABEL_POSITION
       : null,
@@ -275,6 +287,9 @@ const bindTextToContainer = (
       type: "text",
       id: textElement.id,
     }),
+    ...(stickyInk && stickyInk !== container.strokeColor
+      ? { strokeColor: stickyInk }
+      : null),
   });
 
   redrawTextBoundingBox(textElement, container, scene);

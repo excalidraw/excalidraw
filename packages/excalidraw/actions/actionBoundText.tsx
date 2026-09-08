@@ -168,6 +168,13 @@ export const actionBindText = register({
       textElement = selectedElements[1] as ExcalidrawTextElement;
       container = selectedElements[0] as ExcalidrawTextContainer;
     }
+    // a note and its label share one ink: the text the user styled wins,
+    // unless it is transparent (a note's label never is)
+    const stickyInk = isStickyNoteElement(container)
+      ? isTransparent(textElement.strokeColor)
+        ? container.strokeColor
+        : textElement.strokeColor
+      : null;
     app.scene.mutateElement(textElement, {
       containerId: container.id,
       verticalAlign: VERTICAL_ALIGN.MIDDLE,
@@ -177,15 +184,12 @@ export const actionBindText = register({
       labelPosition: isArrowElement(container)
         ? DEFAULT_BOUND_TEXT_LABEL_POSITION
         : null,
-      ...(isStickyNoteElement(container)
+      ...(stickyInk
         ? {
             fontSizeMax: normalizeStickyNoteFontSize(
               textElement.fontSizeMax ?? textElement.fontSize,
             ),
-            // the label is the note's visible text — never transparent
-            strokeColor: isTransparent(textElement.strokeColor)
-              ? container.strokeColor
-              : textElement.strokeColor,
+            strokeColor: stickyInk,
           }
         : null),
     });
@@ -194,6 +198,8 @@ export const actionBindText = register({
         type: "text",
         id: textElement.id,
       }),
+      // the footer paints with the note's ink
+      ...(stickyInk ? { strokeColor: stickyInk } : null),
     });
     const originalContainerHeight = container.height;
     redrawTextBoundingBox(textElement, container, app.scene);

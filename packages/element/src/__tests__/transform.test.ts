@@ -1117,6 +1117,26 @@ describe("Test Transform", () => {
       expect(note.strokeColor).not.toBe("transparent");
     });
 
+    it("gives the note the color of a label that sets its own", () => {
+      const elements = convertToExcalidrawElements(
+        [
+          {
+            type: "stickynote",
+            x: 0,
+            y: 0,
+            strokeColor: "#1971c2",
+            label: { text: "hello", strokeColor: "#e03131" },
+          },
+        ],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+      const label = find<ExcalidrawTextElement>(elements, "text");
+
+      expect(label.strokeColor).toBe("#e03131");
+      expect(note.strokeColor).toBe("#e03131");
+    });
+
     it("binds a label whose font size becomes the note's ceiling", () => {
       const elements = convertToExcalidrawElements(
         [

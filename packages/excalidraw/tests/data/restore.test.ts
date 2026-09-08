@@ -290,6 +290,34 @@ describe("restoreElements", () => {
     expect(restoredLabel.strokeColor).toBe(COLOR_PALETTE.black);
   });
 
+  it("should give a note its label's color when the two drifted apart", () => {
+    const stickyNote = API.createElement({
+      type: "stickynote",
+      id: "sticky",
+      strokeColor: COLOR_PALETTE.black,
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      text: "text",
+      fontSize: 20,
+      containerId: "sticky",
+      strokeColor: COLOR_PALETTE.red[4],
+    });
+
+    const restored = restore.restoreElements([stickyNote, label], null, {
+      repairBindings: true,
+    });
+
+    expect(
+      restored.find((element) => element.id === "sticky")!.strokeColor,
+    ).toBe(COLOR_PALETTE.red[4]);
+    expect(
+      restored.find((element) => element.id === "label")!.strokeColor,
+    ).toBe(COLOR_PALETTE.red[4]);
+  });
+
   it("should restore the sticky note defaults and top-pick slots", () => {
     const restored = restore.restoreAppState(
       {
