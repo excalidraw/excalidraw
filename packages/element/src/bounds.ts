@@ -1073,32 +1073,17 @@ export const getResizedElementAbsoluteCoords = (
     normalizePoints,
   );
 
-  let bounds: Bounds;
-
   if (isFreeDrawElement(element)) {
-    // Free Draw
-    bounds = getBoundsFromPoints(points);
-  } else {
-    // Line
-    const gen = rough.generator();
-    const curve = !element.roundness
-      ? gen.linearPath(
-          points as [number, number][],
-          generateRoughOptions(element),
-        )
-      : gen.curve(points as [number, number][], generateRoughOptions(element));
-
-    const ops = getCurvePathOps(curve);
-    bounds = getMinMaxXYFromCurvePathOps(ops);
+    const [minX, minY, maxX, maxY] = getBoundsFromPoints(points);
+    return [
+      minX + element.x,
+      minY + element.y,
+      maxX + element.x,
+      maxY + element.y,
+    ];
   }
 
-  const [minX, minY, maxX, maxY] = bounds;
-  return [
-    minX + element.x,
-    minY + element.y,
-    maxX + element.x,
-    maxY + element.y,
-  ];
+  return getElementPointsCoords(element, points as [number, number][]);
 };
 
 export const getElementPointsCoords = (

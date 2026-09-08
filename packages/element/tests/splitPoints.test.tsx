@@ -39,6 +39,12 @@ import {
 } from "../src/splitPoints";
 import { generateLinearCollisionShape, getElementShape } from "../src/shape";
 import { LinearElementEditor } from "../src/linearElementEditor";
+import {
+  getElementBounds,
+  getElementPointsCoords,
+  getResizedElementAbsoluteCoords,
+} from "../src/bounds";
+import { transformElements } from "../src/resizeElements";
 
 import type { Op } from "roughjs/bin/core";
 
@@ -87,7 +93,14 @@ const createLine = (
   overrides: Partial<
     Pick<
       ExcalidrawLineElement,
-      "x" | "y" | "points" | "roundness" | "splitPoints" | "polygon"
+      | "x"
+      | "y"
+      | "width"
+      | "height"
+      | "points"
+      | "roundness"
+      | "splitPoints"
+      | "polygon"
     >
   > = {},
 ): NonDeleted<ExcalidrawLineElement> =>
@@ -234,6 +247,28 @@ describe("arrow and line split points", () => {
       // later points don't affect it
       expect(shiftSplitPointsOnDuplicate(arrow, [4])).toEqual([3]);
       expect(shiftSplitPointsOnDuplicate(arrow, [])).toBeUndefined();
+    });
+
+    it("remaps dormant split indices while the element is sharp", () => {
+      // a sharp element keeps its splits so switching back to curved restores
+      // the same corners — point edits made meanwhile still have to move them,
+      // even though none of them render
+      const sharp = createArrow({
+        roundness: null,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(50, 50),
+          pointFrom<LocalPoint>(100, 0),
+          pointFrom<LocalPoint>(150, 50),
+          pointFrom<LocalPoint>(200, 0),
+        ],
+        splitPoints: [3],
+      });
+
+      expect(getSplitPoints(sharp)).toEqual([]);
+      expect(shiftSplitPointsOnInsert(sharp, 2)).toEqual([4]);
+      expect(shiftSplitPointsOnDuplicate(sharp, [1])).toEqual([4]);
+      expect(shiftSplitPointsOnDelete(sharp, [1])).toEqual([2]);
     });
 
     it("groups points into overlapping runs", () => {
@@ -566,6 +601,87 @@ describe("arrow and line split points", () => {
     );
   });
 
+  describe("resizing", () => {
+    beforeEach(async () => {
+      unmountComponent();
+      localStorage.clear();
+      reseed(7);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      h.state.width = 1000;
+      h.state.height = 1000;
+    });
+
+    // splitting both interior points turns the smooth curve — which overshoots
+    // the points on every side — into three straight segments, so the drawn
+    // bounds are exactly [0, 0, 100, 100]
+    const squareLine = () =>
+      createLine({
+        width: 100,
+        height: 100,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(0, 100),
+          pointFrom<LocalPoint>(100, 100),
+          pointFrom<LocalPoint>(100, 0),
+        ],
+        splitPoints: [1, 2],
+      });
+
+    it("measures a split line by its split curves, not by one smooth curve", () => {
+      const line = squareLine();
+
+      expect(
+        getResizedElementAbsoluteCoords(line, line.width, line.height, true),
+      ).toEqual(getElementPointsCoords(line, line.points));
+    });
+
+    const dragEastHandleTo = (
+      line: NonDeleted<ExcalidrawLineElement>,
+      pointerX: number,
+    ) => {
+      API.setElements([line]);
+      API.setSelectedElements([line]);
+
+      const [, y1, , y2] = getElementBounds(line, arrayToMap(h.elements));
+
+      act(() => {
+        transformElements(
+          new Map([[line.id, line]]),
+          "e",
+          [h.elements[0] as NonDeleted<ExcalidrawLineElement>],
+          h.app.scene,
+          false,
+          false,
+          false,
+          pointerX,
+          (y1 + y2) / 2,
+          0,
+          0,
+        );
+      });
+
+      return getElementBounds(h.elements[0], arrayToMap(h.elements));
+    };
+
+    it("does not jump when the pointer grabs a split line's handle", () => {
+      // the handle sits on the drawn right edge, so scaling from there with
+      // the pointer held still has to be a no-op
+      const bounds = dragEastHandleTo(squareLine(), 100);
+
+      bounds.forEach((coord, idx) =>
+        expect(coord).toBeCloseTo([0, 0, 100, 100][idx]),
+      );
+    });
+
+    it("scales a split line against the outline the handles sit on", () => {
+      const bounds = dragEastHandleTo(squareLine(), 150);
+
+      bounds.forEach((coord, idx) =>
+        expect(coord).toBeCloseTo([0, 0, 150, 100][idx]),
+      );
+    });
+  });
+
   describe("duplicating points", () => {
     beforeEach(async () => {
       unmountComponent();
@@ -576,7 +692,9 @@ describe("arrow and line split points", () => {
       h.state.height = 1000;
     });
 
-    const fivePointArrow = () =>
+    const fivePointArrow = (
+      overrides: Partial<ExcalidrawArrowElement> = {},
+    ) =>
       createArrow({
         x: 0,
         y: 0,
@@ -588,6 +706,7 @@ describe("arrow and line split points", () => {
           pointFrom<LocalPoint>(200, 0),
         ],
         splitPoints: [3],
+        ...overrides,
       });
 
     const editWithSelectedPoint = (
@@ -620,6 +739,23 @@ describe("arrow and line split points", () => {
       expect(updated.points).toHaveLength(6);
       expect(updated.splitPoints).toEqual([4]);
       // the corner is still on the very same point, not its neighbour
+      expect(updated.points[4]).toEqual(splitPointBefore);
+    });
+
+    it("keeps a dormant split on the same point while the arrow is sharp", () => {
+      const arrow = fivePointArrow({ roundness: null });
+      const splitPointBefore = arrow.points[3];
+      editWithSelectedPoint(arrow, 1);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionDuplicateSelection);
+      });
+
+      const updated = h.elements[0] as ExcalidrawArrowElement;
+
+      expect(updated.points).toHaveLength(6);
+      // switching back to curved has to put the corner back where it was
+      expect(updated.splitPoints).toEqual([4]);
       expect(updated.points[4]).toEqual(splitPointBefore);
     });
 
