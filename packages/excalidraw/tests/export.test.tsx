@@ -1,11 +1,15 @@
 import React from "react";
+import tEXt from "png-chunk-text";
+import decodePng from "png-chunks-extract";
+import encodePng from "png-chunks-encode";
 
-import { SVG_NS } from "@excalidraw/common";
+import { SVG_NS, MIME_TYPES } from "@excalidraw/common";
 
 import type { FileId } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
-import { getDataURL } from "../data/blob";
+import { getDataURL, blobToArrayBuffer } from "../data/blob";
+import { encode } from "../data/encode";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
 import { Excalidraw } from "../index";
@@ -34,14 +38,52 @@ const testElements = [
   },
 ];
 
-// tiny polyfill for TextDecoder.decode on which we depend
+// tiny polyfill for TextDecoder.decode on which we depend.
+// Must actually decode UTF-8 (not just map each byte to a char code),
+// since it needs to correctly invert the real (non-polyfilled)
+// TextEncoder's multi-byte output for the iTXt PNG chunk round-trip.
 Object.defineProperty(window, "TextDecoder", {
   value: class TextDecoder {
+    private encoding: string;
+    constructor(encoding = "utf-8") {
+      this.encoding = encoding.toLowerCase();
+    }
     decode(ab: ArrayBuffer) {
-      return new Uint8Array(ab).reduce(
-        (acc, c) => acc + String.fromCharCode(c),
-        "",
-      );
+      const bytes = new Uint8Array(ab);
+      if (this.encoding === "latin1" || this.encoding === "iso-8859-1") {
+        return bytes.reduce((acc, c) => acc + String.fromCharCode(c), "");
+      }
+      // utf-8 (default)
+      let result = "";
+      let i = 0;
+      while (i < bytes.length) {
+        const byte1 = bytes[i++];
+        if (byte1 < 0x80) {
+          result += String.fromCharCode(byte1);
+        } else if (byte1 >> 5 === 0b110) {
+          const byte2 = bytes[i++];
+          result += String.fromCharCode(
+            ((byte1 & 0x1f) << 6) | (byte2 & 0x3f),
+          );
+        } else if (byte1 >> 4 === 0b1110) {
+          const byte2 = bytes[i++];
+          const byte3 = bytes[i++];
+          result += String.fromCharCode(
+            ((byte1 & 0x0f) << 12) | ((byte2 & 0x3f) << 6) | (byte3 & 0x3f),
+          );
+        } else if (byte1 >> 3 === 0b11110) {
+          const byte2 = bytes[i++];
+          const byte3 = bytes[i++];
+          const byte4 = bytes[i++];
+          const codepoint =
+            ((byte1 & 0x07) << 18) |
+            ((byte2 & 0x3f) << 12) |
+            ((byte3 & 0x3f) << 6) |
+            (byte4 & 0x3f);
+          result += String.fromCodePoint(codepoint);
+        }
+      }
+      return result;
     }
   },
 });
@@ -217,5 +259,44 @@ describe("export", () => {
     // in case of regressions, save the SVG to a file and visually compare to:
     // src/tests/fixtures/svg-image-exporting-reference.svg
     expect(svgText).toMatchSnapshot(`svg export output`);
+  });
+
+  it("exports scene metadata as an iTXt chunk, not tEXt", async () => {
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
+    const pngBlobEmbedded = await encodePngMetadata({
+      blob: pngBlob,
+      metadata: serializeAsJSON(testElements, h.state, {}, "local"),
+    });
+    const chunks = decodePng(
+      new Uint8Array(await blobToArrayBuffer(pngBlobEmbedded)),
+    );
+    expect(chunks.some((chunk) => chunk.name === "iTXt")).toBe(true);
+    expect(chunks.some((chunk) => chunk.name === "tEXt")).toBe(false);
+  });
+
+  it("still imports scenes embedded as a legacy tEXt chunk", async () => {
+    const pngBlob = await API.loadFile("./fixtures/smiley.png");
+    const chunks = decodePng(new Uint8Array(await blobToArrayBuffer(pngBlob)));
+    const legacyChunk = tEXt.encode(
+      MIME_TYPES.excalidraw,
+      JSON.stringify(
+        encode({
+          text: serializeAsJSON(testElements, h.state, {}, "local"),
+          compress: true,
+        }),
+      ),
+    );
+    chunks.splice(-1, 0, legacyChunk);
+    const legacyBlob = new Blob([encodePng(chunks)], {
+      type: MIME_TYPES.png,
+    });
+
+    await API.drop([{ kind: "file", file: legacyBlob }]);
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "text", text: "😀" }),
+      ]);
+    });
   });
 });
