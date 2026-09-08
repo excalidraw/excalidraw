@@ -16,7 +16,7 @@ If you want to overwrite the `source` field in the `JSON` string, you can set `w
 
 <pre>
 serializeAsJSON(&#123;<br/>&nbsp;
-  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>,<br/>&nbsp;
+  elements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">ExcalidrawElement[]</a>,<br/>&nbsp;
   appState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a>,<br/>
 }): string
 </pre>
@@ -53,7 +53,7 @@ Returns `true` if element is invisibly small (e.g. width & height are zero).
 **_Signature_**
 
 <pre>
-isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement</a>): boolean
+isInvisiblySmallElement(element:  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">ExcalidrawElement</a>): boolean
 </pre>
 
 **How to use**
@@ -81,7 +81,7 @@ excalidrawAPI.updateScene(scene);
 loadFromBlob(<br/>&nbsp;
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,<br/>&nbsp;
   localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a> | null,<br/>&nbsp;
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">ExcalidrawElement[]</a> | null,<br/>&nbsp;
   fileHandle?: FileSystemHandle | null <br/>
 ) => Promise&lt;<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/restore.ts#L61">RestoredDataState</a>>
 </pre>
@@ -131,7 +131,7 @@ if (contents.type === MIME_TYPES.excalidraw) {
 loadSceneOrLibraryFromBlob(<br/>&nbsp;
   blob: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Blob">Blob</a>,<br/>&nbsp;
   localAppState: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95">AppState</a> | null,<br/>&nbsp;
-  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a> | null,<br/>&nbsp;
+  localElements: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">ExcalidrawElement[]</a> | null,<br/>&nbsp;
   fileHandle?: FileSystemHandle | null<br/>
 ) => Promise&lt;&#123; type: string, data: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/restore.ts#L53">RestoredDataState</a> | <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/types.ts#L33">ImportedLibraryState</a>}>
 </pre>
@@ -149,7 +149,7 @@ import { getFreeDrawSvgPath } from "@excalidraw/excalidraw";
 **Signature**
 
 <pre>
-getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L182">ExcalidrawFreeDrawElement</a>)
+getFreeDrawSvgPath(element: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L387">ExcalidrawFreeDrawElement</a>)
 </pre>
 
 ### isLinearElement
@@ -165,7 +165,7 @@ import { isLinearElement } from "@excalidraw/excalidraw";
 **Signature**
 
 <pre>
-isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L80">ExcalidrawElement</a>): boolean
+isLinearElement(elementType?: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">ExcalidrawElement</a>): boolean
 </pre>
 
 ### getNonDeletedElements
@@ -181,7 +181,7 @@ import { getNonDeletedElements } from "@excalidraw/excalidraw";
 **Signature**
 
 <pre>
-getNonDeletedElements(elements:<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114"> readonly ExcalidrawElement[]</a>): as readonly <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L125">NonDeletedExcalidrawElement[]</a>
+getNonDeletedElements(elements:<a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206"> readonly ExcalidrawElement[]</a>): as readonly <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L233">NonDeletedExcalidrawElement[]</a>
 </pre>
 
 ### mergeLibraryItems
@@ -253,7 +253,7 @@ This function returns the current `scene` version.
 **_Signature_**
 
 <pre>
-getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">ExcalidrawElement[]</a>)
+getSceneVersion(elements:  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">ExcalidrawElement[]</a>)
 </pre>
 
 **How to use**
