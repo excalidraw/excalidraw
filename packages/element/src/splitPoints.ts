@@ -18,20 +18,25 @@ import type { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
  * and only on curved, non-elbow arrows and lines.
  */
 
+const canStoreSplitPoints = <T extends ExcalidrawElement>(
+  element: T,
+): element is T & ExcalidrawLinearElement =>
+  isLinearElement(element) && !isElbowArrow(element);
+
 export const canSplitPoints = <T extends ExcalidrawElement>(
   element: T,
 ): element is T & ExcalidrawLinearElement =>
-  isLinearElement(element) && !isElbowArrow(element) && !!element.roundness;
+  canStoreSplitPoints(element) && !!element.roundness;
 
 export const isValidSplitPointIndex = (
   element: ExcalidrawLinearElement,
   index: number,
 ) => Number.isInteger(index) && index > 0 && index < element.points.length - 1;
 
-export const getSplitPoints = (
+const getStoredSplitPoints = (
   element: ExcalidrawElement,
 ): readonly number[] => {
-  if (!canSplitPoints(element) || !element.splitPoints?.length) {
+  if (!canStoreSplitPoints(element) || !element.splitPoints?.length) {
     return [];
   }
 
@@ -39,6 +44,9 @@ export const getSplitPoints = (
     isValidSplitPointIndex(element, index),
   );
 };
+
+export const getSplitPoints = (element: ExcalidrawElement): readonly number[] =>
+  canSplitPoints(element) ? getStoredSplitPoints(element) : [];
 
 export const isSplitPoint = (element: ExcalidrawElement, index: number) =>
   getSplitPoints(element).includes(index);
@@ -81,7 +89,7 @@ export const shiftSplitPointsOnInsert = (
   insertIndex: number,
   count = 1,
 ): ExcalidrawLinearElement["splitPoints"] | undefined => {
-  const current = getSplitPoints(element);
+  const current = getStoredSplitPoints(element);
 
   if (!current.length) {
     return undefined;
@@ -101,7 +109,7 @@ export const shiftSplitPointsOnDuplicate = (
   element: ExcalidrawElement,
   duplicatedIndices: readonly number[],
 ): ExcalidrawLinearElement["splitPoints"] | undefined => {
-  const current = getSplitPoints(element);
+  const current = getStoredSplitPoints(element);
 
   if (!current.length || !duplicatedIndices.length) {
     return undefined;
@@ -126,7 +134,7 @@ export const shiftSplitPointsOnDelete = (
   element: ExcalidrawElement,
   deletedIndices: readonly number[],
 ): ExcalidrawLinearElement["splitPoints"] | undefined => {
-  const current = getSplitPoints(element);
+  const current = getStoredSplitPoints(element);
 
   if (!current.length) {
     return undefined;
