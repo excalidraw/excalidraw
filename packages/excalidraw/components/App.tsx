@@ -13560,10 +13560,12 @@ class App extends React.Component<AppProps, AppState> {
       activeEmbeddable: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
+    const shouldSnapToGrid =
+      transformHandleType !== "rotation" && !event[KEYS.CTRL_OR_CMD];
     let [resizeX, resizeY] = getGridPoint(
       pointerCoords.x - pointerDownState.resize.offset.x,
       pointerCoords.y - pointerDownState.resize.offset.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+      shouldSnapToGrid ? this.getEffectiveGridSize() : null,
     );
 
     const frameElementsOffsetsMap = new Map<
@@ -13594,7 +13596,7 @@ class App extends React.Component<AppProps, AppState> {
       const [gridX, gridY] = getGridPoint(
         pointerCoords.x,
         pointerCoords.y,
-        event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+        shouldSnapToGrid ? this.getEffectiveGridSize() : null,
       );
 
       const dragOffset = {
