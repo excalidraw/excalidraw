@@ -231,7 +231,7 @@ export const STICKY_NOTE_FOOTER = {
   fontFamily: "Helvetica, Arial, sans-serif",
   /** from the bottom padding up to the alphabetic baseline (descender room) */
   baselineOffset: 4,
-  opacity: 0.65,
+  opacity: 1,
   minBodyWidthForYear: 80,
 } as const;
 /** outer height → label body height: top + bottom padding + footer */
