@@ -2,14 +2,14 @@ import {
   FONT_FAMILY,
   VERTICAL_ALIGN,
   escapeDoubleQuotes,
-  getFontString,
+  getLineHeight,
 } from "@excalidraw/common";
 
 import type { ExcalidrawProps } from "@excalidraw/excalidraw/types";
 import type { MarkRequired } from "@excalidraw/common/utility-types";
 
 import { newTextElement } from "./newElement";
-import { wrapText } from "./textWrapping";
+import { getTextHeight } from "./textMeasurements";
 import { isIframeElement } from "./typeChecks";
 
 import type {
@@ -399,6 +399,33 @@ export const getEmbedLink = (
   };
 };
 
+/** gap between the embed's edge and its placeholder text, per side */
+const PLACEHOLDER_PADDING = 10;
+
+/**
+ * Longest placeholder text. Below this the font size is `width / length`
+ * (see below), so a line is at most `advance * width` wide -- which, at the
+ * ~0.5em average advance of Latin text, fits the padded box without ever
+ * measuring it. Above it the font size stops shrinking and text would have
+ * to wrap.
+ */
+const PLACEHOLDER_MAX_CHARS = 30;
+
+/** The link as shown in a placeholder: scheme and `www.` dropped, capped. */
+export const getPlaceholderLinkText = (link: string) => {
+  const text = link.replace(/^https?:\/\//i, "").replace(/^www\./i, "");
+  return text.length > PLACEHOLDER_MAX_CHARS
+    ? `${text.slice(0, PLACEHOLDER_MAX_CHARS - 1)}…`
+    : text;
+};
+
+/**
+ * The text drawn in place of an embed that isn't rendered live (on export,
+ * or when the embed fails validation). A single line, capped at
+ * `PLACEHOLDER_MAX_CHARS`, laid out WITHOUT measuring text -- so it needs no
+ * canvas and comes out the same on every host. The full link is not lost:
+ * the SVG renderer wraps a linked element in an `<a href>`.
+ */
 export const createPlaceholderEmbeddableLabel = (
   element: ExcalidrawIframeLikeElement,
 ): NonDeletedExcalidrawElement => {
@@ -406,20 +433,17 @@ export const createPlaceholderEmbeddableLabel = (
   if (isIframeElement(element)) {
     text = "IFrame element";
   } else {
-    text =
-      !element.link || element?.link === "" ? "Empty Web-Embed" : element.link;
+    text = element.link ? getPlaceholderLinkText(element.link) : "";
+    text = text || "Empty Web-Embed";
   }
 
   const fontSize = Math.max(
     Math.min(element.width / 2, element.width / text.length),
-    element.width / 30,
+    element.width / PLACEHOLDER_MAX_CHARS,
   );
   const fontFamily = FONT_FAMILY.Helvetica;
-
-  const fontString = getFontString({
-    fontSize,
-    fontFamily,
-  });
+  const lineHeight = getLineHeight(fontFamily);
+  const width = element.width - PLACEHOLDER_PADDING * 2;
 
   return newTextElement({
     x: element.x + element.width / 2,
@@ -429,10 +453,12 @@ export const createPlaceholderEmbeddableLabel = (
     backgroundColor: "transparent",
     fontFamily,
     fontSize,
-    text: wrapText(text, fontString, element.width - 20),
+    lineHeight,
+    text,
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     angle: element.angle ?? 0,
+    metrics: { width, height: getTextHeight(text, fontSize, lineHeight) },
   });
 };
 

@@ -21,6 +21,7 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+import type { RenderEnvironment } from "@excalidraw/element";
 
 import {
   copyBlobToClipboardAsPng,
@@ -107,6 +108,8 @@ export const exportCanvas = async (
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
+    renderEnvironment,
+    ownerDocument,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -115,6 +118,8 @@ export const exportCanvas = async (
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    renderEnvironment?: RenderEnvironment;
+    ownerDocument?: Document;
   },
 ) => {
   if (elements.length === 0) {
@@ -132,7 +137,7 @@ export const exportCanvas = async (
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
-      { exportingFrame },
+      { exportingFrame, ownerDocument },
     );
 
     if (type === "svg") {
@@ -168,6 +173,7 @@ export const exportCanvas = async (
     viewBackgroundColor,
     exportPadding,
     exportingFrame,
+    renderEnvironment,
   });
 
   if (type === "png") {

@@ -1,18 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+
+import { getTargetWindow } from "@excalidraw/common";
 
 import "./Tooltip.scss";
 
-export const getTooltipDiv = () => {
-  const existingDiv = document.querySelector<HTMLDivElement>(
-    ".excalidraw-tooltip",
+export const TOOLTIP_CLASS = "excalidraw-tooltip";
+export const TOOLTIP_VISIBLE_CLASS = "excalidraw-tooltip--visible";
+
+export const getTooltipDiv = (ownerDocument: Document) => {
+  const existingDiv = ownerDocument.querySelector<HTMLDivElement>(
+    `.${TOOLTIP_CLASS}`,
   );
   if (existingDiv) {
     return existingDiv;
   }
-  const div = document.createElement("div");
-  document.body.appendChild(div);
-  div.classList.add("excalidraw-tooltip");
+  const div = ownerDocument.createElement("div");
+  ownerDocument.body.appendChild(div);
+  div.classList.add(TOOLTIP_CLASS);
   return div;
+};
+
+export const hideTooltip = (ownerDocument: Document) => {
+  ownerDocument
+    .querySelector(`.${TOOLTIP_CLASS}`)
+    ?.classList.remove(TOOLTIP_VISIBLE_CLASS);
 };
 
 export const updateTooltipPosition = (
@@ -26,9 +37,15 @@ export const updateTooltipPosition = (
   position: "bottom" | "top" = "bottom",
 ) => {
   const tooltipRect = tooltip.getBoundingClientRect();
+  // callers have already made the tooltip visible, so it must always end up
+  // positioned — falls back to the module realm for a detached document
+  const ownerWindow = getTargetWindow(tooltip);
+  if (!ownerWindow) {
+    return;
+  }
 
-  const viewportWidth = window.innerWidth;
-  const viewportHeight = window.innerHeight;
+  const viewportWidth = ownerWindow.innerWidth;
+  const viewportHeight = ownerWindow.innerHeight;
 
   const margin = 5;
 
@@ -65,7 +82,7 @@ const updateTooltip = (
   label: string,
   long: boolean,
 ) => {
-  tooltip.classList.add("excalidraw-tooltip--visible");
+  tooltip.classList.add(TOOLTIP_VISIBLE_CLASS);
   tooltip.style.minWidth = long ? "50ch" : "10ch";
   tooltip.style.maxWidth = long ? "50ch" : "15ch";
 
@@ -90,27 +107,43 @@ export const Tooltip = ({
   style,
   disabled,
 }: TooltipProps) => {
+  // the tooltip div we're currently showing (may live in another document),
+  // so that unmounting while hovered doesn't leave it stuck on screen
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    return () =>
-      getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    return () => {
+      tooltipRef.current?.classList.remove(TOOLTIP_VISIBLE_CLASS);
+      tooltipRef.current = null;
+    };
   }, []);
+  useEffect(() => {
+    // the wrapper is unmounted while disabled, so its onPointerLeave never
+    // fires and the shared tooltip div must be cleared here instead
+    if (disabled) {
+      tooltipRef.current?.classList.remove(TOOLTIP_VISIBLE_CLASS);
+      tooltipRef.current = null;
+    }
+  }, [disabled]);
   if (disabled) {
     return null;
   }
   return (
     <div
       className="excalidraw-tooltip-wrapper"
-      onPointerEnter={(event) =>
+      onPointerEnter={(event) => {
+        const tooltip = getTooltipDiv(event.currentTarget.ownerDocument);
+        tooltipRef.current = tooltip;
         updateTooltip(
           event.currentTarget as HTMLDivElement,
-          getTooltipDiv(),
+          tooltip,
           label,
           long,
-        )
-      }
-      onPointerLeave={() =>
-        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
-      }
+        );
+      }}
+      onPointerLeave={(event) => {
+        hideTooltip(event.currentTarget.ownerDocument);
+        tooltipRef.current = null;
+      }}
       style={style}
     >
       {children}

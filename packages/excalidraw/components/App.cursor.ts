@@ -206,7 +206,7 @@ export class AppCursor {
 
     if (!this.eraserCanvasCache || this.eraserCanvasCache.theme !== theme) {
       const isDarkTheme = theme === THEME.DARK;
-      this.eraserCanvasCache = document.createElement("canvas");
+      this.eraserCanvasCache = this.app.ownerDocument.createElement("canvas");
       this.eraserCanvasCache.theme = theme;
       this.eraserCanvasCache.height = cursorImageSizePx;
       this.eraserCanvasCache.width = cursorImageSizePx;

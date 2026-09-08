@@ -22,7 +22,11 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getLanguage, t } from "../i18n";
-import { AnimationController } from "../renderer/animation";
+import {
+  AnimationController,
+  type AnimationKey,
+  type AnimationScheduler,
+} from "../renderer/animation";
 import {
   constrainScrollState,
   DEFAULT_OVERSCROLL,
@@ -44,9 +48,13 @@ import type {
 } from "../types";
 import type App from "./App";
 
-export const SCROLL_TO_CONTENT_ANIMATION_KEY = "animateScrollToContent";
-export const SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY =
-  "animateScrollConstraintsSnapBack";
+/** The AnimationController keys a viewport uses, unique per AppViewport so
+ * concurrent editors in the same window never share (or cancel) each
+ * other's animations. */
+export type ViewportAnimationKeys = {
+  scrollToContent: AnimationKey;
+  snapBack: AnimationKey;
+};
 
 const DEFAULT_SCROLL_ANIMATION_DURATION = 500;
 
@@ -325,6 +333,8 @@ const animateToViewport = (
   from: Viewport,
   target: Viewport,
   duration: number,
+  key: AnimationKey,
+  scheduler: AnimationScheduler,
   onFrame: (
     state: Pick<
       AppState,
@@ -334,7 +344,7 @@ const animateToViewport = (
   onComplete: () => void,
 ) => {
   AnimationController.start<{ elapsed: number }>(
-    SCROLL_TO_CONTENT_ANIMATION_KEY,
+    key,
     ({ deltaTime, state }) => {
       const elapsed = (state?.elapsed ?? 0) + deltaTime;
       const progress = Math.min(elapsed / duration, 1);
@@ -352,6 +362,7 @@ const animateToViewport = (
 
       return null;
     },
+    scheduler,
   );
 };
 
@@ -379,6 +390,8 @@ export const snapBackToConstraints = (
       >,
     ) => Viewport | null,
   ) => void,
+  keys: ViewportAnimationKeys,
+  scheduler: AnimationScheduler = window,
   duration = SNAP_BACK_ANIMATION_DURATION,
 ) => {
   const target = constrainScrollState(state);
@@ -393,7 +406,7 @@ export const snapBackToConstraints = (
 
   // A programmatic navigation owns the viewport until it settles. A stale
   // rubberband debounce must not supersede it.
-  if (AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY)) {
+  if (AnimationController.running(keys.scrollToContent)) {
     return;
   }
 
@@ -404,7 +417,7 @@ export const snapBackToConstraints = (
   const overscrollY = (state.scrollY - target.scrollY) * state.zoom.value;
 
   AnimationController.start<{ elapsed: number }>(
-    SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY,
+    keys.snapBack,
     ({ deltaTime, state: animationState }) => {
       const elapsed = (animationState?.elapsed ?? 0) + deltaTime;
       const progress = Math.min(elapsed / duration, 1);
@@ -426,6 +439,7 @@ export const snapBackToConstraints = (
 
       return progress < 1 ? { elapsed } : null;
     },
+    scheduler,
   );
 };
 
@@ -446,6 +460,11 @@ export class AppViewport {
     { side: "left" | "right"; offset: number }
   >();
 
+  /** Unique per instance (see `ViewportAnimationKeys`); exposed for tests
+   * observing the animations. */
+  readonly scrollToContentAnimationKey = Symbol("scrollToContentAnimation");
+  readonly snapBackAnimationKey = Symbol("snapBackAnimation");
+
   constructor(
     private app: App,
     private dependencies: AppViewportDependencies,
@@ -453,8 +472,8 @@ export class AppViewport {
 
   get isAnimating() {
     return (
-      AnimationController.running(SCROLL_TO_CONTENT_ANIMATION_KEY) ||
-      AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY)
+      AnimationController.running(this.scrollToContentAnimationKey) ||
+      AnimationController.running(this.snapBackAnimationKey)
     );
   }
 
@@ -634,7 +653,7 @@ export class AppViewport {
   setViewport = (opts: SetViewportOptions | null) => {
     if (opts === null) {
       this.cancelTransition();
-      AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+      AnimationController.cancel(this.snapBackAnimationKey);
       this.snapBackDebounced.cancel();
       this.app.setState({
         scrollConstraints: null,
@@ -679,7 +698,7 @@ export class AppViewport {
     // A new programmatic navigation supersedes the previous one and starts
     // from whatever viewport its last rendered frame reached.
     this.cancelTransition();
-    AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+    AnimationController.cancel(this.snapBackAnimationKey);
     this.snapBackDebounced.cancel();
 
     if (duration === null) {
@@ -706,6 +725,8 @@ export class AppViewport {
       from,
       viewportUpdate,
       duration,
+      this.scrollToContentAnimationKey,
+      this.app.ownerWindow,
       (state) => {
         if (this.activeTransition === transition) {
           this.app.setState(state);
@@ -746,7 +767,7 @@ export class AppViewport {
 
     this.cancelTransition();
     if (!opts?.preserveScrollConstraintsSnapBack) {
-      AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+      AnimationController.cancel(this.snapBackAnimationKey);
     }
     this.app.setState({ shouldCacheIgnoreZoom: false });
     this.app.requestUnfollow();
@@ -792,8 +813,14 @@ export class AppViewport {
     if (this.app.unmounted || this.dependencies.isGestureActive()) {
       return;
     }
-    snapBackToConstraints(this.app.state, (updater) =>
-      this.app.setState((state) => updater(state)),
+    snapBackToConstraints(
+      this.app.state,
+      (updater) => this.app.setState((state) => updater(state)),
+      {
+        scrollToContent: this.scrollToContentAnimationKey,
+        snapBack: this.snapBackAnimationKey,
+      },
+      this.app.ownerWindow,
     );
   };
 
@@ -804,12 +831,12 @@ export class AppViewport {
 
   private cancelTransition = () => {
     this.activeTransition = null;
-    AnimationController.cancel(SCROLL_TO_CONTENT_ANIMATION_KEY);
+    AnimationController.cancel(this.scrollToContentAnimationKey);
   };
 
   destroy = () => {
     this.cancelTransition();
-    AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
+    AnimationController.cancel(this.snapBackAnimationKey);
     this.snapBackDebounced.cancel();
   };
 }

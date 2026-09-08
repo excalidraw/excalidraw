@@ -289,7 +289,7 @@ import type {
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
 
-import type { ArrowEndpoint } from "@excalidraw/element";
+import type { ArrowEndpoint, RenderEnvironment } from "@excalidraw/element";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -450,6 +450,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
+import { AppHost } from "./App.host";
 import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
@@ -609,7 +610,6 @@ let IS_PLAIN_PASTE = false;
 let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
-let lastPointerUp: (() => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -642,6 +642,18 @@ class App extends React.Component<AppProps, AppState> {
   public get ownerWindow(): Window & typeof globalThis {
     return (this.ownerDocument.defaultView ?? window) as Window &
       typeof globalThis;
+  }
+
+  /**
+   * Everything binding this editor to the document/window it renders into
+   * (render environment, hyperlink tooltip ownership). Delegated to so the
+   * cross-document ownership rules live in one place.
+   */
+  public host: AppHost = new AppHost(this);
+
+  /** @see AppHost.renderEnvironment */
+  public get renderEnvironment(): RenderEnvironment {
+    return this.host.renderEnvironment;
   }
 
   public scene: Scene;
@@ -1085,7 +1097,7 @@ class App extends React.Component<AppProps, AppState> {
     let data = null;
     try {
       data = JSON.parse(event.data);
-    } catch (e) {}
+    } catch {}
     if (!data) {
       return;
     }
@@ -2592,6 +2604,8 @@ class App extends React.Component<AppProps, AppState> {
                             renderConfig={{
                               imageCache: this.imageCache,
                               isExporting: false,
+                              scale: this.ownerWindow.devicePixelRatio,
+                              renderEnvironment: this.renderEnvironment,
                               renderGrid: isGridModeEnabled(this),
                               renderLinks: this.isLinksEnabled(),
                               canvasBackgroundColor:
@@ -2616,6 +2630,8 @@ class App extends React.Component<AppProps, AppState> {
                               renderConfig={{
                                 imageCache: this.imageCache,
                                 isExporting: false,
+                                scale: this.ownerWindow.devicePixelRatio,
+                                renderEnvironment: this.renderEnvironment,
                                 renderGrid: false,
                                 canvasBackgroundColor:
                                   this.state.viewBackgroundColor,
@@ -2733,6 +2749,8 @@ class App extends React.Component<AppProps, AppState> {
         name: this.getName(),
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
+        renderEnvironment: this.renderEnvironment,
+        ownerDocument: this.ownerDocument,
       },
     )
       .catch(muteFSAbortError)
@@ -2992,7 +3010,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private openEyeDropper = ({ type }: { type: "stroke" | "background" }) => {
-    this.updateEditorAtom(activeEyeDropperAtom, {
+    this.host.setActiveEyeDropper({
       swapPreviewOnAlt: true,
       colorPickerType:
         type === "stroke" ? "elementStroke" : "elementBackground",
@@ -3227,7 +3245,7 @@ class App extends React.Component<AppProps, AppState> {
     isHoldingSpace = false;
     isPanning = false;
     isDraggingScrollBar = false;
-    lastPointerUp = null;
+    this.host.setPointerUp(null);
 
     gesture.pointers.clear();
     gesture.lastCenter = null;
@@ -3253,6 +3271,7 @@ class App extends React.Component<AppProps, AppState> {
     // These components install their own DOM listeners rather than going
     // through App's input handlers, so they must be explicitly unmounted.
     editorJotaiStore.set(activeEyeDropperAtom, null);
+    this.host.releaseEyeDropperOwnership();
     editorJotaiStore.set(convertElementTypePopupAtom, null);
 
     if (this.state.editingFrame) {
@@ -3342,7 +3361,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isLinksEnabled(prevProps) !== this.isLinksEnabled()) {
       if (!this.isLinksEnabled()) {
         this.hitLinkElement = undefined;
-        hideHyperlinkToolip();
+        hideHyperlinkToolip(this.host.hyperlinkTooltipOwner);
         this.cursor.reset();
       }
     }
@@ -3617,10 +3636,16 @@ class App extends React.Component<AppProps, AppState> {
     // can be loaded fresh
     this.clearImageShapeCache();
 
-    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
-    this.fonts.loadSceneFonts().then((fontFaces) => {
-      this.fonts.onLoaded(fontFaces);
-    });
+    // manually loading the font faces seems faster even in browsers that do
+    // fire the loadingdone event. Prewarming the default font family, so that
+    // the first text element is not rendered with a fallback font.
+    // NOTE: reading from `restoredAppState` instead of `this.state`, as the
+    // `syncActionResult` above sets the state asynchronously
+    this.fonts
+      .loadSceneFonts(restoredAppState.currentItemFontFamily)
+      .then((fontFaces) => {
+        this.fonts.onLoaded(fontFaces);
+      });
 
     if (isElementLink(this.ownerWindow.location.href)) {
       this.viewport.setViewport({
@@ -3682,7 +3707,7 @@ class App extends React.Component<AppProps, AppState> {
     this.viewport.invalidateUIOffset("stylesPanel");
 
     if (prevStylesPanelMode !== "full" && nextStylesPanelMode === "full") {
-      this.setState((prevState) => ({
+      this.setState(() => ({
         preferredSelectionTool: {
           type: "selection",
           initialized: true,
@@ -3713,6 +3738,7 @@ class App extends React.Component<AppProps, AppState> {
   public async componentDidMount() {
     this.unmounted = false;
     this.api = this.createExcalidrawAPI();
+    this.host.sync();
 
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
@@ -3834,7 +3860,9 @@ class App extends React.Component<AppProps, AppState> {
 
     (this.ownerWindow as any).launchQueue?.setConsumer(() => {});
 
-    this.renderer.destroy();
+    this.host.destroy();
+
+    this.renderer.destroy(this.canvas);
     this.scene.destroy();
     this.scene = new Scene();
     this.fonts = new Fonts(this.scene, this.ownerDocument);
@@ -4161,6 +4189,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
+    this.host.sync(prevProps);
 
     this.appStateObserver.flush(prevState);
 
@@ -4268,8 +4297,9 @@ class App extends React.Component<AppProps, AppState> {
         // execute only if the condition still holds when the deferred callback
         // executes (it can be scheduled multiple times depending on how
         // many times the component renders)
-        this.state.selectedLinearElement?.isEditing &&
+        if (this.state.selectedLinearElement?.isEditing) {
           this.actionManager.executeAction(actionFinalize);
+        }
       });
     }
 
@@ -4552,6 +4582,7 @@ class App extends React.Component<AppProps, AppState> {
         data.programmaticAPI
           ? convertToExcalidrawElements(
               data.elements as ExcalidrawElementSkeleton[],
+              { renderEnvironment: this.renderEnvironment },
             )
           : data.elements
       ) as readonly ExcalidrawElement[];
@@ -4581,6 +4612,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const elements = convertToExcalidrawElements(skeletonElements, {
           regenerateIds: true,
+          renderEnvironment: this.renderEnvironment,
         });
 
         this.addElementsFromPasteOrLibrary({
@@ -4792,7 +4824,12 @@ class App extends React.Component<AppProps, AppState> {
           newElement,
           this.scene.getElementsMapIncludingDeleted(),
         );
-        redrawTextBoundingBox(newElement, container, this.scene);
+        redrawTextBoundingBox(
+          newElement,
+          container,
+          this.scene,
+          this.renderEnvironment,
+        );
       }
     });
 
@@ -4955,15 +4992,25 @@ class App extends React.Component<AppProps, AppState> {
             y: currentY,
           });
 
-          let metrics = measureText(originalText, fontString, lineHeight);
+          let metrics = measureText(
+            originalText,
+            fontString,
+            lineHeight,
+            this.renderEnvironment,
+          );
           const isTextUnwrapped = metrics.width > maxTextWidth;
 
           const text = isTextUnwrapped
-            ? wrapText(originalText, fontString, maxTextWidth)
+            ? wrapText(
+                originalText,
+                fontString,
+                maxTextWidth,
+                this.renderEnvironment,
+              )
             : originalText;
 
           metrics = isTextUnwrapped
-            ? measureText(text, fontString, lineHeight)
+            ? measureText(text, fontString, lineHeight, this.renderEnvironment)
             : metrics;
 
           const startX = x - metrics.width / 2;
@@ -4978,6 +5025,7 @@ class App extends React.Component<AppProps, AppState> {
             lineHeight,
             autoResize: !isTextUnwrapped,
             frameId: topLayerFrame ? topLayerFrame.id : null,
+            renderEnvironment: this.renderEnvironment,
           });
           acc.push(element);
           currentY += element.height + LINE_GAP;
@@ -6277,6 +6325,7 @@ class App extends React.Component<AppProps, AppState> {
                 getContainerElement(_element, elementsMap),
                 elementsMap,
                 nextOriginalText,
+                this.renderEnvironment,
               ),
             });
           }
@@ -6854,6 +6903,7 @@ class App extends React.Component<AppProps, AppState> {
       const minWidth = getApproxMinLineWidth(
         getFontString(fontString),
         lineHeight,
+        this.renderEnvironment,
       );
       const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
       const newHeight = Math.max(container.height, minHeight);
@@ -6949,6 +6999,7 @@ class App extends React.Component<AppProps, AppState> {
             : container.angle
           : (0 as Radians),
         frameId,
+        renderEnvironment: this.renderEnvironment,
       });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -7348,7 +7399,7 @@ class App extends React.Component<AppProps, AppState> {
       this.editorInterface.formFactor === "phone",
     );
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
-      hideHyperlinkToolip();
+      hideHyperlinkToolip(this.host.hyperlinkTooltipOwner);
       let url = this.hitLinkElement.link;
       if (url) {
         url = normalizeLink(url);
@@ -7392,10 +7443,12 @@ class App extends React.Component<AppProps, AppState> {
         this.hitLinkElement,
         this.state,
         this.scene.getNonDeletedElementsMap(),
+        this.ownerDocument,
+        this.host.hyperlinkTooltipOwner,
       );
       return true;
     }
-    hideHyperlinkToolip();
+    hideHyperlinkToolip(this.host.hyperlinkTooltipOwner);
     return false;
   };
 
@@ -8234,7 +8287,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // set touch moving for mobile context menu
-  private handleTouchMove = (event: React.TouchEvent<HTMLCanvasElement>) => {
+  private handleTouchMove = (_event: React.TouchEvent<HTMLCanvasElement>) => {
     if (!this.isInteractionEnabled()) {
       return;
     }
@@ -8520,7 +8573,7 @@ class App extends React.Component<AppProps, AppState> {
     //fires only once, if pen is detected, penMode is enabled
     //the user can disable this by toggling the penMode button
     if (!this.state.penDetected && event.pointerType === "pen") {
-      this.setState((prevState) => {
+      this.setState(() => {
         return {
           penMode: true,
           penDetected: true,
@@ -8709,7 +8762,9 @@ class App extends React.Component<AppProps, AppState> {
 
           Object.keys(prevState.selectedElementIds).forEach((id) => {
             const element = this.scene.getElement(id);
-            element && previouslySelectedElements.push(element);
+            if (element) {
+              previouslySelectedElements.push(element);
+            }
           });
 
           const hitElement = pointerDownState.hit.element!;
@@ -8968,7 +9023,7 @@ class App extends React.Component<AppProps, AppState> {
    * pointerup handlers manually
    */
   private maybeCleanupAfterMissingPointerUp = (event: PointerEvent | null) => {
-    lastPointerUp?.();
+    this.host.runPendingPointerUp();
     this.missingPointerEventCleanupEmitter.trigger(event).clear();
   };
 
@@ -9064,29 +9119,29 @@ class App extends React.Component<AppProps, AppState> {
         scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
         scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
-    });
-    const teardown = withBatchedUpdates(
-      (lastPointerUp = () => {
-        lastPointerUp = null;
-        isPanning = false;
-        if (!isHoldingSpace) {
-          this.cursor.reset();
-        }
-        this.setState(
-          {
-            cursorButton: "up",
-          },
-          // Runs after the trailing throttled pointer move has committed, so
-          // the snap-back starts from the pan's actual final viewport.
-          this.viewport.releaseOverscroll,
-        );
-        this.savePointer(event.clientX, event.clientY, "up");
-        this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-        this.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
-        this.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
-        onPointerMove.flush();
-      }),
-    );
+    }, this.ownerWindow);
+    const onPointerUp = () => {
+      this.host.setPointerUp(null);
+      isPanning = false;
+      if (!isHoldingSpace) {
+        this.cursor.reset();
+      }
+      this.setState(
+        {
+          cursorButton: "up",
+        },
+        // Runs after the trailing throttled pointer move has committed, so
+        // the snap-back starts from the pan's actual final viewport.
+        this.viewport.releaseOverscroll,
+      );
+      this.savePointer(event.clientX, event.clientY, "up");
+      this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+      this.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
+      this.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
+      onPointerMove.flush();
+    };
+    this.host.setPointerUp(onPointerUp);
+    const teardown = withBatchedUpdates(onPointerUp);
     this.ownerWindow.addEventListener(EVENT.BLUR, teardown);
     this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
       passive: true,
@@ -9278,9 +9333,9 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.handlePointerMoveOverScrollbars(event, pointerDownState);
-    });
+    }, this.ownerWindow);
     const onPointerUp = withBatchedUpdates(() => {
-      lastPointerUp = null;
+      this.host.setPointerUp(null);
       isDraggingScrollBar = false;
       this.cursor.applyForTool();
       this.setState({
@@ -9292,7 +9347,7 @@ class App extends React.Component<AppProps, AppState> {
       onPointerMove.flush();
     });
 
-    lastPointerUp = onPointerUp;
+    this.host.setPointerUp(onPointerUp);
 
     this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
     this.ownerWindow.addEventListener(EVENT.POINTER_UP, onPointerUp);
@@ -9650,7 +9705,9 @@ class App extends React.Component<AppProps, AppState> {
 
                 Object.keys(prevState.selectedElementIds).forEach((id) => {
                   const element = this.scene.getElement(id);
-                  element && previouslySelectedElements.push(element);
+                  if (element) {
+                    previouslySelectedElements.push(element);
+                  }
                 });
 
                 // if hitElement is frame-like, deselect all of its elements
@@ -10563,7 +10620,9 @@ class App extends React.Component<AppProps, AppState> {
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
       // Prevents focus from escaping excalidraw tab
-      event.key === KEYS.ALT && event.preventDefault();
+      if (event.key === KEYS.ALT) {
+        event.preventDefault();
+      }
       if (this.maybeHandleResize(pointerDownState, event)) {
         return;
       }
@@ -11473,7 +11532,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-    });
+    }, this.ownerWindow);
   }
 
   // Returns whether the pointer move happened over either scrollbar
@@ -11635,7 +11694,9 @@ class App extends React.Component<AppProps, AppState> {
             .map((e) => elementsMap.get(e.id))
             .filter((e) => isElbowArrow(e))
             .forEach((e) => {
-              !!e && this.scene.mutateElement(e, {});
+              if (e) {
+                this.scene.mutateElement(e, {});
+              }
             });
         }
       }
@@ -11897,6 +11958,7 @@ class App extends React.Component<AppProps, AppState> {
             fontFamily: newElement.fontFamily,
           }),
           newElement.lineHeight,
+          this.renderEnvironment,
         );
 
         if (newElement.width < minWidth) {
@@ -12850,6 +12912,7 @@ class App extends React.Component<AppProps, AppState> {
       imageCache: this.imageCache,
       fileIds: elements.map((element) => element.fileId),
       files,
+      createImage: () => this.renderEnvironment.createImage(),
     });
 
     if (erroredFiles.size) {
@@ -13343,6 +13406,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter: false,
         scene: this.scene,
         zoom: this.state.zoom.value,
+        renderEnvironment: this.renderEnvironment,
         informMutation: false,
       });
       return;
@@ -13413,6 +13477,7 @@ class App extends React.Component<AppProps, AppState> {
         shouldResizeFromCenter: shouldResizeFromCenter(event),
         zoom: this.state.zoom.value,
         scene: this.scene,
+        renderEnvironment: this.renderEnvironment,
         widthAspectRatio: aspectRatio,
         originOffset: this.state.originSnapOffset,
         informMutation,
@@ -13638,6 +13703,7 @@ class App extends React.Component<AppProps, AppState> {
         resizeY,
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
+        this.renderEnvironment,
       )
     ) {
       const elementsToHighlight = new Set<NonDeletedExcalidrawElement>();
@@ -13977,7 +14043,9 @@ class App extends React.Component<AppProps, AppState> {
           offsetTop,
         },
         () => {
-          cb && cb();
+          if (cb) {
+            cb();
+          }
         },
       );
       // a smaller viewport may push the min zoom up / shrink the pan range

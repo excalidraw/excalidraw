@@ -48,6 +48,7 @@ import {
   getApproxMinLineHeight,
 } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
+
 import {
   isArrowElement,
   isBindingElement,
@@ -61,6 +62,8 @@ import {
 } from "./typeChecks";
 
 import { isInGroup } from "./groups";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 
 import type { Scene } from "./Scene";
 
@@ -96,6 +99,7 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
+  renderEnvironment?: RenderEnvironment,
 ): boolean => {
   const elementsMap = scene.getNonDeletedElementsMap();
   if (selectedElements.length === 1) {
@@ -141,6 +145,7 @@ export const transformElements = (
           {
             shouldMaintainAspectRatio,
             shouldResizeFromCenter,
+            renderEnvironment,
           },
         );
       }
@@ -191,6 +196,7 @@ export const transformElements = (
           nextWidth,
           nextHeight,
           originalBoundingBox,
+          renderEnvironment,
         },
       );
 
@@ -315,6 +321,7 @@ export const resizeSingleTextElement = (
   shouldResizeFromCenter: boolean,
   nextWidth: number,
   nextHeight: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -357,6 +364,7 @@ export const resizeSingleTextElement = (
         fontFamily: element.fontFamily,
       }),
       element.lineHeight,
+      renderEnvironment,
     );
 
     const newWidth = Math.max(minWidth, nextWidth);
@@ -365,11 +373,13 @@ export const resizeSingleTextElement = (
       element.originalText,
       getFontString(element),
       Math.abs(newWidth),
+      renderEnvironment,
     );
     const metrics = measureText(
       text,
       getFontString(element),
       element.lineHeight,
+      renderEnvironment,
     );
 
     const newHeight = metrics.height;
@@ -731,10 +741,12 @@ export const resizeSingleElement = (
     shouldInformMutation = true,
     shouldMaintainAspectRatio = false,
     shouldResizeFromCenter = false,
+    renderEnvironment,
   }: {
     shouldMaintainAspectRatio?: boolean;
     shouldResizeFromCenter?: boolean;
     shouldInformMutation?: boolean;
+    renderEnvironment?: RenderEnvironment;
   } = {},
 ) => {
   if (isTextElement(latestElement) && isTextElement(origElement)) {
@@ -746,6 +758,7 @@ export const resizeSingleElement = (
       shouldResizeFromCenter,
       nextWidth,
       nextHeight,
+      renderEnvironment,
     );
   }
 
@@ -784,6 +797,7 @@ export const resizeSingleElement = (
       const minWidth = getApproxMinLineWidth(
         getFontString(boundTextElement),
         boundTextElement.lineHeight,
+        renderEnvironment,
       );
       const minHeight = getApproxMinLineHeight(
         boundTextElement.fontSize,
@@ -920,6 +934,7 @@ export const resizeSingleElement = (
       handleDirection,
       shouldMaintainAspectRatio,
       shouldResizeFromCenter,
+      renderEnvironment,
     );
 
     updateBoundElements(latestElement, scene);
@@ -1161,6 +1176,7 @@ export const resizeMultipleElements = (
     nextHeight,
     nextWidth,
     originalBoundingBox,
+    renderEnvironment,
   }: {
     nextWidth?: number;
     nextHeight?: number;
@@ -1170,6 +1186,7 @@ export const resizeMultipleElements = (
     flipByY?: boolean;
     // added to improve performance
     originalBoundingBox?: BoundingBox;
+    renderEnvironment?: RenderEnvironment;
   } = {},
 ) => {
   // in the case of just flipping, there is no need to specify the next width and height
@@ -1502,6 +1519,7 @@ export const resizeMultipleElements = (
           handleDirection,
           true,
           shouldResizeFromCenter,
+          renderEnvironment,
         );
       }
     }

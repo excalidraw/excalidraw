@@ -1,4 +1,16 @@
-import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
+import {
+  createPlaceholderEmbeddableLabel,
+  embeddableURLValidator,
+  getEmbedLink,
+  getPlaceholderLinkText,
+} from "../src/embeddable";
+import { newEmbeddableElement, newIframeElement } from "../src/newElement";
+import {
+  resetRenderEnvironment,
+  setRenderEnvironment,
+} from "../src/renderEnvironment";
+import { getLineHeightInPx } from "../src/textMeasurements";
+import { isTextElement } from "../src/typeChecks";
 
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
@@ -229,5 +241,103 @@ describe("Google Drive video embedding", () => {
         undefined,
       ),
     ).toBe(true);
+  });
+});
+
+describe("getPlaceholderLinkText", () => {
+  it("drops the scheme and www., and keeps short links intact", () => {
+    expect(getPlaceholderLinkText("https://www.example.com/a")).toBe(
+      "example.com/a",
+    );
+    expect(getPlaceholderLinkText("http://example.com")).toBe("example.com");
+  });
+
+  it("caps long links with an ellipsis", () => {
+    const capped = getPlaceholderLinkText(
+      "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL0123456789abcdefghijklmnopqrstuv",
+    );
+    expect(capped).toBe("youtube.com/watch?v=dQw4w9WgX…");
+    expect(capped.length).toBe(30);
+  });
+});
+
+describe("createPlaceholderEmbeddableLabel", () => {
+  const spyOnCreateElement = () => vi.spyOn(document, "createElement");
+  let createElementSpy: ReturnType<typeof spyOnCreateElement>;
+
+  beforeEach(() => {
+    createElementSpy = spyOnCreateElement();
+    // any text measurement would build a metrics canvas through the
+    // environment; the placeholder must be laid out without one
+    setRenderEnvironment({
+      createCanvas: () => {
+        throw new Error("placeholder layout must not create a canvas");
+      },
+    });
+  });
+
+  afterEach(() => {
+    resetRenderEnvironment();
+    createElementSpy.mockRestore();
+  });
+
+  const expectNoCanvas = () => {
+    expect(
+      createElementSpy.mock.calls.filter(([tag]) => tag === "canvas"),
+    ).toHaveLength(0);
+  };
+
+  it("centers a short label in the embed on a single line", () => {
+    const iframe = newIframeElement({
+      type: "iframe",
+      x: 40,
+      y: 60,
+      width: 300,
+      height: 200,
+    });
+
+    const label = createPlaceholderEmbeddableLabel(iframe);
+    expectNoCanvas();
+    expect(isTextElement(label)).toBe(true);
+    if (!isTextElement(label)) {
+      return;
+    }
+
+    expect(label.text).toBe("IFrame element");
+    expect(label.width).toBe(iframe.width - 20);
+    expect(label.height).toBe(
+      getLineHeightInPx(label.fontSize, label.lineHeight),
+    );
+    // centered on the embed
+    expect(label.x + label.width / 2).toBe(iframe.x + iframe.width / 2);
+    expect(label.y + label.height / 2).toBe(iframe.y + iframe.height / 2);
+  });
+
+  it("shows a long link capped to a single line, centered in the embed", () => {
+    const link =
+      "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL0123456789abcdefghijklmnopqrstuv";
+    const embed = newEmbeddableElement({
+      type: "embeddable",
+      x: 100,
+      y: 50,
+      width: 560,
+      height: 315,
+      link,
+    });
+
+    const label = createPlaceholderEmbeddableLabel(embed);
+    expectNoCanvas();
+    if (!isTextElement(label)) {
+      throw new Error("expected a text element");
+    }
+
+    expect(label.text).toBe(getPlaceholderLinkText(link));
+    expect(label.text).not.toContain("\n");
+    expect(label.width).toBe(embed.width - 20);
+    expect(label.height).toBe(
+      getLineHeightInPx(label.fontSize, label.lineHeight),
+    );
+    expect(label.x + label.width / 2).toBe(embed.x + embed.width / 2);
+    expect(label.y + label.height / 2).toBe(embed.y + embed.height / 2);
   });
 });

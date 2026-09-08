@@ -28,6 +28,8 @@ import { wrapText } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
 
+import type { RenderEnvironment } from "./renderEnvironment";
+
 import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
@@ -273,17 +275,27 @@ export const newTextElement = (
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
     labelPosition?: ExcalidrawTextElement["labelPosition"];
+    renderEnvironment?: RenderEnvironment;
+    /**
+     * Pre-computed dimensions. Skips measuring, for callers that lay the
+     * (pre-wrapped) text out themselves -- e.g. export-time placeholders,
+     * which have to work without a canvas.
+     */
+    metrics?: { width: number; height: number };
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
   const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
   const text = normalizeText(opts.text);
-  const metrics = measureText(
-    text,
-    getFontString({ fontFamily, fontSize }),
-    lineHeight,
-  );
+  const metrics =
+    opts.metrics ??
+    measureText(
+      text,
+      getFontString({ fontFamily, fontSize }),
+      lineHeight,
+      opts.renderEnvironment,
+    );
   const textAlign = opts.textAlign || DEFAULT_TEXT_ALIGN;
   const verticalAlign = opts.verticalAlign || DEFAULT_VERTICAL_ALIGN;
   const offsets = getTextElementPositionOffsets(
@@ -321,6 +333,7 @@ const getAdjustedDimensions = (
   element: ExcalidrawTextElement,
   elementsMap: ElementsMap,
   nextText: string,
+  renderEnvironment?: RenderEnvironment,
 ): {
   x: number;
   y: number;
@@ -331,6 +344,7 @@ const getAdjustedDimensions = (
     nextText,
     getFontString(element),
     element.lineHeight,
+    renderEnvironment,
   );
 
   // wrapped text
@@ -351,6 +365,7 @@ const getAdjustedDimensions = (
       element.text,
       getFontString(element),
       element.lineHeight,
+      renderEnvironment,
     );
     const offsets = getTextElementPositionOffsets(element, {
       width: nextWidth - prevMetrics.width,
@@ -458,6 +473,7 @@ export const refreshTextDimensions = (
   container: ExcalidrawTextContainer | null,
   elementsMap: ElementsMap,
   text = textElement.text,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (textElement.isDeleted) {
     return;
@@ -469,9 +485,15 @@ export const refreshTextDimensions = (
       container
         ? getBoundTextMaxWidth(container, textElement)
         : textElement.width,
+      renderEnvironment,
     );
   }
-  const dimensions = getAdjustedDimensions(textElement, elementsMap, text);
+  const dimensions = getAdjustedDimensions(
+    textElement,
+    elementsMap,
+    text,
+    renderEnvironment,
+  );
   return { text, ...dimensions };
 };
 

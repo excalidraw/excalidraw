@@ -29,7 +29,7 @@ import {
   isTextElement,
 } from "@excalidraw/element";
 
-import { getContainingFrame } from "@excalidraw/element";
+import { getContainingFrame, getFrameLabel } from "@excalidraw/element";
 
 import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
@@ -39,6 +39,8 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -83,6 +85,116 @@ const maybeWrapNodesInFrameClipPath = (
   }
 
   return null;
+};
+
+/**
+ * Appends one `<text>` per line, laid out the way the canvas renderer lays
+ * text out (alphabetic baseline, per-font vertical offset). Shared by text
+ * elements and frame labels so both come out identical.
+ */
+const appendSvgTextLines = (
+  parent: SVGElement,
+  {
+    text,
+    width,
+    textAlign,
+    fontFamily,
+    fontSize,
+    lineHeight,
+    fill,
+  }: {
+    text: string;
+    width: number;
+    textAlign: ExcalidrawTextElement["textAlign"];
+    fontFamily: ExcalidrawTextElement["fontFamily"];
+    fontSize: ExcalidrawTextElement["fontSize"];
+    lineHeight: ExcalidrawTextElement["lineHeight"];
+    fill: string;
+  },
+) => {
+  const doc = parent.ownerDocument;
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  const lineHeightPx = getLineHeightInPx(fontSize, lineHeight);
+  const horizontalOffset =
+    textAlign === "center" ? width / 2 : textAlign === "right" ? width : 0;
+  const verticalOffset = getVerticalOffset(fontFamily, fontSize, lineHeightPx);
+  const direction = isRTL(text) ? "rtl" : "ltr";
+  const textAnchor =
+    textAlign === "center"
+      ? "middle"
+      : textAlign === "right" || direction === "rtl"
+      ? "end"
+      : "start";
+  for (let i = 0; i < lines.length; i++) {
+    const node = doc.createElementNS(SVG_NS, "text");
+    node.textContent = lines[i];
+    node.setAttribute("x", `${horizontalOffset}`);
+    node.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
+    node.setAttribute("font-family", getFontFamilyString({ fontFamily }));
+    node.setAttribute("font-size", `${fontSize}px`);
+    node.setAttribute("fill", fill);
+    node.setAttribute("text-anchor", textAnchor);
+    node.setAttribute("style", "white-space: pre;");
+    node.setAttribute("direction", direction);
+    node.setAttribute("dominant-baseline", "alphabetic");
+    parent.appendChild(node);
+  }
+};
+
+/**
+ * Frame labels are DOM overlays while editing (`text-overflow: ellipsis` at
+ * the frame's width). Canvas export bakes them in as measured, truncated text
+ * elements; here the full title is emitted and clipped to the frame's width
+ * instead. Nothing is measured, so SVG export needs no canvas: the label's
+ * height is arithmetic and, being left-aligned, its width never affects
+ * layout. The full title also stays in the document (searchable, selectable).
+ */
+const renderFrameLabelToSvg = (
+  frame: ExcalidrawFrameLikeElement,
+  svgRoot: SVGElement,
+  offsetX: number,
+  offsetY: number,
+  renderConfig: SVGRenderConfig,
+) => {
+  const doc = svgRoot.ownerDocument;
+  const label = getFrameLabel(frame, {
+    exportWithDarkMode: renderConfig.exportWithDarkMode,
+  });
+
+  const node = doc.createElementNS(SVG_NS, "g");
+  node.setAttribute(
+    "transform",
+    `translate(${label.x - frame.x + offsetX} ${label.y - frame.y + offsetY})`,
+  );
+
+  // clips horizontally only: the canvas renderer never clips glyphs
+  // vertically, and tall fallback glyphs (emoji, CJK) can overshoot the line
+  // box, so the rect is padded by a label's height above and below
+  const clipId = `${frame.id}-label`;
+  const clipPath = doc.createElementNS(SVG_NS, "clipPath");
+  clipPath.setAttribute("id", clipId);
+  const clipRect = doc.createElementNS(SVG_NS, "rect");
+  clipRect.setAttribute("x", "0");
+  clipRect.setAttribute("y", `${-label.height}`);
+  clipRect.setAttribute("width", `${label.maxWidth}`);
+  clipRect.setAttribute("height", `${label.height * 3}`);
+  clipPath.appendChild(clipRect);
+  node.appendChild(clipPath);
+
+  const textGroup = doc.createElementNS(SVG_NS, "g");
+  textGroup.setAttribute("clip-path", `url(#${clipId})`);
+  appendSvgTextLines(textGroup, {
+    text: label.text,
+    width: label.maxWidth,
+    textAlign: "left",
+    fontFamily: label.fontFamily,
+    fontSize: label.fontSize,
+    lineHeight: label.lineHeight,
+    fill: applyDarkModeFilter(label.color, renderConfig.theme === THEME.DARK),
+  });
+  node.appendChild(textGroup);
+
+  return node;
 };
 
 const renderElementToSvg = (
@@ -619,9 +731,24 @@ const renderElementToSvg = (
     case "magicframe": {
       if (
         renderConfig.frameRendering.enabled &&
+        renderConfig.frameRendering.name
+      ) {
+        addToRoot(
+          renderFrameLabelToSvg(
+            element,
+            svgRoot,
+            offsetX,
+            offsetY,
+            renderConfig,
+          ),
+          element,
+        );
+      }
+      if (
+        renderConfig.frameRendering.enabled &&
         renderConfig.frameRendering.outline
       ) {
-        const rect = document.createElementNS(SVG_NS, "rect");
+        const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
 
         rect.setAttribute(
           "transform",
@@ -664,49 +791,18 @@ const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
-        const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
-        const lineHeightPx = getLineHeightInPx(
-          element.fontSize,
-          element.lineHeight,
-        );
-        const horizontalOffset =
-          element.textAlign === "center"
-            ? element.width / 2
-            : element.textAlign === "right"
-            ? element.width
-            : 0;
-        const verticalOffset = getVerticalOffset(
-          element.fontFamily,
-          element.fontSize,
-          lineHeightPx,
-        );
-        const direction = isRTL(element.text) ? "rtl" : "ltr";
-        const textAnchor =
-          element.textAlign === "center"
-            ? "middle"
-            : element.textAlign === "right" || direction === "rtl"
-            ? "end"
-            : "start";
-        for (let i = 0; i < lines.length; i++) {
-          const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
-          text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
-          text.setAttribute("font-family", getFontFamilyString(element));
-          text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute(
-            "fill",
-            applyDarkModeFilter(
-              element.strokeColor,
-              renderConfig.theme === THEME.DARK,
-            ),
-          );
-          text.setAttribute("text-anchor", textAnchor);
-          text.setAttribute("style", "white-space: pre;");
-          text.setAttribute("direction", direction);
-          text.setAttribute("dominant-baseline", "alphabetic");
-          node.appendChild(text);
-        }
+        appendSvgTextLines(node, {
+          text: element.text,
+          width: element.width,
+          textAlign: element.textAlign,
+          fontFamily: element.fontFamily,
+          fontSize: element.fontSize,
+          lineHeight: element.lineHeight,
+          fill: applyDarkModeFilter(
+            element.strokeColor,
+            renderConfig.theme === THEME.DARK,
+          ),
+        });
 
         const g = maybeWrapNodesInFrameClipPath(
           element,

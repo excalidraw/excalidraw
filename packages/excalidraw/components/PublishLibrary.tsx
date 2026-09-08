@@ -14,6 +14,7 @@ import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { t } from "../i18n";
 
+import { useExcalidrawContainer } from "./App";
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
 import { IconButton } from "./IconButton";
@@ -35,7 +36,10 @@ interface PublishLibraryDataParams {
   website: string;
 }
 
-const generatePreviewImage = async (libraryItems: LibraryItems) => {
+const generatePreviewImage = async (
+  libraryItems: LibraryItems,
+  ownerDocument: Document,
+) => {
   const MAX_ITEMS_PER_ROW = 6;
   const BOX_SIZE = 128;
   const BOX_PADDING = Math.round(BOX_SIZE / 16);
@@ -43,7 +47,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
 
   const rows = chunk(libraryItems, MAX_ITEMS_PER_ROW);
 
-  const canvas = document.createElement("canvas");
+  const canvas = ownerDocument.createElement("canvas");
 
   canvas.width =
     rows[0].length * BOX_SIZE +
@@ -220,6 +224,8 @@ const PublishLibrary = ({
   updateItemsInStorage: (items: LibraryItems) => void;
   onRemove: (id: string) => void;
 }) => {
+  const { container } = useExcalidrawContainer();
+
   const [libraryData, setLibraryData] = useState<PublishLibraryDataParams>({
     authorName: "",
     githubHandle: "",
@@ -275,7 +281,10 @@ const PublishLibrary = ({
       return;
     }
 
-    const previewImage = await generatePreviewImage(clonedLibItems);
+    const previewImage = await generatePreviewImage(
+      clonedLibItems,
+      container?.ownerDocument ?? document,
+    );
 
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
