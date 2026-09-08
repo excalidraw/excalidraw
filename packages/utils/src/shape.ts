@@ -194,18 +194,21 @@ export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
   };
 };
 
-export const getCurvePathOps = (shape: Drawable): Op[] => {
+const getCurvePathOpSets = (shape: Drawable): Op[][] => {
   // NOTE (mtolmacs): Temporary fix for extremely large elements
   if (!shape) {
     return [];
   }
 
-  for (const set of shape.sets) {
-    if (set.type === "path") {
-      return set.ops;
-    }
-  }
-  return shape.sets[0].ops;
+  const paths = shape.sets.filter((set) => set.type === "path");
+
+  return paths.length ? paths.map((set) => set.ops) : [shape.sets[0].ops];
+};
+
+export const getCurvePathOps = (shape: Drawable): Op[] => {
+  const opSets = getCurvePathOpSets(shape);
+
+  return opSets.length === 1 ? opSets[0] : opSets.flat();
 };
 
 // linear
@@ -316,32 +319,34 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
     };
   }
 
-  const ops = getCurvePathOps(roughShape);
+  // Each op set is one rough.js curve
+  const polygonPoints = getCurvePathOpSets(roughShape)
+    .flatMap((ops) => {
+      const points: Point[] = [];
 
-  const points: Point[] = [];
-  let odd = false;
-  for (const operation of ops) {
-    if (operation.op === "move") {
-      odd = !odd;
-      if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
-      }
-    } else if (operation.op === "bcurveTo") {
-      if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
-        points.push(pointFrom(operation.data[2], operation.data[3]));
-        points.push(pointFrom(operation.data[4], operation.data[5]));
-      }
-    } else if (operation.op === "lineTo") {
-      if (odd) {
-        points.push(pointFrom(operation.data[0], operation.data[1]));
-      }
-    }
-  }
+      for (const operation of ops) {
+        if (operation.op === "move") {
+          if (points.length) {
+            // the next stroke pass of this curve starts here
+            break;
+          }
 
-  const polygonPoints = pointsOnBezierCurves(points, 10, 5).map((p) =>
-    transform(p as Point),
-  ) as Point[];
+          points.push(pointFrom(operation.data[0], operation.data[1]));
+        } else if (!points.length) {
+          // ops before the curve's first `move` have no starting point
+          continue;
+        } else if (operation.op === "bcurveTo") {
+          points.push(pointFrom(operation.data[0], operation.data[1]));
+          points.push(pointFrom(operation.data[2], operation.data[3]));
+          points.push(pointFrom(operation.data[4], operation.data[5]));
+        } else if (operation.op === "lineTo") {
+          points.push(pointFrom(operation.data[0], operation.data[1]));
+        }
+      }
+
+      return pointsOnBezierCurves(points, 10, 5);
+    })
+    .map((p) => transform(p as Point)) as Point[];
 
   return {
     type: "polygon",

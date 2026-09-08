@@ -1,6 +1,13 @@
 import { vi } from "vitest";
 
-import { pointFrom } from "@excalidraw/math";
+import {
+  distanceToLineSegment,
+  lineSegment,
+  pointFrom,
+  polygonFromPoints,
+  polygonIncludesPoint,
+} from "@excalidraw/math";
+import { pointsOnBezierCurves } from "points-on-curve";
 import { ROUNDNESS, arrayToMap, reseed } from "@excalidraw/common";
 import {
   Excalidraw,
@@ -30,8 +37,10 @@ import {
   shiftSplitPointsOnInsert,
   toggleSplitPoint,
 } from "../src/splitPoints";
-import { generateLinearCollisionShape } from "../src/shape";
+import { generateLinearCollisionShape, getElementShape } from "../src/shape";
 import { LinearElementEditor } from "../src/linearElementEditor";
+
+import type { Op } from "roughjs/bin/core";
 
 import type {
   ExcalidrawArrowElement,
@@ -42,6 +51,16 @@ import type {
 
 const { h } = window;
 const mouse = new Pointer("mouse");
+
+const distanceToOutline = (point: LocalPoint, outline: readonly LocalPoint[]) =>
+  Math.min(
+    ...outline.map((vertex, idx) =>
+      distanceToLineSegment(
+        point,
+        lineSegment(vertex, outline[(idx + 1) % outline.length]),
+      ),
+    ),
+  );
 
 const basePoints = () => [
   pointFrom<LocalPoint>(0, 0),
@@ -285,16 +304,107 @@ describe("arrow and line split points", () => {
         [1],
         options,
       );
-      const countMoves = (type: string) =>
-        drawable.sets
-          .filter((set) => set.type === type)
-          .flatMap((set) => set.ops)
-          .filter((op) => op.op === "move").length;
+      const strokeSets = drawable.sets.filter((set) => set.type === "path");
+      const fillOps = drawable.sets
+        .filter((set) => set.type === "fillPath")
+        .flatMap((set) => set.ops);
 
-      // one filled region, but two separate stroked curves (rough.js draws
+      // two separate stroked curves, each kept in its own set (rough.js draws
       // each of them twice)
-      expect(countMoves("fillPath")).toBe(1);
-      expect(countMoves("path")).toBe(4);
+      expect(strokeSets).toHaveLength(2);
+      expect(
+        strokeSets.map(
+          (set) => set.ops.filter((op) => op.op === "move").length,
+        ),
+      ).toEqual([2, 2]);
+
+      // the fill is a single region — filling each curve on its own would
+      // seam them closed across the split
+      expect(fillOps.filter((op) => op.op === "move")).toHaveLength(1);
+
+      // ...and it follows the split contour, not the smooth one the element
+      // no longer draws. At roughness 0 the fill shape is the outline.
+      const firstPass = (ops: readonly Op[]) => {
+        const passEnd = ops.findIndex((op, idx) => idx > 0 && op.op === "move");
+
+        return passEnd === -1 ? ops : ops.slice(0, passEnd);
+      };
+
+      expect(fillOps.map((op) => op.data)).toEqual(
+        strokeSets.flatMap((set, idx) =>
+          firstPass(set.ops)
+            // only the first curve keeps its `move`; the rest continue the
+            // region from where the previous one ended
+            .filter((op, opIdx) => idx === 0 || opIdx > 0)
+            .map((op) => op.data),
+        ),
+      );
+    });
+
+    it("keeps a patterned fill inside the split outline", () => {
+      const points = [...basePoints(), pointFrom<LocalPoint>(0, 0)];
+      const options = {
+        seed: 1,
+        roughness: 0,
+        fill: "#000",
+        fillStyle: "hachure",
+      };
+      const drawable = generateSplitCurves(
+        new RoughGenerator(),
+        points,
+        [1],
+        options,
+      );
+
+      // the outline the element actually draws, as a polygon
+      const outline = polygonFromPoints<LocalPoint>(
+        drawable.sets
+          .filter((set) => set.type === "path")
+          .flatMap((set) => {
+            const controlPoints: LocalPoint[] = [];
+
+            for (const op of set.ops) {
+              if (op.op === "move") {
+                if (controlPoints.length) {
+                  break;
+                }
+                controlPoints.push(pointFrom(op.data[0], op.data[1]));
+              } else {
+                controlPoints.push(
+                  pointFrom(op.data[0], op.data[1]),
+                  pointFrom(op.data[2], op.data[3]),
+                  pointFrom(op.data[4], op.data[5]),
+                );
+              }
+            }
+
+            return pointsOnBezierCurves(controlPoints, 10, 5) as LocalPoint[];
+          }),
+      );
+
+      const sketch = drawable.sets.find((set) => set.type === "fillSketch");
+
+      expect(sketch).toBeDefined();
+
+      // every hachure line the filler produced is clipped to the contour it
+      // was given, so none of it may fall outside the outline
+      const strayPoints = sketch!.ops
+        .flatMap((op) => [
+          pointFrom<LocalPoint>(op.data[0], op.data[1]),
+          pointFrom<LocalPoint>(
+            op.data[op.data.length - 2],
+            op.data[op.data.length - 1],
+          ),
+        ])
+        .filter(
+          (point) =>
+            !polygonIncludesPoint(point, outline) &&
+            // the clip lands the endpoints exactly on the outline, where an
+            // even-odd test is a coin flip
+            distanceToOutline(point, outline) > 1,
+        );
+
+      expect(strayPoints).toEqual([]);
     });
 
     it("breaks tangent continuity only at the split point", () => {
@@ -357,7 +467,9 @@ describe("arrow and line split points", () => {
         getSplitPoints(arrow),
         { seed: arrow.seed, roughness: arrow.roughness },
       );
-      const ops = drawable.sets[0].ops;
+      const ops = drawable.sets
+        .filter((set) => set.type === "path")
+        .flatMap((set) => set.ops);
 
       // two curves × two multi-stroke passes
       const moveIndices = ops
@@ -386,6 +498,72 @@ describe("arrow and line split points", () => {
         }
       }
     });
+
+    // the merged drawable holds one stroke pass per curve (two when rough.js
+    // double strokes them), and each pass is its own chain of cubic control
+    // points; the closed shape has to convert them separately
+    it.each([
+      ["solid", [1]],
+      ["solid", [1, 2]],
+      ["dashed", [1]],
+      ["dashed", [1, 2]],
+    ] as const)(
+      "traces the whole outline of a %s filled split polygon (splits %j)",
+      (strokeStyle, splitPoints) => {
+        const closedPoints = [...basePoints(), pointFrom<LocalPoint>(0, 0)];
+        const polygon = (splits?: readonly number[]) =>
+          API.createElement({
+            type: "line",
+            x: 0,
+            y: 0,
+            width: 200,
+            height: 100,
+            roughness: 0,
+            roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+            points: closedPoints,
+            polygon: true,
+            backgroundColor: "#000000",
+            fillStyle: "solid",
+            strokeStyle,
+            splitPoints: splits,
+          }) as NonDeleted<ExcalidrawLineElement>;
+
+        const outlineBounds = (element: NonDeleted<ExcalidrawLineElement>) => {
+          const shape = getElementShape<LocalPoint>(
+            element,
+            arrayToMap([element]),
+          );
+
+          expect(shape.type).toBe("polygon");
+
+          const vertices = shape.data as LocalPoint[];
+
+          return [
+            Math.min(...vertices.map((p) => p[0])),
+            Math.min(...vertices.map((p) => p[1])),
+            Math.max(...vertices.map((p) => p[0])),
+            Math.max(...vertices.map((p) => p[1])),
+          ];
+        };
+
+        const [minX, minY, maxX, maxY] = outlineBounds(polygon(splitPoints));
+
+        // the outline goes around every vertex of the polygon — keeping only
+        // some of the curves would cut it short well inside these bounds. It
+        // may overshoot a little, but only as much as the unsplit one does.
+        expect(minX).toBeLessThanOrEqual(0);
+        expect(minY).toBeLessThanOrEqual(0);
+        expect(maxX).toBeGreaterThanOrEqual(200);
+        expect(maxY).toBeGreaterThanOrEqual(100);
+
+        // ...and it stays snug around them, rather than tracing any curve
+        // more than once
+        expect(minX).toBeGreaterThan(-10);
+        expect(minY).toBeGreaterThan(-10);
+        expect(maxX).toBeLessThan(210);
+        expect(maxY).toBeLessThan(110);
+      },
+    );
   });
 
   describe("duplicating points", () => {
@@ -492,10 +670,15 @@ describe("arrow and line split points", () => {
       expect(countSubpaths(unsplit)).toBe(2);
       expect(countSubpaths(split)).toBe(4);
 
-      // the second curve starts exactly at the split point, points[1]
-      expect(split.querySelector("path")!.getAttribute("d")).toContain(
-        "M100 100",
+      // each curve is exported as its own path element, and the second one
+      // starts exactly at the split point, points[1]
+      const paths = Array.from(split.querySelectorAll("path")).map((path) =>
+        path.getAttribute("d"),
       );
+
+      expect(unsplit.querySelectorAll("path")).toHaveLength(1);
+      expect(paths).toHaveLength(2);
+      expect(paths[1]).toContain("M100 100");
     });
 
     it("strokes both curves in canvas (PNG) exports", async () => {
