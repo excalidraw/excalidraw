@@ -7074,7 +7074,7 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
-      const selectedLinearElement: ExcalidrawLinearElement =
+      const selectedLinearElement: NonDeleted<ExcalidrawLinearElement> =
         selectedElements[0];
 
       if (
@@ -7095,7 +7095,11 @@ class App extends React.Component<AppProps, AppState> {
 
         if (splitPoints !== undefined) {
           this.store.scheduleCapture();
-          this.scene.mutateElement(selectedLinearElement, { splitPoints });
+          LinearElementEditor.updateSplitPoints(
+            selectedLinearElement,
+            this.scene,
+            splitPoints,
+          );
 
           return;
         }

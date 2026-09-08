@@ -24,7 +24,7 @@ import {
 } from "@excalidraw/excalidraw/tests/test-utils";
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import type { LocalPoint } from "@excalidraw/math";
+import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
 import {
   canSplitPoints,
@@ -97,6 +97,7 @@ const createLine = (
       | "y"
       | "width"
       | "height"
+      | "angle"
       | "points"
       | "roundness"
       | "splitPoints"
@@ -692,9 +693,7 @@ describe("arrow and line split points", () => {
       h.state.height = 1000;
     });
 
-    const fivePointArrow = (
-      overrides: Partial<ExcalidrawArrowElement> = {},
-    ) =>
+    const fivePointArrow = (overrides: Partial<ExcalidrawArrowElement> = {}) =>
       createArrow({
         x: 0,
         y: 0,
@@ -771,6 +770,184 @@ describe("arrow and line split points", () => {
 
       expect(updated.points).toHaveLength(6);
       expect(updated.splitPoints).toEqual([3]);
+    });
+  });
+
+  describe("rotated elements", () => {
+    beforeEach(async () => {
+      unmountComponent();
+      localStorage.clear();
+      reseed(7);
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      h.state.width = 1000;
+      h.state.height = 1000;
+    });
+
+    const worldPoints = (element: NonDeleted<ExcalidrawLinearElement>) =>
+      element.points.map((_, index) =>
+        LinearElementEditor.getPointAtIndexGlobalCoordinates(
+          element,
+          index,
+          arrayToMap(h.elements),
+        ),
+      );
+
+    const rotatedLine = (
+      overrides: Parameters<typeof createLine>[0] = {},
+    ): NonDeleted<ExcalidrawLineElement> =>
+      createLine({
+        x: 100,
+        y: 100,
+        width: 300,
+        height: 200,
+        angle: (Math.PI / 2) as Radians,
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(0, 200),
+          pointFrom<LocalPoint>(200, 200),
+          pointFrom<LocalPoint>(200, 0),
+          pointFrom<LocalPoint>(300, 0),
+        ],
+        ...overrides,
+      });
+
+    it("keeps a rotated line's points in place when a corner is toggled", () => {
+      // the points are rotated around the center of the curve's bounds, which
+      // the split moves — the element origin has to absorb that
+      const rotated = rotatedLine();
+      API.setElements([rotated]);
+
+      const before = worldPoints(rotated);
+
+      act(() => {
+        const element = h.elements[0] as NonDeleted<ExcalidrawLineElement>;
+        LinearElementEditor.updateSplitPoints(
+          element,
+          h.app.scene,
+          toggleSplitPoint(element, 2)!,
+        );
+      });
+
+      const updated = h.elements[0] as ExcalidrawLineElement;
+
+      expect(updated.splitPoints).toEqual([2]);
+      worldPoints(updated as NonDeleted<ExcalidrawLineElement>).forEach(
+        (point, index) => {
+          expect(point[0]).toBeCloseTo(before[index][0]);
+          expect(point[1]).toBeCloseTo(before[index][1]);
+        },
+      );
+    });
+
+    it("keeps a rotated line's remaining points in place when a point is deleted", () => {
+      const rotated = rotatedLine({ splitPoints: [2] });
+      API.setElements([rotated]);
+      API.setSelectedElements([rotated]);
+
+      const survivors = worldPoints(rotated).filter((_, index) => index !== 1);
+
+      act(() => {
+        LinearElementEditor.deletePoints(
+          h.elements[0] as NonDeleted<ExcalidrawLineElement>,
+          h.app,
+          [1],
+        );
+      });
+
+      const updated = h.elements[0] as NonDeleted<ExcalidrawLineElement>;
+
+      expect(updated.points).toHaveLength(4);
+      expect(updated.splitPoints).toEqual([1]);
+      // the deleted point's neighbours must not drift: the compensation has to
+      // compare the old points against the new ones under their own splits
+      worldPoints(updated).forEach((point, index) => {
+        expect(point[0]).toBeCloseTo(survivors[index][0]);
+        expect(point[1]).toBeCloseTo(survivors[index][1]);
+      });
+    });
+
+    it("leaves an unrotated line's origin alone", () => {
+      const line = createLine({ splitPoints: null });
+      API.setElements([line]);
+
+      act(() => {
+        LinearElementEditor.updateSplitPoints(line, h.app.scene, [1]);
+      });
+
+      const updated = h.elements[0] as ExcalidrawLineElement;
+
+      expect(updated.splitPoints).toEqual([1]);
+      expect(updated.x).toBe(line.x);
+      expect(updated.y).toBe(line.y);
+    });
+
+    it("keeps a rotated line's points in place when a point is duplicated", () => {
+      const rotated = rotatedLine();
+      API.setElements([rotated]);
+      API.setSelectedElements([rotated]);
+      act(() => {
+        h.setState({
+          selectedLinearElement: {
+            ...new LinearElementEditor(rotated, arrayToMap(h.elements), true),
+            selectedPointsIndices: [1],
+          },
+        });
+      });
+
+      const before = worldPoints(rotated);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionDuplicateSelection);
+      });
+
+      const updated = h.elements[0] as NonDeleted<ExcalidrawLineElement>;
+      const after = worldPoints(updated);
+
+      expect(updated.points).toHaveLength(6);
+      // the copy lands at index 2, so the originals map 0,1,3,4 -> 0,1,3,4
+      [0, 1, 3, 4].forEach((index, original) => {
+        expect(after[index][0]).toBeCloseTo(before[original][0]);
+        expect(after[index][1]).toBeCloseTo(before[original][1]);
+      });
+    });
+
+    it("keeps a rotated line's points in place when a midpoint is added", () => {
+      const rotated = rotatedLine();
+      API.setElements([rotated]);
+      API.setSelectedElements([rotated]);
+
+      const editor = new LinearElementEditor(rotated, arrayToMap(h.elements));
+      const before = worldPoints(rotated);
+
+      act(() => {
+        LinearElementEditor.addMidpoint(
+          {
+            ...editor,
+            initialState: {
+              ...editor.initialState,
+              segmentMidpoint: {
+                index: 2,
+                value: pointFrom<GlobalPoint>(0, 0),
+                added: false,
+              },
+            },
+          } as LinearElementEditor,
+          { x: 100, y: 300 },
+          h.app,
+          false,
+          h.app.scene,
+        );
+      });
+
+      const updated = h.elements[0] as NonDeleted<ExcalidrawLineElement>;
+      const after = worldPoints(updated);
+
+      expect(updated.points).toHaveLength(6);
+      // the midpoint lands at index 2, so the originals map 0..4 -> 0,1,3,4,5
+      [0, 1, 3, 4, 5].forEach((index, original) => {
+        expect(after[index][0]).toBeCloseTo(before[original][0]);
+        expect(after[index][1]).toBeCloseTo(before[original][1]);
+      });
     });
   });
 
