@@ -75,6 +75,7 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
 
   copy.id = randomId();
   copy.updated = getUpdatedTimestamp();
+  copy.created = copy.updated;
   if (randomizeSeed) {
     copy.seed = randomInteger();
     bumpVersion(copy);

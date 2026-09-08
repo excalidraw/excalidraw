@@ -9,6 +9,7 @@ import {
   ROUNDNESS,
   assertNever,
   getStrokeWidthByKey,
+  getUpdatedTimestamp,
 } from "@excalidraw/common";
 
 import {
@@ -185,6 +186,7 @@ export class API {
     frameId?: ExcalidrawElement["id"] | null;
     index?: ExcalidrawElement["index"];
     groupIds?: ExcalidrawElement["groupIds"];
+    created?: ExcalidrawElement["created"];
     // generic element props
     strokeColor?: ExcalidrawGenericElement["strokeColor"];
     backgroundColor?: ExcalidrawGenericElement["backgroundColor"];
@@ -290,6 +292,7 @@ export class API {
       opacity: rest.opacity ?? appState.currentItemOpacity,
       boundElements: rest.boundElements ?? null,
       locked: rest.locked ?? false,
+      created: rest.created === undefined ? getUpdatedTimestamp() : rest.created,
     };
     switch (type) {
       case "rectangle":

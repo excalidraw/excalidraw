@@ -76,6 +76,11 @@ type _ExcalidrawElementBase = Readonly<{
   boundElements: readonly BoundElement[] | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
+  /** Client wall-clock creation time in epoch milliseconds; null if unknown.
+      Preserved for this element's lifetime, including edits and undo/redo,
+      and excluded from `ElementUpdate` (mutateElement / newElementWith).
+      Duplicating an element starts a new lifetime. Not an ordering clock. */
+  created: number | null;
   link: string | null;
   locked: boolean;
   customData?: Record<string, any>;

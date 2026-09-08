@@ -14,14 +14,17 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  FractionalIndex,
 } from "@excalidraw/element/types";
 import type { NormalizedZoomValue } from "@excalidraw/excalidraw/types";
 
 import { API } from "../helpers/api";
 import * as restore from "../../data/restore";
 import { getDefaultAppState } from "../../appState";
+import { serializeAsJSON } from "../../data/json";
 
 import type { ImportedDataState } from "../../data/types";
+import type { LibraryItem, LibraryItem_v1, LibraryItems } from "../../types";
 
 describe("restoreElements", () => {
   const mockSizeHelper = vi.spyOn(sizeHelpers, "isInvisiblySmallElement");
@@ -41,6 +44,50 @@ describe("restoreElements", () => {
 
     const restoredElements = restore.restoreElements(elements, null);
     expect(restoredElements.length).toBe(elements.length);
+  });
+
+  it.each([123, 0, null, undefined])(
+    "restores created=%s without substituting load or last-update time",
+    (created) => {
+      const element = {
+        ...API.createElement({
+          type: "rectangle",
+          index: "a0" as FractionalIndex,
+        }),
+        created,
+        updated: 456,
+      };
+      // JSON removes undefined, matching files from clients predating created.
+      const input: ImportedDataState = JSON.parse(
+        JSON.stringify({ elements: [element] }),
+      );
+      const restored = restore.restoreElements(input.elements, null);
+
+      expect(restored[0]).toMatchObject({
+        id: element.id,
+        created: created ?? null,
+        updated: 456,
+      });
+
+      const exported: ImportedDataState = JSON.parse(
+        serializeAsJSON(restored, getDefaultAppState(), {}, "local"),
+      );
+      expect(exported.elements?.[0]).toHaveProperty("created", created ?? null);
+      expect(restore.restoreElements(exported.elements, null)).toEqual(
+        restored,
+      );
+    },
+  );
+
+  it("preserves creation metadata when repairing duplicate element IDs", () => {
+    const element = API.createElement({ type: "rectangle", created: 123 });
+    const restored = restore.restoreElements(
+      [element, { ...element, created: null }],
+      null,
+    );
+
+    expect(restored.map(({ created }) => created)).toEqual([123, null]);
+    expect(restored[0].id).not.toBe(restored[1].id);
   });
 
   it("when imported data state is null it should return an empty array of elements", () => {
@@ -1300,4 +1347,49 @@ describe("repairing bindings", () => {
       }),
     ]);
   });
+});
+
+describe("restoreLibraryItems creation timestamps", () => {
+  it.each([1, 2])(
+    "accepts v%s input with missing creation metadata",
+    (version) => {
+      const { created, ...legacyElement } = API.createElement({
+        type: "rectangle",
+      });
+      // models library data persisted before `created` existed; the declared
+      // input type is a complete element, restore fills the field at runtime
+      const elements = [
+        legacyElement,
+        API.createElement({ type: "rectangle", created: 123 }),
+        API.createElement({ type: "rectangle", created: null }),
+      ] as unknown as LibraryItem["elements"];
+      const legacyItem: LibraryItem_v1 = elements;
+      const currentItem: LibraryItem = {
+        id: "library-item",
+        status: "unpublished",
+        created: 456,
+        elements,
+      };
+      const imported: ImportedDataState = {
+        libraryItems: version === 1 ? [legacyItem] : [currentItem],
+      };
+
+      const restoredItems: LibraryItems = restore.restoreLibraryItems(
+        imported.libraryItems,
+        "unpublished",
+      );
+
+      expect(restoredItems).toHaveLength(1);
+      expect(
+        restoredItems[0].elements.map((element) => element.created),
+      ).toEqual([null, 123, null]);
+      expect(restoredItems[0].elements.map((element) => element.id)).toEqual(
+        elements.map((element) => element.id),
+      );
+      expect(legacyElement).not.toHaveProperty("created");
+      if (version === 2) {
+        expect(restoredItems[0].created).toBe(456);
+      }
+    },
+  );
 });

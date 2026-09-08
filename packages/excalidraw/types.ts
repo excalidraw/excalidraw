@@ -1017,7 +1017,8 @@ export interface ExcalidrawProps {
 }
 
 export type SceneData = {
-  elements?: ImportedDataState["elements"];
+  /** Expects normalized elements; restore imported data before updating the scene. */
+  elements?: readonly ExcalidrawElement[] | null;
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
   captureUpdate?: CaptureUpdateActionType;
