@@ -41,7 +41,7 @@ import type {
 
 export type ToolConfig = {
   icon: React.ReactNode;
-  /** letter shortcut(s) — the first one is shown in tooltips */
+  /** letter shortcut(s) — the first one is shown in tooltips and badges */
   letterKey?: string | readonly string[];
   /** whether `letterKey` requires Shift to be held (e.g. Shift+X) */
   shiftKey?: boolean;
@@ -291,7 +291,7 @@ const createToolButton = (
         keyBindingLabel={
           hideKeyBinding || hideShortcut
             ? undefined
-            : TOOLS[shortcutType].numericKey || getToolLetter(shortcutType)
+            : getToolLetter(shortcutType) || TOOLS[shortcutType].numericKey
         }
         aria-label={label}
         aria-keyshortcuts={shortcut ?? undefined}
