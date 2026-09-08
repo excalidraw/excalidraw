@@ -1,4 +1,9 @@
-import { isFiniteNumber, isValidPoint, pointFrom } from "@excalidraw/math";
+import {
+  clamp,
+  isFiniteNumber,
+  isValidPoint,
+  pointFrom,
+} from "@excalidraw/math";
 
 import {
   colorToHex,
@@ -472,6 +477,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
+    created: element.created ?? null,
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
   };
@@ -551,6 +557,9 @@ export const restoreElement = (
         originalText: element.originalText || text,
         autoResize: element.autoResize ?? true,
         lineHeight,
+        labelPosition: isFiniteNumber(element.labelPosition)
+          ? clamp(element.labelPosition, 0, 1)
+          : null,
       });
 
       // if empty text, mark as deleted. We keep in array

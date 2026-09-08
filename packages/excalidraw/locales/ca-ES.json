@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Enganxa",
     "pasteAsPlaintext": "Enganxar com a text pla",
     "pasteCharts": "Enganxa els diagrames",
@@ -109,6 +111,7 @@
     "group": "Agrupa la selecció",
     "ungroup": "Desagrupa la selecció",
     "collaborators": "Col·laboradors",
+    "you": "",
     "toggleGrid": "Alterna la quadrícula",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
@@ -332,10 +335,15 @@
     "embeddable": "Incrustació Web",
     "laser": "Punter làser",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Mà (eina de desplaçament)",
     "extraTools": "Més eines",
     "mermaidToExcalidraw": "Mermaid a Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rectangle",
@@ -606,7 +614,9 @@
     "hexCode": "Codi hexadecimal",
     "noShades": "No hi ha ombres disponibles per a aquest color",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

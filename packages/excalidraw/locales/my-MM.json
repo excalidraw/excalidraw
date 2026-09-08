@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "ထား",
     "pasteAsPlaintext": "",
     "pasteCharts": "",
@@ -109,6 +111,7 @@
     "group": "အုပ်စုဖွဲ့",
     "ungroup": "အုပ်စုဖျက်သိမ်း",
     "collaborators": "ပူးပေါင်းပါဝင်သူများ",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "မှတ်တမ်းတင်",
     "removeFromLibrary": "မှတ်တမ်းမှထုတ်",
@@ -332,10 +335,15 @@
     "embeddable": "",
     "laser": "",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -606,7 +614,9 @@
     "hexCode": "",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

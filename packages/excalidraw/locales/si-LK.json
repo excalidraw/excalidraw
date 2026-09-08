@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "අලවන්න",
     "pasteAsPlaintext": "සරල පෙළ ලෙස අලවන්න",
     "pasteCharts": "ප්‍රස්ථාරය",
@@ -109,6 +111,7 @@
     "group": "කණ්ඩායම",
     "ungroup": "කණ්ඩායම් ඉවත් කරන්න",
     "collaborators": "සහයෝගිකයන්",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "පුස්තකාලයට එක් කරන්න",
     "removeFromLibrary": "පුස්තකාලයෙන් ඉවත් කරන්න",
@@ -332,10 +335,15 @@
     "embeddable": "බිහිදැමිය හැකි",
     "laser": "ලේසර්",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "අත",
     "extraTools": "අමතර මෙවලම්",
     "mermaidToExcalidraw": "Mermaid වලින් Excalidraw වෙත",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -606,7 +614,9 @@
     "hexCode": "හෙක්ස් කේත",
     "noShades": "සෙවනැලි නැත",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

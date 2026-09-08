@@ -221,8 +221,8 @@ export const SearchMenu = () => {
         if (
           !isElementCompletelyInViewport(
             [matchAsElement],
-            app.canvas.width / window.devicePixelRatio,
-            app.canvas.height / window.devicePixelRatio,
+            app.canvas.width / app.ownerWindow.devicePixelRatio,
+            app.canvas.height / app.ownerWindow.devicePixelRatio,
             {
               offsetLeft: app.state.offsetLeft,
               offsetTop: app.state.offsetTop,
@@ -273,6 +273,7 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     const eventHandler = (event: KeyboardEvent) => {
+      const target = event.target;
       if (
         event.key === KEYS.ESCAPE &&
         !app.state.openDialog &&
@@ -306,8 +307,8 @@ export const SearchMenu = () => {
       }
 
       if (
-        event.target instanceof HTMLElement &&
-        event.target.closest(".layer-ui__search")
+        target instanceof app.ownerWindow.HTMLElement &&
+        target.closest(".layer-ui__search")
       ) {
         if (stableState.searchMatches.items.length) {
           if (event.key === KEYS.ENTER) {
@@ -328,7 +329,7 @@ export const SearchMenu = () => {
 
     // `capture` needed to prevent firing on initial open from App.tsx,
     // as well as to handle events before App ones
-    return addEventListener(window, EVENT.KEYDOWN, eventHandler, {
+    return addEventListener(app.ownerWindow, EVENT.KEYDOWN, eventHandler, {
       capture: true,
       passive: false,
     });

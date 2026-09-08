@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Επικόλληση",
     "pasteAsPlaintext": "Επικόλληση ως απλό κείμενο",
     "pasteCharts": "Επικόλληση γραφημάτων",
@@ -109,6 +111,7 @@
     "group": "Δημιουργία ομάδας από επιλογή",
     "ungroup": "Κατάργηση ομάδας από επιλογή",
     "collaborators": "Συνεργάτες",
+    "you": "",
     "toggleGrid": "Εναλλαγή ορατότητας πλέγματος",
     "addToLibrary": "Προσθήκη στη βιβλιοθήκη",
     "removeFromLibrary": "Αφαίρεση από τη βιβλιοθήκη",
@@ -332,10 +335,15 @@
     "embeddable": "Web Embed",
     "laser": "Δείκτης λέιζερ",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Χέρι (εργαλείο μετακίνησης)",
     "extraTools": "Περισσότερα εργαλεία",
     "mermaidToExcalidraw": "Mermaid σε Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Ορθογώνιο",
@@ -606,7 +614,9 @@
     "hexCode": "Κωδικός Hex",
     "noShades": "Δεν υπάρχουν διαθέσιμες αποχρώσεις για αυτό το χρώμα",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

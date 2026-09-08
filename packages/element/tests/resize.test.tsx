@@ -1,4 +1,9 @@
-import { pointFrom } from "@excalidraw/math";
+import {
+  bezierEquation,
+  isCurve,
+  pointDistance,
+  pointFrom,
+} from "@excalidraw/math";
 
 import { Excalidraw } from "@excalidraw/excalidraw";
 import {
@@ -16,10 +21,14 @@ import {
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
+import type { GlobalPoint } from "@excalidraw/math";
+
 import type { LocalPoint } from "@excalidraw/math";
 
 import { isLinearElement } from "../src/typeChecks";
 import { resizeSingleElement } from "../src/resizeElements";
+import { distanceToElement } from "../src/distance";
+import { getLinearElementPathSegments } from "../src/utils";
 import { LinearElementEditor } from "../src/linearElementEditor";
 import { getElementPointsCoords } from "../src/bounds";
 import { computeContainerDimensionForBoundText } from "../src/textElement";
@@ -490,35 +499,64 @@ describe("arrow element", () => {
     });
     const label = await UI.editText(arrow, "Hello");
     const elementsMap = arrayToMap(h.elements);
-    UI.resize(arrow, "se", [50, 30]);
-    let labelPos = LinearElementEditor.getBoundTextElementPosition(
-      arrow,
-      label,
-      elementsMap,
-    );
 
-    expect(labelPos.x + label.width / 2).toBeCloseTo(
-      arrow.x + arrow.points[2][0],
-    );
-    expect(labelPos.y + label.height / 2).toBeCloseTo(
-      arrow.y + arrow.points[2][1],
-    );
+    // independently locate the arc-length midpoint by densely sampling the
+    // path, so a regression in the arc-length inversion the production code
+    // uses cannot cancel out of the comparison
+    const sampledPathMidpoint = (): GlobalPoint => {
+      const samples: GlobalPoint[] = [];
+      for (const segment of getLinearElementPathSegments(arrow, elementsMap)) {
+        for (let i = 0; i <= 1000; i++) {
+          const t = i / 1000;
+          samples.push(
+            isCurve(segment)
+              ? bezierEquation(segment, t)
+              : pointFrom<GlobalPoint>(
+                  segment[0][0] + t * (segment[1][0] - segment[0][0]),
+                  segment[0][1] + t * (segment[1][1] - segment[0][1]),
+                ),
+          );
+        }
+      }
+      const cumulative = [0];
+      for (let i = 1; i < samples.length; i++) {
+        cumulative.push(
+          cumulative[i - 1] + pointDistance(samples[i - 1], samples[i]),
+        );
+      }
+      const half = cumulative[cumulative.length - 1] / 2;
+      return samples[cumulative.findIndex((length) => length >= half)];
+    };
+
+    // the label defaults to the arc-length midpoint of the arrow's path and
+    // keeps that normalized position through resizes
+    const expectLabelAtPathMidpoint = () => {
+      const labelPos = LinearElementEditor.getBoundTextElementPosition(
+        arrow,
+        label,
+        elementsMap,
+      );
+      const centerX = labelPos.x + label.width / 2;
+      const centerY = labelPos.y + label.height / 2;
+      const pathMidpoint = sampledPathMidpoint();
+
+      expect(label.labelPosition).toBe(0.5);
+      expect(centerX).toBeCloseTo(pathMidpoint[0], 0);
+      expect(centerY).toBeCloseTo(pathMidpoint[1], 0);
+      expect(
+        distanceToElement(arrow, elementsMap, pointFrom(centerX, centerY)),
+      ).toBeLessThan(0.5);
+    };
+
+    expectLabelAtPathMidpoint();
+
+    UI.resize(arrow, "se", [50, 30]);
+    expectLabelAtPathMidpoint();
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
 
     UI.resize(arrow, "w", [20, 0]);
-    labelPos = LinearElementEditor.getBoundTextElementPosition(
-      arrow,
-      label,
-      elementsMap,
-    );
-
-    expect(labelPos.x + label.width / 2).toBeCloseTo(
-      arrow.x + arrow.points[2][0],
-    );
-    expect(labelPos.y + label.height / 2).toBeCloseTo(
-      arrow.y + arrow.points[2][1],
-    );
+    expectLabelAtPathMidpoint();
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
   });

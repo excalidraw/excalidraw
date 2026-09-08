@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "貼り付け",
     "pasteAsPlaintext": "書式なしテキストとして貼り付け",
     "pasteCharts": "チャートの貼り付け",
@@ -109,6 +111,7 @@
     "group": "グループ化",
     "ungroup": "グループ化を解除",
     "collaborators": "共同編集者",
+    "you": "",
     "toggleGrid": "グリッドを切り替え",
     "addToLibrary": "ライブラリに追加",
     "removeFromLibrary": "ライブラリから削除",
@@ -186,12 +189,12 @@
     "wrapSelectionInFrame": "選択範囲をフレームで囲む",
     "tab": "Tab",
     "shapeSwitch": "図形形状を変更",
-    "preferences": "",
-    "preferences_toolLock": "",
+    "preferences": "環境設定",
+    "preferences_toolLock": "ツールの固定",
     "boxSelectionMode": "",
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
-    "arrowBinding": "",
+    "arrowBinding": "矢印の結合",
     "midpointSnapping": ""
   },
   "elementLink": {
@@ -332,10 +335,15 @@
     "embeddable": "Web埋め込み",
     "laser": "レーザーポインター",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "手 (パンニングツール)",
     "extraTools": "その他のツール",
     "mermaidToExcalidraw": "Mermaid を Excalidraw に変換",
     "convertElementType": "図形タイプを切り替え"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "長方形",
@@ -606,7 +614,9 @@
     "hexCode": "16進コード",
     "noShades": "この色で利用できる影はありません",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

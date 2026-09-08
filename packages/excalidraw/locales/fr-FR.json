@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Coller",
     "pasteAsPlaintext": "Coller comme texte brut",
     "pasteCharts": "Coller les graphiques",
@@ -35,9 +37,9 @@
     "strokeStyle_dashed": "Tirets",
     "strokeStyle_dotted": "Pointillés",
     "sloppiness": "Style de tracé",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Pression",
+    "pressure_constant": "Constant",
+    "pressure_variable": "Variable",
     "opacity": "Transparence",
     "textAlign": "Alignement du texte",
     "edges": "Angles",
@@ -109,6 +111,7 @@
     "group": "Grouper la sélection",
     "ungroup": "Dégrouper la sélection",
     "collaborators": "Collaborateurs",
+    "you": "Vous",
     "toggleGrid": "Afficher/Cacher la grille",
     "addToLibrary": "Ajouter à la bibliothèque",
     "removeFromLibrary": "Supprimer de la bibliothèque",
@@ -188,9 +191,9 @@
     "shapeSwitch": "Changer de forme",
     "preferences": "Préférences",
     "preferences_toolLock": "Verrouillage de l'outil",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "Sélectionner sur",
+    "boxSelectionContain": "Mettre en page",
+    "boxSelectionOverlap": "Chevaucher",
     "arrowBinding": "Liaison de flèches",
     "midpointSnapping": "S'accrocher aux points intermédiaires"
   },
@@ -331,11 +334,16 @@
     "magicframe": "Modèle en fil de fer vers code",
     "embeddable": "Intégration Web",
     "laser": "Pointeur laser",
-    "autoshape": "",
+    "autoshape": "Dessiner pour façonner",
+    "bucketfill": "Remplissage du seau",
     "hand": "Mains (outil de déplacement de la vue)",
     "extraTools": "Plus d'outils",
     "mermaidToExcalidraw": "De Mermaid à Excalidraw",
     "convertElementType": "Basculer le type de forme"
+  },
+  "bucketfill": {
+    "noRegion": "Impossible de trouver une région à remplir ici.",
+    "tooComplex": "Cette région est trop complexe à remplir."
   },
   "element": {
     "rectangle": "Rectangle",
@@ -367,7 +375,7 @@
     "freeDraw": "Cliquez et faites glissez, relâchez quand vous avez terminé",
     "text": "Astuce : vous pouvez aussi ajouter du texte en double-cliquant n'importe où avec l'outil de sélection",
     "embeddable": "Cliquez et glissez pour créer une intégration de site web",
-    "autoshape": "",
+    "autoshape": "Dessiner des rectangles, des cercles, des diamants, des lignes et des flèches",
     "text_selected": "Double-cliquez ou appuyez sur {{shortcut}} pour modifier le texte",
     "text_editing": "Appuyez sur {{shortcut_1}} ou {{shortcut_2}} pour terminer la modification",
     "linearElementMulti": "Cliquez sur le dernier point ou appuyez sur {{shortcut_1}} ou {{shortcut_2}} pour terminer",
@@ -375,7 +383,7 @@
     "resize": "Vous pouvez contraindre les proportions en maintenant {{shortcut_1}} pendant le redimensionnement,\nmaintenez {{shortcut_2}} enfoncé pour redimensionner depuis le centre",
     "resizeImage": "Vous pouvez redimensionner librement en maintenant {{shortcut_1}},\nmaintenez {{shortcut_2}} enfoncé pour redimensionner depuis le centre",
     "rotate": "Vous pouvez contraindre les angles en maintenant {{shortcut}} enfoncé pendant la rotation",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "Double-cliquez pour basculer la tête de flèche",
     "lineEditor_info": "Maintenez {{shortcut_1}} et Double-cliquez ou appuyez sur {{shortcut_2}} pour modifier les points",
     "lineEditor_line_info": "Double-cliquez ou appuyez sur {{shortcut}} pour modifier le texte",
     "lineEditor_pointSelected": "Appuyez sur {{shortcut_1}} pour supprimer le(s) point(s),\n{{shortcut_2}} pour dupliquer, ou faites glisser pour déplacer",
@@ -605,8 +613,10 @@
     "shades": "Nuances",
     "hexCode": "Code hex",
     "noShades": "Aucune nuance disponible pour cette couleur",
-    "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidColor": "Pas une couleur valide",
+    "invalidHexLength": "Le code hexadécimal doit être de 3, 4, 6 ou 8 caractères",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -672,7 +682,7 @@
     "placeholder": {
       "title": "Créons votre diagramme",
       "description": "Décrivez le diagramme que vous voulez créer, et nous le générerons pour vous.",
-      "hint": ""
+      "hint": "Pour le moment, nous connaissons les diagrammes Flowchart, Séquence, Classe, Etat et Entity Relationship."
     },
     "preview": "Prévisualisation",
     "insert": "Insérer",

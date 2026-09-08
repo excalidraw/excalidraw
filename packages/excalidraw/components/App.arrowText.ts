@@ -1,3 +1,5 @@
+import { CURSOR_TYPE, DRAGGING_THRESHOLD } from "@excalidraw/common";
+
 import {
   bindBindingElementToFixedPoint,
   dragNewTextElement,
@@ -5,13 +7,15 @@ import {
   getEndpointBoundTextDragAnchor,
   getTextBindingForArrowEndpoint,
   getUnboundArrowEndpointAtPoint,
+  hitElementBoundText,
   isArrowElement,
   isBindingEnabled,
   isEndpointBoundText,
   isTextElement,
+  LinearElementEditor,
 } from "@excalidraw/element";
 
-import { pointFrom } from "@excalidraw/math";
+import { pointDistance, pointFrom } from "@excalidraw/math";
 
 import type { ArrowEndpoint } from "@excalidraw/element";
 import type {
@@ -19,19 +23,27 @@ import type {
   ExcalidrawTextElement,
   FixedPoint,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type App from "./App";
-import type { AppState } from "../types";
+import type { AppState, PointerDownState } from "../types";
 
 /**
- * The text tool's interaction with arrows: the hover affordance showing where
- * a click would attach text to an arrow — a free endpoint (binds the arrow to
- * a new text element positioned against that endpoint) or the arrow's midpoint
- * (adds a label bound to the arrow) — and the endpoint-bound flavor of
- * drag-sizing a new text.
+ * Text ↔ arrow interactions.
  *
- * The scene-level logic lives in `@excalidraw/element`'s `arrowEndpointText.ts`.
+ * With the text tool: the hover affordance showing where a click would attach
+ * text to an arrow — a free endpoint (binds the arrow to a new text element
+ * positioned against that endpoint) or the arrow's midpoint (adds a label
+ * bound to the arrow) — and the endpoint-bound flavor of drag-sizing a new
+ * text.
+ *
+ * With the selection tool: dragging an arrow's existing label along the arrow
+ * — the grab affordance, the drag itself, and where a double-click starts
+ * editing a label the drag has moved.
+ *
+ * The scene-level logic lives in `@excalidraw/element`'s
+ * `arrowEndpointText.ts` and `linearElementEditor.ts`.
  */
 export class AppArrowText {
   constructor(private app: App) {}
@@ -233,5 +245,108 @@ export class AppArrowText {
     });
 
     return true;
+  }
+
+  /**
+   * Whether the arrow's label is what a grab at this position would pick up:
+   * the pointer is over the label, and no element stacked above the arrow
+   * owns the hit instead.
+   */
+  isBoundTextGrabbable(
+    element: NonDeletedExcalidrawElement,
+    x: number,
+    y: number,
+  ): boolean {
+    if (
+      !isArrowElement(element) ||
+      !hitElementBoundText(
+        pointFrom(x, y),
+        element,
+        this.app.scene.getNonDeletedElementsMap(),
+      )
+    ) {
+      return false;
+    }
+
+    const hitElements = this.app.getElementsAtPosition(x, y);
+    const arrowIndex = hitElements.findIndex((el) => el.id === element.id);
+
+    return (
+      arrowIndex !== -1 &&
+      !hitElements
+        .slice(arrowIndex + 1)
+        .some((el) => this.app.hitElement(x, y, el, false))
+    );
+  }
+
+  /**
+   * The pointer-move half of dragging a label along its arrow. Owns the move
+   * whenever the gesture started on the label (`pointerDownState.hit.arrowLabel`),
+   * dragging only once past the threshold. Returns whether it owned it.
+   */
+  maybeDragLabel(
+    linearElementEditor: LinearElementEditor,
+    pointerDownState: PointerDownState,
+    pointerCoords: { x: number; y: number },
+  ): boolean {
+    if (!pointerDownState.hit.arrowLabel) {
+      return false;
+    }
+
+    this.app.cursor.set(CURSOR_TYPE.GRABBING);
+
+    if (
+      linearElementEditor.isDragging ||
+      pointDistance(
+        pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+        pointFrom(pointerCoords.x, pointerCoords.y),
+      ) >=
+        DRAGGING_THRESHOLD / this.app.state.zoom.value
+    ) {
+      const updatedEditor = LinearElementEditor.handleBoundTextDragging(
+        linearElementEditor,
+        this.app.scene,
+        pointerCoords.x,
+        pointerCoords.y,
+      );
+      if (updatedEditor) {
+        pointerDownState.drag.hasOccurred = true;
+        this.app.setState({
+          selectedLinearElement: updatedEditor,
+        });
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Where a double-click on a labeled arrow should start text editing: the
+   * center of the label itself, which a label drag may have moved away from
+   * the arrow's midpoint. Null when the element is not a labeled arrow.
+   */
+  getLabelCenter(element: ExcalidrawElement): { x: number; y: number } | null {
+    const elementsMap = this.app.scene.getNonDeletedElementsMap();
+
+    if (!isArrowElement(element)) {
+      return null;
+    }
+
+    const boundTextElement = getBoundTextElement(element, elementsMap);
+
+    if (!boundTextElement) {
+      return null;
+    }
+
+    const { x, y } = LinearElementEditor.getBoundTextElementPosition(
+      element,
+      boundTextElement,
+      elementsMap,
+    );
+
+    return {
+      x: x + boundTextElement.width / 2,
+      y: y + boundTextElement.height / 2,
+    };
   }
 }

@@ -1,6 +1,15 @@
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
+import { getUpdatedTimestamp } from "@excalidraw/common";
+
+import {
+  newElement,
+  newEmbeddableElement,
+  newFreeDrawElement,
+  newIframeElement,
+} from "../newElement";
+
 import {
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
@@ -963,6 +972,90 @@ describe("Test Transform", () => {
         versionNonce: expect.any(Number),
         id: expect.any(String),
       });
+    });
+  });
+
+  describe("creation timestamps", () => {
+    const createElements = () => [
+      {
+        ...newElement({ type: "rectangle", x: 0, y: 0 }),
+        type: "rectangle" as const,
+      },
+      newFreeDrawElement({
+        type: "freedraw",
+        x: 0,
+        y: 0,
+        simulatePressure: false,
+      }),
+      newIframeElement({ type: "iframe", x: 0, y: 0 }),
+      newEmbeddableElement({ type: "embeddable", x: 0, y: 0 }),
+    ];
+
+    it("assigns fresh timestamps when regenerating IDs without mutating the input", () => {
+      const elements = createElements().map((element) => ({
+        ...element,
+        created: 123,
+      }));
+      const converted = convertToExcalidrawElements(elements);
+
+      expect(converted).toHaveLength(elements.length);
+      converted.forEach((element, index) => {
+        expect(element.id).not.toBe(elements[index].id);
+        expect(element.created).toBe(getUpdatedTimestamp());
+        expect(elements[index].created).toBe(123);
+      });
+    });
+
+    it.each([123, 0, null])(
+      "preserves an explicit timestamp of %s when retaining IDs",
+      (created) => {
+        const elements = createElements().map((element) => ({
+          ...element,
+          created,
+        }));
+        const converted = convertToExcalidrawElements(elements, opts);
+
+        converted.forEach((element, index) => {
+          expect(element.id).toBe(elements[index].id);
+          expect(element.created).toBe(created);
+        });
+      },
+    );
+
+    it("defaults missing timestamps when retaining IDs, as every type goes through a constructor", () => {
+      // models skeletons persisted before `created` existed; the declared
+      // skeleton type is a complete element
+      const elements = createElements().map(
+        ({ created, ...element }) => element,
+      ) as unknown as ExcalidrawElementSkeleton[];
+      const converted = convertToExcalidrawElements(elements, opts);
+
+      converted.forEach((element, index) => {
+        expect(element.id).toBe(elements[index].id);
+        expect(element.created).toBe(getUpdatedTimestamp());
+        expect(elements[index]).not.toHaveProperty("created");
+      });
+    });
+
+    it("assigns fresh timestamps to generated labels and binding endpoints", () => {
+      const elements: ExcalidrawElementSkeleton[] = [
+        {
+          type: "arrow",
+          x: 100,
+          y: 100,
+          created: 123,
+          // fragments cannot carry a creation time; they are always new
+          label: { text: "label" },
+          start: { type: "rectangle" },
+          end: { type: "text", text: "end" },
+        },
+      ];
+      const converted = convertToExcalidrawElements(elements);
+
+      expect(converted).toHaveLength(4);
+      expect(converted.map((element) => element.created)).toEqual(
+        Array(4).fill(getUpdatedTimestamp()),
+      );
     });
   });
 });

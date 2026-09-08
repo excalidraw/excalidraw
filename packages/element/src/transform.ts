@@ -11,6 +11,7 @@ import {
   assertNever,
   cloneJSON,
   getFontString,
+  getUpdatedTimestamp,
   isDevEnv,
   toBrandedType,
   getLineHeight,
@@ -22,7 +23,10 @@ import { bindBindingElement } from "./binding";
 import {
   newArrowElement,
   newElement,
+  newEmbeddableElement,
   newFrameElement,
+  newFreeDrawElement,
+  newIframeElement,
   newImageElement,
   newLinearElement,
   newMagicFrameElement,
@@ -34,7 +38,10 @@ import { isArrowElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
-import { redrawTextBoundingBox } from "./textElement";
+import {
+  DEFAULT_BOUND_TEXT_LABEL_POSITION,
+  redrawTextBoundingBox,
+} from "./textElement";
 
 import { LinearElementEditor } from "./linearElementEditor";
 
@@ -65,6 +72,16 @@ import type {
   VerticalAlign,
 } from "./types";
 
+/**
+ * Options for elements generated from a skeleton fragment (bound labels and
+ * binding endpoints). Such elements are always constructed fresh, hence they
+ * never carry a creation time of their own.
+ */
+type FragmentConstructorOpts = MarkOptional<
+  Omit<ElementConstructorOpts, "created">,
+  "x" | "y"
+>;
+
 export type ValidLinearElement = {
   type: "arrow" | "line";
   x: number;
@@ -75,7 +92,7 @@ export type ValidLinearElement = {
     fontFamily?: FontFamilyValues;
     textAlign?: TextAlign;
     verticalAlign?: VerticalAlign;
-  } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+  } & FragmentConstructorOpts;
   end?:
     | (
         | (
@@ -115,9 +132,9 @@ export type ValidLinearElement = {
                 text: string;
               }
           ) &
-            Partial<ExcalidrawTextElement>)
+            Partial<Omit<ExcalidrawTextElement, "created">>)
       ) &
-        MarkOptional<ElementConstructorOpts, "x" | "y">;
+        FragmentConstructorOpts;
   start?:
     | (
         | (
@@ -157,9 +174,9 @@ export type ValidLinearElement = {
                 text: string;
               }
           ) &
-            Partial<ExcalidrawTextElement>)
+            Partial<Omit<ExcalidrawTextElement, "created">>)
       ) &
-        MarkOptional<ElementConstructorOpts, "x" | "y">;
+        FragmentConstructorOpts;
 } & Partial<ExcalidrawLinearElement>;
 
 export type ValidContainer =
@@ -172,7 +189,7 @@ export type ValidContainer =
         fontFamily?: FontFamilyValues;
         textAlign?: TextAlign;
         verticalAlign?: VerticalAlign;
-      } & MarkOptional<ElementConstructorOpts, "x" | "y">;
+      } & FragmentConstructorOpts;
     } & ElementConstructorOpts;
 
 export type ExcalidrawElementSkeleton =
@@ -220,7 +237,7 @@ const DEFAULT_DIMENSION = 100;
 
 const bindTextToContainer = (
   container: ExcalidrawElement,
-  textProps: { text: string } & MarkOptional<ElementConstructorOpts, "x" | "y">,
+  textProps: { text: string } & FragmentConstructorOpts,
   scene: Scene,
 ) => {
   const textElement: ExcalidrawTextElement = newTextElement({
@@ -231,6 +248,9 @@ const bindTextToContainer = (
     ...textProps,
     containerId: container.id,
     strokeColor: textProps.strokeColor || container.strokeColor,
+    labelPosition: isArrowElement(container)
+      ? DEFAULT_BOUND_TEXT_LABEL_POSITION
+      : null,
   });
 
   Object.assign(container, {
@@ -525,11 +545,14 @@ export const convertToExcalidrawElements = (
   const oldToNewElementIdMap = new Map<string, string>();
 
   // Create individual elements
+  // regenerated ids mean new instances, hence a fresh creation time as well
+  const created = getUpdatedTimestamp();
+
   for (const element of elements) {
     let excalidrawElement: ExcalidrawElement;
     const originalId = element.id;
     if (opts?.regenerateIds !== false) {
-      Object.assign(element, { id: randomId() });
+      Object.assign(element, { id: randomId(), created });
     }
 
     switch (element.type) {
@@ -628,10 +651,16 @@ export const convertToExcalidrawElements = (
         });
         break;
       }
-      case "freedraw":
-      case "iframe":
+      case "freedraw": {
+        excalidrawElement = newFreeDrawElement({ ...element });
+        break;
+      }
+      case "iframe": {
+        excalidrawElement = newIframeElement({ ...element });
+        break;
+      }
       case "embeddable": {
-        excalidrawElement = element;
+        excalidrawElement = newEmbeddableElement({ ...element });
         break;
       }
 

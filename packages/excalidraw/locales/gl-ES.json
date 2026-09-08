@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar coma texto sen formato",
     "pasteCharts": "Pegar gráficos",
@@ -109,6 +111,7 @@
     "group": "Agrupar selección",
     "ungroup": "Desagrupar selección",
     "collaborators": "Colaboradores",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "Engadir á biblioteca",
     "removeFromLibrary": "Eliminar da biblioteca",
@@ -332,10 +335,15 @@
     "embeddable": "Inserir na web",
     "laser": "Punteiro láser",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Man (ferramenta de desprazamento)",
     "extraTools": "Máis ferramentas",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -606,7 +614,9 @@
     "hexCode": "",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

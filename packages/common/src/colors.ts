@@ -345,6 +345,19 @@ export const rgbToHex = (r: number, g: number, b: number, a?: number) => {
 };
 
 /**
+ * @returns the color with its alpha replaced by `alpha` (as #RRGGBBAA), or the
+ *  input unchanged if it's not a valid color
+ */
+export const setColorAlpha = (color: string, alpha: number): string => {
+  const tc = tinycolor(color);
+  if (!tc.isValid()) {
+    return color;
+  }
+  const { r, g, b } = tc.toRgb();
+  return rgbToHex(r, g, b, alpha);
+};
+
+/**
  * @returns #RRGGBB or #RRGGBBAA based on color containing non-opaque alpha,
  *  null if not valid color
  */

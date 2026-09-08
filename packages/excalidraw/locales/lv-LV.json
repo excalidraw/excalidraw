@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Ielīmēt",
     "pasteAsPlaintext": "Ielīmēt kā vienkāršu tekstu",
     "pasteCharts": "Ielīmēt grafikus",
@@ -109,6 +111,7 @@
     "group": "Grupēt atlasīto",
     "ungroup": "Atgrupēt atlasīto",
     "collaborators": "Dalībnieki",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "Pievienot bibliotēkai",
     "removeFromLibrary": "Izņemt no bibliotēkas",
@@ -332,10 +335,15 @@
     "embeddable": "",
     "laser": "",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Roka (panoramēšanas rīks)",
     "extraTools": "",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -606,7 +614,9 @@
     "hexCode": "",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

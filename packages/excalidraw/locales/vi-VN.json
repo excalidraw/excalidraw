@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Dán",
     "pasteAsPlaintext": "Dán kiểu văn bản thuần",
     "pasteCharts": "Dán biểu đồ",
@@ -109,6 +111,7 @@
     "group": "Gộp nhóm lại lựa chọn",
     "ungroup": "Tách nhóm lựa chọn",
     "collaborators": "Cộng tác viên",
+    "you": "",
     "toggleGrid": "Bật/tắt lưới",
     "addToLibrary": "Thêm vào thư viện",
     "removeFromLibrary": "Xóa khỏi thư viện",
@@ -332,10 +335,15 @@
     "embeddable": "Nhúng Web",
     "laser": "Con trỏ laser",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Tay kéo",
     "extraTools": "Công cụ khác",
     "mermaidToExcalidraw": "Mermaid sang Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Hình chữ nhật",
@@ -606,7 +614,9 @@
     "hexCode": "",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

@@ -27,6 +27,7 @@ import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 export { MIME_TYPES };
 
 type ExportOpts = {
+  /** restored before exporting */
   elements: readonly NonDeletedExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
@@ -150,8 +151,8 @@ export const exportToBlob = async (
             metadata: serializeAsJSON(
               // NOTE as long as we're using the Scene hack, we need to ensure
               // we pass the original, uncloned elements when serializing
-              // so that we keep ids stable
-              opts.elements,
+              // so that we keep ids stable (restoring keeps the ids)
+              restoreElements(opts.elements, null),
               opts.appState,
               opts.files || {},
               "local",
@@ -214,7 +215,10 @@ export const exportToClipboard = async (
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob(opts));
   } else if (opts.type === "json") {
-    await copyToClipboard(opts.elements, opts.files);
+    await copyToClipboard(
+      getNonDeletedElements(restoreElements(opts.elements, null)),
+      opts.files,
+    );
   } else {
     throw new Error("Invalid export type");
   }

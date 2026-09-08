@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Beillesztés",
     "pasteAsPlaintext": "Beillesztés formázatlan szövegként",
     "pasteCharts": "Grafikon beillesztése",
@@ -109,6 +111,7 @@
     "group": "Csoportosítás",
     "ungroup": "Csoportbontás",
     "collaborators": "Közreműködők",
+    "you": "",
     "toggleGrid": "Keresés törlése",
     "addToLibrary": "Hozzáadás a könyvtárhoz",
     "removeFromLibrary": "Eltávólítás a könyvtárból",
@@ -332,10 +335,15 @@
     "embeddable": "",
     "laser": "Lézermutató",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "",
     "extraTools": "További eszközök",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Téglalap",
@@ -606,7 +614,9 @@
     "hexCode": "",
     "noShades": "",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

@@ -1688,8 +1688,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     }
 
     if (!flags.containsVisibleDifference) {
-      // strip away fractional index, as even if it would be different, it doesn't have to result in visible change
-      const { index, ...rest } = directlyApplicablePartial;
+      // Creation metadata is not visible; a different fractional index does
+      // not necessarily change the visible order either.
+      const { index, created, ...rest } = directlyApplicablePartial;
       const containsVisibleDifference = ElementsDelta.checkForVisibleDifference(
         element,
         rest,

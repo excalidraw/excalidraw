@@ -76,6 +76,11 @@ type _ExcalidrawElementBase = Readonly<{
   boundElements: readonly BoundElement[] | null;
   /** epoch (ms) timestamp of last element update */
   updated: number;
+  /** Client wall-clock creation time in epoch milliseconds; null if unknown.
+      Preserved for this element's lifetime, including edits and undo/redo,
+      and excluded from `ElementUpdate` (mutateElement / newElementWith).
+      Duplicating an element starts a new lifetime. Not an ordering clock. */
+  created: number | null;
   link: string | null;
   locked: boolean;
   customData?: Record<string, any>;
@@ -254,6 +259,13 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      *  with font size (using `getLineHeightInPx` helper).
      */
     lineHeight: number & { _brand: "unitlessLineHeight" };
+    /**
+     * Position of text bound to a linear element (such as an arrow),
+     * expressed as a normalized arc-length parameter (0–1) along the
+     * container's whole path. Independent of how the path is segmented,
+     * so it survives midpoint insertion and other geometry changes.
+     * */
+    labelPosition?: number | null;
   }>;
 
 export type ExcalidrawBindableElement =

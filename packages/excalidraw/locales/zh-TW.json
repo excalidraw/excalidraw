@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "貼上",
     "pasteAsPlaintext": "以純文字貼上",
     "pasteCharts": "貼上圖表",
@@ -35,9 +37,9 @@
     "strokeStyle_dashed": "虛線",
     "strokeStyle_dotted": "點線",
     "sloppiness": "線條風格",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "壓力",
+    "pressure_constant": "常數",
+    "pressure_variable": "變數",
     "opacity": "透明度",
     "textAlign": "文字對齊",
     "edges": "邊緣",
@@ -56,14 +58,14 @@
     "arrowhead_crowfoot_many": "雞爪符號（多）",
     "arrowhead_crowfoot_one": "雞爪符號（一）",
     "arrowhead_crowfoot_one_or_many": "雞爪符號（一或多）",
-    "arrowhead_cardinality_one": "",
-    "arrowhead_cardinality_many": "",
-    "arrowhead_cardinality_one_or_many": "",
-    "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
-    "arrowhead_cardinality_zero_or_many": "",
+    "arrowhead_cardinality_one": "基數（一）",
+    "arrowhead_cardinality_many": "基數（多個）",
+    "arrowhead_cardinality_one_or_many": "基數（一個或多個）",
+    "arrowhead_cardinality_exactly_one": "基數（恰好為 1）",
+    "arrowhead_cardinality_zero_or_one": "基數（零或一）",
+    "arrowhead_cardinality_zero_or_many": "基數（零或多）",
     "more_options": "更多選項",
-    "cardinality": "",
+    "cardinality": "基數",
     "arrowtypes": "箭頭類型",
     "arrowtype_sharp": "尖銳箭頭",
     "arrowtype_round": "彎角箭頭",
@@ -109,6 +111,7 @@
     "group": "建立群組",
     "ungroup": "取消群組",
     "collaborators": "協作者",
+    "you": "你",
     "toggleGrid": "切換網格",
     "addToLibrary": "加入資料庫",
     "removeFromLibrary": "從資料庫中移除",
@@ -188,9 +191,9 @@
     "shapeSwitch": "切換形狀",
     "preferences": "偏好設定",
     "preferences_toolLock": "鎖定工具",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "選取方式",
+    "boxSelectionContain": "完全包覆",
+    "boxSelectionOverlap": "部分重疊",
     "arrowBinding": "箭頭連結",
     "midpointSnapping": "貼齊中點"
   },
@@ -331,11 +334,16 @@
     "magicframe": "線框稿轉為程式碼",
     "embeddable": "嵌入網站",
     "laser": "雷射筆",
-    "autoshape": "",
+    "autoshape": "畫出形狀",
+    "bucketfill": "油漆桶填充工具",
     "hand": "手形（平移工具）",
     "extraTools": "更多工具",
     "mermaidToExcalidraw": "Mermaid 至 Excalidraw",
     "convertElementType": "切換形狀類型"
+  },
+  "bucketfill": {
+    "noRegion": "找不到可填滿的封閉區域。",
+    "tooComplex": "區域太複雜，無法填充。"
   },
   "element": {
     "rectangle": "矩形",
@@ -367,7 +375,7 @@
     "freeDraw": "點擊並拖曳來繪圖，放開即結束",
     "text": "提示：亦可使用選取工具在任何地方雙擊來加入文字",
     "embeddable": "點擊並拖移以建立嵌入網站",
-    "autoshape": "",
+    "autoshape": "畫出矩形、圓形、菱形、直線和箭頭",
     "text_selected": "按兩下滑鼠或按 {{shortcut}} 以編輯文字",
     "text_editing": "{{shortcut_1}} 或 {{shortcut_2}} 以結束編輯",
     "linearElementMulti": "點選最後一個點，或按下 {{shortcut_1}} 或 {{shortcut_2}} 以完成",
@@ -375,7 +383,7 @@
     "resize": "縮放時按住 {{shortcut_1}} 可保持等比例，\n按住 {{shortcut_2}} 則可從中心縮放",
     "resizeImage": "按住 {{shortcut_1}} 可自由縮放，\n按住 {{shortcut_2}} 則可從中心縮放",
     "rotate": "你可以在旋轉時按住 {{shortcut}} 以鎖定角度",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "按兩下切換箭頭",
     "lineEditor_info": "按住 {{shortcut_1}} 並按兩下或按下 {{shortcut_2}} 以編輯點",
     "lineEditor_line_info": "按兩下或按 {{shortcut}} 以編輯點",
     "lineEditor_pointSelected": "按下 {{shortcut_1}} 移除點，\n{{shortcut_2}} 重製，或拖曳以移動",
@@ -605,8 +613,10 @@
     "shades": "漸變色",
     "hexCode": "Hex 碼",
     "noShades": "沒有此顏色的漸變色",
-    "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidColor": "無效顏色",
+    "invalidHexLength": "十六進位代碼必須為 3、4、6 或 8 個字元。",
+    "topPicksTip": "提示：將任意顏色拖曳到你的收藏夾上即可固定。",
+    "resetTopPicks": "重設為預設首選"
   },
   "overwriteConfirm": {
     "action": {
@@ -642,7 +652,7 @@
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",
     "button": "插入",
-    "description": "",
+    "description": "目前僅支援 <flowchartLink>Flowchart</flowchartLink> 、 <sequenceLink>Sequence</sequenceLink> 及 <classLink>Class </classLink> 圖表。其餘檔案類型在 Excalidraw 將會以圖像呈現。",
     "syntax": "Mermaid 語法",
     "preview": "預覽",
     "label": "Mermaid",
@@ -672,7 +682,7 @@
     "placeholder": {
       "title": "讓我們開始設計你的圖表",
       "description": "描述你想要建立的圖表，我們將為你生成。",
-      "hint": ""
+      "hint": "到目前我們了解流程圖、序列圖、類別圖、狀態圖和實體關係圖。"
     },
     "preview": "預覽",
     "insert": "插入",

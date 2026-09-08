@@ -531,3 +531,5 @@ export const getTextFromElements = (
     .join(separator);
   return text;
 };
+
+export const DEFAULT_BOUND_TEXT_LABEL_POSITION = 0.5;

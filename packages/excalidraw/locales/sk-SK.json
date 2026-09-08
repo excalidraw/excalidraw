@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Vložiť",
     "pasteAsPlaintext": "Vložiť ako obyčajný text",
     "pasteCharts": "Vložiť grafy",
@@ -109,6 +111,7 @@
     "group": "Zoskupiť",
     "ungroup": "Zrušiť zoskupenie",
     "collaborators": "Spolupracovníci",
+    "you": "",
     "toggleGrid": "Prepnúť mriežku",
     "addToLibrary": "Pridať do knižnice",
     "removeFromLibrary": "Odstrániť z knižnice",
@@ -332,10 +335,15 @@
     "embeddable": "Web Embed",
     "laser": "Laserový ukazovateľ",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Ruka (nástroj pre pohyb plátna)",
     "extraTools": "Ďalšie nástroje",
     "mermaidToExcalidraw": "Mermaid do Excalidraw",
     "convertElementType": "Prepnúť typ tvaru"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Obdĺžnik",
@@ -606,7 +614,9 @@
     "hexCode": "Hex kód",
     "noShades": "Pre túto farbu nie sú dostupné žiadne odtiene",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {

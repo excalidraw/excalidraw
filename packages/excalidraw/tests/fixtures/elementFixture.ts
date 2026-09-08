@@ -28,6 +28,7 @@ const elementBase: Omit<ExcalidrawElement, "type"> = {
   isDeleted: false,
   boundElements: null,
   updated: 1,
+  created: null,
   link: null,
   locked: false,
 };

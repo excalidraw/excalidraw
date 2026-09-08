@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Itsatsi",
     "pasteAsPlaintext": "Itsatsi testu arrunt gisa",
     "pasteCharts": "Itsatsi grafikoak",
@@ -109,6 +111,7 @@
     "group": "Hautapena taldea bihurtu",
     "ungroup": "Desegin hautapenaren taldea",
     "collaborators": "Kolaboratzaileak",
+    "you": "",
     "toggleGrid": "Txandakatu sareta",
     "addToLibrary": "Gehitu liburutegira",
     "removeFromLibrary": "Kendu liburutegitik",
@@ -332,10 +335,15 @@
     "embeddable": "Web kapsulatzea",
     "laser": "Laser punteroa",
     "autoshape": "",
+    "bucketfill": "",
     "hand": "Eskua (panoratze tresna)",
     "extraTools": "Tresna gehiago",
     "mermaidToExcalidraw": "Mermaid-etik Excalidraw-ra",
     "convertElementType": "Aldatu forma mota"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Laukizuzena",
@@ -606,7 +614,9 @@
     "hexCode": "Hez kodea",
     "noShades": "Kolore honetarako ez dago ñabardurarik eskuragarri",
     "invalidColor": "",
-    "invalidHexLength": ""
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
