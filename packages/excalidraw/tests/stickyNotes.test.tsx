@@ -17,6 +17,7 @@ import {
   resizeSingleElement,
   updateStickyNoteLayout,
 } from "@excalidraw/element";
+import { exportToCanvas } from "@excalidraw/utils";
 
 import type {
   ExcalidrawArrowElement,
@@ -36,6 +37,7 @@ import { actionCopyStyles, actionPasteStyles } from "../actions/actionStyles";
 import { activeEyeDropperAtom } from "../components/EyeDropper";
 import { editorJotaiStore } from "../editor-jotai";
 import { Excalidraw } from "../index";
+import { exportToSvg } from "../scene/export";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -782,6 +784,43 @@ describe("sticky notes", () => {
       updated = getElement<ExcalidrawStickyNoteElement>(note.id);
       expect(updated.width).toBe(800);
       expect(getElement<ExcalidrawTextElement>(label.id).fontSizeMax).toBe(56);
+    });
+  });
+
+  describe("creation date", () => {
+    it("exports the same absolute date to SVG and canvas, omitting unknown dates", async () => {
+      const elements = [
+        API.createElement({
+          type: "stickynote",
+          width: DEFAULT_STICKY_NOTE_SIZE,
+          height: DEFAULT_STICKY_NOTE_SIZE,
+          // a past year, so the label carries it in every "current year"
+          created: new Date(2025, 2, 7, 12).getTime(),
+        }),
+        API.createElement({
+          type: "stickynote",
+          x: 300,
+          width: DEFAULT_STICKY_NOTE_SIZE,
+          height: DEFAULT_STICKY_NOTE_SIZE,
+          created: null,
+        }),
+      ];
+
+      const svg = await exportToSvg(
+        elements,
+        { exportBackground: false, viewBackgroundColor: "#ffffff" },
+        {},
+      );
+      expect(
+        [...svg.querySelectorAll("text")].map((text) => text.textContent),
+      ).toEqual(["7 Mar 2025"]);
+
+      const canvas = await exportToCanvas({ elements, files: {} });
+      expect(canvas.getContext("2d")?.fillText).toHaveBeenCalledWith(
+        "7 Mar 2025",
+        expect.any(Number),
+        expect.any(Number),
+      );
     });
   });
 });

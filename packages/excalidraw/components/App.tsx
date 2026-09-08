@@ -12023,8 +12023,12 @@ class App extends React.Component<AppProps, AppState> {
             fontSize: this.state.currentItemFontSize,
             fontFamily: this.state.currentItemFontFamily,
           });
-          const width = Math.max(newElement.width, minSize);
-          const height = Math.max(newElement.height, minSize);
+          let width = Math.max(newElement.width, minSize.width);
+          let height = Math.max(newElement.height, minSize.height);
+          if (shouldMaintainAspectRatio(childEvent)) {
+            // the two floors differ, so a square drag stays square
+            width = height = Math.max(width, height);
+          }
           const { originInGrid } = pointerDownState;
           nextGeometry = {
             // a drag toward the top/left put the note's origin before the

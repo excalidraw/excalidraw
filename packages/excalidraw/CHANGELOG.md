@@ -19,6 +19,7 @@ Please add the latest change on the top under the correct section.
 - Element model: the note carries `baseHeight` (the user's height; `height ≥ baseHeight`), its label carries `fontSizeMax` (the user's font ceiling, `null`/absent on any other text) while `fontSize` holds the fitted size. Read a text element's user-facing size through `getUserFontSize(text, elementsMap)`.
 - Sticky notes are their own color domain: new `appState.currentItemStickynoteStrokeColor` (the note's text color) and `appState.currentItemStickynoteBackgroundColor` defaults, and new customizable top-pick slots `appState.colorTopPicks.stickyNoteStroke` / `stickyNoteBackground`. The stroke and background pickers, both eyedroppers and paste-styles resolve their target (regular / sticky / mixed) at execution time.
 - Skeleton API: `convertToExcalidrawElements([{ type: "stickynote", x, y, label?: { text, fontSize? } }])` creates a note (and fitted label); see the element-skeleton docs.
+- Each note shows its creation date (`element.created`) in a footer band — "7 Sep", or "7 Sep 2025" once the year differs — on canvas and in SVG/PNG exports. The band is reserved in the note's layout, so the label never overlaps it; notes without a timestamp keep the band empty.
 - Resize semantics: width-only gestures keep the base height, height gestures set it, proportional gestures (Shift on any handle, aspect-locked multi-select, Stats group) also scale the label's font ceiling; flips preserve everything. Arrows bound to a note follow it as it grows.
 
 ## Excalidraw API

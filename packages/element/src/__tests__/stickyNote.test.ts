@@ -6,6 +6,9 @@ import {
   STICKY_NOTE_FALLBACK_FONT_SIZE,
   STICKY_NOTE_MAX_FONT_SIZE,
   STICKY_NOTE_MIN_FONT_SIZE,
+  STICKY_NOTE_BODY_INSET_Y,
+  STICKY_NOTE_FOOTER,
+  STICKY_NOTE_MIN_SIZE,
   STICKY_NOTE_PADDING,
   VERTICAL_ALIGN,
   arrayToMap,
@@ -31,12 +34,14 @@ import { resizeMultipleElements, resizeSingleElement } from "../resizeElements";
 import {
   getStickyNoteLayout,
   getStickyNoteCornerRadius,
+  getStickyNoteDateLabel,
+  getStickyNoteFooter,
   getStickyNoteMinSize,
   normalizeStickyNoteFontSize,
   updateStickyNoteLayout,
 } from "../stickyNote";
 import * as textMeasurements from "../textMeasurements";
-import { redrawTextBoundingBox } from "../textElement";
+import { getBoundTextMaxHeight, redrawTextBoundingBox } from "../textElement";
 
 import type {
   ExcalidrawElement,
@@ -738,17 +743,149 @@ describe("sticky note text layout", () => {
   });
 
   it("sizes the minimum note to fit one line at the ceiling", () => {
+    // a 25px line (20 × 1.25): the constant floor wins horizontally, the
+    // footer pushes the height above it
     expect(
       getStickyNoteMinSize({
         fontSize: 20,
         fontFamily: FONT_FAMILY.Excalifont,
       }),
-    ).toBe(75);
+    ).toEqual({
+      width: STICKY_NOTE_MIN_SIZE,
+      height: 25 + STICKY_NOTE_BODY_INSET_Y,
+    });
+    // a 60px line (48 × 1.25)
     expect(
       getStickyNoteMinSize({
         fontSize: 48,
         fontFamily: FONT_FAMILY.Excalifont,
       }),
-    ).toBe(92);
+    ).toEqual({
+      width: 60 + STICKY_NOTE_PADDING * 2,
+      height: 60 + STICKY_NOTE_BODY_INSET_Y,
+    });
+  });
+
+  it("never resizes a note below one line at its ceiling plus the footer", () => {
+    const { scene, stickyId } = createStickyWithText("A");
+    const sticky = getSticky(scene, stickyId);
+    const originalElementsMap = arrayToMap(
+      scene.getNonDeletedElements().map((element) => ({ ...element })),
+    );
+    // 28 × 1.25 = 35px line: 75 wide (floor), 35 + 64 = 99 high
+    const minSize = getStickyNoteMinSize({
+      fontSize: STICKY_FONT_SIZE,
+      fontFamily: FONT_FAMILY.Excalifont,
+    });
+    expect(minSize).toEqual({ width: STICKY_NOTE_MIN_SIZE, height: 99 });
+
+    resizeSingleElement(
+      40,
+      40,
+      sticky,
+      { ...sticky },
+      originalElementsMap,
+      scene,
+      "se",
+    );
+
+    const resized = getSticky(scene, stickyId);
+    expect(resized.width).toBe(minSize.width);
+    expect(resized.baseHeight).toBe(minSize.height);
+    expect(resized.height).toBe(minSize.height);
+    scene.destroy();
+  });
+
+  it.each([0, Math.PI / 4, Math.PI / 2])(
+    "keeps bottom-aligned text above the date footer at angle %s",
+    (angle) => {
+      const { scene, stickyId, textId } = createStickyWithText("Last line");
+      const sticky = getSticky(scene, stickyId);
+      const text = getBoundText(scene, textId);
+      scene.mutateElement(sticky, { angle: angle as Radians });
+      scene.mutateElement(text, { verticalAlign: VERTICAL_ALIGN.BOTTOM });
+      redrawTextBoundingBox(text, sticky, scene);
+
+      // Bring the rendered label center back into the note's local frame.
+      const [, centerY] = pointRotateRads(
+        pointFrom(text.x + text.width / 2, text.y + text.height / 2),
+        pointFrom(sticky.x + sticky.width / 2, sticky.y + sticky.height / 2),
+        -angle as Radians,
+      );
+      expect(centerY + text.height / 2).toBeCloseTo(
+        sticky.y +
+          sticky.height -
+          STICKY_NOTE_PADDING -
+          STICKY_NOTE_FOOTER.height,
+      );
+      expect(sticky.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(sticky.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      scene.destroy();
+    },
+  );
+});
+
+describe("sticky note creation date", () => {
+  // local noon, so the calendar day is the same in every time zone
+  const NOW = new Date(2026, 8, 8, 12).getTime();
+  const at = (year: number, month: number, day: number) =>
+    new Date(year, month, day, 12).getTime();
+
+  it("formats an absolute date, short while the year is the current one", () => {
+    expect(getStickyNoteDateLabel(at(2026, 8, 7), { now: NOW })).toBe("7 Sep");
+    expect(getStickyNoteDateLabel(at(2025, 11, 31), { now: NOW })).toBe(
+      "31 Dec 2025",
+    );
+    expect(
+      getStickyNoteDateLabel(at(2025, 11, 31), { now: NOW, short: true }),
+    ).toBe("31 Dec");
+    // a creator's clock ahead of ours is still a date
+    expect(getStickyNoteDateLabel(at(2027, 0, 1), { now: NOW })).toBe(
+      "1 Jan 2027",
+    );
+  });
+
+  it.each([null, NaN, Infinity, 8.64e15 + 1])(
+    "hides an unknown or invalid timestamp: %s",
+    (created) => {
+      expect(getStickyNoteDateLabel(created, { now: NOW })).toBeNull();
+    },
+  );
+
+  it("picks the footer form by width bucket, without measuring", () => {
+    const created = at(2025, 4, 30);
+    const footer = (width: number, height = DEFAULT_STICKY_NOTE_SIZE) =>
+      getStickyNoteFooter({ created, width, height }, NOW);
+    const yearWidth =
+      STICKY_NOTE_PADDING * 2 + STICKY_NOTE_FOOTER.minBodyWidthForYear;
+
+    expect(footer(DEFAULT_STICKY_NOTE_SIZE)).toEqual({
+      text: "30 May 2025",
+      x: DEFAULT_STICKY_NOTE_SIZE - STICKY_NOTE_PADDING,
+      y:
+        DEFAULT_STICKY_NOTE_SIZE -
+        STICKY_NOTE_PADDING -
+        STICKY_NOTE_FOOTER.baselineOffset,
+    });
+    expect(footer(yearWidth)?.text).toBe("30 May 2025");
+    expect(footer(yearWidth - 1)?.text).toBe("30 May");
+    // the data floor always fits the short form
+    expect(footer(STICKY_NOTE_MIN_SIZE, STICKY_NOTE_MIN_SIZE)?.text).toBe(
+      "30 May",
+    );
+    // the 0×0 creation draft paints no footer, nor does an unknown date
+    expect(footer(0, 0)).toBeNull();
+    expect(
+      getStickyNoteFooter({ created: null, width: 250, height: 250 }, NOW),
+    ).toBeNull();
+  });
+
+  it("reserves the footer below the label body", () => {
+    const { scene, stickyId, textId } = createStickyWithText("A");
+    const sticky = getSticky(scene, stickyId);
+    expect(getBoundTextMaxHeight(sticky, getBoundText(scene, textId))).toBe(
+      sticky.height - STICKY_NOTE_BODY_INSET_Y,
+    );
+    scene.destroy();
   });
 });

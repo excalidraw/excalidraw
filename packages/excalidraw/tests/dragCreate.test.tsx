@@ -4,7 +4,9 @@ import { vi } from "vitest";
 import {
   DEFAULT_STICKY_NOTE_SIZE,
   KEYS,
+  STICKY_NOTE_BODY_INSET_Y,
   STICKY_NOTE_MIN_SIZE,
+  STICKY_NOTE_PADDING,
   reseed,
 } from "@excalidraw/common";
 
@@ -324,21 +326,22 @@ describe("Test dragCreate", () => {
       fireEvent.pointerUp(canvas, { clientX: 320, clientY: 320 });
       await getTextEditor();
 
-      // on release it grows to the minimum, away from the origin corner
-      // (the default 20px ceiling fits one line inside the constant floor)
+      // on release it grows to the minimum, away from the origin corner: the
+      // constant floor wide, one 25px line at the default 20px ceiling plus
+      // padding and the date footer high
       const stickyNote = h.elements.find(
         (element) => element.type === "stickynote",
       ) as ExcalidrawStickyNoteElement;
       expect(stickyNote.x).toBe(300);
       expect(stickyNote.y).toBe(300);
       expect(stickyNote.width).toBe(STICKY_NOTE_MIN_SIZE);
-      expect(stickyNote.height).toBe(STICKY_NOTE_MIN_SIZE);
-      expect(stickyNote.baseHeight).toBe(STICKY_NOTE_MIN_SIZE);
+      expect(stickyNote.height).toBe(25 + STICKY_NOTE_BODY_INSET_Y);
+      expect(stickyNote.baseHeight).toBe(25 + STICKY_NOTE_BODY_INSET_Y);
     });
 
     it("sizes the minimum note to fit one line at a large font ceiling", async () => {
       const { getByToolName, container } = await render(<Excalidraw />);
-      // 48 × 1.25 line height + 2 × 16 padding = 92 > the 75 floor
+      // a 60px line (48 × 1.25): plus padding wide, plus the date footer high
       API.setAppState({ currentItemFontSize: 48 });
       fireEvent.click(getByToolName("stickynote"));
 
@@ -351,8 +354,8 @@ describe("Test dragCreate", () => {
       const stickyNote = h.elements.find(
         (element) => element.type === "stickynote",
       ) as ExcalidrawStickyNoteElement;
-      expect(stickyNote.width).toBe(92);
-      expect(stickyNote.height).toBe(92);
+      expect(stickyNote.width).toBe(60 + STICKY_NOTE_PADDING * 2);
+      expect(stickyNote.height).toBe(60 + STICKY_NOTE_BODY_INSET_Y);
 
       // one line fits without growing the note
       updateTextEditor(editor, "A");
@@ -362,7 +365,33 @@ describe("Test dragCreate", () => {
             (element) => element.type === "stickynote",
           ) as ExcalidrawStickyNoteElement
         ).height,
-      ).toBe(92);
+      ).toBe(60 + STICKY_NOTE_BODY_INSET_Y);
+    });
+
+    it("keeps a Shift-created note square when reserving its date footer", async () => {
+      const { getByToolName, container } = await render(<Excalidraw />);
+      fireEvent.click(getByToolName("stickynote"));
+      const canvas = container.querySelector("canvas.interactive")!;
+      fireEvent.pointerDown(canvas, {
+        clientX: 300,
+        clientY: 300,
+        shiftKey: true,
+      });
+      fireEvent.pointerMove(canvas, {
+        clientX: 320,
+        clientY: 320,
+        shiftKey: true,
+      });
+      fireEvent.pointerUp(canvas, {
+        clientX: 320,
+        clientY: 320,
+        shiftKey: true,
+      });
+      await getTextEditor();
+
+      const note = h.elements.find((element) => element.type === "stickynote")!;
+      expect(note.width).toBe(25 + STICKY_NOTE_BODY_INSET_Y);
+      expect(note.height).toBe(25 + STICKY_NOTE_BODY_INSET_Y);
     });
 
     it("keeps the origin corner fixed when a drag toward the top-left snaps to the minimum", async () => {

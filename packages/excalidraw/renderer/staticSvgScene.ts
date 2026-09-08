@@ -13,6 +13,7 @@ import {
   MIME_TYPES,
   STICKY_NOTE_EDGE_SHADOW_OPACITY,
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
+  STICKY_NOTE_FOOTER,
   STICKY_NOTE_SHADOW_OFFSET,
   STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
@@ -40,6 +41,7 @@ import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 import { ShapeCache } from "@excalidraw/element";
 import {
   getStickyNoteCornerRadius,
+  getStickyNoteFooter,
   getStickyNotePathCommands,
   getStickyNoteRenderPoints,
 } from "@excalidraw/element";
@@ -242,6 +244,29 @@ const renderElementToSvg = (
       group.appendChild(shadow);
       group.appendChild(rect);
       group.appendChild(edgeShadow);
+
+      const footer = getStickyNoteFooter(element);
+      if (footer) {
+        const dateText = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
+        dateText.setAttribute("x", `${footer.x}`);
+        dateText.setAttribute("y", `${footer.y}`);
+        dateText.setAttribute("font-family", STICKY_NOTE_FOOTER.fontFamily);
+        dateText.setAttribute("font-size", `${STICKY_NOTE_FOOTER.fontSize}px`);
+        // `text-anchor` is logical in SVG: pin the direction so an RTL host
+        // page can't flip the label to the left edge
+        dateText.setAttribute("text-anchor", "end");
+        dateText.setAttribute("direction", "ltr");
+        dateText.setAttribute(
+          "fill",
+          applyDarkModeFilter(
+            element.strokeColor,
+            renderConfig.theme === THEME.DARK,
+          ),
+        );
+        dateText.setAttribute("fill-opacity", `${STICKY_NOTE_FOOTER.opacity}`);
+        dateText.textContent = footer.text;
+        group.appendChild(dateText);
+      }
 
       const g = maybeWrapNodesInFrameClipPath(
         element,

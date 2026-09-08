@@ -19,11 +19,16 @@ describe("element creation timestamps", () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
-  it.each([123, null])(
-    "preserves created=%s through capture, edits, and creation undo/redo",
-    (created) => {
+  it.each([
+    { type: "rectangle", created: 123 },
+    { type: "rectangle", created: null },
+    { type: "stickynote", created: 123 },
+    { type: "stickynote", created: null },
+  ] as const)(
+    "preserves $type created=$created through capture, edits, and creation undo/redo",
+    ({ type, created }) => {
       const element = API.createElement({
-        type: "rectangle",
+        type,
         x: 10,
         created,
         index: "a0" as FractionalIndex,

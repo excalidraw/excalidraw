@@ -216,6 +216,27 @@ export const STICKY_NOTE_MAX_FONT_SIZE = 512;
 export const STICKY_NOTE_FALLBACK_FONT_SIZE = 28;
 export const STICKY_NOTE_FONT_STEP = 2;
 export const STICKY_NOTE_PADDING = 16;
+/**
+ * The creation-date footer: a 20px text row under the label body plus a 12px
+ * gap above it, inside the note's bottom padding. Reserved for every note —
+ * also when `created` is unknown — so geometry never depends on data
+ * availability. The label is chosen by width bucket, never measured, so
+ * painting stays measurement-free (the server has no text measurer):
+ * `minBodyWidthForYear` is the worst case ("30 May 2026") in the system sans
+ * stack at 12px, with margin for wider fallbacks such as DejaVu Sans.
+ */
+export const STICKY_NOTE_FOOTER = {
+  height: 32,
+  fontSize: 12,
+  fontFamily: "Helvetica, Arial, sans-serif",
+  /** from the bottom padding up to the alphabetic baseline (descender room) */
+  baselineOffset: 4,
+  opacity: 0.65,
+  minBodyWidthForYear: 80,
+} as const;
+/** outer height → label body height: top + bottom padding + footer */
+export const STICKY_NOTE_BODY_INSET_Y =
+  STICKY_NOTE_PADDING * 2 + STICKY_NOTE_FOOTER.height;
 export const DEFAULT_STICKY_NOTE_SIZE = 250;
 // floor for a finalized note's width and base height; the UI floor is font-aware
 // on top of it (see `getStickyNoteMinSize`)

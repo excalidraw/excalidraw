@@ -3,7 +3,9 @@ import {
   DEFAULT_STICKY_NOTE_BG,
   MIN_FONT_SIZE,
   arrayToMap,
+  STICKY_NOTE_BODY_INSET_Y,
   STICKY_NOTE_FALLBACK_FONT_SIZE,
+  STICKY_NOTE_FOOTER,
   STICKY_NOTE_FONT_STEP,
   STICKY_NOTE_MAX_FONT_SIZE,
   STICKY_NOTE_MIN_SIZE,
@@ -309,9 +311,81 @@ export const getUserFontSizeUpdate = (
     : { fontSize };
 };
 
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
 /**
- * The smallest note the UI lets a user create or resize to: a square that
- * fits one line at the label's font ceiling (plus padding), never below
+ * The creation-date label: absolute, so painting needs no clock and exports
+ * don't go stale, and short ("7 Sep") while the year is the current one.
+ * `null` when the note has no usable timestamp (files restored without one).
+ * Fixed English in the viewer's local time zone — the element package has no
+ * locale, and the footer is chosen by width bucket rather than measured.
+ */
+export const getStickyNoteDateLabel = (
+  created: ExcalidrawStickyNoteElement["created"],
+  { short = false, now = Date.now() }: { short?: boolean; now?: number } = {},
+): string | null => {
+  if (created === null || !Number.isFinite(created)) {
+    return null;
+  }
+  const date = new Date(created);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  const label = `${date.getDate()} ${MONTHS[date.getMonth()]}`;
+  const year = date.getFullYear();
+  return short || year === new Date(now).getFullYear()
+    ? label
+    : `${label} ${year}`;
+};
+
+/**
+ * What the footer paints and where, in note-local coordinates — shared by the
+ * canvas and SVG renderers, which take the font and opacity from
+ * `STICKY_NOTE_FOOTER`. `null` for the 0×0 creation draft and anything under
+ * the data floor, where the band would overlap the top padding.
+ */
+export const getStickyNoteFooter = (
+  element: Pick<ExcalidrawStickyNoteElement, "created" | "width" | "height">,
+  now = Date.now(),
+) => {
+  if (
+    element.width < STICKY_NOTE_MIN_SIZE ||
+    element.height < STICKY_NOTE_MIN_SIZE
+  ) {
+    return null;
+  }
+  const text = getStickyNoteDateLabel(element.created, {
+    short:
+      element.width - STICKY_NOTE_PADDING * 2 <
+      STICKY_NOTE_FOOTER.minBodyWidthForYear,
+    now,
+  });
+  if (!text) {
+    return null;
+  }
+  return {
+    text,
+    x: element.width - STICKY_NOTE_PADDING,
+    y: element.height - STICKY_NOTE_PADDING - STICKY_NOTE_FOOTER.baselineOffset,
+  };
+};
+
+/**
+ * The smallest note the UI lets a user create or resize to: one line at the
+ * label's font ceiling plus padding (and, vertically, the footer), never below
  * `STICKY_NOTE_MIN_SIZE`. Without the font term a fresh note would grow on
  * the very first keystroke. Data-level passes (restore, action post-passes)
  * only enforce the constant floor — the layout grows a note as needed.
@@ -320,12 +394,19 @@ export const getStickyNoteMinSize = ({
   fontSize,
   fontFamily,
 }: Pick<ExcalidrawTextElement, "fontSize" | "fontFamily">) => {
-  const lineHeightPx =
-    normalizeStickyNoteFontSize(fontSize) * getLineHeight(fontFamily);
-  return Math.max(
-    STICKY_NOTE_MIN_SIZE,
-    Math.round(lineHeightPx) + STICKY_NOTE_PADDING * 2,
+  const lineHeightPx = Math.ceil(
+    normalizeStickyNoteFontSize(fontSize) * getLineHeight(fontFamily),
   );
+  return {
+    width: Math.max(
+      STICKY_NOTE_MIN_SIZE,
+      lineHeightPx + STICKY_NOTE_PADDING * 2,
+    ),
+    height: Math.max(
+      STICKY_NOTE_MIN_SIZE,
+      lineHeightPx + STICKY_NOTE_BODY_INSET_Y,
+    ),
+  };
 };
 
 // -----------------------------------------------------------------------------
@@ -538,7 +619,7 @@ export const getStickyNoteLayout = (
   );
   const fontSizeMin = Math.min(STICKY_NOTE_MIN_FONT_SIZE, fontSizeMax);
   const maxWidth = Math.max(baseWidth - STICKY_NOTE_PADDING * 2, 1);
-  const maxHeight = Math.max(baseHeight - STICKY_NOTE_PADDING * 2, 0);
+  const maxHeight = Math.max(baseHeight - STICKY_NOTE_BODY_INSET_Y, 0);
   const { fontFamily, lineHeight } = textElement;
 
   const fit = (fontSize: number): FontFit => {
@@ -568,7 +649,7 @@ export const getStickyNoteLayout = (
 
   const height = isBlank
     ? baseHeight
-    : Math.max(baseHeight, fitted.height + STICKY_NOTE_PADDING * 2);
+    : Math.max(baseHeight, fitted.height + STICKY_NOTE_BODY_INSET_Y);
   const nextContainer = {
     ...getStickyNoteAutoResizePosition(container, height, anchor),
     width: baseWidth,

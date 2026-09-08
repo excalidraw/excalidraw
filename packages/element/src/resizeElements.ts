@@ -768,8 +768,8 @@ export const resizeSingleElement = (
           fontSize: boundTextElement.fontSizeMax ?? boundTextElement.fontSize,
           fontFamily: boundTextElement.fontFamily,
         })
-      : STICKY_NOTE_MIN_SIZE
-    : 0;
+      : { width: STICKY_NOTE_MIN_SIZE, height: STICKY_NOTE_MIN_SIZE }
+    : null;
 
   if (boundTextElement) {
     const stateOfBoundTextElementAtResize = originalElementsMap.get(
@@ -780,9 +780,9 @@ export const resizeSingleElement = (
         fontSize: stateOfBoundTextElementAtResize.fontSize,
       };
     }
-    if (isResizingStickyNote) {
-      nextWidth = Math.max(nextWidth, stickyNoteMinSize);
-      nextHeight = Math.max(nextHeight, stickyNoteMinSize);
+    if (stickyNoteMinSize) {
+      nextWidth = Math.max(nextWidth, stickyNoteMinSize.width);
+      nextHeight = Math.max(nextHeight, stickyNoteMinSize.height);
     } else if (shouldMaintainAspectRatio) {
       const updatedElement = {
         ...latestElement,
@@ -813,9 +813,9 @@ export const resizeSingleElement = (
       nextWidth = Math.max(nextWidth, minWidth);
       nextHeight = Math.max(nextHeight, minHeight);
     }
-  } else if (isResizingStickyNote) {
-    nextWidth = Math.max(nextWidth, stickyNoteMinSize);
-    nextHeight = Math.max(nextHeight, stickyNoteMinSize);
+  } else if (stickyNoteMinSize) {
+    nextWidth = Math.max(nextWidth, stickyNoteMinSize.width);
+    nextHeight = Math.max(nextHeight, stickyNoteMinSize.height);
   }
 
   const rescaledPoints = rescalePointsInElement(

@@ -3,6 +3,7 @@ import {
   ARROW_LABEL_WIDTH_FRACTION,
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_SIZE,
+  STICKY_NOTE_BODY_INSET_Y,
   STICKY_NOTE_PADDING,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
@@ -281,10 +282,17 @@ export const computeBoundTextPosition = (
   const angle = (container.angle ?? 0) as Radians;
 
   if (angle !== 0) {
-    const contentCenter = pointFrom(
-      containerCoords.x + maxContainerWidth / 2,
-      containerCoords.y + maxContainerHeight / 2,
-    );
+    // A sticky's footer makes its body asymmetric. The body still rotates
+    // about the note's center, rather than about its own (higher) center.
+    const contentCenter = isStickyNoteElement(container)
+      ? pointFrom(
+          container.x + container.width / 2,
+          container.y + container.height / 2,
+        )
+      : pointFrom(
+          containerCoords.x + maxContainerWidth / 2,
+          containerCoords.y + maxContainerHeight / 2,
+        );
     const textCenter = pointFrom(
       x + boundTextElement.width / 2,
       y + boundTextElement.height / 2,
@@ -522,6 +530,10 @@ export const getBoundTextMaxHeight = (
   boundTextElement: ExcalidrawTextElementWithContainer,
 ) => {
   const { height } = container;
+  if (isStickyNoteElement(container)) {
+    // the label body ends above the creation-date footer
+    return Math.max(0, height - STICKY_NOTE_BODY_INSET_Y);
+  }
   if (isArrowElement(container)) {
     const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
     if (containerHeight <= 0) {
@@ -540,13 +552,7 @@ export const getBoundTextMaxHeight = (
     // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;
   }
-  return (
-    height -
-    (isStickyNoteElement(container)
-      ? STICKY_NOTE_PADDING
-      : BOUND_TEXT_PADDING) *
-      2
-  );
+  return height - BOUND_TEXT_PADDING * 2;
 };
 
 /** retrieves text from text elements and concatenates to a single string */
