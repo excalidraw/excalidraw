@@ -22,6 +22,7 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newTextElement,
+  restoreSplitPoints,
 } from "@excalidraw/element";
 
 import { isUsingAdaptiveRadius, getSelectedElements } from "@excalidraw/element";
@@ -43,6 +44,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   FixedSegment,
+  SplitPoint,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -229,8 +231,9 @@ export class API {
       : never;
     elbowed?: boolean;
     fixedSegments?: FixedSegment[] | null;
+    // both anchored splits and bare point indices, for convenience
     splitPoints?: T extends "arrow" | "line"
-      ? ExcalidrawLinearElement["splitPoints"]
+      ? readonly (number | SplitPoint)[] | null
       : never;
   }): NonDeleted<
     T extends "arrow" | "line"
@@ -339,34 +342,38 @@ export class API {
           ...base,
         });
         break;
-      case "arrow":
+      case "arrow": {
+        const points = rest.points ?? [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(100, 100),
+        ];
         element = newArrowElement({
           ...base,
           width,
           height,
           type,
-          points: rest.points ?? [
-            pointFrom<LocalPoint>(0, 0),
-            pointFrom<LocalPoint>(100, 100),
-          ],
+          points,
           elbowed: rest.elbowed ?? false,
-          splitPoints: rest.splitPoints ?? null,
+          splitPoints: restoreSplitPoints(points, rest.splitPoints),
         });
         break;
-      case "line":
+      }
+      case "line": {
+        const points = rest.points ?? [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(100, 100),
+        ];
         element = newLinearElement({
           ...base,
           width,
           height,
           type,
-          points: rest.points ?? [
-            pointFrom<LocalPoint>(0, 0),
-            pointFrom<LocalPoint>(100, 100),
-          ],
+          points,
           polygon: rest.polygon,
-          splitPoints: rest.splitPoints ?? null,
+          splitPoints: restoreSplitPoints(points, rest.splitPoints),
         });
         break;
+      }
       case "image":
         element = newImageElement({
           ...base,

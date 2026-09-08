@@ -46,7 +46,11 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 import { intersectElementWithLineSegment } from "./collision";
-import { generateSplitCurves, getSplitPoints } from "./splitPoints";
+import {
+  generateSplitCurves,
+  getSplitPoints,
+  getSplitPointsFor,
+} from "./splitPoints";
 import { elementOverlapsWithFrame, getContainingFrame } from "./frame";
 
 import type { Drawable, Op } from "roughjs/bin/core";
@@ -1093,8 +1097,11 @@ export const getElementPointsCoords = (
   // This might be computationally heavey
   const gen = rough.generator();
   const options = generateRoughOptions(element);
-  const splitPoints = getSplitPoints(element).filter(
-    (index) => index < points.length - 1,
+  // `points` may be a revision the element does not carry yet (a resize, a
+  // point insertion, ...), so the splits have to be resolved against them
+  const splitPoints = getSplitPointsFor(
+    element,
+    points as readonly LocalPoint[],
   );
   const curves =
     element.roundness == null

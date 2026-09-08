@@ -338,7 +338,7 @@ export type ExcalidrawLinearElement = _ExcalidrawElementBase &
     endBinding: FixedPointBinding | null;
     startArrowhead: Arrowhead | null;
     endArrowhead: Arrowhead | null;
-    splitPoints: readonly number[] | null;
+    splitPoints: readonly SplitPoint[] | null;
   }>;
 
 export type ExcalidrawLineElement = ExcalidrawLinearElement &
@@ -350,6 +350,19 @@ export type ExcalidrawLineElement = ExcalidrawLinearElement &
 export type FixedSegment = {
   start: LocalPoint;
   end: LocalPoint;
+  index: Index;
+};
+
+/**
+ * Marks the point at `index` as a corner, breaking the curve there.
+ *
+ * `point` is the local position of the marked point, which is what the split
+ * is really anchored to: `points` and `splitPoints` are independent
+ * properties, so an undo, a remote update or a restore can hand us an `index`
+ * recorded against a different revision of `points`.
+ */
+export type SplitPoint = {
+  point: LocalPoint;
   index: Index;
 };
 

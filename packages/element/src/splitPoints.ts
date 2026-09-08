@@ -1,21 +1,37 @@
 import { pointsOnBezierCurves } from "points-on-curve";
 import { curveToBezier } from "points-on-curve/lib/curve-to-bezier.js";
 
+import { pointFrom, pointsEqual } from "@excalidraw/math";
+
+import type { LocalPoint } from "@excalidraw/math";
+
 import { isElbowArrow, isLinearElement } from "./typeChecks";
 
 import type { Drawable, Op, OpSet, Options } from "roughjs/bin/core";
 import type { Point as RoughPoint } from "roughjs/bin/geometry";
 import type { RoughGenerator } from "roughjs/bin/generator";
-import type { ExcalidrawElement, ExcalidrawLinearElement } from "./types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawLinearElement,
+  SplitPoint,
+} from "./types";
 
 /**
  * Split points break a curved arrow or line into several independent curves.
  * The element still has a single, continuous `points` array and the split
- * index simply marks the point where one curve ends and the next one begins,
+ * simply marks the point where one curve ends and the next one begins,
  * which renders as a sharp transition instead of a smooth one.
  *
  * Only interior points (i.e. neither the first nor the last one) can be split,
  * and only on curved, non-elbow arrows and lines.
+ *
+ * A split records the marked point's local coordinates next to its index,
+ * because `points` and `splitPoints` are independent properties which can be
+ * updated on their own: an undo, a remote update or a restored file can bring
+ * back a `points` array that a stored index was never recorded against. The
+ * coordinates are what a split is anchored to — the same way an elbow arrow's
+ * `fixedSegments` are anchored to their `start`/`end` coordinates — so a stale
+ * index is re-anchored on read instead of silently marking another corner.
  */
 
 const canStoreSplitPoints = <T extends ExcalidrawElement>(
@@ -28,35 +44,227 @@ export const canSplitPoints = <T extends ExcalidrawElement>(
 ): element is T & ExcalidrawLinearElement =>
   canStoreSplitPoints(element) && !!element.roundness;
 
+const isInteriorPointIndex = (
+  points: readonly LocalPoint[],
+  index: number,
+): boolean => Number.isInteger(index) && index > 0 && index < points.length - 1;
+
 export const isValidSplitPointIndex = (
   element: ExcalidrawLinearElement,
   index: number,
-) => Number.isInteger(index) && index > 0 && index < element.points.length - 1;
+) => isInteriorPointIndex(element.points, index);
 
-const getStoredSplitPoints = (
-  element: ExcalidrawElement,
-): readonly number[] => {
-  if (!canStoreSplitPoints(element) || !element.splitPoints?.length) {
-    return [];
+/**
+ * The interior point of `points` sharing `point`'s coordinates and sitting
+ * closest to `preferredIndex` (duplicated points can share coordinates), or
+ * `-1` when the marked point is not part of `points` at all.
+ */
+const findAnchoredPointIndex = (
+  points: readonly LocalPoint[],
+  point: LocalPoint,
+  preferredIndex: number,
+): number => {
+  let found = -1;
+
+  for (let index = 1; index < points.length - 1; index++) {
+    if (
+      pointsEqual(points[index], point) &&
+      (found === -1 ||
+        Math.abs(index - preferredIndex) < Math.abs(found - preferredIndex))
+    ) {
+      found = index;
+    }
   }
 
-  return element.splitPoints.filter((index) =>
-    isValidSplitPointIndex(element, index),
-  );
+  return found;
 };
 
+/**
+ * Resolves stored splits against `points`, which may well be a different
+ * revision of the array they were recorded against.
+ */
+const resolveSplitPointIndices = (
+  points: readonly LocalPoint[],
+  splitPoints: readonly SplitPoint[],
+): readonly number[] => {
+  const anchored = splitPoints.map(({ point, index }) =>
+    isInteriorPointIndex(points, index) && pointsEqual(points[index], point)
+      ? index
+      : findAnchoredPointIndex(points, point, index),
+  );
+
+  // a marked point that is nowhere to be found means the points were moved
+  // (a resize, a point drag, ...) rather than reindexed, in which case the
+  // stored indices are the better reference — and resolving some splits
+  // against the points and the rest against the indices would pair up two
+  // revisions of the element
+  return anchored.includes(-1)
+    ? splitPoints
+        .map(({ index }) => index)
+        .filter((index) => isInteriorPointIndex(points, index))
+    : anchored;
+};
+
+const normalizeSplitPoints = (
+  splitPoints: readonly SplitPoint[],
+  pointsLength: number,
+): ExcalidrawLinearElement["splitPoints"] => {
+  const byIndex = new Map<number, SplitPoint>();
+
+  for (const splitPoint of splitPoints) {
+    if (
+      Number.isInteger(splitPoint.index) &&
+      splitPoint.index > 0 &&
+      splitPoint.index < pointsLength - 1
+    ) {
+      byIndex.set(splitPoint.index, splitPoint);
+    }
+  }
+
+  const normalized = Array.from(byIndex.values()).sort(
+    (a, b) => a.index - b.index,
+  );
+
+  return normalized.length ? normalized : null;
+};
+
+/**
+ * Anchors split indices on the points they mark.
+ */
+export const splitPointsFromIndices = (
+  points: readonly LocalPoint[],
+  indices: readonly number[],
+): ExcalidrawLinearElement["splitPoints"] =>
+  normalizeSplitPoints(
+    indices
+      .filter((index) => isInteriorPointIndex(points, index))
+      .map((index) => ({ point: points[index], index })),
+    points.length,
+  );
+
+/**
+ * Splits resolved against `points` and re-anchored on the points they ended
+ * up marking.
+ */
+const anchorSplitPointsOn = (
+  points: readonly LocalPoint[],
+  splitPoints: readonly SplitPoint[],
+): ExcalidrawLinearElement["splitPoints"] =>
+  splitPointsFromIndices(points, resolveSplitPointIndices(points, splitPoints));
+
+/**
+ * The element's splits, resolved against its current points, whether or not
+ * they currently render (a sharp element keeps its splits so that turning it
+ * curved again restores the same corners).
+ */
+const getStoredSplitPoints = (
+  element: ExcalidrawElement,
+): readonly SplitPoint[] =>
+  canStoreSplitPoints(element) && element.splitPoints?.length
+    ? anchorSplitPointsOn(element.points, element.splitPoints) ?? []
+    : [];
+
+/**
+ * Split indices resolved against an explicit `points` array, for the callers
+ * measuring points the element does not carry (yet).
+ */
+export const getSplitPointsFor = (
+  element: ExcalidrawElement,
+  points: readonly LocalPoint[],
+): readonly number[] =>
+  canSplitPoints(element) && element.splitPoints?.length
+    ? (anchorSplitPointsOn(points, element.splitPoints) ?? []).map(
+        ({ index }) => index,
+      )
+    : [];
+
 export const getSplitPoints = (element: ExcalidrawElement): readonly number[] =>
-  canSplitPoints(element) ? getStoredSplitPoints(element) : [];
+  canSplitPoints(element) ? getSplitPointsFor(element, element.points) : [];
 
 export const isSplitPoint = (element: ExcalidrawElement, index: number) =>
   getSplitPoints(element).includes(index);
 
-const normalizeSplitPoints = (
-  indices: readonly number[],
-): readonly number[] | null => {
-  const normalized = Array.from(new Set(indices)).sort((a, b) => a - b);
+const splitPointsEqual = (
+  a: ExcalidrawLinearElement["splitPoints"],
+  b: ExcalidrawLinearElement["splitPoints"],
+): boolean =>
+  a === b ||
+  (!!a &&
+    !!b &&
+    a.length === b.length &&
+    a.every(
+      (splitPoint, idx) =>
+        splitPoint.index === b[idx].index &&
+        splitPoint.point[0] === b[idx].point[0] &&
+        splitPoint.point[1] === b[idx].point[1],
+    ));
 
-  return normalized.length ? normalized : null;
+/**
+ * Re-anchors the stored splits on `nextPoints`, or `undefined` when there is
+ * nothing to re-anchor (so the caller can skip the mutation).
+ *
+ * Only same length updates are handled here: those move the points without
+ * changing which point sits at which index (a drag, a resize, a flip, ...).
+ * A caller changing the topology owns the split update itself, and anything
+ * that bypasses `mutateElement` altogether — history, remote updates — is
+ * caught by the anchors on read.
+ */
+export const reanchorSplitPoints = (
+  element: ExcalidrawElement,
+  nextPoints: readonly LocalPoint[],
+): ExcalidrawLinearElement["splitPoints"] | undefined => {
+  if (
+    !canStoreSplitPoints(element) ||
+    !element.splitPoints?.length ||
+    nextPoints.length !== element.points.length
+  ) {
+    return undefined;
+  }
+
+  const next = normalizeSplitPoints(
+    getStoredSplitPoints(element).map(({ index }) => ({
+      point: nextPoints[index],
+      index,
+    })),
+    nextPoints.length,
+  );
+
+  return splitPointsEqual(element.splitPoints, next) ? undefined : next;
+};
+
+/**
+ * Rebuilds the splits of an untrusted element (a restored file, the
+ * programmatic API), accepting both anchored splits and bare point indices.
+ */
+export const restoreSplitPoints = (
+  points: readonly LocalPoint[],
+  splitPoints: unknown,
+): ExcalidrawLinearElement["splitPoints"] => {
+  if (!Array.isArray(splitPoints)) {
+    return null;
+  }
+
+  const anchored: SplitPoint[] = [];
+
+  for (const splitPoint of splitPoints) {
+    if (isInteriorPointIndex(points, splitPoint)) {
+      anchored.push({ point: points[splitPoint], index: splitPoint });
+    } else if (
+      splitPoint &&
+      typeof splitPoint === "object" &&
+      Number.isInteger(splitPoint.index) &&
+      Array.isArray(splitPoint.point) &&
+      splitPoint.point.length === 2 &&
+      splitPoint.point.every((coord: unknown) => Number.isFinite(coord))
+    ) {
+      anchored.push({
+        point: pointFrom<LocalPoint>(splitPoint.point[0], splitPoint.point[1]),
+        index: splitPoint.index,
+      });
+    }
+  }
+
+  return anchorSplitPointsOn(points, anchored);
 };
 
 /**
@@ -71,9 +279,12 @@ export const toggleSplitPoint = (
     return undefined;
   }
 
-  const current = getSplitPoints(element);
+  const current = getStoredSplitPoints(element).map(
+    (splitPoint) => splitPoint.index,
+  );
 
-  return normalizeSplitPoints(
+  return splitPointsFromIndices(
+    element.points,
     current.includes(index)
       ? current.filter((idx) => idx !== index)
       : [...current, index],
@@ -81,8 +292,9 @@ export const toggleSplitPoint = (
 };
 
 /**
- * Keeps split indices pointing at the same points after `count` points have
- * been inserted at `insertIndex`.
+ * Keeps splits on the same points after `count` points have been inserted at
+ * `insertIndex`. Only the indices shift; the marked points stay where they
+ * are.
  */
 export const shiftSplitPointsOnInsert = (
   element: ExcalidrawElement,
@@ -96,12 +308,16 @@ export const shiftSplitPointsOnInsert = (
   }
 
   return normalizeSplitPoints(
-    current.map((index) => (index >= insertIndex ? index + count : index)),
+    current.map(({ point, index }) => ({
+      point,
+      index: index >= insertIndex ? index + count : index,
+    })),
+    (element as ExcalidrawLinearElement).points.length + count,
   );
 };
 
 /**
- * Keeps split indices pointing at the same points after a copy of each point in
+ * Keeps splits on the same points after a copy of each point in
  * `duplicatedIndices` has been inserted directly after it (as `Cmd+D` does in
  * the line editor). A split on a duplicated point stays on the original.
  */
@@ -115,20 +331,20 @@ export const shiftSplitPointsOnDuplicate = (
     return undefined;
   }
 
-  const duplicated = new Set(duplicatedIndices);
+  const duplicated = Array.from(new Set(duplicatedIndices));
 
   return normalizeSplitPoints(
-    current.map(
-      (index) =>
-        index +
-        Array.from(duplicated).filter((dupIndex) => dupIndex < index).length,
-    ),
+    current.map(({ point, index }) => ({
+      point,
+      index: index + duplicated.filter((dupIndex) => dupIndex < index).length,
+    })),
+    (element as ExcalidrawLinearElement).points.length + duplicated.length,
   );
 };
 
 /**
- * Keeps split indices pointing at the same points after the points at
- * `deletedIndices` have been removed. Splits on deleted points are dropped.
+ * Keeps splits on the same points after the points at `deletedIndices` have
+ * been removed. Splits on deleted points are dropped.
  */
 export const shiftSplitPointsOnDelete = (
   element: ExcalidrawElement,
@@ -140,18 +356,16 @@ export const shiftSplitPointsOnDelete = (
     return undefined;
   }
 
-  const deleted = new Set(deletedIndices);
-  const nextLastIndex =
-    (element as ExcalidrawLinearElement).points.length - deleted.size - 1;
+  const deleted = Array.from(new Set(deletedIndices));
 
   return normalizeSplitPoints(
     current
-      .filter((index) => !deleted.has(index))
-      .map(
-        (index) =>
-          index - deletedIndices.filter((deleted) => deleted < index).length,
-      )
-      .filter((index) => index > 0 && index < nextLastIndex),
+      .filter(({ index }) => !deleted.includes(index))
+      .map(({ point, index }) => ({
+        point,
+        index: index - deleted.filter((delIndex) => delIndex < index).length,
+      })),
+    (element as ExcalidrawLinearElement).points.length - deleted.length,
   );
 };
 

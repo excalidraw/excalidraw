@@ -12,6 +12,8 @@ import { ShapeCache } from "./shape";
 
 import { updateElbowArrowPoints } from "./elbowArrow";
 
+import { reanchorSplitPoints } from "./splitPoints";
+
 import { isElbowArrow } from "./typeChecks";
 
 import type {
@@ -72,6 +74,16 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     };
   } else if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };
+
+    if (typeof splitPoints === "undefined") {
+      const reanchored = reanchorSplitPoints(element, points);
+
+      if (typeof reanchored !== "undefined") {
+        updates = { ...updates, splitPoints: reanchored } as ElementUpdate<
+          typeof element
+        >;
+      }
+    }
   }
 
   for (const key in updates) {

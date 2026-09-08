@@ -35,6 +35,7 @@ import {
   isNonDeletedElement,
 } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
+import { restoreSplitPoints } from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
   validateElbowPoints,
@@ -165,26 +166,6 @@ const restoreLinearElementPoints = (
         ),
       ]
     : restoredPoints;
-};
-
-const restoreSplitPoints = (
-  splitPoints: unknown,
-  pointsLength: number,
-): readonly number[] | null => {
-  if (!Array.isArray(splitPoints)) {
-    return null;
-  }
-
-  const restored = Array.from(
-    new Set(
-      splitPoints.filter(
-        (index): index is number =>
-          Number.isInteger(index) && index > 0 && index < pointsLength - 1,
-      ),
-    ),
-  ).sort((a, b) => a - b);
-
-  return restored.length ? restored : null;
 };
 
 const restoreFreedrawPoints = (
@@ -636,8 +617,8 @@ export const restoreElement = (
         x,
         y,
         splitPoints: restoreSplitPoints(
+          points,
           (element as ExcalidrawLinearElement).splitPoints,
-          points.length,
         ),
         ...(isLineElement(element)
           ? {
@@ -711,8 +692,8 @@ export const restoreElement = (
         : restoreElementWithProperties(element as ExcalidrawArrowElement, {
             ...base,
             splitPoints: restoreSplitPoints(
+              points,
               (element as ExcalidrawLinearElement).splitPoints,
-              points.length,
             ),
           });
 
