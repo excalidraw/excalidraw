@@ -875,7 +875,7 @@ const ExcalidrawWrapper = () => {
           height: "100%",
         }}
       >
-        <h1>I'm not a pretzel!</h1>
+        <h1>Try to refresh the page</h1>
       </div>
     );
   }
