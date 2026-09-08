@@ -95,6 +95,15 @@ export default defineConfig({
         functions: 63,
         statements: 60,
       },
+      exclude: [
+        "node_modules/**",
+        "scripts/**",
+        "public/**",
+        "examples/**",
+        "**/*.d.ts",
+        "**/setupTests.ts",
+        "**/\0*",
+      ],
     },
   },
 });
