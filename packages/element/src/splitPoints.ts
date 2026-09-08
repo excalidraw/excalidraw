@@ -1,3 +1,6 @@
+import { pointsOnBezierCurves } from "points-on-curve";
+import { curveToBezier } from "points-on-curve/lib/curve-to-bezier.js";
+
 import { isElbowArrow, isLinearElement } from "./typeChecks";
 
 import type { Drawable, Op, OpSet, Options } from "roughjs/bin/core";
@@ -208,10 +211,80 @@ const snapStrokeEndpoints = (
     return op;
   });
 
+const FILL_SHAPE_ROUGHNESS_GAIN = 0.8;
+
 /**
- * Generates one rough.js curve per split group and merges their stroke ops
- * into a single drawable, so a split element is treated as one continuous
- * shape for both rendering and bounds computation.
+ * rough.js fills a `curve()` along the curve through all of its points, so a
+ * split element would keep being filled along the smooth contour it no longer
+ * draws.
+ */
+const generateSplitSolidFillOps = <P extends readonly [number, number]>(
+  generator: RoughGenerator,
+  groups: readonly (readonly P[])[],
+  options: Options,
+): Op[] => {
+  const fillOptions: Options = {
+    ...options,
+    // only the fill shape's outline is needed, and rough.js roughens it a
+    // little more than the stroke
+    fill: undefined,
+    disableMultiStroke: true,
+    roughness: options.roughness
+      ? options.roughness +
+        (options.fillShapeRoughnessGain ?? FILL_SHAPE_ROUGHNESS_GAIN)
+      : 0,
+  };
+
+  return (
+    groups
+      .flatMap((group, groupIdx) =>
+        snapStrokeEndpoints(
+          generator
+            // SAFETY: point pairs are finite [x, y] numbers, exactly the shape
+            // rough.js consumes; the cast only drops readonly
+            .curve(group as unknown as RoughPoint[], fillOptions)
+            .sets.filter((set) => set.type === "path")
+            .flatMap((set) => set.ops),
+          groupIdx > 0 ? group[0] : null,
+          groupIdx < groups.length - 1 ? group[group.length - 1] : null,
+        ),
+      )
+      // consecutive groups touch, so they describe one continuous region —
+      // dropping the `move` that starts each of them keeps it that way
+      .filter((op, idx) => idx === 0 || op.op !== "move")
+  );
+};
+
+const generateSplitPatternFillSet = <P extends readonly [number, number]>(
+  generator: RoughGenerator,
+  groups: readonly (readonly P[])[],
+  options: Options,
+): OpSet | undefined => {
+  const roughness = options.roughness ?? 1;
+  // rough.js hands its fillers a polygon approximation of the contour, sampled
+  // exactly like this
+  const contour = groups.flatMap((group) =>
+    group.length < 3
+      ? (group as unknown as RoughPoint[])
+      : (pointsOnBezierCurves(
+          curveToBezier(group as unknown as RoughPoint[]),
+          10,
+          (1 + roughness) / 2,
+        ) as RoughPoint[]),
+  );
+
+  return generator
+    .polygon(contour, options)
+    .sets.find((set) => set.type === "fillSketch");
+};
+
+/**
+ * Generates one rough.js curve per split group and collects them into a single
+ * drawable, so a split element is treated as one shape for both rendering and
+ * bounds computation. Each curve keeps its own stroke `OpSet`, so consumers can
+ * still tell the curves apart. The ops of one curve are a self contained chain
+ * of control points, and concatenating several of them yields a chain that no
+ * longer parses.
  */
 export const generateSplitCurves = <P extends readonly [number, number]>(
   generator: RoughGenerator,
@@ -234,22 +307,52 @@ export const generateSplitCurves = <P extends readonly [number, number]>(
   }
 
   const isStroke = (set: OpSet) => set.type === "path";
-  const strokeOps = groups.flatMap((group, groupIdx) => {
+  const strokeSets: OpSet[] = groups.map((group, groupIdx) => {
     // pin curve boundaries that fall on a split vertex onto that exact
     // vertex; the element's own endpoints (first group start, last group end)
     // keep their sketchy random offset
     const start = groupIdx > 0 ? group[0] : null;
     const end = groupIdx < groups.length - 1 ? group[group.length - 1] : null;
 
-    return curve(group)
-      .sets.filter(isStroke)
-      .flatMap((set) => snapStrokeEndpoints(set.ops, start, end));
+    return {
+      type: "path",
+      ops: curve(group)
+        .sets.filter(isStroke)
+        .flatMap((set) => snapStrokeEndpoints(set.ops, start, end)),
+    };
   });
+
+  // the per curve stroke sets take the place of the whole element's single
+  // one, so they stay in the same position relative to the fill sets
+  let replaced = false;
 
   return {
     ...whole,
-    sets: whole.sets.map((set) =>
-      isStroke(set) ? { ...set, ops: strokeOps } : set,
-    ),
+    sets: whole.sets.flatMap((set) => {
+      if (isStroke(set)) {
+        if (replaced) {
+          return [];
+        }
+
+        replaced = true;
+
+        return strokeSets;
+      }
+
+      if (set.type === "fillPath") {
+        return [
+          {
+            type: "fillPath",
+            ops: generateSplitSolidFillOps(generator, groups, options),
+          },
+        ];
+      }
+
+      if (set.type === "fillSketch") {
+        return [generateSplitPatternFillSet(generator, groups, options) ?? set];
+      }
+
+      return [set];
+    }),
   };
 };
