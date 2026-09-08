@@ -16,7 +16,7 @@ import {
 } from "@excalidraw/excalidraw";
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   act,
   render,
@@ -35,10 +35,13 @@ import {
   shiftSplitPointsOnDelete,
   shiftSplitPointsOnDuplicate,
   shiftSplitPointsOnInsert,
+  splitPointsFromIndices,
   toggleSplitPoint,
 } from "../src/splitPoints";
 import { generateLinearCollisionShape, getElementShape } from "../src/shape";
 import { LinearElementEditor } from "../src/linearElementEditor";
+import { mutateElement, newElementWith } from "../src/mutateElement";
+import { CaptureUpdateAction } from "../src/store";
 import {
   getElementBounds,
   getElementPointsCoords,
@@ -53,6 +56,7 @@ import type {
   ExcalidrawLineElement,
   ExcalidrawLinearElement,
   NonDeleted,
+  SplitPoint,
 } from "../src/types";
 
 const { h } = window;
@@ -74,8 +78,28 @@ const basePoints = () => [
   pointFrom<LocalPoint>(200, 0),
 ];
 
+/** the splits of an element or of an update, by the index they mark */
+const splitIndices = <T extends readonly SplitPoint[] | null | undefined>(
+  splitPoints: T,
+) =>
+  (splitPoints == null
+    ? splitPoints
+    : splitPoints.map(({ index }) => index)) as T extends readonly SplitPoint[]
+    ? number[]
+    : T;
+
+/** the split points marking `indices`, as they are stored on the element */
+const splitPointsAt = (
+  element: NonDeleted<ExcalidrawLinearElement>,
+  indices: readonly number[],
+) => splitPointsFromIndices(element.points, indices);
+
+type SplitOverrides<T> = Omit<Partial<T>, "splitPoints"> & {
+  splitPoints?: readonly number[] | null;
+};
+
 const createArrow = (
-  overrides: Partial<ExcalidrawArrowElement> = {},
+  overrides: SplitOverrides<ExcalidrawArrowElement> = {},
 ): NonDeleted<ExcalidrawArrowElement> =>
   API.createElement({
     type: "arrow",
@@ -90,7 +114,7 @@ const createArrow = (
   }) as NonDeleted<ExcalidrawArrowElement>;
 
 const createLine = (
-  overrides: Partial<
+  overrides: SplitOverrides<
     Pick<
       ExcalidrawLineElement,
       | "x"
@@ -144,27 +168,31 @@ describe("arrow and line split points", () => {
     });
 
     it("toggles a split on a curved line", () => {
-      expect(toggleSplitPoint(createLine(), 1)).toEqual([1]);
-      expect(toggleSplitPoint(createLine({ splitPoints: [1] }), 1)).toBe(null);
+      expect(splitIndices(toggleSplitPoint(createLine(), 1))).toEqual([1]);
       expect(
-        toggleSplitPoint(createLine({ roundness: null }), 1),
+        splitIndices(toggleSplitPoint(createLine({ splitPoints: [1] }), 1)),
+      ).toBe(null);
+      expect(
+        splitIndices(toggleSplitPoint(createLine({ roundness: null }), 1)),
       ).toBeUndefined();
     });
 
     it("toggles a split on and off", () => {
       const arrow = createArrow();
 
-      expect(toggleSplitPoint(arrow, 1)).toEqual([1]);
-      expect(toggleSplitPoint(createArrow({ splitPoints: [1] }), 1)).toBe(null);
+      expect(splitIndices(toggleSplitPoint(arrow, 1))).toEqual([1]);
+      expect(
+        splitIndices(toggleSplitPoint(createArrow({ splitPoints: [1] }), 1)),
+      ).toBe(null);
     });
 
     it("refuses to split endpoints or out-of-range indices", () => {
       const arrow = createArrow();
 
-      expect(toggleSplitPoint(arrow, 0)).toBeUndefined();
-      expect(toggleSplitPoint(arrow, 2)).toBeUndefined();
-      expect(toggleSplitPoint(arrow, -1)).toBeUndefined();
-      expect(toggleSplitPoint(arrow, 7)).toBeUndefined();
+      expect(splitIndices(toggleSplitPoint(arrow, 0))).toBeUndefined();
+      expect(splitIndices(toggleSplitPoint(arrow, 2))).toBeUndefined();
+      expect(splitIndices(toggleSplitPoint(arrow, -1))).toBeUndefined();
+      expect(splitIndices(toggleSplitPoint(arrow, 7))).toBeUndefined();
     });
 
     it("keeps split indices sorted and deduplicated", () => {
@@ -179,7 +207,7 @@ describe("arrow and line split points", () => {
         splitPoints: [3, 3],
       });
 
-      expect(toggleSplitPoint(arrow, 1)).toEqual([1, 3]);
+      expect(splitIndices(toggleSplitPoint(arrow, 1))).toEqual([1, 3]);
     });
 
     it("ignores stale indices when reading splits", () => {
@@ -202,9 +230,9 @@ describe("arrow and line split points", () => {
         splitPoints: [1, 3],
       });
 
-      expect(shiftSplitPointsOnInsert(arrow, 2)).toEqual([1, 4]);
-      expect(shiftSplitPointsOnInsert(arrow, 1)).toEqual([2, 4]);
-      expect(shiftSplitPointsOnInsert(arrow, 4)).toEqual([1, 3]);
+      expect(splitIndices(shiftSplitPointsOnInsert(arrow, 2))).toEqual([1, 4]);
+      expect(splitIndices(shiftSplitPointsOnInsert(arrow, 1))).toEqual([2, 4]);
+      expect(splitIndices(shiftSplitPointsOnInsert(arrow, 4))).toEqual([1, 3]);
     });
 
     it("shifts split indices when points are deleted", () => {
@@ -220,11 +248,13 @@ describe("arrow and line split points", () => {
       });
 
       // deleting an unrelated earlier point shifts the later splits
-      expect(shiftSplitPointsOnDelete(arrow, [2])).toEqual([1, 2]);
+      expect(splitIndices(shiftSplitPointsOnDelete(arrow, [2]))).toEqual([
+        1, 2,
+      ]);
       // deleting a split point drops that split
-      expect(shiftSplitPointsOnDelete(arrow, [1])).toEqual([2]);
+      expect(splitIndices(shiftSplitPointsOnDelete(arrow, [1]))).toEqual([2]);
       // splits that would land on an endpoint are dropped
-      expect(shiftSplitPointsOnDelete(arrow, [0])).toEqual([2]);
+      expect(splitIndices(shiftSplitPointsOnDelete(arrow, [0]))).toEqual([2]);
     });
 
     it("shifts split indices when points are duplicated", () => {
@@ -240,14 +270,24 @@ describe("arrow and line split points", () => {
       });
 
       // a copy lands after point 1, pushing the split one along
-      expect(shiftSplitPointsOnDuplicate(arrow, [1])).toEqual([4]);
+      expect(splitIndices(shiftSplitPointsOnDuplicate(arrow, [1]))).toEqual([
+        4,
+      ]);
       // copies after two earlier points push it two along
-      expect(shiftSplitPointsOnDuplicate(arrow, [0, 2])).toEqual([5]);
+      expect(splitIndices(shiftSplitPointsOnDuplicate(arrow, [0, 2]))).toEqual([
+        5,
+      ]);
       // duplicating the split point itself keeps the split on the original
-      expect(shiftSplitPointsOnDuplicate(arrow, [3])).toEqual([3]);
+      expect(splitIndices(shiftSplitPointsOnDuplicate(arrow, [3]))).toEqual([
+        3,
+      ]);
       // later points don't affect it
-      expect(shiftSplitPointsOnDuplicate(arrow, [4])).toEqual([3]);
-      expect(shiftSplitPointsOnDuplicate(arrow, [])).toBeUndefined();
+      expect(splitIndices(shiftSplitPointsOnDuplicate(arrow, [4]))).toEqual([
+        3,
+      ]);
+      expect(
+        splitIndices(shiftSplitPointsOnDuplicate(arrow, [])),
+      ).toBeUndefined();
     });
 
     it("remaps dormant split indices while the element is sharp", () => {
@@ -267,9 +307,69 @@ describe("arrow and line split points", () => {
       });
 
       expect(getSplitPoints(sharp)).toEqual([]);
-      expect(shiftSplitPointsOnInsert(sharp, 2)).toEqual([4]);
-      expect(shiftSplitPointsOnDuplicate(sharp, [1])).toEqual([4]);
-      expect(shiftSplitPointsOnDelete(sharp, [1])).toEqual([2]);
+      expect(splitIndices(shiftSplitPointsOnInsert(sharp, 2))).toEqual([4]);
+      expect(splitIndices(shiftSplitPointsOnDuplicate(sharp, [1]))).toEqual([
+        4,
+      ]);
+      expect(splitIndices(shiftSplitPointsOnDelete(sharp, [1]))).toEqual([2]);
+    });
+
+    it("re-anchors a split recorded against another revision of the points", () => {
+      // the split marks the point at (100, 0), which sat at index 3 while an
+      // extra point was in front of it
+      const inserted = createArrow({
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(25, 25),
+          pointFrom<LocalPoint>(50, 50),
+          pointFrom<LocalPoint>(100, 0),
+          pointFrom<LocalPoint>(150, 50),
+          pointFrom<LocalPoint>(200, 0),
+        ],
+        splitPoints: [3],
+      });
+      const withoutInsertedPoint = {
+        ...inserted,
+        points: inserted.points.filter((_, index) => index !== 1),
+      };
+
+      expect(getSplitPoints(withoutInsertedPoint)).toEqual([2]);
+      expect(withoutInsertedPoint.points[2]).toEqual(inserted.points[3]);
+    });
+
+    it("keeps the recorded indices when the points moved instead", () => {
+      // scaling moves every point, so the coordinates the splits were
+      // anchored on are gone - but nothing was reindexed either
+      const arrow = createArrow({
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(50, 50),
+          pointFrom<LocalPoint>(100, 0),
+          pointFrom<LocalPoint>(150, 50),
+          pointFrom<LocalPoint>(200, 0),
+        ],
+        splitPoints: [3],
+      });
+
+      expect(
+        getSplitPoints({
+          ...arrow,
+          points: arrow.points.map((p) =>
+            pointFrom<LocalPoint>(p[0] * 2, p[1] * 2),
+          ),
+        }),
+      ).toEqual([3]);
+    });
+
+    it("moves the anchors along with the points they mark", () => {
+      const arrow = createArrow({ splitPoints: [1] });
+      const nextPoints = arrow.points.map((p) =>
+        pointFrom<LocalPoint>(p[0] * 2, p[1] * 2),
+      );
+
+      mutateElement(arrow, arrayToMap([arrow]), { points: nextPoints });
+
+      expect(arrow.splitPoints).toEqual([{ point: nextPoints[1], index: 1 }]);
     });
 
     it("groups points into overlapping runs", () => {
@@ -693,7 +793,9 @@ describe("arrow and line split points", () => {
       h.state.height = 1000;
     });
 
-    const fivePointArrow = (overrides: Partial<ExcalidrawArrowElement> = {}) =>
+    const fivePointArrow = (
+      overrides: SplitOverrides<ExcalidrawArrowElement> = {},
+    ) =>
       createArrow({
         x: 0,
         y: 0,
@@ -736,7 +838,7 @@ describe("arrow and line split points", () => {
       const updated = h.elements[0] as ExcalidrawArrowElement;
 
       expect(updated.points).toHaveLength(6);
-      expect(updated.splitPoints).toEqual([4]);
+      expect(splitIndices(updated.splitPoints)).toEqual([4]);
       // the corner is still on the very same point, not its neighbour
       expect(updated.points[4]).toEqual(splitPointBefore);
     });
@@ -754,7 +856,7 @@ describe("arrow and line split points", () => {
 
       expect(updated.points).toHaveLength(6);
       // switching back to curved has to put the corner back where it was
-      expect(updated.splitPoints).toEqual([4]);
+      expect(splitIndices(updated.splitPoints)).toEqual([4]);
       expect(updated.points[4]).toEqual(splitPointBefore);
     });
 
@@ -769,7 +871,7 @@ describe("arrow and line split points", () => {
       const updated = h.elements[0] as ExcalidrawArrowElement;
 
       expect(updated.points).toHaveLength(6);
-      expect(updated.splitPoints).toEqual([3]);
+      expect(splitIndices(updated.splitPoints)).toEqual([3]);
     });
   });
 
@@ -830,7 +932,7 @@ describe("arrow and line split points", () => {
 
       const updated = h.elements[0] as ExcalidrawLineElement;
 
-      expect(updated.splitPoints).toEqual([2]);
+      expect(splitIndices(updated.splitPoints)).toEqual([2]);
       worldPoints(updated as NonDeleted<ExcalidrawLineElement>).forEach(
         (point, index) => {
           expect(point[0]).toBeCloseTo(before[index][0]);
@@ -857,7 +959,7 @@ describe("arrow and line split points", () => {
       const updated = h.elements[0] as NonDeleted<ExcalidrawLineElement>;
 
       expect(updated.points).toHaveLength(4);
-      expect(updated.splitPoints).toEqual([1]);
+      expect(splitIndices(updated.splitPoints)).toEqual([1]);
       // the deleted point's neighbours must not drift: the compensation has to
       // compare the old points against the new ones under their own splits
       worldPoints(updated).forEach((point, index) => {
@@ -871,12 +973,16 @@ describe("arrow and line split points", () => {
       API.setElements([line]);
 
       act(() => {
-        LinearElementEditor.updateSplitPoints(line, h.app.scene, [1]);
+        LinearElementEditor.updateSplitPoints(
+          line,
+          h.app.scene,
+          splitPointsAt(line, [1]),
+        );
       });
 
       const updated = h.elements[0] as ExcalidrawLineElement;
 
-      expect(updated.splitPoints).toEqual([1]);
+      expect(splitIndices(updated.splitPoints)).toEqual([1]);
       expect(updated.x).toBe(line.x);
       expect(updated.y).toBe(line.y);
     });
@@ -1053,14 +1159,14 @@ describe("arrow and line split points", () => {
 
       // point 1 is at (200, 200) in scene coords
       mouse.doubleClickAt(200, 200);
-      expect((h.elements[0] as ExcalidrawArrowElement).splitPoints).toEqual([
-        1,
-      ]);
+      expect(
+        splitIndices((h.elements[0] as ExcalidrawArrowElement).splitPoints),
+      ).toEqual([1]);
 
       mouse.doubleClickAt(200, 200);
-      expect((h.elements[0] as ExcalidrawArrowElement).splitPoints).toEqual(
-        null,
-      );
+      expect(
+        splitIndices((h.elements[0] as ExcalidrawArrowElement).splitPoints),
+      ).toEqual(null);
     });
 
     it("toggles a split on the line point under the cursor", () => {
@@ -1068,12 +1174,14 @@ describe("arrow and line split points", () => {
       edit(line);
 
       mouse.doubleClickAt(200, 200);
-      expect((h.elements[0] as ExcalidrawLineElement).splitPoints).toEqual([1]);
+      expect(
+        splitIndices((h.elements[0] as ExcalidrawLineElement).splitPoints),
+      ).toEqual([1]);
 
       mouse.doubleClickAt(200, 200);
-      expect((h.elements[0] as ExcalidrawLineElement).splitPoints).toEqual(
-        null,
-      );
+      expect(
+        splitIndices((h.elements[0] as ExcalidrawLineElement).splitPoints),
+      ).toEqual(null);
     });
 
     it("does not split sharp arrows", () => {
@@ -1081,9 +1189,9 @@ describe("arrow and line split points", () => {
       edit(arrow);
 
       mouse.doubleClickAt(200, 200);
-      expect((h.elements[0] as ExcalidrawArrowElement).splitPoints).toEqual(
-        null,
-      );
+      expect(
+        splitIndices((h.elements[0] as ExcalidrawArrowElement).splitPoints),
+      ).toEqual(null);
     });
 
     it("does not split endpoints", () => {
@@ -1091,9 +1199,9 @@ describe("arrow and line split points", () => {
       edit(arrow);
 
       mouse.doubleClickAt(100, 100);
-      expect((h.elements[0] as ExcalidrawArrowElement).splitPoints).toEqual(
-        null,
-      );
+      expect(
+        splitIndices((h.elements[0] as ExcalidrawArrowElement).splitPoints),
+      ).toEqual(null);
     });
 
     it("does not split outside the editor", () => {
@@ -1106,9 +1214,80 @@ describe("arrow and line split points", () => {
 
         mouse.doubleClickAt(200, 200);
         expect(
-          (h.elements[0] as NonDeleted<ExcalidrawLinearElement>).splitPoints,
+          splitIndices(
+            (h.elements[0] as NonDeleted<ExcalidrawLinearElement>).splitPoints,
+          ),
         ).toEqual(null);
       }
+    });
+  });
+  describe("points updated independently of the splits", () => {
+    beforeEach(async () => {
+      unmountComponent();
+      localStorage.clear();
+      reseed(7);
+    });
+
+    it("keeps a split on its own point when an unrelated insertion is undone", async () => {
+      // `points` and `splitPoints` are captured as independent property
+      // deltas, so undoing a change that only touched the points hands the
+      // splits an array they were never recorded against
+      const arrow = createArrow({
+        points: [
+          pointFrom<LocalPoint>(0, 0),
+          pointFrom<LocalPoint>(50, 50),
+          pointFrom<LocalPoint>(100, 0),
+          pointFrom<LocalPoint>(150, 50),
+          pointFrom<LocalPoint>(200, 0),
+        ],
+      });
+
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          initialData={{ elements: [arrow] }}
+        />,
+      );
+
+      const marked = arrow.points[2];
+
+      // insert a point after the second one, and commit it to history
+      API.updateScene({
+        elements: [
+          newElementWith(h.elements[0] as ExcalidrawArrowElement, {
+            points: [
+              ...arrow.points.slice(0, 2),
+              pointFrom<LocalPoint>(75, 25),
+              ...arrow.points.slice(2),
+            ],
+          }),
+        ],
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+
+      // ...then split the marked point, without capturing it
+      const inserted = h.elements[0] as NonDeleted<ExcalidrawArrowElement>;
+
+      expect(inserted.points[3]).toEqual(marked);
+
+      API.updateScene({
+        elements: [
+          newElementWith(inserted, {
+            splitPoints: splitPointsAt(inserted, [3]),
+          }),
+        ],
+        captureUpdate: CaptureUpdateAction.NEVER,
+      });
+
+      Keyboard.undo();
+
+      const undone = h.elements[0] as NonDeleted<ExcalidrawArrowElement>;
+
+      expect(undone.points).toEqual(arrow.points);
+      // the corner has to follow its own point back to index 2, rather than
+      // stay on index 3 and silently mark its neighbour
+      expect(getSplitPoints(undone)).toEqual([2]);
+      expect(undone.points[2]).toEqual(marked);
     });
   });
 });
