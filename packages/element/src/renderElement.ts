@@ -654,12 +654,35 @@ const drawElementFromCanvas = (
   // revert afterwards we don't have account for it during drawing
   context.translate(-cx, -cy);
 
+  let drawX =
+    (x1 + appState.scrollX) * window.devicePixelRatio -
+    (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
+  let drawY =
+    (y1 + appState.scrollY) * window.devicePixelRatio -
+    (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
+
+  if (!element.angle || isRightAngleRads(element.angle)) {
+    // blit the cached bitmap on whole device pixels. Smoothing is off for
+    // these elements (see `renderElement`), so a 1:1 blit at a fractional
+    // offset is a pixel-exact copy shifted to the nearest pixel — except at
+    // an exact half pixel, where a GPU-accelerated canvas decides the
+    // rounding per scanline by float precision and a few rows sample the
+    // neighboring row: doubled or broken strokes, varying with scroll and
+    // position. A centered label lands on a half pixel routinely. The
+    // context is scaled here (canvas scale × zoom ÷ devicePixelRatio), so
+    // round where the pixels are; rounding `drawX` itself only lands on
+    // device pixels at 100% zoom.
+    const { a, d, e, f } = context.getTransform();
+    if (a && d) {
+      drawX = (Math.round(drawX * a + e) - e) / a;
+      drawY = (Math.round(drawY * d + f) - f) / d;
+    }
+  }
+
   context.drawImage(
     elementWithCanvas.canvas!,
-    (x1 + appState.scrollX) * window.devicePixelRatio -
-      (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
-    (y1 + appState.scrollY) * window.devicePixelRatio -
-      (padding * elementWithCanvas.scale) / elementWithCanvas.scale,
+    drawX,
+    drawY,
     elementWithCanvas.canvas!.width / elementWithCanvas.scale,
     elementWithCanvas.canvas!.height / elementWithCanvas.scale,
   );
