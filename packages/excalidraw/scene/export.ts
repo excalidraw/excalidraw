@@ -1,4 +1,4 @@
-import rough from "roughjs/bin/rough";
+import rough from "roughjs/bin/rough.js";
 
 import {
   DEFAULT_EXPORT_PADDING,
