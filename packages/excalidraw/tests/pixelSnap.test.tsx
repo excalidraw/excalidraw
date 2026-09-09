@@ -135,3 +135,46 @@ describe("scroll pixel snap", () => {
     }
   });
 });
+
+describe("grid pixel snap", () => {
+  /** the static canvas's path starts, in device pixels */
+  const getPathStarts = () => {
+    const context = GlobalTestState.canvas.getContext("2d") as any;
+    return (context.__getEvents() as CanvasEvent[])
+      .filter((event) => event.type === "moveTo")
+      .map(({ transform: [a, , , d, e, f], props }) => ({
+        scale: a,
+        x: a * (props as any).x + e,
+        y: d * (props as any).y + f,
+      }));
+  };
+  const fraction = (value: number) => value - Math.floor(value);
+
+  it("centers one-pixel grid lines on device pixels at any zoom", async () => {
+    await render(<Excalidraw />);
+    API.setAppState({ width: 800, height: 600, gridModeEnabled: true });
+    // zooms at which a grid line is at least a device pixel wide
+    for (const zoom of [1, 1.5, 2.2]) {
+      (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
+      API.setAppState({
+        zoom: { value: zoom as NormalizedZoomValue },
+        scrollX: 3.3,
+        scrollY: -7.77,
+      });
+      const lines = await waitFor(() => {
+        const starts = getPathStarts().filter(
+          (start) => Math.abs(start.scale - zoom) < 1e-9,
+        );
+        expect(starts.length).toBeGreaterThan(0);
+        return starts;
+      });
+      for (const line of lines) {
+        // a vertical line has its x on the half pixel, a horizontal its y
+        const onHalfPixel =
+          Math.abs(fraction(line.x) - 0.5) < 1e-6 ||
+          Math.abs(fraction(line.y) - 0.5) < 1e-6;
+        expect(onHalfPixel).toBe(true);
+      }
+    }
+  });
+});

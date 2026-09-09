@@ -70,6 +70,8 @@ const strokeGrid = (
   theme: StaticCanvasRenderConfig["theme"],
   width: number,
   height: number,
+  /** the canvas scale (devicePixelRatio on screen); the context is scaled by it and by the zoom */
+  scale: number,
 ) => {
   const offsetX = (scrollX % gridSize) - gridSize;
   const offsetY = (scrollY % gridSize) - gridSize;
@@ -78,15 +80,30 @@ const strokeGrid = (
 
   const spaceWidth = 1 / zoom.value;
 
-  context.save();
+  // scene units → device pixels
+  const devicePixels = zoom.value * scale;
 
-  // Offset rendering by 0.5 to ensure that 1px wide lines are crisp.
-  // We only do this when zoomed to 100% because otherwise the offset is
-  // fractional, and also visibly offsets the elements.
-  // We also do this per-axis, as each axis may already be offset by 0.5.
-  if (zoom.value === 1) {
-    context.translate(offsetX % 1 ? 0 : 0.5, offsetY % 1 ? 0 : 0.5);
-  }
+  // A line at least a device pixel wide is drawn a whole number of device
+  // pixels wide and centered to cover them exactly — on the half pixel when
+  // the count is odd. Straddling a pixel boundary renders it as two lighter
+  // pixels, which is how the grid looked at every zoom but 100%. Thinner
+  // lines (zoomed far out) keep their sub-pixel width: their lightness is
+  // the point.
+  const snap = (position: number, lineWidth: number) => {
+    const widthInDevicePixels = lineWidth * devicePixels;
+    if (widthInDevicePixels < 1) {
+      return { position, lineWidth };
+    }
+    const wholeWidth = Math.round(widthInDevicePixels);
+    const center = wholeWidth % 2 ? 0.5 : 0;
+    return {
+      position:
+        (Math.round(position * devicePixels - center) + center) / devicePixels,
+      lineWidth: wholeWidth / devicePixels,
+    };
+  };
+
+  context.save();
 
   // vertical lines
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
@@ -97,7 +114,10 @@ const strokeGrid = (
       continue;
     }
 
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+    const { position, lineWidth } = snap(
+      x,
+      Math.min(1 / zoom.value, isBold ? 4 : 1),
+    );
     context.lineWidth = lineWidth;
     const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
@@ -106,8 +126,8 @@ const strokeGrid = (
     context.strokeStyle = isBold
       ? GridLineColor[theme].bold
       : GridLineColor[theme].regular;
-    context.moveTo(x, offsetY - gridSize);
-    context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
+    context.moveTo(position, offsetY - gridSize);
+    context.lineTo(position, Math.ceil(offsetY + height + gridSize * 2));
     context.stroke();
   }
 
@@ -118,7 +138,10 @@ const strokeGrid = (
       continue;
     }
 
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+    const { position, lineWidth } = snap(
+      y,
+      Math.min(1 / zoom.value, isBold ? 4 : 1),
+    );
     context.lineWidth = lineWidth;
     const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
@@ -127,8 +150,8 @@ const strokeGrid = (
     context.strokeStyle = isBold
       ? GridLineColor[theme].bold
       : GridLineColor[theme].regular;
-    context.moveTo(offsetX - gridSize, y);
-    context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
+    context.moveTo(offsetX - gridSize, position);
+    context.lineTo(Math.ceil(offsetX + width + gridSize * 2), position);
     context.stroke();
   }
   context.restore();
@@ -287,6 +310,7 @@ const _renderStaticScene = ({
       renderConfig.theme,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
+      scale,
     );
   }
 
