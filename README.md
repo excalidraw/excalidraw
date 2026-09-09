@@ -39,7 +39,7 @@
 <div align="center">
   <figure>
     <a href="https://excalidraw.com" target="_blank" rel="noopener">
-      <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Product showcase" />
+      <img src="https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png" alt="Screenshot of the Excalidraw canvas showing hand-drawn style shapes, arrows, and a wireframe diagram" />
     </a>
     <figcaption>
       <p align="center">
@@ -48,6 +48,17 @@
     </figcaption>
   </figure>
 </div>
+
+## Table of contents
+
+- [Features](#features)
+- [Excalidraw.com](#excalidrawcom)
+- [Quick start](#quick-start)
+- [Contributing](#contributing)
+- [Integrations](#integrations)
+- [Who's integrating Excalidraw](#whos-integrating-excalidraw)
+- [Sponsors & support](#sponsors--support)
+- [Star history](#star-history)
 
 ## Features
 
@@ -78,18 +89,20 @@ The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase
 - 💾&nbsp;Local-first support (autosaves to the browser).
 - 🔗&nbsp;Shareable links (export to a readonly link you can share with others).
 
-We'll be adding these features as drop-in plugins for the npm package in the future.
+These app-level features (collaboration, encryption, local-first storage) are not yet part of the core npm package. We're working on making them available as drop-in plugins so consumers of `@excalidraw/excalidraw` can opt into them directly.
 
 ## Quick start
 
 **Note:** following instructions are for installing the Excalidraw [npm package](https://www.npmjs.com/package/@excalidraw/excalidraw) when integrating Excalidraw into your own app. To run the repository locally for development, please refer to our [Development Guide](https://docs.excalidraw.com/docs/introduction/development).
 
-Use `npm` or `yarn` to install the package.
+Use `npm`, `yarn`, or `pnpm` to install the package.
 
 ```bash
 npm install react react-dom @excalidraw/excalidraw
 # or
 yarn add react react-dom @excalidraw/excalidraw
+# or
+pnpm add react react-dom @excalidraw/excalidraw
 ```
 
 Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
@@ -99,6 +112,9 @@ Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excal
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
 - Want to contribute? Check out our [contribution guide](https://docs.excalidraw.com/docs/introduction/contributing) or let us know on [Discord](https://discord.gg/UexuTaE).
 - Want to help with translations? See the [translation guide](https://docs.excalidraw.com/docs/introduction/contributing#translating).
+- Found a security issue? Please avoid filing a public issue — see our [security policy](https://github.com/excalidraw/excalidraw/security/policy) for responsible disclosure steps.
+
+All contributors are expected to follow our community guidelines and treat one another with respect.
 
 ## Integrations
 
@@ -122,3 +138,12 @@ If you like the project, you can become a sponsor at [Open Collective](https://o
 Last but not least, we're thankful to these companies for offering their services for free:
 
 [![Vercel](./.github/assets/vercel.svg)](https://vercel.com) [![Sentry](./.github/assets/sentry.svg)](https://sentry.io) [![Crowdin](./.github/assets/crowdin.svg)](https://crowdin.com)
+
+## Star history
+
+<a href="https://star-history.com/#excalidraw/excalidraw&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=excalidraw/excalidraw&type=Date&theme=dark" />
+    <img alt="Star history chart for excalidraw/excalidraw" src="https://api.star-history.com/svg?repos=excalidraw/excalidraw&type=Date" />
+  </picture>
+</a>
