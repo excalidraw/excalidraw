@@ -296,6 +296,11 @@ const createToolButton = (
         aria-label={label}
         aria-keyshortcuts={shortcut ?? undefined}
         data-testid={`toolbar-${type}`}
+        onPointerDown={(event) => {
+          // a draggable tool can be dragged out onto the canvas; a press that
+          // stays put is still a click (`onSelect`)
+          app.toolDrag.handleButtonPointerDown(type, event.nativeEvent);
+        }}
         onSelect={({ pointerType }) => {
           if (!app.state.penDetected && pointerType === "pen") {
             app.togglePenMode(true);

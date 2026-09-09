@@ -1151,6 +1151,7 @@ export type AppClassProperties = {
   arrowText: App["arrowText"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
+  toolDrag: App["toolDrag"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];

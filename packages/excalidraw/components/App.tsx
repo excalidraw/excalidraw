@@ -444,6 +444,7 @@ import ConvertElementTypePopup, {
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppArrowText } from "./App.arrowText";
 import { AppBucketFill } from "./App.bucketFill";
+import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
@@ -666,7 +667,7 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
-  private store: Store;
+  public store: Store;
   private history: History;
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -708,6 +709,7 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public bucketFill: AppBucketFill = new AppBucketFill(this);
+  public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
@@ -2336,6 +2338,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
+    // a tool dragged out of the toolbar previews on the new-element canvas
+    // (it is not in the scene until dropped)
+    const previewElement = newElementCanvasElement ?? this.toolDrag.preview;
+
     const shouldBlockPointerEvents =
       // default back to `--ui-pointerEvents` flow if setPointerCapture
       // not supported
@@ -2616,10 +2622,10 @@ class App extends React.Component<AppProps, AppState> {
                               theme: this.state.theme,
                             }}
                           />
-                          {newElementCanvasElement && (
+                          {previewElement && (
                             <NewElementCanvas
                               appState={this.state}
-                              newElement={newElementCanvasElement}
+                              newElement={previewElement}
                               scale={this.ownerWindow.devicePixelRatio}
                               rc={this.rc}
                               elementsMap={renderableElementsMap}
@@ -2637,6 +2643,14 @@ class App extends React.Component<AppProps, AppState> {
                                 pendingFlowchartNodes: null,
                                 theme: this.state.theme,
                               }}
+                              // a tool dragged out of the toolbar previews
+                              // translucently; the element itself is drawn
+                              // exactly as it will land
+                              opacity={
+                                this.toolDrag.preview
+                                  ? TOOL_DRAG_PREVIEW_OPACITY
+                                  : undefined
+                              }
                             />
                           )}
                           <InteractiveCanvas
@@ -3877,6 +3891,7 @@ class App extends React.Component<AppProps, AppState> {
     this.library.destroy();
     this.laserTrails.stop();
     this.drawShape.stop();
+    this.toolDrag.cancel();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
@@ -6824,7 +6839,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private startTextEditing = ({
+  public startTextEditing = ({
     sceneX,
     sceneY,
     insertAtParentCenter = true,
@@ -10457,7 +10472,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getCurrentItemRoundness(
+  public getCurrentItemRoundness(
     elementType:
       | "selection"
       | "rectangle"
@@ -10476,7 +10491,7 @@ class App extends React.Component<AppProps, AppState> {
       : null;
   }
 
-  private getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
+  public getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
     return getStrokeWidthByKey(
       elementType,
       this.state.currentItemStrokeWidthKey,
