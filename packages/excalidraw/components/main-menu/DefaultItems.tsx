@@ -525,6 +525,28 @@ const PreferencesToggleMidpointSnappingItem = () => {
   );
 };
 
+const PreferencesToggleViewportBasedFontSizingItem = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.viewportBasedFontSizingEnabled}
+      data-testid="toggle-viewport-based-font-sizing"
+      onSelect={(event) => {
+        setAppState({
+          viewportBasedFontSizingEnabled:
+            !appState.viewportBasedFontSizingEnabled,
+        });
+        event.preventDefault();
+      }}
+    >
+      {t("labels.viewportBasedFontSizing")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 export const PreferencesToggleGridModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -626,6 +648,7 @@ export const Preferences = ({
             <PreferencesToggleElementPropertiesItem />
             <PreferencesToggleArrowBindingItem />
             <PreferencesToggleMidpointSnappingItem />
+            <PreferencesToggleViewportBasedFontSizingItem />
           </>
         )}
         {additionalItems}
@@ -639,6 +662,8 @@ Preferences.BoxSelectionMode = PreferencesBoxSelectionModeItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
+Preferences.ToggleViewportBasedFontSizing =
+  PreferencesToggleViewportBasedFontSizingItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;
