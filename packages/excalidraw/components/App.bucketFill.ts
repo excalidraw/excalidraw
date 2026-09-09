@@ -295,7 +295,10 @@ export class AppBucketFill {
     /** supply only for display purposes such as when applying to the cursor */
     theme?: Theme,
   ) =>
-    isTransparent(backgroundColor)
-      ? COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX]
-      : applyDarkModeFilter(backgroundColor, theme === THEME.DARK);
+    applyDarkModeFilter(
+      isTransparent(backgroundColor)
+        ? COLOR_PALETTE.green[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX]
+        : backgroundColor,
+      theme === THEME.DARK,
+    );
 }

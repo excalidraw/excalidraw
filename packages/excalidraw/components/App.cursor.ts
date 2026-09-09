@@ -36,6 +36,15 @@ const createBucketFillCursorDataURL = (color: string) => {
 };
 
 /**
+ * Tools whose cursor is rendered from the current theme. Their cursor must be
+ * re-applied when the theme changes, or it keeps advertising the old theme's
+ * colors — keep in sync with the `theme` lookup in `applyForTool()`.
+ */
+export const isThemeDependentToolCursor = (
+  type: AppState["activeTool"]["type"],
+) => type === "eraser" || type === "laser" || type === "bucketfill";
+
+/**
  * Captures all cursor management for the interactive canvas.
  *
  * The canvas cursor is set exclusively imperatively, through this class —
@@ -100,12 +109,9 @@ export class AppCursor {
       return;
     }
 
-    const theme =
-      activeTool.type === "eraser" ||
-      activeTool.type === "laser" ||
-      activeTool.type === "bucketfill"
-        ? this.app.state.theme
-        : undefined;
+    const theme = isThemeDependentToolCursor(activeTool.type)
+      ? this.app.state.theme
+      : undefined;
 
     const bucketFillColor =
       activeTool.type === "bucketfill"
