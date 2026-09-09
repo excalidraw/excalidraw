@@ -62,6 +62,7 @@ import {
 } from "@excalidraw/element";
 
 import { hasStrokeColor } from "@excalidraw/element";
+import { applyColorRangeToSelection } from "@excalidraw/element";
 
 import {
   updateElbowArrowPoints,
@@ -150,6 +151,7 @@ import {
 
 import { Fonts } from "../fonts";
 import { getLanguage, t } from "../i18n";
+import { getActiveTextEditSelection } from "../wysiwyg/textWysiwyg";
 import {
   canHaveArrowheads,
   getSelectedElements,
@@ -352,11 +354,35 @@ export const actionChangeStrokeColor = register<
           elements,
           appState,
           (el) => {
-            return hasStrokeColor(el.type)
-              ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
-              : el;
+            if (!hasStrokeColor(el.type)) {
+              return el;
+            }
+
+            if (
+              isTextElement(el) &&
+              el.id === appState.editingTextElement?.id
+            ) {
+              const selection = getActiveTextEditSelection(el.id);
+              if (selection) {
+                return newElementWith(el, {
+                  colorRanges: applyColorRangeToSelection(
+                    el.colorRanges,
+                    selection.start,
+                    selection.end,
+                    value.currentItemStrokeColor,
+                    el.strokeColor,
+                  ),
+                });
+              }
+              return newElementWith(el, {
+                strokeColor: value.currentItemStrokeColor,
+                colorRanges: null,
+              });
+            }
+
+            return newElementWith(el, {
+              strokeColor: value.currentItemStrokeColor,
+            });
           },
           true,
         ),
