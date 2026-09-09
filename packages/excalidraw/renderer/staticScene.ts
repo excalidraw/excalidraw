@@ -70,7 +70,6 @@ const strokeGrid = (
   theme: StaticCanvasRenderConfig["theme"],
   width: number,
   height: number,
-  /** the canvas scale (devicePixelRatio on screen); the context is scaled by it and by the zoom */
   scale: number,
 ) => {
   const offsetX = (scrollX % gridSize) - gridSize;
@@ -89,10 +88,15 @@ const strokeGrid = (
   // pixels, which is how the grid looked at every zoom but 100%. Thinner
   // lines (zoomed far out) keep their sub-pixel width: their lightness is
   // the point.
-  const snap = (position: number, lineWidth: number) => {
-    const widthInDevicePixels = lineWidth * devicePixels;
+  const snap = (position: number, maxWidthInCssPixels: number) => {
+    // a line is `min(1 / zoom, max)` scene units wide; computed straight in
+    // device pixels, so `(1 / zoom) × zoom` never lands just under 1
+    const widthInDevicePixels = Math.min(
+      scale,
+      maxWidthInCssPixels * devicePixels,
+    );
     if (widthInDevicePixels < 1) {
-      return { position, lineWidth };
+      return { position, lineWidth: widthInDevicePixels / devicePixels };
     }
     const wholeWidth = Math.round(widthInDevicePixels);
     const center = wholeWidth % 2 ? 0.5 : 0;
@@ -114,10 +118,7 @@ const strokeGrid = (
       continue;
     }
 
-    const { position, lineWidth } = snap(
-      x,
-      Math.min(1 / zoom.value, isBold ? 4 : 1),
-    );
+    const { position, lineWidth } = snap(x, isBold ? 4 : 1);
     context.lineWidth = lineWidth;
     const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
@@ -138,10 +139,7 @@ const strokeGrid = (
       continue;
     }
 
-    const { position, lineWidth } = snap(
-      y,
-      Math.min(1 / zoom.value, isBold ? 4 : 1),
-    );
+    const { position, lineWidth } = snap(y, isBold ? 4 : 1);
     context.lineWidth = lineWidth;
     const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 

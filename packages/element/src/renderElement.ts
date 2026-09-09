@@ -661,6 +661,8 @@ const drawElementFromCanvas = (
     (y1 + appState.scrollY) * window.devicePixelRatio -
     (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
 
+  const transform = context.getTransform();
+
   if (!element.angle || isRightAngleRads(element.angle)) {
     // blit the cached bitmap on whole device pixels. Smoothing is off for
     // these elements (see `renderElement`), so a 1:1 blit at a fractional
@@ -668,15 +670,25 @@ const drawElementFromCanvas = (
     // an exact half pixel, where a GPU-accelerated canvas decides the
     // rounding per scanline by float precision and a few rows sample the
     // neighboring row: doubled or broken strokes, varying with scroll and
-    // position. A centered label lands on a half pixel routinely. The
-    // context is scaled here (canvas scale × zoom ÷ devicePixelRatio), so
-    // round where the pixels are; rounding `drawX` itself only lands on
-    // device pixels at 100% zoom.
-    const { a, d, e, f } = context.getTransform();
-    if (a && d) {
-      drawX = (Math.round(drawX * a + e) - e) / a;
-      drawY = (Math.round(drawY * d + f) - f) / d;
-    }
+    // position. A centered label lands on a half pixel routinely.
+    //
+    // Done by moving the transform's origin onto the rounded device
+    // position of the blit and drawing at (0, 0): the rotation, mirroring
+    // and scale stay in `a`–`d` (a right angle keeps its scale in `b`/`c`),
+    // and the origin is an exact integer even in the canvas's float32
+    // matrix. Rounding `drawX` itself only lands on device pixels at 100%
+    // zoom.
+    const { a, b, c, d, e, f } = transform;
+    context.setTransform(
+      a,
+      b,
+      c,
+      d,
+      Math.round(a * drawX + c * drawY + e),
+      Math.round(b * drawX + d * drawY + f),
+    );
+    drawX = 0;
+    drawY = 0;
   }
 
   context.drawImage(
@@ -686,6 +698,8 @@ const drawElementFromCanvas = (
     elementWithCanvas.canvas!.width / elementWithCanvas.scale,
     elementWithCanvas.canvas!.height / elementWithCanvas.scale,
   );
+
+  context.setTransform(transform);
 
   if (
     import.meta.env.VITE_APP_DEBUG_ENABLE_TEXT_CONTAINER_BOUNDING_BOX ===

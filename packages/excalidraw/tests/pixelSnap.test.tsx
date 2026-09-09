@@ -19,10 +19,11 @@ const getBlits = () => {
   const context = GlobalTestState.canvas.getContext("2d") as any;
   return (context.__getEvents() as CanvasEvent[])
     .filter((event) => event.type === "drawImage")
-    .map(({ transform: [a, , , d, e, f], props }) => ({
-      scale: a,
-      x: a * props.dx + e,
-      y: d * props.dy + f,
+    .map(({ transform: [a, b, c, d, e, f], props }) => ({
+      // the matrix's scale, whatever its rotation
+      scale: Math.hypot(a, b),
+      x: a * props.dx + c * props.dy + e,
+      y: b * props.dx + d * props.dy + f,
     }));
 };
 
@@ -66,6 +67,30 @@ describe("element pixel snap", () => {
         for (const blit of blits) {
           expect(distanceToWholePixel(blit)).toBeLessThan(1e-6);
         }
+      }
+    },
+  );
+
+  it.each([Math.PI / 2, (3 * Math.PI) / 2])(
+    "snaps a right-angle rotation (%s rad) without displacing it",
+    async (angle) => {
+      API.setElements([
+        API.createElement({
+          type: "rectangle",
+          x: 110.37,
+          y: 120.61,
+          width: 120,
+          height: 60,
+          angle: angle as any,
+        }),
+      ]);
+      const blits = await renderAt(1.5, 3.3, -7.77);
+      for (const blit of blits) {
+        expect(distanceToWholePixel(blit)).toBeLessThan(1e-6);
+        // and it stays where the element is — a formula that divides by the
+        // near-zero diagonal of a rotation sends it far offscreen
+        expect(Math.abs(blit.x)).toBeLessThan(2000);
+        expect(Math.abs(blit.y)).toBeLessThan(2000);
       }
     },
   );
@@ -153,8 +178,9 @@ describe("grid pixel snap", () => {
   it("centers one-pixel grid lines on device pixels at any zoom", async () => {
     await render(<Excalidraw />);
     API.setAppState({ width: 800, height: 600, gridModeEnabled: true });
-    // zooms at which a grid line is at least a device pixel wide
-    for (const zoom of [1, 1.5, 2.2]) {
+    // zooms at which a grid line is at least a device pixel wide — 1.9
+    // included, where `(1 / zoom) × zoom` evaluates just under 1
+    for (const zoom of [1, 1.5, 1.9, 2.2]) {
       (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
       API.setAppState({
         zoom: { value: zoom as NormalizedZoomValue },
