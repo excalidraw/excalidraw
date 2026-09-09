@@ -14,12 +14,16 @@ import { useUIAppState } from "../context/ui-appState";
 
 import "../components/dropdownMenu/DropdownMenu.scss";
 
+import { t } from "../i18n";
+
 import { useExcalidrawSetAppState } from "./App";
 import { LibraryMenu } from "./LibraryMenu";
 import { SearchMenu } from "./SearchMenu";
 import { Sidebar } from "./Sidebar/Sidebar";
 import { withInternalFallback } from "./hoc/withInternalFallback";
 import { LibraryIcon, searchIcon } from "./icons";
+
+import { Tooltip } from "./Tooltip";
 
 import type { SidebarProps, SidebarTriggerProps } from "./Sidebar/common";
 
@@ -99,12 +103,16 @@ export const DefaultSidebar = Object.assign(
           <Sidebar.Tabs>
             <Sidebar.Header>
               <Sidebar.TabTriggers>
-                <Sidebar.TabTrigger tab={CANVAS_SEARCH_TAB}>
-                  {searchIcon}
-                </Sidebar.TabTrigger>
-                <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
-                  {LibraryIcon}
-                </Sidebar.TabTrigger>
+                <Tooltip label={t("search.title")}>
+                  <Sidebar.TabTrigger tab={CANVAS_SEARCH_TAB}>
+                    {searchIcon}
+                  </Sidebar.TabTrigger>
+                </Tooltip>
+                <Tooltip label={t("toolBar.library")}>
+                  <Sidebar.TabTrigger tab={LIBRARY_SIDEBAR_TAB}>
+                    {LibraryIcon}
+                  </Sidebar.TabTrigger>
+                </Tooltip>
                 <DefaultSidebarTabTriggersTunnel.Out />
               </Sidebar.TabTriggers>
             </Sidebar.Header>
