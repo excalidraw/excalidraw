@@ -607,6 +607,14 @@ const canSnapElement = (
   !appState?.shouldCacheIgnoreZoom &&
   (!element.angle || isRightAngleRads(element.angle));
 
+/**
+ * Breaks a `Math.round` tie at exactly half a device pixel the same way
+ * every frame. A label's offset from its container lands on one routinely
+ * (an odd scene offset at 150%), and the float noise of a fractional drag
+ * would otherwise flip it between the two neighbors.
+ */
+const SNAP_TIE_BIAS = 1e-6;
+
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
@@ -702,13 +710,37 @@ const drawElementFromCanvas = (
     // matrix. Rounding `drawX` itself only lands on device pixels at 100%
     // zoom.
     const { a, b, c, d, e, f } = transform;
+    const container = isTextElement(element)
+      ? getContainerElement(element, allElementsMap)
+      : null;
+    // A bound label shares its unrotated container's anchor. Other bitmaps
+    // anchor to themselves, with a zero relative offset.
+    const anchor = container && !container.angle ? container : element;
+    const anchorCoords =
+      anchor === element
+        ? null
+        : getElementAbsoluteCoords(anchor, allElementsMap);
+    const anchorSceneX = anchorCoords?.[0] ?? x1;
+    const anchorSceneY = anchorCoords?.[1] ?? y1;
+    const anchorPadding =
+      anchor === element ? padding : getCanvasPadding(anchor);
+    const anchorX =
+      (anchorSceneX + appState.scrollX) * devicePixelRatio - anchorPadding;
+    const anchorY =
+      (anchorSceneY + appState.scrollY) * devicePixelRatio - anchorPadding;
+
+    // Form the relative vector before introducing the scroll translation.
+    const dx = (x1 - anchorSceneX) * devicePixelRatio + anchorPadding - padding;
+    const dy = (y1 - anchorSceneY) * devicePixelRatio + anchorPadding - padding;
     context.setTransform(
       a,
       b,
       c,
       d,
-      Math.round(a * drawX + c * drawY + e),
-      Math.round(b * drawX + d * drawY + f),
+      Math.round(a * anchorX + c * anchorY + e) +
+        Math.round(a * dx + c * dy + SNAP_TIE_BIAS),
+      Math.round(b * anchorX + d * anchorY + f) +
+        Math.round(b * dx + d * dy + SNAP_TIE_BIAS),
     );
     drawX = 0;
     drawY = 0;

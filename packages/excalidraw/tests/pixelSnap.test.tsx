@@ -11,7 +11,7 @@ import type { NormalizedZoomValue } from "../types";
 type CanvasEvent = {
   type: string;
   transform: [number, number, number, number, number, number];
-  props: { dx: number; dy: number };
+  props: { dx: number; dy: number; dWidth: number };
 };
 
 /** the static canvas's element blits, in device pixels */
@@ -24,6 +24,7 @@ const getBlits = () => {
       scale: Math.hypot(a, b),
       x: a * props.dx + c * props.dy + e,
       y: b * props.dx + d * props.dy + f,
+      width: props.dWidth,
     }));
 };
 
@@ -117,6 +118,52 @@ describe("element pixel snap", () => {
     expect(distanceToWholePixel(blit)).toBeGreaterThan(1e-3);
     API.setAppState({ shouldCacheIgnoreZoom: false });
   });
+
+  it.each([
+    // a plain fractional offset, and one that is exactly half a device pixel
+    // at 150% (51 scene units → 76.5), where the float noise of a drag used
+    // to flip the rounding between two neighbors
+    ["fractional", { box: [100.3, 100.3], label: [150.7, 140.2] }],
+    ["half-pixel tie", { box: [10, 10], label: [61, 30] }],
+  ])(
+    "keeps a label at a constant device offset from its container while dragged (%s)",
+    async (_, { box, label }) => {
+      const offsets = new Set<string>();
+      for (const drag of [0, 0.3, 0.4, 0.7, 1.4]) {
+        API.setElements([
+          API.createElement({
+            type: "rectangle",
+            id: "box",
+            x: box[0] + drag,
+            y: box[1] + drag,
+            width: 200,
+            height: 100,
+            boundElements: [{ type: "text", id: "label" }],
+          }),
+          API.createElement({
+            type: "text",
+            id: "label",
+            x: label[0] + drag,
+            y: label[1] + drag,
+            text: "hi",
+            fontSize: 20,
+            containerId: "box",
+          }),
+        ]);
+        const blits = await renderAt(1.5, 3.3, -7.77);
+        expect(blits).toHaveLength(2);
+        for (const blit of blits) {
+          expect(distanceToWholePixel(blit)).toBeLessThan(1e-6);
+        }
+        // the container's bitmap is the wider one
+        const [labelBlit, boxBlit] = [...blits].sort(
+          (p, q) => p.width - q.width,
+        );
+        offsets.add(`${labelBlit.x - boxBlit.x},${labelBlit.y - boxBlit.y}`);
+      }
+      expect(offsets.size).toBe(1);
+    },
+  );
 
   it("leaves rotated elements alone", async () => {
     API.setElements([
