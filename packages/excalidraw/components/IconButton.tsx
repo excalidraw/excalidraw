@@ -7,6 +7,8 @@ import type { PointerType } from "@excalidraw/element/types";
 
 import { AbortError } from "../errors";
 
+import { Tooltip } from "./Tooltip";
+
 import "./ToolIcon.scss";
 
 import Spinner from "./Spinner";
@@ -106,8 +108,11 @@ export const IconButton = React.forwardRef(
 
     const lastPointerTypeRef = useRef<PointerType | null>(null);
 
+    const withTooltip = (node: React.ReactNode) =>
+      props.title ? <Tooltip label={props.title}>{node}</Tooltip> : node;
+
     if (props.type === "button" || props.type === "icon") {
-      return (
+      return withTooltip(
         <button
           className={clsx(
             "ToolIcon_type_button",
@@ -124,7 +129,6 @@ export const IconButton = React.forwardRef(
           style={props.style}
           data-testid={props["data-testid"]}
           hidden={props.hidden}
-          title={props.title}
           aria-label={props["aria-label"]}
           type="button"
           onClick={onClick}
@@ -156,14 +160,13 @@ export const IconButton = React.forwardRef(
       );
     }
 
-    return (
+    return withTooltip(
       <button
         className={clsx("ToolIcon", "ToolIcon_type_toggle", sizeCn, className, {
           "ToolIcon--checked": props.checked,
         })}
         type="button"
         style={props.style}
-        title={props.title}
         aria-label={props["aria-label"]}
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         aria-pressed={props.checked}
