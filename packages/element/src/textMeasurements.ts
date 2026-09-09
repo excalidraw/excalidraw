@@ -5,9 +5,19 @@ import {
   getFontString,
   isTestEnv,
   normalizeEOL,
+  rewriteTextForExcalifont,
 } from "@excalidraw/common";
 
 import type { FontString, ExcalidrawTextElement } from "./types";
+
+const prepareTextForFont = (text: string, font: FontString) => {
+  // Excalifont omits some precomposed Latin glyphs (e.g. Ȳ); measure the NFD
+  // form so width matches canvas/SVG rendering that uses combining marks.
+  if (font.includes("Excalifont")) {
+    return rewriteTextForExcalifont(text);
+  }
+  return text;
+};
 
 export const measureText = (
   text: string,
@@ -154,7 +164,7 @@ export const getLineWidth = (text: string, font: FontString) => {
     textMetricsProvider = new CanvasTextMetricsProvider();
   }
 
-  return textMetricsProvider.getLineWidth(text, font);
+  return textMetricsProvider.getLineWidth(prepareTextForFont(text, font), font);
 };
 
 export const getTextWidth = (text: string, font: FontString) => {

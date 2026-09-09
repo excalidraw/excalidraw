@@ -5,6 +5,7 @@ import {
   WINDOWS_EMOJI_FALLBACK_FONT,
   getFontFamilyFallbacks,
   FONT_SIZES,
+  rewriteTextForFontFamily,
 } from "@excalidraw/common";
 import { getContainerElement } from "@excalidraw/element";
 import { charWidth } from "@excalidraw/element";
@@ -445,7 +446,13 @@ export class Fonts {
       }
 
       // gather unique codepoints only when inlining fonts
-      for (const char of element.originalText) {
+      // rewrite so subsetting includes combining marks used for glyphs
+      // missing as precomposed forms (e.g. Ȳ → Y + U+0304 in Excalifont)
+      const textForSubset = rewriteTextForFontFamily(
+        element.originalText,
+        element.fontFamily,
+      );
+      for (const char of textForSubset) {
         if (!charsPerFamily[element.fontFamily]) {
           charsPerFamily[element.fontFamily] = new Set();
         }
