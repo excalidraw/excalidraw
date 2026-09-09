@@ -333,7 +333,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "versionNonce": Any<Number>,
   "verticalAlign": "top",
   "width": 100,
-  "x": 560,
+  "x": 355,
   "y": 226.5,
 }
 `;
@@ -355,7 +355,7 @@ exports[`Test Transform > Test arrow bindings > should bind arrows to existing t
   "endBinding": {
     "elementId": "text-2",
     "fixedPoint": [
-      -2.05,
+      0,
       0.5001,
     ],
     "mode": "orbit",
@@ -1355,7 +1355,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id56",
+      "id": "id58",
       "type": "text",
     },
     {
@@ -1399,7 +1399,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id57",
+      "id": "id59",
       "type": "text",
     },
   ],
@@ -1439,7 +1439,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id58",
+      "id": "id60",
       "type": "text",
     },
     {
@@ -1483,7 +1483,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id59",
+      "id": "id61",
       "type": "text",
     },
     {
@@ -1531,7 +1531,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id60",
+      "id": "id62",
       "type": "text",
     },
   ],
@@ -1600,7 +1600,7 @@ exports[`Test Transform > should transform the elements correctly when linear el
   "backgroundColor": "transparent",
   "boundElements": [
     {
-      "id": "id61",
+      "id": "id63",
       "type": "text",
     },
   ],
