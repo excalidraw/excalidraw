@@ -13,13 +13,13 @@ import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import { IconButton } from "../components/IconButton";
 import { UndoIcon, RedoIcon } from "../components/icons";
-import { HistoryChangedEvent } from "../history";
+import { HistoryChangedEvent } from "../editorHistory";
 import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
 
 import { useStylesPanelMode } from "../components/App";
 
-import type { History } from "../history";
+import type { History } from "../editorHistory";
 import type { AppClassProperties, AppState } from "../types";
 import type { Action, ActionResult } from "./types";
 

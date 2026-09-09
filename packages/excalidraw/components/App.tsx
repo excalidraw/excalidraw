@@ -359,7 +359,7 @@ import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
-import { History } from "../history";
+import { History } from "../editorHistory";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
 import {
