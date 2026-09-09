@@ -110,10 +110,18 @@ export const CLASSES = {
 };
 
 export const FONT_SIZES = {
+  "2xs": 10,
+  xs: 12,
   sm: 16,
   md: 20,
   lg: 28,
   xl: 36,
+  "2xl": 48,
+  "3xl": 60,
+  "4xl": 72,
+  "5xl": 84,
+  "8xl": 120,
+  "10xl": 144,
 } as const;
 
 export const CJK_HAND_DRAWN_FALLBACK_FONT = "Xiaolai";
