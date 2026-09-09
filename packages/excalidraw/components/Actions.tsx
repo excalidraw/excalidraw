@@ -93,7 +93,7 @@ const AlignFieldset = ({
 
   return (
     <fieldset>
-      <legend>{t("labels.align")}</legend>
+      <legend>{showDistribute ? t("labels.alignAndDistribute") : t("labels.align")}</legend>
       <div className="buttonList">
         {isRTL ? (
           <>
