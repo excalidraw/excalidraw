@@ -362,7 +362,10 @@ export const actionFinalize = register<FormData>({
     // converted separately), so it stays active regardless of `element`
     const keepActiveTool =
       appState.activeTool.type === "autoshape" ||
-      ((isToolLocked || appState.activeTool.type === "freedraw") && !!element);
+      ((isToolLocked ||
+        appState.activeTool.type === "freedraw" ||
+        appState.activeTool.type === "highlighter") &&
+        !!element);
 
     if (!keepActiveTool) {
       // the active tool reverts (see the returned `appState.activeTool`) —
@@ -405,7 +408,10 @@ export const actionFinalize = register<FormData>({
         frameToHighlight: null,
         selectedElementIds: isDrawShapeTool
           ? {}
-          : element && !isToolLocked && appState.activeTool.type !== "freedraw"
+          : element &&
+            !isToolLocked &&
+            appState.activeTool.type !== "freedraw" &&
+            appState.activeTool.type !== "highlighter"
           ? {
               ...appState.selectedElementIds,
               [element.id]: true,

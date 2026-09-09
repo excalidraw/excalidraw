@@ -147,6 +147,7 @@ export const getShapeActionPredicates = (
     // active without an actual selection
     layers:
       (activeToolType !== "freedraw" &&
+        activeToolType !== "highlighter" &&
         activeToolType !== "autoshape" &&
         !targetElements.some((element) => element.type === "freedraw")) ||
       getSelectedElements(elementsMap, appState).some(

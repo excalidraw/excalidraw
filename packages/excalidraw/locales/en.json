@@ -324,6 +324,7 @@
     "arrow": "Arrow",
     "line": "Line",
     "freedraw": "Draw",
+    "highlighter": "Highlighter",
     "text": "Text",
     "library": "Library",
     "lock": "Keep selected tool active after drawing",
