@@ -60,5 +60,6 @@
         ]
       }
     }
-  ]
+  ],
+  "ignorePatterns": ["src-tauri/**"]
 }
