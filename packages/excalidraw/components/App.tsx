@@ -110,6 +110,7 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
+  matchKey,
 } from "@excalidraw/common";
 
 import {
@@ -287,6 +288,7 @@ import type {
   SceneElementsMap,
   NonDeletedSceneElementsMap,
   ExcalidrawBindableElement,
+  PointsPositionUpdates,
 } from "@excalidraw/element/types";
 
 import type { ArrowEndpoint } from "@excalidraw/element";
@@ -3203,6 +3205,111 @@ class App extends React.Component<AppProps, AppState> {
     return true;
   };
 
+  /** #7016: Ctrl/Cmd+Z during multi-point drawing removes the last
+   * committed waypoint instead of hitting history (which is blocked
+   * mid-gesture); cancels the shape once only the origin remains. */
+  private undoMultiElementDraw = (): void => {
+    const selectedLinearElement = this.state.selectedLinearElement;
+    if (!this.state.multiElement || !selectedLinearElement) {
+      return;
+    }
+    // resolve against the live scene — appState.multiElement can be
+    // detached if an API/collab update replaced the element mid-draw
+    const multiElement = this.scene
+      .getNonDeletedElementsMap()
+      .get(selectedLinearElement.elementId) as
+      | NonDeleted<ExcalidrawLinearElement>
+      | undefined;
+    if (!multiElement) {
+      return;
+    }
+    const { points } = multiElement;
+    const { lastCommittedPoint } = selectedLinearElement;
+    let lastCommittedIdx = lastCommittedPoint
+      ? points.findIndex((point) => point === lastCommittedPoint)
+      : -1;
+    if (lastCommittedIdx === -1 && lastCommittedPoint) {
+      // remote/API updates may have cloned point objects — fall back to
+      // value identity so we still locate the committed waypoint
+      lastCommittedIdx = points.findIndex(
+        (point) =>
+          point[0] === lastCommittedPoint[0] &&
+          point[1] === lastCommittedPoint[1],
+      );
+    }
+
+    // no waypoints beyond the origin (or the draw state can't be matched to
+    // the scene anymore) → undoing cancels the whole shape (same cleanup
+    // as Escape)
+    if (lastCommittedIdx <= 0) {
+      this.actionManager.executeAction(actionFinalize);
+      return;
+    }
+
+    const nextPoints = points.slice(0, lastCommittedIdx);
+    this.scene.mutateElement(
+      multiElement,
+      { points: nextPoints },
+      { informMutation: false, isDragging: false },
+    );
+
+    // recompute the end binding from the new last point (same trailing-point
+    // cleanup as actionFinalize), so removing a bound endpoint doesn't leave
+    // a stale endBinding / boundElements pair behind
+    if (
+      isBindingElement(multiElement) &&
+      multiElement.endBinding &&
+      nextPoints.length > 1
+    ) {
+      const draggedPoints: PointsPositionUpdates = new Map([
+        [
+          nextPoints.length - 1,
+          {
+            point: nextPoints[nextPoints.length - 1],
+            isDragging: false,
+          },
+        ],
+      ]);
+      const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        multiElement,
+        -1,
+        this.scene.getNonDeletedElementsMap(),
+      );
+      bindOrUnbindBindingElement(
+        multiElement,
+        draggedPoints,
+        globalPoint[0],
+        globalPoint[1],
+        this.scene,
+        this.state,
+        {
+          newArrow: Boolean(this.state.newElement),
+        },
+      );
+    }
+
+    const newLastIdx = nextPoints.length - 1;
+    this.setState({
+      selectedLinearElement: {
+        ...selectedLinearElement,
+        selectedPointsIndices: selectedLinearElement.selectedPointsIndices
+          ? [
+              ...new Set(
+                selectedLinearElement.selectedPointsIndices.map((idx) =>
+                  Math.min(idx, newLastIdx),
+                ),
+              ),
+            ]
+          : selectedLinearElement.selectedPointsIndices,
+        lastCommittedPoint: nextPoints[newLastIdx],
+        initialState: {
+          ...selectedLinearElement.initialState,
+          lastClickedPoint: newLastIdx,
+        },
+      },
+    });
+  };
+
   private preventBrowserZoomKeyDown = (event: KeyboardEvent) => {
     if (
       event[KEYS.CTRL_OR_CMD] &&
@@ -5566,6 +5673,19 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           maybeHandleArrowPointlikeDrag({ app: this, event });
         }
+      }
+
+      // intercept undo during multi-point drawing before the history
+      // action runs (it is blocked mid-gesture) — #7016
+      if (
+        this.state.multiElement &&
+        event[KEYS.CTRL_OR_CMD] &&
+        !event.shiftKey &&
+        matchKey(event, KEYS.Z)
+      ) {
+        event.preventDefault();
+        this.undoMultiElementDraw();
+        return;
       }
 
       if (this.actionManager.handleKeyDown(event)) {
