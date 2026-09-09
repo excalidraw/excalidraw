@@ -915,7 +915,7 @@ const ExcalidrawWrapper = () => {
     },
   };
   const ExcalidrawPlusAppCommand = {
-    label: "Sign up",
+    label: t("buttons.signUp"),
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
     icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
@@ -1250,7 +1250,7 @@ const ExcalidrawWrapper = () => {
               ? [
                   {
                     ...ExcalidrawPlusAppCommand,
-                    label: "Sign in / Go to Excalidraw+",
+                    label: `${t("buttons.signIn")} / Go to Excalidraw+`,
                   },
                 ]
               : [ExcalidrawPlusCommand, ExcalidrawPlusAppCommand]),
