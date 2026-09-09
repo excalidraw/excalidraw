@@ -141,7 +141,13 @@ export type ActionName =
   | "cropEditor"
   | "wrapSelectionInFrame"
   | "toggleShapeSwitch"
-  | "togglePolygon";
+  | "togglePolygon"
+  | "tableAddRowAbove"
+  | "tableAddRowBelow"
+  | "tableAddColLeft"
+  | "tableAddColRight"
+  | "tableDeleteRow"
+  | "tableDeleteCol";
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

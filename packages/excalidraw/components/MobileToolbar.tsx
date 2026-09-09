@@ -18,6 +18,7 @@ import {
   ImageToolButton,
   isToolButtonDisabled,
   SelectionToolPopover,
+  TableToolButton,
   TextToolButton,
   TOOLS,
 } from "./Tools";
@@ -33,6 +34,7 @@ import {
   bucketFillIcon,
   mermaidLogoIcon,
   MagicIcon,
+  TableIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -74,6 +76,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   }, [activeTool.type]);
 
   const frameToolSelected = activeTool.type === "frame";
+  const tableToolSelected = activeTool.type === "table";
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
@@ -298,6 +301,16 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             disabled={isToolButtonDisabled(app, "embeddable")}
           >
             {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setAppState({ openDialog: { name: "table" } })}
+            icon={TableIcon}
+            shortcut={"G"}
+            data-testid="toolbar-table"
+            selected={tableToolSelected || app.state.openDialog?.name === "table"}
+            disabled={isToolButtonDisabled(app, "table")}
+          >
+            {t("toolBar.table")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "autoshape" })}

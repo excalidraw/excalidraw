@@ -1,0 +1,159 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .TableDialog {
+    .Dialog__title {
+      padding-bottom: 0.5rem;
+    }
+
+    .TableDialog__title {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+
+    .TableDialog__title-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+
+      svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .TableDialog__container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .TableDialog__preview-label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      min-height: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .TableDialog__grid {
+      display: grid;
+      grid-template-columns: repeat(8, 22px);
+      grid-template-rows: repeat(8, 22px);
+      gap: 3px;
+      padding: 6px;
+      background: var(--island-bg-color);
+      border: 1px solid var(--dialog-border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .TableDialog__grid-cell {
+      width: 22px;
+      height: 22px;
+      border: 1.5px solid var(--color-gray-40);
+      border-radius: 3px;
+      background: transparent;
+      transition: background 0.1s ease, border-color 0.1s ease;
+
+      &--highlighted {
+        background: var(--color-primary-light);
+        border-color: var(--color-primary);
+      }
+
+      &--selected {
+        background: var(--color-primary);
+        border-color: var(--color-primary-darker);
+      }
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .TableDialog__steppers {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      gap: 1rem;
+    }
+
+    .TableDialog__stepper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+
+      label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text-primary-color);
+      }
+
+      .TableDialog__stepper-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+
+        button {
+          width: 26px;
+          height: 26px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 5px;
+          border: 1px solid var(--dialog-border-color);
+          background: var(--button-gray-1);
+          color: var(--text-primary-color);
+          font-weight: bold;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: background 0.1s ease;
+
+          &:hover {
+            background: var(--button-gray-2);
+          }
+
+          &:active {
+            transform: scale(0.95);
+          }
+        }
+
+        span {
+          font-size: 0.95rem;
+          font-weight: 600;
+          min-width: 24px;
+          text-align: center;
+          color: var(--text-primary-color);
+        }
+      }
+    }
+
+    .TableDialog__actions {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+      justify-content: center;
+      margin-top: 0.25rem;
+
+      button {
+        flex: 1;
+        padding: 0.5rem 0.75rem;
+      }
+    }
+  }
+}
