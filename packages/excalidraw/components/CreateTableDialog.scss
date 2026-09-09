@@ -1,0 +1,19 @@
+.excalidraw {
+  .CreateTableDialog {
+    .CreateTableDialog__fields {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .CreateTableDialog__fields > * {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .CreateTableDialog__actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}

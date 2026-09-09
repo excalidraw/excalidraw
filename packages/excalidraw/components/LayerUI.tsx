@@ -30,6 +30,7 @@ import { getScrollToContentState } from "../scene";
 import { SelectedShapeActions, CompactShapeActions } from "./Actions";
 import { LoadingMessage } from "./LoadingMessage";
 import { MobileMenu } from "./MobileMenu";
+import { CreateTableDialog } from "./CreateTableDialog";
 import { PasteChartDialog } from "./PasteChartDialog";
 import { Section } from "./Section";
 import Stack from "./Stack";
@@ -585,6 +586,15 @@ const LayerUI = ({
         <PasteChartDialog
           data={appState.openDialog.data}
           rawText={appState.openDialog.rawText}
+          onClose={() =>
+            setAppState({
+              openDialog: null,
+            })
+          }
+        />
+      )}
+      {defaultUIEnabled && appState.openDialog?.name === "createTable" && (
+        <CreateTableDialog
           onClose={() =>
             setAppState({
               openDialog: null,

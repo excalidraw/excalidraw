@@ -29,6 +29,7 @@ import {
   handIcon,
   frameToolIcon,
   EmbedIcon,
+  tableIcon,
 } from "./icons";
 
 import type {
@@ -316,6 +317,37 @@ const createToolButton = (
 };
 
 export const HandToolButton = createToolButton("hand");
+
+/**
+ * Inserts a table of rectangles and lines. Opens a size dialog instead of
+ * becoming an active drawing tool.
+ */
+export const TableToolButton = ({
+  app,
+  appState,
+}: {
+  app: AppClassProperties;
+  appState: UIAppState;
+}) => {
+  const label = t("toolBar.table");
+  const isOpen = appState.openDialog?.name === "createTable";
+
+  return (
+    <IconButton
+      type="toggle"
+      icon={tableIcon}
+      checked={isOpen}
+      title={label}
+      aria-label={label}
+      data-testid="toolbar-table"
+      onSelect={() => {
+        trackEvent("toolbar", "table", "ui");
+        app.setOpenDialog(isOpen ? null : { name: "createTable" });
+      }}
+    />
+  );
+};
+
 export const RectangleToolButton = createToolButton("rectangle");
 export const DiamondToolButton = createToolButton("diamond");
 export const EllipseToolButton = createToolButton("ellipse");
