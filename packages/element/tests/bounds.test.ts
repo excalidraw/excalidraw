@@ -1,5 +1,10 @@
 import { pointFrom } from "@excalidraw/math";
-import { arrayToMap, type Bounds, ROUNDNESS } from "@excalidraw/common";
+import {
+  arrayToMap,
+  type Bounds,
+  ROUNDNESS,
+  ROUGHNESS,
+} from "@excalidraw/common";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import type { LocalPoint } from "@excalidraw/math";
@@ -7,6 +12,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import {
   elementsOverlappingBBox,
   getElementAbsoluteCoords,
+  getElementAbsoluteVisualCoords,
   getElementBounds,
 } from "../src/bounds";
 
@@ -66,6 +72,72 @@ describe("getElementAbsoluteCoords", () => {
     const element = _ce({ x: 0, y: 10, w: 0, h: 10 });
     const [, , , y2] = getElementAbsoluteCoords(element, arrayToMap([element]));
     expect(y2).toEqual(20);
+  });
+
+  it("ignores roughness", () => {
+    const clean = {
+      ..._ce({
+        t: "line",
+        x: 449.58203125,
+        y: 186.0625,
+        w: 170.12890625,
+        h: 92.48828125,
+        a: 0.6447741904932416,
+      }),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(67.33984375, 92.48828125),
+        pointFrom<LocalPoint>(-102.7890625, 52.15625),
+      ],
+      roughness: ROUGHNESS.architect,
+    } as ExcalidrawElement;
+
+    const cartoony = {
+      ...clean,
+      roughness: ROUGHNESS.cartoonist,
+    } as ExcalidrawElement;
+
+    const cleanCoords = getElementAbsoluteCoords(clean, arrayToMap([clean]));
+    const cartoonyCoords = getElementAbsoluteCoords(
+      cartoony,
+      arrayToMap([cartoony]),
+    );
+
+    expect(cleanCoords).toEqual(cartoonyCoords);
+  });
+});
+
+describe("getElementAbsoluteVisualCoords", () => {
+  it("takes roughness into account", () => {
+    const clean = {
+      ..._ce({
+        t: "line",
+        x: 449.58203125,
+        y: 186.0625,
+        w: 170.12890625,
+        h: 92.48828125,
+        a: 0.6447741904932416,
+      }),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(67.33984375, 92.48828125),
+        pointFrom<LocalPoint>(-102.7890625, 52.15625),
+      ],
+      roughness: ROUGHNESS.architect,
+    } as ExcalidrawElement;
+
+    const cartoony = {
+      ...clean,
+      roughness: ROUGHNESS.cartoonist,
+    } as ExcalidrawElement;
+
+    const cleanCoords = getElementAbsoluteVisualCoords(clean, arrayToMap([clean]));
+    const cartoonyCoords = getElementAbsoluteVisualCoords(
+      cartoony,
+      arrayToMap([cartoony]),
+    );
+
+    expect(cleanCoords).not.toEqual(cartoonyCoords);
   });
 });
 
@@ -139,10 +211,41 @@ describe("getElementBounds", () => {
     } as ExcalidrawLinearElement;
 
     const [x1, y1, x2, y2] = getElementBounds(element, arrayToMap([element]));
-    expect(x1).toEqual(360.9291017525165);
-    expect(y1).toEqual(185.24770129343722);
-    expect(x2).toEqual(481.4815539037601);
-    expect(y2).toEqual(319.8162855827246);
+    expect(x1).toEqual(360.3176068760539);
+    expect(y1).toEqual(185.90654264413516);
+    expect(x2).toEqual(473.8171188951176);
+    expect(y2).toEqual(320.391865303557);
+  });
+
+  it("ignores roughness", () => {
+    const clean = {
+      ..._ce({
+        t: "line",
+        x: 449.58203125,
+        y: 186.0625,
+        w: 170.12890625,
+        h: 92.48828125,
+        a: 0.6447741904932416,
+      }),
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(67.33984375, 92.48828125),
+        pointFrom<LocalPoint>(-102.7890625, 52.15625),
+      ],
+      roughness: ROUGHNESS.architect,
+    } as ExcalidrawElement;
+
+    const cartoony = {
+      ...clean,
+      roughness: ROUGHNESS.cartoonist,
+    } as ExcalidrawElement;
+
+    const cleanCoords = getElementAbsoluteCoords(clean, arrayToMap([clean]));
+    const cartoonyCoords = getElementAbsoluteCoords(
+      cartoony,
+      arrayToMap([cartoony]),
+    );
+    expect(cleanCoords).toEqual(cartoonyCoords);
   });
 });
 

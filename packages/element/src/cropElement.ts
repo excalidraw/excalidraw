@@ -16,8 +16,8 @@ import { type Point } from "points-on-curve";
 
 import {
   elementCenterPoint,
-  getElementAbsoluteCoords,
-  getResizedElementAbsoluteCoords,
+  getElementAbsoluteVisualCoords,
+  getResizedElementAbsoluteVisualCoords,
 } from "./bounds";
 
 import type { TransformHandleType } from "./transformHandles";
@@ -411,7 +411,7 @@ const recomputeOrigin = (
   height: number,
   shouldMaintainAspectRatio?: boolean,
 ) => {
-  const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
+  const [x1, y1, x2, y2] = getResizedElementAbsoluteVisualCoords(
     stateAtCropStart,
     stateAtCropStart.width,
     stateAtCropStart.height,
@@ -422,7 +422,7 @@ const recomputeOrigin = (
   const startCenter: any = pointCenter(startTopLeft, startBottomRight);
 
   const [newBoundsX1, newBoundsY1, newBoundsX2, newBoundsY2] =
-    getResizedElementAbsoluteCoords(stateAtCropStart, width, height, true);
+    getResizedElementAbsoluteVisualCoords(stateAtCropStart, width, height, true);
   const newBoundsWidth = newBoundsX2 - newBoundsX1;
   const newBoundsHeight = newBoundsY2 - newBoundsY1;
 
@@ -482,7 +482,7 @@ export const getUncroppedImageElement = (
   if (element.crop) {
     const { width, height } = getUncroppedWidthAndHeight(element);
 
-    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteCoords(
+    const [x1, y1, x2, y2, cx, cy] = getElementAbsoluteVisualCoords(
       element,
       elementsMap,
     );
