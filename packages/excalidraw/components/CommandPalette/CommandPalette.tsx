@@ -335,6 +335,7 @@ function CommandPaletteInner({
         actionManager.actions.toggleLinearEditor,
         actionManager.actions.cropEditor,
         actionManager.actions.togglePolygon,
+        actionManager.actions.toggleMathText,
         actionLink,
         actionCopyElementLink,
         actionLinkToElement,

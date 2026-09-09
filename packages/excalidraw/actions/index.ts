@@ -36,6 +36,8 @@ export {
 export { actionFinalize } from "./actionFinalize";
 export { actionDeselect } from "./actionDeselect";
 
+export { actionToggleMathText } from "./actionMathText";
+
 export {
   actionChangeProjectName,
   actionChangeExportBackground,

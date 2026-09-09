@@ -45,6 +45,7 @@ import type {
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
+import { getMathTextImage } from "./mathText";
 import {
   getBoundTextElement,
   getContainerCoords,
@@ -476,6 +477,40 @@ const drawElementOnCanvas = (
     }
     default: {
       if (isTextElement(element)) {
+        // math mode: draw the typeset equation (falls through to plain text
+        // while the image is loading, or if the source is invalid TeX)
+        const mathImage = getMathTextImage(
+          element,
+          applyDarkModeFilter(
+            element.strokeColor,
+            renderConfig.theme === THEME.DARK,
+          ),
+        );
+        if (mathImage) {
+          // fit the equation into the element box preserving its aspect ratio
+          // (same as the SVG export's default preserveAspectRatio) — the box
+          // normally *is* the equation box, but must never distort it if it
+          // isn't (e.g. dimensions measured by a client without math support)
+          const imageWidth = mathImage.naturalWidth || element.width;
+          const imageHeight = mathImage.naturalHeight || element.height;
+          const scale = Math.min(
+            element.width / imageWidth,
+            element.height / imageHeight,
+          );
+          const drawWidth = imageWidth * scale;
+          const drawHeight = imageHeight * scale;
+          context.save();
+          context.drawImage(
+            mathImage,
+            (element.width - drawWidth) / 2,
+            (element.height - drawHeight) / 2,
+            drawWidth,
+            drawHeight,
+          );
+          context.restore();
+          break;
+        }
+
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
