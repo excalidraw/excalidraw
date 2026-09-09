@@ -1,11 +1,11 @@
 import { ROUNDNESS } from "@excalidraw/common";
 
+import type { AppState } from "@excalidraw/excalidraw/types";
+
 import { Scene } from "../Scene";
 import { addNewNodes } from "../flowchart";
 import { newStickyNoteElement } from "../newElement";
 import { isFlowchartNodeElement, isStickyNoteElement } from "../typeChecks";
-
-import type { AppState } from "@excalidraw/excalidraw/types";
 
 describe("flowchart", () => {
   it("creates connected sticky notes", () => {
