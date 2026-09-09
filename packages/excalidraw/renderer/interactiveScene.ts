@@ -99,6 +99,7 @@ import {
   fillCircle,
   getNormalizedCanvasDimensions,
   strokeRectWithRotation_simple,
+  snapScrollToDevicePixels,
 } from "./helpers";
 
 import type {
@@ -1631,7 +1632,7 @@ const _renderInteractiveScene = ({
   selectedElements,
   allElementsMap,
   scale,
-  appState,
+  appState: unsnappedAppState,
   renderConfig,
   editorInterface,
   animationState,
@@ -1643,6 +1644,10 @@ const _renderInteractiveScene = ({
   if (canvas === null) {
     return {};
   }
+
+  // the same whole-device-pixel scroll the static scene draws at, so the
+  // overlays sit exactly on the content
+  const appState = snapScrollToDevicePixels(unsnappedAppState, scale);
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,

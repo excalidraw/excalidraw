@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Excalidraw } from "../index";
+import { snapScrollToDevicePixels } from "../renderer/helpers";
 
 import { API } from "./helpers/api";
 import { GlobalTestState, render, waitFor } from "./test-utils";
@@ -93,5 +94,44 @@ describe("element pixel snap", () => {
       return blits;
     });
     expect(distanceToWholePixel(blit)).toBeGreaterThan(1e-3);
+  });
+});
+
+describe("scroll pixel snap", () => {
+  it("rounds the scroll to whole device pixels and is identity when it already is", () => {
+    const zoom = { value: 1.5 as NormalizedZoomValue };
+    const snapped = snapScrollToDevicePixels(
+      { scrollX: 3.3, scrollY: -7.77, zoom },
+      2,
+    );
+    // 3.3 × 1.5 × 2 = 9.9 → 10;  -7.77 × 3 = -23.31 → -23
+    expect(snapped.scrollX * 3).toBeCloseTo(10, 9);
+    expect(snapped.scrollY * 3).toBeCloseTo(-23, 9);
+
+    const whole = { scrollX: 4, scrollY: -6, zoom };
+    expect(snapScrollToDevicePixels(whole, 2)).toBe(whole);
+  });
+
+  it("blits a shape at integer coordinates on whole device pixels at any fractional scroll", async () => {
+    await render(<Excalidraw />);
+    API.setAppState({ width: 800, height: 600 });
+    API.setElements([
+      API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 200,
+        width: 200,
+        height: 100,
+      }),
+    ]);
+    // zooms at which the element canvas's padding is itself whole device
+    // pixels, so the only fractional term left is the scroll
+    for (const zoom of [1, 1.5]) {
+      const [atFirst] = await renderAt(zoom, 3.3, -7.77);
+      expect(distanceToWholePixel(atFirst)).toBeLessThan(1e-6);
+      // a tenth of a device pixel further lands on the same pixels
+      const [atSecond] = await renderAt(zoom, 3.3 + 0.1 / zoom, -7.77);
+      expect(atSecond).toEqual(atFirst);
+    }
   });
 });

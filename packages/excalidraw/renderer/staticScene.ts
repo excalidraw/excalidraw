@@ -35,7 +35,11 @@ import {
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import {
+  bootstrapCanvas,
+  getNormalizedCanvasDimensions,
+  snapScrollToDevicePixels,
+} from "./helpers";
 
 import type {
   StaticCanvasRenderConfig,
@@ -240,7 +244,7 @@ const _renderStaticScene = ({
   allElementsMap,
   visibleElements,
   scale,
-  appState,
+  appState: unsnappedAppState,
   renderConfig,
 }: StaticSceneRenderConfig) => {
   if (canvas === null) {
@@ -248,6 +252,10 @@ const _renderStaticScene = ({
   }
 
   const { renderGrid = true, isExporting } = renderConfig;
+  // export draws vectors, not cached bitmaps — nothing to keep on the grid
+  const appState = isExporting
+    ? unsnappedAppState
+    : snapScrollToDevicePixels(unsnappedAppState, scale);
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
