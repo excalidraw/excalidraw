@@ -418,7 +418,10 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
 import { isOverScrollBars } from "../scene/scrollbars";
-import { isMaybeMermaidDefinition } from "../mermaid";
+import {
+  isMaybeMermaidDefinition,
+  normalizeMermaidLineBreaks,
+} from "../mermaid";
 import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
@@ -4579,9 +4582,12 @@ class App extends React.Component<AppProps, AppState> {
         const { elements: skeletonElements, files = {} } =
           await api.parseMermaidToExcalidraw(data.text);
 
-        const elements = convertToExcalidrawElements(skeletonElements, {
-          regenerateIds: true,
-        });
+        const elements = convertToExcalidrawElements(
+          normalizeMermaidLineBreaks(skeletonElements),
+          {
+            regenerateIds: true,
+          },
+        );
 
         this.addElementsFromPasteOrLibrary({
           elements,

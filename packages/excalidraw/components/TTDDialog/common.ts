@@ -14,6 +14,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { normalizeMermaidLineBreaks } from "../../mermaid";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
 
@@ -98,9 +99,12 @@ export const convertMermaidToExcalidraw = async ({
     setError(null);
 
     data.current = {
-      elements: convertToExcalidrawElements(elements, {
-        regenerateIds: true,
-      }),
+      elements: convertToExcalidrawElements(
+        normalizeMermaidLineBreaks(elements),
+        {
+          regenerateIds: true,
+        },
+      ),
       files,
     };
 
