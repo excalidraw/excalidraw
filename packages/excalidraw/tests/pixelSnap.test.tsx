@@ -95,6 +95,29 @@ describe("element pixel snap", () => {
     },
   );
 
+  it("does not snap while a zoom gesture keeps the cached bitmaps", async () => {
+    API.setElements([
+      API.createElement({ type: "text", x: 10.37, y: 20.61, text: "hello" }),
+    ]);
+    // the bitmaps are resampled during the gesture; rounding would only
+    // make elements twitch
+    await renderAt(1, 0, 0);
+    (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
+    API.setAppState({
+      shouldCacheIgnoreZoom: true,
+      zoom: { value: 1.5 as NormalizedZoomValue },
+      scrollX: 3.3,
+      scrollY: -7.77,
+    });
+    const [blit] = await waitFor(() => {
+      const blits = getBlits();
+      expect(blits.length).toBeGreaterThan(0);
+      return blits;
+    });
+    expect(distanceToWholePixel(blit)).toBeGreaterThan(1e-3);
+    API.setAppState({ shouldCacheIgnoreZoom: false });
+  });
+
   it("leaves rotated elements alone", async () => {
     API.setElements([
       API.createElement({

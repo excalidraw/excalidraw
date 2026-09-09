@@ -583,6 +583,30 @@ const generateElementWithCanvas = (
   return prevElementWithCanvas;
 };
 
+/**
+ * Whether an element's cached bitmap may be laid on the device-pixel grid:
+ * unrotated or at a right angle, and not during a zoom gesture. The cached
+ * path disables smoothing for exactly these — a nearest-neighbor 1:1 blit is
+ * a pixel-exact copy, and rounding its origin keeps it off the half-pixel
+ * boundary where it tears — and every eligible blit is snapped. It is
+ * eligibility, not a guarantee of a 1:1 copy: freedraw is blitted with
+ * smoothing on, and a size-capped cache is rescaled; snapping is harmless
+ * for both.
+ *
+ * Not during a zoom gesture: the bitmaps stay at the old scale and are
+ * resampled, and blurry shapes look better on low resolution (while still
+ * zooming in) than sharp ones; snapping would only make elements twitch.
+ * Right angles qualify because smoothing can be off there without aliasing
+ * (for other angles it is terrible on Chromium); the right-angle test
+ * tolerates float arithmetic.
+ */
+const canSnapElement = (
+  element: ExcalidrawElement,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+) =>
+  !appState?.shouldCacheIgnoreZoom &&
+  (!element.angle || isRightAngleRads(element.angle));
+
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
@@ -662,14 +686,14 @@ const drawElementFromCanvas = (
 
   const transform = context.getTransform();
 
-  if (!element.angle || isRightAngleRads(element.angle)) {
-    // blit the cached bitmap on whole device pixels. Smoothing is off for
-    // these elements (see `renderElement`), so a 1:1 blit at a fractional
-    // offset is a pixel-exact copy shifted to the nearest pixel — except at
-    // an exact half pixel, where a GPU-accelerated canvas decides the
-    // rounding per scanline by float precision and a few rows sample the
-    // neighboring row: doubled or broken strokes, varying with scroll and
-    // position. A centered label lands on a half pixel routinely.
+  if (canSnapElement(element, appState)) {
+    // blit the cached bitmap on whole device pixels. Nearest-neighbor at a
+    // fractional offset is a pixel-exact copy shifted to the nearest pixel
+    // — except at an exact half pixel, where a GPU-accelerated canvas
+    // decides the rounding per scanline by float precision and a few rows
+    // sample the neighboring row: doubled or broken strokes, varying with
+    // scroll and position. A centered label lands on a half pixel
+    // routinely.
     //
     // Done by moving the transform's origin onto the rounded device
     // position of the blit and drawing at (0, 0): the rotation, mirroring
@@ -957,17 +981,9 @@ export const renderElement = (
 
         const currentImageSmoothingStatus = context.imageSmoothingEnabled;
 
-        if (
-          // do not disable smoothing during zoom as blurry shapes look better
-          // on low resolution (while still zooming in) than sharp ones
-          !appState?.shouldCacheIgnoreZoom &&
-          // angle is 0 -> always disable smoothing
-          (!element.angle ||
-            // or check if angle is a right angle in which case we can still
-            // disable smoothing without adversely affecting the result
-            // We need less-than comparison because of FP artihmetic
-            isRightAngleRads(element.angle))
-        ) {
+        // see `canSnapElement` for why not during zoom gestures or at
+        // other angles
+        if (canSnapElement(element, appState)) {
           // Disabling smoothing makes output much sharper, especially for
           // text. Unless for non-right angles, where the aliasing is really
           // terrible on Chromium.
