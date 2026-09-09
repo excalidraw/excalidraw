@@ -591,13 +591,16 @@ const drawElementFromCanvas = (
   allElementsMap: NonDeletedSceneElementsMap,
 ) => {
   const element = elementWithCanvas.element;
+  // the ratio the cached bitmap was generated with (`generateElementCanvas`);
+  // the blit's size math needs the same one, so it is not the owner window's
+  const devicePixelRatio = window.devicePixelRatio;
   const padding = getCanvasPadding(element);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
-  const cx = ((x1 + x2) / 2 + appState.scrollX) * window.devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + appState.scrollY) * window.devicePixelRatio;
+  const cx = ((x1 + x2) / 2 + appState.scrollX) * devicePixelRatio;
+  const cy = ((y1 + y2) / 2 + appState.scrollY) * devicePixelRatio;
 
   context.save();
-  context.scale(1 / window.devicePixelRatio, 1 / window.devicePixelRatio);
+  context.scale(1 / devicePixelRatio, 1 / devicePixelRatio);
 
   const boundTextElement = getBoundTextElement(element, allElementsMap);
 
@@ -612,7 +615,7 @@ const drawElementFromCanvas = (
     );
     // generously covers the arrow's blit at any rotation
     const outerHalf =
-      Math.max(distance(x1, x2), distance(y1, y2)) * window.devicePixelRatio +
+      Math.max(distance(x1, x2), distance(y1, y2)) * devicePixelRatio +
       padding * 10;
     context.beginPath();
     context.rect(cx - outerHalf, cy - outerHalf, outerHalf * 2, outerHalf * 2);
@@ -621,16 +624,14 @@ const drawElementFromCanvas = (
         boundTextElement.width / 2 -
         BOUND_TEXT_PADDING +
         appState.scrollX) *
-        window.devicePixelRatio,
+        devicePixelRatio,
       (boundTextCy -
         boundTextElement.height / 2 -
         BOUND_TEXT_PADDING +
         appState.scrollY) *
-        window.devicePixelRatio,
-      (boundTextElement.width + BOUND_TEXT_PADDING * 2) *
-        window.devicePixelRatio,
-      (boundTextElement.height + BOUND_TEXT_PADDING * 2) *
-        window.devicePixelRatio,
+        devicePixelRatio,
+      (boundTextElement.width + BOUND_TEXT_PADDING * 2) * devicePixelRatio,
+      (boundTextElement.height + BOUND_TEXT_PADDING * 2) * devicePixelRatio,
     );
     context.clip("evenodd");
   }
@@ -654,12 +655,10 @@ const drawElementFromCanvas = (
   // revert afterwards we don't have account for it during drawing
   context.translate(-cx, -cy);
 
-  let drawX =
-    (x1 + appState.scrollX) * window.devicePixelRatio -
-    (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
-  let drawY =
-    (y1 + appState.scrollY) * window.devicePixelRatio -
-    (padding * elementWithCanvas.scale) / elementWithCanvas.scale;
+  // the blit origin, in the space the context is in here (scaled by
+  // canvas scale × zoom ÷ devicePixelRatio)
+  let drawX = (x1 + appState.scrollX) * devicePixelRatio - padding;
+  let drawY = (y1 + appState.scrollY) * devicePixelRatio - padding;
 
   const transform = context.getTransform();
 
@@ -714,10 +713,10 @@ const drawElementFromCanvas = (
     context.strokeStyle = "#c92a2a";
     context.lineWidth = 3;
     context.strokeRect(
-      (coords.x + appState.scrollX) * window.devicePixelRatio,
-      (coords.y + appState.scrollY) * window.devicePixelRatio,
-      getBoundTextMaxWidth(element, textElement) * window.devicePixelRatio,
-      getBoundTextMaxHeight(element, textElement) * window.devicePixelRatio,
+      (coords.x + appState.scrollX) * devicePixelRatio,
+      (coords.y + appState.scrollY) * devicePixelRatio,
+      getBoundTextMaxWidth(element, textElement) * devicePixelRatio,
+      getBoundTextMaxHeight(element, textElement) * devicePixelRatio,
     );
   }
   context.restore();
