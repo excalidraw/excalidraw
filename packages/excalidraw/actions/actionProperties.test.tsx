@@ -13,6 +13,8 @@ import { API } from "../tests/helpers/api";
 import { UI } from "../tests/helpers/ui";
 import { render } from "../tests/test-utils";
 
+import { actionFlipArrowDirection } from "./actionProperties";
+
 describe("element locking", () => {
   beforeEach(async () => {
     await render(<Excalidraw />);
@@ -225,6 +227,35 @@ describe("element locking", () => {
       expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
         "active",
       );
+    });
+
+    it("should swap start and end arrowheads", () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 10,
+        y: 20,
+        points: [
+          [0, 0],
+          [100, 50],
+        ] as any,
+        startArrowhead: "arrow",
+        endArrowhead: null,
+      });
+
+      API.setElements([arrow]);
+      API.setSelectedElements([arrow]);
+
+      API.executeAction(actionFlipArrowDirection);
+
+      const updatedArrow = API.getSelectedElement() as any;
+      expect(updatedArrow.x).toBe(10);
+      expect(updatedArrow.y).toBe(20);
+      expect(updatedArrow.points).toEqual([
+        [0, 0],
+        [100, 50],
+      ]);
+      expect(updatedArrow.startArrowhead).toBe(null);
+      expect(updatedArrow.endArrowhead).toBe("arrow");
     });
   });
 });
