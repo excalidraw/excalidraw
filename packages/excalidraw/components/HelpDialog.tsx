@@ -264,6 +264,18 @@ export const HelpDialog = ({ onClose }: { onClose?: () => void }) => {
             caption={t("helpDialog.view")}
           >
             <Shortcut
+              label={t("helpDialog.panCanvas")}
+              shortcuts={[
+                `Space+${t("helpDialog.drag")}`,
+                `${t("helpDialog.wheel")}+${t("helpDialog.drag")}`,
+              ]}
+              isOr={true}
+            />
+            <Shortcut
+              label={t("helpDialog.zoomCanvas")}
+              shortcuts={[getShortcutKey(`CtrlOrCmd+${t("helpDialog.wheel")}`)]}
+            />
+            <Shortcut
               label={t("buttons.zoomIn")}
               shortcuts={[getShortcutKey("CtrlOrCmd++")]}
             />

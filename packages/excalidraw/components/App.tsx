@@ -13988,6 +13988,50 @@ class App extends React.Component<AppProps, AppState> {
     ];
   };
 
+  private zoomFromWheelDelta = (deltaY: number) => {
+    const sign = Math.sign(deltaY);
+    const MAX_STEP = ZOOM_STEP * 100;
+    const absDelta = Math.abs(deltaY);
+    let delta = deltaY;
+    if (absDelta > MAX_STEP) {
+      delta = MAX_STEP * sign;
+    }
+
+    let newZoom = this.state.zoom.value - delta / 100;
+    // increase zoom steps the more zoomed-in we are (applies to >100% only)
+    newZoom +=
+      Math.log10(Math.max(1, this.state.zoom.value)) *
+      -sign *
+      // reduced amplification for small deltas (small movements on a trackpad)
+      Math.min(1, absDelta / 20);
+
+    const minZoom = this.state.scrollConstraints?.lockZoom
+      ? this.state.scrollConstraints.zoom
+      : MIN_ZOOM;
+    newZoom = Math.max(newZoom, minZoom);
+
+    const didTranslate = this.viewport.translate(
+      (state) => ({
+        ...getViewportForZoomWithScrollConstraints(
+          {
+            viewportX: this.viewport.lastPosition.x,
+            viewportY: this.viewport.lastPosition.y,
+            nextZoom: getNormalizedZoom(newZoom),
+          },
+          state,
+        ),
+        shouldCacheIgnoreZoom: true,
+      }),
+      {
+        zoomPreConstrained: true,
+        preserveScrollConstraintsSnapBack: true,
+      },
+    );
+    if (didTranslate) {
+      this.resetShouldCacheIgnoreZoomDebounced();
+    }
+  };
+
   private handleWheel = withBatchedUpdates(
     (
       event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
@@ -14020,49 +14064,24 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const { deltaX, deltaY } = event;
-      // note that event.ctrlKey is necessary to handle pinch zooming
-      if (event.metaKey || event.ctrlKey) {
-        const sign = Math.sign(deltaY);
-        const MAX_STEP = ZOOM_STEP * 100;
-        const absDelta = Math.abs(deltaY);
-        let delta = deltaY;
-        if (absDelta > MAX_STEP) {
-          delta = MAX_STEP * sign;
-        }
 
-        let newZoom = this.state.zoom.value - delta / 100;
-        // increase zoom steps the more zoomed-in we are (applies to >100% only)
-        newZoom +=
-          Math.log10(Math.max(1, this.state.zoom.value)) *
-          -sign *
-          // reduced amplification for small deltas (small movements on a trackpad)
-          Math.min(1, absDelta / 20);
+      const shouldZoom =
+        // note that event.ctrlKey is necessary to handle pinch zooming, so
+        // ctrl/cmd+wheel zooms regardless of the `wheelBehavior` preference
+        event.metaKey ||
+        event.ctrlKey ||
+        (this.state.wheelBehavior === "zoom" &&
+          // shift+wheel stays horizontal panning — the escape hatch for
+          // scrolling the canvas while the wheel is bound to zoom
+          !event.shiftKey &&
+          // alt+wheel stays vertical panning, ditto
+          !event.altKey &&
+          // let tilt wheels & horizontal trackpad swipes pan rather than
+          // zoom by a deltaY of ~0
+          Math.abs(deltaY) >= Math.abs(deltaX));
 
-        const minZoom = this.state.scrollConstraints?.lockZoom
-          ? this.state.scrollConstraints.zoom
-          : MIN_ZOOM;
-        newZoom = Math.max(newZoom, minZoom);
-
-        const didTranslate = this.viewport.translate(
-          (state) => ({
-            ...getViewportForZoomWithScrollConstraints(
-              {
-                viewportX: this.viewport.lastPosition.x,
-                viewportY: this.viewport.lastPosition.y,
-                nextZoom: getNormalizedZoom(newZoom),
-              },
-              state,
-            ),
-            shouldCacheIgnoreZoom: true,
-          }),
-          {
-            zoomPreConstrained: true,
-            preserveScrollConstraintsSnapBack: true,
-          },
-        );
-        if (didTranslate) {
-          this.resetShouldCacheIgnoreZoomDebounced();
-        }
+      if (shouldZoom) {
+        this.zoomFromWheelDelta(deltaY);
         return;
       }
 

@@ -1277,6 +1277,13 @@ export const restoreAppState = (
     nextAppState.boxSelectionMode = boxSelectionMode;
   }
 
+  // persisted/imported data is untrusted — fall back to the default on an
+  // unknown value rather than letting it reach `handleWheel`
+  const wheelBehavior = appState.wheelBehavior ?? localAppState?.wheelBehavior;
+  if (wheelBehavior === "scroll" || wheelBehavior === "zoom") {
+    nextAppState.wheelBehavior = wheelBehavior;
+  }
+
   // drop malformed persisted custom top picks (imported data is untrusted)
   nextAppState.colorTopPicks = {
     elementStroke: restoreColorTopPicksList(
