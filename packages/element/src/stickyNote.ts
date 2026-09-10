@@ -860,7 +860,8 @@ const hasStickyNoteLayoutInputChanged = (
   if (
     !prevContainer ||
     (textElement && !prevText) ||
-    (!textElement && prevContainer.boundElements?.length)
+    (!textElement &&
+      prevContainer.boundElements?.some(({ type }) => type === "text"))
   ) {
     return true;
   }
