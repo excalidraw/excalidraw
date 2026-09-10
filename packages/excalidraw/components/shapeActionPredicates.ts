@@ -3,6 +3,7 @@ import { isTransparent } from "@excalidraw/common";
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
+  getColorTargetElement,
   hasBoundTextElement,
   isElbowArrow,
   isImageElement,
@@ -13,6 +14,7 @@ import {
 } from "@excalidraw/element";
 
 import type {
+  ElementsMap,
   ExcalidrawElement,
   ExcalidrawElementType,
   NonDeletedElementsMap,
@@ -62,10 +64,17 @@ export const canChangeStrokeColor = (
 export const canChangeBackgroundColor = (
   appState: UIAppState,
   targetElements: ExcalidrawElement[],
+  elementsMap: ElementsMap,
 ) => {
   return (
     hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type))
+    // a note's label (the target while editing it) has no fill, but a
+    // background pick on it colors the note — so the picker stays available
+    targetElements.some((element) =>
+      hasBackground(
+        getColorTargetElement(element, "backgroundColor", elementsMap).type,
+      ),
+    )
   );
 };
 
@@ -113,7 +122,11 @@ export const getShapeActionPredicates = (
 
     // color
     strokeColor: canChangeStrokeColor(appState, targetElements),
-    backgroundColor: canChangeBackgroundColor(appState, targetElements),
+    backgroundColor: canChangeBackgroundColor(
+      appState,
+      targetElements,
+      elementsMap,
+    ),
     fill:
       // bucket fill never renders transparent (it falls back to a real
       // color), so its fill style stays relevant either way

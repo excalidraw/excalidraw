@@ -87,6 +87,26 @@ export const normalizeStickyNoteBackgroundColor = (
  * color surface (actions, both eyedroppers, paste styles, bind) routes
  * through this instead of re-deriving the rule.
  */
+/**
+ * The element a color pick on `element` lands on. A note's label has no fill
+ * of its own, so a background pick on the label — the styles panel while
+ * editing it — goes to the note; everything else colors itself.
+ */
+export const getColorTargetElement = (
+  element: ExcalidrawElement,
+  property: "strokeColor" | "backgroundColor",
+  elementsMap: ElementsMap,
+): ExcalidrawElement => {
+  if (
+    property === "backgroundColor" &&
+    isTextElement(element) &&
+    isStickyNoteBoundText(element, elementsMap)
+  ) {
+    return elementsMap.get(element.containerId!) ?? element;
+  }
+  return element;
+};
+
 export const getColorUpdate = (
   element: ExcalidrawElement,
   property: "strokeColor" | "backgroundColor",

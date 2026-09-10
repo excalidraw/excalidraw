@@ -36,6 +36,7 @@ import {
 } from "../actions/actionProperties";
 import { actionCopyStyles, actionPasteStyles } from "../actions/actionStyles";
 import { activeEyeDropperAtom } from "../components/EyeDropper";
+import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 import { editorJotaiStore } from "../editor-jotai";
 import { Excalidraw } from "../index";
 import { exportToSvg } from "../scene/export";
@@ -606,6 +607,81 @@ describe("sticky notes", () => {
       expect(getElement(note.id).strokeColor).toBe(RED);
       expect(h.state.currentItemStickynoteStrokeColor).toBe(RED);
       expect(h.state.currentItemStrokeColor).toBe(shapeDefault);
+      Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
+    });
+
+    it("offers the note's background while editing its label and colors the note with it", async () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: "hi",
+        fontSize: 28,
+      });
+      API.setElements([note, label]);
+      layoutNotes(note.id);
+      const shapeDefault = h.state.currentItemBackgroundColor;
+      const noteBackground = getElement(note.id).backgroundColor;
+
+      mouse.doubleClickAt(note.x + note.width / 2, note.y + note.height / 2);
+      await getTextEditor();
+
+      // the label is the styles panel's target and has no fill of its own,
+      // yet the background picker stays available and shows the note's fill
+      const elementsMap = h.app.scene.getNonDeletedElementsMap();
+      expect(
+        getShapeActionPredicates(
+          h.state,
+          [getElement(label.id)],
+          elementsMap,
+          h.app,
+        ).backgroundColor,
+      ).toBe(true);
+      const backgroundPicker = document.querySelector(
+        ".color-picker__top-picks .color-picker__button.active[title]",
+      );
+      const activeSwatches = Array.from(
+        document.querySelectorAll(".color-picker__top-picks .active"),
+      ).map((button) => button.getAttribute("title"));
+      expect(backgroundPicker).not.toBeNull();
+      expect(activeSwatches).toContain(noteBackground);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeBackgroundColor, "ui", {
+          color: COLOR_PALETTE.pink[1],
+        });
+      });
+
+      // text and background in one editing pass: the pick lands on the note
+      expect(getElement(note.id).backgroundColor).toBe(COLOR_PALETTE.pink[1]);
+      expect(getElement(label.id).backgroundColor).toBe(label.backgroundColor);
+      expect(h.state.currentItemStickynoteBackgroundColor).toBe(
+        COLOR_PALETTE.pink[1],
+      );
+      expect(h.state.currentItemBackgroundColor).toBe(shapeDefault);
+      Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
+    });
+
+    it("keeps the background picker away from plain text being edited", async () => {
+      const text = API.createElement({
+        type: "text",
+        id: "text",
+        x: 100,
+        y: 100,
+        text: "hi",
+        fontSize: 28,
+      });
+      API.setElements([text]);
+
+      mouse.doubleClickAt(text.x + text.width / 2, text.y + text.height / 2);
+      await getTextEditor();
+
+      expect(
+        getShapeActionPredicates(
+          h.state,
+          [getElement(text.id)],
+          h.app.scene.getNonDeletedElementsMap(),
+          h.app,
+        ).backgroundColor,
+      ).toBe(false);
       Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
     });
 

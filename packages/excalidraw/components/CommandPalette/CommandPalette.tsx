@@ -6,6 +6,7 @@ import {
   DEFAULT_SIDEBAR,
   EVENT,
   KEYS,
+  arrayToMap,
   isWritableElement,
 } from "@excalidraw/common";
 
@@ -486,7 +487,11 @@ function CommandPaletteInner({
             const selectedElements = getSelectedElements(elements, appState);
             return (
               selectedElements.length > 0 &&
-              canChangeBackgroundColor(appState, selectedElements)
+              canChangeBackgroundColor(
+                appState,
+                selectedElements,
+                arrayToMap(elements),
+              )
             );
           },
           perform: () => {

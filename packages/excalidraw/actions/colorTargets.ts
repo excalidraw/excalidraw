@@ -10,6 +10,7 @@ import {
 } from "@excalidraw/common";
 
 import {
+  getColorTargetElement,
   hasBackground,
   hasStrokeColor,
   isStickyNoteBoundText,
@@ -95,8 +96,9 @@ const isStickyNoteColorTarget = (
  *
  * Targets are the selected color-capable elements (for stroke incl. bound
  * labels, since a note's visible text is its label) plus the text being
- * edited (`handleTextWysiwyg` deselects while editing). With no target, the
- * active tool decides the domain.
+ * edited (`handleTextWysiwyg` deselects while editing) — or, for a
+ * background pick on a note's label, the note (see `getColorTargetElement`).
+ * With no target, the active tool decides the domain.
  */
 export const resolveColorTarget = (
   appState: ColorTargetAppState,
@@ -112,9 +114,11 @@ export const resolveColorTarget = (
   const targets: ExcalidrawElement[] = getSelectedElements(elements, appState, {
     includeBoundTextElement: property === "strokeColor",
   }).filter(supports);
-  const editing =
+  const editingText =
     appState.editingTextElement &&
     elementsMap.get(appState.editingTextElement.id);
+  const editing =
+    editingText && getColorTargetElement(editingText, property, elementsMap);
   if (
     editing &&
     !editing.isDeleted &&

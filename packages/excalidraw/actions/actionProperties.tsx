@@ -64,6 +64,7 @@ import {
 } from "@excalidraw/element";
 
 import {
+  getColorTargetElement,
   getColorUpdate,
   hasFillStyle,
   hasStrokeColor,
@@ -455,6 +456,8 @@ export const actionChangeBackgroundColor = register<
     const selectedElements = app.scene.getSelectedElements(appState);
     const shouldEnablePolygon =
       !isTransparent(color) &&
+      // `every` is vacuously true with nothing selected (editing text)
+      selectedElements.length > 0 &&
       selectedElements.every(
         (el) => isLineElement(el) && canBecomePolygon(el.points),
       );
@@ -472,11 +475,32 @@ export const actionChangeBackgroundColor = register<
       });
     } else {
       nextElements = changeProperty(elements, appState, (el) =>
-        newElementWith(
-          el,
-          getColorUpdate(el, "backgroundColor", color, elementsMap),
-        ),
+        // a note's label passes the pick on to the note (below)
+        getColorTargetElement(el, "backgroundColor", elementsMap) === el
+          ? newElementWith(
+              el,
+              getColorUpdate(el, "backgroundColor", color, elementsMap),
+            )
+          : el,
       );
+      // editing a note's label (no selection): the label has no fill, the
+      // pick colors the note — text and background in one editing pass
+      const editingText =
+        appState.editingTextElement &&
+        elementsMap.get(appState.editingTextElement.id);
+      const editingTarget =
+        editingText &&
+        getColorTargetElement(editingText, "backgroundColor", elementsMap);
+      if (editingTarget && editingTarget !== editingText) {
+        nextElements = nextElements.map((el) =>
+          el.id === editingTarget.id
+            ? newElementWith(
+                el,
+                getColorUpdate(el, "backgroundColor", color, elementsMap),
+              )
+            : el,
+        );
+      }
     }
 
     return {
@@ -492,6 +516,8 @@ export const actionChangeBackgroundColor = register<
   PanelComponent: ({ elements, appState, updateData, app }) => {
     const { stylesPanelMode } = getStylesPanelInfo(app);
     const target = resolveColorTarget(appState, elements, "backgroundColor");
+    // while editing a note's label the picker shows and sets the note's fill
+    const elementsMap = app.scene.getNonDeletedElementsMap();
 
     return (
       <>
@@ -508,7 +534,9 @@ export const actionChangeBackgroundColor = register<
           color={getFormValue(
             elements,
             app,
-            (element) => element.backgroundColor,
+            (element) =>
+              getColorTargetElement(element, "backgroundColor", elementsMap)
+                .backgroundColor,
             true,
             (hasSelection) => (!hasSelection ? target.currentValue : null),
           )}
