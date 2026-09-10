@@ -350,7 +350,7 @@ export const getStickyNotePathCommands = (
 };
 
 // -----------------------------------------------------------------------------
-// font size — `fontSizeMax` is the size the user picked, `fontSize` the fitted one
+// font size — `baseFontSize` is the size the user picked, `fontSize` the fitted one
 // -----------------------------------------------------------------------------
 
 // clamping the ceiling: the fit steps down from it in `STICKY_NOTE_FONT_STEP`
@@ -380,25 +380,25 @@ export const isStickyNoteBoundText = (
  *
  * Container-aware on purpose — generic binding repair (duplication, history)
  * rewrites `containerId` without touching the ceiling, so a numeric
- * `fontSizeMax` alone does not prove the text is still sticky-bound.
+ * `baseFontSize` alone does not prove the text is still sticky-bound.
  */
-export const getUserFontSize = (
+export const getBaseFontSize = (
   textElement: ExcalidrawTextElement,
   elementsMap: ElementsMap,
 ) => {
   return isStickyNoteBoundText(textElement, elementsMap)
-    ? textElement.fontSizeMax ?? textElement.fontSize
+    ? textElement.baseFontSize ?? textElement.fontSize
     : textElement.fontSize;
 };
 
-/** the update that applies a user-picked font size (see `getUserFontSize`) */
-export const getUserFontSizeUpdate = (
+/** the update that applies a user-picked font size (see `getBaseFontSize`) */
+export const getBaseFontSizeUpdate = (
   textElement: ExcalidrawTextElement,
   fontSize: number,
   elementsMap: ElementsMap,
-): { fontSize: number } | { fontSizeMax: number } => {
+): { fontSize: number } | { baseFontSize: number } => {
   return isStickyNoteBoundText(textElement, elementsMap)
-    ? { fontSizeMax: normalizeStickyNoteFontSize(fontSize) }
+    ? { baseFontSize: normalizeStickyNoteFontSize(fontSize) }
     : { fontSize };
 };
 
@@ -520,7 +520,7 @@ export type StickyNoteLayoutOpts = {
    * `gesture-start ceiling × scale`). Omitted = keep the label's live ceiling.
    * Never a multiplier on the live value — that compounds across pointer-moves.
    */
-  fontSizeMax?: number;
+  baseFontSize?: number;
   /** the edge that stays put when the content correction changes the height */
   anchor?: StickyNoteLayoutAnchor;
 };
@@ -534,7 +534,7 @@ export type StickyNoteLayout = {
     ExcalidrawTextElement,
     | "text"
     | "fontSize"
-    | "fontSizeMax"
+    | "baseFontSize"
     | "width"
     | "height"
     | "x"
@@ -567,13 +567,13 @@ const getStickyNoteBaseWidth = (container: ExcalidrawStickyNoteElement) => {
 const fitStickyNoteFont = (
   fit: (fontSize: number) => FontFit,
   {
-    fontSizeMax,
+    baseFontSize,
     fontSizeMin,
     maxWidth,
     maxHeight,
     warmStart,
   }: {
-    fontSizeMax: number;
+    baseFontSize: number;
     fontSizeMin: number;
     maxWidth: number;
     maxHeight: number;
@@ -582,10 +582,10 @@ const fitStickyNoteFont = (
 ): FontFit => {
   const steps = Math.max(
     0,
-    Math.ceil((fontSizeMax - fontSizeMin) / STICKY_NOTE_FONT_STEP),
+    Math.ceil((baseFontSize - fontSizeMin) / STICKY_NOTE_FONT_STEP),
   );
   const sizeAt = (index: number) =>
-    index >= steps ? fontSizeMin : fontSizeMax - index * STICKY_NOTE_FONT_STEP;
+    index >= steps ? fontSizeMin : baseFontSize - index * STICKY_NOTE_FONT_STEP;
 
   const fits = new Map<number, FontFit>();
   const at = (index: number) => {
@@ -608,7 +608,7 @@ const fitStickyNoteFont = (
   // the previous fitted size, snapped onto the grid and clamped into the
   // current interval (a lowered ceiling must not keep the old larger size)
   const warm = clamp(
-    Math.round((fontSizeMax - warmStart) / STICKY_NOTE_FONT_STEP),
+    Math.round((baseFontSize - warmStart) / STICKY_NOTE_FONT_STEP),
     0,
     steps,
   );
@@ -672,10 +672,10 @@ export const getStickyNoteLayout = (
   }
 
   const originalText = opts.originalText ?? textElement.originalText;
-  const fontSizeMax = normalizeStickyNoteFontSize(
-    opts.fontSizeMax ?? textElement.fontSizeMax ?? textElement.fontSize,
+  const baseFontSize = normalizeStickyNoteFontSize(
+    opts.baseFontSize ?? textElement.baseFontSize ?? textElement.fontSize,
   );
-  const fontSizeMin = Math.min(STICKY_NOTE_MIN_FONT_SIZE, fontSizeMax);
+  const fontSizeMin = Math.min(STICKY_NOTE_MIN_FONT_SIZE, baseFontSize);
   const maxWidth = Math.max(baseWidth - STICKY_NOTE_PADDING * 2, 1);
   const maxHeight = Math.max(baseHeight - STICKY_NOTE_BODY_INSET_Y, 0);
   const { fontFamily, lineHeight } = textElement;
@@ -690,15 +690,15 @@ export const getStickyNoteLayout = (
   const fitted: FontFit = isBlank
     ? {
         text: "",
-        fontSize: fontSizeMax,
+        fontSize: baseFontSize,
         ...measureText(
           "",
-          getFontString({ fontFamily, fontSize: fontSizeMax }),
+          getFontString({ fontFamily, fontSize: baseFontSize }),
           lineHeight,
         ),
       }
     : fitStickyNoteFont(fit, {
-        fontSizeMax,
+        baseFontSize,
         fontSizeMin,
         maxWidth,
         maxHeight,
@@ -731,7 +731,7 @@ export const getStickyNoteLayout = (
     text: {
       text: fitted.text,
       fontSize: fitted.fontSize,
-      fontSizeMax,
+      baseFontSize,
       width: fitted.width,
       height: fitted.height,
       x,
@@ -764,18 +764,18 @@ export const getStickyNoteResizeIntent = (
     fromCenter,
     flip = false,
   }: { proportional: boolean; fromCenter: boolean; flip?: boolean },
-): Pick<StickyNoteLayoutOpts, "baseHeight" | "fontSizeMax" | "anchor"> => {
+): Pick<StickyNoteLayoutOpts, "baseHeight" | "baseFontSize" | "anchor"> => {
   const origContainer = originalElementsMap.get(container.id);
   const origSticky = isStickyNoteElement(origContainer)
     ? origContainer
     : container;
   const origText = getBoundTextElement(origSticky, originalElementsMap);
   const ceiling = origText
-    ? origText.fontSizeMax ?? origText.fontSize
+    ? origText.baseFontSize ?? origText.fontSize
     : undefined;
 
   if (flip) {
-    return { baseHeight: origSticky.baseHeight, fontSizeMax: ceiling };
+    return { baseHeight: origSticky.baseHeight, baseFontSize: ceiling };
   }
 
   const changesHeight =
@@ -788,7 +788,7 @@ export const getStickyNoteResizeIntent = (
 
   return {
     baseHeight: changesHeight ? container.height : origSticky.baseHeight,
-    fontSizeMax: ceiling === undefined ? undefined : ceiling * scale,
+    baseFontSize: ceiling === undefined ? undefined : ceiling * scale,
     anchor: fromCenter
       ? "center"
       : handleDirection.includes("n")
@@ -848,7 +848,7 @@ const STICKY_NOTE_LAYOUT_INPUTS = {
   container: ["x", "y", "width", "baseHeight", "angle"],
   text: [
     "originalText",
-    "fontSizeMax",
+    "baseFontSize",
     "fontFamily",
     "lineHeight",
     "textAlign",

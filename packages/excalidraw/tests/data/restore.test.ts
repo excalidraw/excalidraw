@@ -218,7 +218,7 @@ describe("restoreElements", () => {
       text: "text",
     });
     textElement.fontSize = NaN;
-    textElement.fontSizeMax = "abc";
+    textElement.baseFontSize = "abc";
 
     const restoredText = restore.restoreElements(
       [textElement],
@@ -226,7 +226,7 @@ describe("restoreElements", () => {
     )[0] as ExcalidrawTextElement;
 
     expect(restoredText.fontSize).toBe(DEFAULT_FONT_SIZE);
-    expect(restoredText.fontSizeMax).toBe(null);
+    expect(restoredText.baseFontSize).toBe(null);
   });
 
   it("should clamp restored font ceilings to the sticky note maximum", () => {
@@ -234,14 +234,14 @@ describe("restoreElements", () => {
       type: "text",
       text: "text",
     });
-    textElement.fontSizeMax = 1e20;
+    textElement.baseFontSize = 1e20;
 
     const restoredText = restore.restoreElements(
       [textElement],
       null,
     )[0] as ExcalidrawTextElement;
 
-    expect(restoredText.fontSizeMax).toBe(STICKY_NOTE_MAX_FONT_SIZE);
+    expect(restoredText.baseFontSize).toBe(STICKY_NOTE_MAX_FONT_SIZE);
   });
 
   it("should clear a font ceiling on text that is not bound to a sticky note", () => {
@@ -252,13 +252,13 @@ describe("restoreElements", () => {
       text: "text",
       fontSize: 20,
     });
-    textElement.fontSizeMax = 28;
+    textElement.baseFontSize = 28;
 
     const restoredText = restore.restoreElements([textElement], null, {
       repairBindings: true,
     })[0] as ExcalidrawTextElement;
 
-    expect(restoredText.fontSizeMax).toBe(null);
+    expect(restoredText.baseFontSize).toBe(null);
   });
 
   it("should seed the font ceiling and a visible stroke on a sticky note label", () => {
@@ -277,7 +277,7 @@ describe("restoreElements", () => {
       }),
       strokeColor: COLOR_PALETTE.transparent,
     };
-    delete label.fontSizeMax;
+    delete label.baseFontSize;
 
     const restored = restore.restoreElements([stickyNote, label], null, {
       repairBindings: true,
@@ -286,7 +286,7 @@ describe("restoreElements", () => {
       (element) => element.id === "label",
     ) as ExcalidrawTextElement;
 
-    expect(restoredLabel.fontSizeMax).toBe(20);
+    expect(restoredLabel.baseFontSize).toBe(20);
     expect(restoredLabel.strokeColor).toBe(COLOR_PALETTE.black);
   });
 
@@ -372,7 +372,7 @@ describe("restoreElements", () => {
     expect(note.baseHeight).toBe(250);
     expect(note.height).toBeGreaterThan(250);
     expect(text.fontSize).toBe(STICKY_NOTE_MIN_FONT_SIZE);
-    expect(text.fontSizeMax).toBe(28);
+    expect(text.baseFontSize).toBe(28);
     expect(note.height).toBeCloseTo(
       getStickyNoteLayout(note, text).container.height,
     );

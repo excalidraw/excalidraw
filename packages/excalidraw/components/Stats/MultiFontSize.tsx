@@ -1,7 +1,7 @@
 import {
   getBoundTextElement,
-  getUserFontSize,
-  getUserFontSizeUpdate,
+  getBaseFontSize,
+  getBaseFontSizeUpdate,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
@@ -85,7 +85,7 @@ const handleFontSizeChange: DragInputCallbackType<
     for (const textElement of latestTextElements) {
       scene.mutateElement(
         textElement,
-        getUserFontSizeUpdate(textElement, nextFontSize, elementsMap),
+        getBaseFontSizeUpdate(textElement, nextFontSize, elementsMap),
       );
 
       redrawTextBoundingBox(
@@ -104,7 +104,7 @@ const handleFontSizeChange: DragInputCallbackType<
       const originalElement = originalTextElements[i];
 
       const originalFontSize = Math.round(
-        getUserFontSize(originalElement, elementsMap),
+        getBaseFontSize(originalElement, elementsMap),
       );
       const changeInFontSize = Math.round(accumulatedChange);
       let nextFontSize = Math.max(
@@ -116,7 +116,7 @@ const handleFontSizeChange: DragInputCallbackType<
       }
       scene.mutateElement(
         latestElement,
-        getUserFontSizeUpdate(latestElement, nextFontSize, elementsMap),
+        getBaseFontSizeUpdate(latestElement, nextFontSize, elementsMap),
       );
 
       redrawTextBoundingBox(
@@ -144,7 +144,7 @@ const MultiFontSize = ({
   }
 
   const fontSizes = latestTextElements.map(
-    (textEl) => Math.round(getUserFontSize(textEl, elementsMap) * 10) / 10,
+    (textEl) => Math.round(getBaseFontSize(textEl, elementsMap) * 10) / 10,
   );
   const value = new Set(fontSizes).size === 1 ? fontSizes[0] : "Mixed";
   const editable = fontSizes.length > 0;

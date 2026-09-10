@@ -91,7 +91,7 @@ export const actionUnbindText = register({
           width,
           height,
           text: boundTextElement.originalText,
-          fontSizeMax: null,
+          baseFontSize: null,
           x,
           y,
           labelPosition: null,
@@ -186,8 +186,8 @@ export const actionBindText = register({
         : null,
       ...(stickyInk
         ? {
-            fontSizeMax: normalizeStickyNoteFontSize(
-              textElement.fontSizeMax ?? textElement.fontSize,
+            baseFontSize: normalizeStickyNoteFontSize(
+              textElement.baseFontSize ?? textElement.fontSize,
             ),
             strokeColor: stickyInk,
           }

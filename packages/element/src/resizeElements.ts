@@ -771,7 +771,7 @@ export const resizeSingleElement = (
     // A note must fit one line at its label's font ceiling.
     minSize = boundTextElement
       ? getStickyNoteMinSize({
-          fontSize: boundTextElement.fontSizeMax ?? boundTextElement.fontSize,
+          fontSize: boundTextElement.baseFontSize ?? boundTextElement.fontSize,
           fontFamily: boundTextElement.fontFamily,
         })
       : { width: STICKY_NOTE_MIN_SIZE, height: STICKY_NOTE_MIN_SIZE };

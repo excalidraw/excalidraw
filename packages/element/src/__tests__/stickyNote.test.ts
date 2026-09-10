@@ -83,7 +83,7 @@ const createStickyWithText = (
     text: originalText,
     originalText,
     fontSize: STICKY_FONT_SIZE,
-    fontSizeMax: STICKY_FONT_SIZE,
+    baseFontSize: STICKY_FONT_SIZE,
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     containerId: baseSticky.id,
@@ -172,7 +172,7 @@ describe("sticky note text layout", () => {
 
     scene.mutateElement(text, {
       fontSize,
-      fontSizeMax: fontSize,
+      baseFontSize: fontSize,
     });
 
     const layout = getStickyNoteLayout(
@@ -204,8 +204,8 @@ describe("sticky note text layout", () => {
 
     // 1e20 - STICKY_NOTE_FONT_STEP === 1e20 in doubles: without the ceiling
     // clamp the descent loop would never progress
-    for (const fontSizeMax of [1e20, Infinity, NaN]) {
-      scene.mutateElement(text, { fontSizeMax });
+    for (const baseFontSize of [1e20, Infinity, NaN]) {
+      scene.mutateElement(text, { baseFontSize });
 
       const layout = getStickyNoteLayout(
         getSticky(scene, text.containerId),
@@ -232,7 +232,7 @@ describe("sticky note text layout", () => {
     expect(sticky.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
     expect(text.x - sticky.x).toBeGreaterThanOrEqual(STICKY_NOTE_PADDING);
     expect(text.y - sticky.y).toBeGreaterThanOrEqual(STICKY_NOTE_PADDING);
-    expect(text.fontSize).toBeLessThan(text.fontSizeMax!);
+    expect(text.fontSize).toBeLessThan(text.baseFontSize!);
     expect(text.fontSize).toBeGreaterThan(STICKY_NOTE_MIN_FONT_SIZE);
   });
 
@@ -259,7 +259,7 @@ describe("sticky note text layout", () => {
 
     expect(updatedSticky.height).toBe(updatedSticky.baseHeight);
     expect(updatedSticky.y).toBe(100);
-    expect(updatedText.fontSize).toBe(updatedText.fontSizeMax);
+    expect(updatedText.fontSize).toBe(updatedText.baseFontSize);
   });
 
   it("keeps the bottom edge anchored when a north resize is content-pinned", () => {
@@ -338,7 +338,7 @@ describe("sticky note text layout", () => {
     // "se" holds the top-left corner
     expect(updatedSticky.y).toBeCloseTo(originalSticky.y);
     expect(updatedText.fontSize).toBe(originalText.fontSize);
-    expect(updatedText.fontSizeMax).toBe(originalText.fontSizeMax);
+    expect(updatedText.baseFontSize).toBe(originalText.baseFontSize);
   });
 
   it("scales the note, its base height and its font ceiling on a proportional resize", () => {
@@ -366,7 +366,7 @@ describe("sticky note text layout", () => {
     expect(updatedSticky.width).toBe(500);
     expect(updatedSticky.height).toBe(500);
     expect(updatedSticky.baseHeight).toBe(500);
-    expect(updatedText.fontSizeMax).toBe(STICKY_FONT_SIZE * 2);
+    expect(updatedText.baseFontSize).toBe(STICKY_FONT_SIZE * 2);
     expect(updatedText.fontSize).toBe(STICKY_FONT_SIZE * 2);
   });
 
@@ -419,7 +419,7 @@ describe("sticky note text layout", () => {
       { shouldMaintainAspectRatio: true },
     );
     expect(getSticky(scene, stickyId).baseHeight).toBe(500);
-    expect(getBoundText(scene, textId).fontSizeMax).toBe(STICKY_FONT_SIZE * 2);
+    expect(getBoundText(scene, textId).baseFontSize).toBe(STICKY_FONT_SIZE * 2);
 
     // Shift released, same gesture: the ceiling goes back to the
     // gesture-start value instead of compounding from the live 56
@@ -434,7 +434,7 @@ describe("sticky note text layout", () => {
     );
     expect(getSticky(scene, stickyId).width).toBe(400);
     expect(getSticky(scene, stickyId).baseHeight).toBe(300);
-    expect(getBoundText(scene, textId).fontSizeMax).toBe(STICKY_FONT_SIZE);
+    expect(getBoundText(scene, textId).baseFontSize).toBe(STICKY_FONT_SIZE);
     expect(getBoundText(scene, textId).fontSize).toBe(STICKY_FONT_SIZE);
 
     // and a width-only move restores the gesture-start base height too
@@ -483,7 +483,7 @@ describe("sticky note text layout", () => {
 
     expect(updatedSticky.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
     expect(updatedSticky.height).toBeCloseTo(grownHeight);
-    expect(updatedText.fontSizeMax).toBe(STICKY_FONT_SIZE);
+    expect(updatedText.baseFontSize).toBe(STICKY_FONT_SIZE);
     expect(updatedSticky.angle).not.toBeCloseTo(0.5);
     expect(updatedText.angle).toBeCloseTo(updatedSticky.angle);
   });
@@ -582,7 +582,7 @@ describe("sticky note text layout", () => {
     expect(updatedSticky.width).toBe(500);
     expect(updatedSticky.height).toBe(500);
     expect(updatedSticky.baseHeight).toBe(500);
-    expect(updatedText.fontSizeMax).toBe(STICKY_FONT_SIZE * 2);
+    expect(updatedText.baseFontSize).toBe(STICKY_FONT_SIZE * 2);
     expect(updatedText.fontSize).toBe(STICKY_FONT_SIZE * 2);
   });
 
@@ -655,7 +655,7 @@ describe("sticky note text layout", () => {
     const updatedText = getBoundText(scene, textId);
     expect(updatedSticky.width).toBe(DEFAULT_STICKY_NOTE_SIZE);
     expect(updatedSticky.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
-    expect(updatedText.fontSizeMax).toBe(STICKY_FONT_SIZE);
+    expect(updatedText.baseFontSize).toBe(STICKY_FONT_SIZE);
     expect(updatedText.fontSize).toBe(STICKY_FONT_SIZE);
   });
 
@@ -705,7 +705,7 @@ describe("sticky note text layout", () => {
       { ...text, fontSize: STICKY_NOTE_MAX_FONT_SIZE },
       {
         originalText: Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n"),
-        fontSizeMax: STICKY_NOTE_MAX_FONT_SIZE,
+        baseFontSize: STICKY_NOTE_MAX_FONT_SIZE,
       },
     );
     expect(measure.mock.calls.length).toBeLessThanOrEqual(12);
@@ -718,10 +718,10 @@ describe("sticky note text layout", () => {
     const text = getBoundText(scene, textId);
     expect(text.fontSize).toBe(STICKY_FONT_SIZE);
 
-    const layout = getStickyNoteLayout(sticky, text, { fontSizeMax: 20 });
+    const layout = getStickyNoteLayout(sticky, text, { baseFontSize: 20 });
 
     expect(layout.text!.fontSize).toBe(20);
-    expect(layout.text!.fontSizeMax).toBe(20);
+    expect(layout.text!.baseFontSize).toBe(20);
   });
 
   it("keeps odd and fractional ceilings reachable and stays on the ceiling-anchored grid", () => {
@@ -730,16 +730,16 @@ describe("sticky note text layout", () => {
     const text = getBoundText(scene, textId);
 
     expect(
-      getStickyNoteLayout(sticky, text, { fontSizeMax: 27 }).text!.fontSize,
+      getStickyNoteLayout(sticky, text, { baseFontSize: 27 }).text!.fontSize,
     ).toBe(27);
     expect(
-      getStickyNoteLayout(sticky, text, { fontSizeMax: 27.5 }).text!.fontSize,
+      getStickyNoteLayout(sticky, text, { baseFontSize: 27.5 }).text!.fontSize,
     ).toBe(27.5);
 
     const overflowing = Array(7).fill("abcdefghij").join("\n");
     const fitted = getStickyNoteLayout(sticky, text, {
       originalText: overflowing,
-      fontSizeMax: 27,
+      baseFontSize: 27,
     }).text!.fontSize;
     expect(fitted).toBeLessThan(27);
     expect(
@@ -832,7 +832,7 @@ describe("sticky note text layout", () => {
     expect(resized.x).toBe(100);
     // mirrored over the original top edge (y = 100)
     expect(resized.y).toBe(100 - 400);
-    expect(text.fontSizeMax).toBeCloseTo(STICKY_FONT_SIZE * (400 / 250));
+    expect(text.baseFontSize).toBeCloseTo(STICKY_FONT_SIZE * (400 / 250));
     // the label is laid out inside the flipped note, upright
     expect(text.angle).toBe(0);
     expect(text.y).toBeGreaterThan(resized.y);

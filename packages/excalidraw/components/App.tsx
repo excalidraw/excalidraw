@@ -7022,10 +7022,10 @@ class App extends React.Component<AppProps, AppState> {
         opacity: this.state.currentItemOpacity,
         text: "",
         fontSize,
-        fontSizeMax:
+        baseFontSize:
           shouldBindToContainer && isStickyNoteElement(container)
             ? fontSize
-            : undefined,
+            : null,
         fontFamily,
         textAlign:
           arrowEndpointBinding?.textAlign ??

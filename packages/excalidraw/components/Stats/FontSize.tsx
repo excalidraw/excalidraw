@@ -1,7 +1,7 @@
 import {
   getBoundTextElement,
-  getUserFontSize,
-  getUserFontSizeUpdate,
+  getBaseFontSize,
+  getBaseFontSizeUpdate,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 import { hasBoundTextElement, isTextElement } from "@excalidraw/element";
@@ -56,7 +56,7 @@ const handleFontSizeChange: DragInputCallbackType<
       nextFontSize = Math.max(Math.round(nextValue), MIN_FONT_SIZE);
     } else if (origElement.type === "text") {
       const originalFontSize = Math.round(
-        getUserFontSize(origElement, elementsMap),
+        getBaseFontSize(origElement, elementsMap),
       );
       const changeInFontSize = Math.round(accumulatedChange);
       nextFontSize = Math.max(
@@ -71,7 +71,7 @@ const handleFontSizeChange: DragInputCallbackType<
     if (nextFontSize) {
       scene.mutateElement(
         latestElement,
-        getUserFontSizeUpdate(latestElement, nextFontSize, elementsMap),
+        getBaseFontSizeUpdate(latestElement, nextFontSize, elementsMap),
       );
       redrawTextBoundingBox(
         latestElement,
@@ -98,7 +98,7 @@ const FontSize = ({ element, scene, appState, property }: FontSizeProps) => {
       label="F"
       value={
         Math.round(
-          getUserFontSize(_element, scene.getNonDeletedElementsMap()) * 10,
+          getBaseFontSize(_element, scene.getNonDeletedElementsMap()) * 10,
         ) / 10
       }
       elements={[_element]}

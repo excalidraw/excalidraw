@@ -13,7 +13,7 @@ import { pointFrom } from "@excalidraw/math";
 import {
   getStickyNoteLayout,
   getTransformHandles,
-  getUserFontSize,
+  getBaseFontSize,
   resizeMultipleElements,
   resizeSingleElement,
   updateStickyNoteLayout,
@@ -214,7 +214,7 @@ describe("sticky notes", () => {
     const label = getElement<ExcalidrawTextElement>(text.id);
     const grown = getElement<ExcalidrawStickyNoteElement>(note.id);
     expect(label.containerId).toBe(note.id);
-    expect(label.fontSizeMax).toBe(28);
+    expect(label.baseFontSize).toBe(28);
     expect(label.fontSize).toBe(STICKY_NOTE_MIN_FONT_SIZE);
     expect(grown.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
     expect(grown.height).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
@@ -226,7 +226,7 @@ describe("sticky notes", () => {
     const emptied = getElement<ExcalidrawStickyNoteElement>(note.id);
     expect(freed.containerId).toBe(null);
     // the ceiling is cleared for good (`undefined` would be skipped by the mutator)
-    expect(freed.fontSizeMax).toBe(null);
+    expect(freed.baseFontSize).toBe(null);
     expect(emptied.boundElements ?? []).toEqual([]);
     expect(emptied.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
   });
@@ -255,7 +255,7 @@ describe("sticky notes", () => {
     const note = getElement<ExcalidrawStickyNoteElement>(target.note.id);
     const label = getElement<ExcalidrawTextElement>(target.label.id);
     // the user's ceiling was copied, not the source's fitted size
-    expect(label.fontSizeMax).toBe(10);
+    expect(label.baseFontSize).toBe(10);
     // the note shrank with its smaller label, and the pair is self-consistent
     // (no phantom container: the returned note carries the new layout)
     expect(note.height).toBeLessThan(grownHeight);
@@ -553,7 +553,7 @@ describe("sticky notes", () => {
         h.app.actionManager.executeAction(actionChangeFontSize, "ui", 20);
       });
 
-      expect(getElement<ExcalidrawTextElement>(label.id).fontSizeMax).toBe(20);
+      expect(getElement<ExcalidrawTextElement>(label.id).baseFontSize).toBe(20);
       expect(getElement(note.id).height).toBeGreaterThan(
         DEFAULT_STICKY_NOTE_SIZE,
       );
@@ -661,7 +661,7 @@ describe("sticky notes", () => {
       API.executeAction(actionPasteStyles);
 
       expect(
-        getElement<ExcalidrawTextElement>(target.label.id).fontSizeMax,
+        getElement<ExcalidrawTextElement>(target.label.id).baseFontSize,
       ).toBe(28);
     });
 
@@ -716,11 +716,11 @@ describe("sticky notes", () => {
       // what generic binding repair can leave behind
       act(() => {
         h.app.scene.mutateElement(getElement<ExcalidrawTextElement>(text.id), {
-          fontSizeMax: 28,
+          baseFontSize: 28,
         });
       });
       expect(
-        getUserFontSize(
+        getBaseFontSize(
           getElement<ExcalidrawTextElement>(text.id),
           h.app.scene.getNonDeletedElementsMap(),
         ),
@@ -731,7 +731,7 @@ describe("sticky notes", () => {
 
       const after = getElement<ExcalidrawTextElement>(text.id);
       expect(after.fontSize).toBe(22);
-      expect(after.fontSizeMax).toBe(28);
+      expect(after.baseFontSize).toBe(28);
     });
 
     it("duplicates a note with its label's ceiling and base height", () => {
@@ -760,9 +760,9 @@ describe("sticky notes", () => {
       ) as ExcalidrawTextElement;
       expect(copy.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
       expect(copy.height).toBeCloseTo(getElement(note.id).height);
-      expect(copyLabel.fontSizeMax).toBe(28);
+      expect(copyLabel.baseFontSize).toBe(28);
       expect(
-        getUserFontSize(copyLabel, h.app.scene.getNonDeletedElementsMap()),
+        getBaseFontSize(copyLabel, h.app.scene.getNonDeletedElementsMap()),
       ).toBe(28);
     });
   });
@@ -849,7 +849,7 @@ describe("sticky notes", () => {
 
     it("skips empty-label cleanup after a font change captures creation", async () => {
       const editor = await createNoteByClick();
-      // Changing the empty label's fontSizeMax is invisible too.
+      // Changing the empty label's baseFontSize is invisible too.
       act(() => {
         h.app.actionManager.executeAction(actionChangeFontSize, "ui", 28);
       });
@@ -901,7 +901,7 @@ describe("sticky notes", () => {
       return { note: getElement<ExcalidrawStickyNoteElement>(note.id), label };
     };
     const ceiling = (id: string) =>
-      getElement<ExcalidrawTextElement>(id).fontSizeMax;
+      getElement<ExcalidrawTextElement>(id).baseFontSize;
 
     it("resizes proportionally from a corner by default and scales the ceiling", () => {
       const { note, label } = setup();
@@ -1058,7 +1058,7 @@ describe("sticky notes", () => {
       UI.updateInput(groupWidth, String(Number(groupWidth.value) * 2));
       updated = getElement<ExcalidrawStickyNoteElement>(note.id);
       expect(updated.width).toBe(800);
-      expect(getElement<ExcalidrawTextElement>(label.id).fontSizeMax).toBe(56);
+      expect(getElement<ExcalidrawTextElement>(label.id).baseFontSize).toBe(56);
     });
   });
 

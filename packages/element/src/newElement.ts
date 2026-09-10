@@ -344,7 +344,7 @@ export const newTextElement = (
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
     labelPosition?: ExcalidrawTextElement["labelPosition"];
-    fontSizeMax?: ExcalidrawTextElement["fontSizeMax"];
+    baseFontSize?: ExcalidrawTextElement["baseFontSize"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -367,7 +367,7 @@ export const newTextElement = (
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
     fontSize,
-    fontSizeMax: opts.fontSizeMax ?? null,
+    baseFontSize: opts.baseFontSize ?? null,
     fontFamily,
     textAlign,
     verticalAlign,

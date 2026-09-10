@@ -47,8 +47,8 @@ import { getArrowheadForPicker } from "@excalidraw/element";
 
 import {
   getBoundTextElement,
-  getUserFontSize,
-  getUserFontSizeUpdate,
+  getBaseFontSize,
+  getBaseFontSizeUpdate,
   redrawTextBoundingBox,
 } from "@excalidraw/element";
 
@@ -311,7 +311,7 @@ const changeFontSize = (
 
         let newElement: ExcalidrawTextElement = newElementWith(
           oldElement,
-          getUserFontSizeUpdate(oldElement, newFontSize, elementsMap),
+          getBaseFontSizeUpdate(oldElement, newFontSize, elementsMap),
         );
         redrawTextBoundingBox(newElement, container, app.scene);
 
@@ -1026,14 +1026,14 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
                 (element) => {
                   const elementsMap = app.scene.getNonDeletedElementsMap();
                   if (isTextElement(element)) {
-                    return getUserFontSize(element, elementsMap);
+                    return getBaseFontSize(element, elementsMap);
                   }
                   const boundTextElement = getBoundTextElement(
                     element,
                     elementsMap,
                   );
                   if (boundTextElement) {
-                    return getUserFontSize(boundTextElement, elementsMap);
+                    return getBaseFontSize(boundTextElement, elementsMap);
                   }
                   return null;
                 },
@@ -1075,7 +1075,7 @@ export const actionDecreaseFontSize = register({
         // get previous value before relative increase (doesn't work fully
         // due to rounding and float precision issues)
         (1 / (1 + FONT_SIZE_RELATIVE_INCREASE_STEP)) *
-          getUserFontSize(element, app.scene.getNonDeletedElementsMap()),
+          getBaseFontSize(element, app.scene.getNonDeletedElementsMap()),
       ),
     );
   },
@@ -1097,7 +1097,7 @@ export const actionIncreaseFontSize = register({
   perform: (elements, appState, value, app) => {
     return changeFontSize(elements, appState, app, (element) =>
       Math.round(
-        getUserFontSize(element, app.scene.getNonDeletedElementsMap()) *
+        getBaseFontSize(element, app.scene.getNonDeletedElementsMap()) *
           (1 + FONT_SIZE_RELATIVE_INCREASE_STEP),
       ),
     );

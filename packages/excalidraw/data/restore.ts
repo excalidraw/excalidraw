@@ -577,8 +577,8 @@ export const restoreElement = (
           : null,
         // only meaningful for sticky note labels; reconciled against the
         // container in `restoreStickyNotes` once bindings are repaired
-        fontSizeMax: isFiniteNumber(element.fontSizeMax)
-          ? normalizeStickyNoteFontSize(element.fontSizeMax)
+        baseFontSize: isFiniteNumber(element.baseFontSize)
+          ? normalizeStickyNoteFontSize(element.baseFontSize)
           : null,
       });
 
@@ -891,7 +891,7 @@ const repairFrameMembership = (
 /**
  * Sticky note invariants that need both halves of the pair present, so they
  * run after binding repair. Mutates elements (like the repair helpers).
- * - a label's `fontSizeMax` is meaningful only while bound to a sticky note:
+ * - a label's `baseFontSize` is meaningful only while bound to a sticky note:
  *   seeded from `fontSize` when missing, cleared everywhere else
  * - a sticky label's stroke is never transparent (it is the visible text)
  * - a note's stroke — its ink, which the footer paints with — equals its label's
@@ -917,16 +917,16 @@ const restoreStickyNotes = (
           : element.strokeColor,
       );
       Object.assign(element, {
-        fontSizeMax: normalizeStickyNoteFontSize(
-          element.fontSizeMax ?? element.fontSize,
+        baseFontSize: normalizeStickyNoteFontSize(
+          element.baseFontSize ?? element.fontSize,
         ),
         strokeColor,
       });
       if (container && container.strokeColor !== strokeColor) {
         Object.assign(container, { strokeColor });
       }
-    } else if (element.fontSizeMax != null) {
-      Object.assign(element, { fontSizeMax: null });
+    } else if (element.baseFontSize != null) {
+      Object.assign(element, { baseFontSize: null });
     }
   }
 

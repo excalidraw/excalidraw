@@ -97,6 +97,10 @@ export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
 export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
   Readonly<{
     type: "stickynote";
+    /**
+     * The height the user set, from which the layout derives `height`: the
+     * note grows above it to fit its label and never shrinks below it
+     */
     baseHeight: number;
   }>;
 
@@ -252,12 +256,14 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     fontSize: number;
     fontFamily: FontFamilyValues;
     /**
-     * Sticky note labels only: the font size the user picked, which the
-     * auto-fit shrinks `fontSize` from. `null`/absent for every other text.
-     * Read it through `getUserFontSize` — generic binding repair can detach a
-     * label without clearing this, so the container decides its meaning.
+     * The font size the user picked, from which the layout derives `fontSize`.
+     * Today only sticky note labels have one: the auto-fit shrinks below it
+     * and never above it (compare `baseHeight`, which the note grows above).
+     * `null` for every other text. Read it through `getBaseFontSize` —
+     * generic binding repair can detach a label without clearing this, so
+     * the container decides its meaning.
      */
-    fontSizeMax?: number | null;
+    baseFontSize: number | null;
     text: string;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;

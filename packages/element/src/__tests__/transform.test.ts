@@ -1156,7 +1156,7 @@ describe("Test Transform", () => {
       expect(elements).toHaveLength(2);
       expect(label.containerId).toBe(note.id);
       expect(note.boundElements).toEqual([{ type: "text", id: label.id }]);
-      expect(label.fontSizeMax).toBe(28);
+      expect(label.baseFontSize).toBe(28);
       expect(label.fontSize).toBe(28);
       // the label is the note's visible text: it takes the note's stroke
       expect(label.strokeColor).toBe("#1971c2");
@@ -1182,7 +1182,7 @@ describe("Test Transform", () => {
       const label = find<ExcalidrawTextElement>(elements, "text");
 
       expect(label.fontSize).toBe(STICKY_NOTE_MIN_FONT_SIZE);
-      expect(label.fontSizeMax).toBe(28);
+      expect(label.baseFontSize).toBe(28);
       expect(note.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
       expect(note.height).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
     });

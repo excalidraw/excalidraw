@@ -23,8 +23,8 @@ import {
   isStickyNoteBoundText,
   isStickyNoteElement,
   isTextElement,
-  getUserFontSize,
-  getUserFontSizeUpdate,
+  getBaseFontSize,
+  getBaseFontSizeUpdate,
   relayoutStickyNotes,
   updateBoundElements,
 } from "@excalidraw/element";
@@ -138,7 +138,7 @@ export const actionPasteStyles = register({
                 elementStylesToCopyFrom as ExcalidrawTextElement;
               const fontSize =
                 (isTextElement(elementStylesToCopyFrom)
-                  ? getUserFontSize(elementStylesToCopyFrom, copiedElementsMap)
+                  ? getBaseFontSize(elementStylesToCopyFrom, copiedElementsMap)
                   : sourceText.fontSize) || DEFAULT_FONT_SIZE;
               const fontFamily = sourceText.fontFamily || DEFAULT_FONT_FAMILY;
               let container = null;
@@ -150,7 +150,7 @@ export const actionPasteStyles = register({
                   ) || null;
               }
               const newTextElement = newElementWith(newElement, {
-                ...getUserFontSizeUpdate(newElement, fontSize, elementsMap),
+                ...getBaseFontSizeUpdate(newElement, fontSize, elementsMap),
                 fontFamily,
                 textAlign: sourceText.textAlign || DEFAULT_TEXT_ALIGN,
                 lineHeight: sourceText.lineHeight || getLineHeight(fontFamily),
