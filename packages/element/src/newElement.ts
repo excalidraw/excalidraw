@@ -367,7 +367,7 @@ export const newTextElement = (
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
     fontSize,
-    fontSizeMax: opts.fontSizeMax,
+    fontSizeMax: opts.fontSizeMax ?? null,
     fontFamily,
     textAlign,
     verticalAlign,
