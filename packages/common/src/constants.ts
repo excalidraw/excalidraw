@@ -6,6 +6,8 @@ import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
 
 import { COLOR_PALETTE } from "./colors";
 
+export { DEFAULT_STICKY_NOTE_BG } from "./colors";
+
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
 
@@ -252,7 +254,6 @@ export const DEFAULT_STICKY_NOTE_SIZE = 250;
 // floor for a finalized note's width and base height; the UI floor is font-aware
 // on top of it (see `getStickyNoteMinSize`)
 export const STICKY_NOTE_MIN_SIZE = 75;
-export const DEFAULT_STICKY_NOTE_BG = "#ffd43b";
 export const STICKY_NOTE_SHADOW_OFFSET = 3;
 export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
 export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
