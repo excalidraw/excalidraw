@@ -1152,6 +1152,7 @@ export type AppClassProperties = {
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
   toolDrag: App["toolDrag"];
+  activeResizeHandle: App["activeResizeHandle"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];

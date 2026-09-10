@@ -12,6 +12,7 @@ import { pointFrom } from "@excalidraw/math";
 
 import {
   getStickyNoteLayout,
+  getTransformHandles,
   getUserFontSize,
   resizeMultipleElements,
   resizeSingleElement,
@@ -884,6 +885,98 @@ describe("sticky notes", () => {
       expect(liveNotes()).toHaveLength(1);
       Keyboard.redo();
       expect(getElement<ExcalidrawTextElement>(label.id).text).toBe("hello");
+    });
+  });
+
+  describe("resize handles", () => {
+    const setup = () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: "hi",
+        fontSize: 28,
+      });
+      API.setElements([note, label]);
+      layoutNotes(note.id);
+      API.setSelectedElements([getElement(note.id)]);
+      return { note: getElement<ExcalidrawStickyNoteElement>(note.id), label };
+    };
+    const ceiling = (id: string) =>
+      getElement<ExcalidrawTextElement>(id).fontSizeMax;
+
+    it("resizes proportionally from a corner by default and scales the ceiling", () => {
+      const { note, label } = setup();
+      UI.resize(note, "se", [50, 0]);
+
+      const resized = getElement<ExcalidrawStickyNoteElement>(note.id);
+      expect(resized.width).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
+      expect(resized.height).toBeCloseTo(resized.width);
+      expect(resized.baseHeight).toBeCloseTo(resized.height);
+      expect(ceiling(label.id)).toBeCloseTo(
+        (28 * resized.width) / DEFAULT_STICKY_NOTE_SIZE,
+      );
+    });
+
+    it("resizes freely from a corner with Shift, leaving the ceiling alone", () => {
+      const { note, label } = setup();
+      UI.resize(note, "se", [50, 0], { shift: true });
+
+      const resized = getElement<ExcalidrawStickyNoteElement>(note.id);
+      expect(resized.width).toBe(DEFAULT_STICKY_NOTE_SIZE + 50);
+      expect(resized.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(ceiling(label.id)).toBe(28);
+    });
+
+    it("resizes an edge freely by default, keeping the base height and ceiling", () => {
+      const { note, label } = setup();
+      UI.resize(note, "e", [50, 0]);
+
+      const resized = getElement<ExcalidrawStickyNoteElement>(note.id);
+      expect(resized.width).toBe(DEFAULT_STICKY_NOTE_SIZE + 50);
+      expect(resized.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(resized.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(ceiling(label.id)).toBe(28);
+    });
+
+    const hintWhileDragging = (
+      note: ExcalidrawStickyNoteElement,
+      handle: "se" | "e",
+    ) => {
+      const [x, y, width, height] = getTransformHandles(
+        note,
+        h.state.zoom,
+        h.app.scene.getNonDeletedElementsMap(),
+        "mouse",
+        {},
+      )[handle]!;
+      mouse.reset();
+      mouse.downAt(x + width / 2, y + height / 2);
+      mouse.moveTo(x + width / 2 + 30, y + height / 2 + 30);
+      const hint =
+        h.app.ownerDocument.querySelector(".HintViewer")?.textContent ?? "";
+      mouse.up();
+      return hint;
+    };
+
+    it("hints that a corner is proportional and Shift frees it", () => {
+      const { note } = setup();
+      expect(hintWhileDragging(note, "se")).toContain("resize freely");
+    });
+
+    it("hints that an edge is free and Shift constrains it", () => {
+      const { note } = setup();
+      expect(hintWhileDragging(note, "e")).toContain("constrain proportions");
+    });
+
+    it("constrains an edge with Shift and scales the ceiling", () => {
+      const { note, label } = setup();
+      UI.resize(note, "e", [50, 0], { shift: true });
+
+      const resized = getElement<ExcalidrawStickyNoteElement>(note.id);
+      expect(resized.width).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
+      expect(resized.height).toBeCloseTo(resized.width);
+      expect(ceiling(label.id)).toBeCloseTo(
+        (28 * resized.width) / DEFAULT_STICKY_NOTE_SIZE,
+      );
     });
   });
 

@@ -295,7 +295,10 @@ import type {
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
 
-import type { ArrowEndpoint } from "@excalidraw/element";
+import type {
+  ArrowEndpoint,
+  TransformHandleDirection,
+} from "@excalidraw/element";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -725,6 +728,13 @@ class App extends React.Component<AppProps, AppState> {
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
+  /**
+   * the handle of the resize in progress while `state.isResizing` — for UI
+   * that words itself by handle (a sticky note's corners resize
+   * proportionally, its edges freely); not app state, so it costs no
+   * re-render of its own
+   */
+  activeResizeHandle: TransformHandleDirection | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   // TODO this is a hack and we should ideally unify touch and pointer events
@@ -11646,6 +11656,7 @@ class App extends React.Component<AppProps, AppState> {
         isCropping,
       } = this.state;
 
+      this.activeResizeHandle = null;
       this.setState((prevState) => ({
         isResizing: false,
         isRotating: false,
@@ -12046,8 +12057,9 @@ class App extends React.Component<AppProps, AppState> {
           });
           let width = Math.max(newElement.width, minSize.width);
           let height = Math.max(newElement.height, minSize.height);
-          if (shouldMaintainAspectRatio(childEvent)) {
-            // the two floors differ, so a square drag stays square
+          if (!shouldMaintainAspectRatio(childEvent)) {
+            // a plain drag is proportional (Shift frees it); the two floors
+            // differ, so the square is kept through the snap
             width = height = Math.max(width, height);
           }
           const { originInGrid } = pointerDownState;
@@ -13595,9 +13607,12 @@ class App extends React.Component<AppProps, AppState> {
         y: gridY,
         width: distance(pointerDownState.originInGrid.x, gridX),
         height: distance(pointerDownState.originInGrid.y, gridY),
-        shouldMaintainAspectRatio: isImageElement(newElement)
-          ? !shouldMaintainAspectRatio(event)
-          : shouldMaintainAspectRatio(event),
+        // images and sticky notes are proportional by default — Shift frees
+        // them; every other shape is free by default and Shift constrains it
+        shouldMaintainAspectRatio:
+          isImageElement(newElement) || isStickyNoteElement(newElement)
+            ? !shouldMaintainAspectRatio(event)
+            : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter: shouldResizeFromCenter(event),
         zoom: this.state.zoom.value,
         scene: this.scene,
@@ -13739,6 +13754,10 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
 
+    this.activeResizeHandle =
+      transformHandleType && transformHandleType !== "rotation"
+        ? transformHandleType
+        : null;
     this.setState({
       // TODO: rename this state field to "isScaling" to distinguish
       // it from the generic "isResizing" which includes scaling and
@@ -13811,6 +13830,16 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
+    // images are proportional by default, and so is a sticky note's corner
+    // (its label's font ceiling scales with it); Shift frees them. A note's
+    // edges stay free by default — Shift constrains them like any shape.
+    const proportionalByDefault =
+      selectedElements.some((element) => isImageElement(element)) ||
+      (selectedElements.length === 1 &&
+        isStickyNoteElement(selectedElements[0]) &&
+        typeof transformHandleType === "string" &&
+        transformHandleType.length === 2);
+
     if (
       transformElements(
         pointerDownState.originalElements,
@@ -13819,7 +13848,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
-        selectedElements.some((element) => isImageElement(element))
+        proportionalByDefault
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         resizeX,

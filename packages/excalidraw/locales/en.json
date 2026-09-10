@@ -386,6 +386,7 @@
     "lockAngle": "You can constrain angle by holding {{shortcut}}",
     "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
     "resizeImage": "You can resize freely by holding {{shortcut_1}},\nhold {{shortcut_2}} to resize from the center",
+    "resizeStickyNote": "hold {{shortcut_1}} to resize freely, {{shortcut_2}} to resize from the center",
     "rotate": "You can constrain angles by holding {{shortcut}} while rotating",
     "toggleArrowhead": "Double-click to toggle the arrowhead",
     "lineEditor_info": "Hold {{shortcut_1}} and Double-click or press {{shortcut_2}} to edit points",
