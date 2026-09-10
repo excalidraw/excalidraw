@@ -42,7 +42,11 @@ import {
   updateStickyNoteLayout,
 } from "../stickyNote";
 import * as textMeasurements from "../textMeasurements";
-import { getBoundTextMaxHeight, redrawTextBoundingBox } from "../textElement";
+import {
+  computeBoundTextPosition,
+  getBoundTextMaxHeight,
+  redrawTextBoundingBox,
+} from "../textElement";
 
 import type {
   ExcalidrawElement,
@@ -773,12 +777,15 @@ describe("sticky note text layout", () => {
     const originalElementsMap = arrayToMap(
       scene.getNonDeletedElements().map((element) => ({ ...element })),
     );
-    // 28 × 1.25 = 35px line: 75 wide (floor), 35 + 64 = 99 high
+    // 28 × 1.25 = 35px line: 75 wide (floor), 35 + the vertical inset high
     const minSize = getStickyNoteMinSize({
       fontSize: STICKY_FONT_SIZE,
       fontFamily: FONT_FAMILY.Excalifont,
     });
-    expect(minSize).toEqual({ width: STICKY_NOTE_MIN_SIZE, height: 99 });
+    expect(minSize).toEqual({
+      width: STICKY_NOTE_MIN_SIZE,
+      height: 35 + STICKY_NOTE_BODY_INSET_Y,
+    });
 
     resizeSingleElement(
       40,
@@ -794,6 +801,54 @@ describe("sticky note text layout", () => {
     expect(resized.width).toBe(minSize.width);
     expect(resized.baseHeight).toBe(minSize.height);
     expect(resized.height).toBe(minSize.height);
+    scene.destroy();
+  });
+
+  it.each([0, Math.PI / 4, Math.PI / 2])(
+    "centers a middle-aligned label in the whole note, footer ignored, at angle %s",
+    (angle) => {
+      const { scene, stickyId, textId } = createStickyWithText("Balanced");
+      const sticky = getSticky(scene, stickyId);
+      const text = getBoundText(scene, textId);
+      scene.mutateElement(sticky, { angle: angle as Radians });
+      redrawTextBoundingBox(text, sticky, scene);
+
+      // the label's center is the note's center, not the center of the body
+      // above the footer (which would sit half a footer higher)
+      const [centerX, centerY] = pointRotateRads(
+        pointFrom(text.x + text.width / 2, text.y + text.height / 2),
+        pointFrom(sticky.x + sticky.width / 2, sticky.y + sticky.height / 2),
+        -angle as Radians,
+      );
+      expect(centerX).toBeCloseTo(sticky.x + sticky.width / 2);
+      expect(centerY).toBeCloseTo(sticky.y + sticky.height / 2);
+      scene.destroy();
+    },
+  );
+
+  it("pushes a middle-aligned label up only once centering would overlap the footer", () => {
+    const { scene, stickyId, textId } = createStickyWithText("Tall");
+    const sticky = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    const elementsMap = scene.getNonDeletedElementsMap();
+    const paddedHeight = sticky.height - STICKY_NOTE_PADDING * 2;
+    const bodyBottom =
+      sticky.y +
+      sticky.height -
+      STICKY_NOTE_PADDING -
+      STICKY_NOTE_FOOTER.height;
+
+    // fits centered with room to spare above the footer
+    const short = { ...text, height: 100 };
+    expect(computeBoundTextPosition(sticky, short, elementsMap).y).toBeCloseTo(
+      sticky.y + STICKY_NOTE_PADDING + (paddedHeight - 100) / 2,
+    );
+
+    // centered it would run into the footer: it ends at the body's bottom
+    const tall = { ...text, height: paddedHeight - STICKY_NOTE_FOOTER.height };
+    expect(computeBoundTextPosition(sticky, tall, elementsMap).y).toBeCloseTo(
+      bodyBottom - tall.height,
+    );
     scene.destroy();
   });
 
@@ -863,10 +918,7 @@ describe("sticky note creation date", () => {
     expect(footer(DEFAULT_STICKY_NOTE_SIZE)).toEqual({
       text: "30 May 2025",
       x: DEFAULT_STICKY_NOTE_SIZE - STICKY_NOTE_PADDING,
-      y:
-        DEFAULT_STICKY_NOTE_SIZE -
-        STICKY_NOTE_PADDING -
-        STICKY_NOTE_FOOTER.baselineOffset,
+      y: DEFAULT_STICKY_NOTE_SIZE - STICKY_NOTE_FOOTER.baselineFromBottom,
     });
     expect(footer(yearWidth)?.text).toBe("30 May 2025");
     expect(footer(yearWidth - 1)?.text).toBe("30 May");

@@ -266,6 +266,18 @@ export const computeBoundTextPosition = (
     y = containerCoords.y;
   } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
     y = containerCoords.y + (maxContainerHeight - boundTextElement.height);
+  } else if (isStickyNoteElement(container)) {
+    // a note's label body ends above the creation-date footer, but a label
+    // centered in that body sits visibly high — center it in the whole
+    // padded note while it stays clear of the footer, and only push it up
+    // against the body's bottom once it would overlap
+    const paddedHeight = container.height - STICKY_NOTE_PADDING * 2;
+    y =
+      containerCoords.y +
+      Math.min(
+        (paddedHeight - boundTextElement.height) / 2,
+        maxContainerHeight - boundTextElement.height,
+      );
   } else {
     y =
       containerCoords.y +

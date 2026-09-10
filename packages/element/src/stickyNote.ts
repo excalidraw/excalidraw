@@ -431,7 +431,7 @@ export const getStickyNoteFooter = (
   return {
     text,
     x: element.width - STICKY_NOTE_PADDING,
-    y: element.height - STICKY_NOTE_PADDING - STICKY_NOTE_FOOTER.baselineOffset,
+    y: element.height - STICKY_NOTE_FOOTER.baselineFromBottom,
   };
 };
 

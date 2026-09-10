@@ -226,16 +226,26 @@ export const STICKY_NOTE_PADDING = 16;
  * `minBodyWidthForYear` is the worst case ("30 May 2026") in the system sans
  * stack at 12px, with margin for wider fallbacks such as DejaVu Sans.
  */
+/**
+ * The creation-date footer of a sticky note. The label body ends `height`
+ * above the note's bottom padding, and the date's baseline sits
+ * `baselineFromBottom` above the note's bottom edge — so the 12px glyphs
+ * (~9px above the baseline, ~3px below) end up roughly 11px from the edge
+ * with a ~13px gap to the label body above them.
+ */
 export const STICKY_NOTE_FOOTER = {
-  height: 32,
+  height: 20,
   fontSize: 12,
   fontFamily: "Helvetica, Arial, sans-serif",
-  /** from the bottom padding up to the alphabetic baseline (descender room) */
-  baselineOffset: 4,
+  baselineFromBottom: 14,
   opacity: 1,
   minBodyWidthForYear: 80,
 } as const;
-/** outer height → label body height: top + bottom padding + footer */
+/**
+ * outer height → label body height: top + bottom padding + footer. The body
+ * is what the label is fitted into; a middle-aligned label is still centered
+ * in the whole padded note when it fits (see `computeBoundTextPosition`).
+ */
 export const STICKY_NOTE_BODY_INSET_Y =
   STICKY_NOTE_PADDING * 2 + STICKY_NOTE_FOOTER.height;
 export const DEFAULT_STICKY_NOTE_SIZE = 250;
