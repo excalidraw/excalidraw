@@ -90,21 +90,32 @@ export const Picker = React.forwardRef(
       palette,
     });
 
-    useEffect(() => {
-      if (!activeColorPickerSection) {
-        const isCustom = !!color && isCustomColor({ color, palette });
-        const isCustomButNotInList = isCustom && !customColors.includes(color);
+    const didMount = React.useRef(false);
 
-        setActiveColorPickerSection(
-          isCustomButNotInList
-            ? null
-            : isCustom
-            ? "custom"
-            : colorObj?.shade != null
-            ? "shades"
-            : "baseColors",
-        );
+    useEffect(() => {
+      // On mount, always derive the section fresh: the active-section atom is
+      // shared across picker instances, so a stale "hex" section left over
+      // from a previous popup would auto-focus the hex input on reopen and
+      // swallow the I / Alt eyedropper shortcuts afterwards (#9410).
+      // After mount, fill in only when nothing is active (preserves
+      // user-driven section switching and external color changes).
+      if (didMount.current && activeColorPickerSection) {
+        return;
       }
+      didMount.current = true;
+
+      const isCustom = !!color && isCustomColor({ color, palette });
+      const isCustomButNotInList = isCustom && !customColors.includes(color);
+
+      setActiveColorPickerSection(
+        isCustomButNotInList
+          ? null
+          : isCustom
+          ? "custom"
+          : colorObj?.shade != null
+          ? "shades"
+          : "baseColors",
+      );
     }, [
       activeColorPickerSection,
       color,
