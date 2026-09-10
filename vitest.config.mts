@@ -1,6 +1,6 @@
 import path from "path";
 
-import { defineConfig } from "vitest/config";
+import { defineConfig, coverageConfigDefaults } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -96,13 +96,11 @@ export default defineConfig({
         statements: 60,
       },
       exclude: [
-        "node_modules/**",
+        ...coverageConfigDefaults.exclude,
         "scripts/**",
         "public/**",
         "examples/**",
-        "**/*.d.ts",
         "**/setupTests.ts",
-        "**/\0*",
       ],
     },
   },
