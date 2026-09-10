@@ -5844,6 +5844,33 @@ class App extends React.Component<AppProps, AppState> {
               editingFrame: selectedElement.id,
             });
           }
+        } else {
+          const selectedGroupIds = getSelectedGroupIds(this.state);
+          if (selectedGroupIds.length === 1) {
+            const editingGroupId = selectedGroupIds[0];
+            const elementsInGroup = getElementsInGroup(
+              this.scene.getNonDeletedElements(),
+              editingGroupId,
+            );
+            if (elementsInGroup.length > 0) {
+              this.store.scheduleCapture();
+              this.setState((prevState) => ({
+                ...prevState,
+                ...selectGroupsForSelectedElements(
+                  {
+                    editingGroupId,
+                    selectedElementIds: Object.fromEntries(
+                      elementsInGroup.map((element) => [element.id, true]),
+                    ),
+                  },
+                  this.scene.getNonDeletedElements(),
+                  prevState,
+                  this,
+                ),
+              }));
+              event.preventDefault();
+            }
+          }
         }
       }
 
