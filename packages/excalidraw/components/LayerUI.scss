@@ -186,7 +186,8 @@
   }
 
   .theme--dark {
-    .plus-banner {
+    .plus-banner,
+    .disable-view-mode {
       &:hover {
         color: black !important;
       }
