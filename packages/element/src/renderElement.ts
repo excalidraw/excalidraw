@@ -26,7 +26,6 @@ import {
   isSafari,
   STICKY_NOTE_EDGE_SHADOW_OPACITY,
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
-  STICKY_NOTE_SHADOW_OFFSET,
   STICKY_NOTE_FOOTER,
   STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
@@ -73,10 +72,8 @@ import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
 import {
-  getStickyNoteCornerRadius,
   getStickyNoteFooter,
   getStickyNotePathCommands,
-  getStickyNoteRenderPoints,
   type StickyNotePathCommand,
 } from "./stickyNote";
 
@@ -380,22 +377,13 @@ const drawElementOnCanvas = (
   switch (element.type) {
     case "stickynote": {
       context.save();
-      const radius = getStickyNoteCornerRadius(element);
       context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_SHADOW_OPACITY})`;
       fillStickyNoteShape(
         context,
-        getStickyNotePathCommands(
-          getStickyNoteRenderPoints(element, {
-            offsetX: STICKY_NOTE_SHADOW_OFFSET,
-            offsetY: STICKY_NOTE_SHADOW_OFFSET,
-            seedOffset: 1,
-          }),
-          radius,
-        ),
+        getStickyNotePathCommands(element, { shadow: true }),
       );
 
-      const points = getStickyNoteRenderPoints(element);
-      const commands = getStickyNotePathCommands(points, radius);
+      const commands = getStickyNotePathCommands(element);
       context.fillStyle = applyDarkModeFilter(
         element.backgroundColor,
         renderConfig.theme === THEME.DARK,

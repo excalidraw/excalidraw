@@ -14,7 +14,6 @@ import {
   STICKY_NOTE_EDGE_SHADOW_OPACITY,
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_FOOTER,
-  STICKY_NOTE_SHADOW_OFFSET,
   STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
@@ -40,10 +39,9 @@ import { getCornerRadius, isPathALoop } from "@excalidraw/element";
 
 import { ShapeCache } from "@excalidraw/element";
 import {
-  getStickyNoteCornerRadius,
   getStickyNoteFooter,
   getStickyNotePathCommands,
-  getStickyNoteRenderPoints,
+  type StickyNotePathCommand,
 } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
@@ -158,13 +156,8 @@ const renderElementToSvg = (
       throw new Error("Selection rendering is not supported for SVG");
     }
     case "stickynote": {
-      const getPathData = (
-        elementPoints: ReturnType<typeof getStickyNoteRenderPoints>,
-      ) =>
-        getStickyNotePathCommands(
-          elementPoints,
-          getStickyNoteCornerRadius(element),
-        )
+      const getPathData = (commands: StickyNotePathCommand[]) =>
+        commands
           .map((command) => {
             if (command.type === "move") {
               return `M ${command.point.x} ${command.point.y}`;
@@ -178,12 +171,12 @@ const renderElementToSvg = (
           .concat(" Z");
 
       const createPath = (
-        elementPoints: ReturnType<typeof getStickyNoteRenderPoints>,
+        commands: StickyNotePathCommand[],
         fill: string,
         fillOpacity?: number,
       ) => {
         const path = svgRoot.ownerDocument.createElementNS(SVG_NS, "path");
-        path.setAttribute("d", getPathData(elementPoints));
+        path.setAttribute("d", getPathData(commands));
         path.setAttribute("fill", fill);
         if (typeof fillOpacity !== "undefined") {
           path.setAttribute("fill-opacity", `${fillOpacity}`);
@@ -204,17 +197,13 @@ const renderElementToSvg = (
       }
 
       const shadow = createPath(
-        getStickyNoteRenderPoints(element, {
-          offsetX: STICKY_NOTE_SHADOW_OFFSET,
-          offsetY: STICKY_NOTE_SHADOW_OFFSET,
-          seedOffset: 1,
-        }),
+        getStickyNotePathCommands(element, { shadow: true }),
         "#000",
         STICKY_NOTE_SHADOW_OPACITY,
       );
-      const points = getStickyNoteRenderPoints(element);
+      const commands = getStickyNotePathCommands(element);
       const rect = createPath(
-        points,
+        commands,
         applyDarkModeFilter(
           element.backgroundColor,
           renderConfig.theme === THEME.DARK,
@@ -226,10 +215,10 @@ const renderElementToSvg = (
       );
       clipPath.setAttribute("id", `sticky-note-clipPath-${element.id}`);
       clipPath.setAttribute("clipPathUnits", "userSpaceOnUse");
-      clipPath.appendChild(createPath(points, "#000"));
+      clipPath.appendChild(createPath(commands, "#000"));
       addToRoot(clipPath, element);
 
-      const edgeShadow = createPath(points, "none");
+      const edgeShadow = createPath(commands, "none");
       edgeShadow.setAttribute("stroke", "#000");
       edgeShadow.setAttribute(
         "stroke-opacity",

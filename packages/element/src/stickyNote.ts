@@ -11,6 +11,7 @@ import {
   STICKY_NOTE_MIN_SIZE,
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
+  STICKY_NOTE_SHADOW_OFFSET,
   getFontString,
   getLineHeight,
   isTransparent,
@@ -252,10 +253,28 @@ export const getStickyNoteRenderPoints = (
 };
 
 export const getStickyNotePathCommands = (
-  points: StickyNoteRenderPoint[],
-  radius: number,
+  element: ExcalidrawStickyNoteElement,
+  { shadow = false }: { shadow?: boolean } = {},
 ): StickyNotePathCommand[] => {
-  if (!radius) {
+  const points = getStickyNoteRenderPoints(
+    element,
+    shadow
+      ? {
+          offsetX: STICKY_NOTE_SHADOW_OFFSET,
+          offsetY: STICKY_NOTE_SHADOW_OFFSET,
+          seedOffset: 1,
+        }
+      : undefined,
+  );
+  const radius = getStickyNoteCornerRadius(element);
+  // The note's seed keeps the same corner for the paper and shadow through
+  // redraws and resizes.
+  const liftedCorner =
+    element.roughness === 2
+      ? Math.floor(seededRandom(element.seed)() * points.length)
+      : -1;
+
+  if (!radius && liftedCorner === -1) {
     return [
       { type: "move", point: points[0] },
       ...points.slice(1).map(
@@ -267,7 +286,7 @@ export const getStickyNotePathCommands = (
     ];
   }
 
-  const corners = points.map((point, index) => {
+  const corners = points.map((point, index): StickyNotePathCommand[] => {
     const prev = points[(index + points.length - 1) % points.length];
     const next = points[(index + 1) % points.length];
     const cornerRadius = Math.min(
@@ -276,36 +295,56 @@ export const getStickyNotePathCommands = (
       Math.hypot(point.x - next.x, point.y - next.y) / 2,
     );
 
-    return {
-      point,
-      start: pointAtDistance(point, prev, cornerRadius),
-      end: pointAtDistance(point, next, cornerRadius),
-    };
+    if (index === liftedCorner) {
+      const size = Math.min(element.width, element.height);
+      const reach = Math.min(size * 0.18, 40);
+      // The shadow follows the paper inward at half the bend, keeping its
+      // usual down-right offset from the light at the top left.
+      const lift = Math.min(size * 0.02, 5) * (shadow ? 0.5 : 1);
+      // The bend joins the straight edges before the corner, keeping it local.
+      const tip = {
+        x: point.x + (index === 1 || index === 2 ? -lift : lift),
+        y: point.y + (index >= 2 ? -lift : lift),
+      };
+      const start = pointAtDistance(point, prev, reach);
+      const end = pointAtDistance(point, next, reach);
+      return [
+        { type: "line", point: start },
+        {
+          type: "quadratic",
+          control: pointAtDistance(point, prev, reach / 2),
+          point: pointAtDistance(tip, start, cornerRadius),
+        },
+        {
+          type: "quadratic",
+          control: tip,
+          point: pointAtDistance(tip, end, cornerRadius),
+        },
+        {
+          type: "quadratic",
+          control: pointAtDistance(point, next, reach / 2),
+          point: end,
+        },
+      ];
+    }
+
+    return [
+      { type: "line", point: pointAtDistance(point, prev, cornerRadius) },
+      {
+        type: "quadratic",
+        control: point,
+        point: pointAtDistance(point, next, cornerRadius),
+      },
+    ];
   });
 
   const commands: StickyNotePathCommand[] = [
-    { type: "move", point: corners[0].end },
+    { type: "move", point: corners[0][corners[0].length - 1].point },
   ];
 
-  for (let index = 1; index < corners.length; index++) {
-    commands.push(
-      { type: "line", point: corners[index].start },
-      {
-        type: "quadratic",
-        control: corners[index].point,
-        point: corners[index].end,
-      },
-    );
+  for (let index = 1; index <= corners.length; index++) {
+    commands.push(...corners[index % corners.length]);
   }
-
-  commands.push(
-    { type: "line", point: corners[0].start },
-    {
-      type: "quadratic",
-      control: corners[0].point,
-      point: corners[0].end,
-    },
-  );
 
   return commands;
 };
