@@ -47,6 +47,7 @@ import { mutateElement, newElementWith } from "./mutateElement";
 import { getBoundTextElementId, redrawTextBoundingBox } from "./textElement";
 import {
   hasBoundTextElement,
+  isArrowElement,
   isBindableElement,
   isBoundToContainer,
   isTextElement,
@@ -1442,6 +1443,48 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
     }
 
     try {
+      // Whether this delta results in a visible change is decided from the
+      // *applied* result, not from the property patches: binding repair and
+      // layout (text bounding boxes, bound arrows) run below and can move
+      // elements the delta never named, and an `isDeleted` flip or a
+      // `boundElements` edit is not visible by itself — deleting a note's
+      // empty label is the canonical case. History relies on this answer to
+      // skip such entries on undo/redo (see `History`'s apply loop).
+      //
+      // `idsToCheck` is every element whose "before" and "after" get
+      // compared: the changed elements plus what layout can move for them —
+      // a text's container, and everything in `boundElements` (a container's
+      // label and arrows). The set is walked as it grows, so an arrow added
+      // for its container brings in its own label in turn. The dev/test
+      // assertion after the redraw verifies the set is complete.
+      const idsToCheck = new Set(changedElements.keys());
+      // Unchanged elements are shared between `elements` and `nextElements`,
+      // and layout mutates them in place — their "before" must be a shallow
+      // copy taken now. Changed elements already have a fresh instance in
+      // `nextElements`, so the instance in `elements` is their "before" as
+      // is. Only `idsToCheck` is saved; the whole scene is never copied.
+      const previousElements = new Map<string, OrderedExcalidrawElement>();
+      for (const id of idsToCheck) {
+        const previous = elements.get(id);
+        const next = nextElements.get(id);
+        for (const element of [previous, next]) {
+          if (element) {
+            if (isTextElement(element) && element.containerId) {
+              idsToCheck.add(element.containerId);
+            }
+            for (const binding of element.boundElements ?? []) {
+              idsToCheck.add(binding.id);
+            }
+          }
+        }
+        if (previous) {
+          previousElements.set(
+            id,
+            previous === next ? { ...previous } : previous,
+          );
+        }
+      }
+
       // the following reorder performs mutations, but only on new instances of changed elements,
       // unless something goes really bad and it fallbacks to fixing all invalid indices
       nextElements = ElementsDelta.reorderElements(
@@ -1450,8 +1493,53 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
         flags,
       );
 
+      // Guard for `idsToCheck`: layout bumps the version of everything it
+      // mutates, so an element whose version moved during the redraw but was
+      // never collected is a layout dependency the expansion above does not
+      // know about — and a visible change that undo would silently skip.
+      // Fail loudly instead (dev and tests only; this is a scene-wide pass).
+      const versionsBeforeRedraw =
+        isTestEnv() || isDevEnv()
+          ? new Map(
+              Array.from(nextElements, ([id, element]) => [
+                id,
+                element.version,
+              ]),
+            )
+          : undefined;
+
       ElementsDelta.redrawElements(nextElements, changedElements);
+
+      if (versionsBeforeRedraw) {
+        for (const [id, element] of nextElements) {
+          if (
+            versionsBeforeRedraw.get(id) !== element.version &&
+            !idsToCheck.has(id)
+          ) {
+            throw new Error(
+              `Redrawn element "${id}" is missing from idsToCheck`,
+            );
+          }
+        }
+      }
+
+      if (!flags.containsVisibleDifference) {
+        for (const id of idsToCheck) {
+          if (
+            ElementsDelta.checkForVisibleDifference(
+              previousElements.get(id),
+              nextElements.get(id),
+              previousElements,
+              nextElements,
+            )
+          ) {
+            flags.containsVisibleDifference = true;
+            break;
+          }
+        }
+      }
     } catch (e) {
+      flags.containsVisibleDifference = true;
       console.error(
         `Couldn't mutate elements after applying elements change`,
         e,
@@ -1460,9 +1548,9 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       if (isTestEnv() || isDevEnv()) {
         throw e;
       }
-    } finally {
-      return [nextElements, flags.containsVisibleDifference];
     }
+
+    return [nextElements, flags.containsVisibleDifference];
   }
 
   public squash(delta: ElementsDelta): this {
@@ -1625,12 +1713,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
 
         if (element) {
           // as the element was brought from the snapshot, it automatically results in a possible zindex difference
+          // (whether it is *visible* is decided in `applyTo`, from the applied result)
           flags.containsZindexDifference = true;
-
-          // as the element was force deleted, we need to check if adding it back results in a visible change
-          if (!partial.isDeleted || (partial.isDeleted && !element.isDeleted)) {
-            flags.containsVisibleDifference = true;
-          }
         } else {
           // not in elements, not in snapshot? element might have been added remotely!
           element = newElementWith(
@@ -1687,18 +1771,8 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
       });
     }
 
-    if (!flags.containsVisibleDifference) {
-      // Creation metadata is not visible; a different fractional index does
-      // not necessarily change the visible order either.
-      const { index, created, ...rest } = directlyApplicablePartial;
-      const containsVisibleDifference = ElementsDelta.checkForVisibleDifference(
-        element,
-        rest,
-      );
-
-      flags.containsVisibleDifference = containsVisibleDifference;
-    }
-
+    // visibility is not decided here: `applyTo` compares the applied result
+    // once layout has run, so that its effects count too
     if (!flags.containsZindexDifference) {
       flags.containsZindexDifference =
         delta.deleted.index !== delta.inserted.index;
@@ -1708,29 +1782,96 @@ export class ElementsDelta implements DeltaContainer<SceneElementsMap> {
   }
 
   /**
-   * Check for visible changes regardless of whether they were removed, added or updated.
+   * Whether an element looks different after the delta — and the layout that
+   * followed it — was applied. The input to history's "skip entries with no
+   * visible change" loop.
+   *
+   * Both sides are first reduced to what actually paints:
+   * - a missing or deleted element paints nothing;
+   * - an empty text element paints nothing either — unless it carries arrow
+   *   bindings (an arrow may end at it) or sits on an arrow (an empty label
+   *   still cuts the arrow's gap);
+   * so an empty label's deletion or restoration compares as nothing against
+   * nothing. Two painting elements are then compared property by property:
+   * - `version`, `versionNonce`, `updated`, `created` are metadata, and
+   *   `index` is covered by the separate z-order check (`reorderElements`);
+   * - `boundElements` is compared as `type:id` references with references to
+   *   empty labels dropped, so adding or removing an empty label's reference
+   *   is not visible on its own, and binding repair that rebuilt equal
+   *   objects is not either;
+   * - everything else counts. Nested arrays (`points`, binding fixed points)
+   *   compare by reference, which can only over-report a change — the safe
+   *   direction, where undo stops one entry early.
+   *
+   * `previousElements` holds only `idsToCheck` (see `applyTo`); the label
+   * lookups it serves are for elements whose labels are in that set.
    */
   private static checkForVisibleDifference(
-    element: OrderedExcalidrawElement,
-    partial: ElementPartial,
+    previous: OrderedExcalidrawElement | undefined,
+    next: OrderedExcalidrawElement | undefined,
+    previousElements: ReadonlyMap<string, OrderedExcalidrawElement>,
+    nextElements: ReadonlyMap<string, OrderedExcalidrawElement>,
   ) {
-    if (element.isDeleted && partial.isDeleted !== false) {
-      // when it's deleted and partial is not false, it cannot end up with a visible change
-      return false;
+    const visibleElement = (
+      element: OrderedExcalidrawElement | undefined,
+      elements: ReadonlyMap<string, OrderedExcalidrawElement>,
+    ) => {
+      if (!element || element.isDeleted) {
+        return null;
+      }
+      if (
+        isTextElement(element) &&
+        !element.text.trim() &&
+        !element.boundElements?.length &&
+        !isArrowElement(elements.get(element.containerId ?? ""))
+      ) {
+        return null;
+      }
+
+      return element;
+    };
+
+    const before = visibleElement(previous, previousElements);
+    const after = visibleElement(next, nextElements);
+    if (!before || !after) {
+      return before !== after;
     }
 
-    if (element.isDeleted && partial.isDeleted === false) {
-      // when we add an element, it results in a visible change
-      return true;
-    }
+    const visibleBindings = (
+      element: OrderedExcalidrawElement,
+      elements: ReadonlyMap<string, OrderedExcalidrawElement>,
+    ) =>
+      (element.boundElements ?? [])
+        .filter((binding) => {
+          const label = elements.get(binding.id);
+          return (
+            binding.type !== "text" ||
+            isArrowElement(element) ||
+            !label ||
+            !isTextElement(label) ||
+            !!label.text.trim()
+          );
+        })
+        .map(({ id, type }) => `${type}:${id}`);
 
-    if (element.isDeleted === false && partial.isDeleted) {
-      // when we remove an element, it results in a visible change
-      return true;
-    }
-
-    // check for any difference on a visible element
-    return Delta.isRightDifferent(element, partial);
+    return Delta.getDifferences(before, after).some((key) => {
+      switch (key) {
+        // Ordering is checked separately; the remaining fields are metadata.
+        case "index":
+        case "version":
+        case "versionNonce":
+        case "updated":
+        case "created":
+          return false;
+        case "boundElements":
+          return !isShallowEqual(
+            visibleBindings(before, previousElements),
+            visibleBindings(after, nextElements),
+          );
+        default:
+          return true;
+      }
+    });
   }
 
   /**

@@ -796,6 +796,97 @@ describe("sticky notes", () => {
     });
   });
 
+  describe("history", () => {
+    const liveNotes = () =>
+      h.elements.filter(
+        (element) => element.type === "stickynote" && !element.isDeleted,
+      );
+    const createNoteByClick = async () => {
+      UI.clickTool("stickynote");
+      mouse.downAt(300, 300);
+      mouse.up();
+      const editor = await getTextEditor();
+      // the editor arms its submit-on-blur a tick after the pointer-up
+      await act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+      return editor;
+    };
+
+    it("undoes an abandoned note when the editor is escaped", async () => {
+      const editor = await createNoteByClick();
+      expect(API.getUndoStack()).toHaveLength(1);
+
+      Keyboard.keyPress(KEYS.ESCAPE, editor);
+
+      expect(liveNotes()).toHaveLength(1);
+      expect(API.getUndoStack()).toHaveLength(1);
+      Keyboard.undo();
+      expect(liveNotes()).toHaveLength(0);
+      Keyboard.redo();
+      expect(liveNotes()).toHaveLength(1);
+    });
+
+    it("skips the empty label's history entry when clicking out", async () => {
+      const editor = await createNoteByClick();
+
+      // a click on empty canvas blurs the editor (submitting it), then its
+      // pointer-up records — which used to leave the empty label's deletion
+      // as a second, invisible entry. The wysiwyg's own outside-pointerdown
+      // submit is disabled under vitest, so the blur is fired explicitly.
+      fireEvent.blur(editor);
+      mouse.downAt(900, 800);
+      mouse.up();
+
+      expect(h.state.editingTextElement).toBeNull();
+      expect(liveNotes()).toHaveLength(1);
+      expect(API.getUndoStack()).toHaveLength(2);
+      Keyboard.undo();
+      expect(liveNotes()).toHaveLength(0);
+      expect(API.getUndoStack()).toHaveLength(0);
+      Keyboard.redo();
+      expect(liveNotes()).toHaveLength(1);
+    });
+
+    it("skips empty-label cleanup after a font change captures creation", async () => {
+      const editor = await createNoteByClick();
+      // Changing the empty label's fontSizeMax is invisible too.
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeFontSize, "ui", 28);
+      });
+      expect(h.state.editingTextElement).not.toBeNull();
+
+      fireEvent.blur(editor);
+      mouse.downAt(900, 800);
+      mouse.up();
+
+      Keyboard.undo();
+      expect(liveNotes()).toHaveLength(0);
+      expect(API.getUndoStack()).toHaveLength(0);
+      Keyboard.redo();
+      expect(liveNotes()).toHaveLength(1);
+    });
+
+    it("undoes typing separately from creating the note", async () => {
+      const editor = await createNoteByClick();
+      updateTextEditor(editor, "hello");
+      Keyboard.keyPress(KEYS.ESCAPE, editor);
+
+      const label = h.elements.find(
+        (element) => element.type === "text" && !element.isDeleted,
+      ) as ExcalidrawTextElement;
+      expect(label.text).toBe("hello");
+      expect(API.getUndoStack()).toHaveLength(2);
+      Keyboard.undo();
+      expect(liveNotes()).toHaveLength(1);
+      expect(getElement<ExcalidrawTextElement>(label.id).text).toBe("");
+      Keyboard.undo();
+      expect(liveNotes()).toHaveLength(0);
+      Keyboard.redo();
+      expect(liveNotes()).toHaveLength(1);
+      Keyboard.redo();
+      expect(getElement<ExcalidrawTextElement>(label.id).text).toBe("hello");
+    });
+  });
+
   describe("Stats", () => {
     beforeAll(() => {
       mockBoundingClientRect();

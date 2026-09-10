@@ -91,15 +91,16 @@ describe("dragging a tool out of the toolbar", () => {
     expect(note.y + note.height / 2).toBeCloseTo(center.y);
     expect(note.width).toBe(DEFAULT_STICKY_NOTE_SIZE);
     expect(note.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
-    // one history entry, and the note's label is being edited
-    expect(API.getUndoStack()).toHaveLength(1);
+    // The drop is recorded while its label is being edited.
     expect(h.state.editingTextElement).not.toBeNull();
+    expect(API.getUndoStack()).toHaveLength(1);
     // back on the selection tool (the editor owns the selection meanwhile,
     // as on the click path)
     expect(h.state.activeTool.type).toBe("selection");
 
-    // undo takes the note back out
+    // Abandoning the editor leaves one visible action; undo removes the note.
     Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
+    expect(API.getUndoStack()).toHaveLength(1);
     Keyboard.undo();
     expect(liveNotes()).toHaveLength(0);
   });
