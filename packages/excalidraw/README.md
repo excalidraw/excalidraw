@@ -113,6 +113,46 @@ For example:
 import { exportToSvg } from "@excalidraw/excalidraw";
 ```
 
+## Breaking Changes
+
+### Iframe validation (v0.19+)
+
+Starting from this version, all `<iframe>` elements on the canvas are **blocked by default** unless the host explicitly opts in via the `validateIframe` prop. This is a secure-by-default change to prevent phishing attacks where a malicious collaborator could embed arbitrary iframes.
+
+**What changed:**
+
+- If `validateIframe` is not set (or set to `undefined`), all iframe elements are blocked and will not render.
+- If `validateIframe` is `true`, all iframes are allowed.
+- If `validateIframe` is a function, it receives the iframe element and returns `true` (allow) or `false` (block).
+
+**Why this matters:**
+
+The built-in AI text-to-diagram (TTD) feature generates iframe elements as output. Without `validateIframe: true` from the host, TTD-generated iframes will be silently blocked. If you use TTD, add `validateIframe={true}` to your `<Excalidraw>` component.
+
+**Migration:**
+
+```tsx
+// Before (iframes silently blocked)
+<Excalidraw />
+
+// After — explicitly allow iframes
+<Excalidraw validateIframe={true} />
+```
+
+If you want finer control, pass a validation function:
+
+```tsx
+<Excalidraw
+  validateIframe={(element) => {
+    // Only allow iframes whose HTML content references trusted origins
+    const html = element.customData?.generationData?.html || "";
+    return html.includes("trusted-domain.com");
+  }}
+/>
+```
+
+A console warning will appear if iframes are present but `validateIframe` is not set.
+
 ## Self-hosting fonts
 
 By default, Excalidraw downloads the fonts it needs from the [CDN](https://esm.run/@excalidraw/excalidraw/dist/prod).

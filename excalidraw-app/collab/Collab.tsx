@@ -21,7 +21,11 @@ import {
 import { decryptData } from "@excalidraw/excalidraw/data/encryption";
 import { getVisibleSceneBounds } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
-import { isImageElement, isInitializedImageElement } from "@excalidraw/element";
+import {
+  isIframeElement,
+  isImageElement,
+  isInitializedImageElement,
+} from "@excalidraw/element";
 import { AbortError } from "@excalidraw/excalidraw/errors";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { withBatchedUpdates } from "@excalidraw/excalidraw/reactUtils";
@@ -769,6 +773,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     // as we'd regenerate even elements such as appState.newElement which would
     // break the state
     remoteElements = restoreElements(remoteElements, existingElements);
+
+    // Security: filter out iframe elements from remote updates to prevent
+    // phishing attacks via collaboration (issue #11930). Iframe elements
+    // injected through SCENE_UPDATE messages could persist in the scene
+    // and re-appear on remount, viewport scroll, or export.
+    remoteElements = remoteElements.filter(
+      (el) => !isIframeElement(el),
+    ) as typeof remoteElements;
 
     let reconciledElements = reconcileElements(
       existingElements,
