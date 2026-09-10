@@ -240,6 +240,19 @@ describe("Test dragCreate", () => {
       fireEvent.pointerUp(canvas, { clientX: 300, clientY: 300 });
     };
 
+    it("places a clicked note on the grid", async () => {
+      const { getByToolName, container } = await render(<Excalidraw />);
+      API.setAppState({ gridModeEnabled: true, gridSize: 20 });
+      fireEvent.click(getByToolName("stickynote"));
+
+      createDefaultStickyNote(container.querySelector("canvas.interactive")!);
+      await getTextEditor();
+
+      expect(
+        h.elements.find((element) => element.type === "stickynote"),
+      ).toMatchObject({ x: 180, y: 180 });
+    });
+
     it("switches back to selection and starts editing when tool is unlocked", async () => {
       const { getByToolName, container } = await render(<Excalidraw />);
       fireEvent.click(getByToolName("stickynote"));

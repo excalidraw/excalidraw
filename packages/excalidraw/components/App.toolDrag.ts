@@ -3,6 +3,7 @@ import {
   DRAGGING_THRESHOLD,
   EVENT,
   KEYS,
+  getGridPoint,
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
@@ -149,10 +150,17 @@ export class AppToolDrag {
       }
       trackEvent("toolbar", this.armed.type, "drag");
     }
-    this.preview = this.tool!.createElement(
+    const preview = this.tool!.createElement(
       this.app,
       viewportCoordsToSceneCoords(event, this.app.state),
     );
+    // Snap after the tool centers its element, just like click-to-place.
+    const [x, y] = getGridPoint(
+      preview.x,
+      preview.y,
+      event[KEYS.CTRL_OR_CMD] ? null : this.app.getEffectiveGridSize(),
+    );
+    this.preview = { ...preview, x, y };
     this.app.triggerRender();
   };
 

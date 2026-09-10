@@ -12025,9 +12025,15 @@ class App extends React.Component<AppProps, AppState> {
         let nextGeometry;
         if (isClick) {
           const size = DEFAULT_STICKY_NOTE_SIZE;
+          // Snap after centering: half the default size need not be on the grid.
+          const [x, y] = getGridPoint(
+            pointerDownState.origin.x - size / 2,
+            pointerDownState.origin.y - size / 2,
+            childEvent[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+          );
           nextGeometry = {
-            x: pointerDownState.origin.x - size / 2,
-            y: pointerDownState.origin.y - size / 2,
+            x,
+            y,
             width: size,
             height: size,
           };

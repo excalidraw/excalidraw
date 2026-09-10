@@ -105,6 +105,20 @@ describe("dragging a tool out of the toolbar", () => {
     expect(liveNotes()).toHaveLength(0);
   });
 
+  it("places the preview and dropped note on the grid", () => {
+    API.setAppState({ gridModeEnabled: true, gridSize: 20 });
+    dragOut(300, 300);
+    expect(h.app.toolDrag.preview).toMatchObject({ x: 180, y: 180 });
+
+    fireEvent.pointerUp(GlobalTestState.interactiveCanvas, {
+      ...POINTER,
+      button: 0,
+      clientX: 300,
+      clientY: 300,
+    });
+    expect(liveNotes()[0]).toMatchObject({ x: 180, y: 180 });
+  });
+
   it("leaves nothing behind when Escape cancels the drag", () => {
     dragOut(300, 260);
     expect(h.app.toolDrag.preview).not.toBeNull();
