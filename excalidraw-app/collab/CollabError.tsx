@@ -7,7 +7,7 @@ import { atom } from "../app-jotai";
 
 import "./CollabError.scss";
 
-type ErrorIndicator = {
+export type ErrorIndicator = {
   message: string | null;
   /** used to rerun the useEffect responsible for animation */
   nonce: number;
@@ -21,12 +21,17 @@ export const collabErrorIndicatorAtom = atom<ErrorIndicator>({
 const CollabError = ({ collabError }: { collabError: ErrorIndicator }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const clearAnimationRef = useRef<string | number>(0);
+  const prevMessageRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setIsAnimating(true);
-    clearAnimationRef.current = window.setTimeout(() => {
-      setIsAnimating(false);
-    }, 1000);
+    // animate once per error type, not on every save
+    if (collabError.message && collabError.message !== prevMessageRef.current) {
+      setIsAnimating(true);
+      clearAnimationRef.current = window.setTimeout(() => {
+        setIsAnimating(false);
+      }, 1000);
+    }
+    prevMessageRef.current = collabError.message;
 
     return () => {
       window.clearTimeout(clearAnimationRef.current);
