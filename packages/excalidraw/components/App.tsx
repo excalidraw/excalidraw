@@ -12068,7 +12068,6 @@ class App extends React.Component<AppProps, AppState> {
         );
 
         this.store.scheduleCapture();
-        this.store.scheduleCapture();
         this.scene.triggerUpdate();
 
         if (activeTool.locked) {
