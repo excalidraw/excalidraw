@@ -6,6 +6,8 @@ import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
 
 import { COLOR_PALETTE } from "./colors";
 
+export { DEFAULT_STICKY_NOTE_BG } from "./colors";
+
 export const supportsResizeObserver =
   typeof window !== "undefined" && "ResizeObserver" in window;
 
@@ -69,6 +71,7 @@ export enum EVENT {
   POINTER_MOVE = "pointermove",
   POINTER_DOWN = "pointerdown",
   POINTER_UP = "pointerup",
+  POINTER_CANCEL = "pointercancel",
   STATE_CHANGE = "statechange",
   WHEEL = "wheel",
   TOUCH_START = "touchstart",
@@ -211,6 +214,50 @@ export const FRAME_STYLE = {
 
 export const MIN_FONT_SIZE = 1;
 export const DEFAULT_FONT_SIZE = 20;
+export const STICKY_NOTE_MIN_FONT_SIZE = 16;
+export const STICKY_NOTE_MAX_FONT_SIZE = 512;
+export const STICKY_NOTE_FALLBACK_FONT_SIZE = 28;
+export const STICKY_NOTE_FONT_STEP = 2;
+export const STICKY_NOTE_PADDING = 16;
+/**
+ * The creation-date footer: a 20px text row under the label body plus a 12px
+ * gap above it, inside the note's bottom padding. Reserved for every note —
+ * also when `created` is unknown — so geometry never depends on data
+ * availability. The label is chosen by width bucket, never measured, so
+ * painting stays measurement-free (the server has no text measurer):
+ * `minBodyWidthForYear` is the worst case ("30 May 2026") in the system sans
+ * stack at 12px, with margin for wider fallbacks such as DejaVu Sans.
+ */
+/**
+ * The creation-date footer of a sticky note. The label body ends `height`
+ * above the note's bottom padding, and the date's baseline sits
+ * `baselineFromBottom` above the note's bottom edge — so the 12px glyphs
+ * (~9px above the baseline, ~3px below) end up roughly 11px from the edge
+ * with a ~13px gap to the label body above them.
+ */
+export const STICKY_NOTE_FOOTER = {
+  height: 20,
+  fontSize: 12,
+  fontFamily: "Helvetica, Arial, sans-serif",
+  baselineFromBottom: 14,
+  opacity: 1,
+  minBodyWidthForYear: 80,
+} as const;
+/**
+ * outer height → label body height: top + bottom padding + footer. The body
+ * is what the label is fitted into; a middle-aligned label is still centered
+ * in the whole padded note when it fits (see `computeBoundTextPosition`).
+ */
+export const STICKY_NOTE_BODY_INSET_Y =
+  STICKY_NOTE_PADDING * 2 + STICKY_NOTE_FOOTER.height;
+export const DEFAULT_STICKY_NOTE_SIZE = 250;
+// floor for a finalized note's width and base height; the UI floor is font-aware
+// on top of it (see `getStickyNoteMinSize`)
+export const STICKY_NOTE_MIN_SIZE = 75;
+export const STICKY_NOTE_SHADOW_OFFSET = 3;
+export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
+export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
+export const STICKY_NOTE_EDGE_SHADOW_OPACITY = 0.08;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
@@ -497,6 +544,7 @@ export const TOOL_TYPE = {
   hand: "hand",
   frame: "frame",
   magicframe: "magicframe",
+  stickynote: "stickynote",
   embeddable: "embeddable",
   laser: "laser",
   autoshape: "autoshape",

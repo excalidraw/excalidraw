@@ -15,6 +15,8 @@ import {
   isDevEnv,
   toBrandedType,
   getLineHeight,
+  DEFAULT_STICKY_NOTE_SIZE,
+  isTransparent,
 } from "@excalidraw/common";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
@@ -32,9 +34,12 @@ import {
   newMagicFrameElement,
   newTextElement,
   type ElementConstructorOpts,
+  newStickyNoteElement,
+  normalizeStickyNoteGeometry,
 } from "./newElement";
+import { normalizeStickyNoteStrokeColor } from "./stickyNote";
 import { measureText, normalizeText } from "./textMeasurements";
-import { isArrowElement } from "./typeChecks";
+import { isArrowElement, isStickyNoteElement } from "./typeChecks";
 
 import { syncInvalidIndices } from "./fractionalIndex";
 
@@ -70,6 +75,7 @@ import type {
   Ordered,
   TextAlign,
   VerticalAlign,
+  ExcalidrawStickyNoteElement,
 } from "./types";
 
 /**
@@ -192,6 +198,18 @@ export type ValidContainer =
       } & FragmentConstructorOpts;
     } & ElementConstructorOpts;
 
+/**
+ * A sticky note: an always-filled note whose label auto-fits. `label.fontSize`
+ * is the font ceiling the fit shrinks from; the note grows past its height
+ * (kept as `baseHeight`) only once the label hits the minimum font size.
+ */
+export type ValidStickyNote = {
+  type: "stickynote";
+  id?: ExcalidrawStickyNoteElement["id"];
+  label?: Extract<ValidContainer, { label?: unknown }>["label"];
+} & ElementConstructorOpts &
+  Partial<Pick<ExcalidrawStickyNoteElement, "baseHeight">>;
+
 export type ExcalidrawElementSkeleton =
   | Extract<
       Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
@@ -203,6 +221,7 @@ export type ExcalidrawElementSkeleton =
       y: number;
     } & Partial<ExcalidrawLinearElement>)
   | ValidContainer
+  | ValidStickyNote
   | ValidLinearElement
   | ({
       type: "text";
@@ -240,6 +259,16 @@ const bindTextToContainer = (
   textProps: { text: string } & FragmentConstructorOpts,
   scene: Scene,
 ) => {
+  // a note and its label share one ink: a label that sets its own color
+  // gives it to the note (the footer paints with it); transparent falls
+  // back to the note's
+  const stickyInk = isStickyNoteElement(container)
+    ? normalizeStickyNoteStrokeColor(
+        textProps.strokeColor && !isTransparent(textProps.strokeColor)
+          ? textProps.strokeColor
+          : container.strokeColor,
+      )
+    : null;
   const textElement: ExcalidrawTextElement = newTextElement({
     x: 0,
     y: 0,
@@ -247,7 +276,7 @@ const bindTextToContainer = (
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     ...textProps,
     containerId: container.id,
-    strokeColor: textProps.strokeColor || container.strokeColor,
+    strokeColor: stickyInk ?? (textProps.strokeColor || container.strokeColor),
     labelPosition: isArrowElement(container)
       ? DEFAULT_BOUND_TEXT_LABEL_POSITION
       : null,
@@ -258,6 +287,9 @@ const bindTextToContainer = (
       type: "text",
       id: textElement.id,
     }),
+    ...(stickyInk && stickyInk !== container.strokeColor
+      ? { strokeColor: stickyInk }
+      : null),
   });
 
   redrawTextBoundingBox(textElement, container, scene);
@@ -659,6 +691,22 @@ export const convertToExcalidrawElements = (
         excalidrawElement = newIframeElement({ ...element });
         break;
       }
+      case "stickynote": {
+        const width = element.width || DEFAULT_STICKY_NOTE_SIZE;
+        const height = element.height || DEFAULT_STICKY_NOTE_SIZE;
+        // finalized geometry (min size, baseHeight ≤ height) — only a
+        // pointer-down draft is exempt from it
+        excalidrawElement = normalizeStickyNoteGeometry(
+          newStickyNoteElement({
+            ...element,
+            type: "stickynote",
+            width,
+            height,
+            baseHeight: element.baseHeight ?? height,
+          }),
+        );
+        break;
+      }
       case "embeddable": {
         excalidrawElement = newEmbeddableElement({ ...element });
         break;
@@ -697,8 +745,11 @@ export const convertToExcalidrawElements = (
       case "rectangle":
       case "ellipse":
       case "diamond":
+      case "stickynote":
       case "arrow": {
         if (element.label?.text) {
+          // for a sticky note this runs the sticky fit (via
+          // `redrawTextBoundingBox`): the label's font size becomes its ceiling
           let [container, text] = bindTextToContainer(
             excalidrawElement,
             element?.label,

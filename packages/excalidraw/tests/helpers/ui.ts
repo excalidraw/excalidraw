@@ -451,6 +451,14 @@ export class UI {
     fireEvent.click(GlobalTestState.renderResult.getByToolName(toolName));
   };
 
+  /** clicks a tool that lives in the extra-tools dropdown, opening it first */
+  static clickExtraTool = (toolName: ToolType) => {
+    fireEvent.click(
+      document.querySelector(".App-toolbar__extra-tools-trigger")!,
+    );
+    UI.clickTool(toolName);
+  };
+
   static clickLabeledElement = (label: string) => {
     const element = document.querySelector(`[aria-label='${label}']`);
     if (!element) {

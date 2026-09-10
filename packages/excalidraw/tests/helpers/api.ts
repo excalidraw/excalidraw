@@ -22,6 +22,7 @@ import {
   newImageElement,
   newLinearElement,
   newMagicFrameElement,
+  newStickyNoteElement,
   newTextElement,
 } from "@excalidraw/element";
 
@@ -43,6 +44,7 @@ import type {
   ExcalidrawMagicFrameElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
+  ExcalidrawStickyNoteElement,
   FixedSegment,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -205,6 +207,9 @@ export class API {
       ? ExcalidrawTextElement["verticalAlign"]
       : never;
     boundElements?: ExcalidrawGenericElement["boundElements"];
+    baseHeight?: T extends "stickynote"
+      ? ExcalidrawStickyNoteElement["baseHeight"]
+      : never;
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
@@ -244,6 +249,8 @@ export class API {
       ? ExcalidrawFrameElement
       : T extends "magicframe"
       ? ExcalidrawMagicFrameElement
+      : T extends "stickynote"
+      ? ExcalidrawStickyNoteElement
       : ExcalidrawGenericElement
   > => {
     let element: Mutable<ExcalidrawElement> = null!;
@@ -269,9 +276,16 @@ export class API {
       frameId: rest.frameId ?? null,
       index: rest.index ?? null,
       angle: (rest.angle ?? 0) as Radians,
-      strokeColor: rest.strokeColor ?? appState.currentItemStrokeColor,
+      strokeColor:
+        rest.strokeColor ??
+        (type === "stickynote"
+          ? appState.currentItemStickynoteStrokeColor
+          : appState.currentItemStrokeColor),
       backgroundColor:
-        rest.backgroundColor ?? appState.currentItemBackgroundColor,
+        rest.backgroundColor ??
+        (type === "stickynote"
+          ? appState.currentItemStickynoteBackgroundColor
+          : appState.currentItemBackgroundColor),
       fillStyle: rest.fillStyle ?? appState.currentItemFillStyle,
       strokeWidth:
         rest.strokeWidth ??
@@ -313,6 +327,15 @@ export class API {
         element = newIframeElement({
           type: "iframe",
           ...base,
+        });
+        break;
+      case "stickynote":
+        element = newStickyNoteElement({
+          ...base,
+          width,
+          height,
+          type,
+          baseHeight: rest.baseHeight ?? height,
         });
         break;
       case "text":

@@ -10,6 +10,7 @@ import {
   COLOR_TOP_PICKS_SLOTS,
   type CombineBrandsIfNeeded,
   DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
   DEFAULT_STROKE_STREAMLINE,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
@@ -29,6 +30,7 @@ import {
   STROKE_WIDTH,
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
+  isTransparent,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -45,8 +47,17 @@ import {
   validateElbowPoints,
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
-import { bumpVersion } from "@excalidraw/element";
-import { getContainerElement } from "@excalidraw/element";
+import {
+  bumpVersion,
+  getStickyNoteLayout,
+  isStickyNoteBoundText,
+  normalizeStickyNote,
+  normalizeStickyNoteBackgroundColor,
+  normalizeStickyNoteFontSize,
+  normalizeStickyNoteStrokeColor,
+} from "@excalidraw/element";
+import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
+import { isStickyNoteElement } from "@excalidraw/element";
 import { detectLineHeight } from "@excalidraw/element";
 import {
   isArrowBoundToElement,
@@ -222,6 +233,7 @@ export const AllowedExcalidrawActiveTools: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  stickynote: true,
   eraser: false,
   custom: true,
   frame: true,
@@ -532,6 +544,9 @@ export const restoreElement = (
         fontSize = parseFloat(fontPx);
         fontFamily = getFontFamilyByName(_fontFamily);
       }
+      if (!isFiniteNumber(fontSize)) {
+        fontSize = DEFAULT_FONT_SIZE;
+      }
       const text = (typeof element.text === "string" && element.text) || "";
 
       // line-height might not be specified either when creating elements
@@ -559,6 +574,11 @@ export const restoreElement = (
         lineHeight,
         labelPosition: isFiniteNumber(element.labelPosition)
           ? clamp(element.labelPosition, 0, 1)
+          : null,
+        // only meaningful for sticky note labels; reconciled against the
+        // container in `restoreStickyNotes` once bindings are repaired
+        baseFontSize: isFiniteNumber(element.baseFontSize)
+          ? normalizeStickyNoteFontSize(element.baseFontSize)
           : null,
       });
 
@@ -711,6 +731,15 @@ export const restoreElement = (
     case "iframe":
     case "embeddable":
       return restoreElementWithProperties(element, {});
+    case "stickynote":
+      return normalizeStickyNote(
+        restoreElementWithProperties(element, {
+          baseHeight:
+            element.baseHeight ??
+            (element as typeof element & { maxHeight?: number }).maxHeight ??
+            element.height,
+        }),
+      );
     case "magicframe":
     case "frame":
       return restoreElementWithProperties(element, {
@@ -859,6 +888,63 @@ const repairFrameMembership = (
   }
 };
 
+/**
+ * Sticky note invariants that need both halves of the pair present, so they
+ * run after binding repair. Mutates elements (like the repair helpers).
+ * - a label's `baseFontSize` is meaningful only while bound to a sticky note:
+ *   seeded from `fontSize` when missing, cleared everywhere else
+ * - a sticky label's stroke is never transparent (it is the visible text)
+ * - a note's stroke — its ink, which the footer paints with — equals its label's
+ * - with `refreshDimensions`, the note and its label are refitted together
+ */
+const restoreStickyNotes = (
+  elements: readonly ExcalidrawElement[],
+  elementsMap: ElementsMap,
+  opts: { refreshDimensions: boolean },
+) => {
+  for (const element of elements) {
+    if (!isTextElement(element) || element.isDeleted) {
+      continue;
+    }
+    if (isStickyNoteBoundText(element, elementsMap)) {
+      const container = elementsMap.get(element.containerId!);
+      // one ink per note: a transparent label takes the note's color;
+      // otherwise the label — the visible text — wins over a note that
+      // drifted (edit-mode coloring on older builds)
+      const strokeColor = normalizeStickyNoteStrokeColor(
+        isTransparent(element.strokeColor)
+          ? container?.strokeColor
+          : element.strokeColor,
+      );
+      Object.assign(element, {
+        baseFontSize: normalizeStickyNoteFontSize(
+          element.baseFontSize ?? element.fontSize,
+        ),
+        strokeColor,
+      });
+      if (container && container.strokeColor !== strokeColor) {
+        Object.assign(container, { strokeColor });
+      }
+    } else if (element.baseFontSize != null) {
+      Object.assign(element, { baseFontSize: null });
+    }
+  }
+
+  if (opts.refreshDimensions) {
+    for (const element of elements) {
+      if (!isStickyNoteElement(element) || element.isDeleted) {
+        continue;
+      }
+      const textElement = getBoundTextElement(element, elementsMap);
+      const layout = getStickyNoteLayout(element, textElement);
+      Object.assign(element, layout.container);
+      if (textElement && layout.text) {
+        Object.assign(textElement, layout.text);
+      }
+    }
+  }
+};
+
 export const restoreElements = <T extends ExcalidrawElement>(
   targetElements: readonly T[] | undefined | null,
   /** used for additional context (e.g. repairing arrow bindings) */
@@ -945,7 +1031,12 @@ export const restoreElements = <T extends ExcalidrawElement>(
       repairContainerElement(element, restoredElementsMap);
     }
 
-    if (opts.refreshDimensions && isTextElement(element)) {
+    if (
+      opts.refreshDimensions &&
+      isTextElement(element) &&
+      // sticky labels are refitted together with their note below
+      !isStickyNoteBoundText(element, restoredElementsMap)
+    ) {
       Object.assign(
         element,
         refreshTextDimensions(
@@ -973,6 +1064,10 @@ export const restoreElements = <T extends ExcalidrawElement>(
       }
     }
   }
+
+  restoreStickyNotes(restoredElements, restoredElementsMap, {
+    refreshDimensions: !!opts.refreshDimensions,
+  });
 
   const repairedElements = repairBoundTextElementOrder(restoredElements);
 
@@ -1193,6 +1288,12 @@ export const restoreAppState = (
     bucketFill: restoreColorTopPicksList(
       nextAppState.colorTopPicks?.bucketFill,
     ),
+    stickyNoteStroke: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.stickyNoteStroke,
+    ),
+    stickyNoteBackground: restoreColorTopPicksList(
+      nextAppState.colorTopPicks?.stickyNoteBackground,
+    ),
   };
 
   // legacy
@@ -1238,6 +1339,12 @@ export const restoreAppState = (
     ),
     gridStep: getNormalizedGridStep(
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
+    ),
+    currentItemStickynoteStrokeColor: normalizeStickyNoteStrokeColor(
+      nextAppState.currentItemStickynoteStrokeColor,
+    ),
+    currentItemStickynoteBackgroundColor: normalizeStickyNoteBackgroundColor(
+      nextAppState.currentItemStickynoteBackgroundColor,
     ),
     editingFrame: null,
   };

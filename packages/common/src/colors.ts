@@ -264,6 +264,22 @@ export const BUCKET_FILL_BACKGROUND_PICKS = [
   COLOR_PALETTE.yellow[DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX],
 ] as ColorTuple;
 
+// sticky notes are their own color domain (own defaults, own picks)
+export const DEFAULT_STICKY_NOTE_BG = "#ffdf6b";
+
+export const STICKY_NOTE_STROKE_PICKS: ColorTuple =
+  DEFAULT_ELEMENT_STROKE_PICKS;
+
+// ORDER matters for positioning in quick picker. Classic note colors; the
+// first one is `DEFAULT_STICKY_NOTE_BG`. Never transparent.
+export const STICKY_NOTE_BACKGROUND_PICKS = [
+  DEFAULT_STICKY_NOTE_BG,
+  COLOR_PALETTE.pink[1],
+  COLOR_PALETTE.green[1],
+  COLOR_PALETTE.blue[1],
+  COLOR_PALETTE.orange[1],
+] as ColorTuple;
+
 // ORDER matters for positioning in quick picker
 export const DEFAULT_CANVAS_BACKGROUND_PICKS = [
   COLOR_PALETTE.white,

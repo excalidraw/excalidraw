@@ -159,6 +159,7 @@ export type ToolType =
   | "hand"
   | "frame"
   | "magicframe"
+  | "stickynote"
   | "embeddable"
   | "laser"
   | "autoshape"
@@ -416,6 +417,8 @@ export interface AppState {
   exportWithDarkMode: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
+  currentItemStickynoteStrokeColor: string;
+  currentItemStickynoteBackgroundColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidthKey: StrokeWidthKey;
@@ -546,6 +549,9 @@ export interface AppState {
      * even though both drive `currentItemBackgroundColor` (its defaults and
      * use case differ — no transparent) */
     bucketFill: readonly string[] | null;
+    /** sticky notes are their own color domain (own defaults, own picks) */
+    stickyNoteStroke: readonly string[] | null;
+    stickyNoteBackground: readonly string[] | null;
   };
 }
 
@@ -1145,6 +1151,8 @@ export type AppClassProperties = {
   arrowText: App["arrowText"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
+  toolDrag: App["toolDrag"];
+  activeResizeHandle: App["activeResizeHandle"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];

@@ -3,6 +3,8 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_TEXT_ALIGN,
+  DEFAULT_STICKY_NOTE_SIZE,
+  STICKY_NOTE_MIN_SIZE,
   DEFAULT_VERTICAL_ALIGN,
   DEFAULT_STROKE_STREAMLINE,
   VERTICAL_ALIGN,
@@ -22,6 +24,10 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 import { newElementWith } from "./mutateElement";
+import {
+  normalizeStickyNoteBackgroundColor,
+  normalizeStickyNoteStrokeColor,
+} from "./stickyNote";
 import { getBoundTextMaxWidth } from "./textElement";
 import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
@@ -49,6 +55,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
+  ExcalidrawStickyNoteElement,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -171,6 +178,70 @@ export const newElement = (
 ): NonDeleted<ExcalidrawGenericElement> =>
   _newElementBase<ExcalidrawGenericElement>(opts.type, opts);
 
+/**
+ * Style invariants of a sticky note: never-transparent colors, solid fill.
+ * Applied by the constructor and by every normalization pass. Returns the
+ * same object when nothing needs fixing.
+ */
+export const normalizeStickyNoteStyle = <T extends ExcalidrawStickyNoteElement>(
+  element: T,
+): T => {
+  return newElementWith(element as ExcalidrawStickyNoteElement, {
+    backgroundColor: normalizeStickyNoteBackgroundColor(
+      element.backgroundColor,
+    ),
+    strokeColor: normalizeStickyNoteStrokeColor(element.strokeColor),
+    fillStyle: "solid",
+  }) as T;
+};
+
+/**
+ * Geometry invariants of a *finalized* sticky note: minimum size and
+ * `baseHeight ≤ height`. Deliberately not part of the constructor — a
+ * pointer-down draft starts at 0×0 like every other tool and is previewed at
+ * its true dragged size; pointer-up, restore, the skeleton path and the
+ * action post-passes enforce this.
+ */
+export const normalizeStickyNoteGeometry = <
+  T extends ExcalidrawStickyNoteElement,
+>(
+  element: T,
+): T => {
+  const width = Math.max(element.width, STICKY_NOTE_MIN_SIZE);
+  const baseHeight = Math.max(
+    element.baseHeight || element.height || DEFAULT_STICKY_NOTE_SIZE,
+    STICKY_NOTE_MIN_SIZE,
+  );
+
+  return newElementWith(element as ExcalidrawStickyNoteElement, {
+    width,
+    height: Math.max(element.height, baseHeight),
+    baseHeight,
+  }) as T;
+};
+
+/** all sticky note invariants (style + finalized geometry) */
+export const normalizeStickyNote = <T extends ExcalidrawStickyNoteElement>(
+  element: T,
+): T => {
+  return normalizeStickyNoteGeometry(normalizeStickyNoteStyle(element));
+};
+
+export const newStickyNoteElement = (
+  opts: {
+    type: "stickynote";
+    baseHeight?: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawStickyNoteElement> => {
+  const base = _newElementBase<ExcalidrawStickyNoteElement>("stickynote", opts);
+
+  // no size inflation here (see `normalizeStickyNoteGeometry`)
+  return normalizeStickyNoteStyle({
+    ...base,
+    baseHeight: opts.baseHeight ?? base.height,
+  });
+};
+
 export const newEmbeddableElement = (
   opts: {
     type: "embeddable";
@@ -273,6 +344,7 @@ export const newTextElement = (
     lineHeight?: ExcalidrawTextElement["lineHeight"];
     autoResize?: ExcalidrawTextElement["autoResize"];
     labelPosition?: ExcalidrawTextElement["labelPosition"];
+    baseFontSize?: ExcalidrawTextElement["baseFontSize"];
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawTextElement> => {
   const fontFamily = opts.fontFamily || DEFAULT_FONT_FAMILY;
@@ -295,6 +367,7 @@ export const newTextElement = (
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
     fontSize,
+    baseFontSize: opts.baseFontSize ?? null,
     fontFamily,
     textAlign,
     verticalAlign,

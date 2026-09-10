@@ -1,7 +1,12 @@
+import {
+  DEFAULT_STICKY_NOTE_BG,
+  DEFAULT_STICKY_NOTE_SIZE,
+  STICKY_NOTE_MIN_FONT_SIZE,
+  STICKY_NOTE_MIN_SIZE,
+  getUpdatedTimestamp,
+} from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
-
-import { getUpdatedTimestamp } from "@excalidraw/common";
 
 import {
   newElement,
@@ -15,7 +20,11 @@ import {
   type ExcalidrawElementSkeleton,
 } from "../transform";
 
-import type { ExcalidrawArrowElement } from "../types";
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawStickyNoteElement,
+  ExcalidrawTextElement,
+} from "../types";
 
 const opts = { regenerateIds: false };
 
@@ -1056,6 +1065,126 @@ describe("Test Transform", () => {
       expect(converted.map((element) => element.created)).toEqual(
         Array(4).fill(getUpdatedTimestamp()),
       );
+    });
+  });
+
+  describe("sticky notes", () => {
+    const find = <
+      T extends ExcalidrawStickyNoteElement | ExcalidrawTextElement,
+    >(
+      elements: readonly { type: string }[],
+      type: T["type"],
+    ) => elements.find((element) => element.type === type) as T;
+
+    it("creates a finalized note with the sticky defaults", () => {
+      const elements = convertToExcalidrawElements(
+        [{ type: "stickynote", x: 100, y: 100 }],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+
+      expect(elements).toHaveLength(1);
+      expect(note.width).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.backgroundColor).toBe(DEFAULT_STICKY_NOTE_BG);
+      expect(note.fillStyle).toBe("solid");
+    });
+
+    it("enforces the note invariants on the given properties", () => {
+      const note = find<ExcalidrawStickyNoteElement>(
+        convertToExcalidrawElements(
+          [
+            {
+              type: "stickynote",
+              x: 0,
+              y: 0,
+              width: 10,
+              height: 300,
+              backgroundColor: "transparent",
+              strokeColor: "transparent",
+            },
+          ],
+          opts,
+        ),
+        "stickynote",
+      );
+
+      expect(note.width).toBe(STICKY_NOTE_MIN_SIZE);
+      expect(note.height).toBe(300);
+      expect(note.baseHeight).toBe(300);
+      expect(note.backgroundColor).toBe(DEFAULT_STICKY_NOTE_BG);
+      expect(note.strokeColor).not.toBe("transparent");
+    });
+
+    it("gives the note the color of a label that sets its own", () => {
+      const elements = convertToExcalidrawElements(
+        [
+          {
+            type: "stickynote",
+            x: 0,
+            y: 0,
+            strokeColor: "#1971c2",
+            label: { text: "hello", strokeColor: "#e03131" },
+          },
+        ],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+      const label = find<ExcalidrawTextElement>(elements, "text");
+
+      expect(label.strokeColor).toBe("#e03131");
+      expect(note.strokeColor).toBe("#e03131");
+    });
+
+    it("binds a label whose font size becomes the note's ceiling", () => {
+      const elements = convertToExcalidrawElements(
+        [
+          {
+            type: "stickynote",
+            x: 100,
+            y: 100,
+            strokeColor: "#1971c2",
+            label: { text: "hello", fontSize: 28 },
+          },
+        ],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+      const label = find<ExcalidrawTextElement>(elements, "text");
+
+      expect(elements).toHaveLength(2);
+      expect(label.containerId).toBe(note.id);
+      expect(note.boundElements).toEqual([{ type: "text", id: label.id }]);
+      expect(label.baseFontSize).toBe(28);
+      expect(label.fontSize).toBe(28);
+      // the label is the note's visible text: it takes the note's stroke
+      expect(label.strokeColor).toBe("#1971c2");
+      expect(note.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+    });
+
+    it("grows the note for a label that overflows at the minimum font size", () => {
+      const elements = convertToExcalidrawElements(
+        [
+          {
+            type: "stickynote",
+            x: 0,
+            y: 0,
+            label: {
+              text: Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n"),
+              fontSize: 28,
+            },
+          },
+        ],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+      const label = find<ExcalidrawTextElement>(elements, "text");
+
+      expect(label.fontSize).toBe(STICKY_NOTE_MIN_FONT_SIZE);
+      expect(label.baseFontSize).toBe(28);
+      expect(note.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.height).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
     });
   });
 });

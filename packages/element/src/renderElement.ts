@@ -24,6 +24,10 @@ import {
   invariant,
   applyDarkModeFilter,
   isSafari,
+  STICKY_NOTE_EDGE_SHADOW_OPACITY,
+  STICKY_NOTE_EDGE_SHADOW_WIDTH,
+  STICKY_NOTE_FOOTER,
+  STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
 
 import type {
@@ -67,6 +71,11 @@ import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
 
 import { ShapeCache } from "./shape";
+import {
+  getStickyNoteFooter,
+  getStickyNotePathCommands,
+  type StickyNotePathCommand,
+} from "./stickyNote";
 
 import type {
   ExcalidrawElement,
@@ -315,6 +324,50 @@ const drawImagePlaceholder = (
   );
 };
 
+const drawStickyNotePath = (
+  context: CanvasRenderingContext2D,
+  commands: StickyNotePathCommand[],
+) => {
+  context.beginPath();
+  for (const command of commands) {
+    if (command.type === "move") {
+      context.moveTo(command.point.x, command.point.y);
+    } else if (command.type === "line") {
+      context.lineTo(command.point.x, command.point.y);
+    } else {
+      context.quadraticCurveTo(
+        command.control.x,
+        command.control.y,
+        command.point.x,
+        command.point.y,
+      );
+    }
+  }
+  context.closePath();
+};
+
+const fillStickyNoteShape = (
+  context: CanvasRenderingContext2D,
+  commands: StickyNotePathCommand[],
+) => {
+  drawStickyNotePath(context, commands);
+  context.fill();
+};
+
+const strokeStickyNoteEdge = (
+  context: CanvasRenderingContext2D,
+  commands: StickyNotePathCommand[],
+) => {
+  context.save();
+  drawStickyNotePath(context, commands);
+  context.clip();
+  context.lineWidth = STICKY_NOTE_EDGE_SHADOW_WIDTH * 2;
+  context.strokeStyle = `rgba(0, 0, 0, ${STICKY_NOTE_EDGE_SHADOW_OPACITY})`;
+  drawStickyNotePath(context, commands);
+  context.stroke();
+  context.restore();
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -322,6 +375,41 @@ const drawElementOnCanvas = (
   renderConfig: StaticCanvasRenderConfig,
 ) => {
   switch (element.type) {
+    case "stickynote": {
+      context.save();
+      context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_SHADOW_OPACITY})`;
+      fillStickyNoteShape(
+        context,
+        getStickyNotePathCommands(element, { shadow: true }),
+      );
+
+      const commands = getStickyNotePathCommands(element);
+      context.fillStyle = applyDarkModeFilter(
+        element.backgroundColor,
+        renderConfig.theme === THEME.DARK,
+      );
+      fillStickyNoteShape(context, commands);
+      strokeStickyNoteEdge(context, commands);
+
+      // the label is absolute, so this cached canvas only goes stale at a
+      // year boundary — and is regenerated on the next zoom, theme or
+      // element change anyway
+      const footer = getStickyNoteFooter(element);
+      if (footer) {
+        context.font = `${STICKY_NOTE_FOOTER.fontSize}px ${STICKY_NOTE_FOOTER.fontFamily}`;
+        context.textAlign = "right";
+        context.textBaseline = "alphabetic";
+        context.fillStyle = applyDarkModeFilter(
+          element.strokeColor,
+          renderConfig.theme === THEME.DARK,
+        );
+        context.globalAlpha *= STICKY_NOTE_FOOTER.opacity;
+        context.fillText(footer.text, footer.x, footer.y);
+      }
+
+      context.restore();
+      break;
+    }
     case "rectangle":
     case "iframe":
     case "embeddable":
@@ -909,6 +997,7 @@ export const renderElement = (
       break;
     }
     case "rectangle":
+    case "stickynote":
     case "diamond":
     case "ellipse":
     case "line":
