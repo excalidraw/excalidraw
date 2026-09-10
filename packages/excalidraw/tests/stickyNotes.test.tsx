@@ -937,6 +937,30 @@ describe("sticky notes", () => {
       expect(ceiling(label.id)).toBe(28);
     });
 
+    it("flips over the far corner like a rectangle, keeping the label upright", () => {
+      const { note, label } = setup();
+      // `note` is the live element; keep the pre-resize position to compare
+      const { x: originalX, y: originalY } = note;
+      // the SE corner dragged 400px up and left: past the NW corner
+      UI.resize(note, "se", [-400, -400]);
+
+      const resized = getElement<ExcalidrawStickyNoteElement>(note.id);
+      const resizedLabel = getElement<ExcalidrawTextElement>(label.id);
+      // proportional: 150px past the corner on both axes → a 150 square,
+      // mirrored so its bottom-right sits on the original top-left
+      expect(resized.width).toBeCloseTo(150);
+      expect(resized.height).toBeCloseTo(150);
+      expect(resized.x + resized.width).toBeCloseTo(originalX);
+      expect(resized.y + resized.height).toBeCloseTo(originalY);
+      expect(ceiling(label.id)).toBeCloseTo(
+        (28 * 150) / DEFAULT_STICKY_NOTE_SIZE,
+      );
+      // the label is inside the flipped note and not mirrored
+      expect(resizedLabel.angle).toBe(0);
+      expect(resizedLabel.x).toBeGreaterThan(resized.x);
+      expect(resizedLabel.y).toBeGreaterThan(resized.y);
+    });
+
     const hintWhileDragging = (
       note: ExcalidrawStickyNoteElement,
       handle: "se" | "e",

@@ -804,6 +804,118 @@ describe("sticky note text layout", () => {
     scene.destroy();
   });
 
+  it("flips a proportional corner resize over the far side, like a rectangle", () => {
+    // the SE corner dragged up past the top edge: the note mirrors over its
+    // top side at the dragged size (clamping the axes one by one used to pin
+    // the height at its minimum under a still-growing width)
+    const { scene, stickyId, textId } = createStickyWithText("A");
+    const sticky = getSticky(scene, stickyId);
+    const originalElementsMap = arrayToMap(
+      scene.getNonDeletedElements().map((element) => ({ ...element })),
+    );
+
+    resizeSingleElement(
+      400,
+      -400,
+      sticky,
+      { ...sticky },
+      originalElementsMap,
+      scene,
+      "se",
+      { shouldMaintainAspectRatio: true },
+    );
+
+    const resized = getSticky(scene, stickyId);
+    const text = getBoundText(scene, textId);
+    expect(resized.width).toBe(400);
+    expect(resized.height).toBe(400);
+    expect(resized.x).toBe(100);
+    // mirrored over the original top edge (y = 100)
+    expect(resized.y).toBe(100 - 400);
+    expect(text.fontSizeMax).toBeCloseTo(STICKY_FONT_SIZE * (400 / 250));
+    // the label is laid out inside the flipped note, upright
+    expect(text.angle).toBe(0);
+    expect(text.y).toBeGreaterThan(resized.y);
+    expect(text.y + text.height).toBeLessThan(resized.y + resized.height);
+    scene.destroy();
+  });
+
+  it("keeps a proportional shrink below the minimum proportional", () => {
+    const { scene, stickyId } = createStickyWithText("A");
+    const sticky = getSticky(scene, stickyId);
+    const originalElementsMap = arrayToMap(
+      scene.getNonDeletedElements().map((element) => ({ ...element })),
+    );
+
+    resizeSingleElement(
+      60,
+      60,
+      sticky,
+      { ...sticky },
+      originalElementsMap,
+      scene,
+      "se",
+      { shouldMaintainAspectRatio: true },
+    );
+
+    const resized = getSticky(scene, stickyId);
+    // one scale for both axes, so the square is kept through the clamp
+    expect(resized.width).toBeCloseTo(resized.height);
+    expect(resized.height).toBeGreaterThanOrEqual(
+      35 + STICKY_NOTE_BODY_INSET_Y,
+    );
+    scene.destroy();
+  });
+
+  it("flips a free edge resize over the far side", () => {
+    const { scene, stickyId } = createStickyWithText("A");
+    const sticky = getSticky(scene, stickyId);
+    const originalElementsMap = arrayToMap(
+      scene.getNonDeletedElements().map((element) => ({ ...element })),
+    );
+
+    // the east edge dragged left, 300px past the west edge
+    resizeSingleElement(
+      -300,
+      sticky.height,
+      sticky,
+      { ...sticky },
+      originalElementsMap,
+      scene,
+      "e",
+    );
+
+    const resized = getSticky(scene, stickyId);
+    expect(resized.width).toBe(300);
+    expect(resized.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+    expect(resized.x).toBe(100 - 300);
+    scene.destroy();
+  });
+
+  it("applies the minimum to a flipped size's magnitude", () => {
+    const { scene, stickyId } = createStickyWithText("A");
+    const sticky = getSticky(scene, stickyId);
+    const originalElementsMap = arrayToMap(
+      scene.getNonDeletedElements().map((element) => ({ ...element })),
+    );
+
+    // just past the west edge: the mirrored note is the minimum wide
+    resizeSingleElement(
+      -10,
+      sticky.height,
+      sticky,
+      { ...sticky },
+      originalElementsMap,
+      scene,
+      "e",
+    );
+
+    const resized = getSticky(scene, stickyId);
+    expect(resized.width).toBe(STICKY_NOTE_MIN_SIZE);
+    expect(resized.x).toBe(100 - STICKY_NOTE_MIN_SIZE);
+    scene.destroy();
+  });
+
   it.each([0, Math.PI / 4, Math.PI / 2])(
     "centers a middle-aligned label in the whole note, footer ignored, at angle %s",
     (angle) => {

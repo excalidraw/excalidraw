@@ -19,16 +19,16 @@ import {
 
 import { clamp } from "@excalidraw/math";
 
-import type { Radians } from "@excalidraw/math";
-
 import { updateBoundElements } from "./binding";
 import { newElementWith } from "./mutateElement";
+import { getPositionAfterHeightChange } from "./sizeHelpers";
 import { computeBoundTextPosition, getBoundTextElement } from "./textElement";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import { isStickyNoteElement, isTextElement } from "./typeChecks";
 
 import type { Scene } from "./Scene";
+import type { VerticalResizeAnchor } from "./sizeHelpers";
 import type { TransformHandleDirection } from "./transformHandles";
 import type {
   ElementsMap,
@@ -465,7 +465,7 @@ export const getStickyNoteMinSize = ({
 // layout — one pure calculation, two ways of applying it
 // -----------------------------------------------------------------------------
 
-export type StickyNoteLayoutAnchor = "top" | "bottom" | "center";
+export type StickyNoteLayoutAnchor = VerticalResizeAnchor;
 
 export type StickyNoteLayoutOpts = {
   /** unwrapped text to lay out; defaults to the label's `originalText` */
@@ -516,39 +516,6 @@ const NO_ELEMENTS: ElementsMap = new Map();
 
 const getStickyNoteBaseWidth = (container: ExcalidrawStickyNoteElement) => {
   return Math.max(container.width, STICKY_NOTE_MIN_SIZE);
-};
-
-/**
- * Position of the note after its height changes to `nextHeight` so that the
- * chosen edge stays put in the note's own (rotated) frame.
- */
-export const getStickyNoteAutoResizePosition = (
-  container: ExcalidrawStickyNoteElement,
-  nextHeight: number,
-  anchor: StickyNoteLayoutAnchor = "top",
-) => {
-  const prevHeight = container.height;
-  const delta = (prevHeight - nextHeight) / 2;
-
-  if (anchor === "center") {
-    // rotation is about the center, so holding it is angle-independent
-    return { x: container.x, y: container.y + delta };
-  }
-
-  const sin = Math.sin(container.angle as Radians);
-  const cos = Math.cos(container.angle as Radians);
-
-  if (anchor === "bottom") {
-    return {
-      x: container.x - delta * sin,
-      y: container.y + delta * (1 + cos),
-    };
-  }
-
-  return {
-    x: container.x + delta * sin,
-    y: container.y + delta * (1 - cos),
-  };
 };
 
 /**
@@ -656,7 +623,7 @@ export const getStickyNoteLayout = (
     // an empty note sits at its base height
     return {
       container: {
-        ...getStickyNoteAutoResizePosition(container, baseHeight, anchor),
+        ...getPositionAfterHeightChange(container, baseHeight, anchor),
         width: baseWidth,
         height: baseHeight,
         baseHeight,
@@ -703,7 +670,7 @@ export const getStickyNoteLayout = (
     ? baseHeight
     : Math.max(baseHeight, fitted.height + STICKY_NOTE_BODY_INSET_Y);
   const nextContainer = {
-    ...getStickyNoteAutoResizePosition(container, height, anchor),
+    ...getPositionAfterHeightChange(container, height, anchor),
     width: baseWidth,
     height,
     baseHeight,

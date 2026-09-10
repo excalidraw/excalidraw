@@ -21,6 +21,7 @@ import {
   updateOriginalContainerCache,
 } from "./containerCache";
 import { LinearElementEditor } from "./linearElementEditor";
+import { getPositionAfterHeightChange } from "./sizeHelpers";
 
 import { updateStickyNoteLayout } from "./stickyNote";
 import { measureText } from "./textMeasurements";
@@ -157,6 +158,7 @@ export const handleBindTextResize = (
   transformHandleType: MaybeTransformHandleType,
   shouldMaintainAspectRatio = false,
   shouldResizeFromCenter = false,
+  flipByY = false,
 ) => {
   if (isStickyNoteElement(container)) {
     // resize callers pass their intents to `updateStickyNoteLayout` directly
@@ -208,24 +210,24 @@ export const handleBindTextResize = (
         container.type,
       );
 
-      const diff = containerHeight - container.height;
-      // fix the y coord when resizing from ne/nw/n
+      // Crossing the opposite edge swaps the anchor for text-driven growth.
       const shouldResizeFromTop =
-        transformHandleType === "n" ||
-        transformHandleType === "ne" ||
-        transformHandleType === "nw";
+        (transformHandleType === "n" ||
+          transformHandleType === "ne" ||
+          transformHandleType === "nw") !== flipByY;
 
-      let offsetY = 0;
-      if (!isArrowElement(container)) {
-        if (shouldResizeFromCenter) {
-          offsetY = diff / 2;
-        } else if (shouldResizeFromTop) {
-          offsetY = diff;
-        }
-      }
       scene.mutateElement(container, {
         height: containerHeight,
-        y: container.y - offsetY,
+        ...(!isArrowElement(container) &&
+          getPositionAfterHeightChange(
+            container,
+            containerHeight,
+            shouldResizeFromCenter
+              ? "center"
+              : shouldResizeFromTop
+              ? "bottom"
+              : "top",
+          )),
       });
     }
 

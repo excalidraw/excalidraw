@@ -756,22 +756,54 @@ export const resizeSingleElement = (
     );
   }
 
-  let boundTextFont: { fontSize?: number } = {};
+  // Constraints and font scaling use magnitudes. Keep the signs for the
+  // geometry below, where crossing the opposite edge flips the element.
+  const flipFactorX = nextWidth < 0 ? -1 : 1;
+  const flipFactorY = nextHeight < 0 ? -1 : 1;
+  nextWidth = Math.abs(nextWidth);
+  nextHeight = Math.abs(nextHeight);
+
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElement = getBoundTextElement(latestElement, elementsMap);
   const isResizingStickyNote = isStickyNoteElement(latestElement);
-  // a note never shrinks below one line at its label's ceiling (an empty note
-  // gets the constant floor; the layout grows it once it has a label)
-  const stickyNoteMinSize = isResizingStickyNote
-    ? boundTextElement
+  let minSize: { width: number; height: number } | undefined;
+  if (isResizingStickyNote) {
+    // A note must fit one line at its label's font ceiling.
+    minSize = boundTextElement
       ? getStickyNoteMinSize({
           fontSize: boundTextElement.fontSizeMax ?? boundTextElement.fontSize,
           fontFamily: boundTextElement.fontFamily,
         })
-      : { width: STICKY_NOTE_MIN_SIZE, height: STICKY_NOTE_MIN_SIZE }
-    : null;
+      : { width: STICKY_NOTE_MIN_SIZE, height: STICKY_NOTE_MIN_SIZE };
+  } else if (boundTextElement && !shouldMaintainAspectRatio) {
+    minSize = {
+      width: getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      ),
+      height: getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      ),
+    };
+  }
 
-  if (boundTextElement) {
+  if (minSize) {
+    nextWidth = Math.max(nextWidth, minSize.width);
+    nextHeight = Math.max(nextHeight, minSize.height);
+    if (shouldMaintainAspectRatio) {
+      // Both dimensions must use the same scale even at the minimum size.
+      const scale = Math.max(
+        nextWidth / origElement.width,
+        nextHeight / origElement.height,
+      );
+      nextWidth = origElement.width * scale;
+      nextHeight = origElement.height * scale;
+    }
+  }
+
+  let boundTextFont: { fontSize?: number } = {};
+  if (boundTextElement && !isResizingStickyNote) {
     const stateOfBoundTextElementAtResize = originalElementsMap.get(
       boundTextElement.id,
     ) as typeof boundTextElement | undefined;
@@ -780,10 +812,7 @@ export const resizeSingleElement = (
         fontSize: stateOfBoundTextElementAtResize.fontSize,
       };
     }
-    if (stickyNoteMinSize) {
-      nextWidth = Math.max(nextWidth, stickyNoteMinSize.width);
-      nextHeight = Math.max(nextHeight, stickyNoteMinSize.height);
-    } else if (shouldMaintainAspectRatio) {
+    if (shouldMaintainAspectRatio) {
       const updatedElement = {
         ...latestElement,
         width: nextWidth,
@@ -801,22 +830,11 @@ export const resizeSingleElement = (
       boundTextFont = {
         fontSize: nextFont.size,
       };
-    } else {
-      const minWidth = getApproxMinLineWidth(
-        getFontString(boundTextElement),
-        boundTextElement.lineHeight,
-      );
-      const minHeight = getApproxMinLineHeight(
-        boundTextElement.fontSize,
-        boundTextElement.lineHeight,
-      );
-      nextWidth = Math.max(nextWidth, minWidth);
-      nextHeight = Math.max(nextHeight, minHeight);
     }
-  } else if (stickyNoteMinSize) {
-    nextWidth = Math.max(nextWidth, stickyNoteMinSize.width);
-    nextHeight = Math.max(nextHeight, stickyNoteMinSize.height);
   }
+
+  nextWidth *= flipFactorX;
+  nextHeight *= flipFactorY;
 
   const rescaledPoints = rescalePointsInElement(
     origElement,
@@ -889,7 +907,7 @@ export const resizeSingleElement = (
     shouldMaintainAspectRatio
   ) {
     const fontSize =
-      (nextWidth / latestElement.width) * boundTextElement.fontSize;
+      (Math.abs(nextWidth) / latestElement.width) * boundTextElement.fontSize;
     if (fontSize < MIN_FONT_SIZE) {
       return;
     }
@@ -959,6 +977,7 @@ export const resizeSingleElement = (
         handleDirection,
         shouldMaintainAspectRatio,
         shouldResizeFromCenter,
+        flipFactorY < 0,
       );
     }
 
@@ -1565,6 +1584,7 @@ export const resizeMultipleElements = (
           handleDirection,
           true,
           shouldResizeFromCenter,
+          flipByY,
         );
       }
     }
