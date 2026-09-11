@@ -233,7 +233,7 @@ export type InteractiveCanvasAppState = Readonly<
     isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
     gridModeEnabled: AppState["gridModeEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
-    hoveredArrowTextAnchor: AppState["hoveredArrowTextAnchor"];
+    textToolHover: AppState["textToolHover"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
     // Collaborators
@@ -358,37 +358,32 @@ export interface AppState {
   boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
-  /**
-   * user preference whether arrow snap to midpoints while binding.
-   *
-   * When enabled, the `suggestedBinding` highlight also renders midpoint
-   * indicators, but only while the pointer is outside the highlighted
-   * element (or when drawing an elbow arrow) — so consumers that suggest
-   * binding only while the pointer is inside the element (e.g. the text
-   * tool) never show them.
-   */
+  /** user preference whether arrow snap to midpoints while binding */
   isMidpointSnappingEnabled: boolean;
   /**
-   * The element the UI highlights (with a shape-following outline) when
-   * releasing or otherwise finishing the current interaction would bind to
-   * said element:
-   * - a bindable element an arrow endpoint is dragged or hovered close to
-   * - a text-bindable container the text tool is hovered over that would result
-   *   in a label being bound to it (arrows use `hoveredArrowTextAnchor` instead)
+   * The bindable element the UI highlights for the user when an arrow is
+   * dragged or otherwise its endpoint being close to said element.
    */
   suggestedBinding: {
     element: NonDeleted<ExcalidrawBindableElement>;
     midPoint?: GlobalPoint;
   } | null;
   /**
-   * Where on a hovered arrow the text tool would attach text if clicked —
-   * a free endpoint (binds the arrow to a new text element positioned against
-   * that endpoint) or the arrow's midpoint (adds a label bound to the arrow).
+   * What a text-tool click at the hovered position would act on — the text
+   * it would edit, the empty container it would label, or the arrow anchor
+   * (a free endpoint, or the midpoint for a label) it would attach text to.
+   * `null` when the click would create free text, or the tool isn't active.
+   * Drives the hover affordance only.
    */
-  hoveredArrowTextAnchor: {
-    elementId: ExcalidrawArrowElement["id"];
-    anchor: "start" | "end" | "label";
-  } | null;
+  textToolHover:
+    | { type: "text"; elementId: ExcalidrawElement["id"] }
+    | { type: "container"; elementId: ExcalidrawElement["id"] }
+    | {
+        type: "arrow";
+        elementId: ExcalidrawArrowElement["id"];
+        anchor: "start" | "end" | "label";
+      }
+    | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
     enabled: boolean;
@@ -401,9 +396,8 @@ export interface AppState {
    */
   editingFrame: ExcalidrawFrameLikeElement["id"] | null;
   /**
-   * Elements the UI highlights with a bounding-box outline. Used when
-   * dragging/resizing a frame (elements that would get added to it) and by
-   * the text tool on hover (the text element a click would edit).
+   * Elements the UI highlights with a bounding-box outline — those that
+   * would get added to a frame being dragged/resized.
    */
   elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
@@ -599,7 +593,7 @@ export type UIAppState = Omit<
   | "snapLines"
   | "originSnapOffset"
   | "suggestedBinding"
-  | "hoveredArrowTextAnchor"
+  | "textToolHover"
   | "frameToHighlight"
   | "elementsToHighlight"
 >;
@@ -1166,6 +1160,7 @@ export type AppClassProperties = {
   flowchart: App["flowchart"];
   drawShape: App["drawShape"];
   arrowText: App["arrowText"];
+  textTool: App["textTool"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
   toolDrag: App["toolDrag"];
