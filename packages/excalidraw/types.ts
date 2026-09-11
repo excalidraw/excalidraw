@@ -374,8 +374,7 @@ export interface AppState {
    * said element:
    * - a bindable element an arrow endpoint is dragged or hovered close to
    * - a text-bindable container the text tool is hovered over that would result
-   *   in a label being bound to it (arrow containers excluded — the highlight
-   *   renderer can't outline them, so they use `elementsToHighlight` instead)
+   *   in a label being bound to it (arrows use `hoveredArrowTextAnchor` instead)
    */
   suggestedBinding: {
     element: NonDeleted<ExcalidrawBindableElement>;
@@ -404,8 +403,7 @@ export interface AppState {
   /**
    * Elements the UI highlights with a bounding-box outline. Used when
    * dragging/resizing a frame (elements that would get added to it) and by
-   * the text tool on hover (the text element a click would edit, or the
-   * arrow container a click would bind a label to).
+   * the text tool on hover (the text element a click would edit).
    */
   elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
@@ -1271,6 +1269,10 @@ export type PointerDownState = Readonly<{
   boxSelection: {
     // If the box selection tool is activated on pointer down
     hasOccurred: boolean;
+  };
+  text: {
+    // A center click binds text; a drag creates free text instead.
+    pendingContainerId: ExcalidrawElement["id"] | null;
   };
 }>;
 

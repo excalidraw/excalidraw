@@ -45,6 +45,7 @@ import {
   ROUNDNESS,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
+  TEXT_AUTOWRAP_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -6843,6 +6844,24 @@ class App extends React.Component<AppProps, AppState> {
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
   }
 
+  private getTextCreationContainerAtPosition(
+    x: number,
+    y: number,
+    skipBinding: boolean,
+  ) {
+    if (skipBinding) {
+      return null;
+    }
+    const container = this.getTextBindableContainerAtPosition(x, y);
+    // Existing labels are edited only by hitting the text itself. Empty
+    // containers are candidates for binding only near their center.
+    return container &&
+      !hasBoundTextElement(container) &&
+      this.getTextWysiwygSnappedToCenterPosition(x, y, this.state, container)
+      ? container
+      : null;
+  }
+
   /**
    * Whether a text element's content is still being authored.
    *
@@ -6868,6 +6887,7 @@ class App extends React.Component<AppProps, AppState> {
     autoEdit = true,
     initialCaretSceneCoords,
     arrowEndpoint,
+    textCreation,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -6883,6 +6903,8 @@ class App extends React.Component<AppProps, AppState> {
      * dictates the text's position and alignment, overriding (sceneX, sceneY)
      */
     arrowEndpoint?: ArrowEndpoint | null;
+    /** Pending click-or-drag decision when creating text with the text tool. */
+    textCreation?: PointerDownState["text"];
   }) => {
     let shouldBindToContainer = false;
 
@@ -6934,6 +6956,19 @@ class App extends React.Component<AppProps, AppState> {
             )
           : null) ||
         this.getTextElementAtPosition(sceneX, sceneY);
+
+    if (
+      !autoEdit &&
+      textCreation &&
+      !existingTextElement &&
+      shouldBindToContainer &&
+      container
+    ) {
+      // Wait for a click before binding or resizing the container. A drag
+      // from its center should create free text at the pointer origin.
+      textCreation.pendingContainerId = container.id;
+      return;
+    }
 
     const fontFamily =
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
@@ -7090,7 +7125,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    if (autoEdit || existingTextElement || container) {
+    // A nearby container only skips drag sizing when the text binds to it.
+    if (autoEdit || existingTextElement || shouldBindToContainer) {
       this.handleTextWysiwyg(element, {
         isExistingElement: !!existingTextElement,
         initialCaretSceneCoords: existingTextElement
@@ -7766,22 +7802,12 @@ class App extends React.Component<AppProps, AppState> {
         if (textAtPosition) {
           elementToHighlight = textAtPosition;
         } else {
-          const container = this.getTextBindableContainerAtPosition(
+          const container = this.getTextCreationContainerAtPosition(
             sceneCoords.x,
             sceneCoords.y,
+            event.altKey,
           );
-          if (
-            container &&
-            !isArrowElement(container) &&
-            !hasBoundTextElement(container) &&
-            !event.altKey &&
-            this.getTextWysiwygSnappedToCenterPosition(
-              sceneCoords.x,
-              sceneCoords.y,
-              this.state,
-              container,
-            )
-          ) {
+          if (container && !isArrowElement(container)) {
             containerToBindTo = container;
           }
         }
@@ -9454,6 +9480,9 @@ class App extends React.Component<AppProps, AppState> {
       boxSelection: {
         hasOccurred: false,
       },
+      text: {
+        pendingContainerId: null,
+      },
     };
   }
 
@@ -10025,31 +10054,11 @@ class App extends React.Component<AppProps, AppState> {
         arrowEndpoint,
       });
     } else {
-      const containerAtPosition = this.getTextBindableContainerAtPosition(
+      const container = this.getTextCreationContainerAtPosition(
         sceneX,
         sceneY,
+        event.altKey,
       );
-
-      // pass the container only if the new text will actually get bound to it
-      // (container without a label yet + click near its center). In all other
-      // cases free text is created:
-      // - editing an existing label happens only by clicking the label itself,
-      //   which startTextEditing resolves on its own (the label, not the
-      //   container, is what's hit at that point)
-      // - a non-null container that ends up not binding would still suppress
-      //   the drag-to-size free text flow in startTextEditing
-      const container =
-        containerAtPosition &&
-        !hasBoundTextElement(containerAtPosition) &&
-        !event.altKey &&
-        this.getTextWysiwygSnappedToCenterPosition(
-          sceneX,
-          sceneY,
-          this.state,
-          containerAtPosition,
-        )
-          ? containerAtPosition
-          : null;
 
       this.startTextEditing({
         sceneX,
@@ -10058,9 +10067,23 @@ class App extends React.Component<AppProps, AppState> {
         container,
         autoEdit: false,
         initialCaretSceneCoords: { x: sceneX, y: sceneY },
+        textCreation: pointerDownState.text,
       });
     }
 
+    if (!pointerDownState.text.pendingContainerId) {
+      this.resetTextTool();
+    }
+  };
+
+  private resetTextTool = () => {
+    // The pointer may have refreshed the hover while a center click was
+    // pending. Clear it when creation starts, including with a locked tool.
+    this.setState({
+      hoveredArrowTextAnchor: null,
+      elementsToHighlight: null,
+      suggestedBinding: null,
+    });
     if (!this.isToolLocked()) {
       this.setState(
         {
@@ -10074,6 +10097,60 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.cursor.reset();
     }
+  };
+
+  private maybeStartPendingText = (
+    event: PointerEvent,
+    pointerDownState: PointerDownState,
+  ): boolean => {
+    const { pendingContainerId } = pointerDownState.text;
+    if (!pendingContainerId) {
+      return false;
+    }
+
+    // Tool changes and missing-pointer-up cleanup cancel the pending click.
+    if (
+      this.state.activeTool.type !== "text" ||
+      (event.type !== EVENT.POINTER_MOVE && event.type !== EVENT.POINTER_UP)
+    ) {
+      pointerDownState.text.pendingContainerId = null;
+      return true;
+    }
+
+    const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
+    const isDrag =
+      Math.abs(pointerCoords.x - pointerDownState.origin.x) *
+        this.state.zoom.value >
+      TEXT_AUTOWRAP_THRESHOLD;
+
+    if (!isDrag && event.type !== EVENT.POINTER_UP) {
+      return true;
+    }
+
+    pointerDownState.text.pendingContainerId = null;
+    const container = this.scene.getNonDeletedElement(pendingContainerId);
+    if (!isTextBindableContainer(container, false)) {
+      return true;
+    }
+
+    flushSync(() => {
+      this.startTextEditing({
+        sceneX: pointerDownState.origin.x,
+        sceneY: pointerDownState.origin.y,
+        container: isDrag ? null : container,
+        insertAtParentCenter: !isDrag,
+        autoEdit: !isDrag,
+      });
+      this.resetTextTool();
+    });
+
+    if (isDrag) {
+      pointerDownState.lastCoords.x = pointerCoords.x;
+      pointerDownState.lastCoords.y = pointerCoords.y;
+      this.maybeDragNewGenericElement(pointerDownState, event);
+    }
+
+    return true;
   };
 
   private handleFreeDrawElementOnPointerDown = (
@@ -10885,6 +10962,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.handlePointerMoveOverScrollbars(event, pointerDownState)) {
+        return;
+      }
+
+      if (this.maybeStartPendingText(event, pointerDownState)) {
         return;
       }
 
@@ -11744,6 +11825,8 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.eventListeners.onMove) {
         pointerDownState.eventListeners.onMove.flush();
       }
+
+      this.maybeStartPendingText(childEvent, pointerDownState);
 
       // an armed bucket fill commits only on a GENUINE pointer up. The
       // missing-pointer-up cleanup replays this handler with the pointer
