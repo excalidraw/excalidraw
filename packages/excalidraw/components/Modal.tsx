@@ -15,7 +15,10 @@ export const Modal: React.FC<{
   children: React.ReactNode;
   maxWidth?: number;
   onCloseRequest(): void;
-  labelledBy: string;
+  // Element id for `aria-labelledby`, when the dialog renders a visible
+  // title. Omit and pass `ariaLabel` instead for dialogs without one.
+  labelledBy?: string;
+  ariaLabel?: string;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
 }> = (props) => {
@@ -54,6 +57,7 @@ export const Modal: React.FC<{
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
+      aria-label={props.labelledBy ? undefined : props.ariaLabel}
     >
       <div
         className="Modal__background"
