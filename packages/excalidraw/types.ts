@@ -416,8 +416,7 @@ export interface AppState {
   /**
    * Elements the UI highlights with a bounding-box outline. Used when
    * dragging/resizing a frame (elements that would get added to it) and by
-   * the text tool on hover (the text element a click would edit, or the
-   * arrow container a click would bind a label to).
+   * the text tool on hover (the text element a click would edit).
    */
   elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
@@ -1323,6 +1322,10 @@ export type PointerDownState = Readonly<{
   boxSelection: {
     // If the box selection tool is activated on pointer down
     hasOccurred: boolean;
+  };
+  text: {
+    // A center click binds text; a drag creates free text instead.
+    pendingContainerId: ExcalidrawElement["id"] | null;
   };
 }>;
 
