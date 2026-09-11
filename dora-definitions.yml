@@ -12,12 +12,11 @@ application: excalidraw
 deploiement:
   # Que compte-t-on comme déploiement ? Regardez les valeurs d'environment
   # renvoyées par l'API avant de répondre. (support 2.3, 7.3)
-  compte_comme_deploiement: "???"
-  exclut: ["???"]
-
+  compte_comme_deploiement: "Deployment Status 'success' sur environment=Production – excalidraw"
+  exclut: ["preproduction", "rollback automatique", "redémarrage d'infra"]
   # Quel instant fait foi : la création de l'évènement, ou le passage au
   # statut success ? Les deux existent et ne sont pas simultanés. (support 5.2)
-  horodatage: "???"
+  horodatage: "fin du déploiement (created_at du status success)"
 
 changement:
   # Committer date sur la branche par défaut, ou ouverture de la PR ?
