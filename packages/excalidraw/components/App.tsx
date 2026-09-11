@@ -319,6 +319,7 @@ import {
   actionFlipVertical,
   actionGroup,
   actionPasteStyles,
+  actionSaveToActiveFile,
   actionSelectAll,
   actionSendBackward,
   actionSendToBack,
@@ -5567,6 +5568,16 @@ class App extends React.Component<AppProps, AppState> {
       if (event[KEYS.CTRL_OR_CMD] && isWritableElement(event.target)) {
         if (event.code === CODES.MINUS || event.code === CODES.EQUAL) {
           event.preventDefault();
+          return;
+        }
+        // Ctrl/Cmd+S while focus is in an input (e.g. the canvas search
+        // field or a dialog) would otherwise open the browser's "save page
+        // as" dialog. Route it through the save shortcut instead. Text
+        // editing runs its own save on submit, hence the defaultPrevented
+        // guard to avoid saving twice.
+        if (!event.defaultPrevented && actionSaveToActiveFile.keyTest(event)) {
+          event.preventDefault();
+          this.actionManager.handleKeyDown(event);
           return;
         }
       }
