@@ -2373,6 +2373,16 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <div
         translate="no"
+        dir={
+          this.props.applyLanguageToDocument
+            ? undefined
+            : getLanguage().rtl
+            ? "rtl"
+            : "ltr"
+        }
+        lang={
+          this.props.applyLanguageToDocument ? undefined : getLanguage().code
+        }
         className={clsx(
           "excalidraw excalidraw-container notranslate",
           this.props.className,
@@ -14227,7 +14237,7 @@ class App extends React.Component<AppProps, AppState> {
     const currentLang =
       languages.find((lang) => lang.code === this.props.langCode) ||
       defaultLang;
-    await setLanguage(currentLang);
+    await setLanguage(currentLang, this.props.applyLanguageToDocument);
     this.setAppState({});
   }
 }

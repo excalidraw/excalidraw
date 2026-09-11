@@ -2,6 +2,8 @@ import { useState, useLayoutEffect } from "react";
 
 import { THEME } from "@excalidraw/common";
 
+import { getLanguage } from "../i18n";
+
 import { useEditorInterface, useExcalidrawContainer } from "../components/App";
 import { useUIAppState } from "../context/ui-appState";
 
@@ -39,6 +41,11 @@ export const useCreatePortalContainer = (opts?: {
     }
 
     const div = ownerDocument.createElement("div");
+
+    const lang = getLanguage();
+    if (lang.rtl) {
+      div.dir = "rtl";
+    }
 
     container.appendChild(div);
 
