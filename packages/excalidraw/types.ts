@@ -415,6 +415,7 @@ export interface AppState {
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
+  exportWithGrid: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
   currentItemStickynoteStrokeColor: string;

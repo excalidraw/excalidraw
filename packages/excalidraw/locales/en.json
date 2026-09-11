@@ -525,6 +525,7 @@
       "withBackground": "Background",
       "onlySelected": "Only selected",
       "darkMode": "Dark mode",
+      "withGrid": "Grid",
       "embedScene": "Embed scene",
       "scale": "Scale",
       "padding": "Padding"

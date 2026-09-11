@@ -53,6 +53,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -703,6 +704,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -1280,6 +1282,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -1655,6 +1658,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -2031,6 +2035,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -2308,6 +2313,7 @@ exports[`history > multiplayer undo/redo > conflicts in arrows and their bindabl
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -2777,6 +2783,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -3098,6 +3105,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -3437,6 +3445,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -3748,6 +3757,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -4049,6 +4059,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -4298,6 +4309,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -4570,6 +4582,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -4858,6 +4871,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -5101,6 +5115,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -5344,6 +5359,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -5606,6 +5622,7 @@ exports[`history > multiplayer undo/redo > conflicts in bound text elements and 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -5879,6 +5896,7 @@ exports[`history > multiplayer undo/redo > conflicts in frames and their childre
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -6150,6 +6168,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -6493,6 +6512,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -6936,6 +6956,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -7326,6 +7347,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -7652,6 +7674,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -7956,6 +7979,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -8198,6 +8222,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -8566,6 +8591,7 @@ exports[`history > multiplayer undo/redo > should iterate through the history wh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -8934,6 +8960,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -9355,6 +9382,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -9655,6 +9683,7 @@ exports[`history > multiplayer undo/redo > should not let remote changes to inte
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -9932,6 +9961,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -10210,6 +10240,7 @@ exports[`history > multiplayer undo/redo > should not override remote changes on
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -10454,6 +10485,7 @@ exports[`history > multiplayer undo/redo > should override remotely added groups
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -10765,6 +10797,7 @@ exports[`history > multiplayer undo/redo > should override remotely added points
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -11094,6 +11127,7 @@ exports[`history > multiplayer undo/redo > should redistribute deltas when eleme
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -11342,6 +11376,7 @@ exports[`history > multiplayer undo/redo > should redraw arrows on undo > [end o
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -12283,6 +12318,7 @@ exports[`history > multiplayer undo/redo > should update history entries after r
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -12555,6 +12591,7 @@ exports[`history > singleplayer undo/redo > remounting undo/redo buttons should 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -12803,6 +12840,7 @@ exports[`history > singleplayer undo/redo > should clear the redo stack on eleme
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -13053,6 +13091,7 @@ exports[`history > singleplayer undo/redo > should create entry when selecting f
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -13471,6 +13510,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -13693,6 +13733,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on e
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -13912,6 +13953,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -14227,6 +14269,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on i
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -14539,6 +14582,7 @@ exports[`history > singleplayer undo/redo > should create new history entry on s
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -14797,6 +14841,7 @@ exports[`history > singleplayer undo/redo > should disable undo/redo buttons whe
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -15047,6 +15092,7 @@ exports[`history > singleplayer undo/redo > should end up with no history entry 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -15297,6 +15343,7 @@ exports[`history > singleplayer undo/redo > should iterate through the history w
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -15556,6 +15603,7 @@ exports[`history > singleplayer undo/redo > should not clear the redo stack on s
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -15901,6 +15949,7 @@ exports[`history > singleplayer undo/redo > should not collapse when applying co
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -16082,6 +16131,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -16380,6 +16430,7 @@ exports[`history > singleplayer undo/redo > should not end up with history entry
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -16657,6 +16708,7 @@ exports[`history > singleplayer undo/redo > should not modify anything on unrela
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -16821,6 +16873,7 @@ exports[`history > singleplayer undo/redo > should not override appstate changes
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -17115,6 +17168,7 @@ exports[`history > singleplayer undo/redo > should support appstate name or view
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -17287,6 +17341,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -18057,6 +18112,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -18725,6 +18781,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -19393,6 +19450,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -20164,6 +20222,7 @@ exports[`history > singleplayer undo/redo > should support bidirectional binding
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -20954,6 +21013,7 @@ exports[`history > singleplayer undo/redo > should support changes in elements' 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -21450,6 +21510,7 @@ exports[`history > singleplayer undo/redo > should support duplication of groups
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -21981,6 +22042,7 @@ exports[`history > singleplayer undo/redo > should support element creation, del
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -22456,6 +22518,7 @@ exports[`history > singleplayer undo/redo > should support linear element creati
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,

@@ -53,6 +53,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -492,6 +493,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -921,6 +923,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -1500,6 +1503,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -1718,6 +1722,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -2115,6 +2120,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -2372,6 +2378,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -2563,6 +2570,7 @@ exports[`regression tests > can drag element that covers another element, while 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -2901,6 +2909,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -3167,6 +3176,7 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -3420,6 +3430,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -3667,6 +3678,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -3937,6 +3949,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -4264,6 +4277,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -4712,6 +4726,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -5008,6 +5023,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -5296,6 +5312,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -5516,6 +5533,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -5727,6 +5745,7 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -6133,6 +6152,7 @@ exports[`regression tests > drags selected elements from point inside common bou
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -6442,6 +6462,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -7252,6 +7273,7 @@ exports[`regression tests > given a group of selected elements with an element t
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -7599,6 +7621,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -7890,6 +7913,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -8137,6 +8161,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -8389,6 +8414,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -8580,6 +8606,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -8771,6 +8798,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -8962,6 +8990,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -9206,6 +9235,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -9448,6 +9478,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -9655,6 +9686,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -9899,6 +9931,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -10090,6 +10123,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -10332,6 +10366,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -10523,6 +10558,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -10730,6 +10766,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -10921,6 +10958,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -11468,6 +11506,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -11760,6 +11799,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -11893,6 +11933,7 @@ exports[`regression tests > shift click on selected element should deselect it o
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -12104,6 +12145,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -12435,6 +12477,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -12877,6 +12920,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -13531,6 +13575,7 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -13667,6 +13712,7 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -14311,6 +14357,7 @@ exports[`regression tests > switches from group of selected elements to another 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -14664,6 +14711,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -14941,6 +14989,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -15074,6 +15123,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -15451,6 +15501,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,
@@ -15584,6 +15635,7 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "exportEmbedScene": false,
   "exportScale": 1,
   "exportWithDarkMode": false,
+  "exportWithGrid": false,
   "fileHandle": null,
   "frameRendering": {
     "clip": true,

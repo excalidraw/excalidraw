@@ -5,6 +5,7 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  THEME,
 } from "@excalidraw/common";
 
 import { pointFrom } from "@excalidraw/math";
@@ -17,6 +18,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { LocalPoint } from "@excalidraw/math";
+
+import { GridLineColor } from "../../renderer/staticScene";
 
 import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";
@@ -134,6 +137,53 @@ describe("exportToSvg", () => {
       expect(textEl.getAttribute("fill")).toBe(
         applyDarkModeFilter(textFixture.strokeColor),
       );
+    });
+  });
+
+  it("does not render grid by default", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      DEFAULT_OPTIONS,
+      null,
+    );
+
+    expect(svgElement.querySelector("g.grid")).toBeNull();
+  });
+
+  it("renders grid when exportWithGrid is enabled", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      {
+        ...DEFAULT_OPTIONS,
+        exportWithGrid: true,
+      },
+      null,
+    );
+
+    const grid = svgElement.querySelector("g.grid");
+    expect(grid).not.toBeNull();
+    expect(grid!.querySelectorAll("line").length).toBeGreaterThan(0);
+  });
+
+  it("renders grid with dark mode colors", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      ELEMENTS,
+      {
+        ...DEFAULT_OPTIONS,
+        exportWithGrid: true,
+        exportWithDarkMode: true,
+      },
+      null,
+    );
+
+    const lines = svgElement.querySelectorAll("g.grid line");
+    expect(lines.length).toBeGreaterThan(0);
+    lines.forEach((line) => {
+      const stroke = line.getAttribute("stroke");
+      expect([
+        GridLineColor[THEME.DARK].bold,
+        GridLineColor[THEME.DARK].regular,
+      ]).toContain(stroke);
     });
   });
 
@@ -294,6 +344,44 @@ describe("exportToSvg", () => {
 });
 
 describe("exportToCanvas", () => {
+  it("renders grid onto the canvas only when exportWithGrid is enabled", async () => {
+    const element = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    });
+
+    const countStrokes = (canvas: HTMLCanvasElement) =>
+      (canvas.getContext("2d") as any)
+        .__getEvents()
+        .filter((event: any) => event.type === "stroke").length;
+
+    const withoutGrid = await exportToCanvas({
+      elements: [element],
+      files: null,
+      appState: {
+        exportBackground: true,
+        viewBackgroundColor: "#ffffff",
+        exportWithGrid: false,
+      },
+    });
+
+    const withGrid = await exportToCanvas({
+      elements: [element],
+      files: null,
+      appState: {
+        exportBackground: true,
+        viewBackgroundColor: "#ffffff",
+        exportWithGrid: true,
+      },
+    });
+
+    // the grid adds many extra stroke() calls on top of the element rendering
+    expect(countStrokes(withGrid)).toBeGreaterThan(countStrokes(withoutGrid));
+  });
+
   it("does not paint over elements beneath a labeled arrow's label (#11591)", async () => {
     const rectangle = API.createElement({
       type: "rectangle",
