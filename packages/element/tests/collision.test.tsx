@@ -217,4 +217,48 @@ describe("hitElementItself cache", () => {
       }),
     ).toBe(true);
   });
+
+  it("rechecks a bound label when only its arrow changes", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 200,
+      y: 200,
+      width: 300,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(300, 0)],
+    });
+    const label = API.createElement({
+      type: "text",
+      text: "label",
+      x: 325,
+      y: 187.5,
+      width: 50,
+      height: 25,
+      containerId: arrow.id,
+    });
+    API.setElements([arrow, label]);
+    API.updateElement(arrow, {
+      boundElements: [{ id: label.id, type: "text" }],
+    });
+    const elementsMap = window.h.scene.getNonDeletedElementsMap();
+    const labelVersion = label.version;
+    const point = pointFrom<GlobalPoint>(350, 200);
+
+    expect(
+      hitElementItself({ point, element: label, threshold: 1, elementsMap }),
+    ).toBe(true);
+    API.updateElement(arrow, { x: 500 });
+    expect(label.version).toBe(labelVersion);
+    expect(
+      hitElementItself({ point, element: label, threshold: 1, elementsMap }),
+    ).toBe(false);
+    expect(
+      hitElementItself({
+        point: pointFrom<GlobalPoint>(650, 200),
+        element: label,
+        threshold: 1,
+        elementsMap,
+      }),
+    ).toBe(true);
+  });
 });
