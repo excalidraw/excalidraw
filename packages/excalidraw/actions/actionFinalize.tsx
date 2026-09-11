@@ -378,9 +378,7 @@ export const actionFinalize = register<FormData>({
     selectedLinearElement = selectedLinearElement
       ? {
           ...selectedLinearElement,
-          isEditing: appState.newElement
-            ? false
-            : selectedLinearElement.isEditing,
+          isEditing: false,
           initialState: {
             ...selectedLinearElement.initialState,
             lastClickedPoint: -1,
