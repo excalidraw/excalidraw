@@ -131,6 +131,14 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
     local: true,
     fallback: true,
   },
+  [FONT_FAMILY.Vazir]: {
+  metrics: {
+    unitsPerEm: 1000,
+    ascender: 900,
+    descender: -200,
+    lineHeight: 1.25,
+  },
+},
 };
 
 /** Unicode ranges defined by google fonts */
