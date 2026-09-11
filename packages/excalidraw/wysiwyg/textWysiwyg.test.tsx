@@ -441,7 +441,7 @@ describe("textWysiwyg", () => {
       expect(h.state.activeTool.type).toBe("text");
     });
 
-    it("should set a fixed text width when Alt-dragging at a shape's center", async () => {
+    it("should set a fixed text width when ctrl/cmd-dragging at a shape's center", async () => {
       const container = API.createElement({
         type: "rectangle",
         x: 100,
@@ -453,7 +453,7 @@ describe("textWysiwyg", () => {
       API.setElements([container]);
       UI.clickTool("text");
 
-      Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
         mouse.downAt(350, 300);
         for (let i = 1; i <= 4; i++) {
           mouse.moveTo(350 + i * 20, 300);
@@ -467,8 +467,10 @@ describe("textWysiwyg", () => {
 
       const text = h.elements[1] as ExcalidrawTextElement;
       expect(text.autoResize).toBe(false);
-      expect(text.width).toBe(160);
-      expect(text.x).toBe(270);
+      // one-sided from the origin (alt would resize from the center, as it
+      // does for any tool)
+      expect(text.width).toBe(80);
+      expect(text.x).toBe(350);
       expect(text.containerId).toBe(null);
       expect(container.boundElements).toBe(null);
     });
@@ -2186,8 +2188,8 @@ describe("textWysiwyg", () => {
         elementId: rectangle.id,
       });
 
-      // alt opts out of binding, so no highlight either
-      Keyboard.withModifierKeys({ alt: true }, () => {
+      // ctrl/cmd opts out of binding, so no highlight either
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
         mouse.moveTo(54, 57.5);
         expect(h.state.textToolHover).toBe(null);
       });
@@ -2382,7 +2384,7 @@ describe("textWysiwyg", () => {
       expect(h.state.textToolHover).toBe(null);
     });
 
-    it("should refresh the container hover when alt is pressed or released without moving", () => {
+    it("should refresh the container hover when ctrl/cmd is pressed or released without moving", () => {
       UI.clickTool("text");
       mouse.moveTo(55, 57.5);
       expect(h.state.textToolHover).toEqual({
@@ -2390,43 +2392,41 @@ describe("textWysiwyg", () => {
         elementId: rectangle.id,
       });
 
-      // alt opts out of binding: the outline goes with no pointermove...
-      Keyboard.withModifierKeys({ alt: true }, () => {
-        Keyboard.keyDown(KEYS.ALT);
+      // ctrl/cmd opts out of binding: the outline goes with no pointermove...
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyDown("Control");
         expect(h.state.textToolHover).toBe(null);
       });
       // ...and comes back on release
-      Keyboard.keyUp(KEYS.ALT);
+      Keyboard.keyUp("Control");
       expect(h.state.textToolHover).toEqual({
         type: "container",
         elementId: rectangle.id,
       });
     });
 
-    it("should keep the container hover under ctrl/cmd, which only concerns arrow binding", async () => {
+    it("should create free text on a ctrl/cmd click at an empty container's center", async () => {
       UI.clickTool("text");
       mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
-        Keyboard.keyDown("Control");
-        expect(h.state.isBindingEnabled).toBe(false);
-        expect(h.state.textToolHover).toEqual({
-          type: "container",
-          elementId: rectangle.id,
-        });
-        // the affordance is honest: the click binds regardless of ctrl/cmd
-        mouse.clickAt(55, 57.5);
+        mouse.moveTo(54, 57.5);
+        expect(h.state.textToolHover).toBe(null);
+        mouse.clickAt(54, 57.5);
       });
       const editor = await getTextEditor();
-      updateTextEditor(editor, "Label");
+      updateTextEditor(editor, "free");
       Keyboard.exitTextEditor(editor);
 
       const text = h.elements[1] as ExcalidrawTextElement;
-      expect(text.containerId).toBe(rectangle.id);
-      expect(rectangle.boundElements).toEqual([{ id: text.id, type: "text" }]);
+      expect(text.containerId).toBe(null);
+      expect(rectangle.boundElements).toBe(null);
     });
-
-    it("should not advertise a label on an empty arrow's midpoint while alt is held", async () => {
+    it("should not advertise a label on an empty arrow's midpoint while ctrl/cmd is held", async () => {
       const arrow = API.createElement({
         type: "arrow",
         x: 200,
@@ -2445,7 +2445,7 @@ describe("textWysiwyg", () => {
         anchor: "label",
       });
 
-      Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
         mouse.moveTo(351, 200);
         expect(h.state.textToolHover).toBe(null);
         mouse.clickAt(351, 200);

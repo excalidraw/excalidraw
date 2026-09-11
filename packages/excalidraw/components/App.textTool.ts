@@ -3,6 +3,7 @@ import { flushSync } from "react-dom";
 import {
   CURSOR_TYPE,
   EVENT,
+  KEYS,
   TEXT_AUTOWRAP_THRESHOLD,
   updateActiveTool,
   viewportCoordsToSceneCoords,
@@ -31,7 +32,7 @@ import type { AppState, PointerDownState } from "../types";
 type ScenePoint = { x: number; y: number };
 
 /** the modifier state a target depends on — off a pointer or keyboard event */
-type Modifiers = { altKey: boolean };
+type Modifiers = Pick<KeyboardEvent, "ctrlKey" | "metaKey">;
 
 /** What a text-tool click at a position does. */
 export type TextToolTarget =
@@ -113,7 +114,11 @@ export class AppTextTool {
    * it: a free arrow endpoint (the smaller, more deliberate target; z-aware,
    * and off while ctrl/cmd disables binding) → the text under the pointer,
    * which the click edits → an empty container near its center, which gets
-   * a label unless alt opts out → free text at the pointer.
+   * a label unless ctrl/cmd opts out → free text at the pointer.
+   *
+   * Ctrl/cmd is "no binding" throughout the tool, as elsewhere in the
+   * editor. For the container it is read off the event rather than the
+   * arrow-binding preference: a label is not an arrow binding.
    */
   getTargetAt = (
     scenePointer: ScenePoint,
@@ -131,7 +136,7 @@ export class AppTextTool {
       return { type: "text", element: text };
     }
 
-    if (!modifiers.altKey) {
+    if (!modifiers[KEYS.CTRL_OR_CMD]) {
       const container = this.app.getTextBindableContainerAtPosition(x, y);
       if (
         container &&
@@ -188,8 +193,8 @@ export class AppTextTool {
 
   /**
    * Re-evaluates the hover at the last known pointer position — for the
-   * events that change what a click would do without the pointer moving:
-   * the alt (container label) and ctrl/cmd (endpoint binding) toggles.
+   * event that changes what a click would do without the pointer moving:
+   * the ctrl/cmd binding toggle.
    */
   refreshHover = (modifiers: Modifiers) => {
     if (this.app.lastPointerMoveCoords) {

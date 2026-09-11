@@ -5705,11 +5705,6 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           maybeHandleArrowPointlikeDrag({ app: this, event });
         }
-        // alt opts out of labeling a container — the text-tool affordance
-        // must follow without waiting for a pointermove
-        if (!event.repeat) {
-          this.textTool.refreshHover(event);
-        }
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -6052,7 +6047,6 @@ class App extends React.Component<AppProps, AppState> {
     if (event.key === KEYS.ALT) {
       this.bucketFill.closeTemporaryEyeDropper();
       maybeHandleArrowPointlikeDrag({ app: this, event });
-      this.textTool.refreshHover(event);
     }
 
     if (
