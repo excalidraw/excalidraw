@@ -931,6 +931,13 @@ export const textWysiwyg = ({
           pendingInitialSelection.end,
         );
         pendingInitialSelection = null;
+        // focus() scrolled the textarea to the caret it had until now — the
+        // end of the value. For a text reaching past the viewport, whose
+        // editor is clamped to it, that shifts the text out of line with the
+        // canvas. The caret placed at the click is inside the visible box, so
+        // the editor can sit flush again.
+        editable.scrollTop = 0;
+        editable.scrollLeft = 0;
       }
     });
   };
