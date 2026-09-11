@@ -8,6 +8,14 @@ export class ExcalidrawFontFace {
   public readonly urls: URL[] | DataURL[];
   public readonly fontFace: FontFace;
 
+  /**
+   * `FontFace#unicodeRange` defaults to `U+0-10FFFF` per spec, but non-browser
+   * `FontFace` implementations (i.e. the polyfills needed to run exports in
+   * node) commonly don't expose it at all, so keep the declared range around
+   * as a fallback.
+   */
+  private readonly declaredUnicodeRange: string;
+
   private static readonly ASSETS_FALLBACK_URL = `https://esm.sh/${
     import.meta.env.PKG_NAME
       ? `${import.meta.env.PKG_NAME}@${import.meta.env.PKG_VERSION}` // is provided during package build
@@ -27,6 +35,8 @@ export class ExcalidrawFontFace {
       weight: "400",
       ...descriptors,
     });
+
+    this.declaredUnicodeRange = descriptors?.unicodeRange || "U+0-10FFFF";
   }
 
   /**
@@ -112,10 +122,13 @@ export class ExcalidrawFontFace {
   }
 
   private getUnicodeRangeRegex() {
+    const unicodeRange =
+      this.fontFace.unicodeRange || this.declaredUnicodeRange;
+
     // using \u{h} or \u{hhhhh} to match any number of hex digits,
     // otherwise we would get an "Invalid Unicode escape" error
     // e.g. U+0-1007F -> \u{0}-\u{1007F}
-    const unicodeRangeRegex = this.fontFace.unicodeRange
+    const unicodeRangeRegex = unicodeRange
       .split(/,\s*/)
       .map((range) => {
         const [start, end] = range.replace("U+", "").split("-");
