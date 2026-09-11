@@ -112,6 +112,7 @@ export const getDefaultAppState = (): Omit<
     editingFrame: null,
     elementsToHighlight: null,
     toast: null,
+    shapeToolExitedViaEscape: false,
     viewBackgroundColor: COLOR_PALETTE.white,
     zenModeEnabled: false,
     zoom: {
@@ -265,6 +266,7 @@ const APP_STATE_STORAGE_CONF = (<
   editingFrame: { browser: false, export: false, server: false },
   elementsToHighlight: { browser: false, export: false, server: false },
   toast: { browser: false, export: false, server: false },
+  shapeToolExitedViaEscape: { browser: false, export: false, server: false },
   viewBackgroundColor: { browser: true, export: true, server: true },
   width: { browser: false, export: false, server: false },
   zenModeEnabled: { browser: true, export: false, server: false },
