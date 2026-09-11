@@ -31,6 +31,8 @@ import {
   normalizeStickyNote,
   getNonDeletedElements,
   isNonDeletedElement,
+  relayoutStickyNotes,
+  STICKY_NOTE_FOOTER_FORMAT,
   syncStickyNoteInk,
 } from "@excalidraw/element";
 
@@ -87,6 +89,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
+  ExcalidrawStickyNoteElement,
   ExcalidrawTextElement,
   FontFamilyValues,
   StrokeVariability,
@@ -153,6 +156,11 @@ import {
   ArrowheadCardinalityZeroOrOneIcon,
   strokeVariabilityConstantIcon,
   strokeVariabilityVariableIcon,
+  CalendarClockIcon,
+  CalendarCogIcon,
+  CalendarDaysIcon,
+  CalendarShortDateIcon,
+  CalendarXIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1640,6 +1648,180 @@ export const actionChangeTextAlign = register<TextAlign>({
   },
 });
 
+type StickyNoteFooterPreset = "none" | "short" | "time" | "long";
+type StickyNoteFooterPickerValue = StickyNoteFooterPreset | "custom" | "mixed";
+
+const getTargetStickyNotes = (
+  elements: readonly ExcalidrawElement[],
+  appState: Parameters<typeof getTargetElements>[1],
+) => {
+  const elementsMap = arrayToMap(elements);
+  const stickyNotes = new Map<string, ExcalidrawStickyNoteElement>();
+
+  for (const target of getTargetElements(elementsMap, appState)) {
+    const stickyNote = isStickyNoteElement(target)
+      ? target
+      : isTextElement(target) && target.containerId
+      ? elementsMap.get(target.containerId)
+      : null;
+
+    if (
+      stickyNote &&
+      !stickyNote.isDeleted &&
+      isStickyNoteElement(stickyNote)
+    ) {
+      stickyNotes.set(stickyNote.id, stickyNote);
+    }
+  }
+
+  return [...stickyNotes.values()];
+};
+
+const getStickyNoteFooterPreset = (
+  stickyNote: ExcalidrawStickyNoteElement,
+): StickyNoteFooterPickerValue => {
+  const footerOptions = stickyNote.footerOptions;
+  if (footerOptions === null) {
+    return "none";
+  }
+  if (
+    footerOptions.type === "date" &&
+    (footerOptions.format === STICKY_NOTE_FOOTER_FORMAT.SHORT ||
+      footerOptions.format === STICKY_NOTE_FOOTER_FORMAT.TIME ||
+      footerOptions.format === STICKY_NOTE_FOOTER_FORMAT.LONG)
+  ) {
+    return footerOptions.format;
+  }
+  return "custom";
+};
+
+const getStickyNoteFooterPickerValue = (
+  stickyNotes: readonly ExcalidrawStickyNoteElement[],
+) => {
+  const first = stickyNotes[0]
+    ? getStickyNoteFooterPreset(stickyNotes[0])
+    : "mixed";
+  return stickyNotes.every(
+    (stickyNote) => getStickyNoteFooterPreset(stickyNote) === first,
+  )
+    ? first
+    : "mixed";
+};
+
+export const actionChangeStickyNoteFooter = register<StickyNoteFooterPreset>({
+  name: "changeStickyNoteFooter",
+  label: "Change sticky note footer",
+  keywords: ["sticky note", "footer", "date", "time"],
+  trackEvent: { category: "element" },
+  predicate: (elements, appState) =>
+    getTargetStickyNotes(elements, appState).length > 0,
+  perform: (elements, appState, value, app) => {
+    invariant(value, "actionChangeStickyNoteFooter: value must be defined");
+    const stickyNotes = getTargetStickyNotes(elements, appState);
+    if (stickyNotes.length === 0) {
+      return false;
+    }
+
+    const targetIds = new Set(stickyNotes.map((stickyNote) => stickyNote.id));
+    const footerOptions =
+      value === "none"
+        ? null
+        : {
+            type: "date" as const,
+            format:
+              value === "short"
+                ? STICKY_NOTE_FOOTER_FORMAT.SHORT
+                : value === "time"
+                ? STICKY_NOTE_FOOTER_FORMAT.TIME
+                : STICKY_NOTE_FOOTER_FORMAT.LONG,
+          };
+    const prevElementsMap = arrayToMap(elements);
+    const changedElements = elements.map((element) =>
+      targetIds.has(element.id) && isStickyNoteElement(element)
+        ? newElementWith(element, { footerOptions })
+        : element,
+    );
+    const nextElements = relayoutStickyNotes(changedElements, targetIds, {
+      prevElementsMap,
+    });
+
+    for (const element of nextElements) {
+      const prev = prevElementsMap.get(element.id);
+      if (
+        isStickyNoteElement(element) &&
+        isNonDeletedElement(element) &&
+        prev &&
+        (prev.x !== element.x ||
+          prev.y !== element.y ||
+          prev.height !== element.height)
+      ) {
+        updateBoundElements(element, app.scene);
+      }
+    }
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const stickyNotes = getTargetStickyNotes(elements, appState);
+    if (stickyNotes.length === 0) {
+      return null;
+    }
+
+    const label = t("labels.stickyNote.footer");
+    const visibleSections = [
+      {
+        name: "default",
+        options: [
+          {
+            value: "none",
+            text: t("labels.stickyNote.footerNone"),
+            icon: CalendarXIcon,
+            keyBinding: null,
+          },
+          {
+            value: "short",
+            text: t("labels.stickyNote.footerShortDate"),
+            icon: CalendarShortDateIcon,
+            keyBinding: null,
+          },
+          {
+            value: "time",
+            text: t("labels.stickyNote.footerTime"),
+            icon: CalendarClockIcon,
+            keyBinding: null,
+          },
+          {
+            value: "long",
+            text: t("labels.stickyNote.footerFullDate"),
+            icon: CalendarDaysIcon,
+            keyBinding: null,
+          },
+        ],
+      },
+    ] as const;
+
+    return (
+      <div style={{ marginLeft: "auto" }}>
+        <IconPicker<StickyNoteFooterPickerValue>
+          visibleSections={visibleSections}
+          label={label}
+          value={getStickyNoteFooterPickerValue(stickyNotes)}
+          triggerIcon={CalendarCogIcon}
+          onChange={(value) => {
+            if (value !== "custom" && value !== "mixed") {
+              updateData(value);
+            }
+          }}
+        />
+      </div>
+    );
+  },
+});
+
 export const actionChangeVerticalAlign = register<VerticalAlign>({
   name: "changeVerticalAlign",
   label: "Change vertical alignment",
@@ -1674,7 +1856,14 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+  PanelComponent: ({
+    elements,
+    appState,
+    updateData,
+    app,
+    data,
+    renderAction,
+  }) => {
     const { isCompact } = getStylesPanelInfo(app);
     return (
       <fieldset>
@@ -1734,6 +1923,7 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
               );
             }}
           />
+          {renderAction("changeStickyNoteFooter")}
         </div>
       </fieldset>
     );

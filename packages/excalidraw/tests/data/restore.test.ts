@@ -339,6 +339,35 @@ describe("restoreElements", () => {
     expect(restored.colorTopPicks.stickyNoteStroke).toBe(null);
   });
 
+  it("should restore sticky note footer options and the legacy default", () => {
+    const legacy = API.createElement({
+      type: "stickynote",
+      id: "legacy",
+      width: 250,
+      height: 250,
+    });
+    const withoutFooter = newElementWith(
+      API.createElement({
+        type: "stickynote",
+        id: "without-footer",
+        width: 250,
+        height: 250,
+      }),
+      { footerOptions: null },
+    );
+
+    const restored = restore.restoreElements(
+      [{ ...legacy, footerOptions: undefined } as any, withoutFooter],
+      null,
+    ) as ExcalidrawStickyNoteElement[];
+
+    expect(restored[0].footerOptions).toEqual({
+      type: "date",
+      format: "short",
+    });
+    expect(restored[1].footerOptions).toBeNull();
+  });
+
   it("should refit a sticky note together with its label when refreshing dimensions", () => {
     const stickyNote = API.createElement({
       type: "stickynote",

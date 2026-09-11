@@ -37,6 +37,7 @@ import {
   getStickyNoteDateLabel,
   getStickyNoteFooter,
   getStickyNoteMinSize,
+  formatStickyNoteFooterDate,
   syncStickyNoteInk,
   normalizeStickyNoteFontSize,
   updateStickyNoteLayout,
@@ -1045,11 +1046,75 @@ describe("sticky note creation date", () => {
     ).toBeNull();
   });
 
+  it("supports each footer type and custom date formats", () => {
+    const sticky = newStickyNoteElement({
+      type: "stickynote",
+      x: 0,
+      y: 0,
+      width: DEFAULT_STICKY_NOTE_SIZE,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+      created: at(2025, 4, 30),
+    });
+
+    expect(sticky.footerOptions).toEqual({ type: "date", format: "short" });
+    expect(
+      getStickyNoteFooter(newElementWith(sticky, { footerOptions: null }), NOW),
+    ).toBeNull();
+    expect(
+      getStickyNoteFooter(
+        newElementWith(sticky, {
+          footerOptions: { type: "text", text: "Custom footer" },
+        }),
+        NOW,
+      )?.text,
+    ).toBe("Custom footer");
+    expect(
+      formatStickyNoteFooterDate(sticky.created, "YYYY-MM-DD [at] HH:mm"),
+    ).toBe("2025-05-30 at 12:00");
+    expect(formatStickyNoteFooterDate(sticky.created, "time")).toBe(
+      new Intl.DateTimeFormat(undefined, {
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(new Date(sticky.created!)),
+    );
+    expect(formatStickyNoteFooterDate(sticky.created, "long")).toBe(
+      new Intl.DateTimeFormat(undefined, { dateStyle: "long" }).format(
+        new Date(sticky.created!),
+      ),
+    );
+  });
+
   it("reserves the footer below the label body", () => {
     const { scene, stickyId, textId } = createStickyWithText("A");
     const sticky = getSticky(scene, stickyId);
     expect(getBoundTextMaxHeight(sticky, getBoundText(scene, textId))).toBe(
       sticky.height - STICKY_NOTE_BODY_INSET_Y,
+    );
+    scene.destroy();
+  });
+
+  it("uses equal top and bottom text padding without a footer", () => {
+    const { scene, stickyId, textId } = createStickyWithText("A");
+    const sticky = newElementWith(getSticky(scene, stickyId), {
+      footerOptions: null,
+    });
+    const text = getBoundText(scene, textId);
+    const elementsMap = arrayToMap([sticky, text]);
+    const topText = newElementWith(text, {
+      verticalAlign: VERTICAL_ALIGN.TOP,
+    });
+    const bottomText = newElementWith(text, {
+      verticalAlign: VERTICAL_ALIGN.BOTTOM,
+    });
+    const top = computeBoundTextPosition(sticky, topText, elementsMap);
+    const bottom = computeBoundTextPosition(sticky, bottomText, elementsMap);
+
+    expect(getBoundTextMaxHeight(sticky, text)).toBe(
+      sticky.height - STICKY_NOTE_PADDING * 2,
+    );
+    expect(top.y - sticky.y).toBe(STICKY_NOTE_PADDING);
+    expect(sticky.y + sticky.height - (bottom.y + bottomText.height)).toBe(
+      STICKY_NOTE_PADDING,
     );
     scene.destroy();
   });

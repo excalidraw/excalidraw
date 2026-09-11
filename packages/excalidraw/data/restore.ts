@@ -49,6 +49,7 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 import {
   bumpVersion,
+  DEFAULT_STICKY_NOTE_FOOTER_OPTIONS,
   getStickyNoteLayout,
   isStickyNoteBoundText,
   normalizeStickyNote,
@@ -738,6 +739,10 @@ export const restoreElement = (
             element.baseHeight ??
             (element as typeof element & { maxHeight?: number }).maxHeight ??
             element.height,
+          footerOptions:
+            element.footerOptions === undefined
+              ? DEFAULT_STICKY_NOTE_FOOTER_OPTIONS
+              : element.footerOptions,
         }),
       );
     case "magicframe":

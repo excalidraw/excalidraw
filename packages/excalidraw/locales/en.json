@@ -163,6 +163,13 @@
       "breakPolygon": "Break polygon",
       "convertToPolygon": "Convert to polygon"
     },
+    "stickyNote": {
+      "footer": "Sticky note footer",
+      "footerNone": "No footer",
+      "footerShortDate": "Short date",
+      "footerTime": "Time only",
+      "footerFullDate": "Full date"
+    },
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
