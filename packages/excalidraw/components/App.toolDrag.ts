@@ -57,6 +57,7 @@ export const DRAGGABLE_TOOLS: Partial<Record<ToolType, DraggableTool>> = {
         baseHeight: size,
         strokeColor: state.currentItemStickynoteStrokeColor,
         backgroundColor: state.currentItemStickynoteBackgroundColor,
+        footerOptions: state.currentItemStickynoteFooterOptions,
         fillStyle: state.currentItemFillStyle,
         strokeWidth: app.getCurrentItemStrokeWidth("stickynote"),
         strokeStyle: state.currentItemStrokeStyle,

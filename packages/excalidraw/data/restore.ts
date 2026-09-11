@@ -49,11 +49,11 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 import {
   bumpVersion,
-  DEFAULT_STICKY_NOTE_FOOTER_OPTIONS,
   getStickyNoteLayout,
   isStickyNoteBoundText,
   normalizeStickyNote,
   normalizeStickyNoteBackgroundColor,
+  normalizeStickyNoteFooterOptions,
   normalizeStickyNoteFontSize,
   normalizeStickyNoteStrokeColor,
 } from "@excalidraw/element";
@@ -739,10 +739,9 @@ export const restoreElement = (
             element.baseHeight ??
             (element as typeof element & { maxHeight?: number }).maxHeight ??
             element.height,
-          footerOptions:
-            element.footerOptions === undefined
-              ? DEFAULT_STICKY_NOTE_FOOTER_OPTIONS
-              : element.footerOptions,
+          footerOptions: normalizeStickyNoteFooterOptions(
+            element.footerOptions,
+          ),
         }),
       );
     case "magicframe":
@@ -1350,6 +1349,9 @@ export const restoreAppState = (
     ),
     currentItemStickynoteBackgroundColor: normalizeStickyNoteBackgroundColor(
       nextAppState.currentItemStickynoteBackgroundColor,
+    ),
+    currentItemStickynoteFooterOptions: normalizeStickyNoteFooterOptions(
+      nextAppState.currentItemStickynoteFooterOptions,
     ),
     editingFrame: null,
   };

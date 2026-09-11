@@ -36,6 +36,10 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentItemRoundness": "sharp",
   "currentItemStartArrowhead": null,
   "currentItemStickynoteBackgroundColor": "#ffdf6b",
+  "currentItemStickynoteFooterOptions": {
+    "format": "short",
+    "type": "date",
+  },
   "currentItemStickynoteStrokeColor": "#1e1e1e",
   "currentItemStrokeColor": "#1e1e1e",
   "currentItemStrokeStyle": "solid",

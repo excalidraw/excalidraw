@@ -193,6 +193,13 @@ export const SelectedShapeActions = ({
       )}
 
       {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+      {!predicates.verticalAlign && predicates.stickyNoteFooter && (
+        <fieldset>
+          <div className="buttonList">
+            {renderAction("changeStickyNoteFooter")}
+          </div>
+        </fieldset>
+      )}
       {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
 
       {predicates.opacity && renderAction("changeOpacity")}
@@ -484,7 +491,10 @@ const CombinedTextProperties = ({
             <div className="selected-shape-actions">
               {predicates.text && renderAction("changeFontSize")}
               {predicates.textAlign && renderAction("changeTextAlign")}
-              {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+              {predicates.verticalAlign
+                ? renderAction("changeVerticalAlign")
+                : predicates.stickyNoteFooter &&
+                  renderAction("changeStickyNoteFooter")}
             </div>
           </PropertiesPopover>
         )}
@@ -697,6 +707,11 @@ export const CompactShapeActions = ({
           />
         </>
       )}
+      {!predicates.text && predicates.stickyNoteFooter && (
+        <div className="compact-action-item">
+          {renderAction("changeStickyNoteFooter")}
+        </div>
+      )}
 
       {/* Dedicated Copy Button */}
       {predicates.showExtraActions && (
@@ -844,6 +859,11 @@ export const MobileShapeActions = ({
               container={container}
             />
           </>
+        )}
+        {!predicates.text && predicates.stickyNoteFooter && (
+          <div className="compact-action-item">
+            {renderAction("changeStickyNoteFooter")}
+          </div>
         )}
 
         {/* Combined Other Actions */}

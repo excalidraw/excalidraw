@@ -77,6 +77,25 @@ export const DEFAULT_STICKY_NOTE_FOOTER_OPTIONS: StickyNoteFooterOptions =
     format: STICKY_NOTE_FOOTER_FORMAT.SHORT,
   });
 
+export const normalizeStickyNoteFooterOptions = (
+  footerOptions: unknown,
+): StickyNoteFooterOptions | null => {
+  if (footerOptions === null) {
+    return null;
+  }
+  if (typeof footerOptions !== "object" || Array.isArray(footerOptions)) {
+    return DEFAULT_STICKY_NOTE_FOOTER_OPTIONS;
+  }
+  const value = footerOptions as Record<string, unknown>;
+  if (value.type === "date" && typeof value.format === "string") {
+    return footerOptions as StickyNoteFooterOptions;
+  }
+  if (value.type === "text" && typeof value.text === "string") {
+    return footerOptions as StickyNoteFooterOptions;
+  }
+  return DEFAULT_STICKY_NOTE_FOOTER_OPTIONS;
+};
+
 export const normalizeStickyNoteStrokeColor = (
   strokeColor: string | null | undefined,
 ) => {
@@ -548,10 +567,7 @@ export const getStickyNoteFooter = (
     Partial<Pick<ExcalidrawStickyNoteElement, "footerOptions">>,
   now = Date.now(),
 ) => {
-  const footerOptions =
-    element.footerOptions === undefined
-      ? DEFAULT_STICKY_NOTE_FOOTER_OPTIONS
-      : element.footerOptions;
+  const footerOptions = normalizeStickyNoteFooterOptions(element.footerOptions);
   if (
     footerOptions === null ||
     element.width < STICKY_NOTE_MIN_SIZE ||

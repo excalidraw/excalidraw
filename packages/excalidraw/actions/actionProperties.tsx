@@ -95,6 +95,7 @@ import type {
   StrokeVariability,
   NonDeleted,
   NonDeletedExcalidrawElement,
+  StickyNoteFooterOptions,
   TextAlign,
   VerticalAlign,
 } from "@excalidraw/element/types";
@@ -1678,9 +1679,8 @@ const getTargetStickyNotes = (
 };
 
 const getStickyNoteFooterPreset = (
-  stickyNote: ExcalidrawStickyNoteElement,
+  footerOptions: StickyNoteFooterOptions | null,
 ): StickyNoteFooterPickerValue => {
-  const footerOptions = stickyNote.footerOptions;
   if (footerOptions === null) {
     return "none";
   }
@@ -1697,16 +1697,46 @@ const getStickyNoteFooterPreset = (
 
 const getStickyNoteFooterPickerValue = (
   stickyNotes: readonly ExcalidrawStickyNoteElement[],
+  currentFooterOptions: StickyNoteFooterOptions | null,
 ) => {
-  const first = stickyNotes[0]
-    ? getStickyNoteFooterPreset(stickyNotes[0])
-    : "mixed";
+  if (stickyNotes.length === 0) {
+    return getStickyNoteFooterPreset(currentFooterOptions);
+  }
+  const first = getStickyNoteFooterPreset(stickyNotes[0].footerOptions);
   return stickyNotes.every(
-    (stickyNote) => getStickyNoteFooterPreset(stickyNote) === first,
+    (stickyNote) =>
+      getStickyNoteFooterPreset(stickyNote.footerOptions) === first,
   )
     ? first
     : "mixed";
 };
+
+const getStickyNoteFooterOptions = (
+  value: StickyNoteFooterPreset,
+): StickyNoteFooterOptions | null =>
+  value === "none"
+    ? null
+    : {
+        type: "date",
+        format:
+          value === "short"
+            ? STICKY_NOTE_FOOTER_FORMAT.SHORT
+            : value === "time"
+            ? STICKY_NOTE_FOOTER_FORMAT.TIME
+            : STICKY_NOTE_FOOTER_FORMAT.LONG,
+      };
+
+const areStickyNoteFooterOptionsEqual = (
+  a: StickyNoteFooterOptions | null,
+  b: StickyNoteFooterOptions | null,
+) =>
+  a === b ||
+  (a !== null &&
+    b !== null &&
+    a.type === b.type &&
+    (a.type === "date"
+      ? b.type === "date" && a.format === b.format
+      : b.type === "text" && a.text === b.text));
 
 export const actionChangeStickyNoteFooter = register<StickyNoteFooterPreset>({
   name: "changeStickyNoteFooter",
@@ -1714,27 +1744,41 @@ export const actionChangeStickyNoteFooter = register<StickyNoteFooterPreset>({
   keywords: ["sticky note", "footer", "date", "time"],
   trackEvent: { category: "element" },
   predicate: (elements, appState) =>
+    appState.activeTool.type === "stickynote" ||
     getTargetStickyNotes(elements, appState).length > 0,
   perform: (elements, appState, value, app) => {
     invariant(value, "actionChangeStickyNoteFooter: value must be defined");
     const stickyNotes = getTargetStickyNotes(elements, appState);
-    if (stickyNotes.length === 0) {
+    const footerOptions = getStickyNoteFooterOptions(value);
+    const appStateChanged = !areStickyNoteFooterOptionsEqual(
+      appState.currentItemStickynoteFooterOptions,
+      footerOptions,
+    );
+    const changedStickyNotes = stickyNotes.filter(
+      (stickyNote) =>
+        !areStickyNoteFooterOptionsEqual(
+          stickyNote.footerOptions,
+          footerOptions,
+        ),
+    );
+
+    if (!appStateChanged && changedStickyNotes.length === 0) {
       return false;
     }
+    const nextAppState = {
+      ...appState,
+      currentItemStickynoteFooterOptions: footerOptions,
+    };
+    if (changedStickyNotes.length === 0) {
+      return {
+        appState: nextAppState,
+        captureUpdate: CaptureUpdateAction.EVENTUALLY,
+      };
+    }
 
-    const targetIds = new Set(stickyNotes.map((stickyNote) => stickyNote.id));
-    const footerOptions =
-      value === "none"
-        ? null
-        : {
-            type: "date" as const,
-            format:
-              value === "short"
-                ? STICKY_NOTE_FOOTER_FORMAT.SHORT
-                : value === "time"
-                ? STICKY_NOTE_FOOTER_FORMAT.TIME
-                : STICKY_NOTE_FOOTER_FORMAT.LONG,
-          };
+    const targetIds = new Set(
+      changedStickyNotes.map((stickyNote) => stickyNote.id),
+    );
     const prevElementsMap = arrayToMap(elements);
     const changedElements = elements.map((element) =>
       targetIds.has(element.id) && isStickyNoteElement(element)
@@ -1761,13 +1805,13 @@ export const actionChangeStickyNoteFooter = register<StickyNoteFooterPreset>({
 
     return {
       elements: nextElements,
-      appState,
+      appState: nextAppState,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const stickyNotes = getTargetStickyNotes(elements, appState);
-    if (stickyNotes.length === 0) {
+    if (stickyNotes.length === 0 && appState.activeTool.type !== "stickynote") {
       return null;
     }
 
@@ -1809,7 +1853,10 @@ export const actionChangeStickyNoteFooter = register<StickyNoteFooterPreset>({
         <IconPicker<StickyNoteFooterPickerValue>
           visibleSections={visibleSections}
           label={label}
-          value={getStickyNoteFooterPickerValue(stickyNotes)}
+          value={getStickyNoteFooterPickerValue(
+            stickyNotes,
+            appState.currentItemStickynoteFooterOptions,
+          )}
           triggerIcon={CalendarCogIcon}
           onChange={(value) => {
             if (value !== "custom" && value !== "mixed") {

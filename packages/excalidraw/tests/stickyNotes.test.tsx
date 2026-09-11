@@ -1156,6 +1156,9 @@ describe("sticky notes", () => {
       fireEvent.click(
         getByRole(document.body, "button", { name: "Sticky note footer" }),
       );
+      fireEvent.click(getByTitle(document.body, "Short date"));
+      expect(h.history.isUndoStackEmpty).toBe(true);
+
       fireEvent.click(getByTitle(document.body, "No footer"));
       expect(
         getElement<ExcalidrawStickyNoteElement>(note.id).footerOptions,
@@ -1177,6 +1180,40 @@ describe("sticky notes", () => {
       expect(
         getElement<ExcalidrawStickyNoteElement>(note.id).footerOptions,
       ).toEqual({ type: "date", format: "time" });
+    });
+
+    it("shows the footer picker for an empty sticky note", () => {
+      const note = API.createElement({
+        type: "stickynote",
+        id: "empty-note",
+      });
+      API.setElements([note]);
+      API.setSelectedElements([note]);
+
+      expect(
+        getByRole(document.body, "button", { name: "Sticky note footer" }),
+      ).toBeTruthy();
+    });
+
+    it("applies the current footer options to newly created sticky notes", async () => {
+      UI.clickTool("stickynote");
+      fireEvent.click(
+        getByRole(document.body, "button", { name: "Sticky note footer" }),
+      );
+      fireEvent.click(getByTitle(document.body, "No footer"));
+      expect(h.state.currentItemStickynoteFooterOptions).toBeNull();
+
+      fireEvent.click(
+        getByRole(document.body, "button", { name: "Sticky note footer" }),
+      );
+      mouse.downAt(300, 300);
+      mouse.up();
+
+      const note = h.elements.find(
+        (element) => element.type === "stickynote",
+      ) as ExcalidrawStickyNoteElement;
+      expect(note.footerOptions).toBeNull();
+      Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
     });
 
     it("exports the same absolute date to SVG and canvas, omitting unknown dates", async () => {
