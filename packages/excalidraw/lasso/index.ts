@@ -188,7 +188,7 @@ export class LassoTrail extends AnimatedTrail {
         intersectedElements: this.intersectedElements,
         enclosedElements: this.enclosedElements,
         simplifyDistance: 5 / this.app.state.zoom.value,
-        mode: this.app.state.boxSelectionMode,
+        mode: this.app.state.lassoSelectionMode,
       });
 
       this.selectElementsFromIds(selectedElementIds);
