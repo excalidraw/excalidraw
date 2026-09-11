@@ -45,7 +45,6 @@ import {
   ROUNDNESS,
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
-  TEXT_AUTOWRAP_THRESHOLD,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -447,6 +446,7 @@ import ConvertElementTypePopup, {
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppArrowText } from "./App.arrowText";
+import { AppTextTool } from "./App.textTool";
 import { AppBucketFill } from "./App.bucketFill";
 import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
@@ -717,6 +717,7 @@ class App extends React.Component<AppProps, AppState> {
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
+  public textTool: AppTextTool = new AppTextTool(this);
   public viewport: AppViewport = new AppViewport(this, {
     getContainer: () => this.excalidrawContainerRef.current,
     getStylesPanelMode: () => this.stylesPanelMode,
@@ -6844,24 +6845,6 @@ class App extends React.Component<AppProps, AppState> {
     return isTextBindableContainer(hitElement, false) ? hitElement : null;
   }
 
-  private getTextCreationContainerAtPosition(
-    x: number,
-    y: number,
-    skipBinding: boolean,
-  ) {
-    if (skipBinding) {
-      return null;
-    }
-    const container = this.getTextBindableContainerAtPosition(x, y);
-    // Existing labels are edited only by hitting the text itself. Empty
-    // containers are candidates for binding only near their center.
-    return container &&
-      !hasBoundTextElement(container) &&
-      this.getTextWysiwygSnappedToCenterPosition(x, y, this.state, container)
-      ? container
-      : null;
-  }
-
   /**
    * Whether a text element's content is still being authored.
    *
@@ -7757,77 +7740,6 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  private maybeUpdateTextToolHighlightOnPointerMove = (
-    sceneCoords: { x: number; y: number },
-    event: React.PointerEvent<HTMLCanvasElement>,
-    isOverScrollBar: boolean,
-  ) => {
-    // `elementsToHighlight` is shared with frame drag/resize flows, so only
-    // manage it while the text tool owns the interaction (switching tools
-    // resets it via setActiveTool)
-    if (this.state.activeTool.type !== "text") {
-      return;
-    }
-
-    if (
-      this.state.newElement ||
-      this.state.multiElement ||
-      this.state.selectionElement ||
-      this.state.selectedElementsAreBeingDragged
-    ) {
-      return;
-    }
-
-    let elementToHighlight: NonDeleted<ExcalidrawElement> | null = null;
-    let containerToBindTo: NonDeleted<
-      Exclude<ExcalidrawTextContainer, ExcalidrawArrowElement>
-    > | null = null;
-
-    if (!this.state.editingTextElement && !isOverScrollBar) {
-      // mirror what clicking at this position would do: a bindable arrow
-      // endpoint wins (see handleTextOnPointerDown) and gets its affordance
-      // via `hoveredArrowTextAnchor` — as do arrow midpoint-label anchors —
-      // so both are skipped here. Then editing an existing text element wins
-      // (see startTextEditing), else highlight the empty (non-arrow)
-      // container the new text would get bound to.
-      const arrowEndpoint = this.arrowText.getBindableEndpointAtPosition(
-        sceneCoords.x,
-        sceneCoords.y,
-      );
-      if (!arrowEndpoint) {
-        const textAtPosition = this.getTextElementAtPosition(
-          sceneCoords.x,
-          sceneCoords.y,
-        );
-        if (textAtPosition) {
-          elementToHighlight = textAtPosition;
-        } else {
-          const container = this.getTextCreationContainerAtPosition(
-            sceneCoords.x,
-            sceneCoords.y,
-            event.altKey,
-          );
-          if (container && !isArrowElement(container)) {
-            containerToBindTo = container;
-          }
-        }
-      }
-    }
-
-    if ((this.state.elementsToHighlight?.[0] ?? null) !== elementToHighlight) {
-      this.setState({
-        elementsToHighlight: elementToHighlight ? [elementToHighlight] : null,
-      });
-    }
-    if ((this.state.suggestedBinding?.element ?? null) !== containerToBindTo) {
-      this.setState({
-        suggestedBinding: containerToBindTo
-          ? { element: containerToBindTo }
-          : null,
-      });
-    }
-  };
-
   public insertNewElements = (elements: readonly ExcalidrawElement[]) => {
     if (!elements.length) {
       return;
@@ -7937,7 +7849,7 @@ class App extends React.Component<AppProps, AppState> {
       isOverScrollBar,
     );
 
-    this.maybeUpdateTextToolHighlightOnPointerMove(
+    this.textTool.maybeUpdateHighlightOnPointerMove(
       {
         x: scenePointerX,
         y: scenePointerY,
@@ -9010,7 +8922,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.wasAddedToSelection = true;
       }
     } else if (this.state.activeTool.type === "text") {
-      this.handleTextOnPointerDown(event, pointerDownState);
+      this.textTool.handlePointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
@@ -10014,145 +9926,6 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private handleTextOnPointerDown = (
-    event: React.PointerEvent<HTMLElement>,
-    pointerDownState: PointerDownState,
-  ): void => {
-    // if we're currently still editing text, clicking outside
-    // should only finalize it, not create another (irrespective
-    // of state.activeTool.locked)
-    if (this.state.editingTextElement) {
-      return;
-    }
-    const sceneX = pointerDownState.origin.x;
-    const sceneY = pointerDownState.origin.y;
-
-    // the click transitions into text editing either way, consuming (or
-    // bypassing) whatever anchor or hover highlight was shown — don't leave
-    // them lingering under the editor, which outlives the hover when the
-    // tool is locked
-    this.setState({
-      hoveredArrowTextAnchor: null,
-      elementsToHighlight: null,
-      suggestedBinding: null,
-    });
-
-    // a free arrow endpoint takes precedence over adding a label *to* the
-    // arrow — it's the smaller, more deliberate target
-    const arrowEndpoint = this.arrowText.getBindableEndpointAtPosition(
-      sceneX,
-      sceneY,
-    );
-
-    if (arrowEndpoint) {
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        // the binding fixes the position, but the width is still the user's
-        // to drag out (see `getEndpointBoundTextDragAnchor`)
-        autoEdit: false,
-        arrowEndpoint,
-      });
-    } else {
-      const container = this.getTextCreationContainerAtPosition(
-        sceneX,
-        sceneY,
-        event.altKey,
-      );
-
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        insertAtParentCenter: !event.altKey,
-        container,
-        autoEdit: false,
-        initialCaretSceneCoords: { x: sceneX, y: sceneY },
-        textCreation: pointerDownState.text,
-      });
-    }
-
-    if (!pointerDownState.text.pendingContainerId) {
-      this.resetTextTool();
-    }
-  };
-
-  private resetTextTool = () => {
-    // The pointer may have refreshed the hover while a center click was
-    // pending. Clear it when creation starts, including with a locked tool.
-    this.setState({
-      hoveredArrowTextAnchor: null,
-      elementsToHighlight: null,
-      suggestedBinding: null,
-    });
-    if (!this.isToolLocked()) {
-      this.setState(
-        {
-          activeTool: updateActiveTool(this.state, {
-            type: this.state.preferredSelectionTool.type,
-          }),
-        },
-        // reset once the tool revert has settled
-        () => this.cursor.reset(),
-      );
-    } else {
-      this.cursor.reset();
-    }
-  };
-
-  private maybeStartPendingText = (
-    event: PointerEvent,
-    pointerDownState: PointerDownState,
-  ): boolean => {
-    const { pendingContainerId } = pointerDownState.text;
-    if (!pendingContainerId) {
-      return false;
-    }
-
-    // Tool changes and missing-pointer-up cleanup cancel the pending click.
-    if (
-      this.state.activeTool.type !== "text" ||
-      (event.type !== EVENT.POINTER_MOVE && event.type !== EVENT.POINTER_UP)
-    ) {
-      pointerDownState.text.pendingContainerId = null;
-      return true;
-    }
-
-    const pointerCoords = viewportCoordsToSceneCoords(event, this.state);
-    const isDrag =
-      Math.abs(pointerCoords.x - pointerDownState.origin.x) *
-        this.state.zoom.value >
-      TEXT_AUTOWRAP_THRESHOLD;
-
-    if (!isDrag && event.type !== EVENT.POINTER_UP) {
-      return true;
-    }
-
-    pointerDownState.text.pendingContainerId = null;
-    const container = this.scene.getNonDeletedElement(pendingContainerId);
-    if (!isTextBindableContainer(container, false)) {
-      return true;
-    }
-
-    flushSync(() => {
-      this.startTextEditing({
-        sceneX: pointerDownState.origin.x,
-        sceneY: pointerDownState.origin.y,
-        container: isDrag ? null : container,
-        insertAtParentCenter: !isDrag,
-        autoEdit: !isDrag,
-      });
-      this.resetTextTool();
-    });
-
-    if (isDrag) {
-      pointerDownState.lastCoords.x = pointerCoords.x;
-      pointerDownState.lastCoords.y = pointerCoords.y;
-      this.maybeDragNewGenericElement(pointerDownState, event);
-    }
-
-    return true;
-  };
-
   private handleFreeDrawElementOnPointerDown = (
     event: React.PointerEvent<HTMLElement>,
     elementType: ExcalidrawFreeDrawElement["type"],
@@ -10965,7 +10738,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (this.maybeStartPendingText(event, pointerDownState)) {
+      if (this.textTool.maybeStartPending(event, pointerDownState)) {
         return;
       }
 
@@ -11826,7 +11599,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onMove.flush();
       }
 
-      this.maybeStartPendingText(childEvent, pointerDownState);
+      this.textTool.maybeStartPending(childEvent, pointerDownState);
 
       // an armed bucket fill commits only on a GENUINE pointer up. The
       // missing-pointer-up cleanup replays this handler with the pointer
@@ -13714,7 +13487,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  private maybeDragNewGenericElement = (
+  public maybeDragNewGenericElement = (
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
     informMutation = true,
