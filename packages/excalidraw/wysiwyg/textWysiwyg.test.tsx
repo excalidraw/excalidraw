@@ -465,6 +465,61 @@ describe("textWysiwyg", () => {
       expect(container.boundElements).toBe(null);
     });
 
+    it.each([
+      { location: "canvas", locked: false },
+      { location: "canvas", locked: true },
+      { location: "container center", locked: false },
+      { location: "container center", locked: true },
+    ])(
+      "should redraw dashed text bounds while dragging from $location (tool locked: $locked)",
+      async ({ location, locked }) => {
+        if (location === "container center") {
+          API.setElements([
+            API.createElement({
+              type: "rectangle",
+              x: 100,
+              y: 100,
+              width: 500,
+              height: 400,
+            }),
+          ]);
+        }
+        UI.clickTool("text");
+        if (locked) {
+          UI.clickTool("lock");
+        }
+
+        const context = GlobalTestState.interactiveCanvas.getContext("2d")!;
+        const setLineDash = vi.spyOn(context, "setLineDash");
+        const strokeRect = vi.spyOn(context, "strokeRect");
+
+        mouse.downAt(350, 300);
+        for (const width of [80, 160]) {
+          setLineDash.mockClear();
+          strokeRect.mockClear();
+          mouse.moveTo(350 + width, 300);
+
+          expect(setLineDash).toHaveBeenCalledWith([6, 4]);
+          // The outline follows the dragged width, with 4px padding per side.
+          expect(strokeRect).toHaveBeenCalledWith(
+            expect.any(Number),
+            expect.any(Number),
+            width + 8,
+            33,
+          );
+        }
+        mouse.upAt(510, 300);
+
+        const editor = await getTextEditor();
+        updateTextEditor(editor, "Free text");
+        Keyboard.exitTextEditor(editor);
+        expect(h.state.activeTool.locked).toBe(locked);
+        expect(h.state.activeTool.type).toBe(locked ? "text" : "selection");
+        setLineDash.mockRestore();
+        strokeRect.mockRestore();
+      },
+    );
+
     it("should edit text under cursor when double-clicked with selection tool", async () => {
       const text = API.createElement({
         type: "text",
