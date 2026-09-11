@@ -1,0 +1,47 @@
+name: deploy.yml
+on:
+  push:
+    branches: [ master ]
+
+permissions:
+  deployments: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v6
+    - name: Créer l'évènement de déploiement
+      id: deployment
+      uses: actions/github-script@v9
+      with:
+        script: |
+          const deployment = await github.rest.repos.createDeployment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.sha,
+            environment: 'production',
+            required_contexts: [],
+            auto_merge: false,
+          });
+          return deployment.data.id;
+
+    - name: Déployer
+      run: ./scripts/deploy.sh
+
+    - name: Marquer le déploiement comme réussi
+      if: success()
+      uses: actions/github-script@v9
+      with:
+        script: |
+          await github.rest.repos.createDeploymentStatus({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            deployment_id: ${{ steps.deployment.outputs.result }},
+            state: 'success',
+            environment: 'production',
+          });
+
+
+
