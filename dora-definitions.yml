@@ -1,0 +1,54 @@
+# dora-definitions.yml : contrat d'équipe, versionné avec le code
+#
+# TD phase 0 : à remplir avant de lancer le moindre outil.
+# Chaque ligne est une décision. Une décision non prise ici sera prise par
+# l'outil, sans que vous le sachiez.
+#
+# Remplacez chaque "???". Les commentaires indiquent la section du support
+# qui traite la question.
+
+application: excalidraw
+
+deploiement:
+  # Que compte-t-on comme déploiement ? Regardez les valeurs d'environment
+  # renvoyées par l'API avant de répondre. (support 2.3, 7.3)
+  compte_comme_deploiement: "???"
+  exclut: ["???"]
+
+  # Quel instant fait foi : la création de l'évènement, ou le passage au
+  # statut success ? Les deux existent et ne sont pas simultanés. (support 5.2)
+  horodatage: "???"
+
+changement:
+  # Committer date sur la branche par défaut, ou ouverture de la PR ?
+  # Le support tranche pour la métrique DORA. L'essentiel est de figer votre
+  # convention et de ne plus en changer. (support 2.2)
+  point_de_depart: "???"
+
+incident:
+  # Vous n'exploitez pas la production d'excalidraw. Que décidez-vous
+  # d'appeler "incident" ? S'agit-il d'un proxy ou de la métrique DORA ?
+  # (support 2.4, 5.1)
+  definition: "???"
+  source: "???"
+  debut: "???"           # détection, ou ouverture du ticket ? (support 2.4)
+  fin: "???"             # service rétabli, ou post-mortem rédigé ?
+  rattachement_deploiement: "???"   # le maillon faible (support 5.1)
+
+rework:
+  # Comment reconnaîtrez-vous un déploiement non planifié ? La convention
+  # doit être décidée avant la collecte, sinon la donnée n'existera pas.
+  # (support 2.6)
+  marqueur: "???"
+
+fenetre_de_reference: "??? jours glissants"   # ni 7, ni l'année (support 7.3)
+agregation: "???"                             # (support 2.2, annexe B)
+
+# ---------------------------------------------------------------------------
+# Phase 3 : à remplir après avoir vu les chiffres.
+# Qu'auriez-vous écrit différemment ? Ne modifiez pas les lignes ci-dessus.
+# Une définition changée en cours de route rend la série inexploitable.
+# Notez ici, et datez.
+#
+# revision_envisagee: |
+#   ???
