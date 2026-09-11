@@ -181,6 +181,7 @@ export const SelectedShapeActions = ({
       {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
 
       {predicates.roundness && <>{renderAction("changeRoundness")}</>}
+      {predicates.stickyShape && <>{renderAction("changeStickyShape")}</>}
 
       {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
 
@@ -302,6 +303,7 @@ const CombinedShapeProperties = ({
               )}
               {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
+              {predicates.stickyShape && renderAction("changeStickyShape")}
               {predicates.opacity && renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>

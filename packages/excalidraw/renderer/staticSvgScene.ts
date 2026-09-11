@@ -12,6 +12,8 @@ import {
   applyDarkModeFilter,
   MIME_TYPES,
   STICKY_NOTE_EDGE_SHADOW_OPACITY,
+  STICKY_NOTE_RULE_OPACITY,
+  STICKY_NOTE_RULE_WIDTH,
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_FOOTER,
   STICKY_NOTE_SHADOW_OPACITY,
@@ -41,6 +43,7 @@ import { ShapeCache } from "@excalidraw/element";
 import {
   getStickyNoteFooter,
   getStickyNotePathCommands,
+  getStickyNoteRuleLines,
   type StickyNotePathCommand,
 } from "@excalidraw/element";
 
@@ -233,6 +236,18 @@ const renderElementToSvg = (
       group.appendChild(shadow);
       group.appendChild(rect);
       group.appendChild(edgeShadow);
+
+      for (const rule of getStickyNoteRuleLines(element, elementsMap)) {
+        const ruleLine = svgRoot.ownerDocument.createElementNS(SVG_NS, "line");
+        ruleLine.setAttribute("x1", `${rule.x1}`);
+        ruleLine.setAttribute("y1", `${rule.y1}`);
+        ruleLine.setAttribute("x2", `${rule.x2}`);
+        ruleLine.setAttribute("y2", `${rule.y2}`);
+        ruleLine.setAttribute("stroke", "#000");
+        ruleLine.setAttribute("stroke-opacity", `${STICKY_NOTE_RULE_OPACITY}`);
+        ruleLine.setAttribute("stroke-width", `${STICKY_NOTE_RULE_WIDTH}`);
+        group.appendChild(ruleLine);
+      }
 
       const footer = getStickyNoteFooter(element);
       if (footer) {

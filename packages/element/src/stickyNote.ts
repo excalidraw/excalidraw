@@ -12,6 +12,9 @@ import {
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
   STICKY_NOTE_SHADOW_OFFSET,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_SIZE,
+  getVerticalOffset,
   getFontString,
   getLineHeight,
   isTransparent,
@@ -24,7 +27,7 @@ import { updateBoundElements } from "./binding";
 import { newElementWith } from "./mutateElement";
 import { getPositionAfterHeightChange } from "./sizeHelpers";
 import { computeBoundTextPosition, getBoundTextElement } from "./textElement";
-import { measureText } from "./textMeasurements";
+import { getLineHeightInPx, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import { isStickyNoteElement, isTextElement } from "./typeChecks";
 
@@ -367,6 +370,56 @@ export const getStickyNotePathCommands = (
   }
 
   return commands;
+};
+
+/** one ruled line of a ruled note, in note-local coordinates */
+export type StickyNoteRule = { x1: number; y1: number; x2: number; y2: number };
+
+/**
+ * The rules of a ruled note: spaced at the label’s line height and sitting on
+ * its baselines, so the text is written on the lines rather than floating
+ * between them. A ruled note pins its label to the top (see
+ * `computeBoundTextPosition`), which is what keeps the two in step as the fit
+ * changes the font size. Ruled down to the bottom of the body, so an empty
+ * note still reads as paper. Empty for every other form.
+ */
+export const getStickyNoteRuleLines = (
+  element: ExcalidrawStickyNoteElement,
+  elementsMap: ElementsMap,
+): StickyNoteRule[] => {
+  if (element.stickyShape !== "ruled") {
+    return [];
+  }
+
+  // before the first keystroke there is no label to measure; the defaults keep
+  // the paper ruled and the fit re-spaces it as soon as one exists
+  const label = getBoundTextElement(element, elementsMap);
+  const fontFamily = label?.fontFamily ?? DEFAULT_FONT_FAMILY;
+  const fontSize = label?.fontSize ?? DEFAULT_FONT_SIZE;
+  const lineHeightPx = getLineHeightInPx(
+    fontSize,
+    label?.lineHeight ?? getLineHeight(fontFamily),
+  );
+  const bottom =
+    element.height - STICKY_NOTE_BODY_INSET_Y + STICKY_NOTE_PADDING;
+  const rules: StickyNoteRule[] = [];
+
+  for (
+    let y =
+      STICKY_NOTE_PADDING +
+      getVerticalOffset(fontFamily, fontSize, lineHeightPx);
+    y <= bottom;
+    y += lineHeightPx
+  ) {
+    rules.push({
+      x1: STICKY_NOTE_PADDING,
+      y1: y,
+      x2: element.width - STICKY_NOTE_PADDING,
+      y2: y,
+    });
+  }
+
+  return rules;
 };
 
 // -----------------------------------------------------------------------------

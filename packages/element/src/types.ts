@@ -94,9 +94,14 @@ export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
 };
 
+/** the paper a sticky note is cut to */
+export type StickyNoteShape = "square" | "ruled";
+
 export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
   Readonly<{
     type: "stickynote";
+    /** paper form; absent is the original square */
+    stickyShape?: StickyNoteShape;
     /**
      * The height the user set, from which the layout derives `height`: the
      * note grows above it to fit its label and never shrinks below it

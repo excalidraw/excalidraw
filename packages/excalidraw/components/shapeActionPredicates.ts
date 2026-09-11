@@ -8,6 +8,7 @@ import {
   isElbowArrow,
   isImageElement,
   isLinearElement,
+  isStickyNoteElement,
   isTextElement,
   hasStrokeColor,
   toolIsArrow,
@@ -144,6 +145,7 @@ export const getShapeActionPredicates = (
     strokeStyle: forToolOrSelection(hasStrokeStyle),
     sloppiness: forToolOrSelection(hasRoughness),
     roundness: forToolOrSelection(canChangeRoundness),
+    stickyShape: targetElements.some(isStickyNoteElement),
     arrowType: forToolOrSelection(toolIsArrow),
     arrowheads: forToolOrSelection(canHaveArrowheads),
 

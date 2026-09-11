@@ -89,6 +89,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
   FontFamilyValues,
+  StickyNoteShape,
   StrokeVariability,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -132,6 +133,8 @@ import {
   FontSizeLargeIcon,
   FontSizeExtraLargeIcon,
   EdgeSharpIcon,
+  StickyNoteRuledIcon,
+  StickyNoteSquareIcon,
   EdgeRoundIcon,
   TextAlignLeftIcon,
   TextAlignCenterIcon,
@@ -1738,6 +1741,56 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
       </fieldset>
     );
   },
+});
+
+export const actionChangeStickyShape = register<StickyNoteShape>({
+  name: "changeStickyShape",
+  label: "labels.stickyShape",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        isStickyNoteElement(el)
+          ? newElementWith(el, { stickyShape: value })
+          : el,
+      ),
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => (
+    <fieldset>
+      <legend>{t("labels.stickyShape")}</legend>
+      <div className="buttonList">
+        <RadioSelection
+          group="stickyShape"
+          options={[
+            {
+              value: "square",
+              text: t("labels.stickyShapeSquare"),
+              icon: StickyNoteSquareIcon,
+            },
+            {
+              value: "ruled",
+              text: t("labels.stickyShapeRuled"),
+              icon: StickyNoteRuledIcon,
+            },
+          ]}
+          value={getFormValue(
+            elements,
+            app,
+            (element) =>
+              isStickyNoteElement(element)
+                ? element.stickyShape ?? "square"
+                : null,
+            (element) => isStickyNoteElement(element),
+            (hasSelection) => (hasSelection ? null : "square"),
+          )}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
 });
 
 export const actionChangeRoundness = register<"sharp" | "round">({

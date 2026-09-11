@@ -26,6 +26,8 @@ import {
   isSafari,
   STICKY_NOTE_EDGE_SHADOW_OPACITY,
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
+  STICKY_NOTE_RULE_OPACITY,
+  STICKY_NOTE_RULE_WIDTH,
   STICKY_NOTE_FOOTER,
   STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
@@ -74,6 +76,7 @@ import { ShapeCache } from "./shape";
 import {
   getStickyNoteFooter,
   getStickyNotePathCommands,
+  getStickyNoteRuleLines,
   type StickyNotePathCommand,
 } from "./stickyNote";
 
@@ -86,6 +89,7 @@ import type {
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawFrameLikeElement,
+  ExcalidrawStickyNoteElement,
   NonDeletedSceneElementsMap,
   ElementsMap,
 } from "./types";
@@ -260,7 +264,7 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  drawElementOnCanvas(element, rc, context, renderConfig);
+  drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
 
   context.restore();
 
@@ -368,11 +372,35 @@ const strokeStickyNoteEdge = (
   context.restore();
 };
 
+const strokeStickyNoteRules = (
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawStickyNoteElement,
+  elementsMap: ElementsMap,
+) => {
+  const rules = getStickyNoteRuleLines(element, elementsMap);
+
+  if (!rules.length) {
+    return;
+  }
+
+  context.save();
+  context.strokeStyle = `rgba(0, 0, 0, ${STICKY_NOTE_RULE_OPACITY})`;
+  context.lineWidth = STICKY_NOTE_RULE_WIDTH;
+  context.beginPath();
+  for (const rule of rules) {
+    context.moveTo(rule.x1, rule.y1);
+    context.lineTo(rule.x2, rule.y2);
+  }
+  context.stroke();
+  context.restore();
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
+  elementsMap: ElementsMap,
 ) => {
   switch (element.type) {
     case "stickynote": {
@@ -390,6 +418,7 @@ const drawElementOnCanvas = (
       );
       fillStickyNoteShape(context, commands);
       strokeStickyNoteEdge(context, commands);
+      strokeStickyNoteRules(context, element, elementsMap);
 
       // the label is absolute, so this cached canvas only goes stale at a
       // year boundary — and is regenerated on the next zoom, theme or
@@ -972,7 +1001,7 @@ export const renderElement = (
         context.translate(cx, cy);
         context.rotate(element.angle);
         context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig);
+        drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
         context.restore();
       } else {
         const elementWithCanvas = generateElementWithCanvas(
@@ -1071,7 +1100,7 @@ export const renderElement = (
           context.clip("evenodd");
           context.rotate(element.angle);
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
+          drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
           context.restore();
         } else {
           context.rotate(element.angle);
@@ -1082,7 +1111,7 @@ export const renderElement = (
           }
 
           context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
+          drawElementOnCanvas(element, rc, context, renderConfig, elementsMap);
         }
 
         context.restore();

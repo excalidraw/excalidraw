@@ -1366,6 +1366,23 @@ export const EdgeRoundIcon = createIcon(
   tablerIconProps,
 );
 
+export const StickyNoteSquareIcon = createIcon(
+  <svg strokeWidth="1.5">
+    <path d="M3.75 3.75H16.25V16.25H3.75V3.75Z" />
+  </svg>,
+  modifiedTablerIconProps,
+);
+
+export const StickyNoteRuledIcon = createIcon(
+  <svg strokeWidth="1.5">
+    <path d="M3.75 3.75H16.25V16.25H3.75V3.75Z" />
+    <path d="M6.5 8H13.5" />
+    <path d="M6.5 11H13.5" />
+    <path d="M6.5 14H13.5" />
+  </svg>,
+  modifiedTablerIconProps,
+);
+
 export const ArrowheadNoneIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
