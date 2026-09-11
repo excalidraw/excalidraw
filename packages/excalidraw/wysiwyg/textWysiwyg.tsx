@@ -77,24 +77,22 @@ import type { ParsedDataTranferList } from "../clipboard";
 import type App from "../components/App";
 import type { AppState } from "../types";
 
+/**
+ * The editor is scaled and rotated about the text's center (its transform
+ * origin), as the canvas draws the text. The zoom puts that center at half
+ * the *scaled* size from the box's top-left, while the origin sits at half
+ * the unscaled size — the translate makes up the difference.
+ */
 const getTransform = (
   width: number,
   height: number,
   angle: number,
   appState: AppState,
-  maxWidth: number,
-  maxHeight: number,
 ) => {
   const { zoom } = appState;
   const degree = (180 * angle) / Math.PI;
-  let translateX = (width * (zoom.value - 1)) / 2;
-  let translateY = (height * (zoom.value - 1)) / 2;
-  if (width > maxWidth && zoom.value !== 1) {
-    translateX = (maxWidth * (zoom.value - 1)) / 2;
-  }
-  if (height > maxHeight && zoom.value !== 1) {
-    translateY = (maxHeight * (zoom.value - 1)) / 2;
-  }
+  const translateX = (width * (zoom.value - 1)) / 2;
+  const translateY = (height * (zoom.value - 1)) / 2;
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
@@ -383,10 +381,21 @@ export const textWysiwyg = ({
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
+      const angle = getTextElementAngle(updatedTextElement, container);
+
+      // The editor is kept within the viewport's right and bottom edges, so
+      // that revealing the caret never has anything to scroll the container
+      // by: its box is cut short and the textarea scrolls inside instead.
+      // The cut runs along the box's own edges, which line up with the
+      // viewport's only while the text is unrotated — a rotated box is left
+      // whole, or lines still on screen would go missing from the editor.
+      const clampToViewport = angle === 0;
 
       if (!container) {
-        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
-        width = Math.min(width, maxWidth);
+        if (clampToViewport) {
+          maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
+          width = Math.min(width, maxWidth);
+        }
       } else {
         width += 0.5;
       }
@@ -395,11 +404,10 @@ export const textWysiwyg = ({
       height *= 1.05;
 
       const font = getFontString(updatedTextElement);
-      const angle = getTextElementAngle(updatedTextElement, container);
 
-      // Make sure text editor height doesn't go beyond viewport
-      const editorMaxHeight =
-        (appState.height - viewportY) / appState.zoom.value;
+      const editorMaxHeight = clampToViewport
+        ? (appState.height - viewportY) / appState.zoom.value
+        : null;
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -408,13 +416,16 @@ export const textWysiwyg = ({
         height: `${height}px`,
         left: `${viewportX}px`,
         top: `${viewportY}px`,
+        // about the text's center, whatever size the box itself ends up
+        // (clamped to the viewport, the 5% buffer) — see getTransform
+        transformOrigin: `${updatedTextElement.width / 2}px ${
+          updatedTextElement.height / 2
+        }px`,
         transform: getTransform(
-          width,
-          height,
+          updatedTextElement.width,
+          updatedTextElement.height,
           angle,
           appState,
-          maxWidth,
-          editorMaxHeight,
         ),
         textAlign,
         verticalAlign,
@@ -423,7 +434,7 @@ export const textWysiwyg = ({
           appState.theme === THEME.DARK,
         ),
         opacity: updatedTextElement.opacity / 100,
-        maxHeight: `${editorMaxHeight}px`,
+        maxHeight: editorMaxHeight === null ? "none" : `${editorMaxHeight}px`,
       });
       currentTextLayout = {
         angle: angle as Radians,
@@ -922,9 +933,11 @@ export const textWysiwyg = ({
         return;
       }
 
-      // Otherwise, re-enable submit on blur and refocus the editor.
+      // Otherwise, re-enable submit on blur and refocus the editor. Never
+      // let the focus scroll the container (the app owns scrolling): a box
+      // reaching past the viewport would pull it along to reveal the caret.
       editable.onblur = handleSubmit;
-      editable.focus();
+      editable.focus({ preventScroll: true });
       if (pendingInitialSelection) {
         editable.setSelectionRange(
           pendingInitialSelection.start,
@@ -1018,7 +1031,7 @@ export const textWysiwyg = ({
       ".properties-content",
     );
     if (!isPopupOpened) {
-      editable.focus();
+      editable.focus({ preventScroll: true });
     }
   });
 
