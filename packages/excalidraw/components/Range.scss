@@ -44,12 +44,16 @@
     transform: translateX(-50%);
     font-size: 12px;
     color: var(--text-primary-color);
+
+    :root[dir="rtl"] & {
+      transform: translateX(50%);
+    }
   }
 
   .zero-label {
     position: absolute;
     bottom: 0;
-    left: 4px;
+    inset-inline-start: 4px;
     font-size: 12px;
     color: var(--text-primary-color);
   }
