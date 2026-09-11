@@ -773,6 +773,7 @@ export const resizeSingleElement = (
       ? getStickyNoteMinSize({
           fontSize: boundTextElement.baseFontSize ?? boundTextElement.fontSize,
           fontFamily: boundTextElement.fontFamily,
+          footerOptions: latestElement.footerOptions,
         })
       : { width: STICKY_NOTE_MIN_SIZE, height: STICKY_NOTE_MIN_SIZE };
   } else if (boundTextElement && !shouldMaintainAspectRatio) {

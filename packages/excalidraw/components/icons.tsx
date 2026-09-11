@@ -2591,3 +2591,78 @@ export const settingsIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+// lucide: calendar-x-2
+export const CalendarXIcon = createIcon(
+  <>
+    <path d="M16 2v3" />
+    <path d="m17 16 5 5" />
+    <path d="m17 21 5-5" />
+    <path d="M21 12V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8" />
+    <path d="M3 9h18" />
+    <path d="M8 2v3" />
+  </>,
+  tablerIconProps,
+);
+
+// lucide: calendar-clock
+export const CalendarClockIcon = createIcon(
+  <>
+    <path d="M16 14v2.2l1.6 1" />
+    <path d="M16 2v3" />
+    <path d="M21 7.338V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h2.338" />
+    <path d="M3 9h5.859" />
+    <path d="M8 2v3" />
+    <circle cx="16" cy="16" r="6" />
+  </>,
+  tablerIconProps,
+);
+
+// lucide: calendar-cog
+export const CalendarCogIcon = createIcon(
+  <>
+    <path d="m15.228 16.852-.923-.383" />
+    <path d="m15.228 19.148-.923.383" />
+    <path d="M16 2v3" />
+    <path d="m16.47 14.305.382.923" />
+    <path d="m16.852 20.772-.383.924" />
+    <path d="m19.148 15.228.383-.923" />
+    <path d="m19.53 21.696-.382-.924" />
+    <path d="m20.773 16.852.924-.383" />
+    <path d="m20.773 19.148.924.383" />
+    <path d="M21 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5.5" />
+    <path d="M3 9h18" />
+    <path d="M8 2v3" />
+    <circle cx="18" cy="18" r="3" />
+  </>,
+  tablerIconProps,
+);
+
+// lucide: calendar-1
+export const CalendarShortDateIcon = createIcon(
+  <>
+    <path d="M11 13h1v4" />
+    <path d="M16 2v3" />
+    <path d="M3 9h18" />
+    <path d="M8 2v3" />
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+  </>,
+  tablerIconProps,
+);
+
+// lucide: calendar-days
+export const CalendarDaysIcon = createIcon(
+  <>
+    <path d="M8 2v3" />
+    <path d="M16 2v3" />
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18" />
+    <path d="M8 13h.01" />
+    <path d="M12 13h.01" />
+    <path d="M16 13h.01" />
+    <path d="M8 17h.01" />
+    <path d="M12 17h.01" />
+    <path d="M16 17h.01" />
+  </>,
+  tablerIconProps,
+);

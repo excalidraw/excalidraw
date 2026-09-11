@@ -286,12 +286,14 @@ function Picker<T>({
 export function IconPicker<T>({
   value,
   label,
+  triggerIcon,
   visibleSections,
   hiddenSections,
   onChange,
 }: {
   label: string;
   value: T;
+  triggerIcon?: JSX.Element;
   visibleSections: readonly PickerSection<T>[];
   hiddenSections?: readonly PickerSection<T>[];
   onChange: (value: T) => void;
@@ -313,7 +315,7 @@ export function IconPicker<T>({
           onClick={() => setActive(!isActive)}
           className={isActive ? "active" : ""}
         >
-          {selectedOption?.icon}
+          {triggerIcon ?? selectedOption?.icon}
         </Popover.Trigger>
         {isActive && (
           <Picker

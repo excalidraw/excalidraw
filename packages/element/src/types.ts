@@ -94,6 +94,20 @@ export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
 };
 
+export type StickyNoteFooterOptions =
+  | Readonly<{
+      type: "date";
+      /**
+       * One of the built-in formats (`short`, `time`, or `long`) or a custom
+       * date format using tokens such as `D`, `MMM`, `YYYY`, `HH`, and `mm`.
+       */
+      format: string;
+    }>
+  | Readonly<{
+      type: "text";
+      text: string;
+    }>;
+
 export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
   Readonly<{
     type: "stickynote";
@@ -102,6 +116,7 @@ export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
      * note grows above it to fit its label and never shrinks below it
      */
     baseHeight: number;
+    footerOptions: StickyNoteFooterOptions | null;
   }>;
 
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {

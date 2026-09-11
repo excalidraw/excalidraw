@@ -20,6 +20,7 @@ export {
   actionChangeFontFamily,
   actionChangeTextAlign,
   actionChangeVerticalAlign,
+  actionChangeStickyNoteFooter,
   actionChangeArrowProperties,
 } from "./actionProperties";
 

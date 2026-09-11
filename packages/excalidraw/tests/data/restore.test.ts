@@ -323,6 +323,7 @@ describe("restoreElements", () => {
       {
         currentItemStickynoteBackgroundColor: COLOR_PALETTE.transparent,
         currentItemStickynoteStrokeColor: COLOR_PALETTE.transparent,
+        currentItemStickynoteFooterOptions: 42,
         colorTopPicks: { stickyNoteBackground: ["#fcc2d7", "#b2f2bb"] },
       } as any,
       null,
@@ -332,11 +333,70 @@ describe("restoreElements", () => {
       DEFAULT_STICKY_NOTE_BG,
     );
     expect(restored.currentItemStickynoteStrokeColor).toBe(COLOR_PALETTE.black);
+    expect(restored.currentItemStickynoteFooterOptions).toEqual({
+      type: "date",
+      format: "short",
+    });
     expect(restored.colorTopPicks.stickyNoteBackground).toEqual([
       "#fcc2d7",
       "#b2f2bb",
     ]);
     expect(restored.colorTopPicks.stickyNoteStroke).toBe(null);
+  });
+
+  it("should restore valid sticky note footer options and reject malformed values", () => {
+    const legacy = API.createElement({
+      type: "stickynote",
+      id: "legacy",
+      width: 250,
+      height: 250,
+    });
+    const withoutFooter = newElementWith(
+      API.createElement({
+        type: "stickynote",
+        id: "without-footer",
+        width: 250,
+        height: 250,
+      }),
+      { footerOptions: null },
+    );
+    const customFooter = newElementWith(
+      API.createElement({ type: "stickynote", id: "custom-footer" }),
+      { footerOptions: { type: "text", text: "Category" } },
+    );
+
+    const restored = restore.restoreElements(
+      [
+        { ...legacy, footerOptions: undefined } as any,
+        withoutFooter,
+        customFooter,
+        { ...legacy, id: "number-footer", footerOptions: 42 } as any,
+        {
+          ...legacy,
+          id: "invalid-date-footer",
+          footerOptions: { type: "date", format: 42 },
+        } as any,
+      ],
+      null,
+    ) as ExcalidrawStickyNoteElement[];
+
+    expect(restored[0].footerOptions).toEqual({
+      type: "date",
+      format: "short",
+    });
+    expect(restored[1].footerOptions).toBeNull();
+    expect(restored[2].footerOptions).toEqual({
+      type: "text",
+      text: "Category",
+    });
+    expect(restored[3].footerOptions).toEqual({
+      type: "date",
+      format: "short",
+    });
+    expect(restored[4].footerOptions).toEqual({
+      type: "date",
+      format: "short",
+    });
   });
 
   it("should refit a sticky note together with its label when refreshing dimensions", () => {

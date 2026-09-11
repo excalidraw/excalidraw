@@ -53,6 +53,7 @@ import {
   isStickyNoteBoundText,
   normalizeStickyNote,
   normalizeStickyNoteBackgroundColor,
+  normalizeStickyNoteFooterOptions,
   normalizeStickyNoteFontSize,
   normalizeStickyNoteStrokeColor,
 } from "@excalidraw/element";
@@ -738,6 +739,9 @@ export const restoreElement = (
             element.baseHeight ??
             (element as typeof element & { maxHeight?: number }).maxHeight ??
             element.height,
+          footerOptions: normalizeStickyNoteFooterOptions(
+            element.footerOptions,
+          ),
         }),
       );
     case "magicframe":
@@ -1345,6 +1349,9 @@ export const restoreAppState = (
     ),
     currentItemStickynoteBackgroundColor: normalizeStickyNoteBackgroundColor(
       nextAppState.currentItemStickynoteBackgroundColor,
+    ),
+    currentItemStickynoteFooterOptions: normalizeStickyNoteFooterOptions(
+      nextAppState.currentItemStickynoteFooterOptions,
     ),
     editingFrame: null,
   };

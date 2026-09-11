@@ -3,7 +3,6 @@ import {
   ARROW_LABEL_WIDTH_FRACTION,
   BOUND_TEXT_PADDING,
   DEFAULT_FONT_SIZE,
-  STICKY_NOTE_BODY_INSET_Y,
   STICKY_NOTE_PADDING,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
@@ -23,7 +22,7 @@ import {
 import { LinearElementEditor } from "./linearElementEditor";
 import { getPositionAfterHeightChange } from "./sizeHelpers";
 
-import { updateStickyNoteLayout } from "./stickyNote";
+import { getStickyNoteBodyInsetY, updateStickyNoteLayout } from "./stickyNote";
 import { measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 import {
@@ -545,8 +544,7 @@ export const getBoundTextMaxHeight = (
 ) => {
   const { height } = container;
   if (isStickyNoteElement(container)) {
-    // the label body ends above the creation-date footer
-    return Math.max(0, height - STICKY_NOTE_BODY_INSET_Y);
+    return Math.max(0, height - getStickyNoteBodyInsetY(container));
   }
   if (isArrowElement(container)) {
     const containerHeight = height - BOUND_TEXT_PADDING * 8 * 2;
