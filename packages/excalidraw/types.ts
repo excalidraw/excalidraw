@@ -1265,10 +1265,6 @@ export type PointerDownState = Readonly<{
     // If the box selection tool is activated on pointer down
     hasOccurred: boolean;
   };
-  text: {
-    // A center click binds text; a drag creates free text instead.
-    pendingContainerId: ExcalidrawElement["id"] | null;
-  };
 }>;
 
 export type UnsubscribeCallback = () => void;

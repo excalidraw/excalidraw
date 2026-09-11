@@ -4,6 +4,7 @@ import { pointFrom } from "@excalidraw/math";
 import {
   getLineHeightInPx,
   getOriginalContainerHeightFromCache,
+  newElementWith,
 } from "@excalidraw/element";
 
 import {
@@ -340,6 +341,11 @@ describe("textWysiwyg", () => {
         mouse.downAt(350, 300);
         expect(h.elements).toEqual([container]);
         expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+        // the pending click keeps advertising the bind until it resolves
+        expect(h.state.textToolHover).toEqual({
+          type: "container",
+          elementId: container.id,
+        });
         mouse.moveTo(350 + deltaX, 300);
         mouse.upAt(350 + deltaX, 300);
 
@@ -2470,6 +2476,64 @@ describe("textWysiwyg", () => {
       expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
         CURSOR_TYPE.CROSSHAIR,
       );
+    });
+
+    it("should not edit a host-selected text when the text tool clicks elsewhere", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "selected",
+        x: 300,
+        y: 300,
+        width: 80,
+        height: 25,
+      });
+      API.setElements([...h.elements, text]);
+      UI.clickTool("text");
+      // a host can select through the API after the tool is active
+      API.setSelectedElements([text]);
+      expect(h.state.selectedElementIds[text.id]).toBe(true);
+
+      mouse.moveTo(500, 500);
+      expect(h.state.textToolHover).toBe(null);
+      mouse.clickAt(500, 500);
+      const editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).not.toBe(text.id);
+      updateTextEditor(editor, "new");
+      Keyboard.exitTextEditor(editor);
+
+      expect(text.text).toBe("selected");
+      expect(h.elements.length).toBe(3);
+    });
+
+    it("should not label a host-selected container when the text tool clicks elsewhere", async () => {
+      UI.clickTool("text");
+      API.setSelectedElements([rectangle]);
+      expect(h.state.selectedElementIds[rectangle.id]).toBe(true);
+
+      mouse.moveTo(400, 400);
+      expect(h.state.textToolHover).toBe(null);
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "free");
+      Keyboard.exitTextEditor(editor);
+
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(rectangle.boundElements).toBe(null);
+    });
+
+    it("should end the text tool's turn when the pending container is deleted before pointerup", () => {
+      UI.clickTool("text");
+      mouse.downAt(55, 57.5);
+      expect(h.elements.length).toBe(1);
+
+      // a collaborator deletes the container mid-press
+      API.setElements([newElementWith(rectangle, { isDeleted: true })]);
+      mouse.upAt(55, 57.5);
+
+      expect(h.elements.filter((el) => !el.isDeleted)).toEqual([]);
+      expect(h.state.editingTextElement).toBe(null);
+      expect(h.state.activeTool.type).toBe("selection");
     });
 
     it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {
