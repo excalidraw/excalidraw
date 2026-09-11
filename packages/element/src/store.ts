@@ -206,6 +206,10 @@ export class Store {
   public clear(): void {
     this.snapshot = StoreSnapshot.empty();
     this.scheduledMacroActions = new Set();
+    // scheduled micro actions capture a change relative to the pre-clear
+    // snapshot; flushing them after a clear would apply a stale change
+    // on top of the now-empty snapshot and corrupt it.
+    this.scheduledMicroActions = [];
   }
 
   /**
