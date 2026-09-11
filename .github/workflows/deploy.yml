@@ -27,9 +27,6 @@ jobs:
           });
           return deployment.data.id;
 
-    - name: Déployer
-      run: ./scripts/deploy.sh
-
     - name: Marquer le déploiement comme réussi
       if: success()
       uses: actions/github-script@v9
