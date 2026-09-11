@@ -2,6 +2,7 @@ import {
   getCommonFrameId,
   getFrameChildrenInsertionIndex,
   isElementInViewport,
+  isTextElement,
 } from "@excalidraw/element";
 
 import { arrayToMap, memoize, toBrandedType } from "@excalidraw/common";
@@ -207,8 +208,16 @@ export class Renderer {
 
   public getRenderableElements = (opts: GetRenderableElementsOpts) => {
     const { newElement } = opts;
+    // A new element being drag-sized is mutated in place without informing
+    // the scene, so `sceneNonce` doesn't move. Fold the element's own nonce
+    // in where a canvas draws it from the live element but memoizes on this
+    // nonce: a framed new element stays in the static canvas' element map
+    // (see getRenderableElementsMap), and a new text gets its dashed text box
+    // drawn by the interactive canvas (it doubles as `editingTextElement`).
     const canvasNonce = `${this.scene.getSceneNonce()}${
-      newElement?.frameId ? `:${newElement.versionNonce}` : ""
+      newElement?.frameId || isTextElement(newElement)
+        ? `:${newElement.versionNonce}`
+        : ""
     }`;
 
     const ret = this._getRenderableElements({
