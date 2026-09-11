@@ -98,6 +98,17 @@ export class AppTextTool {
   constructor(private app: App) {}
 
   /**
+   * A click on an empty container's center, armed on pointerdown and decided
+   * on the pointer's way out: a click binds a label, a drag creates free
+   * text instead. Deferring is what keeps the drag from first binding to
+   * (and provisionally enlarging) the container.
+   */
+  private pending: {
+    containerId: ExcalidrawElement["id"];
+    origin: ScenePoint;
+  } | null = null;
+
+  /**
    * What a click at this position would do, in the order the click resolves
    * it: a free arrow endpoint (the smaller, more deliberate target; z-aware,
    * and off while ctrl/cmd disables binding) → the text under the pointer,
@@ -154,6 +165,12 @@ export class AppTextTool {
   ): TextToolTarget | null => {
     const { state } = this.app;
     if (state.activeTool.type !== "text") {
+      return null;
+    }
+    // a pending center click keeps the affordance it was armed with until
+    // it resolves (the pointer may leave the snap radius before the drag
+    // threshold, and a release would still bind)
+    if (this.pending) {
       return null;
     }
     const target =
@@ -228,10 +245,6 @@ export class AppTextTool {
     const sceneY = pointerDownState.origin.y;
     const target = this.getTargetAt({ x: sceneX, y: sceneY }, event);
 
-    // the click consumes the affordance — don't leave it lingering under the
-    // editor, which outlives the hover when the tool is locked
-    this.clearHover();
-
     switch (target.type) {
       case "endpoint":
         this.app.startTextEditing({
@@ -241,45 +254,145 @@ export class AppTextTool {
           // user's to drag out (see `getEndpointBoundTextDragAnchor`)
           autoEdit: false,
           arrowEndpoint: target.endpoint,
+          textElement: null,
         });
         break;
       case "text":
         this.app.startTextEditing({
           sceneX,
           sceneY,
+          textElement: target.element,
           autoEdit: false,
           initialCaretSceneCoords: { x: sceneX, y: sceneY },
         });
         break;
       case "container":
-        // arms the pending click (see maybeStartPending)
-        this.app.startTextEditing({
-          sceneX,
-          sceneY,
-          container: target.element,
-          autoEdit: false,
-          textCreation: pointerDownState.text,
-        });
-        break;
+        // decided on the way out (see handlePointerMove / handlePointerUp).
+        // The affordance stays up meanwhile — set explicitly, since a tap
+        // has no hover before it
+        this.pending = {
+          containerId: target.element.id,
+          origin: { x: sceneX, y: sceneY },
+        };
+        this.setHover(toHoverState(target));
+        return;
       case "free":
         this.app.startTextEditing({
           sceneX,
           sceneY,
           container: null,
+          textElement: null,
           insertAtParentCenter: false,
           autoEdit: false,
         });
         break;
     }
 
-    if (!pointerDownState.text.pendingContainerId) {
-      this.reset();
+    this.finish();
+  };
+
+  /**
+   * The pointer-move half of a pending center click. Once the pointer has
+   * moved past the autowrap threshold the click is a drag: free text is
+   * created at the origin and sized by the drag from here on. Horizontal
+   * only (a text is only ever sized that way) and in screen space, and
+   * deliberately wider than the generic drag threshold so a jittery click
+   * still binds. Returns whether a pending click owned the move.
+   */
+  handlePointerMove = (
+    event: PointerEvent,
+    pointerDownState: PointerDownState,
+  ): boolean => {
+    if (!this.pending) {
+      return false;
+    }
+    // a tool switch mid-press orphans the click
+    if (this.app.state.activeTool.type !== "text") {
+      this.pending = null;
+      return true;
+    }
+    const pointerCoords = viewportCoordsToSceneCoords(event, this.app.state);
+    if (this.isDrag(pointerCoords)) {
+      this.resolvePending(true, pointerCoords, pointerDownState, event);
+    }
+    return true;
+  };
+
+  /**
+   * The pointer-up half: a genuine pointerup binds the label. The
+   * missing-pointerup cleanup replays this with the pointerdown event (a
+   * second finger landing mid-press), and a tool switch orphans the click —
+   * both discard it instead.
+   */
+  handlePointerUp = (
+    event: PointerEvent,
+    pointerDownState: PointerDownState,
+  ): void => {
+    if (!this.pending) {
+      return;
+    }
+    if (
+      event.type !== EVENT.POINTER_UP ||
+      this.app.state.activeTool.type !== "text"
+    ) {
+      this.pending = null;
+      return;
+    }
+    const pointerCoords = viewportCoordsToSceneCoords(event, this.app.state);
+    this.resolvePending(
+      this.isDrag(pointerCoords),
+      pointerCoords,
+      pointerDownState,
+      event,
+    );
+  };
+
+  private isDrag = (pointerCoords: ScenePoint) =>
+    Math.abs(pointerCoords.x - this.pending!.origin.x) *
+      this.app.state.zoom.value >
+    TEXT_AUTOWRAP_THRESHOLD;
+
+  private resolvePending = (
+    isDrag: boolean,
+    pointerCoords: ScenePoint,
+    pointerDownState: PointerDownState,
+    event: PointerEvent,
+  ) => {
+    const { containerId, origin } = this.pending!;
+    this.pending = null;
+
+    // gone mid-press (a collaborator deleted it): nothing to create, but the
+    // click still ends the tool's turn
+    const container = this.app.scene.getNonDeletedElement(containerId);
+    const created = isTextBindableContainer(container, false);
+
+    // flushed so the drag below reads the created element off the state
+    flushSync(() => {
+      if (created) {
+        this.app.startTextEditing({
+          sceneX: origin.x,
+          sceneY: origin.y,
+          container: isDrag ? null : container,
+          textElement: null,
+          insertAtParentCenter: !isDrag,
+          autoEdit: !isDrag,
+        });
+      }
+      this.finish();
+    });
+
+    if (created && isDrag) {
+      pointerDownState.lastCoords.x = pointerCoords.x;
+      pointerDownState.lastCoords.y = pointerCoords.y;
+      this.app.maybeDragNewGenericElement(pointerDownState, event);
     }
   };
 
-  reset = () => {
-    // the pointer may have refreshed the hover while a center click was
-    // pending — creation starting consumes it, locked tool or not
+  /**
+   * The click has been acted on: drop the affordance, revert the tool unless
+   * it is locked, restore the cursor.
+   */
+  private finish = () => {
     this.clearHover();
     if (!this.app.isToolLocked()) {
       this.app.setState(
@@ -294,59 +407,5 @@ export class AppTextTool {
     } else {
       this.app.cursor.reset();
     }
-  };
-
-  maybeStartPending = (
-    event: PointerEvent,
-    pointerDownState: PointerDownState,
-  ): boolean => {
-    const { pendingContainerId } = pointerDownState.text;
-    if (!pendingContainerId) {
-      return false;
-    }
-
-    // Tool changes and missing-pointer-up cleanup cancel the pending click.
-    if (
-      this.app.state.activeTool.type !== "text" ||
-      (event.type !== EVENT.POINTER_MOVE && event.type !== EVENT.POINTER_UP)
-    ) {
-      pointerDownState.text.pendingContainerId = null;
-      return true;
-    }
-
-    const pointerCoords = viewportCoordsToSceneCoords(event, this.app.state);
-    const isDrag =
-      Math.abs(pointerCoords.x - pointerDownState.origin.x) *
-        this.app.state.zoom.value >
-      TEXT_AUTOWRAP_THRESHOLD;
-
-    if (!isDrag && event.type !== EVENT.POINTER_UP) {
-      return true;
-    }
-
-    pointerDownState.text.pendingContainerId = null;
-    const container = this.app.scene.getNonDeletedElement(pendingContainerId);
-    if (!isTextBindableContainer(container, false)) {
-      return true;
-    }
-
-    flushSync(() => {
-      this.app.startTextEditing({
-        sceneX: pointerDownState.origin.x,
-        sceneY: pointerDownState.origin.y,
-        container: isDrag ? null : container,
-        insertAtParentCenter: !isDrag,
-        autoEdit: !isDrag,
-      });
-      this.reset();
-    });
-
-    if (isDrag) {
-      pointerDownState.lastCoords.x = pointerCoords.x;
-      pointerDownState.lastCoords.y = pointerCoords.y;
-      this.app.maybeDragNewGenericElement(pointerDownState, event);
-    }
-
-    return true;
   };
 }

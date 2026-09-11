@@ -6877,14 +6877,13 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  /**
+   * The text container at a position — an arrow hit on its path, any other
+   * container hit anywhere in its bounds (frames are skipped so a container
+   * inside one can be hit). Purely positional: the selection plays no part.
+   */
   getTextBindableContainerAtPosition(x: number, y: number) {
     const elements = this.scene.getNonDeletedElements();
-    const selectedElements = this.scene.getSelectedElements(this.state);
-    if (selectedElements.length === 1) {
-      return isTextBindableContainer(selectedElements[0], false)
-        ? selectedElements[0]
-        : null;
-    }
     let hitElement = null;
     // We need to do hit testing from front (end of the array) to back (beginning of the array)
     for (let index = elements.length - 1; index >= 0; --index) {
@@ -6946,7 +6945,7 @@ class App extends React.Component<AppProps, AppState> {
     autoEdit = true,
     initialCaretSceneCoords,
     arrowEndpoint,
-    textCreation,
+    textElement,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -6962,8 +6961,13 @@ class App extends React.Component<AppProps, AppState> {
      * dictates the text's position and alignment, overriding (sceneX, sceneY)
      */
     arrowEndpoint?: ArrowEndpoint | null;
-    /** Pending click-or-drag decision when creating text with the text tool. */
-    textCreation?: PointerDownState["text"];
+    /**
+     * the text to edit: an element to edit exactly that one; `null` to always
+     * create, never adopting a selected text or one under the pointer;
+     * `undefined` to resolve it here — a single selected text, the label of a
+     * selected or passed arrow container, else the text at (sceneX, sceneY)
+     */
+    textElement?: NonDeleted<ExcalidrawTextElement> | null;
   }) => {
     let shouldBindToContainer = false;
 
@@ -7007,6 +7011,8 @@ class App extends React.Component<AppProps, AppState> {
     }
     const existingTextElement = arrowEndpointBinding
       ? null
+      : textElement !== undefined
+      ? textElement
       : this.getSelectedTextElement(container) ||
         (container && isArrowElement(container)
           ? getBoundTextElement(
@@ -7015,19 +7021,6 @@ class App extends React.Component<AppProps, AppState> {
             )
           : null) ||
         this.getTextElementAtPosition(sceneX, sceneY);
-
-    if (
-      !autoEdit &&
-      textCreation &&
-      !existingTextElement &&
-      shouldBindToContainer &&
-      container
-    ) {
-      // Wait for a click before binding or resizing the container. A drag
-      // from its center should create free text at the pointer origin.
-      textCreation.pendingContainerId = container.id;
-      return;
-    }
 
     const fontFamily =
       existingTextElement?.fontFamily || this.state.currentItemFontFamily;
@@ -7421,7 +7414,13 @@ class App extends React.Component<AppProps, AppState> {
         const container =
           // skip binding to container on dblclick when holding ctrl
           !event[KEYS.CTRL_OR_CMD] &&
-          this.getTextBindableContainerAtPosition(sceneX, sceneY);
+          // a single selected element is what the double-click is about —
+          // typing into it — wherever the click lands
+          (selectedElements.length === 1
+            ? isTextBindableContainer(selectedElements[0], false)
+              ? selectedElements[0]
+              : null
+            : this.getTextBindableContainerAtPosition(sceneX, sceneY));
 
         if (container) {
           if (
@@ -9343,9 +9342,6 @@ class App extends React.Component<AppProps, AppState> {
       boxSelection: {
         hasOccurred: false,
       },
-      text: {
-        pendingContainerId: null,
-      },
     };
   }
 
@@ -10690,7 +10686,7 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (this.textTool.maybeStartPending(event, pointerDownState)) {
+      if (this.textTool.handlePointerMove(event, pointerDownState)) {
         return;
       }
 
@@ -11408,7 +11404,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onMove.flush();
       }
 
-      this.textTool.maybeStartPending(childEvent, pointerDownState);
+      this.textTool.handlePointerUp(childEvent, pointerDownState);
 
       // an armed bucket fill commits only on a GENUINE pointer up. The
       // missing-pointer-up cleanup replays this handler with the pointer
