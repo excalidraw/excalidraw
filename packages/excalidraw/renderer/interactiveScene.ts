@@ -216,41 +216,6 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   context.restore();
 };
 
-/**
- * Marks where on the hovered arrow the text tool would attach text — a free
- * endpoint, or the midpoint the arrow's label would center on.
- *
- * Purely presentational: `AppArrowText` maintains the anchor at every event
- * that can change it (pointermove, the ctrl/cmd binding toggle, pointerdown,
- * tool switches, finalize). The element lookup below only guards against the
- * arrow vanishing through channels no local event covers, e.g. a collaborator
- * deleting it.
- */
-const renderHoveredArrowTextAnchor = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  elementsMap: ElementsMap,
-) => {
-  const { elementId, anchor } = appState.hoveredArrowTextAnchor!;
-
-  const element = elementsMap.get(elementId);
-
-  if (!element || !isArrowElement(element) || element.isDeleted) {
-    return;
-  }
-
-  const point =
-    anchor === "label"
-      ? LinearElementEditor.getBoundTextElementCenter(element, elementsMap)
-      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          element,
-          anchor === "start" ? 0 : -1,
-          elementsMap,
-        );
-
-  highlightPoint(point, context, appState);
-};
-
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -1041,9 +1006,6 @@ const renderElementsBoxHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elements: readonly NonDeletedExcalidrawElement[],
-  // needed to derive the accurate position of container-bound labels,
-  // which isn't stored on the element itself
-  elementsMap: ElementsMap,
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
   const {
@@ -1059,7 +1021,7 @@ const renderElementsBoxHighlight = (
   );
 
   const getSelectionFromElements = (elements: ExcalidrawElement[]) => {
-    const [x1, y1, x2, y2] = getCommonBounds(elements, elementsMap);
+    const [x1, y1, x2, y2] = getCommonBounds(elements);
     return {
       angle: 0,
       x1,
@@ -1535,6 +1497,84 @@ const renderTextBox = (
   context.restore();
 };
 
+/**
+ * The text tool's hover affordance — what a click would act on (see
+ * `AppTextTool`): a dashed box around the text it would edit, the binding
+ * outline around the empty container it would label, or a point on the arrow
+ * anchor (free endpoint / midpoint label) it would attach text to.
+ *
+ * Purely presentational: `AppTextTool` keeps the state current at every event
+ * that can change it. The element lookup only guards against the element
+ * vanishing through channels no local event covers, e.g. a collaborator
+ * deleting it.
+ */
+const renderTextToolHover = (
+  app: AppClassProperties,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  elementsMap: NonDeletedSceneElementsMap,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+) => {
+  const hover = appState.textToolHover!;
+  const element = elementsMap.get(hover.elementId);
+  if (!element || element.isDeleted) {
+    return;
+  }
+  switch (hover.type) {
+    case "text": {
+      if (isTextElement(element)) {
+        // the same subtle box as around a wrapped text being edited; a
+        // label's stored coords can be stale, so derive them
+        renderTextBox(
+          getTextElementWithAccuratePosition(element, elementsMap),
+          context,
+          appState,
+          selectionColor,
+        );
+      }
+      return;
+    }
+    case "container": {
+      if (isBindableElement(element)) {
+        // the outline arrow binding shows, minus its animation and its
+        // `isBindingEnabled` gate — ctrl/cmd only concerns arrow binding
+        context.save();
+        context.translate(appState.scrollX, appState.scrollY);
+        renderBindingHighlightForBindableElement_simple(
+          context,
+          { element },
+          elementsMap,
+          appState,
+          app.lastPointerMoveCoords
+            ? pointFrom<GlobalPoint>(
+                app.lastPointerMoveCoords.x,
+                app.lastPointerMoveCoords.y,
+              )
+            : null,
+        );
+        context.restore();
+      }
+      return;
+    }
+    case "arrow": {
+      if (isArrowElement(element)) {
+        const point =
+          hover.anchor === "label"
+            ? LinearElementEditor.getBoundTextElementCenter(
+                element,
+                elementsMap,
+              )
+            : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                hover.anchor === "start" ? 0 : -1,
+                elementsMap,
+              );
+        highlightPoint(point, context, appState);
+      }
+    }
+  }
+};
+
 const renderResetAutoResizeHandle = (
   text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
@@ -1698,8 +1738,14 @@ const _renderInteractiveScene = ({
     };
   }
 
-  if (appState.hoveredArrowTextAnchor) {
-    renderHoveredArrowTextAnchor(context, appState, allElementsMap);
+  if (appState.textToolHover) {
+    renderTextToolHover(
+      app,
+      context,
+      appState,
+      allElementsMap,
+      renderConfig.selectionColor,
+    );
   }
 
   if (appState.frameToHighlight) {
@@ -1712,32 +1758,7 @@ const _renderInteractiveScene = ({
   }
 
   if (appState.elementsToHighlight) {
-    const firstElementToHighlight = appState.elementsToHighlight.at(0);
-    if (
-      appState.activeTool.type === "text" &&
-      appState.elementsToHighlight.length === 1 &&
-      firstElementToHighlight &&
-      isTextElement(firstElementToHighlight)
-    ) {
-      // the text element the text tool would edit on click — use the same
-      // subtle dashed box as when editing a wrapped text element
-      renderTextBox(
-        getTextElementWithAccuratePosition(
-          firstElementToHighlight,
-          allElementsMap,
-        ),
-        context,
-        appState,
-        renderConfig.selectionColor,
-      );
-    } else {
-      renderElementsBoxHighlight(
-        context,
-        appState,
-        appState.elementsToHighlight,
-        allElementsMap,
-      );
-    }
+    renderElementsBoxHighlight(context, appState, appState.elementsToHighlight);
   }
 
   if (appState.activeLockedId) {
@@ -1749,7 +1770,6 @@ const _renderInteractiveScene = ({
       context,
       appState,
       elements as NonDeletedExcalidrawElement[], // We don't typecheck runtime because of performance
-      allElementsMap,
       {
         colors: [getThemedColor("#ced4da", appState.theme)],
         dashed: true,

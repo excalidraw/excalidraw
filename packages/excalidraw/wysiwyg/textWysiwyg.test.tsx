@@ -9,6 +9,7 @@ import {
 import {
   CODES,
   colorToHex,
+  CURSOR_TYPE,
   KEYS,
   FONT_FAMILY,
   TEXT_ALIGN,
@@ -411,15 +412,16 @@ describe("textWysiwyg", () => {
       UI.clickTool("lock");
 
       mouse.moveTo(500, 400);
-      expect(h.state.suggestedBinding?.element.id).toBe(container.id);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: container.id,
+      });
       mouse.downAt(500, 400);
       // At 200% zoom the drag threshold is inside the center snap radius.
       mouse.moveTo(515, 400);
       mouse.moveTo(545, 400);
       expect(h.state.newElement?.type).toBe("text");
-      expect(h.state.suggestedBinding).toBe(null);
-      expect(h.state.elementsToHighlight).toBe(null);
-      expect(h.state.hoveredArrowTextAnchor).toBe(null);
+      expect(h.state.textToolHover).toBe(null);
       mouse.moveTo(660, 400);
       mouse.upAt(660, 400);
 
@@ -2173,17 +2175,20 @@ describe("textWysiwyg", () => {
       // near the container center → click would bind to it, shown with the
       // same binding highlight as arrow binding
       mouse.moveTo(55, 57.5);
-      expect(h.state.suggestedBinding?.element?.id).toBe(rectangle.id);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
 
       // alt opts out of binding, so no highlight either
       Keyboard.withModifierKeys({ alt: true }, () => {
         mouse.moveTo(54, 57.5);
-        expect(h.state.suggestedBinding).toBe(null);
+        expect(h.state.textToolHover).toBe(null);
       });
 
       // off-center → click would create a free text
       mouse.moveTo(20, 30);
-      expect(h.state.suggestedBinding).toBe(null);
+      expect(h.state.textToolHover).toBe(null);
     });
 
     it("should edit the arrow label when clicking on the label with the text tool", async () => {
@@ -2268,11 +2273,14 @@ describe("textWysiwyg", () => {
 
         const labelCenterX = 300 + 400 * (labelPosition ?? 0.5);
         mouse.moveTo(labelCenterX, 250);
-        expect(h.state.elementsToHighlight?.[0]?.id).toBe(label.id);
+        expect(h.state.textToolHover).toEqual({
+          type: "text",
+          elementId: label.id,
+        });
 
         // hovering at the label's stale stored position
         mouse.moveTo(400, 200);
-        expect(h.state.elementsToHighlight).toBe(null);
+        expect(h.state.textToolHover).toBe(null);
 
         // clicking at the derived position should edit the label
         mouse.clickAt(labelCenterX, 250);
@@ -2282,7 +2290,7 @@ describe("textWysiwyg", () => {
       },
     );
 
-    it("should leave arrow anchors to hoveredArrowTextAnchor instead of the text-tool highlights", async () => {
+    it("should hover arrow anchors as the text tool's target", async () => {
       const arrow = API.createElement({
         type: "arrow",
         x: 200,
@@ -2295,24 +2303,21 @@ describe("textWysiwyg", () => {
 
       UI.clickTool("text");
 
-      // near the arrow midpoint → click would bind a label to the arrow;
-      // the affordance is the midpoint-label anchor, not our highlights
+      // near the arrow midpoint → click would bind a label to the arrow
       mouse.moveTo(250, 200);
-      expect(h.state.hoveredArrowTextAnchor).toEqual({
+      expect(h.state.textToolHover).toEqual({
+        type: "arrow",
         elementId: arrow.id,
         anchor: "label",
       });
-      expect(h.state.elementsToHighlight).toBe(null);
-      expect(h.state.suggestedBinding).toBe(null);
 
-      // near a free endpoint → same: endpoint anchor only, no highlights
+      // near a free endpoint → click would bind a text to it
       mouse.moveTo(300, 200);
-      expect(h.state.hoveredArrowTextAnchor).toEqual({
+      expect(h.state.textToolHover).toEqual({
+        type: "arrow",
         elementId: arrow.id,
         anchor: "end",
       });
-      expect(h.state.elementsToHighlight).toBe(null);
-      expect(h.state.suggestedBinding).toBe(null);
     });
 
     it("should clear the hover highlights when the text tool is canceled", async () => {
@@ -2329,17 +2334,23 @@ describe("textWysiwyg", () => {
       // text hover highlight is cleared on Escape
       UI.clickTool("text");
       mouse.moveTo(520, 512);
-      expect(h.state.elementsToHighlight?.[0]?.id).toBe(text.id);
+      expect(h.state.textToolHover).toEqual({
+        type: "text",
+        elementId: text.id,
+      });
       Keyboard.keyPress(KEYS.ESCAPE);
       expect(h.state.activeTool.type).not.toBe("text");
-      expect(h.state.elementsToHighlight).toBe(null);
+      expect(h.state.textToolHover).toBe(null);
 
       // container binding highlight is cleared on Escape
       UI.clickTool("text");
       mouse.moveTo(55, 57.5);
-      expect(h.state.suggestedBinding?.element?.id).toBe(rectangle.id);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
       Keyboard.keyPress(KEYS.ESCAPE);
-      expect(h.state.suggestedBinding).toBe(null);
+      expect(h.state.textToolHover).toBe(null);
     });
 
     it("should highlight the text the text tool would edit on hover", async () => {
@@ -2354,12 +2365,111 @@ describe("textWysiwyg", () => {
 
       // over the label → click would edit it
       mouse.moveTo(55, 57.5);
-      expect(h.state.elementsToHighlight?.[0]?.id).toBe(label.id);
+      expect(h.state.textToolHover).toEqual({
+        type: "text",
+        elementId: label.id,
+      });
 
       // inside the container but off the label → click would create a free
       // text, so neither the label nor the labeled container is highlighted
       mouse.moveTo(20, 30);
-      expect(h.state.elementsToHighlight).toBe(null);
+      expect(h.state.textToolHover).toBe(null);
+    });
+
+    it("should refresh the container hover when alt is pressed or released without moving", () => {
+      UI.clickTool("text");
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // alt opts out of binding: the outline goes with no pointermove...
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        Keyboard.keyDown(KEYS.ALT);
+        expect(h.state.textToolHover).toBe(null);
+      });
+      // ...and comes back on release
+      Keyboard.keyUp(KEYS.ALT);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+    });
+
+    it("should keep the container hover under ctrl/cmd, which only concerns arrow binding", async () => {
+      UI.clickTool("text");
+      mouse.moveTo(55, 57.5);
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyDown("Control");
+        expect(h.state.isBindingEnabled).toBe(false);
+        expect(h.state.textToolHover).toEqual({
+          type: "container",
+          elementId: rectangle.id,
+        });
+        // the affordance is honest: the click binds regardless of ctrl/cmd
+        mouse.clickAt(55, 57.5);
+      });
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Label");
+      Keyboard.exitTextEditor(editor);
+
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(rectangle.id);
+      expect(rectangle.boundElements).toEqual([{ id: text.id, type: "text" }]);
+    });
+
+    it("should not advertise a label on an empty arrow's midpoint while alt is held", async () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 200,
+        y: 200,
+        width: 300,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(300, 0)],
+      });
+      API.setElements([arrow]);
+      UI.clickTool("text");
+
+      mouse.moveTo(350, 200);
+      expect(h.state.textToolHover).toEqual({
+        type: "arrow",
+        elementId: arrow.id,
+        anchor: "label",
+      });
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(351, 200);
+        expect(h.state.textToolHover).toBe(null);
+        mouse.clickAt(351, 200);
+      });
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "free");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+      expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(null);
+      expect(arrow.boundElements).toBe(null);
+    });
+
+    it("should show the text cursor over a label the text tool would edit", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Hello!");
+      Keyboard.exitTextEditor(editor);
+
+      UI.clickTool("text");
+      // over the label (60x25, centered in the rectangle)
+      mouse.moveTo(55, 57.5);
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.TEXT,
+      );
+      // inside the rectangle but off the label: a click creates free text
+      mouse.moveTo(20, 30);
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.CROSSHAIR,
+      );
     });
 
     it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {

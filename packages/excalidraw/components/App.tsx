@@ -3387,6 +3387,7 @@ class App extends React.Component<AppProps, AppState> {
       suggestedBinding: null,
       frameToHighlight: null,
       elementsToHighlight: null,
+      textToolHover: null,
       snapLines: [],
       showHyperlinkPopup: false,
     });
@@ -4325,14 +4326,13 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ showWelcomeScreen: true });
     }
 
-    // the text tool hover highlight must not outlive the tool, no matter
-    // how the tool gets canceled (Esc/finalize paths bypass setActiveTool)
+    // the text tool's hover affordance must not outlive the tool, however
+    // the tool gets left (Esc/finalize paths bypass setActiveTool)
     if (
       prevState.activeTool.type === "text" &&
-      this.state.activeTool.type !== "text" &&
-      (this.state.elementsToHighlight || this.state.suggestedBinding)
+      this.state.activeTool.type !== "text"
     ) {
-      this.setState({ elementsToHighlight: null, suggestedBinding: null });
+      this.textTool.clearHover();
     }
 
     if (
@@ -5705,6 +5705,11 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           maybeHandleArrowPointlikeDrag({ app: this, event });
         }
+        // alt opts out of labeling a container — the text-tool affordance
+        // must follow without waiting for a pointermove
+        if (!event.repeat) {
+          this.textTool.refreshHover(event);
+        }
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -5809,7 +5814,7 @@ class App extends React.Component<AppProps, AppState> {
 
         // the toggle changes what a text-tool click at the current position
         // would do, with no pointermove to refresh the affordance
-        this.arrowText.refresh();
+        this.textTool.refreshHover(event);
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
       }
@@ -6047,6 +6052,7 @@ class App extends React.Component<AppProps, AppState> {
     if (event.key === KEYS.ALT) {
       this.bucketFill.closeTemporaryEyeDropper();
       maybeHandleArrowPointlikeDrag({ app: this, event });
+      this.textTool.refreshHover(event);
     }
 
     if (
@@ -6094,7 +6100,7 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ isBindingEnabled: preferenceEnabled });
         });
 
-        this.arrowText.refresh();
+        this.textTool.refreshHover(event);
       }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -6242,10 +6248,6 @@ class App extends React.Component<AppProps, AppState> {
           ? prevState.selectedLinearElement
           : null,
         frameToHighlight: null,
-        // only the text tool offers arrow-endpoint binding, and the highlight
-        // is refreshed on pointermove — don't leave a stale one behind
-        hoveredArrowTextAnchor: null,
-        elementsToHighlight: null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -7926,11 +7928,8 @@ class App extends React.Component<AppProps, AppState> {
       isOverScrollBar,
     );
 
-    this.textTool.maybeUpdateHighlightOnPointerMove(
-      {
-        x: scenePointerX,
-        y: scenePointerY,
-      },
+    const textToolTarget = this.textTool.updateHover(
+      scenePointer,
       event,
       isOverScrollBar,
     );
@@ -8321,9 +8320,6 @@ class App extends React.Component<AppProps, AppState> {
       hitElement = hitElementMightBeLocked;
     }
 
-    const hoveredArrowTextAnchor =
-      this.arrowText.updateHoveredAnchor(scenePointer);
-
     if (
       !this.handleIframeLikeElementHover({
         hitElement,
@@ -8350,13 +8346,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (this.state.activeTool.type === "text") {
-        this.cursor.set(
-          hoveredArrowTextAnchor
-            ? CURSOR_TYPE.POINTER
-            : isTextElement(hitElement)
-            ? CURSOR_TYPE.TEXT
-            : CURSOR_TYPE.CROSSHAIR,
-        );
+        this.cursor.set(this.textTool.cursorFor(textToolTarget, hitElement));
       } else if (
         !event[KEYS.CTRL_OR_CMD] &&
         this.isHittingCommonBoundingBoxOfSelectedElements(

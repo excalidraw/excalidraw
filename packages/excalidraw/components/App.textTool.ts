@@ -1,6 +1,7 @@
 import { flushSync } from "react-dom";
 
 import {
+  CURSOR_TYPE,
   EVENT,
   TEXT_AUTOWRAP_THRESHOLD,
   updateActiveTool,
@@ -11,23 +12,84 @@ import {
   hasBoundTextElement,
   isArrowElement,
   isTextBindableContainer,
+  isTextElement,
 } from "@excalidraw/element";
 
+import type { ArrowEndpoint } from "@excalidraw/element";
 import type {
-  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawTextContainer,
+  ExcalidrawTextElement,
   NonDeleted,
 } from "@excalidraw/element/types";
 
 import type React from "react";
 
 import type App from "./App";
-import type { PointerDownState } from "../types";
+import type { AppState, PointerDownState } from "../types";
+
+type ScenePoint = { x: number; y: number };
+
+/** the modifier state a target depends on — off a pointer or keyboard event */
+type Modifiers = { altKey: boolean };
+
+/** What a text-tool click at a position does. */
+export type TextToolTarget =
+  /** binds a new text to a free arrow endpoint */
+  | { type: "endpoint"; endpoint: ArrowEndpoint }
+  /** edits this text (a label included, at its derived position) */
+  | { type: "text"; element: NonDeleted<ExcalidrawTextElement> }
+  /** binds a new label to this empty container (an arrow included) */
+  | { type: "container"; element: NonDeleted<ExcalidrawTextContainer> }
+  /** creates free text at the pointer */
+  | { type: "free" };
+
+const toHoverState = (target: TextToolTarget): AppState["textToolHover"] => {
+  switch (target.type) {
+    case "endpoint":
+      return {
+        type: "arrow",
+        elementId: target.endpoint.arrow.id,
+        anchor: target.endpoint.startOrEnd,
+      };
+    case "text":
+      return { type: "text", elementId: target.element.id };
+    case "container":
+      // a shape is outlined whole (the label centers in it); an arrow gets
+      // its midpoint pointed at
+      return isArrowElement(target.element)
+        ? { type: "arrow", elementId: target.element.id, anchor: "label" }
+        : { type: "container", elementId: target.element.id };
+    case "free":
+      return null;
+  }
+};
+
+const isSameHover = (
+  a: AppState["textToolHover"],
+  b: AppState["textToolHover"],
+) => {
+  if (a === b) {
+    return true;
+  }
+  if (!a || !b || a.type !== b.type || a.elementId !== b.elementId) {
+    return false;
+  }
+  return a.type !== "arrow" || b.type !== "arrow" || a.anchor === b.anchor;
+};
 
 /**
- * The text tool's pointer interaction: the hover affordance, what a
- * pointerdown does, the pending center click, and the tool reset.
+ * The text tool's pointer interaction.
+ *
+ * Everything hangs off one question — what would a click at this position
+ * do (`getTargetAt`)? — answered once and used for the hover affordance
+ * (`appState.textToolHover`), the cursor and the pointerdown itself, so the
+ * affordance can never promise something the click won't deliver.
+ *
+ * A click on an empty container's center is armed on pointerdown and
+ * committed on pointerup as a bound label; dragging past the autowrap
+ * threshold first turns it into a free fixed-width text at the origin
+ * instead.
  *
  * Text editing itself (`app.startTextEditing`) is shared with Enter,
  * double-click and the other entry points and stays in `App`.
@@ -35,159 +97,179 @@ import type { PointerDownState } from "../types";
 export class AppTextTool {
   constructor(private app: App) {}
 
-  private getCreationContainerAtPosition(
-    x: number,
-    y: number,
-    skipBinding: boolean,
-  ) {
-    if (skipBinding) {
-      return null;
-    }
-    const container = this.app.getTextBindableContainerAtPosition(x, y);
-    // Existing labels are edited only by hitting the text itself. Empty
-    // containers are candidates for binding only near their center.
-    return container &&
-      !hasBoundTextElement(container) &&
-      this.app.getTextWysiwygSnappedToCenterPosition(
-        x,
-        y,
-        this.app.state,
-        container,
-      )
-      ? container
-      : null;
-  }
+  /**
+   * What a click at this position would do, in the order the click resolves
+   * it: a free arrow endpoint (the smaller, more deliberate target; z-aware,
+   * and off while ctrl/cmd disables binding) → the text under the pointer,
+   * which the click edits → an empty container near its center, which gets
+   * a label unless alt opts out → free text at the pointer.
+   */
+  getTargetAt = (
+    scenePointer: ScenePoint,
+    modifiers: Modifiers,
+  ): TextToolTarget => {
+    const { x, y } = scenePointer;
 
-  maybeUpdateHighlightOnPointerMove = (
-    sceneCoords: { x: number; y: number },
-    event: React.PointerEvent<HTMLCanvasElement>,
-    isOverScrollBar: boolean,
-  ) => {
-    // `elementsToHighlight` is shared with frame drag/resize flows, so only
-    // manage it while the text tool owns the interaction (switching tools
-    // resets it via setActiveTool)
-    if (this.app.state.activeTool.type !== "text") {
-      return;
+    const endpoint = this.app.arrowText.getBindableEndpointAtPosition(x, y);
+    if (endpoint) {
+      return { type: "endpoint", endpoint };
     }
 
-    if (
-      this.app.state.newElement ||
-      this.app.state.multiElement ||
-      this.app.state.selectionElement ||
-      this.app.state.selectedElementsAreBeingDragged
-    ) {
-      return;
+    const text = this.app.getTextElementAtPosition(x, y);
+    if (text) {
+      return { type: "text", element: text };
     }
 
-    let elementToHighlight: NonDeleted<ExcalidrawElement> | null = null;
-    let containerToBindTo: NonDeleted<
-      Exclude<ExcalidrawTextContainer, ExcalidrawArrowElement>
-    > | null = null;
-
-    if (!this.app.state.editingTextElement && !isOverScrollBar) {
-      // mirror what clicking at this position would do: a bindable arrow
-      // endpoint wins (see handleTextOnPointerDown) and gets its affordance
-      // via `hoveredArrowTextAnchor` — as do arrow midpoint-label anchors —
-      // so both are skipped here. Then editing an existing text element wins
-      // (see startTextEditing), else highlight the empty (non-arrow)
-      // container the new text would get bound to.
-      const arrowEndpoint = this.app.arrowText.getBindableEndpointAtPosition(
-        sceneCoords.x,
-        sceneCoords.y,
-      );
-      if (!arrowEndpoint) {
-        const textAtPosition = this.app.getTextElementAtPosition(
-          sceneCoords.x,
-          sceneCoords.y,
-        );
-        if (textAtPosition) {
-          elementToHighlight = textAtPosition;
-        } else {
-          const container = this.getCreationContainerAtPosition(
-            sceneCoords.x,
-            sceneCoords.y,
-            event.altKey,
-          );
-          if (container && !isArrowElement(container)) {
-            containerToBindTo = container;
-          }
-        }
+    if (!modifiers.altKey) {
+      const container = this.app.getTextBindableContainerAtPosition(x, y);
+      if (
+        container &&
+        // an existing label is edited by hitting the text itself (above)
+        !hasBoundTextElement(container) &&
+        this.app.getTextWysiwygSnappedToCenterPosition(
+          x,
+          y,
+          this.app.state,
+          container,
+        )
+      ) {
+        return { type: "container", element: container };
       }
     }
 
-    if (
-      (this.app.state.elementsToHighlight?.[0] ?? null) !== elementToHighlight
-    ) {
-      this.app.setState({
-        elementsToHighlight: elementToHighlight ? [elementToHighlight] : null,
-      });
+    return { type: "free" };
+  };
+
+  /**
+   * Keeps `appState.textToolHover` — the affordance for what a click would
+   * do — in sync with the pointer, and returns the target (for the cursor).
+   * Suppressed while something else owns the interaction: a text being
+   * edited or drag-sized, a multi-point element, a box selection, a drag of
+   * the selection, or the pointer over a scrollbar.
+   */
+  updateHover = (
+    scenePointer: ScenePoint,
+    modifiers: Modifiers,
+    isOverScrollBar = false,
+  ): TextToolTarget | null => {
+    const { state } = this.app;
+    if (state.activeTool.type !== "text") {
+      return null;
     }
-    if (
-      (this.app.state.suggestedBinding?.element ?? null) !== containerToBindTo
-    ) {
-      this.app.setState({
-        suggestedBinding: containerToBindTo
-          ? { element: containerToBindTo }
-          : null,
-      });
+    const target =
+      state.editingTextElement ||
+      state.newElement ||
+      state.multiElement ||
+      state.selectionElement ||
+      state.selectedElementsAreBeingDragged ||
+      isOverScrollBar
+        ? null
+        : this.getTargetAt(scenePointer, modifiers);
+    this.setHover(target && toHoverState(target));
+    return target;
+  };
+
+  /**
+   * Re-evaluates the hover at the last known pointer position — for the
+   * events that change what a click would do without the pointer moving:
+   * the alt (container label) and ctrl/cmd (endpoint binding) toggles.
+   */
+  refreshHover = (modifiers: Modifiers) => {
+    if (this.app.lastPointerMoveCoords) {
+      this.updateHover(this.app.lastPointerMoveCoords, modifiers);
     }
+  };
+
+  clearHover = () => {
+    if (this.app.state.textToolHover) {
+      this.app.setState({ textToolHover: null });
+    }
+  };
+
+  private setHover = (next: AppState["textToolHover"]) => {
+    if (!isSameHover(this.app.state.textToolHover, next)) {
+      this.app.setState({ textToolHover: next });
+    }
+  };
+
+  /**
+   * The cursor for what a click would do: a pointer over the arrow anchors
+   * text would attach to, a text cursor over text the click would edit, else
+   * the tool's crosshair. `hitElement` is the plain hit under the pointer —
+   * the fallback while the affordance is suppressed (editing, dragging), so
+   * the cursor there behaves as it always has.
+   */
+  cursorFor = (
+    target: TextToolTarget | null,
+    hitElement: ExcalidrawElement | null,
+  ): string => {
+    if (
+      target?.type === "endpoint" ||
+      (target?.type === "container" && isArrowElement(target.element))
+    ) {
+      return CURSOR_TYPE.POINTER;
+    }
+    if (target?.type === "text" || isTextElement(hitElement)) {
+      return CURSOR_TYPE.TEXT;
+    }
+    return CURSOR_TYPE.CROSSHAIR;
   };
 
   handlePointerDown = (
     event: React.PointerEvent<HTMLElement>,
     pointerDownState: PointerDownState,
   ): void => {
-    // if we're currently still editing text, clicking outside
-    // should only finalize it, not create another (irrespective
-    // of state.activeTool.locked)
+    // while editing, a click outside only finalizes the edit — it doesn't
+    // create another text (irrespective of state.activeTool.locked)
     if (this.app.state.editingTextElement) {
       return;
     }
     const sceneX = pointerDownState.origin.x;
     const sceneY = pointerDownState.origin.y;
+    const target = this.getTargetAt({ x: sceneX, y: sceneY }, event);
 
-    // the click transitions into text editing either way, consuming (or
-    // bypassing) whatever anchor or hover highlight was shown — don't leave
-    // them lingering under the editor, which outlives the hover when the
-    // tool is locked
-    this.app.setState({
-      hoveredArrowTextAnchor: null,
-      elementsToHighlight: null,
-      suggestedBinding: null,
-    });
+    // the click consumes the affordance — don't leave it lingering under the
+    // editor, which outlives the hover when the tool is locked
+    this.clearHover();
 
-    // a free arrow endpoint takes precedence over adding a label *to* the
-    // arrow — it's the smaller, more deliberate target
-    const arrowEndpoint = this.app.arrowText.getBindableEndpointAtPosition(
-      sceneX,
-      sceneY,
-    );
-
-    if (arrowEndpoint) {
-      this.app.startTextEditing({
-        sceneX,
-        sceneY,
-        // the binding fixes the position, but the width is still the user's
-        // to drag out (see `getEndpointBoundTextDragAnchor`)
-        autoEdit: false,
-        arrowEndpoint,
-      });
-    } else {
-      const container = this.getCreationContainerAtPosition(
-        sceneX,
-        sceneY,
-        event.altKey,
-      );
-
-      this.app.startTextEditing({
-        sceneX,
-        sceneY,
-        insertAtParentCenter: !event.altKey,
-        container,
-        autoEdit: false,
-        initialCaretSceneCoords: { x: sceneX, y: sceneY },
-        textCreation: pointerDownState.text,
-      });
+    switch (target.type) {
+      case "endpoint":
+        this.app.startTextEditing({
+          sceneX,
+          sceneY,
+          // the binding fixes the position, but the width is still the
+          // user's to drag out (see `getEndpointBoundTextDragAnchor`)
+          autoEdit: false,
+          arrowEndpoint: target.endpoint,
+        });
+        break;
+      case "text":
+        this.app.startTextEditing({
+          sceneX,
+          sceneY,
+          autoEdit: false,
+          initialCaretSceneCoords: { x: sceneX, y: sceneY },
+        });
+        break;
+      case "container":
+        // arms the pending click (see maybeStartPending)
+        this.app.startTextEditing({
+          sceneX,
+          sceneY,
+          container: target.element,
+          autoEdit: false,
+          textCreation: pointerDownState.text,
+        });
+        break;
+      case "free":
+        this.app.startTextEditing({
+          sceneX,
+          sceneY,
+          container: null,
+          insertAtParentCenter: false,
+          autoEdit: false,
+        });
+        break;
     }
 
     if (!pointerDownState.text.pendingContainerId) {
@@ -196,13 +278,9 @@ export class AppTextTool {
   };
 
   reset = () => {
-    // The pointer may have refreshed the hover while a center click was
-    // pending. Clear it when creation starts, including with a locked tool.
-    this.app.setState({
-      hoveredArrowTextAnchor: null,
-      elementsToHighlight: null,
-      suggestedBinding: null,
-    });
+    // the pointer may have refreshed the hover while a center click was
+    // pending — creation starting consumes it, locked tool or not
+    this.clearHover();
     if (!this.app.isToolLocked()) {
       this.app.setState(
         {
