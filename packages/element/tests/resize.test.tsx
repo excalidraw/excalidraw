@@ -17,6 +17,7 @@ import {
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
+  act,
   render,
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
@@ -238,6 +239,45 @@ describe("generic element", () => {
     expect(label.fontSize).toEqual(20);
   });
 
+  describe.each(["rectangle", "ellipse", "diamond"] as const)(
+    "%s with a label",
+    (type) => {
+      it.each([false, true])(
+        "flips horizontally while resizing (proportional: %s)",
+        async (proportional) => {
+          const container = UI.createElement(type, {
+            width: 200,
+            height: 100,
+          });
+          const label = await UI.editText(container, "Hello");
+
+          UI.resize(container, proportional ? "se" : "e", [-500, 0], {
+            shift: proportional,
+          });
+
+          expect(container.x).toBeCloseTo(-300);
+          expect(container.y).toBeCloseTo(0);
+          expect(container.width).toBeCloseTo(300);
+          expect(container.height).toBeCloseTo(proportional ? 150 : 100);
+          expect(label.x + label.width / 2).toBeCloseTo(
+            container.x + container.width / 2,
+            0,
+          );
+          expect(label.y + label.height / 2).toBeCloseTo(
+            container.y + container.height / 2,
+            0,
+          );
+          expect(label.angle).toBe(0);
+          if (proportional) {
+            expect(label.fontSize).toBeGreaterThan(20);
+          } else {
+            expect(label.fontSize).toBe(20);
+          }
+        },
+      );
+    },
+  );
+
   it.each<{ handle: TransformHandleDirection; move: [number, number] }>([
     { handle: "n", move: [0, 100] },
     { handle: "s", move: [0, -100] },
@@ -267,6 +307,47 @@ describe("generic element", () => {
       expect(rectangle.height).toBeCloseTo(minContainerHeight);
     },
   );
+
+  it("keeps the flipped corner anchored while wrapped text sets the minimum height", async () => {
+    const rectangle = UI.createElement("rectangle", {
+      width: 200,
+      height: 200,
+    });
+    const label = await UI.editText(rectangle, "first second third fourth");
+    const originalElements = arrayToMap(
+      h.app.scene.getNonDeletedElements().map((element) => ({ ...element })),
+    );
+    const originalRectangle = originalElements.get(rectangle.id)!;
+    let minHeight = 0;
+
+    // One SE drag crosses the top edge, stays below the wrapped text's
+    // minimum height, then grows far enough for the pointer to control it.
+    for (const nextHeight of [-10, -40, -80, -200]) {
+      act(() => {
+        resizeSingleElement(
+          80,
+          nextHeight,
+          h.app.scene.getNonDeletedElement(rectangle.id)!,
+          originalRectangle,
+          originalElements,
+          h.app.scene,
+          "se",
+        );
+      });
+
+      expect(rectangle.x).toBe(originalRectangle.x);
+      expect(rectangle.y + rectangle.height).toBe(originalRectangle.y);
+      expect(label.y).toBeGreaterThan(rectangle.y);
+      expect(label.y + label.height).toBeLessThan(
+        rectangle.y + rectangle.height,
+      );
+      if (nextHeight === -10) {
+        minHeight = rectangle.height;
+        expect(minHeight).toBeGreaterThan(80);
+      }
+      expect(rectangle.height).toBe(Math.max(minHeight, -nextHeight));
+    }
+  });
 });
 
 describe.each(["line", "freedraw"] as const)("%s element", (type) => {
@@ -559,6 +640,26 @@ describe("arrow element", () => {
     expectLabelAtPathMidpoint();
     expect(label.angle).toBeCloseTo(0);
     expect(label.fontSize).toEqual(20);
+
+    const { x, width, height } = arrow;
+    const latestArrow = h.app.scene.getNonDeletedElement(arrow.id)!;
+    act(() => {
+      resizeSingleElement(
+        -2 * width,
+        2 * height,
+        latestArrow,
+        { ...latestArrow },
+        arrayToMap(h.elements.map((element) => ({ ...element }))),
+        h.app.scene,
+        "se",
+        { shouldMaintainAspectRatio: true },
+      );
+    });
+    expect(getBoundsFromPoints(arrow)[2]).toBeCloseTo(x);
+    expect(arrow.width).toBeCloseTo(2 * width);
+    expect(label.fontSize).toBeCloseTo(40);
+    expect(label.angle).toBeCloseTo(0);
+    expectLabelAtPathMidpoint();
   });
 
   it("flips the fixed point binding on negative resize for single bindable", () => {
@@ -904,6 +1005,30 @@ describe("image element", () => {
 });
 
 describe("multiple selection", () => {
+  it("keeps a flipped text container anchored when its label requires extra height", async () => {
+    const rectangle = UI.createElement("rectangle", {
+      position: 0,
+      width: 200,
+      height: 35,
+    });
+    const label = await UI.editText(rectangle, "hello");
+    const other = UI.createElement("rectangle", {
+      x: 300,
+      y: 0,
+      size: 100,
+    });
+    const originalHeight = rectangle.height;
+
+    // Halve the selection and flip vertically. Padding does not scale with
+    // the font, so even a single-line label needs extra container height.
+    UI.resize([rectangle, other], "se", [-200, -150], { shift: true });
+
+    expect(label.fontSize).toBeCloseTo(10);
+    expect(label.text).toBe("hello");
+    expect(rectangle.height).toBeGreaterThan(originalHeight / 2);
+    expect(rectangle.y + rectangle.height).toBeCloseTo(0);
+  });
+
   it("resizes with generic elements", async () => {
     const rectangle = UI.createElement("rectangle", {
       position: 0,

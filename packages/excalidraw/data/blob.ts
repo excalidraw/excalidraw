@@ -158,20 +158,21 @@ export const loadSceneOrLibraryFromBlob = async (
       throw error;
     }
     if (isValidExcalidrawData(data)) {
+      const elements = restoreElements(data.elements, localElements, {
+        repairBindings: true,
+        deleteInvisibleElements: true,
+      });
       return {
         type: MIME_TYPES.excalidraw,
         data: {
-          elements: restoreElements(data.elements, localElements, {
-            repairBindings: true,
-            deleteInvisibleElements: true,
-          }),
+          elements,
           appState: restoreAppState(
             {
               theme: localAppState?.theme,
               fileHandle: fileHandle || blob.handle || null,
               ...cleanAppStateForExport(data.appState || {}),
               ...(localAppState
-                ? getScrollToContentState(data.elements || [], localAppState)
+                ? getScrollToContentState(elements, localAppState)
                 : {}),
             },
             localAppState,

@@ -467,6 +467,7 @@ export const intersectElementWithLineSegment = (
   // Do the actual intersection test against the element's shape
   switch (element.type) {
     case "rectangle":
+    case "stickynote":
     case "image":
     case "text":
     case "iframe":

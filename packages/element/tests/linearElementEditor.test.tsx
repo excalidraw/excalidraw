@@ -1416,7 +1416,7 @@ describe("Test Linear Elements", () => {
       expect({ width: container.width, height: container.height })
         .toMatchInlineSnapshot(`
           {
-            "height": 130,
+            "height": 150,
             "width": "366.11716",
           }
         `);
@@ -1445,11 +1445,11 @@ describe("Test Linear Elements", () => {
       ).toMatchInlineSnapshot(`
         [
           20,
-          35,
+          45,
           "501.11716",
-          95,
+          220,
           "205.45894",
-          "52.50000",
+          145,
         ]
       `);
     });
@@ -1558,6 +1558,7 @@ describe("Test Linear Elements", () => {
         h.elements[0],
         h.app.scene,
         "nw",
+        false,
         false,
         false,
       );

@@ -58,6 +58,7 @@ import {
   DEFAULT_TEXT_ALIGN,
   ARROW_TYPE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
+  DEFAULT_STICKY_NOTE_SIZE,
   isLocalLink,
   normalizeLink,
   toValidURL,
@@ -127,6 +128,7 @@ import {
   newFreeDrawElement,
   newEmbeddableElement,
   newMagicFrameElement,
+  newStickyNoteElement,
   newIframeElement,
   newArrowElement,
   newElement,
@@ -155,6 +157,7 @@ import {
   isElbowArrow,
   isBindableElement,
   isTextElement,
+  isStickyNoteElement,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -171,6 +174,9 @@ import {
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
+  getColorUpdate,
+  getStickyNoteLayout,
+  getStickyNoteMinSize,
   isValidTextContainer,
   redrawTextBoundingBox,
   hasBoundingBox,
@@ -289,7 +295,10 @@ import type {
   ExcalidrawBindableElement,
 } from "@excalidraw/element/types";
 
-import type { ArrowEndpoint } from "@excalidraw/element";
+import type {
+  ArrowEndpoint,
+  TransformHandleDirection,
+} from "@excalidraw/element";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
 
@@ -424,6 +433,11 @@ import { EraserTrail } from "../eraser";
 import { getShortcutKey } from "../shortcut";
 import { tryParseSpreadsheet } from "../charts";
 
+import {
+  getColorTargetAppStateUpdates,
+  resolveColorTarget,
+} from "../actions/colorTargets";
+
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -433,6 +447,7 @@ import ConvertElementTypePopup, {
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppArrowText } from "./App.arrowText";
 import { AppBucketFill } from "./App.bucketFill";
+import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
@@ -655,7 +670,7 @@ class App extends React.Component<AppProps, AppState> {
   public library: AppClassProperties["library"];
   public libraryItemsFromStorage: LibraryItems | undefined;
   public id: string;
-  private store: Store;
+  public store: Store;
   private history: History;
   public excalidrawContainerValue: {
     container: HTMLDivElement | null;
@@ -697,6 +712,7 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public bucketFill: AppBucketFill = new AppBucketFill(this);
+  public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
@@ -712,6 +728,13 @@ class App extends React.Component<AppProps, AppState> {
 
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
+  /**
+   * the handle of the resize in progress while `state.isResizing` — for UI
+   * that words itself by handle (a sticky note's corners resize
+   * proportionally, its edges freely); not app state, so it costs no
+   * re-render of its own
+   */
+  activeResizeHandle: TransformHandleDirection | null = null;
   lastPointerUpEvent: React.PointerEvent<HTMLElement> | PointerEvent | null =
     null;
   // TODO this is a hack and we should ideally unify touch and pointer events
@@ -2325,6 +2348,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
+    // a tool dragged out of the toolbar previews on the new-element canvas
+    // (it is not in the scene until dropped)
+    const previewElement = newElementCanvasElement ?? this.toolDrag.preview;
+
     const shouldBlockPointerEvents =
       // default back to `--ui-pointerEvents` flow if setPointerCapture
       // not supported
@@ -2605,10 +2632,10 @@ class App extends React.Component<AppProps, AppState> {
                               theme: this.state.theme,
                             }}
                           />
-                          {newElementCanvasElement && (
+                          {previewElement && (
                             <NewElementCanvas
                               appState={this.state}
-                              newElement={newElementCanvasElement}
+                              newElement={previewElement}
                               scale={this.ownerWindow.devicePixelRatio}
                               rc={this.rc}
                               elementsMap={renderableElementsMap}
@@ -2626,6 +2653,14 @@ class App extends React.Component<AppProps, AppState> {
                                 pendingFlowchartNodes: null,
                                 theme: this.state.theme,
                               }}
+                              // a tool dragged out of the toolbar previews
+                              // translucently; the element itself is drawn
+                              // exactly as it will land
+                              opacity={
+                                this.toolDrag.preview
+                                  ? TOOL_DRAG_PREVIEW_OPACITY
+                                  : undefined
+                              }
                             />
                           )}
                           <InteractiveCanvas
@@ -2997,36 +3032,54 @@ class App extends React.Component<AppProps, AppState> {
       colorPickerType:
         type === "stroke" ? "elementStroke" : "elementBackground",
       onSelect: (color, event) => {
-        const shouldUpdateStrokeColor =
+        const property =
           (type === "background" && event.altKey) ||
-          (type === "stroke" && !event.altKey);
+          (type === "stroke" && !event.altKey)
+            ? "strokeColor"
+            : "backgroundColor";
         const selectedElements = this.scene.getSelectedElements(this.state);
         if (
           !selectedElements.length ||
           this.state.activeTool.type !== "selection"
         ) {
-          if (shouldUpdateStrokeColor) {
-            this.syncActionResult({
-              appState: { ...this.state, currentItemStrokeColor: color },
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
-          } else {
-            this.syncActionResult({
-              appState: { ...this.state, currentItemBackgroundColor: color },
-              captureUpdate: CaptureUpdateAction.IMMEDIATELY,
-            });
-          }
+          // no target: the pick becomes the default of whichever color
+          // domain (regular / sticky note) the active tool draws in
+          this.syncActionResult({
+            appState: {
+              ...this.state,
+              ...getColorTargetAppStateUpdates(
+                resolveColorTarget(
+                  this.state,
+                  this.scene.getNonDeletedElements(),
+                  property,
+                ),
+                color,
+              ),
+            },
+            captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+          });
         } else {
+          const elementsMap = this.scene.getNonDeletedElementsMap();
+          // a note's visible text is its label, so stroke picks include it
+          const targetIds = new Set(
+            this.scene
+              .getSelectedElements({
+                selectedElementIds: this.state.selectedElementIds,
+                includeBoundTextElement: property === "strokeColor",
+              })
+              .map((element) => element.id),
+          );
           this.updateScene({
-            elements: this.scene.getElementsIncludingDeleted().map((el) => {
-              if (this.state.selectedElementIds[el.id]) {
-                return newElementWith(el, {
-                  [shouldUpdateStrokeColor ? "strokeColor" : "backgroundColor"]:
-                    color,
-                });
-              }
-              return el;
-            }),
+            elements: this.scene
+              .getElementsIncludingDeleted()
+              .map((el) =>
+                targetIds.has(el.id)
+                  ? newElementWith(
+                      el,
+                      getColorUpdate(el, property, color, elementsMap),
+                    )
+                  : el,
+              ),
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
         }
@@ -3848,6 +3901,7 @@ class App extends React.Component<AppProps, AppState> {
     this.library.destroy();
     this.laserTrails.stop();
     this.drawShape.stop();
+    this.toolDrag.cancel();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
@@ -6264,25 +6318,61 @@ class App extends React.Component<AppProps, AppState> {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
     const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
+      const latestTextElement = this.scene.getElement<ExcalidrawTextElement>(
+        element.id,
+      );
+
+      if (!latestTextElement || !isTextElement(latestTextElement)) {
+        return;
+      }
+
+      const container = getContainerElement(latestTextElement, elementsMap);
+      const stickyContainer =
+        container && isStickyNoteElement(container) ? container : null;
+      // sticky notes: the fit owns both the label and the note geometry
+      const stickyLayout = stickyContainer
+        ? getStickyNoteLayout(stickyContainer, latestTextElement, {
+            originalText: nextOriginalText,
+          })
+        : null;
+
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
-          if (_element.id === element.id && isTextElement(_element)) {
+          if (
+            stickyLayout &&
+            _element.id === stickyContainer?.id &&
+            isStickyNoteElement(_element)
+          ) {
+            return newElementWith(_element, stickyLayout.container);
+          }
+          if (_element.id === latestTextElement.id && isTextElement(_element)) {
             return newElementWith(_element, {
               originalText: nextOriginalText,
               isDeleted: isDeleted ?? _element.isDeleted,
-              // returns (wrapped) text and new dimensions
-              ...refreshTextDimensions(
-                _element,
-                getContainerElement(_element, elementsMap),
-                elementsMap,
-                nextOriginalText,
-              ),
+              ...(stickyLayout?.text ??
+                // returns (wrapped) text and new dimensions
+                refreshTextDimensions(
+                  _element,
+                  getContainerElement(_element, elementsMap),
+                  elementsMap,
+                  nextOriginalText,
+                )),
             });
           }
           return _element;
         }),
       ]);
+
+      if (stickyContainer) {
+        // the note may have grown or shrunk — arrows bound to it must follow
+        const latestContainer = this.scene.getNonDeletedElement(
+          stickyContainer.id,
+        );
+        if (latestContainer) {
+          updateBoundElements(latestContainer, this.scene);
+        }
+      }
     };
 
     this.textWysiwygSubmitHandler = textWysiwyg({
@@ -6759,7 +6849,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  private startTextEditing = ({
+  public startTextEditing = ({
     sceneX,
     sceneY,
     insertAtParentCenter = true,
@@ -6845,7 +6935,8 @@ class App extends React.Component<AppProps, AppState> {
       !existingTextElement &&
       shouldBindToContainer &&
       container &&
-      !isArrowElement(container)
+      !isArrowElement(container) &&
+      !isStickyNoteElement(container)
     ) {
       const fontString = {
         fontSize,
@@ -6918,7 +7009,11 @@ class App extends React.Component<AppProps, AppState> {
       newTextElement({
         x: newTextElementPosition.x,
         y: newTextElementPosition.y,
-        strokeColor: this.state.currentItemStrokeColor,
+        // a note's stroke color is its text color: the label inherits it
+        strokeColor:
+          shouldBindToContainer && isStickyNoteElement(container)
+            ? container.strokeColor
+            : this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.getCurrentItemStrokeWidth("text"),
@@ -6927,6 +7022,10 @@ class App extends React.Component<AppProps, AppState> {
         opacity: this.state.currentItemOpacity,
         text: "",
         fontSize,
+        baseFontSize:
+          shouldBindToContainer && isStickyNoteElement(container)
+            ? fontSize
+            : null,
         fontFamily,
         textAlign:
           arrowEndpointBinding?.textAlign ??
@@ -10383,10 +10482,11 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  private getCurrentItemRoundness(
+  public getCurrentItemRoundness(
     elementType:
       | "selection"
       | "rectangle"
+      | "stickynote"
       | "diamond"
       | "ellipse"
       | "iframe"
@@ -10401,7 +10501,7 @@ class App extends React.Component<AppProps, AppState> {
       : null;
   }
 
-  private getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
+  public getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
     return getStrokeWidthByKey(
       elementType,
       this.state.currentItemStrokeWidthKey,
@@ -10409,7 +10509,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createGenericElementOnPointerDown = (
-    elementType: ExcalidrawGenericElement["type"] | "embeddable",
+    elementType: ExcalidrawGenericElement["type"] | "embeddable" | "stickynote",
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -10428,8 +10528,14 @@ class App extends React.Component<AppProps, AppState> {
     const baseElementAttributes = {
       x: gridX,
       y: gridY,
-      strokeColor: this.state.currentItemStrokeColor,
-      backgroundColor: this.state.currentItemBackgroundColor,
+      strokeColor:
+        elementType === "stickynote"
+          ? this.state.currentItemStickynoteStrokeColor
+          : this.state.currentItemStrokeColor,
+      backgroundColor:
+        elementType === "stickynote"
+          ? this.state.currentItemStickynoteBackgroundColor
+          : this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.getCurrentItemStrokeWidth(elementType),
       strokeStyle: this.state.currentItemStrokeStyle,
@@ -10444,6 +10550,11 @@ class App extends React.Component<AppProps, AppState> {
     if (elementType === "embeddable") {
       element = newEmbeddableElement({
         type: "embeddable",
+        ...baseElementAttributes,
+      });
+    } else if (elementType === "stickynote") {
+      element = newStickyNoteElement({
+        type: "stickynote",
         ...baseElementAttributes,
       });
     } else {
@@ -11545,6 +11656,7 @@ class App extends React.Component<AppProps, AppState> {
         isCropping,
       } = this.state;
 
+      this.activeResizeHandle = null;
       this.setState((prevState) => ({
         isResizing: false,
         isRotating: false,
@@ -11910,6 +12022,94 @@ class App extends React.Component<AppProps, AppState> {
         this.handleTextWysiwyg(newElement, {
           isExistingElement: true,
         });
+      }
+
+      if (newElement && isStickyNoteElement(newElement)) {
+        // a gesture under the drag threshold is a click: the default square,
+        // centered on the pointer. A drag keeps its size — previewed
+        // unclamped while the pointer is down — and snaps to the minimum
+        // only now, growing away from the origin corner like the drag did
+        const zoom = this.state.zoom.value;
+        const isClick =
+          newElement.width * zoom < DRAGGING_THRESHOLD &&
+          newElement.height * zoom < DRAGGING_THRESHOLD;
+        let nextGeometry;
+        if (isClick) {
+          const size = DEFAULT_STICKY_NOTE_SIZE;
+          // Snap after centering: half the default size need not be on the grid.
+          const [x, y] = getGridPoint(
+            pointerDownState.origin.x - size / 2,
+            pointerDownState.origin.y - size / 2,
+            childEvent[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+          );
+          nextGeometry = {
+            x,
+            y,
+            width: size,
+            height: size,
+          };
+        } else {
+          // one line at the current font ceiling must fit, or the note would
+          // grow on the first keystroke
+          const minSize = getStickyNoteMinSize({
+            fontSize: this.state.currentItemFontSize,
+            fontFamily: this.state.currentItemFontFamily,
+          });
+          let width = Math.max(newElement.width, minSize.width);
+          let height = Math.max(newElement.height, minSize.height);
+          if (!shouldMaintainAspectRatio(childEvent)) {
+            // a plain drag is proportional (Shift frees it); the two floors
+            // differ, so the square is kept through the snap
+            width = height = Math.max(width, height);
+          }
+          const { originInGrid } = pointerDownState;
+          nextGeometry = {
+            // a drag toward the top/left put the note's origin before the
+            // pointer origin; that far edge stays put when the size grows
+            x:
+              newElement.x < originInGrid.x
+                ? originInGrid.x - width
+                : newElement.x,
+            y:
+              newElement.y < originInGrid.y
+                ? originInGrid.y - height
+                : newElement.y,
+            width,
+            height,
+          };
+        }
+
+        this.scene.mutateElement(
+          newElement,
+          { ...nextGeometry, baseHeight: nextGeometry.height },
+          { informMutation: false, isDragging: false },
+        );
+
+        this.store.scheduleCapture();
+        this.scene.triggerUpdate();
+
+        if (activeTool.locked) {
+          this.setState((prevState) => ({
+            newElement: null,
+            selectedElementIds: makeNextSelectedElementIds({}, prevState),
+          }));
+          this.cursor.applyForTool();
+          return;
+        }
+
+        this.cursor.reset();
+        this.setState({
+          newElement: null,
+          activeTool: updateActiveTool(this.state, {
+            type: this.state.preferredSelectionTool.type,
+          }),
+        });
+        this.startTextEditing({
+          sceneX: newElement.x + newElement.width / 2,
+          sceneY: newElement.y + newElement.height / 2,
+          container: newElement,
+        });
+        return;
       }
 
       if (
@@ -13407,9 +13607,12 @@ class App extends React.Component<AppProps, AppState> {
         y: gridY,
         width: distance(pointerDownState.originInGrid.x, gridX),
         height: distance(pointerDownState.originInGrid.y, gridY),
-        shouldMaintainAspectRatio: isImageElement(newElement)
-          ? !shouldMaintainAspectRatio(event)
-          : shouldMaintainAspectRatio(event),
+        // images and sticky notes are proportional by default — Shift frees
+        // them; every other shape is free by default and Shift constrains it
+        shouldMaintainAspectRatio:
+          isImageElement(newElement) || isStickyNoteElement(newElement)
+            ? !shouldMaintainAspectRatio(event)
+            : shouldMaintainAspectRatio(event),
         shouldResizeFromCenter: shouldResizeFromCenter(event),
         zoom: this.state.zoom.value,
         scene: this.scene,
@@ -13551,6 +13754,10 @@ class App extends React.Component<AppProps, AppState> {
       return false;
     }
 
+    this.activeResizeHandle =
+      transformHandleType && transformHandleType !== "rotation"
+        ? transformHandleType
+        : null;
     this.setState({
       // TODO: rename this state field to "isScaling" to distinguish
       // it from the generic "isResizing" which includes scaling and
@@ -13623,6 +13830,16 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
+    // images are proportional by default, and so is a sticky note's corner
+    // (its label's font ceiling scales with it); Shift frees them. A note's
+    // edges stay free by default — Shift constrains them like any shape.
+    const proportionalByDefault =
+      selectedElements.some((element) => isImageElement(element)) ||
+      (selectedElements.length === 1 &&
+        isStickyNoteElement(selectedElements[0]) &&
+        typeof transformHandleType === "string" &&
+        transformHandleType.length === 2);
+
     if (
       transformElements(
         pointerDownState.originalElements,
@@ -13631,7 +13848,7 @@ class App extends React.Component<AppProps, AppState> {
         this.scene,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
-        selectedElements.some((element) => isImageElement(element))
+        proportionalByDefault
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         resizeX,

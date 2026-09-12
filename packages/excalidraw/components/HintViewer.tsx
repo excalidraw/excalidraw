@@ -6,6 +6,7 @@ import {
   isImageElement,
   isLinearElement,
   isLineElement,
+  isStickyNoteElement,
   isTextBindableContainer,
   isTextElement,
 } from "@excalidraw/element";
@@ -104,6 +105,10 @@ const getHints = ({
     return t("hints.embeddable");
   }
 
+  if (activeTool.type === "stickynote") {
+    return t("hints.stickynote");
+  }
+
   if (activeTool.type === "autoshape") {
     return t("hints.autoshape");
   }
@@ -117,6 +122,17 @@ const getHints = ({
     if (isLinearElement(targetElement) && targetElement.points.length === 2) {
       return t("hints.lockAngle", {
         shortcut: getTaggedShortcutKey("Shift"),
+      });
+    }
+    if (
+      isStickyNoteElement(targetElement) &&
+      // a note's corners are proportional by default (Shift frees them); its
+      // edges are free by default, so they get the generic hint below
+      app.activeResizeHandle?.length === 2
+    ) {
+      return t("hints.resizeStickyNote", {
+        shortcut_1: getTaggedShortcutKey("Shift"),
+        shortcut_2: getTaggedShortcutKey("Alt"),
       });
     }
     return isImageElement(targetElement)

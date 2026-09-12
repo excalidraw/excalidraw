@@ -6,7 +6,10 @@ import type { PointSnapLine, PointerSnapLine } from "../snapping";
 import type { InteractiveCanvasAppState } from "../types";
 
 const SNAP_COLOR_LIGHT = "#ff6b6b";
-const SNAP_COLOR_DARK = "#ff0000";
+// dark-mode colors are the equivalents of what the former CSS inversion filter
+// produced (see `applyDarkModeFilter`)
+const SNAP_COLOR_DARK = "#ff9090";
+const SNAP_COLOR_DARK_ZEN = "#da5b5b";
 const SNAP_WIDTH = 1;
 const SNAP_CROSS_SIZE = 2;
 
@@ -18,12 +21,13 @@ export const renderSnaps = (
     return;
   }
 
-  // in dark mode, we need to adjust the color to account for color inversion.
-  // Don't change if zen mode, because we draw only crosses, we want the
-  // colors to be more visible
+  // in zen mode we draw only crosses, so use a different color to keep them
+  // visible
   const snapColor =
-    appState.theme === THEME.LIGHT || appState.zenModeEnabled
+    appState.theme === THEME.LIGHT
       ? SNAP_COLOR_LIGHT
+      : appState.zenModeEnabled
+      ? SNAP_COLOR_DARK_ZEN
       : SNAP_COLOR_DARK;
   // in zen mode make the cross more visible since we don't draw the lines
   const snapWidth =

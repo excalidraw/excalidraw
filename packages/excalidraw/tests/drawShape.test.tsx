@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import * as common from "@excalidraw/common";
 
 import { getTargetElements, isArrowElement } from "@excalidraw/element";
 
@@ -574,7 +574,7 @@ describe("autoshape finalize funnel", () => {
     expect(h.state.newElement).toBeNull();
 
     Keyboard.withModifierKeys({ ctrl: true }, () => {
-      Keyboard.keyPress(KEYS.Z);
+      Keyboard.keyPress(common.KEYS.Z);
     });
 
     // undo was blocked — the previously committed shape is still there
@@ -778,14 +778,14 @@ describe("autoshape tool activation", () => {
     expect(h.state.activeTool.type).toBe("selection");
 
     Keyboard.withModifierKeys({ shift: true }, () => {
-      Keyboard.keyPress(KEYS.X);
+      Keyboard.keyPress(common.KEYS.X);
     });
 
     expect(h.state.activeTool.type).toBe("autoshape");
   });
 
   it("is not activated by an unmodified X (freedraw's shortcut)", () => {
-    Keyboard.keyPress(KEYS.X);
+    Keyboard.keyPress(common.KEYS.X);
 
     expect(h.state.activeTool.type).toBe("freedraw");
   });

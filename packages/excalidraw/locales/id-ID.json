@@ -1,7 +1,7 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "Daftar",
+    "signIn": "Daftar",
     "paste": "Tempel",
     "pasteAsPlaintext": "Tempel sebagai teks biasa",
     "pasteCharts": "Tempel diagram",
@@ -29,7 +29,7 @@
     "stroke": "Guratan",
     "changeStroke": "Ubah warna garis",
     "background": "Latar",
-    "changeBackground": "Ubah warna background",
+    "changeBackground": "Ubah warna latar",
     "fill": "Isian",
     "strokeWidth": "Lebar guratan",
     "strokeStyle": "Gaya guratan",
@@ -615,8 +615,8 @@
     "noShades": "Tidak ada nuansa untuk warna ini",
     "invalidColor": "Bukan warna yang valid",
     "invalidHexLength": "Kode Hex harus 3, 4, 6, atau 8 karakter",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "Tip: Seret warna apa saja ke 'pilihan utama' untuk menyematkannya",
+    "resetTopPicks": "Balikkan ke 'pilihan utama' awal"
   },
   "overwriteConfirm": {
     "action": {
