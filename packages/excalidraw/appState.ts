@@ -42,6 +42,7 @@ export const getDefaultAppState = (): Omit<
     currentItemStickynoteStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
     currentItemStickynoteBackgroundColor: DEFAULT_STICKY_NOTE_BG,
     currentItemRoundness: isTestEnv() ? "sharp" : "round",
+    currentItemRoundnessValue: null,
     currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
     currentItemStrokeWidthKey: DEFAULT_ELEMENT_STROKE_WIDTH_KEY,
@@ -168,6 +169,11 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemFontFamily: { browser: true, export: false, server: false },
   currentItemFontSize: { browser: true, export: false, server: false },
   currentItemRoundness: {
+    browser: true,
+    export: false,
+    server: false,
+  },
+  currentItemRoundnessValue: {
     browser: true,
     export: false,
     server: false,

@@ -11,6 +11,8 @@ import {
   DEFAULT_FONT_SIZE,
   FONT_FAMILY,
   ROUNDNESS,
+  ROUNDNESS_SLIDER_MAX_RATIO,
+  DEFAULT_ADAPTIVE_RADIUS,
   STROKE_WIDTH_KEYS,
   VERTICAL_ALIGN,
   KEYS,
@@ -1781,6 +1783,22 @@ export const actionChangeRoundness = register<"sharp" | "round">({
       (el) => el.roundness?.type === ROUNDNESS.LEGACY,
     );
 
+    const edgeValue = getFormValue(
+      elements,
+      app,
+      (element) =>
+        hasLegacyRoundness ? null : element.roundness ? "round" : "sharp",
+      (element) =>
+        !isArrowElement(element) && element.hasOwnProperty("roundness"),
+      (hasSelection) => (hasSelection ? null : appState.currentItemRoundness),
+    );
+
+    const showsRoundnessAmount =
+      edgeValue === "round" &&
+      (targetElements.length > 0
+        ? targetElements.some((el) => isUsingAdaptiveRadius(el.type))
+        : isUsingAdaptiveRadius(app.state.activeTool.type));
+
     return (
       <fieldset>
         <legend>{t("labels.edges")}</legend>
@@ -1799,25 +1817,81 @@ export const actionChangeRoundness = register<"sharp" | "round">({
                 icon: EdgeRoundIcon,
               },
             ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) =>
-                hasLegacyRoundness
-                  ? null
-                  : element.roundness
-                  ? "round"
-                  : "sharp",
-              (element) =>
-                !isArrowElement(element) && element.hasOwnProperty("roundness"),
-              (hasSelection) =>
-                hasSelection ? null : appState.currentItemRoundness,
-            )}
+            value={edgeValue}
             onChange={(value) => updateData(value)}
           />
           {renderAction("togglePolygon")}
         </div>
+        {showsRoundnessAmount && renderAction("changeRoundnessAmount")}
       </fieldset>
+    );
+  },
+});
+
+// only used before anything has customized the roundness amount, so the
+// slider starts somewhere reasonable instead of at 0
+const DEFAULT_ROUNDNESS_AMOUNT_PERCENT = 35;
+
+const getMaxAdaptiveRadius = (element: ExcalidrawElement) =>
+  (Math.min(element.width, element.height) / 2) * ROUNDNESS_SLIDER_MAX_RATIO;
+
+const getRoundnessPercent = (element: ExcalidrawElement) => {
+  const maxRadius = getMaxAdaptiveRadius(element);
+  if (maxRadius <= 0) {
+    return 0;
+  }
+  const value = element.roundness?.value ?? DEFAULT_ADAPTIVE_RADIUS;
+  return Math.round(Math.min(value / maxRadius, 1) * 100);
+};
+
+export const actionChangeRoundnessAmount = register<number>({
+  name: "changeRoundnessAmount",
+  label: "labels.roundness",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    invariant(
+      value !== undefined,
+      "actionChangeRoundnessAmount: Expected a percent value",
+    );
+
+    return {
+      elements: changeProperty(elements, appState, (el) => {
+        if (el.roundness?.type !== ROUNDNESS.ADAPTIVE_RADIUS) {
+          return el;
+        }
+
+        return newElementWith(el, {
+          roundness: {
+            type: ROUNDNESS.ADAPTIVE_RADIUS,
+            value: (value / 100) * getMaxAdaptiveRadius(el),
+          },
+        });
+      }),
+      appState: { ...appState, currentItemRoundnessValue: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, app, updateData }) => {
+    const percent = getFormValue(
+      elements,
+      app,
+      (element) => getRoundnessPercent(element),
+      (element) => element.roundness?.type === ROUNDNESS.ADAPTIVE_RADIUS,
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemRoundnessValue,
+    );
+
+    return (
+      <Range
+        label={t("labels.roundness")}
+        value={percent ?? DEFAULT_ROUNDNESS_AMOUNT_PERCENT}
+        hasCommonValue={percent !== null}
+        onChange={updateData}
+        min={0}
+        max={100}
+        step={5}
+        testId="roundnessAmount"
+      />
     );
   },
 });
