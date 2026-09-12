@@ -15,6 +15,7 @@ import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 
 import { getElementsWithinSelection, getSelectedElements } from "./selection";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
+import { getCanvasPadding } from "./canvasPadding";
 
 import {
   getElementLineSegments,
@@ -908,6 +909,27 @@ export const isElementInFrame = (
   return false;
 };
 
+// text elements are rasterized onto an offscreen canvas padded by
+// `getCanvasPadding(element)` device/canvas pixels on each side, to avoid
+// clipping ascenders/descenders and anti-aliased glyph edges (see
+// `drawElementFromCanvas` in `renderElement.ts`, where that padding is
+// subtracted from the element's device-pixel position with no further
+// scaling — i.e. it's already expressed in device pixels, not scene units).
+// That padding means the actually-rendered pixels can extend past the
+// element's logical (scene-unit) bounds, so the frame-clip decision needs to
+// account for it or text sitting close to (but not crossing) the frame's
+// logical edge can bleed past the frame boundary unclipped.
+//
+// Since scene units map to device pixels via `devicePixelRatio` (zoom
+// cancels out of this particular conversion — see `drawElementFromCanvas`),
+// converting the device-pixel padding back to scene units means dividing by
+// `devicePixelRatio`, not multiplying: at DPR 2 the same 20-device-pixel
+// margin is only 10 scene units wide, while at DPR 0.5 it's 40.
+const getFrameClipRenderPadding = (element: ExcalidrawElement): number =>
+  isTextElement(element)
+    ? getCanvasPadding(element) / window.devicePixelRatio
+    : 0;
+
 export const shouldApplyFrameClip = (
   element: ExcalidrawElement,
   frame: ExcalidrawFrameLikeElement,
@@ -919,12 +941,24 @@ export const shouldApplyFrameClip = (
     return false;
   }
 
+  const renderPadding = getFrameClipRenderPadding(element);
+  const elementWithRenderPadding =
+    renderPadding > 0
+      ? {
+          ...element,
+          x: element.x - renderPadding,
+          y: element.y - renderPadding,
+          width: element.width + renderPadding * 2,
+          height: element.height + renderPadding * 2,
+        }
+      : element;
+
   // for individual elements, only clip when the element is
   // a. overlapping with the frame, or
   // b. containing the frame, for example when an element is used as a background
   //    and is therefore bigger than the frame and completely contains the frame
   const shouldClipElementItself =
-    isElementIntersectingFrame(element, frame, elementsMap) ||
+    isElementIntersectingFrame(elementWithRenderPadding, frame, elementsMap) ||
     isElementContainingFrame(element, frame, elementsMap);
 
   if (shouldClipElementItself) {
