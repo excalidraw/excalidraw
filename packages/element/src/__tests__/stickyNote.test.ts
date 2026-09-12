@@ -1155,13 +1155,12 @@ describe("ruled sticky notes", () => {
   });
 
   it("keeps the key off a note that was never given a paper form", () => {
+    const at = { type: "stickynote", x: 0, y: 0 } as const;
+
     // an untouched note has to serialize exactly as it did before this existed
-    expect("stickyShape" in newStickyNoteElement({ type: "stickynote" })).toBe(
-      false,
-    );
+    expect("stickyShape" in newStickyNoteElement({ ...at })).toBe(false);
     expect(
-      newStickyNoteElement({ type: "stickynote", stickyShape: "ruled" })
-        .stickyShape,
+      newStickyNoteElement({ ...at, stickyShape: "ruled" }).stickyShape,
     ).toBe("ruled");
   });
 });
