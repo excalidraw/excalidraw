@@ -433,6 +433,10 @@ export interface AppState {
   currentItemEndArrowhead: Arrowhead | null;
   currentHoveredFontFamily: FontFamilyValues | null;
   currentItemRoundness: StrokeRoundness;
+  // percent (0-100) applied on top of the "round" edges setting above, for
+  // elements that support a custom adaptive radius (rectangle, image,
+  // iframe, embeddable); null means "use the default fixed radius"
+  currentItemRoundnessValue: number | null;
   currentItemArrowType: "sharp" | "round" | "elbow";
   viewBackgroundColor: string;
   scrollX: number;
