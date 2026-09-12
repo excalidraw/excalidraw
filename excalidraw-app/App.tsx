@@ -451,6 +451,28 @@ const ExcalidrawWrapper = () => {
   });
 
   const [, forceRefresh] = useState(false);
+  const [showLinkIcons, setShowLinkIcons] = useState(() => {
+    try {
+      return (
+        localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_SHOW_LINK_ICONS) !==
+        "false"
+      );
+    } catch {
+      return true;
+    }
+  });
+
+  const updateShowLinkIcons = useCallback((show: boolean) => {
+    setShowLinkIcons(show);
+    try {
+      localStorage.setItem(
+        STORAGE_KEYS.LOCAL_STORAGE_SHOW_LINK_ICONS,
+        String(show),
+      );
+    } catch {
+      // Local storage may be unavailable in privacy-restricted contexts.
+    }
+  }, []);
 
   useEffect(() => {
     if (isDevEnv()) {
@@ -946,6 +968,7 @@ const ExcalidrawWrapper = () => {
       })}
     >
       <Excalidraw
+        showLinkIcons={showLinkIcons}
         viewportStatusFrame={viewportStatusFrame}
         userToFollow={userToFollow}
         onChange={onChange}
@@ -1033,6 +1056,8 @@ const ExcalidrawWrapper = () => {
           isCollabEnabled={!isCollabDisabled}
           theme={appTheme}
           refresh={() => forceRefresh((prev) => !prev)}
+          showLinkIcons={showLinkIcons}
+          onShowLinkIconsChange={updateShowLinkIcons}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}

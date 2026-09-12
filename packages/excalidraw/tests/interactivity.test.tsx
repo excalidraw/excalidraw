@@ -911,6 +911,20 @@ describe("interaction={{ enabled: { links } }}", () => {
     return rect;
   };
 
+  const addText = (link: string) => {
+    const text = API.createElement({
+      type: "text",
+      x: 20,
+      y: 20,
+      width: 120,
+      height: 40,
+      text: "Linked heading",
+    });
+    API.setElements([text]);
+    API.updateElement(text, { link });
+    return text;
+  };
+
   // the link-mode pointerup relies on `hitLinkElement` being set during a
   // preceding pointermove (on non-touchscreen devices), so hover first
   const clickElementCenter = () => {
@@ -969,6 +983,54 @@ describe("interaction={{ enabled: { links } }}", () => {
     expect(windowOpenSpy).not.toHaveBeenCalled();
     // and the click didn't select the element
     expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("opens a linked text element with Ctrl/Cmd+click while editing", async () => {
+    await render(<Excalidraw showLinkIcons={false} onLinkOpen={onLinkOpen} />);
+    const linkedText = addText("https://excalidraw.com");
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.clickAt(80, 40);
+    });
+
+    expect(onLinkOpenSpy).toHaveBeenCalledTimes(1);
+    expect(onLinkOpenSpy.mock.calls[0][0]).toMatchObject({
+      id: linkedText.id,
+      link: "https://excalidraw.com",
+    });
+    expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("opens a linked text element with a regular click in view mode", async () => {
+    await render(
+      <Excalidraw
+        viewModeEnabled={true}
+        showLinkIcons={false}
+        onLinkOpen={onLinkOpen}
+      />,
+    );
+    const linkedText = addText("https://excalidraw.com");
+
+    mouse.reset();
+    mouse.moveTo(80, 40);
+    mouse.clickAt(80, 40);
+
+    expect(onLinkOpenSpy).toHaveBeenCalledTimes(1);
+    expect(onLinkOpenSpy.mock.calls[0][0]).toMatchObject({
+      id: linkedText.id,
+      link: "https://excalidraw.com",
+    });
+    expect(h.state.selectedElementIds).toEqual({});
+  });
+
+  it("selects linked text on regular click while editing", async () => {
+    await render(<Excalidraw showLinkIcons={false} onLinkOpen={onLinkOpen} />);
+    const linkedText = addText("https://excalidraw.com");
+
+    mouse.clickAt(80, 40);
+
+    expect(onLinkOpenSpy).not.toHaveBeenCalled();
+    expect(h.state.selectedElementIds).toEqual({ [linkedText.id]: true });
   });
 
   it("{enabled: {links: true}}: clicking an element without a link does nothing", async () => {
