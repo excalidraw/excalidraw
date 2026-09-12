@@ -235,6 +235,28 @@ describe("<Excalidraw/>", () => {
         expect(queryByTestId(container, "canvas-background-picker")).toBeNull();
       });
 
+      it("should keep the canvas background picker full-size in the menu on tablet", async () => {
+        const { container } = await render(
+          <Excalidraw UIOptions={{ getFormFactor: () => "tablet" }} />,
+        );
+        fireEvent.resize(window);
+        await waitFor(() =>
+          expect(h.app.editorInterface.formFactor).toBe("tablet"),
+        );
+        //open menu
+        toggleMenu(container);
+        const picker = container.querySelector(
+          ".dropdown-menu .color-picker-container",
+        );
+        expect(picker).not.toBeNull();
+        expect(picker).not.toHaveClass("color-picker-container--no-top-picks");
+        expect(
+          container.querySelector(
+            ".dropdown-menu .color-picker__button.compact-sizing",
+          ),
+        ).toBeNull();
+      });
+
       it("should hide the theme toggle when theme is false", async () => {
         const { container } = await render(
           <Excalidraw UIOptions={{ canvasActions: { toggleTheme: false } }} />,
