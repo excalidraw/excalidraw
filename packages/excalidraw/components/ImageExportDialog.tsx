@@ -26,6 +26,7 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
+import { getExportReadinessWarnings } from "../scene/exportReadiness";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -81,9 +82,11 @@ const ImageExportModal = ({
   const [exportWithBackground, setExportWithBackground] = useState(
     appStateSnapshot.exportBackground,
   );
+
   const [embedScene, setEmbedScene] = useState(
     appStateSnapshot.exportEmbedScene,
   );
+
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
 
   const previewRef = useRef<HTMLDivElement>(null);
@@ -93,7 +96,7 @@ const ImageExportModal = ({
   const { onCopy, copyStatus, resetCopyStatus } = useCopyStatus();
 
   useEffect(() => {
-    // if user changes setting right after export to clipboard, reset the status
+    // if the user changes setting right after export to clipboard, reset the status
     // so they don't have to wait for the timeout to click the button again
     resetCopyStatus();
   }, [
@@ -111,11 +114,14 @@ const ImageExportModal = ({
     exportSelectionOnly,
   );
 
+  const exportReadinessWarnings = getExportReadinessWarnings(exportedElements);
+
   useEffect(() => {
     const previewNode = previewRef.current;
     if (!previewNode) {
       return;
     }
+
     const maxWidth = previewNode.offsetWidth;
     const maxHeight = previewNode.offsetHeight;
     if (!maxWidth) {
@@ -299,6 +305,30 @@ const ImageExportModal = ({
             }))}
           />
         </ExportSetting>
+
+        {exportReadinessWarnings.length > 0 && (
+          <div className="ImageExportModal__settings__warnings">
+            <strong>Export warnings</strong>
+            <ul>
+              {exportReadinessWarnings.map((warning) => (
+                <li key={warning.type}>
+                  {warning.type === "emptyText" &&
+                    `${warning.count} empty text element${
+                      warning.count === 1 ? "" : "s"
+                    } found.`}
+                  {warning.type === "lowOpacity" &&
+                    `${warning.count} element${
+                      warning.count === 1 ? "" : "s"
+                    } with very low opacity found.`}
+                  {warning.type === "farAwayElement" &&
+                    `${warning.count} element${
+                      warning.count === 1 ? "" : "s"
+                    } far away from the main drawing found.`}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="ImageExportModal__settings__buttons">
           <FilledButton
