@@ -1081,17 +1081,24 @@ describe("ruled sticky notes", () => {
     ruled.scene.destroy();
   });
 
-  it("closes each line box, so the caret rests on the rule", () => {
+  it("splits the descender between the glyphs and the caret", () => {
     const { scene, stickyId, textId } = createStickyWithText("A", [], "ruled");
     const label = getBoundText(scene, textId);
     const lineHeightPx = getLineHeightInPx(label.fontSize, label.lineHeight);
+    const baseline = getVerticalOffset(
+      label.fontFamily,
+      label.fontSize,
+      lineHeightPx,
+    );
     const rules = rulesOf(scene, stickyId);
 
-    // the caret spans a line box, so a rule closing the box is what its foot
-    // lands on; the glyphs then sit a descender above it
+    // a caret's foot is a descender below the baseline, so neither can sit on
+    // the rule; each gets half
     rules.forEach((rule, index) => {
       expect(rule.y1).toBeCloseTo(
-        STICKY_NOTE_PADDING + (index + 1) * lineHeightPx,
+        STICKY_NOTE_PADDING +
+          index * lineHeightPx +
+          (baseline + lineHeightPx) / 2,
       );
       // a rule is horizontal and inset by the note's own padding
       expect(rule.y2).toBe(rule.y1);
@@ -1101,13 +1108,11 @@ describe("ruled sticky notes", () => {
       );
     });
 
-    // a line's glyphs clear its rule by exactly the font's descent
-    const baseline =
-      STICKY_NOTE_PADDING +
-      getVerticalOffset(label.fontFamily, label.fontSize, lineHeightPx);
-    expect(rules[0].y1 - baseline).toBeCloseTo(
-      lineHeightPx -
-        getVerticalOffset(label.fontFamily, label.fontSize, lineHeightPx),
+    // the glyphs clear the rule by half a descender, and the caret, whose foot
+    // is a full descender down, passes the same distance below it
+    const descender = lineHeightPx - baseline;
+    expect(rules[0].y1 - (STICKY_NOTE_PADDING + baseline)).toBeCloseTo(
+      descender / 2,
     );
     scene.destroy();
   });

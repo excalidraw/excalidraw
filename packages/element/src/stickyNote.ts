@@ -12,6 +12,7 @@ import {
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
   STICKY_NOTE_SHADOW_OFFSET,
+  getVerticalOffset,
   TEXT_ALIGN,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
@@ -425,8 +426,14 @@ export const getStickyNoteRuleLines = (
     element.height - STICKY_NOTE_BODY_INSET_Y + STICKY_NOTE_PADDING;
   const rules: StickyNoteRule[] = [];
 
+  // A caret's foot sits a descender below the baseline, so a rule cannot meet
+  // both: on the baseline the caret overhangs it, at the foot of the line box
+  // the glyphs float above it. Splitting the descender keeps each within half.
+  const ruleOffset =
+    (getVerticalOffset(fontFamily, fontSize, lineHeightPx) + lineHeightPx) / 2;
+
   for (
-    let y = STICKY_NOTE_PADDING + lineHeightPx;
+    let y = STICKY_NOTE_PADDING + ruleOffset;
     y <= bottom;
     y += lineHeightPx
   ) {
