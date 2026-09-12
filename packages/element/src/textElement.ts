@@ -268,6 +268,12 @@ export const computeBoundTextPosition = (
     y = containerCoords.y;
   } else if (boundTextElement.verticalAlign === VERTICAL_ALIGN.BOTTOM) {
     y = containerCoords.y + (maxContainerHeight - boundTextElement.height);
+  } else if (
+    isStickyNoteElement(container) &&
+    container.stickyShape === "ruled"
+  ) {
+    // ruled paper is written from the first rule down, not from the middle
+    y = containerCoords.y;
   } else if (isStickyNoteElement(container)) {
     // a note's label body ends above the creation-date footer, but a label
     // centered in that body sits visibly high — center it in the whole
