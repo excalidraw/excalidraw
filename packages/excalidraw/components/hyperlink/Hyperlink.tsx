@@ -10,7 +10,7 @@ import {
 
 import { EVENT, HYPERLINK_TOOLTIP_DELAY, KEYS } from "@excalidraw/common";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import { hitElementBoundingBox } from "@excalidraw/element";
 
@@ -67,14 +67,18 @@ const embeddableLinkCache = new Map<
 
 export const Hyperlink = ({
   element,
+  elements,
   scene,
+  scheduleCapture,
   setAppState,
   onLinkOpen,
   setToast,
   updateEmbedValidationStatus,
 }: {
   element: NonDeletedExcalidrawElement;
+  elements: readonly NonDeletedExcalidrawElement[];
   scene: Scene;
+  scheduleCapture: () => void;
   setAppState: React.Component<any, AppState>["setState"];
   onLinkOpen: ExcalidrawProps["onLinkOpen"];
   setToast: (
@@ -94,14 +98,23 @@ export const Hyperlink = ({
 
   const [inputVal, setInputVal] = useState(linkVal);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isInputDirty = useRef(false);
   const isEditing = appState.showHyperlinkPopup === "editor";
 
+  useEffect(() => {
+    if (!isInputDirty.current) {
+      setInputVal(linkVal);
+    }
+  }, [linkVal]);
+
   const handleSubmit = useCallback(() => {
-    if (!inputRef.current) {
+    if (!inputRef.current || !isInputDirty.current) {
       return;
     }
 
+    isInputDirty.current = false;
     const link = normalizeLink(inputRef.current.value) || null;
+    scheduleCapture();
 
     if (!element.link && link) {
       trackEvent("hyperlink", "create");
@@ -167,11 +180,15 @@ export const Hyperlink = ({
         }
       }
     } else {
-      scene.mutateElement(element, { link });
+      for (const member of elements) {
+        scene.mutateElement(member, { link });
+      }
     }
   }, [
     element,
+    elements,
     scene,
+    scheduleCapture,
     setToast,
     appProps.validateEmbeddable,
     appState.activeEmbeddable,
@@ -206,7 +223,7 @@ export const Hyperlink = ({
         clearTimeout(timeoutId);
       }
       const shouldHide = shouldHideLinkPopup(
-        element,
+        elements,
         elementsMap,
         appState,
         pointFrom(event.clientX, event.clientY),
@@ -224,19 +241,23 @@ export const Hyperlink = ({
         clearTimeout(timeoutId);
       }
     };
-  }, [appState, element, isEditing, setAppState, elementsMap]);
+  }, [appState, elements, isEditing, setAppState, elementsMap]);
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
-    scene.mutateElement(element, { link: null });
+    isInputDirty.current = false;
+    scheduleCapture();
+    for (const member of elements) {
+      scene.mutateElement(member, { link: null });
+    }
     setAppState({ showHyperlinkPopup: false });
-  }, [setAppState, element, scene]);
+  }, [setAppState, elements, scene, scheduleCapture]);
 
   const onEdit = () => {
     trackEvent("hyperlink", "edit", "popup-ui");
     setAppState({ showHyperlinkPopup: "editor" });
   };
-  const { x, y } = getCoordsForPopover(element, appState, elementsMap);
+  const { x, y } = getCoordsForPopover(elements, appState, elementsMap);
   if (
     appState.contextMenu ||
     appState.selectedElementsAreBeingDragged ||
@@ -264,7 +285,10 @@ export const Hyperlink = ({
           placeholder={t("labels.link.hint")}
           ref={inputRef}
           value={inputVal}
-          onChange={(event) => setInputVal(event.target.value)}
+          onChange={(event) => {
+            isInputDirty.current = true;
+            setInputVal(event.target.value);
+          }}
           autoFocus
           onKeyDown={(event) => {
             event.stopPropagation();
@@ -322,21 +346,23 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-        <IconButton
-          type="button"
-          title={t("labels.linkToElement")}
-          aria-label={t("labels.linkToElement")}
-          label={t("labels.linkToElement")}
-          onClick={() => {
-            setAppState({
-              openDialog: {
-                name: "elementLinkSelector",
-                sourceElementId: element.id,
-              },
-            });
-          }}
-          icon={elementLinkIcon}
-        />
+        {elements.length === 1 && (
+          <IconButton
+            type="button"
+            title={t("labels.linkToElement")}
+            aria-label={t("labels.linkToElement")}
+            label={t("labels.linkToElement")}
+            onClick={() => {
+              setAppState({
+                openDialog: {
+                  name: "elementLinkSelector",
+                  sourceElementId: element.id,
+                },
+              });
+            }}
+            icon={elementLinkIcon}
+          />
+        )}
         {linkVal && !isEmbeddableElement(element) && (
           <IconButton
             type="button"
@@ -354,13 +380,16 @@ export const Hyperlink = ({
 };
 
 const getCoordsForPopover = (
-  element: NonDeletedExcalidrawElement,
+  elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
-  const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
+  const [x1, y1, x2] =
+    elements.length === 1
+      ? getElementAbsoluteCoords(elements[0], elementsMap)
+      : getCommonBounds(elements);
   const { x: viewportX, y: viewportY } = sceneCoordsToViewportCoords(
-    { sceneX: x1 + element.width / 2, sceneY: y1 },
+    { sceneX: (x1 + x2) / 2, sceneY: y1 },
     appState,
   );
   const x = viewportX - appState.offsetLeft - POPUP_WIDTH / 2;
@@ -451,7 +480,7 @@ export const hideHyperlinkToolip = () => {
 };
 
 const shouldHideLinkPopup = (
-  element: NonDeletedExcalidrawElement,
+  elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
   appState: AppState,
   [clientX, clientY]: GlobalPoint,
@@ -463,10 +492,26 @@ const shouldHideLinkPopup = (
 
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
-  if (hitElementBoundingBox(pointFrom(sceneX, sceneY), element, elementsMap)) {
+  if (
+    elements.some((element) =>
+      hitElementBoundingBox(pointFrom(sceneX, sceneY), element, elementsMap),
+    )
+  ) {
     return false;
   }
-  const [x1, y1, x2] = getElementAbsoluteCoords(element, elementsMap);
+  const [x1, y1, x2, y2] =
+    elements.length === 1
+      ? getElementAbsoluteCoords(elements[0], elementsMap)
+      : getCommonBounds(elements);
+  if (
+    elements.length > 1 &&
+    sceneX >= x1 &&
+    sceneX <= x2 &&
+    sceneY >= y1 &&
+    sceneY <= y2
+  ) {
+    return false;
+  }
   // hit box to prevent hiding when hovered in the vertical area between element and popover
   if (
     sceneX >= x1 &&
@@ -478,7 +523,7 @@ const shouldHideLinkPopup = (
   }
   // hit box to prevent hiding when hovered around popover within threshold
   const { x: popoverX, y: popoverY } = getCoordsForPopover(
-    element,
+    elements,
     appState,
     elementsMap,
   );

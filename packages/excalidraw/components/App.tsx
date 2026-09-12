@@ -465,6 +465,7 @@ import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
+import { canEditHyperlink } from "./hyperlink/selection";
 import { CursorHint, CursorHints } from "./CursorHint";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
@@ -2500,14 +2501,18 @@ class App extends React.Component<AppProps, AppState> {
                           />
                           {this.isDefaultUIEnabled() && <CursorHint />}
                           {this.isDefaultUIEnabled() &&
-                            selectedElements.length === 1 &&
+                            canEditHyperlink(selectedElements, this.state) &&
                             this.state.openDialog?.name !==
                               "elementLinkSelector" &&
                             this.state.showHyperlinkPopup && (
                               <Hyperlink
-                                key={firstSelectedElement.id}
+                                key={selectedElements
+                                  .map(({ id }) => id)
+                                  .join(",")}
                                 element={firstSelectedElement}
+                                elements={selectedElements}
                                 scene={this.scene}
+                                scheduleCapture={this.scheduleCapture}
                                 setAppState={this.setAppState}
                                 onLinkOpen={this.props.onLinkOpen}
                                 setToast={this.setToast}
