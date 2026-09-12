@@ -8,6 +8,7 @@ import { render } from "@excalidraw/excalidraw/tests/test-utils";
 
 import * as distance from "../src/distance";
 import { hitElementItself } from "../src/collision";
+import { getFreedrawOutlineAsSegments } from "../src/renderElement";
 
 describe("check rotated elements can be hit:", () => {
   beforeEach(async () => {
@@ -216,5 +217,38 @@ describe("hitElementItself cache", () => {
         overrideShouldTestInside: true,
       }),
     ).toBe(true);
+  });
+});
+
+describe("getFreedrawOutlineAsSegments", () => {
+  it("safely handles outline points with fewer than 2 points without throwing (#11945)", () => {
+    const element = API.createElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      width: 10,
+      height: 10,
+      points: [[0, 0]],
+    });
+    const elementsMap = arrayToMap([element]);
+
+    expect(
+      getFreedrawOutlineAsSegments(element as any, [], elementsMap),
+    ).toEqual([]);
+
+    expect(
+      getFreedrawOutlineAsSegments(element as any, [[0, 0]], elementsMap),
+    ).toEqual([]);
+
+    const segments = getFreedrawOutlineAsSegments(
+      element as any,
+      [
+        [0, 0],
+        [10, 10],
+        [20, 20],
+      ],
+      elementsMap,
+    );
+    expect(segments.length).toBe(2);
   });
 });
