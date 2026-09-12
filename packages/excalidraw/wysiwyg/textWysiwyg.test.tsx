@@ -2567,7 +2567,7 @@ describe("textWysiwyg", () => {
       );
     });
 
-    it("should drop a pending center click when the browser cancels the pointer", () => {
+    it("should drop a pending center click when the browser cancels the pointer", async () => {
       UI.clickTool("text");
       const touch = new Pointer("touch", 7);
       touch.downAt(55, 57.5);
@@ -2583,13 +2583,22 @@ describe("textWysiwyg", () => {
         clientX: 55,
         clientY: 57.5,
       });
+      // the gesture is gone with the pointer: nothing listens for movement
+      // any more, and the tool is still the user's
       mouse.moveTo(175, 57.5);
       expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
       expect(h.state.editingTextElement).toBe(null);
-      // release what the gesture still listens for, so nothing lingers
-      mouse.upAt(175, 57.5);
-      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
-      expect(h.state.editingTextElement).toBe(null);
+      expect(h.state.activeTool.type).toBe("text");
+
+      // the next center click is an ordinary one — nothing of the canceled
+      // press replays into it
+      mouse.clickAt(55, 57.5);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Label");
+      Keyboard.exitTextEditor(editor);
+      expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(
+        rectangle.id,
+      );
     });
 
     it("should refresh the hover when the viewport scrolls or zooms under a still pointer", async () => {

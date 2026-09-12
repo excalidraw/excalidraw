@@ -2747,7 +2747,7 @@ class App extends React.Component<AppProps, AppState> {
                             onClick={this.handleCanvasClick}
                             onPointerMove={this.handleCanvasPointerMove}
                             onPointerUp={this.handleCanvasPointerUp}
-                            onPointerCancel={this.removePointer}
+                            onPointerCancel={this.handleCanvasPointerCancel}
                             onTouchMove={this.handleTouchMove}
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
@@ -9125,6 +9125,19 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /**
+   * The browser took the pointer over (scroll, pinch, palm rejection): no
+   * pointerup will follow, so the gesture is torn down here and now — the
+   * same cleanup a lost pointerup gets at the next press, only not left
+   * lying in wait for it, where its replay would tangle with that press.
+   */
+  private handleCanvasPointerCancel = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    this.removePointer(event);
+    this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
+  };
+
   private handleCanvasPointerUp = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -11446,8 +11459,9 @@ class App extends React.Component<AppProps, AppState> {
       // an armed bucket fill commits only on a GENUINE pointer up. The
       // missing-pointer-up cleanup replays this handler with the pointer
       // DOWN event (e.g. when a second finger lands mid-press — pinch/pan
-      // intent), and a tool switch mid-press orphans the click — both must
-      // discard the fill instead of committing an unwanted edit.
+      // intent) or with a pointercancel, and a tool switch mid-press orphans
+      // the click — all must discard the fill instead of committing an
+      // unwanted edit.
       if (
         childEvent.type === "pointerup" &&
         this.state.activeTool.type === TOOL_TYPE.bucketfill
@@ -12516,6 +12530,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        // only a genuine pointerup is a click of the tool, which reverts it.
+        // A replay by the missing-pointerup cleanup — a second finger
+        // landing, a pointercancel, the next press after a lost pointerup —
+        // only tears the gesture down, and must leave the tool to the press
+        // that follows
+        childEvent.type === "pointerup" &&
         !this.isToolLocked() &&
         activeTool.type !== "freedraw" &&
         // bucket fill stays active for back-to-back fills regardless of the
