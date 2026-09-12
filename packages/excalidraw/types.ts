@@ -159,6 +159,7 @@ export type ToolType =
   | "hand"
   | "frame"
   | "magicframe"
+  | "stickynote"
   | "embeddable"
   | "laser"
   | "autoshape"
@@ -416,6 +417,8 @@ export interface AppState {
   exportWithDarkMode: boolean;
   exportScale: number;
   currentItemStrokeColor: string;
+  currentItemStickynoteStrokeColor: string;
+  currentItemStickynoteBackgroundColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidthKey: StrokeWidthKey;
@@ -546,6 +549,9 @@ export interface AppState {
      * even though both drive `currentItemBackgroundColor` (its defaults and
      * use case differ — no transparent) */
     bucketFill: readonly string[] | null;
+    /** sticky notes are their own color domain (own defaults, own picks) */
+    stickyNoteStroke: readonly string[] | null;
+    stickyNoteBackground: readonly string[] | null;
   };
 }
 
@@ -1017,7 +1023,8 @@ export interface ExcalidrawProps {
 }
 
 export type SceneData = {
-  elements?: ImportedDataState["elements"];
+  /** Expects normalized elements; restore imported data before updating the scene. */
+  elements?: readonly ExcalidrawElement[] | null;
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
   captureUpdate?: CaptureUpdateActionType;
@@ -1141,8 +1148,11 @@ export type AppClassProperties = {
   dismissLinearEditor: App["dismissLinearEditor"];
   flowchart: App["flowchart"];
   drawShape: App["drawShape"];
+  arrowText: App["arrowText"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
+  toolDrag: App["toolDrag"];
+  activeResizeHandle: App["activeResizeHandle"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
@@ -1209,6 +1219,9 @@ export type PointerDownState = Readonly<{
     // elements, which is useful for discriminating between selecitng
     // the entire selection vs a specific element
     hasHitCommonBoundingBoxOfSelectedElements: boolean;
+    // Whether the pointer went down on the selected arrow's label, which
+    // makes the gesture a label drag along the arrow rather than a point drag
+    arrowLabel: boolean;
   };
   // This is determined on the initial pointer down event to
   // set various interaction modalities

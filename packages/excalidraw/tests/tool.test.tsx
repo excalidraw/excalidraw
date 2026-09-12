@@ -348,3 +348,41 @@ describe("props.activeTool (forced tool)", () => {
     expect(h.state.activeTool.type).toBe("laser");
   });
 });
+
+describe("toolbar", () => {
+  const queryTool = (type: string) =>
+    document.querySelector<HTMLButtonElement>(
+      `[data-testid="toolbar-${type}"]`,
+    );
+  const openExtraTools = () =>
+    fireEvent.click(
+      document.querySelector(".App-toolbar__extra-tools-trigger")!,
+    );
+
+  it("keeps the image tool in the extra-tools menu", async () => {
+    await render(<Excalidraw />);
+    expect(queryTool("image")).toBe(null);
+
+    openExtraTools();
+    expect(queryTool("image")).not.toBe(null);
+    expect(queryTool("frame")).not.toBe(null);
+  });
+
+  it("hides the image tool through UIOptions.tools.image", async () => {
+    await render(<Excalidraw UIOptions={{ tools: { image: false } }} />);
+    openExtraTools();
+    expect(queryTool("image")).toBe(null);
+    expect(queryTool("frame")).not.toBe(null);
+  });
+
+  it("badges tools with their letter shortcut", async () => {
+    await render(<Excalidraw />);
+    const badge = (type: string) =>
+      queryTool(type)?.querySelector(".ToolIcon__keybinding")?.textContent;
+    expect(badge("selection")).toBe("V");
+    expect(badge("rectangle")).toBe("R");
+    expect(badge("text")).toBe("T");
+    expect(badge("stickynote")).toBe("N");
+    expect(badge("eraser")).toBe("E");
+  });
+});

@@ -1381,13 +1381,11 @@ describe("textWysiwyg", () => {
       const originalRectY = rectangle.y;
       const originalTextX = text.x;
       const originalTextY = text.y;
-      mouse.select(rectangle);
-      mouse.downAt(rectangle.x, rectangle.y);
-      mouse.moveTo(rectangle.x + 100, rectangle.y + 50);
-      mouse.up(rectangle.x + 100, rectangle.y + 50);
-      expect(rectangle.x).toBe(80);
+      UI.resize(rectangle, "nw", [100, 50]);
+      // The NW handle crossed the right edge, so the container flips past it.
+      expect(rectangle.x).toBe(100);
       expect(rectangle.y).toBe(-40);
-      expect(text.x).toBe(85);
+      expect(text.x).toBe(105);
       expect(text.y).toBe(-35);
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {

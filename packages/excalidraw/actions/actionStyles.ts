@@ -5,18 +5,28 @@ import {
   CODES,
   KEYS,
   getLineHeight,
+  arrayToMap,
 } from "@excalidraw/common";
 
-import { newElementWith } from "@excalidraw/element";
+import { newElementWith, syncStickyNoteInk } from "@excalidraw/element";
 
 import {
+  normalizeStickyNote,
   hasBoundTextElement,
   canApplyRoundnessTypeToElement,
   getDefaultRoundnessTypeForElement,
   isFrameLikeElement,
   isArrowElement,
   isExcalidrawElement,
+  getColorUpdate,
+  isNonDeletedElement,
+  isStickyNoteBoundText,
+  isStickyNoteElement,
   isTextElement,
+  getBaseFontSize,
+  getBaseFontSizeUpdate,
+  relayoutStickyNotes,
+  updateBoundElements,
 } from "@excalidraw/element";
 
 import {
@@ -86,84 +96,133 @@ export const actionPasteStyles = register({
       includeBoundTextElement: true,
     });
     const selectedElementIds = selectedElements.map((element) => element.id);
-    return {
-      elements: elements.map((element) => {
-        if (selectedElementIds.includes(element.id)) {
-          let elementStylesToCopyFrom = pastedElement;
-          if (isTextElement(element) && element.containerId) {
-            elementStylesToCopyFrom = boundTextElement;
-          }
-          if (!elementStylesToCopyFrom) {
-            return element;
-          }
-          let newElement = newElementWith(element, {
-            backgroundColor: elementStylesToCopyFrom?.backgroundColor,
-            strokeWidth: elementStylesToCopyFrom?.strokeWidth,
-            strokeColor: elementStylesToCopyFrom?.strokeColor,
-            strokeStyle: elementStylesToCopyFrom?.strokeStyle,
-            fillStyle: elementStylesToCopyFrom?.fillStyle,
-            opacity: elementStylesToCopyFrom?.opacity,
-            roughness: elementStylesToCopyFrom?.roughness,
-            roundness: elementStylesToCopyFrom.roundness
-              ? canApplyRoundnessTypeToElement(
-                  elementStylesToCopyFrom.roundness.type,
-                  element,
-                )
-                ? elementStylesToCopyFrom.roundness
-                : getDefaultRoundnessTypeForElement(element)
-              : null,
-          });
-
-          if (isTextElement(newElement)) {
-            const fontSize =
-              (elementStylesToCopyFrom as ExcalidrawTextElement).fontSize ||
-              DEFAULT_FONT_SIZE;
-            const fontFamily =
-              (elementStylesToCopyFrom as ExcalidrawTextElement).fontFamily ||
-              DEFAULT_FONT_FAMILY;
-            const newTextElement = newElementWith(newElement, {
-              fontSize,
-              fontFamily,
-              textAlign:
-                (elementStylesToCopyFrom as ExcalidrawTextElement).textAlign ||
-                DEFAULT_TEXT_ALIGN,
-              lineHeight:
-                (elementStylesToCopyFrom as ExcalidrawTextElement).lineHeight ||
-                getLineHeight(fontFamily),
+    const elementsMap = arrayToMap(elements);
+    // whether the copied text was a sticky label is decided by the copied
+    // snapshot — its container may be gone from the live scene by now
+    const copiedElementsMap = arrayToMap(
+      (elementsCopied as unknown[]).filter(isExcalidrawElement),
+    );
+    const nextElements = relayoutStickyNotes(
+      // a restyled note and its label end up with one ink — the label's,
+      // when the copied styles carry two colors
+      syncStickyNoteInk(
+        elements.map((element) => {
+          if (selectedElementIds.includes(element.id)) {
+            let elementStylesToCopyFrom = pastedElement;
+            if (isTextElement(element) && element.containerId) {
+              elementStylesToCopyFrom = boundTextElement;
+            }
+            if (!elementStylesToCopyFrom) {
+              return element;
+            }
+            let newElement = newElementWith(element, {
+              backgroundColor: elementStylesToCopyFrom?.backgroundColor,
+              strokeWidth: elementStylesToCopyFrom?.strokeWidth,
+              strokeColor: elementStylesToCopyFrom?.strokeColor,
+              strokeStyle: elementStylesToCopyFrom?.strokeStyle,
+              fillStyle: elementStylesToCopyFrom?.fillStyle,
+              opacity: elementStylesToCopyFrom?.opacity,
+              roughness: elementStylesToCopyFrom?.roughness,
+              roundness: elementStylesToCopyFrom.roundness
+                ? canApplyRoundnessTypeToElement(
+                    elementStylesToCopyFrom.roundness.type,
+                    element,
+                  )
+                  ? elementStylesToCopyFrom.roundness
+                  : getDefaultRoundnessTypeForElement(element)
+                : null,
             });
-            newElement = newTextElement;
-            let container = null;
-            if (newTextElement.containerId) {
-              container =
-                selectedElements.find(
-                  (element) => element.id === newTextElement.containerId,
-                ) || null;
+
+            if (isTextElement(newElement)) {
+              const sourceText =
+                elementStylesToCopyFrom as ExcalidrawTextElement;
+              const fontSize =
+                (isTextElement(elementStylesToCopyFrom)
+                  ? getBaseFontSize(elementStylesToCopyFrom, copiedElementsMap)
+                  : sourceText.fontSize) || DEFAULT_FONT_SIZE;
+              const fontFamily = sourceText.fontFamily || DEFAULT_FONT_FAMILY;
+              let container = null;
+              const containerId = newElement.containerId;
+              if (containerId) {
+                container =
+                  selectedElements.find(
+                    (element) => element.id === containerId,
+                  ) || null;
+              }
+              const newTextElement = newElementWith(newElement, {
+                ...getBaseFontSizeUpdate(newElement, fontSize, elementsMap),
+                fontFamily,
+                textAlign: sourceText.textAlign || DEFAULT_TEXT_ALIGN,
+                lineHeight: sourceText.lineHeight || getLineHeight(fontFamily),
+              });
+              newElement = newTextElement;
+
+              if (isStickyNoteBoundText(newTextElement, elementsMap)) {
+                // the copied stroke may be transparent; a note's label never is
+                newElement = newElementWith(
+                  newTextElement,
+                  getColorUpdate(
+                    newTextElement,
+                    "strokeColor",
+                    newTextElement.strokeColor,
+                    elementsMap,
+                  ),
+                );
+              } else {
+                // sticky labels are laid out together with their (possibly
+                // also restyled) note in the post-pass below
+                redrawTextBoundingBox(newTextElement, container, app.scene);
+              }
             }
 
-            redrawTextBoundingBox(newTextElement, container, app.scene);
-          }
+            if (
+              newElement.type === "arrow" &&
+              isArrowElement(elementStylesToCopyFrom)
+            ) {
+              newElement = newElementWith(newElement, {
+                startArrowhead: elementStylesToCopyFrom.startArrowhead,
+                endArrowhead: elementStylesToCopyFrom.endArrowhead,
+              });
+            }
 
-          if (
-            newElement.type === "arrow" &&
-            isArrowElement(elementStylesToCopyFrom)
-          ) {
-            newElement = newElementWith(newElement, {
-              startArrowhead: elementStylesToCopyFrom.startArrowhead,
-              endArrowhead: elementStylesToCopyFrom.endArrowhead,
-            });
-          }
+            if (isFrameLikeElement(element)) {
+              newElement = newElementWith(newElement, {
+                roundness: null,
+                backgroundColor: "transparent",
+              });
+            }
 
-          if (isFrameLikeElement(element)) {
-            newElement = newElementWith(newElement, {
-              roundness: null,
-              backgroundColor: "transparent",
-            });
-          }
+            if (isStickyNoteElement(newElement)) {
+              newElement = normalizeStickyNote(newElement);
+            }
 
-          return newElement;
-        }
-        return element;
-      }),
+            return newElement;
+          }
+          return element;
+        }),
+        elementsMap,
+      ),
+      new Set(selectedElementIds),
+      { prevElementsMap: elementsMap },
+    );
+
+    // a restyled note may have grown or shrunk — arrows bound to it follow
+    for (const element of nextElements) {
+      const prev = elementsMap.get(element.id);
+      if (
+        isStickyNoteElement(element) &&
+        isNonDeletedElement(element) &&
+        prev &&
+        (prev.height !== element.height ||
+          prev.x !== element.x ||
+          prev.y !== element.y)
+      ) {
+        updateBoundElements(element, app.scene);
+      }
+    }
+
+    return {
+      elements: nextElements,
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },

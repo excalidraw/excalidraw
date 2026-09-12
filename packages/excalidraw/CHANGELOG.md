@@ -13,6 +13,17 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Sticky notes (2026-09-06) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- New `stickynote` element type and toolbar tool (`N`): an always-filled, flat-rendered note whose label auto-fits — the font shrinks from the user's size down to a minimum, and only then does the note grow in height (it never shrinks below the height the user gave it). Click to place a 250×250 note, drag to size it (previewed at the dragged size, snapped to a font-aware minimum on release); text editing starts right away.
+- Element model: the note carries `baseHeight` (the user's height; `height ≥ baseHeight`), its label carries `baseFontSize` (the user's font ceiling, `null`/absent on any other text) while `fontSize` holds the fitted size. Read a text element's user-facing size through `getBaseFontSize(text, elementsMap)`.
+- Sticky notes are their own color domain: new `appState.currentItemStickynoteStrokeColor` (the note's text color) and `appState.currentItemStickynoteBackgroundColor` defaults, and new customizable top-pick slots `appState.colorTopPicks.stickyNoteStroke` / `stickyNoteBackground`. The stroke and background pickers, both eyedroppers and paste-styles resolve their target (regular / sticky / mixed) at execution time. A note and its label share one ink (the stroke picker reads "Text color" for notes): coloring the label while editing colors the note too, binding a colored text gives the note its color, and the creation-date footer always paints in that ink.
+- Skeleton API: `convertToExcalidrawElements([{ type: "stickynote", x, y, label?: { text, fontSize? } }])` creates a note (and fitted label); see the element-skeleton docs.
+- Tools can be dragged out of the toolbar: drag the sticky note button onto the canvas to drop a default-sized note where you release it, previewed translucently while dragging (nothing reaches the scene, history or collaborators until the drop; Escape cancels). The mechanism is generic — other tools can opt in.
+- Toolbar: on desktop and tablet the image tool moved into the "More tools" menu (still `9`; `UIOptions.tools.image` keeps hiding it; the mobile toolbar keeps its image slot), and tool badges now show the letter shortcuts (`R`, `T`, `N`, …) instead of the numbers, which are no longer contiguous. The number keys keep working.
+- Each note shows its creation date (`element.created`) in a footer band — "7 Sep", or "7 Sep 2025" once the year differs — on canvas and in SVG/PNG exports. The band is reserved in the note's layout, so the label never overlaps it; notes without a timestamp keep the band empty.
+- Resize semantics: a note's corners resize proportionally by default and scale the label's font ceiling with the note (Shift frees them); its edges resize freely by default (Shift constrains them). Drag-creation is proportional by default too (Shift frees it) and never touches the font ceiling. Width-only gestures keep the base height, height gestures set it, aspect-locked multi-select and Stats group edits scale the ceiling; flips preserve everything. Arrows bound to a note follow it as it grows.
+
 ## Excalidraw API
 
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)

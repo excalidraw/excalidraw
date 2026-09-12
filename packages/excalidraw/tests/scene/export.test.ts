@@ -237,6 +237,60 @@ describe("exportToSvg", () => {
     // the masked arrow group still renders its line (not clipped away)
     expect(svgElement.querySelector("g[mask] path")).not.toBeNull();
   });
+
+  it("cuts the same padded hole around an arrow label as the canvas", async () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow-hole",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+      boundElements: [{ type: "text", id: "label-hole" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label-hole",
+      text: "label",
+      width: 50,
+      height: 20,
+      containerId: "arrow-hole",
+    });
+
+    const svgElement = await exportUtils.exportToSvg(
+      [arrow, label] as NonDeletedExcalidrawElement[],
+      { ...DEFAULT_OPTIONS, exportPadding: 0 },
+      null,
+    );
+
+    // the mask's first rect is the visible region, sized to the arrow plus
+    // its offset within the export; the second is the hole cut for the label
+    const [visible, hole] = Array.from(
+      svgElement.querySelectorAll("mask rect"),
+    );
+    expect(hole).toBeDefined();
+    const offsetX = Number(visible.getAttribute("width")) - 100 - arrow.width;
+    const offsetY = Number(visible.getAttribute("height")) - 100 - arrow.height;
+
+    // the label sits centered on the arrow's midpoint; the hole is its box
+    // grown by the padding on every side, in the mask's (arrow-relative)
+    // coordinates
+    const labelLeft = arrow.x + arrow.width / 2 - label.width / 2;
+    const labelTop = arrow.y - label.height / 2;
+    expect(Number(hole.getAttribute("x"))).toBe(
+      offsetX + labelLeft - arrow.x - BOUND_TEXT_PADDING,
+    );
+    expect(Number(hole.getAttribute("y"))).toBe(
+      offsetY + labelTop - arrow.y - BOUND_TEXT_PADDING,
+    );
+    expect(Number(hole.getAttribute("width"))).toBe(
+      label.width + BOUND_TEXT_PADDING * 2,
+    );
+    expect(Number(hole.getAttribute("height"))).toBe(
+      label.height + BOUND_TEXT_PADDING * 2,
+    );
+  });
 });
 
 describe("exportToCanvas", () => {

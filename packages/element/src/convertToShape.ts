@@ -797,6 +797,10 @@ export const convertToShapeHandlePointerMoveFromPointerDown = (
             prevPreview?.type === shapePreview.type
               ? prevPreview.id
               : shapePreview.id,
+          created:
+            prevPreview?.type === shapePreview.type
+              ? prevPreview.created
+              : shapePreview.created,
           seed: 1,
           opacity: ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
           isDeleted: false as const,
