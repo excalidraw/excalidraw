@@ -114,8 +114,18 @@ export const actionCut = register<ClipboardEvent | null>({
   label: "labels.cut",
   icon: cutIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState, event, app) => {
-    actionCopy.perform(elements, appState, event, app);
+  perform: async (elements, appState, event, app) => {
+    const copyResult = await actionCopy.perform(elements, appState, event, app);
+
+    // if copy failed, abort the cut so we don't lose data
+    if (
+      copyResult &&
+      typeof copyResult === "object" &&
+      copyResult.appState?.errorMessage
+    ) {
+      return copyResult;
+    }
+
     return actionDeleteSelected.perform(elements, appState, null, app);
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
