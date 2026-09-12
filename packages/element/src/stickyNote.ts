@@ -15,7 +15,6 @@ import {
   TEXT_ALIGN,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
-  getVerticalOffset,
   getFontString,
   getLineHeight,
   isTransparent,
@@ -427,9 +426,7 @@ export const getStickyNoteRuleLines = (
   const rules: StickyNoteRule[] = [];
 
   for (
-    let y =
-      STICKY_NOTE_PADDING +
-      getVerticalOffset(fontFamily, fontSize, lineHeightPx);
+    let y = STICKY_NOTE_PADDING + lineHeightPx;
     y <= bottom;
     y += lineHeightPx
   ) {
