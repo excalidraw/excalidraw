@@ -38,6 +38,7 @@ import {
   getStickyNoteDateLabel,
   getStickyNoteFooter,
   getStickyNoteMinSize,
+  getStickyNoteRuleFontKey,
   getStickyNoteRuleLines,
   syncStickyNoteInk,
   normalizeStickyNoteFontSize,
@@ -1167,6 +1168,35 @@ describe("ruled sticky notes", () => {
     // a plain note keeps whatever alignment its label was given
     const plain = createStickyWithText("A");
     expect(getBoundText(plain.scene, plain.textId).textAlign).toBe("center");
+    plain.scene.destroy();
+  });
+
+  it("changes its cache key when the label's font changes", () => {
+    // the rules are painted on the note but follow the label, so a renderer
+    // caching the note's bitmap needs to see the label move
+    const { scene, stickyId, textId } = createStickyWithText("A", [], "ruled");
+    const key = () =>
+      getStickyNoteRuleFontKey(
+        getSticky(scene, stickyId),
+        scene.getNonDeletedElementsMap(),
+      );
+    const before = key();
+
+    updateStickyNoteLayout(getSticky(scene, stickyId), scene, {
+      baseFontSize: getBoundText(scene, textId).fontSize / 2,
+    });
+
+    expect(key()).not.toBe(before);
+    scene.destroy();
+
+    // a plain note has no rules to invalidate
+    const plain = createStickyWithText("A");
+    expect(
+      getStickyNoteRuleFontKey(
+        getSticky(plain.scene, plain.stickyId),
+        plain.scene.getNonDeletedElementsMap(),
+      ),
+    ).toBeNull();
     plain.scene.destroy();
   });
 

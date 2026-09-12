@@ -68,6 +68,7 @@ import {
   hasBoundTextElement,
   isMagicFrameElement,
   isImageElement,
+  isStickyNoteElement,
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
@@ -76,6 +77,7 @@ import { ShapeCache } from "./shape";
 import {
   getStickyNoteFooter,
   getStickyNotePathCommands,
+  getStickyNoteRuleFontKey,
   getStickyNoteRuleLines,
   type StickyNotePathCommand,
 } from "./stickyNote";
@@ -155,6 +157,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetY: number;
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
+  stickyNoteRuleFontKey: string | null;
 }
 
 const cappedElementCanvasSize = (
@@ -279,6 +282,9 @@ const generateElementCanvas = (
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     imageCrop: isImageElement(element) ? element.crop : null,
+    stickyNoteRuleFontKey: isStickyNoteElement(element)
+      ? getStickyNoteRuleFontKey(element, elementsMap)
+      : null,
   };
 };
 
@@ -673,13 +679,19 @@ const generateElementWithCanvas = (
 
   const containingFrameOpacity =
     getContainingFrame(element, elementsMap)?.opacity || 100;
+  // the rules are painted on the note but follow its label, which can change
+  // while the note itself does not
+  const stickyNoteRuleFontKey = isStickyNoteElement(element)
+    ? getStickyNoteRuleFontKey(element, elementsMap)
+    : null;
 
   if (
     !prevElementWithCanvas ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
-    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
+    prevElementWithCanvas.stickyNoteRuleFontKey !== stickyNoteRuleFontKey
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,

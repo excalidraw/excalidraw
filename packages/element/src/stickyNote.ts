@@ -377,6 +377,27 @@ export const getStickyNotePathCommands = (
 export type StickyNoteRule = { x1: number; y1: number; x2: number; y2: number };
 
 /**
+ * What a ruled note's rules are derived from: the font of the label bound to
+ * it. The rules are painted onto the note but follow the label, so a renderer
+ * caching the note's bitmap has to regenerate it when this changes — the note
+ * itself may be untouched. `null` for a note that is not ruled.
+ */
+export const getStickyNoteRuleFontKey = (
+  element: ExcalidrawStickyNoteElement,
+  elementsMap: ElementsMap,
+): string | null => {
+  if (element.stickyShape !== "ruled") {
+    return null;
+  }
+
+  const label = getBoundTextElement(element, elementsMap);
+
+  return label
+    ? `${label.fontSize}/${label.fontFamily}/${label.lineHeight}`
+    : "";
+};
+
+/**
  * The rules of a ruled note: spaced at the label’s line height and sitting on
  * its baselines, so the text is written on the lines rather than floating
  * between them. A ruled note pins its label to the top (see
