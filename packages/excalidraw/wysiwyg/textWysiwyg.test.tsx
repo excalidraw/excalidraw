@@ -38,6 +38,7 @@ import {
 } from "../tests/test-utils";
 import {
   fireEvent,
+  waitFor,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
@@ -2534,6 +2535,116 @@ describe("textWysiwyg", () => {
       expect(h.elements.filter((el) => !el.isDeleted)).toEqual([]);
       expect(h.state.editingTextElement).toBe(null);
       expect(h.state.activeTool.type).toBe("selection");
+    });
+
+    it("should not revive a pending center click when the text tool is left and picked again mid-press", async () => {
+      UI.clickTool("text");
+      mouse.downAt(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+      expect(h.state.activeTool.type).toBe("selection");
+      UI.clickTool("text");
+      // the press belonged to the tool that was left
+      mouse.moveTo(175, 57.5);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+      mouse.upAt(175, 57.5);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+      expect(h.state.editingTextElement).toBe(null);
+
+      // a fresh center click still binds (the release above counted as a
+      // click of the re-picked tool and reverted it, as any tool's would)
+      UI.clickTool("text");
+      mouse.clickAt(55, 57.5);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Label");
+      Keyboard.exitTextEditor(editor);
+      expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(
+        rectangle.id,
+      );
+    });
+
+    it("should drop a pending center click when the browser cancels the pointer", () => {
+      UI.clickTool("text");
+      const touch = new Pointer("touch", 7);
+      touch.downAt(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // scroll / palm rejection: no pointerup will follow
+      fireEvent.pointerCancel(GlobalTestState.interactiveCanvas, {
+        pointerId: 7,
+        pointerType: "touch",
+        clientX: 55,
+        clientY: 57.5,
+      });
+      mouse.moveTo(175, 57.5);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+      expect(h.state.editingTextElement).toBe(null);
+      // release what the gesture still listens for, so nothing lingers
+      mouse.upAt(175, 57.5);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+      expect(h.state.editingTextElement).toBe(null);
+    });
+
+    it("should refresh the hover when the viewport scrolls or zooms under a still pointer", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "free",
+        x: 300,
+        y: 300,
+        width: 40,
+        height: 25,
+      });
+      API.setElements([...h.elements, text]);
+      UI.clickTool("text");
+
+      // container target, scrolled away and back
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: 400 });
+      await waitFor(() => expect(h.state.scrollY).not.toBe(0));
+      expect(h.state.textToolHover).toBe(null);
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: -400 });
+      await waitFor(() => expect(h.state.scrollY).toBe(0));
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // text target
+      mouse.moveTo(320, 312);
+      expect(h.state.textToolHover).toEqual({
+        type: "text",
+        elementId: text.id,
+      });
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: 400 });
+      await waitFor(() => expect(h.state.scrollY).not.toBe(0));
+      expect(h.state.textToolHover).toBe(null);
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: -400 });
+      await waitFor(() => expect(h.state.scrollY).toBe(0));
+      expect(h.state.textToolHover).toEqual({
+        type: "text",
+        elementId: text.id,
+      });
+
+      // a zoom about the viewport origin (as from the keyboard) moves the
+      // rectangle's center away from the still pointer
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+      expect(h.state.textToolHover).toBe(null);
     });
 
     it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {

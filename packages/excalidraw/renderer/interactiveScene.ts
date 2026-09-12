@@ -1537,7 +1537,8 @@ const renderTextToolHover = (
     case "container": {
       if (isBindableElement(element)) {
         // the outline arrow binding shows, minus its animation and its
-        // `isBindingEnabled` gate — ctrl/cmd only concerns arrow binding
+        // `isBindingEnabled` gate: the resolved target already accounts for
+        // the modifier, independently of the arrow-binding preference
         context.save();
         context.translate(appState.scrollX, appState.scrollY);
         renderBindingHighlightForBindableElement_simple(

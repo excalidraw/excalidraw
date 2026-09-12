@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { CURSOR_TYPE, KEYS } from "@excalidraw/common";
 
 import { isTextElement } from "@excalidraw/element";
 
@@ -16,7 +16,7 @@ import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import { getTextEditor, updateTextEditor } from "./queries/dom";
-import { render, unmountComponent } from "./test-utils";
+import { GlobalTestState, render, unmountComponent } from "./test-utils";
 
 unmountComponent();
 
@@ -252,10 +252,17 @@ describe("binding text to an arrow endpoint", () => {
       UI.clickTool("text");
       mouse.moveTo(100, 100);
       expect(h.state.textToolHover).not.toBeNull();
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.POINTER,
+      );
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
         Keyboard.keyDown("Control");
         expect(h.state.textToolHover).toBeNull();
+        // the cursor describes the click as much as the highlight does
+        expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+          CURSOR_TYPE.CROSSHAIR,
+        );
       });
 
       Keyboard.keyUp("Control");
@@ -264,6 +271,9 @@ describe("binding text to an arrow endpoint", () => {
         elementId: "arrow",
         anchor: "end",
       });
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.POINTER,
+      );
     });
 
     it("drops plain text instead of binding the endpoint", async () => {

@@ -487,6 +487,7 @@ import type {
 import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
+import type { Modifiers } from "./App.textTool";
 
 import type {
   AppClassProperties,
@@ -4326,13 +4327,15 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ showWelcomeScreen: true });
     }
 
-    // the text tool's hover affordance must not outlive the tool, however
-    // the tool gets left (Esc/finalize paths bypass setActiveTool)
+    // neither the text tool's hover affordance nor a pending center click
+    // may outlive the tool, however it gets left (Esc/finalize paths bypass
+    // setActiveTool) — the tool coming back mid-press must not revive them
     if (
       prevState.activeTool.type === "text" &&
       this.state.activeTool.type !== "text"
     ) {
       this.textTool.clearHover();
+      this.textTool.cancel();
     }
 
     if (
@@ -4350,6 +4353,9 @@ class App extends React.Component<AppProps, AppState> {
         this.state.scrollY,
         this.state.zoom,
       );
+      // the scene moved under a still pointer: what a text-tool click would
+      // do there may have changed
+      this.refreshTextToolHover();
     }
 
     if (
@@ -5155,8 +5161,10 @@ class App extends React.Component<AppProps, AppState> {
 
     if (event.type === "pointercancel") {
       // the browser took the pointer over (scroll, palm rejection) — no
-      // pointerup will follow, so the armed bucket fill must not commit
+      // pointerup will follow, so the armed bucket fill must not commit and
+      // the text tool's pending center click must not resolve either
       this.bucketFill.cancel();
+      this.textTool.cancel();
     }
 
     const wasMultiTouchGesture = gesture.pointers.size >= 2;
@@ -5809,7 +5817,7 @@ class App extends React.Component<AppProps, AppState> {
 
         // the toggle changes what a text-tool click at the current position
         // would do, with no pointermove to refresh the affordance
-        this.textTool.refreshHover(event);
+        this.refreshTextToolHover(event);
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
       }
@@ -6094,7 +6102,7 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ isBindingEnabled: preferenceEnabled });
         });
 
-        this.textTool.refreshHover(event);
+        this.refreshTextToolHover(event);
       }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -7848,6 +7856,41 @@ class App extends React.Component<AppProps, AppState> {
 
     this.updateFrameToHighlight(
       frame && isFrameLikeElement(frame) ? frame : null,
+    );
+  };
+
+  /**
+   * Re-resolves the text tool's hover — and the cursor that goes with it —
+   * where the pointer last was, for what changes a click's outcome without
+   * the pointer moving: the ctrl/cmd toggle (pass its event) or the viewport
+   * moving under the pointer (no event). Mirrors the pointermove path; a
+   * gesture that owns the cursor (space/wheel panning, a scrollbar drag, the
+   * hand tool) keeps it.
+   */
+  private refreshTextToolHover = (modifiers?: Modifiers) => {
+    const target = this.textTool.refreshHover(modifiers);
+    if (
+      target === undefined ||
+      this.pan.isSpaceHeld() ||
+      this.pan.isActive() ||
+      isDraggingScrollBar ||
+      isHandToolActive(this.state)
+    ) {
+      return;
+    }
+    const scenePointer = this.lastPointerMoveEvent
+      ? viewportCoordsToSceneCoords(this.lastPointerMoveEvent, this.state)
+      : this.lastPointerMoveCoords!;
+    const hitElement = this.getElementAtPosition(
+      scenePointer.x,
+      scenePointer.y,
+      { preferSelected: true, includeLockedElements: true },
+    );
+    this.cursor.set(
+      this.textTool.cursorFor(
+        target,
+        hitElement && hitElement.locked ? null : hitElement,
+      ),
     );
   };
 

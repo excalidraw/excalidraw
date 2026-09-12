@@ -32,7 +32,7 @@ import type { AppState, PointerDownState } from "../types";
 type ScenePoint = { x: number; y: number };
 
 /** the modifier state a target depends on — off a pointer or keyboard event */
-type Modifiers = Pick<KeyboardEvent, "ctrlKey" | "metaKey">;
+export type Modifiers = Pick<KeyboardEvent, "ctrlKey" | "metaKey">;
 
 /** What a text-tool click at a position does. */
 export type TextToolTarget =
@@ -110,6 +110,12 @@ export class AppTextTool {
   } | null = null;
 
   /**
+   * The modifiers the hover was last resolved with — what a refresh without
+   * an event of its own (the viewport moving under a still pointer) uses.
+   */
+  private lastModifiers: Modifiers = { ctrlKey: false, metaKey: false };
+
+  /**
    * What a click at this position would do, in the order the click resolves
    * it: a free arrow endpoint (the smaller, more deliberate target; z-aware,
    * and off while ctrl/cmd disables binding) → the text under the pointer,
@@ -178,6 +184,10 @@ export class AppTextTool {
     if (this.pending) {
       return null;
     }
+    this.lastModifiers = {
+      ctrlKey: modifiers.ctrlKey,
+      metaKey: modifiers.metaKey,
+    };
     const target =
       state.editingTextElement ||
       state.newElement ||
@@ -192,13 +202,42 @@ export class AppTextTool {
   };
 
   /**
-   * Re-evaluates the hover at the last known pointer position — for the
-   * event that changes what a click would do without the pointer moving:
-   * the ctrl/cmd binding toggle.
+   * Re-evaluates the hover where the pointer last was — for what changes
+   * what a click would do without the pointer moving: the ctrl/cmd toggle
+   * (pass its event), or the viewport scrolling or zooming under the pointer
+   * (no event; the last modifiers stand). The scene position is re-derived
+   * from the pointer's viewport position, so a moved viewport resolves what
+   * is under the pointer now. Returns the target, or `undefined` when there
+   * was nothing to refresh (no pointer position yet, or another tool).
    */
-  refreshHover = (modifiers: Modifiers) => {
-    if (this.app.lastPointerMoveCoords) {
-      this.updateHover(this.app.lastPointerMoveCoords, modifiers);
+  refreshHover = (
+    modifiers: Modifiers = this.lastModifiers,
+  ): TextToolTarget | null | undefined => {
+    if (this.app.state.activeTool.type !== "text") {
+      return undefined;
+    }
+    const scenePointer = this.app.lastPointerMoveEvent
+      ? viewportCoordsToSceneCoords(
+          this.app.lastPointerMoveEvent,
+          this.app.state,
+        )
+      : this.app.lastPointerMoveCoords;
+    if (!scenePointer) {
+      return undefined;
+    }
+    return this.updateHover(scenePointer, modifiers);
+  };
+
+  /**
+   * Drops a pending center click without acting on it — the tool was left,
+   * the browser took the pointer (pointercancel), or a second finger turned
+   * the press into a pinch/pan — so no pointerup of ours will decide it. The
+   * outline it armed goes with it: while pending, the hover is that click's.
+   */
+  cancel = () => {
+    if (this.pending) {
+      this.pending = null;
+      this.clearHover();
     }
   };
 
@@ -313,7 +352,7 @@ export class AppTextTool {
     }
     // a tool switch mid-press orphans the click
     if (this.app.state.activeTool.type !== "text") {
-      this.pending = null;
+      this.cancel();
       return true;
     }
     const pointerCoords = viewportCoordsToSceneCoords(event, this.app.state);
@@ -340,7 +379,7 @@ export class AppTextTool {
       event.type !== EVENT.POINTER_UP ||
       this.app.state.activeTool.type !== "text"
     ) {
-      this.pending = null;
+      this.cancel();
       return;
     }
     const pointerCoords = viewportCoordsToSceneCoords(event, this.app.state);
