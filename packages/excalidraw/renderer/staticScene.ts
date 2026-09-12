@@ -181,7 +181,11 @@ export const frameClip = (
   );
 };
 
-type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
+type LinkIconCanvas = HTMLCanvasElement & {
+  zoom: Zoom["value"];
+  theme: StaticCanvasAppState["theme"];
+  viewBackgroundColor: StaticCanvasAppState["viewBackgroundColor"];
+};
 
 const linkIconCanvasCache: {
   regularLink: LinkIconCanvas | null;
@@ -189,6 +193,16 @@ const linkIconCanvasCache: {
 } = {
   regularLink: null,
   elementLink: null,
+};
+
+export const getLinkIconBackgroundColor = (
+  viewBackgroundColor: StaticCanvasAppState["viewBackgroundColor"],
+  theme: StaticCanvasAppState["theme"],
+): string | null => {
+  if (!viewBackgroundColor || viewBackgroundColor === "transparent") {
+    return null;
+  }
+  return applyDarkModeFilter(viewBackgroundColor, theme === THEME.DARK);
 };
 
 const renderLinkIcon = (
@@ -214,11 +228,20 @@ const renderLinkIcon = (
       ? "elementLink"
       : "regularLink";
 
+    const viewBackgroundColor = appState.viewBackgroundColor || COLOR_WHITE;
+
     let linkCanvas = linkIconCanvasCache[canvasKey];
 
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
+    if (
+      !linkCanvas ||
+      linkCanvas.zoom !== appState.zoom.value ||
+      linkCanvas.theme !== appState.theme ||
+      linkCanvas.viewBackgroundColor !== viewBackgroundColor
+    ) {
       linkCanvas = Object.assign(document.createElement("canvas"), {
         zoom: appState.zoom.value,
+        theme: appState.theme,
+        viewBackgroundColor,
       });
       linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
       linkCanvas.height =
@@ -234,10 +257,14 @@ const renderLinkIcon = (
       // Seed a sane default so a corrupted color (silently rejected by the
       // canvas) falls back to white instead of a stale fillStyle.
       linkCanvasCacheContext.fillStyle = COLOR_WHITE;
-      linkCanvasCacheContext.fillStyle =
-        appState.viewBackgroundColor || COLOR_WHITE;
-
-      linkCanvasCacheContext.fillRect(0, 0, width, height);
+      const backgroundColor = getLinkIconBackgroundColor(
+        viewBackgroundColor,
+        appState.theme,
+      );
+      if (backgroundColor) {
+        linkCanvasCacheContext.fillStyle = backgroundColor;
+        linkCanvasCacheContext.fillRect(0, 0, width, height);
+      }
 
       if (canvasKey === "elementLink") {
         linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
