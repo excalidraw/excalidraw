@@ -1154,6 +1154,22 @@ describe("ruled sticky notes", () => {
     plain.scene.destroy();
   });
 
+  it("writes from the left margin, whatever the label's alignment", () => {
+    const { scene, stickyId, textId } = createStickyWithText("A", [], "ruled");
+    const sticky = getSticky(scene, stickyId);
+    const label = getBoundText(scene, textId);
+
+    // the helper binds a centred label, as the editor does at a note's centre
+    expect(label.textAlign).toBe("left");
+    expect(label.x).toBe(sticky.x + STICKY_NOTE_PADDING);
+    scene.destroy();
+
+    // a plain note keeps whatever alignment its label was given
+    const plain = createStickyWithText("A");
+    expect(getBoundText(plain.scene, plain.textId).textAlign).toBe("center");
+    plain.scene.destroy();
+  });
+
   it("keeps the key off a note that was never given a paper form", () => {
     const at = { type: "stickynote", x: 0, y: 0 } as const;
 

@@ -12,6 +12,7 @@ import {
   STICKY_NOTE_MIN_FONT_SIZE,
   STICKY_NOTE_PADDING,
   STICKY_NOTE_SHADOW_OFFSET,
+  TEXT_ALIGN,
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   getVerticalOffset,
@@ -613,6 +614,7 @@ export type StickyNoteLayout = {
     | "x"
     | "y"
     | "angle"
+    | "textAlign"
   > | null;
 };
 
@@ -787,6 +789,10 @@ export const getStickyNoteLayout = (
     height,
     baseHeight,
   };
+  // ruled paper is written from the left margin, so the caret starts there and
+  // a line wraps against the right one, the way the rules are drawn
+  const textAlign =
+    container.stickyShape === "ruled" ? TEXT_ALIGN.LEFT : textElement.textAlign;
   const { x, y } = computeBoundTextPosition(
     { ...container, ...nextContainer },
     {
@@ -795,6 +801,7 @@ export const getStickyNoteLayout = (
       fontSize: fitted.fontSize,
       width: fitted.width,
       height: fitted.height,
+      textAlign,
     } as ExcalidrawTextElementWithContainer,
     NO_ELEMENTS,
   );
@@ -810,6 +817,7 @@ export const getStickyNoteLayout = (
       x,
       y,
       angle: container.angle,
+      textAlign,
     },
   };
 };
