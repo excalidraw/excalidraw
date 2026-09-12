@@ -119,24 +119,44 @@ const cloneLibraryItems = (libraryItems: LibraryItems): LibraryItems =>
 /**
  * checks if library item does not exist already in current library
  */
+const getElementFingerprint = (el: ExcalidrawElement) =>
+  `${el.type}::${el.x}::${el.y}::${el.width}::${el.height}`;
+
 const isUniqueItem = (
   existingLibraryItems: LibraryItems,
   targetLibraryItem: LibraryItem,
 ) => {
-  return !existingLibraryItems.find((libraryItem) => {
-    if (libraryItem.elements.length !== targetLibraryItem.elements.length) {
+  return !existingLibraryItems.some((libraryItem) => {
+    // fast path: matching library item id (most reliable)
+    if (targetLibraryItem.id && libraryItem.id === targetLibraryItem.id) {
+      return true;
+    }
+
+    const existingEls = libraryItem.elements;
+    const targetEls = targetLibraryItem.elements;
+
+    if (existingEls.length !== targetEls.length) {
       return false;
     }
 
-    // detect z-index difference by checking the excalidraw elements
-    // are in order
-    return libraryItem.elements.every((libItemExcalidrawItem, idx) => {
-      return (
-        libItemExcalidrawItem.id === targetLibraryItem.elements[idx].id &&
-        libItemExcalidrawItem.versionNonce ===
-          targetLibraryItem.elements[idx].versionNonce
-      );
-    });
+    // 1st pass: compare by element id + versionNonce (fast, order-independent)
+    const existingIdSet = new Set(
+      existingEls.map((el) => `${el.id}::${el.versionNonce}`),
+    );
+    if (
+      targetEls.every((el) => existingIdSet.has(`${el.id}::${el.versionNonce}`))
+    ) {
+      return true;
+    }
+
+    // 2nd pass: compare by stable content fingerprint (handles randomId
+    // reassignment from restoreElements duplicate detection, or missing ids)
+    const existingFingerprintSet = new Set(
+      existingEls.map(getElementFingerprint),
+    );
+    return targetEls.every((el) =>
+      existingFingerprintSet.has(getElementFingerprint(el)),
+    );
   });
 };
 
