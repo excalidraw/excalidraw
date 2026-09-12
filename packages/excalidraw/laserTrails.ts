@@ -29,9 +29,13 @@ export class LaserTrails implements Trail {
         const DECAY_TIME = 1000;
         const DECAY_LENGTH = 50;
 
-        const t = c.decayStartTime
-          ? Math.max(0, 1 - (performance.now() - c.decayStartTime) / DECAY_TIME)
-          : 1;
+        const t =
+          c.decayStartTime != null
+            ? Math.max(
+                0,
+                1 - (performance.now() - c.decayStartTime) / DECAY_TIME,
+              )
+            : 1;
 
         const l =
           (DECAY_LENGTH -
