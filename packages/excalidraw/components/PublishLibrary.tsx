@@ -186,7 +186,7 @@ const SingleLibraryItem = ({
             ref={inputRef}
             style={{ width: "80%", padding: "0.2rem" }}
             defaultValue={libItem.name}
-            placeholder="Item name"
+            placeholder={t("publishDialog.itemName")}
             onChange={(event) => {
               onChange(event.target.value, index);
             }}
