@@ -5162,7 +5162,11 @@ class App extends React.Component<AppProps, AppState> {
     if (event.type === "pointercancel") {
       // the browser took the pointer over (scroll, palm rejection) — no
       // pointerup will follow, so the armed bucket fill must not commit and
-      // the text tool's pending center click must not resolve either
+      // the text tool's pending center click must not resolve either. Both
+      // are canceled right here, ahead of the gesture teardown that follows
+      // (handleCanvasPointerCancel): that teardown first flushes a pointermove
+      // the gesture has queued, and with the click still pending that move
+      // would resolve it as a drag.
       this.bucketFill.cancel();
       this.textTool.cancel();
     }
@@ -7878,20 +7882,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       return;
     }
-    const scenePointer = this.lastPointerMoveEvent
-      ? viewportCoordsToSceneCoords(this.lastPointerMoveEvent, this.state)
-      : this.lastPointerMoveCoords!;
-    const hitElement = this.getElementAtPosition(
-      scenePointer.x,
-      scenePointer.y,
-      { preferSelected: true, includeLockedElements: true },
-    );
-    this.cursor.set(
-      this.textTool.cursorFor(
-        target,
-        hitElement && hitElement.locked ? null : hitElement,
-      ),
-    );
+    this.cursor.set(this.textTool.cursorFor(target));
   };
 
   private handleCanvasPointerMove = (
@@ -8382,7 +8373,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (this.state.activeTool.type === "text") {
-        this.cursor.set(this.textTool.cursorFor(textToolTarget, hitElement));
+        this.cursor.set(this.textTool.cursorFor(textToolTarget));
       } else if (
         !event[KEYS.CTRL_OR_CMD] &&
         this.isHittingCommonBoundingBoxOfSelectedElements(

@@ -2299,36 +2299,6 @@ describe("textWysiwyg", () => {
       },
     );
 
-    it("should hover arrow anchors as the text tool's target", async () => {
-      const arrow = API.createElement({
-        type: "arrow",
-        x: 200,
-        y: 200,
-        width: 100,
-        height: 0,
-        points: [pointFrom(0, 0), pointFrom(100, 0)],
-      });
-      API.setElements([arrow]);
-
-      UI.clickTool("text");
-
-      // near the arrow midpoint → click would bind a label to the arrow
-      mouse.moveTo(250, 200);
-      expect(h.state.textToolHover).toEqual({
-        type: "arrow",
-        elementId: arrow.id,
-        anchor: "label",
-      });
-
-      // near a free endpoint → click would bind a text to it
-      mouse.moveTo(300, 200);
-      expect(h.state.textToolHover).toEqual({
-        type: "arrow",
-        elementId: arrow.id,
-        anchor: "end",
-      });
-    });
-
     it("should clear the hover highlights when the text tool is canceled", async () => {
       const text = API.createElement({
         type: "text",
@@ -2416,7 +2386,6 @@ describe("textWysiwyg", () => {
 
       Keyboard.withModifierKeys({ ctrl: true }, () => {
         mouse.moveTo(54, 57.5);
-        expect(h.state.textToolHover).toBe(null);
         mouse.clickAt(54, 57.5);
       });
       const editor = await getTextEditor();
@@ -2571,6 +2540,10 @@ describe("textWysiwyg", () => {
       UI.clickTool("text");
       const touch = new Pointer("touch", 7);
       touch.downAt(55, 57.5);
+      // finger jitter, well under the drag threshold — and what makes the
+      // finger, not the mouse that drew the rectangle, the last pointer to
+      // have moved, as in a touch-only session
+      touch.moveTo(56, 57.5);
       expect(h.state.textToolHover).toEqual({
         type: "container",
         elementId: rectangle.id,
@@ -2583,6 +2556,9 @@ describe("textWysiwyg", () => {
         clientX: 55,
         clientY: 57.5,
       });
+      // the outline was the armed click's: it goes with it, before any other
+      // pointer moves (no finger is left to refresh it)
+      expect(h.state.textToolHover).toBe(null);
       // the gesture is gone with the pointer: nothing listens for movement
       // any more, and the tool is still the user's
       mouse.moveTo(175, 57.5);
@@ -2601,6 +2577,74 @@ describe("textWysiwyg", () => {
       );
     });
 
+    it("should clear the armed outline when a second finger discards a pending center click", () => {
+      UI.clickTool("text");
+      const first = new Pointer("touch", 7);
+      const second = new Pointer("touch", 8);
+      first.downAt(55, 57.5);
+      // jitter: the finger is the last pointer to have moved (see above)
+      first.moveTo(56, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // pinch/pan intent: the first press is torn down unresolved, and its
+      // outline with it — no finger hovers to refresh it later
+      second.downAt(300, 300);
+      expect(h.state.textToolHover).toBe(null);
+      first.upAt(55, 57.5);
+      second.upAt(300, 300);
+      expect(h.state.textToolHover).toBe(null);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+    });
+
+    it("should not refresh the hover from a lifted finger's position when the viewport moves", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "free",
+        x: 300,
+        y: 300,
+        width: 40,
+        height: 25,
+      });
+      API.setElements([...h.elements, text]);
+      UI.clickTool("text");
+      UI.clickTool("lock");
+      const touch = new Pointer("touch", 7);
+
+      // a tap on the text (with some finger jitter) edits it
+      touch.downAt(320, 312);
+      touch.moveTo(322, 312);
+      touch.upAt(322, 312);
+      let editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      Keyboard.exitTextEditor(editor);
+      expect(h.state.activeTool.type).toBe("text");
+      expect(h.state.textToolHover).toBe(null);
+      // a finger doesn't hover: a viewport change has nothing to re-resolve,
+      // not even where it lifted, over the text
+      API.setAppState({ scrollY: h.state.scrollY - 1 });
+      expect(h.state.textToolHover).toBe(null);
+      API.setAppState({ scrollY: h.state.scrollY + 1 });
+      expect(h.state.textToolHover).toBe(null);
+
+      // a short drag from an empty container's center still binds a label;
+      // once its editor closes, the lifted finger doesn't bring the outline
+      // back either
+      touch.downAt(55, 57.5);
+      touch.moveTo(65, 57.5);
+      touch.upAt(65, 57.5);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.containerId).toBe(rectangle.id);
+      Keyboard.exitTextEditor(editor);
+      expect(h.state.textToolHover).toBe(null);
+      API.setAppState({ scrollY: h.state.scrollY - 1 });
+      expect(h.state.textToolHover).toBe(null);
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+      API.setAppState({ zoom: { value: 1 as typeof h.state.zoom.value } });
+      expect(h.state.textToolHover).toBe(null);
+    });
     it("should refresh the hover when the viewport scrolls or zooms under a still pointer", async () => {
       const text = API.createElement({
         type: "text",

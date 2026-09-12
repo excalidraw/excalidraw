@@ -13,7 +13,6 @@ import {
   hasBoundTextElement,
   isArrowElement,
   isTextBindableContainer,
-  isTextElement,
 } from "@excalidraw/element";
 
 import type { ArrowEndpoint } from "@excalidraw/element";
@@ -208,24 +207,26 @@ export class AppTextTool {
    * (no event; the last modifiers stand). The scene position is re-derived
    * from the pointer's viewport position, so a moved viewport resolves what
    * is under the pointer now. Returns the target, or `undefined` when there
-   * was nothing to refresh (no pointer position yet, or another tool).
+   * is nothing to refresh: another tool, or no hovering pointer — a finger
+   * never hovers (its last move is where it lifted), and the affordance a
+   * press armed is cleared when the press resolves or is canceled, so
+   * nothing is kept current for it either.
    */
   refreshHover = (
     modifiers: Modifiers = this.lastModifiers,
   ): TextToolTarget | null | undefined => {
-    if (this.app.state.activeTool.type !== "text") {
+    const pointer = this.app.lastPointerMoveEvent;
+    if (
+      this.app.state.activeTool.type !== "text" ||
+      !pointer ||
+      pointer.pointerType === "touch"
+    ) {
       return undefined;
     }
-    const scenePointer = this.app.lastPointerMoveEvent
-      ? viewportCoordsToSceneCoords(
-          this.app.lastPointerMoveEvent,
-          this.app.state,
-        )
-      : this.app.lastPointerMoveCoords;
-    if (!scenePointer) {
-      return undefined;
-    }
-    return this.updateHover(scenePointer, modifiers);
+    return this.updateHover(
+      viewportCoordsToSceneCoords(pointer, this.app.state),
+      modifiers,
+    );
   };
 
   /**
@@ -255,22 +256,18 @@ export class AppTextTool {
 
   /**
    * The cursor for what a click would do: a pointer over the arrow anchors
-   * text would attach to, a text cursor over text the click would edit, else
-   * the tool's crosshair. `hitElement` is the plain hit under the pointer —
-   * the fallback while the affordance is suppressed (editing, dragging), so
-   * the cursor there behaves as it always has.
+   * text would attach to, a text cursor over text the click would edit, the
+   * tool's crosshair otherwise — also while the affordance is suppressed
+   * (editing, drag-sizing), where a click has nothing to point at.
    */
-  cursorFor = (
-    target: TextToolTarget | null,
-    hitElement: ExcalidrawElement | null,
-  ): string => {
+  cursorFor = (target: TextToolTarget | null): string => {
     if (
       target?.type === "endpoint" ||
       (target?.type === "container" && isArrowElement(target.element))
     ) {
       return CURSOR_TYPE.POINTER;
     }
-    if (target?.type === "text" || isTextElement(hitElement)) {
+    if (target?.type === "text") {
       return CURSOR_TYPE.TEXT;
     }
     return CURSOR_TYPE.CROSSHAIR;
