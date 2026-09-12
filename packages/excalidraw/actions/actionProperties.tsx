@@ -1754,7 +1754,10 @@ export const actionChangeStickyShape = register<StickyNoteShape>({
           ? newElementWith(el, { stickyShape: value })
           : el,
       ),
-      appState,
+      appState: {
+        ...appState,
+        currentItemStickyShape: value,
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -1784,7 +1787,8 @@ export const actionChangeStickyShape = register<StickyNoteShape>({
                 ? element.stickyShape ?? "square"
                 : null,
             (element) => isStickyNoteElement(element),
-            (hasSelection) => (hasSelection ? null : "square"),
+            (hasSelection) =>
+              hasSelection ? null : appState.currentItemStickyShape,
           )}
           onChange={(value) => updateData(value)}
         />
