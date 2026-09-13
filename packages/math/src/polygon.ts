@@ -1,21 +1,17 @@
 import { pointsEqual } from "./point";
 import { PRECISION } from "./utils";
 
-import type { GlobalPoint, LocalPoint, Polygon } from "./types";
+import type { Polygon, GenericPoint } from "./types";
 
-export function polygon<Point extends GlobalPoint | LocalPoint>(
-  ...points: Point[]
-) {
+export function polygon<Point extends GenericPoint>(...points: Point[]) {
   return polygonClose(points) as Polygon<Point>;
 }
 
-export function polygonFromPoints<Point extends GlobalPoint | LocalPoint>(
-  points: Point[],
-) {
+export function polygonFromPoints<Point extends GenericPoint>(points: Point[]) {
   return polygonClose(points) as Polygon<Point>;
 }
 
-export const polygonIncludesPoint = <Point extends LocalPoint | GlobalPoint>(
+export const polygonIncludesPoint = <Point extends GenericPoint>(
   point: Point,
   polygon: Polygon<Point>,
 ) => {
@@ -68,15 +64,13 @@ export const polygonIncludesPointNonZero = <Point extends [number, number]>(
   return windingNumber !== 0;
 };
 
-function polygonClose<Point extends LocalPoint | GlobalPoint>(
-  polygon: Point[],
-) {
+function polygonClose<Point extends GenericPoint>(polygon: Point[]) {
   return polygonIsClosed(polygon)
     ? polygon
     : ([...polygon, polygon[0]] as Polygon<Point>);
 }
 
-export function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
+export function polygonIsClosed<Point extends GenericPoint>(
   polygon: readonly Point[],
   tolerance: number = PRECISION,
 ) {
@@ -89,7 +83,7 @@ export function polygonIsClosed<Point extends LocalPoint | GlobalPoint>(
  *
  * The polygon may be given open or closed; a closing vertex
  */
-export function polygonSignedArea<Point extends LocalPoint | GlobalPoint>(
+export function polygonSignedArea<Point extends GenericPoint>(
   polygon: readonly Point[],
   tolerance: number = PRECISION,
 ): number {
@@ -103,7 +97,7 @@ export function polygonSignedArea<Point extends LocalPoint | GlobalPoint>(
   return sum / 2;
 }
 
-export function polygonArea<Point extends LocalPoint | GlobalPoint>(
+export function polygonArea<Point extends GenericPoint>(
   polygon: readonly Point[],
   tolerance: number = PRECISION,
 ): number {
@@ -116,7 +110,7 @@ export function polygonArea<Point extends LocalPoint | GlobalPoint>(
  * @returns The hull vertices in counter-clockwise order (y-down), without a
  * repeated closing vertex.
  */
-export function convexHull<Point extends LocalPoint | GlobalPoint>(
+export function convexHull<Point extends GenericPoint>(
   points: readonly Point[],
 ): Point[] {
   if (points.length < 3) {
@@ -159,7 +153,7 @@ export function convexHull<Point extends LocalPoint | GlobalPoint>(
  * @param angleThreshold Minimum accumulated turn (radians) for a vertex to be
  * kept.
  */
-export function simplifyConvexPolygon<Point extends LocalPoint | GlobalPoint>(
+export function simplifyConvexPolygon<Point extends GenericPoint>(
   polygon: readonly Point[],
   angleThreshold: number,
 ): Point[] {

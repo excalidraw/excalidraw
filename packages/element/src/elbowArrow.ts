@@ -11,6 +11,7 @@ import {
   vectorScale,
   type GlobalPoint,
   type LocalPoint,
+  type GenericPoint,
 } from "@excalidraw/math";
 
 import {
@@ -1657,7 +1658,7 @@ const pathTo = (start: Node, node: Node) => {
   return path;
 };
 
-const m_dist = (a: GlobalPoint | LocalPoint, b: GlobalPoint | LocalPoint) =>
+const m_dist = (a: GenericPoint, b: GenericPoint) =>
   Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
 
 /**
@@ -2295,7 +2296,7 @@ const getHoveredElement = (
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>
   a[0] === b[0] && a[1] === b[1];
 
-export const validateElbowPoints = <P extends GlobalPoint | LocalPoint>(
+export const validateElbowPoints = <P extends GenericPoint>(
   points: readonly P[],
   tolerance: number = DEDUP_TRESHOLD,
 ) =>
