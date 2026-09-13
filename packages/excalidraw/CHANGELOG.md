@@ -16,6 +16,7 @@ Please add the latest change on the top under the correct section.
 ### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.
+- New `appState.zoomWithScrollWheel` preference (default `false`, persisted in browser storage) for mouse users who would rather scroll to zoom: a plain wheel zooms and ctrl/cmd+wheel pans vertically instead, while shift+wheel keeps panning horizontally and the wheel-button zoom above is unaffected. Since a trackpad pinch is delivered as ctrl+wheel, it pans while the preference is on. Toggle it via the `zoomWithScrollWheel` action or the new "Zoom with scroll wheel" item in the main menu's preferences submenu, also exposed as `MainMenu.DefaultItems.Preferences.ToggleZoomWithScrollWheel`.
 
 ### Sticky notes (2026-09-06) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 

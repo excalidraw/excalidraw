@@ -361,6 +361,11 @@ export interface AppState {
   /** user preference whether arrow snap to midpoints while binding */
   isMidpointSnappingEnabled: boolean;
   /**
+   * user preference to zoom with plain wheel scrolling — ctrl/cmd+wheel
+   * pans vertically instead (the default is the other way around)
+   */
+  zoomWithScrollWheel: boolean;
+  /**
    * The bindable element the UI highlights for the user when an arrow is
    * dragged or otherwise its endpoint being close to said element.
    */

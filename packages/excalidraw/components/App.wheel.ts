@@ -18,8 +18,9 @@ const WHEEL_BUTTON_MASK = 4;
 /**
  * Wheel input over the editor: pans the canvas, or zooms it around the
  * pointer (`viewport.lastPosition`) — on ctrl/cmd+wheel (which is also how
- * a trackpad pinch is delivered), or while the wheel button itself is held
- * down.
+ * a trackpad pinch is delivered), while the wheel button itself is held
+ * down, or on a plain wheel with the `zoomWithScrollWheel` preference (which
+ * makes ctrl/cmd+wheel pan instead).
  */
 export class AppWheel {
   constructor(
@@ -83,7 +84,15 @@ export class AppWheel {
 
     const { deltaX, deltaY } = event;
     // note that event.ctrlKey is necessary to handle pinch zooming
-    if (isWheelButtonHeld || event.metaKey || event.ctrlKey) {
+    const hasZoomModifier = event.metaKey || event.ctrlKey;
+    const shouldZoom =
+      isWheelButtonHeld ||
+      (this.app.state.zoomWithScrollWheel
+        ? // the preference swaps the roles: a plain wheel zooms, and any
+          // modifier pans instead (ctrl/cmd vertically, shift horizontally)
+          !hasZoomModifier && !event.shiftKey
+        : hasZoomModifier);
+    if (shouldZoom) {
       this.zoomBy(deltaY);
       return;
     }

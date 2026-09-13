@@ -4,8 +4,10 @@ import { vi } from "vitest";
 
 import { viewportCoordsToSceneCoords } from "@excalidraw/common";
 
+import { actionToggleZoomWithScrollWheel } from "../actions";
 import { Excalidraw } from "../index";
 
+import { API } from "./helpers/api";
 import { GlobalTestState, render } from "./test-utils";
 
 const { h } = window;
@@ -218,6 +220,61 @@ describe("wheel navigation", () => {
 
         expect(h.state.zoom.value).toBeGreaterThan(start.zoom);
         expectGrabbedUnderCursor(grabbed);
+      });
+    });
+  });
+
+  describe("zoomWithScrollWheel preference", () => {
+    it("is off by default and toggled by its action", () => {
+      expect(h.state.zoomWithScrollWheel).toBe(false);
+      React.act(() => {
+        h.app.actionManager.executeAction(actionToggleZoomWithScrollWheel);
+      });
+      expect(h.state.zoomWithScrollWheel).toBe(true);
+      React.act(() => {
+        h.app.actionManager.executeAction(actionToggleZoomWithScrollWheel);
+      });
+      expect(h.state.zoomWithScrollWheel).toBe(false);
+    });
+
+    describe("enabled", () => {
+      beforeEach(() => {
+        API.setAppState({ zoomWithScrollWheel: true });
+      });
+
+      it("zooms on plain wheel and pans vertically on ctrl/cmd+wheel", () => {
+        const start = getViewport();
+        wheel({ deltaY: -100 });
+        expect(h.state.zoom.value).toBeGreaterThan(start.zoom);
+
+        const zoomed = getViewport();
+        wheel({ deltaY: 40, ctrlKey: true });
+        expect(getViewport()).toEqual({
+          ...zoomed,
+          scrollY: zoomed.scrollY - 40 / zoomed.zoom,
+        });
+
+        const panned = getViewport();
+        wheel({ deltaY: 40, metaKey: true });
+        expect(getViewport()).toEqual({
+          ...panned,
+          scrollY: panned.scrollY - 40 / panned.zoom,
+        });
+      });
+
+      it("keeps shift+wheel panning horizontally", () => {
+        const start = getViewport();
+        wheel({ deltaY: 40, shiftKey: true });
+        expect(getViewport()).toEqual({
+          ...start,
+          scrollX: start.scrollX - 40 / start.zoom,
+        });
+      });
+
+      it("keeps zooming with the wheel button held", () => {
+        const start = getViewport();
+        wheel({ deltaY: -100, buttons: WHEEL_BUTTON, ctrlKey: true });
+        expect(h.state.zoom.value).toBeGreaterThan(start.zoom);
       });
     });
   });

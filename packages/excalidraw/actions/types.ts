@@ -61,6 +61,7 @@ export type ActionName =
   | "objectsSnapMode"
   | "arrowBinding"
   | "midpointSnapping"
+  | "zoomWithScrollWheel"
   | "stats"
   | "changeStrokeColor"
   | "changeBackgroundColor"

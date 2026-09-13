@@ -17,6 +17,7 @@ import {
   actionToggleStats,
   actionToggleTheme,
   actionToggleZenMode,
+  actionToggleZoomWithScrollWheel,
 } from "../../actions";
 import { actionToggleViewMode } from "../../actions/actionToggleViewMode";
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
@@ -473,6 +474,23 @@ const PreferencesBoxSelectionModeItem = () => {
   );
 };
 
+const PreferencesToggleZoomWithScrollWheelItem = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+  const appState = useUIAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.zoomWithScrollWheel}
+      onSelect={(event) => {
+        actionManager.executeAction(actionToggleZoomWithScrollWheel);
+        event.preventDefault();
+      }}
+    >
+      {t("labels.zoomWithScrollWheel")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 const PreferencesToggleSnapModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -618,6 +636,7 @@ export const Preferences = ({
         {children || (
           <>
             <PreferencesBoxSelectionModeItem />
+            <PreferencesToggleZoomWithScrollWheelItem />
             <PreferencesToggleToolLockItem />
             <PreferencesToggleSnapModeItem />
             <PreferencesToggleGridModeItem />
@@ -636,6 +655,8 @@ export const Preferences = ({
 
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.BoxSelectionMode = PreferencesBoxSelectionModeItem;
+Preferences.ToggleZoomWithScrollWheel =
+  PreferencesToggleZoomWithScrollWheelItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;

@@ -122,5 +122,6 @@ exports[`exportToSvg > with default arguments 1`] = `
   "zoom": {
     "value": 1,
   },
+  "zoomWithScrollWheel": false,
 }
 `;
