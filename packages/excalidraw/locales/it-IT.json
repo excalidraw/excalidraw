@@ -386,7 +386,7 @@
     "lockAngle": "Puoi limitare l'angolo tenendo premuto {{shortcut}}",
     "resize": "Puoi limitare le proporzioni tenendo premuto {{shortcut_1}} durante il ridimensionamento,\ntenendo premuto {{shortcut_2}} per ridimensionare dal centro",
     "resizeImage": "Puoi ridimensionare liberamente tenendo premuto {{shortcut_1}},\ntenendo premuto {{shortcut_2}} per ridimensionare dal centro",
-    "resizeStickyNote": "",
+    "resizeStickyNote": "tieni premuto {{shortcut_1}} per ridimensionare liberamente, {{shortcut_2}} per ridimensionare dal centro",
     "rotate": "Puoi limitare gli angoli tenendo premuto {{shortcut}} durante la rotazione",
     "toggleArrowhead": "Doppio clic per attivare o disattivare la freccia",
     "lineEditor_info": "Tieni premuto {{shortcut_1}} e fai doppio clic oppure premi {{shortcut_2}} per modificare i punti",
