@@ -13,6 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.
+
 ### Sticky notes (2026-09-06) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - New `stickynote` element type and toolbar tool (`N`): an always-filled, flat-rendered note whose label auto-fits — the font shrinks from the user's size down to a minimum, and only then does the note grow in height (it never shrinks below the height the user gave it). Click to place a 250×250 note, drag to size it (previewed at the dragged size, snapped to a font-aware minimum on release); text editing starts right away.

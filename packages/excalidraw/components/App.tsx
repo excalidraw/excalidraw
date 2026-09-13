@@ -624,6 +624,9 @@ let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
 let lastPointerUp: (() => void) | null = null;
+/** applies the pointer movement the active drag-pan is holding back for its
+ * next frame, if any */
+let flushPanMove: (() => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -722,6 +725,7 @@ class App extends React.Component<AppProps, AppState> {
   });
   public wheel: AppWheel = new AppWheel(this, {
     isPanning: () => isPanning,
+    flushPanMove: () => flushPanMove?.(),
   });
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
@@ -9152,14 +9156,19 @@ class App extends React.Component<AppProps, AppState> {
         this.ownerWindow.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
-      this.viewport.translate({
-        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
-        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
-      });
+      // an updater, not a snapshot of `this.state`: a wheel zoom queued in
+      // the same React flush would otherwise be overwritten by a pan
+      // computed from the pre-zoom state
+      this.viewport.translate((state) => ({
+        scrollX: state.scrollX - deltaX / state.zoom.value,
+        scrollY: state.scrollY - deltaY / state.zoom.value,
+      }));
     });
+    flushPanMove = onPointerMove.flush;
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
+        flushPanMove = null;
         isPanning = false;
         if (!isHoldingSpace) {
           this.cursor.reset();

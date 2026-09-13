@@ -12,10 +12,14 @@ type EditorWheelEvent =
   | WheelEvent
   | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>;
 
+/** `MouseEvent.buttons` bit of the wheel (middle) button */
+const WHEEL_BUTTON_MASK = 4;
+
 /**
  * Wheel input over the editor: pans the canvas, or zooms it around the
- * pointer (`viewport.lastPosition`) on ctrl/cmd+wheel — which is also how
- * a trackpad pinch is delivered.
+ * pointer (`viewport.lastPosition`) — on ctrl/cmd+wheel (which is also how
+ * a trackpad pinch is delivered), or while the wheel button itself is held
+ * down.
  */
 export class AppWheel {
   constructor(
@@ -24,6 +28,9 @@ export class AppWheel {
       /** whether a drag-pan (wheel button, space+drag, hand tool) is in
        * progress — wheel input is ignored meanwhile */
       isPanning: () => boolean;
+      /** applies the pointer movement the drag-pan is holding back for its
+       * next frame, if any */
+      flushPanMove: () => void;
     },
   ) {}
 
@@ -56,13 +63,27 @@ export class AppWheel {
 
     event.preventDefault();
 
+    // scrolling with the wheel button held down zooms: the wheel sits under
+    // the same finger, so a wheel-button pan can be zoomed without reaching
+    // for a modifier — hence it wins over any modifier, and over the
+    // drag-pan the button itself started
+    const isWheelButtonHeld = !!(event.buttons & WHEEL_BUTTON_MASK);
+
     if (this.dependencies.isPanning()) {
-      return;
+      if (!isWheelButtonHeld) {
+        return;
+      }
+      // the drag-pan applies pointer movement once per frame; a move still
+      // waiting for its frame has to land before the zoom, or it lands after
+      // it — at the new zoom, on a viewport the zoom anchored without it —
+      // and the point grabbed by the pan drifts from under the cursor a
+      // little on every tick
+      this.dependencies.flushPanMove();
     }
 
     const { deltaX, deltaY } = event;
     // note that event.ctrlKey is necessary to handle pinch zooming
-    if (event.metaKey || event.ctrlKey) {
+    if (isWheelButtonHeld || event.metaKey || event.ctrlKey) {
       this.zoomBy(deltaY);
       return;
     }
@@ -95,7 +116,7 @@ export class AppWheel {
 
   /** zooms around the pointer by a wheel delta (positive = zoom out) */
   private zoomBy = (deltaY: number) => {
-    const { state, viewport } = this.app;
+    const { viewport } = this.app;
 
     const sign = Math.sign(deltaY);
     const MAX_STEP = ZOOM_STEP * 100;
@@ -105,31 +126,36 @@ export class AppWheel {
       delta = MAX_STEP * sign;
     }
 
-    let newZoom = state.zoom.value - delta / 100;
-    // increase zoom steps the more zoomed-in we are (applies to >100% only)
-    newZoom +=
-      Math.log10(Math.max(1, state.zoom.value)) *
-      -sign *
-      // reduced amplification for small deltas (small movements on a trackpad)
-      Math.min(1, absDelta / 20);
-
-    const minZoom = state.scrollConstraints?.lockZoom
-      ? state.scrollConstraints.zoom
-      : MIN_ZOOM;
-    newZoom = Math.max(newZoom, minZoom);
+    // where the pointer is now — the updater below runs when React flushes,
+    // by which time the pointer may have moved on (`lastPosition` is live)
+    const { x: viewportX, y: viewportY } = viewport.lastPosition;
 
     const didTranslate = viewport.translate(
-      (state) => ({
-        ...getViewportForZoomWithScrollConstraints(
-          {
-            viewportX: viewport.lastPosition.x,
-            viewportY: viewport.lastPosition.y,
-            nextZoom: getNormalizedZoom(newZoom),
-          },
-          state,
-        ),
-        shouldCacheIgnoreZoom: true,
-      }),
+      // computed from the state the zoom applies to, not `app.state`: wheel
+      // ticks arriving before React has flushed the previous one would
+      // otherwise all start from the same zoom and collapse into one step
+      (state) => {
+        let newZoom = state.zoom.value - delta / 100;
+        // increase zoom steps the more zoomed-in we are (applies to >100% only)
+        newZoom +=
+          Math.log10(Math.max(1, state.zoom.value)) *
+          -sign *
+          // reduced amplification for small deltas (small movements on a trackpad)
+          Math.min(1, absDelta / 20);
+
+        const minZoom = state.scrollConstraints?.lockZoom
+          ? state.scrollConstraints.zoom
+          : MIN_ZOOM;
+        newZoom = Math.max(newZoom, minZoom);
+
+        return {
+          ...getViewportForZoomWithScrollConstraints(
+            { viewportX, viewportY, nextZoom: getNormalizedZoom(newZoom) },
+            state,
+          ),
+          shouldCacheIgnoreZoom: true,
+        };
+      },
       {
         zoomPreConstrained: true,
         preserveScrollConstraintsSnapBack: true,
