@@ -196,7 +196,10 @@
     "boxSelectionContain": "Avvolgi",
     "boxSelectionOverlap": "Sovrapponi",
     "arrowBinding": "Legatura a freccia",
-    "midpointSnapping": "Aggancia ai punti medi"
+    "midpointSnapping": "Aggancia ai punti medi",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Link all'oggetto",
