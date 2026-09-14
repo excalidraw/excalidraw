@@ -27,7 +27,6 @@ import {
   togglePopover,
   unmountComponent,
 } from "./test-utils";
-import { rectangle } from "@excalidraw/math/rectangle";
 
 const { h } = window;
 
@@ -74,8 +73,7 @@ afterEach(() => {
   checkpoint("end of test");
 });
 
-describe("regression tests", () => {   
-
+describe("regression tests", () => {
   it("draw every type of shape", () => {
     UI.clickTool("rectangle");
     mouse.down(10, -10);
@@ -125,40 +123,39 @@ describe("regression tests", () => {
     ]);
   });
 
-it("does not erase an image when erasing a drawing over it", () => {
-  const image = API.createElement({
-    type: "image",
-    x: 0,
-    y: 0,
-    width: 100,
-    height: 100,
-    fileId: "file_A",
-    status: "saved",
+  it("does not erase an image when erasing a drawing over it", () => {
+    const image = API.createElement({
+      type: "image",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      fileId: "file_A",
+      status: "saved",
+    });
+
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 20,
+      width: 40,
+      height: 40,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+
+    API.setElements([image, rectangle]);
+
+    UI.clickTool("eraser");
+
+    mouse.moveTo(30, 40);
+    mouse.down();
+    mouse.moveTo(70, 40);
+    mouse.up();
+
+    expect(h.elements).toContainEqual(image);
+    expect(h.elements).not.toContainEqual(rectangle);
   });
-
-  const rectangle = API.createElement({
-    type: "rectangle",
-    x: 20,
-    y: 20,
-    width: 40,
-    height: 40,
-    backgroundColor: "red",
-    fillStyle: "solid",
-  });
-
-  API.setElements([image, rectangle]);
-
-  UI.clickTool("eraser");
-
-  mouse.moveTo(30, 40);
-  mouse.down();
-  mouse.moveTo(70, 40);
-  mouse.up();
-
-  expect(h.elements).toContainEqual(image);
-  expect(h.elements).not.toContainEqual(rectangle);
-});
-
 
   it("click to select a shape", () => {
     UI.clickTool("rectangle");
