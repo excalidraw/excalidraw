@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "箭头绑定",
-    "midpointSnapping": "吸附到中点"
+    "midpointSnapping": "吸附到中点",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "链接到对象",
