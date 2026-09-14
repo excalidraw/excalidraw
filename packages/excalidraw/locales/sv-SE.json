@@ -196,7 +196,10 @@
     "boxSelectionContain": "Slå in",
     "boxSelectionOverlap": "Överlappande",
     "arrowBinding": "Pilbindning",
-    "midpointSnapping": "Fäst mot mittpunkter"
+    "midpointSnapping": "Fäst mot mittpunkter",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Länk till objektet",
