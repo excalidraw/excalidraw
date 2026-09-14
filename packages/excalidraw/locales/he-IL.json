@@ -196,7 +196,10 @@
     "boxSelectionContain": "עטיפה",
     "boxSelectionOverlap": "חפיפה",
     "arrowBinding": "קשירת חצים",
-    "midpointSnapping": "הצמדה לנקודות ביניים"
+    "midpointSnapping": "הצמדה לנקודות ביניים",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "קישור לפריט",
