@@ -1,6 +1,7 @@
 import {
   getCommonFrameId,
   getFrameChildrenInsertionIndex,
+  getBoundTextElement,
   isElementInViewport,
 } from "@excalidraw/element";
 
@@ -20,7 +21,7 @@ import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
 import type { RenderableElementsMap } from "./types";
 
-import type { AppState } from "../types";
+import type { AppState, ElementRenderOverrides } from "../types";
 
 type GetRenderableElementsOpts = {
   zoom: AppState["zoom"];
@@ -43,6 +44,84 @@ export class Renderer {
   constructor(scene: Scene) {
     this.scene = scene;
   }
+
+  /** Visual culling is separate from the document geometry used for interaction. */
+  public getVisibleElementsForRendering(
+    elementsMap: RenderableElementsMap,
+    appState: AppState,
+    overrides: ElementRenderOverrides,
+  ) {
+    return this._getVisibleElementsForRendering({
+      elementsMap,
+      overrides,
+      zoom: appState.zoom,
+      scrollX: appState.scrollX,
+      scrollY: appState.scrollY,
+      offsetLeft: appState.offsetLeft,
+      offsetTop: appState.offsetTop,
+      width: appState.width,
+      height: appState.height,
+      selectedElements: this.scene.getSelectedElements(appState),
+      frameToHighlight: appState.selectedElementsAreBeingDragged
+        ? appState.frameToHighlight
+        : null,
+    });
+  }
+
+  private _getVisibleElementsForRendering = memoize(
+    ({
+      elementsMap,
+      overrides,
+      selectedElements,
+      frameToHighlight,
+      ...viewport
+    }: Pick<
+      GetRenderableElementsOpts,
+      | "zoom"
+      | "scrollX"
+      | "scrollY"
+      | "offsetLeft"
+      | "offsetTop"
+      | "width"
+      | "height"
+      | "selectedElements"
+      | "frameToHighlight"
+    > & {
+      elementsMap: RenderableElementsMap;
+      overrides: ElementRenderOverrides;
+    }) => {
+      const isVisible = (element: NonDeletedExcalidrawElement) => {
+        const offset = overrides.get(element.id)?.offset;
+        // Shifting the viewport also works for arrow labels whose coordinates
+        // are derived from their container rather than their own x/y fields.
+        return isElementInViewport(
+          element,
+          viewport.width,
+          viewport.height,
+          {
+            ...viewport,
+            scrollX: viewport.scrollX + (offset?.x ?? 0),
+            scrollY: viewport.scrollY + (offset?.y ?? 0),
+          },
+          elementsMap,
+        );
+      };
+      const visibleElements = [...elementsMap.values()].filter((element) => {
+        const label = getBoundTextElement(element, elementsMap);
+        return isVisible(element) || (!!label && isVisible(label));
+      });
+      if (frameToHighlight) {
+        if (getCommonFrameId(selectedElements) !== frameToHighlight.id) {
+          return this.sortSelectedElementsIntoHighlightedFrame({
+            visibleElements,
+            selectedElements,
+            frameToHighlight,
+          });
+        }
+      }
+      return visibleElements;
+    },
+  );
 
   private getVisibleCanvasElements({
     elementsMap,
@@ -258,5 +337,6 @@ export class Renderer {
   public destroy() {
     renderStaticSceneThrottled.cancel();
     this._getRenderableElements.clear();
+    this._getVisibleElementsForRendering.clear();
   }
 }

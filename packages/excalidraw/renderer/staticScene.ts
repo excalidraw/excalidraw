@@ -15,11 +15,16 @@ import {
 } from "@excalidraw/element";
 import {
   elementOverlapsWithFrame,
+  getContainingFrame,
   getTargetFrame,
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
-import { renderElement } from "@excalidraw/element";
+import {
+  getRenderElementWithPositionOverride,
+  getRenderOpacity,
+  renderElement,
+} from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
@@ -196,8 +201,11 @@ const renderLinkIcon = (
   context: CanvasRenderingContext2D,
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,
+  renderConfig: StaticCanvasRenderConfig,
 ) => {
   if (element.link && !appState.selectedElementIds[element.id]) {
+    const link = element.link;
+    element = getRenderElementWithPositionOverride(element, renderConfig);
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const [x, y, width, height] = getLinkHandleFromCoords(
       [x1, y1, x2, y2],
@@ -210,9 +218,7 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    const canvasKey = isElementLink(element.link)
-      ? "elementLink"
-      : "regularLink";
+    const canvasKey = isElementLink(link) ? "elementLink" : "regularLink";
 
     let linkCanvas = linkIconCanvasCache[canvasKey];
 
@@ -253,7 +259,13 @@ const renderLinkIcon = (
 
       linkCanvasCacheContext.restore();
     }
-    context.globalAlpha = element.opacity / 100;
+    context.globalAlpha = getRenderOpacity(
+      element,
+      renderConfig,
+      getContainingFrame(element, elementsMap),
+      renderConfig.elementsPendingErasure,
+      renderConfig.pendingFlowchartNodes,
+    );
     context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
@@ -351,22 +363,32 @@ const _renderStaticScene = ({
         }
 
         context.save();
+        const boundTextElement = getBoundTextElement(element, elementsMap);
 
         if (
           frameId &&
           appState.frameRendering.enabled &&
           appState.frameRendering.clip
         ) {
-          const frame = getTargetFrame(element, elementsMap, appState);
+          const targetFrame = getTargetFrame(element, elementsMap, appState);
+          const frame =
+            targetFrame &&
+            getRenderElementWithPositionOverride(targetFrame, renderConfig);
           if (
             frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
+            ((element.frameId === frame.id &&
+              (renderConfig.elementRenderOverrides?.get(element.id)?.offset ||
+                (boundTextElement &&
+                  renderConfig.elementRenderOverrides?.get(boundTextElement.id)
+                    ?.offset) ||
+                renderConfig.elementRenderOverrides?.get(frame.id)?.offset)) ||
+              shouldApplyFrameClip(
+                getRenderElementWithPositionOverride(element, renderConfig),
+                frame,
+                appState,
+                elementsMap,
+                inFrameGroupsMap,
+              ))
           ) {
             frameClip(frame, context, renderConfig, appState);
           }
@@ -391,7 +413,6 @@ const _renderStaticScene = ({
           );
         }
 
-        const boundTextElement = getBoundTextElement(element, elementsMap);
         if (boundTextElement) {
           renderElement(
             boundTextElement,
@@ -407,7 +428,7 @@ const _renderStaticScene = ({
         context.restore();
 
         if (!isExporting && renderConfig.renderLinks !== false) {
-          renderLinkIcon(element, context, appState, elementsMap);
+          renderLinkIcon(element, context, appState, elementsMap, renderConfig);
         }
       } catch (error: any) {
         console.error(
@@ -446,7 +467,13 @@ const _renderStaticScene = ({
             element.width &&
             element.height
           ) {
-            const label = createPlaceholderEmbeddableLabel(element);
+            const label = {
+              ...createPlaceholderEmbeddableLabel(element),
+              // Synthetic visual: resolve overrides and frame opacity through
+              // its owner, without creating another animation target.
+              id: element.id,
+              frameId: element.frameId,
+            };
             renderElement(
               label,
               elementsMap,
@@ -458,7 +485,13 @@ const _renderStaticScene = ({
             );
           }
           if (!isExporting && renderConfig.renderLinks !== false) {
-            renderLinkIcon(element, context, appState, elementsMap);
+            renderLinkIcon(
+              element,
+              context,
+              appState,
+              elementsMap,
+              renderConfig,
+            );
           }
         };
         // - when exporting the whole canvas, we DO NOT apply clipping
@@ -473,17 +506,23 @@ const _renderStaticScene = ({
         ) {
           context.save();
 
-          const frame = getTargetFrame(element, elementsMap, appState);
+          const targetFrame = getTargetFrame(element, elementsMap, appState);
+          const frame =
+            targetFrame &&
+            getRenderElementWithPositionOverride(targetFrame, renderConfig);
 
           if (
             frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
+            ((element.frameId === frame.id &&
+              (renderConfig.elementRenderOverrides?.get(element.id)?.offset ||
+                renderConfig.elementRenderOverrides?.get(frame.id)?.offset)) ||
+              shouldApplyFrameClip(
+                getRenderElementWithPositionOverride(element, renderConfig),
+                frame,
+                appState,
+                elementsMap,
+                inFrameGroupsMap,
+              ))
           ) {
             frameClip(frame, context, renderConfig, appState);
           }

@@ -1,6 +1,7 @@
 import rough from "roughjs/bin/rough";
 
 import {
+  clamp,
   type GlobalPoint,
   isRightAngleRads,
   lineSegment,
@@ -115,8 +116,70 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
   }
 };
 
+export const resolveRenderOpacity = (
+  element: ExcalidrawElement,
+  renderConfig: Pick<StaticCanvasRenderConfig, "elementRenderOverrides">,
+) =>
+  clamp(
+    renderConfig.elementRenderOverrides?.get(element.id)?.opacity ??
+      element.opacity,
+    0,
+    100,
+  );
+
+export const resolveRenderPositionOffset = (
+  element: ExcalidrawElement,
+  renderConfig: Pick<StaticCanvasRenderConfig, "elementRenderOverrides">,
+) =>
+  renderConfig.elementRenderOverrides?.get(element.id)?.offset ?? {
+    x: 0,
+    y: 0,
+  };
+
+export const getRenderElementWithPositionOverride = <
+  TElement extends ExcalidrawElement,
+>(
+  element: TElement,
+  renderConfig: Pick<StaticCanvasRenderConfig, "elementRenderOverrides">,
+): TElement => {
+  const positionOffset = resolveRenderPositionOffset(element, renderConfig);
+
+  if (positionOffset.x === 0 && positionOffset.y === 0) {
+    return element;
+  }
+
+  return {
+    ...element,
+    x: element.x + positionOffset.x,
+    y: element.y + positionOffset.y,
+  } as TElement;
+};
+
+const withRenderPositionOffset = <T>(
+  context: CanvasRenderingContext2D,
+  element: ExcalidrawElement,
+  renderConfig: Pick<StaticCanvasRenderConfig, "elementRenderOverrides">,
+  cb: (positionOffset: { x: number; y: number }) => T,
+): T => {
+  const positionOffset = resolveRenderPositionOffset(element, renderConfig);
+
+  if (positionOffset.x === 0 && positionOffset.y === 0) {
+    return cb(positionOffset);
+  }
+
+  context.save();
+  context.translate(positionOffset.x, positionOffset.y);
+
+  try {
+    return cb(positionOffset);
+  } finally {
+    context.restore();
+  }
+};
+
 export const getRenderOpacity = (
   element: ExcalidrawElement,
+  renderConfig: Pick<StaticCanvasRenderConfig, "elementRenderOverrides">,
   containingFrame: ExcalidrawFrameLikeElement | null,
   elementsPendingErasure: ElementsPendingErasure,
   pendingNodes: Readonly<PendingExcalidrawElements> | null,
@@ -125,7 +188,11 @@ export const getRenderOpacity = (
   // multiplying frame opacity with element opacity to combine them
   // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
   let opacity =
-    (((containingFrame?.opacity ?? 100) * element.opacity) / 10000) *
+    (((containingFrame
+      ? resolveRenderOpacity(containingFrame, renderConfig)
+      : 100) *
+      resolveRenderOpacity(element, renderConfig)) /
+      10000) *
     globalAlpha;
 
   // if pending erasure, multiply again to combine further
@@ -709,6 +776,7 @@ const drawElementFromCanvas = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
   allElementsMap: NonDeletedSceneElementsMap,
+  positionOffset: { x: number; y: number },
 ) => {
   const element = elementWithCanvas.element;
   // the ratio the cached bitmap was generated with (`generateElementCanvas`);
@@ -716,8 +784,10 @@ const drawElementFromCanvas = (
   const devicePixelRatio = window.devicePixelRatio;
   const padding = getCanvasPadding(element);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
-  const cx = ((x1 + x2) / 2 + appState.scrollX) * devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + appState.scrollY) * devicePixelRatio;
+  const cx =
+    ((x1 + x2) / 2 + positionOffset.x + appState.scrollX) * devicePixelRatio;
+  const cy =
+    ((y1 + y2) / 2 + positionOffset.y + appState.scrollY) * devicePixelRatio;
 
   context.save();
   context.scale(1 / devicePixelRatio, 1 / devicePixelRatio);
@@ -743,11 +813,13 @@ const drawElementFromCanvas = (
       (boundTextCx -
         boundTextElement.width / 2 -
         BOUND_TEXT_PADDING +
+        positionOffset.x +
         appState.scrollX) *
         devicePixelRatio,
       (boundTextCy -
         boundTextElement.height / 2 -
         BOUND_TEXT_PADDING +
+        positionOffset.y +
         appState.scrollY) *
         devicePixelRatio,
       (boundTextElement.width + BOUND_TEXT_PADDING * 2) * devicePixelRatio,
@@ -777,8 +849,10 @@ const drawElementFromCanvas = (
 
   // the blit origin, in the space the context is in here (scaled by
   // canvas scale × zoom ÷ devicePixelRatio)
-  let drawX = (x1 + appState.scrollX) * devicePixelRatio - padding;
-  let drawY = (y1 + appState.scrollY) * devicePixelRatio - padding;
+  let drawX =
+    (x1 + positionOffset.x + appState.scrollX) * devicePixelRatio - padding;
+  let drawY =
+    (y1 + positionOffset.y + appState.scrollY) * devicePixelRatio - padding;
 
   const transform = context.getTransform();
 
@@ -801,8 +875,8 @@ const drawElementFromCanvas = (
     const container = isTextElement(element)
       ? getContainerElement(element, allElementsMap)
       : null;
-    // A bound label shares its unrotated container's anchor. Other bitmaps
-    // anchor to themselves, with a zero relative offset.
+    // A bound label shares its unrotated container's anchor when both have
+    // the same visual offset. Other bitmaps anchor to themselves.
     const anchor = container && !container.angle ? container : element;
     const anchorCoords =
       anchor === element
@@ -813,9 +887,11 @@ const drawElementFromCanvas = (
     const anchorPadding =
       anchor === element ? padding : getCanvasPadding(anchor);
     const anchorX =
-      (anchorSceneX + appState.scrollX) * devicePixelRatio - anchorPadding;
+      (anchorSceneX + positionOffset.x + appState.scrollX) * devicePixelRatio -
+      anchorPadding;
     const anchorY =
-      (anchorSceneY + appState.scrollY) * devicePixelRatio - anchorPadding;
+      (anchorSceneY + positionOffset.y + appState.scrollY) * devicePixelRatio -
+      anchorPadding;
 
     // Form the relative vector before introducing the scroll translation.
     const dx = (x1 - anchorSceneX) * devicePixelRatio + anchorPadding - padding;
@@ -857,8 +933,8 @@ const drawElementFromCanvas = (
     context.strokeStyle = "#c92a2a";
     context.lineWidth = 3;
     context.strokeRect(
-      (coords.x + appState.scrollX) * devicePixelRatio,
-      (coords.y + appState.scrollY) * devicePixelRatio,
+      (coords.x + positionOffset.x + appState.scrollX) * devicePixelRatio,
+      (coords.y + positionOffset.y + appState.scrollY) * devicePixelRatio,
       getBoundTextMaxWidth(element, textElement) * devicePixelRatio,
       getBoundTextMaxHeight(element, textElement) * devicePixelRatio,
     );
@@ -911,6 +987,7 @@ export const renderElement = (
 
   context.globalAlpha = getRenderOpacity(
     element,
+    renderConfig,
     getContainingFrame(element, elementsMap),
     renderConfig.elementsPendingErasure,
     renderConfig.pendingFlowchartNodes,
@@ -921,59 +998,66 @@ export const renderElement = (
     case "magicframe":
     case "frame": {
       if (appState.frameRendering.enabled && appState.frameRendering.outline) {
-        context.save();
-        context.translate(
-          element.x + appState.scrollX,
-          element.y + appState.scrollY,
-        );
-        context.fillStyle = "rgba(0, 0, 200, 0.04)";
-
-        context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = applyDarkModeFilter(
-          FRAME_STYLE.strokeColor,
-          appState.theme === THEME.DARK,
-        );
-
-        // TODO change later to only affect AI frames
-        if (isMagicFrameElement(element)) {
-          context.strokeStyle =
-            appState.theme === THEME.LIGHT
-              ? "#7affd7"
-              : applyDarkModeFilter("#1d8264");
-        }
-
-        if (FRAME_STYLE.radius && context.roundRect) {
-          context.beginPath();
-          context.roundRect(
-            0,
-            0,
-            element.width,
-            element.height,
-            FRAME_STYLE.radius / appState.zoom.value,
+        withRenderPositionOffset(context, element, renderConfig, () => {
+          context.save();
+          context.translate(
+            element.x + appState.scrollX,
+            element.y + appState.scrollY,
           );
-          context.stroke();
-          context.closePath();
-        } else {
-          context.strokeRect(0, 0, element.width, element.height);
-        }
+          context.fillStyle = "rgba(0, 0, 200, 0.04)";
 
-        context.restore();
+          context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
+          context.strokeStyle = applyDarkModeFilter(
+            FRAME_STYLE.strokeColor,
+            appState.theme === THEME.DARK,
+          );
+
+          // TODO change later to only affect AI frames
+          if (isMagicFrameElement(element)) {
+            context.strokeStyle =
+              appState.theme === THEME.LIGHT
+                ? "#7affd7"
+                : applyDarkModeFilter("#1d8264");
+          }
+
+          if (FRAME_STYLE.radius && context.roundRect) {
+            context.beginPath();
+            context.roundRect(
+              0,
+              0,
+              element.width,
+              element.height,
+              FRAME_STYLE.radius / appState.zoom.value,
+            );
+            context.stroke();
+            context.closePath();
+          } else {
+            context.strokeRect(0, 0, element.width, element.height);
+          }
+
+          context.restore();
+        });
       }
       break;
     }
     case "freedraw": {
       if (renderConfig.isExporting) {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-        const cx = (x1 + x2) / 2 + appState.scrollX;
-        const cy = (y1 + y2) / 2 + appState.scrollY;
-        const shiftX = (x2 - x1) / 2 - (element.x - x1);
-        const shiftY = (y2 - y1) / 2 - (element.y - y1);
-        context.save();
-        context.translate(cx, cy);
-        context.rotate(element.angle);
-        context.translate(-shiftX, -shiftY);
-        drawElementOnCanvas(element, rc, context, renderConfig);
-        context.restore();
+        withRenderPositionOffset(context, element, renderConfig, () => {
+          const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+            element,
+            elementsMap,
+          );
+          const cx = (x1 + x2) / 2 + appState.scrollX;
+          const cy = (y1 + y2) / 2 + appState.scrollY;
+          const shiftX = (x2 - x1) / 2 - (element.x - x1);
+          const shiftY = (y2 - y1) / 2 - (element.y - y1);
+          context.save();
+          context.translate(cx, cy);
+          context.rotate(element.angle);
+          context.translate(-shiftX, -shiftY);
+          drawElementOnCanvas(element, rc, context, renderConfig);
+          context.restore();
+        });
       } else {
         const elementWithCanvas = generateElementWithCanvas(
           element,
@@ -991,6 +1075,7 @@ export const renderElement = (
           renderConfig,
           appState,
           allElementsMap,
+          resolveRenderPositionOffset(element, renderConfig),
         );
       }
 
@@ -1007,85 +1092,90 @@ export const renderElement = (
     case "iframe":
     case "embeddable": {
       if (renderConfig.isExporting) {
-        const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-        const centerX = (x1 + x2) / 2;
-        const centerY = (y1 + y2) / 2;
-        const cx = centerX + appState.scrollX;
-        const cy = centerY + appState.scrollY;
-        let shiftX = (x2 - x1) / 2 - (element.x - x1);
-        let shiftY = (y2 - y1) / 2 - (element.y - y1);
-        if (isTextElement(element)) {
-          const container = getContainerElement(element, elementsMap);
-          if (isArrowElement(container)) {
-            const boundTextCoords =
-              LinearElementEditor.getBoundTextElementPosition(
-                container,
-                element as ExcalidrawTextElementWithContainer,
-                elementsMap,
-              );
-            shiftX = (x2 - x1) / 2 - (boundTextCoords.x - x1);
-            shiftY = (y2 - y1) / 2 - (boundTextCoords.y - y1);
-          }
-        }
-        context.save();
-        context.translate(cx, cy);
-
-        const boundTextElement = getBoundTextElement(element, elementsMap);
-
-        if (isArrowElement(element) && boundTextElement) {
-          // Draw arrow directly as vector (no temp-canvas bitmap blit which
-          // introduces resampling blur). The label "hole" is cut by clipping
-          // the arrow's own strokes out of the label rect (even-odd clip)
-          // so that elements rendered beneath the arrow keep showing through
-          // the gap.
-          shiftX = element.width / 2 - (element.x - x1);
-          shiftY = element.height / 2 - (element.y - y1);
-
-          const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
-            boundTextElement,
+        withRenderPositionOffset(context, element, renderConfig, () => {
+          const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+            element,
             elementsMap,
           );
-          const holeX =
-            boundTextCx -
-            centerX -
-            boundTextElement.width / 2 -
-            BOUND_TEXT_PADDING;
-          const holeY =
-            boundTextCy -
-            centerY -
-            boundTextElement.height / 2 -
-            BOUND_TEXT_PADDING;
-          const holeWidth = boundTextElement.width + BOUND_TEXT_PADDING * 2;
-          const holeHeight = boundTextElement.height + BOUND_TEXT_PADDING * 2;
-
-          // generously covers the arrow's painted extent at any rotation
-          // (the hole rect stays axis-aligned in scene space)
-          const outerHalf =
-            Math.max(distance(x1, x2), distance(y1, y2)) +
-            getCanvasPadding(element) * 10;
-
+          const centerX = (x1 + x2) / 2;
+          const centerY = (y1 + y2) / 2;
+          const cx = centerX + appState.scrollX;
+          const cy = centerY + appState.scrollY;
+          let shiftX = (x2 - x1) / 2 - (element.x - x1);
+          let shiftY = (y2 - y1) / 2 - (element.y - y1);
+          if (isTextElement(element)) {
+            const container = getContainerElement(element, elementsMap);
+            if (isArrowElement(container)) {
+              const boundTextCoords =
+                LinearElementEditor.getBoundTextElementPosition(
+                  container,
+                  element as ExcalidrawTextElementWithContainer,
+                  elementsMap,
+                );
+              shiftX = (x2 - x1) / 2 - (boundTextCoords.x - x1);
+              shiftY = (y2 - y1) / 2 - (boundTextCoords.y - y1);
+            }
+          }
           context.save();
-          context.beginPath();
-          context.rect(-outerHalf, -outerHalf, outerHalf * 2, outerHalf * 2);
-          context.rect(holeX, holeY, holeWidth, holeHeight);
-          context.clip("evenodd");
-          context.rotate(element.angle);
-          context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
-          context.restore();
-        } else {
-          context.rotate(element.angle);
+          context.translate(cx, cy);
 
-          if (element.type === "image") {
-            // note: scale must be applied *after* rotating
-            context.scale(element.scale[0], element.scale[1]);
+          const boundTextElement = getBoundTextElement(element, elementsMap);
+
+          if (isArrowElement(element) && boundTextElement) {
+            // Draw arrow directly as vector (no temp-canvas bitmap blit which
+            // introduces resampling blur). The label "hole" is cut by clipping
+            // the arrow's own strokes out of the label rect (even-odd clip)
+            // so that elements rendered beneath the arrow keep showing through
+            // the gap.
+            shiftX = element.width / 2 - (element.x - x1);
+            shiftY = element.height / 2 - (element.y - y1);
+
+            const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
+              boundTextElement,
+              elementsMap,
+            );
+            const holeX =
+              boundTextCx -
+              centerX -
+              boundTextElement.width / 2 -
+              BOUND_TEXT_PADDING;
+            const holeY =
+              boundTextCy -
+              centerY -
+              boundTextElement.height / 2 -
+              BOUND_TEXT_PADDING;
+            const holeWidth = boundTextElement.width + BOUND_TEXT_PADDING * 2;
+            const holeHeight = boundTextElement.height + BOUND_TEXT_PADDING * 2;
+
+            // generously covers the arrow's painted extent at any rotation
+            // (the hole rect stays axis-aligned in scene space)
+            const outerHalf =
+              Math.max(distance(x1, x2), distance(y1, y2)) +
+              getCanvasPadding(element) * 10;
+
+            context.save();
+            context.beginPath();
+            context.rect(-outerHalf, -outerHalf, outerHalf * 2, outerHalf * 2);
+            context.rect(holeX, holeY, holeWidth, holeHeight);
+            context.clip("evenodd");
+            context.rotate(element.angle);
+            context.translate(-shiftX, -shiftY);
+            drawElementOnCanvas(element, rc, context, renderConfig);
+            context.restore();
+          } else {
+            context.rotate(element.angle);
+
+            if (element.type === "image") {
+              // note: scale must be applied *after* rotating
+              context.scale(element.scale[0], element.scale[1]);
+            }
+
+            context.translate(-shiftX, -shiftY);
+            drawElementOnCanvas(element, rc, context, renderConfig);
           }
 
-          context.translate(-shiftX, -shiftY);
-          drawElementOnCanvas(element, rc, context, renderConfig);
-        }
-
-        context.restore();
+          context.restore();
+        });
         // not exporting → optimized rendering (cache & render from element
         // canvases)
       } else {
@@ -1141,6 +1231,7 @@ export const renderElement = (
               renderConfig,
               appState,
               allElementsMap,
+              { x: 0, y: 0 },
             );
           }
 
@@ -1153,6 +1244,7 @@ export const renderElement = (
           renderConfig,
           appState,
           allElementsMap,
+          resolveRenderPositionOffset(element, renderConfig),
         );
 
         // reset

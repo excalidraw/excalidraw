@@ -785,6 +785,20 @@ export type UIConfig = {
   };
 };
 
+/** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
+export type ElementRenderOverride = Readonly<{
+  /** Absolute render opacity (0–100, clamped). Omitted: use element.opacity. */
+  opacity?: number;
+  /** Translation in scene units. Does not change the element's coordinates. */
+  offset?: Readonly<{ x: number; y: number }>;
+}>;
+
+/** see {@link ExcalidrawImperativeAPI.setElementRenderOverrides} for details */
+export type ElementRenderOverrides = ReadonlyMap<
+  ExcalidrawElement["id"],
+  ElementRenderOverride
+>;
+
 export interface ExcalidrawProps {
   className?: string;
   /**
@@ -1295,6 +1309,20 @@ export interface ExcalidrawImperativeAPI {
   getName: InstanceType<typeof App>["getName"];
   setViewport: InstanceType<typeof App>["viewport"]["setViewport"];
   getViewportOffsets: InstanceType<typeof App>["viewport"]["getOffsets"];
+  /**
+   * Atomically replaces all transient visual overrides. Values are copied;
+   * omitted IDs/fields use document values. null clears the snapshot.
+   * Repaints without document changes, history entries or onChange events.
+   * Finite opacity is clamped to 0–100; non-finite values reject the snapshot.
+   * Unknown/deleted IDs are ignored when rendering. Reset/unmount clears it.
+   * Per-element offsets are explicit: target bound labels/frame children too.
+   * Frame opacity still multiplies child opacity. Decorations follow their owner.
+   * Exports and interactive geometry (hit tests, selection, editing) use document
+   * values, including while authoring an animation preview in edit mode.
+   */
+  setElementRenderOverrides: InstanceType<
+    typeof App
+  >["setElementRenderOverrides"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
