@@ -196,7 +196,10 @@
     "boxSelectionContain": "Mettre en page",
     "boxSelectionOverlap": "Chevaucher",
     "arrowBinding": "Liaison de flèches",
-    "midpointSnapping": "S'accrocher aux points intermédiaires"
+    "midpointSnapping": "S'accrocher aux points intermédiaires",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Lien vers un objet",
