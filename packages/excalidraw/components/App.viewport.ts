@@ -744,11 +744,20 @@ export class AppViewport {
       return false;
     }
 
+    // a user gesture interrupting an animated `setViewport` takes over from
+    // frames that draw from zoom-scaled bitmaps, and the completion handler
+    // that would switch back to crisp ones no longer runs. Otherwise the
+    // flag is left alone: wheel and touch zoom set it and clear it on a
+    // debounce once the gesture is over, and a pan frame landing between two
+    // zoom ticks must not force every element to be re-rasterized at the
+    // in-progress zoom
+    if (this.activeTransition) {
+      this.app.setState({ shouldCacheIgnoreZoom: false });
+    }
     this.cancelTransition();
     if (!opts?.preserveScrollConstraintsSnapBack) {
       AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
     }
-    this.app.setState({ shouldCacheIgnoreZoom: false });
     this.app.requestUnfollow();
 
     const prevZoom = this.app.state.zoom.value;

@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent } from "@testing-library/react";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
 import { viewportCoordsToSceneCoords } from "@excalidraw/common";
@@ -220,6 +220,27 @@ describe("wheel navigation", () => {
 
         expect(h.state.zoom.value).toBeGreaterThan(start.zoom);
         expectGrabbedUnderCursor(grabbed);
+      });
+
+      it("keeps drawing from zoom-scaled bitmaps until the gesture is over", async () => {
+        grab();
+
+        wheel({ deltaY: -100, ...wheelButtonPointer });
+        expect(h.state.shouldCacheIgnoreZoom).toBe(true);
+
+        // a pan frame between two ticks must not switch back to crisp
+        // rasterization — that re-rasterizes every element at a zoom the
+        // next tick is about to change again
+        fireEvent.pointerMove(GlobalTestState.interactiveCanvas, moved);
+        expect(h.state.shouldCacheIgnoreZoom).toBe(true);
+
+        wheel({ deltaY: -100, ...moved });
+        expect(h.state.shouldCacheIgnoreZoom).toBe(true);
+
+        // ...only once the zoom has been idle for a moment
+        await waitFor(() => {
+          expect(h.state.shouldCacheIgnoreZoom).toBe(false);
+        });
       });
     });
   });

@@ -683,7 +683,9 @@ describe("setViewport lock (integration)", () => {
     React.act(() => {
       h.app.viewport.setViewport({
         target: [2000, 2000, 3000, 3000],
-        animation: { duration: 1000 },
+        // long enough that it cannot complete on its own while the test
+        // waits for a frame below, even on a saturated CI machine
+        animation: { duration: 60_000 },
       });
     });
 
@@ -691,6 +693,11 @@ describe("setViewport lock (integration)", () => {
       true,
     );
     expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+
+    // the animation's frames draw from zoom-scaled bitmaps
+    await waitFor(() => {
+      expect(h.state.shouldCacheIgnoreZoom).toBe(true);
+    });
 
     React.act(() => {
       h.app.viewport.translate({ scrollX: 123, scrollY: 456 });
@@ -701,6 +708,9 @@ describe("setViewport lock (integration)", () => {
     );
     expect(h.state.scrollX).toBe(123);
     expect(h.state.scrollY).toBe(456);
+    // the interrupted animation's completion handler no longer runs, so the
+    // interrupting gesture switches back to crisp rasterization itself
+    expect(h.state.shouldCacheIgnoreZoom).toBe(false);
   });
 
   it("applies back-to-back lock updates in call order", async () => {
