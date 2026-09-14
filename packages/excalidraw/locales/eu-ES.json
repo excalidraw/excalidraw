@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Gezi azala",
-    "midpointSnapping": "Lotu erdiko puntuetara"
+    "midpointSnapping": "Lotu erdiko puntuetara",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Estekatu objektura",
