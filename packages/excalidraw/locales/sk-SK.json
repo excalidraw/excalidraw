@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Pripájanie šípky",
-    "midpointSnapping": "Prichytiť k bodom"
+    "midpointSnapping": "Prichytiť k bodom",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Odkaz na objekt",
