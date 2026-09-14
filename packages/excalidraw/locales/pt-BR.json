@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Atalho de flecha",
-    "midpointSnapping": "Encaixar em pontos intermediários"
+    "midpointSnapping": "Encaixar em pontos intermediários",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Links para o objeto",
