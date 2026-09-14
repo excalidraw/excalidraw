@@ -196,7 +196,10 @@
     "boxSelectionContain": "دربرگیری",
     "boxSelectionOverlap": "هم‌پوشانی",
     "arrowBinding": "اتصال پیکان",
-    "midpointSnapping": "چسبیدن به نقاط میانی"
+    "midpointSnapping": "چسبیدن به نقاط میانی",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "لینک به آیتم",
