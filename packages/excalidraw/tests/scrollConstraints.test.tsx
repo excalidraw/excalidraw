@@ -1202,6 +1202,43 @@ describe("rubberband overscroll (integration)", () => {
     mouse.up();
   });
 
+  it("keeps the rubberband overscroll when a pan lands in the same React flush as a wheel-zoom tick", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+    });
+
+    // rubberband past the top edge
+    for (let i = 0; i < 20; i++) {
+      Keyboard.keyPress(KEYS.PAGE_UP);
+    }
+    expect(h.state.scrollY).toBeGreaterThan(
+      constrainScrollState(h.state).scrollY,
+    );
+
+    // a zoom tick and a pan queued in one flush (a pan frame runs before
+    // React has flushed the zoom): the pan's constraint pass must not read
+    // the zoom change as its own and hard-clamp the overscroll to zero
+    React.act(() => {
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+        ctrlKey: true,
+        deltaY: -10,
+      });
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: 1 });
+    });
+
+    expect(h.state.scrollY).toBeGreaterThan(
+      constrainScrollState(h.state).scrollY,
+    );
+  });
+
   it("continues rubberband snap-back while wheel-zooming", async () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
     await waitFor(() => expect(h.state.width).toBe(200));

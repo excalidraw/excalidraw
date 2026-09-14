@@ -760,20 +760,21 @@ export class AppViewport {
     }
     this.app.requestUnfollow();
 
-    const prevZoom = this.app.state.zoom.value;
-    this.app.setState(state);
-
-    this.app.setState((prevState) => {
-      if (!prevState.scrollConstraints) {
-        return null;
+    this.app.setState((prevState, props) => {
+      const update =
+        typeof state === "function" ? state(prevState, props) : state;
+      const nextState = { ...prevState, ...update };
+      if (!nextState.scrollConstraints) {
+        return update;
       }
       const zoomed =
-        !opts?.zoomPreConstrained && prevState.zoom.value !== prevZoom;
-      const overscroll = zoomed ? 0 : prevState.scrollConstraints.overscroll;
+        !opts?.zoomPreConstrained &&
+        nextState.zoom.value !== prevState.zoom.value;
+      const overscroll = zoomed ? 0 : nextState.scrollConstraints.overscroll;
       if (overscroll > 0) {
         this.snapBackDebounced();
       }
-      return constrainScrollState(prevState, overscroll);
+      return { ...nextState, ...constrainScrollState(nextState, overscroll) };
     });
 
     return true;
