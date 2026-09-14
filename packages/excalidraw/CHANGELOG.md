@@ -13,6 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.
+- New `appState.inputDevice` preference (`"auto" | "mouse" | "trackpad"`, default `"auto"`, persisted in browser storage) selecting the wheel mappings. With `"trackpad"` a plain wheel pans and ctrl/cmd+wheel (how a pinch is delivered) zooms, as before; with `"mouse"` a plain wheel zooms and ctrl/cmd+wheel pans vertically instead, while shift+wheel keeps panning horizontally and the wheel-button zoom above is unaffected. `"auto"` is reserved for detecting the device from the wheel events and resolves to `"trackpad"` until that is implemented (`resolveInputDevice()`). Set it from the new "Input device" radio in the main menu's preferences submenu, also exposed as `MainMenu.DefaultItems.Preferences.InputDevice`.
+
 ### Sticky notes (2026-09-06) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - New `stickynote` element type and toolbar tool (`N`): an always-filled, flat-rendered note whose label auto-fits — the font shrinks from the user's size down to a minimum, and only then does the note grow in height (it never shrinks below the height the user gave it). Click to place a 250×250 note, drag to size it (previewed at the dragged size, snapped to a font-aware minimum on release); text editing starts right away.

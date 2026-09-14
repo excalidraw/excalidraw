@@ -683,7 +683,9 @@ describe("setViewport lock (integration)", () => {
     React.act(() => {
       h.app.viewport.setViewport({
         target: [2000, 2000, 3000, 3000],
-        animation: { duration: 1000 },
+        // long enough that it cannot complete on its own while the test
+        // waits for a frame below, even on a saturated CI machine
+        animation: { duration: 60_000 },
       });
     });
 
@@ -691,6 +693,11 @@ describe("setViewport lock (integration)", () => {
       true,
     );
     expect(h.app.viewport.isLockedTransitionPending).toBe(false);
+
+    // the animation's frames draw from zoom-scaled bitmaps
+    await waitFor(() => {
+      expect(h.state.shouldCacheIgnoreZoom).toBe(true);
+    });
 
     React.act(() => {
       h.app.viewport.translate({ scrollX: 123, scrollY: 456 });
@@ -701,6 +708,9 @@ describe("setViewport lock (integration)", () => {
     );
     expect(h.state.scrollX).toBe(123);
     expect(h.state.scrollY).toBe(456);
+    // the interrupted animation's completion handler no longer runs, so the
+    // interrupting gesture switches back to crisp rasterization itself
+    expect(h.state.shouldCacheIgnoreZoom).toBe(false);
   });
 
   it("applies back-to-back lock updates in call order", async () => {
@@ -1190,6 +1200,43 @@ describe("rubberband overscroll (integration)", () => {
       AnimationController.running(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY),
     ).toBe(false);
     mouse.up();
+  });
+
+  it("keeps the rubberband overscroll when a pan lands in the same React flush as a wheel-zoom tick", async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    React.act(() => {
+      h.app.viewport.setViewport({
+        target: [0, 0, 1000, 1000],
+        fit: "scale-down",
+        animation: false,
+        lock: { scroll: true, overscroll: 50 },
+      });
+    });
+
+    // rubberband past the top edge
+    for (let i = 0; i < 20; i++) {
+      Keyboard.keyPress(KEYS.PAGE_UP);
+    }
+    expect(h.state.scrollY).toBeGreaterThan(
+      constrainScrollState(h.state).scrollY,
+    );
+
+    // a zoom tick and a pan queued in one flush (a pan frame runs before
+    // React has flushed the zoom): the pan's constraint pass must not read
+    // the zoom change as its own and hard-clamp the overscroll to zero
+    React.act(() => {
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, {
+        ctrlKey: true,
+        deltaY: -10,
+      });
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: 1 });
+    });
+
+    expect(h.state.scrollY).toBeGreaterThan(
+      constrainScrollState(h.state).scrollY,
+    );
   });
 
   it("continues rubberband snap-back while wheel-zooming", async () => {
