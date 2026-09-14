@@ -67,6 +67,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "gridStep": 5,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -122,6 +123,5 @@ exports[`exportToSvg > with default arguments 1`] = `
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;

@@ -67,6 +67,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -131,7 +132,6 @@ exports[`given element A and group of elements B and given both are selected whe
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -507,6 +507,7 @@ exports[`given element A and group of elements B and given both are selected whe
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -573,7 +574,6 @@ exports[`given element A and group of elements B and given both are selected whe
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -937,6 +937,7 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -994,7 +995,6 @@ exports[`regression tests > Cmd/Ctrl-click exclusively select element under poin
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -1517,6 +1517,7 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1574,7 +1575,6 @@ exports[`regression tests > Drags selected element when hitting only bounding bo
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -1736,6 +1736,7 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -1798,7 +1799,6 @@ exports[`regression tests > adjusts z order when grouping > [end of test] appSta
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -2134,6 +2134,7 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2193,7 +2194,6 @@ exports[`regression tests > alt-drag duplicates an element > [end of test] appSt
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -2392,6 +2392,7 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2449,7 +2450,6 @@ exports[`regression tests > arrow keys > [end of test] appState 1`] = `
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -2584,6 +2584,7 @@ exports[`regression tests > can drag element that covers another element, while 
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2643,7 +2644,6 @@ exports[`regression tests > can drag element that covers another element, while 
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -2923,6 +2923,7 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -2980,7 +2981,6 @@ exports[`regression tests > change the properties of a shape > [end of test] app
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -3190,6 +3190,7 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3249,7 +3250,6 @@ exports[`regression tests > click on an element and drag it > [dragged] appState
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -3444,6 +3444,7 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3503,7 +3504,6 @@ exports[`regression tests > click on an element and drag it > [end of test] appS
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -3692,6 +3692,7 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -3751,7 +3752,6 @@ exports[`regression tests > click to select a shape > [end of test] appState 1`]
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -3963,6 +3963,7 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -4023,7 +4024,6 @@ exports[`regression tests > click-drag to select a group > [end of test] appStat
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -4291,6 +4291,7 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -4350,7 +4351,6 @@ exports[`regression tests > deleting last but one element in editing group shoul
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -4740,6 +4740,7 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -4827,7 +4828,6 @@ exports[`regression tests > deselects group of selected elements on pointer down
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -5037,6 +5037,7 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5095,7 +5096,6 @@ exports[`regression tests > deselects group of selected elements on pointer up w
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -5326,6 +5326,7 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5412,7 +5413,6 @@ exports[`regression tests > deselects selected element on pointer down when poin
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -5547,6 +5547,7 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5604,7 +5605,6 @@ exports[`regression tests > deselects selected element, on pointer up, when clic
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -5759,6 +5759,7 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -5816,7 +5817,6 @@ exports[`regression tests > double click to edit a group > [end of test] appStat
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -6166,6 +6166,7 @@ exports[`regression tests > drags selected elements from point inside common bou
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -6227,7 +6228,6 @@ exports[`regression tests > drags selected elements from point inside common bou
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -6476,6 +6476,7 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -6531,7 +6532,6 @@ exports[`regression tests > draw every type of shape > [end of test] appState 1`
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -7287,6 +7287,7 @@ exports[`regression tests > given a group of selected elements with an element t
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -7347,7 +7348,6 @@ exports[`regression tests > given a group of selected elements with an element t
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -7635,6 +7635,7 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -7695,7 +7696,6 @@ exports[`regression tests > given a selected element A and a not selected elemen
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -7927,6 +7927,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -7986,7 +7987,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -8175,6 +8175,7 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -8234,7 +8235,6 @@ exports[`regression tests > given selected element A with lower z-index than uns
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -8428,6 +8428,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -8485,7 +8486,6 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -8620,6 +8620,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -8677,7 +8678,6 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -8812,6 +8812,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -8869,7 +8870,6 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -9004,6 +9004,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9092,7 +9093,6 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] appState 1`
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -9249,6 +9249,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9337,7 +9338,6 @@ exports[`regression tests > key 6 selects line tool > [end of test] appState 1`]
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -9492,6 +9492,7 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9547,7 +9548,6 @@ exports[`regression tests > key 7 selects freedraw tool > [end of test] appState
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -9700,6 +9700,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -9788,7 +9789,6 @@ exports[`regression tests > key a selects arrow tool > [end of test] appState 1`
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -9945,6 +9945,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -10002,7 +10003,6 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -10137,6 +10137,7 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -10225,7 +10226,6 @@ exports[`regression tests > key l selects line tool > [end of test] appState 1`]
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -10380,6 +10380,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -10437,7 +10438,6 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -10572,6 +10572,7 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -10627,7 +10628,6 @@ exports[`regression tests > key p selects freedraw tool > [end of test] appState
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -10780,6 +10780,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -10837,7 +10838,6 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -10972,6 +10972,7 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -11037,7 +11038,6 @@ exports[`regression tests > make a group and duplicate it > [end of test] appSta
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -11520,6 +11520,7 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -11579,7 +11580,6 @@ exports[`regression tests > noop interaction after undo shouldn't create history
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -11813,6 +11813,7 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -11868,7 +11869,6 @@ exports[`regression tests > pinch-to-zoom works > [end of test] appState 1`] = `
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -11947,6 +11947,7 @@ exports[`regression tests > shift click on selected element should deselect it o
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -12004,7 +12005,6 @@ exports[`regression tests > shift click on selected element should deselect it o
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -12159,6 +12159,7 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -12220,7 +12221,6 @@ exports[`regression tests > shift-click to multiselect, then drag > [end of test
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -12491,6 +12491,7 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -12554,7 +12555,6 @@ exports[`regression tests > should group elements and ungroup them > [end of tes
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -12934,6 +12934,7 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -13001,7 +13002,6 @@ exports[`regression tests > single-clicking on a subgroup of a selected group sh
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -13589,6 +13589,7 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -13647,7 +13648,6 @@ exports[`regression tests > spacebar + drag scrolls the canvas > [end of test] a
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -13726,6 +13726,7 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -13785,7 +13786,6 @@ exports[`regression tests > supports nested groups > [end of test] appState 1`] 
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -14371,6 +14371,7 @@ exports[`regression tests > switches from group of selected elements to another 
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -14460,7 +14461,6 @@ exports[`regression tests > switches from group of selected elements to another 
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -14725,6 +14725,7 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -14813,7 +14814,6 @@ exports[`regression tests > switches selected element on pointer down > [end of 
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -15003,6 +15003,7 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -15058,7 +15059,6 @@ exports[`regression tests > two-finger scroll works > [end of test] appState 1`]
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -15137,6 +15137,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -15194,7 +15195,6 @@ exports[`regression tests > undo/redo drawing an element > [end of test] appStat
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -15515,6 +15515,7 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -15570,7 +15571,6 @@ exports[`regression tests > updates fontSize & fontFamily appState > [end of tes
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 
@@ -15649,6 +15649,7 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "height": 768,
   "hoveredArrowTextAnchor": null,
   "hoveredElementIds": {},
+  "inputDevice": "auto",
   "isBindingEnabled": true,
   "isCropping": false,
   "isLoading": false,
@@ -15707,7 +15708,6 @@ exports[`regression tests > zoom hotkeys > [end of test] appState 1`] = `
   "zoom": {
     "value": 1,
   },
-  "zoomWithScrollWheel": false,
 }
 `;
 

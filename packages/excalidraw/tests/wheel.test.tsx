@@ -4,7 +4,7 @@ import { vi } from "vitest";
 
 import { CLASSES, viewportCoordsToSceneCoords } from "@excalidraw/common";
 
-import { actionToggleZoomWithScrollWheel } from "../actions";
+import { resolveInputDevice } from "../appState";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -245,22 +245,15 @@ describe("wheel navigation", () => {
     });
   });
 
-  describe("zoomWithScrollWheel preference", () => {
-    it("is off by default and toggled by its action", () => {
-      expect(h.state.zoomWithScrollWheel).toBe(false);
-      React.act(() => {
-        h.app.actionManager.executeAction(actionToggleZoomWithScrollWheel);
-      });
-      expect(h.state.zoomWithScrollWheel).toBe(true);
-      React.act(() => {
-        h.app.actionManager.executeAction(actionToggleZoomWithScrollWheel);
-      });
-      expect(h.state.zoomWithScrollWheel).toBe(false);
+  describe("inputDevice preference", () => {
+    it("defaults to auto, which resolves to trackpad until detection exists", () => {
+      expect(h.state.inputDevice).toBe("auto");
+      expect(resolveInputDevice(h.state.inputDevice)).toBe("trackpad");
     });
 
-    describe("enabled", () => {
+    describe("mouse", () => {
       beforeEach(() => {
-        API.setAppState({ zoomWithScrollWheel: true });
+        API.setAppState({ inputDevice: "mouse" });
       });
 
       it("zooms on plain wheel and pans vertically on ctrl/cmd+wheel", () => {

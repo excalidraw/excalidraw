@@ -197,7 +197,9 @@
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints",
-    "zoomWithScrollWheel": "Zoom with scroll wheel"
+    "inputDevice": "Input",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Mouse"
   },
   "elementLink": {
     "title": "Link to object",

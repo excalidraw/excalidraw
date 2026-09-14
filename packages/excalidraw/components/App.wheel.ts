@@ -1,5 +1,6 @@
 import { CLASSES, KEYS, MIN_ZOOM, ZOOM_STEP } from "@excalidraw/common";
 
+import { resolveInputDevice } from "../appState";
 import { withBatchedUpdates } from "../reactUtils";
 import { getNormalizedZoom } from "../scene";
 import { getViewportForZoomWithScrollConstraints } from "../viewport";
@@ -13,8 +14,8 @@ const WHEEL_BUTTON_MASK = 4;
  * Wheel input over the editor: pans the canvas, or zooms it around the
  * pointer (`viewport.lastPosition`) — on ctrl/cmd+wheel (which is also how
  * a trackpad pinch is delivered), while the wheel button itself is held
- * down, or on a plain wheel with the `zoomWithScrollWheel` preference (which
- * makes ctrl/cmd+wheel pan instead).
+ * down, or on a plain wheel when the input device is a mouse
+ * (`appState.inputDevice`; ctrl/cmd+wheel pans instead then).
  */
 export class AppWheel {
   constructor(
@@ -82,9 +83,9 @@ export class AppWheel {
     const hasZoomModifier = event.metaKey || event.ctrlKey;
     const shouldZoom =
       isWheelButtonHeld ||
-      (this.app.state.zoomWithScrollWheel
-        ? // the preference swaps the roles: a plain wheel zooms, and any
-          // modifier pans instead (ctrl/cmd vertically, shift horizontally)
+      (resolveInputDevice(this.app.state.inputDevice) === "mouse"
+        ? // a mouse has no pinch: a plain wheel zooms, and any modifier
+          // pans instead (ctrl/cmd vertically, shift horizontally)
           !hasZoomModifier && !event.shiftKey
         : hasZoomModifier);
     if (shouldZoom) {

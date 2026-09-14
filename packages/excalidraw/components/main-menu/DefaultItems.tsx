@@ -17,9 +17,10 @@ import {
   actionToggleStats,
   actionToggleTheme,
   actionToggleZenMode,
-  actionToggleZoomWithScrollWheel,
 } from "../../actions";
 import { actionToggleViewMode } from "../../actions/actionToggleViewMode";
+import { resolveInputDevice } from "../../appState";
+
 import { getShortcutFromShortcutName } from "../../actions/shortcuts";
 import { trackEvent } from "../../analytics";
 import { useUIAppState } from "../../context/ui-appState";
@@ -63,6 +64,8 @@ import {
 } from "../icons";
 
 import "./DefaultItems.scss";
+
+import type { InputDevice } from "../../types";
 
 export const LoadScene = () => {
   const { t } = useI18n();
@@ -474,20 +477,37 @@ const PreferencesBoxSelectionModeItem = () => {
   );
 };
 
-const PreferencesToggleZoomWithScrollWheelItem = () => {
+const PreferencesInputDeviceItem = () => {
   const { t } = useI18n();
-  const actionManager = useExcalidrawActionManager();
   const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
   return (
-    <DropdownMenuItemCheckbox
-      checked={appState.zoomWithScrollWheel}
-      onSelect={(event) => {
-        actionManager.executeAction(actionToggleZoomWithScrollWheel);
-        event.preventDefault();
+    <DropdownMenuItemContentRadio<Exclude<InputDevice, "auto">>
+      name="inputDevice"
+      icon={emptyIcon}
+      // `auto` isn't offered yet; the radio shows what it resolves to
+      value={resolveInputDevice(appState.inputDevice)}
+      onChange={(value) => {
+        setAppState({
+          inputDevice: value,
+        });
       }}
+      choices={[
+        {
+          value: "trackpad",
+          label: t("labels.inputDeviceTrackpad"),
+          ariaLabel: t("labels.inputDeviceTrackpad"),
+        },
+        {
+          value: "mouse",
+          label: t("labels.inputDeviceMouse"),
+          ariaLabel: t("labels.inputDeviceMouse"),
+        },
+      ]}
     >
-      {t("labels.zoomWithScrollWheel")}
-    </DropdownMenuItemCheckbox>
+      {t("labels.inputDevice")}
+    </DropdownMenuItemContentRadio>
   );
 };
 
@@ -636,7 +656,7 @@ export const Preferences = ({
         {children || (
           <>
             <PreferencesBoxSelectionModeItem />
-            <PreferencesToggleZoomWithScrollWheelItem />
+            <PreferencesInputDeviceItem />
             <PreferencesToggleToolLockItem />
             <PreferencesToggleSnapModeItem />
             <PreferencesToggleGridModeItem />
@@ -655,8 +675,7 @@ export const Preferences = ({
 
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.BoxSelectionMode = PreferencesBoxSelectionModeItem;
-Preferences.ToggleZoomWithScrollWheel =
-  PreferencesToggleZoomWithScrollWheelItem;
+Preferences.InputDevice = PreferencesInputDeviceItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
