@@ -654,6 +654,9 @@ export const Preferences = ({
 
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.SelectionMode = PreferencesSelectionModeItem;
+Preferences.BoxSelectionMode = () => (
+  <PreferencesSelectionModeItem type="rectangle" />
+);
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
