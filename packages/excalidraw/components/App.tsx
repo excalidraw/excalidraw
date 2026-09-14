@@ -13312,9 +13312,34 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasContextMenu = (
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
   ) => {
-    // Always suppress the native menu over the canvas. In non-interactive
-    // mode we stop here so it cannot be mistaken for Excalidraw's own menu.
+    // Always suppress the native menu over the canvas.
     event.preventDefault();
+    // a secondary-button press is a pan session, which opens the menu
+    // itself if the press turns out to be a click — this event is the
+    // platform's, fired on mousedown or on mouseup depending on the OS
+    if (this.pan.consumesContextMenuEvent()) {
+      return;
+    }
+    this.openContextMenu({
+      clientX: event.clientX,
+      clientY: event.clientY,
+      button: event.button,
+      pointerType:
+        "pointerType" in event.nativeEvent
+          ? (event.nativeEvent as PointerEvent).pointerType
+          : undefined,
+    });
+  };
+
+  /** opens the context menu for the element under the pointer, or the canvas */
+  public openContextMenu = (pointer: {
+    clientX: number;
+    clientY: number;
+    button?: number;
+    pointerType?: string;
+  }) => {
+    // In non-interactive mode there is no menu, so the native one cannot be
+    // mistaken for Excalidraw's own.
     if (!this.isInteractionEnabled()) {
       return;
     }
@@ -13324,18 +13349,16 @@ class App extends React.Component<AppProps, AppState> {
     this.bucketFill.cancel();
 
     if (
-      (("pointerType" in event.nativeEvent &&
-        event.nativeEvent.pointerType === "touch") ||
-        ("pointerType" in event.nativeEvent &&
-          event.nativeEvent.pointerType === "pen" &&
+      (pointer.pointerType === "touch" ||
+        (pointer.pointerType === "pen" &&
           // always allow if user uses a pen secondary button
-          event.button !== POINTER_BUTTON.SECONDARY)) &&
+          pointer.button !== POINTER_BUTTON.SECONDARY)) &&
       this.state.activeTool.type !== this.state.preferredSelectionTool.type
     ) {
       return;
     }
 
-    const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+    const { x, y } = viewportCoordsToSceneCoords(pointer, this.state);
     const element = this.getElementAtPosition(x, y, {
       preferSelected: true,
       includeLockedElements: true,
@@ -13353,8 +13376,8 @@ class App extends React.Component<AppProps, AppState> {
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =
       container.getBoundingClientRect();
-    const left = event.clientX - offsetLeft;
-    const top = event.clientY - offsetTop;
+    const left = pointer.clientX - offsetLeft;
+    const top = pointer.clientY - offsetTop;
 
     trackEvent("contextMenu", "openContextMenu", type);
 

@@ -1,4 +1,9 @@
-import { CURSOR_TYPE, EVENT, POINTER_BUTTON } from "@excalidraw/common";
+import {
+  CURSOR_TYPE,
+  DRAGGING_THRESHOLD,
+  EVENT,
+  POINTER_BUTTON,
+} from "@excalidraw/common";
 
 import { isHandToolActive } from "../appState";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
@@ -8,15 +13,27 @@ import type React from "react";
 import type App from "./App";
 
 /**
- * The drag-pan: a pointer drag that moves the canvas — the wheel button,
- * the main button while space is held or the hand tool is active, or any
- * button in view mode. One session at a time, owning its window listeners
- * and teardown; wheel input is gated on it (see `AppWheel`).
+ * The drag-pan: a pointer drag that moves the canvas — the wheel or the
+ * secondary button, the main button while space is held or the hand tool
+ * is active, or any button in view mode. One session at a time, owning its
+ * window listeners and teardown; wheel input is gated on it (see
+ * `AppWheel`).
+ *
+ * A secondary-button session is a pan only once the pointer travels past
+ * the drag threshold; released before that, it is a right-click and the
+ * session opens the context menu itself.
  */
 export class AppPan {
   /** space held down turns a main-button drag into a pan */
   private spaceHeld = false;
   private active = false;
+  /** the secondary-button session, while one is active */
+  private secondary: { engaged: boolean; nativeMenuSeen: boolean } | null =
+    null;
+  /** the platform fires `contextmenu` on mouseup (Windows) or on mousedown
+   * (macOS, Linux); the one belonging to a secondary-button session is not a
+   * new click, whichever side of the session it lands on */
+  private suppressNextContextMenu = false;
   /** applies the pointer move the session is holding back for its next
    * frame, if any */
   private pendingMoveFlush: (() => void) | null = null;
@@ -49,14 +66,35 @@ export class AppPan {
     this.teardown?.();
   };
 
+  /**
+   * Whether a `contextmenu` event belongs to a secondary-button session —
+   * which opens the menu itself, on release without a drag — and must not
+   * open it again.
+   */
+  consumesContextMenuEvent = () => {
+    if (this.secondary) {
+      this.secondary.nativeMenuSeen = true;
+      return true;
+    }
+    if (this.suppressNextContextMenu) {
+      this.suppressNextContextMenu = false;
+      return true;
+    }
+    return false;
+  };
+
   /** starts a session for the pointerdown if it qualifies; returns whether
    * it did */
   start = (event: React.PointerEvent<HTMLElement> | MouseEvent): boolean => {
     const { app } = this;
+    // a new press supersedes whatever the previous session left pending
+    this.suppressNextContextMenu = false;
+    const isSecondary = event.button === POINTER_BUTTON.SECONDARY;
     if (
       !(
         this.dependencies.getPointerCount() <= 1 &&
         (((event.button === POINTER_BUTTON.WHEEL ||
+          isSecondary ||
           (event.button === POINTER_BUTTON.MAIN && this.spaceHeld) ||
           isHandToolActive(app.state)) &&
           // reachable while non-interactive when the active tool is allowed
@@ -69,6 +107,9 @@ export class AppPan {
       return false;
     }
     this.active = true;
+    this.secondary = isSecondary
+      ? { engaged: false, nativeMenuSeen: false }
+      : null;
 
     // due to event.preventDefault below, container wouldn't get focus
     // automatically
@@ -86,9 +127,28 @@ export class AppPan {
     let nextPastePrevented = false;
     const isLinux = /Linux/.test(app.ownerWindow.navigator.platform);
 
-    app.cursor.set(CURSOR_TYPE.GRABBING);
+    if (!this.secondary) {
+      app.cursor.set(CURSOR_TYPE.GRABBING);
+    }
+    const { clientX: startX, clientY: startY } = event;
     let { clientX: lastX, clientY: lastY } = event;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
+      if (this.secondary && !this.secondary.engaged) {
+        // a right-click until the pointer travels far enough for a drag
+        if (
+          Math.hypot(event.clientX - startX, event.clientY - startY) <=
+          DRAGGING_THRESHOLD
+        ) {
+          return;
+        }
+        this.secondary.engaged = true;
+        app.cursor.set(CURSOR_TYPE.GRABBING);
+        // pans from here on; the threshold distance is not caught up
+        lastX = event.clientX;
+        lastY = event.clientY;
+        return;
+      }
+
       const deltaX = lastX - event.clientX;
       const deltaY = lastY - event.clientY;
       lastX = event.clientX;
@@ -146,27 +206,50 @@ export class AppPan {
       }));
     });
     this.pendingMoveFlush = onPointerMove.flush;
-    const teardown = withBatchedUpdates(() => {
-      this.teardown = null;
-      this.pendingMoveFlush = null;
-      this.active = false;
-      if (!this.spaceHeld) {
-        app.cursor.reset();
-      }
-      app.setState(
-        {
-          cursorButton: "up",
-        },
-        // Runs after the trailing throttled pointer move has committed, so
-        // the snap-back starts from the pan's actual final viewport.
-        app.viewport.releaseOverscroll,
-      );
-      app.savePointer(event.clientX, event.clientY, "up");
-      app.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      app.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
-      app.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
-      onPointerMove.flush();
-    });
+    const teardown = withBatchedUpdates(
+      (upEvent?: PointerEvent | FocusEvent) => {
+        const { secondary } = this;
+        this.teardown = null;
+        this.pendingMoveFlush = null;
+        this.active = false;
+        this.secondary = null;
+        if (secondary && !secondary.nativeMenuSeen) {
+          // the platform's `contextmenu` for this press is still to come
+          this.suppressNextContextMenu = true;
+        }
+        if (!this.spaceHeld) {
+          app.cursor.reset();
+        }
+        app.setState(
+          {
+            cursorButton: "up",
+          },
+          // Runs after the trailing throttled pointer move has committed, so
+          // the snap-back starts from the pan's actual final viewport.
+          app.viewport.releaseOverscroll,
+        );
+        app.savePointer(event.clientX, event.clientY, "up");
+        app.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
+        app.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
+        app.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
+        onPointerMove.flush();
+
+        // released without a drag: a right-click, at the release point
+        if (
+          secondary &&
+          !secondary.engaged &&
+          upEvent &&
+          "clientX" in upEvent
+        ) {
+          app.openContextMenu({
+            clientX: upEvent.clientX,
+            clientY: upEvent.clientY,
+            button: upEvent.button,
+            pointerType: upEvent.pointerType,
+          });
+        }
+      },
+    );
     this.teardown = teardown;
     app.ownerWindow.addEventListener(EVENT.BLUR, teardown);
     app.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
