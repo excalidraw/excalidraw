@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Pijlverbinding",
-    "midpointSnapping": "Vastklikken op middelpunt"
+    "midpointSnapping": "Vastklikken op middelpunt",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Link naar object",
