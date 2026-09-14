@@ -2,13 +2,13 @@ import React from "react";
 import { fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { viewportCoordsToSceneCoords } from "@excalidraw/common";
+import { CLASSES, viewportCoordsToSceneCoords } from "@excalidraw/common";
 
 import { actionToggleZoomWithScrollWheel } from "../actions";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
-import { GlobalTestState, render } from "./test-utils";
+import { GlobalTestState, mockBoundingClientRect, render } from "./test-utils";
 
 const { h } = window;
 
@@ -298,5 +298,37 @@ describe("wheel navigation", () => {
         expect(h.state.zoom.value).toBeGreaterThan(start.zoom);
       });
     });
+  });
+});
+
+describe("wheel over a frame label", () => {
+  beforeEach(async () => {
+    // frame labels render only for frames inside the measured viewport
+    mockBoundingClientRect();
+    await render(<Excalidraw />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+  });
+
+  it("is handled once", async () => {
+    const frame = API.createElement({
+      type: "frame",
+      x: 20,
+      y: 30,
+      width: 80,
+      height: 50,
+    });
+    API.setElements([frame]);
+    const label = await waitFor(() => {
+      const element = document.querySelector(`.${CLASSES.FRAME_NAME}`);
+      expect(element).not.toBe(null);
+      return element as HTMLElement;
+    });
+
+    // the label is DOM inside the editor container, whose wheel listener
+    // accepts it; a React `onWheel` on the label itself used to handle the
+    // same event a second time, panning and zooming twice per tick
+    const start = getViewport();
+    fireEvent.wheel(label, { deltaY: 40 });
+    expect(h.state.scrollY).toBeCloseTo(start.scrollY - 40 / start.zoom);
   });
 });

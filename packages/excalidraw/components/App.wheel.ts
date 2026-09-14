@@ -4,13 +4,7 @@ import { withBatchedUpdates } from "../reactUtils";
 import { getNormalizedZoom } from "../scene";
 import { getViewportForZoomWithScrollConstraints } from "../viewport";
 
-import type React from "react";
-
 import type App from "./App";
-
-type EditorWheelEvent =
-  | WheelEvent
-  | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>;
 
 /** `MouseEvent.buttons` bit of the wheel (middle) button */
 const WHEEL_BUTTON_MASK = 4;
@@ -36,8 +30,9 @@ export class AppWheel {
   ) {}
 
   /** the editor surfaces whose wheel input the editor consumes; everywhere
-   * else (menus, sidebars, …) the DOM keeps scrolling */
-  private isOverEditorSurface = (event: EditorWheelEvent) => {
+   * else (menus, sidebars, …) the DOM keeps scrolling. The frame-name labels
+   * are DOM, but sit inside the container this listener is attached to */
+  private isOverEditorSurface = (event: WheelEvent) => {
     const { ownerWindow } = this.app;
     return (
       event.target instanceof ownerWindow.HTMLCanvasElement ||
@@ -48,7 +43,7 @@ export class AppWheel {
     );
   };
 
-  handle = withBatchedUpdates((event: EditorWheelEvent) => {
+  handle = withBatchedUpdates((event: WheelEvent) => {
     // NOTE no preventDefault so the page can scroll over the editor
     if (!this.app.isNavigationEnabled()) {
       return;
