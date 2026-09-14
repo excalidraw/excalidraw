@@ -56,6 +56,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawLineElement,
   ExcalidrawStickyNoteElement,
+  StickyNoteShape,
 } from "./types";
 
 export type ElementConstructorOpts = MarkOptional<
@@ -231,6 +232,7 @@ export const newStickyNoteElement = (
   opts: {
     type: "stickynote";
     baseHeight?: number;
+    stickyShape?: StickyNoteShape;
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawStickyNoteElement> => {
   const base = _newElementBase<ExcalidrawStickyNoteElement>("stickynote", opts);
@@ -239,6 +241,9 @@ export const newStickyNoteElement = (
   return normalizeStickyNoteStyle({
     ...base,
     baseHeight: opts.baseHeight ?? base.height,
+    // kept off the element entirely when absent, so a plain note serializes
+    // exactly as it did before this form existed
+    ...(opts.stickyShape ? { stickyShape: opts.stickyShape } : {}),
   });
 };
 

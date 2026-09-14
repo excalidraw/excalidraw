@@ -380,6 +380,19 @@ describe("sticky notes", () => {
       Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
     });
 
+    it("creates notes on the paper picked before drawing", async () => {
+      API.setAppState({ currentItemStickyShape: "ruled" });
+      UI.clickTool("stickynote");
+      mouse.downAt(300, 300);
+      mouse.up();
+
+      const note = h.elements.find(
+        (element) => element.type === "stickynote",
+      ) as ExcalidrawStickyNoteElement;
+      expect(note.stickyShape).toBe("ruled");
+      Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
+    });
+
     it("binding a transparent text to a note gives it the note's text color", () => {
       const note = API.createElement({
         type: "stickynote",

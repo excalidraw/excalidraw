@@ -258,6 +258,13 @@ export const STICKY_NOTE_SHADOW_OFFSET = 3;
 export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
 export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
 export const STICKY_NOTE_EDGE_SHADOW_OPACITY = 0.08;
+/**
+ * The rules of a ruled note are painted as black at low alpha over the paper,
+ * like the drop shadow and the edge shading, so they read on every paper color
+ * without either renderer doing color math.
+ */
+export const STICKY_NOTE_RULE_OPACITY = 0.2;
+export const STICKY_NOTE_RULE_WIDTH = 1;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";

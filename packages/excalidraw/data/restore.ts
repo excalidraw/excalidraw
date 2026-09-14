@@ -738,6 +738,7 @@ export const restoreElement = (
             element.baseHeight ??
             (element as typeof element & { maxHeight?: number }).maxHeight ??
             element.height,
+          stickyShape: element.stickyShape,
         }),
       );
     case "magicframe":

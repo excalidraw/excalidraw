@@ -11,6 +11,7 @@ import {
   STICKY_NOTE_MIN_SIZE,
   STICKY_NOTE_PADDING,
   VERTICAL_ALIGN,
+  getVerticalOffset,
   arrayToMap,
 } from "@excalidraw/common";
 import {
@@ -37,10 +38,13 @@ import {
   getStickyNoteDateLabel,
   getStickyNoteFooter,
   getStickyNoteMinSize,
+  getStickyNoteRuleFontKey,
+  getStickyNoteRuleLines,
   syncStickyNoteInk,
   normalizeStickyNoteFontSize,
   updateStickyNoteLayout,
 } from "../stickyNote";
+import { getLineHeightInPx } from "../textMeasurements";
 import * as textMeasurements from "../textMeasurements";
 import {
   computeBoundTextPosition,
@@ -68,6 +72,7 @@ const getBoundText = (scene: Scene, id: string) =>
 const createStickyWithText = (
   originalText: string,
   extraElements: ExcalidrawElement[] = [],
+  stickyShape?: ExcalidrawStickyNoteElement["stickyShape"],
 ) => {
   const baseSticky = newStickyNoteElement({
     type: "stickynote",
@@ -76,6 +81,7 @@ const createStickyWithText = (
     width: DEFAULT_STICKY_NOTE_SIZE,
     height: DEFAULT_STICKY_NOTE_SIZE,
     baseHeight: DEFAULT_STICKY_NOTE_SIZE,
+    stickyShape,
   });
   const text = newTextElement({
     x: baseSticky.x + baseSticky.width / 2,
@@ -1052,6 +1058,170 @@ describe("sticky note creation date", () => {
       sticky.height - STICKY_NOTE_BODY_INSET_Y,
     );
     scene.destroy();
+  });
+});
+
+describe("ruled sticky notes", () => {
+  const rulesOf = (scene: Scene, stickyId: string) =>
+    getStickyNoteRuleLines(
+      getSticky(scene, stickyId),
+      scene.getNonDeletedElementsMap(),
+    );
+
+  const ruleGap = (rules: ReturnType<typeof getStickyNoteRuleLines>) =>
+    rules[1].y1 - rules[0].y1;
+
+  it("rules only a ruled note", () => {
+    const plain = createStickyWithText("A");
+    expect(rulesOf(plain.scene, plain.stickyId)).toEqual([]);
+    plain.scene.destroy();
+
+    const ruled = createStickyWithText("A", [], "ruled");
+    expect(rulesOf(ruled.scene, ruled.stickyId).length).toBeGreaterThan(0);
+    ruled.scene.destroy();
+  });
+
+  it("splits the descender between the glyphs and the caret", () => {
+    const { scene, stickyId, textId } = createStickyWithText("A", [], "ruled");
+    const label = getBoundText(scene, textId);
+    const lineHeightPx = getLineHeightInPx(label.fontSize, label.lineHeight);
+    const baseline = getVerticalOffset(
+      label.fontFamily,
+      label.fontSize,
+      lineHeightPx,
+    );
+    const rules = rulesOf(scene, stickyId);
+
+    // a caret's foot is a descender below the baseline, so neither can sit on
+    // the rule; each gets half
+    rules.forEach((rule, index) => {
+      expect(rule.y1).toBeCloseTo(
+        STICKY_NOTE_PADDING +
+          index * lineHeightPx +
+          (baseline + lineHeightPx) / 2,
+      );
+      // a rule is horizontal and inset by the note's own padding
+      expect(rule.y2).toBe(rule.y1);
+      expect(rule.x1).toBe(STICKY_NOTE_PADDING);
+      expect(rule.x2).toBe(
+        getSticky(scene, stickyId).width - STICKY_NOTE_PADDING,
+      );
+    });
+
+    // the glyphs clear the rule by half a descender, and the caret, whose foot
+    // is a full descender down, passes the same distance below it
+    const descender = lineHeightPx - baseline;
+    expect(rules[0].y1 - (STICKY_NOTE_PADDING + baseline)).toBeCloseTo(
+      descender / 2,
+    );
+    scene.destroy();
+  });
+
+  it("stops the rules above the footer band", () => {
+    const { scene, stickyId } = createStickyWithText("A", [], "ruled");
+    const sticky = getSticky(scene, stickyId);
+    const bottom =
+      sticky.height - STICKY_NOTE_BODY_INSET_Y + STICKY_NOTE_PADDING;
+
+    for (const rule of rulesOf(scene, stickyId)) {
+      expect(rule.y1).toBeLessThanOrEqual(bottom);
+    }
+    scene.destroy();
+  });
+
+  it("re-spaces the rules when the fit changes the font size", () => {
+    const { scene, stickyId, textId } = createStickyWithText("A", [], "ruled");
+    // the scene mutates its elements in place, so keep the value, not the element
+    const fontSizeBefore = getBoundText(scene, textId).fontSize;
+    const gapBefore = ruleGap(rulesOf(scene, stickyId));
+
+    updateStickyNoteLayout(getSticky(scene, stickyId), scene, {
+      baseFontSize: fontSizeBefore / 2,
+    });
+
+    expect(getBoundText(scene, textId).fontSize).toBeLessThan(fontSizeBefore);
+    expect(ruleGap(rulesOf(scene, stickyId))).toBeLessThan(gapBefore);
+    scene.destroy();
+  });
+
+  it("writes from the first rule down rather than from the middle", () => {
+    const ruled = createStickyWithText("A", [], "ruled");
+    const sticky = getSticky(ruled.scene, ruled.stickyId);
+    const { y } = computeBoundTextPosition(
+      sticky,
+      getBoundText(ruled.scene, ruled.textId),
+      ruled.scene.getNonDeletedElementsMap(),
+    );
+
+    expect(y).toBe(sticky.y + STICKY_NOTE_PADDING);
+    ruled.scene.destroy();
+
+    // a plain note keeps centring its label
+    const plain = createStickyWithText("A");
+    const plainSticky = getSticky(plain.scene, plain.stickyId);
+    expect(
+      computeBoundTextPosition(
+        plainSticky,
+        getBoundText(plain.scene, plain.textId),
+        plain.scene.getNonDeletedElementsMap(),
+      ).y,
+    ).toBeGreaterThan(plainSticky.y + STICKY_NOTE_PADDING);
+    plain.scene.destroy();
+  });
+
+  it("writes from the left margin, whatever the label's alignment", () => {
+    const { scene, stickyId, textId } = createStickyWithText("A", [], "ruled");
+    const sticky = getSticky(scene, stickyId);
+    const label = getBoundText(scene, textId);
+
+    // the helper binds a centred label, as the editor does at a note's centre
+    expect(label.textAlign).toBe("left");
+    expect(label.x).toBe(sticky.x + STICKY_NOTE_PADDING);
+    scene.destroy();
+
+    // a plain note keeps whatever alignment its label was given
+    const plain = createStickyWithText("A");
+    expect(getBoundText(plain.scene, plain.textId).textAlign).toBe("center");
+    plain.scene.destroy();
+  });
+
+  it("changes its cache key when the label's font changes", () => {
+    // the rules are painted on the note but follow the label, so a renderer
+    // caching the note's bitmap needs to see the label move
+    const { scene, stickyId, textId } = createStickyWithText("A", [], "ruled");
+    const key = () =>
+      getStickyNoteRuleFontKey(
+        getSticky(scene, stickyId),
+        scene.getNonDeletedElementsMap(),
+      );
+    const before = key();
+
+    updateStickyNoteLayout(getSticky(scene, stickyId), scene, {
+      baseFontSize: getBoundText(scene, textId).fontSize / 2,
+    });
+
+    expect(key()).not.toBe(before);
+    scene.destroy();
+
+    // a plain note has no rules to invalidate
+    const plain = createStickyWithText("A");
+    expect(
+      getStickyNoteRuleFontKey(
+        getSticky(plain.scene, plain.stickyId),
+        plain.scene.getNonDeletedElementsMap(),
+      ),
+    ).toBeNull();
+    plain.scene.destroy();
+  });
+
+  it("keeps the key off a note that was never given a paper form", () => {
+    const at = { type: "stickynote", x: 0, y: 0 } as const;
+
+    // an untouched note has to serialize exactly as it did before this existed
+    expect("stickyShape" in newStickyNoteElement({ ...at })).toBe(false);
+    expect(
+      newStickyNoteElement({ ...at, stickyShape: "ruled" }).stickyShape,
+    ).toBe("ruled");
   });
 });
 
