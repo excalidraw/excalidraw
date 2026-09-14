@@ -21,7 +21,6 @@ import {
   getFontString,
   isRTL,
   getVerticalOffset,
-  invariant,
   applyDarkModeFilter,
   isSafari,
   STICKY_NOTE_EDGE_SHADOW_OPACITY,
@@ -1174,6 +1173,10 @@ export function getFreedrawOutlineAsSegments(
   points: [number, number][],
   elementsMap: ElementsMap,
 ) {
+  if (points.length < 2) {
+    return [];
+  }
+
   const bounds = getElementBounds(
     {
       ...element,
@@ -1185,8 +1188,6 @@ export function getFreedrawOutlineAsSegments(
     (bounds[0] + bounds[2]) / 2,
     (bounds[1] + bounds[3]) / 2,
   );
-
-  invariant(points.length >= 2, "Freepath outline must have at least 2 points");
 
   return points.slice(2).reduce(
     (acc, curr) => {

@@ -15,9 +15,11 @@ import {
   isPointInElement,
 } from "@excalidraw/element";
 import {
+  distanceToLineSegment,
   lineSegment,
   lineSegmentsDistance,
   pointFrom,
+  pointRotateRads,
   polygon,
   polygonIncludesPointNonZero,
 } from "@excalidraw/math";
@@ -30,7 +32,7 @@ import { getBoundTextElementId } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
 
-import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
+import type { GlobalPoint, LineSegment, Radians } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animatedTrail";
@@ -249,17 +251,44 @@ const eraserTest = (
       }
     }
 
-    const poly = polygon(
-      ...(outlinePoints.map(([x, y]) =>
-        pointFrom<GlobalPoint>(element.x + x, element.y + y),
-      ) as GlobalPoint[]),
-    );
+    if (outlinePoints.length >= 3) {
+      const poly = polygon(
+        ...(outlinePoints.map(([x, y]) =>
+          pointFrom<GlobalPoint>(element.x + x, element.y + y),
+        ) as GlobalPoint[]),
+      );
 
-    // PERF: Check only one point of the eraser segment. If the eraser segment
-    // start is inside the closed freedraw shape, the other point is either also
-    // inside or the eraser segment will intersect the shape outline anyway
-    if (polygonIncludesPointNonZero(pathSegment[0], poly)) {
-      return true;
+      // PERF: Check only one point of the eraser segment. If the eraser segment
+      // start is inside the closed freedraw shape, the other point is either also
+      // inside or the eraser segment will intersect the shape outline anyway
+      if (polygonIncludesPointNonZero(pathSegment[0], poly)) {
+        return true;
+      }
+    }
+
+    if (strokeSegments.length === 0) {
+      const bounds = getElementBounds(
+        {
+          ...element,
+          angle: 0 as Radians,
+        },
+        elementsMap,
+      );
+      const center = pointFrom<GlobalPoint>(
+        (bounds[0] + bounds[2]) / 2,
+        (bounds[1] + bounds[3]) / 2,
+      );
+
+      for (const pt of element.points) {
+        const globalPt = pointRotateRads(
+          pointFrom<GlobalPoint>(pt[0] + element.x, pt[1] + element.y),
+          center,
+          element.angle,
+        );
+        if (distanceToLineSegment(globalPt, pathSegment) <= tolerance) {
+          return true;
+        }
+      }
     }
 
     return false;
