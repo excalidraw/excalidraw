@@ -67,20 +67,20 @@ describe("secondary-button pan", () => {
     expect(h.state.contextMenu).not.toBe(null);
   });
 
-  it("opens the context menu on release when not dragged (contextmenu after mouseup)", () => {
+  it("lets the platform's contextmenu after mouseup open the menu, as always", () => {
     fireEvent.pointerDown(canvas(), at(100, 100));
     fireEvent.pointerMove(canvas(), at(104, 102));
     expect(h.state.contextMenu).toBe(null);
 
+    // Windows fires contextmenu after mouseup: nothing is open at release,
+    // so the event lands on the canvas and opens the menu, as before
     fireEvent.pointerUp(window, { ...at(104, 102), buttons: 0 });
+    expect(h.state.contextMenu).toBe(null);
+    fireEvent.contextMenu(canvas(), at(104, 102));
     const menu = h.state.contextMenu;
     expect(menu).not.toBe(null);
     expect(menu!.left).toBe(104 - h.state.offsetLeft);
     expect(menu!.top).toBe(102 - h.state.offsetTop);
-
-    // the platform's contextmenu for the same press does not open it again
-    fireEvent.contextMenu(canvas(), at(104, 102));
-    expect(h.state.contextMenu).toBe(menu);
   });
 
   it("opens the context menu on release when not dragged (contextmenu on mousedown)", () => {
@@ -122,6 +122,8 @@ describe("secondary-button pan", () => {
     API.setElements([rectangle]);
 
     fireEvent.pointerDown(canvas(), at(30, 30));
+    // contextmenu with the press: the session opens the menu on release
+    fireEvent.contextMenu(canvas(), at(30, 30));
     fireEvent.pointerUp(window, { ...at(30, 30), buttons: 0 });
 
     expect(h.state.contextMenu).not.toBe(null);
@@ -131,6 +133,7 @@ describe("secondary-button pan", () => {
   it("leaves a menu-less editor menu-less while still panning", async () => {
     await render(<Excalidraw interaction={false} />);
     fireEvent.pointerDown(canvas(), at(100, 100));
+    fireEvent.contextMenu(canvas(), at(100, 100));
     fireEvent.pointerUp(window, { ...at(100, 100), buttons: 0 });
     expect(h.state.contextMenu).toBe(null);
   });

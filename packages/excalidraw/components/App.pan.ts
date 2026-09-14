@@ -20,8 +20,11 @@ import type App from "./App";
  * `AppWheel`).
  *
  * A secondary-button session is a pan only once the pointer travels past
- * the drag threshold; released before that, it is a right-click and the
- * session opens the context menu itself.
+ * the drag threshold; released before that, it is a right-click. The
+ * platform's `contextmenu` event opens the menu for a right-click where it
+ * follows the release (Windows), as it always has; where it comes with the
+ * press (macOS, Linux) it is swallowed — a drag cannot be told from a
+ * click yet — and the session opens the menu on release instead.
  */
 export class AppPan {
   /** space held down turns a main-button drag into a pan */
@@ -67,9 +70,9 @@ export class AppPan {
   };
 
   /**
-   * Whether a `contextmenu` event belongs to a secondary-button session —
-   * which opens the menu itself, on release without a drag — and must not
-   * open it again.
+   * Whether a `contextmenu` event belongs to a secondary-button session and
+   * must not open the menu: it came with the press (the session decides on
+   * release), or it follows a release that turned out to be a drag.
    */
   consumesContextMenuEvent = () => {
     if (this.secondary) {
@@ -213,8 +216,8 @@ export class AppPan {
         this.pendingMoveFlush = null;
         this.active = false;
         this.secondary = null;
-        if (secondary && !secondary.nativeMenuSeen) {
-          // the platform's `contextmenu` for this press is still to come
+        if (secondary?.engaged && !secondary.nativeMenuSeen) {
+          // a drag: the platform's `contextmenu` still to come is no click
           this.suppressNextContextMenu = true;
         }
         if (!this.spaceHeld) {
@@ -234,10 +237,14 @@ export class AppPan {
         app.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
         onPointerMove.flush();
 
-        // released without a drag: a right-click, at the release point
+        // released without a drag: a right-click. Where the platform's
+        // `contextmenu` came with the press it was swallowed, so the menu
+        // opens here, at the release point; where it is still to come it
+        // opens the menu itself, as it always has
         if (
           secondary &&
           !secondary.engaged &&
+          secondary.nativeMenuSeen &&
           upEvent &&
           "clientX" in upEvent
         ) {

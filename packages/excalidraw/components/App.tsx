@@ -13314,9 +13314,10 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     // Always suppress the native menu over the canvas.
     event.preventDefault();
-    // a secondary-button press is a pan session, which opens the menu
-    // itself if the press turns out to be a click — this event is the
-    // platform's, fired on mousedown or on mouseup depending on the OS
+    // a secondary-button press is a pan session: this event is not a click
+    // when it comes with the press (macOS and Linux fire it on mousedown,
+    // and the session opens the menu on release if no drag follows), nor
+    // when it follows a release that was a drag
     if (this.pan.consumesContextMenuEvent()) {
       return;
     }
