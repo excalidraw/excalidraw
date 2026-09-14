@@ -2,10 +2,15 @@ import React from "react";
 import { fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { CLASSES, viewportCoordsToSceneCoords } from "@excalidraw/common";
+import {
+  CLASSES,
+  MIN_ZOOM,
+  viewportCoordsToSceneCoords,
+} from "@excalidraw/common";
 
 import { resolveInputDevice } from "../appState";
 import { Excalidraw } from "../index";
+import { getNormalizedZoom } from "../scene";
 
 import { API } from "./helpers/api";
 import { GlobalTestState, mockBoundingClientRect, render } from "./test-utils";
@@ -111,6 +116,17 @@ describe("wheel navigation", () => {
     expect(zoomedIn).toBeGreaterThan(beforeZoom.zoom);
     wheel({ deltaY: 100, metaKey: true });
     expect(h.state.zoom.value).toBeLessThan(zoomedIn);
+  });
+
+  it("does nothing on a zoom tick at the zoom limit", () => {
+    API.setAppState({ zoom: { value: getNormalizedZoom(MIN_ZOOM) } });
+    const start = getViewport();
+
+    wheel({ deltaY: 100, ctrlKey: true });
+
+    expect(getViewport()).toEqual(start);
+    // in particular no bitmap-cache flip, which would redraw the scene
+    expect(h.state.shouldCacheIgnoreZoom).toBe(false);
   });
 
   describe("wheel button held down", () => {
@@ -289,6 +305,17 @@ describe("wheel navigation", () => {
         const start = getViewport();
         wheel({ deltaY: -100, buttons: WHEEL_BUTTON, ctrlKey: true });
         expect(h.state.zoom.value).toBeGreaterThan(start.zoom);
+      });
+
+      it("pans sideways on a horizontal-only wheel instead of zooming", () => {
+        // a tilt wheel or a sideways two-finger scroll
+        const start = getViewport();
+        wheel({ deltaX: 30 });
+        expect(getViewport()).toEqual({
+          ...start,
+          scrollX: start.scrollX - 30 / start.zoom,
+        });
+        expect(h.state.shouldCacheIgnoreZoom).toBe(false);
       });
     });
   });

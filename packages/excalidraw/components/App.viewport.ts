@@ -763,6 +763,9 @@ export class AppViewport {
     this.app.setState((prevState, props) => {
       const update =
         typeof state === "function" ? state(prevState, props) : state;
+      if (!update) {
+        return null;
+      }
       const nextState = { ...prevState, ...update };
       if (!nextState.scrollConstraints) {
         return update;

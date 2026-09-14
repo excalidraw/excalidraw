@@ -79,15 +79,21 @@ export class AppWheel {
     }
 
     const { deltaX, deltaY } = event;
+    if (!deltaX && !deltaY) {
+      return;
+    }
     // note that event.ctrlKey is necessary to handle pinch zooming
     const hasZoomModifier = event.metaKey || event.ctrlKey;
     const shouldZoom =
-      isWheelButtonHeld ||
-      (resolveInputDevice(this.app.state.inputDevice) === "mouse"
-        ? // a mouse has no pinch: a plain wheel zooms, and any modifier
-          // pans instead (ctrl/cmd vertically, shift horizontally)
-          !hasZoomModifier && !event.shiftKey
-        : hasZoomModifier);
+      // a horizontal-only wheel (tilt wheel, sideways two-finger scroll)
+      // has nothing to zoom by; it pans sideways below instead
+      deltaY !== 0 &&
+      (isWheelButtonHeld ||
+        (resolveInputDevice(this.app.state.inputDevice) === "mouse"
+          ? // a mouse has no pinch: a plain wheel zooms, and any modifier
+            // pans instead (ctrl/cmd vertically, shift horizontally)
+            !hasZoomModifier && !event.shiftKey
+          : hasZoomModifier));
     if (shouldZoom) {
       this.zoomBy(deltaY);
       return;
@@ -151,11 +157,16 @@ export class AppWheel {
         const minZoom = state.scrollConstraints?.lockZoom
           ? state.scrollConstraints.zoom
           : MIN_ZOOM;
-        newZoom = Math.max(newZoom, minZoom);
+        const nextZoom = getNormalizedZoom(Math.max(newZoom, minZoom));
+        if (nextZoom === state.zoom.value) {
+          // at a zoom limit there is nothing to do; flipping the bitmap-cache
+          // flag would only redraw the scene on every tick
+          return null;
+        }
 
         return {
           ...getViewportForZoomWithScrollConstraints(
-            { viewportX, viewportY, nextZoom: getNormalizedZoom(newZoom) },
+            { viewportX, viewportY, nextZoom },
             state,
           ),
           shouldCacheIgnoreZoom: true,
