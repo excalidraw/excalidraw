@@ -196,7 +196,10 @@
     "boxSelectionContain": "Încapsulare",
     "boxSelectionOverlap": "Suprapunere",
     "arrowBinding": "Legare săgeată",
-    "midpointSnapping": "Ancorare la punctele medii"
+    "midpointSnapping": "Ancorare la punctele medii",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Link către obiect",
