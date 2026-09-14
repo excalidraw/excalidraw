@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Привязка стрелкой",
-    "midpointSnapping": "Привязка к средней точке"
+    "midpointSnapping": "Привязка к средней точке",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Ссылка на объект",
