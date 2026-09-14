@@ -196,7 +196,10 @@
     "boxSelectionContain": "Ovij",
     "boxSelectionOverlap": "Prekrij",
     "arrowBinding": "Vezava puščic",
-    "midpointSnapping": "Pripni na srednje točke"
+    "midpointSnapping": "Pripni na srednje točke",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Povezava do objekta",
