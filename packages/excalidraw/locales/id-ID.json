@@ -196,7 +196,10 @@
     "boxSelectionContain": "Cakup penuh",
     "boxSelectionOverlap": "Tumpang tindih",
     "arrowBinding": "Pengikatan anak panah",
-    "midpointSnapping": "Rapatkan ke titik tengah"
+    "midpointSnapping": "Rapatkan ke titik tengah",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Taut ke objek",
