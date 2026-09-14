@@ -341,10 +341,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
         ? t("errors.collabSaveFailed_sizeExceeded")
         : t("errors.collabSaveFailed");
 
-      if (
-        !this.state.dialogNotifiedErrors[errorMessage] ||
-        !this.isCollaborating()
-      ) {
+      if (!this.state.dialogNotifiedErrors[errorMessage]) {
         this.setErrorDialog(errorMessage);
         this.setState({
           dialogNotifiedErrors: {
