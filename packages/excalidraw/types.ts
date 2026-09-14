@@ -281,6 +281,12 @@ export type ObservedElementsAppState = {
 export type BoxSelectionMode = "contain" | "overlap";
 
 /**
+ * The pointing device the wheel mappings are tuned for. `auto` is reserved
+ * for detecting it from the wheel events; see `resolveInputDevice`.
+ */
+export type InputDevice = "auto" | "mouse" | "trackpad";
+
+/**
  * A box, in scene coordinates, that pan & zoom are constrained to.
  *
  * This is a private type. For public API, only use specific properties,
@@ -360,6 +366,13 @@ export interface AppState {
   bindingPreference: "enabled" | "disabled";
   /** user preference whether arrow snap to midpoints while binding */
   isMidpointSnappingEnabled: boolean;
+  /**
+   * user preference for what the wheel does: with a `trackpad` a plain wheel
+   * pans and ctrl/cmd+wheel (how a pinch is delivered) zooms; with a `mouse`
+   * a plain wheel zooms and ctrl/cmd+wheel pans vertically. `auto` resolves
+   * to `trackpad` until device detection exists — see `resolveInputDevice`
+   */
+  inputDevice: InputDevice;
   /**
    * The bindable element the UI highlights for the user when an arrow is
    * dragged or otherwise its endpoint being close to said element.
