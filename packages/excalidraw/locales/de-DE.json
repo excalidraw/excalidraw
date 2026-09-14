@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Pfeilbindung",
-    "midpointSnapping": "An Mittelpunkten einrasten"
+    "midpointSnapping": "An Mittelpunkten einrasten",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Link zum Objekt",
