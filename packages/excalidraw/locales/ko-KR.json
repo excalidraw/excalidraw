@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "화살표 연결",
-    "midpointSnapping": "중간에 맞춤"
+    "midpointSnapping": "중간에 맞춤",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "객체에 연결",
