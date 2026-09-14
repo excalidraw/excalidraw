@@ -288,6 +288,10 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
      * so it survives midpoint insertion and other geometry changes.
      * */
     labelPosition?: number | null;
+    /**
+     * Ranges of text that have a different color than the element's default strokeColor.
+     */
+    styleRanges?: Array<{ index: number; length: number; color: string }>;
   }>;
 
 export type ExcalidrawBindableElement =

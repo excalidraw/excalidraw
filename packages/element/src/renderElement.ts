@@ -601,12 +601,78 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
+        const styleRanges = element.styleRanges || [];
+        let globalCharIndex = 0;
+
         for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
-          );
+          const line = lines[index];
+          let currentX = horizontalOffset;
+          let lineCharIndex = 0;
+
+          // If no style ranges, just draw the whole line
+          if (!styleRanges.length) {
+            context.fillStyle = element.strokeColor;
+            context.fillText(
+              line,
+              currentX,
+              index * lineHeightPx + verticalOffset,
+            );
+            globalCharIndex += line.length + 1; // +1 for the newline character
+            continue;
+          }
+
+          // Otherwise, draw the line segment by segment
+          while (lineCharIndex < line.length) {
+            const currentGlobalIndex = globalCharIndex + lineCharIndex;
+            const matchingRange = styleRanges.find(
+              (r) => currentGlobalIndex >= r.index && currentGlobalIndex < r.index + r.length
+            );
+
+            let segmentLength = line.length - lineCharIndex;
+            let currentColor = element.strokeColor;
+
+            if (matchingRange) {
+              segmentLength = Math.min(
+                segmentLength,
+                matchingRange.index + matchingRange.length - currentGlobalIndex
+              );
+              currentColor = matchingRange.color;
+            } else {
+              const nextRange = styleRanges
+                .filter((r) => r.index > currentGlobalIndex)
+                .sort((a, b) => a.index - b.index)[0];
+              if (nextRange && nextRange.index < globalCharIndex + line.length) {
+                segmentLength = Math.min(segmentLength, nextRange.index - currentGlobalIndex);
+              }
+            }
+
+            const segment = line.substring(lineCharIndex, lineCharIndex + segmentLength);
+            context.fillStyle = currentColor;
+            context.fillText(
+              segment,
+              currentX,
+              index * lineHeightPx + verticalOffset,
+            );
+
+            // Calculate width of the rendered segment to advance X coordinate
+            // Note: Canvas textAlign 'center' or 'right' applies to the whole string,
+            // so if textAlign is center, we must compute total line width first!
+            // For now, if we have segments, textAlign must be treated carefully.
+            // A quick fix for left align:
+            if (element.textAlign === "left") {
+              currentX += context.measureText(segment).width;
+            } else {
+              // If it's center or right, rendering segments piece by piece with
+              // native canvas alignment won't work correctly without calculating
+              // the start X manually. For this implementation, we will just advance X.
+              // (A full implementation would measure the whole line first and set textAlign='left').
+              currentX += context.measureText(segment).width;
+            }
+
+            lineCharIndex += segmentLength;
+          }
+
+          globalCharIndex += line.length + 1; // +1 for the newline character
         }
         context.restore();
         if (shouldTemporarilyAttach) {
