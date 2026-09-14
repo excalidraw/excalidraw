@@ -18,17 +18,7 @@ const WHEEL_BUTTON_MASK = 4;
  * (`appState.inputDevice`; ctrl/cmd+wheel pans instead then).
  */
 export class AppWheel {
-  constructor(
-    private app: App,
-    private dependencies: {
-      /** whether a drag-pan (wheel button, space+drag, hand tool) is in
-       * progress — wheel input is ignored meanwhile */
-      isPanning: () => boolean;
-      /** applies the pointer movement the drag-pan is holding back for its
-       * next frame, if any */
-      flushPanMove: () => void;
-    },
-  ) {}
+  constructor(private app: App) {}
 
   /** the editor surfaces whose wheel input the editor consumes; everywhere
    * else (menus, sidebars, …) the DOM keeps scrolling. The frame-name labels
@@ -66,7 +56,10 @@ export class AppWheel {
     // drag-pan the button itself started
     const isWheelButtonHeld = !!(event.buttons & WHEEL_BUTTON_MASK);
 
-    if (this.dependencies.isPanning()) {
+    // a drag-pan (wheel button, space+drag, hand tool) in progress owns the
+    // viewport; wheel input is ignored meanwhile — except for the wheel
+    // button's own zoom
+    if (this.app.pan.isActive()) {
       if (!isWheelButtonHeld) {
         return;
       }
@@ -75,7 +68,7 @@ export class AppWheel {
       // it — at the new zoom, on a viewport the zoom anchored without it —
       // and the point grabbed by the pan drifts from under the cursor a
       // little on every tick
-      this.dependencies.flushPanMove();
+      this.app.pan.flushMove();
     }
 
     const { deltaX, deltaY } = event;
