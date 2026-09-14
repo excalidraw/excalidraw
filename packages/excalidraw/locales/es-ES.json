@@ -196,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Vinculación de flecha",
-    "midpointSnapping": "Adherirse a los puntos medios"
+    "midpointSnapping": "Adherirse a los puntos medios",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Enlace al objeto",
