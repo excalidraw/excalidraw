@@ -27,6 +27,7 @@
     "copyStyles": "Kopioi tyyli",
     "pasteStyles": "Liitä tyyli",
     "stroke": "Piirto",
+    "textColor": "",
     "changeStroke": "",
     "background": "Tausta",
     "changeBackground": "",
@@ -195,7 +196,10 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -332,6 +336,7 @@
     "eraser": "Poistotyökalu",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "Verkkoupote",
     "laser": "Laserosoitin",
     "autoshape": "",
@@ -357,6 +362,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,6 +381,7 @@
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "embeddable": "",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +389,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
