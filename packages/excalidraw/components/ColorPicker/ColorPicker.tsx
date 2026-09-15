@@ -13,7 +13,11 @@ import {
   THEME,
 } from "@excalidraw/common";
 
-import type { ColorTuple, ColorPaletteCustom } from "@excalidraw/common";
+import type {
+  ColorTuple,
+  ColorPaletteCustom,
+  StylesPanelMode,
+} from "@excalidraw/common";
 
 import type { ExcalidrawElement, Theme } from "@excalidraw/element/types";
 
@@ -69,6 +73,13 @@ interface ColorPickerProps {
   customizableTopPicks?: keyof AppState["colorTopPicks"];
 }
 
+// canvasBackground only renders in the fixed-width main menu, so it must not
+// inherit the styles panel's viewport-derived compact mode.
+const getPickerLayoutMode = (
+  type: ColorPickerType,
+  mode: StylesPanelMode,
+): StylesPanelMode => (type === "canvasBackground" ? "full" : mode);
+
 const ColorPickerPopupContent = ({
   type,
   color,
@@ -96,7 +107,7 @@ const ColorPickerPopupContent = ({
 }) => {
   const { container } = useExcalidrawContainer();
   const app = useApp();
-  const stylesPanelMode = useStylesPanelMode();
+  const stylesPanelMode = getPickerLayoutMode(type, useStylesPanelMode());
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
   const [, setActiveColorPickerSection] = useAtom(activeColorPickerSectionAtom);
@@ -278,7 +289,7 @@ const ColorPickerTrigger = ({
   editingTextElement?: boolean;
 }) => {
   const app = useApp();
-  const stylesPanelMode = useStylesPanelMode();
+  const stylesPanelMode = getPickerLayoutMode(type, useStylesPanelMode());
   const isCompactMode = stylesPanelMode !== "full";
   const isMobileMode = stylesPanelMode === "mobile";
   const dnd = useColorPickerDnD();
@@ -360,7 +371,7 @@ const ColorPickerComponent = ({
   useEffect(() => {
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
-  const stylesPanelMode = useStylesPanelMode();
+  const stylesPanelMode = getPickerLayoutMode(type, useStylesPanelMode());
   const isCompactMode = stylesPanelMode !== "full";
 
   const isTopPicksCustomizable = !!customizableTopPicks && !isCompactMode;
