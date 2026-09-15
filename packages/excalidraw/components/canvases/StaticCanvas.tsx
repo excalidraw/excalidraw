@@ -1,6 +1,11 @@
 import React, { useEffect, useRef } from "react";
 
-import { isShallowEqual } from "@excalidraw/common";
+import { isShallowEqual, isTestEnv } from "@excalidraw/common";
+
+import {
+  getAnimatedImageFrameIndex,
+  isImageElement,
+} from "@excalidraw/element";
 
 import type {
   NonDeletedExcalidrawElement,
@@ -8,14 +13,18 @@ import type {
 } from "@excalidraw/element/types";
 
 import { isRenderThrottlingEnabled } from "../../reactUtils";
+import { AnimationController } from "../../renderer/animation";
 import { renderStaticScene } from "../../renderer/staticScene";
 
 import type {
   RenderableElementsMap,
   StaticCanvasRenderConfig,
+  StaticSceneRenderConfig,
 } from "../../scene/types";
 import type { AppState, StaticCanvasAppState } from "../../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
+
+let animatedImagesAnimationKeySequence = 0;
 
 type StaticCanvasProps = {
   canvas: HTMLCanvasElement;
@@ -30,9 +39,55 @@ type StaticCanvasProps = {
   renderConfig: StaticCanvasRenderConfig;
 };
 
+/**
+ * Advances every visible animation toward the current playhead and returns a
+ * key of the frames actually decoded so far. Decoding is asynchronous, so
+ * keying on `renderedFrameIndex` (instead of the target frame) makes the
+ * loop re-render exactly when a new frame becomes available.
+ */
+const getAnimatedImageFrameKeys = (
+  renderConfig: StaticSceneRenderConfig,
+): string | null => {
+  const now = performance.now();
+  let frameKeys: string | null = null;
+
+  for (const element of renderConfig.visibleElements) {
+    if (!isImageElement(element) || !element.fileId) {
+      continue;
+    }
+    const animation = renderConfig.renderConfig.imageCache.get(
+      element.fileId,
+    )?.animation;
+    if (!animation) {
+      continue;
+    }
+    animation.seek(getAnimatedImageFrameIndex(animation, now));
+    frameKeys = `${frameKeys ?? ""}${element.fileId}:${
+      animation.renderedFrameIndex
+    };`;
+  }
+
+  return frameKeys;
+};
+
 const StaticCanvas = (props: StaticCanvasProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isComponentMounted = useRef(false);
+  const renderParamsRef = useRef<StaticSceneRenderConfig | null>(null);
+  const animationKeyRef = useRef<string | null>(null);
+  if (animationKeyRef.current === null) {
+    animationKeyRef.current = `static-scene-animated-images-${animatedImagesAnimationKeySequence++}`;
+  }
+
+  useEffect(() => {
+    const animationKey = animationKeyRef.current!;
+    return () => {
+      // stop the playback loop and drop the retained render params when the
+      // editor unmounts
+      renderParamsRef.current = null;
+      AnimationController.cancel(animationKey);
+    };
+  }, []);
 
   useEffect(() => {
     props.canvas.style.width = `${props.appState.width}px`;
@@ -56,19 +111,48 @@ const StaticCanvas = (props: StaticCanvasProps) => {
       canvas.classList.add("excalidraw__canvas", "static");
     }
 
-    renderStaticScene(
-      {
-        canvas,
-        rc: props.rc,
-        scale: props.scale,
-        elementsMap: props.elementsMap,
-        allElementsMap: props.allElementsMap,
-        visibleElements: props.visibleElements,
-        appState: props.appState,
-        renderConfig: props.renderConfig,
-      },
-      isRenderThrottlingEnabled(),
-    );
+    renderParamsRef.current = {
+      canvas,
+      rc: props.rc,
+      scale: props.scale,
+      elementsMap: props.elementsMap,
+      allElementsMap: props.allElementsMap,
+      visibleElements: props.visibleElements,
+      appState: props.appState,
+      renderConfig: props.renderConfig,
+    };
+
+    renderStaticScene(renderParamsRef.current, isRenderThrottlingEnabled());
+
+    if (
+      !isTestEnv() &&
+      !AnimationController.running(animationKeyRef.current!) &&
+      getAnimatedImageFrameKeys(renderParamsRef.current) !== null
+    ) {
+      AnimationController.start<{ frameKeys: string }>(
+        animationKeyRef.current!,
+        ({ state }) => {
+          const renderParams = renderParamsRef.current;
+          if (!renderParams) {
+            return null;
+          }
+
+          const frameKeys = getAnimatedImageFrameKeys(renderParams);
+          if (frameKeys === null) {
+            return null;
+          }
+
+          // the initial invocation (state === undefined) runs synchronously
+          // right after the scene was already rendered above, so only
+          // re-render on actual frame changes
+          if (state && frameKeys !== state.frameKeys) {
+            renderStaticScene(renderParams, false);
+          }
+
+          return { frameKeys };
+        },
+      );
+    }
   });
 
   return <div className="excalidraw__canvas-wrapper" ref={wrapperRef} />;

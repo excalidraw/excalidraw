@@ -264,6 +264,8 @@ import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
 } from "@excalidraw/element";
 
+import { isAnimatedImage } from "@excalidraw/utils";
+
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
@@ -471,6 +473,8 @@ import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
 
 import UnlockPopup from "./UnlockPopup";
+
+import { AppAnimated } from "./App.animated";
 
 import type { ExcalidrawLibraryIds } from "../data/types";
 
@@ -681,6 +685,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public files: BinaryFiles = {};
   public imageCache: AppClassProperties["imageCache"] = new Map();
+  private appAnimation;
   private iFrameRefs = new Map<ExcalidrawElement["id"], HTMLIFrameElement>();
   /**
    * Indicates whether the embeddable's url has been validated for rendering.
@@ -926,6 +931,8 @@ class App extends React.Component<AppProps, AppState> {
     // will invalidate it (so in StrictMode, doing this in constructor alone
     // would be a problem)
     this.api = this.createExcalidrawAPI();
+
+    this.appAnimation = new AppAnimated(this);
   }
 
   /**
@@ -12872,15 +12879,18 @@ class App extends React.Component<AppProps, AppState> {
     if (!existingFileData?.dataURL) {
       const { maxWidthOrHeight, maxFileSizeBytes } = this.props.imageOptions;
 
-      try {
-        imageFile = await resizeImageFile(imageFile, {
-          maxWidthOrHeight,
-        });
-      } catch (error: any) {
-        console.error(
-          "Error trying to resizing image file on insertion",
-          error,
-        );
+      if (!(await isAnimatedImage(imageFile))) {
+        //TODO resize Image File output is jpg, breaks anim
+        try {
+          imageFile = await resizeImageFile(imageFile, {
+            maxWidthOrHeight,
+          });
+        } catch (error: any) {
+          console.error(
+            "Error trying to resizing image file on insertion",
+            error,
+          );
+        }
       }
 
       if (imageFile.size > maxFileSizeBytes) {
@@ -13070,6 +13080,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
+    this.appAnimation.decodeAnimatedImages(elements, files);
+
     return { updatedFiles, erroredFiles };
   };
 
@@ -13102,6 +13114,8 @@ class App extends React.Component<AppProps, AppState> {
         this.scene.triggerUpdate();
       }
     }
+
+    this.appAnimation.decodeAnimatedImages(imageElements, files);
   };
 
   /** generally you should use `addNewImagesToImageCache()` directly if you need
@@ -13184,10 +13198,14 @@ class App extends React.Component<AppProps, AppState> {
     const initialized = await Promise.all(
       placeholders.map(async (placeholder, i) => {
         try {
-          return await this.initializeImage(
+          const element = await this.initializeImage(
             placeholder,
             await normalizeFile(imageFiles[i]),
           );
+          const imageFile = imageFiles[i];
+          return (await isAnimatedImage(imageFile))
+            ? newElementWith(element, { isAnimated: true })
+            : element;
         } catch (error: any) {
           this.setState({
             errorMessage: error.message || t("errors.imageInsertError"),
