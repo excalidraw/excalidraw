@@ -579,10 +579,11 @@ export const convertElementTypes = (
                 fixedSegments,
               },
             );
-            mutateElement(element, app.scene.getNonDeletedElementsMap(), {
-              ...updates,
-              endArrowhead: "arrow",
-            });
+            mutateElement(
+              element,
+              app.scene.getNonDeletedElementsMap(),
+              updates,
+            );
           } else {
             // if we're converting to non-elbow linear element, check if
             // we've already cached one of these linear elements so we can
