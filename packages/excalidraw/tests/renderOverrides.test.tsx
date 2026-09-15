@@ -16,6 +16,7 @@ import { getDefaultAppState } from "../appState";
 import * as StaticScene from "../renderer/staticScene";
 import { Renderer } from "../scene/Renderer";
 import { exportToSvg } from "../scene/export";
+import { getNormalizedZoom } from "../scene";
 import { getElementRenderOffsets } from "../renderOverrides";
 
 import { API } from "./helpers/api";
@@ -265,6 +266,105 @@ describe("setElementRenderOverrides", () => {
     act(() => h.setState({ editingFrame: null }));
     expect(query(".frame-name")).toBe(null);
   });
+
+  it.each([
+    { type: "frame", zoom: 1, editing: false },
+    { type: "frame", zoom: 2, editing: false },
+    { type: "frame", zoom: 2, editing: true },
+    { type: "magicframe", zoom: 2, editing: false },
+  ] as const)(
+    "keeps $type title hit bounds in document coordinates at zoom $zoom (editing: $editing)",
+    async ({ type, zoom, editing }) => {
+      mockBoundingClientRect({
+        width: 1200,
+        height: 1000,
+        x: 40,
+        left: 40,
+        y: 30,
+        top: 30,
+        right: 1240,
+        bottom: 1030,
+      });
+      const { onChange, submit } = await setup();
+      await waitFor(() => expect(h.state.width).toBe(1200));
+      const frame = API.createElement({
+        type,
+        id: "frame",
+        x: 200,
+        y: 200,
+        width: 200,
+        height: 80,
+      });
+      API.setElements([frame]);
+      API.updateElement(frame, { name: "Frame title" });
+      act(() =>
+        h.setState({
+          zoom: { value: getNormalizedZoom(zoom) },
+          scrollX: 25,
+          scrollY: -30,
+          editingFrame: editing ? frame.id : null,
+        }),
+      );
+      const title = await waitFor(() => {
+        const element =
+          GlobalTestState.renderResult.container.querySelector<HTMLElement>(
+            ".frame-name",
+          );
+        expect(element).not.toBe(null);
+        return element!;
+      });
+      // JSDOM has no layout: measure the rendered CSS position, including
+      // visual offsets, within the editor's viewport rectangle.
+      const measure = vi
+        .spyOn(title, "getBoundingClientRect")
+        .mockImplementation(() => {
+          const width = 60;
+          const height = editing ? 32 : 20;
+          const left = h.state.offsetLeft + parseFloat(title.style.left);
+          const bottom =
+            h.state.offsetTop + h.state.height - parseFloat(title.style.bottom);
+          return {
+            x: left,
+            y: bottom - height,
+            left,
+            top: bottom - height,
+            right: left + width,
+            bottom,
+            width,
+            height,
+            toJSON: () => ({}),
+          };
+        });
+      const cache = h.app.frameNameBoundsCache;
+      cache._cache.clear();
+      const documentBounds = cache.get(frame)!;
+      const point = {
+        x: documentBounds.x + documentBounds.width / 2,
+        y: documentBounds.y + documentBounds.height / 2,
+      };
+      expect(h.app.hitElement(point.x, point.y, frame, false)).toBe(true);
+      cache._cache.clear();
+      onChange.mockClear();
+      const documentElements = JSON.stringify(h.elements);
+
+      // First measurement happens with a translated title (unless editing).
+      submit(new Map([[frame.id, { offset: { x: 120, y: 150 } }]]));
+      const bounds = cache.get(frame);
+      expect(bounds).toEqual(documentBounds);
+      measure.mockClear();
+      submit(new Map([[frame.id, { offset: { x: 140, y: 160 } }]]));
+      expect(cache.get(frame)).toBe(bounds);
+      submit(null);
+      expect(cache.get(frame)).toBe(bounds);
+      expect(h.app.hitElement(point.x, point.y, frame, false)).toBe(true);
+      expect(h.app.hitElement(point.x + 120, point.y + 150, frame, false)).toBe(
+        false,
+      );
+      expect(measure).not.toHaveBeenCalled();
+      expect(JSON.stringify(h.elements)).toBe(documentElements);
+      expect(onChange).not.toHaveBeenCalled();
+    },
+  );
 
   it("keeps the offsets map identity while only opacities change", () => {
     const first = getElementRenderOffsets(

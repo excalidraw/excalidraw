@@ -2132,21 +2132,17 @@ class App extends React.Component<AppProps, AppState> {
 
         if (frameNameDiv) {
           const box = frameNameDiv.getBoundingClientRect();
-          const boxSceneTopLeft = viewportCoordsToSceneCoords(
-            { clientX: box.x, clientY: box.y },
-            this.state,
-          );
-          const boxSceneBottomRight = viewportCoordsToSceneCoords(
-            { clientX: box.right, clientY: box.bottom },
-            this.state,
-          );
+          const zoom = this.state.zoom.value;
 
+          // Only the title's size comes from layout: its visual position may
+          // have an override. Hit bounds stay anchored to the document frame,
+          // with the title's bottom nameOffsetY screen pixels above it.
           bounds = {
-            x: boxSceneTopLeft.x,
-            y: boxSceneTopLeft.y,
-            width: boxSceneBottomRight.x - boxSceneTopLeft.x,
-            height: boxSceneBottomRight.y - boxSceneTopLeft.y,
-            zoom: this.state.zoom.value,
+            x: frameElement.x,
+            y: frameElement.y - (box.height + FRAME_STYLE.nameOffsetY) / zoom,
+            width: box.width / zoom,
+            height: box.height / zoom,
+            zoom,
             versionNonce: frameElement.versionNonce,
           };
 
