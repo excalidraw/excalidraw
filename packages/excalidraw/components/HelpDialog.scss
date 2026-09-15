@@ -6,6 +6,45 @@
       max-width: 960px;
     }
 
+    &__search {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    &__search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary-color);
+      pointer-events: none;
+      svg {
+        width: 1rem;
+        height: 1rem;
+      }
+    }
+
+    &__search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+      border: 1px solid var(--dialog-border-color);
+      border-radius: var(--border-radius-lg);
+      background-color: var(--color-surface-low);
+      color: var(--text-primary-color);
+      font-size: 0.875rem;
+      font-family: inherit;
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px var(--color-primary-light);
+      }
+
+      &::placeholder {
+        color: var(--text-secondary-color);
+      }
+    }
+
     h3 {
       margin: 1.5rem 0;
       font-weight: 700;
