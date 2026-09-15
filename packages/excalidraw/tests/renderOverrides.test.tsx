@@ -57,7 +57,10 @@ describe("setElementRenderOverrides", () => {
     const rendering = vi.spyOn(StaticScene, "renderStaticScene");
     const submit = (snapshot: ElementRenderOverrides | null) => {
       act(() => h.app.api.setElementRenderOverrides(snapshot));
-      return rendering.mock.lastCall![0].renderConfig.elementRenderOverrides!;
+      // Equivalent snapshots need not render, but the published state remains
+      // available for checking snapshot ownership and identity.
+      // eslint-disable-next-line dot-notation -- inspect private state without triggering a render
+      return h.app["elementRenderOverrides"];
     };
     onChange.mockClear();
     return { element: h.elements[0], onChange, rendering, submit, ...mounted };
@@ -127,6 +130,76 @@ describe("setElementRenderOverrides", () => {
     expect(rendering).not.toHaveBeenCalled();
   });
 
+  it("skips empty submissions and repeated clears, but repaints the first clear", async () => {
+    const { element, submit, rendering, onChange } = await setup();
+    const renders = vi.spyOn(h.app, "render");
+    const empty = submit(null);
+    expect(submit(new Map())).toBe(empty);
+    expect(submit(new Map([[element.id, {}]]))).toBe(empty);
+    expect(renders).not.toHaveBeenCalled();
+    expect(rendering).not.toHaveBeenCalled();
+
+    submit(new Map([[element.id, { opacity: 50 }]]));
+    renders.mockClear();
+    rendering.mockClear();
+    const cleared = submit(null);
+    expect(cleared.size).toBe(0);
+    expect(renders).toHaveBeenCalledTimes(1);
+    expect(rendering).toHaveBeenCalledTimes(1);
+    expect(submit(null)).toBe(cleared);
+    expect(submit(new Map([[element.id, {}]]))).toBe(cleared);
+    expect(renders).toHaveBeenCalledTimes(1);
+    expect(rendering).toHaveBeenCalledTimes(1);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("detects caller mutations and complete replacements in a reused map", async () => {
+    const { element, submit, rendering } = await setup();
+    const value = { opacity: 25, offset: { x: 10, y: 20 } };
+    const input: Map<string, ElementRenderOverride> = new Map([
+      [element.id, value],
+    ]);
+    const first = submit(input);
+    rendering.mockClear();
+
+    value.opacity = 60;
+    value.offset.x = 30;
+    const changed = submit(input);
+    expect(changed).not.toBe(first);
+    expect(changed.get(element.id)).toEqual({
+      opacity: 60,
+      offset: { x: 30, y: 20 },
+    });
+    expect(first.get(element.id)).toEqual({
+      opacity: 25,
+      offset: { x: 10, y: 20 },
+    });
+    input.set(element.id, { opacity: 60 });
+    expect(submit(input).get(element.id)).toEqual({ opacity: 60 });
+    input.delete(element.id);
+    input.set("future", { opacity: 60 });
+    expect([...submit(input)]).toEqual([["future", { opacity: 60 }]]);
+    input.clear();
+    expect(submit(input).size).toBe(0);
+    expect(rendering).toHaveBeenCalledTimes(4);
+  });
+
+  it("preserves a pending visual update when followed by an equivalent snapshot", async () => {
+    const { element, rendering, onChange } = await setup();
+    const input = new Map([[element.id, { opacity: 50 }]]);
+    act(() => {
+      h.app.api.setElementRenderOverrides(input);
+      h.app.api.setElementRenderOverrides(new Map(input));
+    });
+    expect(rendering).toHaveBeenCalledTimes(1);
+    expect(
+      rendering.mock.lastCall![0].renderConfig.elementRenderOverrides?.get(
+        element.id,
+      ),
+    ).toEqual({ opacity: 50 });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it.each(["opacity", "translation", "unknown", "empty"])(
     "does not repaint for unrelated updates with a %s snapshot",
     async (kind) => {
@@ -192,6 +265,7 @@ describe("setElementRenderOverrides", () => {
 
   it("does not skip ordinary forceUpdate calls after a visual-only commit", async () => {
     const { element, submit, onChange } = await setup();
+    submit(new Map([[element.id, { opacity: 0 }]]));
     submit(new Map([[element.id, { opacity: 0 }]]));
     expect(onChange).not.toHaveBeenCalled();
     act(() => h.app.forceUpdate());

@@ -1319,7 +1319,9 @@ export interface ExcalidrawImperativeAPI {
    * Atomically replaces all transient visual overrides. Values are copied;
    * omitted IDs/fields use document values, except for inherited label offsets.
    * null clears the snapshot.
-   * Repaints without document changes, history entries or onChange events.
+   * Repaints without document changes, history entries or onChange events;
+   * an equivalent snapshot may still repaint (clearing an already clear
+   * snapshot does not), so submit only when something changed.
    * Finite opacity is clamped to 0–100; non-finite values reject the snapshot.
    * Unknown/deleted IDs are ignored when rendering. Reset/unmount clears it.
    * Bound labels inherit their container's offset; offsets targeting them are

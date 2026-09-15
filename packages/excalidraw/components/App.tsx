@@ -5431,7 +5431,12 @@ class App extends React.Component<AppProps, AppState> {
     if (this.unmounted) {
       return;
     }
-    this.elementRenderOverrides = copyElementRenderOverrides(overrides);
+    const nextOverrides = copyElementRenderOverrides(overrides);
+    // clearing an already clear snapshot is the one cheap no-op worth having
+    if (!nextOverrides.size && !this.elementRenderOverrides.size) {
+      return;
+    }
+    this.elementRenderOverrides = nextOverrides;
     this.elementRenderOffsets = getElementRenderOffsets(
       this.elementRenderOverrides,
       this.elementRenderOffsets,
