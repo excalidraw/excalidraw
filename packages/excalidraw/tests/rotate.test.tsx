@@ -1,14 +1,18 @@
 import React from "react";
 import { expect } from "vitest";
 
-import { reseed } from "@excalidraw/common";
+import { arrayToMap, reseed } from "@excalidraw/common";
+import { getTransformHandles } from "@excalidraw/element";
 
 import { Excalidraw } from "../index";
 
+import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
 import { render, unmountComponent } from "./test-utils";
 
 unmountComponent();
+
+const { h } = window;
 
 beforeEach(() => {
   localStorage.clear();
@@ -82,4 +86,38 @@ test("unselected bound arrows update when rotating their target elements", async
   expect(textArrow.points[0]).toEqual([0, 0]);
   expect(textArrow.points[1][0]).toBeCloseTo(-95.4635969899922, 0);
   expect(textArrow.points[1][1]).toBeCloseTo(-126.8785027399889, 0);
+});
+
+test("rotates exactly to 90 degrees in grid mode", async () => {
+  await render(<Excalidraw />);
+  API.setAppState({ gridModeEnabled: true });
+
+  const rectangle = API.createElement({
+    type: "rectangle",
+    x: 100,
+    y: 103,
+    width: 80,
+    height: 40,
+  });
+  API.setElements([rectangle]);
+
+  const rotationHandle = getTransformHandles(
+    rectangle,
+    h.state.zoom,
+    arrayToMap(h.elements),
+    "mouse",
+    {},
+  ).rotation!;
+
+  const handleCenterX = rotationHandle[0] + rotationHandle[2] / 2;
+  const handleCenterY = rotationHandle[1] + rotationHandle[3] / 2;
+  const elementCenterX = rectangle.x + rectangle.width / 2;
+  const elementCenterY = rectangle.y + rectangle.height / 2;
+
+  UI.rotate(rectangle, [
+    elementCenterX + 100 - handleCenterX,
+    elementCenterY - handleCenterY,
+  ]);
+
+  expect(API.getElement(rectangle).angle).toBeCloseTo(Math.PI / 2);
 });
