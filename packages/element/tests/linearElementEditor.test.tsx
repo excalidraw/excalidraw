@@ -1561,6 +1561,7 @@ describe("Test Linear Elements", () => {
         false,
         false,
         false,
+        h.app.renderEnvironment,
       );
       expect(
         wrapText(

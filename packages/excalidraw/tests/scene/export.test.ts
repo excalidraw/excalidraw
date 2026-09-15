@@ -7,6 +7,13 @@ import {
   FRAME_STYLE,
 } from "@excalidraw/common";
 
+import {
+  getPlaceholderLinkText,
+  newElementWith,
+  resetRenderEnvironment,
+  setRenderEnvironment,
+} from "@excalidraw/element";
+
 import { pointFrom } from "@excalidraw/math";
 
 import type {
@@ -634,6 +641,66 @@ describe("exporting frames", () => {
       );
     });
 
+    it("renders frame labels without measuring text (no canvas needed)", async () => {
+      const createElementSpy = vi.spyOn(document, "createElement");
+      // any text measurement would build a metrics canvas through the
+      // environment; SVG export must not need one
+      setRenderEnvironment({
+        createCanvas: () => {
+          throw new Error("exportToSvg must not create a canvas");
+        },
+      });
+
+      try {
+        const frame = newElementWith(
+          API.createElement({
+            type: "frame",
+            width: 100,
+            height: 100,
+            x: 0,
+            y: 0,
+          }),
+          { name: "a frame name long enough to overflow the frame width" },
+        );
+
+        const svg = await exportToSvg({
+          elements: [frame],
+          files: null,
+          exportPadding: 0,
+        });
+
+        expect(
+          createElementSpy.mock.calls.filter(([tag]) => tag === "canvas"),
+        ).toHaveLength(0);
+
+        // the full title stays in the document -- clipped to the frame
+        // rather than ellipsis-truncated like the canvas export
+        const label = svg.querySelector("text");
+        expect(label?.textContent).toBe(frame.name);
+        const clipRect = svg.querySelector(
+          `clipPath[id="${frame.id}-label"] rect`,
+        );
+        expect(clipRect?.getAttribute("width")).toBe(`${frame.width}`);
+        expect(label?.closest("g[clip-path]")?.getAttribute("clip-path")).toBe(
+          `url(#${frame.id}-label)`,
+        );
+
+        // the label sits above the frame: at the top of the export, with
+        // the export grown by the label's height
+        expect(
+          svg
+            .querySelector(`clipPath[id="${frame.id}-label"]`)
+            ?.parentElement?.getAttribute("transform"),
+        ).toBe("translate(0 0)");
+        expect(svg.getAttribute("height")).toBe(
+          (frame.height + getFrameNameHeight("svg")).toString(),
+        );
+      } finally {
+        resetRenderEnvironment();
+        createElementSpy.mockRestore();
+      }
+    });
+
     it("should not export frame-overlapping elements belonging to different frame", async () => {
       const frame1 = API.createElement({
         type: "frame",
@@ -695,5 +762,65 @@ describe("exporting frames", () => {
       expect(svg.getAttribute("width")).toBe(frame1.width.toString());
       expect(svg.getAttribute("height")).toBe(frame1.height.toString());
     });
+  });
+});
+
+describe("embed placeholders", () => {
+  it("renders them in SVG without measuring text (no canvas needed)", async () => {
+    const createElementSpy = vi.spyOn(document, "createElement");
+    setRenderEnvironment({
+      createCanvas: () => {
+        throw new Error("exportToSvg must not create a canvas");
+      },
+    });
+
+    try {
+      const iframe = API.createElement({
+        type: "iframe",
+        x: 0,
+        y: 0,
+        width: 300,
+        height: 200,
+      });
+      const link =
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PL0123456789abcdefghijklmnopqrstuv";
+      const embed = newElementWith(
+        API.createElement({
+          type: "embeddable",
+          x: 400,
+          y: 0,
+          width: 560,
+          height: 315,
+        }),
+        { link },
+      );
+
+      const svg = await exportToSvg({
+        elements: [iframe, embed],
+        files: null,
+        exportPadding: 0,
+      });
+
+      expect(
+        createElementSpy.mock.calls.filter(([tag]) => tag === "canvas"),
+      ).toHaveLength(0);
+
+      const texts = Array.from(svg.querySelectorAll("text")).map(
+        (node) => node.textContent,
+      );
+      expect(texts).toContain("IFrame element");
+
+      // the link is shown capped to a single line; the full link lives on
+      // the element's anchor
+      expect(texts).toContain(getPlaceholderLinkText(link));
+      expect(
+        Array.from(svg.querySelectorAll("a[href]")).some((anchor) =>
+          anchor.getAttribute("href")?.includes("youtube.com/watch?v="),
+        ),
+      ).toBe(true);
+    } finally {
+      resetRenderEnvironment();
+      createElementSpy.mockRestore();
+    }
   });
 });

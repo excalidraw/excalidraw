@@ -22,6 +22,8 @@ import {
   wrapText,
 } from "@excalidraw/element";
 
+import type { RenderEnvironment } from "@excalidraw/element";
+
 import type {
   ChartType,
   ExcalidrawTextElement,
@@ -268,9 +270,10 @@ export const getRadarDisplayText = (
   text: string,
   fontString: ReturnType<typeof getFontString>,
   maxWidth: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   return shouldWrapRadarText(text)
-    ? wrapText(text, fontString, maxWidth)
+    ? wrapText(text, fontString, maxWidth, renderEnvironment)
     : text;
 };
 
@@ -281,6 +284,7 @@ export const createRadarAxisLabels = (
   centerY: number,
   radius: number,
   backgroundColor: string,
+  renderEnvironment?: RenderEnvironment,
 ): {
   axisLabels: ChartElements;
   axisLabelTopY: number;
@@ -294,7 +298,11 @@ export const createRadarAxisLabels = (
     RADAR_AXIS_LABEL_MAX_WIDTH,
     radius * (labels.length > 8 ? 0.56 : 0.72),
   );
-  const minLabelWidth = getApproxMinLineWidth(fontString, lineHeight);
+  const minLabelWidth = getApproxMinLineWidth(
+    fontString,
+    lineHeight,
+    renderEnvironment,
+  );
 
   const axisLabels = labels.map((label, index) => {
     const angle = angles[index];
@@ -304,15 +312,28 @@ export const createRadarAxisLabels = (
         .trim()
         .split(/\s+/)
         .filter(Boolean)
-        .map((word) => measureText(word, fontString, lineHeight).width),
+        .map(
+          (word) =>
+            measureText(word, fontString, lineHeight, renderEnvironment).width,
+        ),
     );
     const maxLabelWidth = Math.max(
       minLabelWidth,
       baseLabelWidth,
       longestWordWidth,
     );
-    const displayLabel = getRadarDisplayText(label, fontString, maxLabelWidth);
-    const metrics = measureText(displayLabel, fontString, lineHeight);
+    const displayLabel = getRadarDisplayText(
+      label,
+      fontString,
+      maxLabelWidth,
+      renderEnvironment,
+    );
+    const metrics = measureText(
+      displayLabel,
+      fontString,
+      lineHeight,
+      renderEnvironment,
+    );
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
 
@@ -353,6 +374,7 @@ export const createRadarAxisLabels = (
       lineHeight,
       textAlign,
       verticalAlign: "middle",
+      renderEnvironment,
     });
   });
 
@@ -370,6 +392,7 @@ export const createSeriesLegend = (
   minLegendTopY: number,
   fallbackLegendY: number,
   backgroundColor: string,
+  renderEnvironment?: RenderEnvironment,
 ): ChartElements => {
   if (series.length <= 1) {
     return [];
@@ -381,8 +404,18 @@ export const createSeriesLegend = (
   const fontString = getFontString({ fontFamily, fontSize });
   const legendItems = series.map((seriesItem, index) => {
     const label = seriesItem.title?.trim() || `Series ${index + 1}`;
-    const displayLabel = getRadarDisplayText(label, fontString, BAR_HEIGHT);
-    const metrics = measureText(displayLabel, fontString, lineHeight);
+    const displayLabel = getRadarDisplayText(
+      label,
+      fontString,
+      BAR_HEIGHT,
+      renderEnvironment,
+    );
+    const metrics = measureText(
+      displayLabel,
+      fontString,
+      lineHeight,
+      renderEnvironment,
+    );
     const itemWidth =
       RADAR_LEGEND_SWATCH_SIZE + RADAR_LEGEND_TEXT_GAP + metrics.width;
     return {
@@ -463,6 +496,7 @@ export const createSeriesLegend = (
         lineHeight,
         textAlign: "left",
         verticalAlign: "middle",
+        renderEnvironment,
       }),
     );
 
@@ -477,15 +511,22 @@ const ellipsifyTextToWidth = (
   maxWidth: number,
   fontString: ReturnType<typeof getFontString>,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  renderEnvironment?: RenderEnvironment,
 ) => {
-  if (measureText(text, fontString, lineHeight).width <= maxWidth) {
+  if (
+    measureText(text, fontString, lineHeight, renderEnvironment).width <=
+    maxWidth
+  ) {
     return text;
   }
 
   let end = text.length;
   while (end > 1) {
     const candidate = `${text.slice(0, end)}...`;
-    if (measureText(candidate, fontString, lineHeight).width <= maxWidth) {
+    if (
+      measureText(candidate, fontString, lineHeight, renderEnvironment).width <=
+      maxWidth
+    ) {
       return candidate;
     }
     end--;
@@ -499,27 +540,44 @@ const wrapOrEllipsifyTextToWidth = (
   maxWidth: number,
   fontString: ReturnType<typeof getFontString>,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  renderEnvironment?: RenderEnvironment,
 ) => {
-  if (measureText(text, fontString, lineHeight).width <= maxWidth) {
+  if (
+    measureText(text, fontString, lineHeight, renderEnvironment).width <=
+    maxWidth
+  ) {
     return { wrapped: false, text };
   }
 
   const words = text.trim().split(/\s+/).filter(Boolean);
   if (words.length > 1) {
     const hasLongWord = words.some((word) => {
-      return measureText(word, fontString, lineHeight).width > maxWidth;
+      return (
+        measureText(word, fontString, lineHeight, renderEnvironment).width >
+        maxWidth
+      );
     });
     if (
       !hasLongWord &&
-      maxWidth >= getApproxMinLineWidth(fontString, lineHeight)
+      maxWidth >=
+        getApproxMinLineWidth(fontString, lineHeight, renderEnvironment)
     ) {
-      return { wrapped: true, text: wrapText(text, fontString, maxWidth) };
+      return {
+        wrapped: true,
+        text: wrapText(text, fontString, maxWidth, renderEnvironment),
+      };
     }
   }
 
   return {
     wrapped: false,
-    text: ellipsifyTextToWidth(text, maxWidth, fontString, lineHeight),
+    text: ellipsifyTextToWidth(
+      text,
+      maxWidth,
+      fontString,
+      lineHeight,
+      renderEnvironment,
+    ),
   };
 };
 
@@ -553,10 +611,11 @@ const getCartesianAxisLabelSpec = (
   maxRotatedWidth: number,
   fontString: ReturnType<typeof getFontString>,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  renderEnvironment?: RenderEnvironment,
 ): CartesianAxisLabelSpec => {
   const minWidth = Math.max(
     CARTESIAN_LABEL_MIN_WIDTH,
-    Math.ceil(getApproxMinLineWidth(fontString, lineHeight)),
+    Math.ceil(getApproxMinLineWidth(fontString, lineHeight, renderEnvironment)),
   );
   const maxWidth = Math.max(minWidth, Math.floor(maxLabelWidth));
   const candidateWidths: number[] = [];
@@ -614,8 +673,14 @@ const getCartesianAxisLabelSpec = (
       width,
       fontString,
       lineHeight,
+      renderEnvironment,
     );
-    const metrics = measureText(text, fontString, lineHeight);
+    const metrics = measureText(
+      text,
+      fontString,
+      lineHeight,
+      renderEnvironment,
+    );
     const rotated = getRotatedBoundingBox(
       metrics.width,
       metrics.height,
@@ -691,6 +756,7 @@ export const chartXLabels = (
   y: number,
   backgroundColor: string,
   layout: CartesianChartLayout,
+  renderEnvironment?: RenderEnvironment,
 ): ChartElements => {
   const fontFamily = commonProps.fontFamily;
   const fontSize = FONT_SIZES.sm;
@@ -713,6 +779,7 @@ export const chartXLabels = (
         maxRotatedWidth,
         fontString,
         lineHeight,
+        renderEnvironment,
       );
       const centerX =
         x +
@@ -737,6 +804,7 @@ export const chartXLabels = (
         lineHeight,
         textAlign: "center",
         verticalAlign: "top",
+        renderEnvironment,
       });
     }) || []
   );
@@ -749,6 +817,7 @@ const chartYLabels = (
   backgroundColor: string,
   layout: CartesianChartLayout,
   maxValue = Math.max(...spreadsheet.series[0].values),
+  renderEnvironment?: RenderEnvironment,
 ): ChartElements => {
   const minYLabel = newTextElement({
     backgroundColor,
@@ -757,6 +826,7 @@ const chartYLabels = (
     y: y - layout.gap,
     text: "0",
     textAlign: "right",
+    renderEnvironment,
   });
 
   const maxYLabel = newTextElement({
@@ -766,6 +836,7 @@ const chartYLabels = (
     y: y - layout.chartHeight - minYLabel.height / 2,
     text: maxValue.toLocaleString(),
     textAlign: "right",
+    renderEnvironment,
   });
 
   return [minYLabel, maxYLabel];
@@ -823,6 +894,7 @@ export const chartBaseElements = (
   layout: CartesianChartLayout,
   maxValue = Math.max(...spreadsheet.series[0].values),
   debug?: boolean,
+  renderEnvironment?: RenderEnvironment,
 ): ChartElements => {
   const { chartWidth, chartHeight } = getChartDimensions(spreadsheet, layout);
 
@@ -837,6 +909,7 @@ export const chartBaseElements = (
         textAlign: "center",
         fontSize: FONT_SIZES.xl,
         fontFamily: FONT_FAMILY["Lilita One"],
+        renderEnvironment,
       })
     : null;
 
@@ -858,8 +931,23 @@ export const chartBaseElements = (
   return [
     ...(debugRect ? [debugRect] : []),
     ...(title ? [title] : []),
-    ...chartXLabels(spreadsheet, x, y, backgroundColor, layout),
-    ...chartYLabels(spreadsheet, x, y, backgroundColor, layout, maxValue),
+    ...chartXLabels(
+      spreadsheet,
+      x,
+      y,
+      backgroundColor,
+      layout,
+      renderEnvironment,
+    ),
+    ...chartYLabels(
+      spreadsheet,
+      x,
+      y,
+      backgroundColor,
+      layout,
+      maxValue,
+      renderEnvironment,
+    ),
     ...chartLines(spreadsheet, x, y, backgroundColor, layout),
   ];
 };

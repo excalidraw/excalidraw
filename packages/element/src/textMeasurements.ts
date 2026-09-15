@@ -7,12 +7,17 @@ import {
   normalizeEOL,
 } from "@excalidraw/common";
 
+import { getRenderEnvironment } from "./renderEnvironment";
+
+import type { RenderEnvironment } from "./renderEnvironment";
+
 import type { FontString, ExcalidrawTextElement } from "./types";
 
 export const measureText = (
   text: string,
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  env?: RenderEnvironment,
 ) => {
   const _text = text
     .split("\n")
@@ -22,7 +27,7 @@ export const measureText = (
     .join("\n");
   const fontSize = parseFloat(font);
   const height = getTextHeight(_text, fontSize, lineHeight);
-  const width = getTextWidth(_text, font);
+  const width = getTextWidth(_text, font, env);
   return { width, height };
 };
 
@@ -32,11 +37,13 @@ const DUMMY_TEXT = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toLocaleUpperCase();
 export const getApproxMinLineWidth = (
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  env?: RenderEnvironment,
 ) => {
-  const maxCharWidth = getMaxCharWidth(font);
+  const maxCharWidth = getMaxCharWidth(font, env);
   if (maxCharWidth === 0) {
     return (
-      measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight).width +
+      measureText(DUMMY_TEXT.split("").join("\n"), font, lineHeight, env)
+        .width +
       BOUND_TEXT_PADDING * 2
     );
   }
@@ -46,8 +53,9 @@ export const getApproxMinLineWidth = (
 export const getMinTextElementWidth = (
   font: FontString,
   lineHeight: ExcalidrawTextElement["lineHeight"],
+  env?: RenderEnvironment,
 ) => {
-  return measureText("", font, lineHeight).width + BOUND_TEXT_PADDING * 2;
+  return measureText("", font, lineHeight, env).width + BOUND_TEXT_PADDING * 2;
 };
 
 export const isMeasureTextSupported = () => {
@@ -103,15 +111,40 @@ export const getApproxMinLineHeight = (
   return getLineHeightInPx(fontSize, lineHeight) + BOUND_TEXT_PADDING * 2;
 };
 
-let textMetricsProvider: TextMetricsProvider | undefined;
+let customTextMetricsProvider: TextMetricsProvider | undefined;
+const customTextMetricsProviders = new WeakMap<
+  RenderEnvironment,
+  TextMetricsProvider
+>();
+/**
+ * The lazily-built canvas-backed default provider per environment -- each
+ * environment (e.g. each editor's owner window) measures on a canvas of its
+ * own. A custom provider (see `setCustomTextMetricsProvider`) is the caller's
+ * and is left alone.
+ */
+const defaultTextMetricsProviders = new WeakMap<
+  RenderEnvironment,
+  TextMetricsProvider
+>();
 
 /**
  * Set a custom text metrics provider.
  *
  * Useful for overriding the width calculation algorithm where canvas API is not available / desired.
  */
-export const setCustomTextMetricsProvider = (provider: TextMetricsProvider) => {
-  textMetricsProvider = provider;
+export const setCustomTextMetricsProvider = (
+  provider: TextMetricsProvider | undefined,
+  env?: RenderEnvironment,
+) => {
+  if (env) {
+    if (provider) {
+      customTextMetricsProviders.set(env, provider);
+    } else {
+      customTextMetricsProviders.delete(env);
+    }
+    return;
+  }
+  customTextMetricsProvider = provider;
 };
 
 export interface TextMetricsProvider {
@@ -121,8 +154,8 @@ export interface TextMetricsProvider {
 class CanvasTextMetricsProvider implements TextMetricsProvider {
   private canvas: HTMLCanvasElement;
 
-  constructor() {
-    this.canvas = document.createElement("canvas");
+  constructor(env: RenderEnvironment) {
+    this.canvas = getRenderEnvironment(env).createCanvas();
   }
 
   /**
@@ -149,19 +182,40 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
   }
 }
 
-export const getLineWidth = (text: string, font: FontString) => {
-  if (!textMetricsProvider) {
-    textMetricsProvider = new CanvasTextMetricsProvider();
+const getDefaultTextMetricsProvider = (
+  env: RenderEnvironment | undefined,
+): TextMetricsProvider => {
+  const resolvedEnv = getRenderEnvironment(env);
+  let provider = defaultTextMetricsProviders.get(resolvedEnv);
+  if (!provider) {
+    provider = new CanvasTextMetricsProvider(resolvedEnv);
+    defaultTextMetricsProviders.set(resolvedEnv, provider);
   }
-
-  return textMetricsProvider.getLineWidth(text, font);
+  return provider;
 };
 
-export const getTextWidth = (text: string, font: FontString) => {
+export const getLineWidth = (
+  text: string,
+  font: FontString,
+  env?: RenderEnvironment,
+) => {
+  const resolvedEnv = getRenderEnvironment(env);
+  const provider =
+    customTextMetricsProviders.get(resolvedEnv) ??
+    customTextMetricsProvider ??
+    getDefaultTextMetricsProvider(resolvedEnv);
+  return provider.getLineWidth(text, font);
+};
+
+export const getTextWidth = (
+  text: string,
+  font: FontString,
+  env?: RenderEnvironment,
+) => {
   const lines = splitIntoLines(text);
   let width = 0;
   lines.forEach((line) => {
-    width = Math.max(width, getLineWidth(line, font));
+    width = Math.max(width, getLineWidth(line, font, env));
   });
 
   return width;
@@ -177,27 +231,47 @@ export const getTextHeight = (
 };
 
 export const charWidth = (() => {
-  const cachedCharWidth: { [key: FontString]: Array<number> } = {};
+  // one env's metrics at a time: two realms measure the same font string
+  // differently, so a different env drops the cache rather than mixing them.
+  // Held weakly -- an editor's env closes over its owner window, and a strong
+  // ref here would pin a closed popout's realm for the life of the process.
+  let cachedEnv: WeakRef<RenderEnvironment> | undefined;
+  let cachedCharWidth: { [key: FontString]: Array<number> } = {};
 
-  const calculate = (char: string, font: FontString) => {
+  const isCachedEnv = (resolvedEnv: RenderEnvironment) =>
+    cachedEnv?.deref() === resolvedEnv;
+
+  const selectEnv = (env: RenderEnvironment | undefined) => {
+    const resolvedEnv = getRenderEnvironment(env);
+    if (!isCachedEnv(resolvedEnv)) {
+      cachedEnv = new WeakRef(resolvedEnv);
+      cachedCharWidth = {};
+    }
+  };
+
+  const calculate = (
+    char: string,
+    font: FontString,
+    env?: RenderEnvironment,
+  ) => {
+    selectEnv(env);
     const unicode = char.charCodeAt(0);
     if (!cachedCharWidth[font]) {
       cachedCharWidth[font] = [];
     }
-    if (!cachedCharWidth[font][unicode]) {
-      const width = getLineWidth(char, font);
-      cachedCharWidth[font][unicode] = width;
+    if (cachedCharWidth[font][unicode] === undefined) {
+      cachedCharWidth[font][unicode] = getLineWidth(char, font, env);
     }
-
     return cachedCharWidth[font][unicode];
   };
 
-  const getCache = (font: FontString) => {
-    return cachedCharWidth[font];
-  };
+  const getCache = (font: FontString, env?: RenderEnvironment) =>
+    isCachedEnv(getRenderEnvironment(env)) ? cachedCharWidth[font] : undefined;
 
+  // dropped rather than emptied, so that the approximation helpers fall back
+  // to measuring instead of reducing over an empty array
   const clearCache = (font: FontString) => {
-    cachedCharWidth[font] = [];
+    delete cachedCharWidth[font];
   };
 
   return {
@@ -207,8 +281,8 @@ export const charWidth = (() => {
   };
 })();
 
-export const getMinCharWidth = (font: FontString) => {
-  const cache = charWidth.getCache(font);
+export const getMinCharWidth = (font: FontString, env?: RenderEnvironment) => {
+  const cache = charWidth.getCache(font, env);
   if (!cache) {
     return 0;
   }
@@ -217,8 +291,8 @@ export const getMinCharWidth = (font: FontString) => {
   return Math.min(...cacheWithOutEmpty);
 };
 
-export const getMaxCharWidth = (font: FontString) => {
-  const cache = charWidth.getCache(font);
+export const getMaxCharWidth = (font: FontString, env?: RenderEnvironment) => {
+  const cache = charWidth.getCache(font, env);
   if (!cache) {
     return 0;
   }

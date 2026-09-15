@@ -6,7 +6,10 @@ import {
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
-import { getNonDeletedElements } from "@excalidraw/element";
+import {
+  getNonDeletedElements,
+  getRenderEnvironment,
+} from "@excalidraw/element";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import {
   restoreAppState,
@@ -22,6 +25,7 @@ import type {
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
+import type { RenderEnvironment } from "@excalidraw/element";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 
 export { MIME_TYPES };
@@ -37,6 +41,7 @@ type ExportOpts = {
     width: number,
     height: number,
   ) => { width: number; height: number; scale?: number };
+  renderEnvironment?: RenderEnvironment;
 };
 
 export const exportToCanvas = ({
@@ -47,6 +52,7 @@ export const exportToCanvas = ({
   getDimensions,
   exportPadding,
   exportingFrame,
+  renderEnvironment,
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
@@ -62,9 +68,15 @@ export const exportToCanvas = ({
     restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
+    {
+      exportBackground,
+      exportPadding,
+      viewBackgroundColor,
+      exportingFrame,
+      renderEnvironment,
+    },
     (width: number, height: number) => {
-      const canvas = document.createElement("canvas");
+      const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
 
       if (maxWidthOrHeight) {
         if (typeof getDimensions === "function") {
@@ -176,11 +188,13 @@ export const exportToSvg = async ({
   exportingFrame,
   skipInliningFonts,
   reuseImages,
-}: Omit<ExportOpts, "getDimensions"> & {
+  ownerDocument,
+}: Omit<ExportOpts, "getDimensions" | "renderEnvironment"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
   skipInliningFonts?: true;
   reuseImages?: boolean;
+  ownerDocument?: Document;
 }): Promise<SVGSVGElement> => {
   const restoredElements = getNonDeletedElements(
     restoreElements(elements, null, {
@@ -199,6 +213,7 @@ export const exportToSvg = async ({
     renderEmbeddables,
     skipInliningFonts,
     reuseImages,
+    ownerDocument,
   });
 };
 

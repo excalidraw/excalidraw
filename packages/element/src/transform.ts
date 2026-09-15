@@ -54,6 +54,8 @@ import { getCommonBounds } from "./bounds";
 
 import { Scene } from "./Scene";
 
+import type { RenderEnvironment } from "./renderEnvironment";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
@@ -258,6 +260,7 @@ const bindTextToContainer = (
   container: ExcalidrawElement,
   textProps: { text: string } & FragmentConstructorOpts,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   // a note and its label share one ink: a label that sets its own color
   // gives it to the note (the footer paints with it); transparent falls
@@ -280,6 +283,7 @@ const bindTextToContainer = (
     labelPosition: isArrowElement(container)
       ? DEFAULT_BOUND_TEXT_LABEL_POSITION
       : null,
+    renderEnvironment,
   });
 
   Object.assign(container, {
@@ -292,7 +296,7 @@ const bindTextToContainer = (
       : null),
   });
 
-  redrawTextBoundingBox(textElement, container, scene);
+  redrawTextBoundingBox(textElement, container, scene, renderEnvironment);
 
   return [container, textElement] as const;
 };
@@ -303,6 +307,7 @@ const bindLinearElementToElement = (
   end: ValidLinearElement["end"],
   elementStore: ElementStore,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ): {
   linearElement: ExcalidrawLinearElement;
   startBoundElement?: ExcalidrawElement;
@@ -352,6 +357,7 @@ const bindLinearElementToElement = (
           ...existingElement,
           ...start,
           text,
+          renderEnvironment,
         });
         // to position the text correctly when coordinates not provided
         Object.assign(startBoundElement, {
@@ -429,6 +435,7 @@ const bindLinearElementToElement = (
           ...existingElement,
           ...end,
           text,
+          renderEnvironment,
         });
         // to position the text correctly when coordinates not provided
         Object.assign(endBoundElement, {
@@ -566,7 +573,7 @@ class ElementStore {
 
 export const convertToExcalidrawElements = (
   elementsSkeleton: ExcalidrawElementSkeleton[] | null,
-  opts?: { regenerateIds: boolean },
+  opts?: { regenerateIds?: boolean; renderEnvironment?: RenderEnvironment },
 ) => {
   if (!elementsSkeleton) {
     return [];
@@ -647,6 +654,7 @@ export const convertToExcalidrawElements = (
           normalizedText,
           getFontString({ fontFamily, fontSize }),
           lineHeight,
+          opts?.renderEnvironment,
         );
 
         excalidrawElement = newTextElement({
@@ -655,6 +663,7 @@ export const convertToExcalidrawElements = (
           fontFamily,
           fontSize,
           ...element,
+          renderEnvironment: opts?.renderEnvironment,
         });
         break;
       }
@@ -754,6 +763,7 @@ export const convertToExcalidrawElements = (
             excalidrawElement,
             element?.label,
             scene,
+            opts?.renderEnvironment,
           );
           elementStore.add(container);
           elementStore.add(text);
@@ -782,6 +792,7 @@ export const convertToExcalidrawElements = (
                 originalEnd,
                 elementStore,
                 scene,
+                opts?.renderEnvironment,
               );
             container = linearElement;
             elementStore.add(linearElement);
@@ -807,6 +818,7 @@ export const convertToExcalidrawElements = (
                   end,
                   elementStore,
                   scene,
+                  opts?.renderEnvironment,
                 );
 
               elementStore.add(linearElement);

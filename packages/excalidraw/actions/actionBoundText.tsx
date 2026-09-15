@@ -76,6 +76,7 @@ export const actionUnbindText = register({
           boundTextElement.originalText,
           getFontString(boundTextElement),
           boundTextElement.lineHeight,
+          app.renderEnvironment,
         );
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,
@@ -103,7 +104,9 @@ export const actionUnbindText = register({
         });
         if (isStickyNoteElement(element)) {
           // an empty note sits at its base height; bound arrows follow
-          updateStickyNoteLayout(element, app.scene);
+          updateStickyNoteLayout(element, app.scene, {
+            renderEnvironment: app.renderEnvironment,
+          });
         } else {
           app.scene.mutateElement(element, {
             height: originalContainerHeight
@@ -202,7 +205,12 @@ export const actionBindText = register({
       ...(stickyInk ? { strokeColor: stickyInk } : null),
     });
     const originalContainerHeight = container.height;
-    redrawTextBoundingBox(textElement, container, app.scene);
+    redrawTextBoundingBox(
+      textElement,
+      container,
+      app.scene,
+      app.renderEnvironment,
+    );
     // overwritting the cache with original container height so
     // it can be restored when unbind
     updateOriginalContainerCache(container.id, originalContainerHeight);
@@ -353,7 +361,12 @@ export const actionWrapTextInContainer = register({
           autoResize: true,
         });
 
-        redrawTextBoundingBox(textElement, container, app.scene);
+        redrawTextBoundingBox(
+          textElement,
+          container,
+          app.scene,
+          app.renderEnvironment,
+        );
 
         updatedElements = pushContainerBelowText(
           [...updatedElements, container],

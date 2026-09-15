@@ -48,6 +48,7 @@ const ChartPreviewBtn = (props: {
     null,
   );
   const { theme } = useUIAppState();
+  const { renderEnvironment, ownerDocument } = useApp();
 
   useLayoutEffect(() => {
     if (!props.spreadsheet) {
@@ -61,6 +62,7 @@ const ChartPreviewBtn = (props: {
       0,
       0,
       props.colorSeed,
+      renderEnvironment,
     );
     if (!elements) {
       setChartElements(null);
@@ -82,6 +84,7 @@ const ChartPreviewBtn = (props: {
         null, // files
         {
           skipInliningFonts: true,
+          ownerDocument,
         },
       );
       svg.querySelector(".style-fonts")?.remove();
@@ -92,7 +95,14 @@ const ChartPreviewBtn = (props: {
     return () => {
       previewNode.replaceChildren();
     };
-  }, [props.spreadsheet, props.chartType, props.colorSeed, theme]);
+  }, [
+    props.spreadsheet,
+    props.chartType,
+    props.colorSeed,
+    theme,
+    renderEnvironment,
+    ownerDocument,
+  ]);
 
   const chartTypeLabel = getChartTypeLabel(props.chartType);
 
@@ -119,6 +129,7 @@ const PlainTextPreviewBtn = (props: {
 }) => {
   const previewRef = useRef<HTMLDivElement | null>(null);
   const { theme } = useUIAppState();
+  const { ownerDocument } = useApp();
 
   useLayoutEffect(() => {
     if (!props.rawText) {
@@ -144,6 +155,7 @@ const PlainTextPreviewBtn = (props: {
         null,
         {
           skipInliningFonts: true,
+          ownerDocument,
         },
       );
       svg.querySelector(".style-fonts")?.remove();
@@ -154,7 +166,7 @@ const PlainTextPreviewBtn = (props: {
     return () => {
       previewNode.replaceChildren();
     };
-  }, [props.rawText, theme]);
+  }, [props.rawText, theme, ownerDocument]);
 
   return (
     <button
@@ -182,7 +194,7 @@ export const PasteChartDialog = ({
   rawText: string;
   onClose: () => void;
 }) => {
-  const { onInsertElements, focusContainer } = useApp();
+  const { onInsertElements, focusContainer, renderEnvironment } = useApp();
   const [colorSeed, setColorSeed] = useState(Math.random());
 
   const handleReshuffleColors = React.useCallback(() => {
@@ -207,6 +219,7 @@ export const PasteChartDialog = ({
       text: rawText,
       x: 0,
       y: 0,
+      renderEnvironment,
     });
     onInsertElements([textElement]);
     trackEvent("paste", "chart", "plaintext");

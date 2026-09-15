@@ -146,6 +146,7 @@ const flipElements = (
       flipByY: flipDirection === "vertical",
       shouldResizeFromCenter: true,
       shouldMaintainAspectRatio: true,
+      renderEnvironment: app.renderEnvironment,
     },
   );
 

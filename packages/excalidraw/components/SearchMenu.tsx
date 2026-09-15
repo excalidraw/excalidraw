@@ -29,6 +29,7 @@ import { isTextElement, isFrameLikeElement } from "@excalidraw/element";
 
 import { getDefaultFrameName } from "@excalidraw/element/frame";
 
+import type { RenderEnvironment } from "@excalidraw/element";
 import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
@@ -630,6 +631,7 @@ const getMatchedLines = (
   textElement: ExcalidrawTextElement,
   searchQuery: SearchQuery,
   index: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const normalizedText = normalizeWrappedText(
     textElement.text,
@@ -687,6 +689,7 @@ const getMatchedLines = (
         textToStart,
         getFontString(textElement),
         textElement.lineHeight,
+        renderEnvironment,
       );
 
       // measureText returns a non-zero width for the empty string
@@ -700,6 +703,7 @@ const getMatchedLines = (
           lineIndexRange.line,
           getFontString(textElement),
           textElement.lineHeight,
+          renderEnvironment,
         );
 
         const spaceToStart =
@@ -713,6 +717,7 @@ const getMatchedLines = (
         matchedWord,
         getFontString(textElement),
         textElement.lineHeight,
+        renderEnvironment,
       );
 
       const offsetX = offset.width;
@@ -738,6 +743,7 @@ const getMatchInFrame = (
   searchQuery: SearchQuery,
   index: number,
   zoomValue: number,
+  renderEnvironment?: RenderEnvironment,
 ): SearchMatch["matchedLines"] => {
   const text = frame.name ?? getDefaultFrameName(frame);
   const matchedText = text.slice(index, index + searchQuery.length);
@@ -750,14 +756,19 @@ const getMatchInFrame = (
 
   const lineHeight = getLineHeight(FONT_FAMILY.Assistant);
 
-  const offset = measureText(prefixText, font, lineHeight);
+  const offset = measureText(prefixText, font, lineHeight, renderEnvironment);
 
   // Correct non-zero width for empty string
   if (prefixText === "") {
     offset.width = 0;
   }
 
-  const matchedMetrics = measureText(matchedText, font, lineHeight);
+  const matchedMetrics = measureText(
+    matchedText,
+    font,
+    lineHeight,
+    renderEnvironment,
+  );
 
   const offsetX = offset.width;
   const offsetY = -offset.height - FRAME_STYLE.strokeWidth;
@@ -811,7 +822,12 @@ const handleSearch = debounce(
 
       while ((match = regex.exec(text)) !== null) {
         const preview = getMatchPreview(text, match.index, searchQuery);
-        const matchedLines = getMatchedLines(textEl, searchQuery, match.index);
+        const matchedLines = getMatchedLines(
+          textEl,
+          searchQuery,
+          match.index,
+          app.renderEnvironment,
+        );
 
         if (matchedLines.length > 0) {
           textMatches.push({
@@ -838,6 +854,7 @@ const handleSearch = debounce(
           searchQuery,
           match.index,
           app.state.zoom.value,
+          app.renderEnvironment,
         );
 
         if (matchedLines.length > 0) {

@@ -3,7 +3,6 @@ import rough from "roughjs/bin/rough";
 import {
   DEFAULT_EXPORT_PADDING,
   FRAME_STYLE,
-  FONT_FAMILY,
   SVG_NS,
   THEME,
   MIME_TYPES,
@@ -19,6 +18,7 @@ import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
+  getRenderEnvironment,
   updateImageCache,
 } from "@excalidraw/element";
 
@@ -29,15 +29,12 @@ import { isFrameLikeElement } from "@excalidraw/element";
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
-  getFrameLikeTitle,
   getRootElements,
 } from "@excalidraw/element";
 
 import { syncInvalidIndices } from "@excalidraw/element";
 
-import { type Mutable } from "@excalidraw/common/utility-types";
-
-import { newTextElement } from "@excalidraw/element";
+import { newTextElement, getFrameLabel } from "@excalidraw/element";
 
 import type { Bounds } from "@excalidraw/common";
 
@@ -48,6 +45,8 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
+
+import type { RenderEnvironment } from "@excalidraw/element";
 
 import { getDefaultAppState } from "../appState";
 import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
@@ -65,11 +64,12 @@ import type { AppState, BinaryFiles } from "../types";
 const truncateText = (
   element: NonDeleted<ExcalidrawTextElement>,
   maxWidth: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (element.width <= maxWidth) {
     return element;
   }
-  const canvas = document.createElement("canvas");
+  const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
   const ctx = canvas.getContext("2d")!;
   ctx.font = getFontString({
     fontFamily: element.fontFamily,
@@ -97,36 +97,36 @@ const truncateText = (
 };
 
 /**
- * When exporting frames, we need to render frame labels which are currently
- * being rendered in DOM when editing. Adding the labels as regular text
- * elements seems like a simple hack. In the future we'll want to move to
- * proper canvas rendering, even within editor (instead of DOM).
+ * Frame labels are DOM overlays while editing. For canvas export we bake them
+ * in as text elements, measured and ellipsis-truncated to the frame's width
+ * (the SVG renderer draws them itself, without measuring -- see
+ * `renderFrameLabelToSvg`). In the future we'll want to move to proper canvas
+ * rendering, even within editor (instead of DOM).
  */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  opts: Pick<AppState, "exportWithDarkMode">,
+  opts: Pick<AppState, "exportWithDarkMode"> & {
+    renderEnvironment?: RenderEnvironment;
+  },
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
-      let textElement: Mutable<NonDeleted<ExcalidrawTextElement>> =
-        newTextElement({
-          x: element.x,
-          y: element.y - FRAME_STYLE.nameOffsetY,
-          fontFamily: FONT_FAMILY.Helvetica,
-          fontSize: FRAME_STYLE.nameFontSize,
-          lineHeight:
-            FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
-          strokeColor: opts.exportWithDarkMode
-            ? FRAME_STYLE.nameColorDarkTheme
-            : FRAME_STYLE.nameColorLightTheme,
-          text: getFrameLikeTitle(element),
-        });
-      textElement.y -= textElement.height;
+      const label = getFrameLabel(element, opts);
+      const textElement = newTextElement({
+        x: label.x,
+        y: label.y,
+        fontFamily: label.fontFamily,
+        fontSize: label.fontSize,
+        lineHeight: label.lineHeight,
+        strokeColor: label.color,
+        text: label.text,
+        renderEnvironment: opts.renderEnvironment,
+      });
 
-      textElement = truncateText(textElement, element.width);
-
-      nextElements.push(textElement);
+      nextElements.push(
+        truncateText(textElement, label.maxWidth, opts.renderEnvironment),
+      );
     }
     nextElements.push(element);
   }
@@ -147,34 +147,26 @@ const getFrameRenderingConfig = (
   };
 };
 
+/**
+ * The elements an export renders: when exporting a single frame, only what
+ * overlaps it (the renderer clips to the frame); otherwise the elements as
+ * supplied.
+ */
 const prepareElementsForRender = ({
   elements,
   exportingFrame,
-  frameRendering,
-  exportWithDarkMode,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
-  frameRendering: AppState["frameRendering"];
-  exportWithDarkMode: AppState["exportWithDarkMode"];
 }) => {
-  let nextElements: readonly NonDeletedExcalidrawElement[];
-
   if (exportingFrame) {
-    nextElements = getElementsOverlappingFrame(
+    return getElementsOverlappingFrame(
       elements,
       exportingFrame,
       arrayToMap(elements),
     );
-  } else if (frameRendering.enabled && frameRendering.name) {
-    nextElements = addFrameLabelsAsTextElements(elements, {
-      exportWithDarkMode,
-    });
-  } else {
-    nextElements = elements;
   }
-
-  return nextElements;
+  return elements;
 };
 
 export const exportToCanvas = async (
@@ -186,17 +178,19 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    renderEnvironment,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    renderEnvironment?: RenderEnvironment;
   },
   createCanvas: (
     width: number,
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
-    const canvas = document.createElement("canvas");
+    const canvas = getRenderEnvironment(renderEnvironment).createCanvas();
     canvas.width = width * appState.exportScale;
     canvas.height = height * appState.exportScale;
     return { canvas, scale: appState.exportScale };
@@ -218,12 +212,18 @@ export const exportToCanvas = async (
     frameRendering.clip = false;
   }
 
-  const elementsForRender = prepareElementsForRender({
+  let elementsForRender = prepareElementsForRender({
     elements,
     exportingFrame,
-    exportWithDarkMode: appState.exportWithDarkMode,
-    frameRendering,
   });
+
+  // `getFrameRenderingConfig` turns names off when exporting a single frame
+  if (frameRendering.enabled && frameRendering.name) {
+    elementsForRender = addFrameLabelsAsTextElements(elementsForRender, {
+      exportWithDarkMode: appState.exportWithDarkMode,
+      renderEnvironment,
+    });
+  }
 
   if (exportingFrame) {
     exportPadding = 0;
@@ -244,6 +244,7 @@ export const exportToCanvas = async (
       (element) => element.fileId,
     ),
     files,
+    createImage: renderEnvironment && (() => renderEnvironment.createImage()),
   });
 
   renderStaticScene({
@@ -272,6 +273,8 @@ export const exportToCanvas = async (
       imageCache,
       renderGrid: false,
       isExporting: true,
+      scale,
+      renderEnvironment,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
@@ -283,11 +286,11 @@ export const exportToCanvas = async (
   return canvas;
 };
 
-const createHTMLComment = (text: string) => {
+const createHTMLComment = (ownerDocument: Document, text: string) => {
   // surrounding with spaces to maintain prettified consistency with previous
   // iterations
   // <!-- comment -->
-  return document.createComment(` ${text} `);
+  return ownerDocument.createComment(` ${text} `);
 };
 
 export const exportToSvg = async (
@@ -310,8 +313,19 @@ export const exportToSvg = async (
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
+    ownerDocument?: Document;
   },
 ): Promise<SVGSVGElement> => {
+  const ownerDocument =
+    opts?.ownerDocument ?? (typeof document !== "undefined" ? document : null);
+
+  if (!ownerDocument) {
+    throw new Error(
+      "exportToSvg: no ownerDocument available. Pass opts.ownerDocument when " +
+        "running in a non-browser environment.",
+    );
+  }
+
   const frameRendering = getFrameRenderingConfig(
     opts?.exportingFrame ?? null,
     appState.frameRendering ?? null,
@@ -330,17 +344,33 @@ export const exportToSvg = async (
   const elementsForRender = prepareElementsForRender({
     elements,
     exportingFrame,
-    exportWithDarkMode,
-    frameRendering,
   });
 
   if (exportingFrame) {
     exportPadding = 0;
   }
 
+  // frame labels sit above their frames and are drawn by the SVG renderer
+  // (see `renderFrameLabelToSvg`) rather than being baked in as elements, so
+  // they have to be fitted into the bounds explicitly. `getFrameRenderingConfig`
+  // turns names off when exporting a single frame.
+  const frameLabelBounds: Bounds[] =
+    frameRendering.enabled && frameRendering.name
+      ? getFrameLikeElements(elementsForRender).map((frame) => {
+          const label = getFrameLabel(frame, { exportWithDarkMode });
+          return [
+            label.x,
+            label.y,
+            label.x + label.maxWidth,
+            label.y + label.height,
+          ];
+        })
+      : [];
+
   const [minX, minY, width, height] = getCanvasSize(
     exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
     exportPadding,
+    frameLabelBounds,
   );
 
   const offsetX = -minX + exportPadding;
@@ -350,7 +380,7 @@ export const exportToSvg = async (
   // initialize SVG root element
   // ---------------------------------------------------------------------------
 
-  const svgRoot = document.createElementNS(SVG_NS, "svg");
+  const svgRoot = ownerDocument.createElementNS(SVG_NS, "svg");
 
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
@@ -358,14 +388,13 @@ export const exportToSvg = async (
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
 
-  const defsElement = svgRoot.ownerDocument.createElementNS(SVG_NS, "defs");
+  const defsElement = ownerDocument.createElementNS(SVG_NS, "defs");
 
-  const metadataElement = svgRoot.ownerDocument.createElementNS(
-    SVG_NS,
-    "metadata",
+  const metadataElement = ownerDocument.createElementNS(SVG_NS, "metadata");
+
+  svgRoot.appendChild(
+    createHTMLComment(ownerDocument, "svg-source:excalidraw"),
   );
-
-  svgRoot.appendChild(createHTMLComment("svg-source:excalidraw"));
   svgRoot.appendChild(metadataElement);
   svgRoot.appendChild(defsElement);
 
@@ -400,10 +429,7 @@ export const exportToSvg = async (
     const elementsMap = arrayToMap(elements);
 
     for (const frame of frameElements) {
-      const clipPath = svgRoot.ownerDocument.createElementNS(
-        SVG_NS,
-        "clipPath",
-      );
+      const clipPath = ownerDocument.createElementNS(SVG_NS, "clipPath");
 
       clipPath.setAttribute("id", frame.id);
 
@@ -411,7 +437,7 @@ export const exportToSvg = async (
       const cx = (x2 - x1) / 2 - (frame.x - x1);
       const cy = (y2 - y1) / 2 - (frame.y - y1);
 
-      const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      const rect = ownerDocument.createElementNS(SVG_NS, "rect");
       rect.setAttribute(
         "transform",
         `translate(${frame.x + offsetX} ${frame.y + offsetY}) rotate(${
@@ -442,10 +468,10 @@ export const exportToSvg = async (
 
   const delimiter = "\n      "; // 6 spaces
 
-  const style = svgRoot.ownerDocument.createElementNS(SVG_NS, "style");
+  const style = ownerDocument.createElementNS(SVG_NS, "style");
   style.classList.add("style-fonts");
   style.appendChild(
-    document.createTextNode(`${delimiter}${fontFaces.join(delimiter)}`),
+    ownerDocument.createTextNode(`${delimiter}${fontFaces.join(delimiter)}`),
   );
 
   defsElement.appendChild(style);
@@ -456,7 +482,7 @@ export const exportToSvg = async (
 
   // render background rect
   if (appState.exportBackground && viewBackgroundColor) {
-    const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+    const rect = ownerDocument.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
     rect.setAttribute("y", "0");
     rect.setAttribute("width", `${width}`);
@@ -519,13 +545,19 @@ export const encodeSvgBase64Payload = ({
     true /* is already byte string */,
   );
 
+  const ownerDocument = metadataElement.ownerDocument;
+
   metadataElement.appendChild(
-    createHTMLComment(`payload-type:${MIME_TYPES.excalidraw}`),
+    createHTMLComment(ownerDocument, `payload-type:${MIME_TYPES.excalidraw}`),
   );
-  metadataElement.appendChild(createHTMLComment("payload-version:2"));
-  metadataElement.appendChild(createHTMLComment("payload-start"));
-  metadataElement.appendChild(document.createTextNode(base64));
-  metadataElement.appendChild(createHTMLComment("payload-end"));
+  metadataElement.appendChild(
+    createHTMLComment(ownerDocument, "payload-version:2"),
+  );
+  metadataElement.appendChild(
+    createHTMLComment(ownerDocument, "payload-start"),
+  );
+  metadataElement.appendChild(ownerDocument.createTextNode(base64));
+  metadataElement.appendChild(createHTMLComment(ownerDocument, "payload-end"));
 };
 
 export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
@@ -566,8 +598,16 @@ export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
 const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
+  /** extra boxes to fit, for things drawn that aren't elements (frame labels) */
+  extraBounds: readonly Bounds[] = [],
 ): Bounds => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  let [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  for (const [x1, y1, x2, y2] of extraBounds) {
+    minX = Math.min(minX, x1);
+    minY = Math.min(minY, y1);
+    maxX = Math.max(maxX, x2);
+    maxY = Math.max(maxY, y2);
+  }
   const width = distance(minX, maxX) + exportPadding * 2;
   const height = distance(minY, maxY) + exportPadding * 2;
 
