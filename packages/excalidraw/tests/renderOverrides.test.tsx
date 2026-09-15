@@ -18,7 +18,14 @@ import { Renderer } from "../scene/Renderer";
 import { exportToSvg } from "../scene/export";
 
 import { API } from "./helpers/api";
-import { act, render } from "./test-utils";
+import {
+  act,
+  GlobalTestState,
+  mockBoundingClientRect,
+  render,
+  restoreOriginalGetBoundingClientRect,
+  waitFor,
+} from "./test-utils";
 
 import type {
   AppState,
@@ -29,7 +36,10 @@ import type { StaticCanvasRenderConfig } from "../scene/types";
 
 const { h } = window;
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  restoreOriginalGetBoundingClientRect();
+});
 
 describe("setElementRenderOverrides", () => {
   const setup = async () => {
@@ -208,6 +218,47 @@ describe("setElementRenderOverrides", () => {
       api.setElementRenderOverrides(new Map([[element.id, { opacity: 0 }]])),
     ).not.toThrow();
     expect(rendering).not.toHaveBeenCalled();
+  });
+
+  it("keeps frame-name editing on document geometry while the frame is translated", async () => {
+    mockBoundingClientRect();
+    const { onChange, submit } = await setup();
+    await waitFor(() => expect(h.state.width).toBe(200));
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame",
+      x: 20,
+      y: 30,
+      width: 80,
+      height: 50,
+    });
+    API.setElements([frame]);
+    API.updateElement(frame, { name: "  Draft  " });
+    act(() => h.setState({ editingFrame: frame.id }));
+    const query = (selector: string) =>
+      GlobalTestState.renderResult.container.querySelector<HTMLElement>(
+        selector,
+      );
+    const nameElement = await waitFor(() => {
+      const element = query(".frame-name");
+      expect(element?.querySelector("input")).not.toBe(null);
+      return element!;
+    });
+    const documentLeft = nameElement.style.left;
+    onChange.mockClear();
+
+    // A render-only offset that puts the frame far off-screen must neither
+    // end the edit (which trims and commits the name) nor move the editor.
+    submit(new Map([[frame.id, { offset: { x: 10000, y: 0 } }]]));
+    expect(h.state.editingFrame).toBe(frame.id);
+    expect(API.getElement(frame).name).toBe("  Draft  ");
+    expect(onChange).not.toHaveBeenCalled();
+    expect(query(".frame-name input")).not.toBe(null);
+    expect(query(".frame-name")!.style.left).toBe(documentLeft);
+
+    // Back to being a decoration, the name follows the offset and is culled.
+    act(() => h.setState({ editingFrame: null }));
+    expect(query(".frame-name")).toBe(null);
   });
 });
 

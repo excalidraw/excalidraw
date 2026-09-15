@@ -799,9 +799,12 @@ class App extends React.Component<AppProps, AppState> {
     elementRenderOverrides: this.elementRenderOverrides,
   });
 
-  private getElementRenderState = (element: ExcalidrawElement) =>
+  private getElementRenderState = (
+    element: ExcalidrawElement,
+    overrides: ElementRenderOverrides | null = this.elementRenderOverrides,
+  ) =>
     resolveElementRenderState(element, this.scene.getNonDeletedElementsMap(), {
-      ...this.getRenderOverrideConfig(),
+      elementRenderOverrides: overrides ?? undefined,
       elementsPendingErasure: this.elementsPendingErasure,
       pendingFlowchartNodes: null,
     });
@@ -2185,7 +2188,15 @@ class App extends React.Component<AppProps, AppState> {
         : null;
 
     return nonDeletedFramesLikes.map((f) => {
-      const renderState = this.getElementRenderState(f);
+      // The name is a decoration that follows the frame's render overrides,
+      // except while it's being edited: editing is interaction and keeps to
+      // document geometry like everything else interactive. Culling by the
+      // translated frame would otherwise end the edit (and commit the name)
+      // from a render-only override.
+      const renderState = this.getElementRenderState(
+        f,
+        f.id === this.state.editingFrame ? null : this.elementRenderOverrides,
+      );
       if (
         !isElementInViewport(
           getRenderElementWithPositionOverride(f, renderState.offset),
