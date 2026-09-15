@@ -1,7 +1,6 @@
 import {
   getCommonFrameId,
   getFrameChildrenInsertionIndex,
-  getBoundTextElement,
   getContainerElement,
   isElementInViewport,
   isTextElement,
@@ -51,9 +50,9 @@ export class Renderer {
    * Adjusts the document-visible set for render-override translations: an
    * element leaves it when its offset moves it out of view and enters it when
    * its offset brings it in; everything else keeps its document visibility.
-   * Only translated elements go through viewport geometry; their bound
-   * labels follow them. The result is memoized on the offsets' identity so
-   * that opacity-only snapshots don't reach it at all.
+   * Only translated elements go through viewport geometry. The result is
+   * memoized on the offsets' identity so that opacity-only snapshots don't
+   * reach it at all.
    */
   public getVisibleElementsWithRenderOffsets(
     visibleElements: readonly NonDeletedExcalidrawElement[],
@@ -136,20 +135,16 @@ export class Renderer {
       };
       for (const [id, offset] of offsets) {
         const element = elementsMap.get(id);
-        // a bound label's own offset is ignored; it moves with its container
+        // A bound label's own offset is ignored, and it needs no entry of
+        // its own: the static renderer draws it with its container and skips
+        // its entry, so its document visibility can stay as it is.
         if (
           !element ||
           (isTextElement(element) && getContainerElement(element, elementsMap))
         ) {
           continue;
         }
-        const visible = isVisible(element, offset);
-        update(element, visible);
-        // its bound label renders with it and follows the same offset
-        const label = getBoundTextElement(element, elementsMap);
-        if (label) {
-          update(label, visible);
-        }
+        update(element, isVisible(element, offset));
       }
 
       if (!added.size && !removed.size) {

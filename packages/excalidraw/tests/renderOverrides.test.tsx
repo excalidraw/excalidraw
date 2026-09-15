@@ -832,8 +832,45 @@ describe("render override geometry", () => {
     expect(visibleWith(new Map())).toEqual([b, d]);
   });
 
+  it("does not rebuild the visible set for a translated arrow whose label is off-screen", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow",
+      x: -1000,
+      y: 100,
+      width: 1100,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(1100, 0)],
+      boundElements: [{ id: "label", type: "text" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      x: -500,
+      y: 90,
+      width: 50,
+      text: "label",
+      containerId: arrow.id,
+    });
+    const { renderer, appState, elementsMap, visibleWith } = setup([
+      arrow,
+      label,
+    ]);
+    const documentVisible = renderer.getRenderableElements({
+      ...appState,
+      selectedElements: [],
+    }).visibleElements;
+    expect(documentVisible).toEqual([arrow]);
+    const walk = vi.spyOn(elementsMap, "values");
+    for (const x of [10, 20, 30]) {
+      expect(visibleWith(new Map([[arrow.id, { offset: { x, y: 0 } }]]))).toBe(
+        documentVisible,
+      );
+    }
+    expect(walk).not.toHaveBeenCalled();
+  });
+
   it.each(["rectangle", "arrow"] as const)(
-    "culls a %s and its label using the container offset",
+    "culls a %s by its container offset; its label needs no entry of its own",
     (type) => {
       const container = API.createElement({
         type,
@@ -859,11 +896,12 @@ describe("render override geometry", () => {
       const { renderer, appState, visibleWith } = setup([container, label]);
       const visible = visibleWith;
       expect(visible(new Map())).toEqual([]);
-      // The label follows its container into view, whatever its own bounds
-      // and whatever offset targets it directly.
+      // The container comes into view through its offset; the label is drawn
+      // with it, so its own (document, off-screen) entry stays out and any
+      // offset targeting it directly is ignored.
       expect(
         visible(new Map([[container.id, { offset: { x: -500, y: 0 } }]])),
-      ).toEqual([container, label]);
+      ).toEqual([container]);
       expect(
         visible(
           new Map([
@@ -871,7 +909,7 @@ describe("render override geometry", () => {
             [label.id, { offset: { x: 2000, y: 0 } }],
           ]),
         ),
-      ).toEqual([container, label]);
+      ).toEqual([container]);
       expect(
         visible(new Map([[label.id, { offset: { x: -800, y: 0 } }]])),
       ).toEqual([]);
