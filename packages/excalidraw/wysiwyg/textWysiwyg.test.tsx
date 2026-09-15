@@ -652,6 +652,35 @@ describe("textWysiwyg", () => {
       expect(textarea.value).toEqual(`Line#1\nLine#2`);
     });
 
+    it("should keep cursor position when removing a partial tab", () => {
+      // cursor: "Line#1\n   Line#2|"
+      textarea.value = `Line#1\n   Line#2`;
+      textarea.selectionStart = 16;
+      textarea.selectionEnd = 16;
+
+      fireEvent.keyDown(textarea, {
+        key: KEYS.TAB,
+        shiftKey: true,
+      });
+      expect(textarea.value).toEqual(`Line#1\nLine#2`);
+      expect(textarea.selectionStart).toEqual(13);
+      expect(textarea.selectionEnd).toEqual(13);
+    });
+
+    it("should keep cursor position inside partial tab whitespace", () => {
+      // cursor: "Line#1\n  | Line#2"
+      textarea.value = `Line#1\n   Line#2`;
+      textarea.selectionStart = 9;
+      textarea.selectionEnd = 9;
+
+      fireEvent.keyDown(textarea, {
+        key: KEYS.TAB,
+        shiftKey: true,
+      });
+      expect(textarea.value).toEqual(`Line#1\nLine#2`);
+      expect(textarea.selectionStart).toEqual(7);
+      expect(textarea.selectionEnd).toEqual(7);
+    });
     it("should remove nothing", () => {
       // cursor: "Line#1\n  Li|ne#2"
       textarea.value = `Line#1\nLine#2`;
