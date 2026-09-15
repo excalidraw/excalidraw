@@ -134,6 +134,7 @@ export const getDefaultAppState = (): Omit<
     activeLockedId: null,
     bindMode: "orbit",
     boxSelectionMode: "contain",
+    lassoSelectionMode: "contain",
     colorTopPicks: {
       elementStroke: null,
       elementBackground: null,
@@ -222,6 +223,7 @@ const APP_STATE_STORAGE_CONF = (<
   height: { browser: false, export: false, server: false },
   isBindingEnabled: { browser: true, export: false, server: false },
   boxSelectionMode: { browser: true, export: false, server: false },
+  lassoSelectionMode: { browser: true, export: false, server: false },
   bindingPreference: { browser: true, export: false, server: false },
   isMidpointSnappingEnabled: { browser: true, export: false, server: false },
   inputDevice: { browser: true, export: false, server: false },
