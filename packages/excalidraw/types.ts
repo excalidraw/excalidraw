@@ -798,6 +798,26 @@ export type UIConfig = {
   };
 };
 
+/** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
+export type ElementRenderOverride = Readonly<{
+  /** Absolute render opacity (0–100, clamped). Omitted: use element.opacity. */
+  opacity?: number;
+  /** Translation in scene units. Bound labels inherit their container's offset and ignore this field. */
+  offset?: Readonly<{ x: number; y: number }>;
+}>;
+
+/** see {@link ExcalidrawImperativeAPI.setElementRenderOverrides} for details */
+export type ElementRenderOverrides = ReadonlyMap<
+  ExcalidrawElement["id"],
+  ElementRenderOverride
+>;
+
+/** The translation part of a snapshot: only the entries that carry an offset. */
+export type ElementRenderOffsets = ReadonlyMap<
+  ExcalidrawElement["id"],
+  NonNullable<ElementRenderOverride["offset"]>
+>;
+
 export interface ExcalidrawProps {
   className?: string;
   /**
@@ -1308,6 +1328,24 @@ export interface ExcalidrawImperativeAPI {
   getName: InstanceType<typeof App>["getName"];
   setViewport: InstanceType<typeof App>["viewport"]["setViewport"];
   getViewportOffsets: InstanceType<typeof App>["viewport"]["getOffsets"];
+  /**
+   * Atomically replaces all transient visual overrides. Values are copied;
+   * omitted IDs/fields use document values, except for inherited label offsets.
+   * null clears the snapshot.
+   * Repaints without document changes, history entries or onChange events;
+   * an equivalent snapshot may still repaint (clearing an already clear
+   * snapshot does not), so submit only when something changed.
+   * Finite opacity is clamped to 0–100; non-finite values reject the snapshot.
+   * Unknown/deleted IDs are ignored when rendering. Reset/unmount clears it.
+   * Bound labels inherit their container's offset; offsets targeting them are
+   * ignored. Label opacity remains independent. Target frame children explicitly.
+   * Frame opacity still multiplies child opacity. Decorations follow their owner.
+   * Exports and interactive geometry (hit tests, selection, editing) use document
+   * values, including while authoring an animation preview in edit mode.
+   */
+  setElementRenderOverrides: InstanceType<
+    typeof App
+  >["setElementRenderOverrides"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];

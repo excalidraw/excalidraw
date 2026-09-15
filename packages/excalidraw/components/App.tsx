@@ -209,7 +209,8 @@ import {
   getApproxMinLineHeight,
   getMinTextElementWidth,
   ShapeCache,
-  getRenderOpacity,
+  resolveElementRenderState,
+  getRenderElementWithPositionOverride,
   editGroupForSelectedElement,
   getElementsInGroup,
   getSelectedGroupIdForElement,
@@ -366,6 +367,10 @@ import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
+import {
+  copyElementRenderOverrides,
+  getElementRenderOffsets,
+} from "../renderOverrides";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
@@ -487,6 +492,8 @@ import type {
   AppClassProperties,
   AppProps,
   AppState,
+  ElementRenderOffsets,
+  ElementRenderOverrides,
   BinaryFileData,
   ExcalidrawImperativeAPI,
   BinaryFiles,
@@ -795,6 +802,24 @@ class App extends React.Component<AppProps, AppState> {
   onRemoveEventListenersEmitter = new Emitter<[]>();
 
   api: ExcalidrawImperativeAPI;
+  private elementRenderOverrides: ElementRenderOverrides = new Map();
+  /** offsets of `elementRenderOverrides`; keeps its identity while they don't change */
+  private elementRenderOffsets: ElementRenderOffsets = new Map();
+  private renderOverridesUpdatePending = false;
+
+  private getRenderOverrideConfig = () => ({
+    elementRenderOverrides: this.elementRenderOverrides,
+  });
+
+  private getElementRenderState = (
+    element: ExcalidrawElement,
+    overrides: ElementRenderOverrides | null = this.elementRenderOverrides,
+  ) =>
+    resolveElementRenderState(element, this.scene.getNonDeletedElementsMap(), {
+      elementRenderOverrides: overrides ?? undefined,
+      elementsPendingErasure: this.elementsPendingErasure,
+      pendingFlowchartNodes: null,
+    });
 
   private createExcalidrawAPI(): ExcalidrawImperativeAPI {
     const api: ExcalidrawImperativeAPI = {
@@ -813,6 +838,7 @@ class App extends React.Component<AppProps, AppState> {
       },
       setViewport: this.viewport.setViewport,
       getViewportOffsets: this.viewport.getOffsets,
+      setElementRenderOverrides: this.setElementRenderOverrides,
       getSceneElements: this.getSceneElements,
       getAppState: () => this.state,
       getFiles: () => this.files,
@@ -1822,13 +1848,14 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <>
         {embeddableElements.map((el) => {
+          const renderState = this.getElementRenderState(el);
           const { x, y } = sceneCoordsToViewportCoords(
             { sceneX: el.x, sceneY: el.y },
             this.state,
           );
 
           const isVisible = isElementInViewport(
-            el,
+            getRenderElementWithPositionOverride(el, renderState.offset),
             normalizedWidth,
             normalizedHeight,
             this.state,
@@ -1982,20 +2009,22 @@ class App extends React.Component<AppProps, AppState> {
               })}
               style={{
                 transform: isVisible
-                  ? `translate(${x - this.state.offsetLeft}px, ${
-                      y - this.state.offsetTop
+                  ? `translate(${
+                      x +
+                      renderState.offset.x * this.state.zoom.value -
+                      this.state.offsetLeft
+                    }px, ${
+                      y +
+                      renderState.offset.y * this.state.zoom.value -
+                      this.state.offsetTop
                     }px) scale(${scale})`
                   : "none",
                 display: isVisible ? "block" : "none",
-                opacity: getRenderOpacity(
-                  el,
-                  getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
-                  this.elementsPendingErasure,
-                  null,
-                  this.state.openDialog?.name === "elementLinkSelector"
+                opacity:
+                  renderState.opacity *
+                  (this.state.openDialog?.name === "elementLinkSelector"
                     ? DEFAULT_REDUCED_GLOBAL_ALPHA
-                    : 1,
-                ),
+                    : 1),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
                   Math.min(el.width, el.height),
                   el,
@@ -2109,21 +2138,17 @@ class App extends React.Component<AppProps, AppState> {
 
         if (frameNameDiv) {
           const box = frameNameDiv.getBoundingClientRect();
-          const boxSceneTopLeft = viewportCoordsToSceneCoords(
-            { clientX: box.x, clientY: box.y },
-            this.state,
-          );
-          const boxSceneBottomRight = viewportCoordsToSceneCoords(
-            { clientX: box.right, clientY: box.bottom },
-            this.state,
-          );
+          const zoom = this.state.zoom.value;
 
+          // Only the title's size comes from layout: its visual position may
+          // have an override. Hit bounds stay anchored to the document frame,
+          // with the title's bottom nameOffsetY screen pixels above it.
           bounds = {
-            x: boxSceneTopLeft.x,
-            y: boxSceneTopLeft.y,
-            width: boxSceneBottomRight.x - boxSceneTopLeft.x,
-            height: boxSceneBottomRight.y - boxSceneTopLeft.y,
-            zoom: this.state.zoom.value,
+            x: frameElement.x,
+            y: frameElement.y - (box.height + FRAME_STYLE.nameOffsetY) / zoom,
+            width: box.width / zoom,
+            height: box.height / zoom,
+            zoom,
             versionNonce: frameElement.versionNonce,
           };
 
@@ -2171,9 +2196,18 @@ class App extends React.Component<AppProps, AppState> {
         : null;
 
     return nonDeletedFramesLikes.map((f) => {
+      // The name is a decoration that follows the frame's render overrides,
+      // except while it's being edited: editing is interaction and keeps to
+      // document geometry like everything else interactive. Culling by the
+      // translated frame would otherwise end the edit (and commit the name)
+      // from a render-only override.
+      const renderState = this.getElementRenderState(
+        f,
+        f.id === this.state.editingFrame ? null : this.elementRenderOverrides,
+      );
       if (
         !isElementInViewport(
-          f,
+          getRenderElementWithPositionOverride(f, renderState.offset),
           this.canvas.width / this.ownerWindow.devicePixelRatio,
           this.canvas.height / this.ownerWindow.devicePixelRatio,
           {
@@ -2194,7 +2228,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const { x: x1, y: y1 } = sceneCoordsToViewportCoords(
-        { sceneX: f.x, sceneY: f.y },
+        {
+          sceneX: f.x + renderState.offset.x,
+          sceneY: f.y + renderState.offset.y,
+        },
         this.state,
       );
 
@@ -2268,6 +2305,7 @@ class App extends React.Component<AppProps, AppState> {
           key={f.id}
           style={{
             position: "absolute",
+            opacity: renderState.opacity,
             // Positioning from bottom so that we don't to either
             // calculate text height or adjust using transform (which)
             // messes up input position when editing the frame name.
@@ -2614,7 +2652,16 @@ class App extends React.Component<AppProps, AppState> {
                             rc={this.rc}
                             elementsMap={renderableElementsMap}
                             allElementsMap={allElementsMap}
-                            visibleElements={visibleElements}
+                            visibleElements={
+                              this.elementRenderOffsets.size
+                                ? this.renderer.getVisibleElementsWithRenderOffsets(
+                                    visibleElements,
+                                    renderableElementsMap,
+                                    this.state,
+                                    this.elementRenderOffsets,
+                                  )
+                                : visibleElements
+                            }
                             canvasNonce={canvasNonce}
                             selectionNonce={
                               this.state.selectionElement?.versionNonce
@@ -2635,6 +2682,7 @@ class App extends React.Component<AppProps, AppState> {
                               pendingFlowchartNodes:
                                 this.flowchart.pendingNodes,
                               theme: this.state.theme,
+                              ...this.getRenderOverrideConfig(),
                             }}
                           />
                           {previewElement && (
@@ -2657,6 +2705,7 @@ class App extends React.Component<AppProps, AppState> {
                                   this.elementsPendingErasure,
                                 pendingFlowchartNodes: null,
                                 theme: this.state.theme,
+                                ...this.getRenderOverrideConfig(),
                               }}
                               // a tool dragged out of the toolbar previews
                               // translucently; the element itself is drawn
@@ -3517,6 +3566,8 @@ class App extends React.Component<AppProps, AppState> {
    */
   private resetScene = withBatchedUpdates(
     (opts?: { resetLoadingState: boolean }) => {
+      this.elementRenderOverrides = new Map();
+      this.elementRenderOffsets = new Map();
       this.scene.replaceAllElements([]);
       this.setState((state) => ({
         ...getDefaultAppState(),
@@ -3880,6 +3931,8 @@ class App extends React.Component<AppProps, AppState> {
     this.editorLifecycleEvents.emit("editor:unmount");
     this.props.onUnmount?.();
     this.props.onExcalidrawAPI?.(null);
+    this.elementRenderOverrides = new Map();
+    this.elementRenderOffsets = new Map();
 
     (this.ownerWindow as any).launchQueue?.setConsumer(() => {});
 
@@ -4202,6 +4255,18 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+    const renderOverridesUpdatePending = this.renderOverridesUpdatePending;
+    this.renderOverridesUpdatePending = false;
+    // Only a requested visual update can skip the document pipeline. Real
+    // props/state changes batched with it must still commit and notify.
+    if (
+      renderOverridesUpdatePending &&
+      prevProps === this.props &&
+      prevState === this.state
+    ) {
+      return;
+    }
+
     // must be updated *before* state change listeners are triggered below
     if (!this._initialized && !this.state.isLoading) {
       this._initialized = true;
@@ -5352,6 +5417,30 @@ class App extends React.Component<AppProps, AppState> {
       }
     },
   );
+
+  /**
+   * see {@link ExcalidrawImperativeAPI.setElementRenderOverrides} for details
+   */
+  public setElementRenderOverrides = (
+    overrides: ElementRenderOverrides | null,
+  ) => {
+    if (this.unmounted) {
+      return;
+    }
+    const nextOverrides = copyElementRenderOverrides(overrides);
+    // clearing an already clear snapshot is the one cheap no-op worth having
+    if (!nextOverrides.size && !this.elementRenderOverrides.size) {
+      return;
+    }
+    this.elementRenderOverrides = nextOverrides;
+    this.elementRenderOffsets = getElementRenderOffsets(
+      this.elementRenderOverrides,
+      this.elementRenderOffsets,
+    );
+    this.renderOverridesUpdatePending = true;
+    // Preserve AppState identity and explicitly request a visual-only commit.
+    this.forceUpdate();
+  };
 
   public applyDeltas = (
     deltas: StoreDelta[],
