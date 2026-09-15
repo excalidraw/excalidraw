@@ -22,6 +22,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { alignActionsPredicate } from "../actions/actionAlign";
+
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -33,6 +34,8 @@ import {
   hasStrokeStyle,
   hasStrokeWidth,
 } from "../scene";
+
+import { canEditHyperlink } from "./hyperlink/selection";
 
 import type { ElementOrToolType } from "../types";
 
@@ -113,6 +116,10 @@ export const getShapeActionPredicates = (
     appState.editingTextElement || appState.newElement,
   );
   const hasSelection = targetElements.length > 0;
+  const canLinkSelection = canEditHyperlink(
+    getSelectedElements(elementsMap, appState),
+    appState,
+  );
 
   return {
     /** some element(s) selected */
@@ -172,10 +179,10 @@ export const getShapeActionPredicates = (
 
     // per-element actions
     // NOTE: the full panel treats a bound container as linkable; the compact /
-    // mobile layouts only link a truly single selection. Both are preserved via
+    // mobile layouts use the selection directly. Both are preserved via
     // the two flags below.
-    link: singleSelected || isSingleElementBoundContainer,
-    linkSingleOnly: singleSelected,
+    link: canLinkSelection || isSingleElementBoundContainer,
+    linkSelection: canLinkSelection,
     cropEditor:
       !appState.croppingElementId &&
       singleSelected &&
