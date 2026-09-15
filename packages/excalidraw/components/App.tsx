@@ -6378,6 +6378,7 @@ class App extends React.Component<AppProps, AppState> {
       const stickyLayout = stickyContainer
         ? getStickyNoteLayout(stickyContainer, latestTextElement, {
             originalText: nextOriginalText,
+            renderEnvironment: this.renderEnvironment,
           })
         : null;
 

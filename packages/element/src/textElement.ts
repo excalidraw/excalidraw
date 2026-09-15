@@ -63,7 +63,10 @@ export const redrawTextBoundingBox = (
     // the sticky fit owns both halves (label + note geometry). `textElement`
     // may be an uncommitted clone (font actions clone before install), so it
     // is passed explicitly instead of looked up in the scene
-    updateStickyNoteLayout(container, scene, { text: textElement });
+    updateStickyNoteLayout(container, scene, {
+      text: textElement,
+      renderEnvironment,
+    });
     return;
   }
 
@@ -170,7 +173,10 @@ export const handleBindTextResize = (
   if (isStickyNoteElement(container)) {
     // resize callers pass their intents to `updateStickyNoteLayout` directly
     // and own the bound-arrow pass; this is the fallback for generic callers
-    updateStickyNoteLayout(container, scene, { bindings: false });
+    updateStickyNoteLayout(container, scene, {
+      bindings: false,
+      renderEnvironment,
+    });
     return;
   }
   const elementsMap = scene.getNonDeletedElementsMap();

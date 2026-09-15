@@ -76,6 +76,7 @@ export const actionUnbindText = register({
           boundTextElement.originalText,
           getFontString(boundTextElement),
           boundTextElement.lineHeight,
+          app.renderEnvironment,
         );
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,
@@ -103,7 +104,9 @@ export const actionUnbindText = register({
         });
         if (isStickyNoteElement(element)) {
           // an empty note sits at its base height; bound arrows follow
-          updateStickyNoteLayout(element, app.scene);
+          updateStickyNoteLayout(element, app.scene, {
+            renderEnvironment: app.renderEnvironment,
+          });
         } else {
           app.scene.mutateElement(element, {
             height: originalContainerHeight

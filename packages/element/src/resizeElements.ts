@@ -978,6 +978,7 @@ export const resizeSingleElement = (
         ),
         // the arrow pass below is this function's — keep it single
         bindings: false,
+        renderEnvironment,
       });
     } else {
       if (boundTextElement && boundTextFont != null) {
@@ -1565,6 +1566,7 @@ export const resizeMultipleElements = (
             },
           ),
           bindings: { simultaneouslyUpdated: elementsToUpdate },
+          renderEnvironment,
         });
       } else {
         updateBoundElements(element, scene, {

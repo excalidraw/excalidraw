@@ -208,7 +208,10 @@ export const actionPasteStyles = register({
         elementsMap,
       ),
       new Set(selectedElementIds),
-      { prevElementsMap: elementsMap },
+      {
+        prevElementsMap: elementsMap,
+        renderEnvironment: app.renderEnvironment,
+      },
     );
 
     // a restyled note may have grown or shrunk — arrows bound to it follow

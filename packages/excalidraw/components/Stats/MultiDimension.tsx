@@ -31,7 +31,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
-import type { Scene } from "@excalidraw/element";
+import type { RenderEnvironment, Scene } from "@excalidraw/element";
 
 import DragInput from "./DragInput";
 import { getAtomicUnits, getStepSizedValue, isPropertyEditable } from "./utils";
@@ -89,6 +89,7 @@ const resizeElementInGroup = (
   origElement: NonDeletedExcalidrawElement,
   originalElementsMap: ElementsMap,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -116,6 +117,7 @@ const resizeElementInGroup = (
         { proportional: true, fromCenter: false },
       ),
       anchor: "top",
+      renderEnvironment,
     });
     return;
   }
@@ -137,6 +139,9 @@ const resizeElementInGroup = (
         scene,
         property === "width" ? "e" : "s",
         true,
+        false,
+        false,
+        renderEnvironment,
       );
     }
   }
@@ -153,6 +158,7 @@ const resizeGroup = (
   originalElements: NonDeletedExcalidrawElement[],
   originalElementsMap: ElementsMap,
   scene: Scene,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   // keep aspect ratio for groups
   if (property === "width") {
@@ -176,6 +182,7 @@ const resizeGroup = (
       origElement,
       originalElementsMap,
       scene,
+      renderEnvironment,
     );
   }
 };
@@ -231,6 +238,7 @@ const handleDimensionChange: DragInputCallbackType<
           originalElements,
           originalElementsMap,
           scene,
+          app.renderEnvironment,
         );
       } else {
         const [el] = elementsInUnit;
@@ -277,6 +285,7 @@ const handleDimensionChange: DragInputCallbackType<
             property === "width" ? "e" : "s",
             {
               shouldInformMutation: false,
+              renderEnvironment: app.renderEnvironment,
             },
           );
 
