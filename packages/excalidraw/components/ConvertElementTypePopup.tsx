@@ -58,10 +58,13 @@ import { ShapeCache } from "@excalidraw/element";
 
 import { updateBindings } from "@excalidraw/element";
 
+import type { Mutable } from "@excalidraw/common/utility-types";
+
 import type {
   ConvertibleGenericTypes,
   ConvertibleLinearTypes,
   ConvertibleTypes,
+  ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
@@ -114,6 +117,10 @@ const LINEAR_TYPES = [
   "curvedArrow",
   "elbowArrow",
 ] as const;
+
+// arrows bound to shapes or text can't be converted to lines (lines are not
+// bindable), so bound selections only cycle through arrow sub-types
+const BOUND_LINEAR_TYPES = ["sharpArrow", "curvedArrow", "elbowArrow"] as const;
 
 const CONVERTIBLE_GENERIC_TYPES: ReadonlySet<ConvertibleGenericTypes> = new Set(
   GENERIC_TYPES,
@@ -294,12 +301,17 @@ const Panel = ({
 
   const SHAPES: [string, ReactNode][] =
     conversionType === "linear"
-      ? [
-          ["line", LineIcon],
-          ["sharpArrow", sharpArrowIcon],
-          ["curvedArrow", roundArrowIcon],
-          ["elbowArrow", elbowArrowIcon],
-        ]
+      ? (
+          [
+            ["line", LineIcon],
+            ["sharpArrow", sharpArrowIcon],
+            ["curvedArrow", roundArrowIcon],
+            ["elbowArrow", elbowArrowIcon],
+          ] as [string, ReactNode][]
+        ).filter(
+          ([type]) =>
+            type !== "line" || !isLinearSelectionBound(linearElements),
+        )
       : conversionType === "generic"
       ? [
           ["rectangle", RectangleIcon],
@@ -511,17 +523,22 @@ export const convertElementTypes = (
     const convertibleLinearElements =
       filterLinearConvertibleElements(selectedElements);
 
+    // bound (or labeled) arrows must not be convertible to lines
+    const isBound = isLinearSelectionBound(convertibleLinearElements);
+    const types = isBound ? BOUND_LINEAR_TYPES : LINEAR_TYPES;
+
     if (!nextType) {
       const commonSubType = reduceToCommonValue(
         convertibleLinearElements,
         getLinearElementSubType,
       );
 
-      const index = commonSubType ? LINEAR_TYPES.indexOf(commonSubType) : -1;
-      nextType =
-        LINEAR_TYPES[
-          (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
-        ];
+      const index = commonSubType
+        ? (types as readonly string[]).indexOf(commonSubType)
+        : -1;
+      nextType = types[(index + types.length + advancement) % types.length];
+    } else if (isBound && nextType === "line") {
+      return false;
     }
 
     if (isConvertibleLinearType(nextType)) {
@@ -655,10 +672,21 @@ export const getConversionTypeFromElements = (
 };
 
 const isEligibleLinearElement = (element: ExcalidrawElement) => {
-  return (
-    isLinearElement(element) &&
-    (!isArrowElement(element) ||
-      (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
+  return isLinearElement(element);
+};
+
+/**
+ * `true` if the linear selection contains arrows bound to shapes or
+ * labeled arrows. Such selections must not be convertible to `line`
+ * (lines are not bindable, so converting would silently unbind them).
+ */
+export const isLinearSelectionBound = (
+  elements: readonly ExcalidrawElement[],
+) => {
+  return elements.some(
+    (element) =>
+      isArrowElement(element) &&
+      (isArrowBoundToElement(element) || hasBoundTextElement(element)),
   );
 };
 
@@ -865,53 +893,68 @@ const convertElementType = <
   }
 
   if (isConvertibleLinearType(targetType)) {
+    let nextLinearElement: ExcalidrawLinearElement;
+
     switch (targetType) {
       case "line": {
-        return bumpVersion(
-          newLinearElement({
-            ...element,
-            type: "line",
-          }),
-        );
+        nextLinearElement = newLinearElement({
+          ...element,
+          type: "line",
+        });
+        break;
       }
       case "sharpArrow": {
-        return bumpVersion(
-          newArrowElement({
-            ...element,
-            type: "arrow",
-            elbowed: false,
-            roundness: null,
-            startArrowhead: app.state.currentItemStartArrowhead,
-            endArrowhead: app.state.currentItemEndArrowhead,
-          }),
-        );
+        nextLinearElement = newArrowElement({
+          ...element,
+          type: "arrow",
+          elbowed: false,
+          roundness: null,
+          startArrowhead: app.state.currentItemStartArrowhead,
+          endArrowhead: app.state.currentItemEndArrowhead,
+        });
+        break;
       }
       case "curvedArrow": {
-        return bumpVersion(
-          newArrowElement({
-            ...element,
-            type: "arrow",
-            elbowed: false,
-            roundness: {
-              type: ROUNDNESS.PROPORTIONAL_RADIUS,
-            },
-            startArrowhead: app.state.currentItemStartArrowhead,
-            endArrowhead: app.state.currentItemEndArrowhead,
-          }),
-        );
+        nextLinearElement = newArrowElement({
+          ...element,
+          type: "arrow",
+          elbowed: false,
+          roundness: {
+            type: ROUNDNESS.PROPORTIONAL_RADIUS,
+          },
+          startArrowhead: app.state.currentItemStartArrowhead,
+          endArrowhead: app.state.currentItemEndArrowhead,
+        });
+        break;
       }
       case "elbowArrow": {
-        return bumpVersion(
-          newArrowElement({
-            ...element,
-            type: "arrow",
-            elbowed: true,
-            fixedSegments: null,
-            roundness: null,
-          }),
+        nextLinearElement = newArrowElement({
+          ...element,
+          type: "arrow",
+          elbowed: true,
+          fixedSegments: null,
+          roundness: null,
+        });
+        break;
+      }
+      default: {
+        assertNever(
+          targetType,
+          `unhandled linear conversion type: ${targetType}`,
         );
+        return element;
       }
     }
+
+    // `newArrowElement` constructs unbound arrows, but converting between
+    // arrow sub-types must not drop existing bindings (#9656)
+    if (targetType !== "line" && isArrowElement(element)) {
+      const mutable = nextLinearElement as Mutable<ExcalidrawArrowElement>;
+      mutable.startBinding = element.startBinding;
+      mutable.endBinding = element.endBinding;
+    }
+
+    return bumpVersion(nextLinearElement) as NonDeletedExcalidrawElement;
   }
 
   assertNever(targetType, `unhandled conversion type: ${targetType}`);
