@@ -63,12 +63,28 @@ export type LocalCoord = { x: number; y: number } & {
   _brand: "excalimath__localcoord";
 };
 
+/**
+ * Represents a 2D position in viewport/screen space, i.e. CSS pixels
+ * relative to the top-left corner of the canvas container. Unlike
+ * GlobalPoint it is affected by scroll and zoom.
+ */
+export type ViewportPoint = [x: number, y: number] & {
+  _brand: "excalimath__viewportpoint";
+};
+
+/**
+ * Union of every point tuple type. Use it as the constraint for generic
+ * point parameters (`<P extends GenericPoint>`) so that geometry helpers
+ * work in any coordinate space while still preserving the caller's brand.
+ */
+export type GenericPoint = GlobalPoint | LocalPoint | ViewportPoint;
+
 // Line
 
 /**
  * A line is an infinitely long object with no width, depth, or curvature.
  */
-export type Line<P extends GlobalPoint | LocalPoint> = [p: P, q: P] & {
+export type Line<P extends GenericPoint> = [p: P, q: P] & {
   _brand: "excalimath_line";
 };
 
@@ -77,7 +93,7 @@ export type Line<P extends GlobalPoint | LocalPoint> = [p: P, q: P] & {
  * line that is bounded by two distinct end points, and
  * contains every point on the line that is between its endpoints.
  */
-export type LineSegment<P extends GlobalPoint | LocalPoint> = [a: P, b: P] & {
+export type LineSegment<P extends GenericPoint> = [a: P, b: P] & {
   _brand: "excalimath_linesegment";
 };
 
@@ -97,18 +113,14 @@ export type Vector = [u: number, v: number] & {
 /**
  * A triangle represented by 3 points
  */
-export type Triangle<P extends GlobalPoint | LocalPoint> = [
-  a: P,
-  b: P,
-  c: P,
-] & {
+export type Triangle<P extends GenericPoint> = [a: P, b: P, c: P] & {
   _brand: "excalimath__triangle";
 };
 
 /**
  * A rectangular shape represented by 4 points at its corners
  */
-export type Rectangle<P extends GlobalPoint | LocalPoint> = [a: P, b: P] & {
+export type Rectangle<P extends GenericPoint> = [a: P, b: P] & {
   _brand: "excalimath__rectangle";
 };
 
@@ -120,7 +132,7 @@ export type Rectangle<P extends GlobalPoint | LocalPoint> = [a: P, b: P] & {
  * A polygon is a closed shape by connecting the given points
  * rectangles and diamonds are modelled by polygons
  */
-export type Polygon<Point extends GlobalPoint | LocalPoint> = Point[] & {
+export type Polygon<Point extends GenericPoint> = Point[] & {
   _brand: "excalimath_polygon";
 };
 
@@ -131,12 +143,7 @@ export type Polygon<Point extends GlobalPoint | LocalPoint> = Point[] & {
 /**
  * Cubic bezier curve with four control points
  */
-export type Curve<Point extends GlobalPoint | LocalPoint> = [
-  Point,
-  Point,
-  Point,
-  Point,
-] & {
+export type Curve<Point extends GenericPoint> = [Point, Point, Point, Point] & {
   _brand: "excalimath_curve";
 };
 
@@ -151,7 +158,7 @@ export type PolarCoords = [
   but for the sake of simplicity, we've used halfWidth and halfHeight instead
   in replace of semi major and semi minor axes
  */
-export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
+export type Ellipse<Point extends GenericPoint> = {
   center: Point;
   halfWidth: number;
   halfHeight: number;

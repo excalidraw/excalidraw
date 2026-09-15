@@ -18,10 +18,10 @@ import {
 } from "@excalidraw/math";
 
 import type {
-  LocalPoint,
   GlobalPoint,
   Triangle,
   Vector,
+  GenericPoint,
 } from "@excalidraw/math";
 
 import { getCenterForBounds } from "./bounds";
@@ -48,12 +48,10 @@ export const vectorToHeading = (vec: Vector): Heading => {
   return HEADING_UP;
 };
 
-export const headingForPoint = <P extends GlobalPoint | LocalPoint>(
-  p: P,
-  o: P,
-) => vectorToHeading(vectorFromPoint<P>(p, o));
+export const headingForPoint = <P extends GenericPoint>(p: P, o: P) =>
+  vectorToHeading(vectorFromPoint<P>(p, o));
 
-export const headingForPointIsHorizontal = <P extends GlobalPoint | LocalPoint>(
+export const headingForPointIsHorizontal = <P extends GenericPoint>(
   p: P,
   o: P,
 ) => headingIsHorizontal(headingForPoint<P>(p, o));
