@@ -46,6 +46,7 @@
     "edges": "Edges",
     "sharp": "Sharp",
     "round": "Round",
+    "roundness": "Roundness",
     "arrowheads": "Arrowheads",
     "arrowhead_none": "None",
     "arrowhead_arrow": "Arrow",

@@ -426,6 +426,10 @@ export const ELEMENT_PENDING_DRAW_SHAPE_OPACITY = 70;
 export const DEFAULT_PROPORTIONAL_RADIUS = 0.25;
 // Fixed radius for the ADAPTIVE_RADIUS algorithm. In pixels.
 export const DEFAULT_ADAPTIVE_RADIUS = 32;
+// Soft ceiling for the roundness slider, as a fraction of half the
+// element's shorter side (the radius that would render as a pill/circle).
+// Below 1 so a sliver of straight edge always remains visible.
+export const ROUNDNESS_SLIDER_MAX_RATIO = 0.9;
 // roundness type (algorithm)
 export const ROUNDNESS = {
   // Used for legacy rounding (rectangles), which currently works the same

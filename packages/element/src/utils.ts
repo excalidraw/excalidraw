@@ -537,11 +537,12 @@ export const getCornerRadius = (x: number, element: ExcalidrawElement) => {
 
     const CUTOFF_SIZE = fixedRadiusSize / DEFAULT_PROPORTIONAL_RADIUS;
 
-    if (x <= CUTOFF_SIZE) {
-      return x * DEFAULT_PROPORTIONAL_RADIUS;
-    }
+    const radius =
+      x <= CUTOFF_SIZE ? x * DEFAULT_PROPORTIONAL_RADIUS : fixedRadiusSize;
 
-    return fixedRadiusSize;
+    // never let the radius exceed half the shorter side, or the rounded
+    // path (which assumes two distinct corners per edge) self-intersects
+    return Math.min(radius, x / 2);
   }
 
   return 0;
