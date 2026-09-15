@@ -135,8 +135,8 @@ const config = {
         maxHeadingLevel: 4,
       },
       algolia: {
-        appId: "8FEAOD28DI",
-        apiKey: "4b07cca33ff2d2919bc95ff98f148e9e",
+        appId: process.env.ALGOLIA_APP_ID || "8FEAOD28DI",
+        apiKey: process.env.ALGOLIA_API_KEY,
         indexName: "excalidraw",
       },
     }),
