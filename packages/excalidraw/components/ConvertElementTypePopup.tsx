@@ -134,6 +134,13 @@ const isConvertibleLinearType = (
   elementType === "arrow" ||
   CONVERTIBLE_LINEAR_TYPES.has(elementType as ConvertibleLinearTypes);
 
+const LINEAR_TYPE_ICONS: Record<ConvertibleLinearTypes, ReactNode> = {
+  line: LineIcon,
+  sharpArrow: sharpArrowIcon,
+  curvedArrow: roundArrowIcon,
+  elbowArrow: elbowArrowIcon,
+};
+
 export const convertElementTypePopupAtom = atom<{
   type: "panel";
 } | null>(null);
@@ -294,12 +301,10 @@ const Panel = ({
 
   const SHAPES: [string, ReactNode][] =
     conversionType === "linear"
-      ? [
-          ["line", LineIcon],
-          ["sharpArrow", sharpArrowIcon],
-          ["curvedArrow", roundArrowIcon],
-          ["elbowArrow", elbowArrowIcon],
-        ]
+      ? getAvailableLinearConvertibleTypes(linearElements).map((type) => [
+          type,
+          LINEAR_TYPE_ICONS[type],
+        ])
       : conversionType === "generic"
       ? [
           ["rectangle", RectangleIcon],
@@ -512,15 +517,19 @@ export const convertElementTypes = (
       filterLinearConvertibleElements(selectedElements);
 
     if (!nextType) {
+      const availableTypes = getAvailableLinearConvertibleTypes(
+        convertibleLinearElements,
+      );
+
       const commonSubType = reduceToCommonValue(
         convertibleLinearElements,
         getLinearElementSubType,
       );
 
-      const index = commonSubType ? LINEAR_TYPES.indexOf(commonSubType) : -1;
+      const index = commonSubType ? availableTypes.indexOf(commonSubType) : -1;
       nextType =
-        LINEAR_TYPES[
-          (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
+        availableTypes[
+          (index + availableTypes.length + advancement) % availableTypes.length
         ];
     }
 
@@ -654,13 +663,23 @@ export const getConversionTypeFromElements = (
   return null;
 };
 
-const isEligibleLinearElement = (element: ExcalidrawElement) => {
-  return (
-    isLinearElement(element) &&
-    (!isArrowElement(element) ||
-      (!isArrowBoundToElement(element) && !hasBoundTextElement(element)))
-  );
-};
+const isEligibleLinearElement = (element: ExcalidrawElement) =>
+  isLinearElement(element) &&
+  (!isArrowElement(element) || !hasBoundTextElement(element));
+
+// A bound arrow can't be converted into a plain line: a line is not bindable,
+// so the conversion would silently drop the binding. Such arrows can still
+// switch between the arrow subtypes, so we only remove `line` from the
+// available targets (while preserving the binding across the conversion).
+const cannotConvertToLine = (element: ExcalidrawElement) =>
+  isArrowElement(element) && isArrowBoundToElement(element);
+
+const getAvailableLinearConvertibleTypes = (
+  elements: readonly ExcalidrawElement[],
+): readonly ConvertibleLinearTypes[] =>
+  elements.some(cannotConvertToLine)
+    ? LINEAR_TYPES.filter((type) => type !== "line")
+    : LINEAR_TYPES;
 
 const toCacheKey = (
   elementId: ExcalidrawElement["id"],
@@ -874,6 +893,9 @@ const convertElementType = <
           }),
         );
       }
+      // switching between arrow subtypes keeps any bindings: `newArrowElement`
+      // carries over the `startBinding`/`endBinding` spread from the source
+      // element (a plain line has none)
       case "sharpArrow": {
         return bumpVersion(
           newArrowElement({
