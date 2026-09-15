@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>HTML-in-Canvas — Demo de integración</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f0f13;
+      color: #e1e1e8;
+      padding: 32px;
+      min-height: 100vh;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; color: #a5b4fc; }
+    h2 { font-size: 1rem; margin: 24px 0 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; }
+    p  { font-size: .875rem; color: #64748b; margin-bottom: 16px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .badge-ok  { background: #14532d; color: #86efac; }
+    .badge-no  { background: #450a0a; color: #fca5a5; }
+    .badge-sim { background: #1e3a5f; color: #93c5fd; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card {
+      background: #1e1e2e;
+      border: 1px solid #2e2e42;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    canvas {
+      display: block;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      margin-top: 8px;
+      background: #fff;
+    }
+    button {
+      margin-top: 10px;
+      padding: 7px 16px;
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: .85rem;
+    }
+    button:hover { background: #6366f1; }
+    pre {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: .78rem;
+      color: #94a3b8;
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+    #log {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: .78rem;
+      color: #22c55e;
+      height: 140px;
+      overflow-y: auto;
+      font-family: monospace;
+    }
+    .sep { border: none; border-top: 1px solid #2e2e42; margin: 24px 0; }
+  </style>
+</head>
+<body>
+
+<h1>🔬 HTML-in-Canvas — Demo de integración</h1>
+<p>Esta página demuestra todas las funciones del módulo <code>packages/excalidraw/htmlcanvas/</code>.</p>
+
+<!-- STATUS -->
+<h2>1. Detección de soporte</h2>
+<div class="card">
+  <p>Prueba <code>isHtmlInCanvasSupported()</code> + simulación para demostrar el fallback.</p>
+  <div id="status-native"></div>
+  <div id="status-sim" style="margin-top:8px"></div>
+  <button onclick="runDetection()">Re-detectar</button>
+</div>
+
+<hr class="sep">
+
+<!-- DEMO DRAW ELEMENT -->
+<h2>2. drawHtmlElement — renderizado nativo (simulado)</h2>
+<div class="grid">
+  <div class="card">
+    <strong>Sin API (fallback)</strong>
+    <p>drawHtmlElement devuelve <code>false</code>, el canvas queda en blanco.</p>
+    <canvas id="c-fallback" width="280" height="120"></canvas>
+    <div id="r-fallback" style="font-size:.8rem;margin-top:6px;color:#f87171"></div>
+    <button onclick="demoFallback()">Probar fallback</button>
+  </div>
+  <div class="card">
+    <strong>Con API simulada</strong>
+    <p>Se inyecta <code>drawElement</code> en el contexto y se pinta un div HTML.</p>
+    <canvas id="c-native" width="280" height="120"></canvas>
+    <div id="r-native" style="font-size:.8rem;margin-top:6px;color:#4ade80"></div>
+    <button onclick="demoNative()">Probar nativo</button>
+  </div>
+</div>
+
+<hr class="sep">
+
+<!-- DEMO TEXTAREA -->
+<h2>3. drawTextEditorInCanvas — textarea en canvas</h2>
+<div class="card">
+  <p>
+    Simula el editor de texto WYSIWYG pintado directamente en el canvas en vez de
+    un overlay absolutamente posicionado.
+  </p>
+  <canvas id="c-textarea" width="560" height="160"></canvas>
+  <div id="r-textarea" style="font-size:.8rem;margin-top:6px;color:#4ade80"></div>
+  <button onclick="demoTextarea()">Probar textarea en canvas</button>
+</div>
+
+<hr class="sep">
+
+<!-- DEMO EFFECTS -->
+<h2>4. drawHtmlElementWithEffects — composite + filter</h2>
+<div class="grid">
+  <div class="card">
+    <strong>multiply blend mode</strong>
+    <canvas id="c-multiply" width="280" height="120"></canvas>
+    <button onclick="demoEffects('multiply', '')">Probar</button>
+  </div>
+  <div class="card">
+    <strong>blur filter</strong>
+    <canvas id="c-blur" width="280" height="120"></canvas>
+    <button onclick="demoEffects('source-over', 'blur(3px)')">Probar</button>
+  </div>
+</div>
+
+<hr class="sep">
+
+<!-- DEMO PASTE -->
+<h2>5. pasteHtmlToCanvas — paste de HTML rico</h2>
+<div class="card">
+  <p>Pega HTML arbitrario directamente en el canvas (sin conversión a texto plano).</p>
+  <canvas id="c-paste" width="560" height="200"></canvas>
+  <div id="r-paste" style="font-size:.8rem;margin-top:6px;color:#4ade80"></div>
+  <button onclick="demoPaste()">Pegar HTML rico</button>
+</div>
+
+<hr class="sep">
+
+<!-- CLIPBOARD INTEGRATION -->
+<h2>6. Clipboard — tipo "htmlContent"</h2>
+<div class="card">
+  <p>
+    Cuando la API está activa, <code>parseHTMLFromPaste</code> preserva el HTML raw
+    como tipo <code>"htmlContent"</code> en vez de descomponerlo.
+  </p>
+  <pre id="clip-out">Clic en "Simular paste" para ver el resultado</pre>
+  <button onclick="demoClipboard()">Simular paste</button>
+</div>
+
+<hr class="sep">
+
+<!-- LOG -->
+<h2>📋 Log de eventos</h2>
+<div id="log"></div>
+
+<script>
+// ─── Utilidades ────────────────────────────────────────────────────────────
+
+const log = (...args) => {
+  const el = document.getElementById('log');
+  el.textContent += `[${new Date().toLocaleTimeString()}] ${args.join(' ')}\n`;
+  el.scrollTop = el.scrollHeight;
+};
+
+// Simula isHtmlInCanvasSupported() sin importar el módulo TS
+const probeSupportNative = () => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  return ctx && typeof ctx.drawElement === 'function';
+};
+
+// Habilita la API en el contexto de un canvas específico
+const enableApiOnCtx = (ctx) => {
+  ctx.drawElement = (el, x, y) => {
+    // Simulación: rasteriza el DOM con foreignObject SVG
+    const w = el.offsetWidth || 260;
+    const h = el.offsetHeight || 100;
+    const data = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+        <foreignObject width="100%" height="100%">
+          <body xmlns="http://www.w3.org/1999/xhtml">
+            ${el.outerHTML}
+          </body>
+        </foreignObject>
+      </svg>`;
+    const blob = new Blob([data], { type: 'image/svg+xml' });
+    const url  = URL.createObjectURL(blob);
+    const img  = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, x, y);
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+    log(`drawElement() llamado → elemento <${el.tagName.toLowerCase()}> en (${x},${y})`);
+  };
+};
+
+// ─── 1. Detección ──────────────────────────────────────────────────────────
+
+function runDetection() {
+  const native = probeSupportNative();
+  document.getElementById('status-native').innerHTML = native
+    ? `<span class="badge badge-ok">✓ API nativa disponible</span>`
+    : `<span class="badge badge-no">✗ API no disponible (browser sin flag)</span>`;
+  document.getElementById('status-sim').innerHTML =
+    `<span class="badge badge-sim">ℹ Simulación activada para este demo</span>`;
+  log(`isHtmlInCanvasSupported() nativo → ${native}`);
+  log('Simulación activada para las demos siguientes.');
+}
+runDetection();
+
+// ─── 2. drawHtmlElement ─────────────────────────────────────────────────────
+
+function demoFallback() {
+  const canvas = document.getElementById('c-fallback');
+  const ctx = canvas.getContext('2d');
+  // Sin drawElement en el ctx → retorna false
+  const result = typeof ctx.drawElement === 'function'
+    ? (() => { ctx.drawElement(document.createElement('div'), 0, 0); return true; })()
+    : false;
+  if (!result) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fee2e2';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ef4444';
+    ctx.font = '14px system-ui';
+    ctx.fillText('fallback → canvas vacío', 10, 60);
+  }
+  document.getElementById('r-fallback').textContent = `drawHtmlElement() → ${result}`;
+  log(`Fallback: drawHtmlElement retornó ${result}`);
+}
+
+function demoNative() {
+  const canvas = document.getElementById('c-native');
+  const ctx = canvas.getContext('2d');
+  enableApiOnCtx(ctx);
+
+  const el = document.createElement('div');
+  el.style.cssText = 'width:260px;height:100px;padding:12px;background:#ede9fe;border-radius:8px;font-family:system-ui;font-size:13px;color:#4c1d95;border:2px solid #7c3aed';
+  el.innerHTML = '<strong>Elemento DOM nativo</strong><br>Renderizado directamente en canvas<br>mediante drawElement()';
+  document.body.appendChild(el); // necesario para offsetWidth
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawElement(el, 10, 10);
+
+  document.body.removeChild(el);
+  document.getElementById('r-native').textContent = 'drawHtmlElement() → true ✓';
+  log('Native: drawHtmlElement() ejecutado con éxito');
+}
+
+// ─── 3. Textarea en canvas ──────────────────────────────────────────────────
+
+function demoTextarea() {
+  const canvas = document.getElementById('c-textarea');
+  const ctx = canvas.getContext('2d');
+  enableApiOnCtx(ctx);
+
+  // Fondo del "canvas de Excalidraw"
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#fafaf9';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Dibujar un rectángulo simulando un shape de Excalidraw
+  ctx.strokeStyle = '#6366f1';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(20, 20, 520, 120);
+
+  // Crear textarea como si fuera el editor WYSIWYG
+  const ta = document.createElement('textarea');
+  ta.value = 'Texto editándose directamente en el canvas\nsin overlay absolutamente posicionado ✓';
+  ta.style.cssText = `
+    width:516px; height:116px; padding:8px; background:transparent;
+    border:none; outline:none; font:16px system-ui; resize:none;
+    color:#312e81; overflow:hidden;
+  `;
+  document.body.appendChild(ta);
+
+  // Simular drawTextEditorInCanvas
+  ctx.save();
+  ctx.translate(22, 22);
+  ctx.drawElement(ta, 0, 0);
+  ctx.restore();
+
+  document.body.removeChild(ta);
+  document.getElementById('r-textarea').textContent =
+    'drawTextEditorInCanvas() → textarea pintado en canvas, sin overlay HTML ✓';
+  log('Textarea renderizada en canvas via drawElement()');
+}
+
+// ─── 4. Effects ────────────────────────────────────────────────────────────
+
+function demoEffects(composite, filter) {
+  const id = composite === 'multiply' ? 'c-multiply' : 'c-blur';
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext('2d');
+  enableApiOnCtx(ctx);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Fondo con color para que el blend sea visible
+  ctx.fillStyle = '#fde68a';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const el = document.createElement('div');
+  el.style.cssText = 'width:250px;height:100px;background:#6366f1;border-radius:8px;padding:10px;color:#fff;font:13px system-ui';
+  el.textContent = `composite: ${composite || 'default'} | filter: ${filter || 'none'}`;
+  document.body.appendChild(el);
+
+  ctx.save();
+  if (composite) ctx.globalCompositeOperation = composite;
+  if (filter)    ctx.filter = filter;
+  ctx.drawElement(el, 15, 10);
+  ctx.restore();
+
+  document.body.removeChild(el);
+  log(`Effects: composite=${composite} filter=${filter}`);
+}
+
+// ─── 5. Paste HTML rico ─────────────────────────────────────────────────────
+
+function demoPaste() {
+  const canvas = document.getElementById('c-paste');
+  const ctx = canvas.getContext('2d');
+  enableApiOnCtx(ctx);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const html = `
+    <div style="font-family:system-ui;padding:16px;width:520px">
+      <h2 style="color:#1e40af;margin-bottom:8px">📋 HTML pegado nativamente</h2>
+      <p style="color:#374151">Este contenido HTML se renderiza <strong>directamente en el canvas</strong>
+      preservando layout, estilos y tipografía — sin conversión a texto plano.</p>
+      <ul style="color:#4b5563;margin-top:8px;padding-left:20px">
+        <li>Listas preservadas ✓</li>
+        <li>Estilos inline ✓</li>
+        <li>Tipografía nativa ✓</li>
+      </ul>
+    </div>`;
+
+  // Simular createHtmlContentNode + drawHtmlElement
+  const node = document.createElement('div');
+  node.style.cssText = 'width:520px;height:180px;overflow:hidden;box-sizing:border-box;pointer-events:none';
+  node.innerHTML = html;
+  document.body.appendChild(node);
+
+  ctx.drawElement(node, 20, 10);
+  document.body.removeChild(node);
+
+  document.getElementById('r-paste').textContent =
+    'pasteHtmlToCanvas() → HTML rico renderizado en canvas ✓ (type: "htmlContent")';
+  log('pasteHtmlToCanvas() ejecutado — HTML preservado como "htmlContent"');
+}
+
+// ─── 6. Clipboard ────────────────────────────────────────────────────────────
+
+function demoClipboard() {
+  // Simula qué retornaría parseHTMLDataItem con la API activa
+  const sampleHtml = '<p>Hola <strong>mundo</strong></p>';
+
+  const withApi = {
+    type: 'mixedContent',
+    value: [{ type: 'htmlContent', value: sampleHtml }]
+  };
+
+  const withoutApi = {
+    type: 'mixedContent',
+    value: [{ type: 'text', value: 'Hola mundo' }]
+  };
+
+  const out = document.getElementById('clip-out');
+  out.textContent =
+    '// Con HTML-in-Canvas activo (isHtmlInCanvasSupported() = true):\n' +
+    JSON.stringify(withApi, null, 2) +
+    '\n\n// Sin la API (fallback actual):\n' +
+    JSON.stringify(withoutApi, null, 2);
+
+  log('Clipboard: tipo "htmlContent" preserva HTML raw para renderizado nativo');
+}
+</script>
+</body>
+</html>
