@@ -1,7 +1,7 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import { MIME_TYPES } from "@excalidraw/common";
-import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { getElementAbsoluteCoords, isTextElement } from "@excalidraw/element";
 import { hitElementBoundingBox } from "@excalidraw/element";
 
 import type { GlobalPoint, Radians } from "@excalidraw/math";
@@ -85,13 +85,19 @@ export const isPointHittingLink = (
   appState: AppState,
   [x, y]: GlobalPoint,
   isMobile: boolean,
+  openTextLinkOnModifierClick = false,
 ) => {
-  if (!element.link || appState.selectedElementIds[element.id]) {
+  const isModifierTextLink =
+    openTextLinkOnModifierClick && isTextElement(element);
+  if (
+    !element.link ||
+    (appState.selectedElementIds[element.id] && !isModifierTextLink)
+  ) {
     return false;
   }
   if (
     !isMobile &&
-    appState.viewModeEnabled &&
+    (appState.viewModeEnabled || isModifierTextLink) &&
     hitElementBoundingBox(pointFrom(x, y), element, elementsMap)
   ) {
     return true;
