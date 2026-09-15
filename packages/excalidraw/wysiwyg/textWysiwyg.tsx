@@ -418,13 +418,43 @@ export const textWysiwyg = ({
         ),
         textAlign,
         verticalAlign,
-        color: applyDarkModeFilter(
+        color: "transparent",
+        caretColor: applyDarkModeFilter(
           updatedTextElement.strokeColor,
           appState.theme === THEME.DARK,
         ),
         opacity: updatedTextElement.opacity / 100,
         maxHeight: `${editorMaxHeight}px`,
       });
+      Object.assign(overlay.style, {
+        font,
+        lineHeight: updatedTextElement.lineHeight,
+        width: `${width}px`,
+        height: `${height}px`,
+        left: `${viewportX}px`,
+        top: `${viewportY}px`,
+        transform: editable.style.transform,
+        textAlign,
+        verticalAlign,
+        color: applyDarkModeFilter(
+          updatedTextElement.strokeColor,
+          appState.theme === THEME.DARK,
+        ),
+        opacity: updatedTextElement.opacity / 100,
+        maxHeight: `${editorMaxHeight}px`,
+        position: "absolute",
+        display: "inline-block",
+        margin: 0,
+        padding: 0,
+        border: 0,
+        pointerEvents: "none",
+        whiteSpace,
+        wordBreak,
+        overflowWrap: "break-word",
+        boxSizing: "content-box",
+        zIndex: "var(--zIndex-wysiwyg)",
+      });
+      updateOverlayText();
       currentTextLayout = {
         angle: angle as Radians,
         font,
@@ -450,7 +480,8 @@ export const textWysiwyg = ({
   };
 
   const editable = ownerDocument.createElement("textarea");
-
+  const overlay = ownerDocument.createElement("div");
+  overlay.classList.add("excalidraw-wysiwyg-overlay");
   editable.dir = "auto";
   editable.tabIndex = 0;
   editable.dataset.type = "wysiwyg";
@@ -486,6 +517,28 @@ export const textWysiwyg = ({
     boxSizing: "content-box",
   });
   editable.value = element.originalText;
+  
+  const updateOverlayText = () => {
+    if (!element.styleRanges || element.styleRanges.length === 0) {
+      overlay.textContent = editable.value;
+      return;
+    }
+    const val = editable.value;
+    let html = "";
+    let lastIndex = 0;
+    for (const range of element.styleRanges) {
+      if (range.index > lastIndex) {
+        html += val.substring(lastIndex, range.index).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+      const segment = val.substring(range.index, range.index + range.length);
+      html += `<span style="color: ${range.color}">${segment.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`;
+      lastIndex = range.index + range.length;
+    }
+    html += val.substring(lastIndex).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    // Ensure trailing newlines render correctly in div
+    overlay.innerHTML = html.replace(/\n$/, "\n<br>");
+  };
+  
   updateWysiwygStyle();
 
   const getCaretIndexFromInitialSceneCoords = () => {
@@ -594,6 +647,7 @@ export const textWysiwyg = ({
               editable.selectionStart = editable.selectionEnd = newPos;
 
               editable.dispatchEvent(new Event("input"));
+              updateOverlayText();
             }
           }
 
@@ -892,6 +946,7 @@ export const textWysiwyg = ({
     unbindOnScroll();
 
     editable.remove();
+    overlay.remove();
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
@@ -1052,6 +1107,9 @@ export const textWysiwyg = ({
     });
   });
   ownerWindow.addEventListener("beforeunload", handleSubmit);
+  excalidrawContainer
+    ?.querySelector(".excalidraw-textEditorContainer")!
+    .appendChild(overlay);
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);
