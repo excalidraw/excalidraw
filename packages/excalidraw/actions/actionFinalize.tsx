@@ -56,6 +56,7 @@ export const actionFinalize = register<FormData>({
   trackEvent: false,
   perform: (elements, appState, data, app) => {
     let shouldCommit = true;
+    let elementWasDeleted = false;
     let newElements = elements;
     const { focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
@@ -298,6 +299,7 @@ export const actionFinalize = register<FormData>({
       }
 
       if (element && isInvisiblySmallElement(element)) {
+        elementWasDeleted = true;
         // TODO: #7348 in theory this gets recorded by the store, so the invisible elements could be restored by the undo/redo, which might be not what we would want
         newElements = newElements.map((el) => {
           if (el.id === element?.id) {
@@ -415,7 +417,7 @@ export const actionFinalize = register<FormData>({
         selectedLinearElement: isDrawShapeTool ? null : selectedLinearElement,
       },
       // TODO: #7348 we should not capture everything, but if we don't, it leads to incosistencies -> revisit
-      captureUpdate: shouldCommit
+      captureUpdate: shouldCommit || elementWasDeleted
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.NEVER,
     };
