@@ -799,6 +799,12 @@ export type ElementRenderOverrides = ReadonlyMap<
   ElementRenderOverride
 >;
 
+/** The translation part of a snapshot: only the entries that carry an offset. */
+export type ElementRenderOffsets = ReadonlyMap<
+  ExcalidrawElement["id"],
+  NonNullable<ElementRenderOverride["offset"]>
+>;
+
 export interface ExcalidrawProps {
   className?: string;
   /**

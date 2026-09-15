@@ -16,6 +16,7 @@ import { getDefaultAppState } from "../appState";
 import * as StaticScene from "../renderer/staticScene";
 import { Renderer } from "../scene/Renderer";
 import { exportToSvg } from "../scene/export";
+import { getElementRenderOffsets } from "../renderOverrides";
 
 import { API } from "./helpers/api";
 import {
@@ -29,10 +30,14 @@ import {
 
 import type {
   AppState,
+  ElementRenderOffsets,
   ElementRenderOverride,
   ElementRenderOverrides,
 } from "../types";
-import type { StaticCanvasRenderConfig } from "../scene/types";
+import type {
+  RenderableElementsMap,
+  StaticCanvasRenderConfig,
+} from "../scene/types";
 
 const { h } = window;
 
@@ -260,6 +265,101 @@ describe("setElementRenderOverrides", () => {
     act(() => h.setState({ editingFrame: null }));
     expect(query(".frame-name")).toBe(null);
   });
+
+  it("keeps the offsets map identity while only opacities change", () => {
+    const first = getElementRenderOffsets(
+      new Map([
+        ["a", { opacity: 10, offset: { x: 1, y: 2 } }],
+        ["b", { opacity: 20 }],
+      ]),
+      new Map(),
+    );
+    expect([...first]).toEqual([["a", { x: 1, y: 2 }]]);
+    expect(
+      getElementRenderOffsets(
+        new Map([
+          ["a", { opacity: 99, offset: { x: 1, y: 2 } }],
+          ["b", { opacity: 0 }],
+          ["c", { opacity: 0 }],
+        ]),
+        first,
+      ),
+    ).toBe(first);
+    expect(
+      getElementRenderOffsets(
+        new Map([["a", { offset: { x: 1, y: 3 } }]]),
+        first,
+      ),
+    ).not.toBe(first);
+    expect(getElementRenderOffsets(new Map(), first).size).toBe(0);
+    expect(
+      getElementRenderOffsets(
+        new Map([["b", { offset: { x: 1, y: 2 } }]]),
+        first,
+      ),
+    ).not.toBe(first);
+  });
+
+  it("does not populate a replacement offsets map during a fade", () => {
+    const snapshot = (opacity: number): ElementRenderOverrides =>
+      new Map(
+        Array.from({ length: 1000 }, (_, index) => [
+          `r${index}`,
+          { opacity, offset: { x: index, y: -index } },
+        ]),
+      );
+    const first = getElementRenderOffsets(snapshot(20), new Map());
+    // Snapshot iteration order does not affect offsets or their identity.
+    const fade = new Map([...snapshot(80)].reverse());
+    const set = vi.spyOn(Map.prototype, "set");
+    const next = getElementRenderOffsets(fade, first);
+    const writes = set.mock.calls.length;
+    set.mockRestore();
+
+    expect(next).toBe(first);
+    expect(writes).toBe(0);
+  });
+
+  it.each([
+    [
+      "a later offset changes",
+      [
+        ["a", { x: 1, y: 2 }],
+        ["b", { x: 3, y: 5 }],
+      ],
+    ],
+    [
+      "an offset is appended after unchanged entries",
+      [
+        ["a", { x: 1, y: 2 }],
+        ["b", { x: 3, y: 4 }],
+        ["c", { x: 5, y: 6 }],
+      ],
+    ],
+    ["an offset is removed", [["a", { x: 1, y: 2 }]]],
+    [
+      "an ID changes without changing the number of offsets",
+      [
+        ["a", { x: 1, y: 2 }],
+        ["c", { x: 3, y: 4 }],
+      ],
+    ],
+  ] as const)("replaces the offsets map when %s", (_, entries) => {
+    const previous: ElementRenderOffsets = new Map([
+      ["a", { x: 1, y: 2 }],
+      ["b", { x: 3, y: 4 }],
+    ]);
+    const next = getElementRenderOffsets(
+      new Map(entries.map(([id, offset]) => [id, { offset }])),
+      previous,
+    );
+    expect(next).not.toBe(previous);
+    expect([...next]).toEqual(entries);
+    expect([...previous]).toEqual([
+      ["a", { x: 1, y: 2 }],
+      ["b", { x: 3, y: 4 }],
+    ]);
+  });
 });
 
 describe("render override geometry", () => {
@@ -292,6 +392,28 @@ describe("render override geometry", () => {
       pendingFlowchartNodes: null,
       theme: "light",
     };
+    // What App hands the static canvas: document culling, adjusted for the
+    // snapshot's offsets, whose identity is kept while they don't change.
+    let offsets: ElementRenderOffsets = new Map();
+    const visibleWith = (
+      overrides: ElementRenderOverrides,
+      state: AppState = appState,
+      map: RenderableElementsMap = elementsMap,
+    ) => {
+      const { visibleElements } = renderer.getRenderableElements({
+        ...state,
+        selectedElements: scene.getSelectedElements(state),
+      });
+      offsets = getElementRenderOffsets(overrides, offsets);
+      return offsets.size
+        ? renderer.getVisibleElementsWithRenderOffsets(
+            visibleElements,
+            map,
+            state,
+            offsets,
+          )
+        : visibleElements;
+    };
     const draw = (overrides: ElementRenderOverrides) =>
       StaticScene.renderStaticScene({
         canvas,
@@ -299,11 +421,7 @@ describe("render override geometry", () => {
         scale: 1,
         elementsMap,
         allElementsMap: scene.getNonDeletedElementsMap(),
-        visibleElements: renderer.getVisibleElementsForRendering(
-          elementsMap,
-          appState,
-          overrides,
-        ),
+        visibleElements: visibleWith(overrides),
         appState,
         renderConfig: {
           ...renderConfig,
@@ -317,6 +435,7 @@ describe("render override geometry", () => {
       elementsMap,
       context,
       draw,
+      visibleWith,
       renderConfig,
     };
   };
@@ -329,11 +448,9 @@ describe("render override geometry", () => {
       width: 50,
       height: 50,
     });
-    const { renderer, elementsMap, appState } = setup([rect]);
+    const { renderer, appState, visibleWith } = setup([rect]);
     const overrides = new Map([[rect.id, { offset: { x: -300, y: 0 } }]]);
-    expect(
-      renderer.getVisibleElementsForRendering(elementsMap, appState, overrides),
-    ).toContain(rect);
+    expect(visibleWith(overrides)).toContain(rect);
     expect(
       renderer.getRenderableElements({ ...appState, selectedElements: [] })
         .visibleElements,
@@ -350,38 +467,26 @@ describe("render override geometry", () => {
       width: 50,
       height: 50,
     });
-    const { renderer, elementsMap, appState, scene } = setup([rect]);
+    const { renderer, appState, scene, visibleWith } = setup([rect]);
     const overrides = new Map([[rect.id, { offset: { x: -300, y: 0 } }]]);
-    const visible = renderer.getVisibleElementsForRendering(
-      elementsMap,
-      appState,
-      overrides,
-    );
+    const visible = visibleWith(overrides);
     expect(visible).toContain(rect);
+    expect(visibleWith(overrides, { ...appState, cursorButton: "down" })).toBe(
+      visible,
+    );
+    // a new snapshot with the same offsets keeps the result too
     expect(
-      renderer.getVisibleElementsForRendering(
-        elementsMap,
-        { ...appState, cursorButton: "down" },
-        overrides,
+      visibleWith(
+        new Map([[rect.id, { opacity: 50, offset: { x: -300, y: 0 } }]]),
       ),
     ).toBe(visible);
+    expect(visibleWith(overrides, { ...appState, width: 100 })).not.toContain(
+      rect,
+    );
     expect(
-      renderer.getVisibleElementsForRendering(
-        elementsMap,
-        { ...appState, width: 100 },
-        overrides,
-      ),
+      visibleWith(overrides, { ...appState, scrollX: -600 }),
     ).not.toContain(rect);
-    expect(
-      renderer.getVisibleElementsForRendering(
-        elementsMap,
-        { ...appState, scrollX: -600 },
-        overrides,
-      ),
-    ).not.toContain(rect);
-    expect(
-      renderer.getVisibleElementsForRendering(elementsMap, appState, new Map()),
-    ).not.toContain(rect);
+    expect(visibleWith(new Map())).not.toContain(rect);
 
     const moved = { ...rect, x: 1200 };
     scene.replaceAllElements([moved], { skipValidation: true });
@@ -389,17 +494,56 @@ describe("render override geometry", () => {
       ...appState,
       selectedElements: [],
     });
+    expect(visibleWith(overrides, appState, changed.elementsMap)).not.toContain(
+      moved,
+    );
+  });
+
+  it("reuses the document-visible set for opacity-only snapshots without viewport geometry", () => {
+    const rects = Array.from({ length: 20 }, (_, index) =>
+      API.createElement({
+        type: "rectangle",
+        id: `r${index}`,
+        x: index * 30,
+        y: 10,
+        width: 20,
+        height: 20,
+      }),
+    );
+    const { renderer, appState, visibleWith } = setup(rects);
+    const documentVisible = renderer.getRenderableElements({
+      ...appState,
+      selectedElements: [],
+    }).visibleElements;
+    const inViewport = vi.spyOn(Element, "isElementInViewport");
+
+    expect(visibleWith(new Map([[rects[3].id, { opacity: 50 }]]))).toBe(
+      documentVisible,
+    );
+    expect(visibleWith(new Map([[rects[3].id, { opacity: 51 }]]))).toBe(
+      documentVisible,
+    );
+    expect(inViewport).not.toHaveBeenCalled();
+
+    // translating one element checks that element only, not the scene
+    const moving = visibleWith(
+      new Map([[rects[3].id, { opacity: 50, offset: { x: 5, y: 0 } }]]),
+    );
+    expect(moving).toBe(documentVisible);
+    expect(inViewport).toHaveBeenCalledTimes(1);
+    expect(inViewport.mock.calls[0][0]).toBe(rects[3]);
     expect(
-      renderer.getVisibleElementsForRendering(
-        changed.elementsMap,
-        appState,
-        overrides,
+      visibleWith(
+        new Map([[rects[3].id, { opacity: 50, offset: { x: 5000, y: 0 } }]]),
       ),
-    ).not.toContain(moved);
+    ).toEqual(documentVisible.filter((element) => element !== rects[3]));
+    expect(inViewport).toHaveBeenCalledTimes(2);
   });
 
   it("keeps frame-drag ordering responsive to selection and drag-state changes", () => {
-    const a = API.createElement({ type: "rectangle", id: "a", x: 10, y: 10 });
+    // `a` is off-screen in the document and only visible through its offset,
+    // so the visible set is rebuilt in scene order on every change here.
+    const a = API.createElement({ type: "rectangle", id: "a", x: 600, y: 10 });
     const b = API.createElement({ type: "rectangle", id: "b", x: 10, y: 10 });
     const frame = API.createElement({
       type: "frame",
@@ -414,12 +558,10 @@ describe("render override geometry", () => {
       x: 20,
       y: 20,
     });
-    const { renderer, elementsMap, appState } = setup([a, b, frame, child]);
-    const overrides = new Map([[a.id, { opacity: 50 }]]);
+    const { appState, visibleWith } = setup([a, b, frame, child]);
+    const overrides = new Map([[a.id, { offset: { x: -590, y: 0 } }]]);
     const ids = (state: AppState) =>
-      renderer
-        .getVisibleElementsForRendering(elementsMap, state, overrides)
-        .map((element) => element.id);
+      visibleWith(overrides, state).map((element) => element.id);
     const selected: AppState = {
       ...appState,
       selectedElementIds: { [a.id]: true },
@@ -437,6 +579,83 @@ describe("render override geometry", () => {
       }),
     ).toEqual(["a", "frame", "child", "b"]);
     expect(ids(selected)).toEqual(["a", "b", "frame", "child"]);
+  });
+
+  it("drops the frame-drag reordering when the anchoring frame is translated away", () => {
+    const a = API.createElement({ type: "rectangle", id: "a", x: 10, y: 10 });
+    const b = API.createElement({ type: "rectangle", id: "b", x: 10, y: 10 });
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame",
+      x: 200,
+      y: 200,
+      width: 100,
+      height: 100,
+    });
+    const { appState, visibleWith } = setup([a, b, frame]);
+    const dragging: AppState = {
+      ...appState,
+      selectedElementIds: { [a.id]: true },
+      frameToHighlight: frame,
+      selectedElementsAreBeingDragged: true,
+    };
+    const ids = (overrides: ElementRenderOverrides) =>
+      visibleWith(overrides, dragging).map((element) => element.id);
+    expect(ids(new Map())).toEqual(["b", "a", "frame"]);
+    // the frame leaves the view: back to plain scene order, like a full
+    // recalculation would produce
+    expect(ids(new Map([[frame.id, { offset: { x: 10000, y: 0 } }]]))).toEqual([
+      "a",
+      "b",
+    ]);
+    expect(ids(new Map([[frame.id, { offset: { x: 0, y: 0 } }]]))).toEqual([
+      "b",
+      "a",
+      "frame",
+    ]);
+  });
+
+  it.each(["a", "b", "c"])(
+    "preserves scene order as %s is translated into and out of view",
+    (id) => {
+      const sceneIds = ["a", "b", "c"];
+      const { visibleWith } = setup(
+        sceneIds.map((elementId) =>
+          API.createElement({
+            type: "rectangle",
+            id: elementId,
+            x: elementId === id ? 600 : 10,
+            y: 10,
+          }),
+        ),
+      );
+      const ids = (offsetX: number) =>
+        visibleWith(new Map([[id, { offset: { x: offsetX, y: 0 } }]])).map(
+          (element) => element.id,
+        );
+      expect(ids(-590)).toEqual(sceneIds);
+      expect(ids(-580)).toEqual(sceneIds);
+      expect(ids(-570)).toEqual(sceneIds);
+      expect(ids(0)).toEqual(sceneIds.filter((elementId) => elementId !== id));
+    },
+  );
+
+  it("preserves scene order when elements enter and leave in the same update", () => {
+    const a = API.createElement({ type: "rectangle", id: "a", x: 600, y: 10 });
+    const b = API.createElement({ type: "rectangle", id: "b", x: 10, y: 10 });
+    const c = API.createElement({ type: "rectangle", id: "c", x: 600, y: 60 });
+    const d = API.createElement({ type: "rectangle", id: "d", x: 10, y: 60 });
+    const { visibleWith } = setup([a, b, c, d]);
+    expect(
+      visibleWith(
+        new Map([
+          [c.id, { offset: { x: -590, y: 0 } }],
+          [b.id, { offset: { x: 1000, y: 0 } }],
+          [a.id, { offset: { x: -590, y: 0 } }],
+        ]),
+      ),
+    ).toEqual([a, c, d]);
+    expect(visibleWith(new Map())).toEqual([b, d]);
   });
 
   it.each(["rectangle", "arrow"] as const)(
@@ -463,13 +682,8 @@ describe("render override geometry", () => {
         text: "label",
         containerId: container.id,
       });
-      const { renderer, appState, elementsMap } = setup([container, label]);
-      const visible = (overrides: ElementRenderOverrides) =>
-        renderer.getVisibleElementsForRendering(
-          elementsMap,
-          appState,
-          overrides,
-        );
+      const { renderer, appState, visibleWith } = setup([container, label]);
+      const visible = visibleWith;
       expect(visible(new Map())).toEqual([]);
       // The translated label overlaps the viewport even though its container
       // remains offscreen. The container must be included to paint the label.
@@ -601,7 +815,7 @@ describe("render override geometry", () => {
       y: 100,
       text: "Label",
     });
-    const { renderer, appState, elementsMap, renderConfig } = setup([label]);
+    const { elementsMap, renderConfig, visibleWith } = setup([label]);
     const overrides = new Map([[label.id, { offset: { x: -400, y: 10 } }]]);
     expect(
       Element.resolveElementRenderState(label, elementsMap, {
@@ -609,9 +823,7 @@ describe("render override geometry", () => {
         elementRenderOverrides: overrides,
       }).offset,
     ).toEqual({ x: -400, y: 10 });
-    expect(
-      renderer.getVisibleElementsForRendering(elementsMap, appState, overrides),
-    ).toContain(label);
+    expect(visibleWith(overrides)).toContain(label);
   });
 
   it("clips a translated child against the translated frame boundary", () => {

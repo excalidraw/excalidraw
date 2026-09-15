@@ -369,7 +369,10 @@ import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
-import { copyElementRenderOverrides } from "../renderOverrides";
+import {
+  copyElementRenderOverrides,
+  getElementRenderOffsets,
+} from "../renderOverrides";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
 
@@ -490,6 +493,7 @@ import type {
   AppClassProperties,
   AppProps,
   AppState,
+  ElementRenderOffsets,
   ElementRenderOverrides,
   BinaryFileData,
   ExcalidrawImperativeAPI,
@@ -793,6 +797,8 @@ class App extends React.Component<AppProps, AppState> {
 
   api: ExcalidrawImperativeAPI;
   private elementRenderOverrides: ElementRenderOverrides = new Map();
+  /** offsets of `elementRenderOverrides`; keeps its identity while they don't change */
+  private elementRenderOffsets: ElementRenderOffsets = new Map();
   private renderOverridesUpdatePending = false;
 
   private getRenderOverrideConfig = () => ({
@@ -2646,11 +2652,12 @@ class App extends React.Component<AppProps, AppState> {
                             elementsMap={renderableElementsMap}
                             allElementsMap={allElementsMap}
                             visibleElements={
-                              this.elementRenderOverrides.size
-                                ? this.renderer.getVisibleElementsForRendering(
+                              this.elementRenderOffsets.size
+                                ? this.renderer.getVisibleElementsWithRenderOffsets(
+                                    visibleElements,
                                     renderableElementsMap,
                                     this.state,
-                                    this.elementRenderOverrides,
+                                    this.elementRenderOffsets,
                                   )
                                 : visibleElements
                             }
@@ -3568,6 +3575,7 @@ class App extends React.Component<AppProps, AppState> {
   private resetScene = withBatchedUpdates(
     (opts?: { resetLoadingState: boolean }) => {
       this.elementRenderOverrides = new Map();
+      this.elementRenderOffsets = new Map();
       this.scene.replaceAllElements([]);
       this.setState((state) => ({
         ...getDefaultAppState(),
@@ -3932,6 +3940,7 @@ class App extends React.Component<AppProps, AppState> {
     this.props.onUnmount?.();
     this.props.onExcalidrawAPI?.(null);
     this.elementRenderOverrides = new Map();
+    this.elementRenderOffsets = new Map();
 
     (this.ownerWindow as any).launchQueue?.setConsumer(() => {});
 
@@ -5427,6 +5436,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     this.elementRenderOverrides = copyElementRenderOverrides(overrides);
+    this.elementRenderOffsets = getElementRenderOffsets(
+      this.elementRenderOverrides,
+      this.elementRenderOffsets,
+    );
     this.renderOverridesUpdatePending = true;
     // Preserve AppState identity and explicitly request a visual-only commit.
     this.forceUpdate();

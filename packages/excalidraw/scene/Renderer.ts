@@ -2,8 +2,9 @@ import {
   getCommonFrameId,
   getFrameChildrenInsertionIndex,
   getBoundTextElement,
-  getElementRenderOffset,
+  getContainerElement,
   isElementInViewport,
+  isTextElement,
 } from "@excalidraw/element";
 
 import { arrayToMap, memoize, toBrandedType } from "@excalidraw/common";
@@ -22,7 +23,7 @@ import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
 import type { RenderableElementsMap } from "./types";
 
-import type { AppState, ElementRenderOverrides } from "../types";
+import type { AppState, ElementRenderOffsets } from "../types";
 
 type GetRenderableElementsOpts = {
   zoom: AppState["zoom"];
@@ -46,15 +47,24 @@ export class Renderer {
     this.scene = scene;
   }
 
-  /** Visual culling is separate from the document geometry used for interaction. */
-  public getVisibleElementsForRendering(
+  /**
+   * Adjusts the document-visible set for render-override translations: an
+   * element leaves it when its offset moves it out of view and enters it when
+   * its offset brings it in; everything else keeps its document visibility.
+   * Only translated elements (and their bound labels, which inherit the
+   * offset) go through viewport geometry. The result is memoized on the
+   * offsets' identity so that opacity-only snapshots don't reach it at all.
+   */
+  public getVisibleElementsWithRenderOffsets(
+    visibleElements: readonly NonDeletedExcalidrawElement[],
     elementsMap: RenderableElementsMap,
     appState: AppState,
-    overrides: ElementRenderOverrides,
+    offsets: ElementRenderOffsets,
   ) {
-    return this._getVisibleElementsForRendering({
+    return this._getVisibleElementsWithRenderOffsets({
+      visibleElements,
       elementsMap,
-      overrides,
+      offsets,
       zoom: appState.zoom,
       scrollX: appState.scrollX,
       scrollY: appState.scrollY,
@@ -69,10 +79,11 @@ export class Renderer {
     });
   }
 
-  private _getVisibleElementsForRendering = memoize(
+  private _getVisibleElementsWithRenderOffsets = memoize(
     ({
+      visibleElements,
       elementsMap,
-      overrides,
+      offsets,
       selectedElements,
       frameToHighlight,
       ...viewport
@@ -88,41 +99,107 @@ export class Renderer {
       | "selectedElements"
       | "frameToHighlight"
     > & {
+      visibleElements: readonly NonDeletedExcalidrawElement[];
       elementsMap: RenderableElementsMap;
-      overrides: ElementRenderOverrides;
+      offsets: ElementRenderOffsets;
     }) => {
-      const isVisible = (element: NonDeletedExcalidrawElement) => {
-        const offset = getElementRenderOffset(element, elementsMap, overrides);
-        // Shifting the viewport also works for arrow labels whose coordinates
-        // are derived from their container rather than their own x/y fields.
-        return isElementInViewport(
+      // Shifting the viewport instead of the element also works for arrow
+      // labels, whose coordinates derive from their container.
+      const isVisible = (
+        element: NonDeletedExcalidrawElement,
+        offset: ElementRenderOffsets extends ReadonlyMap<string, infer T>
+          ? T
+          : never,
+      ) =>
+        isElementInViewport(
           element,
           viewport.width,
           viewport.height,
           {
             ...viewport,
-            scrollX: viewport.scrollX + (offset?.x ?? 0),
-            scrollY: viewport.scrollY + (offset?.y ?? 0),
+            scrollX: viewport.scrollX + offset.x,
+            scrollY: viewport.scrollY + offset.y,
           },
           elementsMap,
         );
+
+      const documentVisible = this.getVisibleSet(visibleElements);
+      const added = new Set<NonDeletedExcalidrawElement>();
+      const removed = new Set<NonDeletedExcalidrawElement>();
+      const update = (
+        element: NonDeletedExcalidrawElement,
+        visible: boolean,
+      ) => {
+        if (documentVisible.has(element) !== visible) {
+          (visible ? added : removed).add(element);
+        }
       };
-      const visibleElements = [...elementsMap.values()].filter((element) => {
+      for (const [id, offset] of offsets) {
+        const element = elementsMap.get(id);
+        // a bound label's own offset is ignored; it moves with its container
+        if (
+          !element ||
+          (isTextElement(element) && getContainerElement(element, elementsMap))
+        ) {
+          continue;
+        }
         const label = getBoundTextElement(element, elementsMap);
-        return isVisible(element) || (!!label && isVisible(label));
-      });
-      if (frameToHighlight) {
-        if (getCommonFrameId(selectedElements) !== frameToHighlight.id) {
-          return this.sortSelectedElementsIntoHighlightedFrame({
-            visibleElements,
-            selectedElements,
-            frameToHighlight,
-          });
+        const labelVisible = !!label && isVisible(label, offset);
+        update(element, isVisible(element, offset) || labelVisible);
+        if (label) {
+          update(label, labelVisible);
         }
       }
-      return visibleElements;
+
+      if (!added.size && !removed.size) {
+        return visibleElements;
+      }
+
+      const needsFrameReordering =
+        frameToHighlight &&
+        getCommonFrameId(selectedElements) !== frameToHighlight.id;
+      if (!added.size && !needsFrameReordering) {
+        return visibleElements.filter((element) => !removed.has(element));
+      }
+
+      // Rebuild in scene order when elements enter the view. Frame-drag
+      // ordering also needs rebuilding on removals, since the anchoring frame
+      // may have left the view.
+      const result: NonDeletedExcalidrawElement[] = [];
+      for (const element of elementsMap.values()) {
+        if (
+          added.has(element) ||
+          (documentVisible.has(element) && !removed.has(element))
+        ) {
+          result.push(element);
+        }
+      }
+      return needsFrameReordering
+        ? this.sortSelectedElementsIntoHighlightedFrame({
+            visibleElements: result,
+            selectedElements,
+            frameToHighlight,
+          })
+        : result;
     },
   );
+
+  /** the document-visible elements as a set, cached per visible array */
+  private visibleSets = new WeakMap<
+    readonly NonDeletedExcalidrawElement[],
+    Set<NonDeletedExcalidrawElement>
+  >();
+
+  private getVisibleSet(
+    visibleElements: readonly NonDeletedExcalidrawElement[],
+  ) {
+    let set = this.visibleSets.get(visibleElements);
+    if (!set) {
+      set = new Set(visibleElements);
+      this.visibleSets.set(visibleElements, set);
+    }
+    return set;
+  }
 
   private getVisibleCanvasElements({
     elementsMap,
@@ -338,6 +415,6 @@ export class Renderer {
   public destroy() {
     renderStaticSceneThrottled.cancel();
     this._getRenderableElements.clear();
-    this._getVisibleElementsForRendering.clear();
+    this._getVisibleElementsWithRenderOffsets.clear();
   }
 }
