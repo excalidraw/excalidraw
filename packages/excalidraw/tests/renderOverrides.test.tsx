@@ -859,15 +859,15 @@ describe("render override geometry", () => {
       const { renderer, appState, visibleWith } = setup([container, label]);
       const visible = visibleWith;
       expect(visible(new Map())).toEqual([]);
-      // The translated label overlaps the viewport even though its container
-      // remains offscreen. The container must be included to paint the label.
+      // The label follows its container into view, whatever its own bounds
+      // and whatever offset targets it directly.
       expect(
-        visible(new Map([[container.id, { offset: { x: -300, y: 0 } }]])),
+        visible(new Map([[container.id, { offset: { x: -500, y: 0 } }]])),
       ).toEqual([container, label]);
       expect(
         visible(
           new Map([
-            [container.id, { offset: { x: -300, y: 0 } }],
+            [container.id, { offset: { x: -500, y: 0 } }],
             [label.id, { offset: { x: 2000, y: 0 } }],
           ]),
         ),

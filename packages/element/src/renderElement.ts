@@ -152,8 +152,6 @@ export type ElementRenderState = Readonly<{
   /** Alpha including frame opacity and pending erasure; selection dimming is separate. */
   opacity: number;
   offset: RenderPositionOffset;
-  /** Includes an inherited offset, even an explicit zero translation. */
-  hasPositionOverride: boolean;
 }>;
 
 /** Resolve visual state at the drawing boundary, preserving document cache keys. */
@@ -200,11 +198,7 @@ export const resolveElementRenderState = (
     elementRenderOverrides,
   );
 
-  return {
-    opacity,
-    offset: offset ?? ZERO_RENDER_OFFSET,
-    hasPositionOverride: offset !== undefined,
-  };
+  return { opacity, offset: offset ?? ZERO_RENDER_OFFSET };
 };
 
 export interface ExcalidrawElementWithCanvas {

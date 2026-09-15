@@ -51,9 +51,9 @@ export class Renderer {
    * Adjusts the document-visible set for render-override translations: an
    * element leaves it when its offset moves it out of view and enters it when
    * its offset brings it in; everything else keeps its document visibility.
-   * Only translated elements (and their bound labels, which inherit the
-   * offset) go through viewport geometry. The result is memoized on the
-   * offsets' identity so that opacity-only snapshots don't reach it at all.
+   * Only translated elements go through viewport geometry; their bound
+   * labels follow them. The result is memoized on the offsets' identity so
+   * that opacity-only snapshots don't reach it at all.
    */
   public getVisibleElementsWithRenderOffsets(
     visibleElements: readonly NonDeletedExcalidrawElement[],
@@ -143,11 +143,12 @@ export class Renderer {
         ) {
           continue;
         }
+        const visible = isVisible(element, offset);
+        update(element, visible);
+        // its bound label renders with it and follows the same offset
         const label = getBoundTextElement(element, elementsMap);
-        const labelVisible = !!label && isVisible(label, offset);
-        update(element, isVisible(element, offset) || labelVisible);
         if (label) {
-          update(label, labelVisible);
+          update(label, visible);
         }
       }
 

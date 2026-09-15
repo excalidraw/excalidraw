@@ -375,9 +375,11 @@ const _renderStaticScene = ({
       targetFrame,
       frameState.offset,
     );
+    const isTranslated = (state: ElementRenderState) =>
+      state.offset.x !== 0 || state.offset.y !== 0;
     if (
       (element.frameId === frame.id &&
-        (renderState.hasPositionOverride || frameState.hasPositionOverride)) ||
+        (isTranslated(renderState) || isTranslated(frameState))) ||
       shouldApplyFrameClip(
         getRenderElementWithPositionOverride(element, renderState.offset),
         frame,
