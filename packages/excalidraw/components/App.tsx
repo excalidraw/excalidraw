@@ -211,8 +211,7 @@ import {
   getApproxMinLineHeight,
   getMinTextElementWidth,
   ShapeCache,
-  getRenderOpacity,
-  resolveRenderPositionOffset,
+  resolveElementRenderState,
   getRenderElementWithPositionOverride,
   editGroupForSelectedElement,
   getElementsInGroup,
@@ -799,6 +798,13 @@ class App extends React.Component<AppProps, AppState> {
   private getRenderOverrideConfig = () => ({
     elementRenderOverrides: this.elementRenderOverrides,
   });
+
+  private getElementRenderState = (element: ExcalidrawElement) =>
+    resolveElementRenderState(element, this.scene.getNonDeletedElementsMap(), {
+      ...this.getRenderOverrideConfig(),
+      elementsPendingErasure: this.elementsPendingErasure,
+      pendingFlowchartNodes: null,
+    });
 
   private createExcalidrawAPI(): ExcalidrawImperativeAPI {
     const api: ExcalidrawImperativeAPI = {
@@ -1827,16 +1833,14 @@ class App extends React.Component<AppProps, AppState> {
     return (
       <>
         {embeddableElements.map((el) => {
+          const renderState = this.getElementRenderState(el);
           const { x, y } = sceneCoordsToViewportCoords(
             { sceneX: el.x, sceneY: el.y },
             this.state,
           );
 
           const isVisible = isElementInViewport(
-            getRenderElementWithPositionOverride(
-              el,
-              this.getRenderOverrideConfig(),
-            ),
+            getRenderElementWithPositionOverride(el, renderState.offset),
             normalizedWidth,
             normalizedHeight,
             this.state,
@@ -1969,10 +1973,6 @@ class App extends React.Component<AppProps, AppState> {
           const isHovered =
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "hover";
-          const renderPositionOffset = resolveRenderPositionOffset(
-            el,
-            this.getRenderOverrideConfig(),
-          );
 
           // scale video embeds based on zoom (capped) so that smaller embeds
           // on canvas when zoomed are still of legible quality
@@ -1996,25 +1996,20 @@ class App extends React.Component<AppProps, AppState> {
                 transform: isVisible
                   ? `translate(${
                       x +
-                      renderPositionOffset.x * this.state.zoom.value -
+                      renderState.offset.x * this.state.zoom.value -
                       this.state.offsetLeft
                     }px, ${
                       y +
-                      renderPositionOffset.y * this.state.zoom.value -
+                      renderState.offset.y * this.state.zoom.value -
                       this.state.offsetTop
                     }px) scale(${scale})`
                   : "none",
                 display: isVisible ? "block" : "none",
-                opacity: getRenderOpacity(
-                  el,
-                  this.getRenderOverrideConfig(),
-                  getContainingFrame(el, this.scene.getNonDeletedElementsMap()),
-                  this.elementsPendingErasure,
-                  null,
-                  this.state.openDialog?.name === "elementLinkSelector"
+                opacity:
+                  renderState.opacity *
+                  (this.state.openDialog?.name === "elementLinkSelector"
                     ? DEFAULT_REDUCED_GLOBAL_ALPHA
-                    : 1,
-                ),
+                    : 1),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
                   Math.min(el.width, el.height),
                   el,
@@ -2190,12 +2185,10 @@ class App extends React.Component<AppProps, AppState> {
         : null;
 
     return nonDeletedFramesLikes.map((f) => {
+      const renderState = this.getElementRenderState(f);
       if (
         !isElementInViewport(
-          getRenderElementWithPositionOverride(
-            f,
-            this.getRenderOverrideConfig(),
-          ),
+          getRenderElementWithPositionOverride(f, renderState.offset),
           this.canvas.width / this.ownerWindow.devicePixelRatio,
           this.canvas.height / this.ownerWindow.devicePixelRatio,
           {
@@ -2217,12 +2210,8 @@ class App extends React.Component<AppProps, AppState> {
 
       const { x: x1, y: y1 } = sceneCoordsToViewportCoords(
         {
-          sceneX:
-            f.x +
-            resolveRenderPositionOffset(f, this.getRenderOverrideConfig()).x,
-          sceneY:
-            f.y +
-            resolveRenderPositionOffset(f, this.getRenderOverrideConfig()).y,
+          sceneX: f.x + renderState.offset.x,
+          sceneY: f.y + renderState.offset.y,
         },
         this.state,
       );
@@ -2297,13 +2286,7 @@ class App extends React.Component<AppProps, AppState> {
           key={f.id}
           style={{
             position: "absolute",
-            opacity: getRenderOpacity(
-              f,
-              this.getRenderOverrideConfig(),
-              null,
-              this.elementsPendingErasure,
-              null,
-            ),
+            opacity: renderState.opacity,
             // Positioning from bottom so that we don't to either
             // calculate text height or adjust using transform (which)
             // messes up input position when editing the frame name.

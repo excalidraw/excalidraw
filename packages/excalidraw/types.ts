@@ -789,7 +789,7 @@ export type UIConfig = {
 export type ElementRenderOverride = Readonly<{
   /** Absolute render opacity (0–100, clamped). Omitted: use element.opacity. */
   opacity?: number;
-  /** Translation in scene units. Does not change the element's coordinates. */
+  /** Translation in scene units. Bound labels inherit their container's offset and ignore this field. */
   offset?: Readonly<{ x: number; y: number }>;
 }>;
 
@@ -1311,11 +1311,13 @@ export interface ExcalidrawImperativeAPI {
   getViewportOffsets: InstanceType<typeof App>["viewport"]["getOffsets"];
   /**
    * Atomically replaces all transient visual overrides. Values are copied;
-   * omitted IDs/fields use document values. null clears the snapshot.
+   * omitted IDs/fields use document values, except for inherited label offsets.
+   * null clears the snapshot.
    * Repaints without document changes, history entries or onChange events.
    * Finite opacity is clamped to 0–100; non-finite values reject the snapshot.
    * Unknown/deleted IDs are ignored when rendering. Reset/unmount clears it.
-   * Per-element offsets are explicit: target bound labels/frame children too.
+   * Bound labels inherit their container's offset; offsets targeting them are
+   * ignored. Label opacity remains independent. Target frame children explicitly.
    * Frame opacity still multiplies child opacity. Decorations follow their owner.
    * Exports and interactive geometry (hit tests, selection, editing) use document
    * values, including while authoring an animation preview in edit mode.

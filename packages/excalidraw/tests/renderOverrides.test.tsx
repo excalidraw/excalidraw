@@ -2,6 +2,12 @@ import React from "react";
 import rough from "roughjs/bin/rough";
 
 import * as Element from "@excalidraw/element";
+import {
+  BOUND_TEXT_PADDING,
+  DEFAULT_REDUCED_GLOBAL_ALPHA,
+  ELEMENT_READY_TO_ERASE_OPACITY,
+} from "@excalidraw/common";
+import { pointFrom, type LocalPoint } from "@excalidraw/math";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -19,6 +25,7 @@ import type {
   ElementRenderOverride,
   ElementRenderOverrides,
 } from "../types";
+import type { StaticCanvasRenderConfig } from "../scene/types";
 
 const { h } = window;
 
@@ -55,8 +62,16 @@ describe("setElementRenderOverrides", () => {
 
     const next = submit(new Map([[element.id, { offset: { x: 10, y: 0 } }]]));
     expect(
-      Element.resolveRenderOpacity(element, { elementRenderOverrides: next }),
-    ).toBe(70);
+      Element.resolveElementRenderState(
+        element,
+        h.app.scene.getNonDeletedElementsMap(),
+        {
+          elementRenderOverrides: next,
+          elementsPendingErasure: new Set(),
+          pendingFlowchartNodes: null,
+        },
+      ).opacity,
+    ).toBe(0.7);
     expect(submit(new Map())).toHaveLength(0);
     expect(submit(null)).toHaveLength(0);
   });
@@ -216,6 +231,16 @@ describe("render override geometry", () => {
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 500;
     const context = canvas.getContext("2d")!;
+    const renderConfig: StaticCanvasRenderConfig = {
+      imageCache: new Map(),
+      renderGrid: false,
+      isExporting: false,
+      canvasBackgroundColor: "#fff",
+      embedsValidationStatus: new Map(),
+      elementsPendingErasure: new Set(),
+      pendingFlowchartNodes: null,
+      theme: "light",
+    };
     const draw = (overrides: ElementRenderOverrides) =>
       StaticScene.renderStaticScene({
         canvas,
@@ -230,18 +255,19 @@ describe("render override geometry", () => {
         ),
         appState,
         renderConfig: {
-          imageCache: new Map(),
-          renderGrid: false,
-          isExporting: false,
-          canvasBackgroundColor: "#fff",
-          embedsValidationStatus: new Map(),
-          elementsPendingErasure: new Set(),
-          pendingFlowchartNodes: null,
-          theme: "light",
+          ...renderConfig,
           elementRenderOverrides: overrides,
         },
       });
-    return { scene, renderer, appState, elementsMap, context, draw };
+    return {
+      scene,
+      renderer,
+      appState,
+      elementsMap,
+      context,
+      draw,
+      renderConfig,
+    };
   };
 
   it("culls at visual coordinates while preserving interaction geometry", () => {
@@ -362,30 +388,179 @@ describe("render override geometry", () => {
     expect(ids(selected)).toEqual(["a", "b", "frame", "child"]);
   });
 
-  it("includes a container when only its translated bound label is visible", () => {
-    const rect = API.createElement({
-      type: "rectangle",
-      id: "a",
-      x: 600,
-      y: 100,
-      boundElements: [{ id: "label", type: "text" }],
-    });
+  it.each(["rectangle", "arrow"] as const)(
+    "culls a %s and its label using the container offset",
+    (type) => {
+      const container = API.createElement({
+        type,
+        id: "a",
+        x: 900,
+        y: 100,
+        width: 100,
+        points:
+          type === "arrow"
+            ? [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)]
+            : undefined,
+        boundElements: [{ id: "label", type: "text" }],
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        x: 750,
+        y: 110,
+        width: 400,
+        text: "label",
+        containerId: container.id,
+      });
+      const { renderer, appState, elementsMap } = setup([container, label]);
+      const visible = (overrides: ElementRenderOverrides) =>
+        renderer.getVisibleElementsForRendering(
+          elementsMap,
+          appState,
+          overrides,
+        );
+      expect(visible(new Map())).toEqual([]);
+      // The translated label overlaps the viewport even though its container
+      // remains offscreen. The container must be included to paint the label.
+      expect(
+        visible(new Map([[container.id, { offset: { x: -300, y: 0 } }]])),
+      ).toEqual([container, label]);
+      expect(
+        visible(
+          new Map([
+            [container.id, { offset: { x: -300, y: 0 } }],
+            [label.id, { offset: { x: 2000, y: 0 } }],
+          ]),
+        ),
+      ).toEqual([container, label]);
+      expect(
+        visible(new Map([[label.id, { offset: { x: -800, y: 0 } }]])),
+      ).toEqual([]);
+      expect(
+        visible(
+          new Map([
+            [container.id, { offset: { x: -2000, y: 0 } }],
+            [label.id, { offset: { x: -800, y: 0 } }],
+          ]),
+        ),
+      ).toEqual([]);
+      expect(
+        renderer.getRenderableElements({ ...appState, selectedElements: [] })
+          .visibleElements,
+      ).toEqual([]);
+    },
+  );
+
+  it.each(["arrow", "rectangle", "ellipse", "diamond", "stickynote"] as const)(
+    "moves a %s label with its container while keeping label opacity independent",
+    (type) => {
+      const frame = API.createElement({
+        type: "frame",
+        id: "frame",
+        width: 500,
+        height: 500,
+        opacity: 50,
+      });
+      const container = API.createElement({
+        type,
+        id: "container",
+        x: 50,
+        y: 100,
+        width: 200,
+        height: 100,
+        frameId: frame.id,
+        points:
+          type === "arrow"
+            ? [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)]
+            : undefined,
+        boundElements: [{ id: "label", type: "text" }],
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        text: "Label",
+        x: 100,
+        y: 140,
+        width: 50,
+        height: 25,
+        opacity: 70,
+        containerId: container.id,
+        frameId: frame.id,
+      });
+      const { context, draw } = setup([container, label, frame]);
+      draw(new Map());
+      const bitmap = Element.elementWithCanvasCache.get(label)!;
+      expect(bitmap).toBeDefined();
+      const original = JSON.stringify([container, label, frame]);
+      const paints: { x: number; y: number; alpha: number }[] = [];
+      const drawImage = vi.mocked(context.drawImage).getMockImplementation()!;
+      vi.spyOn(context, "drawImage").mockImplementation((...args) => {
+        const [source, x, y] = args;
+        if (source === bitmap.canvas) {
+          const t = context.getTransform();
+          paints.push({
+            x: t.a * x + t.c * y + t.e,
+            y: t.b * x + t.d * y + t.f,
+            alpha: context.globalAlpha,
+          });
+        }
+        drawImage.call(context, ...args);
+      });
+      const offset = { x: 20, y: 10 };
+      draw(new Map());
+      draw(new Map([[container.id, { offset }]]));
+      draw(
+        new Map([
+          [container.id, { offset }],
+          [label.id, { offset }],
+        ]),
+      );
+      draw(
+        new Map([
+          [container.id, { offset, opacity: 10 }],
+          [label.id, { offset: { x: 1000, y: -1000 }, opacity: 40 }],
+        ]),
+      );
+      draw(new Map([[label.id, { offset: { x: 1000, y: -1000 } }]]));
+      draw(new Map());
+      expect(paints).toHaveLength(6);
+      const [baseline] = paints;
+      expect(baseline.alpha).toBe(0.35);
+      const translated = {
+        x: baseline.x + offset.x,
+        y: baseline.y + offset.y,
+        alpha: baseline.alpha,
+      };
+      expect(paints.slice(1)).toEqual([
+        translated,
+        translated,
+        { ...translated, alpha: 0.2 },
+        baseline,
+        baseline,
+      ]);
+      expect(Element.elementWithCanvasCache.get(label)).toBe(bitmap);
+      expect(JSON.stringify([container, label, frame])).toBe(original);
+    },
+  );
+
+  it("keeps offsets on unbound text independent", () => {
     const label = API.createElement({
       type: "text",
-      id: "label",
-      x: 620,
-      y: 110,
-      text: "label",
-      containerId: rect.id,
+      x: 600,
+      y: 100,
+      text: "Label",
     });
-    const { renderer, appState, elementsMap } = setup([rect, label]);
+    const { renderer, appState, elementsMap, renderConfig } = setup([label]);
+    const overrides = new Map([[label.id, { offset: { x: -400, y: 10 } }]]);
     expect(
-      renderer.getVisibleElementsForRendering(
-        elementsMap,
-        appState,
-        new Map([[label.id, { offset: { x: -400, y: 0 } }]]),
-      ),
-    ).toContain(rect);
+      Element.resolveElementRenderState(label, elementsMap, {
+        ...renderConfig,
+        elementRenderOverrides: overrides,
+      }).offset,
+    ).toEqual({ x: -400, y: 10 });
+    expect(
+      renderer.getVisibleElementsForRendering(elementsMap, appState, overrides),
+    ).toContain(label);
   });
 
   it("clips a translated child against the translated frame boundary", () => {
@@ -422,18 +597,21 @@ describe("render override geometry", () => {
     const frame = API.createElement({ type: "frame", id: "frame" });
     const rect = API.createElement({ type: "rectangle", frameId: frame.id });
     expect(
-      Element.getRenderOpacity(
+      Element.resolveElementRenderState(
         rect,
+        new Map<string, NonDeletedExcalidrawElement>([
+          [frame.id, frame],
+          [rect.id, rect],
+        ]),
         {
           elementRenderOverrides: new Map([
             [frame.id, { opacity: 50 }],
             [rect.id, { opacity: 50 }],
           ]),
+          elementsPendingErasure: new Set(),
+          pendingFlowchartNodes: null,
         },
-        frame,
-        new Set(),
-        null,
-      ),
+      ).opacity,
     ).toBe(0.25);
   });
 
@@ -458,5 +636,172 @@ describe("render override geometry", () => {
       ([element]) => element.type === "text",
     )?.[0];
     expect(label).toMatchObject({ id: embed.id, frameId: frame.id });
+  });
+
+  it.each([
+    [0, 80],
+    [80, 0],
+    [30, 80],
+    [80, 80],
+  ])(
+    "keeps the label gap with its arrow (arrow %s, ignored label %s)",
+    (arrowX, labelX) => {
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        x: 50,
+        y: 100,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(300, 0)],
+        boundElements: [{ id: "label", type: "text" }],
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        containerId: arrow.id,
+        text: "Label",
+        width: 50,
+        height: 25,
+      });
+      const { context, draw } = setup([arrow, label]);
+      const holes: number[] = [];
+      const rect = vi.mocked(context.rect).getMockImplementation()!;
+      vi.spyOn(context, "rect").mockImplementation((x, y, width, height) => {
+        if (width === label.width + BOUND_TEXT_PADDING * 2) {
+          const transform = context.getTransform();
+          holes.push(transform.a * x + transform.c * y + transform.e);
+        }
+        rect.call(context, x, y, width, height);
+      });
+      draw(new Map());
+      draw(
+        new Map([
+          [arrow.id, { offset: { x: arrowX, y: 0 } }],
+          [label.id, { offset: { x: labelX, y: 0 } }],
+        ]),
+      );
+      expect(holes).toHaveLength(2);
+      expect(holes[1] - holes[0]).toBeCloseTo(arrowX, 8);
+    },
+  );
+
+  it("reuses original arrow shapes and bitmaps when rendering translated links", () => {
+    const arrow = {
+      ...API.createElement({
+        type: "arrow",
+        x: 50,
+        y: 100,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(200, 0)],
+      }),
+      link: "https://example.com",
+    };
+    const { draw } = setup([arrow]);
+    draw(new Map());
+    const bitmap = Element.elementWithCanvasCache.get(arrow);
+    const shape = Element.ShapeCache.get(arrow, null);
+    const generateShape = vi.spyOn(Element.ShapeCache, "generateElementShape");
+    for (const x of [10, 20, 0]) {
+      draw(new Map([[arrow.id, { offset: { x, y: 0 }, opacity: 40 }]]));
+    }
+    expect(bitmap).toBeDefined();
+    expect(shape).toBeDefined();
+    expect(Element.elementWithCanvasCache.get(arrow)).toBe(bitmap);
+    expect(Element.ShapeCache.get(arrow, null)).toBe(shape);
+    expect(generateShape).toHaveBeenCalled();
+    expect(
+      generateShape.mock.calls.every(([element]) => element === arrow),
+    ).toBe(true);
+  });
+
+  it("preserves frame, erasure and selection alpha without leaking it to siblings or links", () => {
+    const frame = API.createElement({
+      type: "frame",
+      id: "frame",
+      width: 400,
+      height: 400,
+    });
+    const child = {
+      ...API.createElement({
+        type: "rectangle",
+        x: 50,
+        y: 50,
+        frameId: frame.id,
+      }),
+      link: "https://example.com",
+    };
+    const sibling = API.createElement({ type: "rectangle", x: 200, y: 200 });
+    const { context, draw, appState, renderConfig } = setup([
+      child,
+      frame,
+      sibling,
+    ]);
+    appState.openDialog = {
+      name: "elementLinkSelector",
+      sourceElementId: sibling.id,
+    };
+    appState.selectedElementIds = { [sibling.id]: true };
+    renderConfig.elementsPendingErasure.add(child.id);
+    const alphas: number[] = [];
+    const drawImage = vi.mocked(context.drawImage).getMockImplementation()!;
+    vi.spyOn(context, "drawImage").mockImplementation((...args) => {
+      alphas.push(context.globalAlpha);
+      drawImage.call(context, ...args);
+    });
+    draw(
+      new Map([
+        [child.id, { opacity: 50 }],
+        [frame.id, { opacity: 50 }],
+      ]),
+    );
+    const erasedAlpha = (0.25 * ELEMENT_READY_TO_ERASE_OPACITY) / 100;
+    expect(alphas).toEqual([
+      erasedAlpha * DEFAULT_REDUCED_GLOBAL_ALPHA,
+      erasedAlpha,
+      1,
+    ]);
+    expect(context.globalAlpha).toBe(1);
+  });
+
+  it("keeps the uncropped preview at document coordinates while translating the image", () => {
+    const image = {
+      ...API.createElement({
+        type: "image",
+        x: 100,
+        y: 100,
+        width: 100,
+        height: 60,
+      }),
+      crop: {
+        x: 10,
+        y: 5,
+        width: 50,
+        height: 30,
+        naturalWidth: 100,
+        naturalHeight: 60,
+      },
+    };
+    const { context, draw, appState } = setup([image]);
+    appState.croppingElementId = image.id;
+    const paints: { x: number; y: number; alpha: number }[] = [];
+    const drawImage = vi.mocked(context.drawImage).getMockImplementation()!;
+    vi.spyOn(context, "drawImage").mockImplementation((...args) => {
+      const [, x, y] = args;
+      const t = context.getTransform();
+      paints.push({
+        x: t.a * x + t.c * y + t.e,
+        y: t.b * x + t.d * y + t.f,
+        alpha: context.globalAlpha,
+      });
+      drawImage.call(context, ...args);
+    });
+    draw(new Map());
+    draw(new Map([[image.id, { offset: { x: 80, y: 40 }, opacity: 25 }]]));
+    expect(paints).toHaveLength(4);
+    expect(paints[2]).toEqual(paints[0]);
+    expect(paints[2].alpha).toBe(0.1);
+    expect(paints[3]).toEqual({
+      x: paints[1].x + 80,
+      y: paints[1].y + 40,
+      alpha: 0.25,
+    });
   });
 });

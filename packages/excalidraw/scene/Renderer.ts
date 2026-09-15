@@ -2,6 +2,7 @@ import {
   getCommonFrameId,
   getFrameChildrenInsertionIndex,
   getBoundTextElement,
+  getElementRenderOffset,
   isElementInViewport,
 } from "@excalidraw/element";
 
@@ -91,7 +92,7 @@ export class Renderer {
       overrides: ElementRenderOverrides;
     }) => {
       const isVisible = (element: NonDeletedExcalidrawElement) => {
-        const offset = overrides.get(element.id)?.offset;
+        const offset = getElementRenderOffset(element, elementsMap, overrides);
         // Shifting the viewport also works for arrow labels whose coordinates
         // are derived from their container rather than their own x/y fields.
         return isElementInViewport(

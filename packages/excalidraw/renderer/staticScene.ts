@@ -15,21 +15,23 @@ import {
 } from "@excalidraw/element";
 import {
   elementOverlapsWithFrame,
-  getContainingFrame,
   getTargetFrame,
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
 import {
   getRenderElementWithPositionOverride,
-  getRenderOpacity,
+  resolveElementRenderState,
   renderElement,
 } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
+import type { ElementRenderState } from "@excalidraw/element";
+
 import type {
   ElementsMap,
+  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -201,14 +203,17 @@ const renderLinkIcon = (
   context: CanvasRenderingContext2D,
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,
-  renderConfig: StaticCanvasRenderConfig,
+  renderState: ElementRenderState,
 ) => {
   if (element.link && !appState.selectedElementIds[element.id]) {
-    const link = element.link;
-    element = getRenderElementWithPositionOverride(element, renderConfig);
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const [x, y, width, height] = getLinkHandleFromCoords(
-      [x1, y1, x2, y2],
+      [
+        x1 + renderState.offset.x,
+        y1 + renderState.offset.y,
+        x2 + renderState.offset.x,
+        y2 + renderState.offset.y,
+      ],
       element.angle,
       appState,
     );
@@ -218,7 +223,9 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    const canvasKey = isElementLink(link) ? "elementLink" : "regularLink";
+    const canvasKey = isElementLink(element.link)
+      ? "elementLink"
+      : "regularLink";
 
     let linkCanvas = linkIconCanvasCache[canvasKey];
 
@@ -259,13 +266,7 @@ const renderLinkIcon = (
 
       linkCanvasCacheContext.restore();
     }
-    context.globalAlpha = getRenderOpacity(
-      element,
-      renderConfig,
-      getContainingFrame(element, elementsMap),
-      renderConfig.elementsPendingErasure,
-      renderConfig.pendingFlowchartNodes,
-    );
+    context.globalAlpha = renderState.opacity;
     context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
@@ -346,13 +347,54 @@ const _renderStaticScene = ({
 
   const inFrameGroupsMap = new Map<string, boolean>();
 
+  const getRenderState = (element: ExcalidrawElement) =>
+    resolveElementRenderState(
+      element,
+      elementsMap,
+      renderConfig,
+      allElementsMap,
+    );
+
+  const clipElementToFrame = (
+    element: NonDeletedExcalidrawElement,
+    renderState: ElementRenderState,
+  ) => {
+    if (
+      !(element.frameId || appState.frameToHighlight?.id) ||
+      !appState.frameRendering.enabled ||
+      !appState.frameRendering.clip
+    ) {
+      return;
+    }
+    const targetFrame = getTargetFrame(element, elementsMap, appState);
+    if (!targetFrame) {
+      return;
+    }
+    const frameState = getRenderState(targetFrame);
+    const frame = getRenderElementWithPositionOverride(
+      targetFrame,
+      frameState.offset,
+    );
+    if (
+      (element.frameId === frame.id &&
+        (renderState.hasPositionOverride || frameState.hasPositionOverride)) ||
+      shouldApplyFrameClip(
+        getRenderElementWithPositionOverride(element, renderState.offset),
+        frame,
+        appState,
+        elementsMap,
+        inFrameGroupsMap,
+      )
+    ) {
+      frameClip(frame, context, renderConfig, appState);
+    }
+  };
+
   // Paint visible elements
   visibleElements
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       try {
-        const frameId = element.frameId || appState.frameToHighlight?.id;
-
         if (
           isTextElement(element) &&
           element.containerId &&
@@ -365,53 +407,18 @@ const _renderStaticScene = ({
         context.save();
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          const targetFrame = getTargetFrame(element, elementsMap, appState);
-          const frame =
-            targetFrame &&
-            getRenderElementWithPositionOverride(targetFrame, renderConfig);
-          if (
-            frame &&
-            ((element.frameId === frame.id &&
-              (renderConfig.elementRenderOverrides?.get(element.id)?.offset ||
-                (boundTextElement &&
-                  renderConfig.elementRenderOverrides?.get(boundTextElement.id)
-                    ?.offset) ||
-                renderConfig.elementRenderOverrides?.get(frame.id)?.offset)) ||
-              shouldApplyFrameClip(
-                getRenderElementWithPositionOverride(element, renderConfig),
-                frame,
-                appState,
-                elementsMap,
-                inFrameGroupsMap,
-              ))
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          renderElement(
-            element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        } else {
-          renderElement(
-            element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        }
+        const renderState = getRenderState(element);
+        clipElementToFrame(element, renderState);
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+          renderState,
+        );
 
         if (boundTextElement) {
           renderElement(
@@ -428,7 +435,7 @@ const _renderStaticScene = ({
         context.restore();
 
         if (!isExporting && renderConfig.renderLinks !== false) {
-          renderLinkIcon(element, context, appState, elementsMap, renderConfig);
+          renderLinkIcon(element, context, appState, elementsMap, renderState);
         }
       } catch (error: any) {
         console.error(
@@ -447,9 +454,37 @@ const _renderStaticScene = ({
     .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
       try {
-        const render = () => {
+        const renderState = getRenderState(element);
+        context.save();
+        clipElementToFrame(element, renderState);
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+          renderState,
+        );
+
+        if (
+          isIframeLikeElement(element) &&
+          (isExporting ||
+            (isEmbeddableElement(element) &&
+              renderConfig.embedsValidationStatus.get(element.id) !== true)) &&
+          element.width &&
+          element.height
+        ) {
+          const label = {
+            ...createPlaceholderEmbeddableLabel(element),
+            // Synthetic visual: resolve overrides and frame opacity through
+            // its owner, without creating another animation target.
+            id: element.id,
+            frameId: element.frameId,
+          };
           renderElement(
-            element,
+            label,
             elementsMap,
             allElementsMap,
             rc,
@@ -457,80 +492,11 @@ const _renderStaticScene = ({
             renderConfig,
             appState,
           );
-
-          if (
-            isIframeLikeElement(element) &&
-            (isExporting ||
-              (isEmbeddableElement(element) &&
-                renderConfig.embedsValidationStatus.get(element.id) !==
-                  true)) &&
-            element.width &&
-            element.height
-          ) {
-            const label = {
-              ...createPlaceholderEmbeddableLabel(element),
-              // Synthetic visual: resolve overrides and frame opacity through
-              // its owner, without creating another animation target.
-              id: element.id,
-              frameId: element.frameId,
-            };
-            renderElement(
-              label,
-              elementsMap,
-              allElementsMap,
-              rc,
-              context,
-              renderConfig,
-              appState,
-            );
-          }
-          if (!isExporting && renderConfig.renderLinks !== false) {
-            renderLinkIcon(
-              element,
-              context,
-              appState,
-              elementsMap,
-              renderConfig,
-            );
-          }
-        };
-        // - when exporting the whole canvas, we DO NOT apply clipping
-        // - when we are exporting a particular frame, apply clipping
-        //   if the containing frame is not selected, apply clipping
-        const frameId = element.frameId || appState.frameToHighlight?.id;
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          context.save();
-
-          const targetFrame = getTargetFrame(element, elementsMap, appState);
-          const frame =
-            targetFrame &&
-            getRenderElementWithPositionOverride(targetFrame, renderConfig);
-
-          if (
-            frame &&
-            ((element.frameId === frame.id &&
-              (renderConfig.elementRenderOverrides?.get(element.id)?.offset ||
-                renderConfig.elementRenderOverrides?.get(frame.id)?.offset)) ||
-              shouldApplyFrameClip(
-                getRenderElementWithPositionOverride(element, renderConfig),
-                frame,
-                appState,
-                elementsMap,
-                inFrameGroupsMap,
-              ))
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          render();
-          context.restore();
-        } else {
-          render();
         }
+        if (!isExporting && renderConfig.renderLinks !== false) {
+          renderLinkIcon(element, context, appState, elementsMap, renderState);
+        }
+        context.restore();
       } catch (error: any) {
         console.error(error);
       }
