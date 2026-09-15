@@ -27,6 +27,10 @@ export interface DialogProps {
   size?: DialogSize;
   onCloseRequest(): void;
   title: React.ReactNode | false;
+  // Accessible name for the dialog when `title` is `false`, since there's
+  // then no visible heading for `aria-labelledby` to point to. Ignored
+  // (and unnecessary) when `title` is set.
+  ariaLabel?: string;
   autofocus?: boolean;
   closeOnClickOutside?: boolean;
 }
@@ -108,7 +112,8 @@ export const Dialog = (props: DialogProps) => {
       className={clsx("Dialog", props.className, {
         "Dialog--fullscreen": isFullscreen,
       })}
-      labelledBy="dialog-title"
+      labelledBy={props.title ? `${id}-dialog-title` : undefined}
+      ariaLabel={props.ariaLabel}
       maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
       closeOnClickOutside={props.closeOnClickOutside}
