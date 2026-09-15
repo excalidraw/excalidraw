@@ -480,6 +480,8 @@ export { Stats } from "./components/Stats";
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
+export { GenerateMenuItem } from "./components/GenerateMenuItem";
+export type { GenerateMenuItemProps } from "./components/GenerateMenuItem";
 export {
   TTDStreamFetch,
   parseSSEStream,

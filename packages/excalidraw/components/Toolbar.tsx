@@ -64,7 +64,7 @@ const ExtraToolsDropdown = ({
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   const isFullStylesPanel = useStylesPanelMode() === "full";
-  const { TTDDialogTriggerTunnel } = useTunnels();
+  const { TTDDialogTriggerTunnel, GenerateMenuItemTunnel } = useTunnels();
 
   const imageToolSelected = activeTool.type === "image";
   const frameToolSelected = activeTool.type === "frame";
@@ -214,6 +214,7 @@ const ExtraToolsDropdown = ({
             {t("toolBar.magicframe")}
           </DropdownMenu.Item>
         )}
+        <GenerateMenuItemTunnel.Out />
       </DropdownMenu.Content>
     </DropdownMenu>
   );
