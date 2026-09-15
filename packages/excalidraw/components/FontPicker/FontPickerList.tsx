@@ -39,6 +39,7 @@ import { getDropdownMenuItemClassName } from "../dropdownMenu/common";
 import {
   FontFamilyCodeIcon,
   FontFamilyHeadingIcon,
+  FontFamilyItalicIcon,
   FontFamilyNormalIcon,
   FreedrawIcon,
 } from "../icons";
@@ -82,6 +83,8 @@ const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
     case FONT_FAMILY["Comic Shanns"]:
     case FONT_FAMILY.Cascadia:
       return FontFamilyCodeIcon;
+    case FONT_FAMILY.Italic:
+      return FontFamilyItalicIcon;
     default:
       return FontFamilyNormalIcon;
   }
