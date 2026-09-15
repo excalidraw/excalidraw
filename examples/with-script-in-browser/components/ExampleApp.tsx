@@ -97,6 +97,7 @@ export default function ExampleApp({
     convertToExcalidrawElements,
     TTDDialog,
     TTDDialogTrigger,
+    GenerateMenuItem,
     ROUNDNESS,
     loadSceneOrLibraryFromBlob,
   } = excalidrawLib;
@@ -265,6 +266,16 @@ export default function ExampleApp({
           <TTDDialogTrigger icon={<span>😀</span>}>
             Text to diagram
           </TTDDialogTrigger>
+        )}
+        {excalidrawAPI && (
+          <GenerateMenuItem
+            icon={<span>🔌</span>}
+            onSelect={() => window.alert("host-defined generator invoked")}
+            shortcut="⌘⇧B"
+            data-testid="example-generate-menu-item"
+          >
+            Insert from custom source
+          </GenerateMenuItem>
         )}
         <TTDDialog
           onTextSubmit={async (_) => {
