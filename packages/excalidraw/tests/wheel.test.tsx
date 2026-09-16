@@ -238,6 +238,55 @@ describe("wheel navigation", () => {
         expectGrabbedUnderCursor(grabbed);
       });
 
+      it.each(["pointerup", "blur", "cleanup"] as const)(
+        "broadcasts the final pointer using the committed pan viewport on %s",
+        (ending) => {
+          const onPointerUpdate = vi.fn();
+          GlobalTestState.renderResult.rerender(
+            <Excalidraw onPointerUpdate={onPointerUpdate} />,
+          );
+          grab();
+          fireEvent.pointerMove(GlobalTestState.interactiveCanvas, {
+            ...wheelButtonPointer,
+            clientX: 110,
+            clientY: 105,
+          });
+
+          const released = {
+            ...moved,
+            clientX: 150,
+            clientY: 140,
+            buttons: 0,
+          };
+          throttle.holding = true;
+          try {
+            fireEvent.pointerMove(GlobalTestState.interactiveCanvas, moved);
+            if (ending === "pointerup") {
+              fireEvent.pointerUp(GlobalTestState.interactiveCanvas, released);
+            } else if (ending === "blur") {
+              fireEvent.blur(window);
+            } else {
+              React.act(() => h.app.pan.end());
+            }
+          } finally {
+            throttle.holding = false;
+          }
+
+          expect(onPointerUpdate).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+              pointer: {
+                ...viewportCoordsToSceneCoords(
+                  ending === "pointerup" ? released : moved,
+                  h.state,
+                ),
+                tool: "pointer",
+              },
+              button: "up",
+            }),
+          );
+        },
+      );
+
       it("keeps drawing from zoom-scaled bitmaps until the gesture is over", async () => {
         grab();
 

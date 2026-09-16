@@ -224,11 +224,21 @@ export class AppPan {
           {
             cursorButton: "up",
           },
-          // Runs after the trailing throttled pointer move has committed, so
-          // the snap-back starts from the pan's actual final viewport.
-          app.viewport.releaseOverscroll,
+          // Wait for the trailing pan move to commit before converting the
+          // pointer to scene coordinates or starting the snap-back.
+          () => {
+            // Missing-pointerup cleanup can run during a new press. Don't
+            // overwrite the newer button state with this pan's release.
+            if (app.state.cursorButton === "up") {
+              const pointer =
+                upEvent && "clientX" in upEvent
+                  ? upEvent
+                  : { clientX: lastX, clientY: lastY };
+              app.savePointer(pointer.clientX, pointer.clientY, "up");
+            }
+            app.viewport.releaseOverscroll();
+          },
         );
-        app.savePointer(event.clientX, event.clientY, "up");
         app.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
         app.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
         app.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
