@@ -1,7 +1,7 @@
 import React from "react";
 import { fireEvent } from "@testing-library/react";
 
-import { POINTER_BUTTON } from "@excalidraw/common";
+import { CURSOR_TYPE, POINTER_BUTTON } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
 
@@ -37,35 +37,41 @@ describe("secondary-button pan", () => {
     await render(<Excalidraw />);
   });
 
-  it("pans once the pointer travels past the drag threshold, with no context menu", () => {
-    fireEvent.pointerDown(canvas(), at(100, 100));
-    const start = getViewport();
+  it.each([false, true])(
+    "pans past five pixels with no context menu (viewModeEnabled=%s)",
+    (viewModeEnabled) => {
+      API.setAppState({ viewModeEnabled });
+      fireEvent.pointerDown(canvas(), at(100, 100));
+      const start = getViewport();
 
-    // within the threshold it is still a click
-    fireEvent.pointerMove(canvas(), at(105, 103));
-    expect(getViewport()).toEqual(start);
+      // at the five-pixel threshold it is still a click
+      fireEvent.pointerMove(canvas(), at(103, 104));
+      expect(getViewport()).toEqual(start);
+      expect(canvas().style.cursor).not.toBe(CURSOR_TYPE.GRABBING);
 
-    // past it the pan engages, and moves from here on
-    fireEvent.pointerMove(canvas(), at(130, 120));
-    expect(getViewport()).toEqual(start);
-    fireEvent.pointerMove(canvas(), at(140, 135));
-    expect(getViewport()).toEqual({
-      ...start,
-      scrollX: start.scrollX + 10 / start.zoom,
-      scrollY: start.scrollY + 15 / start.zoom,
-    });
+      // past it the pan engages, and moves from here on
+      fireEvent.pointerMove(canvas(), at(106, 100));
+      expect(getViewport()).toEqual(start);
+      expect(canvas().style.cursor).toBe(CURSOR_TYPE.GRABBING);
+      fireEvent.pointerMove(canvas(), at(108, 103));
+      expect(getViewport()).toEqual({
+        ...start,
+        scrollX: start.scrollX + 2 / start.zoom,
+        scrollY: start.scrollY + 3 / start.zoom,
+      });
 
-    fireEvent.pointerUp(window, { ...at(140, 135), buttons: 0 });
-    expect(h.state.contextMenu).toBe(null);
+      fireEvent.pointerUp(window, { ...at(108, 103), buttons: 0 });
+      expect(h.state.contextMenu).toBe(null);
 
-    // the platform's own contextmenu for this press (Windows fires it on
-    // mouseup) is not a new click...
-    fireEvent.contextMenu(canvas(), at(140, 135));
-    expect(h.state.contextMenu).toBe(null);
-    // ...but only that one
-    fireEvent.contextMenu(canvas(), at(140, 135));
-    expect(h.state.contextMenu).not.toBe(null);
-  });
+      // the platform's own contextmenu for this press (Windows fires it on
+      // mouseup) is not a new click...
+      fireEvent.contextMenu(canvas(), at(108, 103));
+      expect(h.state.contextMenu).toBe(null);
+      // ...but only that one
+      fireEvent.contextMenu(canvas(), at(108, 103));
+      expect(h.state.contextMenu).not.toBe(null);
+    },
+  );
 
   it("lets the platform's contextmenu after mouseup open the menu, as always", () => {
     fireEvent.pointerDown(canvas(), at(100, 100));

@@ -1,9 +1,4 @@
-import {
-  CURSOR_TYPE,
-  DRAGGING_THRESHOLD,
-  EVENT,
-  POINTER_BUTTON,
-} from "@excalidraw/common";
+import { CURSOR_TYPE, EVENT, POINTER_BUTTON } from "@excalidraw/common";
 
 import { isHandToolActive } from "../appState";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
@@ -11,6 +6,8 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import type React from "react";
 
 import type App from "./App";
+
+const SECONDARY_BUTTON_PAN_THRESHOLD = 5; // px
 
 /**
  * The drag-pan: a pointer drag that moves the canvas — the wheel or the
@@ -140,7 +137,7 @@ export class AppPan {
         // a right-click until the pointer travels far enough for a drag
         if (
           Math.hypot(event.clientX - startX, event.clientY - startY) <=
-          DRAGGING_THRESHOLD
+          SECONDARY_BUTTON_PAN_THRESHOLD
         ) {
           return;
         }
