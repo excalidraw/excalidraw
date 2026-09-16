@@ -94,6 +94,25 @@ yarn add react react-dom @excalidraw/excalidraw
 
 Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/installation) for more details!
 
+## Self-hosting
+
+This repository ships a `Dockerfile` and a `docker-compose.yml`, and a prebuilt image is published to Docker Hub, so you can run your own instance:
+
+```bash
+docker compose up -d
+# http://localhost:3000
+```
+
+Or run the published image directly:
+
+```bash
+docker run -p 3000:80 excalidraw/excalidraw:latest
+```
+
+If you'd rather not manage a host, the same image can be deployed in one click with [zopday](https://zop.dev/zopday/app/deploy?image=excalidraw/excalidraw:latest&port=80).
+
+**Note:** self-hosted instances run the editor only. Real-time collaboration additionally requires [excalidraw-room](https://github.com/excalidraw/excalidraw-room).
+
 ## Contributing
 
 - Missing something or found a bug? [Report here](https://github.com/excalidraw/excalidraw/issues).
