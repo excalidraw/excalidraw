@@ -368,9 +368,10 @@ export interface AppState {
   isMidpointSnappingEnabled: boolean;
   /**
    * user preference for what the wheel does: with a `trackpad` a plain wheel
-   * pans and ctrl/cmd+wheel (how a pinch is delivered) zooms; with a `mouse`
-   * a plain wheel zooms and ctrl/cmd+wheel pans vertically. `auto` resolves
-   * to `trackpad` until device detection exists — see `resolveInputDevice`
+   * pans; with a `mouse` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is
+   * delivered) zooms with either device. Shift+wheel pans horizontally;
+   * ctrl/cmd+shift+wheel pans vertically. `auto` resolves to `trackpad` until
+   * device detection exists — see `resolveInputDevice`
    */
   inputDevice: InputDevice;
   /**
