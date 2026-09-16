@@ -95,7 +95,7 @@ describe("secondary-button pan", () => {
   });
 
   it.each([false, true])(
-    "broadcasts the release position after a pan (viewModeEnabled=%s)",
+    "pauses pointer broadcasts until pan release (viewModeEnabled=%s)",
     (viewModeEnabled) => {
       const onPointerUpdate = vi.fn();
       GlobalTestState.renderResult.rerender(
@@ -103,17 +103,33 @@ describe("secondary-button pan", () => {
       );
       API.setAppState({ viewModeEnabled });
       fireEvent.pointerDown(canvas(), at(100, 100));
+      fireEvent.pointerMove(canvas(), at(103, 104));
       fireEvent.pointerMove(canvas(), at(106, 100));
       fireEvent.pointerMove(canvas(), at(140, 135));
+      expect(onPointerUpdate).not.toHaveBeenCalled();
 
       // The release can be beyond the last delivered pointer move.
       const released = { ...at(150, 145), buttons: 0 };
       fireEvent.pointerUp(canvas(), released);
 
+      expect(onPointerUpdate).toHaveBeenCalledTimes(1);
       expect(onPointerUpdate).toHaveBeenLastCalledWith(
         expect.objectContaining({
           pointer: {
             ...viewportCoordsToSceneCoords(released, h.state),
+            tool: "pointer",
+          },
+          button: "up",
+        }),
+      );
+
+      const hovered = { ...released, clientX: 160, clientY: 155 };
+      fireEvent.pointerMove(canvas(), hovered);
+      expect(onPointerUpdate).toHaveBeenCalledTimes(2);
+      expect(onPointerUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          pointer: {
+            ...viewportCoordsToSceneCoords(hovered, h.state),
             tool: "pointer",
           },
           button: "up",

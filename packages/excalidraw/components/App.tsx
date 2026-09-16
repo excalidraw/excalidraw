@@ -13919,6 +13919,11 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public savePointer = (x: number, y: number, button: "up" | "down") => {
+    // Pan teardown broadcasts once the viewport has settled. Updates during
+    // the drag use a viewport that can lag behind the pointer and flicker.
+    if (this.pan.isActive()) {
+      return;
+    }
     // don't broadcast pointer updates (props.onPointerUpdate) when
     // non-interactive, unless the active tool stays user-driven via
     // `interaction.enabled.tools` — collaborators render e.g. a presenter's

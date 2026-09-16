@@ -261,6 +261,7 @@ describe("wheel navigation", () => {
           throttle.holding = true;
           try {
             fireEvent.pointerMove(GlobalTestState.interactiveCanvas, moved);
+            expect(onPointerUpdate).not.toHaveBeenCalled();
             if (ending === "pointerup") {
               fireEvent.pointerUp(GlobalTestState.interactiveCanvas, released);
             } else if (ending === "blur") {
@@ -272,6 +273,7 @@ describe("wheel navigation", () => {
             throttle.holding = false;
           }
 
+          expect(onPointerUpdate).toHaveBeenCalledTimes(1);
           expect(onPointerUpdate).toHaveBeenLastCalledWith(
             expect.objectContaining({
               pointer: {
