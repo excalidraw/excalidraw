@@ -1,13 +1,19 @@
 import React from "react";
 import { vi } from "vitest";
 
-import { CODES, CURSOR_TYPE, POINTER_BUTTON } from "@excalidraw/common";
+import {
+  CODES,
+  CURSOR_TYPE,
+  FRAME_STYLE,
+  POINTER_BUTTON,
+} from "@excalidraw/common";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { actionZoomIn } from "../actions/actionCanvas";
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 import { DefaultSidebar, Excalidraw, Footer, MainMenu } from "../index";
+import { getNormalizedZoom } from "../scene";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -543,6 +549,58 @@ describe("toggling `interaction` at runtime", () => {
     expect(h.elements.find((element) => element.id === frame.id)).toMatchObject(
       { name: "committed" },
     );
+  });
+
+  it("keeps frame-name labels readable across zoom levels", async () => {
+    mockBoundingClientRect();
+    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+    await waitFor(() => expect(h.state.width).toBe(200));
+
+    const frame = API.createElement({
+      type: "frame",
+      x: 20,
+      y: 30,
+      width: 200,
+      height: 120,
+    });
+    API.setElements([frame]);
+    API.updateElement(frame, { name: "My Frame" });
+
+    for (const zoomValue of [1, 0.5, 0.1] as const) {
+      API.setAppState({ zoom: { value: getNormalizedZoom(zoomValue) } });
+
+      await waitFor(() => {
+        const label = queryContainer(".frame-name") as HTMLElement | null;
+        expect(label).not.toBe(null);
+        expect(label!.style.fontSize).toBe(`${FRAME_STYLE.nameFontSize}px`);
+        expect(label!.style.maxWidth).toBe(
+          `${Math.max(
+            frame.width * getNormalizedZoom(zoomValue),
+            FRAME_STYLE.nameMinWidth,
+          )}px`,
+        );
+      });
+    }
+
+    // Default (unnamed) frames use the same min-width clamp.
+    API.updateElement(frame, { name: null });
+    API.setAppState({ zoom: { value: getNormalizedZoom(0.1) } });
+    await waitFor(() => {
+      const label = queryContainer(".frame-name") as HTMLElement | null;
+      expect(label).not.toBe(null);
+      expect(label!.textContent).toBe("Frame");
+      expect(label!.style.maxWidth).toBe(`${FRAME_STYLE.nameMinWidth}px`);
+    });
+
+    API.setAppState({
+      frameRendering: {
+        ...h.state.frameRendering,
+        name: false,
+      },
+    });
+    await waitFor(() => {
+      expect(queryContainer(".frame-name")).toBe(null);
+    });
   });
 
   it("clears held-key state before interaction is re-enabled", async () => {

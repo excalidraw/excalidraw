@@ -207,6 +207,10 @@ export const FRAME_STYLE = {
   nameColorDarkTheme: "#7a7a7a",
   nameFontSize: 14,
   nameLineHeight: 1.25,
+  // Minimum screen-space width so labels stay readable when zoomed out
+  // (font size is already fixed; without this, maxWidth = frame.width * zoom
+  // collapses names into tiny ellipses).
+  nameMinWidth: 56,
 };
 
 export const MIN_FONT_SIZE = 1;

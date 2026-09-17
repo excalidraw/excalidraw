@@ -2252,7 +2252,10 @@ class App extends React.Component<AppProps, AppState> {
             maxWidth:
               focusedSearchMatch?.id === f.id && focusedSearchMatch?.focus
                 ? "none"
-                : `${f.width * this.state.zoom.value}px`,
+                : `${Math.max(
+                    f.width * this.state.zoom.value,
+                    FRAME_STYLE.nameMinWidth,
+                  )}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
