@@ -6212,6 +6212,16 @@ class App extends React.Component<AppProps, AppState> {
             lastActiveTool: this.state.activeTool,
           })
         : updateActiveTool(this.state, tool);
+    if (
+      this.state.activeTool.type === "laser" &&
+      nextActiveTool.type !== "laser"
+    ) {
+      if (this.state.laserMode === "annotation") {
+        this.laserTrails.clearLocalTrails();
+      }
+      this.laserTrails.hideLocalPointerDot();
+    }
+
     if (nextActiveTool.type === "hand") {
       this.cursor.set(CURSOR_TYPE.GRAB);
     } else if (!this.pan.isSpaceHeld()) {
@@ -6280,6 +6290,10 @@ class App extends React.Component<AppProps, AppState> {
 
   setOpenDialog = (dialogType: AppState["openDialog"]) => {
     this.setState({ openDialog: dialogType });
+  };
+
+  clearLaserTrails = () => {
+    this.laserTrails.clearLocalTrails();
   };
 
   /**
@@ -9179,6 +9193,11 @@ class App extends React.Component<AppProps, AppState> {
   private updateMultiTouchGesture = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
+    if (this.state.activeTool.type === "laser") {
+      const scenePointer = viewportCoordsToSceneCoords(event, this.state);
+      this.laserTrails.updatePointerPosition(scenePointer.x, scenePointer.y);
+    }
+
     if (gesture.pointers.has(event.pointerId)) {
       gesture.pointers.set(event.pointerId, {
         x: event.clientX,
@@ -14040,7 +14059,11 @@ class App extends React.Component<AppProps, AppState> {
       y: sceneY,
       tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
     };
-
+    if (pointer.tool === "laser") {
+      pointer.laserMode = this.state.laserMode;
+      pointer.laserThickness = this.state.laserThickness;
+      pointer.laserNeon = this.state.laserNeon;
+    }
     this.props.onPointerUpdate?.({
       pointer,
       button,
