@@ -169,7 +169,12 @@ describe("duplicate element on move when ALT is clicked", () => {
       renderStaticScene.mockClear();
     }
 
+    // alt-drag duplication requires a genuine Alt keydown reaching the app
+    // (OS-initiated switches like Alt+Tab never deliver one, #8508)
+    const excalidrawContainer = canvas.closest(".excalidraw")!;
+
     fireEvent.pointerDown(canvas, { clientX: 50, clientY: 20 });
+    fireEvent.keyDown(excalidrawContainer, { key: KEYS.ALT });
     fireEvent.pointerMove(canvas, { clientX: 20, clientY: 40, altKey: true });
 
     // firing another pointerMove event with alt key pressed should NOT trigger
@@ -177,8 +182,9 @@ describe("duplicate element on move when ALT is clicked", () => {
     fireEvent.pointerMove(canvas, { clientX: 20, clientY: 40, altKey: true });
     fireEvent.pointerMove(canvas, { clientX: 10, clientY: 60 });
     fireEvent.pointerUp(canvas);
+    fireEvent.keyUp(excalidrawContainer, { key: KEYS.ALT });
 
-    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`4`);
+    expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(`5`);
     expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`3`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(2);
