@@ -16,7 +16,10 @@ import {
 
 import { syncMovedIndices } from "@excalidraw/element";
 
-import { duplicateElements } from "@excalidraw/element";
+import {
+  duplicateElements,
+  reconcileDuplicatedElements,
+} from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -60,7 +63,7 @@ export const actionDuplicateSelection = register({
       }
     }
 
-    let { duplicatedElements, elementsWithDuplicates } = duplicateElements({
+    const duplication = duplicateElements({
       type: "in-place",
       elements,
       idsOfElementsToDuplicate: arrayToMap(
@@ -82,13 +85,24 @@ export const actionDuplicateSelection = register({
       },
     });
 
-    if (app.props.onDuplicate && elementsWithDuplicates) {
-      const mappedElements = app.props.onDuplicate(
-        elementsWithDuplicates,
-        elements,
-      );
-      if (mappedElements) {
-        elementsWithDuplicates = mappedElements;
+    let { duplicatedElements, elementsWithDuplicates } = duplication;
+
+    if (app.props.onDuplicate) {
+      ({ elements: elementsWithDuplicates, duplicatedElements } =
+        reconcileDuplicatedElements(
+          app.props.onDuplicate(elementsWithDuplicates, elements, {
+            duplicateElements: duplication.duplicateElementsMap,
+            originalElements: duplication.origElementsMap,
+            origIdToDuplicateId: duplication.origIdToDuplicateId,
+            duplicateIdToOrigId: duplication.duplicateIdToOrigId,
+          }),
+          elementsWithDuplicates,
+          duplicatedElements,
+        ));
+
+      // host vetoed the duplication
+      if (!duplicatedElements.length) {
+        return false;
       }
     }
 

@@ -30,6 +30,7 @@ import { bumpVersion } from "./mutateElement";
 
 import {
   hasBoundTextElement,
+  isArrowElement,
   isBoundToContainer,
   isFrameLikeElement,
 } from "./typeChecks";
@@ -38,15 +39,53 @@ import { getBoundTextElement, getContainerElement } from "./textElement";
 
 import { fixDuplicatedBindingsAfterDuplication } from "./binding";
 
+import { ShapeCache } from "./shape";
+
 import { isNonDeletedElement } from ".";
+
+import type { ElementUpdate } from "./mutateElement";
 
 import type {
   ElementsMap,
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   GroupId,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "./types";
+
+/**
+ * Lookups supplied to the host's `props.onDuplicate`, covering just the
+ * elements taking part in the duplication.
+ */
+export type OnDuplicateData = {
+  /** the duplicates, by their id */
+  duplicateElements: ReadonlyMap<ExcalidrawElement["id"], ExcalidrawElement>;
+  /**
+   * The elements the duplicates were made from, by their id.
+   *
+   * On paste and library insert these are the inserted elements, which aren't
+   * part of the scene (though they may share ids with the scene elements they
+   * were copied from).
+   */
+  originalElements: ReadonlyMap<ExcalidrawElement["id"], ExcalidrawElement>;
+  /**
+   * id of an original -> id of its duplicate (e.g. to remap element ids you
+   * keep in `customData`, which the duplicate copied from its original)
+   */
+  origIdToDuplicateId: ReadonlyMap<
+    ExcalidrawElement["id"],
+    ExcalidrawElement["id"]
+  >;
+  /**
+   * id of a duplicate -> id of its original (e.g. to look up the original in
+   * `originalElements` while modifying the duplicate)
+   */
+  duplicateIdToOrigId: ReadonlyMap<
+    ExcalidrawElement["id"],
+    ExcalidrawElement["id"]
+  >;
+};
 
 /**
  * Duplicate an element, often used in the alt-drag operation.
@@ -167,11 +206,12 @@ export const duplicateElements = (
     ExcalidrawElement["id"],
     ExcalidrawElement["id"]
   >();
-  const duplicateIdToOrigElement = new Map<
+  const duplicateIdToOrigId = new Map<
     ExcalidrawElement["id"],
-    ExcalidrawElement
+    ExcalidrawElement["id"]
   >();
   const duplicateElementsMap = new Map<string, NonDeletedExcalidrawElement>();
+  const origElementsMap = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
   const elementsMap = arrayToMap(elements) as ElementsMap;
   const _idsOfElementsToDuplicate =
     opts.type === "in-place"
@@ -231,8 +271,9 @@ export const duplicateElements = (
         processedIds.set(newElement.id, true);
 
         duplicateElementsMap.set(newElement.id, newElement);
+        origElementsMap.set(element.id, element);
         origIdToDuplicateId.set(element.id, newElement.id);
-        duplicateIdToOrigElement.set(newElement.id, element);
+        duplicateIdToOrigId.set(newElement.id, element.id);
 
         origElements.push(element);
         duplicatedElements.push(newElement);
@@ -411,7 +452,9 @@ export const duplicateElements = (
 
   if (opts.overrides) {
     for (const duplicateElement of duplicatedElements) {
-      const origElement = duplicateIdToOrigElement.get(duplicateElement.id);
+      const origElement = origElementsMap.get(
+        duplicateIdToOrigId.get(duplicateElement.id)!,
+      );
       if (origElement) {
         Object.assign(
           duplicateElement,
@@ -428,9 +471,148 @@ export const duplicateElements = (
   return {
     duplicatedElements,
     duplicateElementsMap,
+    origElementsMap,
     elementsWithDuplicates,
     origIdToDuplicateId,
+    duplicateIdToOrigId,
   };
+};
+
+/**
+ * Folds the elements returned by the host (`props.onDuplicate`) back into the
+ * duplicates the editor created, so that everything that follows (frame
+ * assignment, bound text redraw, selection, alt-drag handover) can keep
+ * working with the editor's own objects, whether the host mutated the
+ * duplicates or returned new objects for them.
+ *
+ * - A returned element with a duplicate's id is shallow-merged into that
+ *   duplicate, which takes its place in the returned array. Properties the
+ *   host omits are kept, so that a partial element can't invalidate the
+ *   duplicate. Safe only because the duplicates are fresh (not in the scene or
+ *   the store snapshot yet), which is why nothing but the passed duplicates is
+ *   ever merged into. Since the merge goes around `mutateElement`, what may
+ *   have been cached for the duplicate by then is invalidated here.
+ * - A duplicate missing from the returned array (or returned as deleted) is
+ *   vetoed. So is the bound text of a vetoed container. What the remaining
+ *   duplicates reference of the vetoed ones is cleared, as if those were never
+ *   part of the duplication (see `fixDuplicatedBindingsAfterDuplication`).
+ * - Any other returned element is used as is (existing elements must not be
+ *   mutated, so the host replaces them).
+ * - `false` vetoes all the duplicates.
+ *
+ * @returns next elements, and the duplicates that weren't vetoed
+ */
+export const reconcileDuplicatedElements = <
+  TDuplicate extends ExcalidrawElement,
+>(
+  /** what the host returned from `props.onDuplicate`, if anything */
+  hostElements: readonly ExcalidrawElement[] | void | false,
+  /** elements that were passed to the host */
+  nextElements: ExcalidrawElement[],
+  duplicatedElements: TDuplicate[],
+): {
+  elements: ExcalidrawElement[];
+  duplicatedElements: TDuplicate[];
+} => {
+  if (hostElements === false) {
+    return { elements: nextElements, duplicatedElements: [] };
+  }
+
+  if (!hostElements) {
+    return { elements: nextElements, duplicatedElements };
+  }
+
+  const duplicatesMap = arrayToMap(duplicatedElements);
+  // (if a duplicate is returned more than once, the last one wins)
+  const hostDuplicates = new Map<ExcalidrawElement["id"], ExcalidrawElement>();
+
+  for (const element of hostElements) {
+    if (duplicatesMap.has(element.id)) {
+      hostDuplicates.set(element.id, element);
+    }
+  }
+
+  // merge first, so that everything below sees the duplicates as the host
+  // wants them (what the host returned may be partial)
+  const survivedIds = new Set<ExcalidrawElement["id"]>();
+
+  for (const [id, element] of hostDuplicates) {
+    const duplicate = duplicatesMap.get(id)!;
+
+    if (element !== duplicate) {
+      Object.assign(duplicate, element);
+      // The duplicate may have been measured already (e.g. to resolve the
+      // frame it's pasted into), and we're going around `mutateElement`.
+      // The shape is cached by identity, the bounds by version.
+      ShapeCache.delete(duplicate);
+      bumpVersion(duplicate);
+    }
+
+    if (!duplicate.isDeleted) {
+      survivedIds.add(id);
+    }
+  }
+
+  const isVetoed = (id: ExcalidrawElement["id"]) =>
+    duplicatesMap.has(id) && !survivedIds.has(id);
+
+  for (const id of survivedIds) {
+    const duplicate = duplicatesMap.get(id)!;
+    if (isBoundToContainer(duplicate) && isVetoed(duplicate.containerId)) {
+      survivedIds.delete(id);
+    }
+  }
+
+  const elements: ExcalidrawElement[] = [];
+
+  for (const element of hostElements) {
+    const duplicate = duplicatesMap.get(element.id);
+
+    if (!duplicate) {
+      elements.push(element);
+    } else if (
+      survivedIds.has(element.id) &&
+      hostDuplicates.get(element.id) === element
+    ) {
+      elements.push(duplicate);
+    }
+  }
+
+  if (survivedIds.size === duplicatedElements.length) {
+    return { elements, duplicatedElements };
+  }
+
+  const survivedDuplicates = duplicatedElements.filter((duplicate) =>
+    survivedIds.has(duplicate.id),
+  );
+
+  for (const duplicate of survivedDuplicates) {
+    const updates: Mutable<ElementUpdate<ExcalidrawArrowElement>> = {};
+
+    if (duplicate.boundElements?.some((binding) => isVetoed(binding.id))) {
+      updates.boundElements = duplicate.boundElements.filter(
+        (binding) => !isVetoed(binding.id),
+      );
+    }
+    if (duplicate.frameId && isVetoed(duplicate.frameId)) {
+      updates.frameId = null;
+    }
+    if (isArrowElement(duplicate)) {
+      if (
+        duplicate.startBinding &&
+        isVetoed(duplicate.startBinding.elementId)
+      ) {
+        updates.startBinding = null;
+      }
+      if (duplicate.endBinding && isVetoed(duplicate.endBinding.elementId)) {
+        updates.endBinding = null;
+      }
+    }
+
+    Object.assign(duplicate, updates);
+  }
+
+  return { elements, duplicatedElements: survivedDuplicates };
 };
 
 // Simplified deep clone for the purpose of cloning ExcalidrawElement.

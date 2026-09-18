@@ -136,6 +136,7 @@ import {
   refreshTextDimensions,
   deepCopyElement,
   duplicateElements,
+  reconcileDuplicatedElements,
   hasBoundTextElement,
   isArrowElement,
   isBindingElement,
@@ -4853,7 +4854,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
 
-    const { duplicatedElements } = duplicateElements({
+    const duplication = duplicateElements({
       type: "everything",
       elements: elements.map((element) => {
         return newElementWith(element, {
@@ -4864,6 +4865,7 @@ class App extends React.Component<AppProps, AppState> {
       randomizeSeed: !opts.retainSeed,
       preserveFrameChildrenOrder: opts.preserveFrameChildrenOrder,
     });
+    let { duplicatedElements } = duplication;
 
     const prevElements = this.scene.getElementsIncludingDeleted();
     let nextElements: ExcalidrawElement[] = [
@@ -4871,15 +4873,10 @@ class App extends React.Component<AppProps, AppState> {
       ...duplicatedElements,
     ];
 
-    const mappedNewSceneElements = this.props.onDuplicate?.(
-      nextElements,
-      prevElements,
-    );
-
-    nextElements = mappedNewSceneElements || nextElements;
-
     syncMovedIndices(nextElements, arrayToMap(duplicatedElements));
 
+    // resolved ahead of `onDuplicate` so that the host sees the duplicates
+    // the way they end up in the scene
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({ x, y });
 
     if (topLayerFrame) {
@@ -4892,6 +4889,28 @@ class App extends React.Component<AppProps, AppState> {
         eligibleElements,
         topLayerFrame,
       );
+    }
+
+    if (this.props.onDuplicate) {
+      ({ elements: nextElements, duplicatedElements } =
+        reconcileDuplicatedElements(
+          this.props.onDuplicate(nextElements, prevElements, {
+            duplicateElements: duplication.duplicateElementsMap,
+            originalElements: duplication.origElementsMap,
+            origIdToDuplicateId: duplication.origIdToDuplicateId,
+            duplicateIdToOrigId: duplication.duplicateIdToOrigId,
+          }),
+          nextElements,
+          duplicatedElements,
+        ));
+
+      // host vetoed the duplication
+      if (!duplicatedElements.length) {
+        return;
+      }
+
+      // host may have reordered the elements
+      syncMovedIndices(nextElements, arrayToMap(duplicatedElements));
     }
 
     this.scene.replaceAllElements(nextElements);
@@ -11189,10 +11208,12 @@ class App extends React.Component<AppProps, AppState> {
             );
 
             const {
-              duplicatedElements,
-              duplicateElementsMap,
+              duplicatedElements: _duplicatedElements,
+              duplicateElementsMap: _duplicateElementsMap,
+              origElementsMap,
               elementsWithDuplicates,
               origIdToDuplicateId,
+              duplicateIdToOrigId,
             } = duplicateElements({
               type: "in-place",
               elements,
@@ -11212,6 +11233,47 @@ class App extends React.Component<AppProps, AppState> {
                 };
               },
             });
+
+            const mappedClonedElements = elementsWithDuplicates.map((el) => {
+              if (idsOfElementsToDuplicate.has(el.id)) {
+                const origEl = pointerDownState.originalElements.get(el.id);
+
+                if (origEl) {
+                  const resetElement = newElementWith(el, {
+                    x: origEl.x,
+                    y: origEl.y,
+                  });
+                  // so that the host gets the originals as they are in the
+                  // next elements
+                  if (origElementsMap.has(el.id)) {
+                    origElementsMap.set(el.id, resetElement);
+                  }
+                  return resetElement;
+                }
+              }
+              return el;
+            });
+
+            const { elements: nextElements, duplicatedElements } =
+              reconcileDuplicatedElements(
+                this.props.onDuplicate?.(mappedClonedElements, elements, {
+                  duplicateElements: _duplicateElementsMap,
+                  originalElements: origElementsMap,
+                  origIdToDuplicateId,
+                  duplicateIdToOrigId,
+                }),
+                mappedClonedElements,
+                _duplicatedElements,
+              );
+
+            // host vetoed the duplication, so we keep dragging the originals
+            if (!duplicatedElements.length) {
+              return;
+            }
+
+            // (originals whose duplicates were vetoed are left behind)
+            const duplicateElementsMap = arrayToMap(duplicatedElements);
+
             duplicatedElements.forEach((element) => {
               pointerDownState.originalElements.set(
                 element.id,
@@ -11219,28 +11281,9 @@ class App extends React.Component<AppProps, AppState> {
               );
             });
 
-            const mappedClonedElements = elementsWithDuplicates.map((el) => {
-              if (idsOfElementsToDuplicate.has(el.id)) {
-                const origEl = pointerDownState.originalElements.get(el.id);
-
-                if (origEl) {
-                  return newElementWith(el, {
-                    x: origEl.x,
-                    y: origEl.y,
-                  });
-                }
-              }
-              return el;
-            });
-
-            const mappedNewSceneElements = this.props.onDuplicate?.(
-              mappedClonedElements,
-              elements,
-            );
-
             const elementsWithIndices = syncMovedIndices(
-              mappedNewSceneElements || mappedClonedElements,
-              arrayToMap(duplicatedElements),
+              nextElements,
+              duplicateElementsMap,
             );
 
             // we need to update synchronously so as to keep pointerDownState,
