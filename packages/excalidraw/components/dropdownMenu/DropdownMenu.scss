@@ -69,7 +69,10 @@
 
       box-shadow: var(--box-shadow, var(--shadow-island));
 
-      max-height: calc(100svh - var(--editor-container-padding) * 2 - 2.25rem);
+      max-height: calc(
+        100svh - var(--editor-container-padding) * 2 -
+          var(--default-button-size) - 1rem
+      );
 
       @at-root .excalidraw.theme--dark#{&} {
         box-shadow: var(--box-shadow, var(--shadow-island)),

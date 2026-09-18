@@ -477,8 +477,8 @@ const PreferencesBoxSelectionModeItem = () => {
   );
 };
 
-const MIN_UI_SCALE = 50;
-const MAX_UI_SCALE = 150;
+const MIN_UI_SCALE = 75;
+const MAX_UI_SCALE = 125;
 const UI_SCALE_STEP = 5;
 
 const PreferencesUIScaleItem = () => {

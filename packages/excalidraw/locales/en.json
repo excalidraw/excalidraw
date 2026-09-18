@@ -195,9 +195,6 @@
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "uiScale": "UI scale",
-    "uiScale75": "75%",
-    "uiScale100": "100%",
-    "uiScale125": "125%",
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints"
   },
