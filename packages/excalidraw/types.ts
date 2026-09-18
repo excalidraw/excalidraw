@@ -7,6 +7,7 @@ import type {
   StrokeWidthKey,
 } from "@excalidraw/common";
 
+import type { ConnectionHandleSide } from "@excalidraw/element";
 import type { LinearElementEditor } from "@excalidraw/element";
 
 import type { MaybeTransformHandleType } from "@excalidraw/element";
@@ -234,6 +235,8 @@ export type InteractiveCanvasAppState = Readonly<
     gridModeEnabled: AppState["gridModeEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
     hoveredArrowTextAnchor: AppState["hoveredArrowTextAnchor"];
+    connectionHandles: AppState["connectionHandles"];
+    connectionDrag: AppState["connectionDrag"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];
     // Collaborators
@@ -390,6 +393,36 @@ export interface AppState {
   hoveredArrowTextAnchor: {
     elementId: ExcalidrawArrowElement["id"];
     anchor: "start" | "end" | "label";
+  } | null;
+  /**
+   * The shape currently showing its connection handles — the four dots just
+   * outside its side midpoints that a drag pulls a bound arrow out of.
+   *
+   * On pointer devices this follows the hover; on touch it follows the
+   * selection, since there is no hover to follow. `hoveredSide` is the handle
+   * under the pointer, which takes hit-test priority over the shape body.
+   *
+   * Transient affordance state: never persisted, never sent to collaborators.
+   */
+  connectionHandles: {
+    elementId: ExcalidrawBindableElement["id"];
+    hoveredSide: ConnectionHandleSide | null;
+  } | null;
+  /**
+   * The in-progress connection drag: the arrow being pulled out of a handle,
+   * plus the shape/side its end is currently snapped to (null while over
+   * empty space, which leaves the end unbound).
+   */
+  connectionDrag: {
+    arrowId: ExcalidrawArrowElement["id"];
+    source: {
+      elementId: ExcalidrawBindableElement["id"];
+      side: ConnectionHandleSide;
+    };
+    target: {
+      elementId: ExcalidrawBindableElement["id"];
+      side: ConnectionHandleSide;
+    } | null;
   } | null;
   frameToHighlight: NonDeleted<ExcalidrawFrameLikeElement> | null;
   frameRendering: {
@@ -597,6 +630,8 @@ export type UIAppState = Omit<
   | "originSnapOffset"
   | "suggestedBinding"
   | "hoveredArrowTextAnchor"
+  | "connectionHandles"
+  | "connectionDrag"
   | "frameToHighlight"
   | "elementsToHighlight"
 >;
@@ -1256,6 +1291,10 @@ export type PointerDownState = Readonly<{
     // Whether the pointer went down on the selected arrow's label, which
     // makes the gesture a label drag along the arrow rather than a point drag
     arrowLabel: boolean;
+    // Whether the pointer went down on a shape's connection handle, which
+    // makes the gesture a drag that pulls a new bound arrow out of that shape
+    // rather than anything the selection tool would otherwise do
+    connectionHandle: boolean;
   };
   // This is determined on the initial pointer down event to
   // set various interaction modalities

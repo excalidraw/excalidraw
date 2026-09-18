@@ -27,7 +27,10 @@ import {
   deconstructRectanguloidElement,
   elementCenterPoint,
   getDiamondBaseCorners,
+  canHaveConnectionHandles,
+  CONNECTION_HANDLE_RADIUS,
   FOCUS_POINT_SIZE,
+  getConnectionHandles,
   getOmitSidesForEditorInterface,
   getTransformHandles,
   getTransformHandlesFromCoords,
@@ -211,6 +214,65 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
     false,
   );
+
+  context.restore();
+};
+
+/**
+ * Draws a shape's connection handles: the four dots just outside its side
+ * midpoints that a drag pulls a bound arrow out of. The hovered one — or, mid
+ * drag, the side the arrow's end has snapped to — is drawn filled.
+ *
+ * Interactive canvas only, so hovering a shape never costs a static redraw.
+ * Sizes divide by zoom so the dots stay the same size on screen.
+ */
+const renderConnectionHandles = (
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  elementsMap: ElementsMap,
+) => {
+  const { elementId, hoveredSide } = appState.connectionHandles!;
+
+  const element = elementsMap.get(elementId);
+
+  if (
+    !isBindableElement(element, false) ||
+    element.isDeleted ||
+    !canHaveConnectionHandles(element, appState.zoom.value)
+  ) {
+    return;
+  }
+
+  const handles = getConnectionHandles(
+    element,
+    elementsMap,
+    appState.zoom.value,
+  );
+
+  const radius = CONNECTION_HANDLE_RADIUS / appState.zoom.value;
+  const accent = getThemedColor("#6965db", appState.theme);
+
+  context.save();
+  context.translate(appState.scrollX, appState.scrollY);
+  context.lineWidth = 1 / appState.zoom.value;
+  context.setLineDash([]);
+
+  for (const handle of handles) {
+    const isActive = handle.side === hoveredSide;
+
+    context.fillStyle = isActive
+      ? accent
+      : getThemedColor("rgba(255, 255, 255, 0.9)", appState.theme);
+    context.strokeStyle = accent;
+
+    fillCircle(
+      context,
+      handle.point[0],
+      handle.point[1],
+      isActive ? radius * 1.4 : radius,
+      true,
+    );
+  }
 
   context.restore();
 };
@@ -1754,6 +1816,10 @@ const _renderInteractiveScene = ({
 
   if (appState.hoveredArrowTextAnchor) {
     renderHoveredArrowTextAnchor(context, appState, allElementsMap);
+  }
+
+  if (appState.connectionHandles) {
+    renderConnectionHandles(context, appState, allElementsMap);
   }
 
   if (appState.frameToHighlight) {

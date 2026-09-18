@@ -255,6 +255,8 @@ const getRelevantAppStateProps = (
   gridModeEnabled: appState.gridModeEnabled,
   suggestedBinding: appState.suggestedBinding,
   hoveredArrowTextAnchor: appState.hoveredArrowTextAnchor,
+  connectionHandles: appState.connectionHandles,
+  connectionDrag: appState.connectionDrag,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,
   collaborators: appState.collaborators, // Necessary for collab. sessions

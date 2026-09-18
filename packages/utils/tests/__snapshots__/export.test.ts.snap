@@ -22,6 +22,8 @@ exports[`exportToSvg > with default arguments 1`] = `
     "stickyNoteBackground": null,
     "stickyNoteStroke": null,
   },
+  "connectionDrag": null,
+  "connectionHandles": null,
   "contextMenu": null,
   "croppingElementId": null,
   "currentHoveredFontFamily": null,
