@@ -30,6 +30,13 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
+      <MainMenu.Item
+        onSelect={() => {
+          window.dispatchEvent(new CustomEvent("excalidraw-clases:import-pdf"));
+        }}
+      >
+        Importar PDF
+      </MainMenu.Item>
       {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}
