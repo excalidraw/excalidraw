@@ -47,6 +47,7 @@ body.excalidraw-cursor-resize * {
   }
 
   font-family: var(--ui-font);
+  font-size: calc(1rem * var(--ui-scale));
 
   position: relative;
   overflow: hidden;
@@ -61,7 +62,7 @@ body.excalidraw-cursor-resize * {
 
   button {
     // browser default. Looks kinda good on low-dpi.
-    font-size: 0.8333rem;
+    font-size: calc(0.8333rem * var(--ui-scale));
   }
 
   button,
@@ -161,14 +162,14 @@ body.excalidraw-cursor-resize * {
   .selected-shape-actions {
     display: flex;
     flex-direction: column;
-    row-gap: 0.75rem;
+    row-gap: calc(0.75rem * var(--ui-scale));
 
     h3,
     legend,
     .control-label {
       margin: 0;
-      margin-bottom: 0.25rem;
-      font-size: 0.75rem;
+      margin-bottom: calc(0.25rem * var(--ui-scale));
+      font-size: calc(0.75rem * var(--ui-scale));
       color: var(--text-primary-color);
       font-weight: 400;
       display: block;
@@ -191,11 +192,11 @@ body.excalidraw-cursor-resize * {
     .buttonList {
       flex-wrap: wrap;
       display: flex;
-      column-gap: 0.5rem;
-      row-gap: 0.5rem;
+      column-gap: calc(0.5rem * var(--ui-scale));
+      row-gap: calc(0.5rem * var(--ui-scale));
 
       label {
-        font-size: 0.75rem;
+        font-size: calc(0.75rem * var(--ui-scale));
       }
 
       input[type="radio"],
@@ -456,14 +457,14 @@ body.excalidraw-cursor-resize * {
 
   .App-menu_bottom {
     position: absolute;
-    bottom: 1rem;
+    bottom: calc(1rem * var(--ui-scale));
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     cursor: default;
     pointer-events: none !important;
     box-sizing: border-box;
-    padding: 0 1rem;
+    padding: 0 calc(1rem * var(--ui-scale));
 
     &--transition-left {
       section {
@@ -503,15 +504,15 @@ body.excalidraw-cursor-resize * {
   }
 
   .dropdown-select {
-    height: 1.5rem;
+    height: calc(1.5rem * var(--ui-scale));
     padding: 0;
-    padding-inline-start: 0.5rem;
-    padding-inline-end: 1.5rem;
+    padding-inline-start: calc(0.5rem * var(--ui-scale));
+    padding-inline-end: calc(1.5rem * var(--ui-scale));
     color: var(--icon-fill-color);
     background-color: var(--button-gray-1);
     border-radius: var(--space-factor);
     border: 1px solid var(--button-gray-2);
-    font-size: 0.8rem;
+    font-size: calc(0.8rem * var(--ui-scale));
     font-family: inherit;
     outline: none;
     appearance: none;
@@ -828,9 +829,9 @@ body.excalidraw-cursor-resize * {
 
     legend {
       display: block;
-      font-size: 0.75rem;
+      font-size: calc(0.75rem * var(--ui-scale));
       font-weight: 400;
-      margin: 0 0 0.25rem;
+      margin: 0 0 calc(0.25rem * var(--ui-scale));
       padding: 0;
     }
   }

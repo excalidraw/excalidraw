@@ -20,13 +20,13 @@
     flex-direction: row;
     align-items: flex-start;
 
-    padding: 3px;
-    border-radius: 10px;
+    padding: calc(3px * var(--ui-scale));
+    border-radius: calc(10px * var(--ui-scale));
 
     background: var(--RadioGroup-background);
     border: 1px solid var(--RadioGroup-border);
 
-    gap: 2px;
+    gap: calc(2px * var(--ui-scale));
 
     &__choice {
       box-sizing: content-box;
@@ -34,22 +34,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 20px;
-      height: 24px;
-      padding: 0 0.375rem;
+      min-width: calc(20px * var(--ui-scale));
+      height: calc(24px * var(--ui-scale));
+      padding: 0 calc(0.375rem * var(--ui-scale));
 
       color: var(--RadioGroup-choice-color-off);
       background: var(--RadioGroup-choice-background-off);
 
-      border-radius: 8px;
+      border-radius: calc(8px * var(--ui-scale));
 
       font-family: "Assistant";
       font-style: normal;
       font-weight: 600;
-      font-size: 0.75rem;
+      font-size: calc(0.75rem * var(--ui-scale));
       line-height: 100%;
       user-select: none;
       letter-spacing: 0.4px;
+
+      svg {
+        width: calc(1rem * var(--ui-scale));
+        height: calc(1rem * var(--ui-scale));
+      }
 
       &:hover {
         color: var(--RadioGroup-choice-color-off-hover);
@@ -80,7 +85,7 @@
         margin: 0;
         padding: 0;
 
-        border-radius: 8px;
+        border-radius: calc(8px * var(--ui-scale));
 
         -webkit-appearance: none;
         -moz-appearance: none;

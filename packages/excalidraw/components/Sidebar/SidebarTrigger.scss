@@ -10,11 +10,11 @@
 
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: calc(0.5rem * var(--ui-scale));
 
     line-height: 0;
 
-    font-size: 0.75rem;
+    font-size: calc(0.75rem * var(--ui-scale));
     letter-spacing: 0.4px;
 
     svg {

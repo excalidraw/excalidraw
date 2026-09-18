@@ -39,6 +39,9 @@ import DropdownMenuItemCheckbox from "../dropdownMenu/DropdownMenuItemCheckbox";
 import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemContentRadio";
 import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
+import { IconButton } from "../IconButton";
+import { ZoomInIcon, ZoomOutIcon } from "../icons";
+import { useState, useRef, useEffect } from "react";
 import {
   GithubIcon,
   DiscordIcon,
@@ -231,17 +234,17 @@ ClearCanvas.displayName = "ClearCanvas";
 export const ToggleTheme = (
   props:
     | {
-        allowSystemTheme: true;
-        /**
-         * Controls the theme of this UI component only.
-         * You should subscribe to `props.onThemeChange` and control the theme
-         * upstream.
-         */
-        theme: Theme | "system";
-      }
+      allowSystemTheme: true;
+      /**
+       * Controls the theme of this UI component only.
+       * You should subscribe to `props.onThemeChange` and control the theme
+       * upstream.
+       */
+      theme: Theme | "system";
+    }
     | {
-        allowSystemTheme: false;
-      },
+      allowSystemTheme: false;
+    },
 ) => {
   const { t } = useI18n();
   const appState = useUIAppState();
@@ -473,6 +476,113 @@ const PreferencesBoxSelectionModeItem = () => {
   );
 };
 
+const MIN_UI_SCALE = 50;
+const MAX_UI_SCALE = 150;
+const UI_SCALE_STEP = 5;
+
+const PreferencesUIScaleItem = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+
+  const currentScalePercent = Math.round((appState.uiScale ?? 1) * 100);
+  const [percent, setPercent] = useState(currentScalePercent);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Synchronize local percent when appState.uiScale changes externally
+  useEffect(() => {
+    setPercent(currentScalePercent);
+  }, [currentScalePercent]);
+
+  // Clean up any pending timer when unmounting
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  const changeScale = (newPercent: number, immediate = false) => {
+    const clamped = Math.min(
+      Math.max(newPercent, MIN_UI_SCALE),
+      MAX_UI_SCALE,
+    );
+
+    // Instant local state update for zero-latency UI feedback
+    setPercent(clamped);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (immediate) {
+      setAppState({
+        uiScale: clamped / 100,
+      });
+    } else {
+      // Debounce the actual layout reflow so rapid clicks don't cause jitter
+      timerRef.current = setTimeout(() => {
+        setAppState({
+          uiScale: clamped / 100,
+        });
+      }, 300);
+    }
+  };
+
+  return (
+    <div
+      className="dropdown-menu-item-base dropdown-menu-item-bare preferences-ui-scale-item"
+      onPointerDown={(event) => {
+        event.stopPropagation();
+      }}
+    >
+      <div className="dropdown-menu-item__icon">{emptyIcon}</div>
+      <label className="dropdown-menu-item__text">
+        {t("labels.uiScale")}
+      </label>
+        <div
+          className="zoom-actions"
+          style={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <IconButton
+            type="button"
+            className="zoom-out-button zoom-button"
+            icon={ZoomOutIcon}
+            title={t("buttons.zoomOut")}
+            aria-label={t("buttons.zoomOut")}
+            disabled={percent <= MIN_UI_SCALE}
+            onClick={() => changeScale(percent - UI_SCALE_STEP)}
+          />
+          <IconButton
+            type="button"
+            className="reset-zoom-button zoom-button"
+            title={t("buttons.resetZoom")}
+            aria-label={t("buttons.resetZoom")}
+            disabled={percent === 100}
+            onClick={() => changeScale(100, true)}
+          >
+            {percent}%
+          </IconButton>
+          <IconButton
+            type="button"
+            className="zoom-in-button zoom-button"
+            icon={ZoomInIcon}
+            title={t("buttons.zoomIn")}
+            aria-label={t("buttons.zoomIn")}
+            disabled={percent >= MAX_UI_SCALE}
+            onClick={() => changeScale(percent + UI_SCALE_STEP)}
+          />
+        </div>
+      </div>
+  );
+};
+
+
 const PreferencesToggleSnapModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -618,6 +728,7 @@ export const Preferences = ({
         {children || (
           <>
             <PreferencesBoxSelectionModeItem />
+            <PreferencesUIScaleItem />
             <PreferencesToggleToolLockItem />
             <PreferencesToggleSnapModeItem />
             <PreferencesToggleGridModeItem />
@@ -636,6 +747,7 @@ export const Preferences = ({
 
 Preferences.ToggleToolLock = PreferencesToggleToolLockItem;
 Preferences.BoxSelectionMode = PreferencesBoxSelectionModeItem;
+Preferences.UIScale = PreferencesUIScaleItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;

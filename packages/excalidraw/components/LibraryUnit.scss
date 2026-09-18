@@ -7,8 +7,8 @@
     display: flex;
     justify-content: center;
     position: relative;
-    width: 55px;
-    height: 55px;
+    width: calc(55px * var(--ui-scale));
+    height: calc(55px * var(--ui-scale));
     box-sizing: border-box;
     border-radius: var(--border-radius-lg);
 

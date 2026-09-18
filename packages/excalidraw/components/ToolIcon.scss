@@ -20,8 +20,8 @@
   .ToolIcon--plain {
     background-color: transparent;
     .ToolIcon__icon {
-      width: 2rem;
-      height: 2rem;
+      width: var(--default-button-size);
+      height: var(--default-button-size);
     }
   }
 
@@ -81,8 +81,8 @@
   }
 
   .ToolIcon_size_small .ToolIcon__icon {
-    width: 2rem;
-    height: 2rem;
+    width: var(--default-button-size);
+    height: var(--default-button-size);
     font-size: 0.8em;
   }
 
@@ -147,16 +147,16 @@
         background-color: var(--button-gray-3);
       }
 
-      width: 2rem;
-      height: 2rem;
+      width: var(--default-button-size);
+      height: var(--default-button-size);
     }
   }
 
   .ToolIcon__keybinding {
     position: absolute;
-    bottom: 2px;
-    right: 3px;
-    font-size: 0.625rem;
+    bottom: calc(2px * var(--ui-scale));
+    right: calc(3px * var(--ui-scale));
+    font-size: calc(0.625rem * var(--ui-scale));
     color: var(--keybinding-color);
     font-family: var(--ui-font);
     user-select: none;

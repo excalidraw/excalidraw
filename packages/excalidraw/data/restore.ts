@@ -1238,6 +1238,10 @@ export const restoreAppState = (
     gridStep: getNormalizedGridStep(
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
     ),
+    uiScale:
+      isFiniteNumber(nextAppState.uiScale) && nextAppState.uiScale > 0
+        ? nextAppState.uiScale
+        : 1,
     editingFrame: null,
   };
 };

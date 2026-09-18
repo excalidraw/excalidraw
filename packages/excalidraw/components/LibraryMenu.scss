@@ -96,7 +96,7 @@
     text-decoration: none !important;
 
     font-weight: 600;
-    font-size: 0.75rem;
+    font-size: calc(0.75rem * var(--ui-scale));
 
     &:hover {
       background-color: var(--color-brand-hover);

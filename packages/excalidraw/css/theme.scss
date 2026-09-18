@@ -44,12 +44,14 @@
   --button-active-border: var(--color-brand-active);
   --default-border-color: var(--color-surface-high);
 
-  --default-button-size: 2rem;
-  --default-icon-size: 1rem;
-  --lg-button-size: 2.25rem;
-  --lg-icon-size: 1rem;
-  --editor-container-padding: 1rem;
-  --mobile-action-button-size: 2rem;
+  --ui-scale: 1;
+
+  --default-button-size: calc(2rem * var(--ui-scale));
+  --default-icon-size: calc(1rem * var(--ui-scale));
+  --lg-button-size: calc(2.25rem * var(--ui-scale));
+  --lg-icon-size: calc(1rem * var(--ui-scale));
+  --editor-container-padding: calc(1rem * var(--ui-scale));
+  --mobile-action-button-size: calc(2rem * var(--ui-scale));
 
   --scrollbar-thumb: var(--button-gray-2);
   --scrollbar-thumb-hover: var(--button-gray-3);
@@ -77,7 +79,7 @@
     0px 1px 2px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1);
   --chat-msg-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
-  --space-factor: 0.25rem;
+  --space-factor: calc(0.25rem * var(--ui-scale));
   --text-primary-color: var(--color-on-surface);
 
   --color-selection: #6965db;
@@ -166,14 +168,14 @@
   --background-color-badge: #d3ffd2;
 
   @include isMobile {
-    --editor-container-padding: 0.75rem;
+    --editor-container-padding: calc(0.75rem * var(--ui-scale));
   }
 
   @media screen and (min-device-width: 1921px) {
-    --lg-button-size: 2.5rem;
-    --lg-icon-size: 1.25rem;
-    --default-button-size: 2.25rem;
-    --default-icon-size: 1.25rem;
+    --lg-button-size: calc(2.5rem * var(--ui-scale));
+    --lg-icon-size: calc(1.25rem * var(--ui-scale));
+    --default-button-size: calc(2.25rem * var(--ui-scale));
+    --default-icon-size: calc(1.25rem * var(--ui-scale));
   }
 
   &.theme--dark {

@@ -2380,7 +2380,9 @@ class App extends React.Component<AppProps, AppState> {
           ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
             ? POINTER_EVENTS.disabled
             : POINTER_EVENTS.enabled,
-          ["--right-sidebar-width" as any]: `${RIGHT_SIDEBAR_WIDTH}px`,
+          ["--right-sidebar-width" as any]: `calc(${RIGHT_SIDEBAR_WIDTH}px * var(--ui-scale))`,
+          ["--ui-scale" as any]:
+            this.props.UIOptions?.uiScale ?? this.state.uiScale ?? 1,
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.isInteractionEnabled() ? this.handleAppOnDrop : undefined}
@@ -4252,6 +4254,13 @@ class App extends React.Component<AppProps, AppState> {
 
     if (prevProps.theme !== this.props.theme && this.props.theme) {
       this.setState({ theme: this.props.theme });
+    }
+
+    if (
+      prevProps.UIOptions?.uiScale !== this.props.UIOptions?.uiScale &&
+      typeof this.props.UIOptions?.uiScale === "number"
+    ) {
+      this.setState({ uiScale: this.props.UIOptions.uiScale });
     }
 
     this.excalidrawContainerRef.current?.classList.toggle(

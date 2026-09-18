@@ -9,7 +9,7 @@
 .undo-redo-buttons button {
   border-radius: 0 !important;
   background-color: var(--color-surface-low) !important;
-  font-size: 0.875rem !important;
+  font-size: calc(0.875rem * var(--ui-scale)) !important;
   width: var(--lg-button-size);
   height: var(--lg-button-size);
 
@@ -27,8 +27,8 @@
 .reset-zoom-button {
   border-left: 0 !important;
   border-right: 0 !important;
-  padding: 0 0.625rem !important;
-  width: 3.75rem !important;
+  padding: 0 calc(0.625rem * var(--ui-scale)) !important;
+  width: calc(3.75rem * var(--ui-scale)) !important;
   justify-content: center;
   color: var(--text-primary-color);
 }
@@ -108,7 +108,7 @@
     min-height: 2.5rem;
     pointer-events: auto;
 
-    --default-button-size: 2rem;
+    --default-button-size: calc(2rem * var(--ui-scale));
 
     .compact-action-button {
       width: var(--mobile-action-button-size);

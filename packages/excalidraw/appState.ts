@@ -130,6 +130,7 @@ export const getDefaultAppState = (): Omit<
     activeLockedId: null,
     bindMode: "orbit",
     boxSelectionMode: "contain",
+    uiScale: 1,
     colorTopPicks: {
       elementStroke: null,
       elementBackground: null,
@@ -267,6 +268,7 @@ const APP_STATE_STORAGE_CONF = (<
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
   colorTopPicks: { browser: true, export: false, server: false },
+  uiScale: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

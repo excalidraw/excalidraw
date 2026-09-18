@@ -65,7 +65,7 @@
     &__row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
+      gap: calc(1rem * var(--ui-scale));
     }
 
     &__items {
@@ -85,9 +85,9 @@
       flex: 1 1 auto;
 
       color: var(--color-primary);
-      font-size: 1.125rem;
+      font-size: calc(1.125rem * var(--ui-scale));
       font-weight: 700;
-      margin-bottom: 0.75rem;
+      margin-bottom: calc(0.75rem * var(--ui-scale));
       width: 100%;
       box-sizing: border-box;
 
@@ -113,7 +113,7 @@
     &__grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
-      grid-gap: 1rem;
+      grid-gap: calc(1rem * var(--ui-scale));
     }
 
     &__search {
@@ -123,7 +123,7 @@
       .ExcTextField__input {
         height: var(--lg-button-size);
         input {
-          font-size: 0.875rem;
+          font-size: calc(0.875rem * var(--ui-scale));
         }
       }
 

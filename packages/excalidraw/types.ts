@@ -488,6 +488,7 @@ export interface AppState {
   gridStep: number;
   gridModeEnabled: boolean;
   viewModeEnabled: boolean;
+  uiScale: number;
 
   /** top-most selected groups (i.e. does not include nested groups) */
   selectedGroupIds: { [groupId: string]: boolean };
@@ -1068,6 +1069,7 @@ export type UIOptions = Partial<{
   tools: {
     image: boolean;
   };
+  uiScale?: number;
   /**
    * Optionally control the editor form factor and desktop UI mode from the host app.
    * If not provided, we will take care of it internally.
