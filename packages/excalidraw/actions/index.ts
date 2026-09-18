@@ -73,6 +73,7 @@ export {
   actionCopy,
   actionCut,
   actionCopyAsPng,
+  actionCopyAsPngTransparent,
   actionCopyAsSvg,
   copyText,
 } from "./actionClipboard";
