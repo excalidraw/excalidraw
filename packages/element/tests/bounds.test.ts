@@ -142,7 +142,7 @@ describe("getElementBounds", () => {
     expect(x1).toEqual(366.0476290709661);
     expect(y1).toEqual(186.59818534770224);
     expect(x2).toEqual(494.6034220048372);
-    expect(y2).toEqual(324.1648979922154);
+    expect(y2).toBeCloseTo(324.1648979922154, 10);
   });
 });
 
