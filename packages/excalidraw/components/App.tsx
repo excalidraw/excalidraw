@@ -8064,7 +8064,7 @@ class App extends React.Component<AppProps, AppState> {
           });
           this.setState({ suggestedBinding: null });
           if (!this.state.activeTool.locked) {
-            resetCursor(this.interactiveCanvas);
+            this.cursor.reset();
             this.setState((prevState) => ({
               newElement: null,
               activeTool: updateActiveTool(this.state, {

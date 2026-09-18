@@ -8,7 +8,6 @@ import {
   isBindingElement,
   isLineElement,
   LinearElementEditor,
-  maxBindingDistance_simple,
   newArrowElement,
   updateBoundPoint,
 } from "@excalidraw/element";
@@ -92,7 +91,6 @@ export class AppDrawShape {
     const { app } = this;
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const elements = app.scene.getNonDeletedElements();
-    const bindingDistance = maxBindingDistance_simple(app.state.zoom);
 
     const endpoints = (["start", "end"] as const).map((startOrEnd) => {
       const globalPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
@@ -104,10 +102,11 @@ export class AppDrawShape {
         startOrEnd,
         globalPoint,
         target: getHoveredElementForBinding(
+          arrow,
           globalPoint,
           elements,
           elementsMap,
-          bindingDistance,
+          app.state.zoom,
         ),
       };
     });
@@ -125,6 +124,7 @@ export class AppDrawShape {
           sameTarget ? "inside" : "orbit",
           startOrEnd,
           app.scene,
+          app.state.zoom,
           globalPoint,
           app.state.isBindingEnabled,
           isMidpointSnappingEnabled,
@@ -175,10 +175,10 @@ export class AppDrawShape {
     const { app } = this;
     const elementsMap = app.scene.getNonDeletedElementsMap();
     const elements = app.scene.getNonDeletedElements();
-    const bindingDistance = maxBindingDistance_simple(app.state.zoom);
 
     const [startTarget, endTarget] = ([0, -1] as const).map((index) =>
       getHoveredElementForBinding(
+        { elbowed: false },
         LinearElementEditor.getPointAtIndexGlobalCoordinates(
           line,
           index,
@@ -186,7 +186,7 @@ export class AppDrawShape {
         ),
         elements,
         elementsMap,
-        bindingDistance,
+        app.state.zoom,
       ),
     );
     if ((!startTarget && !endTarget) || startTarget === endTarget) {

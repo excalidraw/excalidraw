@@ -1783,7 +1783,7 @@ const snapBoundPointToGrid = (
       ? vectorToHeading(vectorFromPoint(adjacentPoint, outlinePoint))
       : headingForPointFromElement(bindableElement, aabb, outlinePoint);
 
-  const bindingGap = getBindingGap(bindableElement, arrowElement);
+  const bindingGap = getBindingGap(bindableElement);
   const extent =
     Math.max(bindableElement.width, bindableElement.height) + bindingGap * 2;
   const center = getCenterForBounds(aabb);
@@ -2049,7 +2049,7 @@ export const calculateFixedPointForElbowArrowBinding = (
   // elements smaller than the gap don't blow up the ratio: the snapped
   // point sits at most one gap-width outside the outline, so this keeps
   // the resulting fixedPoint bounded even for zero/near-zero-size elements.
-  const sizeFloor = getBindingGap(hoveredElement, linearElement);
+  const sizeFloor = getBindingGap(hoveredElement);
 
   return {
     fixedPoint: normalizeFixedPoint([
@@ -2099,7 +2099,7 @@ export const calculateFixedPointForNonElbowArrowBinding = (
   // elements smaller than the gap don't blow up the ratio: the bound
   // point sits at most one gap-width outside the outline, so this keeps
   // the resulting fixedPoint bounded even for zero/near-zero-size elements.
-  const sizeFloor = getBindingGap(hoveredElement, linearElement);
+  const sizeFloor = getBindingGap(hoveredElement);
 
   // Calculate the ratio relative to the element's bounds
   const fixedPointX =

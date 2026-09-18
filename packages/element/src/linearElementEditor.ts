@@ -2390,7 +2390,7 @@ const pointDraggingUpdates = (
 ): {
   positions: PointsPositionUpdates;
   updates?: PointMoveOtherUpdates;
-  hit?: ExcalidrawBindableElement | null;
+  hit?: NonDeleted<ExcalidrawBindableElement> | null;
 } => {
   const naiveDraggingPoints = new Map(
     selectedPointsIndices.map((pointIndex) => {

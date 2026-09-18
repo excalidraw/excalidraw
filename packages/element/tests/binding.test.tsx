@@ -16,6 +16,8 @@ import {
 
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
+import type { Zoom } from "@excalidraw/excalidraw/types";
+
 import { bindBindingElement, updateBoundElements } from "../src/binding";
 import { getTransformHandles } from "../src/transformHandles";
 import {
@@ -797,7 +799,9 @@ describe("binding to a point-like (sub-pixel) element", () => {
       }) as NonDeleted<ExcalidrawArrowElement>;
       API.setElements([rect, arrow]);
 
-      bindBindingElement(arrow, rect, "orbit", "end", h.scene);
+      bindBindingElement(arrow, rect, "orbit", "end", h.scene, {
+        value: 1,
+      } as Zoom);
 
       const endBinding = arrow.endBinding as FixedPointBinding;
       expect(endBinding.elementId).toBe(rect.id);
