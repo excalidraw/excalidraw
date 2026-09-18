@@ -319,8 +319,12 @@ describe("<Excalidraw/>", () => {
       const { container } = await render(
         <Excalidraw UIOptions={{ uiScale: 0.8 }} />,
       );
-      const excalidrawElement = container.querySelector(".excalidraw") as HTMLElement;
-      expect(excalidrawElement.style.getPropertyValue("--ui-scale")).toBe("0.8");
+      const excalidrawElement = container.querySelector(
+        ".excalidraw",
+      ) as HTMLElement;
+      expect(excalidrawElement.style.getPropertyValue("--ui-scale")).toBe(
+        "0.8",
+      );
     });
 
     it("should sync export theme with the UI theme when there is no session override", async () => {

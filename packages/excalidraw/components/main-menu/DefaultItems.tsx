@@ -2,6 +2,8 @@ import clsx from "clsx";
 
 import { THEME } from "@excalidraw/common";
 
+import { useState, useRef, useEffect } from "react";
+
 import type { Theme } from "@excalidraw/element/types";
 
 import {
@@ -41,7 +43,6 @@ import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
 import { IconButton } from "../IconButton";
 import { ZoomInIcon, ZoomOutIcon } from "../icons";
-import { useState, useRef, useEffect } from "react";
 import {
   GithubIcon,
   DiscordIcon,
@@ -234,17 +235,17 @@ ClearCanvas.displayName = "ClearCanvas";
 export const ToggleTheme = (
   props:
     | {
-      allowSystemTheme: true;
-      /**
-       * Controls the theme of this UI component only.
-       * You should subscribe to `props.onThemeChange` and control the theme
-       * upstream.
-       */
-      theme: Theme | "system";
-    }
+        allowSystemTheme: true;
+        /**
+         * Controls the theme of this UI component only.
+         * You should subscribe to `props.onThemeChange` and control the theme
+         * upstream.
+         */
+        theme: Theme | "system";
+      }
     | {
-      allowSystemTheme: false;
-    },
+        allowSystemTheme: false;
+      },
 ) => {
   const { t } = useI18n();
   const appState = useUIAppState();
@@ -504,10 +505,7 @@ const PreferencesUIScaleItem = () => {
   }, []);
 
   const changeScale = (newPercent: number, immediate = false) => {
-    const clamped = Math.min(
-      Math.max(newPercent, MIN_UI_SCALE),
-      MAX_UI_SCALE,
-    );
+    const clamped = Math.min(Math.max(newPercent, MIN_UI_SCALE), MAX_UI_SCALE);
 
     // Instant local state update for zero-latency UI feedback
     setPercent(clamped);
@@ -539,49 +537,46 @@ const PreferencesUIScaleItem = () => {
       }}
     >
       <div className="dropdown-menu-item__icon">{emptyIcon}</div>
-      <label className="dropdown-menu-item__text">
-        {t("labels.uiScale")}
-      </label>
-        <div
-          className="zoom-actions"
-          style={{
-            display: "flex",
-            alignItems: "center",
-          }}
+      <label className="dropdown-menu-item__text">{t("labels.uiScale")}</label>
+      <div
+        className="zoom-actions"
+        style={{
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <IconButton
+          type="button"
+          className="zoom-out-button zoom-button"
+          icon={ZoomOutIcon}
+          title={t("buttons.zoomOut")}
+          aria-label={t("buttons.zoomOut")}
+          disabled={percent <= MIN_UI_SCALE}
+          onClick={() => changeScale(percent - UI_SCALE_STEP)}
+        />
+        <IconButton
+          type="button"
+          className="reset-zoom-button zoom-button"
+          title={t("buttons.resetZoom")}
+          aria-label={t("buttons.resetZoom")}
+          disabled={percent === 100}
+          onClick={() => changeScale(100, true)}
         >
-          <IconButton
-            type="button"
-            className="zoom-out-button zoom-button"
-            icon={ZoomOutIcon}
-            title={t("buttons.zoomOut")}
-            aria-label={t("buttons.zoomOut")}
-            disabled={percent <= MIN_UI_SCALE}
-            onClick={() => changeScale(percent - UI_SCALE_STEP)}
-          />
-          <IconButton
-            type="button"
-            className="reset-zoom-button zoom-button"
-            title={t("buttons.resetZoom")}
-            aria-label={t("buttons.resetZoom")}
-            disabled={percent === 100}
-            onClick={() => changeScale(100, true)}
-          >
-            {percent}%
-          </IconButton>
-          <IconButton
-            type="button"
-            className="zoom-in-button zoom-button"
-            icon={ZoomInIcon}
-            title={t("buttons.zoomIn")}
-            aria-label={t("buttons.zoomIn")}
-            disabled={percent >= MAX_UI_SCALE}
-            onClick={() => changeScale(percent + UI_SCALE_STEP)}
-          />
-        </div>
+          {percent}%
+        </IconButton>
+        <IconButton
+          type="button"
+          className="zoom-in-button zoom-button"
+          icon={ZoomInIcon}
+          title={t("buttons.zoomIn")}
+          aria-label={t("buttons.zoomIn")}
+          disabled={percent >= MAX_UI_SCALE}
+          onClick={() => changeScale(percent + UI_SCALE_STEP)}
+        />
       </div>
+    </div>
   );
 };
-
 
 const PreferencesToggleSnapModeItem = () => {
   const { t } = useI18n();

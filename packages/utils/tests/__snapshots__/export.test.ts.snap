@@ -112,6 +112,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "suggestedBinding": null,
   "theme": "light",
   "toast": null,
+  "uiScale": 1,
   "viewBackgroundColor": "#ffffff",
   "viewModeEnabled": false,
   "zenModeEnabled": false,

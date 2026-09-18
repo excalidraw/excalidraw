@@ -65,7 +65,9 @@
 
   .color-picker-container {
     display: grid;
-    grid-template-columns: 1fr calc(20px * var(--ui-scale)) calc(1.625rem * var(--ui-scale));
+    grid-template-columns: 1fr calc(20px * var(--ui-scale)) calc(
+        1.625rem * var(--ui-scale)
+      );
     padding: calc(0.25rem * var(--ui-scale)) 0px;
     align-items: center;
 
