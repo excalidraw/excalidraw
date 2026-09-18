@@ -230,4 +230,13 @@ describe("Google Drive video embedding", () => {
       ),
     ).toBe(true);
   });
+
+  it("should validate Wordwall embeds by default", () => {
+    expect(
+      embeddableURLValidator(
+        "https://wordwall.net/ru/embed/8c75f257e076416f86d5dda0dfd57d67?themeId=45&templateId=72&fontStackId=0",
+        undefined,
+      ),
+    ).toBe(true);
+  });
 });
