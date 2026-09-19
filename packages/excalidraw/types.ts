@@ -1202,6 +1202,7 @@ export type AppClassProperties = {
   arrowText: App["arrowText"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
+  duplicate: App["duplicate"];
   toolDrag: App["toolDrag"];
   activeResizeHandle: App["activeResizeHandle"];
   isToolLocked: App["isToolLocked"];
