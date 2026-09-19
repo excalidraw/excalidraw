@@ -37,6 +37,11 @@ import {
   isBindableElementInsideOtherBindable,
   isPointInElement,
 } from "./collision";
+import {
+  canHaveConnectionHandles,
+  getFixedPointForSide,
+  getNearestConnectionHandle,
+} from "./connectionHandles";
 import { distanceToElement } from "./distance";
 import {
   headingForPointFromElement,
@@ -58,7 +63,11 @@ import {
 } from "./typeChecks";
 
 import { aabbForElement, elementCenterPoint } from "./bounds";
-import { BASE_PADDING, updateElbowArrowPoints } from "./elbowArrow";
+import {
+  BASE_PADDING,
+  getElbowArrowRouteMemo,
+  updateElbowArrowPoints,
+} from "./elbowArrow";
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
@@ -67,6 +76,7 @@ import {
 
 import { isNonDeletedElement } from ".";
 
+import type { ConnectionHandleSide } from "./connectionHandles";
 import type { Scene } from "./Scene";
 
 import type { ElementUpdate } from "./mutateElement";
@@ -94,18 +104,27 @@ export type BindingStrategy =
       mode: BindMode;
       element: NonDeleted<ExcalidrawBindableElement>;
       focusPoint: GlobalPoint;
+      /**
+       * Side of the target to anchor an elbow arrow to, when the target is
+       * big enough to carry connection handles. Set while an endpoint is
+       * being dragged, so releasing anywhere over a shape lands on the same
+       * four anchors the handles offer.
+       */
+      snapToSide?: ConnectionHandleSide;
     }
   // Break the binding
   | {
       mode: null;
       element?: undefined;
       focusPoint?: undefined;
+      snapToSide?: undefined;
     }
   // Keep the existing binding
   | {
       mode: undefined;
       element?: undefined;
       focusPoint?: undefined;
+      snapToSide?: undefined;
     };
 
 /**
@@ -241,7 +260,7 @@ export const bindOrUnbindBindingElement = (
 
 const bindOrUnbindBindingElementEdge = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
-  { mode, element, focusPoint }: BindingStrategy,
+  { mode, element, focusPoint, snapToSide }: BindingStrategy,
   startOrEnd: "start" | "end",
   scene: Scene,
   shouldSnapToOutline = true,
@@ -260,6 +279,7 @@ const bindOrUnbindBindingElementEdge = (
       focusPoint,
       shouldSnapToOutline,
       isMidpointSnappingEnabled,
+      snapToSide,
     );
   }
 };
@@ -270,6 +290,13 @@ const bindingStrategyForElbowArrowEndpointDragging = (
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom?: AppState["zoom"],
+  /**
+   * Whether the arrow is being drawn for the first time. Drawing one is a
+   * deliberate choice of where it leaves and meets a shape, so it keeps the
+   * exact point; re-dropping an end onto a target is the magnetic case that
+   * snaps to a side.
+   */
+  isNewArrow = false,
 ): {
   start: BindingStrategy;
   end: BindingStrategy;
@@ -305,6 +332,13 @@ const bindingStrategyForElbowArrowEndpointDragging = (
           pointIdx,
           elementsMap,
         ),
+        // Zoom 1 on purpose: whether a shape offers handles then depends on
+        // the shape alone, so two collaborators at different zoom levels
+        // still agree on where the arrow attached.
+        snapToSide:
+          !isNewArrow && canHaveConnectionHandles(hit, 1)
+            ? getNearestConnectionHandle(globalPoint, hit, elementsMap, 1).side
+            : undefined,
       }
     : {
         mode: null,
@@ -703,6 +737,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       elementsMap,
       elements,
       opts?.zoom,
+      opts?.newArrow,
     );
   }
 
@@ -1009,6 +1044,8 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
       draggingPoints,
       elementsMap,
       elements,
+      undefined,
+      opts?.newArrow,
     );
   }
 
@@ -1135,6 +1172,7 @@ export const bindBindingElement = (
   focusPoint?: GlobalPoint,
   shouldSnapToOutline = true,
   isMidpointSnappingEnabled = true,
+  snapToSide?: ConnectionHandleSide,
 ): void => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -1144,14 +1182,16 @@ export const bindBindingElement = (
     binding = {
       elementId: hoveredElement.id,
       mode: "orbit",
-      ...calculateFixedPointForElbowArrowBinding(
-        arrow,
-        hoveredElement,
-        startOrEnd,
-        elementsMap,
-        shouldSnapToOutline,
-        isMidpointSnappingEnabled,
-      ),
+      ...(snapToSide
+        ? { fixedPoint: normalizeFixedPoint(getFixedPointForSide(snapToSide)) }
+        : calculateFixedPointForElbowArrowBinding(
+            arrow,
+            hoveredElement,
+            startOrEnd,
+            elementsMap,
+            shouldSnapToOutline,
+            isMidpointSnappingEnabled,
+          )),
     };
   } else {
     binding = {
@@ -1316,49 +1356,94 @@ export const updateBoundElements = (
 };
 
 /**
- * Re-routes elbow arrows that merely PASS NEAR `changedElement` without being
- * bound to it.
+ * Re-routes elbow arrows that merely PASS NEAR one of `changedElements`
+ * without being bound to it.
  *
  * An elbow arrow recomputes its route when one of its OWN bound shapes moves,
- * which `boundElementsVisitor` above takes care of. A third shape dragged onto
- * the arrow is bound to nothing, so without this nothing would ever ask the
- * arrow to route around it and the line would simply be left crossing the
- * shape.
+ * which `boundElementsVisitor` takes care of. A third shape dragged onto the
+ * arrow is bound to nothing, so without this nothing would ever ask the arrow
+ * to route around it and the line would simply be left crossing the shape.
  *
- * `mutateElement` with no updates is the renormalization case, which re-runs
- * routing (and therefore obstacle avoidance) for the arrow.
+ * Both directions of the change matter, and they need different tests:
+ *
+ * - a shape moving INTO the way is caught by its new bounds landing in the
+ *   region the arrow's router last searched;
+ * - a shape moving OUT of the way (or being deleted, or shrinking) is caught
+ *   by it appearing among the obstacles that route was built from — the
+ *   arrow's current bounds say nothing useful, since they still describe the
+ *   detour around where the shape used to be.
+ *
+ * Arrows never routed in this session have no memo, so they fall back to
+ * their own bounds. That is what keeps a file full of saved arrows quiet on
+ * load: an arrow is only re-routed once something it touches changes.
  */
-const rerouteElbowArrowsPassing = (
-  changedElement: NonDeletedExcalidrawElement,
+export const rerouteElbowArrowsPassing = (
+  changedElements:
+    | NonDeletedExcalidrawElement
+    | readonly NonDeletedExcalidrawElement[],
   scene: Scene,
 ) => {
+  const changed = Array.isArray(changedElements)
+    ? (changedElements as readonly NonDeletedExcalidrawElement[])
+    : [changedElements as NonDeletedExcalidrawElement];
+
+  if (changed.length === 0) {
+    return;
+  }
+
   const elementsMap = scene.getNonDeletedElementsMap();
-  const [cx1, cy1, cx2, cy2] = aabbForElement(changedElement, elementsMap);
+  const changedIds = new Set(changed.map((element) => element.id));
+  const changedBounds = changed.map((element) =>
+    aabbForElement(element, elementsMap),
+  );
 
   for (const element of scene.getNonDeletedElements()) {
     if (!isElbowArrow(element) || element.isDeleted) {
       continue;
     }
 
-    // arrows bound to it were already handled above
+    // arrows bound to one of them were already handled by `updateBoundElements`
     if (
-      element.startBinding?.elementId === changedElement.id ||
-      element.endBinding?.elementId === changedElement.id
+      (element.startBinding &&
+        changedIds.has(element.startBinding.elementId)) ||
+      (element.endBinding && changedIds.has(element.endBinding.elementId))
     ) {
       continue;
     }
 
-    // A route may bulge outside the arrow's current bounds to get around
-    // something, so compare against a region padded by the same margin the
-    // router is allowed to detour by.
-    const [ax1, ay1, ax2, ay2] = aabbForElement(element, elementsMap);
+    const memo = getElbowArrowRouteMemo(element.id);
 
-    if (
-      cx2 < ax1 - BASE_PADDING ||
-      cx1 > ax2 + BASE_PADDING ||
-      cy2 < ay1 - BASE_PADDING ||
-      cy1 > ay2 + BASE_PADDING
-    ) {
+    // something the last route went around has changed — it may have shrunk,
+    // moved off or been deleted, and the arrow is still bending around where
+    // it used to be
+    let affected = memo?.obstacleIds.some((id) => changedIds.has(id)) ?? false;
+
+    if (!affected) {
+      // A route may bulge outside the arrow's own bounds to get around
+      // something, so an arrow with no memo falls back to a region padded by
+      // the margin the router is allowed to detour by.
+      let region = memo?.searchBounds;
+
+      if (!region) {
+        const [ax1, ay1, ax2, ay2] = aabbForElement(element, elementsMap);
+        region = [
+          ax1 - BASE_PADDING,
+          ay1 - BASE_PADDING,
+          ax2 + BASE_PADDING,
+          ay2 + BASE_PADDING,
+        ];
+      }
+
+      affected = changedBounds.some(
+        (bounds) =>
+          bounds[2] >= region![0] &&
+          bounds[0] <= region![2] &&
+          bounds[3] >= region![1] &&
+          bounds[1] <= region![3],
+      );
+    }
+
+    if (!affected) {
       continue;
     }
 

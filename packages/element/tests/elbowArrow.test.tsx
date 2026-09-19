@@ -294,13 +294,15 @@ describe("elbow arrow ui", () => {
     ) as HTMLInputElement;
     UI.updateInput(inputAngle, String("40"));
 
+    // the end now anchors to the rotated shape's nearest side handle, which
+    // sits a little further along its edge than the outline snap did
     expect(arrow.points.map((point) => point.map(Math.round))).toEqual([
       [0, 0],
-      [36, 0],
-      [36, 90],
-      [28, 90],
-      [28, 164],
-      [101, 164],
+      [42, 0],
+      [42, 90],
+      [34, 90],
+      [34, 168],
+      [112, 168],
     ]);
   });
 

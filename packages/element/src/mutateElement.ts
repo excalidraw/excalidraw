@@ -14,6 +14,8 @@ import { updateElbowArrowPoints } from "./elbowArrow";
 
 import { isElbowArrow } from "./typeChecks";
 
+import type { ElbowArrowSceneQuery } from "./elbowArrow";
+
 import type {
   ElementsMap,
   ExcalidrawElbowArrowElement,
@@ -45,6 +47,12 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     isDragging?: boolean;
     isBindingEnabled?: boolean;
     isMidpointSnappingEnabled?: boolean;
+    /**
+     * Lets elbow arrow routing look up the shapes it has to go around without
+     * walking the whole scene. Optional: without it routing falls back to
+     * scanning `elementsMap`.
+     */
+    scene?: ElbowArrowSceneQuery;
   },
 ) => {
   let didChange = false;

@@ -10,10 +10,12 @@ import { LinearElementEditor } from "@excalidraw/element";
 import { newElementWith } from "@excalidraw/element";
 import { getContainerElement } from "@excalidraw/element";
 import {
+  isBindableElement,
   isBoundToContainer,
   isElbowArrow,
   isFrameLikeElement,
 } from "@excalidraw/element";
+import { rerouteElbowArrowsPassing } from "@excalidraw/element";
 import { getFrameChildren } from "@excalidraw/element";
 
 import {
@@ -23,7 +25,10 @@ import {
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
@@ -275,12 +280,26 @@ export const actionDeleteSelected = register({
     let { elements: nextElements, appState: nextAppState } =
       deleteSelectedElements(elements, appState, app);
 
-    fixBindingsAfterDeletion(
-      nextElements,
-      nextElements.filter((el) => el.isDeleted),
-    );
+    const deleted = nextElements.filter((el) => el.isDeleted);
+
+    fixBindingsAfterDeletion(nextElements, deleted);
 
     nextAppState = handleGroupEditingState(nextAppState, nextElements);
+
+    // An elbow arrow that was going around one of these is still bending
+    // around empty space. Rerouting needs the deletions to be visible in the
+    // scene, so commit them first — the same elements are returned below, so
+    // the action's own update is a no-op replay of this.
+    if (deleted.some((element) => isBindableElement(element))) {
+      app.scene.replaceAllElements(nextElements);
+      rerouteElbowArrowsPassing(
+        deleted.filter((element) =>
+          isBindableElement(element),
+        ) as NonDeletedExcalidrawElement[],
+        app.scene,
+      );
+      nextElements = app.scene.getElementsIncludingDeleted().slice();
+    }
 
     return {
       elements: nextElements,

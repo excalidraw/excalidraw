@@ -272,6 +272,30 @@ export const hitElementBoundText = (
   return isPointInElement(point, boundTextElement, elementsMap);
 };
 
+/**
+ * Whether `p` falls inside the element's own box — the unrotated rectangle it
+ * was drawn in, with the point rotated back into element space so that a
+ * rotated shape keeps a box that matches what is on screen.
+ */
+const isPointInElementBox = (
+  element: NonDeleted<ExcalidrawBindableElement>,
+  p: GlobalPoint,
+  elementsMap: NonDeletedSceneElementsMap,
+): boolean => {
+  const [lx, ly] = pointRotateRads(
+    p,
+    elementCenterPoint(element, elementsMap),
+    -element.angle as Radians,
+  );
+
+  return (
+    lx >= element.x &&
+    lx <= element.x + element.width &&
+    ly >= element.y &&
+    ly <= element.y + element.height
+  );
+};
+
 const bindingBorderTest = (
   element: NonDeleted<ExcalidrawBindableElement>,
   [x, y]: Readonly<GlobalPoint>,
@@ -305,6 +329,20 @@ const bindingBorderTest = (
         return false;
       }
     }
+  }
+
+  // A diamond's or ellipse's outline is inset from the box it was drawn in,
+  // by up to half the diagonal at the corners — far more than any sensible
+  // binding tolerance. Releasing an arrow end there reads as "on the shape"
+  // even though the outline is nowhere near, so the box counts as a hit too.
+  // The outline still decides everything that follows: which side the arrow
+  // attaches to, and where exactly it meets the shape.
+  if (
+    shouldTestInside &&
+    (element.type === "diamond" || element.type === "ellipse") &&
+    isPointInElementBox(element, p, elementsMap)
+  ) {
+    return true;
   }
 
   // Do the intersection test against the element since it's close enough

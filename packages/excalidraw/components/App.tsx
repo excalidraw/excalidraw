@@ -120,6 +120,7 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
   updateBoundElements,
+  rerouteElbowArrowsPassing,
   LinearElementEditor,
   newElementWith,
   newFrameElement,
@@ -7824,6 +7825,18 @@ class App extends React.Component<AppProps, AppState> {
         : null;
       this.scene.insertElementsAtIndex(chunk, insertionIndex);
     }
+
+    // pasted, duplicated and library elements arrive fully sized, so any
+    // elbow arrow they landed on top of has to find its way around them.
+    // A shape drawn by hand is inserted zero-sized and is handled on pointer
+    // up instead, once it has a size worth routing around.
+    rerouteElbowArrowsPassing(
+      elements.filter(
+        (element) =>
+          isBindableElement(element) && element.width > 0 && element.height > 0,
+      ) as NonDeletedExcalidrawElement[],
+      this.scene,
+    );
   };
 
   public insertNewElement = (element: ExcalidrawElement) => {
@@ -12200,6 +12213,12 @@ class App extends React.Component<AppProps, AppState> {
             isDragging: false,
           },
         );
+        // A shape is inserted at pointer down, when it is still zero-sized,
+        // so this is the first moment an elbow arrow could know whether it
+        // now has to go around it.
+        if (isBindableElement(newElement)) {
+          rerouteElbowArrowsPassing(newElement, this.scene);
+        }
         // the above does not guarantee the scene to be rendered again, hence the trigger below
         this.scene.triggerUpdate();
       }

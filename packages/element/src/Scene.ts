@@ -9,7 +9,7 @@ import {
   toArray,
 } from "@excalidraw/common";
 import { isNonDeletedElement } from "@excalidraw/element";
-import { isFrameLikeElement } from "@excalidraw/element";
+import { isElbowArrow, isFrameLikeElement } from "@excalidraw/element";
 import { getElementsInGroup } from "@excalidraw/element";
 
 import {
@@ -21,6 +21,8 @@ import {
 import { getSelectedElements } from "@excalidraw/element";
 
 import { mutateElement, type ElementUpdate } from "@excalidraw/element";
+
+import type { Bounds } from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -39,6 +41,8 @@ import type {
   Mutable,
   SameType,
 } from "@excalidraw/common/utility-types";
+
+import { BindableElementIndex } from "./obstacleIndex";
 
 import type { AppState } from "../../excalidraw/types";
 
@@ -140,6 +144,19 @@ export class Scene {
    */
   private sceneNonce: number | undefined;
 
+  /**
+   * Bumped by every path that can change an element's geometry, including the
+   * ones that deliberately skip {@link triggerUpdate}. Used to decide when the
+   * cached {@link BindableElementIndex} has to be rebuilt — a stale index
+   * would route elbow arrows around shapes that have already moved.
+   */
+  private elementsGeneration = 0;
+
+  private bindableIndexCache: {
+    generation: number;
+    index: BindableElementIndex;
+  } | null = null;
+
   getSceneNonce() {
     return this.sceneNonce;
   }
@@ -147,6 +164,30 @@ export class Scene {
   getNonDeletedElementsMap() {
     return this.nonDeletedElementsMap;
   }
+
+  /**
+   * Bindable elements whose bounds overlap `bounds`, in scene order.
+   *
+   * Backed by a bucketed index that is rebuilt only when something actually
+   * moved, so a drag that re-routes many elbow arrows pays for one rebuild
+   * instead of one full scan per arrow.
+   */
+  getBindableElementsInBounds = (bounds: Bounds) => {
+    if (
+      !this.bindableIndexCache ||
+      this.bindableIndexCache.generation !== this.elementsGeneration
+    ) {
+      this.bindableIndexCache = {
+        generation: this.elementsGeneration,
+        index: new BindableElementIndex(
+          this.nonDeletedElements,
+          this.nonDeletedElementsMap,
+        ),
+      };
+    }
+
+    return this.bindableIndexCache.index.query(bounds);
+  };
 
   getElementsIncludingDeleted() {
     return this.elements;
@@ -296,6 +337,7 @@ export class Scene {
 
     this.frames = nextFrameLikes;
     this.nonDeletedFramesLikes = getNonDeletedElements(this.frames).elements;
+    this.elementsGeneration++;
 
     this.triggerUpdate();
   }
@@ -428,8 +470,16 @@ export class Scene {
       element,
       elementsMap,
       updates,
-      options,
+      // routing needs to see the rest of the scene, and only an elbow arrow
+      // ever reads it — so the extra object is only built for those
+      isElbowArrow(element) ? { ...options, scene: this } : options,
     );
+
+    // even a mutation that deliberately skips `triggerUpdate` can have moved
+    // the element, which invalidates the bindable element index
+    if (prevVersion !== nextVersion) {
+      this.elementsGeneration++;
+    }
 
     if (
       // skip if the element is not in the scene (i.e. selection)

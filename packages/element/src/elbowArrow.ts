@@ -47,7 +47,7 @@ import {
   headingForPoint,
 } from "./heading";
 import { type ElementUpdate } from "./mutateElement";
-import { isBindableElement } from "./typeChecks";
+import { isBindableElement, isFrameLikeElement } from "./typeChecks";
 import {
   type ExcalidrawElbowArrowElement,
   type NonDeletedSceneElementsMap,
@@ -98,6 +98,10 @@ type ElbowArrowData = {
   dynamicAABBs: Bounds[];
   /** other shapes the route must go around; see `collectRouteObstacles` */
   obstacles?: Bounds[];
+  /** ids behind `obstacles`, recorded so a later change to one can re-route */
+  obstacleIds?: string[];
+  /** the region `obstacles` were collected from; see `rememberRoute` */
+  searchBounds?: Bounds;
   /** the bound shapes themselves, which a clipped corridor box must still
    * contain so its dongle stays clear of them */
   startElementBounds?: Bounds | null;
@@ -113,6 +117,58 @@ type ElbowArrowData = {
   hoveredEndElement: ExcalidrawBindableElement | null;
 };
 
+/**
+ * How a scene answers "what is near this region?".
+ *
+ * Structural rather than a `Scene` import so that routing stays usable
+ * without one (restore, tests, elements mutated outside a scene).
+ */
+export type ElbowArrowSceneQuery = {
+  getBindableElementsInBounds: (bounds: Bounds) => readonly {
+    element: ExcalidrawBindableElement;
+    bounds: Bounds;
+  }[];
+};
+
+/**
+ * What the last route for an arrow was computed against.
+ *
+ * Re-routing has to catch both directions of change: a shape moving INTO an
+ * arrow's way (the region the router searched now contains it) and a shape
+ * moving OUT of it (it was an obstacle last time, so the arrow is still
+ * detouring around where it used to be). The first needs the region, the
+ * second needs the ids — neither is recoverable from the arrow's points.
+ *
+ * Purely a hint for deciding WHEN to re-route. The route itself stays a pure
+ * function of the arrow and the scene, so collaborators who re-route at
+ * different moments still compute identical paths.
+ */
+export type ElbowArrowRouteMemo = {
+  searchBounds: Bounds;
+  obstacleIds: readonly string[];
+};
+
+/**
+ * Bounded so a long session can't accumulate memos for arrows that are long
+ * gone. Dropping them only costs a missed re-route, which the next change to
+ * the arrow fixes.
+ */
+const MAX_ROUTE_MEMOS = 10_000;
+
+const routeMemos = new Map<string, ElbowArrowRouteMemo>();
+
+export const getElbowArrowRouteMemo = (
+  arrowId: string,
+): ElbowArrowRouteMemo | undefined => routeMemos.get(arrowId);
+
+const rememberRoute = (arrowId: string, memo: ElbowArrowRouteMemo) => {
+  if (routeMemos.size >= MAX_ROUTE_MEMOS && !routeMemos.has(arrowId)) {
+    routeMemos.clear();
+  }
+
+  routeMemos.set(arrowId, memo);
+};
+
 const DEDUP_TRESHOLD = 1;
 export const BASE_PADDING = 40;
 
@@ -121,16 +177,28 @@ export const BASE_PADDING = 40;
  * units. Smaller than {@link BASE_PADDING}, which is the room an arrow needs
  * to leave its OWN endpoints — a shape merely in the way needs only enough
  * clearance to read as "goes around" rather than "touches".
+ *
+ * Doubles as the "don't hug the edge" margin: the grid lines a detour can run
+ * along are the PADDED edges, so a route never comes closer than this to the
+ * shape it passes.
  */
-const OBSTACLE_PADDING = 12;
+const OBSTACLE_PADDING = 16;
 
 /**
- * How many obstacles a single route will consider. The grid A* runs on gains
- * two rows and two columns per obstacle, so its node count grows quadratically
- * — this cap keeps routing bounded on a crowded board. The nearest shapes win,
- * since those are the ones a route would actually cross.
+ * How many obstacle boxes a single route will consider, after overlapping
+ * ones have been merged. The grid A* runs on gains two rows and two columns
+ * per box, so its node count grows quadratically — this cap keeps routing
+ * bounded on a crowded board. The nearest boxes win, since those are the ones
+ * a route would actually cross.
  */
-const MAX_ROUTE_OBSTACLES = 10;
+const MAX_ROUTE_OBSTACLES = 24;
+
+/**
+ * Smallest shape, in scene units, that can push a route around. Below this a
+ * shape has no meaningful interior — including the zero-sized placeholder a
+ * shape starts life as while it is being drawn.
+ */
+const MIN_OBSTACLE_SIZE = 1;
 
 /**
  * The shapes a route should go around, as padded bounding boxes.
@@ -214,28 +282,110 @@ const clipAABBAgainstObstacles = (
   return next;
 };
 
+/**
+ * Merges obstacle boxes that overlap into their union, repeatedly, until none
+ * overlap any more.
+ *
+ * Two shapes sitting shoulder to shoulder offer no usable corridor between
+ * them, so keeping them apart only buys the grid four extra lines to search.
+ * Merging also bounds the grid on a dense board without silently dropping a
+ * shape the way a hard "nearest N elements" cap would.
+ */
+const mergeOverlappingObstacles = (boxes: Bounds[]): Bounds[] => {
+  const merged: Bounds[] = [];
+
+  for (const box of boxes) {
+    let next: Bounds = box;
+    let didMerge = true;
+
+    while (didMerge) {
+      didMerge = false;
+
+      for (let i = merged.length - 1; i >= 0; i--) {
+        const other = merged[i];
+
+        if (
+          next[0] <= other[2] &&
+          next[2] >= other[0] &&
+          next[1] <= other[3] &&
+          next[3] >= other[1]
+        ) {
+          next = [
+            Math.min(next[0], other[0]),
+            Math.min(next[1], other[1]),
+            Math.max(next[2], other[2]),
+            Math.max(next[3], other[3]),
+          ];
+          merged.splice(i, 1);
+          didMerge = true;
+        }
+      }
+    }
+
+    merged.push(next);
+  }
+
+  return merged;
+};
+
+/**
+ * The shapes a route should go around, as padded bounding boxes.
+ *
+ * Only bindable shapes count — the same set connection handles offer — so
+ * arrows, lines, freedraw ink and labels never push a route around. Frames
+ * are skipped too: a frame is a region an arrow travels THROUGH, and treating
+ * one as solid would send every crossing arrow the long way around it. The
+ * arrow's own bound shapes are excluded as well; those are handled by
+ * `dynamicAABBs`, which deliberately lets the route touch them, since that is
+ * where it starts and ends.
+ *
+ * `sceneQuery` narrows the scan to the region the route can reach. Without it
+ * (elements mutated outside a scene, e.g. on restore) every element is
+ * considered, which is correct but linear in board size.
+ */
 const collectRouteObstacles = (
   elementsMap: NonDeletedSceneElementsMap,
   searchBounds: Bounds,
   excludedIds: (string | null | undefined)[],
-): Bounds[] => {
+  sceneQuery?: ElbowArrowSceneQuery,
+): { boxes: Bounds[]; elementIds: string[] } => {
   const excluded = new Set(excludedIds.filter((id): id is string => !!id));
   const [sx1, sy1, sx2, sy2] = searchBounds;
   const centerX = (sx1 + sx2) / 2;
   const centerY = (sy1 + sy2) / 2;
 
-  const candidates: { bounds: Bounds; distanceSq: number }[] = [];
+  const candidates: {
+    bounds: Bounds;
+    distanceSq: number;
+    id: string;
+  }[] = [];
 
-  for (const element of elementsMap.values()) {
+  const consider = (
+    element: Ordered<NonDeletedExcalidrawElement>,
+    elementBounds?: Bounds,
+  ) => {
     if (
       element.isDeleted ||
       excluded.has(element.id) ||
-      !isBindableElement(element, false)
+      // a frame is a container, not a wall
+      isFrameLikeElement(element) ||
+      // `true` keeps locked shapes: locking hides a shape from editing, not
+      // from the canvas, and a route through one still reads as a mistake
+      !isBindableElement(element, true) ||
+      // fully transparent shapes are not on the board as far as the eye is
+      // concerned, so routing around them would look arbitrary
+      element.opacity === 0 ||
+      // A shape is inserted zero-sized and grows under the pointer while it
+      // is drawn. Padding that into an obstacle would push arrows around a
+      // shape that isn't there yet.
+      element.width < MIN_OBSTACLE_SIZE ||
+      element.height < MIN_OBSTACLE_SIZE
     ) {
-      continue;
+      return;
     }
 
-    const [x1, y1, x2, y2] = aabbForElement(element, elementsMap);
+    const [x1, y1, x2, y2] =
+      elementBounds ?? aabbForElement(element, elementsMap);
 
     const bounds: Bounds = [
       x1 - OBSTACLE_PADDING,
@@ -251,19 +401,42 @@ const collectRouteObstacles = (
       bounds[3] < sy1 ||
       bounds[1] > sy2
     ) {
-      continue;
+      return;
     }
 
     const dx = (bounds[0] + bounds[2]) / 2 - centerX;
     const dy = (bounds[1] + bounds[3]) / 2 - centerY;
 
-    candidates.push({ bounds, distanceSq: dx * dx + dy * dy });
+    candidates.push({ bounds, distanceSq: dx * dx + dy * dy, id: element.id });
+  };
+
+  if (sceneQuery) {
+    for (const entry of sceneQuery.getBindableElementsInBounds(searchBounds)) {
+      consider(
+        entry.element as Ordered<NonDeletedExcalidrawElement>,
+        entry.bounds,
+      );
+    }
+  } else {
+    for (const element of elementsMap.values()) {
+      consider(element);
+    }
   }
 
-  return candidates
-    .sort((a, b) => a.distanceSq - b.distanceSq)
-    .slice(0, MAX_ROUTE_OBSTACLES)
-    .map((candidate) => candidate.bounds);
+  // Nearest first, ties broken by element id so that every collaborator
+  // reduces the same set to the same boxes.
+  candidates.sort(
+    (a, b) => a.distanceSq - b.distanceSq || (a.id < b.id ? -1 : 1),
+  );
+
+  const boxes = mergeOverlappingObstacles(
+    candidates.map((candidate) => candidate.bounds),
+  ).slice(0, MAX_ROUTE_OBSTACLES);
+
+  return {
+    boxes,
+    elementIds: candidates.map((candidate) => candidate.id),
+  };
 };
 
 const handleSegmentRenormalization = (
@@ -1073,6 +1246,7 @@ export const updateElbowArrowPoints = (
     isDragging?: boolean;
     isBindingEnabled?: boolean;
     isMidpointSnappingEnabled?: boolean;
+    scene?: ElbowArrowSceneQuery;
   },
 ): ElementUpdate<ExcalidrawElbowArrowElement> => {
   if (arrow.points.length < 2) {
@@ -1209,6 +1383,13 @@ export const updateElbowArrowPoints = (
     updatedPoints,
     options,
   );
+
+  if (rest.searchBounds) {
+    rememberRoute(arrow.id, {
+      searchBounds: rest.searchBounds,
+      obstacleIds: rest.obstacleIds ?? [],
+    });
+  }
 
   // 0. During all element replacement in the scene, we just need to renormalize
   // the arrow
@@ -1362,6 +1543,7 @@ const getElbowArrowData = (
     zoom?: AppState["zoom"];
     isBindingEnabled?: boolean;
     isMidpointSnappingEnabled?: boolean;
+    scene?: ElbowArrowSceneQuery;
   },
 ) => {
   const origStartGlobalPoint: GlobalPoint = pointTranslate<
@@ -1576,16 +1758,23 @@ const getElbowArrowData = (
     commonBounds[3] + BASE_PADDING,
   ];
 
-  const obstacles = collectRouteObstacles(elementsMap, searchBounds, [
-    hoveredStartElement?.id,
-    hoveredEndElement?.id,
-    arrow.startBinding?.elementId,
-    arrow.endBinding?.elementId,
-  ]);
+  const { boxes: obstacles, elementIds: obstacleIds } = collectRouteObstacles(
+    elementsMap,
+    searchBounds,
+    [
+      hoveredStartElement?.id,
+      hoveredEndElement?.id,
+      arrow.startBinding?.elementId,
+      arrow.endBinding?.elementId,
+    ],
+    options?.scene,
+  );
 
   return {
     dynamicAABBs,
     obstacles,
+    obstacleIds,
+    searchBounds,
     startDonglePosition,
     startGlobalPoint,
     startHeading,
