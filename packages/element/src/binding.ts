@@ -58,7 +58,7 @@ import {
 } from "./typeChecks";
 
 import { aabbForElement, elementCenterPoint } from "./bounds";
-import { updateElbowArrowPoints } from "./elbowArrow";
+import { BASE_PADDING, updateElbowArrowPoints } from "./elbowArrow";
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
@@ -1311,6 +1311,62 @@ export const updateBoundElements = (
   };
 
   boundElementsVisitor(elementsMap, changedElement, visitor);
+
+  rerouteElbowArrowsPassing(changedElement, scene);
+};
+
+/**
+ * Re-routes elbow arrows that merely PASS NEAR `changedElement` without being
+ * bound to it.
+ *
+ * An elbow arrow recomputes its route when one of its OWN bound shapes moves,
+ * which `boundElementsVisitor` above takes care of. A third shape dragged onto
+ * the arrow is bound to nothing, so without this nothing would ever ask the
+ * arrow to route around it and the line would simply be left crossing the
+ * shape.
+ *
+ * `mutateElement` with no updates is the renormalization case, which re-runs
+ * routing (and therefore obstacle avoidance) for the arrow.
+ */
+const rerouteElbowArrowsPassing = (
+  changedElement: NonDeletedExcalidrawElement,
+  scene: Scene,
+) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const [cx1, cy1, cx2, cy2] = aabbForElement(changedElement, elementsMap);
+
+  for (const element of scene.getNonDeletedElements()) {
+    if (!isElbowArrow(element) || element.isDeleted) {
+      continue;
+    }
+
+    // arrows bound to it were already handled above
+    if (
+      element.startBinding?.elementId === changedElement.id ||
+      element.endBinding?.elementId === changedElement.id
+    ) {
+      continue;
+    }
+
+    // A route may bulge outside the arrow's current bounds to get around
+    // something, so compare against a region padded by the same margin the
+    // router is allowed to detour by.
+    const [ax1, ay1, ax2, ay2] = aabbForElement(element, elementsMap);
+
+    if (
+      cx2 < ax1 - BASE_PADDING ||
+      cx1 > ax2 + BASE_PADDING ||
+      cy2 < ay1 - BASE_PADDING ||
+      cy1 > ay2 + BASE_PADDING
+    ) {
+      continue;
+    }
+
+    // Passing the points explicitly forces the full routing path. Mutating
+    // with no updates would instead take the renormalization branch, which
+    // only tidies fixed segments and leaves a plain two-point arrow alone.
+    scene.mutateElement(element, { points: element.points });
+  }
 };
 
 const updateArrowBindings = (

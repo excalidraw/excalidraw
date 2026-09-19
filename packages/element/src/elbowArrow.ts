@@ -96,6 +96,12 @@ type ElbowArrowState = {
 
 type ElbowArrowData = {
   dynamicAABBs: Bounds[];
+  /** other shapes the route must go around; see `collectRouteObstacles` */
+  obstacles?: Bounds[];
+  /** the bound shapes themselves, which a clipped corridor box must still
+   * contain so its dongle stays clear of them */
+  startElementBounds?: Bounds | null;
+  endElementBounds?: Bounds | null;
   startDonglePosition: GlobalPoint | null;
   startGlobalPoint: GlobalPoint;
   startHeading: Heading;
@@ -109,6 +115,156 @@ type ElbowArrowData = {
 
 const DEDUP_TRESHOLD = 1;
 export const BASE_PADDING = 40;
+
+/**
+ * Gap kept between a routed arrow and a shape it detours around, in scene
+ * units. Smaller than {@link BASE_PADDING}, which is the room an arrow needs
+ * to leave its OWN endpoints — a shape merely in the way needs only enough
+ * clearance to read as "goes around" rather than "touches".
+ */
+const OBSTACLE_PADDING = 12;
+
+/**
+ * How many obstacles a single route will consider. The grid A* runs on gains
+ * two rows and two columns per obstacle, so its node count grows quadratically
+ * — this cap keeps routing bounded on a crowded board. The nearest shapes win,
+ * since those are the ones a route would actually cross.
+ */
+const MAX_ROUTE_OBSTACLES = 10;
+
+/**
+ * The shapes a route should go around, as padded bounding boxes.
+ *
+ * Only bindable shapes count — the same set connection handles offer — so
+ * arrows, lines, freedraw ink and labels never push a route around. The
+ * arrow's own bound shapes are excluded: those are handled by `dynamicAABBs`,
+ * which deliberately lets the route touch them, since that is where it starts
+ * and ends.
+ */
+/**
+ * Pulls one edge of `box` back so it no longer overlaps `obstacles`.
+ *
+ * The two dynamic AABBs tile the whole corridor between an arrow's endpoints
+ * and meet in the middle, which puts both dongles on that shared edge — at the
+ * SAME point when the endpoints face each other. A* then has nothing to search
+ * and the arrow runs dead straight, through whatever happens to be in the way.
+ *
+ * Clipping the boxes back off an obstacle separates the dongles again and
+ * leaves the obstacle outside both boxes, so the router has to find a way
+ * around it. The smallest clip that still contains `mustContain` — the box's
+ * own element, which the dongle has to stay clear of — wins; when no clip can
+ * do that, the box is left alone and routing falls back to a straight run.
+ */
+const clipAABBAgainstObstacles = (
+  box: Bounds,
+  mustContain: Bounds | null | undefined,
+  obstacles: Bounds[],
+): Bounds => {
+  let next: Bounds = [box[0], box[1], box[2], box[3]];
+
+  for (const [ox1, oy1, ox2, oy2] of obstacles) {
+    const [x1, y1, x2, y2] = next;
+
+    // no overlap, nothing to clip
+    if (ox2 <= x1 || ox1 >= x2 || oy2 <= y1 || oy1 >= y2) {
+      continue;
+    }
+
+    const keep = mustContain;
+    const candidates: { box: Bounds; removed: number }[] = [];
+
+    if (!keep || ox1 >= keep[2]) {
+      candidates.push({
+        box: [x1, y1, Math.min(x2, ox1), y2],
+        removed: x2 - ox1,
+      });
+    }
+    if (!keep || ox2 <= keep[0]) {
+      candidates.push({
+        box: [Math.max(x1, ox2), y1, x2, y2],
+        removed: ox2 - x1,
+      });
+    }
+    if (!keep || oy1 >= keep[3]) {
+      candidates.push({
+        box: [x1, y1, x2, Math.min(y2, oy1)],
+        removed: y2 - oy1,
+      });
+    }
+    if (!keep || oy2 <= keep[1]) {
+      candidates.push({
+        box: [x1, Math.max(y1, oy2), x2, y2],
+        removed: oy2 - y1,
+      });
+    }
+
+    const best = candidates
+      .filter(
+        (candidate) =>
+          candidate.box[2] - candidate.box[0] > 1 &&
+          candidate.box[3] - candidate.box[1] > 1,
+      )
+      .sort((a, b) => a.removed - b.removed)[0];
+
+    if (best) {
+      next = best.box;
+    }
+  }
+
+  return next;
+};
+
+const collectRouteObstacles = (
+  elementsMap: NonDeletedSceneElementsMap,
+  searchBounds: Bounds,
+  excludedIds: (string | null | undefined)[],
+): Bounds[] => {
+  const excluded = new Set(excludedIds.filter((id): id is string => !!id));
+  const [sx1, sy1, sx2, sy2] = searchBounds;
+  const centerX = (sx1 + sx2) / 2;
+  const centerY = (sy1 + sy2) / 2;
+
+  const candidates: { bounds: Bounds; distanceSq: number }[] = [];
+
+  for (const element of elementsMap.values()) {
+    if (
+      element.isDeleted ||
+      excluded.has(element.id) ||
+      !isBindableElement(element, false)
+    ) {
+      continue;
+    }
+
+    const [x1, y1, x2, y2] = aabbForElement(element, elementsMap);
+
+    const bounds: Bounds = [
+      x1 - OBSTACLE_PADDING,
+      y1 - OBSTACLE_PADDING,
+      x2 + OBSTACLE_PADDING,
+      y2 + OBSTACLE_PADDING,
+    ];
+
+    // only what lies in the region the route can actually use
+    if (
+      bounds[2] < sx1 ||
+      bounds[0] > sx2 ||
+      bounds[3] < sy1 ||
+      bounds[1] > sy2
+    ) {
+      continue;
+    }
+
+    const dx = (bounds[0] + bounds[2]) / 2 - centerX;
+    const dy = (bounds[1] + bounds[3]) / 2 - centerY;
+
+    candidates.push({ bounds, distanceSq: dx * dx + dy * dy });
+  }
+
+  return candidates
+    .sort((a, b) => a.distanceSq - b.distanceSq)
+    .slice(0, MAX_ROUTE_OBSTACLES)
+    .map((candidate) => candidate.bounds);
+};
 
 const handleSegmentRenormalization = (
   arrow: ExcalidrawElbowArrowElement,
@@ -1410,8 +1566,26 @@ const getElbowArrowData = (
     endGlobalPoint,
   );
 
+  // The route may bulge outside the two endpoints' common bounds to get past
+  // something, so obstacles are searched for in a region padded by the same
+  // margin the router is allowed to detour by.
+  const searchBounds: Bounds = [
+    commonBounds[0] - BASE_PADDING,
+    commonBounds[1] - BASE_PADDING,
+    commonBounds[2] + BASE_PADDING,
+    commonBounds[3] + BASE_PADDING,
+  ];
+
+  const obstacles = collectRouteObstacles(elementsMap, searchBounds, [
+    hoveredStartElement?.id,
+    hoveredEndElement?.id,
+    arrow.startBinding?.elementId,
+    arrow.endBinding?.elementId,
+  ]);
+
   return {
     dynamicAABBs,
+    obstacles,
     startDonglePosition,
     startGlobalPoint,
     startHeading,
@@ -1442,6 +1616,7 @@ const routeElbowArrow = (
 ): GlobalPoint[] | null => {
   const {
     dynamicAABBs,
+    obstacles = [],
     startDonglePosition,
     startGlobalPoint,
     startHeading,
@@ -1450,49 +1625,96 @@ const routeElbowArrow = (
     endHeading,
     commonBounds,
     hoveredEndElement,
+    startElementBounds,
+    endElementBounds,
   } = elbowArrowData;
 
-  // Canculate Grid positions
-  const grid = calculateGrid(
-    dynamicAABBs,
-    startDonglePosition ? startDonglePosition : startGlobalPoint,
-    startHeading,
-    endDonglePosition ? endDonglePosition : endGlobalPoint,
-    endHeading,
-    commonBounds,
-  );
+  /**
+   * One routing attempt. `extraObstacles` are shapes merely in the way; the
+   * arrow's own endpoints are always avoided via `dynamicAABBs`.
+   *
+   * Each attempt builds its own grid: the grid's lines are derived from the
+   * boxes being avoided, and its nodes carry mutable A* bookkeeping, so it
+   * can be neither shared nor reused between attempts.
+   */
+  const attempt = (extraObstacles: Bounds[]): GlobalPoint[] | null => {
+    // Clip the corridor boxes off the obstacles first: left as they are they
+    // meet in the middle and collapse both dongles onto one point, leaving A*
+    // nothing to search. See `clipAABBAgainstObstacles`.
+    const boxes = extraObstacles.length
+      ? ([
+          clipAABBAgainstObstacles(
+            dynamicAABBs[0],
+            startElementBounds,
+            extraObstacles,
+          ),
+          clipAABBAgainstObstacles(
+            dynamicAABBs[1],
+            endElementBounds,
+            extraObstacles,
+          ),
+        ] as Bounds[])
+      : dynamicAABBs;
 
-  const startDongle =
-    startDonglePosition && pointToGridNode(startDonglePosition, grid);
-  const endDongle =
-    endDonglePosition && pointToGridNode(endDonglePosition, grid);
+    const aabbs = [...boxes, ...extraObstacles];
 
-  // Do not allow stepping on the true end or true start points
-  const endNode = pointToGridNode(endGlobalPoint, grid);
-  if (endNode && hoveredEndElement) {
-    endNode.closed = true;
-  }
-  const startNode = pointToGridNode(startGlobalPoint, grid);
-  if (startNode && arrow.startBinding) {
-    startNode.closed = true;
-  }
-  const dongleOverlap =
-    startDongle &&
-    endDongle &&
-    (pointInsideBounds(startDongle.pos, dynamicAABBs[1]) ||
-      pointInsideBounds(endDongle.pos, dynamicAABBs[0]));
+    // the dongles ride the corridor boxes, so clipping moves them too
+    const startDongleAt =
+      startDonglePosition &&
+      getDonglePosition(boxes[0], startHeading, startGlobalPoint);
+    const endDongleAt =
+      endDonglePosition &&
+      getDonglePosition(boxes[1], endHeading, endGlobalPoint);
 
-  // Create path to end dongle from start dongle
-  const path = astar(
-    startDongle ? startDongle : startNode!,
-    endDongle ? endDongle : endNode!,
-    grid,
-    startHeading ? startHeading : HEADING_RIGHT,
-    endHeading ? endHeading : HEADING_RIGHT,
-    dongleOverlap ? [] : dynamicAABBs,
-  );
+    // Canculate Grid positions
+    const grid = calculateGrid(
+      aabbs,
+      startDongleAt ? startDongleAt : startGlobalPoint,
+      startHeading,
+      endDongleAt ? endDongleAt : endGlobalPoint,
+      endHeading,
+      commonBounds,
+    );
 
-  if (path) {
+    const startDongle = startDongleAt && pointToGridNode(startDongleAt, grid);
+    const endDongle = endDongleAt && pointToGridNode(endDongleAt, grid);
+
+    // Do not allow stepping on the true end or true start points
+    const endNode = pointToGridNode(endGlobalPoint, grid);
+    if (endNode && hoveredEndElement) {
+      endNode.closed = true;
+    }
+    const startNode = pointToGridNode(startGlobalPoint, grid);
+    if (startNode && arrow.startBinding) {
+      startNode.closed = true;
+    }
+    const dongleOverlap =
+      startDongle &&
+      endDongle &&
+      (pointInsideBounds(startDongle.pos, boxes[1]) ||
+        pointInsideBounds(endDongle.pos, boxes[0]));
+
+    if (!startDongle && !startNode) {
+      return null;
+    }
+    if (!endDongle && !endNode) {
+      return null;
+    }
+
+    // Create path to end dongle from start dongle
+    const path = astar(
+      startDongle ? startDongle : startNode!,
+      endDongle ? endDongle : endNode!,
+      grid,
+      startHeading ? startHeading : HEADING_RIGHT,
+      endHeading ? endHeading : HEADING_RIGHT,
+      dongleOverlap ? [] : aabbs,
+    );
+
+    if (!path) {
+      return null;
+    }
+
     const points = path.map((node) => [
       node.pos[0],
       node.pos[1],
@@ -1501,9 +1723,13 @@ const routeElbowArrow = (
     endDongle && points.push(endGlobalPoint);
 
     return points;
-  }
+  };
 
-  return null;
+  // Going around is a preference, not a guarantee: a shape can box the route
+  // in entirely (or sit right on an endpoint), and a drawn arrow beats no
+  // arrow. So a blocked route falls back to the old obstacle-free one rather
+  // than leaving the arrow unrouted.
+  return (obstacles.length ? attempt(obstacles) : null) ?? attempt([]);
 };
 
 const offsetFromHeading = (

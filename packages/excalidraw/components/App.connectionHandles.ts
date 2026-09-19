@@ -1,5 +1,3 @@
-import { ARROW_TYPE, ROUNDNESS } from "@excalidraw/common";
-
 import {
   bindBindingElementToFixedPoint,
   canHaveConnectionHandles,
@@ -242,7 +240,6 @@ export class AppConnectionHandles {
       return null;
     }
 
-    const zoom = this.app.state.zoom.value;
     const elementsMap = this.app.scene.getNonDeletedElementsMap();
     const element = elementsMap.get(shownId);
 
@@ -289,17 +286,17 @@ export class AppConnectionHandles {
       strokeStyle: state.currentItemStrokeStyle,
       roughness: state.currentItemRoughness,
       opacity: state.currentItemOpacity,
-      roundness:
-        state.currentItemArrowType === ARROW_TYPE.round
-          ? { type: ROUNDNESS.PROPORTIONAL_RADIUS }
-          : null,
+      // A connector is always elbow-routed, whatever arrow type was last used
+      // for hand-drawn arrows: going around a shape in the way is only
+      // possible along a right-angled path. A straight or curved arrow has no
+      // way around without ceasing to be one.
+      roundness: null,
       startArrowhead: state.currentItemStartArrowhead,
       endArrowhead: state.currentItemEndArrowhead,
       locked: false,
       frameId: this.app.getTopLayerFrameAtSceneCoords(origin)?.id ?? null,
-      elbowed: state.currentItemArrowType === ARROW_TYPE.elbow,
-      fixedSegments:
-        state.currentItemArrowType === ARROW_TYPE.elbow ? [] : null,
+      elbowed: true,
+      fixedSegments: [],
       points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
     }) as NonDeleted<ExcalidrawArrowElement>;
 

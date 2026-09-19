@@ -353,3 +353,145 @@ describe("connection handles — the arrow stays attached", () => {
     expect(resizedArrow.endBinding?.elementId).toBe(target.id);
   });
 });
+
+describe("connection handles — routing around shapes in the way", () => {
+  /** The arrow's points in scene coordinates. */
+  const globalPoints = (arrow: ExcalidrawArrowElement) =>
+    arrow.points.map(
+      (point) => [arrow.x + point[0], arrow.y + point[1]] as const,
+    );
+
+  /**
+   * Whether any segment of the path enters `bounds`. Elbow routes are
+   * axis-aligned, so sampling along each segment is exact enough to catch a
+   * crossing without reimplementing segment/AABB clipping.
+   */
+  const pathEnters = (
+    points: readonly (readonly [number, number])[],
+    bounds: readonly [number, number, number, number],
+  ) => {
+    const [x1, y1, x2, y2] = bounds;
+
+    for (let i = 0; i < points.length - 1; i++) {
+      const [ax, ay] = points[i];
+      const [bx, by] = points[i + 1];
+      const steps = 40;
+
+      for (let step = 0; step <= steps; step++) {
+        const t = step / steps;
+        const x = ax + (bx - ax) * t;
+        const y = ay + (by - ay) * t;
+
+        if (x > x1 && x < x2 && y > y1 && y < y2) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const connect = (
+    source: NonDeleted<ExcalidrawBindableElement>,
+    dropAt: readonly [number, number],
+  ) => {
+    const right = handlePoint(source, "right");
+    mouse.moveTo(right[0], right[1]);
+    mouse.downAt(right[0], right[1]);
+    mouse.moveTo(dropAt[0], dropAt[1]);
+    mouse.upAt(dropAt[0], dropAt[1]);
+
+    return h.elements.find(
+      (element) => element.type === "arrow" && !element.isDeleted,
+    ) as ExcalidrawArrowElement;
+  };
+
+  it("goes straight across when nothing is in the way", () => {
+    const source = createRect(0, 0);
+    const target = createRect(400, 0);
+    API.setElements([source, target]);
+    API.setSelectedElements([source]);
+
+    const arrow = connect(source, [410, 50]);
+
+    // the empty corridor between them is never left
+    expect(pathEnters(globalPoints(arrow), [150, 200, 350, 400])).toBe(false);
+  });
+
+  it("routes around a shape sitting between the two it connects", () => {
+    const source = createRect(0, 0);
+    const obstacle = createRect(200, 0);
+    const target = createRect(400, 0);
+    API.setElements([source, obstacle, target]);
+    API.setSelectedElements([source]);
+
+    const arrow = connect(source, [410, 50]);
+
+    expect(arrow.startBinding?.elementId).toBe(source.id);
+    expect(arrow.endBinding?.elementId).toBe(target.id);
+
+    // the whole point: the route must not pass through the obstacle
+    expect(pathEnters(globalPoints(arrow), [200, 0, 300, 100])).toBe(false);
+
+    // and it had to bend to get around, so it is no longer a 2-point line
+    expect(arrow.points.length).toBeGreaterThan(2);
+  });
+
+  it("re-routes when a shape is moved onto an existing connector", () => {
+    const source = createRect(0, 0);
+    const obstacle = createRect(200, 300);
+    const target = createRect(400, 0);
+    API.setElements([source, obstacle, target]);
+    API.setSelectedElements([source]);
+
+    const arrow = connect(source, [410, 50]);
+
+    // nothing in the way yet, so it runs straight across — through the region
+    // the obstacle is about to occupy
+    expect(pathEnters(globalPoints(arrow), [200, 0, 300, 100])).toBe(true);
+
+    // drag the third shape squarely onto the connector. It is bound to
+    // nothing, so only the pass-near reroute can react to it.
+    mouse.reset();
+    act(() => {
+      h.setState({ selectedElementIds: { [obstacle.id]: true } });
+    });
+    mouse.downAt(250, 350);
+    mouse.moveTo(250, 200);
+    mouse.moveTo(250, 50);
+    mouse.upAt(250, 50);
+
+    expect(h.elements.find((el) => el.id === obstacle.id)!.y).toBeLessThan(60);
+
+    const rerouted = h.elements.find(
+      (el) => el.id === arrow.id,
+    ) as ExcalidrawArrowElement;
+
+    expect(pathEnters(globalPoints(rerouted), [200, 0, 300, 100])).toBe(false);
+    expect(rerouted.points.length).toBeGreaterThan(2);
+  });
+
+  it("still connects when the obstacle boxes the route in", () => {
+    const source = createRect(0, 0);
+    API.setElements([
+      source,
+      // a big shape swallowing the whole corridor, leaving no way around
+      createRect(150, -400),
+      createRect(400, 0),
+    ]);
+    act(() => {
+      h.app.scene.mutateElement(h.elements.find((el) => el.x === 150) as any, {
+        width: 120,
+        height: 900,
+      });
+    });
+    API.setSelectedElements([source]);
+
+    const arrow = connect(source, [410, 50]);
+
+    // routing is a preference, not a guarantee — a blocked route still draws
+    expect(arrow).toBeDefined();
+    expect(arrow.isDeleted).toBe(false);
+    expect(arrow.startBinding?.elementId).toBe(source.id);
+  });
+});

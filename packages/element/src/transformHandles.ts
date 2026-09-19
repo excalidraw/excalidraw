@@ -52,8 +52,6 @@ const transformHandleSizes: { [k in PointerType]: number } = {
   touch: 28,
 };
 
-const ROTATION_RESIZE_HANDLE_GAP = 16;
-
 export const DEFAULT_OMIT_SIDES = {
   e: true,
   s: true,
@@ -196,21 +194,8 @@ export const getTransformHandlesFromCoords = (
           cy,
           angle,
         ),
-    rotation: omitSides.rotation
-      ? undefined
-      : generateTransformHandle(
-          x1 + width / 2 - handleWidth / 2,
-          y1 -
-            dashedLineMargin -
-            handleMarginY +
-            centeringOffset -
-            ROTATION_RESIZE_HANDLE_GAP / zoom.value,
-          handleWidth,
-          handleHeight,
-          cx,
-          cy,
-          angle,
-        ),
+    // rotation is disabled, so the rotation handle is never generated
+    rotation: undefined,
   };
 
   // We only want to show height handles (all cardinal directions)  above a certain size
