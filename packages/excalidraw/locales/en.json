@@ -350,6 +350,11 @@
     "noRegion": "Couldn't find an enclosed region to fill here.",
     "tooComplex": "This region is too complex to fill."
   },
+  "keyboardPlacement": {
+    "started": "{{shape}} placement: use Arrow keys to move, Shift+Arrow keys to resize, Enter to place, or Escape to cancel.",
+    "created": "{{shape}} created.",
+    "cancelled": "Keyboard placement cancelled."
+  },
   "element": {
     "rectangle": "Rectangle",
     "diamond": "Diamond",

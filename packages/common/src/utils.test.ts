@@ -42,6 +42,17 @@ describe("@excalidraw/common/utils", () => {
 
       iframe.remove();
     });
+
+    it("treats contentEditable elements and their children as input-like", () => {
+      const editor = document.createElement("div");
+      const child = document.createElement("span");
+      editor.setAttribute("contenteditable", "true");
+      editor.appendChild(child);
+
+      expect(isInputLike(editor)).toBe(true);
+      expect(isInputLike(child)).toBe(true);
+      expect(isInteractive(child)).toBe(true);
+    });
   });
 
   describe("isTransparent()", () => {
