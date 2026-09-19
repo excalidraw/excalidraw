@@ -25,7 +25,8 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 import "./Actions.scss";
 
-import { useExcalidrawContainer } from "./App";
+import { useApp, useExcalidrawContainer, useExcalidrawSetAppState } from "./App";
+import { MathSymbolPicker } from "./MathSymbolPicker/MathSymbolPicker";
 import Stack from "./Stack";
 import { Tooltip } from "./Tooltip";
 import { PropertiesPopover } from "./PropertiesPopover";
@@ -144,6 +145,8 @@ export const SelectedShapeActions = ({
   renderAction: ActionManager["renderAction"];
   app: AppClassProperties;
 }) => {
+  const setAppState = useExcalidrawSetAppState();
+  const { container } = useExcalidrawContainer();
   const targetElements = getTargetElements(elementsMap, appState);
   const predicates = getShapeActionPredicates(
     appState,
@@ -189,6 +192,15 @@ export const SelectedShapeActions = ({
           <fieldset>{renderAction("changeFontFamily")}</fieldset>
           {renderAction("changeFontSize")}
           {predicates.textAlign && renderAction("changeTextAlign")}
+          <fieldset>
+            <legend>{t("labels.mathSymbols")}</legend>
+            <MathSymbolPicker
+              app={app}
+              appState={appState}
+              setAppState={setAppState}
+              container={container}
+            />
+          </fieldset>
         </>
       )}
 
@@ -420,6 +432,7 @@ const CombinedTextProperties = ({
   predicates: ShapeActionPredicates;
   container: HTMLDivElement | null;
 }) => {
+  const app = useApp();
   const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus(
     container?.ownerDocument,
   );
@@ -485,6 +498,17 @@ const CombinedTextProperties = ({
               {predicates.text && renderAction("changeFontSize")}
               {predicates.textAlign && renderAction("changeTextAlign")}
               {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+              {predicates.text && (
+                <fieldset>
+                  <legend>{t("labels.mathSymbols")}</legend>
+                  <MathSymbolPicker
+                    app={app}
+                    appState={appState}
+                    setAppState={setAppState}
+                    container={container}
+                  />
+                </fieldset>
+              )}
             </div>
           </PropertiesPopover>
         )}
