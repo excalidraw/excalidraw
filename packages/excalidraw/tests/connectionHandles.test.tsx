@@ -6,6 +6,7 @@ import {
   getConnectionHandles,
   getFixedPointForSide,
   hitTestConnectionHandles,
+  updateBoundElements,
 } from "@excalidraw/element";
 
 import { pointFrom } from "@excalidraw/math";
@@ -257,6 +258,113 @@ describe("connection handles — snapping to a target", () => {
     ) as ExcalidrawArrowElement;
 
     expect(arrow.endBinding).toBe(null);
+  });
+});
+
+describe("connection handles — meeting the target's outline", () => {
+  /** The arrow's points in scene coordinates. */
+  const arrowPoints = (arrow: ExcalidrawArrowElement) =>
+    arrow.points.map(
+      (point) =>
+        pointFrom<GlobalPoint>(arrow.x + point[0], arrow.y + point[1]) as
+          | GlobalPoint
+          | GlobalPoint,
+    );
+
+  /**
+   * A 200x200 shape at (300, 300) — as a diamond its tips are then at
+   * (400,300) (500,400) (400,500) (300,400), a full 100px in from the corners
+   * of the box the handles hang off.
+   */
+  const createTarget = (type: "diamond" | "ellipse" | "rectangle") =>
+    API.createElement({
+      type,
+      x: 300,
+      y: 300,
+      width: 200,
+      height: 200,
+      backgroundColor: "#ffc9c9",
+      fillStyle: "solid",
+    }) as NonDeleted<ExcalidrawBindableElement>;
+
+  /**
+   * Drags a connector out of a source shape on the left and releases it just
+   * below the target's bottom side, so the arrow arrives travelling right.
+   */
+  const dragConnectorFromTheLeft = (
+    target: NonDeleted<ExcalidrawBindableElement>,
+  ) => {
+    const source = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 350,
+      width: 100,
+      height: 100,
+    }) as NonDeleted<ExcalidrawBindableElement>;
+    API.setElements([source, target]);
+    API.setSelectedElements([source]);
+
+    const right = handlePoint(source, "right");
+    mouse.moveTo(right[0], right[1]);
+    mouse.downAt(right[0], right[1]);
+    mouse.moveTo(400, 508);
+    mouse.upAt(400, 508);
+
+    return h.elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawArrowElement;
+  };
+
+  it.each(["diamond", "ellipse", "rectangle"] as const)(
+    "ends a %s connector on the outline, travelling into the shape",
+    (type) => {
+      const target = createTarget(type);
+      const arrow = dragConnectorFromTheLeft(target);
+
+      expect(arrow.endBinding?.elementId).toBe(target.id);
+
+      const points = arrowPoints(arrow);
+      const end = points[points.length - 1];
+      const beforeEnd = points[points.length - 2];
+
+      // Released below the bottom side, so the arrow enters through it: the
+      // end sits on the bottom of the outline — the tip itself for a diamond,
+      // 100px in from the corners the handles hang off — and the last segment
+      // runs straight up into the shape rather than rightwards past it.
+      expect(end[0]).toBeCloseTo(400, 1);
+      expect(end[1]).toBeCloseTo(500, 1);
+      expect(beforeEnd[0]).toBeCloseTo(end[0], 1);
+      expect(beforeEnd[1]).toBeGreaterThan(end[1]);
+    },
+  );
+
+  it("leaves nothing for a later recompute to correct", () => {
+    const target = createTarget("diamond");
+    const arrow = dragConnectorFromTheLeft(target);
+    const onRelease = arrowPoints(arrow);
+
+    // Moving a bound shape recomputes every arrow attached to it, and that
+    // used to be the only thing that placed this connector properly — nudging
+    // the shape looked like the fix. Releasing has to leave geometry the
+    // recompute already agrees with.
+    act(() => {
+      updateBoundElements(
+        h.app.scene.getNonDeletedElementsMap().get(target.id)!,
+        h.app.scene,
+      );
+    });
+
+    const recomputed = arrowPoints(
+      h.elements.find(
+        (element) => element.type === "arrow",
+      ) as ExcalidrawArrowElement,
+    );
+
+    expect(recomputed.length).toBe(onRelease.length);
+    recomputed.forEach((point, index) => {
+      expect(point[0]).toBeCloseTo(onRelease[index][0], 1);
+      expect(point[1]).toBeCloseTo(onRelease[index][1], 1);
+    });
   });
 });
 

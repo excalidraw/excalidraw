@@ -11,6 +11,7 @@ import {
   isBindableElement,
   isBindingEnabled,
   newArrowElement,
+  updateBoundElements,
   LinearElementEditor,
 } from "@excalidraw/element";
 
@@ -461,6 +462,15 @@ export class AppConnectionHandles {
         getFixedPointForSide(connectionDrag.target.side),
         this.app.scene,
       );
+
+      // The drag routed the arrow to the pointer, which is near the target's
+      // side but not on it: a side handle sits outside the box, and a diamond
+      // or an ellipse is inset from that box by up to half its diagonal.
+      // Writing the binding doesn't move the arrow, so the connector would be
+      // left stopping short of the shape on the heading it arrived on —
+      // running alongside the outline instead of into it. Re-route it the way
+      // a bound shape does when it moves.
+      updateBoundElements(target, this.app.scene);
     }
 
     this.app.setState({
