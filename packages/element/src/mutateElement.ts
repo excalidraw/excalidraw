@@ -12,6 +12,8 @@ import { ShapeCache } from "./shape";
 
 import { updateElbowArrowPoints } from "./elbowArrow";
 
+import { reanchorSplitPoints } from "./splitPoints";
+
 import { isElbowArrow } from "./typeChecks";
 
 import type {
@@ -51,7 +53,7 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
 
   // casting to any because can't use `in` operator
   // (see https://github.com/microsoft/TypeScript/issues/21732)
-  const { points, fixedSegments, fileId } = updates as any;
+  const { points, fixedSegments, fileId, splitPoints } = updates as any;
 
   if (
     isElbowArrow(element) &&
@@ -75,6 +77,16 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     };
   } else if (typeof points !== "undefined") {
     updates = { ...getSizeFromPoints(points), ...updates };
+
+    if (typeof splitPoints === "undefined") {
+      const reanchored = reanchorSplitPoints(element, points);
+
+      if (typeof reanchored !== "undefined") {
+        updates = { ...updates, splitPoints: reanchored } as ElementUpdate<
+          typeof element
+        >;
+      }
+    }
   }
 
   for (const key in updates) {
@@ -134,7 +146,8 @@ export const mutateElement = <TElement extends Mutable<ExcalidrawElement>>(
     typeof updates.height !== "undefined" ||
     typeof updates.width !== "undefined" ||
     typeof fileId != "undefined" ||
-    typeof points !== "undefined"
+    typeof points !== "undefined" ||
+    typeof splitPoints !== "undefined"
   ) {
     ShapeCache.delete(element);
   }

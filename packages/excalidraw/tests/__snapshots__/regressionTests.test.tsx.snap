@@ -6762,6 +6762,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6840,6 +6841,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "polygon": false,
             "roughness": 1,
             "roundness": null,
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -6920,6 +6922,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -7049,6 +7052,7 @@ exports[`regression tests > draw every type of shape > [end of test] undo stack 
             "polygon": false,
             "roughness": 1,
             "roundness": null,
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -9158,6 +9162,7 @@ exports[`regression tests > key 5 selects arrow tool > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -9401,6 +9406,7 @@ exports[`regression tests > key 6 selects line tool > [end of test] undo stack 1
             "polygon": false,
             "roughness": 1,
             "roundness": null,
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -9854,6 +9860,7 @@ exports[`regression tests > key a selects arrow tool > [end of test] undo stack 
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -10289,6 +10296,7 @@ exports[`regression tests > key l selects line tool > [end of test] undo stack 1
             "polygon": false,
             "roughness": 1,
             "roundness": null,
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",
@@ -15314,6 +15322,7 @@ exports[`regression tests > undo/redo drawing an element > [end of test] redo st
             "roundness": {
               "type": 2,
             },
+            "splitPoints": null,
             "startArrowhead": null,
             "startBinding": null,
             "strokeColor": "#1e1e1e",

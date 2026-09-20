@@ -42,6 +42,7 @@ import {
   isNonDeletedElement,
 } from "@excalidraw/element";
 import { normalizeFixedPoint } from "@excalidraw/element";
+import { restoreSplitPoints } from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
   validateElbowPoints,
@@ -644,6 +645,10 @@ export const restoreElement = (
         points,
         x,
         y,
+        splitPoints: restoreSplitPoints(
+          points,
+          (element as ExcalidrawLinearElement).splitPoints,
+        ),
         ...(isLineElement(element)
           ? {
               polygon: isValidPolygon(points)
@@ -705,6 +710,7 @@ export const restoreElement = (
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
             ...base,
             elbowed: true,
+            splitPoints: null,
             fixedSegments:
               element.fixedSegments?.length && base.points.length >= 4
                 ? element.fixedSegments
@@ -712,7 +718,13 @@ export const restoreElement = (
             startIsSpecial: element.startIsSpecial,
             endIsSpecial: element.endIsSpecial,
           })
-        : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
+        : restoreElementWithProperties(element as ExcalidrawArrowElement, {
+            ...base,
+            splitPoints: restoreSplitPoints(
+              points,
+              (element as ExcalidrawLinearElement).splitPoints,
+            ),
+          });
 
       const normalizedRestoredElement = {
         ...restoredElement,

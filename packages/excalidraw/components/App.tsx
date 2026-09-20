@@ -236,6 +236,8 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
+  canSplitPoints,
+  toggleSplitPoint,
   StoreDelta,
   type ApplyToOptions,
   positionElementsOnGrid,
@@ -7216,8 +7218,36 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
-      const selectedLinearElement: ExcalidrawLinearElement =
+      const selectedLinearElement: NonDeleted<ExcalidrawLinearElement> =
         selectedElements[0];
+
+      if (
+        !event[KEYS.CTRL_OR_CMD] &&
+        this.state.selectedLinearElement?.isEditing &&
+        this.state.selectedLinearElement.elementId ===
+          selectedLinearElement.id &&
+        canSplitPoints(selectedLinearElement)
+      ) {
+        const pointIndex = LinearElementEditor.getPointIndexUnderCursor(
+          selectedLinearElement,
+          this.scene.getNonDeletedElementsMap(),
+          this.state.zoom,
+          sceneX,
+          sceneY,
+        );
+        const splitPoints = toggleSplitPoint(selectedLinearElement, pointIndex);
+
+        if (splitPoints !== undefined) {
+          this.store.scheduleCapture();
+          LinearElementEditor.updateSplitPoints(
+            selectedLinearElement,
+            this.scene,
+            splitPoints,
+          );
+
+          return;
+        }
+      }
 
       if (
         ((event[KEYS.CTRL_OR_CMD] && isSimpleArrow(selectedLinearElement)) ||

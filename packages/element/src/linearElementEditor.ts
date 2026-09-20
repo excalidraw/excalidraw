@@ -70,6 +70,11 @@ import {
 import { headingIsHorizontal, vectorToHeading } from "./heading";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, handleBindTextResize } from "./textElement";
+import {
+  shiftSplitPointsOnDelete,
+  shiftSplitPointsOnDuplicate,
+  shiftSplitPointsOnInsert,
+} from "./splitPoints";
 import { isArrowElement, isBindingElement, isElbowArrow } from "./typeChecks";
 
 import { ShapeCache, toggleLinePolygonState } from "./shape";
@@ -1541,7 +1546,19 @@ export class LinearElementEditor {
       return acc;
     }, []);
 
-    scene.mutateElement(element, { points: nextPoints });
+    const splitPoints = shiftSplitPointsOnDuplicate(
+      element,
+      selectedPointsIndices,
+    );
+
+    LinearElementEditor._updatePoints(
+      element,
+      scene,
+      nextPoints,
+      0,
+      0,
+      splitPoints !== undefined ? { splitPoints } : undefined,
+    );
 
     // temp hack to ensure the line doesn't move when adding point to the end,
     // potentially expanding the bounding box
@@ -1582,6 +1599,8 @@ export class LinearElementEditor {
       return !pointIndices.includes(idx);
     });
 
+    const splitPoints = shiftSplitPointsOnDelete(element, pointIndices);
+
     const isPolygon = isLineElement(element) && element.polygon;
 
     // keep polygon intact if deleting start/end point or uncommitted point
@@ -1609,6 +1628,7 @@ export class LinearElementEditor {
       normalizedPoints,
       offsetX,
       offsetY,
+      splitPoints !== undefined ? { splitPoints } : undefined,
     );
   }
 
@@ -1810,7 +1830,19 @@ export class LinearElementEditor {
       ...element.points.slice(segmentMidpoint.index!),
     ];
 
-    scene.mutateElement(element, { points });
+    const splitPoints = shiftSplitPointsOnInsert(
+      element,
+      segmentMidpoint.index!,
+    );
+
+    LinearElementEditor._updatePoints(
+      element,
+      scene,
+      points,
+      0,
+      0,
+      splitPoints !== undefined ? { splitPoints } : undefined,
+    );
 
     ret.pointerDownState = {
       ...linearElementEditor.initialState,
@@ -1833,6 +1865,7 @@ export class LinearElementEditor {
     otherUpdates?: {
       startBinding?: FixedPointBinding | null;
       endBinding?: FixedPointBinding | null;
+      splitPoints?: ExcalidrawLinearElement["splitPoints"];
     },
     options?: {
       isDragging?: boolean;
@@ -1864,19 +1897,22 @@ export class LinearElementEditor {
         isMidpointSnappingEnabled: options?.isMidpointSnappingEnabled,
       });
     } else {
-      // TODO do we need to get precise coords here just to calc centers?
-      const nextCoords = getElementPointsCoords(element, nextPoints);
-      const prevCoords = getElementPointsCoords(element, element.points);
-      const nextCenterX = (nextCoords[0] + nextCoords[2]) / 2;
-      const nextCenterY = (nextCoords[1] + nextCoords[3]) / 2;
-      const prevCenterX = (prevCoords[0] + prevCoords[2]) / 2;
-      const prevCenterY = (prevCoords[1] + prevCoords[3]) / 2;
-      const dX = prevCenterX - nextCenterX;
-      const dY = prevCenterY - nextCenterY;
-      const rotatedOffset = pointRotateRads(
-        pointFrom(offsetX, offsetY),
-        pointFrom(dX, dY),
-        element.angle,
+      // both sides of the change have to be measured from matching
+      // `points`/`splitPoints` pairs, or the compensation is computed off
+      // geometry the element never had
+      const nextSplitPoints =
+        otherUpdates?.splitPoints !== undefined
+          ? otherUpdates.splitPoints
+          : element.splitPoints;
+      const rotatedOffset = getOriginOffsetForBoundsChange(
+        element,
+        getElementPointsCoords(element, element.points),
+        getElementPointsCoords(
+          { ...element, splitPoints: nextSplitPoints },
+          nextPoints,
+        ),
+        offsetX,
+        offsetY,
       );
       scene.mutateElement(element, {
         ...otherUpdates,
@@ -1885,6 +1921,16 @@ export class LinearElementEditor {
         y: element.y + rotatedOffset[1],
       });
     }
+  }
+
+  static updateSplitPoints(
+    element: NonDeleted<ExcalidrawLinearElement>,
+    scene: Scene,
+    splitPoints: ExcalidrawLinearElement["splitPoints"],
+  ) {
+    LinearElementEditor._updatePoints(element, scene, element.points, 0, 0, {
+      splitPoints,
+    });
   }
 
   private static _getShiftLockedDelta(
@@ -2842,3 +2888,22 @@ const pathSegmentPointAtLength = (
   isCurve(segment)
     ? curvePointAtLength(segment, fraction, segmentLength)
     : lineSegmentPointAt(segment, fraction);
+
+const getOriginOffsetForBoundsChange = (
+  element: ExcalidrawLinearElement,
+  prevCoords: Bounds,
+  nextCoords: Bounds,
+  offsetX = 0,
+  offsetY = 0,
+) => {
+  const dX =
+    (prevCoords[0] + prevCoords[2] - nextCoords[0] - nextCoords[2]) / 2;
+  const dY =
+    (prevCoords[1] + prevCoords[3] - nextCoords[1] - nextCoords[3]) / 2;
+
+  return pointRotateRads(
+    pointFrom(offsetX, offsetY),
+    pointFrom(dX, dY),
+    element.angle,
+  );
+};
