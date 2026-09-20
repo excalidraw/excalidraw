@@ -1229,5 +1229,4 @@ describe("Test Transform", () => {
     expect(labelElement).toBeDefined();
     expect(labelElement?.text).toBe("标签一\n标签二");
   });
-  });
 });
