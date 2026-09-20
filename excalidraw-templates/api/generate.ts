@@ -141,19 +141,31 @@ export async function generateMermaid(
     template.label,
     template.rules,
   );
-  const prefill = `${template.header}\n`;
 
+  // NOTE: the original design used an assistant-message prefill (send
+  // the header as if the model had already written it, forcing the
+  // completion to continue from there) as a second, structural nudge on
+  // top of the system-prompt instruction. Confirmed live that this
+  // model rejects prefill outright ("This model does not support
+  // assistant message prefill. The conversation must end with a user
+  // message."), so that mechanism is unavailable here. This does NOT
+  // weaken the actual guarantee: enforceHeader() below is unconditional
+  // — it corrects the header whether or not the model's raw output
+  // already happened to get it right — so the deterministic type lock
+  // holds on the response either way. What's lost without prefill is
+  // only the softer signal of how often the model gets it right
+  // unprompted, which is exactly what headerCorrected / the
+  // type_mismatch_corrected event now measures.
   const messages: Anthropic.MessageParam[] = [
     { role: "user", content: prompt },
   ];
   if (repair) {
-    messages.push({ role: "assistant", content: repair.priorMermaid });
+    messages.push({ role: "assistant", content: repair.priorMermaid.trim() });
     messages.push({
       role: "user",
       content: `That didn't work: ${repair.parseError} Return corrected mermaid source that starts with "${template.header}" and fixes this.`,
     });
   }
-  messages.push({ role: "assistant", content: prefill });
 
   const client = getClient();
   let response;
@@ -162,7 +174,11 @@ export async function generateMermaid(
       {
         model: MODEL,
         max_tokens: 1000,
-        temperature: 0.3,
+        // `temperature` is deprecated/rejected by this model (confirmed
+        // live: "400 `temperature` is deprecated for this model") — the
+        // original spec asked for temperature 0.3, but the deployed model
+        // no longer accepts the parameter at all, so it's omitted rather
+        // than sent as a no-op.
         system: systemPrompt,
         messages,
       },
@@ -176,8 +192,7 @@ export async function generateMermaid(
   }
 
   const textBlock = response.content.find((block) => block.type === "text");
-  const continuation = textBlock && "text" in textBlock ? textBlock.text : "";
-  const fullMermaid = prefill + continuation;
+  const fullMermaid = textBlock && "text" in textBlock ? textBlock.text : "";
 
   return {
     mermaid: enforceHeader(fullMermaid, template.header),
