@@ -1,12 +1,12 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "Zarejestruj się",
+    "signIn": "Zaloguj się",
     "paste": "Wklej",
     "pasteAsPlaintext": "Wklej jako zwykły tekst",
     "pasteCharts": "Wklej wykresy",
-    "chartType_bar": "",
-    "chartType_line": "",
+    "chartType_bar": "Wykres słupkowy",
+    "chartType_line": "Wykres liniowy",
     "chartType_radar": "",
     "chartType_plaintext": "",
     "selectAll": "Zaznacz wszystko",
