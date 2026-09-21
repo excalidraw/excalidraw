@@ -1226,19 +1226,33 @@ export const reanchorBindingsToOutline = (
         continue;
       }
 
+      const startOrEndName = startOrEnd === "startBinding" ? "start" : "end";
+
+      if (isElbowArrow(element)) {
+        updates[startOrEnd] = {
+          ...binding,
+          ...calculateFixedPointForElbowArrowBinding(
+            element,
+            changedElement,
+            startOrEndName,
+            elementsMap,
+          ),
+        };
+        continue;
+      }
+
       const focusPoint = getGlobalFixedPointForBindableElement(
         binding.fixedPoint,
         changedElement,
         elementsMap,
       );
-      const bindingGap = getBindingGap(changedElement, element);
 
       if (
         hitElementItself({
           element: changedElement,
           point: focusPoint,
           elementsMap,
-          threshold: bindingGap,
+          threshold: getBindingGap(changedElement, element),
           overrideShouldTestInside: true,
         })
       ) {
@@ -1273,7 +1287,7 @@ export const reanchorBindingsToOutline = (
         ...calculateFixedPointForNonElbowArrowBinding(
           element,
           changedElement,
-          startOrEnd === "startBinding" ? "start" : "end",
+          startOrEndName,
           elementsMap,
           outlinePoint,
         ),
