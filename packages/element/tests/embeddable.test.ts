@@ -231,3 +231,30 @@ describe("Google Drive video embedding", () => {
     ).toBe(true);
   });
 });
+
+describe("Wordwall domain embedding", () => {
+  it.each([
+    {
+      url: "https://wordwall.net/ru/embed/8c75f257e076416f86d5dda0dfd57d67?themeId=45&templateId=72&fontStackId=0",
+      description: "Russian language Wordwall embed with theme and template params",
+    },
+    {
+      url: "https://wordwall.net/embed/abc123def456",
+      description: "basic Wordwall embed URL",
+    },
+    {
+      url: "https://www.wordwall.net/embed/demo789",
+      description: "Wordwall embed with www subdomain",
+    },
+  ])("should allow $description", ({ url }) => {
+    expect(embeddableURLValidator(url, undefined)).toBe(true);
+  });
+
+  it("should return generic embed type for Wordwall URL", () => {
+    const result = getEmbedLink(
+      "https://wordwall.net/embed/8c75f257e076416f86d5dda0dfd57d67",
+    );
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("generic");
+  });
+});
