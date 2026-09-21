@@ -679,8 +679,10 @@ const intersectRectanguloidWithLineSegment = (
 /**
  *
  * @param element
- * @param a
- * @param b
+ * @param elementsMap
+ * @param l
+ * @param offset
+ * @param onlyFirst
  * @returns
  */
 const intersectDiamondWithLineSegment = (
@@ -729,8 +731,9 @@ const intersectDiamondWithLineSegment = (
 /**
  *
  * @param element
- * @param a
- * @param b
+ * @param elementsMap
+ * @param l
+ * @param offset
  * @returns
  */
 const intersectEllipseWithLineSegment = (
