@@ -2714,6 +2714,9 @@ class App extends React.Component<AppProps, AppState> {
                           )}
                           <InteractiveCanvas
                             app={this}
+                            canvasHandleScale={
+                              this.props.UIOptions.canvasHandleScale
+                            }
                             containerRef={this.excalidrawContainerRef}
                             canvas={this.interactiveCanvas}
                             elementsMap={renderableElementsMap}
@@ -7238,6 +7241,7 @@ class App extends React.Component<AppProps, AppState> {
           { x: sceneX, y: sceneY },
           this.state,
           this.scene.getNonDeletedElementsMap(),
+          this.props.UIOptions.canvasHandleScale,
         );
         const midPoint = hitCoords
           ? LinearElementEditor.getSegmentMidPointIndex(
@@ -7245,6 +7249,7 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               hitCoords,
               this.scene.getNonDeletedElementsMap(),
+              this.props.UIOptions.canvasHandleScale,
             )
           : -1;
 
@@ -7264,6 +7269,7 @@ class App extends React.Component<AppProps, AppState> {
             { x: sceneX, y: sceneY },
             this.state,
             this.scene.getNonDeletedElementsMap(),
+            this.props.UIOptions.canvasHandleScale,
           );
           const nextIndex = nextCoords
             ? LinearElementEditor.getSegmentMidPointIndex(
@@ -7271,6 +7277,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state,
                 nextCoords,
                 this.scene.getNonDeletedElementsMap(),
+                this.props.UIOptions.canvasHandleScale,
               )
             : null;
 
@@ -8187,6 +8194,7 @@ class App extends React.Component<AppProps, AppState> {
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
             this.editorInterface,
+            this.props.UIOptions.canvasHandleScale,
           );
         if (
           elementWithTransformHandleType &&
@@ -8210,6 +8218,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.zoom,
         event.pointerType,
         this.editorInterface,
+        this.props.UIOptions.canvasHandleScale,
       );
       if (transformHandleType) {
         this.cursor.set(
@@ -8412,6 +8421,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.zoom,
         scenePointerX,
         scenePointerY,
+        this.props.UIOptions.canvasHandleScale,
       );
       const isHoveringAPointHandle = LinearElementEditor.isPointHandle(
         element,
@@ -8424,6 +8434,7 @@ class App extends React.Component<AppProps, AppState> {
             { x: scenePointerX, y: scenePointerY },
             this.state,
             elementsMap,
+            this.props.UIOptions.canvasHandleScale,
           );
 
       if (isHoveringAPointHandle || segmentMidPointHoveredCoords) {
@@ -9364,6 +9375,7 @@ class App extends React.Component<AppProps, AppState> {
             event.pointerType,
             this.scene.getNonDeletedElementsMap(),
             this.editorInterface,
+            this.props.UIOptions.canvasHandleScale,
           );
         if (elementWithTransformHandleType != null) {
           if (
@@ -9393,6 +9405,7 @@ class App extends React.Component<AppProps, AppState> {
           this.state.zoom,
           event.pointerType,
           this.editorInterface,
+          this.props.UIOptions.canvasHandleScale,
         );
       }
       if (pointerDownState.resize.handleType) {
@@ -10638,6 +10651,7 @@ class App extends React.Component<AppProps, AppState> {
             { x: gridX, y: gridY },
             this.state,
             this.scene.getNonDeletedElementsMap(),
+            this.props.UIOptions.canvasHandleScale,
           );
           index = nextCoords
             ? LinearElementEditor.getSegmentMidPointIndex(
@@ -10645,6 +10659,7 @@ class App extends React.Component<AppProps, AppState> {
                 this.state,
                 nextCoords,
                 this.scene.getNonDeletedElementsMap(),
+                this.props.UIOptions.canvasHandleScale,
               )
             : -1;
         }

@@ -150,6 +150,7 @@ const getThemedColor = (
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  handleScale = 1,
 ) => {
   invariant(appState.selectedLinearElement, "selectedLinearElement is null");
 
@@ -157,13 +158,14 @@ const renderElbowArrowMidPointHighlight = (
 
   invariant(segmentMidPointHoveredCoords, "midPointCoords is null");
 
-  highlightPoint(segmentMidPointHoveredCoords, context, appState);
+  highlightPoint(segmentMidPointHoveredCoords, context, appState, handleScale);
 };
 
 const renderLinearElementPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   elementsMap: ElementsMap,
+  handleScale = 1,
 ) => {
   const { elementId, hoverPointIndex } = appState.selectedLinearElement!;
   if (
@@ -187,7 +189,7 @@ const renderLinearElementPointHighlight = (
     hoverPointIndex,
     elementsMap,
   );
-  highlightPoint(point, context, appState);
+  highlightPoint(point, context, appState, handleScale);
 };
 
 /** draws the point marker in scene coordinates */
@@ -195,6 +197,7 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
+  handleScale = 1,
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
@@ -208,7 +211,7 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
     context,
     point[0],
     point[1],
-    LinearElementEditor.POINT_HANDLE_SIZE / appState.zoom.value,
+    (LinearElementEditor.POINT_HANDLE_SIZE * handleScale) / appState.zoom.value,
     false,
   );
 
@@ -1150,6 +1153,7 @@ const renderLinearPointHandles = (
   appState: InteractiveCanvasAppState,
   element: NonDeleted<ExcalidrawLinearElement>,
   elementsMap: RenderableElementsMap,
+  handleScale = 1,
 ) => {
   if (!appState.selectedLinearElement) {
     return;
@@ -1162,10 +1166,10 @@ const renderLinearPointHandles = (
     elementsMap,
   );
 
-  const { POINT_HANDLE_SIZE } = LinearElementEditor;
+  const pointHandleSize = LinearElementEditor.POINT_HANDLE_SIZE * handleScale;
   const radius = appState.selectedLinearElement?.isEditing
-    ? POINT_HANDLE_SIZE
-    : POINT_HANDLE_SIZE / 2;
+    ? pointHandleSize
+    : pointHandleSize / 2;
 
   const _isElbowArrow = isElbowArrow(element);
   const _isLineElement = isLineElement(element);
@@ -1225,6 +1229,7 @@ const renderLinearPointHandles = (
           idx,
           appState.zoom,
           elementsMap,
+          handleScale,
         )
       ) {
         renderSingleLinearPoint(
@@ -1234,7 +1239,7 @@ const renderLinearPointHandles = (
             (p[0] + points[idx + 1][0]) / 2,
             (p[1] + points[idx + 1][1]) / 2,
           ),
-          POINT_HANDLE_SIZE / 2,
+          pointHandleSize / 2,
           false,
           !fixedSegments.includes(idx + 1),
           false,
@@ -1246,6 +1251,7 @@ const renderLinearPointHandles = (
       element,
       elementsMap,
       appState,
+      handleScale,
     ).filter(
       (midPoint, idx, midPoints): midPoint is GlobalPoint =>
         midPoint !== null &&
@@ -1258,7 +1264,7 @@ const renderLinearPointHandles = (
           context,
           appState,
           segmentMidPoint,
-          POINT_HANDLE_SIZE / 2,
+          pointHandleSize / 2,
           false,
           true,
           false,
@@ -1689,6 +1695,7 @@ const _renderInteractiveScene = ({
       appState,
       editingLinearElement,
       elementsMap,
+      renderConfig.canvasHandleScale,
     );
   }
 
@@ -1802,6 +1809,7 @@ const _renderInteractiveScene = ({
       appState,
       selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
       elementsMap,
+      renderConfig.canvasHandleScale,
     );
   }
 
@@ -1814,7 +1822,11 @@ const _renderInteractiveScene = ({
   if (selectedLinearElement) {
     if (!appState.selectedLinearElement.isDragging) {
       if (linearState.segmentMidPointHoveredCoords) {
-        renderElbowArrowMidPointHighlight(context, appState);
+        renderElbowArrowMidPointHighlight(
+          context,
+          appState,
+          renderConfig.canvasHandleScale,
+        );
       } else if (
         isElbowArrow(selectedLinearElement)
           ? linearState.hoverPointIndex === 0 ||
@@ -1822,7 +1834,12 @@ const _renderInteractiveScene = ({
               selectedLinearElement.points.length - 1
           : linearState.hoverPointIndex >= 0
       ) {
-        renderLinearElementPointHighlight(context, appState, elementsMap);
+        renderLinearElementPointHighlight(
+          context,
+          appState,
+          elementsMap,
+          renderConfig.canvasHandleScale,
+        );
       }
     }
 
@@ -1870,6 +1887,7 @@ const _renderInteractiveScene = ({
         appState,
         selectedElements[0] as NonDeleted<ExcalidrawLinearElement>,
         elementsMap,
+        renderConfig.canvasHandleScale,
       );
     }
     const selectionColor =
@@ -1993,6 +2011,7 @@ const _renderInteractiveScene = ({
         elementsMap,
         "mouse", // when we render we don't know which pointer type so use mouse,
         getOmitSidesForEditorInterface(editorInterface),
+        renderConfig.canvasHandleScale,
       );
       if (
         !appState.viewModeEnabled &&
@@ -2061,6 +2080,9 @@ const _renderInteractiveScene = ({
               rotation: true,
             }
           : getOmitSidesForEditorInterface(editorInterface),
+        undefined,
+        undefined,
+        renderConfig.canvasHandleScale,
       );
       if (selectedElements.some((element) => !element.locked)) {
         renderTransformHandles(

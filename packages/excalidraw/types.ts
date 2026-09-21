@@ -1122,6 +1122,11 @@ export type CanvasActions = Partial<{
 
 export type UIOptions = Partial<{
   dockedSidebarBreakpoint: number;
+  /**
+   * Scale canvas point and selection handles without scaling the document.
+   * Values are clamped to 1–2; omitted or non-finite values use 1.
+   */
+  canvasHandleScale: number;
   canvasActions: CanvasActions;
   tools: {
     image: boolean;
@@ -1144,6 +1149,7 @@ export type AppProps = Merge<
     UIOptions: Merge<
       UIOptions,
       {
+        canvasHandleScale: number;
         canvasActions: Required<CanvasActions> & { export: ExportOpts };
       }
     >;
