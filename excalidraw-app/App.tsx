@@ -148,6 +148,7 @@ import "./index.scss";
 
 import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanner";
 import { AppSidebar } from "./components/AppSidebar";
+import { useWebMcpTools } from "./webmcp/useWebMcpTools";
 
 import type { CollabAPI } from "./collab/Collab";
 
@@ -374,6 +375,15 @@ const initializeScene = async (opts: {
 
 const ExcalidrawWrapper = () => {
   const excalidrawAPI = useExcalidrawAPI();
+  const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
+
+  const handleAppRoot = useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      setOwnerDocument(node.ownerDocument);
+    }
+  }, []);
+
+  useWebMcpTools(excalidrawAPI, ownerDocument);
 
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
@@ -940,6 +950,7 @@ const ExcalidrawWrapper = () => {
 
   return (
     <div
+      ref={handleAppRoot}
       style={{ height: "100%" }}
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
