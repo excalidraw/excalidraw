@@ -744,27 +744,40 @@ export class AppViewport {
       return false;
     }
 
+    // a user gesture interrupting an animated `setViewport` takes over from
+    // frames that draw from zoom-scaled bitmaps, and the completion handler
+    // that would switch back to crisp ones no longer runs. Otherwise the
+    // flag is left alone: wheel and touch zoom set it and clear it on a
+    // debounce once the gesture is over, and a pan frame landing between two
+    // zoom ticks must not force every element to be re-rasterized at the
+    // in-progress zoom
+    if (this.activeTransition) {
+      this.app.setState({ shouldCacheIgnoreZoom: false });
+    }
     this.cancelTransition();
     if (!opts?.preserveScrollConstraintsSnapBack) {
       AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
     }
-    this.app.setState({ shouldCacheIgnoreZoom: false });
     this.app.requestUnfollow();
 
-    const prevZoom = this.app.state.zoom.value;
-    this.app.setState(state);
-
-    this.app.setState((prevState) => {
-      if (!prevState.scrollConstraints) {
+    this.app.setState((prevState, props) => {
+      const update =
+        typeof state === "function" ? state(prevState, props) : state;
+      if (!update) {
         return null;
       }
+      const nextState = { ...prevState, ...update };
+      if (!nextState.scrollConstraints) {
+        return update;
+      }
       const zoomed =
-        !opts?.zoomPreConstrained && prevState.zoom.value !== prevZoom;
-      const overscroll = zoomed ? 0 : prevState.scrollConstraints.overscroll;
+        !opts?.zoomPreConstrained &&
+        nextState.zoom.value !== prevState.zoom.value;
+      const overscroll = zoomed ? 0 : nextState.scrollConstraints.overscroll;
       if (overscroll > 0) {
         this.snapBackDebounced();
       }
-      return constrainScrollState(prevState, overscroll);
+      return { ...nextState, ...constrainScrollState(nextState, overscroll) };
     });
 
     return true;

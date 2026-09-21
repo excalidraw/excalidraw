@@ -952,7 +952,7 @@ export const textWysiwyg = ({
       // trying to pan by clicking inside text area itself -> handle here
       if (target instanceof ownerWindow.HTMLTextAreaElement) {
         event.preventDefault();
-        app.handleCanvasPanUsingWheelOrSpaceDrag(event);
+        app.pan.start(event);
       }
 
       temporarilyDisableSubmit();

@@ -49,6 +49,7 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
+  OnDuplicateData,
 } from "@excalidraw/element";
 import type { GlobalPoint } from "@excalidraw/math";
 
@@ -281,6 +282,12 @@ export type ObservedElementsAppState = {
 export type BoxSelectionMode = "contain" | "overlap";
 
 /**
+ * The pointing device the wheel mappings are tuned for. `auto` is reserved
+ * for detecting it from the wheel events; see `resolveInputDevice`.
+ */
+export type InputDevice = "auto" | "mouse" | "trackpad";
+
+/**
  * A box, in scene coordinates, that pan & zoom are constrained to.
  *
  * This is a private type. For public API, only use specific properties,
@@ -360,6 +367,14 @@ export interface AppState {
   bindingPreference: "enabled" | "disabled";
   /** user preference whether arrow snap to midpoints while binding */
   isMidpointSnappingEnabled: boolean;
+  /**
+   * user preference for what the wheel does: with a `trackpad` a plain wheel
+   * pans; with a `mouse` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is
+   * delivered) zooms with either device. Shift+wheel pans horizontally;
+   * ctrl/cmd+shift+wheel pans vertically. `auto` resolves to `trackpad` until
+   * device detection exists — see `resolveInputDevice`
+   */
+  inputDevice: InputDevice;
   /**
    * The bindable element the UI highlights for the user when an arrow is
    * dragged or otherwise its endpoint being close to said element.
@@ -785,6 +800,26 @@ export type UIConfig = {
   };
 };
 
+/** Supported visual changes. Geometry, content, bindings and styles are not overridable. */
+export type ElementRenderOverride = Readonly<{
+  /** Absolute render opacity (0–100, clamped). Omitted: use element.opacity. */
+  opacity?: number;
+  /** Translation in scene units. Bound labels inherit their container's offset and ignore this field. */
+  offset?: Readonly<{ x: number; y: number }>;
+}>;
+
+/** see {@link ExcalidrawImperativeAPI.setElementRenderOverrides} for details */
+export type ElementRenderOverrides = ReadonlyMap<
+  ExcalidrawElement["id"],
+  ElementRenderOverride
+>;
+
+/** The translation part of a snapshot: only the entries that carry an offset. */
+export type ElementRenderOffsets = ReadonlyMap<
+  ExcalidrawElement["id"],
+  NonNullable<ElementRenderOverride["offset"]>
+>;
+
 export interface ExcalidrawProps {
   className?: string;
   /**
@@ -847,13 +882,29 @@ export interface ExcalidrawProps {
    *
    * Returned elements will be used in place of the next elements
    * (you should return all elements, including deleted, and not mutate
-   * the element if changes are made)
+   * the element if changes are made).
+   *
+   * The duplicates are the elements in `nextElements` which are not in
+   * `prevElements` (see also `data.duplicateElements`). When pasting or
+   * inserting onto a frame, their `frameId` is already set. To change a
+   * duplicate, return a new object with the same `id`. It is shallow-merged
+   * into the duplicate (omitted properties are kept), and your changes are
+   * part of the duplication itself (same undo entry, same durable increment).
+   *
+   * To prevent an element from being duplicated, omit its duplicate from the
+   * returned array. References to it from the remaining duplicates are
+   * cleared, and a bound text isn't duplicated without its container. To
+   * prevent the duplication as a whole, return `false`. If no duplicate
+   * remains, the duplication is cancelled and the returned elements are
+   * ignored (alt-drag then moves the original elements instead).
    */
   onDuplicate?: (
     nextElements: readonly ExcalidrawElement[],
     /** excludes the duplicated elements */
     prevElements: readonly ExcalidrawElement[],
-  ) => ExcalidrawElement[] | void;
+    /** lookups covering just the elements taking part in the duplication */
+    data: OnDuplicateData,
+  ) => ExcalidrawElement[] | void | false;
   renderTopLeftUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -1151,6 +1202,7 @@ export type AppClassProperties = {
   arrowText: App["arrowText"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
+  duplicate: App["duplicate"];
   toolDrag: App["toolDrag"];
   activeResizeHandle: App["activeResizeHandle"];
   isToolLocked: App["isToolLocked"];
@@ -1295,6 +1347,24 @@ export interface ExcalidrawImperativeAPI {
   getName: InstanceType<typeof App>["getName"];
   setViewport: InstanceType<typeof App>["viewport"]["setViewport"];
   getViewportOffsets: InstanceType<typeof App>["viewport"]["getOffsets"];
+  /**
+   * Atomically replaces all transient visual overrides. Values are copied;
+   * omitted IDs/fields use document values, except for inherited label offsets.
+   * null clears the snapshot.
+   * Repaints without document changes, history entries or onChange events;
+   * an equivalent snapshot may still repaint (clearing an already clear
+   * snapshot does not), so submit only when something changed.
+   * Finite opacity is clamped to 0–100; non-finite values reject the snapshot.
+   * Unknown/deleted IDs are ignored when rendering. Reset/unmount clears it.
+   * Bound labels inherit their container's offset; offsets targeting them are
+   * ignored. Label opacity remains independent. Target frame children explicitly.
+   * Frame opacity still multiplies child opacity. Decorations follow their owner.
+   * Exports and interactive geometry (hit tests, selection, editing) use document
+   * values, including while authoring an animation preview in edit mode.
+   */
+  setElementRenderOverrides: InstanceType<
+    typeof App
+  >["setElementRenderOverrides"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
