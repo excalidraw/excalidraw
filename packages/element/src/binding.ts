@@ -1202,6 +1202,90 @@ export const unbindBindingElement = (
   return binding.elementId;
 };
 
+export const reanchorBindingsToOutline = (
+  changedElement: NonDeleted<ExcalidrawBindableElement>,
+  scene: Scene,
+) => {
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const center = elementCenterPoint(changedElement, elementsMap);
+  const reach = Math.max(changedElement.width, changedElement.height) * 2;
+
+  boundElementsVisitor(elementsMap, changedElement, (element) => {
+    if (!isArrowElement(element) || !isNonDeletedElement(element)) {
+      return;
+    }
+
+    const updates: {
+      startBinding?: FixedPointBinding;
+      endBinding?: FixedPointBinding;
+    } = {};
+
+    for (const startOrEnd of ["startBinding", "endBinding"] as const) {
+      const binding = element[startOrEnd];
+      if (binding?.elementId !== changedElement.id) {
+        continue;
+      }
+
+      const focusPoint = getGlobalFixedPointForBindableElement(
+        binding.fixedPoint,
+        changedElement,
+        elementsMap,
+      );
+      const bindingGap = getBindingGap(changedElement, element);
+
+      if (
+        hitElementItself({
+          element: changedElement,
+          point: focusPoint,
+          elementsMap,
+          threshold: bindingGap,
+          overrideShouldTestInside: true,
+        })
+      ) {
+        continue;
+      }
+
+      const direction = vectorFromPoint(focusPoint, center);
+      if (direction[0] === 0 && direction[1] === 0) {
+        continue;
+      }
+      const outlinePoint = intersectElementWithLineSegment(
+        changedElement,
+        elementsMap,
+        lineSegment(
+          center,
+          pointFromVector(
+            vectorScale(vectorNormalize(direction), reach),
+            center,
+          ),
+        ),
+      ).sort(
+        (a, b) =>
+          pointDistanceSq(a, focusPoint) - pointDistanceSq(b, focusPoint),
+      )[0];
+
+      if (!outlinePoint) {
+        continue;
+      }
+
+      updates[startOrEnd] = {
+        ...binding,
+        ...calculateFixedPointForNonElbowArrowBinding(
+          element,
+          changedElement,
+          startOrEnd === "startBinding" ? "start" : "end",
+          elementsMap,
+          outlinePoint,
+        ),
+      };
+    }
+
+    if (updates.startBinding || updates.endBinding) {
+      mutateElement(element, elementsMap, updates);
+    }
+  });
+};
+
 // Supports translating, rotating and scaling `changedElement` with bound
 // linear elements.
 export const updateBoundElements = (
