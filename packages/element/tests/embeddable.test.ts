@@ -230,4 +230,13 @@ describe("Google Drive video embedding", () => {
       ),
     ).toBe(true);
   });
+
+  it("should validate somnathsinghstatrys.github.io domain by default", () => {
+    expect(
+      embeddableURLValidator(
+        "https://somnathsinghstatrys.github.io/static-data/admin-ui-sample.html",
+        undefined,
+      ),
+    ).toBe(true);
+  });
 });
