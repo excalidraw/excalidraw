@@ -7,12 +7,13 @@ import {
   DEFAULT_SIDEBAR,
   FONT_FAMILY,
   ROUNDNESS,
+  getFontString,
   STICKY_NOTE_MAX_FONT_SIZE,
   DEFAULT_STICKY_NOTE_BG,
   STICKY_NOTE_MIN_FONT_SIZE,
 } from "@excalidraw/common";
 
-import { newElementWith } from "@excalidraw/element";
+import { measureText, newElementWith } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
 
 import { getStickyNoteLayout } from "@excalidraw/element";
@@ -339,6 +340,80 @@ describe("restoreElements", () => {
     expect(restored.colorTopPicks.stickyNoteStroke).toBe(null);
   });
 
+  it("should remeasure text without bumping its version when refreshing dimensions", () => {
+    const text = API.createElement({
+      type: "text",
+      text: "你好世界",
+      // stale bounds, i.e. measured with a fallback font elsewhere
+      width: 999,
+      height: 999,
+      // valid, so that restore has no other reason to bump the version
+      index: "a0" as FractionalIndex,
+    });
+    const expected = measureText(
+      text.text,
+      getFontString(text),
+      text.lineHeight,
+    );
+
+    // works with and without binding repair (the collab path can't repair
+    // partial batches), and is invisible to versioning either way
+    for (const repairBindings of [false, true]) {
+      const [restored] = restore.restoreElements([text], null, {
+        repairBindings,
+        refreshDimensions: true,
+      }) as ExcalidrawTextElement[];
+
+      expect(restored.width).toBe(expected.width);
+      expect(restored.height).toBe(expected.height);
+      expect(restored.version).toBe(text.version);
+      expect(restored.versionNonce).toBe(text.versionNonce);
+    }
+
+    const [untouched] = restore.restoreElements([text], null, {
+      repairBindings: true,
+    });
+    expect(untouched.width).toBe(999);
+  });
+
+  it("should measure a label against a container that is only in the existing elements", () => {
+    const container = API.createElement({
+      type: "rectangle",
+      id: "container",
+      width: 100,
+      height: 100,
+      boundElements: [{ type: "text", id: "label" }],
+      index: "a0" as FractionalIndex,
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      text: "abcdefghijklmnopqrstuvwxyz",
+      containerId: "container",
+      width: 999,
+      height: 999,
+      index: "a1" as FractionalIndex,
+    });
+
+    // a partial remote batch: the label arrives without its container
+    const [restored] = restore.restoreElements([label], [container], {
+      refreshDimensions: true,
+    }) as ExcalidrawTextElement[];
+
+    // wrapped to the container width, so narrower than the stale bounds
+    expect(restored.width).toBeLessThan(999);
+    expect(restored.width).toBeLessThanOrEqual(container.width);
+    expect(restored.text).toContain("\n");
+    expect(restored.containerId).toBe("container");
+    expect(restored.version).toBe(label.version);
+
+    // without the container in reach the label is left alone
+    const [alone] = restore.restoreElements([label], null, {
+      refreshDimensions: true,
+    }) as ExcalidrawTextElement[];
+    expect(alone.width).toBe(999);
+  });
+
   it("should refit a sticky note together with its label when refreshing dimensions", () => {
     const stickyNote = API.createElement({
       type: "stickynote",
@@ -376,6 +451,111 @@ describe("restoreElements", () => {
     expect(note.height).toBeCloseTo(
       getStickyNoteLayout(note, text).container.height,
     );
+  });
+
+  describe("remeasureTextElements", () => {
+    it("should swap in remeasured, versioned copies", () => {
+      const stale = API.createElement({
+        type: "text",
+        id: "stale",
+        text: "你好世界",
+        // measured with a fallback font before the real one loaded
+        width: 999,
+        height: 999,
+      });
+      const skipped = API.createElement({
+        type: "text",
+        id: "skipped",
+        text: "你好世界",
+        width: 999,
+        height: 999,
+      });
+      const rectangle = API.createElement({ type: "rectangle" });
+      const elements = restore.restoreElements(
+        [stale, skipped, rectangle],
+        null,
+      );
+      const [restoredStale, restoredSkipped, restoredRectangle] = elements;
+      const expected = measureText(
+        stale.text,
+        getFontString(stale),
+        stale.lineHeight,
+      );
+
+      const remeasured = restore.remeasureTextElements(
+        elements,
+        (element) => element.id === "stale",
+      )!;
+      const [text, untouched, shape] = remeasured;
+
+      // same order, same ids
+      expect(remeasured.map((element) => element.id)).toEqual(
+        elements.map((element) => element.id),
+      );
+
+      // the stale text comes back as a new object, remeasured and bumped so
+      // that the store picks it up (it only diffs elements whose version
+      // increased; `restoreElements` is the pass that doesn't bump)
+      expect(text).not.toBe(restoredStale);
+      expect(text.width).toBe(expected.width);
+      expect(text.height).toBe(expected.height);
+      expect(text.version).toBe(restoredStale.version + 1);
+      expect(text.versionNonce).not.toBe(restoredStale.versionNonce);
+      // the original is left alone
+      expect(restoredStale.width).toBe(999);
+
+      // everything else keeps its identity
+      expect(untouched).toBe(restoredSkipped);
+      expect(shape).toBe(restoredRectangle);
+    });
+
+    it("should return null when the text is already measured right", () => {
+      const text = API.createElement({ type: "text", text: "hello" });
+      const elements = restore.restoreElements([text], null, {
+        refreshDimensions: true,
+      });
+
+      expect(restore.remeasureTextElements(elements, () => true)).toBeNull();
+    });
+
+    it("should refit a sticky note together with its label", () => {
+      const stickyNote = API.createElement({
+        type: "stickynote",
+        id: "sticky",
+        width: 250,
+        height: 250,
+        baseHeight: 250,
+        boundElements: [{ type: "text", id: "label" }],
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        text: Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n"),
+        fontSize: 28,
+        containerId: "sticky",
+      });
+      const elements = restore.restoreElements([stickyNote, label], null, {
+        repairBindings: true,
+      });
+      const [restoredNote, restoredLabel] = elements;
+
+      const [note, text] = restore.remeasureTextElements(
+        elements,
+        () => true,
+      )! as [ExcalidrawStickyNoteElement, ExcalidrawTextElement];
+
+      // both halves are new objects, refitted and bumped
+      expect(note).not.toBe(restoredNote);
+      expect(text).not.toBe(restoredLabel);
+      expect(note.version).toBe(restoredNote.version + 1);
+      expect(text.version).toBe(restoredLabel.version + 1);
+      expect(note.baseHeight).toBe(250);
+      expect(note.height).toBeGreaterThan(250);
+      expect(text.fontSize).toBe(STICKY_NOTE_MIN_FONT_SIZE);
+      expect(note.height).toBeCloseTo(
+        getStickyNoteLayout(note, text).container.height,
+      );
+    });
   });
 
   it("should restore freedraw element correctly", () => {

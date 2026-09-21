@@ -768,7 +768,9 @@ class Collab extends PureComponent<CollabProps, CollabState> {
     // NOTE ideally we restore _after_ reconciliation but we can't do that
     // as we'd regenerate even elements such as appState.newElement which would
     // break the state
-    remoteElements = restoreElements(remoteElements, existingElements);
+    remoteElements = restoreElements(remoteElements, existingElements, {
+      refreshDimensions: true,
+    });
 
     let reconciledElements = reconcileElements(
       existingElements,
