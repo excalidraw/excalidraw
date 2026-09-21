@@ -78,7 +78,7 @@ import {
   syncMovedIndices,
 } from "@excalidraw/element";
 
-import { refreshTextDimensions } from "@excalidraw/element";
+import { newElementWith, refreshTextDimensions } from "@excalidraw/element";
 
 import { getNormalizedDimensions } from "@excalidraw/element";
 
@@ -104,6 +104,8 @@ import type {
   StrokeVariability,
   StrokeRoundness,
 } from "@excalidraw/element/types";
+
+import type { ElementUpdate } from "@excalidraw/element";
 
 import type { MarkOptional, Mutable } from "@excalidraw/common/utility-types";
 
@@ -887,6 +889,114 @@ const repairFrameMembership = (
 };
 
 /**
+ * Measures a text element with the local font metrics. Returns `null` for
+ * text that is not measured on its own: sticky labels (refitted together
+ * with their note) and labels whose container is out of reach (unbound by
+ * the binding repair when enabled, left alone either way).
+ */
+const getRefreshedTextDimensions = (
+  element: ExcalidrawTextElement,
+  elementsMap: ElementsMap,
+) => {
+  if (element.isDeleted || isStickyNoteBoundText(element, elementsMap)) {
+    return null;
+  }
+
+  const container = getContainerElement(element, elementsMap);
+  if (element.containerId && !container) {
+    return null;
+  }
+
+  return refreshTextDimensions(element, container, elementsMap) ?? null;
+};
+
+/**
+ * Remeasures text elements with the local font metrics, in place and without
+ * bumping versions.
+ */
+const refreshElementsTextDimensions = (
+  elements: readonly ExcalidrawElement[],
+  existingElements: ElementsMap | null,
+) => {
+  const elementsMap: ElementsMap = existingElements
+    ? new Map([...existingElements, ...arrayToMap(elements)])
+    : arrayToMap(elements);
+
+  for (const element of elements) {
+    if (!isTextElement(element)) {
+      continue;
+    }
+
+    const dimensions = getRefreshedTextDimensions(element, elementsMap);
+    if (dimensions) {
+      Object.assign(element, dimensions);
+    }
+  }
+};
+
+/**
+ * Remeasures the selected text elements of a scene with the local font
+ * metrics, e.g. once the fonts they were measured against finally load.
+ */
+export const remeasureTextElements = (
+  elements: readonly OrderedExcalidrawElement[],
+  shouldRemeasure: (element: ExcalidrawTextElement) => boolean,
+): readonly OrderedExcalidrawElement[] | null => {
+  const elementsMap = arrayToMap(elements);
+  const remeasured = new Map<
+    ExcalidrawElement["id"],
+    OrderedExcalidrawElement
+  >();
+
+  // swaps in a bumped copy carrying the updates; a no-op update hands back
+  // the element itself and is dropped
+  const update = <T extends OrderedExcalidrawElement>(
+    element: T,
+    updates: ElementUpdate<T>,
+  ) => {
+    const next = newElementWith(element, updates);
+    if (next !== element) {
+      remeasured.set(next.id, next);
+      elementsMap.set(next.id, next);
+    }
+  };
+
+  for (const element of elements) {
+    if (
+      !isTextElement(element) ||
+      element.isDeleted ||
+      !shouldRemeasure(element)
+    ) {
+      continue;
+    }
+
+    if (isStickyNoteBoundText(element, elementsMap)) {
+      const container = elementsMap.get(element.containerId!);
+      if (!container || !isStickyNoteElement(container)) {
+        continue;
+      }
+      const layout = getStickyNoteLayout(container, element);
+      if (layout.text) {
+        update(element, layout.text);
+      }
+      update(container, layout.container);
+      continue;
+    }
+
+    const dimensions = getRefreshedTextDimensions(element, elementsMap);
+    if (dimensions) {
+      update(element, dimensions);
+    }
+  }
+
+  if (!remeasured.size) {
+    return null;
+  }
+
+  return elements.map((element) => remeasured.get(element.id) ?? element);
+};
+
+/**
  * Sticky note invariants that need both halves of the pair present, so they
  * run after binding repair. Mutates elements (like the repair helpers).
  * - a label's `baseFontSize` is meaningful only while bound to a sticky note:
@@ -1010,6 +1120,10 @@ export const restoreElements = <T extends ExcalidrawElement>(
   );
 
   if (!opts?.repairBindings) {
+    if (opts?.refreshDimensions) {
+      refreshElementsTextDimensions(restoredElements, existingElementsMap);
+    }
+
     return restoredElements as CombineBrandsIfNeeded<
       T,
       OrderedExcalidrawElement
@@ -1029,22 +1143,6 @@ export const restoreElements = <T extends ExcalidrawElement>(
       repairContainerElement(element, restoredElementsMap);
     }
 
-    if (
-      opts.refreshDimensions &&
-      isTextElement(element) &&
-      // sticky labels are refitted together with their note below
-      !isStickyNoteBoundText(element, restoredElementsMap)
-    ) {
-      Object.assign(
-        element,
-        refreshTextDimensions(
-          element,
-          getContainerElement(element, restoredElementsMap),
-          restoredElementsMap,
-        ),
-      );
-    }
-
     if (isLinearElement(element)) {
       if (
         element.startBinding &&
@@ -1061,6 +1159,11 @@ export const restoreElements = <T extends ExcalidrawElement>(
         (element as Mutable<ExcalidrawLinearElement>).endBinding = null;
       }
     }
+  }
+
+  if (opts.refreshDimensions) {
+    // after binding repair so that a label is measured against its container
+    refreshElementsTextDimensions(restoredElements, existingElementsMap);
   }
 
   restoreStickyNotes(restoredElements, restoredElementsMap, {

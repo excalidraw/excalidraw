@@ -32,6 +32,7 @@ import {
   POINTER_BUTTON,
   ROUNDNESS,
   SCROLL_TIMEOUT,
+  SCENE_FONTS_LOAD_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   THEME,
   TOUCH_CTX_MENU_TIMEOUT,
@@ -69,6 +70,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
+  toIterable,
   applyDarkModeFilter,
   AppEventBus,
   type EXPORT_IMAGE_TYPES,
@@ -84,7 +86,6 @@ import {
   deriveStylesPanelMode,
   isIOS,
   isBrave,
-  isSafari,
   type EditorInterface,
   type StylesPanelMode,
   loadDesktopUIModePreference,
@@ -222,6 +223,7 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
+  ExcalidrawTextElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeLikeElement,
@@ -299,7 +301,11 @@ import {
 
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import { restoreAppState, restoreElements } from "../data/restore";
+import {
+  remeasureTextElements,
+  restoreAppState,
+  restoreElements,
+} from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import {
   copyElementRenderOverrides,
@@ -3599,9 +3605,40 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const restoredElements = restoreElements(initialData?.elements, null, {
+    // restore runs twice on purpose. `loadElementsFonts` reads each text
+    // element's `fontFamily`, and raw initialData may carry legacy or unknown
+    // values that only restore normalizes — so the first pass exists to hand
+    // it canonical families. It deliberately skips `refreshDimensions`: the
+    // measurement has to wait until those fonts are loaded, which is what the
+    // second pass below does. Binding repair therefore runs twice on init;
+    // acceptable for now, but it's the cost to cut if large scenes get slow
+    const normalizedElements = restoreElements(initialData?.elements, null, {
       repairBindings: true,
       deleteInvisibleElements: true,
+    });
+
+    // text bounds are remeasured with the local font metrics below, so the
+    // faces they depend on must be loaded first — otherwise the fallback
+    // font gets measured and the stale bounds survive until a later reload.
+    // A slow CDN must not hold the editor: give up after a bit and open with
+    // the fallback metrics, which the `loadSceneFonts` pass below corrects
+    // once the faces do arrive
+    const didLoadSceneFonts = await Promise.race([
+      Fonts.loadElementsFonts(normalizedElements, this.ownerDocument).then(
+        () => true,
+        (error) => {
+          console.error(error);
+          return false;
+        },
+      ),
+      new Promise<boolean>((resolve) =>
+        setTimeout(() => resolve(false), SCENE_FONTS_LOAD_TIMEOUT),
+      ),
+    ]);
+
+    const restoredElements = restoreElements(normalizedElements, null, {
+      repairBindings: true,
+      refreshDimensions: true,
     });
     let restoredAppState = restoreAppState(initialData?.appState, null);
     const activeTool = restoredAppState.activeTool;
@@ -3687,6 +3724,16 @@ class App extends React.Component<AppProps, AppState> {
     // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
     this.fonts.loadSceneFonts().then((fontFaces) => {
       this.fonts.onLoaded(fontFaces);
+
+      if (!didLoadSceneFonts) {
+        this.remeasureText(
+          new Set(
+            restoredElements
+              .filter((element) => isTextElement(element))
+              .map((element) => element.id),
+          ),
+        );
+      }
     });
 
     if (isElementLink(this.ownerWindow.location.href)) {
@@ -3694,6 +3741,54 @@ class App extends React.Component<AppProps, AppState> {
         target: this.ownerWindow.location.href,
         fit: "scale-down",
         animation: false,
+      });
+    }
+  };
+
+  private remeasureTextOnceFontsLoad = (
+    textElements: readonly ExcalidrawTextElement[],
+  ) => {
+    Fonts.loadElementsFonts(textElements, this.ownerDocument)
+      .then((fontFaces) => {
+        // only the faces that had to be loaded come back
+        if (!fontFaces.length) {
+          return;
+        }
+        // drops the fallback glyph widths and rerenders — or bails when the
+        // `loadingdone` listener got there first, which cleared them as well
+        this.fonts.onLoaded(fontFaces);
+        this.remeasureText(new Set(textElements.map((element) => element.id)));
+      })
+      .catch((error) => console.error(error));
+  };
+
+  /**
+   * Remeasures the given text elements with the local font metrics. The
+   * elements are already in the store snapshot with their stale bounds, so
+   * the corrected copies are versioned and pushed through the store, but
+   * never captured: a measurement is not an edit, so it must not become an
+   * undo entry, only bring the snapshot up to date (otherwise the next undo
+   * would revert the text to the fallback geometry). The host sees it as
+   * an `onChange`, and in collab the corrected elements are broadcast once;
+   * peers remeasure them locally on receipt rather than echoing them back.
+   */
+  private remeasureText = (
+    elementIds: ReadonlySet<ExcalidrawElement["id"]>,
+  ) => {
+    const editingTextElementId = this.state.editingTextElement?.id;
+
+    const remeasuredElements = remeasureTextElements(
+      this.scene.getElementsIncludingDeleted(),
+      (element) =>
+        elementIds.has(element.id) && element.id !== editingTextElementId,
+    );
+
+    if (remeasuredElements) {
+      // the copies re-enter the incoming-text check in `updateScene`, which
+      // is a no-op now that their faces are loaded
+      this.updateScene({
+        elements: remeasuredElements,
+        captureUpdate: CaptureUpdateAction.NEVER,
       });
     }
   };
@@ -4594,6 +4689,8 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const elements = restoreElements(opts.elements, null, {
       deleteInvisibleElements: true,
+      // pasted text carries the source's metrics; measure it locally
+      refreshDimensions: true,
     });
     const clientX =
       typeof opts.position === "object"
@@ -4635,13 +4732,17 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
 
-    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
-    if (isSafari) {
-      Fonts.loadElementsFonts(duplicatedElements, this.ownerDocument).then(
-        (fontFaces) => {
-          this.fonts.onLoaded(fontFaces);
-        },
-      );
+    // faces the pasted text needs may not be loaded yet (and Safari may not
+    // fire `loadingdone` on paste at all), so the synchronous measurement
+    // above may have used fallback metrics. Load them explicitly and
+    // remeasure once they arrive; the pasted elements are captured below,
+    // and the later (uncaptured) correction only brings the snapshot up to
+    // date, same as incoming `updateScene` text
+    const pastedText = duplicatedElements.filter((element) =>
+      isTextElement(element),
+    );
+    if (pastedText.length) {
+      this.remeasureTextOnceFontsLoad(pastedText);
     }
 
     if (opts.files) {
@@ -4977,7 +5078,25 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (elements) {
+        // text new to the scene may carry bounds measured against a font
+        // that is not loaded here yet (a host's own restore, a remote peer's
+        // metrics): once its faces land, measure it locally
+        const incomingText: ExcalidrawTextElement[] = [];
+        for (const element of toIterable(elements)) {
+          if (
+            isTextElement(element) &&
+            !element.isDeleted &&
+            this.scene.getElement(element.id) !== element
+          ) {
+            incomingText.push(element);
+          }
+        }
+
         this.scene.replaceAllElements(elements);
+
+        if (incomingText.length) {
+          this.remeasureTextOnceFontsLoad(incomingText);
+        }
       }
 
       if (collaborators) {

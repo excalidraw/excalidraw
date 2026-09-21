@@ -20,7 +20,7 @@ import {
 
 import { ShapeCache } from "@excalidraw/element";
 
-import { isTextElement, redrawTextBoundingBox } from "@excalidraw/element";
+import { isTextElement } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
@@ -139,10 +139,6 @@ export class Fonts {
         if (container) {
           ShapeCache.delete(container);
         }
-
-        // Headless / MCP measurement used Excalifont metrics before Xiaolai
-        // loaded, so CJK labels stay undersized until an edit remasures them.
-        redrawTextBoundingBox(element, container, this.scene);
       }
     }
 
