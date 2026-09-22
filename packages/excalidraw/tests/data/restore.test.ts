@@ -356,8 +356,8 @@ describe("restoreElements", () => {
       text.lineHeight,
     );
 
-    // works with and without binding repair (the collab path can't repair
-    // partial batches), and is invisible to versioning either way
+    // works with and without binding repair, and is invisible to versioning
+    // either way
     for (const repairBindings of [false, true]) {
       const [restored] = restore.restoreElements([text], null, {
         repairBindings,
@@ -395,7 +395,7 @@ describe("restoreElements", () => {
       index: "a1" as FractionalIndex,
     });
 
-    // a partial remote batch: the label arrives without its container
+    // the label arrives without its container (e.g. a partial batch)
     const [restored] = restore.restoreElements([label], [container], {
       refreshDimensions: true,
     }) as ExcalidrawTextElement[];

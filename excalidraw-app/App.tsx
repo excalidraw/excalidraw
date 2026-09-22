@@ -585,7 +585,6 @@ const ExcalidrawWrapper = () => {
             excalidrawAPI.updateScene({
               elements: restoreElements(data.scene.elements, null, {
                 repairBindings: true,
-                refreshDimensions: true,
               }),
               appState: restoreAppState(data.scene.appState, null),
               captureUpdate: CaptureUpdateAction.IMMEDIATELY,
