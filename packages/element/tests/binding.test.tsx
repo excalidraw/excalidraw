@@ -239,6 +239,30 @@ describe("binding for simple arrows", () => {
       expect(h.state.multiElement).not.toBe(null);
       expect(h.state.activeTool.type).toBe("arrow");
     });
+
+    it("inside -> inside stays in multi-point mode when the pointer moves on", () => {
+      const end: [number, number] = [INSIDE[0] + 50, INSIDE[1] + 50];
+      drawSelfArrow(INSIDE, end);
+      // nudge within the commit zone of the point just placed
+      mouse.moveTo(end[0] + 2, end[1] + 1);
+
+      expect(h.state.multiElement).not.toBe(null);
+      expect(h.state.activeTool.type).toBe("arrow");
+      expect(h.state.multiElement!.points.length).toBe(3);
+    });
+
+    it("bend point inside a shape the arrow doesn't start on stays in multi-point mode when the pointer moves on", () => {
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.clickAt(...MIDDLE);
+      mouse.moveTo(...INSIDE);
+      mouse.clickAt(...INSIDE);
+      mouse.moveTo(INSIDE[0] + 2, INSIDE[1] + 1);
+
+      expect(h.state.multiElement).not.toBe(null);
+      expect(h.state.activeTool.type).toBe("arrow");
+      expect(h.state.multiElement!.points.length).toBe(2);
+    });
   });
 
   describe("when arrow is outside of shape", () => {
