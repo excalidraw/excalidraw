@@ -10,6 +10,7 @@ import type {
   Vector,
   GlobalCoord,
   LocalCoord,
+  GenericPoint,
 } from "./types";
 
 /**
@@ -19,7 +20,7 @@ import type {
  * @param y The Y coordinate
  * @returns The branded and created point
  */
-export function pointFrom<Point extends GlobalPoint | LocalPoint>(
+export function pointFrom<Point extends GenericPoint>(
   x: number,
   y: number,
 ): Point;
@@ -28,11 +29,11 @@ export function pointFrom<Coord extends GlobalCoord | LocalCoord>(
   coords: Coord,
 ): Coord extends GlobalCoord ? GlobalPoint : LocalPoint;
 // TODO remove the overload once we migrate to using Point tuples everywhere
-export function pointFrom<Point extends GlobalPoint | LocalPoint>(coords: {
+export function pointFrom<Point extends GenericPoint>(coords: {
   x: number;
   y: number;
 }): Point;
-export function pointFrom<Point extends GlobalPoint | LocalPoint>(
+export function pointFrom<Point extends GenericPoint>(
   xOrCoords: number | { x: number; y: number },
   y?: number,
 ): Point {
@@ -47,7 +48,7 @@ export function pointFrom<Point extends GlobalPoint | LocalPoint>(
  * @param numberArray The number array to check and to convert to Point
  * @returns The point instance
  */
-export function pointFromArray<Point extends GlobalPoint | LocalPoint>(
+export function pointFromArray<Point extends GenericPoint>(
   numberArray: number[],
 ): Point | undefined {
   return numberArray.length === 2
@@ -61,7 +62,7 @@ export function pointFromArray<Point extends GlobalPoint | LocalPoint>(
  * @param pair A number pair to convert to Point
  * @returns The point instance
  */
-export function pointFromPair<Point extends GlobalPoint | LocalPoint>(
+export function pointFromPair<Point extends GenericPoint>(
   pair: [number, number],
 ): Point {
   return pair as Point;
@@ -73,7 +74,7 @@ export function pointFromPair<Point extends GlobalPoint | LocalPoint>(
  * @param v The vector to convert
  * @returns The point the vector points at with origin 0,0
  */
-export function pointFromVector<P extends GlobalPoint | LocalPoint>(
+export function pointFromVector<P extends GenericPoint>(
   v: Vector,
   offset: P = pointFrom(0, 0),
 ): P {
@@ -86,7 +87,7 @@ export function pointFromVector<P extends GlobalPoint | LocalPoint>(
  * @param p The value to attempt verification on
  * @returns TRUE if the provided value has the shape of a local or global point
  */
-export function isPoint(p: unknown): p is LocalPoint | GlobalPoint {
+export function isPoint(p: unknown): p is GenericPoint {
   return (
     Array.isArray(p) &&
     p.length === 2 &&
@@ -105,7 +106,7 @@ export function isPoint(p: unknown): p is LocalPoint | GlobalPoint {
  * @param b Point The second point to compare
  * @returns TRUE if the points are sufficiently close to each other
  */
-export function pointsEqual<Point extends GlobalPoint | LocalPoint>(
+export function pointsEqual<Point extends GenericPoint>(
   a: Point,
   b: Point,
   tolerance: number = PRECISION,
@@ -122,7 +123,7 @@ export function pointsEqual<Point extends GlobalPoint | LocalPoint>(
  * @param angle The radians to rotate the point by
  * @returns The rotated point
  */
-export function pointRotateRads<Point extends GlobalPoint | LocalPoint>(
+export function pointRotateRads<Point extends GenericPoint>(
   point: Point,
   center: Point,
   angle: Radians,
@@ -146,7 +147,7 @@ export function pointRotateRads<Point extends GlobalPoint | LocalPoint>(
  * @param angle The degree to rotate the point by
  * @returns The rotated point
  */
-export function pointRotateDegs<Point extends GlobalPoint | LocalPoint>(
+export function pointRotateDegs<Point extends GenericPoint>(
   point: Point,
   center: Point,
   angle: Degrees,
@@ -168,8 +169,8 @@ export function pointRotateDegs<Point extends GlobalPoint | LocalPoint>(
  */
 // TODO 99% of use is translating between global and local coords, which need to be formalized
 export function pointTranslate<
-  From extends GlobalPoint | LocalPoint,
-  To extends GlobalPoint | LocalPoint,
+  From extends GenericPoint,
+  To extends GenericPoint,
 >(p: From, v: Vector = [0, 0] as Vector): To {
   return pointFrom(p[0] + v[0], p[1] + v[1]);
 }
@@ -181,7 +182,7 @@ export function pointTranslate<
  * @param b The other point to create the middle point for
  * @returns The middle point
  */
-export function pointCenter<P extends LocalPoint | GlobalPoint>(a: P, b: P): P {
+export function pointCenter<P extends GenericPoint>(a: P, b: P): P {
   return pointFrom((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
 }
 
@@ -192,10 +193,7 @@ export function pointCenter<P extends LocalPoint | GlobalPoint>(a: P, b: P): P {
  * @param b Second point
  * @returns The euclidean distance between the two points.
  */
-export function pointDistance<P extends LocalPoint | GlobalPoint>(
-  a: P,
-  b: P,
-): number {
+export function pointDistance<P extends GenericPoint>(a: P, b: P): number {
   return Math.hypot(b[0] - a[0], b[1] - a[1]);
 }
 
@@ -208,10 +206,7 @@ export function pointDistance<P extends LocalPoint | GlobalPoint>(
  * @param b Second point
  * @returns The euclidean distance between the two points.
  */
-export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
-  a: P,
-  b: P,
-): number {
+export function pointDistanceSq<P extends GenericPoint>(a: P, b: P): number {
   const xDiff = b[0] - a[0];
   const yDiff = b[1] - a[1];
 
@@ -226,7 +221,7 @@ export function pointDistanceSq<P extends LocalPoint | GlobalPoint>(
  * @param multiplier The scaling factor
  * @returns
  */
-export const pointScaleFromOrigin = <P extends GlobalPoint | LocalPoint>(
+export const pointScaleFromOrigin = <P extends GenericPoint>(
   p: P,
   mid: P,
   multiplier: number,
@@ -241,7 +236,7 @@ export const pointScaleFromOrigin = <P extends GlobalPoint | LocalPoint>(
  * @param r The other point to compare against
  * @returns TRUE if q is indeed between p and r
  */
-export const isPointWithinBounds = <P extends GlobalPoint | LocalPoint>(
+export const isPointWithinBounds = <P extends GenericPoint>(
   p: P,
   q: P,
   r: P,
