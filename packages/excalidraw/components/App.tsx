@@ -221,7 +221,6 @@ import type {
   FileId,
   NonDeletedExcalidrawElement,
   ExcalidrawTextContainer,
-  ExcalidrawTextElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawIframeLikeElement,
@@ -299,11 +298,7 @@ import {
 
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import {
-  remeasureTextElements,
-  restoreAppState,
-  restoreElements,
-} from "../data/restore";
+import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import {
   copyElementRenderOverrides,
@@ -387,6 +382,7 @@ import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppDuplicate } from "./App.duplicate";
+import { AppFonts } from "./App.fonts";
 import { AppFlowchart } from "./App.flowchart";
 import { AppModifiers } from "./App.modifiers";
 import { AppPan } from "./App.pan";
@@ -665,6 +661,7 @@ class App extends React.Component<AppProps, AppState> {
   public duplicate: AppDuplicate = new AppDuplicate(this, {
     getPointerCount: () => gesture.pointers.size,
   });
+  public fontMetrics: AppFonts = new AppFonts(this);
   public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
@@ -3688,10 +3685,7 @@ class App extends React.Component<AppProps, AppState> {
     // can be loaded fresh
     this.clearImageShapeCache();
 
-    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
-    this.fonts.loadSceneFonts().then((fontFaces) => {
-      this.fonts.onLoaded(fontFaces);
-    });
+    this.fontMetrics.loadSceneFonts();
 
     if (isElementLink(this.ownerWindow.location.href)) {
       this.viewport.setViewport({
@@ -3700,53 +3694,6 @@ class App extends React.Component<AppProps, AppState> {
         animation: false,
       });
     }
-  };
-
-  public remeasureTextOnceFontsLoad = (
-    textElements: readonly ExcalidrawElement[],
-  ) => {
-    const text = textElements.filter((element) =>
-      isTextElement(element),
-    ) as ExcalidrawTextElement[];
-    if (!text.length) {
-      return;
-    }
-    Fonts.loadElementsFonts(text, this.ownerDocument)
-      .then((fontFaces) => {
-        // only the faces that had to be loaded come back
-        if (!fontFaces.length) {
-          return;
-        }
-        // drops the fallback glyph widths and rerenders — or bails when the
-        // `loadingdone` listener got there first, which cleared them as well
-        this.fonts.onLoaded(fontFaces);
-        this.remeasureText(new Set(text.map((element) => element.id)));
-      })
-      .catch((error) => console.error(error));
-  };
-
-  /**
-   * Remeasures the given text elements with the local font metrics.
-   */
-  private remeasureText = (
-    elementIds: ReadonlySet<ExcalidrawElement["id"]>,
-  ) => {
-    this.setState({}, () => {
-      const editingTextElementId = this.state.editingTextElement?.id;
-
-      const remeasuredElements = remeasureTextElements(
-        this.scene.getElementsIncludingDeleted(),
-        (element) =>
-          elementIds.has(element.id) && element.id !== editingTextElementId,
-      );
-
-      if (remeasuredElements) {
-        this.updateScene({
-          elements: remeasuredElements,
-          captureUpdate: CaptureUpdateAction.NEVER,
-        });
-      }
-    });
   };
 
   private getFormFactor = (editorWidth: number, editorHeight: number) => {
@@ -4049,14 +3996,10 @@ class App extends React.Component<AppProps, AppState> {
           passive: false,
         },
       ), // #3553
-      // rerender text elements on font load to fix #637 && #1553
       addEventListener(
         this.ownerDocument.fonts,
         "loadingdone",
-        (event) => {
-          const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-          this.fonts.onLoaded(fontFaces);
-        },
+        this.fontMetrics.handleLoadingDone,
         { passive: false },
       ),
       addEventListener(
@@ -4694,7 +4637,7 @@ class App extends React.Component<AppProps, AppState> {
     // remeasure once they arrive; the pasted elements are captured below,
     // and the later (uncaptured) correction only brings the snapshot up to
     // date
-    this.remeasureTextOnceFontsLoad(duplicatedElements);
+    this.fontMetrics.remeasureTextOnceLoaded(duplicatedElements);
 
     if (opts.files) {
       this.addMissingFiles(opts.files);
@@ -10830,7 +10773,7 @@ class App extends React.Component<AppProps, AppState> {
             replaceFiles: true,
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
-          this.remeasureTextOnceFontsLoad(scene.elements);
+          this.fontMetrics.remeasureTextOnceLoaded(scene.elements);
           this.showSceneReplacedToast();
           return;
         }
@@ -10996,7 +10939,7 @@ class App extends React.Component<AppProps, AppState> {
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
-        this.remeasureTextOnceFontsLoad(ret.data.elements);
+        this.fontMetrics.remeasureTextOnceLoaded(ret.data.elements);
         return true;
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library

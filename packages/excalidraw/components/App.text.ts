@@ -16,7 +16,6 @@ import { pointFrom, type Radians } from "@excalidraw/math";
 
 import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
-  charWidth,
   fixBindingsAfterDeletion,
   getActiveTextElement,
   getApproxMinLineHeight,
@@ -275,53 +274,10 @@ export class AppText {
       }
     };
 
-    let isEditing = true;
-    const pendingFontLoads = new Map<string, Promise<unknown>>();
-
-    const remeasureOnceFontLoads = (nextOriginalText: string) => {
-      const latestTextElement =
-        this.app.scene.getElement<ExcalidrawTextElement>(element.id);
-      if (!latestTextElement || !nextOriginalText) {
-        return;
-      }
-      const font = getFontString(latestTextElement);
-      if (
-        pendingFontLoads.has(font) ||
-        this.app.ownerDocument.fonts.check(font, nextOriginalText)
-      ) {
-        return;
-      }
-      pendingFontLoads.set(
-        font,
-        this.app.ownerDocument.fonts
-          .load(font, nextOriginalText)
-          .then((fontFaces) => {
-            pendingFontLoads.delete(font);
-            if (!isEditing) {
-              return;
-            }
-            const currentTextElement =
-              this.app.scene.getElement<ExcalidrawTextElement>(element.id);
-            if (!currentTextElement || currentTextElement.isDeleted) {
-              return;
-            }
-            // drop the fallback glyph widths before wrapping again
-            charWidth.clearCache(font);
-            this.app.fonts.onLoaded(fontFaces);
-            updateElement(currentTextElement.originalText, false);
-            if (isNonDeletedElement(element)) {
-              updateBoundElements(element, this.app.scene);
-            }
-            // text typed while this load was in flight may need subsets this
-            // load didn't cover — re-check once against the latest text
-            remeasureOnceFontLoads(currentTextElement.originalText);
-          })
-          .catch((error) => {
-            pendingFontLoads.delete(font);
-            console.error(error);
-          }),
-      );
-    };
+    const fontSession = this.app.fontMetrics.createEditSession(
+      element,
+      (originalText) => updateElement(originalText, false),
+    );
 
     this.textWysiwygSubmitHandler = textWysiwyg({
       canvas: this.app.canvas,
@@ -343,10 +299,10 @@ export class AppText {
         if (isNonDeletedElement(element)) {
           updateBoundElements(element, this.app.scene);
         }
-        remeasureOnceFontLoads(nextOriginalText);
+        fontSession.onChange(nextOriginalText);
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
-        isEditing = false;
+        fontSession.end();
         this.textWysiwygSubmitHandler = null;
 
         const isDeleted = !nextOriginalText.trim();
