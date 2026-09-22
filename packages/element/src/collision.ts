@@ -310,7 +310,9 @@ const bindableElementBorderDistanceIfClose = (
 
   const distance = distanceToElement(element, elementsMap, point);
   if (isPointInElement(point, element, elementsMap)) {
-    return distance;
+    // frames are only bindable from the outside, so arrows ending inside
+    // a frame can bind to its children (or stay unbound)
+    return isFrameLikeElement(element) ? -Infinity : distance;
   }
 
   return distance > tolerance ? -Infinity : -distance;
@@ -337,6 +339,11 @@ export const getAllHoveredElementAtPoint = (
 
     if (
       isBindableElement(element, false) &&
+      // frames are only bindable from the outside
+      !(
+        isFrameLikeElement(element) &&
+        isPointInElement(point, element, elementsMap)
+      ) &&
       hitElementItself({
         element,
         point,

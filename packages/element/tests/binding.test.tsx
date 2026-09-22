@@ -265,6 +265,84 @@ describe("binding for simple arrows", () => {
     });
   });
 
+  describe("binding to frames", () => {
+    // frame spans x:200..600, y:200..600, child rect x:300..400, y:300..400
+    beforeEach(async () => {
+      mouse.reset();
+      await act(() => setLanguage(defaultLang));
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const frame = API.createElement({
+        id: "frame",
+        type: "frame",
+        x: 200,
+        y: 200,
+        width: 400,
+        height: 400,
+      });
+      const child = API.createElement({
+        id: "child",
+        type: "rectangle",
+        x: 300,
+        y: 300,
+        width: 100,
+        height: 100,
+        frameId: frame.id,
+      });
+      API.setElements([frame, child]);
+    });
+
+    const drawArrow = (end: [number, number]) => {
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.downAt(50, 50);
+      mouse.moveTo(end[0] - 10, end[1] - 10);
+      mouse.moveTo(...end);
+      mouse.up();
+
+      return h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+    };
+
+    it("doesn't bind an arrow ending in the frame's empty interior", () => {
+      const arrow = drawArrow([500, 500]);
+
+      expect(arrow.endBinding).toBe(null);
+    });
+
+    it("binds an arrow ending on a frame child to the child", () => {
+      const arrow = drawArrow([350, 350]);
+
+      expect(arrow.endBinding?.elementId).toBe("child");
+    });
+
+    it("binds an arrow ending just outside the frame to the frame", () => {
+      const arrow = drawArrow([500, 610]);
+
+      expect(arrow.endBinding?.elementId).toBe("frame");
+      expect(arrow.endBinding?.mode).toBe("orbit");
+    });
+
+    it("keeps an elbow arrow drawn inside the frame where it was drawn", () => {
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.downAt(250, 250);
+      mouse.moveTo(400, 450);
+      mouse.moveTo(550, 550);
+      mouse.up();
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      expect(arrow.elbowed).toBe(true);
+      // no self-orbit binding to the frame, which would route the arrow
+      // around the frame's outside
+      expect(arrow.startBinding).toBe(null);
+      expect(arrow.endBinding).toBe(null);
+      expect(arrow.frameId).toBe("frame");
+      expect([arrow.x, arrow.y]).toEqual([250, 250]);
+      expect(arrow.points[arrow.points.length - 1]).toEqual([300, 300]);
+    });
+  });
+
   describe("when arrow is outside of shape", () => {
     beforeEach(async () => {
       mouse.reset();
