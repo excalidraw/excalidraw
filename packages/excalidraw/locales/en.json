@@ -1,4 +1,11 @@
 {
+  "fileDrop": {
+    "replace": "Drop to replace content",
+    "add": "Drop to add to canvas",
+    "importLibrary": "Drop to import library",
+    "replaceHint": "Hold <shift>Shift</shift> to keep existing content",
+    "keepHint": "Your existing content will be kept"
+  },
   "labels": {
     "signUp": "Sign up",
     "signIn": "Sign in",
