@@ -1,4 +1,4 @@
-import { simplify } from "points-on-curve";
+import { pointsOnBezierCurves, simplify } from "points-on-curve";
 import { getStroke } from "perfect-freehand";
 import { LaserPointer } from "@excalidraw/laser-pointer";
 
@@ -16,6 +16,7 @@ import {
   pointDistance,
   type LocalPoint,
   pointRotateRads,
+  polygonFromPoints,
 } from "@excalidraw/math";
 import {
   ROUGHNESS,
@@ -31,7 +32,7 @@ import {
 
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import type { GlobalPoint, Polygon } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -577,6 +578,48 @@ const getArrowheadShapes = (
   }
 };
 
+/** The simplified centerline the freedraw fill is drawn along. */
+const getFreedrawFillCurvePoints = (element: ExcalidrawFreeDrawElement) =>
+  simplify(element.points as Mutable<LocalPoint[]>, 0.75) as [number, number][];
+
+const freedrawFillPolygonCache = new WeakMap<
+  ExcalidrawFreeDrawElement,
+  { version: number; polygon: Polygon<LocalPoint> }
+>();
+
+/**
+ * Returns the flattened fill contour of a freedraw loop in local, unrotated
+ * coordinates, following the rendered fill rather than the stroke outline.
+ */
+export const getFreedrawFillPolygon = (element: ExcalidrawFreeDrawElement) => {
+  const cached = freedrawFillPolygonCache.get(element);
+  if (cached?.version === element.version) {
+    return cached.polygon;
+  }
+
+  // Same curve as the rendered fill, without roughness jitter. RoughJS also
+  // handles inputs simplified to two points.
+  const ops = new RoughGenerator().curve(getFreedrawFillCurvePoints(element), {
+    roughness: 0,
+    disableMultiStroke: true,
+  }).sets[0].ops;
+  const bezierPoints: LocalPoint[] = [];
+  // A single curve pass consists of a move followed by cubic control points.
+  for (const { data } of ops) {
+    for (let i = 0; i < data.length; i += 2) {
+      bezierPoints.push(pointFrom<LocalPoint>(data[i], data[i + 1]));
+    }
+  }
+
+  // Omit the optional distance argument to avoid simplifying the boundary again.
+  const polygon = polygonFromPoints(
+    pointsOnBezierCurves(bezierPoints, 0.5) as LocalPoint[],
+  );
+  freedrawFillPolygonCache.set(element, { version: element.version, polygon });
+
+  return polygon;
+};
+
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
@@ -940,12 +983,8 @@ const _generateElementShape = (
       // (1) background fill (rc shape), optional
       if (isPathALoop(element.points)) {
         // generate rough polygon to fill freedraw shape
-        const simplifiedPoints = simplify(
-          element.points as Mutable<LocalPoint[]>,
-          0.75,
-        );
         shapes.push(
-          generator.curve(simplifiedPoints as [number, number][], {
+          generator.curve(getFreedrawFillCurvePoints(element), {
             ...generateRoughOptions(element, false, isDarkMode),
             stroke: "none",
           }),

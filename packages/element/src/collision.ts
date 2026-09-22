@@ -8,6 +8,7 @@ import {
   pointFromVector,
   pointRotateRads,
   pointsEqual,
+  polygonIncludesPoint,
   vectorFromPoint,
   vectorNormalize,
   vectorScale,
@@ -22,6 +23,7 @@ import type {
   Curve,
   GlobalPoint,
   LineSegment,
+  LocalPoint,
   Radians,
 } from "@excalidraw/math";
 
@@ -62,6 +64,8 @@ import { distanceToElement } from "./distance";
 import { getBindingGap } from "./binding";
 
 import { hasBackground } from "./comparisons";
+
+import { getFreedrawFillPolygon } from "./shape";
 
 import type {
   ElementsMap,
@@ -764,6 +768,26 @@ export const isPointInElement = (
   ) {
     // There isn't any "inside" for a non-looping path
     return false;
+  }
+
+  if (isFreeDrawElement(element)) {
+    // Test before the rotated-bounds check below: the smoothed fill can bulge
+    // past the recorded points, and how much of it those bounds would clip
+    // depends on the angle. An asymmetric loop's rotated bounds center is also
+    // not its rotation pivot.
+    const [x1, y1, x2, y2] = getElementBounds(element, elementsMap, true);
+    const [px, py] = pointRotateRads(
+      point,
+      pointFrom<GlobalPoint>((x1 + x2) / 2, (y1 + y2) / 2),
+      -element.angle as Radians,
+    );
+
+    // The fill follows the centerline rather than the stroke outline, and uses
+    // the same even-odd rule as RoughJS's filled curves.
+    return polygonIncludesPoint(
+      pointFrom<LocalPoint>(px - element.x, py - element.y),
+      getFreedrawFillPolygon(element),
+    );
   }
 
   const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
