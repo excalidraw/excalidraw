@@ -223,6 +223,35 @@ describe("repairBindings", () => {
       // the surviving binding still keeps the arrow on the target
       expect(fixedRect.boundElements).toEqual([{ id: "arrow", type: "arrow" }]);
     });
+
+    it("honours the arrowIds scope, like every other arrow-side action", () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        x: 0,
+        y: 0,
+        points: [
+          [0, 0],
+          [50, 0],
+        ],
+        startBinding: {
+          elementId: "missing",
+          fixedPoint: [0.5, 0.5],
+          mode: "orbit",
+        },
+        endBinding: null,
+      });
+
+      const fixed = repairBindings([arrow], {
+        ...REPAIR_ALL,
+        actions: ["unbindDangling"],
+        arrowIds: ["some-other-arrow"],
+      });
+      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+
+      // out of scope, so the dangling binding is left untouched
+      expect(fixedArrow.startBinding?.elementId).toBe("missing");
+    });
   });
 
   describe("pruneBoundElements", () => {
@@ -295,6 +324,68 @@ describe("repairBindings", () => {
       const fixedRect = fixed.find((el) => el.id === "rect")!;
 
       expect(fixedRect.boundElements).toEqual([]);
+    });
+
+    it("drops a record whose type disagrees with the element it points at", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        // text element recorded as an arrow: `getBoundTextElementId` looks
+        // bound text up by `type === "text"`, so this record stops resolving
+        boundElements: [{ id: "text", type: "arrow" }],
+      });
+      const text = API.createElement({
+        type: "text",
+        id: "text",
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 20,
+        text: "hi",
+        containerId: "rect",
+      });
+
+      const fixed = repairBindings([rect, text], {
+        ...REPAIR_ALL,
+        actions: ["pruneBoundElements"],
+      });
+      const fixedRect = fixed.find((el) => el.id === "rect")!;
+
+      expect(fixedRect.boundElements).toEqual([]);
+    });
+
+    it("keeps a record whose type matches", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ id: "text", type: "text" }],
+      });
+      const text = API.createElement({
+        type: "text",
+        id: "text",
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 20,
+        text: "hi",
+        containerId: "rect",
+      });
+
+      const fixed = repairBindings([rect, text], {
+        ...REPAIR_ALL,
+        actions: ["pruneBoundElements"],
+      });
+      const fixedRect = fixed.find((el) => el.id === "rect")!;
+
+      expect(fixedRect.boundElements).toEqual([{ id: "text", type: "text" }]);
     });
   });
 
@@ -530,7 +621,7 @@ describe("repairBindings", () => {
   });
 
   describe("dedupeBoundElements", () => {
-    it("keeps the last occurrence of a duplicate entry", () => {
+    it("keeps the first occurrence and preserves listing order", () => {
       const rect = API.createElement({
         type: "rectangle",
         id: "rect",
@@ -539,34 +630,23 @@ describe("repairBindings", () => {
         width: 100,
         height: 100,
         boundElements: [
-          { id: "arrow", type: "arrow" },
-          { id: "arrow", type: "arrow" },
+          { id: "a", type: "arrow" },
+          { id: "b", type: "arrow" },
+          { id: "a", type: "arrow" },
         ],
-      });
-      const arrow = API.createElement({
-        type: "arrow",
-        id: "arrow",
-        x: 100,
-        y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
-        startBinding: {
-          elementId: "rect",
-          fixedPoint: [0.5, 0.5],
-          mode: "orbit",
-        },
-        endBinding: null,
       });
 
-      const fixed = repairBindings([rect, arrow], {
+      const fixed = repairBindings([rect], {
         ...REPAIR_ALL,
         actions: ["dedupeBoundElements"],
       });
       const fixedRect = fixed.find((el) => el.id === "rect")!;
 
-      expect(fixedRect.boundElements).toEqual([{ id: "arrow", type: "arrow" }]);
+      // `a` keeps its original position; the later duplicate is dropped
+      expect(fixedRect.boundElements).toEqual([
+        { id: "a", type: "arrow" },
+        { id: "b", type: "arrow" },
+      ]);
     });
   });
 
@@ -993,6 +1073,48 @@ describe("repairBindings", () => {
 
       repairBindings([arrow], { warn: false });
 
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it("does not warn for a dangling end that inference then rebinds", () => {
+      const warnSpy = vi
+        .spyOn(console, "warn")
+        .mockImplementation(() => undefined);
+
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: null,
+      });
+      // the start endpoint sits on rect's outline, so after unbindDangling
+      // drops the stale target, inferMissingBindings re-binds it
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        x: 100,
+        y: 50,
+        points: [
+          [0, 0],
+          [50, 0],
+        ],
+        startBinding: {
+          elementId: "stale",
+          fixedPoint: [0.5, 0.5],
+          mode: "orbit",
+        },
+        endBinding: null,
+      });
+
+      const fixed = repairBindings([rect, arrow], { warn: true });
+      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+
+      // the repair succeeded, so nothing is reported
+      expect(fixedArrow.startBinding?.elementId).toBe("rect");
       expect(warnSpy).not.toHaveBeenCalled();
       warnSpy.mockRestore();
     });

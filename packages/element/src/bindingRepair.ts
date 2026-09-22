@@ -49,7 +49,8 @@ export type BindingRepairAction =
   // `boundElements` records on a bindable element that do not resolve to a live
   // element, or whose reverse half no longer points back: drop the record.
   | "pruneBoundElements"
-  // duplicate `boundElements` entries sharing an id: keep the last one.
+  // duplicate `boundElements` entries sharing an id: keep the first one, so the
+  // surviving order is the order the entries were first listed in.
   | "dedupeBoundElements"
   // `mode`/`fixedPoint` missing or stale after the target moved: re-derive from
   // the current arrow endpoints.
@@ -82,8 +83,12 @@ export interface RepairBindingsOptions {
    */
   actions?: readonly BindingRepairAction[];
   /**
-   * Restricts inference/re-anchoring to these arrow ids. Dangling and stale
-   * records are still repaired scene-wide. Defaults to all arrows.
+   * Restricts arrow-side repairs (dangling bindings, inference, re-anchoring,
+   * outline snapping, ledger links) to these arrow ids. The container-side
+   * ledger actions (`pruneBoundElements`, `dedupeBoundElements`) are not
+   * arrow-scoped: they always run scene-wide, since a stale or duplicated
+   * record is a defect of the container regardless of which arrow produced it.
+   * Defaults to all arrows.
    */
   arrowIds?: readonly ExcalidrawElement["id"][];
   /**
@@ -140,7 +145,19 @@ type RepairState = {
   arrowIds: ReadonlySet<ExcalidrawElement["id"]> | null;
   tolerance: number;
   warn: boolean;
+  /**
+   * Warnings held back until the run ends, keyed by `arrowId:startOrEnd`.
+   * `unbindDangling` drops a binding before `inferMissingBindings` gets a
+   * chance to rebind the same endpoint, so warning at drop time would report a
+   * failure for a repair that then fully succeeds. `inferMissingBindings`
+   * clears the entry it rebinds; whatever remains is genuinely unrepaired and
+   * is flushed by `flushPendingWarnings`.
+   */
+  pendingWarnings: Map<string, string>;
 };
+
+const pendingKey = (arrow: ExcalidrawElement, endpoint: Endpoint): string =>
+  `${arrow.id}:${endpoint.startOrEnd}`;
 
 const isInScope = (state: RepairState, arrow: ExcalidrawElement): boolean =>
   state.arrowIds === null || state.arrowIds.has(arrow.id);
@@ -150,6 +167,33 @@ const report = (state: RepairState, message: string): void => {
     // eslint-disable-next-line no-console
     console.warn(`[repairBindings] ${message}`);
   }
+};
+
+/** Reports `message` only once the run confirms the endpoint stayed unbound. */
+const reportPending = (
+  state: RepairState,
+  arrow: ExcalidrawElement,
+  endpoint: Endpoint,
+  message: string,
+): void => {
+  state.pendingWarnings.set(pendingKey(arrow, endpoint), message);
+};
+
+/** Marks a pending warning as resolved, for an endpoint that was repaired. */
+const clearPending = (
+  state: RepairState,
+  arrow: ExcalidrawElement,
+  endpoint: Endpoint,
+): void => {
+  state.pendingWarnings.delete(pendingKey(arrow, endpoint));
+};
+
+/** Emits the warnings for endpoints that no later pass managed to repair. */
+const flushPendingWarnings = (state: RepairState): void => {
+  for (const message of state.pendingWarnings.values()) {
+    report(state, message);
+  }
+  state.pendingWarnings.clear();
 };
 
 /**
@@ -198,7 +242,12 @@ const resolveTarget = (
   return target && isBindableElement(target) ? target : null;
 };
 
-/** Whether `element` records a binding onto `bindableElementId`. */
+/**
+ * Whether `element` records a binding onto `bindableElementId`. Checks only the
+ * id and the reverse half; the record's `type` field is validated separately by
+ * {@link hasBoundElementType}, since a wrong type is a distinct defect that the
+ * reverse half alone would not catch.
+ */
 const isBoundTo = (
   element: ExcalidrawElement,
   bindableElementId: ExcalidrawElement["id"],
@@ -218,9 +267,35 @@ const isBoundTo = (
 };
 
 /**
+ * Whether a `boundElements` record's `type` matches the element it points at.
+ * `getBoundTextElementId` looks bound text up by `type === "text"`, so a text
+ * element recorded as `type: "arrow"` would silently stop resolving; the
+ * reverse is equally a defect. Records may only be `{ id, type: "arrow" }` or
+ * `{ id, type: "text" }`.
+ */
+const hasBoundElementType = (
+  bound: ExcalidrawElement,
+  record: NonNullable<ExcalidrawElement["boundElements"]>[number],
+): boolean => {
+  if (isArrowElement(bound)) {
+    return record.type === "arrow";
+  }
+
+  if (isTextElement(bound)) {
+    return record.type === "text";
+  }
+
+  return false;
+};
+
+/**
  * Drops `startBinding`/`endBinding` that point at elements absent from the
  * scene or marked deleted. A binding without a resolvable target cannot be
- * repaired, so the arrow is left unbound on that end and the drop is reported.
+ * repaired, so the arrow is left unbound on that end.
+ *
+ * The drop is reported only if no later pass rebinds the endpoint: a dangling
+ * end that `inferMissingBindings` then re-binds is a repair that succeeded, and
+ * warning about it would be noise in the main generator-cleanup flow.
  */
 const unbindDangling = (state: RepairState): void => {
   forEachBinding(state, (arrow, endpoint, binding) => {
@@ -228,8 +303,10 @@ const unbindDangling = (state: RepairState): void => {
       return;
     }
 
-    report(
+    reportPending(
       state,
+      arrow,
+      endpoint,
       `arrow "${arrow.id}" ${endpoint.startOrEnd} binding targets ` +
         `"${binding.elementId}", which is missing or deleted; unbinding`,
     );
@@ -258,6 +335,9 @@ const pruneBoundElements = (state: RepairState): void => {
         ? "is missing"
         : bound.isDeleted
         ? "is deleted"
+        : !hasBoundElementType(bound, boundElement)
+        ? `is recorded as type "${boundElement.type}" but is a ` +
+          `"${bound.type}"`
         : !isBoundTo(bound, bindable.id)
         ? "no longer binds back"
         : null;
@@ -281,9 +361,10 @@ const pruneBoundElements = (state: RepairState): void => {
 };
 
 /**
- * Removes duplicate `boundElements` entries sharing an id. The last entry wins,
- * matching `boundElementsVisitor`, where the most recently added arrow/text is
- * the one kept.
+ * Removes duplicate `boundElements` entries sharing an id, keeping the first
+ * occurrence. Duplicates sharing an id are interchangeable (same id, same
+ * type), so keeping the first preserves the original listing order rather than
+ * introducing an arbitrary reordering.
  */
 const dedupeBoundElements = (state: RepairState): void => {
   for (const bindable of state.bindables()) {
@@ -577,6 +658,10 @@ const inferMissingBindings = (state: RepairState): void => {
         state.scene,
         point,
       );
+
+      // a dangling end dropped by `unbindDangling` that this pass re-binds is a
+      // completed repair, so its pending warning is no longer accurate
+      clearPending(state, arrow, endpoint);
     }
   }
 };
@@ -672,12 +757,16 @@ export const repairBindings = (
     arrowIds: opts?.arrowIds ? new Set(opts.arrowIds) : null,
     tolerance: opts?.tolerance ?? DEFAULT_TOLERANCE,
     warn: opts?.warn !== false,
+    pendingWarnings: new Map(),
   };
 
   for (const action of opts?.actions ?? ALL_BINDING_REPAIR_ACTIONS) {
     cache = null;
     ACTION_IMPL[action](state);
   }
+
+  // only the endpoints no later pass repaired are reported
+  flushPendingWarnings(state);
 
   return scene.getElementsIncludingDeleted() as OrderedExcalidrawElement[];
 };
