@@ -49,6 +49,7 @@ import type {
   CaptureUpdateActionType,
   DurableIncrement,
   EphemeralIncrement,
+  OnDuplicateData,
 } from "@excalidraw/element";
 import type { GlobalPoint } from "@excalidraw/math";
 
@@ -881,13 +882,29 @@ export interface ExcalidrawProps {
    *
    * Returned elements will be used in place of the next elements
    * (you should return all elements, including deleted, and not mutate
-   * the element if changes are made)
+   * the element if changes are made).
+   *
+   * The duplicates are the elements in `nextElements` which are not in
+   * `prevElements` (see also `data.duplicateElements`). When pasting or
+   * inserting onto a frame, their `frameId` is already set. To change a
+   * duplicate, return a new object with the same `id`. It is shallow-merged
+   * into the duplicate (omitted properties are kept), and your changes are
+   * part of the duplication itself (same undo entry, same durable increment).
+   *
+   * To prevent an element from being duplicated, omit its duplicate from the
+   * returned array. References to it from the remaining duplicates are
+   * cleared, and a bound text isn't duplicated without its container. To
+   * prevent the duplication as a whole, return `false`. If no duplicate
+   * remains, the duplication is cancelled and the returned elements are
+   * ignored (alt-drag then moves the original elements instead).
    */
   onDuplicate?: (
     nextElements: readonly ExcalidrawElement[],
     /** excludes the duplicated elements */
     prevElements: readonly ExcalidrawElement[],
-  ) => ExcalidrawElement[] | void;
+    /** lookups covering just the elements taking part in the duplication */
+    data: OnDuplicateData,
+  ) => ExcalidrawElement[] | void | false;
   renderTopLeftUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -1185,6 +1202,7 @@ export type AppClassProperties = {
   arrowText: App["arrowText"];
   cursor: App["cursor"];
   bucketFill: App["bucketFill"];
+  duplicate: App["duplicate"];
   toolDrag: App["toolDrag"];
   activeResizeHandle: App["activeResizeHandle"];
   isToolLocked: App["isToolLocked"];
