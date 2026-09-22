@@ -161,6 +161,8 @@ export const loadSceneOrLibraryFromBlob = async (
       const elements = restoreElements(data.elements, localElements, {
         repairBindings: true,
         deleteInvisibleElements: true,
+        // imported text carries the source's metrics; measure it locally
+        refreshDimensions: true,
       });
       return {
         type: MIME_TYPES.excalidraw,
