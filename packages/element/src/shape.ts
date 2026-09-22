@@ -1,4 +1,4 @@
-import { simplify } from "points-on-curve";
+import { pointsOnBezierCurves, simplify } from "points-on-curve";
 import { getStroke, getStrokePoints } from "perfect-freehand";
 import { LaserPointer } from "@excalidraw/laser-pointer";
 
@@ -16,6 +16,7 @@ import {
   pointDistance,
   type LocalPoint,
   pointRotateRads,
+  polygonFromPoints,
 } from "@excalidraw/math";
 import {
   ROUGHNESS,
@@ -30,7 +31,7 @@ import {
 
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import type { GlobalPoint } from "@excalidraw/math";
+import type { GlobalPoint, Polygon } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -575,6 +576,48 @@ const getArrowheadShapes = (
   }
 };
 
+/** The simplified centerline the freedraw fill is drawn along. */
+const getFreedrawFillCurvePoints = (element: ExcalidrawFreeDrawElement) =>
+  simplify(element.points as Mutable<LocalPoint[]>, 0.75) as [number, number][];
+
+const freedrawFillPolygonCache = new WeakMap<
+  ExcalidrawFreeDrawElement,
+  { version: number; polygon: Polygon<LocalPoint> }
+>();
+
+/**
+ * Returns the flattened fill contour of a freedraw loop in local, unrotated
+ * coordinates, following the rendered fill rather than the stroke outline.
+ */
+export const getFreedrawFillPolygon = (element: ExcalidrawFreeDrawElement) => {
+  const cached = freedrawFillPolygonCache.get(element);
+  if (cached?.version === element.version) {
+    return cached.polygon;
+  }
+
+  // Same curve as the rendered fill, without roughness jitter. RoughJS also
+  // handles inputs simplified to two points.
+  const ops = new RoughGenerator().curve(getFreedrawFillCurvePoints(element), {
+    roughness: 0,
+    disableMultiStroke: true,
+  }).sets[0].ops;
+  const bezierPoints: LocalPoint[] = [];
+  // A single curve pass consists of a move followed by cubic control points.
+  for (const { data } of ops) {
+    for (let i = 0; i < data.length; i += 2) {
+      bezierPoints.push(pointFrom<LocalPoint>(data[i], data[i + 1]));
+    }
+  }
+
+  // Omit the optional distance argument to avoid simplifying the boundary again.
+  const polygon = polygonFromPoints(
+    pointsOnBezierCurves(bezierPoints, 0.5) as LocalPoint[],
+  );
+  freedrawFillPolygonCache.set(element, { version: element.version, polygon });
+
+  return polygon;
+};
+
 export const generateLinearCollisionShape = (
   element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
   elementsMap: ElementsMap,
@@ -675,69 +718,44 @@ export const generateLinearCollisionShape = (
         });
     }
     case "freedraw": {
-      if (element.points.length < 2) {
+      const outlinePoints = getFreedrawOutlinePoints(element);
+
+      if (outlinePoints.length < 2) {
         return [];
       }
 
-      const simplifiedPoints = simplify(
-        element.points as Mutable<LocalPoint[]>,
-        0.75,
-      );
+      const collisionOutline =
+        element.strokeOptions?.variability === "constant"
+          ? (simplify(
+              outlinePoints as Mutable<LocalPoint[]>,
+              CONSTANT_WIDTH_FREEDRAW.COLLISION_SIMPLIFY_TOLERANCE,
+            ) as [number, number][])
+          : outlinePoints;
 
-      return generator
-        .curve(simplifiedPoints as [number, number][], options)
-        .sets[0].ops.slice(0, element.points.length)
-        .map((op, i) => {
-          if (i === 0) {
-            const p = pointRotateRads<GlobalPoint>(
-              pointFrom<GlobalPoint>(
-                element.x + op.data[0],
-                element.y + op.data[1],
-              ),
-              center,
-              element.angle,
-            );
+      if (collisionOutline.length < 2) {
+        return [];
+      }
 
-            return {
-              op: "move",
-              data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-            };
-          }
+      // Close the outline polygon so its boundary never has a gap at the seam.
+      const [firstX, firstY] = collisionOutline[0];
+      const [lastX, lastY] = collisionOutline[collisionOutline.length - 1];
+      const closedOutline =
+        firstX === lastX && firstY === lastY
+          ? collisionOutline
+          : [...collisionOutline, collisionOutline[0]];
 
-          return {
-            op: "bcurveTo",
-            data: [
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[0],
-                  element.y + op.data[1],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[2],
-                  element.y + op.data[3],
-                ),
-                center,
-                element.angle,
-              ),
-              pointRotateRads(
-                pointFrom<GlobalPoint>(
-                  element.x + op.data[4],
-                  element.y + op.data[5],
-                ),
-                center,
-                element.angle,
-              ),
-            ]
-              .map((p) =>
-                pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
-              )
-              .flat(),
-          };
-        });
+      return closedOutline.map((point, idx) => {
+        const p = pointRotateRads<GlobalPoint>(
+          pointFrom<GlobalPoint>(element.x + point[0], element.y + point[1]),
+          center,
+          element.angle,
+        );
+
+        return {
+          op: idx === 0 ? "move" : "lineTo",
+          data: pointFrom<LocalPoint>(p[0] - element.x, p[1] - element.y),
+        };
+      });
     }
   }
 };
@@ -962,12 +980,8 @@ const _generateElementShape = (
       // (1) background fill (rc shape), optional
       if (isPathALoop(element.points)) {
         // generate rough polygon to fill freedraw shape
-        const simplifiedPoints = simplify(
-          element.points as Mutable<LocalPoint[]>,
-          0.75,
-        );
         shapes.push(
-          generator.curve(simplifiedPoints as [number, number][], {
+          generator.curve(getFreedrawFillCurvePoints(element), {
             ...generateRoughOptions(element, false, isDarkMode),
             stroke: "none",
           }),
@@ -1193,6 +1207,11 @@ const VARIABLE_WIDTH_FREEDRAW = {
 const CONSTANT_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
   SIZE_FACTOR: 1.4,
+  /**
+   * Max deviation (px) when dropping vertices of the dense laser outline for
+   * collision. Perfect-freehand outlines are already thinned by `smoothing`.
+   */
+  COLLISION_SIMPLIFY_TOLERANCE: 0.2,
 } as const;
 
 const getFreedrawStreamline = (element: ExcalidrawFreeDrawElement) =>
@@ -1256,6 +1275,21 @@ export const getFreedrawOutlinePoints = (
     ? getConstantWidthFreedrawOutline(element)
     : getVariableWidthFreedrawOutline(element);
 };
+
+/**
+ * Upper bound on how far a freedraw stroke's ink reaches past its centerline
+ * points. Both stroke generators scale the stroke size by at most 1 (easing
+ * or pressure), so the size itself bounds the radius, except for
+ * perfect-freehand's short strokes: under 3px long, the start cap is drawn
+ * around the first point from an outline point of the last one (reaching
+ * sqrt(size² + 3²)), and a single point gets a synthetic neighbor 1px away.
+ */
+export const getFreedrawMaxStrokeRadius = (
+  element: ExcalidrawFreeDrawElement,
+) =>
+  element.strokeOptions?.variability === "constant"
+    ? element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
+    : element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR + 3;
 
 /**
  * The streamline-smoothed centerline the freedraw stroke is rendered
