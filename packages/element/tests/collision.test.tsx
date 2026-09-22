@@ -15,6 +15,7 @@ import * as distance from "../src/distance";
 import { getElementBounds } from "../src/bounds";
 import { hitElementItself, isPointInElement } from "../src/collision";
 import { mutateElement } from "../src/mutateElement";
+import { newFreeDrawElement } from "../src/newElement";
 
 describe("check rotated elements can be hit:", () => {
   beforeEach(async () => {
@@ -274,6 +275,54 @@ describe("freedraw collision matches the rendered stroke width", () => {
 
   it("does not hit points clearly outside even the widest stroke", () => {
     expect(distanceAt(createFreeDraw("variable"), 50, 45)).toBeGreaterThan(0);
+  });
+
+  it("hits thick ink outside the centerline bounds", () => {
+    const hitAt = (
+      element: ReturnType<typeof createFreeDraw>,
+      x: number,
+      y: number,
+    ) =>
+      hitElementItself({
+        element,
+        elementsMap: arrayToMap([element]),
+        point: pointFrom<GlobalPoint>(x, y),
+        threshold: 1,
+      });
+
+    // The centerline bounds have zero height, far below the ink's reach.
+    expect(hitAt(createFreeDraw("variable"), 50, 20)).toBe(true);
+    expect(hitAt(createFreeDraw("variable"), 50, -20)).toBe(true);
+    expect(hitAt(createFreeDraw("constant"), 50, 10)).toBe(true);
+    expect(hitAt(createFreeDraw("constant"), 50, 20)).toBe(false);
+    expect(hitAt(createFreeDraw("variable"), 50, 45)).toBe(false);
+  });
+
+  it("hits the start cap of a short stroke reaching past its stroke size", () => {
+    // Under 3px long, perfect-freehand draws the start cap around the first
+    // point from the last point's outline, reaching past the stroke size.
+    const element = newFreeDrawElement({
+      type: "freedraw",
+      x: 0,
+      y: 0,
+      strokeWidth: 1,
+      simulatePressure: false,
+      pressures: [1, 1, 1],
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(0.01, 0),
+        pointFrom<LocalPoint>(2.9, 0),
+      ],
+      strokeOptions: { variability: "variable", streamline: 0.5 },
+    });
+    const elementsMap = arrayToMap([element]);
+    const point = pointFrom<GlobalPoint>(0.1, 4.9);
+
+    expect(distance.distanceToElement(element, elementsMap, point)).toBe(0);
+    // The hit threshold at 30x zoom.
+    expect(
+      hitElementItself({ element, elementsMap, point, threshold: 0.6 }),
+    ).toBe(true);
   });
 });
 

@@ -1275,6 +1275,21 @@ export const getFreedrawOutlinePoints = (
     : getVariableWidthFreedrawOutline(element);
 };
 
+/**
+ * Upper bound on how far a freedraw stroke's ink reaches past its centerline
+ * points. Both stroke generators scale the stroke size by at most 1 (easing
+ * or pressure), so the size itself bounds the radius, except for
+ * perfect-freehand's short strokes: under 3px long, the start cap is drawn
+ * around the first point from an outline point of the last one (reaching
+ * sqrt(size² + 3²)), and a single point gets a synthetic neighbor 1px away.
+ */
+export const getFreedrawMaxStrokeRadius = (
+  element: ExcalidrawFreeDrawElement,
+) =>
+  element.strokeOptions?.variability === "constant"
+    ? element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
+    : element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR + 3;
+
 const med = (A: number[], B: number[]) => {
   return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
 };

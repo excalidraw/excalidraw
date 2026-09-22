@@ -65,7 +65,7 @@ import { getBindingGap } from "./binding";
 
 import { hasBackground } from "./comparisons";
 
-import { getFreedrawFillPolygon } from "./shape";
+import { getFreedrawFillPolygon, getFreedrawMaxStrokeRadius } from "./shape";
 
 import type {
   ElementsMap,
@@ -164,7 +164,10 @@ export const hitElementItself = ({
     point,
     bounds,
     element.angle,
-    threshold,
+    // Freedraw bounds follow the centerline points, but the ink extends past them
+    isFreeDrawElement(element)
+      ? threshold + getFreedrawMaxStrokeRadius(element)
+      : threshold,
   );
 
   // PERF: Bail out early if the point is not even in the
