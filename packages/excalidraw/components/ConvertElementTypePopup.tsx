@@ -56,7 +56,11 @@ import {
 
 import { ShapeCache } from "@excalidraw/element";
 
-import { updateBindings } from "@excalidraw/element";
+import {
+  isBindableElement,
+  reanchorBindingsToOutline,
+  updateBindings,
+} from "@excalidraw/element";
 
 import type {
   ConvertibleGenericTypes,
@@ -475,6 +479,11 @@ export const convertElementTypes = (
       app.scene.replaceAllElements(nextElements);
 
       for (const element of Object.values(convertedElements)) {
+        if (isBindableElement(element)) {
+          reanchorBindingsToOutline(element, app.scene);
+          updateBindings(element, app.scene, app.state);
+        }
+
         const boundText = getBoundTextElement(
           element,
           app.scene.getNonDeletedElementsMap(),
@@ -858,8 +867,6 @@ const convertElementType = <
           : element.roundness,
       }),
     ) as typeof element;
-
-    updateBindings(nextElement, app.scene, app.state);
 
     return nextElement;
   }
