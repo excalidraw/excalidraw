@@ -1,12 +1,18 @@
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
 
+import { applyDarkModeFilter, THEME } from "@excalidraw/common";
+
+import type { Theme } from "@excalidraw/element/types";
+
 import { useAtom } from "../../editor-jotai";
 
 import HotkeyLabel from "./HotkeyLabel";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
+import { useColorPickerDnD } from "./topPicksDnD";
 
 interface CustomColorListProps {
+  theme: Theme;
   colors: string[];
   color: string | null;
   onChange: (color: string) => void;
@@ -14,6 +20,7 @@ interface CustomColorListProps {
 }
 
 export const CustomColorList = ({
+  theme,
   colors,
   color,
   onChange,
@@ -22,6 +29,7 @@ export const CustomColorList = ({
   const [activeColorPickerSection, setActiveColorPickerSection] = useAtom(
     activeColorPickerSectionAtom,
   );
+  const dnd = useColorPickerDnD();
 
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -34,6 +42,7 @@ export const CustomColorList = ({
   return (
     <div className="color-picker-content--default">
       {colors.map((c, i) => {
+        const displayColor = applyDarkModeFilter(c, theme === THEME.DARK);
         return (
           <button
             ref={color === c ? btnRef : undefined}
@@ -50,13 +59,16 @@ export const CustomColorList = ({
               onChange(c);
               setActiveColorPickerSection("custom");
             }}
+            onPointerDown={
+              dnd ? (event) => dnd.startSwatchDrag(event, c) : undefined
+            }
             title={c}
             aria-label={label}
-            style={{ "--swatch-color": c }}
+            style={{ "--swatch-color": displayColor }}
             key={i}
           >
             <div className="color-picker__button-outline" />
-            <HotkeyLabel color={c} keyLabel={i + 1} />
+            <HotkeyLabel color={displayColor} keyLabel={i + 1} />
           </button>
         );
       })}

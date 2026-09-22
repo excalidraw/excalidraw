@@ -1,7 +1,9 @@
 import {
   getCommonFrameId,
   getFrameChildrenInsertionIndex,
+  getContainerElement,
   isElementInViewport,
+  isTextElement,
 } from "@excalidraw/element";
 
 import { arrayToMap, memoize, toBrandedType } from "@excalidraw/common";
@@ -20,7 +22,7 @@ import { renderStaticSceneThrottled } from "../renderer/staticScene";
 
 import type { RenderableElementsMap } from "./types";
 
-import type { AppState } from "../types";
+import type { AppState, ElementRenderOffsets } from "../types";
 
 type GetRenderableElementsOpts = {
   zoom: AppState["zoom"];
@@ -42,6 +44,157 @@ export class Renderer {
 
   constructor(scene: Scene) {
     this.scene = scene;
+  }
+
+  /**
+   * Adjusts the document-visible set for render-override translations: an
+   * element leaves it when its offset moves it out of view and enters it when
+   * its offset brings it in; everything else keeps its document visibility.
+   * Only translated elements go through viewport geometry. The result is
+   * memoized on the offsets' identity so that opacity-only snapshots don't
+   * reach it at all.
+   */
+  public getVisibleElementsWithRenderOffsets(
+    visibleElements: readonly NonDeletedExcalidrawElement[],
+    elementsMap: RenderableElementsMap,
+    appState: AppState,
+    offsets: ElementRenderOffsets,
+  ) {
+    return this._getVisibleElementsWithRenderOffsets({
+      visibleElements,
+      elementsMap,
+      offsets,
+      zoom: appState.zoom,
+      scrollX: appState.scrollX,
+      scrollY: appState.scrollY,
+      offsetLeft: appState.offsetLeft,
+      offsetTop: appState.offsetTop,
+      width: appState.width,
+      height: appState.height,
+      selectedElements: this.scene.getSelectedElements(appState),
+      frameToHighlight: appState.selectedElementsAreBeingDragged
+        ? appState.frameToHighlight
+        : null,
+    });
+  }
+
+  private _getVisibleElementsWithRenderOffsets = memoize(
+    ({
+      visibleElements,
+      elementsMap,
+      offsets,
+      selectedElements,
+      frameToHighlight,
+      ...viewport
+    }: Pick<
+      GetRenderableElementsOpts,
+      | "zoom"
+      | "scrollX"
+      | "scrollY"
+      | "offsetLeft"
+      | "offsetTop"
+      | "width"
+      | "height"
+      | "selectedElements"
+      | "frameToHighlight"
+    > & {
+      visibleElements: readonly NonDeletedExcalidrawElement[];
+      elementsMap: RenderableElementsMap;
+      offsets: ElementRenderOffsets;
+    }) => {
+      // Shifting the viewport instead of the element also works for arrow
+      // labels, whose coordinates derive from their container.
+      const isVisible = (
+        element: NonDeletedExcalidrawElement,
+        offset: ElementRenderOffsets extends ReadonlyMap<string, infer T>
+          ? T
+          : never,
+      ) =>
+        isElementInViewport(
+          element,
+          viewport.width,
+          viewport.height,
+          {
+            ...viewport,
+            scrollX: viewport.scrollX + offset.x,
+            scrollY: viewport.scrollY + offset.y,
+          },
+          elementsMap,
+        );
+
+      const documentVisible = this.getVisibleSet(visibleElements);
+      const added = new Set<NonDeletedExcalidrawElement>();
+      const removed = new Set<NonDeletedExcalidrawElement>();
+      const update = (
+        element: NonDeletedExcalidrawElement,
+        visible: boolean,
+      ) => {
+        if (documentVisible.has(element) !== visible) {
+          (visible ? added : removed).add(element);
+        }
+      };
+      for (const [id, offset] of offsets) {
+        const element = elementsMap.get(id);
+        // A bound label's own offset is ignored, and it needs no entry of
+        // its own: the static renderer draws it with its container and skips
+        // its entry, so its document visibility can stay as it is.
+        if (
+          !element ||
+          (isTextElement(element) && getContainerElement(element, elementsMap))
+        ) {
+          continue;
+        }
+        update(element, isVisible(element, offset));
+      }
+
+      if (!added.size && !removed.size) {
+        return visibleElements;
+      }
+
+      const needsFrameReordering =
+        frameToHighlight &&
+        getCommonFrameId(selectedElements) !== frameToHighlight.id;
+      if (!added.size && !needsFrameReordering) {
+        return visibleElements.filter((element) => !removed.has(element));
+      }
+
+      // Rebuild in scene order when elements enter the view. Frame-drag
+      // ordering also needs rebuilding on removals, since the anchoring frame
+      // may have left the view.
+      const result: NonDeletedExcalidrawElement[] = [];
+      for (const element of elementsMap.values()) {
+        if (
+          added.has(element) ||
+          (documentVisible.has(element) && !removed.has(element))
+        ) {
+          result.push(element);
+        }
+      }
+      return needsFrameReordering
+        ? this.sortSelectedElementsIntoHighlightedFrame({
+            visibleElements: result,
+            selectedElements,
+            frameToHighlight,
+          })
+        : result;
+    },
+  );
+
+  /** the document-visible elements as a set, cached per visible array */
+  private visibleSets = new WeakMap<
+    readonly NonDeletedExcalidrawElement[],
+    Set<NonDeletedExcalidrawElement>
+  >();
+
+  private getVisibleSet(
+    visibleElements: readonly NonDeletedExcalidrawElement[],
+  ) {
+    let set = this.visibleSets.get(visibleElements);
+    if (!set) {
+      set = new Set(visibleElements);
+      this.visibleSets.set(visibleElements, set);
+    }
+    return set;
   }
 
   private getVisibleCanvasElements({
@@ -258,5 +411,6 @@ export class Renderer {
   public destroy() {
     renderStaticSceneThrottled.cancel();
     this._getRenderableElements.clear();
+    this._getVisibleElementsWithRenderOffsets.clear();
   }
 }

@@ -3,9 +3,13 @@ import { unstable_batchedUpdates } from "react-dom";
 
 import { KEYS, queryFocusableElements } from "@excalidraw/common";
 
+import { clamp } from "@excalidraw/math";
+
 import clsx from "clsx";
 
 import "./Popover.scss";
+
+const POPOVER_CONTAINER_GAP = 10;
 
 type Props = {
   top?: number;
@@ -13,8 +17,6 @@ type Props = {
   children?: React.ReactNode;
   onCloseRequest?(event: PointerEvent): void;
   fitInViewport?: boolean;
-  offsetLeft?: number;
-  offsetTop?: number;
   viewportWidth?: number;
   viewportHeight?: number;
   className?: string;
@@ -26,8 +28,6 @@ export const Popover = ({
   top,
   onCloseRequest,
   fitInViewport = false,
-  offsetLeft = 0,
-  offsetTop = 0,
   viewportWidth = window.innerWidth,
   viewportHeight = window.innerHeight,
   className,
@@ -92,8 +92,8 @@ export const Popover = ({
   // ensure the popover doesn't overflow the viewport
   useLayoutEffect(() => {
     if (fitInViewport && popoverRef.current && top != null && left != null) {
-      const container = popoverRef.current;
-      const { width, height } = container.getBoundingClientRect();
+      const element = popoverRef.current;
+      const { width, height } = element.getBoundingClientRect();
 
       // hack for StrictMode so this effect only runs once for
       // the same top/left position, otherwise
@@ -107,35 +107,33 @@ export const Popover = ({
       }
       lastInitializedPosRef.current = { top, left };
 
-      if (width >= viewportWidth) {
-        container.style.width = `${viewportWidth}px`;
-        container.style.left = "0px";
-        container.style.overflowX = "scroll";
-      } else if (left + width - offsetLeft > viewportWidth) {
-        container.style.left = `${viewportWidth - width - 10}px`;
+      const maxWidth = Math.max(0, viewportWidth - POPOVER_CONTAINER_GAP * 2);
+      if (width >= maxWidth) {
+        element.style.width = `${maxWidth}px`;
+        element.style.left = `${POPOVER_CONTAINER_GAP}px`;
+        element.style.overflowX = "scroll";
       } else {
-        container.style.left = `${left}px`;
+        element.style.left = `${clamp(
+          left,
+          POPOVER_CONTAINER_GAP,
+          viewportWidth - POPOVER_CONTAINER_GAP - width,
+        )}px`;
       }
 
-      if (height >= viewportHeight) {
-        container.style.height = `${viewportHeight - 20}px`;
-        container.style.top = "10px";
-        container.style.overflowY = "scroll";
-      } else if (top + height - offsetTop > viewportHeight) {
-        container.style.top = `${viewportHeight - height}px`;
+      const maxHeight = Math.max(0, viewportHeight - POPOVER_CONTAINER_GAP * 2);
+      if (height >= maxHeight) {
+        element.style.height = `${maxHeight}px`;
+        element.style.top = `${POPOVER_CONTAINER_GAP}px`;
+        element.style.overflowY = "scroll";
       } else {
-        container.style.top = `${top}px`;
+        element.style.top = `${clamp(
+          top,
+          POPOVER_CONTAINER_GAP,
+          viewportHeight - POPOVER_CONTAINER_GAP - height,
+        )}px`;
       }
     }
-  }, [
-    top,
-    left,
-    fitInViewport,
-    viewportWidth,
-    viewportHeight,
-    offsetLeft,
-    offsetTop,
-  ]);
+  }, [top, left, fitInViewport, viewportWidth, viewportHeight]);
 
   useEffect(() => {
     if (onCloseRequest) {

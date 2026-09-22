@@ -12,6 +12,8 @@ import { getSelectedElements } from "./selection";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { getHoveredElementForBinding } from "./collision";
 
+import { getNonDeletedElements } from ".";
+
 import type { Scene } from "./Scene";
 import type {
   ExcalidrawArrowElement,
@@ -19,7 +21,6 @@ import type {
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
-  Ordered,
   OrderedExcalidrawElement,
 } from "./types";
 
@@ -155,14 +156,19 @@ const getContiguousFrameRangeElements = (
 export const moveArrowAboveBindable = (
   point: GlobalPoint,
   arrow: ExcalidrawArrowElement,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly OrderedExcalidrawElement[],
   elementsMap: NonDeletedSceneElementsMap,
   scene: Scene,
   hit?: NonDeletedExcalidrawElement,
 ): readonly OrderedExcalidrawElement[] => {
   const hoveredElement = hit
     ? hit
-    : getHoveredElementForBinding(point, elements, elementsMap);
+    : getHoveredElementForBinding(
+        point,
+        // SAFETY: callers that omit `hit` pass non-deleted elements
+        getNonDeletedElements(elements),
+        elementsMap,
+      );
 
   if (!hoveredElement) {
     return elements;

@@ -119,6 +119,19 @@ let cachedElement: WeakRef<ExcalidrawElement> | null = null;
 let cachedThreshold: number = Infinity;
 let cachedHit: boolean = false;
 let cachedOverrideShouldTestInside = false;
+let cachedFrameNameBound: FrameNameBounds | null = null;
+
+const frameNameBoundsEqual = (
+  a: FrameNameBounds | null,
+  b: FrameNameBounds | null,
+) =>
+  a === b ||
+  (!!a &&
+    !!b &&
+    a.x === b.x &&
+    a.y === b.y &&
+    a.width === b.width &&
+    a.height === b.height);
 
 export const hitElementItself = ({
   point,
@@ -128,12 +141,16 @@ export const hitElementItself = ({
   frameNameBound = null,
   overrideShouldTestInside = false,
 }: HitTestArgs) => {
-  // Return cached result if the same point and element version is tested again
+  // Return cached result if the same point and element version is tested again.
+  // A cached hit stays valid for any larger threshold, while a cached miss
+  // stays valid only for a threshold no larger than the cached one (a larger
+  // threshold could turn a miss into a hit).
   if (
     cachedPoint &&
     pointsEqual(point, cachedPoint) &&
-    cachedThreshold <= threshold &&
-    overrideShouldTestInside === cachedOverrideShouldTestInside
+    (cachedHit ? cachedThreshold <= threshold : cachedThreshold >= threshold) &&
+    overrideShouldTestInside === cachedOverrideShouldTestInside &&
+    frameNameBoundsEqual(frameNameBound, cachedFrameNameBound)
   ) {
     const derefElement = cachedElement?.deref();
     if (
@@ -193,6 +210,7 @@ export const hitElementItself = ({
   cachedElement = new WeakRef(element);
   cachedThreshold = threshold;
   cachedOverrideShouldTestInside = overrideShouldTestInside;
+  cachedFrameNameBound = frameNameBound;
   cachedHit = result;
 
   return result;
@@ -380,7 +398,7 @@ export const getHoveredElementForFocusPoint = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   tolerance?: number,
-): ExcalidrawBindableElement | null => {
+): NonDeleted<ExcalidrawBindableElement> | null => {
   const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
   // We need to to hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
@@ -456,6 +474,7 @@ export const intersectElementWithLineSegment = (
   // Do the actual intersection test against the element's shape
   switch (element.type) {
     case "rectangle":
+    case "stickynote":
     case "image":
     case "text":
     case "iframe":

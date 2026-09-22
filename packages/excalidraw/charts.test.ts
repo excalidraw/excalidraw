@@ -7,6 +7,7 @@ import {
 import type {
   ExcalidrawLineElement,
   ExcalidrawTextElement,
+  NonDeleted,
 } from "@excalidraw/element/types";
 
 import {
@@ -476,7 +477,7 @@ describe("charts", () => {
       const multiElements = renderSpreadsheet("bar", multiSeries, 0, 0);
       const getXAxisWidth = (elements: ReturnType<typeof renderSpreadsheet>) =>
         elements!.find(
-          (element): element is ExcalidrawLineElement =>
+          (element): element is NonDeleted<ExcalidrawLineElement> =>
             element.type === "line" &&
             element.strokeStyle === "solid" &&
             element.points[0][1] === 0 &&
@@ -509,7 +510,7 @@ describe("charts", () => {
       const multiElements = renderSpreadsheet("line", multiSeries, 0, 0);
       const getXAxisWidth = (elements: ReturnType<typeof renderSpreadsheet>) =>
         elements!.find(
-          (element): element is ExcalidrawLineElement =>
+          (element): element is NonDeleted<ExcalidrawLineElement> =>
             element.type === "line" &&
             element.strokeStyle === "solid" &&
             element.points[0][1] === 0 &&
@@ -539,13 +540,13 @@ describe("charts", () => {
 
       const elements = renderSpreadsheet("bar", spreadsheet, 0, 0);
       const longWordLabel = elements!.find(
-        (element): element is ExcalidrawTextElement =>
+        (element): element is NonDeleted<ExcalidrawTextElement> =>
           element.type === "text" &&
           Math.abs(element.angle) > 0 &&
           element.text.includes("..."),
       );
       const spacedLabels = elements!.filter(
-        (element): element is ExcalidrawTextElement =>
+        (element): element is NonDeleted<ExcalidrawTextElement> =>
           element.type === "text" &&
           (element.originalText === "Data Flow" ||
             element.originalText === "Logic Layer"),
@@ -587,7 +588,7 @@ describe("charts", () => {
 
       const elements = renderSpreadsheet("bar", spreadsheet, 0, 0);
       const axisLabels = elements!.filter(
-        (element): element is ExcalidrawTextElement =>
+        (element): element is NonDeleted<ExcalidrawTextElement> =>
           element.type === "text" && Math.abs(element.angle) > 0,
       );
 
@@ -620,7 +621,7 @@ describe("charts", () => {
 
       const elements = renderSpreadsheet("line", spreadsheet, 0, 0);
       const seriesLines = elements!.filter(
-        (element): element is ExcalidrawLineElement =>
+        (element): element is NonDeleted<ExcalidrawLineElement> =>
           element.type === "line" && element.strokeWidth === 2,
       );
       const dots = elements!.filter(
@@ -689,7 +690,7 @@ describe("charts", () => {
         const elements = renderSpreadsheet("line", spreadsheet, 0, 0, seed);
         return elements!
           .filter(
-            (element): element is ExcalidrawLineElement =>
+            (element): element is NonDeleted<ExcalidrawLineElement> =>
               element.type === "line" && element.strokeWidth === 2,
           )
           .map((line) => line.strokeColor);
@@ -759,7 +760,7 @@ describe("charts", () => {
 
       const elements = renderSpreadsheet("line", spreadsheet, 0, 0);
       const axisLabels = elements!.filter(
-        (element): element is ExcalidrawTextElement =>
+        (element): element is NonDeleted<ExcalidrawTextElement> =>
           element.type === "text" && Math.abs(element.angle) > 0,
       );
 
@@ -793,7 +794,7 @@ describe("charts", () => {
 
       const elements = renderSpreadsheet("radar", spreadsheet, 0, 0);
       const seriesPolygons = elements!.filter(
-        (element): element is ExcalidrawLineElement =>
+        (element): element is NonDeleted<ExcalidrawLineElement> =>
           element.type === "line" &&
           "polygon" in element &&
           element.polygon === true &&
@@ -820,7 +821,7 @@ describe("charts", () => {
 
       const elements = renderSpreadsheet("radar", spreadsheet, 0, 0);
       const seriesPolygons = elements!.filter(
-        (element): element is ExcalidrawLineElement =>
+        (element): element is NonDeleted<ExcalidrawLineElement> =>
           element.type === "line" &&
           "polygon" in element &&
           element.polygon === true &&
@@ -880,7 +881,7 @@ describe("charts", () => {
 
       const elements = renderSpreadsheet("radar", spreadsheet, 0, 0);
       const seriesPolygons = elements!.filter(
-        (element): element is ExcalidrawLineElement =>
+        (element): element is NonDeleted<ExcalidrawLineElement> =>
           element.type === "line" &&
           "polygon" in element &&
           element.polygon === true &&
@@ -994,7 +995,7 @@ describe("charts", () => {
       const topSpokeY = Math.min(
         ...elements!
           .filter(
-            (element): element is ExcalidrawLineElement =>
+            (element): element is NonDeleted<ExcalidrawLineElement> =>
               element.type === "line" &&
               "polygon" in element &&
               !element.polygon &&

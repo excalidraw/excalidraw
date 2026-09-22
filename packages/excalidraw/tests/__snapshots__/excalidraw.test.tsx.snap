@@ -690,84 +690,68 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
       <div
         style="padding: 0px 0.625rem;"
       >
-        <div>
+        <div
+          aria-modal="true"
+          class="color-picker-container"
+          role="dialog"
+        >
           <div
-            aria-modal="true"
-            class="color-picker-container"
-            role="dialog"
+            class="color-picker__top-picks"
           >
-            <div
-              class="color-picker__top-picks"
-            >
-              <button
-                class="color-picker__button active has-outline"
-                data-testid="color-top-pick-#ffffff"
-                style="--swatch-color: #ffffff;"
-                title="#ffffff"
-                type="button"
-              >
-                <div
-                  class="color-picker__button-outline"
-                />
-              </button>
-              <button
-                class="color-picker__button has-outline"
-                data-testid="color-top-pick-#f8f9fa"
-                style="--swatch-color: #f8f9fa;"
-                title="#f8f9fa"
-                type="button"
-              >
-                <div
-                  class="color-picker__button-outline"
-                />
-              </button>
-              <button
-                class="color-picker__button has-outline"
-                data-testid="color-top-pick-#f5faff"
-                style="--swatch-color: #f5faff;"
-                title="#f5faff"
-                type="button"
-              >
-                <div
-                  class="color-picker__button-outline"
-                />
-              </button>
-              <button
-                class="color-picker__button has-outline"
-                data-testid="color-top-pick-#fffce8"
-                style="--swatch-color: #fffce8;"
-                title="#fffce8"
-                type="button"
-              >
-                <div
-                  class="color-picker__button-outline"
-                />
-              </button>
-              <button
-                class="color-picker__button has-outline"
-                data-testid="color-top-pick-#fdf8f6"
-                style="--swatch-color: #fdf8f6;"
-                title="#fdf8f6"
-                type="button"
-              >
-                <div
-                  class="color-picker__button-outline"
-                />
-              </button>
-            </div>
-            <div
-              style="width: 1px; height: 1rem; margin: 0px auto;"
-            />
             <button
-              aria-controls="radix-:r16:"
-              aria-expanded="false"
-              aria-haspopup="dialog"
-              aria-label="Canvas background"
-              class="color-picker__button active-color properties-trigger has-outline"
-              data-openpopup="canvasBackground"
-              data-state="closed"
+              class="color-picker__button active has-outline"
+              data-testid="color-top-pick-#ffffff"
+              data-top-pick-index="0"
               style="--swatch-color: #ffffff;"
-              title="Show background color picker"
+              title="#ffffff"
+              type="button"
+            >
+              <div
+                class="color-picker__button-outline"
+              />
+            </button>
+            <button
+              class="color-picker__button has-outline"
+              data-testid="color-top-pick-#f8f9fa"
+              data-top-pick-index="1"
+              style="--swatch-color: #f8f9fa;"
+              title="#f8f9fa"
+              type="button"
+            >
+              <div
+                class="color-picker__button-outline"
+              />
+            </button>
+            <button
+              class="color-picker__button has-outline"
+              data-testid="color-top-pick-#f5faff"
+              data-top-pick-index="2"
+              style="--swatch-color: #f5faff;"
+              title="#f5faff"
+              type="button"
+            >
+              <div
+                class="color-picker__button-outline"
+              />
+            </button>
+            <button
+              class="color-picker__button has-outline"
+              data-testid="color-top-pick-#fffce8"
+              data-top-pick-index="3"
+              style="--swatch-color: #fffce8;"
+              title="#fffce8"
+              type="button"
+            >
+              <div
+                class="color-picker__button-outline"
+              />
+            </button>
+            <button
+              class="color-picker__button has-outline"
+              data-testid="color-top-pick-#fdf8f6"
+              data-top-pick-index="4"
+              style="--swatch-color: #fdf8f6;"
+              title="#fdf8f6"
               type="button"
             >
               <div
@@ -775,6 +759,25 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
               />
             </button>
           </div>
+          <div
+            style="width: 1px; height: 1rem; margin: 0px auto;"
+          />
+          <button
+            aria-controls="radix-:r16:"
+            aria-expanded="false"
+            aria-haspopup="dialog"
+            aria-label="Canvas background"
+            class="color-picker__button active-color properties-trigger has-outline"
+            data-openpopup="canvasBackground"
+            data-state="closed"
+            style="--swatch-color: #ffffff;"
+            title="Show background color picker"
+            type="button"
+          >
+            <div
+              class="color-picker__button-outline"
+            />
+          </button>
         </div>
       </div>
     </div>

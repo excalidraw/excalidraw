@@ -29,29 +29,25 @@ $color-blue-8: #1971c2;
   }
 }
 
+// the .ToolIcon_type_toggle.ToolIcon--checked selectors use both classes so
+// they keep outranking the :hover/:active rules below
 @mixin toolbarButtonColorStates {
   &.fillable {
-    .ToolIcon_type_radio,
-    .ToolIcon_type_checkbox {
-      &:checked + .ToolIcon__icon {
-        --icon-fill-color: var(--color-on-primary-container);
+    &.ToolIcon_type_toggle.ToolIcon--checked .ToolIcon__icon {
+      --icon-fill-color: var(--color-on-primary-container);
 
-        svg {
-          fill: var(--icon-fill-color);
-        }
+      svg {
+        fill: var(--icon-fill-color);
       }
     }
   }
 
-  .ToolIcon_type_radio,
-  .ToolIcon_type_checkbox {
-    &:checked + .ToolIcon__icon {
-      background: var(--color-surface-primary-container);
-      --keybinding-color: var(--color-on-primary-container);
+  &.ToolIcon_type_toggle.ToolIcon--checked .ToolIcon__icon {
+    background: var(--color-surface-primary-container);
+    --keybinding-color: var(--color-on-primary-container);
 
-      svg {
-        color: var(--color-on-primary-container);
-      }
+    svg {
+      color: var(--color-on-primary-container);
     }
   }
 
@@ -80,6 +76,29 @@ $color-blue-8: #1971c2;
 
       svg {
         color: var(--color-disabled);
+      }
+    }
+  }
+
+  // disabled toggle buttons (e.g. non-forced tools while `props.activeTool`
+  // is set) — greyed out, without hover/active affordances
+  &.ToolIcon_type_toggle:disabled {
+    cursor: default;
+    --keybinding-color: var(--color-disabled);
+
+    .ToolIcon__icon {
+      svg {
+        color: var(--color-disabled);
+      }
+
+      &:hover,
+      &:active {
+        background: initial;
+        border: none;
+
+        svg {
+          color: var(--color-disabled);
+        }
       }
     }
   }
@@ -124,7 +143,8 @@ $color-blue-8: #1971c2;
     border-color: var(--button-active-border, var(--color-primary-darkest));
   }
 
-  &.active {
+  &.active,
+  &.ToolIcon--checked {
     background-color: var(
       --button-selected-bg,
       var(--color-surface-primary-container)

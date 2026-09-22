@@ -131,7 +131,7 @@ describe("image insertion", () => {
           API.loadFile("./fixtures/smiley.png"),
         ]),
     );
-    UI.clickTool("image");
+    UI.clickExtraTool("image");
 
     await assert();
   });

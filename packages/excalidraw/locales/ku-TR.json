@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "دانانەوە",
     "pasteAsPlaintext": "دایبنێ وەک دەقی سادە",
     "pasteCharts": "دانانەوەی خشتەکان",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "دیاریکردنی هەموو",
     "multiSelect": "زیادکردنی بۆ دیاریکراوەکان",
     "moveCanvas": "تابلۆ بجوڵێنە",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "پچڕ پچڕ",
     "strokeStyle_dotted": "خاڵدار",
     "sloppiness": "لێژی",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "ڕوونی",
     "textAlign": "ڕێکخستنی دەق",
     "edges": "لێوارەکان",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -95,6 +111,7 @@
     "group": "دیاریکردنی گروپ",
     "ungroup": "گروپی دیاریکراوەکان لابەرە",
     "collaborators": "هاوکارەکان",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "زیادکردن بۆ کتێبخانە",
     "removeFromLibrary": "لابردن لە کتێبخانە",
@@ -171,7 +188,14 @@
     "linkToElement": "",
     "wrapSelectionInFrame": "",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -310,10 +334,16 @@
     "magicframe": "",
     "embeddable": "",
     "laser": "",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "دەست (ئامرازی پانکردن)",
     "extraTools": "ئامرازی زیاتر",
     "mermaidToExcalidraw": "",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "",
@@ -345,6 +375,7 @@
     "freeDraw": "کرتە بکە و ڕایبکێشە، کاتێک تەواو بوویت دەست هەڵگرە",
     "text": "زانیاری: هەروەها دەتوانیت دەق زیادبکەیت بە دوو کرتەکردن لە هەر شوێنێک لەگەڵ ئامڕازی دەستنیشانکردن",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "هه‌ڵه‌ ڕوویدا"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "پاشەکەوت بکە لە دیسک",
@@ -576,7 +612,11 @@
     "colors": "ڕەنگەکان",
     "shades": "سێبەرەکان",
     "hexCode": "کۆدی هێکس",
-    "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە"
+    "noShades": "هیچ سێبەرێک بۆ ئەم ڕەنگە بەردەست نییە",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -616,7 +656,8 @@
     "syntax": "",
     "preview": "",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

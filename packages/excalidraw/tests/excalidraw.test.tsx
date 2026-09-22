@@ -42,6 +42,9 @@ describe("<Excalidraw/>", () => {
       const contextMenu = document.querySelector(".context-menu");
       fireEvent.click(queryByText(contextMenu as HTMLElement, "Zen mode")!);
       expect(h.state.zenModeEnabled).toBe(true);
+      expect(container.querySelector(".excalidraw")).toHaveClass(
+        "excalidraw--zen-mode",
+      );
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(1);
@@ -483,5 +486,15 @@ describe("<Excalidraw/>", () => {
       expect(onThemeChange).toHaveBeenCalledWith(THEME.DARK);
       expect(h.state.theme).toBe(THEME.LIGHT);
     });
+  });
+
+  it("should apply a custom class name to the editor root", async () => {
+    const { container } = await render(
+      <Excalidraw className="custom-excalidraw" />,
+    );
+
+    expect(container.querySelector(".excalidraw")).toHaveClass(
+      "custom-excalidraw",
+    );
   });
 });

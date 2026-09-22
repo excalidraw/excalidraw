@@ -8,7 +8,7 @@ import {
   actionDuplicateSelection,
 } from "@excalidraw/excalidraw/actions";
 
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { Excalidraw, getNonDeletedElements } from "@excalidraw/excalidraw";
 
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import {
@@ -116,7 +116,7 @@ const populateElements = (
     h.setState({
       ...selectGroupsForSelectedElements(
         { ...h.state, ...appState, selectedElementIds },
-        h.elements,
+        getNonDeletedElements(h.elements),
         h.state,
         null,
       ),

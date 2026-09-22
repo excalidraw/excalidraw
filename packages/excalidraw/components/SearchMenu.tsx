@@ -1,4 +1,3 @@
-import { round } from "@excalidraw/math";
 import clsx from "clsx";
 import debounce from "lodash.debounce";
 import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
@@ -11,7 +10,10 @@ import {
   getLineHeight,
 } from "@excalidraw/common";
 
-import { isElementCompletelyInViewport } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  isElementCompletelyInViewport,
+} from "@excalidraw/element";
 
 import { measureText } from "@excalidraw/element";
 
@@ -219,8 +221,8 @@ export const SearchMenu = () => {
         if (
           !isElementCompletelyInViewport(
             [matchAsElement],
-            app.canvas.width / window.devicePixelRatio,
-            app.canvas.height / window.devicePixelRatio,
+            app.canvas.width / app.ownerWindow.devicePixelRatio,
+            app.canvas.height / app.ownerWindow.devicePixelRatio,
             {
               offsetLeft: app.state.offsetLeft,
               offsetTop: app.state.offsetTop,
@@ -229,31 +231,22 @@ export const SearchMenu = () => {
               zoom: app.state.zoom,
             },
             app.scene.getNonDeletedElementsMap(),
-            app.getEditorUIOffsets(),
+            app.viewport.getOffsets(),
           ) ||
           isTextTiny
         ) {
-          let zoomOptions: Parameters<AppClassProperties["scrollToContent"]>[1];
+          // tiny, illegible text fills the viewport so it becomes readable;
+          // otherwise just fit the match into view (capped at 100%)
+          const behavior =
+            isTextTiny && fontSize < FONT_SIZE_LEGIBILITY_THRESHOLD
+              ? "contain"
+              : "scale-down";
 
-          if (isTextTiny) {
-            if (fontSize >= FONT_SIZE_LEGIBILITY_THRESHOLD) {
-              zoomOptions = { fitToContent: true };
-            } else {
-              zoomOptions = {
-                fitToViewport: true,
-                // calculate zoom level to make the fontSize ~equal to FONT_SIZE_THRESHOLD, rounded to nearest 10%
-                maxZoom: round(FONT_SIZE_LEGIBILITY_THRESHOLD / fontSize, 1),
-              };
-            }
-          } else {
-            zoomOptions = { fitToContent: true };
-          }
-
-          app.scrollToContent(matchAsElement, {
-            animate: true,
-            duration: 300,
-            ...zoomOptions,
-            canvasOffsets: app.getEditorUIOffsets(),
+          app.viewport.setViewport({
+            target: getCommonBounds([matchAsElement]),
+            fit: behavior,
+            animation: { duration: 300 },
+            offsets: { ui: true },
           });
         }
       }
@@ -280,6 +273,7 @@ export const SearchMenu = () => {
 
   useEffect(() => {
     const eventHandler = (event: KeyboardEvent) => {
+      const target = event.target;
       if (
         event.key === KEYS.ESCAPE &&
         !app.state.openDialog &&
@@ -313,8 +307,8 @@ export const SearchMenu = () => {
       }
 
       if (
-        event.target instanceof HTMLElement &&
-        event.target.closest(".layer-ui__search")
+        target instanceof app.ownerWindow.HTMLElement &&
+        target.closest(".layer-ui__search")
       ) {
         if (stableState.searchMatches.items.length) {
           if (event.key === KEYS.ENTER) {
@@ -335,7 +329,7 @@ export const SearchMenu = () => {
 
     // `capture` needed to prevent firing on initial open from App.tsx,
     // as well as to handle events before App ones
-    return addEventListener(window, EVENT.KEYDOWN, eventHandler, {
+    return addEventListener(app.ownerWindow, EVENT.KEYDOWN, eventHandler, {
       capture: true,
       passive: false,
     });

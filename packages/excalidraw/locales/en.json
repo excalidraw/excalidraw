@@ -1,5 +1,7 @@
 {
   "labels": {
+    "signUp": "Sign up",
+    "signIn": "Sign in",
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
@@ -25,6 +27,7 @@
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",
+    "textColor": "Text color",
     "changeStroke": "Change stroke color",
     "background": "Background",
     "changeBackground": "Change background color",
@@ -109,6 +112,7 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
+    "you": "You",
     "toggleGrid": "Toggle grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
@@ -192,7 +196,10 @@
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
-    "midpointSnapping": "Snap to midpoints"
+    "midpointSnapping": "Snap to midpoints",
+    "inputDevice": "Input",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Mouse"
   },
   "elementLink": {
     "title": "Link to object",
@@ -329,12 +336,19 @@
     "eraser": "Eraser",
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
+    "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
+    "autoshape": "Draw to shape",
+    "bucketfill": "Bucket fill",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "convertElementType": "Toggle shape type"
+  },
+  "bucketfill": {
+    "noRegion": "Couldn't find an enclosed region to fill here.",
+    "tooComplex": "This region is too complex to fill."
   },
   "element": {
     "rectangle": "Rectangle",
@@ -348,6 +362,7 @@
     "group": "Group",
     "frame": "Frame",
     "magicframe": "Wireframe to code",
+    "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "selection": "Selection",
     "iframe": "IFrame"
@@ -366,13 +381,17 @@
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",
+    "stickynote": "Click to place a note, or drag to size it",
+    "autoshape": "Draw rectangles, circles, diamonds, lines and arrows",
     "text_selected": "Double-click or press {{shortcut}} to edit text",
     "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",
     "linearElementMulti": "Click on last point or press {{shortcut_1}} or {{shortcut_2}} to finish",
     "lockAngle": "You can constrain angle by holding {{shortcut}}",
     "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
     "resizeImage": "You can resize freely by holding {{shortcut_1}},\nhold {{shortcut_2}} to resize from the center",
+    "resizeStickyNote": "hold {{shortcut_1}} to resize freely, {{shortcut_2}} to resize from the center",
     "rotate": "You can constrain angles by holding {{shortcut}} while rotating",
+    "toggleArrowhead": "Double-click to toggle the arrowhead",
     "lineEditor_info": "Hold {{shortcut_1}} and Double-click or press {{shortcut_2}} to edit points",
     "lineEditor_line_info": "Double-click or press {{shortcut}} to edit points",
     "lineEditor_pointSelected": "Press {{shortcut_1}} to remove point(s),\n{{shortcut_2}} to duplicate, or drag to move",
@@ -601,7 +620,11 @@
     "colors": "Colors",
     "shades": "Shades",
     "hexCode": "Hex code",
-    "noShades": "No shades available for this color"
+    "noShades": "No shades available for this color",
+    "invalidColor": "Not a valid color",
+    "invalidHexLength": "Hex code must be 3, 4, 6, or 8 characters",
+    "topPicksTip": "Tip: drag any color onto your top picks to pin it",
+    "resetTopPicks": "Reset to default top picks"
   },
   "overwriteConfirm": {
     "action": {

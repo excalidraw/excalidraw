@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar en tèxt brut",
     "pasteCharts": "Pegar los grafics",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Tot seleccionar",
     "multiSelect": "Apondre un element a la seleccion",
     "moveCanvas": "Desplaçar lo canabàs",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "Tiret",
     "strokeStyle_dotted": "Puntilhat",
     "sloppiness": "Estil de traça",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Opacitat",
     "textAlign": "Alinhament tèxt",
     "edges": "Angles",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "",
     "arrowhead_crowfoot_one": "",
     "arrowhead_crowfoot_one_or_many": "",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "",
+    "cardinality": "",
     "arrowtypes": "",
     "arrowtype_sharp": "",
     "arrowtype_round": "",
@@ -95,6 +111,7 @@
     "group": "Gropar la seleccion",
     "ungroup": "Desunir la seleccion",
     "collaborators": "Collaborators",
+    "you": "",
     "toggleGrid": "",
     "addToLibrary": "Apondre a la bibliotèca",
     "removeFromLibrary": "Suprimir de la bibliotèca",
@@ -171,7 +188,14 @@
     "linkToElement": "Ligam cap a l’objècte",
     "wrapSelectionInFrame": "",
     "tab": "Onglet",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "",
@@ -310,10 +334,16 @@
     "magicframe": "",
     "embeddable": "Integracion Web",
     "laser": "Puntador laser",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Man (aisina de desplaçament de la vista)",
     "extraTools": "Mai d’aisinas",
     "mermaidToExcalidraw": "De Mermaid cap a Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rectangle",
@@ -345,6 +375,7 @@
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
     "embeddable": "",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Salvar al disc",
@@ -576,7 +612,11 @@
     "colors": "Colors",
     "shades": "Nuanças",
     "hexCode": "Còdi exadecimal",
-    "noShades": "Cap de nuança pas disponibla per aquesta color"
+    "noShades": "Cap de nuança pas disponibla per aquesta color",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -612,11 +652,12 @@
   "mermaid": {
     "title": "De Mermaid cap a Excalidraw",
     "button": "Inserir",
-    "description": "Actualament, sonque los diagramas <flowchartLink>logics</flowchartLink>,<sequenceLink> de sequéncia</sequenceLink> e <classLink>de classa </classLink>son preses en carga. Los autres tipes seràn afichats coma imatge dins Excalidraw.",
+    "description": "",
     "syntax": "Sintaxi Mermaid",
     "preview": "Apercebut",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

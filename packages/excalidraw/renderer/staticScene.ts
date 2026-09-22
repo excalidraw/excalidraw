@@ -1,5 +1,6 @@
 import {
   applyDarkModeFilter,
+  COLOR_WHITE,
   FRAME_STYLE,
   THEME,
   throttleRAF,
@@ -18,12 +19,19 @@ import {
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
-import { renderElement } from "@excalidraw/element";
+import {
+  getRenderElementWithPositionOverride,
+  resolveElementRenderState,
+  renderElement,
+} from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
 
+import type { ElementRenderState } from "@excalidraw/element";
+
 import type {
   ElementsMap,
+  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -34,7 +42,11 @@ import {
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import {
+  bootstrapCanvas,
+  getNormalizedCanvasDimensions,
+  snapScrollToDevicePixels,
+} from "./helpers";
 
 import type {
   StaticCanvasRenderConfig,
@@ -65,6 +77,7 @@ const strokeGrid = (
   theme: StaticCanvasRenderConfig["theme"],
   width: number,
   height: number,
+  scale: number,
 ) => {
   const offsetX = (scrollX % gridSize) - gridSize;
   const offsetY = (scrollY % gridSize) - gridSize;
@@ -73,15 +86,35 @@ const strokeGrid = (
 
   const spaceWidth = 1 / zoom.value;
 
-  context.save();
+  // scene units → device pixels
+  const devicePixels = zoom.value * scale;
 
-  // Offset rendering by 0.5 to ensure that 1px wide lines are crisp.
-  // We only do this when zoomed to 100% because otherwise the offset is
-  // fractional, and also visibly offsets the elements.
-  // We also do this per-axis, as each axis may already be offset by 0.5.
-  if (zoom.value === 1) {
-    context.translate(offsetX % 1 ? 0 : 0.5, offsetY % 1 ? 0 : 0.5);
-  }
+  // A line at least a device pixel wide is drawn a whole number of device
+  // pixels wide and centered to cover them exactly — on the half pixel when
+  // the count is odd. Straddling a pixel boundary renders it as two lighter
+  // pixels, which is how the grid looked at every zoom but 100%. Thinner
+  // lines (zoomed far out) keep their sub-pixel width: their lightness is
+  // the point.
+  const snap = (position: number, maxWidthInCssPixels: number) => {
+    // a line is `min(1 / zoom, max)` scene units wide; computed straight in
+    // device pixels, so `(1 / zoom) × zoom` never lands just under 1
+    const widthInDevicePixels = Math.min(
+      scale,
+      maxWidthInCssPixels * devicePixels,
+    );
+    if (widthInDevicePixels < 1) {
+      return { position, lineWidth: widthInDevicePixels / devicePixels };
+    }
+    const wholeWidth = Math.round(widthInDevicePixels);
+    const center = wholeWidth % 2 ? 0.5 : 0;
+    return {
+      position:
+        (Math.round(position * devicePixels - center) + center) / devicePixels,
+      lineWidth: wholeWidth / devicePixels,
+    };
+  };
+
+  context.save();
 
   // vertical lines
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
@@ -92,7 +125,7 @@ const strokeGrid = (
       continue;
     }
 
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+    const { position, lineWidth } = snap(x, isBold ? 4 : 1);
     context.lineWidth = lineWidth;
     const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
@@ -101,8 +134,8 @@ const strokeGrid = (
     context.strokeStyle = isBold
       ? GridLineColor[theme].bold
       : GridLineColor[theme].regular;
-    context.moveTo(x, offsetY - gridSize);
-    context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
+    context.moveTo(position, offsetY - gridSize);
+    context.lineTo(position, Math.ceil(offsetY + height + gridSize * 2));
     context.stroke();
   }
 
@@ -113,7 +146,7 @@ const strokeGrid = (
       continue;
     }
 
-    const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+    const { position, lineWidth } = snap(y, isBold ? 4 : 1);
     context.lineWidth = lineWidth;
     const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
@@ -122,8 +155,8 @@ const strokeGrid = (
     context.strokeStyle = isBold
       ? GridLineColor[theme].bold
       : GridLineColor[theme].regular;
-    context.moveTo(offsetX - gridSize, y);
-    context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
+    context.moveTo(offsetX - gridSize, position);
+    context.lineTo(Math.ceil(offsetX + width + gridSize * 2), position);
     context.stroke();
   }
   context.restore();
@@ -170,11 +203,17 @@ const renderLinkIcon = (
   context: CanvasRenderingContext2D,
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,
+  renderState: ElementRenderState,
 ) => {
   if (element.link && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const [x, y, width, height] = getLinkHandleFromCoords(
-      [x1, y1, x2, y2],
+      [
+        x1 + renderState.offset.x,
+        y1 + renderState.offset.y,
+        x2 + renderState.offset.x,
+        y2 + renderState.offset.y,
+      ],
       element.angle,
       appState,
     );
@@ -204,7 +243,13 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
+
+      // Seed a sane default so a corrupted color (silently rejected by the
+      // canvas) falls back to white instead of a stale fillStyle.
+      linkCanvasCacheContext.fillStyle = COLOR_WHITE;
+      linkCanvasCacheContext.fillStyle =
+        appState.viewBackgroundColor || COLOR_WHITE;
+
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
       if (canvasKey === "elementLink") {
@@ -221,7 +266,7 @@ const renderLinkIcon = (
 
       linkCanvasCacheContext.restore();
     }
-    context.globalAlpha = element.opacity / 100;
+    context.globalAlpha = renderState.opacity;
     context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
@@ -233,7 +278,7 @@ const _renderStaticScene = ({
   allElementsMap,
   visibleElements,
   scale,
-  appState,
+  appState: unsnappedAppState,
   renderConfig,
 }: StaticSceneRenderConfig) => {
   if (canvas === null) {
@@ -241,6 +286,10 @@ const _renderStaticScene = ({
   }
 
   const { renderGrid = true, isExporting } = renderConfig;
+  // export draws vectors, not cached bitmaps — nothing to keep on the grid
+  const appState = isExporting
+    ? unsnappedAppState
+    : snapScrollToDevicePixels(unsnappedAppState, scale);
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -272,6 +321,7 @@ const _renderStaticScene = ({
       renderConfig.theme,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
+      scale,
     );
   }
 
@@ -297,13 +347,56 @@ const _renderStaticScene = ({
 
   const inFrameGroupsMap = new Map<string, boolean>();
 
+  const getRenderState = (element: ExcalidrawElement) =>
+    resolveElementRenderState(
+      element,
+      elementsMap,
+      renderConfig,
+      allElementsMap,
+    );
+
+  const clipElementToFrame = (
+    element: NonDeletedExcalidrawElement,
+    renderState: ElementRenderState,
+  ) => {
+    if (
+      !(element.frameId || appState.frameToHighlight?.id) ||
+      !appState.frameRendering.enabled ||
+      !appState.frameRendering.clip
+    ) {
+      return;
+    }
+    const targetFrame = getTargetFrame(element, elementsMap, appState);
+    if (!targetFrame) {
+      return;
+    }
+    const frameState = getRenderState(targetFrame);
+    const frame = getRenderElementWithPositionOverride(
+      targetFrame,
+      frameState.offset,
+    );
+    const isTranslated = (state: ElementRenderState) =>
+      state.offset.x !== 0 || state.offset.y !== 0;
+    if (
+      (element.frameId === frame.id &&
+        (isTranslated(renderState) || isTranslated(frameState))) ||
+      shouldApplyFrameClip(
+        getRenderElementWithPositionOverride(element, renderState.offset),
+        frame,
+        appState,
+        elementsMap,
+        inFrameGroupsMap,
+      )
+    ) {
+      frameClip(frame, context, renderConfig, appState);
+    }
+  };
+
   // Paint visible elements
   visibleElements
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       try {
-        const frameId = element.frameId || appState.frameToHighlight?.id;
-
         if (
           isTextElement(element) &&
           element.containerId &&
@@ -314,47 +407,21 @@ const _renderStaticScene = ({
         }
 
         context.save();
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          const frame = getTargetFrame(element, elementsMap, appState);
-          if (
-            frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          renderElement(
-            element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        } else {
-          renderElement(
-            element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        }
-
         const boundTextElement = getBoundTextElement(element, elementsMap);
+
+        const renderState = getRenderState(element);
+        clipElementToFrame(element, renderState);
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+          renderState,
+        );
+
         if (boundTextElement) {
           renderElement(
             boundTextElement,
@@ -369,8 +436,8 @@ const _renderStaticScene = ({
 
         context.restore();
 
-        if (!isExporting) {
-          renderLinkIcon(element, context, appState, elementsMap);
+        if (!isExporting && renderConfig.renderLinks !== false) {
+          renderLinkIcon(element, context, appState, elementsMap, renderState);
         }
       } catch (error: any) {
         console.error(
@@ -389,9 +456,37 @@ const _renderStaticScene = ({
     .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
       try {
-        const render = () => {
+        const renderState = getRenderState(element);
+        context.save();
+        clipElementToFrame(element, renderState);
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+          renderState,
+        );
+
+        if (
+          isIframeLikeElement(element) &&
+          (isExporting ||
+            (isEmbeddableElement(element) &&
+              renderConfig.embedsValidationStatus.get(element.id) !== true)) &&
+          element.width &&
+          element.height
+        ) {
+          const label = {
+            ...createPlaceholderEmbeddableLabel(element),
+            // Synthetic visual: resolve overrides and frame opacity through
+            // its owner, without creating another animation target.
+            id: element.id,
+            frameId: element.frameId,
+          };
           renderElement(
-            element,
+            label,
             elementsMap,
             allElementsMap,
             rc,
@@ -399,62 +494,11 @@ const _renderStaticScene = ({
             renderConfig,
             appState,
           );
-
-          if (
-            isIframeLikeElement(element) &&
-            (isExporting ||
-              (isEmbeddableElement(element) &&
-                renderConfig.embedsValidationStatus.get(element.id) !==
-                  true)) &&
-            element.width &&
-            element.height
-          ) {
-            const label = createPlaceholderEmbeddableLabel(element);
-            renderElement(
-              label,
-              elementsMap,
-              allElementsMap,
-              rc,
-              context,
-              renderConfig,
-              appState,
-            );
-          }
-          if (!isExporting) {
-            renderLinkIcon(element, context, appState, elementsMap);
-          }
-        };
-        // - when exporting the whole canvas, we DO NOT apply clipping
-        // - when we are exporting a particular frame, apply clipping
-        //   if the containing frame is not selected, apply clipping
-        const frameId = element.frameId || appState.frameToHighlight?.id;
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          context.save();
-
-          const frame = getTargetFrame(element, elementsMap, appState);
-
-          if (
-            frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          render();
-          context.restore();
-        } else {
-          render();
         }
+        if (!isExporting && renderConfig.renderLinks !== false) {
+          renderLinkIcon(element, context, appState, elementsMap, renderState);
+        }
+        context.restore();
       } catch (error: any) {
         console.error(error);
       }

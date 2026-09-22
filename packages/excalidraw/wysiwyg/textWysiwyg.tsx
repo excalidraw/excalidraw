@@ -43,14 +43,16 @@ import { getWrappedTextLines } from "@excalidraw/element";
 import {
   isArrowElement,
   isBoundToContainer,
+  isStickyNoteElement,
   isTextElement,
 } from "@excalidraw/element";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElementWithContainer,
   ExcalidrawTextElement,
+  NonDeleted,
+  ExcalidrawTextContainer,
 } from "@excalidraw/element/types";
 
 import { actionSaveToActiveFile } from "../actions";
@@ -125,21 +127,27 @@ const getLineCaretOffsetFromNativeLayout = ({
   lineHeightPx,
   direction,
   targetX,
+  ownerDocument,
 }: {
   text: string;
   font: ReturnType<typeof getFontString>;
   lineHeightPx: number;
   direction: "ltr" | "rtl";
   targetX: number;
+  ownerDocument: Document;
 }) => {
-  if (!text || !document.body || typeof document.createRange !== "function") {
+  if (
+    !text ||
+    !ownerDocument.body ||
+    typeof ownerDocument.createRange !== "function"
+  ) {
     return null;
   }
 
   const offsets = getCaretBoundaryOffsets(text);
-  const mirror = document.createElement("div");
-  const textNode = document.createTextNode(text);
-  const range = document.createRange();
+  const mirror = ownerDocument.createElement("div");
+  const textNode = ownerDocument.createTextNode(text);
+  const range = ownerDocument.createRange();
   const positions: number[] = [];
 
   mirror.dir = direction;
@@ -157,7 +165,7 @@ const getLineCaretOffsetFromNativeLayout = ({
     lineHeight: `${lineHeightPx}px`,
   });
   mirror.append(textNode);
-  document.body.append(mirror);
+  ownerDocument.body.append(mirror);
 
   try {
     for (const offset of offsets) {
@@ -196,7 +204,6 @@ const getLineCaretOffsetFromNativeLayout = ({
 type SubmitHandler = () => void;
 
 export const textWysiwyg = ({
-  id,
   onChange,
   onSubmit,
   getViewportCoords,
@@ -207,7 +214,6 @@ export const textWysiwyg = ({
   autoSelect = true,
   initialCaretSceneCoords = null,
 }: {
-  id: ExcalidrawElement["id"];
   /**
    * textWysiwyg only deals with `originalText`
    *
@@ -224,6 +230,8 @@ export const textWysiwyg = ({
   autoSelect?: boolean;
   initialCaretSceneCoords?: { x: number; y: number } | null;
 }): SubmitHandler => {
+  const ownerDocument = excalidrawContainer?.ownerDocument ?? document;
+  const ownerWindow = ownerDocument.defaultView ?? window;
   let currentTextLayout: {
     angle: Radians;
     font: ReturnType<typeof getFontString>;
@@ -261,7 +269,9 @@ export const textWysiwyg = ({
     LAST_THEME = app.state.theme;
 
     const appState = app.state;
-    const updatedTextElement = app.scene.getElement<ExcalidrawTextElement>(id);
+    const updatedTextElement = app.scene.getElement<
+      NonDeleted<ExcalidrawTextElement>
+    >(element.id);
 
     if (!updatedTextElement) {
       return;
@@ -271,10 +281,10 @@ export const textWysiwyg = ({
     if (updatedTextElement && isTextElement(updatedTextElement)) {
       let coordX = updatedTextElement.x;
       let coordY = updatedTextElement.y;
-      const container = getContainerElement(
-        updatedTextElement,
-        app.scene.getNonDeletedElementsMap(),
-      );
+      const container = getContainerElement<
+        NonDeleted<ExcalidrawTextElement>,
+        NonDeleted<ExcalidrawTextContainer>
+      >(updatedTextElement, app.scene.getNonDeletedElementsMap());
 
       let width = updatedTextElement.width;
 
@@ -296,57 +306,15 @@ export const textWysiwyg = ({
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
         }
-        const propertiesUpdated = textPropertiesUpdated(
-          updatedTextElement,
-          editable,
-        );
-
-        let originalContainerData;
-        if (propertiesUpdated) {
-          originalContainerData = updateOriginalContainerCache(
-            container.id,
-            container.height,
-          );
-        } else {
-          originalContainerData = originalContainerCache[container.id];
-          if (!originalContainerData) {
-            originalContainerData = updateOriginalContainerCache(
-              container.id,
-              container.height,
-            );
-          }
-        }
-
         maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
         );
 
-        // autogrow container height if text exceeds
-        if (!isArrowElement(container) && height > maxHeight) {
-          const targetContainerHeight = computeContainerDimensionForBoundText(
-            height,
-            container.type,
-          );
-
-          app.scene.mutateElement(container, { height: targetContainerHeight });
-          updateBoundElements(container, app.scene);
-          return;
-        } else if (
-          // autoshrink container height until original container height
-          // is reached when text is removed
-          !isArrowElement(container) &&
-          container.height > originalContainerData.height &&
-          height < maxHeight
-        ) {
-          const targetContainerHeight = computeContainerDimensionForBoundText(
-            height,
-            container.type,
-          );
-          app.scene.mutateElement(container, { height: targetContainerHeight });
-          updateBoundElements(container, app.scene);
-        } else {
+        if (isStickyNoteElement(container)) {
+          // the sticky fit (App.updateElement) owns the note's height; the
+          // editor only mirrors the fitted label's position
           const { x, y } = computeBoundTextPosition(
             container,
             updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -354,6 +322,64 @@ export const textWysiwyg = ({
           );
           coordX = x;
           coordY = y;
+        } else {
+          const propertiesUpdated = textPropertiesUpdated(
+            updatedTextElement,
+            editable,
+          );
+
+          let originalContainerData;
+          if (propertiesUpdated) {
+            originalContainerData = updateOriginalContainerCache(
+              container.id,
+              container.height,
+            );
+          } else {
+            originalContainerData = originalContainerCache[container.id];
+            if (!originalContainerData) {
+              originalContainerData = updateOriginalContainerCache(
+                container.id,
+                container.height,
+              );
+            }
+          }
+
+          // autogrow container height if text exceeds
+          if (!isArrowElement(container) && height > maxHeight) {
+            const targetContainerHeight = computeContainerDimensionForBoundText(
+              height,
+              container.type,
+            );
+
+            app.scene.mutateElement(container, {
+              height: targetContainerHeight,
+            });
+            updateBoundElements(container, app.scene);
+            return;
+          } else if (
+            // autoshrink container height until original container height
+            // is reached when text is removed
+            !isArrowElement(container) &&
+            container.height > originalContainerData.height &&
+            height < maxHeight
+          ) {
+            const targetContainerHeight = computeContainerDimensionForBoundText(
+              height,
+              container.type,
+            );
+            app.scene.mutateElement(container, {
+              height: targetContainerHeight,
+            });
+            updateBoundElements(container, app.scene);
+          } else {
+            const { x, y } = computeBoundTextPosition(
+              container,
+              updatedTextElement as ExcalidrawTextElementWithContainer,
+              elementsMap,
+            );
+            coordX = x;
+            coordY = y;
+          }
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
@@ -423,7 +449,7 @@ export const textWysiwyg = ({
     }
   };
 
-  const editable = document.createElement("textarea");
+  const editable = ownerDocument.createElement("textarea");
 
   editable.dir = "auto";
   editable.tabIndex = 0;
@@ -509,6 +535,7 @@ export const textWysiwyg = ({
       lineHeightPx: layout.lineHeightPx,
       direction,
       targetX: relativeX,
+      ownerDocument,
     });
 
     return line.start + (lineCaretOffset || 0);
@@ -593,21 +620,27 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
 
-      const font = getFontString({
-        fontSize: app.state.currentItemFontSize,
-        fontFamily: app.state.currentItemFontFamily,
-      });
       if (container) {
         const boundTextElement = getBoundTextElement(
           container,
           app.scene.getNonDeletedElementsMap(),
         );
-        const wrappedText = wrapText(
-          `${editable.value}${text}`,
-          font,
-          getBoundTextMaxWidth(container, boundTextElement),
-        );
-        const width = getTextWidth(wrappedText, font);
+        const font = getFontString({
+          fontSize:
+            isStickyNoteElement(container) && boundTextElement
+              ? boundTextElement.fontSize
+              : app.state.currentItemFontSize,
+          fontFamily:
+            isStickyNoteElement(container) && boundTextElement
+              ? boundTextElement.fontFamily
+              : app.state.currentItemFontFamily,
+        });
+        const maxWidth = getBoundTextMaxWidth(container, boundTextElement);
+        const { selectionStart, selectionEnd, value } = editable;
+        const nextText =
+          value.slice(0, selectionStart) + text + value.slice(selectionEnd);
+        const wrappedText = wrapText(nextText, font, maxWidth);
+        const width = Math.min(getTextWidth(wrappedText, font), maxWidth);
         editable.style.width = `${width}px`;
       }
     };
@@ -773,7 +806,7 @@ export const textWysiwyg = ({
   };
 
   const stopEvent = (event: Event) => {
-    if (event.target instanceof HTMLCanvasElement) {
+    if (event.target instanceof ownerWindow.HTMLCanvasElement) {
       event.preventDefault();
       event.stopPropagation();
     }
@@ -848,12 +881,12 @@ export const textWysiwyg = ({
       observer.disconnect();
     }
 
-    window.removeEventListener("resize", updateWysiwygStyle);
-    window.removeEventListener("wheel", stopEvent, true);
-    window.removeEventListener("pointerdown", onPointerDown);
-    window.removeEventListener("pointerup", bindBlurEvent);
-    window.removeEventListener("blur", handleSubmit);
-    window.removeEventListener("beforeunload", handleSubmit);
+    ownerWindow.removeEventListener("resize", updateWysiwygStyle);
+    ownerWindow.removeEventListener("wheel", stopEvent, true);
+    ownerWindow.removeEventListener("pointerdown", onPointerDown);
+    ownerWindow.removeEventListener("pointerup", bindBlurEvent);
+    ownerWindow.removeEventListener("blur", handleSubmit);
+    ownerWindow.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
     unsubOnChange();
     unbindOnScroll();
@@ -862,7 +895,7 @@ export const textWysiwyg = ({
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
-    window.removeEventListener("pointerup", bindBlurEvent);
+    ownerWindow.removeEventListener("pointerup", bindBlurEvent);
     // Deferred so that the pointerdown that initiates the wysiwyg doesn't
     // trigger the blur on ensuing pointerup.
     // Also to handle cases such as picking a color which would trigger a blur
@@ -870,17 +903,19 @@ export const textWysiwyg = ({
     const target = event?.target;
 
     const isPropertiesTrigger =
-      target instanceof HTMLElement &&
+      target instanceof ownerWindow.HTMLElement &&
       target.classList.contains("properties-trigger");
     const isPropertiesContent =
-      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      (target instanceof ownerWindow.HTMLElement ||
+        target instanceof ownerWindow.SVGElement) &&
       !!(target as Element).closest(".properties-content");
     const inShapeActionsMenu =
-      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      (target instanceof ownerWindow.HTMLElement ||
+        target instanceof ownerWindow.SVGElement) &&
       (!!(target as Element).closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
         !!(target as Element).closest(".compact-shape-actions-island"));
 
-    setTimeout(() => {
+    ownerWindow.setTimeout(() => {
       // If we interacted within shape actions menu or its popovers/triggers,
       // keep submit disabled and don't steal focus back to textarea.
       if (inShapeActionsMenu || isPropertiesTrigger || isPropertiesContent) {
@@ -902,10 +937,10 @@ export const textWysiwyg = ({
 
   const temporarilyDisableSubmit = () => {
     editable.onblur = null;
-    window.addEventListener("pointerup", bindBlurEvent);
+    ownerWindow.addEventListener("pointerup", bindBlurEvent);
     // handle edge-case where pointerup doesn't fire e.g. due to user
     // alt-tabbing away
-    window.addEventListener("blur", handleSubmit);
+    ownerWindow.addEventListener("blur", handleSubmit);
   };
 
   // prevent blur when changing properties from the menu
@@ -915,9 +950,9 @@ export const textWysiwyg = ({
     // panning canvas
     if (event.button === POINTER_BUTTON.WHEEL) {
       // trying to pan by clicking inside text area itself -> handle here
-      if (target instanceof HTMLTextAreaElement) {
+      if (target instanceof ownerWindow.HTMLTextAreaElement) {
         event.preventDefault();
-        app.handleCanvasPanUsingWheelOrSpaceDrag(event);
+        app.pan.start(event);
       }
 
       temporarilyDisableSubmit();
@@ -925,15 +960,16 @@ export const textWysiwyg = ({
     }
 
     const isPropertiesTrigger =
-      target instanceof HTMLElement &&
+      target instanceof ownerWindow.HTMLElement &&
       target.classList.contains("properties-trigger");
     const isPropertiesContent =
-      (target instanceof HTMLElement || target instanceof SVGElement) &&
+      (target instanceof ownerWindow.HTMLElement ||
+        target instanceof ownerWindow.SVGElement) &&
       !!(target as Element).closest(".properties-content");
 
     if (
-      ((event.target instanceof HTMLElement ||
-        event.target instanceof SVGElement) &&
+      ((event.target instanceof ownerWindow.HTMLElement ||
+        event.target instanceof ownerWindow.SVGElement) &&
         (event.target.closest(
           `.${CLASSES.SHAPE_ACTIONS_MENU}, .${CLASSES.ZOOM_ACTIONS}`,
         ) ||
@@ -944,7 +980,7 @@ export const textWysiwyg = ({
     ) {
       temporarilyDisableSubmit();
     } else if (
-      event.target instanceof HTMLCanvasElement &&
+      event.target instanceof ownerWindow.HTMLCanvasElement &&
       // Vitest simply ignores stopPropagation, capture-mode, or rAF
       // so without introducing crazier hacks, nothing we can do
       !isTestEnv()
@@ -955,7 +991,7 @@ export const textWysiwyg = ({
       // immediately (if tools locked) so that users on mobile have chance
       // to submit first (to hide virtual keyboard).
       // Note: revisit if we want to differ this behavior on Desktop
-      requestAnimationFrame(() => {
+      ownerWindow.requestAnimationFrame(() => {
         handleSubmit();
       });
     }
@@ -971,7 +1007,7 @@ export const textWysiwyg = ({
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {
     updateWysiwygStyle();
-    const isPopupOpened = !!document.activeElement?.closest(
+    const isPopupOpened = !!ownerDocument.activeElement?.closest(
       ".properties-content",
     );
     if (!isPopupOpened) {
@@ -997,23 +1033,25 @@ export const textWysiwyg = ({
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
   // is preferred so we catch changes from host, where window may not resize.
   let observer: ResizeObserver | null = null;
-  if (canvas && "ResizeObserver" in window) {
-    observer = new window.ResizeObserver(() => {
+  if (canvas && "ResizeObserver" in ownerWindow) {
+    observer = new ownerWindow.ResizeObserver(() => {
       updateWysiwygStyle();
     });
     observer.observe(canvas);
   } else {
-    window.addEventListener("resize", updateWysiwygStyle);
+    ownerWindow.addEventListener("resize", updateWysiwygStyle);
   }
 
   editable.onpointerdown = (event) => event.stopPropagation();
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg
-  requestAnimationFrame(() => {
-    window.addEventListener("pointerdown", onPointerDown, { capture: true });
+  ownerWindow.requestAnimationFrame(() => {
+    ownerWindow.addEventListener("pointerdown", onPointerDown, {
+      capture: true,
+    });
   });
-  window.addEventListener("beforeunload", handleSubmit);
+  ownerWindow.addEventListener("beforeunload", handleSubmit);
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
     .appendChild(editable);

@@ -45,7 +45,7 @@ function extractRateLimitHeaders(headers: Headers): RateLimitInfo {
   };
 }
 
-async function* parseSSEStream(
+export async function* parseSSEStream(
   reader: ReadableStreamDefaultReader<Uint8Array>,
 ): AsyncGenerator<string, void, unknown> {
   const decoder = new TextDecoder();

@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Plakken",
     "pasteAsPlaintext": "Plakken als platte tekst",
     "pasteCharts": "Grafieken plakken",
+    "chartType_bar": "Staafdiagram",
+    "chartType_line": "Lijndiagram",
+    "chartType_radar": "Spinnenweb diagram",
+    "chartType_plaintext": "Tekst zonder opmaak",
     "selectAll": "Alles selecteren",
     "multiSelect": "Voeg element toe aan selectie",
     "moveCanvas": "Canvas verplaatsen",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "Gestreept",
     "strokeStyle_dotted": "Gestippeld",
     "sloppiness": "Slordigheid",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Doorzichtigheid",
     "textAlign": "Uitlijning",
     "edges": "Randen",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "Kraaienpoot (veel)",
     "arrowhead_crowfoot_one": "Kraaienpoot (enkel)",
     "arrowhead_crowfoot_one_or_many": "Kraaienpoot (enkel of veel)",
+    "arrowhead_cardinality_one": "Kardinaliteit (één)",
+    "arrowhead_cardinality_many": "Kardinaliteit (Meerdere)",
+    "arrowhead_cardinality_one_or_many": "Kardinaliteit (één of meerdere)",
+    "arrowhead_cardinality_exactly_one": "Kardinaliteit (Precies één)",
+    "arrowhead_cardinality_zero_or_one": "Kardinaliteit (nul of één)",
+    "arrowhead_cardinality_zero_or_many": "Kardinaliteit (nul of meerdere)",
     "more_options": "Meer opties",
+    "cardinality": "Kardinaliteit",
     "arrowtypes": "Pijl type",
     "arrowtype_sharp": "Scherpe pijl",
     "arrowtype_round": "Gebogen pijl",
@@ -95,6 +111,7 @@
     "group": "Groeperen",
     "ungroup": "Groep opheffen",
     "collaborators": "Deelnemers",
+    "you": "",
     "toggleGrid": "Raster in-/uitschakelen",
     "addToLibrary": "Voeg toe aan bibliotheek",
     "removeFromLibrary": "Verwijder uit bibliotheek",
@@ -129,7 +146,7 @@
     "createContainerFromText": "Tekst in een container laten doorlopen",
     "link": {
       "edit": "Wijzig link",
-      "editEmbed": "Embedbare link bewerken",
+      "editEmbed": "Bewerken van insluitbare link",
       "create": "Link toevoegen",
       "label": "Link",
       "labelEmbed": "Link toevoegen & embedden",
@@ -171,7 +188,14 @@
     "linkToElement": "Link naar object",
     "wrapSelectionInFrame": "Selectie omslaan in frame",
     "tab": "Tab",
-    "shapeSwitch": "Verander vorm"
+    "shapeSwitch": "Verander vorm",
+    "preferences": "Voorkeuren",
+    "preferences_toolLock": "Tool vergrendelen",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "Pijlverbinding",
+    "midpointSnapping": "Vastklikken op middelpunt"
   },
   "elementLink": {
     "title": "Link naar object",
@@ -310,10 +334,16 @@
     "magicframe": "Wireframe naar code",
     "embeddable": "Web Embed",
     "laser": "Laseraanwijzer",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Hand (panning tool)",
     "extraTools": "Meer tools",
     "mermaidToExcalidraw": "Mermaid naar Excalidraw",
     "convertElementType": "Vorm type in-/uitschakelen"
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rechthoek",
@@ -345,6 +375,7 @@
     "freeDraw": "Klik en sleep, laat los als je klaar bent",
     "text": "Tip: je kunt tekst toevoegen door ergens dubbel te klikken met de selectietool",
     "embeddable": "Klink-sleep om een website-insluiting te maken",
+    "autoshape": "",
     "text_selected": "Dubbelklik of druk op {{shortcut}} om de tekst te bewerken",
     "text_editing": "Druk op {{shortcut_1}} of {{shortcut_2}} om het bewerken te voltooien",
     "linearElementMulti": "Klik op het laatste punt of druk op {{shortcut_1}} of {{shortcut_2}} om te voltooien",
@@ -352,6 +383,7 @@
     "resize": "Je kunt de verhoudingen behouden door {{shortcut_1}} ingedrukt te houden tijdens het schalen,\nhoud {{shortcut_2}} ingedrukt om vanuit het midden te schalen",
     "resizeImage": "Je kunt vrij vergroten of verkleinen door {{shortcut_1}} ingedrukt te houden,\nhoud {{shortcut_2}} ingedrukt om vanuit het midden te schalen",
     "rotate": "Je kan hoeken beperken door {{shortcut}} ingedrukt te houden tijdens het draaien",
+    "toggleArrowhead": "",
     "lineEditor_info": "Houd {{shortcut_1}} en Dubbelklik of druk op {{shortcut_2}} om punten te bewerken",
     "lineEditor_line_info": "Dubbelklik of druk op {{shortcut}} om punten te bewerken",
     "lineEditor_pointSelected": "Druk op {{shortcut_1}} om punt(en) te verwijderen,\n{{shortcut_2}} om te dupliceren, of sleep om te verplaatsen",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Fout"
+  },
+  "progressDialog": {
+    "title": "Bezig met opslaan",
+    "defaultMessage": "Voorbereiden om op te slaan..."
   },
   "exportDialog": {
     "disk_title": "Opslaan op schijf",
@@ -472,7 +508,7 @@
   },
   "publishSuccessDialog": {
     "title": "Bibliotheek ingediend",
-    "content": "<link>Hier</link>"
+    "content": "Dank je {{authorName}}. Jouw bibliotheek is ingediend voor beoordeling. Je kunt de status <link>hier bijhouden</link>"
   },
   "confirmDialog": {
     "resetLibrary": "Reset bibliotheek",
@@ -483,7 +519,7 @@
     "label": {
       "withBackground": "Achtergrond",
       "onlySelected": "Alleen geselecteerd",
-      "darkMode": "Dark mode",
+      "darkMode": "Donkere modus",
       "embedScene": "Scène embedden",
       "scale": "Schaal",
       "padding": "Padding"
@@ -557,9 +593,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "",
-      "center_heading_line2": "",
-      "center_heading_line3": "",
+      "center_heading": "Je tekeningen worden bewaard in de opslag van je browser.",
+      "center_heading_line2": "Browser opslag kan onverwacht gewist worden.",
+      "center_heading_line3": "Sla je werk regelmatig op in een bestand om te voorkomen dat je het kwijtraakt.",
       "center_heading_plus": "Wil je in plaats daarvan naar Excalidraw+ gaan?",
       "menuHint": "Exporteren, voorkeuren en meer, ..."
     },
@@ -576,7 +612,11 @@
     "colors": "Kleuren",
     "shades": "Tinten",
     "hexCode": "HEX-code",
-    "noShades": "Geen tinten beschikbaar voor deze kleur"
+    "noShades": "Geen tinten beschikbaar voor deze kleur",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -612,11 +652,12 @@
   "mermaid": {
     "title": "Mermaid naar Excalidraw",
     "button": "Invoegen",
-    "description": "Momenteel worden alleen <flowchartLink>Flowchart</flowchartLink>-, <sequenceLink>Sequence</sequenceLink>- en <classLink>Class</classLink>-diagrammen ondersteund. De andere types worden als afbeelding weergegeven in Excalidraw.",
+    "description": "Momenteel worden alleen <flowchartLink>Stroomdiagram</flowchartLink>, <sequenceLink>Volgordediagram</sequenceLink>, <classLink>Klasse</classLink>, en <erdLink>Entiteitsrelatie</erdLink>diagrammen ondersteund. De andere typen worden weergegeven als afbeelding in Excalidraw.",
     "syntax": "Mermaid Syntaxis",
     "preview": "Voorbeeld",
     "label": "Mermaid",
-    "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier..."
+    "inputPlaceholder": "Noteer Mermaid diagram omschrijving hier...",
+    "autoFixAvailable": "Auto-correctie is beschikbaar"
   },
   "ttd": {
     "error": "Fout!"
@@ -624,7 +665,7 @@
   "chat": {
     "inputPlaceholder": "Begin je diagram idee hier in te typen... ({{shortcut}} voor een nieuwe lijn)",
     "inputPlaceholderWithMessages": "Ga door met het verfijnen van je diagram...",
-    "generating": "",
+    "generating": "Genereren...",
     "rateLimitRemaining": "{{count}} verzoeken over vandaag",
     "role": {
       "user": "Jij",
@@ -641,7 +682,7 @@
     "placeholder": {
       "title": "Laten we jouw diagram ontwerpen",
       "description": "Beschrijf het diagram dat je wilt aanmaken, en we genereren het voor je.",
-      "hint": "Op dit moment kennen we Flowchart, Sequence, en Class diagrammen."
+      "hint": ""
     },
     "preview": "Voorbeeld",
     "insert": "Invoegen",
@@ -655,7 +696,7 @@
       "aiRepair": "Opnieuw genereren (automatisch repareren) →",
       "requestAborted": "Verzoek gestopt",
       "requestFailed": "Verzoek mislukt",
-      "mermaidParseError": ""
+      "mermaidParseError": "Mermaid syntax fout"
     },
     "rateLimit": {
       "messageLimit": "Je hebt je AI limiet bereikt op het gratis abonnement. Probeer Excalidraw+ uit voor meer of kom morgen terug.",

@@ -20,7 +20,7 @@ import { duplicateElements } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import { DuplicateIcon } from "../components/icons";
 
 import { t } from "../i18n";
@@ -60,7 +60,7 @@ export const actionDuplicateSelection = register({
       }
     }
 
-    let { duplicatedElements, elementsWithDuplicates } = duplicateElements({
+    const duplication = duplicateElements({
       type: "in-place",
       elements,
       idsOfElementsToDuplicate: arrayToMap(
@@ -82,13 +82,19 @@ export const actionDuplicateSelection = register({
       },
     });
 
-    if (app.props.onDuplicate && elementsWithDuplicates) {
-      const mappedElements = app.props.onDuplicate(
-        elementsWithDuplicates,
-        elements,
-      );
-      if (mappedElements) {
-        elementsWithDuplicates = mappedElements;
+    let { duplicatedElements, elementsWithDuplicates } = duplication;
+
+    if (app.props.onDuplicate) {
+      ({ elements: elementsWithDuplicates, duplicatedElements } =
+        app.duplicate.runOnDuplicate(
+          duplication,
+          elementsWithDuplicates,
+          elements,
+        ));
+
+      // host vetoed the duplication
+      if (!duplicatedElements.length) {
+        return false;
       }
     }
 
@@ -113,7 +119,7 @@ export const actionDuplicateSelection = register({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={DuplicateIcon}
         title={`${t("labels.duplicateSelection")} — ${getShortcutKey(

@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "",
+    "signIn": "",
     "paste": "Enganxa",
     "pasteAsPlaintext": "Enganxar com a text pla",
     "pasteCharts": "Enganxa els diagrames",
+    "chartType_bar": "",
+    "chartType_line": "",
+    "chartType_radar": "",
+    "chartType_plaintext": "",
     "selectAll": "Selecciona-ho tot",
     "multiSelect": "Afegeix un element a la selecció",
     "moveCanvas": "Mou el llenç",
@@ -31,6 +37,9 @@
     "strokeStyle_dashed": "Guions",
     "strokeStyle_dotted": "Punts",
     "sloppiness": "Estil del traç",
+    "pressure": "",
+    "pressure_constant": "",
+    "pressure_variable": "",
     "opacity": "Opacitat",
     "textAlign": "Alineació del text",
     "edges": "Vores",
@@ -49,7 +58,14 @@
     "arrowhead_crowfoot_many": "Potes de gall (moltes)",
     "arrowhead_crowfoot_one": "Potes de gall (una)",
     "arrowhead_crowfoot_one_or_many": "Potes de gall (una o moltes)",
+    "arrowhead_cardinality_one": "",
+    "arrowhead_cardinality_many": "",
+    "arrowhead_cardinality_one_or_many": "",
+    "arrowhead_cardinality_exactly_one": "",
+    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_many": "",
     "more_options": "Més opcions",
+    "cardinality": "",
     "arrowtypes": "Tipus de fletxa",
     "arrowtype_sharp": "Fletxa Esmolada",
     "arrowtype_round": "Fletxa corba",
@@ -95,6 +111,7 @@
     "group": "Agrupa la selecció",
     "ungroup": "Desagrupa la selecció",
     "collaborators": "Col·laboradors",
+    "you": "",
     "toggleGrid": "Alterna la quadrícula",
     "addToLibrary": "Afegir a la biblioteca",
     "removeFromLibrary": "Eliminar de la biblioteca",
@@ -171,7 +188,14 @@
     "linkToElement": "Enllaç a l'objecte",
     "wrapSelectionInFrame": "Embolica la selecció en un marc",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "preferences": "",
+    "preferences_toolLock": "",
+    "boxSelectionMode": "",
+    "boxSelectionContain": "",
+    "boxSelectionOverlap": "",
+    "arrowBinding": "",
+    "midpointSnapping": ""
   },
   "elementLink": {
     "title": "Enllaç a l'objecte",
@@ -310,10 +334,16 @@
     "magicframe": "De Wireframe a codi",
     "embeddable": "Incrustació Web",
     "laser": "Punter làser",
+    "autoshape": "",
+    "bucketfill": "",
     "hand": "Mà (eina de desplaçament)",
     "extraTools": "Més eines",
     "mermaidToExcalidraw": "Mermaid a Excalidraw",
     "convertElementType": ""
+  },
+  "bucketfill": {
+    "noRegion": "",
+    "tooComplex": ""
   },
   "element": {
     "rectangle": "Rectangle",
@@ -345,6 +375,7 @@
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
     "embeddable": "Feu clic i arrossegueu per crear una Incrustació Web",
+    "autoshape": "",
     "text_selected": "",
     "text_editing": "",
     "linearElementMulti": "",
@@ -352,6 +383,7 @@
     "resize": "",
     "resizeImage": "",
     "rotate": "",
+    "toggleArrowhead": "",
     "lineEditor_info": "",
     "lineEditor_line_info": "",
     "lineEditor_pointSelected": "",
@@ -394,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "progressDialog": {
+    "title": "",
+    "defaultMessage": ""
   },
   "exportDialog": {
     "disk_title": "Desa al disc",
@@ -576,7 +612,11 @@
     "colors": "Colors",
     "shades": "Ombres",
     "hexCode": "Codi hexadecimal",
-    "noShades": "No hi ha ombres disponibles per a aquest color"
+    "noShades": "No hi ha ombres disponibles per a aquest color",
+    "invalidColor": "",
+    "invalidHexLength": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "overwriteConfirm": {
     "action": {
@@ -612,11 +652,12 @@
   "mermaid": {
     "title": "Mermaid a Excalidraw",
     "button": "Inseriu",
-    "description": "Actualment només s'admeten els diagrames <flowchartLink>Flowchart</flowchartLink>, <sequenceLink> Sequence, </sequenceLink> i <classLink> Class </classLink>. Els altres tipus es representaran com a imatge a Excalidraw.",
+    "description": "",
     "syntax": "Sintaxi de Mermaid",
     "preview": "Previsualització",
     "label": "",
-    "inputPlaceholder": ""
+    "inputPlaceholder": "",
+    "autoFixAvailable": ""
   },
   "ttd": {
     "error": ""

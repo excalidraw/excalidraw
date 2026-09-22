@@ -62,6 +62,18 @@ When saving an Excalidraw scene locally to a file, the JSON file (`.excalidraw`)
 }
 ```
 
+### Element creation time
+
+Every normalized element has a `created: number | null` field. A number is the client's wall-clock time in epoch milliseconds when this element instance was created. `null` means the creation time is unknown; restoring an older file does not substitute its load time or last-update time.
+
+| Operation | `created` |
+| --- | --- |
+| Construct a new element | Current time, unless explicitly supplied (including `null`) |
+| Duplicate, paste, or insert from a library | New time for the new instance |
+| Convert element skeletons with ID regeneration | New time for each resulting instance |
+| Restore/open/import an existing scene | Preserve the carried value; missing values become `null` |
+| Edit, change type while retaining the ID, capture, undo, or redo | Preserve the value |
+
 ## Excalidraw clipboard format
 
 When copying selected excalidraw elements to clipboard, the JSON schema is similar to `.excalidraw` format, except it differs in attributes.

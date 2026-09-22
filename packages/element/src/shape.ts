@@ -1,5 +1,5 @@
 import { pointsOnBezierCurves, simplify } from "points-on-curve";
-import { getStroke } from "perfect-freehand";
+import { getStroke, getStrokePoints } from "perfect-freehand";
 import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
@@ -27,7 +27,6 @@ import {
   LINE_POLYGON_POINT_MERGE_DISTANCE,
   applyDarkModeFilter,
   DEFAULT_STROKE_STREAMLINE,
-  DEFAULT_STROKE_STREAMLINE_PRECISE,
 } from "@excalidraw/common";
 
 import { RoughGenerator } from "roughjs/bin/generator";
@@ -70,7 +69,6 @@ import { shouldTestInside } from "./collision";
 
 import type {
   ExcalidrawElement,
-  NonDeletedExcalidrawElement,
   ExcalidrawSelectionElement,
   ExcalidrawLinearElement,
   ExcalidrawFreeDrawElement,
@@ -262,7 +260,7 @@ export const generateRoughOptions = (
 };
 
 const modifyIframeLikeForRoughOptions = (
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   isExporting: boolean,
   embedsValidationStatus: EmbedsValidationStatus | null,
 ) => {
@@ -727,11 +725,10 @@ export const generateLinearCollisionShape = (
       }
 
       const collisionOutline =
-        element.strokeOptions?.variability === "constant" &&
-        CONSTANT_WIDTH_FREEDRAW.STREAMLINE > 0
+        element.strokeOptions?.variability === "constant"
           ? (simplify(
               outlinePoints as Mutable<LocalPoint[]>,
-              CONSTANT_WIDTH_FREEDRAW.STREAMLINE,
+              CONSTANT_WIDTH_FREEDRAW.COLLISION_SIMPLIFY_TOLERANCE,
             ) as [number, number][])
           : outlinePoints;
 
@@ -771,7 +768,7 @@ export const generateLinearCollisionShape = (
  * @private
  */
 const _generateElementShape = (
-  element: Exclude<NonDeletedExcalidrawElement, ExcalidrawSelectionElement>,
+  element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
   generator: RoughGenerator,
   {
     isExporting,
@@ -996,6 +993,9 @@ const _generateElementShape = (
 
       return shapes;
     }
+    // sticky notes are painted directly (canvas + SVG) from
+    // `getStickyNoteRenderPoints`, never through roughjs
+    case "stickynote":
     case "frame":
     case "magicframe":
     case "text":
@@ -1090,6 +1090,7 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
 ): GeometricShape<Point> => {
   switch (element.type) {
     case "rectangle":
+    case "stickynote":
     case "diamond":
     case "frame":
     case "magicframe":
@@ -1201,20 +1202,20 @@ const VARIABLE_WIDTH_FREEDRAW = {
   SIZE_FACTOR: 4.25,
   THINNING: 0.6,
   SMOOTHING: 0.5,
-  STREAMLINE: DEFAULT_STROKE_STREAMLINE,
 } as const;
 
 const CONSTANT_WIDTH_FREEDRAW = {
   /** Stroke size relative to `strokeWidth` for uniform (laser) strokes. */
   SIZE_FACTOR: 1.4,
-  STREAMLINE: DEFAULT_STROKE_STREAMLINE_PRECISE,
+  /**
+   * Max deviation (px) when dropping vertices of the dense laser outline for
+   * collision. Perfect-freehand outlines are already thinned by `smoothing`.
+   */
+  COLLISION_SIMPLIFY_TOLERANCE: 0.2,
 } as const;
 
 const getFreedrawStreamline = (element: ExcalidrawFreeDrawElement) =>
-  element.strokeOptions?.streamline ??
-  (element.strokeOptions?.variability === "constant"
-    ? CONSTANT_WIDTH_FREEDRAW.STREAMLINE
-    : VARIABLE_WIDTH_FREEDRAW.STREAMLINE);
+  element.strokeOptions?.streamline ?? DEFAULT_STROKE_STREAMLINE;
 
 /**
  * Pressure-sensitive (variable width) freedraw outline, rendered with
@@ -1289,6 +1290,26 @@ export const getFreedrawMaxStrokeRadius = (
   element.strokeOptions?.variability === "constant"
     ? element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
     : element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR + 3;
+
+/**
+ * The streamline-smoothed centerline the freedraw stroke is rendered
+ * around, in element-local coordinates. Boundary-sensitive consumers (e.g.
+ * bucket fill) should use this instead of `element.points`: raw input
+ * points can sit 20px+ apart and the rendered stroke is smoothed between
+ * them, so raw chords visibly deviate from what's on screen.
+ *
+ * Constant-width ("laser geometry") strokes technically smooth via
+ * `LaserPointer` instead; the perfect-freehand centerline with the same
+ * `streamline` is a close approximation the stroke width hides.
+ */
+export const getFreedrawStrokeCenterPoints = (
+  element: ExcalidrawFreeDrawElement,
+): [number, number][] =>
+  getStrokePoints(element.points as unknown as number[][], {
+    size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
+    streamline: getFreedrawStreamline(element),
+    last: true,
+  }).map((strokePoint) => strokePoint.point as [number, number]);
 
 const med = (A: number[], B: number[]) => {
   return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];

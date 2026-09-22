@@ -12,6 +12,7 @@ import type {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
+  ElementRenderOverrides,
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
@@ -30,6 +31,9 @@ export type StaticCanvasRenderConfig = {
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
   renderGrid: boolean;
+  /** whether to render link icons on elements with links (never rendered
+   when exporting). @default true */
+  renderLinks?: boolean;
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
@@ -37,6 +41,7 @@ export type StaticCanvasRenderConfig = {
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
   theme: AppState["theme"];
+  elementRenderOverrides?: ElementRenderOverrides;
 };
 
 export type SVGRenderConfig = {
@@ -74,8 +79,6 @@ export type InteractiveCanvasRenderConfig = {
 };
 
 export type RenderInteractiveSceneCallback = {
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   scrollBars?: ScrollBars;
 };
 
@@ -113,7 +116,7 @@ export type InteractiveSceneRenderConfig = {
 export type NewElementSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
   rc: RoughCanvas;
-  newElement: ExcalidrawElement | null;
+  newElement: NonDeletedExcalidrawElement | null;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
@@ -169,6 +172,7 @@ export type ElementShapes = {
   arrow: Drawable[];
   line: Drawable[];
   text: null;
+  stickynote: null;
   image: null;
   frame: null;
   magicframe: null;

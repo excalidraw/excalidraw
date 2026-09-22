@@ -5,6 +5,7 @@ import {
   ORIG_ID,
   ROUNDNESS,
   isPrimitive,
+  getUpdatedTimestamp,
 } from "@excalidraw/common";
 
 import { Excalidraw, mutateElement } from "@excalidraw/excalidraw";
@@ -24,7 +25,11 @@ import {
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { duplicateElement, duplicateElements } from "../src/duplicate";
+import {
+  deepCopyElement,
+  duplicateElement,
+  duplicateElements,
+} from "../src/duplicate";
 
 import type { ExcalidrawLinearElement } from "../src/types";
 
@@ -43,6 +48,24 @@ const assertCloneObjects = (source: any, clone: any) => {
 };
 
 describe("duplicating single elements", () => {
+  it.each([123, 0, null])(
+    "preserves created=%s on a deep copy and resets it for a new instance",
+    (created) => {
+      const element = API.createElement({ type: "rectangle", created });
+      const cloned = deepCopyElement(element);
+      const duplicate = duplicateElement(null, new Map(), element);
+
+      expect(cloned).toEqual(element);
+      expect(duplicate).toMatchObject({
+        created: getUpdatedTimestamp(),
+        version: element.version,
+        versionNonce: element.versionNonce,
+      });
+      expect(duplicate.id).not.toBe(element.id);
+      expect(element.created).toBe(created);
+    },
+  );
+
   it("clones arrow element", () => {
     const element = API.createElement({
       type: "arrow",

@@ -18,7 +18,7 @@ import { actionToggleArrowBinding } from "../actions/actionToggleArrowBinding";
 import { Excalidraw, sceneCoordsToViewportCoords } from "../index";
 
 import { API } from "./helpers/api";
-import { Pointer, UI } from "./helpers/ui";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   render,
   fireEvent,
@@ -329,7 +329,7 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
   // -------------------------------------------------------------------------
   // Arrow does snap to midpoint when isMidpointSnappingEnabled is true
   // -------------------------------------------------------------------------
-  describe("Arrow doesn't snap to midpoint when midpoint snapping is disabled", () => {
+  describe("Midpoint snapping", () => {
     it("does not snap to midpoint when midpoint snapping is turned off", () => {
       const rect = API.createElement({
         type: "rectangle",
@@ -374,6 +374,133 @@ describe("Arrow binding – non-default case (bindingPreference: disabled)", () 
 
       expect(snappedWithMidpoint).toEqual([500, 200]);
       expect(snappedWithoutMidpoint).not.toEqual([500, 200]);
+    });
+
+    it("does not snap an angle-locked elbow binding to midpoint on finalize", async () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect-elbow-angle-lock",
+        x: 600,
+        y: 300,
+        width: 200,
+        height: 200,
+      }) as ExcalidrawBindableElement;
+      API.setElements([rect]);
+      API.setAppState({
+        currentItemArrowType: "elbow",
+        gridModeEnabled: false,
+        isMidpointSnappingEnabled: true,
+      });
+
+      const start = sceneCoordsToViewportCoords(
+        { sceneX: 480, sceneY: 392 },
+        h.state,
+      );
+      const target = sceneCoordsToViewportCoords(
+        { sceneX: 596, sceneY: 397 },
+        h.state,
+      );
+
+      UI.clickTool("arrow");
+      mouse.downAt(start.x, start.y);
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.moveTo(target.x, target.y);
+        mouse.upAt();
+      });
+
+      await waitFor(() => {
+        const arrow = h.elements.find(isElbowArrow);
+        expect(arrow).toBeDefined();
+        expect(arrow!.endBinding?.elementId).toBe(rect.id);
+
+        const endY = arrow!.y + arrow!.points.at(-1)![1];
+        expect(endY).toBeCloseTo(397, 1);
+      });
+    });
+  });
+
+  describe("Grid binding interactions", () => {
+    it("does not snap angle-locked binding to grid when grid mode is disabled", async () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect-angle-lock-no-grid",
+        x: 600,
+        y: 300,
+        width: 200,
+        height: 200,
+      }) as ExcalidrawBindableElement;
+      API.setElements([rect]);
+      API.setAppState({ gridModeEnabled: false, gridSize: 20 });
+
+      const start = sceneCoordsToViewportCoords(
+        { sceneX: 300, sceneY: 333 },
+        h.state,
+      );
+      const target = sceneCoordsToViewportCoords(
+        { sceneX: 596, sceneY: 347 },
+        h.state,
+      );
+
+      UI.clickTool("arrow");
+      mouse.downAt(start.x, start.y);
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        mouse.moveTo(target.x, target.y);
+        mouse.upAt();
+      });
+
+      await waitFor(() => {
+        const arrow = h.elements.find(
+          (element): element is ExcalidrawArrowElement =>
+            element.type === "arrow",
+        );
+        expect(arrow).toBeDefined();
+        expect(arrow!.endBinding?.elementId).toBe(rect.id);
+
+        const startY = arrow!.y + arrow!.points[0][1];
+        const endY = arrow!.y + arrow!.points.at(-1)![1];
+        expect(endY).toBeCloseTo(startY);
+      });
+    });
+
+    it("uses the incoming direction to choose the grid axis for rotated bindables", async () => {
+      const ellipse = API.createElement({
+        type: "ellipse",
+        id: "ellipse-rotated-grid-binding",
+        x: 610,
+        y: 300,
+        width: 240,
+        height: 120,
+        angle: Math.PI / 3,
+      }) as ExcalidrawBindableElement;
+      API.setElements([ellipse]);
+      API.setAppState({ gridModeEnabled: true, gridSize: 20 });
+
+      const start = sceneCoordsToViewportCoords(
+        { sceneX: 400, sceneY: 360 },
+        h.state,
+      );
+      const target = sceneCoordsToViewportCoords(
+        { sceneX: 658, sceneY: 360 },
+        h.state,
+      );
+
+      UI.clickTool("arrow");
+      mouse.downAt(start.x, start.y);
+      mouse.moveTo(target.x, target.y);
+      mouse.upAt();
+
+      await waitFor(() => {
+        const arrow = h.elements.find(
+          (element): element is ExcalidrawArrowElement =>
+            element.type === "arrow",
+        );
+        expect(arrow).toBeDefined();
+        expect(arrow!.endBinding?.elementId).toBe(ellipse.id);
+
+        const startY = arrow!.y + arrow!.points[0][1];
+        const endY = arrow!.y + arrow!.points.at(-1)![1];
+        expect(endY).toBeCloseTo(startY, 1);
+      });
     });
   });
 

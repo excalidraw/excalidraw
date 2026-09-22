@@ -28,7 +28,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
 import { TrashIcon } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 
 import { useStylesPanelMode } from "../components/App";
 
@@ -178,7 +178,7 @@ const deleteSelectedElements = (
           selectedElementIds,
           editingGroupId: nextEditingGroupId,
         },
-        nextElements,
+        getNonDeletedElements(nextElements),
         appState,
         null,
       ),
@@ -309,7 +309,7 @@ export const actionDeleteSelected = register({
     const isMobile = useStylesPanelMode() === "mobile";
 
     return (
-      <ToolButton
+      <IconButton
         type="button"
         icon={TrashIcon}
         title={t("labels.delete")}

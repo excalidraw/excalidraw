@@ -26,7 +26,6 @@ import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ImageCrop,
-  NonDeleted,
 } from "./types";
 
 export const MINIMAL_CROP_SIZE = 10;
@@ -406,7 +405,7 @@ export const cropElement = (
 };
 
 const recomputeOrigin = (
-  stateAtCropStart: NonDeleted<ExcalidrawElement>,
+  stateAtCropStart: ExcalidrawElement,
   transformHandle: TransformHandleType,
   width: number,
   height: number,
