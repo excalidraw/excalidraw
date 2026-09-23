@@ -278,6 +278,26 @@ export const hitElementBoundText = (
   return isPointInElement(point, boundTextElement, elementsMap);
 };
 
+// Frame children are clipped to their enclosing frame, so a point outside
+// the frame cannot hit them
+const isPointClippedByEnclosingFrame = (
+  element: ExcalidrawElement,
+  point: Readonly<GlobalPoint>,
+  elementsMap: ElementsMap,
+) => {
+  if (!element.frameId) {
+    return false;
+  }
+
+  const enclosingFrame = elementsMap.get(element.frameId);
+
+  return (
+    !!enclosingFrame &&
+    isFrameLikeElement(enclosingFrame) &&
+    !pointInsideBounds(point, getElementBounds(enclosingFrame, elementsMap))
+  );
+};
+
 const bindableElementBorderDistanceIfClose = (
   element: NonDeleted<ExcalidrawBindableElement>,
   point: GlobalPoint,
@@ -294,25 +314,20 @@ const bindableElementBorderDistanceIfClose = (
     return -Infinity;
   }
 
-  // If the element is inside a frame, we should clip the element
-  if (element.frameId) {
-    const enclosingFrame = elementsMap.get(element.frameId);
-    if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-      const enclosingFrameBounds = getElementBounds(
-        enclosingFrame,
-        elementsMap,
-      );
-      if (!pointInsideBounds(point, enclosingFrameBounds)) {
-        return -Infinity;
-      }
-    }
+  if (isPointClippedByEnclosingFrame(element, point, elementsMap)) {
+    return -Infinity;
+  }
+
+  const isInside = isPointInElement(point, element, elementsMap);
+  // frames are only bindable from the outside, so arrows ending inside
+  // a frame can bind to its children (or stay unbound)
+  if (isInside && isFrameLikeElement(element)) {
+    return -Infinity;
   }
 
   const distance = distanceToElement(element, elementsMap, point);
-  if (isPointInElement(point, element, elementsMap)) {
-    // frames are only bindable from the outside, so arrows ending inside
-    // a frame can bind to its children (or stay unbound)
-    return isFrameLikeElement(element) ? -Infinity : distance;
+  if (isInside) {
+    return distance;
   }
 
   return distance > tolerance ? -Infinity : -distance;
@@ -339,6 +354,7 @@ export const getAllHoveredElementAtPoint = (
 
     if (
       isBindableElement(element, false) &&
+      !isPointClippedByEnclosingFrame(element, point, elementsMap) &&
       // frames are only bindable from the outside
       !(
         isFrameLikeElement(element) &&

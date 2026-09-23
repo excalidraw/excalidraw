@@ -831,6 +831,9 @@ export const projectFixedPointOntoDiagonal = (
   isMidpointSnappingEnabled: boolean = true,
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");
+  if (arrow.width < 3 && arrow.height < 3) {
+    return null;
+  }
 
   if (isMidpointSnappingEnabled) {
     const sideMidPoint = getSnapOutlineMidPoint(

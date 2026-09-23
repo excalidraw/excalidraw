@@ -342,7 +342,13 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
     draggingPoints.get(startDragged ? startIdx : endIdx)!.point,
     elementsMap,
   );
-  const hit = getHoveredElementForBinding(arrow, point, elements, elementsMap);
+  const hit = getHoveredElementForBinding(
+    arrow,
+    point,
+    elements,
+    elementsMap,
+    appState.zoom,
+  );
 
   // With new arrows this handles the binding at arrow creation
   if (startDragged) {
@@ -488,13 +494,20 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   globalBindMode: AppState["bindMode"],
   arrow: NonDeleted<ExcalidrawArrowElement>,
+  zoom: AppState["zoom"],
   finalize?: boolean,
 ): { current: BindingStrategy; other: BindingStrategy } => {
   let current: BindingStrategy = { mode: undefined };
   let other: BindingStrategy = { mode: undefined };
 
   const isMultiPoint = arrow.points.length > 2;
-  const hit = getHoveredElementForBinding(arrow, point, elements, elementsMap);
+  const hit = getHoveredElementForBinding(
+    arrow,
+    point,
+    elements,
+    elementsMap,
+    zoom,
+  );
   const isOverlapping = oppositeBinding
     ? getAllHoveredElementAtPoint(arrow, point, elements, elementsMap).some(
         (el) => el.id === oppositeBinding.elementId,
@@ -1016,6 +1029,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
       draggingPoints,
       elementsMap,
       elements,
+      appState.zoom,
     );
   }
 
@@ -1057,6 +1071,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
         elements,
         globalBindMode,
         arrow,
+        appState.zoom,
         opts?.finalize,
       );
 
@@ -1081,6 +1096,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
         elements,
         globalBindMode,
         arrow,
+        appState.zoom,
         opts?.finalize,
       );
 

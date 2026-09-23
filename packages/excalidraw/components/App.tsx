@@ -1209,6 +1209,7 @@ class App extends React.Component<AppProps, AppState> {
           ),
           this.scene.getNonDeletedElements(),
           elementsMap,
+          this.state.zoom,
         );
       const element = LinearElementEditor.getElement(
         this.state.selectedLinearElement.elementId,
@@ -1343,6 +1344,7 @@ class App extends React.Component<AppProps, AppState> {
         pointFrom<GlobalPoint>(x, y),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
+        this.state.zoom,
       );
 
       if (hoveredElement && this.state.bindMode !== "skip") {
@@ -6039,6 +6041,7 @@ class App extends React.Component<AppProps, AppState> {
               pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
               this.scene.getNonDeletedElements(),
               this.scene.getNonDeletedElementsMap(),
+              this.state.zoom,
             );
 
             this.handleDelayedBindModeChange(element, hoveredElement);
@@ -7953,9 +7956,12 @@ class App extends React.Component<AppProps, AppState> {
           scenePointerY,
         );
         const elementsMap = this.scene.getNonDeletedElementsMap();
+        const arrow = {
+          elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
+        };
         const hoveredElement = getHoveredElementForBinding(
-          { elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow },
-          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          arrow,
+          globalPoint,
           this.scene.getNonDeletedElements(),
           elementsMap,
           this.state.zoom,
@@ -7969,9 +7975,7 @@ class App extends React.Component<AppProps, AppState> {
                 hoveredElement,
                 elementsMap,
                 this.state.zoom,
-                {
-                  elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow,
-                },
+                arrow,
               ),
             },
           });
@@ -8084,6 +8088,7 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             elementsMap,
+            this.state.zoom,
           );
 
           if (getFeatureFlag("COMPLEX_BINDINGS")) {
@@ -10320,6 +10325,7 @@ class App extends React.Component<AppProps, AppState> {
             point,
             this.scene.getNonDeletedElements(),
             elementsMap,
+            this.state.zoom,
           )
         : null;
 

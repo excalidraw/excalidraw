@@ -21,7 +21,7 @@ import { getPerfectElementSize } from "./sizeHelpers";
 import { getBoundTextElement } from "./textElement";
 import { getMinTextElementWidth } from "./textMeasurements";
 import {
-  isArrowElement as isBindingElement,
+  isArrowElement,
   isElbowArrow,
   isFrameLikeElement,
   isImageElement,
@@ -108,7 +108,7 @@ export const dragSelectedElements = (
   );
 
   elementsToUpdate.forEach((element) => {
-    if (!isBindingElement(element)) {
+    if (!isArrowElement(element)) {
       updateElementCoords(pointerDownState, element, scene, adjustedOffset);
 
       // skip arrow labels since we calculate its position during render
