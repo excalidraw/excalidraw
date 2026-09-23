@@ -27,7 +27,7 @@ import type {
   Radians,
 } from "@excalidraw/math";
 
-import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
+import type { AppState, FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./utils";
 import {
@@ -61,7 +61,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 
 import { distanceToElement } from "./distance";
 
-import { getBindingGap } from "./binding";
+import { maxBindingDistance_simple } from "./binding";
 
 import { hasBackground } from "./comparisons";
 
@@ -69,7 +69,6 @@ import { getFreedrawFillPolygon, getFreedrawMaxStrokeRadius } from "./shape";
 
 import type {
   ElementsMap,
-  ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawDiamondElement,
   ExcalidrawElement,
@@ -279,62 +278,81 @@ export const hitElementBoundText = (
   return isPointInElement(point, boundTextElement, elementsMap);
 };
 
-const bindingBorderTest = (
-  element: NonDeleted<ExcalidrawBindableElement>,
-  [x, y]: Readonly<GlobalPoint>,
-  elementsMap: NonDeletedSceneElementsMap,
-  tolerance: number = 0,
-): boolean => {
-  const p = pointFrom<GlobalPoint>(x, y);
-  const shouldTestInside =
-    // disable fullshape snapping for frame elements so we
-    // can bind to frame children
-    !isFrameLikeElement(element);
+// Frame children are clipped to their enclosing frame, so a point outside
+// the frame cannot hit them
+const isPointClippedByEnclosingFrame = (
+  element: ExcalidrawElement,
+  point: Readonly<GlobalPoint>,
+  elementsMap: ElementsMap,
+) => {
+  if (!element.frameId) {
+    return false;
+  }
 
+  const enclosingFrame = elementsMap.get(element.frameId);
+
+  return (
+    !!enclosingFrame &&
+    isFrameLikeElement(enclosingFrame) &&
+    !pointInsideBounds(point, getElementBounds(enclosingFrame, elementsMap))
+  );
+};
+
+const bindableElementBorderDistanceIfClose = (
+  element: NonDeleted<ExcalidrawBindableElement>,
+  point: GlobalPoint,
+  elementsMap: ElementsMap,
+  tolerance: number = 0,
+) => {
   // PERF: Run a cheap test to see if the binding element
   // is even close to the element
+  const [x, y] = point;
   const t = Math.max(1, tolerance);
   const bounds = [x - t, y - t, x + t, y + t] as Bounds;
   const elementBounds = getElementBounds(element, elementsMap);
   if (!doBoundsIntersect(bounds, elementBounds)) {
-    return false;
+    return -Infinity;
   }
 
-  // If the element is inside a frame, we should clip the element
-  if (element.frameId) {
-    const enclosingFrame = elementsMap.get(element.frameId);
-    if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
-      const enclosingFrameBounds = getElementBounds(
-        enclosingFrame,
-        elementsMap,
-      );
-      if (!pointInsideBounds(p, enclosingFrameBounds)) {
-        return false;
-      }
-    }
+  if (isPointClippedByEnclosingFrame(element, point, elementsMap)) {
+    return -Infinity;
   }
 
-  // Do the intersection test against the element since it's close enough
-  const intersections = intersectElementWithLineSegment(
-    element,
-    elementsMap,
-    lineSegment(elementCenterPoint(element, elementsMap), p),
-  );
-  const distance = distanceToElement(element, elementsMap, p);
+  const isInside = isPointInElement(point, element, elementsMap);
+  // frames are only bindable from the outside, so arrows ending inside
+  // a frame can bind to its children (or stay unbound)
+  if (isInside && isFrameLikeElement(element)) {
+    return -Infinity;
+  }
 
-  return shouldTestInside
-    ? intersections.length === 0 || distance <= tolerance
-    : intersections.length > 0 && distance <= t;
+  const distance = distanceToElement(element, elementsMap, point);
+  if (isInside) {
+    return distance;
+  }
+
+  return distance > tolerance ? -Infinity : -distance;
 };
 
-export const getAllHoveredElementAtPoint = (
+type BindingCandidate = {
+  element: NonDeleted<ExcalidrawBindableElement>;
+  /** distance to the outline: positive inside, negative outside */
+  distance: number;
+};
+
+/**
+ * Bindable elements within binding distance of the point, front to back.
+ * Stops at the first opaque element containing the point, since it hides
+ * everything behind it.
+ */
+const getBindingCandidates = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  tolerance?: number,
-): NonDeleted<ExcalidrawBindableElement>[] => {
-  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
+  zoom: AppState["zoom"],
+): BindingCandidate[] => {
+  const maxDistance = maxBindingDistance_simple(zoom);
+  const candidates: BindingCandidate[] = [];
+  // We need to do hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index
   for (let index = elements.length - 1; index >= 0; --index) {
@@ -342,104 +360,98 @@ export const getAllHoveredElementAtPoint = (
 
     invariant(
       !element.isDeleted,
-      "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
+      "Elements passed to binding hit tests should not contain deleted elements",
     );
 
-    if (
-      isBindableElement(element, false) &&
-      bindingBorderTest(element, point, elementsMap, tolerance)
-    ) {
-      candidateElements.push(element);
+    if (!isBindableElement(element, false)) {
+      continue;
+    }
+
+    const distance = bindableElementBorderDistanceIfClose(
+      element,
+      point,
+      elementsMap,
+      maxDistance,
+    );
+
+    if (distance > -maxDistance) {
+      candidates.push({ element, distance });
 
       if (
         hasBackground(element.type) &&
-        !isTransparent(element.backgroundColor)
+        !isTransparent(element.backgroundColor) &&
+        distance >= 0
       ) {
         break;
       }
     }
   }
 
-  return candidateElements;
+  return candidates;
 };
+
+/**
+ * All elements an arrow endpoint at the point could bind to. Always includes
+ * the result of `getHoveredElementForBinding` for the same arguments.
+ */
+export const getAllHoveredElementAtPoint = (
+  point: Readonly<GlobalPoint>,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+): NonDeleted<ExcalidrawBindableElement>[] =>
+  getBindingCandidates(point, elements, elementsMap, zoom).map(
+    ({ element }) => element,
+  );
 
 export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  tolerance?: number,
+  zoom: AppState["zoom"],
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  const candidateElements = getAllHoveredElementAtPoint(
-    point,
-    elements,
-    elementsMap,
-    tolerance,
+  const candidates = getBindingCandidates(point, elements, elementsMap, zoom);
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  if (candidates.length === 1) {
+    return candidates[0].element;
+  }
+
+  const closestElements = candidates.sort(
+    (a, b) => Math.abs(a.distance) - Math.abs(b.distance),
   );
 
-  if (!candidateElements || candidateElements.length === 0) {
-    return null;
-  }
+  const candidate = closestElements[0];
+  const [cx1, cy1, cx2, cy2] = getElementBounds(candidate.element, elementsMap);
+  const candidateArea = Math.max(
+    0.00001,
+    Math.abs(cx2 - cx1) * Math.abs(cy2 - cy1),
+  );
+  // A smaller element overlapping the closest one takes precedence, but only
+  // when the point is inside it: otherwise the closest outline wins, e.g. an
+  // arrow ending just inside a container's edge next to a nested element
+  const overlaps = closestElements
+    .filter((c) => c.element !== candidate.element && c.distance >= 0)
+    .map((c) => {
+      const [x1, y1, x2, y2] = getElementBounds(c.element, elementsMap);
+      const overlapWidth = Math.max(0, Math.min(x2, cx2) - Math.max(x1, cx1));
+      const overlapHeight = Math.max(0, Math.min(y2, cy2) - Math.max(y1, cy1));
+      const area = Math.max(0.00001, Math.abs(x2 - x1) * Math.abs(y2 - y1));
 
-  if (candidateElements.length === 1) {
-    return candidateElements[0];
-  }
+      return {
+        ...c,
+        overlapPercent: (overlapHeight * overlapWidth) / area,
+        relativeArea: area / candidateArea,
+      };
+    })
+    .filter((c) => c.overlapPercent > 0.25 && c.relativeArea < 0.75);
 
-  // Prefer smaller shapes
-  return candidateElements
-    .sort(
-      (a, b) => b.width ** 2 + b.height ** 2 - (a.width ** 2 + a.height ** 2),
-    )
-    .pop() as NonDeleted<ExcalidrawBindableElement>;
-};
-
-export const getHoveredElementForFocusPoint = (
-  point: GlobalPoint,
-  arrow: ExcalidrawArrowElement,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  elementsMap: NonDeletedSceneElementsMap,
-  tolerance?: number,
-): NonDeleted<ExcalidrawBindableElement> | null => {
-  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
-  // We need to to hit testing from front (end of the array) to back (beginning of the array)
-  // because array is ordered from lower z-index to highest and we want element z-index
-  // with higher z-index
-  for (let index = elements.length - 1; index >= 0; --index) {
-    const element = elements[index];
-
-    invariant(
-      !element.isDeleted,
-      "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
-    );
-
-    if (
-      isBindableElement(element, false) &&
-      bindingBorderTest(element, point, elementsMap, tolerance)
-    ) {
-      candidateElements.push(element);
-    }
-  }
-
-  if (!candidateElements || candidateElements.length === 0) {
-    return null;
-  }
-
-  if (candidateElements.length === 1) {
-    return candidateElements[0];
-  }
-
-  const distanceFilteredCandidateElements = candidateElements
-    // Resolve by distance
-    .filter(
-      (el) =>
-        distanceToElement(el, elementsMap, point) <= getBindingGap(el, arrow) ||
-        isPointInElement(point, el, elementsMap),
-    );
-
-  if (distanceFilteredCandidateElements.length === 0) {
-    return null;
-  }
-
-  return distanceFilteredCandidateElements[0] as NonDeleted<ExcalidrawBindableElement>;
+  return candidate.distance >= 0 && overlaps.length > 0
+    ? overlaps[0].element
+    : candidate.element;
 };
 
 /**
@@ -516,6 +528,8 @@ export const intersectElementWithLineSegment = (
   }
 };
 
+const CURVE_BOUNDS_EPSILON = 1e-6;
+
 const curveIntersections = (
   curves: Curve<GlobalPoint>[],
   segment: LineSegment<GlobalPoint>,
@@ -524,15 +538,19 @@ const curveIntersections = (
   angle: Radians,
   onlyFirst = false,
 ) => {
+  // Pad the segment bounds so an axis-aligned segment passing exactly through
+  // the joint of two curves still overlaps their bounds, as
+  // `doBoundsIntersect` treats bounds that only touch as not intersecting
+  const b2 = [
+    Math.min(segment[0][0], segment[1][0]) - CURVE_BOUNDS_EPSILON,
+    Math.min(segment[0][1], segment[1][1]) - CURVE_BOUNDS_EPSILON,
+    Math.max(segment[0][0], segment[1][0]) + CURVE_BOUNDS_EPSILON,
+    Math.max(segment[0][1], segment[1][1]) + CURVE_BOUNDS_EPSILON,
+  ] as Bounds;
+
   for (const c of curves) {
     // Optimize by doing a cheap bounding box check first
     const b1 = getCubicBezierCurveBound(c[0], c[1], c[2], c[3]);
-    const b2 = [
-      Math.min(segment[0][0], segment[1][0]),
-      Math.min(segment[0][1], segment[1][1]),
-      Math.max(segment[0][0], segment[1][0]),
-      Math.max(segment[0][1], segment[1][1]),
-    ] as Bounds;
 
     if (!doBoundsIntersect(b1, b2)) {
       continue;

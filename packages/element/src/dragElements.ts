@@ -108,18 +108,6 @@ export const dragSelectedElements = (
   );
 
   elementsToUpdate.forEach((element) => {
-    const isArrow = !isArrowElement(element);
-    const isStartBoundElementSelected =
-      isArrow ||
-      (element.startBinding
-        ? elementsToUpdateIds.has(element.startBinding.elementId)
-        : false);
-    const isEndBoundElementSelected =
-      isArrow ||
-      (element.endBinding
-        ? elementsToUpdateIds.has(element.endBinding.elementId)
-        : false);
-
     if (!isArrowElement(element)) {
       updateElementCoords(pointerDownState, element, scene, adjustedOffset);
 
@@ -143,7 +131,6 @@ export const dragSelectedElements = (
       // NOTE: Add a little initial drag to the arrow dragging when the arrow
       // is the single element being dragged to avoid accidentally unbinding
       // the arrow when the user just wants to select it.
-
       elementsToUpdate.size > 1 ||
       Math.max(Math.abs(adjustedOffset.x), Math.abs(adjustedOffset.y)) >
         DRAGGING_THRESHOLD ||
@@ -151,9 +138,12 @@ export const dragSelectedElements = (
     ) {
       updateElementCoords(pointerDownState, element, scene, adjustedOffset);
 
-      const shouldUnbindStart =
-        element.startBinding && !isStartBoundElementSelected;
-      const shouldUnbindEnd = element.endBinding && !isEndBoundElementSelected;
+      const shouldUnbindStart = element.startBinding
+        ? !elementsToUpdateIds.has(element.startBinding.elementId)
+        : true;
+      const shouldUnbindEnd = element.endBinding
+        ? !elementsToUpdateIds.has(element.endBinding.elementId)
+        : true;
       if (shouldUnbindStart || shouldUnbindEnd) {
         // NOTE: Moving the bound arrow should unbind it, otherwise we would
         // have weird situations, like 0 lenght arrow when the user moves

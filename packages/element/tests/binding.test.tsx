@@ -1,4 +1,4 @@
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { KEYS, ROUNDNESS, arrayToMap } from "@excalidraw/common";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -16,7 +16,16 @@ import {
 
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
-import { bindBindingElement, updateBoundElements } from "../src/binding";
+import type { Radians } from "@excalidraw/math";
+
+import type { Zoom } from "@excalidraw/excalidraw/types";
+
+import {
+  bindBindingElement,
+  getBindingGap,
+  updateBoundElements,
+} from "../src/binding";
+import { getAllMidpoints } from "../src/utils";
 import { getTransformHandles } from "../src/transformHandles";
 import {
   getTextEditor,
@@ -236,6 +245,285 @@ describe("binding for simple arrows", () => {
       // ambiguous → must be confirmed with a second click, so still in progress
       expect(h.state.multiElement).not.toBe(null);
       expect(h.state.activeTool.type).toBe("arrow");
+    });
+
+    it("inside -> inside stays in multi-point mode when the pointer moves on", () => {
+      const end: [number, number] = [INSIDE[0] + 50, INSIDE[1] + 50];
+      drawSelfArrow(INSIDE, end);
+      // nudge within the commit zone of the point just placed
+      mouse.moveTo(end[0] + 2, end[1] + 1);
+
+      expect(h.state.multiElement).not.toBe(null);
+      expect(h.state.activeTool.type).toBe("arrow");
+      expect(h.state.multiElement!.points.length).toBe(3);
+    });
+
+    it("bend point inside a shape the arrow doesn't start on stays in multi-point mode when the pointer moves on", () => {
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.clickAt(...MIDDLE);
+      mouse.moveTo(...INSIDE);
+      mouse.clickAt(...INSIDE);
+      mouse.moveTo(INSIDE[0] + 2, INSIDE[1] + 1);
+
+      expect(h.state.multiElement).not.toBe(null);
+      expect(h.state.activeTool.type).toBe("arrow");
+      expect(h.state.multiElement!.points.length).toBe(2);
+    });
+  });
+
+  describe("binding to frames", () => {
+    // frame spans x:200..600, y:200..600, child rect x:300..400, y:300..400
+    beforeEach(async () => {
+      mouse.reset();
+      await act(() => setLanguage(defaultLang));
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      const frame = API.createElement({
+        id: "frame",
+        type: "frame",
+        x: 200,
+        y: 200,
+        width: 400,
+        height: 400,
+      });
+      const child = API.createElement({
+        id: "child",
+        type: "rectangle",
+        x: 300,
+        y: 300,
+        width: 100,
+        height: 100,
+        frameId: frame.id,
+      });
+      API.setElements([frame, child]);
+    });
+
+    const drawArrow = (end: [number, number]) => {
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.downAt(50, 50);
+      mouse.moveTo(end[0] - 10, end[1] - 10);
+      mouse.moveTo(...end);
+      mouse.up();
+
+      return h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+    };
+
+    it("doesn't bind an arrow ending in the frame's empty interior", () => {
+      const arrow = drawArrow([500, 500]);
+
+      expect(arrow.endBinding).toBe(null);
+    });
+
+    it("binds an arrow ending on a frame child to the child", () => {
+      const arrow = drawArrow([350, 350]);
+
+      expect(arrow.endBinding?.elementId).toBe("child");
+    });
+
+    it("binds an arrow ending just outside the frame to the frame", () => {
+      const arrow = drawArrow([500, 610]);
+
+      expect(arrow.endBinding?.elementId).toBe("frame");
+      expect(arrow.endBinding?.mode).toBe("orbit");
+    });
+
+    it("keeps an elbow arrow drawn inside the frame where it was drawn", () => {
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.downAt(250, 250);
+      mouse.moveTo(400, 450);
+      mouse.moveTo(550, 550);
+      mouse.up();
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      expect(arrow.elbowed).toBe(true);
+      // no self-orbit binding to the frame, which would route the arrow
+      // around the frame's outside
+      expect(arrow.startBinding).toBe(null);
+      expect(arrow.endBinding).toBe(null);
+      expect(arrow.frameId).toBe("frame");
+      expect([arrow.x, arrow.y]).toEqual([250, 250]);
+      expect(arrow.points[arrow.points.length - 1]).toEqual([300, 300]);
+    });
+  });
+
+  describe("binding at an ellipse's center", () => {
+    beforeEach(async () => {
+      mouse.reset();
+      await act(() => setLanguage(defaultLang));
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+    });
+
+    it("binds an arrow dropped at a circle's exact center", () => {
+      const circle = API.createElement({
+        type: "ellipse",
+        x: 100,
+        y: -100,
+        width: 200,
+        height: 200,
+      });
+      API.setElements([circle]);
+
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.downAt(-100, 0);
+      mouse.moveTo(100, 0);
+      mouse.moveTo(200, 0);
+      mouse.up();
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      expect(arrow.endBinding?.elementId).toBe(circle.id);
+    });
+  });
+
+  describe("midpoint snapping on diamonds", () => {
+    beforeEach(async () => {
+      mouse.reset();
+      await act(() => setLanguage(defaultLang));
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+    });
+
+    for (const rounded of [false, true]) {
+      for (const elbowed of [false, true]) {
+        it(`${
+          elbowed ? "elbow" : "simple"
+        } arrow ends a binding gap outside the ${
+          rounded ? "rounded" : "sharp"
+        } left vertex`, () => {
+          const diamond = API.createElement({
+            type: "diamond",
+            x: 100,
+            y: -100,
+            width: 200,
+            height: 200,
+            roundness: rounded ? { type: ROUNDNESS.PROPORTIONAL_RADIUS } : null,
+          }) as ExcalidrawBindableElement;
+          API.setElements([diamond]);
+          const [, , left] = getAllMidpoints(diamond, arrayToMap([diamond]));
+
+          UI.clickTool("arrow");
+          if (elbowed) {
+            UI.clickOnTestId("elbow-arrow");
+          }
+          mouse.reset();
+          mouse.downAt(-200, left[1]);
+          mouse.moveTo(left[0] - 50, left[1]);
+          // near (not on) the vertex, so the end snaps to it
+          mouse.moveTo(left[0] - 4, left[1] + 2);
+          mouse.up();
+
+          const arrow = h.elements[
+            h.elements.length - 1
+          ] as ExcalidrawArrowElement;
+          const [endX, endY] = arrow.points[arrow.points.length - 1];
+
+          expect(arrow.endBinding?.elementId).toBe(diamond.id);
+          expect(arrow.x + endX).toBeCloseTo(
+            left[0] - getBindingGap(diamond),
+            0,
+          );
+          expect(arrow.y + endY).toBeCloseTo(left[1], 0);
+        });
+      }
+
+      it(`elbow arrow binds above the ${
+        rounded ? "rounded" : "sharp"
+      } top vertex when the pointer is slightly inside`, () => {
+        const diamond = API.createElement({
+          type: "diamond",
+          x: 100,
+          y: -100,
+          width: 300,
+          height: 300,
+          roundness: rounded ? { type: ROUNDNESS.PROPORTIONAL_RADIUS } : null,
+        }) as ExcalidrawBindableElement;
+        API.setElements([diamond]);
+        const [, , , top] = getAllMidpoints(diamond, arrayToMap([diamond]));
+
+        UI.clickTool("arrow");
+        UI.clickOnTestId("elbow-arrow");
+        mouse.reset();
+        mouse.downAt(top[0] - 300, top[1] - 100);
+        mouse.moveTo(top[0] - 50, top[1] - 50);
+        // inside the diamond, a bit right of the vertex
+        mouse.moveTo(top[0] + 3, top[1] + 10);
+        mouse.up();
+
+        const arrow = h.elements[
+          h.elements.length - 1
+        ] as ExcalidrawArrowElement;
+        const points = arrow.points;
+        const [endX, endY] = points[points.length - 1];
+
+        expect(arrow.endBinding?.elementId).toBe(diamond.id);
+        expect(arrow.x + endX).toBeCloseTo(top[0], 0);
+        expect(arrow.y + endY).toBeCloseTo(top[1] - getBindingGap(diamond), 0);
+        // the last segment comes straight down into the vertex
+        expect(points[points.length - 2][0]).toBeCloseTo(endX);
+      });
+    }
+
+    it("elbow arrow binds next to the tip of a thin rotated diamond", () => {
+      const diamond = API.createElement({
+        type: "diamond",
+        x: 0,
+        y: 0,
+        width: 600,
+        height: 100,
+        angle: ((15 * Math.PI) / 180) as Radians,
+        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+      }) as ExcalidrawBindableElement;
+      API.setElements([diamond]);
+      const [right] = getAllMidpoints(diamond, arrayToMap([diamond]));
+
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.downAt(right[0] + 300, right[1] + 300);
+      mouse.moveTo(right[0] + 50, right[1] + 50);
+      // just outside the right tip
+      mouse.moveTo(right[0] + 4, right[1] + 1);
+      mouse.up();
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      const [endX, endY] = arrow.points[arrow.points.length - 1];
+
+      expect(arrow.endBinding?.elementId).toBe(diamond.id);
+      // a binding gap away, not on another edge of the diamond
+      expect(
+        Math.hypot(arrow.x + endX - right[0], arrow.y + endY - right[1]),
+      ).toBeLessThan(getBindingGap(diamond) + 2);
+    });
+
+    it("elbow arrow snaps to a diamond's edge midpoint", () => {
+      const diamond = API.createElement({
+        type: "diamond",
+        x: 100,
+        y: -100,
+        width: 200,
+        height: 200,
+      }) as ExcalidrawBindableElement;
+      API.setElements([diamond]);
+      // midpoint of the top-left edge
+      const edgeMidpoint = [150, -50] as const;
+
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.downAt(-200, -50);
+      mouse.moveTo(100, -60);
+      // near (not on) the edge midpoint
+      mouse.moveTo(edgeMidpoint[0] - 9, edgeMidpoint[1] - 3);
+      mouse.up();
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      const [, endY] = arrow.points[arrow.points.length - 1];
+
+      expect(arrow.endBinding?.elementId).toBe(diamond.id);
+      expect(arrow.y + endY).toBeCloseTo(edgeMidpoint[1], 0);
     });
   });
 
@@ -797,7 +1085,9 @@ describe("binding to a point-like (sub-pixel) element", () => {
       }) as NonDeleted<ExcalidrawArrowElement>;
       API.setElements([rect, arrow]);
 
-      bindBindingElement(arrow, rect, "orbit", "end", h.scene);
+      bindBindingElement(arrow, rect, "orbit", "end", h.scene, {
+        value: 1,
+      } as Zoom);
 
       const endBinding = arrow.endBinding as FixedPointBinding;
       expect(endBinding.elementId).toBe(rect.id);

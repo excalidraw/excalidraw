@@ -1,7 +1,13 @@
-import { arrayToMap, getSizeFromPoints, reseed } from "@excalidraw/common";
+import {
+  ROUNDNESS,
+  arrayToMap,
+  getSizeFromPoints,
+  reseed,
+} from "@excalidraw/common";
 import {
   type GlobalPoint,
   type LocalPoint,
+  lineSegment,
   pointFrom,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -11,11 +17,27 @@ import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import "@excalidraw/utils/test-utils";
 import { render } from "@excalidraw/excalidraw/tests/test-utils";
 
+import type { Zoom } from "@excalidraw/excalidraw/types";
+
 import * as distance from "../src/distance";
 import { getElementBounds } from "../src/bounds";
-import { hitElementItself, isPointInElement } from "../src/collision";
+import {
+  getAllHoveredElementAtPoint,
+  getHoveredElementForBinding,
+  hitElementItself,
+  intersectElementWithLineSegment,
+  isPointInElement,
+} from "../src/collision";
 import { mutateElement } from "../src/mutateElement";
 import { newFreeDrawElement } from "../src/newElement";
+import { getAllMidpoints } from "../src/utils";
+
+import type {
+  ExcalidrawDiamondElement,
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+  Ordered,
+} from "../src/types";
 
 describe("check rotated elements can be hit:", () => {
   beforeEach(async () => {
@@ -618,5 +640,212 @@ describe("freedraw loop fill containment", () => {
 
     expect(element.version).toBeGreaterThan(version);
     expect(isPointInElement(point, element, elementsMap)).toBe(false);
+  });
+});
+
+describe("binding hit tests", () => {
+  type SceneElement = Ordered<NonDeletedExcalidrawElement>;
+  const zoom = (value: number) => ({ value } as Zoom);
+
+  const hitTest = (
+    elements: SceneElement[],
+    point: GlobalPoint,
+    zoomValue = 1,
+  ) => {
+    const elementsMap = arrayToMap(elements) as NonDeletedSceneElementsMap;
+    return {
+      hovered: getHoveredElementForBinding(
+        point,
+        elements,
+        elementsMap,
+        zoom(zoomValue),
+      )?.id,
+      all: getAllHoveredElementAtPoint(
+        point,
+        elements,
+        elementsMap,
+        zoom(zoomValue),
+      ).map((element) => element.id),
+    };
+  };
+
+  it("both use the zoom-aware binding distance", () => {
+    const rect = API.createElement({
+      id: "rect",
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    }) as SceneElement;
+    // 20px outside the right edge
+    const point = pointFrom<GlobalPoint>(120, 50);
+
+    // 15px binding distance at zoom 1
+    expect(hitTest([rect], point, 1)).toEqual({ hovered: undefined, all: [] });
+    // 25px binding distance at zoom 0.4
+    expect(hitTest([rect], point, 0.4)).toEqual({
+      hovered: "rect",
+      all: ["rect"],
+    });
+  });
+
+  it("both skip elements hidden behind an opaque element", () => {
+    const hidden = API.createElement({
+      id: "hidden",
+      type: "rectangle",
+      x: 30,
+      y: 30,
+      width: 40,
+      height: 40,
+      index: "a0" as SceneElement["index"],
+    }) as SceneElement;
+    const cover = (backgroundColor: string) =>
+      API.createElement({
+        id: "cover",
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        backgroundColor,
+        index: "a1" as SceneElement["index"],
+      }) as SceneElement;
+    const point = pointFrom<GlobalPoint>(50, 50);
+
+    expect(hitTest([hidden, cover("#ffc9c9")], point)).toEqual({
+      hovered: "cover",
+      all: ["cover"],
+    });
+
+    const transparent = hitTest([hidden, cover("transparent")], point);
+    expect(transparent.hovered).toBe("hidden");
+    expect(transparent.all).toEqual(["cover", "hidden"]);
+  });
+
+  describe("overlapping elements", () => {
+    const rect = (id: string, x: number, y: number, w: number, h: number) =>
+      API.createElement({
+        id,
+        type: "rectangle",
+        x,
+        y,
+        width: w,
+        height: h,
+      }) as SceneElement;
+
+    it("binds to the container's edge next to a nested element", () => {
+      const container = rect("container", 0, 0, 200, 200);
+      // 18px inside the container's left edge
+      const child = rect("child", 18, 80, 60, 40);
+
+      // 5px inside the container's edge, 13px outside the child
+      expect(
+        hitTest([container, child], pointFrom<GlobalPoint>(5, 100)).hovered,
+      ).toBe("container");
+      // closer to the child's outline than to the container's
+      expect(
+        hitTest([container, child], pointFrom<GlobalPoint>(10, 100)).hovered,
+      ).toBe("child");
+    });
+
+    it("binds to a smaller element straddling the container's edge when inside both", () => {
+      const container = rect("container", 0, 0, 200, 200);
+      const badge = rect("badge", -30, 80, 60, 40);
+
+      // 3px inside the container's edge, inside the badge
+      expect(
+        hitTest([container, badge], pointFrom<GlobalPoint>(3, 92)).hovered,
+      ).toBe("badge");
+      // 5px outside the container's edge, inside the badge: the closer
+      // container outline wins
+      expect(
+        hitTest([container, badge], pointFrom<GlobalPoint>(-5, 108)).hovered,
+      ).toBe("container");
+    });
+  });
+
+  it("binds at a circle's exact center, where an opaque circle still occludes", () => {
+    const hidden = API.createElement({
+      id: "hidden",
+      type: "rectangle",
+      x: 90,
+      y: 90,
+      width: 20,
+      height: 20,
+      index: "a0" as SceneElement["index"],
+    }) as SceneElement;
+    const circle = (backgroundColor: string) =>
+      API.createElement({
+        id: "circle",
+        type: "ellipse",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+        backgroundColor,
+        index: "a1" as SceneElement["index"],
+      }) as SceneElement;
+    const center = pointFrom<GlobalPoint>(100, 100);
+
+    expect(hitTest([circle("transparent")], center).hovered).toBe("circle");
+    expect(hitTest([hidden, circle("#ffc9c9")], center)).toEqual({
+      hovered: "circle",
+      all: ["circle"],
+    });
+  });
+});
+
+describe("ellipse outline hit test", () => {
+  it("doesn't hit a transparent ellipse's outline from its center line", () => {
+    const ellipse = API.createElement({
+      type: "ellipse",
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 100,
+      backgroundColor: "transparent",
+    });
+
+    // on the horizontal center line, ~50px from the outline
+    expect(
+      hitElementItself({
+        point: pointFrom<GlobalPoint>(210, 50),
+        element: ellipse,
+        threshold: 10,
+        elementsMap: arrayToMap([ellipse]),
+      }),
+    ).toBe(false);
+  });
+});
+
+describe("intersectElementWithLineSegment", () => {
+  it("hits a rounded diamond corner along a line through its apex", () => {
+    const diamond = API.createElement({
+      type: "diamond",
+      x: 100,
+      y: -100,
+      width: 200,
+      height: 200,
+      roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+    }) as ExcalidrawDiamondElement;
+    const elementsMap = arrayToMap([diamond]);
+    const [, , left] = getAllMidpoints(diamond, elementsMap);
+
+    // the offset corner is split into several curves, and this line passes
+    // exactly through the joint of two of them
+    const hits = intersectElementWithLineSegment(
+      diamond,
+      elementsMap,
+      lineSegment(
+        pointFrom<GlobalPoint>(200, left[1]),
+        pointFrom<GlobalPoint>(-200, left[1]),
+      ),
+      6,
+    );
+
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits[0][0]).toBeCloseTo(left[0] - 6, 0);
+    expect(hits[0][1]).toBeCloseTo(left[1]);
   });
 });

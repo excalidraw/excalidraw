@@ -83,9 +83,7 @@ describe("convert element type keeps bound arrows attached", () => {
           h.app.scene.getNonDeletedElementsMap(),
           globalEnd,
         );
-        expect(distance).toBeLessThanOrEqual(
-          getBindingGap(converted, arrowAfter) + 1,
-        );
+        expect(distance).toBeLessThanOrEqual(getBindingGap(converted) + 1);
       },
     );
   }
