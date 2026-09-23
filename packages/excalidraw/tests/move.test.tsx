@@ -1,16 +1,13 @@
 import React from "react";
 import { vi } from "vitest";
-
-import { bindOrUnbindLinearElement } from "@excalidraw/element/binding";
-
 import { KEYS, reseed } from "@excalidraw/common";
-
+import { bindBindingElement } from "@excalidraw/element";
 import "@excalidraw/utils/test-utils";
 
 import type {
-  ExcalidrawLinearElement,
+  ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   NonDeleted,
-  ExcalidrawRectangleElement,
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
@@ -19,6 +16,8 @@ import * as StaticScene from "../renderer/staticScene";
 
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { render, fireEvent, act, unmountComponent } from "./test-utils";
+
+import type { Zoom } from "../types";
 
 unmountComponent();
 
@@ -82,14 +81,25 @@ describe("move element", () => {
     // create elements
     const rectA = UI.createElement("rectangle", { size: 100 });
     const rectB = UI.createElement("rectangle", { x: 200, y: 0, size: 300 });
-    const arrow = UI.createElement("arrow", { x: 110, y: 50, size: 80 });
+    const arrow = UI.createElement("arrow", { x: 105, y: 50, size: 88 });
+
     act(() => {
       // bind line to two rectangles
-      bindOrUnbindLinearElement(
-        arrow.get() as NonDeleted<ExcalidrawLinearElement>,
-        rectA.get() as ExcalidrawRectangleElement,
-        rectB.get() as ExcalidrawRectangleElement,
+      bindBindingElement(
+        arrow.get() as NonDeleted<ExcalidrawArrowElement>,
+        rectA.get() as NonDeleted<ExcalidrawBindableElement>,
+        "orbit",
+        "start",
         h.app.scene,
+        { value: 1 } as Zoom,
+      );
+      bindBindingElement(
+        arrow.get() as NonDeleted<ExcalidrawArrowElement>,
+        rectB.get() as NonDeleted<ExcalidrawBindableElement>,
+        "orbit",
+        "end",
+        h.app.scene,
+        { value: 1 } as Zoom,
       );
     });
 
@@ -97,16 +107,19 @@ describe("move element", () => {
     new Pointer("mouse").clickOn(rectB);
 
     expect(renderInteractiveScene.mock.calls.length).toMatchInlineSnapshot(
-      `17`,
+      `16`,
     );
-    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`13`);
+    expect(renderStaticScene.mock.calls.length).toMatchInlineSnapshot(`15`);
     expect(h.state.selectionElement).toBeNull();
     expect(h.elements.length).toEqual(3);
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([200, 0]);
-    expect([arrow.x, arrow.y]).toEqual([110, 50]);
-    expect([arrow.width, arrow.height]).toEqual([80, 80]);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
+      [[106.00000000000001, 55.6867741935484]],
+      0,
+    );
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[88, 88]], 0);
 
     renderInteractiveScene.mockClear();
     renderStaticScene.mockClear();
@@ -124,8 +137,11 @@ describe("move element", () => {
     expect(h.state.selectedElementIds[rectB.id]).toBeTruthy();
     expect([rectA.x, rectA.y]).toEqual([0, 0]);
     expect([rectB.x, rectB.y]).toEqual([201, 2]);
-    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints([[107.07, 47.07]]);
-    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[86.86, 87.3]]);
+    expect([[arrow.x, arrow.y]]).toCloselyEqualPoints(
+      [[106, 55.6867741935484]],
+      0,
+    );
+    expect([[arrow.width, arrow.height]]).toCloselyEqualPoints([[89, 90]], 0);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
   });

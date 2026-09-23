@@ -1,14 +1,13 @@
 import { exportToCanvas, exportToSvg } from "@excalidraw/utils/export";
-import OpenColor from "open-color";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
-  EXPORT_SOURCE,
   MIME_TYPES,
   VERSIONS,
   chunk,
+  getExportSource,
 } from "@excalidraw/common";
 
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
@@ -17,7 +16,7 @@ import { t } from "../i18n";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import Trans from "./Trans";
 import { CloseIcon } from "./icons";
 
@@ -57,7 +56,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
 
   const ctx = canvas.getContext("2d")!;
 
-  ctx.fillStyle = OpenColor.white;
+  ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // draw items
@@ -87,7 +86,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
     // draw item border
     // -------------------------------------------------------------------------
     ctx.lineWidth = BORDER_WIDTH;
-    ctx.strokeStyle = OpenColor.gray[4];
+    ctx.strokeStyle = "#ced4da";
     ctx.strokeRect(
       colOffset + BOX_PADDING / 2,
       rowOffset + BOX_PADDING / 2,
@@ -131,7 +130,7 @@ const SingleLibraryItem = ({
         elements: libItem.elements,
         appState: {
           ...appState,
-          viewBackgroundColor: OpenColor.white,
+          viewBackgroundColor: "#fff",
           exportBackground: true,
         },
         files: null,
@@ -149,7 +148,7 @@ const SingleLibraryItem = ({
         </span>
       )}
       <div ref={svgRef} className="single-library-item__svg" />
-      <ToolButton
+      <IconButton
         aria-label={t("buttons.remove")}
         type="button"
         icon={CloseIcon}
@@ -175,7 +174,7 @@ const SingleLibraryItem = ({
           }}
         >
           <div style={{ padding: "0.5em 0" }}>
-            <span style={{ fontWeight: 500, color: OpenColor.gray[6] }}>
+            <span style={{ fontWeight: 500, color: "#868e96" }}>
               {t("publishDialog.itemName")}
             </span>
             <span aria-hidden="true" className="required">
@@ -281,7 +280,7 @@ const PublishLibrary = ({
     const libContent: ExportedLibraryData = {
       type: EXPORT_DATA_TYPES.excalidrawLibrary,
       version: VERSIONS.excalidrawLibrary,
-      source: EXPORT_SOURCE,
+      source: getExportSource(),
       libraryItems: clonedLibItems,
     };
     const content = JSON.stringify(libContent, null, 2);
@@ -518,7 +517,7 @@ const PublishLibrary = ({
           </div>
           <div className="publish-library__buttons">
             <DialogActionButton
-              label={t("buttons.cancel")}
+              label={t("buttons.saveLibNames")}
               onClick={onDialogClose}
               data-testid="cancel-clear-canvas-button"
             />

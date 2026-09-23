@@ -5,18 +5,18 @@ import { normalizeLink, KEYS } from "@excalidraw/common";
 import {
   defaultGetElementLinkFromSelection,
   getLinkIdAndTypeFromSelection,
-} from "@excalidraw/element/elementLink";
+} from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
 
 import DialogActionButton from "./DialogActionButton";
 import { TextField } from "./TextField";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import { TrashIcon } from "./icons";
 
 import "./ElementLinkDialog.scss";
@@ -137,7 +137,7 @@ const ElementLinkDialog = ({
         />
 
         {originalLink && nextLink && (
-          <ToolButton
+          <IconButton
             type="button"
             title={t("buttons.remove")}
             aria-label={t("buttons.remove")}

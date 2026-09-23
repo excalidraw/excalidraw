@@ -1,18 +1,22 @@
 import { getNonDeletedElements } from "@excalidraw/element";
 
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { isFrameLikeElement } from "@excalidraw/element";
 
-import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 
-import { KEYS, arrayToMap, getShortcutKey } from "@excalidraw/common";
+import { KEYS, arrayToMap } from "@excalidraw/common";
 
-import { alignElements } from "@excalidraw/element/align";
+import { alignElements } from "@excalidraw/element";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
+
+import { getSelectedElementsByGroup } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import type { Alignment } from "@excalidraw/element/align";
+import type { Alignment } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
+import { IconButton } from "../components/IconButton";
 import {
   AlignBottomIcon,
   AlignLeftIcon,
@@ -25,7 +29,8 @@ import {
 import { t } from "../i18n";
 
 import { isSomeElementSelected } from "../scene";
-import { CaptureUpdateAction } from "../store";
+
+import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
 
@@ -37,7 +42,11 @@ export const alignActionsPredicate = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
   return (
-    selectedElements.length > 1 &&
+    getSelectedElementsByGroup(
+      selectedElements,
+      app.scene.getNonDeletedElementsMap(),
+      appState as Readonly<AppState>,
+    ).length > 1 &&
     // TODO enable aligning frames when implemented properly
     !selectedElements.some((el) => isFrameLikeElement(el))
   );
@@ -51,7 +60,12 @@ const alignSelectedElements = (
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
-  const updatedElements = alignElements(selectedElements, alignment, app.scene);
+  const updatedElements = alignElements(
+    selectedElements,
+    alignment,
+    app.scene,
+    appState,
+  );
 
   const updatedElementsMap = arrayToMap(updatedElements);
 
@@ -82,7 +96,7 @@ export const actionAlignTop = register({
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_UP,
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
       icon={AlignTopIcon}
@@ -116,7 +130,7 @@ export const actionAlignBottom = register({
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_DOWN,
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
       icon={AlignBottomIcon}
@@ -150,7 +164,7 @@ export const actionAlignLeft = register({
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_LEFT,
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
       icon={AlignLeftIcon}
@@ -184,7 +198,7 @@ export const actionAlignRight = register({
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] && event.shiftKey && event.key === KEYS.ARROW_RIGHT,
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
       icon={AlignRightIcon}
@@ -216,7 +230,7 @@ export const actionAlignVerticallyCentered = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
       icon={CenterVerticallyIcon}
@@ -246,7 +260,7 @@ export const actionAlignHorizontallyCentered = register({
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => (
-    <ToolButton
+    <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
       icon={CenterHorizontallyIcon}

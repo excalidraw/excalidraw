@@ -1,11 +1,8 @@
-import { average, pointFrom, type GlobalPoint } from "@excalidraw/math";
+import { average } from "@excalidraw/math";
 
-import type {
-  ExcalidrawBindableElement,
-  FontFamilyValues,
-  FontString,
-  ExcalidrawElement,
-} from "@excalidraw/element/types";
+import type { GlobalCoord } from "@excalidraw/math";
+
+import type { FontFamilyValues, FontString } from "@excalidraw/element/types";
 
 import type {
   ActiveTool,
@@ -15,13 +12,11 @@ import type {
   Zoom,
 } from "@excalidraw/excalidraw/types";
 
-import { COLOR_PALETTE } from "./colors";
 import {
   DEFAULT_VERSION,
   ENV,
   FONT_FAMILY,
   getFontFamilyFallbacks,
-  isDarwin,
   WINDOWS_EMOJI_FALLBACK_FONT,
 } from "./constants";
 
@@ -53,10 +48,23 @@ export const getDateTime = () => {
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
+const getTargetWindow = (
+  target: Element | EventTarget | null,
+): (Window & typeof globalThis) | null =>
+  (target as (EventTarget & { ownerDocument?: Document | null }) | null)
+    ?.ownerDocument?.defaultView ??
+  (typeof window === "undefined" ? null : window);
+
 export const isToolIcon = (
   target: Element | EventTarget | null,
-): target is HTMLElement =>
-  target instanceof HTMLElement && target.className.includes("ToolIcon");
+): target is HTMLElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    target instanceof targetWindow.HTMLElement &&
+    target.className.includes("ToolIcon")
+  );
+};
 
 export const isInputLike = (
   target: Element | EventTarget | null,
@@ -65,17 +73,26 @@ export const isInputLike = (
   | HTMLTextAreaElement
   | HTMLSelectElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLInputElement ||
-  target instanceof HTMLTextAreaElement ||
-  target instanceof HTMLSelectElement;
+  | HTMLDivElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    ((target instanceof targetWindow.HTMLElement &&
+      target.dataset.type === "wysiwyg") ||
+      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+      target instanceof targetWindow.HTMLInputElement ||
+      target instanceof targetWindow.HTMLTextAreaElement ||
+      target instanceof targetWindow.HTMLSelectElement)
+  );
+};
 
 export const isInteractive = (target: Element | EventTarget | null) => {
+  const targetWindow = getTargetWindow(target);
   return (
     isInputLike(target) ||
-    (target instanceof Element && !!target.closest("label, button"))
+    (!!targetWindow &&
+      target instanceof targetWindow.Element &&
+      !!target.closest("label, button"))
   );
 };
 
@@ -85,14 +102,23 @@ export const isWritableElement = (
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLTextAreaElement ||
-  (target instanceof HTMLInputElement &&
-    (target.type === "text" ||
-      target.type === "number" ||
-      target.type === "password"));
+  | HTMLDivElement => {
+  const targetWindow = getTargetWindow(target);
+  return (
+    !!targetWindow &&
+    ((target instanceof targetWindow.HTMLElement &&
+      target.dataset.type === "wysiwyg") ||
+      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+      target instanceof targetWindow.HTMLTextAreaElement ||
+      (target instanceof targetWindow.HTMLInputElement &&
+        (target.type === "text" ||
+          target.type === "number" ||
+          target.type === "password" ||
+          target.type === "search")) ||
+      (target instanceof targetWindow.HTMLElement &&
+        target.closest(".cm-editor") !== null))
+  );
+};
 
 export const getFontFamilyString = ({
   fontFamily,
@@ -101,7 +127,6 @@ export const getFontFamilyString = ({
 }) => {
   for (const [fontFamilyString, id] of Object.entries(FONT_FAMILY)) {
     if (id === fontFamily) {
-      // TODO: we should fallback first to generic family names first
       return `${fontFamilyString}${getFontFamilyFallbacks(id)
         .map((x) => `, ${x}`)
         .join("")}`;
@@ -119,6 +144,11 @@ export const getFontString = ({
   fontFamily: FontFamilyValues;
 }) => {
   return `${fontSize}px ${getFontFamilyString({ fontFamily })}` as FontString;
+};
+
+/** executes callback in the frame that's after the current one */
+export const nextAnimationFrame = async (cb: () => any) => {
+  requestAnimationFrame(() => requestAnimationFrame(cb));
 };
 
 export const debounce = <T extends any[]>(
@@ -150,38 +180,27 @@ export const debounce = <T extends any[]>(
   return ret;
 };
 
-// throttle callback to execute once per animation frame
-export const throttleRAF = <T extends any[]>(
-  fn: (...args: T) => void,
-  opts?: { trailing?: boolean },
-) => {
+// throttle callback to execute once per animation frame using the latest args
+export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
-  let lastArgsTrailing: T | null = null;
 
-  const scheduleFunc = (args: T) => {
+  const scheduleFunc = () => {
     timerId = window.requestAnimationFrame(() => {
       timerId = null;
-      fn(...args);
+      const args = lastArgs;
       lastArgs = null;
-      if (lastArgsTrailing) {
-        lastArgs = lastArgsTrailing;
-        lastArgsTrailing = null;
-        scheduleFunc(lastArgs);
+
+      if (args) {
+        fn(...args);
       }
     });
   };
 
   const ret = (...args: T) => {
-    if (isTestEnv()) {
-      fn(...args);
-      return;
-    }
     lastArgs = args;
     if (timerId === null) {
-      scheduleFunc(lastArgs);
-    } else if (opts?.trailing) {
-      lastArgsTrailing = args;
+      scheduleFunc();
     }
   };
   ret.flush = () => {
@@ -190,12 +209,12 @@ export const throttleRAF = <T extends any[]>(
       timerId = null;
     }
     if (lastArgs) {
-      fn(...(lastArgsTrailing || lastArgs));
-      lastArgs = lastArgsTrailing = null;
+      fn(...lastArgs);
+      lastArgs = null;
     }
   };
   ret.cancel = () => {
-    lastArgs = lastArgsTrailing = null;
+    lastArgs = null;
     if (timerId !== null) {
       cancelAnimationFrame(timerId);
       timerId = null;
@@ -212,135 +231,6 @@ export const throttleRAF = <T extends any[]>(
  */
 export const easeOut = (k: number) => {
   return 1 - Math.pow(1 - k, 4);
-};
-
-const easeOutInterpolate = (from: number, to: number, progress: number) => {
-  return (to - from) * easeOut(progress) + from;
-};
-
-/**
- * Animates values from `fromValues` to `toValues` using the requestAnimationFrame API.
- * Executes the `onStep` callback on each step with the interpolated values.
- * Returns a function that can be called to cancel the animation.
- *
- * @example
- * // Example usage:
- * const fromValues = { x: 0, y: 0 };
- * const toValues = { x: 100, y: 200 };
- * const onStep = ({x, y}) => {
- *   setState(x, y)
- * };
- * const onCancel = () => {
- *   console.log("Animation canceled");
- * };
- *
- * const cancelAnimation = easeToValuesRAF({
- *   fromValues,
- *   toValues,
- *   onStep,
- *   onCancel,
- * });
- *
- * // To cancel the animation:
- * cancelAnimation();
- */
-export const easeToValuesRAF = <
-  T extends Record<keyof T, number>,
-  K extends keyof T,
->({
-  fromValues,
-  toValues,
-  onStep,
-  duration = 250,
-  interpolateValue,
-  onStart,
-  onEnd,
-  onCancel,
-}: {
-  fromValues: T;
-  toValues: T;
-  /**
-   * Interpolate a single value.
-   * Return undefined to be handled by the default interpolator.
-   */
-  interpolateValue?: (
-    fromValue: number,
-    toValue: number,
-    /** no easing applied  */
-    progress: number,
-    key: K,
-  ) => number | undefined;
-  onStep: (values: T) => void;
-  duration?: number;
-  onStart?: () => void;
-  onEnd?: () => void;
-  onCancel?: () => void;
-}) => {
-  let canceled = false;
-  let frameId = 0;
-  let startTime: number;
-
-  function step(timestamp: number) {
-    if (canceled) {
-      return;
-    }
-    if (startTime === undefined) {
-      startTime = timestamp;
-      onStart?.();
-    }
-
-    const elapsed = Math.min(timestamp - startTime, duration);
-    const factor = easeOut(elapsed / duration);
-
-    const newValues = {} as T;
-
-    Object.keys(fromValues).forEach((key) => {
-      const _key = key as keyof T;
-      const result = ((toValues[_key] - fromValues[_key]) * factor +
-        fromValues[_key]) as T[keyof T];
-      newValues[_key] = result;
-    });
-
-    onStep(newValues);
-
-    if (elapsed < duration) {
-      const progress = elapsed / duration;
-
-      const newValues = {} as T;
-
-      Object.keys(fromValues).forEach((key) => {
-        const _key = key as K;
-        const startValue = fromValues[_key];
-        const endValue = toValues[_key];
-
-        let result;
-
-        result = interpolateValue
-          ? interpolateValue(startValue, endValue, progress, _key)
-          : easeOutInterpolate(startValue, endValue, progress);
-
-        if (result == null) {
-          result = easeOutInterpolate(startValue, endValue, progress);
-        }
-
-        newValues[_key] = result as T[K];
-      });
-      onStep(newValues);
-
-      frameId = window.requestAnimationFrame(step);
-    } else {
-      onStep(toValues);
-      onEnd?.();
-    }
-  }
-
-  frameId = window.requestAnimationFrame(step);
-
-  return () => {
-    onCancel?.();
-    canceled = true;
-    window.cancelAnimationFrame(frameId);
-  };
 };
 
 // https://github.com/lodash/lodash/blob/es/chunk.js
@@ -379,6 +269,10 @@ export const removeSelection = () => {
 
 export const distance = (x: number, y: number) => Math.abs(x - y);
 
+export const isSelectionLikeTool = (type: ToolType | "custom") => {
+  return type === "selection" || type === "lasso";
+};
+
 export const updateActiveTool = (
   appState: Pick<AppState, "activeTool">,
   data: ((
@@ -387,7 +281,7 @@ export const updateActiveTool = (
       }
     | { type: "custom"; customType: string }
   ) & { locked?: boolean; fromSelection?: boolean }) & {
-    lastActiveToolBeforeEraser?: ActiveTool | null;
+    lastActiveTool?: ActiveTool | null;
   },
 ): AppState["activeTool"] => {
   if (data.type === "custom") {
@@ -402,9 +296,9 @@ export const updateActiveTool = (
   return {
     ...appState.activeTool,
     lastActiveTool:
-      data.lastActiveToolBeforeEraser === undefined
+      data.lastActiveTool === undefined
         ? appState.activeTool.lastActiveTool
-        : data.lastActiveToolBeforeEraser,
+        : data.lastActiveTool,
     type: data.type,
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
@@ -419,19 +313,6 @@ export const allowFullScreen = () =>
   document.documentElement.requestFullscreen();
 
 export const exitFullScreen = () => document.exitFullscreen();
-
-export const getShortcutKey = (shortcut: string): string => {
-  shortcut = shortcut
-    .replace(/\bAlt\b/i, "Alt")
-    .replace(/\bShift\b/i, "Shift")
-    .replace(/\b(Enter|Return)\b/i, "Enter");
-  if (isDarwin) {
-    return shortcut
-      .replace(/\bCtrlOrCmd\b/gi, "Cmd")
-      .replace(/\bAlt\b/i, "Option");
-  }
-  return shortcut.replace(/\bCtrlOrCmd\b/gi, "Ctrl");
-};
 
 export const viewportCoordsToSceneCoords = (
   { clientX, clientY }: { clientX: number; clientY: number },
@@ -452,7 +333,7 @@ export const viewportCoordsToSceneCoords = (
   const x = (clientX - offsetLeft) / zoom.value - scrollX;
   const y = (clientY - offsetTop) / zoom.value - scrollY;
 
-  return { x, y };
+  return { x, y } as GlobalCoord;
 };
 
 export const sceneCoordsToViewportCoords = (
@@ -544,18 +425,19 @@ export const findLastIndex = <T>(
   return -1;
 };
 
-export const isTransparent = (color: string) => {
-  const isRGBTransparent = color.length === 5 && color.substr(4, 1) === "0";
-  const isRRGGBBTransparent = color.length === 9 && color.substr(7, 2) === "00";
-  return (
-    isRGBTransparent ||
-    isRRGGBBTransparent ||
-    color === COLOR_PALETTE.transparent
-  );
+/** returns the first non-null mapped value */
+export const mapFind = <T, K>(
+  collection: readonly T[],
+  iteratee: (value: T, index: number) => K | undefined | null,
+): K | undefined => {
+  for (let idx = 0; idx < collection.length; idx++) {
+    const result = iteratee(collection[idx], idx);
+    if (result != null) {
+      return result;
+    }
+  }
+  return undefined;
 };
-
-export const isBindingFallthroughEnabled = (el: ExcalidrawBindableElement) =>
-  el.fillStyle !== "solid" || isTransparent(el.backgroundColor);
 
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
@@ -622,12 +504,14 @@ export const supportsEmoji = () => {
 export const getNearestScrollableContainer = (
   element: HTMLElement,
 ): HTMLElement | Document => {
+  const ownerDocument = element.ownerDocument;
+  const ownerWindow = ownerDocument.defaultView ?? window;
   let parent = element.parentElement;
   while (parent) {
-    if (parent === document.body) {
-      return document;
+    if (parent === ownerDocument.body) {
+      return ownerDocument;
     }
-    const { overflowY } = window.getComputedStyle(parent);
+    const { overflowY } = ownerWindow.getComputedStyle(parent);
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
     if (
       hasScrollableContent &&
@@ -639,7 +523,7 @@ export const getNearestScrollableContainer = (
     }
     parent = parent.parentElement;
   }
-  return document;
+  return ownerDocument;
 };
 
 export const focusNearestParent = (element: HTMLInputElement) => {
@@ -698,8 +582,8 @@ export const arrayToObject = <T>(
   array: readonly T[],
   groupBy?: (value: T) => string | number,
 ) =>
-  array.reduce((acc, value) => {
-    acc[groupBy ? groupBy(value) : String(value)] = value;
+  array.reduce((acc, value, idx) => {
+    acc[groupBy ? groupBy(value) : idx] = value;
     return acc;
   }, {} as { [key: string]: T });
 
@@ -734,6 +618,25 @@ export const arrayToList = <T>(array: readonly T[]): Node<T>[] =>
 
     return acc;
   }, [] as Node<T>[]);
+
+/**
+ * Converts a readonly array or map into an iterable.
+ * Useful for avoiding entry allocations when iterating object / map on each iteration.
+ */
+export const toIterable = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): Iterable<T> => {
+  return Array.isArray(values) ? values : values.values();
+};
+
+/**
+ * Converts a readonly array or map into an array.
+ */
+export const toArray = <T>(
+  values: readonly T[] | ReadonlyMap<string, T>,
+): T[] => {
+  return Array.isArray(values) ? values : Array.from(toIterable(values));
+};
 
 export const isTestEnv = () => import.meta.env.MODE === ENV.TEST;
 
@@ -1137,39 +1040,69 @@ export const normalizeEOL = (str: string) => {
 };
 
 // -----------------------------------------------------------------------------
-type HasBrand<T> = {
+export type HasBrand<T> = {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  [K in keyof T]: K extends `~brand${infer _}` ? true : never;
+  [K in keyof T]: K extends `~brand${infer _}` | "_brand" ? true : never;
 }[keyof T];
 
 type RemoveAllBrands<T> = HasBrand<T> extends true
   ? {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      [K in keyof T as K extends `~brand~${infer _}` ? never : K]: T[K];
+      [K in keyof T as K extends `~brand~${infer _}` | "_brand"
+        ? never
+        : K]: T[K];
     }
-  : never;
+  : T;
 
-// adapted from https://github.com/colinhacks/zod/discussions/1994#discussioncomment-6068940
-// currently does not cover all types (e.g. tuples, promises...)
-type Unbrand<T> = T extends Map<infer E, infer F>
-  ? Map<E, F>
+// For accepting values - uses loose matching for branded types
+// Preserves readonly modifier: mutable array requires mutable input
+type UnbrandForValue<T> = T extends Map<infer E, infer F>
+  ? Map<UnbrandForValue<E>, UnbrandForValue<F>>
   : T extends Set<infer E>
-  ? Set<E>
-  : T extends Array<infer E>
-  ? Array<E>
+  ? Set<UnbrandForValue<E>>
+  : T extends readonly any[]
+  ? T extends any[]
+    ? unknown[] // mutable array - require mutable input
+    : readonly unknown[] // readonly array - accept readonly input
   : RemoveAllBrands<T>;
+
+// For return types - preserves array element unbranding
+export type Unbrand<T> = T extends Map<infer E, infer F>
+  ? Map<Unbrand<E>, Unbrand<F>>
+  : T extends Set<infer E>
+  ? Set<Unbrand<E>>
+  : T extends readonly (infer E)[]
+  ? Array<Unbrand<E>>
+  : RemoveAllBrands<T>;
+
+export type CombineBrands<BrandedType, CurrentType> =
+  BrandedType extends readonly (infer BE)[]
+    ? CurrentType extends readonly (infer CE)[]
+      ? Array<CE & BE>
+      : CurrentType & BrandedType
+    : CurrentType & BrandedType;
+
+export type CombineBrandsIfNeeded<T, Required> = [T] extends [Required]
+  ? T[]
+  : HasBrand<T> extends true
+  ? CombineBrands<T, Required>[]
+  : Required[];
 
 /**
  * Makes type into a branded type, ensuring that value is assignable to
- * the base ubranded type. Optionally you can explicitly supply current value
+ * the base unbranded type. Optionally you can explicitly supply current value
  * type to combine both (useful for composite branded types. Make sure you
  * compose branded types which are not composite themselves.)
  */
-export const toBrandedType = <BrandedType, CurrentType = BrandedType>(
-  value: Unbrand<BrandedType>,
-) => {
-  return value as CurrentType & BrandedType;
-};
+export function toBrandedType<BrandedType>(
+  value: UnbrandForValue<BrandedType>,
+): BrandedType;
+export function toBrandedType<BrandedType, CurrentType>(
+  value: CurrentType,
+): CombineBrands<BrandedType, CurrentType>;
+export function toBrandedType(value: unknown) {
+  return value;
+}
 
 // -----------------------------------------------------------------------------
 
@@ -1205,31 +1138,96 @@ export const escapeDoubleQuotes = (str: string) => {
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
 
-export const elementCenterPoint = (
-  element: ExcalidrawElement,
-  xOffset: number = 0,
-  yOffset: number = 0,
-) => {
-  const { x, y, width, height } = element;
-
-  const centerXPoint = x + width / 2 + xOffset;
-
-  const centerYPoint = y + height / 2 + yOffset;
-
-  return pointFrom<GlobalPoint>(centerXPoint, centerYPoint);
-};
-
 /** hack for Array.isArray type guard not working with readonly value[] */
 export const isReadonlyArray = (value?: any): value is readonly any[] => {
   return Array.isArray(value);
 };
 
 export const sizeOf = (
-  value: readonly number[] | Readonly<Map<any, any>> | Record<any, any>,
+  value:
+    | readonly unknown[]
+    | Readonly<Map<string, unknown>>
+    | Readonly<Record<string, unknown>>
+    | ReadonlySet<unknown>,
 ): number => {
   return isReadonlyArray(value)
     ? value.length
-    : value instanceof Map
+    : value instanceof Map || value instanceof Set
     ? value.size
     : Object.keys(value).length;
+};
+
+export const reduceToCommonValue = <T, R = T>(
+  collection: readonly T[] | ReadonlySet<T>,
+  getValue?: (item: T) => R,
+): R | null => {
+  if (sizeOf(collection) === 0) {
+    return null;
+  }
+
+  const valueExtractor = getValue || ((item: T) => item as unknown as R);
+
+  let commonValue: R | null = null;
+
+  for (const item of collection) {
+    const value = valueExtractor(item);
+    if ((commonValue === null || commonValue === value) && value != null) {
+      commonValue = value;
+    } else {
+      return null;
+    }
+  }
+
+  return commonValue;
+};
+
+type FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: boolean;
+};
+
+const FEATURE_FLAGS_STORAGE_KEY = "excalidraw-feature-flags";
+const DEFAULT_FEATURE_FLAGS: FEATURE_FLAGS = {
+  COMPLEX_BINDINGS: false,
+};
+let featureFlags: FEATURE_FLAGS | null = null;
+
+export const getFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+): FEATURE_FLAGS[F] => {
+  if (!featureFlags) {
+    try {
+      const serializedFlags = localStorage.getItem(FEATURE_FLAGS_STORAGE_KEY);
+      if (serializedFlags) {
+        const flags = JSON.parse(serializedFlags);
+        featureFlags = flags ?? DEFAULT_FEATURE_FLAGS;
+      }
+    } catch {}
+  }
+
+  return (featureFlags || DEFAULT_FEATURE_FLAGS)[flag];
+};
+
+export const setFeatureFlag = <F extends keyof FEATURE_FLAGS>(
+  flag: F,
+  value: FEATURE_FLAGS[F],
+) => {
+  try {
+    featureFlags = {
+      ...(featureFlags || DEFAULT_FEATURE_FLAGS),
+      [flag]: value,
+    };
+    localStorage.setItem(
+      FEATURE_FLAGS_STORAGE_KEY,
+      JSON.stringify(featureFlags),
+    );
+  } catch (e) {
+    console.error("unable to set feature flag", e);
+  }
+};
+
+export const oneOf = <N extends string | number | symbol | null, H extends N>(
+  needle: N,
+  haystack: readonly H[],
+): needle is H => {
+  return haystack.includes(needle as any);
 };

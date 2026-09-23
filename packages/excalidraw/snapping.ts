@@ -12,23 +12,20 @@ import {
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
-import {
-  isBoundToContainer,
-  isFrameLikeElement,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
+import { isBoundToContainer } from "@excalidraw/element";
 
-import { getMaximumGroups } from "@excalidraw/element/groups";
+import { getMaximumGroups } from "@excalidraw/element";
 
 import {
   getSelectedElements,
   getVisibleAndNonSelectedElements,
-} from "@excalidraw/element/selection";
+} from "@excalidraw/element";
 
 import type { InclusiveRange } from "@excalidraw/math";
 
-import type { Bounds } from "@excalidraw/element/bounds";
-import type { MaybeTransformHandleType } from "@excalidraw/element/transformHandles";
+import type { Bounds } from "@excalidraw/common";
+import type { MaybeTransformHandleType } from "@excalidraw/element";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -169,14 +166,21 @@ export const isSnappingEnabled = ({
 }: {
   app: AppClassProperties;
   event: KeyboardModifiersObject;
-  selectedElements: NonDeletedExcalidrawElement[];
+  selectedElements: readonly NonDeletedExcalidrawElement[];
 }) => {
   if (event) {
+    // Allow snapping for lasso tool when dragging selected elements
+    // but not during lasso selection phase
+    const isLassoDragging =
+      app.state.activeTool.type === "lasso" &&
+      app.state.selectedElementsAreBeingDragged;
+
     return (
-      (app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
-      (!app.state.objectsSnapModeEnabled &&
-        event[KEYS.CTRL_OR_CMD] &&
-        !isGridModeEnabled(app))
+      (app.state.activeTool.type !== "lasso" || isLassoDragging) &&
+      ((app.state.objectsSnapModeEnabled && !event[KEYS.CTRL_OR_CMD]) ||
+        (!app.state.objectsSnapModeEnabled &&
+          event[KEYS.CTRL_OR_CMD] &&
+          !isGridModeEnabled(app)))
     );
   }
 
@@ -192,7 +196,7 @@ export const areRoughlyEqual = (a: number, b: number, precision = 0.01) => {
 };
 
 export const getElementsCorners = (
-  elements: ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   elementsMap: ElementsMap,
   {
     omitCenter,
@@ -310,27 +314,20 @@ export const getElementsCorners = (
 
 const getReferenceElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  selectedElements: NonDeletedExcalidrawElement[],
+  selectedElements: readonly ExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
-) => {
-  const selectedFrames = selectedElements
-    .filter((element) => isFrameLikeElement(element))
-    .map((frame) => frame.id);
-
-  return getVisibleAndNonSelectedElements(
+) =>
+  getVisibleAndNonSelectedElements(
     elements,
     selectedElements,
     appState,
     elementsMap,
-  ).filter(
-    (element) => !(element.frameId && selectedFrames.includes(element.frameId)),
   );
-};
 
 export const getVisibleGaps = (
   elements: readonly NonDeletedExcalidrawElement[],
-  selectedElements: ExcalidrawElement[],
+  selectedElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
@@ -447,7 +444,7 @@ export const getVisibleGaps = (
 };
 
 const getGapSnaps = (
-  selectedElements: ExcalidrawElement[],
+  selectedElements: readonly NonDeletedExcalidrawElement[],
   dragOffset: Vector2D,
   app: AppClassProperties,
   event: KeyboardModifiersObject,
@@ -618,7 +615,7 @@ const getGapSnaps = (
 
 export const getReferenceSnapPoints = (
   elements: readonly NonDeletedExcalidrawElement[],
-  selectedElements: ExcalidrawElement[],
+  selectedElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
@@ -637,7 +634,7 @@ export const getReferenceSnapPoints = (
 };
 
 const getPointSnaps = (
-  selectedElements: ExcalidrawElement[],
+  selectedElements: readonly NonDeletedExcalidrawElement[],
   selectionSnapPoints: GlobalPoint[],
   app: AppClassProperties,
   event: KeyboardModifiersObject,
@@ -916,7 +913,7 @@ const dedupeGapSnapLines = (gapSnapLines: GapSnapLine[]) => {
 };
 
 const createGapSnapLines = (
-  selectedElements: ExcalidrawElement[],
+  selectedElements: readonly NonDeletedExcalidrawElement[],
   dragOffset: Vector2D,
   gapSnaps: GapSnap[],
 ): GapSnapLine[] => {
@@ -1110,9 +1107,9 @@ const createGapSnapLines = (
 
 export const snapResizingElements = (
   // use the latest elements to create snap lines
-  selectedElements: ExcalidrawElement[],
+  selectedElements: readonly NonDeletedExcalidrawElement[],
   // while using the original elements to appy dragOffset to calculate snaps
-  selectedOriginalElements: ExcalidrawElement[],
+  selectedOriginalElements: readonly NonDeletedExcalidrawElement[],
   app: AppClassProperties,
   event: KeyboardModifiersObject,
   dragOffset: Vector2D,
@@ -1247,7 +1244,7 @@ export const snapResizingElements = (
 };
 
 export const snapNewElement = (
-  newElement: ExcalidrawElement,
+  newElement: NonDeletedExcalidrawElement,
   app: AppClassProperties,
   event: KeyboardModifiersObject,
   origin: Vector2D,
@@ -1319,7 +1316,7 @@ export const snapNewElement = (
 };
 
 export const getSnapLinesAtPointer = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly NonDeletedExcalidrawElement[],
   app: AppClassProperties,
   pointer: Vector2D,
   event: KeyboardModifiersObject,

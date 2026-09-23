@@ -5,6 +5,7 @@ import {
   ORIG_ID,
   ROUNDNESS,
   isPrimitive,
+  getUpdatedTimestamp,
 } from "@excalidraw/common";
 
 import { Excalidraw, mutateElement } from "@excalidraw/excalidraw";
@@ -24,7 +25,11 @@ import {
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { duplicateElement, duplicateElements } from "../src/duplicate";
+import {
+  deepCopyElement,
+  duplicateElement,
+  duplicateElements,
+} from "../src/duplicate";
 
 import type { ExcalidrawLinearElement } from "../src/types";
 
@@ -43,6 +48,24 @@ const assertCloneObjects = (source: any, clone: any) => {
 };
 
 describe("duplicating single elements", () => {
+  it.each([123, 0, null])(
+    "preserves created=%s on a deep copy and resets it for a new instance",
+    (created) => {
+      const element = API.createElement({ type: "rectangle", created });
+      const cloned = deepCopyElement(element);
+      const duplicate = duplicateElement(null, new Map(), element);
+
+      expect(cloned).toEqual(element);
+      expect(duplicate).toMatchObject({
+        created: getUpdatedTimestamp(),
+        version: element.version,
+        versionNonce: element.versionNonce,
+      });
+      expect(duplicate.id).not.toBe(element.id);
+      expect(element.created).toBe(created);
+    },
+  );
+
   it("clones arrow element", () => {
     const element = API.createElement({
       type: "arrow",
@@ -144,9 +167,8 @@ describe("duplicating multiple elements", () => {
       id: "arrow1",
       startBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
     });
 
@@ -155,9 +177,8 @@ describe("duplicating multiple elements", () => {
       id: "arrow2",
       endBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
       boundElements: [{ id: "text2", type: "text" }],
     });
@@ -276,9 +297,8 @@ describe("duplicating multiple elements", () => {
       id: "arrow1",
       startBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
     });
 
@@ -293,15 +313,13 @@ describe("duplicating multiple elements", () => {
       id: "arrow2",
       startBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
       endBinding: {
         elementId: "rectangle-not-exists",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
     });
 
@@ -310,15 +328,13 @@ describe("duplicating multiple elements", () => {
       id: "arrow3",
       startBinding: {
         elementId: "rectangle-not-exists",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
       endBinding: {
         elementId: "rectangle1",
-        focus: 0.2,
-        gap: 7,
         fixedPoint: [0.5, 1],
+        mode: "orbit",
       },
     });
 
@@ -504,8 +520,6 @@ describe("group-related duplication", () => {
       mouse.down(rectangle2.x + 5, rectangle2.y + 5);
       mouse.up(frame.x + frame.width + 50, frame.y + frame.height + 50);
     });
-
-    // console.log(h.elements);
 
     assertElements(h.elements, [
       { id: frame.id },
@@ -823,7 +837,7 @@ describe("duplication z-order", () => {
     const arrow = UI.createElement("arrow", {
       x: -100,
       y: 50,
-      width: 95,
+      width: 115,
       height: 0,
     });
 

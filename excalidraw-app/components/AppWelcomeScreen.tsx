@@ -33,7 +33,15 @@ export const AppWelcomeScreen: React.FC<{
         return bit;
       });
   } else {
-    headingContent = t("welcomeScreen.app.center_heading");
+    headingContent = (
+      <>
+        {t("welcomeScreen.app.center_heading")}
+        <br />
+        {t("welcomeScreen.app.center_heading_line2")}
+        <br />
+        {t("welcomeScreen.app.center_heading_line3")}
+      </>
+    );
   }
 
   return (
@@ -64,7 +72,7 @@ export const AppWelcomeScreen: React.FC<{
               shortcut={null}
               icon={loginIcon}
             >
-              Sign up
+              {t("labels.signUp")}
             </WelcomeScreen.Center.MenuItemLink>
           )}
         </WelcomeScreen.Center.Menu>

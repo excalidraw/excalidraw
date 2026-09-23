@@ -1,4 +1,5 @@
-import { useDevice } from "../App";
+import { useEditorInterface } from "../App";
+import { Ellipsify } from "../Ellipsify";
 import { RadioGroup } from "../RadioGroup";
 
 type Props<T> = {
@@ -12,6 +13,7 @@ type Props<T> = {
   onChange: (value: T) => void;
   children: React.ReactNode;
   name: string;
+  icon?: React.ReactNode;
 };
 
 const DropdownMenuItemContentRadio = <T,>({
@@ -21,14 +23,16 @@ const DropdownMenuItemContentRadio = <T,>({
   choices,
   children,
   name,
+  icon,
 }: Props<T>) => {
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
 
   return (
     <>
       <div className="dropdown-menu-item-base dropdown-menu-item-bare">
-        <label className="dropdown-menu-item__text" htmlFor={name}>
-          {children}
+        {icon && <div className="dropdown-menu-item__icon">{icon}</div>}
+        <label className="dropdown-menu-item__text">
+          <Ellipsify>{children}</Ellipsify>
         </label>
         <RadioGroup
           name={name}
@@ -37,7 +41,7 @@ const DropdownMenuItemContentRadio = <T,>({
           choices={choices}
         />
       </div>
-      {shortcut && !device.editor.isMobile && (
+      {shortcut && editorInterface.formFactor !== "phone" && (
         <div className="dropdown-menu-item__shortcut dropdown-menu-item__shortcut--orphaned">
           {shortcut}
         </div>

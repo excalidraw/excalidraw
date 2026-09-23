@@ -22,8 +22,10 @@ export interface FontMetadata {
   };
   /** flag to indicate a deprecated font */
   deprecated?: true;
-  /** flag to indicate a server-side only font */
-  serverSide?: true;
+  /**
+   * whether this is a font that users can use (= shown in font picker)
+   */
+  private?: true;
   /** flag to indiccate a local-only font */
   local?: true;
   /** flag to indicate a fallback font */
@@ -44,7 +46,7 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       unitsPerEm: 1000,
       ascender: 1011,
       descender: -353,
-      lineHeight: 1.35,
+      lineHeight: 1.25,
     },
   },
   [FONT_FAMILY["Lilita One"]]: {
@@ -98,14 +100,23 @@ export const FONT_METADATA: Record<number, FontMetadata> = {
       descender: -434,
       lineHeight: 1.15,
     },
-    serverSide: true,
+    private: true,
+  },
+  [FONT_FAMILY.Assistant]: {
+    metrics: {
+      unitsPerEm: 2048,
+      ascender: 1021,
+      descender: -287,
+      lineHeight: 1.25,
+    },
+    private: true,
   },
   [FONT_FAMILY_FALLBACKS.Xiaolai]: {
     metrics: {
       unitsPerEm: 1000,
       ascender: 880,
       descender: -144,
-      lineHeight: 1.15,
+      lineHeight: 1.25,
     },
     fallback: true,
   },

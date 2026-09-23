@@ -1,17 +1,17 @@
 import { degreesToRadians, radiansToDegrees } from "@excalidraw/math";
 
-import { getBoundTextElement } from "@excalidraw/element/textElement";
-import { isArrowElement, isElbowArrow } from "@excalidraw/element/typeChecks";
+import { getBoundTextElement } from "@excalidraw/element";
+import { isArrowElement, isElbowArrow } from "@excalidraw/element";
+
+import { updateBindings } from "@excalidraw/element";
 
 import type { Degrees } from "@excalidraw/math";
 
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import { angleIcon } from "../icons";
-
-import { updateBindings } from "../../../element/src/binding";
 
 import DragInput from "./DragInput";
 import { getStepSizedValue, isPropertyEditable } from "./utils";
@@ -20,7 +20,7 @@ import type { DragInputCallbackType } from "./DragInput";
 import type { AppState } from "../../types";
 
 interface AngleProps {
-  element: ExcalidrawElement;
+  element: NonDeletedExcalidrawElement;
   scene: Scene;
   appState: AppState;
   property: "angle";
@@ -34,6 +34,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
   shouldChangeByStepSize,
   nextValue,
   scene,
+  app,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -48,7 +49,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
       scene.mutateElement(latestElement, {
         angle: nextAngle,
       });
-      updateBindings(latestElement, scene);
+      updateBindings(latestElement, scene, app.state);
 
       const boundTextElement = getBoundTextElement(latestElement, elementsMap);
       if (boundTextElement && !isArrowElement(latestElement)) {
@@ -74,7 +75,7 @@ const handleDegreeChange: DragInputCallbackType<AngleProps["property"]> = ({
     scene.mutateElement(latestElement, {
       angle: nextAngle,
     });
-    updateBindings(latestElement, scene);
+    updateBindings(latestElement, scene, app.state);
 
     const boundTextElement = getBoundTextElement(latestElement, elementsMap);
     if (boundTextElement && !isArrowElement(latestElement)) {

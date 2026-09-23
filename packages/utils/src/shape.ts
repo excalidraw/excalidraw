@@ -34,7 +34,7 @@ import {
   type LocalPoint,
 } from "@excalidraw/math";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type {
   ElementsMap,
@@ -50,6 +50,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawRectangleElement,
   ExcalidrawSelectionElement,
+  ExcalidrawStickyNoteElement,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 import type { Curve, LineSegment, Polygon, Radians } from "@excalidraw/math";
@@ -104,6 +105,7 @@ export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
 
 type RectangularElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawFrameLikeElement
   | ExcalidrawEmbeddableElement

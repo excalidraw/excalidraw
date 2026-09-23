@@ -3,12 +3,15 @@ import { clamp, pointFrom, pointRotateRads, round } from "@excalidraw/math";
 import {
   getFlipAdjustedCropPosition,
   getUncroppedWidthAndHeight,
-} from "@excalidraw/element/cropElement";
-import { isImageElement } from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
 
-import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ElementsMap,
+  NonDeletedExcalidrawElement,
+} from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import StatsDragInput from "./DragInput";
 import { getStepSizedValue, moveElement, STEP_SIZE } from "./utils";
@@ -18,7 +21,7 @@ import type { AppState } from "../../types";
 
 interface PositionProps {
   property: "x" | "y";
-  element: ExcalidrawElement;
+  element: NonDeletedExcalidrawElement;
   elementsMap: ElementsMap;
   scene: Scene;
   appState: AppState;
@@ -34,6 +37,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
   property,
   scene,
   originalAppState,
+  app,
 }) => {
   const elementsMap = scene.getNonDeletedElementsMap();
   const origElement = originalElements[0];
@@ -131,6 +135,7 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
       newTopLeftY,
       origElement,
       scene,
+      app.state,
       originalElementsMap,
     );
     return;
@@ -162,17 +167,12 @@ const handlePositionChange: DragInputCallbackType<"x" | "y"> = ({
     newTopLeftY,
     origElement,
     scene,
+    app.state,
     originalElementsMap,
   );
 };
 
-const Position = ({
-  property,
-  element,
-  elementsMap,
-  scene,
-  appState,
-}: PositionProps) => {
+const Position = ({ property, element, scene, appState }: PositionProps) => {
   const [topLeftX, topLeftY] = pointRotateRads(
     pointFrom(element.x, element.y),
     pointFrom(element.x + element.width / 2, element.y + element.height / 2),

@@ -1,106 +1,138 @@
 import clsx from "clsx";
-import { useState } from "react";
+import { useRef } from "react";
+import { Popover } from "radix-ui";
 
-import {
-  CLASSES,
-  KEYS,
-  capitalizeString,
-  isTransparent,
-} from "@excalidraw/common";
+import { CLASSES } from "@excalidraw/common";
 
-import {
-  shouldAllowVerticalAlign,
-  suppportsHorizontalAlign,
-} from "@excalidraw/element/textElement";
-
-import {
-  hasBoundTextElement,
-  isElbowArrow,
-  isImageElement,
-  isLinearElement,
-  isTextElement,
-} from "@excalidraw/element/typeChecks";
-
-import { hasStrokeColor, toolIsArrow } from "@excalidraw/element/comparisons";
+import { isArrowElement } from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
-  ExcalidrawElementType,
   NonDeletedElementsMap,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
 
 import { actionToggleZenMode } from "../actions";
 
-import { alignActionsPredicate } from "../actions/actionAlign";
-import { trackEvent } from "../analytics";
-import { useTunnels } from "../context/tunnels";
-
 import { t } from "../i18n";
-import {
-  canChangeRoundness,
-  canHaveArrowheads,
-  getTargetElements,
-  hasBackground,
-  hasStrokeStyle,
-  hasStrokeWidth,
-} from "../scene";
+import { getTargetElements } from "../scene";
 
-import { SHAPES } from "./shapes";
+import { getFormValue } from "../actions/actionProperties";
+
+import { useTextEditorFocus } from "../hooks/useTextEditorFocus";
+
+import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 
 import "./Actions.scss";
 
-import { useDevice } from "./App";
+import { useExcalidrawContainer } from "./App";
 import Stack from "./Stack";
-import { ToolButton } from "./ToolButton";
 import { Tooltip } from "./Tooltip";
-import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { PropertiesPopover } from "./PropertiesPopover";
 import {
-  EmbedIcon,
-  extraToolsIcon,
-  frameToolIcon,
-  mermaidLogoIcon,
-  laserPointerToolIcon,
-  MagicIcon,
-  LassoIcon,
+  sharpArrowIcon,
+  roundArrowIcon,
+  elbowArrowIcon,
+  TextSizeIcon,
+  adjustmentsIcon,
+  DotsHorizontalIcon,
+  pencilIcon,
 } from "./icons";
 
-import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
+import { Island } from "./Island";
+
+import { getShapeActionPredicates } from "./shapeActionPredicates";
+
+import type { ShapeActionPredicates } from "./shapeActionPredicates";
+import type { AppClassProperties, UIAppState, AppState } from "../types";
 import type { ActionManager } from "../actions/manager";
 
-export const canChangeStrokeColor = (
-  appState: UIAppState,
-  targetElements: ExcalidrawElement[],
-) => {
-  let commonSelectedType: ExcalidrawElementType | null =
-    targetElements[0]?.type || null;
+// re-exported for consumers outside the styles panel (e.g. CommandPalette)
+export {
+  canChangeStrokeColor,
+  canChangeBackgroundColor,
+} from "./shapeActionPredicates";
 
-  for (const element of targetElements) {
-    if (element.type !== commonSelectedType) {
-      commonSelectedType = null;
-      break;
-    }
-  }
+// Common CSS class combinations
+const PROPERTIES_CLASSES = clsx([
+  CLASSES.SHAPE_ACTIONS_THEME_SCOPE,
+  "properties-content",
+]);
+
+/**
+ * The "arrange" (z-order) fieldset, identical across every styles-panel layout.
+ */
+const LayersFieldset = ({
+  renderAction,
+}: {
+  renderAction: ActionManager["renderAction"];
+}) => (
+  <fieldset>
+    <legend>{t("labels.layers")}</legend>
+    <div className="buttonList">
+      {renderAction("sendToBack")}
+      {renderAction("sendBackward")}
+      {renderAction("bringForward")}
+      {renderAction("bringToFront")}
+    </div>
+  </fieldset>
+);
+
+/**
+ * The align + distribute fieldset, identical across every styles-panel layout.
+ * Button order is mirrored for RTL so the leftmost button always aligns left.
+ */
+const AlignFieldset = ({
+  renderAction,
+  showDistribute,
+}: {
+  renderAction: ActionManager["renderAction"];
+  showDistribute: boolean;
+}) => {
+  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
   return (
-    (hasStrokeColor(appState.activeTool.type) &&
-      commonSelectedType !== "image" &&
-      commonSelectedType !== "frame" &&
-      commonSelectedType !== "magicframe") ||
-    targetElements.some((element) => hasStrokeColor(element.type))
+    <fieldset>
+      <legend>{t("labels.align")}</legend>
+      <div className="buttonList">
+        {isRTL ? (
+          <>
+            {renderAction("alignRight")}
+            {renderAction("alignHorizontallyCentered")}
+            {renderAction("alignLeft")}
+          </>
+        ) : (
+          <>
+            {renderAction("alignLeft")}
+            {renderAction("alignHorizontallyCentered")}
+            {renderAction("alignRight")}
+          </>
+        )}
+        {showDistribute && renderAction("distributeHorizontally")}
+        {/* breaks the row ˇˇ */}
+        <div style={{ flexBasis: "100%", height: 0 }} />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: ".5rem",
+            marginTop: "-0.5rem",
+          }}
+        >
+          {renderAction("alignTop")}
+          {renderAction("alignVerticallyCentered")}
+          {renderAction("alignBottom")}
+          {showDistribute && renderAction("distributeVertically")}
+        </div>
+      </div>
+    </fieldset>
   );
 };
 
-export const canChangeBackgroundColor = (
-  appState: UIAppState,
-  targetElements: ExcalidrawElement[],
-) => {
-  return (
-    hasBackground(appState.activeTool.type) ||
-    targetElements.some((element) => hasBackground(element.type))
-  );
-};
-
+/**
+ * Full styles panel: the wide, always-expanded layout used on desktop when the
+ * UI is in "full" mode.
+ */
 export const SelectedShapeActions = ({
   appState,
   elementsMap,
@@ -113,166 +145,77 @@ export const SelectedShapeActions = ({
   app: AppClassProperties;
 }) => {
   const targetElements = getTargetElements(elementsMap, appState);
-
-  let isSingleElementBoundContainer = false;
-  if (
-    targetElements.length === 2 &&
-    (hasBoundTextElement(targetElements[0]) ||
-      hasBoundTextElement(targetElements[1]))
-  ) {
-    isSingleElementBoundContainer = true;
-  }
-  const isEditingTextOrNewElement = Boolean(
-    appState.editingTextElement || appState.newElement,
+  const predicates = getShapeActionPredicates(
+    appState,
+    targetElements,
+    elementsMap,
+    app,
   );
-  const device = useDevice();
-  const isRTL = document.documentElement.getAttribute("dir") === "rtl";
 
-  const showFillIcons =
-    (hasBackground(appState.activeTool.type) &&
-      !isTransparent(appState.currentItemBackgroundColor)) ||
-    targetElements.some(
-      (element) =>
-        hasBackground(element.type) && !isTransparent(element.backgroundColor),
+  // the bucket fill tool configures only the fill it creates: color, fill
+  // style, and opacity (shared `currentItem*` values; no stroke properties)
+  if (appState.activeTool.type === "bucketfill") {
+    return (
+      <div className="selected-shape-actions">
+        <div>{renderAction("changeBucketFillBackgroundColor")}</div>
+        {renderAction("changeFillStyle")}
+        {renderAction("changeOpacity")}
+      </div>
     );
-
-  const showLinkIcon =
-    targetElements.length === 1 || isSingleElementBoundContainer;
-
-  const showLineEditorAction =
-    !appState.editingLinearElement &&
-    targetElements.length === 1 &&
-    isLinearElement(targetElements[0]) &&
-    !isElbowArrow(targetElements[0]);
-
-  const showCropEditorAction =
-    !appState.croppingElementId &&
-    targetElements.length === 1 &&
-    isImageElement(targetElements[0]);
-
-  const showAlignActions =
-    !isSingleElementBoundContainer && alignActionsPredicate(appState, app);
+  }
 
   return (
-    <div className="panelColumn">
-      <div>
-        {canChangeStrokeColor(appState, targetElements) &&
-          renderAction("changeStrokeColor")}
-      </div>
-      {canChangeBackgroundColor(appState, targetElements) && (
+    <div className="selected-shape-actions">
+      <div>{predicates.strokeColor && renderAction("changeStrokeColor")}</div>
+      {predicates.backgroundColor && (
         <div>{renderAction("changeBackgroundColor")}</div>
       )}
-      {showFillIcons && renderAction("changeFillStyle")}
+      {predicates.fill && renderAction("changeFillStyle")}
 
-      {(hasStrokeWidth(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeWidth(element.type))) &&
-        renderAction("changeStrokeWidth")}
+      {predicates.strokeWidth && renderAction("changeStrokeWidth")}
 
-      {(appState.activeTool.type === "freedraw" ||
-        targetElements.some((element) => element.type === "freedraw")) &&
-        renderAction("changeStrokeShape")}
+      {predicates.strokeStyle && <>{renderAction("changeStrokeStyle")}</>}
 
-      {(hasStrokeStyle(appState.activeTool.type) ||
-        targetElements.some((element) => hasStrokeStyle(element.type))) && (
+      {predicates.freedrawMode && renderAction("changeFreedrawMode")}
+
+      {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
+
+      {predicates.roundness && <>{renderAction("changeRoundness")}</>}
+
+      {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
+
+      {predicates.text && (
         <>
-          {renderAction("changeStrokeStyle")}
-          {renderAction("changeSloppiness")}
-        </>
-      )}
-
-      {(canChangeRoundness(appState.activeTool.type) ||
-        targetElements.some((element) => canChangeRoundness(element.type))) && (
-        <>{renderAction("changeRoundness")}</>
-      )}
-
-      {(toolIsArrow(appState.activeTool.type) ||
-        targetElements.some((element) => toolIsArrow(element.type))) && (
-        <>{renderAction("changeArrowType")}</>
-      )}
-
-      {(appState.activeTool.type === "text" ||
-        targetElements.some(isTextElement)) && (
-        <>
-          {renderAction("changeFontFamily")}
+          <fieldset>{renderAction("changeFontFamily")}</fieldset>
           {renderAction("changeFontSize")}
-          {(appState.activeTool.type === "text" ||
-            suppportsHorizontalAlign(targetElements, elementsMap)) &&
-            renderAction("changeTextAlign")}
+          {predicates.textAlign && renderAction("changeTextAlign")}
         </>
       )}
 
-      {shouldAllowVerticalAlign(targetElements, elementsMap) &&
-        renderAction("changeVerticalAlign")}
-      {(canHaveArrowheads(appState.activeTool.type) ||
-        targetElements.some((element) => canHaveArrowheads(element.type))) && (
-        <>{renderAction("changeArrowhead")}</>
+      {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+      {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
+
+      {predicates.opacity && renderAction("changeOpacity")}
+
+      {predicates.layers && <LayersFieldset renderAction={renderAction} />}
+
+      {predicates.align && (
+        <AlignFieldset
+          renderAction={renderAction}
+          showDistribute={predicates.distribute}
+        />
       )}
-
-      {renderAction("changeOpacity")}
-
-      <fieldset>
-        <legend>{t("labels.layers")}</legend>
-        <div className="buttonList">
-          {renderAction("sendToBack")}
-          {renderAction("sendBackward")}
-          {renderAction("bringForward")}
-          {renderAction("bringToFront")}
-        </div>
-      </fieldset>
-
-      {showAlignActions && !isSingleElementBoundContainer && (
-        <fieldset>
-          <legend>{t("labels.align")}</legend>
-          <div className="buttonList">
-            {
-              // swap this order for RTL so the button positions always match their action
-              // (i.e. the leftmost button aligns left)
-            }
-            {isRTL ? (
-              <>
-                {renderAction("alignRight")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignLeft")}
-              </>
-            ) : (
-              <>
-                {renderAction("alignLeft")}
-                {renderAction("alignHorizontallyCentered")}
-                {renderAction("alignRight")}
-              </>
-            )}
-            {targetElements.length > 2 &&
-              renderAction("distributeHorizontally")}
-            {/* breaks the row ˇˇ */}
-            <div style={{ flexBasis: "100%", height: 0 }} />
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: ".5rem",
-                marginTop: "-0.5rem",
-              }}
-            >
-              {renderAction("alignTop")}
-              {renderAction("alignVerticallyCentered")}
-              {renderAction("alignBottom")}
-              {targetElements.length > 2 &&
-                renderAction("distributeVertically")}
-            </div>
-          </div>
-        </fieldset>
-      )}
-      {!isEditingTextOrNewElement && targetElements.length > 0 && (
+      {predicates.showExtraActions && (
         <fieldset>
           <legend>{t("labels.actions")}</legend>
           <div className="buttonList">
-            {!device.editor.isMobile && renderAction("duplicateSelection")}
-            {!device.editor.isMobile && renderAction("deleteSelectedElements")}
+            {renderAction("duplicateSelection")}
+            {renderAction("deleteSelectedElements")}
             {renderAction("group")}
             {renderAction("ungroup")}
-            {showLinkIcon && renderAction("hyperlink")}
-            {showCropEditorAction && renderAction("cropEditor")}
-            {showLineEditorAction && renderAction("toggleLinearEditor")}
+            {predicates.link && renderAction("hyperlink")}
+            {predicates.cropEditor && renderAction("cropEditor")}
+            {predicates.lineEditor && renderAction("toggleLinearEditor")}
           </div>
         </fieldset>
       )}
@@ -280,188 +223,668 @@ export const SelectedShapeActions = ({
   );
 };
 
-export const ShapesSwitcher = ({
-  activeTool,
+const CombinedShapeProperties = ({
   appState,
-  app,
-  UIOptions,
+  renderAction,
+  setAppState,
+  predicates,
+  container,
 }: {
-  activeTool: UIAppState["activeTool"];
   appState: UIAppState;
-  app: AppClassProperties;
-  UIOptions: AppProps["UIOptions"];
+  renderAction: ActionManager["renderAction"];
+  setAppState: React.Component<any, AppState>["setState"];
+  predicates: ShapeActionPredicates;
+  container: HTMLDivElement | null;
 }) => {
-  const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
+  const shouldShowCombinedProperties =
+    predicates.hasSelection ||
+    (appState.activeTool.type !== "selection" &&
+      appState.activeTool.type !== "eraser" &&
+      appState.activeTool.type !== "hand" &&
+      appState.activeTool.type !== "laser" &&
+      appState.activeTool.type !== "lasso");
+  const isOpen = appState.openPopup === "compactStrokeStyles";
 
-  const frameToolSelected = activeTool.type === "frame";
-  const laserToolSelected = activeTool.type === "laser";
-  const lassoToolSelected = activeTool.type === "lasso";
-
-  const embeddableToolSelected = activeTool.type === "embeddable";
-
-  const { TTDDialogTriggerTunnel } = useTunnels();
+  if (!shouldShowCombinedProperties) {
+    return null;
+  }
 
   return (
-    <>
-      {SHAPES.map(({ value, icon, key, numericKey, fillable }, index) => {
-        if (
-          UIOptions.tools?.[
-            value as Extract<typeof value, keyof AppProps["UIOptions"]["tools"]>
-          ] === false
-        ) {
-          return null;
-        }
+    <div className="compact-action-item">
+      <Popover.Root
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            setAppState({ openPopup: "compactStrokeStyles" });
+          } else {
+            setAppState({ openPopup: null });
+          }
+        }}
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
+            title={t("labels.stroke")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
 
-        const label = t(`toolBar.${value}`);
-        const letter =
-          key && capitalizeString(typeof key === "string" ? key : key[0]);
-        const shortcut = letter
-          ? `${letter} ${t("helpDialog.or")} ${numericKey}`
-          : `${numericKey}`;
-
-        return (
-          <ToolButton
-            className={clsx("Shape", { fillable })}
-            key={value}
-            type="radio"
-            icon={icon}
-            checked={activeTool.type === value}
-            name="editor-current-shape"
-            title={`${capitalizeString(label)} — ${shortcut}`}
-            keyBindingLabel={numericKey || letter}
-            aria-label={capitalizeString(label)}
-            aria-keyshortcuts={shortcut}
-            data-testid={`toolbar-${value}`}
-            onPointerDown={({ pointerType }) => {
-              if (!appState.penDetected && pointerType === "pen") {
-                app.togglePenMode(true);
-              }
-
-              if (value === "selection") {
-                if (appState.activeTool.type === "selection") {
-                  app.setActiveTool({ type: "lasso" });
-                } else {
-                  app.setActiveTool({ type: "selection" });
-                }
-              }
+              setAppState({
+                openPopup: isOpen ? null : "compactStrokeStyles",
+              });
             }}
-            onChange={({ pointerType }) => {
-              if (appState.activeTool.type !== value) {
-                trackEvent("toolbar", value, "ui");
+          >
+            {adjustmentsIcon}
+          </button>
+        </Popover.Trigger>
+        {isOpen && (
+          <PropertiesPopover
+            className={PROPERTIES_CLASSES}
+            container={container}
+            style={{ maxWidth: "13rem" }}
+            onClose={() => {}}
+          >
+            <div className="selected-shape-actions">
+              {predicates.fill && renderAction("changeFillStyle")}
+              {predicates.strokeWidth && renderAction("changeStrokeWidth")}
+              {
+                /* in compact UI the freedraw pressure setting is rendered as a
+                  standalone cycle button in the compact actions list; we render
+                  it in the combined properties popup as well for clarity
+                */
+                predicates.freedrawMode && renderAction("changeFreedrawMode")
               }
-              if (value === "image") {
-                app.setActiveTool({
-                  type: value,
-                  insertOnCanvasDirectly: pointerType !== "mouse",
-                });
+              {predicates.strokeStyle && (
+                <>{renderAction("changeStrokeStyle")}</>
+              )}
+              {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
+              {predicates.roundness && renderAction("changeRoundness")}
+              {predicates.opacity && renderAction("changeOpacity")}
+            </div>
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
+
+const CombinedArrowProperties = ({
+  appState,
+  renderAction,
+  setAppState,
+  targetElements,
+  predicates,
+  container,
+  app,
+}: {
+  appState: UIAppState;
+  renderAction: ActionManager["renderAction"];
+  setAppState: React.Component<any, AppState>["setState"];
+  targetElements: ExcalidrawElement[];
+  predicates: ShapeActionPredicates;
+  container: HTMLDivElement | null;
+  app: AppClassProperties;
+}) => {
+  if (!predicates.arrowType) {
+    return null;
+  }
+
+  const isOpen = appState.openPopup === "compactArrowProperties";
+
+  return (
+    <div className="compact-action-item">
+      <Popover.Root
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            setAppState({ openPopup: "compactArrowProperties" });
+          } else {
+            setAppState({ openPopup: null });
+          }
+        }}
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
+            title={t("labels.arrowtypes")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              setAppState({
+                openPopup: isOpen ? null : "compactArrowProperties",
+              });
+            }}
+          >
+            {(() => {
+              // Show an icon based on the current arrow type
+              const arrowType = getFormValue(
+                targetElements,
+                app,
+                (element) => {
+                  if (isArrowElement(element)) {
+                    return element.elbowed
+                      ? "elbow"
+                      : element.roundness
+                      ? "round"
+                      : "sharp";
+                  }
+                  return null;
+                },
+                (element) => isArrowElement(element),
+                (hasSelection) =>
+                  hasSelection ? null : appState.currentItemArrowType,
+              );
+
+              if (arrowType === "elbow") {
+                return elbowArrowIcon;
+              }
+              if (arrowType === "round") {
+                return roundArrowIcon;
+              }
+              return sharpArrowIcon;
+            })()}
+          </button>
+        </Popover.Trigger>
+        {isOpen && (
+          <PropertiesPopover
+            container={container}
+            className="properties-content"
+            style={{ maxWidth: "13rem" }}
+            onClose={() => {}}
+          >
+            {renderAction("changeArrowProperties")}
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
+
+const CombinedTextProperties = ({
+  appState,
+  renderAction,
+  setAppState,
+  predicates,
+  container,
+}: {
+  appState: UIAppState;
+  renderAction: ActionManager["renderAction"];
+  setAppState: React.Component<any, AppState>["setState"];
+  predicates: ShapeActionPredicates;
+  container: HTMLDivElement | null;
+}) => {
+  const { saveCaretPosition, restoreCaretPosition } = useTextEditorFocus(
+    container?.ownerDocument,
+  );
+  const isOpen = appState.openPopup === "compactTextProperties";
+
+  return (
+    <div className="compact-action-item">
+      <Popover.Root
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            if (appState.editingTextElement) {
+              saveCaretPosition();
+            }
+            setAppState({ openPopup: "compactTextProperties" });
+          } else {
+            setAppState({ openPopup: null });
+            if (appState.editingTextElement) {
+              restoreCaretPosition();
+            }
+          }
+        }}
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
+            title={t("labels.textAlign")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              if (isOpen) {
+                setAppState({ openPopup: null });
               } else {
-                app.setActiveTool({ type: value });
+                if (appState.editingTextElement) {
+                  saveCaretPosition();
+                }
+                setAppState({ openPopup: "compactTextProperties" });
               }
             }}
-          />
-        );
-      })}
-      <div className="App-toolbar__divider" />
+          >
+            {TextSizeIcon}
+          </button>
+        </Popover.Trigger>
+        {appState.openPopup === "compactTextProperties" && (
+          <PropertiesPopover
+            className={PROPERTIES_CLASSES}
+            container={container}
+            style={{ maxWidth: "13rem" }}
+            // Improve focus handling for text editing scenarios
+            preventAutoFocusOnTouch={!!appState.editingTextElement}
+            onClose={() => {
+              // Refocus text editor when popover closes with caret restoration
+              if (appState.editingTextElement) {
+                restoreCaretPosition();
+              }
+            }}
+          >
+            <div className="selected-shape-actions">
+              {predicates.text && renderAction("changeFontSize")}
+              {predicates.textAlign && renderAction("changeTextAlign")}
+              {predicates.verticalAlign && renderAction("changeVerticalAlign")}
+            </div>
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
 
-      <DropdownMenu open={isExtraToolsMenuOpen}>
-        <DropdownMenu.Trigger
-          className={clsx("App-toolbar__extra-tools-trigger", {
-            "App-toolbar__extra-tools-trigger--selected":
-              frameToolSelected ||
-              embeddableToolSelected ||
-              lassoToolSelected ||
-              // in collab we're already highlighting the laser button
-              // outside toolbar, so let's not highlight extra-tools button
-              // on top of it
-              (laserToolSelected && !app.props.isCollaborating),
-          })}
-          onToggle={() => setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen)}
-          title={t("toolBar.extraTools")}
-        >
-          {frameToolSelected
-            ? frameToolIcon
-            : embeddableToolSelected
-            ? EmbedIcon
-            : laserToolSelected && !app.props.isCollaborating
-            ? laserPointerToolIcon
-            : lassoToolSelected
-            ? LassoIcon
-            : extraToolsIcon}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          onClickOutside={() => setIsExtraToolsMenuOpen(false)}
-          onSelect={() => setIsExtraToolsMenuOpen(false)}
-          className="App-toolbar__extra-tools-dropdown"
-        >
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "frame" })}
-            icon={frameToolIcon}
-            shortcut={KEYS.F.toLocaleUpperCase()}
-            data-testid="toolbar-frame"
-            selected={frameToolSelected}
+const CombinedExtraActions = ({
+  appState,
+  renderAction,
+  predicates,
+  setAppState,
+  container,
+  showDuplicate,
+  showDelete,
+}: {
+  appState: UIAppState;
+  renderAction: ActionManager["renderAction"];
+  predicates: ShapeActionPredicates;
+  setAppState: React.Component<any, AppState>["setState"];
+  container: HTMLDivElement | null;
+  showDuplicate?: boolean;
+  showDelete?: boolean;
+}) => {
+  const isOpen = appState.openPopup === "compactOtherProperties";
+
+  if (!predicates.showExtraActions) {
+    return null;
+  }
+
+  return (
+    <div className="compact-action-item">
+      <Popover.Root
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open) {
+            setAppState({ openPopup: "compactOtherProperties" });
+          } else {
+            setAppState({ openPopup: null });
+          }
+        }}
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
+            title={t("labels.actions")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setAppState({
+                openPopup: isOpen ? null : "compactOtherProperties",
+              });
+            }}
           >
-            {t("toolBar.frame")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
-            data-testid="toolbar-embeddable"
-            selected={embeddableToolSelected}
+            {DotsHorizontalIcon}
+          </button>
+        </Popover.Trigger>
+        {isOpen && (
+          <PropertiesPopover
+            className={PROPERTIES_CLASSES}
+            container={container}
+            style={{
+              maxWidth: "12rem",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            onClose={() => {}}
           >
-            {t("toolBar.embeddable")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "laser" })}
-            icon={laserPointerToolIcon}
-            data-testid="toolbar-laser"
-            selected={laserToolSelected}
-            shortcut={KEYS.K.toLocaleUpperCase()}
-          >
-            {t("toolBar.laser")}
-          </DropdownMenu.Item>
-          <DropdownMenu.Item
-            onSelect={() => app.setActiveTool({ type: "lasso" })}
-            icon={LassoIcon}
-            data-testid="toolbar-lasso"
-            selected={lassoToolSelected}
-          >
-            {t("toolBar.lasso")}
-          </DropdownMenu.Item>
-          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
-            Generate
-          </div>
-          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-embeddable"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
-          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
-            <>
-              <DropdownMenu.Item
-                onSelect={() => app.onMagicframeToolSelect()}
-                icon={MagicIcon}
-                data-testid="toolbar-magicframe"
-              >
-                {t("toolBar.magicframe")}
-                <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
-              </DropdownMenu.Item>
-            </>
+            <div className="selected-shape-actions">
+              {predicates.layers && (
+                <LayersFieldset renderAction={renderAction} />
+              )}
+
+              {predicates.align && (
+                <AlignFieldset
+                  renderAction={renderAction}
+                  showDistribute={predicates.distribute}
+                />
+              )}
+              <fieldset>
+                <legend>{t("labels.actions")}</legend>
+                <div className="buttonList">
+                  {renderAction("group")}
+                  {renderAction("ungroup")}
+                  {predicates.linkSingleOnly && renderAction("hyperlink")}
+                  {predicates.cropEditor && renderAction("cropEditor")}
+                  {showDuplicate && renderAction("duplicateSelection")}
+                  {showDelete && renderAction("deleteSelectedElements")}
+                </div>
+              </fieldset>
+            </div>
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
+
+const LinearEditorAction = ({
+  renderAction,
+  predicates,
+}: {
+  renderAction: ActionManager["renderAction"];
+  predicates: ShapeActionPredicates;
+}) => {
+  if (!predicates.lineEditor) {
+    return null;
+  }
+
+  return (
+    <div className="compact-action-item">
+      {renderAction("toggleLinearEditor")}
+    </div>
+  );
+};
+
+/**
+ * Compact styles panel — the collapsed, popover-driven layout used on tablets
+ * and on desktop when the UI is in "compact" mode.
+ */
+export const CompactShapeActions = ({
+  appState,
+  elementsMap,
+  renderAction,
+  app,
+  setAppState,
+}: {
+  appState: UIAppState;
+  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
+  renderAction: ActionManager["renderAction"];
+  app: AppClassProperties;
+  setAppState: React.Component<any, AppState>["setState"];
+}) => {
+  const targetElements = getTargetElements(elementsMap, appState);
+  const predicates = getShapeActionPredicates(
+    appState,
+    targetElements,
+    elementsMap,
+    app,
+  );
+  const { container } = useExcalidrawContainer();
+
+  return (
+    <div className="compact-shape-actions">
+      {/* Stroke Color */}
+      {predicates.strokeColor && (
+        <div className={clsx("compact-action-item")}>
+          {renderAction("changeStrokeColor")}
+        </div>
+      )}
+
+      {/* Background Color (the bucket fill variant excludes `transparent`) */}
+      {predicates.backgroundColor && (
+        <div className="compact-action-item">
+          {renderAction(
+            appState.activeTool.type === "bucketfill"
+              ? "changeBucketFillBackgroundColor"
+              : "changeBackgroundColor",
           )}
-        </DropdownMenu.Content>
-      </DropdownMenu>
-    </>
+        </div>
+      )}
+
+      {/* Freedraw pressure: standalone button cycling the variability mode */}
+      {predicates.freedrawMode && (
+        <div className="compact-action-item">
+          {renderAction("changeFreedrawMode", { cycle: true })}
+        </div>
+      )}
+
+      <CombinedShapeProperties
+        appState={appState}
+        renderAction={renderAction}
+        setAppState={setAppState}
+        predicates={predicates}
+        container={container}
+      />
+
+      <CombinedArrowProperties
+        appState={appState}
+        renderAction={renderAction}
+        setAppState={setAppState}
+        targetElements={targetElements}
+        predicates={predicates}
+        container={container}
+        app={app}
+      />
+      {/* Linear Editor */}
+      {predicates.lineEditor && (
+        <div className="compact-action-item">
+          {renderAction("toggleLinearEditor")}
+        </div>
+      )}
+
+      {/* Text Properties */}
+      {predicates.text && (
+        <>
+          <div className="compact-action-item">
+            {renderAction("changeFontFamily")}
+          </div>
+          <CombinedTextProperties
+            appState={appState}
+            renderAction={renderAction}
+            setAppState={setAppState}
+            predicates={predicates}
+            container={container}
+          />
+        </>
+      )}
+
+      {/* Dedicated Copy Button */}
+      {predicates.showExtraActions && (
+        <div className="compact-action-item">
+          {renderAction("duplicateSelection")}
+        </div>
+      )}
+
+      {/* Dedicated Delete Button */}
+      {predicates.showExtraActions && (
+        <div className="compact-action-item">
+          {renderAction("deleteSelectedElements")}
+        </div>
+      )}
+
+      <CombinedExtraActions
+        appState={appState}
+        renderAction={renderAction}
+        predicates={predicates}
+        setAppState={setAppState}
+        container={container}
+      />
+    </div>
+  );
+};
+
+/**
+ * Mobile styles panel — the horizontal action bar used on phones, with an
+ * overflow measurement that promotes duplicate/delete out of the popover when
+ * there is room.
+ */
+export const MobileShapeActions = ({
+  appState,
+  elementsMap,
+  renderAction,
+  app,
+  setAppState,
+}: {
+  appState: UIAppState;
+  elementsMap: NonDeletedElementsMap | NonDeletedSceneElementsMap;
+  renderAction: ActionManager["renderAction"];
+  app: AppClassProperties;
+  setAppState: React.Component<any, AppState>["setState"];
+}) => {
+  const targetElements = getTargetElements(elementsMap, appState);
+  const predicates = getShapeActionPredicates(
+    appState,
+    targetElements,
+    elementsMap,
+    app,
+  );
+  const { container } = useExcalidrawContainer();
+  const mobileActionsRef = useRef<HTMLDivElement>(null);
+
+  const ACTIONS_WIDTH =
+    mobileActionsRef.current?.getBoundingClientRect()?.width ?? 0;
+
+  // 7 actions + 2 for undo/redo
+  const MIN_ACTIONS = 9;
+
+  const GAP = 6;
+  const WIDTH = 32;
+
+  const MIN_WIDTH = MIN_ACTIONS * WIDTH + (MIN_ACTIONS - 1) * GAP;
+
+  const ADDITIONAL_WIDTH = WIDTH + GAP;
+
+  const showDeleteOutside = ACTIONS_WIDTH >= MIN_WIDTH + ADDITIONAL_WIDTH;
+  const showDuplicateOutside =
+    ACTIONS_WIDTH >= MIN_WIDTH + 2 * ADDITIONAL_WIDTH;
+
+  return (
+    <Island
+      className="compact-shape-actions mobile-shape-actions"
+      style={{
+        flexDirection: "row",
+        boxShadow: "none",
+        padding: 0,
+        zIndex: 2,
+        backgroundColor: "transparent",
+        height: WIDTH * 1.35,
+        marginBottom: 4,
+        alignItems: "center",
+        gap: GAP,
+        pointerEvents: "none",
+      }}
+      ref={mobileActionsRef}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: GAP,
+          flex: 1,
+        }}
+      >
+        {predicates.strokeColor && (
+          <div className={clsx("compact-action-item")}>
+            {renderAction("changeStrokeColor")}
+          </div>
+        )}
+        {/* Background Color (the bucket fill variant excludes `transparent`) */}
+        {predicates.backgroundColor && (
+          <div className="compact-action-item">
+            {renderAction(
+              appState.activeTool.type === "bucketfill"
+                ? "changeBucketFillBackgroundColor"
+                : "changeBackgroundColor",
+            )}
+          </div>
+        )}
+        <CombinedShapeProperties
+          appState={appState}
+          renderAction={renderAction}
+          setAppState={setAppState}
+          predicates={predicates}
+          container={container}
+        />
+        {/* Combined Arrow Properties */}
+        <CombinedArrowProperties
+          appState={appState}
+          renderAction={renderAction}
+          setAppState={setAppState}
+          targetElements={targetElements}
+          predicates={predicates}
+          container={container}
+          app={app}
+        />
+        {/* Linear Editor */}
+        <LinearEditorAction
+          renderAction={renderAction}
+          predicates={predicates}
+        />
+        {/* Text Properties */}
+        {predicates.text && (
+          <>
+            <div className="compact-action-item">
+              {renderAction("changeFontFamily")}
+            </div>
+            <CombinedTextProperties
+              appState={appState}
+              renderAction={renderAction}
+              setAppState={setAppState}
+              predicates={predicates}
+              container={container}
+            />
+          </>
+        )}
+
+        {/* Combined Other Actions */}
+        <CombinedExtraActions
+          appState={appState}
+          renderAction={renderAction}
+          predicates={predicates}
+          setAppState={setAppState}
+          container={container}
+          showDuplicate={!showDuplicateOutside}
+          showDelete={!showDeleteOutside}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: GAP,
+        }}
+      >
+        <div className="compact-action-item">{renderAction("undo")}</div>
+        <div className="compact-action-item">{renderAction("redo")}</div>
+        {showDuplicateOutside && (
+          <div className="compact-action-item">
+            {renderAction("duplicateSelection")}
+          </div>
+        )}
+        {showDeleteOutside && (
+          <div className="compact-action-item">
+            {renderAction("deleteSelectedElements")}
+          </div>
+        )}
+      </div>
+    </Island>
   );
 };
 
 export const ZoomActions = ({
   renderAction,
-  zoom,
 }: {
   renderAction: ActionManager["renderAction"];
-  zoom: Zoom;
 }) => (
   <Stack.Col gap={1} className={CLASSES.ZOOM_ACTIONS}>
     <Stack.Row align="center">
@@ -489,7 +912,7 @@ export const UndoRedoActions = ({
   </div>
 );
 
-export const ExitZenModeAction = ({
+export const ExitZenModeButton = ({
   actionManager,
   showExitZenModeBtn,
 }: {
@@ -507,14 +930,16 @@ export const ExitZenModeAction = ({
   </button>
 );
 
-export const FinalizeAction = ({
-  renderAction,
-  className,
+export const ExitViewModeButton = ({
+  actionManager,
 }: {
-  renderAction: ActionManager["renderAction"];
-  className?: string;
+  actionManager: ActionManager;
 }) => (
-  <div className={`finalize-button ${className}`}>
-    {renderAction("finalize", { size: "small" })}
-  </div>
+  <button
+    type="button"
+    className="disable-view-mode"
+    onClick={() => actionManager.executeAction(actionToggleViewMode)}
+  >
+    {pencilIcon}
+  </button>
 );

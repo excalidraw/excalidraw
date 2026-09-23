@@ -1,4 +1,4 @@
-import * as RadixTabs from "@radix-ui/react-tabs";
+import { Tabs as RadixTabs } from "radix-ui";
 import { useRef } from "react";
 
 import { isMemberOf } from "@excalidraw/common";

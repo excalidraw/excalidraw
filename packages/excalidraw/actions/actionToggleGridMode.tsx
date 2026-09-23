@@ -1,11 +1,10 @@
 import { CODES, KEYS } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import { gridIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
-
-import type { AppState } from "../types";
 
 export const actionToggleGridMode = register({
   name: "gridMode",
@@ -27,7 +26,7 @@ export const actionToggleGridMode = register({
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  checked: (appState: AppState) => appState.gridModeEnabled,
+  checked: (appState) => appState.gridModeEnabled,
   predicate: (element, appState, props) => {
     return props.gridModeEnabled === undefined;
   },

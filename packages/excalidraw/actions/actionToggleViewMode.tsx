@@ -1,7 +1,8 @@
 import { CODES, KEYS } from "@excalidraw/common";
 
+import { CaptureUpdateAction } from "@excalidraw/element";
+
 import { eyeIcon } from "../components/icons";
-import { CaptureUpdateAction } from "../store";
 
 import { register } from "./register";
 
@@ -24,8 +25,11 @@ export const actionToggleViewMode = register({
     };
   },
   checked: (appState) => appState.viewModeEnabled,
-  predicate: (elements, appState, appProps) => {
-    return typeof appProps.viewModeEnabled === "undefined";
+  predicate: (elements, appState, appProps, app) => {
+    return (
+      typeof appProps.viewModeEnabled === "undefined" &&
+      app.isInteractionEnabled()
+    );
   },
   keyTest: (event) =>
     !event[KEYS.CTRL_OR_CMD] && event.altKey && event.code === CODES.R,

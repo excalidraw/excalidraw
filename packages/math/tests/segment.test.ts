@@ -1,5 +1,9 @@
 import { pointFrom } from "../src/point";
-import { lineSegment, lineSegmentIntersectionPoints } from "../src/segment";
+import {
+  lineSegment,
+  lineSegmentIntersectionPoints,
+  isLineSegment,
+} from "../src/segment";
 
 describe("line-segment intersections", () => {
   it("should correctly detect intersection", () => {
@@ -17,5 +21,25 @@ describe("line-segment intersections", () => {
         lineSegment(pointFrom(3, 1), pointFrom(4, 4)),
       ),
     ).toEqual(null);
+  });
+});
+describe("isLineSegment validation", () => {
+  it("should return true for a valid segment", () => {
+    expect(
+      isLineSegment([
+        [0, 0],
+        [1, 1],
+      ]),
+    ).toBe(true);
+  });
+
+  it("should return false if second element is not a point", () => {
+    const invalidSegment = [[0, 0], "not-a-point"] as any;
+
+    expect(isLineSegment(invalidSegment)).toBe(false);
+  });
+
+  it("should return false for wrong length", () => {
+    expect(isLineSegment([[0, 0]])).toBe(false);
   });
 });

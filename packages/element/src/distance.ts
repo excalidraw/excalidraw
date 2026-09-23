@@ -2,43 +2,56 @@ import {
   curvePointDistance,
   distanceToLineSegment,
   pointRotateRads,
+  polygonIncludesPointNonZero,
 } from "@excalidraw/math";
 
 import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
-
-import { elementCenterPoint } from "@excalidraw/common";
 
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import {
   deconstructDiamondElement,
+  deconstructLinearOrFreeDrawElement,
   deconstructRectanguloidElement,
 } from "./utils";
 
+import { elementCenterPoint } from "./bounds";
+
 import type {
-  ExcalidrawBindableElement,
+  ElementsMap,
   ExcalidrawDiamondElement,
+  ExcalidrawElement,
   ExcalidrawEllipseElement,
+  ExcalidrawFreeDrawElement,
+  ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
 
-export const distanceToBindableElement = (
-  element: ExcalidrawBindableElement,
+export const distanceToElement = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ): number => {
   switch (element.type) {
+    case "selection":
     case "rectangle":
+    case "stickynote":
     case "image":
     case "text":
     case "iframe":
     case "embeddable":
     case "frame":
     case "magicframe":
-      return distanceToRectanguloidElement(element, p);
+      return distanceToRectanguloidElement(element, elementsMap, p);
     case "diamond":
-      return distanceToDiamondElement(element, p);
+      return distanceToDiamondElement(element, elementsMap, p);
     case "ellipse":
-      return distanceToEllipseElement(element, p);
+      return distanceToEllipseElement(element, elementsMap, p);
+    case "line":
+    case "arrow":
+      return distanceToLinearOrFreeDraElement(element, elementsMap, p);
+    case "freedraw":
+      return distanceToFreeDrawElement(element, elementsMap, p);
   }
 };
 
@@ -52,9 +65,10 @@ export const distanceToBindableElement = (
  */
 const distanceToRectanguloidElement = (
   element: ExcalidrawRectanguloidElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ) => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
   // To emulate a rotated rectangle we rotate the point in the inverse angle
   // instead. It's all the same distance-wise.
   const rotatedPoint = pointRotateRads(p, center, -element.angle as Radians);
@@ -64,9 +78,7 @@ const distanceToRectanguloidElement = (
 
   return Math.min(
     ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
-    ...corners
-      .map((a) => curvePointDistance(a, rotatedPoint))
-      .filter((d): d is number => d !== null),
+    ...corners.map((a) => curvePointDistance(a, rotatedPoint)),
   );
 };
 
@@ -80,9 +92,10 @@ const distanceToRectanguloidElement = (
  */
 const distanceToDiamondElement = (
   element: ExcalidrawDiamondElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ): number => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
 
   // Rotate the point to the inverse direction to simulate the rotated diamond
   // points. It's all the same distance-wise.
@@ -92,9 +105,7 @@ const distanceToDiamondElement = (
 
   return Math.min(
     ...sides.map((s) => distanceToLineSegment(rotatedPoint, s)),
-    ...curves
-      .map((a) => curvePointDistance(a, rotatedPoint))
-      .filter((d): d is number => d !== null),
+    ...curves.map((a) => curvePointDistance(a, rotatedPoint)),
   );
 };
 
@@ -108,12 +119,55 @@ const distanceToDiamondElement = (
  */
 const distanceToEllipseElement = (
   element: ExcalidrawEllipseElement,
+  elementsMap: ElementsMap,
   p: GlobalPoint,
 ): number => {
-  const center = elementCenterPoint(element);
+  const center = elementCenterPoint(element, elementsMap);
   return ellipseDistanceFromPoint(
     // Instead of rotating the ellipse, rotate the point to the inverse angle
     pointRotateRads(p, center, -element.angle as Radians),
     ellipse(center, element.width / 2, element.height / 2),
   );
+};
+
+const distanceToLinearOrFreeDraElement = (
+  element: ExcalidrawLinearElement | ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
+  p: GlobalPoint,
+) => {
+  const [lines, curves] = deconstructLinearOrFreeDrawElement(
+    element,
+    elementsMap,
+  );
+  return Math.min(
+    ...lines.map((s) => distanceToLineSegment(p, s)),
+    ...curves.map((a) => curvePointDistance(a, p)),
+  );
+};
+
+/**
+ * Returns the distance of a point to a freedraw element.
+ *
+ * @param element The freedraw element
+ * @param p The point to consider
+ * @returns 0 if the point is within the inked area, otherwise the euclidean
+ * distance to the stroke outline
+ */
+const distanceToFreeDrawElement = (
+  element: ExcalidrawFreeDrawElement,
+  elementsMap: ElementsMap,
+  p: GlobalPoint,
+) => {
+  const [lines] = deconstructLinearOrFreeDrawElement(element, elementsMap);
+
+  if (lines.length === 0) {
+    return Infinity;
+  }
+
+  const polygon = lines.map((line) => line[0]);
+  if (polygonIncludesPointNonZero(p, polygon)) {
+    return 0;
+  }
+
+  return Math.min(...lines.map((s) => distanceToLineSegment(p, s)));
 };

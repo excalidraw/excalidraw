@@ -1,18 +1,25 @@
 import { arrayToMap, findIndex, findLastIndex } from "@excalidraw/common";
 
+import { isFiniteNumber } from "@excalidraw/math";
+
 import type { AppState } from "@excalidraw/excalidraw/types";
+import type { GlobalPoint } from "@excalidraw/math";
 
-import { isFrameLikeElement } from "./typeChecks";
-
+import { isFrameLikeElement, isTextElement } from "./typeChecks";
 import { getElementsInGroup } from "./groups";
-
 import { syncMovedIndices } from "./fractionalIndex";
-
 import { getSelectedElements } from "./selection";
+import { getBoundTextElement, getContainerElement } from "./textElement";
 
-import type Scene from "./Scene";
-
-import type { ExcalidrawElement, ExcalidrawFrameLikeElement } from "./types";
+import type { Scene } from "./Scene";
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+  OrderedExcalidrawElement,
+} from "./types";
 
 const isOfTargetFrame = (element: ExcalidrawElement, frameId: string) => {
   return element.frameId === frameId || element.id === frameId;
@@ -140,6 +147,46 @@ const getContiguousFrameRangeElements = (
 };
 
 /**
+ * Moves the arrow element above any bindable elements it intersects with or
+ * hovers over.
+ */
+export const moveArrowAboveBindable = (
+  point: GlobalPoint,
+  arrow: ExcalidrawArrowElement,
+  elements: readonly OrderedExcalidrawElement[],
+  elementsMap: NonDeletedSceneElementsMap,
+  scene: Scene,
+  hoveredElement: NonDeletedExcalidrawElement,
+): readonly OrderedExcalidrawElement[] => {
+  if (!hoveredElement) {
+    return elements;
+  }
+
+  const boundTextElement = getBoundTextElement(hoveredElement, elementsMap);
+  const containerElement = isTextElement(hoveredElement)
+    ? getContainerElement(hoveredElement, elementsMap)
+    : null;
+
+  const bindableIds = [
+    hoveredElement.id,
+    boundTextElement?.id,
+    containerElement?.id,
+  ].filter((id): id is NonDeletedExcalidrawElement["id"] => !!id);
+  const bindableIdx = elements.findIndex((el) => bindableIds.includes(el.id));
+  const arrowIdx = elements.findIndex((el) => el.id === arrow.id);
+
+  if (arrowIdx !== -1 && bindableIdx !== -1 && arrowIdx < bindableIdx) {
+    const updatedElements = Array.from(elements);
+    const arrow = updatedElements.splice(arrowIdx, 1)[0];
+    updatedElements.splice(bindableIdx, 0, arrow);
+
+    scene.replaceAllElements(updatedElements);
+  }
+
+  return elements;
+};
+
+/**
  * Returns next candidate index that's available to be moved to. Currently that
  *  is a non-deleted element, and not inside a group (unless we're editing it).
  */
@@ -262,12 +309,46 @@ const getTargetElementsMap = <T extends ExcalidrawElement>(
   }, new Map<string, ExcalidrawElement>());
 };
 
+const hasSameElementIds = (
+  prevElements: readonly ExcalidrawElement[],
+  nextElements: readonly ExcalidrawElement[],
+) => {
+  if (prevElements.length !== nextElements.length) {
+    console.error(
+      "z-index reordering failed: resulting array have different lengths",
+    );
+    return false;
+  }
+
+  const prevElementIdCounts = new Map<ExcalidrawElement["id"], number>();
+  for (const element of prevElements) {
+    prevElementIdCounts.set(
+      element.id,
+      (prevElementIdCounts.get(element.id) || 0) + 1,
+    );
+  }
+
+  for (const element of nextElements) {
+    const count = prevElementIdCounts.get(element.id);
+    if (!count) {
+      console.error(
+        "z-index reordering failed: element id mismatch / duplicate ids",
+      );
+      return false;
+    }
+    prevElementIdCounts.set(element.id, count - 1);
+  }
+
+  return true;
+};
+
 const shiftElementsByOne = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   direction: "left" | "right",
   scene: Scene,
 ) => {
+  const originalElements = elements;
   const indicesToMove = getIndicesToMove(elements, appState);
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
 
@@ -338,6 +419,10 @@ const shiftElementsByOne = (
           ];
   });
 
+  if (!hasSameElementIds(originalElements, elements)) {
+    return originalElements;
+  }
+
   syncMovedIndices(elements, targetElementsMap);
 
   return elements;
@@ -351,11 +436,20 @@ const shiftElementsToEnd = (
   elementsToBeMoved?: readonly ExcalidrawElement[],
 ) => {
   const indicesToMove = getIndicesToMove(elements, appState, elementsToBeMoved);
+
+  // Nothing to move (e.g. `elementsToBeMoved` is empty because all selected
+  // elements were frame children handled in a prior pass). Bail out early —
+  // otherwise `leadingIndex`/`trailingIndex` below resolve to `undefined` and
+  // the resulting `slice()` calls overlap, duplicating elements.
+  if (indicesToMove.length === 0) {
+    return elements;
+  }
+
   const targetElementsMap = getTargetElementsMap(elements, indicesToMove);
   const displacedElements: ExcalidrawElement[] = [];
 
-  let leadingIndex: number;
-  let trailingIndex: number;
+  let leadingIndex: number | undefined;
+  let trailingIndex: number | undefined;
   if (direction === "left") {
     if (containingFrame) {
       leadingIndex = findIndex(elements, (el) =>
@@ -400,6 +494,19 @@ const shiftElementsToEnd = (
     leadingIndex = 0;
   }
 
+  const isValidIndex = (index: number | undefined): index is number => {
+    return isFiniteNumber(index) && index >= 0;
+  };
+
+  if (
+    !isValidIndex(leadingIndex) ||
+    !isValidIndex(trailingIndex) ||
+    leadingIndex > trailingIndex ||
+    indicesToMove.some((index) => index < leadingIndex || index > trailingIndex)
+  ) {
+    return elements;
+  }
+
   for (let index = leadingIndex; index < trailingIndex + 1; index++) {
     if (!indicesToMove.includes(index)) {
       displacedElements.push(elements[index]);
@@ -423,6 +530,10 @@ const shiftElementsToEnd = (
           ...targetElements,
           ...trailingElements,
         ];
+
+  if (!hasSameElementIds(elements, nextElements)) {
+    return elements;
+  }
 
   syncMovedIndices(nextElements, targetElementsMap);
 
@@ -492,7 +603,7 @@ function shiftElementsAccountingForFrames(
 
   for (const [frameId, children] of frameChildrenSets) {
     nextElements = shiftFunction(
-      allElements,
+      nextElements,
       appState,
       direction,
       frameId,

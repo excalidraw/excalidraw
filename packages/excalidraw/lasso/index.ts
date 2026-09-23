@@ -4,20 +4,19 @@ import {
   pointFrom,
 } from "@excalidraw/math";
 
-import { getElementLineSegments } from "@excalidraw/element/bounds";
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { getElementLineSegments } from "@excalidraw/element";
+import { LinearElementEditor } from "@excalidraw/element";
+import { isFrameLikeElement, isLinearElement } from "@excalidraw/element";
+
+import { getFrameChildren } from "@excalidraw/element";
+import { selectGroupsForSelectedElements } from "@excalidraw/element";
+
 import {
-  isFrameLikeElement,
-  isLinearElement,
-  isTextElement,
-} from "@excalidraw/element/typeChecks";
-
-import { getFrameChildren } from "@excalidraw/element/frame";
-import { selectGroupsForSelectedElements } from "@excalidraw/element/groups";
-
-import { getContainerElement } from "@excalidraw/element/textElement";
-
-import { arrayToMap, easeOut } from "@excalidraw/common";
+  arrayToMap,
+  easeOut,
+  isShallowEqual,
+  setColorAlpha,
+} from "@excalidraw/common";
 
 import type {
   ExcalidrawElement,
@@ -25,23 +24,29 @@ import type {
   NonDeleted,
 } from "@excalidraw/element/types";
 
-import { type AnimationFrameHandler } from "../animation-frame-handler";
-
-import { AnimatedTrail } from "../animated-trail";
+import { AnimatedTrail } from "../animatedTrail";
+import { getSelectionColor } from "../renderer/helpers";
 
 import { getLassoSelectedElementIds } from "./utils";
 
 import type App from "../components/App";
+
+type CanvasTranslate = {
+  scrollX: number;
+  scrollY: number;
+  zoom: number;
+};
 
 export class LassoTrail extends AnimatedTrail {
   private intersectedElements: Set<ExcalidrawElement["id"]> = new Set();
   private enclosedElements: Set<ExcalidrawElement["id"]> = new Set();
   private elementsSegments: Map<string, LineSegment<GlobalPoint>[]> | null =
     null;
+  private canvasTranslate: CanvasTranslate | null = null;
   private keepPreviousSelection: boolean = false;
 
-  constructor(animationFrameHandler: AnimationFrameHandler, app: App) {
-    super(animationFrameHandler, app, {
+  constructor(app: App) {
+    super(app, {
       animateTrail: true,
       streamline: 0.4,
       sizeMapping: (c) => {
@@ -58,8 +63,9 @@ export class LassoTrail extends AnimatedTrail {
 
         return Math.min(easeOut(l), easeOut(t));
       },
-      fill: () => "rgba(105,101,219,0.05)",
-      stroke: () => "rgba(105,101,219)",
+      // same color as the marquee selection (theme-aware, host-overridable)
+      fill: () => setColorAlpha(getSelectionColor(app.interactiveCanvas), 0.05),
+      stroke: () => getSelectionColor(app.interactiveCanvas),
     });
   }
 
@@ -92,21 +98,6 @@ export class LassoTrail extends AnimatedTrail {
       if (this.keepPreviousSelection) {
         for (const id of Object.keys(prevState.selectedElementIds)) {
           nextSelectedElementIds[id] = true;
-        }
-      }
-
-      for (const [id] of Object.entries(nextSelectedElementIds)) {
-        const element = this.app.scene.getNonDeletedElement(id);
-
-        if (element && isTextElement(element)) {
-          const container = getContainerElement(
-            element,
-            this.app.scene.getNonDeletedElementsMap(),
-          );
-          if (container) {
-            nextSelectedElementIds[container.id] = true;
-            delete nextSelectedElementIds[element.id];
-          }
         }
       }
 
@@ -169,7 +160,17 @@ export class LassoTrail extends AnimatedTrail {
       .getCurrentTrail()
       ?.originalPoints?.map((p) => pointFrom<GlobalPoint>(p[0], p[1]));
 
-    if (!this.elementsSegments) {
+    const currentCanvasTranslate: CanvasTranslate = {
+      scrollX: this.app.state.scrollX,
+      scrollY: this.app.state.scrollY,
+      zoom: this.app.state.zoom.value,
+    };
+
+    if (
+      !this.elementsSegments ||
+      !isShallowEqual(currentCanvasTranslate, this.canvasTranslate ?? {})
+    ) {
+      this.canvasTranslate = currentCanvasTranslate;
       this.elementsSegments = new Map();
       const visibleElementsMap = arrayToMap(this.app.visibleElements);
       for (const element of this.app.visibleElements) {
@@ -182,10 +183,12 @@ export class LassoTrail extends AnimatedTrail {
       const { selectedElementIds } = getLassoSelectedElementIds({
         lassoPath,
         elements: this.app.visibleElements,
+        elementsMap: this.app.scene.getNonDeletedElementsMap(),
         elementsSegments: this.elementsSegments,
         intersectedElements: this.intersectedElements,
         enclosedElements: this.enclosedElements,
         simplifyDistance: 5 / this.app.state.zoom.value,
+        mode: this.app.state.boxSelectionMode,
       });
 
       this.selectElementsFromIds(selectedElementIds);

@@ -14,9 +14,8 @@ import {
 } from "@excalidraw/math";
 import { type Point } from "points-on-curve";
 
-import { elementCenterPoint } from "@excalidraw/common";
-
 import {
+  elementCenterPoint,
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
@@ -27,13 +26,13 @@ import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ImageCrop,
-  NonDeleted,
 } from "./types";
 
 export const MINIMAL_CROP_SIZE = 10;
 
 export const cropElement = (
   element: ExcalidrawImageElement,
+  elementsMap: ElementsMap,
   transformHandle: TransformHandleType,
   naturalWidth: number,
   naturalHeight: number,
@@ -63,7 +62,7 @@ export const cropElement = (
 
   const rotatedPointer = pointRotateRads(
     pointFrom(pointerX, pointerY),
-    elementCenterPoint(element),
+    elementCenterPoint(element, elementsMap),
     -element.angle as Radians,
   );
 
@@ -406,7 +405,7 @@ export const cropElement = (
 };
 
 const recomputeOrigin = (
-  stateAtCropStart: NonDeleted<ExcalidrawElement>,
+  stateAtCropStart: ExcalidrawElement,
   transformHandle: TransformHandleType,
   width: number,
   height: number,

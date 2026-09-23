@@ -1,5 +1,4 @@
-@import "open-color/open-color.scss";
-@import "../css/variables.module.scss";
+@use "../css/variables.module" as *;
 
 .excalidraw {
   .App-toolbar {
@@ -10,16 +9,17 @@
       }
     }
 
+    &--compact {
+      .ToolIcon__keybinding {
+        display: none;
+      }
+    }
+
     &__divider {
       width: 1px;
       height: 1.5rem;
       align-self: center;
       background-color: var(--default-border-color);
-      margin: 0 0.25rem;
-
-      @include isMobile {
-        margin: 0;
-      }
     }
   }
 
@@ -34,10 +34,15 @@
         var(--button-active-border, var(--color-primary-darkest)) inset;
     }
 
+    &:hover {
+      background-color: transparent;
+    }
+
+    // same state colors as checked tool buttons (`ToolIcon--checked`)
     &--selected,
     &--selected:hover {
-      background: var(--color-primary-light);
-      color: var(--color-primary);
+      background: var(--color-surface-primary-container);
+      color: var(--color-on-primary-container);
     }
   }
 

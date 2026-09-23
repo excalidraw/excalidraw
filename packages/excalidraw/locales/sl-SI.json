@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "Registriraj se",
+    "signIn": "Prijavi se",
     "paste": "Prilepi",
     "pasteAsPlaintext": "Prilepi kot navadno besedilo",
     "pasteCharts": "Prilepi grafikone",
+    "chartType_bar": "Palični grafikon",
+    "chartType_line": "Črtni grafikon",
+    "chartType_radar": "Grafikon radarja",
+    "chartType_plaintext": "Navadno besedilo",
     "selectAll": "Izberi vse",
     "multiSelect": "Dodaj element v izbor",
     "moveCanvas": "Premakni platno",
@@ -21,7 +27,9 @@
     "copyStyles": "Kopiraj slog",
     "pasteStyles": "Prilepi slog",
     "stroke": "Poteza",
+    "changeStroke": "Spremeni barvo poteze",
     "background": "Ozadje",
+    "changeBackground": "Spremeni barvo ozadja",
     "fill": "Polnilo",
     "strokeWidth": "Debelina poteze",
     "strokeStyle": "Slog poteze",
@@ -29,6 +37,9 @@
     "strokeStyle_dashed": "Črtkana",
     "strokeStyle_dotted": "Pikasta",
     "sloppiness": "Površnost",
+    "pressure": "Pritisk",
+    "pressure_constant": "Konstanten",
+    "pressure_variable": "Spremenljiv",
     "opacity": "Prekrivnost",
     "textAlign": "Poravnava besedila",
     "edges": "Robovi",
@@ -44,6 +55,21 @@
     "arrowhead_triangle_outline": "Trikotnik (oris)",
     "arrowhead_diamond": "Diamant",
     "arrowhead_diamond_outline": "Diamant (oris)",
+    "arrowhead_crowfoot_many": "Vranja noga (več)",
+    "arrowhead_crowfoot_one": "Vranja noga (ena)",
+    "arrowhead_crowfoot_one_or_many": "Vranja noga (ena ali več)",
+    "arrowhead_cardinality_one": "Kardinalnost (ena)",
+    "arrowhead_cardinality_many": "Kardinalnost (več)",
+    "arrowhead_cardinality_one_or_many": "Kardinalnost (ena ali več)",
+    "arrowhead_cardinality_exactly_one": "Kardinalnost (natančno ena)",
+    "arrowhead_cardinality_zero_or_one": "Kardinalnost (nič ali ena)",
+    "arrowhead_cardinality_zero_or_many": "Kardinalnost (nič ali več)",
+    "more_options": "Več možnosti",
+    "cardinality": "Kardinalnost",
+    "arrowtypes": "Vrsta puščice",
+    "arrowtype_sharp": "Ostra puščica",
+    "arrowtype_round": "Ukrivljena puščica",
+    "arrowtype_elbowed": "Puščica tipa komolca",
     "fontSize": "Velikost pisave",
     "fontFamily": "Družina pisave",
     "addWatermark": "Dodaj \"Izdelano z Excalidraw\"",
@@ -72,6 +98,7 @@
     "canvasColors": "Uporabljeno na platnu",
     "canvasBackground": "Ozadje platna",
     "drawingCanvas": "Platno za risanje",
+    "clearCanvas": "Počisti platno",
     "layers": "Plasti",
     "actions": "Dejanja",
     "language": "Jezik",
@@ -84,12 +111,14 @@
     "group": "Združi izbor",
     "ungroup": "Razdruži izbor",
     "collaborators": "Sodelavci",
-    "showGrid": "Prikaži mrežo",
+    "you": "Ti",
+    "toggleGrid": "Preklopi mrežo",
     "addToLibrary": "Dodaj v knjižnico",
     "removeFromLibrary": "Odstrani iz knjižnice",
     "libraryLoadingMessage": "Nalaganje knjižnice ...",
     "libraries": "Brskaj po knjižnicah",
     "loadingScene": "Nalaganje scene...",
+    "loadScene": "Naloži sceno iz datoteke",
     "align": "Poravnava",
     "alignTop": "Poravnaj na vrh",
     "alignBottom": "Poravnaj na dno",
@@ -105,7 +134,9 @@
     "share": "Deli",
     "showStroke": "Prikaži izbirnik barv poteze",
     "showBackground": "Prikaži izbirnik barv ozadja",
-    "toggleTheme": "Obrni temo",
+    "showFonts": "Pokaži izbirnik pisave",
+    "toggleTheme": "Preklapljanje med svetlo/temno temo",
+    "theme": "Tema",
     "personalLib": "Osebna knjižnica",
     "excalidrawLib": "Knjižnica Excalidraw",
     "decreaseFontSize": "Zmanjšaj velikost pisave",
@@ -115,16 +146,21 @@
     "createContainerFromText": "Zavij besedilo v vsebnik",
     "link": {
       "edit": "Uredi povezavo",
-      "editEmbed": "Uredi povezavo in vdelaj",
-      "create": "Ustvari povezavo",
-      "createEmbed": "Ustvari povezavo in vdelaj",
+      "editEmbed": "Uredi vdelano povezavo",
+      "create": "Dodaj povezavo",
       "label": "Povezava",
       "labelEmbed": "Povezava in vdelovanje",
-      "empty": "Povezava ni nastavljena"
+      "empty": "Povezava ni nastavljena",
+      "hint": "Tukaj vnesite ali prilepite svojo povezavo",
+      "goToElement": "Pojdite na ciljni element"
     },
     "lineEditor": {
       "edit": "Uredi črto",
-      "exit": "Zapri urejanje črte"
+      "editArrow": "Uredi puščico"
+    },
+    "polygon": {
+      "breakPolygon": "Prekini poligon",
+      "convertToPolygon": "Pretvori v poligon"
     },
     "elementLock": {
       "lock": "Zakleni",
@@ -138,12 +174,53 @@
     "removeAllElementsFromFrame": "Izbriši vse elemente v okvirju",
     "eyeDropper": "Izberi barvo s platna",
     "textToDiagram": "Besedilo v diagram",
-    "prompt": "Poziv"
+    "prompt": "Poziv",
+    "followUs": "Sledi nas",
+    "discordChat": "Klepet v Discordu",
+    "zoomToFitViewport": "Približaj na vidno polje",
+    "zoomToFitSelection": "Približaj na izbor",
+    "zoomToFit": "Približaj na vse elemente",
+    "installPWA": "Namesti Excalidraw lokalno (PWA)",
+    "autoResize": "Omogoči samodejno spreminjanje velikosti besedila",
+    "imageCropping": "Obrezovanje slike",
+    "unCroppedDimension": "Neobrezana dimenzija",
+    "copyElementLink": "Kopiraj povezavo do objekta",
+    "linkToElement": "Povezava do objekta",
+    "wrapSelectionInFrame": "Zavij izbor v okvir",
+    "tab": "Zavihek",
+    "shapeSwitch": "Spremeni obliko",
+    "preferences": "Nastavitve",
+    "preferences_toolLock": "Zaklep orodja",
+    "boxSelectionMode": "Izberi na",
+    "boxSelectionContain": "Ovij",
+    "boxSelectionOverlap": "Prekrij",
+    "arrowBinding": "Vezava puščic",
+    "midpointSnapping": "Pripni na srednje točke"
+  },
+  "elementLink": {
+    "title": "Povezava do objekta",
+    "desc": "Kliknite obliko na platnu ali prilepite povezavo.",
+    "notFound": "Objekta s povezave ni bilo mogoče najti na platnu."
   },
   "library": {
     "noItems": "Dodan še ni noben element...",
     "hint_emptyLibrary": "Izberite element na platnu, da ga dodate sem, ali namestite knjižnico iz javnega skladišča spodaj.",
-    "hint_emptyPrivateLibrary": "Izberite element na platnu, da ga dodate sem."
+    "hint_emptyPrivateLibrary": "Izberite element na platnu, da ga dodate sem.",
+    "search": {
+      "inputPlaceholder": "Iskanje v knjižnici",
+      "heading": "Ujemanja v knjižnici",
+      "noResults": "Ni najdenih ustreznih elementov...",
+      "clearSearch": "Počisti iskanje"
+    }
+  },
+  "search": {
+    "title": "Poišči na platnu",
+    "noMatch": "Ni zadetkov ...",
+    "singleResult": "rezultat",
+    "multipleResults": "rezultata/i/ov",
+    "placeholder": "Poišči besedilo na platnu ...",
+    "frames": "Okvirji",
+    "texts": "Besedila"
   },
   "buttons": {
     "clearReset": "Ponastavi platno",
@@ -151,6 +228,7 @@
     "exportImage": "Izvozi sliko...",
     "export": "Shrani v...",
     "copyToClipboard": "Kopiraj v odložišče",
+    "copyLink": "Kopiraj povezavo",
     "save": "Shrani v trenutno datoteko",
     "saveAs": "Shrani kot",
     "load": "Odpri",
@@ -171,14 +249,16 @@
     "fullScreen": "Celozaslonski način",
     "darkMode": "Temni način",
     "lightMode": "Svetli način",
+    "systemMode": "Sistemski način",
     "zenMode": "Način Zen",
     "objectsSnapMode": "Pripenjanje na predmete",
     "exitZenMode": "Zapri način Zen",
     "cancel": "Prekliči",
+    "saveLibNames": "Shrani ime(na) in izhod",
     "clear": "Počisti",
     "remove": "Odstrani",
     "embed": "Preklopi vdelavo",
-    "publishLibrary": "Objavi",
+    "publishLibrary": "Preimenuj ali objavi",
     "submit": "Pošlji",
     "confirm": "Potrdi",
     "embeddableInteractionButton": "Kliknite za interakcijo"
@@ -204,7 +284,8 @@
     "resetLibrary": "To bo počistilo vašo knjižnico. Ali ste prepričani?",
     "removeItemsFromsLibrary": "Izbriši elemente ({{count}}) iz knjižnice?",
     "invalidEncryptionKey": "Ključ za šifriranje mora vsebovati 22 znakov. Sodelovanje v živo je onemogočeno.",
-    "collabOfflineWarning": "Internetna povezava ni na voljo.\nVaše spremembe ne bodo shranjene!"
+    "collabOfflineWarning": "Internetna povezava ni na voljo.\nVaše spremembe ne bodo shranjene!",
+    "localStorageQuotaExceeded": "Kvota shranjevanja brskalnika je presežena. Spremembe ne bodo shranjene."
   },
   "errors": {
     "unsupportedFileType": "Nepodprt tip datoteke.",
@@ -212,9 +293,9 @@
     "fileTooBig": "Datoteka je prevelika. Največja dovoljena velikost je {{maxSize}}.",
     "svgImageInsertError": "Vstavljanje slike SVG ni uspelo. Oznake SVG so videti neveljavne.",
     "failedToFetchImage": "Pridobivanje slike ni uspelo.",
-    "invalidSVGString": "Neveljaven SVG.",
     "cannotResolveCollabServer": "Povezave s strežnikom za sodelovanje ni bilo mogoče vzpostaviti. Ponovno naložite stran in poskusite znova.",
     "importLibraryError": "Nalaganje knjižnice ni uspelo",
+    "saveLibraryError": "Knjižnice ni bilo mogoče shraniti v shrambo. Prosimo, shranite svojo knjižnico v datoteko lokalno, da ne boste izgubili sprememb.",
     "collabSaveFailed": "Ni bilo mogoče shraniti v zaledno bazo podatkov. Če se težave nadaljujejo, shranite datoteko lokalno, da ne boste izgubili svojega dela.",
     "collabSaveFailed_sizeExceeded": "Ni bilo mogoče shraniti v zaledno bazo podatkov, zdi se, da je platno preveliko. Datoteko shranite lokalno, da ne izgubite svojega dela.",
     "imageToolNotSupported": "Slike so onemogočene.",
@@ -235,6 +316,7 @@
   },
   "toolBar": {
     "selection": "Izbor",
+    "lasso": "Izbira z lassom",
     "image": "Vstavi sliko",
     "rectangle": "Pravokotnik",
     "diamond": "Diamant",
@@ -246,16 +328,38 @@
     "library": "Knjižnica",
     "lock": "Ohrani izbrano orodje aktivno po risanju",
     "penMode": "Način peresa - prepreči dotik",
-    "link": "Dodaj/posodobi povezavo za izbrano obliko",
+    "link": "Dodaj / posodobi povezavo za izbrano obliko",
     "eraser": "Radirka",
     "frame": "Okvir",
     "magicframe": "Žični okvir v kodo",
     "embeddable": "Spletna vdelava",
     "laser": "Laserski kazalec",
+    "autoshape": "Risanje v obliko",
+    "bucketfill": "Zapolnjevanje z vedrom",
     "hand": "Roka (orodje za premikanje)",
     "extraTools": "Več orodij",
     "mermaidToExcalidraw": "Mermaid v Excalidraw",
-    "magicSettings": "Nastavitve AI"
+    "convertElementType": "Preklopi vrsto oblike"
+  },
+  "bucketfill": {
+    "noRegion": "Ni bilo mogoče najti zaprtega območja za zapolnitev.",
+    "tooComplex": "To območje je preveč zapleteno, da bi ga zapolnili."
+  },
+  "element": {
+    "rectangle": "Pravokotnik",
+    "diamond": "Diamant",
+    "ellipse": "Elipsa",
+    "arrow": "Puščica",
+    "line": "Črta",
+    "freedraw": "Prosto risanje",
+    "text": "Besedilo",
+    "image": "Slika",
+    "group": "Skupina",
+    "frame": "Okvir",
+    "magicframe": "Žični okvir v kodo",
+    "embeddable": "Spletna vdelava",
+    "selection": "Izbor",
+    "iframe": "IFrame"
   },
   "headings": {
     "canvasActions": "Dejanja za platno",
@@ -263,28 +367,36 @@
     "shapes": "Oblike"
   },
   "hints": {
-    "canvasPanning": "Za premikanje platna med vlečenjem držite kolesce miške ali preslednico ali uporabite orodje roka",
+    "dismissSearch": "{{shortcut}} za opustitev iskanja",
+    "canvasPanning": "Za premikanje platna med vlečenjem držite tipko {{shortcut_1}} ali {{shortcut_2}} ali uporabite orodje z roko",
     "linearElement": "Kliknite za začetek več točk, povlecite za posamezno črto",
+    "arrowTool": "Kliknite za začetek več točk, povlecite za eno samo črto. Ponovno pritisnite {{shortcut}}, da spremenite vrsto puščice.",
+    "arrowBindModifiers": "Držite {{shortcut_1}}, da onemogočite vezavo, ali {{shortcut_2}}, da se vezava izvede na fiksni točki",
     "freeDraw": "Kliknite in povlecite, spustite, ko končate",
     "text": "Namig: besedilo lahko dodate tudi z dvoklikom kjer koli z orodjem za izbiro",
     "embeddable": "Kliknite in povlecite, da ustvarite spletno vdelavo",
-    "text_selected": "Dvokliknite ali pritisnite tipko Enter, da uredite besedilo",
-    "text_editing": "Pritisnite tipko Escape ali CtrlOrCmd+Enter za zaključek urejanja",
-    "linearElementMulti": "Kliknite zadnjo točko ali pritisnite Escape ali Enter, da končate",
-    "lockAngle": "Kot lahko omejite tako, da držite tipko Shift",
-    "resize": "Razmerja lahko omejite tako, da držite tipko Shift med spreminjanjem velikosti. Držite tipko Alt, da spremenite velikost od središča",
-    "resizeImage": "Velikost lahko prosto spreminjate tako, da držite tipko Shift. Držite tipko Alt, da spremenite velikost od središča",
-    "rotate": "Kote lahko omejite tako, da med vrtenjem držite tipko Shift",
-    "lineEditor_info": "Držite CtrlOrCmd in dvokliknite ali pritisnite CtrlOrCmd + Enter za urejanje točk",
-    "lineEditor_pointSelected": "Pritisnite tipko Delete, da odstranite točko(e), CtrlOrCmd+D za podvojitev ali povlecite za premikanje",
-    "lineEditor_nothingSelected": "Izberite točko za urejanje (pridržite tipko Shift za izbiro več točk), ali držite tipko Alt in kliknite za dodajanje novih točk",
-    "placeImage": "Kliknite, da postavite sliko, ali kliknite in povlecite, da ročno nastavite njeno velikost",
+    "autoshape": "Rišite pravokotnike, kroge, rombe, črte in puščice",
+    "text_selected": "Dvokliknite ali pritisnite {{shortcut}} za urejanje besedila",
+    "text_editing": "Pritisnite {{shortcut_1}} ali {{shortcut_2}} za dokončanje urejanja",
+    "linearElementMulti": "Kliknite na zadnjo točko ali pritisnite {{shortcut_1}} ali {{shortcut_2}} za dokončanje",
+    "lockAngle": "Kot lahko omejite tako, da držite tipko {{shortcut}}",
+    "resize": "Razmerja lahko omejite tako, da med spreminjanjem velikosti držite tipko {{shortcut_1}}, za spreminjanje velikosti od sredine pa držite tipko {{shortcut_2}}",
+    "resizeImage": "Velikost lahko prosto spreminjate tako, da držite {{shortcut_1}},\nza spreminjanje velikosti od sredine držite {{shortcut_2}}",
+    "rotate": "Kote lahko omejite tako, da med vrtenjem držite tipko {{shortcut}}",
+    "toggleArrowhead": "Dvokliknite za preklop konice puščice",
+    "lineEditor_info": "Držite {{shortcut_1}} in dvokliknite ali pritisnite {{shortcut_2}} za urejanje točk",
+    "lineEditor_line_info": "Dvokliknite ali pritisnite {{shortcut}} za urejanje točk",
+    "lineEditor_pointSelected": "Pritisnite {{shortcut_1}} za odstranitev točke(-e),\n{{shortcut_2}} za podvajanje ali povlecite za premikanje",
+    "lineEditor_nothingSelected": "Izberite točko za urejanje (držite {{shortcut_1}} za izbiro več točk) ali držite {{shortcut_2}} in kliknite za dodajanje novih točk",
     "publishLibrary": "Objavi svojo knjižnico",
-    "bindTextToElement": "Pritisnite tipko Enter za dodajanje besedila",
-    "deepBoxSelect": "Držite tipko CtrlOrCmd za globoko izbiro in preprečitev vlečenja",
-    "eraserRevert": "Pridržite tipko Alt, da razveljavite elemente, označene za brisanje",
+    "bindTextToElement": "{{shortcut}} za dodajanje besedila",
+    "createFlowchart": "{{shortcut}} za ustvarjanje diagrama poteka",
+    "deepBoxSelect": "Držite {{shortcut}} za globoko izbiro in za preprečevanje vlečenja",
+    "eraserRevert": "Držite {{shortcut}}, da razveljavite elemente, označene za brisanje",
     "firefox_clipboard_write": "To funkcijo lahko verjetno omogočite z nastavitvijo zastavice \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Če želite spremeniti zastavice brskalnika v Firefoxu, obiščite stran \"about:config\".",
-    "disableSnapping": "Držite CtrlOrCmd, da onemogočite pripenjanje"
+    "disableSnapping": "Držite {{shortcut}}, da onemogočite pripenjanje",
+    "enterCropEditor": "Dvokliknite sliko ali pritisnite {{shortcut}}, da jo obrežete",
+    "leaveCropEditor": "Kliknite zunaj slike ali pritisnite {{shortcut_1}} ali {{shortcut_2}}, da dokončate obrezovanje"
   },
   "canvasError": {
     "cannotShowPreview": "Predogleda ni bilo mogoče prikazati",
@@ -299,9 +411,12 @@
     "openIssueMessage": "Zelo smo bili previdni, da v podatke o napaki nismo vključili vaših podatkov o sceni. Če vaša scena ni zasebna, vas prosimo, da napišete več podrobnosti na našem <button>sledilniku hroščev.</button> Prosimo, vključite spodnje informacije tako, da jih kopirate in prilepite v GitHub vprašanje.",
     "sceneContent": "Vsebina scene:"
   },
+  "shareDialog": {
+    "or": "Ali"
+  },
   "roomDialog": {
-    "desc_intro": "Na vašo trenutno sceno lahko povabite osebe, ki bodo sodelovale z vami.",
-    "desc_privacy": "Brez skrbi. Seja uporablja šifriranje od konca do konca, tako da bo vse, kar narišete, ostalo zasebno. Niti naš strežnik ne bo mogel videti, kaj si izmislite.",
+    "desc_intro": "Povabite ljudi k sodelovanju pri vaši risbi.",
+    "desc_privacy": "Ne skrbite, seja je šifrirana od konca do konca in popolnoma zasebna. Niti naš strežnik ne vidi, kaj rišete.",
     "button_startSession": "Začni sejo",
     "button_stopSession": "Ustavi sejo",
     "desc_inProgressIntro": "Seja sodelovanja v živo je v teku.",
@@ -311,6 +426,10 @@
   },
   "errorDialog": {
     "title": "Napaka"
+  },
+  "progressDialog": {
+    "title": "Shranjevanje",
+    "defaultMessage": "Priprava na shranjevanje..."
   },
   "exportDialog": {
     "disk_title": "Shrani na disk",
@@ -328,6 +447,8 @@
     "click": "klik",
     "deepSelect": "Globoka izbira",
     "deepBoxSelect": "Globoka izbira znotraj polja in preprečitev vlečenja",
+    "createFlowchart": "Ustvarite diagram poteka iz generičnega elementa",
+    "navigateFlowchart": "Krmarjenje po diagramu poteka",
     "curvedArrow": "Ukrivljena puščica",
     "curvedLine": "Ukrivljena črta",
     "documentation": "Dokumentacija",
@@ -350,7 +471,9 @@
     "zoomToSelection": "Približaj na izbor",
     "toggleElementLock": "Zakleni/odkleni izbor",
     "movePageUpDown": "Premakni stran gor/dol",
-    "movePageLeftRight": "Premakni stran levo/desno"
+    "movePageLeftRight": "Premakni stran levo/desno",
+    "cropStart": "Obreži sliko",
+    "cropFinish": "Dokončaj obrezovanje slike"
   },
   "clearCanvasDialog": {
     "title": "Počisti platno"
@@ -421,13 +544,15 @@
   },
   "stats": {
     "angle": "Kot",
-    "element": "Element",
-    "elements": "Elementi",
+    "shapes": "Oblike",
     "height": "Višina",
     "scene": "Scena",
     "selected": "Izbrano",
     "storage": "Shramba",
-    "title": "Statistika za napredne uporabnike",
+    "fullTitle": "Lastnosti platna in oblike",
+    "title": "Lastnosti",
+    "generalStats": "Splošno",
+    "elementProperties": "Lastnosti oblike",
     "total": "Skupaj",
     "version": "Različica",
     "versionCopy": "Kliknite za kopiranje",
@@ -439,13 +564,15 @@
     "copyStyles": "Slogi kopirani.",
     "copyToClipboard": "Kopirano v odložišče.",
     "copyToClipboardAsPng": "Kopirano v odložišče kot PNG ({{exportSelection}}, {{exportColorScheme}})",
+    "copyToClipboardAsSvg": "Kopirano v odložišče kot SVG ({{exportSelection}}, {{exportColorScheme}})",
     "fileSaved": "Datoteka shranjena.",
     "fileSavedToFilename": "Shranjeno v {filename}",
     "canvas": "platno",
     "selection": "izbor",
     "pasteAsSingleElement": "Uporabite {{shortcut}}, da prilepite kot en element,\n ali prilepite v obstoječ urejevalnik besedil",
     "unableToEmbed": "Vdelava tega URL-ja trenutno ni dovoljena. Ustvarite vprašanje na GitHub-u in prosite za vmestitev URL-ja na seznam dovoljenih",
-    "unrecognizedLinkFormat": "Povezava, ki ste jo vdelali, se ne ujema s pričakovano obliko. Poskusite prilepiti niz za vdelavo, ki ste ga prejeli na izvorni strani"
+    "unrecognizedLinkFormat": "Povezava, ki ste jo vdelali, se ne ujema s pričakovano obliko. Poskusite prilepiti niz za vdelavo, ki ste ga prejeli na izvorni strani",
+    "elementLinkCopied": "Povezava kopirana na odložišče"
   },
   "colors": {
     "transparent": "Prosojno",
@@ -466,7 +593,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Vsi vaši podatki so shranjeni lokalno v vašem brskalniku.",
+      "center_heading": "Vaše risbe so shranjene v pomnilniku vašega brskalnika.",
+      "center_heading_line2": "Pomnilnik brskalnika se lahko nepričakovano izprazni.",
+      "center_heading_line3": "Redno shranjujte svoje delo v datoteko, da ga ne izgubite.",
       "center_heading_plus": "Ste namesto tega želeli odpreti Excalidraw+?",
       "menuHint": "Izvoz, nastavitve, jeziki, ..."
     },
@@ -478,11 +607,16 @@
     }
   },
   "colorPicker": {
+    "color": "Barva",
     "mostUsedCustomColors": "Najpogosteje uporabljene barve po meri",
     "colors": "Barve",
     "shades": "Odtenki",
     "hexCode": "Hex koda",
-    "noShades": "Odtenki za to barvo niso na voljo"
+    "noShades": "Odtenki za to barvo niso na voljo",
+    "invalidColor": "Ni veljavna barva",
+    "invalidHexLength": "Šestnajstiška koda mora imeti 3, 4, 6 ali 8 znakov",
+    "topPicksTip": "Nasvet: povlecite katero koli barvo med svoje najljubše, da jo pripnete",
+    "resetTopPicks": "Ponastavi na privzete najboljše izbire"
   },
   "overwriteConfirm": {
     "action": {
@@ -518,8 +652,105 @@
   "mermaid": {
     "title": "Mermaid v Excalidraw",
     "button": "Vstavi",
-    "description": "Trenutno so podprti samo <flowchartLink>diagrami poteka</flowchartLink>, <sequenceLink>diagrami zaporedij</sequenceLink> in <classLink>Razredni diagrami</classLink>. Druge vrste bodo upodobljene kot slike v Excalidraw.",
+    "description": "Trenutno so podprti samo diagrami <flowchartLink>Diagram poteka</flowchartLink>, <sequenceLink>Zaporedje</sequenceLink>, <classLink>Razred</classLink> in <erdLink>Diagrami entitet in razmerij</erdLink>. Druge vrste bodo v programu Excalidraw upodobljene kot slike.",
     "syntax": "Sintaksa Mermaid",
-    "preview": "Predogled"
+    "preview": "Predogled",
+    "label": "Mermaid",
+    "inputPlaceholder": "Tukaj napišite definicijo diagrama Mermaid...",
+    "autoFixAvailable": "Samodejno popravljanje je na voljo"
+  },
+  "ttd": {
+    "error": "Napaka!"
+  },
+  "chat": {
+    "inputPlaceholder": "Začnite tipkati svojo idejo za diagram tukaj... ({{shortcut}} za novo vrstico)",
+    "inputPlaceholderWithMessages": "Nadaljujte z izpopolnjevanjem diagrama...",
+    "generating": "Ustvarjanje...",
+    "rateLimitRemaining": "Danes je ostalo še {{count}} zahtev",
+    "role": {
+      "user": "Ti",
+      "assistant": "Pomočnik umetne inteligence",
+      "system": "Sistem"
+    },
+    "aiBeta": "Beta umetne inteligence",
+    "label": "Klepet",
+    "menu": "Meni",
+    "newChat": "Nov klepet",
+    "deleteChat": "Izbriši klepet",
+    "deleteMessage": "Izbriši sporočilo",
+    "viewAsMermaid": "Ogled kot Mermaid",
+    "placeholder": {
+      "title": "Oblikujmo vaš diagram",
+      "description": "Opišite diagram, ki ga želite ustvariti, in mi ga bomo ustvarili za vas.",
+      "hint": "Trenutno poznamo diagrame poteka, zaporedja, razredov, stanj in entitetno-relacijskih diagramov."
+    },
+    "preview": "Predogled",
+    "insert": "Vstavi",
+    "retry": "Poskusi ponovno",
+    "errors": {
+      "promptTooShort": "Poziv je prekratek (najmanj {{min}} znakov)",
+      "promptTooLong": "Poziv je predolg (največ {{max}} znakov)",
+      "generationFailed": "Ustvarjanje ni uspelo",
+      "invalidDiagram": "Ustvarjen je bil neveljaven diagram :(. Lahko ga uredite ročno, poskusite znova s ​​samodejnim popravljanjem ali poskusite z drugim pozivom.",
+      "fixInMermaid": "Ročno uredite Mermaid diagram →",
+      "aiRepair": "Regeneriraj (samodejno popravi) →",
+      "requestAborted": "Zahteva prekinjena",
+      "requestFailed": "Zahteva ni uspela",
+      "mermaidParseError": "Sintaktična napaka Mermaid"
+    },
+    "rateLimit": {
+      "messageLimit": "Dosegli ste omejitev uporabe umetne inteligence v brezplačnem paketu. Za več informacij preizkusite Excalidraw+ ali se vrnite jutri.",
+      "generalRateLimit": "Počakaj malo, prehiter si za nas! Prosim, počakaj trenutek, preden poskusiš znova.",
+      "messageLimitInputPlaceholder": "Dosegli ste omejitev števila sporočil"
+    },
+    "upsellBtnLabel": "Nadgradi na Plus"
+  },
+  "quickSearch": {
+    "placeholder": "Hitro iskanje"
+  },
+  "fontList": {
+    "badge": {
+      "old": "stara"
+    },
+    "sceneFonts": "V tej sceni",
+    "availableFonts": "Razpoložljive pisave",
+    "empty": "Ni pisav"
+  },
+  "userList": {
+    "empty": "Ni uporabnikov",
+    "hint": {
+      "text": "Klikni na uporabnika za sledenje",
+      "followStatus": "Trenutno slediš temu uporabniku",
+      "inCall": "Uporabnik je v glasovnem klicu",
+      "micMuted": "Uporabnikov mikrofon je izklopljen",
+      "isSpeaking": "Uporabnik govori"
+    }
+  },
+  "commandPalette": {
+    "title": "Paleta ukazov",
+    "shortcuts": {
+      "select": "Izberi",
+      "confirm": "Potrdi",
+      "close": "Zapri"
+    },
+    "recents": "Nedavno uporabljeno",
+    "search": {
+      "placeholder": "Išči po menijih, ukazih in odkrij skrite funkcije",
+      "noMatch": "Ni ustreznih ukazov ..."
+    },
+    "itemNotAvailable": "Ukaz ni na voljo ...",
+    "shortcutHint": "Za paleto ukazov uporabi {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "Ctrl",
+    "option": "Možnost",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Presledek",
+    "delete": "Izbriši",
+    "mmb": "Kolesce za pomikanje"
   }
 }

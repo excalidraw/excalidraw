@@ -1,5 +1,4 @@
-@import "open-color/open-color";
-@import "../css/variables.module.scss";
+@use "../css/variables.module" as *;
 
 .excalidraw {
   .layer-ui__wrapper.animate {
@@ -23,6 +22,10 @@
       justify-content: flex-end;
       gap: 0.75rem;
       pointer-events: none !important;
+
+      &--compact {
+        gap: 0.5rem;
+      }
 
       & > * {
         pointer-events: var(--ui-pointerEvents);
@@ -114,6 +117,79 @@
     .layer-ui__wrapper__footer-right {
       margin-top: auto;
       margin-bottom: auto;
+    }
+  }
+
+  // on tablet, the pen mode button is rendered as a separate floating button
+  // below the compact actions menu (see LayerUI.tsx)
+  .App-menu_top__left > .ToolIcon__penMode {
+    // NOTE: not `justify-self: center` — that centers against the grid
+    // column's track width, which (see above) can be inflated by unrelated
+    // content, visibly shifting this button off from the icon stack above
+    // it. Nudge by hand instead, against the fixed-width compact actions
+    // column (see .selected-shape-actions-container--compact's min-width).
+    justify-self: start;
+    margin-left: calc((48px - var(--lg-button-size)) / 2);
+
+    .ToolIcon__icon {
+      width: var(--lg-button-size);
+      height: var(--lg-button-size);
+      background-color: var(--island-bg-color);
+      box-shadow: var(--shadow-island);
+    }
+
+    // no shadow while pen mode is active (the active fill is enough)
+    &.ToolIcon--checked .ToolIcon__icon {
+      box-shadow: none;
+    }
+  }
+
+  .disable-view-mode {
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    align-items: center;
+    border: 1px solid var(--color-primary);
+    padding: 0.5rem;
+    border-radius: var(--border-radius-lg);
+    background-color: var(--island-bg-color);
+    text-decoration: none !important;
+
+    font-family: var(--ui-font);
+    font-size: 0.8333rem;
+    box-sizing: border-box;
+
+    width: var(--mobile-action-button-size, var(--default-button-size));
+    height: var(--mobile-action-button-size, var(--default-button-size));
+
+    border: none;
+    box-shadow: 0 0 0 1px var(--color-surface-lowest);
+    background-color: var(--color-surface-low);
+    color: var(--button-color, var(--color-on-surface)) !important;
+
+    &:active {
+      box-shadow: 0 0 0 1px var(--color-brand-active);
+    }
+
+    &:hover {
+      background-color: var(--color-primary);
+      color: white !important;
+    }
+    &:active {
+      background-color: var(--color-primary-darker);
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .theme--dark {
+    .plus-banner {
+      &:hover {
+        color: black !important;
+      }
     }
   }
 }

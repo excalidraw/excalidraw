@@ -10,16 +10,13 @@ import {
 
 import { EVENT, HYPERLINK_TOOLTIP_DELAY, KEYS } from "@excalidraw/common";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element/bounds";
+import { getElementAbsoluteCoords } from "@excalidraw/element";
 
-import { hitElementBoundingBox } from "@excalidraw/element/collision";
+import { hitElementBoundingBox } from "@excalidraw/element";
 
-import { isElementLink } from "@excalidraw/element/elementLink";
+import { isElementLink } from "@excalidraw/element";
 
-import {
-  getEmbedLink,
-  embeddableURLValidator,
-} from "@excalidraw/element/embeddable";
+import { getEmbedLink, embeddableURLValidator } from "@excalidraw/element";
 
 import {
   sceneCoordsToViewportCoords,
@@ -29,9 +26,9 @@ import {
   normalizeLink,
 } from "@excalidraw/common";
 
-import { isEmbeddableElement } from "@excalidraw/element/typeChecks";
+import { isEmbeddableElement } from "@excalidraw/element";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
 import type {
   ElementsMap,
@@ -44,8 +41,8 @@ import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
 
 import { t } from "../../i18n";
 
-import { useAppProps, useDevice, useExcalidrawAppState } from "../App";
-import { ToolButton } from "../ToolButton";
+import { useAppProps, useEditorInterface, useExcalidrawAppState } from "../App";
+import { IconButton } from "../IconButton";
 import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
 import { getSelectedElements } from "../../scene";
 
@@ -91,7 +88,7 @@ export const Hyperlink = ({
   const elementsMap = scene.getNonDeletedElementsMap();
   const appState = useExcalidrawAppState();
   const appProps = useAppProps();
-  const device = useDevice();
+  const editorInterface = useEditorInterface();
 
   const linkVal = element.link || "";
 
@@ -192,11 +189,11 @@ export const Hyperlink = ({
     if (
       isEditing &&
       inputRef?.current &&
-      !(device.viewport.isMobile || device.isTouchScreen)
+      !(editorInterface.formFactor === "phone" || editorInterface.isTouchScreen)
     ) {
       inputRef.current.select();
     }
-  }, [isEditing, device.viewport.isMobile, device.isTouchScreen]);
+  }, [isEditing, editorInterface.formFactor, editorInterface.isTouchScreen]);
 
   useEffect(() => {
     let timeoutId: number | null = null;
@@ -315,7 +312,7 @@ export const Hyperlink = ({
       )}
       <div className="excalidraw-hyperlinkContainer__buttons">
         {!isEditing && (
-          <ToolButton
+          <IconButton
             type="button"
             title={t("buttons.edit")}
             aria-label={t("buttons.edit")}
@@ -325,7 +322,7 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-        <ToolButton
+        <IconButton
           type="button"
           title={t("labels.linkToElement")}
           aria-label={t("labels.linkToElement")}
@@ -341,7 +338,7 @@ export const Hyperlink = ({
           icon={elementLinkIcon}
         />
         {linkVal && !isEmbeddableElement(element) && (
-          <ToolButton
+          <IconButton
             type="button"
             title={t("buttons.remove")}
             aria-label={t("buttons.remove")}
@@ -466,7 +463,7 @@ const shouldHideLinkPopup = (
 
   const threshold = 15 / appState.zoom.value;
   // hitbox to prevent hiding when hovered in element bounding box
-  if (hitElementBoundingBox(sceneX, sceneY, element, elementsMap)) {
+  if (hitElementBoundingBox(pointFrom(sceneX, sceneY), element, elementsMap)) {
     return false;
   }
   const [x1, y1, x2] = getElementAbsoluteCoords(element, elementsMap);

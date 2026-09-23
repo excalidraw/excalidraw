@@ -38,6 +38,8 @@ If you want to only import `Excalidraw` component you can do :point_down:
 
 ```jsx showLineNumbers
 import dynamic from "next/dynamic";
+import "@excalidraw/excalidraw/index.css";
+
 const Excalidraw = dynamic(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
   {

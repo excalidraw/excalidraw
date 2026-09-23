@@ -5,14 +5,14 @@ import { nanoid } from "nanoid";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { Card } from "@excalidraw/excalidraw/components/Card";
 import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
-import { ToolButton } from "@excalidraw/excalidraw/components/ToolButton";
+import { IconButton } from "@excalidraw/excalidraw/components/IconButton";
 import { MIME_TYPES, getFrame } from "@excalidraw/common";
 import {
   encryptData,
   generateEncryptionKey,
 } from "@excalidraw/excalidraw/data/encryption";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { isInitializedImageElement } from "@excalidraw/element/typeChecks";
+import { isInitializedImageElement } from "@excalidraw/element";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 
 import type {
@@ -111,7 +111,7 @@ export const ExportToExcalidrawPlus: React.FC<{
       <div className="Card-details">
         {t("exportDialog.excalidrawplus_description")}
       </div>
-      <ToolButton
+      <IconButton
         className="Card-button"
         type="button"
         title={t("exportDialog.excalidrawplus_button")}

@@ -6,48 +6,45 @@ import {
   FONT_FAMILY,
   SVG_NS,
   THEME,
-  THEME_FILTER,
   MIME_TYPES,
   EXPORT_DATA_TYPES,
   arrayToMap,
   distance,
   getFontString,
   toBrandedType,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
-import {
-  getCommonBounds,
-  getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
   updateImageCache,
-} from "@excalidraw/element/image";
+} from "@excalidraw/element";
 
-import { newElementWith } from "@excalidraw/element/mutateElement";
+import { newElementWith } from "@excalidraw/element";
 
-import { isFrameLikeElement } from "@excalidraw/element/typeChecks";
+import { isFrameLikeElement } from "@excalidraw/element";
 
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
   getFrameLikeTitle,
   getRootElements,
-} from "@excalidraw/element/frame";
+} from "@excalidraw/element";
 
-import { syncInvalidIndices } from "@excalidraw/element/fractionalIndex";
+import { syncInvalidIndices } from "@excalidraw/element";
 
 import { type Mutable } from "@excalidraw/common/utility-types";
 
-import { newTextElement } from "@excalidraw/element/newElement";
+import { newTextElement } from "@excalidraw/element";
 
-import type { Bounds } from "@excalidraw/element/bounds";
+import type { Bounds } from "@excalidraw/common";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
 } from "@excalidraw/element/types";
@@ -65,7 +62,10 @@ import type { RenderableElementsMap } from "./types";
 
 import type { AppState, BinaryFiles } from "../types";
 
-const truncateText = (element: ExcalidrawTextElement, maxWidth: number) => {
+const truncateText = (
+  element: NonDeleted<ExcalidrawTextElement>,
+  maxWidth: number,
+) => {
   if (element.width <= maxWidth) {
     return element;
   }
@@ -109,18 +109,19 @@ const addFrameLabelsAsTextElements = (
   const nextElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
-      let textElement: Mutable<ExcalidrawTextElement> = newTextElement({
-        x: element.x,
-        y: element.y - FRAME_STYLE.nameOffsetY,
-        fontFamily: FONT_FAMILY.Helvetica,
-        fontSize: FRAME_STYLE.nameFontSize,
-        lineHeight:
-          FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
-        strokeColor: opts.exportWithDarkMode
-          ? FRAME_STYLE.nameColorDarkTheme
-          : FRAME_STYLE.nameColorLightTheme,
-        text: getFrameLikeTitle(element),
-      });
+      let textElement: Mutable<NonDeleted<ExcalidrawTextElement>> =
+        newTextElement({
+          x: element.x,
+          y: element.y - FRAME_STYLE.nameOffsetY,
+          fontFamily: FONT_FAMILY.Helvetica,
+          fontSize: FRAME_STYLE.nameFontSize,
+          lineHeight:
+            FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
+          strokeColor: opts.exportWithDarkMode
+            ? FRAME_STYLE.nameColorDarkTheme
+            : FRAME_STYLE.nameColorLightTheme,
+          text: getFrameLikeTitle(element),
+        });
       textElement.y -= textElement.height;
 
       textElement = truncateText(textElement, element.width);
@@ -152,15 +153,19 @@ const prepareElementsForRender = ({
   frameRendering,
   exportWithDarkMode,
 }: {
-  elements: readonly ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
   frameRendering: AppState["frameRendering"];
   exportWithDarkMode: AppState["exportWithDarkMode"];
 }) => {
-  let nextElements: readonly ExcalidrawElement[];
+  let nextElements: readonly NonDeletedExcalidrawElement[];
 
   if (exportingFrame) {
-    nextElements = getElementsOverlappingFrame(elements, exportingFrame);
+    nextElements = getElementsOverlappingFrame(
+      elements,
+      exportingFrame,
+      arrayToMap(elements),
+    );
   } else if (frameRendering.enabled && frameRendering.name) {
     nextElements = addFrameLabelsAsTextElements(elements, {
       exportWithDarkMode,
@@ -185,7 +190,7 @@ export const exportToCanvas = async (
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
-    exportingFrame?: ExcalidrawFrameLikeElement | null;
+    exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   },
   createCanvas: (
     width: number,
@@ -271,6 +276,7 @@ export const exportToCanvas = async (
       embedsValidationStatus: new Map(),
       elementsPendingErasure: new Set(),
       pendingFlowchartNodes: null,
+      theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     },
   });
 
@@ -301,7 +307,7 @@ export const exportToSvg = async (
      * if true, all embeddables passed in will be rendered when possible.
      */
     renderEmbeddables?: boolean;
-    exportingFrame?: ExcalidrawFrameLikeElement | null;
+    exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
   },
@@ -351,9 +357,6 @@ export const exportToSvg = async (
   svgRoot.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svgRoot.setAttribute("width", `${width * exportScale}`);
   svgRoot.setAttribute("height", `${height * exportScale}`);
-  if (exportWithDarkMode) {
-    svgRoot.setAttribute("filter", THEME_FILTER);
-  }
 
   const defsElement = svgRoot.ownerDocument.createElementNS(SVG_NS, "defs");
 
@@ -458,7 +461,10 @@ export const exportToSvg = async (
     rect.setAttribute("y", "0");
     rect.setAttribute("width", `${width}`);
     rect.setAttribute("height", `${height}`);
-    rect.setAttribute("fill", viewBackgroundColor);
+    rect.setAttribute(
+      "fill",
+      applyDarkModeFilter(viewBackgroundColor, exportWithDarkMode),
+    );
     svgRoot.appendChild(rect);
   }
 
@@ -492,6 +498,7 @@ export const exportToSvg = async (
           )
         : new Map(),
       reuseImages: opts?.reuseImages ?? true,
+      theme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     },
   );
 

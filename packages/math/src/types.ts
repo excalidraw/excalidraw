@@ -28,11 +28,21 @@ export type InclusiveRange = [number, number] & { _brand: "excalimath_degree" };
 //
 
 /**
- * Represents a 2D position in world or canvas space. A
+ * Represents a 2D position in world/canvas/scene space. A
  * global coordinate.
  */
 export type GlobalPoint = [x: number, y: number] & {
   _brand: "excalimath__globalpoint";
+};
+
+/**
+ * Represents a 2D position in world/canvas/scene space. A
+ * global coordinate.
+ *
+ * TODO remove this once we migrate the codebase to use Point tuples everywhere
+ */
+export type GlobalCoord = { x: number; y: number } & {
+  _brand: "excalimath__globalcoord";
 };
 
 /**
@@ -41,6 +51,16 @@ export type GlobalPoint = [x: number, y: number] & {
  */
 export type LocalPoint = [x: number, y: number] & {
   _brand: "excalimath__localpoint";
+};
+
+/**
+ * Represents a 2D position in whatever local space it's needed.
+ * A local coordinate.
+ *
+ * TODO remove this once we migrate the codebase to use Point tuples everywhere
+ */
+export type LocalCoord = { x: number; y: number } & {
+  _brand: "excalimath__localcoord";
 };
 
 // Line

@@ -14,11 +14,14 @@ import type { RoughCanvas } from "roughjs/bin/canvas";
 
 interface NewElementCanvasProps {
   appState: AppState;
+  newElement: NonNullable<AppState["newElement"]>;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
   rc: RoughCanvas;
   renderConfig: StaticCanvasRenderConfig;
+  /** CSS opacity of the whole canvas — a translucent preview of a finished element */
+  opacity?: number;
 }
 
 const NewElementCanvas = (props: NewElementCanvasProps) => {
@@ -31,7 +34,7 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
       {
         canvas: canvasRef.current,
         scale: props.scale,
-        newElement: props.appState.newElement,
+        newElement: props.newElement,
         elementsMap: props.elementsMap,
         allElementsMap: props.allElementsMap,
         rc: props.rc,
@@ -48,6 +51,7 @@ const NewElementCanvas = (props: NewElementCanvasProps) => {
       style={{
         width: props.appState.width,
         height: props.appState.height,
+        opacity: props.opacity,
       }}
       width={props.appState.width * props.scale}
       height={props.appState.height * props.scale}

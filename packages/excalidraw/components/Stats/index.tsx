@@ -4,13 +4,13 @@ import throttle from "lodash.throttle";
 import { useEffect, useMemo, useState, memo } from "react";
 
 import { STATS_PANELS } from "@excalidraw/common";
-import { getCommonBounds } from "@excalidraw/element/bounds";
-import { getUncroppedWidthAndHeight } from "@excalidraw/element/cropElement";
-import { isElbowArrow, isImageElement } from "@excalidraw/element/typeChecks";
+import { getCommonBounds } from "@excalidraw/element";
+import { getUncroppedWidthAndHeight } from "@excalidraw/element";
+import { isImageElement } from "@excalidraw/element";
 
-import { frameAndChildrenSelectedTogether } from "@excalidraw/element/frame";
+import { frameAndChildrenSelectedTogether } from "@excalidraw/element";
 
-import { elementsAreInSameGroup } from "@excalidraw/element/groups";
+import { elementsAreInSameGroup } from "@excalidraw/element";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -333,16 +333,14 @@ export const StatsInner = memo(
                           appState={appState}
                         />
                       </StatsRow>
-                      {!isElbowArrow(singleElement) && (
-                        <StatsRow>
-                          <Angle
-                            property="angle"
-                            element={singleElement}
-                            scene={scene}
-                            appState={appState}
-                          />
-                        </StatsRow>
-                      )}
+                      <StatsRow>
+                        <Angle
+                          property="angle"
+                          element={singleElement}
+                          scene={scene}
+                          appState={appState}
+                        />
+                      </StatsRow>
                       <StatsRow>
                         <FontSize
                           property="fontSize"

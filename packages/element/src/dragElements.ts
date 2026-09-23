@@ -1,7 +1,9 @@
 import {
+  type Bounds,
   TEXT_AUTOWRAP_THRESHOLD,
   getGridPoint,
   getFontString,
+  DRAGGING_THRESHOLD,
 } from "@excalidraw/common";
 
 import type {
@@ -13,7 +15,7 @@ import type {
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { updateBoundElements } from "./binding";
+import { unbindBindingElement, updateBoundElements } from "./binding";
 import { getCommonBounds } from "./bounds";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { getBoundTextElement } from "./textElement";
@@ -26,10 +28,9 @@ import {
   isTextElement,
 } from "./typeChecks";
 
-import type Scene from "./Scene";
+import type { Scene } from "./Scene";
 
-import type { Bounds } from "./bounds";
-import type { ExcalidrawElement } from "./types";
+import type { ExcalidrawElement, ExcalidrawTextElement } from "./types";
 
 export const dragSelectedElements = (
   pointerDownState: PointerDownState,
@@ -102,9 +103,14 @@ export const dragSelectedElements = (
     gridSize,
   );
 
+  const elementsToUpdateIds = new Set(
+    Array.from(elementsToUpdate, (el) => el.id),
+  );
+
   elementsToUpdate.forEach((element) => {
-    updateElementCoords(pointerDownState, element, scene, adjustedOffset);
     if (!isArrowElement(element)) {
+      updateElementCoords(pointerDownState, element, scene, adjustedOffset);
+
       // skip arrow labels since we calculate its position during render
       const textElement = getBoundTextElement(
         element,
@@ -121,6 +127,35 @@ export const dragSelectedElements = (
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: Array.from(elementsToUpdate),
       });
+    } else if (
+      // NOTE: Add a little initial drag to the arrow dragging when the arrow
+      // is the single element being dragged to avoid accidentally unbinding
+      // the arrow when the user just wants to select it.
+      elementsToUpdate.size > 1 ||
+      Math.max(Math.abs(adjustedOffset.x), Math.abs(adjustedOffset.y)) >
+        DRAGGING_THRESHOLD ||
+      (!element.startBinding && !element.endBinding)
+    ) {
+      updateElementCoords(pointerDownState, element, scene, adjustedOffset);
+
+      const shouldUnbindStart = element.startBinding
+        ? !elementsToUpdateIds.has(element.startBinding.elementId)
+        : true;
+      const shouldUnbindEnd = element.endBinding
+        ? !elementsToUpdateIds.has(element.endBinding.elementId)
+        : true;
+      if (shouldUnbindStart || shouldUnbindEnd) {
+        // NOTE: Moving the bound arrow should unbind it, otherwise we would
+        // have weird situations, like 0 lenght arrow when the user moves
+        // the arrow outside a filled shape suddenly forcing the arrow start
+        // and end point to jump "outside" the shape.
+        if (shouldUnbindStart) {
+          unbindBindingElement(element, "start", scene);
+        }
+        if (shouldUnbindEnd) {
+          unbindBindingElement(element, "end", scene);
+        }
+      }
     }
   });
 };
@@ -158,7 +193,7 @@ const calculateOffset = (
 
 const updateElementCoords = (
   pointerDownState: PointerDownState,
-  element: NonDeletedExcalidrawElement,
+  element: ExcalidrawElement,
   scene: Scene,
   dragOffset: { x: number; y: number },
 ) => {
@@ -181,6 +216,72 @@ export const getDragOffsetXY = (
 ): [number, number] => {
   const [x1, y1] = getCommonBounds(selectedElements);
   return [x - x1, y - y1];
+};
+
+/**
+ * Sizes a text element as it is dragged out.
+ *
+ * A dragged text pins one point and grows away from it; `anchorRatio` says
+ * where along the box that point sits — 0 for its left edge, 1 for its right,
+ * 0.5 for its centre.
+ *
+ * A free text pins the point the drag started from and takes the ratio from
+ * the drag direction, so it can be pulled either way. A text bound to an arrow
+ * endpoint instead pins whatever the binding placed it against and takes the
+ * ratio from its alignment — which is also what keeps it from growing back
+ * over the arrow, since dragging that way makes no progress rather than
+ * flipping the box around.
+ */
+export const dragNewTextElement = ({
+  newElement,
+  anchorX,
+  anchorRatio,
+  pointerX,
+  nextY,
+  zoom,
+  scene,
+  informMutation = true,
+}: {
+  newElement: ExcalidrawTextElement;
+  anchorX: number;
+  /** 0 = anchored by its left edge, 1 = by its right, 0.5 = by its centre */
+  anchorRatio: number;
+  pointerX: number;
+  /** free text re-tops itself to the drag origin; a bound one must not move */
+  nextY?: number;
+  zoom: NormalizedZoomValue;
+  scene: Scene;
+  informMutation?: boolean;
+}) => {
+  const offset = pointerX - anchorX;
+
+  // how far the pointer has travelled away from the anchor along the direction
+  // the box may grow — negative once it heads back the other way
+  const reach =
+    anchorRatio === 0 ? offset : anchorRatio === 1 ? -offset : Math.abs(offset);
+
+  const width = Math.max(
+    // a centred box grows on both sides, so it widens at twice the reach
+    anchorRatio === 0.5 ? reach * 2 : reach,
+    getMinTextElementWidth(
+      getFontString({
+        fontSize: newElement.fontSize,
+        fontFamily: newElement.fontFamily,
+      }),
+      newElement.lineHeight,
+    ),
+  );
+
+  scene.mutateElement(
+    newElement,
+    {
+      x: anchorX - width * anchorRatio,
+      ...(nextY === undefined ? {} : { y: nextY }),
+      width,
+      ...(reach > TEXT_AUTOWRAP_THRESHOLD / zoom ? { autoResize: false } : {}),
+    },
+    { informMutation, isDragging: false },
+  );
 };
 
 export const dragNewElement = ({
@@ -248,6 +349,22 @@ export const dragNewElement = ({
     }
   }
 
+  if (isTextElement(newElement)) {
+    // a text is only ever sized horizontally — its height follows the wrapped
+    // content — so it grows away from the point the drag started at
+    dragNewTextElement({
+      newElement,
+      anchorX: originX + (originOffset?.x ?? 0),
+      anchorRatio: shouldResizeFromCenter ? 0.5 : x < originX ? 1 : 0,
+      pointerX: x,
+      nextY: originY + (originOffset?.y ?? 0),
+      zoom,
+      scene,
+      informMutation,
+    });
+    return;
+  }
+
   let newX = x < originX ? originX - width : originX;
   let newY = y < originY ? originY - height : originY;
 
@@ -256,31 +373,6 @@ export const dragNewElement = ({
     height += height;
     newX = originX - width / 2;
     newY = originY - height / 2;
-  }
-
-  let textAutoResize = null;
-
-  if (isTextElement(newElement)) {
-    height = newElement.height;
-    const minWidth = getMinTextElementWidth(
-      getFontString({
-        fontSize: newElement.fontSize,
-        fontFamily: newElement.fontFamily,
-      }),
-      newElement.lineHeight,
-    );
-    width = Math.max(width, minWidth);
-
-    if (Math.abs(x - originX) > TEXT_AUTOWRAP_THRESHOLD / zoom) {
-      textAutoResize = {
-        autoResize: false,
-      };
-    }
-
-    newY = originY;
-    if (shouldResizeFromCenter) {
-      newX = originX - width / 2;
-    }
   }
 
   if (width !== 0 && height !== 0) {
@@ -299,7 +391,6 @@ export const dragNewElement = ({
         y: newY + (originOffset?.y ?? 0),
         width,
         height,
-        ...textAutoResize,
         ...imageInitialDimension,
       },
       { informMutation, isDragging: false },

@@ -92,6 +92,13 @@ module.exports.woff2BrowserPlugin = () => {
       />
       <link
         rel="preload"
+        href="${OSS_FONTS_CDN}fonts/Assistant/Assistant-SemiBold.woff2"
+        as="font"
+        type="font/woff2"
+        crossorigin="anonymous"
+      />
+      <link
+        rel="preload"
         href="${OSS_FONTS_CDN}fonts/ComicShanns/ComicShanns-Regular-279a7b317d12eb88de06167bd672b4b4.woff2"
         as="font"
         type="font/woff2"

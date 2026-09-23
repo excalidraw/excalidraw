@@ -1,6 +1,11 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
-import { updateElbowArrowPoints } from "@excalidraw/element/elbowArrow";
+import {
+  bumpVersion,
+  getLinearElementSubType,
+  mutateElement,
+  updateElbowArrowPoints,
+} from "@excalidraw/element";
 
 import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 
@@ -8,54 +13,60 @@ import {
   hasBoundTextElement,
   isArrowBoundToElement,
   isArrowElement,
-  isCurvedArrow,
   isElbowArrow,
   isLinearElement,
-  isSharpArrow,
   isUsingAdaptiveRadius,
-} from "@excalidraw/element/typeChecks";
+} from "@excalidraw/element";
 
 import {
   getCommonBoundingBox,
   getElementAbsoluteCoords,
-} from "@excalidraw/element/bounds";
+} from "@excalidraw/element";
 
 import {
   getBoundTextElement,
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
   redrawTextBoundingBox,
-} from "@excalidraw/element/textElement";
+} from "@excalidraw/element";
 
-import { wrapText } from "@excalidraw/element/textWrapping";
+import { wrapText } from "@excalidraw/element";
 
 import {
   assertNever,
   CLASSES,
   getFontString,
   isProdEnv,
+  mapFind,
+  reduceToCommonValue,
+  ROUNDNESS,
+  sceneCoordsToViewportCoords,
   updateActiveTool,
 } from "@excalidraw/common";
 
-import { measureText } from "@excalidraw/element/textMeasurements";
+import { measureText } from "@excalidraw/element";
 
-import { LinearElementEditor } from "@excalidraw/element/linearElementEditor";
+import { LinearElementEditor } from "@excalidraw/element";
 
 import {
   newArrowElement,
   newElement,
   newLinearElement,
-} from "@excalidraw/element/newElement";
+} from "@excalidraw/element";
 
-import { ShapeCache } from "@excalidraw/element/ShapeCache";
+import { ShapeCache } from "@excalidraw/element";
+
+import {
+  isBindableElement,
+  reanchorBindingsToOutline,
+  updateBindings,
+} from "@excalidraw/element";
 
 import type {
   ConvertibleGenericTypes,
   ConvertibleLinearTypes,
   ConvertibleTypes,
-  ExcalidrawArrowElement,
   ExcalidrawDiamondElement,
-  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawEllipseElement,
   ExcalidrawLinearElement,
@@ -64,22 +75,17 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElementWithContainer,
   FixedSegment,
+  NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
+import type { Scene } from "@excalidraw/element";
 
-import {
-  bumpVersion,
-  mutateElement,
-  ROUNDNESS,
-  sceneCoordsToViewportCoords,
-} from "..";
 import { trackEvent } from "../analytics";
-import { atom, editorJotaiStore, useSetAtom } from "../editor-jotai";
-import { updateBindings } from "../../element/src/binding";
+import { atom } from "../editor-jotai";
 
 import "./ConvertElementTypePopup.scss";
-import { ToolButton } from "./ToolButton";
+import { IconButton } from "./IconButton";
 import {
   DiamondIcon,
   elbowArrowIcon,
@@ -96,6 +102,12 @@ import type { AppClassProperties } from "../types";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
+
+type ExcalidrawConvertibleElement =
+  | ExcalidrawRectangleElement
+  | ExcalidrawDiamondElement
+  | ExcalidrawEllipseElement
+  | ExcalidrawLinearElement;
 
 // indicates order of switching
 const GENERIC_TYPES = ["rectangle", "diamond", "ellipse"] as const;
@@ -130,28 +142,21 @@ export const convertElementTypePopupAtom = atom<{
   type: "panel";
 } | null>(null);
 
-// NOTE doesn't need to be an atom. Review once we integrate with properties panel.
-export const fontSize_conversionCacheAtom = atom<{
-  [id: string]: {
-    fontSize: number;
-    elementType: ConvertibleGenericTypes;
-  };
-} | null>(null);
+type CacheKey = string & { _brand: "CacheKey" };
 
-// NOTE doesn't need to be an atom. Review once we integrate with properties panel.
-export const linearElement_conversionCacheAtom = atom<{
-  [id: string]: {
-    properties:
-      | Partial<ExcalidrawLinearElement>
-      | Partial<ExcalidrawElbowArrowElement>;
-    initialType: ConvertibleLinearTypes;
-  };
-} | null>(null);
+const FONT_SIZE_CONVERSION_CACHE = new Map<
+  ExcalidrawElement["id"],
+  {
+    fontSize: number;
+  }
+>();
+
+const LINEAR_ELEMENT_CONVERSION_CACHE = new Map<
+  CacheKey,
+  ExcalidrawLinearElement
+>();
 
 const ConvertElementTypePopup = ({ app }: { app: App }) => {
-  const setFontSizeCache = useSetAtom(fontSize_conversionCacheAtom);
-  const setLinearElementCache = useSetAtom(linearElement_conversionCacheAtom);
-
   const selectedElements = app.scene.getSelectedElements(app.state);
   const elementsCategoryRef = useRef<ConversionType>(null);
 
@@ -178,10 +183,10 @@ const ConvertElementTypePopup = ({ app }: { app: App }) => {
 
   useEffect(() => {
     return () => {
-      setFontSizeCache(null);
-      setLinearElementCache(null);
+      FONT_SIZE_CONVERSION_CACHE.clear();
+      LINEAR_ELEMENT_CONVERSION_CACHE.clear();
     };
-  }, [setFontSizeCache, setLinearElementCache]);
+  }, []);
 
   return <Panel app={app} elements={selectedElements} />;
 };
@@ -191,7 +196,7 @@ const Panel = ({
   elements,
 }: {
   app: App;
-  elements: ExcalidrawElement[];
+  elements: readonly NonDeletedExcalidrawElement[];
 }) => {
   const conversionType = getConversionTypeFromElements(elements);
 
@@ -214,7 +219,8 @@ const Panel = ({
       : conversionType === "linear"
       ? linearElements.every(
           (element) =>
-            getArrowType(element) === getArrowType(linearElements[0]),
+            getLinearElementSubType(element) ===
+            getLinearElementSubType(linearElements[0]),
         )
       : false;
 
@@ -263,51 +269,29 @@ const Panel = ({
   }, [genericElements, linearElements, app.scene, app.state]);
 
   useEffect(() => {
-    if (editorJotaiStore.get(linearElement_conversionCacheAtom)) {
-      return;
-    }
-
     for (const linearElement of linearElements) {
-      const initialType = getArrowType(linearElement);
-      const cachedProperties =
-        initialType === "line"
-          ? getLineProperties(linearElement)
-          : initialType === "sharpArrow"
-          ? getSharpArrowProperties(linearElement)
-          : initialType === "curvedArrow"
-          ? getCurvedArrowProperties(linearElement)
-          : initialType === "elbowArrow"
-          ? getElbowArrowProperties(linearElement)
-          : {};
-
-      editorJotaiStore.set(linearElement_conversionCacheAtom, {
-        ...editorJotaiStore.get(linearElement_conversionCacheAtom),
-        [linearElement.id]: {
-          properties: cachedProperties,
-          initialType,
-        },
-      });
+      const cacheKey = toCacheKey(
+        linearElement.id,
+        getConvertibleType(linearElement),
+      );
+      if (!LINEAR_ELEMENT_CONVERSION_CACHE.has(cacheKey)) {
+        LINEAR_ELEMENT_CONVERSION_CACHE.set(cacheKey, linearElement);
+      }
     }
   }, [linearElements]);
 
   useEffect(() => {
-    if (editorJotaiStore.get(fontSize_conversionCacheAtom)) {
-      return;
-    }
-
     for (const element of genericElements) {
-      const boundText = getBoundTextElement(
-        element,
-        app.scene.getNonDeletedElementsMap(),
-      );
-      if (boundText) {
-        editorJotaiStore.set(fontSize_conversionCacheAtom, {
-          ...editorJotaiStore.get(fontSize_conversionCacheAtom),
-          [element.id]: {
+      if (!FONT_SIZE_CONVERSION_CACHE.has(element.id)) {
+        const boundText = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        if (boundText) {
+          FONT_SIZE_CONVERSION_CACHE.set(element.id, {
             fontSize: boundText.fontSize,
-            elementType: element.type as ConvertibleGenericTypes,
-          },
-        });
+          });
+        }
       }
     }
   }, [genericElements, app.scene]);
@@ -349,21 +333,22 @@ const Panel = ({
           sameType &&
           ((conversionType === "generic" && genericElements[0].type === type) ||
             (conversionType === "linear" &&
-              getArrowType(linearElements[0]) === type));
+              getLinearElementSubType(linearElements[0]) === type));
 
         return (
-          <ToolButton
-            className="Shape"
+          <IconButton
             key={`${elements[0].id}${elements[0].version}_${type}`}
-            type="radio"
+            type="toggle"
             icon={icon}
             checked={isSelected}
-            name="convertElementType-option"
             title={type}
-            keyBindingLabel={""}
             aria-label={type}
             data-testid={`toolbar-${type}`}
-            onChange={() => {
+            onSelect={() => {
+              // selecting the already-selected type is a no-op
+              if (isSelected) {
+                return;
+              }
               if (app.state.activeTool.type !== type) {
                 trackEvent("convertElementType", type, "ui");
               }
@@ -474,7 +459,7 @@ export const convertElementTypes = (
       ];
 
     if (nextType && isConvertibleGenericType(nextType)) {
-      const convertedElements: Record<string, ExcalidrawElement> = {};
+      const convertedElements: Record<string, NonDeletedExcalidrawElement> = {};
 
       for (const element of convertibleGenericElements) {
         const convertedElement = convertElementType(element, nextType, app);
@@ -494,19 +479,21 @@ export const convertElementTypes = (
       app.scene.replaceAllElements(nextElements);
 
       for (const element of Object.values(convertedElements)) {
+        if (isBindableElement(element)) {
+          reanchorBindingsToOutline(element, app.scene, app.state.zoom);
+          updateBindings(element, app.scene, app.state);
+        }
+
         const boundText = getBoundTextElement(
           element,
           app.scene.getNonDeletedElementsMap(),
         );
         if (boundText) {
-          if (
-            editorJotaiStore.get(fontSize_conversionCacheAtom)?.[element.id]
-              ?.elementType === nextType
-          ) {
+          if (FONT_SIZE_CONVERSION_CACHE.get(element.id)) {
             mutateElement(boundText, app.scene.getNonDeletedElementsMap(), {
               fontSize:
-                editorJotaiStore.get(fontSize_conversionCacheAtom)?.[element.id]
-                  ?.fontSize ?? boundText.fontSize,
+                FONT_SIZE_CONVERSION_CACHE.get(element.id)?.fontSize ??
+                boundText.fontSize,
             });
           }
 
@@ -530,128 +517,105 @@ export const convertElementTypes = (
   }
 
   if (conversionType === "linear") {
-    const convertibleLinearElements = filterLinearConvertibleElements(
-      selectedElements,
-    ) as ExcalidrawLinearElement[];
+    const convertibleLinearElements =
+      filterLinearConvertibleElements(selectedElements);
 
-    const arrowType = getArrowType(convertibleLinearElements[0]);
-    const sameType = convertibleLinearElements.every(
-      (element) => getArrowType(element) === arrowType,
-    );
+    if (!nextType) {
+      const commonSubType = reduceToCommonValue(
+        convertibleLinearElements,
+        getLinearElementSubType,
+      );
 
-    const index = sameType ? LINEAR_TYPES.indexOf(arrowType) : -1;
-    nextType =
-      nextType ??
-      LINEAR_TYPES[
-        (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
-      ];
+      const index = commonSubType ? LINEAR_TYPES.indexOf(commonSubType) : -1;
+      nextType =
+        LINEAR_TYPES[
+          (index + LINEAR_TYPES.length + advancement) % LINEAR_TYPES.length
+        ];
+    }
 
-    if (nextType && isConvertibleLinearType(nextType)) {
-      const convertedElements: Record<string, ExcalidrawElement> = {};
+    if (isConvertibleLinearType(nextType)) {
+      const convertedElements: ExcalidrawElement[] = [];
+
+      const nextElementsMap: Map<ExcalidrawElement["id"], ExcalidrawElement> =
+        app.scene.getElementsMapIncludingDeleted();
+
       for (const element of convertibleLinearElements) {
-        const { properties, initialType } =
-          editorJotaiStore.get(linearElement_conversionCacheAtom)?.[
-            element.id
-          ] || {};
+        const cachedElement = LINEAR_ELEMENT_CONVERSION_CACHE.get(
+          toCacheKey(element.id, nextType),
+        );
 
-        // If the initial type is not elbow, and when we switch to elbow,
-        // the linear line might be "bent" and the points would likely be different.
-        // When we then switch to other non elbow types from this converted elbow,
-        // we still want to use the original points instead.
+        // if switching to the original subType or a subType we've already
+        // converted to, reuse the cached element to get the original properties
+        // (needed for simple->elbow->simple conversions or between line
+        // and arrows)
         if (
-          initialType &&
-          properties &&
-          isElbowArrow(element) &&
-          initialType !== "elbowArrow" &&
-          nextType !== "elbowArrow"
+          cachedElement &&
+          getLinearElementSubType(cachedElement) === nextType
         ) {
-          // first convert back to the original type
-          const originalType = convertElementType(
-            element,
-            initialType,
-            app,
-          ) as ExcalidrawLinearElement;
-          // then convert to the target type
-          const converted = convertElementType(
-            initialType === "line"
-              ? newLinearElement({
-                  ...originalType,
-                  ...properties,
-                  type: "line",
-                })
-              : newArrowElement({
-                  ...originalType,
-                  ...properties,
-                  type: "arrow",
-                }),
-            nextType,
-            app,
-          );
-          convertedElements[converted.id] = converted;
+          nextElementsMap.set(cachedElement.id, cachedElement);
+          convertedElements.push(cachedElement);
         } else {
           const converted = convertElementType(element, nextType, app);
-          convertedElements[converted.id] = converted;
+          nextElementsMap.set(converted.id, converted);
+          convertedElements.push(converted);
         }
       }
 
-      const nextElements = [];
+      app.scene.replaceAllElements(nextElementsMap);
 
-      for (const element of app.scene.getElementsIncludingDeleted()) {
-        if (convertedElements[element.id]) {
-          nextElements.push(convertedElements[element.id]);
-        } else {
-          nextElements.push(element);
-        }
-      }
-
-      app.scene.replaceAllElements(nextElements);
-
-      for (const element of Object.values(convertedElements)) {
-        const cachedLinear = editorJotaiStore.get(
-          linearElement_conversionCacheAtom,
-        )?.[element.id];
-
-        if (cachedLinear) {
-          const { properties, initialType } = cachedLinear;
-
-          if (initialType === nextType) {
-            mutateElement(
+      // post normalization
+      for (const element of convertedElements) {
+        if (isLinearElement(element)) {
+          if (isElbowArrow(element)) {
+            const nextPoints = convertLineToElbow(element);
+            if (nextPoints.length < 2) {
+              // skip if not enough points to form valid segments
+              continue;
+            }
+            const fixedSegments: FixedSegment[] = [];
+            for (let i = 1; i < nextPoints.length - 2; i++) {
+              fixedSegments.push({
+                start: nextPoints[i],
+                end: nextPoints[i + 1],
+                index: i + 1,
+              });
+            }
+            const updates = updateElbowArrowPoints(
               element,
               app.scene.getNonDeletedElementsMap(),
-              properties,
+              {
+                points: nextPoints,
+                fixedSegments,
+              },
             );
-            continue;
-          }
-        }
-
-        if (isElbowArrow(element)) {
-          const nextPoints = convertLineToElbow(element);
-          if (nextPoints.length < 2) {
-            // skip if not enough points to form valid segments
-            continue;
-          }
-          const fixedSegments: FixedSegment[] = [];
-          for (let i = 0; i < nextPoints.length - 1; i++) {
-            fixedSegments.push({
-              start: nextPoints[i],
-              end: nextPoints[i + 1],
-              index: i + 1,
+            mutateElement(element, app.scene.getNonDeletedElementsMap(), {
+              ...updates,
+              endArrowhead: "arrow",
             });
+          } else {
+            // if we're converting to non-elbow linear element, check if
+            // we've already cached one of these linear elements so we can
+            // reuse the points (case: curved->elbow->line and similar)
+
+            const similarCachedLinearElement = mapFind(
+              ["line", "sharpArrow", "curvedArrow"] as const,
+              (type) =>
+                LINEAR_ELEMENT_CONVERSION_CACHE.get(
+                  toCacheKey(element.id, type),
+                ),
+            );
+
+            if (similarCachedLinearElement) {
+              const points = similarCachedLinearElement.points;
+              app.scene.mutateElement(element, {
+                points,
+              });
+            }
           }
-          const updates = updateElbowArrowPoints(
-            element,
-            app.scene.getNonDeletedElementsMap(),
-            {
-              points: nextPoints,
-              fixedSegments,
-            },
-          );
-          mutateElement(element, app.scene.getNonDeletedElementsMap(), {
-            ...updates,
-          });
         }
       }
     }
+
     const convertedSelectedLinearElements = filterLinearConvertibleElements(
       app.scene.getSelectedElements(app.state),
     );
@@ -675,7 +639,7 @@ export const convertElementTypes = (
 };
 
 export const getConversionTypeFromElements = (
-  elements: ExcalidrawElement[],
+  elements: readonly ExcalidrawElement[],
 ): ConversionType => {
   if (elements.length === 0) {
     return null;
@@ -707,96 +671,37 @@ const isEligibleLinearElement = (element: ExcalidrawElement) => {
   );
 };
 
-const getArrowType = (element: ExcalidrawLinearElement) => {
-  if (isSharpArrow(element)) {
-    return "sharpArrow";
-  }
-  if (isCurvedArrow(element)) {
-    return "curvedArrow";
-  }
-  if (isElbowArrow(element)) {
-    return "elbowArrow";
-  }
-  return "line";
+const toCacheKey = (
+  elementId: ExcalidrawElement["id"],
+  convertitleType: ConvertibleTypes,
+) => {
+  return `${elementId}:${convertitleType}` as CacheKey;
 };
 
-const getLineProperties = (
-  element: ExcalidrawLinearElement,
-): Partial<ExcalidrawLinearElement> => {
-  if (element.type === "line") {
-    return {
-      points: element.points,
-      roundness: element.roundness,
-    };
-  }
-  return {};
-};
-
-const getSharpArrowProperties = (
-  element: ExcalidrawLinearElement,
-): Partial<ExcalidrawArrowElement> => {
-  if (isSharpArrow(element)) {
-    return {
-      points: element.points,
-      startArrowhead: element.startArrowhead,
-      endArrowhead: element.endArrowhead,
-      startBinding: element.startBinding,
-      endBinding: element.endBinding,
-      roundness: null,
-    };
-  }
-
-  return {};
-};
-
-const getCurvedArrowProperties = (
-  element: ExcalidrawLinearElement,
-): Partial<ExcalidrawArrowElement> => {
-  if (isCurvedArrow(element)) {
-    return {
-      points: element.points,
-      startArrowhead: element.startArrowhead,
-      endArrowhead: element.endArrowhead,
-      startBinding: element.startBinding,
-      endBinding: element.endBinding,
-      roundness: element.roundness,
-    };
-  }
-
-  return {};
-};
-
-const getElbowArrowProperties = (
-  element: ExcalidrawLinearElement,
-): Partial<ExcalidrawElbowArrowElement> => {
-  if (isElbowArrow(element)) {
-    return {
-      points: element.points,
-      startArrowhead: element.startArrowhead,
-      endArrowhead: element.endArrowhead,
-      startBinding: element.startBinding,
-      endBinding: element.endBinding,
-      roundness: null,
-      fixedSegments: element.fixedSegments,
-      startIsSpecial: element.startIsSpecial,
-      endIsSpecial: element.endIsSpecial,
-    };
-  }
-
-  return {};
-};
-
-const filterGenericConvetibleElements = (elements: ExcalidrawElement[]) =>
+const filterGenericConvetibleElements = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+) =>
   elements.filter((element) => isConvertibleGenericType(element.type)) as Array<
-    | ExcalidrawRectangleElement
-    | ExcalidrawDiamondElement
-    | ExcalidrawEllipseElement
+    T extends NonDeletedExcalidrawElement
+      ? NonDeleted<
+          | ExcalidrawRectangleElement
+          | ExcalidrawDiamondElement
+          | ExcalidrawEllipseElement
+        >
+      :
+          | ExcalidrawRectangleElement
+          | ExcalidrawDiamondElement
+          | ExcalidrawEllipseElement
   >;
 
-const filterLinearConvertibleElements = (elements: ExcalidrawElement[]) =>
+const filterLinearConvertibleElements = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+) =>
   elements.filter((element) =>
     isEligibleLinearElement(element),
-  ) as ExcalidrawLinearElement[];
+  ) as (T extends NonDeletedExcalidrawElement
+    ? NonDeleted<ExcalidrawLinearElement>
+    : ExcalidrawLinearElement)[];
 
 const THRESHOLD = 20;
 const isVert = (a: LocalPoint, b: LocalPoint) => a[0] === b[0];
@@ -926,12 +831,15 @@ const sanitizePoints = (points: readonly LocalPoint[]): LocalPoint[] => {
  *   e.g. elbow arrow -> line
  */
 const convertElementType = <
-  TElement extends Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  TElement extends Exclude<
+    NonDeletedExcalidrawElement,
+    ExcalidrawSelectionElement
+  >,
 >(
   element: TElement,
   targetType: ConvertibleTypes,
   app: AppClassProperties,
-): ExcalidrawElement => {
+): NonDeletedExcalidrawElement => {
   if (!isValidConversion(element.type, targetType)) {
     if (!isProdEnv()) {
       throw Error(`Invalid conversion from ${element.type} to ${targetType}.`);
@@ -950,18 +858,15 @@ const convertElementType = <
       newElement({
         ...element,
         type: targetType,
-        roundness:
-          targetType === "diamond" && element.roundness
-            ? {
-                type: isUsingAdaptiveRadius(targetType)
-                  ? ROUNDNESS.ADAPTIVE_RADIUS
-                  : ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
-            : element.roundness,
+        roundness: element.roundness
+          ? {
+              type: isUsingAdaptiveRadius(targetType)
+                ? ROUNDNESS.ADAPTIVE_RADIUS
+                : ROUNDNESS.PROPORTIONAL_RADIUS,
+            }
+          : element.roundness,
       }),
     ) as typeof element;
-
-    updateBindings(nextElement, app.scene);
 
     return nextElement;
   }
@@ -1042,6 +947,15 @@ const isValidConversion = (
   // NOTE: add more conversions when needed
 
   return false;
+};
+
+const getConvertibleType = (
+  element: ExcalidrawConvertibleElement,
+): ConvertibleTypes => {
+  if (isLinearElement(element)) {
+    return getLinearElementSubType(element);
+  }
+  return element.type;
 };
 
 export default ConvertElementTypePopup;

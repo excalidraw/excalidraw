@@ -47,42 +47,43 @@ class DataTransferItem {
   }
 }
 
-class DataTransferList {
-  items: DataTransferItem[] = [];
-
+class DataTransferItemList extends Array<DataTransferItem> {
   add(data: string | File, type: string = ""): void {
     if (typeof data === "string") {
-      this.items.push(new DataTransferItem("string", type, data));
+      this.push(new DataTransferItem("string", type, data));
     } else if (data instanceof File) {
-      this.items.push(new DataTransferItem("file", type, data));
+      this.push(new DataTransferItem("file", type, data));
     }
   }
 
   clear(): void {
-    this.items = [];
+    this.clear();
   }
 }
 
 class DataTransfer {
-  public items: DataTransferList = new DataTransferList();
-  private _types: Record<string, string> = {};
+  public items: DataTransferItemList = new DataTransferItemList();
 
   get files() {
-    return this.items.items
+    return this.items
       .filter((item) => item.kind === "file")
       .map((item) => item.getAsFile()!);
   }
 
   add(data: string | File, type: string = ""): void {
-    this.items.add(data, type);
+    if (typeof data === "string") {
+      this.items.add(data, type);
+    } else {
+      this.items.add(data);
+    }
   }
 
   setData(type: string, value: string) {
-    this._types[type] = value;
+    this.items.add(value, type);
   }
 
   getData(type: string) {
-    return this._types[type] || "";
+    return this.items.find((item) => item.type === type)?.data || "";
   }
 }
 
@@ -92,4 +93,43 @@ export const testPolyfills = {
   DataTransferItem,
   // https://github.com/vitest-dev/vitest/pull/4164#issuecomment-2172729965
   URL,
+};
+
+export const PolyfillLocalStorage = () => {
+  // Node.js 25+ provides a native localStorage global that shadows jsdom's,
+  // and jsdom's own localStorage also uses the native one -- both are broken
+  // (empty objects without Storage methods). On older Node versions, jsdom
+  // provides a working localStorage. This polyfill replaces localStorage on
+  // all supported versions with a standard Storage implementation backed by
+  // a Map, ensuring consistent behavior regardless of the Node.js version.
+  const storage = new Map<string, string>();
+  const storagePolyfill: Storage = {
+    get length() {
+      return storage.size;
+    },
+    clear() {
+      storage.clear();
+    },
+    key(index) {
+      return Array.from(storage.keys())[index] ?? null;
+    },
+    getItem(key) {
+      return storage.get(key) ?? null;
+    },
+    setItem(key, value) {
+      storage.set(key, value);
+    },
+    removeItem(key) {
+      storage.delete(key);
+    },
+    *[Symbol.iterator]() {
+      yield* storage.entries();
+    },
+  };
+
+  Object.defineProperty(window, "localStorage", {
+    value: storagePolyfill,
+    writable: true,
+    configurable: true,
+  });
 };

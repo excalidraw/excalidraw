@@ -1,19 +1,14 @@
 import { getNonDeletedElements } from "@excalidraw/element";
-import {
-  bindOrUnbindLinearElements,
-  isBindingEnabled,
-} from "@excalidraw/element/binding";
-import { getCommonBoundingBox } from "@excalidraw/element/bounds";
-import { newElementWith } from "@excalidraw/element/mutateElement";
-import { deepCopyElement } from "@excalidraw/element/duplicate";
-import { resizeMultipleElements } from "@excalidraw/element/resizeElements";
-import {
-  isArrowElement,
-  isElbowArrow,
-  isLinearElement,
-} from "@excalidraw/element/typeChecks";
-import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element/frame";
+import { bindOrUnbindBindingElements } from "@excalidraw/element";
+import { getCommonBoundingBox } from "@excalidraw/element";
+import { newElementWith } from "@excalidraw/element";
+import { deepCopyElement } from "@excalidraw/element";
+import { resizeMultipleElements } from "@excalidraw/element";
+import { isArrowElement, isElbowArrow } from "@excalidraw/element";
+import { updateFrameMembershipOfSelectedElements } from "@excalidraw/element";
 import { CODES, KEYS, arrayToMap } from "@excalidraw/common";
+
+import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type {
   ExcalidrawArrowElement,
@@ -24,7 +19,6 @@ import type {
 } from "@excalidraw/element/types";
 
 import { getSelectedElements } from "../scene";
-import { CaptureUpdateAction } from "../store";
 
 import { flipHorizontal, flipVertical } from "../components/icons";
 
@@ -102,7 +96,6 @@ const flipSelectedElements = (
   const updatedElements = flipElements(
     selectedElements,
     elementsMap,
-    appState,
     flipDirection,
     app,
   );
@@ -117,7 +110,6 @@ const flipSelectedElements = (
 const flipElements = (
   selectedElements: NonDeleted<ExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  appState: AppState,
   flipDirection: "horizontal" | "vertical",
   app: AppClassProperties,
 ): ExcalidrawElement[] => {
@@ -157,12 +149,10 @@ const flipElements = (
     },
   );
 
-  bindOrUnbindLinearElements(
-    selectedElements.filter(isLinearElement),
-    isBindingEnabled(appState),
-    [],
+  bindOrUnbindBindingElements(
+    selectedElements.filter(isArrowElement),
     app.scene,
-    appState.zoom,
+    app.state,
   );
 
   // ---------------------------------------------------------------------------

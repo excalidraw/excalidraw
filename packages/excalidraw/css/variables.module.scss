@@ -1,4 +1,27 @@
-@import "open-color/open-color.scss";
+$color-red-1: #ffe3e3;
+$color-red-3: #ffa8a8;
+$color-red-6: #fa5252;
+$color-red-7: #f03e3e;
+$color-red-8: #e03131;
+$color-red-9: #c92a2a;
+$color-gray-1: #f1f3f5;
+$color-gray-2: #e9ecef;
+$color-gray-4: #ced4da;
+$color-gray-5: #adb5bd;
+$color-gray-6: #868e96;
+$color-gray-7: #495057;
+$color-gray-8: #343a40;
+$color-green-0: #ebfbee;
+$color-green-2: #b2f2bb;
+$color-green-4: #69db7c;
+$color-green-9: #2b8a3e;
+$color-blue-1: #d0ebff;
+$color-blue-2: #a5d8ff;
+$color-blue-4: #4dabf7;
+$color-blue-5: #339af0;
+$color-blue-6: #228be6;
+$color-blue-7: #1c7ed6;
+$color-blue-8: #1971c2;
 
 @mixin isMobile() {
   @at-root .excalidraw--mobile#{&} {
@@ -6,29 +29,25 @@
   }
 }
 
+// the .ToolIcon_type_toggle.ToolIcon--checked selectors use both classes so
+// they keep outranking the :hover/:active rules below
 @mixin toolbarButtonColorStates {
   &.fillable {
-    .ToolIcon_type_radio,
-    .ToolIcon_type_checkbox {
-      &:checked + .ToolIcon__icon {
-        --icon-fill-color: var(--color-on-primary-container);
+    &.ToolIcon_type_toggle.ToolIcon--checked .ToolIcon__icon {
+      --icon-fill-color: var(--color-on-primary-container);
 
-        svg {
-          fill: var(--icon-fill-color);
-        }
+      svg {
+        fill: var(--icon-fill-color);
       }
     }
   }
 
-  .ToolIcon_type_radio,
-  .ToolIcon_type_checkbox {
-    &:checked + .ToolIcon__icon {
-      background: var(--color-surface-primary-container);
-      --keybinding-color: var(--color-on-primary-container);
+  &.ToolIcon_type_toggle.ToolIcon--checked .ToolIcon__icon {
+    background: var(--color-surface-primary-container);
+    --keybinding-color: var(--color-on-primary-container);
 
-      svg {
-        color: var(--color-on-primary-container);
-      }
+    svg {
+      color: var(--color-on-primary-container);
     }
   }
 
@@ -57,6 +76,29 @@
 
       svg {
         color: var(--color-disabled);
+      }
+    }
+  }
+
+  // disabled toggle buttons (e.g. non-forced tools while `props.activeTool`
+  // is set) — greyed out, without hover/active affordances
+  &.ToolIcon_type_toggle:disabled {
+    cursor: default;
+    --keybinding-color: var(--color-disabled);
+
+    .ToolIcon__icon {
+      svg {
+        color: var(--color-disabled);
+      }
+
+      &:hover,
+      &:active {
+        background: initial;
+        border: none;
+
+        svg {
+          color: var(--color-disabled);
+        }
       }
     }
   }
@@ -101,7 +143,8 @@
     border-color: var(--button-active-border, var(--color-primary-darkest));
   }
 
-  &.active {
+  &.active,
+  &.ToolIcon--checked {
     background-color: var(
       --button-selected-bg,
       var(--color-surface-primary-container)
@@ -122,11 +165,25 @@
       color: var(--button-color, var(--color-on-primary-container));
     }
   }
+
+  @include isMobile() {
+    width: var(--mobile-action-button-size, var(--default-button-size));
+    height: var(--mobile-action-button-size, var(--default-button-size));
+  }
+}
+
+@mixin buttonNoHighlight {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 @mixin outlineButtonIconStyles {
   @include outlineButtonStyles;
-  padding: 0;
+
+  & {
+    padding: 0;
+  }
 
   svg {
     width: var(--default-icon-size);
@@ -186,5 +243,10 @@
 
   &:active {
     box-shadow: 0 0 0 1px var(--color-brand-active);
+  }
+
+  @include isMobile() {
+    width: var(--mobile-action-button-size, 2rem);
+    height: var(--mobile-action-button-size, 2rem);
   }
 }

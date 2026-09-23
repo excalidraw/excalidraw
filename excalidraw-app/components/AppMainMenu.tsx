@@ -3,6 +3,7 @@ import {
   ExcalLogo,
   eyeIcon,
 } from "@excalidraw/excalidraw/components/icons";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
 
@@ -20,9 +21,9 @@ export const AppMainMenu: React.FC<{
   isCollaborating: boolean;
   isCollabEnabled: boolean;
   theme: Theme | "system";
-  setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
 }> = React.memo((props) => {
+  const { t } = useI18n();
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
@@ -57,12 +58,12 @@ export const AppMainMenu: React.FC<{
         }?utm_source=signin&utm_medium=app&utm_content=hamburger`}
         className="highlighted"
       >
-        {isExcalidrawPlusSignedUser ? "Sign in" : "Sign up"}
+        {isExcalidrawPlusSignedUser ? t("labels.signIn") : t("labels.signUp")}
       </MainMenu.ItemLink>
       {isDevEnv() && (
         <MainMenu.Item
           icon={eyeIcon}
-          onClick={() => {
+          onSelect={() => {
             if (window.visualDebug) {
               delete window.visualDebug;
               saveDebugState({ enabled: false });
@@ -77,11 +78,8 @@ export const AppMainMenu: React.FC<{
         </MainMenu.Item>
       )}
       <MainMenu.Separator />
-      <MainMenu.DefaultItems.ToggleTheme
-        allowSystemTheme
-        theme={props.theme}
-        onSelect={props.setTheme}
-      />
+      <MainMenu.DefaultItems.Preferences />
+      <MainMenu.DefaultItems.ToggleTheme allowSystemTheme theme={props.theme} />
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>

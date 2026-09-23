@@ -1,14 +1,20 @@
 import {
   DiagramToCodePlugin,
   exportToBlob,
+  getNonDeletedElements,
   getTextFromElements,
   MIME_TYPES,
+  parseSSEStream,
   TTDDialog,
+  TTDStreamFetch,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
 
+import type { StreamChunk } from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
+
+import { TTDIndexedDBAdapter } from "../data/TTDStorage";
 
 export const AIComponents = ({
   excalidrawAPI,
@@ -18,11 +24,18 @@ export const AIComponents = ({
   return (
     <>
       <DiagramToCodePlugin
-        generate={async ({ frame, children }) => {
+        generate={async ({ frame, children, onPartial }) => {
           const appState = excalidrawAPI.getAppState();
 
+          // SAFETY: This should never happen, but log it just in case
+          if (children.some((el) => el.isDeleted)) {
+            console.error(
+              "[NONDELETED][INVARIANT] Generated children elements should not be `isDeleted: true`",
+            );
+          }
+
           const blob = await exportToBlob({
-            elements: children,
+            elements: getNonDeletedElements(children),
             appState: {
               ...appState,
               exportBackground: true,
@@ -40,11 +53,11 @@ export const AIComponents = ({
           const response = await fetch(
             `${
               import.meta.env.VITE_APP_AI_BACKEND
-            }/v1/ai/diagram-to-code/generate`,
+            }/v1/ai/diagram-to-code/generate-streaming`,
             {
               method: "POST",
               headers: {
-                Accept: "application/json",
+                Accept: "text/event-stream",
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
@@ -83,77 +96,78 @@ export const AIComponents = ({
             throw new Error(errorJSON.message || text);
           }
 
-          try {
-            const { html } = await response.json();
+          const reader = response.body?.getReader();
 
-            if (!html) {
-              throw new Error("Generation failed (invalid response)");
-            }
-            return {
-              html,
-            };
-          } catch (error: any) {
+          if (!reader) {
             throw new Error("Generation failed (invalid response)");
           }
+
+          let html = "";
+          let streamError: Error | null = null;
+
+          for await (const data of parseSSEStream(reader)) {
+            if (data === "[DONE]") {
+              break;
+            }
+
+            const chunk = safelyParseJSON(data) as StreamChunk | null;
+
+            if (!chunk) {
+              continue;
+            }
+
+            switch (chunk.type) {
+              case "content": {
+                if (chunk.delta) {
+                  html += chunk.delta;
+                  onPartial?.(html);
+                }
+                break;
+              }
+              case "error": {
+                streamError = new Error(
+                  chunk.error.message || "Generation failed",
+                );
+                break;
+              }
+              case "done": {
+                break;
+              }
+            }
+          }
+
+          if (streamError) {
+            throw streamError;
+          }
+
+          if (!html.trim()) {
+            throw new Error("Generation failed (invalid response)");
+          }
+
+          return {
+            html,
+          };
         }}
       />
 
       <TTDDialog
-        onTextSubmit={async (input) => {
-          try {
-            const response = await fetch(
-              `${
-                import.meta.env.VITE_APP_AI_BACKEND
-              }/v1/ai/text-to-diagram/generate`,
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ prompt: input }),
-              },
-            );
+        onTextSubmit={async (props) => {
+          const { onChunk, onStreamCreated, signal, messages } = props;
 
-            const rateLimit = response.headers.has("X-Ratelimit-Limit")
-              ? parseInt(response.headers.get("X-Ratelimit-Limit") || "0", 10)
-              : undefined;
+          const result = await TTDStreamFetch({
+            url: `${
+              import.meta.env.VITE_APP_AI_BACKEND
+            }/v1/ai/text-to-diagram/chat-streaming`,
+            messages,
+            onChunk,
+            onStreamCreated,
+            extractRateLimits: true,
+            signal,
+          });
 
-            const rateLimitRemaining = response.headers.has(
-              "X-Ratelimit-Remaining",
-            )
-              ? parseInt(
-                  response.headers.get("X-Ratelimit-Remaining") || "0",
-                  10,
-                )
-              : undefined;
-
-            const json = await response.json();
-
-            if (!response.ok) {
-              if (response.status === 429) {
-                return {
-                  rateLimit,
-                  rateLimitRemaining,
-                  error: new Error(
-                    "Too many requests today, please try again tomorrow!",
-                  ),
-                };
-              }
-
-              throw new Error(json.message || "Generation failed...");
-            }
-
-            const generatedResponse = json.generatedResponse;
-            if (!generatedResponse) {
-              throw new Error("Generation failed...");
-            }
-
-            return { generatedResponse, rateLimit, rateLimitRemaining };
-          } catch (err: any) {
-            throw new Error("Request failed");
-          }
+          return result;
         }}
+        persistenceAdapter={TTDIndexedDBAdapter}
       />
     </>
   );

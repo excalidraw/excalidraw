@@ -6,28 +6,33 @@ import {
   copyToClipboard,
 } from "@excalidraw/excalidraw/clipboard";
 import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
+import { getNonDeletedElements } from "@excalidraw/element";
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import { restore } from "@excalidraw/excalidraw/data/restore";
+import {
+  restoreAppState,
+  restoreElements,
+} from "@excalidraw/excalidraw/data/restore";
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
 } from "@excalidraw/excalidraw/scene/export";
 
 import type {
-  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 
 export { MIME_TYPES };
 
 type ExportOpts = {
-  elements: readonly NonDeleted<ExcalidrawElement>[];
+  /** restored before exporting */
+  elements: readonly NonDeletedExcalidrawElement[];
   appState?: Partial<Omit<AppState, "offsetTop" | "offsetLeft">>;
   files: BinaryFiles | null;
   maxWidthOrHeight?: number;
-  exportingFrame?: ExcalidrawFrameLikeElement | null;
+  exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   getDimensions?: (
     width: number,
     height: number,
@@ -45,11 +50,13 @@ export const exportToCanvas = ({
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
-  const { elements: restoredElements, appState: restoredAppState } = restore(
-    { elements, appState },
-    null,
-    null,
+  const restoredElements = getNonDeletedElements(
+    restoreElements(elements, null, {
+      deleteInvisibleElements: true,
+    }),
   );
+  const restoredAppState = restoreAppState(appState, null);
+
   const { exportBackground, viewBackgroundColor } = restoredAppState;
   return _exportToCanvas(
     restoredElements,
@@ -144,8 +151,8 @@ export const exportToBlob = async (
             metadata: serializeAsJSON(
               // NOTE as long as we're using the Scene hack, we need to ensure
               // we pass the original, uncloned elements when serializing
-              // so that we keep ids stable
-              opts.elements,
+              // so that we keep ids stable (restoring keeps the ids)
+              restoreElements(opts.elements, null),
               opts.appState,
               opts.files || {},
               "local",
@@ -175,11 +182,12 @@ export const exportToSvg = async ({
   skipInliningFonts?: true;
   reuseImages?: boolean;
 }): Promise<SVGSVGElement> => {
-  const { elements: restoredElements, appState: restoredAppState } = restore(
-    { elements, appState },
-    null,
-    null,
+  const restoredElements = getNonDeletedElements(
+    restoreElements(elements, null, {
+      deleteInvisibleElements: true,
+    }),
   );
+  const restoredAppState = restoreAppState(appState, null);
 
   const exportAppState = {
     ...restoredAppState,
@@ -207,7 +215,10 @@ export const exportToClipboard = async (
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob(opts));
   } else if (opts.type === "json") {
-    await copyToClipboard(opts.elements, opts.files);
+    await copyToClipboard(
+      getNonDeletedElements(restoreElements(opts.elements, null)),
+      opts.files,
+    );
   } else {
     throw new Error("Invalid export type");
   }

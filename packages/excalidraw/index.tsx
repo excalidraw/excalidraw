@@ -1,14 +1,33 @@
-import React, { useEffect } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import { DEFAULT_UI_OPTIONS, isShallowEqual } from "@excalidraw/common";
+import {
+  applyDarkModeFilter,
+  DEFAULT_IMAGE_OPTIONS,
+  DEFAULT_UI_OPTIONS,
+  getStrokeWidthByKey,
+  isShallowEqual,
+} from "@excalidraw/common";
 
-import App from "./components/App";
+import App, {
+  ExcalidrawAPIContext,
+  ExcalidrawAPISetContext,
+} from "./components/App";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
 import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import { defaultLang } from "./i18n";
+import {
+  useAppStateValue as _useAppStateValue,
+  useOnAppStateChange as _useOnAppStateChange,
+} from "./hooks/useAppStateValue";
 import { EditorJotaiProvider, editorJotaiStore } from "./editor-jotai";
 import polyfill from "./polyfill";
 
@@ -16,20 +35,58 @@ import "./css/app.scss";
 import "./css/styles.scss";
 import "./fonts/fonts.css";
 
-import type { AppProps, ExcalidrawProps } from "./types";
+import type {
+  AppProps,
+  AppState,
+  ExcalidrawImperativeAPI,
+  ExcalidrawProps,
+} from "./types";
 
 polyfill();
 
+/**
+ * Stateless provider that allows `useExcalidrawAPI()` (and hooks built
+ * on it, such as `useAppStateValue()` and `useOnAppStateChange()`) to work
+ * outside the <Excalidraw> component tree.
+ */
+export const ExcalidrawAPIProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [api, setApi] = useState<ExcalidrawImperativeAPI | null>(null);
+  return (
+    <ExcalidrawAPIContext.Provider value={api}>
+      <ExcalidrawAPISetContext.Provider value={setApi}>
+        {children}
+      </ExcalidrawAPISetContext.Provider>
+    </ExcalidrawAPIContext.Provider>
+  );
+};
+
 const ExcalidrawBase = (props: ExcalidrawProps) => {
   const {
+    onExport,
+    className,
+    ownerDocument = document,
     onChange,
+    onThemeChange,
+    onIncrement,
     initialData,
-    excalidrawAPI,
+    initialState,
+    onExcalidrawAPI,
+    onMount,
+    onUnmount,
+    onInitialize,
     isCollaborating = false,
     onPointerUpdate,
+    renderTopLeftUI,
     renderTopRightUI,
     langCode = defaultLang.code,
     viewModeEnabled,
+    interaction,
+    ui,
+    activeTool,
     zenModeEnabled,
     gridModeEnabled,
     libraryReturnUrl,
@@ -47,6 +104,8 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerDown,
     onPointerUp,
     onScrollChange,
+    onUserFollow,
+    userToFollow,
     onDuplicate,
     children,
     validateEmbeddable,
@@ -54,6 +113,9 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     aiEnabled,
     showDeprecatedFonts,
     renderScrollbars,
+    viewportStatusFrame,
+    currentUserControls,
+    imageOptions,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -79,10 +141,39 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
 
   if (
     UIOptions.canvasActions.toggleTheme === null &&
-    typeof theme === "undefined"
+    (theme == null || onThemeChange)
   ) {
     UIOptions.canvasActions.toggleTheme = true;
   }
+
+  const normalizedImageOptions: AppProps["imageOptions"] = {
+    maxFileSizeBytes:
+      imageOptions?.maxFileSizeBytes ?? DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes,
+    maxWidthOrHeight:
+      imageOptions?.maxWidthOrHeight ?? DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight,
+  };
+
+  const setExcalidrawAPI = useContext(ExcalidrawAPISetContext);
+
+  const onExcalidrawAPIRef = useRef(onExcalidrawAPI);
+  onExcalidrawAPIRef.current = onExcalidrawAPI;
+
+  const handleExcalidrawAPI = useCallback(
+    (api: ExcalidrawImperativeAPI | null) => {
+      setExcalidrawAPI?.(api);
+      onExcalidrawAPIRef.current?.(api);
+    },
+    [setExcalidrawAPI],
+  );
+
+  // whether the browser's own zoom is kept available while the editor is
+  // non-interactive (with navigation allowed, pinch is consumed by the
+  // editor instead, which relies on the pinch prevention below)
+  const browserZoomAllowed =
+    typeof interaction === "object" &&
+    interaction !== null &&
+    interaction.enabled?.browserZoom === true &&
+    interaction.enabled?.navigation !== true;
 
   useEffect(() => {
     const importPolyfill = async () => {
@@ -92,6 +183,10 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
 
     importPolyfill();
 
+    if (browserZoomAllowed) {
+      return;
+    }
+
     // Block pinch-zooming on iOS outside of the content area
     const handleTouchMove = (event: TouchEvent) => {
       // @ts-ignore
@@ -100,27 +195,40 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
       }
     };
 
-    document.addEventListener("touchmove", handleTouchMove, {
+    ownerDocument.addEventListener("touchmove", handleTouchMove, {
       passive: false,
     });
 
     return () => {
-      document.removeEventListener("touchmove", handleTouchMove);
+      ownerDocument.removeEventListener("touchmove", handleTouchMove);
     };
-  }, []);
+  }, [browserZoomAllowed, ownerDocument]);
 
   return (
     <EditorJotaiProvider store={editorJotaiStore}>
       <InitializeApp langCode={langCode} theme={theme}>
         <App
+          onExport={onExport}
+          className={className}
+          ownerDocument={ownerDocument}
           onChange={onChange}
+          onThemeChange={onThemeChange}
+          onIncrement={onIncrement}
           initialData={initialData}
-          excalidrawAPI={excalidrawAPI}
+          initialState={initialState}
+          onExcalidrawAPI={handleExcalidrawAPI}
+          onMount={onMount}
+          onUnmount={onUnmount}
+          onInitialize={onInitialize}
           isCollaborating={isCollaborating}
           onPointerUpdate={onPointerUpdate}
+          renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
+          interaction={interaction}
+          ui={ui}
+          activeTool={activeTool}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
           libraryReturnUrl={libraryReturnUrl}
@@ -139,12 +247,17 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
+          onUserFollow={onUserFollow}
+          userToFollow={userToFollow}
           onDuplicate={onDuplicate}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
           renderScrollbars={renderScrollbars}
+          viewportStatusFrame={viewportStatusFrame}
+          currentUserControls={currentUserControls}
+          imageOptions={normalizedImageOptions}
         >
           {children}
         </App>
@@ -162,13 +275,75 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   const {
     initialData: prevInitialData,
     UIOptions: prevUIOptions = {},
+    imageOptions: prevImageOptions,
+    interaction: prevInteraction,
+    ui: prevUI,
+    activeTool: prevActiveTool,
     ...prev
   } = prevProps;
   const {
     initialData: nextInitialData,
     UIOptions: nextUIOptions = {},
+    imageOptions: nextImageOptions,
+    interaction: nextInteraction,
+    ui: nextUI,
+    activeTool: nextActiveTool,
     ...next
   } = nextProps;
+
+  // compare `activeTool` semantically so that hosts inlining the object
+  // (`activeTool={{ type: "laser" }}`) don't bust the memo every render
+  const isActiveToolSame =
+    prevActiveTool === nextActiveTool ||
+    (prevActiveTool?.type === nextActiveTool?.type &&
+      (prevActiveTool?.type === "custom" ? prevActiveTool.customType : null) ===
+        (nextActiveTool?.type === "custom" ? nextActiveTool.customType : null));
+
+  if (!isActiveToolSame) {
+    return false;
+  }
+
+  // compare `interaction` semantically so that hosts inlining the config
+  // object (`interaction={{ enabled: { links: true } }}`) don't bust the
+  // memo every render
+  const isInteractionSame =
+    prevInteraction === nextInteraction ||
+    (typeof prevInteraction === "object" &&
+      prevInteraction !== null &&
+      typeof nextInteraction === "object" &&
+      nextInteraction !== null &&
+      !!prevInteraction.enabled?.links === !!nextInteraction.enabled?.links &&
+      !!prevInteraction.enabled?.embeds === !!nextInteraction.enabled?.embeds &&
+      !!prevInteraction.enabled?.interactiveContent ===
+        !!nextInteraction.enabled?.interactiveContent &&
+      !!prevInteraction.enabled?.navigation ===
+        !!nextInteraction.enabled?.navigation &&
+      !!prevInteraction.enabled?.browserZoom ===
+        !!nextInteraction.enabled?.browserZoom &&
+      !!prevInteraction.enabled?.tools?.laser ===
+        !!nextInteraction.enabled?.tools?.laser &&
+      !!prevInteraction.enabled?.tools?.custom ===
+        !!nextInteraction.enabled?.tools?.custom);
+
+  if (!isInteractionSame) {
+    return false;
+  }
+
+  // compare `ui` semantically so that hosts inlining the config object don't
+  // bust the memo every render
+  const isUISame =
+    prevUI === nextUI ||
+    (typeof prevUI === "object" &&
+      prevUI !== null &&
+      typeof nextUI === "object" &&
+      nextUI !== null &&
+      !!prevUI.enabled?.zoom === !!nextUI.enabled?.zoom &&
+      !!prevUI.enabled?.scrollBackToContent ===
+        !!nextUI.enabled?.scrollBackToContent);
+
+  if (!isUISame) {
+    return false;
+  }
 
   // comparing UIOptions
   const prevUIOptionsKeys = Object.keys(prevUIOptions) as (keyof Partial<
@@ -183,6 +358,9 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
   }
 
   const isUIOptionsSame = prevUIOptionsKeys.every((key) => {
+    if (key === "getFormFactor") {
+      return true;
+    }
     if (key === "canvasActions") {
       const canvasOptionKeys = Object.keys(
         prevUIOptions.canvasActions!,
@@ -207,7 +385,17 @@ const areEqual = (prevProps: ExcalidrawProps, nextProps: ExcalidrawProps) => {
     return prevUIOptions[key] === nextUIOptions[key];
   });
 
-  return isUIOptionsSame && isShallowEqual(prev, next);
+  const isImageOptionsSame =
+    (prevImageOptions?.maxWidthOrHeight ??
+      DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight) ===
+      (nextImageOptions?.maxWidthOrHeight ??
+        DEFAULT_IMAGE_OPTIONS.maxWidthOrHeight) &&
+    (prevImageOptions?.maxFileSizeBytes ??
+      DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes) ===
+      (nextImageOptions?.maxFileSizeBytes ??
+        DEFAULT_IMAGE_OPTIONS.maxFileSizeBytes);
+
+  return isUIOptionsSame && isImageOptionsSame && isShallowEqual(prev, next);
 };
 
 export const Excalidraw = React.memo(ExcalidrawBase, areEqual);
@@ -220,13 +408,13 @@ export {
   getNonDeletedElements,
 } from "@excalidraw/element";
 
-export { getTextFromElements } from "@excalidraw/element/textElement";
-export { isInvisiblySmallElement } from "@excalidraw/element/sizeHelpers";
+export { getTextFromElements } from "@excalidraw/element";
+export { isInvisiblySmallElement } from "@excalidraw/element";
 
 export { defaultLang, useI18n, languages } from "./i18n";
 export {
-  restore,
   restoreAppState,
+  restoreElement,
   restoreElements,
   restoreLibraryItems,
 } from "./data/restore";
@@ -246,9 +434,8 @@ export {
   loadSceneOrLibraryFromBlob,
   loadLibraryFromBlob,
 } from "./data/blob";
-export { getFreeDrawSvgPath } from "@excalidraw/element/renderElement";
 export { mergeLibraryItems, getLibraryItemsHash } from "./data/library";
-export { isLinearElement } from "@excalidraw/element/typeChecks";
+export { isLinearElement } from "@excalidraw/element";
 
 export {
   FONT_FAMILY,
@@ -258,28 +445,34 @@ export {
   DEFAULT_LASER_COLOR,
   UserIdleState,
   normalizeLink,
+  sceneCoordsToViewportCoords,
+  viewportCoordsToSceneCoords,
+  getFormFactor,
+  throttleRAF,
 } from "@excalidraw/common";
 
 export {
   mutateElement,
   newElementWith,
   bumpVersion,
-} from "@excalidraw/element/mutateElement";
+} from "@excalidraw/element";
 
-export { CaptureUpdateAction } from "./store";
+export { CaptureUpdateAction } from "@excalidraw/element";
 
 export { parseLibraryTokensFromUrl, useHandleLibrary } from "./data/library";
-
-export {
-  sceneCoordsToViewportCoords,
-  viewportCoordsToSceneCoords,
-} from "@excalidraw/common";
 
 export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };
 export { MainMenu };
-export { useDevice } from "./components/App";
+export { Ellipsify } from "./components/Ellipsify";
+export {
+  useEditorInterface,
+  useStylesPanelMode,
+  useExcalidrawAPI,
+  ExcalidrawAPIContext,
+} from "./components/App";
+
 export { WelcomeScreen };
 export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
@@ -287,22 +480,79 @@ export { Stats } from "./components/Stats";
 export { DefaultSidebar } from "./components/DefaultSidebar";
 export { TTDDialog } from "./components/TTDDialog/TTDDialog";
 export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
+export {
+  TTDStreamFetch,
+  parseSSEStream,
+} from "./components/TTDDialog/utils/TTDStreamFetch";
+export type { StreamChunk } from "./components/TTDDialog/utils/TTDStreamFetch";
+export type {
+  TTDPersistenceAdapter,
+  SavedChat,
+  SavedChats,
+} from "./components/TTDDialog/types";
 
-export { zoomToFitBounds } from "./actions/actionCanvas";
-export { convertToExcalidrawElements } from "./data/transform";
+export type {
+  ViewportStatusFrame,
+  ElementRenderOverride,
+  ElementRenderOverrides,
+} from "./types";
+
+export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
+
 export {
   getCommonBounds,
   getVisibleSceneBounds,
-} from "@excalidraw/element/bounds";
+  convertToExcalidrawElements,
+} from "@excalidraw/element";
 
-export {
-  elementsOverlappingBBox,
-  isElementInsideBBox,
-  elementPartiallyOverlapsWithOrContainsBBox,
-} from "@excalidraw/utils/withinBounds";
+export { elementsOverlappingBBox } from "@excalidraw/element";
 
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
-export { isElementLink } from "@excalidraw/element/elementLink";
+export { isElementLink } from "@excalidraw/element";
 
-export { setCustomTextMetricsProvider } from "@excalidraw/element/textMeasurements";
+export { Fonts } from "./fonts/Fonts";
+
+export { setCustomTextMetricsProvider } from "@excalidraw/element";
+
+export { CommandPalette } from "./components/CommandPalette/CommandPalette";
+
+export {
+  renderSpreadsheet,
+  tryParseSpreadsheet,
+  isSpreadsheetValidForChartType,
+} from "./charts";
+
+// -----------------------------------------------------------------------------
+// useExcalidrawStateValue() wrapper for host apps for the return type to reflect the
+// the potentially `undefined` value for initial render before the excalidrawAPI
+// is ready.
+//
+/**
+ * hook that subscribes to specific appState prop(s)
+ *
+ * @param prop - appState prop(s) to subscribe to, or a selector function.
+ * NOTE `prop/selector` is memoized and will not change after initial render
+ */
+export function useExcalidrawStateValue<K extends keyof AppState>(
+  prop: K,
+): AppState[K] | undefined;
+export function useExcalidrawStateValue<T extends keyof AppState>(
+  props: T[],
+): AppState | undefined;
+export function useExcalidrawStateValue<T>(
+  selector: (appState: AppState) => T,
+): T | undefined;
+export function useExcalidrawStateValue(
+  selector:
+    | keyof AppState
+    | (keyof AppState)[]
+    | ((appState: AppState) => unknown),
+) {
+  return _useAppStateValue(selector as any, false);
+}
+// -----------------------------------------------------------------------------
+
+export { _useOnAppStateChange as useOnExcalidrawStateChange };
+
+export { applyDarkModeFilter, getStrokeWidthByKey };

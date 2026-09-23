@@ -1,4 +1,4 @@
-import type { UserIdleState } from "@excalidraw/common";
+import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
   NonDeletedElementsMap,
@@ -12,11 +12,11 @@ import type {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
+  ElementRenderOverrides,
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
   SocketId,
-  Device,
   PendingExcalidrawElements,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -31,12 +31,17 @@ export type StaticCanvasRenderConfig = {
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
   renderGrid: boolean;
+  /** whether to render link icons on elements with links (never rendered
+   when exporting). @default true */
+  renderLinks?: boolean;
   /** when exporting the behavior is slightly different (e.g. we can't use
    CSS filters), and we disable render optimizations for best output */
   isExporting: boolean;
   embedsValidationStatus: EmbedsValidationStatus;
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
+  theme: AppState["theme"];
+  elementRenderOverrides?: ElementRenderOverrides;
 };
 
 export type SVGRenderConfig = {
@@ -55,6 +60,7 @@ export type SVGRenderConfig = {
    * @default true
    */
   reuseImages: boolean;
+  theme: AppState["theme"];
 };
 
 export type InteractiveCanvasRenderConfig = {
@@ -66,14 +72,13 @@ export type InteractiveCanvasRenderConfig = {
   remotePointerUsernames: Map<SocketId, string>;
   remotePointerButton: Map<SocketId, string | undefined>;
   selectionColor: string;
+  lastViewportPosition: { x: number; y: number };
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   renderScrollbars?: boolean;
 };
 
 export type RenderInteractiveSceneCallback = {
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   scrollBars?: ScrollBars;
 };
 
@@ -88,7 +93,12 @@ export type StaticSceneRenderConfig = {
   renderConfig: StaticCanvasRenderConfig;
 };
 
+export type InteractiveSceneRenderAnimationState = {
+  bindingHighlight: { runtime: number } | undefined;
+};
+
 export type InteractiveSceneRenderConfig = {
+  app: AppClassProperties;
   canvas: HTMLCanvasElement | null;
   elementsMap: RenderableElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
@@ -97,14 +107,16 @@ export type InteractiveSceneRenderConfig = {
   scale: number;
   appState: InteractiveCanvasAppState;
   renderConfig: InteractiveCanvasRenderConfig;
-  device: Device;
+  editorInterface: EditorInterface;
   callback: (data: RenderInteractiveSceneCallback) => void;
+  animationState?: InteractiveSceneRenderAnimationState;
+  deltaTime: number;
 };
 
 export type NewElementSceneRenderConfig = {
   canvas: HTMLCanvasElement | null;
   rc: RoughCanvas;
-  newElement: ExcalidrawElement | null;
+  newElement: NonDeletedExcalidrawElement | null;
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   scale: number;
@@ -141,7 +153,14 @@ export type ScrollBars = {
   } | null;
 };
 
-export type ElementShape = Drawable | Drawable[] | null;
+export type SVGPathString = string & { __brand: "SVGPathString" };
+
+export type ElementShape =
+  | Drawable
+  | Drawable[]
+  | Path2D
+  | (Drawable | SVGPathString)[]
+  | null;
 
 export type ElementShapes = {
   rectangle: Drawable;
@@ -149,10 +168,11 @@ export type ElementShapes = {
   diamond: Drawable;
   iframe: Drawable;
   embeddable: Drawable;
-  freedraw: Drawable | null;
+  freedraw: (Drawable | SVGPathString)[];
   arrow: Drawable[];
   line: Drawable[];
   text: null;
+  stickynote: null;
   image: null;
   frame: null;
   magicframe: null;

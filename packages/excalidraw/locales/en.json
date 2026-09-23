@@ -1,8 +1,14 @@
 {
   "labels": {
+    "signUp": "Sign up",
+    "signIn": "Sign in",
     "paste": "Paste",
     "pasteAsPlaintext": "Paste as plaintext",
     "pasteCharts": "Paste charts",
+    "chartType_bar": "Bar chart",
+    "chartType_line": "Line chart",
+    "chartType_radar": "Radar chart",
+    "chartType_plaintext": "Plain text",
     "selectAll": "Select all",
     "multiSelect": "Add element to selection",
     "moveCanvas": "Move canvas",
@@ -21,6 +27,7 @@
     "copyStyles": "Copy styles",
     "pasteStyles": "Paste styles",
     "stroke": "Stroke",
+    "textColor": "Text color",
     "changeStroke": "Change stroke color",
     "background": "Background",
     "changeBackground": "Change background color",
@@ -31,6 +38,9 @@
     "strokeStyle_dashed": "Dashed",
     "strokeStyle_dotted": "Dotted",
     "sloppiness": "Sloppiness",
+    "pressure": "Pressure",
+    "pressure_constant": "Constant",
+    "pressure_variable": "Variable",
     "opacity": "Opacity",
     "textAlign": "Text align",
     "edges": "Edges",
@@ -49,7 +59,14 @@
     "arrowhead_crowfoot_many": "Crow's foot (many)",
     "arrowhead_crowfoot_one": "Crow's foot (one)",
     "arrowhead_crowfoot_one_or_many": "Crow's foot (one or many)",
+    "arrowhead_cardinality_one": "Cardinality (one)",
+    "arrowhead_cardinality_many": "Cardinality (many)",
+    "arrowhead_cardinality_one_or_many": "Cardinality (one or many)",
+    "arrowhead_cardinality_exactly_one": "Cardinality (exactly one)",
+    "arrowhead_cardinality_zero_or_one": "Cardinality (zero or one)",
+    "arrowhead_cardinality_zero_or_many": "Cardinality (zero or many)",
     "more_options": "More options",
+    "cardinality": "Cardinality",
     "arrowtypes": "Arrow type",
     "arrowtype_sharp": "Sharp arrow",
     "arrowtype_round": "Curved arrow",
@@ -95,6 +112,7 @@
     "group": "Group selection",
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
+    "you": "You",
     "toggleGrid": "Toggle grid",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",
@@ -141,6 +159,10 @@
       "edit": "Edit line",
       "editArrow": "Edit arrow"
     },
+    "polygon": {
+      "breakPolygon": "Break polygon",
+      "convertToPolygon": "Convert to polygon"
+    },
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
@@ -167,7 +189,17 @@
     "linkToElement": "Link to object",
     "wrapSelectionInFrame": "Wrap selection in frame",
     "tab": "Tab",
-    "shapeSwitch": "Switch shape"
+    "shapeSwitch": "Switch shape",
+    "preferences": "Preferences",
+    "preferences_toolLock": "Tool lock",
+    "boxSelectionMode": "Select on",
+    "boxSelectionContain": "Wrap",
+    "boxSelectionOverlap": "Overlap",
+    "arrowBinding": "Arrow binding",
+    "midpointSnapping": "Snap to midpoints",
+    "inputDevice": "Input",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Mouse"
   },
   "elementLink": {
     "title": "Link to object",
@@ -177,14 +209,22 @@
   "library": {
     "noItems": "No items added yet...",
     "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
-    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here."
+    "hint_emptyPrivateLibrary": "Select an item on canvas to add it here.",
+    "search": {
+      "inputPlaceholder": "Search library",
+      "heading": "Library matches",
+      "noResults": "No matching items found...",
+      "clearSearch": "Clear search"
+    }
   },
   "search": {
     "title": "Find on canvas",
     "noMatch": "No matches found...",
     "singleResult": "result",
     "multipleResults": "results",
-    "placeholder": "Find text on canvas..."
+    "placeholder": "Find text on canvas...",
+    "frames": "Frames",
+    "texts": "Texts"
   },
   "buttons": {
     "clearReset": "Reset the canvas",
@@ -218,10 +258,11 @@
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",
+    "saveLibNames": "Save name(s) and exit",
     "clear": "Clear",
     "remove": "Remove",
     "embed": "Toggle embedding",
-    "publishLibrary": "Publish",
+    "publishLibrary": "Rename or publish",
     "submit": "Submit",
     "confirm": "Confirm",
     "embeddableInteractionButton": "Click to interact"
@@ -247,7 +288,8 @@
     "resetLibrary": "This will clear your library. Are you sure?",
     "removeItemsFromsLibrary": "Delete {{count}} item(s) from library?",
     "invalidEncryptionKey": "Encryption key must be of 22 characters. Live collaboration is disabled.",
-    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!"
+    "collabOfflineWarning": "No internet connection available.\nYour changes will not be saved!",
+    "localStorageQuotaExceeded": "Browser storage quota exceeded. Changes will not be saved."
   },
   "errors": {
     "unsupportedFileType": "Unsupported file type.",
@@ -294,12 +336,19 @@
     "eraser": "Eraser",
     "frame": "Frame tool",
     "magicframe": "Wireframe to code",
+    "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
+    "autoshape": "Draw to shape",
+    "bucketfill": "Bucket fill",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "convertElementType": "Toggle shape type"
+  },
+  "bucketfill": {
+    "noRegion": "Couldn't find an enclosed region to fill here.",
+    "tooComplex": "This region is too complex to fill."
   },
   "element": {
     "rectangle": "Rectangle",
@@ -313,6 +362,7 @@
     "group": "Group",
     "frame": "Frame",
     "magicframe": "Wireframe to code",
+    "stickynote": "Sticky note",
     "embeddable": "Web Embed",
     "selection": "Selection",
     "iframe": "IFrame"
@@ -323,33 +373,38 @@
     "shapes": "Shapes"
   },
   "hints": {
-    "dismissSearch": "Escape to dismiss search",
-    "canvasPanning": "To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool",
+    "dismissSearch": "{{shortcut}} to dismiss search",
+    "canvasPanning": "To move canvas, hold {{shortcut_1}} or {{shortcut_2}} while dragging, or use the hand tool",
     "linearElement": "Click to start multiple points, drag for single line",
-    "arrowTool": "Click to start multiple points, drag for single line. Press {{arrowShortcut}} again to change arrow type.",
+    "arrowTool": "Click to start multiple points, drag for single line. Press {{shortcut}} again to change arrow type.",
+    "arrowBindModifiers": "Hold {{shortcut_1}} to disable binding, or {{shortcut_2}} to bind at a fixed point",
     "freeDraw": "Click and drag, release when you're finished",
     "text": "Tip: you can also add text by double-clicking anywhere with the selection tool",
     "embeddable": "Click-drag to create a website embed",
-    "text_selected": "Double-click or press ENTER to edit text",
-    "text_editing": "Press Escape or CtrlOrCmd+ENTER to finish editing",
-    "linearElementMulti": "Click on last point or press Escape or Enter to finish",
-    "lockAngle": "You can constrain angle by holding SHIFT",
-    "resize": "You can constrain proportions by holding SHIFT while resizing,\nhold ALT to resize from the center",
-    "resizeImage": "You can resize freely by holding SHIFT,\nhold ALT to resize from the center",
-    "rotate": "You can constrain angles by holding SHIFT while rotating",
-    "lineEditor_info": "Hold CtrlOrCmd and Double-click or press CtrlOrCmd + Enter to edit points",
-    "lineEditor_pointSelected": "Press Delete to remove point(s),\nCtrlOrCmd+D to duplicate, or drag to move",
-    "lineEditor_nothingSelected": "Select a point to edit (hold SHIFT to select multiple),\nor hold Alt and click to add new points",
-    "placeImage": "Click to place the image, or click and drag to set its size manually",
+    "stickynote": "Click to place a note, or drag to size it",
+    "autoshape": "Draw rectangles, circles, diamonds, lines and arrows",
+    "text_selected": "Double-click or press {{shortcut}} to edit text",
+    "text_editing": "Press {{shortcut_1}} or {{shortcut_2}} to finish editing",
+    "linearElementMulti": "Click on last point or press {{shortcut_1}} or {{shortcut_2}} to finish",
+    "lockAngle": "You can constrain angle by holding {{shortcut}}",
+    "resize": "You can constrain proportions by holding {{shortcut_1}} while resizing,\nhold {{shortcut_2}} to resize from the center",
+    "resizeImage": "You can resize freely by holding {{shortcut_1}},\nhold {{shortcut_2}} to resize from the center",
+    "resizeStickyNote": "hold {{shortcut_1}} to resize freely, {{shortcut_2}} to resize from the center",
+    "rotate": "You can constrain angles by holding {{shortcut}} while rotating",
+    "toggleArrowhead": "Double-click to toggle the arrowhead",
+    "lineEditor_info": "Hold {{shortcut_1}} and Double-click or press {{shortcut_2}} to edit points",
+    "lineEditor_line_info": "Double-click or press {{shortcut}} to edit points",
+    "lineEditor_pointSelected": "Press {{shortcut_1}} to remove point(s),\n{{shortcut_2}} to duplicate, or drag to move",
+    "lineEditor_nothingSelected": "Select a point to edit (hold {{shortcut_1}} to select multiple),\nor hold {{shortcut_2}} and click to add new points",
     "publishLibrary": "Publish your own library",
-    "bindTextToElement": "Press enter to add text",
-    "createFlowchart": "Hold CtrlOrCmd and Arrow key to create a flowchart",
-    "deepBoxSelect": "Hold CtrlOrCmd to deep select, and to prevent dragging",
-    "eraserRevert": "Hold Alt to revert the elements marked for deletion",
+    "bindTextToElement": "{{shortcut}} to add text",
+    "createFlowchart": "{{shortcut}} to create a flowchart",
+    "deepBoxSelect": "Hold {{shortcut}} to deep select, and to prevent dragging",
+    "eraserRevert": "Hold {{shortcut}} to revert the elements marked for deletion",
     "firefox_clipboard_write": "This feature can likely be enabled by setting the \"dom.events.asyncClipboard.clipboardItem\" flag to \"true\". To change the browser flags in Firefox, visit the \"about:config\" page.",
-    "disableSnapping": "Hold CtrlOrCmd to disable snapping",
-    "enterCropEditor": "Double click the image or press ENTER to crop the image",
-    "leaveCropEditor": "Click outside the image or press ENTER or ESCAPE to finish cropping"
+    "disableSnapping": "Hold {{shortcut}} to disable snapping",
+    "enterCropEditor": "Double click the image or press {{shortcut}} to crop the image",
+    "leaveCropEditor": "Click outside the image or press {{shortcut_1}} or {{shortcut_2}} to finish cropping"
   },
   "canvasError": {
     "cannotShowPreview": "Cannot show preview",
@@ -379,6 +434,10 @@
   },
   "errorDialog": {
     "title": "Error"
+  },
+  "progressDialog": {
+    "title": "Saving",
+    "defaultMessage": "Preparing to save..."
   },
   "exportDialog": {
     "disk_title": "Save to disk",
@@ -542,7 +601,9 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "All your data is saved locally in your browser.",
+      "center_heading": "Your drawings are saved in your browser's storage.",
+      "center_heading_line2": "Browser storage can be cleared unexpectedly.",
+      "center_heading_line3": "Save your work to a file regularly to avoid losing it.",
       "center_heading_plus": "Did you want to go to the Excalidraw+ instead?",
       "menuHint": "Export, preferences, languages, ..."
     },
@@ -554,11 +615,16 @@
     }
   },
   "colorPicker": {
+    "color": "Color",
     "mostUsedCustomColors": "Most used custom colors",
     "colors": "Colors",
     "shades": "Shades",
     "hexCode": "Hex code",
-    "noShades": "No shades available for this color"
+    "noShades": "No shades available for this color",
+    "invalidColor": "Not a valid color",
+    "invalidHexLength": "Hex code must be 3, 4, 6, or 8 characters",
+    "topPicksTip": "Tip: drag any color onto your top picks to pin it",
+    "resetTopPicks": "Reset to default top picks"
   },
   "overwriteConfirm": {
     "action": {
@@ -594,9 +660,58 @@
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
-    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>,<sequenceLink> Sequence, </sequenceLink> and <classLink>Class </classLink>Diagrams are supported. The other types will be rendered as image in Excalidraw.",
+    "description": "Currently only <flowchartLink>Flowchart</flowchartLink>, <sequenceLink>Sequence</sequenceLink>, <classLink>Class</classLink>, and <erdLink>Entity Relationship</erdLink> Diagrams are supported. The other types will be rendered as image in Excalidraw.",
     "syntax": "Mermaid Syntax",
-    "preview": "Preview"
+    "preview": "Preview",
+    "label": "Mermaid",
+    "inputPlaceholder": "Write Mermaid diagram defintion here...",
+    "autoFixAvailable": "Auto-fix is available"
+  },
+  "ttd": {
+    "error": "Error!"
+  },
+  "chat": {
+    "inputPlaceholder": "Start typing your diagram idea here... ({{shortcut}} for new line)",
+    "inputPlaceholderWithMessages": "Continue refining your diagram...",
+    "generating": "Generating...",
+    "rateLimitRemaining": "{{count}} requests left today",
+    "role": {
+      "user": "You",
+      "assistant": "AI Assistant",
+      "system": "System"
+    },
+    "aiBeta": "AI Beta",
+    "label": "Chat",
+    "menu": "Menu",
+    "newChat": "New Chat",
+    "deleteChat": "Delete chat",
+    "deleteMessage": "Delete message",
+    "viewAsMermaid": "View as Mermaid",
+    "placeholder": {
+      "title": "Let's design your diagram",
+      "description": "Describe the diagram you want to create, and we'll generate it for you.",
+      "hint": "At the moment we know Flowchart, Sequence, Class, State, and Entity Relationship diagrams."
+    },
+    "preview": "Preview",
+    "insert": "Insert",
+    "retry": "Retry",
+    "errors": {
+      "promptTooShort": "Prompt is too short (min {{min}} characters)",
+      "promptTooLong": "Prompt is too long (max {{max}} characters)",
+      "generationFailed": "Generation failed",
+      "invalidDiagram": "Generated an invalid diagram :(. You may edit manually, retry with auto-fix, or try a different prompt.",
+      "fixInMermaid": "Edit Mermaid manually →",
+      "aiRepair": "Regenerate (auto-fix) →",
+      "requestAborted": "Request aborted",
+      "requestFailed": "Request failed",
+      "mermaidParseError": "Mermaid syntax error"
+    },
+    "rateLimit": {
+      "messageLimit": "You've hit your AI limit on the free plan. Try out Excalidraw+ for more or come back tomorrow.",
+      "generalRateLimit": "Hold your horses, you're too fast for us! Please wait a moment before trying again.",
+      "messageLimitInputPlaceholder": "You've reached your message limit"
+    },
+    "upsellBtnLabel": "Upgrade to Plus"
   },
   "quickSearch": {
     "placeholder": "Quick search"
@@ -633,5 +748,17 @@
     },
     "itemNotAvailable": "Command is not available...",
     "shortcutHint": "For Command palette, use {{shortcut}}"
+  },
+  "keys": {
+    "ctrl": "Ctrl",
+    "option": "Option",
+    "cmd": "Cmd",
+    "alt": "Alt",
+    "escape": "Esc",
+    "enter": "Enter",
+    "shift": "Shift",
+    "spacebar": "Space",
+    "delete": "Delete",
+    "mmb": "Scroll wheel"
   }
 }

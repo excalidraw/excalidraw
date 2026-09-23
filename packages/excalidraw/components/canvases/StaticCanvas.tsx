@@ -23,7 +23,7 @@ type StaticCanvasProps = {
   elementsMap: RenderableElementsMap;
   allElementsMap: NonDeletedSceneElementsMap;
   visibleElements: readonly NonDeletedExcalidrawElement[];
-  sceneNonce: number | undefined;
+  canvasNonce: string;
   selectionNonce: number | undefined;
   scale: number;
   appState: StaticCanvasAppState;
@@ -33,6 +33,13 @@ type StaticCanvasProps = {
 const StaticCanvas = (props: StaticCanvasProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isComponentMounted = useRef(false);
+
+  useEffect(() => {
+    props.canvas.style.width = `${props.appState.width}px`;
+    props.canvas.style.height = `${props.appState.height}px`;
+    props.canvas.width = props.appState.width * props.scale;
+    props.canvas.height = props.appState.height * props.scale;
+  }, [props.appState.height, props.appState.width, props.canvas, props.scale]);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -47,26 +54,6 @@ const StaticCanvas = (props: StaticCanvasProps) => {
 
       wrapper.replaceChildren(canvas);
       canvas.classList.add("excalidraw__canvas", "static");
-    }
-
-    const widthString = `${props.appState.width}px`;
-    const heightString = `${props.appState.height}px`;
-    if (canvas.style.width !== widthString) {
-      canvas.style.width = widthString;
-    }
-    if (canvas.style.height !== heightString) {
-      canvas.style.height = heightString;
-    }
-
-    const scaledWidth = props.appState.width * props.scale;
-    const scaledHeight = props.appState.height * props.scale;
-    // setting width/height resets the canvas even if dimensions not changed,
-    // which would cause flicker when we skip frame (due to throttling)
-    if (canvas.width !== scaledWidth) {
-      canvas.width = scaledWidth;
-    }
-    if (canvas.height !== scaledHeight) {
-      canvas.height = scaledHeight;
     }
 
     renderStaticScene(
@@ -100,7 +87,6 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     offsetLeft: appState.offsetLeft,
     offsetTop: appState.offsetTop,
     theme: appState.theme,
-    pendingImageElementId: appState.pendingImageElementId,
     shouldCacheIgnoreZoom: appState.shouldCacheIgnoreZoom,
     viewBackgroundColor: appState.viewBackgroundColor,
     exportScale: appState.exportScale,
@@ -113,6 +99,7 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     editingGroupId: appState.editingGroupId,
     currentHoveredFontFamily: appState.currentHoveredFontFamily,
     croppingElementId: appState.croppingElementId,
+    suggestedBinding: appState.suggestedBinding,
   };
 
   return relevantAppStateProps;
@@ -123,10 +110,10 @@ const areEqual = (
   nextProps: StaticCanvasProps,
 ) => {
   if (
-    prevProps.sceneNonce !== nextProps.sceneNonce ||
+    prevProps.canvasNonce !== nextProps.canvasNonce ||
     prevProps.scale !== nextProps.scale ||
     // we need to memoize on elementsMap because they may have renewed
-    // even if sceneNonce didn't change (e.g. we filter elements out based
+    // even if canvasNonce didn't change (e.g. we filter elements out based
     // on appState)
     prevProps.elementsMap !== nextProps.elementsMap ||
     prevProps.visibleElements !== nextProps.visibleElements

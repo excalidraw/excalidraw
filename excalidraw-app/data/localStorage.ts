@@ -2,7 +2,6 @@ import {
   clearAppStateForLocalStorage,
   getDefaultAppState,
 } from "@excalidraw/excalidraw/appState";
-import { clearElementsForLocalStorage } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -50,7 +49,7 @@ export const importFromLocalStorage = () => {
   let elements: ExcalidrawElement[] = [];
   if (savedElements) {
     try {
-      elements = clearElementsForLocalStorage(JSON.parse(savedElements));
+      elements = JSON.parse(savedElements);
     } catch (error: any) {
       console.error(error);
       // Do nothing because elements array is already empty

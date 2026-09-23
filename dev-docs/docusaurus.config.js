@@ -97,8 +97,8 @@ const config = {
                 href: "https://discord.gg/UexuTaE",
               },
               {
-                label: "Twitter",
-                href: "https://twitter.com/excalidraw",
+                label: "𝕏",
+                href: "https://x.com/excalidraw",
               },
               {
                 label: "Linkedin",

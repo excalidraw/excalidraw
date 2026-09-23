@@ -1,18 +1,23 @@
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import { getBoundTextElement } from "@excalidraw/element/textElement";
 import {
-  isFrameLikeElement,
-  isTextElement,
-} from "@excalidraw/element/typeChecks";
+  getBoundTextElement,
+  getNonDeletedElements,
+  isBindingElement,
+  unbindBindingElement,
+} from "@excalidraw/element";
+import { isFrameLikeElement } from "@excalidraw/element";
 
 import {
   getSelectedGroupIds,
   getElementsInGroup,
   isInGroup,
-} from "@excalidraw/element/groups";
+} from "@excalidraw/element";
 
-import { getFrameChildren } from "@excalidraw/element/frame";
+import { getFrameChildren } from "@excalidraw/element";
+
+import { updateBindings } from "@excalidraw/element";
+import { DRAGGING_THRESHOLD } from "@excalidraw/common";
 
 import type { Radians } from "@excalidraw/math";
 
@@ -22,9 +27,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type Scene from "@excalidraw/element/Scene";
-
-import { updateBindings } from "../../../element/src/binding";
+import type { Scene } from "@excalidraw/element";
 
 import type { AppState } from "../../types";
 
@@ -44,12 +47,6 @@ export const isPropertyEditable = (
   element: ExcalidrawElement,
   property: keyof ExcalidrawElement,
 ) => {
-  if (property === "height" && isTextElement(element)) {
-    return false;
-  }
-  if (property === "width" && isTextElement(element)) {
-    return false;
-  }
   if (property === "angle" && isFrameLikeElement(element)) {
     return false;
   }
@@ -117,11 +114,27 @@ export const newOrigin = (
 export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
-  originalElement: ExcalidrawElement,
+  originalElement: NonDeletedExcalidrawElement,
   scene: Scene,
+  appState: AppState,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
 ) => {
+  if (
+    isBindingElement(originalElement) &&
+    (originalElement.startBinding || originalElement.endBinding)
+  ) {
+    if (
+      Math.abs(newTopLeftX - originalElement.x) < DRAGGING_THRESHOLD &&
+      Math.abs(newTopLeftY - originalElement.y) < DRAGGING_THRESHOLD
+    ) {
+      return;
+    }
+
+    unbindBindingElement(originalElement, "start", scene);
+    unbindBindingElement(originalElement, "end", scene);
+  }
+
   const elementsMap = scene.getNonDeletedElementsMap();
   const latestElement = elementsMap.get(originalElement.id);
   if (!latestElement) {
@@ -154,7 +167,7 @@ export const moveElement = (
     },
     { informMutation: shouldInformMutation, isDragging: false },
   );
-  updateBindings(latestElement, scene);
+  updateBindings(latestElement, scene, appState);
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -212,26 +225,9 @@ export const moveElement = (
         },
         { informMutation: shouldInformMutation, isDragging: false },
       );
-      updateBindings(latestChildElement, scene, {
-        simultaneouslyUpdated: originalChildren,
+      updateBindings(latestChildElement, scene, appState, {
+        simultaneouslyUpdated: getNonDeletedElements(originalChildren),
       });
-
-      const boundTextElement = getBoundTextElement(
-        latestChildElement,
-        originalElementsMap,
-      );
-      if (boundTextElement) {
-        const latestBoundTextElement = elementsMap.get(boundTextElement.id);
-        latestBoundTextElement &&
-          scene.mutateElement(
-            latestBoundTextElement,
-            {
-              x: boundTextElement.x + changeInX,
-              y: boundTextElement.y + changeInY,
-            },
-            { informMutation: shouldInformMutation, isDragging: false },
-          );
-      }
     });
   }
 };
