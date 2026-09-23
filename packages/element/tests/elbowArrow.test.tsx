@@ -207,6 +207,55 @@ describe("elbow arrow routing", () => {
   });
 });
 
+describe("elbow arrow mutation with zero coordinates", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it("does not silently drop an origin coordinate of 0 during elbow routing (x)", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 100,
+      y: 100,
+      width: 90,
+      height: 200,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
+    }) as NonDeleted<ExcalidrawElbowArrowElement>;
+    h.scene.insertElement(arrow);
+
+    // points must be included in the same update for the elbow-routing
+    // branch (and therefore the x/y fallback) to run at all.
+    h.scene.mutateElement(arrow, {
+      x: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
+    });
+
+    expect(arrow.x).toEqual(0);
+  });
+
+  it("does not silently drop an origin coordinate of 0 during elbow routing (y)", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 100,
+      y: 100,
+      width: 90,
+      height: 200,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
+    }) as NonDeleted<ExcalidrawElbowArrowElement>;
+    h.scene.insertElement(arrow);
+
+    h.scene.mutateElement(arrow, {
+      y: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(90, 200)],
+    });
+
+    expect(arrow.y).toEqual(0);
+  });
+});
+
 describe("elbow arrow ui", () => {
   beforeEach(async () => {
     localStorage.clear();
