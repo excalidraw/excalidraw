@@ -2,9 +2,11 @@ import { pointFrom } from "@excalidraw/math";
 
 import { bindOrUnbindBindingElement } from "@excalidraw/element/binding";
 import {
+  isArrowBoundOutsideOfFrame,
   isValidPolygon,
   LinearElementEditor,
   newElementWith,
+  removeElementsFromFrame,
 } from "@excalidraw/element";
 
 import {
@@ -135,6 +137,10 @@ export const actionFinalize = register<FormData>({
             gridSize: app.getEffectiveGridSize(),
           },
         );
+
+        if (isArrowBoundOutsideOfFrame(element, elementsMap)) {
+          removeElementsFromFrame([element], elementsMap);
+        }
       } else if (isLineElement(element)) {
         if (
           appState.selectedLinearElement?.isEditing &&
@@ -295,6 +301,10 @@ export const actionFinalize = register<FormData>({
             );
           }
         }
+      }
+
+      if (isArrowBoundOutsideOfFrame(element, elementsMap)) {
+        removeElementsFromFrame([element], elementsMap);
       }
 
       if (element && isInvisiblySmallElement(element)) {
