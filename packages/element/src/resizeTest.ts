@@ -86,7 +86,16 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
   });
 
   if (filter.length > 0) {
-    return filter[0] as TransformHandleType;
+    // handles can overlap on small elements (especially with the larger
+    // touch handles), so pick the one whose center is closest
+    const distanceToCenter = (key: string) => {
+      const [hx, hy, hw, hh] =
+        transformHandles[key as Exclude<TransformHandleType, "rotation">]!;
+      return Math.hypot(x - (hx + hw / 2), y - (hy + hh / 2));
+    };
+    return filter.reduce((closest, key) =>
+      distanceToCenter(key) < distanceToCenter(closest) ? key : closest,
+    ) as TransformHandleType;
   }
 
   if (canResizeFromSides(editorInterface)) {
