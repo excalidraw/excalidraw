@@ -187,20 +187,6 @@ window.addEventListener(
   },
 );
 
-let isSelfEmbedding = false;
-
-if (window.self !== window.top) {
-  try {
-    const parentUrl = new URL(document.referrer);
-    const currentUrl = new URL(window.location.href);
-    if (parentUrl.origin === currentUrl.origin) {
-      isSelfEmbedding = true;
-    }
-  } catch (error) {
-    // ignore
-  }
-}
-
 const shareableLinkConfirmDialog = {
   title: t("overwriteConfirm.modal.shareableLink.title"),
   description: (
@@ -879,25 +865,6 @@ const ExcalidrawWrapper = () => {
   //   return new Promise((r) => setTimeout(r, 2500));
   //   // console.log("onExport");
   // };
-
-  // browsers generally prevent infinite self-embedding, there are
-  // cases where it still happens, and while we disallow self-embedding
-  // by not whitelisting our own origin, this serves as an additional guard
-  if (isSelfEmbedding) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          height: "100%",
-        }}
-      >
-        <h1>I'm not a pretzel!</h1>
-      </div>
-    );
-  }
 
   const ExcalidrawPlusCommand = {
     label: "Excalidraw+",

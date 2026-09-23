@@ -5,6 +5,7 @@ import { Excalidraw } from "@excalidraw/excalidraw";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { UI, Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
+  fireEvent,
   render,
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
@@ -155,6 +156,36 @@ describe("flow chart creation", () => {
 
     expect(firstChildNode.x).toBe(secondChildNode.x);
     expect(secondChildNode.x).toBe(thirdChildNode.x);
+  });
+
+  it("creates a connected node from the contextual direction picker", () => {
+    const initialNode = h.elements[0];
+    const addStep = document.querySelector<HTMLButtonElement>(
+      '[data-testid="flowchart-add-step"]',
+    );
+    expect(addStep).not.toBeNull();
+
+    fireEvent.click(addStep!);
+
+    const downButton = document.querySelector<HTMLButtonElement>(
+      '[data-testid="flowchart-add-step-down"]',
+    );
+    expect(downButton).not.toBeNull();
+
+    fireEvent.click(downButton!);
+
+    expect(
+      h.elements.filter((element) => element.type === "rectangle"),
+    ).toHaveLength(2);
+    expect(
+      h.elements.filter((element) => element.type === "arrow"),
+    ).toHaveLength(1);
+    expect(
+      h.elements.find(
+        (element) =>
+          element.type === "rectangle" && element.id !== initialNode.id,
+      )?.y,
+    ).toBe(200);
   });
 
   // regression for #8518: additional siblings must not overlap existing ones
