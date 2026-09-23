@@ -495,10 +495,7 @@ const renderBindingHighlightForBindableElement_simple = (
     // Render the highlighted midpoint if any
     const midpoint = appState.suggestedBinding?.midPoint;
     if (midpoint) {
-      context.fillStyle =
-        appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, 1)`
-          : `rgba(106, 189, 252, 1)`;
+      context.fillStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, 1)`;
 
       context.beginPath();
       context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
