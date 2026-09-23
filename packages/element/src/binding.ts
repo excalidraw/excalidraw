@@ -1662,12 +1662,16 @@ export const bindPointToSnapToElementOutline = (
           otherPoint,
         ),
       );
+    // The ray can cross the outline twice (e.g. a thin rotated diamond), so
+    // take the crossing nearest to the point we aim at
+    const byDistanceToResolved = (a: GlobalPoint, b: GlobalPoint) =>
+      pointDistanceSq(a, resolved) - pointDistanceSq(b, resolved);
     intersection = intersectElementWithLineSegment(
       bindableElement,
       elementsMap,
       intersector,
       bindingGap,
-    ).sort(pointDistanceSq)[0];
+    ).sort(byDistanceToResolved)[0];
 
     if (!intersection) {
       const anotherPoint = pointFrom<GlobalPoint>(
@@ -1689,7 +1693,7 @@ export const bindPointToSnapToElementOutline = (
         elementsMap,
         anotherIntersector,
         BASE_BINDING_GAP,
-      ).sort(pointDistanceSq)[0];
+      ).sort(byDistanceToResolved)[0];
     }
   } else {
     let intersector = customIntersector;

@@ -16,6 +16,8 @@ import {
 
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
+import type { Radians } from "@excalidraw/math";
+
 import type { Zoom } from "@excalidraw/excalidraw/types";
 
 import {
@@ -463,6 +465,38 @@ describe("binding for simple arrows", () => {
         expect(points[points.length - 2][0]).toBeCloseTo(endX);
       });
     }
+
+    it("elbow arrow binds next to the tip of a thin rotated diamond", () => {
+      const diamond = API.createElement({
+        type: "diamond",
+        x: 0,
+        y: 0,
+        width: 600,
+        height: 100,
+        angle: ((15 * Math.PI) / 180) as Radians,
+        roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+      }) as ExcalidrawBindableElement;
+      API.setElements([diamond]);
+      const [right] = getAllMidpoints(diamond, arrayToMap([diamond]));
+
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.downAt(right[0] + 300, right[1] + 300);
+      mouse.moveTo(right[0] + 50, right[1] + 50);
+      // just outside the right tip
+      mouse.moveTo(right[0] + 4, right[1] + 1);
+      mouse.up();
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      const [endX, endY] = arrow.points[arrow.points.length - 1];
+
+      expect(arrow.endBinding?.elementId).toBe(diamond.id);
+      // a binding gap away, not on another edge of the diamond
+      expect(
+        Math.hypot(arrow.x + endX - right[0], arrow.y + endY - right[1]),
+      ).toBeLessThan(getBindingGap(diamond) + 2);
+    });
 
     it("elbow arrow snaps to a diamond's edge midpoint", () => {
       const diamond = API.createElement({
