@@ -98,7 +98,7 @@ Check out our [documentation](https://docs.excalidraw.com/docs/@excalidraw/excal
 
 Deploy to ZopCloud, or into your own AWS, GCP or Azure account.
 
-[![Deploy to ZopDay](https://zop.dev/deploytozopday-ink.svg)](https://zop.dev/zopday/app/deploy?image=excalidraw/excalidraw:latest&port=80)
+[![Deploy to ZopDay](https://zop.dev/deploytozopday-inkhard.svg)](https://zop.dev/zopday/app/deploy?image=excalidraw/excalidraw:latest&port=80)
 
 ## Contributing
 
