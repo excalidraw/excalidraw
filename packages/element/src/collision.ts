@@ -61,7 +61,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 
 import { distanceToElement } from "./distance";
 
-import { getBindingGap, maxBindingDistance_simple } from "./binding";
+import { maxBindingDistance_simple } from "./binding";
 
 import { hasBackground } from "./comparisons";
 
@@ -333,14 +333,25 @@ const bindableElementBorderDistanceIfClose = (
   return distance > tolerance ? -Infinity : -distance;
 };
 
-export const getAllHoveredElementAtPoint = (
-  arrow: { elbowed: boolean },
+type BindingCandidate = {
+  element: NonDeleted<ExcalidrawBindableElement>;
+  /** distance to the outline: positive inside, negative outside */
+  distance: number;
+};
+
+/**
+ * Bindable elements within binding distance of the point, front to back.
+ * Stops at the first opaque element containing the point, since it hides
+ * everything behind it.
+ */
+const getBindingCandidates = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  tolerance?: number,
-): NonDeleted<ExcalidrawBindableElement>[] => {
-  const candidateElements: NonDeleted<ExcalidrawBindableElement>[] = [];
+  zoom: AppState["zoom"],
+): BindingCandidate[] => {
+  const maxDistance = maxBindingDistance_simple(zoom);
+  const candidates: BindingCandidate[] = [];
   // We need to do hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index
@@ -349,57 +360,8 @@ export const getAllHoveredElementAtPoint = (
 
     invariant(
       !element.isDeleted,
-      "Elements in the function parameter for getAllElementsAtPositionForBinding() should not contain deleted elements",
+      "Elements passed to binding hit tests should not contain deleted elements",
     );
-
-    if (
-      isBindableElement(element, false) &&
-      !isPointClippedByEnclosingFrame(element, point, elementsMap) &&
-      // frames are only bindable from the outside
-      !(
-        isFrameLikeElement(element) &&
-        isPointInElement(point, element, elementsMap)
-      ) &&
-      hitElementItself({
-        element,
-        point,
-        elementsMap,
-        threshold: tolerance ?? getBindingGap(element),
-        overrideShouldTestInside: true,
-      })
-    ) {
-      candidateElements.push(element);
-
-      if (
-        hasBackground(element.type) &&
-        !isTransparent(element.backgroundColor)
-      ) {
-        break;
-      }
-    }
-  }
-
-  return candidateElements;
-};
-
-export const getHoveredElementForBinding = (
-  arrow: { elbowed: boolean },
-  point: Readonly<GlobalPoint>,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  elementsMap: NonDeletedSceneElementsMap,
-  zoom?: AppState["zoom"],
-): NonDeleted<ExcalidrawBindableElement> | null => {
-  type Candidate = {
-    element: NonDeleted<ExcalidrawBindableElement>;
-    distance: number;
-    overlapPercent?: number;
-    relativeArea?: number;
-  };
-
-  const maxDistance = maxBindingDistance_simple(zoom);
-  const candidates: Candidate[] = [];
-  for (let index = elements.length - 1; index >= 0; --index) {
-    const element = elements[index];
 
     if (!isBindableElement(element, false)) {
       continue;
@@ -424,6 +386,33 @@ export const getHoveredElementForBinding = (
       }
     }
   }
+
+  return candidates;
+};
+
+/**
+ * All elements an arrow endpoint at the point could bind to. Always includes
+ * the result of `getHoveredElementForBinding` for the same arguments.
+ */
+export const getAllHoveredElementAtPoint = (
+  arrow: { elbowed: boolean },
+  point: Readonly<GlobalPoint>,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+): NonDeleted<ExcalidrawBindableElement>[] =>
+  getBindingCandidates(point, elements, elementsMap, zoom).map(
+    ({ element }) => element,
+  );
+
+export const getHoveredElementForBinding = (
+  arrow: { elbowed: boolean },
+  point: Readonly<GlobalPoint>,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elementsMap: NonDeletedSceneElementsMap,
+  zoom: AppState["zoom"],
+): NonDeleted<ExcalidrawBindableElement> | null => {
+  const candidates = getBindingCandidates(point, elements, elementsMap, zoom);
 
   if (candidates.length === 0) {
     return null;

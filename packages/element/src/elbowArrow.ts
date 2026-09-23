@@ -1210,6 +1210,10 @@ const getElbowArrowData = (
     GlobalPoint
   >(nextPoints[nextPoints.length - 1], vector(arrow.x, arrow.y));
 
+  // NOTE: updates coming through `mutateElement` don't carry the zoom, so
+  // those fall back to the zoom=1 binding distance
+  const zoom = options?.zoom ?? ({ value: 1 } as AppState["zoom"]);
+
   let hoveredStartElement = null;
   let hoveredEndElement = null;
   if (options?.isDragging && options?.isBindingEnabled !== false) {
@@ -1220,7 +1224,7 @@ const getElbowArrowData = (
         origStartGlobalPoint,
         elementsMap,
         elements,
-        options?.zoom,
+        zoom,
       ) || null;
     hoveredEndElement =
       getHoveredElement(
@@ -1228,7 +1232,7 @@ const getElbowArrowData = (
         origEndGlobalPoint,
         elementsMap,
         elements,
-        options?.zoom,
+        zoom,
       ) || null;
   } else {
     hoveredStartElement = arrow.startBinding
@@ -1251,7 +1255,7 @@ const getElbowArrowData = (
     "start",
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
-    options?.zoom || ({ value: 1 } as AppState["zoom"]),
+    zoom,
     hoveredStartElement,
     elementsMap,
     options?.isDragging,
@@ -1269,7 +1273,7 @@ const getElbowArrowData = (
     "end",
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
-    options?.zoom || ({ value: 1 } as AppState["zoom"]),
+    zoom,
     hoveredEndElement,
     elementsMap,
     options?.isDragging,
@@ -1282,7 +1286,7 @@ const getElbowArrowData = (
     hoveredStartElement,
     origStartGlobalPoint,
     elementsMap,
-    options?.zoom,
+    zoom,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
@@ -1290,7 +1294,7 @@ const getElbowArrowData = (
     hoveredEndElement,
     origEndGlobalPoint,
     elementsMap,
-    options?.zoom,
+    zoom,
   );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
@@ -2282,7 +2286,7 @@ const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  zoom?: AppState["zoom"],
+  zoom: AppState["zoom"],
 ) => {
   return getHoveredElementForBinding(
     arrow,

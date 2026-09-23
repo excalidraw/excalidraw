@@ -10190,7 +10190,6 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               {
                 newArrow: Boolean(this.state.newElement),
-                zoom: this.state.zoom,
               },
             )
           : { end: { mode: undefined } };

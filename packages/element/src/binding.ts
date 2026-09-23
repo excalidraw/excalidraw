@@ -269,7 +269,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  zoom?: AppState["zoom"],
+  zoom: AppState["zoom"],
 ): {
   start: BindingStrategy;
   end: BindingStrategy;
@@ -398,6 +398,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
         point,
         elements,
         elementsMap,
+        appState.zoom,
       );
 
       if (allHits.find((el) => el.id === startBinding.elementId)) {
@@ -509,9 +510,13 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
     zoom,
   );
   const isOverlapping = oppositeBinding
-    ? getAllHoveredElementAtPoint(arrow, point, elements, elementsMap).some(
-        (el) => el.id === oppositeBinding.elementId,
-      )
+    ? getAllHoveredElementAtPoint(
+        arrow,
+        point,
+        elements,
+        elementsMap,
+        zoom,
+      ).some((el) => el.id === oppositeBinding.elementId)
     : false;
   const oppositeElement = oppositeBinding
     ? (elementsMap.get(
@@ -633,7 +638,6 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
-    zoom?: AppState["zoom"];
     gridSize?: NullableGridSize;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
@@ -674,7 +678,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     altKey?: boolean;
     finalize?: boolean;
     initialBinding?: boolean;
-    zoom?: AppState["zoom"];
     gridSize?: NullableGridSize;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
@@ -721,7 +724,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       draggingPoints,
       elementsMap,
       elements,
-      opts?.zoom,
+      appState.zoom,
     );
   }
 

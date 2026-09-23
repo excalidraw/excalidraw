@@ -11,11 +11,24 @@ import { UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import "@excalidraw/utils/test-utils";
 import { render } from "@excalidraw/excalidraw/tests/test-utils";
 
+import type { Zoom } from "@excalidraw/excalidraw/types";
+
 import * as distance from "../src/distance";
 import { getElementBounds } from "../src/bounds";
-import { hitElementItself, isPointInElement } from "../src/collision";
+import {
+  getAllHoveredElementAtPoint,
+  getHoveredElementForBinding,
+  hitElementItself,
+  isPointInElement,
+} from "../src/collision";
 import { mutateElement } from "../src/mutateElement";
 import { newFreeDrawElement } from "../src/newElement";
+
+import type {
+  NonDeletedExcalidrawElement,
+  NonDeletedSceneElementsMap,
+  Ordered,
+} from "../src/types";
 
 describe("check rotated elements can be hit:", () => {
   beforeEach(async () => {
@@ -618,5 +631,89 @@ describe("freedraw loop fill containment", () => {
 
     expect(element.version).toBeGreaterThan(version);
     expect(isPointInElement(point, element, elementsMap)).toBe(false);
+  });
+});
+
+describe("binding hit tests", () => {
+  type SceneElement = Ordered<NonDeletedExcalidrawElement>;
+  const zoom = (value: number) => ({ value } as Zoom);
+  const arrow = { elbowed: false };
+
+  const hitTest = (
+    elements: SceneElement[],
+    point: GlobalPoint,
+    zoomValue = 1,
+  ) => {
+    const elementsMap = arrayToMap(elements) as NonDeletedSceneElementsMap;
+    return {
+      hovered: getHoveredElementForBinding(
+        arrow,
+        point,
+        elements,
+        elementsMap,
+        zoom(zoomValue),
+      )?.id,
+      all: getAllHoveredElementAtPoint(
+        arrow,
+        point,
+        elements,
+        elementsMap,
+        zoom(zoomValue),
+      ).map((element) => element.id),
+    };
+  };
+
+  it("both use the zoom-aware binding distance", () => {
+    const rect = API.createElement({
+      id: "rect",
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    }) as SceneElement;
+    // 20px outside the right edge
+    const point = pointFrom<GlobalPoint>(120, 50);
+
+    // 15px binding distance at zoom 1
+    expect(hitTest([rect], point, 1)).toEqual({ hovered: undefined, all: [] });
+    // 25px binding distance at zoom 0.4
+    expect(hitTest([rect], point, 0.4)).toEqual({
+      hovered: "rect",
+      all: ["rect"],
+    });
+  });
+
+  it("both skip elements hidden behind an opaque element", () => {
+    const hidden = API.createElement({
+      id: "hidden",
+      type: "rectangle",
+      x: 30,
+      y: 30,
+      width: 40,
+      height: 40,
+      index: "a0" as SceneElement["index"],
+    }) as SceneElement;
+    const cover = (backgroundColor: string) =>
+      API.createElement({
+        id: "cover",
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        backgroundColor,
+        index: "a1" as SceneElement["index"],
+      }) as SceneElement;
+    const point = pointFrom<GlobalPoint>(50, 50);
+
+    expect(hitTest([hidden, cover("#ffc9c9")], point)).toEqual({
+      hovered: "cover",
+      all: ["cover"],
+    });
+
+    const transparent = hitTest([hidden, cover("transparent")], point);
+    expect(transparent.hovered).toBe("hidden");
+    expect(transparent.all).toEqual(["cover", "hidden"]);
   });
 });
