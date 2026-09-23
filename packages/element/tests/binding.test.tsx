@@ -348,6 +348,35 @@ describe("binding for simple arrows", () => {
     });
   });
 
+  describe("binding at an ellipse's center", () => {
+    beforeEach(async () => {
+      mouse.reset();
+      await act(() => setLanguage(defaultLang));
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+    });
+
+    it("binds an arrow dropped at a circle's exact center", () => {
+      const circle = API.createElement({
+        type: "ellipse",
+        x: 100,
+        y: -100,
+        width: 200,
+        height: 200,
+      });
+      API.setElements([circle]);
+
+      UI.clickTool("arrow");
+      mouse.reset();
+      mouse.downAt(-100, 0);
+      mouse.moveTo(100, 0);
+      mouse.moveTo(200, 0);
+      mouse.up();
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      expect(arrow.endBinding?.elementId).toBe(circle.id);
+    });
+  });
+
   describe("midpoint snapping on diamonds", () => {
     beforeEach(async () => {
       mouse.reset();

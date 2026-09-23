@@ -764,6 +764,59 @@ describe("binding hit tests", () => {
       ).toBe("container");
     });
   });
+
+  it("binds at a circle's exact center, where an opaque circle still occludes", () => {
+    const hidden = API.createElement({
+      id: "hidden",
+      type: "rectangle",
+      x: 90,
+      y: 90,
+      width: 20,
+      height: 20,
+      index: "a0" as SceneElement["index"],
+    }) as SceneElement;
+    const circle = (backgroundColor: string) =>
+      API.createElement({
+        id: "circle",
+        type: "ellipse",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+        backgroundColor,
+        index: "a1" as SceneElement["index"],
+      }) as SceneElement;
+    const center = pointFrom<GlobalPoint>(100, 100);
+
+    expect(hitTest([circle("transparent")], center).hovered).toBe("circle");
+    expect(hitTest([hidden, circle("#ffc9c9")], center)).toEqual({
+      hovered: "circle",
+      all: ["circle"],
+    });
+  });
+});
+
+describe("ellipse outline hit test", () => {
+  it("doesn't hit a transparent ellipse's outline from its center line", () => {
+    const ellipse = API.createElement({
+      type: "ellipse",
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 100,
+      backgroundColor: "transparent",
+    });
+
+    // on the horizontal center line, ~50px from the outline
+    expect(
+      hitElementItself({
+        point: pointFrom<GlobalPoint>(210, 50),
+        element: ellipse,
+        threshold: 10,
+        elementsMap: arrayToMap([ellipse]),
+      }),
+    ).toBe(false);
+  });
 });
 
 describe("intersectElementWithLineSegment", () => {
