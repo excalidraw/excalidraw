@@ -109,7 +109,9 @@ Or run the published image directly:
 docker run -p 3000:80 excalidraw/excalidraw:latest
 ```
 
-If you'd rather not manage a host, the same image can be deployed in one click with [zopday](https://zop.dev/zopday/app/deploy?image=excalidraw/excalidraw:latest&port=80).
+If you'd rather not manage a host, the same image can be deployed in one click:
+
+[![Deploy to zopday](https://zop.dev/deploytozopday-ink.svg)](https://zop.dev/zopday/app/deploy?image=excalidraw/excalidraw:latest&port=80)
 
 **Note:** self-hosted instances run the editor only. Real-time collaboration additionally requires [excalidraw-room](https://github.com/excalidraw/excalidraw-room).
 
