@@ -31,6 +31,7 @@ import {
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
   isTransparent,
+  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -112,12 +113,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type {
-  AppState,
-  BinaryFiles,
-  LibraryItem,
-  NormalizedZoomValue,
-} from "../types";
+import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -402,7 +398,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               boundElement,
               startOrEnd,
               elementsMap,
-              { value: 1 as NormalizedZoomValue },
+              DEFAULT_ZOOM,
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
         safeElement as NonDeleted<ExcalidrawArrowElement>,
