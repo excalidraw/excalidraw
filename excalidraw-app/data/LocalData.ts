@@ -82,8 +82,12 @@ const saveDataStateToLocalStorage = (
   );
   try {
     // another tab saved since we last synced, so our scene is stale and
-    // we must not overwrite it. We'll sync once this tab is focused.
-    if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
+    // we must not overwrite it, unless the user is working in this tab.
+    // We'll sync once this tab is focused.
+    if (
+      !document.hasFocus() &&
+      isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)
+    ) {
       return;
     }
 

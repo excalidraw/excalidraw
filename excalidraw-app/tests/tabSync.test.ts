@@ -33,6 +33,11 @@ describe("tab sync", () => {
   beforeEach(() => {
     localStorage.clear();
     importFromLocalStorage();
+    vi.spyOn(document, "hasFocus").mockReturnValue(false);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("should not overwrite a newer scene saved by another tab", () => {
@@ -55,6 +60,17 @@ describe("tab sync", () => {
     saveSceneFromOtherTab([newerRect]);
     importFromLocalStorage();
 
+    saveScene([editedRect]);
+    expect(getSavedElementIds()).toEqual(["edited"]);
+  });
+
+  it("should save from the focused tab even if another tab saved since", () => {
+    const newerRect = API.createElement({ type: "rectangle", id: "newer" });
+    const editedRect = API.createElement({ type: "rectangle", id: "edited" });
+
+    saveSceneFromOtherTab([newerRect]);
+
+    vi.spyOn(document, "hasFocus").mockReturnValue(true);
     saveScene([editedRect]);
     expect(getSavedElementIds()).toEqual(["edited"]);
   });
