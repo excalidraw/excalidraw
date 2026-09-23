@@ -724,14 +724,11 @@ const getSnappedMidpointIndexForSimpleArrow = (
   element: ExcalidrawBindableElement,
   point: GlobalPoint,
   elementsMap: ElementsMap,
-  horizontalThreshold: number,
-  verticalThreshold: number,
+  threshold: number,
 ) => {
   const baseMidpoints = getAllMidpoints(element, elementsMap);
 
   for (let i = 0; i < baseMidpoints.length; i++) {
-    const threshold = i % 2 === 0 ? horizontalThreshold : verticalThreshold;
-
     if (
       pointDistance(baseMidpoints[i], point) <= threshold &&
       !hitElementItself({
@@ -810,8 +807,7 @@ export const getSnapOutlineMidPoint = (
         element,
         point,
         elementsMap,
-        horizontalThreshold,
-        verticalThreshold,
+        maxDistance,
       );
 
   if (idx === -1) {
