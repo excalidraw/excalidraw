@@ -6,11 +6,14 @@ import {
   updateBoundElements,
 } from "@excalidraw/element";
 
+import { pointFrom } from "@excalidraw/math";
+
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
   ExcalidrawElement,
   ExcalidrawElbowArrowElement,
+  ExcalidrawTextElement,
 } from "@excalidraw/element/types";
 
 const REPAIR_ALL = { warn: false } as const;
@@ -42,10 +45,7 @@ describe("repairBindings", () => {
       id: "arrow",
       x: 100,
       y: 50,
-      points: [
-        [0, 0],
-        [50, 0],
-      ],
+      points: [pointFrom(0, 0), pointFrom(50, 0)],
       startBinding: {
         elementId: "missing",
         fixedPoint: [0.5, 0.5],
@@ -78,10 +78,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "missing",
           fixedPoint: [0.5, 0.5],
@@ -98,7 +95,9 @@ describe("repairBindings", () => {
         ...REPAIR_ALL,
         actions: ["unbindDangling"],
       });
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
       const fixedRect = fixed.find((el) => el.id === "rect")!;
 
       expect(fixedArrow.startBinding).toBeNull();
@@ -122,10 +121,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -137,7 +133,9 @@ describe("repairBindings", () => {
       // a deleted target is absent from the non-deleted map, so this used to
       // throw inside `unbindBindingElement` rather than clear the binding
       const fixed = repairBindings([rect, arrow], REPAIR_ALL);
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
       const fixedRect = fixed.find((el) => el.id === "rect")!;
 
       expect(fixedArrow.startBinding).toBeNull();
@@ -162,10 +160,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "missing",
           fixedPoint: [0.5, 0.5],
@@ -175,7 +170,9 @@ describe("repairBindings", () => {
       });
 
       const fixed = repairBindings([rect, arrow], REPAIR_ALL);
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       expect(fixedArrow.startBinding?.elementId).toBe("rect");
     });
@@ -195,10 +192,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "nope",
           fixedPoint: [0.5, 0.5],
@@ -215,7 +209,9 @@ describe("repairBindings", () => {
         ...REPAIR_ALL,
         actions: ["unbindDangling"],
       });
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
       const fixedRect = fixed.find((el) => el.id === "rect")!;
 
       expect(fixedArrow.startBinding).toBeNull();
@@ -230,10 +226,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 0,
         y: 0,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "missing",
           fixedPoint: [0.5, 0.5],
@@ -247,7 +240,9 @@ describe("repairBindings", () => {
         actions: ["unbindDangling"],
         arrowIds: ["some-other-arrow"],
       });
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       // out of scope, so the dangling binding is left untouched
       expect(fixedArrow.startBinding?.elementId).toBe("missing");
@@ -273,10 +268,7 @@ describe("repairBindings", () => {
         id: "present",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -309,10 +301,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 500,
         y: 500,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
@@ -326,7 +315,7 @@ describe("repairBindings", () => {
       expect(fixedRect.boundElements).toEqual([]);
     });
 
-    it("drops a record whose type disagrees with the element it points at", () => {
+    it("fixes the type of a record that otherwise binds back", () => {
       const rect = API.createElement({
         type: "rectangle",
         id: "rect",
@@ -347,6 +336,42 @@ describe("repairBindings", () => {
         height: 20,
         text: "hi",
         containerId: "rect",
+      });
+
+      const fixed = repairBindings([rect, text], {
+        ...REPAIR_ALL,
+        actions: ["pruneBoundElements"],
+      });
+      const fixedRect = fixed.find((el) => el.id === "rect")!;
+      const fixedText = fixed.find(
+        (el) => el.id === "text",
+      ) as ExcalidrawTextElement;
+
+      // the record is corrected rather than dropped, so the label stays bound
+      // on both sides
+      expect(fixedRect.boundElements).toEqual([{ id: "text", type: "text" }]);
+      expect(fixedText.containerId).toBe("rect");
+    });
+
+    it("drops a mistyped record that does not bind back", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ id: "text", type: "arrow" }],
+      });
+      const text = API.createElement({
+        type: "text",
+        id: "text",
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 20,
+        text: "hi",
+        containerId: null,
       });
 
       const fixed = repairBindings([rect, text], {
@@ -405,10 +430,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -433,10 +455,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 0,
         y: 0,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "missing",
           fixedPoint: [0.5, 0.5],
@@ -468,10 +487,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -505,11 +521,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 0,
         y: 0,
-        points: [
-          [0, 50],
-          [50, 0],
-          [100, 50],
-        ],
+        points: [pointFrom(0, 50), pointFrom(50, 0), pointFrom(100, 50)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -546,10 +558,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -583,10 +592,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -607,7 +613,7 @@ describe("repairBindings", () => {
 
       // what a drag does: move the container, then run the bound-element update
       movedRect.x = 500;
-      updateBoundElements(movedRect, scene, {} as any, new Map());
+      updateBoundElements(movedRect, scene);
 
       const afterArrow = scene
         .getElementsMapIncludingDeleted()
@@ -666,22 +672,152 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
 
       const fixed = repairBindings([rect, arrow], REPAIR_ALL);
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
       const fixedRect = fixed.find((el) => el.id === "rect")!;
 
       expect(fixedArrow.startBinding).toEqual(
         expect.objectContaining({ elementId: "rect" }),
       );
       expect(fixedRect.boundElements).toEqual([{ id: "arrow", type: "arrow" }]);
+    });
+
+    describe("see-through group boxes", () => {
+      const groupBox = () =>
+        API.createElement({
+          type: "rectangle",
+          id: "group",
+          x: 0,
+          y: 0,
+          width: 500,
+          height: 500,
+          backgroundColor: "transparent",
+        });
+      const innerRect = () =>
+        API.createElement({
+          type: "rectangle",
+          id: "inner",
+          x: 300,
+          y: 200,
+          width: 100,
+          height: 100,
+        });
+
+      it("does not bind an arrow lying entirely inside the box", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          id: "arrow",
+          x: 100,
+          y: 250,
+          points: [pointFrom(0, 0), pointFrom(100, 0)],
+          startBinding: null,
+          endBinding: null,
+        });
+
+        const fixed = repairBindings([groupBox(), arrow], REPAIR_ALL);
+        const fixedArrow = fixed.find(
+          (el) => el.id === "arrow",
+        ) as ExcalidrawArrowElement;
+        const fixedGroup = fixed.find((el) => el.id === "group")!;
+
+        expect(fixedArrow.startBinding).toBeNull();
+        expect(fixedArrow.endBinding).toBeNull();
+        expect(fixedGroup.boundElements ?? []).toEqual([]);
+      });
+
+      it("binds the end that reaches an inner shape, not the box", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          id: "arrow",
+          x: 100,
+          y: 250,
+          // end sits on the inner rect's left edge, start falls short of
+          // anything
+          points: [pointFrom(0, 0), pointFrom(200, 0)],
+          startBinding: null,
+          endBinding: null,
+        });
+
+        const fixed = repairBindings(
+          [groupBox(), innerRect(), arrow],
+          REPAIR_ALL,
+        );
+        const fixedArrow = fixed.find(
+          (el) => el.id === "arrow",
+        ) as ExcalidrawArrowElement;
+
+        expect(fixedArrow.startBinding).toBeNull();
+        expect(fixedArrow.endBinding?.elementId).toBe("inner");
+      });
+
+      it("still binds inside when the arrow points in from outside", () => {
+        const arrow = API.createElement({
+          type: "arrow",
+          id: "arrow",
+          x: -200,
+          y: 250,
+          points: [pointFrom(0, 0), pointFrom(300, 0)],
+          startBinding: null,
+          endBinding: null,
+        });
+
+        const fixed = repairBindings([groupBox(), arrow], REPAIR_ALL);
+        const fixedArrow = fixed.find(
+          (el) => el.id === "arrow",
+        ) as ExcalidrawArrowElement;
+
+        expect(fixedArrow.startBinding).toBeNull();
+        expect(fixedArrow.endBinding).toEqual(
+          expect.objectContaining({ elementId: "group", mode: "inside" }),
+        );
+      });
+
+      it("still binds center-to-center arrows between separate boxes", () => {
+        const a = API.createElement({
+          type: "rectangle",
+          id: "a",
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+        });
+        const b = API.createElement({
+          type: "rectangle",
+          id: "b",
+          x: 300,
+          y: 0,
+          width: 100,
+          height: 100,
+        });
+        const arrow = API.createElement({
+          type: "arrow",
+          id: "arrow",
+          x: 50,
+          y: 50,
+          points: [pointFrom(0, 0), pointFrom(300, 0)],
+          startBinding: null,
+          endBinding: null,
+        });
+
+        const fixed = repairBindings([a, b, arrow], REPAIR_ALL);
+        const fixedArrow = fixed.find(
+          (el) => el.id === "arrow",
+        ) as ExcalidrawArrowElement;
+
+        expect(fixedArrow.startBinding).toEqual(
+          expect.objectContaining({ elementId: "a", mode: "inside" }),
+        );
+        expect(fixedArrow.endBinding).toEqual(
+          expect.objectContaining({ elementId: "b", mode: "inside" }),
+        );
+      });
     });
 
     it("leaves an endpoint alone when no bindable element is in reach", () => {
@@ -698,16 +834,15 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 1000,
         y: 1000,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
 
       const fixed = repairBindings([rect, arrow], REPAIR_ALL);
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
       const fixedRect = fixed.find((el) => el.id === "rect")!;
 
       expect(fixedArrow.startBinding).toBeNull();
@@ -729,10 +864,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
@@ -741,7 +873,9 @@ describe("repairBindings", () => {
         ...REPAIR_ALL,
         arrowIds: ["some-other-arrow"],
       });
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       expect(fixedArrow.startBinding).toBeNull();
     });
@@ -761,16 +895,15 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 300,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
 
       const fixed = repairBindings([rect, arrow], REPAIR_ALL);
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       expect(fixedArrow.startBinding).toBeNull();
     });
@@ -790,23 +923,20 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 120,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
 
       const withoutTolerance = repairBindings([rect, arrow], REPAIR_ALL).find(
         (el) => el.id === "arrow",
-      )!;
+      ) as ExcalidrawArrowElement;
       expect(withoutTolerance.startBinding).toBeNull();
 
       const withTolerance = repairBindings([rect, arrow], {
         ...REPAIR_ALL,
         tolerance: 30,
-      }).find((el) => el.id === "arrow")!;
+      }).find((el) => el.id === "arrow") as ExcalidrawArrowElement;
       expect(withTolerance.startBinding).toEqual(
         expect.objectContaining({ elementId: "rect" }),
       );
@@ -820,10 +950,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           // stale: rect now sits at x=200
@@ -846,12 +973,91 @@ describe("repairBindings", () => {
         ...REPAIR_ALL,
         actions: ["reanchorBindings"],
       });
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       expect(fixedArrow.startBinding?.elementId).toBe("rect");
       expect(fixedArrow.startBinding?.fixedPoint).toEqual(
         expect.arrayContaining([expect.any(Number), expect.any(Number)]),
       );
+      expect(fixedArrow.startBinding?.mode).toBe("orbit");
+    });
+
+    it.each([
+      // endpoint just outside the rect's left edge
+      { x: 95, expected: "orbit" },
+      // endpoint well inside the rect
+      { x: 150, expected: "inside" },
+    ])("infers a missing mode as $expected", ({ x, expected }) => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 100,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ id: "arrow", type: "arrow" }],
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        x,
+        y: 50,
+        points: [pointFrom(0, 0), pointFrom(-50, 0)],
+        // generator omitted `mode`
+        startBinding: {
+          elementId: "rect",
+          fixedPoint: [0.5, 0.5],
+        } as any,
+        endBinding: null,
+      });
+
+      const fixed = repairBindings([rect, arrow], {
+        ...REPAIR_ALL,
+        actions: ["reanchorBindings"],
+      });
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
+
+      expect(fixedArrow.startBinding?.elementId).toBe("rect");
+      expect(fixedArrow.startBinding?.mode).toBe(expected);
+    });
+
+    it("keeps a valid explicit mode", () => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: 100,
+        y: 0,
+        width: 100,
+        height: 100,
+        boundElements: [{ id: "arrow", type: "arrow" }],
+      });
+      const arrow = API.createElement({
+        type: "arrow",
+        id: "arrow",
+        // endpoint inside the rect, which would infer "inside"
+        x: 150,
+        y: 50,
+        points: [pointFrom(0, 0), pointFrom(-100, 0)],
+        startBinding: {
+          elementId: "rect",
+          fixedPoint: [0.5, 0.5],
+          mode: "orbit",
+        },
+        endBinding: null,
+      });
+
+      const fixed = repairBindings([rect, arrow], {
+        ...REPAIR_ALL,
+        actions: ["reanchorBindings"],
+      });
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
+
       expect(fixedArrow.startBinding?.mode).toBe("orbit");
     });
 
@@ -870,10 +1076,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: undefined as unknown as [number, number],
@@ -886,7 +1089,9 @@ describe("repairBindings", () => {
         ...REPAIR_ALL,
         actions: ["reanchorBindings"],
       });
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       expect(fixedArrow.startBinding?.fixedPoint).toEqual(
         expect.arrayContaining([expect.any(Number), expect.any(Number)]),
@@ -911,10 +1116,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 40,
         y: 50,
-        points: [
-          [0, 0],
-          [60, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(60, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [1, 0.5],
@@ -956,10 +1158,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "missing",
           fixedPoint: [0.5, 0.5],
@@ -973,7 +1172,9 @@ describe("repairBindings", () => {
         ...REPAIR_ALL,
         actions: ["inferMissingBindings"],
       });
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       expect(fixedArrow.startBinding?.elementId).toBe("missing");
     });
@@ -994,10 +1195,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
@@ -1029,10 +1227,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 0,
         y: 0,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "missing",
           fixedPoint: [0.5, 0.5],
@@ -1059,10 +1254,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 0,
         y: 0,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "missing",
           fixedPoint: [0.5, 0.5],
@@ -1098,10 +1290,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "stale",
           fixedPoint: [0.5, 0.5],
@@ -1111,7 +1300,9 @@ describe("repairBindings", () => {
       });
 
       const fixed = repairBindings([rect, arrow], { warn: true });
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       // the repair succeeded, so nothing is reported
       expect(fixedArrow.startBinding?.elementId).toBe("rect");
@@ -1137,10 +1328,7 @@ describe("repairBindings", () => {
         x: 100,
         y: 50,
         index: null,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
@@ -1189,16 +1377,15 @@ describe("repairBindings", () => {
         x: 100,
         y: 50,
         locked: true,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
 
       const fixed = repairBindings([rect, arrow], REPAIR_ALL);
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       expect(fixedArrow.startBinding?.elementId).toBe("rect");
     });
@@ -1219,10 +1406,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [1, 0.5],
@@ -1232,7 +1416,9 @@ describe("repairBindings", () => {
       });
 
       const fixed = repairBindings([rect, arrow], REPAIR_ALL);
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
       const fixedRect = fixed.find((el) => el.id === "rect")!;
 
       expect(fixedArrow.startBinding?.elementId).toBe("rect");
@@ -1254,16 +1440,15 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: null,
         endBinding: null,
       });
 
       const fixed = repairBindings([rect, arrow], REPAIR_ALL);
-      const fixedArrow = fixed.find((el) => el.id === "arrow")!;
+      const fixedArrow = fixed.find(
+        (el) => el.id === "arrow",
+      ) as ExcalidrawArrowElement;
 
       expect(fixedArrow.startBinding).toBeNull();
     });
@@ -1319,10 +1504,7 @@ describe("repairBindings", () => {
         elbowed: true,
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 40],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 40)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -1354,14 +1536,10 @@ describe("repairBindings", () => {
         elbowed: true,
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-          [100, 40],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0), pointFrom(100, 40)],
         fixedSegments: [
-          { start: [0, 0], end: [10, 10], index: 99 },
-          { start: [5, 5], end: [999, 999], index: -3 },
+          { start: pointFrom(0, 0), end: pointFrom(10, 10), index: 99 },
+          { start: pointFrom(5, 5), end: pointFrom(999, 999), index: -3 },
         ],
         startBinding: {
           elementId: "rect",
@@ -1390,10 +1568,7 @@ describe("repairBindings", () => {
         elbowed: true,
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -1419,10 +1594,7 @@ describe("repairBindings", () => {
         id: "arrow",
         x: 100,
         y: 50,
-        points: [
-          [0, 0],
-          [50, 0],
-        ],
+        points: [pointFrom(0, 0), pointFrom(50, 0)],
         startBinding: {
           elementId: "rect",
           fixedPoint: [0.5, 0.5],
@@ -1446,11 +1618,11 @@ describe("repairBindings", () => {
 
 describe("repairBindings types", () => {
   it("accepts a typed bindable array", () => {
-    const rect: ExcalidrawBindableElement = API.createElement({
+    const rect = API.createElement({
       type: "rectangle",
       x: 0,
       y: 0,
-    });
+    }) as ExcalidrawBindableElement;
 
     const fixed: readonly ExcalidrawElement[] = repairBindings([rect], {
       actions: ["pruneBoundElements"],

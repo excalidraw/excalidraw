@@ -507,7 +507,10 @@ export {
 
 export { elementsOverlappingBBox } from "@excalidraw/element";
 
-export { repairBindings } from "@excalidraw/element";
+export {
+  ALL_BINDING_REPAIR_ACTIONS,
+  repairBindings,
+} from "@excalidraw/element";
 export type {
   BindingRepairAction,
   RepairBindingsOptions,

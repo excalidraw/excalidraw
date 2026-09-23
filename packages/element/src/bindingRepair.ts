@@ -47,7 +47,8 @@ export type BindingRepairAction =
   // is deleted: drop the binding on both sides.
   | "unbindDangling"
   // `boundElements` records on a bindable element that do not resolve to a live
-  // element, or whose reverse half no longer points back: drop the record.
+  // element, or whose reverse half no longer points back: drop the record. A
+  // record with a valid back-link but the wrong `type` gets its type fixed.
   | "pruneBoundElements"
   // duplicate `boundElements` entries sharing an id: keep the first one, so the
   // surviving order is the order the entries were first listed in.
@@ -244,9 +245,9 @@ const resolveTarget = (
 
 /**
  * Whether `element` records a binding onto `bindableElementId`. Checks only the
- * id and the reverse half; the record's `type` field is validated separately by
- * {@link hasBoundElementType}, since a wrong type is a distinct defect that the
- * reverse half alone would not catch.
+ * id and the reverse half; the record's `type` field is checked separately
+ * against {@link getBoundElementType}, since a wrong type is a distinct defect
+ * that the reverse half alone would not catch.
  */
 const isBoundTo = (
   element: ExcalidrawElement,
@@ -267,25 +268,24 @@ const isBoundTo = (
 };
 
 /**
- * Whether a `boundElements` record's `type` matches the element it points at.
+ * The `type` a `boundElements` record pointing at `bound` must carry, or null
+ * when `bound` can never be a bound element. Records may only be
+ * `{ id, type: "arrow" }` or `{ id, type: "text" }`, and
  * `getBoundTextElementId` looks bound text up by `type === "text"`, so a text
- * element recorded as `type: "arrow"` would silently stop resolving; the
- * reverse is equally a defect. Records may only be `{ id, type: "arrow" }` or
- * `{ id, type: "text" }`.
+ * element recorded as `type: "arrow"` would silently stop resolving.
  */
-const hasBoundElementType = (
+const getBoundElementType = (
   bound: ExcalidrawElement,
-  record: NonNullable<ExcalidrawElement["boundElements"]>[number],
-): boolean => {
+): "arrow" | "text" | null => {
   if (isArrowElement(bound)) {
-    return record.type === "arrow";
+    return "arrow";
   }
 
   if (isTextElement(bound)) {
-    return record.type === "text";
+    return "text";
   }
 
-  return false;
+  return null;
 };
 
 /**
@@ -321,6 +321,11 @@ const unbindDangling = (state: RepairState): void => {
  * reverse half no longer points back at the owner. This is the container-side
  * counterpart of {@link unbindDangling} and also covers containers still listing
  * a deleted arrow.
+ *
+ * A record whose id and reverse half are valid but whose `type` is wrong (e.g.
+ * a label recorded as `type: "arrow"`) is rewritten rather than dropped:
+ * dropping it would leave the text's `containerId` pointing at a container
+ * that no longer lists it, i.e. bound on one side only.
  */
 const pruneBoundElements = (state: RepairState): void => {
   for (const bindable of state.bindables()) {
@@ -328,33 +333,49 @@ const pruneBoundElements = (state: RepairState): void => {
       continue;
     }
 
-    const kept = bindable.boundElements.filter((boundElement) => {
+    let changed = false;
+    const kept: NonNullable<ExcalidrawElement["boundElements"]>[number][] = [];
+
+    for (const boundElement of bindable.boundElements) {
       const bound = state.elementsMap.get(boundElement.id);
+      const expectedType = bound ? getBoundElementType(bound) : null;
 
       const reason = !bound
         ? "is missing"
         : bound.isDeleted
         ? "is deleted"
-        : !hasBoundElementType(bound, boundElement)
-        ? `is recorded as type "${boundElement.type}" but is a ` +
-          `"${bound.type}"`
+        : !expectedType
+        ? `is a "${bound.type}", which cannot be bound`
         : !isBoundTo(bound, bindable.id)
         ? "no longer binds back"
         : null;
 
-      if (!reason) {
-        return true;
+      if (reason) {
+        report(
+          state,
+          `bindable "${bindable.id}" lists bound element ` +
+            `"${boundElement.id}", which ${reason}; dropping record`,
+        );
+        changed = true;
+        continue;
       }
 
-      report(
-        state,
-        `bindable "${bindable.id}" lists bound element ` +
-          `"${boundElement.id}", which ${reason}; dropping record`,
-      );
-      return false;
-    });
+      if (boundElement.type !== expectedType) {
+        report(
+          state,
+          `bindable "${bindable.id}" records bound element ` +
+            `"${boundElement.id}" as type "${boundElement.type}" but it is ` +
+            `a "${expectedType}"; fixing record type`,
+        );
+        kept.push({ ...boundElement, type: expectedType! });
+        changed = true;
+        continue;
+      }
 
-    if (kept.length !== bindable.boundElements.length) {
+      kept.push(boundElement);
+    }
+
+    if (changed) {
       state.scene.mutateElement(bindable, { boundElements: kept });
     }
   }
@@ -443,7 +464,13 @@ const isSameBinding = (a: FixedPointBinding, b: FixedPointBinding): boolean =>
   a.fixedPoint[0] === b.fixedPoint[0] &&
   a.fixedPoint[1] === b.fixedPoint[1];
 
-/** Re-derives a binding's `fixedPoint` against its (possibly moved) target. */
+const isBindMode = (mode: unknown): mode is BindMode =>
+  mode === "inside" || mode === "orbit" || mode === "skip";
+
+/**
+ * Re-derives a binding's `fixedPoint` against its (possibly moved) target, and
+ * its `mode` when that is missing or unknown.
+ */
 const reanchorBinding = (
   state: RepairState,
   arrow: NonDeleted<ExcalidrawArrowElement>,
@@ -478,6 +505,16 @@ const reanchorBinding = (
 
   return {
     ...binding,
+    // a missing or unknown `mode` is inferred from where the endpoint sits now,
+    // the same way `inferMissingBindings` picks it for a fresh binding
+    mode: isBindMode(binding.mode)
+      ? binding.mode
+      : getInferredBindMode(
+          arrow,
+          target,
+          endpointGlobalPoint(arrow, endpoint, state.nonDeletedMap),
+          state.nonDeletedMap,
+        ),
     ...calculateFixedPointForNonElbowArrowBinding(
       arrow,
       target,
@@ -491,7 +528,7 @@ const reanchorBinding = (
 /**
  * Re-derives `mode`/`fixedPoint` for every binding so endpoints follow their
  * targets. Covers both a moved target and a binding the generator wrote
- * incompletely (missing `fixedPoint`).
+ * incompletely (missing `fixedPoint` or `mode`).
  */
 const reanchorBindings = (state: RepairState): void => {
   forEachBinding(state, (arrow, endpoint, binding) => {
@@ -614,7 +651,8 @@ const findBindTarget = (
 
 /**
  * Creates bindings for endpoints that geometrically touch a bindable element
- * but carry no binding.
+ * but carry no binding. An endpoint is never bound to the interior of a shape
+ * that also contains the arrow's other endpoint.
  */
 const inferMissingBindings = (state: RepairState): void => {
   for (const arrow of state.arrows()) {
@@ -649,6 +687,21 @@ const inferMissingBindings = (state: RepairState): void => {
         point,
         state.nonDeletedMap,
       );
+
+      if (
+        mode === "inside" &&
+        isPointInElement(
+          endpointGlobalPoint(
+            arrow,
+            endpoint === ENDPOINTS.start ? ENDPOINTS.end : ENDPOINTS.start,
+            state.nonDeletedMap,
+          ),
+          target,
+          state.nonDeletedMap,
+        )
+      ) {
+        continue;
+      }
 
       bindBindingElement(
         arrow,
