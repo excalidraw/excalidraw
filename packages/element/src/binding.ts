@@ -290,7 +290,6 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     elementsMap,
   );
   const hit = getHoveredElementForBinding(
-    arrow,
     globalPoint,
     elements,
     elementsMap,
@@ -343,7 +342,6 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
     elementsMap,
   );
   const hit = getHoveredElementForBinding(
-    arrow,
     point,
     elements,
     elementsMap,
@@ -394,7 +392,6 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
     if (hit && arrow.startBinding) {
       const startBinding = arrow.startBinding;
       const allHits = getAllHoveredElementAtPoint(
-        arrow,
         point,
         elements,
         elementsMap,
@@ -502,21 +499,11 @@ const bindingStrategyForSimpleArrowEndpointDragging_complex = (
   let other: BindingStrategy = { mode: undefined };
 
   const isMultiPoint = arrow.points.length > 2;
-  const hit = getHoveredElementForBinding(
-    arrow,
-    point,
-    elements,
-    elementsMap,
-    zoom,
-  );
+  const hit = getHoveredElementForBinding(point, elements, elementsMap, zoom);
   const isOverlapping = oppositeBinding
-    ? getAllHoveredElementAtPoint(
-        arrow,
-        point,
-        elements,
-        elementsMap,
-        zoom,
-      ).some((el) => el.id === oppositeBinding.elementId)
+    ? getAllHoveredElementAtPoint(point, elements, elementsMap, zoom).some(
+        (el) => el.id === oppositeBinding.elementId,
+      )
     : false;
   const oppositeElement = oppositeBinding
     ? (elementsMap.get(
@@ -744,7 +731,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     elementsMap,
   );
   const hit = getHoveredElementForBinding(
-    arrow,
     opts?.angleLocked || appState.gridModeEnabled
       ? pointFrom<GlobalPoint>(scenePointerX, scenePointerY)
       : globalPoint,

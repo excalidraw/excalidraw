@@ -646,7 +646,6 @@ describe("freedraw loop fill containment", () => {
 describe("binding hit tests", () => {
   type SceneElement = Ordered<NonDeletedExcalidrawElement>;
   const zoom = (value: number) => ({ value } as Zoom);
-  const arrow = { elbowed: false };
 
   const hitTest = (
     elements: SceneElement[],
@@ -656,14 +655,12 @@ describe("binding hit tests", () => {
     const elementsMap = arrayToMap(elements) as NonDeletedSceneElementsMap;
     return {
       hovered: getHoveredElementForBinding(
-        arrow,
         point,
         elements,
         elementsMap,
         zoom(zoomValue),
       )?.id,
       all: getAllHoveredElementAtPoint(
-        arrow,
         point,
         elements,
         elementsMap,

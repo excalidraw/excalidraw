@@ -317,7 +317,6 @@ const handleSegmentRelease = (
     ...rest
   } = getElbowArrowData(
     {
-      ...arrow,
       x,
       y,
       startBinding,
@@ -1041,7 +1040,6 @@ export const updateElbowArrowPoints = (
     ...rest
   } = getElbowArrowData(
     {
-      ...arrow,
       x: arrow.x,
       y: arrow.y,
       startBinding,
@@ -1191,7 +1189,15 @@ export const updateElbowArrowPoints = (
  * - hoveredEndElement: The element being hovered over at the end point.
  */
 const getElbowArrowData = (
-  arrow: ExcalidrawElbowArrowElement,
+  arrow: {
+    x: number;
+    y: number;
+    startBinding: FixedPointBinding | null;
+    endBinding: FixedPointBinding | null;
+    startArrowhead: Arrowhead | null;
+    endArrowhead: Arrowhead | null;
+    points: readonly LocalPoint[];
+  },
   elementsMap: NonDeletedSceneElementsMap,
   nextPoints: readonly LocalPoint[],
   options?: {
@@ -1219,21 +1225,11 @@ const getElbowArrowData = (
   if (options?.isDragging && options?.isBindingEnabled !== false) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
-      getHoveredElement(
-        arrow,
-        origStartGlobalPoint,
-        elementsMap,
-        elements,
-        zoom,
-      ) || null;
+      getHoveredElement(origStartGlobalPoint, elementsMap, elements, zoom) ||
+      null;
     hoveredEndElement =
-      getHoveredElement(
-        arrow,
-        origEndGlobalPoint,
-        elementsMap,
-        elements,
-        zoom,
-      ) || null;
+      getHoveredElement(origEndGlobalPoint, elementsMap, elements, zoom) ||
+      null;
   } else {
     hoveredStartElement = arrow.startBinding
       ? getBindableElementForId(arrow.startBinding.elementId, elementsMap) ||
@@ -2282,19 +2278,12 @@ const getBindPointHeading = (
   );
 
 const getHoveredElement = (
-  arrow: ExcalidrawElbowArrowElement,
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   zoom: AppState["zoom"],
 ) => {
-  return getHoveredElementForBinding(
-    arrow,
-    origPoint,
-    elements,
-    elementsMap,
-    zoom,
-  );
+  return getHoveredElementForBinding(origPoint, elements, elementsMap, zoom);
 };
 
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>

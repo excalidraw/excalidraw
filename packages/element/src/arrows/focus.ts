@@ -243,7 +243,6 @@ export const handleFocusPointDrag = (
   );
   const bindingField = isStartBinding ? "startBinding" : "endBinding";
   const hit = getHoveredElementForBinding(
-    arrow,
     point,
     scene.getNonDeletedElements(),
     elementsMap,

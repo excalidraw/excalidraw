@@ -102,7 +102,6 @@ export class AppDrawShape {
         startOrEnd,
         globalPoint,
         target: getHoveredElementForBinding(
-          arrow,
           globalPoint,
           elements,
           elementsMap,
@@ -178,7 +177,6 @@ export class AppDrawShape {
 
     const [startTarget, endTarget] = ([0, -1] as const).map((index) =>
       getHoveredElementForBinding(
-        { elbowed: false },
         LinearElementEditor.getPointAtIndexGlobalCoordinates(
           line,
           index,

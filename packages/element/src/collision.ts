@@ -395,7 +395,6 @@ const getBindingCandidates = (
  * the result of `getHoveredElementForBinding` for the same arguments.
  */
 export const getAllHoveredElementAtPoint = (
-  arrow: { elbowed: boolean },
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
@@ -406,7 +405,6 @@ export const getAllHoveredElementAtPoint = (
   );
 
 export const getHoveredElementForBinding = (
-  arrow: { elbowed: boolean },
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
