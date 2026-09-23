@@ -725,6 +725,48 @@ describe("binding hit tests", () => {
     expect(transparent.hovered).toBe("hidden");
     expect(transparent.all).toEqual(["cover", "hidden"]);
   });
+
+  describe("overlapping elements", () => {
+    const rect = (id: string, x: number, y: number, w: number, h: number) =>
+      API.createElement({
+        id,
+        type: "rectangle",
+        x,
+        y,
+        width: w,
+        height: h,
+      }) as SceneElement;
+
+    it("binds to the container's edge next to a nested element", () => {
+      const container = rect("container", 0, 0, 200, 200);
+      // 18px inside the container's left edge
+      const child = rect("child", 18, 80, 60, 40);
+
+      // 5px inside the container's edge, 13px outside the child
+      expect(
+        hitTest([container, child], pointFrom<GlobalPoint>(5, 100)).hovered,
+      ).toBe("container");
+      // closer to the child's outline than to the container's
+      expect(
+        hitTest([container, child], pointFrom<GlobalPoint>(10, 100)).hovered,
+      ).toBe("child");
+    });
+
+    it("binds to a smaller element straddling the container's edge when inside both", () => {
+      const container = rect("container", 0, 0, 200, 200);
+      const badge = rect("badge", -30, 80, 60, 40);
+
+      // 3px inside the container's edge, inside the badge
+      expect(
+        hitTest([container, badge], pointFrom<GlobalPoint>(3, 92)).hovered,
+      ).toBe("badge");
+      // 5px outside the container's edge, inside the badge: the closer
+      // container outline wins
+      expect(
+        hitTest([container, badge], pointFrom<GlobalPoint>(-5, 108)).hovered,
+      ).toBe("container");
+    });
+  });
 });
 
 describe("intersectElementWithLineSegment", () => {

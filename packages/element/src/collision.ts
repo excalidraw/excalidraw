@@ -432,23 +432,21 @@ export const getHoveredElementForBinding = (
     0.00001,
     Math.abs(cx2 - cx1) * Math.abs(cy2 - cy1),
   );
+  // A smaller element overlapping the closest one takes precedence, but only
+  // when the point is inside it: otherwise the closest outline wins, e.g. an
+  // arrow ending just inside a container's edge next to a nested element
   const overlaps = closestElements
+    .filter((c) => c.element !== candidate.element && c.distance >= 0)
     .map((c) => {
-      if (c.element === candidate.element) {
-        return { ...c, overlapPercent: 0, relativeArea: 1 };
-      }
-
       const [x1, y1, x2, y2] = getElementBounds(c.element, elementsMap);
       const overlapWidth = Math.max(0, Math.min(x2, cx2) - Math.max(x1, cx1));
       const overlapHeight = Math.max(0, Math.min(y2, cy2) - Math.max(y1, cy1));
       const area = Math.max(0.00001, Math.abs(x2 - x1) * Math.abs(y2 - y1));
-      const overlapPercent = (overlapHeight * overlapWidth) / area;
 
       return {
         ...c,
-        overlapPercent,
-        relativeArea:
-          overlapPercent === 0 ? 1 : Math.min(area / candidateArea, 1),
+        overlapPercent: (overlapHeight * overlapWidth) / area,
+        relativeArea: area / candidateArea,
       };
     })
     .filter((c) => c.overlapPercent > 0.25 && c.relativeArea < 0.75);
