@@ -831,10 +831,6 @@ export const projectFixedPointOntoDiagonal = (
   isMidpointSnappingEnabled: boolean = true,
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");
-  if (arrow.width < 3 && arrow.height < 3) {
-    return null;
-  }
-
   if (isMidpointSnappingEnabled) {
     const sideMidPoint = getSnapOutlineMidPoint(
       point,
@@ -846,6 +842,11 @@ export const projectFixedPointOntoDiagonal = (
     if (sideMidPoint) {
       return sideMidPoint;
     }
+  }
+
+  // Projection needs a meaningful arrow direction
+  if (arrow.width < 3 && arrow.height < 3) {
+    return null;
   }
 
   // Do the projection onto the diagonals (or center lines
