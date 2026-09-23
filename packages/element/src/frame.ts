@@ -261,6 +261,30 @@ export const getFrameLikeElements = (
 };
 
 /**
+ * Orders frames the way they read on the canvas: top-to-bottom in rows, and
+ * left-to-right within a row. A frame joins the current row if its top edge
+ * lies above the vertical center of the row's first frame.
+ */
+export const sortFramesInReadingOrder = <T extends ExcalidrawFrameLikeElement>(
+  frames: readonly T[],
+): T[] => {
+  const rows: T[][] = [];
+  let rowBottom = -Infinity;
+
+  for (const frame of [...frames].sort((a, b) => a.y - b.y || a.x - b.x)) {
+    const row = rows[rows.length - 1];
+    if (row && frame.y < rowBottom) {
+      row.push(frame);
+    } else {
+      rows.push([frame]);
+      rowBottom = frame.y + frame.height / 2;
+    }
+  }
+
+  return rows.flatMap((row) => row.sort((a, b) => a.x - b.x || a.y - b.y));
+};
+
+/**
  * Returns ExcalidrawFrameElements and non-frame-children elements.
  *
  * Considers children as root elements if they point to a frame parent
