@@ -62,7 +62,7 @@ import { updateElbowArrowPoints } from "./elbowArrow";
 import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
-  getSnapOutlineMidPoint,
+  getElbowArrowSnapMidPoint,
   projectFixedPointOntoDiagonal,
 } from "./utils";
 
@@ -1648,19 +1648,18 @@ export const bindPointToSnapToElementOutline = (
 
   let intersection: GlobalPoint | null = null;
   if (elbowed) {
-    const isHorizontal = headingIsHorizontal(
-      headingForPointFromElement(bindableElement, aabb, point),
-    );
-    const snapPoint = isMidpointSnappingEnabled
-      ? getSnapOutlineMidPoint(
-          edgePoint,
-          bindableElement,
-          elementsMap,
-          zoom,
-          arrowElement,
-        )
+    const snap = isMidpointSnappingEnabled
+      ? getElbowArrowSnapMidPoint(edgePoint, bindableElement, elementsMap, zoom)
       : undefined;
-    const resolved = snapPoint || point;
+    const resolved = snap?.point ?? point;
+    // A midpoint on the element's axes fixes the side to bind to. The pointer
+    // can report another side, e.g. horizontal when slightly inside a
+    // diamond's top vertex, which would bind next to the vertex.
+    const isHorizontal = headingIsHorizontal(
+      snap?.onAxis
+        ? vectorToHeading(vectorFromPoint(snap.point, bindableCenter))
+        : headingForPointFromElement(bindableElement, aabb, point),
+    );
     const otherPoint = pointFrom<GlobalPoint>(
       isHorizontal ? bindableCenter[0] : resolved[0],
       !isHorizontal ? bindableCenter[1] : resolved[1],

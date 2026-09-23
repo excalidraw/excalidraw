@@ -1,4 +1,4 @@
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { KEYS, ROUNDNESS, arrayToMap } from "@excalidraw/common";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -18,7 +18,12 @@ import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
 import type { Zoom } from "@excalidraw/excalidraw/types";
 
-import { bindBindingElement, updateBoundElements } from "../src/binding";
+import {
+  bindBindingElement,
+  getBindingGap,
+  updateBoundElements,
+} from "../src/binding";
+import { getAllMidpoints } from "../src/utils";
 import { getTransformHandles } from "../src/transformHandles";
 import {
   getTextEditor,
@@ -340,6 +345,122 @@ describe("binding for simple arrows", () => {
       expect(arrow.frameId).toBe("frame");
       expect([arrow.x, arrow.y]).toEqual([250, 250]);
       expect(arrow.points[arrow.points.length - 1]).toEqual([300, 300]);
+    });
+  });
+
+  describe("midpoint snapping on diamonds", () => {
+    beforeEach(async () => {
+      mouse.reset();
+      await act(() => setLanguage(defaultLang));
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+    });
+
+    for (const rounded of [false, true]) {
+      for (const elbowed of [false, true]) {
+        it(`${
+          elbowed ? "elbow" : "simple"
+        } arrow ends a binding gap outside the ${
+          rounded ? "rounded" : "sharp"
+        } left vertex`, () => {
+          const diamond = API.createElement({
+            type: "diamond",
+            x: 100,
+            y: -100,
+            width: 200,
+            height: 200,
+            roundness: rounded ? { type: ROUNDNESS.PROPORTIONAL_RADIUS } : null,
+          }) as ExcalidrawBindableElement;
+          API.setElements([diamond]);
+          const [, , left] = getAllMidpoints(diamond, arrayToMap([diamond]));
+
+          UI.clickTool("arrow");
+          if (elbowed) {
+            UI.clickOnTestId("elbow-arrow");
+          }
+          mouse.reset();
+          mouse.downAt(-200, left[1]);
+          mouse.moveTo(left[0] - 50, left[1]);
+          // near (not on) the vertex, so the end snaps to it
+          mouse.moveTo(left[0] - 4, left[1] + 2);
+          mouse.up();
+
+          const arrow = h.elements[
+            h.elements.length - 1
+          ] as ExcalidrawArrowElement;
+          const [endX, endY] = arrow.points[arrow.points.length - 1];
+
+          expect(arrow.endBinding?.elementId).toBe(diamond.id);
+          expect(arrow.x + endX).toBeCloseTo(
+            left[0] - getBindingGap(diamond),
+            0,
+          );
+          expect(arrow.y + endY).toBeCloseTo(left[1], 0);
+        });
+      }
+
+      it(`elbow arrow binds above the ${
+        rounded ? "rounded" : "sharp"
+      } top vertex when the pointer is slightly inside`, () => {
+        const diamond = API.createElement({
+          type: "diamond",
+          x: 100,
+          y: -100,
+          width: 300,
+          height: 300,
+          roundness: rounded ? { type: ROUNDNESS.PROPORTIONAL_RADIUS } : null,
+        }) as ExcalidrawBindableElement;
+        API.setElements([diamond]);
+        const [, , , top] = getAllMidpoints(diamond, arrayToMap([diamond]));
+
+        UI.clickTool("arrow");
+        UI.clickOnTestId("elbow-arrow");
+        mouse.reset();
+        mouse.downAt(top[0] - 300, top[1] - 100);
+        mouse.moveTo(top[0] - 50, top[1] - 50);
+        // inside the diamond, a bit right of the vertex
+        mouse.moveTo(top[0] + 3, top[1] + 10);
+        mouse.up();
+
+        const arrow = h.elements[
+          h.elements.length - 1
+        ] as ExcalidrawArrowElement;
+        const points = arrow.points;
+        const [endX, endY] = points[points.length - 1];
+
+        expect(arrow.endBinding?.elementId).toBe(diamond.id);
+        expect(arrow.x + endX).toBeCloseTo(top[0], 0);
+        expect(arrow.y + endY).toBeCloseTo(top[1] - getBindingGap(diamond), 0);
+        // the last segment comes straight down into the vertex
+        expect(points[points.length - 2][0]).toBeCloseTo(endX);
+      });
+    }
+
+    it("elbow arrow snaps to a diamond's edge midpoint", () => {
+      const diamond = API.createElement({
+        type: "diamond",
+        x: 100,
+        y: -100,
+        width: 200,
+        height: 200,
+      }) as ExcalidrawBindableElement;
+      API.setElements([diamond]);
+      // midpoint of the top-left edge
+      const edgeMidpoint = [150, -50] as const;
+
+      UI.clickTool("arrow");
+      UI.clickOnTestId("elbow-arrow");
+      mouse.reset();
+      mouse.downAt(-200, -50);
+      mouse.moveTo(100, -60);
+      // near (not on) the edge midpoint
+      mouse.moveTo(edgeMidpoint[0] - 9, edgeMidpoint[1] - 3);
+      mouse.up();
+
+      const arrow = h.elements[h.elements.length - 1] as ExcalidrawArrowElement;
+      const [, endY] = arrow.points[arrow.points.length - 1];
+
+      expect(arrow.endBinding?.elementId).toBe(diamond.id);
+      expect(arrow.y + endY).toBeCloseTo(edgeMidpoint[1], 0);
     });
   });
 
