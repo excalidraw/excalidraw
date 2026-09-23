@@ -723,6 +723,56 @@ describe("binding hit tests", () => {
     expect(transparent.all).toEqual(["cover", "hidden"]);
   });
 
+  it("an image, and a locked opaque element, hide what's behind them", () => {
+    const hidden = API.createElement({
+      id: "hidden",
+      type: "rectangle",
+      x: 30,
+      y: 30,
+      width: 40,
+      height: 40,
+      index: "a0" as SceneElement["index"],
+    }) as SceneElement;
+    const point = pointFrom<GlobalPoint>(50, 50);
+
+    const image = API.createElement({
+      id: "image",
+      type: "image",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      index: "a1" as SceneElement["index"],
+    }) as SceneElement;
+    expect(hitTest([hidden, image], point)).toEqual({
+      hovered: "image",
+      all: ["image"],
+    });
+
+    const locked = (backgroundColor: string) =>
+      API.createElement({
+        id: "locked",
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        backgroundColor,
+        locked: true,
+        index: "a1" as SceneElement["index"],
+      }) as SceneElement;
+    // can't bind to the locked element, nor through it
+    expect(hitTest([hidden, locked("#ffc9c9")], point)).toEqual({
+      hovered: undefined,
+      all: [],
+    });
+    // a transparent locked element hides nothing
+    expect(hitTest([hidden, locked("transparent")], point)).toEqual({
+      hovered: "hidden",
+      all: ["hidden"],
+    });
+  });
+
   describe("overlapping elements", () => {
     const rect = (id: string, x: number, y: number, w: number, h: number) =>
       API.createElement({

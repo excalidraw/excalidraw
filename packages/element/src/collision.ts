@@ -340,9 +340,18 @@ type BindingCandidate = {
 };
 
 /**
+ * Whether the element hides what is behind it from binding. Images count as
+ * opaque, and frames once they support a background.
+ */
+const isOpaqueForBinding = (element: ExcalidrawElement) =>
+  isImageElement(element) ||
+  (hasBackground(element.type) && !isTransparent(element.backgroundColor));
+
+/**
  * Bindable elements within binding distance of the point, front to back.
  * Stops at the first opaque element containing the point, since it hides
- * everything behind it.
+ * everything behind it. Locked elements can't be bound to, but still hide
+ * what is behind them.
  */
 const getBindingCandidates = (
   point: Readonly<GlobalPoint>,
@@ -352,6 +361,9 @@ const getBindingCandidates = (
 ): BindingCandidate[] => {
   const maxDistance = maxBindingDistance_simple(zoom);
   const candidates: BindingCandidate[] = [];
+  // A frame's children sit just below it in z-order, so a frame's background
+  // can't end the search: it only hides the non-children behind it
+  let occludingFrameId: ExcalidrawElement["id"] | null = null;
   // We need to do hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index
@@ -363,8 +375,21 @@ const getBindingCandidates = (
       "Elements passed to binding hit tests should not contain deleted elements",
     );
 
-    if (!isBindableElement(element, false)) {
+    if (occludingFrameId && element.frameId !== occludingFrameId) {
       continue;
+    }
+
+    if (!isBindableElement(element)) {
+      continue;
+    }
+
+    if (isFrameLikeElement(element)) {
+      if (
+        isOpaqueForBinding(element) &&
+        isPointInElement(point, element, elementsMap)
+      ) {
+        occludingFrameId = element.id;
+      }
     }
 
     const distance = bindableElementBorderDistanceIfClose(
@@ -375,13 +400,11 @@ const getBindingCandidates = (
     );
 
     if (distance > -maxDistance) {
-      candidates.push({ element, distance });
+      if (!element.locked) {
+        candidates.push({ element, distance });
+      }
 
-      if (
-        hasBackground(element.type) &&
-        !isTransparent(element.backgroundColor) &&
-        distance >= 0
-      ) {
+      if (distance >= 0 && isOpaqueForBinding(element)) {
         break;
       }
     }
