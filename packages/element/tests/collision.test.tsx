@@ -1,7 +1,13 @@
-import { arrayToMap, getSizeFromPoints, reseed } from "@excalidraw/common";
+import {
+  ROUNDNESS,
+  arrayToMap,
+  getSizeFromPoints,
+  reseed,
+} from "@excalidraw/common";
 import {
   type GlobalPoint,
   type LocalPoint,
+  lineSegment,
   pointFrom,
   pointRotateRads,
 } from "@excalidraw/math";
@@ -19,12 +25,15 @@ import {
   getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
   hitElementItself,
+  intersectElementWithLineSegment,
   isPointInElement,
 } from "../src/collision";
 import { mutateElement } from "../src/mutateElement";
 import { newFreeDrawElement } from "../src/newElement";
+import { getAllMidpoints } from "../src/utils";
 
 import type {
+  ExcalidrawDiamondElement,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
   Ordered,
@@ -715,5 +724,36 @@ describe("binding hit tests", () => {
     const transparent = hitTest([hidden, cover("transparent")], point);
     expect(transparent.hovered).toBe("hidden");
     expect(transparent.all).toEqual(["cover", "hidden"]);
+  });
+});
+
+describe("intersectElementWithLineSegment", () => {
+  it("hits a rounded diamond corner along a line through its apex", () => {
+    const diamond = API.createElement({
+      type: "diamond",
+      x: 100,
+      y: -100,
+      width: 200,
+      height: 200,
+      roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+    }) as ExcalidrawDiamondElement;
+    const elementsMap = arrayToMap([diamond]);
+    const [, , left] = getAllMidpoints(diamond, elementsMap);
+
+    // the offset corner is split into several curves, and this line passes
+    // exactly through the joint of two of them
+    const hits = intersectElementWithLineSegment(
+      diamond,
+      elementsMap,
+      lineSegment(
+        pointFrom<GlobalPoint>(200, left[1]),
+        pointFrom<GlobalPoint>(-200, left[1]),
+      ),
+      6,
+    );
+
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits[0][0]).toBeCloseTo(left[0] - 6, 0);
+    expect(hits[0][1]).toBeCloseTo(left[1]);
   });
 });

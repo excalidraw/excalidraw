@@ -532,6 +532,8 @@ export const intersectElementWithLineSegment = (
   }
 };
 
+const CURVE_BOUNDS_EPSILON = 1e-6;
+
 const curveIntersections = (
   curves: Curve<GlobalPoint>[],
   segment: LineSegment<GlobalPoint>,
@@ -540,15 +542,19 @@ const curveIntersections = (
   angle: Radians,
   onlyFirst = false,
 ) => {
+  // Pad the segment bounds so an axis-aligned segment passing exactly through
+  // the joint of two curves still overlaps their bounds, as
+  // `doBoundsIntersect` treats bounds that only touch as not intersecting
+  const b2 = [
+    Math.min(segment[0][0], segment[1][0]) - CURVE_BOUNDS_EPSILON,
+    Math.min(segment[0][1], segment[1][1]) - CURVE_BOUNDS_EPSILON,
+    Math.max(segment[0][0], segment[1][0]) + CURVE_BOUNDS_EPSILON,
+    Math.max(segment[0][1], segment[1][1]) + CURVE_BOUNDS_EPSILON,
+  ] as Bounds;
+
   for (const c of curves) {
     // Optimize by doing a cheap bounding box check first
     const b1 = getCubicBezierCurveBound(c[0], c[1], c[2], c[3]);
-    const b2 = [
-      Math.min(segment[0][0], segment[1][0]),
-      Math.min(segment[0][1], segment[1][1]),
-      Math.max(segment[0][0], segment[1][0]),
-      Math.max(segment[0][1], segment[1][1]),
-    ] as Bounds;
 
     if (!doBoundsIntersect(b1, b2)) {
       continue;
