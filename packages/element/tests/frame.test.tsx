@@ -1287,4 +1287,34 @@ describe("arrows bound to elements in frames", () => {
     expect(arrow.endBinding?.elementId).toBe(bottomRightRect.id);
     expect(arrow.frameId).toBe(frame1.id);
   });
+
+  it("should remove an arrow from its frame when its endpoint is rebound outside of the frame", () => {
+    const topLeftRect = API.createElement({
+      type: "rectangle",
+      x: 5,
+      y: 5,
+      width: 30,
+      height: 30,
+      frameId: frame1.id,
+    });
+    const bottomRightRect = API.createElement({
+      type: "rectangle",
+      x: 65,
+      y: 65,
+      width: 30,
+      height: 30,
+      frameId: frame1.id,
+    });
+    API.setElements([topLeftRect, bottomRightRect, frame1, rect2, frame2]);
+
+    const arrow = drawArrow(topLeftRect, bottomRightRect);
+    expect(arrow.frameId).toBe(frame1.id);
+
+    mouse.downAt(80, 80);
+    mouse.moveTo(rect2.x + rect2.width / 2, rect2.y + rect2.height / 2);
+    mouse.up();
+
+    expect(arrow.endBinding?.elementId).toBe(rect2.id);
+    expect(arrow.frameId).toBe(null);
+  });
 });
