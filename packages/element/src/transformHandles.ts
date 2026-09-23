@@ -111,8 +111,8 @@ const generateTransformHandle = (
 
 export const canResizeFromSides = (editorInterface: EditorInterface) => {
   if (
-    editorInterface.formFactor === "phone" &&
-    editorInterface.userAgent.isMobileDevice
+    editorInterface.userAgent.isMobileDevice &&
+    (editorInterface.formFactor === "phone" || editorInterface.isTouchScreen)
   ) {
     return false;
   }
