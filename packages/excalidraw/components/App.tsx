@@ -343,6 +343,10 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
+import {
+  actionPresentFromFrame,
+  actionTogglePresentation,
+} from "../actions/actionPresentation";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
@@ -451,6 +455,8 @@ import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppDuplicate } from "./App.duplicate";
 import { AppFlowchart } from "./App.flowchart";
+import { AppPresentation } from "./App.presentation";
+import { PresentationOverlay } from "./Presentation/PresentationOverlay";
 import { AppPan } from "./App.pan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import { AppWheel } from "./App.wheel";
@@ -717,6 +723,7 @@ class App extends React.Component<AppProps, AppState> {
   public duplicate: AppDuplicate = new AppDuplicate(this);
   public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
+  public presentation: AppPresentation = new AppPresentation(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
   public pan: AppPan = new AppPan(this, {
@@ -2753,6 +2760,9 @@ class App extends React.Component<AppProps, AppState> {
                               />
                             )}
                           {this.renderFrameNames()}
+                          {this.state.presentation && (
+                            <PresentationOverlay app={this} />
+                          )}
                           {this.isDefaultUIEnabled() &&
                             this.state.activeLockedId && (
                               <UnlockPopup
@@ -3972,6 +3982,7 @@ class App extends React.Component<AppProps, AppState> {
 
   /** generally invoked only if fullscreen was invoked programmatically */
   private onFullscreenChange = () => {
+    this.presentation.onFullscreenChange();
     if (
       // points to the iframe element we fullscreened
       !this.ownerDocument.fullscreenElement &&
@@ -4186,6 +4197,12 @@ class App extends React.Component<AppProps, AppState> {
         this.onGestureEnd as any,
         false,
       ),
+      addEventListener(
+        this.ownerDocument,
+        EVENT.FULLSCREENCHANGE,
+        this.onFullscreenChange,
+        { passive: false },
+      ),
     );
 
     if (this.state.viewModeEnabled) {
@@ -4197,12 +4214,6 @@ class App extends React.Component<AppProps, AppState> {
     // -------------------------------------------------------------------------
 
     this.onRemoveEventListenersEmitter.once(
-      addEventListener(
-        this.ownerDocument,
-        EVENT.FULLSCREENCHANGE,
-        this.onFullscreenChange,
-        { passive: false },
-      ),
       addEventListener(
         this.ownerDocument,
         EVENT.PASTE,
@@ -4271,6 +4282,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
+    this.presentation.onUpdate(prevState);
 
     this.appStateObserver.flush(prevState);
 
@@ -5485,6 +5497,10 @@ class App extends React.Component<AppProps, AppState> {
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
       if (!this.isInteractionEnabled()) {
+        return;
+      }
+
+      if (this.presentation.handleKeyEvent(event)) {
         return;
       }
 
@@ -13711,6 +13727,7 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleGridMode,
           actionToggleZenMode,
           actionToggleViewMode,
+          actionTogglePresentation,
           actionToggleStats,
         ];
       }
@@ -13731,6 +13748,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
+        actionTogglePresentation,
         actionToggleStats,
       ];
     }
@@ -13764,6 +13782,7 @@ class App extends React.Component<AppProps, AppState> {
       actionSelectAllElementsInFrame,
       actionRemoveAllElementsFromFrame,
       actionWrapSelectionInFrame,
+      actionPresentFromFrame,
       CONTEXT_MENU_SEPARATOR,
       actionToggleCropEditor,
       CONTEXT_MENU_SEPARATOR,

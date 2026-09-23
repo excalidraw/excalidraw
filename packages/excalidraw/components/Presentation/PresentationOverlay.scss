@@ -1,0 +1,75 @@
+.excalidraw {
+  .presentation-overlay {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: var(--zIndex-layerUI);
+  }
+
+  // letterboxes everything outside the current slide
+  .presentation-overlay__slide {
+    position: absolute;
+    box-shadow: 0 0 0 100vmax #000;
+  }
+
+  .presentation-controls {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    pointer-events: all;
+    transition: opacity 0.3s ease;
+
+    &--hidden:not(:hover):not(:focus-within) {
+      opacity: 0;
+    }
+  }
+
+  .presentation-controls__counter {
+    min-width: 3.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    user-select: none;
+  }
+
+  .presentation-controls__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    &--prev svg {
+      transform: scaleX(-1);
+    }
+  }
+}
