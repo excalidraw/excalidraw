@@ -564,6 +564,12 @@ export const EDITOR_LS_KEYS = {
  */
 export const DEFAULT_FILENAME = "Untitled";
 
+/**
+ * Prefix applied to default export filenames (PNG/SVG/.excalidraw/etc) for
+ * brand recognition. Not translated, same rationale as DEFAULT_FILENAME.
+ */
+export const EXPORT_FILENAME_BRAND_PREFIX = "excalidraw";
+
 export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
 
 export const MIN_WIDTH_OR_HEIGHT = 1;
