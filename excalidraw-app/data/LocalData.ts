@@ -44,7 +44,10 @@ import { SAVE_TO_LOCAL_STORAGE_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { FileManager } from "./FileManager";
 import { FileStatusStore } from "./fileStatusStore";
 import { Locker } from "./Locker";
-import { updateBrowserStateVersion } from "./tabSync";
+import {
+  isBrowserStorageStateNewer,
+  updateBrowserStateVersion,
+} from "./tabSync";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -78,6 +81,12 @@ const saveDataStateToLocalStorage = (
     localStorageQuotaExceededAtom,
   );
   try {
+    // another tab saved since we last synced, so our scene is stale and
+    // we must not overwrite it. We'll sync once this tab is focused.
+    if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
+      return;
+    }
+
     const _appState = clearAppStateForLocalStorage(appState);
 
     if (
