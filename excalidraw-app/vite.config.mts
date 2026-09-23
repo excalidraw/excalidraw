@@ -16,7 +16,11 @@ export default defineConfig(({ mode }) => {
     server: {
       port: Number(envVars.VITE_APP_PORT || 3000),
       // open the browser
-      open: true,
+      open: !process.env.TAURI_ENV_DEBUG,
+      watch: {
+        // The Tauri Rust project is not part of the frontend dependency graph.
+        ignored: ["**/src-tauri/**"],
+      },
     },
     // We need to specify the envDir since now there are no
     //more located in parallel with the vite.config.ts file but in parent dir
@@ -25,7 +29,10 @@ export default defineConfig(({ mode }) => {
       alias: [
         {
           find: /^@excalidraw\/excalidraw$/,
-          replacement: path.resolve(__dirname, "../packages/excalidraw/index.tsx"),
+          replacement: path.resolve(
+            __dirname,
+            "../packages/excalidraw/index.tsx",
+          ),
         },
         {
           find: /^@excalidraw\/excalidraw\/(.*?)/,
@@ -197,7 +204,7 @@ export default defineConfig(({ mode }) => {
             },
           ],
           start_url: "/",
-          id:"excalidraw",
+          id: "excalidraw",
           display: "standalone",
           theme_color: "#121212",
           background_color: "#ffffff",

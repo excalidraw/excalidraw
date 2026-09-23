@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Excalidraw",
+  "version": "0.1.0",
+  "identifier": "com.excalidraw.desktop",
+  "build": {
+    "beforeDevCommand": "yarn start",
+    "beforeBuildCommand": "yarn build:app:docker",
+    "devUrl": "http://localhost:3000",
+    "frontendDist": "../build"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Excalidraw",
+        "width": 1280,
+        "height": 840,
+        "minWidth": 720,
+        "minHeight": 480,
+        "resizable": true,
+        "fullscreen": false,
+        "create": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' ipc: http://ipc.localhost; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; base-uri 'none'; frame-ancestors 'none';"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "dmg", "appimage", "deb", "rpm"],
+    "icon": ["../../public/favicon.ico"],
+    "createUpdaterArtifacts": true,
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "REPLACE_WITH_TAURI_UPDATER_PUBLIC_KEY",
+      "endpoints": ["https://updates.invalid/excalidraw/{{target}}/{{arch}}/{{current_version}}"]
+    }
+  }
+}

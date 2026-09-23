@@ -26,6 +26,7 @@
     "node": "18.0.0 - 22.x.x"
   },
   "dependencies": {
+    "@tauri-apps/api": "2.11.1",
     "@excalidraw/random-username": "1.0.0",
     "@sentry/browser": "9.0.1",
     "callsites": "4.2.0",
@@ -45,12 +46,15 @@
     "build:app": "cross-env VITE_APP_GIT_SHA=$VERCEL_GIT_COMMIT_SHA cross-env VITE_APP_ENABLE_TRACKING=true vite build",
     "build:version": "node ../scripts/build-version.js",
     "build": "yarn build:app && yarn build:version",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
     "start": "yarn && vite",
     "start:production": "yarn build && yarn serve",
     "serve": "npx http-server build -a localhost -p 5001 -o",
     "build:preview": "yarn build && vite preview --port 5000"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "2.11.5",
     "vite-plugin-sitemap": "0.7.1"
   }
 }

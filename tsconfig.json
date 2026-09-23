@@ -28,5 +28,5 @@
     }
   },
   "include": ["packages", "excalidraw-app"],
-  "exclude": ["examples", "dist", "types", "tests"]
+  "exclude": ["examples", "dist", "types", "tests", "excalidraw-app/src-tauri/target", "excalidraw-app/src-tauri/gen"]
 }

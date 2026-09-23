@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main",
+  "description": "Only the local editor can invoke the constrained document commands.",
+  "windows": ["main"],
+  "local": true,
+  "permissions": ["allow-open-document", "allow-save-document", "allow-restore-document", "allow-persist-document"]
+}

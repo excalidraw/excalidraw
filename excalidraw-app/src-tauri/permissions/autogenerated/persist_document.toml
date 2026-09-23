@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-persist-document"
+description = "Enables the persist_document command without any pre-configured scope."
+commands.allow = ["persist_document"]
+
+[[permission]]
+identifier = "deny-persist-document"
+description = "Denies the persist_document command without any pre-configured scope."
+commands.deny = ["persist_document"]

@@ -1,0 +1,19 @@
+[package]
+name = "excalidraw-desktop"
+version = "0.1.0"
+description = "Offline Excalidraw desktop foundation"
+edition = "2021"
+license = "MIT"
+
+[build-dependencies]
+tauri-build = { version = "=2.6.3", features = [] }
+
+[dependencies]
+tauri = { version = "=2.11.6", features = [] }
+tauri-plugin-dialog = "=2.7.3"
+tauri-plugin-updater = "=2.12.0"
+serde = { version = "=1.0.228", features = ["derive"] }
+serde_json = "=1.0.149"
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]

@@ -12,6 +12,7 @@ import {
   VERSION_TIMEOUT,
 } from "@excalidraw/excalidraw/constants";
 import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
+import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import type {
   FileId,
   NonDeletedExcalidrawElement,
@@ -74,7 +75,10 @@ import {
 } from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
-import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
+import {
+  isExcalidrawElement,
+  isInitializedImageElement,
+} from "@excalidraw/excalidraw/element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
 import {
   LibraryIndexedDBAdapter,
@@ -132,6 +136,12 @@ import DebugCanvas, {
 import { AIComponents } from "./components/AI";
 import { ExcalidrawPlusIframeExport } from "./ExcalidrawPlusIframeExport";
 import { isElementLink } from "@excalidraw/excalidraw/element/elementLink";
+import {
+  flushDesktopDocument,
+  isDesktop,
+  persistDesktopDocument,
+  restoreDesktopDocument,
+} from "./desktop/bridge";
 
 polyfill();
 
@@ -196,6 +206,22 @@ const shareableLinkConfirmDialog = {
   color: "danger",
 } as const;
 
+const hasValidBrowserScene = () => {
+  try {
+    const savedElements = localStorage.getItem(
+      STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
+    );
+    if (savedElements === null) {
+      return false;
+    }
+    const elements: unknown = JSON.parse(savedElements);
+    // An explicitly saved [] is a valid, intentionally cleared scene.
+    return Array.isArray(elements) && elements.every(isExcalidrawElement);
+  } catch {
+    return false;
+  }
+};
+
 const initializeScene = async (opts: {
   collabAPI: CollabAPI | null;
   excalidrawAPI: ExcalidrawImperativeAPI;
@@ -213,10 +239,31 @@ const initializeScene = async (opts: {
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
   const localDataState = importFromLocalStorage();
+  const desktop = isDesktop();
+  let shouldRestoreDesktop = desktop && !hasValidBrowserScene();
 
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
-  } = await loadScene(null, null, localDataState);
+  } = await loadScene(null, null, localDataState).catch((error) => {
+    if (!desktop) {
+      throw error;
+    }
+    // A parseable browser scene can still fail restoration.
+    shouldRestoreDesktop = true;
+    console.warn("Unable to restore the browser scene.");
+    return loadScene(null, null, null);
+  });
+
+  if (shouldRestoreDesktop) {
+    try {
+      const desktopScene = await restoreDesktopDocument();
+      if (desktopScene) {
+        scene = desktopScene as typeof scene;
+      }
+    } catch {
+      console.warn("Unable to restore the desktop document.");
+    }
+  }
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
@@ -442,9 +489,12 @@ const ExcalidrawWrapper = () => {
             });
           });
         } else if (isInitialLoad) {
-          if (fileIds.length) {
+          const missingFileIds = fileIds.filter(
+            (fileId) => !data.scene?.files?.[fileId],
+          );
+          if (missingFileIds.length) {
             LocalData.fileStorage
-              .getFiles(fileIds)
+              .getFiles(missingFileIds)
               .then(({ loadedFiles, erroredFiles }) => {
                 if (loadedFiles.length) {
                   excalidrawAPI.addFiles(loadedFiles);
@@ -559,11 +609,14 @@ const ExcalidrawWrapper = () => {
 
     const onUnload = () => {
       LocalData.flushSave();
+      // Best effort: unload does not wait for asynchronous native persistence.
+      void flushDesktopDocument();
     };
 
     const visibilityChange = (event: FocusEvent | Event) => {
       if (event.type === EVENT.BLUR || document.hidden) {
         LocalData.flushSave();
+        void flushDesktopDocument();
       }
       if (
         event.type === EVENT.VISIBILITY_CHANGE ||
@@ -595,6 +648,8 @@ const ExcalidrawWrapper = () => {
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
       LocalData.flushSave();
+      // Best effort: beforeunload cannot guarantee completion before closing.
+      void flushDesktopDocument();
 
       if (
         excalidrawAPI &&
@@ -650,6 +705,9 @@ const ExcalidrawWrapper = () => {
           }
         }
       });
+      persistDesktopDocument(() =>
+        serializeAsJSON(elements, appState, files, "local"),
+      );
     }
 
     // Render the debug scene if the debug canvas is available
