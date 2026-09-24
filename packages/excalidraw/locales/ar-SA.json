@@ -249,6 +249,7 @@
     "undo": "تراجع",
     "redo": "إعادة تنفيذ",
     "resetLibrary": "إعادة ضبط المكتبة",
+    "reset": "",
     "createNewRoom": "إنشاء غرفة جديدة",
     "fullScreen": "شاشة كاملة",
     "darkMode": "الوضع المظلم",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "في هذا المشهد",
     "availableFonts": "الخطوط المتوفرة",
-    "empty": "لم يتم العثور على خطوط"
+    "empty": "لم يتم العثور على خطوط",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "لم يتم العثور على مستخدمين",
