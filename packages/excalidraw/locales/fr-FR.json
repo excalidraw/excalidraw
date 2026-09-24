@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "Chevaucher",
     "arrowBinding": "Liaison de flèches",
     "midpointSnapping": "S'accrocher aux points intermédiaires",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
