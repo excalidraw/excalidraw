@@ -249,6 +249,7 @@
     "undo": "Sefsex",
     "redo": "Err-d",
     "resetLibrary": "Ales awennez n temkarḍit",
+    "reset": "",
     "createNewRoom": "Snulfu-d taxxamt tamaynutt",
     "fullScreen": "Agdil aččuran",
     "darkMode": "Askar imsulles",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
