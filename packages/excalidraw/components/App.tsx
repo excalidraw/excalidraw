@@ -517,6 +517,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
+import { STORAGE_KEYS } from "excalidraw-app/app_constants";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
@@ -6257,6 +6258,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public getName = () => {
     return (
+      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_FILENAME) ||
       this.state.name ||
       this.props.name ||
       `${t("labels.untitled")}-${getDateTime()}`
