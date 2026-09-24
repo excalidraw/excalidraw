@@ -15,7 +15,7 @@ import {
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
-import { KEYS, getFrame } from "@excalidraw/common";
+import { KEYS, getFrame, isDarwin, isWindows } from "@excalidraw/common";
 import { useEffect, useRef, useState } from "react";
 
 import { atom, useAtom, useAtomValue } from "../app-jotai";
@@ -34,13 +34,9 @@ export const shareDialogStateAtom = atom<
 >({ isOpen: false });
 
 const getShareIcon = () => {
-  const navigator = window.navigator as any;
-  const isAppleBrowser = /Apple/.test(navigator.vendor);
-  const isWindowsBrowser = navigator.appVersion.indexOf("Win") !== -1;
-
-  if (isAppleBrowser) {
+  if (isDarwin) {
     return shareIOS;
-  } else if (isWindowsBrowser) {
+  } else if (isWindows) {
     return shareWindows;
   }
 
