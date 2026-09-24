@@ -32,6 +32,7 @@
     "firebase": "11.3.1",
     "i18next-browser-languagedetector": "6.1.4",
     "idb-keyval": "6.0.3",
+    "jszip": "3.10.1",
     "jotai": "2.11.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",

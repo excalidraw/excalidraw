@@ -115,6 +115,9 @@ const isQuotaExceededError = (error: any) => {
 type SavingLockTypes = "collaboration";
 
 export class LocalData {
+  static onSaveStart: (() => void) | null = null;
+  static onSaveComplete: (() => void) | null = null;
+
   private static _save = debounce(
     async (
       elements: readonly ExcalidrawElement[],
@@ -129,6 +132,7 @@ export class LocalData {
         files,
       });
       onFilesSaved();
+      LocalData.onSaveComplete?.();
     },
     SAVE_TO_LOCAL_STORAGE_TIMEOUT,
   );
@@ -142,6 +146,7 @@ export class LocalData {
   ) => {
     // we need to make the `isSavePaused` check synchronously (undebounced)
     if (!this.isSavePaused()) {
+      LocalData.onSaveStart?.();
       this._save(elements, appState, files, onFilesSaved);
     }
   };
