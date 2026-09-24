@@ -249,6 +249,7 @@
     "undo": "Desfés",
     "redo": "Refés",
     "resetLibrary": "Restableix la biblioteca",
+    "reset": "",
     "createNewRoom": "Crea una sala nova",
     "fullScreen": "Pantalla completa",
     "darkMode": "Mode fosc",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "En aquesta escena",
     "availableFonts": "Lletres tipogràfiques disponibles",
-    "empty": "No s'ha trobat cap lletra tipogràfica"
+    "empty": "No s'ha trobat cap lletra tipogràfica",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "No s'ha trobat cap usuari",
