@@ -249,6 +249,7 @@
     "undo": "Отмяна",
     "redo": "Повтори",
     "resetLibrary": "Нулиране на библиотеката",
+    "reset": "",
     "createNewRoom": "Създай нова стая",
     "fullScreen": "На цял екран",
     "darkMode": "Тъмен режим",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
