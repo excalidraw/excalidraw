@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "Överlappande",
     "arrowBinding": "Pilbindning",
     "midpointSnapping": "Fäst mot mittpunkter",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
