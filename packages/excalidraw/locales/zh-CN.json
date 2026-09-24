@@ -249,6 +249,7 @@
     "undo": "撤销",
     "redo": "重做",
     "resetLibrary": "重置素材库",
+    "reset": "",
     "createNewRoom": "新建会议室",
     "fullScreen": "全屏",
     "darkMode": "深色模式",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "画布中的",
     "availableFonts": "可用字体",
-    "empty": "未找到字体"
+    "empty": "未找到字体",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "未找到用户",
