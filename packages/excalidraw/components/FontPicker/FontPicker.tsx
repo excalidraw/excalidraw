@@ -1,22 +1,37 @@
 import { Popover } from "radix-ui";
 import clsx from "clsx";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 
 import { FONT_FAMILY } from "@excalidraw/common";
 
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
+import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
-import { RadioSelection } from "../RadioSelection";
+import { useExcalidrawSetAppState } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import {
   FontFamilyCodeIcon,
   FontFamilyNormalIcon,
   FreedrawIcon,
 } from "../icons";
+import { TopPicksContextMenu } from "../TopPicksDnD/TopPicksContextMenu";
+import {
+  getTopPickReorderOffset,
+  TopPicksDnDOutline,
+} from "../TopPicksDnD/topPicksDnD";
 
-import { FontPickerList } from "./FontPickerList";
+import {
+  FontPickerList,
+  getFontFamilyIcon,
+  getFontFamilyLabel,
+} from "./FontPickerList";
 import { FontPickerTrigger } from "./FontPickerTrigger";
+import {
+  FontPickerDnDContext,
+  useFontPickerDnD,
+  useFontTopPicksDnD,
+} from "./fontTopPicksDnD";
 
 import "./FontPicker.scss";
 
@@ -41,7 +56,9 @@ export const DEFAULT_FONTS = [
   },
 ];
 
-const defaultFontFamilies = new Set(DEFAULT_FONTS.map((x) => x.value));
+const DEFAULT_FONT_TOP_PICKS = DEFAULT_FONTS.map((font) => font.value);
+
+const defaultFontFamilies = new Set(DEFAULT_FONT_TOP_PICKS);
 
 export const isDefaultFont = (fontFamily: number | null) => {
   if (!fontFamily) {
@@ -51,10 +68,98 @@ export const isDefaultFont = (fontFamily: number | null) => {
   return defaultFontFamilies.has(fontFamily);
 };
 
+const getTopPickFont = (fontFamily: FontFamilyValues) =>
+  DEFAULT_FONTS.find((font) => font.value === fontFamily) ?? {
+    value: fontFamily,
+    icon: getFontFamilyIcon(fontFamily),
+    text: getFontFamilyLabel(
+      fontFamily,
+      Fonts.registered.get(fontFamily)?.fontFaces ?? [],
+    ),
+    testId: `font-family-${fontFamily}`,
+  };
+
+const FontTopPicks = ({
+  picks,
+  selectedFontFamily,
+  onSelect,
+  onReset,
+  isCustomized,
+}: {
+  picks: readonly FontFamilyValues[];
+  selectedFontFamily: FontFamilyValues | null;
+  onSelect: (fontFamily: FontFamilyValues) => void;
+  /** present when the strip is user-customizable */
+  onReset?: () => void;
+  isCustomized: boolean;
+}) => {
+  const dnd = useFontPickerDnD();
+  const dragState = dnd?.dragState ?? null;
+
+  return (
+    <TopPicksContextMenu
+      onReset={onReset}
+      isCustomized={isCustomized}
+      resetLabel={t("fontList.resetTopPicks")}
+    >
+      <div className="buttonList FontPicker__top-picks">
+        {/* the drop target (outline & hit area) — hugs the picks, unlike the
+            wrapper, which spans its grid column and carries padding */}
+        <div
+          className={clsx("FontPicker__top-picks-slots top-picks-dnd", {
+            "is-dnd-active": !!dragState,
+          })}
+          ref={dnd?.setStripEl}
+        >
+          {dragState && <TopPicksDnDOutline />}
+          {picks.map((fontFamily, index) => {
+            const font = getTopPickFont(fontFamily);
+            const reorderOffset = getTopPickReorderOffset(dragState, index);
+            return (
+              <button
+                key={fontFamily}
+                type="button"
+                title={font.text}
+                data-testid={font.testId}
+                className={clsx("top-picks-dnd__pick", {
+                  active: fontFamily === selectedFontFamily,
+                  "is-dnd-source":
+                    dragState?.origin.kind === "pick" &&
+                    dragState.origin.index === index,
+                  "is-dnd-target":
+                    dragState?.origin.kind === "source" &&
+                    dragState.overIndex === index,
+                  "is-dnd-duplicate": dragState?.duplicateIndex === index,
+                })}
+                style={
+                  reorderOffset
+                    ? { transform: `translateX(${reorderOffset}px)` }
+                    : undefined
+                }
+                onClick={() => onSelect(fontFamily)}
+                onPointerDown={
+                  dnd
+                    ? (event) => dnd.startPickDrag(event, index, fontFamily)
+                    : undefined
+                }
+                data-top-pick-index={index}
+              >
+                {font.icon}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </TopPicksContextMenu>
+  );
+};
+
 interface FontPickerProps {
   isOpened: boolean;
   selectedFontFamily: FontFamilyValues | null;
   hoveredFontFamily: FontFamilyValues | null;
+  /** user-customized top picks (`appState.fontTopPicks`) */
+  topPicks: readonly FontFamilyValues[] | null;
   onSelect: (fontFamily: FontFamilyValues) => void;
   onHover: (fontFamily: FontFamilyValues) => void;
   onLeave: () => void;
@@ -67,13 +172,14 @@ export const FontPicker = React.memo(
     isOpened,
     selectedFontFamily,
     hoveredFontFamily,
+    topPicks,
     onSelect,
     onHover,
     onLeave,
     onPopupChange,
     compactMode = false,
   }: FontPickerProps) => {
-    const defaultFonts = useMemo(() => DEFAULT_FONTS, []);
+    const setAppState = useExcalidrawSetAppState();
     const onSelectCallback = useCallback(
       (value: number | false) => {
         if (value) {
@@ -83,48 +189,68 @@ export const FontPicker = React.memo(
       [onSelect],
     );
 
+    // the strip (and thus its customization) is hidden in compact mode
+    const isTopPicksCustomizable = !compactMode;
+    const isCustomized = !!topPicks?.length;
+    const picks = isCustomized ? topPicks : DEFAULT_FONT_TOP_PICKS;
+
+    const dnd = useFontTopPicksDnD({
+      enabled: isTopPicksCustomizable,
+      picks,
+      onPicksChange: (fontTopPicks) => setAppState({ fontTopPicks }),
+    });
+
     return (
-      <div
-        role="dialog"
-        aria-modal="true"
-        className={clsx("FontPicker__container", {
-          "FontPicker__container--compact": compactMode,
-        })}
+      <FontPickerDnDContext.Provider
+        value={isTopPicksCustomizable ? dnd : null}
       >
-        {!compactMode && (
-          <div className="buttonList">
-            <RadioSelection<FontFamilyValues | false>
-              type="button"
-              options={defaultFonts}
-              value={selectedFontFamily}
-              onClick={onSelectCallback}
-            />
-          </div>
-        )}
-        {!compactMode && <ButtonSeparator />}
-        <Popover.Root open={isOpened} onOpenChange={onPopupChange}>
-          <FontPickerTrigger
-            selectedFontFamily={selectedFontFamily}
-            isOpened={isOpened}
-            compactMode={compactMode}
-          />
-          {isOpened && (
-            <FontPickerList
+        <div
+          role="dialog"
+          aria-modal="true"
+          className={clsx("FontPicker__container", {
+            "FontPicker__container--compact": compactMode,
+          })}
+        >
+          {!compactMode && (
+            <FontTopPicks
+              picks={picks}
               selectedFontFamily={selectedFontFamily}
-              hoveredFontFamily={hoveredFontFamily}
               onSelect={onSelectCallback}
-              onHover={onHover}
-              onLeave={onLeave}
-              onOpen={() => onPopupChange(true)}
-              onClose={() => onPopupChange(false)}
+              isCustomized={isCustomized}
+              onReset={
+                isTopPicksCustomizable
+                  ? () => setAppState({ fontTopPicks: null })
+                  : undefined
+              }
             />
           )}
-        </Popover.Root>
-      </div>
+          {!compactMode && <ButtonSeparator />}
+          <Popover.Root open={isOpened} onOpenChange={onPopupChange}>
+            <FontPickerTrigger
+              selectedFontFamily={selectedFontFamily}
+              isOpened={isOpened}
+              compactMode={compactMode}
+            />
+            {isOpened && (
+              <FontPickerList
+                selectedFontFamily={selectedFontFamily}
+                hoveredFontFamily={hoveredFontFamily}
+                onSelect={onSelectCallback}
+                onHover={onHover}
+                onLeave={onLeave}
+                onOpen={() => onPopupChange(true)}
+                onClose={() => onPopupChange(false)}
+              />
+            )}
+          </Popover.Root>
+        </div>
+      </FontPickerDnDContext.Provider>
     );
   },
   (prev, next) =>
     prev.isOpened === next.isOpened &&
     prev.selectedFontFamily === next.selectedFontFamily &&
-    prev.hoveredFontFamily === next.hoveredFontFamily,
+    prev.hoveredFontFamily === next.hoveredFontFamily &&
+    prev.topPicks === next.topPicks &&
+    prev.compactMode === next.compactMode,
 );

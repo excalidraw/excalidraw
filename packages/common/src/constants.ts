@@ -259,6 +259,9 @@ export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
 export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
 export const STICKY_NOTE_EDGE_SHADOW_OPACITY = 0.08;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
+/** number of slots in the font-picker top-picks strip — pick customization
+ * (replace / reorder) preserves it */
+export const FONT_TOP_PICKS_SLOTS = 3;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";

@@ -722,7 +722,9 @@
     },
     "sceneFonts": "In this scene",
     "availableFonts": "Available fonts",
-    "empty": "No fonts found"
+    "empty": "No fonts found",
+    "topPicksTip": "Tip: drag any font onto your top picks to pin it",
+    "resetTopPicks": "Reset to default top picks"
   },
   "userList": {
     "empty": "No users found",

@@ -55,6 +55,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "exportScale": 1,
   "exportWithDarkMode": false,
   "fileHandle": null,
+  "fontTopPicks": null,
   "frameRendering": {
     "clip": true,
     "enabled": true,

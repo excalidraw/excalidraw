@@ -568,6 +568,9 @@ export interface AppState {
     stickyNoteStroke: readonly string[] | null;
     stickyNoteBackground: readonly string[] | null;
   };
+  /** user-customized font-picker top picks (pinned via drag & drop from the
+   * font picker popup). `null` means no customization (defaults are used) */
+  fontTopPicks: readonly FontFamilyValues[] | null;
 }
 
 export type SearchMatch = {

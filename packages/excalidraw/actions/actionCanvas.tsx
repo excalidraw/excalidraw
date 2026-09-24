@@ -112,6 +112,7 @@ export const actionClearCanvas = register({
         gridModeEnabled: appState.gridModeEnabled,
         stats: appState.stats,
         colorTopPicks: appState.colorTopPicks,
+        fontTopPicks: appState.fontTopPicks,
         activeTool:
           appState.activeTool.type === "image"
             ? {

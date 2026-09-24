@@ -1441,6 +1441,7 @@ export const actionChangeFontFamily = register<{
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
+          topPicks={appState.fontTopPicks}
           compactMode={stylesPanelMode !== "full"}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(

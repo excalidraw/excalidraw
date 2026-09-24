@@ -141,6 +141,7 @@ export const getDefaultAppState = (): Omit<
       stickyNoteStroke: null,
       stickyNoteBackground: null,
     },
+    fontTopPicks: null,
   };
 };
 
@@ -284,6 +285,7 @@ const APP_STATE_STORAGE_CONF = (<
   activeLockedId: { browser: false, export: false, server: false },
   bindMode: { browser: true, export: false, server: false },
   colorTopPicks: { browser: true, export: false, server: false },
+  fontTopPicks: { browser: true, export: false, server: false },
 });
 
 const _clearAppStateForStorage = <

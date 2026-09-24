@@ -26,7 +26,7 @@ import {
   isCustomColor,
 } from "./colorPickerUtils";
 import { colorPickerKeyNavHandler } from "./keyboardNavHandlers";
-import { useColorPickerDnD } from "./topPicksDnD";
+import { useColorPickerDnD } from "./colorTopPicksDnD";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
