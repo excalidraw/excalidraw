@@ -249,6 +249,7 @@
     "undo": "Annuler",
     "redo": "Rétablir",
     "resetLibrary": "Réinitialiser la bibliothèque",
+    "reset": "",
     "createNewRoom": "Créer une nouvelle salle",
     "fullScreen": "Plein écran",
     "darkMode": "Mode sombre",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "Dans cette scène",
     "availableFonts": "Polices disponibles",
-    "empty": "Aucune police trouvée"
+    "empty": "Aucune police trouvée",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Aucun utilisateurs trouvé",
