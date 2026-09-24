@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "Pfeilbindung",
     "midpointSnapping": "An Mittelpunkten einrasten",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
