@@ -57,6 +57,7 @@ import {
   ARROW_TYPE,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   DEFAULT_STICKY_NOTE_SIZE,
+  ZEN_MODE_TRANSITION_DURATION,
   isLocalLink,
   normalizeLink,
   toValidURL,
@@ -647,6 +648,7 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private excalidrawContainerRef = React.createRef<HTMLDivElement>();
+  private zenModeTransitionTimer = 0;
 
   public get ownerDocument(): Document {
     return (
@@ -2447,6 +2449,7 @@ class App extends React.Component<AppProps, AppState> {
             ? POINTER_EVENTS.disabled
             : POINTER_EVENTS.enabled,
           ["--right-sidebar-width" as any]: `${RIGHT_SIDEBAR_WIDTH}px`,
+          ["--zen-mode-transition-duration" as any]: `${ZEN_MODE_TRANSITION_DURATION}ms`,
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.isInteractionEnabled() ? this.handleAppOnDrop : undefined}
@@ -3364,7 +3367,9 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState({
       contextMenu: null,
-      openMenu: null,
+      // keep the main menu open when entering view mode, since that's where
+      // the user usually toggles it from (Preferences submenu)
+      openMenu: this.isInteractionEnabled() ? this.state.openMenu : null,
       openPopup: null,
       cursorButton: "up",
       bindMode: "orbit",
@@ -3923,6 +3928,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    clearTimeout(this.zenModeTransitionTimer);
     this.editorLifecycleEvents.emit("editor:unmount");
     this.props.onUnmount?.();
     this.props.onExcalidrawAPI?.(null);
@@ -4247,6 +4253,34 @@ class App extends React.Component<AppProps, AppState> {
         ),
       );
     }
+  }
+
+  getSnapshotBeforeUpdate(prevProps: AppProps, prevState: AppState) {
+    // before the DOM update, so the transition styles are in place by the time
+    // the zen-mode class changes (layout reads during commit would otherwise
+    // resolve the new styles without them)
+    if (prevState.zenModeEnabled !== this.state.zenModeEnabled) {
+      this.markZenModeTransition();
+    }
+    return null;
+  }
+
+  /**
+   * Flags the container while toggling zen mode so that UI chrome
+   * (backgrounds etc.) animates only then, and hover transitions stay
+   * instant. A data attribute so that React doesn't reset it on re-render.
+   */
+  private markZenModeTransition() {
+    const container = this.excalidrawContainerRef.current;
+    if (!container) {
+      return;
+    }
+    container.setAttribute("data-zen-mode-transition", "");
+    clearTimeout(this.zenModeTransitionTimer);
+    this.zenModeTransitionTimer = window.setTimeout(() => {
+      container.removeAttribute("data-zen-mode-transition");
+      // slightly past the CSS transition so it isn't cut short
+    }, ZEN_MODE_TRANSITION_DURATION + 100);
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {

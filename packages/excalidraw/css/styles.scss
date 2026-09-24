@@ -680,6 +680,71 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  // in zen mode, canvas controls render without background/border/shadow
+  // (hover/active states still apply). Popups & dialogs are unaffected.
+  &.excalidraw--zen-mode {
+    .App-toolbar,
+    .zoom-actions {
+      background-color: transparent;
+      box-shadow: none;
+    }
+
+    .main-menu-trigger,
+    .scroll-back-to-content,
+    .disable-zen-mode {
+      &:not(:active) {
+        border-color: transparent;
+        box-shadow: none;
+      }
+    }
+
+    .main-menu-trigger,
+    .scroll-back-to-content,
+    .disable-zen-mode {
+      &:not(:hover, :active) {
+        background-color: transparent !important;
+      }
+    }
+
+    // only show the zoom level (fade out in place, same as other zen-hidden
+    // UI). Hides the tooltip wrappers so they don't show tooltips either.
+    .zoom-out-button-wrapper,
+    .zoom-in-button-wrapper {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .reset-zoom-button {
+      border-radius: var(--border-radius-lg) !important;
+    }
+
+    // shift into the hidden zoom-out button's place
+    .reset-zoom-button-wrapper {
+      transform: translateX(calc(-1 * var(--lg-button-size)));
+
+      :root[dir="rtl"] & {
+        transform: translateX(var(--lg-button-size));
+      }
+    }
+  }
+
+  // fade the chrome in/out only while toggling zen mode (see
+  // App.markZenModeTransition) so hover transitions stay instant
+  &[data-zen-mode-transition] {
+    .App-toolbar,
+    .zoom-actions,
+    .main-menu-trigger,
+    .scroll-back-to-content {
+      transition: background-color var(--zen-mode-transition-duration)
+          ease-in-out,
+        border-color var(--zen-mode-transition-duration) ease-in-out,
+        box-shadow var(--zen-mode-transition-duration) ease-in-out,
+        opacity var(--zen-mode-transition-duration) ease-in-out,
+        visibility var(--zen-mode-transition-duration);
+    }
+  }
+
   .disable-pointerEvents {
     pointer-events: none !important;
   }

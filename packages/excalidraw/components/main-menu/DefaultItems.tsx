@@ -563,6 +563,23 @@ const PreferencesToggleMidpointSnappingItem = () => {
   );
 };
 
+const PreferencesToggleShowHintsItem = () => {
+  const { t } = useI18n();
+  const appState = useUIAppState();
+  const setAppState = useExcalidrawSetAppState();
+  return (
+    <DropdownMenuItemCheckbox
+      checked={appState.showHints}
+      onSelect={(event) => {
+        setAppState({ showHints: !appState.showHints });
+        event.preventDefault();
+      }}
+    >
+      {t("labels.showHints")}
+    </DropdownMenuItemCheckbox>
+  );
+};
+
 export const PreferencesToggleGridModeItem = () => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
@@ -665,6 +682,7 @@ export const Preferences = ({
             <PreferencesToggleElementPropertiesItem />
             <PreferencesToggleArrowBindingItem />
             <PreferencesToggleMidpointSnappingItem />
+            <PreferencesToggleShowHintsItem />
           </>
         )}
         {additionalItems}
@@ -679,6 +697,7 @@ Preferences.InputDevice = PreferencesInputDeviceItem;
 Preferences.ToggleSnapMode = PreferencesToggleSnapModeItem;
 Preferences.ToggleArrowBinding = PreferencesToggleArrowBindingItem;
 Preferences.ToggleMidpointSnapping = PreferencesToggleMidpointSnappingItem;
+Preferences.ToggleShowHints = PreferencesToggleShowHintsItem;
 Preferences.ToggleGridMode = PreferencesToggleGridModeItem;
 Preferences.ToggleZenMode = PreferencesToggleZenModeItem;
 Preferences.ToggleViewMode = PreferencesToggleViewModeItem;

@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
     "midpointSnapping": "Snap to midpoints",
+    "showHints": "Show hints",
     "inputDevice": "Input",
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Mouse"

@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React, { useEffect } from "react";
 
 import "./Tooltip.scss";
@@ -59,6 +60,26 @@ export const updateTooltipPosition = (
   });
 };
 
+/** ms before a `delay`ed tooltip shows */
+const TOOLTIP_DELAY = 500;
+/**
+ * ms after a tooltip hides during which a `delay`ed tooltip shows right away
+ * (e.g. when moving across adjacent buttons)
+ */
+const TOOLTIP_WARM_WINDOW = 300;
+
+let showTooltipTimer = 0;
+let tooltipHiddenAt = 0;
+
+const hideTooltip = () => {
+  clearTimeout(showTooltipTimer);
+  const tooltip = getTooltipDiv();
+  if (tooltip.classList.contains("excalidraw-tooltip--visible")) {
+    tooltip.classList.remove("excalidraw-tooltip--visible");
+    tooltipHiddenAt = Date.now();
+  }
+};
+
 const updateTooltip = (
   item: HTMLDivElement,
   tooltip: HTMLDivElement,
@@ -80,7 +101,10 @@ type TooltipProps = {
   label: string;
   long?: boolean;
   style?: React.CSSProperties;
+  className?: string;
   disabled?: boolean;
+  /** show after a short delay (unless a tooltip was visible just now) */
+  delay?: boolean;
 };
 
 export const Tooltip = ({
@@ -88,29 +112,30 @@ export const Tooltip = ({
   label,
   long = false,
   style,
+  className,
   disabled,
+  delay = false,
 }: TooltipProps) => {
   useEffect(() => {
-    return () =>
-      getTooltipDiv().classList.remove("excalidraw-tooltip--visible");
+    return () => hideTooltip();
   }, []);
   if (disabled) {
     return null;
   }
   return (
     <div
-      className="excalidraw-tooltip-wrapper"
-      onPointerEnter={(event) =>
-        updateTooltip(
-          event.currentTarget as HTMLDivElement,
-          getTooltipDiv(),
-          label,
-          long,
-        )
-      }
-      onPointerLeave={() =>
-        getTooltipDiv().classList.remove("excalidraw-tooltip--visible")
-      }
+      className={clsx("excalidraw-tooltip-wrapper", className)}
+      onPointerEnter={(event) => {
+        const item = event.currentTarget as HTMLDivElement;
+        const show = () => updateTooltip(item, getTooltipDiv(), label, long);
+        clearTimeout(showTooltipTimer);
+        if (delay && Date.now() - tooltipHiddenAt > TOOLTIP_WARM_WINDOW) {
+          showTooltipTimer = window.setTimeout(show, TOOLTIP_DELAY);
+        } else {
+          show();
+        }
+      }}
+      onPointerLeave={hideTooltip}
       style={style}
     >
       {children}

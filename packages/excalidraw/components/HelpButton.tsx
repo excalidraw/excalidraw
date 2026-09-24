@@ -10,7 +10,7 @@ type HelpButtonProps = {
 };
 
 export const HelpButton = (props: HelpButtonProps) => (
-  <Tooltip label={`${t("helpDialog.title")} — ?`}>
+  <Tooltip label={`${t("helpDialog.title")} — ?`} delay>
     <button
       className="help-icon"
       onClick={props.onClick}
