@@ -46,10 +46,14 @@
     color: var(--text-primary-color);
   }
 
+  [dir="rtl"] & .value-bubble {
+    transform: translateX(50%);
+  }
+
   .zero-label {
     position: absolute;
     bottom: 0;
-    left: 4px;
+    inset-inline-start: 4px;
     font-size: 12px;
     color: var(--text-primary-color);
   }
