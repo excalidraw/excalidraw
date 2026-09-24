@@ -249,6 +249,7 @@
     "undo": "Hoàn tác",
     "redo": "Làm lại",
     "resetLibrary": "Cài lại thư viện",
+    "reset": "",
     "createNewRoom": "Tạo phòng mới",
     "fullScreen": "Toàn màn hình",
     "darkMode": "Chế độ tối",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
