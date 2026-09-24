@@ -83,3 +83,15 @@ test("unselected bound arrows update when rotating their target elements", async
   expect(textArrow.points[1][0]).toBeCloseTo(-95.4635969899922, 0);
   expect(textArrow.points[1][1]).toBeCloseTo(-126.8785027399889, 0);
 });
+
+test("grid mode does not snap rotation pointer position", async () => {
+  await render(<Excalidraw gridModeEnabled={true} />);
+  const rectangle = UI.createElement("rectangle", {
+    width: 100,
+    height: 100,
+  });
+
+  UI.rotate(rectangle, [100, 70]);
+
+  expect(rectangle.angle).toBeCloseTo(Math.PI / 2);
+});
