@@ -249,6 +249,7 @@
     "undo": "Rückgängig machen",
     "redo": "Wiederholen",
     "resetLibrary": "Bibliothek zurücksetzen",
+    "reset": "",
     "createNewRoom": "Neuen Raum erstellen",
     "fullScreen": "Vollbildanzeige",
     "darkMode": "Dunkles Design",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "In dieser Szene",
     "availableFonts": "Verfügbare Schriftarten",
-    "empty": "Keine Schriftarten gefunden"
+    "empty": "Keine Schriftarten gefunden",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Keine Benutzer gefunden",
