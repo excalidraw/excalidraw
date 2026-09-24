@@ -108,6 +108,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
+  "showHints": true,
   "showHyperlinkPopup": false,
   "showWelcomeScreen": false,
   "snapLines": [],
