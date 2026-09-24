@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React, { useEffect } from "react";
 
 import "./Tooltip.scss";
@@ -80,6 +81,7 @@ type TooltipProps = {
   label: string;
   long?: boolean;
   style?: React.CSSProperties;
+  className?: string;
   disabled?: boolean;
 };
 
@@ -88,6 +90,7 @@ export const Tooltip = ({
   label,
   long = false,
   style,
+  className,
   disabled,
 }: TooltipProps) => {
   useEffect(() => {
@@ -99,7 +102,7 @@ export const Tooltip = ({
   }
   return (
     <div
-      className="excalidraw-tooltip-wrapper"
+      className={clsx("excalidraw-tooltip-wrapper", className)}
       onPointerEnter={(event) =>
         updateTooltip(
           event.currentTarget as HTMLDivElement,

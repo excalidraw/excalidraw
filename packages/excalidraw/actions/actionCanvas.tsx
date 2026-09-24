@@ -254,7 +254,11 @@ export const actionResetZoom = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
+      <Tooltip
+        label={t("buttons.resetZoom")}
+        style={{ height: "100%" }}
+        className="reset-zoom-button-wrapper"
+      >
         <IconButton
           type="button"
           className="reset-zoom-button zoom-button"

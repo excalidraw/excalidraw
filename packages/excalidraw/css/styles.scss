@@ -717,6 +717,15 @@ body.excalidraw-cursor-resize * {
     .reset-zoom-button {
       border-radius: var(--border-radius-lg) !important;
     }
+
+    // shift into the hidden zoom-out button's place
+    .reset-zoom-button-wrapper {
+      transform: translateX(calc(-1 * var(--lg-button-size)));
+
+      :root[dir="rtl"] & {
+        transform: translateX(var(--lg-button-size));
+      }
+    }
   }
 
   // fade the chrome in/out only while toggling zen mode (see
