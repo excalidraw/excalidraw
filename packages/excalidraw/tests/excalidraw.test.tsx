@@ -379,6 +379,19 @@ describe("<Excalidraw/>", () => {
       const textInput = document.querySelector(
         ".ImageExportModal .ImageExportModal__preview__filename .TextInput",
       ) as HTMLInputElement;
+      // default export filename is branded with the "excalidraw-" prefix
+      expect(textInput?.value).toEqual(`excalidraw-${name}`);
+      expect(textInput?.nodeName).toBe("INPUT");
+    });
+
+    it("should not double-prefix a name that's already branded", async () => {
+      const name = "excalidraw-test";
+      const { container } = await render(<Excalidraw name={name} />);
+      toggleMenu(container);
+      await fireEvent.click(queryByTestId(container, "image-export-button")!);
+      const textInput = document.querySelector(
+        ".ImageExportModal .ImageExportModal__preview__filename .TextInput",
+      ) as HTMLInputElement;
       expect(textInput?.value).toEqual(name);
       expect(textInput?.nodeName).toBe("INPUT");
     });

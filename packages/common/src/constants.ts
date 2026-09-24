@@ -348,6 +348,20 @@ export const EXPORT_DATA_TYPES = {
 export const getExportSource = () =>
   window.EXCALIDRAW_EXPORT_SOURCE || window.location.origin;
 
+/**
+ * URL of the official Excalidraw brand icon (vector), resolved relative to
+ * the exporting origin. Embedded as branding metadata in exported
+ * `.excalidraw` files and in the scene metadata sidecar embedded in
+ * PNG/SVG exports (when "embed scene" is enabled), so any tooling that
+ * reads the file can look up and display a consistent Excalidraw icon.
+ *
+ * NOTE: this is inert file content, not an OS-level file icon — it does
+ * not by itself change how Finder/Windows Explorer renders the file's
+ * icon. That requires OS-level file-type/icon registration, which is
+ * outside what a browser-downloaded file can carry.
+ */
+export const getExportIconUrl = () => `${getExportSource()}/favicon.svg`;
+
 // time in milliseconds
 export const IMAGE_RENDER_TIMEOUT = 500;
 export const TAP_TWICE_TIMEOUT = 300;
@@ -576,6 +590,12 @@ export const EDITOR_LS_KEYS = {
  * where filename is optional and we can't retrieve name from app state
  */
 export const DEFAULT_FILENAME = "Untitled";
+
+/**
+ * Prefix applied to default export filenames (PNG/SVG/.excalidraw/etc) for
+ * brand recognition. Not translated, same rationale as DEFAULT_FILENAME.
+ */
+export const EXPORT_FILENAME_BRAND_PREFIX = "excalidraw";
 
 export const STATS_PANELS = { generalStats: 1, elementProperties: 2 } as const;
 

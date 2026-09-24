@@ -1,5 +1,6 @@
 import {
   EXPORT_DATA_TYPES,
+  getExportIconUrl,
   getExportSource,
   MIME_TYPES,
   VERSIONS,
@@ -59,6 +60,7 @@ export const serializeAsJSON = (
     type: EXPORT_DATA_TYPES.excalidraw,
     version: VERSIONS.excalidraw,
     source: getExportSource(),
+    icon: getExportIconUrl(),
     elements,
     appState:
       type === "local"
