@@ -49,11 +49,13 @@ export type TopPicksGhost = {
   rect: DOMRect;
 };
 
+/** called on pointerdown (the source may not stay mounted until the drag
+ * activates), for every potential drag — keep it cheap */
 export type CreateTopPicksGhost<T> = (args: {
   value: T;
   /** the element the drag started on */
   sourceEl: HTMLElement;
-  /** the registered strip (already measured) */
+  /** the registered strip */
   stripEl: HTMLElement;
 }) => TopPicksGhost;
 
@@ -69,9 +71,10 @@ type DragSession<T> = {
   activationTimer: number | null;
   value: T;
   origin: DragOrigin;
-  sourceEl: HTMLElement;
-  /** set on activation (see `TopPicksGhost.rect`) */
-  homeRect: DOMRect | null;
+  /** built on pointerdown, shown on activation */
+  ghostContent: HTMLElement;
+  /** see `TopPicksGhost.rect` */
+  homeRect: DOMRect;
   activated: boolean;
   ghost: HTMLDivElement | null;
   ghostW: number;
@@ -239,24 +242,18 @@ export const useTopPicksDnD = <T,>({
     };
 
     const activate = (x: number, y: number) => {
-      const stripEl = stripRef.current;
-      if (!session || !stripEl) {
+      if (!session) {
         return;
       }
-      const { content, rect } = latestRef.current.createGhost({
-        value: session.value,
-        sourceEl: session.sourceEl,
-        stripEl,
-      });
+      const { ghostContent, homeRect: rect } = session;
 
       const ghost = document.createElement("div");
       ghost.className = GHOST_CLASS;
-      content.classList.add(`${GHOST_CLASS}__content`);
-      ghost.appendChild(content);
+      ghostContent.classList.add(`${GHOST_CLASS}__content`);
+      ghost.appendChild(ghostContent);
       document.body.appendChild(ghost);
 
       session.ghost = ghost;
-      session.homeRect = rect;
       session.ghostW = rect.width;
       session.ghostH = rect.height;
       ghost.style.width = `${rect.width}px`;
@@ -336,7 +333,7 @@ export const useTopPicksDnD = <T,>({
       if (overIndex !== null) {
         const rect = session.slotRects[overIndex];
         setGhostSize(rect.width, rect.height, x, y);
-      } else if (session.homeRect) {
+      } else {
         setGhostSize(session.homeRect.width, session.homeRect.height, x, y);
       }
     };
@@ -567,6 +564,21 @@ export const useTopPicksDnD = <T,>({
       ) {
         return;
       }
+      const stripEl = stripRef.current;
+      if (!stripEl) {
+        return;
+      }
+      // build & measure the ghost now, while the source is guaranteed to be
+      // mounted — it may be re-rendered (detached) before the drag activates
+      // (e.g. the font list re-renders on hover), and a detached source
+      // measures as a zero rect, flying a cancelled ghost to the viewport's
+      // top-left
+      const { content: ghostContent, rect: homeRect } =
+        latestRef.current.createGhost({
+          value,
+          sourceEl: event.currentTarget as HTMLElement,
+          stripEl,
+        });
       session = {
         pointerId: event.pointerId,
         startX: event.clientX,
@@ -577,8 +589,8 @@ export const useTopPicksDnD = <T,>({
         activationTimer: null,
         value,
         origin,
-        sourceEl: event.currentTarget as HTMLElement,
-        homeRect: null,
+        ghostContent,
+        homeRect,
         activated: false,
         ghost: null,
         ghostW: 0,
