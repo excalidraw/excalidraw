@@ -91,6 +91,7 @@
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
-    "strip-ansi": "6.0.1"
+    "strip-ansi": "6.0.1",
+    "websocket-driver": "0.7.5"
   }
 }
