@@ -78,6 +78,15 @@
   }
 
   .redo-button-container button {
+    border-radius: 0 !important;
+    border-right: 0 !important;
+
+    .ToolIcon__icon {
+      border-radius: 0 !important;
+    }
+  }
+
+  .duplicate-button-container button {
     border-top-right-radius: var(--border-radius-lg) !important;
     border-bottom-right-radius: var(--border-radius-lg) !important;
 
