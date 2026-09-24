@@ -2,9 +2,9 @@ import { MIME_TYPES } from "@excalidraw/excalidraw";
 import { fileOpen as _fileOpen } from "browser-fs-access";
 import { unstable_batchedUpdates } from "react-dom";
 
-type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
+type FILE_EXTENSION = Exclude<Extract<keyof typeof MIME_TYPES, string>, "binary">;
 
-export type ResolvablePromise<T> = Promise<T> & {
+export type ResolvablePromise<T> = Promise<T> & { 
   resolve: [T] extends [undefined] ? (value?: T) => void : (value: T) => void;
   reject: (error: Error) => void;
 };
