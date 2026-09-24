@@ -249,6 +249,7 @@
     "undo": "گه‌ڕانه‌وه‌ بۆ پێشوو",
     "redo": "گه‌ڕانه‌وه‌ بۆ داهاتوو",
     "resetLibrary": "ڕێکخستنەوەی کتێبخانە",
+    "reset": "",
     "createNewRoom": "ژوورێکی نوێ دروست بکە",
     "fullScreen": "پڕ بە شاشە",
     "darkMode": "دۆخی تاریک",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
