@@ -14,6 +14,7 @@ export const CODES = {
   TWO: "Digit2",
   THREE: "Digit3",
   NINE: "Digit9",
+  BACKQUOTE: "Backquote",
   QUOTE: "Quote",
   ZERO: "Digit0",
   SLASH: "Slash",
