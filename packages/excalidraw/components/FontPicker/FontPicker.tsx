@@ -2,13 +2,16 @@ import { Popover } from "radix-ui";
 import clsx from "clsx";
 import React, { useCallback, useMemo } from "react";
 
-import { FONT_FAMILY, FONT_TOP_PICKS_SLOTS } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  FONT_TOP_PICKS_SLOTS,
+  getFontFamilyString,
+} from "@excalidraw/common";
 
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
 import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
-import { useExcalidrawSetAppState } from "../App";
 import { ButtonSeparator } from "../ButtonSeparator";
 import {
   FontFamilyCodeIcon,
@@ -95,6 +98,19 @@ const getTopPickFont = (fontFamily: FontFamilyValues) =>
     testId: `font-family-${fontFamily}`,
   };
 
+const needsGlyphSample = (
+  fontFamily: FontFamilyValues,
+  picks: readonly FontFamilyValues[],
+) => {
+  if (defaultFontFamilies.has(fontFamily)) {
+    return false;
+  }
+  const icon = getFontFamilyIcon(fontFamily);
+  return picks.some(
+    (pick) => pick !== fontFamily && getTopPickFont(pick).icon === icon,
+  );
+};
+
 const FontTopPicks = ({
   picks,
   selectedFontFamily,
@@ -160,7 +176,16 @@ const FontTopPicks = ({
                 }
                 data-top-pick-index={index}
               >
-                {font.icon}
+                {needsGlyphSample(fontFamily, picks) ? (
+                  <span
+                    className="FontPicker__top-pick-sample"
+                    style={{ fontFamily: getFontFamilyString({ fontFamily }) }}
+                  >
+                    Aa
+                  </span>
+                ) : (
+                  font.icon
+                )}
               </button>
             );
           })}
@@ -177,6 +202,7 @@ interface FontPickerProps {
   /** user-customized top picks (`appState.fontTopPicks`) */
   topPicks: readonly FontFamilyValues[] | null;
   onSelect: (fontFamily: FontFamilyValues) => void;
+  onTopPicksChange: (fontTopPicks: FontFamilyValues[] | null) => void;
   onHover: (fontFamily: FontFamilyValues) => void;
   onLeave: () => void;
   onPopupChange: (open: boolean) => void;
@@ -190,12 +216,12 @@ export const FontPicker = React.memo(
     hoveredFontFamily,
     topPicks,
     onSelect,
+    onTopPicksChange,
     onHover,
     onLeave,
     onPopupChange,
     compactMode = false,
   }: FontPickerProps) => {
-    const setAppState = useExcalidrawSetAppState();
     const onSelectCallback = useCallback(
       (value: number | false) => {
         if (value) {
@@ -214,12 +240,12 @@ export const FontPicker = React.memo(
       [topPicks],
     );
 
-    const resetTopPicks = () => setAppState({ fontTopPicks: null });
+    const resetTopPicks = () => onTopPicksChange(null);
 
     const dnd = useFontTopPicksDnD({
       enabled: isTopPicksCustomizable,
       picks,
-      onPicksChange: (fontTopPicks) => setAppState({ fontTopPicks }),
+      onPicksChange: onTopPicksChange,
     });
 
     return (

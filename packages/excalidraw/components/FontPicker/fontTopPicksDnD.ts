@@ -50,6 +50,18 @@ const createFontGhost: CreateTopPicksGhost<FontFamilyValues> = ({
       iconClone.style.height = `${templateIconRect.height}px`;
     }
     tile.appendChild(iconClone);
+  } else {
+    // a pick rendering a glyph sample instead of an icon
+    const sample = sourceEl.querySelector<HTMLElement>(
+      ".FontPicker__top-pick-sample",
+    );
+    if (sample) {
+      const sampleClone = sample.cloneNode(true) as HTMLElement;
+      // the ghost is outside the editor's CSS scope
+      sampleClone.style.fontSize = getComputedStyle(sample).fontSize;
+      sampleClone.style.lineHeight = "1";
+      tile.appendChild(sampleClone);
+    }
   }
 
   if (isPick) {

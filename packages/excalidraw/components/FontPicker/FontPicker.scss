@@ -30,6 +30,12 @@
     border-color: var(--color-primary);
   }
 
+  // glyph sample standing in for a clashing icon (see `needsGlyphSample`)
+  .FontPicker__top-pick-sample {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
   .FontPicker__tip {
     margin-top: 0.5rem;
   }
