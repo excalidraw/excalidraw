@@ -24,7 +24,8 @@
   }
 }
 
-.reset-zoom-button {
+.zoom-value-button,
+.zoom-value-input {
   border-left: 0 !important;
   border-right: 0 !important;
   padding: 0 0.625rem !important;
@@ -33,7 +34,28 @@
   color: var(--text-primary-color);
 }
 
-.zoom-out-button {
+// scoped through `.zoom-actions` so it outranks the app-wide `input[type="text"]`
+// and `input:focus-visible` rules in styles.scss
+.excalidraw {
+  .zoom-actions .zoom-value-input {
+    // must match the button it replaces, so the bar doesn't resize mid-edit
+    box-sizing: border-box;
+    height: var(--lg-button-size);
+    margin: 0;
+    border: 0;
+    outline: none;
+    appearance: none;
+    text-align: center;
+    font-family: inherit;
+    color: var(--text-primary-color);
+
+    &:focus-visible {
+      box-shadow: none;
+    }
+  }
+}
+
+.reset-zoom-button {
   border-top-left-radius: var(--border-radius-lg) !important;
   border-bottom-left-radius: var(--border-radius-lg) !important;
 
@@ -44,7 +66,16 @@
   .ToolIcon__icon {
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
+
+    // the icon itself must stay upright when the button is mirrored for RTL
+    :root[dir="rtl"] & {
+      transform: scaleX(-1);
+    }
   }
+}
+
+.zoom-out-button {
+  border-radius: 0 !important;
 }
 
 .zoom-in-button {
