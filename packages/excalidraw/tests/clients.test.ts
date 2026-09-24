@@ -27,6 +27,11 @@ describe("getClientInitials", () => {
     expect(getNameInitial(null)).toBe("?");
   });
 
+  it('returns "?" for non-string values', () => {
+    expect(getNameInitial(123 as any)).toBe("?");
+    expect(getNameInitial({} as any)).toBe("?");
+  });
+
   it('returns "?" when value is blank', () => {
     expect(getNameInitial(" ")).toBe("?");
   });

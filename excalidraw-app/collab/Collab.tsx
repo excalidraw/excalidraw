@@ -630,7 +630,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               pointer,
               button,
               selectedElementIds,
-              username,
+              username: typeof username === "string" ? username : null,
             });
 
             break;
@@ -672,7 +672,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             const { userState, socketId, username } = decryptedData.payload;
             this.updateCollaborator(socketId, {
               userState,
-              username,
+              username: typeof username === "string" ? username : null,
             });
             break;
           }

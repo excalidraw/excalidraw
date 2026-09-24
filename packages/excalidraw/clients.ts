@@ -47,7 +47,8 @@ export const getClientColor = (
  */
 export const getNameInitial = (name?: string | null) => {
   // first char can be a surrogate pair, hence using codePointAt
-  const firstCodePoint = name?.trim()?.codePointAt(0);
+  const firstCodePoint =
+    typeof name === "string" ? name.trim().codePointAt(0) : undefined;
   return (
     firstCodePoint ? String.fromCodePoint(firstCodePoint) : "?"
   ).toUpperCase();
