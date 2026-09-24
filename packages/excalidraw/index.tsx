@@ -83,6 +83,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     renderTopLeftUI,
     renderTopRightUI,
     langCode = defaultLang.code,
+    applyLanguageToDocument = true,
     viewModeEnabled,
     interaction,
     ui,
@@ -206,7 +207,11 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
 
   return (
     <EditorJotaiProvider store={editorJotaiStore}>
-      <InitializeApp langCode={langCode} theme={theme}>
+      <InitializeApp
+        langCode={langCode}
+        theme={theme}
+        applyLanguageToDocument={applyLanguageToDocument}
+      >
         <App
           onExport={onExport}
           className={className}
@@ -225,6 +230,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
           langCode={langCode}
+          applyLanguageToDocument={applyLanguageToDocument}
           viewModeEnabled={viewModeEnabled}
           interaction={interaction}
           ui={ui}
