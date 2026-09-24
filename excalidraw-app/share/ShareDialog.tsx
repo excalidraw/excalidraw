@@ -167,10 +167,9 @@ const ActiveRoomDialog = ({
           icon={playerStopFilledIcon}
           onClick={() => {
             trackEvent("share", "room closed");
-            collabAPI.stopCollaboration();
-            if (!collabAPI.isCollaborating()) {
+            collabAPI.stopCollaboration().then(() => {
               handleClose();
-            }
+            });
           }}
         />
       </div>
