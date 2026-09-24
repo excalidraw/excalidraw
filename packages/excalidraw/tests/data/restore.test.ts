@@ -102,6 +102,87 @@ describe("restoreElements", () => {
     expect(restored[0].id).not.toBe(restored[1].id);
   });
 
+  it.each([
+    [1e300, restore.MAX_ELEMENT_VERSION],
+    [Infinity, 1],
+    [-Infinity, 1],
+    [NaN, 1],
+    ["zzz", 1],
+    [{}, 1],
+    [-5, 1],
+    [0, 1],
+    [2.7, 2],
+    [42, 42],
+    [restore.MAX_ELEMENT_VERSION, restore.MAX_ELEMENT_VERSION],
+  ])("normalizes version=%s to %s", (version, expected) => {
+    const element = {
+      ...API.createElement({
+        type: "rectangle",
+        index: "a0" as FractionalIndex,
+      }),
+      version,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.version).toBe(expected);
+    // bumps must remain effective
+    expect(restored.version + 1).not.toBe(restored.version);
+  });
+
+  it.each([
+    [-1e300, 0],
+    [1e300, 0],
+    [NaN, 0],
+    [Infinity, 0],
+    ["zzz", 0],
+    [1.5, 0],
+    [2 ** 31, 0],
+    [-(2 ** 31), -(2 ** 31)],
+    [0, 0],
+    [123456789, 123456789],
+    [2 ** 31 - 1, 2 ** 31 - 1],
+  ])("normalizes versionNonce=%s to %s", (versionNonce, expected) => {
+    const element = {
+      ...API.createElement({
+        type: "rectangle",
+        index: "a0" as FractionalIndex,
+      }),
+      versionNonce,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.versionNonce).toBe(expected);
+  });
+
+  it("keeps scene version bumpable after restoring a pinned version", () => {
+    const evil = {
+      ...API.createElement({ type: "rectangle", isDeleted: true }),
+      version: 1e300,
+      versionNonce: -1e300,
+      updated: 8.64e15,
+    } as unknown as ExcalidrawElement;
+    const normal = API.createElement({ type: "rectangle" });
+
+    const restored = restore.restoreElements([evil, normal], null);
+    const sceneVersion = restored.reduce((acc, el) => acc + el.version, 0);
+    expect(Number.isSafeInteger(sceneVersion)).toBe(true);
+    expect(sceneVersion + 1).toBeGreaterThan(sceneVersion);
+    expect(restored[0].updated).toBeLessThanOrEqual(Date.now());
+  });
+
+  it.each([Infinity, NaN, "zzz"])(
+    "normalizes non-finite updated=%s",
+    (updated) => {
+      const element = {
+        ...API.createElement({ type: "rectangle" }),
+        updated,
+      } as unknown as ExcalidrawElement;
+
+      const [restored] = restore.restoreElements([element], null);
+      expect(Number.isFinite(restored.updated)).toBe(true);
+    },
+  );
+
   it("should restore transparent sticky note stroke as black", () => {
     const stickyNote = {
       ...API.createElement({ type: "stickynote" }),
