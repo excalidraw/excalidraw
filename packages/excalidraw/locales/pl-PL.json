@@ -249,6 +249,7 @@
     "undo": "Cofnij",
     "redo": "Przywróć",
     "resetLibrary": "Resetuj bibliotekę",
+    "reset": "",
     "createNewRoom": "Utwórz nowy pokój",
     "fullScreen": "Pełny ekran",
     "darkMode": "Ciemny motyw",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "W tej scenie",
     "availableFonts": "Dostępne czcionki",
-    "empty": "Nie znaleziono czcionek"
+    "empty": "Nie znaleziono czcionek",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Nie znaleziono użytkowników",
