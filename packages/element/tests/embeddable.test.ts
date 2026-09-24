@@ -231,3 +231,32 @@ describe("Google Drive video embedding", () => {
     ).toBe(true);
   });
 });
+
+describe("GitHub Pages whitelist boundary", () => {
+  it("should allow the requested GitHub Pages hostname", () => {
+    expect(
+      embeddableURLValidator(
+        "https://somnathsinghstatrys.github.io/static-data/admin-ui-sample.html",
+        undefined,
+      ),
+    ).toBe(true);
+  });
+
+  it("should block other GitHub Pages hostnames", () => {
+    expect(
+      embeddableURLValidator(
+        "https://another-user.github.io/some-page.html",
+        undefined,
+      ),
+    ).toBe(false);
+  });
+
+  it("should block the bare github.io domain", () => {
+    expect(
+      embeddableURLValidator(
+        "https://github.io/some-page.html",
+        undefined,
+      ),
+    ).toBe(false);
+  });
+});
