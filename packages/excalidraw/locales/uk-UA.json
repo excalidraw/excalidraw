@@ -249,6 +249,7 @@
     "undo": "Відмінити",
     "redo": "Повторити",
     "resetLibrary": "Очистити бібліотеку",
+    "reset": "",
     "createNewRoom": "Створити нову кімнату",
     "fullScreen": "Повноекранний режим",
     "darkMode": "Темна тема",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "На цій сцені",
     "availableFonts": "Доступні шрифти",
-    "empty": "Шрифти не знайдено"
+    "empty": "Шрифти не знайдено",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Користувачів не знайдено",
