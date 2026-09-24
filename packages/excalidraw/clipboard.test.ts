@@ -127,6 +127,24 @@ describe("parseClipboard()", () => {
         value: "https://example.com/image2.png",
       },
     ]);
+    // -------------------------------------------------------------------------
+    const dataURL =
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+    clipboardData = await parseClipboard(
+      await parseDataTransferEvent(
+        createPasteEvent({
+          types: {
+            "text/html": `<img src="${dataURL}" />`,
+          },
+        }),
+      ),
+    );
+    expect(clipboardData.mixedContent).toEqual([
+      {
+        type: "imageUrl",
+        value: dataURL,
+      },
+    ]);
   });
 
   it("should parse text content alongside <image> `src` urls out of text/html", async () => {
