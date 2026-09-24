@@ -1,6 +1,6 @@
 import { Popover } from "radix-ui";
 import clsx from "clsx";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 
 import {
   FONT_FAMILY,
@@ -234,11 +234,9 @@ export const FontPicker = React.memo(
     // the strip (and thus its customization) is hidden in compact mode
     const isTopPicksCustomizable = !compactMode;
     const isCustomized = !!topPicks?.length;
-    const picks = useMemo(
-      () =>
-        topPicks?.length ? getFontTopPicks(topPicks) : DEFAULT_FONT_TOP_PICKS,
-      [topPicks],
-    );
+    const picks = topPicks?.length
+      ? getFontTopPicks(topPicks)
+      : DEFAULT_FONT_TOP_PICKS;
 
     const resetTopPicks = () => onTopPicksChange(null);
 
