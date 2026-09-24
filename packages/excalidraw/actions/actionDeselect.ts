@@ -2,6 +2,7 @@ import {
   getElementsInGroup,
   isSomeElementSelected,
   makeNextSelectedElementIds,
+  newElementWith,
   selectGroupsForSelectedElements,
 } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
@@ -65,9 +66,36 @@ export const actionDeselect = register({
   name: "deselect",
   label: "",
   trackEvent: false,
-  perform: (_elements, appState, _, app) => {
+  perform: (elements, appState, _, app) => {
     const activeTool = getNextActiveTool(appState, app);
     app.cursor.applyForTool(activeTool);
+
+    if (appState.multiElement) {
+      return {
+        elements: elements.map((element) =>
+          element.id === appState.multiElement?.id
+            ? newElementWith(element, { isDeleted: true })
+            : element,
+        ),
+        appState: {
+          ...appState,
+          activeEmbeddable: null,
+          activeTool,
+          editingGroupId: null,
+          newElement: null,
+          multiElement: null,
+          selectedElementIds: makeNextSelectedElementIds({}, appState),
+          selectedGroupIds: {},
+          selectedLinearElement: null,
+          selectionElement: null,
+          showHyperlinkPopup: false,
+          suggestedBinding: null,
+          hoveredArrowTextAnchor: null,
+          frameToHighlight: null,
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
 
     if (appState.editingGroupId) {
       const nonDeletedElements = app.scene.getNonDeletedElements();
@@ -138,11 +166,13 @@ export const actionDeselect = register({
       return false;
     }
 
+    const isCancelingMultiElement = appState.multiElement !== null;
+
     return (
-      !appState.newElement &&
-      appState.multiElement === null &&
-      !appState.selectedLinearElement?.isEditing &&
-      (appState.activeEmbeddable !== null ||
+      (isCancelingMultiElement || !appState.newElement) &&
+      (isCancelingMultiElement || !appState.selectedLinearElement?.isEditing) &&
+      (isCancelingMultiElement ||
+        appState.activeEmbeddable !== null ||
         appState.activeTool.type !== app.state.preferredSelectionTool.type ||
         !!appState.editingGroupId ||
         !!appState.selectedLinearElement ||

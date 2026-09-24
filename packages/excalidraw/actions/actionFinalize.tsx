@@ -421,9 +421,10 @@ export const actionFinalize = register<FormData>({
     };
   },
   keyTest: (event, appState) =>
-    (event.key === KEYS.ESCAPE && appState.selectedLinearElement?.isEditing) ||
-    ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
-      appState.multiElement !== null),
+    (event.key === KEYS.ESCAPE &&
+      appState.multiElement === null &&
+      appState.selectedLinearElement?.isEditing) ||
+    (event.key === KEYS.ENTER && appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
     <IconButton
       type="button"
