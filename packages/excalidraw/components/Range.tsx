@@ -39,11 +39,20 @@ export const Range = ({
             "--slider-thumb-size",
           ),
         ) || 16;
+      const isRTL =
+        document.documentElement.getAttribute("dir") === "rtl";
       const progress = ((value - min) / (max - min || 1)) * 100;
       const position =
         (progress / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
-      valueElement.style.left = `${position}px`;
-      rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${progress}%, var(--button-bg) ${progress}%, var(--button-bg) 100%)`;
+      if (isRTL) {
+        valueElement.style.right = `${position}px`;
+        valueElement.style.left = "auto";
+      } else {
+        valueElement.style.left = `${position}px`;
+        valueElement.style.right = "auto";
+      }
+      const direction = isRTL ? "to left" : "to right";
+      rangeElement.style.background = `linear-gradient(${direction}, var(--color-slider-track) 0%, var(--color-slider-track) ${progress}%, var(--button-bg) ${progress}%, var(--button-bg) 100%)`;
     }
   }, [max, min, value]);
 
