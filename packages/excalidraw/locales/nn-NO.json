@@ -249,6 +249,7 @@
     "undo": "Angre",
     "redo": "Gjer om",
     "resetLibrary": "Nullstill bibliotek",
+    "reset": "",
     "createNewRoom": "Lag nytt rom",
     "fullScreen": "Fullskjerm",
     "darkMode": "Mørk modus",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
