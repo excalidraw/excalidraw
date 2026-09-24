@@ -64,6 +64,7 @@ export type SVGRenderConfig = {
 };
 
 export type InteractiveCanvasRenderConfig = {
+  canvasHandleScale?: number;
   // collab-related state
   // ---------------------------------------------------------------------------
   remoteSelectedElementIds: Map<ExcalidrawElement["id"], SocketId[]>;
