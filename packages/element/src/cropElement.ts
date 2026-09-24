@@ -26,6 +26,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawImageElement,
   ImageCrop,
+  NonDeleted,
 } from "./types";
 
 export const MINIMAL_CROP_SIZE = 10;
@@ -476,9 +477,9 @@ const recomputeOrigin = (
 
 // refer to https://link.excalidraw.com/l/6rfy1007QOo/6stx5PmRn0k
 export const getUncroppedImageElement = (
-  element: ExcalidrawImageElement,
+  element: NonDeleted<ExcalidrawImageElement>,
   elementsMap: ElementsMap,
-) => {
+): NonDeleted<ExcalidrawImageElement> => {
   if (element.crop) {
     const { width, height } = getUncroppedWidthAndHeight(element);
 
@@ -531,7 +532,7 @@ export const getUncroppedImageElement = (
       -element.angle as Radians,
     );
 
-    const uncroppedElement: ExcalidrawImageElement = {
+    const uncroppedElement: NonDeleted<ExcalidrawImageElement> = {
       ...element,
       x: unrotatedTopLeft[0],
       y: unrotatedTopLeft[1],

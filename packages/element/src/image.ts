@@ -13,10 +13,37 @@ import type {
 import { isInitializedImageElement } from "./typeChecks";
 
 import type {
+  AnimatedImage,
   ExcalidrawElement,
   FileId,
   InitializedExcalidrawImageElement,
 } from "./types";
+
+export const getAnimatedImageFrameIndex = (
+  animation: AnimatedImage,
+  now: number,
+): number => {
+  const elapsed = Math.max(0, now - animation.startTime);
+
+  if (
+    animation.loopCount > 0 &&
+    elapsed >= animation.loopCount * animation.totalDuration
+  ) {
+    return animation.frameCount - 1;
+  }
+
+  const playhead = elapsed % animation.totalDuration;
+
+  let accumulated = 0;
+  for (let index = 0; index < animation.frameCount; index++) {
+    accumulated += animation.delays[index];
+    if (playhead < accumulated) {
+      return index;
+    }
+  }
+
+  return animation.frameCount - 1;
+};
 
 export const loadHTMLImageElement = (dataURL: DataURL) => {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -61,6 +88,8 @@ export const updateImageCache = async ({
               const data = {
                 image: imagePromise,
                 mimeType: fileData.mimeType,
+                // Keep decoded animation frames across cache refreshes
+                animation: imageCache.get(fileId)?.animation,
               } as const;
               // store the promise immediately to indicate there's an in-progress
               // initialization
@@ -68,7 +97,12 @@ export const updateImageCache = async ({
 
               const image = await imagePromise;
 
-              imageCache.set(fileId, { ...data, image });
+              // Re-read the entry. An animation decode may have completed
+              // while the image was loading
+              imageCache.set(fileId, {
+                ...(imageCache.get(fileId) ?? data),
+                image,
+              });
             } catch (error: any) {
               erroredFiles.set(fileId, true);
             }
