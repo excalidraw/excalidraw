@@ -1,0 +1,386 @@
+# Excalidraw Architecture
+
+_Updated: June 3, 2025_
+
+This document provides an overview of the Excalidraw codebase architecture to help contributors understand how the application is structured and how its various components interact.
+
+There is an AI generated [DeepWiki documentation](https://deepwiki.com/excalidraw/excalidraw) which can be a useful resource.
+
+## Introduction
+
+Excalidraw is a virtual collaborative whiteboard application that lets you easily sketch diagrams with a hand-drawn feel. It's built with React and TypeScript, focusing on a simple user interface, responsive design, and real-time collaboration capabilities.
+
+This architecture document aims to:
+
+- Provide a high-level overview of the codebase structure
+- Explain key components and their interactions
+- Help new contributors navigate the codebase effectively
+- Serve as a reference for architectural decisions
+
+## High-Level Architecture
+
+Excalidraw follows a modular, component-based architecture organized as a monorepo with multiple packages. Apart from the main App React class and the `excalidraw-app` implementation the codebase consist of **stateless** and **independent** helper functions which operate on the data received via the function's parameters. There are very few direct depdendencies used in Excalidraw and the project tends to avoid introducing new depdendencies whenever possible.
+
+### Core Components
+
+1. **Monorepo Structure**
+
+   - The project uses Yarn workspaces to manage multiple packages:
+     - `excalidraw-app`: The main web application built on React, embedding and wrapping the @excalidraw/excalidraw package
+     - `packages/excalidraw`: The core component library
+     - `packages/element`: Element definitions and operations
+     - `packages/common`: Shared utilities and constants
+     - `packages/math`: Mathematical utilities
+     - `packages/utils`: General utilities
+
+2. **Component Hierarchy**
+
+   - `packages/excalidraw/components/App.tsx`: The main (or root) component of the project.
+   - `excalidraw-app/App.tsx`: The entry point of the application demonstrating Excalidraw and also the frame and implementation for excalidraw.com.
+   - `packages/element/src/Scene.ts`: Manages the elements on the canvas, the "element database". Instantiated in the @excalidraw/excalidraw App class and passed down to idempotent functions.
+   - `packages/excalidraw/components/canvases/StaticCanvas.tsx`: Handles the main canvas and rendering, this is where the elements from the Scene is drawn.
+   - `packages/excalidraw/components/canvases/InteractiveCanvas.tsx`: Renders all the "extra", i.e. selection boxes, element highlights, control points etc
+
+3. **State Management**
+
+   - Uses a combination of React state, context, and Jotai atoms.
+   - Element updates happen via `State.mutateElement(...)`.
+   - The global app state (defined in `packages/excalidraw/appState.ts`) is managed by the `App` React class.
+   - At various points very limited and local state is used as static classes almost exclusively for memory caching purposes. Avoid any other use of local state if possible.
+
+4. **Rendering Pipeline**
+
+   - Multiple canvas layers (static, interactive, new element)
+   - Optimized rendering with throttling
+   - Uses RoughJS for the sketchy, hand-drawn style
+
+5. **Hit Testing and Interaction Pipeline**
+   - Uses the same RoughJS shapes for hit testing or wherever a faster implementation is possible, recreates the same shape for hit testing
+   - Uses analytical calculations (or numerical approximations when analytical solution is not possible or not performant enough) to determine distance from shapes and shape intersections to signal a successful hit (i.e. pointer or touch event)
+   - Hit testing shapes are heavily cached
+
+### Data Flow
+
+1. **Element Creation and Manipulation**
+
+   - Elements are created via the `newElement` functions
+   - Mutations happen through the `mutateElement` functions. Prefer `Scene.mutateElement(...)` unless you're extremely familiar with the Excalidraw collaboration implementation.
+   - Elements are stored in the `Scene` class in a Map.
+   - Most of the time the functions use non-deleted elements as deleted elements remain in the scene for history purposes.
+
+2. **User Interaction**
+
+   - Input events are captured by the App class and dispatched from there.
+   - `ActionManager` processes user actions. This is an in-progress refactor where most features will move into Actions, but currently only a few functions are converted.
+   - Tools modify the scene based on user input.
+
+3. **Collaboration**
+   - Real-time updates via WebSockets
+   - Scene reconciliation to merge changes
+   - Firebase for storage and persistence
+
+## Folder-by-Folder Overview
+
+### `excalidraw-app/`
+
+This is the main web application that users interact with when visiting excalidraw.com.
+
+- **Key Files**:
+
+  - `App.tsx`: Entry point for the web application
+  - `index.tsx`: Renders the app and registers service workers
+  - `collab/`: Collaboration features
+  - `data/`: Data persistence and file management
+  - `components/`: App-specific UI components
+
+- **Connections**: Imports and uses the `@excalidraw/excalidraw` package, adding web-specific features like collaboration, file storage, and export to Excalidraw+.
+
+### `packages/excalidraw/`
+
+The main component library that can be embedded in other applications.
+
+- **Key Files**:
+
+  - `index.tsx`: Exports the main `Excalidraw` component
+  - `components/App.tsx`: Core application logic
+  - `scene/`: Scene management
+  - `actions/`: User actions and commands
+  - `data/`: Data import/export
+  - `css/`: Styling
+
+- **Connections**: Uses `@excalidraw/element` for element operations and rendering, and exports components that can be used by `excalidraw-app`.
+
+### `packages/element/`
+
+Defines the element types and operations on them.
+
+- **Key Files**:
+
+  - `types.ts`: Element type definitions.
+  - `newElement.ts`: Element creation functions.
+  - `mutateElement.ts`: NOTE: Do not use this unless you're familiar with Excalidraw's collaboration architecture. Use `Scene.mutateElement(...)` instead.
+  - `bounds.ts`: Element boundary calculations.
+  - `renderElement.ts`: Element rendering logic.
+  - `Scene.ts`: Manages the collection of elements.
+
+- **Connections**: Used by `@excalidraw/excalidraw` for element operations.
+
+### `packages/common/`, `packages/math/`, `packages/utils/`
+
+Shared utilities, constants, and mathematical functions used across packages.
+
+## App Initialization & Rendering Flow
+
+1. **Application Bootstrap**:
+
+   - `excalidraw-app/index.tsx` renders the `ExcalidrawApp` component
+   - `ExcalidrawApp` initializes the Jotai store and renders `ExcalidrawWrapper`
+   - `ExcalidrawWrapper` sets up the initial state and renders the `Excalidraw` component
+
+2. **Excalidraw Component Initialization**:
+
+   - `packages/excalidraw/index.tsx` renders the `App` component with props
+   - `App` component initializes core services:
+     - `ActionManager`: Manages user actions
+     - `Scene`: Manages elements
+     - `History`: Manages undo/redo
+     - `Renderer`: Handles rendering
+
+3. **Canvas Initialization**:
+
+   - Multiple canvas layers are created:
+     - `StaticCanvas`: Renders the static elements
+     - `InteractiveCanvas`: Handles user interactions
+     - `NewElementCanvas`: Shows elements being created
+
+4. **Scene Loading**:
+   - Initial data is loaded from props, localStorage, or Firebase identified by URL parameter "json"
+   - Elements are processed and added to the scene
+   - The scene is rendered to the canvas
+
+## State Management
+
+Excalidraw uses a hybrid state management approach:
+
+1. **App State**:
+
+   - Stored in `appState` object
+   - Manages UI state, tool selection, view properties
+   - Defined in `packages/excalidraw/appState.ts`
+   - Some parts are persisted to localStorage
+
+2. **Scene State**:
+
+   - Managed by the `Scene` class in `packages/element/src/Scene.ts`
+   - Stores all elements and provides methods to manipulate them
+   - Maintains indices and caches for efficient access
+
+3. **Jotai Atoms**:
+
+   - Used for isolated state management
+   - `editorJotaiStore` for the editor component
+   - `appJotaiStore` for the web application
+   - Allows for fine-grained reactivity
+
+4. **Context**:
+   - Multiple React contexts for providing state to components
+   - `ExcalidrawContainerContext`, `ExcalidrawElementsContext`, etc.
+
+## Element Lifecycle
+
+Elements are the core objects in Excalidraw:
+
+1. **Element Definition**:
+
+   - Defined in `packages/element/src/types.ts`
+   - Base type `ExcalidrawElement` with specialized types for different shapes
+   - Properties include position, size, style, and type-specific attributes
+
+2. **Element Creation**:
+
+   - Created via functions in `packages/element/src/newElement.ts`
+   - Different functions for different element types: `newTextElement`, `newLinearElement`, etc.
+   - Elements get a unique ID, seed for randomization, and default properties
+
+3. **Element Modification**:
+
+   - Modified via `mutateElement` in `packages/element/src/Scene.ts`
+   - Ensures proper updating of version numbers and dependent properties
+   - Triggers scene updates
+
+4. **Element Rendering**:
+
+   - Rendered via functions in `packages/element/src/renderElement.ts`
+   - Uses RoughJS for the sketchy style
+   - Different rendering logic for different element types
+   - Caching for performance
+
+5. **Element Deletion**:
+   - Elements are marked as deleted rather than removed
+   - Allows for undo/redo and collaboration
+
+## Canvas Rendering Engine
+
+The canvas rendering system is sophisticated and optimized:
+
+1. **Multiple Canvas Layers**:
+
+   - `StaticCanvas`: Renders static elements
+   - `InteractiveCanvas`: Handles user interactions
+   - `NewElementCanvas`: Shows elements being created
+
+2. **Renderer**:
+
+   - `Renderer` class in `packages/excalidraw/scene/Renderer.ts`
+   - Determines which elements are visible
+   - Optimizes rendering with throttling
+
+3. **RoughJS Integration**:
+
+   - Uses RoughJS for the sketchy, hand-drawn style
+   - Customized for different element types
+
+4. **Performance Optimizations**:
+   - Element caching
+   - Throttled rendering
+   - Only renders visible elements
+
+## Commands, Tools, and Actions
+
+User interactions are managed through a system of commands and tools:
+
+1. **Action Manager**:
+
+   - Defined in `packages/excalidraw/actions/manager.ts`
+   - Registers and executes actions
+   - Handles keyboard shortcuts
+
+2. **Tools**:
+
+   - Selection, drawing, text, etc.
+   - Each tool has specific behavior for mouse/touch events
+   - Tool state is stored in `appState.activeTool`
+
+3. **Commands**:
+
+   - Higher-level operations like copy, paste, delete
+   - Accessible via UI, keyboard shortcuts, or command palette
+   - Defined in `packages/excalidraw/actions/types.ts`
+
+4. **Command Palette**:
+   - Provides quick access to commands
+   - Searchable interface
+   - Defined in `packages/excalidraw/components/CommandPalette/`
+
+## Collaboration Features
+
+Excalidraw supports real-time collaboration:
+
+1. **Architecture**:
+
+   - WebSocket-based communication
+   - Firebase for storage and persistence
+   - End-to-end encryption for security
+
+2. **Key Components**:
+
+   - `excalidraw-app/collab/Collab.tsx`: Main collaboration component
+   - `excalidraw-app/data/firebase.ts`: Firebase integration
+   - Room creation and joining logic
+
+3. **Data Flow**:
+
+   - Scene changes are synchronized between clients
+   - Elements are reconciled to merge changes
+   - Files are uploaded to Firebase storage
+
+4. **Security**:
+   - End-to-end encryption using a shared room key
+   - No server-side access to drawing content
+   - Room IDs and keys are generated client-side
+
+## Testing and Utilities
+
+1. **Testing**:
+
+   - Uses Vitest for unit tests
+   - Tests are located alongside the code they test
+   - Test utilities in `test/` directories
+
+2. **Utilities**:
+
+   - Common utilities in `packages/common/`
+   - Math utilities in `packages/math/`
+   - General utilities in `packages/utils/`
+   - Element-specific utilities in `packages/element/`
+
+3. **Import/Export**:
+   - JSON serialization in `packages/excalidraw/data/json.ts`
+   - Image export in `packages/excalidraw/scene/export.ts`
+   - File system access via the File System Access API
+
+## Contributor Recommendations
+
+### Key Entry Points for New Contributors
+
+If you're new to the Excalidraw codebase, here are the recommended starting points:
+
+1. **`packages/excalidraw/components/App.tsx`**:
+
+   - The main application component
+   - Shows how everything fits together
+   - Well-commented and structured
+
+2. **`packages/element/src/types.ts`**:
+
+   - Defines the core element types
+   - Helps understand the data model
+
+3. **`packages/excalidraw/actions/`**:
+
+   - Shows how user actions are processed
+   - Good entry point for understanding the application flow
+
+4. **`excalidraw-app/App.tsx`**:
+
+   - Entry point for the web application
+   - Shows how the Excalidraw component is used in a real application
+
+5. **`packages/excalidraw/scene/Renderer.ts`**:
+   - Explains how the canvas rendering works
+   - Important for understanding the drawing pipeline
+
+### Development Workflow Tips
+
+1. **Running the Application**:
+
+   ```bash
+   yarn
+   yarn start # or yarn start --no-open
+   ```
+
+2. **Testing Changes**:
+
+   ```bash
+   yarn test:app # -u for snapshot updates
+   ```
+
+3. **Building the Package**:
+   ```bash
+   yarn build:package
+   ```
+
+### Code Style and Patterns
+
+- TypeScript is used throughout the codebase
+- React functional components with hooks are preferred
+- Immutability is important, especially for elements
+- Use the `mutateElement` function to modify elements
+- Follow the existing patterns for creating new features
+
+## References & Links
+
+- [Excalidraw GitHub Repository](https://github.com/excalidraw/excalidraw)
+- [Excalidraw Documentation](https://docs.excalidraw.com)
+- [Excalidraw Blog](https://blog.excalidraw.com)
+- [Contributing Guidelines](https://github.com/excalidraw/excalidraw/blob/master/CONTRIBUTING.md)
