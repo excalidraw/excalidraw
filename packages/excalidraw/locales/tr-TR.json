@@ -249,6 +249,7 @@
     "undo": "Geri Al",
     "redo": "Yeniden yap",
     "resetLibrary": "Kütüphaneyi sıfırla",
+    "reset": "",
     "createNewRoom": "Yeni oda oluştur",
     "fullScreen": "Tam ekran",
     "darkMode": "Koyu tema",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "Bu sahnede",
     "availableFonts": "Kullanılabilir yazı tipleri",
-    "empty": "Yazı tipi bulunamadı"
+    "empty": "Yazı tipi bulunamadı",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Kullanıcı bulunamadı",
