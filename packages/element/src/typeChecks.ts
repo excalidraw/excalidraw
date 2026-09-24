@@ -192,6 +192,7 @@ export const isBindableElement = <T extends ExcalidrawElement>(
       element.type === "stickynote" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
+      element.type === "star" ||
       element.type === "image" ||
       element.type === "iframe" ||
       element.type === "embeddable" ||
@@ -248,6 +249,7 @@ export const isTextBindableContainer = <T extends ExcalidrawElement>(
       element.type === "stickynote" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
+      element.type === "star" ||
       isArrowElement(element))
   );
 };
@@ -262,6 +264,7 @@ export const isExcalidrawElement = (
   switch (type) {
     case "text":
     case "diamond":
+    case "star":
     case "rectangle":
     case "stickynote":
     case "iframe":
@@ -290,7 +293,8 @@ export const isFlowchartNodeElement = <T extends ExcalidrawElement>(
     element.type === "rectangle" ||
     element.type === "stickynote" ||
     element.type === "ellipse" ||
-    element.type === "diamond"
+    element.type === "diamond" ||
+    element.type === "star"
   );
 };
 
@@ -415,6 +419,7 @@ export const isEligibleFrameChildType = (type: ElementOrToolType) => {
     case "rectangle":
     case "stickynote":
     case "diamond":
+    case "star":
     case "ellipse":
     case "arrow":
     case "line":

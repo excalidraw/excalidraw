@@ -1887,7 +1887,9 @@ const snapBoundPointToGrid = (
   // outline point is near a cardinal zone or an angled diamond face.
   const heading =
     adjacentPoint &&
-    (bindableElement.type === "ellipse" || bindableElement.type === "diamond")
+    (bindableElement.type === "ellipse" ||
+      bindableElement.type === "diamond" ||
+      bindableElement.type === "star")
       ? vectorToHeading(vectorFromPoint(adjacentPoint, outlinePoint))
       : headingForPointFromElement(bindableElement, aabb, outlinePoint);
 
