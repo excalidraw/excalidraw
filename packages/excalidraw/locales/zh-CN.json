@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "箭头绑定",
     "midpointSnapping": "吸附到中点",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
