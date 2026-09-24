@@ -249,6 +249,7 @@
     "undo": "ביטול",
     "redo": "ביצוע מחדש",
     "resetLibrary": "איפוס ספרייה",
+    "reset": "",
     "createNewRoom": "יצירת חדר חדש",
     "fullScreen": "מסך מלא",
     "darkMode": "מצב כהה",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "בסצינה הנוכחית",
     "availableFonts": "הפונטים הקיימים",
-    "empty": "לא נמצאו פונטים"
+    "empty": "לא נמצאו פונטים",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "לא נמצאו משתמשים",
