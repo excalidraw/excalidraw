@@ -16,7 +16,8 @@ import type {
 
 function hashToInteger(id: string) {
   let hash = 0;
-  if (id.length === 0) {
+  // guard against non-string ids coming from untrusted collaborator data
+  if (typeof id !== "string" || id.length === 0) {
     return hash;
   }
   for (let i = 0; i < id.length; i++) {

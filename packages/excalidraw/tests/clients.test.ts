@@ -1,4 +1,24 @@
-import { getNameInitial } from "../clients";
+import { getClientColor, getNameInitial } from "../clients";
+
+import type { SocketId } from "../types";
+
+describe("getClientColor", () => {
+  it("returns a stable color for string ids", () => {
+    expect(getClientColor("abc" as SocketId, undefined)).toBe(
+      "hsl(60, 100%, 83%)",
+    );
+  });
+
+  it("does not throw for non-string ids", () => {
+    const fallback = getClientColor("" as SocketId, undefined);
+    for (const id of [null, undefined, 42, ["a"], { length: 1 }, {}]) {
+      expect(getClientColor(id as any, undefined)).toBe(fallback);
+      expect(() =>
+        getClientColor("abc" as SocketId, { id: id as any }),
+      ).not.toThrow();
+    }
+  });
+});
 
 describe("getClientInitials", () => {
   it("returns substring if one name provided", () => {
