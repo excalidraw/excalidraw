@@ -2,6 +2,9 @@
 const OSS_FONTS_CDN = "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/oss/";
 const OSS_FONTS_FALLBACK = "/";
 
+module.exports.OSS_FONTS_CDN = OSS_FONTS_CDN;
+module.exports.OSS_FONTS_FALLBACK = OSS_FONTS_FALLBACK;
+
 /**
  * Custom vite plugin for auto-prefixing `EXCALIDRAW_ASSET_PATH` woff2 fonts in `excalidraw-app`.
  *
