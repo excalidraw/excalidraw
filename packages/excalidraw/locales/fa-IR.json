@@ -249,6 +249,7 @@
     "undo": "بازگرد",
     "redo": "از سر",
     "resetLibrary": "تنظیم مجدد کتابخانه",
+    "reset": "",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "fullScreen": "تمام‌صفحه",
     "darkMode": "حالت تیره",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "در این صحنه",
     "availableFonts": "قلم های در دسترس",
-    "empty": "قلمی یافت نشد"
+    "empty": "قلمی یافت نشد",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "کاربری یافت نشد",
