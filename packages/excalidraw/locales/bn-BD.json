@@ -249,6 +249,7 @@
     "undo": "ফেরত যান",
     "redo": "পুনরায় করুন",
     "resetLibrary": "সংগ্রহ সাফ করুন",
+    "reset": "",
     "createNewRoom": "নতুন রুম বানান",
     "fullScreen": "পূর্ণস্ক্রীন",
     "darkMode": "ডার্ক মোড",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
