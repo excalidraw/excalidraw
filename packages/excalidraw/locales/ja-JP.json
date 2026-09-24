@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "矢印の結合",
     "midpointSnapping": "",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
