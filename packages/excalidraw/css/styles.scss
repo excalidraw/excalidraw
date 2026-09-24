@@ -706,9 +706,10 @@ body.excalidraw-cursor-resize * {
       }
     }
 
-    // only show the zoom level (fade out in place, same as other zen-hidden UI)
-    .zoom-out-button,
-    .zoom-in-button {
+    // only show the zoom level (fade out in place, same as other zen-hidden
+    // UI). Hides the tooltip wrappers so they don't show tooltips either.
+    .zoom-out-button-wrapper,
+    .zoom-in-button-wrapper {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;

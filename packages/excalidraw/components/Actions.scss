@@ -44,8 +44,8 @@
 }
 
 // faded out in zen mode
-.zoom-out-button,
-.zoom-in-button {
+.zoom-out-button-wrapper,
+.zoom-in-button-wrapper {
   transition: opacity var(--zen-mode-transition-duration) ease-in-out,
     visibility var(--zen-mode-transition-duration);
 }
