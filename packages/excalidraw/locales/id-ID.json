@@ -249,6 +249,7 @@
     "undo": "Urungkan",
     "redo": "Ulangi",
     "resetLibrary": "Reset pustaka",
+    "reset": "",
     "createNewRoom": "Buat ruang baru",
     "fullScreen": "Layar penuh",
     "darkMode": "Mode gelap",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "Pada layar ini",
     "availableFonts": "Font yang tersedia",
-    "empty": "Tidak ada font yang ditemukan"
+    "empty": "Tidak ada font yang ditemukan",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Tidak ada pengguna yang ditemukan",
