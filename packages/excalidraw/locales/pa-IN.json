@@ -249,6 +249,7 @@
     "undo": "ਅਣਕੀਤਾ ਕਰੋ",
     "redo": "ਮੁੜ-ਕਰੋ",
     "resetLibrary": "ਲਾਇਬ੍ਰੇਰੀ ਰੀਸੈੱਟ ਕਰੋ",
+    "reset": "",
     "createNewRoom": "ਨਵਾਂ ਕਮਰਾ ਬਣਾਓ",
     "fullScreen": "ਪੂਰੀ ਸਕਰੀਨ",
     "darkMode": "ਡਾਰਕ ਮੋਡ",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
