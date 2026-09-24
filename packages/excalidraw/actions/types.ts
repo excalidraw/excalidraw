@@ -60,6 +60,7 @@ export type ActionName =
   | "zenMode"
   | "presentation"
   | "presentFromFrame"
+  | "changeFrameSize"
   | "objectsSnapMode"
   | "arrowBinding"
   | "midpointSnapping"

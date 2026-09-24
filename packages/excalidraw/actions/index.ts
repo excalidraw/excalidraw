@@ -79,6 +79,7 @@ export {
 
 export { actionToggleGridMode } from "./actionToggleGridMode";
 export { actionToggleZenMode } from "./actionToggleZenMode";
+export { actionChangeFrameSize } from "./actionFrameSize";
 export {
   actionTogglePresentation,
   actionPresentFromFrame,
