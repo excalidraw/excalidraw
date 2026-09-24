@@ -249,6 +249,7 @@
     "undo": "元に戻す",
     "redo": "やり直し",
     "resetLibrary": "ライブラリをリセット",
+    "reset": "",
     "createNewRoom": "新しい部屋を作成する",
     "fullScreen": "フルスクリーン",
     "darkMode": "ダークモード",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "このシーン内",
     "availableFonts": "利用可能フォント",
-    "empty": "フォントなし"
+    "empty": "フォントなし",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "ユーザーなし",
