@@ -249,6 +249,7 @@
     "undo": "ត្រឡប់វិញ",
     "redo": "ធ្វើ​វិញ",
     "resetLibrary": "កំណត់បណ្ណាល័យឡើងវិញ",
+    "reset": "",
     "createNewRoom": "បង្កើតបន្ទប់ថ្មី",
     "fullScreen": "ពេញ​អេក្រង់",
     "darkMode": "ម៉ូដងងឹត",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
