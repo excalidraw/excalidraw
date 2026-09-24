@@ -256,7 +256,7 @@ export default defineConfig(({ mode }) => {
           id: "excalidraw",
           display: "standalone",
           theme_color: "#121212",
-          background_color: "#ffffff",
+          background_color: "#121212",
           file_handlers: [
             {
               action: "/",
