@@ -249,6 +249,7 @@
     "undo": "Desfazer",
     "redo": "Refazer",
     "resetLibrary": "Repor a biblioteca",
+    "reset": "",
     "createNewRoom": "Criar nova sala",
     "fullScreen": "Ecrã inteiro",
     "darkMode": "Modo escuro",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "Nesta cena",
     "availableFonts": "Fontes disponíveis",
-    "empty": "Nenhuma fonte encontrada"
+    "empty": "Nenhuma fonte encontrada",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Nenhum utilizador encontrado",
