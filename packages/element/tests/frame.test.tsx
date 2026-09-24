@@ -17,6 +17,7 @@ import { getSelectedElements } from "@excalidraw/excalidraw/scene";
 import { elementOverlapsWithFrame } from "../src/frame";
 
 import type {
+  ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeleted,
@@ -1181,5 +1182,139 @@ describe("adding elements to frames", () => {
       dragElementIntoFrame(frame2, rectangle1);
       expect(h.elements.length).toBe(4);
     });
+  });
+});
+
+describe("arrows bound to elements in frames", () => {
+  let frame1: ExcalidrawElement;
+  let frame2: ExcalidrawElement;
+  let rect1: ExcalidrawElement;
+  let rect2: ExcalidrawElement;
+
+  const drawArrow = (from: ExcalidrawElement, to: ExcalidrawElement) => {
+    UI.clickTool("arrow");
+    mouse.downAt(from.x + from.width / 2, from.y + from.height / 2);
+    mouse.moveTo(to.x + to.width / 2, to.y + to.height / 2);
+    mouse.up();
+
+    return h.elements.find(
+      (element) => element.type === "arrow",
+    ) as ExcalidrawArrowElement;
+  };
+
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+
+    frame1 = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    frame2 = API.createElement({
+      type: "frame",
+      x: 200,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    rect1 = API.createElement({
+      type: "rectangle",
+      x: 25,
+      y: 25,
+      width: 50,
+      height: 50,
+      frameId: frame1.id,
+    });
+    rect2 = API.createElement({
+      type: "rectangle",
+      x: 225,
+      y: 25,
+      width: 50,
+      height: 50,
+      frameId: frame2.id,
+    });
+  });
+
+  it("should not add an arrow bound to elements in different frames to a frame", () => {
+    API.setElements([rect1, rect2, frame1, frame2]);
+
+    const arrow = drawArrow(rect1, rect2);
+
+    expect(arrow.startBinding?.elementId).toBe(rect1.id);
+    expect(arrow.endBinding?.elementId).toBe(rect2.id);
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should not add an arrow bound to an element outside of the frame to the frame", () => {
+    const outsideRect = API.createElement({
+      type: "rectangle",
+      x: 425,
+      y: 25,
+      width: 50,
+      height: 50,
+    });
+    API.setElements([rect1, frame1, outsideRect]);
+
+    const arrow = drawArrow(rect1, outsideRect);
+
+    expect(arrow.endBinding?.elementId).toBe(outsideRect.id);
+    expect(arrow.frameId).toBe(null);
+  });
+
+  it("should keep an arrow bound to elements in the same frame in that frame", () => {
+    const topLeftRect = API.createElement({
+      type: "rectangle",
+      x: 5,
+      y: 5,
+      width: 30,
+      height: 30,
+      frameId: frame1.id,
+    });
+    const bottomRightRect = API.createElement({
+      type: "rectangle",
+      x: 65,
+      y: 65,
+      width: 30,
+      height: 30,
+      frameId: frame1.id,
+    });
+    API.setElements([topLeftRect, bottomRightRect, frame1]);
+
+    const arrow = drawArrow(topLeftRect, bottomRightRect);
+
+    expect(arrow.endBinding?.elementId).toBe(bottomRightRect.id);
+    expect(arrow.frameId).toBe(frame1.id);
+  });
+
+  it("should remove an arrow from its frame when its endpoint is rebound outside of the frame", () => {
+    const topLeftRect = API.createElement({
+      type: "rectangle",
+      x: 5,
+      y: 5,
+      width: 30,
+      height: 30,
+      frameId: frame1.id,
+    });
+    const bottomRightRect = API.createElement({
+      type: "rectangle",
+      x: 65,
+      y: 65,
+      width: 30,
+      height: 30,
+      frameId: frame1.id,
+    });
+    API.setElements([topLeftRect, bottomRightRect, frame1, rect2, frame2]);
+
+    const arrow = drawArrow(topLeftRect, bottomRightRect);
+    expect(arrow.frameId).toBe(frame1.id);
+
+    mouse.downAt(80, 80);
+    mouse.moveTo(rect2.x + rect2.width / 2, rect2.y + rect2.height / 2);
+    mouse.up();
+
+    expect(arrow.endBinding?.elementId).toBe(rect2.id);
+    expect(arrow.frameId).toBe(null);
   });
 });
