@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "חפיפה",
     "arrowBinding": "קשירת חצים",
     "midpointSnapping": "הצמדה לנקודות ביניים",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
