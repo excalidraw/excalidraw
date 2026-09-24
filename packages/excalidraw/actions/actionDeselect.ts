@@ -2,10 +2,12 @@ import {
   getElementsInGroup,
   isSomeElementSelected,
   makeNextSelectedElementIds,
+  newElementWith,
   selectGroupsForSelectedElements,
 } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
 import { KEYS, isWritableElement, updateActiveTool } from "@excalidraw/common";
+import { t } from "../i18n";
 
 import type { GroupId } from "@excalidraw/element/types";
 
@@ -14,6 +16,21 @@ import { TOGGLE_TOOLS } from "../components/Tools";
 import { register } from "./register";
 
 import type { AppClassProperties, AppState } from "../types";
+
+const isShapeTool = (type: string): boolean => {
+  switch (type) {
+    case "rectangle":
+    case "diamond":
+    case "ellipse":
+    case "arrow":
+    case "line":
+    case "freedraw":
+    case "text":
+      return true;
+    default:
+      return false;
+  }
+};
 
 const getNextActiveTool = (
   appState: Readonly<AppState>,
@@ -65,9 +82,33 @@ export const actionDeselect = register({
   name: "deselect",
   label: "",
   trackEvent: false,
-  perform: (_elements, appState, _, app) => {
+  perform: (elements, appState, _, app) => {
+    if (appState.multiElement) {
+      return {
+        elements: elements.map((el) =>
+          el.id === appState.multiElement!.id
+            ? newElementWith(el, { isDeleted: true })
+            : el,
+        ),
+        appState: {
+          ...appState,
+          activeTool: updateActiveTool(appState, {
+            type: app.state.preferredSelectionTool.type,
+          }),
+          newElement: null,
+          multiElement: null,
+          selectionElement: null,
+        },
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      };
+    }
+
     const activeTool = getNextActiveTool(appState, app);
     app.cursor.applyForTool(activeTool);
+
+    const shouldShowTooltip =
+      isShapeTool(appState.activeTool.type) &&
+      activeTool.type === app.state.preferredSelectionTool.type;
 
     if (appState.editingGroupId) {
       const nonDeletedElements = app.scene.getNonDeletedElements();
@@ -106,6 +147,9 @@ export const actionDeselect = register({
           suggestedBinding: null,
           hoveredArrowTextAnchor: null,
           frameToHighlight: null,
+          toast: shouldShowTooltip
+            ? { message: t("toast.selectShapeTool"), duration: 3000 }
+            : appState.toast,
         },
         captureUpdate: CaptureUpdateAction.IMMEDIATELY,
       };
@@ -125,6 +169,9 @@ export const actionDeselect = register({
         suggestedBinding: null,
         hoveredArrowTextAnchor: null,
         frameToHighlight: null,
+        toast: shouldShowTooltip
+          ? { message: t("toast.selectShapeTool"), duration: 3000 }
+          : appState.toast,
       },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
@@ -139,14 +186,15 @@ export const actionDeselect = register({
     }
 
     return (
-      !appState.newElement &&
-      appState.multiElement === null &&
-      !appState.selectedLinearElement?.isEditing &&
-      (appState.activeEmbeddable !== null ||
-        appState.activeTool.type !== app.state.preferredSelectionTool.type ||
-        !!appState.editingGroupId ||
-        !!appState.selectedLinearElement ||
-        isSomeElementSelected(app.scene.getNonDeletedElements(), appState))
+      appState.multiElement !== null ||
+      (!appState.newElement &&
+        appState.multiElement === null &&
+        !appState.selectedLinearElement?.isEditing &&
+        (appState.activeEmbeddable !== null ||
+          appState.activeTool.type !== app.state.preferredSelectionTool.type ||
+          !!appState.editingGroupId ||
+          !!appState.selectedLinearElement ||
+          isSomeElementSelected(app.scene.getNonDeletedElements(), appState)))
     );
   },
 });
