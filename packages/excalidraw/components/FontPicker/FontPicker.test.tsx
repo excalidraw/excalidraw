@@ -160,6 +160,41 @@ describe("FontPicker", () => {
       ]);
     });
 
+    it("pads a short customized list with unpicked defaults", async () => {
+      const { container } = await openFontPicker();
+
+      act(() => {
+        API.setAppState({ fontTopPicks: [FONT_FAMILY["Lilita One"]] });
+      });
+      await waitFor(() =>
+        expect(getStripFamilies(container)).toEqual([
+          "Lilita One",
+          "Hand-drawn",
+          "Normal",
+        ]),
+      );
+
+      // padded defaults count as pinned
+      const row = document.querySelector<HTMLElement>(
+        '.dropdown-menu.fonts [title="Nunito"]',
+      )!;
+      await drag(row, { clientX: 16, clientY: 316 }, slotCenter(0));
+      expect(h.state.fontTopPicks).toEqual([FONT_FAMILY["Lilita One"]]);
+
+      // dropping on a padded slot persists the full strip
+      const code = document.querySelector<HTMLElement>(
+        '.dropdown-menu.fonts [title="Comic Shanns"]',
+      )!;
+      await drag(code, { clientX: 16, clientY: 316 }, slotCenter(1));
+      await waitFor(() =>
+        expect(h.state.fontTopPicks).toEqual([
+          FONT_FAMILY["Lilita One"],
+          FONT_FAMILY["Comic Shanns"],
+          FONT_FAMILY.Nunito,
+        ]),
+      );
+    });
+
     it("resets customized picks from the tip's reset link", async () => {
       await openFontPicker();
 

@@ -1,8 +1,8 @@
 import { Popover } from "radix-ui";
 import clsx from "clsx";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 
-import { FONT_FAMILY } from "@excalidraw/common";
+import { FONT_FAMILY, FONT_TOP_PICKS_SLOTS } from "@excalidraw/common";
 
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
@@ -35,6 +35,7 @@ import {
 
 import "./FontPicker.scss";
 
+// length must equal FONT_TOP_PICKS_SLOTS (enforced by fontTopPicks.test.ts)
 export const DEFAULT_FONTS = [
   {
     value: FONT_FAMILY.Excalifont,
@@ -59,6 +60,21 @@ export const DEFAULT_FONTS = [
 const DEFAULT_FONT_TOP_PICKS = DEFAULT_FONTS.map((font) => font.value);
 
 const defaultFontFamilies = new Set(DEFAULT_FONT_TOP_PICKS);
+
+const getFontTopPicks = (
+  topPicks: readonly FontFamilyValues[],
+): readonly FontFamilyValues[] => {
+  const picks = [...new Set(topPicks)].slice(0, FONT_TOP_PICKS_SLOTS);
+  for (const fontFamily of DEFAULT_FONT_TOP_PICKS) {
+    if (picks.length >= FONT_TOP_PICKS_SLOTS) {
+      break;
+    }
+    if (!picks.includes(fontFamily)) {
+      picks.push(fontFamily);
+    }
+  }
+  return picks;
+};
 
 export const isDefaultFont = (fontFamily: number | null) => {
   if (!fontFamily) {
@@ -192,7 +208,11 @@ export const FontPicker = React.memo(
     // the strip (and thus its customization) is hidden in compact mode
     const isTopPicksCustomizable = !compactMode;
     const isCustomized = !!topPicks?.length;
-    const picks = isCustomized ? topPicks : DEFAULT_FONT_TOP_PICKS;
+    const picks = useMemo(
+      () =>
+        topPicks?.length ? getFontTopPicks(topPicks) : DEFAULT_FONT_TOP_PICKS,
+      [topPicks],
+    );
 
     const resetTopPicks = () => setAppState({ fontTopPicks: null });
 

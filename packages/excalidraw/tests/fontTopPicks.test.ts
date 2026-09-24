@@ -4,7 +4,14 @@ import {
   FONT_TOP_PICKS_SLOTS,
 } from "@excalidraw/common";
 
+import { DEFAULT_FONTS } from "../components/FontPicker/FontPicker";
 import { restoreAppState } from "../data/restore";
+
+describe("font top picks slots", () => {
+  it("matches the default font list length", () => {
+    expect(DEFAULT_FONTS.length).toBe(FONT_TOP_PICKS_SLOTS);
+  });
+});
 
 describe("restore appState.fontTopPicks", () => {
   it("dedupes and drops unknown, internal and fallback font families", () => {
