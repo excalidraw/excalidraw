@@ -573,7 +573,7 @@ const CombinedExtraActions = ({
                 <div className="buttonList">
                   {renderAction("group")}
                   {renderAction("ungroup")}
-                  {predicates.linkSingleOnly && renderAction("hyperlink")}
+                  {predicates.linkSelection && renderAction("hyperlink")}
                   {predicates.cropEditor && renderAction("cropEditor")}
                   {showDuplicate && renderAction("duplicateSelection")}
                   {showDelete && renderAction("deleteSelectedElements")}

@@ -9,6 +9,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { IconButton } from "../components/IconButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
+import { canEditHyperlink } from "../components/hyperlink/selection";
 import { LinkIcon } from "../components/icons";
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
@@ -22,7 +23,10 @@ export const actionLink = register({
     getContextMenuLabel(getNonDeletedElements(elements), appState),
   icon: LinkIcon,
   perform: (elements, appState) => {
-    if (appState.showHyperlinkPopup === "editor") {
+    if (
+      appState.showHyperlinkPopup === "editor" ||
+      !canEditHyperlink(getSelectedElements(elements, appState), appState)
+    ) {
       return false;
     }
 
@@ -40,7 +44,7 @@ export const actionLink = register({
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.K,
   predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
-    return selectedElements.length === 1;
+    return canEditHyperlink(selectedElements, appState);
   },
   PanelComponent: ({ elements, appState, updateData }) => {
     const selectedElements = getSelectedElements(elements, appState);
@@ -53,12 +57,12 @@ export const actionLink = register({
           getContextMenuLabel(getNonDeletedElements(elements), appState),
         )}
         title={`${
-          isEmbeddableElement(elements[0])
+          isEmbeddableElement(selectedElements[0])
             ? t("labels.link.labelEmbed")
             : t("labels.link.label")
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
         onSelect={() => updateData(null)}
-        checked={selectedElements.length === 1 && !!selectedElements[0].link}
+        checked={!!selectedElements[0]?.link}
       />
     );
   },
