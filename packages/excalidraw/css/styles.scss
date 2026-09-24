@@ -158,7 +158,9 @@ body.excalidraw-cursor-resize * {
   .selected-shape-actions {
     display: flex;
     flex-direction: column;
-    row-gap: 0.75rem;
+    row-gap: 0.5rem;
+
+    --default-button-size: 2rem;
 
     h3,
     legend,
@@ -494,7 +496,7 @@ body.excalidraw-cursor-resize * {
   .App-menu__left {
     overflow-y: auto;
     padding: 0.75rem;
-    width: 12.5rem;
+    max-width: 12.5rem;
     box-sizing: border-box;
     position: absolute;
   }

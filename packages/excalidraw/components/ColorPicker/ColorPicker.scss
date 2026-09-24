@@ -27,7 +27,7 @@
 
   .color-picker-container {
     display: grid;
-    grid-template-columns: 1fr 20px 1.625rem;
+    grid-template-columns: 1fr 15px 1.625rem;
     padding: 0.25rem 0px;
     align-items: center;
 
@@ -46,6 +46,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 5px;
   }
 
   .color-picker__button {
@@ -169,7 +170,7 @@
     }
 
     &.mobile-border {
-      border: 1px solid var(--mobile-color-border);
+      border: 1px solid var(--default-border-color);
     }
   }
 

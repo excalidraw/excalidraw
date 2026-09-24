@@ -92,6 +92,20 @@
   }
 }
 
+// two separate rows (rather than a flex-wrap row break) so the panel's
+// intrinsic width is that of a single row
+.align-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
 .compact-shape-actions {
   display: flex;
   flex-direction: column;

@@ -4,6 +4,9 @@
   --slider-thumb-size: 16px;
 
   .range-wrapper {
+    // 0..1, set from the value
+    --range-progress: 0;
+
     position: relative;
     padding-top: 10px;
     padding-bottom: 25px;
@@ -11,9 +14,15 @@
 
   .range-input {
     width: 100%;
+    // UA default margin would offset the track from the value bubble
+    margin-inline: 0;
     height: 4px;
     -webkit-appearance: none;
-    background: var(--color-slider-track);
+    background: linear-gradient(
+      to right,
+      var(--color-slider-track) calc(var(--range-progress) * 100%),
+      var(--button-bg) calc(var(--range-progress) * 100%)
+    );
     border-radius: 2px;
     outline: none;
   }
@@ -41,6 +50,11 @@
   .value-bubble {
     position: absolute;
     bottom: 0;
+    // centered on the thumb, which travels (width - thumb size)
+    left: calc(
+      var(--slider-thumb-size) / 2 + (100% - var(--slider-thumb-size)) *
+        var(--range-progress)
+    );
     transform: translateX(-50%);
     font-size: 12px;
     color: var(--text-primary-color);

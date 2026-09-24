@@ -10,7 +10,6 @@
   --button-gray-2: #{$color-gray-4};
   --button-gray-3: #{$color-gray-5};
   --mobile-action-button-bg: rgba(255, 255, 255, 0.35);
-  --mobile-color-border: var(--default-border-color);
   --button-special-active-bg-color: #{$color-green-0};
   --dialog-border-color: var(--color-gray-20);
   --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
@@ -170,7 +169,7 @@
   }
 
   @media screen and (min-device-width: 1921px) {
-    --lg-button-size: 2.5rem;
+    --lg-button-size: 2.375rem;
     --lg-icon-size: 1.25rem;
     --default-button-size: 2.25rem;
     --default-icon-size: 1.25rem;
@@ -191,7 +190,6 @@
     --button-gray-2: #272727;
     --button-gray-3: #222;
     --mobile-action-button-bg: var(--island-bg-color);
-    --mobile-color-border: rgba(255, 255, 255, 0.85);
     --button-special-active-bg-color: #204624;
     --dialog-border-color: var(--color-gray-80);
     --dropdown-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="292.4" height="292.4" viewBox="0 0 292 292"><path fill="%23ced4da" d="M287 197L159 69c-4-3-8-5-13-5s-9 2-13 5L5 197c-3 4-5 8-5 13s2 9 5 13c4 4 8 5 13 5h256c5 0 9-1 13-5s5-8 5-13-1-9-5-13z"/></svg>');
