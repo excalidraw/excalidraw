@@ -1079,6 +1079,44 @@ describe("regression tests", () => {
     expect(API.getSelectedElements()).toEqual([rect2.get()]);
   });
 
+  it("shift-deselecting a group while individual elements are selected keeps selectedGroupIds free of element ids", () => {
+    const rectA = UI.createElement("rectangle", { x: 0 });
+    const rectB = UI.createElement("rectangle", { x: 30 });
+
+    const rect1 = UI.createElement("rectangle", { x: 0, y: 60 });
+    const rect2 = UI.createElement("rectangle", { x: 30, y: 60 });
+    UI.group([rect1, rect2]);
+    const groupId = rect1.groupIds[0];
+
+    API.clearSelection();
+
+    // select two individual elements
+    mouse.clickOn(rectA);
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(rectB);
+    });
+
+    // shift-select the whole group
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(rect1);
+    });
+    expect(h.state.selectedGroupIds).toEqual({ [groupId]: true });
+
+    // shift-click a group member to deselect the group (isSelectedViaGroup path)
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickOn(rect2);
+    });
+
+    // selectedGroupIds must only ever hold group ids, never element ids
+    const elementIds = [rectA.id, rectB.id, rect1.id, rect2.id];
+    for (const id of Object.keys(h.state.selectedGroupIds)) {
+      expect(elementIds).not.toContain(id);
+    }
+
+    // the two individual elements stay selected, group members are dropped
+    assertSelectedElements(rectA, rectB);
+  });
+
   it("Cmd/Ctrl-click exclusively select element under pointer", () => {
     const rect1 = UI.createElement("rectangle", { x: 0 });
     const rect2 = UI.createElement("rectangle", { x: 30 });
