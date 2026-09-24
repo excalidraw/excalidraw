@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "Suprapunere",
     "arrowBinding": "Legare săgeată",
     "midpointSnapping": "Ancorare la punctele medii",
+    "showHints": "",
     "inputDevice": "Intrare",
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Maus"
