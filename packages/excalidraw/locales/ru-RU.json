@@ -249,6 +249,7 @@
     "undo": "Шаг назад",
     "redo": "Шаг вперёд",
     "resetLibrary": "Сброс библиотеки",
+    "reset": "",
     "createNewRoom": "Создать новую комнату",
     "fullScreen": "Полный экран",
     "darkMode": "Тёмная тема",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "В этой сцене",
     "availableFonts": "Доступные шрифты",
-    "empty": "Шрифты не найдены"
+    "empty": "Шрифты не найдены",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Пользователи не найдены",
