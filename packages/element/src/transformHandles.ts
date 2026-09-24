@@ -19,6 +19,7 @@ import {
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
+  isTextElement,
 } from "./typeChecks";
 
 import type {
@@ -111,8 +112,8 @@ const generateTransformHandle = (
 
 export const canResizeFromSides = (editorInterface: EditorInterface) => {
   if (
-    editorInterface.formFactor === "phone" &&
-    editorInterface.userAgent.isMobileDevice
+    editorInterface.userAgent.isMobileDevice &&
+    (editorInterface.formFactor === "phone" || editorInterface.isTouchScreen)
   ) {
     return false;
   }
@@ -138,6 +139,8 @@ export const getTransformHandlesFromCoords = (
   omitSides: { [T in TransformHandleType]?: boolean } = {},
   margin = 4,
   spacing = DEFAULT_TRANSFORM_HANDLE_SPACING,
+  // show the w/e handles regardless of the element's height
+  alwaysShowHorizontalSides = false,
 ): TransformHandles => {
   const size = transformHandleSizes[pointerType];
   const handleWidth = size / zoom.value;
@@ -241,7 +244,10 @@ export const getTransformHandlesFromCoords = (
       );
     }
   }
-  if (Math.abs(height) > minimumSizeForEightHandles) {
+  if (
+    Math.abs(height) > minimumSizeForEightHandles ||
+    alwaysShowHorizontalSides
+  ) {
     if (!omitSides.w) {
       transformHandles.w = generateTransformHandle(
         x1 - dashedLineMargin - handleMarginX + centeringOffset,
@@ -322,6 +328,9 @@ export const getTransformHandles = (
     omitSides,
     margin,
     isImageElement(element) ? 0 : undefined,
+    // text is usually a single line, which would be too short for the w/e
+    // handles, but they're the only way to change its wrapping width
+    isTextElement(element),
   );
 };
 
