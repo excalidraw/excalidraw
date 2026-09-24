@@ -68,21 +68,27 @@ export const isToolIcon = (
 
 export const isInputLike = (
   target: Element | EventTarget | null,
-): target is
-  | HTMLInputElement
-  | HTMLTextAreaElement
-  | HTMLSelectElement
-  | HTMLBRElement
-  | HTMLDivElement => {
+): target is HTMLElement => {
   const targetWindow = getTargetWindow(target);
+  if (!targetWindow || !(target instanceof targetWindow.HTMLElement)) {
+    return false;
+  }
+
+  const contentEditable = target.closest<HTMLElement>("[contenteditable]");
+  const contentEditableValue = contentEditable
+    ?.getAttribute("contenteditable")
+    ?.toLowerCase();
+
   return (
-    !!targetWindow &&
-    ((target instanceof targetWindow.HTMLElement &&
-      target.dataset.type === "wysiwyg") ||
-      target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
-      target instanceof targetWindow.HTMLInputElement ||
-      target instanceof targetWindow.HTMLTextAreaElement ||
-      target instanceof targetWindow.HTMLSelectElement)
+    target.dataset.type === "wysiwyg" ||
+    target instanceof targetWindow.HTMLBRElement || // newline in wysiwyg
+    target instanceof targetWindow.HTMLInputElement ||
+    target instanceof targetWindow.HTMLTextAreaElement ||
+    target instanceof targetWindow.HTMLSelectElement ||
+    target.isContentEditable ||
+    contentEditableValue === "" ||
+    contentEditableValue === "true" ||
+    contentEditableValue === "plaintext-only"
   );
 };
 

@@ -254,7 +254,7 @@ const DEFAULT_LINEAR_ELEMENT_PROPS = {
   height: 0,
 };
 
-const DEFAULT_DIMENSION = 100;
+export const DEFAULT_DIMENSION = 100;
 
 const bindTextToContainer = (
   container: ExcalidrawElement,

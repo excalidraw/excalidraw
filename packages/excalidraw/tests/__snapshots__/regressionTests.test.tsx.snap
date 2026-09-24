@@ -8488,7 +8488,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] appStat
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8528,7 +8528,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] undo st
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -8539,7 +8539,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] undo st
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -8574,7 +8574,7 @@ exports[`regression tests > key 2 selects rectangle tool > [end of test] undo st
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;
@@ -8681,7 +8681,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] appState 
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8721,7 +8721,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] undo stac
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -8732,7 +8732,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] undo stac
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -8767,7 +8767,7 @@ exports[`regression tests > key 3 selects diamond tool > [end of test] undo stac
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;
@@ -8874,7 +8874,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] appState 
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -8914,7 +8914,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stac
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -8925,7 +8925,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stac
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -8960,7 +8960,7 @@ exports[`regression tests > key 4 selects ellipse tool > [end of test] undo stac
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;
@@ -10012,7 +10012,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] appState 
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10052,7 +10052,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] undo stac
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -10063,7 +10063,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] undo stac
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -10098,7 +10098,7 @@ exports[`regression tests > key d selects diamond tool > [end of test] undo stac
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;
@@ -10449,7 +10449,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] appState 
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10489,7 +10489,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] undo stac
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -10500,7 +10500,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] undo stac
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -10535,7 +10535,7 @@ exports[`regression tests > key o selects ellipse tool > [end of test] undo stac
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;
@@ -10851,7 +10851,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] appStat
   "scrolledOutside": false,
   "searchMatches": null,
   "selectedElementIds": {
-    "id0": true,
+    "id1": true,
   },
   "selectedElementsAreBeingDragged": false,
   "selectedGroupIds": {},
@@ -10891,7 +10891,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] undo st
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {
-            "id0": true,
+            "id1": true,
           },
         },
         "inserted": {
@@ -10902,7 +10902,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] undo st
     "elements": {
       "added": {},
       "removed": {
-        "id0": {
+        "id1": {
           "deleted": {
             "angle": 0,
             "backgroundColor": "transparent",
@@ -10937,7 +10937,7 @@ exports[`regression tests > key r selects rectangle tool > [end of test] undo st
       },
       "updated": {},
     },
-    "id": "id2",
+    "id": "id3",
   },
 ]
 `;

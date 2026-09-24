@@ -67,6 +67,7 @@ import {
   getFontString,
   getNearestScrollableContainer,
   isInputLike,
+  isInteractive,
   isToolIcon,
   isWritableElement,
   sceneCoordsToViewportCoords,
@@ -451,6 +452,10 @@ import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppDuplicate } from "./App.duplicate";
 import { AppFlowchart } from "./App.flowchart";
+import {
+  AppKeyboardPlacement,
+  isKeyboardPlacementShape,
+} from "./App.keyboardPlacement";
 import { AppPan } from "./App.pan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import { AppWheel } from "./App.wheel";
@@ -717,6 +722,9 @@ class App extends React.Component<AppProps, AppState> {
   public duplicate: AppDuplicate = new AppDuplicate(this);
   public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
+  public keyboardPlacement: AppKeyboardPlacement = new AppKeyboardPlacement(
+    this,
+  );
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
   public pan: AppPan = new AppPan(this, {
@@ -2387,9 +2395,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const allElementsMap = this.scene.getNonDeletedElementsMap();
 
-    // a tool dragged out of the toolbar previews on the new-element canvas
-    // (it is not in the scene until dropped)
-    const previewElement = newElementCanvasElement ?? this.toolDrag.preview;
+    // Out-of-scene placement interactions preview on the new-element canvas.
+    const previewElement =
+      newElementCanvasElement ??
+      this.toolDrag.preview ??
+      this.keyboardPlacement.preview;
 
     const shouldBlockPointerEvents =
       // default back to `--ui-pointerEvents` flow if setPointerCapture
@@ -2450,6 +2460,8 @@ class App extends React.Component<AppProps, AppState> {
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.isInteractionEnabled() ? this.handleAppOnDrop : undefined}
+        onBlur={this.handleEditorBlur}
+        onPointerDownCapture={this.handleEditorPointerDownCapture}
         tabIndex={0}
         onKeyDown={
           this.props.handleKeyboardGlobally || !this.isInteractionEnabled()
@@ -3242,10 +3254,25 @@ class App extends React.Component<AppProps, AppState> {
 
   private onBlur = withBatchedUpdates(() => {
     this.pan.setSpaceHeld(false);
+    this.keyboardPlacement.cancel();
     this.setState({
       isBindingEnabled: this.state.bindingPreference === "enabled",
     });
   });
+
+  private handleEditorBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    const nextTarget = event.relatedTarget;
+    if (
+      !(nextTarget instanceof this.ownerWindow.Node) ||
+      !event.currentTarget.contains(nextTarget)
+    ) {
+      this.keyboardPlacement.cancel();
+    }
+  };
+
+  private handleEditorPointerDownCapture = () => {
+    this.keyboardPlacement.cancel();
+  };
 
   private onUnload = () => {
     this.onBlur();
@@ -3342,6 +3369,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.flowchart.clear();
+    this.keyboardPlacement.cancel();
 
     // These components install their own DOM listeners rather than going
     // through App's input handlers, so they must be explicitly unmounted.
@@ -3946,6 +3974,7 @@ class App extends React.Component<AppProps, AppState> {
     this.laserTrails.stop();
     this.drawShape.stop();
     this.toolDrag.cancel();
+    this.keyboardPlacement.destroy();
     this.eraserTrail.stop();
     this.onChangeEmitter.clear();
     this.store.onStoreIncrementEmitter.clear();
@@ -4271,6 +4300,20 @@ class App extends React.Component<AppProps, AppState> {
 
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
+
+    if (
+      this.keyboardPlacement.isActive() &&
+      (!isKeyboardPlacementShape(this.state.activeTool.type) ||
+        !this.isInteractionEnabled() ||
+        this.state.viewModeEnabled ||
+        !!this.state.editingTextElement ||
+        !!this.state.openDialog ||
+        !!this.state.openMenu ||
+        !!this.state.openPopup ||
+        !!this.state.contextMenu)
+    ) {
+      this.keyboardPlacement.cancel();
+    }
 
     this.appStateObserver.flush(prevState);
 
@@ -5514,6 +5557,10 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (!isInputLike(event.target)) {
+        if (this.keyboardPlacement.handleKeyDown(event)) {
+          return;
+        }
+
         if (
           (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
           this.state.croppingElementId
@@ -5693,6 +5740,24 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (shape) {
+          if (
+            isKeyboardPlacementShape(shape) &&
+            (isInteractive(event.target) ||
+              this.state.editingTextElement ||
+              this.state.openDialog ||
+              this.state.openMenu ||
+              this.state.openPopup ||
+              this.state.contextMenu)
+          ) {
+            return;
+          }
+
+          const shouldStartKeyboardPlacement =
+            isKeyboardPlacementShape(shape) &&
+            !event.repeat &&
+            this.isToolSupported(shape) &&
+            (!this.props.activeTool || this.props.activeTool.type === shape);
+
           if (this.state.activeTool.type !== shape) {
             trackEvent(
               "toolbar",
@@ -5734,6 +5799,10 @@ class App extends React.Component<AppProps, AppState> {
             });
           } else {
             this.setActiveTool({ type: shape }, { toggle: true });
+          }
+
+          if (shouldStartKeyboardPlacement) {
+            this.keyboardPlacement.start(shape);
           }
 
           event.stopPropagation();
@@ -6144,6 +6213,11 @@ class App extends React.Component<AppProps, AppState> {
       );
       return;
     }
+
+    // A keyboard placement belongs to the tool that started it. Any explicit
+    // tool activation ends the pending preview; keyboard shortcut activation
+    // starts a fresh one after this call.
+    this.keyboardPlacement.cancel();
 
     if (this.drawShape.hasPendingGesture()) {
       // switching tools mid-sketch (e.g. paste resets to the selection tool)
@@ -10436,6 +10510,58 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  private getGenericElementBaseAttributes = (
+    type: ExcalidrawGenericElement["type"] | "embeddable" | "stickynote",
+    x: number,
+    y: number,
+    frameId: ExcalidrawElement["frameId"],
+  ) =>
+    ({
+      x,
+      y,
+      strokeColor:
+        type === "stickynote"
+          ? this.state.currentItemStickynoteStrokeColor
+          : this.state.currentItemStrokeColor,
+      backgroundColor:
+        type === "stickynote"
+          ? this.state.currentItemStickynoteBackgroundColor
+          : this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.getCurrentItemStrokeWidth(type),
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      roundness: this.getCurrentItemRoundness(type),
+      locked: false,
+      frameId,
+    } as const);
+
+  public createGenericShapeElement = ({
+    type,
+    x,
+    y,
+    width,
+    height,
+    frameId,
+  }: {
+    type: Extract<
+      ExcalidrawGenericElement["type"],
+      "rectangle" | "diamond" | "ellipse"
+    >;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    frameId: ExcalidrawElement["frameId"];
+  }): NonDeleted<ExcalidrawGenericElement> =>
+    newElement({
+      type,
+      ...this.getGenericElementBaseAttributes(type, x, y, frameId),
+      width,
+      height,
+    });
+
   private createGenericElementOnPointerDown = (
     elementType: ExcalidrawGenericElement["type"] | "embeddable" | "stickynote",
     pointerDownState: PointerDownState,
@@ -10453,26 +10579,12 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
-    const baseElementAttributes = {
-      x: gridX,
-      y: gridY,
-      strokeColor:
-        elementType === "stickynote"
-          ? this.state.currentItemStickynoteStrokeColor
-          : this.state.currentItemStrokeColor,
-      backgroundColor:
-        elementType === "stickynote"
-          ? this.state.currentItemStickynoteBackgroundColor
-          : this.state.currentItemBackgroundColor,
-      fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.getCurrentItemStrokeWidth(elementType),
-      strokeStyle: this.state.currentItemStrokeStyle,
-      roughness: this.state.currentItemRoughness,
-      opacity: this.state.currentItemOpacity,
-      roundness: this.getCurrentItemRoundness(elementType),
-      locked: false,
-      frameId: topLayerFrame ? topLayerFrame.id : null,
-    } as const;
+    const baseElementAttributes = this.getGenericElementBaseAttributes(
+      elementType,
+      gridX,
+      gridY,
+      topLayerFrame?.id ?? null,
+    );
 
     let element;
     if (elementType === "embeddable") {
@@ -10485,10 +10597,19 @@ class App extends React.Component<AppProps, AppState> {
         type: "stickynote",
         ...baseElementAttributes,
       });
-    } else {
+    } else if (elementType === "selection") {
       element = newElement({
         type: elementType,
         ...baseElementAttributes,
+      });
+    } else {
+      element = this.createGenericShapeElement({
+        type: elementType,
+        x: gridX,
+        y: gridY,
+        width: 0,
+        height: 0,
+        frameId: topLayerFrame?.id ?? null,
       });
     }
 
