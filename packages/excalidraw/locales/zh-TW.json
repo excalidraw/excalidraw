@@ -249,6 +249,7 @@
     "undo": "復原",
     "redo": "重做",
     "resetLibrary": "重設資料庫",
+    "reset": "",
     "createNewRoom": "建立新協作會議室",
     "fullScreen": "全螢幕",
     "darkMode": "深色模式",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "在此場景中",
     "availableFonts": "可用字型",
-    "empty": "找不到字型"
+    "empty": "找不到字型",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "找不到使用者",
