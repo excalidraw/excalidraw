@@ -218,17 +218,36 @@ export const syncMovedIndices = (
 /**
  * Synchronizes all invalid fractional indices within the array order by mutating elements in the passed array.
  *
+ * Pass `preserveVersions: true` when the elements come from outside the editor
+ * (e.g. applying remote elements through `updateScene`): healing an invalid
+ * index there is a repair of internal ordering state, not a user edit —
+ * bumping `version` / re-rolling `versionNonce` would make the local copy
+ * appear "newer" than its source of truth, poisoning version-based
+ * reconciliation (`reconcileElements`) so that genuine remote edits get
+ * discarded after the local copy was healed.
+ *
  * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
  */
 export const syncInvalidIndices = <T extends ExcalidrawElement>(
   elements: readonly T[],
+  options?: { preserveVersions?: boolean },
 ): Ordered<T>[] => {
   const elementsMap = arrayToMap(elements);
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
 
   for (const [element, { index }] of elementsUpdates) {
-    mutateElement(element, elementsMap, { index });
+    mutateElement(
+      element,
+      elementsMap,
+      options?.preserveVersions
+        ? {
+            index,
+            version: element.version,
+            versionNonce: element.versionNonce,
+          }
+        : { index },
+    );
   }
 
   return elements as Ordered<T>[];
@@ -237,17 +256,32 @@ export const syncInvalidIndices = <T extends ExcalidrawElement>(
 /**
  * Synchronizes all invalid fractional indices within the array order by creating new instances of elements with corrected indices.
  *
+ * See `syncInvalidIndices` for the `preserveVersions` semantics.
+ *
  * WARN: in edge cases it could modify the elements which were not moved, as it's impossible to guess the actually moved elements from the elements array itself.
  */
 export const syncInvalidIndicesImmutable = (
   elements: readonly ExcalidrawElement[],
+  options?: { preserveVersions?: boolean },
 ): SceneElementsMap | undefined => {
   const syncedElements = arrayToMap(elements);
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
 
   for (const [element, { index }] of elementsUpdates) {
-    syncedElements.set(element.id, newElementWith(element, { index }));
+    syncedElements.set(
+      element.id,
+      newElementWith(
+        element,
+        options?.preserveVersions
+          ? {
+              index,
+              version: element.version,
+              versionNonce: element.versionNonce,
+            }
+          : { index },
+      ),
+    );
   }
 
   return syncedElements as SceneElementsMap;

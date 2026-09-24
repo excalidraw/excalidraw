@@ -111,8 +111,9 @@ export const reconcileElements = (
 
   validateIndicesThrottled(orderedElements, localElements, remoteElements);
 
-  // de-duplicate indices
-  syncInvalidIndices(orderedElements);
+  // de-duplicate indices — reconciled elements are not user edits, so healing
+  // must not re-version them (would poison the next reconciliation round)
+  syncInvalidIndices(orderedElements, { preserveVersions: true });
 
   return orderedElements as ReconciledExcalidrawElement[];
 };
