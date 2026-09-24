@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "Atalho de flecha",
     "midpointSnapping": "Encaixar em pontos intermediários",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
