@@ -88,6 +88,18 @@ export const PlusPromoIcon = createIcon(
   tablerIconProps,
 );
 
+// tabler-icons: layout-grid
+export const ShapeTemplatesIcon = createIcon(
+  <g strokeWidth="1.25">
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <rect x="4" y="4" width="6" height="6" rx="1" />
+    <rect x="14" y="4" width="6" height="6" rx="1" />
+    <rect x="4" y="14" width="6" height="6" rx="1" />
+    <rect x="14" y="14" width="6" height="6" rx="1" />
+  </g>,
+  tablerIconProps,
+);
+
 // tabler-icons: book
 export const LibraryIcon = createIcon(
   <g strokeWidth="1.25">
