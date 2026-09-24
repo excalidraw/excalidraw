@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "Tumpang tindih",
     "arrowBinding": "Pengikatan anak panah",
     "midpointSnapping": "Rapatkan ke titik tengah",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
