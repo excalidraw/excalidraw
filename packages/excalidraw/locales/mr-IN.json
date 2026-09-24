@@ -249,6 +249,7 @@
     "undo": "पूर्ववत करा",
     "redo": "पुन्हा करा(&R)",
     "resetLibrary": "संग्रह पुनर्स्थित करा",
+    "reset": "",
     "createNewRoom": "एक नवी खोली बनवा",
     "fullScreen": "पूर्ण दृश्यपटल",
     "darkMode": "अंधार स्थिथि",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "ह्या दृश्या मधे",
     "availableFonts": "उपलब्ध लीपीं",
-    "empty": "लिपि सपडली नाहीं"
+    "empty": "लिपि सपडली नाहीं",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "वापरकर्ते सापडले नाहीत",
