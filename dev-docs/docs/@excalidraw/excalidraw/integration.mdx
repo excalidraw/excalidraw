@@ -210,7 +210,7 @@ import TabItem from "@theme/TabItem";
 // See https://www.npmjs.com/package/@excalidraw/excalidraw documentation.
 import * as ExcalidrawLib from 'https://esm.sh/@excalidraw/excalidraw@0.18.0/dist/dev/index.js?external=react,react-dom';
 import React from "https://esm.sh/react@19.0.0";
-import ReactDOM from "https://esm.sh/react-dom@19.0.0"
+import { createRoot } from "https://esm.sh/react-dom@19.0.0/client";
 
 window.ExcalidrawLib = ExcalidrawLib;
 console.log("Excalidraw library", ExcalidrawLib);
@@ -230,7 +230,7 @@ const App = () => {
 };
 
 const excalidrawWrapper = document.getElementById("app");
-const root = ReactDOM.createRoot(excalidrawWrapper);
+const root = createRoot(excalidrawWrapper);
 root.render(React.createElement(App));
 ```
 
