@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "Pijlverbinding",
     "midpointSnapping": "Vastklikken op middelpunt",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
