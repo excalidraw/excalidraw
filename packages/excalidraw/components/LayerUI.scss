@@ -41,27 +41,24 @@
       }
     }
 
+    // UI hidden in zen mode fades out in place. `visibility` flips at the end
+    // of the fade-out (and immediately on fade-in), and makes the hidden UI
+    // non-interactive & unfocusable.
     .zen-mode-transition {
-      transition: transform 0.5s ease-in-out;
+      transition: opacity var(--zen-mode-transition-duration) ease-in-out,
+        visibility var(--zen-mode-transition-duration);
 
-      :root[dir="ltr"] &.transition-left {
-        transform: translate(-999px, 0);
-      }
-
-      :root[dir="ltr"] &.transition-right {
-        transform: translate(999px, 0);
-      }
-
-      :root[dir="rtl"] &.transition-left {
-        transform: translate(999px, 0);
-      }
-
-      :root[dir="rtl"] &.transition-right {
-        transform: translate(-999px, 0);
-      }
-
+      &.transition-left,
+      &.transition-right,
       &.layer-ui__wrapper__footer-left--transition-bottom {
-        transform: translate(0, 92px);
+        opacity: 0;
+        visibility: hidden;
+
+        // disable interaction immediately, not only once faded out
+        &,
+        * {
+          pointer-events: none !important;
+        }
       }
     }
 

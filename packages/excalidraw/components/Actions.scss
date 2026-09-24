@@ -1,6 +1,6 @@
 .zoom-actions,
 .undo-redo-buttons {
-  background-color: var(--island-bg-color);
+  background-color: var(--color-surface-low);
   border-radius: var(--border-radius-lg);
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
 }
@@ -8,7 +8,6 @@
 .zoom-button,
 .undo-redo-buttons button {
   border-radius: 0 !important;
-  background-color: var(--color-surface-low) !important;
   font-size: 0.875rem !important;
   width: var(--lg-button-size);
   height: var(--lg-button-size);
@@ -31,6 +30,13 @@
   width: 3.75rem !important;
   justify-content: center;
   color: var(--text-primary-color);
+}
+
+// faded out in zen mode
+.zoom-out-button,
+.zoom-in-button {
+  transition: opacity var(--zen-mode-transition-duration) ease-in-out,
+    visibility var(--zen-mode-transition-duration);
 }
 
 .zoom-out-button {
