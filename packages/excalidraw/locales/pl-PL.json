@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "Nakładanie",
     "arrowBinding": "Przyczepianie strzałki",
     "midpointSnapping": "Przyciągnij do punktów środkowych",
+    "showHints": "",
     "inputDevice": "Urządzenie wejściowe",
     "inputDeviceTrackpad": "Gładzik",
     "inputDeviceMouse": "Myszka"
