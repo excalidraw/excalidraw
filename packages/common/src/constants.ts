@@ -2,7 +2,11 @@ import type {
   ExcalidrawElement,
   FontFamilyValues,
 } from "@excalidraw/element/types";
-import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
+import type {
+  AppProps,
+  AppState,
+  NormalizedZoomValue,
+} from "@excalidraw/excalidraw/types";
 
 import { COLOR_PALETTE } from "./colors";
 
@@ -349,6 +353,10 @@ export const SCROLL_TIMEOUT = 100;
 export const ZOOM_STEP = 0.1;
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 30;
+/** 100% zoom, for computations that have no editor zoom to go by */
+export const DEFAULT_ZOOM: AppState["zoom"] = Object.freeze({
+  value: 1 as NormalizedZoomValue,
+});
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds

@@ -1,5 +1,6 @@
 import {
   clamp,
+  pointDistance,
   pointFrom,
   pointsEqual,
   type GlobalPoint,
@@ -31,6 +32,7 @@ import {
   getTransformHandles,
   getTransformHandlesFromCoords,
   hasBoundingBox,
+  hitElementItself,
   isArrowElement,
   isBindableElement,
   isElbowArrow,
@@ -40,6 +42,7 @@ import {
   isLineElement,
   isTextElement,
   LinearElementEditor,
+  maxBindingDistance_simple,
   getActiveTextElement,
   getElementsInGroup,
   getSelectedGroupIds,
@@ -479,33 +482,77 @@ const renderBindingHighlightForBindableElement_simple = (
     (isFrameLikeElement(suggestedBinding.element) ||
       isBindableElement(suggestedBinding.element))
   ) {
-    context.save();
+    const linearElement = appState.selectedLinearElement;
+    const arrow =
+      linearElement?.elementId &&
+      LinearElementEditor.getElement(linearElement.elementId, elementsMap);
+    const isElbow =
+      (arrow && isElbowArrow(arrow)) ||
+      (appState.activeTool.type === "arrow" &&
+        appState.currentItemArrowType === "elbow");
+    const cursorIsInsideBindable =
+      pointerCoords &&
+      hitElementItself({
+        point: pointerCoords,
+        element: suggestedBinding.element,
+        elementsMap,
+        threshold: 0,
+        overrideShouldTestInside: true,
+      });
 
-    const midpointRadius = 4 / appState.zoom.value;
+    // Simple arrows only snap to midpoints from outside the element
+    if (!cursorIsInsideBindable || isElbow) {
+      context.save();
 
-    // Render base midpoints
-    const midpoints = getAllMidpoints(suggestedBinding.element, elementsMap);
-    for (const midpoint of midpoints) {
+      const midpointRadius = 4 / appState.zoom.value;
+      const highlightedMidpoint = suggestedBinding.midPoint;
+      const midpoints = getAllMidpoints(suggestedBinding.element, elementsMap);
+
+      // Elbow arrows show all midpoints, simple arrows only the one closest to
+      // the pointer, once the pointer gets near it
+      let shownMidpoints = midpoints;
+      if (!isElbow) {
+        const threshold =
+          maxBindingDistance_simple(appState.zoom) +
+          suggestedBinding.element.strokeWidth / 2;
+        const closest =
+          pointerCoords &&
+          midpoints.reduce((a, b) =>
+            pointDistance(a, pointerCoords) <= pointDistance(b, pointerCoords)
+              ? a
+              : b,
+          );
+        shownMidpoints =
+          closest && pointDistance(closest, pointerCoords) <= threshold * 2
+            ? [closest]
+            : [];
+      }
+
       context.fillStyle = BINDING_MIDPOINT_COLOR[appState.theme];
-      context.beginPath();
-      context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-      context.fill();
+      for (const midpoint of shownMidpoints) {
+        if (highlightedMidpoint && pointsEqual(midpoint, highlightedMidpoint)) {
+          continue;
+        }
+        context.beginPath();
+        context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+        context.fill();
+      }
+
+      if (highlightedMidpoint) {
+        context.fillStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, 1)`;
+        context.beginPath();
+        context.arc(
+          highlightedMidpoint[0],
+          highlightedMidpoint[1],
+          midpointRadius,
+          0,
+          2 * Math.PI,
+        );
+        context.fill();
+      }
+
+      context.restore();
     }
-
-    // Render the highlighted midpoint if any
-    const midpoint = appState.suggestedBinding?.midPoint;
-    if (midpoint) {
-      context.fillStyle =
-        appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, 1)`
-          : `rgba(106, 189, 252, 1)`;
-
-      context.beginPath();
-      context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-      context.fill();
-    }
-
-    context.restore();
   }
 };
 
