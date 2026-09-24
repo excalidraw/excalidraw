@@ -72,14 +72,16 @@ export const cropElement = (
   let nextWidth = element.width;
   let nextHeight = element.height;
 
-  let crop: ImageCrop | null = element.crop ?? {
-    x: 0,
-    y: 0,
-    width: naturalWidth,
-    height: naturalHeight,
-    naturalWidth,
-    naturalHeight,
-  };
+  let crop: ImageCrop | null = element.crop
+    ? { ...element.crop }
+    : {
+        x: 0,
+        y: 0,
+        width: naturalWidth,
+        height: naturalHeight,
+        naturalWidth,
+        naturalHeight,
+      };
 
   const previousCropHeight = crop.height;
   const previousCropWidth = crop.width;

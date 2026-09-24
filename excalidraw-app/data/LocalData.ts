@@ -11,6 +11,7 @@
  */
 
 import { clearAppStateForLocalStorage } from "@excalidraw/excalidraw/appState";
+import { stringifyWithPrecision } from "@excalidraw/excalidraw/data/json";
 import {
   CANVAS_SEARCH_TAB,
   DEFAULT_SIDEBAR,
@@ -89,7 +90,7 @@ const saveDataStateToLocalStorage = (
 
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
+      stringifyWithPrecision(getNonDeletedElements(elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,

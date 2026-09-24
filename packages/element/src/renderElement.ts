@@ -69,7 +69,7 @@ import {
   isImageElement,
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
-import { getCornerRadius } from "./utils";
+import { getCornerRadius, roundCoord } from "./utils";
 
 import { ShapeCache } from "./shape";
 import {
@@ -141,10 +141,14 @@ export const getRenderElementWithPositionOverride = <
     return element;
   }
 
+  // Round the moved position onto the geometry grid so an override renders
+  // exactly like a document element stored at that position. Without it the
+  // offset sum can differ from the stored coordinate by a float ULP, which
+  // flips a pixel-snap tie at a half device pixel.
   return {
     ...element,
-    x: element.x + positionOffset.x,
-    y: element.y + positionOffset.y,
+    x: roundCoord(element.x + positionOffset.x),
+    y: roundCoord(element.y + positionOffset.y),
   } as TElement;
 };
 
@@ -773,10 +777,17 @@ const drawElementFromCanvas = (
   const devicePixelRatio = window.devicePixelRatio;
   const padding = getCanvasPadding(element);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
-  const cx =
-    ((x1 + x2) / 2 + positionOffset.x + appState.scrollX) * devicePixelRatio;
-  const cy =
-    ((y1 + y2) / 2 + positionOffset.y + appState.scrollY) * devicePixelRatio;
+  // The render offset is a transient translation; land the moved position on
+  // the geometry grid so an override renders exactly like a document element
+  // stored at that position. Otherwise the offset sum can differ from the
+  // stored coordinate by a float ULP, which flips a pixel-snap tie at a half
+  // device pixel (see the pixel-snap tests).
+  const ex1 = roundCoord(x1 + positionOffset.x);
+  const ey1 = roundCoord(y1 + positionOffset.y);
+  const ex2 = ex1 + (x2 - x1);
+  const ey2 = ey1 + (y2 - y1);
+  const cx = ((ex1 + ex2) / 2 + appState.scrollX) * devicePixelRatio;
+  const cy = ((ey1 + ey2) / 2 + appState.scrollY) * devicePixelRatio;
 
   context.save();
   context.scale(1 / devicePixelRatio, 1 / devicePixelRatio);
@@ -799,16 +810,14 @@ const drawElementFromCanvas = (
     context.beginPath();
     context.rect(cx - outerHalf, cy - outerHalf, outerHalf * 2, outerHalf * 2);
     context.rect(
-      (boundTextCx -
+      (roundCoord(boundTextCx + positionOffset.x) -
         boundTextElement.width / 2 -
         BOUND_TEXT_PADDING +
-        positionOffset.x +
         appState.scrollX) *
         devicePixelRatio,
-      (boundTextCy -
+      (roundCoord(boundTextCy + positionOffset.y) -
         boundTextElement.height / 2 -
         BOUND_TEXT_PADDING +
-        positionOffset.y +
         appState.scrollY) *
         devicePixelRatio,
       (boundTextElement.width + BOUND_TEXT_PADDING * 2) * devicePixelRatio,
@@ -838,10 +847,8 @@ const drawElementFromCanvas = (
 
   // the blit origin, in the space the context is in here (scaled by
   // canvas scale × zoom ÷ devicePixelRatio)
-  let drawX =
-    (x1 + positionOffset.x + appState.scrollX) * devicePixelRatio - padding;
-  let drawY =
-    (y1 + positionOffset.y + appState.scrollY) * devicePixelRatio - padding;
+  let drawX = (ex1 + appState.scrollX) * devicePixelRatio - padding;
+  let drawY = (ey1 + appState.scrollY) * devicePixelRatio - padding;
 
   const transform = context.getTransform();
 
@@ -876,15 +883,23 @@ const drawElementFromCanvas = (
     const anchorPadding =
       anchor === element ? padding : getCanvasPadding(anchor);
     const anchorX =
-      (anchorSceneX + positionOffset.x + appState.scrollX) * devicePixelRatio -
+      (roundCoord(anchorSceneX + positionOffset.x) + appState.scrollX) *
+        devicePixelRatio -
       anchorPadding;
     const anchorY =
-      (anchorSceneY + positionOffset.y + appState.scrollY) * devicePixelRatio -
+      (roundCoord(anchorSceneY + positionOffset.y) + appState.scrollY) *
+        devicePixelRatio -
       anchorPadding;
 
     // Form the relative vector before introducing the scroll translation.
-    const dx = (x1 - anchorSceneX) * devicePixelRatio + anchorPadding - padding;
-    const dy = (y1 - anchorSceneY) * devicePixelRatio + anchorPadding - padding;
+    const dx =
+      (ex1 - roundCoord(anchorSceneX + positionOffset.x)) * devicePixelRatio +
+      anchorPadding -
+      padding;
+    const dy =
+      (ey1 - roundCoord(anchorSceneY + positionOffset.y)) * devicePixelRatio +
+      anchorPadding -
+      padding;
     context.setTransform(
       a,
       b,
@@ -922,8 +937,10 @@ const drawElementFromCanvas = (
     context.strokeStyle = "#c92a2a";
     context.lineWidth = 3;
     context.strokeRect(
-      (coords.x + positionOffset.x + appState.scrollX) * devicePixelRatio,
-      (coords.y + positionOffset.y + appState.scrollY) * devicePixelRatio,
+      (roundCoord(coords.x + positionOffset.x) + appState.scrollX) *
+        devicePixelRatio,
+      (roundCoord(coords.y + positionOffset.y) + appState.scrollY) *
+        devicePixelRatio,
       getBoundTextMaxWidth(element, textElement) * devicePixelRatio,
       getBoundTextMaxHeight(element, textElement) * devicePixelRatio,
     );

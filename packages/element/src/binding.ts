@@ -1420,7 +1420,7 @@ export const updateBoundElements = (
 
     const boundText = getBoundTextElement(element, elementsMap);
     if (boundText && !boundText.isDeleted) {
-      handleBindTextResize(element, scene, false);
+      handleBindTextResize(element, scene, false, false);
     }
   };
 

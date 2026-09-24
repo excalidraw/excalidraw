@@ -1,6 +1,7 @@
 import { reconcileElements } from "@excalidraw/excalidraw";
 import { MIME_TYPES, toBrandedType } from "@excalidraw/common";
 import { decompressData } from "@excalidraw/excalidraw/data/encode";
+import { stringifyWithPrecision } from "@excalidraw/excalidraw/data/json";
 import {
   encryptData,
   decryptData,
@@ -94,7 +95,7 @@ const encryptElements = async (
   key: string,
   elements: readonly ExcalidrawElement[],
 ): Promise<{ ciphertext: ArrayBuffer; iv: Uint8Array }> => {
-  const json = JSON.stringify(elements);
+  const json = stringifyWithPrecision(elements);
   const encoded = new TextEncoder().encode(json);
   const { encryptedBuffer, iv } = await encryptData(key, encoded);
 
