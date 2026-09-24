@@ -249,6 +249,7 @@
     "undo": "Anulare",
     "redo": "Refacere",
     "resetLibrary": "Resetare bibliotecă",
+    "reset": "",
     "createNewRoom": "Creare cameră nouă",
     "fullScreen": "Ecran complet",
     "darkMode": "Mod întunecat",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "În această scenă",
     "availableFonts": "Fonturi disponibile",
-    "empty": "Niciun font găsit"
+    "empty": "Niciun font găsit",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Niciun utilizator găsit",
