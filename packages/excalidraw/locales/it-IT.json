@@ -249,6 +249,7 @@
     "undo": "Annulla",
     "redo": "Ripeti",
     "resetLibrary": "Ripristina libreria",
+    "reset": "",
     "createNewRoom": "Crea nuova stanza",
     "fullScreen": "Schermo intero",
     "darkMode": "Tema scuro",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "In questa scena",
     "availableFonts": "Font disponibili",
-    "empty": "Nessun font trovato"
+    "empty": "Nessun font trovato",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Nessun utente trovato",
