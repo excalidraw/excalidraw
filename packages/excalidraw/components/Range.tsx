@@ -10,6 +10,12 @@ export type RangeProps = {
   max?: number;
   step?: number;
   minLabel?: React.ReactNode;
+  /**
+   * Renders a fixed label at the right end of the track. Omitted by default:
+   * a slider whose range is self-evident (opacity is always 0–100) does not
+   * need one, but one whose max varies with what is selected does.
+   */
+  maxLabel?: React.ReactNode;
   hasCommonValue?: boolean;
   testId?: string;
 };
@@ -22,6 +28,7 @@ export const Range = ({
   max = 100,
   step = 10,
   minLabel = min,
+  maxLabel,
   hasCommonValue = true,
   testId,
 }: RangeProps) => {
@@ -47,6 +54,13 @@ export const Range = ({
     }
   }, [max, min, value]);
 
+  // The bubble travels with the thumb, so at either end of the track it lands
+  // on top of the fixed edge label. Hiding it at `min` is why the zero label
+  // reads cleanly; do the same at `max`, but only when a max label is actually
+  // rendered — sliders without one (opacity) must keep showing their value
+  // when they reach the top of the range.
+  const showValueBubble = value !== min && !(maxLabel != null && value === max);
+
   return (
     <label className="control-label">
       {label}
@@ -70,9 +84,10 @@ export const Range = ({
           data-testid={testId}
         />
         <div className="value-bubble" ref={valueRef}>
-          {value !== min ? value : null}
+          {showValueBubble ? value : null}
         </div>
         <div className="zero-label">{minLabel}</div>
+        {maxLabel != null && <div className="max-label">{maxLabel}</div>}
       </div>
     </label>
   );
