@@ -249,6 +249,7 @@
     "undo": "Ongedaan maken",
     "redo": "Herstel ongedaan maken",
     "resetLibrary": "Bibliotheek Resetten",
+    "reset": "",
     "createNewRoom": "Creëer live-samenwerkingssessie",
     "fullScreen": "Volledig scherm",
     "darkMode": "Donkere modus",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "In deze scène",
     "availableFonts": "Beschikbare lettertypen",
-    "empty": "Geen lettertypes gevonden"
+    "empty": "Geen lettertypes gevonden",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Geen gebruikers gevonden",
