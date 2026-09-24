@@ -249,6 +249,7 @@
     "undo": "ပြန်ထား",
     "redo": "ထပ်လုပ်",
     "resetLibrary": "",
+    "reset": "",
     "createNewRoom": "အခန်းသစ်ဖွဲ့",
     "fullScreen": "",
     "darkMode": "",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
