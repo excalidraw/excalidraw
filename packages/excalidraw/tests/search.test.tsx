@@ -161,6 +161,106 @@ describe("search", () => {
     });
   });
 
+  it("should keep search results order stable when an element is moved (#9503)", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    const elementA = API.createElement({
+      type: "text",
+      text: "test alpha",
+      y: 100,
+    });
+    const elementB = API.createElement({
+      type: "text",
+      text: "test bravo",
+      y: 500,
+    });
+    API.setElements([elementA, elementB]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+    updateTextEditor(searchInput, "test");
+
+    // first render: top-to-bottom by y -> A then B
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+      expect(h.app.state.searchMatches?.matches[0].id).toBe(elementA.id);
+      expect(h.app.state.searchMatches?.matches[1].id).toBe(elementB.id);
+    });
+
+    const initialMatches = h.app.state.searchMatches!.matches;
+
+    // move A to below B and commit via a full scene update (mimics drag-end
+    // `replaceAllElements`, which is what triggers SearchMenu's re-search).
+    // A y-based re-sort would now put B first.
+    const movedA = {
+      ...(h.elements[0] as ExcalidrawTextElement),
+      y: 1000,
+    };
+    API.setElements([movedA, h.elements[1]]);
+
+    // wait for search to re-run (new matches array reference)
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches).not.toBe(initialMatches);
+    });
+
+    // order must stay stable: A still first even though it has higher y now
+    expect(h.app.state.searchMatches?.matches[0].id).toBe(elementA.id);
+    expect(h.app.state.searchMatches?.matches[1].id).toBe(elementB.id);
+  });
+
+  it("should append newly matching elements at the end of the search results (#9503)", async () => {
+    const scrollIntoViewMock = jest.fn();
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
+
+    const elementA = API.createElement({
+      type: "text",
+      text: "test alpha",
+      y: 100,
+    });
+    const elementB = API.createElement({
+      type: "text",
+      text: "test bravo",
+      y: 500,
+    });
+    API.setElements([elementA, elementB]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+
+    const initialMatches = h.app.state.searchMatches!.matches;
+
+    // add a new matching element with `y` between A and B; a y-based sort
+    // would slot it between them, but we want stable order with the new
+    // match appended at the end.
+    const elementC = API.createElement({
+      type: "text",
+      text: "test charlie",
+      y: 300,
+    });
+    API.setElements([...h.elements, elementC]);
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(3);
+      expect(h.app.state.searchMatches?.matches).not.toBe(initialMatches);
+    });
+
+    expect(h.app.state.searchMatches?.matches[0].id).toBe(elementA.id);
+    expect(h.app.state.searchMatches?.matches[1].id).toBe(elementB.id);
+    expect(h.app.state.searchMatches?.matches[2].id).toBe(elementC.id);
+  });
+
   it("should match frame names", async () => {
     const scrollIntoViewMock = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
