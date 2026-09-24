@@ -154,6 +154,32 @@ describe("restoreElements", () => {
     expect(restored.versionNonce).toBe(expected);
   });
 
+  it.each([
+    [{}, []],
+    ["abc", []],
+    [123, []],
+    [null, []],
+    [undefined, []],
+    [
+      [null, {}, 1, "", "g1", ["g2"], "g3"],
+      ["g1", "g3"],
+    ],
+    [
+      ["inner", "middle", "outer"],
+      ["inner", "middle", "outer"],
+    ],
+  ])("normalizes groupIds=%j to %j", (groupIds, expected) => {
+    const element = {
+      ...API.createElement({ type: "rectangle" }),
+      groupIds,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null, {
+      repairBindings: true,
+    });
+    expect(restored.groupIds).toEqual(expected);
+  });
+
   it("keeps scene version bumpable after restoring a pinned version", () => {
     const evil = {
       ...API.createElement({ type: "rectangle", isDeleted: true }),

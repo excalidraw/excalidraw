@@ -95,6 +95,7 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
+  GroupId,
   NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
@@ -298,6 +299,18 @@ const normalizeElementUpdated = (updated: unknown): number => {
     return getUpdatedTimestamp();
   }
   return Math.min(updated, Date.now());
+};
+
+// Non-array or non-string groupIds (e.g. from a malicious peer) crash group
+// selection. Order is meaningful (innermost group first), so keep it as is.
+const normalizeElementGroupIds = (groupIds: unknown): GroupId[] => {
+  if (!Array.isArray(groupIds)) {
+    return [];
+  }
+  return groupIds.filter(
+    (groupId): groupId is GroupId =>
+      typeof groupId === "string" && groupId.length > 0,
+  );
 };
 
 const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
@@ -506,7 +519,7 @@ const restoreElementWithProperties = <
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
-    groupIds: element.groupIds ?? [],
+    groupIds: normalizeElementGroupIds(element.groupIds),
     frameId: element.frameId ?? null,
     roundness: element.roundness
       ? element.roundness
