@@ -249,6 +249,7 @@
     "undo": "เลิกทำ",
     "redo": "ทำซ้ำ",
     "resetLibrary": "รีเซ็ตคลัง",
+    "reset": "",
     "createNewRoom": "สร้างห้องใหม่",
     "fullScreen": "เต็มหน้าจอ",
     "darkMode": "โหมดกลางคืน",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "ในฉากนี้",
     "availableFonts": "",
-    "empty": "ไม่พบแบบอักษร"
+    "empty": "ไม่พบแบบอักษร",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "ไม่พบผู้ใช้",
