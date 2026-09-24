@@ -46,6 +46,25 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   return (await normalizeFile(files)) as RetType;
 };
 
+/**
+ * Detects whether a given error was thrown because the browser (or the
+ * underlying OS/organization policy) denied access to the local file
+ * system, as opposed to the user simply cancelling the file picker
+ * (`AbortError`) or some other unrelated failure.
+ *
+ * Browsers that support the File System Access API throw a `NotAllowedError`
+ * (sometimes surfaced as `SecurityError`) when:
+ * - the user has explicitly blocked file system access for the site, or
+ * - the permission is unavailable because it was disabled by a system
+ *   administrator/enterprise policy (the corresponding browser setting is
+ *   then usually shown as grayed out).
+ */
+export const isFilesystemPermissionError = (error: unknown): boolean => {
+  const name = (error as { name?: unknown } | null | undefined)?.name;
+
+  return name === "NotAllowedError" || name === "SecurityError";
+};
+
 export const fileSave = (
   blob: Blob | Promise<Blob>,
   opts: {
