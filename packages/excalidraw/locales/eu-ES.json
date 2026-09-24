@@ -249,6 +249,7 @@
     "undo": "Desegin",
     "redo": "Berregin",
     "resetLibrary": "Leheneratu liburutegia",
+    "reset": "",
     "createNewRoom": "Sortu gela berria",
     "fullScreen": "Pantaila osoa",
     "darkMode": "Modu iluna",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "Eszena honetan",
     "availableFonts": "Letra mota erabilgarriak",
-    "empty": "Ez da letra motarik aurkitu"
+    "empty": "Ez da letra motarik aurkitu",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Ez da erabiltzailerik aurkitu",
