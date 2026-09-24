@@ -249,6 +249,7 @@
     "undo": "Vissza",
     "redo": "Újra",
     "resetLibrary": "Könyvtár alaphelyzetbe állítása",
+    "reset": "",
     "createNewRoom": "Új szoba létrehozása",
     "fullScreen": "Teljes képernyő",
     "darkMode": "Sötét mód",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "Elérhető betűtípusok",
-    "empty": "Nem találhatóak betűtípusok"
+    "empty": "Nem találhatóak betűtípusok",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
