@@ -6,6 +6,7 @@ import {
   getColorTargetElement,
   hasBoundTextElement,
   isElbowArrow,
+  isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
@@ -168,7 +169,9 @@ export const getShapeActionPredicates = (
       ),
     align:
       !isSingleElementBoundContainer && alignActionsPredicate(appState, app),
-    distribute: targetElements.length > 2,
+    distribute:
+      targetElements.length > 2 &&
+      !targetElements.some((el) => isFrameLikeElement(el)),
 
     // per-element actions
     // NOTE: the full panel treats a bound container as linkable; the compact /
