@@ -1,6 +1,7 @@
 import { FONT_FAMILY, KEYS } from "@excalidraw/common";
 
 import { Excalidraw } from "../..";
+import { API } from "../../tests/helpers/api";
 import { Keyboard } from "../../tests/helpers/ui";
 import { act, fireEvent, render, waitFor } from "../../tests/test-utils";
 
@@ -157,6 +158,32 @@ describe("FontPicker", () => {
         "Code",
         "Hand-drawn",
       ]);
+    });
+
+    it("resets customized picks from the tip's reset link", async () => {
+      await openFontPicker();
+
+      const getResetLink = () =>
+        document.querySelector<HTMLElement>(
+          ".FontPicker__tip .top-picks-dnd__tip-reset",
+        );
+      // nothing to reset while the picks are the defaults
+      expect(getResetLink()).toBe(null);
+
+      act(() => {
+        API.setAppState({
+          fontTopPicks: [FONT_FAMILY["Lilita One"], FONT_FAMILY.Nunito],
+        });
+      });
+      await waitFor(() => expect(getResetLink()).not.toBe(null));
+
+      act(() => {
+        getResetLink()!.click();
+      });
+
+      expect(h.state.fontTopPicks).toBe(null);
+      expect(h.state.openPopup).toBe("fontFamily");
+      await waitFor(() => expect(getResetLink()).toBe(null));
     });
   });
 });

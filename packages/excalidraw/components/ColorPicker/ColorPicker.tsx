@@ -80,6 +80,7 @@ const ColorPickerPopupContent = ({
   getOpenPopup,
   appState,
   excludedColors,
+  onResetTopPicks,
 }: Pick<
   ColorPickerProps,
   | "type"
@@ -93,6 +94,8 @@ const ColorPickerPopupContent = ({
   | "excludedColors"
 > & {
   getOpenPopup: () => AppState["openPopup"];
+  /** present only while the top picks are customized */
+  onResetTopPicks?: () => void;
 }) => {
   const { container } = useExcalidrawContainer();
   const app = useApp();
@@ -194,6 +197,7 @@ const ColorPickerPopupContent = ({
           ref={colorPickerContentRef}
           palette={palette}
           excludedColors={excludedColors}
+          onResetTopPicks={onResetTopPicks}
           color={color}
           theme={appState.theme}
           onChange={(changedColor) => {
@@ -380,6 +384,18 @@ const ColorPickerComponent = ({
         ? DEFAULT_ELEMENT_STROKE_PICKS
         : DEFAULT_ELEMENT_BACKGROUND_PICKS);
 
+  const resetTopPicks =
+    isTopPicksCustomizable && customizableTopPicks
+      ? () => {
+          updateData({
+            colorTopPicks: {
+              ...appState.colorTopPicks,
+              [customizableTopPicks]: null,
+            },
+          });
+        }
+      : undefined;
+
   const dnd = useColorTopPicksDnD({
     enabled: isTopPicksCustomizable,
     picks: effectiveTopPicks,
@@ -428,18 +444,7 @@ const ColorPickerComponent = ({
             type={type}
             topPicks={customTopPicks?.length ? customTopPicks : topPicks}
             isCustomized={!!customTopPicks?.length}
-            onReset={
-              isTopPicksCustomizable && customizableTopPicks
-                ? () => {
-                    updateData({
-                      colorTopPicks: {
-                        ...appState.colorTopPicks,
-                        [customizableTopPicks]: null,
-                      },
-                    });
-                  }
-                : undefined
-            }
+            onReset={resetTopPicks}
           />
         )}
         {!isCompactMode && <ButtonSeparator />}
@@ -485,6 +490,9 @@ const ColorPickerComponent = ({
               updateData={updateData}
               getOpenPopup={() => openRef.current}
               appState={appState}
+              onResetTopPicks={
+                customTopPicks?.length ? resetTopPicks : undefined
+              }
             />
           )}
         </Popover.Root>

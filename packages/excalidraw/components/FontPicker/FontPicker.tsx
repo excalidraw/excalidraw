@@ -194,6 +194,8 @@ export const FontPicker = React.memo(
     const isCustomized = !!topPicks?.length;
     const picks = isCustomized ? topPicks : DEFAULT_FONT_TOP_PICKS;
 
+    const resetTopPicks = () => setAppState({ fontTopPicks: null });
+
     const dnd = useFontTopPicksDnD({
       enabled: isTopPicksCustomizable,
       picks,
@@ -217,11 +219,7 @@ export const FontPicker = React.memo(
               selectedFontFamily={selectedFontFamily}
               onSelect={onSelectCallback}
               isCustomized={isCustomized}
-              onReset={
-                isTopPicksCustomizable
-                  ? () => setAppState({ fontTopPicks: null })
-                  : undefined
-              }
+              onReset={isTopPicksCustomizable ? resetTopPicks : undefined}
             />
           )}
           {!compactMode && <ButtonSeparator />}
@@ -240,6 +238,11 @@ export const FontPicker = React.memo(
                 onLeave={onLeave}
                 onOpen={() => onPopupChange(true)}
                 onClose={() => onPopupChange(false)}
+                onResetTopPicks={
+                  isTopPicksCustomizable && isCustomized
+                    ? resetTopPicks
+                    : undefined
+                }
               />
             )}
           </Popover.Root>

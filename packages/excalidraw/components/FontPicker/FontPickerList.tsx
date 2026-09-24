@@ -29,6 +29,7 @@ import {
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
+import { TopPicksTip } from "../TopPicksDnD/TopPicksTip";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
 import {
   DropDownMenuItemBadgeType,
@@ -68,6 +69,8 @@ interface FontPickerListProps {
   onLeave: () => void;
   onOpen: () => void;
   onClose: () => void;
+  /** present only while the top picks are customized */
+  onResetTopPicks?: () => void;
 }
 
 export const getFontFamilyIcon = (
@@ -108,6 +111,7 @@ export const FontPickerList = React.memo(
     onLeave,
     onOpen,
     onClose,
+    onResetTopPicks,
   }: FontPickerListProps) => {
     const { container } = useExcalidrawContainer();
     const app = useApp();
@@ -414,12 +418,18 @@ export const FontPickerList = React.memo(
           {groups.length ? groups : null}
         </ScrollableList>
         {dnd && (
-          <div className="FontPicker__tip">{t("fontList.topPicksTip")}</div>
+          <TopPicksTip
+            className="FontPicker__tip"
+            tip={t("fontList.topPicksTip")}
+            onReset={onResetTopPicks}
+            resetTitle={t("fontList.resetTopPicks")}
+          />
         )}
       </PropertiesPopover>
     );
   },
   (prev, next) =>
     prev.selectedFontFamily === next.selectedFontFamily &&
-    prev.hoveredFontFamily === next.hoveredFontFamily,
+    prev.hoveredFontFamily === next.hoveredFontFamily &&
+    !!prev.onResetTopPicks === !!next.onResetTopPicks,
 );
