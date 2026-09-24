@@ -249,6 +249,7 @@
     "undo": "Anuliuoti",
     "redo": "",
     "resetLibrary": "Atstatyti biblioteką",
+    "reset": "",
     "createNewRoom": "Sukurti naują kambarį",
     "fullScreen": "Visas ekranas",
     "darkMode": "Tamsus režimas",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
