@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "Prekrij",
     "arrowBinding": "Vezava puščic",
     "midpointSnapping": "Pripni na srednje točke",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
