@@ -66,6 +66,8 @@ export const normalizeText = (text: string) => {
     normalizeEOL(text)
       // replace tabs with spaces so they render and measure correctly
       .replace(/\t/g, "        ")
+      //replaced <br> to sanitize it making the tag not visible in the final diagram
+      .replace(/<br\s*\/?>/gi, "\n")
   );
 };
 
