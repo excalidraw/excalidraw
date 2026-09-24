@@ -223,7 +223,9 @@ export default defineConfig(({ mode }) => {
               },
             },
           ],
-          maximumFileSizeToCacheInBytes: 2.3 * 1024 ** 2, // 2.3MB
+          // raise the precache limit so the build does not fail when the
+          // main bundle exceeds it (e.g. in Docker builds)
+          maximumFileSizeToCacheInBytes: 5 * 1024 ** 2, // 5MB
         },
         manifest: {
           short_name: "Excalidraw",
