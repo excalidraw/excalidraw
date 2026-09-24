@@ -143,12 +143,10 @@ export const t = (
     fallback;
   if (translation === undefined) {
     const errorMessage = `Can't find translation for ${path}`;
-    // in production, don't blow up the app on a missing translation key
-    if (import.meta.env.PROD) {
-      console.warn(errorMessage);
-      return "";
-    }
-    throw new Error(errorMessage);
+    // fallback to the key path so the UI stays functional instead of showing
+    // blank text (prod) or crashing (dev) when a translation key is missing
+    console.warn(errorMessage);
+    return path;
   }
 
   if (replacement) {
