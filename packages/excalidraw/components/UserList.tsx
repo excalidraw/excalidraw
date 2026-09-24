@@ -139,7 +139,11 @@ export const UserList = React.memo(
         ...collaborator,
         socketId,
       }),
-    ).filter((collaborator) => collaborator.username?.trim());
+    ).filter(
+      (collaborator) =>
+        typeof collaborator.username === "string" &&
+        collaborator.username.trim(),
+    );
     const currentUser = collaboratorsArray.find((c) => c.isCurrentUser);
     const otherCollaborators = collaboratorsArray.filter(
       (c) => !c.isCurrentUser,
