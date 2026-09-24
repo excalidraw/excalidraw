@@ -153,7 +153,13 @@ describe("box-selection", () => {
 
 describe("lasso reselection", () => {
   beforeEach(async () => {
-    await render(<Excalidraw />);
+    await render(
+      <Excalidraw
+        initialData={{ appState: { boxSelectionMode: "overlap" } }}
+      />,
+    );
+    h.state.width = 1000;
+    h.state.height = 1000;
   });
 
   it("should allow ctrl+alt lasso reselection when starting inside the active common bounds", () => {
