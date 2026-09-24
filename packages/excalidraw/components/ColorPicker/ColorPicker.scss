@@ -25,44 +25,6 @@
     text-align: left;
   }
 
-  .color-picker__context-menu {
-    background: var(--popup-bg-color);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-island);
-    padding: 0.25rem;
-  }
-
-  .color-picker__context-menu-item {
-    font-size: 0.75rem;
-    padding: 0.375rem 0.625rem;
-    border-radius: var(--border-radius-md);
-    color: var(--text-primary-color);
-    cursor: pointer;
-    outline: none;
-    user-select: none;
-
-    // :hover as well — radix only sets data-highlighted once the item gets
-    // focus via pointermove, which leaves dead frames (e.g. menu opening
-    // under a stationary cursor)
-    &[data-highlighted],
-    &:not([data-disabled]):hover {
-      background: var(--button-hover-bg);
-    }
-
-    &[data-disabled] {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-  }
-
-  .color-picker__tip {
-    padding: 0 0.5rem;
-    font-size: 0.6875rem;
-    line-height: 1.4;
-    text-align: left;
-    color: var(--color-gray-60);
-  }
-
   .color-picker-container {
     display: grid;
     grid-template-columns: 1fr 20px 1.625rem;
@@ -442,157 +404,27 @@
     }
   }
 
-  // top-picks drag & drop (pinning + reordering)
+  // top-picks drag & drop (pinning + reordering) — shared parts live in
+  // TopPicksDnD.scss
   // ---------------------------------------------------------------------------
-
-  .color-picker__top-picks {
-    // anchor for the animated drop-target outline
-    position: relative;
-  }
-
-  .color-picker__top-picks .color-picker__button {
-    // the strip is tiny and never scrolls — allow touch-dragging picks
-    touch-action: none;
-  }
-
-  .color-picker__top-picks.is-dnd-active {
-    .color-picker__button {
-      // no hover/tooltips while a drag is in flight; hit-testing is
-      // coordinate-based so this doesn't affect dropping
-      pointer-events: none;
-      transition: transform 0.14s ease, opacity 0.14s ease,
-        box-shadow 0.14s ease;
-    }
-  }
-
-  // "marching ants" outline hinting that the strip accepts the drop —
-  // SVG because CSS dashed outlines/borders can't animate their dash offset
-  .color-picker__top-picks__dnd-outline {
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    width: calc(100% + 10px);
-    height: calc(100% + 10px);
-    pointer-events: none;
-    overflow: visible;
-
-    rect {
-      x: 0.5px;
-      y: 0.5px;
-      rx: 6px;
-      width: calc(100% - 1px);
-      height: calc(100% - 1px);
-      fill: none;
-      stroke: var(--color-primary);
-      stroke-width: 1;
-      stroke-dasharray: 4 4;
-      animation: excalidraw-color-dnd-march 0.8s linear infinite;
-
-      @media (prefers-reduced-motion: reduce) {
-        animation: none;
-      }
-    }
-  }
-
-  @keyframes excalidraw-color-dnd-march {
-    to {
-      // one full dash+gap period per cycle → seamless loop
-      stroke-dashoffset: -8;
-    }
-  }
-
-  // the pick being reordered — its ghost is following the pointer
-  .color-picker__button.is-dnd-source {
-    opacity: 0.3;
-  }
 
   // slot a dragged swatch would replace
   .color-picker__button.is-dnd-target {
     transform: scale(1.2);
     box-shadow: 0 0 0 1px var(--color-primary-darkest);
   }
-
-  // this color is already pinned — drop not allowed
-  .color-picker__button.is-dnd-duplicate {
-    animation: excalidraw-color-dnd-duplicate 0.45s ease-in-out infinite
-      alternate;
-  }
-
-  @keyframes excalidraw-color-dnd-duplicate {
-    from {
-      box-shadow: 0 0 0 2px var(--color-danger, #e03131);
-      transform: scale(1);
-    }
-    to {
-      box-shadow: 0 0 0 3px var(--color-danger, #e03131);
-      transform: scale(1.12);
-    }
-  }
 }
 
-// drag & drop ghost — appended to document.body (outside the .excalidraw
-// scope) so it can follow the pointer without overflow clipping
-.excalidraw-color-dnd-ghost {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10000;
-  pointer-events: none;
-  will-change: transform;
-  // NOTE transform is deliberately not transitioned here (tracks the pointer
-  // every frame); --dropping adds it for the fly-to-target animation
-  transition: width 0.15s ease, height 0.15s ease;
+// drag & drop ghost content (see TopPicksDnD.scss) — outside the .excalidraw
+// scope
+.excalidraw-color-dnd-ghost-swatch {
+  --top-picks-dnd-ghost-ring: 0 0 0 1px rgba(0, 0, 0, 0.08);
 
-  &__swatch {
-    width: 100%;
-    height: 100%;
-    border-radius: 4px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 4px;
 
-    &.is-transparent {
-      background-color: #fff;
-      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==");
-      background-position: left center;
-    }
-  }
-
-  &--lifted &__swatch {
-    transform: scale(1.2);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
-  }
-
-  &--over &__swatch {
-    transform: scale(1.05);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08);
-  }
-
-  &--blocked &__swatch {
-    opacity: 0.4;
-    transform: scale(0.85);
-  }
-
-  &--dropping {
-    transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.3, 1), width 0.18s ease,
-      height 0.18s ease;
-  }
-
-  &--dropping &__swatch {
-    transform: scale(1);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
-  }
-
-  &--fade &__swatch {
-    opacity: 0;
-  }
-}
-
-body.excalidraw-color-dnd-active {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-
-  &,
-  * {
-    cursor: grabbing !important;
+  &.is-transparent {
+    background-color: #fff;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMUlEQVQ4T2NkYGAQYcAP3uCTZhw1gGGYhAGBZIA/nYDCgBDAm9BGDWAAJyRCgLaBCAAgXwixzAS0pgAAAABJRU5ErkJggg==");
+    background-position: left center;
   }
 }
