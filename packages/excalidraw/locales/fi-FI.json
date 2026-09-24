@@ -249,6 +249,7 @@
     "undo": "Kumoa",
     "redo": "Tee uudelleen",
     "resetLibrary": "Tyhjennä kirjasto",
+    "reset": "",
     "createNewRoom": "Luo huone",
     "fullScreen": "Koko näyttö",
     "darkMode": "Tumma tila",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
