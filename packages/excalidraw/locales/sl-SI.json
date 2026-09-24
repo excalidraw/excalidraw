@@ -249,6 +249,7 @@
     "undo": "Razveljavi",
     "redo": "Ponovi",
     "resetLibrary": "Ponastavi knjižnico",
+    "reset": "",
     "createNewRoom": "Ustvari novo sobo",
     "fullScreen": "Celozaslonski način",
     "darkMode": "Temni način",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "V tej sceni",
     "availableFonts": "Razpoložljive pisave",
-    "empty": "Ni pisav"
+    "empty": "Ni pisav",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Ni uporabnikov",
