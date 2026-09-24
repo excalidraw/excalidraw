@@ -923,9 +923,18 @@ export const shouldApplyFrameClip = (
   // a. overlapping with the frame, or
   // b. containing the frame, for example when an element is used as a background
   //    and is therefore bigger than the frame and completely contains the frame
+  // c. owned by the frame but not fully within its bounds. (a) only catches
+  //    elements whose *border* crosses the frame's border, so an element that
+  //    sits entirely outside its own frame would otherwise never be clipped.
+  // d. text owned by the frame. Text paints beyond its recorded bounds (glyph
+  //    overhang, font-metric mismatch, fixed-width text whose content overflows),
+  //    so a bounds test can't prove it stays inside the frame.
   const shouldClipElementItself =
     isElementIntersectingFrame(element, frame, elementsMap) ||
-    isElementContainingFrame(element, frame, elementsMap);
+    isElementContainingFrame(element, frame, elementsMap) ||
+    (element.frameId === frame.id &&
+      (isTextElement(element) ||
+        !elementsAreInFrameBounds([element], frame, elementsMap)));
 
   if (shouldClipElementItself) {
     for (const groupId of element.groupIds) {
