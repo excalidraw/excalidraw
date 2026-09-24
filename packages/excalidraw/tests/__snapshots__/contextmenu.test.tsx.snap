@@ -1311,6 +1311,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -1570,6 +1571,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1625,6 +1627,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1658,6 +1661,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -1917,6 +1921,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -1972,6 +1977,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2005,6 +2011,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2233,6 +2240,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2457,6 +2465,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2488,6 +2497,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
       "updated": {},
     },
     "id": "id4",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -2747,6 +2757,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -2802,6 +2813,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3070,6 +3082,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3125,6 +3138,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3145,6 +3159,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3190,6 +3205,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3451,6 +3467,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3506,6 +3523,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3531,6 +3549,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3556,6 +3575,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       },
     },
     "id": "id9",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3581,6 +3601,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3606,6 +3627,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       },
     },
     "id": "id13",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3631,6 +3653,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       },
     },
     "id": "id15",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3656,6 +3679,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       },
     },
     "id": "id17",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3681,6 +3705,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       },
     },
     "id": "id19",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -3726,6 +3751,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
       },
     },
     "id": "id21",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -3985,6 +4011,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4040,6 +4067,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4065,6 +4093,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -4324,6 +4353,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4379,6 +4409,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4404,6 +4435,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
       },
     },
     "id": "id7",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -4666,6 +4698,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4721,6 +4754,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4741,6 +4775,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4786,6 +4821,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
       },
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -4831,6 +4867,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
       },
     },
     "id": "id13",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -5967,6 +6004,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6022,6 +6060,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6044,6 +6083,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -6064,6 +6104,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -7206,6 +7247,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7261,6 +7303,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "updated": {},
     },
     "id": "id5",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7283,6 +7326,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "updated": {},
     },
     "id": "id8",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7303,6 +7347,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       "updated": {},
     },
     "id": "id11",
+    "schemaVersion": 1,
   },
   {
     "appState": AppStateDelta {
@@ -7348,6 +7393,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
       },
     },
     "id": "id14",
+    "schemaVersion": 1,
   },
 ]
 `;
@@ -10227,6 +10273,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] un
       "updated": {},
     },
     "id": "id2",
+    "schemaVersion": 1,
   },
 ]
 `;
