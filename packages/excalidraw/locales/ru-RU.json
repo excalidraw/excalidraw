@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "Привязка стрелкой",
     "midpointSnapping": "Привязка к средней точке",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
