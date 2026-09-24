@@ -17,7 +17,7 @@ import { Excalidraw } from "../index";
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
 import { updateTextEditor } from "./queries/dom";
-import { act, render, waitFor } from "./test-utils";
+import { act, fireEvent, render, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -73,6 +73,21 @@ describe("search", () => {
       Keyboard.keyPress(KEYS.F);
     });
     expect(searchInput?.matches(":focus")).toBe(true);
+  });
+
+  it("should let browser handle cmd+f when help dialog is open", () => {
+    API.setAppState({
+      openDialog: { name: "help" },
+    });
+
+    const wasNotPrevented = fireEvent.keyDown(document, {
+      key: KEYS.F,
+      [KEYS.CTRL_OR_CMD]: true,
+    });
+
+    expect(wasNotPrevented).toBe(true);
+    expect(h.app.state.openDialog?.name).toBe("help");
+    expect(h.app.state.openSidebar).toBeNull();
   });
 
   it("should match text and cycle through matches on Enter", async () => {
