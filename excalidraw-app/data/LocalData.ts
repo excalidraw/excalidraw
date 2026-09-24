@@ -48,6 +48,23 @@ import { updateBrowserStateVersion } from "./tabSync";
 
 const filesStore = createStore("files-db", "files-store");
 
+/**
+ * Request persistent storage so the browser won't evict IndexedDB data
+ * (where images are stored) under storage pressure.
+ */
+export const requestPersistentStorage = async () => {
+  if (navigator.storage?.persist) {
+    try {
+      const isPersisted = await navigator.storage.persisted();
+      if (!isPersisted) {
+        await navigator.storage.persist();
+      }
+    } catch (error) {
+      console.warn("Failed to request persistent storage:", error);
+    }
+  }
+};
+
 export const localStorageQuotaExceededAtom = atom(false);
 
 class LocalFileManager extends FileManager {
