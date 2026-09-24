@@ -249,6 +249,7 @@
     "undo": "Späť",
     "redo": "Znova",
     "resetLibrary": "Obnoviť knižnicu",
+    "reset": "",
     "createNewRoom": "Vytvoriť novú miestnosť",
     "fullScreen": "Celá obrazovka",
     "darkMode": "Tmavý režim",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "V tejto scéne",
     "availableFonts": "Dostupné písma",
-    "empty": "Nenašli sa žiadne písma"
+    "empty": "Nenašli sa žiadne písma",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Nenašli sa žiadni používatelia",
