@@ -249,6 +249,7 @@
     "undo": "Desfacer",
     "redo": "Refacer",
     "resetLibrary": "Reiniciar biblioteca",
+    "reset": "",
     "createNewRoom": "Crear nova sala",
     "fullScreen": "Pantalla completa",
     "darkMode": "Modo escuro",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
