@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "Pripájanie šípky",
     "midpointSnapping": "Prichytiť k bodom",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
