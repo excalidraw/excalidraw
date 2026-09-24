@@ -249,6 +249,7 @@
     "undo": "පසුගමන",
     "redo": "නැවත කරන්න",
     "resetLibrary": "පුස්තකාලය යළි සකසන්න",
+    "reset": "",
     "createNewRoom": "නව කාමරයක් සාදන්න",
     "fullScreen": "පූර්ණ තිරය",
     "darkMode": "අඳුරු මාදිලිය",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
