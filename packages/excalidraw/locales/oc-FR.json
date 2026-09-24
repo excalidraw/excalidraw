@@ -249,6 +249,7 @@
     "undo": "Anullar",
     "redo": "Restablir",
     "resetLibrary": "Reïnicializar la bibliotèca",
+    "reset": "",
     "createNewRoom": "Crear sala novèla",
     "fullScreen": "Ecran complèt",
     "darkMode": "Mòde escur",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "Dins aquesta scèna",
     "availableFonts": "Polissas disponiblas",
-    "empty": "Cap de polissa pas trobada"
+    "empty": "Cap de polissa pas trobada",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Cap d’utilizaire pas trobat",
