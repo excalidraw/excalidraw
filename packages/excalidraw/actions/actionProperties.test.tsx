@@ -6,6 +6,8 @@ import {
   FREEDRAW_STROKE_WIDTH,
   FONT_FAMILY,
   STROKE_WIDTH,
+  ROUNDNESS,
+  ROUNDNESS_SLIDER_MAX_RATIO,
 } from "@excalidraw/common";
 
 import { Excalidraw } from "../index";
@@ -251,5 +253,73 @@ describe("element locking", () => {
         "active",
       );
     });
+  });
+});
+
+describe("roundness amount", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("is only shown for round adaptive-radius elements", () => {
+    const sharpRect = API.createElement({ type: "rectangle", roundness: null });
+    API.setElements([sharpRect]);
+    API.setSelectedElements([sharpRect]);
+    expect(queryByTestId(document.body, "roundnessAmount")).toBe(null);
+
+    const roundDiamond = API.createElement({
+      type: "diamond",
+      roundness: { type: ROUNDNESS.PROPORTIONAL_RADIUS },
+    });
+    API.setElements([roundDiamond]);
+    API.setSelectedElements([roundDiamond]);
+    expect(queryByTestId(document.body, "roundnessAmount")).toBe(null);
+
+    const roundRect = API.createElement({
+      type: "rectangle",
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+    });
+    API.setElements([roundRect]);
+    API.setSelectedElements([roundRect]);
+    expect(queryByTestId(document.body, "roundnessAmount")).not.toBe(null);
+  });
+
+  it("reflects the element's current radius as a percent of the max", () => {
+    const maxRadius = (100 / 2) * ROUNDNESS_SLIDER_MAX_RATIO;
+    const rect = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+    });
+    API.setElements([rect]);
+    // API.createElement only accepts a round/sharp boolean for roundness, so
+    // the custom radius has to be applied as a follow-up mutation
+    API.updateElement(rect, {
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS, value: maxRadius / 2 },
+    });
+    API.setSelectedElements([rect]);
+
+    const slider = queryByTestId(document.body, "roundnessAmount");
+    expect(slider).toHaveValue("50");
+  });
+
+  it("updates the radius, clamped short of a full pill, when dragged to the max", () => {
+    const rect = API.createElement({
+      type: "rectangle",
+      width: 200,
+      height: 200,
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+    });
+    API.setElements([rect]);
+    API.setSelectedElements([rect]);
+
+    const slider = queryByTestId(document.body, "roundnessAmount")!;
+    fireEvent.change(slider, { target: { value: "100" } });
+
+    const updated = API.getSelectedElements()[0];
+    expect(updated.roundness?.value).toBe(
+      (200 / 2) * ROUNDNESS_SLIDER_MAX_RATIO,
+    );
   });
 });

@@ -105,6 +105,7 @@ export type ActionName =
   | "goToCollaborator"
   | "addToLibrary"
   | "changeRoundness"
+  | "changeRoundnessAmount"
   | "alignTop"
   | "alignBottom"
   | "alignLeft"
