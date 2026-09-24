@@ -249,6 +249,7 @@
     "undo": "Atsaukt",
     "redo": "Atcelt atsaukšanu",
     "resetLibrary": "Atiestatīt bibliotēku",
+    "reset": "",
     "createNewRoom": "Izveidot jaunu telpu",
     "fullScreen": "Pilnekrāna režīms",
     "darkMode": "Tumšais režīms",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
