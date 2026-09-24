@@ -113,6 +113,10 @@ export const userToFollowAtom = atom<UserToFollow | null>(null);
 
 type CollabInstance = InstanceType<typeof Collab>;
 
+/** remote payloads are untrusted, so validate the socketId before use */
+const isValidSocketId = (socketId: unknown): socketId is SocketId =>
+  typeof socketId === "string" && socketId.length > 0;
+
 export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
@@ -626,6 +630,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               // @ts-ignore legacy, see #2094 (#2097)
               decryptedData.payload.socketID;
 
+            if (!isValidSocketId(socketId)) {
+              return;
+            }
+
             this.updateCollaborator(socketId, {
               pointer,
               button,
@@ -638,6 +646,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
           case WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS: {
             const { sceneBounds, socketId } = decryptedData.payload;
+
+            if (!isValidSocketId(socketId)) {
+              return;
+            }
 
             const userToFollow = appJotaiStore.get(userToFollowAtom);
 
@@ -670,6 +682,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
           case WS_SUBTYPES.IDLE_STATUS: {
             const { userState, socketId, username } = decryptedData.payload;
+
+            if (!isValidSocketId(socketId)) {
+              return;
+            }
+
             this.updateCollaborator(socketId, {
               userState,
               username: typeof username === "string" ? username : null,
