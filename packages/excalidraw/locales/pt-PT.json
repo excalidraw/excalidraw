@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "Ligar automaticamente as setas",
     "midpointSnapping": "Ligar automaticamente aos pontos médios",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
