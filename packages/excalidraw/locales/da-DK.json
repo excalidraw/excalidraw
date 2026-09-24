@@ -249,6 +249,7 @@
     "undo": "Fortryd",
     "redo": "Gendan",
     "resetLibrary": "Nulstil bibliotek",
+    "reset": "",
     "createNewRoom": "Opret nyt rum",
     "fullScreen": "Fuld skærm",
     "darkMode": "Mørk tilstand",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
