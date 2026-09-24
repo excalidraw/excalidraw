@@ -197,6 +197,7 @@
     "boxSelectionOverlap": "",
     "arrowBinding": "화살표 연결",
     "midpointSnapping": "중간에 맞춤",
+    "showHints": "",
     "inputDevice": "",
     "inputDeviceTrackpad": "",
     "inputDeviceMouse": ""
