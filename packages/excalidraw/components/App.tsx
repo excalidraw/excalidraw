@@ -3364,7 +3364,9 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState({
       contextMenu: null,
-      openMenu: null,
+      // keep the main menu open when entering view mode, since that's where
+      // the user usually toggles it from (Preferences submenu)
+      openMenu: this.isInteractionEnabled() ? this.state.openMenu : null,
       openPopup: null,
       cursorButton: "up",
       bindMode: "orbit",
