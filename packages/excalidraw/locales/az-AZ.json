@@ -249,6 +249,7 @@
     "undo": "",
     "redo": "",
     "resetLibrary": "",
+    "reset": "",
     "createNewRoom": "",
     "fullScreen": "",
     "darkMode": "",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
