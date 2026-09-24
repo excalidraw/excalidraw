@@ -249,6 +249,7 @@
     "undo": "पूर्ववत् करें",
     "redo": "फिर से करें",
     "resetLibrary": "संग्रह को पुनः स्थापित करें",
+    "reset": "",
     "createNewRoom": "एक नया कमरा बनाएं",
     "fullScreen": "पूर्ण दृश्यपटल",
     "darkMode": "कम प्रकाश प्रणाली",
@@ -722,7 +723,9 @@
     },
     "sceneFonts": "इस दृश्य में",
     "availableFonts": "उपलब्ध लिपियां",
-    "empty": "कोई लिपि नहीं मिली"
+    "empty": "कोई लिपि नहीं मिली",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "कोई उपयोक्ता नहीं मिला",
