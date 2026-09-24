@@ -374,6 +374,36 @@ export const actionChangeStrokeColor = register<
     const target = resolveColorTarget(appState, elements, "strokeColor");
     const elementsMap = arrayToMap(elements);
 
+    // If we are actively editing a text element and have a selection,
+    // apply the color to the selection only!
+    if (appState.editingTextElement) {
+      const editingElement = elementsMap.get(appState.editingTextElement.id);
+      // Fallback to querySelector since perform doesn't always have app easily
+      const textarea = document.activeElement?.closest(".excalidraw-container")?.querySelector(".excalidraw-wysiwyg") as HTMLTextAreaElement;
+      
+      if (editingElement && editingElement.type === "text" && textarea && textarea.selectionStart !== textarea.selectionEnd) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        
+        const existingRanges = editingElement.styleRanges || [];
+        const newRanges = existingRanges.filter(
+          r => r.index >= end || r.index + r.length <= start
+        );
+        newRanges.push({ index: start, length: end - start, color });
+        
+        return {
+          elements: changeProperty(
+            elements,
+            appState,
+            (el) => el.id === editingElement.id ? newElementWith(el, { styleRanges: newRanges } as any) : el,
+            true
+          ),
+          appState: { ...appState, ...appStateUpdates },
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        };
+      }
+    }
+
     return {
       // a note and its label share one ink: coloring the label while editing
       // it (no selection) colors the note too — the footer paints with it
