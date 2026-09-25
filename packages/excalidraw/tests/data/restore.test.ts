@@ -229,6 +229,24 @@ describe("restoreElements", () => {
     expect(restore.restoreElements(null, null)).toStrictEqual([]);
   });
 
+  it("should return empty array when input is not an array", () => {
+    for (const input of [{}, "x", 1, true]) {
+      expect(restore.restoreElements(input as any, null)).toStrictEqual([]);
+    }
+  });
+
+  it("should skip null and primitive entries", () => {
+    const rectElement = API.createElement({ type: "rectangle" });
+    const restoredElements = restore.restoreElements(
+      [null, 1, "a", undefined, true, {}, rectElement] as any,
+      null,
+      { repairBindings: true },
+    );
+    expect(restoredElements).toEqual([
+      expect.objectContaining({ id: rectElement.id, type: "rectangle" }),
+    ]);
+  });
+
   it("should not call isInvisiblySmallElement when element is a selection element", () => {
     const selectionEl = { type: "selection" } as ExcalidrawElement;
     const restoreElements = restore.restoreElements([selectionEl], null);
