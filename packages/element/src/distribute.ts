@@ -23,10 +23,10 @@ export const distributeElements = (
   appState: Readonly<AppState>,
   scene: Scene,
 ): NonDeletedExcalidrawElement[] => {
-  const [start, mid, end, extent] =
+  const [start, mid, extent] =
     distribution.axis === "x"
-      ? (["minX", "midX", "maxX", "width"] as const)
-      : (["minY", "midY", "maxY", "height"] as const);
+      ? (["minX", "midX", "width"] as const)
+      : (["minY", "midY", "height"] as const);
 
   const bounds = getCommonBoundingBox(selectedElements);
   const groups = getSelectedElementsByGroup(
@@ -49,16 +49,19 @@ export const distributeElements = (
     // If we have a negative step, we'll need to distribute from centers
     // rather than from gaps. Buckle up, this is a weird one.
 
-    // Get indices of boxes that define start and end of our bounding box
-    const index0 = groups.findIndex((g) => g[1][start] === bounds[start]);
-    const index1 = groups.findIndex((g) => g[1][end] === bounds[end]);
+    // Anchor on the outermost boxes by center. `groups` is already sorted by
+    // center, so those are simply the first and the last one. Picking them by
+    // which box touches the bounding box edges instead would break when a
+    // single wide box defines both edges: it would be picked twice, making the
+    // step 0 and collapsing every box between onto one center.
+    const lastIndex = groups.length - 1;
 
     // Get our step, based on the distance between the center points of our
     // start and end boxes
     const step =
-      (groups[index1][1][mid] - groups[index0][1][mid]) / (groups.length - 1);
+      (groups[lastIndex][1][mid] - groups[0][1][mid]) / (groups.length - 1);
 
-    let pos = groups[index0][1][mid];
+    let pos = groups[0][1][mid];
 
     return groups.flatMap(([group, box], index) => {
       const translation = {
@@ -67,7 +70,7 @@ export const distributeElements = (
       };
 
       // Don't move our start and end boxes
-      if (index !== index0 && index !== index1) {
+      if (index !== 0 && index !== lastIndex) {
         pos += step;
         translation[distribution.axis] = pos - box[mid];
       }

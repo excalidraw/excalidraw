@@ -74,6 +74,45 @@ describe("distributing", () => {
     await render(<Excalidraw handleKeyboardGlobally={true} />);
   });
 
+  it("should keep distributing evenly when one element spans the whole selection", async () => {
+    // The widest element defines BOTH ends of the common bounding box, so the
+    // overlapping branch can't derive a step from "the box at the start" and
+    // "the box at the end" — they are the same box.
+    const spanning = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 300,
+      height: 100,
+    });
+    const small1 = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 0,
+      width: 200,
+      height: 100,
+    });
+    const small2 = API.createElement({
+      type: "rectangle",
+      x: 20,
+      y: 0,
+      width: 200,
+      height: 100,
+    });
+
+    API.setElements([spanning, small1, small2]);
+    API.setSelectedElements([spanning, small1, small2]);
+
+    API.executeAction(distributeHorizontally);
+
+    const centers = API.getSelectedElements()
+      .map((el) => el.x + el.width / 2)
+      .sort((a, b) => a - b);
+
+    // centers stay evenly spaced instead of collapsing onto a single point
+    expect(centers).toEqual([110, 130, 150]);
+  });
+
   it("should distribute selected elements horizontally", async () => {
     createAndSelectThreeRectanglesWithGap();
     expect(API.getSelectedElements()[0].x).toEqual(0);
