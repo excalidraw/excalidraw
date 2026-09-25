@@ -400,6 +400,7 @@ const ColorPickerComponent = ({
       <div
         role="dialog"
         aria-modal="true"
+        aria-label={label}
         className={clsx("color-picker-container", {
           "color-picker-container--no-top-picks": isCompactMode,
         })}

@@ -87,6 +87,7 @@ export const FontPicker = React.memo(
       <div
         role="dialog"
         aria-modal="true"
+        aria-label={t("labels.fontFamily")}
         className={clsx("FontPicker__container", {
           "FontPicker__container--compact": compactMode,
         })}

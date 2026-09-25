@@ -15,7 +15,8 @@ export const Modal: React.FC<{
   children: React.ReactNode;
   maxWidth?: number;
   onCloseRequest(): void;
-  labelledBy: string;
+  labelledBy?: string;
+  ariaLabel?: string;
   theme?: AppState["theme"];
   closeOnClickOutside?: boolean;
 }> = (props) => {
@@ -50,6 +51,7 @@ export const Modal: React.FC<{
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
+      aria-label={props.ariaLabel}
     >
       <div
         className="Modal__background"
