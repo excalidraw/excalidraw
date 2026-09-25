@@ -23,7 +23,8 @@
     },
     "./index.css": {
       "development": "./dist/dev/index.css",
-      "production": "./dist/prod/index.css"
+      "production": "./dist/prod/index.css",
+      "default": "./dist/prod/index.css"
     },
     ".": {
       "types": "./dist/types/excalidraw/index.d.ts",
