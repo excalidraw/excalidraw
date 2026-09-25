@@ -108,7 +108,8 @@ export const Dialog = (props: DialogProps) => {
       className={clsx("Dialog", props.className, {
         "Dialog--fullscreen": isFullscreen,
       })}
-      labelledBy={`${id}-dialog-title`}
+      labelledBy={props.title ? `${id}-dialog-title` : undefined}
+      ariaLabel={props.title ? undefined : t("labels.dialog")}
       maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
       closeOnClickOutside={props.closeOnClickOutside}
