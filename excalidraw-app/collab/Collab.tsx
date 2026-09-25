@@ -592,27 +592,50 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           this.portal.roomKey,
         );
 
+        if (!decryptedData || typeof decryptedData !== "object") {
+          return;
+        }
+
         switch (decryptedData.type) {
           case WS_SUBTYPES.INVALID_RESPONSE:
             return;
           case WS_SUBTYPES.INIT: {
+            // ignore malformed INIT so that the fallback timer or a later
+            // valid INIT can still initialize the room
+            if (
+              !decryptedData.payload ||
+              typeof decryptedData.payload !== "object"
+            ) {
+              return;
+            }
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
-              const remoteElements = toBrandedType<
-                readonly RemoteExcalidrawElement[]
-              >(decryptedData.payload.elements);
-              const reconciledElements =
-                this._reconcileElements(remoteElements);
-              this.handleRemoteSceneUpdate(reconciledElements);
-              // noop if already resolved via init from firebase
-              scenePromise.resolve({
-                elements: reconciledElements,
-                scrollToContent: true,
-              });
+              try {
+                const remoteElements = toBrandedType<
+                  readonly RemoteExcalidrawElement[]
+                >(decryptedData.payload.elements);
+                const reconciledElements =
+                  this._reconcileElements(remoteElements);
+                this.handleRemoteSceneUpdate(reconciledElements);
+                // noop if already resolved via init from firebase
+                scenePromise.resolve({
+                  elements: reconciledElements,
+                  scrollToContent: true,
+                });
+              } catch (error) {
+                // room is already marked as initialized, so fall back to
+                // loading the scene from firebase instead of leaving the
+                // scene promise pending forever
+                console.error(error);
+                fallbackInitializationHandler();
+              }
             }
             break;
           }
           case WS_SUBTYPES.UPDATE:
+            if (!decryptedData.payload) {
+              return;
+            }
             this.handleRemoteSceneUpdate(
               this._reconcileElements(
                 toBrandedType<readonly RemoteExcalidrawElement[]>(
