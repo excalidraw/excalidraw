@@ -1006,13 +1006,19 @@ export const restoreElements = <T extends ExcalidrawElement>(
 ): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const targetElementsMap = arrayToMap(targetElements || []);
+  // guard against malformed input (non-array, null or primitive entries)
+  targetElements = Array.isArray(targetElements)
+    ? targetElements.filter(
+        (element) => element !== null && typeof element === "object",
+      )
+    : [];
+  const targetElementsMap = arrayToMap(targetElements);
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
 
   const restoredElements = syncInvalidIndices(
-    (targetElements || []).reduce((elements, element) => {
+    targetElements.reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {
