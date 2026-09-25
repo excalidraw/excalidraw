@@ -6,6 +6,7 @@ import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 import { useEditorInterface } from "./App";
 import { CheckboxItem } from "./CheckboxItem";
 import { PlusIcon } from "./icons";
+import { hideTooltip, showTooltip } from "./Tooltip";
 
 import "./LibraryUnit.scss";
 
@@ -15,6 +16,7 @@ import type { SvgCache } from "../hooks/useLibraryItemSvg";
 export const LibraryUnit = memo(
   ({
     id,
+    name,
     elements,
     isPending,
     onClick,
@@ -24,6 +26,7 @@ export const LibraryUnit = memo(
     svgCache,
   }: {
     id: LibraryItem["id"] | /** for pending item */ null;
+    name?: LibraryItem["name"];
     elements?: LibraryItem["elements"];
     isPending?: boolean;
     onClick: (id: LibraryItem["id"] | null) => void;
@@ -37,6 +40,8 @@ export const LibraryUnit = memo(
 
     const [isHovered, setIsHovered] = useState(false);
     const isMobile = useEditorInterface().formFactor === "phone";
+    const hasName = !!name?.trim();
+
     const adder = isPending && (
       <div className="library-unit__adder">{PlusIcon}</div>
     );
@@ -51,6 +56,19 @@ export const LibraryUnit = memo(
         })}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        // pointer (not mouse) events so that touch taps don't leave the
+        // tooltip behind (pointerdown right after pointerenter cancels it)
+        onPointerEnter={
+          hasName
+            ? (event) =>
+                showTooltip(event.currentTarget, name!, {
+                  delay: true,
+                  position: "top",
+                })
+            : undefined
+        }
+        onPointerLeave={hasName ? hideTooltip : undefined}
+        onPointerDown={hasName ? hideTooltip : undefined}
       >
         <div
           className={clsx("library-unit__dragger", {
