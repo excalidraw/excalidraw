@@ -1,4 +1,5 @@
 import { queryByText } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
 import {
@@ -39,7 +40,7 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
-import { actionBindText } from "../actions";
+import { actionBindText, actionSaveFileToDisk } from "../actions";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 
 const { h } = window;
@@ -663,6 +664,25 @@ describe("textWysiwyg", () => {
       });
 
       expect(textarea.value).toEqual(`Line#1\nLine#2`);
+    });
+
+    it("should commit edited text before saving with Ctrl+Shift+S", () => {
+      const saveSpy = vi
+        .spyOn(actionSaveFileToDisk, "perform")
+        .mockImplementation(() => false);
+      const nextText = "saved while editing";
+
+      updateTextEditor(textarea, nextText);
+      fireEvent.keyDown(textarea, {
+        key: KEYS.S,
+        ctrlKey: true,
+        shiftKey: true,
+      });
+
+      expect(saveSpy).toHaveBeenCalled();
+      expect((h.elements[0] as ExcalidrawTextElement).text).toBe(nextText);
+
+      saveSpy.mockRestore();
     });
 
     it("should resize text via shortcuts while in wysiwyg", () => {
