@@ -68,6 +68,19 @@ The Excalidraw editor (npm package) supports:
 - 🔙&nbsp;Undo / Redo.
 - 🔍&nbsp;Zoom and panning support.
 
+### Text Formatting Support:
+
+Currently, Excalidraw supports **basic text formatting**:
+
+- **Bold**: Supported using markdown-style `**bold**` in text elements.
+- *Italic*: Supported using markdown-style `*italic*`.
+- _Underline_: Not yet supported, but planned in a future update.
+
+These features are available for all users, including Excalidraw+. 
+For upcoming features and roadmap updates, check the [Excalidraw public roadmap](https://github.com/excalidraw/excalidraw/projects/1).
+
+
+
 ## Excalidraw.com
 
 The app hosted at [excalidraw.com](https://excalidraw.com) is a minimal showcase of what you can build with Excalidraw. Its [source code](https://github.com/excalidraw/excalidraw/tree/master/excalidraw-app) is part of this repository as well, and the app features:
