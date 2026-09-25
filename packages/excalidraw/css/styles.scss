@@ -707,10 +707,11 @@ body.excalidraw-cursor-resize * {
       box-shadow: none;
     }
 
+    // :focus-visible excluded: the keyboard focus ring is a box-shadow
     .main-menu-trigger,
     .scroll-back-to-content,
     .disable-zen-mode {
-      &:not(:active) {
+      &:not(:active, :focus-visible) {
         border-color: transparent;
         box-shadow: none;
       }

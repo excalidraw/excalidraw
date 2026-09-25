@@ -71,19 +71,48 @@ const TOOLTIP_WARM_WINDOW = 300;
 let showTooltipTimer = 0;
 let tooltipHiddenAt = 0;
 /**
+ * the item the visible (or pending) tooltip belongs to. All tooltips share
+ * one DOM node & timer, so without an owner an unrelated item unmounting
+ * would cancel/hide a tooltip someone else is still hovering.
+ */
+let tooltipOwner: HTMLElement | null = null;
+/**
  * while a tooltip is visible, hides it once its item is removed from the DOM
  * (e.g. unmounted while hovered, which doesn't fire pointerleave)
  */
 let tooltipItemObserver: MutationObserver | null = null;
 
+/** hides the tooltip & cancels a pending one, whichever item owns it */
 export const hideTooltip = () => {
   clearTimeout(showTooltipTimer);
+  showTooltipTimer = 0;
+  tooltipOwner = null;
   tooltipItemObserver?.disconnect();
   tooltipItemObserver = null;
-  const tooltip = getTooltipDiv();
-  if (tooltip.classList.contains("excalidraw-tooltip--visible")) {
+  // a plain query, so that hiding never creates the tooltip node
+  const tooltip = document.querySelector<HTMLDivElement>(".excalidraw-tooltip");
+  if (tooltip?.classList.contains("excalidraw-tooltip--visible")) {
     tooltip.classList.remove("excalidraw-tooltip--visible");
     tooltipHiddenAt = Date.now();
+  }
+};
+
+/** hides the tooltip only if `item` is the one that owns it */
+const hideTooltipOf = (item: HTMLElement) => {
+  if (tooltipOwner === item) {
+    hideTooltip();
+  }
+};
+
+/**
+ * hides the tooltip if its item left the DOM. Unlike the MutationObserver,
+ * synchronous, and also covers a still-pending tooltip. A no-op while no
+ * tooltip is owned, so that unmounting an item that was never hovered doesn't
+ * touch the DOM.
+ */
+const hideOrphanedTooltip = () => {
+  if (tooltipOwner && !tooltipOwner.isConnected) {
+    hideTooltip();
   }
 };
 
@@ -140,6 +169,7 @@ export const showTooltip = (
     }
   };
   clearTimeout(showTooltipTimer);
+  tooltipOwner = item;
   if (delay && Date.now() - tooltipHiddenAt > TOOLTIP_WARM_WINDOW) {
     showTooltipTimer = window.setTimeout(show, TOOLTIP_DELAY);
   } else {
@@ -167,9 +197,11 @@ export const Tooltip = ({
   disabled,
   delay = false,
 }: TooltipProps) => {
-  useEffect(() => {
-    return () => hideTooltip();
-  }, []);
+  // retract our tooltip if we unmount while hovered, but leave others' alone.
+  // (`disabled` removes the wrapper without unmounting — the MutationObserver
+  // covers that.)
+  useEffect(() => hideOrphanedTooltip, []);
+
   if (disabled) {
     return null;
   }
@@ -179,7 +211,7 @@ export const Tooltip = ({
       onPointerEnter={(event) =>
         showTooltip(event.currentTarget, label, { long, delay })
       }
-      onPointerLeave={hideTooltip}
+      onPointerLeave={(event) => hideTooltipOf(event.currentTarget)}
       style={style}
     >
       {children}

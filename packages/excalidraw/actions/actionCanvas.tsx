@@ -165,6 +165,8 @@ export const actionZoomIn = register({
           className="zoom-in-button zoom-button"
           icon={ZoomInIcon}
           aria-label={t("buttons.zoomIn")}
+          // the shortcut used to reach AT via the (now removed) native title
+          aria-keyshortcuts={getShortcutKey("CtrlOrCmd++")}
           disabled={zoomValue >= MAX_ZOOM}
           onClick={() => {
             updateData(null);
@@ -217,6 +219,8 @@ export const actionZoomOut = register({
           className="zoom-out-button zoom-button"
           icon={ZoomOutIcon}
           aria-label={t("buttons.zoomOut")}
+          // the shortcut used to reach AT via the (now removed) native title
+          aria-keyshortcuts={getShortcutKey("CtrlOrCmd+-")}
           disabled={zoomValue <= MIN_ZOOM}
           onClick={() => {
             updateData(null);
