@@ -659,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "मर्मेड पासून एक्सकाली मधे",
     "button": "शिरवा",
