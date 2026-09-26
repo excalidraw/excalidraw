@@ -13132,13 +13132,21 @@ class App extends React.Component<AppProps, AppState> {
         file &&
         (file.type === MIME_TYPES.png || file.type === MIME_TYPES.svg)
       ) {
+        let scene;
         try {
-          const scene = await loadFromBlob(
+          scene = await loadFromBlob(
             file,
             this.state,
             this.scene.getElementsIncludingDeleted(),
             fileHandle,
           );
+        } catch (error: any) {
+          if (error.name !== "EncodingError") {
+            throw new Error(t("alerts.couldNotLoadInvalidFile"));
+          }
+          // if EncodingError, fall through to insert as regular image
+        }
+        if (scene) {
           if (insertPosition) {
             this.addElementsFromPasteOrLibrary({
               elements: scene.elements,
@@ -13159,11 +13167,6 @@ class App extends React.Component<AppProps, AppState> {
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
           return;
-        } catch (error: any) {
-          if (error.name !== "EncodingError") {
-            throw new Error(t("alerts.couldNotLoadInvalidFile"));
-          }
-          // if EncodingError, fall through to insert as regular image
         }
       }
     }

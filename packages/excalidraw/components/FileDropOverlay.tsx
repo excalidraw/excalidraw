@@ -69,8 +69,8 @@ export const FileDropOverlay = () => {
       }
     };
     const onDragOver = (event: DragEvent) => {
+      // App's own dragover listener already calls preventDefault()
       if (isFileDrag(event)) {
-        event.preventDefault();
         // Shift defaults the drag to "move" (and its cursor), but we only
         // ever copy the file in
         if (event.dataTransfer) {
