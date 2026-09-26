@@ -25,6 +25,14 @@
     );
     border-radius: 2px;
     outline: none;
+
+    :root[dir="rtl"] & {
+      background: linear-gradient(
+        to left,
+        var(--color-slider-track) calc(var(--range-progress) * 100%),
+        var(--button-bg) calc(var(--range-progress) * 100%)
+      );
+    }
   }
 
   .range-input::-webkit-slider-thumb {
@@ -51,19 +59,23 @@
     position: absolute;
     bottom: 0;
     // centered on the thumb, which travels (width - thumb size)
-    left: calc(
+    inset-inline-start: calc(
       var(--slider-thumb-size) / 2 + (100% - var(--slider-thumb-size)) *
         var(--range-progress)
     );
     transform: translateX(-50%);
     font-size: 12px;
     color: var(--text-primary-color);
+
+    :root[dir="rtl"] & {
+      transform: translateX(50%);
+    }
   }
 
   .zero-label {
     position: absolute;
     bottom: 0;
-    left: 4px;
+    inset-inline-start: 4px;
     font-size: 12px;
     color: var(--text-primary-color);
   }
