@@ -98,6 +98,7 @@ import type {
   ExcalidrawTextElement,
   FixedPointBinding,
   FontFamilyValues,
+  GroupId,
   NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
@@ -262,6 +263,52 @@ const restoreStrokeVariability = (
     ALLOWED_STROKE_VARIABILITIES.has(variability as StrokeVariability)
     ? (variability as StrokeVariability)
     : defaultValue;
+};
+
+// Per-element cap for `version`. Scene versions are summed across elements
+// (`getSceneVersion`), so this keeps the sum exactly representable (and +1
+// bumps effective) for up to ~4M elements (MAX_SAFE_INTEGER / 2^31). No
+// legitimate element comes close: each version bump is one user edit.
+export const MAX_ELEMENT_VERSION = 2 ** 31 - 1;
+
+// Guards against malicious/corrupted versions (e.g. 1e300, NaN, strings)
+// which would otherwise dominate the scene version and freeze collab sync.
+const normalizeElementVersion = (version: unknown): number => {
+  if (!isFiniteNumber(version) || version < 1) {
+    return 1;
+  }
+  return Math.min(Math.floor(version), MAX_ELEMENT_VERSION);
+};
+
+// versionNonce is a 31-bit random int (`randomInteger()`); accept any 32-bit
+// signed integer and fall back to 0 otherwise.
+const normalizeElementVersionNonce = (versionNonce: unknown): number => {
+  return Number.isInteger(versionNonce) &&
+    (versionNonce as number) >= -(2 ** 31) &&
+    (versionNonce as number) < 2 ** 31
+    ? (versionNonce as number)
+    : 0;
+};
+
+// Future timestamps would keep deleted elements syncing (and persisting)
+// indefinitely, so clamp them to now.
+const normalizeElementUpdated = (updated: unknown): number => {
+  if (!isFiniteNumber(updated)) {
+    return getUpdatedTimestamp();
+  }
+  return Math.min(updated, Date.now());
+};
+
+// Non-array or non-string groupIds (e.g. from a malicious peer) crash group
+// selection. Order is meaningful (innermost group first), so keep it as is.
+const normalizeElementGroupIds = (groupIds: unknown): GroupId[] => {
+  if (!Array.isArray(groupIds)) {
+    return [];
+  }
+  return groupIds.filter(
+    (groupId): groupId is GroupId =>
+      typeof groupId === "string" && groupId.length > 0,
+  );
 };
 
 const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
@@ -450,8 +497,8 @@ const restoreElementWithProperties = <
     type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
-    version: element.version || 1,
-    versionNonce: element.versionNonce ?? 0,
+    version: normalizeElementVersion(element.version),
+    versionNonce: normalizeElementVersionNonce(element.versionNonce),
     index: element.index ?? null,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
@@ -470,7 +517,7 @@ const restoreElementWithProperties = <
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
-    groupIds: element.groupIds ?? [],
+    groupIds: normalizeElementGroupIds(element.groupIds),
     frameId: element.frameId ?? null,
     roundness: element.roundness
       ? element.roundness
@@ -486,7 +533,7 @@ const restoreElementWithProperties = <
     boundElements: element.boundElementIds
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
-    updated: element.updated ?? getUpdatedTimestamp(),
+    updated: normalizeElementUpdated(element.updated),
     created: element.created ?? null,
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
@@ -957,13 +1004,19 @@ export const restoreElements = <T extends ExcalidrawElement>(
 ): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const targetElementsMap = arrayToMap(targetElements || []);
+  // guard against malformed input (non-array, null or primitive entries)
+  targetElements = Array.isArray(targetElements)
+    ? targetElements.filter(
+        (element) => element !== null && typeof element === "object",
+      )
+    : [];
+  const targetElementsMap = arrayToMap(targetElements);
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
 
   const restoredElements = syncInvalidIndices(
-    (targetElements || []).reduce((elements, element) => {
+    targetElements.reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {

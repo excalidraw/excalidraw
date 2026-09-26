@@ -113,6 +113,10 @@ export const userToFollowAtom = atom<UserToFollow | null>(null);
 
 type CollabInstance = InstanceType<typeof Collab>;
 
+/** remote payloads are untrusted, so validate the socketId before use */
+const isValidSocketId = (socketId: unknown): socketId is SocketId =>
+  typeof socketId === "string" && socketId.length > 0;
+
 export interface CollabAPI {
   /** function so that we can access the latest value from stale callbacks */
   isCollaborating: () => boolean;
@@ -588,27 +592,50 @@ class Collab extends PureComponent<CollabProps, CollabState> {
           this.portal.roomKey,
         );
 
+        if (!decryptedData || typeof decryptedData !== "object") {
+          return;
+        }
+
         switch (decryptedData.type) {
           case WS_SUBTYPES.INVALID_RESPONSE:
             return;
           case WS_SUBTYPES.INIT: {
+            // ignore malformed INIT so that the fallback timer or a later
+            // valid INIT can still initialize the room
+            if (
+              !decryptedData.payload ||
+              typeof decryptedData.payload !== "object"
+            ) {
+              return;
+            }
             if (!this.portal.socketInitialized) {
               this.initializeRoom({ fetchScene: false });
-              const remoteElements = toBrandedType<
-                readonly RemoteExcalidrawElement[]
-              >(decryptedData.payload.elements);
-              const reconciledElements =
-                this._reconcileElements(remoteElements);
-              this.handleRemoteSceneUpdate(reconciledElements);
-              // noop if already resolved via init from firebase
-              scenePromise.resolve({
-                elements: reconciledElements,
-                scrollToContent: true,
-              });
+              try {
+                const remoteElements = toBrandedType<
+                  readonly RemoteExcalidrawElement[]
+                >(decryptedData.payload.elements);
+                const reconciledElements =
+                  this._reconcileElements(remoteElements);
+                this.handleRemoteSceneUpdate(reconciledElements);
+                // noop if already resolved via init from firebase
+                scenePromise.resolve({
+                  elements: reconciledElements,
+                  scrollToContent: true,
+                });
+              } catch (error) {
+                // room is already marked as initialized, so fall back to
+                // loading the scene from firebase instead of leaving the
+                // scene promise pending forever
+                console.error(error);
+                fallbackInitializationHandler();
+              }
             }
             break;
           }
           case WS_SUBTYPES.UPDATE:
+            if (!decryptedData.payload) {
+              return;
+            }
             this.handleRemoteSceneUpdate(
               this._reconcileElements(
                 toBrandedType<readonly RemoteExcalidrawElement[]>(
@@ -626,11 +653,15 @@ class Collab extends PureComponent<CollabProps, CollabState> {
               // @ts-ignore legacy, see #2094 (#2097)
               decryptedData.payload.socketID;
 
+            if (!isValidSocketId(socketId)) {
+              return;
+            }
+
             this.updateCollaborator(socketId, {
               pointer,
               button,
               selectedElementIds,
-              username,
+              username: typeof username === "string" ? username : null,
             });
 
             break;
@@ -638,6 +669,10 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
           case WS_SUBTYPES.USER_VISIBLE_SCENE_BOUNDS: {
             const { sceneBounds, socketId } = decryptedData.payload;
+
+            if (!isValidSocketId(socketId)) {
+              return;
+            }
 
             const userToFollow = appJotaiStore.get(userToFollowAtom);
 
@@ -670,9 +705,14 @@ class Collab extends PureComponent<CollabProps, CollabState> {
 
           case WS_SUBTYPES.IDLE_STATUS: {
             const { userState, socketId, username } = decryptedData.payload;
+
+            if (!isValidSocketId(socketId)) {
+              return;
+            }
+
             this.updateCollaborator(socketId, {
               userState,
-              username,
+              username: typeof username === "string" ? username : null,
             });
             break;
           }
