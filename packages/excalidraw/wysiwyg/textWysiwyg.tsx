@@ -388,7 +388,8 @@ export const textWysiwyg = ({
       // by: its box is cut short and the textarea scrolls inside instead.
       // The cut runs along the box's own edges, which line up with the
       // viewport's only while the text is unrotated — a rotated box is left
-      // whole, or lines still on screen would go missing from the editor.
+      // whole, or lines still on screen would go missing from the editor
+      // (its caret is revealed by panning the canvas, see onContainerScroll).
       const clampToViewport = angle === 0;
 
       if (!container) {
@@ -901,6 +902,7 @@ export const textWysiwyg = ({
     unbindUpdate();
     unsubOnChange();
     unbindOnScroll();
+    excalidrawContainer?.removeEventListener("scroll", onContainerScroll);
 
     editable.remove();
   };
@@ -1038,6 +1040,31 @@ export const textWysiwyg = ({
   const unbindOnScroll = app.onScrollChangeEmitter.on(() => {
     updateWysiwygStyle();
   });
+
+  // The browser reveals an out-of-view caret by scrolling the nearest scroll
+  // container. For an editor reaching past the viewport (a rotated text's,
+  // which isn't clamped to it, or any text scrolled away while edited), that
+  // is the editor root, and the whole UI would shift out of line with the
+  // canvas. Hand the offset to the canvas instead and put the root back: the
+  // canvas follows the caret. Scroll events fire before the frame is
+  // painted, so the root's shift is never seen; and the root absorbing the
+  // reveal keeps it from scrolling a host page around an embedded editor.
+  const onContainerScroll = () => {
+    if (!excalidrawContainer) {
+      return;
+    }
+    const { scrollLeft, scrollTop } = excalidrawContainer;
+    if (!scrollLeft && !scrollTop) {
+      return;
+    }
+    excalidrawContainer.scrollLeft = 0;
+    excalidrawContainer.scrollTop = 0;
+    app.viewport.translate((state) => ({
+      scrollX: state.scrollX - scrollLeft / state.zoom.value,
+      scrollY: state.scrollY - scrollTop / state.zoom.value,
+    }));
+  };
+  excalidrawContainer?.addEventListener("scroll", onContainerScroll);
 
   // ---------------------------------------------------------------------------
 

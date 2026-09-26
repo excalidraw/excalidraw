@@ -977,6 +977,34 @@ describe("textWysiwyg", () => {
       expect(textarea.style.width).toBe("792px");
       expect(h.elements[0].width).toBe(1000);
     });
+
+    it("should pan the canvas instead of letting the editor root scroll to reveal the caret", () => {
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+      const root = textarea.closest<HTMLElement>(".excalidraw")!;
+      const { scrollX, scrollY } = h.state;
+      const editorTop = parseFloat(textarea.style.top);
+
+      // what the browser does to reveal a caret below and right of the viewport
+      root.scrollTop = 120;
+      root.scrollLeft = 40;
+      fireEvent.scroll(root);
+
+      // the root is put back, and the canvas pans by the same screen distance
+      expect(root.scrollTop).toBe(0);
+      expect(root.scrollLeft).toBe(0);
+      expect(h.state.scrollX).toBe(scrollX - 20);
+      expect(h.state.scrollY).toBe(scrollY - 60);
+      // with the editor on it
+      expect(parseFloat(textarea.style.top)).toBe(editorTop - 120);
+
+      // with no text being edited, the root is left alone
+      Keyboard.exitTextEditor(textarea);
+      root.scrollTop = 50;
+      fireEvent.scroll(root);
+      expect(root.scrollTop).toBe(50);
+      expect(h.state.scrollY).toBe(scrollY - 60);
+      root.scrollTop = 0;
+    });
   });
 
   describe("Test container-bound text", () => {

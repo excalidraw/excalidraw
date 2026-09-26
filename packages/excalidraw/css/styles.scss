@@ -49,14 +49,12 @@ body.excalidraw-cursor-resize * {
   font-family: var(--ui-font);
 
   position: relative;
-  // clip, don't scroll: the editor never scrolls this box itself, but the
-  // browser would — to reveal the caret of a text editor reaching past the
-  // viewport (a rotated text's editor can't be clamped to it without losing
-  // lines still on screen), taking the whole UI along. `clip` is `hidden`
-  // without being a scroll container; `hidden` stays as the fallback where
-  // `clip` is unknown.
+  // `hidden`, not `clip`: this box must stay a scroll container. The browser
+  // scrolls it to reveal the caret of a text editor reaching past the
+  // viewport — and with `clip` it would scroll a host page around an
+  // embedded editor instead. The text editor hands any such scroll to the
+  // canvas and puts this box back (see textWysiwyg).
   overflow: hidden;
-  overflow: clip;
   color: var(--text-primary-color);
   display: flex;
   top: 0;
