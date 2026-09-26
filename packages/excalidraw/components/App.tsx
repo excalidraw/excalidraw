@@ -10410,9 +10410,13 @@ class App extends React.Component<AppProps, AppState> {
       | "stickynote"
       | "diamond"
       | "ellipse"
+      | "star"
       | "iframe"
       | "embeddable",
   ) {
+    if (elementType === "star") {
+      return null;
+    }
     return this.state.currentItemRoundness === "round"
       ? {
           type: isUsingAdaptiveRadius(elementType)
