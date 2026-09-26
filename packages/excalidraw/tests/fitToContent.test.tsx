@@ -1,4 +1,5 @@
 import React from "react";
+import { vi } from "vitest";
 
 import { Excalidraw } from "../index";
 import { SCROLL_TO_CONTENT_ANIMATION_KEY } from "../components/App.viewport";
@@ -7,6 +8,8 @@ import { getNormalizedZoom } from "../scene";
 
 import { API } from "./helpers/api";
 import { act, render } from "./test-utils";
+
+import type { SocketId } from "../types";
 
 const { h } = window;
 
@@ -226,6 +229,45 @@ describe("none", () => {
     // (scroll = viewportSize / 2 / zoom - sceneCenter)
     expect(h.state.scrollX).toBeCloseTo(100 / 2 / 0.5 - 1025);
     expect(h.state.scrollY).toBeCloseTo(100 / 2 / 0.5 - 1025);
+  });
+});
+
+describe("following a collaborator", () => {
+  const userToFollow = { socketId: "socket-1" as SocketId, username: "Ann" };
+
+  it("should stop following when navigating", async () => {
+    const onUserFollow = vi.fn();
+    await render(
+      <Excalidraw userToFollow={userToFollow} onUserFollow={onUserFollow} />,
+    );
+    const rectElement = API.createElement({ x: 1000, y: 1000 });
+    API.setElements([rectElement]);
+
+    act(() => {
+      h.app.viewport.setViewport({ target: rectElement, animation: false });
+    });
+
+    expect(onUserFollow).toHaveBeenCalledTimes(1);
+    expect(onUserFollow).toHaveBeenCalledWith({
+      userToFollow,
+      action: "UNFOLLOW",
+    });
+  });
+
+  it("should keep following when not navigating", async () => {
+    const onUserFollow = vi.fn();
+    await render(
+      <Excalidraw userToFollow={userToFollow} onUserFollow={onUserFollow} />,
+    );
+
+    act(() => {
+      // clears a lock; the view stays where it is
+      h.app.viewport.setViewport(null);
+      // resolves to nothing
+      h.app.viewport.setViewport({ target: "missing-id", animation: false });
+    });
+
+    expect(onUserFollow).not.toHaveBeenCalled();
   });
 });
 
