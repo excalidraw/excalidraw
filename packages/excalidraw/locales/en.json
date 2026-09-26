@@ -537,14 +537,22 @@
       "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
     },
     "title": {
-      "exportToPng": "Export to PNG",
-      "exportToSvg": "Export to SVG",
       "copyPngToClipboard": "Copy PNG to clipboard"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "download": "Download {{format}}",
       "copyPngToClipboard": "Copy to clipboard"
+    },
+    "aspectRatio": {
+      "title": "Aspect ratio",
+      "original": "Original"
+    },
+    "format": {
+      "png": "PNG",
+      "svg": "SVG",
+      "webp": "WebP",
+      "jpg": "JPEG",
+      "excalidraw": ".excalidraw"
     },
     "attributionSurvey": {
       "header": "A few quick questions to turn off the attribution mark",

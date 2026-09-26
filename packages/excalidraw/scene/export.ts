@@ -194,12 +194,15 @@ export const exportToCanvas = async (
     viewBackgroundColor,
     exportingFrame,
     attributionMark,
+    aspectRatio,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
     attributionMark?: AttributionMarkOptions;
+    /** target canvas width / height; canvas is grown to it, never cropped */
+    aspectRatio?: number;
   },
   createCanvas: (
     width: number,
@@ -242,10 +245,17 @@ export const exportToCanvas = async (
     exportPadding = Math.max(exportPadding, ATTRIBUTION_MARK_MIN_PADDING);
   }
 
-  const [minX, minY, width, height] = getCanvasSize(
+  const [minX, minY, contentWidth, contentHeight] = getCanvasSize(
     exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
     exportPadding,
   );
+
+  const width = aspectRatio
+    ? Math.max(contentWidth, contentHeight * aspectRatio)
+    : contentWidth;
+  const height = aspectRatio
+    ? Math.max(contentHeight, contentWidth / aspectRatio)
+    : contentHeight;
 
   const { canvas, scale = 1 } = createCanvas(width, height);
 
@@ -274,8 +284,9 @@ export const exportToCanvas = async (
       ...appState,
       frameRendering,
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
+      // content is centered when the canvas was grown to fit `aspectRatio`
+      scrollX: -minX + exportPadding + (width - contentWidth) / 2,
+      scrollY: -minY + exportPadding + (height - contentHeight) / 2,
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,

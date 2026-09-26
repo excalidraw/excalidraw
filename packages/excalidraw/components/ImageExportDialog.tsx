@@ -1,4 +1,5 @@
 import { exportToCanvas } from "@excalidraw/utils/export";
+import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
@@ -67,6 +68,33 @@ export const ErrorCanvasPreview = () => {
   );
 };
 
+type ExportFormat = Exclude<keyof typeof EXPORT_IMAGE_TYPES, "clipboard">;
+
+const EXPORT_FORMATS: ExportFormat[] = [
+  EXPORT_IMAGE_TYPES.png,
+  EXPORT_IMAGE_TYPES.svg,
+  EXPORT_IMAGE_TYPES.webp,
+  EXPORT_IMAGE_TYPES.jpg,
+  EXPORT_IMAGE_TYPES.excalidraw,
+];
+
+type AspectRatio = "original" | "1:1" | "4:5" | "3:4" | "2:3";
+
+// width / height, `undefined` keeps the drawing's own proportions
+const ASPECT_RATIOS: Record<AspectRatio, number | undefined> = {
+  original: undefined,
+  "1:1": 1,
+  "4:5": 4 / 5,
+  "3:4": 3 / 4,
+  "2:3": 2 / 3,
+};
+
+// only the rendered raster formats that support it can be resized
+const ASPECT_RATIO_FORMATS: ExportFormat[] = [
+  EXPORT_IMAGE_TYPES.png,
+  EXPORT_IMAGE_TYPES.jpg,
+];
+
 type ImageExportModalProps = {
   appStateSnapshot: Readonly<UIAppState>;
   elementsSnapshot: readonly NonDeletedExcalidrawElement[];
@@ -100,6 +128,15 @@ const ImageExportModal = ({
     appStateSnapshot.exportEmbedScene,
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>(
+    EXPORT_IMAGE_TYPES.png,
+  );
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("original");
+
+  const supportsAspectRatio = ASPECT_RATIO_FORMATS.includes(exportFormat);
+  const exportAspectRatio = supportsAspectRatio
+    ? ASPECT_RATIOS[aspectRatio]
+    : undefined;
 
   // Attribution mark: opted-out + survey-complete state, time-boxed to 30
   // days (see excalidraw-attribution-vision.md Section 9.7). Kept outside
@@ -198,7 +235,9 @@ const ImageExportModal = ({
       appState: {
         ...appStateSnapshot,
         name: projectName,
-        exportBackground: exportWithBackground,
+        // JPEG can't be transparent, the export always gets a background
+        exportBackground:
+          exportWithBackground || exportFormat === EXPORT_IMAGE_TYPES.jpg,
         exportWithDarkMode,
         exportScale,
         exportEmbedScene: embedScene,
@@ -208,6 +247,7 @@ const ImageExportModal = ({
       maxWidthOrHeight: Math.max(maxWidth, maxHeight),
       exportingFrame,
       attributionMark: { show: showAttributionMark },
+      aspectRatio: exportAspectRatio,
     })
       .then(async (canvas) => {
         if (isStaleRequest()) {
@@ -251,11 +291,17 @@ const ImageExportModal = ({
     exportingFrame,
     projectName,
     exportWithBackground,
+    exportFormat,
     exportWithDarkMode,
     exportScale,
     embedScene,
     showAttributionMark,
+    exportAspectRatio,
   ]);
+
+  const downloadLabel = t("imageExportDialog.button.download", {
+    format: t(`imageExportDialog.format.${exportFormat}`),
+  });
 
   return (
     <div className="ImageExportModal">
@@ -388,36 +434,53 @@ const ImageExportModal = ({
 
         {(!attributionOptedOut || attributionSurveyComplete) && (
           <div className="ImageExportModal__settings__buttons">
+            <ExportPills
+              options={EXPORT_FORMATS.map((format) => ({
+                value: format,
+                label: t(`imageExportDialog.format.${format}`),
+              }))}
+              value={exportFormat}
+              onChange={setExportFormat}
+            />
+            {supportsAspectRatio && (
+              <div className="ImageExportModal__aspectRatio">
+                <div className="ImageExportModal__aspectRatio__label">
+                  {t("imageExportDialog.aspectRatio.title")}
+                </div>
+                <ExportPills
+                  options={(Object.keys(ASPECT_RATIOS) as AspectRatio[]).map(
+                    (ratio) => ({
+                      value: ratio,
+                      label:
+                        ratio === "original"
+                          ? t("imageExportDialog.aspectRatio.original")
+                          : ratio,
+                    }),
+                  )}
+                  value={aspectRatio}
+                  onChange={setAspectRatio}
+                />
+              </div>
+            )}
             <FilledButton
               className="ImageExportModal__settings__buttons__button"
-              label={t("imageExportDialog.title.exportToPng")}
+              label={downloadLabel}
               onClick={() =>
-                onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements, {
+                onExportImage(exportFormat, exportedElements, {
                   exportingFrame,
                   showAttributionMark,
+                  aspectRatio: exportAspectRatio,
                 })
               }
               icon={downloadIcon}
             >
-              {t("imageExportDialog.button.exportToPng")}
-            </FilledButton>
-            <FilledButton
-              className="ImageExportModal__settings__buttons__button"
-              label={t("imageExportDialog.title.exportToSvg")}
-              onClick={() =>
-                onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
-                  exportingFrame,
-                  showAttributionMark,
-                })
-              }
-              icon={downloadIcon}
-            >
-              {t("imageExportDialog.button.exportToSvg")}
+              {downloadLabel}
             </FilledButton>
             {(probablySupportsClipboardBlob || isFirefox) && (
               <FilledButton
                 className="ImageExportModal__settings__buttons__button"
                 label={t("imageExportDialog.title.copyPngToClipboard")}
+                disabled={exportFormat === EXPORT_IMAGE_TYPES.excalidraw}
                 status={copyStatus}
                 onClick={async () => {
                   await onExportImage(
@@ -426,6 +489,7 @@ const ImageExportModal = ({
                     {
                       exportingFrame,
                       showAttributionMark,
+                      aspectRatio: exportAspectRatio,
                     },
                   );
                   onCopy();
@@ -438,6 +502,34 @@ const ImageExportModal = ({
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+const ExportPills = <T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}) => {
+  return (
+    <div className="ImageExportModal__pills">
+      {options.map((option) => (
+        <button
+          type="button"
+          key={option.value}
+          className={clsx("ImageExportModal__pill", {
+            "ImageExportModal__pill--active": option.value === value,
+          })}
+          aria-pressed={option.value === value}
+          onClick={() => onChange(option.value)}
+        >
+          {option.label}
+        </button>
+      ))}
     </div>
   );
 };

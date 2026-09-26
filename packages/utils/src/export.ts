@@ -48,9 +48,11 @@ export const exportToCanvas = ({
   exportPadding,
   exportingFrame,
   attributionMark,
+  aspectRatio,
 }: ExportOpts & {
   exportPadding?: number;
   attributionMark?: { show: boolean };
+  aspectRatio?: number;
 }) => {
   const restoredElements = getNonDeletedElements(
     restoreElements(elements, null, {
@@ -70,6 +72,7 @@ export const exportToCanvas = ({
       viewBackgroundColor,
       exportingFrame,
       attributionMark,
+      aspectRatio,
     },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");

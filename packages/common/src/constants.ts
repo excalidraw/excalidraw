@@ -326,6 +326,9 @@ export const ALLOWED_PASTE_MIME_TYPES = [
 export const EXPORT_IMAGE_TYPES = {
   png: "png",
   svg: "svg",
+  webp: "webp",
+  jpg: "jpg",
+  excalidraw: "excalidraw",
   clipboard: "clipboard",
 } as const;
 

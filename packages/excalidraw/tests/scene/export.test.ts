@@ -807,3 +807,54 @@ describe("attribution mark", () => {
     expect(ty).toBeLessThan(svgHeight);
   });
 });
+
+describe("aspect ratio", () => {
+  const getCanvasSize = async (
+    size: { width: number; height: number },
+    aspectRatio?: number,
+  ) => {
+    const canvas = await exportToCanvas({
+      elements: [API.createElement({ type: "rectangle", ...size })],
+      files: null,
+      exportPadding: 0,
+      aspectRatio,
+    });
+    return { width: canvas.width, height: canvas.height };
+  };
+
+  it("keeps the original size when no ratio is set", async () => {
+    expect(await getCanvasSize({ width: 200, height: 100 })).toEqual({
+      width: 200,
+      height: 100,
+    });
+  });
+
+  it("grows a wide drawing's height to reach the ratio", async () => {
+    expect(await getCanvasSize({ width: 200, height: 100 }, 1)).toEqual({
+      width: 200,
+      height: 200,
+    });
+    expect(await getCanvasSize({ width: 200, height: 100 }, 2 / 3)).toEqual({
+      width: 200,
+      height: 300,
+    });
+  });
+
+  it("grows a tall drawing's width to reach the ratio", async () => {
+    expect(await getCanvasSize({ width: 100, height: 200 }, 1)).toEqual({
+      width: 200,
+      height: 200,
+    });
+  });
+
+  it("never crops the drawing", async () => {
+    // 4:5 (0.8) is taller than a 200x100 drawing, so only the height grows
+    const { width, height } = await getCanvasSize(
+      { width: 200, height: 100 },
+      4 / 5,
+    );
+    expect(width).toBeGreaterThanOrEqual(200);
+    expect(height).toBeGreaterThanOrEqual(100);
+    expect(width / height).toBeCloseTo(4 / 5, 1);
+  });
+});

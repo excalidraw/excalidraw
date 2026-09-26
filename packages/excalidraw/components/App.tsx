@@ -2807,6 +2807,7 @@ class App extends React.Component<AppProps, AppState> {
     opts: {
       exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
       showAttributionMark?: boolean;
+      aspectRatio?: number;
     },
   ) => {
     trackEvent("export", type, "ui");
@@ -2821,6 +2822,7 @@ class App extends React.Component<AppProps, AppState> {
         viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
         attributionMark: { show: !!opts.showAttributionMark },
+        aspectRatio: opts.aspectRatio,
       },
     )
       .catch(muteFSAbortError)
