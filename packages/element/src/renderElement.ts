@@ -47,12 +47,7 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
-import {
-  getCodeBlockMeta,
-  isCodeBlockTextElement,
-  tokenizeCode,
-  wrapCodeLines,
-} from "./codeBlock";
+import { hasTextBackground, parseMarkdownCodeFenceLines } from "./codeBlock";
 import { getUncroppedImageElement } from "./cropElement";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
@@ -434,56 +429,21 @@ const strokeStickyNoteEdge = (
   context.restore();
 };
 
-/**
- * Renders a code block's bound text element with per-token syntax colors.
- * Relies on the monospace font having a constant advance width, so each run is
- * placed at `column * charWidth`. Token colors come from the code block's own
- * theme, so we deliberately skip the global dark-mode filter here.
- */
-const drawCodeBlockText = (
-  element: NonDeletedExcalidrawElement & { type: "text" },
+const getCodeLineStart = (
   context: CanvasRenderingContext2D,
-  isDarkMode: boolean,
+  element: ExcalidrawTextElement,
+  runs: readonly { text: string }[],
 ) => {
-  const meta = getCodeBlockMeta(element);
-  if (!meta) {
-    return;
+  if (element.textAlign === "left") {
+    return 0;
   }
-
-  context.save();
-  context.font = getFontString(element);
-  context.textAlign = "left";
-  context.textBaseline = "alphabetic";
-
-  const charWidth = context.measureText("M").width || element.fontSize * 0.6;
-  const lineHeightPx = getLineHeightInPx(element.fontSize, element.lineHeight);
-  const verticalOffset = getVerticalOffset(
-    element.fontFamily,
-    element.fontSize,
-    lineHeightPx,
-  );
-
-  let lines = tokenizeCode(
-    element.text,
-    meta.language,
-    isDarkMode ? "dark" : "light",
-  );
-
-  if (meta.wrap) {
-    const maxChars = Math.max(1, Math.floor(element.width / charWidth));
-    lines = wrapCodeLines(lines, maxChars);
+  let width = 0;
+  for (const run of runs) {
+    width += context.measureText(run.text).width;
   }
-
-  for (let index = 0; index < lines.length; index++) {
-    const y = index * lineHeightPx + verticalOffset;
-    let column = 0;
-    for (const run of lines[index]) {
-      context.fillStyle = run.color;
-      context.fillText(run.text, column * charWidth, y);
-      column += run.text.length;
-    }
-  }
-  context.restore();
+  return element.textAlign === "center"
+    ? (element.width - width) / 2
+    : element.width - width;
 };
 
 const drawElementOnCanvas = (
@@ -681,9 +641,7 @@ const drawElementOnCanvas = (
       break;
     }
     default: {
-      if (isCodeBlockTextElement(element)) {
-        drawCodeBlockText(element, context, renderConfig.theme === THEME.DARK);
-      } else if (isTextElement(element)) {
+      if (isTextElement(element)) {
         const rtl = isRTL(element.text);
         const shouldTemporarilyAttach = rtl && !context.canvas.isConnected;
         if (shouldTemporarilyAttach) {
@@ -693,8 +651,17 @@ const drawElementOnCanvas = (
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
+
+        if (hasTextBackground(element)) {
+          context.fillStyle = applyDarkModeFilter(
+            element.backgroundColor,
+            renderConfig.theme === THEME.DARK,
+          );
+          context.fillRect(0, 0, element.width, element.height);
+        }
+
         context.font = getFontString(element);
-        context.fillStyle = applyDarkModeFilter(
+        const textColor = applyDarkModeFilter(
           element.strokeColor,
           renderConfig.theme === THEME.DARK,
         );
@@ -702,6 +669,10 @@ const drawElementOnCanvas = (
 
         // Canvas does not support multiline text by default
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
+        const markdownLines = parseMarkdownCodeFenceLines(
+          element.text,
+          renderConfig.theme === THEME.DARK ? "dark" : "light",
+        );
 
         const horizontalOffset =
           element.textAlign === "center"
@@ -722,11 +693,25 @@ const drawElementOnCanvas = (
         );
 
         for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
-          );
+          const markdownLine = markdownLines?.[index];
+          const y = index * lineHeightPx + verticalOffset;
+          if (markdownLine?.type === "fence") {
+            continue;
+          }
+          if (markdownLine?.type === "code") {
+            context.textAlign = "left";
+            let x = getCodeLineStart(context, element, markdownLine.runs);
+            for (const run of markdownLine.runs) {
+              context.fillStyle = run.color;
+              context.fillText(run.text, x, y);
+              x += context.measureText(run.text).width;
+            }
+            continue;
+          }
+
+          context.textAlign = element.textAlign as CanvasTextAlign;
+          context.fillStyle = textColor;
+          context.fillText(lines[index], horizontalOffset, y);
         }
         context.restore();
         if (shouldTemporarilyAttach) {

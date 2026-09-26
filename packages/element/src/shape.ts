@@ -47,8 +47,6 @@ import type {
 
 import { elementWithCanvasCache } from "./renderElement";
 
-import { CODE_BLOCK_THEMES, getCodeBlockBorderColor } from "./codeBlock";
-
 import {
   canBecomePolygon,
   isElbowArrow,
@@ -68,8 +66,6 @@ import {
   getElementAbsoluteCoords,
 } from "./bounds";
 import { shouldTestInside } from "./collision";
-
-import type { CodeBlockTheme } from "./codeBlock";
 
 import type {
   ExcalidrawElement,
@@ -201,14 +197,6 @@ export const generateRoughOptions = (
   continuousPath = false,
   isDarkMode: boolean = false,
 ): Options => {
-  // code block containers use editor colors driven by the current app theme
-  // (light/dark) rather than the generic per-color dark-mode inversion
-  const codeBlockTheme: CodeBlockTheme | null = element.customData?.codeBlock
-    ? isDarkMode
-      ? "dark"
-      : "light"
-    : null;
-
   const options: Options = {
     seed: element.seed,
     strokeLineDash:
@@ -232,9 +220,7 @@ export const generateRoughOptions = (
     fillWeight: element.strokeWidth / 2,
     hachureGap: element.strokeWidth * 4,
     roughness: adjustRoughness(element),
-    stroke: codeBlockTheme
-      ? getCodeBlockBorderColor(codeBlockTheme)
-      : applyDarkModeFilter(element.strokeColor, isDarkMode),
+    stroke: applyDarkModeFilter(element.strokeColor, isDarkMode),
     preserveVertices:
       continuousPath || element.roughness < ROUGHNESS.cartoonist,
   };
@@ -246,9 +232,7 @@ export const generateRoughOptions = (
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
-      options.fill = codeBlockTheme
-        ? CODE_BLOCK_THEMES[codeBlockTheme].background
-        : isTransparent(element.backgroundColor)
+      options.fill = isTransparent(element.backgroundColor)
         ? undefined
         : applyDarkModeFilter(element.backgroundColor, isDarkMode);
       if (element.type === "ellipse") {

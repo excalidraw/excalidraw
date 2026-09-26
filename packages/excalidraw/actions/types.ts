@@ -130,8 +130,6 @@ export type ActionName =
   | "selectAllElementsInFrame"
   | "removeAllElementsFromFrame"
   | "updateFrameRendering"
-  | "insertCodeBlock"
-  | "toggleCodeBlockWrap"
   | "createContainerFromText"
   | "wrapTextInContainer"
   | "commandPalette"

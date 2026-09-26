@@ -177,17 +177,11 @@ export const SelectedShapeActions = ({
 
       {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
 
-      {predicates.editableText && (
+      {predicates.text && (
         <>
           <fieldset>{renderAction("changeFontFamily")}</fieldset>
           {renderAction("changeFontSize")}
           {predicates.textAlign && renderAction("changeTextAlign")}
-        </>
-      )}
-      {predicates.codeBlockText && (
-        <>
-          {renderAction("changeFontSize")}
-          {renderAction("toggleCodeBlockWrap")}
         </>
       )}
 
@@ -482,7 +476,6 @@ const CombinedTextProperties = ({
           >
             <div className="selected-shape-actions">
               {predicates.text && renderAction("changeFontSize")}
-              {predicates.codeBlockText && renderAction("toggleCodeBlockWrap")}
               {predicates.textAlign && renderAction("changeTextAlign")}
               {predicates.verticalAlign && renderAction("changeVerticalAlign")}
             </div>
@@ -685,11 +678,9 @@ export const CompactShapeActions = ({
       {/* Text Properties */}
       {predicates.text && (
         <>
-          {predicates.editableText && (
-            <div className="compact-action-item">
-              {renderAction("changeFontFamily")}
-            </div>
-          )}
+          <div className="compact-action-item">
+            {renderAction("changeFontFamily")}
+          </div>
           <CombinedTextProperties
             appState={appState}
             renderAction={renderAction}
@@ -835,11 +826,9 @@ export const MobileShapeActions = ({
         {/* Text Properties */}
         {predicates.text && (
           <>
-            {predicates.editableText && (
-              <div className="compact-action-item">
-                {renderAction("changeFontFamily")}
-              </div>
-            )}
+            <div className="compact-action-item">
+              {renderAction("changeFontFamily")}
+            </div>
             <CombinedTextProperties
               appState={appState}
               renderAction={renderAction}

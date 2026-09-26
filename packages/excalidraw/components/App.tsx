@@ -125,7 +125,6 @@ import {
   newFrameElement,
   newFreeDrawElement,
   newEmbeddableElement,
-  newCodeBlockElements,
   newMagicFrameElement,
   newStickyNoteElement,
   newIframeElement,
@@ -236,7 +235,6 @@ import {
   CaptureUpdateAction,
   type ElementUpdate,
   hitElementBoundingBox,
-  isCodeBlockTextElement,
   isLineElement,
   isSimpleArrow,
   StoreDelta,
@@ -4713,24 +4711,6 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    // ------------------- Code block -------------------
-    if (!isPlainPaste && data.code) {
-      const { container, text } = newCodeBlockElements({
-        code: data.code.value,
-        language: data.code.language,
-        theme: this.state.theme === THEME.DARK ? "dark" : "light",
-        x: 0,
-        y: 0,
-      });
-      this.addElementsFromPasteOrLibrary({
-        elements: [container, text],
-        files: null,
-        position:
-          this.editorInterface.formFactor === "desktop" ? "cursor" : "center",
-      });
-      return;
-    }
-
     // ------------------- Only textual stuff remaining -------------------
     if (!data.text) {
       return;
@@ -5044,6 +5024,9 @@ class App extends React.Component<AppProps, AppState> {
       y,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
+      customData: !isTransparent(this.state.currentItemBackgroundColor)
+        ? { textBackground: true }
+        : undefined,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.getCurrentItemStrokeWidth("text"),
       strokeStyle: this.state.currentItemStrokeStyle,
@@ -7109,6 +7092,11 @@ class App extends React.Component<AppProps, AppState> {
             ? container.strokeColor
             : this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
+        customData:
+          !(shouldBindToContainer && isStickyNoteElement(container)) &&
+          !isTransparent(this.state.currentItemBackgroundColor)
+            ? { textBackground: true }
+            : undefined,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.getCurrentItemStrokeWidth("text"),
         strokeStyle: this.state.currentItemStrokeStyle,
@@ -7270,25 +7258,6 @@ class App extends React.Component<AppProps, AppState> {
       event,
       this.state,
     );
-
-    // double-clicking a code block opens the code block editor dialog
-    const doubleClickedElement = this.getElementAtPosition(sceneX, sceneY, {
-      includeBoundTextElement: true,
-    });
-    if (
-      doubleClickedElement &&
-      (isCodeBlockTextElement(doubleClickedElement) ||
-        (doubleClickedElement.type === "rectangle" &&
-          !!doubleClickedElement.customData?.codeBlock))
-    ) {
-      this.setState({
-        openDialog: {
-          name: "codeBlock",
-          editingElementId: doubleClickedElement.id,
-        },
-      });
-      return;
-    }
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       const selectedLinearElement: ExcalidrawLinearElement =

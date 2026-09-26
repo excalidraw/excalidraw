@@ -8,8 +8,6 @@ import {
   DEFAULT_VERTICAL_ALIGN,
   DEFAULT_STROKE_STREAMLINE,
   VERTICAL_ALIGN,
-  FONT_FAMILY,
-  ROUNDNESS,
   randomInteger,
   randomId,
   getFontString,
@@ -20,16 +18,6 @@ import {
 import type { Radians } from "@excalidraw/math";
 
 import type { MarkOptional, Merge } from "@excalidraw/common/utility-types";
-
-import {
-  CODE_BLOCK_FONT_SIZE,
-  CODE_BLOCK_PADDING,
-  CODE_BLOCK_THEMES,
-  DEFAULT_CODE_BLOCK_THEME,
-  getCodeBlockBorderColor,
-  normalizeCodeLanguage,
-  normalizeCodeText,
-} from "./codeBlock";
 
 import {
   getElementAbsoluteCoords,
@@ -45,8 +33,6 @@ import { normalizeText, measureText } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
 
 import { isLineElement } from "./typeChecks";
-
-import type { CodeBlockMeta, CodeBlockTheme } from "./codeBlock";
 
 import type {
   ExcalidrawElement,
@@ -326,70 +312,6 @@ export const getTextAnchorRatios = (opts: {
       ? 1
       : 0,
 });
-
-/**
- * Builds a code block: a rectangle container + a monospace, auto-resizing text
- * element, grouped together so they move/select/delete as one unit. The text is
- * left/top aligned and never wrapped, preserving indentation. Both elements
- * carry `customData.codeBlock` so the renderer can syntax-highlight the text.
- *
- * Returns the elements in z-order (container behind text).
- */
-export const newCodeBlockElements = (opts: {
-  code: string;
-  language?: string | null;
-  theme?: CodeBlockTheme;
-  showLineNumbers?: boolean;
-  fontSize?: number;
-  x: number;
-  y: number;
-}): {
-  container: NonDeleted<ExcalidrawGenericElement>;
-  text: NonDeleted<ExcalidrawTextElement>;
-} => {
-  const language = normalizeCodeLanguage(opts.language);
-  const theme = opts.theme ?? DEFAULT_CODE_BLOCK_THEME;
-  const palette = CODE_BLOCK_THEMES[theme];
-  const code = normalizeCodeText(opts.code) || " ";
-  const groupId = randomId();
-  const codeBlock: CodeBlockMeta = {
-    language,
-    theme,
-    showLineNumbers: opts.showLineNumbers ?? false,
-  };
-
-  const text = newTextElement({
-    x: opts.x + CODE_BLOCK_PADDING,
-    y: opts.y + CODE_BLOCK_PADDING,
-    text: code,
-    fontFamily: FONT_FAMILY.Cascadia,
-    fontSize: opts.fontSize ?? CODE_BLOCK_FONT_SIZE,
-    textAlign: "left",
-    verticalAlign: VERTICAL_ALIGN.TOP,
-    autoResize: true,
-    strokeColor: palette.foreground,
-    groupIds: [groupId],
-    customData: { codeBlock },
-  });
-
-  const container = newElement({
-    type: "rectangle",
-    x: opts.x,
-    y: opts.y,
-    width: text.width + CODE_BLOCK_PADDING * 2,
-    height: text.height + CODE_BLOCK_PADDING * 2,
-    backgroundColor: palette.background,
-    fillStyle: "solid",
-    strokeColor: getCodeBlockBorderColor(theme),
-    strokeWidth: 1,
-    roughness: 0,
-    roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
-    groupIds: [groupId],
-    customData: { codeBlock: { language, theme } },
-  });
-
-  return { container, text };
-};
 
 /** computes element x/y offset based on textAlign/verticalAlign */
 const getTextElementPositionOffsets = (

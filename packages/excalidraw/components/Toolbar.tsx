@@ -14,7 +14,6 @@ import { PenModeButton } from "./PenModeButton";
 import Stack from "./Stack";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
-  codeIcon,
   drawShapeToolIcon,
   EmbedIcon,
   frameToolIcon,
@@ -171,13 +170,6 @@ const ExtraToolsDropdown = ({
           disabled={isToolButtonDisabled(app, "laser")}
         >
           {t("toolBar.laser")}
-        </DropdownMenu.Item>
-        <DropdownMenu.Item
-          onSelect={() => app.setOpenDialog({ name: "codeBlock" })}
-          icon={codeIcon}
-          data-testid="toolbar-code-block"
-        >
-          {t("toolBar.codeBlock")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "bucketfill" })}

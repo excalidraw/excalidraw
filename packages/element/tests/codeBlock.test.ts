@@ -1,13 +1,11 @@
 import {
-  CODE_BLOCK_PADDING,
-  isCodeBlockTextElement,
   normalizeCodeLanguage,
+  parseMarkdownCodeFenceLines,
   tokenizeCode,
 } from "../src/codeBlock";
-import { newCodeBlockElements } from "../src/newElement";
 
 describe("normalizeCodeLanguage", () => {
-  it("maps aliases to canonical language ids", () => {
+  it("maps aliases to bundled Prism language ids", () => {
     expect(normalizeCodeLanguage("js")).toBe("javascript");
     expect(normalizeCodeLanguage("TS")).toBe("typescript");
     expect(normalizeCodeLanguage("py")).toBe("python");
@@ -15,78 +13,82 @@ describe("normalizeCodeLanguage", () => {
     expect(normalizeCodeLanguage("xml")).toBe("html");
   });
 
-  it("falls back to plaintext for unknown languages", () => {
+  it("uses plaintext for an absent or unsupported language", () => {
+    expect(normalizeCodeLanguage()).toBe("plaintext");
     expect(normalizeCodeLanguage("brainfuck")).toBe("plaintext");
-  });
-
-  it("defaults to javascript when empty", () => {
-    expect(normalizeCodeLanguage("")).toBe("javascript");
-    expect(normalizeCodeLanguage(null)).toBe("javascript");
   });
 });
 
 describe("tokenizeCode", () => {
-  it("splits source into one entry per line, preserving indentation", () => {
+  it("preserves source text, line breaks, and indentation", () => {
     const code = "def f(x):\n    return x";
-    const lines = tokenizeCode(code, "python", "dark");
-    expect(lines).toHaveLength(2);
-    // the second line keeps its leading whitespace
-    const secondLineText = lines[1].map((run) => run.text).join("");
-    expect(secondLineText.startsWith("    ")).toBe(true);
-  });
-
-  it("assigns distinct colors to keywords vs identifiers", () => {
-    const lines = tokenizeCode("const x = 1;", "javascript", "dark");
-    const runs = lines[0];
-    const keywordRun = runs.find((run) => run.text === "const");
-    const numberRun = runs.find((run) => run.text === "1");
-    expect(keywordRun).toBeDefined();
-    expect(numberRun).toBeDefined();
-    expect(keywordRun!.color).not.toBe(numberRun!.color);
-  });
-
-  it("round-trips the source text across runs", () => {
-    const code = "function add(a, b) {\n  return a + b;\n}";
-    const roundTrip = tokenizeCode(code, "javascript", "light")
+    const roundTrip = tokenizeCode(code, "python", "dark")
       .map((line) => line.map((run) => run.text).join(""))
       .join("\n");
+
     expect(roundTrip).toBe(code);
+  });
+
+  it("assigns distinct colors to syntax token types", () => {
+    const runs = tokenizeCode("const x = 1;", "javascript", "dark")[0];
+    const keywordRun = runs.find((run) => run.text === "const");
+    const numberRun = runs.find((run) => run.text === "1");
+
+    expect(keywordRun?.color).toBeDefined();
+    expect(numberRun?.color).toBeDefined();
+    expect(keywordRun?.color).not.toBe(numberRun?.color);
   });
 });
 
-describe("newCodeBlockElements", () => {
-  it("creates a grouped rectangle container + code text element", () => {
-    const { container, text } = newCodeBlockElements({
-      code: "print('hi')",
-      language: "python",
-      theme: "dark",
-      x: 100,
-      y: 200,
-    });
+describe("parseMarkdownCodeFenceLines", () => {
+  it("detects fenced sections inside ordinary text", () => {
+    const lines = parseMarkdownCodeFenceLines(
+      [
+        "Before",
+        "```js",
+        "const value = 1;",
+        "```",
+        "After",
+        "~~~py",
+        "return True",
+        "~~~~",
+      ].join("\n"),
+      "light",
+    );
 
-    expect(container.type).toBe("rectangle");
-    expect(text.type).toBe("text");
-    expect(isCodeBlockTextElement(text)).toBe(true);
-    expect((container.customData?.codeBlock as any).language).toBe("python");
-
-    // shared group so they move/select together
-    expect(container.groupIds).toEqual(text.groupIds);
-    expect(container.groupIds.length).toBe(1);
-
-    // container wraps the text with padding on both axes
-    expect(text.x).toBe(container.x + CODE_BLOCK_PADDING);
-    expect(text.y).toBe(container.y + CODE_BLOCK_PADDING);
-    expect(container.width).toBeGreaterThan(text.width);
-    expect(container.height).toBeGreaterThan(text.height);
+    expect(lines?.map((line) => line.type)).toEqual([
+      "text",
+      "fence",
+      "code",
+      "fence",
+      "text",
+      "fence",
+      "code",
+      "fence",
+    ]);
+    expect(
+      lines?.[2].type === "code"
+        ? lines[2].runs.map((run) => run.text).join("")
+        : null,
+    ).toBe("const value = 1;");
   });
 
-  it("expands tabs so indentation renders with the monospace grid", () => {
-    const { text } = newCodeBlockElements({
-      code: "if x:\n\treturn",
-      language: "python",
-      x: 0,
-      y: 0,
-    });
-    expect(text.text).not.toContain("\t");
+  it("highlights an unfinished fence while it is edited", () => {
+    const lines = parseMarkdownCodeFenceLines(
+      "```ts\nconst value: number = 1;",
+      "dark",
+    );
+
+    expect(lines?.map((line) => line.type)).toEqual(["fence", "code"]);
+  });
+
+  it("keeps an empty block aligned with its two source lines", () => {
+    const lines = parseMarkdownCodeFenceLines("```js\n```", "dark");
+
+    expect(lines?.map((line) => line.type)).toEqual(["fence", "fence"]);
+  });
+
+  it("does no parsing work for regular text", () => {
+    expect(parseMarkdownCodeFenceLines("const value = 1;", "dark")).toBeNull();
   });
 });

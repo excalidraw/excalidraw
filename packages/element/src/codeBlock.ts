@@ -1,23 +1,6 @@
-/**
- * Code block support: a code block is modelled as a regular rectangle container
- * with a bound monospace text element. Both carry `customData.codeBlock` so the
- * renderer can syntax-highlight the text on canvas (and in SVG export).
- *
- * Highlighting is done by tokenizing the source with Prism and drawing each
- * token run in its theme color. We intentionally only bundle a curated set of
- * languages to keep the bundle small.
- */
-import {
-  FONT_FAMILY,
-  FONT_SIZES,
-  getFontString,
-  getLineHeight,
-} from "@excalidraw/common";
-
 import Prism from "prismjs";
 
-// NOTE: order matters — a language component must be imported after the
-// languages it extends (clike/javascript/markup are bundled with prism core).
+// Order matters: extended grammars load after their dependencies.
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-jsx";
@@ -30,90 +13,58 @@ import "prismjs/components/prism-css";
 import "prismjs/components/prism-json";
 import "prismjs/components/prism-bash";
 
-import {
-  getLineHeightInPx,
-  getLineWidth,
-  measureText,
-} from "./textMeasurements";
+import type { ExcalidrawElement } from "./types";
 
-import type { ExcalidrawElement, ExcalidrawTextElement } from "./types";
+export const hasTextBackground = (element: ExcalidrawElement): boolean =>
+  element.type === "text" && element.customData?.textBackground === true;
 
 export type CodeBlockTheme = "light" | "dark";
 
-export type CodeBlockMeta = {
-  language: string;
-  /**
-   * @deprecated colors now follow the live app theme at render time; retained
-   * for backwards compatibility with previously-created blocks.
-   */
-  theme?: CodeBlockTheme;
-  showLineNumbers?: boolean;
-  /** wrap long lines to fit the block's width instead of overflowing it */
-  wrap?: boolean;
-};
-
-export const DEFAULT_CODE_BLOCK_LANGUAGE = "javascript";
-export const DEFAULT_CODE_BLOCK_THEME: CodeBlockTheme = "dark";
-
-/** font size (px) used for the bound code text element */
-export const CODE_BLOCK_FONT_SIZE = 16;
-/** inner padding (px) between the container edge and the code text */
-export const CODE_BLOCK_PADDING = 12;
-/** tabs are expanded to this many spaces so monospace columns line up */
-export const CODE_BLOCK_TAB_SIZE = 2;
-
-/** Languages offered in the UI (value is the canonical Prism-compatible id). */
-export const CODE_BLOCK_LANGUAGES: { value: string; label: string }[] = [
-  { value: "plaintext", label: "Plain Text" },
-  { value: "javascript", label: "JavaScript" },
-  { value: "typescript", label: "TypeScript" },
-  { value: "jsx", label: "JSX" },
-  { value: "tsx", label: "TSX" },
-  { value: "python", label: "Python" },
-  { value: "java", label: "Java" },
-  { value: "c", label: "C" },
-  { value: "cpp", label: "C++" },
-  { value: "css", label: "CSS" },
-  { value: "html", label: "HTML" },
-  { value: "json", label: "JSON" },
-  { value: "bash", label: "Bash" },
-];
-
 const LANGUAGE_ALIASES: Record<string, string> = {
   js: "javascript",
-  node: "javascript",
+  jsx: "jsx",
   ts: "typescript",
+  tsx: "tsx",
   py: "python",
-  py3: "python",
-  python3: "python",
-  "c++": "cpp",
-  cc: "cpp",
-  h: "c",
-  hpp: "cpp",
   sh: "bash",
   shell: "bash",
   zsh: "bash",
-  markup: "html",
+  html: "html",
   xml: "html",
-  htm: "html",
+  svg: "html",
+  c: "c",
+  "c++": "cpp",
+  cpp: "cpp",
   text: "plaintext",
   txt: "plaintext",
-  plain: "plaintext",
 };
 
-/** Normalize a loose language id (e.g. from a paste) to a canonical id. */
+const SUPPORTED_LANGUAGES: Record<string, true> = {
+  plaintext: true,
+  javascript: true,
+  typescript: true,
+  jsx: true,
+  tsx: true,
+  python: true,
+  java: true,
+  c: true,
+  cpp: true,
+  css: true,
+  html: true,
+  json: true,
+  bash: true,
+};
+
+/** Normalizes a Markdown fence info string to a bundled Prism grammar. */
 export const normalizeCodeLanguage = (language?: string | null): string => {
-  const lang = (language || "").trim().toLowerCase();
+  const lang = (language ?? "").trim().toLowerCase();
   if (!lang) {
-    return DEFAULT_CODE_BLOCK_LANGUAGE;
+    return "plaintext";
   }
   const normalized = LANGUAGE_ALIASES[lang] ?? lang;
-  return CODE_BLOCK_LANGUAGES.some((l) => l.value === normalized)
-    ? normalized
-    : "plaintext";
+  return SUPPORTED_LANGUAGES[normalized] ? normalized : "plaintext";
 };
 
-/** Maps a canonical language id to the Prism grammar key. */
 const getPrismGrammar = (language: string): Prism.Grammar | null => {
   const key = language === "html" ? "markup" : language;
   return (
@@ -121,17 +72,13 @@ const getPrismGrammar = (language: string): Prism.Grammar | null => {
   );
 };
 
-// --- token color themes (approx. VS Code Dark+ / Light+) ---------------------
-
 type TokenTheme = {
-  background: string;
   foreground: string;
   colors: Record<string, string>;
 };
 
-export const CODE_BLOCK_THEMES: Record<CodeBlockTheme, TokenTheme> = {
+const CODE_BLOCK_THEMES: Record<CodeBlockTheme, TokenTheme> = {
   dark: {
-    background: "#1e1e1e",
     foreground: "#d4d4d4",
     colors: {
       comment: "#6a9955",
@@ -162,7 +109,6 @@ export const CODE_BLOCK_THEMES: Record<CodeBlockTheme, TokenTheme> = {
     },
   },
   light: {
-    background: "#f6f8fa",
     foreground: "#1f2328",
     colors: {
       comment: "#008000",
@@ -194,124 +140,8 @@ export const CODE_BLOCK_THEMES: Record<CodeBlockTheme, TokenTheme> = {
   },
 };
 
-/** border color for the container rectangle, per theme */
-export const getCodeBlockBorderColor = (theme: CodeBlockTheme): string =>
-  theme === "dark" ? "#3c3c3c" : "#d0d7de";
-
-/** font string for the bound code text element */
-export const getCodeBlockFontString = (
-  fontSize: number = CODE_BLOCK_FONT_SIZE,
-) =>
-  getFontString({
-    fontFamily: FONT_FAMILY.Cascadia,
-    fontSize,
-  });
-
-/** Hard-wraps a single plain-text line into chunks of at most `maxChars` columns. */
-const wrapPlainLine = (line: string, maxChars: number): string[] => {
-  if (line.length <= maxChars) {
-    return [line];
-  }
-  const chunks: string[] = [];
-  for (let i = 0; i < line.length; i += maxChars) {
-    chunks.push(line.slice(i, i + maxChars));
-  }
-  return chunks;
-};
-
-/** Number of visual lines `text` would occupy once wrapped at `maxChars` columns. */
-export const countWrappedLines = (text: string, maxChars: number): number => {
-  if (maxChars <= 0) {
-    return text.split("\n").length;
-  }
-  return text
-    .split("\n")
-    .reduce((count, line) => count + wrapPlainLine(line, maxChars).length, 0);
-};
-
-/**
- * measured width/height of normalized code at the given font size.
- * When `wrap` + `maxWidth` are provided, height accounts for lines wrapping
- * to fit `maxWidth` instead of overflowing it.
- */
-export const measureCodeBlockText = (
-  code: string,
-  opts?: { fontSize?: number; wrap?: boolean; maxWidth?: number },
-): { width: number; height: number } => {
-  const fontSize = opts?.fontSize ?? CODE_BLOCK_FONT_SIZE;
-  const font = getCodeBlockFontString(fontSize);
-  const normalized = normalizeCodeText(code) || " ";
-  const lineHeight = getLineHeight(FONT_FAMILY.Cascadia);
-
-  if (opts?.wrap && opts.maxWidth) {
-    const charWidth = getLineWidth("M", font) || fontSize * 0.6;
-    const maxChars = Math.max(1, Math.floor(opts.maxWidth / charWidth));
-    const lineCount = countWrappedLines(normalized, maxChars);
-    return {
-      width: opts.maxWidth,
-      height: lineCount * getLineHeightInPx(fontSize, lineHeight),
-    };
-  }
-
-  return measureText(normalized, font, lineHeight);
-};
-
-/** discrete font sizes a wrapped code block snaps to on vertical/diagonal resize */
-export const CODE_BLOCK_FONT_SIZE_STEPS = [
-  FONT_SIZES.sm,
-  FONT_SIZES.md,
-  FONT_SIZES.lg,
-  FONT_SIZES.xl,
-];
-
-/**
- * Picks the largest discrete font size (from ascending `steps`) whose
- * wrapped content still fits within `availableHeight` at `availableWidth`.
- * Falls back to the smallest step if even that overflows, so callers can
- * clamp the block to that minimum instead of clipping the code.
- */
-export const fitCodeBlockFontSize = (
-  code: string,
-  availableWidth: number,
-  availableHeight: number,
-  steps: readonly number[] = CODE_BLOCK_FONT_SIZE_STEPS,
-): { fontSize: number; width: number; height: number } => {
-  const firstStep = steps[0] ?? CODE_BLOCK_FONT_SIZE;
-  let fontSize = firstStep;
-  let metrics = measureCodeBlockText(code, {
-    fontSize,
-    wrap: true,
-    maxWidth: availableWidth,
-  });
-
-  for (let i = 1; i < steps.length; i++) {
-    const candidate = steps[i];
-    const candidateMetrics = measureCodeBlockText(code, {
-      fontSize: candidate,
-      wrap: true,
-      maxWidth: availableWidth,
-    });
-    if (candidateMetrics.height > availableHeight) {
-      break;
-    }
-    fontSize = candidate;
-    metrics = candidateMetrics;
-  }
-
-  return { fontSize, width: metrics.width, height: metrics.height };
-};
-
-/** Expand tabs and strip trailing blank lines so the block sizes tightly. */
-export const normalizeCodeText = (code: string): string =>
-  code.replace(/\t/g, " ".repeat(CODE_BLOCK_TAB_SIZE)).replace(/\s+$/, "");
-
 export type CodeRun = { text: string; color: string };
 export type CodeLine = CodeRun[];
-
-const colorForType = (
-  type: string | undefined,
-  theme: TokenTheme,
-): string | undefined => (type ? theme.colors[type] : undefined);
 
 const flattenTokens = (
   tokens: Array<string | Prism.Token>,
@@ -324,7 +154,8 @@ const flattenTokens = (
       acc.push({ text: token, color: inheritedColor });
       continue;
     }
-    const color = colorForType(token.type, theme) ?? inheritedColor;
+
+    const color = theme.colors[token.type] ?? inheritedColor;
     const { content } = token;
     if (typeof content === "string") {
       acc.push({ text: content, color });
@@ -336,10 +167,7 @@ const flattenTokens = (
   }
 };
 
-/**
- * Tokenize `code` and return, per source line, the colored runs that make it up.
- * Lines preserve all whitespace (indentation) since we never wrap.
- */
+/** Tokenizes source while preserving every source line and its whitespace. */
 export const tokenizeCode = (
   code: string,
   language: string,
@@ -347,8 +175,8 @@ export const tokenizeCode = (
 ): CodeLine[] => {
   const theme = CODE_BLOCK_THEMES[themeName];
   const grammar = getPrismGrammar(normalizeCodeLanguage(language));
-
   const runs: CodeRun[] = [];
+
   if (grammar) {
     try {
       flattenTokens(
@@ -357,100 +185,139 @@ export const tokenizeCode = (
         theme.foreground,
         runs,
       );
-    } catch {
-      runs.length = 0;
+    } catch (error) {
+      console.error("Failed to highlight fenced code", { language, error });
       runs.push({ text: code, color: theme.foreground });
     }
   } else {
     runs.push({ text: code, color: theme.foreground });
   }
 
-  // split runs into lines on newlines, preserving empty lines
   const lines: CodeLine[] = [[]];
   for (const run of runs) {
     const parts = run.text.split("\n");
-    for (let i = 0; i < parts.length; i++) {
-      if (i > 0) {
+    for (let index = 0; index < parts.length; index++) {
+      if (index > 0) {
         lines.push([]);
       }
-      if (parts[i] !== "") {
-        lines[lines.length - 1].push({ text: parts[i], color: run.color });
+      if (parts[index]) {
+        lines[lines.length - 1].push({ text: parts[index], color: run.color });
       }
     }
   }
   return lines;
 };
 
-/**
- * Re-wraps already-tokenized lines so no visual line exceeds `maxChars`
- * columns, splitting runs across the boundary while preserving their color.
- */
-export const wrapCodeLines = (
-  lines: CodeLine[],
-  maxChars: number,
-): CodeLine[] => {
-  if (maxChars <= 0) {
-    return lines;
+export type MarkdownLine =
+  | { type: "text"; text: string }
+  | { type: "fence" }
+  | { type: "code"; runs: CodeLine };
+
+type OpenFence = {
+  marker: "`" | "~";
+  length: number;
+  language: string;
+};
+
+const parseOpeningFence = (line: string): OpenFence | null => {
+  let offset = 0;
+  while (offset < 3 && line[offset] === " ") {
+    offset++;
+  }
+  const marker = line[offset];
+  if (marker !== "`" && marker !== "~") {
+    return null;
   }
 
-  const wrapped: CodeLine[] = [];
-  for (const line of lines) {
-    if (line.length === 0) {
-      wrapped.push([]);
+  let end = offset;
+  while (line[end] === marker) {
+    end++;
+  }
+  const length = end - offset;
+  if (length < 3) {
+    return null;
+  }
+
+  const info = line.slice(end).trim();
+  if (marker === "`" && info.includes("`")) {
+    return null;
+  }
+  return {
+    marker,
+    length,
+    language: normalizeCodeLanguage(info.split(/\s/, 1)[0]),
+  };
+};
+
+const isClosingFence = (line: string, fence: OpenFence): boolean => {
+  let offset = 0;
+  while (offset < 3 && line[offset] === " ") {
+    offset++;
+  }
+  let end = offset;
+  while (line[end] === fence.marker) {
+    end++;
+  }
+  return end - offset >= fence.length && line.slice(end).trim() === "";
+};
+
+/**
+ * Parses fenced sections in a text element. Delimiter lines stay in the layout
+ * as blank lines, keeping the in-canvas editor and rendered text geometrically
+ * aligned. Returns null when no opening fence exists, avoiding Prism work for
+ * ordinary text elements.
+ */
+export const parseMarkdownCodeFenceLines = (
+  text: string,
+  theme: CodeBlockTheme,
+): MarkdownLine[] | null => {
+  if (!text.includes("```") && !text.includes("~~~")) {
+    return null;
+  }
+
+  const sourceLines = text.replace(/\r\n?/g, "\n").split("\n");
+  const result: MarkdownLine[] = [];
+  let fence: OpenFence | null = null;
+  let codeStart = 0;
+
+  const appendCode = (end: number) => {
+    if (end === codeStart) {
+      return;
+    }
+    const codeLines = tokenizeCode(
+      sourceLines.slice(codeStart, end).join("\n"),
+      fence!.language,
+      theme,
+    );
+    for (const runs of codeLines) {
+      result.push({ type: "code", runs });
+    }
+  };
+
+  for (let index = 0; index < sourceLines.length; index++) {
+    const line = sourceLines[index];
+    if (!fence) {
+      const opening = parseOpeningFence(line);
+      if (opening) {
+        fence = opening;
+        codeStart = index + 1;
+        result.push({ type: "fence" });
+      } else {
+        result.push({ type: "text", text: line });
+      }
       continue;
     }
 
-    let current: CodeRun[] = [];
-    let column = 0;
-    for (const run of line) {
-      let text = run.text;
-      while (text.length > 0) {
-        const remaining = maxChars - column;
-        if (remaining <= 0) {
-          wrapped.push(current);
-          current = [];
-          column = 0;
-          continue;
-        }
-        const chunk = text.slice(0, remaining);
-        current.push({ text: chunk, color: run.color });
-        column += chunk.length;
-        text = text.slice(chunk.length);
-      }
+    if (isClosingFence(line, fence)) {
+      appendCode(index);
+      result.push({ type: "fence" });
+      fence = null;
     }
-    wrapped.push(current);
   }
-  return wrapped;
-};
 
-// --- element helpers ---------------------------------------------------------
-
-export const getCodeBlockMeta = (
-  element: ExcalidrawElement,
-): CodeBlockMeta | undefined =>
-  (element.customData?.codeBlock as CodeBlockMeta | undefined) ?? undefined;
-
-export const isCodeBlockTextElement = <T extends ExcalidrawElement>(
-  element: T,
-): element is T &
-  ExcalidrawTextElement & {
-    customData: { codeBlock: CodeBlockMeta };
-  } => element.type === "text" && !!element.customData?.codeBlock;
-
-export const isCodeBlockContainerElement = (
-  element: ExcalidrawElement,
-): boolean => element.type === "rectangle" && !!element.customData?.codeBlock;
-
-/** Finds the rectangle container grouped with a code block's text element. */
-export const findCodeBlockContainer = (
-  elements: readonly ExcalidrawElement[],
-  text: ExcalidrawElement,
-): ExcalidrawElement | undefined => {
-  const groupId = text.groupIds[0];
-  if (!groupId) {
-    return undefined;
+  if (fence) {
+    appendCode(sourceLines.length);
   }
-  return elements.find(
-    (el) => isCodeBlockContainerElement(el) && el.groupIds.includes(groupId),
-  );
+
+  return result;
 };

@@ -513,41 +513,6 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeLessThan(7000);
   });
 
-  it("ignores a text element's never-rendered backgroundColor", () => {
-    // text elements inherit currentItemBackgroundColor on creation but never
-    // paint it — such a text box overlapping the owner outline must neither
-    // cover (clip) the outline nor act as a boundary
-    const owner = API.createElement({
-      type: "rectangle",
-      x: 0,
-      y: 0,
-      width: 100,
-      height: 100,
-      roundness: null,
-    });
-    const text = API.createElement({
-      type: "text",
-      x: 80,
-      y: 40,
-      width: 60,
-      height: 25,
-      backgroundColor: "#ffec99",
-    });
-    const { elements, elementsMap } = setup([owner, text]);
-
-    const result = computeBucketFillPolygon({
-      point: pointFrom<GlobalPoint>(50, 50),
-      elements,
-      elementsMap,
-    });
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) {
-      return;
-    }
-    expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -1);
-  });
-
   it("does not treat a hachure-filled element as covering", () => {
     // hachure fill is see-through: the lower outline stays visible through it
     // and must still act as a boundary
