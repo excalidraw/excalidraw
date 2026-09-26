@@ -46,6 +46,12 @@
       background: var(--color-surface-low);
       font: inherit;
     }
+
+    &--secondary {
+      margin-top: 0;
+      opacity: 0.45;
+      font-size: 0.75rem;
+    }
   }
 
   .file-drop-overlay__illustration {

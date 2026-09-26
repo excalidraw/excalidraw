@@ -159,6 +159,23 @@ describe("file drop overlay", () => {
     expect(overlay()?.textContent).toContain("Drop to import library");
   });
 
+  it("mentions libraries when the file type is unknown, as for OS-dragged .excalidraw(lib) files", async () => {
+    await render(<Excalidraw />);
+    const canvas = GlobalTestState.interactiveCanvas;
+    const untyped = new h.app.ownerWindow.File([], "file", { type: "" });
+    drag(canvas, "dragenter", { files: [untyped] });
+    expect(overlay()?.textContent).toContain("Drop to replace content");
+    expect(overlay()?.textContent).toContain("Library files will append");
+    drag(canvas, "dragleave");
+
+    const json = new h.app.ownerWindow.File([], "file", {
+      type: MIME_TYPES.json,
+    });
+    drag(canvas, "dragenter", { files: [json] });
+    expect(overlay()?.textContent).toContain("Drop to replace content");
+    expect(overlay()?.textContent).not.toContain("Library files");
+  });
+
   it.each([
     { interaction: false as const },
     { ui: false as const },

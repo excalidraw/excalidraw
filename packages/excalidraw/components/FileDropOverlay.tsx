@@ -13,7 +13,9 @@ import "./FileDropOverlay.scss";
 
 type FileDropState = {
   shiftKey: boolean;
-  kind: "scene" | "library";
+  // "unknown": no MIME type, which is what OS-dragged .excalidraw and
+  // .excalidrawlib files both report, so it can be either until dropped
+  kind: "scene" | "library" | "unknown";
 };
 
 export const FileDropOverlay = () => {
@@ -46,8 +48,13 @@ export const FileDropOverlay = () => {
         return;
       }
 
+      const type = files[0]?.type;
       const kind: FileDropState["kind"] =
-        files[0]?.type === MIME_TYPES.excalidrawlib ? "library" : "scene";
+        type === MIME_TYPES.excalidrawlib
+          ? "library"
+          : type
+          ? "scene"
+          : "unknown";
 
       setDragState((previous) =>
         previous?.shiftKey === event.shiftKey && previous.kind === kind
@@ -143,6 +150,11 @@ export const FileDropOverlay = () => {
               />
             )}
           </div>
+          {dragState.kind === "unknown" && (
+            <div className="file-drop-overlay__hint file-drop-overlay__hint--secondary">
+              ({t("fileDrop.libraryHint")})
+            </div>
+          )}
         </div>
         <div className="file-drop-overlay__illustration" aria-hidden="true">
           {(["back", "front"] as const).map((position) => (

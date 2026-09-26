@@ -4,7 +4,8 @@
     "add": "Drop to add to canvas",
     "importLibrary": "Drop to import library",
     "replaceHint": "Hold <shift>Shift</shift> to keep existing content",
-    "keepHint": "Your existing content will be kept"
+    "keepHint": "Your existing content will be kept",
+    "libraryHint": "Library files will append"
   },
   "labels": {
     "signUp": "Sign up",
