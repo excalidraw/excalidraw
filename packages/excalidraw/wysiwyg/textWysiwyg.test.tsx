@@ -667,9 +667,10 @@ describe("textWysiwyg", () => {
     });
 
     it("should commit edited text before saving with Ctrl+Shift+S", () => {
+      // `perform` is async, so the mock has to hand back a promise.
       const saveSpy = vi
         .spyOn(actionSaveFileToDisk, "perform")
-        .mockImplementation(() => false);
+        .mockImplementation(() => Promise.resolve(false));
       const nextText = "saved while editing";
 
       updateTextEditor(textarea, nextText);
