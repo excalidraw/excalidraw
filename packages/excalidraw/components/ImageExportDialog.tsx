@@ -18,8 +18,14 @@ import {
   actionChangeExportScale,
   actionChangeProjectName,
 } from "../actions/actionExport";
+import { trackEvent } from "../analytics";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { prepareElementsForExport } from "../data";
+import {
+  clearAttributionOptOutState,
+  getAttributionOptOutState,
+  setAttributionOptOutCompleted,
+} from "../data/attributionOptOut";
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { useCopyStatus } from "../hooks/useCopiedIndicator";
@@ -27,6 +33,10 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 
+import {
+  ATTRIBUTION_SURVEY_QUESTION_IDS,
+  AttributionMarkSurvey,
+} from "./AttributionMarkSurvey";
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
@@ -36,6 +46,11 @@ import { FilledButton } from "./FilledButton";
 
 import "./ImageExportDialog.scss";
 
+import type {
+  AttributionSurveyAnswer,
+  AttributionSurveyAnswers,
+  AttributionSurveyQuestionId,
+} from "./AttributionMarkSurvey";
 import type { ActionManager } from "../actions/manager";
 
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
@@ -86,6 +101,56 @@ const ImageExportModal = ({
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
 
+  // Attribution mark: opted-out + survey-complete state, time-boxed to 30
+  // days (see excalidraw-attribution-vision.md Section 9.7). Kept outside
+  // appState since it's a standalone user preference, not scene data.
+  const [attributionOptedOut, setAttributionOptedOut] = useState(
+    () => !!getAttributionOptOutState(),
+  );
+  const [attributionSurveyComplete, setAttributionSurveyComplete] =
+    useState(attributionOptedOut);
+  const [showAttributionSurvey, setShowAttributionSurvey] = useState(false);
+  const [attributionAnswers, setAttributionAnswers] =
+    useState<AttributionSurveyAnswers>({});
+
+  const showAttributionMark = !(
+    attributionOptedOut && attributionSurveyComplete
+  );
+
+  useEffect(() => {
+    if (
+      showAttributionSurvey &&
+      !attributionSurveyComplete &&
+      ATTRIBUTION_SURVEY_QUESTION_IDS.every((id) => attributionAnswers[id])
+    ) {
+      setAttributionSurveyComplete(true);
+      setAttributionOptOutCompleted();
+    }
+  }, [attributionAnswers, showAttributionSurvey, attributionSurveyComplete]);
+
+  const handleAttributionToggleChange = (checked: boolean) => {
+    setAttributionOptedOut(checked);
+    if (checked) {
+      trackEvent("export", "attribution-opt-out", "ui");
+      setShowAttributionSurvey(true);
+      if (!attributionSurveyComplete) {
+        setAttributionAnswers({});
+      }
+    } else {
+      setShowAttributionSurvey(false);
+      setAttributionSurveyComplete(false);
+      setAttributionAnswers({});
+      clearAttributionOptOutState();
+    }
+  };
+
+  const handleAttributionAnswer = (
+    questionId: AttributionSurveyQuestionId,
+    answer: AttributionSurveyAnswer,
+  ) => {
+    setAttributionAnswers((prev) => ({ ...prev, [questionId]: answer }));
+  };
+
   const previewRef = useRef<HTMLDivElement>(null);
   const previewRenderRequestIdRef = useRef(0);
   const [renderError, setRenderError] = useState<Error | null>(null);
@@ -102,6 +167,7 @@ const ImageExportModal = ({
     exportWithDarkMode,
     exportScale,
     embedScene,
+    showAttributionMark,
     resetCopyStatus,
   ]);
 
@@ -141,6 +207,7 @@ const ImageExportModal = ({
       exportPadding: DEFAULT_EXPORT_PADDING,
       maxWidthOrHeight: Math.max(maxWidth, maxHeight),
       exportingFrame,
+      attributionMark: { show: showAttributionMark },
     })
       .then(async (canvas) => {
         if (isStaleRequest()) {
@@ -187,6 +254,7 @@ const ImageExportModal = ({
     exportWithDarkMode,
     exportScale,
     embedScene,
+    showAttributionMark,
   ]);
 
   return (
@@ -300,52 +368,75 @@ const ImageExportModal = ({
           />
         </ExportSetting>
 
-        <div className="ImageExportModal__settings__buttons">
-          <FilledButton
-            className="ImageExportModal__settings__buttons__button"
-            label={t("imageExportDialog.title.exportToPng")}
-            onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements, {
-                exportingFrame,
-              })
-            }
-            icon={downloadIcon}
-          >
-            {t("imageExportDialog.button.exportToPng")}
-          </FilledButton>
-          <FilledButton
-            className="ImageExportModal__settings__buttons__button"
-            label={t("imageExportDialog.title.exportToSvg")}
-            onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
-                exportingFrame,
-              })
-            }
-            icon={downloadIcon}
-          >
-            {t("imageExportDialog.button.exportToSvg")}
-          </FilledButton>
-          {(probablySupportsClipboardBlob || isFirefox) && (
+        <ExportSetting
+          label={t("imageExportDialog.label.hideAttribution")}
+          name="exportHideAttributionSwitch"
+        >
+          <Switch
+            name="exportHideAttributionSwitch"
+            checked={attributionOptedOut}
+            onChange={handleAttributionToggleChange}
+          />
+        </ExportSetting>
+
+        {showAttributionSurvey && (
+          <AttributionMarkSurvey
+            answers={attributionAnswers}
+            onAnswer={handleAttributionAnswer}
+          />
+        )}
+
+        {(!attributionOptedOut || attributionSurveyComplete) && (
+          <div className="ImageExportModal__settings__buttons">
             <FilledButton
               className="ImageExportModal__settings__buttons__button"
-              label={t("imageExportDialog.title.copyPngToClipboard")}
-              status={copyStatus}
-              onClick={async () => {
-                await onExportImage(
-                  EXPORT_IMAGE_TYPES.clipboard,
-                  exportedElements,
-                  {
-                    exportingFrame,
-                  },
-                );
-                onCopy();
-              }}
-              icon={copyIcon}
+              label={t("imageExportDialog.title.exportToPng")}
+              onClick={() =>
+                onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements, {
+                  exportingFrame,
+                  showAttributionMark,
+                })
+              }
+              icon={downloadIcon}
             >
-              {t("imageExportDialog.button.copyPngToClipboard")}
+              {t("imageExportDialog.button.exportToPng")}
             </FilledButton>
-          )}
-        </div>
+            <FilledButton
+              className="ImageExportModal__settings__buttons__button"
+              label={t("imageExportDialog.title.exportToSvg")}
+              onClick={() =>
+                onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
+                  exportingFrame,
+                  showAttributionMark,
+                })
+              }
+              icon={downloadIcon}
+            >
+              {t("imageExportDialog.button.exportToSvg")}
+            </FilledButton>
+            {(probablySupportsClipboardBlob || isFirefox) && (
+              <FilledButton
+                className="ImageExportModal__settings__buttons__button"
+                label={t("imageExportDialog.title.copyPngToClipboard")}
+                status={copyStatus}
+                onClick={async () => {
+                  await onExportImage(
+                    EXPORT_IMAGE_TYPES.clipboard,
+                    exportedElements,
+                    {
+                      exportingFrame,
+                      showAttributionMark,
+                    },
+                  );
+                  onCopy();
+                }}
+                icon={copyIcon}
+              >
+                {t("imageExportDialog.button.copyPngToClipboard")}
+              </FilledButton>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

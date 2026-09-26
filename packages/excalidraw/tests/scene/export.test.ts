@@ -697,3 +697,113 @@ describe("exporting frames", () => {
     });
   });
 });
+
+describe("attribution mark", () => {
+  const getElements = () => [
+    API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      x: 0,
+      y: 0,
+    }),
+  ];
+
+  it("is present in SVG export when requested", async () => {
+    const svg = await exportToSvg({
+      elements: getElements(),
+      files: null,
+      attributionMark: { show: true },
+    });
+
+    const marks = Array.from(svg.querySelectorAll("text")).filter(
+      (text) => text.textContent === "Made with Excalidraw",
+    );
+    expect(marks.length).toBe(1);
+  });
+
+  it("is absent from SVG export by default", async () => {
+    const svg = await exportToSvg({
+      elements: getElements(),
+      files: null,
+    });
+
+    const marks = Array.from(svg.querySelectorAll("text")).filter(
+      (text) => text.textContent === "Made with Excalidraw",
+    );
+    expect(marks.length).toBe(0);
+  });
+
+  it("is absent from SVG export when explicitly suppressed", async () => {
+    const svg = await exportToSvg({
+      elements: getElements(),
+      files: null,
+      attributionMark: { show: false },
+    });
+
+    const marks = Array.from(svg.querySelectorAll("text")).filter(
+      (text) => text.textContent === "Made with Excalidraw",
+    );
+    expect(marks.length).toBe(0);
+  });
+
+  it("reserves extra canvas padding only when shown", async () => {
+    const withoutMark = await exportToCanvas({
+      elements: getElements(),
+      files: null,
+      exportPadding: 10,
+    });
+    const withMark = await exportToCanvas({
+      elements: getElements(),
+      files: null,
+      exportPadding: 10,
+      attributionMark: { show: true },
+    });
+
+    expect(withMark.width).toBeGreaterThan(withoutMark.width);
+    expect(withMark.height).toBeGreaterThan(withoutMark.height);
+  });
+
+  it("stays fully within canvas bounds for a tiny/tightly-cropped export", async () => {
+    // a single very small element, the scenario reported as "cropped when
+    // zoomed in" — the reserved padding must be big enough on its own to
+    // fit the mark, since the content contributes almost nothing.
+    const tinyElements = [
+      API.createElement({
+        type: "rectangle",
+        width: 10,
+        height: 10,
+        x: 0,
+        y: 0,
+      }),
+    ];
+
+    const svg = await exportToSvg({
+      elements: tinyElements,
+      files: null,
+      attributionMark: { show: true },
+    });
+
+    const svgWidth = Number(svg.getAttribute("width"));
+    const svgHeight = Number(svg.getAttribute("height"));
+
+    const iconPath = Array.from(svg.querySelectorAll("path")).find((path) =>
+      path.getAttribute("transform")?.startsWith("translate("),
+    );
+    expect(iconPath).not.toBeUndefined();
+
+    const [, txStr, tyStr] =
+      iconPath!
+        .getAttribute("transform")!
+        .match(/translate\(([\d.-]+) ([\d.-]+)\)/) ?? [];
+    const tx = Number(txStr);
+    const ty = Number(tyStr);
+
+    // never negative (would mean it's cropped off the left/top edge) and
+    // never past the canvas's own bounds on the right/bottom
+    expect(tx).toBeGreaterThanOrEqual(0);
+    expect(ty).toBeGreaterThanOrEqual(0);
+    expect(tx).toBeLessThan(svgWidth);
+    expect(ty).toBeLessThan(svgHeight);
+  });
+});

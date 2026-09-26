@@ -108,6 +108,19 @@
       flex-wrap: wrap;
       gap: 18px;
 
+      // the survey can make this column taller than the preview; scroll it
+      // internally (within the preview's fixed height) instead of letting
+      // the whole dialog grow/scroll, which would drag the preview along
+      // with it. `min-height: 0` overrides the flex default that otherwise
+      // stops a flex item from shrinking below its content's natural size.
+      // `flex-wrap: nowrap` stops overflow from splitting into a second
+      // side-by-side column instead of scrolling vertically.
+      max-height: 360px;
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 4px;
+      flex-wrap: nowrap;
+
       @include isMobile {
         margin-left: unset;
         margin-top: 1rem;
@@ -115,6 +128,10 @@
         gap: 6px 34px;
 
         align-content: flex-start;
+
+        max-height: unset;
+        overflow-y: unset;
+        padding-right: unset;
       }
 
       &__setting {

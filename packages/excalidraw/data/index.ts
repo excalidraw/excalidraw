@@ -107,6 +107,7 @@ export const exportCanvas = async (
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
+    attributionMark,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -115,6 +116,7 @@ export const exportCanvas = async (
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    attributionMark?: { show: boolean };
   },
 ) => {
   if (elements.length === 0) {
@@ -132,7 +134,7 @@ export const exportCanvas = async (
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
-      { exportingFrame },
+      { exportingFrame, attributionMark },
     );
 
     if (type === "svg") {
@@ -168,6 +170,7 @@ export const exportCanvas = async (
     viewBackgroundColor,
     exportPadding,
     exportingFrame,
+    attributionMark,
   });
 
   if (type === "png") {
