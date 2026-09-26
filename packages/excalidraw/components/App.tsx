@@ -348,11 +348,7 @@ import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { trackEvent } from "../analytics";
-import {
-  getDefaultAppState,
-  isEraserActive,
-  isHandToolActive,
-} from "../appState";
+import { getDefaultAppState, isEraserActive } from "../appState";
 import {
   copyTextToSystemClipboard,
   parseClipboard,
@@ -446,6 +442,7 @@ import ConvertElementTypePopup, {
 
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { AppArrowText } from "./App.arrowText";
+import { AppTextTool } from "./App.textTool";
 import { AppBucketFill } from "./App.bucketFill";
 import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
@@ -723,7 +720,9 @@ class App extends React.Component<AppProps, AppState> {
   public arrowText: AppArrowText = new AppArrowText(this);
   public pan: AppPan = new AppPan(this, {
     getPointerCount: () => gesture.pointers.size,
+    isDraggingScrollBar: () => isDraggingScrollBar,
   });
+  public textTool: AppTextTool = new AppTextTool(this);
   public viewport: AppViewport = new AppViewport(this, {
     getContainer: () => this.excalidrawContainerRef.current,
     getStylesPanelMode: () => this.stylesPanelMode,
@@ -2744,7 +2743,7 @@ class App extends React.Component<AppProps, AppState> {
                             onClick={this.handleCanvasClick}
                             onPointerMove={this.handleCanvasPointerMove}
                             onPointerUp={this.handleCanvasPointerUp}
-                            onPointerCancel={this.removePointer}
+                            onPointerCancel={this.handleCanvasPointerCancel}
                             onTouchMove={this.handleTouchMove}
                             onPointerDown={this.handleCanvasPointerDown}
                             onDoubleClick={this.handleCanvasDoubleClick}
@@ -3385,6 +3384,7 @@ class App extends React.Component<AppProps, AppState> {
       suggestedBinding: null,
       frameToHighlight: null,
       elementsToHighlight: null,
+      textToolHover: null,
       snapLines: [],
       showHyperlinkPopup: false,
     });
@@ -4323,6 +4323,17 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ showWelcomeScreen: true });
     }
 
+    // neither the text tool's hover affordance nor a pending center click
+    // may outlive the tool, however it gets left (Esc/finalize paths bypass
+    // setActiveTool) — the tool coming back mid-press must not revive them
+    if (
+      prevState.activeTool.type === "text" &&
+      this.state.activeTool.type !== "text"
+    ) {
+      this.textTool.clearHover();
+      this.textTool.cancel();
+    }
+
     if (
       prevState.zoom.value !== this.state.zoom.value ||
       prevState.scrollX !== this.state.scrollX ||
@@ -4338,6 +4349,9 @@ class App extends React.Component<AppProps, AppState> {
         this.state.scrollY,
         this.state.zoom,
       );
+      // the scene moved under a still pointer: what a text-tool click would
+      // do there may have changed
+      this.textTool.refresh();
     }
 
     if (
@@ -5143,8 +5157,14 @@ class App extends React.Component<AppProps, AppState> {
 
     if (event.type === "pointercancel") {
       // the browser took the pointer over (scroll, palm rejection) — no
-      // pointerup will follow, so the armed bucket fill must not commit
+      // pointerup will follow, so the armed bucket fill must not commit and
+      // the text tool's pending center click must not resolve either. Both
+      // are canceled right here, ahead of the gesture teardown that follows
+      // (handleCanvasPointerCancel): that teardown first flushes a pointermove
+      // the gesture has queued, and with the click still pending that move
+      // would resolve it as a drag.
       this.bucketFill.cancel();
+      this.textTool.cancel();
     }
 
     const wasMultiTouchGesture = gesture.pointers.size >= 2;
@@ -5797,7 +5817,7 @@ class App extends React.Component<AppProps, AppState> {
 
         // the toggle changes what a text-tool click at the current position
         // would do, with no pointermove to refresh the affordance
-        this.arrowText.refresh();
+        this.textTool.refresh(event);
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
       }
@@ -6082,7 +6102,7 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ isBindingEnabled: preferenceEnabled });
         });
 
-        this.arrowText.refresh();
+        this.textTool.refresh(event);
       }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -6230,9 +6250,6 @@ class App extends React.Component<AppProps, AppState> {
           ? prevState.selectedLinearElement
           : null,
         frameToHighlight: null,
-        // only the text tool offers arrow-endpoint binding, and the highlight
-        // is refreshed on pointermove — don't leave a stale one behind
-        hoveredArrowTextAnchor: null,
       } as const;
 
       if (nextActiveTool.type === "freedraw") {
@@ -6862,14 +6879,13 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
+  /**
+   * The text container at a position — an arrow hit on its path, any other
+   * container hit anywhere in its bounds (frames are skipped so a container
+   * inside one can be hit). Purely positional: the selection plays no part.
+   */
   getTextBindableContainerAtPosition(x: number, y: number) {
     const elements = this.scene.getNonDeletedElements();
-    const selectedElements = this.scene.getSelectedElements(this.state);
-    if (selectedElements.length === 1) {
-      return isTextBindableContainer(selectedElements[0], false)
-        ? selectedElements[0]
-        : null;
-    }
     let hitElement = null;
     // We need to do hit testing from front (end of the array) to back (beginning of the array)
     for (let index = elements.length - 1; index >= 0; --index) {
@@ -6931,6 +6947,7 @@ class App extends React.Component<AppProps, AppState> {
     autoEdit = true,
     initialCaretSceneCoords,
     arrowEndpoint,
+    textElement,
   }: {
     /** X position to insert text at */
     sceneX: number;
@@ -6946,6 +6963,13 @@ class App extends React.Component<AppProps, AppState> {
      * dictates the text's position and alignment, overriding (sceneX, sceneY)
      */
     arrowEndpoint?: ArrowEndpoint | null;
+    /**
+     * the text to edit: an element to edit exactly that one; `null` to always
+     * create, never adopting a selected text or one under the pointer;
+     * `undefined` to resolve it here — a single selected text, the label of a
+     * selected or passed arrow container, else the text at (sceneX, sceneY)
+     */
+    textElement?: NonDeleted<ExcalidrawTextElement> | null;
   }) => {
     let shouldBindToContainer = false;
 
@@ -6989,6 +7013,8 @@ class App extends React.Component<AppProps, AppState> {
     }
     const existingTextElement = arrowEndpointBinding
       ? null
+      : textElement !== undefined
+      ? textElement
       : this.getSelectedTextElement(container) ||
         (container && isArrowElement(container)
           ? getBoundTextElement(
@@ -7114,13 +7140,12 @@ class App extends React.Component<AppProps, AppState> {
           shouldBindToContainer && container && isArrowElement(container)
             ? DEFAULT_BOUND_TEXT_LABEL_POSITION
             : null,
-        groupIds: container?.groupIds ?? [],
+        groupIds: shouldBindToContainer ? container?.groupIds ?? [] : [],
         lineHeight,
-        angle: container
-          ? isArrowElement(container)
-            ? (0 as Radians)
-            : container.angle
-          : (0 as Radians),
+        angle:
+          shouldBindToContainer && container && !isArrowElement(container)
+            ? container.angle
+            : (0 as Radians),
         frameId,
       });
 
@@ -7154,7 +7179,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    if (autoEdit || existingTextElement || container) {
+    // A nearby container only skips drag sizing when the text binds to it.
+    if (autoEdit || existingTextElement || shouldBindToContainer) {
       this.handleTextWysiwyg(element, {
         isExistingElement: !!existingTextElement,
         initialCaretSceneCoords: existingTextElement
@@ -7390,7 +7416,13 @@ class App extends React.Component<AppProps, AppState> {
         const container =
           // skip binding to container on dblclick when holding ctrl
           !event[KEYS.CTRL_OR_CMD] &&
-          this.getTextBindableContainerAtPosition(sceneX, sceneY);
+          // a single selected element is what the double-click is about —
+          // typing into it — wherever the click lands
+          (selectedElements.length === 1
+            ? isTextBindableContainer(selectedElements[0], false)
+              ? selectedElements[0]
+              : null
+            : this.getTextBindableContainerAtPosition(sceneX, sceneY));
 
         if (container) {
           if (
@@ -7861,12 +7893,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.updateMultiTouchGesture(event);
 
-    if (
-      this.pan.isSpaceHeld() ||
-      this.pan.isActive() ||
-      isDraggingScrollBar ||
-      isHandToolActive(this.state)
-    ) {
+    if (this.pan.isNavigating()) {
       return;
     }
 
@@ -7894,6 +7921,12 @@ class App extends React.Component<AppProps, AppState> {
         x: scenePointerX,
         y: scenePointerY,
       },
+      isOverScrollBar,
+    );
+
+    const textToolTarget = this.textTool.updateHover(
+      scenePointer,
+      event,
       isOverScrollBar,
     );
 
@@ -8283,9 +8316,6 @@ class App extends React.Component<AppProps, AppState> {
       hitElement = hitElementMightBeLocked;
     }
 
-    const hoveredArrowTextAnchor =
-      this.arrowText.updateHoveredAnchor(scenePointer);
-
     if (
       !this.handleIframeLikeElementHover({
         hitElement,
@@ -8312,13 +8342,7 @@ class App extends React.Component<AppProps, AppState> {
       ) {
         this.setState({ showHyperlinkPopup: "info" });
       } else if (this.state.activeTool.type === "text") {
-        this.cursor.set(
-          hoveredArrowTextAnchor
-            ? CURSOR_TYPE.POINTER
-            : isTextElement(hitElement)
-            ? CURSOR_TYPE.TEXT
-            : CURSOR_TYPE.CROSSHAIR,
-        );
+        this.cursor.set(this.textTool.cursorFor(textToolTarget));
       } else if (
         !event[KEYS.CTRL_OR_CMD] &&
         this.isHittingCommonBoundingBoxOfSelectedElements(
@@ -8967,7 +8991,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.wasAddedToSelection = true;
       }
     } else if (this.state.activeTool.type === "text") {
-      this.handleTextOnPointerDown(event, pointerDownState);
+      this.textTool.handlePointerDown(event, pointerDownState);
     } else if (
       this.state.activeTool.type === "arrow" ||
       this.state.activeTool.type === "line"
@@ -9059,6 +9083,19 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.eventListeners.onKeyUp = onKeyUp;
       pointerDownState.eventListeners.onKeyDown = onKeyDown;
     }
+  };
+
+  /**
+   * The browser took the pointer over (scroll, pinch, palm rejection): no
+   * pointerup will follow, so the gesture is torn down here and now — the
+   * same cleanup a lost pointerup gets at the next press, only not left
+   * lying in wait for it, where its replay would tangle with that press.
+   */
+  private handleCanvasPointerCancel = (
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => {
+    this.removePointer(event);
+    this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
   };
 
   private handleCanvasPointerUp = (
@@ -9845,84 +9882,6 @@ class App extends React.Component<AppProps, AppState> {
       point.y < y2 + boundsPadding + threshold
     );
   }
-
-  private handleTextOnPointerDown = (
-    event: React.PointerEvent<HTMLElement>,
-    pointerDownState: PointerDownState,
-  ): void => {
-    // if we're currently still editing text, clicking outside
-    // should only finalize it, not create another (irrespective
-    // of state.activeTool.locked)
-    if (this.state.editingTextElement) {
-      return;
-    }
-    let sceneX = pointerDownState.origin.x;
-    let sceneY = pointerDownState.origin.y;
-
-    // the click transitions into text editing either way, consuming (or
-    // bypassing) whatever anchor was highlighted — don't leave it lingering
-    // under the editor, which outlives the hover when the tool is locked
-    this.setState({ hoveredArrowTextAnchor: null });
-
-    // a free arrow endpoint takes precedence over adding a label *to* the
-    // arrow — it's the smaller, more deliberate target
-    const arrowEndpoint = this.arrowText.getBindableEndpointAtPosition(
-      sceneX,
-      sceneY,
-    );
-
-    if (arrowEndpoint) {
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        // the binding fixes the position, but the width is still the user's
-        // to drag out (see `getEndpointBoundTextDragAnchor`)
-        autoEdit: false,
-        arrowEndpoint,
-      });
-    } else {
-      const element = this.getElementAtPosition(sceneX, sceneY, {
-        includeBoundTextElement: true,
-      });
-
-      // FIXME
-      let container = this.getTextBindableContainerAtPosition(sceneX, sceneY);
-
-      if (hasBoundTextElement(element)) {
-        container = element as NonDeleted<ExcalidrawTextContainer>;
-        const labelCenter = this.arrowText.getLabelCenter(element);
-        if (labelCenter) {
-          sceneX = labelCenter.x;
-          sceneY = labelCenter.y;
-        } else {
-          sceneX = element.x + element.width / 2;
-          sceneY = element.y + element.height / 2;
-        }
-      }
-      this.startTextEditing({
-        sceneX,
-        sceneY,
-        insertAtParentCenter: !event.altKey,
-        container,
-        autoEdit: false,
-        initialCaretSceneCoords: { x: sceneX, y: sceneY },
-      });
-    }
-
-    if (!this.isToolLocked()) {
-      this.setState(
-        {
-          activeTool: updateActiveTool(this.state, {
-            type: this.state.preferredSelectionTool.type,
-          }),
-        },
-        // reset once the tool revert has settled
-        () => this.cursor.reset(),
-      );
-    } else {
-      this.cursor.reset();
-    }
-  };
 
   private handleFreeDrawElementOnPointerDown = (
     event: React.PointerEvent<HTMLElement>,
@@ -10737,6 +10696,10 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (this.textTool.handlePointerMove(event, pointerDownState)) {
+        return;
+      }
+
       if (isEraserActive(this.state)) {
         this.handleEraser(event, pointerCoords);
         return;
@@ -11451,11 +11414,14 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onMove.flush();
       }
 
+      this.textTool.handlePointerUp(childEvent, pointerDownState);
+
       // an armed bucket fill commits only on a GENUINE pointer up. The
       // missing-pointer-up cleanup replays this handler with the pointer
       // DOWN event (e.g. when a second finger lands mid-press — pinch/pan
-      // intent), and a tool switch mid-press orphans the click — both must
-      // discard the fill instead of committing an unwanted edit.
+      // intent) or with a pointercancel, and a tool switch mid-press orphans
+      // the click — all must discard the fill instead of committing an
+      // unwanted edit.
       if (
         childEvent.type === "pointerup" &&
         this.state.activeTool.type === TOOL_TYPE.bucketfill
@@ -12524,6 +12490,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        // only a genuine pointerup is a click of the tool, which reverts it.
+        // A replay by the missing-pointerup cleanup — a second finger
+        // landing, a pointercancel, the next press after a lost pointerup —
+        // only tears the gesture down, and must leave the tool to the press
+        // that follows
+        childEvent.type === "pointerup" &&
         !this.isToolLocked() &&
         activeTool.type !== "freedraw" &&
         // bucket fill stays active for back-to-back fills regardless of the
@@ -13361,7 +13333,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  private maybeDragNewGenericElement = (
+  public maybeDragNewGenericElement = (
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
     informMutation = true,
