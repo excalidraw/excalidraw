@@ -9,7 +9,7 @@
     padding: 1rem;
     box-sizing: border-box;
     pointer-events: none;
-    background: color-mix(in srgb, var(--island-bg-color) 88%, transparent);
+    background: var(--overlay-bg-color);
     animation: file-drop-overlay-appear 120ms ease-out;
   }
 
