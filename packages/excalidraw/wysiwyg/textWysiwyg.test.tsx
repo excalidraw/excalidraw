@@ -1054,6 +1054,8 @@ describe("textWysiwyg", () => {
       root.getBoundingClientRect = rect(0, 800);
       const sidebar = document.createElement("div");
       sidebar.className = "sidebar sidebar--docked";
+      sidebar.dataset.viewportUi = "side";
+      sidebar.dataset.viewportUiName = "sidebar";
       sidebar.getBoundingClientRect = rect(500, 300);
       root.appendChild(sidebar);
       const editorLeft = parseFloat(textarea.style.left);

@@ -245,31 +245,16 @@ export const textWysiwyg = ({
     ) ?? null;
 
   /**
-   * Keeps the editor's box off a docked sidebar, so a caret behind the
-   * sidebar is outside the box and gets revealed like one past the
-   * viewport's edge. Returns the box's left inset, which the editor's
-   * position is relative to.
+   * Keeps the editor's box off the sidebar, so a caret behind the sidebar
+   * is outside the box and gets revealed like one past the viewport's edge.
+   * Returns the box's left inset, which the editor's position is relative
+   * to.
    */
   const updateEditorBoxInsets = () => {
-    if (!excalidrawContainer || !editorBox) {
+    if (!editorBox) {
       return 0;
     }
-    let left = 0;
-    let right = 0;
-    const sidebar = excalidrawContainer.querySelector(".sidebar--docked");
-    if (sidebar) {
-      const containerRect = excalidrawContainer.getBoundingClientRect();
-      const sidebarRect = sidebar.getBoundingClientRect();
-      // docked on the right, or on the left (RTL)
-      if (
-        sidebarRect.left + sidebarRect.width / 2 >
-        containerRect.left + containerRect.width / 2
-      ) {
-        right = Math.max(0, containerRect.right - sidebarRect.left);
-      } else {
-        left = Math.max(0, sidebarRect.right - containerRect.left);
-      }
-    }
+    const { left, right } = app.viewport.getSidebarInsets();
     editorBox.style.left = `${left}px`;
     editorBox.style.right = `${right}px`;
     return left;
@@ -1067,7 +1052,7 @@ export const textWysiwyg = ({
 
   // The browser reveals an out-of-view caret by scrolling the nearest scroll
   // container: the editor's box, which clips it to the canvas area (off a
-  // docked sidebar too, see updateEditorBoxInsets). Scrolled, the editor
+  // sidebar too, see updateEditorBoxInsets). Scrolled, the editor
   // would leave its text on the canvas; hand the offset to the canvas
   // instead, plus some room to spare, and put the box back: the canvas
   // follows the caret. Scroll events fire before the frame is painted, so
