@@ -1113,6 +1113,27 @@ export const bindOrUnbindBindingElements = (
 };
 
 /**
+ * Records the arrow in the bind target's `boundElements` ledger, the container
+ * side of a binding. Idempotent: an arrow already listed is left alone, so an
+ * arrow bound to the same element at both ends is recorded once.
+ */
+export const recordBoundElement = (
+  bindableElement: NonDeleted<ExcalidrawBindableElement>,
+  arrow: ExcalidrawArrowElement,
+  scene: Scene,
+): void => {
+  const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
+  if (!boundElementsMap.has(arrow.id)) {
+    scene.mutateElement(bindableElement, {
+      boundElements: (bindableElement.boundElements || []).concat({
+        id: arrow.id,
+        type: "arrow",
+      }),
+    });
+  }
+};
+
+/**
  * Writes a binding onto the arrow and records the arrow on the bind target,
  * keeping the two sides of the relationship in step.
  */
@@ -1127,15 +1148,7 @@ const applyBinding = (
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
   });
 
-  const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
-  if (!boundElementsMap.has(arrow.id)) {
-    scene.mutateElement(bindableElement, {
-      boundElements: (bindableElement.boundElements || []).concat({
-        id: arrow.id,
-        type: "arrow",
-      }),
-    });
-  }
+  recordBoundElement(bindableElement, arrow, scene);
 };
 
 export const bindBindingElement = (
@@ -1200,15 +1213,17 @@ export const unbindBindingElement = (
     arrow[startOrEnd === "start" ? "endBinding" : "startBinding"];
   if (!oppositeBinding || oppositeBinding.elementId !== binding.elementId) {
     // Only remove the record on the bound element if the other
-    // end is not bound to the same element
+    // end is not bound to the same element.
     const boundElement = scene
-      .getNonDeletedElementsMap()
-      .get(binding.elementId) as NonDeleted<ExcalidrawBindableElement>;
-    scene.mutateElement(boundElement, {
-      boundElements: boundElement.boundElements?.filter(
-        (element) => element.id !== arrow.id,
-      ),
-    });
+      .getElementsMapIncludingDeleted()
+      .get(binding.elementId);
+    if (boundElement && !boundElement.isDeleted) {
+      scene.mutateElement(boundElement, {
+        boundElements: boundElement.boundElements?.filter(
+          (element) => element.id !== arrow.id,
+        ),
+      });
+    }
   }
 
   scene.mutateElement(arrow, { [field]: null });

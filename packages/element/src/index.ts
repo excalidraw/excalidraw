@@ -59,6 +59,7 @@ export const getNonDeletedElements = <T extends ExcalidrawElement>(
 export * from "./align";
 export * from "./arrowEndpointText";
 export * from "./binding";
+export * from "./bindingRepair";
 export * from "./bounds";
 export * from "./bucketFill";
 export * from "./collision";

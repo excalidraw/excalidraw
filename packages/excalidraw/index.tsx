@@ -507,6 +507,15 @@ export {
 
 export { elementsOverlappingBBox } from "@excalidraw/element";
 
+export {
+  ALL_BINDING_REPAIR_ACTIONS,
+  repairBindings,
+} from "@excalidraw/element";
+export type {
+  BindingRepairAction,
+  RepairBindingsOptions,
+} from "@excalidraw/element";
+
 export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
