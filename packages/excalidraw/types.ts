@@ -27,6 +27,7 @@ import type {
   Theme,
   StrokeRoundness,
   ExcalidrawEmbeddableElement,
+  ExcalidrawIframeElement,
   ExcalidrawMagicFrameElement,
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
@@ -1037,6 +1038,12 @@ export interface ExcalidrawProps {
     | RegExp
     | RegExp[]
     | ((link: string) => boolean | undefined);
+  validateIframe?:
+    | boolean
+    | string[]
+    | RegExp
+    | RegExp[]
+    | ((element: ExcalidrawIframeElement) => boolean);
   renderEmbeddable?: (
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
