@@ -11085,11 +11085,18 @@ class App extends React.Component<AppProps, AppState> {
             }
           }
 
+          // Frame children move along with their frame, so they must not be
+          // used as snap references while dragging it
+          const draggedElements = this.scene.getSelectedElements({
+            selectedElementIds: this.state.selectedElementIds,
+            includeElementsInFrames: true,
+          });
+
           // Snap cache *must* be synchronously popuplated before initial drag,
           // otherwise the first drag even will not snap, causing a jump before
           // it snaps to its position if previously snapped already.
-          this.maybeCacheVisibleGaps(event, selectedElements);
-          this.maybeCacheReferenceSnapPoints(event, selectedElements);
+          this.maybeCacheVisibleGaps(event, draggedElements);
+          this.maybeCacheReferenceSnapPoints(event, draggedElements);
 
           const { snapOffset, snapLines } = snapDraggedElements(
             originalElements,
