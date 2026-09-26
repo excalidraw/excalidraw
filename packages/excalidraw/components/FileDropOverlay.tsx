@@ -161,6 +161,12 @@ export const FileDropOverlay = () => {
                 className="file-drop-overlay__lines"
                 d="M24 61h43M24 77h43M24 93h26"
               />
+              {position === "back" && (
+                <path
+                  className="file-drop-overlay__cross"
+                  d="M18 44l24 24M42 44L18 68"
+                />
+              )}
             </svg>
           ))}
         </div>

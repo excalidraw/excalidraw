@@ -73,7 +73,6 @@
       --file-angle: -18deg;
       top: 1rem;
       color: var(--color-primary-light-darker);
-      transition: color 180ms ease;
     }
 
     &--front {
@@ -91,8 +90,25 @@
     opacity: 0.35;
   }
 
-  .file-drop-overlay--keep .file-drop-overlay__file--back {
-    color: var(--color-primary);
+  .file-drop-overlay__cross {
+    stroke-width: 4;
+  }
+
+  // replacing: the existing content (back file) is crossed out
+  .file-drop-overlay:not(.file-drop-overlay--keep)
+    .file-drop-overlay__file--back
+    .file-drop-overlay__lines {
+    opacity: 0;
+  }
+
+  .file-drop-overlay--keep {
+    .file-drop-overlay__file--back {
+      color: var(--color-primary);
+    }
+
+    .file-drop-overlay__cross {
+      opacity: 0;
+    }
   }
 
   @keyframes file-drop-overlay-appear {
@@ -123,7 +139,6 @@
 
     .file-drop-overlay__file {
       transform: translate(var(--file-x), 0) rotate(var(--file-angle));
-      transition: none;
     }
   }
 
