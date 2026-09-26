@@ -13,6 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Text backgrounds and fenced code (2026-09-25) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- Text elements can now use the Background color picker for a solid tint. Existing scenes keep dormant legacy text background values invisible until the text is explicitly tinted.
+- Markdown fenced sections such as ` ```js ` are syntax-highlighted directly in regular text elements. Fence delimiters are hidden on canvas and in SVG exports, but remain available in the in-canvas text editor; the separate code-block tool and modal are no longer used.
+
 ### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.

@@ -32,6 +32,10 @@ import {
   isInitializedImageElement,
   isTextElement,
 } from "@excalidraw/element";
+import {
+  hasTextBackground,
+  parseMarkdownCodeFenceLines,
+} from "@excalidraw/element";
 
 import { getContainingFrame } from "@excalidraw/element";
 
@@ -786,6 +790,22 @@ const renderElementToSvg = (
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
+        if (hasTextBackground(element)) {
+          const background = svgRoot.ownerDocument.createElementNS(
+            SVG_NS,
+            "rect",
+          );
+          background.setAttribute("width", `${element.width}`);
+          background.setAttribute("height", `${element.height}`);
+          background.setAttribute(
+            "fill",
+            applyDarkModeFilter(
+              element.backgroundColor,
+              renderConfig.theme === THEME.DARK,
+            ),
+          );
+          node.appendChild(background);
+        }
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeightPx = getLineHeightInPx(
           element.fontSize,
@@ -809,20 +829,44 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
+
+        const markdownLines = parseMarkdownCodeFenceLines(
+          element.text,
+          renderConfig.theme === THEME.DARK ? "dark" : "light",
+        );
+
         for (let i = 0; i < lines.length; i++) {
+          const markdownLine = markdownLines?.[i];
+          if (markdownLine?.type === "fence") {
+            continue;
+          }
+
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-          text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
           text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute(
-            "fill",
-            applyDarkModeFilter(
-              element.strokeColor,
-              renderConfig.theme === THEME.DARK,
-            ),
-          );
+          if (markdownLine?.type === "code") {
+            for (const run of markdownLine.runs) {
+              const tspan = svgRoot.ownerDocument.createElementNS(
+                SVG_NS,
+                "tspan",
+              );
+              tspan.textContent = run.text;
+              tspan.setAttribute("fill", run.color);
+              tspan.setAttribute("xml:space", "preserve");
+              text.appendChild(tspan);
+            }
+          } else {
+            text.textContent = lines[i];
+            text.setAttribute(
+              "fill",
+              applyDarkModeFilter(
+                element.strokeColor,
+                renderConfig.theme === THEME.DARK,
+              ),
+            );
+          }
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);
