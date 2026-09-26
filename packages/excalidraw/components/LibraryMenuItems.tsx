@@ -351,7 +351,7 @@ export default function LibraryMenuItems({
         )}
       </div>
       {filteredItems.length > 0 ? (
-        <LibraryMenuSectionGrid>
+        <LibraryMenuSectionGrid showNames>
           <LibraryMenuSection
             itemsRenderedPerBatch={itemsRenderedPerBatch}
             items={filteredItems}
@@ -360,6 +360,7 @@ export default function LibraryMenuItems({
             onClick={onItemClick}
             isItemSelected={isItemSelected}
             svgCache={svgCache}
+            showNames
           />
         </LibraryMenuSectionGrid>
       ) : (
