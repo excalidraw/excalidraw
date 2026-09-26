@@ -31,6 +31,7 @@ const drag = (
   });
   Object.defineProperty(event, "dataTransfer", {
     value: {
+      dropEffect: "none",
       types,
       files: type === "drop" ? files : [],
       items: files.map((file) => ({
@@ -41,10 +42,25 @@ const drag = (
     },
   });
   fireEvent(target, event);
+  return event as MouseEvent & { dataTransfer: { dropEffect: string } };
 };
 
 const overlay = () =>
   GlobalTestState.renderResult.container.querySelector(".file-drop-overlay");
+
+const sceneFile = () =>
+  new h.app.ownerWindow.File(
+    [
+      serializeAsJSON(
+        [API.createElement({ type: "ellipse", id: "existing" })],
+        { ...h.state, viewBackgroundColor: "#ff0000" },
+        {},
+        "local",
+      ),
+    ],
+    "scene.excalidraw",
+    { type: MIME_TYPES.json },
+  );
 
 describe("file drop overlay", () => {
   it("ignores text and library-item drags, and stays visible across child boundaries", async () => {
@@ -167,20 +183,6 @@ describe("dropping scenes", () => {
     );
   });
 
-  const sceneFile = () =>
-    new h.app.ownerWindow.File(
-      [
-        serializeAsJSON(
-          [API.createElement({ type: "ellipse", id: "existing" })],
-          { ...h.state, viewBackgroundColor: "#ff0000" },
-          {},
-          "local",
-        ),
-      ],
-      "scene.excalidraw",
-      { type: MIME_TYPES.json },
-    );
-
   it("replaces the scene by default and removes the overlay", async () => {
     drag(GlobalTestState.interactiveCanvas, "dragenter");
     drag(GlobalTestState.interactiveCanvas, "drop", { files: [sceneFile()] });
@@ -226,6 +228,42 @@ describe("dropping scenes", () => {
       await waitFor(() => expect(h.elements).toHaveLength(2));
       expect(h.elements[0].id).toBe("existing");
       expect(h.elements[1]).toMatchObject({ type: "text", text: "😀" });
+    },
+  );
+});
+
+describe("ignoring drops", () => {
+  it.each([
+    ["in view mode", { viewModeEnabled: true }],
+    ["when non-interactive", { interaction: false as const }],
+  ])(
+    "%s, cancels the browser default and changes nothing",
+    async (_, props) => {
+      await render(
+        <Excalidraw
+          {...props}
+          initialData={{
+            elements: [
+              API.createElement({ type: "rectangle", id: "existing" }),
+            ],
+            appState: { viewBackgroundColor: "#ffffff" },
+          }}
+        />,
+      );
+      const canvas = GlobalTestState.interactiveCanvas;
+      const original = h.elements[0];
+
+      drag(canvas, "dragenter");
+      const dragOver = drag(canvas, "dragover");
+      expect(dragOver.defaultPrevented).toBe(true);
+      expect(dragOver.dataTransfer.dropEffect).toBe("none");
+      expect(overlay()).toBeNull();
+
+      const drop = drag(canvas, "drop", { files: [sceneFile()] });
+      expect(drop.defaultPrevented).toBe(true);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(h.elements).toEqual([original]);
+      expect(h.state.viewBackgroundColor).toBe("#ffffff");
     },
   );
 });

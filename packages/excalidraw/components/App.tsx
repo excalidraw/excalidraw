@@ -2454,7 +2454,7 @@ class App extends React.Component<AppProps, AppState> {
           ["--zen-mode-transition-duration" as any]: `${ZEN_MODE_TRANSITION_DURATION}ms`,
         }}
         ref={this.excalidrawContainerRef}
-        onDrop={this.isInteractionEnabled() ? this.handleAppOnDrop : undefined}
+        onDrop={this.isFileDropEnabled() ? this.handleAppOnDrop : undefined}
         tabIndex={0}
         onKeyDown={
           this.props.handleKeyboardGlobally || !this.isInteractionEnabled()
@@ -3263,6 +3263,18 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
   };
 
+  private isFileDropEnabled() {
+    return this.isInteractionEnabled() && !this.state.viewModeEnabled;
+  }
+
+  private onDragOver = (event: DragEvent) => {
+    event.preventDefault();
+    if (!this.isFileDropEnabled() && event.dataTransfer) {
+      // show a no-drop cursor
+      event.dataTransfer.dropEffect = "none";
+    }
+  };
+
   // handles only the navigation keyboard: page-scroll keys and
   // `navigation`-flagged action shortcuts (canvas zoom & zoom-to-fit — see
   // `ActionManager.handleKeyDown` gates); the rest of the keyboard handling
@@ -4014,6 +4026,20 @@ class App extends React.Component<AppProps, AppState> {
         this.onWindowMessage,
         false,
       ),
+      // cancelled even when drops are ignored (view mode, non-interactive),
+      // so a dropped file doesn't make the browser navigate away to it
+      addEventListener(
+        this.excalidrawContainerRef.current,
+        EVENT.DRAG_OVER,
+        this.onDragOver,
+        false,
+      ),
+      addEventListener(
+        this.excalidrawContainerRef.current,
+        EVENT.DROP,
+        this.disableEvent,
+        false,
+      ),
       addEventListener(
         this.ownerDocument,
         EVENT.POINTER_UP,
@@ -4234,18 +4260,6 @@ class App extends React.Component<AppProps, AppState> {
         EVENT.WHEEL,
         this.wheel.handle,
         { passive: false },
-      ),
-      addEventListener(
-        this.excalidrawContainerRef.current,
-        EVENT.DRAG_OVER,
-        this.disableEvent,
-        false,
-      ),
-      addEventListener(
-        this.excalidrawContainerRef.current,
-        EVENT.DROP,
-        this.disableEvent,
-        false,
       ),
     );
 
@@ -13097,8 +13111,7 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    // NOTE no preventDefault so the host page can handle the drop itself
-    if (!this.isInteractionEnabled()) {
+    if (!this.isFileDropEnabled()) {
       return;
     }
     const { shiftKey, clientX, clientY } = event;
