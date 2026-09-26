@@ -290,7 +290,6 @@ export const textWysiwyg = ({
       // what is going to be used for unbounded text
       let height = updatedTextElement.height;
 
-      let maxWidth = updatedTextElement.width;
       let maxHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
@@ -304,7 +303,6 @@ export const textWysiwyg = ({
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
         }
-        maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -383,21 +381,10 @@ export const textWysiwyg = ({
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
       const angle = getTextElementAngle(updatedTextElement, container);
 
-      // The editor is kept within the viewport's right and bottom edges, so
-      // that revealing the caret never has anything to scroll the container
-      // by: its box is cut short and the textarea scrolls inside instead.
-      // The cut runs along the box's own edges, which line up with the
-      // viewport's only while the text is unrotated — a rotated box is left
-      // whole, or lines still on screen would go missing from the editor
-      // (its caret is revealed by panning the canvas, see onContainerScroll).
-      const clampToViewport = angle === 0;
-
-      if (!container) {
-        if (clampToViewport) {
-          maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
-          width = Math.min(width, maxWidth);
-        }
-      } else {
+      // The editor box is the text's, never cut to the viewport: a caret past
+      // the viewport's edge is revealed by panning the canvas (see
+      // onContainerScroll), and the editor stays on its text.
+      if (container) {
         width += 0.5;
       }
 
@@ -406,9 +393,6 @@ export const textWysiwyg = ({
 
       const font = getFontString(updatedTextElement);
 
-      const editorMaxHeight = clampToViewport
-        ? (appState.height - viewportY) / appState.zoom.value
-        : null;
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
@@ -418,7 +402,7 @@ export const textWysiwyg = ({
         left: `${viewportX}px`,
         top: `${viewportY}px`,
         // about the text's center, whatever size the box itself ends up
-        // (clamped to the viewport, the 5% buffer) — see getTransform
+        // (the 5% buffer) — see getTransform
         transformOrigin: `${updatedTextElement.width / 2}px ${
           updatedTextElement.height / 2
         }px`,
@@ -435,7 +419,6 @@ export const textWysiwyg = ({
           appState.theme === THEME.DARK,
         ),
         opacity: updatedTextElement.opacity / 100,
-        maxHeight: editorMaxHeight === null ? "none" : `${editorMaxHeight}px`,
       });
       currentTextLayout = {
         angle: angle as Radians,
@@ -936,8 +919,9 @@ export const textWysiwyg = ({
       }
 
       // Otherwise, re-enable submit on blur and refocus the editor. Never
-      // let the focus scroll the container (the app owns scrolling): a box
-      // reaching past the viewport would pull it along to reveal the caret.
+      // let the focus scroll the container: for a box reaching past the
+      // viewport, revealing the caret the textarea has until the click's is
+      // placed (the end of the value) would pan the canvas there.
       editable.onblur = handleSubmit;
       editable.focus({ preventScroll: true });
       if (pendingInitialSelection) {
@@ -946,13 +930,6 @@ export const textWysiwyg = ({
           pendingInitialSelection.end,
         );
         pendingInitialSelection = null;
-        // focus() scrolled the textarea to the caret it had until now — the
-        // end of the value. For a text reaching past the viewport, whose
-        // editor is clamped to it, that shifts the text out of line with the
-        // canvas. The caret placed at the click is inside the visible box, so
-        // the editor can sit flush again.
-        editable.scrollTop = 0;
-        editable.scrollLeft = 0;
       }
     });
   };
@@ -1042,10 +1019,9 @@ export const textWysiwyg = ({
   });
 
   // The browser reveals an out-of-view caret by scrolling the nearest scroll
-  // container. For an editor reaching past the viewport (a rotated text's,
-  // which isn't clamped to it, or any text scrolled away while edited), that
-  // is the editor root, and the whole UI would shift out of line with the
-  // canvas. Hand the offset to the canvas instead and put the root back: the
+  // container. For an editor reaching past the viewport (its box is never cut
+  // to it), that is the editor root, and the whole UI would shift out of
+  // line with the canvas. Hand the offset to the canvas instead and put the root back: the
   // canvas follows the caret. Scroll events fire before the frame is
   // painted, so the root's shift is never seen; and the root absorbing the
   // reveal keeps it from scrolling a host page around an embedded editor.

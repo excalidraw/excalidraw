@@ -963,19 +963,28 @@ describe("textWysiwyg", () => {
       expect(h.state.zoom.value).toBe(1);
     });
 
-    it("text should never go beyond max width", async () => {
+    it("should not cut the editor off at the viewport's edges", async () => {
       UI.clickTool("text");
       mouse.click(0, 0);
 
       textarea = await getTextEditor();
+      // wider and taller than the 800x400 viewport
       updateTextEditor(
         textarea,
-        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+        `Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!${"\nline".repeat(
+          20,
+        )}`,
       );
-      Keyboard.exitTextEditor(textarea);
 
-      expect(textarea.style.width).toBe("792px");
-      expect(h.elements[0].width).toBe(1000);
+      // the editor box is the text's: a caret past an edge pans the canvas
+      // (see below) instead of scrolling inside a box cut to the viewport
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.width).toBe(1000);
+      expect(text.height).toBeGreaterThan(400);
+      expect(textarea.style.width).toBe(`${text.width}px`);
+      expect(parseFloat(textarea.style.height)).toBeCloseTo(text.height * 1.05);
+      expect(textarea.style.maxHeight).toBe("");
+      Keyboard.exitTextEditor(textarea);
     });
 
     it("should pan the canvas instead of letting the editor root scroll to reveal the caret", () => {
