@@ -109,6 +109,7 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
+  TEXT_VIEWPORT_PADDING,
 } from "@excalidraw/common";
 
 import {
@@ -416,6 +417,7 @@ import { Renderer } from "../scene/Renderer";
 import {
   type SetViewportOptions,
   getViewportForZoomWithScrollConstraints,
+  scrollBoundsIntoView,
 } from "../viewport";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { LaserTrails } from "../laserTrails";
@@ -5057,8 +5059,12 @@ class App extends React.Component<AppProps, AppState> {
     });
     const lineHeight = getLineHeight(textElementProps.fontFamily);
     const [x1, , x2] = getVisibleSceneBounds(this.state);
-    // long texts should not go beyond 800 pixels in width nor should it go below 200 px
-    const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.5, 800), 200);
+    // long texts should not go beyond 800 pixels in width nor should it go
+    // below 200 px — nor, whatever those make of it, outgrow the view
+    const maxTextWidth = Math.min(
+      Math.max(Math.min((x2 - x1) * 0.5, 800), 200),
+      this.getMaxTextWidth(),
+    );
     const LINE_GAP = 10;
     let currentY = y;
 
@@ -5126,6 +5132,17 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       ),
     });
+    // wrapped to fit the view: make sure all of it is in view, too
+    if (textElements.some((element) => !element.autoResize)) {
+      const scroll = scrollBoundsIntoView({
+        bounds: getCommonBounds(textElements),
+        appState: this.state,
+        offsets: this.getTextViewportOffsets(),
+      });
+      if (scroll) {
+        this.viewport.translate(scroll);
+      }
+    }
 
     if (
       !isPlainPaste &&
@@ -6392,6 +6409,33 @@ class App extends React.Component<AppProps, AppState> {
     gesture.initialScale = null;
   });
 
+  /**
+   * The part of the canvas a typed or pasted text is kept within, as offsets
+   * from its edges (screen px): all of it but the sidebar, less some room
+   * at each side.
+   */
+  private getTextViewportOffsets = () => {
+    const { left, right } = this.viewport.getSidebarInsets();
+    const padding = TEXT_VIEWPORT_PADDING;
+    return {
+      top: padding,
+      right: right + padding,
+      bottom: padding,
+      left: left + padding,
+    };
+  };
+
+  /**
+   * The widest a text may grow to as it's typed or pasted, in scene units:
+   * the width of the part of the canvas it's kept within, so that a text
+   * never outgrows the view.
+   */
+  private getMaxTextWidth = () => {
+    const { left, right } = this.getTextViewportOffsets();
+    const width = this.state.width - left - right;
+    return width > 0 ? width / this.state.zoom.value : Infinity;
+  };
+
   private handleTextWysiwyg(
     element: NonDeleted<ExcalidrawTextElement>,
     {
@@ -6426,6 +6470,8 @@ class App extends React.Component<AppProps, AppState> {
             originalText: nextOriginalText,
           })
         : null;
+      // a free text stops growing at the view's width and wraps from there
+      const maxWidth = this.getMaxTextWidth();
 
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
@@ -6448,12 +6494,39 @@ class App extends React.Component<AppProps, AppState> {
                   getContainerElement(_element, elementsMap),
                   elementsMap,
                   nextOriginalText,
+                  maxWidth,
                 )),
             });
           }
           return _element;
         }),
       ]);
+
+      const updatedTextElement = this.scene.getNonDeletedElement(
+        latestTextElement.id,
+      );
+      if (
+        latestTextElement.autoResize &&
+        updatedTextElement &&
+        isTextElement(updatedTextElement) &&
+        !updatedTextElement.autoResize
+      ) {
+        // it just started wrapping at the view's width: bring all of it into
+        // view (right edge off the view's by the same room as the width
+        // left) — vertically only if it fits; the caret follows the rest
+        const scroll = scrollBoundsIntoView({
+          bounds: getElementBounds(
+            updatedTextElement,
+            this.scene.getNonDeletedElementsMap(),
+          ),
+          appState: this.state,
+          offsets: this.getTextViewportOffsets(),
+          tooLarge: "leave",
+        });
+        if (scroll) {
+          this.viewport.translate(scroll);
+        }
+      }
 
       if (stickyContainer) {
         // the note may have grown or shrunk — arrows bound to it must follow

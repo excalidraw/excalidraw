@@ -423,6 +423,16 @@ export const textWysiwyg = ({
       const font = getFontString(updatedTextElement);
       const editorBoxLeft = updateEditorBoxInsets();
 
+      // a free text that stopped growing at the viewport's width (see
+      // App.getMaxTextWidth) wraps from then on, and so does its editor
+      if (
+        !updatedTextElement.autoResize &&
+        editable.style.whiteSpace !== "pre-wrap"
+      ) {
+        editable.style.whiteSpace = "pre-wrap";
+        editable.style.wordBreak = "break-word";
+      }
+
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯

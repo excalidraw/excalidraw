@@ -17,6 +17,7 @@ import {
   THEME,
   VERTICAL_ALIGN,
   applyDarkModeFilter,
+  TEXT_VIEWPORT_PADDING,
 } from "@excalidraw/common";
 
 import type {
@@ -765,6 +766,29 @@ describe("textWysiwyg", () => {
   describe("Test container-unbound text", () => {
     const { h } = window;
     const dimensions = { height: 400, width: 800 };
+    const domRect = (left: number, width: number) => () =>
+      ({
+        x: left,
+        y: 0,
+        left,
+        top: 0,
+        width,
+        height: 400,
+        right: left + width,
+        bottom: 400,
+        toJSON: () => {},
+      } as DOMRect);
+    const dockSidebar = (left: number, width: number) => {
+      const root = textarea.closest<HTMLElement>(".excalidraw")!;
+      root.getBoundingClientRect = domRect(0, 800);
+      const sidebar = document.createElement("div");
+      sidebar.className = "sidebar sidebar--docked";
+      sidebar.dataset.viewportUi = "side";
+      sidebar.dataset.viewportUiName = "sidebar";
+      sidebar.getBoundingClientRect = domRect(left, width);
+      root.appendChild(sidebar);
+      return sidebar;
+    };
 
     let textarea: HTMLTextAreaElement;
     let textElement: ExcalidrawTextElement;
@@ -966,27 +990,143 @@ describe("textWysiwyg", () => {
     });
 
     it("should not cut the editor off at the viewport's edges", async () => {
-      UI.clickTool("text");
-      mouse.click(0, 0);
-
+      Keyboard.exitTextEditor(textarea);
+      // already wider than the 800x400 viewport: such a text keeps growing
+      const line =
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+      const wide = API.createElement({ type: "text", text: line, width: 1000 });
+      API.setElements([wide]);
+      API.setSelectedElements([wide]);
+      Keyboard.keyPress(KEYS.ENTER);
       textarea = await getTextEditor();
-      // wider and taller than the 800x400 viewport
-      updateTextEditor(
-        textarea,
-        `Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!${"\nline".repeat(
-          20,
-        )}`,
-      );
+      // and taller, too
+      updateTextEditor(textarea, `${line}${"\nline".repeat(20)}`);
 
       // the editor box is the text's: a caret past an edge pans the canvas
       // (see below) instead of scrolling inside a box cut to the viewport
       const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
       expect(text.width).toBe(1000);
       expect(text.height).toBeGreaterThan(400);
       expect(textarea.style.width).toBe(`${text.width}px`);
       expect(parseFloat(textarea.style.height)).toBeCloseTo(text.height * 1.05);
       expect(textarea.style.maxHeight).toBe("");
       Keyboard.exitTextEditor(textarea);
+    });
+
+    it("should stop a growing text at the view's width and wrap it from there", () => {
+      // the 800px wide view, less some room at each side
+      const maxWidth = 800 - 2 * TEXT_VIEWPORT_PADDING;
+      const line =
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+      updateTextEditor(textarea, line);
+
+      let text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      expect(text.width).toBe(maxWidth);
+      expect(text.originalText).toBe(line);
+      expect(text.text).toContain("\n");
+      // the editor wraps along
+      expect(textarea.style.whiteSpace).toBe("pre-wrap");
+      expect(textarea.style.width).toBe(`${maxWidth}px`);
+
+      // typing on wraps further; the width stays
+      const { height } = text;
+      updateTextEditor(textarea, `${line} ${line}`);
+      text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.width).toBe(maxWidth);
+      expect(text.height).toBeGreaterThan(height);
+    });
+
+    it("should stop a growing text at a width that follows the zoom and a docked sidebar", () => {
+      const sidebar = dockSidebar(500, 300);
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+
+      updateTextEditor(
+        textarea,
+        "Excalidraw is an opensource virtual collaborative whiteboard",
+      );
+      // the canvas left of the sidebar, less the room, in scene units
+      expect(h.elements[0].width).toBe(
+        (800 - 300 - 2 * TEXT_VIEWPORT_PADDING) / 2,
+      );
+      sidebar.remove();
+    });
+
+    it("should bring a text that starts wrapping into view, with room at its right edge", async () => {
+      Keyboard.exitTextEditor(textarea);
+      UI.clickTool("text");
+      mouse.clickAt(300, 100);
+      textarea = await getTextEditor();
+      const { scrollY } = h.state;
+      // starts at 300px: it would stop growing well past the right edge
+      updateTextEditor(
+        textarea,
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+      );
+
+      const text = h.app.scene.getElement(
+        h.state.editingTextElement!.id,
+      ) as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      // as wide as the view less the room at each side, it now fills that
+      const zoom = h.state.zoom.value;
+      expect((text.x + h.state.scrollX) * zoom).toBeCloseTo(
+        TEXT_VIEWPORT_PADDING,
+      );
+      expect((text.x + text.width + h.state.scrollX) * zoom).toBeCloseTo(
+        800 - TEXT_VIEWPORT_PADDING,
+      );
+      // it fitted vertically already
+      expect(h.state.scrollY).toBe(scrollY);
+      // and the editor moved along
+      expect(parseFloat(textarea.style.left)).toBeCloseTo(
+        TEXT_VIEWPORT_PADDING,
+      );
+    });
+
+    it("should leave the vertical to the caret when a text that starts wrapping is taller than the view", async () => {
+      Keyboard.exitTextEditor(textarea);
+      UI.clickTool("text");
+      mouse.clickAt(300, 100);
+      textarea = await getTextEditor();
+      const { scrollY } = h.state;
+      updateTextEditor(
+        textarea,
+        `${"line\n".repeat(
+          20,
+        )}Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!`,
+      );
+
+      const text = h.app.scene.getElement(
+        h.state.editingTextElement!.id,
+      ) as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      expect(text.height).toBeGreaterThan(400);
+      // brought in horizontally…
+      expect(
+        (text.x + text.width + h.state.scrollX) * h.state.zoom.value,
+      ).toBeCloseTo(800 - TEXT_VIEWPORT_PADDING);
+      // …but not vertically: all of it can't be, and the caret is followed
+      // as usual
+      expect(h.state.scrollY).toBe(scrollY);
+    });
+
+    it("should keep a right-aligned text's right edge where it stops growing", () => {
+      API.updateElement(h.elements[0] as ExcalidrawTextElement, {
+        textAlign: "right",
+      });
+      updateTextEditor(textarea, "short");
+      const { x, width } = h.elements[0];
+      expect((h.elements[0] as ExcalidrawTextElement).textAlign).toBe("right");
+
+      updateTextEditor(
+        textarea,
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+      );
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      expect(text.x + text.width).toBeCloseTo(x + width);
     });
 
     it("should pan the canvas instead of scrolling the editor to reveal the caret", () => {
@@ -1038,26 +1178,7 @@ describe("textWysiwyg", () => {
 
     it("should keep the editor's box off a docked sidebar", () => {
       const editorBox = textarea.parentElement!;
-      const root = textarea.closest<HTMLElement>(".excalidraw")!;
-      const rect = (left: number, width: number) => () =>
-        ({
-          x: left,
-          y: 0,
-          left,
-          top: 0,
-          width,
-          height: 400,
-          right: left + width,
-          bottom: 400,
-          toJSON: () => {},
-        } as DOMRect);
-      root.getBoundingClientRect = rect(0, 800);
-      const sidebar = document.createElement("div");
-      sidebar.className = "sidebar sidebar--docked";
-      sidebar.dataset.viewportUi = "side";
-      sidebar.dataset.viewportUiName = "sidebar";
-      sidebar.getBoundingClientRect = rect(500, 300);
-      root.appendChild(sidebar);
+      const sidebar = dockSidebar(500, 300);
       const editorLeft = parseFloat(textarea.style.left);
 
       // docked on the right: the box ends where the sidebar starts, so a
@@ -1069,7 +1190,7 @@ describe("textWysiwyg", () => {
 
       // docked on the left (RTL): the box starts where the sidebar ends, and
       // the editor keeps its place on the canvas
-      sidebar.getBoundingClientRect = rect(0, 300);
+      sidebar.getBoundingClientRect = domRect(0, 300);
       updateTextEditor(textarea, "Hello!");
       expect(editorBox.style.left).toBe("300px");
       expect(editorBox.style.right).toBe("0px");
