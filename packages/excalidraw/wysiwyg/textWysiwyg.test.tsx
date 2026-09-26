@@ -1,4 +1,5 @@
 import { queryByText } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
 import {
@@ -43,6 +44,7 @@ import {
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
+import * as dataModule from "../data";
 import { actionBindText } from "../actions";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 
@@ -963,6 +965,28 @@ describe("textWysiwyg", () => {
         shiftKey: true,
       });
       expect(textElement.fontSize).toBe(origFontSize);
+    });
+
+    it.each([
+      { label: "Cmd/Ctrl+S", shiftKey: false },
+      { label: "Cmd/Ctrl+Shift+S", shiftKey: true },
+    ])("should commit text before saving via $label", ({ shiftKey }) => {
+      let editingWhenSaved: unknown = "not saved";
+      const saveSpy = vi
+        .spyOn(dataModule, "saveAsJSON")
+        .mockImplementation((async () => {
+          editingWhenSaved = h.state.editingTextElement;
+          return { fileHandle: null };
+        }) as unknown as typeof dataModule.saveAsJSON);
+
+      try {
+        fireEvent.keyDown(textarea, { key: KEYS.S, ctrlKey: true, shiftKey });
+
+        expect(saveSpy).toHaveBeenCalledTimes(1);
+        expect(editingWhenSaved).toBe(null);
+      } finally {
+        saveSpy.mockRestore();
+      }
     });
 
     it("zooming via keyboard should zoom canvas", () => {
