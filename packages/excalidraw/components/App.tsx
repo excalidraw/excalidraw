@@ -101,7 +101,6 @@ import {
   deriveStylesPanelMode,
   isIOS,
   isBrave,
-  isSafari,
   type EditorInterface,
   type StylesPanelMode,
   loadDesktopUIModePreference,
@@ -448,6 +447,7 @@ import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppDuplicate } from "./App.duplicate";
+import { AppFonts } from "./App.fonts";
 import { AppFlowchart } from "./App.flowchart";
 import { AppPan } from "./App.pan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
@@ -714,6 +714,7 @@ class App extends React.Component<AppProps, AppState> {
 
   public bucketFill: AppBucketFill = new AppBucketFill(this);
   public duplicate: AppDuplicate = new AppDuplicate(this);
+  public fontMetrics: AppFonts = new AppFonts(this);
   public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
@@ -3717,10 +3718,7 @@ class App extends React.Component<AppProps, AppState> {
     // can be loaded fresh
     this.clearImageShapeCache();
 
-    // manually loading the font faces seems faster even in browsers that do fire the loadingdone event
-    this.fonts.loadSceneFonts().then((fontFaces) => {
-      this.fonts.onLoaded(fontFaces);
-    });
+    this.fontMetrics.loadSceneFonts();
 
     if (isElementLink(this.ownerWindow.location.href)) {
       this.viewport.setViewport({
@@ -4016,14 +4014,10 @@ class App extends React.Component<AppProps, AppState> {
           passive: false,
         },
       ), // #3553
-      // rerender text elements on font load to fix #637 && #1553
       addEventListener(
         this.ownerDocument.fonts,
         "loadingdone",
-        (event) => {
-          const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
-          this.fonts.onLoaded(fontFaces);
-        },
+        this.fontMetrics.handleLoadingDone,
         { passive: false },
       ),
       addEventListener(
@@ -4872,6 +4866,8 @@ class App extends React.Component<AppProps, AppState> {
   }) => {
     const elements = restoreElements(opts.elements, null, {
       deleteInvisibleElements: true,
+      // pasted text carries the source's metrics; measure it locally
+      refreshDimensions: true,
     });
     const clientX =
       typeof opts.position === "object"
@@ -4913,14 +4909,13 @@ class App extends React.Component<AppProps, AppState> {
       }
     });
 
-    // paste event may not fire FontFace loadingdone event in Safari, hence loading font faces manually
-    if (isSafari) {
-      Fonts.loadElementsFonts(duplicatedElements, this.ownerDocument).then(
-        (fontFaces) => {
-          this.fonts.onLoaded(fontFaces);
-        },
-      );
-    }
+    // faces the pasted text needs may not be loaded yet (and Safari may not
+    // fire `loadingdone` on paste at all), so the synchronous measurement
+    // above may have used fallback metrics. Load them explicitly and
+    // remeasure once they arrive; the pasted elements are captured below,
+    // and the later (uncaptured) correction only brings the snapshot up to
+    // date
+    this.fontMetrics.remeasureTextOnceLoaded(duplicatedElements);
 
     if (opts.files) {
       this.addMissingFiles(opts.files);
@@ -6466,6 +6461,11 @@ class App extends React.Component<AppProps, AppState> {
       }
     };
 
+    const fontSession = this.fontMetrics.createEditSession(
+      element,
+      (originalText) => updateElement(originalText, false),
+    );
+
     this.textWysiwygSubmitHandler = textWysiwyg({
       canvas: this.canvas,
       getViewportCoords: (x, y) => {
@@ -6486,8 +6486,10 @@ class App extends React.Component<AppProps, AppState> {
         if (isNonDeletedElement(element)) {
           updateBoundElements(element, this.scene);
         }
+        fontSession.onChange(nextOriginalText);
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
+        fontSession.end();
         this.textWysiwygSubmitHandler = null;
 
         const isDeleted = !nextOriginalText.trim();
@@ -13056,6 +13058,7 @@ class App extends React.Component<AppProps, AppState> {
             replaceFiles: true,
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
+          this.fontMetrics.remeasureTextOnceLoaded(scene.elements);
           return;
         } catch (error: any) {
           if (error.name !== "EncodingError") {
@@ -13211,6 +13214,7 @@ class App extends React.Component<AppProps, AppState> {
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
+        this.fontMetrics.remeasureTextOnceLoaded(ret.data.elements);
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
           .updateLibrary({
