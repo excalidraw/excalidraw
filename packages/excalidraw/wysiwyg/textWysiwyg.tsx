@@ -78,6 +78,13 @@ import type App from "../components/App";
 import type { AppState } from "../types";
 
 /**
+ * How much further than the browser's caret reveal the canvas pans, in
+ * screen px: text typed past the viewport's edge comes back with this much
+ * room to spare, instead of flush against the edge.
+ */
+export const CARET_FOLLOW_PADDING = 5;
+
+/**
  * The editor is scaled and rotated about the text's center (its transform
  * origin), as the canvas draws the text. The zoom puts that center at half
  * the *scaled* size from the box's top-left, while the origin sits at half
@@ -1021,10 +1028,13 @@ export const textWysiwyg = ({
   // The browser reveals an out-of-view caret by scrolling the nearest scroll
   // container. For an editor reaching past the viewport (its box is never cut
   // to it), that is the editor root, and the whole UI would shift out of
-  // line with the canvas. Hand the offset to the canvas instead and put the root back: the
-  // canvas follows the caret. Scroll events fire before the frame is
-  // painted, so the root's shift is never seen; and the root absorbing the
-  // reveal keeps it from scrolling a host page around an embedded editor.
+  // line with the canvas. Hand the offset to the canvas instead, plus some
+  // room to spare, and put the root back: the canvas follows the caret.
+  // Scroll events fire before the frame is painted, so the root's shift is
+  // never seen; and the root absorbing the reveal keeps it from scrolling a
+  // host page around an embedded editor. (The root's `scroll-padding` can't
+  // give the room: the reveal only scrolls as far as the editor box
+  // reaches, which ends at the text.)
   const onContainerScroll = () => {
     if (!excalidrawContainer) {
       return;
@@ -1035,9 +1045,12 @@ export const textWysiwyg = ({
     }
     excalidrawContainer.scrollLeft = 0;
     excalidrawContainer.scrollTop = 0;
+    // the root only scrolls right and down (it can't go below 0)
+    const panX = scrollLeft && scrollLeft + CARET_FOLLOW_PADDING;
+    const panY = scrollTop && scrollTop + CARET_FOLLOW_PADDING;
     app.viewport.translate((state) => ({
-      scrollX: state.scrollX - scrollLeft / state.zoom.value,
-      scrollY: state.scrollY - scrollTop / state.zoom.value,
+      scrollX: state.scrollX - panX / state.zoom.value,
+      scrollY: state.scrollY - panY / state.zoom.value,
     }));
   };
   excalidrawContainer?.addEventListener("scroll", onContainerScroll);

@@ -45,6 +45,8 @@ import {
 import { actionBindText } from "../actions";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 
+import { CARET_FOLLOW_PADDING } from "./textWysiwyg";
+
 const { h } = window;
 
 unmountComponent();
@@ -998,20 +1000,35 @@ describe("textWysiwyg", () => {
       root.scrollLeft = 40;
       fireEvent.scroll(root);
 
-      // the root is put back, and the canvas pans by the same screen distance
+      // the root is put back, and the canvas pans by the same screen
+      // distance plus room to spare
       expect(root.scrollTop).toBe(0);
       expect(root.scrollLeft).toBe(0);
-      expect(h.state.scrollX).toBe(scrollX - 20);
-      expect(h.state.scrollY).toBe(scrollY - 60);
+      expect(h.state.scrollX).toBe(scrollX - (40 + CARET_FOLLOW_PADDING) / 2);
+      expect(h.state.scrollY).toBe(scrollY - (120 + CARET_FOLLOW_PADDING) / 2);
       // with the editor on it
-      expect(parseFloat(textarea.style.top)).toBe(editorTop - 120);
+      expect(parseFloat(textarea.style.top)).toBe(
+        editorTop - (120 + CARET_FOLLOW_PADDING),
+      );
+
+      // a reveal along one axis pans along that axis only
+      const scrolledX = h.state.scrollX;
+      root.scrollTop = 30;
+      fireEvent.scroll(root);
+      expect(h.state.scrollX).toBe(scrolledX);
+      expect(h.state.scrollY).toBe(
+        scrollY -
+          (120 + CARET_FOLLOW_PADDING) / 2 -
+          (30 + CARET_FOLLOW_PADDING) / 2,
+      );
 
       // with no text being edited, the root is left alone
+      const lastScrollY = h.state.scrollY;
       Keyboard.exitTextEditor(textarea);
       root.scrollTop = 50;
       fireEvent.scroll(root);
       expect(root.scrollTop).toBe(50);
-      expect(h.state.scrollY).toBe(scrollY - 60);
+      expect(h.state.scrollY).toBe(lastScrollY);
       root.scrollTop = 0;
     });
   });
