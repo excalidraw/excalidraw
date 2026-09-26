@@ -237,6 +237,43 @@ export const textWysiwyg = ({
 }): SubmitHandler => {
   const ownerDocument = excalidrawContainer?.ownerDocument ?? document;
   const ownerWindow = ownerDocument.defaultView ?? window;
+  // the editor's box: the part of the canvas a caret is revealed into (see
+  // onEditorBoxScroll)
+  const editorBox =
+    excalidrawContainer?.querySelector<HTMLDivElement>(
+      ".excalidraw-textEditorContainer",
+    ) ?? null;
+
+  /**
+   * Keeps the editor's box off a docked sidebar, so a caret behind the
+   * sidebar is outside the box and gets revealed like one past the
+   * viewport's edge. Returns the box's left inset, which the editor's
+   * position is relative to.
+   */
+  const updateEditorBoxInsets = () => {
+    if (!excalidrawContainer || !editorBox) {
+      return 0;
+    }
+    let left = 0;
+    let right = 0;
+    const sidebar = excalidrawContainer.querySelector(".sidebar--docked");
+    if (sidebar) {
+      const containerRect = excalidrawContainer.getBoundingClientRect();
+      const sidebarRect = sidebar.getBoundingClientRect();
+      // docked on the right, or on the left (RTL)
+      if (
+        sidebarRect.left + sidebarRect.width / 2 >
+        containerRect.left + containerRect.width / 2
+      ) {
+        right = Math.max(0, containerRect.right - sidebarRect.left);
+      } else {
+        left = Math.max(0, sidebarRect.right - containerRect.left);
+      }
+    }
+    editorBox.style.left = `${left}px`;
+    editorBox.style.right = `${right}px`;
+    return left;
+  };
   let currentTextLayout: {
     angle: Radians;
     font: ReturnType<typeof getFontString>;
@@ -390,7 +427,7 @@ export const textWysiwyg = ({
 
       // The editor box is the text's, never cut to the viewport: a caret past
       // the viewport's edge is revealed by panning the canvas (see
-      // onContainerScroll), and the editor stays on its text.
+      // onEditorBoxScroll), and the editor stays on its text.
       if (container) {
         width += 0.5;
       }
@@ -399,6 +436,7 @@ export const textWysiwyg = ({
       height *= 1.05;
 
       const font = getFontString(updatedTextElement);
+      const editorBoxLeft = updateEditorBoxInsets();
 
       Object.assign(editable.style, {
         font,
@@ -406,7 +444,7 @@ export const textWysiwyg = ({
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
         height: `${height}px`,
-        left: `${viewportX}px`,
+        left: `${viewportX - editorBoxLeft}px`,
         top: `${viewportY}px`,
         // about the text's center, whatever size the box itself ends up
         // (the 5% buffer) — see getTransform
@@ -892,7 +930,9 @@ export const textWysiwyg = ({
     unbindUpdate();
     unsubOnChange();
     unbindOnScroll();
-    excalidrawContainer?.removeEventListener("scroll", onContainerScroll);
+    editorBox?.removeEventListener("scroll", onEditorBoxScroll);
+    editorBox?.style.removeProperty("left");
+    editorBox?.style.removeProperty("right");
 
     editable.remove();
   };
@@ -1026,26 +1066,27 @@ export const textWysiwyg = ({
   });
 
   // The browser reveals an out-of-view caret by scrolling the nearest scroll
-  // container. For an editor reaching past the viewport (its box is never cut
-  // to it), that is the editor root, and the whole UI would shift out of
-  // line with the canvas. Hand the offset to the canvas instead, plus some
-  // room to spare, and put the root back: the canvas follows the caret.
-  // Scroll events fire before the frame is painted, so the root's shift is
-  // never seen; and the root absorbing the reveal keeps it from scrolling a
-  // host page around an embedded editor. (The root's `scroll-padding` can't
-  // give the room: the reveal only scrolls as far as the editor box
-  // reaches, which ends at the text.)
-  const onContainerScroll = () => {
-    if (!excalidrawContainer) {
+  // container: the editor's box, which clips it to the canvas area (off a
+  // docked sidebar too, see updateEditorBoxInsets). Scrolled, the editor
+  // would leave its text on the canvas; hand the offset to the canvas
+  // instead, plus some room to spare, and put the box back: the canvas
+  // follows the caret. Scroll events fire before the frame is painted, so
+  // the box's shift is never seen, and the reveal never gets past the box —
+  // to the editor root, whose overflow a host may override, or to a page
+  // around an embedded editor. (A `scroll-padding` can't give the room: the
+  // reveal only scrolls as far as the editor reaches, which ends at the
+  // text.)
+  const onEditorBoxScroll = () => {
+    if (!editorBox) {
       return;
     }
-    const { scrollLeft, scrollTop } = excalidrawContainer;
+    const { scrollLeft, scrollTop } = editorBox;
     if (!scrollLeft && !scrollTop) {
       return;
     }
-    excalidrawContainer.scrollLeft = 0;
-    excalidrawContainer.scrollTop = 0;
-    // the root only scrolls right and down (it can't go below 0)
+    editorBox.scrollLeft = 0;
+    editorBox.scrollTop = 0;
+    // the box only scrolls right and down (it can't go below 0)
     const panX = scrollLeft && scrollLeft + CARET_FOLLOW_PADDING;
     const panY = scrollTop && scrollTop + CARET_FOLLOW_PADDING;
     app.viewport.translate((state) => ({
@@ -1053,7 +1094,7 @@ export const textWysiwyg = ({
       scrollY: state.scrollY - panY / state.zoom.value,
     }));
   };
-  excalidrawContainer?.addEventListener("scroll", onContainerScroll);
+  editorBox?.addEventListener("scroll", onEditorBoxScroll);
 
   // ---------------------------------------------------------------------------
 
@@ -1088,9 +1129,7 @@ export const textWysiwyg = ({
     });
   });
   ownerWindow.addEventListener("beforeunload", handleSubmit);
-  excalidrawContainer
-    ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(editable);
+  editorBox!.appendChild(editable);
 
   return handleSubmit;
 };

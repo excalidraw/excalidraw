@@ -49,11 +49,6 @@ body.excalidraw-cursor-resize * {
   font-family: var(--ui-font);
 
   position: relative;
-  // `hidden`, not `clip`: this box must stay a scroll container. The browser
-  // scrolls it to reveal the caret of a text editor reaching past the
-  // viewport — and with `clip` it would scroll a host page around an
-  // embedded editor instead. The text editor hands any such scroll to the
-  // canvas and puts this box back (see textWysiwyg).
   overflow: hidden;
   color: var(--text-primary-color);
   display: flex;
@@ -133,6 +128,23 @@ body.excalidraw-cursor-resize * {
 
   &__canvas {
     position: absolute;
+  }
+
+  // The text editor's box: the canvas area, clipped, and kept off a docked
+  // sidebar (see textWysiwyg). A caret outside it is revealed by scrolling
+  // this box, which the text editor turns into a canvas pan.
+  .excalidraw-textEditorContainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    > textarea {
+      pointer-events: auto;
+    }
   }
 
   &__embeddable {

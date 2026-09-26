@@ -989,32 +989,36 @@ describe("textWysiwyg", () => {
       Keyboard.exitTextEditor(textarea);
     });
 
-    it("should pan the canvas instead of letting the editor root scroll to reveal the caret", () => {
+    it("should pan the canvas instead of scrolling the editor to reveal the caret", () => {
       API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+      const editorBox = textarea.parentElement!;
       const root = textarea.closest<HTMLElement>(".excalidraw")!;
       const { scrollX, scrollY } = h.state;
       const editorTop = parseFloat(textarea.style.top);
 
-      // what the browser does to reveal a caret below and right of the viewport
-      root.scrollTop = 120;
-      root.scrollLeft = 40;
-      fireEvent.scroll(root);
+      // what the browser does to reveal a caret below and right of the
+      // editor's box (the canvas area)
+      editorBox.scrollTop = 120;
+      editorBox.scrollLeft = 40;
+      fireEvent.scroll(editorBox);
 
-      // the root is put back, and the canvas pans by the same screen
+      // the box is put back, and the canvas pans by the same screen
       // distance plus room to spare
-      expect(root.scrollTop).toBe(0);
-      expect(root.scrollLeft).toBe(0);
+      expect(editorBox.scrollTop).toBe(0);
+      expect(editorBox.scrollLeft).toBe(0);
       expect(h.state.scrollX).toBe(scrollX - (40 + CARET_FOLLOW_PADDING) / 2);
       expect(h.state.scrollY).toBe(scrollY - (120 + CARET_FOLLOW_PADDING) / 2);
       // with the editor on it
       expect(parseFloat(textarea.style.top)).toBe(
         editorTop - (120 + CARET_FOLLOW_PADDING),
       );
+      // the reveal never reaches the root
+      expect(root.scrollTop).toBe(0);
 
       // a reveal along one axis pans along that axis only
       const scrolledX = h.state.scrollX;
-      root.scrollTop = 30;
-      fireEvent.scroll(root);
+      editorBox.scrollTop = 30;
+      fireEvent.scroll(editorBox);
       expect(h.state.scrollX).toBe(scrolledX);
       expect(h.state.scrollY).toBe(
         scrollY -
@@ -1022,14 +1026,63 @@ describe("textWysiwyg", () => {
           (30 + CARET_FOLLOW_PADDING) / 2,
       );
 
-      // with no text being edited, the root is left alone
+      // with no text being edited, the box is left alone
       const lastScrollY = h.state.scrollY;
       Keyboard.exitTextEditor(textarea);
-      root.scrollTop = 50;
-      fireEvent.scroll(root);
-      expect(root.scrollTop).toBe(50);
+      editorBox.scrollTop = 50;
+      fireEvent.scroll(editorBox);
+      expect(editorBox.scrollTop).toBe(50);
       expect(h.state.scrollY).toBe(lastScrollY);
-      root.scrollTop = 0;
+      editorBox.scrollTop = 0;
+    });
+
+    it("should keep the editor's box off a docked sidebar", () => {
+      const editorBox = textarea.parentElement!;
+      const root = textarea.closest<HTMLElement>(".excalidraw")!;
+      const rect = (left: number, width: number) => () =>
+        ({
+          x: left,
+          y: 0,
+          left,
+          top: 0,
+          width,
+          height: 400,
+          right: left + width,
+          bottom: 400,
+          toJSON: () => {},
+        } as DOMRect);
+      root.getBoundingClientRect = rect(0, 800);
+      const sidebar = document.createElement("div");
+      sidebar.className = "sidebar sidebar--docked";
+      sidebar.getBoundingClientRect = rect(500, 300);
+      root.appendChild(sidebar);
+      const editorLeft = parseFloat(textarea.style.left);
+
+      // docked on the right: the box ends where the sidebar starts, so a
+      // caret behind the sidebar is outside it (and revealed by a pan)
+      updateTextEditor(textarea, "Hello");
+      expect(editorBox.style.right).toBe("300px");
+      expect(editorBox.style.left).toBe("0px");
+      expect(parseFloat(textarea.style.left)).toBe(editorLeft);
+
+      // docked on the left (RTL): the box starts where the sidebar ends, and
+      // the editor keeps its place on the canvas
+      sidebar.getBoundingClientRect = rect(0, 300);
+      updateTextEditor(textarea, "Hello!");
+      expect(editorBox.style.left).toBe("300px");
+      expect(editorBox.style.right).toBe("0px");
+      expect(parseFloat(textarea.style.left)).toBe(editorLeft - 300);
+
+      // not docked: the whole canvas
+      sidebar.remove();
+      updateTextEditor(textarea, "Hello");
+      expect(editorBox.style.left).toBe("0px");
+      expect(editorBox.style.right).toBe("0px");
+
+      // the insets go with the editor
+      Keyboard.exitTextEditor(textarea);
+      expect(editorBox.style.left).toBe("");
+      expect(editorBox.style.right).toBe("");
     });
   });
 
