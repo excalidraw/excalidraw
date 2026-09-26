@@ -659,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "मर्मेड से एक्सकाली में",
     "button": "सन्निवेश करे",
