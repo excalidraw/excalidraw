@@ -70,9 +70,16 @@ const TOOLTIP_WARM_WINDOW = 300;
 
 let showTooltipTimer = 0;
 let tooltipHiddenAt = 0;
+/**
+ * while a tooltip is visible, hides it once its item is removed from the DOM
+ * (e.g. unmounted while hovered, which doesn't fire pointerleave)
+ */
+let tooltipItemObserver: MutationObserver | null = null;
 
-const hideTooltip = () => {
+export const hideTooltip = () => {
   clearTimeout(showTooltipTimer);
+  tooltipItemObserver?.disconnect();
+  tooltipItemObserver = null;
   const tooltip = getTooltipDiv();
   if (tooltip.classList.contains("excalidraw-tooltip--visible")) {
     tooltip.classList.remove("excalidraw-tooltip--visible");
@@ -81,10 +88,11 @@ const hideTooltip = () => {
 };
 
 const updateTooltip = (
-  item: HTMLDivElement,
+  item: HTMLElement,
   tooltip: HTMLDivElement,
   label: string,
   long: boolean,
+  position: "bottom" | "top",
 ) => {
   tooltip.classList.add("excalidraw-tooltip--visible");
   tooltip.style.minWidth = long ? "50ch" : "10ch";
@@ -93,7 +101,50 @@ const updateTooltip = (
   tooltip.textContent = label;
 
   const itemRect = item.getBoundingClientRect();
-  updateTooltipPosition(tooltip, itemRect);
+  updateTooltipPosition(tooltip, itemRect, position);
+
+  tooltipItemObserver?.disconnect();
+  tooltipItemObserver = new MutationObserver(() => {
+    if (!item.isConnected) {
+      hideTooltip();
+    }
+  });
+  tooltipItemObserver.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+};
+
+/**
+ * Shows the tooltip for `item`. For elements that can't be wrapped
+ * in <Tooltip>. Pair with `hideTooltip()`.
+ */
+export const showTooltip = (
+  item: HTMLElement,
+  label: string,
+  {
+    long = false,
+    delay = false,
+    position = "bottom",
+  }: {
+    long?: boolean;
+    /** show after a short delay (unless a tooltip was visible just now) */
+    delay?: boolean;
+    position?: "bottom" | "top";
+  } = {},
+) => {
+  const show = () => {
+    // item may have been unmounted while the delayed tooltip was pending
+    if (item.isConnected) {
+      updateTooltip(item, getTooltipDiv(), label, long, position);
+    }
+  };
+  clearTimeout(showTooltipTimer);
+  if (delay && Date.now() - tooltipHiddenAt > TOOLTIP_WARM_WINDOW) {
+    showTooltipTimer = window.setTimeout(show, TOOLTIP_DELAY);
+  } else {
+    show();
+  }
 };
 
 type TooltipProps = {
@@ -125,16 +176,9 @@ export const Tooltip = ({
   return (
     <div
       className={clsx("excalidraw-tooltip-wrapper", className)}
-      onPointerEnter={(event) => {
-        const item = event.currentTarget as HTMLDivElement;
-        const show = () => updateTooltip(item, getTooltipDiv(), label, long);
-        clearTimeout(showTooltipTimer);
-        if (delay && Date.now() - tooltipHiddenAt > TOOLTIP_WARM_WINDOW) {
-          showTooltipTimer = window.setTimeout(show, TOOLTIP_DELAY);
-        } else {
-          show();
-        }
-      }}
+      onPointerEnter={(event) =>
+        showTooltip(event.currentTarget, label, { long, delay })
+      }
       onPointerLeave={hideTooltip}
       style={style}
     >

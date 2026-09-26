@@ -77,6 +77,9 @@
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
+      // reserve the (thin) scrollbar's space so the content doesn't shift
+      // when it starts/stops overflowing (e.g. while searching)
+      scrollbar-gutter: stable;
     }
 
     &__header {
@@ -114,6 +117,15 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
       grid-gap: 1rem;
+
+      &--named {
+        // items are sized by the grid (not fixed like the default ones), so
+        // don't let it shrink to its content (e.g. only placeholders yet)
+        width: 100%;
+        // minmax so long (nowrap) names don't widen the columns
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-gap: 0.5rem;
+      }
     }
 
     &__search {
