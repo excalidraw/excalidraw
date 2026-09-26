@@ -1429,9 +1429,7 @@ const getElbowArrowData = (
  * Generate the elbow arrow segments
  *
  * @param arrow
- * @param elementsMap
- * @param nextPoints
- * @param options
+ * @param elbowArrowData
  * @returns
  */
 const routeElbowArrow = (
