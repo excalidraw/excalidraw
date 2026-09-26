@@ -9,9 +9,16 @@ const LOCAL_STATE_VERSIONS = {
 
 type BrowserStateTypes = keyof typeof LOCAL_STATE_VERSIONS;
 
+const getBrowserStorageStateVersion = (type: BrowserStateTypes): number =>
+  JSON.parse(localStorage.getItem(type) || "-1");
+
 export const isBrowserStorageStateNewer = (type: BrowserStateTypes) => {
-  const storageTimestamp = JSON.parse(localStorage.getItem(type) || "-1");
-  return storageTimestamp > LOCAL_STATE_VERSIONS[type];
+  return getBrowserStorageStateVersion(type) > LOCAL_STATE_VERSIONS[type];
+};
+
+/** marks this tab's state as up to date with the current browser storage */
+export const syncBrowserStateVersion = (type: BrowserStateTypes) => {
+  LOCAL_STATE_VERSIONS[type] = getBrowserStorageStateVersion(type);
 };
 
 export const updateBrowserStateVersion = (type: BrowserStateTypes) => {
