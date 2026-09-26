@@ -466,6 +466,12 @@ export interface AppState {
   scrollX: number;
   scrollY: number;
   scrollConstraints: ScrollConstraints | null;
+  /**
+   * set while presenting frames as slides (see `App.presentation.ts`)
+   */
+  presentation: {
+    frameId: ExcalidrawFrameLikeElement["id"];
+  } | null;
   cursorButton: "up" | "down";
   scrolledOutside: boolean;
   name: string | null;
@@ -482,6 +488,7 @@ export interface AppState {
     | "compactStrokeStyles"
     | "compactOtherProperties"
     | "compactArrowProperties"
+    | "compactFrameSize"
     | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:
@@ -1214,6 +1221,7 @@ export type AppClassProperties = {
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
   flowchart: App["flowchart"];
+  presentation: App["presentation"];
   drawShape: App["drawShape"];
   arrowText: App["arrowText"];
   textTool: App["textTool"];

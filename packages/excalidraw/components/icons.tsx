@@ -2554,6 +2554,41 @@ export const presentationIcon = createIcon(
   tablerIconProps,
 );
 
+export type ScreenIconDevice = "laptop" | "monitor" | "tablet" | "phone";
+
+/**
+ * A screen drawn in its true proportions, so icons of different aspect
+ * ratios can be told apart at a glance, with a small cue for devices.
+ */
+export const createScreenIcon = (
+  width: number,
+  height: number,
+  device?: ScreenIconDevice,
+) => {
+  // room below the screen for a monitor stand / laptop base
+  const extra = device === "monitor" ? 3.5 : device === "laptop" ? 2.5 : 0;
+  const maxWidth = device === "laptop" ? 17 : 20;
+  const scale = Math.min(maxWidth / width, (20 - extra) / height);
+  const w = width * scale;
+  const h = height * scale;
+  const x = 12 - w / 2;
+  const y = 12 - (h + extra) / 2;
+  const bottom = y + h;
+  const isHandheld = device === "tablet" || device === "phone";
+
+  return createIcon(
+    <g strokeWidth="1.5">
+      <rect x={x} y={y} width={w} height={h} rx={isHandheld ? 2 : 1.5} />
+      {device === "monitor" && (
+        <path d={`M12 ${bottom}v3.5M9 ${bottom + 3.5}h6`} />
+      )}
+      {device === "laptop" && <path d={`M${x - 2} ${bottom + 2.5}h${w + 4}`} />}
+      {isHandheld && <path d={`M11 ${bottom - 2}h2`} />}
+    </g>,
+    tablerIconProps,
+  );
+};
+
 // empty placeholder icon (used for alignment in menus)
 export const emptyIcon = <div style={{ width: "1rem", height: "1rem" }} />;
 

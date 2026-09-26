@@ -1,0 +1,13 @@
+.excalidraw {
+  .frame-size-panel {
+    .buttonList + .buttonList {
+      margin-top: 0.5rem;
+    }
+  }
+
+  .frame-size-panel__dimensions {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+  }
+}

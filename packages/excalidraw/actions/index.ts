@@ -79,6 +79,11 @@ export {
 
 export { actionToggleGridMode } from "./actionToggleGridMode";
 export { actionToggleZenMode } from "./actionToggleZenMode";
+export { actionChangeFrameSize } from "./actionFrameSize";
+export {
+  actionTogglePresentation,
+  actionPresentFromFrame,
+} from "./actionPresentation";
 export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
 export { actionToggleArrowBinding } from "./actionToggleArrowBinding";
 export { actionToggleMidpointSnapping } from "./actionToggleMidpointSnapping";

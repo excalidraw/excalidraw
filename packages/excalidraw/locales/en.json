@@ -202,6 +202,34 @@
     "inputDeviceTrackpad": "Trackpad",
     "inputDeviceMouse": "Mouse"
   },
+  "frameSize": {
+    "title": "Frame size",
+    "addFrame": "Add frame",
+    "orientation": "Orientation",
+    "landscape": "Landscape",
+    "portrait": "Portrait",
+    "presetTooltip": "{{name}} · {{width}} × {{height}}",
+    "presets": {
+      "slide16x9": "Slide 16:9",
+      "slide4x3": "Slide 4:3",
+      "widescreen16x10": "Widescreen 16:10",
+      "ultrawide": "Ultrawide 21:9",
+      "laptop": "Laptop",
+      "monitor4k": "4K monitor",
+      "tablet": "Tablet",
+      "phone": "Phone"
+    }
+  },
+  "presentation": {
+    "start": "Start presentation",
+    "stop": "Stop presentation",
+    "startFromFrame": "Present from this frame",
+    "noFrames": "Add frames to present them as slides.",
+    "previous": "Previous slide",
+    "next": "Next slide",
+    "slideCounter": "{{current}} / {{total}}",
+    "hint": "Use arrow keys or Space to move between slides, Esc to exit"
+  },
   "elementLink": {
     "title": "Link to object",
     "desc": "Click on a shape on canvas or paste a link.",
