@@ -231,3 +231,18 @@ describe("Google Drive video embedding", () => {
     ).toBe(true);
   });
 });
+
+describe("p5.js editor embedding", () => {
+  it("should allow editor.p5js.org URLs by default", () => {
+    const url = "https://editor.p5js.org/j-palindrome/sketches/_f0VbfPAL";
+    const result = getEmbedLink(url);
+
+    expect(embeddableURLValidator(url, undefined)).toBe(true);
+    expect(result).toBeTruthy();
+    expect(result?.type).toBe("generic");
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(url);
+      expect(result.sandbox).toEqual({ allowSameOrigin: true });
+    }
+  });
+});
