@@ -27,7 +27,7 @@
   --link-color: #{$color-blue-7};
   --link-color-hover: #{$color-blue-8};
   --link-color-active: #{$color-blue-2};
-  --overlay-bg-color: #{color.adjust(#fff, $alpha: -0.12)};
+  --overlay-bg-color: rgba(12, 12, 14, 0.35);
   --popup-bg-color: var(--island-bg-color);
   --popup-secondary-bg-color: #{$color-gray-1};
   --popup-text-color: #000;
@@ -204,7 +204,7 @@
     --island-bg-color-alt: hsl(240, 12%, 12%);
     --keybinding-color: var(--color-gray-60);
     --link-color: #{$color-blue-4};
-    --overlay-bg-color: #{color.adjust($color-gray-8, $alpha: -0.88)};
+    --overlay-bg-color: rgba(12, 12, 14, 0.65);
     --popup-secondary-bg-color: #222;
     --popup-text-color: #{$color-gray-4};
     --popup-text-inverted-color: #2c2c2c;

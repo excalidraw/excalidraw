@@ -457,6 +457,7 @@ import { AppWheel } from "./App.wheel";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
+import { FileDropOverlay } from "./FileDropOverlay";
 import { ViewportStatusBorder } from "./ViewportStatusFrame/ViewportStatusFrame";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
@@ -2453,7 +2454,7 @@ class App extends React.Component<AppProps, AppState> {
           ["--zen-mode-transition-duration" as any]: `${ZEN_MODE_TRANSITION_DURATION}ms`,
         }}
         ref={this.excalidrawContainerRef}
-        onDrop={this.isInteractionEnabled() ? this.handleAppOnDrop : undefined}
+        onDrop={this.isFileDropEnabled() ? this.handleAppOnDrop : undefined}
         tabIndex={0}
         onKeyDown={
           this.props.handleKeyboardGlobally || !this.isInteractionEnabled()
@@ -2542,6 +2543,9 @@ class App extends React.Component<AppProps, AppState> {
                             ]}
                           />
                           {this.isDefaultUIEnabled() && <CursorHint />}
+                          {this.isDefaultUIEnabled() &&
+                            this.isInteractionEnabled() &&
+                            !this.state.viewModeEnabled && <FileDropOverlay />}
                           {this.isDefaultUIEnabled() &&
                             selectedElements.length === 1 &&
                             this.state.openDialog?.name !==
@@ -3257,6 +3261,18 @@ class App extends React.Component<AppProps, AppState> {
 
   private disableEvent: EventListener = (event) => {
     event.preventDefault();
+  };
+
+  private isFileDropEnabled() {
+    return this.isInteractionEnabled() && !this.state.viewModeEnabled;
+  }
+
+  private onDragOver = (event: DragEvent) => {
+    event.preventDefault();
+    if (!this.isFileDropEnabled() && event.dataTransfer) {
+      // show a no-drop cursor
+      event.dataTransfer.dropEffect = "none";
+    }
   };
 
   // handles only the navigation keyboard: page-scroll keys and
@@ -4010,6 +4026,20 @@ class App extends React.Component<AppProps, AppState> {
         this.onWindowMessage,
         false,
       ),
+      // cancelled even when drops are ignored (view mode, non-interactive),
+      // so a dropped file doesn't make the browser navigate away to it
+      addEventListener(
+        this.excalidrawContainerRef.current,
+        EVENT.DRAG_OVER,
+        this.onDragOver,
+        false,
+      ),
+      addEventListener(
+        this.excalidrawContainerRef.current,
+        EVENT.DROP,
+        this.disableEvent,
+        false,
+      ),
       addEventListener(
         this.ownerDocument,
         EVENT.POINTER_UP,
@@ -4230,18 +4260,6 @@ class App extends React.Component<AppProps, AppState> {
         EVENT.WHEEL,
         this.wheel.handle,
         { passive: false },
-      ),
-      addEventListener(
-        this.excalidrawContainerRef.current,
-        EVENT.DRAG_OVER,
-        this.disableEvent,
-        false,
-      ),
-      addEventListener(
-        this.excalidrawContainerRef.current,
-        EVENT.DROP,
-        this.disableEvent,
-        false,
       ),
     );
 
@@ -5316,6 +5334,16 @@ class App extends React.Component<AppProps, AppState> {
   setToast = (toast: AppState["toast"]) => {
     this.setState({ toast });
   };
+
+  private showSceneReplacedToast() {
+    this.setToast({
+      message: t("fileDrop.replacedToast", {
+        shortcut: getShortcutKey("CtrlOrCmd+Z"),
+      }),
+      closable: true,
+      duration: 8000,
+    });
+  }
 
   restoreFileFromShare = async () => {
     try {
@@ -13093,10 +13121,11 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
-    // NOTE no preventDefault so the host page can handle the drop itself
-    if (!this.isInteractionEnabled()) {
+    if (!this.isFileDropEnabled()) {
       return;
     }
+    const { shiftKey, clientX, clientY } = event;
+    const insertPosition = shiftKey ? { clientX, clientY } : undefined;
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
       event,
       this.state,
@@ -13113,13 +13142,31 @@ class App extends React.Component<AppProps, AppState> {
         file &&
         (file.type === MIME_TYPES.png || file.type === MIME_TYPES.svg)
       ) {
+        let scene;
         try {
-          const scene = await loadFromBlob(
+          scene = await loadFromBlob(
             file,
             this.state,
             this.scene.getElementsIncludingDeleted(),
             fileHandle,
           );
+        } catch (error: any) {
+          if (error.name !== "EncodingError") {
+            throw new Error(t("alerts.couldNotLoadInvalidFile"));
+          }
+          // if EncodingError, fall through to insert as regular image
+        }
+        if (scene) {
+          if (insertPosition) {
+            this.addElementsFromPasteOrLibrary({
+              elements: scene.elements,
+              files: scene.files,
+              position: insertPosition,
+              retainSeed: true,
+              preserveFrameChildrenOrder: true,
+            });
+            return;
+          }
           this.syncActionResult({
             ...scene,
             appState: {
@@ -13129,12 +13176,8 @@ class App extends React.Component<AppProps, AppState> {
             replaceFiles: true,
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
+          this.showSceneReplacedToast();
           return;
-        } catch (error: any) {
-          if (error.name !== "EncodingError") {
-            throw new Error(t("alerts.couldNotLoadInvalidFile"));
-          }
-          // if EncodingError, fall through to insert as regular image
         }
       }
     }
@@ -13195,7 +13238,9 @@ class App extends React.Component<AppProps, AppState> {
       const { file, fileHandle } = fileItems[0];
       if (file) {
         // Attempt to parse an excalidraw/excalidrawlib file
-        await this.loadFileToCanvas(file, fileHandle);
+        if (await this.loadFileToCanvas(file, fileHandle, insertPosition)) {
+          this.showSceneReplacedToast();
+        }
       }
     }
 
@@ -13222,9 +13267,11 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /** @returns true if the file replaced the scene */
   loadFileToCanvas = async (
     file: File,
     fileHandle: FileSystemFileHandle | null,
+    insertPosition?: { clientX: number; clientY: number },
   ) => {
     file = await normalizeFile(file);
     try {
@@ -13263,6 +13310,16 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (ret.type === MIME_TYPES.excalidraw) {
+        if (insertPosition) {
+          this.addElementsFromPasteOrLibrary({
+            elements: ret.data.elements,
+            files: ret.data.files,
+            position: insertPosition,
+            retainSeed: true,
+            preserveFrameChildrenOrder: true,
+          });
+          return;
+        }
         // restore the fractional indices by mutating elements
         syncInvalidIndices(elements.concat(ret.data.elements));
 
@@ -13284,6 +13341,7 @@ class App extends React.Component<AppProps, AppState> {
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
+        return true;
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
           .updateLibrary({

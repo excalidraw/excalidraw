@@ -659,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "Drop to replace content",
+    "add": "Drop to add to canvas",
+    "importLibrary": "Drop to import library",
+    "replaceHint": "Hold <shift>Shift</shift> to keep existing content",
+    "keepHint": "Your existing content will be kept",
+    "libraryHint": "Library files will append",
+    "replacedToast": "Content replaced. {{shortcut}} to undo"
+  },
   "mermaid": {
     "title": "Mermaid to Excalidraw",
     "button": "Insert",
