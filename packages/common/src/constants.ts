@@ -570,6 +570,7 @@ export const EDITOR_LS_KEYS = {
   // legacy naming (non)scheme
   MERMAID_TO_EXCALIDRAW: "mermaid-to-excalidraw",
   PUBLISH_LIBRARY: "publish-library-data",
+  MATH_TOP_PICKS: "excalidraw-math-top-picks",
 } as const;
 
 /**
