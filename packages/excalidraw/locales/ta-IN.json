@@ -27,6 +27,7 @@
     "copyStyles": "ஒயில்களை நகலெடு",
     "pasteStyles": "ஒயில்களை ஒட்டு",
     "stroke": "கீறல்",
+    "textColor": "",
     "changeStroke": "கீறல் நிறத்தை மாற்று",
     "background": "பின்புலம்",
     "changeBackground": "பின்புல நிறத்தை மாற்று",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "இணைப்பு",
@@ -245,6 +250,7 @@
     "undo": "செயல்தவிர்",
     "redo": "மீண்டும்செய்",
     "resetLibrary": "நூலகத்தை அகரமாக்கு",
+    "reset": "",
     "createNewRoom": "புதிய அறையை உருவாக்கு",
     "fullScreen": "முழுத் திரை",
     "darkMode": "கருமை பயன்முறை",
@@ -332,6 +338,7 @@
     "eraser": "அழிப்பி",
     "frame": "சட்டகம் கருவி",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "வலை நுழைப்பு",
     "laser": "சீரொளி குறிமுள்",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "குழு",
     "frame": "வடிவு",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "தேர்வு",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "சொடுக்கி பிடித்திழு, முடித்ததும் விடுவி",
     "text": "துணுக்குதவி: தெரிவு கருவி கொண்டு எங்காவது இரு-சொடுக்கி உரையைச் சேர்க்கலாம்",
     "embeddable": "இழுத்து வலை நுழைப்பு உருவாக்கு",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +391,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "மெர்மெய்டிலிருந்து எக்ஸ்காலிட்ரா",
     "button": "புகுத்து",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "இந்தத் தளவட்டத்தில்",
     "availableFonts": "எழுத்துருக்கள்",
-    "empty": "எழுத்துருக்கள் எதுவும் இல்லை"
+    "empty": "எழுத்துருக்கள் எதுவும் இல்லை",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "பயனர்கள் காணவில்லை",

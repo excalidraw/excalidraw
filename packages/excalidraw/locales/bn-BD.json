@@ -27,6 +27,7 @@
     "copyStyles": "ডিজাইন কপি করুন",
     "pasteStyles": "ডিজাইন পেস্ট করুন",
     "stroke": "রেখাংশ",
+    "textColor": "",
     "changeStroke": "Hi",
     "background": "পটভূমি",
     "changeBackground": "পটভূমির রঙ পরিবর্তন করুন",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -245,6 +250,7 @@
     "undo": "ফেরত যান",
     "redo": "পুনরায় করুন",
     "resetLibrary": "সংগ্রহ সাফ করুন",
+    "reset": "",
     "createNewRoom": "নতুন রুম বানান",
     "fullScreen": "পূর্ণস্ক্রীন",
     "darkMode": "ডার্ক মোড",
@@ -332,6 +338,7 @@
     "eraser": "ঝাড়ন",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "laser": "",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,6 +383,7 @@
     "freeDraw": "ক্লিক করুন এবং টেনে আনুন, আপনার কাজ শেষ হলে ছেড়ে দিন",
     "text": "বিশেষ্য: আপনি নির্বাচন টুলের সাথে যে কোনো জায়গায় ডাবল-ক্লিক করে পাঠ্য যোগ করতে পারেন",
     "embeddable": "",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +391,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",

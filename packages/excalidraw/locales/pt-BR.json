@@ -27,6 +27,7 @@
     "copyStyles": "Copiar os estilos",
     "pasteStyles": "Colar os estilos",
     "stroke": "Contorno",
+    "textColor": "",
     "changeStroke": "Alterar cor da borda",
     "background": "Fundo",
     "changeBackground": "Alterar cor de fundo",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Atalho de flecha",
-    "midpointSnapping": "Encaixar em pontos intermediários"
+    "midpointSnapping": "Encaixar em pontos intermediários",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Links para o objeto",
@@ -245,6 +250,7 @@
     "undo": "Desfazer",
     "redo": "Refazer",
     "resetLibrary": "Redefinir biblioteca",
+    "reset": "",
     "createNewRoom": "Criar nova sala",
     "fullScreen": "Tela cheia",
     "darkMode": "Modo escuro",
@@ -332,6 +338,7 @@
     "eraser": "Borracha",
     "frame": "Ferramenta de quadro",
     "magicframe": "Wireframe para código",
+    "stickynote": "",
     "embeddable": "Página web incorporada",
     "laser": "Ponteiro de laser",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "Grupo",
     "frame": "Moldura",
     "magicframe": "Wireframe para código",
+    "stickynote": "",
     "embeddable": "Página web incorporada",
     "selection": "Seleção",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "Clique e arraste para criar um site incorporado",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "Clique duas vezes ou pressione {{shortcut}} para editar texto",
     "text_editing": "Pressione {{shortcut_1}} ou {{shortcut_2}} para salvar as edições",
@@ -382,6 +391,7 @@
     "lockAngle": "Você pode restringir ângulos segurando {{shortcut}}",
     "resize": "Você pode restringir proporções segurando {{shortcut_1}} enquanto redimensiona,\nsegure {{shortcut_2}} para redimensionar a partir do centro",
     "resizeImage": "Você pode redimensionar livremente segurando {{shortcut_1}},\nsegure {{shortcut_2}} para redimensionar a partir do centro",
+    "resizeStickyNote": "",
     "rotate": "Você pode restringir ângulos segurando {{shortcut}} enquanto rotaciona",
     "toggleArrowhead": "",
     "lineEditor_info": "Segure {{shortcut_1}} e clique duas vezes com o mouse ou pressione {{shortcut_2}} para editar pontos",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid para Excalidraw",
     "button": "Inserir",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "Neste cenário",
     "availableFonts": "Fontes disponíveis",
-    "empty": "Nenhuma fonte encontrada"
+    "empty": "Nenhuma fonte encontrada",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Nenhum usuário encontrado",

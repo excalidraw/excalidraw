@@ -27,6 +27,7 @@
     "copyStyles": "Kopiatu estiloak",
     "pasteStyles": "Itsatsi estiloak",
     "stroke": "Marra",
+    "textColor": "",
     "changeStroke": "Marraren kolorea aldatu",
     "background": "Atzeko planoa",
     "changeBackground": "Atzealdeko kolorea aldatu",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Gezi azala",
-    "midpointSnapping": "Lotu erdiko puntuetara"
+    "midpointSnapping": "Lotu erdiko puntuetara",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Estekatu objektura",
@@ -245,6 +250,7 @@
     "undo": "Desegin",
     "redo": "Berregin",
     "resetLibrary": "Leheneratu liburutegia",
+    "reset": "",
     "createNewRoom": "Sortu gela berria",
     "fullScreen": "Pantaila osoa",
     "darkMode": "Modu iluna",
@@ -332,6 +338,7 @@
     "eraser": "Borragoma",
     "frame": "Marko tresna",
     "magicframe": "Wireframetik kodera",
+    "stickynote": "",
     "embeddable": "Web kapsulatzea",
     "laser": "Laser punteroa",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "Taldea",
     "frame": "Markoa",
     "magicframe": "Wireframetik kodera",
+    "stickynote": "",
     "embeddable": "Web kapsulatzea",
     "selection": "Hautapena",
     "iframe": "IFramea"
@@ -375,6 +383,7 @@
     "freeDraw": "Egin klik eta arrastatu, askatu amaitutakoan",
     "text": "Aholkua: testua gehitu dezakezu edozein lekutan klik bikoitza eginez hautapen tresnarekin",
     "embeddable": "Egin klik eta arrastatu webgunea kapsulatzeko",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "Klik bikoitza edo sakatu {{shortcut}} testua editatzeko",
     "text_editing": "Sakatu {{shortcut_1}} edo {{shortcut_2}} edizioa amaitzeko",
@@ -382,6 +391,7 @@
     "lockAngle": "Angelua mugatu dezakezu {{shortcut}} helduta",
     "resize": "Proportzioak mugatu ditzakezu {{shortcut_1}} helduta tamaina aldatzean, heldu {{shortcut_2}} erdigunetik tamaina aldatzeko",
     "resizeImage": "Libreki alda dezakezu tamaina {{shortcut_1}} helduta, heldu {{shortcut_2}} tamaina erdigunetik aldatzeko",
+    "resizeStickyNote": "",
     "rotate": "Angeluak mugatu ditzakezu {{shortcut}} helduta biratzen duzun bitartean",
     "toggleArrowhead": "",
     "lineEditor_info": "Heldu {{shortcut_1}} eta egin klik bikoitza edo sakatu {{shortcut_2}} puntuak editatzeko",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid-etik Excalidraw-ra",
     "button": "Txertatu",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "Eszena honetan",
     "availableFonts": "Letra mota erabilgarriak",
-    "empty": "Ez da letra motarik aurkitu"
+    "empty": "Ez da letra motarik aurkitu",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Ez da erabiltzailerik aurkitu",

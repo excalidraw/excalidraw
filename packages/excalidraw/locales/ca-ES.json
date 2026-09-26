@@ -27,6 +27,7 @@
     "copyStyles": "Copia els estils",
     "pasteStyles": "Enganxa els estils",
     "stroke": "Color del traç",
+    "textColor": "",
     "changeStroke": "Canvia el color del traç",
     "background": "Color del fons",
     "changeBackground": "Canvia el color de fons",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Enllaç a l'objecte",
@@ -245,6 +250,7 @@
     "undo": "Desfés",
     "redo": "Refés",
     "resetLibrary": "Restableix la biblioteca",
+    "reset": "",
     "createNewRoom": "Crea una sala nova",
     "fullScreen": "Pantalla completa",
     "darkMode": "Mode fosc",
@@ -332,6 +338,7 @@
     "eraser": "Esborrador",
     "frame": "Eina de marc",
     "magicframe": "De Wireframe a codi",
+    "stickynote": "",
     "embeddable": "Incrustació Web",
     "laser": "Punter làser",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "Grup",
     "frame": "Marc",
     "magicframe": "De Wireframe a codi",
+    "stickynote": "",
     "embeddable": "Incrustació Web",
     "selection": "Selecció",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "Feu clic i arrossegueu, deixeu anar per a finalitzar",
     "text": "Consell: també podeu afegir text fent doble clic en qualsevol lloc amb l'eina de selecció",
     "embeddable": "Feu clic i arrossegueu per crear una Incrustació Web",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +391,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid a Excalidraw",
     "button": "Inseriu",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "En aquesta escena",
     "availableFonts": "Lletres tipogràfiques disponibles",
-    "empty": "No s'ha trobat cap lletra tipogràfica"
+    "empty": "No s'ha trobat cap lletra tipogràfica",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "No s'ha trobat cap usuari",

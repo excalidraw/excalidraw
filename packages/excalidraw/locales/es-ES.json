@@ -27,6 +27,7 @@
     "copyStyles": "Copiar estilos",
     "pasteStyles": "Pegar estilos",
     "stroke": "Trazo",
+    "textColor": "",
     "changeStroke": "Cambiar el color del trazo",
     "background": "Fondo",
     "changeBackground": "Cambiar el color de fondo",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Vinculación de flecha",
-    "midpointSnapping": "Adherirse a los puntos medios"
+    "midpointSnapping": "Adherirse a los puntos medios",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Enlace al objeto",
@@ -245,6 +250,7 @@
     "undo": "Deshacer",
     "redo": "Rehacer",
     "resetLibrary": "Reiniciar biblioteca",
+    "reset": "",
     "createNewRoom": "Crear nueva sala",
     "fullScreen": "Pantalla completa",
     "darkMode": "Modo oscuro",
@@ -332,6 +338,7 @@
     "eraser": "Borrar",
     "frame": "Herramienta Estructura",
     "magicframe": "Esquema a código",
+    "stickynote": "",
     "embeddable": "Incrustar Web",
     "laser": "Puntero láser",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "Grupo",
     "frame": "Marco",
     "magicframe": "Esquema a código",
+    "stickynote": "",
     "embeddable": "Incrustar Web",
     "selection": "Selección",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "Haz clic y arrastra, suelta al terminar",
     "text": "Consejo: también puedes añadir texto haciendo doble clic en cualquier lugar con la herramienta de selección",
     "embeddable": "Haga clic y arrastre para crear un sitio web incrustado",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "Haga doble clic o presione {{shortcut}} para editar el texto",
     "text_editing": "Pulsa {{shortcut_1}} o {{shortcut_2}} para terminar de editar",
@@ -382,6 +391,7 @@
     "lockAngle": "Puedes restringir el ángulo manteniendo el {{shortcut}}",
     "resize": "Puedes restringir las proporciones manteniendo pulsado {{shortcut_1}} mientras cambias el tamaño,\nmantén pulsado {{shortcut_2}} para cambiar el tamaño desde el centro",
     "resizeImage": "Puedes cambiar el tamaño libremente manteniendo {{shortcut_1}},\nmantén pulsado {{shortcut_2}} para cambiar el tamaño desde el centro",
+    "resizeStickyNote": "",
     "rotate": "Puedes restringir ángulos manteniendo pulsado el {{shortcut}} mientras giras",
     "toggleArrowhead": "",
     "lineEditor_info": "Mantén pulsado {{shortcut_1}} y haz doble clic o pulsa {{shortcut_2}} para editar puntos",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid a Excalidraw",
     "button": "Insertar",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "En esta escena",
     "availableFonts": "Fuentes disponibles",
-    "empty": "No se han encontrado fuentes"
+    "empty": "No se han encontrado fuentes",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "No se han encontrado usuarios",

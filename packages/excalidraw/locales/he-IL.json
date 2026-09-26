@@ -27,6 +27,7 @@
     "copyStyles": "העתקת סגנון",
     "pasteStyles": "הדבקת סגנונות",
     "stroke": "קו מתאר",
+    "textColor": "",
     "changeStroke": "החלפת צבע קו מתאר",
     "background": "רקע",
     "changeBackground": "החלפת צבע הרקע",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "עטיפה",
     "boxSelectionOverlap": "חפיפה",
     "arrowBinding": "קשירת חצים",
-    "midpointSnapping": "הצמדה לנקודות ביניים"
+    "midpointSnapping": "הצמדה לנקודות ביניים",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "קישור לפריט",
@@ -245,6 +250,7 @@
     "undo": "ביטול",
     "redo": "ביצוע מחדש",
     "resetLibrary": "איפוס ספרייה",
+    "reset": "",
     "createNewRoom": "יצירת חדר חדש",
     "fullScreen": "מסך מלא",
     "darkMode": "מצב כהה",
@@ -332,6 +338,7 @@
     "eraser": "מחק",
     "frame": "כלי מסגרת",
     "magicframe": "תרשים קווי מתאר לקוד",
+    "stickynote": "",
     "embeddable": "הטמעה באתר",
     "laser": "סמן לייזר",
     "autoshape": "ציור אל צורה",
@@ -357,6 +364,7 @@
     "group": "קבוצה",
     "frame": "מסגרת",
     "magicframe": "מתרשים קווי מתאר לקוד",
+    "stickynote": "",
     "embeddable": "הטמעה באתר",
     "selection": "בחירה",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "לחץ וגרור, שחרר כשסיימת",
     "text": "טיפ: אפשר להוסיף טקסט על ידי לחיצה כפולה בכל מקום עם כלי הבחירה",
     "embeddable": "לחצו וגררו כדי ליצור הטמעת אתר",
+    "stickynote": "",
     "autoshape": "צייר מלבנים, עיגולים, יהלומים, קווים וחצים",
     "text_selected": "לחיצה כפולה או הקשה על {{shortcut}} יאפשרו לך לערוך את הטקסט",
     "text_editing": "יש ללחוץ על {{shortcut_1}} או {{shortcut_2}} לסיום העריכה",
@@ -382,6 +391,7 @@
     "lockAngle": "ניתן להגביל את הזווית על ידי החזקת {{shortcut}}",
     "resize": "ניתן להגביל פרופורציות על ידי החזקת {{shortcut_1}} בזמן שינוי הגודל, החזק את {{shortcut_2}} כדי לשנות גודל מהמרכז",
     "resizeImage": "ניתן לשנות גודל חופשי על ידי החזקת {{shortcut_1}}, החזק את {{shortcut_2}} כדי לשנות גודל מהמרכז",
+    "resizeStickyNote": "",
     "rotate": "ניתן להגביל זוויות על ידי החזקת {{shortcut}} בזמן סיבוב",
     "toggleArrowhead": "לחץ לחיצה כפולה כדי להחליף בין צורות ראש החץ",
     "lineEditor_info": "החזק את {{shortcut_1}} ולחץ לחיצה כפולה או לחץ על {{shortcut_2}} כדי לערוך נקודות",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid ל־Excalidraw",
     "button": "הוספה",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "בסצינה הנוכחית",
     "availableFonts": "הפונטים הקיימים",
-    "empty": "לא נמצאו פונטים"
+    "empty": "לא נמצאו פונטים",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "לא נמצאו משתמשים",

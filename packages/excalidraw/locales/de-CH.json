@@ -27,6 +27,7 @@
     "copyStyles": "Formatierung kopieren",
     "pasteStyles": "Formatierung übernehmen",
     "stroke": "Strich",
+    "textColor": "",
     "changeStroke": "Strichfarbe ändern",
     "background": "Hintergrund",
     "changeBackground": "Hintergrundfarbe ändern",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Pfeilbindung",
-    "midpointSnapping": "An Mittelpunkten einrasten"
+    "midpointSnapping": "An Mittelpunkten einrasten",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Link zum Objekt",
@@ -245,6 +250,7 @@
     "undo": "Rückgängig machen",
     "redo": "Wiederholen",
     "resetLibrary": "Bibliothek zurücksetzen",
+    "reset": "",
     "createNewRoom": "Neuen Raum erstellen",
     "fullScreen": "Vollbildanzeige",
     "darkMode": "Dunkles Design",
@@ -332,6 +338,7 @@
     "eraser": "Radierer",
     "frame": "Rahmenwerkzeug",
     "magicframe": "Wireframe zu Code",
+    "stickynote": "",
     "embeddable": "Web-Einbettung",
     "laser": "Laserpointer",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "Gruppe",
     "frame": "Rahmen",
     "magicframe": "Wireframe zu Code",
+    "stickynote": "",
     "embeddable": "Web-Einbettung",
     "selection": "Auswahl",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "Klicke und ziehe. Lass los, wenn du fertig bist",
     "text": "Tipp: Du kannst auch Text hinzufügen, indem du mit dem Auswahlwerkzeug auf eine beliebige Stelle doppelklickst",
     "embeddable": "Klicken und ziehen, um eine Webseiten-Einbettung zu erstellen",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "Doppelklicken oder {{shortcut}} drücken, um Text zu bearbeiten",
     "text_editing": "Drücke {{shortcut_1}} oder {{shortcut_2}}, um die Bearbeitung abzuschließen",
@@ -382,6 +391,7 @@
     "lockAngle": "Halte {{shortcut}} gedrückt, um den Winkel einzuschränken",
     "resize": "Halte {{shortcut_1}} gedrückt, um die Proportionen beizubehalten.\n{{shortcut_2}} gedrückt halten, um von der Mitte aus zu skalieren",
     "resizeImage": "Halte {{shortcut_1}} gedrückt, um frei zu skalieren.\n{{shortcut_2}} gedrückt halten, um von der Mitte aus zu skalieren",
+    "resizeStickyNote": "",
     "rotate": "Halte {{shortcut}} gedrückt, um den Winkel einzuschränken",
     "toggleArrowhead": "",
     "lineEditor_info": "Halte {{shortcut_1}} gedrückt und doppelklicke oder drücke {{shortcut_2}}, um Punkte zu bearbeiten",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid zu Excalidraw",
     "button": "Einfügen",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "In dieser Szene",
     "availableFonts": "Verfügbare Schriftarten",
-    "empty": "Keine Schriftarten gefunden"
+    "empty": "Keine Schriftarten gefunden",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Keine Benutzer gefunden",

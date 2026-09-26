@@ -27,6 +27,7 @@
     "copyStyles": "Копіювати стилі",
     "pasteStyles": "Вставити стилі",
     "stroke": "Контур",
+    "textColor": "",
     "changeStroke": "Змінити колір обведення",
     "background": "Тло",
     "changeBackground": "Змінити колір фону",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Посилання на об’єкт",
@@ -245,6 +250,7 @@
     "undo": "Відмінити",
     "redo": "Повторити",
     "resetLibrary": "Очистити бібліотеку",
+    "reset": "",
     "createNewRoom": "Створити нову кімнату",
     "fullScreen": "Повноекранний режим",
     "darkMode": "Темна тема",
@@ -332,6 +338,7 @@
     "eraser": "Гумка",
     "frame": "Інструмент фрейму",
     "magicframe": "Перетворити у код",
+    "stickynote": "",
     "embeddable": "Веб вкладення",
     "laser": "Лазерний вказівник",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "Група",
     "frame": "Рамка",
     "magicframe": "Перетворити у код",
+    "stickynote": "",
     "embeddable": "Веб вкладення",
     "selection": "Виділення",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "Натисніть і потягніть, відпустіть коли завершите",
     "text": "Порада: можна також додати текст, двічі клацнувши по будь-якому місці інструментом вибору",
     "embeddable": "Клікніть та перетягніть для створення вбудованого вебсайту",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +391,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid у Excalidraw",
     "button": "Вставити",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "На цій сцені",
     "availableFonts": "Доступні шрифти",
-    "empty": "Шрифти не знайдено"
+    "empty": "Шрифти не знайдено",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Користувачів не знайдено",

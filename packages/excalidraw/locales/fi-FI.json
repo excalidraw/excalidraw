@@ -27,6 +27,7 @@
     "copyStyles": "Kopioi tyyli",
     "pasteStyles": "Liitä tyyli",
     "stroke": "Piirto",
+    "textColor": "",
     "changeStroke": "",
     "background": "Tausta",
     "changeBackground": "",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -245,6 +250,7 @@
     "undo": "Kumoa",
     "redo": "Tee uudelleen",
     "resetLibrary": "Tyhjennä kirjasto",
+    "reset": "",
     "createNewRoom": "Luo huone",
     "fullScreen": "Koko näyttö",
     "darkMode": "Tumma tila",
@@ -332,6 +338,7 @@
     "eraser": "Poistotyökalu",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "Verkkoupote",
     "laser": "Laserosoitin",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,6 +383,7 @@
     "freeDraw": "Paina ja raahaa, päästä irti kun olet valmis",
     "text": "Vinkki: voit myös lisätä tekstiä kaksoisnapsauttamalla mihin tahansa valintatyökalulla",
     "embeddable": "",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +391,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",

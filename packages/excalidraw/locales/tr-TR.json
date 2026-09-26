@@ -27,6 +27,7 @@
     "copyStyles": "Stilleri kopyala",
     "pasteStyles": "Stilleri yapıştır",
     "stroke": "Kontur",
+    "textColor": "",
     "changeStroke": "Kontur rengini değiştir",
     "background": "Arka plan",
     "changeBackground": "Arka plan rengini değiştir",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Nesneye bağlantıla",
@@ -245,6 +250,7 @@
     "undo": "Geri Al",
     "redo": "Yeniden yap",
     "resetLibrary": "Kütüphaneyi sıfırla",
+    "reset": "",
     "createNewRoom": "Yeni oda oluştur",
     "fullScreen": "Tam ekran",
     "darkMode": "Koyu tema",
@@ -332,6 +338,7 @@
     "eraser": "Silgi",
     "frame": "Çerçeve aracı",
     "magicframe": "Wireframe'den koda",
+    "stickynote": "",
     "embeddable": "Web Yerleştirme",
     "laser": "Lazer işaretçisi",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "Grup",
     "frame": "Çerçeve",
     "magicframe": "Wireframe'den koda",
+    "stickynote": "",
     "embeddable": "Web Yerleştirme",
     "selection": "Seçim",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "Tıkla ve sürükle, bitirdiğinde serbest bırak",
     "text": "İpucu: seçme aracıyla herhangi bir yere çift tıklayarak da yazı ekleyebilirsin",
     "embeddable": "Web sitesi yerleştirmek için sürükle bırak",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "Metni düzenlemek için çift tıklayın veya {{shortcut}} kısayoluna basın",
     "text_editing": "Düzenlemeyi bitirmek için {{shortcut_1}} veya {{shortcut_2}} kısayoluna basın",
@@ -382,6 +391,7 @@
     "lockAngle": "{{shortcut}} kısayolunu basılı tutarak açıyı kısıtlayabilirsiniz",
     "resize": "Yeniden boyutlandırırken {{shortcut_1}} tuşuna basılı tutarak oranları koruyabilir, merkezden boyutlandırmak için {{shortcut_2}} tuşuna basılı tutabilirsiniz.",
     "resizeImage": "Serbestçe boyutlandırmak için {{shortcut_1}} tuşunu, merkez odaklı boyutlandırmak için {{shortcut_2}} tuşunu basılı tutun.",
+    "resizeStickyNote": "",
     "rotate": "Açıları sabitleyerek döndürmek için {{shortcut}} tuşuna basılı tutun.",
     "toggleArrowhead": "",
     "lineEditor_info": "Noktaları düzenlemek için {{shortcut_1}} tuşuna basılı tutarak çift tıklayın veya {{shortcut_2}} tuşuna basın.",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid'den Excalidraw'a",
     "button": "Ekle",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "Bu sahnede",
     "availableFonts": "Kullanılabilir yazı tipleri",
-    "empty": "Yazı tipi bulunamadı"
+    "empty": "Yazı tipi bulunamadı",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Kullanıcı bulunamadı",

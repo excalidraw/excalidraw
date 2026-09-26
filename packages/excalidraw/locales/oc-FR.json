@@ -27,6 +27,7 @@
     "copyStyles": "Copiar los estiles",
     "pasteStyles": "Pegar los estils",
     "stroke": "Contorn",
+    "textColor": "",
     "changeStroke": "Modificar la color d’emplenament",
     "background": "Rèireplan",
     "changeBackground": "Modificar la color de rèireplan",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -245,6 +250,7 @@
     "undo": "Anullar",
     "redo": "Restablir",
     "resetLibrary": "Reïnicializar la bibliotèca",
+    "reset": "",
     "createNewRoom": "Crear sala novèla",
     "fullScreen": "Ecran complèt",
     "darkMode": "Mòde escur",
@@ -332,6 +338,7 @@
     "eraser": "Goma",
     "frame": "Esplech quadre",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "Integracion Web",
     "laser": "Puntador laser",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "Grop",
     "frame": "Quadre",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "Seleccion",
     "iframe": ""
@@ -375,6 +383,7 @@
     "freeDraw": "Clicatz e lisatz, relargatz un còp acabat",
     "text": "Astúcia : podètz tanben apondre de tèxt en doble clicant ont que siá amb l’aisina de seleccion",
     "embeddable": "",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +391,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "De Mermaid cap a Excalidraw",
     "button": "Inserir",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "Dins aquesta scèna",
     "availableFonts": "Polissas disponiblas",
-    "empty": "Cap de polissa pas trobada"
+    "empty": "Cap de polissa pas trobada",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Cap d’utilizaire pas trobat",

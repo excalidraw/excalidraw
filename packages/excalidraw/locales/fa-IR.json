@@ -27,6 +27,7 @@
     "copyStyles": "کپی سبک",
     "pasteStyles": "جایگذاری سبک",
     "stroke": "حاشیه",
+    "textColor": "",
     "changeStroke": "تغییر رنگ حاشیه",
     "background": "پس زمینه",
     "changeBackground": "تغییر رنگ پس زمینه",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "دربرگیری",
     "boxSelectionOverlap": "هم‌پوشانی",
     "arrowBinding": "اتصال پیکان",
-    "midpointSnapping": "چسبیدن به نقاط میانی"
+    "midpointSnapping": "چسبیدن به نقاط میانی",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "لینک به آیتم",
@@ -245,6 +250,7 @@
     "undo": "بازگرد",
     "redo": "از سر",
     "resetLibrary": "تنظیم مجدد کتابخانه",
+    "reset": "",
     "createNewRoom": "ایجاد یک اتاق جدید",
     "fullScreen": "تمام‌صفحه",
     "darkMode": "حالت تیره",
@@ -332,6 +338,7 @@
     "eraser": "پاک کن",
     "frame": "ابزار فریم",
     "magicframe": "وایرفریم به کد",
+    "stickynote": "",
     "embeddable": "افزونه وب",
     "laser": "اشاره گر لیزری",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "گروه",
     "frame": "قاب",
     "magicframe": "وایرفریم به کد",
+    "stickynote": "",
     "embeddable": "افزونه وب",
     "selection": "انتخاب",
     "iframe": "آی فریم"
@@ -375,6 +383,7 @@
     "freeDraw": "کلیک کنید و بکشید و وقتی کار تمام شد رها کنید",
     "text": "نکته: با برنامه انتخاب شده شما میتوانید با دوبار کلیک کردن هرکجا میخواید متن اظاف کنید",
     "embeddable": "کلیک-درگ برای ساخت افزونه وب",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +391,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "مرمید به excalidraw",
     "button": "درج",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "در این صحنه",
     "availableFonts": "قلم های در دسترس",
-    "empty": "قلمی یافت نشد"
+    "empty": "قلمی یافت نشد",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "کاربری یافت نشد",

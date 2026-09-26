@@ -27,6 +27,7 @@
     "copyStyles": "スタイルのコピー",
     "pasteStyles": "スタイルの貼り付け",
     "stroke": "線",
+    "textColor": "",
     "changeStroke": "線の色を変更",
     "background": "背景",
     "changeBackground": "背景色変更",
@@ -195,7 +196,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "矢印の結合",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "オブジェクトにリンク",
@@ -245,6 +250,7 @@
     "undo": "元に戻す",
     "redo": "やり直し",
     "resetLibrary": "ライブラリをリセット",
+    "reset": "",
     "createNewRoom": "新しい部屋を作成する",
     "fullScreen": "フルスクリーン",
     "darkMode": "ダークモード",
@@ -332,6 +338,7 @@
     "eraser": "消しゴム",
     "frame": "フレーム",
     "magicframe": "ワイヤーフレームからコードを生成",
+    "stickynote": "",
     "embeddable": "Web埋め込み",
     "laser": "レーザーポインター",
     "autoshape": "",
@@ -357,6 +364,7 @@
     "group": "グループ",
     "frame": "フレーム",
     "magicframe": "ワイヤーフレームからコードを生成",
+    "stickynote": "",
     "embeddable": "Web埋め込み",
     "selection": "選択",
     "iframe": "IFrame"
@@ -375,6 +383,7 @@
     "freeDraw": "クリックしてドラッグします。離すと終了します",
     "text": "ヒント: 選択ツールを使用して任意の場所をダブルクリックしてテキストを追加することもできます",
     "embeddable": "クリックしてドラッグし、ウェブサイトを埋め込む",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "ダブルクリック、または {{shortcut}} を押してテキストを編集",
     "text_editing": "{{shortcut_1}} または {{shortcut_2}} を押して編集を終了",
@@ -382,6 +391,7 @@
     "lockAngle": "{{shortcut}} を押し続けて角度を固定",
     "resize": "{{shortcut_1}} を押し続けて縦横比を維持、\n{{shortcut_2}} を押し続けて中心からリサイズ",
     "resizeImage": "{{shortcut_1}} を押し続けて自由にリサイズ、\n{{shortcut_2}} を押し続けて中心からリサイズ",
+    "resizeStickyNote": "",
     "rotate": "{{shortcut}} を押し続けて角度を固定して回転",
     "toggleArrowhead": "",
     "lineEditor_info": "{{shortcut_1}} を押しながらダブルクリック、または {{shortcut_2}} を押して点を編集",
@@ -649,6 +659,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid を Excalidraw に変換",
     "button": "挿入",
@@ -714,7 +733,9 @@
     },
     "sceneFonts": "このシーン内",
     "availableFonts": "利用可能フォント",
-    "empty": "フォントなし"
+    "empty": "フォントなし",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "ユーザーなし",
