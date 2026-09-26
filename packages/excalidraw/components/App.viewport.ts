@@ -469,6 +469,41 @@ export class AppViewport {
   };
 
   /**
+   * The side a rendered side UI (`data-viewport-ui="side"`) docks to, and
+   * how far it reaches into the canvas from it, in screen px.
+   */
+  private measureSide = (node: HTMLElement, containerRect: DOMRect) => {
+    const domRect = node.getBoundingClientRect();
+    const left = domRect.left - containerRect.left;
+    const right = domRect.right - containerRect.left;
+    return left + domRect.width / 2 < this.app.state.width / 2
+      ? { side: "left" as const, offset: right }
+      : { side: "right" as const, offset: this.app.state.width - left };
+  };
+
+  /**
+   * How far the sidebar reaches into the canvas, in screen px, from the
+   * right or (RTL) the left: the part of the canvas it covers. Zero when
+   * it's closed — or on phones, where it's an overlay that doesn't count as
+   * viewport UI.
+   */
+  getSidebarInsets = () => {
+    const insets = { left: 0, right: 0 };
+    const container = this.dependencies.getContainer();
+    const sidebar = container?.querySelector<HTMLElement>(
+      '[data-viewport-ui="side"][data-viewport-ui-name="sidebar"]',
+    );
+    if (container && sidebar) {
+      const { side, offset } = this.measureSide(
+        sidebar,
+        container.getBoundingClientRect(),
+      );
+      insets[side] = Math.max(0, offset);
+    }
+    return insets;
+  };
+
+  /**
    * Resolves user-supplied viewport offsets into concrete per-side pixel
    * values. Static sides take precedence over UI-derived sides.
    */
@@ -532,10 +567,10 @@ export class AppViewport {
             );
             break;
           case "side": {
-            const [side, offset] =
-              rect.left + rect.width / 2 < this.app.state.width / 2
-                ? (["left", rect.right] as const)
-                : (["right", this.app.state.width - rect.left] as const);
+            const { side, offset } = this.measureSide(
+              node,
+              excalidrawContainerRect,
+            );
 
             measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
 

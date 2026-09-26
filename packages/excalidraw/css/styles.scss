@@ -130,6 +130,23 @@ body.excalidraw-cursor-resize * {
     position: absolute;
   }
 
+  // The text editor's box: the canvas area, clipped, and kept off a docked
+  // sidebar (see textWysiwyg). A caret outside it is revealed by scrolling
+  // this box, which the text editor turns into a canvas pan.
+  .excalidraw-textEditorContainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    pointer-events: none;
+
+    > textarea {
+      pointer-events: auto;
+    }
+  }
+
   &__embeddable {
     width: 100%;
     height: 100%;

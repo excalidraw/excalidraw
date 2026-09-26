@@ -22,6 +22,9 @@ export const APP_NAME = "Excalidraw";
 // don't unintentionally create text elements that are wrapped to a few chars
 // (happens a lot with fast clicks with the text tool)
 export const TEXT_AUTOWRAP_THRESHOLD = 36; // px
+// room left at each side of the visible canvas when a text stops growing at
+// its width, or is brought into view once it wraps
+export const TEXT_VIEWPORT_PADDING = 20; // px
 export const DRAGGING_THRESHOLD = 10; // px
 export const MINIMUM_ARROW_SIZE = 20; // px
 export const LINE_CONFIRM_THRESHOLD = 8; // px
