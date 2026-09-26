@@ -7,7 +7,7 @@ import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { Keyboard } from "./helpers/ui";
-import { fireEvent, GlobalTestState, render, waitFor } from "./test-utils";
+import { act, fireEvent, GlobalTestState, render, waitFor } from "./test-utils";
 
 const { h } = window;
 
@@ -283,4 +283,27 @@ describe("ignoring drops", () => {
       expect(h.state.viewBackgroundColor).toBe("#ffffff");
     },
   );
+});
+
+it("cancels file drags over a modal so the browser doesn't open the file", async () => {
+  await render(<Excalidraw />);
+  act(() => h.app.setState({ openDialog: { name: "help" } }));
+  const modal = await waitFor(() => {
+    const modal = document.querySelector(".excalidraw-modal-container .Modal");
+    expect(modal).not.toBeNull();
+    return modal!;
+  });
+  expect(GlobalTestState.interactiveCanvas.closest(".excalidraw")).not.toBe(
+    modal.closest(".excalidraw"),
+  );
+
+  const dragOver = drag(modal, "dragover");
+  expect(dragOver.defaultPrevented).toBe(true);
+  expect(dragOver.dataTransfer.dropEffect).toBe("none");
+  expect(drag(modal, "drop").defaultPrevented).toBe(true);
+
+  // text can still be dropped natively, e.g. into a modal's inputs
+  expect(
+    drag(modal, "dragover", { types: [MIME_TYPES.text] }).defaultPrevented,
+  ).toBe(false);
 });
