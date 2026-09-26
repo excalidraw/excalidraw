@@ -348,11 +348,7 @@ import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { trackEvent } from "../analytics";
-import {
-  getDefaultAppState,
-  isEraserActive,
-  isHandToolActive,
-} from "../appState";
+import { getDefaultAppState, isEraserActive } from "../appState";
 import {
   copyTextToSystemClipboard,
   parseClipboard,
@@ -487,7 +483,6 @@ import type {
 import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
-import type { Modifiers } from "./App.textTool";
 
 import type {
   AppClassProperties,
@@ -725,6 +720,7 @@ class App extends React.Component<AppProps, AppState> {
   public arrowText: AppArrowText = new AppArrowText(this);
   public pan: AppPan = new AppPan(this, {
     getPointerCount: () => gesture.pointers.size,
+    isDraggingScrollBar: () => isDraggingScrollBar,
   });
   public textTool: AppTextTool = new AppTextTool(this);
   public viewport: AppViewport = new AppViewport(this, {
@@ -4355,7 +4351,7 @@ class App extends React.Component<AppProps, AppState> {
       );
       // the scene moved under a still pointer: what a text-tool click would
       // do there may have changed
-      this.refreshTextToolHover();
+      this.textTool.refresh();
     }
 
     if (
@@ -5821,7 +5817,7 @@ class App extends React.Component<AppProps, AppState> {
 
         // the toggle changes what a text-tool click at the current position
         // would do, with no pointermove to refresh the affordance
-        this.refreshTextToolHover(event);
+        this.textTool.refresh(event);
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
       }
@@ -6106,7 +6102,7 @@ class App extends React.Component<AppProps, AppState> {
           this.setState({ isBindingEnabled: preferenceEnabled });
         });
 
-        this.refreshTextToolHover(event);
+        this.textTool.refresh(event);
       }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -7863,28 +7859,6 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  /**
-   * Re-resolves the text tool's hover — and the cursor that goes with it —
-   * where the pointer last was, for what changes a click's outcome without
-   * the pointer moving: the ctrl/cmd toggle (pass its event) or the viewport
-   * moving under the pointer (no event). Mirrors the pointermove path; a
-   * gesture that owns the cursor (space/wheel panning, a scrollbar drag, the
-   * hand tool) keeps it.
-   */
-  private refreshTextToolHover = (modifiers?: Modifiers) => {
-    const target = this.textTool.refreshHover(modifiers);
-    if (
-      target === undefined ||
-      this.pan.isSpaceHeld() ||
-      this.pan.isActive() ||
-      isDraggingScrollBar ||
-      isHandToolActive(this.state)
-    ) {
-      return;
-    }
-    this.cursor.set(this.textTool.cursorFor(target));
-  };
-
   private handleCanvasPointerMove = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
@@ -7919,12 +7893,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.updateMultiTouchGesture(event);
 
-    if (
-      this.pan.isSpaceHeld() ||
-      this.pan.isActive() ||
-      isDraggingScrollBar ||
-      isHandToolActive(this.state)
-    ) {
+    if (this.pan.isNavigating()) {
       return;
     }
 

@@ -201,32 +201,35 @@ export class AppTextTool {
   };
 
   /**
-   * Re-evaluates the hover where the pointer last was — for what changes
-   * what a click would do without the pointer moving: the ctrl/cmd toggle
-   * (pass its event), or the viewport scrolling or zooming under the pointer
-   * (no event; the last modifiers stand). The scene position is re-derived
-   * from the pointer's viewport position, so a moved viewport resolves what
-   * is under the pointer now. Returns the target, or `undefined` when there
-   * is nothing to refresh: another tool, or no hovering pointer — a finger
-   * never hovers (its last move is where it lifted), and the affordance a
-   * press armed is cleared when the press resolves or is canceled, so
-   * nothing is kept current for it either.
+   * Re-resolves the hover — and the cursor that goes with it — where the
+   * pointer last was, for what changes a click's outcome without the pointer
+   * moving: the ctrl/cmd toggle (pass its event), or the viewport scrolling
+   * or zooming under the pointer (no event; the last modifiers stand). The
+   * scene position is re-derived from the pointer's viewport position, so a
+   * moved viewport resolves what is under the pointer now.
+   *
+   * Nothing to refresh with another tool or without a hovering pointer — a
+   * finger never hovers (its last move is where it lifted), and the
+   * affordance a press armed is cleared when the press resolves or is
+   * canceled. The cursor is left to viewport navigation (space/wheel
+   * panning, a scrollbar drag, the hand tool), as on pointermove.
    */
-  refreshHover = (
-    modifiers: Modifiers = this.lastModifiers,
-  ): TextToolTarget | null | undefined => {
+  refresh = (modifiers: Modifiers = this.lastModifiers) => {
     const pointer = this.app.lastPointerMoveEvent;
     if (
       this.app.state.activeTool.type !== "text" ||
       !pointer ||
       pointer.pointerType === "touch"
     ) {
-      return undefined;
+      return;
     }
-    return this.updateHover(
+    const target = this.updateHover(
       viewportCoordsToSceneCoords(pointer, this.app.state),
       modifiers,
     );
+    if (!this.app.pan.isNavigating()) {
+      this.app.cursor.set(this.cursorFor(target));
+    }
   };
 
   /**
