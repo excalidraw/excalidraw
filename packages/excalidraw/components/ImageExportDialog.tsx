@@ -37,6 +37,7 @@ import { isSomeElementSelected } from "../scene";
 import {
   ATTRIBUTION_SURVEY_QUESTION_IDS,
   AttributionMarkSurvey,
+  trackAttributionSurveyAnswers,
 } from "./AttributionMarkSurvey";
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -162,6 +163,7 @@ const ImageExportModal = ({
     ) {
       setAttributionSurveyComplete(true);
       setAttributionOptOutCompleted();
+      trackAttributionSurveyAnswers(attributionAnswers);
     }
   }, [attributionAnswers, showAttributionSurvey, attributionSurveyComplete]);
 

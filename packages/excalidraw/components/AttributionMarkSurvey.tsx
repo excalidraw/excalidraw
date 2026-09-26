@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { trackEvent } from "../analytics";
 import { t } from "../i18n";
 
 import "./AttributionMarkSurvey.scss";
@@ -196,6 +197,21 @@ const getAttributionSurveyQuestions = (): AttributionSurveyQuestion[] => [
 ];
 
 const OTHER_OPTION_ID = "other";
+
+/**
+ * Reports a completed survey as one anonymous event per question. The free
+ * text typed under "Other" is never sent, only that "other" was chosen.
+ */
+export const trackAttributionSurveyAnswers = (
+  answers: AttributionSurveyAnswers,
+) => {
+  for (const id of ATTRIBUTION_SURVEY_QUESTION_IDS) {
+    const answer = answers[id];
+    if (answer) {
+      trackEvent("export", `attribution-survey-${id}`, answer.optionId);
+    }
+  }
+};
 
 const getAnswerSummaryLabel = (
   question: AttributionSurveyQuestion,

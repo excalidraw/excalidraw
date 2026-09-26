@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 
+import * as analytics from "../analytics";
+
 import {
   AttributionMarkSurvey,
+  trackAttributionSurveyAnswers,
   type AttributionSurveyAnswers,
 } from "./AttributionMarkSurvey";
 
@@ -89,5 +92,48 @@ describe("AttributionMarkSurvey", () => {
     // no active options list left to interact with
     expect(screen.queryByText("(pick one, fill if other)")).toBeNull();
     expect(screen.queryByText("(pick one)")).toBeNull();
+  });
+});
+
+describe("trackAttributionSurveyAnswers", () => {
+  const trackEventSpy = vi.spyOn(analytics, "trackEvent");
+
+  beforeEach(() => {
+    trackEventSpy.mockReset();
+  });
+
+  it("sends one event per answered question", () => {
+    trackAttributionSurveyAnswers({
+      reason: { optionId: "design" },
+      purpose: { optionId: "blog" },
+      keepOn: { optionId: "subtler" },
+      role: { optionId: "developer" },
+    });
+
+    expect(trackEventSpy.mock.calls).toEqual([
+      ["export", "attribution-survey-reason", "design"],
+      ["export", "attribution-survey-purpose", "blog"],
+      ["export", "attribution-survey-keepOn", "subtler"],
+      ["export", "attribution-survey-role", "developer"],
+    ]);
+  });
+
+  it("never sends the free text typed under Other", () => {
+    trackAttributionSurveyAnswers({
+      reason: { optionId: "other", otherText: "my private reason" },
+    });
+
+    expect(trackEventSpy.mock.calls).toEqual([
+      ["export", "attribution-survey-reason", "other"],
+    ]);
+    expect(JSON.stringify(trackEventSpy.mock.calls)).not.toContain(
+      "my private reason",
+    );
+  });
+
+  it("skips questions that weren't answered", () => {
+    trackAttributionSurveyAnswers({ purpose: { optionId: "social" } });
+
+    expect(trackEventSpy).toHaveBeenCalledTimes(1);
   });
 });
