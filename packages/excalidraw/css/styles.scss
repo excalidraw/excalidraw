@@ -464,6 +464,19 @@ body.excalidraw-cursor-resize * {
     &--compact {
       min-width: 48px;
     }
+
+    .selected-shape-actions--right {
+      position: absolute;
+      top: calc(var(--editor-container-padding) + 3rem);
+      right: var(--editor-container-padding);
+      left: auto;
+      width: 12.5rem;
+      max-width: calc(100% - var(--editor-container-padding) * 2);
+    }
+
+    &--compact .selected-shape-actions--right {
+      width: 48px;
+    }
   }
 
   .App-menu_top > .layer-ui__wrapper__top-right {

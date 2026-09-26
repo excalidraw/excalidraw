@@ -8,9 +8,14 @@ import {
   arrayToMap,
   capitalizeString,
   isShallowEqual,
+  sceneCoordsToViewportCoords,
 } from "@excalidraw/common";
 
-import { getColorUpdate, mutateElement } from "@excalidraw/element";
+import {
+  getColorUpdate,
+  getCommonBounds,
+  mutateElement,
+} from "@excalidraw/element";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
@@ -25,7 +30,11 @@ import { UIAppStateContext } from "../context/ui-appState";
 import { useAtom, useAtomValue } from "../editor-jotai";
 
 import { t } from "../i18n";
-import { getScrollToContentState, getSelectedElements } from "../scene";
+import {
+  getScrollToContentState,
+  getSelectedElements,
+  getTargetElements,
+} from "../scene";
 import {
   getColorTargetAppStateUpdates,
   resolveColorTarget,
@@ -247,11 +256,30 @@ const LayerUI = ({
   );
 
   const renderSelectedShapeActions = () => {
+    const elementsMap = app.scene.getNonDeletedElementsMap();
+    const selectedElements = getTargetElements(elementsMap, appState);
+    const selectedElementsBounds = selectedElements.length
+      ? getCommonBounds(selectedElements)
+      : null;
+    const selectedElementsCenterX = selectedElementsBounds
+      ? sceneCoordsToViewportCoords(
+          {
+            sceneX: (selectedElementsBounds[0] + selectedElementsBounds[2]) / 2,
+            sceneY: 0,
+          },
+          app.state,
+        ).x - appState.offsetLeft
+      : null;
+    const shouldPositionOnRight =
+      selectedElementsCenterX !== null &&
+      selectedElementsCenterX < appState.width / 2;
+
     return (
       <Section
         heading="selectedShapeActions"
         className={clsx("selected-shape-actions zen-mode-transition", {
           "transition-left": appState.zenModeEnabled,
+          "selected-shape-actions--right": shouldPositionOnRight,
         })}
       >
         {isCompactStylesPanel ? (
@@ -268,7 +296,7 @@ const LayerUI = ({
           >
             <CompactShapeActions
               appState={appState}
-              elementsMap={app.scene.getNonDeletedElementsMap()}
+              elementsMap={elementsMap}
               renderAction={actionManager.renderAction}
               app={app}
               setAppState={setAppState}
@@ -288,7 +316,7 @@ const LayerUI = ({
           >
             <SelectedShapeActions
               appState={appState}
-              elementsMap={app.scene.getNonDeletedElementsMap()}
+              elementsMap={elementsMap}
               renderAction={actionManager.renderAction}
               app={app}
             />
