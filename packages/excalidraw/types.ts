@@ -1179,6 +1179,7 @@ export type AppClassProperties = {
   state: AppState;
   readonly ownerDocument: Document;
   readonly ownerWindow: Window & typeof globalThis;
+  actionManager: App["actionManager"];
   api: App["api"];
   sessionExportThemeOverride: App["sessionExportThemeOverride"];
   interactiveCanvas: HTMLCanvasElement | null;
