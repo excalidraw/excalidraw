@@ -192,7 +192,7 @@
     "shapeSwitch": "Switch shape",
     "preferences": "Preferences",
     "preferences_toolLock": "Tool lock",
-    "boxSelectionMode": "Select on",
+    "boxSelectionMode": "Rectangle selection",
     "boxSelectionContain": "Wrap",
     "boxSelectionOverlap": "Overlap",
     "arrowBinding": "Arrow binding",
