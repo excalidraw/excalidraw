@@ -91,6 +91,9 @@
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
+    "vitest": "3.0.6",
+    "@vitest/coverage-v8": "3.0.6",
+    "@vitest/ui": "3.0.6",
     "strip-ansi": "6.0.1"
   }
 }
