@@ -5335,6 +5335,16 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ toast });
   };
 
+  private showSceneReplacedToast() {
+    this.setToast({
+      message: t("fileDrop.replacedToast", {
+        shortcut: getShortcutKey("CtrlOrCmd+Z"),
+      }),
+      closable: true,
+      duration: 8000,
+    });
+  }
+
   restoreFileFromShare = async () => {
     try {
       const webShareTargetCache = await caches.open("web-share-target");
@@ -13166,6 +13176,7 @@ class App extends React.Component<AppProps, AppState> {
             replaceFiles: true,
             captureUpdate: CaptureUpdateAction.IMMEDIATELY,
           });
+          this.showSceneReplacedToast();
           return;
         }
       }
@@ -13227,7 +13238,9 @@ class App extends React.Component<AppProps, AppState> {
       const { file, fileHandle } = fileItems[0];
       if (file) {
         // Attempt to parse an excalidraw/excalidrawlib file
-        await this.loadFileToCanvas(file, fileHandle, insertPosition);
+        if (await this.loadFileToCanvas(file, fileHandle, insertPosition)) {
+          this.showSceneReplacedToast();
+        }
       }
     }
 
@@ -13254,6 +13267,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  /** @returns true if the file replaced the scene */
   loadFileToCanvas = async (
     file: File,
     fileHandle: FileSystemFileHandle | null,
@@ -13327,6 +13341,7 @@ class App extends React.Component<AppProps, AppState> {
           replaceFiles: true,
           captureUpdate: CaptureUpdateAction.IMMEDIATELY,
         });
+        return true;
       } else if (ret.type === MIME_TYPES.excalidrawlib) {
         await this.library
           .updateLibrary({

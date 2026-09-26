@@ -200,7 +200,8 @@ describe("dropping scenes", () => {
     );
   });
 
-  it("replaces the scene by default and removes the overlay", async () => {
+  it("replaces the scene by default, removes the overlay, and toasts how to undo", async () => {
+    const original = h.elements[0];
     drag(GlobalTestState.interactiveCanvas, "dragenter");
     drag(GlobalTestState.interactiveCanvas, "drop", { files: [sceneFile()] });
     expect(overlay()).toBeNull();
@@ -210,6 +211,25 @@ describe("dropping scenes", () => {
       ]);
       expect(h.state.viewBackgroundColor).toBe("#ff0000");
     });
+    expect(h.state.toast?.message).toMatch(/^Content replaced\. .+Z to undo$/);
+
+    await waitFor(() => expect(API.getUndoStack()).toHaveLength(1));
+    Keyboard.undo();
+    expect(h.app.scene.getNonDeletedElements()).toEqual([
+      expect.objectContaining({ id: original.id, type: "rectangle" }),
+    ]);
+    expect(h.state.viewBackgroundColor).toBe("#ffffff");
+  });
+
+  it("toasts how to undo when a scene embedded in an image replaces the scene", async () => {
+    const file = await API.loadFile("./fixtures/smiley_embedded_v2.png");
+    drag(GlobalTestState.interactiveCanvas, "drop", { files: [file] });
+    await waitFor(() =>
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "text", text: "😀" }),
+      ]),
+    );
+    expect(h.state.toast?.message).toMatch(/^Content replaced\./);
   });
 
   it("Shift-drop keeps existing content and settings, remaps IDs, and can be undone", async () => {
@@ -221,6 +241,7 @@ describe("dropping scenes", () => {
     });
     expect(overlay()).toBeNull();
     await waitFor(() => expect(h.elements).toHaveLength(2));
+    expect(h.state.toast).toBeNull();
     expect(h.elements[0]).toEqual(original);
     expect(h.elements[1].id).not.toBe(original.id);
     expect(h.elements[1]).toMatchObject({ type: "ellipse", x: 150, y: 150 });

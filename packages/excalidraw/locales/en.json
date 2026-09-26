@@ -665,7 +665,8 @@
     "importLibrary": "Drop to import library",
     "replaceHint": "Hold <shift>Shift</shift> to keep existing content",
     "keepHint": "Your existing content will be kept",
-    "libraryHint": "Library files will append"
+    "libraryHint": "Library files will append",
+    "replacedToast": "Content replaced. {{shortcut}} to undo"
   },
   "mermaid": {
     "title": "Mermaid to Excalidraw",
