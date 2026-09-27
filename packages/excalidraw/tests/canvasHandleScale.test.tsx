@@ -1,5 +1,7 @@
 import React from "react";
 
+import type { Radians } from "@excalidraw/math";
+
 import { Excalidraw } from "../index";
 
 import { serializeAsJSON } from "../data/json";
@@ -8,9 +10,95 @@ import { API } from "./helpers/api";
 import { Pointer } from "./helpers/ui";
 import { act, render } from "./test-utils";
 
+import type { AppState } from "../types";
+
 const { h } = window;
 
 describe("UIOptions.canvasHandleScale", () => {
+  it.each([0.5, 1, 2])(
+    "selects the nearer overlapping corner at zoom %s",
+    async (value) => {
+      const rectangle = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        width: 1,
+        height: 1,
+      });
+      await render(
+        <Excalidraw
+          initialData={{
+            elements: [rectangle],
+            appState: { selectedElementIds: { [rectangle.id]: true } },
+          }}
+        />,
+      );
+      const { getTransformHandles } = await import(
+        "@excalidraw/element/transformHandles"
+      );
+      const { resizeTest, getTransformHandleTypeFromCoords } = await import(
+        "@excalidraw/element/resizeTest"
+      );
+      const zoom = { value: value as AppState["zoom"]["value"] };
+      for (const angle of [0, Math.PI / 4]) {
+        const rotated = { ...rectangle, angle: angle as Radians };
+        const elementsMap = new Map([[rotated.id, rotated]]);
+        const handles = getTransformHandles(
+          rotated,
+          zoom,
+          elementsMap,
+          "mouse",
+          undefined,
+          2,
+        );
+        const se = handles.se!;
+        const nw = handles.nw!;
+        const x = (se[0] + se[2] / 2) * 0.55 + (nw[0] + nw[2] / 2) * 0.45;
+        const y = (se[1] + se[3] / 2) * 0.55 + (nw[1] + nw[3] / 2) * 0.45;
+        expect(
+          resizeTest(
+            rotated,
+            elementsMap,
+            h.state,
+            x,
+            y,
+            zoom,
+            "mouse",
+            h.app.editorInterface,
+            2,
+          ),
+        ).toBe("se");
+        const rotation = handles.rotation!;
+        expect(
+          resizeTest(
+            rotated,
+            elementsMap,
+            h.state,
+            rotation[0] + rotation[2] / 2,
+            rotation[1] + rotation[3] / 2,
+            zoom,
+            "mouse",
+            h.app.editorInterface,
+            2,
+          ),
+        ).toBe("rotation");
+        if (angle === 0) {
+          expect(
+            getTransformHandleTypeFromCoords(
+              [100, 100, 101, 101],
+              x,
+              y,
+              zoom,
+              "mouse",
+              h.app.editorInterface,
+              2,
+            ),
+          ).toBe("se");
+        }
+      }
+    },
+  );
+
   it.each([
     [undefined, 1],
     [0, 1],

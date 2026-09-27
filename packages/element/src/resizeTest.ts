@@ -25,6 +25,7 @@ import {
 import { isImageElement, isLinearElement } from "./typeChecks";
 
 import type {
+  TransformHandles,
   TransformHandleType,
   TransformHandle,
   MaybeTransformHandleType,
@@ -45,6 +46,29 @@ const isInsideTransformHandle = (
   x <= transformHandle[0] + transformHandle[2] &&
   y >= transformHandle[1] &&
   y <= transformHandle[1] + transformHandle[3];
+
+const getNearestTransformHandle = (
+  handles: TransformHandles,
+  x: number,
+  y: number,
+): MaybeTransformHandleType => {
+  let nearest: MaybeTransformHandleType = false;
+  let nearestDistance = Infinity;
+  for (const key of Object.keys(handles) as TransformHandleType[]) {
+    const handle = handles[key];
+    if (!handle || !isInsideTransformHandle(handle, x, y)) {
+      continue;
+    }
+    const distance =
+      (x - handle[0] - handle[2] / 2) ** 2 +
+      (y - handle[1] - handle[3] / 2) ** 2;
+    if (distance < nearestDistance) {
+      nearest = key;
+      nearestDistance = distance;
+    }
+  }
+  return nearest;
+};
 
 export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
   element: NonDeletedExcalidrawElement,
@@ -78,17 +102,9 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
     return "rotation" as TransformHandleType;
   }
 
-  const filter = Object.keys(transformHandles).filter((key) => {
-    const transformHandle =
-      transformHandles[key as Exclude<TransformHandleType, "rotation">]!;
-    if (!transformHandle) {
-      return false;
-    }
-    return isInsideTransformHandle(transformHandle, x, y);
-  });
-
-  if (filter.length > 0) {
-    return filter[0] as TransformHandleType;
+  const nearest = getNearestTransformHandle(transformHandles, x, y);
+  if (nearest) {
+    return nearest;
   }
 
   if (canResizeFromSides(editorInterface)) {
@@ -181,17 +197,13 @@ export const getTransformHandleTypeFromCoords = <
     handleScale,
   );
 
-  const found = Object.keys(transformHandles).find((key) => {
-    const transformHandle =
-      transformHandles[key as Exclude<TransformHandleType, "rotation">]!;
-    return (
-      transformHandle &&
-      isInsideTransformHandle(transformHandle, scenePointerX, scenePointerY)
-    );
-  });
-
-  if (found) {
-    return found as MaybeTransformHandleType;
+  const nearest = getNearestTransformHandle(
+    transformHandles,
+    scenePointerX,
+    scenePointerY,
+  );
+  if (nearest) {
+    return nearest;
   }
 
   if (canResizeFromSides(editorInterface)) {
