@@ -297,6 +297,8 @@ const CombinedShapeProperties = ({
               {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
               {predicates.opacity && renderAction("changeOpacity")}
+              {predicates.freedrawPointer &&
+                renderAction("changeFreedrawPointer")}
             </div>
           </PropertiesPopover>
         )}
