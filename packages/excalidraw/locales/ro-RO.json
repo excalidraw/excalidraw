@@ -660,13 +660,13 @@
     }
   },
   "fileDrop": {
-    "replace": "",
-    "add": "",
-    "importLibrary": "",
-    "replaceHint": "",
-    "keepHint": "",
-    "libraryHint": "",
-    "replacedToast": ""
+    "replace": "Plasează pentru a înlocui conținutul",
+    "add": "Plasează pentru a adăuga la pânză",
+    "importLibrary": "Plasează pentru a importa biblioteca",
+    "replaceHint": "Ține apăsată tasta <shift>Shift</shift> pentru a păstra conținutul existent",
+    "keepHint": "Conținutul tău existent va fi păstrat",
+    "libraryHint": "Fișierele bibliotecii vor fi anexate",
+    "replacedToast": "Conținut înlocuit. Apasă {{shortcut}} pentru a anula"
   },
   "mermaid": {
     "title": "Mermaid la Excalidraw",
