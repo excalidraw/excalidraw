@@ -44,7 +44,11 @@ export type HostTextEditorMountProps = {
   element: ExcalidrawTextElement;
   container: HTMLDivElement | null;
   initialText: string;
-  /** Client point to put the caret at (double click on text), or `null`. */
+  /**
+   * Client point to put the caret at (a text tool click on the text, or a click
+   * on the selected text), or `null` (e.g. double click: the caret goes to the
+   * end, as in the textarea).
+   */
   initialCaretClientPoint: { x: number; y: number } | null;
   onChange: (
     nextOriginalText: string,
