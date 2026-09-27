@@ -804,8 +804,12 @@ const handleSearch = debounce(
     for (const el of [...texts, ...frames]) {
       yPositions.set(el.id, el.y);
     }
-    texts.sort((a, b) => (yPositions.get(a.id) ?? a.y) - (yPositions.get(b.id) ?? b.y));
-    frames.sort((a, b) => (yPositions.get(a.id) ?? a.y) - (yPositions.get(b.id) ?? b.y));
+    texts.sort(
+      (a, b) => (yPositions.get(a.id) ?? a.y) - (yPositions.get(b.id) ?? b.y),
+    );
+    frames.sort(
+      (a, b) => (yPositions.get(a.id) ?? a.y) - (yPositions.get(b.id) ?? b.y),
+    );
 
     const textMatches: SearchMatchItem[] = [];
 
