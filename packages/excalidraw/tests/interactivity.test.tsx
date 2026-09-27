@@ -794,10 +794,32 @@ describe("ui={false} with host UI", () => {
       </Excalidraw>,
     );
 
-    expect(queryContainer("[data-testid='host-top-left']")).not.toBe(null);
-    expect(queryContainer("[data-testid='host-top-right']")).not.toBe(null);
+    const hostTopLeft = queryContainer("[data-testid='host-top-left']")!;
+    const hostTopRight = queryContainer("[data-testid='host-top-right']")!;
+    expect(hostTopLeft).not.toBe(null);
+    expect(hostTopRight).not.toBe(null);
     expect(queryContainer("[data-testid='host-footer']")).not.toBe(null);
     expect(queryContainer("[aria-label='host sidebar']")).not.toBe(null);
+    expect(hostTopLeft.parentElement).toHaveClass(
+      "exc-region-top-left-host-slot",
+    );
+    expect(hostTopLeft.closest(".exc-region-top-left-content")).not.toBe(null);
+    expect(hostTopRight.parentElement).toHaveClass(
+      "exc-region-top-right-host-slot",
+    );
+    const topRightContent = hostTopRight.closest(
+      ".exc-region-top-right-content",
+    );
+    expect(topRightContent).not.toBe(null);
+    expect(
+      topRightContent!.querySelector("[aria-label='host sidebar']"),
+    ).not.toBe(null);
+    // top regions live in the mesh, the host footer in its sibling band
+    expect(hostTopLeft.closest(".exc-region-mesh")).not.toBe(null);
+    expect(hostTopRight.closest(".exc-region-mesh")).not.toBe(null);
+    const hostFooter = queryContainer("[data-testid='host-footer']")!;
+    expect(hostFooter.closest(".exc-region-mesh")).toBe(null);
+    expect(hostFooter.closest(".exc-region-bottom")).not.toBe(null);
 
     fireEvent.click(container.querySelector(".dropdown-menu-button")!);
     expect(container.textContent).toContain("host menu item");

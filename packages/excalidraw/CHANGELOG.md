@@ -95,13 +95,14 @@ The editor UI is now laid out as a grid of nine logical regions, replacing the t
 
 ```
 .exc-regions
- |_ .exc-region-top-left      .exc-region-top-center      .exc-region-top-right
- |_ .exc-region-center-left   .exc-region-center-center   .exc-region-center-right
+ |_ .exc-region-mesh
+ |   |_ .exc-region-top-left     .exc-region-top-center     .exc-region-top-right
+ |   |_ .exc-region-center-left  .exc-region-center-center  .exc-region-center-right
  |_ .exc-region-bottom
      |_ .exc-region-bottom-left  .exc-region-bottom-center  .exc-region-bottom-right
 ```
 
-Regions at the same height negotiate width with each other — the toolbar's space is exactly what's left between the top-left and the top-right UI, and at widths where nothing fits the top row overflows to the right rather than overlapping. Regions in the same column stack independently of the other columns — the styles panel hangs right below the top-left UI regardless of how far the toolbar or a tall top-right UI reach down, while the stats panel clears the top-left/top-right UI (but not the top-center toolbar). The full-width bottom wrapper uses an independent three-column grid, so its left/right controls cannot size the outer columns or displace the toolbar, while its center track prevents the footer regions from overlapping. Regions stretch to their cell(s) and stay `pointer-events: none`, with only their content interactive.
+Regions at the same height negotiate width with each other. The top row has three regimes as the editor narrows: with room to spare the toolbar is exactly viewport-centered between equal side tracks; once one side's content outgrows its share, that side pins to its content width and the toolbar shifts aside, making exactly enough room (e.g. tablet portrait while collaborating); and when nothing fits, the top row overflows to the right and is clipped at the editor edge — content never slides under its neighbors. The collaborator list is the one flexible piece: it takes whatever width is left in the top-right cluster and collapses avatars into a "+N" pill as that space shrinks. Regions in the same column stack independently of the other columns — the styles panel hangs right below the top-left UI regardless of how far the toolbar or a tall top-right UI reach down, while the stats panel clears the top-left/top-right UI (but not the top-center toolbar). The footer band (`.exc-region-bottom`) is a separate sibling grid of the top/center mesh: nothing in the footer can displace the toolbar, an overflowing top row cannot push the footer or the toast past the editor edge, and its flexible center track prevents the footer regions from overlapping. Regions stretch to their cell(s) and stay `pointer-events: none`, with only their content interactive.
 
 #### Breaking changes
 
@@ -112,7 +113,7 @@ If you style or query the editor DOM:
 - The zen-mode modifier `.layer-ui__wrapper__footer-left--transition-bottom` is now `.transition-bottom`, alongside the existing `.transition-left` / `.transition-right`.
 - The styles panel (`.App-menu__left`) and the stats panel (`.exc-stats`) are no longer absolutely positioned — they are in flow inside `.exc-region-center-left` / `.exc-region-center-right`.
 - `<Footer>` content renders in the flexible `.exc-region-bottom-center` track between the zoom/undo controls and help button. `.footer-center` remains full-width flex content, so hosts can keep content beside the left controls, beside the right controls, or at both edges using flex alignment and auto margins.
-- The host-content containers `.excalidraw-ui-top-left` / `.excalidraw-ui-top-right` were split into two concepts: `.exc-region-top-left-content` / `.exc-region-top-right-content` are the mixed rows of editor + host content (shared with the mobile top bar), and the new `.exc-region-top-left-host-slot` / `.exc-region-top-right-host-slot` wrap _only_ the host-rendered output (`renderTopLeftUI` / `renderTopRightUI`). Slots are flex rows (`gap: 0.5rem`) and hide themselves when empty, so host content no longer needs its own flex wrapper — returning a fragment is enough.
+- The host-content containers `.excalidraw-ui-top-left` / `.excalidraw-ui-top-right` were split into two concepts: `.exc-region-top-left-content` / `.exc-region-top-right-content` are the mixed rows of editor + host content (shared with the mobile top bar), and the new `.exc-region-top-left-host-slot` / `.exc-region-top-right-host-slot` wrap _only_ the host-rendered output (`renderTopLeftUI` / `renderTopRightUI`). Slots are flex rows (`gap: 0.5rem`) and hide themselves when empty, so host content no longer needs its own flex wrapper — returning a fragment is enough. Host content keeps its intrinsic width and participates in the top-row width negotiation: it can push the toolbar aside and, past that, overflow the editor edge (as before the rewrite) — it is never shrunk or clipped mid-cluster.
 
 #### Behavior changes
 
@@ -121,7 +122,7 @@ If you style or query the editor DOM:
 - The stats panel starts below the top-right UI (default position unchanged in full mode; in compact mode it aligns with the styles panel, 8px higher than before), so tall host UI in the top-right region pushes it down instead of overlapping it — while the toolbar's height doesn't affect it. (A top-left UI taller than the top-right also pushes it down, by design.)
 - In compact mode, the pen-mode button centers over the styles panel rather than over the top-left UI.
 - The toast and the scroll-back-to-content button sit in a separate full-width overlay on the bottom-row baseline (14px lower than the previous `bottom: 30px`), so they remain centered on the canvas rather than on the footer's asymmetric middle track.
-- At narrow widths the toolbar keeps a 1rem clearance from the top-left UI and pushes the top-right UI off-screen (as before), rather than sliding under its neighbors.
+- At narrow widths the top row degrades in order: the collaborator list collapses to its "+N" pill first, then the toolbar shifts off-center to make room for the side clusters, and past that the top row overflows to the right, clipped at the editor edge — while the footer band and the toast/scroll-back overlay always remain bounded by the editor. The toolbar keeps its intrinsic width and 1rem side clearance for now (adapting the toolbar to its allocated width is a separate change).
 
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
 
