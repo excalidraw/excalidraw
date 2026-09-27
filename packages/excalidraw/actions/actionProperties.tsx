@@ -191,6 +191,51 @@ const getStylesPanelInfo = (app: AppClassProperties) => {
   } as const;
 };
 
+const FreedrawPointerPicker = ({
+  appState,
+  onChange,
+}: {
+  appState: Pick<
+    AppState,
+    "currentItemFreedrawPointer" | "currentItemStrokeColor"
+  >;
+  onChange: (value: AppState["currentItemFreedrawPointer"]) => void;
+}) => (
+  <fieldset>
+    <legend>{t("labels.pointer")}</legend>
+    <div className="buttonList">
+      <RadioSelection<AppState["currentItemFreedrawPointer"]>
+        group="freedraw-pointer"
+        options={[
+          {
+            value: "crosshair",
+            text: t("labels.crosshair"),
+            icon: PlusIcon,
+            testId: "freedrawPointer-crosshair",
+          },
+          {
+            value: "dot",
+            text: t("labels.dot"),
+            icon: (
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="4"
+                  fill={appState.currentItemStrokeColor}
+                />
+              </svg>
+            ),
+            testId: "freedrawPointer-dot",
+          },
+        ]}
+        value={appState.currentItemFreedrawPointer}
+        onChange={onChange}
+      />
+    </div>
+  </fieldset>
+);
+
 export const changeProperty = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
@@ -430,6 +475,15 @@ export const actionChangeStrokeColor = register<
           appState={appState}
           updateData={updateData}
         />
+        {stylesPanelMode !== "full" &&
+          appState.activeTool.type === "freedraw" && (
+            <FreedrawPointerPicker
+              appState={appState}
+              onChange={(currentItemFreedrawPointer) =>
+                updateData({ currentItemFreedrawPointer })
+              }
+            />
+          )}
       </>
     );
   },
@@ -780,39 +834,10 @@ export const actionChangeFreedrawPointer = register<
     };
   },
   PanelComponent: ({ appState, updateData }) => (
-    <fieldset>
-      <legend>{t("labels.pointer")}</legend>
-      <div className="buttonList">
-        <RadioSelection<AppState["currentItemFreedrawPointer"]>
-          group="freedraw-pointer"
-          options={[
-            {
-              value: "crosshair",
-              text: t("labels.crosshair"),
-              icon: PlusIcon,
-              testId: "freedrawPointer-crosshair",
-            },
-            {
-              value: "dot",
-              text: t("labels.dot"),
-              icon: (
-                <svg aria-hidden="true" viewBox="0 0 24 24">
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="4"
-                    fill={appState.currentItemStrokeColor}
-                  />
-                </svg>
-              ),
-              testId: "freedrawPointer-dot",
-            },
-          ]}
-          value={appState.currentItemFreedrawPointer}
-          onChange={(value) => updateData(value)}
-        />
-      </div>
-    </fieldset>
+    <FreedrawPointerPicker
+      appState={appState}
+      onChange={(value) => updateData(value)}
+    />
   ),
 });
 
