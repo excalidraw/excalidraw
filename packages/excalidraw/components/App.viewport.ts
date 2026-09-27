@@ -665,7 +665,10 @@ export class AppViewport {
     });
   };
 
-  /** Navigates to a target and optionally installs scroll/zoom constraints. */
+  /**
+   * Navigates to a target and optionally installs scroll/zoom constraints.
+   * Navigating stops following a collaborator, as a user's pan does.
+   */
   setViewport = (opts: SetViewportOptions | null) => {
     if (opts === null) {
       this.cancelTransition();
@@ -698,6 +701,10 @@ export class AppViewport {
       }
       return;
     }
+
+    // the view is about to show something other than what the followed
+    // user sees
+    this.app.requestUnfollow();
 
     const viewportUpdate = getConstrainedTargetViewport(
       this.app.state,
