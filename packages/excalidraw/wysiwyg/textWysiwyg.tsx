@@ -242,7 +242,7 @@ export const textWysiwyg = ({
   // Its root takes the place of the textarea: same geometry and style, no
   // textarea value, selection, paste, indent or onblur handling.
   const hostEditor = getHostTextEditor();
-  const isHostEditor = !!hostEditor?.shouldEdit(element);
+  const isHostEditor = !!hostEditor?.shouldEdit(element, excalidrawContainer);
   let hostHandle: HostTextEditorHandle | null = null;
   // the host editor counterpart of `editable.onblur = handleSubmit`
   let hostBlurSubmitEnabled = false;
@@ -489,8 +489,13 @@ export const textWysiwyg = ({
     const caretPoint = initialCaretSceneCoords
       ? getViewportCoords(initialCaretSceneCoords.x, initialCaretSceneCoords.y)
       : null;
+    // in the DOM before mount: the host finds its editor instance by the root
+    excalidrawContainer
+      ?.querySelector(".excalidraw-textEditorContainer")
+      ?.appendChild(editorElement);
     hostHandle = hostEditor.mount(editorElement as HTMLDivElement, {
       element,
+      container: excalidrawContainer,
       initialText: element.originalText,
       initialCaretClientPoint: caretPoint
         ? {
@@ -1124,9 +1129,11 @@ export const textWysiwyg = ({
     window.addEventListener("pointerdown", onPointerDown, { capture: true });
   });
   window.addEventListener("beforeunload", handleSubmit);
-  excalidrawContainer
-    ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(editorElement);
+  if (!isHostEditor) {
+    excalidrawContainer
+      ?.querySelector(".excalidraw-textEditorContainer")!
+      .appendChild(editable);
+  }
 
   return handleSubmit;
 };

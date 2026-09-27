@@ -20,12 +20,14 @@ const mouse = new Pointer("mouse");
 const { h } = window;
 
 /** A host editor: a contenteditable div inside the root, value kept aside. */
-const createHostEditor = (shouldEdit = () => true) => {
+const createHostEditor = (accept = true) => {
+  const shouldEdit = vi.fn(() => accept);
   const state = {
     props: null as HostTextEditorMountProps | null,
     root: null as HTMLDivElement | null,
     field: null as HTMLDivElement | null,
     value: "",
+    connectedAtMount: false,
     mount: vi.fn(),
     focus: vi.fn(),
     unmount: vi.fn(),
@@ -36,6 +38,7 @@ const createHostEditor = (shouldEdit = () => true) => {
     mount: (root, props) => {
       state.root = root;
       state.props = props;
+      state.connectedAtMount = root.isConnected;
       state.value = props.initialText;
       const field = document.createElement("div");
       field.contentEditable = "true";
@@ -58,7 +61,7 @@ const createHostEditor = (shouldEdit = () => true) => {
     state.value = value;
     act(() => state.props!.onChange(value, options));
   };
-  return { editor, state, type };
+  return { editor, state, type, shouldEdit };
 };
 
 const nextTask = () =>
@@ -87,6 +90,12 @@ describe("host text editor (sdamex F5)", () => {
     mouse.clickAt(100, 100);
 
     expect(host.state.mount).toHaveBeenCalledTimes(1);
+    expect(host.state.connectedAtMount).toBe(true);
+    expect(host.state.props!.container?.classList).toContain("excalidraw");
+    expect(host.shouldEdit).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "text" }),
+      host.state.props!.container,
+    );
     const root = host.state.root!;
     expect(root.tagName).toBe("DIV");
     expect(root.dataset.type).toBe("wysiwyg");
@@ -216,7 +225,7 @@ describe("host text editor (sdamex F5)", () => {
   });
 
   it("shouldEdit false keeps the textarea", async () => {
-    const host = createHostEditor(() => false);
+    const host = createHostEditor(false);
     setHostTextEditor(host.editor);
     UI.clickTool("text");
     mouse.clickAt(100, 100);

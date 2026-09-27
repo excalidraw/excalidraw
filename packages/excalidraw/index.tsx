@@ -361,6 +361,9 @@ export {
   viewportCoordsToSceneCoords,
   getFormFactor,
   throttleRAF,
+  // sdamex: text line geometry for host editors (hostTextEditor.ts)
+  getLineHeight,
+  getVerticalOffset,
 } from "@excalidraw/common";
 
 export {

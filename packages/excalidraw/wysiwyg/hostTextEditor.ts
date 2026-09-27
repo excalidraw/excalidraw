@@ -13,9 +13,13 @@ import type { ExcalidrawTextElement } from "@excalidraw/element/types";
  *
  * Contract:
  * - text goes in and out in the element format (`originalText`);
- * - `mount` runs synchronously inside `textWysiwyg`, before the root is in the
- *   DOM. The host may render into the root later (a React portal) and must
- *   answer `getValue()` with the current text from the start;
+ * - `shouldEdit(element, container)` and `mount` get the container of the
+ *   editor instance (`.excalidraw`): a page may hold several editors, and the
+ *   editor registry is one per page;
+ * - `mount` runs synchronously inside `textWysiwyg`, with the root already in
+ *   the text editor container. It must not call back synchronously. The host
+ *   may render into the root later (a React portal) and must answer
+ *   `getValue()` with the current text from the start;
  * - `onChange(text, { lineHeight })` is the textarea `input`: the element is
  *   updated and resized. `lineHeight` (unitless, as the element property)
  *   changes the element line height first, e.g. for a tall inline fragment;
@@ -38,6 +42,7 @@ import type { ExcalidrawTextElement } from "@excalidraw/element/types";
  */
 export type HostTextEditorMountProps = {
   element: ExcalidrawTextElement;
+  container: HTMLDivElement | null;
   initialText: string;
   /** Client point to put the caret at (double click on text), or `null`. */
   initialCaretClientPoint: { x: number; y: number } | null;
@@ -57,7 +62,10 @@ export type HostTextEditorHandle = {
 };
 
 export interface HostTextEditor {
-  shouldEdit: (element: ExcalidrawTextElement) => boolean;
+  shouldEdit: (
+    element: ExcalidrawTextElement,
+    container: HTMLDivElement | null,
+  ) => boolean;
   mount: (
     root: HTMLDivElement,
     props: HostTextEditorMountProps,
