@@ -21,6 +21,7 @@ import {
 import { LinearElementEditor } from "@excalidraw/element";
 import { getBoundTextElement, getContainerElement } from "@excalidraw/element";
 import { getLineHeightInPx } from "@excalidraw/element";
+import { getTextInlineHooks } from "@excalidraw/element";
 import {
   isArrowElement,
   isIframeLikeElement,
@@ -701,20 +702,39 @@ const renderElementToSvg = (
             : element.textAlign === "right" || direction === "rtl"
             ? "end"
             : "start";
+        const fill = applyDarkModeFilter(
+          element.strokeColor,
+          renderConfig.theme === THEME.DARK,
+        );
+        // sdamex: the host may emit a line itself (inline formulas, #5072)
+        const renderInlineLineSvg = getTextInlineHooks()?.renderLineSvg;
         for (let i = 0; i < lines.length; i++) {
+          const lineY = i * lineHeightPx + verticalOffset;
+          const inlineNode = renderInlineLineSvg?.(
+            svgRoot.ownerDocument,
+            element,
+            lines[i],
+            {
+              x: horizontalOffset,
+              y: lineY,
+              fill,
+              fontFamily: getFontFamilyString(element),
+              fontSize: element.fontSize,
+              textAnchor,
+              direction,
+            },
+          );
+          if (inlineNode) {
+            node.appendChild(inlineNode);
+            continue;
+          }
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
           text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
+          text.setAttribute("y", `${lineY}`);
           text.setAttribute("font-family", getFontFamilyString(element));
           text.setAttribute("font-size", `${element.fontSize}px`);
-          text.setAttribute(
-            "fill",
-            applyDarkModeFilter(
-              element.strokeColor,
-              renderConfig.theme === THEME.DARK,
-            ),
-          );
+          text.setAttribute("fill", fill);
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
           text.setAttribute("direction", direction);

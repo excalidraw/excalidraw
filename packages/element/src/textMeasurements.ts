@@ -149,6 +149,13 @@ class CanvasTextMetricsProvider implements TextMetricsProvider {
   }
 }
 
+/**
+ * sdamex: the default canvas provider, so that a host provider can delegate
+ * plain text to exactly the measurement the fork would use (#5072).
+ */
+export const createCanvasTextMetricsProvider = (): TextMetricsProvider =>
+  new CanvasTextMetricsProvider();
+
 export const getLineWidth = (text: string, font: FontString) => {
   if (!textMetricsProvider) {
     textMetricsProvider = new CanvasTextMetricsProvider();

@@ -11,6 +11,14 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## 0.30.7 (2026-09-27)
+
+### Features
+
+- Крючки хоста для встроенных фрагментов текста (формулы на доске SdamEx, emevart/billion-dollars#5072). `setTextInlineHooks(hooks)` регистрирует объект `TextInlineHooks`, без регистрации всё работает как в 0.30.6. `tokenize(line)` и `isAtom(token)` дают переносу строк токены хоста: атом не режется по символам и не считается хвостовым пробелом, атом шире строки стоит один в своей строке. `renderLine(ctx, element, line, x, y)` рисует строку текста на холсте вместо `fillText`, `false` возвращает строку форку. `renderLineSvg(document, element, line, attrs)` отдаёт узел строки для экспорта SVG, `null` оставляет `<text>` форка. Типы `TextInlineHooks` и `TextInlineSvgLineAttrs` экспортируются [#19](https://github.com/emevart/sdamexdraw/pull/19).
+- `excalidrawAPI.invalidateTextRender(ids?)` сбрасывает кэш холста текстовых элементов (все или по `ids`) и перерисовывает сцену. Нужен хосту, когда картинка фрагмента готова: смена `versionNonce` ради перерисовки разослала бы правку соавторам [#19](https://github.com/emevart/sdamexdraw/pull/19).
+- `createCanvasTextMetricsProvider()` отдаёт измеритель ширины форка по умолчанию: провайдер хоста в `setCustomTextMetricsProvider` может передать ему обычный текст [#19](https://github.com/emevart/sdamexdraw/pull/19).
+
 ## 0.30.6 (2026-09-26)
 
 ### Features
