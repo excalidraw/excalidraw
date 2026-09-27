@@ -53,6 +53,7 @@ import {
   getBoundTextMaxHeight,
   getBoundTextMaxWidth,
 } from "./textElement";
+import { getTextInlineHooks } from "./textInline";
 import { getLineHeightInPx } from "./textMeasurements";
 import {
   isTextElement,
@@ -530,12 +531,22 @@ const drawElementOnCanvas = (
           lineHeightPx,
         );
 
+        // sdamex: the host may draw a line itself (inline formulas, #5072)
+        const renderInlineLine = getTextInlineHooks()?.renderLine;
+
         for (let index = 0; index < lines.length; index++) {
-          context.fillText(
-            lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
-          );
+          const lineY = index * lineHeightPx + verticalOffset;
+          if (
+            !renderInlineLine?.(
+              context,
+              element,
+              lines[index],
+              horizontalOffset,
+              lineY,
+            )
+          ) {
+            context.fillText(lines[index], horizontalOffset, lineY);
+          }
         }
         context.restore();
         if (shouldTemporarilyAttach) {

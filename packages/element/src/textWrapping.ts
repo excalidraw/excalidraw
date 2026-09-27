@@ -1,5 +1,6 @@
 import { isDevEnv, isTestEnv } from "@excalidraw/common";
 
+import { getTextInlineHooks, isTextInlineAtom } from "./textInline";
 import { charWidth, getLineWidth } from "./textMeasurements";
 
 import type { FontString } from "./types";
@@ -380,6 +381,12 @@ const Break = {
  * keep in mind that this assumes the input text is already NFC-normalized.
  */
 export const parseTokens = (line: string) => {
+  // sdamex: host tokens (inline formulas) take precedence for this line
+  const hostTokens = getTextInlineHooks()?.tokenize?.(line);
+  if (hostTokens) {
+    return hostTokens.filter(Boolean);
+  }
+
   const breakLineRegex = getLineBreakRegex();
 
   // normalizing to single-codepoint composed chars due to canonical equivalence
@@ -511,12 +518,26 @@ const wrapLine = (
       ? currentLineWidth + charWidth.calculate(token, font)
       : getLineWidth(testLine, font);
 
+    const isAtom = isTextInlineAtom(token);
+
     // build up the current line, skipping length check for possibly trailing whitespaces
-    if (/\s/.test(token) || testLineWidth <= maxWidth) {
+    // (sdamex: an atom may contain spaces but is never trailing whitespace)
+    if ((!isAtom && /\s/.test(token)) || testLineWidth <= maxWidth) {
       if (!currentLine) {
         currentLineStart = tokenStart;
       }
       currentLine = testLine;
+      currentLineEnd = tokenEnd;
+      currentLineWidth = testLineWidth;
+      tokenOffset = tokenEnd;
+      tokenIndex++;
+      continue;
+    }
+
+    // sdamex: an atom wider than `maxWidth` is never split; it takes its own line
+    if (!currentLine && isAtom) {
+      currentLine = token;
+      currentLineStart = tokenStart;
       currentLineEnd = tokenEnd;
       currentLineWidth = testLineWidth;
       tokenOffset = tokenEnd;

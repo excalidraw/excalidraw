@@ -164,6 +164,7 @@ import {
   isFlowchartNodeElement,
   isBindableElement,
   isTextElement,
+  elementWithCanvasCache,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -1126,6 +1127,7 @@ class App extends React.Component<AppProps, AppState> {
       getToolSettings: this.getToolSettings,
       setToolSettings: this.setToolSettings,
       onToolSettingsChange: (cb) => this.toolSettingsChangeEmitter.on(cb),
+      invalidateTextRender: this.invalidateTextRender,
     };
     return api;
   }
@@ -5396,6 +5398,22 @@ class App extends React.Component<AppProps, AppState> {
     } else {
       this.setState({});
     }
+  };
+
+  /**
+   * sdamex: drops the cached canvases of text elements and repaints the static
+   * scene. For host-drawn inline fragments (board formulas, #5072) that became
+   * ready asynchronously: bumping `versionNonce` instead would sync an edit to
+   * collaborators. No ids invalidates every text element.
+   */
+  public invalidateTextRender = (elementIds?: readonly string[]) => {
+    const ids = elementIds ? new Set(elementIds) : null;
+    for (const element of this.scene.getNonDeletedElements()) {
+      if (isTextElement(element) && (!ids || ids.has(element.id))) {
+        elementWithCanvasCache.delete(element);
+      }
+    }
+    this.scene.triggerUpdate();
   };
 
   /**

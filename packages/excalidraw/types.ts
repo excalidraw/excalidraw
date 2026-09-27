@@ -1136,6 +1136,11 @@ export interface ExcalidrawImperativeAPI {
   onToolSettingsChange: (
     callback: (settings: ToolSettingsSnapshot) => void,
   ) => UnsubscribeCallback;
+  /**
+   * sdamex: сброс кэша отрисовки текстовых элементов и перерисовка сцены, когда
+   * встроенные фрагменты хоста (формулы, #5072) готовы. Без ids — все тексты.
+   */
+  invalidateTextRender: InstanceType<typeof App>["invalidateTextRender"];
 }
 
 /** sdamex: свойства штриха одного набора настроек инструмента. */
