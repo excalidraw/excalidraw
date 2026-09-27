@@ -15,7 +15,11 @@ import type {
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { unbindBindingElement, updateBoundElements } from "./binding";
+import {
+  getSimultaneouslyUpdatedElementIds,
+  unbindBindingElement,
+  updateBoundElements,
+} from "./binding";
 import { getCommonBounds } from "./bounds";
 import { getPerfectElementSize } from "./sizeHelpers";
 import { getBoundTextElement } from "./textElement";
@@ -103,8 +107,11 @@ export const dragSelectedElements = (
     gridSize,
   );
 
-  const elementsToUpdateIds = new Set(
-    Array.from(elementsToUpdate, (el) => el.id),
+  // one array for the whole update, so that every element's bound-arrow
+  // update and the unbinding checks share its cached id set
+  const elementsToUpdateArray = Array.from(elementsToUpdate);
+  const elementsToUpdateIds = getSimultaneouslyUpdatedElementIds(
+    elementsToUpdateArray,
   );
 
   elementsToUpdate.forEach((element) => {
@@ -125,7 +132,7 @@ export const dragSelectedElements = (
         );
       }
       updateBoundElements(element, scene, {
-        simultaneouslyUpdated: Array.from(elementsToUpdate),
+        simultaneouslyUpdated: elementsToUpdateArray,
       });
     } else if (
       // NOTE: Add a little initial drag to the arrow dragging when the arrow

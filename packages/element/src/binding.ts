@@ -1322,6 +1322,7 @@ export const updateBoundElements = (
   changedElement: NonDeletedExcalidrawElement,
   scene: Scene,
   options?: {
+    /** see `getSimultaneouslyUpdatedElementIds` for how to pass it */
     simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
   },
@@ -1550,7 +1551,13 @@ const simultaneouslyUpdatedElementIdsCache = new WeakMap<
   ReadonlySet<ExcalidrawElement["id"]>
 >();
 
-const getSimultaneouslyUpdatedElementIds = (
+/**
+ * The id set of `simultaneouslyUpdated`, shared by every `updateBoundElements()`
+ * call given the same array. Pass one array instance for all elements of an
+ * operation, and don't change its membership after the first lookup, or the
+ * cached ids go stale.
+ */
+export const getSimultaneouslyUpdatedElementIds = (
   simultaneouslyUpdated: readonly ExcalidrawElement[] | undefined,
 ): ReadonlySet<ExcalidrawElement["id"]> => {
   if (!simultaneouslyUpdated) {
