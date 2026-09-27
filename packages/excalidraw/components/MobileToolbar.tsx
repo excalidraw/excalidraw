@@ -299,6 +299,8 @@ export const MobileToolbar = ({
           onChange={() => handleToolChange("image")}
         />
 
+        {app.props.renderToolbarExtra?.(true, app.state)}
+
         {/* Extras dropdown (frame, embed, laser, mermaid); sdamex: no hardcoded "Generate" header, the TTD slot is empty without a trigger (#5069) */}
         <DropdownMenu open={isExtrasOpen}>
           <DropdownMenu.Trigger

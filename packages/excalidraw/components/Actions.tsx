@@ -1521,6 +1521,7 @@ export const ShapesSwitcher = ({
           );
         },
       )}
+      {app.props.renderToolbarExtra?.(false, app.state)}
       <div className="App-toolbar__divider" />
 
       <DropdownMenu open={isExtraToolsMenuOpen}>

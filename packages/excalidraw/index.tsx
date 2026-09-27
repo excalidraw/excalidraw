@@ -80,6 +80,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onPointerUpdate,
     renderTopLeftUI,
     renderTopRightUI,
+    renderToolbarExtra,
     langCode = defaultLang.code,
     viewModeEnabled,
     zenModeEnabled,
@@ -201,6 +202,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onPointerUpdate={onPointerUpdate}
           renderTopLeftUI={renderTopLeftUI}
           renderTopRightUI={renderTopRightUI}
+          renderToolbarExtra={renderToolbarExtra}
           langCode={langCode}
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
@@ -359,6 +361,9 @@ export {
   viewportCoordsToSceneCoords,
   getFormFactor,
   throttleRAF,
+  // sdamex: text line geometry for host editors (hostTextEditor.ts)
+  getLineHeight,
+  getVerticalOffset,
 } from "@excalidraw/common";
 
 export {
@@ -423,6 +428,12 @@ export type {
   TextInlineSvgLineAttrs,
   TextMetricsProvider,
 } from "@excalidraw/element";
+export { setHostTextEditor } from "./wysiwyg/hostTextEditor";
+export type {
+  HostTextEditor,
+  HostTextEditorHandle,
+  HostTextEditorMountProps,
+} from "./wysiwyg/hostTextEditor";
 
 export { CommandPalette } from "./components/CommandPalette/CommandPalette";
 

@@ -53,6 +53,10 @@ export const isToolIcon = (
 ): target is HTMLElement =>
   target instanceof HTMLElement && target.className.includes("ToolIcon");
 
+const isInsideTextEditor = (target: Element | EventTarget | null) =>
+  target instanceof HTMLElement &&
+  target.closest('[data-type="wysiwyg"]') !== null;
+
 export const isInputLike = (
   target: Element | EventTarget | null,
 ): target is
@@ -61,7 +65,9 @@ export const isInputLike = (
   | HTMLSelectElement
   | HTMLBRElement
   | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+  // sdamex: anything inside the text editor, including a host editor root
+  // (hostTextEditor.ts) and shadow hosts of its inner fields
+  isInsideTextEditor(target) ||
   target instanceof HTMLBRElement || // newline in wysiwyg
   target instanceof HTMLInputElement ||
   target instanceof HTMLTextAreaElement ||
@@ -81,7 +87,9 @@ export const isWritableElement = (
   | HTMLTextAreaElement
   | HTMLBRElement
   | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+  // sdamex: anything inside the text editor, including a host editor root
+  // (hostTextEditor.ts) and shadow hosts of its inner fields
+  isInsideTextEditor(target) ||
   target instanceof HTMLBRElement || // newline in wysiwyg
   target instanceof HTMLTextAreaElement ||
   (target instanceof HTMLInputElement &&
