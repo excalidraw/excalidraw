@@ -1541,10 +1541,27 @@ const doesNeedUpdate = (
   );
 };
 
+// PERF: callers updating many elements invoke `updateBoundElements()` for each
+// of them with the same `simultaneouslyUpdated` array, so cache the id set
+// per array to avoid rebuilding it on every call (O(n^2) on multi-element
+// transforms)
+const simultaneouslyUpdatedElementIdsCache = new WeakMap<
+  readonly ExcalidrawElement[],
+  ReadonlySet<ExcalidrawElement["id"]>
+>();
+
 const getSimultaneouslyUpdatedElementIds = (
   simultaneouslyUpdated: readonly ExcalidrawElement[] | undefined,
-): Set<ExcalidrawElement["id"]> => {
-  return new Set((simultaneouslyUpdated || []).map((element) => element.id));
+): ReadonlySet<ExcalidrawElement["id"]> => {
+  if (!simultaneouslyUpdated) {
+    return new Set();
+  }
+  let ids = simultaneouslyUpdatedElementIdsCache.get(simultaneouslyUpdated);
+  if (!ids) {
+    ids = new Set(simultaneouslyUpdated.map((element) => element.id));
+    simultaneouslyUpdatedElementIdsCache.set(simultaneouslyUpdated, ids);
+  }
+  return ids;
 };
 
 export const getHeadingForElbowArrowSnap = (
