@@ -11,6 +11,14 @@ The change should be grouped under one of the below section and must contain PR 
 Please add the latest change on the top under the correct section.
 -->
 
+## 0.30.8 (2026-09-27)
+
+### Features
+
+- Редактор текста от хоста (формулы на доске SdamEx, emevart/billion-dollars#5072). `setHostTextEditor(editor)` регистрирует `HostTextEditor`: для текста, который хост берёт (`shouldEdit(element)`), форк вместо `textarea` создаёт корень `div.excalidraw-wysiwyg[data-type="wysiwyg"]` с той же геометрией и стилем и отдаёт его хосту (`mount(root, props)`). Хост возвращает `getValue`, `focus`, `unmount` и необязательный `onLayout`. Форк зовёт `onChange` и сохраняет текст так же, как у `textarea`: по щелчку по холсту, при уходе со страницы, по Esc, Ctrl/Cmd+Enter и сохранению файла. Масштаб и размер шрифта с клавиатуры работают. Потерю фокуса сообщает хост (`props.onBlur()`), форк сохраняет текст, если это не открытое меню свойств. `props.onChange(text, { lineHeight })` сначала меняет высоту строки элемента. Обновление сцены возвращает фокус редактору хоста, только если фокус вне корня. `focus()` корня зовёт хост, поэтому пикеры цвета и шрифта возвращают фокус тексту. Без регистрации или при `shouldEdit() === false` работает `textarea`, как в 0.30.7. Типы `HostTextEditor`, `HostTextEditorHandle`, `HostTextEditorMountProps` экспортируются.
+- `isWritableElement` и `isInputLike` считают вводом любой элемент внутри редактора текста (`[data-type="wysiwyg"]`), в том числе хост shadow DOM внутреннего поля. Клавиши и вставка из редактора хоста не становятся сочетаниями и вставкой элементов.
+- Проп `renderToolbarExtra(isMobile, appState)`: кнопки хоста в конце кнопок инструментов, перед «Ещё», на панели компьютера и в нижней панели телефона. Проп сравнивается по ссылке: хост держит функцию стабильной. Кнопка, которая работает во время правки текста, не должна забирать фокус.
+
 ## 0.30.7 (2026-09-27)
 
 ### Features

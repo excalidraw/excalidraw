@@ -71,10 +71,14 @@ import {
   actionZoomOut,
 } from "../actions/actionCanvas";
 
+import { getHostTextEditor } from "./hostTextEditor";
+
 import type { ParsedDataTranferList } from "../clipboard";
 
 import type App from "../components/App";
 import type { AppState } from "../types";
+
+import type { HostTextEditorHandle } from "./hostTextEditor";
 
 const getTransform = (
   width: number,
@@ -234,9 +238,18 @@ export const textWysiwyg = ({
     y: number;
   } | null = null;
 
+  // sdamex: the host may edit this text in its own editor (hostTextEditor.ts).
+  // Its root takes the place of the textarea: same geometry and style, no
+  // textarea value, selection, paste, indent or onblur handling.
+  const hostEditor = getHostTextEditor();
+  const isHostEditor = !!hostEditor?.shouldEdit(element);
+  let hostHandle: HostTextEditorHandle | null = null;
+  // the host editor counterpart of `editable.onblur = handleSubmit`
+  let hostBlurSubmitEnabled = false;
+
   const textPropertiesUpdated = (
     updatedTextElement: ExcalidrawTextElement,
-    editable: HTMLTextAreaElement,
+    editable: HTMLElement,
   ) => {
     if (!editable.style.fontFamily || !editable.style.fontSize) {
       return false;
@@ -299,7 +312,7 @@ export const textWysiwyg = ({
         }
         const propertiesUpdated = textPropertiesUpdated(
           updatedTextElement,
-          editable,
+          editorElement,
         );
 
         let originalContainerData;
@@ -375,7 +388,7 @@ export const textWysiwyg = ({
       // Make sure text editor height doesn't go beyond viewport
       const editorMaxHeight =
         (appState.height - viewportY) / appState.zoom.value;
-      Object.assign(editable.style, {
+      Object.assign(editorElement.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
@@ -413,25 +426,32 @@ export const textWysiwyg = ({
         x: coordX,
         y: coordY,
       };
-      editable.scrollTop = 0;
+      editorElement.scrollTop = 0;
       // For some reason updating font attribute doesn't set font family
       // hence updating font family explicitly for test environment
       if (isTestEnv()) {
-        editable.style.fontFamily = getFontFamilyString(updatedTextElement);
+        editorElement.style.fontFamily =
+          getFontFamilyString(updatedTextElement);
       }
 
       app.scene.mutateElement(updatedTextElement, { x: coordX, y: coordY });
+      hostHandle?.onLayout?.();
     }
   };
 
   const editable = document.createElement("textarea");
+  // sdamex: the element styled and placed as the editor — the textarea, or
+  // the root the host editor mounts into
+  const editorElement: HTMLTextAreaElement | HTMLDivElement = isHostEditor
+    ? document.createElement("div")
+    : editable;
 
-  editable.dir = "auto";
   editable.tabIndex = 0;
-  editable.dataset.type = "wysiwyg";
   // prevent line wrapping on Safari
   editable.wrap = "off";
-  editable.classList.add("excalidraw-wysiwyg");
+  editorElement.dir = "auto";
+  editorElement.dataset.type = "wysiwyg";
+  editorElement.classList.add("excalidraw-wysiwyg");
 
   let whiteSpace = "pre";
   let wordBreak = "normal";
@@ -440,7 +460,7 @@ export const textWysiwyg = ({
     whiteSpace = "pre-wrap";
     wordBreak = "break-word";
   }
-  Object.assign(editable.style, {
+  Object.assign(editorElement.style, {
     position: "absolute",
     display: "inline-block",
     minHeight: "1em",
@@ -463,8 +483,57 @@ export const textWysiwyg = ({
   editable.value = element.originalText;
   updateWysiwygStyle();
 
+  if (isHostEditor && hostEditor) {
+    // pickers refocus the text editor through `.excalidraw-wysiwyg`
+    editorElement.focus = () => hostHandle?.focus();
+    const caretPoint = initialCaretSceneCoords
+      ? getViewportCoords(initialCaretSceneCoords.x, initialCaretSceneCoords.y)
+      : null;
+    hostHandle = hostEditor.mount(editorElement as HTMLDivElement, {
+      element,
+      initialText: element.originalText,
+      initialCaretClientPoint: caretPoint
+        ? {
+            x: caretPoint[0] + app.state.offsetLeft,
+            y: caretPoint[1] + app.state.offsetTop,
+          }
+        : null,
+      onChange: (nextOriginalText, options) => {
+        if (isDestroyed) {
+          return;
+        }
+        const lineHeight = options?.lineHeight;
+        const current = app.scene.getElement(element.id);
+        if (
+          lineHeight &&
+          lineHeight > 0 &&
+          current &&
+          isTextElement(current) &&
+          current.lineHeight !== lineHeight
+        ) {
+          app.scene.mutateElement(current, {
+            lineHeight: lineHeight as ExcalidrawTextElement["lineHeight"],
+          });
+        }
+        onChange?.(normalizeText(nextOriginalText));
+      },
+      onBlur: () => {
+        if (hostBlurSubmitEnabled) {
+          handleSubmit();
+        }
+      },
+      submit: (viaKeyboard) => {
+        submittedViaKeyboard = viaKeyboard;
+        handleSubmit();
+      },
+    });
+  }
+
+  const getEditorValue = () =>
+    hostHandle ? normalizeText(hostHandle.getValue()) : editable.value;
+
   const getCaretIndexFromInitialSceneCoords = () => {
-    if (!initialCaretSceneCoords || !currentTextLayout) {
+    if (isHostEditor || !initialCaretSceneCoords || !currentTextLayout) {
       return null;
     }
 
@@ -528,7 +597,7 @@ export const textWysiwyg = ({
     };
   })();
 
-  if (onChange) {
+  if (onChange && !isHostEditor) {
     editable.onpaste = async (event) => {
       // we need to synchronously get the MIME types so we can preventDefault()
       // in the same tick (FF requires that)
@@ -627,7 +696,7 @@ export const textWysiwyg = ({
     };
   }
 
-  editable.onkeydown = (event) => {
+  editorElement.onkeydown = (event) => {
     // sdamex: only Ctrl/Cmd zooms while typing, bare "=", "-", "+" are text
     // since the zoom actions also accept them without modifiers (#2667)
     if (
@@ -670,10 +739,12 @@ export const textWysiwyg = ({
       submittedViaKeyboard = true;
       handleSubmit();
     } else if (
-      event.key === KEYS.TAB ||
-      (event[KEYS.CTRL_OR_CMD] &&
-        (event.code === CODES.BRACKET_LEFT ||
-          event.code === CODES.BRACKET_RIGHT))
+      // sdamex: indentation edits the textarea; the host editor handles Tab
+      !isHostEditor &&
+      (event.key === KEYS.TAB ||
+        (event[KEYS.CTRL_OR_CMD] &&
+          (event.code === CODES.BRACKET_LEFT ||
+            event.code === CODES.BRACKET_RIGHT)))
     ) {
       event.preventDefault();
       if (event.isComposing) {
@@ -800,6 +871,8 @@ export const textWysiwyg = ({
     }
 
     isDestroyed = true;
+    // sdamex: read before cleanup, which unmounts the host editor
+    const nextOriginalText = getEditorValue();
     // cleanup must be run before onSubmit otherwise when app blurs the wysiwyg
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
@@ -816,7 +889,7 @@ export const textWysiwyg = ({
     );
 
     if (container) {
-      if (editable.value.trim()) {
+      if (nextOriginalText.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
           app.scene.mutateElement(container, {
@@ -845,7 +918,7 @@ export const textWysiwyg = ({
 
     onSubmit({
       viaKeyboard: submittedViaKeyboard,
-      nextOriginalText: editable.value,
+      nextOriginalText,
     });
   };
 
@@ -853,7 +926,8 @@ export const textWysiwyg = ({
     // remove events to ensure they don't late-fire
     editable.onblur = null;
     editable.oninput = null;
-    editable.onkeydown = null;
+    editorElement.onkeydown = null;
+    hostBlurSubmitEnabled = false;
 
     if (observer) {
       observer.disconnect();
@@ -869,7 +943,12 @@ export const textWysiwyg = ({
     unsubOnChange();
     unbindOnScroll();
 
-    editable.remove();
+    if (hostHandle) {
+      const handle = hostHandle;
+      hostHandle = null;
+      handle.unmount();
+    }
+    editorElement.remove();
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
@@ -898,6 +977,14 @@ export const textWysiwyg = ({
         return;
       }
 
+      if (isHostEditor) {
+        if (!isDestroyed) {
+          hostBlurSubmitEnabled = true;
+          hostHandle?.focus();
+        }
+        return;
+      }
+
       // Otherwise, re-enable submit on blur and refocus the editor.
       editable.onblur = handleSubmit;
       editable.focus();
@@ -913,6 +1000,7 @@ export const textWysiwyg = ({
 
   const temporarilyDisableSubmit = () => {
     editable.onblur = null;
+    hostBlurSubmitEnabled = false;
     window.addEventListener("pointerup", bindBlurEvent);
     // handle edge-case where pointerup doesn't fire e.g. due to user
     // alt-tabbing away
@@ -926,7 +1014,12 @@ export const textWysiwyg = ({
     // panning canvas
     if (event.button === POINTER_BUTTON.WHEEL) {
       // trying to pan by clicking inside text area itself -> handle here
-      if (target instanceof HTMLTextAreaElement) {
+      if (
+        target instanceof HTMLTextAreaElement ||
+        (isHostEditor &&
+          target instanceof Node &&
+          editorElement.contains(target))
+      ) {
         event.preventDefault();
         app.handleCanvasPanUsingWheelOrSpaceDrag(event);
       }
@@ -986,7 +1079,13 @@ export const textWysiwyg = ({
       ".properties-content",
     );
     if (!isPopupOpened) {
-      editable.focus();
+      if (!isHostEditor) {
+        editable.focus();
+      } else if (!editorElement.contains(document.activeElement)) {
+        // sdamex: refocusing on every update would move the caret out of an
+        // inner field of the host editor (a formula being edited)
+        hostHandle?.focus();
+      }
     }
   });
 
@@ -998,7 +1097,7 @@ export const textWysiwyg = ({
 
   let isDestroyed = false;
 
-  if (autoSelect && !pendingInitialSelection) {
+  if (autoSelect && !pendingInitialSelection && !isHostEditor) {
     // select on init (focusing is done separately inside the bindBlurEvent()
     // because we need it to happen *after* the blur event from `pointerdown`)
     editable.select();
@@ -1017,7 +1116,7 @@ export const textWysiwyg = ({
     window.addEventListener("resize", updateWysiwygStyle);
   }
 
-  editable.onpointerdown = (event) => event.stopPropagation();
+  editorElement.onpointerdown = (event) => event.stopPropagation();
 
   // rAF (+ capture to by doubly sure) so we don't catch te pointerdown that
   // triggered the wysiwyg
@@ -1027,7 +1126,7 @@ export const textWysiwyg = ({
   window.addEventListener("beforeunload", handleSubmit);
   excalidrawContainer
     ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(editable);
+    .appendChild(editorElement);
 
   return handleSubmit;
 };

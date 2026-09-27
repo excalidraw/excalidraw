@@ -721,6 +721,16 @@ export interface ExcalidrawProps {
     isMobile: boolean,
     appState: UIAppState,
   ) => JSX.Element | null;
+  /**
+   * sdamex: host buttons at the end of the tool buttons, before "more tools"
+   * (desktop toolbar and the phone bottom toolbar). A button that must work
+   * while text is being edited should not take focus (prevent the default of
+   * `pointerdown` and `mousedown`).
+   */
+  renderToolbarExtra?: (
+    isMobile: boolean,
+    appState: UIAppState,
+  ) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
