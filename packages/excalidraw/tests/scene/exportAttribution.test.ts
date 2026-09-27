@@ -297,15 +297,23 @@ describe("export attribution badge", () => {
 
     const png = () =>
       new Blob([new Uint8Array([137, 80, 78, 71])], { type: "image/png" });
-    const link = {
-      href: getExportAttributionUrl("clipboard"),
-      alt: "Diagram made with excalidraw.com",
-      canvas: { width: 1640, height: 274 } as HTMLCanvasElement,
-      scale: 2,
+    const createLink = async () => {
+      const canvas = await exportToCanvas({
+        elements: [createRectangle()],
+        files: null,
+      });
+      canvas.width = 1640;
+      canvas.height = 274;
+      return {
+        href: getExportAttributionUrl("clipboard"),
+        alt: "Diagram made with excalidraw.com",
+        canvas,
+        scale: 2,
+      };
     };
 
     it("copies a linked version of the image when the badge is on", async () => {
-      await copyBlobToClipboardAsPng(png(), link);
+      await copyBlobToClipboardAsPng(png(), await createLink());
 
       expect(write).toHaveBeenCalledTimes(1);
       expect(Object.keys(written[0])).toEqual(["image/png", "text/html"]);
@@ -329,7 +337,7 @@ describe("export attribution badge", () => {
       write.mockRejectedValueOnce(new Error("text/html not supported"));
       const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-      await copyBlobToClipboardAsPng(png(), link);
+      await copyBlobToClipboardAsPng(png(), await createLink());
 
       expect(write).toHaveBeenCalledTimes(2);
       expect(Object.keys(written[0])).toEqual(["image/png"]);

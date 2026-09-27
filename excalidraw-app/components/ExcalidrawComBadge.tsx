@@ -1,4 +1,5 @@
 import { useEditorInterface } from "@excalidraw/excalidraw";
+import { useApp } from "@excalidraw/excalidraw/components/App";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import {
   EXCALIDRAW_LOGO_ICON_PATH,
@@ -15,31 +16,37 @@ const CANVAS_BADGE_QUERY =
  * and the same local or preview build while testing (so the new tab shows the
  * same app, badge included). Exported files always link to excalidraw.com.
  */
-export const getExcalidrawComBadgeUrl = () => {
-  const origin = window.location.origin.startsWith("http")
-    ? window.location.origin
+export const getExcalidrawComBadgeUrl = (
+  ownerWindow: Window & typeof globalThis,
+) => {
+  const origin = ownerWindow.location.origin.startsWith("http")
+    ? ownerWindow.location.origin
     : "https://excalidraw.com";
   return `${origin}/${CANVAS_BADGE_QUERY}`;
 };
 
 /** always-visible "excalidraw.com" link in the bottom-right of the whiteboard */
-export const ExcalidrawComBadge = () => (
-  <a
-    className="excalidraw-com-badge"
-    href={getExcalidrawComBadgeUrl()}
-    target="_blank"
-    rel="noopener noreferrer"
-    title={`Open ${EXPORT_ATTRIBUTION_TEXT}`}
-  >
-    <svg
-      viewBox={`0 0 ${EXCALIDRAW_LOGO_ICON_VIEWBOX} ${EXCALIDRAW_LOGO_ICON_VIEWBOX}`}
-      aria-hidden="true"
+export const ExcalidrawComBadge = () => {
+  const app = useApp();
+
+  return (
+    <a
+      className="excalidraw-com-badge"
+      href={getExcalidrawComBadgeUrl(app.ownerWindow)}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={`Open ${EXPORT_ATTRIBUTION_TEXT}`}
     >
-      <path d={EXCALIDRAW_LOGO_ICON_PATH} fill="currentColor" />
-    </svg>
-    <span>{EXPORT_ATTRIBUTION_TEXT}</span>
-  </a>
-);
+      <svg
+        viewBox={`0 0 ${EXCALIDRAW_LOGO_ICON_VIEWBOX} ${EXCALIDRAW_LOGO_ICON_VIEWBOX}`}
+        aria-hidden="true"
+      >
+        <path d={EXCALIDRAW_LOGO_ICON_PATH} fill="currentColor" />
+      </svg>
+      <span>{EXPORT_ATTRIBUTION_TEXT}</span>
+    </a>
+  );
+};
 
 type MobileBadgePlacement =
   | { mode: "row"; left: number; top: number; height: number }
@@ -57,6 +64,7 @@ const isSamePlacement = (a: MobileBadgePlacement, b: MobileBadgePlacement) =>
  * no toolbar (view mode).
  */
 export const MobileExcalidrawComBadge = () => {
+  const app = useApp();
   const { formFactor } = useEditorInterface();
   const appState = useUIAppState();
   const isPhone = formFactor === "phone";
@@ -68,12 +76,14 @@ export const MobileExcalidrawComBadge = () => {
     if (!isPhone) {
       return;
     }
+    const ownerDocument = app.ownerDocument;
+    const ownerWindow = app.ownerWindow;
     let frame = 0;
     const update = () => {
-      cancelAnimationFrame(frame);
+      ownerWindow.cancelAnimationFrame(frame);
       // read the layout after the editor UI has committed this render
-      frame = requestAnimationFrame(() => {
-        const row = document.querySelector<HTMLElement>(
+      frame = ownerWindow.requestAnimationFrame(() => {
+        const row = ownerDocument.querySelector<HTMLElement>(
           ".excalidraw .mobile-shape-actions",
         );
         let next: MobileBadgePlacement;
@@ -94,12 +104,13 @@ export const MobileExcalidrawComBadge = () => {
       });
     };
     update();
-    window.addEventListener("resize", update);
+    ownerWindow.addEventListener("resize", update);
     return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("resize", update);
+      ownerWindow.cancelAnimationFrame(frame);
+      ownerWindow.removeEventListener("resize", update);
     };
   }, [
+    app,
     isPhone,
     appState.selectedElementIds,
     appState.activeTool.type,

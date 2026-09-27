@@ -29,7 +29,9 @@ describe("AppFooter", () => {
     expect(badge).not.toBeNull();
     expect(badge!.textContent).toBe("excalidraw.com");
     // opens the Excalidraw it runs on (excalidraw.com in production)
-    expect(badge!.getAttribute("href")).toBe(getExcalidrawComBadgeUrl());
+    expect(badge!.getAttribute("href")).toBe(
+      getExcalidrawComBadgeUrl(window.h.app.ownerWindow),
+    );
     expect(badge!.getAttribute("href")).toBe(
       `${window.location.origin}/?utm_source=excalidraw&utm_medium=app&utm_content=canvasBadge`,
     );
@@ -70,7 +72,9 @@ describe("MobileExcalidrawComBadge", () => {
       );
 
     await waitFor(() => expect(getBadge()).not.toBeNull());
-    expect(getBadge()!.getAttribute("href")).toBe(getExcalidrawComBadgeUrl());
+    expect(getBadge()!.getAttribute("href")).toBe(
+      getExcalidrawComBadgeUrl(h.app.ownerWindow),
+    );
 
     // a drawing tool fills the row with style buttons
     UI.clickTool("rectangle");

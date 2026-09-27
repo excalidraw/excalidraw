@@ -574,9 +574,9 @@ const MAX_LINKED_IMAGE_BYTES = 5 * 1024 * 1024;
 const escapeHtmlAttribute = (value: string) =>
   value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
-const blobToDataURL = (blob: Blob) =>
+const blobToDataURL = (blob: Blob, ownerWindow: Window & typeof globalThis) =>
   new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
+    const reader = new ownerWindow.FileReader();
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(blob);
@@ -593,7 +593,13 @@ export const createLinkedImageHTML = async (
   const scale = link.scale || 1;
   const width = Math.round(canvas.width / scale);
   const height = Math.round(canvas.height / scale);
-  const src = await blobToDataURL(png);
+  const ownerWindow = canvas.ownerDocument.defaultView as
+    | (Window & typeof globalThis)
+    | null;
+  if (!ownerWindow) {
+    throw new Error("Could not resolve the canvas owner window");
+  }
+  const src = await blobToDataURL(png, ownerWindow);
   // no underline/border, so docs apps don't draw a link line under the image
   // (Chrome strips inline styles when writing the clipboard, so Word still
   // shows a thin link line there; other browsers may keep them)
@@ -602,7 +608,7 @@ export const createLinkedImageHTML = async (
   )}" style="text-decoration:none"><img src="${src}" alt="${escapeHtmlAttribute(
     link.alt,
   )}" width="${width}" height="${height}" style="border:0"></a>`;
-  return new Blob([html], { type: MIME_TYPES.html });
+  return new ownerWindow.Blob([html], { type: MIME_TYPES.html });
 };
 
 export const copyBlobToClipboardAsPng = async (

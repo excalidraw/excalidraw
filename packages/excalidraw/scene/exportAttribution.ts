@@ -184,9 +184,13 @@ export const renderExportAttributionToCanvas = (
   context.save();
   context.setTransform(opts.scale, 0, 0, opts.scale, 0, 0);
 
-  if (typeof Path2D !== "undefined") {
+  const ownerWindow = canvas.ownerDocument.defaultView as
+    | (Window & typeof globalThis)
+    | null;
+  const OwnerPath2D = ownerWindow?.Path2D;
+  if (OwnerPath2D) {
     const logoScale = layout.logoSize / EXCALIDRAW_LOGO_ICON_VIEWBOX;
-    const logo = new Path2D(EXCALIDRAW_LOGO_ICON_PATH);
+    const logo = new OwnerPath2D(EXCALIDRAW_LOGO_ICON_PATH);
     context.save();
     context.translate(layout.x, layout.y);
     context.scale(logoScale, logoScale);
