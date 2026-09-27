@@ -81,6 +81,7 @@ export type ActionName =
   | "changeProjectName"
   | "changeExportBackground"
   | "changeExportEmbedScene"
+  | "changeExportWithAttribution"
   | "changeExportScale"
   | "saveToActiveFile"
   | "saveFileToDisk"
@@ -211,6 +212,8 @@ export interface Action<TData = any> {
           elements: readonly ExcalidrawElement[],
           value: any,
         ) => boolean;
+        /** extra detail appended to the event label, e.g. "attribution:on" */
+        getLabelSuffix?: (appState: Readonly<AppState>, value: any) => string;
       };
   /** if set to `true`, allow action to be performed in viewMode.
    *  Defaults to `false` */

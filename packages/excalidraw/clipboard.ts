@@ -554,7 +554,75 @@ export const parseClipboard = async (
   return { text: parsedEventData.value };
 };
 
-export const copyBlobToClipboardAsPng = async (blob: Blob | Promise<Blob>) => {
+/**
+ * Link to add around a copied image, so rich-text apps (docs, email) paste an
+ * image that opens `href` when clicked.
+ */
+export type ClipboardImageLink = {
+  href: string;
+  alt: string;
+  /** exported canvas, used to size the pasted image */
+  canvas: HTMLCanvasElement | Promise<HTMLCanvasElement>;
+  /** export scale the canvas was rendered at */
+  scale?: number;
+};
+
+// very large images are copied without the linked version, so the clipboard
+// doesn't have to hold the picture twice
+const MAX_LINKED_IMAGE_BYTES = 5 * 1024 * 1024;
+
+const escapeHtmlAttribute = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+const blobToDataURL = (blob: Blob) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+
+export const createLinkedImageHTML = async (
+  blob: Blob | Promise<Blob>,
+  link: ClipboardImageLink,
+): Promise<Blob> => {
+  const [png, canvas] = await Promise.all([blob, link.canvas]);
+  if (png.size > MAX_LINKED_IMAGE_BYTES) {
+    throw new Error("Image too large to copy with a link");
+  }
+  const scale = link.scale || 1;
+  const width = Math.round(canvas.width / scale);
+  const height = Math.round(canvas.height / scale);
+  const src = await blobToDataURL(png);
+  // no underline/border, so docs apps don't draw a link line under the image
+  // (Chrome strips inline styles when writing the clipboard, so Word still
+  // shows a thin link line there; other browsers may keep them)
+  const html = `<a href="${escapeHtmlAttribute(
+    link.href,
+  )}" style="text-decoration:none"><img src="${src}" alt="${escapeHtmlAttribute(
+    link.alt,
+  )}" width="${width}" height="${height}" style="border:0"></a>`;
+  return new Blob([html], { type: MIME_TYPES.html });
+};
+
+export const copyBlobToClipboardAsPng = async (
+  blob: Blob | Promise<Blob>,
+  link?: ClipboardImageLink,
+) => {
+  if (link) {
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [MIME_TYPES.png]: blob,
+          [MIME_TYPES.html]: createLinkedImageHTML(blob, link),
+        }),
+      ]);
+      return;
+    } catch (error: any) {
+      // some browsers don't accept an HTML version; copy the image alone
+      console.warn(error);
+    }
+  }
   try {
     // in Safari so far we need to construct the ClipboardItem synchronously
     // (i.e. in the same tick) otherwise browser will complain for lack of

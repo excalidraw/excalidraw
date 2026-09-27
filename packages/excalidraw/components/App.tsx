@@ -2815,7 +2815,11 @@ class App extends React.Component<AppProps, AppState> {
     elements: ExportedElements,
     opts: { exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null },
   ) => {
-    trackEvent("export", type, "ui");
+    trackEvent(
+      "export",
+      type,
+      `ui | attribution:${this.state.exportWithAttribution ? "on" : "off"}`,
+    );
     const fileHandle = await exportCanvas(
       type,
       elements,

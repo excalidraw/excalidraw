@@ -231,7 +231,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -282,7 +283,8 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -926,6 +928,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -1140,6 +1143,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -1369,6 +1373,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -1717,6 +1722,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -2065,6 +2071,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -2294,6 +2301,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -2550,6 +2558,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -2865,6 +2874,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -3254,6 +3264,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -3791,6 +3802,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -4131,6 +4143,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -4471,6 +4484,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -5078,7 +5092,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -5129,7 +5144,8 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -5773,6 +5789,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -6312,7 +6329,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -6363,7 +6381,8 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -7007,6 +7026,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -7449,7 +7469,8 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -7500,7 +7521,8 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -7981,6 +8003,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -8299,7 +8322,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -8350,7 +8374,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -8994,6 +9019,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,
@@ -9303,7 +9329,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -9354,7 +9381,8 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "perform": [Function],
         "predicate": [Function],
         "trackEvent": {
-          "category": "element",
+          "category": "export",
+          "getLabelSuffix": [Function],
         },
       },
       {
@@ -9998,6 +10026,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
   "exportBackground": true,
   "exportEmbedScene": false,
   "exportScale": 1,
+  "exportWithAttribution": false,
   "exportWithDarkMode": false,
   "fileHandle": null,
   "fontTopPicks": null,

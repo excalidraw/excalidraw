@@ -16,7 +16,9 @@ import {
   actionChangeExportBackground,
   actionChangeExportEmbedScene,
   actionChangeExportScale,
+  actionChangeExportWithAttribution,
   actionChangeProjectName,
+  getExportAttributionLabel,
 } from "../actions/actionExport";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { prepareElementsForExport } from "../data";
@@ -84,6 +86,10 @@ const ImageExportModal = ({
   const [embedScene, setEmbedScene] = useState(
     appStateSnapshot.exportEmbedScene,
   );
+  const [exportWithAttribution, setExportWithAttribution] = useState(
+    appStateSnapshot.exportWithAttribution,
+  );
+  const attributionLabel = getExportAttributionLabel();
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
 
   const previewRef = useRef<HTMLDivElement>(null);
@@ -102,6 +108,7 @@ const ImageExportModal = ({
     exportWithDarkMode,
     exportScale,
     embedScene,
+    exportWithAttribution,
     resetCopyStatus,
   ]);
 
@@ -136,11 +143,13 @@ const ImageExportModal = ({
         exportWithDarkMode,
         exportScale,
         exportEmbedScene: embedScene,
+        exportWithAttribution,
       },
       files,
       exportPadding: DEFAULT_EXPORT_PADDING,
       maxWidthOrHeight: Math.max(maxWidth, maxHeight),
       exportingFrame,
+      exportWithAttribution,
     })
       .then(async (canvas) => {
         if (isStaleRequest()) {
@@ -187,6 +196,7 @@ const ImageExportModal = ({
     exportWithDarkMode,
     exportScale,
     embedScene,
+    exportWithAttribution,
   ]);
 
   return (
@@ -258,6 +268,24 @@ const ImageExportModal = ({
             onChange={(checked) => {
               actionManager.executeAction(
                 actionExportWithDarkMode,
+                "ui",
+                checked,
+              );
+            }}
+          />
+        </ExportSetting>
+        <ExportSetting
+          label={attributionLabel.label}
+          tooltip={attributionLabel.tooltip}
+          name="exportAttributionSwitch"
+        >
+          <Switch
+            name="exportAttributionSwitch"
+            checked={exportWithAttribution}
+            onChange={(checked) => {
+              setExportWithAttribution(checked);
+              actionManager.executeAction(
+                actionChangeExportWithAttribution,
                 "ui",
                 checked,
               );
