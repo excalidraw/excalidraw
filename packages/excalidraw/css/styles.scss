@@ -517,9 +517,12 @@ body.excalidraw-cursor-resize * {
   // the wrapper is flush with a docked sidebar's visible edge; keep the
   // region content at the same visual clearance from the sidebar it had
   // when the wrapper stopped at the reserved column instead (this also
-  // keeps the stack/toast center unchanged)
+  // keeps the stack/toast center unchanged). Logical, because the sidebar
+  // docks on the left in RTL.
   .layer-ui__wrapper--sidebar-docked .exc-regions {
-    right: calc(var(--editor-container-padding) + var(--space-factor) * 2);
+    inset-inline-end: calc(
+      var(--editor-container-padding) + var(--space-factor) * 2
+    );
   }
 
   .exc-regions {

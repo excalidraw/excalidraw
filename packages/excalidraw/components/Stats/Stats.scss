@@ -4,6 +4,17 @@
   z-index: var(--zIndex-layerUI);
   pointer-events: var(--ui-pointerEvents);
 
+  // bounded by its region (down to the footer band), scrolling past it
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  min-height: 0;
+
+  & > .Island {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
   h2 {
     font-size: 1.5em;
     margin-block-start: 0.83em;
