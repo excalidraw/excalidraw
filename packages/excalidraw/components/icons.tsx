@@ -2591,3 +2591,12 @@ export const settingsIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const mathSymbolIcon = createIcon(
+  <g strokeWidth={1.75}>
+    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+    <path d="M18 5h-11l6 7l-6 7h11" />
+  </g>,
+  tablerIconProps,
+);
+

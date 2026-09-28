@@ -1,0 +1,111 @@
+@use "../../css/variables.module" as *;
+
+.excalidraw {
+  .MathSymbolPicker__container {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    &--compact {
+      display: block;
+    }
+
+    .MathSymbolPicker__top-picks {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .MathSymbolPicker__button {
+      width: var(--default-button-size);
+      height: var(--default-button-size);
+      font-size: 1.05rem;
+      line-height: 1;
+      font-family: var(--ui-font);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      color: var(--text-primary-color);
+      cursor: pointer;
+    }
+  }
+
+  .MathSymbolPicker__popover {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 20rem;
+  }
+
+  .MathSymbolPicker__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .MathSymbolPicker__category-tab {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-surface-lowest, rgba(0, 0, 0, 0.1));
+    background: var(--color-surface-lowest, transparent);
+    color: var(--text-primary-color);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: var(--color-surface-low, rgba(0, 0, 0, 0.05));
+    }
+
+    &.active {
+      background: var(--color-brand, #6965db);
+      color: #ffffff;
+      border-color: var(--color-brand, #6965db);
+    }
+  }
+
+  .MathSymbolPicker__grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.25rem;
+    max-height: 13.5rem;
+    overflow-y: auto;
+    padding: 0.15rem;
+  }
+
+  .MathSymbolPicker__grid-item {
+    height: 2.2rem;
+    font-size: 1.15rem;
+    font-family: var(--ui-font);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius-md);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-primary-color);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s ease, transform 0.05s ease;
+
+    &:hover {
+      background: var(--color-surface-low, rgba(0, 0, 0, 0.06));
+      border-color: var(--color-surface-lowest, rgba(0, 0, 0, 0.1));
+    }
+
+    &:active {
+      transform: scale(0.92);
+    }
+  }
+
+  .MathSymbolPicker__empty {
+    padding: 1.5rem 0.5rem;
+    text-align: center;
+    color: var(--color-gray-50, #888);
+    font-size: 0.825rem;
+  }
+}
