@@ -168,6 +168,38 @@ export const createSrcDoc = (body: string) => {
   return `<html><body>${body}</body></html>`;
 };
 
+/**
+ * Content-Security-Policy applied to `iframe` elements' srcdoc (arbitrary,
+ * possibly collaborator-supplied HTML). Intentionally minimal: it only blocks
+ * nested frames and form submissions, leaving scripts/styles/images/fetches
+ * untouched so generated output (which may rely on CDNs) renders unchanged.
+ *
+ * A later `<meta>` CSP in the untrusted HTML can only add restrictions, never
+ * loosen this one.
+ */
+export const IFRAME_ELEMENT_CSP =
+  "frame-src 'none'; child-src 'none'; form-action 'none'";
+
+const RE_LEADING_DOCTYPE = /^\s*<!doctype\b[^>]*>/i;
+
+/**
+ * Injects `IFRAME_ELEMENT_CSP` as a `<meta http-equiv>` into an HTML document.
+ *
+ * The meta is inserted right after a leading doctype (so we don't flip the
+ * document into quirks mode), or prepended otherwise. In both cases the HTML
+ * parser implicitly creates `<head>` and places the meta in it; a later
+ * explicit `<html>`/`<head>` start tag is merged/ignored by the parser, so the
+ * rest of the document renders as before.
+ */
+export const injectIframeElementCSP = (html: string) => {
+  const meta = `<meta http-equiv="Content-Security-Policy" content="${IFRAME_ELEMENT_CSP}">`;
+  const doctype = html.match(RE_LEADING_DOCTYPE)?.[0];
+  if (doctype) {
+    return `${doctype}${meta}${html.slice(doctype.length)}`;
+  }
+  return `${meta}${html}`;
+};
+
 export const getEmbedLink = (
   link: string | null | undefined,
 ): IframeDataWithSandbox | null => {
