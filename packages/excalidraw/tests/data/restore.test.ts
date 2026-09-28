@@ -346,6 +346,152 @@ describe("restoreElements", () => {
     });
   });
 
+  describe("arrow bindings", () => {
+    const restoreArrow = (
+      startBinding: unknown,
+      { elbowed = false }: { elbowed?: boolean } = {},
+    ) => {
+      const element = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+        }),
+        startBinding,
+      } as unknown as ExcalidrawElement;
+
+      const [restored] = restore.restoreElements([element], null);
+      return restored as ExcalidrawArrowElement;
+    };
+
+    describe.each([
+      ["elbow", true],
+      ["simple", false],
+    ])("%s arrow", (_, elbowed) => {
+      it.each([
+        null,
+        undefined,
+        "str",
+        "",
+        123,
+        NaN,
+        Infinity,
+        true,
+        // wrapped, as it.each spreads array cases into arguments
+        [[]],
+        [[1, "a"]],
+        {},
+        { a: 1 },
+        { elementId: 123, mode: "orbit" },
+        { elementId: {}, mode: "orbit" },
+        { elementId: ["rect"], mode: "orbit" },
+        { elementId: "", mode: "orbit" },
+      ])("normalizes startBinding=%j to null", (binding) => {
+        expect(restoreArrow(binding, { elbowed }).startBinding).toBe(null);
+      });
+
+      it.each([
+        ["str", [0.5001, 0.5001]],
+        [
+          [NaN, 1],
+          [0.5001, 0.5001],
+        ],
+        [[1], [0.5001, 0.5001]],
+        [
+          [1, 0.5, 0],
+          [0.5001, 0.5001],
+        ],
+        [{}, [0.5001, 0.5001]],
+        [null, [0.5001, 0.5001]],
+        [
+          [1, Infinity],
+          [0.5001, 0.5001],
+        ],
+        [
+          [1e9, -1e9],
+          [10, -10],
+        ],
+        [
+          [1, 0.25],
+          [1, 0.25],
+        ],
+      ])("normalizes fixedPoint=%j to %j", (fixedPoint, expected) => {
+        expect(
+          restoreArrow(
+            { elementId: "rect", fixedPoint, mode: "orbit" },
+            { elbowed },
+          ).startBinding?.fixedPoint,
+        ).toEqual(expected);
+      });
+
+      it.each([
+        [123, "orbit"],
+        [{}, "orbit"],
+        ["bogus", "orbit"],
+        [true, "orbit"],
+        ["inside", "inside"],
+        ["orbit", "orbit"],
+        ["skip", "skip"],
+      ])("normalizes mode=%j to %j", (mode, expected) => {
+        expect(
+          restoreArrow(
+            { elementId: "rect", fixedPoint: [1, 0.25], mode },
+            { elbowed },
+          ).startBinding?.mode,
+        ).toBe(expected);
+      });
+
+      it("keeps only known binding props", () => {
+        expect(
+          restoreArrow(
+            {
+              elementId: "rect",
+              fixedPoint: [1, 0.25],
+              mode: "inside",
+              extra: "x",
+            },
+            { elbowed },
+          ).startBinding,
+        ).toEqual({ elementId: "rect", fixedPoint: [1, 0.25], mode: "inside" });
+      });
+    });
+
+    it("defaults elbow arrow binding mode to orbit", () => {
+      expect(
+        restoreArrow(
+          { elementId: "rect", fixedPoint: [1, 0.25] },
+          { elbowed: true },
+        ).startBinding,
+      ).toEqual({ elementId: "rect", fixedPoint: [1, 0.25], mode: "orbit" });
+    });
+
+    it.each([
+      [true, true],
+      [false, false],
+      [null, null],
+      [undefined, null],
+      ["true", null],
+      [1, null],
+      [{}, null],
+    ])("normalizes startIsSpecial/endIsSpecial=%j to %j", (value, expected) => {
+      const element = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed: true,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+        }),
+        startIsSpecial: value,
+        endIsSpecial: value,
+      } as unknown as ExcalidrawElement;
+
+      const [restored] = restore.restoreElements([element], null) as [
+        ExcalidrawElbowArrowElement,
+      ];
+      expect(restored.startIsSpecial).toBe(expected);
+      expect(restored.endIsSpecial).toBe(expected);
+    });
+  });
+
   it("keeps valid boundElements on repair", () => {
     const container = API.createElement({ type: "rectangle" });
     const arrow = API.createElement({ type: "arrow" });

@@ -87,6 +87,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
+  BindMode,
   BoundElement,
   ElementsMap,
   ElementsMapOrArray,
@@ -97,6 +98,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FixedPoint,
   FixedPointBinding,
   FixedSegment,
   FontFamilyValues,
@@ -395,6 +397,9 @@ const normalizeFixedSegments = (
   return [...byIndex.values()].sort((a, b) => a.index - b.index);
 };
 
+const normalizeElbowArrowIsSpecial = (isSpecial: unknown): boolean | null =>
+  typeof isSpecial === "boolean" ? isSpecial : null;
+
 const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
   return isFiniteNumber(strokeWidth)
     ? STROKE_WIDTH_KEYS.find((key) => STROKE_WIDTH[key] === strokeWidth) ?? null
@@ -426,16 +431,33 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
+const BIND_MODES: readonly BindMode[] = ["inside", "orbit", "skip"];
+
+const normalizeBindMode = (mode: unknown): BindMode =>
+  BIND_MODES.includes(mode as BindMode) ? (mode as BindMode) : "orbit";
+
+// Malformed bindings (e.g. a string, or an object without a valid `elementId`
+// from a malicious peer) end up as bindings to nonexistent elements, which
+// crash arrow interactions.
+const isBindingLike = (
+  binding: unknown,
+): binding is { elementId: string; fixedPoint?: unknown; mode?: unknown } =>
+  !!binding &&
+  typeof binding === "object" &&
+  !Array.isArray(binding) &&
+  typeof (binding as { elementId?: unknown }).elementId === "string" &&
+  (binding as { elementId: string }).elementId.length > 0;
+
 const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,
-  binding: FixedPointBinding | null,
+  binding: unknown,
   targetElementsMap: Readonly<ElementsMap>,
   /** used for context (arrow bindings) */
   existingElementsMap: Readonly<ElementsMap> | null | undefined,
   startOrEnd: "start" | "end",
 ): FixedPointBinding | null => {
   try {
-    if (!binding) {
+    if (!isBindingLike(binding)) {
       return null;
     }
 
@@ -444,15 +466,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     // ---------------------------------------------------------------------------
 
     if (isElbowArrow(element)) {
-      const fixedPointBinding:
-        | ExcalidrawElbowArrowElement["startBinding"]
-        | ExcalidrawElbowArrowElement["endBinding"] = {
-        ...binding,
-        fixedPoint: normalizeFixedPoint(binding.fixedPoint),
-        mode: binding.mode || "orbit",
+      return {
+        elementId: binding.elementId,
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint as FixedPoint),
+        mode: normalizeBindMode(binding.mode),
       };
-
-      return fixedPointBinding;
     }
 
     // ---------------------------------------------------------------------------
@@ -465,14 +483,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     if (binding.mode) {
       // if latest binding schema, don't check if binding.elementId exists
       // (it's done in a separate pass)
-      if (binding.elementId) {
-        return {
-          elementId: binding.elementId,
-          mode: binding.mode,
-          fixedPoint: normalizeFixedPoint(binding.fixedPoint),
-        } as FixedPointBinding | null;
-      }
-      return null;
+      return {
+        elementId: binding.elementId,
+        mode: normalizeBindMode(binding.mode),
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint as FixedPoint),
+      };
     }
 
     // binding schema v1 (legacy) -> attempt to migrate to v2
@@ -838,8 +853,10 @@ export const restoreElement = (
               element.fixedSegments,
               base.points,
             ),
-            startIsSpecial: element.startIsSpecial,
-            endIsSpecial: element.endIsSpecial,
+            startIsSpecial: normalizeElbowArrowIsSpecial(
+              element.startIsSpecial,
+            ),
+            endIsSpecial: normalizeElbowArrowIsSpecial(element.endIsSpecial),
           })
         : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
 
