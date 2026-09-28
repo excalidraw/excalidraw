@@ -1135,16 +1135,6 @@ export const escapeDoubleQuotes = (str: string) => {
   return str.replace(/"/g, "&quot;");
 };
 
-/** escapes an unsafe string for use as HTML text or (quoted) attribute value */
-export const escapeHTML = (str: string) => {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-};
-
 export const castArray = <T>(value: T | T[]): T[] =>
   Array.isArray(value) ? value : [value];
 

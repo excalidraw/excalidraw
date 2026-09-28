@@ -495,6 +495,8 @@ export type {
   ViewportStatusFrame,
   ElementRenderOverride,
   ElementRenderOverrides,
+  GenerateDiagramToCode,
+  RenderDiagramToCodeError,
 } from "./types";
 
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
@@ -507,7 +509,10 @@ export {
 
 export { elementsOverlappingBBox } from "@excalidraw/element";
 
-export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
+export {
+  DiagramToCodePlugin,
+  DiagramToCodeError,
+} from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 

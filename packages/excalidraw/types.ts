@@ -1495,6 +1495,21 @@ export type GenerateDiagramToCode = (props: {
   onPartial?: (html: string) => void;
 }) => MaybePromise<{ html: string }>;
 
+/**
+ * Renders the content of the (host app UI) overlay shown over an `iframe`
+ * element whose generation failed. Return `null`/`undefined` to fall back to
+ * the default error message.
+ *
+ * NOTE: `code` and `message` come from element data, which may be supplied
+ * by collaborators, share links, or files. Treat them as untrusted: only use
+ * `code` to pick host-authored content, and render `message` as plain text
+ * (never as HTML, nor as or inside a link/URL).
+ */
+export type RenderDiagramToCodeError = (error: {
+  code: string;
+  message?: string;
+}) => React.ReactNode | null | undefined;
+
 export type Offsets = Partial<{
   top: number;
   right: number;
