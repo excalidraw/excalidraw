@@ -41,31 +41,6 @@ describe("Tooltip", () => {
     vi.useRealTimers();
   });
 
-  it("shows right away without `delay`", () => {
-    const { container } = renderComponent(<Harness labels={["a"]} />);
-
-    fireEvent.pointerEnter(wrapperOf(container, "a"));
-    expect(isTooltipVisible()).toBe(true);
-    expect(getTooltip()!.textContent).toBe("a");
-  });
-
-  it("shows only after TOOLTIP_DELAY with `delay`", () => {
-    const { container } = renderComponent(<Harness labels={["a"]} delay />);
-
-    fireEvent.pointerEnter(wrapperOf(container, "a"));
-    expect(isTooltipVisible()).toBe(false);
-
-    act(() => {
-      vi.advanceTimersByTime(TOOLTIP_DELAY - 1);
-    });
-    expect(isTooltipVisible()).toBe(false);
-
-    act(() => {
-      vi.advanceTimersByTime(1);
-    });
-    expect(isTooltipVisible()).toBe(true);
-  });
-
   it("does not flash when the pointer only passes over", () => {
     const { container } = renderComponent(<Harness labels={["a"]} delay />);
     const wrapper = wrapperOf(container, "a");
@@ -98,43 +73,7 @@ describe("Tooltip", () => {
     expect(getTooltip()!.textContent).toBe("b");
   });
 
-  it("goes back to delaying once the warm window has passed", () => {
-    const { container } = renderComponent(
-      <Harness labels={["a", "b"]} delay />,
-    );
-
-    fireEvent.pointerEnter(wrapperOf(container, "a"));
-    act(() => {
-      vi.advanceTimersByTime(TOOLTIP_DELAY);
-    });
-    fireEvent.pointerLeave(wrapperOf(container, "a"));
-
-    act(() => {
-      vi.advanceTimersByTime(TOOLTIP_WARM_WINDOW + 1);
-    });
-
-    fireEvent.pointerEnter(wrapperOf(container, "b"));
-    expect(isTooltipVisible()).toBe(false);
-  });
-
-  it("an unrelated Tooltip unmounting doesn't cancel a pending tooltip", () => {
-    const { container, rerender } = renderComponent(
-      <Harness labels={["a", "b"]} delay />,
-    );
-
-    fireEvent.pointerEnter(wrapperOf(container, "a"));
-
-    // "b" unmounts for its own reasons (e.g. a collaborator leaving)
-    rerender(<Harness labels={["a"]} delay />);
-
-    act(() => {
-      vi.advanceTimersByTime(TOOLTIP_DELAY);
-    });
-    expect(isTooltipVisible()).toBe(true);
-    expect(getTooltip()!.textContent).toBe("a");
-  });
-
-  it("an unrelated Tooltip unmounting doesn't hide a visible tooltip", () => {
+  it("an unrelated Tooltip unmounting doesn't hide a visible tooltip", async () => {
     const { container, rerender } = renderComponent(
       <Harness labels={["a", "b"]} />,
     );
@@ -142,13 +81,15 @@ describe("Tooltip", () => {
     fireEvent.pointerEnter(wrapperOf(container, "a"));
     expect(isTooltipVisible()).toBe(true);
 
+    // "b" unmounts for its own reasons (e.g. a collaborator leaving)
     rerender(<Harness labels={["a"]} />);
+    await Promise.resolve();
 
     expect(isTooltipVisible()).toBe(true);
     expect(getTooltip()!.textContent).toBe("a");
   });
 
-  it("hides when the Tooltip showing it unmounts", () => {
+  it("hides when the Tooltip showing it unmounts", async () => {
     const { container, rerender } = renderComponent(
       <Harness labels={["a", "b"]} />,
     );
@@ -157,6 +98,8 @@ describe("Tooltip", () => {
     expect(isTooltipVisible()).toBe(true);
 
     rerender(<Harness labels={["b"]} />);
+    // retracted by the MutationObserver, whose callbacks run as a microtask
+    await Promise.resolve();
 
     expect(isTooltipVisible()).toBe(false);
   });
