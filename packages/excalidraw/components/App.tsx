@@ -465,6 +465,7 @@ import { SVGLayer } from "./SVGLayer";
 import Spinner from "./Spinner";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
+import { hideTooltip } from "./Tooltip";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
@@ -3946,7 +3947,8 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
-    clearTimeout(this.zenModeTransitionTimer);
+    this.ownerWindow.clearTimeout(this.zenModeTransitionTimer);
+    this.unmarkZenModeTransition();
     this.editorLifecycleEvents.emit("editor:unmount");
     this.props.onUnmount?.();
     this.props.onExcalidrawAPI?.(null);
@@ -4295,12 +4297,21 @@ class App extends React.Component<AppProps, AppState> {
     if (!container) {
       return;
     }
+    // controls fade out or slide over without the pointer moving, so nothing
+    // would retract a tooltip anchored to one of them
+    hideTooltip();
     container.setAttribute("data-zen-mode-transition", "");
-    clearTimeout(this.zenModeTransitionTimer);
-    this.zenModeTransitionTimer = window.setTimeout(() => {
-      container.removeAttribute("data-zen-mode-transition");
+    this.ownerWindow.clearTimeout(this.zenModeTransitionTimer);
+    this.zenModeTransitionTimer = this.ownerWindow.setTimeout(() => {
+      this.unmarkZenModeTransition();
       // slightly past the CSS transition so it isn't cut short
     }, ZEN_MODE_TRANSITION_DURATION + 100);
+  }
+
+  private unmarkZenModeTransition() {
+    this.excalidrawContainerRef.current?.removeAttribute(
+      "data-zen-mode-transition",
+    );
   }
 
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {

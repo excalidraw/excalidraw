@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useEffect } from "react";
+import React from "react";
 
 import "./Tooltip.scss";
 
@@ -80,8 +80,9 @@ export const hideTooltip = () => {
   clearTimeout(showTooltipTimer);
   tooltipItemObserver?.disconnect();
   tooltipItemObserver = null;
-  const tooltip = getTooltipDiv();
-  if (tooltip.classList.contains("excalidraw-tooltip--visible")) {
+  // a plain query, so that hiding never creates the tooltip node
+  const tooltip = document.querySelector<HTMLDivElement>(".excalidraw-tooltip");
+  if (tooltip?.classList.contains("excalidraw-tooltip--visible")) {
     tooltip.classList.remove("excalidraw-tooltip--visible");
     tooltipHiddenAt = Date.now();
   }
@@ -167,9 +168,6 @@ export const Tooltip = ({
   disabled,
   delay = false,
 }: TooltipProps) => {
-  useEffect(() => {
-    return () => hideTooltip();
-  }, []);
   if (disabled) {
     return null;
   }
