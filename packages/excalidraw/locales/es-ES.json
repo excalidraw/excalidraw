@@ -675,7 +675,7 @@
     "syntax": "Sintaxis Mermaid",
     "preview": "Vista previa",
     "label": "Mermaid",
-    "inputPlaceholder": "Escribe aquí la definición del diagrama Mermaid...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Autocorrección disponible"
   },
   "ttd": {
