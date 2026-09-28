@@ -17,4 +17,12 @@ FROM nginx:stable-alpine-slim@sha256:2c605dbeab79a6b2a63340474fe58119d0ef95bdc4b
 
 COPY --from=build /opt/node_app/excalidraw-app/build /usr/share/nginx/html
 
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
+# Platforms like Railway assign the listen port via $PORT at runtime and
+# route traffic to it, so nginx has to listen on it instead of a hardcoded
+# port. default.conf.template is rendered with envsubst by the base image's
+# docker-entrypoint.d scripts before nginx starts. Default to 80 so the
+# image still works unchanged for local use (e.g. docker-compose).
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+ENV PORT=80
+
+HEALTHCHECK CMD wget -q -O /dev/null "http://localhost:${PORT}" || exit 1

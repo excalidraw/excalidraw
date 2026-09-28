@@ -1,0 +1,19 @@
+server {
+    # Railway (and most PaaS providers) assign the port to listen on via the
+    # $PORT environment variable at runtime and route external traffic to it.
+    # nginx can't read env vars directly, so this file is processed as a
+    # template by the official nginx image's docker-entrypoint.d scripts
+    # (envsubst), which substitute ${PORT} before nginx starts.
+    listen ${PORT};
+    listen [::]:${PORT};
+
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        # Excalidraw is a single-page app; fall back to index.html so
+        # client-side routes (e.g. /excalidraw-plus-export) don't 404.
+        try_files $uri $uri/ /index.html;
+    }
+}
