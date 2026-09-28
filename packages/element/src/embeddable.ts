@@ -180,6 +180,37 @@ export const createSrcDoc = (body: string) => {
 export const IFRAME_ELEMENT_CSP =
   "frame-src 'none'; child-src 'none'; form-action 'none'";
 
+/**
+ * Permissions Policy (`allow` attribute) for `iframe` elements. Their content
+ * is untrusted, so we explicitly deny powerful features instead of relying on
+ * browser defaults (e.g. clipboard-write would let content overwrite the
+ * user's clipboard on click — the "paste this command" trick).
+ */
+export const IFRAME_ELEMENT_PERMISSIONS_POLICY = [
+  "accelerometer",
+  "autoplay",
+  "camera",
+  "clipboard-read",
+  "clipboard-write",
+  "display-capture",
+  "encrypted-media",
+  "fullscreen",
+  "geolocation",
+  "gyroscope",
+  "magnetometer",
+  "microphone",
+  "midi",
+  "payment",
+  "picture-in-picture",
+  "publickey-credentials-get",
+  "screen-wake-lock",
+  "usb",
+  "web-share",
+  "xr-spatial-tracking",
+]
+  .map((feature) => `${feature} 'none'`)
+  .join("; ");
+
 const RE_LEADING_DOCTYPE = /^\s*<!doctype\b[^>]*>/i;
 
 /**

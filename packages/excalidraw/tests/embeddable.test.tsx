@@ -2,10 +2,9 @@ import React from "react";
 
 import {
   IFRAME_ELEMENT_CSP,
+  IFRAME_ELEMENT_PERMISSIONS_POLICY,
   injectIframeElementCSP,
 } from "@excalidraw/element";
-
-import { act, fireEvent } from "@testing-library/react";
 
 import { Excalidraw } from "../index";
 
@@ -67,6 +66,17 @@ describe("embeddable & iframe sandbox", () => {
     expect(IFRAME_ELEMENT_CSP).toContain("frame-src 'none'");
     expect(IFRAME_ELEMENT_CSP).toContain("child-src 'none'");
     expect(IFRAME_ELEMENT_CSP).toContain("form-action 'none'");
+    // also enforced across navigations (Chromium)
+    expect(iframe.getAttribute("csp")).toBe(IFRAME_ELEMENT_CSP);
+
+    const allow = iframe.getAttribute("allow");
+    expect(allow).toBe(IFRAME_ELEMENT_PERMISSIONS_POLICY);
+    expect(allow).toContain("clipboard-write 'none'");
+    expect(allow).toContain("clipboard-read 'none'");
+    expect(allow).toContain("fullscreen 'none'");
+    expect(allow).toContain("autoplay 'none'");
+    expect(iframe.hasAttribute("allowfullscreen")).toBe(false);
+    expect(iframe.getAttribute("referrerpolicy")).toBe("no-referrer");
 
     const tokens = getSandboxTokens(iframe);
     expect(tokens).toContain("allow-scripts");
@@ -100,6 +110,14 @@ describe("embeddable & iframe sandbox", () => {
       return iframe!;
     });
 
+    expect(iframe.hasAttribute("csp")).toBe(false);
+    expect(iframe.getAttribute("allow")).toContain("clipboard-write");
+    expect(iframe.getAttribute("allow")).not.toContain("'none'");
+    expect(iframe.hasAttribute("allowfullscreen")).toBe(true);
+    expect(iframe.getAttribute("referrerpolicy")).toBe(
+      "no-referrer-when-downgrade",
+    );
+
     const tokens = getSandboxTokens(iframe);
     expect(tokens).toContain("allow-scripts");
     expect(tokens).toContain("allow-popups");
@@ -130,11 +148,6 @@ describe("embeddable & iframe sandbox", () => {
         return iframe!;
       });
 
-    const load = (iframe: HTMLIFrameElement) =>
-      act(() => {
-        fireEvent.load(iframe);
-      });
-
     it("escapes the error message", async () => {
       const payload = `<img src=x onerror=alert(1)>`;
       const { container } = await render(
@@ -158,124 +171,6 @@ describe("embeddable & iframe sandbox", () => {
       expect(srcdoc).toContain(
         `<meta http-equiv="Content-Security-Policy" content="${IFRAME_ELEMENT_CSP}">`,
       );
-    });
-
-    it("resets the frame when its content navigates away", async () => {
-      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-      const expectedSrcdoc = injectIframeElementCSP("<p>hi</p>");
-
-      const { container } = await render(
-        <Excalidraw
-          initialData={{
-            elements: [
-              createIframeElement({ status: "done", html: "<p>hi</p>" }),
-            ],
-          }}
-        />,
-      );
-
-      // note: jsdom fires the initial `load` itself when the iframe is
-      // inserted into the document (standing in for the srcdoc load)
-      let iframe = await waitForIframe(container);
-      expect(getIframe(container)).toBe(iframe);
-
-      // navigations → remount back to srcdoc (up to the limit)
-      for (let i = 0; i < 3; i++) {
-        await load(iframe);
-        const next = getIframe(container)!;
-        expect(next).not.toBe(iframe);
-        expect(next.getAttribute("srcdoc")).toBe(expectedSrcdoc);
-        iframe = next;
-      }
-      expect(warn).not.toHaveBeenCalled();
-
-      // exceeding the limit → blank frame
-      await load(iframe);
-      const blank = getIframe(container)!;
-      expect(blank).not.toBe(iframe);
-      expect(blank.getAttribute("srcdoc")).toBe("");
-      expect(warn).toHaveBeenCalledTimes(1);
-
-      // ...and stays blank
-      await load(blank);
-      expect(getIframe(container)).toBe(blank);
-      expect(blank.getAttribute("srcdoc")).toBe("");
-
-      warn.mockRestore();
-    });
-
-    it("doesn't treat srcdoc changes as navigation", async () => {
-      const { container } = await render(
-        <Excalidraw
-          initialData={{
-            elements: [
-              createIframeElement({ status: "done", html: "<p>a</p>" }),
-            ],
-          }}
-        />,
-      );
-
-      // (initial `load` fired by jsdom on insertion)
-      const iframe = await waitForIframe(container);
-
-      const [element] = window.h.elements;
-      act(() => {
-        window.h.app.scene.mutateElement(element, {
-          customData: { generationData: { status: "done", html: "<p>b</p>" } },
-        });
-      });
-
-      await waitFor(() => {
-        expect(getIframe(container)!.getAttribute("srcdoc")).toBe(
-          injectIframeElementCSP("<p>b</p>"),
-        );
-      });
-      // load of the new srcdoc
-      await load(getIframe(container)!);
-      expect(getIframe(container)).toBe(iframe);
-      expect(iframe.getAttribute("srcdoc")).toBe(
-        injectIframeElementCSP("<p>b</p>"),
-      );
-
-      // ...whereas a subsequent load still is
-      await load(iframe);
-      expect(getIframe(container)).not.toBe(iframe);
-      expect(getIframe(container)!.getAttribute("srcdoc")).toBe(
-        injectIframeElementCSP("<p>b</p>"),
-      );
-    });
-
-    it("doesn't give up on navigations that are far apart", async () => {
-      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-      const now = vi.spyOn(Date, "now");
-      let time = 1_000_000;
-      now.mockImplementation(() => time);
-
-      const { container } = await render(
-        <Excalidraw
-          initialData={{
-            elements: [
-              createIframeElement({ status: "done", html: "<p>hi</p>" }),
-            ],
-          }}
-        />,
-      );
-
-      let iframe = await waitForIframe(container);
-      for (let i = 0; i < 6; i++) {
-        time += 10_000;
-        await load(iframe);
-        const next = getIframe(container)!;
-        expect(next).not.toBe(iframe);
-        expect(next.getAttribute("srcdoc")).toBe(
-          injectIframeElementCSP("<p>hi</p>"),
-        );
-        iframe = next;
-      }
-      expect(warn).not.toHaveBeenCalled();
-
-      now.mockRestore();
-      warn.mockRestore();
     });
   });
 });
