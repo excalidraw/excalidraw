@@ -91,8 +91,8 @@ const isSameHover = (
  * threshold first turns it into a free fixed-width text at the origin
  * instead.
  *
- * Text editing itself (`app.startTextEditing`) is shared with Enter,
- * double-click and the other entry points and stays in `App`.
+ * Text editing itself (`app.text.startTextEditing`, see `AppText`) is
+ * shared with Enter, double-click and the other entry points.
  */
 export class AppTextTool {
   constructor(private app: App) {}
@@ -136,18 +136,18 @@ export class AppTextTool {
       return { type: "endpoint", endpoint };
     }
 
-    const text = this.app.getTextElementAtPosition(x, y);
+    const text = this.app.text.getTextElementAtPosition(x, y);
     if (text) {
       return { type: "text", element: text };
     }
 
     if (!modifiers[KEYS.CTRL_OR_CMD]) {
-      const container = this.app.getTextBindableContainerAtPosition(x, y);
+      const container = this.app.text.getTextBindableContainerAtPosition(x, y);
       if (
         container &&
         // an existing label is edited by hitting the text itself (above)
         !hasBoundTextElement(container) &&
-        this.app.getTextWysiwygSnappedToCenterPosition(
+        this.app.text.getTextWysiwygSnappedToCenterPosition(
           x,
           y,
           this.app.state,
@@ -291,7 +291,7 @@ export class AppTextTool {
 
     switch (target.type) {
       case "endpoint":
-        this.app.startTextEditing({
+        this.app.text.startTextEditing({
           sceneX,
           sceneY,
           // the binding fixes the position, but the width is still the
@@ -302,7 +302,7 @@ export class AppTextTool {
         });
         break;
       case "text":
-        this.app.startTextEditing({
+        this.app.text.startTextEditing({
           sceneX,
           sceneY,
           textElement: target.element,
@@ -321,7 +321,7 @@ export class AppTextTool {
         this.setHover(toHoverState(target));
         return;
       case "free":
-        this.app.startTextEditing({
+        this.app.text.startTextEditing({
           sceneX,
           sceneY,
           container: null,
@@ -413,7 +413,7 @@ export class AppTextTool {
     // flushed so the drag below reads the created element off the state
     flushSync(() => {
       if (created) {
-        this.app.startTextEditing({
+        this.app.text.startTextEditing({
           sceneX: origin.x,
           sceneY: origin.y,
           container: isDrag ? null : container,
