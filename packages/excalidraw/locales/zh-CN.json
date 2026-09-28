@@ -675,7 +675,7 @@
     "syntax": "Mermaid 语法",
     "preview": "预览",
     "label": "Mermaid",
-    "inputPlaceholder": "在此处输入 Mermaid 图定义……",
+    "inputPlaceholder": "",
     "autoFixAvailable": "自动修复可用"
   },
   "ttd": {
