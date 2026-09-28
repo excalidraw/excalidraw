@@ -50,6 +50,7 @@ import {
   debounce,
   distance,
   getFontString,
+  escapeHTML,
   getNearestScrollableContainer,
   isInputLike,
   isToolIcon,
@@ -145,6 +146,7 @@ import {
   getCornerRadius,
   isPathALoop,
   createSrcDoc,
+  injectIframeElementCSP,
   embeddableURLValidator,
   getEmbedLink,
   getInitializedImageElements,
@@ -583,6 +585,18 @@ const GOOGLE_DRIVE_AUTOPLAYED = new WeakSet<HTMLIFrameElement>();
 
 const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
 
+/**
+ * how many times (in quick succession) we reset an `iframe` element that
+ * navigated away from its srcdoc before giving up and rendering it blank
+ */
+const MAX_IFRAME_ELEMENT_NAVIGATION_RESETS = 3;
+/**
+ * resets further apart than this don't count towards the limit above (the
+ * browser also reloads an iframe when React moves its DOM node, e.g. on
+ * z-index change, which we can't tell apart from a navigation)
+ */
+const IFRAME_ELEMENT_NAVIGATION_RESET_WINDOW = 5000; // ms
+
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -661,6 +675,30 @@ class App extends React.Component<AppProps, AppState> {
   /** embeds that have been inserted to DOM (as a perf optim, we don't want to
    * insert to DOM before user initially scrolls to them) */
   private initializedEmbeds = new Set<ExcalidrawIframeLikeElement["id"]>();
+  /**
+   * Tracks document loads of `iframe` elements so we can detect (and revert)
+   * their untrusted srcdoc content navigating the frame away (e.g. via
+   * `location = ...` or `<meta http-equiv="refresh">`), which neither the
+   * sandbox nor the CSP prevents.
+   */
+  private iframeElementNavigationGuards = new Map<
+    ExcalidrawIframeElement["id"],
+    {
+      /** srcdoc the frame is supposed to display */
+      srcdoc: string;
+      /** DOM node the `loads` were counted on */
+      iframe: HTMLIFrameElement | null;
+      /** number of loads of the current srcdoc on `iframe` */
+      loads: number;
+      /** number of recent times we've reset the frame back to its srcdoc */
+      resets: number;
+      lastResetAt: number;
+      /** <iframe> key, bumped to remount the frame */
+      key: number;
+      /** content kept navigating away, so we render a blank frame instead */
+      blocked: boolean;
+    }
+  >();
 
   private elementsPendingErasure: ElementsPendingErasure = new Set();
 
@@ -1812,6 +1850,80 @@ class App extends React.Component<AppProps, AppState> {
         this.iFrameRefs.delete(id);
       }
     });
+    this.iframeElementNavigationGuards.forEach((_, id) => {
+      if (!iframeLikes.has(id)) {
+        this.iframeElementNavigationGuards.delete(id);
+      }
+    });
+  };
+
+  /**
+   * Returns the navigation guard for an `iframe` element, resetting it when
+   * the srcdoc legitimately changes (e.g. generation pending → done).
+   */
+  private getIframeElementNavigationGuard(
+    element: ExcalidrawIframeElement,
+    srcdoc: string,
+  ) {
+    let guard = this.iframeElementNavigationGuards.get(element.id);
+    if (!guard || guard.srcdoc !== srcdoc) {
+      guard = {
+        srcdoc,
+        iframe: null,
+        loads: 0,
+        resets: 0,
+        lastResetAt: 0,
+        key: 0,
+        blocked: false,
+      };
+      this.iframeElementNavigationGuards.set(element.id, guard);
+    }
+    return guard;
+  }
+
+  /**
+   * A srcdoc frame fires `load` once per document, so any subsequent load of
+   * the same srcdoc on the same DOM node means the content navigated away.
+   * In that case, remount the frame (back to its srcdoc), giving up after
+   * a few attempts (e.g. content that redirects on every load).
+   *
+   * Note: the pending generation shell streams via document.open()/write()
+   * but never calls document.close(), so streaming doesn't fire `load`.
+   */
+  private onIframeElementLoad = (
+    element: ExcalidrawIframeElement,
+    iframe: HTMLIFrameElement,
+  ) => {
+    const guard = this.iframeElementNavigationGuards.get(element.id);
+    if (!guard || guard.blocked) {
+      return;
+    }
+    if (guard.iframe !== iframe) {
+      // first load of the current srcdoc on a (re)mounted node
+      guard.iframe = iframe;
+      guard.loads = 1;
+      return;
+    }
+    guard.loads++;
+    if (guard.loads <= 1) {
+      return;
+    }
+    const now = Date.now();
+    if (now - guard.lastResetAt > IFRAME_ELEMENT_NAVIGATION_RESET_WINDOW) {
+      guard.resets = 0;
+    }
+    guard.resets++;
+    guard.lastResetAt = now;
+    guard.key++;
+    if (guard.resets > MAX_IFRAME_ELEMENT_NAVIGATION_RESETS) {
+      guard.blocked = true;
+      console.warn(
+        `Blocked iframe element (${element.id}) content from navigating away from its srcdoc.`,
+      );
+    }
+    // bumping the key remounts the <iframe> (re-assigning the same srcDoc
+    // via React would be a no-op)
+    this.triggerRender();
   };
 
   private renderEmbeddables() {
@@ -1857,6 +1969,8 @@ class App extends React.Component<AppProps, AppState> {
 
           let src: IframeData | null;
           let isPendingGeneration = false;
+          let srcdoc: string | undefined;
+          let iframeKey: number | undefined;
 
           if (isIframeElement(el)) {
             src = null;
@@ -1874,7 +1988,7 @@ class App extends React.Component<AppProps, AppState> {
                 intrinsicSize: { w: el.width, h: el.height },
                 type: "document",
                 srcdoc: () => {
-                  return html;
+                  return injectIframeElementCSP(html);
                 },
               } as const;
             } else if (data.status === "pending") {
@@ -1882,7 +1996,11 @@ class App extends React.Component<AppProps, AppState> {
                 intrinsicSize: { w: el.width, h: el.height },
                 type: "document",
                 srcdoc: () => {
-                  return createSrcDoc(`
+                  // the CSP persists across the document.open() below
+                  // (it doesn't reset the document's policy container), so
+                  // it also applies to the streamed partial HTML
+                  return injectIframeElementCSP(
+                    createSrcDoc(`
                     <style>
                       html, body {
                         width: 100%;
@@ -1923,7 +2041,8 @@ class App extends React.Component<AppProps, AppState> {
 
                       window.addEventListener("message", onPartialMessage);
                     </script>
-                  `);
+                  `),
+                  );
                 },
               } as const;
               isPendingGeneration = true;
@@ -1938,7 +2057,8 @@ class App extends React.Component<AppProps, AppState> {
                 intrinsicSize: { w: el.width, h: el.height },
                 type: "document",
                 srcdoc: () => {
-                  return createSrcDoc(`
+                  return injectIframeElementCSP(
+                    createSrcDoc(`
                     <style>
                     html, body {
                       height: 100%;
@@ -1956,13 +2076,25 @@ class App extends React.Component<AppProps, AppState> {
                       }
                     </style>
                     <h1>Error!</h1>
-                    <h3>${message}</h3>
-                  `);
+                    <h3>${escapeHTML(message)}</h3>
+                  `),
+                  );
                 },
               } as const;
             }
+
+            srcdoc = src.srcdoc(this.state.theme);
+            const guard = this.getIframeElementNavigationGuard(el, srcdoc);
+            if (guard.blocked) {
+              // content keeps navigating away, render a blank frame
+              srcdoc = "";
+            }
+            iframeKey = guard.key;
           } else {
             src = getEmbedLink(toValidURL(el.link || ""));
+            if (src?.type === "document") {
+              srcdoc = src.srcdoc(this.state.theme);
+            }
           }
 
           const isActive =
@@ -2064,13 +2196,19 @@ class App extends React.Component<AppProps, AppState> {
                       ? this.props.renderEmbeddable?.(el, this.state)
                       : null) ?? (
                       <iframe
+                        key={iframeKey}
                         ref={(ref) => this.cacheEmbeddableRef(el, ref)}
-                        className="excalidraw__embeddable"
-                        srcDoc={
-                          src?.type === "document"
-                            ? src.srcdoc(this.state.theme)
+                        onLoad={
+                          isIframeElement(el)
+                            ? (event) =>
+                                this.onIframeElementLoad(
+                                  el,
+                                  event.currentTarget,
+                                )
                             : undefined
                         }
+                        className="excalidraw__embeddable"
+                        srcDoc={srcdoc}
                         src={
                           src?.type !== "document" ? src?.link ?? "" : undefined
                         }
@@ -2080,11 +2218,20 @@ class App extends React.Component<AppProps, AppState> {
                         title="Excalidraw Embedded Content"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen={true}
-                        sandbox={`${
-                          src?.sandbox?.allowSameOrigin
-                            ? "allow-same-origin"
-                            : ""
-                        } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
+                        sandbox={
+                          isIframeElement(el)
+                            ? // `iframe` elements render arbitrary HTML via
+                              // srcdoc, so we don't let them open popups,
+                              // trigger downloads, or ever run same-origin.
+                              // Scripts are still needed, e.g. for streaming
+                              // partial HTML while generation is pending.
+                              "allow-scripts allow-forms"
+                            : `${
+                                src?.sandbox?.allowSameOrigin
+                                  ? "allow-same-origin"
+                                  : ""
+                              } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`
+                        }
                       />
                     )}
                   </div>
