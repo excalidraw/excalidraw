@@ -112,11 +112,22 @@ export const getColorUpdate = (
   property: "strokeColor" | "backgroundColor",
   color: string,
   elementsMap: ElementsMap,
-): { strokeColor: string } | { backgroundColor: string } => {
+):
+  | { strokeColor: string }
+  | { backgroundColor: string; customData?: Record<string, any> } => {
   if (isStickyNoteElement(element)) {
     return property === "backgroundColor"
       ? { backgroundColor: normalizeStickyNoteBackgroundColor(color) }
       : { strokeColor: normalizeStickyNoteStrokeColor(color) };
+  }
+  if (property === "backgroundColor" && isTextElement(element)) {
+    return {
+      backgroundColor: color,
+      customData: {
+        ...element.customData,
+        textBackground: !isTransparent(color),
+      },
+    };
   }
   if (
     property === "strokeColor" &&

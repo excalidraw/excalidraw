@@ -6,6 +6,7 @@ import {
   KEYS,
   getLineHeight,
   arrayToMap,
+  isTransparent,
 } from "@excalidraw/common";
 
 import { newElementWith, syncStickyNoteInk } from "@excalidraw/element";
@@ -117,6 +118,16 @@ export const actionPasteStyles = register({
             }
             let newElement = newElementWith(element, {
               backgroundColor: elementStylesToCopyFrom?.backgroundColor,
+              ...(isTextElement(element)
+                ? {
+                    customData: {
+                      ...element.customData,
+                      textBackground: !isTransparent(
+                        elementStylesToCopyFrom.backgroundColor,
+                      ),
+                    },
+                  }
+                : null),
               strokeWidth: elementStylesToCopyFrom?.strokeWidth,
               strokeColor: elementStylesToCopyFrom?.strokeColor,
               strokeStyle: elementStylesToCopyFrom?.strokeStyle,

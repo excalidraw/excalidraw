@@ -660,7 +660,7 @@ describe("sticky notes", () => {
       Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
     });
 
-    it("keeps the background picker away from plain text being edited", async () => {
+    it("offers a background tint while editing plain text", async () => {
       const text = API.createElement({
         type: "text",
         id: "text",
@@ -681,7 +681,15 @@ describe("sticky notes", () => {
           h.app.scene.getNonDeletedElementsMap(),
           h.app,
         ).backgroundColor,
-      ).toBe(false);
+      ).toBe(true);
+      act(() => {
+        h.app.actionManager.executeAction(actionChangeBackgroundColor, "ui", {
+          color: COLOR_PALETTE.yellow[1],
+        });
+      });
+      expect(getElement(text.id).backgroundColor).toBe(COLOR_PALETTE.yellow[1]);
+      expect(getElement(text.id).customData?.textBackground).toBe(true);
+      expect(h.state.currentItemBackgroundColor).toBe(COLOR_PALETTE.yellow[1]);
       Keyboard.keyPress(KEYS.ESCAPE, await getTextEditor());
     });
 

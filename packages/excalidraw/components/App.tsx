@@ -5069,6 +5069,9 @@ class App extends React.Component<AppProps, AppState> {
       y,
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
+      customData: !isTransparent(this.state.currentItemBackgroundColor)
+        ? { textBackground: true }
+        : undefined,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.getCurrentItemStrokeWidth("text"),
       strokeStyle: this.state.currentItemStrokeStyle,
@@ -7228,6 +7231,11 @@ class App extends React.Component<AppProps, AppState> {
             ? container.strokeColor
             : this.state.currentItemStrokeColor,
         backgroundColor: this.state.currentItemBackgroundColor,
+        customData:
+          !(shouldBindToContainer && isStickyNoteElement(container)) &&
+          !isTransparent(this.state.currentItemBackgroundColor)
+            ? { textBackground: true }
+            : undefined,
         fillStyle: this.state.currentItemFillStyle,
         strokeWidth: this.getCurrentItemStrokeWidth("text"),
         strokeStyle: this.state.currentItemStrokeStyle,

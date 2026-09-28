@@ -7,6 +7,7 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "embeddable" ||
   type === "ellipse" ||
   type === "diamond" ||
+  type === "text" ||
   type === "line" ||
   type === "freedraw" ||
   type === "autoshape" ||
@@ -14,7 +15,7 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "bucketfill";
 
 export const hasFillStyle = (type: ElementOrToolType) =>
-  hasBackground(type) && type !== "stickynote";
+  hasBackground(type) && type !== "stickynote" && type !== "text";
 
 export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "rectangle" ||
