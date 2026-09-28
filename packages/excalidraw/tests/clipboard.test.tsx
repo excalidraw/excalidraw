@@ -832,3 +832,95 @@ describe("clipboard - pasting mermaid definition", () => {
     });
   });
 });
+
+describe("copy and cut events", () => {
+  const dispatchClipboardEvent = (type: "copy" | "cut") => {
+    const clipboardData = new DataTransfer();
+    document.dispatchEvent(
+      Object.assign(new Event(type, { bubbles: true, cancelable: true }), {
+        clipboardData,
+      }),
+    );
+    return clipboardData;
+  };
+
+  it("should copy the selection on a copy event, and cut it on a cut event", async () => {
+    const rectangle = API.createElement({ type: "rectangle" });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+
+    const copied = dispatchClipboardEvent("copy");
+    await waitFor(() => {
+      expect(JSON.parse(copied.getData("text/plain")).elements).toEqual([
+        expect.objectContaining({ id: rectangle.id }),
+      ]);
+    });
+    expect(h.elements[0].isDeleted).toBe(false);
+
+    const cut = dispatchClipboardEvent("cut");
+    await waitFor(() => {
+      expect(h.elements[0].isDeleted).toBe(true);
+    });
+    expect(JSON.parse(cut.getData("text/plain")).elements).toEqual([
+      expect.objectContaining({ id: rectangle.id }),
+    ]);
+  });
+});
+
+describe("paste routing", () => {
+  it("should leave a paste to the host when its onPaste returns false", async () => {
+    unmountComponent();
+    const onPaste = vi.fn(() => false);
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        onPaste={onPaste}
+      />,
+    );
+
+    pasteWithCtrlCmdV("hello");
+    await waitFor(() => {
+      expect(onPaste).toHaveBeenCalledWith(
+        expect.objectContaining({ text: "hello" }),
+        expect.anything(),
+      );
+    });
+    await sleep(50);
+    expect(h.elements.length).toBe(0);
+  });
+
+  it("should open the charts dialog for a pasted spreadsheet", async () => {
+    pasteWithCtrlCmdV("time\tvalue\n1\t10\n2\t20\n3\t30");
+    await waitFor(() => {
+      expect(h.state.openDialog?.name).toBe("charts");
+    });
+    expect(h.elements.length).toBe(0);
+  });
+
+  it("should paste the text of mixed content when images can't be inserted", async () => {
+    unmountComponent();
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        UIOptions={{ tools: { image: false } }}
+      />,
+    );
+
+    document.dispatchEvent(
+      createPasteEvent({
+        types: {
+          "text/html":
+            '<p>hello</p><img src="https://example.com/a.png" /><p>world</p>',
+        },
+      }),
+    );
+    await waitFor(() => {
+      expect(h.elements.map((element) => (element as any).text)).toEqual([
+        "hello",
+        "world",
+      ]);
+    });
+  });
+});
