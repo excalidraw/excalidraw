@@ -675,7 +675,7 @@
     "syntax": "Mermaid syntax",
     "preview": "Ukážka",
     "label": "Mermaid",
-    "inputPlaceholder": "Sem napíšte definíciu Mermaid diagramu...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Automatická oprava je dostupná"
   },
   "ttd": {
