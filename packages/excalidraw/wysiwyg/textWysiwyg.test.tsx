@@ -1139,6 +1139,8 @@ describe("textWysiwyg", () => {
             bottom: statsHeight,
           } as DOMRect);
         updateTextEditor(textarea, text);
+        // the canvas follows the caret once the update's in the app's state
+        await act(() => new Promise((resolve) => setTimeout(resolve)));
         return h.app.scene.getElement(
           h.state.editingTextElement!.id,
         ) as ExcalidrawTextElement;
@@ -1164,6 +1166,44 @@ describe("textWysiwyg", () => {
 
         text = await typeAt(236, 100, long, 200);
         expect(text.width).toBe(500 - 216 - 2 * TEXT_VIEWPORT_PADDING);
+      });
+
+      it("should pan the canvas while typing only once the caret is under the stats panel", async () => {
+        // below it, the caret is in sight
+        let text = await typeAt(400, 300, "Excalidraw is", 200);
+        expect(text.x + text.width).toBeGreaterThan(500);
+        expect(h.state.scrollX).toBe(0);
+        Keyboard.exitTextEditor(textarea);
+
+        // under it, it's brought out, with some room to spare
+        text = await typeAt(400, 100, "Excalidraw is", 200);
+        expect(h.state.scrollX).toBeLessThan(0);
+        expect(
+          (text.x + text.width + h.state.scrollX) * h.state.zoom.value,
+        ).toBeCloseTo(500 - CARET_FOLLOW_PADDING);
+      });
+
+      it("should find the caret in a bidirectional line where the browser lays it out", async () => {
+        // "א abcdef", a paragraph of its own, goes right to left, as
+        // "abcdef א": the caret after the "f" is 60px in (not at the line's
+        // left edge, where it'd be if all of it went right to left, nor its
+        // right one, as the text's first paragraph goes), which jsdom can't
+        // lay out
+        const { getBoundingClientRect } = Range.prototype;
+        Range.prototype.getBoundingClientRect = function (this: Range) {
+          const isRTL =
+            this.startContainer.parentElement?.getAttribute("dir") === "rtl";
+          return { left: this.collapsed && isRTL ? 60 : 0 } as DOMRect;
+        };
+        try {
+          // from 450px, 80px long: its caret's under the stats panel
+          const text = await typeAt(450, 100, "hello\nא abcdef", 200);
+          expect(
+            (text.x + 60 + h.state.scrollX) * h.state.zoom.value,
+          ).toBeCloseTo(500 - CARET_FOLLOW_PADDING);
+        } finally {
+          Range.prototype.getBoundingClientRect = getBoundingClientRect;
+        }
       });
     });
 

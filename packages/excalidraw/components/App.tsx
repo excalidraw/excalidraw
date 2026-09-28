@@ -6518,7 +6518,7 @@ class App extends React.Component<AppProps, AppState> {
    * which shows next to a text while it's edited, and once it's pasted and
    * selected.
    */
-  private getTextSidePanels = (): ViewportUIName[] =>
+  public getTextSidePanels = (): ViewportUIName[] =>
     this.stylesPanelMode === "full" &&
     this.isDefaultUIEnabled() &&
     !this.state.zenModeEnabled

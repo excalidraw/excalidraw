@@ -373,6 +373,13 @@ const RE_RTL_CHECK = new RegExp(`^[^${RS_LTR_CHARS}]*[${RS_RTL_CHARS}]`);
  */
 export const isRTL = (text: string) => RE_RTL_CHECK.test(text);
 
+const RE_RTL_CHARS = new RegExp(`[${RS_RTL_CHARS}]`);
+/**
+ * Checks whether the text has any RTL character, i.e. whether it may be laid
+ * out bidirectionally.
+ */
+export const hasRTLChars = (text: string) => RE_RTL_CHARS.test(text);
+
 export const tupleToCoors = (
   xyTuple: readonly [number, number],
 ): { x: number; y: number } => {
