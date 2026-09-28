@@ -13,6 +13,10 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Hide toolbar hints (2026-09-25) [#12165](https://github.com/excalidraw/excalidraw/pull/12165)
+
+- New `appState.showHints` preference (`boolean`, default `true`, persisted in browser storage) controlling the contextual hints shown next to the toolbar ("Click and drag, release when you're finished", ...). When off, no hint is rendered for any tool or gesture. Toggle it from the new "Show hints" checkbox in the main menu's preferences submenu, also exposed as `MainMenu.DefaultItems.Preferences.ToggleShowHints`, or from the command palette.
+
 ### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.

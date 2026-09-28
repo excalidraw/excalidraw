@@ -14,6 +14,7 @@ import {
   actionToggleMidpointSnapping,
   actionToggleObjectsSnapMode,
   actionToggleSearchMenu,
+  actionToggleShowHints,
   actionToggleStats,
   actionToggleTheme,
   actionToggleZenMode,
@@ -565,13 +566,13 @@ const PreferencesToggleMidpointSnappingItem = () => {
 
 const PreferencesToggleShowHintsItem = () => {
   const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
   const appState = useUIAppState();
-  const setAppState = useExcalidrawSetAppState();
   return (
     <DropdownMenuItemCheckbox
       checked={appState.showHints}
       onSelect={(event) => {
-        setAppState({ showHints: !appState.showHints });
+        actionManager.executeAction(actionToggleShowHints);
         event.preventDefault();
       }}
     >
