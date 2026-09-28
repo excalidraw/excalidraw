@@ -675,7 +675,7 @@
     "syntax": "Mermaid sintaxia",
     "preview": "Aurrebista",
     "label": "Mermaid",
-    "inputPlaceholder": "Idatzi Mermaid diagramaren definizioa hemen...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Konponketa automatikoa eskuragarri dago"
   },
   "ttd": {
