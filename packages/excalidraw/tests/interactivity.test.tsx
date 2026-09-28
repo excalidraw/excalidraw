@@ -833,6 +833,26 @@ describe("ui={false} with host UI", () => {
   });
 });
 
+describe("host top-right UI on phone", () => {
+  it("renders alongside the default sidebar trigger", async () => {
+    await render(
+      <Excalidraw
+        UIOptions={{ getFormFactor: () => "phone" }}
+        renderTopRightUI={() => <div data-testid="host-top-right" />}
+      />,
+    );
+    fireEvent.resize(window);
+    await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
+
+    const topRightContent = queryContainer(
+      "[data-testid='host-top-right']",
+    )!.closest(".exc-region-top-right-content");
+    expect(topRightContent!.querySelector(".default-sidebar-trigger")).not.toBe(
+      null,
+    );
+  });
+});
+
 describe("interaction={false} ui={false}", () => {
   beforeEach(async () => {
     mockBoundingClientRect();

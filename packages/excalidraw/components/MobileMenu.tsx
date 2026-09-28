@@ -68,26 +68,25 @@ export const MobileMenu = ({
       return null;
     }
 
-    const topRightHostUI = renderTopRightUI?.(true, appState);
+    // host UI renders alongside the editor's own controls, same as on desktop
     const topRightUI = (
       <div className="exc-region-top-right-content">
-        {topRightHostUI != null ? (
-          <div className="exc-region-top-right-host-slot">{topRightHostUI}</div>
-        ) : (
-          !appState.viewModeEnabled && (
-            <>
-              {defaultUIEnabled && (
-                <PenModeButton
-                  checked={appState.penMode}
-                  onChange={() => onPenModeToggle(null)}
-                  title={t("toolBar.penMode")}
-                  isMobile
-                  penDetected={appState.penDetected}
-                />
-              )}
-              <DefaultSidebarTriggerTunnel.Out />
-            </>
-          )
+        <div className="exc-region-top-right-host-slot">
+          {renderTopRightUI?.(true, appState)}
+        </div>
+        {!appState.viewModeEnabled && (
+          <>
+            {defaultUIEnabled && (
+              <PenModeButton
+                checked={appState.penMode}
+                onChange={() => onPenModeToggle(null)}
+                title={t("toolBar.penMode")}
+                isMobile
+                penDetected={appState.penDetected}
+              />
+            )}
+            <DefaultSidebarTriggerTunnel.Out />
+          </>
         )}
         {defaultUIEnabled &&
           appState.viewModeEnabled &&
