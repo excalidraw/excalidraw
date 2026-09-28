@@ -675,7 +675,7 @@
     "syntax": "Mermaid Sözdizimi",
     "preview": "Önizleme",
     "label": "Mermaid",
-    "inputPlaceholder": "\"Mermaid diyagram tanımını buraya yazın...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Otomatik düzeltme mevcut"
   },
   "ttd": {
