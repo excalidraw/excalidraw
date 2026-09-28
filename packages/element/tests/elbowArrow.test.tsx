@@ -162,6 +162,33 @@ describe("elbow arrow routing", () => {
     expect(arrow.height).toEqual(200);
   });
 
+  it("preserves zero coordinates when updating an elbow arrow", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      elbowed: true,
+      x: 40,
+      y: 60,
+      points: [
+        pointFrom<LocalPoint>(0, 0),
+        pointFrom<LocalPoint>(100, 0),
+        pointFrom<LocalPoint>(100, 100),
+      ],
+    }) as NonDeleted<ExcalidrawElbowArrowElement>;
+
+    act(() => {
+      API.setElements([arrow]);
+
+      h.scene.mutateElement(arrow, {
+        x: 0,
+        y: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 100)],
+      });
+    });
+
+    expect(arrow.x).toBe(0);
+    expect(arrow.y).toBe(0);
+  });
+
   it("can generate proper points for bound elbow arrow", () => {
     const rectangle1 = API.createElement({
       type: "rectangle",
