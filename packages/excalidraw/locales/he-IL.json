@@ -675,7 +675,7 @@
     "syntax": "תחביר Mermaid",
     "preview": "תצוגה מקדימה",
     "label": "Mermaid",
-    "inputPlaceholder": "נא לכתוב כאן הגדרת תרשים ל־Mermaid...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "התיקון האוטומטי זמין"
   },
   "ttd": {
