@@ -312,6 +312,14 @@ const normalizeElementGroupIds = (groupIds: unknown): GroupId[] => {
   );
 };
 
+// Non-number opacity (e.g. an object from a malicious peer) gets rendered as
+// a React child by the opacity slider and crashes the editor on selection.
+const normalizeElementOpacity = (opacity: unknown): number => {
+  return isFiniteNumber(opacity)
+    ? clamp(opacity, 0, 100)
+    : DEFAULT_ELEMENT_PROPS.opacity;
+};
+
 // Non-array boundElements (e.g. from a malicious peer) crash rendering, which
 // calls `.find`/`.some`/`.filter` on it. Keep only well-formed entries, and
 // copy them so no unknown props leak through. Legacy `boundElementIds` are
@@ -535,8 +543,7 @@ const restoreElementWithProperties = <
     strokeWidth: element.strokeWidth || DEFAULT_ELEMENT_PROPS.strokeWidth,
     strokeStyle: element.strokeStyle ?? DEFAULT_ELEMENT_PROPS.strokeStyle,
     roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
-    opacity:
-      element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
+    opacity: normalizeElementOpacity(element.opacity),
     angle: element.angle || (0 as Radians),
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,

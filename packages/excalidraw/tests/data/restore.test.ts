@@ -216,6 +216,32 @@ describe("restoreElements", () => {
     expect(restored.boundElements).toEqual(expected);
   });
 
+  it.each([
+    [{}, 100],
+    [{ a: 1 }, 100],
+    [[50], 100],
+    ["50", 100],
+    [true, 100],
+    [NaN, 100],
+    [Infinity, 100],
+    [-Infinity, 100],
+    [null, 100],
+    [undefined, 100],
+    [-10, 0],
+    [150, 100],
+    [0, 0],
+    [50, 50],
+    [100, 100],
+  ])("normalizes opacity=%j to %j", (opacity, expected) => {
+    const element = {
+      ...API.createElement({ type: "rectangle" }),
+      opacity,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.opacity).toBe(expected);
+  });
+
   it("keeps valid boundElements on repair", () => {
     const container = API.createElement({ type: "rectangle" });
     const arrow = API.createElement({ type: "arrow" });
