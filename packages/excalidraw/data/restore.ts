@@ -98,6 +98,7 @@ import type {
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
   FixedPointBinding,
+  FixedSegment,
   FontFamilyValues,
   GroupId,
   NonDeleted,
@@ -346,6 +347,52 @@ const normalizeBoundElements = (
         binding.id.length > 0,
     )
     .map(({ type, id }) => ({ type, id }));
+};
+
+// Malformed fixedSegments (e.g. a string or an array of junk from a malicious
+// peer) crash rendering (`.map`) and elbow arrow routing. Segment `index` N
+// is the segment between points[N - 1] and points[N]; the first (1) and last
+// (points.length - 1) segments can never be fixed. The elbow arrow code also
+// assumes fixed segments are axis-aligned, sorted by index and unique (e.g.
+// segment release looks up neighbors by array position), so enforce that.
+// Entries are copied so no unknown props leak through.
+const normalizeFixedSegments = (
+  fixedSegments: unknown,
+  points: readonly LocalPoint[],
+): FixedSegment[] | null => {
+  if (!Array.isArray(fixedSegments) || points.length < 4) {
+    return null;
+  }
+
+  const byIndex = new Map<number, FixedSegment>();
+  for (const segment of fixedSegments) {
+    if (
+      !segment ||
+      typeof segment !== "object" ||
+      !isValidPoint(segment.start) ||
+      !isValidPoint(segment.end) ||
+      !Number.isInteger(segment.index) ||
+      segment.index < 2 ||
+      segment.index > points.length - 2 ||
+      // must be either horizontal or vertical
+      (segment.start[0] !== segment.end[0] &&
+        segment.start[1] !== segment.end[1]) ||
+      byIndex.has(segment.index)
+    ) {
+      continue;
+    }
+    byIndex.set(segment.index, {
+      start: pointFrom<LocalPoint>(segment.start[0], segment.start[1]),
+      end: pointFrom<LocalPoint>(segment.end[0], segment.end[1]),
+      index: segment.index,
+    });
+  }
+
+  if (byIndex.size === 0) {
+    return null;
+  }
+
+  return [...byIndex.values()].sort((a, b) => a.index - b.index);
 };
 
 const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
@@ -787,10 +834,10 @@ export const restoreElement = (
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
             ...base,
             elbowed: true,
-            fixedSegments:
-              element.fixedSegments?.length && base.points.length >= 4
-                ? element.fixedSegments
-                : null,
+            fixedSegments: normalizeFixedSegments(
+              element.fixedSegments,
+              base.points,
+            ),
             startIsSpecial: element.startIsSpecial,
             endIsSpecial: element.endIsSpecial,
           })

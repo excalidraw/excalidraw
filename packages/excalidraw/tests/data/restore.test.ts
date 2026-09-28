@@ -22,6 +22,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawStickyNoteElement,
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -240,6 +241,109 @@ describe("restoreElements", () => {
 
     const [restored] = restore.restoreElements([element], null);
     expect(restored.opacity).toBe(expected);
+  });
+
+  describe("fixedSegments", () => {
+    // 5 points -> segments 1..4, of which only 2 and 3 may be fixed
+    const points = [
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(50, 0),
+      pointFrom<LocalPoint>(50, 100),
+      pointFrom<LocalPoint>(150, 100),
+      pointFrom<LocalPoint>(150, 200),
+    ];
+    const seg2 = { start: [50, 0], end: [50, 100], index: 2 };
+    const seg3 = { start: [50, 100], end: [150, 100], index: 3 };
+
+    const restoreElbowArrow = (
+      fixedSegments: unknown,
+      arrowPoints: LocalPoint[] = points,
+    ) => {
+      const element = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed: true,
+          points: arrowPoints,
+        }),
+        fixedSegments,
+      } as unknown as ExcalidrawElement;
+
+      const [restored] = restore.restoreElements([element], null);
+      return restored as ExcalidrawElbowArrowElement;
+    };
+
+    it.each([
+      "str",
+      "",
+      123,
+      true,
+      {},
+      { length: 1 },
+      { length: 1, 0: seg2 },
+      null,
+      undefined,
+      [],
+    ])("normalizes fixedSegments=%j to null", (fixedSegments) => {
+      expect(restoreElbowArrow(fixedSegments).fixedSegments).toBe(null);
+    });
+
+    it.each([
+      [[null, undefined, 1, "seg", [], {}, [50, 0]]],
+      [[{ start: [50, 0], end: [50, 100] }]],
+      [[{ start: [50, 0], end: [50, 100], index: "2" }]],
+      [[{ start: [50, 0], end: [50, 100], index: 2.5 }]],
+      [[{ start: [50, 0], end: [50, 100], index: NaN }]],
+      [[{ start: "50,0", end: [50, 100], index: 2 }]],
+      [[{ start: [50, 0], end: null, index: 2 }]],
+      [[{ start: [50], end: [50, 100], index: 2 }]],
+      [[{ start: [50, 0, 1], end: [50, 100], index: 2 }]],
+      [[{ start: [50, "0"], end: [50, 100], index: 2 }]],
+      [[{ start: [50, Infinity], end: [50, 100], index: 2 }]],
+      // neither horizontal nor vertical
+      [[{ start: [0, 0], end: [50, 100], index: 2 }]],
+      // first and last segments cannot be fixed
+      [[{ start: [0, 0], end: [50, 0], index: 1 }]],
+      [[{ start: [150, 100], end: [150, 200], index: 4 }]],
+      // out of range
+      [[{ start: [50, 0], end: [50, 100], index: 0 }]],
+      [[{ start: [50, 0], end: [50, 100], index: -2 }]],
+      [[{ start: [50, 0], end: [50, 100], index: 5 }]],
+      [[{ start: [50, 0], end: [50, 100], index: 1e9 }]],
+    ])("normalizes invalid fixedSegments=%j to null", (fixedSegments) => {
+      expect(restoreElbowArrow(fixedSegments).fixedSegments).toBe(null);
+    });
+
+    it("keeps only valid fixedSegments, sorted and deduplicated", () => {
+      const restored = restoreElbowArrow([
+        "junk",
+        null,
+        { ...seg3, extra: "x" },
+        { start: [0, 0], end: [50, 0], index: 1 },
+        seg2,
+        { ...seg2, start: [50, 10] },
+        { start: [150, 100], end: [150, 200], index: 4 },
+        { start: [50, 0], end: [50, 100], index: 7 },
+      ]);
+
+      expect(restored.fixedSegments).toEqual([seg2, seg3]);
+      expect(restored.fixedSegments?.[1]).not.toHaveProperty("extra");
+    });
+
+    it("keeps valid fixedSegments", () => {
+      expect(restoreElbowArrow([seg2, seg3]).fixedSegments).toEqual([
+        seg2,
+        seg3,
+      ]);
+    });
+
+    it("drops fixedSegments of elbow arrows with less than 4 points", () => {
+      expect(
+        restoreElbowArrow(
+          [seg2],
+          [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(50, 100)],
+        ).fixedSegments,
+      ).toBe(null);
+    });
   });
 
   it("keeps valid boundElements on repair", () => {

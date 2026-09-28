@@ -1,8 +1,10 @@
 import { ARROW_TYPE, DEFAULT_ZOOM } from "@excalidraw/common";
+import { CaptureUpdateAction } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
+import { restoreElements } from "@excalidraw/excalidraw/data/restore";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
@@ -427,4 +429,117 @@ describe("elbow arrow ui", () => {
       [78, 200],
     ]);
   });
+});
+
+describe("elbow arrow with malformed fixedSegments", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it.each([
+    ["string", "str"],
+    ["array-like object", { length: 1, 0: { index: 2 } }],
+    ["array of junk", [null, 1, "x", [], {}]],
+    ["missing points", [{ index: 2 }]],
+    ["malformed points", [{ start: [125], end: null, index: 2 }]],
+    [
+      "first/last/out of range indices",
+      [
+        { start: [0, 0], end: [125, 0], index: 1 },
+        { start: [125, 200], end: [250, 200], index: 3 },
+        { start: [125, 0], end: [125, 200], index: 9 },
+      ],
+    ],
+    [
+      "unsorted duplicates",
+      [
+        { start: [125, 0], end: [125, 200], index: 2, extra: "x" },
+        { start: [125, 0], end: [125, 200], index: 2 },
+        "junk",
+      ],
+    ],
+  ])(
+    "can render and interact with a restored elbow arrow with %s fixedSegments",
+    (_, fixedSegments) => {
+      const arrow = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed: true,
+          x: 0,
+          y: 0,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(125, 0),
+            pointFrom<LocalPoint>(125, 200),
+            pointFrom<LocalPoint>(250, 200),
+          ],
+        }),
+        fixedSegments,
+      } as unknown as ExcalidrawElbowArrowElement;
+
+      API.updateScene({
+        elements: restoreElements([arrow], null),
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+
+      const restored = h.elements[0] as ExcalidrawElbowArrowElement;
+      expect(
+        restored.fixedSegments === null ||
+          (Array.isArray(restored.fixedSegments) &&
+            restored.fixedSegments.every(
+              (segment) =>
+                segment.index === 2 &&
+                Object.keys(segment).sort().join() === "end,index,start",
+            )),
+      ).toBe(true);
+
+      // select the arrow
+      mouse.reset();
+      mouse.clickAt(60, 0);
+      expect(h.state.selectedLinearElement?.elementId).toBe(restored.id);
+
+      // hover and drag the middle segment
+      mouse.reset();
+      mouse.moveTo(125, 100);
+      mouse.down();
+      mouse.moveTo(140, 100);
+      mouse.up();
+
+      expect(
+        (h.elements[0] as ExcalidrawElbowArrowElement).fixedSegments,
+      ).toEqual([
+        {
+          index: 2,
+          start: pointFrom<LocalPoint>(140, 0),
+          end: pointFrom<LocalPoint>(140, 200),
+        },
+      ]);
+
+      // drag the end point with a fixed segment
+      mouse.reset();
+      mouse.moveTo(250, 200);
+      mouse.down();
+      mouse.moveTo(300, 250);
+      mouse.up();
+
+      expect(
+        (h.elements[0] as ExcalidrawElbowArrowElement).fixedSegments,
+      ).toHaveLength(1);
+
+      // release the fixed segment
+      mouse.reset();
+      mouse.moveTo(140, 125);
+      mouse.doubleClick();
+
+      const updated = h.elements[0] as ExcalidrawElbowArrowElement;
+      expect(updated.isDeleted).toBe(false);
+      expect(updated.fixedSegments).toBe(null);
+      expect(
+        updated.points.every(
+          (p) => Number.isFinite(p[0]) && Number.isFinite(p[1]),
+        ),
+      ).toBe(true);
+    },
+  );
 });
