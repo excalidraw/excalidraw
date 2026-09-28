@@ -675,7 +675,7 @@
     "syntax": "Mermaid-syntax",
     "preview": "Förhandsgranska",
     "label": "Mermaid",
-    "inputPlaceholder": "Skriv Mermaid-diagramdefinitionen här...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Auto-fix är tillgängligt"
   },
   "ttd": {
