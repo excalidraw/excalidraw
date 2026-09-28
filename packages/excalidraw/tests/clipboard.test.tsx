@@ -3,9 +3,16 @@ import { vi } from "vitest";
 
 import { getLineHeightInPx } from "@excalidraw/element";
 
-import { KEYS, arrayToMap, getLineHeight } from "@excalidraw/common";
+import {
+  KEYS,
+  TEXT_VIEWPORT_PADDING,
+  arrayToMap,
+  getLineHeight,
+} from "@excalidraw/common";
 
 import { getElementBounds } from "@excalidraw/element";
+
+import type { ExcalidrawTextElement } from "@excalidraw/element/types";
 
 import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
@@ -202,6 +209,56 @@ describe("paste text as a single element", () => {
     await waitFor(() => {
       expect(h.elements.length).toEqual(1);
     });
+  });
+  it("should not make a pasted text wider than the view", async () => {
+    API.setAppState({
+      width: 1000,
+      zoom: { value: 8 as NormalizedZoomValue },
+    });
+    // the view at 800%, less some room at each side: under the 200px a
+    // pasted text otherwise wraps at, at the least
+    const maxWidth = (1000 - 2 * TEXT_VIEWPORT_PADDING) / 8;
+    expect(maxWidth).toBeLessThan(200);
+
+    pasteWithCtrlCmdShiftV(
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+    );
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(1);
+    });
+    const text = h.elements[0] as ExcalidrawTextElement;
+    expect(text.autoResize).toBe(false);
+    expect(text.width).toBeLessThanOrEqual(maxWidth);
+  });
+  it("should bring a pasted text that wraps into view", async () => {
+    API.setAppState({ width: 1000, height: 800 });
+    // pasted at the pointer, near the bottom-right corner
+    h.app.viewport.lastPosition.x = 950;
+    h.app.viewport.lastPosition.y = 780;
+
+    pasteWithCtrlCmdShiftV(
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+    );
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(1);
+    });
+    const text = h.elements[0] as ExcalidrawTextElement;
+    expect(text.autoResize).toBe(false);
+    // all of it within the view, with room at each side
+    const { scrollX, scrollY } = h.state;
+    const zoom = h.state.zoom.value;
+    expect((text.x + scrollX) * zoom).toBeGreaterThanOrEqual(
+      TEXT_VIEWPORT_PADDING - 0.01,
+    );
+    expect((text.x + text.width + scrollX) * zoom).toBeLessThanOrEqual(
+      1000 - TEXT_VIEWPORT_PADDING + 0.01,
+    );
+    expect((text.y + scrollY) * zoom).toBeGreaterThanOrEqual(
+      TEXT_VIEWPORT_PADDING - 0.01,
+    );
+    expect((text.y + text.height + scrollY) * zoom).toBeLessThanOrEqual(
+      800 - TEXT_VIEWPORT_PADDING + 0.01,
+    );
   });
   it("should not create any element when only new lines in clipboard", async () => {
     const text = "\n\n\n\n";

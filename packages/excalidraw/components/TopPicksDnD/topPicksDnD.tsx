@@ -1,60 +1,65 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { colorToHex, isTransparent } from "@excalidraw/common";
+import "./TopPicksDnD.scss";
 
 /**
- * Custom (non-native) drag & drop for pinning colors to the color-picker
- * top-picks strip and reordering the strip itself.
+ * Custom (non-native) drag & drop for pinning values (colors, font families)
+ * to a picker's top-picks strip and reordering the strip itself.
  *
- * Implemented with pointer events + a manually rendered "ghost" swatch so we
+ * Implemented with pointer events + a manually rendered "ghost" so we
  * control the visuals fully (native HTML5 dnd flickers and forces ugly
  * ghosting/cursors).
+ *
+ * The strip must be registered via `setStripEl`, and render its picks with
+ * `data-top-pick-index` (hit-testing and the drop animation measure these).
  */
 
-const GHOST_CLASS = "excalidraw-color-dnd-ghost";
-const BODY_CLASS = "excalidraw-color-dnd-active";
+const GHOST_CLASS = "excalidraw-top-picks-dnd-ghost";
+const BODY_CLASS = "excalidraw-top-picks-dnd-active";
 const DRAG_THRESHOLD = 10;
 /** a fast sloppy click can travel many px — releases faster than this stay
  * clicks; the drag only starts once the pointer is held this long */
 const DRAG_TIME_THRESHOLD_MS = 100;
 
-/** value-equality of colors — normalizes notation (`#fff` vs `#ffffff` vs
- * `white`) so visually identical colors can't occupy multiple pick slots */
-const isSameColor = (a: string, b: string) => {
-  if (a.toLowerCase() === b.toLowerCase()) {
-    return true;
-  }
-  const aHex = colorToHex(a);
-  return aHex !== null && aHex === colorToHex(b);
-};
-
 type DragOrigin =
-  // a color dragged from the picker popup (palette/shades/custom) or the
-  // active-color trigger — dropping replaces the hovered pick
-  | { kind: "swatch" }
+  // a value dragged from outside the strip (picker popup, active-value
+  // trigger) — dropping replaces the hovered pick
+  | { kind: "source" }
   // a pick dragged from the top-picks strip itself — dropping reorders
   | { kind: "pick"; index: number };
 
-export type TopPicksDragState = {
-  color: string;
+export type TopPicksDragState<T> = {
+  value: T;
   origin: DragOrigin;
-  /** hovered strip slot — the slot to replace (swatch drags) or the final
+  /** hovered strip slot — the slot to replace (source drags) or the final
    * position (pick reorders). null while the pointer is outside the strip */
   overIndex: number | null;
-  /** index of an already-pinned identical color that blocks the drop */
+  /** index of an already-pinned identical value that blocks the drop */
   duplicateIndex: number | null;
   /** signed distance between strip slot centers (for reorder preview) */
   slotSpan: number;
 } | null;
 
-type DragSession = {
+export type TopPicksGhost = {
+  /** the ghost's visual. Rendered into `document.body` — outside the
+   * editor's CSS scope, so theme-dependent styling must be resolved from the
+   * rendered DOM (computed styles) rather than CSS variables */
+  content: HTMLElement;
+  /** where the ghost spawns (its size) and flies back to on cancel */
+  rect: DOMRect;
+};
+
+/** called on pointerdown (the source may not stay mounted until the drag
+ * activates), for every potential drag — keep it cheap */
+export type CreateTopPicksGhost<T> = (args: {
+  value: T;
+  /** the element the drag started on */
+  sourceEl: HTMLElement;
+  /** the registered strip */
+  stripEl: HTMLElement;
+}) => TopPicksGhost;
+
+type DragSession<T> = {
   pointerId: number;
   startX: number;
   startY: number;
@@ -64,10 +69,12 @@ type DragSession = {
   /** pending delayed activation (spatial threshold crossed before the
    * temporal one) */
   activationTimer: number | null;
-  color: string;
+  value: T;
   origin: DragOrigin;
-  sourceEl: HTMLElement;
-  sourceRect: DOMRect;
+  /** built on pointerdown, shown on activation */
+  ghostContent: HTMLElement;
+  /** see `TopPicksGhost.rect` */
+  homeRect: DOMRect;
   activated: boolean;
   ghost: HTMLDivElement | null;
   ghostW: number;
@@ -79,43 +86,94 @@ type DragSession = {
   duplicateIndex: number | null;
 };
 
-export type ColorPickerDnD = {
-  dragState: TopPicksDragState;
-  startSwatchDrag: (event: React.PointerEvent, color: string | null) => void;
-  startPickDrag: (
-    event: React.PointerEvent,
-    index: number,
-    color: string,
-  ) => void;
+export type TopPicksDnD<T> = {
+  dragState: TopPicksDragState<T>;
+  startSourceDrag: (event: React.PointerEvent, value: T | null) => void;
+  startPickDrag: (event: React.PointerEvent, index: number, value: T) => void;
   setStripEl: (el: HTMLDivElement | null) => void;
 };
 
-export const ColorPickerDnDContext = createContext<ColorPickerDnD | null>(null);
+/**
+ * live preview of the reorder result — the translation (px) moving the pick
+ * at `index` to the slot it would occupy if dropped right now
+ */
+export const getTopPickReorderOffset = (
+  dragState: TopPicksDragState<unknown>,
+  index: number,
+) => {
+  if (
+    !dragState ||
+    dragState.origin.kind !== "pick" ||
+    dragState.overIndex === null
+  ) {
+    return 0;
+  }
+  const from = dragState.origin.index;
+  const to = dragState.overIndex;
+  if (from === to) {
+    return 0;
+  }
+  let newIndex = index;
+  if (index === from) {
+    newIndex = to;
+  } else {
+    if (index > from) {
+      newIndex -= 1;
+    }
+    if (newIndex >= to) {
+      newIndex += 1;
+    }
+  }
+  return (newIndex - index) * dragState.slotSpan;
+};
 
-export const useColorPickerDnD = () => useContext(ColorPickerDnDContext);
+/** "marching ants" outline hinting that the strip accepts the drop — SVG
+ * because CSS dashed outlines/borders can't animate their dash offset */
+export const TopPicksDnDOutline = () => (
+  <svg className="top-picks-dnd__outline" aria-hidden="true">
+    <rect />
+  </svg>
+);
 
-export const useTopPicksDnD = ({
+export const useTopPicksDnD = <T,>({
   enabled,
   picks,
   onPicksChange,
+  isSamePick = (a, b) => a === b,
+  createGhost,
 }: {
   enabled: boolean;
-  picks: readonly string[];
-  onPicksChange: (picks: string[]) => void;
-}): ColorPickerDnD => {
-  const [dragState, setDragState] = useState<TopPicksDragState>(null);
+  picks: readonly T[];
+  onPicksChange: (picks: T[]) => void;
+  /** value-equality — pins identical to an existing pick are refused */
+  isSamePick?: (a: T, b: T) => boolean;
+  createGhost: CreateTopPicksGhost<T>;
+}): TopPicksDnD<T> => {
+  const [dragState, setDragState] = useState<TopPicksDragState<T>>(null);
   const stripRef = useRef<HTMLDivElement | null>(null);
 
-  const latestRef = useRef({ enabled, picks, onPicksChange });
-  latestRef.current = { enabled, picks, onPicksChange };
+  const latestRef = useRef({
+    enabled,
+    picks,
+    onPicksChange,
+    isSamePick,
+    createGhost,
+  });
+  latestRef.current = {
+    enabled,
+    picks,
+    onPicksChange,
+    isSamePick,
+    createGhost,
+  };
 
   const controller = useMemo(() => {
-    let session: DragSession | null = null;
+    let session: DragSession<T> | null = null;
 
     const publish = () => {
       if (session?.activated) {
         setDragState({
-          color: session.color,
+          value: session.value,
           origin: session.origin,
           overIndex: session.overIndex,
           duplicateIndex: session.duplicateIndex,
@@ -144,7 +202,7 @@ export const useTopPicksDnD = ({
         button.getBoundingClientRect(),
       );
       const [first, second] = session.slotRects;
-      // strip is evenly spaced (space-between); sign flips under RTL
+      // strip is evenly spaced; sign flips under RTL
       session.slotSpan = second ? second.left - first.left : first.width + 4;
       const stripRect = strip.getBoundingClientRect();
       const padX = Math.max(Math.abs(session.slotSpan) / 2, 10);
@@ -187,30 +245,19 @@ export const useTopPicksDnD = ({
       if (!session) {
         return;
       }
-      const { sourceRect, sourceEl, color } = session;
+      const { ghostContent, homeRect: rect } = session;
 
       const ghost = document.createElement("div");
       ghost.className = GHOST_CLASS;
-      const swatch = document.createElement("div");
-      swatch.className = `${GHOST_CLASS}__swatch`;
-      if (isTransparent(color)) {
-        swatch.classList.add("is-transparent");
-      } else {
-        // swatches render the theme-adjusted color (dark mode remaps colors
-        // rather than CSS-filtering them) — sample the rendered color so the
-        // ghost matches what the user picked up
-        const rendered = getComputedStyle(sourceEl).backgroundColor;
-        swatch.style.backgroundColor =
-          rendered && rendered !== "rgba(0, 0, 0, 0)" ? rendered : color;
-      }
-      ghost.appendChild(swatch);
+      ghostContent.classList.add(`${GHOST_CLASS}__content`);
+      ghost.appendChild(ghostContent);
       document.body.appendChild(ghost);
 
       session.ghost = ghost;
-      session.ghostW = sourceRect.width;
-      session.ghostH = sourceRect.height;
-      ghost.style.width = `${sourceRect.width}px`;
-      ghost.style.height = `${sourceRect.height}px`;
+      session.ghostW = rect.width;
+      session.ghostH = rect.height;
+      ghost.style.width = `${rect.width}px`;
+      ghost.style.height = `${rect.height}px`;
       positionGhost(x, y);
       // let the spawn frame paint at rest, then "lift" (scale-up transition)
       requestAnimationFrame(() => {
@@ -249,9 +296,10 @@ export const useTopPicksDnD = ({
             best = index;
           }
         });
-        if (session.origin.kind === "swatch") {
-          const duplicate = latestRef.current.picks.findIndex((pick) =>
-            isSameColor(pick, session!.color),
+        if (session.origin.kind === "source") {
+          const { picks, isSamePick } = latestRef.current;
+          const duplicate = picks.findIndex((pick) =>
+            isSamePick(pick, session!.value),
           );
           if (duplicate !== -1) {
             duplicateIndex = duplicate;
@@ -286,7 +334,7 @@ export const useTopPicksDnD = ({
         const rect = session.slotRects[overIndex];
         setGhostSize(rect.width, rect.height, x, y);
       } else {
-        setGhostSize(session.sourceRect.width, session.sourceRect.height, x, y);
+        setGhostSize(session.homeRect.width, session.homeRect.height, x, y);
       }
     };
 
@@ -374,7 +422,7 @@ export const useTopPicksDnD = ({
       settleStripInstantly();
       if (session.ghost) {
         if (animate) {
-          releaseGhost({ rect: session.sourceRect });
+          releaseGhost({ rect: session.homeRect });
         } else {
           session.ghost.remove();
           session.ghost = null;
@@ -464,16 +512,16 @@ export const useTopPicksDnD = ({
       event.stopPropagation();
       suppressNextClick();
 
-      const { overIndex, origin, color, slotRects } = session;
-      const { picks, onPicksChange } = latestRef.current;
+      const { overIndex, origin, value, slotRects } = session;
+      const { picks, onPicksChange, isSamePick } = latestRef.current;
 
       settleStripInstantly();
 
       if (overIndex !== null) {
-        if (origin.kind === "swatch") {
-          if (!picks.some((pick) => isSameColor(pick, color))) {
+        if (origin.kind === "source") {
+          if (!picks.some((pick) => isSamePick(pick, value))) {
             const next = [...picks];
-            next[overIndex] = color;
+            next[overIndex] = value;
             onPicksChange(next);
           }
         } else if (origin.index !== overIndex) {
@@ -484,7 +532,7 @@ export const useTopPicksDnD = ({
         }
         releaseGhost({ rect: slotRects[overIndex] });
       } else {
-        releaseGhost({ rect: session.sourceRect });
+        releaseGhost({ rect: session.homeRect });
       }
       dispose();
     };
@@ -505,17 +553,32 @@ export const useTopPicksDnD = ({
 
     const begin = (
       event: React.PointerEvent,
-      color: string | null,
+      value: T | null,
       origin: DragOrigin,
     ) => {
       if (
         !latestRef.current.enabled ||
         session ||
         event.button !== 0 ||
-        !color
+        value == null
       ) {
         return;
       }
+      const stripEl = stripRef.current;
+      if (!stripEl) {
+        return;
+      }
+      // build & measure the ghost now, while the source is guaranteed to be
+      // mounted — it may be re-rendered (detached) before the drag activates
+      // (e.g. the font list re-renders on hover), and a detached source
+      // measures as a zero rect, flying a cancelled ghost to the viewport's
+      // top-left
+      const { content: ghostContent, rect: homeRect } =
+        latestRef.current.createGhost({
+          value,
+          sourceEl: event.currentTarget as HTMLElement,
+          stripEl,
+        });
       session = {
         pointerId: event.pointerId,
         startX: event.clientX,
@@ -524,12 +587,10 @@ export const useTopPicksDnD = ({
         lastX: event.clientX,
         lastY: event.clientY,
         activationTimer: null,
-        color,
+        value,
         origin,
-        sourceEl: event.currentTarget as HTMLElement,
-        sourceRect: (
-          event.currentTarget as HTMLElement
-        ).getBoundingClientRect(),
+        ghostContent,
+        homeRect,
         activated: false,
         ghost: null,
         ghostW: 0,
@@ -559,10 +620,10 @@ export const useTopPicksDnD = ({
   return useMemo(
     () => ({
       dragState,
-      startSwatchDrag: (event, color) =>
-        controller.begin(event, color, { kind: "swatch" }),
-      startPickDrag: (event, index, color) =>
-        controller.begin(event, color, { kind: "pick", index }),
+      startSourceDrag: (event, value) =>
+        controller.begin(event, value, { kind: "source" }),
+      startPickDrag: (event, index, value) =>
+        controller.begin(event, value, { kind: "pick", index }),
       setStripEl: (el) => {
         stripRef.current = el;
       },

@@ -9,7 +9,7 @@ import { useAtom } from "../../editor-jotai";
 
 import HotkeyLabel from "./HotkeyLabel";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
-import { useColorPickerDnD } from "./topPicksDnD";
+import { useColorPickerDnD } from "./colorTopPicksDnD";
 
 interface CustomColorListProps {
   theme: Theme;
@@ -60,7 +60,7 @@ export const CustomColorList = ({
               setActiveColorPickerSection("custom");
             }}
             onPointerDown={
-              dnd ? (event) => dnd.startSwatchDrag(event, c) : undefined
+              dnd ? (event) => dnd.startSourceDrag(event, c) : undefined
             }
             title={c}
             aria-label={label}

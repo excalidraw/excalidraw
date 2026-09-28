@@ -480,7 +480,7 @@ export const convertElementTypes = (
 
       for (const element of Object.values(convertedElements)) {
         if (isBindableElement(element)) {
-          reanchorBindingsToOutline(element, app.scene);
+          reanchorBindingsToOutline(element, app.scene, app.state.zoom);
           updateBindings(element, app.scene, app.state);
         }
 

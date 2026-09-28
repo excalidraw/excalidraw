@@ -1,6 +1,6 @@
 import React from "react";
 import { vi } from "vitest";
-import { KEYS, reseed } from "@excalidraw/common";
+import { KEYS, reseed, DEFAULT_ZOOM } from "@excalidraw/common";
 import { bindBindingElement } from "@excalidraw/element";
 import "@excalidraw/utils/test-utils";
 
@@ -89,6 +89,7 @@ describe("move element", () => {
         "orbit",
         "start",
         h.app.scene,
+        DEFAULT_ZOOM,
       );
       bindBindingElement(
         arrow.get() as NonDeleted<ExcalidrawArrowElement>,
@@ -96,6 +97,7 @@ describe("move element", () => {
         "orbit",
         "end",
         h.app.scene,
+        DEFAULT_ZOOM,
       );
     });
 

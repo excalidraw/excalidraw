@@ -1,0 +1,167 @@
+.excalidraw {
+  .file-drop-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: var(--zIndex-fileDropOverlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    pointer-events: none;
+    background: var(--overlay-bg-color);
+    animation: file-drop-overlay-appear 120ms ease-out;
+  }
+
+  .file-drop-overlay__card {
+    width: 30rem;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 2rem 1.5rem 1.5rem;
+    border: 1px solid var(--color-primary-light-darker);
+    border-radius: 1.5rem;
+    background: var(--island-bg-color);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    text-align: center;
+  }
+
+  .file-drop-overlay__title {
+    color: var(--text-primary-color);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .file-drop-overlay__hint {
+    margin-top: 0.5rem;
+    color: var(--text-primary-color);
+    opacity: 0.7;
+    font-size: 0.875rem;
+    line-height: 1.75;
+
+    kbd {
+      padding: 0.125rem 0.375rem;
+      border: 1px solid var(--default-border-color);
+      border-radius: 0.25rem;
+      background: var(--color-surface-low);
+      font: inherit;
+    }
+
+    &--secondary {
+      margin-top: 0;
+      opacity: 0.45;
+      font-size: 0.75rem;
+    }
+  }
+
+  .file-drop-overlay__illustration {
+    position: relative;
+    height: 10rem;
+    margin-top: 1.75rem;
+    color: var(--color-primary);
+  }
+
+  .file-drop-overlay__file {
+    position: absolute;
+    top: 0.5rem;
+    left: calc(50% - 3rem);
+    width: 6rem;
+    height: 8rem;
+    overflow: visible;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: file-drop-overlay-float 3.6s ease-in-out infinite;
+
+    &--back {
+      --file-x: -1.5rem;
+      --file-angle: -18deg;
+      top: 1rem;
+      color: var(--color-primary-light-darker);
+    }
+
+    &--front {
+      --file-x: 1.5rem;
+      --file-angle: 12deg;
+      animation-delay: -1.8s;
+    }
+  }
+
+  .file-drop-overlay__paper {
+    fill: var(--island-bg-color);
+  }
+
+  .file-drop-overlay__lines {
+    opacity: 0.35;
+  }
+
+  .file-drop-overlay__cross {
+    stroke-width: 4;
+  }
+
+  // replacing: the existing content (back file) is crossed out
+  .file-drop-overlay:not(.file-drop-overlay--keep)
+    .file-drop-overlay__file--back
+    .file-drop-overlay__lines {
+    opacity: 0;
+  }
+
+  .file-drop-overlay--keep {
+    .file-drop-overlay__file--back {
+      color: var(--color-primary);
+    }
+
+    .file-drop-overlay__cross {
+      opacity: 0;
+    }
+  }
+
+  @keyframes file-drop-overlay-appear {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes file-drop-overlay-float {
+    0%,
+    100% {
+      transform: translate(var(--file-x), 0) rotate(var(--file-angle));
+    }
+    50% {
+      transform: translate(var(--file-x), -0.375rem)
+        rotate(calc(var(--file-angle) + 3deg));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .file-drop-overlay,
+    .file-drop-overlay__file {
+      animation: none;
+    }
+
+    .file-drop-overlay__file {
+      transform: translate(var(--file-x), 0) rotate(var(--file-angle));
+    }
+  }
+
+  @media (max-height: 420px) {
+    .file-drop-overlay__card {
+      padding: 1.25rem;
+    }
+
+    .file-drop-overlay__illustration {
+      height: 7rem;
+      margin-top: 0.75rem;
+    }
+
+    .file-drop-overlay__file {
+      width: 4.5rem;
+      height: 6rem;
+      left: calc(50% - 2.25rem);
+    }
+  }
+}

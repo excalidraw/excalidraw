@@ -31,6 +31,10 @@ Please add the latest change on the top under the correct section.
 
 ## Excalidraw API
 
+### `setViewport` stops following a collaborator (2026-09-26) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- `setViewport` now asks to stop following a collaborator whenever it navigates (`onUserFollow` with `action: "UNFOLLOW"`, if `userToFollow` is set), as a user's pan or zoom does. `setViewport(null)` (clearing a lock) and a target that doesn't resolve don't navigate, and leave following alone.
+
 ### `onDuplicate` can replace and veto duplicates (2026-09-18) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - `props.onDuplicate` may now return new objects for the duplicated elements in every duplication path. Previously the editor kept using the objects it created, so on paste (and library insert) the frame assignment and bound text redraw went to objects that were no longer in the scene, and alt-drag dragged an element that wasn't in the scene. The returned changes are now merged into the editor's duplicates, so they're part of the duplication's own undo entry and durable increment (no follow-up `updateScene` needed).

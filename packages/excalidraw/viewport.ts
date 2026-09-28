@@ -423,6 +423,63 @@ export const centerScrollOn = ({
   };
 };
 
+/**
+ * The scroll that brings `bounds` into the viewport — less `offsets` (screen
+ * px: UI covering its edges, room to leave) — by the least movement, keeping
+ * the zoom; `null` when they're in view already. Along an axis where they
+ * don't fit, their start (left / top) is brought in instead, or, with
+ * `tooLarge: "leave"`, that axis keeps its scroll.
+ */
+export const scrollBoundsIntoView = ({
+  bounds: [x1, y1, x2, y2],
+  appState: { scrollX, scrollY, zoom, width, height },
+  offsets,
+  tooLarge = "alignStart",
+}: {
+  bounds: Bounds;
+  appState: Pick<AppState, "scrollX" | "scrollY" | "zoom" | "width" | "height">;
+  offsets?: Offsets;
+  tooLarge?: "alignStart" | "leave";
+}): Pick<AppState, "scrollX" | "scrollY"> | null => {
+  const viewLeft = offsets?.left ?? 0;
+  const viewRight = width - (offsets?.right ?? 0);
+  const viewTop = offsets?.top ?? 0;
+  const viewBottom = height - (offsets?.bottom ?? 0);
+  if (viewRight <= viewLeft || viewBottom <= viewTop) {
+    return null;
+  }
+  // how far (screen px) to move a span to bring it within [start, end]
+  const shift = (
+    spanStart: number,
+    spanEnd: number,
+    scroll: number,
+    start: number,
+    end: number,
+  ) => {
+    const screenStart = (spanStart + scroll) * zoom.value;
+    const screenEnd = (spanEnd + scroll) * zoom.value;
+    if (screenEnd - screenStart > end - start) {
+      return tooLarge === "alignStart" ? start - screenStart : 0;
+    }
+    if (screenEnd > end) {
+      return end - screenEnd;
+    }
+    if (screenStart < start) {
+      return start - screenStart;
+    }
+    return 0;
+  };
+  const dx = shift(x1, x2, scrollX, viewLeft, viewRight);
+  const dy = shift(y1, y2, scrollY, viewTop, viewBottom);
+  if (!dx && !dy) {
+    return null;
+  }
+  return {
+    scrollX: scrollX + dx / zoom.value,
+    scrollY: scrollY + dy / zoom.value,
+  };
+};
+
 export const getScrollToContentState = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
