@@ -110,6 +110,8 @@ import {
   oneOf,
   getStrokeWidthByKey,
   TEXT_VIEWPORT_PADDING,
+  TEXT_MAX_WRAP_WIDTH,
+  type Bounds,
 } from "@excalidraw/common";
 
 import {
@@ -197,7 +199,6 @@ import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
   hitElementItself,
-  getVisibleSceneBounds,
   cropElement,
   wrapText,
   isElementLink,
@@ -516,6 +517,8 @@ import type {
   GenerateDiagramToCode,
   NullableGridSize,
   UIConfig,
+  Offsets,
+  ViewportUIName,
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionResult } from "../actions/types";
@@ -5087,19 +5090,12 @@ class App extends React.Component<AppProps, AppState> {
       fontFamily: textElementProps.fontFamily,
     });
     const lineHeight = getLineHeight(textElementProps.fontFamily);
-    const [x1, , x2] = getVisibleSceneBounds(this.state);
-    // long texts should not go beyond 800 pixels in width nor should it go
-    // below 200 px — nor, whatever those make of it, outgrow the view
-    const maxTextWidth = Math.min(
-      Math.max(Math.min((x2 - x1) * 0.5, 800), 200),
-      this.getMaxTextWidth(),
-    );
     const LINE_GAP = 10;
-    let currentY = y;
 
     const lines = isPlainPaste ? [text] : text.split("\n");
-    const textElements = lines.reduce(
-      (acc: ExcalidrawTextElement[], line, idx) => {
+    const createTextElements = (maxTextWidth: number) => {
+      let currentY = y;
+      return lines.reduce((acc: ExcalidrawTextElement[], line, idx) => {
         const originalText = normalizeText(line).trim();
         if (originalText.length) {
           const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -5145,33 +5141,100 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         return acc;
-      },
-      [],
-    );
+      }, []);
+    };
 
+    // long texts wrap as a typed one does; wrapped to fit the view, all of
+    // it is brought in view, too — by moving it there (as far as the view
+    // would have to scroll), not the view
+    const pasteWithin = (offsets: Required<Offsets>) => {
+      const textElements = createTextElements(this.getMaxTextWidth(offsets));
+      const scroll =
+        textElements.length && textElements.some((el) => !el.autoResize)
+          ? scrollBoundsIntoView({
+              bounds: getCommonBounds(textElements),
+              appState: this.state,
+              offsets,
+            })
+          : null;
+      if (!scroll) {
+        return textElements;
+      }
+      const dx = scroll.scrollX - this.state.scrollX;
+      const dy = scroll.scrollY - this.state.scrollY;
+      return textElements.map((element) => {
+        const nextX = element.x + dx;
+        const nextY = element.y + dy;
+        // at the point it's pasted at: its center
+        const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+          x: nextX + element.width / 2,
+          y: nextY + element.height / 2,
+        });
+        return newElementWith(element, {
+          x: nextX,
+          y: nextY,
+          frameId: topLayerFrame ? topLayerFrame.id : null,
+        });
+      });
+    };
+    // laid out as if the stats panel weren't there, to see where it lands:
+    // it counts only beside it
+    const offsets = this.getTextViewportOffsets();
+    let textElements = pasteWithin(offsets);
     if (textElements.length === 0) {
       return;
     }
-
-    this.insertNewElements(textElements);
-    this.store.scheduleCapture();
-    this.setState({
-      selectedElementIds: makeNextSelectedElementIds(
+    const getSelectedElementIds = () =>
+      makeNextSelectedElementIds(
         Object.fromEntries(textElements.map((el) => [el.id, true])),
         this.state,
-      ),
-    });
-    // wrapped to fit the view: make sure all of it is in view, too
-    if (textElements.some((element) => !element.autoResize)) {
-      const scroll = scrollBoundsIntoView({
-        bounds: getCommonBounds(textElements),
-        appState: this.state,
-        offsets: this.getTextViewportOffsets(),
+      );
+
+    if (this.viewport.getSideUIRect("stats")) {
+      // selected, it's in the stats panel, which grows to show its
+      // properties: rendered so (not captured yet), the panels are measured
+      // as they'll be — the styles panel, too, shown then, not reserved
+      flushSync(() => {
+        this.insertNewElements(textElements);
+        this.setState({ selectedElementIds: getSelectedElementIds() });
       });
-      if (scroll) {
-        this.viewport.translate(scroll);
+      const besideOffsets = this.getTextViewportOffsets(
+        getCommonBounds(textElements),
+      );
+      if (
+        besideOffsets.left !== offsets.left ||
+        besideOffsets.right !== offsets.right
+      ) {
+        // beside the stats panel, or the styles panel's not as reserved:
+        // laid out again, as the same elements (for anyone who's seen them
+        // rendered already)
+        const relaid = pasteWithin(besideOffsets);
+        const pastedIds = new Set(textElements.map((element) => element.id));
+        textElements = textElements.map((element, index) => {
+          const { x, y, width, height, text, autoResize, frameId } =
+            relaid[index];
+          return newElementWith(element, {
+            x,
+            y,
+            width,
+            height,
+            text,
+            autoResize,
+            frameId,
+          });
+        });
+        this.scene.replaceAllElements(
+          this.scene
+            .getElementsIncludingDeleted()
+            .filter((element) => !pastedIds.has(element.id)),
+        );
+        this.insertNewElements(textElements);
       }
+    } else {
+      this.insertNewElements(textElements);
     }
+    this.store.scheduleCapture();
+    this.setState({ selectedElementIds: getSelectedElementIds() });
 
     if (
       !isPlainPaste &&
@@ -6450,13 +6513,44 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   /**
-   * The part of the canvas a typed or pasted text is kept within, as offsets
-   * from its edges (screen px): all of it but the sidebar, less some room
-   * at each side.
+   * The side panels, besides the sidebar, that a typed or pasted text is
+   * kept clear of: the stats panel, and the full styles panel (desktop),
+   * which shows next to a text while it's edited, and once it's pasted and
+   * selected.
    */
-  private getTextViewportOffsets = () => {
-    const { left, right } = this.viewport.getSidebarInsets();
+  private getTextSidePanels = (): ViewportUIName[] =>
+    this.stylesPanelMode === "full" &&
+    this.isDefaultUIEnabled() &&
+    !this.state.zenModeEnabled
+      ? ["stats", "stylesPanel"]
+      : ["stats"];
+
+  /**
+   * The part of the canvas a typed or pasted text is kept within, as offsets
+   * from its edges (screen px): all of it but the sidebar and the side
+   * panels (see getTextSidePanels), less some room at each side. The stats
+   * panel covers the top of a side only, and counts only for a text beside
+   * it: one (given by its scene bounds) with rows within that room of it.
+   */
+  private getTextViewportOffsets = (textBounds?: Bounds): Required<Offsets> => {
     const padding = TEXT_VIEWPORT_PADDING;
+    const stats = textBounds && this.viewport.getSideUIRect("stats");
+    const { scrollY, zoom } = this.state;
+    const isBesideStats =
+      !!stats &&
+      !!textBounds &&
+      (textBounds[1] + scrollY) * zoom.value < stats.bottom + padding &&
+      (textBounds[3] + scrollY) * zoom.value > stats.top - padding;
+    const { left, right } = this.viewport.getSideInsets(
+      [
+        "sidebar",
+        ...this.getTextSidePanels().filter(
+          (name) => name !== "stats" || isBesideStats,
+        ),
+      ],
+      // the styles panel isn't shown yet when pasting with nothing selected
+      { reserve: { stylesPanel: true } },
+    );
     return {
       top: padding,
       right: right + padding,
@@ -6467,13 +6561,16 @@ class App extends React.Component<AppProps, AppState> {
 
   /**
    * The widest a text may grow to as it's typed or pasted, in scene units:
-   * the width of the part of the canvas it's kept within, so that a text
-   * never outgrows the view.
+   * TEXT_MAX_WRAP_WIDTH, or less, so that a text never outgrows the part of
+   * the canvas it's kept within.
    */
-  private getMaxTextWidth = () => {
-    const { left, right } = this.getTextViewportOffsets();
-    const width = this.state.width - left - right;
-    return width > 0 ? width / this.state.zoom.value : Infinity;
+  private getMaxTextWidth = (offsets: Required<Offsets>) => {
+    const { left, right } = offsets;
+    const viewWidth = this.state.width - left - right;
+    return Math.min(
+      viewWidth > 0 ? viewWidth / this.state.zoom.value : Infinity,
+      TEXT_MAX_WRAP_WIDTH,
+    );
   };
 
   private handleTextWysiwyg(
@@ -6510,8 +6607,12 @@ class App extends React.Component<AppProps, AppState> {
             originalText: nextOriginalText,
           })
         : null;
-      // a free text stops growing at the view's width and wraps from there
-      const maxWidth = this.getMaxTextWidth();
+      // a free text stops growing at the view's width (between the side
+      // panels beside its rows), or TEXT_MAX_WRAP_WIDTH, and wraps from there
+      const textViewportOffsets = this.getTextViewportOffsets(
+        getElementBounds(latestTextElement, elementsMap),
+      );
+      const maxWidth = this.getMaxTextWidth(textViewportOffsets);
 
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
@@ -6551,16 +6652,16 @@ class App extends React.Component<AppProps, AppState> {
         isTextElement(updatedTextElement) &&
         !updatedTextElement.autoResize
       ) {
-        // it just started wrapping at the view's width: bring all of it into
-        // view (right edge off the view's by the same room as the width
-        // left) — vertically only if it fits; the caret follows the rest
+        // it just started wrapping: bring all of it into view, between the
+        // side panels (with the same room at the edges as the width left)
+        // — vertically only if it fits; the caret follows the rest
         const scroll = scrollBoundsIntoView({
           bounds: getElementBounds(
             updatedTextElement,
             this.scene.getNonDeletedElementsMap(),
           ),
           appState: this.state,
-          offsets: this.getTextViewportOffsets(),
+          offsets: textViewportOffsets,
           tooLarge: "leave",
         });
         if (scroll) {
