@@ -463,7 +463,7 @@ export const textWysiwyg = ({
       const editorBoxLeft = updateEditorBoxInsets();
 
       // a free text that stopped growing at the viewport's width (see
-      // App.getMaxTextWidth) wraps from then on, and so does its editor
+      // AppText.getMaxTextWidth) wraps from then on, and so does its editor
       if (
         !updatedTextElement.autoResize &&
         editable.style.whiteSpace !== "pre-wrap"
@@ -692,7 +692,7 @@ export const textWysiwyg = ({
 
   /**
    * A caret typed in under the stats or the styles panel (see
-   * App.getTextSidePanels) is out of sight, yet inside the editor's box, so
+   * AppText.getTextSidePanels) is out of sight, yet inside the editor's box, so
    * the browser doesn't reveal it (unlike the sidebar, the panels don't span
    * the box's height, see updateEditorBoxInsets). Pan the canvas to bring it
    * out from under the panel, on the canvas' side, with some room to spare —
@@ -703,7 +703,7 @@ export const textWysiwyg = ({
     if (!caret) {
       return;
     }
-    for (const name of app.getTextSidePanels()) {
+    for (const name of app.text.getTextSidePanels()) {
       const panel = app.viewport.getSideUIRect(name);
       if (
         panel &&
@@ -839,8 +839,8 @@ export const textWysiwyg = ({
         editable.selectionEnd = selectionStart;
       }
       onChange(editable.value);
-      // once the update, and any scroll it made (see App.handleTextWysiwyg),
-      // is in the app's state
+      // once the update, and any scroll it made (see
+      // AppText.handleTextWysiwyg), is in the app's state
       queueMicrotask(followCaretFromUnderPanels);
     };
   }
