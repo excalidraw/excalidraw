@@ -89,7 +89,7 @@ export const actionPaste = register({
     }
 
     try {
-      app.pasteFromClipboard(createPasteEvent({ types }));
+      app.clipboard.pasteFromClipboard(createPasteEvent({ types }));
     } catch (error: any) {
       console.error(error);
       return {
