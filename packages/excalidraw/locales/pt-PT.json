@@ -675,7 +675,7 @@
     "syntax": "Sintaxe Mermaid",
     "preview": "Pré-visualizar",
     "label": "Mermaid",
-    "inputPlaceholder": "Introduza aqui o seu código Mermaid…",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Está disponível uma correção automática"
   },
   "ttd": {
