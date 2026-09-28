@@ -675,7 +675,7 @@
     "syntax": "Syntax Mermaid",
     "preview": "Pratinjau",
     "label": "Mermaid",
-    "inputPlaceholder": "Tulis definisi diagram Mermaid di sini...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Perbaikan otomatis tersedia"
   },
   "ttd": {
