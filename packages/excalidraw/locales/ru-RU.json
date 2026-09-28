@@ -675,7 +675,7 @@
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр",
     "label": "Mermaid",
-    "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Автоисправление доступно"
   },
   "ttd": {
