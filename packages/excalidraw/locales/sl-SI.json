@@ -675,7 +675,7 @@
     "syntax": "Sintaksa Mermaid",
     "preview": "Predogled",
     "label": "Mermaid",
-    "inputPlaceholder": "Tukaj napišite definicijo diagrama Mermaid...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Samodejno popravljanje je na voljo"
   },
   "ttd": {
