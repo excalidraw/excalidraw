@@ -180,6 +180,97 @@ describe("restoreElements", () => {
     expect(restored.groupIds).toEqual(expected);
   });
 
+  it.each([
+    [{}, []],
+    [{ a: 1 }, []],
+    ["abc", []],
+    [123, []],
+    [true, []],
+    [null, []],
+    [undefined, []],
+    [
+      [
+        null,
+        1,
+        "b1",
+        {},
+        { type: "arrow" },
+        { type: "arrow", id: "" },
+        { type: "arrow", id: 1 },
+        { type: "line", id: "b2" },
+        { type: "arrow", id: "a1", extra: "x" },
+        { type: "text", id: "t1" },
+      ],
+      [
+        { type: "arrow", id: "a1" },
+        { type: "text", id: "t1" },
+      ],
+    ],
+  ])("normalizes boundElements=%j to %j", (boundElements, expected) => {
+    const element = {
+      ...API.createElement({ type: "rectangle" }),
+      boundElements,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.boundElements).toEqual(expected);
+  });
+
+  it("keeps valid boundElements on repair", () => {
+    const container = API.createElement({ type: "rectangle" });
+    const arrow = API.createElement({ type: "arrow" });
+    const text = API.createElement({
+      type: "text",
+      containerId: container.id,
+    });
+    const element = {
+      ...container,
+      boundElements: [
+        { type: "arrow", id: arrow.id },
+        { type: "text", id: text.id },
+        "junk",
+      ],
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element, arrow, text], null, {
+      repairBindings: true,
+    });
+    expect(restored.boundElements).toEqual([
+      { type: "arrow", id: arrow.id },
+      { type: "text", id: text.id },
+    ]);
+  });
+
+  it.each([{}, "abc", 123, true, { a: 1 }])(
+    "does not drop element with legacy boundElementIds=%j",
+    (boundElementIds) => {
+      const element = {
+        ...API.createElement({ type: "rectangle" }),
+        boundElements: [{ type: "arrow", id: "a1" }],
+        boundElementIds,
+      } as unknown as ExcalidrawElement;
+
+      const restored = restore.restoreElements([element], null);
+      expect(restored).toHaveLength(1);
+      // falls back to (valid) boundElements
+      expect(restored[0].boundElements).toEqual([{ type: "arrow", id: "a1" }]);
+      expect("boundElementIds" in restored[0]).toBe(false);
+    },
+  );
+
+  it("migrates valid legacy boundElementIds", () => {
+    const element = {
+      ...API.createElement({ type: "rectangle" }),
+      boundElementIds: ["a1", "", null, 2, "a2"],
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.boundElements).toEqual([
+      { type: "arrow", id: "a1" },
+      { type: "arrow", id: "a2" },
+    ]);
+  });
+
   it("keeps scene version bumpable after restoring a pinned version", () => {
     const evil = {
       ...API.createElement({ type: "rectangle", isDeleted: true }),

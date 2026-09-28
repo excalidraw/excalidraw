@@ -87,6 +87,7 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
+  BoundElement,
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawArrowElement,
@@ -311,6 +312,34 @@ const normalizeElementGroupIds = (groupIds: unknown): GroupId[] => {
   );
 };
 
+// Non-array boundElements (e.g. from a malicious peer) crash rendering, which
+// calls `.find`/`.some`/`.filter` on it. Keep only well-formed entries, and
+// copy them so no unknown props leak through. Legacy `boundElementIds` are
+// migrated to arrow bindings when valid.
+const normalizeBoundElements = (
+  boundElements: unknown,
+  boundElementIds: unknown,
+): BoundElement[] => {
+  if (Array.isArray(boundElementIds)) {
+    return boundElementIds
+      .filter((id): id is string => typeof id === "string" && id.length > 0)
+      .map((id) => ({ type: "arrow", id }));
+  }
+  if (!Array.isArray(boundElements)) {
+    return [];
+  }
+  return boundElements
+    .filter(
+      (binding): binding is BoundElement =>
+        !!binding &&
+        typeof binding === "object" &&
+        (binding.type === "arrow" || binding.type === "text") &&
+        typeof binding.id === "string" &&
+        binding.id.length > 0,
+    )
+    .map(({ type, id }) => ({ type, id }));
+};
+
 const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
   return isFiniteNumber(strokeWidth)
     ? STROKE_WIDTH_KEYS.find((key) => STROKE_WIDTH[key] === strokeWidth) ?? null
@@ -530,9 +559,10 @@ const restoreElementWithProperties = <
             : ROUNDNESS.PROPORTIONAL_RADIUS,
         }
       : null,
-    boundElements: element.boundElementIds
-      ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
-      : element.boundElements ?? [],
+    boundElements: normalizeBoundElements(
+      element.boundElements,
+      element.boundElementIds,
+    ),
     updated: normalizeElementUpdated(element.updated),
     created: element.created ?? null,
     link: element.link ? normalizeLink(element.link) : null,
