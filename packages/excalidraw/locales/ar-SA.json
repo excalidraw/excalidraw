@@ -675,7 +675,7 @@
     "syntax": "صيغة Mermaid",
     "preview": "معاينة",
     "label": "Mermaid",
-    "inputPlaceholder": "اكتب تعريف الرسم البياني لـ Mermaid هنا...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "الإصلاح التلقائي متوفر"
   },
   "ttd": {
