@@ -296,11 +296,12 @@ const LayerUI = ({
   };
 
   /**
-   * The whole editor UI is laid out as a single grid of nine regions (see
-   * `.exc-regions` in styles.scss for the how and why):
+   * The editor UI is laid out in 3×3 logical regions (see `.exc-regions` in
+   * styles.scss for the how and why). The top and center regions stack in
+   * three columns; the bottom regions form a separate footer band:
    *
    *   top-left     top-center     top-right
-   *   center-left  center-center  center-right
+   *   center-left                 center-right
    *   bottom-left  bottom-center  bottom-right
    */
   const renderUIRegions = () => {
@@ -333,131 +334,134 @@ const LayerUI = ({
           } as React.CSSProperties
         }
       >
-        <div className="exc-region-mesh">
-          <div className="exc-region-top-left">{renderCanvasActions()}</div>
-          <div className="exc-region-top-center">
-            {shouldRenderToolbar && (
-              <Section heading="shapes">
-                {(heading: React.ReactNode) => (
-                  <div style={{ position: "relative" }}>
-                    {renderWelcomeScreen && (
-                      <tunnels.WelcomeScreenToolbarHintTunnel.Out />
-                    )}
-                    <Stack.Col gap={spacing.toolbarColGap} align="start">
-                      <Stack.Row
-                        gap={spacing.toolbarRowGap}
-                        className={clsx("App-toolbar-container", {
-                          "zen-mode": appState.zenModeEnabled,
-                        })}
-                      >
-                        <Toolbar
-                          app={app}
-                          appState={appState}
-                          setAppState={setAppState}
-                          UIOptions={UIOptions}
-                          onPenModeToggle={onPenModeToggle}
-                          onLockToggle={onLockToggle}
-                          heading={heading}
-                        />
-                        {isCollaborating && (
-                          <Island
-                            style={{
-                              marginLeft: spacing.collabMarginLeft,
-                              alignSelf: "center",
-                              height: "fit-content",
-                            }}
-                          >
-                            <LaserPointerButton
-                              title={t("toolBar.laser")}
-                              checked={
-                                appState.activeTool.type === TOOL_TYPE.laser
-                              }
-                              onChange={() =>
-                                app.setActiveTool({ type: TOOL_TYPE.laser })
-                              }
-                              isMobile
-                            />
-                          </Island>
-                        )}
-                      </Stack.Row>
-                    </Stack.Col>
-                  </div>
-                )}
-              </Section>
-            )}
-          </div>
-          <div
-            className={clsx("exc-region-top-right zen-mode-transition", {
-              "transition-right": appState.zenModeEnabled,
-              "exc-region-top-right--compact": isCompactStylesPanel,
-            })}
-          >
-            <div className="exc-region-top-right-content">
-              {defaultUIEnabled && appState.collaborators.size > 0 && (
-                <UserList
-                  collaborators={appState.collaborators}
-                  userToFollow={appProps.userToFollow?.socketId || null}
-                  currentUserControls={currentUserControls}
-                />
+        <div className="exc-region-columns">
+          <div className="exc-region-column-left">
+            <div className="exc-region-top-left">{renderCanvasActions()}</div>
+            <div className="exc-region-center-left">
+              {defaultUIEnabled && (
+                <div
+                  className={clsx("selected-shape-actions-container", {
+                    "selected-shape-actions-container--compact":
+                      isCompactStylesPanel,
+                  })}
+                >
+                  {shouldRenderSelectedShapeActions &&
+                    renderSelectedShapeActions()}
+                </div>
               )}
-              <div className="exc-region-top-right-host-slot">
-                {renderTopRightUI?.(
-                  editorInterface.formFactor === "phone",
-                  appState,
-                )}
-              </div>
-              {!appState.viewModeEnabled &&
-                appState.openDialog?.name !== "elementLinkSelector" &&
-                // hide button when sidebar docked
-                (!isSidebarDocked ||
-                  appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
-                  <tunnels.DefaultSidebarTriggerTunnel.Out />
+              {/* in compact UI the pen mode button lives outside the toolbar, as
+                  a separate floating button below the compact actions menu
+                  (same as we render it on mobile); shown alongside the compact
+                  actions island, i.e. when a drawing tool or elements are
+                  selected */}
+              {defaultUIEnabled &&
+                isCompactStylesPanel &&
+                !appState.viewModeEnabled &&
+                shouldRenderSelectedShapeActions && (
+                  <PenModeButton
+                    checked={appState.penMode}
+                    onChange={() => onPenModeToggle(null)}
+                    title={t("toolBar.penMode")}
+                    isMobile
+                    penDetected={appState.penDetected}
+                  />
                 )}
             </div>
           </div>
-
-          <div className="exc-region-center-left">
-            {defaultUIEnabled && (
-              <div
-                className={clsx("selected-shape-actions-container", {
-                  "selected-shape-actions-container--compact":
-                    isCompactStylesPanel,
-                })}
-              >
-                {shouldRenderSelectedShapeActions &&
-                  renderSelectedShapeActions()}
+          <div className="exc-region-column-center">
+            <div className="exc-region-top-center">
+              {shouldRenderToolbar && (
+                <Section heading="shapes">
+                  {(heading: React.ReactNode) => (
+                    <div style={{ position: "relative" }}>
+                      {renderWelcomeScreen && (
+                        <tunnels.WelcomeScreenToolbarHintTunnel.Out />
+                      )}
+                      <Stack.Col gap={spacing.toolbarColGap} align="start">
+                        <Stack.Row
+                          gap={spacing.toolbarRowGap}
+                          className={clsx("App-toolbar-container", {
+                            "zen-mode": appState.zenModeEnabled,
+                          })}
+                        >
+                          <Toolbar
+                            app={app}
+                            appState={appState}
+                            setAppState={setAppState}
+                            UIOptions={UIOptions}
+                            onPenModeToggle={onPenModeToggle}
+                            onLockToggle={onLockToggle}
+                            heading={heading}
+                          />
+                          {isCollaborating && (
+                            <Island
+                              style={{
+                                marginLeft: spacing.collabMarginLeft,
+                                alignSelf: "center",
+                                height: "fit-content",
+                              }}
+                            >
+                              <LaserPointerButton
+                                title={t("toolBar.laser")}
+                                checked={
+                                  appState.activeTool.type === TOOL_TYPE.laser
+                                }
+                                onChange={() =>
+                                  app.setActiveTool({ type: TOOL_TYPE.laser })
+                                }
+                                isMobile
+                              />
+                            </Island>
+                          )}
+                        </Stack.Row>
+                      </Stack.Col>
+                    </div>
+                  )}
+                </Section>
+              )}
+            </div>
+          </div>
+          <div className="exc-region-column-right">
+            <div
+              className={clsx("exc-region-top-right zen-mode-transition", {
+                "transition-right": appState.zenModeEnabled,
+                "exc-region-top-right--compact": isCompactStylesPanel,
+              })}
+            >
+              <div className="exc-region-top-right-content">
+                {defaultUIEnabled && appState.collaborators.size > 0 && (
+                  <UserList
+                    collaborators={appState.collaborators}
+                    userToFollow={appProps.userToFollow?.socketId || null}
+                    currentUserControls={currentUserControls}
+                  />
+                )}
+                <div className="exc-region-top-right-host-slot">
+                  {renderTopRightUI?.(
+                    editorInterface.formFactor === "phone",
+                    appState,
+                  )}
+                </div>
+                {!appState.viewModeEnabled &&
+                  appState.openDialog?.name !== "elementLinkSelector" &&
+                  // hide button when sidebar docked
+                  (!isSidebarDocked ||
+                    appState.openSidebar?.name !== DEFAULT_SIDEBAR.name) && (
+                    <tunnels.DefaultSidebarTriggerTunnel.Out />
+                  )}
               </div>
-            )}
-            {/* in compact UI the pen mode button lives outside the toolbar, as
-                a separate floating button below the compact actions menu
-                (same as we render it on mobile); shown alongside the compact
-                actions island, i.e. when a drawing tool or elements are
-                selected */}
-            {defaultUIEnabled &&
-              isCompactStylesPanel &&
-              !appState.viewModeEnabled &&
-              shouldRenderSelectedShapeActions && (
-                <PenModeButton
-                  checked={appState.penMode}
-                  onChange={() => onPenModeToggle(null)}
-                  title={t("toolBar.penMode")}
-                  isMobile
-                  penDetected={appState.penDetected}
+            </div>
+            <div className="exc-region-center-right">
+              {shouldShowStats && (
+                <Stats
+                  app={app}
+                  onClose={() => {
+                    actionManager.executeAction(actionToggleStats);
+                  }}
+                  renderCustomStats={renderCustomStats}
                 />
               )}
-          </div>
-          {/* reserved for canvas-centered UI (host content, empty states) */}
-          <div className="exc-region-center-center" />
-          <div className="exc-region-center-right">
-            {shouldShowStats && (
-              <Stats
-                app={app}
-                onClose={() => {
-                  actionManager.executeAction(actionToggleStats);
-                }}
-                renderCustomStats={renderCustomStats}
-              />
-            )}
+            </div>
           </div>
         </div>
 

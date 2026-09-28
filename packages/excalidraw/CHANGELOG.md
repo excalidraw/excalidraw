@@ -91,18 +91,19 @@ Breaking. `exportToCanvas`, `exportToBlob` and `exportToSvg` (in both `@excalidr
 
 ### UI layout regions (2026-07-27)
 
-The editor UI is now laid out as a grid of nine logical regions, replacing the top bar (`FixedSideContainer` > `.App-menu_top`) plus absolutely-positioned footer:
+The editor UI is now laid out in 3×3 logical regions (the middle of the canvas has none), replacing the top bar (`FixedSideContainer` > `.App-menu_top`) plus absolutely-positioned footer:
 
 ```
 .exc-regions
- |_ .exc-region-mesh
- |   |_ .exc-region-top-left     .exc-region-top-center     .exc-region-top-right
- |   |_ .exc-region-center-left  .exc-region-center-center  .exc-region-center-right
+ |_ .exc-region-columns
+ |   |_ .exc-region-column-left    |_ .exc-region-top-left      |_ .exc-region-center-left
+ |   |_ .exc-region-column-center  |_ .exc-region-top-center
+ |   |_ .exc-region-column-right   |_ .exc-region-top-right     |_ .exc-region-center-right
  |_ .exc-region-bottom
      |_ .exc-region-bottom-left  .exc-region-bottom-center  .exc-region-bottom-right
 ```
 
-Regions at the same height negotiate width with each other. The top row has three regimes as the editor narrows: with room to spare the toolbar is exactly viewport-centered between equal side tracks; once one side's content outgrows its share, that side pins to its content width and the toolbar shifts aside, making exactly enough room (e.g. tablet portrait while collaborating); and when nothing fits, the top row overflows to the right and is clipped at the editor edge — content never slides under its neighbors. The collaborator list is the one flexible piece: it takes whatever width is left in the top-right cluster and collapses avatars into a "+N" pill as that space shrinks. Regions in the same column stack independently of the other columns — the styles panel hangs right below the top-left UI regardless of how far the toolbar or a tall top-right UI reach down, while the stats panel clears the top-left/top-right UI (but not the top-center toolbar). The footer band (`.exc-region-bottom`) is a separate sibling grid of the top/center mesh: nothing in the footer can displace the toolbar, an overflowing top row cannot push the footer or the toast past the editor edge, and its flexible center track prevents the footer regions from overlapping. Regions stretch to their cell(s) and stay `pointer-events: none`, with only their content interactive.
+Regions at the same height negotiate width with each other. The top row has three regimes as the editor narrows: with room to spare the toolbar is exactly viewport-centered between equal side tracks; once one side's content outgrows its share, that side pins to its content width and the toolbar shifts aside, making exactly enough room (e.g. tablet portrait while collaborating); and when nothing fits, the top row overflows to the right and is clipped at the editor edge — content never slides under its neighbors. The collaborator list is the one flexible piece: it takes whatever width is left in the top-right cluster and collapses avatars into a "+N" pill as that space shrinks. The top and center regions stack in three columns, so each center region hangs right below the top region of its own column — the styles panel below the top-left UI, the stats panel below the top-right UI — regardless of how far the toolbar or the other side reach down. Only the top regions size the columns: the center regions never widen their column or offset the toolbar. The footer band (`.exc-region-bottom`) is a separate sibling grid of the columns: nothing in the footer can displace the toolbar, an overflowing top row cannot push the footer or the toast past the editor edge, and its flexible center track prevents the footer regions from overlapping. Regions stretch across their column or cell and stay `pointer-events: none`, with only their content interactive.
 
 #### Breaking changes
 
@@ -119,7 +120,7 @@ If you style or query the editor DOM:
 
 - The styles panel is bounded by its region — from below the top-left UI down to the footer band — and scrolls past it, instead of the hardcoded `height - 166px` max-height. Its default position is unchanged; it no longer shifts down when a host renders a tall top-right UI, and it is correctly bounded when the top-left UI is taller than the default menu button.
 - The styles panel's width no longer depends on the top-left UI's width — a wide `renderTopLeftUI` (e.g. a scene-name field) previously stretched the shared left column, inflating the panel's container and swallowing canvas clicks next to it.
-- The stats panel starts below the top-right UI (default position unchanged in full mode; in compact mode it aligns with the styles panel, 8px higher than before), so tall host UI in the top-right region pushes it down instead of overlapping it — while the toolbar's height doesn't affect it. (A top-left UI taller than the top-right also pushes it down, by design.)
+- The stats panel starts below the top-right UI (default position unchanged in full mode; in compact mode it aligns with the styles panel, 8px higher than before), so tall host UI in the top-right region pushes it down instead of overlapping it — while the toolbar's height and the top-left UI don't affect it.
 - In compact mode, the pen-mode button centers over the styles panel rather than over the top-left UI.
 - The toast, the scroll-back-to-content button, and the `ViewportStatusFrame` badge sit in a shared full-width overlay column, centered on the canvas rather than on the footer's asymmetric middle track, ending 0.5rem above the editor's bottom edge (plus the frame border when shown) — same as the post-#11841 UI.
 - With a docked sidebar, the UI area — and with it the `ViewportStatusFrame` border — now reaches the sidebar's visible edge instead of stopping 8px short of it (the sidebar's outer margin used to be a dead gap between the two). Right-aligned UI keeps its previous visual position.

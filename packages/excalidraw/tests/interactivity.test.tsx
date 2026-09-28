@@ -814,11 +814,11 @@ describe("ui={false} with host UI", () => {
     expect(
       topRightContent!.querySelector("[aria-label='host sidebar']"),
     ).not.toBe(null);
-    // top regions live in the mesh, the host footer in its sibling band
-    expect(hostTopLeft.closest(".exc-region-mesh")).not.toBe(null);
-    expect(hostTopRight.closest(".exc-region-mesh")).not.toBe(null);
+    // top regions live in the side columns, the host footer in its sibling band
+    expect(hostTopLeft.closest(".exc-region-column-left")).not.toBe(null);
+    expect(hostTopRight.closest(".exc-region-column-right")).not.toBe(null);
     const hostFooter = queryContainer("[data-testid='host-footer']")!;
-    expect(hostFooter.closest(".exc-region-mesh")).toBe(null);
+    expect(hostFooter.closest(".exc-region-columns")).toBe(null);
     expect(hostFooter.closest(".exc-region-bottom")).not.toBe(null);
 
     fireEvent.click(container.querySelector(".dropdown-menu-button")!);

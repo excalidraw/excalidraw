@@ -433,53 +433,54 @@ body.excalidraw-cursor-resize * {
   // ---------------------------------------------------------------------------
   // UI regions
   //
-  // The editor UI has 3×3 logical regions:
+  // The editor UI is laid out in 3×3 logical regions (the middle of the
+  // canvas has none):
   //
   //   .exc-region-top-left     .exc-region-top-center     .exc-region-top-right
-  //   .exc-region-center-left  .exc-region-center-center  .exc-region-center-right
+  //   .exc-region-center-left                             .exc-region-center-right
   //   .exc-region-bottom-left  .exc-region-bottom-center  .exc-region-bottom-right
   //
-  // `.exc-regions` is a two-row grid — `minmax(0, 1fr) auto` — of two
-  // children plus a floating status overlay:
+  // `.exc-regions` is a two-row grid — `minmax(0, 1fr) auto` — of:
   //
-  //   .exc-region-mesh    the top + center regions (3 COLUMNS × 4 ROWS)
-  //   .exc-region-bottom  the footer band (its own independent 3-column grid)
+  //   .exc-region-columns  the top + center regions, as three column stacks
+  //   .exc-region-bottom   the footer band (its own independent 3-column grid)
   //
   // The two are deliberately kept in SEPARATE grids:
   //   - vertically, the band reserves its own height in normal flow and the
-  //     mesh gets exactly the rest (`minmax(0,1fr)`), so center regions end
+  //     columns get exactly the rest (`minmax(0,1fr)`), so center regions end
   //     above the footer no matter how tall either side grows;
   //   - horizontally, they can't size each other's tracks — nothing in the
   //     footer can displace the toolbar, and an overflowing top row (regime 3
-  //     below) can't drag the footer or the status overlay past the editor
-  //     edge (the outer column is `minmax(0,1fr)`, so mesh overflow doesn't
-  //     widen it).
+  //     below) can't drag the footer past the editor edge (the outer column
+  //     is `minmax(0,1fr)`, so overflow of the columns doesn't widen it).
   //
-  // THE MESH (top + center regions)
-  // -------------------------------
-  // The extra rows let the center regions start right below whatever they
-  // need to clear, instead of all starting below the tallest thing in the
-  // top row (see "why 4 rows", below).
+  // THE COLUMNS (top + center regions)
+  // ----------------------------------
   //
-  //           c1                  c2                c3
-  //      minmax(auto,1fr)        auto         minmax(auto,1fr)
-  //       ┌─────────┬───────────────────────┬─────────┐
-  //  r1   │TOP-LEFT │                       │         │
-  //       ├─────────┤      TOP-CENTER       │TOP-RIGHT│
-  //  r2   │         │       (toolbar)       ├─────────┤
-  //       │ CENTER  │                       │         │
-  //  r3   │ -LEFT   ├───────────────────────┤ CENTER  │
-  //       │         │                       │ -RIGHT  │
-  //  r4   │         │     CENTER-CENTER     │         │
-  //       └─────────┴───────────────────────┴─────────┘
+  //      .exc-region-column-left  -center              -right
+  //       ┌─────────────┬───────────────────────┬─────────────┐
+  //       │  TOP-LEFT   │      TOP-CENTER       │  TOP-RIGHT  │
+  //       ├─────────────┤       (toolbar)       ├─────────────┤
+  //       │ CENTER-LEFT │                       │CENTER-RIGHT │
+  //       │  (styles)   │                       │   (stats)   │
+  //       └─────────────┴───────────────────────┴─────────────┘
+  //       minmax(auto,1fr)         auto          minmax(auto,1fr)
   //
-  // Column tracks:
-  //   c2     sized by the toolbar (the only region alone in c2)
-  //   c1/c3  floor at their own content's min-content, then split the
-  //          leftover space EQUALLY (same `1fr` flex factor)
+  // Each column is a vertical flex stack, so a center region starts right
+  // below the top region of ITS OWN column, and nothing else: a taller
+  // TOP-LEFT (e.g. a scene title) moves the styles panel down, a taller
+  // TOP-RIGHT (e.g. a call tray) moves the stats down, and the toolbar's
+  // height moves neither.
   //
-  // Those floors are what make the top row NEGOTIATE width. As the editor
-  // narrows there are three regimes:
+  // Column widths come from the top regions only: the center regions have
+  // `contain: inline-size`, so their content contributes nothing to their
+  // column's width. A styles panel wider than its column overflows toward
+  // the canvas instead of widening the column and offsetting the toolbar.
+  //
+  // The toolbar column is sized by the toolbar. The side columns floor at
+  // their top region's min-content, then split the leftover space EQUALLY
+  // (same `1fr` flex factor). Those floors are what make the top row
+  // NEGOTIATE width. As the editor narrows there are three regimes:
   //
   //   1. Plenty of space — both sides fit inside their equal share, so the
   //      toolbar is exactly viewport-centered even when TOP-LEFT and
@@ -494,81 +495,23 @@ body.excalidraw-cursor-resize * {
   //      `overflow: hidden`. Content never slides under its neighbors.
   //
   // Because the floors carry this negotiation, DO NOT set `min-width: 0`
-  // (or `overflow` other than `visible`) anywhere on a mesh region or its
+  // (or `overflow` other than `visible`) anywhere on a top region or its
   // content chain — a zero minimum removes that content from the
   // negotiation, and the toolbar will silently cover it. This includes the
   // host slots: they are intentionally rigid. The only shrinkable piece is
   // the user list, which collapses avatars into a "+N" pill (its pill-sized
   // `min-width` keeps it in the negotiation).
   //
-  // Row tracks (`auto auto auto minmax(0, 1fr)`):
-  //   r1  sized only by TOP-LEFT
-  //   r2  TOP-RIGHT's height, MINUS whatever r1 already covers
-  //   r3  the toolbar's height, MINUS whatever r1+r2 already cover
-  //   r4  everything left over
-  //
-  // WHY 4 ROWS (INSTEAD OF 3 NESTED COLUMNS)
-  // ------------------------------------------
-  // We could put each top/center pair in its own nested column. That would
-  // give each center region a fully independent vertical stack, but it would
-  // also make CENTER-RIGHT follow TOP-RIGHT only. We deliberately need an
-  // asymmetric cross-column dependency:
-  //
-  //   line 2 (CENTER-LEFT start)   = height(TOP-LEFT)
-  //   line 3 (CENTER-RIGHT start)  = max(TOP-LEFT, TOP-RIGHT)
-  //   line 4 (CENTER-CENTER start) = max(TOP-LEFT, TOP-RIGHT, TOP-CENTER)
-  //
-  // Thus stats clears both top-left and top-right, while styles clears only
-  // top-left. Neither side waits for a taller toolbar. Independent nested
-  // columns cannot express that shared `max(TOP-LEFT, TOP-RIGHT)` boundary;
-  // the ordered outer rows can.
-  //
-  // If we ever want to drop this constraint, we can reduce the columns to 3
-  // with independent nested grids.
-  // ------------------------------------------
-  //
-  // A grid track's size is set only by the items placed ENTIRELY inside it —
-  // an item that spans across other tracks has its size "absorbed" by
-  // whichever spanned track is still growable, instead of inflating the
-  // tracks it merely passes through. Rows 2 and 3 exist to use that rule on
-  // purpose, in two steps:
-  //
-  //   1. TOP-LEFT alone sizes r1 (nothing else is placed in r1 only).
-  //   2. TOP-RIGHT spans r1–r2. Since r1 is already fixed by TOP-LEFT,
-  //      the part of TOP-RIGHT that's TALLER than r1 spills into r2,
-  //      not affecting r1 height.
-  //   3. The toolbar (TOP-CENTER) spans r1–r3. Since r1+r2 are already
-  //      fixed, the part of the toolbar taller than r1+r2 spills into
-  //      r3, not affecting r1+r2 height.
-  //
-  // Each center region then starts on the row line that matches exactly what
-  // it needs to clear, and nothing else:
-  //   - CENTER-LEFT starts at line 2 (below TOP-LEFT only) — so it hangs
-  //     right below the menu, unmoved by the toolbar's height or a tall
-  //     host UI in TOP-RIGHT (e.g. a call tray).
-  //   - CENTER-RIGHT starts at line 3 (below the taller of TOP-LEFT and
-  //     TOP-RIGHT) — a tall call tray pushes it down; the toolbar does not.
-  //   - CENTER-CENTER starts at line 4 (below the whole top band).
-  //
-  // The result is intentional: a taller TOP-RIGHT moves stats but not styles;
-  // a taller TOP-LEFT moves both; and a taller TOP-CENTER moves neither.
-  //
   // OTHER RULES
   // ------------
-  //   - Gaps between tracks are 0. r2/r3 are 0px in the common case (nothing
-  //     needs the extra room), and any gap would double up whenever that
-  //     happens. Spacing between regions is done with margins on the
-  //     regions themselves instead.
-  //   - Outer region boxes overlap on purpose. Content is pushed into a corner
-  //     with `place-content`, and every region is `pointer-events: none`, with
-  //     only its content opting back in via the `--ui-pointerEvents` value.
-  //     Never set pointer events on a region directly — its box overlaps its
-  //     neighbors, so it would swallow clicks meant for the canvas or for
-  //     another region.
-  //   - When touching the mesh: TOP-LEFT / TOP-CENTER / TOP-RIGHT must
-  //     stay the only regions occupying a single column (c1 / c2 / c3
-  //     respectively) — every other mesh item must keep spanning across c2
-  //     (and usually r4 too), else its width would offset the toolbar.
+  //   - Region boxes stretch across their column and overlap empty canvas.
+  //     Content is pushed into a corner with `place-content`, and every
+  //     region is `pointer-events: none`, with only its content opting back
+  //     in via the `--ui-pointerEvents` value. Never set pointer events on a
+  //     region directly — it would swallow clicks meant for the canvas.
+  //   - New UI that may be wide belongs in a center region (or the footer
+  //     band), not in a top region, else its width negotiates with the
+  //     toolbar.
   // ---------------------------------------------------------------------------
 
   // the wrapper is flush with a docked sidebar's visible edge; keep the
@@ -588,13 +531,13 @@ body.excalidraw-cursor-resize * {
     padding-left: var(--sal, 0);
 
     display: grid;
-    // r1: the mesh (top + center regions) · r2: the footer band. The band
-    // reserves its height in-flow; the mesh gets the rest and can't grow
+    // r1: the columns (top + center regions) · r2: the footer band. The band
+    // reserves its height in-flow; the columns get the rest and can't grow
     // past it.
     grid-template-rows: minmax(0, 1fr) auto;
-    // single shared column with a ZERO minimum, so a mesh whose top row
-    // overflows (regime 3 above) can't widen the column — and thus can't
-    // drag the footer band or the status overlay past the editor edge
+    // single shared column with a ZERO minimum, so columns whose top row
+    // overflows (regime 3 above) can't widen it — and thus can't drag the
+    // footer band past the editor edge
     grid-template-columns: minmax(0, 1fr);
 
     color: var(--icon-fill-color);
@@ -602,31 +545,42 @@ body.excalidraw-cursor-resize * {
     pointer-events: none;
   }
 
-  .exc-region-mesh {
-    // NOTE: explicit column, so that grid auto-placement doesn't move us
-    // into an implicit second column to dodge the status overlay (which
-    // explicitly spans both rows of column 1 — overlap is intended)
-    grid-area: 1 / 1;
+  .exc-region-columns {
+    grid-row: 1;
     display: grid;
-    // c1/c3: equal flex factors so the leftover space (after the toolbar's
-    // c2) splits evenly — that's what keeps the toolbar centered — with
-    // `auto` minimums so each side's content FLOORS its column: the toolbar
-    // moves aside for it instead of covering it (see the doc above)
+    // side columns: equal flex factors so the leftover space (after the
+    // toolbar column) splits evenly — that's what keeps the toolbar centered
+    // — with `auto` minimums so each side's top region FLOORS its column:
+    // the toolbar moves aside for it instead of covering it
     grid-template-columns: minmax(auto, 1fr) auto minmax(auto, 1fr);
-    // r1: top-left anchor · r2: top-right overhang · r3: toolbar overhang ·
-    // r4: leftover
-    grid-template-rows: auto auto auto minmax(0, 1fr);
+    // clearance between the toolbar and the side columns
+    column-gap: 1rem;
     min-height: 0;
+    pointer-events: none;
+
+    @media (min-width: 1536px) {
+      column-gap: 3rem;
+    }
   }
 
-  // NOTE: no `min-width: 0` here — each region's content min-content is the
-  // floor of its mesh column, which is what keeps the toolbar from covering
-  // it (see the mesh doc above).
+  .exc-region-column-left,
+  .exc-region-column-center,
+  .exc-region-column-right {
+    display: flex;
+    flex-direction: column;
+    // gap between a top region and the center region below it
+    row-gap: var(--exc-regions-row-gap, 1rem);
+    min-height: 0;
+    pointer-events: none;
+  }
+
+  // NOTE: no `min-width: 0` here — a top region's min-content is the floor
+  // of its column, which is what keeps the toolbar from covering it (see the
+  // doc above).
   .exc-region-top-left,
   .exc-region-top-center,
   .exc-region-top-right,
   .exc-region-center-left,
-  .exc-region-center-center,
   .exc-region-center-right {
     display: grid;
     min-height: 0;
@@ -654,34 +608,29 @@ body.excalidraw-cursor-resize * {
   }
 
   // `place-content` (not `place-items`) anchors the content inside the region,
-  // so that the region itself can stretch to its cell(s)
+  // so that the region itself can stretch across its column
+  .exc-region-top-left,
+  .exc-region-top-center,
+  .exc-region-top-right {
+    flex: 0 0 auto;
+  }
+
   .exc-region-top-left {
-    grid-area: 1 / 1 / 2 / 2;
     grid-auto-flow: column;
     place-content: start start;
   }
 
-  // single-track on the column axis on purpose: a non-spanning item's
-  // min-content floors its track, so at narrow widths the toolbar pushes the
-  // top-right UI (row overflow) instead of sliding under its neighbors.
-  // (Making the toolbar itself respond to narrow containers is a separate,
-  // future change.)
+  // (Making the toolbar respond to a narrow container is a separate, future
+  // change — until then it keeps its intrinsic width, and in regime 3 it
+  // pushes the top-right UI past the editor edge.)
   .exc-region-top-center {
-    grid-area: 1 / 2 / 4 / 3;
     grid-auto-flow: column;
     place-content: start center;
-    // clearance from the top-left/top-right anchors (in place of column gaps)
-    margin-inline: 1rem;
-
-    @media (min-width: 1536px) {
-      margin-inline: 3rem;
-    }
   }
 
   .exc-region-top-right {
-    grid-area: 1 / 3 / 3 / 4;
     // single flexible track with an `auto` minimum: the content cluster
-    // stretches to whatever width the mesh column resolves to (so the
+    // stretches to whatever width the column resolves to (so the
     // collaborator list can use the leftover space), while the cluster's
     // min-content still floors the column
     grid-template-columns: minmax(auto, 1fr);
@@ -724,36 +673,33 @@ body.excalidraw-cursor-resize * {
     }
   }
 
-  .exc-region-center-left {
-    grid-area: 2 / 1 / 5 / 3;
-    place-content: start start;
+  // center regions hang below their column's top region, and may shrink (and
+  // scroll their panel) down to the footer band. `contain: inline-size`
+  // keeps their content out of the column-width negotiation (see the doc
+  // above).
+  .exc-region-center-left,
+  .exc-region-center-right {
+    flex: 0 1 auto;
+    contain: inline-size;
     row-gap: var(--exc-regions-row-gap, 1rem);
-    margin-top: var(--exc-regions-row-gap, 1rem);
     margin-bottom: 1rem;
   }
 
-  .exc-region-center-center {
-    grid-area: 4 / 2 / 5 / 3;
-    place-content: center center;
+  .exc-region-center-left {
+    place-content: start start;
   }
 
   .exc-region-center-right {
-    grid-area: 3 / 2 / 5 / 4;
     place-content: start end;
-    row-gap: var(--exc-regions-row-gap, 1rem);
-    margin-top: var(--exc-regions-row-gap, 1rem);
-    margin-bottom: 1rem;
   }
 
-  // The bottom band is a sibling of the mesh (not a mesh item), so none of
-  // its occupants can size the mesh columns and offset the toolbar — and an
-  // overflowing top row can't push the band past the editor edge. Its
-  // independent inner grid recreates the footer contract: natural-width
-  // editor controls on either side and a host slot that owns all remaining
-  // space between them.
+  // The bottom band is a sibling of the columns, so none of its occupants
+  // can size the columns and offset the toolbar — and an overflowing top row
+  // can't push the band past the editor edge. Its independent inner grid
+  // recreates the footer contract: natural-width editor controls on either
+  // side and a host slot that owns all remaining space between them.
   .exc-region-bottom {
-    // explicit column for the same reason as `.exc-region-mesh`
-    grid-area: 2 / 1;
+    grid-row: 2;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     min-width: 0;
@@ -784,20 +730,18 @@ body.excalidraw-cursor-resize * {
 
   // Status UI stays tied to the canvas center instead of the center track of
   // the inner footer grid, which shifts when the side controls have different
-  // widths. It deliberately overlays the bottom band just like the old
-  // absolutely positioned status stack.
+  // widths. It deliberately overlays the bottom band.
   .exc-regions > .floating-status-stack {
-    // note: spans BOTH outer rows (not just the band row) so its height gets
-    // absorbed by the flexible mesh row instead of expanding the band row,
-    // which is vertically centered.
-    grid-row: 1 / 3;
-    grid-column: 1;
-    place-self: end center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    // centers the stack when its max-width (see the base rule) kicks in
+    margin-inline: auto;
     // the stack (and thus the viewport-status badge at its bottom) sits
     // 0.5rem above the editor's bottom edge (plus the frame border when
-    // shown). The regions container is inset by --editor-container-padding,
-    // so this is a negative margin pulling the stack below its grid area.
-    margin-bottom: calc(
+    // shown). `.exc-regions` is inset by --editor-container-padding, which
+    // the offset undoes.
+    bottom: calc(
       0.5rem + var(--viewport-status-frame-border-width) -
         var(--editor-container-padding)
     );
