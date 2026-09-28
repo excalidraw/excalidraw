@@ -675,7 +675,7 @@
     "syntax": "Mermaid 語法",
     "preview": "預覽",
     "label": "Mermaid",
-    "inputPlaceholder": "在這裡編寫 Mermaid 定義...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "自動修正可用"
   },
   "ttd": {
