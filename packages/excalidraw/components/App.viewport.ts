@@ -482,26 +482,99 @@ export class AppViewport {
   };
 
   /**
-   * How far the sidebar reaches into the canvas, in screen px, from the
-   * right or (RTL) the left: the part of the canvas it covers. Zero when
-   * it's closed — or on phones, where it's an overlay that doesn't count as
-   * viewport UI.
+   * The side a named surface docks to while it's hidden, and how far it
+   * reaches into the canvas from it: as last measured, else approximately.
    */
-  getSidebarInsets = () => {
+  private getReservedSide = (
+    name: keyof NonNullable<ViewportOffsetsOptions["reserve"]>,
+  ) => {
+    const isRTL = getLanguage().rtl;
+    return (
+      this.uiLastMeasured.get(name) ??
+      (name === "stylesPanel"
+        ? {
+            side: isRTL ? ("right" as const) : ("left" as const),
+            offset:
+              this.dependencies.getStylesPanelMode() === "compact"
+                ? STYLES_PANEL_APPROX_WIDTH.compact
+                : STYLES_PANEL_APPROX_WIDTH.full,
+          }
+        : {
+            side: isRTL ? ("left" as const) : ("right" as const),
+            offset: RIGHT_SIDEBAR_WIDTH,
+          })
+    );
+  };
+
+  private querySideUI = (container: HTMLElement, name: ViewportUIName) =>
+    container.querySelector<HTMLElement>(
+      `[data-viewport-ui="side"][data-viewport-ui-name="${name}"]`,
+    );
+
+  /**
+   * Where a rendered side UI is, relative to the editor's container, in
+   * screen px; null when it isn't rendered.
+   */
+  getSideUIRect = (name: ViewportUIName) => {
+    const container = this.dependencies.getContainer();
+    const node = container && this.querySideUI(container, name);
+    if (!container || !node) {
+      return null;
+    }
+    const containerRect = container.getBoundingClientRect();
+    const rect = node.getBoundingClientRect();
+    return {
+      left: rect.left - containerRect.left,
+      right: rect.right - containerRect.left,
+      top: rect.top - containerRect.top,
+      bottom: rect.bottom - containerRect.top,
+    };
+  };
+
+  /**
+   * How far the named side UIs reach into the canvas, in screen px, from
+   * the left and the right: the part of the canvas they cover. Zero at a
+   * side none of them is rendered at — e.g. with the sidebar closed, or on
+   * phones, where it's an overlay that doesn't count as viewport UI — unless
+   * a hidden one is reserved (see `ViewportOffsetsOptions.reserve`).
+   */
+  getSideInsets = (
+    names: readonly ViewportUIName[],
+    opts?: Pick<ViewportOffsetsOptions, "reserve">,
+  ) => {
     const insets = { left: 0, right: 0 };
     const container = this.dependencies.getContainer();
-    const sidebar = container?.querySelector<HTMLElement>(
-      '[data-viewport-ui="side"][data-viewport-ui-name="sidebar"]',
-    );
-    if (container && sidebar) {
-      const { side, offset } = this.measureSide(
-        sidebar,
-        container.getBoundingClientRect(),
-      );
-      insets[side] = Math.max(0, offset);
+    if (!container) {
+      return insets;
+    }
+    const containerRect = container.getBoundingClientRect();
+    for (const name of names) {
+      const node = this.querySideUI(container, name);
+      let footprint: { side: "left" | "right"; offset: number } | null = null;
+      if (node) {
+        footprint = this.measureSide(node, containerRect);
+        if (footprint.offset > 0) {
+          this.uiLastMeasured.set(name, footprint);
+        }
+      } else if (
+        name !== "stats" &&
+        opts?.reserve?.[name] &&
+        this.app.editorInterface.formFactor !== "phone"
+      ) {
+        footprint = this.getReservedSide(name);
+      }
+      if (footprint) {
+        insets[footprint.side] = Math.max(
+          insets[footprint.side],
+          footprint.offset,
+        );
+      }
     }
     return insets;
   };
+
+  /** How far the sidebar reaches into the canvas (see `getSideInsets`). */
+  getSidebarInsets = () => this.getSideInsets(["sidebar"]);
 
   /**
    * Resolves user-supplied viewport offsets into concrete per-side pixel
@@ -590,31 +663,11 @@ export class AppViewport {
     }
 
     if (opts?.reserve && this.app.editorInterface.formFactor !== "phone") {
-      const reserveSurface = (
-        name: ViewportUIName,
-        fallback: { side: "left" | "right"; offset: number },
-      ) => {
-        if (renderedSurfaces.has(name)) {
-          return;
+      for (const name of ["stylesPanel", "sidebar"] as const) {
+        if (opts.reserve[name] && !renderedSurfaces.has(name)) {
+          const { side, offset } = this.getReservedSide(name);
+          measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
         }
-        const { side, offset } = this.uiLastMeasured.get(name) ?? fallback;
-        measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
-      };
-
-      if (opts.reserve.stylesPanel) {
-        reserveSurface("stylesPanel", {
-          side: isRTL ? "right" : "left",
-          offset:
-            this.dependencies.getStylesPanelMode() === "compact"
-              ? STYLES_PANEL_APPROX_WIDTH.compact
-              : STYLES_PANEL_APPROX_WIDTH.full,
-        });
-      }
-      if (opts.reserve.sidebar) {
-        reserveSurface("sidebar", {
-          side: isRTL ? "left" : "right",
-          offset: RIGHT_SIDEBAR_WIDTH,
-        });
       }
     }
 

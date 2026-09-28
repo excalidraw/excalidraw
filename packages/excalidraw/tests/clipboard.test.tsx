@@ -6,6 +6,7 @@ import { getLineHeightInPx } from "@excalidraw/element";
 import {
   KEYS,
   TEXT_VIEWPORT_PADDING,
+  TEXT_MAX_WRAP_WIDTH,
   arrayToMap,
   getLineHeight,
 } from "@excalidraw/common";
@@ -215,10 +216,8 @@ describe("paste text as a single element", () => {
       width: 1000,
       zoom: { value: 8 as NormalizedZoomValue },
     });
-    // the view at 800%, less some room at each side: under the 200px a
-    // pasted text otherwise wraps at, at the least
+    // the view at 800%, less some room at each side
     const maxWidth = (1000 - 2 * TEXT_VIEWPORT_PADDING) / 8;
-    expect(maxWidth).toBeLessThan(200);
 
     pasteWithCtrlCmdShiftV(
       "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
@@ -230,8 +229,138 @@ describe("paste text as a single element", () => {
     expect(text.autoResize).toBe(false);
     expect(text.width).toBeLessThanOrEqual(maxWidth);
   });
-  it("should bring a pasted text that wraps into view", async () => {
+  it("should wrap a pasted text as a typed one: at TEXT_MAX_WRAP_WIDTH, clear of the full styles panel", async () => {
+    unmountComponent();
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        UIOptions={{ getFormFactor: () => "desktop" }}
+      />,
+    );
+    API.setAppState({ width: 1000 });
+    // nothing's selected: the panel shows only once the text is in
+    expect(
+      document.querySelector('[data-viewport-ui-name="stylesPanel"]'),
+    ).toBe(null);
+
+    pasteWithCtrlCmdShiftV(
+      "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+    );
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(1);
+    });
+    const text = h.elements[0] as ExcalidrawTextElement;
+    expect(text.autoResize).toBe(false);
+    // not at half the view…
+    expect(text.width).toBeGreaterThan(1000 / 2);
+    // …but the view less the panel's room (216, approximately, while never
+    // shown) and some room at each side
+    expect(text.width).toBeLessThanOrEqual(
+      Math.min(1000 - 216 - 2 * TEXT_VIEWPORT_PADDING, TEXT_MAX_WRAP_WIDTH),
+    );
+  });
+  describe("next to the stats panel (desktop)", () => {
+    const { getBoundingClientRect } = HTMLElement.prototype;
+    /** the stats panel's bottom: it grows to show a selection's properties */
+    let getStatsBottom = () => 200;
+
+    beforeEach(async () => {
+      unmountComponent();
+      await render(
+        <Excalidraw
+          autoFocus={true}
+          handleKeyboardGlobally={true}
+          UIOptions={{ getFormFactor: () => "desktop" }}
+        />,
+      );
+      API.setAppState({
+        width: 1000,
+        height: 800,
+        stats: { ...h.state.stats, open: true },
+      });
+      // the styles panel up to 216px, the stats panel from 700px
+      getStatsBottom = () => 200;
+      HTMLElement.prototype.getBoundingClientRect = function (
+        this: HTMLElement,
+      ) {
+        switch (this.dataset.viewportUiName) {
+          case "stylesPanel":
+            return {
+              left: 16,
+              right: 216,
+              width: 200,
+              top: 0,
+              bottom: 400,
+            } as DOMRect;
+          case "stats":
+            return {
+              left: 700,
+              right: 904,
+              width: 204,
+              top: 0,
+              bottom: getStatsBottom(),
+            } as DOMRect;
+        }
+        return getBoundingClientRect.call(this);
+      };
+    });
+
+    afterEach(() => {
+      HTMLElement.prototype.getBoundingClientRect = getBoundingClientRect;
+    });
+
+    const pasteAt = async (y: number) => {
+      API.setSelectedElements([]);
+      h.app.viewport.lastPosition.x = 500;
+      h.app.viewport.lastPosition.y = y;
+      const count = h.elements.length;
+      pasteWithCtrlCmdShiftV(
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+      );
+      await waitFor(() => {
+        expect(h.elements.length).toEqual(count + 1);
+      });
+      return h.elements[count] as ExcalidrawTextElement;
+    };
+    const getRight = (text: ExcalidrawTextElement) =>
+      (text.x + text.width + h.state.scrollX) * h.state.zoom.value;
+    // the view less the styles panel's room, and some room at each side
+    const maxWidth = 1000 - 216 - 2 * TEXT_VIEWPORT_PADDING;
+    // and the stats panel's
+    const maxWidthBesideStats = maxWidth - (1000 - 700);
+
+    it("should keep a pasted text clear of the stats panel only where it lands beside it", async () => {
+      // below it, it's wrapped past it
+      let text = await pasteAt(600);
+      expect(text.width).toBeGreaterThan(maxWidthBesideStats);
+      expect(text.width).toBeLessThanOrEqual(maxWidth);
+
+      // beside it, it's wrapped, and moved, clear of it
+      text = await pasteAt(100);
+      expect(text.width).toBeLessThanOrEqual(maxWidthBesideStats);
+      expect(getRight(text)).toBeLessThanOrEqual(
+        700 - TEXT_VIEWPORT_PADDING + 0.01,
+      );
+    });
+
+    it("should keep a pasted text clear of the stats panel grown to show it, as one step", async () => {
+      getStatsBottom = () =>
+        Object.keys(h.state.selectedElementIds).length ? 500 : 200;
+      const undoSteps = h.history.undoStack.length;
+
+      // below it as it is before the paste, beside it as it is after
+      const text = await pasteAt(350);
+      expect(text.width).toBeLessThanOrEqual(maxWidthBesideStats);
+      expect(getRight(text)).toBeLessThanOrEqual(
+        700 - TEXT_VIEWPORT_PADDING + 0.01,
+      );
+      expect(h.history.undoStack.length).toBe(undoSteps + 1);
+    });
+  });
+  it("should move a pasted text that wraps into view, not the view", async () => {
     API.setAppState({ width: 1000, height: 800 });
+    const { scrollX, scrollY } = h.state;
     // pasted at the pointer, near the bottom-right corner
     h.app.viewport.lastPosition.x = 950;
     h.app.viewport.lastPosition.y = 780;
@@ -244,8 +373,9 @@ describe("paste text as a single element", () => {
     });
     const text = h.elements[0] as ExcalidrawTextElement;
     expect(text.autoResize).toBe(false);
+    expect(h.state.scrollX).toBe(scrollX);
+    expect(h.state.scrollY).toBe(scrollY);
     // all of it within the view, with room at each side
-    const { scrollX, scrollY } = h.state;
     const zoom = h.state.zoom.value;
     expect((text.x + scrollX) * zoom).toBeGreaterThanOrEqual(
       TEXT_VIEWPORT_PADDING - 0.01,

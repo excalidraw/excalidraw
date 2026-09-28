@@ -19,6 +19,7 @@ import {
   VERTICAL_ALIGN,
   applyDarkModeFilter,
   TEXT_VIEWPORT_PADDING,
+  TEXT_MAX_WRAP_WIDTH,
 } from "@excalidraw/common";
 
 import type {
@@ -1075,6 +1076,135 @@ describe("textWysiwyg", () => {
         (800 - 300 - 2 * TEXT_VIEWPORT_PADDING) / 2,
       );
       sidebar.remove();
+    });
+
+    it.each([0.5, 2])(
+      "should stop a growing text at TEXT_MAX_WRAP_WIDTH at any zoom, however wide the view (zoom %s)",
+      (zoom) => {
+        API.setAppState({
+          width: 2000,
+          zoom: { value: zoom as typeof h.state.zoom.value },
+        });
+
+        updateTextEditor(
+          textarea,
+          "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+        );
+        const text = h.elements[0] as ExcalidrawTextElement;
+        expect(text.autoResize).toBe(false);
+        // in scene units: at 200%, the view would allow 980
+        expect(text.width).toBe(TEXT_MAX_WRAP_WIDTH);
+      },
+    );
+
+    describe("next to the side panels (desktop)", () => {
+      beforeEach(async () => {
+        // the 800x400 view is a phone's: make it a desktop's instead
+        unmountComponent();
+        await render(
+          <Excalidraw
+            handleKeyboardGlobally={true}
+            UIOptions={{ getFormFactor: () => "desktop" }}
+          />,
+        );
+        API.setAppState({ stats: { ...h.state.stats, open: true } });
+      });
+
+      const long =
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+
+      /**
+       * Types `text` as a new text started at (x, y), with the styles panel
+       * at the view's left, up to 216px, and the stats panel from 500px,
+       * over the view's top `statsHeight`.
+       */
+      const typeAt = async (
+        x: number,
+        y: number,
+        text: string,
+        statsHeight = 400,
+      ) => {
+        UI.clickTool("text");
+        mouse.clickAt(x, y);
+        textarea = await getTextEditor();
+        const panel = (name: string) =>
+          document.querySelector<HTMLElement>(
+            `[data-viewport-ui="side"][data-viewport-ui-name="${name}"]`,
+          )!;
+        panel("stylesPanel").getBoundingClientRect = domRect(16, 200);
+        panel("stats").getBoundingClientRect = () =>
+          ({
+            ...domRect(500, 204)(),
+            height: statsHeight,
+            bottom: statsHeight,
+          } as DOMRect);
+        updateTextEditor(textarea, text);
+        // the canvas follows the caret once the update's in the app's state
+        await act(() => new Promise((resolve) => setTimeout(resolve)));
+        return h.app.scene.getElement(
+          h.state.editingTextElement!.id,
+        ) as ExcalidrawTextElement;
+      };
+
+      it("should keep a text being edited clear of the full styles panel and the stats panel", async () => {
+        // starts under the styles panel's right edge
+        const text = await typeAt(100, 300, long);
+        expect(text.autoResize).toBe(false);
+        // it wraps at the canvas between the panels, less the room, and is
+        // brought in between them
+        expect(text.width).toBe(500 - 216 - 2 * TEXT_VIEWPORT_PADDING);
+        expect(text.x + h.state.scrollX).toBeCloseTo(
+          216 + TEXT_VIEWPORT_PADDING,
+        );
+      });
+
+      it("should keep a text being edited clear of the stats panel only beside it", async () => {
+        // below it, the text runs on past it
+        let text = await typeAt(236, 300, long, 200);
+        expect(text.width).toBe(800 - 216 - 2 * TEXT_VIEWPORT_PADDING);
+        Keyboard.exitTextEditor(textarea);
+
+        text = await typeAt(236, 100, long, 200);
+        expect(text.width).toBe(500 - 216 - 2 * TEXT_VIEWPORT_PADDING);
+      });
+
+      it("should pan the canvas while typing only once the caret is under the stats panel", async () => {
+        // below it, the caret is in sight
+        let text = await typeAt(400, 300, "Excalidraw is", 200);
+        expect(text.x + text.width).toBeGreaterThan(500);
+        expect(h.state.scrollX).toBe(0);
+        Keyboard.exitTextEditor(textarea);
+
+        // under it, it's brought out, with some room to spare
+        text = await typeAt(400, 100, "Excalidraw is", 200);
+        expect(h.state.scrollX).toBeLessThan(0);
+        expect(
+          (text.x + text.width + h.state.scrollX) * h.state.zoom.value,
+        ).toBeCloseTo(500 - CARET_FOLLOW_PADDING);
+      });
+
+      it("should find the caret in a bidirectional line where the browser lays it out", async () => {
+        // "א abcdef", a paragraph of its own, goes right to left, as
+        // "abcdef א": the caret after the "f" is 60px in (not at the line's
+        // left edge, where it'd be if all of it went right to left, nor its
+        // right one, as the text's first paragraph goes), which jsdom can't
+        // lay out
+        const { getBoundingClientRect } = Range.prototype;
+        Range.prototype.getBoundingClientRect = function (this: Range) {
+          const isRTL =
+            this.startContainer.parentElement?.getAttribute("dir") === "rtl";
+          return { left: this.collapsed && isRTL ? 60 : 0 } as DOMRect;
+        };
+        try {
+          // from 450px, 80px long: its caret's under the stats panel
+          const text = await typeAt(450, 100, "hello\nא abcdef", 200);
+          expect(
+            (text.x + 60 + h.state.scrollX) * h.state.zoom.value,
+          ).toBeCloseTo(500 - CARET_FOLLOW_PADDING);
+        } finally {
+          Range.prototype.getBoundingClientRect = getBoundingClientRect;
+        }
+      });
     });
 
     it("should bring a text that starts wrapping into view, with room at its right edge", async () => {
