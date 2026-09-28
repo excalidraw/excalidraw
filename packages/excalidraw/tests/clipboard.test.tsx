@@ -643,7 +643,7 @@ describe("clipboard - pasting mermaid definition", () => {
                   strokeWidth: 2,
                   label: {
                     groupIds: [],
-                    text: "A",
+                    text: lines[lines.length - 1],
                     fontSize: 20,
                   },
                   link: null,
@@ -683,6 +683,21 @@ describe("clipboard - pasting mermaid definition", () => {
         expect.arrayContaining([
           expect.objectContaining({ type: "rectangle" }),
           expect.objectContaining({ type: "text", text: "A" }),
+        ]),
+      );
+    });
+  });
+
+  it("should convert html line breaks in labels to newlines", async () => {
+    const text = "flowchart TD\nA<br/>B";
+
+    pasteWithCtrlCmdV(text);
+    await waitFor(() => {
+      expect(h.elements.length).toEqual(2);
+      expect(h.elements).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ type: "rectangle" }),
+          expect.objectContaining({ type: "text", text: "A\nB" }),
         ]),
       );
     });
