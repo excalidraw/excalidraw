@@ -13,6 +13,7 @@ import {
 } from "@excalidraw/common";
 
 import { newElementWith } from "@excalidraw/element";
+import { CURRENT_SCHEMA_VERSION } from "@excalidraw/element";
 import * as sizeHelpers from "@excalidraw/element";
 
 import { getStickyNoteLayout } from "@excalidraw/element";
@@ -111,6 +112,29 @@ describe("restoreElements", () => {
     const restoredElement = restore.restoreElements([stickyNote], null)[0];
 
     expect(restoredElement.strokeColor).toBe(COLOR_PALETTE.black);
+  });
+
+  it("restores legacy (unversioned) elements through the migration pipeline", () => {
+    // element persisted before schema versioning existed
+    const legacyElement = {
+      type: "rectangle",
+      id: "legacy",
+      x: 0,
+      y: 0,
+    } as any as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([legacyElement], null);
+    expect(restored.id).toBe("legacy");
+    expect(restored.type).toBe("rectangle");
+  });
+
+  it("restores elements coming from a container at the current schema version", () => {
+    const element = API.createElement({ type: "rectangle" });
+
+    const [restored] = restore.restoreElements([element], null, {
+      schemaVersion: CURRENT_SCHEMA_VERSION,
+    });
+    expect(restored.id).toBe(element.id);
   });
 
   it("when imported data state is null it should return an empty array of elements", () => {

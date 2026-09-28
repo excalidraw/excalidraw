@@ -7,6 +7,7 @@ import {
 } from "@excalidraw/excalidraw/data/encryption";
 import { restoreElements } from "@excalidraw/excalidraw/data/restore";
 import { getSceneVersion } from "@excalidraw/element";
+import { CURRENT_SCHEMA_VERSION, getSchemaVersion } from "@excalidraw/element";
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
@@ -86,6 +87,7 @@ export const loadFirebaseStorage = async () => {
 
 type FirebaseStoredScene = {
   sceneVersion: number;
+  schemaVersion?: number;
   iv: Bytes;
   ciphertext: Bytes;
 };
@@ -179,6 +181,7 @@ const createFirebaseSceneDocument = async (
   const { ciphertext, iv } = await encryptElements(roomKey, elements);
   return {
     sceneVersion,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
     ciphertext: Bytes.fromUint8Array(new Uint8Array(ciphertext)),
     iv: Bytes.fromUint8Array(iv),
   } as FirebaseStoredScene;
@@ -216,7 +219,9 @@ export const saveToFirebase = async (
 
     const prevStoredScene = snapshot.data() as FirebaseStoredScene;
     const prevStoredElements = getSyncableElements(
-      restoreElements(await decryptElements(prevStoredScene, roomKey), null),
+      restoreElements(await decryptElements(prevStoredScene, roomKey), null, {
+        schemaVersion: getSchemaVersion(prevStoredScene),
+      }),
     );
     const reconciledElements = getSyncableElements(
       reconcileElements(
@@ -238,7 +243,9 @@ export const saveToFirebase = async (
   });
 
   const storedElements = getSyncableElements(
-    restoreElements(await decryptElements(storedScene, roomKey), null),
+    restoreElements(await decryptElements(storedScene, roomKey), null, {
+      schemaVersion: getSchemaVersion(storedScene),
+    }),
   );
 
   FirebaseSceneVersionCache.set(socket, storedElements);
@@ -261,6 +268,7 @@ export const loadFromFirebase = async (
   const elements = getSyncableElements(
     restoreElements(await decryptElements(storedScene, roomKey), null, {
       deleteInvisibleElements: true,
+      schemaVersion: getSchemaVersion(storedScene),
     }),
   );
 

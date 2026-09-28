@@ -3,6 +3,8 @@ import {
   getDefaultAppState,
 } from "@excalidraw/excalidraw/appState";
 
+import { getSchemaVersion } from "@excalidraw/element";
+
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
 
@@ -37,10 +39,14 @@ export const importUsernameFromLocalStorage = (): string | null => {
 export const importFromLocalStorage = () => {
   let savedElements = null;
   let savedState = null;
+  let savedSchemaVersion = null;
 
   try {
     savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
+    savedSchemaVersion = localStorage.getItem(
+      STORAGE_KEYS.LOCAL_STORAGE_SCHEMA_VERSION,
+    );
   } catch (error: any) {
     // Unable to access localStorage
     console.error(error);
@@ -53,6 +59,17 @@ export const importFromLocalStorage = () => {
     } catch (error: any) {
       console.error(error);
       // Do nothing because elements array is already empty
+    }
+  }
+
+  let schemaVersion: number | undefined;
+  if (savedSchemaVersion) {
+    try {
+      schemaVersion = getSchemaVersion({
+        schemaVersion: JSON.parse(savedSchemaVersion),
+      });
+    } catch (error: any) {
+      console.error(error);
     }
   }
 
@@ -70,7 +87,7 @@ export const importFromLocalStorage = () => {
       // Do nothing because appState is already null
     }
   }
-  return { elements, appState };
+  return { elements, appState, schemaVersion };
 };
 
 export const getElementsStorageSize = () => {

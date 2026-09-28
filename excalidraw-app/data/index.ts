@@ -10,6 +10,7 @@ import {
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
 import { isInvisiblySmallElement } from "@excalidraw/element";
 import { isInitializedImageElement } from "@excalidraw/element";
+import { getSchemaVersion } from "@excalidraw/element";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { bytesToHexString } from "@excalidraw/common";
 
@@ -84,12 +85,14 @@ export type SocketUpdateDataSource = {
     type: WS_SUBTYPES.INIT;
     payload: {
       elements: readonly OrderedExcalidrawElement[];
+      schemaVersion?: number;
     };
   };
   SCENE_UPDATE: {
     type: WS_SUBTYPES.UPDATE;
     payload: {
       elements: readonly OrderedExcalidrawElement[];
+      schemaVersion?: number;
     };
   };
   MOUSE_LOCATION: {
@@ -196,6 +199,7 @@ const legacy_decodeFromBackend = async ({
   return {
     elements: data.elements || null,
     appState: data.appState || null,
+    schemaVersion: getSchemaVersion(data),
   };
 };
 
@@ -226,6 +230,7 @@ export const importFromBackend = async (
       return {
         elements: data.elements || null,
         appState: data.appState || null,
+        schemaVersion: getSchemaVersion(data),
       };
     } catch (error: any) {
       console.warn(

@@ -2,6 +2,7 @@ import { CaptureUpdateAction } from "@excalidraw/excalidraw";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { encryptData } from "@excalidraw/excalidraw/data/encryption";
 import { newElementWith } from "@excalidraw/element";
+import { CURRENT_SCHEMA_VERSION } from "@excalidraw/element";
 import throttle from "lodash.throttle";
 
 import type { UserIdleState } from "@excalidraw/common";
@@ -167,6 +168,7 @@ class Portal {
       type: updateType,
       payload: {
         elements: syncableElements,
+        schemaVersion: CURRENT_SCHEMA_VERSION,
       },
     };
 
