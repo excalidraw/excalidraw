@@ -509,6 +509,9 @@ body.excalidraw-cursor-resize * {
   //     region is `pointer-events: none`, with only its content opting back
   //     in via the `--ui-pointerEvents` value. Never set pointer events on a
   //     region directly — it would swallow clicks meant for the canvas.
+  //   - Every region is `position: relative`, so absolutely positioned host
+  //     content (e.g. a call tray hanging below the top-right UI) anchors to
+  //     its own region rather than to the whole UI area.
   //   - New UI that may be wide belongs in a center region (or the footer
   //     band), not in a top region, else its width negotiates with the
   //     toolbar.
@@ -586,6 +589,7 @@ body.excalidraw-cursor-resize * {
   .exc-region-center-left,
   .exc-region-center-right {
     display: grid;
+    position: relative;
     min-height: 0;
     pointer-events: none;
 
@@ -601,6 +605,12 @@ body.excalidraw-cursor-resize * {
     display: grid;
     min-height: 0;
     pointer-events: none;
+  }
+
+  .exc-region-bottom-left,
+  .exc-region-bottom-center,
+  .exc-region-bottom-right {
+    position: relative;
   }
 
   .exc-region-bottom-left,
