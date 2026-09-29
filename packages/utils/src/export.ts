@@ -47,14 +47,23 @@ export const exportToCanvas = ({
   getDimensions,
   exportPadding,
   exportingFrame,
+  restoreElements: shouldRestoreElements = true,
 }: ExportOpts & {
   exportPadding?: number;
+  /**
+   * False for elements taken straight from a scene, which has already
+   * restored them, to skip copying every element on every export.
+   * appState is restored either way.
+   */
+  restoreElements?: boolean;
 }) => {
-  const restoredElements = getNonDeletedElements(
-    restoreElements(elements, null, {
-      deleteInvisibleElements: true,
-    }),
-  );
+  const restoredElements = shouldRestoreElements
+    ? getNonDeletedElements(
+        restoreElements(elements, null, {
+          deleteInvisibleElements: true,
+        }),
+      )
+    : elements;
   const restoredAppState = restoreAppState(appState, null);
 
   const { exportBackground, viewBackgroundColor } = restoredAppState;

@@ -31,6 +31,37 @@ describe("exportToCanvas", async () => {
     expect(canvas.width).toBe(200);
     expect(canvas.height).toBe(200);
   });
+
+  describe("restoreElements", () => {
+    const exportToCanvasSpy = vi.spyOn(
+      mockedSceneExportUtils,
+      "exportToCanvas",
+    );
+    afterEach(() => exportToCanvasSpy.mockClear());
+
+    it("exports copies of the elements by default", async () => {
+      const { elements } = diagramFactory();
+      await utils.exportToCanvas({ elements, files: null });
+      const [exported] = exportToCanvasSpy.mock.calls[0];
+      expect(exported).toHaveLength(elements.length);
+      exported.forEach((element, i) => expect(element).not.toBe(elements[i]));
+    });
+
+    it("exports the caller's own elements when false, and still restores appState", async () => {
+      const { elements } = diagramFactory();
+      await utils.exportToCanvas({
+        elements,
+        files: null,
+        appState: { viewBackgroundColor: "#123456" },
+        restoreElements: false,
+      });
+      const [exported, appState] = exportToCanvasSpy.mock.calls[0];
+      expect(exported).toBe(elements);
+      expect(appState.viewBackgroundColor).toBe("#123456");
+      expect(appState.exportBackground).toBe(true);
+      expect(appState.zoom.value).toBe(1);
+    });
+  });
 });
 
 describe("exportToBlob", async () => {
