@@ -11,6 +11,13 @@ RUN --mount=type=cache,target=/root/.cache/yarn \
 
 ARG NODE_ENV=production
 
+# Browser-reachable store URLs (baked into the Vite build). For the all-in-one
+# Docker image these must be localhost ports on the host, not Docker DNS names.
+ARG VITE_APP_BACKEND_V2_GET_URL
+ARG VITE_APP_BACKEND_V2_POST_URL
+ENV VITE_APP_BACKEND_V2_GET_URL=${VITE_APP_BACKEND_V2_GET_URL}
+ENV VITE_APP_BACKEND_V2_POST_URL=${VITE_APP_BACKEND_V2_POST_URL}
+
 RUN npm_config_target_arch=${TARGETARCH} yarn build:app:docker
 
 FROM nginx:stable-alpine-slim@sha256:2c605dbeab79a6b2a63340474fe58119d0ef95bdc4b1f41df0aa689659b3d13b
