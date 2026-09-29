@@ -1,5 +1,5 @@
 import { pointsOnBezierCurves, simplify } from "points-on-curve";
-import { getStroke, getStrokePoints } from "perfect-freehand";
+
 import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
@@ -44,6 +44,8 @@ import type {
   ElementShapes,
   SVGPathString,
 } from "@excalidraw/excalidraw/scene/types";
+
+import { getStroke, getStrokePoints } from "./perfectFreehand";
 
 import { elementWithCanvasCache } from "./renderElement";
 
