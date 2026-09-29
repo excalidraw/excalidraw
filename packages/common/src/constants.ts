@@ -364,7 +364,7 @@ export const SCROLL_TIMEOUT = 100;
 export const ZEN_MODE_TRANSITION_DURATION = 250;
 export const ZOOM_STEP = 0.1;
 export const MIN_ZOOM = 0.1;
-export const MAX_ZOOM = 30;
+export const MAX_ZOOM = 1_000_000;
 /** 100% zoom, for computations that have no editor zoom to go by */
 export const DEFAULT_ZOOM: AppState["zoom"] = Object.freeze({
   value: 1 as NormalizedZoomValue,
