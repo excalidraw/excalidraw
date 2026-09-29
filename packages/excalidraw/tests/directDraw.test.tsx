@@ -1,6 +1,6 @@
 import rough from "roughjs/bin/rough";
 
-import { Scene } from "@excalidraw/element";
+import { mutateElement, Scene } from "@excalidraw/element";
 import { pointFrom, type LocalPoint } from "@excalidraw/math";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
@@ -106,5 +106,25 @@ describe("on-screen rendering draws some elements directly", () => {
       4,
     );
     expect(drawImage).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("a freedraw stroke's Path2D", () => {
+  const filled = (element: NonDeletedExcalidrawElement) =>
+    draw(element, 1).fill.mock.calls[0][0];
+
+  it("is reused while the stroke is unchanged", () => {
+    const element = stroke();
+    const first = filled(element);
+    expect(filled(element)).toBe(first);
+  });
+
+  it("is rebuilt once the stroke changes", () => {
+    const element = stroke();
+    const first = filled(element);
+    mutateElement(element, new Map(), {
+      points: [...element.points, pointFrom<LocalPoint>(60, 10)],
+    });
+    expect(filled(element)).not.toBe(first);
   });
 });

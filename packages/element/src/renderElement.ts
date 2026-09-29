@@ -428,6 +428,27 @@ const strokeStickyNoteEdge = (
   context.restore();
 };
 
+// Building a Path2D parses the whole outline, and direct drawing does it for
+// every stroke on every frame. Keyed by the path text itself, so a stroke is
+// re-parsed exactly when its outline changes.
+const freedrawPath2DCache = new WeakMap<
+  ExcalidrawFreeDrawElement,
+  { path: string; path2D: Path2D }
+>();
+
+const getFreeDrawPath2D = (
+  element: ExcalidrawFreeDrawElement,
+  path: string,
+) => {
+  const cached = freedrawPath2DCache.get(element);
+  if (cached?.path === path) {
+    return cached.path2D;
+  }
+  const path2D = new Path2D(path);
+  freedrawPath2DCache.set(element, { path, path2D });
+  return path2D;
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
@@ -505,7 +526,7 @@ const drawElementOnCanvas = (
             element.strokeColor,
             renderConfig.theme === THEME.DARK,
           );
-          context.fill(new Path2D(shape));
+          context.fill(getFreeDrawPath2D(element, shape));
         } else {
           rc.draw(shape);
         }
