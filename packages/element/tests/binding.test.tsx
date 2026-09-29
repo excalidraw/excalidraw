@@ -8,9 +8,8 @@ import {
 
 import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
-import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
-
 import { actionWrapTextInContainer } from "@excalidraw/excalidraw/actions/actionBoundText";
+import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 
 import { Excalidraw, isLinearElement } from "@excalidraw/excalidraw";
 
@@ -1775,5 +1774,66 @@ describe("updateBoundElements with stale records", () => {
 
     expect(movePoints).not.toHaveBeenCalled();
     expect(arrow.endBinding?.elementId).toBe("b");
+  });
+});
+
+describe("grid mode binding near a rectangle corner", () => {
+  it("keeps the grid snap when the diagonal projection misses", () => {
+    const a = {
+      ...newElement({ type: "rectangle", x: 0, y: 0, width: 100, height: 100 }),
+      id: "a",
+    } as NonDeleted<ExcalidrawBindableElement>;
+    const b = {
+      ...newElement({
+        type: "rectangle",
+        x: 300,
+        y: 0,
+        width: 100,
+        height: 100,
+      }),
+      id: "b",
+    } as NonDeleted<ExcalidrawBindableElement>;
+    // bound to a, dragged to just above b's top side near its left corner:
+    // the line from a's focus point crosses b's diagonal inside the part
+    // trimmed off near the corner, so the diagonal projection misses
+    const points = [
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(237, -53),
+    ];
+    const arrow = {
+      ...newArrowElement({ type: "arrow", x: 106, y: 50, points }),
+      ...getSizeFromPoints(points),
+      id: "x",
+      startBinding: {
+        elementId: "a",
+        mode: "orbit",
+        fixedPoint: [1.06, 0.5001],
+      },
+    } as NonDeleted<ExcalidrawArrowElement>;
+    const elements = [a, b, arrow];
+
+    const { end } = getBindingStrategyForDraggingBindingElementEndpoints(
+      arrow,
+      new Map([[1, { point: points[1] }]]),
+      343,
+      -3,
+      arrayToMap(elements) as NonDeletedSceneElementsMap,
+      elements as Ordered<NonDeleted<ExcalidrawBindableElement>>[],
+      {
+        ...getDefaultAppState(),
+        width: 1000,
+        height: 1000,
+        offsetTop: 0,
+        offsetLeft: 0,
+        gridModeEnabled: true,
+        gridSize: 20 as NullableGridSize,
+      } as AppState,
+    );
+
+    // snapped to the grid line x = 340, one binding gap above the top side,
+    // instead of falling back to the raw pointer at (343, -3)
+    expect(end).toMatchObject({ mode: "orbit", element: b });
+    expect(end.focusPoint![0]).toBeCloseTo(340);
+    expect(end.focusPoint![1]).toBeCloseTo(-getBindingGap(b, arrow));
   });
 });

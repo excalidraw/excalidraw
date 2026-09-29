@@ -853,6 +853,21 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   }
 
   // Handle normal cases
+  const orbitPoint =
+    hit && !pointInElement && !opts?.angleLocked && appState.gridModeEnabled
+      ? snapBoundPointToGrid(
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          hit,
+          elementsMap,
+          appState.gridSize as NullableGridSize,
+          arrow,
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            startDragged ? 1 : -2,
+            elementsMap,
+          ),
+        )
+      : globalPoint;
   const current: BindingStrategy = hit
     ? pointInElement
       ? {
@@ -866,22 +881,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           focusPoint:
             projectFixedPointOntoDiagonal(
               arrow,
-              opts?.angleLocked
-                ? globalPoint
-                : appState.gridModeEnabled
-                ? snapBoundPointToGrid(
-                    pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-                    hit,
-                    elementsMap,
-                    appState.gridSize as NullableGridSize,
-                    arrow,
-                    LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                      arrow,
-                      startDragged ? 1 : -2,
-                      elementsMap,
-                    ),
-                  )
-                : globalPoint,
+              orbitPoint,
               hit,
               startDragged ? "start" : "end",
               elementsMap,
@@ -889,7 +889,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               appState.isMidpointSnappingEnabled &&
                 !opts?.angleLocked &&
                 !appState.gridModeEnabled,
-            ) || globalPoint,
+            ) || orbitPoint,
         }
     : { mode: null };
 
