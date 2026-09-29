@@ -1185,11 +1185,23 @@ export const toggleLinePolygonState = (
 //                         freedraw shape helper
 // -----------------------------------------------------------------------------
 
-// NOTE not cached (-> for SVG export)
+const freedrawSvgPathCache = new WeakMap<
+  ExcalidrawFreeDrawElement,
+  { version: number; path: SVGPathString }
+>();
+
+// Exports bypass ShapeCache, so the path gets its own cache. It depends only
+// on the element's own fields (colour and theme are applied when drawing).
 const getFreeDrawSvgPath = (element: ExcalidrawFreeDrawElement) => {
-  return getSvgPathFromStroke(
+  const cached = freedrawSvgPathCache.get(element);
+  if (cached?.version === element.version) {
+    return cached.path;
+  }
+  const path = getSvgPathFromStroke(
     getFreedrawOutlinePoints(element),
   ) as SVGPathString;
+  freedrawSvgPathCache.set(element, { version: element.version, path });
+  return path;
 };
 
 /**
