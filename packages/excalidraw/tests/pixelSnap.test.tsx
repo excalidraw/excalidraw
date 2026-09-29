@@ -57,13 +57,18 @@ describe("element pixel snap", () => {
   });
 
   it.each([
-    ["text", { type: "text" as const, text: "hello" }],
-    ["rectangle", { type: "rectangle" as const, width: 120, height: 60 }],
+    // above 1x, text is drawn directly instead of blitted
+    ["text", { type: "text" as const, text: "hello" }, [1, 0.73, 0.5]],
+    [
+      "rectangle",
+      { type: "rectangle" as const, width: 120, height: 60 },
+      [1, 1.5, 0.73, 2.2],
+    ],
   ])(
     "blits an unrotated %s on whole device pixels at any zoom",
-    async (_, props) => {
+    async (_, props, zooms) => {
       API.setElements([API.createElement({ x: 10.37, y: 20.61, ...props })]);
-      for (const zoom of [1, 1.5, 0.73, 2.2]) {
+      for (const zoom of zooms) {
         const blits = await renderAt(zoom, 3.3, -7.77);
         for (const blit of blits) {
           expect(distanceToWholePixel(blit)).toBeLessThan(1e-6);
@@ -106,7 +111,7 @@ describe("element pixel snap", () => {
     (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
     API.setAppState({
       shouldCacheIgnoreZoom: true,
-      zoom: { value: 1.5 as NormalizedZoomValue },
+      zoom: { value: 0.73 as NormalizedZoomValue },
       scrollX: 3.3,
       scrollY: -7.77,
     });
@@ -121,8 +126,9 @@ describe("element pixel snap", () => {
 
   it.each([
     // a plain fractional offset, and one that is exactly half a device pixel
-    // at 150% (51 scene units → 76.5), where the float noise of a drag used
-    // to flip the rounding between two neighbors
+    // at 50% (51 scene units → 25.5), where the float noise of a drag used
+    // to flip the rounding between two neighbors. Labels are blitted only
+    // at or below 1x.
     ["fractional", { box: [100.3, 100.3], label: [150.7, 140.2] }],
     ["half-pixel tie", { box: [10, 10], label: [61, 30] }],
   ])(
@@ -150,7 +156,7 @@ describe("element pixel snap", () => {
             containerId: "box",
           }),
         ]);
-        const blits = await renderAt(1.5, 3.3, -7.77);
+        const blits = await renderAt(0.5, 3.3, -7.77);
         expect(blits).toHaveLength(2);
         for (const blit of blits) {
           expect(distanceToWholePixel(blit)).toBeLessThan(1e-6);
@@ -177,7 +183,7 @@ describe("element pixel snap", () => {
     ]);
     (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
     API.setAppState({
-      zoom: { value: 1.5 as NormalizedZoomValue },
+      zoom: { value: 0.73 as NormalizedZoomValue },
       scrollX: 3.3,
       scrollY: -7.77,
     });
@@ -275,7 +281,7 @@ describe("element pixel snap", () => {
       containerId: box.id,
     });
     API.setElements([box, label]);
-    await renderAt(1.5, 3.3, -7.77);
+    await renderAt(0.5, 3.3, -7.77);
     const offsets = new Set<string>();
     for (const translation of [0, 0.3, 0.4, 0.7, 1.4]) {
       (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();

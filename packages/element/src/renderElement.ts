@@ -960,6 +960,25 @@ export const renderSelectionElement = (
   context.restore();
 };
 
+/** Above this zoom, text draws directly instead of from a cached bitmap. */
+const DIRECT_TEXT_ZOOM = 1;
+
+/**
+ * Whether an element skips its cached bitmap and draws straight onto the
+ * canvas, as the exporter does. The bitmaps are rebuilt whenever the zoom
+ * changes and grow with it (one handwritten word is megabytes zoomed in),
+ * and zoomed out over a full board they are thousands of new canvases.
+ * Freedraw and text draw the same either way. Rough fills and labelled
+ * arrows do not (the bitmap crops hatching to the shape, and clears the gap
+ * behind an arrow's label), so they keep their bitmaps.
+ */
+const shouldDrawDirectly = (
+  element: NonDeletedExcalidrawElement,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+) =>
+  element.type === "freedraw" ||
+  (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM);
+
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
   elementsMap: RenderableElementsMap,
@@ -980,6 +999,9 @@ export const renderElement = (
     !appState.selectedElementIds[element.id] &&
     !appState.hoveredElementIds[element.id];
 
+  const drawsDirectly =
+    renderConfig.isExporting || shouldDrawDirectly(element, appState);
+
   context.save();
   context.globalAlpha =
     renderState.opacity *
@@ -987,7 +1009,7 @@ export const renderElement = (
   // Cached bitmaps apply the offset before pixel snapping. Moving it into
   // the canvas transform first loses precision at half-device-pixel ties.
   if (
-    (renderConfig.isExporting || isFrameLikeElement(element)) &&
+    (drawsDirectly || isFrameLikeElement(element)) &&
     (renderState.offset.x || renderState.offset.y)
   ) {
     context.translate(renderState.offset.x, renderState.offset.y);
@@ -1002,6 +1024,7 @@ export const renderElement = (
       renderConfig,
       appState,
       renderState,
+      drawsDirectly,
     );
   } finally {
     context.restore();
@@ -1017,6 +1040,7 @@ const drawElement = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
   renderState: ElementRenderState,
+  drawsDirectly: boolean,
 ) => {
   switch (element.type) {
     case "magicframe":
@@ -1063,7 +1087,7 @@ const drawElement = (
       break;
     }
     case "freedraw": {
-      if (renderConfig.isExporting) {
+      if (drawsDirectly) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
         const cy = (y1 + y2) / 2 + appState.scrollY;
@@ -1108,7 +1132,7 @@ const drawElement = (
     case "text":
     case "iframe":
     case "embeddable": {
-      if (renderConfig.isExporting) {
+      if (drawsDirectly) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const centerX = (x1 + x2) / 2;
         const centerY = (y1 + y2) / 2;
