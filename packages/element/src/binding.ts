@@ -66,9 +66,9 @@ import {
   projectFixedPointOntoDiagonal,
 } from "./utils";
 
-import { isNonDeletedElement } from ".";
+import { Scene } from "./Scene";
 
-import type { Scene } from "./Scene";
+import { isNonDeletedElement } from ".";
 
 import type { ElementUpdate } from "./mutateElement";
 import type {
@@ -86,6 +86,7 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
   Ordered,
+  OrderedExcalidrawElement,
   PointsPositionUpdates,
 } from "./types";
 
@@ -1113,27 +1114,6 @@ export const bindOrUnbindBindingElements = (
 };
 
 /**
- * Records the arrow in the bind target's `boundElements` ledger, the container
- * side of a binding. Idempotent: an arrow already listed is left alone, so an
- * arrow bound to the same element at both ends is recorded once.
- */
-export const recordBoundElement = (
-  bindableElement: NonDeleted<ExcalidrawBindableElement>,
-  arrow: ExcalidrawArrowElement,
-  scene: Scene,
-): void => {
-  const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
-  if (!boundElementsMap.has(arrow.id)) {
-    scene.mutateElement(bindableElement, {
-      boundElements: (bindableElement.boundElements || []).concat({
-        id: arrow.id,
-        type: "arrow",
-      }),
-    });
-  }
-};
-
-/**
  * Writes a binding onto the arrow and records the arrow on the bind target,
  * keeping the two sides of the relationship in step.
  */
@@ -1148,7 +1128,15 @@ const applyBinding = (
     [startOrEnd === "start" ? "startBinding" : "endBinding"]: binding,
   });
 
-  recordBoundElement(bindableElement, arrow, scene);
+  const boundElementsMap = arrayToMap(bindableElement.boundElements || []);
+  if (!boundElementsMap.has(arrow.id)) {
+    scene.mutateElement(bindableElement, {
+      boundElements: (bindableElement.boundElements || []).concat({
+        id: arrow.id,
+        type: "arrow",
+      }),
+    });
+  }
 };
 
 export const bindBindingElement = (
@@ -2333,6 +2321,128 @@ export const fixDuplicatedBindingsAfterDuplication = (
   }
 };
 
+export const repairBindings = (
+  elements: readonly ExcalidrawElement[],
+): OrderedExcalidrawElement[] => {
+  const scene = new Scene(
+    elements.map((element) => ({ ...element })),
+    { skipValidation: true },
+  );
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const liveElements = scene.getNonDeletedElements();
+  const arrows = liveElements.filter(isArrowElement);
+  const update = (
+    element: ExcalidrawElement,
+    updates: ElementUpdate<ExcalidrawElement>,
+  ) => scene.mutateElement(element, updates);
+
+  // arrow side: drop bindings to non-bindable or missing targets, record the
+  // arrow on the remaining ones
+  for (const arrow of arrows) {
+    for (const bindingProp of ["startBinding", "endBinding"] as const) {
+      const binding = arrow[bindingProp];
+      const target = binding && elementsMap.get(binding.elementId);
+      if (target && !isBindableElement(target)) {
+        scene.mutateElement(arrow, { [bindingProp]: null });
+      }
+    }
+    BoundElement.rebindAffected(elementsMap, arrow, update);
+  }
+
+  // target side: drop duplicate records and those of elements that do not
+  // bind back
+  for (const element of liveElements) {
+    if (!isBindableElement(element) || !element.boundElements) {
+      continue;
+    }
+    const seen = new Set<ExcalidrawElement["id"]>();
+    const boundElements = element.boundElements.filter(({ id }) => {
+      if (seen.has(id)) {
+        return false;
+      }
+      seen.add(id);
+      const bound = elementsMap.get(id) ?? null;
+      return isArrowElement(bound)
+        ? bound.startBinding?.elementId === element.id ||
+            bound.endBinding?.elementId === element.id
+        : isTextElement(bound) && bound.containerId === element.id;
+    });
+    if (boundElements.length !== element.boundElements.length) {
+      update(element, { boundElements });
+    }
+  }
+
+  for (const arrow of arrows) {
+    for (const startOrEnd of ["start", "end"] as const) {
+      const binding = arrow[`${startOrEnd}Binding`];
+      const target = binding
+        ? elementsMap.get(binding.elementId) ?? null
+        : null;
+      if (!binding || !isBindableElement(target)) {
+        continue;
+      }
+
+      // complete bindings are kept (normalized), incomplete ones are
+      // re-derived from the current endpoint (elbow arrows only ever orbit)
+      const isValidMode = ["inside", "orbit", "skip"].includes(binding.mode);
+      if (
+        isFixedPoint(binding.fixedPoint) &&
+        (isElbowArrow(arrow) ? binding.mode === "orbit" : isValidMode)
+      ) {
+        const fixedPoint = normalizeFixedPoint(binding.fixedPoint);
+        if (
+          fixedPoint[0] !== binding.fixedPoint[0] ||
+          fixedPoint[1] !== binding.fixedPoint[1]
+        ) {
+          scene.mutateElement(arrow, {
+            [`${startOrEnd}Binding`]: { ...binding, fixedPoint },
+          });
+        }
+        continue;
+      }
+
+      const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      );
+      const mode = isValidMode
+        ? binding.mode
+        : !isElbowArrow(arrow) && isPointInElement(point, target, elementsMap)
+        ? "inside"
+        : "orbit";
+
+      bindBindingElement(arrow, target, mode, startOrEnd, scene, point);
+    }
+
+    // snap bound endpoints onto the target outline
+    const pointUpdates: PointsPositionUpdates = new Map();
+    for (const bindingProp of ["startBinding", "endBinding"] as const) {
+      const binding = arrow[bindingProp];
+      const target = binding
+        ? elementsMap.get(binding.elementId) ?? null
+        : null;
+      const point =
+        isBindableElement(target) &&
+        updateBoundPoint(arrow, bindingProp, binding, target, elementsMap);
+      if (point) {
+        pointUpdates.set(
+          bindingProp === "startBinding" ? 0 : arrow.points.length - 1,
+          { point },
+        );
+      }
+    }
+    if (isElbowArrow(arrow)) {
+      // an empty update re-routes the elbow arrow to its bindings
+      scene.mutateElement(arrow, {});
+    } else if (pointUpdates.size) {
+      LinearElementEditor.movePoints(arrow, scene, pointUpdates);
+    }
+  }
+
+  return scene.getElementsIncludingDeleted() as OrderedExcalidrawElement[];
+};
+
 export const fixBindingsAfterDeletion = (
   sceneElements: readonly ExcalidrawElement[],
   deletedElements: readonly ExcalidrawElement[],
@@ -2354,11 +2464,11 @@ const newBoundElements = (
   idsToRemove: Set<ExcalidrawElement["id"]>,
   elementsToAdd: Array<ExcalidrawElement> = [],
 ) => {
-  if (!boundElements) {
+  if (!boundElements && !elementsToAdd.length) {
     return null;
   }
 
-  const nextBoundElements = boundElements.filter(
+  const nextBoundElements = (boundElements ?? []).filter(
     (boundElement) => !idsToRemove.has(boundElement.id),
   );
 
