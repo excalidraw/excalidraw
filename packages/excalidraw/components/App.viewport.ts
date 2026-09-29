@@ -23,6 +23,7 @@ import type {
 
 import { getLanguage, t } from "../i18n";
 import { AnimationController } from "../renderer/animation";
+import { flightPath } from "../viewportFlight";
 import {
   constrainScrollState,
   DEFAULT_OVERSCROLL,
@@ -306,25 +307,63 @@ type AppViewportDependencies = {
   isGestureActive: () => boolean;
 };
 
-const resolveAnimationDuration = (
+/** A flight path's length (see {@link flightPath}) past which a move flies
+ * by default: a pan of about two views, or a zoom of about 17x. */
+const FLIGHT_MIN_LENGTH = 2;
+/** ms per unit of flight path length, clamped to the range below */
+const FLIGHT_MS_PER_LENGTH = 400;
+const FLIGHT_MIN_DURATION = 400;
+const FLIGHT_MAX_DURATION = 2500;
+
+const easeInOutCubic = (k: number) =>
+  k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+
+type ViewportAnimation = {
+  duration: number;
+  at: (progress: number) => Viewport;
+};
+
+const resolveAnimation = (
   animation: SetViewportOptions["animation"],
-): number | null => {
+  from: Viewport,
+  target: Viewport,
+  screen: { width: number; height: number },
+): ViewportAnimation | null => {
   if (animation === false) {
     return null;
   }
-  if (animation === true || animation == null) {
-    return DEFAULT_SCROLL_ANIMATION_DURATION;
+  const options = animation === true || animation == null ? {} : animation;
+  const flight = flightPath(from, target, screen);
+  const flies =
+    options.path === "flight" ||
+    (options.path == null && flight.length > FLIGHT_MIN_LENGTH);
+
+  if (flies) {
+    return {
+      duration:
+        options.duration ??
+        clamp(
+          flight.length * FLIGHT_MS_PER_LENGTH,
+          FLIGHT_MIN_DURATION,
+          FLIGHT_MAX_DURATION,
+        ),
+      // the path already moves at a constant perceived speed; easing both
+      // ends keeps the start and the landing from jolting
+      at: (progress) => flight.at(easeInOutCubic(progress)),
+    };
   }
-  return animation.duration ?? DEFAULT_SCROLL_ANIMATION_DURATION;
+  return {
+    duration: options.duration ?? DEFAULT_SCROLL_ANIMATION_DURATION,
+    at: (progress) =>
+      interpolateViewport({ from, target, factor: easeOut(progress) }),
+  };
 };
 
-/** Eases the viewport from its current position to `target` over `duration`,
- * driving the transition through the shared AnimationController so it doesn't
- * slow down other processes. */
+/** Moves the viewport along `animation` over its duration, driving the
+ * transition through the shared AnimationController so it doesn't slow down
+ * other processes. */
 const animateToViewport = (
-  from: Viewport,
-  target: Viewport,
-  duration: number,
+  { duration, at }: ViewportAnimation,
   onFrame: (
     state: Pick<
       AppState,
@@ -337,12 +376,11 @@ const animateToViewport = (
     SCROLL_TO_CONTENT_ANIMATION_KEY,
     ({ deltaTime, state }) => {
       const elapsed = (state?.elapsed ?? 0) + deltaTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const factor = easeOut(clamp(progress, 0, 1));
+      const progress = clamp(elapsed / duration, 0, 1);
 
       if (progress < 1) {
         onFrame({
-          ...interpolateViewport({ from, target, factor }),
+          ...at(progress),
           shouldCacheIgnoreZoom: true,
         });
         return { elapsed };
@@ -764,12 +802,17 @@ export class AppViewport {
       bounds,
       { fit, offsets, lock },
     );
-    const duration = resolveAnimationDuration(animation);
     const from = {
       scrollX: this.app.state.scrollX,
       scrollY: this.app.state.scrollY,
       zoom: this.app.state.zoom,
     };
+    const viewportAnimation = resolveAnimation(
+      animation,
+      from,
+      viewportUpdate,
+      this.app.state,
+    );
 
     // A new programmatic navigation supersedes the previous one and starts
     // from whatever viewport its last rendered frame reached.
@@ -777,7 +820,7 @@ export class AppViewport {
     AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
     this.snapBackDebounced.cancel();
 
-    if (duration === null) {
+    if (viewportAnimation === null) {
       this.app.setState({
         ...viewportUpdate,
         shouldCacheIgnoreZoom: false,
@@ -798,9 +841,7 @@ export class AppViewport {
     }
 
     animateToViewport(
-      from,
-      viewportUpdate,
-      duration,
+      viewportAnimation,
       (state) => {
         if (this.activeTransition === transition) {
           this.app.setState(state);

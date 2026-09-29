@@ -10,6 +10,7 @@ import { API } from "./helpers/api";
 import { act, render } from "./test-utils";
 
 import type { SocketId } from "../types";
+import type { SetViewportOptions } from "../viewport";
 
 const { h } = window;
 
@@ -407,5 +408,68 @@ describe("scale-down animated", () => {
     await waitForAnimationProgress();
     expect(h.state.scrollX).toBe(settledScrollX);
     expect(h.state.scrollY).toBe(settledScrollY);
+  });
+});
+
+describe("flight", () => {
+  const SLOW = 100_000;
+
+  beforeEach(async () => {
+    window.EXCALIDRAW_THROTTLE_RENDER = true;
+    await render(<Excalidraw />);
+    h.state.width = 1000;
+    h.state.height = 600;
+  });
+
+  afterEach(() => {
+    window.EXCALIDRAW_THROTTLE_RENDER = undefined;
+    AnimationController.reset();
+  });
+
+  const goTo = (x: number, animation: SetViewportOptions["animation"]) => {
+    const rect = API.createElement({ width: 100, height: 100, x, y: 250 });
+    API.setElements([rect]);
+    act(() => {
+      h.app.viewport.setViewport({ target: rect, fit: "none", animation });
+    });
+  };
+
+  it("zooms out on the way across a move of many views", async () => {
+    goTo(20_000, { duration: SLOW });
+    await waitForAnimationProgress();
+    expect(h.state.zoom.value).toBeLessThan(1);
+  });
+
+  it("keeps the zoom on a move shorter than a view", async () => {
+    goTo(700, { duration: SLOW });
+    await waitForAnimationProgress();
+    expect(h.state.scrollX).not.toBe(0);
+    expect(h.state.zoom.value).toBe(1);
+  });
+
+  it("flies a short move when asked to", async () => {
+    goTo(700, { duration: SLOW, path: "flight" });
+    await waitForAnimationProgress();
+    expect(h.state.zoom.value).toBeLessThan(1);
+  });
+
+  it("takes the direct path on a long move when asked to", async () => {
+    goTo(20_000, { duration: SLOW, path: "direct" });
+    await waitForAnimationProgress();
+    expect(h.state.zoom.value).toBe(1);
+  });
+
+  it("lands exactly where an unanimated move does", async () => {
+    goTo(20_000, false);
+    const expected = { scrollX: h.state.scrollX, scrollY: h.state.scrollY };
+    act(() => {
+      h.app.setState({ scrollX: 0, scrollY: 0 });
+    });
+    goTo(20_000, { duration: 10 });
+    await waitForAnimationToStop();
+    expect({ scrollX: h.state.scrollX, scrollY: h.state.scrollY }).toEqual(
+      expected,
+    );
+    expect(h.state.zoom.value).toBe(1);
   });
 });

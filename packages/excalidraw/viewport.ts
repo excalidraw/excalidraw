@@ -46,7 +46,18 @@ type ZoomOptions = {
 };
 
 export type AnimationOptions = {
+  /** in ms. Defaults to 500 on the direct path, and to one scaled by the
+   * distance on a flight. */
   duration?: number;
+  /**
+   * - `flight` - zoom out, pan and zoom back in (van Wijk and Nuij), so the
+   *   destination comes into view early instead of the scene streaking past
+   * - `direct` - blend straight from the current viewport to the target
+   *
+   * Defaults to `flight` for moves of more than about two views, `direct`
+   * otherwise.
+   */
+  path?: "flight" | "direct";
 };
 
 export type SetViewportRect = {
