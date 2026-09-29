@@ -11,6 +11,7 @@ import {
   MIME_TYPES,
   applyDarkModeFilter,
   isRTL,
+  hasRTLChars,
 } from "@excalidraw/common";
 import { pointFrom, pointRotateRads, type Radians } from "@excalidraw/math";
 
@@ -55,7 +56,7 @@ import type {
   ExcalidrawTextContainer,
 } from "@excalidraw/element/types";
 
-import { actionSaveToActiveFile } from "../actions";
+import { actionSaveFileToDisk, actionSaveToActiveFile } from "../actions";
 
 import {
   parseClipboard,
@@ -77,24 +78,29 @@ import type { ParsedDataTranferList } from "../clipboard";
 import type App from "../components/App";
 import type { AppState } from "../types";
 
+/**
+ * How much further than the browser's caret reveal the canvas pans, in
+ * screen px: text typed past the viewport's edge comes back with this much
+ * room to spare, instead of flush against the edge.
+ */
+export const CARET_FOLLOW_PADDING = 5;
+
+/**
+ * The editor is scaled and rotated about the text's center (its transform
+ * origin), as the canvas draws the text. The zoom puts that center at half
+ * the *scaled* size from the box's top-left, while the origin sits at half
+ * the unscaled size — the translate makes up the difference.
+ */
 const getTransform = (
   width: number,
   height: number,
   angle: number,
   appState: AppState,
-  maxWidth: number,
-  maxHeight: number,
 ) => {
   const { zoom } = appState;
   const degree = (180 * angle) / Math.PI;
-  let translateX = (width * (zoom.value - 1)) / 2;
-  let translateY = (height * (zoom.value - 1)) / 2;
-  if (width > maxWidth && zoom.value !== 1) {
-    translateX = (maxWidth * (zoom.value - 1)) / 2;
-  }
-  if (height > maxHeight && zoom.value !== 1) {
-    translateY = (maxHeight * (zoom.value - 1)) / 2;
-  }
+  const translateX = (width * (zoom.value - 1)) / 2;
+  const translateY = (height * (zoom.value - 1)) / 2;
   return `translate(${translateX}px, ${translateY}px) scale(${zoom.value}) rotate(${degree}deg)`;
 };
 
@@ -121,21 +127,27 @@ const getCaretBoundaryOffsets = (text: string) => {
   return offsets;
 };
 
-const getLineCaretOffsetFromNativeLayout = ({
-  text,
-  font,
-  lineHeightPx,
-  direction,
-  targetX,
-  ownerDocument,
-}: {
+type NativeLineLayout = {
   text: string;
   font: ReturnType<typeof getFontString>;
   lineHeightPx: number;
   direction: "ltr" | "rtl";
-  targetX: number;
   ownerDocument: Document;
-}) => {
+};
+
+/**
+ * Where the caret shows at each of `offsets` into a line of text, as the
+ * browser lays the line out, bidirectionally: the x of each (px, from the
+ * viewport's left), and of the line's left edge. Null where it can't tell.
+ */
+const measureNativeLineCaretPositions = ({
+  text,
+  font,
+  lineHeightPx,
+  direction,
+  ownerDocument,
+  offsets,
+}: NativeLineLayout & { offsets: readonly number[] }) => {
   if (
     !text ||
     !ownerDocument.body ||
@@ -144,7 +156,6 @@ const getLineCaretOffsetFromNativeLayout = ({
     return null;
   }
 
-  const offsets = getCaretBoundaryOffsets(text);
   const mirror = ownerDocument.createElement("div");
   const textNode = ownerDocument.createTextNode(text);
   const range = ownerDocument.createRange();
@@ -168,6 +179,8 @@ const getLineCaretOffsetFromNativeLayout = ({
   ownerDocument.body.append(mirror);
 
   try {
+    range.selectNodeContents(textNode);
+    const { left } = range.getBoundingClientRect();
     for (const offset of offsets) {
       range.setStart(textNode, offset);
       range.setEnd(textNode, offset);
@@ -179,10 +192,25 @@ const getLineCaretOffsetFromNativeLayout = ({
 
       positions.push(caretRect.left);
     }
+    return { left, positions };
   } catch {
     return null;
   } finally {
     mirror.remove();
+  }
+};
+
+const getLineCaretOffsetFromNativeLayout = ({
+  targetX,
+  ...layout
+}: NativeLineLayout & { targetX: number }) => {
+  const offsets = getCaretBoundaryOffsets(layout.text);
+  const positions = measureNativeLineCaretPositions({
+    ...layout,
+    offsets,
+  })?.positions;
+  if (!positions) {
+    return null;
   }
 
   const leftEdge = Math.min(...positions);
@@ -199,6 +227,22 @@ const getLineCaretOffsetFromNativeLayout = ({
   }
 
   return closestOffset;
+};
+
+/**
+ * Where the caret shows at `offset` into a line of text, as the browser lays
+ * the line out, bidirectionally: px from the line's left edge; null where it
+ * can't tell.
+ */
+const getLineCaretXFromNativeLayout = ({
+  offset,
+  ...layout
+}: NativeLineLayout & { offset: number }) => {
+  const measured = measureNativeLineCaretPositions({
+    ...layout,
+    offsets: [offset],
+  });
+  return measured ? measured.positions[0] - measured.left : null;
 };
 
 type SubmitHandler = () => void;
@@ -232,6 +276,28 @@ export const textWysiwyg = ({
 }): SubmitHandler => {
   const ownerDocument = excalidrawContainer?.ownerDocument ?? document;
   const ownerWindow = ownerDocument.defaultView ?? window;
+  // the editor's box: the part of the canvas a caret is revealed into (see
+  // onEditorBoxScroll)
+  const editorBox =
+    excalidrawContainer?.querySelector<HTMLDivElement>(
+      ".excalidraw-textEditorContainer",
+    ) ?? null;
+
+  /**
+   * Keeps the editor's box off the sidebar, so a caret behind the sidebar
+   * is outside the box and gets revealed like one past the viewport's edge.
+   * Returns the box's left inset, which the editor's position is relative
+   * to.
+   */
+  const updateEditorBoxInsets = () => {
+    if (!editorBox) {
+      return 0;
+    }
+    const { left, right } = app.viewport.getSidebarInsets();
+    editorBox.style.left = `${left}px`;
+    editorBox.style.right = `${right}px`;
+    return left;
+  };
   let currentTextLayout: {
     angle: Radians;
     font: ReturnType<typeof getFontString>;
@@ -292,7 +358,6 @@ export const textWysiwyg = ({
       // what is going to be used for unbounded text
       let height = updatedTextElement.height;
 
-      let maxWidth = updatedTextElement.width;
       let maxHeight = updatedTextElement.height;
 
       if (container && updatedTextElement.containerId) {
@@ -306,7 +371,6 @@ export const textWysiwyg = ({
           coordX = boundTextCoords.x;
           coordY = boundTextCoords.y;
         }
-        maxWidth = getBoundTextMaxWidth(container, updatedTextElement);
         maxHeight = getBoundTextMaxHeight(
           container,
           updatedTextElement as ExcalidrawTextElementWithContainer,
@@ -383,11 +447,12 @@ export const textWysiwyg = ({
         }
       }
       const [viewportX, viewportY] = getViewportCoords(coordX, coordY);
+      const angle = getTextElementAngle(updatedTextElement, container);
 
-      if (!container) {
-        maxWidth = (appState.width - 8 - viewportX) / appState.zoom.value;
-        width = Math.min(width, maxWidth);
-      } else {
+      // The editor box is the text's, never cut to the viewport: a caret past
+      // the viewport's edge is revealed by panning the canvas (see
+      // onEditorBoxScroll), and the editor stays on its text.
+      if (container) {
         width += 0.5;
       }
 
@@ -395,26 +460,36 @@ export const textWysiwyg = ({
       height *= 1.05;
 
       const font = getFontString(updatedTextElement);
-      const angle = getTextElementAngle(updatedTextElement, container);
+      const editorBoxLeft = updateEditorBoxInsets();
 
-      // Make sure text editor height doesn't go beyond viewport
-      const editorMaxHeight =
-        (appState.height - viewportY) / appState.zoom.value;
+      // a free text that stopped growing at the viewport's width (see
+      // AppText.getMaxTextWidth) wraps from then on, and so does its editor
+      if (
+        !updatedTextElement.autoResize &&
+        editable.style.whiteSpace !== "pre-wrap"
+      ) {
+        editable.style.whiteSpace = "pre-wrap";
+        editable.style.wordBreak = "break-word";
+      }
+
       Object.assign(editable.style, {
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
         width: `${width}px`,
         height: `${height}px`,
-        left: `${viewportX}px`,
+        left: `${viewportX - editorBoxLeft}px`,
         top: `${viewportY}px`,
+        // about the text's center, whatever size the box itself ends up
+        // (the 5% buffer) — see getTransform
+        transformOrigin: `${updatedTextElement.width / 2}px ${
+          updatedTextElement.height / 2
+        }px`,
         transform: getTransform(
-          width,
-          height,
+          updatedTextElement.width,
+          updatedTextElement.height,
           angle,
           appState,
-          maxWidth,
-          editorMaxHeight,
         ),
         textAlign,
         verticalAlign,
@@ -423,7 +498,6 @@ export const textWysiwyg = ({
           appState.theme === THEME.DARK,
         ),
         opacity: updatedTextElement.opacity / 100,
-        maxHeight: `${editorMaxHeight}px`,
       });
       currentTextLayout = {
         angle: angle as Radians,
@@ -541,6 +615,115 @@ export const textWysiwyg = ({
     return line.start + (lineCaretOffset || 0);
   };
 
+  /**
+   * Where the caret is on screen (see getViewportCoords), as the editor lays
+   * the text out: the bounds of its line-high stroke.
+   */
+  const getCaretViewportBounds = () => {
+    const layout = currentTextLayout;
+    if (!layout) {
+      return null;
+    }
+    const { value } = editable;
+    const caret =
+      editable.selectionDirection === "backward"
+        ? editable.selectionStart
+        : editable.selectionEnd;
+    const lines = getWrappedTextLines(
+      value,
+      layout.font,
+      editable.style.whiteSpace === "pre-wrap" ? layout.width : Infinity,
+    );
+    // the last line starting at or before it: at a soft break, the caret
+    // shows at the start of the next line
+    const lineIndex = Math.max(
+      0,
+      lines.findLastIndex((line) => line.start <= caret),
+    );
+    const line = lines[lineIndex];
+    const lineWidth = getLineWidth(line.text, layout.font);
+    const lineStartX =
+      layout.textAlign === "center"
+        ? (layout.width - lineWidth) / 2
+        : layout.textAlign === "right"
+        ? layout.width - lineWidth
+        : 0;
+    const lineText = value.slice(line.start, line.end);
+    const offset = Math.min(caret, line.end) - line.start;
+    const widthBefore = getLineWidth(lineText.slice(0, offset), layout.font);
+    // the editor's `dir="auto"` makes it `unicode-bidi: plaintext`: each
+    // paragraph goes its first strong character's way
+    const direction = getLineDirection(value, line.start);
+    // any RTL character in it, and the browser's bidirectional layout of
+    // the line says where the caret is
+    const nativeX = hasRTLChars(lineText)
+      ? getLineCaretXFromNativeLayout({
+          text: lineText,
+          font: layout.font,
+          lineHeightPx: layout.lineHeightPx,
+          direction,
+          ownerDocument,
+          offset,
+        })
+      : null;
+    const caretX =
+      lineStartX +
+      (nativeX ??
+        (direction === "rtl" ? lineWidth - widthBefore : widthBefore));
+    const center = pointFrom(
+      layout.x + layout.width / 2,
+      layout.y + layout.height / 2,
+    );
+    const [[x1, y1], [x2, y2]] = [lineIndex, lineIndex + 1].map((index) => {
+      const [x, y] = pointRotateRads(
+        pointFrom(layout.x + caretX, layout.y + index * layout.lineHeightPx),
+        center,
+        layout.angle,
+      );
+      return getViewportCoords(x, y);
+    });
+    return {
+      left: Math.min(x1, x2),
+      right: Math.max(x1, x2),
+      top: Math.min(y1, y2),
+      bottom: Math.max(y1, y2),
+    };
+  };
+
+  /**
+   * A caret typed in under the stats or the styles panel (see
+   * AppText.getTextSidePanels) is out of sight, yet inside the editor's box, so
+   * the browser doesn't reveal it (unlike the sidebar, the panels don't span
+   * the box's height, see updateEditorBoxInsets). Pan the canvas to bring it
+   * out from under the panel, on the canvas' side, with some room to spare —
+   * only then: a text beside or below a panel stays where it is.
+   */
+  const followCaretFromUnderPanels = () => {
+    const caret = !isDestroyed && getCaretViewportBounds();
+    if (!caret) {
+      return;
+    }
+    for (const name of app.text.getTextSidePanels()) {
+      const panel = app.viewport.getSideUIRect(name);
+      if (
+        panel &&
+        caret.right >= panel.left &&
+        caret.left <= panel.right &&
+        caret.bottom > panel.top &&
+        caret.top < panel.bottom
+      ) {
+        const panX =
+          panel.left + panel.right < app.state.width
+            ? panel.right + CARET_FOLLOW_PADDING - caret.left
+            : panel.left - CARET_FOLLOW_PADDING - caret.right;
+        app.viewport.translate((state) => ({
+          scrollX: state.scrollX + panX / state.zoom.value,
+        }));
+        return;
+      }
+    }
+  };
+
   let pendingInitialSelection = (() => {
     const caretIndex = getCaretIndexFromInitialSceneCoords();
 
@@ -656,6 +839,9 @@ export const textWysiwyg = ({
         editable.selectionEnd = selectionStart;
       }
       onChange(editable.value);
+      // once the update, and any scroll it made (see
+      // AppText.handleTextWysiwyg), is in the app's state
+      queueMicrotask(followCaretFromUnderPanels);
     };
   }
 
@@ -683,7 +869,11 @@ export const textWysiwyg = ({
     } else if (actionSaveToActiveFile.keyTest(event)) {
       event.preventDefault();
       handleSubmit();
-      app.actionManager.executeAction(actionSaveToActiveFile);
+      app.actionManager.executeAction(actionSaveToActiveFile, "keyboard");
+    } else if (actionSaveFileToDisk.keyTest(event)) {
+      event.preventDefault();
+      handleSubmit();
+      app.actionManager.executeAction(actionSaveFileToDisk, "keyboard");
     } else if (event.key === KEYS.ENTER && event[KEYS.CTRL_OR_CMD]) {
       event.preventDefault();
       if (event.isComposing || event.keyCode === 229) {
@@ -890,6 +1080,9 @@ export const textWysiwyg = ({
     unbindUpdate();
     unsubOnChange();
     unbindOnScroll();
+    editorBox?.removeEventListener("scroll", onEditorBoxScroll);
+    editorBox?.style.removeProperty("left");
+    editorBox?.style.removeProperty("right");
 
     editable.remove();
   };
@@ -922,9 +1115,12 @@ export const textWysiwyg = ({
         return;
       }
 
-      // Otherwise, re-enable submit on blur and refocus the editor.
+      // Otherwise, re-enable submit on blur and refocus the editor. Never
+      // let the focus scroll the container: for a box reaching past the
+      // viewport, revealing the caret the textarea has until the click's is
+      // placed (the end of the value) would pan the canvas there.
       editable.onblur = handleSubmit;
-      editable.focus();
+      editable.focus({ preventScroll: true });
       if (pendingInitialSelection) {
         editable.setSelectionRange(
           pendingInitialSelection.start,
@@ -952,7 +1148,7 @@ export const textWysiwyg = ({
       // trying to pan by clicking inside text area itself -> handle here
       if (target instanceof ownerWindow.HTMLTextAreaElement) {
         event.preventDefault();
-        app.handleCanvasPanUsingWheelOrSpaceDrag(event);
+        app.pan.start(event);
       }
 
       temporarilyDisableSubmit();
@@ -1011,13 +1207,44 @@ export const textWysiwyg = ({
       ".properties-content",
     );
     if (!isPopupOpened) {
-      editable.focus();
+      editable.focus({ preventScroll: true });
     }
   });
 
   const unbindOnScroll = app.onScrollChangeEmitter.on(() => {
     updateWysiwygStyle();
   });
+
+  // The browser reveals an out-of-view caret by scrolling the nearest scroll
+  // container: the editor's box, which clips it to the canvas area (off a
+  // sidebar too, see updateEditorBoxInsets). Scrolled, the editor
+  // would leave its text on the canvas; hand the offset to the canvas
+  // instead, plus some room to spare, and put the box back: the canvas
+  // follows the caret. Scroll events fire before the frame is painted, so
+  // the box's shift is never seen, and the reveal never gets past the box —
+  // to the editor root, whose overflow a host may override, or to a page
+  // around an embedded editor. (A `scroll-padding` can't give the room: the
+  // reveal only scrolls as far as the editor reaches, which ends at the
+  // text.)
+  const onEditorBoxScroll = () => {
+    if (!editorBox) {
+      return;
+    }
+    const { scrollLeft, scrollTop } = editorBox;
+    if (!scrollLeft && !scrollTop) {
+      return;
+    }
+    editorBox.scrollLeft = 0;
+    editorBox.scrollTop = 0;
+    // the box only scrolls right and down (it can't go below 0)
+    const panX = scrollLeft && scrollLeft + CARET_FOLLOW_PADDING;
+    const panY = scrollTop && scrollTop + CARET_FOLLOW_PADDING;
+    app.viewport.translate((state) => ({
+      scrollX: state.scrollX - panX / state.zoom.value,
+      scrollY: state.scrollY - panY / state.zoom.value,
+    }));
+  };
+  editorBox?.addEventListener("scroll", onEditorBoxScroll);
 
   // ---------------------------------------------------------------------------
 
@@ -1052,9 +1279,7 @@ export const textWysiwyg = ({
     });
   });
   ownerWindow.addEventListener("beforeunload", handleSubmit);
-  excalidrawContainer
-    ?.querySelector(".excalidraw-textEditorContainer")!
-    .appendChild(editable);
+  editorBox!.appendChild(editable);
 
   return handleSubmit;
 };

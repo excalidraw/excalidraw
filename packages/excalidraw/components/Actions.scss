@@ -1,6 +1,6 @@
 .zoom-actions,
 .undo-redo-buttons {
-  background-color: var(--island-bg-color);
+  background-color: var(--color-surface-low);
   border-radius: var(--border-radius-lg);
   box-shadow: 0 0 0 1px var(--color-surface-lowest);
 }
@@ -8,7 +8,6 @@
 .zoom-button,
 .undo-redo-buttons button {
   border-radius: 0 !important;
-  background-color: var(--color-surface-low) !important;
   font-size: 0.875rem !important;
   width: var(--lg-button-size);
   height: var(--lg-button-size);
@@ -31,6 +30,24 @@
   width: 3.75rem !important;
   justify-content: center;
   color: var(--text-primary-color);
+
+  // unlike the other zoom buttons, has no .ToolIcon__icon to show the hover
+  .zoom-actions &:hover:not(:active) {
+    background-color: var(--button-hover-bg);
+  }
+}
+
+// shifted left in zen mode (the wrapper rather than the button, so that the
+// tooltip, positioned off the wrapper, moves along)
+.reset-zoom-button-wrapper {
+  transition: transform var(--zen-mode-transition-duration) ease-in-out;
+}
+
+// faded out in zen mode
+.zoom-out-button-wrapper,
+.zoom-in-button-wrapper {
+  transition: opacity var(--zen-mode-transition-duration) ease-in-out,
+    visibility var(--zen-mode-transition-duration);
 }
 
 .zoom-out-button {
@@ -89,6 +106,20 @@
       border-top-left-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
     }
+  }
+}
+
+// two separate rows (rather than a flex-wrap row break) so the panel's
+// intrinsic width is that of a single row
+.align-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 }
 

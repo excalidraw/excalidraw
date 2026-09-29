@@ -16,7 +16,7 @@ Please add the latest change on the top under the correct section.
 ### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.
-- New `appState.inputDevice` preference (`"auto" | "mouse" | "trackpad"`, default `"auto"`, persisted in browser storage) selecting the wheel mappings. With `"trackpad"` a plain wheel pans and ctrl/cmd+wheel (how a pinch is delivered) zooms, as before; with `"mouse"` a plain wheel zooms and ctrl/cmd+wheel pans vertically instead, while shift+wheel keeps panning horizontally and the wheel-button zoom above is unaffected. `"auto"` is reserved for detecting the device from the wheel events and resolves to `"trackpad"` until that is implemented (`resolveInputDevice()`). Set it from the new "Input device" radio in the main menu's preferences submenu, also exposed as `MainMenu.DefaultItems.Preferences.InputDevice`.
+- New `appState.inputDevice` preference (`"auto" | "mouse" | "trackpad"`, default `"auto"`, persisted in browser storage) selecting the wheel mappings. With `"trackpad"` a plain wheel pans; with `"mouse"` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is delivered) zooms with either device. Shift+wheel pans horizontally, and ctrl/cmd+shift+wheel pans vertically. The wheel-button zoom above is unaffected. `"auto"` is reserved for detecting the device from the wheel events and resolves to `"trackpad"` until that is implemented (`resolveInputDevice()`). Set it from the new "Input device" radio in the main menu's preferences submenu, also exposed as `MainMenu.DefaultItems.Preferences.InputDevice`.
 
 ### Sticky notes (2026-09-06) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
@@ -30,6 +30,18 @@ Please add the latest change on the top under the correct section.
 - Resize semantics: a note's corners resize proportionally by default and scale the label's font ceiling with the note (Shift frees them); its edges resize freely by default (Shift constrains them). Drag-creation is proportional by default too (Shift frees it) and never touches the font ceiling. Width-only gestures keep the base height, height gestures set it, aspect-locked multi-select and Stats group edits scale the ceiling; flips preserve everything. Arrows bound to a note follow it as it grows.
 
 ## Excalidraw API
+
+### `setViewport` stops following a collaborator (2026-09-26) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- `setViewport` now asks to stop following a collaborator whenever it navigates (`onUserFollow` with `action: "UNFOLLOW"`, if `userToFollow` is set), as a user's pan or zoom does. `setViewport(null)` (clearing a lock) and a target that doesn't resolve don't navigate, and leave following alone.
+
+### `onDuplicate` can replace and veto duplicates (2026-09-18) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- `props.onDuplicate` may now return new objects for the duplicated elements in every duplication path. Previously the editor kept using the objects it created, so on paste (and library insert) the frame assignment and bound text redraw went to objects that were no longer in the scene, and alt-drag dragged an element that wasn't in the scene. The returned changes are now merged into the editor's duplicates, so they're part of the duplication's own undo entry and durable increment (no follow-up `updateScene` needed).
+- When pasting or inserting onto a frame, the duplicates passed to `onDuplicate` already have their `frameId` set (and are ordered under the frame).
+- Omitting a duplicate from the returned array (or returning it as deleted) now reliably prevents that element from being duplicated — previously pasting over a frame brought it back, and alt-drag broke. References to it from the remaining duplicates (bindings, `boundElements`, `frameId`) are cleared, and a bound text isn't duplicated without its container. If no duplicate remains, the duplication is cancelled and the returned elements are ignored: paste and the duplicate action do nothing, and alt-drag moves the original elements instead. When only some duplicates are vetoed during alt-drag, their originals stay where they were.
+- `onDuplicate` may return `false` to prevent the duplication as a whole (same as omitting every duplicate, without having to find them).
+- `onDuplicate` receives a third argument with lookups covering just the elements taking part in the duplication, so you don't have to derive them by scanning the scene: `{ duplicateElements, originalElements, origIdToDuplicateId, duplicateIdToOrigId }` — the duplicates by id, the elements they were made from by id, and their ids mapped in both directions (`duplicateIdToOrigId` to look up a duplicate's original while modifying it, `origIdToDuplicateId` e.g. for remapping element ids you keep in `customData`). On paste and library insert the originals are the inserted elements, which aren't part of the scene. The maps are read-only.
 
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
 

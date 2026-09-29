@@ -1,20 +1,25 @@
 import { queryByText } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { pointFrom } from "@excalidraw/math";
 import {
   getLineHeightInPx,
   getOriginalContainerHeightFromCache,
+  newElementWith,
 } from "@excalidraw/element";
 
 import {
   CODES,
   colorToHex,
+  CURSOR_TYPE,
   KEYS,
   FONT_FAMILY,
   TEXT_ALIGN,
   THEME,
   VERTICAL_ALIGN,
   applyDarkModeFilter,
+  TEXT_VIEWPORT_PADDING,
+  TEXT_MAX_WRAP_WIDTH,
 } from "@excalidraw/common";
 
 import type {
@@ -36,11 +41,16 @@ import {
 } from "../tests/test-utils";
 import {
   fireEvent,
+  waitFor,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
 } from "../tests/test-utils";
+import * as dataModule from "../data";
 import { actionBindText } from "../actions";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+import { getTextAutoResizeHandle } from "../textAutoResizeHandle";
+
+import { CARET_FOLLOW_PADDING } from "./textWysiwyg";
 
 const { h } = window;
 
@@ -275,6 +285,259 @@ describe("textWysiwyg", () => {
       expect(text.y).toBe(72);
     });
 
+    it.each([
+      { type: "rectangle", fromX: 220, toX: 380, y: 230 },
+      { type: "ellipse", fromX: 220, toX: 380, y: 230 },
+      { type: "diamond", fromX: 220, toX: 380, y: 230 },
+      { type: "rectangle", fromX: 380, toX: 220, y: 230 },
+      { type: "rectangle", fromX: 350, toX: 510, y: 300 },
+      { type: "ellipse", fromX: 350, toX: 510, y: 300 },
+      { type: "diamond", fromX: 350, toX: 510, y: 300 },
+      { type: "rectangle", fromX: 350, toX: 190, y: 300 },
+      { type: "rectangle", fromX: 365, toX: 525, y: 300 },
+    ] as const)(
+      "should set a fixed text width when dragging inside a $type from $fromX to $toX",
+      async ({ type, fromX, toX, y }) => {
+        const container = API.createElement({
+          type,
+          x: 100,
+          y: 100,
+          width: 500,
+          height: 400,
+        });
+        API.setElements([container]);
+        UI.clickTool("text");
+
+        mouse.downAt(fromX, y);
+        for (let i = 1; i <= 4; i++) {
+          mouse.moveTo(fromX + ((toX - fromX) * i) / 4, y);
+        }
+        mouse.upAt(toX, y);
+
+        const editor = await getTextEditor();
+        const originalText =
+          "A label long enough to wrap within the dragged width";
+        updateTextEditor(editor, originalText);
+        Keyboard.exitTextEditor(editor);
+
+        const text = h.elements[1] as ExcalidrawTextElement;
+        expect(text.autoResize).toBe(false);
+        expect(text.width).toBe(160);
+        expect(text.x).toBe(Math.min(fromX, toX));
+        expect(text.y).toBe(y);
+        expect(text.containerId).toBe(null);
+        expect(text.textAlign).toBe(TEXT_ALIGN.LEFT);
+        expect(text.originalText).toBe(originalText);
+        expect(text.text).toContain("\n");
+        expect(container.boundElements).toBe(null);
+      },
+    );
+
+    it.each([0, 10])(
+      "should bind text on a center click with %s pixels of pointer movement",
+      async (deltaX) => {
+        const container = API.createElement({
+          type: "rectangle",
+          x: 100,
+          y: 100,
+          width: 500,
+          height: 400,
+        });
+        API.setElements([container]);
+        UI.clickTool("text");
+
+        mouse.downAt(350, 300);
+        expect(h.elements).toEqual([container]);
+        expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+        // the pending click keeps advertising the bind until it resolves
+        expect(h.state.textToolHover).toEqual({
+          type: "container",
+          elementId: container.id,
+        });
+        mouse.moveTo(350 + deltaX, 300);
+        mouse.upAt(350 + deltaX, 300);
+
+        const editor = await getTextEditor();
+        updateTextEditor(editor, "Label");
+        Keyboard.exitTextEditor(editor);
+
+        const text = h.elements[1] as ExcalidrawTextElement;
+        expect(text.containerId).toBe(container.id);
+        expect(text.textAlign).toBe(TEXT_ALIGN.CENTER);
+        expect(text.verticalAlign).toBe(VERTICAL_ALIGN.MIDDLE);
+        expect(container.boundElements).toEqual([
+          { id: text.id, type: "text" },
+        ]);
+      },
+    );
+
+    it("should not resize a small shape when dragging text from its center", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        width: 10,
+        height: 10,
+      });
+      API.setElements([container]);
+      UI.clickTool("text");
+
+      mouse.downAt(105, 105);
+      mouse.moveTo(185, 105);
+      mouse.moveTo(265, 105);
+      mouse.upAt(265, 105);
+
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Free text");
+      Keyboard.exitTextEditor(editor);
+
+      expect(container.width).toBe(10);
+      expect(container.height).toBe(10);
+      expect(container.boundElements).toBe(null);
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(text.autoResize).toBe(false);
+      expect(text.width).toBe(160);
+    });
+
+    it("should cancel a pending center click when switching tools", async () => {
+      const container = API.createElement({ type: "rectangle" });
+      API.setElements([container]);
+      UI.clickTool("text");
+
+      mouse.downAt(50, 50);
+      Keyboard.keyPress(KEYS.ESCAPE);
+      mouse.upAt(50, 50);
+
+      expect(h.elements).toEqual([container]);
+      expect(container.boundElements).toBe(null);
+      expect(await getTextEditor({ waitForEditor: false })).toBe(null);
+    });
+
+    it("should clear binding highlights when a locked text tool starts a center drag", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        width: 500,
+        height: 400,
+      });
+      API.setElements([container]);
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+      UI.clickTool("text");
+      UI.clickTool("lock");
+
+      mouse.moveTo(500, 400);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: container.id,
+      });
+      mouse.downAt(500, 400);
+      // At 200% zoom the drag threshold is inside the center snap radius.
+      mouse.moveTo(515, 400);
+      mouse.moveTo(545, 400);
+      expect(h.state.newElement?.type).toBe("text");
+      expect(h.state.textToolHover).toBe(null);
+      mouse.moveTo(660, 400);
+      mouse.upAt(660, 400);
+
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Free text");
+      Keyboard.exitTextEditor(editor);
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.width).toBe(80);
+      expect(text.containerId).toBe(null);
+      expect(text.autoResize).toBe(false);
+      expect(h.state.activeTool.type).toBe("text");
+    });
+
+    it("should set a fixed text width when ctrl/cmd-dragging at a shape's center", async () => {
+      const container = API.createElement({
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        width: 500,
+        height: 400,
+        backgroundColor: "#a5d8ff",
+      });
+      API.setElements([container]);
+      UI.clickTool("text");
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        mouse.downAt(350, 300);
+        for (let i = 1; i <= 4; i++) {
+          mouse.moveTo(350 + i * 20, 300);
+        }
+        mouse.upAt(430, 300);
+      });
+
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Hello");
+      Keyboard.exitTextEditor(editor);
+
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      // one-sided from the origin (alt would resize from the center, as it
+      // does for any tool)
+      expect(text.width).toBe(80);
+      expect(text.x).toBe(350);
+      expect(text.containerId).toBe(null);
+      expect(container.boundElements).toBe(null);
+    });
+
+    it.each([
+      { location: "canvas", locked: false },
+      { location: "canvas", locked: true },
+      { location: "container center", locked: false },
+      { location: "container center", locked: true },
+    ])(
+      "should redraw dashed text bounds while dragging from $location (tool locked: $locked)",
+      async ({ location, locked }) => {
+        if (location === "container center") {
+          API.setElements([
+            API.createElement({
+              type: "rectangle",
+              x: 100,
+              y: 100,
+              width: 500,
+              height: 400,
+            }),
+          ]);
+        }
+        UI.clickTool("text");
+        if (locked) {
+          UI.clickTool("lock");
+        }
+
+        const context = GlobalTestState.interactiveCanvas.getContext("2d")!;
+        const setLineDash = vi.spyOn(context, "setLineDash");
+        const strokeRect = vi.spyOn(context, "strokeRect");
+
+        mouse.downAt(350, 300);
+        for (const width of [80, 160]) {
+          setLineDash.mockClear();
+          strokeRect.mockClear();
+          mouse.moveTo(350 + width, 300);
+
+          expect(setLineDash).toHaveBeenCalledWith([6, 4]);
+          // The outline follows the dragged width, with 4px padding per side.
+          expect(strokeRect).toHaveBeenCalledWith(
+            expect.any(Number),
+            expect.any(Number),
+            width + 8,
+            33,
+          );
+        }
+        mouse.upAt(510, 300);
+
+        const editor = await getTextEditor();
+        updateTextEditor(editor, "Free text");
+        Keyboard.exitTextEditor(editor);
+        expect(h.state.activeTool.locked).toBe(locked);
+        expect(h.state.activeTool.type).toBe(locked ? "text" : "selection");
+        setLineDash.mockRestore();
+        strokeRect.mockRestore();
+      },
+    );
+
     it("should edit text under cursor when double-clicked with selection tool", async () => {
       const text = API.createElement({
         type: "text",
@@ -507,6 +770,29 @@ describe("textWysiwyg", () => {
   describe("Test container-unbound text", () => {
     const { h } = window;
     const dimensions = { height: 400, width: 800 };
+    const domRect = (left: number, width: number) => () =>
+      ({
+        x: left,
+        y: 0,
+        left,
+        top: 0,
+        width,
+        height: 400,
+        right: left + width,
+        bottom: 400,
+        toJSON: () => {},
+      } as DOMRect);
+    const dockSidebar = (left: number, width: number) => {
+      const root = textarea.closest<HTMLElement>(".excalidraw")!;
+      root.getBoundingClientRect = domRect(0, 800);
+      const sidebar = document.createElement("div");
+      sidebar.className = "sidebar sidebar--docked";
+      sidebar.dataset.viewportUi = "side";
+      sidebar.dataset.viewportUiName = "sidebar";
+      sidebar.getBoundingClientRect = domRect(left, width);
+      root.appendChild(sidebar);
+      return sidebar;
+    };
 
     let textarea: HTMLTextAreaElement;
     let textElement: ExcalidrawTextElement;
@@ -683,6 +969,28 @@ describe("textWysiwyg", () => {
       expect(textElement.fontSize).toBe(origFontSize);
     });
 
+    it.each([
+      { label: "Cmd/Ctrl+S", shiftKey: false },
+      { label: "Cmd/Ctrl+Shift+S", shiftKey: true },
+    ])("should commit text before saving via $label", ({ shiftKey }) => {
+      let editingWhenSaved: unknown = "not saved";
+      const saveSpy = vi
+        .spyOn(dataModule, "saveAsJSON")
+        .mockImplementation((async () => {
+          editingWhenSaved = h.state.editingTextElement;
+          return { fileHandle: null };
+        }) as unknown as typeof dataModule.saveAsJSON);
+
+      try {
+        fireEvent.keyDown(textarea, { key: KEYS.S, ctrlKey: true, shiftKey });
+
+        expect(saveSpy).toHaveBeenCalledTimes(1);
+        expect(editingWhenSaved).toBe(null);
+      } finally {
+        saveSpy.mockRestore();
+      }
+    });
+
     it("zooming via keyboard should zoom canvas", () => {
       expect(h.state.zoom.value).toBe(1);
       fireEvent.keyDown(textarea, {
@@ -707,19 +1015,352 @@ describe("textWysiwyg", () => {
       expect(h.state.zoom.value).toBe(1);
     });
 
-    it("text should never go beyond max width", async () => {
-      UI.clickTool("text");
-      mouse.click(0, 0);
-
+    it("should not cut the editor off at the viewport's edges", async () => {
+      Keyboard.exitTextEditor(textarea);
+      // already wider than the 800x400 viewport: such a text keeps growing
+      const line =
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+      const wide = API.createElement({ type: "text", text: line, width: 1000 });
+      API.setElements([wide]);
+      API.setSelectedElements([wide]);
+      Keyboard.keyPress(KEYS.ENTER);
       textarea = await getTextEditor();
+      // and taller, too
+      updateTextEditor(textarea, `${line}${"\nline".repeat(20)}`);
+
+      // the editor box is the text's: a caret past an edge pans the canvas
+      // (see below) instead of scrolling inside a box cut to the viewport
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      expect(text.width).toBe(1000);
+      expect(text.height).toBeGreaterThan(400);
+      expect(textarea.style.width).toBe(`${text.width}px`);
+      expect(parseFloat(textarea.style.height)).toBeCloseTo(text.height * 1.05);
+      expect(textarea.style.maxHeight).toBe("");
+      Keyboard.exitTextEditor(textarea);
+    });
+
+    it("should stop a growing text at the view's width and wrap it from there", () => {
+      // the 800px wide view, less some room at each side
+      const maxWidth = 800 - 2 * TEXT_VIEWPORT_PADDING;
+      const line =
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+      updateTextEditor(textarea, line);
+
+      let text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      expect(text.width).toBe(maxWidth);
+      expect(text.originalText).toBe(line);
+      expect(text.text).toContain("\n");
+      // the editor wraps along
+      expect(textarea.style.whiteSpace).toBe("pre-wrap");
+      expect(textarea.style.width).toBe(`${maxWidth}px`);
+
+      // typing on wraps further; the width stays
+      const { height } = text;
+      updateTextEditor(textarea, `${line} ${line}`);
+      text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.width).toBe(maxWidth);
+      expect(text.height).toBeGreaterThan(height);
+    });
+
+    it("should stop a growing text at a width that follows the zoom and a docked sidebar", () => {
+      const sidebar = dockSidebar(500, 300);
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+
+      updateTextEditor(
+        textarea,
+        "Excalidraw is an opensource virtual collaborative whiteboard",
+      );
+      // the canvas left of the sidebar, less the room, in scene units
+      expect(h.elements[0].width).toBe(
+        (800 - 300 - 2 * TEXT_VIEWPORT_PADDING) / 2,
+      );
+      sidebar.remove();
+    });
+
+    it.each([0.5, 2])(
+      "should stop a growing text at TEXT_MAX_WRAP_WIDTH at any zoom, however wide the view (zoom %s)",
+      (zoom) => {
+        API.setAppState({
+          width: 2000,
+          zoom: { value: zoom as typeof h.state.zoom.value },
+        });
+
+        updateTextEditor(
+          textarea,
+          "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams! Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+        );
+        const text = h.elements[0] as ExcalidrawTextElement;
+        expect(text.autoResize).toBe(false);
+        // in scene units: at 200%, the view would allow 980
+        expect(text.width).toBe(TEXT_MAX_WRAP_WIDTH);
+      },
+    );
+
+    describe("next to the side panels (desktop)", () => {
+      beforeEach(async () => {
+        // the 800x400 view is a phone's: make it a desktop's instead
+        unmountComponent();
+        await render(
+          <Excalidraw
+            handleKeyboardGlobally={true}
+            UIOptions={{ getFormFactor: () => "desktop" }}
+          />,
+        );
+        API.setAppState({ stats: { ...h.state.stats, open: true } });
+      });
+
+      const long =
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!";
+
+      /**
+       * Types `text` as a new text started at (x, y), with the styles panel
+       * at the view's left, up to 216px, and the stats panel from 500px,
+       * over the view's top `statsHeight`.
+       */
+      const typeAt = async (
+        x: number,
+        y: number,
+        text: string,
+        statsHeight = 400,
+      ) => {
+        UI.clickTool("text");
+        mouse.clickAt(x, y);
+        textarea = await getTextEditor();
+        const panel = (name: string) =>
+          document.querySelector<HTMLElement>(
+            `[data-viewport-ui="side"][data-viewport-ui-name="${name}"]`,
+          )!;
+        panel("stylesPanel").getBoundingClientRect = domRect(16, 200);
+        panel("stats").getBoundingClientRect = () =>
+          ({
+            ...domRect(500, 204)(),
+            height: statsHeight,
+            bottom: statsHeight,
+          } as DOMRect);
+        updateTextEditor(textarea, text);
+        // the canvas follows the caret once the update's in the app's state
+        await act(() => new Promise((resolve) => setTimeout(resolve)));
+        return h.app.scene.getElement(
+          h.state.editingTextElement!.id,
+        ) as ExcalidrawTextElement;
+      };
+
+      it("should keep a text being edited clear of the full styles panel and the stats panel", async () => {
+        // starts under the styles panel's right edge
+        const text = await typeAt(100, 300, long);
+        expect(text.autoResize).toBe(false);
+        // it wraps at the canvas between the panels, less the room, and is
+        // brought in between them
+        expect(text.width).toBe(500 - 216 - 2 * TEXT_VIEWPORT_PADDING);
+        expect(text.x + h.state.scrollX).toBeCloseTo(
+          216 + TEXT_VIEWPORT_PADDING,
+        );
+      });
+
+      it("should keep a text being edited clear of the stats panel only beside it", async () => {
+        // below it, the text runs on past it
+        let text = await typeAt(236, 300, long, 200);
+        expect(text.width).toBe(800 - 216 - 2 * TEXT_VIEWPORT_PADDING);
+        Keyboard.exitTextEditor(textarea);
+
+        text = await typeAt(236, 100, long, 200);
+        expect(text.width).toBe(500 - 216 - 2 * TEXT_VIEWPORT_PADDING);
+      });
+
+      it("should pan the canvas while typing only once the caret is under the stats panel", async () => {
+        // below it, the caret is in sight
+        let text = await typeAt(400, 300, "Excalidraw is", 200);
+        expect(text.x + text.width).toBeGreaterThan(500);
+        expect(h.state.scrollX).toBe(0);
+        Keyboard.exitTextEditor(textarea);
+
+        // under it, it's brought out, with some room to spare
+        text = await typeAt(400, 100, "Excalidraw is", 200);
+        expect(h.state.scrollX).toBeLessThan(0);
+        expect(
+          (text.x + text.width + h.state.scrollX) * h.state.zoom.value,
+        ).toBeCloseTo(500 - CARET_FOLLOW_PADDING);
+      });
+
+      it("should find the caret in a bidirectional line where the browser lays it out", async () => {
+        // "א abcdef", a paragraph of its own, goes right to left, as
+        // "abcdef א": the caret after the "f" is 60px in (not at the line's
+        // left edge, where it'd be if all of it went right to left, nor its
+        // right one, as the text's first paragraph goes), which jsdom can't
+        // lay out
+        const { getBoundingClientRect } = Range.prototype;
+        Range.prototype.getBoundingClientRect = function (this: Range) {
+          const isRTL =
+            this.startContainer.parentElement?.getAttribute("dir") === "rtl";
+          return { left: this.collapsed && isRTL ? 60 : 0 } as DOMRect;
+        };
+        try {
+          // from 450px, 80px long: its caret's under the stats panel
+          const text = await typeAt(450, 100, "hello\nא abcdef", 200);
+          expect(
+            (text.x + 60 + h.state.scrollX) * h.state.zoom.value,
+          ).toBeCloseTo(500 - CARET_FOLLOW_PADDING);
+        } finally {
+          Range.prototype.getBoundingClientRect = getBoundingClientRect;
+        }
+      });
+    });
+
+    it("should bring a text that starts wrapping into view, with room at its right edge", async () => {
+      Keyboard.exitTextEditor(textarea);
+      UI.clickTool("text");
+      mouse.clickAt(300, 100);
+      textarea = await getTextEditor();
+      const { scrollY } = h.state;
+      // starts at 300px: it would stop growing well past the right edge
       updateTextEditor(
         textarea,
         "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
       );
-      Keyboard.exitTextEditor(textarea);
 
-      expect(textarea.style.width).toBe("792px");
-      expect(h.elements[0].width).toBe(1000);
+      const text = h.app.scene.getElement(
+        h.state.editingTextElement!.id,
+      ) as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      // as wide as the view less the room at each side, it now fills that
+      const zoom = h.state.zoom.value;
+      expect((text.x + h.state.scrollX) * zoom).toBeCloseTo(
+        TEXT_VIEWPORT_PADDING,
+      );
+      expect((text.x + text.width + h.state.scrollX) * zoom).toBeCloseTo(
+        800 - TEXT_VIEWPORT_PADDING,
+      );
+      // it fitted vertically already
+      expect(h.state.scrollY).toBe(scrollY);
+      // and the editor moved along
+      expect(parseFloat(textarea.style.left)).toBeCloseTo(
+        TEXT_VIEWPORT_PADDING,
+      );
+    });
+
+    it("should leave the vertical to the caret when a text that starts wrapping is taller than the view", async () => {
+      Keyboard.exitTextEditor(textarea);
+      UI.clickTool("text");
+      mouse.clickAt(300, 100);
+      textarea = await getTextEditor();
+      const { scrollY } = h.state;
+      updateTextEditor(
+        textarea,
+        `${"line\n".repeat(
+          20,
+        )}Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!`,
+      );
+
+      const text = h.app.scene.getElement(
+        h.state.editingTextElement!.id,
+      ) as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      expect(text.height).toBeGreaterThan(400);
+      // brought in horizontally…
+      expect(
+        (text.x + text.width + h.state.scrollX) * h.state.zoom.value,
+      ).toBeCloseTo(800 - TEXT_VIEWPORT_PADDING);
+      // …but not vertically: all of it can't be, and the caret is followed
+      // as usual
+      expect(h.state.scrollY).toBe(scrollY);
+    });
+
+    it("should keep a right-aligned text's right edge where it stops growing", () => {
+      API.updateElement(h.elements[0] as ExcalidrawTextElement, {
+        textAlign: "right",
+      });
+      updateTextEditor(textarea, "short");
+      const { x, width } = h.elements[0];
+      expect((h.elements[0] as ExcalidrawTextElement).textAlign).toBe("right");
+
+      updateTextEditor(
+        textarea,
+        "Excalidraw is an opensource virtual collaborative whiteboard for sketching hand-drawn like diagrams!",
+      );
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(false);
+      expect(text.x + text.width).toBeCloseTo(x + width);
+    });
+
+    it("should pan the canvas instead of scrolling the editor to reveal the caret", () => {
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+      const editorBox = textarea.parentElement!;
+      const root = textarea.closest<HTMLElement>(".excalidraw")!;
+      const { scrollX, scrollY } = h.state;
+      const editorTop = parseFloat(textarea.style.top);
+
+      // what the browser does to reveal a caret below and right of the
+      // editor's box (the canvas area)
+      editorBox.scrollTop = 120;
+      editorBox.scrollLeft = 40;
+      fireEvent.scroll(editorBox);
+
+      // the box is put back, and the canvas pans by the same screen
+      // distance plus room to spare
+      expect(editorBox.scrollTop).toBe(0);
+      expect(editorBox.scrollLeft).toBe(0);
+      expect(h.state.scrollX).toBe(scrollX - (40 + CARET_FOLLOW_PADDING) / 2);
+      expect(h.state.scrollY).toBe(scrollY - (120 + CARET_FOLLOW_PADDING) / 2);
+      // with the editor on it
+      expect(parseFloat(textarea.style.top)).toBe(
+        editorTop - (120 + CARET_FOLLOW_PADDING),
+      );
+      // the reveal never reaches the root
+      expect(root.scrollTop).toBe(0);
+
+      // a reveal along one axis pans along that axis only
+      const scrolledX = h.state.scrollX;
+      editorBox.scrollTop = 30;
+      fireEvent.scroll(editorBox);
+      expect(h.state.scrollX).toBe(scrolledX);
+      expect(h.state.scrollY).toBe(
+        scrollY -
+          (120 + CARET_FOLLOW_PADDING) / 2 -
+          (30 + CARET_FOLLOW_PADDING) / 2,
+      );
+
+      // with no text being edited, the box is left alone
+      const lastScrollY = h.state.scrollY;
+      Keyboard.exitTextEditor(textarea);
+      editorBox.scrollTop = 50;
+      fireEvent.scroll(editorBox);
+      expect(editorBox.scrollTop).toBe(50);
+      expect(h.state.scrollY).toBe(lastScrollY);
+      editorBox.scrollTop = 0;
+    });
+
+    it("should keep the editor's box off a docked sidebar", () => {
+      const editorBox = textarea.parentElement!;
+      const sidebar = dockSidebar(500, 300);
+      const editorLeft = parseFloat(textarea.style.left);
+
+      // docked on the right: the box ends where the sidebar starts, so a
+      // caret behind the sidebar is outside it (and revealed by a pan)
+      updateTextEditor(textarea, "Hello");
+      expect(editorBox.style.right).toBe("300px");
+      expect(editorBox.style.left).toBe("0px");
+      expect(parseFloat(textarea.style.left)).toBe(editorLeft);
+
+      // docked on the left (RTL): the box starts where the sidebar ends, and
+      // the editor keeps its place on the canvas
+      sidebar.getBoundingClientRect = domRect(0, 300);
+      updateTextEditor(textarea, "Hello!");
+      expect(editorBox.style.left).toBe("300px");
+      expect(editorBox.style.right).toBe("0px");
+      expect(parseFloat(textarea.style.left)).toBe(editorLeft - 300);
+
+      // not docked: the whole canvas
+      sidebar.remove();
+      updateTextEditor(textarea, "Hello");
+      expect(editorBox.style.left).toBe("0px");
+      expect(editorBox.style.right).toBe("0px");
+
+      // the insets go with the editor
+      Keyboard.exitTextEditor(textarea);
+      expect(editorBox.style.left).toBe("");
+      expect(editorBox.style.right).toBe("");
     });
   });
 
@@ -1814,6 +2455,636 @@ describe("textWysiwyg", () => {
       expect(text.text).toBe("Excalidraw");
     });
 
+    it("shouldn't inherit groupIds or angle when creating unbound text inside a grouped/rotated container", async () => {
+      const groupedRectangle = API.createElement({
+        type: "rectangle",
+        x: 10,
+        y: 20,
+        width: 90,
+        height: 75,
+        groupIds: ["group1"],
+        angle: 0.3,
+      });
+      API.setElements([groupedRectangle]);
+
+      UI.clickTool("text");
+      // click inside the container but away from its center so the text
+      // doesn't bind to it
+      mouse.clickAt(90, 57.5);
+
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Hello");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(text.groupIds).toEqual([]);
+      expect(text.angle).toBe(0);
+    });
+
+    it("should edit the existing label only when clicking on the label itself", async () => {
+      // create a centered label ("Hello!" → 60x25 label centered in the
+      // 90x75 rectangle at (10, 20), so the label bbox is (25, 45)-(85, 70))
+      Keyboard.keyPress(KEYS.ENTER);
+      let editor = await getTextEditor();
+      updateTextEditor(editor, "Hello!");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+      const label = h.elements[1] as ExcalidrawTextElementWithContainer;
+      expect(label.containerId).toBe(rectangle.id);
+
+      // clicking on the label itself should edit it
+      UI.clickTool("text");
+      mouse.clickAt(55, 57.5);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(label.id);
+      Keyboard.exitTextEditor(editor);
+      expect(h.elements.length).toBe(2);
+
+      // clicking inside the container but off the label should create
+      // a free text at the clicked position instead
+      UI.clickTool("text");
+      mouse.clickAt(20, 30);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).not.toBe(label.id);
+      updateTextEditor(editor, "Excalidraw");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(3);
+      expect(rectangle.boundElements).toStrictEqual([
+        { id: label.id, type: "text" },
+      ]);
+      const text = h.elements[2] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(text.text).toBe("Excalidraw");
+      // created at the clicked position (first line box centered on cursor),
+      // not warped to the container or label center
+      expect(text.x).toBe(20);
+      expect(text.y).toBe(17.5);
+    });
+
+    it.each(["mouse", "pen", "touch"] as const)(
+      "should allow dragging a free text box inside a labeled container with %s",
+      async (pointerType) => {
+        API.updateElement(rectangle, { width: 500, height: 400 });
+        Keyboard.keyPress(KEYS.ENTER);
+        let editor = await getTextEditor();
+        updateTextEditor(editor, "Hello!");
+        Keyboard.exitTextEditor(editor);
+
+        expect(h.elements.length).toBe(2);
+        const label = h.elements[1] as ExcalidrawTextElementWithContainer;
+
+        UI.clickTool("text");
+        const pointer = new Pointer(pointerType);
+        pointer.downAt(110, 120);
+        pointer.moveTo(175, 120);
+        pointer.moveTo(240, 120);
+        pointer.up();
+
+        editor = await getTextEditor();
+        expect(h.state.editingTextElement?.id).not.toBe(label.id);
+        updateTextEditor(editor, "Excalidraw");
+        Keyboard.exitTextEditor(editor);
+
+        expect(h.elements.length).toBe(3);
+        expect(rectangle.boundElements).toStrictEqual([
+          { id: label.id, type: "text" },
+        ]);
+        const text = h.elements[2] as ExcalidrawTextElement;
+        expect(text.containerId).toBe(null);
+        expect(text.autoResize).toBe(false);
+        expect(text.width).toBe(130);
+        expect(text.x).toBe(110);
+        expect(text.y).toBe(120);
+        expect(label.originalText).toBe("Hello!");
+      },
+    );
+
+    it("should highlight an empty container the text tool would bind to on hover", async () => {
+      UI.clickTool("text");
+
+      // near the container center → click would bind to it, shown with the
+      // same binding highlight as arrow binding
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // ctrl/cmd opts out of binding, so no highlight either
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        mouse.moveTo(54, 57.5);
+        expect(h.state.textToolHover).toBe(null);
+      });
+
+      // off-center → click would create a free text
+      mouse.moveTo(20, 30);
+      expect(h.state.textToolHover).toBe(null);
+    });
+
+    it("should edit the arrow label when clicking on the label with the text tool", async () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 200,
+        y: 200,
+        width: 300,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(300, 0)],
+      });
+      const label = API.createElement({
+        type: "text",
+        text: "label",
+        x: 325,
+        y: 187.5,
+        width: 50,
+        height: 25,
+        containerId: arrow.id,
+      });
+      API.setElements([arrow, label]);
+      API.updateElement(arrow, {
+        boundElements: [{ type: "text", id: label.id }],
+      });
+
+      // clicking the label itself should edit it
+      UI.clickTool("text");
+      mouse.clickAt(350, 200);
+      let editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(label.id);
+      Keyboard.exitTextEditor(editor);
+
+      // Click off the label and outside the endpoint hit circles.
+      UI.clickTool("text");
+      mouse.clickAt(300, 200);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).not.toBe(label.id);
+      updateTextEditor(editor, "free");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(3);
+      expect((h.elements[2] as ExcalidrawTextElement).containerId).toBe(null);
+      expect(arrow.boundElements).toStrictEqual([
+        { id: label.id, type: "text" },
+      ]);
+      expect(arrow.startBinding).toBe(null);
+      expect(arrow.endBinding).toBe(null);
+    });
+
+    it.each([null, 0.25, 0.75])(
+      "should hit the arrow label at its derived position after the arrow moves (labelPosition: %s)",
+      async (labelPosition) => {
+        const arrow = API.createElement({
+          type: "arrow",
+          x: 200,
+          y: 200,
+          width: 400,
+          height: 0,
+          points: [pointFrom(0, 0), pointFrom(400, 0)],
+        });
+        // Stored at the original midpoint; moved labels derive their position.
+        const label = API.createElement({
+          type: "text",
+          text: "label",
+          x: 375,
+          y: 187.5,
+          width: 50,
+          height: 25,
+          containerId: arrow.id,
+        });
+        API.setElements([arrow, label]);
+        API.updateElement(arrow, {
+          boundElements: [{ type: "text", id: label.id }],
+        });
+        API.updateElement(label, { labelPosition });
+
+        // move the arrow; like dragging, this doesn't update the label's
+        // stored coords — its position is derived from the arrow at render
+        API.updateElement(arrow, { x: 300, y: 250 });
+
+        UI.clickTool("text");
+
+        const labelCenterX = 300 + 400 * (labelPosition ?? 0.5);
+        mouse.moveTo(labelCenterX, 250);
+        expect(h.state.textToolHover).toEqual({
+          type: "text",
+          elementId: label.id,
+        });
+
+        // hovering at the label's stale stored position
+        mouse.moveTo(400, 200);
+        expect(h.state.textToolHover).toBe(null);
+
+        // clicking at the derived position should edit the label
+        mouse.clickAt(labelCenterX, 250);
+        const editor = await getTextEditor();
+        expect(h.state.editingTextElement?.id).toBe(label.id);
+        Keyboard.exitTextEditor(editor);
+      },
+    );
+
+    it("should clear the hover highlights when the text tool is canceled", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "free",
+        x: 500,
+        y: 500,
+        width: 40,
+        height: 25,
+      });
+      API.setElements([...h.elements, text]);
+
+      // text hover highlight is cleared on Escape
+      UI.clickTool("text");
+      mouse.moveTo(520, 512);
+      expect(h.state.textToolHover).toEqual({
+        type: "text",
+        elementId: text.id,
+      });
+      Keyboard.keyPress(KEYS.ESCAPE);
+      expect(h.state.activeTool.type).not.toBe("text");
+      expect(h.state.textToolHover).toBe(null);
+
+      // container binding highlight is cleared on Escape
+      UI.clickTool("text");
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+      Keyboard.keyPress(KEYS.ESCAPE);
+      expect(h.state.textToolHover).toBe(null);
+    });
+
+    it("should highlight the text the text tool would edit on hover", async () => {
+      // create a centered label (60x25 label bbox: (25, 45)-(85, 70))
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Hello!");
+      Keyboard.exitTextEditor(editor);
+      const label = h.elements[1] as ExcalidrawTextElementWithContainer;
+
+      UI.clickTool("text");
+
+      // over the label → click would edit it
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "text",
+        elementId: label.id,
+      });
+
+      // inside the container but off the label → click would create a free
+      // text, so neither the label nor the labeled container is highlighted
+      mouse.moveTo(20, 30);
+      expect(h.state.textToolHover).toBe(null);
+    });
+
+    it("should refresh the container hover when ctrl/cmd is pressed or released without moving", () => {
+      UI.clickTool("text");
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // ctrl/cmd opts out of binding: the outline goes with no pointermove...
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        Keyboard.keyDown("Control");
+        expect(h.state.textToolHover).toBe(null);
+      });
+      // ...and comes back on release
+      Keyboard.keyUp("Control");
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+    });
+
+    it("should create free text on a ctrl/cmd click at an empty container's center", async () => {
+      UI.clickTool("text");
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        mouse.moveTo(54, 57.5);
+        mouse.clickAt(54, 57.5);
+      });
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "free");
+      Keyboard.exitTextEditor(editor);
+
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(rectangle.boundElements).toBe(null);
+    });
+    it("should not advertise a label on an empty arrow's midpoint while ctrl/cmd is held", async () => {
+      const arrow = API.createElement({
+        type: "arrow",
+        x: 200,
+        y: 200,
+        width: 300,
+        height: 0,
+        points: [pointFrom(0, 0), pointFrom(300, 0)],
+      });
+      API.setElements([arrow]);
+      UI.clickTool("text");
+
+      mouse.moveTo(350, 200);
+      expect(h.state.textToolHover).toEqual({
+        type: "arrow",
+        elementId: arrow.id,
+        anchor: "label",
+      });
+
+      Keyboard.withModifierKeys({ ctrl: true }, () => {
+        mouse.moveTo(351, 200);
+        expect(h.state.textToolHover).toBe(null);
+        mouse.clickAt(351, 200);
+      });
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "free");
+      Keyboard.exitTextEditor(editor);
+
+      expect(h.elements.length).toBe(2);
+      expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(null);
+      expect(arrow.boundElements).toBe(null);
+    });
+
+    it("should show the text cursor over a label the text tool would edit", async () => {
+      Keyboard.keyPress(KEYS.ENTER);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Hello!");
+      Keyboard.exitTextEditor(editor);
+
+      UI.clickTool("text");
+      // over the label (60x25, centered in the rectangle)
+      mouse.moveTo(55, 57.5);
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.TEXT,
+      );
+      // inside the rectangle but off the label: a click creates free text
+      mouse.moveTo(20, 30);
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.CROSSHAIR,
+      );
+    });
+
+    it("should not edit a host-selected text when the text tool clicks elsewhere", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "selected",
+        x: 300,
+        y: 300,
+        width: 80,
+        height: 25,
+      });
+      API.setElements([...h.elements, text]);
+      UI.clickTool("text");
+      // a host can select through the API after the tool is active
+      API.setSelectedElements([text]);
+      expect(h.state.selectedElementIds[text.id]).toBe(true);
+
+      mouse.moveTo(500, 500);
+      expect(h.state.textToolHover).toBe(null);
+      mouse.clickAt(500, 500);
+      const editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).not.toBe(text.id);
+      updateTextEditor(editor, "new");
+      Keyboard.exitTextEditor(editor);
+
+      expect(text.text).toBe("selected");
+      expect(h.elements.length).toBe(3);
+    });
+
+    it("should not label a host-selected container when the text tool clicks elsewhere", async () => {
+      UI.clickTool("text");
+      API.setSelectedElements([rectangle]);
+      expect(h.state.selectedElementIds[rectangle.id]).toBe(true);
+
+      mouse.moveTo(400, 400);
+      expect(h.state.textToolHover).toBe(null);
+      mouse.clickAt(400, 400);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "free");
+      Keyboard.exitTextEditor(editor);
+
+      const text = h.elements[1] as ExcalidrawTextElement;
+      expect(text.containerId).toBe(null);
+      expect(rectangle.boundElements).toBe(null);
+    });
+
+    it("should end the text tool's turn when the pending container is deleted before pointerup", () => {
+      UI.clickTool("text");
+      mouse.downAt(55, 57.5);
+      expect(h.elements.length).toBe(1);
+
+      // a collaborator deletes the container mid-press
+      API.setElements([newElementWith(rectangle, { isDeleted: true })]);
+      mouse.upAt(55, 57.5);
+
+      expect(h.elements.filter((el) => !el.isDeleted)).toEqual([]);
+      expect(h.state.editingTextElement).toBe(null);
+      expect(h.state.activeTool.type).toBe("selection");
+    });
+
+    it("should not revive a pending center click when the text tool is left and picked again mid-press", async () => {
+      UI.clickTool("text");
+      mouse.downAt(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+      expect(h.state.activeTool.type).toBe("selection");
+      UI.clickTool("text");
+      // the press belonged to the tool that was left
+      mouse.moveTo(175, 57.5);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+      mouse.upAt(175, 57.5);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+      expect(h.state.editingTextElement).toBe(null);
+
+      // a fresh center click still binds (the release above counted as a
+      // click of the re-picked tool and reverted it, as any tool's would)
+      UI.clickTool("text");
+      mouse.clickAt(55, 57.5);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Label");
+      Keyboard.exitTextEditor(editor);
+      expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(
+        rectangle.id,
+      );
+    });
+
+    it("should drop a pending center click when the browser cancels the pointer", async () => {
+      UI.clickTool("text");
+      const touch = new Pointer("touch", 7);
+      touch.downAt(55, 57.5);
+      // finger jitter, well under the drag threshold — and what makes the
+      // finger, not the mouse that drew the rectangle, the last pointer to
+      // have moved, as in a touch-only session
+      touch.moveTo(56, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // scroll / palm rejection: no pointerup will follow
+      fireEvent.pointerCancel(GlobalTestState.interactiveCanvas, {
+        pointerId: 7,
+        pointerType: "touch",
+        clientX: 55,
+        clientY: 57.5,
+      });
+      // the outline was the armed click's: it goes with it, before any other
+      // pointer moves (no finger is left to refresh it)
+      expect(h.state.textToolHover).toBe(null);
+      // the gesture is gone with the pointer: nothing listens for movement
+      // any more, and the tool is still the user's
+      mouse.moveTo(175, 57.5);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+      expect(h.state.editingTextElement).toBe(null);
+      expect(h.state.activeTool.type).toBe("text");
+
+      // the next center click is an ordinary one — nothing of the canceled
+      // press replays into it
+      mouse.clickAt(55, 57.5);
+      const editor = await getTextEditor();
+      updateTextEditor(editor, "Label");
+      Keyboard.exitTextEditor(editor);
+      expect((h.elements[1] as ExcalidrawTextElement).containerId).toBe(
+        rectangle.id,
+      );
+    });
+
+    it("should clear the armed outline when a second finger discards a pending center click", () => {
+      UI.clickTool("text");
+      const first = new Pointer("touch", 7);
+      const second = new Pointer("touch", 8);
+      first.downAt(55, 57.5);
+      // jitter: the finger is the last pointer to have moved (see above)
+      first.moveTo(56, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // pinch/pan intent: the first press is torn down unresolved, and its
+      // outline with it — no finger hovers to refresh it later
+      second.downAt(300, 300);
+      expect(h.state.textToolHover).toBe(null);
+      first.upAt(55, 57.5);
+      second.upAt(300, 300);
+      expect(h.state.textToolHover).toBe(null);
+      expect(h.elements.map((el) => el.type)).toEqual(["rectangle"]);
+    });
+
+    it("should not refresh the hover from a lifted finger's position when the viewport moves", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "free",
+        x: 300,
+        y: 300,
+        width: 40,
+        height: 25,
+      });
+      API.setElements([...h.elements, text]);
+      UI.clickTool("text");
+      UI.clickTool("lock");
+      const touch = new Pointer("touch", 7);
+
+      // a tap on the text (with some finger jitter) edits it
+      touch.downAt(320, 312);
+      touch.moveTo(322, 312);
+      touch.upAt(322, 312);
+      let editor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(text.id);
+      Keyboard.exitTextEditor(editor);
+      expect(h.state.activeTool.type).toBe("text");
+      expect(h.state.textToolHover).toBe(null);
+      // a finger doesn't hover: a viewport change has nothing to re-resolve,
+      // not even where it lifted, over the text
+      API.setAppState({ scrollY: h.state.scrollY - 1 });
+      expect(h.state.textToolHover).toBe(null);
+      API.setAppState({ scrollY: h.state.scrollY + 1 });
+      expect(h.state.textToolHover).toBe(null);
+
+      // a short drag from an empty container's center still binds a label;
+      // once its editor closes, the lifted finger doesn't bring the outline
+      // back either
+      touch.downAt(55, 57.5);
+      touch.moveTo(65, 57.5);
+      touch.upAt(65, 57.5);
+      editor = await getTextEditor();
+      expect(h.state.editingTextElement?.containerId).toBe(rectangle.id);
+      Keyboard.exitTextEditor(editor);
+      expect(h.state.textToolHover).toBe(null);
+      API.setAppState({ scrollY: h.state.scrollY - 1 });
+      expect(h.state.textToolHover).toBe(null);
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+      API.setAppState({ zoom: { value: 1 as typeof h.state.zoom.value } });
+      expect(h.state.textToolHover).toBe(null);
+    });
+    it("should refresh the hover when the viewport scrolls or zooms under a still pointer", async () => {
+      const text = API.createElement({
+        type: "text",
+        text: "free",
+        x: 300,
+        y: 300,
+        width: 40,
+        height: 25,
+      });
+      API.setElements([...h.elements, text]);
+      UI.clickTool("text");
+
+      // container target, scrolled away and back
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: 400 });
+      await waitFor(() => expect(h.state.scrollY).not.toBe(0));
+      expect(h.state.textToolHover).toBe(null);
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: -400 });
+      await waitFor(() => expect(h.state.scrollY).toBe(0));
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+
+      // text target
+      mouse.moveTo(320, 312);
+      expect(h.state.textToolHover).toEqual({
+        type: "text",
+        elementId: text.id,
+      });
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: 400 });
+      await waitFor(() => expect(h.state.scrollY).not.toBe(0));
+      expect(h.state.textToolHover).toBe(null);
+      fireEvent.wheel(GlobalTestState.interactiveCanvas, { deltaY: -400 });
+      await waitFor(() => expect(h.state.scrollY).toBe(0));
+      expect(h.state.textToolHover).toEqual({
+        type: "text",
+        elementId: text.id,
+      });
+
+      // a zoom about the viewport origin (as from the keyboard) moves the
+      // rectangle's center away from the still pointer
+      mouse.moveTo(55, 57.5);
+      expect(h.state.textToolHover).toEqual({
+        type: "container",
+        elementId: rectangle.id,
+      });
+      API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
+      expect(h.state.textToolHover).toBe(null);
+    });
+
     it("should reset the text element angle to the container's when binding to rotated non-arrow container", async () => {
       const text = API.createElement({
         type: "text",
@@ -2051,6 +3322,34 @@ describe("textWysiwyg", () => {
         expect(edge(text)).toBeCloseTo(before, 4);
       },
     );
+
+    it("unwraps a text clicked on its handle", async () => {
+      // the handle's shown on desktop only
+      unmountComponent();
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          UIOptions={{ getFormFactor: () => "desktop" }}
+        />,
+      );
+      API.setElements([wrappedText()]);
+      API.setAppState({ selectedElementIds: { text: true } });
+      const [x, y] = getTextAutoResizeHandle(
+        h.elements[0] as ExcalidrawTextElement,
+        h.state.zoom.value,
+        "desktop",
+      )!.center;
+
+      mouse.moveTo(x, y);
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.POINTER,
+      );
+
+      mouse.clickAt(x, y);
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      expect(text.text).toBe(text.originalText);
+    });
   });
 
   describe("history", () => {

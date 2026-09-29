@@ -29,6 +29,7 @@ import {
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
+import { TopPicksTip } from "../TopPicksDnD/TopPicksTip";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
 import {
   DropDownMenuItemBadgeType,
@@ -43,6 +44,7 @@ import {
   FreedrawIcon,
 } from "../icons";
 
+import { useFontPickerDnD } from "./fontTopPicksDnD";
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
 
 import type { JSX } from "react";
@@ -67,9 +69,13 @@ interface FontPickerListProps {
   onLeave: () => void;
   onOpen: () => void;
   onClose: () => void;
+  /** present only while the top picks are customized */
+  onResetTopPicks?: () => void;
 }
 
-const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
+export const getFontFamilyIcon = (
+  fontFamily: FontFamilyValues,
+): JSX.Element => {
   switch (fontFamily) {
     case FONT_FAMILY.Excalifont:
     case FONT_FAMILY.Virgil:
@@ -87,7 +93,7 @@ const getFontFamilyIcon = (fontFamily: FontFamilyValues): JSX.Element => {
   }
 };
 
-const getFontFamilyLabel = (
+export const getFontFamilyLabel = (
   fontFamily: FontFamilyValues,
   fontFaces: ExcalidrawFontFace[],
 ) =>
@@ -105,12 +111,15 @@ export const FontPickerList = React.memo(
     onLeave,
     onOpen,
     onClose,
+    onResetTopPicks,
   }: FontPickerListProps) => {
     const { container } = useExcalidrawContainer();
     const app = useApp();
     const { fonts } = app;
     const { showDeprecatedFonts } = useAppProps();
     const stylesPanelMode = useStylesPanelMode();
+    // present only when the top picks are customizable
+    const dnd = useFontPickerDnD();
 
     const [searchTerm, setSearchTerm] = useState("");
     const inputRef = useRef<HTMLInputElement>(null);
@@ -317,10 +326,14 @@ export const FontPickerList = React.memo(
             wrappedOnSelect(Number(e.currentTarget.value));
           }}
           onMouseMove={() => {
-            if (hoveredFont?.value !== font.value) {
+            // don't live-preview fonts the dragged one merely passes over
+            if (!dnd?.dragState && hoveredFont?.value !== font.value) {
               onHover(font.value);
             }
           }}
+          onPointerDown={
+            dnd ? (event) => dnd.startSourceDrag(event, font.value) : undefined
+          }
         >
           <MenuItemContent
             icon={font.icon}
@@ -404,10 +417,19 @@ export const FontPickerList = React.memo(
         >
           {groups.length ? groups : null}
         </ScrollableList>
+        {dnd && (
+          <TopPicksTip
+            className="FontPicker__tip"
+            tip={t("fontList.topPicksTip")}
+            onReset={onResetTopPicks}
+            resetTitle={t("fontList.resetTopPicks")}
+          />
+        )}
       </PropertiesPopover>
     );
   },
   (prev, next) =>
     prev.selectedFontFamily === next.selectedFontFamily &&
-    prev.hoveredFontFamily === next.hoveredFontFamily,
+    prev.hoveredFontFamily === next.hoveredFontFamily &&
+    !!prev.onResetTopPicks === !!next.onResetTopPicks,
 );

@@ -1,5 +1,6 @@
 import {
   clamp,
+  pointDistance,
   pointFrom,
   pointsEqual,
   type GlobalPoint,
@@ -7,7 +8,6 @@ import {
   type Radians,
   bezierEquation,
   pointRotateRads,
-  pointDistance,
 } from "@excalidraw/math";
 
 import {
@@ -26,7 +26,7 @@ import {
   deconstructDiamondElement,
   deconstructRectanguloidElement,
   elementCenterPoint,
-  getDiamondBaseCorners,
+  getAllMidpoints,
   FOCUS_POINT_SIZE,
   getOmitSidesForEditorInterface,
   getTransformHandles,
@@ -40,9 +40,10 @@ import {
   isImageElement,
   isLinearElement,
   isLineElement,
-  maxBindingDistance_simple,
   isTextElement,
+  getTextElementWithAccuratePosition,
   LinearElementEditor,
+  maxBindingDistance_simple,
   getActiveTextElement,
   getElementsInGroup,
   getSelectedGroupIds,
@@ -213,41 +214,6 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   );
 
   context.restore();
-};
-
-/**
- * Marks where on the hovered arrow the text tool would attach text — a free
- * endpoint, or the midpoint the arrow's label would center on.
- *
- * Purely presentational: `AppArrowText` maintains the anchor at every event
- * that can change it (pointermove, the ctrl/cmd binding toggle, pointerdown,
- * tool switches, finalize). The element lookup below only guards against the
- * arrow vanishing through channels no local event covers, e.g. a collaborator
- * deleting it.
- */
-const renderHoveredArrowTextAnchor = (
-  context: CanvasRenderingContext2D,
-  appState: InteractiveCanvasAppState,
-  elementsMap: ElementsMap,
-) => {
-  const { elementId, anchor } = appState.hoveredArrowTextAnchor!;
-
-  const element = elementsMap.get(elementId);
-
-  if (!element || !isArrowElement(element) || element.isDeleted) {
-    return;
-  }
-
-  const point =
-    anchor === "label"
-      ? LinearElementEditor.getBoundTextElementCenter(element, elementsMap)
-      : LinearElementEditor.getPointAtIndexGlobalCoordinates(
-          element,
-          anchor === "start" ? 0 : -1,
-          elementsMap,
-        );
-
-  highlightPoint(point, context, appState);
 };
 
 const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
@@ -474,6 +440,7 @@ const renderBindingHighlightForBindableElement_simple = (
       break;
   }
 
+  // Draw midpoint indicators
   if (
     appState.isMidpointSnappingEnabled &&
     !appState.gridModeEnabled &&
@@ -481,11 +448,14 @@ const renderBindingHighlightForBindableElement_simple = (
     (isFrameLikeElement(suggestedBinding.element) ||
       isBindableElement(suggestedBinding.element))
   ) {
-    // Draw midpoint indicators
     const linearElement = appState.selectedLinearElement;
     const arrow =
       linearElement?.elementId &&
-      LinearElementEditor.getElement(linearElement?.elementId, elementsMap);
+      LinearElementEditor.getElement(linearElement.elementId, elementsMap);
+    const isElbow =
+      (arrow && isElbowArrow(arrow)) ||
+      (appState.activeTool.type === "arrow" &&
+        appState.currentItemArrowType === "elbow");
     const cursorIsInsideBindable =
       pointerCoords &&
       hitElementItself({
@@ -496,118 +466,56 @@ const renderBindingHighlightForBindableElement_simple = (
         overrideShouldTestInside: true,
       });
 
-    const isElbow =
-      (arrow && isElbowArrow(arrow)) ||
-      (appState.activeTool.type === "arrow" &&
-        appState.currentItemArrowType === "elbow");
-
+    // Simple arrows only snap to midpoints from outside the element
     if (!cursorIsInsideBindable || isElbow) {
       context.save();
 
-      const center = elementCenterPoint(suggestedBinding.element, elementsMap);
+      const midpointRadius = 4 / appState.zoom.value;
+      const highlightedMidpoint = suggestedBinding.midPoint;
+      const midpoints = getAllMidpoints(suggestedBinding.element, elementsMap);
 
-      let midpoints: GlobalPoint[];
-      if (suggestedBinding.element.type === "diamond") {
-        const center = elementCenterPoint(
-          suggestedBinding.element,
-          elementsMap,
-        );
-        midpoints = getDiamondBaseCorners(suggestedBinding.element).map(
-          (curve) => {
-            const point = bezierEquation(curve, 0.5);
-            const rotatedPoint = pointRotateRads(
-              point,
-              center,
-              suggestedBinding.element.angle,
-            );
-
-            return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-          },
-        );
-      } else {
-        const basePoints = [
-          {
-            x: suggestedBinding.element.width,
-            y: suggestedBinding.element.height / 2,
-          }, // RIGHT
-          {
-            x: suggestedBinding.element.width / 2,
-            y: suggestedBinding.element.height,
-          }, // BOTTOM
-          { x: 0, y: suggestedBinding.element.height / 2 }, // LEFT
-          { x: suggestedBinding.element.width / 2, y: 0 }, // TOP
-        ];
-        midpoints = basePoints.map((point) => {
-          const globalPoint = pointFrom<GlobalPoint>(
-            point.x + suggestedBinding.element.x,
-            point.y + suggestedBinding.element.y,
+      // Elbow arrows show all midpoints, simple arrows only the one closest to
+      // the pointer, once the pointer gets near it
+      let shownMidpoints = midpoints;
+      if (!isElbow) {
+        const threshold =
+          maxBindingDistance_simple(appState.zoom) +
+          suggestedBinding.element.strokeWidth / 2;
+        const closest =
+          pointerCoords &&
+          midpoints.reduce((a, b) =>
+            pointDistance(a, pointerCoords) <= pointDistance(b, pointerCoords)
+              ? a
+              : b,
           );
-          const rotatedPoint = pointRotateRads(
-            globalPoint,
-            center,
-            suggestedBinding.element.angle,
-          );
-          return pointFrom<GlobalPoint>(rotatedPoint[0], rotatedPoint[1]);
-        });
+        shownMidpoints =
+          closest && pointDistance(closest, pointerCoords) <= threshold * 2
+            ? [closest]
+            : [];
       }
 
-      const hoveredMidpoint =
-        pointerCoords &&
-        midpoints.reduce(
-          (
-            closestIdx: {
-              idx: number;
-              distance: number;
-            },
-            point,
-            idx,
-          ) => {
-            const distance = pointDistance(point, pointerCoords);
-            if (idx === -1 || distance < closestIdx.distance) {
-              return { idx, distance };
-            }
-            return closestIdx;
-          },
-          {
-            idx: -1,
-            distance: Infinity,
-          },
-        );
-
-      const midpointRadius = 4 / appState.zoom.value;
-      const highlightThreshold =
-        maxBindingDistance_simple(appState.zoom) +
-        suggestedBinding.element.strokeWidth / 2;
-
-      midpoints.forEach((midpoint, idx) => {
-        const isHighlighted =
-          (!cursorIsInsideBindable || isElbow) &&
-          hoveredMidpoint?.idx === idx &&
-          hoveredMidpoint.distance <= highlightThreshold;
-
-        // also render midpoint if cursor close but not highlighted
-        // (for elbows, always show all points)
-        const isShown =
-          !isHighlighted &&
-          (isElbow ||
-            (idx === hoveredMidpoint?.idx &&
-              hoveredMidpoint.distance <= highlightThreshold * 2));
-
-        if (isHighlighted) {
-          context.fillStyle = `rgba(${
-            BINDING_HIGHLIGHT_RGB[appState.theme]
-          }, 1)`;
-
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
-        } else if (isShown) {
-          context.fillStyle = BINDING_MIDPOINT_COLOR[appState.theme];
-          context.beginPath();
-          context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
-          context.fill();
+      context.fillStyle = BINDING_MIDPOINT_COLOR[appState.theme];
+      for (const midpoint of shownMidpoints) {
+        if (highlightedMidpoint && pointsEqual(midpoint, highlightedMidpoint)) {
+          continue;
         }
-      });
+        context.beginPath();
+        context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
+        context.fill();
+      }
+
+      if (highlightedMidpoint) {
+        context.fillStyle = `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, 1)`;
+        context.beginPath();
+        context.arc(
+          highlightedMidpoint[0],
+          highlightedMidpoint[1],
+          midpointRadius,
+          0,
+          2 * Math.PI,
+        );
+        context.fill();
+      }
 
       context.restore();
     }
@@ -1589,6 +1497,85 @@ const renderTextBox = (
   context.restore();
 };
 
+/**
+ * The text tool's hover affordance — what a click would act on (see
+ * `AppTextTool`): a dashed box around the text it would edit, the binding
+ * outline around the empty container it would label, or a point on the arrow
+ * anchor (free endpoint / midpoint label) it would attach text to.
+ *
+ * Purely presentational: `AppTextTool` keeps the state current at every event
+ * that can change it. The element lookup only guards against the element
+ * vanishing through channels no local event covers, e.g. a collaborator
+ * deleting it.
+ */
+const renderTextToolHover = (
+  app: AppClassProperties,
+  context: CanvasRenderingContext2D,
+  appState: InteractiveCanvasAppState,
+  elementsMap: NonDeletedSceneElementsMap,
+  selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+) => {
+  const hover = appState.textToolHover!;
+  const element = elementsMap.get(hover.elementId);
+  if (!element || element.isDeleted) {
+    return;
+  }
+  switch (hover.type) {
+    case "text": {
+      if (isTextElement(element)) {
+        // the same subtle box as around a wrapped text being edited; a
+        // label's stored coords can be stale, so derive them
+        renderTextBox(
+          getTextElementWithAccuratePosition(element, elementsMap),
+          context,
+          appState,
+          selectionColor,
+        );
+      }
+      return;
+    }
+    case "container": {
+      if (isBindableElement(element)) {
+        // the outline arrow binding shows, minus its animation and its
+        // `isBindingEnabled` gate: the resolved target already accounts for
+        // the modifier, independently of the arrow-binding preference
+        context.save();
+        context.translate(appState.scrollX, appState.scrollY);
+        renderBindingHighlightForBindableElement_simple(
+          context,
+          { element },
+          elementsMap,
+          appState,
+          app.lastPointerMoveCoords
+            ? pointFrom<GlobalPoint>(
+                app.lastPointerMoveCoords.x,
+                app.lastPointerMoveCoords.y,
+              )
+            : null,
+        );
+        context.restore();
+      }
+      return;
+    }
+    case "arrow": {
+      if (isArrowElement(element)) {
+        const point =
+          hover.anchor === "label"
+            ? LinearElementEditor.getBoundTextElementCenter(
+                element,
+                elementsMap,
+              )
+            : LinearElementEditor.getPointAtIndexGlobalCoordinates(
+                element,
+                hover.anchor === "start" ? 0 : -1,
+                elementsMap,
+              );
+        highlightPoint(point, context, appState);
+      }
+    }
+  }
+};
+
 const renderResetAutoResizeHandle = (
   text: ExcalidrawTextElement,
   context: CanvasRenderingContext2D,
@@ -1752,8 +1739,14 @@ const _renderInteractiveScene = ({
     };
   }
 
-  if (appState.hoveredArrowTextAnchor) {
-    renderHoveredArrowTextAnchor(context, appState, allElementsMap);
+  if (appState.textToolHover) {
+    renderTextToolHover(
+      app,
+      context,
+      appState,
+      allElementsMap,
+      renderConfig.selectionColor,
+    );
   }
 
   if (appState.frameToHighlight) {

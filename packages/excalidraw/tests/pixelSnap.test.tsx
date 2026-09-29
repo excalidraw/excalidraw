@@ -4,7 +4,7 @@ import { Excalidraw } from "../index";
 import { snapScrollToDevicePixels } from "../renderer/helpers";
 
 import { API } from "./helpers/api";
-import { GlobalTestState, render, waitFor } from "./test-utils";
+import { act, GlobalTestState, render, waitFor } from "./test-utils";
 
 import type { NormalizedZoomValue } from "../types";
 
@@ -189,6 +189,110 @@ describe("element pixel snap", () => {
       return blits;
     });
     expect(distanceToWholePixel(blit)).toBeGreaterThan(1e-3);
+  });
+
+  it.each([0, Math.PI / 2, 0.4])(
+    "places overridden bitmaps like translated document geometry (%s rad)",
+    async (angle) => {
+      const ownerWindow = GlobalTestState.canvas.ownerDocument.defaultView!;
+      const pixelRatioDescriptor = Object.getOwnPropertyDescriptor(
+        ownerWindow,
+        "devicePixelRatio",
+      )!;
+      try {
+        for (const devicePixelRatio of [1, 2]) {
+          Object.defineProperty(ownerWindow, "devicePixelRatio", {
+            configurable: true,
+            value: devicePixelRatio,
+          });
+          for (const zoom of [1, 1.5, 0.73]) {
+            const props = {
+              type: "rectangle" as const,
+              x: 110.37,
+              y: 140.61,
+              width: 120,
+              height: 60,
+              angle: angle as any,
+            };
+            const element = API.createElement(props);
+            API.setElements([element]);
+            await renderAt(zoom, 3.3, -7.77);
+            (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
+            act(() =>
+              window.h.app.api.setElementRenderOverrides(
+                new Map([[element.id, { offset: { x: 13.37, y: -7.61 } }]]),
+              ),
+            );
+            const [overridden] = await waitFor(() => {
+              const blits = getBlits();
+              expect(blits).toHaveLength(1);
+              return blits;
+            });
+            act(() => window.h.app.api.setElementRenderOverrides(null));
+            API.setElements([
+              API.createElement({
+                ...props,
+                x: props.x + 13.37,
+                y: props.y - 7.61,
+              }),
+            ]);
+            const [translated] = await renderAt(zoom, 3.3, -7.77);
+            expect(overridden.x).toBeCloseTo(translated.x, 6);
+            expect(overridden.y).toBeCloseTo(translated.y, 6);
+            expect(overridden.scale).toBeCloseTo(translated.scale, 6);
+            if (angle !== 0.4) {
+              expect(distanceToWholePixel(overridden)).toBeLessThan(1e-6);
+            }
+          }
+        }
+      } finally {
+        Object.defineProperty(
+          ownerWindow,
+          "devicePixelRatio",
+          pixelRatioDescriptor,
+        );
+      }
+    },
+  );
+
+  it("keeps bound-label snapping stable through inherited fractional offsets", async () => {
+    const box = API.createElement({
+      type: "rectangle",
+      id: "box",
+      x: 10,
+      y: 10,
+      width: 200,
+      height: 100,
+      boundElements: [{ type: "text", id: "label" }],
+    });
+    const label = API.createElement({
+      type: "text",
+      id: "label",
+      x: 61,
+      y: 30,
+      text: "hi",
+      fontSize: 20,
+      containerId: box.id,
+    });
+    API.setElements([box, label]);
+    await renderAt(1.5, 3.3, -7.77);
+    const offsets = new Set<string>();
+    for (const translation of [0, 0.3, 0.4, 0.7, 1.4]) {
+      (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
+      act(() =>
+        window.h.app.api.setElementRenderOverrides(
+          new Map([[box.id, { offset: { x: translation, y: translation } }]]),
+        ),
+      );
+      const blits = await waitFor(() => {
+        const blits = getBlits();
+        expect(blits).toHaveLength(2);
+        return blits;
+      });
+      const [labelBlit, boxBlit] = [...blits].sort((p, q) => p.width - q.width);
+      offsets.add(`${labelBlit.x - boxBlit.x},${labelBlit.y - boxBlit.y}`);
+    }
+    expect(offsets.size).toBe(1);
   });
 });
 

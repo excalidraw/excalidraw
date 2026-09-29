@@ -15,6 +15,8 @@ import {
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
+  FONT_METADATA,
+  FONT_TOP_PICKS_SLOTS,
   ROUNDNESS,
   DEFAULT_SIDEBAR,
   DEFAULT_ELEMENT_PROPS,
@@ -31,6 +33,7 @@ import {
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
   isTransparent,
+  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -112,12 +115,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type {
-  AppState,
-  BinaryFiles,
-  LibraryItem,
-  NormalizedZoomValue,
-} from "../types";
+import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -402,7 +400,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               boundElement,
               startOrEnd,
               elementsMap,
-              { value: 1 as NormalizedZoomValue },
+              DEFAULT_ZOOM,
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
         safeElement as NonDeleted<ExcalidrawArrowElement>,
@@ -1231,6 +1229,28 @@ const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
   return colors.size ? [...colors.values()] : null;
 };
 
+const restoreFontTopPicks = (
+  value: unknown,
+): readonly FontFamilyValues[] | null => {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+  const fontFamilies = new Set<FontFamilyValues>();
+  for (const fontFamily of value) {
+    const metadata =
+      typeof fontFamily === "number" ? FONT_METADATA[fontFamily] : undefined;
+    // only families the font picker lists (no internal or fallback fonts)
+    if (!metadata || metadata.private || metadata.fallback) {
+      continue;
+    }
+    fontFamilies.add(fontFamily as FontFamilyValues);
+    if (fontFamilies.size >= FONT_TOP_PICKS_SLOTS) {
+      break;
+    }
+  }
+  return fontFamilies.size ? [...fontFamilies] : null;
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -1295,6 +1315,7 @@ export const restoreAppState = (
       nextAppState.colorTopPicks?.stickyNoteBackground,
     ),
   };
+  nextAppState.fontTopPicks = restoreFontTopPicks(nextAppState.fontTopPicks);
 
   // legacy
   if ((appState as any).currentItemStrokeWidth !== undefined) {

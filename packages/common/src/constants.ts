@@ -2,7 +2,11 @@ import type {
   ExcalidrawElement,
   FontFamilyValues,
 } from "@excalidraw/element/types";
-import type { AppProps, AppState } from "@excalidraw/excalidraw/types";
+import type {
+  AppProps,
+  AppState,
+  NormalizedZoomValue,
+} from "@excalidraw/excalidraw/types";
 
 import { COLOR_PALETTE } from "./colors";
 
@@ -18,6 +22,12 @@ export const APP_NAME = "Excalidraw";
 // don't unintentionally create text elements that are wrapped to a few chars
 // (happens a lot with fast clicks with the text tool)
 export const TEXT_AUTOWRAP_THRESHOLD = 36; // px
+// room left at each side of the visible canvas when a text stops growing at
+// its width, or is brought into view once it wraps
+export const TEXT_VIEWPORT_PADDING = 20; // px
+// the widest a typed or pasted text gets before it wraps (in scene units, so
+// at any zoom), however wide the view
+export const TEXT_MAX_WRAP_WIDTH = 800; // px
 export const DRAGGING_THRESHOLD = 10; // px
 export const MINIMUM_ARROW_SIZE = 20; // px
 export const LINE_CONFIRM_THRESHOLD = 8; // px
@@ -259,6 +269,11 @@ export const STICKY_NOTE_SHADOW_OPACITY = 0.16;
 export const STICKY_NOTE_EDGE_SHADOW_WIDTH = 0.5;
 export const STICKY_NOTE_EDGE_SHADOW_OPACITY = 0.08;
 export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
+/** number of slots in the font-picker top-picks strip — pick customization
+ * (replace / reorder) preserves it. Must equal `DEFAULT_FONTS.length` in
+ * `packages/excalidraw/components/FontPicker/FontPicker.tsx` (enforced by
+ * `fontTopPicks.test.ts`) */
+export const FONT_TOP_PICKS_SLOTS = 3;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";
@@ -346,9 +361,14 @@ export const TOUCH_CTX_MENU_TIMEOUT = 500;
 export const TITLE_TIMEOUT = 10000;
 export const VERSION_TIMEOUT = 30000;
 export const SCROLL_TIMEOUT = 100;
+export const ZEN_MODE_TRANSITION_DURATION = 250;
 export const ZOOM_STEP = 0.1;
 export const MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 30;
+/** 100% zoom, for computations that have no editor zoom to go by */
+export const DEFAULT_ZOOM: AppState["zoom"] = Object.freeze({
+  value: 1 as NormalizedZoomValue,
+});
 export const HYPERLINK_TOOLTIP_DELAY = 300;
 
 // Report a user inactive after IDLE_THRESHOLD milliseconds

@@ -238,6 +238,57 @@ describe("wheel navigation", () => {
         expectGrabbedUnderCursor(grabbed);
       });
 
+      it.each(["pointerup", "blur", "cleanup"] as const)(
+        "broadcasts the final pointer using the committed pan viewport on %s",
+        (ending) => {
+          const onPointerUpdate = vi.fn();
+          GlobalTestState.renderResult.rerender(
+            <Excalidraw onPointerUpdate={onPointerUpdate} />,
+          );
+          grab();
+          fireEvent.pointerMove(GlobalTestState.interactiveCanvas, {
+            ...wheelButtonPointer,
+            clientX: 110,
+            clientY: 105,
+          });
+
+          const released = {
+            ...moved,
+            clientX: 150,
+            clientY: 140,
+            buttons: 0,
+          };
+          throttle.holding = true;
+          try {
+            fireEvent.pointerMove(GlobalTestState.interactiveCanvas, moved);
+            expect(onPointerUpdate).not.toHaveBeenCalled();
+            if (ending === "pointerup") {
+              fireEvent.pointerUp(GlobalTestState.interactiveCanvas, released);
+            } else if (ending === "blur") {
+              fireEvent.blur(window);
+            } else {
+              React.act(() => h.app.pan.end());
+            }
+          } finally {
+            throttle.holding = false;
+          }
+
+          expect(onPointerUpdate).toHaveBeenCalledTimes(1);
+          expect(onPointerUpdate).toHaveBeenLastCalledWith(
+            expect.objectContaining({
+              pointer: {
+                ...viewportCoordsToSceneCoords(
+                  ending === "pointerup" ? released : moved,
+                  h.state,
+                ),
+                tool: "pointer",
+              },
+              button: "up",
+            }),
+          );
+        },
+      );
+
       it("keeps drawing from zoom-scaled bitmaps until the gesture is over", async () => {
         grab();
 
@@ -267,43 +318,83 @@ describe("wheel navigation", () => {
       expect(resolveInputDevice(h.state.inputDevice)).toBe("trackpad");
     });
 
+    describe.each(["auto", "mouse", "trackpad"] as const)(
+      "shift+wheel with %s input",
+      (inputDevice) => {
+        beforeEach(() => {
+          API.setAppState({
+            inputDevice,
+            zoom: { value: getNormalizedZoom(2) },
+            scrollX: 12,
+            scrollY: 34,
+          });
+        });
+
+        it.each([
+          { label: "shift+wheel", modifiers: {}, axis: "scrollX" },
+          {
+            label: "ctrl+shift+wheel",
+            modifiers: { ctrlKey: true },
+            axis: "scrollY",
+          },
+          {
+            label: "cmd+shift+wheel",
+            modifiers: { metaKey: true },
+            axis: "scrollY",
+          },
+        ] as const)("pans only $axis on $label", ({ modifiers, axis }) => {
+          const start = getViewport();
+          wheel({ deltaX: 10, deltaY: 40, shiftKey: true, ...modifiers });
+          expect(getViewport()).toEqual({
+            ...start,
+            [axis]: start[axis] - 20,
+          });
+
+          // A horizontal-only wheel delta must follow the requested axis too.
+          wheel({ deltaX: -40, shiftKey: true, ...modifiers });
+          expect(getViewport()).toEqual(start);
+        });
+      },
+    );
+
     describe("mouse", () => {
       beforeEach(() => {
         API.setAppState({ inputDevice: "mouse" });
       });
 
-      it("zooms on plain wheel and pans vertically on ctrl/cmd+wheel", () => {
+      it.each([
+        { label: "plain wheel", modifiers: {} },
+        { label: "ctrl+wheel", modifiers: { ctrlKey: true } },
+        { label: "cmd+wheel", modifiers: { metaKey: true } },
+      ])("zooms around the pointer on $label", ({ modifiers }) => {
+        const pointer = { clientX: 100, clientY: 100 };
+        fireEvent.pointerMove(GlobalTestState.interactiveCanvas, pointer);
+        const scenePoint = viewportCoordsToSceneCoords(pointer, h.state);
         const start = getViewport();
-        wheel({ deltaY: -100 });
+        wheel({ deltaY: -100, ...modifiers });
         expect(h.state.zoom.value).toBeGreaterThan(start.zoom);
 
-        const zoomed = getViewport();
-        wheel({ deltaY: 40, ctrlKey: true });
-        expect(getViewport()).toEqual({
-          ...zoomed,
-          scrollY: zoomed.scrollY - 40 / zoomed.zoom,
-        });
+        const zoomedInPoint = viewportCoordsToSceneCoords(pointer, h.state);
+        expect(zoomedInPoint.x).toBeCloseTo(scenePoint.x);
+        expect(zoomedInPoint.y).toBeCloseTo(scenePoint.y);
 
-        const panned = getViewport();
-        wheel({ deltaY: 40, metaKey: true });
-        expect(getViewport()).toEqual({
-          ...panned,
-          scrollY: panned.scrollY - 40 / panned.zoom,
-        });
-      });
+        const zoomedIn = h.state.zoom.value;
+        wheel({ deltaY: 100, ...modifiers });
+        expect(h.state.zoom.value).toBeLessThan(zoomedIn);
 
-      it("keeps shift+wheel panning horizontally", () => {
-        const start = getViewport();
-        wheel({ deltaY: 40, shiftKey: true });
-        expect(getViewport()).toEqual({
-          ...start,
-          scrollX: start.scrollX - 40 / start.zoom,
-        });
+        const zoomedOutPoint = viewportCoordsToSceneCoords(pointer, h.state);
+        expect(zoomedOutPoint.x).toBeCloseTo(scenePoint.x);
+        expect(zoomedOutPoint.y).toBeCloseTo(scenePoint.y);
       });
 
       it("keeps zooming with the wheel button held", () => {
         const start = getViewport();
-        wheel({ deltaY: -100, buttons: WHEEL_BUTTON, ctrlKey: true });
+        wheel({
+          deltaY: -100,
+          buttons: WHEEL_BUTTON,
+          ctrlKey: true,
+          shiftKey: true,
+        });
         expect(h.state.zoom.value).toBeGreaterThan(start.zoom);
       });
 
