@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/fractional-indexing",
-  "version": "3.3.0",
+  "version": "0.18.0-draw.1",
   "description": "Provides functions for generating ordering strings",
   "type": "module",
   "types": "./dist/types/fractional-indexing/src/index.d.ts",
