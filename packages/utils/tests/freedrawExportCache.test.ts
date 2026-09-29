@@ -4,7 +4,10 @@ import * as perfectFreehand from "@excalidraw/element/perfectFreehand";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { vi } from "vitest";
 
-import type { ExcalidrawFreeDrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawFreeDrawElement,
+  NonDeleted,
+} from "@excalidraw/element/types";
 
 import * as utils from "../src";
 
@@ -18,9 +21,9 @@ const stroke = () =>
       pointFrom<LocalPoint>(20, 10),
       pointFrom<LocalPoint>(40, 0),
     ],
-  }) as ExcalidrawFreeDrawElement;
+  }) as NonDeleted<ExcalidrawFreeDrawElement>;
 
-const exportTile = (elements: ExcalidrawFreeDrawElement[]) =>
+const exportTile = (elements: NonDeleted<ExcalidrawFreeDrawElement>[]) =>
   utils.exportToCanvas({ elements, files: null, restoreElements: false });
 
 describe("freedraw export", () => {
