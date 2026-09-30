@@ -469,6 +469,8 @@
     "saveCardDetails": "Save the scene to your Google Drive.",
     "saveCardButton": "Save to Google Drive",
     "saveFolderPickerTitle": "Choose a folder",
+    "saveFolderPickerMyDriveView": "My Drive",
+    "saveFolderPickerSharedView": "Shared with me",
     "saveInProgressToast": "Saving to Google Drive...",
     "saveSuccessToast": "Saved to Google Drive ({{fileName}})",
     "saveError": "Failed to save to Google Drive",

@@ -127,15 +127,23 @@ export const pickDriveFolder = async ({
   }
 
   return new Promise<DriveFile | null>((resolve) => {
-    const view = new picker.DocsView(picker.ViewId.FOLDERS);
-    view.setSelectFolderEnabled(true);
+    const myDriveView = new picker.DocsView(picker.ViewId.FOLDERS);
+    myDriveView.setSelectFolderEnabled(true);
+    myDriveView.setOwnedByMe(true);
+    myDriveView.setLabel(t("googleDrive.saveFolderPickerMyDriveView"));
+
+    const sharedView = new picker.DocsView(picker.ViewId.FOLDERS);
+    sharedView.setSelectFolderEnabled(true);
+    sharedView.setOwnedByMe(false);
+    sharedView.setLabel(t("googleDrive.saveFolderPickerSharedView"));
 
     const pickerBuilder = new picker.PickerBuilder()
       .setOAuthToken(accessToken)
       .setDeveloperKey(getGoogleApiKey())
       .setAppId(getGoogleAppId())
       .setTitle(t("googleDrive.saveFolderPickerTitle"))
-      .addView(view)
+      .addView(myDriveView)
+      .addView(sharedView)
       .setCallback((data: any) => {
         const action = data[picker.Response.ACTION];
         if (action === picker.Action.PICKED) {
