@@ -1,5 +1,6 @@
 import { KEYS } from "@excalidraw/common";
 import {
+  elementWithCanvasCache,
   getBoundTextMaxWidth,
   getCornerRadius,
   isTextElement,
@@ -563,6 +564,37 @@ describe("authoringUnits: screen, what an element made far in keeps", () => {
     )!;
     expect(headOf(copy)).toBeCloseTo(headOf(arrow), 12);
   });
+
+  it.each([100, 10_000])(
+    "caches a rectangle made at %sx in a bitmap no bigger than it is on screen plus a margin",
+    async (zoom) => {
+      atZoom(zoom);
+      const rectangle = UI.createElement("rectangle", {
+        x: 100,
+        y: 100,
+        width: 220,
+        height: 130,
+      });
+      await act(async () => {});
+      const cached = elementWithCanvasCache.get(rectangle.get())!;
+      const margin = 2 * 20 * window.devicePixelRatio;
+      expect(cached.canvas.width).toBeLessThanOrEqual(
+        220 * window.devicePixelRatio + margin,
+      );
+      expect(cached.canvas.height).toBeLessThanOrEqual(
+        130 * window.devicePixelRatio + margin,
+      );
+
+      const { x } = rectangle.get();
+      mouse.downAt(200, 150);
+      mouse.moveTo(240, 180);
+      mouse.moveTo(280, 210);
+      mouse.upAt();
+      await act(async () => {});
+      expect((rectangle.get().x - x) * zoom).toBeCloseTo(80, 6);
+      expect(elementWithCanvasCache.get(rectangle.get())).toBe(cached);
+    },
+  );
 });
 
 describe("authoringUnits: scene (default)", () => {

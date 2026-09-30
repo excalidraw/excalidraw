@@ -158,6 +158,7 @@ left in scene units, with the reason. Line numbers are on branch
 | `element/src/resizeElements.ts:310, 924, 1522` | smallest font a resize reaches, 1 | D |
 | `element/src/flowchart.ts:174` | gap between flowchart nodes, 100 (the nodes copy their parent's size) | D |
 | `element/src/bounds.ts:1011` `getElementPaintExtent` | how far paint reaches past the centre-line bounds, used by `getElementsOverlappingFrame` (frame export) and `isElementInViewport` (culling) | D |
+| `element/src/renderElement.ts` `getCanvasPadding` | room around an element's cache bitmap, 20 or 40; in scene units a 220 by 130 px rectangle made at 100x got a 4,440 by 4,260 px bitmap, 64 MB, and a new one on each pointer move while it was drawn | D |
 
 ### Text far under a pixel
 
@@ -216,7 +217,9 @@ size and scaled back down. Fonts of a pixel or more are untouched.
   new elements keep upstream's scene sizes at any zoom.
 - The same file: a medium arrow made at 100x keeps its head through JSON
   export and restore and through duplication; `restore` drops an invalid
-  `authoringScale`.
+  `authoringScale`; a rectangle made at 100x or 10,000x is cached in a bitmap
+  no bigger than it is on screen plus 20 px a side, and moving it reuses that
+  bitmap.
 - `packages/excalidraw/tests/freedrawStrokeWidth.test.tsx`: the pen width prop
   in both units.
 - `packages/element/tests/paintExtent.test.ts`: a thick stroke whose ink, not

@@ -101,6 +101,11 @@ const isPendingImageElement = (
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
 
+/**
+ * Room around an element's cache bitmap for paint past its bounds. The fixed
+ * sizes are details (see `getElementDetailScale`); in scene units, an element
+ * made at 100x got 2,000 px of padding a side, 64 MB for a small rectangle.
+ */
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
@@ -109,11 +114,11 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
       return element.fontSize / 2;
     case "arrow":
       if (element.endArrowhead || element.endArrowhead) {
-        return 40;
+        return 40 * getElementDetailScale(element);
       }
-      return 20;
+      return 20 * getElementDetailScale(element);
     default:
-      return 20;
+      return 20 * getElementDetailScale(element);
   }
 };
 
