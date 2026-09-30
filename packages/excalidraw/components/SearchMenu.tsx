@@ -798,8 +798,15 @@ const handleSearch = debounce(
       isFrameLikeElement(el),
     ) as ExcalidrawFrameLikeElement[];
 
-    texts.sort((a, b) => a.y - b.y);
-    frames.sort((a, b) => a.y - b.y);
+    // Sort by Y first, then by ID for deterministic/stable ordering.
+    // Without the ID tiebreaker, elements with identical Y coordinates
+    // can reorder unpredictably, causing the search results list to jump
+    // around while dragging (e.g. dragging one element changes its Y,
+    // which shifts its sort position relative to elements it previously
+    // shared a Y-coordinate with).
+    // See: https://github.com/excalidraw/excalidraw/issues/9503
+    texts.sort((a, b) => a.y - b.y || a.id.localeCompare(b.id));
+    frames.sort((a, b) => a.y - b.y || a.id.localeCompare(b.id));
 
     const textMatches: SearchMatchItem[] = [];
 
