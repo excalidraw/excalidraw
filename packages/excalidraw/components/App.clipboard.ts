@@ -432,7 +432,7 @@ export class AppClipboard {
       strokeColor: this.app.state.currentItemStrokeColor,
       backgroundColor: this.app.state.currentItemBackgroundColor,
       fillStyle: this.app.state.currentItemFillStyle,
-      strokeWidth: this.app.getCurrentItemStrokeWidth("text"),
+      ...this.app.getCurrentItemScale("text"),
       strokeStyle: this.app.state.currentItemStrokeStyle,
       roundness: null,
       roughness: this.app.state.currentItemRoughness,

@@ -127,9 +127,9 @@ export const FOCUS_POINT_SIZE = 10 / 1.5;
 const MIN_BINDABLE_SIZE = 1;
 
 export const getBindingGap = (
-  // only the stroke width is needed, so the gap can also be computed for a
-  // bind target that doesn't exist yet (see `getTextBindingForArrowEndpoint`)
-  bindTarget: Pick<ExcalidrawBindableElement, "type" | "strokeWidth">,
+  // only these are needed, so the gap can also be computed for a bind target
+  // that doesn't exist yet (see `getTextBindingForArrowEndpoint`)
+  bindTarget: Pick<ExcalidrawBindableElement, "strokeWidth" | "authoringScale">,
 ): number => {
   return (
     BASE_BINDING_GAP * getElementDetailScale(bindTarget) +

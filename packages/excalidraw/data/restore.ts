@@ -431,8 +431,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
 };
 
 const restoreElementWithProperties = <
-  T extends Required<Omit<ExcalidrawElement, "customData">> & {
+  T extends Required<
+    Omit<ExcalidrawElement, "customData" | "authoringScale">
+  > & {
     customData?: ExcalidrawElement["customData"];
+    authoringScale?: ExcalidrawElement["authoringScale"];
     /** @deprecated */
     boundElementIds?: readonly ExcalidrawElement["id"][];
     /** @deprecated */
@@ -509,6 +512,15 @@ const restoreElementWithProperties = <
     ...getNormalizedDimensions(base),
     ...extra,
   } as unknown as T;
+
+  // absent means 1 (`getElementDetailScale`)
+  if (
+    !isFiniteNumber(ret.authoringScale) ||
+    ret.authoringScale <= 0 ||
+    ret.authoringScale === 1
+  ) {
+    delete ret.authoringScale;
+  }
 
   // strip legacy props (migrated in previous steps)
   delete ret.strokeSharpness;

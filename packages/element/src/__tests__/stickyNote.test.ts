@@ -1023,10 +1023,7 @@ describe("sticky note creation date", () => {
   it("picks the footer form by width bucket, without measuring", () => {
     const created = at(2025, 4, 30);
     const footer = (width: number, height = DEFAULT_STICKY_NOTE_SIZE) =>
-      getStickyNoteFooter(
-        { created, width, height, type: "stickynote", strokeWidth: 2 },
-        NOW,
-      );
+      getStickyNoteFooter({ created, width, height, type: "stickynote" }, NOW);
     const yearWidth =
       STICKY_NOTE_PADDING * 2 + STICKY_NOTE_FOOTER.minBodyWidthForYear;
 
@@ -1051,7 +1048,6 @@ describe("sticky note creation date", () => {
           width: 250,
           height: 250,
           type: "stickynote",
-          strokeWidth: 2,
         },
         NOW,
       ),

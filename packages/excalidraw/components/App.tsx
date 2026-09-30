@@ -153,8 +153,8 @@ import {
   isInvisiblySmallElement,
   getRoundnessForShape,
   getAuthoringScale,
+  getAuthoringScaleField,
   getElementDetailScale,
-  hasStrokeWidth,
   getCornerRadius,
   isPathALoop,
   createSrcDoc,
@@ -8876,7 +8876,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.getCurrentItemStrokeWidth("freedraw"),
+      ...this.getCurrentItemScale("freedraw"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
@@ -8944,7 +8944,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.getCurrentItemStrokeWidth("iframe"),
+      ...this.getCurrentItemScale("iframe"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("iframe"),
@@ -8997,7 +8997,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: "transparent",
       backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.getCurrentItemStrokeWidth("embeddable"),
+      ...this.getCurrentItemScale("embeddable"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: this.getCurrentItemRoundness("embeddable"),
@@ -9044,7 +9044,7 @@ class App extends React.Component<AppProps, AppState> {
       strokeColor: this.state.currentItemStrokeColor,
       backgroundColor: this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.getCurrentItemStrokeWidth("image"),
+      ...this.getCurrentItemScale("image"),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       roundness: null,
@@ -9222,7 +9222,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
+              ...this.getCurrentItemScale(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -9249,7 +9249,7 @@ class App extends React.Component<AppProps, AppState> {
               strokeColor: this.state.currentItemStrokeColor,
               backgroundColor: this.state.currentItemBackgroundColor,
               fillStyle: this.state.currentItemFillStyle,
-              strokeWidth: this.getCurrentItemStrokeWidth(elementType),
+              ...this.getCurrentItemScale(elementType),
               strokeStyle: this.state.currentItemStrokeStyle,
               roughness: this.state.currentItemRoughness,
               opacity: this.state.currentItemOpacity,
@@ -9384,21 +9384,22 @@ class App extends React.Component<AppProps, AppState> {
       : null;
   }
 
-  public getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
+  /** The stroke width and authoring scale a new element is made with. */
+  public getCurrentItemScale(
+    elementType: ExcalidrawElement["type"],
+  ): Pick<ExcalidrawElement, "strokeWidth" | "authoringScale"> {
     const { freedrawStrokeWidth } = this.props;
     const width =
       elementType === "freedraw" && freedrawStrokeWidth !== undefined
         ? freedrawStrokeWidth
         : getStrokeWidthByKey(
             elementType,
-            // an element that draws no stroke carries the authoring scale in
-            // its width exactly at the thinnest one (`getElementDetailScale`)
-            this.state.authoringUnits === "screen" &&
-              !hasStrokeWidth(elementType)
-              ? "thin"
-              : this.state.currentItemStrokeWidthKey,
+            this.state.currentItemStrokeWidthKey,
           );
-    return width * getAuthoringScale(this.state);
+    return {
+      strokeWidth: width * getAuthoringScale(this.state),
+      ...getAuthoringScaleField(this.state),
+    };
   }
 
   /** The font size new text is created at, in scene units. */
@@ -9435,7 +9436,7 @@ class App extends React.Component<AppProps, AppState> {
           ? this.state.currentItemStickynoteBackgroundColor
           : this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
-      strokeWidth: this.getCurrentItemStrokeWidth(elementType),
+      ...this.getCurrentItemScale(elementType),
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,

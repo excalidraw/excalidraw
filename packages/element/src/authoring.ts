@@ -1,4 +1,4 @@
-import { DEFAULT_ZOOM, getStrokeWidthByKey } from "@excalidraw/common";
+import { DEFAULT_ZOOM } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
@@ -23,18 +23,23 @@ export const getAuthoringScale = (view: AuthoringView) =>
   view.authoringUnits === "screen" ? 1 / view.zoom.value : 1;
 
 /**
+ * The `authoringScale` a new element made in this view carries, spread into
+ * its constructor options. Omitted at 1, so scene authoring writes the same
+ * elements as upstream.
+ */
+export const getAuthoringScaleField = (
+  view: AuthoringView,
+): Pick<ExcalidrawElement, "authoringScale"> => {
+  const authoringScale = getAuthoringScale(view);
+  return authoringScale === 1 ? {} : { authoringScale };
+};
+
+/**
  * How the fixed details drawn or laid out around an element (arrowheads,
  * dash patterns, rough.js wobble, label padding, binding gaps, sticky note
- * chrome) scale with it. They are sized for strokes at least as wide as the
- * thinnest named width, which is every element the UI makes at 1x, so this is
- * 1 for those; thinner strokes, which screen authoring makes when zoomed in,
- * shrink the details in proportion.
+ * chrome) scale with it: the authoring scale it was made at, so they look on
+ * screen as they do at 1x at any stroke width.
  */
 export const getElementDetailScale = (
-  element: Pick<ExcalidrawElement, "type" | "strokeWidth">,
-) => {
-  const thin = getStrokeWidthByKey(element.type, "thin");
-  return element.strokeWidth > 0 && element.strokeWidth < thin
-    ? element.strokeWidth / thin
-    : 1;
-};
+  element: Pick<ExcalidrawElement, "authoringScale">,
+) => element.authoringScale ?? 1;

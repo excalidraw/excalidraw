@@ -95,19 +95,20 @@ export class AppArrowText {
   /**
    * How a text should be created to read as a label for this endpoint — the
    * side midpoint to bind, the alignment that pins it, and the scene position
-   * it must sit at. `targetStrokeWidth` is the caller's to provide so it can
-   * guarantee it matches the stroke width the text is then created with — the
-   * binding gap derives from it (see `getTextBindingForArrowEndpoint`).
+   * it must sit at. `target` is the caller's to provide so it can guarantee
+   * it matches the stroke width and authoring scale the text is then created
+   * with — the binding gap derives from them (see
+   * `getTextBindingForArrowEndpoint`).
    */
   getTextBinding(
     { arrow, startOrEnd }: ArrowEndpoint,
-    targetStrokeWidth: number,
+    target: Parameters<typeof getTextBindingForArrowEndpoint>[3],
   ) {
     return getTextBindingForArrowEndpoint(
       arrow,
       startOrEnd,
       this.app.scene.getNonDeletedElementsMap(),
-      targetStrokeWidth,
+      target,
     );
   }
 

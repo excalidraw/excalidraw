@@ -1,5 +1,6 @@
 import { KEYS } from "@excalidraw/common";
 import {
+  getBoundTextMaxWidth,
   getCornerRadius,
   isTextElement,
   setCustomTextMetricsProvider,
@@ -14,6 +15,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+import { serializeAsJSON } from "../data/json";
+import { restoreElements } from "../data/restore";
 import { exportToSvg } from "../scene/export";
 import { getNormalizedZoom } from "../scene";
 
@@ -317,11 +320,8 @@ describe("authoringUnits: screen", () => {
 describe("authoringUnits: screen, the details drawn around new elements", () => {
   beforeEach(async () => {
     await renderEditor("screen");
-    // exact on screen at the thinnest width, and without rough.js wobble
-    API.setAppState({
-      currentItemStrokeWidthKey: "thin",
-      currentItemRoughness: 0,
-    });
+    // without rough.js wobble, so only the details' sizes differ
+    API.setAppState({ currentItemRoughness: 0 });
   });
 
   afterEach(async () => {
@@ -348,40 +348,73 @@ describe("authoringUnits: screen, the details drawn around new elements", () => 
     };
   };
 
-  it("draws an arrowhead the same size on screen at any zoom", () => {
-    expectSameAtEveryZoom((zoom) => {
-      const arrow = UI.createElement("arrow", {
-        x: 100,
-        y: 100,
-        width: 200,
-        height: 0,
-      }).get() as ExcalidrawArrowElement;
-      const [, ...arrowhead] = ShapeCache.generateElementShape(
-        arrow,
-        null,
-      ) as Drawable[];
-      return span(arrowhead, zoom);
-    });
-  });
+  const WIDTHS = ["thin", "medium", "bold"] as const;
 
-  it("dashes a stroke the same on screen at any zoom", () => {
-    API.setAppState({ currentItemStrokeStyle: "dashed" });
-    const first = expectSameAtEveryZoom((zoom) => {
-      const rectangle = UI.createElement("rectangle", {
-        x: 100,
-        y: 100,
-        width: 120,
-        height: 80,
-      }).get();
-      const { options } = ShapeCache.generateElementShape(
-        rectangle,
-        null,
-      ) as Drawable;
-      const [dash, gap] = options.strokeLineDash!;
-      return { dash: dash * zoom, gap: gap * zoom };
-    });
-    expect(first).toEqual({ dash: 8, gap: 9 });
-  });
+  it.each(WIDTHS)(
+    "draws a %s arrow's head the same size on screen at any zoom",
+    (width) => {
+      API.setAppState({ currentItemStrokeWidthKey: width });
+      expectSameAtEveryZoom((zoom) => {
+        const arrow = UI.createElement("arrow", {
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 0,
+        }).get() as ExcalidrawArrowElement;
+        const [, ...arrowhead] = ShapeCache.generateElementShape(
+          arrow,
+          null,
+        ) as Drawable[];
+        return span(arrowhead, zoom);
+      });
+    },
+  );
+
+  it.each([
+    ["thin", { dash: 8, gap: 9 }],
+    ["medium", { dash: 8, gap: 10 }],
+    ["bold", { dash: 8, gap: 12 }],
+  ] as const)(
+    "dashes a %s stroke the same on screen at any zoom",
+    (width, expected) => {
+      API.setAppState({
+        currentItemStrokeStyle: "dashed",
+        currentItemStrokeWidthKey: width,
+      });
+      const first = expectSameAtEveryZoom((zoom) => {
+        const rectangle = UI.createElement("rectangle", {
+          x: 100,
+          y: 100,
+          width: 120,
+          height: 80,
+        }).get();
+        const { options } = ShapeCache.generateElementShape(
+          rectangle,
+          null,
+        ) as Drawable;
+        const [dash, gap] = options.strokeLineDash!;
+        return { dash: dash * zoom, gap: gap * zoom };
+      });
+      expect(first).toEqual(expected);
+    },
+  );
+
+  it.each(WIDTHS)(
+    "pads a %s rectangle's label the same on screen at any zoom",
+    (width) => {
+      API.setAppState({ currentItemStrokeWidthKey: width });
+      const first = expectSameAtEveryZoom((zoom) => {
+        const rectangle = UI.createElement("rectangle", {
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 100,
+        }).get();
+        return { labelWidth: getBoundTextMaxWidth(rectangle, null) * zoom };
+      });
+      expect(first.labelWidth).toBe(190);
+    },
+  );
 
   it.each([
     ["binds an arrow that ends just off a shape", 8, true],
@@ -451,6 +484,84 @@ describe("authoringUnits: screen, the details drawn around new elements", () => 
       expect(area / areas[0]).toBeGreaterThan(0.66);
       expect(area / areas[0]).toBeLessThan(1.5);
     }
+  });
+});
+
+describe("authoringUnits: screen, what an element made far in keeps", () => {
+  beforeEach(async () => {
+    await renderEditor("screen");
+    API.setAppState({
+      currentItemStrokeWidthKey: "medium",
+      currentItemRoughness: 0,
+    });
+  });
+
+  afterEach(async () => {
+    await act(async () => {});
+  });
+
+  const headOf = (arrow: ExcalidrawArrowElement) => {
+    const [, ...arrowhead] = ShapeCache.generateElementShape(
+      arrow,
+      null,
+    ) as Drawable[];
+    const xs = arrowhead.flatMap((drawable) =>
+      drawable.sets.flatMap((set) =>
+        set.ops.flatMap((op) => op.data.filter((_, i) => i % 2 === 0)),
+      ),
+    );
+    return Math.max(...xs) - Math.min(...xs);
+  };
+
+  it("keeps an arrow's head through saving to JSON and restoring", () => {
+    atZoom(100);
+    const arrow = UI.createElement("arrow", {
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 0,
+    }).get() as ExcalidrawArrowElement;
+    const [restored] = restoreElements(
+      JSON.parse(serializeAsJSON([arrow], h.state, {}, "local")).elements,
+      null,
+    ) as ExcalidrawArrowElement[];
+    expect(headOf(restored)).toBeCloseTo(headOf(arrow), 12);
+    expect(headOf(restored) * 100).toBeLessThan(40);
+  });
+
+  it.each([-1, 0, NaN, "0.01", null])(
+    "restores an invalid authoringScale (%s) as 1",
+    (authoringScale) => {
+      const [restored] = restoreElements(
+        [
+          {
+            ...API.createElement({ type: "rectangle" }),
+            authoringScale,
+          } as any,
+        ],
+        null,
+      );
+      expect("authoringScale" in restored).toBe(false);
+    },
+  );
+
+  it("keeps an arrow's head when duplicated", () => {
+    atZoom(100);
+    const arrow = UI.createElement("arrow", {
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 0,
+    }).get() as ExcalidrawArrowElement;
+    API.setSelectedElements([arrow]);
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.D);
+    });
+    const copy = latest().find(
+      (element): element is ExcalidrawArrowElement =>
+        element.type === "arrow" && element.id !== arrow.id,
+    )!;
+    expect(headOf(copy)).toBeCloseTo(headOf(arrow), 12);
   });
 });
 

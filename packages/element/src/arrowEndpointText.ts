@@ -40,6 +40,7 @@ import type { Heading } from "./heading";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
+  ExcalidrawBindableElement,
   ExcalidrawTextElement,
   FixedPoint,
   NonDeleted,
@@ -135,11 +136,11 @@ export const getTextBindingForArrowEndpoint = (
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
   /**
-   * stroke width the text will be created with — the binding gap is derived
-   * from the *bind target*, so using the arrow's would offset the anchor by
-   * half the difference between the two
+   * stroke width and authoring scale the text will be created with — the
+   * binding gap is derived from the *bind target*, so using the arrow's would
+   * offset the anchor by the difference between the two
    */
-  targetStrokeWidth: number,
+  target: Pick<ExcalidrawBindableElement, "strokeWidth" | "authoringScale">,
 ): {
   /** the text-local ratio the arrow binds to (a side midpoint) */
   fixedPoint: FixedPoint;
@@ -186,9 +187,7 @@ export const getTextBindingForArrowEndpoint = (
   // `updateBoundPoint` will resolve the binding with, or the first text update
   // shifts the arrow. Elbow arrows terminate on the fixed point itself rather
   // than gap-outside the outline, so offsetting there would just shift them.
-  const gap = isElbowArrow(arrow)
-    ? 0
-    : getBindingGap({ type: "text", strokeWidth: targetStrokeWidth });
+  const gap = isElbowArrow(arrow) ? 0 : getBindingGap(target);
 
   // How far back along the arrow the bound side has to sit for the tip to
   // stay exactly where it is.

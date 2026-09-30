@@ -484,7 +484,7 @@ export const getStickyNoteDateLabel = (
 export const getStickyNoteFooter = (
   element: Pick<
     ExcalidrawStickyNoteElement,
-    "created" | "width" | "height" | "type" | "strokeWidth"
+    "created" | "width" | "height" | "type" | "authoringScale"
   >,
   now = Date.now(),
 ) => {

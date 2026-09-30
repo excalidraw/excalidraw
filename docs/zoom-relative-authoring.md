@@ -5,7 +5,8 @@ everything the user makes in scene units: a medium stroke is 2 units wide, a
 new text is 20 units tall, a clicked sticky note is 250 units square. At 100x
 those are 200, 2,000 and 25,000 pixels on screen, so work done while zoomed in
 is drawn with a broom. This fork adds one setting that makes new work look the
-same on screen at any zoom, without changing the element format.
+same on screen at any zoom, and one optional element field, `authoringScale`,
+that keeps the details drawn around that work the same too.
 
 ```tsx
 <Excalidraw authoringUnits="screen" freedrawStrokeWidth={penWidth} />
@@ -14,9 +15,10 @@ same on screen at any zoom, without changing the element format.
 With `authoringUnits="screen"`, every size the editor writes into a new or
 edited element is measured in screen pixels and divided by the zoom at that
 moment. Elements keep their scene sizes afterwards, so they zoom with the rest
-of the board. The default, `"scene"`, is upstream's behaviour. Undo,
-collaboration and the element JSON are unaffected: an element made at 100x is
-an ordinary element whose numbers happen to be small.
+of the board. The default, `"scene"`, is upstream's behaviour. An element made
+at 100x is an ordinary element whose numbers happen to be small, plus
+`"authoringScale": 0.01`. Scene authoring, and screen authoring at 1x, write no
+`authoringScale`, so their elements are upstream's.
 
 ## The data shape
 
@@ -34,12 +36,12 @@ Two numbers carry the whole feature.
 - **Detail scale** (`getElementDetailScale(element)`, same file). How the fixed
   details that rendering and layout add around an element (arrowheads, dash
   patterns, rough.js wobble, label padding, binding gaps, sticky note chrome,
-  minimum font sizes) scale with that element. It is read from the element
-  itself, `min(1, strokeWidth / thinnestNamedWidth)`, so it needs no new field.
-  It is exactly 1 for every element upstream's UI makes (their strokes are at
-  least the thinnest named width), so upstream rendering is unchanged, and it
-  shrinks with the stroke for elements made thinner than that, which is what
-  screen authoring makes when zoomed in.
+  minimum font sizes) scale with that element. It is the element's
+  `authoringScale` field: the authoring scale it was made at, written at
+  creation (`getAuthoringScaleField(view)`, spread into the constructor options
+  by `App.getCurrentItemScale` and `convertToShape`) and omitted when it is 1.
+  An absent field means 1, so every element upstream makes renders as
+  upstream renders it.
 
 The prop `authoringUnits` is mirrored into `AppState.authoringUnits` by
 `App.getDerivedStateFromProps`, the way `gridModeEnabled` and
@@ -54,29 +56,44 @@ exported (`APP_STATE_STORAGE_CONF`).
 | A. Prop plus an `App.getAuthoringScale()` method | `this.props` only | not handled | Rejected. Binding distance is decided in `packages/element` (`maxBindingDistance_simple` and 20 functions that pass `zoom` down to it), which never sees props; every one of them would need a new parameter anyway. |
 | B. Prop mirrored into `AppState`, pure `getAuthoringScale(view)` | `AppState.authoringUnits` | detail scale derived from the element's stroke | **Chosen.** One pure function reachable from both packages; upstream's own pattern for editor modes; tolerance functions take the view (`AuthoringView`) instead of a bare zoom. |
 | C. Create at scene size, then rescale the new element by `1/zoom` | nowhere | not handled | Rejected. Creation mixes sizes that come from the pointer (already scene units) with defaults (stroke, font, sticky size); a post-pass cannot tell them apart, and it would run after bound text and bindings have been laid out. |
-| D. Store the authoring scale on each element | a new element field | exact | Rejected: the element format must not change, and upstream `restore` drops unknown fields. It is the only design that makes every detail exact, so it is listed under open decisions. |
+| D. Store the authoring scale on each element | a new element field | exact | Adopted on top of B in 0.19.0-draw.5, once the owner approved the format change. |
 
 Within B, three ways to size the fixed details:
 
 | Detail sizing | Upstream elements | Screen-authored elements | Verdict |
 | --- | --- | --- | --- |
 | Leave the constants in scene units | unchanged | dashes turn solid, labels cannot fit their shape, sticky notes grow to 75 units, 1-unit bind floors, arrows under 0.1 units deleted | Rejected: broken, not merely off. |
-| Scale by the element's stroke (`getElementDetailScale`) | unchanged (scale 1) | exact at the thinnest width; at medium and bold the details are 2x and 4x their 1x size, in proportion to the stroke | **Chosen.** No format change, continuous in zoom, one rule. |
-| Scale by a stored per-element scale | unchanged | exact | Needs design D. |
+| Scale by the element's stroke, `min(1, strokeWidth / thinnest named width)` | unchanged (scale 1) | exact at the thinnest width; at medium and bold the details are 2x and 4x their 1x size | Shipped in draw.4, replaced in draw.5. |
+| Scale by a stored per-element scale (`authoringScale`) | unchanged (field absent) | exact at every width | **Chosen** (design D). |
 
-Two refinements make the stroke carrier exact where it can be:
+The adaptive corner radius has an optional field in the format already
+(`roundness.value`), so a rounded rectangle made in screen mode stores
+`32 * authoringScale` there (`getRoundnessForShape`) and its corners match 1x
+exactly.
 
-- Elements that draw no stroke (text, sticky notes) are created at the
-  thinnest named width in screen mode (`App.getCurrentItemStrokeWidth`), so
-  their stroke carries the authoring scale exactly and their details (sticky
-  note padding, footer and font range, minimum font size) match 1x on screen.
-- The adaptive corner radius has an optional field in the format already
-  (`roundness.value`), so a rounded rectangle made in screen mode stores
-  `32 * authoringScale` there (`getRoundnessForShape`) and its corners match
-  1x exactly.
+### The `authoringScale` field
+
+- Written at creation only. Every tool creates through
+  `App.getCurrentItemScale(type)`, which returns the stroke width and the
+  field together, so a new element cannot get one without the other. Shapes
+  recognised from a sketch (`convertToShape`) and flowchart nodes and their
+  arrows (`flowchart.ts`, copied from the parent) carry it too.
+- Edits keep it. The stroke width and font size pickers write screen-sized
+  values but leave the field alone, so an element's details stay at the size
+  they had where it was made.
+- Duplicate, copy and paste, undo, collaboration (`reconcileElements`) and
+  JSON and SVG export carry it as they carry any field.
+- `restore` keeps a finite positive value and drops anything else, and drops
+  1, so absent is the only spelling of 1.
+- Elements saved by draw.4 and earlier have no field, so their details render
+  at scale 1: a thin arrow made at 100x by draw.4 gets a 1x-sized head. There
+  is no migration, because the owner chose no backwards compatibility.
+- Zoomed out below 1x the field is above 1, so the details of work made there
+  grow with it and look on screen as they do at 1x.
 
 Shapes (rectangle, diamond, ellipse, line, arrow, embeddable) are generated at
-their nominal scale and scaled back (`generateAtDetailScale` in
+their nominal scale (the element divided by its detail scale, with
+`authoringScale: 1`) and scaled back (`generateAtDetailScale` in
 `packages/element/src/shape.ts`). That single choke point covers every
 constant in the shape generators: arrowhead sizes, dash patterns, the wobble
 rough.js adds in absolute units, the small-shape roughness cutoffs and the
@@ -96,7 +113,7 @@ left in scene units, with the reason. Line numbers are on branch
 
 | Where | What | Kind |
 | --- | --- | --- |
-| `excalidraw/components/App.tsx:9387` `getCurrentItemStrokeWidth` | the named width, or `freedrawStrokeWidth`, times the authoring scale; every tool creates through it (App.tsx 8879, 8947, 9000, 9047, 9225, 9252, 9438; App.text.ts 605, 743; App.clipboard.ts 435; App.toolDrag.ts 65; actionBoundText.tsx 277) | S |
+| `excalidraw/components/App.tsx` `getCurrentItemScale` | the named width, or `freedrawStrokeWidth`, times the authoring scale, and the `authoringScale` field; every tool creates through it (App.tsx 8879, 8947, 9000, 9047, 9225, 9252, 9438; App.text.ts 605, 743; App.clipboard.ts 435; App.toolDrag.ts 65; actionBoundText.tsx 277) | S |
 | `excalidraw/components/App.tsx:9405` `getCurrentItemFontSize` | `currentItemFontSize` (held in authoring units) times the scale; text tool, labels, paste, sticky notes and the text editor read it (App.text.ts 654, App.clipboard.ts 441, App.tsx 10819, wysiwyg/textWysiwyg.tsx 815) | S |
 | `excalidraw/actions/actionProperties.tsx:730, 769` | stroke width picker applied to a selection, and which named width it shows | S |
 | `excalidraw/actions/actionProperties.tsx:301, 1027` | font size picker applied to a selection; `currentItemFontSize` read back in authoring units | S |
@@ -167,13 +184,9 @@ size and scaled back down. Fonts of a pixel or more are untouched.
 
 ## Remaining differences on screen
 
-- Details of medium and bold elements made in screen mode are 2x and 4x their
-  1x size once the zoom passes 2x and 4x: a medium arrow's head is 50 px, not
-  25, and a medium rectangle's label padding is 10 px, not 5. Thin elements,
-  text and sticky notes are exact. Storing the authoring scale on the element
-  (design D) would make all of them exact.
-- Zoomed out below 1x, new elements are larger in scene units, but their
-  details stay at their 1x scene size, so they look smaller on screen.
+- An element whose stroke width is changed with the picker at a zoom other
+  than the one it was made at keeps the details of its original zoom, so its
+  head or dashes are no longer in proportion to the new stroke.
 - The eraser trail's corner smoothing reads pointer speed in scene units
   inside the laser-pointer library, so its outline differs by up to about a
   third between zooms.
@@ -182,9 +195,9 @@ size and scaled back down. Fonts of a pixel or more are untouched.
 
 ## Open decisions
 
-- Whether to add a per-element scale field (design D) to make the medium and
-  bold details exact. It changes the element format, so it is the owner's
-  call.
+- Whether the stroke width picker should rewrite `authoringScale` to the
+  current zoom. Doing so would also change label padding, so bound text would
+  need laying out again.
 - Whether the elbow arrow router and the single-point freedraw stroke should
   scale too.
 
@@ -193,13 +206,17 @@ size and scaled back down. Fonts of a pixel or more are untouched.
 - `packages/excalidraw/tests/zoomRelativeAuthoring.test.tsx`: at zoom 1, 100
   and 10,000 in screen mode, each tool (rectangle, ellipse, diamond, arrow,
   line, frame, freedraw, text, labelled shape, sticky note) makes an element of
-  the same on-screen size, stroke and font; at the thinnest width the corner
-  radius, arrowhead and dash pattern match too; the stroke width and font size pickers apply screen sizes;
+  the same on-screen size, stroke and font; the corner radius matches, and at
+  thin, medium and bold widths so do the arrowhead, the dash pattern and the
+  label padding; the stroke width and font size pickers apply screen sizes;
   the eraser takes a stroke 3 px away and leaves one 30 px away; a click 4 px
   off a shape selects it and one 20 px off does not; an arrow ending 8 px from
   a shape binds and one ending 40 px away does not; the grid stays 20 to
   100 px on screen and nests; the eraser trail keeps its size. In scene mode,
   new elements keep upstream's scene sizes at any zoom.
+- The same file: a medium arrow made at 100x keeps its head through JSON
+  export and restore and through duplication; `restore` drops an invalid
+  `authoringScale`.
 - `packages/excalidraw/tests/freedrawStrokeWidth.test.tsx`: the pen width prop
   in both units.
 - `packages/element/tests/paintExtent.test.ts`: a thick stroke whose ink, not

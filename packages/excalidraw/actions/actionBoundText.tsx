@@ -274,7 +274,7 @@ export const actionWrapTextInContainer = register({
       if (isTextElement(textElement) && !isBoundToContainer(textElement)) {
         const containerStyle = {
           type: "rectangle",
-          strokeWidth: app.getCurrentItemStrokeWidth("rectangle"),
+          ...app.getCurrentItemScale("rectangle"),
         } as const;
         const padding = getBoundTextPadding(containerStyle);
         const container = newElement({

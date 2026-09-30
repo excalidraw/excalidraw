@@ -602,7 +602,7 @@ export class AppText {
       arrowEndpoint &&
       this.app.arrowText.getTextBinding(
         arrowEndpoint,
-        this.app.getCurrentItemStrokeWidth("text"),
+        this.app.getCurrentItemScale("text"),
       );
 
     if (arrowEndpointBinding) {
@@ -740,7 +740,7 @@ export class AppText {
             : this.app.state.currentItemStrokeColor,
         backgroundColor: this.app.state.currentItemBackgroundColor,
         fillStyle: this.app.state.currentItemFillStyle,
-        strokeWidth: this.app.getCurrentItemStrokeWidth("text"),
+        ...this.app.getCurrentItemScale("text"),
         strokeStyle: this.app.state.currentItemStrokeStyle,
         roughness: this.app.state.currentItemRoughness,
         opacity: this.app.state.currentItemOpacity,

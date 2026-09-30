@@ -796,9 +796,8 @@ const scaleDrawable = (drawable: Drawable, scale: number): Drawable => {
  * Generates a shape for the element at its nominal scale and scales it back
  * (see `getElementDetailScale`), so the generators' fixed details, such as
  * arrowhead sizes, dash patterns, rough.js wobble and the adaptive corner
- * radius, shrink with an element drawn thinner than the thinnest named
- * stroke. Freedraw has no fixed details, and other elements are generated
- * as they are.
+ * radius, scale with the element's authoring scale. Freedraw has no fixed
+ * details, and other elements are generated as they are.
  */
 const generateAtDetailScale = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
@@ -816,6 +815,7 @@ const generateAtDetailScale = (
     width: element.width * grow,
     height: element.height * grow,
     strokeWidth: element.strokeWidth * grow,
+    authoringScale: 1,
     roundness: element.roundness?.value
       ? { ...element.roundness, value: element.roundness.value * grow }
       : element.roundness,

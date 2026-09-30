@@ -84,6 +84,10 @@ type _ExcalidrawElementBase = Readonly<{
   link: string | null;
   locked: boolean;
   customData?: Record<string, any>;
+  /** Scene units per screen pixel when the element was made with
+      `authoringUnits: "screen"` (1 / zoom), which sizes the details drawn
+      around it (`getElementDetailScale`). Absent means 1. */
+  authoringScale?: number;
 }>;
 
 export type ExcalidrawSelectionElement = _ExcalidrawElementBase & {

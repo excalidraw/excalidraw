@@ -1245,7 +1245,7 @@ export type AppClassProperties = {
   activeResizeHandle: App["activeResizeHandle"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
-  getCurrentItemStrokeWidth: App["getCurrentItemStrokeWidth"];
+  getCurrentItemScale: App["getCurrentItemScale"];
   getCurrentItemRoundness: App["getCurrentItemRoundness"];
   getCurrentItemFontSize: App["getCurrentItemFontSize"];
   setPlugins: App["setPlugins"];

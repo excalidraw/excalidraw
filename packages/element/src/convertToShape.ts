@@ -44,7 +44,7 @@ import type {
   ExcalidrawLineElement,
 } from "@excalidraw/element/types";
 
-import { getAuthoringScale } from "./authoring";
+import { getAuthoringScale, getAuthoringScaleField } from "./authoring";
 import { getFrameLikeElements } from "./frame";
 import {
   isLinearElement,
@@ -587,6 +587,7 @@ export const convertToShape = (
             recognizedShape.type,
             appState.currentItemStrokeWidthKey,
           ) * authoringScale,
+        ...getAuthoringScaleField(appState),
       }) as NonDeletedRecognizedShapeElement;
     }
     case "arrow": {
@@ -633,6 +634,7 @@ export const convertToShape = (
               recognizedShape.type,
               appState.currentItemStrokeWidthKey,
             ) * authoringScale,
+          ...getAuthoringScaleField(appState),
         });
 
         const normalized =
@@ -672,6 +674,7 @@ export const convertToShape = (
             recognizedShape.type,
             appState.currentItemStrokeWidthKey,
           ) * authoringScale,
+        ...getAuthoringScaleField(appState),
       });
 
       const normalized =
@@ -713,6 +716,7 @@ export const convertToShape = (
             recognizedShape.type,
             appState.currentItemStrokeWidthKey,
           ) * authoringScale,
+        ...getAuthoringScaleField(appState),
       });
 
       const normalized =

@@ -168,6 +168,9 @@ const _newElementBase = <T extends ExcalidrawElement>(
     link,
     locked,
     customData: rest.customData,
+    ...(rest.authoringScale !== undefined && {
+      authoringScale: rest.authoringScale,
+    }),
   };
   return element;
 };

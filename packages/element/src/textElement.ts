@@ -397,7 +397,7 @@ export const getContainerCenter = (
  * container (see `getElementDetailScale`).
  */
 export const getBoundTextPadding = (
-  container: Pick<ExcalidrawElement, "type" | "strokeWidth">,
+  container: Pick<ExcalidrawElement, "type" | "authoringScale">,
 ) =>
   (container.type === "stickynote" ? STICKY_NOTE_PADDING : BOUND_TEXT_PADDING) *
   getElementDetailScale(container);
@@ -405,7 +405,7 @@ export const getBoundTextPadding = (
 /** rounds a label-derived size to whole units at the container's scale */
 const roundForContainer = (
   size: number,
-  container: Pick<ExcalidrawElement, "type" | "strokeWidth">,
+  container: Pick<ExcalidrawElement, "type" | "authoringScale">,
   round: (value: number) => number = Math.round,
 ) => {
   const scale = getElementDetailScale(container);
@@ -537,7 +537,7 @@ export const isValidTextContainer = (element: {
 
 export const computeContainerDimensionForBoundText = (
   dimension: number,
-  container: Pick<ExcalidrawElement, "type" | "strokeWidth">,
+  container: Pick<ExcalidrawElement, "type" | "authoringScale">,
 ) => {
   dimension = roundForContainer(dimension, container, Math.ceil);
   const padding = BOUND_TEXT_PADDING * getElementDetailScale(container) * 2;
