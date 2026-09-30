@@ -1,3 +1,5 @@
+import { MIN_ZOOM } from "@excalidraw/common";
+
 import { flightPath } from "./viewportFlight";
 
 import type { NormalizedZoomValue } from "./types";
@@ -68,6 +70,54 @@ describe("flightPath", () => {
 
     it("is halfway, geometrically, halfway through", () => {
       expect(path.at(0.5).zoom.value).toBeCloseTo(Math.sqrt(8), 9);
+    });
+  });
+
+  describe("between two views at 1x, 400 views apart", () => {
+    // uncapped, this path would zoom out to about 0.01x
+    const from = viewport(0, 0, 1);
+    const target = viewport(-400_000, -100_000, 1);
+    const path = flightPath(from, target, screen);
+    const views = samples(4000).map((f) => path.at(f));
+    const zooms = views.map((v) => v.zoom.value);
+
+    it("never zooms out past MIN_ZOOM", () => {
+      expect(Math.min(...zooms)).toBeGreaterThanOrEqual(MIN_ZOOM * (1 - 1e-12));
+    });
+
+    it("pans across at MIN_ZOOM", () => {
+      expect(Math.min(...zooms)).toBeCloseTo(MIN_ZOOM, 12);
+    });
+
+    it("starts and lands exactly on its endpoints", () => {
+      expect(path.at(0)).toEqual(from);
+      expect(path.at(1)).toEqual(target);
+    });
+
+    it("moves the view center monotonically toward the target", () => {
+      const end = centerOf(target);
+      const distances = views.map((v) => {
+        const c = centerOf(v);
+        return Math.hypot(end.x - c.x, end.y - c.y);
+      });
+      const increases = distances.filter((d, i) => i && d > distances[i - 1]);
+      expect(increases).toEqual([]);
+    });
+
+    it("keeps an even pace, with no jump where the pan meets the zooms", () => {
+      // each step's change in screen terms: the pan in view widths and the
+      // zoom in log units
+      const steps = views.slice(1).map((v, i) => {
+        const [a, b] = [centerOf(views[i]), centerOf(v)];
+        return (
+          (Math.hypot(b.x - a.x, b.y - a.y) * v.zoom.value) / screen.width +
+          Math.abs(Math.log(v.zoom.value / views[i].zoom.value))
+        );
+      });
+      const jumps = steps.filter(
+        (d, i) => i && (d > steps[i - 1] * 1.1 || d < steps[i - 1] / 1.1),
+      );
+      expect(jumps).toEqual([]);
     });
   });
 });

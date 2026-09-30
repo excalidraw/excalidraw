@@ -705,6 +705,31 @@ export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElementWithCanvas
 >();
 
+/**
+ * While the zoom animates (`shouldCacheIgnoreZoom`), a cached bitmap is
+ * reused at other zooms until it would be shown more than this many times
+ * the size it was drawn at. Shrinking one never redraws it.
+ */
+const MAX_BITMAP_UPSCALE = 2;
+
+/**
+ * How long one frame of a zoom animation may spend redrawing blown-up
+ * bitmaps. Past it, the rest stay blurry until a later frame, so zooming in
+ * over many shapes does not stall on redrawing them all at once.
+ */
+const UPSCALE_REDRAW_BUDGET_MS = 4;
+
+/** Every element of a frame shares its zoom, so a new zoom is a new frame. */
+let upscaleRedrawFrame = { zoom: 0, until: 0 };
+
+const withinUpscaleRedrawBudget = (zoom: number) => {
+  const now = performance.now();
+  if (upscaleRedrawFrame.zoom !== zoom) {
+    upscaleRedrawFrame = { zoom, until: now + UPSCALE_REDRAW_BUDGET_MS };
+  }
+  return now < upscaleRedrawFrame.until;
+};
+
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
@@ -716,7 +741,9 @@ const generateElementWithCanvas = (
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
-    !appState?.shouldCacheIgnoreZoom;
+    (!appState?.shouldCacheIgnoreZoom ||
+      (zoom.value > prevElementWithCanvas.zoomValue * MAX_BITMAP_UPSCALE &&
+        withinUpscaleRedrawBudget(zoom.value)));
   const imageCrop = isImageElement(element) ? element.crop : null;
 
   const containingFrameOpacity =

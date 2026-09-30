@@ -1,6 +1,10 @@
 import rough from "roughjs/bin/rough";
 
-import { mutateElement, Scene } from "@excalidraw/element";
+import {
+  elementWithCanvasCache,
+  mutateElement,
+  Scene,
+} from "@excalidraw/element";
 import { pointFrom, type LocalPoint } from "@excalidraw/math";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
@@ -18,7 +22,11 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const draw = (element: NonDeletedExcalidrawElement, zoom: number) => {
+const draw = (
+  element: NonDeletedExcalidrawElement,
+  zoom: number,
+  state: Partial<AppState> = {},
+) => {
   const scene = new Scene([element], { skipValidation: true });
   const renderer = new Renderer(scene);
   const appState: AppState = {
@@ -28,6 +36,7 @@ const draw = (element: NonDeletedExcalidrawElement, zoom: number) => {
     offsetLeft: 0,
     offsetTop: 0,
     zoom: { value: getNormalizedZoom(zoom) },
+    ...state,
   };
   const { elementsMap, visibleElements } = renderer.getRenderableElements({
     ...appState,
@@ -126,5 +135,55 @@ describe("a freedraw stroke's Path2D", () => {
       points: [...element.points, pointFrom<LocalPoint>(60, 10)],
     });
     expect(filled(element)).not.toBe(first);
+  });
+});
+
+describe("a shape's cached bitmap while the zoom animates", () => {
+  const animating = { shouldCacheIgnoreZoom: true };
+  const shape = () =>
+    API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 40,
+      height: 20,
+    });
+  const bitmapZoom = (element: NonDeletedExcalidrawElement) =>
+    elementWithCanvasCache.get(element)?.zoomValue;
+
+  it("is reused while it is shown smaller, or up to twice its size", () => {
+    const element = shape();
+    draw(element, 0.2);
+    draw(element, 0.1, animating);
+    draw(element, 0.4, animating);
+    expect(bitmapZoom(element)).toBe(0.2);
+  });
+
+  it("is redrawn once it would be shown more than twice its size", () => {
+    const element = shape();
+    draw(element, 0.2);
+    draw(element, 20, animating);
+    expect(bitmapZoom(element)).toBe(20);
+  });
+
+  it("is redrawn a few per frame when many are blown up at once", () => {
+    const [first, second] = [shape(), shape()];
+    draw(first, 0.2);
+    draw(second, 0.2);
+    // each read of the clock is 5 ms after the last, past the frame budget
+    let now = 1e12;
+    vi.spyOn(performance, "now").mockImplementation(() => (now += 5));
+    draw(first, 25, animating);
+    draw(second, 25, animating);
+    expect([bitmapZoom(first), bitmapZoom(second)]).toEqual([25, 0.2]);
+    draw(second, 26, animating);
+    expect(bitmapZoom(second)).toBe(26);
+  });
+
+  it("is redrawn at the new zoom once the zoom settles", () => {
+    const element = shape();
+    draw(element, 0.2);
+    draw(element, 0.3);
+    expect(bitmapZoom(element)).toBe(0.3);
   });
 });

@@ -1,3 +1,5 @@
+import { MIN_ZOOM } from "@excalidraw/common";
+
 import type { NormalizedZoomValue } from "./types";
 
 type Viewport = {
@@ -30,7 +32,8 @@ export type FlightPath = {
  * The shortest-looking camera path from one viewport to another on a screen
  * of `width` by `height` px: between distant targets it zooms out, pans
  * across at the wider view, and zooms back in, so the destination comes into
- * view early instead of rushing past at full zoom.
+ * view early instead of rushing past at full zoom. It never zooms out past
+ * MIN_ZOOM: one that would zoom out further pans across at MIN_ZOOM instead.
  */
 export const flightPath = (
   from: Viewport,
@@ -85,6 +88,16 @@ export const flightPath = (
   const r0 = r(w0, 1);
   const r1 = r(w1, -1);
   const length = (r1 - r0) / RHO;
+  const along = (u: number, w: number) =>
+    viewport(c0.x + (dx / d) * u, c0.y + (dy / d) * u, w);
+
+  // The widest view is at s = -r0 / RHO, where the path levels off.
+  const widest = -r0 / RHO > 0 && -r0 / RHO < length ? w0 * Math.cosh(r0) : 0;
+  const maxWidth = Math.max(width / MIN_ZOOM, w0, w1);
+  if (widest > maxWidth) {
+    return cappedFlightPath(w0, w1, d, maxWidth, along, land);
+  }
+
   return {
     length,
     at: (factor) =>
@@ -94,11 +107,51 @@ export const flightPath = (
         const u =
           (w0 / (RHO * RHO)) *
           (Math.cosh(r0) * Math.tanh(RHO * s + r0) - Math.sinh(r0));
-        return viewport(
-          c0.x + (dx / d) * u,
-          c0.y + (dy / d) * u,
-          (w0 * Math.cosh(r0)) / Math.cosh(RHO * s + r0),
-        );
+        return along(u, (w0 * Math.cosh(r0)) / Math.cosh(RHO * s + r0));
+      }),
+  };
+};
+
+/**
+ * A flight whose widest view would be wider than `maxWidth`: the half of an
+ * optimal path that zooms out to exactly `maxWidth`, a pan at that width, and
+ * the half of one that zooms back in. The halves level off where they meet
+ * the pan, and pan at its speed there (du/ds = w / RHO), so the joins are
+ * smooth.
+ */
+const cappedFlightPath = (
+  w0: number,
+  w1: number,
+  d: number,
+  maxWidth: number,
+  along: (u: number, w: number) => Viewport,
+  land: (factor: number, pose: () => Viewport) => Viewport,
+): FlightPath => {
+  // A half path leveling off at maxWidth, as a function of s measured from
+  // where it levels off: its distance from there, and its width.
+  const halfU = (s: number) => (maxWidth / RHO ** 2) * Math.tanh(RHO * s);
+  const halfW = (s: number) => maxWidth / Math.cosh(RHO * s);
+
+  const zoomOut = Math.acosh(maxWidth / w0) / RHO;
+  const zoomIn = Math.acosh(maxWidth / w1) / RHO;
+  const panFrom = -halfU(-zoomOut);
+  const panTo = d - halfU(zoomIn);
+  const pan = ((panTo - panFrom) * RHO) / maxWidth;
+  const length = zoomOut + pan + zoomIn;
+
+  return {
+    length,
+    at: (factor) =>
+      land(factor, () => {
+        const s = factor * length;
+        if (s < zoomOut) {
+          return along(panFrom + halfU(s - zoomOut), halfW(s - zoomOut));
+        }
+        if (s < zoomOut + pan) {
+          return along(panFrom + ((s - zoomOut) * maxWidth) / RHO, maxWidth);
+        }
+        const t = s - zoomOut - pan;
+        return along(panTo + halfU(t), halfW(t));
       }),
   };
 };
