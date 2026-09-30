@@ -1,4 +1,5 @@
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 
 const { execSync } = require("child_process");
@@ -12,7 +13,6 @@ const PACKAGES = [
 ];
 const PACKAGES_DIR = path.resolve(__dirname, "../packages");
 const OUT_DIR = path.resolve(__dirname, "../release");
-const REPO = "redaphid/excalidraw";
 
 const version = process.argv
   .find((argument) => argument.startsWith("--version="))
@@ -30,11 +30,6 @@ const packageJsonPath = (packageName) =>
 
 const tarballName = (packageName) => `excalidraw-${packageName}-${version}.tgz`;
 
-const tarballUrl = (packageName) =>
-  `https://github.com/${REPO}/releases/download/v${version}/${tarballName(
-    packageName,
-  )}`;
-
 const readPackageJson = (packageName) =>
   JSON.parse(fs.readFileSync(packageJsonPath(packageName), "utf-8"));
 
@@ -45,7 +40,7 @@ const writePackageJson = (packageName, pkg) =>
     "utf-8",
   );
 
-const withInternalDependencies = (pkg, toSpecifier) => {
+const setInternalDependencies = (pkg) => {
   if (!pkg.dependencies) {
     return pkg;
   }
@@ -54,20 +49,16 @@ const withInternalDependencies = (pkg, toSpecifier) => {
     if (!dependencies[`@excalidraw/${packageName}`]) {
       continue;
     }
-    dependencies[`@excalidraw/${packageName}`] = toSpecifier(packageName);
+    dependencies[`@excalidraw/${packageName}`] = version;
   }
   return { ...pkg, dependencies };
 };
 
-// The committed package.jsons keep plain versions so the yarn workspace
-// resolves locally; only the packed copies point at the release tarballs,
-// since these versions are never published to npm.
 for (const packageName of PACKAGES) {
-  const pkg = withInternalDependencies(
-    { ...readPackageJson(packageName), version },
-    () => version,
+  writePackageJson(
+    packageName,
+    setInternalDependencies({ ...readPackageJson(packageName), version }),
   );
-  writePackageJson(packageName, pkg);
 }
 
 execSync("yarn --frozen-lockfile", { stdio: "inherit" });
@@ -82,17 +73,65 @@ for (const packageName of PACKAGES) {
 fs.rmSync(OUT_DIR, { recursive: true, force: true });
 fs.mkdirSync(OUT_DIR);
 for (const packageName of PACKAGES) {
-  const committed = readPackageJson(packageName);
-  writePackageJson(
-    packageName,
-    withInternalDependencies(committed, tarballUrl),
+  execSync(
+    `yarn pack --filename ${path.resolve(OUT_DIR, tarballName(packageName))}`,
+    { cwd: path.resolve(PACKAGES_DIR, packageName), stdio: "inherit" },
   );
-  try {
-    execSync(
-      `yarn pack --filename ${path.resolve(OUT_DIR, tarballName(packageName))}`,
-      { cwd: path.resolve(PACKAGES_DIR, packageName), stdio: "inherit" },
-    );
-  } finally {
-    writePackageJson(packageName, committed);
-  }
 }
+
+// These versions are never published to npm, so a consumer cannot resolve
+// the sibling packages. The excalidraw tarball carries them as bundled
+// dependencies instead, which package managers install without resolving.
+const staging = fs.mkdtempSync(path.join(os.tmpdir(), "excalidraw-pack-"));
+execSync(`tar -xzf ${tarballName("excalidraw")} -C ${staging}`, {
+  cwd: OUT_DIR,
+});
+const siblings = PACKAGES.filter((packageName) => packageName !== "excalidraw");
+const excalidraw = JSON.parse(
+  fs.readFileSync(path.join(staging, "package/package.json"), "utf-8"),
+);
+const dependencies = { ...excalidraw.dependencies };
+for (const packageName of siblings) {
+  const target = path.join(
+    staging,
+    "package/node_modules/@excalidraw",
+    packageName,
+  );
+  fs.mkdirSync(target, { recursive: true });
+  execSync(
+    `tar -xzf ${tarballName(packageName)} --strip-components=1 -C ${target}`,
+    { cwd: OUT_DIR },
+  );
+  const sibling = JSON.parse(
+    fs.readFileSync(path.join(target, "package.json"), "utf-8"),
+  );
+  for (const [name, specifier] of Object.entries(sibling.dependencies ?? {})) {
+    if (name.startsWith("@excalidraw/")) {
+      continue;
+    }
+    dependencies[name] = specifier;
+  }
+  dependencies[`@excalidraw/${packageName}`] = version;
+}
+fs.writeFileSync(
+  path.join(staging, "package/package.json"),
+  `${JSON.stringify(
+    {
+      ...excalidraw,
+      dependencies,
+      bundleDependencies: siblings.map(
+        (packageName) => `@excalidraw/${packageName}`,
+      ),
+    },
+    null,
+    2,
+  )}\n`,
+  "utf-8",
+);
+execSync(
+  `tar -czf ${path.resolve(
+    OUT_DIR,
+    tarballName("excalidraw"),
+  )} -C ${staging} package`,
+);
+fs.rmSync(staging, { recursive: true, force: true });
