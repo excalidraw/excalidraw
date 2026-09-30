@@ -5,6 +5,7 @@ import {
   THEME,
   DARK_THEME_FILTER,
   getFontFamilyString,
+  getFontSizeUpscale,
   isRTL,
   isTestEnv,
   getVerticalOffset,
@@ -240,10 +241,15 @@ const renderElementToSvg = (
       const footer = getStickyNoteFooter(element);
       if (footer) {
         const dateText = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
-        dateText.setAttribute("x", `${footer.x}`);
-        dateText.setAttribute("y", `${footer.y}`);
+        // see `getFontSizeUpscale`
+        const upscale = getFontSizeUpscale(footer.fontSize);
+        dateText.setAttribute("x", `${footer.x * upscale}`);
+        dateText.setAttribute("y", `${footer.y * upscale}`);
+        if (upscale !== 1) {
+          dateText.setAttribute("transform", `scale(${1 / upscale})`);
+        }
         dateText.setAttribute("font-family", STICKY_NOTE_FOOTER.fontFamily);
-        dateText.setAttribute("font-size", `${footer.fontSize}px`);
+        dateText.setAttribute("font-size", `${footer.fontSize * upscale}px`);
         // `text-anchor` is logical in SVG: pin the direction so an RTL host
         // page can't flip the label to the left edge
         dateText.setAttribute("text-anchor", "end");
@@ -789,11 +795,15 @@ const renderElementToSvg = (
           node.setAttribute("fill-opacity", `${opacity}`);
         }
 
+        // see `getFontSizeUpscale`
+        const upscale = getFontSizeUpscale(element.fontSize);
         node.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${
             offsetY || 0
-          }) rotate(${degree} ${cx} ${cy})`,
+          }) rotate(${degree} ${cx} ${cy})${
+            upscale === 1 ? "" : ` scale(${1 / upscale})`
+          }`,
         );
         const lines = element.text.replace(/\r\n?/g, "\n").split("\n");
         const lineHeightPx = getLineHeightInPx(
@@ -821,10 +831,13 @@ const renderElementToSvg = (
         for (let i = 0; i < lines.length; i++) {
           const text = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
           text.textContent = lines[i];
-          text.setAttribute("x", `${horizontalOffset}`);
-          text.setAttribute("y", `${i * lineHeightPx + verticalOffset}`);
+          text.setAttribute("x", `${horizontalOffset * upscale}`);
+          text.setAttribute(
+            "y",
+            `${(i * lineHeightPx + verticalOffset) * upscale}`,
+          );
           text.setAttribute("font-family", getFontFamilyString(element));
-          text.setAttribute("font-size", `${element.fontSize}px`);
+          text.setAttribute("font-size", `${element.fontSize * upscale}px`);
           text.setAttribute(
             "fill",
             applyDarkModeFilter(

@@ -14,6 +14,7 @@ import {
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
+  getFontSizeUpscale,
   DARK_THEME_FILTER,
   MIME_TYPES,
   THEME,
@@ -479,7 +480,12 @@ const drawElementOnCanvas = (
       // element change anyway
       const footer = getStickyNoteFooter(element);
       if (footer) {
-        context.font = `${footer.fontSize}px ${STICKY_NOTE_FOOTER.fontFamily}`;
+        // see `getFontSizeUpscale`
+        const upscale = getFontSizeUpscale(footer.fontSize);
+        context.scale(1 / upscale, 1 / upscale);
+        context.font = `${footer.fontSize * upscale}px ${
+          STICKY_NOTE_FOOTER.fontFamily
+        }`;
         context.textAlign = "right";
         context.textBaseline = "alphabetic";
         context.fillStyle = applyDarkModeFilter(
@@ -487,7 +493,7 @@ const drawElementOnCanvas = (
           renderConfig.theme === THEME.DARK,
         );
         context.globalAlpha *= STICKY_NOTE_FOOTER.opacity;
-        context.fillText(footer.text, footer.x, footer.y);
+        context.fillText(footer.text, footer.x * upscale, footer.y * upscale);
       }
 
       context.restore();
@@ -656,7 +662,13 @@ const drawElementOnCanvas = (
         }
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
-        context.font = getFontString(element);
+        // see `getFontSizeUpscale`
+        const upscale = getFontSizeUpscale(element.fontSize);
+        context.scale(1 / upscale, 1 / upscale);
+        context.font = getFontString({
+          fontSize: element.fontSize * upscale,
+          fontFamily: element.fontFamily,
+        });
         context.fillStyle = applyDarkModeFilter(
           element.strokeColor,
           renderConfig.theme === THEME.DARK,
@@ -687,8 +699,8 @@ const drawElementOnCanvas = (
         for (let index = 0; index < lines.length; index++) {
           context.fillText(
             lines[index],
-            horizontalOffset,
-            index * lineHeightPx + verticalOffset,
+            horizontalOffset * upscale,
+            (index * lineHeightPx + verticalOffset) * upscale,
           );
         }
         context.restore();

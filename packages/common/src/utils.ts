@@ -135,6 +135,18 @@ export const getFontFamilyString = ({
   return WINDOWS_EMOJI_FALLBACK_FONT;
 };
 
+/**
+ * Chrome measures and draws nothing for a canvas font much under a pixel
+ * (text thins out below 0.02px and is gone by 0.005px), and text made while
+ * zoomed far in is that small. Such text is measured and drawn this many
+ * times larger and scaled back down: a power of two, so the round trip is
+ * exact, and 1 from a pixel up.
+ */
+export const getFontSizeUpscale = (fontSize: number) =>
+  fontSize >= 1 || !(fontSize > 0)
+    ? 1
+    : 2 ** Math.ceil(Math.log2(1 / fontSize));
+
 /** returns fontSize+fontFamily string for assignment to DOM elements */
 export const getFontString = ({
   fontSize,

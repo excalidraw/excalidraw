@@ -142,6 +142,17 @@ left in scene units, with the reason. Line numbers are on branch
 | `element/src/flowchart.ts:174` | gap between flowchart nodes, 100 (the nodes copy their parent's size) | D |
 | `element/src/bounds.ts:1011` `getElementPaintExtent` | how far paint reaches past the centre-line bounds, used by `getElementsOverlappingFrame` (frame export) and `isElementInViewport` (culling) | D |
 
+### Text far under a pixel
+
+Chrome 154 measures and draws nothing for a canvas font much under a pixel:
+in the bench Chrome, "Hello world" keeps its width per pixel of font size
+down to 0.02px, thins out at 0.015px and is gone at 0.005px, while 20px text
+made at 1,000x is 0.02 units. `getFontSizeUpscale` (`common/src/utils.ts`)
+picks a power of two that brings the font to at least a pixel; text is
+measured (`textMeasurements.ts` `getLineWidth`) and drawn (`renderElement.ts`
+text and sticky note footer, `staticSvgScene.ts` text and footer) at that
+size and scaled back down. Fonts of a pixel or more are untouched.
+
 ### Left in scene units
 
 | Where | Why |
@@ -166,9 +177,6 @@ left in scene units, with the reason. Line numbers are on branch
 - The eraser trail's corner smoothing reads pointer speed in scene units
   inside the laser-pointer library, so its outline differs by up to about a
   third between zooms.
-- Canvas text at font sizes far below one pixel is measured and drawn by the
-  browser; that has not been checked in a browser at 10,000x (the tests use a
-  measuring stub).
 - SVG export with a reduced `precision` rounds coordinates to a fixed number
   of decimals, which flattens anything drawn at depth. Unchanged here.
 

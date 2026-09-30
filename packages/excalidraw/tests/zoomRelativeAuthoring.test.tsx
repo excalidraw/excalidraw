@@ -14,6 +14,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
+import { exportToSvg } from "../scene/export";
 import { getNormalizedZoom } from "../scene";
 
 import { API } from "./helpers/api";
@@ -30,10 +31,11 @@ const mouse = new Pointer("mouse");
 
 const ZOOMS = [1, 100, 10_000];
 
-// the test canvas measures every glyph 10px wide at any font size; text
-// grows with its font here, as it does in a browser
+// the test canvas measures every glyph 10px wide at any font size; here text
+// grows with its font and, as in Chrome, measures nothing far under a pixel
 setCustomTextMetricsProvider({
-  getLineWidth: (text, font) => text.length * parseFloat(font) * 0.6,
+  getLineWidth: (text, font) =>
+    parseFloat(font) < 0.01 ? 0 : text.length * parseFloat(font) * 0.6,
 });
 
 const renderEditor = (authoringUnits?: AuthoringUnits) =>
@@ -160,6 +162,23 @@ describe("authoringUnits: screen", () => {
     expect(sizes[0].fontSize).toBe(20);
     expectSameOnScreen(sizes[1], sizes[0]);
     expectSameOnScreen(sizes[2], sizes[0]);
+  });
+
+  it("exports text made far in at a font size the browser draws", async () => {
+    atZoom(10_000);
+    const text = await createText(100, 100, "hello");
+    const svg = await exportToSvg(
+      [text as NonDeletedExcalidrawElement],
+      h.state,
+      {},
+    );
+    const node = svg.querySelector("text")!;
+    const fontSize = parseFloat(node.getAttribute("font-size")!);
+    const scale = Number(
+      node.parentElement!.getAttribute("transform")!.match(/scale\((.*)\)/)![1],
+    );
+    expect(fontSize).toBeGreaterThanOrEqual(1);
+    expect(fontSize * scale).toBeCloseTo(text.fontSize, 12);
   });
 
   it("labels a shape without resizing it on screen, at the same font size", async () => {
