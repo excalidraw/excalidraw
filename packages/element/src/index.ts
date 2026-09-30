@@ -101,6 +101,7 @@ export * from "./textWrapping";
 export * from "./transform";
 export * from "./transformHandles";
 export * from "./typeChecks";
+export * from "./authoring";
 export * from "./utils";
 export * from "./zindex";
 export * from "./arrows/helpers";

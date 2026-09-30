@@ -29,11 +29,9 @@ import {
 
 import type { Curve, LineSegment, LocalPoint, Radians } from "@excalidraw/math";
 
-import type {
-  AppState,
-  NormalizedZoomValue,
-  Zoom,
-} from "@excalidraw/excalidraw/types";
+import type { NormalizedZoomValue, Zoom } from "@excalidraw/excalidraw/types";
+
+import { getElementDetailScale } from "./authoring";
 
 import { elementCenterPoint, getDiamondPoints } from "./bounds";
 
@@ -49,6 +47,8 @@ import {
   normalizeFixedPoint,
 } from "./binding";
 import { getStickyNoteCornerRadius } from "./stickyNote";
+
+import type { AuthoringView } from "./authoring";
 
 import type {
   ElementsMap,
@@ -770,18 +770,19 @@ export const getElbowArrowSnapMidPoint = (
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  view: AuthoringView,
 ) => {
   const TOLERANCE = 0.05;
-  const maxDistance = maxBindingDistance_simple(zoom) + element.strokeWidth / 2;
+  const maxDistance = maxBindingDistance_simple(view) + element.strokeWidth / 2;
+  const minSnap = getElementDetailScale(element);
 
   return getSnappedMidpointForElbowArrow(
     element,
     point,
     elementsMap,
     elementCenterPoint(element, elementsMap),
-    clamp(TOLERANCE * element.width, 5, maxDistance),
-    clamp(TOLERANCE * element.height, 5, maxDistance),
+    clamp(TOLERANCE * element.width, 5 * minSnap, maxDistance),
+    clamp(TOLERANCE * element.height, 5 * minSnap, maxDistance),
   );
 };
 
@@ -789,14 +790,14 @@ export const getSnapOutlineMidPoint = (
   point: GlobalPoint,
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  view: AuthoringView,
   arrow: { elbowed: boolean },
 ): GlobalPoint | undefined => {
   if (arrow.elbowed) {
-    return getElbowArrowSnapMidPoint(point, element, elementsMap, zoom)?.point;
+    return getElbowArrowSnapMidPoint(point, element, elementsMap, view)?.point;
   }
 
-  const maxDistance = maxBindingDistance_simple(zoom) + element.strokeWidth / 2;
+  const maxDistance = maxBindingDistance_simple(view) + element.strokeWidth / 2;
   const idx = getSnappedMidpointIndexForSimpleArrow(
     element,
     point,
@@ -813,7 +814,7 @@ export const projectFixedPointOntoDiagonal = (
   element: ExcalidrawBindableElement,
   startOrEnd: "start" | "end",
   elementsMap: ElementsMap,
-  zoom: AppState["zoom"],
+  view: AuthoringView,
   isMidpointSnappingEnabled: boolean = true,
 ): GlobalPoint | null => {
   invariant(arrow.points.length >= 2, "Arrow must have at least two points");
@@ -822,7 +823,7 @@ export const projectFixedPointOntoDiagonal = (
       point,
       element,
       elementsMap,
-      zoom,
+      view,
       arrow,
     );
     if (sideMidPoint) {

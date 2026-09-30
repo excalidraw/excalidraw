@@ -1023,7 +1023,10 @@ describe("sticky note creation date", () => {
   it("picks the footer form by width bucket, without measuring", () => {
     const created = at(2025, 4, 30);
     const footer = (width: number, height = DEFAULT_STICKY_NOTE_SIZE) =>
-      getStickyNoteFooter({ created, width, height }, NOW);
+      getStickyNoteFooter(
+        { created, width, height, type: "stickynote", strokeWidth: 2 },
+        NOW,
+      );
     const yearWidth =
       STICKY_NOTE_PADDING * 2 + STICKY_NOTE_FOOTER.minBodyWidthForYear;
 
@@ -1031,6 +1034,7 @@ describe("sticky note creation date", () => {
       text: "30 May 2025",
       x: DEFAULT_STICKY_NOTE_SIZE - STICKY_NOTE_PADDING,
       y: DEFAULT_STICKY_NOTE_SIZE - STICKY_NOTE_FOOTER.baselineFromBottom,
+      fontSize: STICKY_NOTE_FOOTER.fontSize,
     });
     expect(footer(yearWidth)?.text).toBe("30 May 2025");
     expect(footer(yearWidth - 1)?.text).toBe("30 May");
@@ -1041,7 +1045,16 @@ describe("sticky note creation date", () => {
     // the 0×0 creation draft paints no footer, nor does an unknown date
     expect(footer(0, 0)).toBeNull();
     expect(
-      getStickyNoteFooter({ created: null, width: 250, height: 250 }, NOW),
+      getStickyNoteFooter(
+        {
+          created: null,
+          width: 250,
+          height: 250,
+          type: "stickynote",
+          strokeWidth: 2,
+        },
+        NOW,
+      ),
     ).toBeNull();
   });
 

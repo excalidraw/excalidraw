@@ -1,11 +1,8 @@
 import {
-  BOUND_TEXT_PADDING,
-  ROUNDNESS,
   TEXT_ALIGN,
   VERTICAL_ALIGN,
   arrayToMap,
   getFontString,
-  getStrokeWidthByKey,
   isTransparent,
 } from "@excalidraw/common";
 import {
@@ -19,6 +16,8 @@ import {
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
   computeBoundTextPosition,
   computeContainerDimensionForBoundText,
+  getBoundTextPadding,
+  getElementDetailScale,
   getBoundTextElement,
   normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
@@ -31,7 +30,6 @@ import {
   isStickyNoteElement,
   isTextBindableContainer,
   isTextElement,
-  isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
 import { measureText } from "@excalidraw/element";
@@ -188,6 +186,7 @@ export const actionBindText = register({
         ? {
             baseFontSize: normalizeStickyNoteFontSize(
               textElement.baseFontSize ?? textElement.fontSize,
+              getElementDetailScale(container),
             ),
             strokeColor: stickyInk,
           }
@@ -273,6 +272,11 @@ export const actionWrapTextInContainer = register({
 
     for (const textElement of selectedElements) {
       if (isTextElement(textElement) && !isBoundToContainer(textElement)) {
+        const containerStyle = {
+          type: "rectangle",
+          strokeWidth: app.getCurrentItemStrokeWidth("rectangle"),
+        } as const;
+        const padding = getBoundTextPadding(containerStyle);
         const container = newElement({
           type: "rectangle",
           backgroundColor: appState.currentItemBackgroundColor,
@@ -284,30 +288,20 @@ export const actionWrapTextInContainer = register({
           fillStyle: appState.currentItemFillStyle,
           strokeColor: appState.currentItemStrokeColor,
           roughness: appState.currentItemRoughness,
-          strokeWidth: getStrokeWidthByKey(
-            "rectangle",
-            appState.currentItemStrokeWidthKey,
-          ),
+          strokeWidth: containerStyle.strokeWidth,
           strokeStyle: appState.currentItemStrokeStyle,
-          roundness:
-            appState.currentItemRoundness === "round"
-              ? {
-                  type: isUsingAdaptiveRadius("rectangle")
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
-              : null,
+          roundness: app.getCurrentItemRoundness("rectangle"),
           opacity: 100,
           locked: false,
-          x: textElement.x - BOUND_TEXT_PADDING,
-          y: textElement.y - BOUND_TEXT_PADDING,
+          x: textElement.x - padding,
+          y: textElement.y - padding,
           width: computeContainerDimensionForBoundText(
             textElement.width,
-            "rectangle",
+            containerStyle,
           ),
           height: computeContainerDimensionForBoundText(
             textElement.height,
-            "rectangle",
+            containerStyle,
           ),
           groupIds: textElement.groupIds,
           frameId: textElement.frameId,

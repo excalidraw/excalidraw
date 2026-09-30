@@ -33,6 +33,7 @@ import {
   getCommonBoundingBox,
   getElementBounds,
 } from "./bounds";
+import { getElementDetailScale } from "./authoring";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
   getBoundTextElement,
@@ -41,6 +42,7 @@ import {
   handleBindTextResize,
   getBoundTextMaxWidth,
   computeBoundTextPosition,
+  getBoundTextPadding,
 } from "./textElement";
 import {
   getMinTextElementWidth,
@@ -305,7 +307,7 @@ export const measureFontSizeFromWidth = (
     }
   }
   const nextFontSize = element.fontSize * (nextWidth / width);
-  if (nextFontSize < MIN_FONT_SIZE) {
+  if (nextFontSize < MIN_FONT_SIZE * getElementDetailScale(element)) {
     return null;
   }
 
@@ -364,6 +366,7 @@ export const resizeSingleTextElement = (
         fontFamily: element.fontFamily,
       }),
       element.lineHeight,
+      getBoundTextPadding(element),
     );
 
     const newWidth = Math.max(minWidth, nextWidth);
@@ -769,21 +772,31 @@ export const resizeSingleElement = (
   let minSize: { width: number; height: number } | undefined;
   if (isResizingStickyNote) {
     // A note must fit one line at its label's font ceiling.
+    const scale = getElementDetailScale(latestElement);
     minSize = boundTextElement
-      ? getStickyNoteMinSize({
-          fontSize: boundTextElement.baseFontSize ?? boundTextElement.fontSize,
-          fontFamily: boundTextElement.fontFamily,
-        })
-      : { width: STICKY_NOTE_MIN_SIZE, height: STICKY_NOTE_MIN_SIZE };
+      ? getStickyNoteMinSize(
+          {
+            fontSize:
+              boundTextElement.baseFontSize ?? boundTextElement.fontSize,
+            fontFamily: boundTextElement.fontFamily,
+          },
+          scale,
+        )
+      : {
+          width: STICKY_NOTE_MIN_SIZE * scale,
+          height: STICKY_NOTE_MIN_SIZE * scale,
+        };
   } else if (boundTextElement && !shouldMaintainAspectRatio) {
     minSize = {
       width: getApproxMinLineWidth(
         getFontString(boundTextElement),
         boundTextElement.lineHeight,
+        getBoundTextPadding(latestElement),
       ),
       height: getApproxMinLineHeight(
         boundTextElement.fontSize,
         boundTextElement.lineHeight,
+        getBoundTextPadding(latestElement),
       ),
     };
   }
@@ -908,7 +921,7 @@ export const resizeSingleElement = (
   ) {
     const fontSize =
       (Math.abs(nextWidth) / latestElement.width) * boundTextElement.fontSize;
-    if (fontSize < MIN_FONT_SIZE) {
+    if (fontSize < MIN_FONT_SIZE * getElementDetailScale(boundTextElement)) {
       return;
     }
     boundTextFont.fontSize = fontSize;
@@ -1504,7 +1517,10 @@ export const resizeMultipleElements = (
       if (boundTextElement && !isStickyNoteElement(orig)) {
         if (keepAspectRatio) {
           const newFontSize = boundTextElement.fontSize * scale;
-          if (newFontSize < MIN_FONT_SIZE) {
+          if (
+            newFontSize <
+            MIN_FONT_SIZE * getElementDetailScale(boundTextElement)
+          ) {
             return;
           }
           update.boundTextFontSize = newFontSize;

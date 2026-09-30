@@ -11,7 +11,6 @@ import {
 } from "@excalidraw/math";
 
 import {
-  BOUND_TEXT_PADDING,
   DEFAULT_REDUCED_GLOBAL_ALPHA,
   ELEMENT_READY_TO_ERASE_OPACITY,
   FRAME_STYLE,
@@ -48,9 +47,11 @@ import type {
 
 import { getElementAbsoluteCoords, getElementBounds } from "./bounds";
 import { getUncroppedImageElement } from "./cropElement";
+import { getElementDetailScale } from "./authoring";
 import { LinearElementEditor } from "./linearElementEditor";
 import {
   getBoundTextElement,
+  getBoundTextPadding,
   getContainerCoords,
   getContainerElement,
   getBoundTextMaxHeight,
@@ -417,11 +418,12 @@ const fillStickyNoteShape = (
 const strokeStickyNoteEdge = (
   context: CanvasRenderingContext2D,
   commands: StickyNotePathCommand[],
+  scale: number,
 ) => {
   context.save();
   drawStickyNotePath(context, commands);
   context.clip();
-  context.lineWidth = STICKY_NOTE_EDGE_SHADOW_WIDTH * 2;
+  context.lineWidth = STICKY_NOTE_EDGE_SHADOW_WIDTH * 2 * scale;
   context.strokeStyle = `rgba(0, 0, 0, ${STICKY_NOTE_EDGE_SHADOW_OPACITY})`;
   drawStickyNotePath(context, commands);
   context.stroke();
@@ -470,14 +472,14 @@ const drawElementOnCanvas = (
         renderConfig.theme === THEME.DARK,
       );
       fillStickyNoteShape(context, commands);
-      strokeStickyNoteEdge(context, commands);
+      strokeStickyNoteEdge(context, commands, getElementDetailScale(element));
 
       // the label is absolute, so this cached canvas only goes stale at a
       // year boundary — and is regenerated on the next zoom, theme or
       // element change anyway
       const footer = getStickyNoteFooter(element);
       if (footer) {
-        context.font = `${STICKY_NOTE_FOOTER.fontSize}px ${STICKY_NOTE_FOOTER.fontFamily}`;
+        context.font = `${footer.fontSize}px ${STICKY_NOTE_FOOTER.fontFamily}`;
         context.textAlign = "right";
         context.textBaseline = "alphabetic";
         context.fillStyle = applyDarkModeFilter(
@@ -849,18 +851,20 @@ const drawElementFromCanvas = (
     context.rect(
       (boundTextCx -
         boundTextElement.width / 2 -
-        BOUND_TEXT_PADDING +
+        getBoundTextPadding(element) +
         positionOffset.x +
         appState.scrollX) *
         devicePixelRatio,
       (boundTextCy -
         boundTextElement.height / 2 -
-        BOUND_TEXT_PADDING +
+        getBoundTextPadding(element) +
         positionOffset.y +
         appState.scrollY) *
         devicePixelRatio,
-      (boundTextElement.width + BOUND_TEXT_PADDING * 2) * devicePixelRatio,
-      (boundTextElement.height + BOUND_TEXT_PADDING * 2) * devicePixelRatio,
+      (boundTextElement.width + getBoundTextPadding(element) * 2) *
+        devicePixelRatio,
+      (boundTextElement.height + getBoundTextPadding(element) * 2) *
+        devicePixelRatio,
     );
     context.clip("evenodd");
   }
@@ -1345,14 +1349,16 @@ const drawElement = (
             boundTextCx -
             centerX -
             boundTextElement.width / 2 -
-            BOUND_TEXT_PADDING;
+            getBoundTextPadding(element);
           const holeY =
             boundTextCy -
             centerY -
             boundTextElement.height / 2 -
-            BOUND_TEXT_PADDING;
-          const holeWidth = boundTextElement.width + BOUND_TEXT_PADDING * 2;
-          const holeHeight = boundTextElement.height + BOUND_TEXT_PADDING * 2;
+            getBoundTextPadding(element);
+          const holeWidth =
+            boundTextElement.width + getBoundTextPadding(element) * 2;
+          const holeHeight =
+            boundTextElement.height + getBoundTextPadding(element) * 2;
 
           // generously covers the arrow's painted extent at any rotation
           // (the hole rect stays axis-aligned in scene space)

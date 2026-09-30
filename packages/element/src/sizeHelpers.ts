@@ -13,6 +13,7 @@ import { pointsEqual } from "@excalidraw/math";
 
 import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
 
+import { getElementDetailScale } from "./authoring";
 import { getCommonBounds, getElementBounds } from "./bounds";
 import {
   isArrowElement,
@@ -69,7 +70,7 @@ export const isInvisiblySmallElement = (
         pointsEqual(
           element.points[0],
           element.points[element.points.length - 1],
-          INVISIBLY_SMALL_ELEMENT_SIZE,
+          INVISIBLY_SMALL_ELEMENT_SIZE * getElementDetailScale(element),
         ))
     );
   }

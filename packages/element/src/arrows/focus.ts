@@ -42,6 +42,7 @@ export const isFocusPointVisible = (
   appState: {
     isBindingEnabled: AppState["isBindingEnabled"];
     zoom: AppState["zoom"];
+    authoringUnits: AppState["authoringUnits"];
   },
   startOrEnd: "start" | "end",
   ignoreOverlap = false,
@@ -246,7 +247,7 @@ export const handleFocusPointDrag = (
     point,
     scene.getNonDeletedElements(),
     elementsMap,
-    appState.zoom,
+    appState,
   );
 
   // Hovering a bindable element
@@ -277,7 +278,7 @@ export const handleFocusPointDrag = (
         newMode || "orbit",
         linearElementEditor.draggedFocusPointBinding,
         scene,
-        appState.zoom,
+        appState,
         point,
       );
     }

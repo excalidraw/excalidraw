@@ -31,6 +31,9 @@ export type StaticCanvasRenderConfig = {
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
   renderGrid: boolean;
+  /** the grid step to draw, when it differs from `appState.gridSize` (see
+   `App.getEffectiveGridSize`) */
+  gridSize?: number;
   /** whether to render link icons on elements with links (never rendered
    when exporting). @default true */
   renderLinks?: boolean;

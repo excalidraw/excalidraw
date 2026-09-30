@@ -188,7 +188,7 @@ export const getTextBindingForArrowEndpoint = (
   // than gap-outside the outline, so offsetting there would just shift them.
   const gap = isElbowArrow(arrow)
     ? 0
-    : getBindingGap({ strokeWidth: targetStrokeWidth });
+    : getBindingGap({ type: "text", strokeWidth: targetStrokeWidth });
 
   // How far back along the arrow the bound side has to sit for the tip to
   // stay exactly where it is.

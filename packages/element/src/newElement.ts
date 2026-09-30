@@ -23,6 +23,7 @@ import {
   getElementAbsoluteCoords,
   getResizedElementAbsoluteCoords,
 } from "./bounds";
+import { getElementDetailScale } from "./authoring";
 import { newElementWith } from "./mutateElement";
 import {
   normalizeStickyNoteBackgroundColor,
@@ -207,10 +208,11 @@ export const normalizeStickyNoteGeometry = <
 >(
   element: T,
 ): T => {
-  const width = Math.max(element.width, STICKY_NOTE_MIN_SIZE);
+  const minSize = STICKY_NOTE_MIN_SIZE * getElementDetailScale(element);
+  const width = Math.max(element.width, minSize);
   const baseHeight = Math.max(
     element.baseHeight || element.height || DEFAULT_STICKY_NOTE_SIZE,
-    STICKY_NOTE_MIN_SIZE,
+    minSize,
   );
 
   return newElementWith(element as ExcalidrawStickyNoteElement, {

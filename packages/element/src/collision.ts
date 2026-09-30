@@ -27,7 +27,7 @@ import type {
   Radians,
 } from "@excalidraw/math";
 
-import type { AppState, FrameNameBounds } from "@excalidraw/excalidraw/types";
+import type { FrameNameBounds } from "@excalidraw/excalidraw/types";
 
 import { isPathALoop } from "./utils";
 import {
@@ -68,6 +68,8 @@ import { maxBindingDistance_simple } from "./binding";
 import { hasBackground } from "./comparisons";
 
 import { getFreedrawFillPolygon, getFreedrawMaxStrokeRadius } from "./shape";
+
+import type { AuthoringView } from "./authoring";
 
 import type {
   ElementsMap,
@@ -363,9 +365,9 @@ const getBindingCandidates = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  zoom: AppState["zoom"],
+  view: AuthoringView,
 ): BindingCandidate[] => {
-  const maxDistance = maxBindingDistance_simple(zoom);
+  const maxDistance = maxBindingDistance_simple(view);
   const candidates: BindingCandidate[] = [];
   // A frame's children sit just below it in z-order, so a frame's background
   // can't end the search: it only hides the non-children behind it
@@ -427,9 +429,9 @@ export const getAllHoveredElementAtPoint = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  zoom: AppState["zoom"],
+  view: AuthoringView,
 ): NonDeleted<ExcalidrawBindableElement>[] =>
-  getBindingCandidates(point, elements, elementsMap, zoom).map(
+  getBindingCandidates(point, elements, elementsMap, view).map(
     ({ element }) => element,
   );
 
@@ -437,9 +439,9 @@ export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
-  zoom: AppState["zoom"],
+  view: AuthoringView,
 ): NonDeleted<ExcalidrawBindableElement> | null => {
-  const candidates = getBindingCandidates(point, elements, elementsMap, zoom);
+  const candidates = getBindingCandidates(point, elements, elementsMap, view);
 
   if (candidates.length === 0) {
     return null;

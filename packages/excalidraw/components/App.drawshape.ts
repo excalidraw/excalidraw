@@ -105,7 +105,7 @@ export class AppDrawShape {
           globalPoint,
           elements,
           elementsMap,
-          app.state.zoom,
+          app.state,
         ),
       };
     });
@@ -123,7 +123,7 @@ export class AppDrawShape {
           sameTarget ? "inside" : "orbit",
           startOrEnd,
           app.scene,
-          app.state.zoom,
+          app.state,
           globalPoint,
           app.state.isBindingEnabled,
           isMidpointSnappingEnabled,
@@ -184,7 +184,7 @@ export class AppDrawShape {
         ),
         elements,
         elementsMap,
-        app.state.zoom,
+        app.state,
       ),
     );
     if ((!startTarget && !endTarget) || startTarget === endTarget) {

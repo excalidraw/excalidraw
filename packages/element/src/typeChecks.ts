@@ -1,4 +1,8 @@
-import { ROUNDNESS, assertNever } from "@excalidraw/common";
+import {
+  DEFAULT_ADAPTIVE_RADIUS,
+  ROUNDNESS,
+  assertNever,
+} from "@excalidraw/common";
 
 import { pointsEqual } from "@excalidraw/math";
 
@@ -324,6 +328,24 @@ export const isUsingAdaptiveRadius = (type: string) =>
   type === "embeddable" ||
   type === "iframe" ||
   type === "image";
+
+/**
+ * The roundness a shape gets when it is created or restyled to round corners.
+ * An adaptive radius is fixed in scene units, so `scale` (scene units per
+ * authoring unit) sizes it with the shape; at 1 it stays the default.
+ */
+export const getRoundnessForShape = (
+  type: string,
+  scale = 1,
+): ExcalidrawElement["roundness"] =>
+  isUsingAdaptiveRadius(type)
+    ? scale === 1
+      ? { type: ROUNDNESS.ADAPTIVE_RADIUS }
+      : {
+          type: ROUNDNESS.ADAPTIVE_RADIUS,
+          value: DEFAULT_ADAPTIVE_RADIUS * scale,
+        }
+    : { type: ROUNDNESS.PROPORTIONAL_RADIUS };
 
 export const isUsingProportionalRadius = (type: string) =>
   type === "line" ||

@@ -10,7 +10,6 @@ import {
 import {
   ELEMENT_PENDING_DRAW_SHAPE_OPACITY,
   getStrokeWidthByKey,
-  ROUNDNESS,
 } from "@excalidraw/common";
 import {
   convexHull,
@@ -45,11 +44,12 @@ import type {
   ExcalidrawLineElement,
 } from "@excalidraw/element/types";
 
+import { getAuthoringScale } from "./authoring";
 import { getFrameLikeElements } from "./frame";
 import {
   isLinearElement,
   isLineElement,
-  isUsingAdaptiveRadius,
+  getRoundnessForShape,
 } from "./typeChecks";
 import { LinearElementEditor } from "./linearElementEditor";
 
@@ -545,6 +545,7 @@ export const convertToShape = (
     appState.zoom.value,
   );
 
+  const authoringScale = getAuthoringScale(appState);
   const boundingBox = recognizedShape.boundingBox;
   const [minX, minY, maxX, maxY] = boundingBox;
 
@@ -558,11 +559,7 @@ export const convertToShape = (
 
   const roundness =
     appState.currentItemRoundness === "round"
-      ? {
-          type: isUsingAdaptiveRadius(recognizedShape.type)
-            ? ROUNDNESS.ADAPTIVE_RADIUS
-            : ROUNDNESS.PROPORTIONAL_RADIUS,
-        }
+      ? getRoundnessForShape(recognizedShape.type, authoringScale)
       : null;
 
   switch (recognizedShape.type) {
@@ -585,10 +582,11 @@ export const convertToShape = (
         fillStyle: appState.currentItemFillStyle,
         opacity: appState.currentItemOpacity,
         strokeStyle: appState.currentItemStrokeStyle,
-        strokeWidth: getStrokeWidthByKey(
-          recognizedShape.type,
-          appState.currentItemStrokeWidthKey,
-        ),
+        strokeWidth:
+          getStrokeWidthByKey(
+            recognizedShape.type,
+            appState.currentItemStrokeWidthKey,
+          ) * authoringScale,
       }) as NonDeletedRecognizedShapeElement;
     }
     case "arrow": {
@@ -607,7 +605,7 @@ export const convertToShape = (
         globalEndX - recognizedShape.points[0][0],
         globalEndY - recognizedShape.points[0][1],
       );
-      if (arrowLen < 60) {
+      if (arrowLen < 60 * authoringScale) {
         const tempElement = newLinearElement({
           type: "line",
           x: arrowX,
@@ -630,10 +628,11 @@ export const convertToShape = (
           fillStyle: appState.currentItemFillStyle,
           opacity: appState.currentItemOpacity,
           strokeStyle: appState.currentItemStrokeStyle,
-          strokeWidth: getStrokeWidthByKey(
-            recognizedShape.type,
-            appState.currentItemStrokeWidthKey,
-          ),
+          strokeWidth:
+            getStrokeWidthByKey(
+              recognizedShape.type,
+              appState.currentItemStrokeWidthKey,
+            ) * authoringScale,
         });
 
         const normalized =
@@ -668,10 +667,11 @@ export const convertToShape = (
         fillStyle: appState.currentItemFillStyle,
         opacity: appState.currentItemOpacity,
         strokeStyle: appState.currentItemStrokeStyle,
-        strokeWidth: getStrokeWidthByKey(
-          recognizedShape.type,
-          appState.currentItemStrokeWidthKey,
-        ),
+        strokeWidth:
+          getStrokeWidthByKey(
+            recognizedShape.type,
+            appState.currentItemStrokeWidthKey,
+          ) * authoringScale,
       });
 
       const normalized =
@@ -708,10 +708,11 @@ export const convertToShape = (
         fillStyle: appState.currentItemFillStyle,
         opacity: appState.currentItemOpacity,
         strokeStyle: appState.currentItemStrokeStyle,
-        strokeWidth: getStrokeWidthByKey(
-          recognizedShape.type,
-          appState.currentItemStrokeWidthKey,
-        ),
+        strokeWidth:
+          getStrokeWidthByKey(
+            recognizedShape.type,
+            appState.currentItemStrokeWidthKey,
+          ) * authoringScale,
       });
 
       const normalized =

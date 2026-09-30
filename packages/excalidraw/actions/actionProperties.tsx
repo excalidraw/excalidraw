@@ -60,7 +60,8 @@ import {
   isLineElement,
   isStickyNoteElement,
   isTextElement,
-  isUsingAdaptiveRadius,
+  getRoundnessForShape,
+  getAuthoringScale,
 } from "@excalidraw/element";
 
 import {
@@ -291,12 +292,23 @@ const offsetElementAfterFontResize = (
   });
 };
 
+/**
+ * A scene font size in authoring units, as `currentItemFontSize` and the font
+ * size picker hold it; rounded off so a named size multiplied by the
+ * authoring scale reads back as that size.
+ */
+const toAuthoringFontSize = (fontSize: number, appState: AppState) => {
+  const scale = getAuthoringScale(appState);
+  return scale === 1 ? fontSize : Number((fontSize / scale).toPrecision(12));
+};
+
+/** `getNewFontSize` returns scene units, `fallbackValue` authoring units */
 const changeFontSize = (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   app: AppClassProperties,
   getNewFontSize: (element: ExcalidrawTextElement) => number,
-  fallbackValue?: ExcalidrawTextElement["fontSize"],
+  fallbackValue?: AppState["currentItemFontSize"],
 ) => {
   const newFontSizes = new Set<number>();
   const elementsMap = app.scene.getNonDeletedElementsMap();
@@ -346,7 +358,7 @@ const changeFontSize = (
       // the same font size
       currentItemFontSize:
         newFontSizes.size === 1
-          ? [...newFontSizes][0]
+          ? toAuthoringFontSize([...newFontSizes][0], appState)
           : fallbackValue ?? appState.currentItemFontSize,
     },
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,
@@ -688,34 +700,34 @@ export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
   },
 });
 
+/** the named width an element was given at the current authoring scale */
 const getStrokeWidthKeyForElement = (
   element: ExcalidrawElement,
+  scale: number,
 ): StrokeWidthKey | null => {
   return (
     STROKE_WIDTH_KEYS.find(
-      (key) => getStrokeWidthByKey(element.type, key) === element.strokeWidth,
+      (key) =>
+        Math.abs(
+          getStrokeWidthByKey(element.type, key) * scale - element.strokeWidth,
+        ) <=
+        element.strokeWidth * 1e-9,
     ) ?? null
   );
-};
-
-const getStrokeWidthForElement = (
-  element: ExcalidrawElement,
-  strokeWidthKey: StrokeWidthKey,
-): ExcalidrawElement["strokeWidth"] => {
-  return getStrokeWidthByKey(element.type, strokeWidthKey);
 };
 
 export const actionChangeStrokeWidth = register<StrokeWidthKey>({
   name: "changeStrokeWidth",
   label: "labels.strokeWidth",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     invariant(value, "actionChangeStrokeWidth: value must be defined");
 
     return {
       elements: changeProperty(elements, appState, (el) =>
         newElementWith(el, {
-          strokeWidth: getStrokeWidthForElement(el, value),
+          strokeWidth:
+            getStrokeWidthByKey(el.type, value) * getAuthoringScale(appState),
         }),
       ),
       appState: { ...appState, currentItemStrokeWidthKey: value },
@@ -751,7 +763,11 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
           value={getFormValue(
             elements,
             app,
-            getStrokeWidthKeyForElement,
+            (element) =>
+              getStrokeWidthKeyForElement(
+                element,
+                getAuthoringScale(app.state),
+              ),
             (element) => element.hasOwnProperty("strokeWidth"),
             (hasSelection) =>
               hasSelection ? null : appState.currentItemStrokeWidthKey,
@@ -1008,7 +1024,7 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
         app,
         () => {
           invariant(value, "actionChangeFontSize: Expected a font size value");
-          return value;
+          return value * getAuthoringScale(appState);
         },
         value,
       );
@@ -1053,17 +1069,15 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
                 app,
                 (element) => {
                   const elementsMap = app.scene.getNonDeletedElementsMap();
-                  if (isTextElement(element)) {
-                    return getBaseFontSize(element, elementsMap);
-                  }
-                  const boundTextElement = getBoundTextElement(
-                    element,
-                    elementsMap,
-                  );
-                  if (boundTextElement) {
-                    return getBaseFontSize(boundTextElement, elementsMap);
-                  }
-                  return null;
+                  const textElement = isTextElement(element)
+                    ? element
+                    : getBoundTextElement(element, elementsMap);
+                  return textElement
+                    ? toAuthoringFontSize(
+                        getBaseFontSize(textElement, elementsMap),
+                        app.state,
+                      )
+                    : null;
                 },
                 (element) =>
                   isTextElement(element) ||
@@ -1749,7 +1763,7 @@ export const actionChangeRoundness = register<"sharp" | "round">({
   name: "changeRoundness",
   label: "Change edge roundness",
   trackEvent: false,
-  perform: (elements, appState, value) => {
+  perform: (elements, appState, value, app) => {
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isElbowArrow(el)) {
@@ -1759,11 +1773,7 @@ export const actionChangeRoundness = register<"sharp" | "round">({
         const nextElement = newElementWith(el, {
           roundness:
             value === "round"
-              ? {
-                  type: isUsingAdaptiveRadius(el.type)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
+              ? getRoundnessForShape(el.type, getAuthoringScale(appState))
               : null,
         });
 
@@ -2152,7 +2162,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   startElement,
                   "start",
                   elementsMap,
-                  appState.zoom,
+                  appState,
                   appState.isBindingEnabled,
                 ),
               }
@@ -2167,7 +2177,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   endElement,
                   "end",
                   elementsMap,
-                  appState.zoom,
+                  appState,
                   appState.isBindingEnabled,
                 ),
               }
@@ -2200,7 +2210,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               appState.bindMode === "inside" ? "inside" : "orbit",
               "start",
               app.scene,
-              appState.zoom,
+              appState,
             );
           }
         }
@@ -2215,7 +2225,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               appState.bindMode === "inside" ? "inside" : "orbit",
               "end",
               app.scene,
-              appState.zoom,
+              appState,
             );
           }
         }

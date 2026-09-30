@@ -1,4 +1,4 @@
-import { ROUNDNESS } from "@excalidraw/common";
+import { DEFAULT_ZOOM, ROUNDNESS } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
 
@@ -29,6 +29,7 @@ describe("flowchart", () => {
       sticky,
       {
         currentItemEndArrowhead: "arrow",
+        zoom: DEFAULT_ZOOM,
       } as AppState,
       "right",
       scene,

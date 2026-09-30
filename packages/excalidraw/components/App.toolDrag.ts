@@ -7,7 +7,11 @@ import {
   viewportCoordsToSceneCoords,
 } from "@excalidraw/common";
 
-import { isStickyNoteElement, newStickyNoteElement } from "@excalidraw/element";
+import {
+  getAuthoringScale,
+  isStickyNoteElement,
+  newStickyNoteElement,
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawNonSelectionElement,
@@ -49,7 +53,7 @@ const centered = (center: ScenePoint, width: number, height: number) => ({
 export const DRAGGABLE_TOOLS: Partial<Record<ToolType, DraggableTool>> = {
   stickynote: {
     createElement: (app, center) => {
-      const size = DEFAULT_STICKY_NOTE_SIZE;
+      const size = DEFAULT_STICKY_NOTE_SIZE * getAuthoringScale(app.state);
       const { state } = app;
       return newStickyNoteElement({
         type: "stickynote",

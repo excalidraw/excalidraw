@@ -16,33 +16,42 @@ const strokeAt = (zoom: number) => {
 const strokeWidthPicker = () =>
   queryByTestId(document.body, "strokeWidth-thin");
 
-describe("freedrawScreenStrokeWidth", () => {
+describe("freedrawStrokeWidth", () => {
   afterEach(async () => {
     await act(async () => {});
   });
 
-  it("draws each stroke at the same width on screen, whatever the zoom", async () => {
-    await render(<Excalidraw freedrawScreenStrokeWidth={3} />);
+  it("draws each stroke at the same width on screen in screen units", async () => {
+    await render(
+      <Excalidraw authoringUnits="screen" freedrawStrokeWidth={3} />,
+    );
 
     expect(strokeAt(1)).toBe(3);
     expect(strokeAt(100)).toBeCloseTo(0.03, 12);
     expect(strokeAt(10_000)).toBeCloseTo(0.0003, 12);
   });
 
+  it("is a scene width in scene units", async () => {
+    await render(<Excalidraw freedrawStrokeWidth={3} />);
+
+    expect(strokeAt(1)).toBe(3);
+    expect(strokeAt(100)).toBe(3);
+  });
+
   it("applies a new width to the next stroke", async () => {
     const { rerender } = await render(
-      <Excalidraw freedrawScreenStrokeWidth={3} />,
+      <Excalidraw authoringUnits="screen" freedrawStrokeWidth={3} />,
     );
     expect(strokeAt(100)).toBeCloseTo(0.03, 12);
 
-    rerender(<Excalidraw freedrawScreenStrokeWidth={6} />);
+    rerender(<Excalidraw authoringUnits="screen" freedrawStrokeWidth={6} />);
 
     expect(strokeAt(100)).toBeCloseTo(0.06, 12);
     expect(strokeAt(1)).toBe(6);
   });
 
   it("hides the stroke width picker while the freedraw tool is out", async () => {
-    await render(<Excalidraw freedrawScreenStrokeWidth={3} />);
+    await render(<Excalidraw freedrawStrokeWidth={3} />);
 
     UI.clickTool("freedraw");
     expect(strokeWidthPicker()).toBeNull();

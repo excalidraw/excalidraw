@@ -120,7 +120,7 @@ const strokeGrid = (
   // vertical lines
   for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
     const isBold =
-      gridStep > 1 && Math.round(x - scrollX) % (gridStep * gridSize) === 0;
+      gridStep > 1 && Math.round((x - scrollX) / gridSize) % gridStep === 0;
     // don't render regular lines when zoomed out and they're barely visible
     if (!isBold && actualGridSize < 10) {
       continue;
@@ -142,7 +142,7 @@ const strokeGrid = (
 
   for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
     const isBold =
-      gridStep > 1 && Math.round(y - scrollY) % (gridStep * gridSize) === 0;
+      gridStep > 1 && Math.round((y - scrollY) / gridSize) % gridStep === 0;
     if (!isBold && actualGridSize < 10) {
       continue;
     }
@@ -314,7 +314,7 @@ const _renderStaticScene = ({
   if (renderGrid) {
     strokeGrid(
       context,
-      appState.gridSize,
+      renderConfig.gridSize ?? appState.gridSize,
       appState.gridStep,
       appState.scrollX,
       appState.scrollY,

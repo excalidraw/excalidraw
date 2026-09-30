@@ -479,7 +479,7 @@ const renderBindingHighlightForBindableElement_simple = (
       let shownMidpoints = midpoints;
       if (!isElbow) {
         const threshold =
-          maxBindingDistance_simple(appState.zoom) +
+          maxBindingDistance_simple(appState) +
           suggestedBinding.element.strokeWidth / 2;
         const closest =
           pointerCoords &&

@@ -66,6 +66,24 @@ export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
 };
 
 // TODO: Rounding this point causes some shake when free drawing
+/**
+ * The grid step at an authoring scale (scene units per authoring unit): the
+ * grid size, coarsened or refined by whole powers of the major-line step, so
+ * the grid keeps roughly its size on screen and each grid still lines up with
+ * the coarser ones.
+ */
+export const getGridSizeAtScale = (
+  gridSize: number,
+  gridStep: number,
+  scale: number,
+) => {
+  if (scale === 1) {
+    return gridSize;
+  }
+  const base = Math.max(gridStep, 2);
+  return gridSize * base ** Math.ceil(Math.log(scale) / Math.log(base) - 1e-9);
+};
+
 export const getGridPoint = (
   x: number,
   y: number,

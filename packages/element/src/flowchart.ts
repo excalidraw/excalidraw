@@ -12,6 +12,7 @@ import type {
   PendingExcalidrawElements,
 } from "@excalidraw/excalidraw/types";
 
+import { getElementDetailScale } from "./authoring";
 import { bindBindingElement } from "./binding";
 import { updateElbowArrowPoints } from "./elbowArrow";
 import {
@@ -169,8 +170,12 @@ const placeCluster = (
   // INSIGHT: new nodes copy the parent's dimensions
   const nodePrimarySize = horizontal ? parent.width : parent.height;
   const nodeCrossSize = horizontal ? parent.height : parent.width;
-  const primaryGap = horizontal ? HORIZONTAL_OFFSET : VERTICAL_OFFSET;
-  const crossGap = horizontal ? VERTICAL_OFFSET : HORIZONTAL_OFFSET;
+  // the gaps scale with the nodes, which copy the parent's size
+  const gapScale = getElementDetailScale(parent);
+  const primaryGap =
+    (horizontal ? HORIZONTAL_OFFSET : VERTICAL_OFFSET) * gapScale;
+  const crossGap =
+    (horizontal ? VERTICAL_OFFSET : HORIZONTAL_OFFSET) * gapScale;
 
   const parentPrimaryStart = horizontal ? parent.x : parent.y;
   const parentCrossCenter = horizontal
@@ -391,7 +396,7 @@ const createBindingArrow = (
     "orbit",
     "start",
     scene,
-    appState.zoom,
+    appState,
   );
   bindBindingElement(
     bindingArrow,
@@ -399,7 +404,7 @@ const createBindingArrow = (
     "orbit",
     "end",
     scene,
-    appState.zoom,
+    appState,
   );
 
   const changedElements = new Map<string, OrderedExcalidrawElement>();

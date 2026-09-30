@@ -22,7 +22,7 @@ import {
 } from "./binding";
 import { getCommonBounds } from "./bounds";
 import { getPerfectElementSize } from "./sizeHelpers";
-import { getBoundTextElement } from "./textElement";
+import { getBoundTextElement, getBoundTextPadding } from "./textElement";
 import { getMinTextElementWidth } from "./textMeasurements";
 import {
   isArrowElement,
@@ -276,6 +276,7 @@ export const dragNewTextElement = ({
         fontFamily: newElement.fontFamily,
       }),
       newElement.lineHeight,
+      getBoundTextPadding(newElement),
     ),
   );
 

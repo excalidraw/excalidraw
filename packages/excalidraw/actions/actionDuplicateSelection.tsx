@@ -5,7 +5,7 @@ import {
   arrayToMap,
 } from "@excalidraw/common";
 
-import { getNonDeletedElements } from "@excalidraw/element";
+import { getAuthoringScale, getNonDeletedElements } from "@excalidraw/element";
 
 import { LinearElementEditor } from "@excalidraw/element";
 
@@ -60,6 +60,7 @@ export const actionDuplicateSelection = register({
       }
     }
 
+    const offset = (DEFAULT_GRID_SIZE / 2) * getAuthoringScale(appState);
     const duplication = duplicateElements({
       type: "in-place",
       elements,
@@ -75,8 +76,8 @@ export const actionDuplicateSelection = register({
         const duplicateFrameId =
           origElement.frameId && origIdToDuplicateId.get(origElement.frameId);
         return {
-          x: origElement.x + DEFAULT_GRID_SIZE / 2,
-          y: origElement.y + DEFAULT_GRID_SIZE / 2,
+          x: origElement.x + offset,
+          y: origElement.y + offset,
           frameId: duplicateFrameId ?? origElement.frameId,
         };
       },

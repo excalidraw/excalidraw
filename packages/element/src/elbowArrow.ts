@@ -21,10 +21,9 @@ import {
   getSizeFromPoints,
   isDevEnv,
   arrayToMap,
-  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
+import { DEFAULT_AUTHORING_VIEW } from "./authoring";
 
 import {
   bindPointToSnapToElementOutline,
@@ -54,6 +53,8 @@ import {
 } from "./types";
 import { aabbForElement, pointInsideBounds } from "./bounds";
 import { getHoveredElementForBinding } from "./collision";
+
+import type { AuthoringView } from "./authoring";
 
 import type { Heading } from "./heading";
 import type {
@@ -1203,7 +1204,7 @@ const getElbowArrowData = (
   nextPoints: readonly LocalPoint[],
   options?: {
     isDragging?: boolean;
-    zoom?: AppState["zoom"];
+    view?: AuthoringView;
     isBindingEnabled?: boolean;
     isMidpointSnappingEnabled?: boolean;
   },
@@ -1219,17 +1220,17 @@ const getElbowArrowData = (
 
   // NOTE: updates coming through `mutateElement` don't carry the zoom, so
   // those fall back to the zoom=1 binding distance
-  const zoom = options?.zoom ?? DEFAULT_ZOOM;
+  const view = options?.view ?? DEFAULT_AUTHORING_VIEW;
 
   let hoveredStartElement = null;
   let hoveredEndElement = null;
   if (options?.isDragging && options?.isBindingEnabled !== false) {
     const elements = Array.from(elementsMap.values());
     hoveredStartElement =
-      getHoveredElement(origStartGlobalPoint, elementsMap, elements, zoom) ||
+      getHoveredElement(origStartGlobalPoint, elementsMap, elements, view) ||
       null;
     hoveredEndElement =
-      getHoveredElement(origEndGlobalPoint, elementsMap, elements, zoom) ||
+      getHoveredElement(origEndGlobalPoint, elementsMap, elements, view) ||
       null;
   } else {
     hoveredStartElement = arrow.startBinding
@@ -1252,7 +1253,7 @@ const getElbowArrowData = (
     "start",
     arrow.startBinding?.fixedPoint,
     origStartGlobalPoint,
-    zoom,
+    view,
     hoveredStartElement,
     elementsMap,
     options?.isDragging,
@@ -1270,7 +1271,7 @@ const getElbowArrowData = (
     "end",
     arrow.endBinding?.fixedPoint,
     origEndGlobalPoint,
-    zoom,
+    view,
     hoveredEndElement,
     elementsMap,
     options?.isDragging,
@@ -1283,7 +1284,7 @@ const getElbowArrowData = (
     hoveredStartElement,
     origStartGlobalPoint,
     elementsMap,
-    zoom,
+    view,
   );
   const endHeading = getBindPointHeading(
     endGlobalPoint,
@@ -1291,7 +1292,7 @@ const getElbowArrowData = (
     hoveredEndElement,
     origEndGlobalPoint,
     elementsMap,
-    zoom,
+    view,
   );
   const startPointBounds = [
     startGlobalPoint[0] - 2,
@@ -2216,7 +2217,7 @@ const getGlobalPoint = (
   startOrEnd: "start" | "end",
   fixedPointRatio: [number, number] | undefined | null,
   initialPoint: GlobalPoint,
-  zoom: AppState["zoom"],
+  view: AuthoringView,
   element?: ExcalidrawBindableElement | null,
   elementsMap?: ElementsMap,
   isDragging?: boolean,
@@ -2230,7 +2231,7 @@ const getGlobalPoint = (
         element,
         startOrEnd,
         elementsMap,
-        zoom,
+        view,
         undefined,
         isMidpointSnappingEnabled,
       );
@@ -2256,7 +2257,7 @@ const getBindPointHeading = (
   hoveredElement: ExcalidrawBindableElement | null | undefined,
   origPoint: GlobalPoint,
   elementsMap: ElementsMap,
-  zoom?: AppState["zoom"],
+  view?: AuthoringView,
 ): Heading =>
   getHeadingForElbowArrowSnap(
     p,
@@ -2275,16 +2276,16 @@ const getBindPointHeading = (
       ),
     origPoint,
     elementsMap,
-    zoom,
+    view,
   );
 
 const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  zoom: AppState["zoom"],
+  view: AuthoringView,
 ) => {
-  return getHoveredElementForBinding(origPoint, elements, elementsMap, zoom);
+  return getHoveredElementForBinding(origPoint, elements, elementsMap, view);
 };
 
 const gridAddressesEqual = (a: GridAddress, b: GridAddress): boolean =>

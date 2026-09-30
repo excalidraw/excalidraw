@@ -232,6 +232,7 @@ export type InteractiveCanvasAppState = Readonly<
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
     isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
+    authoringUnits: AppState["authoringUnits"];
     gridModeEnabled: AppState["gridModeEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
     textToolHover: AppState["textToolHover"];
@@ -450,11 +451,14 @@ export interface AppState {
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidthKey: StrokeWidthKey;
+  /** mirrors the `authoringUnits` prop; see `getAuthoringScale` */
+  authoringUnits: AuthoringUnits;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
   currentItemStrokeVariability: StrokeVariability;
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
+  /** in `authoringUnits` */
   currentItemFontSize: number;
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
@@ -836,6 +840,9 @@ export type ElementRenderOffsets = ReadonlyMap<
   NonNullable<ElementRenderOverride["offset"]>
 >;
 
+/** See `ExcalidrawProps.authoringUnits`. */
+export type AuthoringUnits = "scene" | "screen";
+
 export interface ExcalidrawProps {
   className?: string;
   /**
@@ -881,11 +888,19 @@ export interface ExcalidrawProps {
   onInitialize?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   /**
-   * The freedraw tool's stroke width as it looks on screen. Each new stroke
-   * gets this divided by the zoom, so the pen draws the same line at any
-   * zoom, and the tool's named stroke widths are hidden.
+   * What the sizes the user authors are measured in. `"scene"` (the default)
+   * measures named stroke widths, font sizes, default element sizes and tool
+   * tolerances in scene units, so they grow on screen as you zoom in.
+   * `"screen"` measures them in screen pixels and divides them by the zoom
+   * when an element is created or edited, so a new element looks the same on
+   * screen at any zoom. Existing elements keep their scene sizes either way.
    */
-  freedrawScreenStrokeWidth?: number;
+  authoringUnits?: AuthoringUnits;
+  /**
+   * The freedraw tool's stroke width, in `authoringUnits`, in place of the
+   * named widths, which are hidden while the tool is out.
+   */
+  freedrawStrokeWidth?: number;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
     button: "down" | "up";
@@ -1230,6 +1245,9 @@ export type AppClassProperties = {
   activeResizeHandle: App["activeResizeHandle"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
+  getCurrentItemStrokeWidth: App["getCurrentItemStrokeWidth"];
+  getCurrentItemRoundness: App["getCurrentItemRoundness"];
+  getCurrentItemFontSize: App["getCurrentItemFontSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
   visibleElements: App["visibleElements"];

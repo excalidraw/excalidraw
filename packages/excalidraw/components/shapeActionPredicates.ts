@@ -115,7 +115,7 @@ export const getShapeActionPredicates = (
   const hasSelection = targetElements.length > 0;
   const hostSetsFreedrawWidth =
     activeToolType === "freedraw" &&
-    app.props.freedrawScreenStrokeWidth !== undefined;
+    app.props.freedrawStrokeWidth !== undefined;
 
   return {
     /** some element(s) selected */

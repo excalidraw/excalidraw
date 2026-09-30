@@ -296,7 +296,7 @@ describe("generic element", () => {
       const initCenterY = rectangle.y + rectangle.height / 2;
       const minContainerHeight = computeContainerDimensionForBoundText(
         label.height,
-        rectangle.type,
+        rectangle,
       );
 
       UI.resize(rectangle, handle, move, {

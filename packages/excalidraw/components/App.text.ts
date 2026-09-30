@@ -20,6 +20,7 @@ import {
   getActiveTextElement,
   getApproxMinLineHeight,
   getApproxMinLineWidth,
+  getBoundTextPadding,
   getBoundTextElement,
   getContainerCenter,
   getContainerElement,
@@ -650,7 +651,7 @@ export class AppText {
 
     const lineHeight =
       existingTextElement?.lineHeight || getLineHeight(fontFamily);
-    const fontSize = this.app.state.currentItemFontSize;
+    const fontSize = this.app.getCurrentItemFontSize();
 
     if (
       !existingTextElement &&
@@ -663,11 +664,13 @@ export class AppText {
         fontSize,
         fontFamily,
       };
+      const padding = getBoundTextPadding(container);
       const minWidth = getApproxMinLineWidth(
         getFontString(fontString),
         lineHeight,
+        padding,
       );
-      const minHeight = getApproxMinLineHeight(fontSize, lineHeight);
+      const minHeight = getApproxMinLineHeight(fontSize, lineHeight, padding);
       const newHeight = Math.max(container.height, minHeight);
       const newWidth = Math.max(container.width, minWidth);
       this.app.scene.mutateElement(container, {

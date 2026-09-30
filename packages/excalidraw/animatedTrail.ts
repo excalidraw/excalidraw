@@ -1,4 +1,5 @@
 import { LaserPointer } from "@excalidraw/laser-pointer";
+import { getAuthoringScale } from "@excalidraw/element";
 import {
   SVG_NS,
   getSvgPathFromStroke,
@@ -58,6 +59,11 @@ export class AnimatedTrail implements Trail {
     }
   }
 
+  /** the trail's width on screen */
+  private get size() {
+    return this.options.size ?? LaserPointer.defaults.size;
+  }
+
   get hasCurrentTrail() {
     return !!this.currentTrail;
   }
@@ -112,7 +118,19 @@ export class AnimatedTrail implements Trail {
   }
 
   startPath(x: number, y: number) {
-    this.currentTrail = new LaserPointer(this.options);
+    // the trail's head and its outline's simplification are sized in scene
+    // units; screen authoring keeps them the same on screen at any zoom
+    const scale = getAuthoringScale(this.app.state);
+    this.currentTrail = new LaserPointer(
+      scale === 1
+        ? this.options
+        : {
+            ...this.options,
+            size: this.size * scale,
+            simplify:
+              (this.options.simplify ?? LaserPointer.defaults.simplify) * scale,
+          },
+    );
 
     this.currentTrail.addPoint([x, y, performance.now()]);
 
@@ -168,8 +186,7 @@ export class AnimatedTrail implements Trail {
 
     this.pastTrails = this.pastTrails.filter(
       (t) =>
-        t.getStrokeOutline(t.options.size / this.app.state.zoom.value)
-          .length !== 0,
+        t.getStrokeOutline(this.size / this.app.state.zoom.value).length !== 0,
     );
 
     if (paths.length === 0) {
@@ -203,7 +220,7 @@ export class AnimatedTrail implements Trail {
 
   private drawTrail(trail: LaserPointer, state: AppState): string {
     const _stroke = trail
-      .getStrokeOutline(trail.options.size / state.zoom.value)
+      .getStrokeOutline(this.size / state.zoom.value)
       .map(([x, y]) => {
         const result = sceneCoordsToViewportCoords(
           { sceneX: x, sceneY: y },

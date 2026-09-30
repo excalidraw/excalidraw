@@ -1,7 +1,10 @@
 import React from "react";
 import { vi } from "vitest";
-import { KEYS, reseed, DEFAULT_ZOOM } from "@excalidraw/common";
-import { bindBindingElement } from "@excalidraw/element";
+import { KEYS, reseed } from "@excalidraw/common";
+import {
+  bindBindingElement,
+  DEFAULT_AUTHORING_VIEW,
+} from "@excalidraw/element";
 import "@excalidraw/utils/test-utils";
 
 import type {
@@ -89,7 +92,7 @@ describe("move element", () => {
         "orbit",
         "start",
         h.app.scene,
-        DEFAULT_ZOOM,
+        DEFAULT_AUTHORING_VIEW,
       );
       bindBindingElement(
         arrow.get() as NonDeleted<ExcalidrawArrowElement>,
@@ -97,7 +100,7 @@ describe("move element", () => {
         "orbit",
         "end",
         h.app.scene,
-        DEFAULT_ZOOM,
+        DEFAULT_AUTHORING_VIEW,
       );
     });
 

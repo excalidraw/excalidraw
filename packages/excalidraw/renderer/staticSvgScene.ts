@@ -1,5 +1,4 @@
 import {
-  BOUND_TEXT_PADDING,
   FRAME_STYLE,
   MAX_DECIMALS_FOR_SVG_EXPORT,
   SVG_NS,
@@ -17,7 +16,11 @@ import {
   STICKY_NOTE_SHADOW_OPACITY,
 } from "@excalidraw/common";
 import { normalizeLink, toValidURL } from "@excalidraw/common";
-import { hashString } from "@excalidraw/element";
+import {
+  getBoundTextPadding,
+  getElementDetailScale,
+  hashString,
+} from "@excalidraw/element";
 import { getUncroppedWidthAndHeight } from "@excalidraw/element";
 import {
   createPlaceholderEmbeddableLabel,
@@ -226,7 +229,7 @@ const renderElementToSvg = (
       );
       edgeShadow.setAttribute(
         "stroke-width",
-        `${STICKY_NOTE_EDGE_SHADOW_WIDTH * 2}`,
+        `${STICKY_NOTE_EDGE_SHADOW_WIDTH * 2 * getElementDetailScale(element)}`,
       );
       edgeShadow.setAttribute("clip-path", `url(#${clipPath.id})`);
 
@@ -240,7 +243,7 @@ const renderElementToSvg = (
         dateText.setAttribute("x", `${footer.x}`);
         dateText.setAttribute("y", `${footer.y}`);
         dateText.setAttribute("font-family", STICKY_NOTE_FOOTER.fontFamily);
-        dateText.setAttribute("font-size", `${STICKY_NOTE_FOOTER.fontSize}px`);
+        dateText.setAttribute("font-size", `${footer.fontSize}px`);
         // `text-anchor` is logical in SVG: pin the direction so an RTL host
         // page can't flip the label to the left edge
         dateText.setAttribute("text-anchor", "end");
@@ -446,20 +449,26 @@ const renderElementToSvg = (
 
         // the same padded hole the canvas renderers cut around the label
         const maskX =
-          offsetX + boundTextCoords.x - element.x - BOUND_TEXT_PADDING;
+          offsetX +
+          boundTextCoords.x -
+          element.x -
+          getBoundTextPadding(element);
         const maskY =
-          offsetY + boundTextCoords.y - element.y - BOUND_TEXT_PADDING;
+          offsetY +
+          boundTextCoords.y -
+          element.y -
+          getBoundTextPadding(element);
 
         maskRectInvisible.setAttribute("x", maskX.toString());
         maskRectInvisible.setAttribute("y", maskY.toString());
         maskRectInvisible.setAttribute("fill", "#000");
         maskRectInvisible.setAttribute(
           "width",
-          `${boundText.width + BOUND_TEXT_PADDING * 2}`,
+          `${boundText.width + getBoundTextPadding(element) * 2}`,
         );
         maskRectInvisible.setAttribute(
           "height",
-          `${boundText.height + BOUND_TEXT_PADDING * 2}`,
+          `${boundText.height + getBoundTextPadding(element) * 2}`,
         );
         maskRectInvisible.setAttribute("opacity", "1");
         maskPath.appendChild(maskRectInvisible);

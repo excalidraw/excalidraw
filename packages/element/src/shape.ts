@@ -45,6 +45,7 @@ import type {
   SVGPathString,
 } from "@excalidraw/excalidraw/scene/types";
 
+import { getElementDetailScale } from "./authoring";
 import { getStroke, getStrokePoints } from "./perfectFreehand";
 
 import { elementWithCanvasCache } from "./renderElement";
@@ -53,6 +54,7 @@ import {
   canBecomePolygon,
   isElbowArrow,
   isEmbeddableElement,
+  isFreeDrawElement,
   isIframeElement,
   isIframeLikeElement,
   isLinearElement,
@@ -143,15 +145,17 @@ export class ShapeCache {
 
     elementWithCanvasCache.delete(element);
 
-    const shape = _generateElementShape(
-      element,
-      ShapeCache.rg,
-      renderConfig || {
-        isExporting: false,
-        canvasBackgroundColor: COLOR_PALETTE.white,
-        embedsValidationStatus: null,
-        theme: THEME.LIGHT,
-      },
+    const shape = generateAtDetailScale(element, (nominal) =>
+      _generateElementShape(
+        nominal,
+        ShapeCache.rg,
+        renderConfig || {
+          isExporting: false,
+          canvasBackgroundColor: COLOR_PALETTE.white,
+          embedsValidationStatus: null,
+          theme: THEME.LIGHT,
+        },
+      ),
     ) as T["type"] extends keyof ElementShapes
       ? ElementShapes[T["type"]]
       : Drawable | null;
@@ -762,6 +766,75 @@ export const generateLinearCollisionShape = (
   }
 };
 
+const scaleDrawable = (drawable: Drawable, scale: number): Drawable => {
+  const { options } = drawable;
+  return {
+    ...drawable,
+    options: {
+      ...options,
+      strokeWidth: options.strokeWidth * scale,
+      fillWeight: options.fillWeight * scale,
+      hachureGap: options.hachureGap * scale,
+      strokeLineDash: options.strokeLineDash?.map((dash) => dash * scale),
+      strokeLineDashOffset:
+        options.strokeLineDashOffset && options.strokeLineDashOffset * scale,
+      fillLineDash: options.fillLineDash?.map((dash) => dash * scale),
+      fillLineDashOffset:
+        options.fillLineDashOffset && options.fillLineDashOffset * scale,
+    },
+    sets: drawable.sets.map((set) => ({
+      ...set,
+      ops: set.ops.map((op) => ({
+        ...op,
+        data: op.data.map((value) => value * scale),
+      })),
+    })),
+  };
+};
+
+/**
+ * Generates a shape for the element at its nominal scale and scales it back
+ * (see `getElementDetailScale`), so the generators' fixed details, such as
+ * arrowhead sizes, dash patterns, rough.js wobble and the adaptive corner
+ * radius, shrink with an element drawn thinner than the thinnest named
+ * stroke. Freedraw has no fixed details, and other elements are generated
+ * as they are.
+ */
+const generateAtDetailScale = (
+  element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  generate: (
+    element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
+  ) => ElementShape,
+): ElementShape => {
+  const scale = isFreeDrawElement(element) ? 1 : getElementDetailScale(element);
+  if (scale === 1) {
+    return generate(element);
+  }
+  const grow = 1 / scale;
+  const shape = generate({
+    ...element,
+    width: element.width * grow,
+    height: element.height * grow,
+    strokeWidth: element.strokeWidth * grow,
+    roundness: element.roundness?.value
+      ? { ...element.roundness, value: element.roundness.value * grow }
+      : element.roundness,
+    ...(isLinearElement(element) && {
+      points: element.points.map((point) =>
+        pointFrom<LocalPoint>(point[0] * grow, point[1] * grow),
+      ),
+    }),
+  } as typeof element);
+  if (Array.isArray(shape)) {
+    return shape.map((drawable) =>
+      scaleDrawable(drawable as Drawable, scale),
+    ) as ElementShape;
+  }
+  return shape && typeof shape === "object" && "sets" in shape
+    ? scaleDrawable(shape, scale)
+    : shape;
+};
+
 /**
  * Generates the roughjs shape for given element.
  *
@@ -1303,7 +1376,8 @@ export const getFreedrawMaxStrokeRadius = (
 ) =>
   element.strokeOptions?.variability === "constant"
     ? element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
-    : element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR + 3;
+    : element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR +
+      3 * getElementDetailScale(element);
 
 /**
  * The streamline-smoothed centerline the freedraw stroke is rendered

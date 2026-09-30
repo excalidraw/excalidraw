@@ -22,6 +22,7 @@ import { clamp } from "@excalidraw/math";
 
 import { updateBoundElements } from "./binding";
 import { newElementWith } from "./mutateElement";
+import { getElementDetailScale } from "./authoring";
 import { getPositionAfterHeightChange } from "./sizeHelpers";
 import { computeBoundTextPosition, getBoundTextElement } from "./textElement";
 import { measureText } from "./textMeasurements";
@@ -219,7 +220,7 @@ export const getStickyNoteCornerRadius = (
 
   return Math.min(
     Math.min(element.width, element.height) * STICKY_NOTE_CORNER_RADIUS_RATIO,
-    STICKY_NOTE_MAX_CORNER_RADIUS,
+    STICKY_NOTE_MAX_CORNER_RADIUS * getElementDetailScale(element),
   );
 };
 
@@ -237,7 +238,7 @@ export const getStickyNoteRenderPoints = (
 ): StickyNoteRenderPoint[] => {
   const roughness = Math.max(0, Math.min(2, Math.round(element.roughness)));
   const amount = Math.min(
-    STICKY_NOTE_RENDER_ROUGHNESS[roughness],
+    STICKY_NOTE_RENDER_ROUGHNESS[roughness] * getElementDetailScale(element),
     Math.min(element.width, element.height) * 0.012,
   );
 
@@ -280,8 +281,8 @@ export const getStickyNotePathCommands = (
     element,
     shadow
       ? {
-          offsetX: STICKY_NOTE_SHADOW_OFFSET,
-          offsetY: STICKY_NOTE_SHADOW_OFFSET,
+          offsetX: STICKY_NOTE_SHADOW_OFFSET * getElementDetailScale(element),
+          offsetY: STICKY_NOTE_SHADOW_OFFSET * getElementDetailScale(element),
           seedOffset: 1,
         }
       : undefined,
@@ -376,11 +377,18 @@ export const getStickyNotePathCommands = (
 // clamping the ceiling: the fit steps down from it in `STICKY_NOTE_FONT_STEP`
 // increments, and for values >= ~2^56 (1e20 - 2 === 1e20) that would never
 // progress and hang the editor
-export const normalizeStickyNoteFontSize = (fontSize: number) => {
+export const normalizeStickyNoteFontSize = (
+  fontSize: number,
+  /** the note's `getElementDetailScale` */
+  scale = 1,
+) => {
   if (!Number.isFinite(fontSize)) {
-    return STICKY_NOTE_FALLBACK_FONT_SIZE;
+    return STICKY_NOTE_FALLBACK_FONT_SIZE * scale;
   }
-  return Math.min(STICKY_NOTE_MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, fontSize));
+  return Math.min(
+    STICKY_NOTE_MAX_FONT_SIZE * scale,
+    Math.max(MIN_FONT_SIZE * scale, fontSize),
+  );
 };
 
 /** whether the text element is the label of a sticky note */
@@ -418,7 +426,12 @@ export const getBaseFontSizeUpdate = (
   elementsMap: ElementsMap,
 ): { fontSize: number } | { baseFontSize: number } => {
   return isStickyNoteBoundText(textElement, elementsMap)
-    ? { baseFontSize: normalizeStickyNoteFontSize(fontSize) }
+    ? {
+        baseFontSize: normalizeStickyNoteFontSize(
+          fontSize,
+          getElementDetailScale(textElement),
+        ),
+      }
     : { fontSize };
 };
 
@@ -469,19 +482,23 @@ export const getStickyNoteDateLabel = (
  * the data floor, where the band would overlap the top padding.
  */
 export const getStickyNoteFooter = (
-  element: Pick<ExcalidrawStickyNoteElement, "created" | "width" | "height">,
+  element: Pick<
+    ExcalidrawStickyNoteElement,
+    "created" | "width" | "height" | "type" | "strokeWidth"
+  >,
   now = Date.now(),
 ) => {
+  const scale = getElementDetailScale(element);
   if (
-    element.width < STICKY_NOTE_MIN_SIZE ||
-    element.height < STICKY_NOTE_MIN_SIZE
+    element.width < STICKY_NOTE_MIN_SIZE * scale ||
+    element.height < STICKY_NOTE_MIN_SIZE * scale
   ) {
     return null;
   }
   const text = getStickyNoteDateLabel(element.created, {
     short:
-      element.width - STICKY_NOTE_PADDING * 2 <
-      STICKY_NOTE_FOOTER.minBodyWidthForYear,
+      element.width - STICKY_NOTE_PADDING * 2 * scale <
+      STICKY_NOTE_FOOTER.minBodyWidthForYear * scale,
     now,
   });
   if (!text) {
@@ -489,8 +506,9 @@ export const getStickyNoteFooter = (
   }
   return {
     text,
-    x: element.width - STICKY_NOTE_PADDING,
-    y: element.height - STICKY_NOTE_FOOTER.baselineFromBottom,
+    x: element.width - STICKY_NOTE_PADDING * scale,
+    y: element.height - STICKY_NOTE_FOOTER.baselineFromBottom * scale,
+    fontSize: STICKY_NOTE_FOOTER.fontSize * scale,
   };
 };
 
@@ -501,21 +519,28 @@ export const getStickyNoteFooter = (
  * the very first keystroke. Data-level passes (restore, action post-passes)
  * only enforce the constant floor — the layout grows a note as needed.
  */
-export const getStickyNoteMinSize = ({
-  fontSize,
-  fontFamily,
-}: Pick<ExcalidrawTextElement, "fontSize" | "fontFamily">) => {
-  const lineHeightPx = Math.ceil(
-    normalizeStickyNoteFontSize(fontSize) * getLineHeight(fontFamily),
-  );
+export const getStickyNoteMinSize = (
+  {
+    fontSize,
+    fontFamily,
+  }: Pick<ExcalidrawTextElement, "fontSize" | "fontFamily">,
+  /** the note's `getElementDetailScale` */
+  scale = 1,
+) => {
+  const lineHeightPx =
+    Math.ceil(
+      (normalizeStickyNoteFontSize(fontSize, scale) *
+        getLineHeight(fontFamily)) /
+        scale,
+    ) * scale;
   return {
     width: Math.max(
-      STICKY_NOTE_MIN_SIZE,
-      lineHeightPx + STICKY_NOTE_PADDING * 2,
+      STICKY_NOTE_MIN_SIZE * scale,
+      lineHeightPx + STICKY_NOTE_PADDING * 2 * scale,
     ),
     height: Math.max(
-      STICKY_NOTE_MIN_SIZE,
-      lineHeightPx + STICKY_NOTE_BODY_INSET_Y,
+      STICKY_NOTE_MIN_SIZE * scale,
+      lineHeightPx + STICKY_NOTE_BODY_INSET_Y * scale,
     ),
   };
 };
@@ -574,7 +599,10 @@ type FontFit = {
 const NO_ELEMENTS: ElementsMap = new Map();
 
 const getStickyNoteBaseWidth = (container: ExcalidrawStickyNoteElement) => {
-  return Math.max(container.width, STICKY_NOTE_MIN_SIZE);
+  return Math.max(
+    container.width,
+    STICKY_NOTE_MIN_SIZE * getElementDetailScale(container),
+  );
 };
 
 /**
@@ -589,23 +617,22 @@ const fitStickyNoteFont = (
   {
     baseFontSize,
     fontSizeMin,
+    fontStep,
     maxWidth,
     maxHeight,
     warmStart,
   }: {
     baseFontSize: number;
     fontSizeMin: number;
+    fontStep: number;
     maxWidth: number;
     maxHeight: number;
     warmStart: number;
   },
 ): FontFit => {
-  const steps = Math.max(
-    0,
-    Math.ceil((baseFontSize - fontSizeMin) / STICKY_NOTE_FONT_STEP),
-  );
+  const steps = Math.max(0, Math.ceil((baseFontSize - fontSizeMin) / fontStep));
   const sizeAt = (index: number) =>
-    index >= steps ? fontSizeMin : baseFontSize - index * STICKY_NOTE_FONT_STEP;
+    index >= steps ? fontSizeMin : baseFontSize - index * fontStep;
 
   const fits = new Map<number, FontFit>();
   const at = (index: number) => {
@@ -628,7 +655,7 @@ const fitStickyNoteFont = (
   // the previous fitted size, snapped onto the grid and clamped into the
   // current interval (a lowered ceiling must not keep the old larger size)
   const warm = clamp(
-    Math.round((baseFontSize - warmStart) / STICKY_NOTE_FONT_STEP),
+    Math.round((baseFontSize - warmStart) / fontStep),
     0,
     steps,
   );
@@ -671,10 +698,11 @@ export const getStickyNoteLayout = (
   textElement: ExcalidrawTextElement | null,
   opts: StickyNoteLayoutOpts = {},
 ): StickyNoteLayout => {
+  const scale = getElementDetailScale(container);
   const baseWidth = getStickyNoteBaseWidth(container);
   const baseHeight = Math.max(
     opts.baseHeight ?? (container.baseHeight || container.height),
-    STICKY_NOTE_MIN_SIZE,
+    STICKY_NOTE_MIN_SIZE * scale,
   );
   const anchor = opts.anchor ?? "top";
 
@@ -694,10 +722,11 @@ export const getStickyNoteLayout = (
   const originalText = opts.originalText ?? textElement.originalText;
   const baseFontSize = normalizeStickyNoteFontSize(
     opts.baseFontSize ?? textElement.baseFontSize ?? textElement.fontSize,
+    scale,
   );
-  const fontSizeMin = Math.min(STICKY_NOTE_MIN_FONT_SIZE, baseFontSize);
-  const maxWidth = Math.max(baseWidth - STICKY_NOTE_PADDING * 2, 1);
-  const maxHeight = Math.max(baseHeight - STICKY_NOTE_BODY_INSET_Y, 0);
+  const fontSizeMin = Math.min(STICKY_NOTE_MIN_FONT_SIZE * scale, baseFontSize);
+  const maxWidth = Math.max(baseWidth - STICKY_NOTE_PADDING * 2 * scale, scale);
+  const maxHeight = Math.max(baseHeight - STICKY_NOTE_BODY_INSET_Y * scale, 0);
   const { fontFamily, lineHeight } = textElement;
 
   const fit = (fontSize: number): FontFit => {
@@ -720,6 +749,7 @@ export const getStickyNoteLayout = (
     : fitStickyNoteFont(fit, {
         baseFontSize,
         fontSizeMin,
+        fontStep: STICKY_NOTE_FONT_STEP * scale,
         maxWidth,
         maxHeight,
         warmStart: textElement.fontSize,
@@ -727,7 +757,7 @@ export const getStickyNoteLayout = (
 
   const height = isBlank
     ? baseHeight
-    : Math.max(baseHeight, fitted.height + STICKY_NOTE_BODY_INSET_Y);
+    : Math.max(baseHeight, fitted.height + STICKY_NOTE_BODY_INSET_Y * scale);
   const nextContainer = {
     ...getPositionAfterHeightChange(container, height, anchor),
     width: baseWidth,

@@ -14,6 +14,7 @@ import {
 import {
   convertToExcalidrawElements,
   embeddableURLValidator,
+  getAuthoringScale,
   getCommonBounds,
   getEmbedLink,
   getLineHeightInPx,
@@ -256,7 +257,9 @@ export class AppClipboard {
           embeddables[embeddables.length - 1];
         const embeddable = this.app.insertEmbeddableElement({
           sceneX: prevEmbeddable
-            ? prevEmbeddable.x + prevEmbeddable.width + 20
+            ? prevEmbeddable.x +
+              prevEmbeddable.width +
+              20 * getAuthoringScale(this.app.state)
             : sceneX,
           sceneY,
           link: normalizeLink(url),
@@ -435,7 +438,7 @@ export class AppClipboard {
       roughness: this.app.state.currentItemRoughness,
       opacity: this.app.state.currentItemOpacity,
       text,
-      fontSize: this.app.state.currentItemFontSize,
+      fontSize: this.app.getCurrentItemFontSize(),
       fontFamily: this.app.state.currentItemFontFamily,
       textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
@@ -446,7 +449,7 @@ export class AppClipboard {
       fontFamily: textElementProps.fontFamily,
     });
     const lineHeight = getLineHeight(textElementProps.fontFamily);
-    const LINE_GAP = 10;
+    const LINE_GAP = 10 * getAuthoringScale(this.app.state);
 
     const lines = isPlainPaste ? [text] : text.split("\n");
     const createTextElements = (maxTextWidth: number) => {

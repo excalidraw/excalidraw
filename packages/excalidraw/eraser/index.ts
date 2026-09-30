@@ -7,6 +7,7 @@ import {
   getElementBounds,
   getElementLineSegments,
   getFreedrawOutlineAsSegments,
+  getFreedrawMaxStrokeRadius,
   getFreedrawOutlinePoints,
   intersectElementWithLineSegment,
   isArrowElement,
@@ -34,6 +35,8 @@ import type { GlobalPoint, LineSegment } from "@excalidraw/math/types";
 import type { ElementsMap, ExcalidrawElement } from "@excalidraw/element/types";
 
 import { AnimatedTrail } from "../animatedTrail";
+
+import type { AppState } from "../types";
 
 import type App from "../components/App";
 
@@ -111,7 +114,7 @@ export class EraserTrail extends AnimatedTrail {
           pathSegment,
           element,
           candidateElementsMap,
-          this.app.state.zoom.value,
+          this.app.state,
         );
 
         if (intersects) {
@@ -147,7 +150,7 @@ export class EraserTrail extends AnimatedTrail {
           pathSegment,
           element,
           candidateElementsMap,
-          this.app.state.zoom.value,
+          this.app.state,
         );
 
         if (intersects) {
@@ -193,16 +196,31 @@ export class EraserTrail extends AnimatedTrail {
   }
 }
 
+/** how far from a stroke's ink the eraser still takes it, in screen px */
+const ERASER_REACH = 5;
+
 const eraserTest = (
   pathSegment: LineSegment<GlobalPoint>,
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
-  zoom: number,
+  appState: Pick<AppState, "zoom" | "authoringUnits">,
 ): boolean => {
   const lastPoint = pathSegment[1];
+  const zoom = appState.zoom.value;
+  // screen authoring keeps the reach on screen at any zoom; otherwise it
+  // bottoms out at a scene distance
+  const reach =
+    appState.authoringUnits === "screen" ? ERASER_REACH / zoom : null;
 
   // PERF: Do a quick bounds intersection test first because it's cheap
-  const threshold = isFreeDrawElement(element) ? 15 : element.strokeWidth / 2;
+  const threshold =
+    reach === null
+      ? isFreeDrawElement(element)
+        ? 15
+        : element.strokeWidth / 2
+      : (isFreeDrawElement(element)
+          ? getFreedrawMaxStrokeRadius(element)
+          : element.strokeWidth / 2) + reach;
   const segmentBounds = [
     Math.min(pathSegment[0][0], pathSegment[1][0]) - threshold,
     Math.min(pathSegment[0][1], pathSegment[1][1]) - threshold,
@@ -241,7 +259,7 @@ const eraserTest = (
       outlinePoints,
       elementsMap,
     );
-    const tolerance = Math.max(2.25, 5 / zoom); // NOTE: Visually fine-tuned approximation
+    const tolerance = reach ?? Math.max(2.25, ERASER_REACH / zoom); // NOTE: Visually fine-tuned approximation
 
     for (const seg of strokeSegments) {
       if (lineSegmentsDistance(seg, pathSegment) <= tolerance) {
@@ -268,10 +286,10 @@ const eraserTest = (
   const boundTextElement = getBoundTextElement(element, elementsMap);
 
   if (isArrowElement(element) || (isLineElement(element) && !element.polygon)) {
-    const tolerance = Math.max(
-      element.strokeWidth,
-      (element.strokeWidth * 2) / zoom,
-    );
+    const tolerance =
+      reach === null
+        ? Math.max(element.strokeWidth, (element.strokeWidth * 2) / zoom)
+        : element.strokeWidth / 2 + reach;
 
     // If the eraser movement is so fast that a large distance is covered
     // between the last two points, the distanceToElement miss, so we test

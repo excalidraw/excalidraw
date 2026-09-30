@@ -1,4 +1,4 @@
-import { ARROW_TYPE, DEFAULT_ZOOM } from "@excalidraw/common";
+import { ARROW_TYPE } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
@@ -13,7 +13,10 @@ import {
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
 import "@excalidraw/utils/test-utils";
-import { bindBindingElement } from "@excalidraw/element";
+import {
+  bindBindingElement,
+  DEFAULT_AUTHORING_VIEW,
+} from "@excalidraw/element";
 
 import type { LocalPoint } from "@excalidraw/math";
 
@@ -194,7 +197,7 @@ describe("elbow arrow routing", () => {
       "orbit",
       "start",
       h.scene,
-      DEFAULT_ZOOM,
+      DEFAULT_AUTHORING_VIEW,
     );
     bindBindingElement(
       arrow,
@@ -202,7 +205,7 @@ describe("elbow arrow routing", () => {
       "orbit",
       "end",
       h.scene,
-      DEFAULT_ZOOM,
+      DEFAULT_AUTHORING_VIEW,
     );
 
     expect(arrow.startBinding).not.toBe(null);

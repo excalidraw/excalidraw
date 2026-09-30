@@ -33,7 +33,6 @@ import {
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
   isTransparent,
-  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -44,7 +43,11 @@ import {
   projectFixedPointOntoDiagonal,
   isNonDeletedElement,
 } from "@excalidraw/element";
-import { normalizeFixedPoint } from "@excalidraw/element";
+import {
+  DEFAULT_AUTHORING_VIEW,
+  getElementDetailScale,
+  normalizeFixedPoint,
+} from "@excalidraw/element";
 import {
   updateElbowArrowPoints,
   validateElbowPoints,
@@ -400,7 +403,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               boundElement,
               startOrEnd,
               elementsMap,
-              DEFAULT_ZOOM,
+              DEFAULT_AUTHORING_VIEW,
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
         safeElement as NonDeleted<ExcalidrawArrowElement>,
@@ -576,7 +579,10 @@ export const restoreElement = (
         // only meaningful for sticky note labels; reconciled against the
         // container in `restoreStickyNotes` once bindings are repaired
         baseFontSize: isFiniteNumber(element.baseFontSize)
-          ? normalizeStickyNoteFontSize(element.baseFontSize)
+          ? normalizeStickyNoteFontSize(
+              element.baseFontSize,
+              getElementDetailScale(element),
+            )
           : null,
       });
 
@@ -917,6 +923,7 @@ const restoreStickyNotes = (
       Object.assign(element, {
         baseFontSize: normalizeStickyNoteFontSize(
           element.baseFontSize ?? element.fontSize,
+          getElementDetailScale(container ?? element),
         ),
         strokeColor,
       });

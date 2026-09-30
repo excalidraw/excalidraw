@@ -58,6 +58,7 @@ import {
   normalizeLink,
   toValidURL,
   getGridPoint,
+  getGridSizeAtScale,
   debounce,
   distance,
   getFontString,
@@ -138,7 +139,6 @@ import {
   isInitializedImageElement,
   isLinearElement,
   isLinearElementType,
-  isUsingAdaptiveRadius,
   isIframeElement,
   isIframeLikeElement,
   isMagicFrameElement,
@@ -151,6 +151,10 @@ import {
   isElementCompletelyInViewport,
   isElementInViewport,
   isInvisiblySmallElement,
+  getRoundnessForShape,
+  getAuthoringScale,
+  getElementDetailScale,
+  hasStrokeWidth,
   getCornerRadius,
   isPathALoop,
   createSrcDoc,
@@ -189,6 +193,7 @@ import {
   isElementLink,
   isMeasureTextSupported,
   getMinTextElementWidth,
+  getBoundTextPadding,
   ShapeCache,
   resolveElementRenderState,
   getRenderElementWithPositionOverride,
@@ -875,6 +880,7 @@ class App extends React.Component<AppProps, AppState> {
       zenModeEnabled,
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
+      authoringUnits: props.authoringUnits ?? defaultAppState.authoringUnits,
       name,
       width: this.ownerWindow.innerWidth,
       height: this.ownerWindow.innerHeight,
@@ -1175,7 +1181,7 @@ class App extends React.Component<AppProps, AppState> {
         ),
         this.scene.getNonDeletedElements(),
         elementsMap,
-        this.state.zoom,
+        this.state,
       );
       const element = LinearElementEditor.getElement(
         this.state.selectedLinearElement.elementId,
@@ -1309,7 +1315,7 @@ class App extends React.Component<AppProps, AppState> {
         pointFrom<GlobalPoint>(x, y),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
-        this.state.zoom,
+        this.state,
       );
 
       if (hoveredElement && this.state.bindMode !== "skip") {
@@ -1489,9 +1495,18 @@ class App extends React.Component<AppProps, AppState> {
    */
   public getEffectiveGridSize = () => {
     return (
-      isGridModeEnabled(this) ? this.state.gridSize : null
+      isGridModeEnabled(this) ? this.getGridSizeAtZoom() : null
     ) as NullableGridSize;
   };
+
+  /** the grid step drawn and snapped to, see `getGridSizeAtScale` */
+  private getGridSizeAtZoom() {
+    return getGridSizeAtScale(
+      this.state.gridSize,
+      this.state.gridStep,
+      getAuthoringScale(this.state),
+    );
+  }
 
   private getHTMLIFrameElement(
     element: ExcalidrawIframeLikeElement,
@@ -1585,7 +1600,7 @@ class App extends React.Component<AppProps, AppState> {
       viewportClickEnd_scenePoint,
     );
 
-    if (draggedDistance > DRAGGING_THRESHOLD) {
+    if (draggedDistance > DRAGGING_THRESHOLD * getAuthoringScale(this.state)) {
       return false;
     }
 
@@ -2624,6 +2639,7 @@ class App extends React.Component<AppProps, AppState> {
                               imageCache: this.imageCache,
                               isExporting: false,
                               renderGrid: isGridModeEnabled(this),
+                              gridSize: this.getGridSizeAtZoom(),
                               renderLinks: this.isLinksEnabled(),
                               canvasBackgroundColor:
                                 this.state.viewBackgroundColor,
@@ -2868,7 +2884,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const frameElement = this.insertIframeElement({
-      sceneX: magicFrame.x + magicFrame.width + 30,
+      sceneX:
+        magicFrame.x + magicFrame.width + 30 * getAuthoringScale(this.state),
       sceneY: magicFrame.y,
       width: magicFrame.width,
       height: magicFrame.height,
@@ -4259,6 +4276,15 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
+  // the prop is the source of truth, whatever restores or resets the state
+  static getDerivedStateFromProps(
+    props: AppProps,
+    state: AppState,
+  ): Partial<AppState> | null {
+    const authoringUnits = props.authoringUnits ?? "scene";
+    return state.authoringUnits === authoringUnits ? null : { authoringUnits };
+  }
+
   componentDidUpdate(prevProps: AppProps, prevState: AppState) {
     const renderOverridesUpdatePending = this.renderOverridesUpdatePending;
     this.renderOverridesUpdatePending = false;
@@ -5408,11 +5434,11 @@ class App extends React.Component<AppProps, AppState> {
         const step =
           (this.getEffectiveGridSize() &&
             (event.shiftKey
-              ? ELEMENT_TRANSLATE_AMOUNT
+              ? ELEMENT_TRANSLATE_AMOUNT * getAuthoringScale(this.state)
               : this.getEffectiveGridSize())) ||
           (event.shiftKey
             ? ELEMENT_SHIFT_TRANSLATE_AMOUNT
-            : ELEMENT_TRANSLATE_AMOUNT);
+            : ELEMENT_TRANSLATE_AMOUNT) * getAuthoringScale(this.state);
 
         let offsetX = 0;
         let offsetY = 0;
@@ -5638,7 +5664,7 @@ class App extends React.Component<AppProps, AppState> {
               pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
               this.scene.getNonDeletedElements(),
               this.scene.getNonDeletedElementsMap(),
-              this.state.zoom,
+              this.state,
             );
 
             this.handleDelayedBindModeChange(element, hoveredElement);
@@ -6075,7 +6101,7 @@ class App extends React.Component<AppProps, AppState> {
 
   getElementHitThreshold(element: ExcalidrawElement) {
     return Math.max(
-      element.strokeWidth / 2 + 0.1,
+      element.strokeWidth / 2 + 0.1 * getElementDetailScale(element),
       // NOTE: Here be dragons. Do not go under the 0.63 multiplier unless you're
       // willing to test extensively. The hit testing starts to become unreliable
       // due to FP imprecision under 0.63 in high zoom levels.
@@ -6957,7 +6983,7 @@ class App extends React.Component<AppProps, AppState> {
           globalPoint,
           this.scene.getNonDeletedElements(),
           elementsMap,
-          this.state.zoom,
+          this.state,
         );
         if (hoveredElement) {
           this.setState({
@@ -6967,7 +6993,7 @@ class App extends React.Component<AppProps, AppState> {
                 globalPoint,
                 hoveredElement,
                 elementsMap,
-                this.state.zoom,
+                this.state,
                 arrow,
               ),
             },
@@ -6996,7 +7022,8 @@ class App extends React.Component<AppProps, AppState> {
           pointDistance(
             pointFrom(scenePointerX - rx, scenePointerY - ry),
             lastPoint,
-          ) >= LINE_CONFIRM_THRESHOLD
+          ) >=
+          LINE_CONFIRM_THRESHOLD * getAuthoringScale(this.state)
         ) {
           this.store.scheduleCapture();
           flushSync(() => {
@@ -7037,7 +7064,8 @@ class App extends React.Component<AppProps, AppState> {
         pointDistance(
           pointFrom(scenePointerX - rx, scenePointerY - ry),
           lastCommittedPoint,
-        ) < LINE_CONFIRM_THRESHOLD
+        ) <
+          LINE_CONFIRM_THRESHOLD * getAuthoringScale(this.state)
       ) {
         this.cursor.set(CURSOR_TYPE.POINTER);
         this.scene.mutateElement(
@@ -7080,7 +7108,7 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             elementsMap,
-            this.state.zoom,
+            this.state,
           );
 
           if (getFeatureFlag("COMPLEX_BINDINGS")) {
@@ -7116,7 +7144,7 @@ class App extends React.Component<AppProps, AppState> {
         scenePointer,
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
-        this.state.zoom,
+        this.state,
       );
       const elementsMap = this.scene.getNonDeletedElementsMap();
       if (hit && !isPointInElement(scenePointer, hit, elementsMap)) {
@@ -7127,7 +7155,7 @@ class App extends React.Component<AppProps, AppState> {
               scenePointer,
               hit,
               elementsMap,
-              this.state.zoom,
+              this.state,
               { elbowed: this.state.currentItemArrowType === ARROW_TYPE.elbow },
             ),
           },
@@ -8807,7 +8835,7 @@ class App extends React.Component<AppProps, AppState> {
     // How many pixels off the shape boundary we still consider a hit
     const threshold = Math.max(
       DEFAULT_COLLISION_THRESHOLD / this.state.zoom.value,
-      1,
+      getAuthoringScale(this.state),
     );
     const boundsPadding =
       (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / this.state.zoom.value;
@@ -8975,8 +9003,8 @@ class App extends React.Component<AppProps, AppState> {
       roundness: this.getCurrentItemRoundness("embeddable"),
       opacity: this.state.currentItemOpacity,
       locked: false,
-      width: embedLink.intrinsicSize.w,
-      height: embedLink.intrinsicSize.h,
+      width: embedLink.intrinsicSize.w * getAuthoringScale(this.state),
+      height: embedLink.intrinsicSize.h * getAuthoringScale(this.state),
       link,
     });
 
@@ -9132,7 +9160,8 @@ class App extends React.Component<AppProps, AppState> {
             pointerDownState.origin.y - ry,
           ),
           lastCommittedPoint,
-        ) < LINE_CONFIRM_THRESHOLD;
+        ) <
+          LINE_CONFIRM_THRESHOLD * getAuthoringScale(this.state);
 
       // clicking inside commit zone → finalize arrow
       if (
@@ -9242,7 +9271,7 @@ class App extends React.Component<AppProps, AppState> {
             point,
             this.scene.getNonDeletedElements(),
             elementsMap,
-            this.state.zoom,
+            this.state,
           )
         : null;
 
@@ -9323,7 +9352,7 @@ class App extends React.Component<AppProps, AppState> {
                       point,
                       boundElement,
                       elementsMap,
-                      this.state.zoom,
+                      this.state,
                       element,
                     ),
                   }
@@ -9351,23 +9380,30 @@ class App extends React.Component<AppProps, AppState> {
       | "embeddable",
   ) {
     return this.state.currentItemRoundness === "round"
-      ? {
-          type: isUsingAdaptiveRadius(elementType)
-            ? ROUNDNESS.ADAPTIVE_RADIUS
-            : ROUNDNESS.PROPORTIONAL_RADIUS,
-        }
+      ? getRoundnessForShape(elementType, getAuthoringScale(this.state))
       : null;
   }
 
   public getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
-    const { freedrawScreenStrokeWidth } = this.props;
-    if (elementType === "freedraw" && freedrawScreenStrokeWidth !== undefined) {
-      return freedrawScreenStrokeWidth / this.state.zoom.value;
-    }
-    return getStrokeWidthByKey(
-      elementType,
-      this.state.currentItemStrokeWidthKey,
-    );
+    const { freedrawStrokeWidth } = this.props;
+    const width =
+      elementType === "freedraw" && freedrawStrokeWidth !== undefined
+        ? freedrawStrokeWidth
+        : getStrokeWidthByKey(
+            elementType,
+            // an element that draws no stroke carries the authoring scale in
+            // its width exactly at the thinnest one (`getElementDetailScale`)
+            this.state.authoringUnits === "screen" &&
+              !hasStrokeWidth(elementType)
+              ? "thin"
+              : this.state.currentItemStrokeWidthKey,
+          );
+    return width * getAuthoringScale(this.state);
+  }
+
+  /** The font size new text is created at, in scene units. */
+  public getCurrentItemFontSize() {
+    return this.state.currentItemFontSize * getAuthoringScale(this.state);
   }
 
   private createGenericElementOnPointerDown = (
@@ -9768,7 +9804,7 @@ class App extends React.Component<AppProps, AppState> {
               pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
               this.scene.getNonDeletedElements(),
               elementsMap,
-              this.state.zoom,
+              this.state,
             );
 
             this.handleDelayedBindModeChange(element, hoveredElement);
@@ -10662,7 +10698,7 @@ class App extends React.Component<AppProps, AppState> {
           if (this.editorInterface.isTouchScreen) {
             const FIXED_DELTA_X = Math.min(
               (this.state.width * 0.7) / this.state.zoom.value,
-              100,
+              100 * getAuthoringScale(this.state),
             );
 
             this.scene.mutateElement(
@@ -10735,6 +10771,7 @@ class App extends React.Component<AppProps, AppState> {
             fontFamily: newElement.fontFamily,
           }),
           newElement.lineHeight,
+          getBoundTextPadding(newElement),
         );
 
         if (newElement.width < minWidth) {
@@ -10761,7 +10798,7 @@ class App extends React.Component<AppProps, AppState> {
           newElement.height * zoom < DRAGGING_THRESHOLD;
         let nextGeometry;
         if (isClick) {
-          const size = DEFAULT_STICKY_NOTE_SIZE;
+          const size = DEFAULT_STICKY_NOTE_SIZE * getAuthoringScale(this.state);
           // Snap after centering: half the default size need not be on the grid.
           const [x, y] = getGridPoint(
             pointerDownState.origin.x - size / 2,
@@ -10777,10 +10814,13 @@ class App extends React.Component<AppProps, AppState> {
         } else {
           // one line at the current font ceiling must fit, or the note would
           // grow on the first keystroke
-          const minSize = getStickyNoteMinSize({
-            fontSize: this.state.currentItemFontSize,
-            fontFamily: this.state.currentItemFontFamily,
-          });
+          const minSize = getStickyNoteMinSize(
+            {
+              fontSize: this.getCurrentItemFontSize(),
+              fontFamily: this.state.currentItemFontFamily,
+            },
+            getElementDetailScale(newElement),
+          );
           let width = Math.max(newElement.width, minSize.width);
           let height = Math.max(newElement.height, minSize.height);
           if (!shouldMaintainAspectRatio(childEvent)) {
