@@ -14,7 +14,7 @@ import { pointsEqual } from "@excalidraw/math";
 import type { AppState, Offsets, Zoom } from "@excalidraw/excalidraw/types";
 
 import { getElementDetailScale } from "./authoring";
-import { getCommonBounds, getElementBounds } from "./bounds";
+import { getCommonBounds, getElementPaintBounds } from "./bounds";
 import {
   isArrowElement,
   isFreeDrawElement,
@@ -91,7 +91,7 @@ export const isElementInViewport = (
   },
   elementsMap: ElementsMap,
 ) => {
-  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap); // scene coordinates
+  const [x1, y1, x2, y2] = getElementPaintBounds(element, elementsMap); // scene coordinates
   const topLeftSceneCoords = viewportCoordsToSceneCoords(
     {
       clientX: viewTransformations.offsetLeft,

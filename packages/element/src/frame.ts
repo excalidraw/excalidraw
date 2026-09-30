@@ -22,6 +22,7 @@ import {
   getElementAbsoluteCoords,
   doBoundsIntersect,
   getElementBounds,
+  getElementPaintBounds,
   boundsContainBounds,
 } from "./bounds";
 import { mutateElement } from "./mutateElement";
@@ -991,7 +992,7 @@ export const getElementsOverlappingFrame = <T extends ExcalidrawElement>(
       // and thus invisible in target frame
       (!el.frameId || el.frameId === frame.id) &&
       doBoundsIntersect(
-        getElementBounds(el, elementsMap),
+        getElementPaintBounds(el, elementsMap),
         getElementBounds(frame, elementsMap),
       ),
   );

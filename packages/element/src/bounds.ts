@@ -27,7 +27,8 @@ import type {
 import type { AppState } from "@excalidraw/excalidraw/types";
 import type { Mutable } from "@excalidraw/common/utility-types";
 
-import { generateRoughOptions } from "./shape";
+import { getElementDetailScale } from "./authoring";
+import { generateRoughOptions, getFreedrawMaxStrokeRadius } from "./shape";
 import { ShapeCache } from "./shape";
 import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement, getContainerElement } from "./textElement";
@@ -1000,6 +1001,37 @@ export const getElementBounds = (
   nonRotated: boolean = false,
 ): Bounds => {
   return ElementBounds.getBounds(element, elementsMap, nonRotated);
+};
+
+/**
+ * How far an element's paint can reach past `getElementBounds`, which follow
+ * a stroke's centre line: half the stroke (a freedraw stroke's radius), plus
+ * the spread of arrowheads and rough.js wobble.
+ */
+export const getElementPaintExtent = (element: ExcalidrawElement): number => {
+  if (isFreeDrawElement(element)) {
+    return getFreedrawMaxStrokeRadius(element);
+  }
+  const arrowheads = isArrowElement(element)
+    ? Math.max(
+        element.startArrowhead ? getArrowheadSize(element.startArrowhead) : 0,
+        element.endArrowhead ? getArrowheadSize(element.endArrowhead) : 0,
+      )
+    : 0;
+  return (
+    element.strokeWidth / 2 +
+    (arrowheads + element.roughness * 2) * getElementDetailScale(element)
+  );
+};
+
+/** `getElementBounds` grown by `getElementPaintExtent` */
+export const getElementPaintBounds = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+): Bounds => {
+  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
+  const extent = getElementPaintExtent(element);
+  return [x1 - extent, y1 - extent, x2 + extent, y2 + extent];
 };
 
 export const getCommonBounds = (
