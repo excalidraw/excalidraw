@@ -34,7 +34,6 @@ import {
   bindPointToSnapToElementOutline,
   getBindingGap,
   getBindingStrategyForDraggingBindingElementEndpoints,
-  snapToMid,
   updateBindings,
   updateBoundElements,
   updateBoundPoint,
@@ -1242,7 +1241,7 @@ describe("avoidRectangularCorner", () => {
     [300, 300],
     [0, 0],
   ]);
-  const gap = getBindingGap(target, arrow);
+  const gap = getBindingGap(target);
   const map = toMap(target, arrow);
 
   it.each([
@@ -1321,9 +1320,10 @@ describe("bindPointToSnapToElementOutline for simple arrows", () => {
       target,
       "end",
       toMap(target, arrow),
+      DEFAULT_ZOOM,
     );
 
-    expect(point[0]).toBeCloseTo(100 + getBindingGap(target, arrow));
+    expect(point[0]).toBeCloseTo(100 + getBindingGap(target));
     expect(point[1]).toBeCloseTo(50);
   });
 
@@ -1339,6 +1339,7 @@ describe("bindPointToSnapToElementOutline for simple arrows", () => {
       target,
       "end",
       toMap(target, arrow),
+      DEFAULT_ZOOM,
     );
 
     expect(point[0]).toBeCloseTo(110.5);
@@ -1699,56 +1700,6 @@ describe("getBindingStrategyForDraggingBindingElementEndpoints", () => {
   });
 });
 
-describe("snapToMid on diamonds", () => {
-  const diamond = rectangle("d", 0, 0, 100, 100, {}, "diamond");
-  const arrow = simpleArrow("x", [
-    [300, 300],
-    [0, 0],
-  ]);
-  const gap = getBindingGap(diamond, arrow);
-  const map = toMap(diamond, arrow);
-
-  it.each([
-    ["top left", [25 - gap, 25 - gap]],
-    ["top right", [75 + gap, 25 - gap]],
-    ["bottom left", [25 - gap, 75 + gap]],
-    ["bottom right", [75 + gap, 75 + gap]],
-  ] as [string, [number, number]][])(
-    "snaps to the midpoint of the %s face",
-    (_, midpoint) => {
-      const result = snapToMid(
-        diamond,
-        map,
-        pointFrom<GlobalPoint>(midpoint[0] + 1, midpoint[1] - 1),
-        0.05,
-        arrow,
-      );
-
-      expect(result).toEqual(midpoint);
-    },
-  );
-
-  it("does not snap far from a face midpoint", () => {
-    expect(
-      snapToMid(diamond, map, pointFrom<GlobalPoint>(10, 40), 0.05, arrow),
-    ).toBeUndefined();
-  });
-
-  it("does not snap to face midpoints of rectangles", () => {
-    const rect = rectangle("r", 0, 0);
-
-    expect(
-      snapToMid(
-        rect,
-        toMap(rect, arrow),
-        pointFrom<GlobalPoint>(25 - gap, 25 - gap),
-        0.05,
-        arrow,
-      ),
-    ).toBeUndefined();
-  });
-});
-
 describe("updateBoundElements with stale records", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -1834,6 +1785,6 @@ describe("grid mode binding near a rectangle corner", () => {
     // instead of falling back to the raw pointer at (343, -3)
     expect(end).toMatchObject({ mode: "orbit", element: b });
     expect(end.focusPoint![0]).toBeCloseTo(340);
-    expect(end.focusPoint![1]).toBeCloseTo(-getBindingGap(b, arrow));
+    expect(end.focusPoint![1]).toBeCloseTo(-getBindingGap(b));
   });
 });

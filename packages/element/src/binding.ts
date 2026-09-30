@@ -1,5 +1,6 @@
 import {
   arrayToMap,
+  DEFAULT_ZOOM,
   getFeatureFlag,
   getGridPoint,
   invariant,
@@ -2412,7 +2413,15 @@ export const repairBindings = (
         ? "inside"
         : "orbit";
 
-      bindBindingElement(arrow, target, mode, startOrEnd, scene, point);
+      bindBindingElement(
+        arrow,
+        target,
+        mode,
+        startOrEnd,
+        scene,
+        DEFAULT_ZOOM,
+        point,
+      );
     }
 
     // snap bound endpoints onto the target outline
