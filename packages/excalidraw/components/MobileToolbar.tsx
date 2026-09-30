@@ -31,6 +31,7 @@ import {
   laserPointerToolIcon,
   drawShapeToolIcon,
   bucketFillIcon,
+  mathSymbolsIcon,
   mermaidLogoIcon,
   MagicIcon,
   stickyNoteToolIcon,
@@ -344,6 +345,13 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             disabled={isToolButtonDisabled(app, "bucketfill")}
           >
             {t("toolBar.bucketfill")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setOpenDialog({ name: "mathSymbols" })}
+            icon={mathSymbolsIcon}
+            data-testid="toolbar-math-symbols"
+          >
+            {t("toolBar.mathSymbols")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate
