@@ -187,3 +187,34 @@ describe("a shape's cached bitmap while the zoom animates", () => {
     expect(bitmapZoom(element)).toBe(0.3);
   });
 });
+
+describe("freedraw once the zoom settles", () => {
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 400));
+
+  it("draws from a bitmap built at the settled zoom", async () => {
+    const element = stroke();
+    expect(draw(element, 2).drawImage).not.toHaveBeenCalled();
+    await settle();
+    const { drawImage, fill } = draw(element, 2);
+    expect(drawImage).toHaveBeenCalledTimes(1);
+    expect(fill).not.toHaveBeenCalled();
+  });
+
+  it("keeps drawing directly while the zoom animates", async () => {
+    const element = stroke();
+    draw(element, 2, { shouldCacheIgnoreZoom: true });
+    await settle();
+    expect(
+      draw(element, 2, { shouldCacheIgnoreZoom: true }).drawImage,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("draws directly at a zoom it has no bitmap for", async () => {
+    const element = stroke();
+    draw(element, 2);
+    await settle();
+    const { drawImage, fill } = draw(element, 3);
+    expect(drawImage).not.toHaveBeenCalled();
+    expect(fill).toHaveBeenCalledWith(expect.any(Path2D));
+  });
+});

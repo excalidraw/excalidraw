@@ -20,6 +20,7 @@ import {
 } from "@excalidraw/element";
 
 import {
+  cacheSettledBitmaps,
   getRenderElementWithPositionOverride,
   resolveElementRenderState,
   renderElement,
@@ -520,6 +521,8 @@ const _renderStaticScene = ({
       console.error(error);
     }
   });
+
+  cacheSettledBitmaps(visibleElements, allElementsMap, renderConfig, appState);
 };
 
 /** throttled to animation framerate */

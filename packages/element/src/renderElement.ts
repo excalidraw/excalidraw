@@ -1012,10 +1012,12 @@ export const renderSelectionElement = (
 const DIRECT_TEXT_ZOOM = 1;
 
 /**
- * Whether an element skips its cached bitmap and draws straight onto the
- * canvas, as the exporter does. The bitmaps are rebuilt whenever the zoom
- * changes and grow with it (one handwritten word is megabytes zoomed in),
- * and zoomed out over a full board they are thousands of new canvases.
+ * Whether an element draws straight onto the canvas, as the exporter does,
+ * unless it has a bitmap for exactly this zoom ({@link cacheSettledBitmaps}
+ * builds those once the zoom settles). Upstream rebuilds the bitmaps as the
+ * zoom changes, and they grow with it (one handwritten word is megabytes
+ * zoomed in); zoomed out over a full board they are thousands of new
+ * canvases.
  * Freedraw and text draw the same either way. Rough fills and labelled
  * arrows do not (the bitmap crops hatching to the shape, and clears the gap
  * behind an arrow's label), so they keep their bitmaps.
@@ -1026,6 +1028,124 @@ const shouldDrawDirectly = (
 ) =>
   element.type === "freedraw" ||
   (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM);
+
+/**
+ * The element's cached bitmap, if it was drawn for exactly this view at full
+ * resolution; otherwise null.
+ */
+const settledElementCanvas = (
+  element: NonDeletedExcalidrawElement,
+  elementsMap: NonDeletedSceneElementsMap,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+) => {
+  const cached = elementWithCanvasCache.get(element);
+  return cached &&
+    cached.zoomValue === appState.zoom.value &&
+    cached.scale === appState.zoom.value &&
+    cached.theme === appState.theme &&
+    cached.containingFrameOpacity ===
+      (getContainingFrame(element, elementsMap)?.opacity || 100)
+    ? cached
+    : null;
+};
+
+/** How long the zoom holds still before direct-drawn elements get bitmaps. */
+const ZOOM_SETTLE_MS = 150;
+/** Where idle callbacks are missing, the time one slice spends building. */
+const SETTLED_BUILD_SLICE_MS = 8;
+
+let zoomHeld = { zoom: NaN, since: 0 };
+let settledBuild: {
+  elements: readonly NonDeletedExcalidrawElement[];
+  next: number;
+  elementsMap: NonDeletedSceneElementsMap;
+  renderConfig: StaticCanvasRenderConfig;
+  appState: StaticCanvasAppState;
+} | null = null;
+let settledBuildScheduled = false;
+
+const scheduleSettledBuild = (delay: number) => {
+  if (delay > 0) {
+    setTimeout(() => scheduleSettledBuild(0), delay);
+  } else if (typeof requestIdleCallback === "function") {
+    requestIdleCallback((deadline) =>
+      buildSettledBitmaps(() => deadline.timeRemaining() > 1),
+    );
+  } else {
+    setTimeout(() => {
+      const until = performance.now() + SETTLED_BUILD_SLICE_MS;
+      buildSettledBitmaps(() => performance.now() < until);
+    });
+  }
+};
+
+const buildSettledBitmaps = (hasTime: () => boolean) => {
+  const build = settledBuild;
+  if (!build) {
+    settledBuildScheduled = false;
+    return;
+  }
+  const wait = zoomHeld.since + ZOOM_SETTLE_MS - performance.now();
+  if (wait > 0) {
+    scheduleSettledBuild(wait);
+    return;
+  }
+  const { elements, elementsMap, renderConfig, appState } = build;
+  const screenArea =
+    appState.width * appState.height * window.devicePixelRatio ** 2;
+  while (build.next < elements.length && hasTime()) {
+    const element = elements[build.next++];
+    if (
+      !shouldDrawDirectly(element, appState) ||
+      settledElementCanvas(element, elementsMap, appState)
+    ) {
+      continue;
+    }
+    const { width, height, scale } = cappedElementCanvasSize(
+      element,
+      elementsMap,
+      appState.zoom,
+    );
+    // a bitmap larger than the screen costs more memory than it saves time
+    if (scale === appState.zoom.value && width * height <= screenArea) {
+      generateElementWithCanvas(element, elementsMap, renderConfig, appState);
+    }
+  }
+  if (build.next < elements.length) {
+    scheduleSettledBuild(0);
+  } else {
+    settledBuild = null;
+    settledBuildScheduled = false;
+  }
+};
+
+/**
+ * Freedraw, and text above 1x, draw directly while the zoom changes. Once it
+ * has settled (no zoom gesture or animation running) and held still for
+ * {@link ZOOM_SETTLE_MS}, the last frame's visible ones get bitmaps at that
+ * zoom in idle time, and later frames at that zoom (pans) draw them from
+ * those. Call once per static frame.
+ */
+export const cacheSettledBitmaps = (
+  elements: readonly NonDeletedExcalidrawElement[],
+  elementsMap: NonDeletedSceneElementsMap,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState,
+) => {
+  if (renderConfig.isExporting || appState.shouldCacheIgnoreZoom) {
+    zoomHeld = { zoom: NaN, since: 0 };
+    settledBuild = null;
+    return;
+  }
+  if (zoomHeld.zoom !== appState.zoom.value) {
+    zoomHeld = { zoom: appState.zoom.value, since: performance.now() };
+  }
+  settledBuild = { elements, next: 0, elementsMap, renderConfig, appState };
+  if (!settledBuildScheduled) {
+    settledBuildScheduled = true;
+    scheduleSettledBuild(ZOOM_SETTLE_MS);
+  }
+};
 
 export const renderElement = (
   element: NonDeletedExcalidrawElement,
@@ -1048,7 +1168,9 @@ export const renderElement = (
     !appState.hoveredElementIds[element.id];
 
   const drawsDirectly =
-    renderConfig.isExporting || shouldDrawDirectly(element, appState);
+    renderConfig.isExporting ||
+    (shouldDrawDirectly(element, appState) &&
+      !settledElementCanvas(element, allElementsMap, appState));
 
   context.save();
   context.globalAlpha =
