@@ -1087,6 +1087,24 @@ export interface ExcalidrawProps {
       signal: AbortSignal;
     },
   ) => MaybePromise<void> | AsyncGenerator<OnExportProgress, void>;
+
+  /**
+   * Called when the user selects "Open from cloud" from the main menu.
+   *
+   * The host is responsible for fetching and loading the scene from its cloud
+   * provider (e.g. Google Drive). When omitted, the menu item is hidden.
+   */
+  onOpenFromCloud?: () => MaybePromise<void>;
+
+  /**
+   * Called when the user saves the current document (the "Save to current
+   * file" action / Ctrl+S) while there is no local file handle, typically
+   * because the document lives in a cloud provider (e.g. Google Drive).
+   *
+   * When supplied, the save action is enabled for such cloud-backed
+   * documents; when omitted, saving still requires a local file handle.
+   */
+  onSaveToActiveFile?: () => MaybePromise<void>;
 }
 
 export type SceneData = {
@@ -1127,6 +1145,11 @@ export type CanvasActions = Partial<{
   export: false | ExportOpts;
   loadScene: boolean;
   saveToActiveFile: boolean;
+  /**
+   * Shows the "Open from cloud" menu item. It's hidden regardless when the
+   * host doesn't supply `onOpenFromCloud`.
+   */
+  openFromCloud: boolean;
   /**
    * defaults to true if `props.theme` is omitted or `props.onThemeChange`
    * is supplied (at which point the theme is considered as host-app controlled),

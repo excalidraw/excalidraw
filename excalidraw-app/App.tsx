@@ -133,6 +133,8 @@ import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
+import { useGoogleDrive } from "./useGoogleDrive";
+import { SaveToGoogleDrive } from "./components/SaveToGoogleDrive";
 import { getPreferredLanguage } from "./app-language/language-detector";
 import { useAppLangCode } from "./app-language/language-state";
 import DebugCanvas, {
@@ -150,6 +152,7 @@ import { ExcalidrawPlusPromoBanner } from "./components/ExcalidrawPlusPromoBanne
 import { AppSidebar } from "./components/AppSidebar";
 
 import type { CollabAPI } from "./collab/Collab";
+import type { DriveFile } from "./data/googleDrive";
 
 polyfill();
 
@@ -375,6 +378,71 @@ const initializeScene = async (opts: {
 const ExcalidrawWrapper = () => {
   const excalidrawAPI = useExcalidrawAPI();
 
+  const appContainerRef = useRef<HTMLDivElement>(null);
+  const { onOpenFromCloud, saveToDrive, clearDriveFile, driveFile } =
+    useGoogleDrive(excalidrawAPI, appContainerRef);
+
+  const notifyDriveSaved = useCallback(
+    (file: DriveFile) => {
+      excalidrawAPI?.setToast({
+        message: t("googleDrive.saveSuccessToast", { fileName: file.name }),
+        duration: 3000,
+      });
+    },
+    [excalidrawAPI],
+  );
+
+  const notifyDriveError = useCallback(
+    (error: unknown) => {
+      if ((error as Error)?.name === "AbortError") {
+        return;
+      }
+      console.error(error);
+      excalidrawAPI?.updateScene({
+        appState: {
+          errorMessage: (error as Error)?.message || t("googleDrive.saveError"),
+        },
+      });
+    },
+    [excalidrawAPI],
+  );
+
+  const notifyDriveSaving = useCallback(() => {
+    excalidrawAPI?.setToast({
+      message: t("googleDrive.saveInProgressToast"),
+      duration: Infinity,
+    });
+  }, [excalidrawAPI]);
+
+  const clearDriveSaving = useCallback(() => {
+    excalidrawAPI?.setToast(null);
+  }, [excalidrawAPI]);
+
+  const saveToActiveFileFromAction = useMemo(() => {
+    if (!driveFile || !saveToDrive) {
+      return undefined;
+    }
+    return async () => {
+      try {
+        notifyDriveSaved(
+          await saveToDrive({
+            onStart: notifyDriveSaving,
+            onSettled: clearDriveSaving,
+          }),
+        );
+      } catch (error) {
+        notifyDriveError(error);
+      }
+    };
+  }, [
+    driveFile,
+    saveToDrive,
+    notifyDriveSaved,
+    notifyDriveError,
+    notifyDriveSaving,
+    clearDriveSaving,
+  ]);
+
   const [errorMessage, setErrorMessage] = useState("");
   const isCollabDisabled = isRunningInIframe();
 
@@ -397,6 +465,13 @@ const ExcalidrawWrapper = () => {
 
   const debugCanvasRef = useRef<HTMLCanvasElement>(null);
 
+  // tracks document identity so we can drop a stale Drive association when the
+  // scene is replaced by a non-Drive source (local file, new scene, …)
+  const prevDocIdentityRef = useRef<{
+    fileHandle: FileSystemFileHandle | null | undefined;
+    name: string | null | undefined;
+  }>({ fileHandle: undefined, name: undefined });
+
   useEffect(() => {
     trackEvent("load", "frame", getFrame());
     // Delayed so that the app has a time to load the latest SW
@@ -412,6 +487,13 @@ const ExcalidrawWrapper = () => {
   });
   const collabError = useAtomValue(collabErrorIndicatorAtom);
   const userToFollow = useAtomValue(userToFollowAtom);
+
+  // a Drive file association never applies while collaborating
+  useEffect(() => {
+    if (isCollaborating) {
+      clearDriveFile?.();
+    }
+  }, [isCollaborating, clearDriveFile]);
 
   const viewportStatusFrame = useMemo(
     () =>
@@ -577,6 +659,8 @@ const ExcalidrawWrapper = () => {
         ) {
           collabAPI.stopCollaboration(false);
         }
+        // the hash points at a different document now
+        clearDriveFile?.();
         excalidrawAPI.updateScene({ appState: { isLoading: true } });
 
         initializeScene({ collabAPI, excalidrawAPI }).then((data) => {
@@ -685,7 +769,14 @@ const ExcalidrawWrapper = () => {
         false,
       );
     };
-  }, [isCollabDisabled, collabAPI, excalidrawAPI, setLangCode, loadImages]);
+  }, [
+    isCollabDisabled,
+    collabAPI,
+    excalidrawAPI,
+    setLangCode,
+    loadImages,
+    clearDriveFile,
+  ]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
@@ -717,6 +808,20 @@ const ExcalidrawWrapper = () => {
     appState: AppState,
     files: BinaryFiles,
   ) => {
+    // drop the Google Drive association when the current document is replaced
+    // so we never overwrite the wrong Drive file
+    const prevDocIdentity = prevDocIdentityRef.current;
+    const localFileOpened =
+      !!appState.fileHandle && !prevDocIdentity.fileHandle;
+    const sceneReplaced = appState.name == null && prevDocIdentity.name != null;
+    if (driveFile && (localFileOpened || sceneReplaced)) {
+      clearDriveFile?.();
+    }
+    prevDocIdentityRef.current = {
+      fileHandle: appState.fileHandle,
+      name: appState.name,
+    };
+
     if (collabAPI?.isCollaborating()) {
       collabAPI.syncElements(elements);
     }
@@ -940,6 +1045,7 @@ const ExcalidrawWrapper = () => {
 
   return (
     <div
+      ref={appContainerRef}
       style={{ height: "100%" }}
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
@@ -950,6 +1056,8 @@ const ExcalidrawWrapper = () => {
         userToFollow={userToFollow}
         onChange={onChange}
         onExport={onExport}
+        onOpenFromCloud={onOpenFromCloud}
+        onSaveToActiveFile={saveToActiveFileFromAction}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}
@@ -961,24 +1069,45 @@ const ExcalidrawWrapper = () => {
               renderCustomUI: excalidrawAPI
                 ? (elements, appState, files) => {
                     return (
-                      <ExportToExcalidrawPlus
-                        elements={elements}
-                        appState={appState}
-                        files={files}
-                        name={excalidrawAPI.getName()}
-                        onError={(error) => {
-                          excalidrawAPI?.updateScene({
-                            appState: {
-                              errorMessage: error.message,
-                            },
-                          });
-                        }}
-                        onSuccess={() => {
-                          excalidrawAPI.updateScene({
-                            appState: { openDialog: null },
-                          });
-                        }}
-                      />
+                      <>
+                        <ExportToExcalidrawPlus
+                          elements={elements}
+                          appState={appState}
+                          files={files}
+                          name={excalidrawAPI.getName()}
+                          onError={(error) => {
+                            excalidrawAPI?.updateScene({
+                              appState: {
+                                errorMessage: error.message,
+                              },
+                            });
+                          }}
+                          onSuccess={() => {
+                            excalidrawAPI.updateScene({
+                              appState: { openDialog: null },
+                            });
+                          }}
+                        />
+                        {saveToDrive && (
+                          <SaveToGoogleDrive
+                            defaultName={excalidrawAPI.getName()}
+                            onSave={(name) =>
+                              saveToDrive({
+                                name,
+                                onStart: notifyDriveSaving,
+                                onSettled: clearDriveSaving,
+                              })
+                            }
+                            onError={notifyDriveError}
+                            onSuccess={(file) => {
+                              notifyDriveSaved(file);
+                              excalidrawAPI.updateScene({
+                                appState: { openDialog: null },
+                              });
+                            }}
+                          />
+                        )}
+                      </>
                     );
                   }
                 : undefined,
@@ -1031,6 +1160,7 @@ const ExcalidrawWrapper = () => {
           onCollabDialogOpen={onCollabDialogOpen}
           isCollaborating={isCollaborating}
           isCollabEnabled={!isCollabDisabled}
+          isDriveFileActive={!!driveFile}
           theme={appTheme}
           refresh={() => forceRefresh((prev) => !prev)}
         />
@@ -1055,6 +1185,22 @@ const ExcalidrawWrapper = () => {
               }}
             >
               {t("overwriteConfirm.action.excalidrawPlus.description")}
+            </OverwriteConfirmDialog.Action>
+          )}
+          {excalidrawAPI && saveToDrive && (
+            <OverwriteConfirmDialog.Action
+              title={t("googleDrive.saveCardTitle")}
+              actionLabel={t("googleDrive.saveCardButton")}
+              onClick={() => {
+                saveToDrive({
+                  onStart: notifyDriveSaving,
+                  onSettled: clearDriveSaving,
+                })
+                  .then(notifyDriveSaved)
+                  .catch(notifyDriveError);
+              }}
+            >
+              {t("googleDrive.saveCardDetails")}
             </OverwriteConfirmDialog.Action>
           )}
         </OverwriteConfirmDialog>
