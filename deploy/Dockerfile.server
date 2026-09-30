@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+# API + realtime + MCP server, built into ONE bundled file (no node_modules at runtime).
+#   docker build -f deploy/Dockerfile.server -t excalidraw-workspace-server .
+
+FROM node:22-alpine AS build
+WORKDIR /app
+# Yarn-classic workspace install (needs the whole monorepo manifest set for the lockfile)
+COPY . .
+RUN --mount=type=cache,target=/usr/local/share/.cache/yarn \
+    yarn install --frozen-lockfile --ignore-scripts --network-timeout 600000
+RUN yarn --cwd server build
+
+FROM node:22-alpine
+ENV NODE_ENV=production \
+    HOST=0.0.0.0 \
+    PORT=3100 \
+    STORAGE_PATH=/data/storage
+WORKDIR /app
+COPY --from=build /app/server/dist/server.mjs ./server.mjs
+COPY --from=build /app/server/bin ./bin
+RUN mkdir -p /data/storage && chown -R node:node /data
+USER node
+VOLUME ["/data/storage"]
+EXPOSE 3100
+HEALTHCHECK --interval=15s --timeout=3s --start-period=10s \
+  CMD wget -q -O /dev/null http://127.0.0.1:3100/health || exit 1
+CMD ["node", "server.mjs"]

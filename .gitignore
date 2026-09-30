@@ -27,3 +27,15 @@ dev-dist
 html
 meta*.json
 .claude
+
+# workspace server secrets
+server/.env
+server/storage/
+
+server/dist/
+
+.env.workspace
+
+test-results/
+playwright-report/
+server/storage-e2e/

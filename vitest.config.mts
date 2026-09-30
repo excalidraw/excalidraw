@@ -1,6 +1,6 @@
 import path from "path";
 
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -79,6 +79,8 @@ export default defineConfig({
     sequence: {
       hooks: "parallel",
     },
+    // server/ has its own vitest config (node env + MongoDB): `yarn test:server`
+    exclude: [...configDefaults.exclude, "server/**"],
     setupFiles: ["./setupTests.ts"],
     globals: true,
     environment: "jsdom",

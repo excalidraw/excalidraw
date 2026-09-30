@@ -1,0 +1,69 @@
+# Self-hosted stack:  docker compose -f docker-compose.workspace.yml --env-file .env.workspace up -d --build
+#
+#   web    nginx: static app + proxy for /api, WebSocket, /public, /mcp     http://localhost:${WEB_PORT:-8080}
+#   server Fastify API + realtime + MCP                                     (internal only)
+#   mongo  MongoDB 7                                                        127.0.0.1:27017 (for Compass)
+#
+# Only for running in containers. Local development needs none of this (see docs/SETUP.md).
+# Put a TLS-terminating proxy in front of `web` for anything beyond localhost.
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    command: ["mongod", "--bind_ip_all"]
+    ports:
+      - "127.0.0.1:${MONGO_PORT:-27017}:27017" # loopback only: connect Compass here
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test:
+        ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.server
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB: ${MONGODB_DB:-excalidraw_workspace}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET in .env.workspace (openssl rand -base64 48)}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      ALLOWED_ORIGINS: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN, e.g. https://draw.example.com}
+      TRUST_PROXY: "1"
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      ALLOW_INSECURE_COOKIES: ${ALLOW_INSECURE_COOKIES:-false}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+      ENABLE_MCP: ${ENABLE_MCP:-false}
+      AI_PROVIDER: ${AI_PROVIDER:-}
+      AI_MODEL: ${AI_MODEL:-}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_ALLOW_PRIVATE_BASE_URLS: ${AI_ALLOW_PRIVATE_BASE_URLS:-false}
+    volumes:
+      - workspace-storage:/data/storage
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
+volumes:
+  mongo-data:
+  workspace-storage:
