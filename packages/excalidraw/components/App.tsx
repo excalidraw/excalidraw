@@ -6023,8 +6023,6 @@ class App extends React.Component<AppProps, AppState> {
   ): NonDeleted<ExcalidrawElement>[] {
     const iframeLikes: Ordered<NonDeleted<ExcalidrawIframeLikeElement>>[] = [];
 
-    const elementsMap = this.scene.getNonDeletedElementsMap();
-
     const elements = (
       opts?.includeBoundTextElement && opts?.includeLockedElements
         ? this.scene.getNonDeletedElements()
@@ -6038,25 +6036,7 @@ class App extends React.Component<AppProps, AppState> {
             )
     )
       .filter((el) => this.hitElement(x, y, el))
-      .filter((element) => {
-        // hitting a frame's element from outside the frame is not considered a hit
-        const containingFrame = getContainingFrame(element, elementsMap);
-        if (containingFrame && !isNonDeletedElement(containingFrame)) {
-          console.error("[NONDELETED][INVARIANT] Containing frame is deleted");
-        }
-        return containingFrame &&
-          this.state.frameRendering.enabled &&
-          this.state.frameRendering.clip &&
-          // iframe-like elements are rendered as DOM overlays and are not
-          // visually clipped by their containing frames
-          !isIframeLikeElement(element)
-          ? isCursorInFrame(
-              { x, y },
-              containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
-              elementsMap,
-            )
-          : true;
-      })
+      .filter((element) => !this.isClippedByFrameAt(x, y, element))
       .filter((el) => {
         // The parameter elements comes ordered from lower z-index to higher.
         // We want to preserve that order on the returned array.
@@ -6071,6 +6051,31 @@ class App extends React.Component<AppProps, AppState> {
       .concat(iframeLikes) as NonDeleted<ExcalidrawElement>[];
 
     return elements;
+  }
+
+  /**
+   * Whether the element's frame clips it away at the position — hitting a
+   * frame's element from outside the frame is not considered a hit.
+   */
+  isClippedByFrameAt(x: number, y: number, element: ExcalidrawElement) {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const containingFrame = getContainingFrame(element, elementsMap);
+    if (containingFrame && !isNonDeletedElement(containingFrame)) {
+      console.error("[NONDELETED][INVARIANT] Containing frame is deleted");
+    }
+    return (
+      !!containingFrame &&
+      this.state.frameRendering.enabled &&
+      this.state.frameRendering.clip &&
+      // iframe-like elements are rendered as DOM overlays and are not
+      // visually clipped by their containing frames
+      !isIframeLikeElement(element) &&
+      !isCursorInFrame(
+        { x, y },
+        containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
+        elementsMap,
+      )
+    );
   }
 
   getElementHitThreshold(element: ExcalidrawElement) {

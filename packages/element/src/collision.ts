@@ -346,10 +346,11 @@ type BindingCandidate = {
 };
 
 /**
- * Whether the element hides what is behind it from binding. Images count as
- * opaque, and frames once they support a background.
+ * Whether the element hides what is behind it from binding — an arrow's or a
+ * text label's. Images count as opaque, and frames once they support a
+ * background.
  */
-const isOpaqueForBinding = (element: ExcalidrawElement) =>
+export const isOpaqueForBinding = (element: ExcalidrawElement) =>
   isImageElement(element) ||
   (hasBackground(element.type) && !isTransparent(element.backgroundColor));
 
