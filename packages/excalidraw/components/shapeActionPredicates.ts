@@ -113,6 +113,9 @@ export const getShapeActionPredicates = (
     appState.editingTextElement || appState.newElement,
   );
   const hasSelection = targetElements.length > 0;
+  const hostSetsFreedrawWidth =
+    activeToolType === "freedraw" &&
+    app.props.freedrawScreenStrokeWidth !== undefined;
 
   return {
     /** some element(s) selected */
@@ -139,7 +142,9 @@ export const getShapeActionPredicates = (
       ),
 
     // stroke / shape properties
-    strokeWidth: forToolOrSelection(hasStrokeWidth),
+    strokeWidth:
+      (hasStrokeWidth(activeToolType) && !hostSetsFreedrawWidth) ||
+      targetElements.some((element) => hasStrokeWidth(element.type)),
     freedrawMode: forToolOrSelection(hasFreedrawMode),
     strokeStyle: forToolOrSelection(hasStrokeStyle),
     sloppiness: forToolOrSelection(hasRoughness),

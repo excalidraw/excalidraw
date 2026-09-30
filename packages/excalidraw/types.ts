@@ -880,6 +880,12 @@ export interface ExcalidrawProps {
    */
   onInitialize?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
+  /**
+   * The freedraw tool's stroke width as it looks on screen. Each new stroke
+   * gets this divided by the zoom, so the pen draws the same line at any
+   * zoom, and the tool's named stroke widths are hidden.
+   */
+  freedrawScreenStrokeWidth?: number;
   onPointerUpdate?: (payload: {
     pointer: { x: number; y: number; tool: "pointer" | "laser" };
     button: "down" | "up";

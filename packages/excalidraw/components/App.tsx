@@ -9360,6 +9360,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   public getCurrentItemStrokeWidth(elementType: ExcalidrawElement["type"]) {
+    const { freedrawScreenStrokeWidth } = this.props;
+    if (elementType === "freedraw" && freedrawScreenStrokeWidth !== undefined) {
+      return freedrawScreenStrokeWidth / this.state.zoom.value;
+    }
     return getStrokeWidthByKey(
       elementType,
       this.state.currentItemStrokeWidthKey,
