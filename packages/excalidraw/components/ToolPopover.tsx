@@ -110,7 +110,11 @@ export const ToolPopover = ({
             }}
           />
         ))}
-        {children && <div className="tool-popover-extra">{children}</div>}
+        {children && (
+          <div className="tool-popover-extra shape-actions-theme-scope">
+            {children}
+          </div>
+        )}
       </Popover.Content>
     </Popover.Root>
   );

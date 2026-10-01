@@ -72,6 +72,21 @@ describe("PenToolFlyout", () => {
         });
       });
 
+      describe("when the slider is dragged to a mid width", () => {
+        let previewWidth: string | undefined;
+
+        beforeEach(() => {
+          slideTo(80, flyout());
+          previewWidth = flyout()?.querySelector<HTMLElement>(
+            '[data-testid="pen-size-preview"]',
+          )?.style.width;
+        });
+
+        it("sizes the preview dot to the stroke the pen will draw", () => {
+          expect(previewWidth).toBe(`${penSizeFromSlider(80) * 2 * 1.4}px`);
+        });
+      });
+
       describe("when the slider is dragged to a thick width", () => {
         let width: number;
 

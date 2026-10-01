@@ -1,5 +1,8 @@
 import { clamp } from "@excalidraw/math";
-import { getAuthoringScale, getFreedrawStrokeSize } from "@excalidraw/element";
+import {
+  getAuthoringScale,
+  getFreedrawStrokeDiameter,
+} from "@excalidraw/element";
 
 import type { StrokeVariability } from "@excalidraw/element/types";
 
@@ -35,8 +38,8 @@ export const PenSizeSlider = ({
     (state) => getAuthoringScale(state) * state.zoom.value,
   );
   const diameter = clamp(
-    getFreedrawStrokeSize(value, variability) * authoringToScreen,
-    1,
+    getFreedrawStrokeDiameter(value, variability) * authoringToScreen,
+    2,
     PREVIEW_BOX,
   );
   const label = String(Number(value.toPrecision(2)));

@@ -1380,13 +1380,14 @@ export const getFreedrawMaxStrokeRadius = (
     : element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR +
       3 * getElementDetailScale(element);
 
-export const getFreedrawStrokeSize = (
+// laser-pointer's `size` is a radius, perfect-freehand's a diameter
+export const getFreedrawStrokeDiameter = (
   strokeWidth: number,
   variability: StrokeVariability | undefined,
 ) =>
   strokeWidth *
   (variability === "constant"
-    ? CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
+    ? 2 * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
     : VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR);
 
 /**

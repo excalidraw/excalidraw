@@ -379,7 +379,7 @@ export const PenToolFlyout = ({
         </div>
       </Popover.Anchor>
       <Popover.Content
-        className="pen-size-flyout"
+        className="pen-size-flyout shape-actions-theme-scope"
         data-testid="pen-size-flyout"
         sideOffset={16}
         collisionBoundary={container ?? undefined}
