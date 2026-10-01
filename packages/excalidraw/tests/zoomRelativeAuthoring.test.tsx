@@ -12,6 +12,7 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawTextElement,
+  NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
@@ -579,7 +580,7 @@ describe("authoringUnits: screen, what an element made far in keeps", () => {
       y: 100,
       width: 200,
       height: 0,
-    }).get() as ExcalidrawArrowElement;
+    }).get() as NonDeleted<ExcalidrawArrowElement>;
     API.setSelectedElements([arrow]);
     Keyboard.withModifierKeys({ ctrl: true }, () => {
       Keyboard.keyPress(KEYS.D);
