@@ -738,17 +738,17 @@ const MAX_BITMAP_RESCALE = 2;
  * bitmaps. Past it, the rest stay as they are until a later frame, so zooming
  * over many shapes does not stall on redrawing them all at once.
  */
-const UPSCALE_REDRAW_BUDGET_MS = 4;
+const RESCALE_REDRAW_BUDGET_MS = 4;
 
 /** Every element of a frame shares its zoom, so a new zoom is a new frame. */
-let upscaleRedrawFrame = { zoom: 0, until: 0 };
+let rescaleRedrawFrame = { zoom: 0, until: 0 };
 
-const withinUpscaleRedrawBudget = (zoom: number) => {
+const withinRescaleRedrawBudget = (zoom: number) => {
   const now = performance.now();
-  if (upscaleRedrawFrame.zoom !== zoom) {
-    upscaleRedrawFrame = { zoom, until: now + UPSCALE_REDRAW_BUDGET_MS };
+  if (rescaleRedrawFrame.zoom !== zoom) {
+    rescaleRedrawFrame = { zoom, until: now + RESCALE_REDRAW_BUDGET_MS };
   }
-  return now < upscaleRedrawFrame.until;
+  return now < rescaleRedrawFrame.until;
 };
 
 const generateElementWithCanvas = (
@@ -765,7 +765,7 @@ const generateElementWithCanvas = (
     (!appState?.shouldCacheIgnoreZoom ||
       ((zoom.value > prevElementWithCanvas.zoomValue * MAX_BITMAP_RESCALE ||
         zoom.value * MAX_BITMAP_RESCALE < prevElementWithCanvas.scale) &&
-        withinUpscaleRedrawBudget(zoom.value)));
+        withinRescaleRedrawBudget(zoom.value)));
   const imageCrop = isImageElement(element) ? element.crop : null;
 
   const containingFrameOpacity =
@@ -860,10 +860,11 @@ const visibleBitmapRect = (
   ]);
   const xs = corners.map(([x]) => x);
   const ys = corners.map(([, y]) => y);
-  const sx = clamp(Math.floor(Math.min(...xs)), 0, bitmap.width);
-  const sy = clamp(Math.floor(Math.min(...ys)), 0, bitmap.height);
-  const sw = clamp(Math.ceil(Math.max(...xs)), 0, bitmap.width) - sx;
-  const sh = clamp(Math.ceil(Math.max(...ys)), 0, bitmap.height) - sy;
+  // a pixel to spare on each side, for smoothing that samples past the edge
+  const sx = clamp(Math.floor(Math.min(...xs)) - 1, 0, bitmap.width);
+  const sy = clamp(Math.floor(Math.min(...ys)) - 1, 0, bitmap.height);
+  const sw = clamp(Math.ceil(Math.max(...xs)) + 1, 0, bitmap.width) - sx;
+  const sh = clamp(Math.ceil(Math.max(...ys)) + 1, 0, bitmap.height) - sy;
   if (sw <= 0 || sh <= 0) {
     return null;
   }
@@ -1099,19 +1100,37 @@ const DIRECT_TEXT_ZOOM = 1;
  * Freedraw and text draw the same either way. Other shapes keep their
  * bitmaps, except when the canvas size limits would cap the bitmap below the
  * zoom: shown blown up it is blurry, and during a pinch it is a bitmap of
- * tens of megabytes read on every frame. Images always keep theirs: the crop
- * editor's uncropped preview is drawn only from the bitmap.
+ * tens of megabytes read on every frame. During a pinch, so do shapes whose
+ * bitmap would be bigger than the screen, rather than drawing one mid-gesture.
+ * Images always keep theirs: the crop editor's uncropped preview is drawn
+ * only from the bitmap.
  */
 const shouldDrawDirectly = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
-) =>
-  element.type === "freedraw" ||
-  (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM) ||
-  (element.type !== "image" &&
-    cappedElementCanvasSize(element, elementsMap, appState.zoom).scale <
-      appState.zoom.value);
+) => {
+  if (
+    element.type === "freedraw" ||
+    (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM)
+  ) {
+    return true;
+  }
+  if (element.type === "image") {
+    return false;
+  }
+  const { width, height, scale } = cappedElementCanvasSize(
+    element,
+    elementsMap,
+    appState.zoom,
+  );
+  return (
+    scale < appState.zoom.value ||
+    (!!appState.shouldCacheIgnoreZoom &&
+      width * height >
+        appState.width * appState.height * window.devicePixelRatio ** 2)
+  );
+};
 
 /**
  * The element's cached bitmap, if it was drawn for exactly this view at full

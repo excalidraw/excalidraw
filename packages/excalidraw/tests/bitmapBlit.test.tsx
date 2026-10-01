@@ -99,7 +99,7 @@ const centeredOn = (x: number, y: number, zoom: number) => ({
 });
 
 describe("blitting an element's cached bitmap", () => {
-  describe("when a pinch shows a small part of a bitmap drawn further out", () => {
+  describe("when a pinch shows a slice of a bitmap drawn further out", () => {
     let drawn: ReturnType<typeof blit>;
 
     beforeEach(() => {
@@ -108,31 +108,25 @@ describe("blitting an element's cached bitmap", () => {
         x: 0,
         y: 0,
         width: 1000,
-        height: 1000,
+        height: 10,
       });
       blit(element, {
-        ...centeredOn(500, 500, 2),
+        ...centeredOn(500, 5, 1),
         shouldCacheIgnoreZoom: false,
       });
-      drawn = blit(element, centeredOn(500, 500, 3.9));
+      drawn = blit(element, centeredOn(500, 5, 1.9));
     });
 
     it("reads at most the on-screen part of the bitmap", () => {
-      expect(drawn.sw * drawn.sh).toBeLessThan(
-        (drawn.source.width * drawn.source.height) / 20,
-      );
+      expect(drawn.sw).toBeLessThan(drawn.source.width / 3);
     });
 
-    it("starts it at or before the screen's top-left corner", () => {
-      expect(Math.max(drawn.screenLeft, drawn.screenTop)).toBeLessThanOrEqual(
-        0,
-      );
+    it("starts it at or before the screen's left edge", () => {
+      expect(drawn.screenLeft).toBeLessThanOrEqual(0);
     });
 
-    it("ends it at or past the screen's bottom-right corner", () => {
-      expect(
-        Math.min(drawn.screenRight, drawn.screenBottom),
-      ).toBeGreaterThanOrEqual(VIEWPORT);
+    it("ends it at or past the screen's right edge", () => {
+      expect(drawn.screenRight).toBeGreaterThanOrEqual(VIEWPORT);
     });
   });
 
@@ -165,7 +159,7 @@ describe("pinching out from a zoom an element's bitmap was drawn at", () => {
       width: 100,
       height: 100,
     });
-    blit(element, centeredOn(50, 50, 4));
+    blit(element, { ...centeredOn(50, 50, 4), shouldCacheIgnoreZoom: false });
     drawn = blit(element, centeredOn(50, 50, 1));
   });
 
