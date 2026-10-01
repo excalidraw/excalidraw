@@ -142,3 +142,25 @@ describe("blitting an element's cached bitmap", () => {
     });
   });
 });
+
+describe("pinching out from a zoom an element's bitmap was drawn at", () => {
+  let drawn: ReturnType<typeof blit>;
+
+  beforeEach(() => {
+    const element = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    });
+    blit(element, centeredOn(50, 50, 4));
+    drawn = blit(element, centeredOn(50, 50, 1));
+  });
+
+  it("reads a bitmap at most twice as wide as it is shown", () => {
+    expect(drawn.sw).toBeLessThanOrEqual(
+      2 * (drawn.screenRight - drawn.screenLeft),
+    );
+  });
+});

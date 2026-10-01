@@ -727,13 +727,15 @@ export const elementWithCanvasCache = new WeakMap<
 /**
  * While the zoom animates (`shouldCacheIgnoreZoom`), a cached bitmap is
  * reused at other zooms until it would be shown more than this many times
- * the size it was drawn at. Shrinking one never redraws it.
+ * larger or smaller than it was drawn. Shrunk further, a bitmap drawn deep
+ * in is read whole to fill a few pixels on every frame of a pinch out. A
+ * bitmap capped by the canvas size limits was drawn at its cap, not the zoom.
  */
-const MAX_BITMAP_UPSCALE = 2;
+const MAX_BITMAP_RESCALE = 2;
 
 /**
- * How long one frame of a zoom animation may spend redrawing blown-up
- * bitmaps. Past it, the rest stay blurry until a later frame, so zooming in
+ * How long one frame of a zoom animation may spend redrawing rescaled
+ * bitmaps. Past it, the rest stay as they are until a later frame, so zooming
  * over many shapes does not stall on redrawing them all at once.
  */
 const UPSCALE_REDRAW_BUDGET_MS = 4;
@@ -761,7 +763,8 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     (!appState?.shouldCacheIgnoreZoom ||
-      (zoom.value > prevElementWithCanvas.zoomValue * MAX_BITMAP_UPSCALE &&
+      ((zoom.value > prevElementWithCanvas.zoomValue * MAX_BITMAP_RESCALE ||
+        zoom.value * MAX_BITMAP_RESCALE < prevElementWithCanvas.scale) &&
         withinUpscaleRedrawBudget(zoom.value)));
   const imageCrop = isImageElement(element) ? element.crop : null;
 
