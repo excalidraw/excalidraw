@@ -120,7 +120,7 @@ describe("on-screen rendering draws some elements directly", () => {
   it("keeps drawing other shapes from their bitmaps", () => {
     const { drawImage } = draw(
       API.createElement({ type: "rectangle", x: 10, y: 10 }),
-      4,
+      3,
     );
     expect(drawImage).toHaveBeenCalledTimes(1);
   });
@@ -170,8 +170,8 @@ describe("a shape's cached bitmap while the zoom animates", () => {
   it("is redrawn once it would be shown more than twice its size", () => {
     const element = shape();
     draw(element, 0.2);
-    draw(element, 20, animating);
-    expect(bitmapZoom(element)).toBe(20);
+    draw(element, 5, animating);
+    expect(bitmapZoom(element)).toBe(5);
   });
 
   it("is redrawn a few per frame when many are blown up at once", () => {
@@ -181,11 +181,11 @@ describe("a shape's cached bitmap while the zoom animates", () => {
     // each read of the clock is 5 ms after the last, past the frame budget
     let now = 1e12;
     vi.spyOn(performance, "now").mockImplementation(() => (now += 5));
-    draw(first, 25, animating);
-    draw(second, 25, animating);
-    expect([bitmapZoom(first), bitmapZoom(second)]).toEqual([25, 0.2]);
-    draw(second, 26, animating);
-    expect(bitmapZoom(second)).toBe(26);
+    draw(first, 6, animating);
+    draw(second, 6, animating);
+    expect([bitmapZoom(first), bitmapZoom(second)]).toEqual([6, 0.2]);
+    draw(second, 7, animating);
+    expect(bitmapZoom(second)).toBe(7);
   });
 
   it("is redrawn at the new zoom once the zoom settles", () => {
@@ -261,7 +261,66 @@ describe("a shape too big for its bitmap at this zoom", () => {
       drawn = draw(element, 750, { ...deep, shouldCacheIgnoreZoom: true });
     });
 
-    it("is drawn from its bitmap", () => {
+    it("is not drawn from its bitmap", () => {
+      expect(drawn.drawImage).not.toHaveBeenCalled();
+    });
+
+    it("is drawn as paths on the canvas", () => {
+      expect(drawn.stroke).toHaveBeenCalled();
+    });
+  });
+});
+
+describe("a shape bigger than the screen", () => {
+  const shape = () =>
+    API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 100,
+      height: 100,
+    });
+  const deep = { scrollX: -10, scrollY: -10 };
+  let drawn: ReturnType<typeof draw>;
+
+  describe.each([
+    ["while the zoom animates", { shouldCacheIgnoreZoom: true }],
+    ["when the zoom has settled", {}],
+  ])("%s", (_, state) => {
+    beforeEach(() => {
+      drawn = draw(shape(), 10, { ...deep, ...state });
+    });
+
+    it("is not drawn from a bitmap", () => {
+      expect(drawn.drawImage).not.toHaveBeenCalled();
+    });
+
+    it("is drawn as paths on the canvas", () => {
+      expect(drawn.stroke).toHaveBeenCalled();
+    });
+  });
+
+  describe("when it is only bigger than the screen in CSS pixels", () => {
+    const pixelRatio = Object.getOwnPropertyDescriptor(
+      window,
+      "devicePixelRatio",
+    );
+
+    beforeEach(() => {
+      Object.defineProperty(window, "devicePixelRatio", {
+        configurable: true,
+        value: 3,
+      });
+      drawn = draw(shape(), 4, deep);
+    });
+
+    afterEach(() => {
+      if (pixelRatio) {
+        Object.defineProperty(window, "devicePixelRatio", pixelRatio);
+      }
+    });
+
+    it("keeps drawing from its bitmap", () => {
       expect(drawn.drawImage).toHaveBeenCalledTimes(1);
     });
   });

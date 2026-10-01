@@ -727,26 +727,28 @@ export const elementWithCanvasCache = new WeakMap<
 /**
  * While the zoom animates (`shouldCacheIgnoreZoom`), a cached bitmap is
  * reused at other zooms until it would be shown more than this many times
- * the size it was drawn at. Shrinking one never redraws it.
+ * larger or smaller than it was drawn. Shrunk further, a bitmap drawn deep
+ * in is read whole to fill a few pixels on every frame of a pinch out. A
+ * bitmap capped by the canvas size limits was drawn at its cap, not the zoom.
  */
-const MAX_BITMAP_UPSCALE = 2;
+const MAX_BITMAP_RESCALE = 2;
 
 /**
- * How long one frame of a zoom animation may spend redrawing blown-up
- * bitmaps. Past it, the rest stay blurry until a later frame, so zooming in
+ * How long one frame of a zoom animation may spend redrawing rescaled
+ * bitmaps. Past it, the rest stay as they are until a later frame, so zooming
  * over many shapes does not stall on redrawing them all at once.
  */
-const UPSCALE_REDRAW_BUDGET_MS = 4;
+const RESCALE_REDRAW_BUDGET_MS = 4;
 
 /** Every element of a frame shares its zoom, so a new zoom is a new frame. */
-let upscaleRedrawFrame = { zoom: 0, until: 0 };
+let rescaleRedrawFrame = { zoom: 0, until: 0 };
 
-const withinUpscaleRedrawBudget = (zoom: number) => {
+const withinRescaleRedrawBudget = (zoom: number) => {
   const now = performance.now();
-  if (upscaleRedrawFrame.zoom !== zoom) {
-    upscaleRedrawFrame = { zoom, until: now + UPSCALE_REDRAW_BUDGET_MS };
+  if (rescaleRedrawFrame.zoom !== zoom) {
+    rescaleRedrawFrame = { zoom, until: now + RESCALE_REDRAW_BUDGET_MS };
   }
-  return now < upscaleRedrawFrame.until;
+  return now < rescaleRedrawFrame.until;
 };
 
 const generateElementWithCanvas = (
@@ -761,8 +763,9 @@ const generateElementWithCanvas = (
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     (!appState?.shouldCacheIgnoreZoom ||
-      (zoom.value > prevElementWithCanvas.zoomValue * MAX_BITMAP_UPSCALE &&
-        withinUpscaleRedrawBudget(zoom.value)));
+      ((zoom.value > prevElementWithCanvas.zoomValue * MAX_BITMAP_RESCALE ||
+        zoom.value * MAX_BITMAP_RESCALE < prevElementWithCanvas.scale) &&
+        withinRescaleRedrawBudget(zoom.value)));
   const imageCrop = isImageElement(element) ? element.crop : null;
 
   const containingFrameOpacity =
@@ -825,6 +828,48 @@ const canSnapElement = (
  * would otherwise flip it between the two neighbors.
  */
 const SNAP_TIE_BIAS = 1e-6;
+
+/**
+ * The part of an element's bitmap, in whole bitmap pixels, that lands on the
+ * canvas when drawn at (`drawX`, `drawY`) under the context's transform. A
+ * bitmap capped by the canvas size limits is shown blown up when zoomed in,
+ * mostly off screen, and reading all of it on every frame of a zoom gesture
+ * is what stalls phones.
+ */
+const visibleBitmapRect = (
+  context: CanvasRenderingContext2D,
+  bitmap: HTMLCanvasElement,
+  scale: number,
+  drawX: number,
+  drawY: number,
+) => {
+  const { a, b, c, d, e, f } = context.getTransform();
+  const det = a * d - b * c;
+  if (!det) {
+    return null;
+  }
+  const { width, height } = context.canvas;
+  const corners = [
+    [0, 0],
+    [width, 0],
+    [0, height],
+    [width, height],
+  ].map(([x, y]) => [
+    ((d * (x - e) - c * (y - f)) / det - drawX) * scale,
+    ((a * (y - f) - b * (x - e)) / det - drawY) * scale,
+  ]);
+  const xs = corners.map(([x]) => x);
+  const ys = corners.map(([, y]) => y);
+  // a pixel to spare on each side, for smoothing that samples past the edge
+  const sx = clamp(Math.floor(Math.min(...xs)) - 1, 0, bitmap.width);
+  const sy = clamp(Math.floor(Math.min(...ys)) - 1, 0, bitmap.height);
+  const sw = clamp(Math.ceil(Math.max(...xs)) + 1, 0, bitmap.width) - sx;
+  const sh = clamp(Math.ceil(Math.max(...ys)) + 1, 0, bitmap.height) - sy;
+  if (sw <= 0 || sh <= 0) {
+    return null;
+  }
+  return { sx, sy, sw, sh };
+};
 
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
@@ -968,13 +1013,26 @@ const drawElementFromCanvas = (
     drawY = 0;
   }
 
-  context.drawImage(
-    elementWithCanvas.canvas!,
+  const visible = visibleBitmapRect(
+    context,
+    elementWithCanvas.canvas,
+    elementWithCanvas.scale,
     drawX,
     drawY,
-    elementWithCanvas.canvas!.width / elementWithCanvas.scale,
-    elementWithCanvas.canvas!.height / elementWithCanvas.scale,
   );
+  if (visible) {
+    context.drawImage(
+      elementWithCanvas.canvas,
+      visible.sx,
+      visible.sy,
+      visible.sw,
+      visible.sh,
+      drawX + visible.sx / elementWithCanvas.scale,
+      drawY + visible.sy / elementWithCanvas.scale,
+      visible.sw / elementWithCanvas.scale,
+      visible.sh / elementWithCanvas.scale,
+    );
+  }
 
   context.setTransform(transform);
 
@@ -1040,21 +1098,37 @@ const DIRECT_TEXT_ZOOM = 1;
  * zoomed in); zoomed out over a full board they are thousands of new
  * canvases.
  * Freedraw and text draw the same either way. Other shapes keep their
- * bitmaps, except at rest when the canvas size limits would cap the bitmap
- * below the zoom and it would be shown blown up. Images always keep theirs:
- * the crop editor's uncropped preview is drawn only from the bitmap.
+ * bitmaps unless the bitmap would be bigger than the screen: drawing one costs
+ * more than it saves (up to tens of megabytes, built on the frame that needs
+ * it), and past the canvas size limits it is capped and shown blurry. Images
+ * always keep theirs: the crop editor's uncropped preview is drawn only from
+ * the bitmap.
  */
 const shouldDrawDirectly = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
-) =>
-  element.type === "freedraw" ||
-  (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM) ||
-  (!appState.shouldCacheIgnoreZoom &&
-    element.type !== "image" &&
-    cappedElementCanvasSize(element, elementsMap, appState.zoom).scale <
-      appState.zoom.value);
+) => {
+  if (
+    element.type === "freedraw" ||
+    (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM)
+  ) {
+    return true;
+  }
+  if (element.type === "image") {
+    return false;
+  }
+  const { width, height, scale } = cappedElementCanvasSize(
+    element,
+    elementsMap,
+    appState.zoom,
+  );
+  return (
+    scale < appState.zoom.value ||
+    width * height >
+      appState.width * appState.height * window.devicePixelRatio ** 2
+  );
+};
 
 /**
  * The element's cached bitmap, if it was drawn for exactly this view at full
