@@ -251,7 +251,7 @@ exports[`restoreElements > should restore freedraw element correctly 1`] = `
     "variability": "variable",
   },
   "strokeStyle": "solid",
-  "strokeWidth": "0.50000",
+  "strokeWidth": "0.25000",
   "type": "freedraw",
   "updated": 1,
   "version": 2,

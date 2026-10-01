@@ -65,8 +65,8 @@ describe("freedrawStrokeWidth", () => {
 
     UI.clickTool("freedraw");
     expect(strokeWidthPicker()).not.toBeNull();
-    expect(strokeAt(1)).toBe(0.5);
-    expect(strokeAt(100)).toBe(0.5);
+    expect(strokeAt(1)).toBe(0.25);
+    expect(strokeAt(100)).toBe(0.25);
     expect(h.state.currentItemStrokeWidthKey).toBe("medium");
   });
 });

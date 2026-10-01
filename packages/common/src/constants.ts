@@ -497,9 +497,9 @@ export const STROKE_WIDTH: Readonly<
 export const FREEDRAW_STROKE_WIDTH: Readonly<
   Record<StrokeWidthKey | "extraBold", ExcalidrawElement["strokeWidth"]>
 > = {
-  thin: 0.25,
-  medium: 0.5,
-  bold: 1,
+  thin: 0.125,
+  medium: 0.25,
+  bold: 0.5,
   extraBold: 4, // legacy (may be used again in the future)
 };
 
