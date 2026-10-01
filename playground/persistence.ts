@@ -1,4 +1,7 @@
-import { getNonDeletedElements } from "@excalidraw/element";
+import {
+  getNonDeletedElements,
+  isInitializedImageElement,
+} from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
@@ -24,12 +27,18 @@ export const saveScene = (
   elements: readonly ExcalidrawElement[],
   { zoom, scrollX, scrollY, theme, viewBackgroundColor }: SavedAppState,
   files: BinaryFiles,
-) =>
+) => {
+  const liveElements = getNonDeletedElements(elements);
   storage.setItem(
     SCENE_KEY,
     JSON.stringify({
-      elements: getNonDeletedElements(elements),
+      elements: liveElements,
       appState: { zoom, scrollX, scrollY, theme, viewBackgroundColor },
-      files,
+      files: Object.fromEntries(
+        liveElements
+          .filter(isInitializedImageElement)
+          .map(({ fileId }) => [fileId, files[fileId]]),
+      ),
     }),
   );
+};

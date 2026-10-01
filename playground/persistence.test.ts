@@ -1,8 +1,10 @@
-import { newElement } from "@excalidraw/element";
+import { newElement, newImageElement } from "@excalidraw/element";
 import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
 import { getNormalizedZoom } from "@excalidraw/excalidraw/scene/normalize";
 
+import type { FileId } from "@excalidraw/element/types";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
+import type { DataURL } from "@excalidraw/excalidraw/types";
 
 import { loadScene, saveScene } from "./persistence";
 
@@ -47,6 +49,31 @@ describe("playground persistence", () => {
 
     it("keeps the zoom", () => {
       expect(scene?.appState?.zoom).toEqual({ value: 100 });
+    });
+  });
+
+  describe("when an image was deleted before the save", () => {
+    const valleyOfTheSun = {
+      ...newImageElement({ type: "image", x: 3, y: 5 }),
+      fileId: "file-id-valley-of-the-sun" as FileId,
+      isDeleted: true,
+    };
+    let scene: ImportedDataState | null;
+
+    beforeEach(() => {
+      saveScene(localStorage, [valleyOfTheSun], getDefaultAppState(), {
+        [valleyOfTheSun.fileId]: {
+          id: valleyOfTheSun.fileId,
+          mimeType: "image/png",
+          dataURL: "data:image/png;base64,THELAIR" as DataURL,
+          created: 1,
+        },
+      });
+      scene = loadScene(localStorage);
+    });
+
+    it("drops its file", () => {
+      expect(scene?.files).toEqual({});
     });
   });
 });
