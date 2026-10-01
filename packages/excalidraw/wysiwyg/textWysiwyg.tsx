@@ -1145,7 +1145,7 @@ export const textWysiwyg = ({
   };
 
   // prevent blur when changing properties from the menu
-  const onPointerDown = (event: MouseEvent) => {
+  const onPointerDown = (event: PointerEvent) => {
     const target = event?.target;
 
     // panning canvas
@@ -1157,6 +1157,25 @@ export const textWysiwyg = ({
       }
 
       temporarilyDisableSubmit();
+      return;
+    }
+
+    // alt+drag on the text being edited duplicates it, as on the canvas:
+    // finish the edit keeping the text selected, then hand the press to the
+    // canvas (the editor is gone by then, so the canvas receives the drag)
+    if (
+      event.altKey &&
+      !event[KEYS.CTRL_OR_CMD] &&
+      event.button === POINTER_BUTTON.MAIN &&
+      target === editable &&
+      (app.state.activeTool.type === "selection" ||
+        app.state.activeTool.type === "lasso")
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      submittedViaKeyboard = true;
+      handleSubmit();
+      app.duplicate.handOverTextEditorPress(event, element.id);
       return;
     }
 

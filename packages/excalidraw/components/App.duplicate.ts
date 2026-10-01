@@ -18,7 +18,9 @@ import {
   getCommonBounds,
   getSelectionStateForElements,
   isBindableElement,
+  isLinearElement,
   isTextElement,
+  LinearElementEditor,
   newElementWith,
   reconcileDuplicatedElements,
   syncMovedIndices,
@@ -26,7 +28,10 @@ import {
 } from "@excalidraw/element";
 
 import type { ListMarkerAdvance } from "@excalidraw/element";
-import type { ExcalidrawElement } from "@excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
 
 import type { PointerDownState } from "../types";
 
@@ -111,50 +116,132 @@ export class AppDuplicate {
   };
 
   /**
+   * The text whose editing an alt-press on it ended, while the press is
+   * handed over to the canvas (see `handOverTextEditorPress()`).
+   */
+  handedOverTextId: ExcalidrawTextElement["id"] | null = null;
+
+  /**
+   * An alt-press on the text being edited, once it ended the editing, is
+   * handed over to the canvas, for the text to be alt-dragged (duplicated) as
+   * on the canvas — its duplicate is then edited on drop.
+   */
+  handOverTextEditorPress = (
+    event: PointerEvent,
+    textElementId: ExcalidrawTextElement["id"],
+  ) => {
+    this.handedOverTextId = textElementId;
+    try {
+      this.app.interactiveCanvas?.dispatchEvent(
+        new this.app.ownerWindow.PointerEvent(event.type, event),
+      );
+    } finally {
+      this.handedOverTextId = null;
+    }
+  };
+
+  /**
+   * The pointer down a handed-over press is replayed as (see
+   * `handOverTextEditorPress()`) moves what was edited — the text, or its
+   * container — and nothing beneath the editor, which reaches past the text:
+   * no resize handle, nor an arrow's point, midpoint or label.
+   *
+   * @returns `false` if the pointer down isn't a handed-over press
+   */
+  hitEditedElement = (pointerDownState: PointerDownState): boolean => {
+    const { editedTextId } = pointerDownState.hit;
+    const elementsMap = this.app.scene.getNonDeletedElementsMap();
+    const text = editedTextId && this.app.scene.getElement(editedTextId);
+    // (the text is gone if emptied)
+    const element =
+      text && isTextElement(text)
+        ? elementsMap.get(text.containerId ?? text.id)
+        : null;
+    if (!element) {
+      return false;
+    }
+
+    pointerDownState.hit.element = element;
+    pointerDownState.hit.allHitElements = [element];
+
+    // a fresh arrow editor, as the last press' (on a point, the midpoint or
+    // the label) would drive the drag
+    if (this.app.state.selectedLinearElement) {
+      this.app.setState({
+        selectedLinearElement: isLinearElement(element)
+          ? new LinearElementEditor(element, elementsMap)
+          : null,
+      });
+    }
+
+    return true;
+  };
+
+  /**
    * On alt-drag drop: the list markers advanced along with the drag go back,
    * for the drag to be committed as is, and forth again once it is, as
    * a separate undo step (before the browser gets to paint either).
    *
-   * A single list item with text after its marker is then edited, with that
-   * text selected (`1. |foo|`), as it's likely to differ from the original's.
+   * A duplicate is then edited (once the drop is committed): a single list
+   * item with text after its marker, with that text selected (`1. |foo|`),
+   * as it's likely to differ from the original's — or else the duplicate of
+   * the text the drag ended the editing of, with all of it selected.
    */
-  commitDraggedListMarkers = (
-    advances: readonly ListMarkerAdvance[],
+  commitDraggedDuplicates = (
+    { hit }: PointerDownState,
     {
-      editListItem,
+      editText,
     }: {
       /** `false` if the drag didn't end with a genuine pointerup */
-      editListItem: boolean;
+      editText: boolean;
     },
   ) => {
+    const advances = hit.advancedListMarkers;
+    const [advance] = advances;
+    const listItem =
+      advances.length === 1 &&
+      advance.contentStart < advance.nextOriginalText.length
+        ? advance
+        : null;
+    const textToEditId = !editText
+      ? null
+      : listItem
+      ? listItem.elementId
+      : hit.editedTextId;
+
+    const editTextOnceCommitted = () => {
+      if (textToEditId) {
+        this.afterCommit(() => {
+          this.editDuplicatedText(textToEditId, listItem);
+          return false;
+        });
+      }
+    };
+
+    if (!advances.length) {
+      editTextOnceCommitted();
+      return;
+    }
+
     applyListMarkerAdvances(advances, "prev", this.app.scene);
 
     this.afterCommit(() => {
       applyListMarkerAdvances(advances, "next", this.app.scene);
-
-      const [advance] = advances;
-      if (
-        editListItem &&
-        advances.length === 1 &&
-        advance.contentStart < advance.nextOriginalText.length
-      ) {
-        // once the marker is committed
-        this.afterCommit(() => {
-          this.editListItemText(advance);
-          return false;
-        });
-      }
-
+      editTextOnceCommitted();
       return true;
     });
   };
 
-  private editListItemText(advance: ListMarkerAdvance) {
-    const element = this.app.scene.getNonDeletedElement(advance.elementId);
+  private editDuplicatedText(
+    elementId: ExcalidrawTextElement["id"],
+    /** to select the item's text only */
+    listItem: ListMarkerAdvance | null,
+  ) {
+    const element = this.app.scene.getNonDeletedElement(elementId);
     if (
       !element ||
       !isTextElement(element) ||
-      element.originalText !== advance.nextOriginalText ||
+      (listItem && element.originalText !== listItem.nextOriginalText) ||
       // another interaction has started
       this.dependencies.getPointerCount() > 0
     ) {
@@ -167,7 +254,7 @@ export class AppDuplicate {
       insertAtParentCenter: false,
       textElement: element,
       initialSelection: {
-        start: advance.contentStart,
+        start: listItem?.contentStart ?? 0,
         end: element.originalText.length,
       },
     });
@@ -346,6 +433,7 @@ export class AppDuplicate {
 
     // host vetoed the duplication, so we keep dragging the originals
     if (!duplicatedElements.length) {
+      pointerDownState.hit.editedTextId = null;
       return;
     }
 
@@ -367,6 +455,14 @@ export class AppDuplicate {
         );
         const clonedElement = cloneId && duplicateElementsMap.get(cloneId);
         pointerDownState.hit.element = clonedElement || null;
+      }
+      // swap the edited text with its duplicate
+      if (pointerDownState.hit.editedTextId) {
+        const cloneId = origIdToDuplicateId.get(
+          pointerDownState.hit.editedTextId,
+        );
+        pointerDownState.hit.editedTextId =
+          (cloneId && duplicateElementsMap.get(cloneId)?.id) || null;
       }
       // swap hit elements with the duplicated ones
       pointerDownState.hit.allHitElements =
@@ -402,7 +498,7 @@ export class AppDuplicate {
       this.app.scene.replaceAllElements(elementsWithIndices);
 
       // visible from the start of the drag, captured on drop (see
-      // `commitDraggedListMarkers()`)
+      // `commitDraggedDuplicates()`)
       pointerDownState.hit.advancedListMarkers = advanceDuplicatedListMarkers(
         duplicatedElements,
         this.app.scene,

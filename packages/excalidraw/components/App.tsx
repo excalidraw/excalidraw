@@ -8275,6 +8275,7 @@ class App extends React.Component<AppProps, AppState> {
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
         advancedListMarkers: [],
+        editedTextId: this.duplicate.handedOverTextId,
         arrowLabel: false,
         hasHitCommonBoundingBoxOfSelectedElements:
           this.isHittingCommonBoundingBoxOfSelectedElements(
@@ -8360,6 +8361,10 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): boolean => {
     if (isSelectionLikeTool(this.state.activeTool.type)) {
+      if (this.duplicate.hitEditedElement(pointerDownState)) {
+        return false;
+      }
+
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
@@ -10361,13 +10366,12 @@ class App extends React.Component<AppProps, AppState> {
 
       this.textTool.handlePointerUp(childEvent, pointerDownState);
 
-      if (pointerDownState.hit.advancedListMarkers.length) {
-        this.duplicate.commitDraggedListMarkers(
-          pointerDownState.hit.advancedListMarkers,
+      if (pointerDownState.hit.hasBeenDuplicated) {
+        this.duplicate.commitDraggedDuplicates(pointerDownState, {
           // not for a replay by the missing-pointerup cleanup (a
           // pointercancel, or the next interaction's pointerdown)
-          { editListItem: childEvent.type === "pointerup" },
-        );
+          editText: childEvent.type === "pointerup",
+        });
       }
 
       // an armed bucket fill commits only on a GENUINE pointer up. The

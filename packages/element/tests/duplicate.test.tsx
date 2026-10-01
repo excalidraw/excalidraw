@@ -2,6 +2,7 @@ import { pointFrom } from "@excalidraw/math";
 
 import {
   FONT_FAMILY,
+  KEYS,
   ORIG_ID,
   ROUNDNESS,
   isPrimitive,
@@ -1181,6 +1182,116 @@ describe("duplicating list items", () => {
       { id: frame.id },
       { [ORIG_ID]: text.id, originalText: "1. foo" },
       { [ORIG_ID]: frame.id, selected: true },
+    ]);
+  });
+});
+
+describe("alt-dragging the text being edited", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  /** alt-presses the text editor, which hands the press over to the canvas */
+  const altPressTextEditor = async (x: number, y: number) => {
+    const editor = await getTextEditor();
+    // (the editor takes pointer downs from the next frame on)
+    await act(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+
+    mouse.restorePosition(x, y);
+    fireEvent.pointerDown(editor, {
+      clientX: x,
+      clientY: y,
+      pointerType: "mouse",
+      pointerId: 1,
+      button: 0,
+      altKey: true,
+    });
+    expect(h.state.editingTextElement).toBe(null);
+  };
+
+  it.each([
+    ["foo", "foo", "foo"],
+    // a list item's text only, as when alt-dragged on the canvas
+    ["1. foo", "2. foo", "foo"],
+  ])(
+    "duplicates %j, editing the duplicate %j with %j selected",
+    async (text, duplicateText, selectedText) => {
+      const element = API.createElement({ type: "text", text });
+      API.setElements([element]);
+      API.setSelectedElements([element]);
+      Keyboard.keyPress(KEYS.ENTER);
+      await altPressTextEditor(element.x + 5, element.y + 5);
+
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        mouse.moveTo(element.x + 5, element.y + 50);
+        mouse.up();
+      });
+
+      const duplicate = getCloneByOrigId(element.id);
+      expect(duplicate).toMatchObject({ originalText: duplicateText });
+      const duplicateEditor = await getTextEditor();
+      expect(h.state.editingTextElement?.id).toBe(duplicate.id);
+      await waitFor(() =>
+        expect(
+          duplicateEditor.value.slice(
+            duplicateEditor.selectionStart,
+            duplicateEditor.selectionEnd,
+          ),
+        ).toBe(selectedText),
+      );
+    },
+  );
+
+  // the editor reaches past the text's bounds, over its resize handles
+  it("duplicates the text when pressed past its bounds", async () => {
+    const element = API.createElement({
+      type: "text",
+      text: "foo\nbar\nbaz\nqux\nquux",
+    });
+    API.setElements([element]);
+    API.setSelectedElements([element]);
+    Keyboard.keyPress(KEYS.ENTER);
+    // (as laid out by the editor)
+    const { x, y, width, height, fontSize } = h
+      .elements[0] as ExcalidrawTextElement;
+    await altPressTextEditor(x + 5, y + height + 3);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.moveTo(x + 5, y + height + 100);
+      mouse.up();
+    });
+
+    assertElements(h.elements, [
+      { id: element.id, x, y, width, height, fontSize },
+      { id: getCloneByOrigId(element.id).id, width, height, fontSize },
+    ]);
+  });
+
+  // the label is over the arrow's midpoint handle
+  it("duplicates a labeled arrow when pressed on its label", async () => {
+    const [arrow, label] = API.createLabeledArrow();
+    API.setElements([arrow, label]);
+    const { x, y, width, height, points } = arrow as ExcalidrawLinearElement;
+    mouse.clickAt(x + width / 4, y + height / 4);
+    // (its editor keeps what the last press grabbed)
+    mouse.clickAt(x + width / 2, y + height / 2);
+    expect(
+      h.state.selectedLinearElement?.initialState.segmentMidpoint.value,
+    ).not.toBe(null);
+    Keyboard.keyPress(KEYS.ENTER);
+    expect(h.state.editingTextElement?.id).toBe(label.id);
+    await altPressTextEditor(x + width / 2, y + height / 2);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.moveTo(x + width / 2, y + height + 100);
+      mouse.up();
+    });
+
+    assertElements(h.elements, [
+      { id: arrow.id, x, y, points },
+      { id: label.id },
+      { id: getCloneByOrigId(arrow.id).id, points },
+      { id: getCloneByOrigId(label.id).id },
     ]);
   });
 });

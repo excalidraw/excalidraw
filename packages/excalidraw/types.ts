@@ -1290,6 +1290,10 @@ export type PointerDownState = Readonly<{
     // The list markers advanced by duplicating the selected element(s)
     // (alt-drag)
     advancedListMarkers: readonly ListMarkerAdvance[];
+    // The text whose editing the pointer down ended (alt-pressing it in the
+    // text editor), swapped with its duplicate when duplicated, which is
+    // then edited on drop
+    editedTextId: ExcalidrawTextElement["id"] | null;
     // Whether the pointer is hitting the common bounding box of selected
     // elements, which is useful for discriminating between selecitng
     // the entire selection vs a specific element
