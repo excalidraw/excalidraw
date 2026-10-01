@@ -28,6 +28,7 @@ import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
 import { syncMovedIndices } from "./fractionalIndex";
 import {
+  isBindingElement,
   isFrameElement,
   isFrameLikeElement,
   isTextElement,
@@ -670,6 +671,29 @@ export const removeElementsFromFrame = (
       frameId: null,
     });
   }
+};
+
+/**
+ * whether the arrow is bound to an element outside of its frame, in which
+ * case it shouldn't be a frame child, otherwise the frame would clip it
+ */
+export const isArrowBoundOutsideOfFrame = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+) => {
+  if (!element.frameId || !isBindingElement(element)) {
+    return false;
+  }
+
+  return [element.startBinding, element.endBinding].some((binding) => {
+    const boundElement = binding && elementsMap.get(binding.elementId);
+
+    return (
+      !!boundElement &&
+      boundElement.id !== element.frameId &&
+      boundElement.frameId !== element.frameId
+    );
+  });
 };
 
 export const removeAllElementsFromFrame = <T extends ExcalidrawElement>(
