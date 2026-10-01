@@ -120,7 +120,7 @@ describe("on-screen rendering draws some elements directly", () => {
   it("keeps drawing other shapes from their bitmaps", () => {
     const { drawImage } = draw(
       API.createElement({ type: "rectangle", x: 10, y: 10 }),
-      4,
+      3,
     );
     expect(drawImage).toHaveBeenCalledTimes(1);
   });
@@ -271,25 +271,58 @@ describe("a shape too big for its bitmap at this zoom", () => {
   });
 });
 
-describe("a shape bigger than the screen while the zoom animates", () => {
+describe("a shape bigger than the screen", () => {
+  const shape = () =>
+    API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 100,
+      height: 100,
+    });
+  const deep = { scrollX: -10, scrollY: -10 };
   let drawn: ReturnType<typeof draw>;
 
-  beforeEach(() => {
-    drawn = draw(
-      API.createElement({
-        type: "rectangle",
-        x: 10,
-        y: 10,
-        width: 100,
-        height: 100,
-      }),
-      10,
-      { scrollX: -10, scrollY: -10, shouldCacheIgnoreZoom: true },
-    );
+  describe.each([
+    ["while the zoom animates", { shouldCacheIgnoreZoom: true }],
+    ["when the zoom has settled", {}],
+  ])("%s", (_, state) => {
+    beforeEach(() => {
+      drawn = draw(shape(), 10, { ...deep, ...state });
+    });
+
+    it("is not drawn from a bitmap", () => {
+      expect(drawn.drawImage).not.toHaveBeenCalled();
+    });
+
+    it("is drawn as paths on the canvas", () => {
+      expect(drawn.stroke).toHaveBeenCalled();
+    });
   });
 
-  it("is not drawn from a bitmap", () => {
-    expect(drawn.drawImage).not.toHaveBeenCalled();
+  describe("when it is only bigger than the screen in CSS pixels", () => {
+    const pixelRatio = Object.getOwnPropertyDescriptor(
+      window,
+      "devicePixelRatio",
+    );
+
+    beforeEach(() => {
+      Object.defineProperty(window, "devicePixelRatio", {
+        configurable: true,
+        value: 3,
+      });
+      drawn = draw(shape(), 4, deep);
+    });
+
+    afterEach(() => {
+      if (pixelRatio) {
+        Object.defineProperty(window, "devicePixelRatio", pixelRatio);
+      }
+    });
+
+    it("keeps drawing from its bitmap", () => {
+      expect(drawn.drawImage).toHaveBeenCalledTimes(1);
+    });
   });
 });
 

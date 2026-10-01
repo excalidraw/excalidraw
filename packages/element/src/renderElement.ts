@@ -1098,12 +1098,11 @@ const DIRECT_TEXT_ZOOM = 1;
  * zoomed in); zoomed out over a full board they are thousands of new
  * canvases.
  * Freedraw and text draw the same either way. Other shapes keep their
- * bitmaps, except when the canvas size limits would cap the bitmap below the
- * zoom: shown blown up it is blurry, and during a pinch it is a bitmap of
- * tens of megabytes read on every frame. During a pinch, so do shapes whose
- * bitmap would be bigger than the screen, rather than drawing one mid-gesture.
- * Images always keep theirs: the crop editor's uncropped preview is drawn
- * only from the bitmap.
+ * bitmaps unless the bitmap would be bigger than the screen: drawing one costs
+ * more than it saves (up to tens of megabytes, built on the frame that needs
+ * it), and past the canvas size limits it is capped and shown blurry. Images
+ * always keep theirs: the crop editor's uncropped preview is drawn only from
+ * the bitmap.
  */
 const shouldDrawDirectly = (
   element: NonDeletedExcalidrawElement,
@@ -1126,9 +1125,8 @@ const shouldDrawDirectly = (
   );
   return (
     scale < appState.zoom.value ||
-    (!!appState.shouldCacheIgnoreZoom &&
-      width * height >
-        appState.width * appState.height * window.devicePixelRatio ** 2)
+    width * height >
+      appState.width * appState.height * window.devicePixelRatio ** 2
   );
 };
 

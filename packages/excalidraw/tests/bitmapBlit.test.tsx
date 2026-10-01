@@ -159,7 +159,7 @@ describe("pinching out from a zoom an element's bitmap was drawn at", () => {
       width: 100,
       height: 100,
     });
-    blit(element, { ...centeredOn(50, 50, 4), shouldCacheIgnoreZoom: false });
+    blit(element, { ...centeredOn(50, 50, 3), shouldCacheIgnoreZoom: false });
     drawn = blit(element, centeredOn(50, 50, 1));
   });
 
