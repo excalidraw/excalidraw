@@ -826,6 +826,47 @@ const canSnapElement = (
  */
 const SNAP_TIE_BIAS = 1e-6;
 
+/**
+ * The part of an element's bitmap, in whole bitmap pixels, that lands on the
+ * canvas when drawn at (`drawX`, `drawY`) under the context's transform. A
+ * bitmap capped by the canvas size limits is shown blown up when zoomed in,
+ * mostly off screen, and reading all of it on every frame of a zoom gesture
+ * is what stalls phones.
+ */
+const visibleBitmapRect = (
+  context: CanvasRenderingContext2D,
+  bitmap: HTMLCanvasElement,
+  scale: number,
+  drawX: number,
+  drawY: number,
+) => {
+  const { a, b, c, d, e, f } = context.getTransform();
+  const det = a * d - b * c;
+  if (!det) {
+    return null;
+  }
+  const { width, height } = context.canvas;
+  const corners = [
+    [0, 0],
+    [width, 0],
+    [0, height],
+    [width, height],
+  ].map(([x, y]) => [
+    ((d * (x - e) - c * (y - f)) / det - drawX) * scale,
+    ((a * (y - f) - b * (x - e)) / det - drawY) * scale,
+  ]);
+  const xs = corners.map(([x]) => x);
+  const ys = corners.map(([, y]) => y);
+  const sx = clamp(Math.floor(Math.min(...xs)), 0, bitmap.width);
+  const sy = clamp(Math.floor(Math.min(...ys)), 0, bitmap.height);
+  const sw = clamp(Math.ceil(Math.max(...xs)), 0, bitmap.width) - sx;
+  const sh = clamp(Math.ceil(Math.max(...ys)), 0, bitmap.height) - sy;
+  if (sw <= 0 || sh <= 0) {
+    return null;
+  }
+  return { sx, sy, sw, sh };
+};
+
 const drawElementFromCanvas = (
   elementWithCanvas: ExcalidrawElementWithCanvas,
   context: CanvasRenderingContext2D,
@@ -968,13 +1009,26 @@ const drawElementFromCanvas = (
     drawY = 0;
   }
 
-  context.drawImage(
-    elementWithCanvas.canvas!,
+  const visible = visibleBitmapRect(
+    context,
+    elementWithCanvas.canvas,
+    elementWithCanvas.scale,
     drawX,
     drawY,
-    elementWithCanvas.canvas!.width / elementWithCanvas.scale,
-    elementWithCanvas.canvas!.height / elementWithCanvas.scale,
   );
+  if (visible) {
+    context.drawImage(
+      elementWithCanvas.canvas,
+      visible.sx,
+      visible.sy,
+      visible.sw,
+      visible.sh,
+      drawX + visible.sx / elementWithCanvas.scale,
+      drawY + visible.sy / elementWithCanvas.scale,
+      visible.sw / elementWithCanvas.scale,
+      visible.sh / elementWithCanvas.scale,
+    );
+  }
 
   context.setTransform(transform);
 
