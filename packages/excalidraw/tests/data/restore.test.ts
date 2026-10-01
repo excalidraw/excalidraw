@@ -151,6 +151,34 @@ describe("restoreElements", () => {
     ).toEqual([expect.objectContaining({ isDeleted: true })]);
   });
 
+  it("should measure the restored element, not the raw one, for invisibly small elements", () => {
+    // A file written without dimensions restores them as 0, so the element is
+    // only invisibly small once restored. The raw value is `undefined`, and
+    // `undefined === 0` is false, so measuring the raw element would keep it.
+    const rectElement = API.createElement({ type: "rectangle" });
+    const withoutDimensions = { ...rectElement } as Record<string, unknown>;
+    delete withoutDimensions.width;
+    delete withoutDimensions.height;
+
+    const restored = restore.restoreElements(
+      [withoutDimensions as unknown as ExcalidrawElement],
+      null,
+      { deleteInvisibleElements: true },
+    );
+
+    expect(restored).toEqual([expect.objectContaining({ isDeleted: true })]);
+    // Without the opt the element is left alone, so it is the measurement that
+    // decided this rather than the restore dropping it outright.
+    expect(
+      restore.restoreElements(
+        [withoutDimensions as unknown as ExcalidrawElement],
+        null,
+      ),
+    ).toEqual([
+      expect.objectContaining({ isDeleted: false, width: 0, height: 0 }),
+    ]);
+  });
+
   it("should restore text element correctly passing value for each attribute", () => {
     const textElement = API.createElement({
       type: "text",
