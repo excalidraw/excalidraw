@@ -815,13 +815,25 @@ export const actionChangeFreedrawStrokeWidth = register<number>({
         hasSelection ? null : appState.currentItemFreedrawStrokeWidth,
     );
     const value = width ?? appState.currentItemFreedrawStrokeWidth;
+    const variability =
+      getFormValue<StrokeVariability | null>(
+        elements,
+        app,
+        (element) =>
+          isFreeDrawElement(element)
+            ? element.strokeOptions?.variability ?? "variable"
+            : null,
+        isFreeDrawElement,
+        (hasSelection) =>
+          hasSelection ? null : appState.currentItemStrokeVariability,
+      ) ?? appState.currentItemStrokeVariability;
 
     return (
       <PenSizeSlider
         value={value}
         hasCommonValue={width !== null}
         color={appState.currentItemStrokeColor}
-        variability={appState.currentItemStrokeVariability}
+        variability={variability}
         onChange={updateData}
       />
     );

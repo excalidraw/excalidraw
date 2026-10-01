@@ -159,6 +159,28 @@ describe("PenToolFlyout", () => {
       });
     });
 
+    describe("when a constant-width stroke is selected while the pen is set to variable", () => {
+      let previewWidth: string | undefined;
+
+      beforeEach(() => {
+        API.setAppState({ currentItemStrokeVariability: "variable" });
+        const stroke = API.createElement({
+          type: "freedraw",
+          strokeWidth: 1,
+          strokeOptions: { variability: "constant", streamline: 0.5 },
+        });
+        API.setElements([stroke]);
+        API.setSelectedElements([stroke]);
+        previewWidth = document.querySelector<HTMLElement>(
+          '[data-testid="pen-size-preview"]',
+        )?.style.width;
+      });
+
+      it("sizes the preview to the selected stroke, not the pen", () => {
+        expect(previewWidth).toBe(`${2 * 1.4}px`);
+      });
+    });
+
     describe("when a stroke and a rectangle are selected together", () => {
       beforeEach(() => {
         const elements = [
