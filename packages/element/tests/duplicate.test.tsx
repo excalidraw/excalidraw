@@ -16,11 +16,16 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import { UI, Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
 
+import { getTextEditor } from "@excalidraw/excalidraw/tests/queries/dom";
+
 import {
+  GlobalTestState,
   act,
   assertElements,
+  fireEvent,
   getCloneByOrigId,
   render,
+  waitFor,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
 import type { LocalPoint } from "@excalidraw/math";
@@ -1075,7 +1080,7 @@ describe("duplicating list items", () => {
     assertElements(h.elements, [{ id: text.id }, { id, isDeleted: true }]);
   });
 
-  it("alt-drag advances the markers from the start of the drag, undoably", () => {
+  it("alt-drag advances the markers from the start of the drag, undoably", async () => {
     const [container, label] = API.createTextContainer({
       label: { text: "9. foo" },
     });
@@ -1100,6 +1105,15 @@ describe("duplicating list items", () => {
     const duplicateLabel = getCloneByOrigId(label.id);
     expect(duplicateLabel).toMatchObject({ originalText: "10. foo" });
 
+    // on to editing the item's text
+    const editor = await getTextEditor();
+    expect(h.state.editingTextElement?.id).toBe(duplicateLabel.id);
+    expect(editor.value).toBe("10. foo");
+    await waitFor(() =>
+      expect([editor.selectionStart, editor.selectionEnd]).toEqual([4, 7]),
+    );
+    Keyboard.exitTextEditor(editor);
+
     Keyboard.undo();
     assertElements(h.elements, [
       { id: container.id },
@@ -1115,6 +1129,37 @@ describe("duplicating list items", () => {
       { id: duplicate.id, selected: true },
       { id: duplicateLabel.id, originalText: "10. foo" },
     ]);
+  });
+
+  it("alt-drag doesn't edit a list item without text", () => {
+    const text = API.createElement({ type: "text", text: "1" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(text.x + 5, text.y + 5);
+      mouse.up(50, 50);
+    });
+
+    expect(getCloneByOrigId(text.id)).toMatchObject({ originalText: "2" });
+    expect(h.state.editingTextElement).toBe(null);
+  });
+
+  it("alt-drag doesn't edit the list item when the drag gets interrupted", () => {
+    const text = API.createElement({ type: "text", text: "1. foo" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(text.x + 5, text.y + 5);
+      mouse.move(50, 50);
+    });
+    fireEvent.pointerCancel(GlobalTestState.interactiveCanvas, {
+      pointerId: 1,
+    });
+
+    expect(getCloneByOrigId(text.id)).toMatchObject({ originalText: "2. foo" });
+    expect(h.state.editingTextElement).toBe(null);
   });
 
   it("leaves the texts of a duplicated frame as they are", () => {

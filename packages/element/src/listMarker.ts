@@ -194,6 +194,11 @@ export type ListMarkerAdvance = {
   elementId: ExcalidrawTextElement["id"];
   prevOriginalText: string;
   nextOriginalText: string;
+  /**
+   * where the item's text (after the marker and whitespace) starts in
+   * `nextOriginalText` (its length if there's none)
+   */
+  contentStart: number;
   /** the label's container before the label (may have) grown it */
   prevContainerSize: { width: number; height: number } | null;
 };
@@ -309,6 +314,10 @@ export const advanceDuplicatedListMarkers = (
         elementId: element.id,
         prevOriginalText: element.originalText,
         nextOriginalText,
+        contentStart:
+          marker.contentIndex +
+          nextOriginalText.length -
+          element.originalText.length,
         prevContainerSize: container
           ? { width: container.width, height: container.height }
           : null,

@@ -18,6 +18,7 @@ import {
   getCommonBounds,
   getSelectionStateForElements,
   isBindableElement,
+  isTextElement,
   newElementWith,
   reconcileDuplicatedElements,
   syncMovedIndices,
@@ -47,7 +48,13 @@ type Duplication = Pick<
  * `runOnDuplicate()`.
  */
 export class AppDuplicate {
-  constructor(private app: App) {}
+  constructor(
+    private app: App,
+    private dependencies: {
+      /** pointers currently down */
+      getPointerCount: () => number;
+    },
+  ) {}
 
   /**
    * Hands the duplication over to the host's `props.onDuplicate` (if any),
@@ -107,15 +114,64 @@ export class AppDuplicate {
    * On alt-drag drop: the list markers advanced along with the drag go back,
    * for the drag to be committed as is, and forth again once it is, as
    * a separate undo step (before the browser gets to paint either).
+   *
+   * A single list item with text after its marker is then edited, with that
+   * text selected (`1. |foo|`), as it's likely to differ from the original's.
    */
-  commitDraggedListMarkers = (advances: readonly ListMarkerAdvance[]) => {
+  commitDraggedListMarkers = (
+    advances: readonly ListMarkerAdvance[],
+    {
+      editListItem,
+    }: {
+      /** `false` if the drag didn't end with a genuine pointerup */
+      editListItem: boolean;
+    },
+  ) => {
     applyListMarkerAdvances(advances, "prev", this.app.scene);
 
     this.afterCommit(() => {
       applyListMarkerAdvances(advances, "next", this.app.scene);
+
+      const [advance] = advances;
+      if (
+        editListItem &&
+        advances.length === 1 &&
+        advance.contentStart < advance.nextOriginalText.length
+      ) {
+        // once the marker is committed
+        this.afterCommit(() => {
+          this.editListItemText(advance);
+          return false;
+        });
+      }
+
       return true;
     });
   };
+
+  private editListItemText(advance: ListMarkerAdvance) {
+    const element = this.app.scene.getNonDeletedElement(advance.elementId);
+    if (
+      !element ||
+      !isTextElement(element) ||
+      element.originalText !== advance.nextOriginalText ||
+      // another interaction has started
+      this.dependencies.getPointerCount() > 0
+    ) {
+      return;
+    }
+
+    this.app.text.startTextEditing({
+      sceneX: element.x,
+      sceneY: element.y,
+      insertAtParentCenter: false,
+      textElement: element,
+      initialSelection: {
+        start: advance.contentStart,
+        end: element.originalText.length,
+      },
+    });
+  }
 
   /**
    * Duplicates elements so that they end up centered at the scene coords

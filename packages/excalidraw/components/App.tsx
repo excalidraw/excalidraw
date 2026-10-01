@@ -679,7 +679,9 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public bucketFill: AppBucketFill = new AppBucketFill(this);
-  public duplicate: AppDuplicate = new AppDuplicate(this);
+  public duplicate: AppDuplicate = new AppDuplicate(this, {
+    getPointerCount: () => gesture.pointers.size,
+  });
   public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
@@ -10362,6 +10364,9 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.hit.advancedListMarkers.length) {
         this.duplicate.commitDraggedListMarkers(
           pointerDownState.hit.advancedListMarkers,
+          // not for a replay by the missing-pointerup cleanup (a
+          // pointercancel, or the next interaction's pointerdown)
+          { editListItem: childEvent.type === "pointerup" },
         );
       }
 
