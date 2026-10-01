@@ -33,7 +33,6 @@ import type {
   ExcalidrawIframeLikeElement,
   OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
-  BindMode,
   ExcalidrawTextElement,
   StrokeVariability,
 } from "@excalidraw/element/types";
@@ -563,10 +562,6 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
-  // Stores the current bind mode which is detemined at various points during
-  // a drag operation (like pointer position vs bindable element) but needed
-  // globally for calculating the binding strategy
-  bindMode: BindMode;
   /** user-customized color-picker top picks (pinned via drag & drop from the
    * color picker popup). `null` means no customization (defaults, or
    * host-supplied `topPicks`, are used). Kept per picker. */
@@ -1237,7 +1232,6 @@ export type AppClassProperties = {
 
   lastPointerMoveCoords: App["lastPointerMoveCoords"];
   lastPointerMoveEvent: App["lastPointerMoveEvent"];
-  bindModeHandler: App["bindModeHandler"];
 
   emitUserFollowIntent: App["emitUserFollowIntent"];
   requestUnfollow: App["requestUnfollow"];

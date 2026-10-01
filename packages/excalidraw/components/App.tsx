@@ -87,9 +87,7 @@ import {
   Emitter,
   MINIMUM_ARROW_SIZE,
   DOUBLE_TAP_POSITION_THRESHOLD,
-  BIND_MODE_TIMEOUT,
   invariant,
-  getFeatureFlag,
   createUserAgentDescriptor,
   getFormFactor,
   deriveStylesPanelMode,
@@ -225,8 +223,6 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   bindOrUnbindBindingElement,
   mutateElement,
-  getElementBounds,
-  doBoundsIntersect,
   isPointInElement,
   getSnapOutlineMidPoint,
   handleFocusPointDrag,
@@ -703,8 +699,6 @@ class App extends React.Component<AppProps, AppState> {
   });
   public wheel: AppWheel = new AppWheel(this);
 
-  bindModeHandler: ReturnType<typeof setTimeout> | null = null;
-
   hitLinkElement?: NonDeletedExcalidrawElement;
   lastPointerDownEvent: React.PointerEvent<HTMLElement> | null = null;
   /**
@@ -1157,322 +1151,6 @@ class App extends React.Component<AppProps, AppState> {
         break;
     }
   };
-
-  private handleSkipBindMode() {
-    if (
-      this.state.selectedLinearElement?.initialState &&
-      !this.state.selectedLinearElement.initialState.arrowStartIsInside
-    ) {
-      invariant(
-        this.lastPointerMoveCoords,
-        "Missing last pointer move coords when changing bind skip mode for arrow start",
-      );
-      const elementsMap = this.scene.getNonDeletedElementsMap();
-      const hoveredElement = getHoveredElementForBinding(
-        pointFrom<GlobalPoint>(
-          this.lastPointerMoveCoords.x,
-          this.lastPointerMoveCoords.y,
-        ),
-        this.scene.getNonDeletedElements(),
-        elementsMap,
-        this.state.zoom,
-      );
-      const element = LinearElementEditor.getElement(
-        this.state.selectedLinearElement.elementId,
-        elementsMap,
-      );
-
-      if (
-        element?.startBinding &&
-        hoveredElement?.id === element.startBinding.elementId
-      ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
-            initialState: {
-              ...this.state.selectedLinearElement.initialState,
-              arrowStartIsInside: true,
-            },
-          },
-        });
-      }
-    }
-
-    if (this.state.bindMode === "orbit") {
-      if (this.bindModeHandler) {
-        clearTimeout(this.bindModeHandler);
-        this.bindModeHandler = null;
-      }
-
-      // PERF: It's okay since it's a single trigger from a key handler
-      // or single call from pointer move handler because the bindMode check
-      // will not pass the second time
-      flushSync(() => {
-        this.setState({
-          bindMode: "skip",
-        });
-      });
-
-      if (
-        this.lastPointerMoveCoords &&
-        this.state.selectedLinearElement?.selectedPointsIndices &&
-        this.state.selectedLinearElement?.selectedPointsIndices.length
-      ) {
-        const { x, y } = this.lastPointerMoveCoords;
-        const event =
-          this.lastPointerMoveEvent ?? this.lastPointerDownEvent?.nativeEvent;
-        invariant(event, "Last event must exist");
-        const deltaX = x - this.state.selectedLinearElement.pointerOffset.x;
-        const deltaY = y - this.state.selectedLinearElement.pointerOffset.y;
-        const newState = this.state.multiElement
-          ? LinearElementEditor.handlePointerMove(
-              event,
-              this,
-              deltaX,
-              deltaY,
-              this.state.selectedLinearElement,
-            )
-          : LinearElementEditor.handlePointDragging(
-              event,
-              this,
-              deltaX,
-              deltaY,
-              this.state.selectedLinearElement,
-            );
-        if (newState) {
-          this.setState(newState);
-        }
-      }
-    }
-  }
-
-  private resetDelayedBindMode() {
-    if (this.bindModeHandler) {
-      clearTimeout(this.bindModeHandler);
-      this.bindModeHandler = null;
-    }
-
-    if (this.state.bindMode !== "orbit") {
-      // We need this iteration to complete binding and change
-      // back to orbit mode after that
-      setTimeout(() =>
-        this.setState({
-          bindMode: "orbit",
-        }),
-      );
-    }
-  }
-
-  private previousHoveredBindableElement: NonDeletedExcalidrawElement | null =
-    null;
-
-  private handleDelayedBindModeChange(
-    arrow: ExcalidrawArrowElement,
-    hoveredElement: NonDeletedExcalidrawElement | null,
-  ) {
-    if (arrow.isDeleted || isElbowArrow(arrow)) {
-      return;
-    }
-
-    const effector = () => {
-      this.bindModeHandler = null;
-
-      invariant(
-        this.lastPointerMoveCoords,
-        "Expected lastPointerMoveCoords to be set",
-      );
-
-      if (!this.state.multiElement) {
-        if (
-          !this.state.selectedLinearElement ||
-          !this.state.selectedLinearElement.selectedPointsIndices ||
-          !this.state.selectedLinearElement.selectedPointsIndices.length
-        ) {
-          return;
-        }
-
-        const startDragged =
-          this.state.selectedLinearElement.selectedPointsIndices.includes(0);
-        const endDragged =
-          this.state.selectedLinearElement.selectedPointsIndices.includes(
-            arrow.points.length - 1,
-          );
-
-        // Check if the whole arrow is dragged by selecting all endpoints
-        if ((!startDragged && !endDragged) || (startDragged && endDragged)) {
-          return;
-        }
-      }
-
-      const { x, y } = this.lastPointerMoveCoords;
-      const hoveredElement = getHoveredElementForBinding(
-        pointFrom<GlobalPoint>(x, y),
-        this.scene.getNonDeletedElements(),
-        this.scene.getNonDeletedElementsMap(),
-        this.state.zoom,
-      );
-
-      if (hoveredElement && this.state.bindMode !== "skip") {
-        invariant(
-          this.state.selectedLinearElement?.elementId === arrow.id,
-          "The selectedLinearElement is expected to not change while a bind mode timeout is ticking",
-        );
-
-        // Once the start is set to inside binding, it remains so
-        const arrowStartIsInside =
-          this.state.selectedLinearElement.initialState.arrowStartIsInside ||
-          arrow.startBinding?.elementId === hoveredElement.id;
-
-        // Change the global binding mode
-        flushSync(() => {
-          invariant(
-            this.state.selectedLinearElement,
-            "this.state.selectedLinearElement must exist",
-          );
-
-          this.setState({
-            bindMode: "inside",
-            selectedLinearElement: {
-              ...this.state.selectedLinearElement,
-              initialState: {
-                ...this.state.selectedLinearElement.initialState,
-                arrowStartIsInside,
-              },
-            },
-          });
-        });
-
-        const event =
-          this.lastPointerMoveEvent ?? this.lastPointerDownEvent?.nativeEvent;
-        invariant(event, "Last event must exist");
-        const deltaX = x - this.state.selectedLinearElement.pointerOffset.x;
-        const deltaY = y - this.state.selectedLinearElement.pointerOffset.y;
-        const newState = this.state.multiElement
-          ? LinearElementEditor.handlePointerMove(
-              event,
-              this,
-              deltaX,
-              deltaY,
-              this.state.selectedLinearElement,
-            )
-          : LinearElementEditor.handlePointDragging(
-              event,
-              this,
-              deltaX,
-              deltaY,
-              this.state.selectedLinearElement,
-            );
-        if (newState) {
-          this.setState(newState);
-        }
-      }
-    };
-
-    let isOverlapping = false;
-    if (this.state.selectedLinearElement?.selectedPointsIndices) {
-      const elementsMap = this.scene.getNonDeletedElementsMap();
-      const startDragged =
-        this.state.selectedLinearElement.selectedPointsIndices.includes(0);
-      const endDragged =
-        this.state.selectedLinearElement.selectedPointsIndices.includes(
-          arrow.points.length - 1,
-        );
-      const startElement = startDragged
-        ? hoveredElement
-        : arrow.startBinding && elementsMap.get(arrow.startBinding.elementId);
-      const endElement = endDragged
-        ? hoveredElement
-        : arrow.endBinding && elementsMap.get(arrow.endBinding.elementId);
-      const startBounds =
-        startElement && getElementBounds(startElement, elementsMap);
-      const endBounds = endElement && getElementBounds(endElement, elementsMap);
-      isOverlapping = !!(
-        startBounds &&
-        endBounds &&
-        startElement.id !== endElement.id &&
-        doBoundsIntersect(startBounds, endBounds)
-      );
-    }
-
-    const startDragged =
-      this.state.selectedLinearElement?.selectedPointsIndices?.includes(0);
-    const endDragged =
-      this.state.selectedLinearElement?.selectedPointsIndices?.includes(
-        arrow.points.length - 1,
-      );
-    const currentBinding = startDragged
-      ? "startBinding"
-      : endDragged
-      ? "endBinding"
-      : null;
-    const otherBinding = startDragged
-      ? "endBinding"
-      : endDragged
-      ? "startBinding"
-      : null;
-    const isAlreadyInsideBindingToSameElement =
-      (otherBinding &&
-        arrow[otherBinding]?.mode === "inside" &&
-        arrow[otherBinding]?.elementId === hoveredElement?.id) ||
-      (currentBinding &&
-        arrow[currentBinding]?.mode === "inside" &&
-        hoveredElement?.id === arrow[currentBinding]?.elementId);
-
-    if (
-      currentBinding &&
-      otherBinding &&
-      arrow[currentBinding]?.mode === "inside" &&
-      hoveredElement?.id !== arrow[currentBinding]?.elementId &&
-      arrow[otherBinding]?.elementId !== arrow[currentBinding]?.elementId
-    ) {
-      // Update binding out of place to orbit mode
-      this.scene.mutateElement(
-        arrow,
-        {
-          [currentBinding]: {
-            ...arrow[currentBinding],
-            mode: "orbit",
-          },
-        },
-        {
-          informMutation: false,
-          isDragging: true,
-        },
-      );
-    }
-
-    if (
-      !hoveredElement ||
-      (this.previousHoveredBindableElement &&
-        hoveredElement.id !== this.previousHoveredBindableElement.id)
-    ) {
-      // Clear the timeout if we're not hovering a bindable
-      if (this.bindModeHandler) {
-        clearTimeout(this.bindModeHandler);
-        this.bindModeHandler = null;
-      }
-
-      // Clear the inside binding mode too
-      if (this.state.bindMode === "inside") {
-        flushSync(() => {
-          this.setState({
-            bindMode: "orbit",
-          });
-        });
-      }
-
-      this.previousHoveredBindableElement = null;
-    } else if (
-      !this.bindModeHandler &&
-      (!this.state.newElement || !arrow.startBinding || isOverlapping) &&
-      !isAlreadyInsideBindingToSameElement
-    ) {
-      // We are hovering a bindable element
-      this.bindModeHandler = setTimeout(effector, BIND_MODE_TIMEOUT);
-    }
-
-    this.previousHoveredBindableElement = hoveredElement;
-  }
 
   private cacheEmbeddableRef(
     element: ExcalidrawIframeLikeElement,
@@ -3302,11 +2980,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.clipboard.clearPlainPaste();
 
-    if (this.bindModeHandler) {
-      clearTimeout(this.bindModeHandler);
-      this.bindModeHandler = null;
-    }
-
     this.flowchart.clear();
 
     // These components install their own DOM listeners rather than going
@@ -3335,7 +3008,6 @@ class App extends React.Component<AppProps, AppState> {
       openMenu: this.isInteractionEnabled() ? this.state.openMenu : null,
       openPopup: null,
       cursorButton: "up",
-      bindMode: "orbit",
       activeEmbeddable: null,
       activeLockedId: null,
       selectedElementsAreBeingDragged: false,
@@ -5253,17 +4925,15 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      // Handle Alt key for bind mode
+      // Handle Alt key
       if (event.key === KEYS.ALT) {
         if (this.state.activeTool.type === "bucketfill") {
           this.bucketFill.openTemporaryEyeDropper();
           event.preventDefault();
           return;
-        } else if (getFeatureFlag("COMPLEX_BINDINGS")) {
-          this.handleSkipBindMode();
-        } else {
-          maybeHandleArrowPointlikeDrag({ app: this, event });
         }
+
+        maybeHandleArrowPointlikeDrag({ app: this, event });
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -5356,10 +5026,6 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event[KEYS.CTRL_OR_CMD] && !event.repeat) {
-        if (getFeatureFlag("COMPLEX_BINDINGS")) {
-          this.resetDelayedBindMode();
-        }
-
         flushSync(() => {
           this.setState({
             isBindingEnabled: this.state.bindingPreference !== "enabled",
@@ -5608,44 +5274,6 @@ class App extends React.Component<AppProps, AppState> {
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
 
-    if (
-      (event.key === KEYS.ALT && this.state.bindMode === "skip") ||
-      (!event[KEYS.CTRL_OR_CMD] && !isBindingEnabled(this.state))
-    ) {
-      // Handle Alt key release for bind mode
-      this.setState({
-        bindMode: "orbit",
-      });
-
-      // Restart the timer if we're creating/editing a linear element and hovering over an element
-      if (this.lastPointerMoveEvent && getFeatureFlag("COMPLEX_BINDINGS")) {
-        const scenePointer = viewportCoordsToSceneCoords(
-          {
-            clientX: this.lastPointerMoveEvent.clientX,
-            clientY: this.lastPointerMoveEvent.clientY,
-          },
-          this.state,
-        );
-
-        if (this.state.selectedLinearElement) {
-          const element = LinearElementEditor.getElement(
-            this.state.selectedLinearElement.elementId,
-            this.scene.getNonDeletedElementsMap(),
-          );
-
-          if (isBindingElement(element)) {
-            const hoveredElement = getHoveredElementForBinding(
-              pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
-              this.scene.getNonDeletedElements(),
-              this.scene.getNonDeletedElementsMap(),
-              this.state.zoom,
-            );
-
-            this.handleDelayedBindModeChange(element, hoveredElement);
-          }
-        }
-      }
-    }
     if (!event[KEYS.CTRL_OR_CMD]) {
       const preferenceEnabled = this.state.bindingPreference === "enabled";
       if (this.state.isBindingEnabled !== preferenceEnabled) {
@@ -7078,21 +6706,6 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         // Update arrow points
-        const elementsMap = this.scene.getNonDeletedElementsMap();
-
-        if (isSimpleArrow(multiElement)) {
-          const hoveredElement = getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-            this.scene.getNonDeletedElements(),
-            elementsMap,
-            this.state.zoom,
-          );
-
-          if (getFeatureFlag("COMPLEX_BINDINGS")) {
-            this.handleDelayedBindModeChange(multiElement, hoveredElement);
-          }
-        }
-
         invariant(
           this.state.selectedLinearElement,
           "Expected selectedLinearElement to be set to operate on a linear element",
@@ -8048,9 +7661,6 @@ class App extends React.Component<AppProps, AppState> {
         this.handleInteractiveContentPointerUp(event);
       }
       return;
-    }
-    if (getFeatureFlag("COMPLEX_BINDINGS")) {
-      this.resetDelayedBindMode();
     }
 
     this.removePointer(event);
@@ -9318,7 +8928,6 @@ class App extends React.Component<AppProps, AppState> {
 
           return {
             ...prevState,
-            bindMode: "orbit",
             newElement: element,
             suggestedBinding:
               boundElement && isBindingElement(element)
@@ -9338,10 +8947,6 @@ class App extends React.Component<AppProps, AppState> {
           };
         });
       });
-
-      if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
-        this.handleDelayedBindModeChange(element, boundElement);
-      }
     }
   };
 
@@ -9762,26 +9367,6 @@ class App extends React.Component<AppProps, AppState> {
 
           if (element?.isDeleted) {
             return;
-          }
-
-          if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
-            const hoveredElement = getHoveredElementForBinding(
-              pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
-              this.scene.getNonDeletedElements(),
-              elementsMap,
-              this.state.zoom,
-            );
-
-            this.handleDelayedBindModeChange(element, hoveredElement);
-          }
-
-          if (
-            event.altKey &&
-            !this.state.selectedLinearElement?.initialState
-              ?.arrowStartIsInside &&
-            getFeatureFlag("COMPLEX_BINDINGS")
-          ) {
-            this.handleSkipBindMode();
           }
 
           // Ignore drag requests if the arrow modification already happened
@@ -10453,13 +10038,8 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      if (getFeatureFlag("COMPLEX_BINDINGS")) {
-        this.resetDelayedBindMode();
-      }
-
       this.setState({
         selectedElementsAreBeingDragged: false,
-        bindMode: "orbit",
       });
 
       if (
