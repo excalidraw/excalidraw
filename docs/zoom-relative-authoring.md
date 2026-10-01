@@ -1,53 +1,21 @@
 # Zoom-relative authoring
 
-draw.hypnodroid.com zooms from 0.1x to 1,000,000x. Upstream Excalidraw sizes
-everything the user makes in scene units: a medium stroke is 2 units wide, a
-new text is 20 units tall, a clicked sticky note is 250 units square. At 100x
-those are 200, 2,000 and 25,000 pixels on screen, so work done while zoomed in
-is drawn with a broom. This fork adds one setting that makes new work look the
-same on screen at any zoom, and one optional element field, `authoringScale`,
-that keeps the details drawn around that work the same too.
+draw.hypnodroid.com zooms from 0.1x to 1,000,000x. Upstream Excalidraw sizes everything the user makes in scene units: a medium stroke is 2 units wide, a new text is 20 units tall, a clicked sticky note is 250 units square. At 100x those are 200, 2,000 and 25,000 pixels on screen, so work done while zoomed in is drawn with a broom. This fork adds one setting that makes new work look the same on screen at any zoom, and one optional element field, `authoringScale`, that keeps the details drawn around that work the same too.
 
 ```tsx
 <Excalidraw authoringUnits="screen" freedrawStrokeWidth={penWidth} />
 ```
 
-With `authoringUnits="screen"`, every size the editor writes into a new or
-edited element is measured in screen pixels and divided by the zoom at that
-moment. Elements keep their scene sizes afterwards, so they zoom with the rest
-of the board. The default, `"scene"`, is upstream's behaviour. An element made
-at 100x is an ordinary element whose numbers happen to be small, plus
-`"authoringScale": 0.01`. Scene authoring, and screen authoring at 1x, write no
-`authoringScale`, so their elements are upstream's.
+With `authoringUnits="screen"`, every size the editor writes into a new or edited element is measured in screen pixels and divided by the zoom at that moment. Elements keep their scene sizes afterwards, so they zoom with the rest of the board. The default, `"scene"`, is upstream's behaviour. An element made at 100x is an ordinary element whose numbers happen to be small, plus `"authoringScale": 0.01`. Scene authoring, and screen authoring at 1x, write no `authoringScale`, so their elements are upstream's.
 
 ## The data shape
 
 Two numbers carry the whole feature.
 
-- **Authoring scale** (`getAuthoringScale(view)` in
-  `packages/element/src/authoring.ts`). Scene units per authoring unit: 1 in
-  scene units, `1 / zoom` in screen units. It is a function of the view
-  (`AuthoringView = Pick<AppState, "zoom" | "authoringUnits">`), so anything
-  holding an `AppState` can compute it. The editor multiplies it into every
-  size it writes (stroke widths, font sizes, default sizes, the adaptive corner
-  radius, nudge and paste offsets) and every scene-unit tolerance an
-  interaction uses (eraser reach, binding distance, the multi-point commit
-  zone, the drag threshold, the grid step).
-- **Detail scale** (`getElementDetailScale(element)`, same file). How the fixed
-  details that rendering and layout add around an element (arrowheads, dash
-  patterns, rough.js wobble, label padding, binding gaps, sticky note chrome,
-  minimum font sizes) scale with that element. It is the element's
-  `authoringScale` field: the authoring scale it was made at, written at
-  creation (`getAuthoringScaleField(view)`, spread into the constructor options
-  by `App.getCurrentItemScale` and `convertToShape`) and omitted when it is 1.
-  An absent field means 1, so every element upstream makes renders as
-  upstream renders it.
+- **Authoring scale** (`getAuthoringScale(view)` in `packages/element/src/authoring.ts`). Scene units per authoring unit: 1 in scene units, `1 / zoom` in screen units. It is a function of the view (`AuthoringView = Pick<AppState, "zoom" | "authoringUnits">`), so anything holding an `AppState` can compute it. The editor multiplies it into every size it writes (stroke widths, font sizes, default sizes, the adaptive corner radius, nudge and paste offsets) and every scene-unit tolerance an interaction uses (eraser reach, binding distance, the multi-point commit zone, the drag threshold, the grid step).
+- **Detail scale** (`getElementDetailScale(element)`, same file). How the fixed details that rendering and layout add around an element (arrowheads, dash patterns, rough.js wobble, label padding, binding gaps, sticky note chrome, minimum font sizes) scale with that element. It is the element's `authoringScale` field: the authoring scale it was made at, written at creation (`getAuthoringScaleField(view)`, spread into the constructor options by `App.getCurrentItemScale` and `convertToShape`) and omitted when it is 1. An absent field means 1, so every element upstream makes renders as upstream renders it.
 
-The prop `authoringUnits` is mirrored into `AppState.authoringUnits` by
-`App.getDerivedStateFromProps`, the way `gridModeEnabled` and
-`viewModeEnabled` reach the element package. The prop stays the source of
-truth whatever restores or resets the state, and the field is never stored or
-exported (`APP_STATE_STORAGE_CONF`).
+The prop `authoringUnits` is mirrored into `AppState.authoringUnits` by `App.getDerivedStateFromProps`, the way `gridModeEnabled` and `viewModeEnabled` reach the element package. The prop stays the source of truth whatever restores or resets the state, and the field is never stored or exported (`APP_STATE_STORAGE_CONF`).
 
 ## Designs considered
 
@@ -66,48 +34,22 @@ Within B, three ways to size the fixed details:
 | Scale by the element's stroke, `min(1, strokeWidth / thinnest named width)` | unchanged (scale 1) | exact at the thinnest width; at medium and bold the details are 2x and 4x their 1x size | Shipped in draw.4, replaced in draw.5. |
 | Scale by a stored per-element scale (`authoringScale`) | unchanged (field absent) | exact at every width | **Chosen** (design D). |
 
-The adaptive corner radius has an optional field in the format already
-(`roundness.value`), so a rounded rectangle made in screen mode stores
-`32 * authoringScale` there (`getRoundnessForShape`) and its corners match 1x
-exactly.
+The adaptive corner radius has an optional field in the format already (`roundness.value`), so a rounded rectangle made in screen mode stores `32 * authoringScale` there (`getRoundnessForShape`) and its corners match 1x exactly.
 
 ### The `authoringScale` field
 
-- Written at creation only. Every tool creates through
-  `App.getCurrentItemScale(type)`, which returns the stroke width and the
-  field together, so a new element cannot get one without the other. Shapes
-  recognised from a sketch (`convertToShape`) and flowchart nodes and their
-  arrows (`flowchart.ts`, copied from the parent) carry it too.
-- Edits keep it. The stroke width and font size pickers write screen-sized
-  values but leave the field alone, so an element's details stay at the size
-  they had where it was made.
-- Duplicate, copy and paste, undo, collaboration (`reconcileElements`) and
-  JSON and SVG export carry it as they carry any field.
-- `restore` keeps a finite positive value and drops anything else, and drops
-  1, so absent is the only spelling of 1.
-- Elements saved by draw.4 and earlier have no field, so their details render
-  at scale 1: a thin arrow made at 100x by draw.4 gets a 1x-sized head. There
-  is no migration, because the owner chose no backwards compatibility.
-- Zoomed out below 1x the field is above 1, so the details of work made there
-  grow with it and look on screen as they do at 1x.
+- Written at creation only. Every tool creates through `App.getCurrentItemScale(type)`, which returns the stroke width and the field together, so a new element cannot get one without the other. Shapes recognised from a sketch (`convertToShape`) and flowchart nodes and their arrows (`flowchart.ts`, copied from the parent) carry it too.
+- Edits keep it. The stroke width and font size pickers write screen-sized values but leave the field alone, so an element's details stay at the size they had where it was made.
+- Duplicate, copy and paste, undo, collaboration (`reconcileElements`) and JSON and SVG export carry it as they carry any field.
+- `restore` keeps a finite positive value and drops anything else, and drops 1, so absent is the only spelling of 1.
+- Elements saved by draw.4 and earlier have no field, so their details render at scale 1: a thin arrow made at 100x by draw.4 gets a 1x-sized head. There is no migration, because the owner chose no backwards compatibility.
+- Zoomed out below 1x the field is above 1, so the details of work made there grow with it and look on screen as they do at 1x.
 
-Shapes (rectangle, diamond, ellipse, line, arrow, embeddable) are generated at
-their nominal scale (the element divided by its detail scale, with
-`authoringScale: 1`) and scaled back (`generateAtDetailScale` in
-`packages/element/src/shape.ts`). That single choke point covers every
-constant in the shape generators: arrowhead sizes, dash patterns, the wobble
-rough.js adds in absolute units, the small-shape roughness cutoffs and the
-adaptive radius cutoff. The output is scaled back op by op, together with the
-stroke width, fill weight and dash options, so hit testing and SVG export see
-the same shape the canvas draws.
+Shapes (rectangle, diamond, ellipse, line, arrow, embeddable) are generated at their nominal scale (the element divided by its detail scale, with `authoringScale: 1`) and scaled back (`generateAtDetailScale` in `packages/element/src/shape.ts`). That single choke point covers every constant in the shape generators: arrowhead sizes, dash patterns, the wobble rough.js adds in absolute units, the small-shape roughness cutoffs and the adaptive radius cutoff. The output is scaled back op by op, together with the stroke width, fill weight and dash options, so hit testing and SVG export see the same shape the canvas draws.
 
 ## Inventory
 
-`S` marks a size the editor writes (scaled by the authoring scale), `T` an
-interaction tolerance (authoring scale), `D` a fixed detail (detail scale),
-`=` a value already divided by the zoom upstream and left alone, `x` a value
-left in scene units, with the reason. Line numbers are on branch
-`zoom-relative`.
+`S` marks a size the editor writes (scaled by the authoring scale), `T` an interaction tolerance (authoring scale), `D` a fixed detail (detail scale), `=` a value already divided by the zoom upstream and left alone, `x` a value left in scene units, with the reason. Line numbers are on branch `zoom-relative`.
 
 ### Sizes the editor writes
 
@@ -162,14 +104,7 @@ left in scene units, with the reason. Line numbers are on branch
 
 ### Text far under a pixel
 
-Chrome 154 measures and draws nothing for a canvas font much under a pixel:
-in the bench Chrome, "Hello world" keeps its width per pixel of font size
-down to 0.02px, thins out at 0.015px and is gone at 0.005px, while 20px text
-made at 1,000x is 0.02 units. `getFontSizeUpscale` (`common/src/utils.ts`)
-picks a power of two that brings the font to at least a pixel; text is
-measured (`textMeasurements.ts` `getLineWidth`) and drawn (`renderElement.ts`
-text and sticky note footer, `staticSvgScene.ts` text and footer) at that
-size and scaled back down. Fonts of a pixel or more are untouched.
+Chrome 154 measures and draws nothing for a canvas font much under a pixel: in the bench Chrome, "Hello world" keeps its width per pixel of font size down to 0.02px, thins out at 0.015px and is gone at 0.005px, while 20px text made at 1,000x is 0.02 units. `getFontSizeUpscale` (`common/src/utils.ts`) picks a power of two that brings the font to at least a pixel; text is measured (`textMeasurements.ts` `getLineWidth`) and drawn (`renderElement.ts` text and sticky note footer, `staticSvgScene.ts` text and footer) at that size and scaled back down. Fonts of a pixel or more are untouched.
 
 ### Left in scene units
 
@@ -185,43 +120,18 @@ size and scaled back down. Fonts of a pixel or more are untouched.
 
 ## Remaining differences on screen
 
-- An element whose stroke width is changed with the picker at a zoom other
-  than the one it was made at keeps the details of its original zoom, so its
-  head or dashes are no longer in proportion to the new stroke.
-- The eraser trail's corner smoothing reads pointer speed in scene units
-  inside the laser-pointer library, so its outline differs by up to about a
-  third between zooms.
-- SVG export with a reduced `precision` rounds coordinates to a fixed number
-  of decimals, which flattens anything drawn at depth. Unchanged here.
+- An element whose stroke width is changed with the picker at a zoom other than the one it was made at keeps the details of its original zoom, so its head or dashes are no longer in proportion to the new stroke.
+- The eraser trail's corner smoothing reads pointer speed in scene units inside the laser-pointer library, so its outline differs by up to about a third between zooms.
+- SVG export with a reduced `precision` rounds coordinates to a fixed number of decimals, which flattens anything drawn at depth. Unchanged here.
 
 ## Open decisions
 
-- Whether the stroke width picker should rewrite `authoringScale` to the
-  current zoom. Doing so would also change label padding, so bound text would
-  need laying out again.
-- Whether the elbow arrow router and the single-point freedraw stroke should
-  scale too.
+- Whether the stroke width picker should rewrite `authoringScale` to the current zoom. Doing so would also change label padding, so bound text would need laying out again.
+- Whether the elbow arrow router and the single-point freedraw stroke should scale too.
 
 ## Tests
 
-- `packages/excalidraw/tests/zoomRelativeAuthoring.test.tsx`: at zoom 1, 100
-  and 10,000 in screen mode, each tool (rectangle, ellipse, diamond, arrow,
-  line, frame, freedraw, text, labelled shape, sticky note) makes an element of
-  the same on-screen size, stroke and font; the corner radius matches, and at
-  thin, medium and bold widths so do the arrowhead, the dash pattern and the
-  label padding; the stroke width and font size pickers apply screen sizes;
-  the eraser takes a stroke 3 px away and leaves one 30 px away; a click 4 px
-  off a shape selects it and one 20 px off does not; an arrow ending 8 px from
-  a shape binds and one ending 40 px away does not; the grid stays 20 to
-  100 px on screen and nests; the eraser trail keeps its size. In scene mode,
-  new elements keep upstream's scene sizes at any zoom.
-- The same file: a medium arrow made at 100x keeps its head through JSON
-  export and restore and through duplication; `restore` drops an invalid
-  `authoringScale`; a rectangle made at 100x or 10,000x is cached in a bitmap
-  no bigger than it is on screen plus 20 px a side, and moving it reuses that
-  bitmap.
-- `packages/excalidraw/tests/freedrawStrokeWidth.test.tsx`: the pen width prop
-  in both units.
-- `packages/element/tests/paintExtent.test.ts`: a thick stroke whose ink, not
-  its centre line, crosses a frame or the viewport edge is exported with the
-  frame and counted as visible.
+- `packages/excalidraw/tests/zoomRelativeAuthoring.test.tsx`: at zoom 1, 100 and 10,000 in screen mode, each tool (rectangle, ellipse, diamond, arrow, line, frame, freedraw, text, labelled shape, sticky note) makes an element of the same on-screen size, stroke and font; the corner radius matches, and at thin, medium and bold widths so do the arrowhead, the dash pattern and the label padding; the stroke width and font size pickers apply screen sizes; the eraser takes a stroke 3 px away and leaves one 30 px away; a click 4 px off a shape selects it and one 20 px off does not; an arrow ending 8 px from a shape binds and one ending 40 px away does not; the grid stays 20 to 100 px on screen and nests; the eraser trail keeps its size. In scene mode, new elements keep upstream's scene sizes at any zoom.
+- The same file: a medium arrow made at 100x keeps its head through JSON export and restore and through duplication; `restore` drops an invalid `authoringScale`; a rectangle made at 100x or 10,000x is cached in a bitmap no bigger than it is on screen plus 20 px a side, and moving it reuses that bitmap.
+- `packages/excalidraw/tests/freedrawStrokeWidth.test.tsx`: the pen width prop in both units.
+- `packages/element/tests/paintExtent.test.ts`: a thick stroke whose ink, not its centre line, crosses a frame or the viewport edge is exported with the frame and counted as visible.
