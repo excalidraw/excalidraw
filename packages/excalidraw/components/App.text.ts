@@ -371,6 +371,18 @@ export class AppText {
     });
     // deselect all other elements when inserting text
     this.app.deselectElements();
+    // (the linear element editor stays up, to come back to on submit — but
+    // without the hover affordances, which are for the selection)
+    if (this.app.state.selectedLinearElement) {
+      this.app.setState({
+        selectedLinearElement: {
+          ...this.app.state.selectedLinearElement,
+          hoverPointIndex: -1,
+          segmentMidPointHoveredCoords: null,
+          hoveredFocusPointBinding: null,
+        },
+      });
+    }
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
