@@ -39,14 +39,20 @@ import {
 import "./ToolIcon.scss";
 import "./MobileToolbar.scss";
 
+import type { ActionManager } from "../actions/manager";
 import type { AppClassProperties, UIAppState } from "../types";
 
 type MobileToolbarProps = {
   app: AppClassProperties;
   setAppState: React.Component<any, UIAppState>["setState"];
+  renderAction: ActionManager["renderAction"];
 };
 
-export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
+export const MobileToolbar = ({
+  app,
+  setAppState,
+  renderAction,
+}: MobileToolbarProps) => {
   const activeTool = app.state.activeTool;
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
@@ -171,7 +177,10 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       <SelectionToolPopover {...toolProps} setAppState={setAppState} />
 
       {/* Free Draw */}
-      <FreedrawToolPopover {...toolProps} />
+      <FreedrawToolPopover {...toolProps}>
+        {app.props.freedrawStrokeWidth === undefined &&
+          renderAction("changeFreedrawStrokeWidth")}
+      </FreedrawToolPopover>
 
       {/* Eraser */}
       <EraserToolButton {...toolProps} hideShortcut />

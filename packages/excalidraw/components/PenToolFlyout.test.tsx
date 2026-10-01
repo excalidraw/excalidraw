@@ -205,6 +205,28 @@ describe("PenToolFlyout", () => {
     });
   });
 
+  describe("when a stroke is selected while authoring in screen units", () => {
+    beforeEach(async () => {
+      await render(<Excalidraw authoringUnits="screen" />);
+      const stroke = API.createElement({ type: "freedraw", strokeWidth: 0.5 });
+      API.setElements([stroke]);
+      API.setSelectedElements([stroke]);
+    });
+
+    describe("when the user zooms to 200%", () => {
+      let label: string | null | undefined;
+
+      beforeEach(() => {
+        API.setAppState({ zoom: { value: getNormalizedZoom(2) } });
+        label = document.querySelector(".pen-size-slider__value")?.textContent;
+      });
+
+      it("shows the stroke's on-screen width at the new zoom", () => {
+        expect(label).toBe("1");
+      });
+    });
+  });
+
   describe("when the host sets the pen width", () => {
     beforeEach(async () => {
       await render(<Excalidraw freedrawStrokeWidth={3} />);

@@ -173,6 +173,7 @@ import {
 } from "../hooks/useTextEditorFocus";
 
 import { getShortcutKey } from "../shortcut";
+import { useAppStateValue } from "../hooks/useAppStateValue";
 
 import {
   getColorTargetAppStateUpdates,
@@ -804,7 +805,7 @@ export const actionChangeFreedrawStrokeWidth = register<number>({
     };
   },
   PanelComponent: ({ elements, appState, updateData, app }) => {
-    const scale = getAuthoringScale(app.state);
+    const scale = useAppStateValue(getAuthoringScale);
     const width = getFormValue<number | null>(
       elements,
       app,
