@@ -1,10 +1,4 @@
-import {
-  arrayToMap,
-  getFeatureFlag,
-  getGridPoint,
-  invariant,
-  isTransparent,
-} from "@excalidraw/common";
+import { arrayToMap, getGridPoint, invariant } from "@excalidraw/common";
 
 import {
   PRECISION,
@@ -30,11 +24,9 @@ import type { Bounds } from "@excalidraw/common";
 
 import { getCenterForBounds } from "./bounds";
 import {
-  getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
   hitElementItself,
   intersectElementWithLineSegment,
-  isBindableElementInsideOtherBindable,
   isPointInElement,
 } from "./collision";
 import { distanceToElement } from "./distance";
@@ -130,7 +122,7 @@ export const getBindingGap = (
   return BASE_BINDING_GAP + bindTarget.strokeWidth / 2;
 };
 
-export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
+export const maxBindingDistance = (zoom?: AppState["zoom"]): number => {
   const BASE_BINDING_DISTANCE = Math.max(BASE_BINDING_GAP, 15);
   const zoomValue = zoom?.value && zoom.value < 1 ? zoom.value : 1;
   return clamp(
@@ -316,342 +308,7 @@ const bindingStrategyForElbowArrowEndpointDragging = (
     : { start: other, end: current };
 };
 
-const bindingStrategyForNewSimpleArrowEndpointDragging = (
-  arrow: NonDeleted<ExcalidrawArrowElement>,
-  draggingPoints: PointsPositionUpdates,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  startDragged: boolean,
-  endDragged: boolean,
-  startIdx: number,
-  endIdx: number,
-  appState: AppState,
-  globalBindMode?: AppState["bindMode"],
-  shiftKey?: boolean,
-): {
-  start: BindingStrategy;
-  end: BindingStrategy;
-} => {
-  let start: BindingStrategy = { mode: undefined };
-  let end: BindingStrategy = { mode: undefined };
-
-  const isMultiPoint = arrow.points.length > 2;
-  const point = LinearElementEditor.getPointGlobalCoordinates(
-    arrow,
-    draggingPoints.get(startDragged ? startIdx : endIdx)!.point,
-    elementsMap,
-  );
-  const hit = getHoveredElementForBinding(
-    point,
-    elements,
-    elementsMap,
-    appState.zoom,
-  );
-
-  // With new arrows this handles the binding at arrow creation
-  if (startDragged) {
-    if (hit) {
-      start = {
-        element: hit,
-        mode: "inside",
-        focusPoint: point,
-      };
-    } else {
-      start = { mode: null };
-    }
-
-    return { start, end };
-  }
-
-  // With new arrows it represents the continuous dragging of the end point
-  if (endDragged) {
-    const origin = appState?.selectedLinearElement?.initialState.origin;
-
-    // Inside -> inside binding
-    if (hit && arrow.startBinding?.elementId === hit.id) {
-      const center = pointFrom<GlobalPoint>(
-        hit.x + hit.width / 2,
-        hit.y + hit.height / 2,
-      );
-
-      return {
-        start: isMultiPoint
-          ? { mode: undefined }
-          : {
-              mode: "inside",
-              element: hit,
-              focusPoint: origin ?? center,
-            },
-        end: isMultiPoint
-          ? { mode: "orbit", element: hit, focusPoint: point }
-          : { mode: "inside", element: hit, focusPoint: point },
-      };
-    }
-
-    // Check and handle nested shapes
-    if (hit && arrow.startBinding) {
-      const startBinding = arrow.startBinding;
-      const allHits = getAllHoveredElementAtPoint(
-        point,
-        elements,
-        elementsMap,
-        appState.zoom,
-      );
-
-      if (allHits.find((el) => el.id === startBinding.elementId)) {
-        const otherElement = elementsMap.get(
-          arrow.startBinding.elementId,
-        ) as NonDeleted<ExcalidrawBindableElement>;
-
-        invariant(otherElement, "Other element must be in the elements map");
-
-        return {
-          start: isMultiPoint
-            ? { mode: undefined }
-            : {
-                mode: otherElement.id !== hit.id ? "orbit" : "inside",
-                element: otherElement,
-                focusPoint: origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
-              },
-          end: {
-            mode: "orbit",
-            element: hit,
-            focusPoint: point,
-          },
-        };
-      }
-    }
-
-    // Inside -> outside binding
-    if (arrow.startBinding && arrow.startBinding.elementId !== hit?.id) {
-      const otherElement = elementsMap.get(
-        arrow.startBinding.elementId,
-      ) as NonDeleted<ExcalidrawBindableElement>;
-      invariant(otherElement, "Other element must be in the elements map");
-
-      const otherIsInsideBinding =
-        !!appState.selectedLinearElement?.initialState.arrowStartIsInside;
-      const other: BindingStrategy = {
-        mode: otherIsInsideBinding ? "inside" : "orbit",
-        element: otherElement,
-        focusPoint: shiftKey
-          ? elementCenterPoint(otherElement, elementsMap)
-          : origin ?? pointFrom<GlobalPoint>(arrow.x, arrow.y),
-      };
-
-      // We are hovering another element with the end point
-      const isNested =
-        hit &&
-        isBindableElementInsideOtherBindable(otherElement, hit, elementsMap);
-      let current: BindingStrategy;
-      if (hit) {
-        const isInsideBinding =
-          globalBindMode === "inside" || globalBindMode === "skip";
-        current = {
-          mode: isInsideBinding && !isNested ? "inside" : "orbit",
-          element: hit,
-          focusPoint: isInsideBinding || isNested ? point : point,
-        };
-      } else {
-        current = { mode: null };
-      }
-
-      return {
-        start: isMultiPoint ? { mode: undefined } : other,
-        end: current,
-      };
-    }
-
-    // No start binding
-    if (!arrow.startBinding) {
-      if (hit) {
-        const isInsideBinding =
-          globalBindMode === "inside" || globalBindMode === "skip";
-
-        end = {
-          mode: isInsideBinding ? "inside" : "orbit",
-          element: hit,
-          focusPoint: point,
-        };
-      } else {
-        end = { mode: null };
-      }
-
-      return { start, end };
-    }
-  }
-
-  invariant(false, "New arrow creation should not reach here");
-};
-
-const bindingStrategyForSimpleArrowEndpointDragging_complex = (
-  point: GlobalPoint,
-  currentBinding: FixedPointBinding | null,
-  oppositeBinding: FixedPointBinding | null,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  globalBindMode: AppState["bindMode"],
-  arrow: NonDeleted<ExcalidrawArrowElement>,
-  zoom: AppState["zoom"],
-  finalize?: boolean,
-): { current: BindingStrategy; other: BindingStrategy } => {
-  let current: BindingStrategy = { mode: undefined };
-  let other: BindingStrategy = { mode: undefined };
-
-  const isMultiPoint = arrow.points.length > 2;
-  const hit = getHoveredElementForBinding(point, elements, elementsMap, zoom);
-  const isOverlapping = oppositeBinding
-    ? getAllHoveredElementAtPoint(point, elements, elementsMap, zoom).some(
-        (el) => el.id === oppositeBinding.elementId,
-      )
-    : false;
-  const oppositeElement = oppositeBinding
-    ? (elementsMap.get(
-        oppositeBinding.elementId,
-      ) as NonDeleted<ExcalidrawBindableElement>)
-    : null;
-  const otherIsTransparent =
-    isOverlapping && oppositeElement
-      ? isTransparent(oppositeElement.backgroundColor)
-      : false;
-  const isNested =
-    hit &&
-    oppositeElement &&
-    isBindableElementInsideOtherBindable(oppositeElement, hit, elementsMap);
-
-  // If the global bind mode is in free binding mode, just bind
-  // where the pointer is and keep the other end intact
-  if (globalBindMode === "inside" || globalBindMode === "skip") {
-    current = hit
-      ? {
-          element:
-            !isOverlapping || !oppositeElement || otherIsTransparent
-              ? hit
-              : oppositeElement,
-          focusPoint: point,
-          mode: "inside",
-        }
-      : { mode: null };
-    other =
-      finalize && hit && hit.id === oppositeBinding?.elementId
-        ? { mode: null }
-        : other;
-
-    return { current, other };
-  }
-
-  // Dragged point is outside of any bindable element
-  // so we break any existing binding
-  if (!hit) {
-    return { current: { mode: null }, other };
-  }
-
-  // Already inside binding over the same hit element should remain inside bound
-  if (
-    hit.id === currentBinding?.elementId &&
-    currentBinding.mode === "inside"
-  ) {
-    return {
-      current: { mode: "inside", focusPoint: point, element: hit },
-      other,
-    };
-  }
-
-  // The dragged point is inside the hovered bindable element
-  if (oppositeBinding) {
-    // The opposite binding is on the same element
-    if (oppositeBinding.elementId === hit.id) {
-      // The opposite binding is on the binding gap of the same element
-      if (oppositeBinding.mode === "orbit") {
-        current = { element: hit, mode: "orbit", focusPoint: point };
-        other = { mode: finalize ? null : undefined };
-
-        return { current, other: isMultiPoint ? { mode: undefined } : other };
-      }
-      // The opposite binding is inside the same element
-      // eslint-disable-next-line no-else-return
-      else {
-        current = { element: hit, mode: "inside", focusPoint: point };
-
-        return { current, other: isMultiPoint ? { mode: undefined } : other };
-      }
-    }
-    // The opposite binding is on a different element (or nested)
-    // eslint-disable-next-line no-else-return
-    else {
-      // Handle the nested element case
-      if (isOverlapping && oppositeElement && !otherIsTransparent) {
-        current = {
-          element: oppositeElement,
-          mode: "inside",
-          focusPoint: point,
-        };
-      } else {
-        current = {
-          element: hit,
-          mode: "orbit",
-          focusPoint: isNested ? point : point,
-        };
-      }
-
-      return { current, other: isMultiPoint ? { mode: undefined } : other };
-    }
-  }
-  // The opposite binding is on a different element or no binding
-  else {
-    current = {
-      element: hit,
-      mode: "orbit",
-      focusPoint: point,
-    };
-  }
-
-  // Must return as only one endpoint is dragged, therefore
-  // the end binding strategy might accidentally gets overriden
-  return { current, other: isMultiPoint ? { mode: undefined } : other };
-};
-
 export const getBindingStrategyForDraggingBindingElementEndpoints = (
-  arrow: NonDeleted<ExcalidrawArrowElement>,
-  draggingPoints: PointsPositionUpdates,
-  screenPointerX: number,
-  screenPointerY: number,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  appState: AppState,
-  opts?: {
-    newArrow?: boolean;
-    angleLocked?: boolean;
-    altKey?: boolean;
-    finalize?: boolean;
-    initialBinding?: boolean;
-    gridSize?: NullableGridSize;
-  },
-): { start: BindingStrategy; end: BindingStrategy } => {
-  if (getFeatureFlag("COMPLEX_BINDINGS")) {
-    return getBindingStrategyForDraggingBindingElementEndpoints_complex(
-      arrow,
-      draggingPoints,
-      elementsMap,
-      elements,
-      appState,
-      opts,
-    );
-  }
-
-  return getBindingStrategyForDraggingBindingElementEndpoints_simple(
-    arrow,
-    draggingPoints,
-    screenPointerX,
-    screenPointerY,
-    elementsMap,
-    elements,
-    appState,
-    opts,
-  );
-};
-
-const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
   scenePointerX: number,
@@ -904,7 +561,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
       point: globalPoint,
       element: otherBindableElement,
       elementsMap,
-      threshold: maxBindingDistance_simple(appState.zoom),
+      threshold: maxBindingDistance(appState.zoom),
       overrideShouldTestInside: true,
     });
   const otherPointWasInsideAtStart =
@@ -959,140 +616,6 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
     start: startDragged ? current : other,
     end: endDragged ? current : other,
   };
-};
-
-const getBindingStrategyForDraggingBindingElementEndpoints_complex = (
-  arrow: NonDeleted<ExcalidrawArrowElement>,
-  draggingPoints: PointsPositionUpdates,
-  elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  appState: AppState,
-  opts?: {
-    newArrow?: boolean;
-    shiftKey?: boolean;
-    finalize?: boolean;
-    initialBinding?: boolean;
-  },
-): { start: BindingStrategy; end: BindingStrategy } => {
-  const globalBindMode = appState.bindMode || "orbit";
-  const startIdx = 0;
-  const endIdx = arrow.points.length - 1;
-  const startDragged = draggingPoints.has(startIdx);
-  const endDragged = draggingPoints.has(endIdx);
-
-  let start: BindingStrategy = { mode: undefined };
-  let end: BindingStrategy = { mode: undefined };
-
-  if (arrow.points.length < 2) {
-    console.error(
-      "Attempting to bind a linear element with less than 2 points",
-    );
-    // a single-point can't be bound -> cancel
-    return { start: { mode: undefined }, end: { mode: undefined } };
-  }
-
-  // If none of the ends are dragged, we don't change anything
-  if (!startDragged && !endDragged) {
-    return { start, end };
-  }
-
-  // If both ends are dragged, we don't bind to anything
-  // and break existing bindings
-  if (startDragged && endDragged) {
-    return { start: { mode: null }, end: { mode: null } };
-  }
-
-  // If binding is disabled and an endpoint is dragged,
-  // we actively break the end binding
-  if (!isBindingEnabled(appState)) {
-    start = startDragged ? { mode: null } : start;
-    end = endDragged ? { mode: null } : end;
-
-    return { start, end };
-  }
-
-  // Handle simpler elbow arrow binding
-  if (isElbowArrow(arrow)) {
-    return bindingStrategyForElbowArrowEndpointDragging(
-      arrow,
-      draggingPoints,
-      elementsMap,
-      elements,
-      appState.zoom,
-    );
-  }
-
-  // Handle new arrow creation separately, as it is special
-  if (opts?.newArrow) {
-    const { start, end } = bindingStrategyForNewSimpleArrowEndpointDragging(
-      arrow,
-      draggingPoints,
-      elementsMap,
-      elements,
-      startDragged,
-      endDragged,
-      startIdx,
-      endIdx,
-      appState,
-      globalBindMode,
-      opts?.shiftKey,
-    );
-
-    return { start, end };
-  }
-
-  // Only the start point is dragged
-  if (startDragged) {
-    const localPoint = draggingPoints.get(startIdx)?.point;
-    invariant(localPoint, "Local point must be defined for start dragging");
-    const globalPoint = LinearElementEditor.getPointGlobalCoordinates(
-      arrow,
-      localPoint,
-      elementsMap,
-    );
-
-    const { current, other } =
-      bindingStrategyForSimpleArrowEndpointDragging_complex(
-        globalPoint,
-        arrow.startBinding,
-        arrow.endBinding,
-        elementsMap,
-        elements,
-        globalBindMode,
-        arrow,
-        appState.zoom,
-        opts?.finalize,
-      );
-
-    return { start: current, end: other };
-  }
-
-  // Only the end point is dragged
-  if (endDragged) {
-    const localPoint = draggingPoints.get(endIdx)?.point;
-    invariant(localPoint, "Local point must be defined for end dragging");
-    const globalPoint = LinearElementEditor.getPointGlobalCoordinates(
-      arrow,
-      localPoint,
-      elementsMap,
-    );
-    const { current, other } =
-      bindingStrategyForSimpleArrowEndpointDragging_complex(
-        globalPoint,
-        arrow.endBinding,
-        arrow.startBinding,
-        elementsMap,
-        elements,
-        globalBindMode,
-        arrow,
-        appState.zoom,
-        opts?.finalize,
-      );
-
-    return { start: other, end: current };
-  }
-
-  return { start, end };
 };
 
 export const bindOrUnbindBindingElements = (
@@ -1457,7 +980,7 @@ const updateArrowBindings = (
       element: bindableElement,
       point,
       elementsMap,
-      threshold: maxBindingDistance_simple(appState.zoom),
+      threshold: maxBindingDistance(appState.zoom),
     });
   const strategyName = startOrEnd === "startBinding" ? "start" : "end";
   unbindBindingElement(latestElement, strategyName, scene);
@@ -1465,16 +988,15 @@ const updateArrowBindings = (
     const pointIdx =
       startOrEnd === "startBinding" ? 0 : latestElement.points.length - 1;
     const localPoint = latestElement.points[pointIdx];
-    const strategy =
-      getBindingStrategyForDraggingBindingElementEndpoints_simple(
-        latestElement,
-        new Map([[pointIdx, { point: localPoint }]]),
-        point[0],
-        point[1],
-        elementsMap,
-        scene.getNonDeletedElements(),
-        appState,
-      );
+    const strategy = getBindingStrategyForDraggingBindingElementEndpoints(
+      latestElement,
+      new Map([[pointIdx, { point: localPoint }]]),
+      point[0],
+      point[1],
+      elementsMap,
+      scene.getNonDeletedElements(),
+      appState,
+    );
     if (
       strategy[strategyName] &&
       strategy[strategyName].element?.id === bindableElement.id &&
@@ -1609,7 +1131,7 @@ const getDistanceForBinding = (
   zoom?: AppState["zoom"],
 ) => {
   const distance = distanceToElement(bindableElement, elementsMap, point);
-  const bindDistance = maxBindingDistance_simple(zoom);
+  const bindDistance = maxBindingDistance(zoom);
 
   return distance > bindDistance ? null : distance;
 };

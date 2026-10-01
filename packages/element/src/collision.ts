@@ -35,7 +35,6 @@ import {
   elementCenterPoint,
   getCenterForBounds,
   getCubicBezierCurveBound,
-  getDiamondPoints,
   getElementBounds,
   pointInsideBounds,
 } from "./bounds";
@@ -63,7 +62,7 @@ import {
 
 import { distanceToElement } from "./distance";
 
-import { maxBindingDistance_simple } from "./binding";
+import { maxBindingDistance } from "./binding";
 
 import { hasBackground } from "./comparisons";
 
@@ -366,7 +365,7 @@ const getBindingCandidates = (
   elementsMap: NonDeletedSceneElementsMap,
   zoom: AppState["zoom"],
 ): BindingCandidate[] => {
-  const maxDistance = maxBindingDistance_simple(zoom);
+  const maxDistance = maxBindingDistance(zoom);
   const candidates: BindingCandidate[] = [];
   // A frame's children sit just below it in z-order, so a frame's background
   // can't end the search: it only hides the non-children behind it
@@ -419,20 +418,6 @@ const getBindingCandidates = (
 
   return candidates;
 };
-
-/**
- * All elements an arrow endpoint at the point could bind to. Always includes
- * the result of `getHoveredElementForBinding` for the same arguments.
- */
-export const getAllHoveredElementAtPoint = (
-  point: Readonly<GlobalPoint>,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
-  elementsMap: NonDeletedSceneElementsMap,
-  zoom: AppState["zoom"],
-): NonDeleted<ExcalidrawBindableElement>[] =>
-  getBindingCandidates(point, elements, elementsMap, zoom).map(
-    ({ element }) => element,
-  );
 
 export const getHoveredElementForBinding = (
   point: Readonly<GlobalPoint>,
@@ -882,62 +867,4 @@ export const isPointInElement = (
   ).filter((p, pos, arr) => arr.findIndex((q) => pointsEqual(q, p)) === pos);
 
   return intersections.length % 2 === 1;
-};
-
-export const isBindableElementInsideOtherBindable = (
-  innerElement: ExcalidrawBindableElement,
-  outerElement: ExcalidrawBindableElement,
-  elementsMap: ElementsMap,
-): boolean => {
-  // Get corner points of the inner element based on its type
-  const getCornerPoints = (
-    element: ExcalidrawElement,
-    offset: number,
-  ): GlobalPoint[] => {
-    const { x, y, width, height, angle } = element;
-    const center = elementCenterPoint(element, elementsMap);
-
-    if (element.type === "diamond") {
-      // Diamond has 4 corner points at the middle of each side
-      const [topX, topY, rightX, rightY, bottomX, bottomY, leftX, leftY] =
-        getDiamondPoints(element);
-      const corners: GlobalPoint[] = [
-        pointFrom(x + topX, y + topY - offset), // top
-        pointFrom(x + rightX + offset, y + rightY), // right
-        pointFrom(x + bottomX, y + bottomY + offset), // bottom
-        pointFrom(x + leftX - offset, y + leftY), // left
-      ];
-      return corners.map((corner) => pointRotateRads(corner, center, angle));
-    }
-    if (element.type === "ellipse") {
-      // For ellipse, test points at the extremes (top, right, bottom, left)
-      const cx = x + width / 2;
-      const cy = y + height / 2;
-      const rx = width / 2;
-      const ry = height / 2;
-      const corners: GlobalPoint[] = [
-        pointFrom(cx, cy - ry - offset), // top
-        pointFrom(cx + rx + offset, cy), // right
-        pointFrom(cx, cy + ry + offset), // bottom
-        pointFrom(cx - rx - offset, cy), // left
-      ];
-      return corners.map((corner) => pointRotateRads(corner, center, angle));
-    }
-    // Rectangle and other rectangular shapes (image, text, etc.)
-    const corners: GlobalPoint[] = [
-      pointFrom(x - offset, y - offset), // top-left
-      pointFrom(x + width + offset, y - offset), // top-right
-      pointFrom(x + width + offset, y + height + offset), // bottom-right
-      pointFrom(x - offset, y + height + offset), // bottom-left
-    ];
-    return corners.map((corner) => pointRotateRads(corner, center, angle));
-  };
-
-  const offset = (-1 * Math.max(innerElement.width, innerElement.height)) / 20; // 5% offset
-  const innerCorners = getCornerPoints(innerElement, offset);
-
-  // Check if all corner points of the inner element are inside the outer element
-  return innerCorners.every((corner) =>
-    isPointInElement(corner, outerElement, elementsMap),
-  );
 };
