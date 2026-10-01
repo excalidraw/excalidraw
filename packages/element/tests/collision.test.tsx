@@ -22,7 +22,6 @@ import type { Zoom } from "@excalidraw/excalidraw/types";
 import * as distance from "../src/distance";
 import { getElementBounds } from "../src/bounds";
 import {
-  getAllHoveredElementAtPoint,
   getHoveredElementForBinding,
   hitElementItself,
   intersectElementWithLineSegment,
@@ -697,23 +696,15 @@ describe("binding hit tests", () => {
     zoomValue = 1,
   ) => {
     const elementsMap = arrayToMap(elements) as NonDeletedSceneElementsMap;
-    return {
-      hovered: getHoveredElementForBinding(
-        point,
-        elements,
-        elementsMap,
-        zoom(zoomValue),
-      )?.id,
-      all: getAllHoveredElementAtPoint(
-        point,
-        elements,
-        elementsMap,
-        zoom(zoomValue),
-      ).map((element) => element.id),
-    };
+    return getHoveredElementForBinding(
+      point,
+      elements,
+      elementsMap,
+      zoom(zoomValue),
+    )?.id;
   };
 
-  it("both use the zoom-aware binding distance", () => {
+  it("uses the zoom-aware binding distance", () => {
     const rect = API.createElement({
       id: "rect",
       type: "rectangle",
@@ -726,15 +717,12 @@ describe("binding hit tests", () => {
     const point = pointFrom<GlobalPoint>(120, 50);
 
     // 15px binding distance at zoom 1
-    expect(hitTest([rect], point, 1)).toEqual({ hovered: undefined, all: [] });
+    expect(hitTest([rect], point, 1)).toBe(undefined);
     // 25px binding distance at zoom 0.4
-    expect(hitTest([rect], point, 0.4)).toEqual({
-      hovered: "rect",
-      all: ["rect"],
-    });
+    expect(hitTest([rect], point, 0.4)).toBe("rect");
   });
 
-  it("both skip elements hidden behind an opaque element", () => {
+  it("skips elements hidden behind an opaque element", () => {
     const hidden = API.createElement({
       id: "hidden",
       type: "rectangle",
@@ -757,14 +745,8 @@ describe("binding hit tests", () => {
       }) as SceneElement;
     const point = pointFrom<GlobalPoint>(50, 50);
 
-    expect(hitTest([hidden, cover("#ffc9c9")], point)).toEqual({
-      hovered: "cover",
-      all: ["cover"],
-    });
-
-    const transparent = hitTest([hidden, cover("transparent")], point);
-    expect(transparent.hovered).toBe("hidden");
-    expect(transparent.all).toEqual(["cover", "hidden"]);
+    expect(hitTest([hidden, cover("#ffc9c9")], point)).toBe("cover");
+    expect(hitTest([hidden, cover("transparent")], point)).toBe("hidden");
   });
 
   it("an image, and a locked opaque element, hide what's behind them", () => {
@@ -788,10 +770,7 @@ describe("binding hit tests", () => {
       height: 100,
       index: "a1" as SceneElement["index"],
     }) as SceneElement;
-    expect(hitTest([hidden, image], point)).toEqual({
-      hovered: "image",
-      all: ["image"],
-    });
+    expect(hitTest([hidden, image], point)).toBe("image");
 
     const locked = (backgroundColor: string) =>
       API.createElement({
@@ -806,15 +785,9 @@ describe("binding hit tests", () => {
         index: "a1" as SceneElement["index"],
       }) as SceneElement;
     // can't bind to the locked element, nor through it
-    expect(hitTest([hidden, locked("#ffc9c9")], point)).toEqual({
-      hovered: undefined,
-      all: [],
-    });
+    expect(hitTest([hidden, locked("#ffc9c9")], point)).toBe(undefined);
     // a transparent locked element hides nothing
-    expect(hitTest([hidden, locked("transparent")], point)).toEqual({
-      hovered: "hidden",
-      all: ["hidden"],
-    });
+    expect(hitTest([hidden, locked("transparent")], point)).toBe("hidden");
   });
 
   describe("overlapping elements", () => {
@@ -834,13 +807,13 @@ describe("binding hit tests", () => {
       const child = rect("child", 18, 80, 60, 40);
 
       // 5px inside the container's edge, 13px outside the child
-      expect(
-        hitTest([container, child], pointFrom<GlobalPoint>(5, 100)).hovered,
-      ).toBe("container");
+      expect(hitTest([container, child], pointFrom<GlobalPoint>(5, 100))).toBe(
+        "container",
+      );
       // closer to the child's outline than to the container's
-      expect(
-        hitTest([container, child], pointFrom<GlobalPoint>(10, 100)).hovered,
-      ).toBe("child");
+      expect(hitTest([container, child], pointFrom<GlobalPoint>(10, 100))).toBe(
+        "child",
+      );
     });
 
     it("binds to a smaller element straddling the container's edge when inside both", () => {
@@ -848,14 +821,14 @@ describe("binding hit tests", () => {
       const badge = rect("badge", -30, 80, 60, 40);
 
       // 3px inside the container's edge, inside the badge
-      expect(
-        hitTest([container, badge], pointFrom<GlobalPoint>(3, 92)).hovered,
-      ).toBe("badge");
+      expect(hitTest([container, badge], pointFrom<GlobalPoint>(3, 92))).toBe(
+        "badge",
+      );
       // 5px outside the container's edge, inside the badge: the closer
       // container outline wins
-      expect(
-        hitTest([container, badge], pointFrom<GlobalPoint>(-5, 108)).hovered,
-      ).toBe("container");
+      expect(hitTest([container, badge], pointFrom<GlobalPoint>(-5, 108))).toBe(
+        "container",
+      );
     });
   });
 
@@ -882,11 +855,8 @@ describe("binding hit tests", () => {
       }) as SceneElement;
     const center = pointFrom<GlobalPoint>(100, 100);
 
-    expect(hitTest([circle("transparent")], center).hovered).toBe("circle");
-    expect(hitTest([hidden, circle("#ffc9c9")], center)).toEqual({
-      hovered: "circle",
-      all: ["circle"],
-    });
+    expect(hitTest([circle("transparent")], center)).toBe("circle");
+    expect(hitTest([hidden, circle("#ffc9c9")], center)).toBe("circle");
   });
 });
 
