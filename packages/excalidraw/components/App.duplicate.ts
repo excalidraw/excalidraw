@@ -10,18 +10,22 @@ import {
 
 import {
   addElementsToFrame,
+  advanceDuplicatedListMarkers,
+  applyListMarkerAdvances,
   deepCopyElement,
   duplicateElements,
   filterElementsEligibleAsFrameChildren,
   getCommonBounds,
   getSelectionStateForElements,
   isBindableElement,
+  isTextElement,
   newElementWith,
   reconcileDuplicatedElements,
   syncMovedIndices,
   updateBoundElements,
 } from "@excalidraw/element";
 
+import type { ListMarkerAdvance } from "@excalidraw/element";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { PointerDownState } from "../types";
@@ -44,7 +48,13 @@ type Duplication = Pick<
  * `runOnDuplicate()`.
  */
 export class AppDuplicate {
-  constructor(private app: App) {}
+  constructor(
+    private app: App,
+    private dependencies: {
+      /** pointers currently down */
+      getPointerCount: () => number;
+    },
+  ) {}
 
   /**
    * Hands the duplication over to the host's `props.onDuplicate` (if any),
@@ -69,6 +79,99 @@ export class AppDuplicate {
       duplication.duplicatedElements,
     );
   };
+
+  /**
+   * Runs `update` once what's pending is committed, capturing what it changes
+   * (if it returns `true`) as a separate undo step.
+   */
+  private afterCommit(update: () => boolean) {
+    // (setState callbacks run after componentDidUpdate, which commits)
+    this.app.setState({}, () => {
+      if (update()) {
+        this.app.store.scheduleCapture();
+      }
+    });
+  }
+
+  /**
+   * Advances the list markers of the duplicated texts (`1.` -> `2.`) once
+   * the duplication is committed, as a separate undo step, so that undo
+   * reverts the markers first.
+   */
+  advanceListMarkers = (duplicatedElements: readonly ExcalidrawElement[]) => {
+    this.afterCommit(() => {
+      const duplicates = duplicatedElements.flatMap(
+        (element) => this.app.scene.getNonDeletedElement(element.id) ?? [],
+      );
+
+      return (
+        advanceDuplicatedListMarkers(duplicates, this.app.scene).length > 0
+      );
+    });
+  };
+
+  /**
+   * On alt-drag drop: the list markers advanced along with the drag go back,
+   * for the drag to be committed as is, and forth again once it is, as
+   * a separate undo step (before the browser gets to paint either).
+   *
+   * A single list item with text after its marker is then edited, with that
+   * text selected (`1. |foo|`), as it's likely to differ from the original's.
+   */
+  commitDraggedListMarkers = (
+    advances: readonly ListMarkerAdvance[],
+    {
+      editListItem,
+    }: {
+      /** `false` if the drag didn't end with a genuine pointerup */
+      editListItem: boolean;
+    },
+  ) => {
+    applyListMarkerAdvances(advances, "prev", this.app.scene);
+
+    this.afterCommit(() => {
+      applyListMarkerAdvances(advances, "next", this.app.scene);
+
+      const [advance] = advances;
+      if (
+        editListItem &&
+        advances.length === 1 &&
+        advance.contentStart < advance.nextOriginalText.length
+      ) {
+        // once the marker is committed
+        this.afterCommit(() => {
+          this.editListItemText(advance);
+          return false;
+        });
+      }
+
+      return true;
+    });
+  };
+
+  private editListItemText(advance: ListMarkerAdvance) {
+    const element = this.app.scene.getNonDeletedElement(advance.elementId);
+    if (
+      !element ||
+      !isTextElement(element) ||
+      element.originalText !== advance.nextOriginalText ||
+      // another interaction has started
+      this.dependencies.getPointerCount() > 0
+    ) {
+      return;
+    }
+
+    this.app.text.startTextEditing({
+      sceneX: element.x,
+      sceneY: element.y,
+      insertAtParentCenter: false,
+      textElement: element,
+      initialSelection: {
+        start: advance.contentStart,
+        end: element.originalText.length,
+      },
+    });
+  }
 
   /**
    * Duplicates elements so that they end up centered at the scene coords
@@ -249,13 +352,6 @@ export class AppDuplicate {
     // (originals whose duplicates were vetoed are left behind)
     const duplicateElementsMap = arrayToMap(duplicatedElements);
 
-    duplicatedElements.forEach((element) => {
-      pointerDownState.originalElements.set(
-        element.id,
-        deepCopyElement(element),
-      );
-    });
-
     const elementsWithIndices = syncMovedIndices(
       nextElements,
       duplicateElementsMap,
@@ -304,6 +400,22 @@ export class AppDuplicate {
       }));
 
       this.app.scene.replaceAllElements(elementsWithIndices);
+
+      // visible from the start of the drag, captured on drop (see
+      // `commitDraggedListMarkers()`)
+      pointerDownState.hit.advancedListMarkers = advanceDuplicatedListMarkers(
+        duplicatedElements,
+        this.app.scene,
+      );
+
+      // (after advancing the list markers, which may resize the duplicates)
+      duplicatedElements.forEach((element) => {
+        pointerDownState.originalElements.set(
+          element.id,
+          deepCopyElement(element),
+        );
+      });
+
       selectedElements.forEach((element) => {
         if (
           isBindableElement(element) &&

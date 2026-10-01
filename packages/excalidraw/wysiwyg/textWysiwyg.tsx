@@ -257,6 +257,7 @@ export const textWysiwyg = ({
   app,
   autoSelect = true,
   initialCaretSceneCoords = null,
+  initialSelection = null,
 }: {
   /**
    * textWysiwyg only deals with `originalText`
@@ -273,6 +274,8 @@ export const textWysiwyg = ({
   app: App;
   autoSelect?: boolean;
   initialCaretSceneCoords?: { x: number; y: number } | null;
+  /** range of `originalText` to select (takes precedence over the caret) */
+  initialSelection?: { start: number; end: number } | null;
 }): SubmitHandler => {
   const ownerDocument = excalidrawContainer?.ownerDocument ?? document;
   const ownerWindow = ownerDocument.defaultView ?? window;
@@ -724,18 +727,20 @@ export const textWysiwyg = ({
     }
   };
 
-  let pendingInitialSelection = (() => {
-    const caretIndex = getCaretIndexFromInitialSceneCoords();
+  let pendingInitialSelection =
+    initialSelection ??
+    (() => {
+      const caretIndex = getCaretIndexFromInitialSceneCoords();
 
-    if (caretIndex === null) {
-      return null;
-    }
+      if (caretIndex === null) {
+        return null;
+      }
 
-    return {
-      start: caretIndex,
-      end: caretIndex,
-    };
-  })();
+      return {
+        start: caretIndex,
+        end: caretIndex,
+      };
+    })();
 
   if (onChange) {
     editable.onpaste = async (event) => {

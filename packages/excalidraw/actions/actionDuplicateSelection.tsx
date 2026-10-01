@@ -98,6 +98,8 @@ export const actionDuplicateSelection = register({
       }
     }
 
+    app.duplicate.advanceListMarkers(duplicatedElements);
+
     return {
       elements: syncMovedIndices(
         elementsWithDuplicates,

@@ -16,11 +16,16 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 
 import { UI, Keyboard, Pointer } from "@excalidraw/excalidraw/tests/helpers/ui";
 
+import { getTextEditor } from "@excalidraw/excalidraw/tests/queries/dom";
+
 import {
+  GlobalTestState,
   act,
   assertElements,
+  fireEvent,
   getCloneByOrigId,
   render,
+  waitFor,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
 import type { LocalPoint } from "@excalidraw/math";
@@ -31,7 +36,13 @@ import {
   duplicateElements,
 } from "../src/duplicate";
 
-import type { ExcalidrawLinearElement } from "../src/types";
+import { isBoundToContainer, isTextElement } from "../src/typeChecks";
+
+import type {
+  ExcalidrawLinearElement,
+  ExcalidrawTextElement,
+  NonDeletedExcalidrawElement,
+} from "../src/types";
 
 const { h } = window;
 const mouse = new Pointer("mouse");
@@ -860,6 +871,316 @@ describe("duplication z-order", () => {
         id: arrow.id,
         endBinding: expect.objectContaining({ elementId: rect.id }),
       },
+    ]);
+  });
+});
+
+describe("duplicating list items", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  const duplicate = (texts: string[]) => {
+    const elements = texts.map((text, index) =>
+      API.createElement({ type: "text", text, y: index * 100 }),
+    );
+    API.setElements(elements);
+    API.setSelectedElements(elements);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    // (each duplicate goes right after its original)
+    const duplicates = h.elements.filter(
+      (element) => h.state.selectedElementIds[element.id],
+    ) as ExcalidrawTextElement[];
+
+    return duplicates.map((element) => {
+      expect(element).toMatchObject({ text: element.originalText });
+      return element.originalText;
+    });
+  };
+
+  it.each([
+    ["1. foo", "2. foo"],
+    ["1) foo", "2) foo"],
+    ["(9) foo", "(10) foo"],
+    ["[1] foo", "[2] foo"],
+    ["09. foo", "10. foo"],
+    ["0.", "1."],
+    ["  b. foo", "  c. foo"],
+    ["A) foo", "B) foo"],
+    ["(a) foo", "(b) foo"],
+    ["(A) foo", "(B) foo"],
+    // below `i` alphabetically, from `i` up as roman numerals
+    ["h. foo", "i. foo"],
+    ["i. foo", "ii. foo"],
+    ["viii) foo", "ix) foo"],
+    ["(iv) foo", "(v) foo"],
+    ["XXXIX. foo", "XL. foo"],
+    ["l. foo", "li. foo"],
+    ["1. step\n  a. sub-step", "2. step\n  a. sub-step"],
+    // lone numbers
+    ["7", "8"],
+    [" 05 ", " 06 "],
+    // numbers up to 42
+    ["41", "42"],
+    ["42", "42"],
+    ["2024", "2024"],
+    ["(41) foo", "(42) foo"],
+    ["42. foo", "42. foo"],
+    // not list items
+    ["1.5 kg", "1.5 kg"],
+    ["e.g. foo", "e.g. foo"],
+    ["[a] foo", "[a] foo"],
+    ["j. foo", "j. foo"],
+    ["Ii. foo", "Ii. foo"],
+    ["iiii. foo", "iiii. foo"],
+    ["xcix. foo", "xcix. foo"],
+    ["1. foo\n2. bar", "1. foo\n2. bar"],
+  ])("advances the marker of %j", (text, expected) => {
+    expect(duplicate([text])).toEqual([expected]);
+  });
+
+  it("continues the list from the highest of the duplicated items", () => {
+    expect(duplicate(["5.", "1.", "3.", "a.", "1", "1"])).toEqual([
+      "8.",
+      "6.",
+      "7.",
+      "b.",
+      "2",
+      "3",
+    ]);
+  });
+
+  it.each<[string, () => NonDeletedExcalidrawElement[], string[]]>([
+    [
+      "labeled containers",
+      () => [
+        ...API.createTextContainer({ label: { text: "1." } }),
+        ...API.createTextContainer({ label: { text: "2." } }),
+      ],
+      ["3.", "4."],
+    ],
+    // several list items only if they're just markers
+    [
+      "list items with text",
+      () => [
+        API.createElement({ type: "text", text: "1. aa" }),
+        API.createElement({ type: "text", text: "2. bb" }),
+        API.createElement({ type: "text", text: "3. cc" }),
+      ],
+      ["1. aa", "2. bb", "3. cc"],
+    ],
+    // along with anything else, list items are copied as they are
+    [
+      "a labeled container and another element",
+      () => [
+        ...API.createTextContainer({ label: { text: "1. foo" } }),
+        API.createElement({ type: "rectangle" }),
+      ],
+      ["1. foo"],
+    ],
+    [
+      "a list item and another text",
+      () => [
+        API.createElement({ type: "text", text: "1. foo" }),
+        API.createElement({ type: "text", text: "foo" }),
+      ],
+      ["1. foo", "foo"],
+    ],
+    [
+      "a list item and another element",
+      () => [
+        API.createElement({ type: "text", text: "1. foo" }),
+        API.createElement({ type: "rectangle" }),
+      ],
+      ["1. foo"],
+    ],
+  ])("duplicating %s", (_, createElements, expected) => {
+    const elements = createElements();
+    API.setElements(elements);
+    API.setSelectedElements(
+      elements.filter((element) => !isBoundToContainer(element)),
+    );
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    expect(
+      elements
+        .filter(isTextElement)
+        .map(
+          (text) =>
+            (getCloneByOrigId(text.id) as ExcalidrawTextElement).originalText,
+        ),
+    ).toEqual(expected);
+  });
+
+  it("stops letters at `i` (the switch to roman numerals)", () => {
+    expect(duplicate(["g.", "h."])).toEqual(["i.", "h."]);
+  });
+
+  it.each([
+    ["rectangle", "9. foo", "10. foo"],
+    ["stickynote", "9. foo", "10. foo"],
+    ["ellipse", "3", "4"],
+  ] as const)(
+    "advances the marker of a %s label %j",
+    (type, text, expected) => {
+      const container = API.createElement({ type });
+      const label = API.createElement({
+        type: "text",
+        text,
+        containerId: container.id,
+      });
+      API.setElements([container, label]);
+      h.app.scene.mutateElement(container, {
+        boundElements: [{ type: "text", id: label.id }],
+      });
+      API.setSelectedElements([container]);
+
+      act(() => {
+        h.app.actionManager.executeAction(actionDuplicateSelection);
+      });
+
+      assertElements(h.elements, [
+        { id: container.id },
+        { id: label.id, originalText: text },
+        { [ORIG_ID]: container.id, selected: true },
+        {
+          [ORIG_ID]: label.id,
+          containerId: getCloneByOrigId(container.id).id,
+          originalText: expected,
+        },
+      ]);
+    },
+  );
+
+  it("undo reverts the marker before the duplication", () => {
+    const text = API.createElement({ type: "text", text: "1. foo" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+    // (undo loses the ORIG_ID)
+    const { id } = getCloneByOrigId(text.id);
+
+    Keyboard.undo();
+    assertElements(h.elements, [
+      { id: text.id, originalText: "1. foo" },
+      { id, selected: true, originalText: "1. foo" },
+    ]);
+
+    Keyboard.undo();
+    assertElements(h.elements, [{ id: text.id }, { id, isDeleted: true }]);
+  });
+
+  it("alt-drag advances the markers from the start of the drag, undoably", async () => {
+    const [container, label] = API.createTextContainer({
+      label: { text: "9. foo" },
+    });
+    API.setElements([container, label]);
+    API.setSelectedElements([container]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(container.x + 5, container.y + 5);
+      mouse.move(50, 50);
+    });
+
+    expect(getCloneByOrigId(label.id)).toMatchObject({
+      originalText: "10. foo",
+    });
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.up();
+    });
+
+    // (undo loses the ORIG_ID)
+    const duplicate = getCloneByOrigId(container.id);
+    const duplicateLabel = getCloneByOrigId(label.id);
+    expect(duplicateLabel).toMatchObject({ originalText: "10. foo" });
+
+    // on to editing the item's text
+    const editor = await getTextEditor();
+    expect(h.state.editingTextElement?.id).toBe(duplicateLabel.id);
+    expect(editor.value).toBe("10. foo");
+    await waitFor(() =>
+      expect([editor.selectionStart, editor.selectionEnd]).toEqual([4, 7]),
+    );
+    Keyboard.exitTextEditor(editor);
+
+    Keyboard.undo();
+    assertElements(h.elements, [
+      { id: container.id },
+      { id: label.id, originalText: "9. foo" },
+      { id: duplicate.id, selected: true, x: duplicate.x, y: duplicate.y },
+      { id: duplicateLabel.id, originalText: "9. foo" },
+    ]);
+
+    Keyboard.redo();
+    assertElements(h.elements, [
+      { id: container.id },
+      { id: label.id },
+      { id: duplicate.id, selected: true },
+      { id: duplicateLabel.id, originalText: "10. foo" },
+    ]);
+  });
+
+  it("alt-drag doesn't edit a list item without text", () => {
+    const text = API.createElement({ type: "text", text: "1" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(text.x + 5, text.y + 5);
+      mouse.up(50, 50);
+    });
+
+    expect(getCloneByOrigId(text.id)).toMatchObject({ originalText: "2" });
+    expect(h.state.editingTextElement).toBe(null);
+  });
+
+  it("alt-drag doesn't edit the list item when the drag gets interrupted", () => {
+    const text = API.createElement({ type: "text", text: "1. foo" });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.down(text.x + 5, text.y + 5);
+      mouse.move(50, 50);
+    });
+    fireEvent.pointerCancel(GlobalTestState.interactiveCanvas, {
+      pointerId: 1,
+    });
+
+    expect(getCloneByOrigId(text.id)).toMatchObject({ originalText: "2. foo" });
+    expect(h.state.editingTextElement).toBe(null);
+  });
+
+  it("leaves the texts of a duplicated frame as they are", () => {
+    const frame = API.createElement({ type: "frame", width: 500 });
+    const text = API.createElement({
+      type: "text",
+      text: "1. foo",
+      frameId: frame.id,
+    });
+    API.setElements([text, frame]);
+    API.setSelectedElements([frame]);
+
+    act(() => {
+      h.app.actionManager.executeAction(actionDuplicateSelection);
+    });
+
+    assertElements(h.elements, [
+      { id: text.id },
+      { id: frame.id },
+      { [ORIG_ID]: text.id, originalText: "1. foo" },
+      { [ORIG_ID]: frame.id, selected: true },
     ]);
   });
 });

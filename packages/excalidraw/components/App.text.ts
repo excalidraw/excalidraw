@@ -170,6 +170,7 @@ export class AppText {
     {
       isExistingElement = false,
       initialCaretSceneCoords = null,
+      initialSelection = null,
     }: {
       isExistingElement?: boolean;
       /**
@@ -177,6 +178,8 @@ export class AppText {
        * text should be auto-selected
        */
       initialCaretSceneCoords?: { x: number; y: number } | null;
+      /** range of the text to select (takes precedence over the caret) */
+      initialSelection?: { start: number; end: number } | null;
     },
   ) {
     const elementsMap = this.app.scene.getElementsMapIncludingDeleted();
@@ -359,6 +362,7 @@ export class AppText {
       excalidrawContainer: this.dependencies.getContainer(),
       app: this.app,
       initialCaretSceneCoords,
+      initialSelection,
       // when text is selected, it's hard (at least on iOS) to re-position the
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
@@ -601,6 +605,7 @@ export class AppText {
     container,
     autoEdit = true,
     initialCaretSceneCoords,
+    initialSelection,
     arrowEndpoint,
     textElement,
   }: {
@@ -613,6 +618,8 @@ export class AppText {
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
     initialCaretSceneCoords?: { x: number; y: number };
+    /** range of an existing text to select (takes precedence over the caret) */
+    initialSelection?: { start: number; end: number };
     /**
      * creates the text as a label for this arrow endpoint: the binding then
      * dictates the text's position and alignment, overriding (sceneX, sceneY)
@@ -843,6 +850,7 @@ export class AppText {
         initialCaretSceneCoords: existingTextElement
           ? initialCaretSceneCoords
           : null,
+        initialSelection: existingTextElement ? initialSelection : null,
       });
     } else {
       this.app.setState({
