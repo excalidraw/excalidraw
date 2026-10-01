@@ -98,6 +98,9 @@ export type CollaboratorPointer = {
   x: number;
   y: number;
   tool: "pointer" | "laser";
+  laserMode?: LaserMode;
+  laserThickness?: number;
+  laserNeon?: boolean;
   /**
    * Whether to render cursor + username. Useful when you only want to render
    * laser trail.
@@ -165,6 +168,8 @@ export type ToolType =
   | "laser"
   | "autoshape"
   | "bucketfill";
+
+export type LaserMode = "pointer" | "annotation" | "hold";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -439,6 +444,9 @@ export interface AppState {
   // Pen handling
   penMode: boolean;
   penDetected: boolean;
+  laserMode: LaserMode;
+  laserThickness: number;
+  laserNeon: boolean;
 
   exportBackground: boolean;
   exportEmbedScene: boolean;
@@ -881,7 +889,14 @@ export interface ExcalidrawProps {
   onInitialize?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
-    pointer: { x: number; y: number; tool: "pointer" | "laser" };
+    pointer: {
+      x: number;
+      y: number;
+      tool: "pointer" | "laser";
+      laserMode?: LaserMode;
+      laserThickness?: number;
+      laserNeon?: boolean;
+    };
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;
@@ -1211,6 +1226,7 @@ export type AppClassProperties = {
   setOpenDialog: App["setOpenDialog"];
   insertEmbeddableElement: App["insertEmbeddableElement"];
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
+  clearLaserTrails: App["clearLaserTrails"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
   flowchart: App["flowchart"];
