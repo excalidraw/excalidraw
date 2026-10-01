@@ -17,7 +17,7 @@ const FULL_HEIGHT = 90;
 const MIN_WIDTH_PER_LABEL = 2;
 const FULL_WIDTH_PER_LABEL = 3;
 const LABEL_SPACING = 120;
-const LABEL_HEIGHT =
+export const FRAME_NAME_HEIGHT =
   FRAME_STYLE.nameFontSize * FRAME_STYLE.nameLineHeight +
   FRAME_STYLE.nameOffsetY;
 
@@ -46,9 +46,9 @@ const labelOnScreen = (f: FrameNameLayout, viewport: Size) =>
   f.x < viewport.width &&
   f.x + Math.min(f.width, f.labelWidth) > 0 &&
   f.y > 0 &&
-  f.y - LABEL_HEIGHT < viewport.height;
+  f.y - FRAME_NAME_HEIGHT < viewport.height;
 
-// Mirrors the draw app's breadcrumb: the innermost frame that holds the middle of the view and fills half of it.
+// The frame the view is in: the innermost one holding the middle of the view and filling half of it.
 const currentFrame = (frames: readonly FrameNameLayout[], viewport: Size) =>
   frames
     .filter(
@@ -64,42 +64,47 @@ const currentFrame = (frames: readonly FrameNameLayout[], viewport: Size) =>
       null,
     );
 
+// Selected and hovered names show on top of the others without displacing
+// them, so moving the pointer never reshuffles the rest of the board.
 export const frameNameOpacities = (
   frames: readonly FrameNameLayout[],
   viewport: Size,
   pinnedIds: ReadonlySet<string>,
 ) => {
   const current = currentFrame(frames, viewport);
-  const isPinned = (f: FrameNameLayout) =>
-    pinnedIds.has(f.id) || f.id === current?.id;
-  const bySize = [...frames].sort((a, b) => area(b) - area(a));
   const opacities = new Map<string, number>();
-  const placed: FrameNameLayout[] = [];
-
-  for (const f of bySize.filter(isPinned)) {
-    opacities.set(f.id, 1);
-    placed.push(f);
-  }
-
+  const placed: FrameNameLayout[] = current ? [current] : [];
+  const tooSmall = new Set<string>();
   const decided: FrameNameLayout[] = [];
-  for (const f of bySize) {
+
+  for (const f of [...frames].sort((a, b) => area(b) - area(a))) {
     const parent = decided.findLast((p) => contains(p, f));
     decided.push(f);
-    if (isPinned(f)) {
+    const opacity = parent && tooSmall.has(parent.id) ? 0 : sizeOpacity(f);
+    if (opacity === 0) {
+      tooSmall.add(f.id);
+    }
+    if (pinnedIds.has(f.id) || f.id === current?.id) {
+      opacities.set(f.id, 1);
       continue;
     }
-    const opacity = parent && !opacities.get(parent.id) ? 0 : sizeOpacity(f);
     if (opacity === 0 || !labelOnScreen(f, viewport)) {
       opacities.set(f.id, opacity);
       continue;
     }
-    const crowded = placed.some(
-      (p) =>
-        labelOnScreen(p, viewport) &&
-        Math.hypot(p.x - f.x, p.y - f.y) < LABEL_SPACING,
+    const crowding = Math.max(
+      0,
+      ...placed
+        .filter(
+          (p) =>
+            labelOnScreen(p, viewport) &&
+            Math.hypot(p.x - f.x, p.y - f.y) < LABEL_SPACING,
+        )
+        .map((p) => opacities.get(p.id) ?? 1),
     );
-    opacities.set(f.id, crowded ? 0 : opacity);
-    if (!crowded) {
+    const shown = opacity * (1 - crowding);
+    opacities.set(f.id, shown);
+    if (shown > 0) {
       placed.push(f);
     }
   }

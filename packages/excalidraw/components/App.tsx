@@ -401,7 +401,7 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isOverScrollBars } from "../scene/scrollbars";
 import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
-import { frameNameOpacities } from "../frameNameVisibility";
+import { FRAME_NAME_HEIGHT, frameNameOpacities } from "../frameNameVisibility";
 import { getShortcutKey } from "../shortcut";
 
 import {
@@ -2151,7 +2151,9 @@ class App extends React.Component<AppProps, AppState> {
           fontFamily: FONT_FAMILY.Assistant,
         }),
       );
-    this.frameNameWidths.set(name, width);
+    if (this.ownerDocument.fonts?.status !== "loading") {
+      this.frameNameWidths.set(name, width);
+    }
     return width;
   };
 
@@ -2159,6 +2161,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent,
     scenePointer: { x: number; y: number },
   ) => {
+    const zoom = this.state.zoom.value;
     const hovered =
       event.pointerType === "touch"
         ? null
@@ -2167,8 +2170,13 @@ class App extends React.Component<AppProps, AppState> {
             .filter(
               (f) =>
                 scenePointer.x >= f.x &&
-                scenePointer.x <= f.x + f.width &&
-                scenePointer.y >= f.y &&
+                scenePointer.x <=
+                  f.x +
+                    Math.max(
+                      f.width,
+                      this.getFrameNameWidth(getFrameLikeTitle(f)) / zoom,
+                    ) &&
+                scenePointer.y >= f.y - FRAME_NAME_HEIGHT / zoom &&
                 scenePointer.y <= f.y + f.height,
             )
             .reduce<ExcalidrawFrameLikeElement | null>(

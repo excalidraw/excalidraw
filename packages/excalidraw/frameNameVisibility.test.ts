@@ -156,4 +156,51 @@ describe("frameNameOpacities", () => {
       expect(result.get("frame-inner-keep")).toBe(1);
     });
   });
+  describe("when a small frame in a section's corner is pinned", () => {
+    beforeEach(() => {
+      frames = [
+        frame("frame-section-rusty", 20, 100, 350, 450),
+        frame("frame-corner-note", 22, 102, 15, 10),
+        frame("frame-sibling-far", 150, 300, 200, 200),
+      ];
+      pinned.add("frame-corner-note");
+      result = frameNameOpacities(frames, viewport, pinned);
+    });
+
+    it("should leave the other names as they were", () => {
+      expect([
+        result.get("frame-section-rusty"),
+        result.get("frame-sibling-far"),
+      ]).toEqual([1, 1]);
+    });
+  });
+
+  describe("when a parent's name is crowded out but the parent is big enough", () => {
+    beforeEach(() => {
+      frames = [
+        frame("frame-grand-hall", 20, 100, 190, 400),
+        frame("frame-anteroom", 30, 110, 170, 380),
+        frame("frame-far-closet", 60, 300, 120, 100, 30),
+      ];
+      result = frameNameOpacities(frames, viewport, pinned);
+    });
+
+    it("should still show its child's name", () => {
+      expect(result.get("frame-far-closet")).toBe(1);
+    });
+  });
+
+  describe("when a barely visible name sits near a name with room to show", () => {
+    beforeEach(() => {
+      frames = [
+        frame("frame-faint-parlour", 20, 100, 205, 300, 100),
+        frame("frame-bright-nook", 40, 150, 150, 120),
+      ];
+      result = frameNameOpacities(frames, viewport, pinned);
+    });
+
+    it("should dim the nearby name only as much as the faint one shows", () => {
+      expect(result.get("frame-bright-nook")).toBeCloseTo(0.95);
+    });
+  });
 });
