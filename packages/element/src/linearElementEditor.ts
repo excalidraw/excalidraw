@@ -812,6 +812,7 @@ export class LinearElementEditor {
     element: ExcalidrawLinearElement,
     elementsMap: ElementsMap,
     appState: InteractiveCanvasAppState,
+    handleScale = 1,
   ): (GlobalPoint | null)[] => {
     const boundText = getBoundTextElement(element, elementsMap);
 
@@ -841,6 +842,7 @@ export class LinearElementEditor {
           index,
           appState.zoom,
           elementsMap,
+          handleScale,
         )
       ) {
         midpoints.push(null);
@@ -864,6 +866,7 @@ export class LinearElementEditor {
     scenePointer: { x: number; y: number },
     appState: AppState,
     elementsMap: ElementsMap,
+    handleScale = 1,
   ): GlobalPoint | null => {
     const { elementId } = linearElementEditor;
     const element = LinearElementEditor.getElement(elementId, elementsMap);
@@ -876,6 +879,7 @@ export class LinearElementEditor {
       appState.zoom,
       scenePointer.x,
       scenePointer.y,
+      handleScale,
     );
     if (!isElbowArrow(element) && clickedPointIndex >= 0) {
       return null;
@@ -893,7 +897,8 @@ export class LinearElementEditor {
     }
 
     const threshold =
-      (LinearElementEditor.POINT_HANDLE_SIZE + 1) / appState.zoom.value;
+      (LinearElementEditor.POINT_HANDLE_SIZE * handleScale + 1) /
+      appState.zoom.value;
 
     const existingSegmentMidpointHitCoords =
       linearElementEditor.segmentMidPointHoveredCoords;
@@ -914,6 +919,7 @@ export class LinearElementEditor {
       element,
       elementsMap,
       appState,
+      handleScale,
     );
 
     while (index < midPoints.length) {
@@ -939,12 +945,13 @@ export class LinearElementEditor {
     index: number,
     zoom: Zoom,
     elementsMap: ElementsMap,
+    handleScale = 1,
   ) {
     if (isElbowArrow(element)) {
       if (index >= 0 && index < element.points.length) {
         return (
           pointDistance(startPoint, endPoint) * zoom.value <
-          LinearElementEditor.POINT_HANDLE_SIZE / 2
+          (LinearElementEditor.POINT_HANDLE_SIZE * handleScale) / 2
         );
       }
 
@@ -970,7 +977,10 @@ export class LinearElementEditor {
       distance = curveLength<GlobalPoint>(curves[index]);
     }
 
-    return distance * zoom.value < LinearElementEditor.POINT_HANDLE_SIZE * 4;
+    return (
+      distance * zoom.value <
+      LinearElementEditor.POINT_HANDLE_SIZE * handleScale * 4
+    );
   }
 
   static getSegmentMidPoint(
@@ -1022,6 +1032,7 @@ export class LinearElementEditor {
     appState: AppState,
     midPoint: GlobalPoint,
     elementsMap: ElementsMap,
+    handleScale = 1,
   ) {
     const element = LinearElementEditor.getElement(
       linearElementEditor.elementId,
@@ -1034,6 +1045,7 @@ export class LinearElementEditor {
       element,
       elementsMap,
       appState,
+      handleScale,
     );
     let index = 0;
     while (index < midPoints.length) {
@@ -1060,6 +1072,7 @@ export class LinearElementEditor {
     linearElementEditor: LinearElementEditor | null;
   } {
     const appState = app.state;
+    const handleScale = app.props.UIOptions.canvasHandleScale;
     const elementsMap = scene.getNonDeletedElementsMap();
 
     const ret: ReturnType<typeof LinearElementEditor["handlePointerDown"]> = {
@@ -1085,6 +1098,7 @@ export class LinearElementEditor {
       scenePointer,
       appState,
       elementsMap,
+      handleScale,
     );
     const point = pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y);
     let segmentMidpointIndex = null;
@@ -1095,6 +1109,7 @@ export class LinearElementEditor {
         appState,
         segmentMidpoint,
         elementsMap,
+        handleScale,
       );
     } else if (event.altKey && appState.selectedLinearElement?.isEditing) {
       if (linearElementEditor.lastUncommittedPoint == null) {
@@ -1145,6 +1160,7 @@ export class LinearElementEditor {
       appState.zoom,
       scenePointer.x,
       scenePointer.y,
+      handleScale,
     );
     const clickedPointIsHandle = LinearElementEditor.isPointHandle(
       element,
@@ -1436,26 +1452,40 @@ export class LinearElementEditor {
     zoom: AppState["zoom"],
     x: number,
     y: number,
+    handleScale = 1,
   ) {
     const pointHandles = LinearElementEditor.getPointsGlobalCoordinates(
       element,
       elementsMap,
     );
     let idx = pointHandles.length;
+    let nearestIndex = -1;
+    let nearestDistance =
+      LinearElementEditor.POINT_HANDLE_SIZE * handleScale + 1;
     // loop from right to left because points on the right are rendered over
     // points on the left, thus should take precedence when clicking, if they
     // overlap
     while (--idx > -1) {
-      const p = pointHandles[idx];
+      // Enlarged targets must not let a non-draggable elbow route point
+      // take precedence over a nearby endpoint.
       if (
-        pointDistance(pointFrom(x, y), pointFrom(p[0], p[1])) * zoom.value <
-        // +1px to account for outline stroke
-        LinearElementEditor.POINT_HANDLE_SIZE + 1
+        handleScale !== 1 &&
+        !LinearElementEditor.isPointHandle(element, idx)
       ) {
-        return idx;
+        continue;
+      }
+      const p = pointHandles[idx];
+      const distance =
+        pointDistance(pointFrom(x, y), pointFrom(p[0], p[1])) * zoom.value;
+      if (distance < nearestDistance) {
+        if (handleScale === 1) {
+          return idx;
+        }
+        nearestIndex = idx;
+        nearestDistance = distance;
       }
     }
-    return -1;
+    return nearestIndex;
   }
 
   static createPointAt(
