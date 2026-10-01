@@ -10,6 +10,8 @@ import {
 
 import {
   addElementsToFrame,
+  advanceDuplicatedListMarkers,
+  applyListMarkerAdvances,
   deepCopyElement,
   duplicateElements,
   filterElementsEligibleAsFrameChildren,
@@ -22,6 +24,7 @@ import {
   updateBoundElements,
 } from "@excalidraw/element";
 
+import type { ListMarkerAdvance } from "@excalidraw/element";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { PointerDownState } from "../types";
@@ -68,6 +71,50 @@ export class AppDuplicate {
       nextElements,
       duplication.duplicatedElements,
     );
+  };
+
+  /**
+   * Runs `update` once what's pending is committed, capturing what it changes
+   * (if it returns `true`) as a separate undo step.
+   */
+  private afterCommit(update: () => boolean) {
+    // (setState callbacks run after componentDidUpdate, which commits)
+    this.app.setState({}, () => {
+      if (update()) {
+        this.app.store.scheduleCapture();
+      }
+    });
+  }
+
+  /**
+   * Advances the list markers of the duplicated texts (`1.` -> `2.`) once
+   * the duplication is committed, as a separate undo step, so that undo
+   * reverts the markers first.
+   */
+  advanceListMarkers = (duplicatedElements: readonly ExcalidrawElement[]) => {
+    this.afterCommit(() => {
+      const duplicates = duplicatedElements.flatMap(
+        (element) => this.app.scene.getNonDeletedElement(element.id) ?? [],
+      );
+
+      return (
+        advanceDuplicatedListMarkers(duplicates, this.app.scene).length > 0
+      );
+    });
+  };
+
+  /**
+   * On alt-drag drop: the list markers advanced along with the drag go back,
+   * for the drag to be committed as is, and forth again once it is, as
+   * a separate undo step (before the browser gets to paint either).
+   */
+  commitDraggedListMarkers = (advances: readonly ListMarkerAdvance[]) => {
+    applyListMarkerAdvances(advances, "prev", this.app.scene);
+
+    this.afterCommit(() => {
+      applyListMarkerAdvances(advances, "next", this.app.scene);
+      return true;
+    });
   };
 
   /**
@@ -249,13 +296,6 @@ export class AppDuplicate {
     // (originals whose duplicates were vetoed are left behind)
     const duplicateElementsMap = arrayToMap(duplicatedElements);
 
-    duplicatedElements.forEach((element) => {
-      pointerDownState.originalElements.set(
-        element.id,
-        deepCopyElement(element),
-      );
-    });
-
     const elementsWithIndices = syncMovedIndices(
       nextElements,
       duplicateElementsMap,
@@ -304,6 +344,22 @@ export class AppDuplicate {
       }));
 
       this.app.scene.replaceAllElements(elementsWithIndices);
+
+      // visible from the start of the drag, captured on drop (see
+      // `commitDraggedListMarkers()`)
+      pointerDownState.hit.advancedListMarkers = advanceDuplicatedListMarkers(
+        duplicatedElements,
+        this.app.scene,
+      );
+
+      // (after advancing the list markers, which may resize the duplicates)
+      duplicatedElements.forEach((element) => {
+        pointerDownState.originalElements.set(
+          element.id,
+          deepCopyElement(element),
+        );
+      });
+
       selectedElements.forEach((element) => {
         if (
           isBindableElement(element) &&

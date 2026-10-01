@@ -81,6 +81,7 @@ export * from "./groups";
 export * from "./heading";
 export * from "./image";
 export * from "./linearElementEditor";
+export * from "./listMarker";
 export * from "./mutateElement";
 export * from "./newElement";
 export * from "./positionElementsOnGrid";

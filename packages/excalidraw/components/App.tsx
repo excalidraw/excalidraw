@@ -8272,6 +8272,7 @@ class App extends React.Component<AppProps, AppState> {
         allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
+        advancedListMarkers: [],
         arrowLabel: false,
         hasHitCommonBoundingBoxOfSelectedElements:
           this.isHittingCommonBoundingBoxOfSelectedElements(
@@ -10357,6 +10358,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.textTool.handlePointerUp(childEvent, pointerDownState);
+
+      if (pointerDownState.hit.advancedListMarkers.length) {
+        this.duplicate.commitDraggedListMarkers(
+          pointerDownState.hit.advancedListMarkers,
+        );
+      }
 
       // an armed bucket fill commits only on a GENUINE pointer up. The
       // missing-pointer-up cleanup replays this handler with the pointer
