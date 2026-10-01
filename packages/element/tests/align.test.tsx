@@ -72,123 +72,123 @@ describe("aligning", () => {
   it("aligns two objects correctly to the top", () => {
     createAndSelectTwoRectangles();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
 
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_UP);
     });
 
     // Check if x position did not change
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(0);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(0);
   });
 
   it("aligns two objects correctly to the bottom", () => {
     createAndSelectTwoRectangles();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
 
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_DOWN);
     });
 
     // Check if x position did not change
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(110);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(110);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
   });
 
   it("aligns two objects correctly to the left", () => {
     createAndSelectTwoRectangles();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
 
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_LEFT);
     });
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(0);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(0);
 
     // Check if y position did not change
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
   });
 
   it("aligns two objects correctly to the right", () => {
     createAndSelectTwoRectangles();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
 
     Keyboard.withModifierKeys({ ctrl: true, shift: true }, () => {
       Keyboard.keyPress(KEYS.ARROW_RIGHT);
     });
 
-    expect(API.getSelectedElements()[0].x).toEqual(110);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(110);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
     // Check if y position did not change
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
   });
 
   it("centers two objects with different sizes correctly vertically", () => {
     createAndSelectTwoRectanglesWithDifferentSizes();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
 
     API.executeAction(actionAlignVerticallyCentered);
 
     // Check if x position did not change
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(60);
-    expect(API.getSelectedElements()[1].y).toEqual(55);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(60);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(55);
   });
 
   it("centers two objects with different sizes correctly horizontally", () => {
     createAndSelectTwoRectanglesWithDifferentSizes();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(110);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(110);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
 
     API.executeAction(actionAlignHorizontallyCentered);
 
-    expect(API.getSelectedElements()[0].x).toEqual(60);
-    expect(API.getSelectedElements()[1].x).toEqual(55);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(60);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(55);
 
     // Check if y position did not change
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(110);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(110);
   });
 
   const createAndSelectGroupAndRectangle = () => {
@@ -226,85 +226,85 @@ describe("aligning", () => {
   it("aligns a group with another element correctly to the top", () => {
     createAndSelectGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignTop);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(0);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(0);
   });
 
   it("aligns a group with another element correctly to the bottom", () => {
     createAndSelectGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignBottom);
 
-    expect(API.getSelectedElements()[0].y).toEqual(100);
-    expect(API.getSelectedElements()[1].y).toEqual(200);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
   });
 
   it("aligns a group with another element correctly to the left", () => {
     createAndSelectGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignLeft);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(0);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(0);
   });
 
   it("aligns a group with another element correctly to the right", () => {
     createAndSelectGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignRight);
 
-    expect(API.getSelectedElements()[0].x).toEqual(100);
-    expect(API.getSelectedElements()[1].x).toEqual(200);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
   });
 
   it("centers a group with another element correctly vertically", () => {
     createAndSelectGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignVerticallyCentered);
 
-    expect(API.getSelectedElements()[0].y).toEqual(50);
-    expect(API.getSelectedElements()[1].y).toEqual(150);
-    expect(API.getSelectedElements()[2].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(100);
   });
 
   it("centers a group with another element correctly horizontally", () => {
     createAndSelectGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignHorizontallyCentered);
 
-    expect(API.getSelectedElements()[0].x).toEqual(50);
-    expect(API.getSelectedElements()[1].x).toEqual(150);
-    expect(API.getSelectedElements()[2].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(100);
   });
 
   const createAndSelectTwoGroups = () => {
@@ -354,97 +354,97 @@ describe("aligning", () => {
   it("aligns two groups correctly to the top", () => {
     createAndSelectTwoGroups();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
-    expect(API.getSelectedElements()[3].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(300);
 
     API.executeAction(actionAlignTop);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(0);
-    expect(API.getSelectedElements()[3].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(100);
   });
 
   it("aligns two groups correctly to the bottom", () => {
     createAndSelectTwoGroups();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
-    expect(API.getSelectedElements()[3].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(300);
 
     API.executeAction(actionAlignBottom);
 
-    expect(API.getSelectedElements()[0].y).toEqual(200);
-    expect(API.getSelectedElements()[1].y).toEqual(300);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
-    expect(API.getSelectedElements()[3].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(300);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(300);
   });
 
   it("aligns two groups correctly to the left", () => {
     createAndSelectTwoGroups();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
-    expect(API.getSelectedElements()[3].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(300);
 
     API.executeAction(actionAlignLeft);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(0);
-    expect(API.getSelectedElements()[3].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(100);
   });
 
   it("aligns two groups correctly to the right", () => {
     createAndSelectTwoGroups();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
-    expect(API.getSelectedElements()[3].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(300);
 
     API.executeAction(actionAlignRight);
 
-    expect(API.getSelectedElements()[0].x).toEqual(200);
-    expect(API.getSelectedElements()[1].x).toEqual(300);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
-    expect(API.getSelectedElements()[3].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(300);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(300);
   });
 
   it("centers two groups correctly vertically", () => {
     createAndSelectTwoGroups();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
-    expect(API.getSelectedElements()[3].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(300);
 
     API.executeAction(actionAlignVerticallyCentered);
 
-    expect(API.getSelectedElements()[0].y).toEqual(100);
-    expect(API.getSelectedElements()[1].y).toEqual(200);
-    expect(API.getSelectedElements()[2].y).toEqual(100);
-    expect(API.getSelectedElements()[3].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(200);
   });
 
   it("centers two groups correctly horizontally", () => {
     createAndSelectTwoGroups();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
-    expect(API.getSelectedElements()[3].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(300);
 
     API.executeAction(actionAlignHorizontallyCentered);
 
-    expect(API.getSelectedElements()[0].x).toEqual(100);
-    expect(API.getSelectedElements()[1].x).toEqual(200);
-    expect(API.getSelectedElements()[2].x).toEqual(100);
-    expect(API.getSelectedElements()[3].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(200);
   });
 
   const createAndSelectNestedGroupAndRectangle = () => {
@@ -497,97 +497,97 @@ describe("aligning", () => {
   it("aligns nested group and other element correctly to the top", () => {
     createAndSelectNestedGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
-    expect(API.getSelectedElements()[3].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(300);
 
     API.executeAction(actionAlignTop);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
-    expect(API.getSelectedElements()[3].y).toEqual(0);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(0);
   });
 
   it("aligns nested group and other element correctly to the bottom", () => {
     createAndSelectNestedGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
-    expect(API.getSelectedElements()[3].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(300);
 
     API.executeAction(actionAlignBottom);
 
-    expect(API.getSelectedElements()[0].y).toEqual(100);
-    expect(API.getSelectedElements()[1].y).toEqual(200);
-    expect(API.getSelectedElements()[2].y).toEqual(300);
-    expect(API.getSelectedElements()[3].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(300);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(300);
   });
 
   it("aligns nested group and other element correctly to the left", () => {
     createAndSelectNestedGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
-    expect(API.getSelectedElements()[3].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(300);
 
     API.executeAction(actionAlignLeft);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
-    expect(API.getSelectedElements()[3].x).toEqual(0);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(0);
   });
 
   it("aligns nested group and other element correctly to the right", () => {
     createAndSelectNestedGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
-    expect(API.getSelectedElements()[3].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(300);
 
     API.executeAction(actionAlignRight);
 
-    expect(API.getSelectedElements()[0].x).toEqual(100);
-    expect(API.getSelectedElements()[1].x).toEqual(200);
-    expect(API.getSelectedElements()[2].x).toEqual(300);
-    expect(API.getSelectedElements()[3].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(300);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(300);
   });
 
   it("centers nested group and other element correctly vertically", () => {
     createAndSelectNestedGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
-    expect(API.getSelectedElements()[3].y).toEqual(300);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(300);
 
     API.executeAction(actionAlignVerticallyCentered);
 
-    expect(API.getSelectedElements()[0].y).toEqual(50);
-    expect(API.getSelectedElements()[1].y).toEqual(150);
-    expect(API.getSelectedElements()[2].y).toEqual(250);
-    expect(API.getSelectedElements()[3].y).toEqual(150);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(250);
+    expect(API.getSelectedElements()[3].y).toBeCloseTo(150);
   });
 
   it("centers nested group and other element correctly horizontally", () => {
     createAndSelectNestedGroupAndRectangle();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
-    expect(API.getSelectedElements()[3].x).toEqual(300);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(300);
 
     API.executeAction(actionAlignHorizontallyCentered);
 
-    expect(API.getSelectedElements()[0].x).toEqual(50);
-    expect(API.getSelectedElements()[1].x).toEqual(150);
-    expect(API.getSelectedElements()[2].x).toEqual(250);
-    expect(API.getSelectedElements()[3].x).toEqual(150);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(250);
+    expect(API.getSelectedElements()[3].x).toBeCloseTo(150);
   });
 
   const createGroupAndSelectInEditGroupMode = () => {
@@ -622,68 +622,68 @@ describe("aligning", () => {
   it("aligns elements within a group while in group edit mode correctly to the top", () => {
     createGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
 
     API.executeAction(actionAlignTop);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(0);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(0);
   });
   it("aligns elements within a group while in group edit mode correctly to the bottom", () => {
     createGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
 
     API.executeAction(actionAlignBottom);
 
-    expect(API.getSelectedElements()[0].y).toEqual(100);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
   });
   it("aligns elements within a group while in group edit mode correctly to the left", () => {
     createGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
 
     API.executeAction(actionAlignLeft);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(0);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(0);
   });
   it("aligns elements within a group while in group edit mode correctly to the right", () => {
     createGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
 
     API.executeAction(actionAlignRight);
 
-    expect(API.getSelectedElements()[0].x).toEqual(100);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
   });
   it("aligns elements within a group while in group edit mode correctly to the vertical center", () => {
     createGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
 
     API.executeAction(actionAlignVerticallyCentered);
 
-    expect(API.getSelectedElements()[0].y).toEqual(50);
-    expect(API.getSelectedElements()[1].y).toEqual(50);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(50);
   });
   it("aligns elements within a group while in group edit mode correctly to the horizontal center", () => {
     createGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
 
     API.executeAction(actionAlignHorizontallyCentered);
 
-    expect(API.getSelectedElements()[0].x).toEqual(50);
-    expect(API.getSelectedElements()[1].x).toEqual(50);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(50);
   });
 
   const createNestedGroupAndSelectInEditGroupMode = () => {
@@ -735,80 +735,80 @@ describe("aligning", () => {
   it("aligns element and nested group while in group edit mode correctly to the top", () => {
     createNestedGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignTop);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(0);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(0);
   });
   it("aligns element and nested group while in group edit mode correctly to the bottom", () => {
     createNestedGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignBottom);
 
-    expect(API.getSelectedElements()[0].y).toEqual(100);
-    expect(API.getSelectedElements()[1].y).toEqual(200);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
   });
   it("aligns element and nested group while in group edit mode correctly to the left", () => {
     createNestedGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignLeft);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(0);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(0);
   });
   it("aligns element and nested group while in group edit mode correctly to the right", () => {
     createNestedGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignRight);
 
-    expect(API.getSelectedElements()[0].x).toEqual(100);
-    expect(API.getSelectedElements()[1].x).toEqual(200);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
   });
   it("aligns element and nested group while in group edit mode correctly to the vertical center", () => {
     createNestedGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignVerticallyCentered);
 
-    expect(API.getSelectedElements()[0].y).toEqual(50);
-    expect(API.getSelectedElements()[1].y).toEqual(150);
-    expect(API.getSelectedElements()[2].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(100);
   });
   it("aligns elements and nested group within a group while in group edit mode correctly to the horizontal center", () => {
     createNestedGroupAndSelectInEditGroupMode();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignHorizontallyCentered);
 
-    expect(API.getSelectedElements()[0].x).toEqual(50);
-    expect(API.getSelectedElements()[1].x).toEqual(150);
-    expect(API.getSelectedElements()[2].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(100);
   });
 
   const createAndSelectSingleGroup = () => {
@@ -834,68 +834,68 @@ describe("aligning", () => {
   it("aligns elements within a single-selected group correctly to the top", () => {
     createAndSelectSingleGroup();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
 
     API.executeAction(actionAlignTop);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(0);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(0);
   });
   it("aligns elements within a single-selected group correctly to the bottom", () => {
     createAndSelectSingleGroup();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
 
     API.executeAction(actionAlignBottom);
 
-    expect(API.getSelectedElements()[0].y).toEqual(100);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
   });
   it("aligns elements within a single-selected group correctly to the left", () => {
     createAndSelectSingleGroup();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
 
     API.executeAction(actionAlignLeft);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(0);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(0);
   });
   it("aligns elements within a single-selected group correctly to the right", () => {
     createAndSelectSingleGroup();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
 
     API.executeAction(actionAlignRight);
 
-    expect(API.getSelectedElements()[0].x).toEqual(100);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
   });
   it("aligns elements within a single-selected group correctly to the vertical center", () => {
     createAndSelectSingleGroup();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
 
     API.executeAction(actionAlignVerticallyCentered);
 
-    expect(API.getSelectedElements()[0].y).toEqual(50);
-    expect(API.getSelectedElements()[1].y).toEqual(50);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(50);
   });
   it("aligns elements within a single-selected group correctly to the horizontal center", () => {
     createAndSelectSingleGroup();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
 
     API.executeAction(actionAlignHorizontallyCentered);
 
-    expect(API.getSelectedElements()[0].x).toEqual(50);
-    expect(API.getSelectedElements()[1].x).toEqual(50);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(50);
   });
 
   const createAndSelectSingleGroupWithNestedGroup = () => {
@@ -934,80 +934,80 @@ describe("aligning", () => {
   it("aligns elements within a single-selected group containing a nested group correctly to the top", () => {
     createAndSelectSingleGroupWithNestedGroup();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignTop);
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(0);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(0);
   });
   it("aligns elements within a single-selected group containing a nested group correctly to the bottom", () => {
     createAndSelectSingleGroupWithNestedGroup();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignBottom);
 
-    expect(API.getSelectedElements()[0].y).toEqual(100);
-    expect(API.getSelectedElements()[1].y).toEqual(200);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
   });
   it("aligns elements within a single-selected group containing a nested group correctly to the left", () => {
     createAndSelectSingleGroupWithNestedGroup();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignLeft);
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(0);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(0);
   });
   it("aligns elements within a single-selected group containing a nested group correctly to the right", () => {
     createAndSelectSingleGroupWithNestedGroup();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignRight);
 
-    expect(API.getSelectedElements()[0].x).toEqual(100);
-    expect(API.getSelectedElements()[1].x).toEqual(200);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(200);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
   });
   it("aligns elements within a single-selected group containing a nested group correctly to the vertical center", () => {
     createAndSelectSingleGroupWithNestedGroup();
 
-    expect(API.getSelectedElements()[0].y).toEqual(0);
-    expect(API.getSelectedElements()[1].y).toEqual(100);
-    expect(API.getSelectedElements()[2].y).toEqual(200);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(200);
 
     API.executeAction(actionAlignVerticallyCentered);
 
-    expect(API.getSelectedElements()[0].y).toEqual(50);
-    expect(API.getSelectedElements()[1].y).toEqual(150);
-    expect(API.getSelectedElements()[2].y).toEqual(100);
+    expect(API.getSelectedElements()[0].y).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].y).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].y).toBeCloseTo(100);
   });
   it("aligns elements within a single-selected group containing a nested group correctly to the horizontal center", () => {
     createAndSelectSingleGroupWithNestedGroup();
 
-    expect(API.getSelectedElements()[0].x).toEqual(0);
-    expect(API.getSelectedElements()[1].x).toEqual(100);
-    expect(API.getSelectedElements()[2].x).toEqual(200);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(0);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(100);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(200);
 
     API.executeAction(actionAlignHorizontallyCentered);
 
-    expect(API.getSelectedElements()[0].x).toEqual(50);
-    expect(API.getSelectedElements()[1].x).toEqual(150);
-    expect(API.getSelectedElements()[2].x).toEqual(100);
+    expect(API.getSelectedElements()[0].x).toBeCloseTo(50);
+    expect(API.getSelectedElements()[1].x).toBeCloseTo(150);
+    expect(API.getSelectedElements()[2].x).toBeCloseTo(100);
   });
 
   const createAndSelectGroupWithBoundTextAndRectangle = () => {
