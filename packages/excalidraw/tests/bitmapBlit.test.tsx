@@ -99,16 +99,27 @@ const centeredOn = (x: number, y: number, zoom: number) => ({
 });
 
 describe("blitting an element's cached bitmap", () => {
-  describe("when the screen shows a small part of a size-capped bitmap", () => {
+  describe("when a pinch shows a small part of a bitmap drawn further out", () => {
     let drawn: ReturnType<typeof blit>;
 
     beforeEach(() => {
-      drawn = blit(rectangle(), centeredOn(170, 165, 250));
+      const element = API.createElement({
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 1000,
+        height: 1000,
+      });
+      blit(element, {
+        ...centeredOn(500, 500, 2),
+        shouldCacheIgnoreZoom: false,
+      });
+      drawn = blit(element, centeredOn(500, 500, 3.9));
     });
 
     it("reads at most the on-screen part of the bitmap", () => {
       expect(drawn.sw * drawn.sh).toBeLessThan(
-        (drawn.source.width * drawn.source.height) / 100,
+        (drawn.source.width * drawn.source.height) / 20,
       );
     });
 

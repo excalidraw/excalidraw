@@ -1097,9 +1097,10 @@ const DIRECT_TEXT_ZOOM = 1;
  * zoomed in); zoomed out over a full board they are thousands of new
  * canvases.
  * Freedraw and text draw the same either way. Other shapes keep their
- * bitmaps, except at rest when the canvas size limits would cap the bitmap
- * below the zoom and it would be shown blown up. Images always keep theirs:
- * the crop editor's uncropped preview is drawn only from the bitmap.
+ * bitmaps, except when the canvas size limits would cap the bitmap below the
+ * zoom: shown blown up it is blurry, and during a pinch it is a bitmap of
+ * tens of megabytes read on every frame. Images always keep theirs: the crop
+ * editor's uncropped preview is drawn only from the bitmap.
  */
 const shouldDrawDirectly = (
   element: NonDeletedExcalidrawElement,
@@ -1108,8 +1109,7 @@ const shouldDrawDirectly = (
 ) =>
   element.type === "freedraw" ||
   (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM) ||
-  (!appState.shouldCacheIgnoreZoom &&
-    element.type !== "image" &&
+  (element.type !== "image" &&
     cappedElementCanvasSize(element, elementsMap, appState.zoom).scale <
       appState.zoom.value);
 

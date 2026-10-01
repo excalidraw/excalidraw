@@ -261,8 +261,12 @@ describe("a shape too big for its bitmap at this zoom", () => {
       drawn = draw(element, 750, { ...deep, shouldCacheIgnoreZoom: true });
     });
 
-    it("is drawn from its bitmap", () => {
-      expect(drawn.drawImage).toHaveBeenCalledTimes(1);
+    it("is not drawn from its bitmap", () => {
+      expect(drawn.drawImage).not.toHaveBeenCalled();
+    });
+
+    it("is drawn as paths on the canvas", () => {
+      expect(drawn.stroke).toHaveBeenCalled();
     });
   });
 });
