@@ -366,7 +366,7 @@ describe("setElementRenderOverrides", () => {
         id: "frame",
         x: 200,
         y: 200,
-        width: 200,
+        width: 400,
         height: 80,
       });
       API.setElements([frame]);

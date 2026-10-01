@@ -34,6 +34,7 @@ import {
   ELEMENT_SHIFT_TRANSLATE_AMOUNT,
   ELEMENT_TRANSLATE_AMOUNT,
   EVENT,
+  FONT_FAMILY,
   FRAME_STYLE,
   IMAGE_MIME_TYPES,
   IMAGE_RENDER_TIMEOUT,
@@ -243,6 +244,7 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
+  getTextWidth,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
@@ -399,6 +401,7 @@ import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isOverScrollBars } from "../scene/scrollbars";
 import { LassoTrail } from "../lasso";
 import { EraserTrail } from "../eraser";
+import { frameNameOpacities } from "../frameNameVisibility";
 import { getShortcutKey } from "../shortcut";
 
 import {
@@ -2089,6 +2092,11 @@ class App extends React.Component<AppProps, AppState> {
 
   frameNameBoundsCache: FrameNameBoundsCache = {
     get: (frameElement) => {
+      if (
+        !this.ownerDocument.getElementById(this.getFrameNameDOMId(frameElement))
+      ) {
+        return null;
+      }
       let bounds = this.frameNameBoundsCache._cache.get(frameElement.id);
       if (
         !bounds ||
@@ -2130,6 +2138,53 @@ class App extends React.Component<AppProps, AppState> {
     _cache: new Map(),
   };
 
+  private hoveredFrameId: ExcalidrawFrameLikeElement["id"] | null = null;
+  private frameNameWidths = new Map<string, number>();
+
+  private getFrameNameWidth = (name: string) => {
+    const width =
+      this.frameNameWidths.get(name) ??
+      getTextWidth(
+        name,
+        getFontString({
+          fontSize: FRAME_STYLE.nameFontSize,
+          fontFamily: FONT_FAMILY.Assistant,
+        }),
+      );
+    this.frameNameWidths.set(name, width);
+    return width;
+  };
+
+  private updateHoveredFrame = (
+    event: React.PointerEvent,
+    scenePointer: { x: number; y: number },
+  ) => {
+    const hovered =
+      event.pointerType === "touch"
+        ? null
+        : this.scene
+            .getNonDeletedFramesLikes()
+            .filter(
+              (f) =>
+                scenePointer.x >= f.x &&
+                scenePointer.x <= f.x + f.width &&
+                scenePointer.y >= f.y &&
+                scenePointer.y <= f.y + f.height,
+            )
+            .reduce<ExcalidrawFrameLikeElement | null>(
+              (smallest, f) =>
+                smallest &&
+                smallest.width * smallest.height <= f.width * f.height
+                  ? smallest
+                  : f,
+              null,
+            );
+    if ((hovered?.id ?? null) !== this.hoveredFrameId) {
+      this.hoveredFrameId = hovered?.id ?? null;
+      this.triggerRender();
+    }
+  };
+
   private resetEditingFrame = (frame: ExcalidrawFrameLikeElement | null) => {
     if (frame) {
       this.scene.mutateElement(frame, { name: frame.name?.trim() || null });
@@ -2157,6 +2212,47 @@ class App extends React.Component<AppProps, AppState> {
           ? this.state.searchMatches.matches.find((sm) => sm.focus)
           : null
         : null;
+
+    const { width, height, offsetLeft, offsetTop, zoom } = this.state;
+    const nameOpacities = frameNameOpacities(
+      nonDeletedFramesLikes
+        .map((f) => {
+          const { offset } = this.getElementRenderState(
+            f,
+            f.id === this.state.editingFrame
+              ? null
+              : this.elementRenderOverrides,
+          );
+          const { x, y } = sceneCoordsToViewportCoords(
+            { sceneX: f.x + offset.x, sceneY: f.y + offset.y },
+            this.state,
+          );
+          return {
+            id: f.id,
+            x: x - offsetLeft,
+            y: y - offsetTop,
+            width: f.width * zoom.value,
+            height: f.height * zoom.value,
+            labelWidth: this.getFrameNameWidth(getFrameLikeTitle(f)),
+          };
+        })
+        .filter(
+          (f) =>
+            f.x < width &&
+            f.y < height &&
+            f.x + f.width > 0 &&
+            f.y + f.height > 0,
+        ),
+      { width, height },
+      new Set(
+        [
+          ...Object.keys(this.state.selectedElementIds),
+          this.state.editingFrame,
+          this.hoveredFrameId,
+          focusedSearchMatch?.id,
+        ].filter((id): id is string => !!id),
+      ),
+    );
 
     return nonDeletedFramesLikes.map((f) => {
       // The name is a decoration that follows the frame's render overrides,
@@ -2187,6 +2283,11 @@ class App extends React.Component<AppProps, AppState> {
           this.resetEditingFrame(f);
         }
         // if frame not visible, don't render its name
+        return null;
+      }
+
+      const nameOpacity = nameOpacities.get(f.id) ?? 0;
+      if (!nameOpacity) {
         return null;
       }
 
@@ -2268,7 +2369,7 @@ class App extends React.Component<AppProps, AppState> {
           key={f.id}
           style={{
             position: "absolute",
-            opacity: renderState.opacity,
+            opacity: renderState.opacity * nameOpacity,
             // Positioning from bottom so that we don't to either
             // calculate text height or adjust using transform (which)
             // messes up input position when editing the frame name.
@@ -2289,7 +2390,9 @@ class App extends React.Component<AppProps, AppState> {
             lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
             maxWidth:
-              focusedSearchMatch?.id === f.id && focusedSearchMatch?.focus
+              (focusedSearchMatch?.id === f.id && focusedSearchMatch?.focus) ||
+              this.state.selectedElementIds[f.id] ||
+              this.hoveredFrameId === f.id
                 ? "none"
                 : `${f.width * this.state.zoom.value}px`,
             overflow: f.id === this.state.editingFrame ? "visible" : "hidden",
@@ -6851,6 +6954,7 @@ class App extends React.Component<AppProps, AppState> {
       x: scenePointerX,
       y: scenePointerY,
     };
+    this.updateHoveredFrame(event, scenePointer);
 
     this.updateMultiTouchGesture(event);
 
