@@ -4,6 +4,9 @@ const path = require("path");
 
 const { execSync } = require("child_process");
 
+// macOS tar otherwise adds an AppleDouble ._ file beside every packed file.
+process.env.COPYFILE_DISABLE = "1";
+
 const PACKAGES = [
   "common",
   "fractional-indexing",
