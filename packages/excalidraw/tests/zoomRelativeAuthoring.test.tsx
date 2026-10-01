@@ -1,4 +1,4 @@
-import { KEYS } from "@excalidraw/common";
+import { KEYS, TEXT_MAX_WRAP_WIDTH } from "@excalidraw/common";
 import {
   elementWithCanvasCache,
   getBoundTextMaxWidth,
@@ -315,6 +315,32 @@ describe("authoringUnits: screen", () => {
         selected: !!h.state.selectedElementIds[rectangle.id],
       }).toEqual({ zoom, selected });
     }
+  });
+});
+
+describe("authoringUnits: screen, a long new text", () => {
+  const long = "Thunderwrench HVAC Co. ".repeat(12);
+
+  beforeEach(async () => {
+    await renderEditor("screen");
+  });
+
+  afterEach(async () => {
+    await act(async () => {});
+  });
+
+  describe.each([0.1, 1, 100])("when it is typed at zoom %s", (zoom) => {
+    let widthOnScreen: number;
+
+    beforeEach(async () => {
+      atZoom(zoom);
+      API.setAppState({ width: 4000 });
+      widthOnScreen = (await createText(100, 100, long)).width * zoom;
+    });
+
+    it("wraps at TEXT_MAX_WRAP_WIDTH on screen", () => {
+      expect(widthOnScreen).toBeCloseTo(TEXT_MAX_WRAP_WIDTH, 6);
+    });
   });
 });
 
