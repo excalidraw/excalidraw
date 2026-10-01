@@ -48,6 +48,7 @@ const draw = (
   const drawImage = vi.spyOn(context, "drawImage");
   const fill = vi.spyOn(context, "fill");
   const fillText = vi.spyOn(context, "fillText");
+  const strokeSpy = vi.spyOn(context, "stroke");
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
@@ -67,7 +68,7 @@ const draw = (
       theme: "light",
     },
   });
-  return { drawImage, fill, fillText };
+  return { drawImage, fill, fillText, stroke: strokeSpy };
 };
 
 const stroke = () =>
@@ -216,5 +217,45 @@ describe("freedraw once the zoom settles", () => {
     const { drawImage, fill } = draw(element, 3);
     expect(drawImage).not.toHaveBeenCalled();
     expect(fill).toHaveBeenCalledWith(expect.any(Path2D));
+  });
+});
+
+describe("a shape too big for its bitmap at this zoom", () => {
+  const deep = { scrollX: -10, scrollY: -10 };
+  let element: NonDeletedExcalidrawElement;
+  let drawn: ReturnType<typeof draw>;
+
+  beforeEach(() => {
+    element = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      width: 100,
+      height: 100,
+    });
+  });
+
+  describe("when the zoom has settled", () => {
+    beforeEach(() => {
+      drawn = draw(element, 750, deep);
+    });
+
+    it("is not drawn from its bitmap", () => {
+      expect(drawn.drawImage).not.toHaveBeenCalled();
+    });
+
+    it("is drawn as paths on the canvas", () => {
+      expect(drawn.stroke).toHaveBeenCalled();
+    });
+  });
+
+  describe("while the zoom animates", () => {
+    beforeEach(() => {
+      drawn = draw(element, 750, { ...deep, shouldCacheIgnoreZoom: true });
+    });
+
+    it("is drawn from its bitmap", () => {
+      expect(drawn.drawImage).toHaveBeenCalledTimes(1);
+    });
   });
 });

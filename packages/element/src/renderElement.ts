@@ -1041,14 +1041,20 @@ const DIRECT_TEXT_ZOOM = 1;
  * canvases.
  * Freedraw and text draw the same either way. Rough fills and labelled
  * arrows do not (the bitmap crops hatching to the shape, and clears the gap
- * behind an arrow's label), so they keep their bitmaps.
+ * behind an arrow's label), so they keep their bitmaps, except at rest when
+ * the canvas size limits would cap the bitmap below the zoom and it would be
+ * shown blown up.
  */
 const shouldDrawDirectly = (
   element: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) =>
   element.type === "freedraw" ||
-  (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM);
+  (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM) ||
+  (!appState.shouldCacheIgnoreZoom &&
+    cappedElementCanvasSize(element, elementsMap, appState.zoom).scale <
+      appState.zoom.value);
 
 /**
  * The element's cached bitmap, if it was drawn for exactly this view at full
@@ -1117,7 +1123,7 @@ const buildSettledBitmaps = (hasTime: () => boolean) => {
   while (build.next < elements.length && hasTime()) {
     const element = elements[build.next++];
     if (
-      !shouldDrawDirectly(element, appState) ||
+      !shouldDrawDirectly(element, elementsMap, appState) ||
       settledElementCanvas(element, elementsMap, appState)
     ) {
       continue;
@@ -1190,7 +1196,7 @@ export const renderElement = (
 
   const drawsDirectly =
     renderConfig.isExporting ||
-    (shouldDrawDirectly(element, appState) &&
+    (shouldDrawDirectly(element, allElementsMap, appState) &&
       !settledElementCanvas(element, allElementsMap, appState));
 
   context.save();
