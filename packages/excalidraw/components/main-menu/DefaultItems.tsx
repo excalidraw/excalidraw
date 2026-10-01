@@ -7,6 +7,7 @@ import type { Theme } from "@excalidraw/element/types";
 import {
   actionClearCanvas,
   actionLoadScene,
+  actionOpenFromCloud,
   actionSaveToActiveFile,
   actionShortcuts,
   actionToggleArrowBinding,
@@ -46,6 +47,7 @@ import {
   GithubIcon,
   DiscordIcon,
   XBrandIcon,
+  GoogleDriveIcon,
   settingsIcon,
   emptyIcon,
 } from "../icons";
@@ -66,6 +68,8 @@ import {
 
 import "./DefaultItems.scss";
 
+import type { JSX } from "react";
+
 import type { InputDevice } from "../../types";
 
 export const LoadScene = () => {
@@ -77,7 +81,7 @@ export const LoadScene = () => {
     return null;
   }
 
-  const handleSelect = async () => {
+  const handleSelectLocal = async () => {
     if (
       !elements.length ||
       (await openConfirmModal({
@@ -97,21 +101,58 @@ export const LoadScene = () => {
     }
   };
 
+  if (!actionManager.isActionEnabled(actionOpenFromCloud)) {
+    return (
+      <DropdownMenuItem
+        icon={LoadIcon}
+        onSelect={handleSelectLocal}
+        data-testid="load-button"
+        shortcut={getShortcutFromShortcutName("loadScene")}
+        aria-label={t("buttons.load")}
+      >
+        {t("buttons.load")}
+      </DropdownMenuItem>
+    );
+  }
+
   return (
-    <DropdownMenuItem
-      icon={LoadIcon}
-      onSelect={handleSelect}
-      data-testid="load-button"
-      shortcut={getShortcutFromShortcutName("loadScene")}
-      aria-label={t("buttons.load")}
-    >
-      {t("buttons.load")}
-    </DropdownMenuItem>
+    <DropdownMenuSub>
+      <DropdownMenuSub.Trigger
+        icon={LoadIcon}
+        shortcut={getShortcutFromShortcutName("loadScene")}
+      >
+        {t("buttons.load")}
+      </DropdownMenuSub.Trigger>
+      <DropdownMenuSub.Content className="excalidraw-main-menu-load-submenu">
+        <DropdownMenuItem
+          icon={LoadIcon}
+          onSelect={handleSelectLocal}
+          data-testid="load-button"
+          aria-label={t("buttons.loadFromFile")}
+        >
+          {t("buttons.loadFromFile")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          icon={GoogleDriveIcon}
+          data-testid="open-from-cloud-button"
+          onSelect={() => actionManager.executeAction(actionOpenFromCloud)}
+          aria-label={t("googleDrive.openMenuLabel")}
+        >
+          {t("googleDrive.openMenuLabel")}
+        </DropdownMenuItem>
+      </DropdownMenuSub.Content>
+    </DropdownMenuSub>
   );
 };
 LoadScene.displayName = "LoadScene";
 
-export const SaveToActiveFile = () => {
+export const SaveToActiveFile = ({
+  icon,
+  label,
+}: {
+  icon?: JSX.Element;
+  label?: string;
+} = {}) => {
   const { t } = useI18n();
   const actionManager = useExcalidrawActionManager();
 
@@ -119,14 +160,18 @@ export const SaveToActiveFile = () => {
     return null;
   }
 
+  const text = label ?? t("buttons.save");
+
   return (
     <DropdownMenuItem
       shortcut={getShortcutFromShortcutName("saveScene")}
       data-testid="save-button"
       onSelect={() => actionManager.executeAction(actionSaveToActiveFile)}
-      icon={save}
-      aria-label={`${t("buttons.save")}`}
-    >{`${t("buttons.save")}`}</DropdownMenuItem>
+      icon={icon ?? save}
+      aria-label={text}
+    >
+      {text}
+    </DropdownMenuItem>
   );
 };
 SaveToActiveFile.displayName = "SaveToActiveFile";
