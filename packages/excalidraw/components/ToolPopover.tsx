@@ -31,6 +31,7 @@ type ToolPopoverProps = {
   "data-testid": string;
   onToolChange: (type: string) => void;
   displayedOption: ToolOption;
+  children?: React.ReactNode;
 };
 
 export const ToolPopover = ({
@@ -41,6 +42,7 @@ export const ToolPopover = ({
   "data-testid": dataTestId,
   onToolChange,
   displayedOption,
+  children,
 }: ToolPopoverProps) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const currentType = activeTool.type;
@@ -108,6 +110,7 @@ export const ToolPopover = ({
             }}
           />
         ))}
+        {children && <div className="tool-popover-extra">{children}</div>}
       </Popover.Content>
     </Popover.Root>
   );

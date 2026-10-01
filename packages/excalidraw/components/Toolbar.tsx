@@ -32,6 +32,7 @@ import {
   EraserToolButton,
   FreedrawToolPopover,
   FreedrawToolButton,
+  PenToolFlyout,
   getToolShortcut,
   HandToolButton,
   isToolButtonDisabled,
@@ -44,6 +45,7 @@ import {
   TextToolButton,
 } from "./Tools";
 
+import type { ActionManager } from "../actions/manager";
 import type {
   AppClassProperties,
   AppProps,
@@ -228,6 +230,7 @@ export const Toolbar = ({
   onPenModeToggle,
   onLockToggle,
   heading,
+  renderAction,
 }: {
   app: AppClassProperties;
   appState: UIAppState;
@@ -236,6 +239,7 @@ export const Toolbar = ({
   onPenModeToggle: AppClassProperties["togglePenMode"];
   onLockToggle: () => void;
   heading: React.ReactNode;
+  renderAction: ActionManager["renderAction"];
 }) => {
   const editorInterface = useEditorInterface();
   const isCompactStylesPanel = useStylesPanelMode() === "compact";
@@ -301,7 +305,16 @@ export const Toolbar = ({
         <ArrowToolButton {...toolProps} />
         <LineToolButton {...toolProps} />
         {isCompactStylesPanel ? (
-          <FreedrawToolPopover {...toolProps} />
+          <FreedrawToolPopover {...toolProps}>
+            {app.props.freedrawStrokeWidth === undefined &&
+              renderAction("changeFreedrawStrokeWidth")}
+          </FreedrawToolPopover>
+        ) : app.props.freedrawStrokeWidth === undefined ? (
+          <PenToolFlyout
+            {...toolProps}
+            openPopup={appState.openPopup}
+            renderAction={renderAction}
+          />
         ) : (
           <FreedrawToolButton {...toolProps} />
         )}

@@ -3,7 +3,7 @@ import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
-import { act, queryByTestId, render } from "./test-utils";
+import { act, queryAllByTestId, queryByTestId, render } from "./test-utils";
 
 const { h } = window;
 
@@ -15,6 +15,8 @@ const strokeAt = (zoom: number) => {
 
 const strokeWidthPicker = () =>
   queryByTestId(document.body, "strokeWidth-thin");
+
+const penSizeSliders = () => queryAllByTestId(document.body, "pen-size-slider");
 
 describe("freedrawStrokeWidth", () => {
   afterEach(async () => {
@@ -60,11 +62,11 @@ describe("freedrawStrokeWidth", () => {
     expect(strokeWidthPicker()).not.toBeNull();
   });
 
-  it("keeps the named widths without it", async () => {
+  it("draws at the default pen width without it", async () => {
     await render(<Excalidraw />);
 
     UI.clickTool("freedraw");
-    expect(strokeWidthPicker()).not.toBeNull();
+    expect(penSizeSliders()).not.toHaveLength(0);
     expect(strokeAt(1)).toBe(0.25);
     expect(strokeAt(100)).toBe(0.25);
     expect(h.state.currentItemStrokeWidthKey).toBe("medium");

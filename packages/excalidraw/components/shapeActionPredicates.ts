@@ -6,6 +6,7 @@ import {
   getColorTargetElement,
   hasBoundTextElement,
   isElbowArrow,
+  isFreeDrawElement,
   isImageElement,
   isLinearElement,
   isTextElement,
@@ -143,8 +144,14 @@ export const getShapeActionPredicates = (
 
     // stroke / shape properties
     strokeWidth:
-      (hasStrokeWidth(activeToolType) && !hostSetsFreedrawWidth) ||
-      targetElements.some((element) => hasStrokeWidth(element.type)),
+      (hasStrokeWidth(activeToolType) && activeToolType !== "freedraw") ||
+      targetElements.some(
+        (element) =>
+          hasStrokeWidth(element.type) && !isFreeDrawElement(element),
+      ),
+    freedrawStrokeWidth:
+      (activeToolType === "freedraw" && !hostSetsFreedrawWidth) ||
+      targetElements.some(isFreeDrawElement),
     freedrawMode: forToolOrSelection(hasFreedrawMode),
     strokeStyle: forToolOrSelection(hasStrokeStyle),
     sloppiness: forToolOrSelection(hasRoughness),

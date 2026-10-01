@@ -5,6 +5,7 @@ import {
   DEFAULT_FONT_FAMILY,
   DEFAULT_FONT_SIZE,
   DEFAULT_ELEMENT_STROKE_WIDTH_KEY,
+  FREEDRAW_STROKE_WIDTH,
   DEFAULT_TEXT_ALIGN,
   DEFAULT_GRID_SIZE,
   EXPORT_SCALES,
@@ -46,6 +47,8 @@ export const getDefaultAppState = (): Omit<
     currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
     currentItemStrokeWidthKey: DEFAULT_ELEMENT_STROKE_WIDTH_KEY,
+    currentItemFreedrawStrokeWidth:
+      FREEDRAW_STROKE_WIDTH[DEFAULT_ELEMENT_STROKE_WIDTH_KEY],
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     currentHoveredFontFamily: null,
     cursorButton: "up",
@@ -203,6 +206,11 @@ const APP_STATE_STORAGE_CONF = (<
   },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
   currentItemStrokeWidthKey: { browser: true, export: false, server: false },
+  currentItemFreedrawStrokeWidth: {
+    browser: false,
+    export: false,
+    server: false,
+  },
   currentItemTextAlign: { browser: true, export: false, server: false },
   currentHoveredFontFamily: { browser: false, export: false, server: false },
   cursorButton: { browser: true, export: false, server: false },

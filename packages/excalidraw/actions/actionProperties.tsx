@@ -60,6 +60,7 @@ import {
   isLineElement,
   isStickyNoteElement,
   isTextElement,
+  isFreeDrawElement,
   getRoundnessForShape,
   getAuthoringScale,
 } from "@excalidraw/element";
@@ -108,6 +109,7 @@ import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
+import { PenSizeSlider } from "../components/PenSizeSlider";
 import {
   ArrowheadArrowIcon,
   ArrowheadBarIcon,
@@ -777,6 +779,52 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
       </div>
     </fieldset>
   ),
+});
+
+export const actionChangeFreedrawStrokeWidth = register<number>({
+  name: "changeFreedrawStrokeWidth",
+  label: "labels.penSize",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    invariant(
+      value !== undefined,
+      "actionChangeFreedrawStrokeWidth: value must be defined",
+    );
+
+    return {
+      elements: changeProperty(elements, appState, (el) =>
+        isFreeDrawElement(el)
+          ? newElementWith(el, {
+              strokeWidth: value * getAuthoringScale(appState),
+            })
+          : el,
+      ),
+      appState: { ...appState, currentItemFreedrawStrokeWidth: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData, app }) => {
+    const scale = getAuthoringScale(app.state);
+    const width = getFormValue<number | null>(
+      elements,
+      app,
+      (element) => element.strokeWidth / scale,
+      isFreeDrawElement,
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemFreedrawStrokeWidth,
+    );
+    const value = width ?? appState.currentItemFreedrawStrokeWidth;
+
+    return (
+      <PenSizeSlider
+        value={value}
+        hasCommonValue={width !== null}
+        color={appState.currentItemStrokeColor}
+        variability={appState.currentItemStrokeVariability}
+        onChange={updateData}
+      />
+    );
+  },
 });
 
 export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({

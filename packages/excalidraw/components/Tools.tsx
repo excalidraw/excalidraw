@@ -1,6 +1,8 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 
+import { Popover } from "radix-ui";
+
 import { KEYS, capitalizeString } from "@excalidraw/common";
 
 import type { PointerType } from "@excalidraw/element/types";
@@ -9,6 +11,7 @@ import { trackEvent } from "../analytics";
 import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
 
+import { useExcalidrawContainer } from "./App";
 import { IconButton } from "./IconButton";
 import { ToolPopover } from "./ToolPopover";
 import {
@@ -32,6 +35,7 @@ import {
   stickyNoteToolIcon,
 } from "./icons";
 
+import type { ActionManager } from "../actions/manager";
 import type {
   AppClassProperties,
   AppState,
@@ -333,6 +337,60 @@ export const ArrowToolButton = createToolButton("arrow");
 export const LineToolButton = createToolButton("line");
 export const FreedrawToolButton = createToolButton("freedraw");
 export const TextToolButton = createToolButton("text");
+
+const PenToolButton = createToolButton("freedraw", {
+  onSelect: (app) => {
+    if (app.state.activeTool.type !== "freedraw") {
+      trackEvent("toolbar", "freedraw", "ui");
+      app.setActiveTool({ type: "freedraw" });
+      app.setAppState({ openPopup: "penSize" });
+      return;
+    }
+    app.setAppState({
+      openPopup: app.state.openPopup === "penSize" ? null : "penSize",
+    });
+  },
+});
+
+/**
+ * The pen button with its pen-size flyout: picking the pen opens the flyout,
+ * clicking the active pen toggles it, and drawing on the canvas closes it.
+ */
+export const PenToolFlyout = ({
+  app,
+  activeTool,
+  openPopup,
+  renderAction,
+}: {
+  app: AppClassProperties;
+  activeTool: UIAppState["activeTool"];
+  openPopup: UIAppState["openPopup"];
+  renderAction: ActionManager["renderAction"];
+}) => {
+  const { container } = useExcalidrawContainer();
+
+  return (
+    <Popover.Root
+      open={activeTool.type === "freedraw" && openPopup === "penSize"}
+    >
+      <Popover.Anchor asChild>
+        <div>
+          <PenToolButton app={app} activeTool={activeTool} />
+        </div>
+      </Popover.Anchor>
+      <Popover.Content
+        className="pen-size-flyout"
+        data-testid="pen-size-flyout"
+        sideOffset={16}
+        collisionBoundary={container ?? undefined}
+        onOpenAutoFocus={(event) => event.preventDefault()}
+        onEscapeKeyDown={() => app.setAppState({ openPopup: null })}
+      >
+        {renderAction("changeFreedrawStrokeWidth")}
+      </Popover.Content>
+    </Popover.Root>
+  );
+};
 export const StickyNoteToolButton = createToolButton("stickynote");
 export const ImageToolButton = createToolButton("image");
 export const EraserToolButton = createToolButton("eraser");
@@ -426,9 +484,11 @@ export const SelectionToolPopover = ({
 export const FreedrawToolPopover = ({
   app,
   activeTool,
+  children,
 }: {
   app: AppClassProperties;
   activeTool: UIAppState["activeTool"];
+  children?: React.ReactNode;
 }) => {
   const DRAWING_TOOLS = [
     {
@@ -473,6 +533,8 @@ export const FreedrawToolPopover = ({
         }
       }}
       displayedOption={displayedOption}
-    />
+    >
+      {activeTool.type === "freedraw" && children}
+    </ToolPopover>
   );
 };

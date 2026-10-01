@@ -68,6 +68,7 @@ export type ActionName =
   | "changeBucketFillBackgroundColor"
   | "changeFillStyle"
   | "changeStrokeWidth"
+  | "changeFreedrawStrokeWidth"
   | "changeSloppiness"
   | "changeFreedrawMode"
   | "changeStrokeStyle"

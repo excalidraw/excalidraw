@@ -79,6 +79,7 @@ import type {
   ElementsMap,
   ExcalidrawLineElement,
   Arrowhead,
+  StrokeVariability,
 } from "./types";
 
 import type { Drawable, Options } from "roughjs/bin/core";
@@ -1378,6 +1379,15 @@ export const getFreedrawMaxStrokeRadius = (
     ? element.strokeWidth * CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
     : element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR +
       3 * getElementDetailScale(element);
+
+export const getFreedrawStrokeSize = (
+  strokeWidth: number,
+  variability: StrokeVariability | undefined,
+) =>
+  strokeWidth *
+  (variability === "constant"
+    ? CONSTANT_WIDTH_FREEDRAW.SIZE_FACTOR
+    : VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR);
 
 /**
  * The streamline-smoothed centerline the freedraw stroke is rendered

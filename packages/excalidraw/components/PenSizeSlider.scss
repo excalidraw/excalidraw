@@ -1,0 +1,49 @@
+@use "../css/variables.module" as *;
+
+.excalidraw {
+  .pen-size-slider {
+    min-width: 11rem;
+  }
+
+  .pen-size-slider__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-block: 0.5rem;
+
+    .range-input {
+      flex: 1;
+      width: auto;
+    }
+  }
+
+  .pen-size-slider__preview {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+
+    span {
+      border-radius: 50%;
+    }
+  }
+
+  .pen-size-slider__value {
+    flex: none;
+    min-width: 2.25rem;
+    font-size: 12px;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary-color);
+  }
+
+  .pen-size-flyout {
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    background: var(--island-bg-color);
+    box-shadow: var(--shadow-island);
+    z-index: var(--zIndex-layerUI);
+  }
+}

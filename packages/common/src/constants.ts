@@ -500,6 +500,8 @@ export const FREEDRAW_STROKE_WIDTH: Readonly<
   extraBold: 4, // legacy (may be used again in the future)
 };
 
+export const FREEDRAW_STROKE_WIDTH_RANGE = { min: 0.05, max: 4 } as const;
+
 export const getStrokeWidthByKey = (
   elementType: ExcalidrawElement["type"],
   strokeWidthKey: StrokeWidthKey,

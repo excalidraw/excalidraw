@@ -370,6 +370,7 @@ const LayerUI = ({
                           onPenModeToggle={onPenModeToggle}
                           onLockToggle={onLockToggle}
                           heading={heading}
+                          renderAction={actionManager.renderAction}
                         />
                         {isCollaborating && (
                           <Island

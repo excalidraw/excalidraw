@@ -451,6 +451,8 @@ export interface AppState {
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
   currentItemStrokeWidthKey: StrokeWidthKey;
+  /** in `authoringUnits` */
+  currentItemFreedrawStrokeWidth: number;
   /** mirrors the `authoringUnits` prop; see `getAuthoringScale` */
   authoringUnits: AuthoringUnits;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
@@ -486,6 +488,7 @@ export interface AppState {
     | "compactStrokeStyles"
     | "compactOtherProperties"
     | "compactArrowProperties"
+    | "penSize"
     | null;
   openSidebar: { name: SidebarName; tab?: SidebarTabName } | null;
   openDialog:

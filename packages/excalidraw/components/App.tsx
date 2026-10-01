@@ -9392,6 +9392,8 @@ class App extends React.Component<AppProps, AppState> {
     const width =
       elementType === "freedraw" && freedrawStrokeWidth !== undefined
         ? freedrawStrokeWidth
+        : elementType === "freedraw"
+        ? this.state.currentItemFreedrawStrokeWidth
         : getStrokeWidthByKey(
             elementType,
             this.state.currentItemStrokeWidthKey,
