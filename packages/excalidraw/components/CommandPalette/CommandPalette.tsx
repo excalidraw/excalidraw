@@ -48,6 +48,7 @@ import {
   boltIcon,
   bucketFillIcon,
   ExportImageIcon,
+  mathSymbolsIcon,
   mermaidLogoIcon,
   brainIconThin,
   LibraryIcon,
@@ -571,6 +572,21 @@ function CommandPaletteInner({
               openDialog: {
                 name: "ttd",
                 tab: "text-to-diagram",
+              },
+            }));
+          },
+        },
+        {
+          label: `${t("toolBar.mathSymbols")}...`,
+          category: DEFAULT_CATEGORIES.tools,
+          icon: mathSymbolsIcon,
+          keywords: ["greek", "symbols", "equation", "formula"],
+          viewMode: false,
+          perform: () => {
+            setAppState((state) => ({
+              ...state,
+              openDialog: {
+                name: "mathSymbols",
               },
             }));
           },
