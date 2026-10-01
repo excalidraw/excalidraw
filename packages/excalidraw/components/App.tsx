@@ -7407,7 +7407,8 @@ class App extends React.Component<AppProps, AppState> {
       elementsMap,
     );
 
-    if (!element) {
+    // (editing text deselects the element)
+    if (!element || this.state.editingTextElement) {
       return;
     }
     if (this.state.selectedLinearElement) {
