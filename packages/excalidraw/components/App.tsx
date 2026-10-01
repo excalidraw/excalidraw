@@ -7463,15 +7463,16 @@ class App extends React.Component<AppProps, AppState> {
         this.cursor.set(CURSOR_TYPE.MOVE);
       }
 
+      // (updating the previous state, as these updates are batched)
       if (
         this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
       ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
+        this.setState((prevState) => ({
+          selectedLinearElement: prevState.selectedLinearElement && {
+            ...prevState.selectedLinearElement,
             hoverPointIndex,
           },
-        });
+        }));
       }
 
       if (
@@ -7480,12 +7481,12 @@ class App extends React.Component<AppProps, AppState> {
           segmentMidPointHoveredCoords,
         )
       ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
+        this.setState((prevState) => ({
+          selectedLinearElement: prevState.selectedLinearElement && {
+            ...prevState.selectedLinearElement,
             segmentMidPointHoveredCoords,
           },
-        });
+        }));
       }
 
       // Check for focus point hover
@@ -7505,13 +7506,13 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement.hoveredFocusPointBinding !==
         hoveredFocusPointBinding
       ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
+        this.setState((prevState) => ({
+          selectedLinearElement: prevState.selectedLinearElement && {
+            ...prevState.selectedLinearElement,
             isDragging: false,
             hoveredFocusPointBinding,
           },
-        });
+        }));
       }
 
       // Set cursor to pointer when hovering over a focus point

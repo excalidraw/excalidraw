@@ -426,6 +426,20 @@ describe("Test Linear Elements", () => {
     await getTextEditor();
   });
 
+  it("updates the hovered handles together (midpoint, then endpoint)", () => {
+    createTwoPointerLinearElement("arrow");
+    mouse.moveTo(midpoint[0], midpoint[1]);
+    expect(
+      h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+    ).not.toBe(null);
+
+    mouse.moveTo(p2[0], p2[1]);
+    expect(h.state.selectedLinearElement).toMatchObject({
+      hoverPointIndex: 1,
+      segmentMidPointHoveredCoords: null,
+    });
+  });
+
   it("doesn't highlight the arrow's midpoint while its label is edited", async () => {
     createTwoPointerLinearElement("arrow");
     mouse.moveTo(midpoint[0], midpoint[1]);
