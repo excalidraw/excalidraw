@@ -203,4 +203,18 @@ describe("frameNameOpacities", () => {
       expect(result.get("frame-bright-nook")).toBeCloseTo(0.95);
     });
   });
+  describe("when a frame whose name crowds its child's is pinned", () => {
+    beforeEach(() => {
+      frames = [
+        frame("frame-hovered-hall", 20, 100, 300, 225),
+        frame("frame-shy-alcove", 34, 114, 125, 100),
+      ];
+      pinned.add("frame-hovered-hall");
+      result = frameNameOpacities(frames, viewport, pinned);
+    });
+
+    it("should keep the child's name hidden", () => {
+      expect(result.get("frame-shy-alcove")).toBe(0);
+    });
+  });
 });

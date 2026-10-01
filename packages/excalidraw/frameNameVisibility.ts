@@ -64,8 +64,8 @@ const currentFrame = (frames: readonly FrameNameLayout[], viewport: Size) =>
       null,
     );
 
-// Selected and hovered names show on top of the others without displacing
-// them, so moving the pointer never reshuffles the rest of the board.
+// Selected and hovered names show at full strength but crowd only as much
+// as they would unpinned, so moving the pointer never reshuffles the board.
 export const frameNameOpacities = (
   frames: readonly FrameNameLayout[],
   viewport: Size,
@@ -73,6 +73,7 @@ export const frameNameOpacities = (
 ) => {
   const current = currentFrame(frames, viewport);
   const opacities = new Map<string, number>();
+  const unpinned = new Map<string, number>();
   const placed: FrameNameLayout[] = current ? [current] : [];
   const tooSmall = new Set<string>();
   const decided: FrameNameLayout[] = [];
@@ -80,33 +81,29 @@ export const frameNameOpacities = (
   for (const f of [...frames].sort((a, b) => area(b) - area(a))) {
     const parent = decided.findLast((p) => contains(p, f));
     decided.push(f);
-    const opacity = parent && tooSmall.has(parent.id) ? 0 : sizeOpacity(f);
-    if (opacity === 0) {
+    const fits = parent && tooSmall.has(parent.id) ? 0 : sizeOpacity(f);
+    if (fits === 0) {
       tooSmall.add(f.id);
     }
-    if (pinnedIds.has(f.id) || f.id === current?.id) {
-      opacities.set(f.id, 1);
-      continue;
-    }
-    if (opacity === 0 || !labelOnScreen(f, viewport)) {
-      opacities.set(f.id, opacity);
-      continue;
-    }
-    const crowding = Math.max(
-      0,
-      ...placed
-        .filter(
-          (p) =>
-            labelOnScreen(p, viewport) &&
-            Math.hypot(p.x - f.x, p.y - f.y) < LABEL_SPACING,
-        )
-        .map((p) => opacities.get(p.id) ?? 1),
-    );
-    const shown = opacity * (1 - crowding);
-    opacities.set(f.id, shown);
-    if (shown > 0) {
+    const crowding =
+      f.id === current?.id || fits === 0 || !labelOnScreen(f, viewport)
+        ? 0
+        : Math.max(
+            0,
+            ...placed
+              .filter(
+                (p) =>
+                  labelOnScreen(p, viewport) &&
+                  Math.hypot(p.x - f.x, p.y - f.y) < LABEL_SPACING,
+              )
+              .map((p) => unpinned.get(p.id) ?? 1),
+          );
+    const shown = f.id === current?.id ? 1 : fits * (1 - crowding);
+    unpinned.set(f.id, shown);
+    if (shown > 0 && f.id !== current?.id) {
       placed.push(f);
     }
+    opacities.set(f.id, pinnedIds.has(f.id) ? 1 : shown);
   }
 
   return opacities;
