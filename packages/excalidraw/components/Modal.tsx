@@ -46,11 +46,10 @@ export const Modal: React.FC<{
   };
 
   return createPortal(
-    <div
+    <dialog
       className={clsx("Modal", props.className, {
         "animations-disabled": animationsDisabled,
       })}
-      role="dialog"
       aria-modal="true"
       onKeyDown={handleKeydown}
       aria-labelledby={props.labelledBy}
@@ -66,7 +65,7 @@ export const Modal: React.FC<{
       >
         {props.children}
       </div>
-    </div>,
+    </dialog>,
     modalRoot,
   );
 };
