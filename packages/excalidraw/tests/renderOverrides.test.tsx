@@ -227,6 +227,14 @@ describe("setElementRenderOverrides", () => {
 
   it("repaints without changing elements, history, store or onChange", async () => {
     const { element, submit, onChange, rendering } = await setup();
+    // jsdom gives the editor no size, and a shape bigger than the screen
+    // draws without the bitmap this test checks is kept
+    act(() => API.setAppState({ width: 800, height: 600 }));
+    await waitFor(() =>
+      expect(Element.elementWithCanvasCache.get(element)).toBeDefined(),
+    );
+    rendering.mockClear();
+    onChange.mockClear();
     const elements = h.elements;
     const before = JSON.stringify(elements);
     const state = h.state;
