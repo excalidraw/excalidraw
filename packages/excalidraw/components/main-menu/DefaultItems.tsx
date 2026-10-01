@@ -17,6 +17,7 @@ import {
   actionToggleShowHints,
   actionToggleStats,
   actionToggleTheme,
+  actionTogglePresentation,
   actionToggleZenMode,
 } from "../../actions";
 import { actionToggleViewMode } from "../../actions/actionToggleViewMode";
@@ -59,6 +60,7 @@ import {
   MoonIcon,
   save,
   searchIcon,
+  presentationIcon,
   SunIcon,
   TrashIcon,
   usersIcon,
@@ -190,6 +192,27 @@ export const SearchMenu = (opts?: { className?: string }) => {
   );
 };
 SearchMenu.displayName = "SearchMenu";
+
+export const Presentation = (opts?: { className?: string }) => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  return (
+    <DropdownMenuItem
+      icon={presentationIcon}
+      data-testid="presentation-menu-button"
+      onSelect={() => {
+        actionManager.executeAction(actionTogglePresentation);
+      }}
+      shortcut={getShortcutFromShortcutName("presentation")}
+      aria-label={t("presentation.start")}
+      className={opts?.className}
+    >
+      {t("presentation.start")}
+    </DropdownMenuItem>
+  );
+};
+Presentation.displayName = "Presentation";
 
 export const Help = () => {
   const { t } = useI18n();

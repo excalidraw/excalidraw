@@ -122,6 +122,7 @@ const DefaultMainMenu: React.FC<{
         <MainMenu.DefaultItems.SaveAsImage />
       )}
       <MainMenu.DefaultItems.SearchMenu />
+      <MainMenu.DefaultItems.Presentation />
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
@@ -467,6 +468,9 @@ const LayerUI = ({
     editorInterface.canFitSidebar
   );
 
+  // presentation hides the editor chrome, including host-tunneled UI
+  const showEditorUI = !appState.presentation;
+
   const layerUIJSX = (
     <>
       {/* ------------------------- tunneled UI ---------------------------- */}
@@ -609,7 +613,7 @@ const LayerUI = ({
           }
         />
       )}
-      {editorInterface.formFactor === "phone" && (
+      {showEditorUI && editorInterface.formFactor === "phone" && (
         <MobileMenu
           app={app}
           appState={appState}
@@ -627,7 +631,7 @@ const LayerUI = ({
           scrollBackToContentUIEnabled={scrollBackToContentUIEnabled}
         />
       )}
-      {editorInterface.formFactor !== "phone" && (
+      {showEditorUI && editorInterface.formFactor !== "phone" && (
         <>
           {appProps.viewportStatusFrame?.border && (
             <ViewportStatusBorder
