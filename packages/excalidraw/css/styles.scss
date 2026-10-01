@@ -62,6 +62,24 @@ body.excalidraw-cursor-resize * {
     @include buttonNoHighlight;
   }
 
+  .font-size-input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 2rem;
+    margin-top: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-gray-30);
+    border-radius: var(--border-radius-md);
+    color: var(--text-primary-color);
+    background: var(--island-bg-color);
+    font: inherit;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+    }
+  }
+
   button {
     cursor: pointer;
     user-select: none;

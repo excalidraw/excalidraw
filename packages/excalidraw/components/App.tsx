@@ -11625,7 +11625,19 @@ class App extends React.Component<AppProps, AppState> {
   private onPointerMoveFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ) {
-    return withBatchedUpdatesThrottled((event: PointerEvent) => {
+    // Keep the raw input samples that arrive between rendered frames. The
+    // throttled handler intentionally keeps only its latest event, which made
+    // the beginning of a fast mouse/pen stroke pause and then jump to a coarse
+    // segment. This buffer belongs to one pointer-down session, so samples can
+    // never leak into another editor or the next stroke.
+    const pendingFreedrawPoints: Array<{
+      x: number;
+      y: number;
+      pressure: number;
+    }> = [];
+    const drawingPointerId = this.lastPointerDownEvent?.pointerId;
+
+    const handlePointerMove = (event: PointerEvent) => {
       if (this.state.openDialog?.name === "elementLinkSelector") {
         return;
       }
@@ -12448,23 +12460,45 @@ class App extends React.Component<AppProps, AppState> {
             return;
           }
 
+          const buffered = pendingFreedrawPoints.splice(0);
+          const samples =
+            buffered.length > 0
+              ? buffered
+              : [
+                  {
+                    x: pointerCoords.x,
+                    y: pointerCoords.y,
+                    pressure: event.pressure,
+                  },
+                ];
           const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+          const appendedPoints: LocalPoint[] = [];
+          const appendedPressures: number[] = [];
+          let lastPoint = points.length > 0 ? points[points.length - 1] : null;
 
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+          for (const sample of samples) {
+            const dx = sample.x - newElement.x;
+            const dy = sample.y - newElement.y;
+            if (lastPoint && lastPoint[0] === dx && lastPoint[1] === dy) {
+              continue;
+            }
+            const point = pointFrom<LocalPoint>(dx, dy);
+            appendedPoints.push(point);
+            if (!newElement.simulatePressure) {
+              appendedPressures.push(sample.pressure);
+            }
+            lastPoint = point;
+          }
 
-          if (!discardPoint) {
+          if (appendedPoints.length > 0) {
             const pressures = newElement.simulatePressure
               ? newElement.pressures
-              : [...newElement.pressures, event.pressure];
+              : [...newElement.pressures, ...appendedPressures];
 
             this.scene.mutateElement(
               newElement,
               {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                points: [...points, ...appendedPoints],
                 pressures,
               },
               {
@@ -12682,7 +12716,41 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-    });
+    };
+    const throttledHandler = withBatchedUpdatesThrottled(handlePointerMove);
+
+    const onPointerMove = ((event: PointerEvent) => {
+      if (
+        drawingPointerId !== undefined &&
+        event.pointerId !== drawingPointerId
+      ) {
+        return;
+      }
+      if (this.state.activeTool.type === "freedraw") {
+        const coalesced = event.getCoalescedEvents?.() ?? [];
+        const lastCoalesced = coalesced[coalesced.length - 1];
+        const samples =
+          lastCoalesced?.clientX === event.clientX &&
+          lastCoalesced?.clientY === event.clientY
+            ? coalesced
+            : [...coalesced, event];
+        for (const sample of samples) {
+          const coords = viewportCoordsToSceneCoords(sample, this.state);
+          pendingFreedrawPoints.push({
+            x: coords.x,
+            y: coords.y,
+            pressure: sample.pressure,
+          });
+        }
+      }
+      throttledHandler(event);
+    }) as ReturnType<typeof withBatchedUpdatesThrottled>;
+    onPointerMove.flush = () => throttledHandler.flush();
+    onPointerMove.cancel = () => {
+      pendingFreedrawPoints.length = 0;
+      throttledHandler.cancel();
+    };
+    return onPointerMove;
   }
 
   // Returns whether the pointer move happened over either scrollbar

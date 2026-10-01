@@ -210,7 +210,9 @@ export class AnimatedTrail implements Trail {
           state,
         );
 
-        return [result.x, result.y];
+        // The SVG layer is clipped to this editor. Viewport coordinates include
+        // the host's offset, while paths inside the layer start at the canvas.
+        return [result.x - state.offsetLeft, result.y - state.offsetTop];
       });
 
     const stroke = this.trailAnimation

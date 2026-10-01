@@ -86,6 +86,7 @@ import { trackEvent } from "../analytics";
 import { RadioSelection } from "../components/RadioSelection";
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { FontPicker } from "../components/FontPicker/FontPicker";
+import { FontSizeInput } from "../components/FontSizeInput";
 import { IconPicker } from "../components/IconPicker";
 import { Range } from "../components/Range";
 import { StrokeWidthRange } from "../components/StrokeWidthRange";
@@ -762,6 +763,36 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
     },
     PanelComponent: ({ elements, appState, updateData, app, data }) => {
       const { isCompact } = getStylesPanelInfo(app);
+      const fontSize = getFormValue(
+        elements,
+        app,
+        (element) => {
+          if (isTextElement(element)) {
+            return element.fontSize;
+          }
+          const boundTextElement = getBoundTextElement(
+            element,
+            app.scene.getNonDeletedElementsMap(),
+          );
+          return boundTextElement?.fontSize ?? null;
+        },
+        (element) =>
+          isTextElement(element) ||
+          getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !==
+            null,
+        (hasSelection) =>
+          hasSelection
+            ? null
+            : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+      );
+      const changeSize = (value: number) => {
+        withCaretPositionPreservation(
+          () => updateData(value),
+          isCompact,
+          !!appState.editingTextElement,
+          data?.onPreventClose,
+        );
+      };
 
       return (
         <fieldset>
@@ -795,43 +826,11 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
                   testId: "fontSize-veryLarge",
                 },
               ]}
-              value={getFormValue(
-                elements,
-                app,
-                (element) => {
-                  if (isTextElement(element)) {
-                    return element.fontSize;
-                  }
-                  const boundTextElement = getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  );
-                  if (boundTextElement) {
-                    return boundTextElement.fontSize;
-                  }
-                  return null;
-                },
-                (element) =>
-                  isTextElement(element) ||
-                  getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  ) !== null,
-                (hasSelection) =>
-                  hasSelection
-                    ? null
-                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-              )}
-              onChange={(value) => {
-                withCaretPositionPreservation(
-                  () => updateData(value),
-                  isCompact,
-                  !!appState.editingTextElement,
-                  data?.onPreventClose,
-                );
-              }}
+              value={fontSize}
+              onChange={changeSize}
             />
           </div>
+          <FontSizeInput value={fontSize} onChange={changeSize} />
         </fieldset>
       );
     },
