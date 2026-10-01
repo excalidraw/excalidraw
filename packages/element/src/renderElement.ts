@@ -1039,11 +1039,10 @@ const DIRECT_TEXT_ZOOM = 1;
  * zoom changes, and they grow with it (one handwritten word is megabytes
  * zoomed in); zoomed out over a full board they are thousands of new
  * canvases.
- * Freedraw and text draw the same either way. Rough fills and labelled
- * arrows do not (the bitmap crops hatching to the shape, and clears the gap
- * behind an arrow's label), so they keep their bitmaps, except at rest when
- * the canvas size limits would cap the bitmap below the zoom and it would be
- * shown blown up.
+ * Freedraw and text draw the same either way. Other shapes keep their
+ * bitmaps, except at rest when the canvas size limits would cap the bitmap
+ * below the zoom and it would be shown blown up. Images always keep theirs:
+ * the crop editor's uncropped preview is drawn only from the bitmap.
  */
 const shouldDrawDirectly = (
   element: NonDeletedExcalidrawElement,
@@ -1053,6 +1052,7 @@ const shouldDrawDirectly = (
   element.type === "freedraw" ||
   (element.type === "text" && appState.zoom.value > DIRECT_TEXT_ZOOM) ||
   (!appState.shouldCacheIgnoreZoom &&
+    element.type !== "image" &&
     cappedElementCanvasSize(element, elementsMap, appState.zoom).scale <
       appState.zoom.value);
 
@@ -1353,7 +1353,7 @@ const drawElement = (
         context.save();
         context.translate(cx, cy);
 
-        const boundTextElement = getBoundTextElement(element, elementsMap);
+        const boundTextElement = getBoundTextElement(element, allElementsMap);
 
         if (isArrowElement(element) && boundTextElement) {
           // Draw arrow directly as vector (no temp-canvas bitmap blit which
@@ -1366,7 +1366,7 @@ const drawElement = (
 
           const [, , , , boundTextCx, boundTextCy] = getElementAbsoluteCoords(
             boundTextElement,
-            elementsMap,
+            allElementsMap,
           );
           const holeX =
             boundTextCx -

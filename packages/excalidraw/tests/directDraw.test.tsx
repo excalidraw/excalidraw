@@ -22,12 +22,12 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const draw = (
-  element: NonDeletedExcalidrawElement,
+const drawScene = (
+  elements: NonDeletedExcalidrawElement[],
   zoom: number,
   state: Partial<AppState> = {},
 ) => {
-  const scene = new Scene([element], { skipValidation: true });
+  const scene = new Scene(elements, { skipValidation: true });
   const renderer = new Renderer(scene);
   const appState: AppState = {
     ...getDefaultAppState(),
@@ -49,6 +49,7 @@ const draw = (
   const fill = vi.spyOn(context, "fill");
   const fillText = vi.spyOn(context, "fillText");
   const strokeSpy = vi.spyOn(context, "stroke");
+  const clip = vi.spyOn(context, "clip");
   renderStaticScene({
     canvas,
     rc: rough.canvas(canvas),
@@ -68,8 +69,14 @@ const draw = (
       theme: "light",
     },
   });
-  return { drawImage, fill, fillText, stroke: strokeSpy };
+  return { drawImage, fill, fillText, stroke: strokeSpy, clip };
 };
+
+const draw = (
+  element: NonDeletedExcalidrawElement,
+  zoom: number,
+  state: Partial<AppState> = {},
+) => drawScene([element], zoom, state);
 
 const stroke = () =>
   API.createElement({
@@ -256,6 +263,63 @@ describe("a shape too big for its bitmap at this zoom", () => {
 
     it("is drawn from its bitmap", () => {
       expect(drawn.drawImage).toHaveBeenCalledTimes(1);
+    });
+  });
+});
+
+describe("an image too big for its bitmap at this zoom", () => {
+  let image: NonDeletedExcalidrawElement;
+
+  beforeEach(() => {
+    image = API.createElement({
+      type: "image",
+      x: 10,
+      y: 10,
+      width: 1000,
+      height: 1000,
+    });
+    draw(image, 10, { scrollX: -10, scrollY: -10 });
+  });
+
+  it("keeps drawing from its bitmap, which the crop editor's preview needs", () => {
+    expect(elementWithCanvasCache.get(image)?.zoomValue).toBe(10);
+  });
+});
+
+describe("a labelled arrow too big for its bitmap at this zoom", () => {
+  let drawn: ReturnType<typeof draw>;
+
+  beforeEach(() => {
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 10,
+      y: 10,
+      width: 2000,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(2000, 0)],
+    });
+    const label = API.createElement({
+      type: "text",
+      text: "hello",
+      x: 990,
+      y: 0,
+      containerId: arrow.id,
+    });
+    mutateElement(arrow, new Map(), {
+      boundElements: [{ type: "text", id: label.id }],
+    });
+    const scene = [arrow, label];
+
+    drawn = drawScene(scene, 20, {
+      scrollX: -980,
+      scrollY: -5,
+      editingTextElement: label,
+    });
+  });
+
+  describe("when its label is being edited", () => {
+    it("still clips the gap behind the label", () => {
+      expect(drawn.clip).toHaveBeenCalledWith("evenodd");
     });
   });
 });
