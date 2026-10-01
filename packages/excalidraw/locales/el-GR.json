@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
     "paste": "Επικόλληση",
     "pasteAsPlaintext": "Επικόλληση ως απλό κείμενο",
     "pasteCharts": "Επικόλληση γραφημάτων",
@@ -27,6 +28,7 @@
     "copyStyles": "Αντιγραφή εμφάνισης",
     "pasteStyles": "Επικόλληση εμφάνισης",
     "stroke": "Μολυβιά",
+    "textColor": "",
     "changeStroke": "Αλλαγή χρώματος πινελιάς",
     "background": "Φόντο",
     "changeBackground": "Αλλαγή χρώματος παρασκηνίου",
@@ -195,7 +197,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -245,6 +251,7 @@
     "undo": "Αναίρεση",
     "redo": "Επαναφορά",
     "resetLibrary": "Καθαρισμός βιβλιοθήκης",
+    "reset": "",
     "createNewRoom": "Δημιουργία νέου χώρου",
     "fullScreen": "Πλήρης οθόνη",
     "darkMode": "Σκοτεινή λειτουργία",
@@ -332,6 +339,7 @@
     "eraser": "Γόμα",
     "frame": "Εργαλείο πλαισίου",
     "magicframe": "Wireframe σε κώδικα",
+    "stickynote": "",
     "embeddable": "Web Embed",
     "laser": "Δείκτης λέιζερ",
     "autoshape": "",
@@ -357,6 +365,7 @@
     "group": "Ομάδα",
     "frame": "Πλαίσιο",
     "magicframe": "Wireframe σε κώδικα",
+    "stickynote": "",
     "embeddable": "Web Embed",
     "selection": "Επιλογή",
     "iframe": "IFrame"
@@ -375,6 +384,7 @@
     "freeDraw": "Κάντε κλικ και σύρτε, απελευθερώσατε όταν έχετε τελειώσει",
     "text": "Tip: μπορείτε επίσης να προσθέστε κείμενο με διπλό-κλικ οπουδήποτε με το εργαλείο επιλογών",
     "embeddable": "Κάντε κλικ και σύρετε για να δημιουργήσετε μια ενσωματωμένη ιστοσελίδα",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +392,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +660,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid σε Excalidraw",
     "button": "Εισαγωγή",
@@ -714,7 +734,9 @@
     },
     "sceneFonts": "Σε αυτή τη σκηνή",
     "availableFonts": "Διαθέσιμες γραμματοσειρές",
-    "empty": "Δεν βρέθηκαν γραμματοσειρές"
+    "empty": "Δεν βρέθηκαν γραμματοσειρές",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Δεν βρέθηκαν χρήστες",

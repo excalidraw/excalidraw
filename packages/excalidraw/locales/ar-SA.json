@@ -1,7 +1,8 @@
 {
   "labels": {
-    "signUp": "",
+    "signUp": "أنشئ حسابًا",
     "signIn": "",
+    "upgrade": "",
     "paste": "لصق",
     "pasteAsPlaintext": "اللصق كنص عادي",
     "pasteCharts": "لصق الرسوم البيانية",
@@ -27,6 +28,7 @@
     "copyStyles": "نسخ الأنماط",
     "pasteStyles": "لصق الأنماط",
     "stroke": "الخط",
+    "textColor": "",
     "changeStroke": "تغيير لون القلم",
     "background": "الخلفية",
     "changeBackground": "تغيير لون الخلفية",
@@ -195,7 +197,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "رابط إلى الكائن",
@@ -245,6 +251,7 @@
     "undo": "تراجع",
     "redo": "إعادة تنفيذ",
     "resetLibrary": "إعادة ضبط المكتبة",
+    "reset": "",
     "createNewRoom": "إنشاء غرفة جديدة",
     "fullScreen": "شاشة كاملة",
     "darkMode": "الوضع المظلم",
@@ -332,6 +339,7 @@
     "eraser": "ممحاة",
     "frame": "أداة الإطار",
     "magicframe": "Wireframe إلى كود",
+    "stickynote": "",
     "embeddable": "تضمين ويب",
     "laser": "مؤشر ليزر",
     "autoshape": "",
@@ -357,6 +365,7 @@
     "group": "مجموعة",
     "frame": "إطار",
     "magicframe": "Wireframe إلى كود",
+    "stickynote": "",
     "embeddable": "تضمين ويب",
     "selection": "تحديد",
     "iframe": "IFrame"
@@ -375,6 +384,7 @@
     "freeDraw": "انقر واسحب، أفرج عند الانتهاء",
     "text": "نصيحة: يمكنك أيضًا إضافة نص بالنقر المزدوج في أي مكان بأداة الاختيار",
     "embeddable": "اضغط مع السحب لإنشاء موقع ويب مضمّن",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "اضغط {{shortcut_1}} أو {{shortcut_2}} لإنهاء التحرير",
@@ -382,6 +392,7 @@
     "lockAngle": "يمكنك تقييد الزاوية بالضغط على {{shortcut}}",
     "resize": "يمكنك تقييد النسب بالضغط على {{shortcut_1}} أثناء تغيير الحجم،\nاضغط مطولاً على {{shortcut_2}} لتغيير الحجم من المركز",
     "resizeImage": "يمكنك تغيير الحجم بحرية بالضغط مطولًا على {{shortcut_1}}،\nاضغط مطولًا على {{shortcut_2}} لتغيير الحجم من المركز",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +660,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid إلى Excalidraw",
     "button": "إدراج",
@@ -656,7 +676,7 @@
     "syntax": "صيغة Mermaid",
     "preview": "معاينة",
     "label": "Mermaid",
-    "inputPlaceholder": "اكتب تعريف الرسم البياني لـ Mermaid هنا...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "الإصلاح التلقائي متوفر"
   },
   "ttd": {
@@ -714,7 +734,9 @@
     },
     "sceneFonts": "في هذا المشهد",
     "availableFonts": "الخطوط المتوفرة",
-    "empty": "لم يتم العثور على خطوط"
+    "empty": "لم يتم العثور على خطوط",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "لم يتم العثور على مستخدمين",

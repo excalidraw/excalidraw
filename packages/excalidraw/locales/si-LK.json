@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
     "paste": "අලවන්න",
     "pasteAsPlaintext": "සරල පෙළ ලෙස අලවන්න",
     "pasteCharts": "ප්‍රස්ථාරය",
@@ -27,6 +28,7 @@
     "copyStyles": "ශෛලීන් පිටපත් කරන්න",
     "pasteStyles": "ශෛලීන් අලවන්න",
     "stroke": "පහර",
+    "textColor": "",
     "changeStroke": "",
     "background": "පසුබිම",
     "changeBackground": "",
@@ -195,7 +197,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -245,6 +251,7 @@
     "undo": "පසුගමන",
     "redo": "නැවත කරන්න",
     "resetLibrary": "පුස්තකාලය යළි සකසන්න",
+    "reset": "",
     "createNewRoom": "නව කාමරයක් සාදන්න",
     "fullScreen": "පූර්ණ තිරය",
     "darkMode": "අඳුරු මාදිලිය",
@@ -332,6 +339,7 @@
     "eraser": "මකනය",
     "frame": "රාමුව",
     "magicframe": "මැජික් රාමුව",
+    "stickynote": "",
     "embeddable": "බිහිදැමිය හැකි",
     "laser": "ලේසර්",
     "autoshape": "",
@@ -357,6 +365,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,6 +384,7 @@
     "freeDraw": "නිදහස් ඇඳීම",
     "text": "පෙළ",
     "embeddable": "බිහිදැමිය හැකි",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +392,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +660,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Mermaid මාතෘකාව",
     "button": "Mermaid බොත්තම",
@@ -714,7 +734,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",

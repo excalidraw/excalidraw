@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "สมัครสมาชิก",
     "signIn": "เข้าสู่ระบบ",
+    "upgrade": "",
     "paste": "วาง",
     "pasteAsPlaintext": "วางโดยไม่มีการจัดรูปแบบ",
     "pasteCharts": "วางแผนภูมิ",
@@ -27,6 +28,7 @@
     "copyStyles": "คัดลอกรูปแบบ",
     "pasteStyles": "วางรูปแบบ",
     "stroke": "เส้นขอบ",
+    "textColor": "",
     "changeStroke": "เปลี่ยนสีเส้น",
     "background": "พื้นหลัง",
     "changeBackground": "เปลี่ยนสีพื้นหลัง",
@@ -195,7 +197,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "ลิงค์ไปสู่วัตถุ",
@@ -245,6 +251,7 @@
     "undo": "เลิกทำ",
     "redo": "ทำซ้ำ",
     "resetLibrary": "รีเซ็ตคลัง",
+    "reset": "",
     "createNewRoom": "สร้างห้องใหม่",
     "fullScreen": "เต็มหน้าจอ",
     "darkMode": "โหมดกลางคืน",
@@ -332,6 +339,7 @@
     "eraser": "ยางลบ",
     "frame": "เครื่องมือกรอบ",
     "magicframe": "ไวร์เฟรมเป็นโค้ด",
+    "stickynote": "",
     "embeddable": "ฝังเว็บ",
     "laser": "ตัวชี้เลเซอร์",
     "autoshape": "",
@@ -357,6 +365,7 @@
     "group": "จัดกลุ่ม",
     "frame": "กรอบ",
     "magicframe": "ไวร์เฟรมเป็นโค้ด",
+    "stickynote": "",
     "embeddable": "ฝังเว็บ",
     "selection": "การเลือก",
     "iframe": "ไอเฟรม"
@@ -375,6 +384,7 @@
     "freeDraw": "",
     "text": "",
     "embeddable": "คลิกและลากเพื่อสร้างการฝังสำหรับเว็บไซต์",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +392,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -649,6 +660,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "แทรก",
@@ -714,7 +734,9 @@
     },
     "sceneFonts": "ในฉากนี้",
     "availableFonts": "",
-    "empty": "ไม่พบแบบอักษร"
+    "empty": "ไม่พบแบบอักษร",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "ไม่พบผู้ใช้",
