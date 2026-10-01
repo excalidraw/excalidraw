@@ -19,6 +19,7 @@ import {
   fixBindingsAfterDeletion,
   getActiveTextElement,
   getApproxMinLineHeight,
+  getAuthoringScale,
   getApproxMinLineWidth,
   getBoundTextPadding,
   getBoundTextElement,
@@ -161,7 +162,7 @@ export class AppText {
     const viewWidth = this.app.state.width - left - right;
     return Math.min(
       viewWidth > 0 ? viewWidth / this.app.state.zoom.value : Infinity,
-      TEXT_MAX_WRAP_WIDTH,
+      TEXT_MAX_WRAP_WIDTH * getAuthoringScale(this.app.state),
     );
   };
 
