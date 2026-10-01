@@ -124,6 +124,13 @@ const findPartsForData = (data: any, parts: string[]) => {
   return data;
 };
 
+/**
+ * whether the current language has its own text for a key, without falling
+ * back to English (untranslated keys arrive from Crowdin as empty strings)
+ */
+export const hasOwnTranslation = (path: NestedKeyOf<typeof fallbackLangData>) =>
+  !!findPartsForData(currentLangData, path.split("."));
+
 export const t = (
   path: NestedKeyOf<typeof fallbackLangData>,
   replacement?: { [key: string]: string | number } | null,

@@ -125,7 +125,12 @@ export const actionCopyAsSvg = register({
   name: "copyAsSvg",
   label: "labels.copyAsSvg",
   icon: svgIcon,
-  trackEvent: { category: "element" },
+  trackEvent: {
+    // counted as exports (the "element" category is dropped by analytics)
+    category: "export",
+    getLabelSuffix: (appState) =>
+      `attribution:${appState.exportWithAttribution ? "on" : "off"}`,
+  },
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {
@@ -193,7 +198,12 @@ export const actionCopyAsPng = register({
   name: "copyAsPng",
   label: "labels.copyAsPng",
   icon: pngIcon,
-  trackEvent: { category: "element" },
+  trackEvent: {
+    // counted as exports (the "element" category is dropped by analytics)
+    category: "export",
+    getLabelSuffix: (appState) =>
+      `attribution:${appState.exportWithAttribution ? "on" : "off"}`,
+  },
   perform: async (elements, appState, _data, app) => {
     if (!app.canvas) {
       return {

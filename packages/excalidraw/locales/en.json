@@ -532,11 +532,13 @@
       "onlySelected": "Only selected",
       "darkMode": "Dark mode",
       "embedScene": "Embed scene",
+      "attribution": "Give Excalidraw a nod",
       "scale": "Scale",
       "padding": "Padding"
     },
     "tooltip": {
-      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
+      "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size.",
+      "attribution": "Excalidraw is free and open source. A small excalidraw.com badge below your drawing helps others find it. In SVG files, the badge is a link."
     },
     "title": {
       "exportToPng": "Export to PNG",
