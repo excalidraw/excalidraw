@@ -11,7 +11,16 @@ import type { NormalizedZoomValue } from "../types";
 type CanvasEvent = {
   type: string;
   transform: [number, number, number, number, number, number];
-  props: { dx: number; dy: number; dWidth: number };
+  props: {
+    dx: number;
+    dy: number;
+    dWidth: number;
+    dHeight: number;
+    sx?: number;
+    sy?: number;
+    sWidth: number;
+    sHeight: number;
+  };
 };
 
 /** the static canvas's element blits, in device pixels */
@@ -19,13 +28,22 @@ const getBlits = () => {
   const context = GlobalTestState.canvas.getContext("2d") as any;
   return (context.__getEvents() as CanvasEvent[])
     .filter((event) => event.type === "drawImage")
-    .map(({ transform: [a, b, c, d, e, f], props }) => ({
-      // the matrix's scale, whatever its rotation
-      scale: Math.hypot(a, b),
-      x: a * props.dx + c * props.dy + e,
-      y: b * props.dx + d * props.dy + f,
-      width: props.dWidth,
-    }));
+    .map(({ transform: [a, b, c, d, e, f], props }) => {
+      // where the bitmap's own origin lands, when only part of it is blitted
+      const dx = props.sx
+        ? props.dx - (props.sx * props.dWidth) / props.sWidth
+        : props.dx;
+      const dy = props.sy
+        ? props.dy - (props.sy * props.dHeight) / props.sHeight
+        : props.dy;
+      return {
+        // the matrix's scale, whatever its rotation
+        scale: Math.hypot(a, b),
+        x: a * dx + c * dy + e,
+        y: b * dx + d * dy + f,
+        width: props.dWidth,
+      };
+    });
 };
 
 /** re-renders at the given viewport and returns that render's blits */
