@@ -1,6 +1,6 @@
 {
   "name": "@excalidraw/element",
-  "version": "0.19.0-draw.7",
+  "version": "0.19.0-draw.8",
   "type": "module",
   "types": "./dist/types/element/src/index.d.ts",
   "main": "./dist/prod/index.js",
@@ -63,8 +63,8 @@
     "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
   },
   "dependencies": {
-    "@excalidraw/common": "0.19.0-draw.7",
-    "@excalidraw/math": "0.19.0-draw.7",
-    "@excalidraw/fractional-indexing": "0.19.0-draw.7"
+    "@excalidraw/common": "0.19.0-draw.8",
+    "@excalidraw/math": "0.19.0-draw.8",
+    "@excalidraw/fractional-indexing": "0.19.0-draw.8"
   }
 }
