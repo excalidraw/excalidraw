@@ -489,11 +489,8 @@ export const STROKE_WIDTH: Readonly<
   extraBold: 8, // unused (may be introduced in the future)
 };
 
-// freedraw schema 2.0 uses thinner stroke, but to maintain backwards and
-// forwards compatibility, instead of changing the shape renderer, we scale
-// the stroke width by 1/2 (previous, thin was 1, medium 2 etc.)
-//
-// note that in the UI, STROKE_WIDTH.thin == FREEDRAW_STROKE_WIDTH.thin still
+// a quarter of upstream's freedraw presets (0.5 / 1 / 2): handwriting reads too heavy
+// at those widths. Strokes saved at the old widths keep rendering at them.
 export const FREEDRAW_STROKE_WIDTH: Readonly<
   Record<StrokeWidthKey | "extraBold", ExcalidrawElement["strokeWidth"]>
 > = {
