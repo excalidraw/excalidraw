@@ -129,6 +129,19 @@ describe("wheel navigation", () => {
     expect(h.state.shouldCacheIgnoreZoom).toBe(false);
   });
 
+  it.each([-4, 4, -100])(
+    "zooms by the same ratio deep in as at 100%% (deltaY %s)",
+    (deltaY) => {
+      const ratioAt = (zoom: number) => {
+        API.setAppState({ zoom: { value: getNormalizedZoom(zoom) } });
+        wheel({ deltaY, ctrlKey: true });
+        return h.state.zoom.value / zoom;
+      };
+
+      expect(ratioAt(10_000)).toBeCloseTo(ratioAt(1), 3);
+    },
+  );
+
   describe("wheel button held down", () => {
     it("zooms instead of panning, whatever the modifiers", () => {
       const start = getViewport();

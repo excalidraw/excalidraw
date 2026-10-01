@@ -140,13 +140,8 @@ export class AppWheel {
       // ticks arriving before React has flushed the previous one would
       // otherwise all start from the same zoom and collapse into one step
       (state) => {
-        let newZoom = state.zoom.value - delta / 100;
-        // increase zoom steps the more zoomed-in we are (applies to >100% only)
-        newZoom +=
-          Math.log10(Math.max(1, state.zoom.value)) *
-          -sign *
-          // reduced amplification for small deltas (small movements on a trackpad)
-          Math.min(1, absDelta / 20);
+        // multiplicative, so a tick feels the same at every depth
+        const newZoom = state.zoom.value * Math.exp(-delta / 100);
 
         const minZoom = state.scrollConstraints?.lockZoom
           ? state.scrollConstraints.zoom
