@@ -113,6 +113,64 @@ describe("search", () => {
     expect(h.app.state.searchMatches?.matches[1].focus).toBe(false);
   });
 
+  it("should keep search results order stable while elements move", async () => {
+    const draggedElement = API.createElement({
+      type: "text",
+      text: "test 1",
+      x: 50,
+      y: 50,
+    });
+    const otherElement = API.createElement({
+      type: "text",
+      text: "test 2",
+      x: 50,
+      y: 200,
+    });
+
+    API.setElements([draggedElement, otherElement]);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.F);
+    });
+
+    const searchInput = await querySearchInput();
+
+    updateTextEditor(searchInput, "test");
+
+    await waitFor(() => {
+      expect(h.app.state.searchMatches?.matches.length).toBe(2);
+    });
+
+    const orderBefore = h.app.state
+      .searchMatches!.matches.map((match) => match.id)
+      .join(",");
+
+    expect(orderBefore).toBe(`${draggedElement.id},${otherElement.id}`);
+
+    // move the top element below the second one and emit a scene update,
+    // mimicking a canvas drag which re-searches and used to reorder the
+    // results list under the user's hands (#9503)
+    const liveElement = h.app.scene
+      .getNonDeletedElements()
+      .find((element) => element.id === draggedElement.id)!;
+
+    act(() => {
+      h.app.scene.mutateElement(liveElement, { y: 350 });
+    });
+    act(() => {
+      h.app.scene.replaceAllElements(h.app.scene.getNonDeletedElements());
+    });
+
+    // wait out the search debounce (350ms) so a re-search definitely ran
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const orderAfter = h.app.state
+      .searchMatches!.matches.map((match) => match.id)
+      .join(",");
+
+    expect(orderAfter).toEqual(orderBefore);
+  });
+
   it("should match text split across multiple lines", async () => {
     const scrollIntoViewMock = jest.fn();
     window.HTMLElement.prototype.scrollIntoView = scrollIntoViewMock;
