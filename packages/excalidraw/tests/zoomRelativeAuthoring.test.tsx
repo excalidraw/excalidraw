@@ -186,6 +186,27 @@ describe("authoringUnits: screen", () => {
     expect(fontSize * scale).toBeCloseTo(text.fontSize, 12);
   });
 
+  it("edits text made far in at a font size the browser lays out", async () => {
+    atZoom(10_000);
+    const text = await createText(100, 100, "hello");
+    expect(text.fontSize).toBeLessThan(1);
+
+    mouse.doubleClickAt(110, 110);
+    const editor = await getTextEditor();
+
+    // under a pixel the editor's box would collapse, so it is laid out
+    // larger and scaled back: the two meet at the size on screen
+    const fontSize = parseFloat(editor.style.fontSize || editor.style.font);
+    const scale = Number(editor.style.transform.match(/scale\((.*?)\)/)![1]);
+    expect(fontSize).toBeGreaterThanOrEqual(1);
+    expect(fontSize * scale).toBeCloseTo(text.fontSize * 10_000, 6);
+    expect(parseFloat(editor.style.width)).toBeGreaterThanOrEqual(1);
+
+    updateTextEditor(editor, "hello!");
+    Keyboard.exitTextEditor(editor);
+    expect(latest().find(isTextElement)!.text).toBe("hello!");
+  });
+
   it("labels a shape without resizing it on screen, at the same font size", async () => {
     const sizes = [];
     for (const zoom of ZOOMS) {
