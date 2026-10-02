@@ -37,7 +37,7 @@ export const actionSendBackward = register({
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
-    event.code === CODES.BRACKET_LEFT,
+    (event.code === CODES.BRACKET_LEFT || event.key === "["),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -67,7 +67,7 @@ export const actionBringForward = register({
   keyTest: (event) =>
     event[KEYS.CTRL_OR_CMD] &&
     !event.shiftKey &&
-    event.code === CODES.BRACKET_RIGHT,
+    (event.code === CODES.BRACKET_RIGHT || event.key === "]"),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -97,10 +97,12 @@ export const actionSendToBack = register({
     isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
         event.altKey &&
-        event.code === CODES.BRACKET_LEFT
+        (event.code === CODES.BRACKET_LEFT || event.key === "[")
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
-        event.code === CODES.BRACKET_LEFT,
+        (event.code === CODES.BRACKET_LEFT ||
+          event.key === "[" ||
+          event.key === "{"),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
@@ -135,10 +137,12 @@ export const actionBringToFront = register({
     isDarwin
       ? event[KEYS.CTRL_OR_CMD] &&
         event.altKey &&
-        event.code === CODES.BRACKET_RIGHT
+        (event.code === CODES.BRACKET_RIGHT || event.key === "]")
       : event[KEYS.CTRL_OR_CMD] &&
         event.shiftKey &&
-        event.code === CODES.BRACKET_RIGHT,
+        (event.code === CODES.BRACKET_RIGHT ||
+          event.key === "]" ||
+          event.key === "}"),
   PanelComponent: ({ updateData, appState }) => (
     <button
       type="button"
