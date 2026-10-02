@@ -4353,6 +4353,14 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       this.cursor.applyForTool();
     }
+    if (
+      this.state.activeTool.type === "freedraw" &&
+      (prevState.currentItemFreedrawPointer !==
+        this.state.currentItemFreedrawPointer ||
+        prevState.currentItemStrokeColor !== this.state.currentItemStrokeColor)
+    ) {
+      this.cursor.applyForTool();
+    }
 
     // Hide hyperlink popup if shown when element type is not selection
     if (
