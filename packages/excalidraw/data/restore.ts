@@ -22,6 +22,8 @@ import {
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_GRID_SIZE,
   DEFAULT_GRID_STEP,
+  DEFAULT_GRID_TYPE,
+  GRID_TYPE,
   randomId,
   getUpdatedTimestamp,
   updateActiveTool,
@@ -1361,6 +1363,8 @@ export const restoreAppState = (
     gridStep: getNormalizedGridStep(
       isFiniteNumber(appState.gridStep) ? appState.gridStep : DEFAULT_GRID_STEP,
     ),
+    gridType:
+      appState.gridType === GRID_TYPE.DOTS ? GRID_TYPE.DOTS : DEFAULT_GRID_TYPE,
     currentItemStickynoteStrokeColor: normalizeStickyNoteStrokeColor(
       nextAppState.currentItemStickynoteStrokeColor,
     ),
