@@ -906,6 +906,9 @@ export const UndoRedoActions = ({
         {renderAction("redo")}
       </Tooltip>
     </div>
+    <div className="duplicate-button-container">
+      {renderAction("duplicateSelection")}
+    </div>
   </div>
 );
 
