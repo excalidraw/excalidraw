@@ -2,6 +2,7 @@ import {
   applyDarkModeFilter,
   COLOR_WHITE,
   FRAME_STYLE,
+  isShallowEqual,
   THEME,
   throttleRAF,
 } from "@excalidraw/common";
@@ -23,9 +24,15 @@ import {
   getRenderElementWithPositionOverride,
   resolveElementRenderState,
   renderElement,
+  regenerateDeferredZoomBitmaps,
+  startZoomRegenBudget,
 } from "@excalidraw/element";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getElementAbsoluteCoords,
+  getElementBounds,
+  getElementRenderPadding,
+} from "@excalidraw/element";
 
 import type { ElementRenderState } from "@excalidraw/element";
 
@@ -522,10 +529,192 @@ const _renderStaticScene = ({
   });
 };
 
+// last painted config per canvas: a pan paints incrementally on top of it,
+// and the repaint after deferred zoom regeneration uses it so it renders the
+// current scene, not the one on screen when regeneration was deferred
+const lastConfigByCanvas = new WeakMap<
+  HTMLCanvasElement,
+  StaticSceneRenderConfig
+>();
+const canvasesWithDeferredZoomRegen = new Set<HTMLCanvasElement>();
+
+// regenerate a budget's worth of stale bitmaps per frame without repainting
+// (a repaint of thousands of elements costs more than the budget), then
+// repaint once they're all sharp
+const regenerateDeferredZoomBitmapsLoop = (ownerWindow: Window) => {
+  if (regenerateDeferredZoomBitmaps()) {
+    ownerWindow.requestAnimationFrame(() =>
+      regenerateDeferredZoomBitmapsLoop(ownerWindow),
+    );
+    return;
+  }
+  const canvases = [...canvasesWithDeferredZoomRegen];
+  canvasesWithDeferredZoomRegen.clear();
+  for (const canvas of canvases) {
+    const config = lastConfigByCanvas.get(canvas);
+    if (config) {
+      // bitmaps changed, so the last frame can't be reused
+      renderOnScreenStaticScene(config, { isFullRender: true });
+    }
+  }
+};
+
+/** Whether the only change since the last paint is the scroll position. */
+const isPanOnly = (
+  prev: StaticSceneRenderConfig,
+  next: StaticSceneRenderConfig,
+) =>
+  !!next.canvasNonce &&
+  prev.canvasNonce === next.canvasNonce &&
+  prev.scale === next.scale &&
+  prev.rc === next.rc &&
+  prev.allElementsMap === next.allElementsMap &&
+  // both draw elements beyond their bounds, or depend on all visible ones
+  !next.appState.frameToHighlight &&
+  !next.renderConfig.elementRenderOverrides?.size &&
+  isShallowEqual(prev.renderConfig, next.renderConfig) &&
+  isShallowEqual(prev.appState, next.appState, {
+    scrollX: () => true,
+    scrollY: () => true,
+  });
+
+/**
+ * Paints a pan by moving the last frame by the scroll delta and rendering
+ * only the exposed strips, so panning over thousands of visible elements
+ * doesn't redraw every one of them each frame. Returns false when the pan
+ * can't be painted that way.
+ */
+const paintPan = (
+  prev: StaticSceneRenderConfig,
+  config: StaticSceneRenderConfig,
+) => {
+  const { canvas, scale } = config;
+  const prevAppState = snapScrollToDevicePixels(prev.appState, scale);
+  const appState = snapScrollToDevicePixels(config.appState, scale);
+  const devicePixels = appState.zoom.value * scale;
+  const dx = (appState.scrollX - prevAppState.scrollX) * devicePixels;
+  const dy = (appState.scrollY - prevAppState.scrollY) * devicePixels;
+  const shiftX = Math.round(dx);
+  const shiftY = Math.round(dy);
+  if (
+    // the snapped scroll keeps the delta on whole device pixels; anything
+    // else would resample the last frame
+    Math.abs(dx - shiftX) > 1e-3 ||
+    Math.abs(dy - shiftY) > 1e-3
+  ) {
+    return false;
+  }
+
+  // Viewport culling uses element bounds, but elements render past them (by
+  // up to their render padding): a full render leaves out, near the viewport
+  // edges, what elements culled just outside it would draw. Along with the
+  // exposed strips, a band along every edge is repainted, as wide as that
+  // padding, so what is kept of the last frame is exactly what a full render
+  // would draw.
+  let padding = 0;
+  for (const element of config.visibleElements) {
+    padding = Math.max(padding, getElementRenderPadding(element));
+  }
+  const band = Math.ceil(padding * devicePixels);
+  const { width, height } = canvas;
+  if (
+    Math.abs(shiftX) + band * 2 >= width ||
+    Math.abs(shiftY) + band * 2 >= height
+  ) {
+    return false;
+  }
+
+  // regions to repaint, in device pixels: [x, y, width, height]
+  const regions: [number, number, number, number][] = [
+    [0, 0, band + Math.max(shiftX, 0), height],
+    [width - band + Math.min(shiftX, 0), 0, band - Math.min(shiftX, 0), height],
+    [0, 0, width, band + Math.max(shiftY, 0)],
+    [0, height - band + Math.min(shiftY, 0), width, band - Math.min(shiftY, 0)],
+  ];
+  const sceneRegions = regions.map(([x, y, w, h]) => [
+    x / devicePixels - appState.scrollX,
+    y / devicePixels - appState.scrollY,
+    (x + w) / devicePixels - appState.scrollX,
+    (y + h) / devicePixels - appState.scrollY,
+  ]);
+  // what a full render draws into the regions: the (culled) visible elements
+  // that render into them
+  const visibleElements = config.visibleElements.filter((element) => {
+    const [x1, y1, x2, y2] = getElementBounds(element, config.elementsMap);
+    const padding = getElementRenderPadding(element);
+    return sceneRegions.some(
+      ([rx1, ry1, rx2, ry2]) =>
+        x1 - padding <= rx2 &&
+        x2 + padding >= rx1 &&
+        y1 - padding <= ry2 &&
+        y2 + padding >= ry1,
+    );
+  });
+
+  const context = canvas.getContext("2d")!;
+  context.save();
+  try {
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    // "copy" so a transparent background doesn't blend with the old frame
+    context.globalCompositeOperation = "copy";
+    context.drawImage(canvas, shiftX, shiftY);
+    context.globalCompositeOperation = "source-over";
+    context.beginPath();
+    for (const region of regions) {
+      context.rect(...region);
+    }
+    context.clip();
+    _renderStaticScene({ ...config, visibleElements });
+  } finally {
+    context.restore();
+  }
+  return true;
+};
+
+/**
+ * Renders the on-screen static canvas: pans paint incrementally, and
+ * zoom-stale element bitmaps are regenerated within a per-frame budget, the
+ * rest on the next frames.
+ */
+const renderOnScreenStaticScene = (
+  config: StaticSceneRenderConfig,
+  { isFullRender = false } = {},
+) => {
+  if (config.renderConfig.isExporting || !config.canvas) {
+    _renderStaticScene(config);
+    return;
+  }
+  const prev = lastConfigByCanvas.get(config.canvas);
+  lastConfigByCanvas.set(config.canvas, config);
+  const endZoomRegenBudget = startZoomRegenBudget();
+  let hasDeferred = false;
+  try {
+    const panned =
+      !isFullRender &&
+      prev &&
+      isPanOnly(prev, config) &&
+      paintPan(prev, config);
+    if (!panned) {
+      _renderStaticScene(config);
+    }
+  } finally {
+    hasDeferred = endZoomRegenBudget();
+  }
+  const ownerWindow = config.canvas.ownerDocument.defaultView;
+  if (hasDeferred && ownerWindow) {
+    if (!canvasesWithDeferredZoomRegen.size) {
+      ownerWindow.requestAnimationFrame(() =>
+        regenerateDeferredZoomBitmapsLoop(ownerWindow),
+      );
+    }
+    canvasesWithDeferredZoomRegen.add(config.canvas);
+  }
+};
+
 /** throttled to animation framerate */
 export const renderStaticSceneThrottled = throttleRAF(
   (config: StaticSceneRenderConfig) => {
-    _renderStaticScene(config);
+    renderOnScreenStaticScene(config);
   },
 );
 
@@ -541,5 +730,5 @@ export const renderStaticScene = (
     return;
   }
 
-  _renderStaticScene(renderConfig);
+  renderOnScreenStaticScene(renderConfig);
 };

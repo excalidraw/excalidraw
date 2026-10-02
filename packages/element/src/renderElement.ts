@@ -340,6 +340,13 @@ const generateElementCanvas = (
 
 export const DEFAULT_LINK_SIZE = 14;
 
+/**
+ * How far an element's rendering can reach past its bounds (scene units): its
+ * cached bitmap's padding, and the link icon outside its top-right corner.
+ */
+export const getElementRenderPadding = (element: ExcalidrawElement) =>
+  getCanvasPadding(element) + (element.link ? DEFAULT_LINK_SIZE * 2 : 0);
+
 const IMAGE_PLACEHOLDER_IMG =
   typeof document !== "undefined"
     ? document.createElement("img")
@@ -684,6 +691,48 @@ export const elementWithCanvasCache = new WeakMap<
   ExcalidrawElementWithCanvas
 >();
 
+/**
+ * Per-frame time budget for regenerating bitmaps made stale by a zoom change.
+ * Once it runs out, the remaining stale bitmaps are blitted rescaled (soft)
+ * and regenerated on the following frames, so settling a zoom over thousands
+ * of elements (e.g. handwritten notes) doesn't freeze the page.
+ */
+const ZOOM_REGEN_BUDGET_MS = 8;
+
+// time left for zoom regeneration in the current render; Infinity outside a
+// budgeted render, so other render paths always regenerate
+let zoomRegenBudgetLeft = Infinity;
+// bitmaps whose zoom regeneration didn't fit the budget
+const deferredZoomRegens = new Map<ExcalidrawElement, () => void>();
+
+/** Starts a budgeted render. Returns a function that ends it and reports
+ *  whether any zoom-stale bitmaps were deferred. */
+export const startZoomRegenBudget = () => {
+  zoomRegenBudgetLeft = ZOOM_REGEN_BUDGET_MS;
+  deferredZoomRegens.clear();
+  return () => {
+    zoomRegenBudgetLeft = Infinity;
+    return deferredZoomRegens.size > 0;
+  };
+};
+
+/**
+ * Regenerates deferred bitmaps within one frame's budget, without rendering.
+ * Returns whether any are left.
+ */
+export const regenerateDeferredZoomBitmaps = () => {
+  zoomRegenBudgetLeft = ZOOM_REGEN_BUDGET_MS;
+  for (const [element, regenerate] of deferredZoomRegens) {
+    if (zoomRegenBudgetLeft <= 0) {
+      break;
+    }
+    deferredZoomRegens.delete(element);
+    regenerate();
+  }
+  zoomRegenBudgetLeft = Infinity;
+  return deferredZoomRegens.size > 0;
+};
+
 const generateElementWithCanvas = (
   element: NonDeletedExcalidrawElement,
   elementsMap: NonDeletedSceneElementsMap,
@@ -692,10 +741,22 @@ const generateElementWithCanvas = (
 ) => {
   const zoom: Zoom = renderConfig ? appState.zoom : DEFAULT_ZOOM;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
-  const shouldRegenerateBecauseZoom =
+  let shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
     !appState?.shouldCacheIgnoreZoom;
+  if (shouldRegenerateBecauseZoom && zoomRegenBudgetLeft <= 0) {
+    shouldRegenerateBecauseZoom = false;
+    deferredZoomRegens.set(element, () =>
+      generateElementWithCanvas(element, elementsMap, renderConfig, appState),
+    );
+  }
+  // only zoom-stale regeneration is budgeted; new or otherwise outdated
+  // bitmaps must be generated now to render correctly
+  const regenStart =
+    shouldRegenerateBecauseZoom && zoomRegenBudgetLeft !== Infinity
+      ? performance.now()
+      : null;
   const imageCrop = isImageElement(element) ? element.crop : null;
 
   const containingFrameOpacity =
@@ -721,6 +782,9 @@ const generateElementWithCanvas = (
     }
 
     elementWithCanvasCache.set(element, elementWithCanvas);
+    if (regenStart !== null) {
+      zoomRegenBudgetLeft -= performance.now() - regenStart;
+    }
 
     return elementWithCanvas;
   }
@@ -745,11 +809,14 @@ const generateElementWithCanvas = (
  * tolerates float arithmetic.
  */
 const canSnapElement = (
-  element: ExcalidrawElement,
+  elementWithCanvas: ExcalidrawElementWithCanvas,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) =>
   !appState?.shouldCacheIgnoreZoom &&
-  (!element.angle || isRightAngleRads(element.angle));
+  // a bitmap still at an old zoom (regeneration deferred) is resampled too
+  elementWithCanvas.zoomValue === appState.zoom.value &&
+  (!elementWithCanvas.element.angle ||
+    isRightAngleRads(elementWithCanvas.element.angle));
 
 /**
  * Breaks a `Math.round` tie at exactly half a device pixel the same way
@@ -845,7 +912,7 @@ const drawElementFromCanvas = (
 
   const transform = context.getTransform();
 
-  if (canSnapElement(element, appState)) {
+  if (canSnapElement(elementWithCanvas, appState)) {
     // blit the cached bitmap on whole device pixels. Nearest-neighbor at a
     // fractional offset is a pixel-exact copy shifted to the nearest pixel
     // — except at an exact half pixel, where a GPU-accelerated canvas
@@ -1206,7 +1273,7 @@ const drawElement = (
 
         // see `canSnapElement` for why not during zoom gestures or at
         // other angles
-        if (canSnapElement(element, appState)) {
+        if (canSnapElement(elementWithCanvas, appState)) {
           // Disabling smoothing makes output much sharper, especially for
           // text. Unless for non-right angles, where the aliasing is really
           // terrible on Chromium.
