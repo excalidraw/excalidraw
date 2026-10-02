@@ -188,7 +188,7 @@ export const frameClip = (
   );
 };
 
-type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
+type LinkIconCanvas = HTMLCanvasElement & { zoom: number; fillColor: string };
 
 const linkIconCanvasCache: {
   regularLink: LinkIconCanvas | null;
@@ -198,7 +198,25 @@ const linkIconCanvasCache: {
   elementLink: null,
 };
 
-const renderLinkIcon = (
+/**
+ * Color for the small chip painted behind an element's link icon.
+ *
+ * This is drawn directly onto a canvas (not styled via CSS), so — same as
+ * bootstrapCanvas' handling of the scene background in renderer/helpers.ts —
+ * dark mode has to be applied explicitly per color rather than relying on a
+ * theme stylesheet. Without this, a light viewBackgroundColor (the common
+ * default) renders as a plain white chip behind the link icon in dark theme.
+ * @param appState current app state
+ */
+export const getLinkIconFillColor = (
+  appState: Pick<StaticCanvasAppState, "viewBackgroundColor" | "theme">,
+): string =>
+  applyDarkModeFilter(
+    appState.viewBackgroundColor || COLOR_WHITE,
+    appState.theme === THEME.DARK,
+  );
+
+export const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
   context: CanvasRenderingContext2D,
   appState: StaticCanvasAppState,
@@ -229,9 +247,16 @@ const renderLinkIcon = (
 
     let linkCanvas = linkIconCanvasCache[canvasKey];
 
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
+    const fillColor = getLinkIconFillColor(appState);
+
+    if (
+      !linkCanvas ||
+      linkCanvas.zoom !== appState.zoom.value ||
+      linkCanvas.fillColor !== fillColor
+    ) {
       linkCanvas = Object.assign(document.createElement("canvas"), {
         zoom: appState.zoom.value,
+        fillColor,
       });
       linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
       linkCanvas.height =
@@ -247,8 +272,7 @@ const renderLinkIcon = (
       // Seed a sane default so a corrupted color (silently rejected by the
       // canvas) falls back to white instead of a stale fillStyle.
       linkCanvasCacheContext.fillStyle = COLOR_WHITE;
-      linkCanvasCacheContext.fillStyle =
-        appState.viewBackgroundColor || COLOR_WHITE;
+      linkCanvasCacheContext.fillStyle = fillColor;
 
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
