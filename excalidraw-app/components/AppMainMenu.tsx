@@ -5,6 +5,8 @@ import {
 } from "@excalidraw/excalidraw/components/icons";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { MainMenu } from "@excalidraw/excalidraw/index";
+import DropdownMenuItemCheckbox from "@excalidraw/excalidraw/components/dropdownMenu/DropdownMenuItemCheckbox";
+import { t } from "@excalidraw/excalidraw/i18n";
 import React from "react";
 
 import { isDevEnv } from "@excalidraw/common";
@@ -22,6 +24,8 @@ export const AppMainMenu: React.FC<{
   isCollabEnabled: boolean;
   theme: Theme | "system";
   refresh: () => void;
+  showLinkIcons: boolean;
+  onShowLinkIconsChange: (showLinkIcons: boolean) => void;
 }> = React.memo((props) => {
   const { t } = useI18n();
   return (
@@ -78,7 +82,19 @@ export const AppMainMenu: React.FC<{
         </MainMenu.Item>
       )}
       <MainMenu.Separator />
-      <MainMenu.DefaultItems.Preferences />
+      <MainMenu.DefaultItems.Preferences
+        additionalItems={
+          <DropdownMenuItemCheckbox
+            checked={props.showLinkIcons}
+            onSelect={(event) => {
+              props.onShowLinkIconsChange(!props.showLinkIcons);
+              event.preventDefault();
+            }}
+          >
+            {t("labels.showLinkIcons")}
+          </DropdownMenuItemCheckbox>
+        }
+      />
       <MainMenu.DefaultItems.ToggleTheme allowSystemTheme theme={props.theme} />
       <MainMenu.ItemCustom>
         <LanguageList style={{ width: "100%" }} />
