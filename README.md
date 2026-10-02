@@ -49,6 +49,31 @@
   </figure>
 </div>
 
+## Self-hosted workspace
+
+This repository also contains an **independent, self-hosted collaborative workspace** built around the unmodified Excalidraw editor. It runs entirely on your own machine or server and never contacts excalidraw.com or plus.excalidraw.com.
+
+- **Accounts, workspaces and roles** (owner / admin / member), dashboard with folders, search, sorting, trash and restore
+- **Cloud scenes** with debounced autosave, offline drafts, retry and conflict merging
+- **Sharing**: per-user view/edit permissions, revocable read-only/edit links, embeds
+- **Realtime collaboration**: live cursors, presence, incremental updates, server-enforced view-only
+- **Comments** pinned to the canvas, **presentations** from frames (with live follow), **personal and workspace libraries**
+- **Export**: PNG / SVG / `.excalidraw` from the editor, plus native **vector PDF** and editable **PowerPoint**
+- **AI text-to-diagram** with pluggable providers (OpenAI, Anthropic, Gemini, OpenRouter, local models), bring-your-own key, daily limits; **Mermaid → diagram needs no AI**
+- **Public API, scoped API keys and an MCP server** for scripts and AI agents
+- MongoDB storage (inspect with Compass), local or S3-compatible file storage, feature flags for everything
+
+```bash
+yarn install
+cp server/.env.example server/.env      # set SESSION_SECRET (openssl rand -base64 48)
+brew services start mongodb-community@7.0   # or any MongoDB on 127.0.0.1:27017
+yarn dev:all                            # web app http://localhost:3002 · API http://127.0.0.1:3100
+```
+
+Documentation: [Setup](docs/SETUP.md) · [Architecture](docs/ARCHITECTURE.md) · [Database](docs/DATABASE.md) · [Auth](docs/AUTH.md) · [Collaboration](docs/COLLABORATION.md) · [AI](docs/AI.md) · [API, keys & MCP](docs/API.md) · [Security](docs/SECURITY.md) · [Deployment](docs/DEPLOYMENT.md) · [Licensing](docs/LICENSING.md)
+
+The packages under `packages/` and `excalidraw-app/` are upstream Excalidraw (MIT) and behave as before.
+
 ## Features
 
 The Excalidraw editor (npm package) supports:

@@ -1,0 +1,11 @@
+# Build context for deploy/Dockerfile.server (BuildKit reads <Dockerfile>.dockerignore).
+**/node_modules
+**/build
+**/dist
+**/.vite
+.git
+.env*
+server/.env
+server/storage
+coverage
+examples

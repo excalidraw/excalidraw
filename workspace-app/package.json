@@ -1,0 +1,28 @@
+{
+  "name": "excalidraw-workspace-app",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "fontkit": "2.0.4",
+    "idb-keyval": "6.0.3",
+    "jspdf": "4.2.1",
+    "pptxgenjs": "4.0.1",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-router-dom": "7.18.4",
+    "svg2pdf.js": "2.8.1"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 3002"
+  },
+  "devDependencies": {
+    "@types/fontkit": "2.0.8"
+  }
+}

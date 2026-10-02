@@ -1,0 +1,35 @@
+{
+  "name": "excalidraw-workspace-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.ts",
+    "build": "node build.mjs",
+    "start:prod": "node dist/server.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1143.0",
+    "@fastify/cookie": "11.1.2",
+    "@fastify/rate-limit": "11.2.0",
+    "@fastify/websocket": "11.3.1",
+    "dotenv": "16.0.1",
+    "fastify": "5.12.5",
+    "mongodb": "6.20.0",
+    "ws": "8.22.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.0",
+    "@types/ws": "8.18.1",
+    "esbuild": "0.25.0",
+    "tsx": "4.20.6"
+  }
+}
