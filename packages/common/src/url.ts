@@ -22,7 +22,9 @@ export const toValidURL = (link: string) => {
   link = normalizeLink(link);
 
   // make relative links into fully-qualified urls
-  if (link.startsWith("/")) {
+  if (link.startsWith("//")) {
+    link = `${location.protocol}${link}`;
+  } else if (link.startsWith("/")) {
     return `${location.origin}${link}`;
   }
 
