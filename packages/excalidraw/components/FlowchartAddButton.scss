@@ -1,0 +1,97 @@
+.flowchart-add-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 1;
+}
+
+.flowchart-add-step__trigger,
+.flowchart-add-step__direction {
+  border: 1px solid var(--button-gray-2);
+  background: var(--island-bg-color);
+  color: var(--text-primary-color);
+  cursor: pointer;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 12%);
+}
+
+.flowchart-add-step__trigger {
+  border-radius: 5px;
+  gap: 4px;
+  min-height: 28px;
+  padding: 3px 7px 3px 5px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.flowchart-add-step__trigger svg {
+  width: 16px;
+  height: 16px;
+}
+
+.flowchart-add-step__trigger:hover,
+.flowchart-add-step__direction:hover,
+.flowchart-add-step__trigger:focus-visible,
+.flowchart-add-step__direction:focus-visible {
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 1px;
+}
+
+.flowchart-add-step__picker {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  display: grid;
+  grid-template-columns: repeat(3, 28px);
+  grid-template-rows: repeat(3, 28px);
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--button-gray-2);
+  border-radius: 7px;
+  background: var(--island-bg-color);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 18%);
+  transform: translateX(-50%);
+}
+
+.flowchart-add-step__direction {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  padding: 0;
+}
+
+.flowchart-add-step__direction--up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.flowchart-add-step__direction--left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.flowchart-add-step__direction--right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.flowchart-add-step__direction--down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.flowchart-add-step__direction-icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
