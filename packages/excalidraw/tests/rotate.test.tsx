@@ -6,7 +6,9 @@ import { reseed } from "@excalidraw/common";
 import { Excalidraw } from "../index";
 
 import { UI } from "./helpers/ui";
-import { render, unmountComponent } from "./test-utils";
+import { act, render, unmountComponent } from "./test-utils";
+
+const { h } = window;
 
 unmountComponent();
 
@@ -82,4 +84,26 @@ test("unselected bound arrows update when rotating their target elements", async
   expect(textArrow.points[0]).toEqual([0, 0]);
   expect(textArrow.points[1][0]).toBeCloseTo(-95.4635969899922, 0);
   expect(textArrow.points[1][1]).toBeCloseTo(-126.8785027399889, 0);
+});
+
+// https://github.com/excalidraw/excalidraw/issues/4057
+test("can rotate to an exact angle while grid mode is enabled", async () => {
+  await render(<Excalidraw />);
+  const rectangle = UI.createElement("rectangle", {
+    x: 0,
+    y: 0,
+    width: 200,
+    height: 100,
+  });
+
+  act(() => {
+    h.setState({ gridModeEnabled: true });
+  });
+
+  // the rotation handle sits directly above the center (100, 50); dragging it
+  // level with the center should rotate the element to exactly 90°. Grid
+  // snapping must not quantize the pointer used to derive the angle (#4057).
+  UI.rotate(rectangle, [60, 70]);
+
+  expect(rectangle.angle).toBeCloseTo(Math.PI / 2, 5);
 });
