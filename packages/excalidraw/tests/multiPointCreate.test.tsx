@@ -10,6 +10,7 @@ import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
+import { Keyboard } from "./helpers/ui";
 import {
   render,
   fireEvent,
@@ -136,6 +137,30 @@ describe("multi point mode in linear elements", () => {
     ]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
+  });
+
+  it("removes an unfinished multi-point arrow when canceled", async () => {
+    const { getByToolName, container } = await render(
+      <Excalidraw handleKeyboardGlobally={true} />,
+    );
+    const tool = getByToolName("arrow");
+    fireEvent.click(tool);
+
+    const canvas = container.querySelector("canvas.interactive")!;
+    fireEvent.pointerDown(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerUp(canvas, { clientX: 30, clientY: 30 });
+    fireEvent.pointerMove(canvas, { clientX: 50, clientY: 60 });
+    fireEvent.pointerDown(canvas, { clientX: 50, clientY: 60 });
+    fireEvent.pointerUp(canvas);
+
+    Keyboard.keyPress(KEYS.ESCAPE);
+
+    expect(h.elements).toEqual([
+      expect.objectContaining({
+        type: "arrow",
+        isDeleted: true,
+      }),
+    ]);
   });
 
   it("line", async () => {
