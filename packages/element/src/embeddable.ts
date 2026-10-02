@@ -27,6 +27,10 @@ const RE_YOUTUBE =
 
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
+// unlisted videos only play with their privacy hash, which share links put in
+// the path (vimeo.com/<id>/<hash>) and embed links in the `h` param
+const RE_VIMEO_HASH_PATH = /^(\d+)\/([a-zA-Z0-9]+)$/;
+const RE_VIMEO_HASH_PARAM = /[?&]h=([a-zA-Z0-9]+)/;
 const RE_FIGMA = /^https:\/\/(?:www\.)?figma\.com/;
 
 const RE_GH_GIST = /^https:\/\/gist\.github\.com\/([\w_-]+)\/([\w_-]+)/;
@@ -224,12 +228,16 @@ export const getEmbedLink = (
 
   const vimeoLink = link.match(RE_VIMEO);
   if (vimeoLink?.[1]) {
-    const target = vimeoLink?.[1];
+    const hashPath = vimeoLink[1].match(RE_VIMEO_HASH_PATH);
+    const target = hashPath?.[1] ?? vimeoLink[1];
+    const hash = hashPath?.[2] ?? link.match(RE_VIMEO_HASH_PARAM)?.[1];
     const error = !/^\d+$/.test(target)
       ? new URIError("Invalid embed link format")
       : undefined;
     type = "video";
-    link = `https://player.vimeo.com/video/${target}?api=1`;
+    link = `https://player.vimeo.com/video/${target}?${
+      hash ? `h=${hash}&` : ""
+    }api=1`;
     aspectRatio = { w: 560, h: 315 };
     //warning deliberately ommited so it is displayed only once per link
     //same link next time will be served from cache
