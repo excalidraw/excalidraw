@@ -16,7 +16,7 @@ import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { KEYS, getFrame } from "@excalidraw/common";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { atom, useAtom, useAtomValue } from "../app-jotai";
 import { activeRoomLinkAtom } from "../collab/Collab";
@@ -64,8 +64,6 @@ const ActiveRoomDialog = ({
   handleClose: () => void;
 }) => {
   const { t } = useI18n();
-  const [, setJustCopied] = useState(false);
-  const timerRef = useRef<number>(0);
   const ref = useRef<HTMLInputElement>(null);
   const isShareSupported = "share" in navigator;
   const { onCopy, copyStatus } = useCopyStatus();
@@ -73,19 +71,10 @@ const ActiveRoomDialog = ({
   const copyRoomLink = async () => {
     try {
       await copyTextToSystemClipboard(activeRoomLink);
+      onCopy();
     } catch (e) {
       collabAPI.setCollabError(t("errors.copyToSystemClipboardFailed"));
     }
-
-    setJustCopied(true);
-
-    if (timerRef.current) {
-      window.clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = window.setTimeout(() => {
-      setJustCopied(false);
-    }, 3000);
 
     ref.current?.select();
   };
@@ -137,10 +126,7 @@ const ActiveRoomDialog = ({
           label={t("buttons.copyLink")}
           icon={copyIcon}
           status={copyStatus}
-          onClick={() => {
-            copyRoomLink();
-            onCopy();
-          }}
+          onClick={copyRoomLink}
         />
       </div>
       <QRCode value={activeRoomLink} />
