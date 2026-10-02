@@ -144,6 +144,44 @@ describe("history", () => {
   });
 
   describe("singleplayer undo/redo", () => {
+    // regression: https://github.com/excalidraw/excalidraw/issues/7016
+    it("undo during multi-point drawing removes the last point", async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+
+      UI.clickTool("arrow");
+
+      // first click starts the arrow and enters multi-point mode
+      mouse.click(40, -10);
+
+      expect(h.state.multiElement).not.toBeNull();
+      const element = h.state.multiElement!;
+      const initialPoints = element.points.length;
+
+      // second click commits a waypoint
+      mouse.click(60, 10);
+
+      expect(h.state.multiElement!.id).toBe(element.id);
+      const pointsBeforeUndo = h.state.multiElement!.points.length;
+      expect(pointsBeforeUndo).toBeGreaterThanOrEqual(initialPoints);
+
+      Keyboard.undo();
+
+      // last waypoint removed, still drawing the same element
+      expect(h.state.multiElement).not.toBeNull();
+      expect(h.state.multiElement!.id).toBe(element.id);
+      expect(h.state.multiElement!.points.length).toBeLessThan(
+        pointsBeforeUndo,
+      );
+
+      // undoing past the origin cancels the whole shape
+      Keyboard.undo();
+
+      expect(h.state.multiElement).toBeNull();
+      expect(h.elements.find((el) => el.id === element.id)?.isDeleted).toBe(
+        true,
+      );
+    });
+
     it("should not collapse when applying corrupted history entry", async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       const rect = API.createElement({ type: "rectangle" });
