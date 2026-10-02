@@ -96,7 +96,7 @@ exports[`restoreElements > should restore arrow element correctly 1`] = `
 }
 `;
 
-exports[`restoreElements > should restore correctly with rectangle, ellipse and diamond elements 1`] = `
+exports[`restoreElements > should restore correctly with rectangle, ellipse, diamond and star elements 1`] = `
 {
   "angle": 0,
   "backgroundColor": "blue",
@@ -135,7 +135,7 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
 }
 `;
 
-exports[`restoreElements > should restore correctly with rectangle, ellipse and diamond elements 2`] = `
+exports[`restoreElements > should restore correctly with rectangle, ellipse, diamond and star elements 2`] = `
 {
   "angle": 0,
   "backgroundColor": "blue",
@@ -174,7 +174,7 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
 }
 `;
 
-exports[`restoreElements > should restore correctly with rectangle, ellipse and diamond elements 3`] = `
+exports[`restoreElements > should restore correctly with rectangle, ellipse, diamond and star elements 3`] = `
 {
   "angle": 0,
   "backgroundColor": "blue",
@@ -204,6 +204,45 @@ exports[`restoreElements > should restore correctly with rectangle, ellipse and 
   "strokeStyle": "dashed",
   "strokeWidth": 2,
   "type": "diamond",
+  "updated": 1,
+  "version": 2,
+  "versionNonce": Any<Number>,
+  "width": 100,
+  "x": 10,
+  "y": 20,
+}
+`;
+
+exports[`restoreElements > should restore correctly with rectangle, ellipse, diamond and star elements 4`] = `
+{
+  "angle": 0,
+  "backgroundColor": "blue",
+  "boundElements": [],
+  "created": 1,
+  "customData": undefined,
+  "fillStyle": "cross-hatch",
+  "frameId": null,
+  "groupIds": [
+    "1",
+    "2",
+    "3",
+  ],
+  "height": 200,
+  "id": "4",
+  "index": "a3",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 10,
+  "roughness": 2,
+  "roundness": {
+    "type": 2,
+  },
+  "seed": Any<Number>,
+  "strokeColor": "red",
+  "strokeStyle": "dashed",
+  "strokeWidth": 2,
+  "type": "star",
   "updated": 1,
   "version": 2,
   "versionNonce": Any<Number>,

@@ -564,6 +564,24 @@ describe("box-selection overlap mode", () => {
     assertSelectedElements([]);
   });
 
+  it("should not select a filled star when the selection box only overlaps its bounds corner", () => {
+    const star = API.createElement({
+      type: "star",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+
+    API.setElements([star]);
+
+    boxSelectTopRightAabbCorner(star);
+
+    assertSelectedElements([]);
+  });
+
   it("should not select a filled rotated ellipse when the selection box only overlaps its axis-aligned bounds", () => {
     const ellipse = API.createElement({
       type: "ellipse",
@@ -637,6 +655,26 @@ describe("box-selection overlap mode", () => {
     boxSelect(-18, -18, -8, -8);
 
     assertSelectedElements([]);
+  });
+
+  it("should select a filled star by clicking its center, not its AABB corner", () => {
+    const star = API.createElement({
+      type: "star",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+
+    API.setElements([star]);
+
+    mouse.clickAt(4, 4);
+    assertSelectedElements([]);
+
+    mouse.clickAt(100, 100);
+    assertSelectedElements([star.id]);
   });
 
   it("should deselect a selected rotated rectangle when clicking in the empty corner of its axis-aligned bounds", () => {

@@ -7,6 +7,7 @@ export const hasBackground = (type: ElementOrToolType) =>
   type === "embeddable" ||
   type === "ellipse" ||
   type === "diamond" ||
+  type === "star" ||
   type === "line" ||
   type === "freedraw" ||
   type === "autoshape" ||
@@ -21,6 +22,7 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "stickynote" ||
   type === "ellipse" ||
   type === "diamond" ||
+  type === "star" ||
   type === "freedraw" ||
   type === "arrow" ||
   type === "line" ||
@@ -34,6 +36,7 @@ export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "embeddable" ||
   type === "ellipse" ||
   type === "diamond" ||
+  type === "star" ||
   type === "freedraw" ||
   type === "arrow" ||
   type === "line" ||
@@ -45,6 +48,7 @@ export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "embeddable" ||
   type === "ellipse" ||
   type === "diamond" ||
+  type === "star" ||
   type === "arrow" ||
   type === "line" ||
   type === "autoshape";

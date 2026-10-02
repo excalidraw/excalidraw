@@ -8,6 +8,8 @@ import {
   elementsOverlappingBBox,
   getElementAbsoluteCoords,
   getElementBounds,
+  getStarPoints,
+  STAR_INNER_RATIO,
 } from "../src/bounds";
 
 import type { ExcalidrawElement, ExcalidrawLinearElement } from "../src/types";
@@ -121,6 +123,24 @@ describe("getElementBounds", () => {
     expect(y2).toEqual(42.90569415042095);
   });
 
+  it("star", () => {
+    const element = _ce({
+      x: 0,
+      y: 0,
+      w: 200,
+      h: 200,
+      a: 0,
+      t: "star",
+    });
+    const [x1, y1, x2, y2] = getElementBounds(element, arrayToMap([element]));
+    expect(x1).toBeGreaterThanOrEqual(-0.01);
+    expect(y1).toBeGreaterThanOrEqual(-0.01);
+    expect(x2).toBeLessThanOrEqual(200.01);
+    expect(y2).toBeLessThanOrEqual(200.01);
+    expect(x2 - x1).toBeGreaterThan(100);
+    expect(y2 - y1).toBeGreaterThan(100);
+  });
+
   it("curved line", () => {
     const element = {
       ..._ce({
@@ -205,5 +225,52 @@ describe("elementsOverlappingBBox()", () => {
         ],
       }),
     ).toEqual([rectInside]);
+  });
+});
+
+describe("getStarPoints", () => {
+  const square = _ce({ x: 0, y: 0, w: 200, h: 200, t: "star" });
+  const points = getStarPoints(square);
+  const cx = 100;
+  const cy = 100;
+  const outer = 100;
+
+  it("returns 10 vertices", () => {
+    expect(points).toHaveLength(10);
+  });
+
+  it("places the first outer tip at the top", () => {
+    expect(points[0][0]).toBeCloseTo(cx, 5);
+    expect(points[0][1]).toBeCloseTo(0, 5);
+  });
+
+  it("alternates outer and inner radii", () => {
+    points.forEach(([px, py], i) => {
+      const r = Math.hypot(px - cx, py - cy);
+      if (i % 2 === 0) {
+        expect(r).toBeCloseTo(outer, 5);
+      } else {
+        expect(r).toBeCloseTo(outer * STAR_INNER_RATIO, 5);
+      }
+    });
+  });
+
+  it("keeps vertices inside the bbox", () => {
+    for (const [px, py] of points) {
+      expect(px).toBeGreaterThanOrEqual(-1e-9);
+      expect(py).toBeGreaterThanOrEqual(-1e-9);
+      expect(px).toBeLessThanOrEqual(200 + 1e-9);
+      expect(py).toBeLessThanOrEqual(200 + 1e-9);
+    }
+  });
+
+  it("stretches with a non-square bbox", () => {
+    const wide = getStarPoints(_ce({ x: 0, y: 0, w: 200, h: 100, t: "star" }));
+    expect(wide[0][0]).toBeCloseTo(100, 5);
+    expect(wide[0][1]).toBeCloseTo(0, 5);
+    expect(wide[0][0]).toBeCloseTo(points[0][0], 5);
+    expect(Math.abs(wide[2][0] - 100)).toBeGreaterThan(
+      Math.abs(points[2][0] - 100) * 0.5,
+    );
   });
 });

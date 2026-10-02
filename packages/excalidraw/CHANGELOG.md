@@ -13,6 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Star shape (2026-09-24) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- Added `star` as an element type and toolbar tool on desktop and mobile. Stars support fill and stroke styles, labels, arrow bindings, snapping, hit testing, resize and rotation, scene restore, and canvas/SVG export.
+- Rectangle, diamond, ellipse, and star elements can be converted between one another from the element type menu. The public API now exports `ExcalidrawStarElement`, and the `ToolType`, `ExcalidrawElement`, `ExcalidrawElementSkeleton`, and `ConvertibleGenericTypes` type surfaces include `"star"`.
+
 ### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.

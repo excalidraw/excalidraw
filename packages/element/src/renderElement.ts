@@ -474,6 +474,7 @@ const drawElementOnCanvas = (
     case "iframe":
     case "embeddable":
     case "diamond":
+    case "star":
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
@@ -1101,6 +1102,7 @@ const drawElement = (
     case "rectangle":
     case "stickynote":
     case "diamond":
+    case "star":
     case "ellipse":
     case "line":
     case "arrow":
