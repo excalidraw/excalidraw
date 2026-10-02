@@ -1,4 +1,5 @@
 import { exportToCanvas } from "@excalidraw/utils/export";
+import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 
 import {
@@ -18,8 +19,14 @@ import {
   actionChangeExportScale,
   actionChangeProjectName,
 } from "../actions/actionExport";
+import { trackEvent } from "../analytics";
 import { probablySupportsClipboardBlob } from "../clipboard";
 import { prepareElementsForExport } from "../data";
+import {
+  clearAttributionOptOutState,
+  getAttributionOptOutState,
+  setAttributionOptOutCompleted,
+} from "../data/attributionOptOut";
 import { canvasToBlob } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { useCopyStatus } from "../hooks/useCopiedIndicator";
@@ -27,6 +34,11 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
 
+import {
+  ATTRIBUTION_SURVEY_QUESTION_IDS,
+  AttributionMarkSurvey,
+  trackAttributionSurveyAnswers,
+} from "./AttributionMarkSurvey";
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
 import { RadioGroup } from "./RadioGroup";
@@ -36,6 +48,11 @@ import { FilledButton } from "./FilledButton";
 
 import "./ImageExportDialog.scss";
 
+import type {
+  AttributionSurveyAnswer,
+  AttributionSurveyAnswers,
+  AttributionSurveyQuestionId,
+} from "./AttributionMarkSurvey";
 import type { ActionManager } from "../actions/manager";
 
 import type { AppClassProperties, BinaryFiles, UIAppState } from "../types";
@@ -51,6 +68,33 @@ export const ErrorCanvasPreview = () => {
     </div>
   );
 };
+
+type ExportFormat = Exclude<keyof typeof EXPORT_IMAGE_TYPES, "clipboard">;
+
+const EXPORT_FORMATS: ExportFormat[] = [
+  EXPORT_IMAGE_TYPES.png,
+  EXPORT_IMAGE_TYPES.svg,
+  EXPORT_IMAGE_TYPES.webp,
+  EXPORT_IMAGE_TYPES.jpg,
+  EXPORT_IMAGE_TYPES.excalidraw,
+];
+
+type AspectRatio = "original" | "1:1" | "4:5" | "3:4" | "2:3";
+
+// width / height, `undefined` keeps the drawing's own proportions
+const ASPECT_RATIOS: Record<AspectRatio, number | undefined> = {
+  original: undefined,
+  "1:1": 1,
+  "4:5": 4 / 5,
+  "3:4": 3 / 4,
+  "2:3": 2 / 3,
+};
+
+// only the rendered raster formats that support it can be resized
+const ASPECT_RATIO_FORMATS: ExportFormat[] = [
+  EXPORT_IMAGE_TYPES.png,
+  EXPORT_IMAGE_TYPES.jpg,
+];
 
 type ImageExportModalProps = {
   appStateSnapshot: Readonly<UIAppState>;
@@ -85,6 +129,66 @@ const ImageExportModal = ({
     appStateSnapshot.exportEmbedScene,
   );
   const [exportScale, setExportScale] = useState(appStateSnapshot.exportScale);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>(
+    EXPORT_IMAGE_TYPES.png,
+  );
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("original");
+
+  const supportsAspectRatio = ASPECT_RATIO_FORMATS.includes(exportFormat);
+  const exportAspectRatio = supportsAspectRatio
+    ? ASPECT_RATIOS[aspectRatio]
+    : undefined;
+
+  // Attribution mark: opted-out + survey-complete state, time-boxed to 30
+  // days (see excalidraw-attribution-vision.md Section 9.7). Kept outside
+  // appState since it's a standalone user preference, not scene data.
+  const [attributionOptedOut, setAttributionOptedOut] = useState(
+    () => !!getAttributionOptOutState(),
+  );
+  const [attributionSurveyComplete, setAttributionSurveyComplete] =
+    useState(attributionOptedOut);
+  const [showAttributionSurvey, setShowAttributionSurvey] = useState(false);
+  const [attributionAnswers, setAttributionAnswers] =
+    useState<AttributionSurveyAnswers>({});
+
+  const showAttributionMark = !(
+    attributionOptedOut && attributionSurveyComplete
+  );
+
+  useEffect(() => {
+    if (
+      showAttributionSurvey &&
+      !attributionSurveyComplete &&
+      ATTRIBUTION_SURVEY_QUESTION_IDS.every((id) => attributionAnswers[id])
+    ) {
+      setAttributionSurveyComplete(true);
+      setAttributionOptOutCompleted();
+      trackAttributionSurveyAnswers(attributionAnswers);
+    }
+  }, [attributionAnswers, showAttributionSurvey, attributionSurveyComplete]);
+
+  const handleAttributionToggleChange = (checked: boolean) => {
+    setAttributionOptedOut(checked);
+    if (checked) {
+      trackEvent("export", "attribution-opt-out", "ui");
+      setShowAttributionSurvey(true);
+      if (!attributionSurveyComplete) {
+        setAttributionAnswers({});
+      }
+    } else {
+      setShowAttributionSurvey(false);
+      setAttributionSurveyComplete(false);
+      setAttributionAnswers({});
+      clearAttributionOptOutState();
+    }
+  };
+
+  const handleAttributionAnswer = (
+    questionId: AttributionSurveyQuestionId,
+    answer: AttributionSurveyAnswer,
+  ) => {
+    setAttributionAnswers((prev) => ({ ...prev, [questionId]: answer }));
+  };
 
   const previewRef = useRef<HTMLDivElement>(null);
   const previewRenderRequestIdRef = useRef(0);
@@ -102,6 +206,7 @@ const ImageExportModal = ({
     exportWithDarkMode,
     exportScale,
     embedScene,
+    showAttributionMark,
     resetCopyStatus,
   ]);
 
@@ -132,7 +237,9 @@ const ImageExportModal = ({
       appState: {
         ...appStateSnapshot,
         name: projectName,
-        exportBackground: exportWithBackground,
+        // JPEG can't be transparent, the export always gets a background
+        exportBackground:
+          exportWithBackground || exportFormat === EXPORT_IMAGE_TYPES.jpg,
         exportWithDarkMode,
         exportScale,
         exportEmbedScene: embedScene,
@@ -141,6 +248,8 @@ const ImageExportModal = ({
       exportPadding: DEFAULT_EXPORT_PADDING,
       maxWidthOrHeight: Math.max(maxWidth, maxHeight),
       exportingFrame,
+      attributionMark: { show: showAttributionMark },
+      aspectRatio: exportAspectRatio,
     })
       .then(async (canvas) => {
         if (isStaleRequest()) {
@@ -184,10 +293,17 @@ const ImageExportModal = ({
     exportingFrame,
     projectName,
     exportWithBackground,
+    exportFormat,
     exportWithDarkMode,
     exportScale,
     embedScene,
+    showAttributionMark,
+    exportAspectRatio,
   ]);
+
+  const downloadLabel = t("imageExportDialog.button.download", {
+    format: t(`imageExportDialog.format.${exportFormat}`),
+  });
 
   return (
     <div className="ImageExportModal">
@@ -300,53 +416,122 @@ const ImageExportModal = ({
           />
         </ExportSetting>
 
-        <div className="ImageExportModal__settings__buttons">
-          <FilledButton
-            className="ImageExportModal__settings__buttons__button"
-            label={t("imageExportDialog.title.exportToPng")}
-            onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.png, exportedElements, {
-                exportingFrame,
-              })
-            }
-            icon={downloadIcon}
-          >
-            {t("imageExportDialog.button.exportToPng")}
-          </FilledButton>
-          <FilledButton
-            className="ImageExportModal__settings__buttons__button"
-            label={t("imageExportDialog.title.exportToSvg")}
-            onClick={() =>
-              onExportImage(EXPORT_IMAGE_TYPES.svg, exportedElements, {
-                exportingFrame,
-              })
-            }
-            icon={downloadIcon}
-          >
-            {t("imageExportDialog.button.exportToSvg")}
-          </FilledButton>
-          {(probablySupportsClipboardBlob || isFirefox) && (
+        <ExportSetting
+          label={t("imageExportDialog.label.hideAttribution")}
+          name="exportHideAttributionSwitch"
+        >
+          <Switch
+            name="exportHideAttributionSwitch"
+            checked={attributionOptedOut}
+            onChange={handleAttributionToggleChange}
+          />
+        </ExportSetting>
+
+        {showAttributionSurvey && (
+          <AttributionMarkSurvey
+            answers={attributionAnswers}
+            onAnswer={handleAttributionAnswer}
+          />
+        )}
+
+        {(!attributionOptedOut || attributionSurveyComplete) && (
+          <div className="ImageExportModal__settings__buttons">
+            <ExportPills
+              options={EXPORT_FORMATS.map((format) => ({
+                value: format,
+                label: t(`imageExportDialog.format.${format}`),
+              }))}
+              value={exportFormat}
+              onChange={setExportFormat}
+            />
+            {supportsAspectRatio && (
+              <div className="ImageExportModal__aspectRatio">
+                <div className="ImageExportModal__aspectRatio__label">
+                  {t("imageExportDialog.aspectRatio.title")}
+                </div>
+                <ExportPills
+                  options={(Object.keys(ASPECT_RATIOS) as AspectRatio[]).map(
+                    (ratio) => ({
+                      value: ratio,
+                      label:
+                        ratio === "original"
+                          ? t("imageExportDialog.aspectRatio.original")
+                          : ratio,
+                    }),
+                  )}
+                  value={aspectRatio}
+                  onChange={setAspectRatio}
+                />
+              </div>
+            )}
             <FilledButton
               className="ImageExportModal__settings__buttons__button"
-              label={t("imageExportDialog.title.copyPngToClipboard")}
-              status={copyStatus}
-              onClick={async () => {
-                await onExportImage(
-                  EXPORT_IMAGE_TYPES.clipboard,
-                  exportedElements,
-                  {
-                    exportingFrame,
-                  },
-                );
-                onCopy();
-              }}
-              icon={copyIcon}
+              label={downloadLabel}
+              onClick={() =>
+                onExportImage(exportFormat, exportedElements, {
+                  exportingFrame,
+                  showAttributionMark,
+                  aspectRatio: exportAspectRatio,
+                })
+              }
+              icon={downloadIcon}
             >
-              {t("imageExportDialog.button.copyPngToClipboard")}
+              {downloadLabel}
             </FilledButton>
-          )}
-        </div>
+            {(probablySupportsClipboardBlob || isFirefox) && (
+              <FilledButton
+                className="ImageExportModal__settings__buttons__button"
+                label={t("imageExportDialog.title.copyPngToClipboard")}
+                disabled={exportFormat === EXPORT_IMAGE_TYPES.excalidraw}
+                status={copyStatus}
+                onClick={async () => {
+                  await onExportImage(
+                    EXPORT_IMAGE_TYPES.clipboard,
+                    exportedElements,
+                    {
+                      exportingFrame,
+                      showAttributionMark,
+                      aspectRatio: exportAspectRatio,
+                    },
+                  );
+                  onCopy();
+                }}
+                icon={copyIcon}
+              >
+                {t("imageExportDialog.button.copyPngToClipboard")}
+              </FilledButton>
+            )}
+          </div>
+        )}
       </div>
+    </div>
+  );
+};
+
+const ExportPills = <T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}) => {
+  return (
+    <div className="ImageExportModal__pills">
+      {options.map((option) => (
+        <button
+          type="button"
+          key={option.value}
+          className={clsx("ImageExportModal__pill", {
+            "ImageExportModal__pill--active": option.value === value,
+          })}
+          aria-pressed={option.value === value}
+          onClick={() => onChange(option.value)}
+        >
+          {option.label}
+        </button>
+      ))}
     </div>
   );
 };

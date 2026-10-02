@@ -96,7 +96,7 @@ export const prepareElementsForExport = (
 };
 
 export const exportCanvas = async (
-  type: Omit<ExportType, "backend">,
+  type: Exclude<ExportType, "backend">,
   elements: ExportedElements,
   appState: AppState,
   files: BinaryFiles,
@@ -107,6 +107,8 @@ export const exportCanvas = async (
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
+    attributionMark,
+    aspectRatio,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
@@ -115,10 +117,24 @@ export const exportCanvas = async (
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
     exportingFrame: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    attributionMark?: { show: boolean };
+    aspectRatio?: number;
   },
 ) => {
   if (elements.length === 0) {
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
+  }
+  if (type === "excalidraw") {
+    return fileSave(
+      new Blob([serializeAsJSON(elements, appState, files, "local")], {
+        type: MIME_TYPES.excalidraw,
+      }),
+      {
+        description: "Export to Excalidraw",
+        name,
+        extension: "excalidraw",
+      },
+    );
   }
   if (type === "svg" || type === "clipboard-svg") {
     const svgPromise = exportToSvg(
@@ -132,7 +148,7 @@ export const exportCanvas = async (
         exportEmbedScene: appState.exportEmbedScene && type === "svg",
       },
       files,
-      { exportingFrame },
+      { exportingFrame, attributionMark },
     );
 
     if (type === "svg") {
@@ -164,10 +180,13 @@ export const exportCanvas = async (
   }
 
   const tempCanvas = exportToCanvas(elements, appState, files, {
-    exportBackground,
+    // JPEG has no alpha channel, transparent areas would come out black
+    exportBackground: type === "jpg" || exportBackground,
     viewBackgroundColor,
     exportPadding,
     exportingFrame,
+    attributionMark,
+    aspectRatio,
   });
 
   if (type === "png") {
@@ -191,6 +210,22 @@ export const exportCanvas = async (
       mimeTypes: [IMAGE_MIME_TYPES.png],
       fileHandle,
     });
+  } else if (type === "webp" || type === "jpg") {
+    return fileSave(
+      // same default qualities as `exportToBlob` in `@excalidraw/utils`
+      canvasToBlob(
+        tempCanvas,
+        IMAGE_MIME_TYPES[type],
+        type === "jpg" ? 0.92 : 0.8,
+      ),
+      {
+        description: `Export to ${type.toUpperCase()}`,
+        name,
+        extension: type,
+        mimeTypes: [IMAGE_MIME_TYPES[type]],
+        fileHandle,
+      },
+    );
   } else if (type === "clipboard") {
     try {
       const blob = canvasToBlob(tempCanvas);

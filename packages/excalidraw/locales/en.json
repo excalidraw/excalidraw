@@ -533,20 +533,78 @@
       "darkMode": "Dark mode",
       "embedScene": "Embed scene",
       "scale": "Scale",
-      "padding": "Padding"
+      "padding": "Padding",
+      "hideAttribution": "Hide attribution mark"
     },
     "tooltip": {
       "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
     },
     "title": {
-      "exportToPng": "Export to PNG",
-      "exportToSvg": "Export to SVG",
       "copyPngToClipboard": "Copy PNG to clipboard"
     },
     "button": {
-      "exportToPng": "PNG",
-      "exportToSvg": "SVG",
+      "download": "Download {{format}}",
       "copyPngToClipboard": "Copy to clipboard"
+    },
+    "aspectRatio": {
+      "title": "Aspect ratio",
+      "original": "Original"
+    },
+    "format": {
+      "png": "PNG",
+      "svg": "SVG",
+      "webp": "WebP",
+      "jpg": "JPEG",
+      "excalidraw": ".excalidraw"
+    },
+    "attributionSurvey": {
+      "header": "A few quick questions to turn off the attribution mark",
+      "done": "done",
+      "other": "Other",
+      "otherPlaceholder": "Tell us more",
+      "hintPickOneFillOther": "(pick one, fill if other)",
+      "hintPickOne": "(pick one)",
+      "questions": {
+        "reason": {
+          "label": "Why are you turning it off?",
+          "options": {
+            "design": "It clashes with my design or looks unprofessional",
+            "branding": "Client, employer, or school branding rules",
+            "advertise": "I don't want to advertise a tool",
+            "content": "It gets in the way of my content"
+          }
+        },
+        "purpose": {
+          "label": "What is this export for?",
+          "options": {
+            "github": "GitHub PR, README or docs",
+            "blog": "Blog post or article",
+            "slides": "Slides or presentation",
+            "social": "Social media",
+            "client": "Client or internal work",
+            "teaching": "Teaching or studying"
+          }
+        },
+        "keepOn": {
+          "label": "What would make you keep it on?",
+          "options": {
+            "subtler": "A smaller or subtler credit",
+            "publicOnly": "Only on public or shared exports",
+            "ownBrand": "Being able to add my own name or brand alongside it",
+            "never": "Nothing, I'd always turn it off"
+          }
+        },
+        "role": {
+          "label": "What best describes you?",
+          "options": {
+            "developer": "Developer or engineer",
+            "designer": "Designer",
+            "pm": "PM or business role",
+            "student": "Student",
+            "teacher": "Teacher"
+          }
+        }
+      }
     }
   },
   "encrypted": {
