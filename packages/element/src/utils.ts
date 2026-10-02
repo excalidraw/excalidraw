@@ -518,9 +518,30 @@ export const isPathALoop = (
     const [first, last] = [points[0], points[points.length - 1]];
     const distance = pointDistance(first, last);
 
-    // Adjusting LINE_CONFIRM_THRESHOLD to current zoom so that when zoomed in
-    // really close we make the threshold smaller, and vice versa.
-    return distance <= LINE_CONFIRM_THRESHOLD / zoomValue;
+    // Fast path: absolute pixel distance check at 1:1 scale or zoom
+    if (distance <= LINE_CONFIRM_THRESHOLD / zoomValue) {
+      return true;
+    }
+
+    // Relative check for scaled/resized elements:
+    // When elements (e.g. from libraries) are scaled up, point coordinates grow proportionally,
+    // which causes absolute distance to exceed LINE_CONFIRM_THRESHOLD. By checking the gap ratio
+    // relative to the element's overall bounding dimension (<= 10%), we ensure scaled loops
+    // preserve their closed status consistently at any size.
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const [x, y] of points) {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+    const maxDim = Math.max(maxX - minX, maxY - minY);
+    if (maxDim > 0 && distance / maxDim <= 0.1) {
+      return true;
+    }
   }
   return false;
 };
