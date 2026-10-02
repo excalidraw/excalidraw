@@ -1,4 +1,5 @@
 import {
+  DiagramToCodeError,
   DiagramToCodePlugin,
   exportToBlob,
   getNonDeletedElements,
@@ -11,10 +12,46 @@ import {
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
 
-import type { StreamChunk } from "@excalidraw/excalidraw";
+import type {
+  RenderDiagramToCodeError,
+  StreamChunk,
+} from "@excalidraw/excalidraw";
 import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 import { TTDIndexedDBAdapter } from "../data/TTDStorage";
+
+const ERR_RATE_LIMIT = "ERR_RATE_LIMIT";
+
+// rendered by the editor as app UI over the failed `iframe` element (not
+// inside its sandboxed frame). Error data comes from the (untrusted) element,
+// so we only use the `code` to pick our own content.
+const renderDiagramToCodeError: RenderDiagramToCodeError = ({ code }) => {
+  if (code !== ERR_RATE_LIMIT) {
+    return null;
+  }
+  return (
+    <>
+      <div style={{ color: "var(--color-danger)" }}>
+        Too many requests today,
+        <br />
+        please try again tomorrow!
+      </div>
+      <div>
+        You can also try{" "}
+        <a
+          href={`${
+            import.meta.env.VITE_APP_PLUS_LP
+          }/plus?utm_source=excalidraw&utm_medium=app&utm_content=d2c`}
+          target="_blank"
+          rel="noopener"
+        >
+          Excalidraw+
+        </a>{" "}
+        to get more requests.
+      </div>
+    </>
+  );
+};
 
 export const AIComponents = ({
   excalidrawAPI,
@@ -24,6 +61,7 @@ export const AIComponents = ({
   return (
     <>
       <DiagramToCodePlugin
+        renderError={renderDiagramToCodeError}
         generate={async ({ frame, children, onPartial }) => {
           const appState = excalidrawAPI.getAppState();
 
@@ -77,20 +115,10 @@ export const AIComponents = ({
             }
 
             if (errorJSON.statusCode === 429) {
-              return {
-                html: `<html>
-                <body style="margin: 0; text-align: center">
-                <div style="display: flex; align-items: center; justify-content: center; flex-direction: column; height: 100vh; padding: 0 60px">
-                  <div style="color:red">Too many requests today,</br>please try again tomorrow!</div>
-                  </br>
-                  </br>
-                  <div>You can also try <a href="${
-                    import.meta.env.VITE_APP_PLUS_LP
-                  }/plus?utm_source=excalidraw&utm_medium=app&utm_content=d2c" target="_blank" rel="noopener">Excalidraw+</a> to get more requests.</div>
-                </div>
-                </body>
-                </html>`,
-              };
+              throw new DiagramToCodeError(
+                "Too many requests today, please try again tomorrow!",
+                ERR_RATE_LIMIT,
+              );
             }
 
             throw new Error(errorJSON.message || text);
