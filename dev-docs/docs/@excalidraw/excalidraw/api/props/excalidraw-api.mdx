@@ -237,7 +237,7 @@ Resets the scene. If `resetLoadingState` is passed as true then it will also for
 
 <pre>
   () =>{" "}
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">
     ExcalidrawElement[]
   </a>
 </pre>
@@ -248,7 +248,7 @@ Returns all the elements including the deleted in the scene.
 
 <pre>
   () => NonDeleted&#60;
-  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115">
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">
     ExcalidrawElement
   </a>
   []&#62;
@@ -301,7 +301,7 @@ Scroll the nearest element out of the elements supplied to the center of the vie
 
 | Attribute | type | default | Description |
 | --- | --- | --- | --- |
-| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L115) | All scene elements | The element(s) to scroll to. |
+| target | [ExcalidrawElement](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206) &#124; [ExcalidrawElement[]](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206) | All scene elements | The element(s) to scroll to. |
 | opts.fitToContent | boolean | false | Whether to fit the elements to viewport by automatically changing zoom as needed. Note that the zoom range is between 10%-100%. |
 | opts.fitToViewport | boolean | false | Similar to fitToContent but the zoom range is not limited. If elements are smaller than the viewport, zoom will go above 100%. |
 | opts.viewportZoomFactor | number | 0.7 | when fitToViewport=true, how much screen should the content cover, between 0.1 (10%) and 1 (100%) |
