@@ -24,7 +24,8 @@ export const importUsernameFromLocalStorage = (): string | null => {
   try {
     const data = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_COLLAB);
     if (data) {
-      return JSON.parse(data).username;
+      const { username } = JSON.parse(data);
+      return typeof username === "string" ? username : null;
     }
   } catch (error: any) {
     // Unable to access localStorage

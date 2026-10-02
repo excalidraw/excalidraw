@@ -1,10 +1,12 @@
-import { ARROW_TYPE, DEFAULT_ZOOM } from "@excalidraw/common";
+import { ARROW_TYPE, DEFAULT_ZOOM, KEYS } from "@excalidraw/common";
+import { CaptureUpdateAction } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
 import { actionDuplicateSelection } from "@excalidraw/excalidraw/actions/actionDuplicateSelection";
+import { restoreElements } from "@excalidraw/excalidraw/data/restore";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
-import { Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
+import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import {
   act,
   fireEvent,
@@ -427,4 +429,260 @@ describe("elbow arrow ui", () => {
       [78, 200],
     ]);
   });
+});
+
+describe("elbow arrow with malformed fixedSegments", () => {
+  beforeEach(async () => {
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  it.each([
+    ["string", "str"],
+    ["array-like object", { length: 1, 0: { index: 2 } }],
+    ["array of junk", [null, 1, "x", [], {}]],
+    ["missing points", [{ index: 2 }]],
+    ["malformed points", [{ start: [125], end: null, index: 2 }]],
+    [
+      "first/last/out of range indices",
+      [
+        { start: [0, 0], end: [125, 0], index: 1 },
+        { start: [125, 200], end: [250, 200], index: 3 },
+        { start: [125, 0], end: [125, 200], index: 9 },
+      ],
+    ],
+    [
+      "unsorted duplicates",
+      [
+        { start: [125, 0], end: [125, 200], index: 2, extra: "x" },
+        { start: [125, 0], end: [125, 200], index: 2 },
+        "junk",
+      ],
+    ],
+  ])(
+    "can render and interact with a restored elbow arrow with %s fixedSegments",
+    (_, fixedSegments) => {
+      const arrow = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed: true,
+          x: 0,
+          y: 0,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(125, 0),
+            pointFrom<LocalPoint>(125, 200),
+            pointFrom<LocalPoint>(250, 200),
+          ],
+        }),
+        fixedSegments,
+      } as unknown as ExcalidrawElbowArrowElement;
+
+      API.updateScene({
+        elements: restoreElements([arrow], null),
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+
+      const restored = h.elements[0] as ExcalidrawElbowArrowElement;
+      expect(
+        restored.fixedSegments === null ||
+          (Array.isArray(restored.fixedSegments) &&
+            restored.fixedSegments.every(
+              (segment) =>
+                segment.index === 2 &&
+                Object.keys(segment).sort().join() === "end,index,start",
+            )),
+      ).toBe(true);
+
+      // select the arrow
+      mouse.reset();
+      mouse.clickAt(60, 0);
+      expect(h.state.selectedLinearElement?.elementId).toBe(restored.id);
+
+      // hover and drag the middle segment
+      mouse.reset();
+      mouse.moveTo(125, 100);
+      mouse.down();
+      mouse.moveTo(140, 100);
+      mouse.up();
+
+      expect(
+        (h.elements[0] as ExcalidrawElbowArrowElement).fixedSegments,
+      ).toEqual([
+        {
+          index: 2,
+          start: pointFrom<LocalPoint>(140, 0),
+          end: pointFrom<LocalPoint>(140, 200),
+        },
+      ]);
+
+      // drag the end point with a fixed segment
+      mouse.reset();
+      mouse.moveTo(250, 200);
+      mouse.down();
+      mouse.moveTo(300, 250);
+      mouse.up();
+
+      expect(
+        (h.elements[0] as ExcalidrawElbowArrowElement).fixedSegments,
+      ).toHaveLength(1);
+
+      // release the fixed segment
+      mouse.reset();
+      mouse.moveTo(140, 125);
+      mouse.doubleClick();
+
+      const updated = h.elements[0] as ExcalidrawElbowArrowElement;
+      expect(updated.isDeleted).toBe(false);
+      expect(updated.fixedSegments).toBe(null);
+      expect(
+        updated.points.every(
+          (p) => Number.isFinite(p[0]) && Number.isFinite(p[1]),
+        ),
+      ).toBe(true);
+    },
+  );
+});
+
+describe("elbow arrow with malformed bindings", () => {
+  const errors: unknown[] = [];
+  const onError = (event: ErrorEvent) => {
+    errors.push(event.error ?? event.message);
+    event.preventDefault();
+  };
+
+  beforeEach(async () => {
+    errors.length = 0;
+    window.addEventListener("error", onError);
+    localStorage.clear();
+    await render(<Excalidraw handleKeyboardGlobally={true} />);
+  });
+
+  afterEach(() => {
+    window.removeEventListener("error", onError);
+  });
+
+  const validBinding = {
+    elementId: "rect",
+    fixedPoint: [1, 0.5001],
+    mode: "orbit",
+  };
+
+  it.each([
+    ["string startBinding", "present", { startBinding: "str" }],
+    ["empty object endBinding", "present", { endBinding: {} }],
+    [
+      "startBinding with numeric elementId",
+      "present",
+      {
+        startBinding: { elementId: 123 },
+      },
+    ],
+    [
+      "startBinding to a missing element",
+      "missing",
+      {
+        startBinding: validBinding,
+      },
+    ],
+    [
+      "endBinding to a deleted element",
+      "deleted",
+      {
+        endBinding: { ...validBinding, fixedPoint: [0, 0.5001] },
+      },
+    ],
+  ])(
+    "can interact with a restored elbow arrow with %s (rect %s)",
+    (_, rectState, overrides) => {
+      const rect = API.createElement({
+        type: "rectangle",
+        id: "rect",
+        x: -100,
+        y: -50,
+        width: 100,
+        height: 100,
+        isDeleted: rectState === "deleted",
+      });
+      const arrow = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed: true,
+          x: 0,
+          y: 0,
+          points: [
+            pointFrom<LocalPoint>(0, 0),
+            pointFrom<LocalPoint>(100, 0),
+            pointFrom<LocalPoint>(100, 100),
+            pointFrom<LocalPoint>(200, 100),
+          ],
+        }),
+        ...overrides,
+      } as unknown as ExcalidrawArrowElement;
+
+      API.updateScene({
+        elements: restoreElements(
+          rectState === "missing" ? [arrow] : [rect, arrow],
+          null,
+        ),
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+
+      const getArrow = () =>
+        h.elements.find(
+          (element) => element.id === arrow.id,
+        ) as ExcalidrawArrowElement;
+      const at = (index: number) => {
+        const { x, y, points } = getArrow();
+        const [px, py] = points.at(index)!;
+        return [x + px, y + py] as const;
+      };
+      const selectArrow = () => {
+        mouse.reset();
+        mouse.clickAt((at(0)[0] + at(1)[0]) / 2, (at(0)[1] + at(1)[1]) / 2);
+      };
+
+      selectArrow();
+      expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+      // drag the middle segment
+      const mid = Math.floor((getArrow().points.length - 1) / 2);
+      const [mx, my] = [
+        (at(mid)[0] + at(mid + 1)[0]) / 2,
+        (at(mid)[1] + at(mid + 1)[1]) / 2,
+      ];
+      mouse.reset();
+      mouse.moveTo(mx, my);
+      mouse.down();
+      mouse.moveTo(mx + 15, my + 15);
+      mouse.up();
+
+      // drag both endpoints
+      for (const index of [0, -1]) {
+        selectArrow();
+        const [px, py] = at(index);
+        mouse.reset();
+        mouse.moveTo(px, py);
+        mouse.down();
+        mouse.moveTo(px + 30, py + 40);
+        mouse.up();
+      }
+
+      // drag the rectangle
+      mouse.reset();
+      mouse.clickAt(-50, -45);
+      mouse.down();
+      mouse.moveTo(-20, 10);
+      mouse.up();
+
+      Keyboard.keyPress(KEYS.ESCAPE);
+
+      expect(errors).toEqual([]);
+      expect(
+        getArrow().points.every(
+          (p) => Number.isFinite(p[0]) && Number.isFinite(p[1]),
+        ),
+      ).toBe(true);
+    },
+  );
 });

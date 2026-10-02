@@ -23,6 +23,9 @@ Object.defineProperty(window, "crypto", {
     subtle: {
       generateKey: () => {},
       exportKey: () => ({ k: "sTdLvMC_M3V8_vGa3UVRDg" }),
+      importKey: async () => ({}),
+      // payloads are sent unencrypted in tests
+      decrypt: async (_opts: unknown, _key: unknown, data: ArrayBuffer) => data,
     },
   },
 });
@@ -49,12 +52,18 @@ vi.mock("../../excalidraw-app/data/firebase.ts", () => {
   };
 });
 
+const socketHandlers = vi.hoisted(
+  () => new Map<string, (...args: any[]) => any>(),
+);
+
 vi.mock("socket.io-client", () => {
   return {
     default: () => {
       return {
         close: () => {},
-        on: () => {},
+        on: (event: string, handler: (...args: any[]) => any) => {
+          socketHandlers.set(event, handler);
+        },
         once: () => {},
         off: () => {},
         emit: () => {},
@@ -247,6 +256,76 @@ describe("collaboration", () => {
         expect.objectContaining(rect1Props),
         expect.objectContaining({ ...rect2Props, isDeleted: true }),
       ]);
+    });
+  });
+
+  describe("joining a room", () => {
+    const emitBroadcast = (message: unknown) =>
+      socketHandlers.get("client-broadcast")!(
+        new TextEncoder().encode(JSON.stringify(message)).buffer,
+        new Uint8Array(12),
+      );
+
+    const joinRoom = async () => {
+      socketHandlers.clear();
+      // previous tests may leave a room link in the URL, which would make the
+      // app start collaborating on its own
+      window.history.replaceState({}, "", "/");
+      await render(<ExcalidrawApp />);
+      // resolves only once the room has been initialized
+      const scenePromise = window.collab.startCollaboration({
+        roomId: "roomId",
+        roomKey: "roomKey",
+      });
+      await waitFor(() => {
+        expect(socketHandlers.has("client-broadcast")).toBe(true);
+      });
+      // wrapped, as returning the promise itself would flatten it
+      return { scenePromise };
+    };
+
+    it("should ignore malformed SCENE_INIT and accept a later valid one", async () => {
+      const { scenePromise } = await joinRoom();
+
+      await emitBroadcast(null);
+      await emitBroadcast(42);
+      await emitBroadcast({ type: "SCENE_INIT" });
+      await emitBroadcast({ type: "SCENE_INIT", payload: null });
+      await emitBroadcast({ type: "SCENE_UPDATE" });
+
+      expect(window.collab.portal.socketInitialized).toBe(false);
+
+      const rect = API.createElement({ type: "rectangle", id: "A" });
+      await emitBroadcast({
+        type: "SCENE_INIT",
+        payload: { elements: syncInvalidIndices([rect]) },
+      });
+
+      const scene = await scenePromise;
+      expect(window.collab.portal.socketInitialized).toBe(true);
+      expect(scene?.elements).toEqual([expect.objectContaining({ id: "A" })]);
+    });
+
+    it("should fall back to firebase when processing SCENE_INIT throws", async () => {
+      const { scenePromise } = await joinRoom();
+
+      const spy = vi
+        .spyOn(window.collab as any, "handleRemoteSceneUpdate")
+        .mockImplementationOnce(() => {
+          throw new Error("boom");
+        });
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+
+      await emitBroadcast({ type: "SCENE_INIT", payload: { elements: [] } });
+
+      // loadFromFirebase is mocked to resolve with no scene
+      await expect(scenePromise).resolves.toBe(null);
+      expect(window.collab.portal.socketInitialized).toBe(true);
+
+      spy.mockRestore();
+      consoleError.mockRestore();
     });
   });
 });

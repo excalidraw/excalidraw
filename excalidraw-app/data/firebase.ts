@@ -108,11 +108,23 @@ const decryptElements = async (
   const ciphertext = data.ciphertext.toUint8Array() as Uint8Array<ArrayBuffer>;
   const iv = data.iv.toUint8Array() as Uint8Array<ArrayBuffer>;
 
+  // NOTE decryption failures (wrong key, tampered ciphertext) intentionally
+  // throw so that we never overwrite a scene we can't read
   const decrypted = await decryptData(iv, ciphertext, roomKey);
   const decodedData = new TextDecoder("utf-8").decode(
     new Uint8Array(decrypted),
   );
-  return JSON.parse(decodedData);
+
+  // the payload authenticated with the room key, but its contents may still
+  // be malformed. Treat it as an empty scene so the room can self-heal on
+  // the next save instead of failing forever.
+  try {
+    const elements = JSON.parse(decodedData);
+    return Array.isArray(elements) ? elements : [];
+  } catch (error: any) {
+    console.error("Failed to parse stored scene", error);
+    return [];
+  }
 };
 
 class FirebaseSceneVersionCache {

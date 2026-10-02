@@ -1203,12 +1203,17 @@ export const unbindBindingElement = (
     // end is not bound to the same element
     const boundElement = scene
       .getNonDeletedElementsMap()
-      .get(binding.elementId) as NonDeleted<ExcalidrawBindableElement>;
-    scene.mutateElement(boundElement, {
-      boundElements: boundElement.boundElements?.filter(
-        (element) => element.id !== arrow.id,
-      ),
-    });
+      .get(binding.elementId) as
+      | NonDeleted<ExcalidrawBindableElement>
+      | undefined;
+    // the bound element may be missing or deleted (e.g. concurrent remote edit)
+    if (boundElement) {
+      scene.mutateElement(boundElement, {
+        boundElements: boundElement.boundElements?.filter(
+          (element) => element.id !== arrow.id,
+        ),
+      });
+    }
   }
 
   scene.mutateElement(arrow, { [field]: null });
