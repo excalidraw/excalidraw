@@ -9535,7 +9535,10 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
-      if (this.maybeHandleResize(pointerDownState, event)) {
+      if (
+        pointerDownState.resize.isResizing &&
+        this.maybeHandleResize(pointerDownState, event)
+      ) {
         return;
       }
       this.maybeDragNewGenericElement(pointerDownState, event);
@@ -9548,7 +9551,10 @@ class App extends React.Component<AppProps, AppState> {
     return withBatchedUpdates((event: KeyboardEvent) => {
       // Prevents focus from escaping excalidraw tab
       event.key === KEYS.ALT && event.preventDefault();
-      if (this.maybeHandleResize(pointerDownState, event)) {
+      if (
+        pointerDownState.resize.isResizing &&
+        this.maybeHandleResize(pointerDownState, event)
+      ) {
         return;
       }
       this.maybeDragNewGenericElement(pointerDownState, event);
@@ -12357,7 +12363,13 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const newElement = this.state.newElement;
-    if (!newElement) {
+    // keydown/keyup while drawing a line, arrow or freedraw also lands here,
+    // but those are updated from their points on pointermove
+    if (
+      !newElement ||
+      isLinearElement(newElement) ||
+      newElement.type === "freedraw"
+    ) {
       return;
     }
 
@@ -12405,30 +12417,28 @@ class App extends React.Component<AppProps, AppState> {
       snapLines,
     });
 
-    if (!isBindingElement(newElement)) {
-      dragNewElement({
-        newElement,
-        elementType: this.state.activeTool.type,
-        originX: pointerDownState.originInGrid.x,
-        originY: pointerDownState.originInGrid.y,
-        x: gridX,
-        y: gridY,
-        width: distance(pointerDownState.originInGrid.x, gridX),
-        height: distance(pointerDownState.originInGrid.y, gridY),
-        // images and sticky notes are proportional by default — Shift frees
-        // them; every other shape is free by default and Shift constrains it
-        shouldMaintainAspectRatio:
-          isImageElement(newElement) || isStickyNoteElement(newElement)
-            ? !shouldMaintainAspectRatio(event)
-            : shouldMaintainAspectRatio(event),
-        shouldResizeFromCenter: shouldResizeFromCenter(event),
-        zoom: this.state.zoom.value,
-        scene: this.scene,
-        widthAspectRatio: aspectRatio,
-        originOffset: this.state.originSnapOffset,
-        informMutation,
-      });
-    }
+    dragNewElement({
+      newElement,
+      elementType: this.state.activeTool.type,
+      originX: pointerDownState.originInGrid.x,
+      originY: pointerDownState.originInGrid.y,
+      x: gridX,
+      y: gridY,
+      width: distance(pointerDownState.originInGrid.x, gridX),
+      height: distance(pointerDownState.originInGrid.y, gridY),
+      // images and sticky notes are proportional by default — Shift frees
+      // them; every other shape is free by default and Shift constrains it
+      shouldMaintainAspectRatio:
+        isImageElement(newElement) || isStickyNoteElement(newElement)
+          ? !shouldMaintainAspectRatio(event)
+          : shouldMaintainAspectRatio(event),
+      shouldResizeFromCenter: shouldResizeFromCenter(event),
+      zoom: this.state.zoom.value,
+      scene: this.scene,
+      widthAspectRatio: aspectRatio,
+      originOffset: this.state.originSnapOffset,
+      informMutation,
+    });
 
     this.setState({
       newElement,
