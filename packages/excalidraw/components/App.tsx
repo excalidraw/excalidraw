@@ -9535,7 +9535,10 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): (event: KeyboardEvent) => void {
     return withBatchedUpdates((event: KeyboardEvent) => {
-      if (this.maybeHandleResize(pointerDownState, event)) {
+      if (
+        pointerDownState.resize.isResizing &&
+        this.maybeHandleResize(pointerDownState, event)
+      ) {
         return;
       }
       this.maybeDragNewGenericElement(pointerDownState, event);
@@ -9548,7 +9551,10 @@ class App extends React.Component<AppProps, AppState> {
     return withBatchedUpdates((event: KeyboardEvent) => {
       // Prevents focus from escaping excalidraw tab
       event.key === KEYS.ALT && event.preventDefault();
-      if (this.maybeHandleResize(pointerDownState, event)) {
+      if (
+        pointerDownState.resize.isResizing &&
+        this.maybeHandleResize(pointerDownState, event)
+      ) {
         return;
       }
       this.maybeDragNewGenericElement(pointerDownState, event);

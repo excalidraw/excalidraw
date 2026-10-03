@@ -509,7 +509,7 @@ describe("Test dragCreate", () => {
       expect(line.height).toBeCloseTo(endY);
     });
 
-    it.each(["line", "arrow", "freedraw"] as const)(
+    it.each(["rectangle", "line", "arrow", "freedraw"] as const)(
       "doesn't snap the %s being drawn to itself when Ctrl is pressed",
       (type) => {
         UI.clickTool(type);
