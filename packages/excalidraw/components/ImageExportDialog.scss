@@ -154,6 +154,18 @@
         }
       }
 
+      &__note {
+        max-width: 22rem;
+        margin: 0;
+        font-size: 0.875rem;
+        line-height: 1.5;
+
+        @include isMobile {
+          max-width: unset;
+          flex-basis: 100%;
+        }
+      }
+
       &__buttons {
         flex-grow: 1;
         flex-wrap: wrap;

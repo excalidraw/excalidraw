@@ -538,6 +538,9 @@
     "tooltip": {
       "embedScene": "Scene data will be saved into the exported PNG/SVG file so that the scene can be restored from it.\nWill increase exported file size."
     },
+    "note": {
+      "embedScene": "Copied images don't include scene data. Download a PNG or SVG to keep the scene editable."
+    },
     "title": {
       "exportToPng": "Export to PNG",
       "exportToSvg": "Export to SVG",
