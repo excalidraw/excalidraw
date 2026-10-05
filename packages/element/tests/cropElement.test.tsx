@@ -136,6 +136,34 @@ describe("Crop an image", () => {
     expect(image.height).toBeLessThan(initialHeight);
   });
 
+  it("Dragging a crop handle in the crop editor crops the image", () => {
+    const image = API.createElement({
+      type: "image",
+      width: 200,
+      height: 100,
+      fileId: "file",
+    });
+    API.setElements([image]);
+    // the file loaded, at twice the element's size
+    const htmlImage = new Image();
+    Object.defineProperties(htmlImage, {
+      naturalWidth: { value: 400 },
+      naturalHeight: { value: 200 },
+    });
+    h.app.imageCache.set(image.fileId!, {
+      image: htmlImage,
+      mimeType: "image/png",
+    });
+    API.setSelectedElements([image]);
+    Keyboard.keyDown(KEYS.ENTER);
+    expect(h.state.croppingElementId).toBe(image.id);
+
+    UI.resize(image, "w", [50, 0]);
+
+    expect(API.getElement(image)).toMatchObject({ x: 50, width: 150 });
+    expect(API.getElement(image).crop).toMatchObject({ x: 100, width: 300 });
+  });
+
   it("Cropping has minimal sizes", async () => {
     const image = h.elements[0] as ExcalidrawImageElement;
     const initialWidth = image.width;

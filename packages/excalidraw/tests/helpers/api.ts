@@ -153,8 +153,7 @@ export class API {
 
   static clearSelection = () => {
     act(() => {
-      // @ts-ignore
-      h.app.clearSelection(null);
+      h.app.selectionTool.clearSelection(null);
     });
     expect(API.getSelectedElements().length).toBe(0);
   };

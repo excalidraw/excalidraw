@@ -201,6 +201,126 @@ describe("lasso reselection", () => {
   });
 });
 
+describe("alt-click cycling", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  // bottom to top, all three overlapping at (50, 50)
+  const createStack = (groupIds: { bottom?: string[]; middle?: string[] }) => {
+    const [bottom, middle, top] = (["bottom", "middle", "top"] as const).map(
+      (name, index) =>
+        API.createElement({
+          type: "rectangle",
+          x: index * 10,
+          y: index * 10,
+          width: 100,
+          height: 100,
+          backgroundColor: "red",
+          fillStyle: "solid",
+          groupIds: name === "top" ? [] : groupIds[name] ?? [],
+        }),
+    );
+    API.setElements([bottom, middle, top]);
+    return { bottom, middle, top };
+  };
+
+  it("selects the element below the selected one, wrapping around to the topmost", () => {
+    const { bottom, middle, top } = createStack({});
+
+    mouse.clickAt(50, 50);
+    assertSelectedElements([top.id]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.clickAt(50, 50);
+      assertSelectedElements([middle.id]);
+      mouse.clickAt(50, 50);
+      assertSelectedElements([bottom.id]);
+      mouse.clickAt(50, 50);
+      assertSelectedElements([top.id]);
+    });
+  });
+
+  it("cycles through the edited group's elements only", () => {
+    const { bottom, middle } = createStack({
+      bottom: ["group"],
+      middle: ["group"],
+    });
+
+    // deep select the middle one where the top one isn't
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.clickAt(15, 15);
+    });
+    assertSelectedElements([middle.id]);
+    expect(h.state.editingGroupId).toBe("group");
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.clickAt(50, 50);
+      assertSelectedElements([bottom.id]);
+      mouse.clickAt(50, 50);
+      assertSelectedElements([middle.id]);
+    });
+    expect(h.state.editingGroupId).toBe("group");
+  });
+
+  it("sets up the line editor of an arrow it selects", () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 20,
+      y: 50,
+      width: 60,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(60, 0)],
+    });
+    API.setElements([rectangle, arrow]);
+
+    // (off the arrow's midpoint knob)
+    mouse.clickAt(35, 50);
+    assertSelectedElements([arrow.id]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.clickAt(35, 50);
+      assertSelectedElements([rectangle.id]);
+      mouse.clickAt(35, 50);
+    });
+    assertSelectedElements([arrow.id]);
+    expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+  });
+
+  it("alt+double-click doesn't create or edit text", () => {
+    createStack({});
+    mouse.clickAt(50, 50);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.doubleClickAt(50, 50);
+    });
+
+    expect(h.state.editingTextElement).toBe(null);
+    expect(h.elements.length).toBe(3);
+  });
+
+  it("alt-drag duplicates only past the drag threshold", () => {
+    const { top } = createStack({});
+    mouse.clickAt(50, 50);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(50, 50);
+      mouse.moveTo(55, 55);
+      mouse.upAt();
+    });
+
+    expect(h.elements.length).toBe(3);
+    expect(API.getElement(top)).toMatchObject({ x: top.x, y: top.y });
+  });
+});
+
 describe("box-selection overlap mode", () => {
   const boxSelect = (
     startX: number,
