@@ -1,0 +1,204 @@
+import { line, linesIntersectAt } from "./line";
+
+import {
+  isPoint,
+  pointCenter,
+  pointDistance,
+  pointFrom,
+  pointFromVector,
+  pointRotateRads,
+} from "./point";
+import { PRECISION } from "./utils";
+import {
+  vectorAdd,
+  vectorCross,
+  vectorFromPoint,
+  vectorScale,
+  vectorSubtract,
+} from "./vector";
+
+import type { GlobalPoint, LineSegment, LocalPoint, Radians } from "./types";
+
+/**
+ * Create a line segment from two points.
+ *
+ * @param points The two points delimiting the line segment on each end
+ * @returns The line segment delineated by the points
+ */
+export function lineSegment<P extends GlobalPoint | LocalPoint>(
+  a: P,
+  b: P,
+): LineSegment<P> {
+  return [a, b] as LineSegment<P>;
+}
+
+/**
+ *
+ * @param segment
+ * @returns
+ */
+export const isLineSegment = <Point extends GlobalPoint | LocalPoint>(
+  segment: unknown,
+): segment is LineSegment<Point> =>
+  Array.isArray(segment) &&
+  segment.length === 2 &&
+  isPoint(segment[0]) &&
+  isPoint(segment[1]);
+
+/**
+ * Return the coordinates resulting from rotating the given line about an origin by an angle in radians
+ * note that when the origin is not given, the midpoint of the given line is used as the origin.
+ *
+ * @param l
+ * @param angle
+ * @param origin
+ * @returns
+ */
+export const lineSegmentRotate = <Point extends LocalPoint | GlobalPoint>(
+  l: LineSegment<Point>,
+  angle: Radians,
+  origin?: Point,
+): LineSegment<Point> => {
+  return lineSegment(
+    pointRotateRads(l[0], origin || pointCenter(l[0], l[1]), angle),
+    pointRotateRads(l[1], origin || pointCenter(l[0], l[1]), angle),
+  );
+};
+
+/**
+ * Calculates the point two line segments with a definite start and end point
+ * intersect at.
+ */
+export const segmentsIntersectAt = <Point extends GlobalPoint | LocalPoint>(
+  a: Readonly<LineSegment<Point>>,
+  b: Readonly<LineSegment<Point>>,
+): Point | null => {
+  const a0 = vectorFromPoint(a[0]);
+  const a1 = vectorFromPoint(a[1]);
+  const b0 = vectorFromPoint(b[0]);
+  const b1 = vectorFromPoint(b[1]);
+  const r = vectorSubtract(a1, a0);
+  const s = vectorSubtract(b1, b0);
+  const denominator = vectorCross(r, s);
+
+  if (denominator === 0) {
+    return null;
+  }
+
+  const i = vectorSubtract(vectorFromPoint(b[0]), vectorFromPoint(a[0]));
+  const u = vectorCross(i, r) / denominator;
+  const t = vectorCross(i, s) / denominator;
+
+  if (u === 0) {
+    return null;
+  }
+
+  const p = vectorAdd(a0, vectorScale(r, t));
+
+  if (t >= 0 && t < 1 && u >= 0 && u < 1) {
+    return pointFromVector<Point>(p);
+  }
+
+  return null;
+};
+
+export const pointOnLineSegment = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  line: LineSegment<Point>,
+  threshold = PRECISION,
+) => {
+  const distance = distanceToLineSegment(point, line);
+
+  if (distance === 0) {
+    return true;
+  }
+
+  return distance < threshold;
+};
+
+export const distanceToLineSegment = <Point extends LocalPoint | GlobalPoint>(
+  point: Point,
+  line: LineSegment<Point>,
+) => {
+  return pointDistance(
+    point,
+    lineSegmentPointAt(line, lineSegmentClosestParameter(point, line)),
+  );
+};
+
+/**
+ * Returns the point at parameter `t` along the segment, where `t = 0` is the
+ * segment's start and `t = 1` its end. Not clamped.
+ */
+export function lineSegmentPointAt<Point extends GlobalPoint | LocalPoint>(
+  line: LineSegment<Point>,
+  t: number,
+): Point {
+  const [[x1, y1], [x2, y2]] = line;
+
+  return pointFrom<Point>(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+}
+
+/**
+ * Returns the intersection point of a segment and a line
+ *
+ * @param l
+ * @param s
+ * @returns
+ */
+export function lineSegmentIntersectionPoints<
+  Point extends GlobalPoint | LocalPoint,
+>(
+  l: LineSegment<Point>,
+  s: LineSegment<Point>,
+  threshold?: number,
+): Point | null {
+  const candidate = linesIntersectAt(line(l[0], l[1]), line(s[0], s[1]));
+
+  if (
+    !candidate ||
+    !pointOnLineSegment(candidate, s, threshold) ||
+    !pointOnLineSegment(candidate, l, threshold)
+  ) {
+    return null;
+  }
+
+  return candidate;
+}
+
+export function lineSegmentsDistance<Point extends GlobalPoint | LocalPoint>(
+  s1: LineSegment<Point>,
+  s2: LineSegment<Point>,
+): number {
+  if (lineSegmentIntersectionPoints(s1, s2)) {
+    return 0;
+  }
+
+  return Math.min(
+    distanceToLineSegment(s1[0], s2),
+    distanceToLineSegment(s1[1], s2),
+    distanceToLineSegment(s2[0], s1),
+    distanceToLineSegment(s2[1], s1),
+  );
+}
+
+export function lineSegmentClosestParameter<
+  Point extends GlobalPoint | LocalPoint,
+>(point: Point, line: LineSegment<Point>): number {
+  const [x, y] = point;
+  const [[x1, y1], [x2, y2]] = line;
+
+  const A = x - x1;
+  const B = y - y1;
+  const C = x2 - x1;
+  const D = y2 - y1;
+
+  const dot = A * C + B * D;
+  const len_sq = C * C + D * D;
+  let param = 0;
+  if (len_sq !== 0) {
+    param = dot / len_sq;
+  }
+
+  return Math.max(0, Math.min(1, param));
+}

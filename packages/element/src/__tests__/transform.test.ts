@@ -1,0 +1,1190 @@
+import {
+  DEFAULT_STICKY_NOTE_BG,
+  DEFAULT_STICKY_NOTE_SIZE,
+  STICKY_NOTE_MIN_FONT_SIZE,
+  STICKY_NOTE_MIN_SIZE,
+  getUpdatedTimestamp,
+} from "@excalidraw/common";
+import { pointFrom } from "@excalidraw/math";
+import { vi } from "vitest";
+
+import {
+  newElement,
+  newEmbeddableElement,
+  newFreeDrawElement,
+  newIframeElement,
+} from "../newElement";
+
+import {
+  convertToExcalidrawElements,
+  type ExcalidrawElementSkeleton,
+} from "../transform";
+
+import type {
+  ExcalidrawArrowElement,
+  ExcalidrawStickyNoteElement,
+  ExcalidrawTextElement,
+} from "../types";
+
+const opts = { regenerateIds: false };
+
+describe("Test Transform", () => {
+  it("should generate id unless opts.regenerateIds is set to false explicitly", () => {
+    const elements = [
+      {
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        id: "rect-1",
+      },
+    ];
+    let data = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+    );
+    expect(data.length).toBe(1);
+    expect(data[0].id).toBe("id0");
+
+    data = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    );
+    expect(data[0].id).toBe("rect-1");
+  });
+
+  it("should transform regular shapes", () => {
+    const elements = [
+      {
+        type: "rectangle",
+        x: 100,
+        y: 100,
+      },
+      {
+        type: "ellipse",
+        x: 100,
+        y: 250,
+      },
+      {
+        type: "diamond",
+        x: 100,
+        y: 400,
+      },
+      {
+        type: "rectangle",
+        x: 300,
+        y: 100,
+        width: 200,
+        height: 100,
+        backgroundColor: "#c0eb75",
+        strokeWidth: 2,
+      },
+      {
+        type: "ellipse",
+        x: 300,
+        y: 250,
+        width: 200,
+        height: 100,
+        backgroundColor: "#ffc9c9",
+        strokeStyle: "dotted",
+        fillStyle: "solid",
+        strokeWidth: 2,
+      },
+      {
+        type: "diamond",
+        x: 300,
+        y: 400,
+        width: 200,
+        height: 100,
+        backgroundColor: "#a5d8ff",
+        strokeColor: "#1971c2",
+        strokeStyle: "dashed",
+        fillStyle: "cross-hatch",
+        strokeWidth: 2,
+      },
+    ];
+
+    convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    ).forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
+  });
+
+  it("should transform text element", () => {
+    const elements = [
+      {
+        type: "text",
+        x: 100,
+        y: 100,
+        text: "HELLO WORLD!",
+      },
+      {
+        type: "text",
+        x: 100,
+        y: 150,
+        text: "STYLED HELLO WORLD!",
+        fontSize: 20,
+        strokeColor: "#5f3dc4",
+      },
+    ];
+    convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    ).forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
+  });
+
+  it("should transform linear elements", () => {
+    const elements = [
+      {
+        type: "arrow",
+        x: 100,
+        y: 20,
+      },
+      {
+        type: "arrow",
+        x: 450,
+        y: 20,
+        startArrowhead: "dot",
+        endArrowhead: "triangle",
+        strokeColor: "#1971c2",
+        strokeWidth: 2,
+      },
+      {
+        type: "line",
+        x: 100,
+        y: 60,
+      },
+      {
+        type: "line",
+        x: 450,
+        y: 60,
+        strokeColor: "#2f9e44",
+        strokeWidth: 2,
+        strokeStyle: "dotted",
+      },
+    ];
+    const excalidrawElements = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    );
+
+    expect(excalidrawElements.length).toBe(4);
+
+    excalidrawElements.forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
+  });
+
+  it("should transform to text containers when label provided", () => {
+    const elements = [
+      {
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        label: {
+          text: "RECTANGLE TEXT CONTAINER",
+        },
+      },
+      {
+        type: "ellipse",
+        x: 500,
+        y: 100,
+        width: 200,
+        label: {
+          text: "ELLIPSE TEXT CONTAINER",
+        },
+      },
+      {
+        type: "diamond",
+        x: 100,
+        y: 150,
+        width: 280,
+        label: {
+          text: "DIAMOND\nTEXT CONTAINER",
+        },
+      },
+      {
+        type: "diamond",
+        x: 100,
+        y: 400,
+        width: 300,
+        backgroundColor: "#fff3bf",
+        strokeWidth: 2,
+        label: {
+          text: "STYLED DIAMOND TEXT CONTAINER",
+          strokeColor: "#099268",
+          fontSize: 20,
+        },
+      },
+      {
+        type: "rectangle",
+        x: 500,
+        y: 300,
+        width: 200,
+        strokeColor: "#c2255c",
+        label: {
+          text: "TOP LEFT ALIGNED RECTANGLE TEXT CONTAINER",
+          textAlign: "left",
+          verticalAlign: "top",
+          fontSize: 20,
+        },
+      },
+      {
+        type: "ellipse",
+        x: 500,
+        y: 500,
+        strokeColor: "#f08c00",
+        backgroundColor: "#ffec99",
+        width: 200,
+        label: {
+          text: "STYLED ELLIPSE TEXT CONTAINER",
+          strokeColor: "#c2255c",
+        },
+      },
+    ];
+    const excalidrawElements = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    );
+
+    expect(excalidrawElements.length).toBe(12);
+
+    excalidrawElements.forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
+  });
+
+  it("should transform to labelled arrows when label provided for arrows", () => {
+    const elements = [
+      {
+        type: "arrow",
+        x: 100,
+        y: 100,
+        label: {
+          text: "LABELED ARROW",
+        },
+      },
+      {
+        type: "arrow",
+        x: 100,
+        y: 200,
+        label: {
+          text: "STYLED LABELED ARROW",
+          strokeColor: "#099268",
+          fontSize: 20,
+        },
+      },
+      {
+        type: "arrow",
+        x: 100,
+        y: 300,
+        strokeColor: "#1098ad",
+        strokeWidth: 2,
+        label: {
+          text: "ANOTHER STYLED LABELLED ARROW",
+        },
+      },
+      {
+        type: "arrow",
+        x: 100,
+        y: 400,
+        strokeColor: "#1098ad",
+        strokeWidth: 2,
+        label: {
+          text: "ANOTHER STYLED LABELLED ARROW",
+          strokeColor: "#099268",
+        },
+      },
+    ];
+    const excalidrawElements = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    );
+
+    expect(excalidrawElements.length).toBe(8);
+
+    excalidrawElements.forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
+  });
+
+  describe("Test Frames", () => {
+    const elements: ExcalidrawElementSkeleton[] = [
+      {
+        type: "rectangle",
+        x: 10,
+        y: 10,
+        strokeWidth: 2,
+        id: "1",
+      },
+      {
+        type: "diamond",
+        x: 120,
+        y: 20,
+        backgroundColor: "#fff3bf",
+        strokeWidth: 2,
+        label: {
+          text: "HELLO EXCALIDRAW",
+          strokeColor: "#099268",
+          fontSize: 30,
+        },
+        id: "2",
+      },
+    ];
+
+    it("should transform frames and update frame ids when regenerated", () => {
+      const elementsSkeleton: ExcalidrawElementSkeleton[] = [
+        ...elements,
+        {
+          type: "frame",
+          children: ["1", "2"],
+          name: "My frame",
+        },
+      ];
+      const excalidrawElements = convertToExcalidrawElements(
+        elementsSkeleton,
+        opts,
+      );
+      expect(excalidrawElements.length).toBe(4);
+
+      excalidrawElements.forEach((ele) => {
+        expect(ele).toMatchObject({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
+    });
+
+    it("should consider user defined frame dimensions over calculated when provided", () => {
+      const elementsSkeleton: ExcalidrawElementSkeleton[] = [
+        ...elements,
+        {
+          type: "frame",
+          children: ["1", "2"],
+          name: "My frame",
+          width: 800,
+          height: 100,
+        },
+      ];
+      const excalidrawElements = convertToExcalidrawElements(
+        elementsSkeleton,
+        opts,
+      );
+      const frame = excalidrawElements.find((ele) => ele.type === "frame")!;
+      expect(frame.width).toBe(800);
+      expect(frame.height).toBe(100);
+    });
+
+    it("should consider user defined frame coordinates calculated when provided", () => {
+      const elementsSkeleton: ExcalidrawElementSkeleton[] = [
+        ...elements,
+        {
+          type: "frame",
+          children: ["1", "2"],
+          name: "My frame",
+          x: 100,
+          y: 300,
+        },
+      ];
+      const excalidrawElements = convertToExcalidrawElements(
+        elementsSkeleton,
+        opts,
+      );
+      const frame = excalidrawElements.find((ele) => ele.type === "frame")!;
+      expect(frame.x).toBe(100);
+      expect(frame.y).toBe(300);
+    });
+  });
+
+  describe("Test arrow bindings", () => {
+    it("should bind arrows to shapes when start / end provided without ids", () => {
+      const elements = [
+        {
+          type: "arrow",
+          x: 255,
+          y: 239,
+          label: {
+            text: "HELLO WORLD!!",
+          },
+          start: {
+            type: "rectangle",
+          },
+          end: {
+            type: "ellipse",
+          },
+        },
+      ];
+      const excalidrawElements = convertToExcalidrawElements(
+        elements as ExcalidrawElementSkeleton[],
+        opts,
+      );
+
+      expect(excalidrawElements.length).toBe(4);
+      const [arrow, text, rectangle, ellipse] = excalidrawElements;
+      expect(arrow).toMatchObject({
+        type: "arrow",
+        x: 255.5,
+        y: 239,
+        boundElements: [{ id: text.id, type: "text" }],
+        startBinding: {
+          elementId: rectangle.id,
+        },
+        endBinding: {
+          elementId: ellipse.id,
+        },
+      });
+
+      expect(text).toMatchObject({
+        x: 240,
+        y: 226.5,
+        type: "text",
+        text: "HELLO WORLD!!",
+        containerId: arrow.id,
+      });
+
+      expect(rectangle).toMatchObject({
+        x: 155,
+        y: 189,
+        type: "rectangle",
+        boundElements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+          },
+        ],
+      });
+
+      expect(ellipse).toMatchObject({
+        x: 355,
+        y: 189,
+        type: "ellipse",
+        boundElements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+          },
+        ],
+      });
+
+      excalidrawElements.forEach((ele) => {
+        expect(ele).toMatchSnapshot({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
+    });
+
+    it("should bind arrows to text when start / end provided without ids", () => {
+      const elements = [
+        {
+          type: "arrow",
+          x: 255,
+          y: 239,
+          label: {
+            text: "HELLO WORLD!!",
+          },
+          start: {
+            type: "text",
+            text: "HEYYYYY",
+          },
+          end: {
+            type: "text",
+            text: "WHATS UP ?",
+          },
+        },
+      ];
+
+      const excalidrawElements = convertToExcalidrawElements(
+        elements as ExcalidrawElementSkeleton[],
+        opts,
+      );
+
+      expect(excalidrawElements.length).toBe(4);
+      const [arrow, text1, text2, text3] = excalidrawElements;
+
+      expect(arrow).toMatchObject({
+        type: "arrow",
+        x: 255.5,
+        y: 239,
+        boundElements: [{ id: text1.id, type: "text" }],
+        startBinding: {
+          elementId: text2.id,
+        },
+        endBinding: {
+          elementId: text3.id,
+        },
+      });
+
+      expect(text1).toMatchObject({
+        x: 240,
+        y: 226.5,
+        type: "text",
+        text: "HELLO WORLD!!",
+        containerId: arrow.id,
+      });
+
+      expect(text2).toMatchObject({
+        x: 185,
+        y: 226.5,
+        type: "text",
+        boundElements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+          },
+        ],
+      });
+
+      expect(text3).toMatchObject({
+        x: 355,
+        y: 226.5,
+        type: "text",
+        boundElements: [
+          {
+            id: arrow.id,
+            type: "arrow",
+          },
+        ],
+      });
+
+      excalidrawElements.forEach((ele) => {
+        expect(ele).toMatchSnapshot({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
+    });
+
+    it("should bind arrows to existing shapes when start / end provided with ids", () => {
+      const elements = [
+        {
+          type: "ellipse",
+          id: "ellipse-1",
+          strokeColor: "#66a80f",
+          x: 630,
+          y: 316,
+          width: 300,
+          height: 300,
+          backgroundColor: "#d8f5a2",
+        },
+        {
+          type: "diamond",
+          id: "diamond-1",
+          strokeColor: "#9c36b5",
+          width: 140,
+          x: 96,
+          y: 400,
+        },
+        {
+          type: "arrow",
+          x: 247,
+          y: 420,
+          width: 395,
+          height: 35,
+          strokeColor: "#1864ab",
+          start: {
+            type: "rectangle",
+            width: 300,
+            height: 300,
+          },
+          end: {
+            id: "ellipse-1",
+          },
+        },
+        {
+          type: "arrow",
+          x: 227,
+          y: 450,
+          width: 400,
+          strokeColor: "#e67700",
+          start: {
+            id: "diamond-1",
+          },
+          end: {
+            id: "ellipse-1",
+          },
+        },
+      ];
+
+      const excalidrawElements = convertToExcalidrawElements(
+        elements as ExcalidrawElementSkeleton[],
+        opts,
+      );
+
+      expect(excalidrawElements.length).toBe(5);
+
+      excalidrawElements.forEach((ele) => {
+        expect(ele).toMatchSnapshot({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
+    });
+
+    it("should bind arrows to existing text elements when start / end provided with ids", () => {
+      const elements = [
+        {
+          x: 100,
+          y: 239,
+          type: "text",
+          text: "HEYYYYY",
+          id: "text-1",
+          strokeColor: "#c2255c",
+        },
+        {
+          type: "text",
+          id: "text-2",
+          x: 560,
+          y: 239,
+          text: "Whats up ?",
+        },
+        {
+          type: "arrow",
+          x: 255,
+          y: 239,
+          label: {
+            text: "HELLO WORLD!!",
+          },
+          start: {
+            id: "text-1",
+          },
+          end: {
+            id: "text-2",
+          },
+        },
+      ];
+
+      const excalidrawElements = convertToExcalidrawElements(
+        elements as ExcalidrawElementSkeleton[],
+        opts,
+      );
+
+      expect(excalidrawElements.length).toBe(4);
+
+      excalidrawElements.forEach((ele) => {
+        expect(ele).toMatchSnapshot({
+          seed: expect.any(Number),
+          versionNonce: expect.any(Number),
+          id: expect.any(String),
+        });
+      });
+    });
+
+    it("should bind arrows to existing elements if ids are correct", () => {
+      const consoleErrorSpy = vi
+        .spyOn(console, "error")
+        .mockImplementationOnce(() => void 0);
+      const elements = [
+        {
+          x: 100,
+          y: 239,
+          type: "text",
+          text: "HEYYYYY",
+          id: "text-1",
+          strokeColor: "#c2255c",
+        },
+        {
+          type: "rectangle",
+          x: 560,
+          y: 139,
+          id: "rect-1",
+          width: 100,
+          height: 200,
+          backgroundColor: "#bac8ff",
+        },
+        {
+          type: "arrow",
+          x: 255,
+          y: 239,
+          label: {
+            text: "HELLO WORLD!!",
+          },
+          start: {
+            id: "text-13",
+          },
+          end: {
+            id: "rect-11",
+          },
+        },
+      ];
+
+      const excalidrawElements = convertToExcalidrawElements(
+        elements as ExcalidrawElementSkeleton[],
+        opts,
+      );
+
+      expect(excalidrawElements.length).toBe(4);
+      const [, , arrow, text] = excalidrawElements;
+      expect(arrow).toMatchObject({
+        type: "arrow",
+        x: 255.5,
+        y: 239,
+        boundElements: [
+          {
+            id: text.id,
+            type: "text",
+          },
+        ],
+        startBinding: null,
+        endBinding: null,
+      });
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+      expect(consoleErrorSpy).toHaveBeenNthCalledWith(
+        1,
+        "No element for start binding with id text-13 found",
+      );
+      expect(consoleErrorSpy).toHaveBeenNthCalledWith(
+        2,
+        "No element for end binding with id rect-11 found",
+      );
+    });
+
+    it("should bind when ids referenced before the element data", () => {
+      const elements = [
+        {
+          type: "arrow",
+          x: 255,
+          y: 239,
+          end: {
+            id: "rect-1",
+          },
+        },
+        {
+          type: "rectangle",
+          x: 560,
+          y: 139,
+          id: "rect-1",
+          width: 100,
+          height: 200,
+          backgroundColor: "#bac8ff",
+        },
+      ];
+      const excalidrawElements = convertToExcalidrawElements(
+        elements as ExcalidrawElementSkeleton[],
+        opts,
+      );
+      expect(excalidrawElements.length).toBe(2);
+      const [arrow, rect] = excalidrawElements;
+      expect((arrow as ExcalidrawArrowElement).endBinding).toStrictEqual({
+        elementId: "rect-1",
+        fixedPoint: [-2.05, 0.5001],
+        mode: "orbit",
+      });
+      expect(rect.boundElements).toStrictEqual([
+        {
+          id: arrow.id,
+          type: "arrow",
+        },
+      ]);
+    });
+  });
+
+  it("should not allow duplicate ids", () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementationOnce(() => void 0);
+    const elements = [
+      {
+        type: "rectangle",
+        x: 300,
+        y: 100,
+        id: "rect-1",
+        width: 100,
+        height: 200,
+      },
+
+      {
+        type: "rectangle",
+        x: 100,
+        y: 200,
+        id: "rect-1",
+        width: 100,
+        height: 200,
+      },
+    ];
+    const excalidrawElements = convertToExcalidrawElements(
+      elements as ExcalidrawElementSkeleton[],
+      opts,
+    );
+
+    expect(excalidrawElements.length).toBe(1);
+    expect(excalidrawElements[0]).toMatchSnapshot({
+      seed: expect.any(Number),
+      versionNonce: expect.any(Number),
+    });
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Duplicate id found for rect-1",
+    );
+  });
+
+  it("should contains customData if provided", () => {
+    const rawData = [
+      {
+        type: "rectangle",
+        x: 100,
+        y: 100,
+        customData: { createdBy: "user01" },
+      },
+    ];
+    const convertedElements = convertToExcalidrawElements(
+      rawData as ExcalidrawElementSkeleton[],
+      opts,
+    );
+    expect(convertedElements[0].customData).toStrictEqual({
+      createdBy: "user01",
+    });
+  });
+
+  it("should transform the elements correctly when linear elements have single point", () => {
+    const elements: ExcalidrawElementSkeleton[] = [
+      {
+        id: "B",
+        type: "rectangle",
+        groupIds: ["subgraph_group_B"],
+        x: 0,
+        y: 0,
+        width: 166.03125,
+        height: 163,
+        label: {
+          groupIds: ["subgraph_group_B"],
+          text: "B",
+          fontSize: 20,
+          verticalAlign: "top",
+        },
+      },
+      {
+        id: "A",
+        type: "rectangle",
+        groupIds: ["subgraph_group_A"],
+        x: 364.546875,
+        y: 0,
+        width: 120.265625,
+        height: 114,
+        label: {
+          groupIds: ["subgraph_group_A"],
+          text: "A",
+          fontSize: 20,
+          verticalAlign: "top",
+        },
+      },
+      {
+        id: "Alice",
+        type: "rectangle",
+        groupIds: ["subgraph_group_A"],
+        x: 389.546875,
+        y: 35,
+        width: 70.265625,
+        height: 44,
+        strokeWidth: 2,
+        label: {
+          groupIds: ["subgraph_group_A"],
+          text: "Alice",
+          fontSize: 20,
+        },
+        link: null,
+      },
+      {
+        id: "Bob",
+        type: "rectangle",
+        groupIds: ["subgraph_group_B"],
+        x: 54.76953125,
+        y: 35,
+        width: 56.4921875,
+        height: 44,
+        strokeWidth: 2,
+        label: {
+          groupIds: ["subgraph_group_B"],
+          text: "Bob",
+          fontSize: 20,
+        },
+        link: null,
+      },
+      {
+        id: "Bob_Alice",
+        type: "arrow",
+        groupIds: [],
+        x: 111.262,
+        y: 57,
+        strokeWidth: 2,
+        points: [pointFrom(0, 0), pointFrom(272.985, 0)],
+        label: {
+          text: "How are you?",
+          fontSize: 20,
+          groupIds: [],
+        },
+        roundness: {
+          type: 2,
+        },
+        start: {
+          id: "Bob",
+        },
+        end: {
+          id: "Alice",
+        },
+      },
+      {
+        id: "Bob_B",
+        type: "arrow",
+        groupIds: [],
+        x: 77.017,
+        y: 79,
+        strokeWidth: 2,
+        points: [pointFrom(0, 0)],
+        label: {
+          text: "Friendship",
+          fontSize: 20,
+          groupIds: [],
+        },
+        roundness: {
+          type: 2,
+        },
+        start: {
+          id: "Bob",
+        },
+        end: {
+          id: "B",
+        },
+      },
+    ];
+
+    const excalidrawElements = convertToExcalidrawElements(elements, opts);
+    expect(excalidrawElements.length).toBe(12);
+    excalidrawElements.forEach((ele) => {
+      expect(ele).toMatchSnapshot({
+        seed: expect.any(Number),
+        versionNonce: expect.any(Number),
+        id: expect.any(String),
+      });
+    });
+  });
+
+  describe("creation timestamps", () => {
+    const createElements = () => [
+      {
+        ...newElement({ type: "rectangle", x: 0, y: 0 }),
+        type: "rectangle" as const,
+      },
+      newFreeDrawElement({
+        type: "freedraw",
+        x: 0,
+        y: 0,
+        simulatePressure: false,
+      }),
+      newIframeElement({ type: "iframe", x: 0, y: 0 }),
+      newEmbeddableElement({ type: "embeddable", x: 0, y: 0 }),
+    ];
+
+    it("assigns fresh timestamps when regenerating IDs without mutating the input", () => {
+      const elements = createElements().map((element) => ({
+        ...element,
+        created: 123,
+      }));
+      const converted = convertToExcalidrawElements(elements);
+
+      expect(converted).toHaveLength(elements.length);
+      converted.forEach((element, index) => {
+        expect(element.id).not.toBe(elements[index].id);
+        expect(element.created).toBe(getUpdatedTimestamp());
+        expect(elements[index].created).toBe(123);
+      });
+    });
+
+    it.each([123, 0, null])(
+      "preserves an explicit timestamp of %s when retaining IDs",
+      (created) => {
+        const elements = createElements().map((element) => ({
+          ...element,
+          created,
+        }));
+        const converted = convertToExcalidrawElements(elements, opts);
+
+        converted.forEach((element, index) => {
+          expect(element.id).toBe(elements[index].id);
+          expect(element.created).toBe(created);
+        });
+      },
+    );
+
+    it("defaults missing timestamps when retaining IDs, as every type goes through a constructor", () => {
+      // models skeletons persisted before `created` existed; the declared
+      // skeleton type is a complete element
+      const elements = createElements().map(
+        ({ created, ...element }) => element,
+      ) as unknown as ExcalidrawElementSkeleton[];
+      const converted = convertToExcalidrawElements(elements, opts);
+
+      converted.forEach((element, index) => {
+        expect(element.id).toBe(elements[index].id);
+        expect(element.created).toBe(getUpdatedTimestamp());
+        expect(elements[index]).not.toHaveProperty("created");
+      });
+    });
+
+    it("assigns fresh timestamps to generated labels and binding endpoints", () => {
+      const elements: ExcalidrawElementSkeleton[] = [
+        {
+          type: "arrow",
+          x: 100,
+          y: 100,
+          created: 123,
+          // fragments cannot carry a creation time; they are always new
+          label: { text: "label" },
+          start: { type: "rectangle" },
+          end: { type: "text", text: "end" },
+        },
+      ];
+      const converted = convertToExcalidrawElements(elements);
+
+      expect(converted).toHaveLength(4);
+      expect(converted.map((element) => element.created)).toEqual(
+        Array(4).fill(getUpdatedTimestamp()),
+      );
+    });
+  });
+
+  describe("sticky notes", () => {
+    const find = <
+      T extends ExcalidrawStickyNoteElement | ExcalidrawTextElement,
+    >(
+      elements: readonly { type: string }[],
+      type: T["type"],
+    ) => elements.find((element) => element.type === type) as T;
+
+    it("creates a finalized note with the sticky defaults", () => {
+      const elements = convertToExcalidrawElements(
+        [{ type: "stickynote", x: 100, y: 100 }],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+
+      expect(elements).toHaveLength(1);
+      expect(note.width).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.backgroundColor).toBe(DEFAULT_STICKY_NOTE_BG);
+      expect(note.fillStyle).toBe("solid");
+    });
+
+    it("enforces the note invariants on the given properties", () => {
+      const note = find<ExcalidrawStickyNoteElement>(
+        convertToExcalidrawElements(
+          [
+            {
+              type: "stickynote",
+              x: 0,
+              y: 0,
+              width: 10,
+              height: 300,
+              backgroundColor: "transparent",
+              strokeColor: "transparent",
+            },
+          ],
+          opts,
+        ),
+        "stickynote",
+      );
+
+      expect(note.width).toBe(STICKY_NOTE_MIN_SIZE);
+      expect(note.height).toBe(300);
+      expect(note.baseHeight).toBe(300);
+      expect(note.backgroundColor).toBe(DEFAULT_STICKY_NOTE_BG);
+      expect(note.strokeColor).not.toBe("transparent");
+    });
+
+    it("gives the note the color of a label that sets its own", () => {
+      const elements = convertToExcalidrawElements(
+        [
+          {
+            type: "stickynote",
+            x: 0,
+            y: 0,
+            strokeColor: "#1971c2",
+            label: { text: "hello", strokeColor: "#e03131" },
+          },
+        ],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+      const label = find<ExcalidrawTextElement>(elements, "text");
+
+      expect(label.strokeColor).toBe("#e03131");
+      expect(note.strokeColor).toBe("#e03131");
+    });
+
+    it("binds a label whose font size becomes the note's ceiling", () => {
+      const elements = convertToExcalidrawElements(
+        [
+          {
+            type: "stickynote",
+            x: 100,
+            y: 100,
+            strokeColor: "#1971c2",
+            label: { text: "hello", fontSize: 28 },
+          },
+        ],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+      const label = find<ExcalidrawTextElement>(elements, "text");
+
+      expect(elements).toHaveLength(2);
+      expect(label.containerId).toBe(note.id);
+      expect(note.boundElements).toEqual([{ type: "text", id: label.id }]);
+      expect(label.baseFontSize).toBe(28);
+      expect(label.fontSize).toBe(28);
+      // the label is the note's visible text: it takes the note's stroke
+      expect(label.strokeColor).toBe("#1971c2");
+      expect(note.height).toBe(DEFAULT_STICKY_NOTE_SIZE);
+    });
+
+    it("grows the note for a label that overflows at the minimum font size", () => {
+      const elements = convertToExcalidrawElements(
+        [
+          {
+            type: "stickynote",
+            x: 0,
+            y: 0,
+            label: {
+              text: Array(40).fill("abcdefghijklmnopqrstuvwx").join("\n"),
+              fontSize: 28,
+            },
+          },
+        ],
+        opts,
+      );
+      const note = find<ExcalidrawStickyNoteElement>(elements, "stickynote");
+      const label = find<ExcalidrawTextElement>(elements, "text");
+
+      expect(label.fontSize).toBe(STICKY_NOTE_MIN_FONT_SIZE);
+      expect(label.baseFontSize).toBe(28);
+      expect(note.baseHeight).toBe(DEFAULT_STICKY_NOTE_SIZE);
+      expect(note.height).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
+    });
+  });
+});

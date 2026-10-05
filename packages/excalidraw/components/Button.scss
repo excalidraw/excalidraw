@@ -1,0 +1,7 @@
+@use "../css/theme" as *;
+
+.excalidraw {
+  .excalidraw-button {
+    @include outlineButtonStyles;
+  }
+}

@@ -1,0 +1,101 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #6965db;
+  --ifm-color-primary-dark: #5b57d1;
+  --ifm-color-primary-darker: #5b57d1;
+  --ifm-color-primary-darkest: #4a47b1;
+  --ifm-color-primary-light: #5b57d1;
+  --ifm-color-primary-lighter: #5b57d1;
+  --ifm-color-primary-lightest: #5b57d1;
+  --ifm-code-font-size: 95%;
+
+  scrollbar-gutter: stable;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme="dark"] {
+  --ifm-color-primary: #8784e3;
+  --ifm-color-primary-dark: #4b46d8;
+  --ifm-color-primary-darker: #4b46d8;
+  --ifm-color-primary-darkest: #3e39be;
+  --ifm-color-primary-light: #3f3d64;
+  --ifm-color-primary-lighter: #3f3d64;
+  --ifm-color-primary-lightest: #3f3d64;
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
+
+[data-theme="dark"] .docusaurus-highlight-code-line {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .navbar__logo {
+  filter: invert(93%) hue-rotate(180deg);
+}
+
+pre a {
+  color: #5dccff;
+
+  &:hover {
+    color: #8fd3f3;
+  }
+}
+
+.custom-button {
+  height: 40px;
+  max-width: 200px;
+  margin: 10px 0;
+  padding: 5px;
+  background: #70b1ec;
+  color: white;
+  font-weight: 700;
+  border: none;
+}
+
+.custom-styles .excalidraw {
+  --color-primary: #fcc6d9;
+  --color-primary-darker: #f783ac;
+  --color-primary-darkest: #e64980;
+  --color-primary-light: #f2a9c4;
+}
+
+.custom-styles .excalidraw.theme--dark {
+  --color-primary: #d494aa;
+  --color-primary-darker: #d64c7e;
+  --color-primary-darkest: #e86e99;
+  --color-primary-light: #dcbec9;
+}
+
+/* The global css conflicts with Excal css hence overriding */
+
+.excalidraw .context-menu-item__shortcut {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.excalidraw .Stats table td,
+.excalidraw .Stats table th,
+.excalidraw .Stats table tr {
+  border: none;
+  background: none;
+  padding: 0;
+}
+.excalidraw .Stats .close {
+  padding: 0;
+}
+
+.excalidraw .Stats table {
+  display: table;
+}

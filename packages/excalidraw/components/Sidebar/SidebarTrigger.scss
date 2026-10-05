@@ -1,0 +1,48 @@
+@use "../../css/variables.module" as *;
+
+.excalidraw {
+  .sidebar-trigger {
+    @include outlineButtonStyles;
+    @include filledButtonOnCanvas;
+
+    width: auto;
+    height: var(--lg-button-size);
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    line-height: 0;
+
+    font-size: 0.75rem;
+    letter-spacing: 0.4px;
+
+    svg {
+      width: var(--lg-icon-size);
+      height: var(--lg-icon-size);
+    }
+
+    // the <button> wrapper — resets the native button chrome (the visual
+    // styling lives on the inner .sidebar-trigger)
+    &__label-element {
+      align-self: flex-start;
+      appearance: none;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background-color: transparent;
+      font: inherit;
+      color: inherit;
+      text-align: inherit;
+    }
+  }
+
+  .default-sidebar-trigger .sidebar-trigger__label {
+    display: block;
+    white-space: nowrap;
+  }
+
+  &.excalidraw--mobile .default-sidebar-trigger .sidebar-trigger__label {
+    display: none;
+  }
+}

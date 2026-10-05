@@ -1,0 +1,14 @@
+.excalidraw {
+  .excalidraw-canvas-buttons {
+    position: absolute;
+
+    box-shadow: 0px 2px 4px 0 rgb(0 0 0 / 30%);
+    z-index: var(--zIndex-canvasButtons);
+    background: var(--island-bg-color);
+    border-radius: var(--border-radius-lg);
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+}

@@ -1,0 +1,106 @@
+@use "../../css/variables.module" as *;
+
+.excalidraw {
+  .viewport-status-frame__border {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    border: 4px solid;
+    z-index: var(--zIndex-viewportStatusFrame);
+  }
+
+  .viewport-status-frame__badge {
+    // always rendered as a flex child of .floating-status-stack, which
+    // handles its position — this stays `relative` only so it remains the
+    // containing block for .viewport-status-frame__badge-action's inset:0.
+    position: relative;
+    z-index: var(--zIndex-viewportStatusFrame);
+    pointer-events: all;
+
+    background-color: var(--viewport-status-frame-badge-background);
+    color: var(--color-primary-light);
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+
+    @include isMobile {
+      // Flatten translucent host colors over an opaque canvas UI surface so
+      // the toolbar cannot show through the badge.
+      background: linear-gradient(
+          var(--viewport-status-frame-badge-background),
+          var(--viewport-status-frame-badge-background)
+        ),
+        var(--island-bg-color);
+    }
+  }
+
+  .viewport-status-frame__badge--clickable {
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+
+  .viewport-status-frame__badge-action {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: inherit;
+
+    &:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: -2px;
+      border-radius: 0.5rem;
+    }
+  }
+
+  .viewport-status-frame__badge-label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    white-space: pre-wrap;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .viewport-status-frame__badge-icon {
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  .viewport-status-frame__badge-close {
+    all: unset;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    margin-right: 0.5rem;
+    position: relative;
+
+    &:hover {
+      background-color: var(--color-primary-darker);
+    }
+
+    &:active {
+      background-color: var(--color-primary-darkest);
+    }
+
+    svg {
+      display: block;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+}

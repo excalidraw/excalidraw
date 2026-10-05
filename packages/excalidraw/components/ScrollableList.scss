@@ -1,0 +1,21 @@
+.excalidraw {
+  .ScrollableList__wrapper {
+    position: static !important;
+    border: none;
+    font-size: 0.875rem;
+    overflow-y: auto;
+
+    & > .empty,
+    & > .hint {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--color-gray-60);
+      overflow: hidden;
+      text-align: center;
+      line-height: 150%;
+    }
+  }
+}

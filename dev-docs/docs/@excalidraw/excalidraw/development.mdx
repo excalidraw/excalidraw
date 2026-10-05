@@ -1,0 +1,39 @@
+---
+pagination_prev: "@excalidraw/excalidraw/installation"
+---
+
+# Development
+
+This page relates to developing the `@excalidraw/excalidraw` package itself.
+
+## Example app
+
+To start the example app using the `@excalidraw/excalidraw` package, follow the below steps:
+
+1. Install the dependencies
+
+   ```bash
+   yarn
+   ```
+
+2. Start the example app
+
+   ```bash
+   yarn start:example
+   ```
+
+   [http://localhost:3001](http://localhost:3001) will open in your default browser.
+   
+   This is the same example as the [CodeSandbox](https://codesandbox.io/p/sandbox/github/excalidraw/excalidraw/tree/master/examples/with-script-in-browser) example.
+
+## Releasing
+
+### Creating a production release
+
+To release the next stable version follow the below steps:
+
+```bash
+yarn release --tag=latest --version=0.19.0
+```
+
+You will need to pass the `latest` tag with `version` for which you want to create the release. This will make the changes needed before publishing the packages into NPM, like updating dependencies of all `@excalidraw/*` packages, generating new entries in `CHANGELOG.md` and more.

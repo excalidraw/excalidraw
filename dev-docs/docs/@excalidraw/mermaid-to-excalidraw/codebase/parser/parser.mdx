@@ -1,0 +1,65 @@
+# How the Parser works under the hood ?
+
+[This](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/index.ts) is the entry point of the library.
+
+
+`parseMermaidToExcalidraw` function is the only function exposed which receives mermaid syntax as the input, parses the mermaid syntax and resolves to Excalidraw Skeleton.
+
+Lets look at the high level overview at how the parse works :point_down:
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/8e060de7-b867-44ad-864b-0c1b24466b67)
+
+Lets dive deeper into individual section now to understand better.
+
+## Parsing Mermaid diagram
+
+One of the dependencies of the library is [`mermaid`](https://www.npmjs.com/package/mermaid) library.
+We need the mermaid diagram in some extractable format so we can parse it to Excalidraw Elements.
+
+Parsing is broken into two steps
+1. [`Rendering Mermaid to Svg`](/docs/@excalidraw/mermaid-to-excalidraw/codebase/parser#rendering-mermaid-to-svg) - This helps in determining the position and dimensions of each element in the diagram
+
+2. [`Parsing the mermaid syntax`](/docs/@excalidraw/mermaid-to-excalidraw/codebase/parser#parsing-the-mermaid-syntax) - We also need to know how elements are connected which isn't possible with svg alone hence we also parse the mermaid syntax which helps in determining the connections and bindings between elements in the diagram.
+
+### Rendering Mermaid to Svg
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/2c24cf7b-f096-4c12-88db-55520de27558)
+
+The [`mermaid`](https://www.npmjs.com/package/mermaid) library provides the API `mermaid.render` API which gives the output of the diagram in `svg`.
+
+
+If the diagram isn't supported, this svg is converted to `dataURL` and can be rendered as an image in Excalidraw.
+
+
+### Parsing the mermaid syntax
+
+For this we first need to process the options along with mermaid defination for diagram provided by the user.
+
+[`processMermaidTextWithOptions`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parseMermaid.ts#L13) takes the mermaid defination and options and returns the full defination including the mermaid [directives ](https://mermaid.js.org/config/directives.html).
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/3a4825d8-9704-468c-a02f-7e507f4d5b7a)
+
+Next we use mermaid api [getDiagramFromText](https://github.com/mermaid-js/mermaid/blob/00d06c7282a701849793680c1e97da1cfdfcce62/packages/mermaid/src/Diagram.ts#L80) to parse the full defination and get the [Diagram](https://github.com/mermaid-js/mermaid/blob/00d06c7282a701849793680c1e97da1cfdfcce62/packages/mermaid/src/Diagram.ts#L15) json from it.
+
+```js
+const diagram = await mermaid.mermaidAPI.getDiagramFromText(fullDefinition);
+```
+
+Next we write our own parser to parse this diagram.
+
+### Parsing the Diagram
+
+For each diagram type, we need a parser as the result of every diagram would differ and dependinng on the data we have to write the parser. Since currently we support flowchart, so here is the [`parseMermaidFlowChartDiagram`](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/parser/flowchart.ts#L256) to parse the flowchart diagram.
+
+If you want to understand how flowchart parser works, you can navigate to [Flowchart Parser](http://localhost:3003/docs/@excalidraw/mermaid-to-excalidraw/codebase/parser/flowchart).
+
+## Converting to ExcalidrawElementSkeleton
+
+Now we have all the data, we just need to transform it to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133C13-L133C38) API so it can be rendered in Excalidraw.
+
+For this we have `converters` which takes the parsed mermaid data and gives back the Excalidraw Skeleton.
+For Unsupported types, we have already mentioned above that we convert it to `dataURL` and return the ExcalidrawImageSkeleton.
+
+For supported types, currently only flowchart, we have [flowchartConverter](https://github.com/excalidraw/mermaid-to-excalidraw/blob/master/src/converter/types/flowchart.ts#L24) which parses the data and converts to [ExcalidrawElementSkeleton](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/data/transform.ts#L133C13-L133C38).
+
+![image](https://github.com/excalidraw/excalidraw/assets/11256141/00226e9d-043d-4a08-989a-3ad9d2a574f1)

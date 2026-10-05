@@ -1,0 +1,35 @@
+@import "../../packages/excalidraw/css/variables.module.scss";
+
+.excalidraw {
+  .collab-errors-button {
+    width: 26px;
+    height: 26px;
+    margin-inline-end: 1rem;
+
+    color: var(--color-danger);
+
+    flex-shrink: 0;
+  }
+
+  .collab-errors-button-shake {
+    animation: strong-shake 0.15s 6;
+  }
+
+  @keyframes strong-shake {
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(10deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+    75% {
+      transform: rotate(-10deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+}

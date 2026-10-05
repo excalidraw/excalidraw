@@ -1,0 +1,155 @@
+# API
+
+At the moment the mermaid-to-excalidraw works in two steps. First, you call `parseMermaidToExcalidraw(mermaidSyntax)` on the mermaid diagram definition string, which resolves with elements in a skeleton format — a simplified excalidraw JSON format (docs coming soon). You then pass them to `convertToExcalidrawElements(elements)` to get the fully qualified excalidraw elements you can render in the editor.
+
+The need for these two steps is due to the [@excalidraw/excalidraw](/docs/@excalidraw/excalidraw/installation) being a **UMD** build so we currently cannot import the `convertToExcalidrawElements()` util alone, until we support a tree-shakeable **ESM** build.
+
+## parseMermaidToExcalidraw
+
+This API receives the mermaid syntax as the input, and resolves to skeleton Excalidraw elements. You will need to call `convertToExcalidraw` API to convert them to fully qualified elements that you can render in Excalidraw.
+
+** Example **
+
+```ts
+import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
+import { convertToExcalidrawElements}  from "@excalidraw/excalidraw"
+try {
+  const { elements, files } = await parseMermaidToExcalidraw(mermaidSyntax: string, {
+    fontSize: number,
+  });
+  const excalidrawElements = convertToExcalidrawElements(elements);
+  // Render elements and files on Excalidraw
+} catch (e) {
+  // Parse error, displaying error message to users
+}
+```
+
+## Supported Diagram Types
+
+Currently only [flowcharts](https://mermaid.js.org/syntax/flowchart.html) are supported. Oother diagram types will be rendered as an image in Excalidraw.
+
+### Flowchart
+
+#### Excalidraw Regular Shapes
+
+**Rectangles**, **Circle**, **Diamond**, and **Arrows** are fully supported in Excalidraw
+
+```
+flowchart TD
+  A[Christmas] -->|Get money| B(Go shopping)
+  B --> C{Let me think}
+  C -->|One| D[Laptop]
+  C -->|Two| E[iPhone]
+  C -->|Three| F[Car]
+ ```
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/c8ea84fc-e9fb-4652-9a12-154136d1a798"  width="250" height="200"/>
+
+
+```
+flowchart LR
+  id1((Hello from Circle))
+```
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/6202a8b9-8aa7-451e-9478-4d8d75c0f2fa"  width="250" height="200"/>
+
+
+#### Subgraphs
+
+Subgraphs are grouped diagrams hence they are also supported in Excalidraw
+
+```
+flowchart TB
+  c1-->a2
+  subgraph one
+  a1-->a2
+  end
+  subgraph two
+  b1-->b2
+  end
+  subgraph three
+  c1-->c2
+  end
+```
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/098bce52-8f93-437c-9a06-c6972e27c70a"  width="350" height="200"/>
+
+#### Unsupported shapes fallback to Rectangle
+
+**Subroutine**, **Cylindrical**, **Asymmetric**, **Hexagon**, **Parallelogram**, **Trapezoid** are not supported in Excalidraw hence they fallback to the closest shape **Rectangle**
+
+```
+flowchart LR
+  id1[[Subroutine fallback to Rectangle]]
+  id2[(Cylindrical fallback to Rectangle)]
+  id3>Asymmetric fallback to Rectangle]
+  id4{{Hexagon fallback to Rectangle}}
+  id5[/Parallelogram fallback to Rectangle /]
+  id6[/Trapezoid fallback to Rectangle\]
+```
+The above shapes are not supported in Excalidraw hence they fallback to Rectangle
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/cb269473-16c5-4c35-bd7a-d631d8cc5b47"  width="350" height="200"/>
+
+#### Markdown fallback to Regular text
+
+Since we don't support wysiwyg text editor yet, hence [Markdown Strings](https://mermaid.js.org/syntax/flowchart.html#markdown-strings) will fallback to regular text.
+
+```
+flowchart LR
+  A("`Hello **World**`") --> B("`Whats **up** ?`")
+```
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/107bd428-9ab9-42d4-ba12-b1e29c8db478"  width="250" height="200"/>
+
+#### Basic FontAwesome fallback to text
+
+The [FontAwesome](https://mermaid.js.org/syntax/flowchart.html#basic-support-for-fontawesome) icons aren't support so they won't be rendered in Excalidraw
+
+```
+flowchart TD
+  B["fab:fa-twitter for peace"]
+  B-->C[fa:fa-ban forbidden]
+  B-->E(A fa:fa-camera-retro perhaps?)
+```
+
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/7a693863-c3f9-42ff-b325-4b3f8303c7af"  width="250" height="200"/>
+
+#### Cross Arrow head fallback to Bar Arrow head
+
+```
+flowchart LR
+  Start x--x Stop
+```
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/217dd1ad-7f4e-4c80-8c1c-03647b42d821"  width="250" height="200"/>
+
+
+## Unsupported Diagram Types
+
+Currently only [flowcharts](https://mermaid.js.org/syntax/flowchart.html) are supported. All other diagram types will be rendered as an image in Excalidraw.
+
+```
+erDiagram
+  CUSTOMER ||--o{ ORDER : places
+  ORDER ||--|{ LINE-ITEM : contains
+  CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+```
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/c1d3fdb3-32ef-4bf3-a38a-02ac3d7d2cb9"  width="300" height="200"/>
+
+```
+gitGraph
+  commit
+  commit
+  branch develop
+  checkout develop
+  commit
+  commit
+  checkout main
+  merge develop
+  commit
+  commit
+
+```
+
+<img src="https://github.com/excalidraw/excalidraw/assets/11256141/e5dcec0b-d570-4eb4-b981-412a996aa96c"  width="400" height="300"/>

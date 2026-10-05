@@ -1,0 +1,45 @@
+{
+  "name": "@excalidraw/fractional-indexing",
+  "version": "3.3.0",
+  "description": "Provides functions for generating ordering strings",
+  "type": "module",
+  "types": "./dist/types/fractional-indexing/src/index.d.ts",
+  "main": "./dist/prod/index.js",
+  "module": "./dist/prod/index.js",
+  "engines": {
+    "node": "^14.13.1 || >=16.0.0"
+  },
+  "scripts": {
+    "gen:types": "rimraf types && tsc",
+    "build:esm": "rimraf dist && node ../../scripts/buildBase.js && yarn gen:types"
+  },
+  "keywords": [
+    "fractional",
+    "indexing",
+    "ordering",
+    "order"
+  ],
+  "homepage": "https://github.com/rocicorp/fractional-indexing#readme",
+  "bugs": "https://github.com/excalidraw/excalidraw/issues",
+  "repository": "https://github.com/excalidraw/excalidraw",
+  "author": "arv@rocicorp.dev",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "prettier": "^2.6.0",
+    "typescript": "5.9.3"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/fractional-indexing/src/index.d.ts",
+      "development": "./dist/dev/index.js",
+      "production": "./dist/prod/index.js",
+      "default": "./dist/prod/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist/*"
+  ]
+}

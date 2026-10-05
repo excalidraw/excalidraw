@@ -1,0 +1,196 @@
+---
+title: Export Utilities
+id: "export"
+---
+
+:::info
+
+We're working on much improved export utilities. Stay tuned!
+
+:::
+
+### exportToCanvas
+
+**_Signature_**
+
+<pre>
+exportToCanvas(&#123;<br/>&nbsp;
+  elements,<br/>&nbsp;
+  appState<br/>&nbsp;
+  getDimensions,<br/>&nbsp;
+  files,<br/>&nbsp;
+  exportPadding?: number;<br/>
+&#125;: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/utils/export.ts#L24">ExportOpts</a>
+</pre>
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `elements` | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114) |  | The elements to be exported to canvas. |
+| `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/packages/utils.ts#L23) | [Default App State](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/appState.ts#L17) | The app state of the scene. |
+| [`getDimensions`](#getdimensions) | `function` | _ | A function which returns the `width`, `height`, and optionally `scale` (defaults to  `1`), with which canvas is to be exported. |
+| `maxWidthOrHeight` | `number` | _ | The maximum `width` or `height` of the exported image. If provided, `getDimensions` is ignored. |
+| `files` | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L59) | _ | The files added to the scene. |
+| `exportPadding` | `number` | `10` | The `padding` to be added on canvas. |
+
+
+#### getDimensions
+
+```tsx
+(width: number, height: number) => { 
+  width: number,
+  height: number, 
+  scale?: number 
+}
+```
+A function which returns the `width`, `height`, and optionally `scale` (defaults to  `1`), with which canvas is to be exported.
+
+**How to use**
+
+```js
+import { exportToCanvas } from "@excalidraw/excalidraw";
+```
+
+This function returns the canvas with the exported elements, appState and dimensions.
+
+```jsx live
+function App() {
+  const [canvasUrl, setCanvasUrl] = useState("");
+  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+
+  return  (
+    <>
+      <button
+        className="custom-button"
+        onClick={async () => {
+          if (!excalidrawAPI) {
+            return
+          }
+          const elements = excalidrawAPI.getSceneElements();
+          if (!elements || !elements.length) {
+            return
+          }
+          const canvas = await exportToCanvas({
+            elements,
+            appState: {
+              ...initialData.appState,
+              exportWithDarkMode: false,
+            },
+            files: excalidrawAPI.getFiles(),
+            getDimensions: () => { return {width: 350, height: 350}}
+          });
+          const ctx = canvas.getContext("2d");
+          ctx.font = "30px Virgil";
+          ctx.strokeText("My custom text", 50, 60);
+          setCanvasUrl(canvas.toDataURL());
+        }}
+      >
+        Export to Canvas
+      </button>
+      <div className="export export-canvas">
+        <img src={canvasUrl} alt="" />
+      </div>
+      <div style={{ height: "400px" }}>
+        <Excalidraw excalidrawAPI={(api) => setExcalidrawAPI(api)}
+/>
+      </div>
+    </>
+  )
+}
+```
+
+
+### exportToBlob
+
+**_Signature_**
+
+<pre>
+exportToBlob(<br/>&nbsp;
+  opts: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/packages/utils.ts#L14">ExportOpts</a> & &#123;<br/>&nbsp;
+  mimeType?: string,<br/>&nbsp;
+  quality?: number,<br/>&nbsp;
+  exportPadding?: number;<br/>
+})
+</pre>
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `opts` | `object` | _ | This param is passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exporttocanvas) |
+| `mimeType` | `string` | `image/png` | Indicates the image format. |
+| `quality` | `number` | `0.92` | A value between `0` and `1` indicating the [image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#parameters). Applies only to `image/jpeg`/`image/webp` MIME types. |
+| `exportPadding` | `number` | `10` | The padding to be added on canvas. |
+
+**How to use**
+
+```js
+import { exportToBlob } from "@excalidraw/excalidraw";
+```
+
+Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob). It internally uses [canvas.ToBlob](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob).
+
+### exportToSvg
+
+**_Signature_**
+
+<pre>
+exportToSvg(&#123;<br/>&nbsp;
+  elements:&nbsp; 
+    <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
+      ExcalidrawElement[]
+    </a>,<br/>&nbsp;
+  appState:
+    <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95"> AppState
+    </a>,<br/>&nbsp;
+  exportPadding: number,<br/>&nbsp;
+  metadata: string,<br/>&nbsp;
+  files:&nbsp;
+  <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L59">
+      BinaryFiles
+    </a>,<br/>
+&#125;);
+</pre>
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114) |  | The elements to exported as `svg `|
+| appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/appState.ts#L11) | The `appState` of the scene |
+| exportPadding | number | 10 | The `padding` to be added on canvas |
+| files | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L64) | undefined | The `files` added to the scene. |
+
+This function returns a promise which resolves to `svg` of the exported drawing.
+
+### exportToClipboard
+
+**_Signature_**
+
+<pre>
+exportToClipboard(<br/>&nbsp;
+  opts: <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/packages/utils.ts#L21">ExportOpts</a> & &#123;<br/>&nbsp;
+  mimeType?: string,<br/>&nbsp;
+  quality?: number;<br/>&nbsp;
+  type: 'png' | 'svg' |'json'<br/>
+})
+</pre>
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `opts` |  |  | This param is same as the params passed to `exportToCanvas`. You can refer to [`exportToCanvas`](#exporttocanvas). |
+| `mimeType` | `string` | `image/png` | Indicates the image format, this will be used when exporting as `png`. |
+| `quality` | `number` | `0.92` | A value between `0` and `1` indicating the [image quality](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#parameters). Applies only to `image/jpeg` / `image/webp` MIME types. This will be used when exporting as `png`. |
+| `type` | 'png' &#124; 'svg' &#124; 'json' | _ | This determines the format to which the scene data should be `exported`. |
+
+**How to use**
+
+```js
+import { exportToClipboard } from "@excalidraw/excalidraw";
+```
+
+Copies the scene data in the specified format (determined by `type`) to clipboard.
+
+### Additional attributes of appState for export\* APIs
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `exportBackground` | `boolean` | `true` | Indicates whether `background` should be exported |
+| `viewBackgroundColor` | `string` | `#fff` | The default background color |
+| `exportWithDarkMode` | `boolean` | `false` | Indicates whether to export with `dark` mode |
+| `exportEmbedScene` | `boolean` | `false` | Indicates whether scene data should be embedded in `svg/png`. This will increase the image size. |
