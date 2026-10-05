@@ -77,9 +77,9 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const frameToolSelected = activeTool.type === "frame";
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected =
-    activeTool.type === "laser" && !app.state.laserPersistent;
+    activeTool.type === "laser" && !activeTool.laserPersistent;
   const annotationToolSelected =
-    activeTool.type === "laser" && app.state.laserPersistent;
+    activeTool.type === "laser" && activeTool.laserPersistent;
   const embeddableToolSelected = activeTool.type === "embeddable";
   const bucketFillToolSelected = activeTool.type === "bucketfill";
   const stickyNoteToolSelected = activeTool.type === "stickynote";

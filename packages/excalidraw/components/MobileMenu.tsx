@@ -191,6 +191,18 @@ export const MobileMenu = ({
         </div>
       )}
 
+      {defaultUIEnabled &&
+        appState.viewModeEnabled &&
+        appState.openDialog?.name !== "elementLinkSelector" && (
+          <div
+            className="App-bottom-bar"
+            style={{ marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN }}
+            data-viewport-ui="bottom"
+          >
+            <ClearAnnotationsButton isMobile />
+          </div>
+        )}
+
       {!shouldRenderDefaultBottomBar && scrollBackToContentButton && (
         <div className="floating-status-stack">{scrollBackToContentButton}</div>
       )}

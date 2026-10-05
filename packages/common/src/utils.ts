@@ -280,7 +280,11 @@ export const updateActiveTool = (
         type: ToolType;
       }
     | { type: "custom"; customType: string }
-  ) & { locked?: boolean; fromSelection?: boolean }) & {
+  ) & {
+    locked?: boolean;
+    fromSelection?: boolean;
+    laserPersistent?: boolean;
+  }) & {
     lastActiveTool?: ActiveTool | null;
   },
 ): AppState["activeTool"] => {
@@ -290,6 +294,7 @@ export const updateActiveTool = (
       type: "custom",
       customType: data.customType,
       locked: data.locked ?? appState.activeTool.locked,
+      laserPersistent: false,
     };
   }
 
@@ -303,6 +308,11 @@ export const updateActiveTool = (
     customType: null,
     locked: data.locked ?? appState.activeTool.locked,
     fromSelection: data.fromSelection ?? false,
+    laserPersistent:
+      data.type === "laser" &&
+      (data.laserPersistent ??
+        (appState.activeTool.type === "laser" &&
+          appState.activeTool.laserPersistent === true)),
   };
 };
 

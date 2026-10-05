@@ -4286,8 +4286,9 @@ class App extends React.Component<AppProps, AppState> {
 
     if (
       prevState.activeTool.type === "laser" &&
-      prevState.laserPersistent &&
-      (this.state.activeTool.type !== "laser" || !this.state.laserPersistent)
+      prevState.activeTool.laserPersistent &&
+      (this.state.activeTool.type !== "laser" ||
+        !this.state.activeTool.laserPersistent)
     ) {
       this.laserTrails.clearAnnotations();
     } else if (
@@ -5795,7 +5796,10 @@ class App extends React.Component<AppProps, AppState> {
             ...tool,
             lastActiveTool: this.state.activeTool,
           })
-        : updateActiveTool(this.state, tool);
+        : updateActiveTool(this.state, {
+            ...tool,
+            laserPersistent: opts.laserPersistent === true,
+          });
     if (nextActiveTool.type === "hand") {
       this.cursor.set(CURSOR_TYPE.GRAB);
     } else if (!this.pan.isSpaceHeld()) {
@@ -5813,8 +5817,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState((prevState) => {
       const commonResets = {
-        laserPersistent:
-          nextActiveTool.type === "laser" && opts.laserPersistent === true,
         snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
         originSnapOffset: null,
         activeEmbeddable: null,

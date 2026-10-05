@@ -54,7 +54,7 @@ export class LaserTrails implements Trail {
   startPath(x: number, y: number): void {
     this.getLocalTrail().startPath(x, y);
     if (
-      this.app.state.laserPersistent &&
+      this.app.state.activeTool.laserPersistent &&
       !editorJotaiStore.get(this.hasAnnotationsAtom)
     ) {
       this.app.updateEditorAtom(this.hasAnnotationsAtom, true);
@@ -71,7 +71,7 @@ export class LaserTrails implements Trail {
   }
 
   private getLocalTrail() {
-    return this.app.state.laserPersistent
+    return this.app.state.activeTool.laserPersistent
       ? this.annotationTrail
       : this.localTrail;
   }

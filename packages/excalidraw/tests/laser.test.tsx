@@ -245,7 +245,7 @@ describe("persistent annotations", () => {
       );
       startClock();
       selectTool("annotation");
-      expect(h.state.laserPersistent).toBe(true);
+      expect(h.state.activeTool.laserPersistent).toBe(true);
 
       const outlineSpy = vi.spyOn(LaserPointer.prototype, "getStrokeOutline");
       mouse.downAt(100, 100);
@@ -318,7 +318,7 @@ describe("persistent annotations", () => {
       expect(ownerDocument.querySelector(".SVGLayer path")).toBeNull();
       expect(getClearButton()).toBeNull();
       expect(h.state.activeTool.type).toBe("laser");
-      expect(h.state.laserPersistent).toBe(true);
+      expect(h.state.activeTool.laserPersistent).toBe(true);
       expect(h.app.scene.getNonDeletedElements()).toEqual([rectangle]);
 
       API.setAppState({ scrollX: 50 });
@@ -344,7 +344,7 @@ describe("persistent annotations", () => {
     mouse.moveTo(200, 100);
     mouse.up();
     selectTool("laser");
-    expect(h.state.laserPersistent).toBe(false);
+    expect(h.state.activeTool.laserPersistent).toBe(false);
     expect(h.app.ownerDocument.querySelector(".SVGLayer path")).toBeNull();
     expect(
       h.app.ownerDocument.querySelector('[data-testid="clear-annotations"]'),
@@ -436,6 +436,128 @@ describe("persistent annotations", () => {
     expect(pannedDrawing).not.toBe(drawing);
     API.setAppState({ zoom: { value: 2 as typeof h.state.zoom.value } });
     expect(path.getAttribute("d")).not.toBe(pannedDrawing);
+  });
+
+  it.each(["dot", "two points"] as const)(
+    "keeps a %s annotation visible through high zoom and back",
+    async (stroke) => {
+      await render(<Excalidraw />);
+      selectTool("annotation");
+      mouse.downAt(100, 100);
+      if (stroke === "two points") {
+        mouse.moveTo(200, 100);
+      }
+      mouse.up();
+      const path = h.app.ownerDocument.querySelector(".SVGLayer path")!;
+      const originalDrawing = path.getAttribute("d");
+      expect(originalDrawing).not.toBe("");
+
+      for (const zoom of [4, 5, 1]) {
+        API.setAppState({ zoom: { value: zoom as typeof h.state.zoom.value } });
+        expect(path.isConnected).toBe(true);
+        expect(path.getAttribute("d")).not.toBe("");
+      }
+      expect(path.getAttribute("d")).toBe(originalDrawing);
+    },
+  );
+
+  it.each([
+    ["h", "h"],
+    ["h", "Escape"],
+    ["e", "e"],
+    ["e", "Escape"],
+  ])("restores Annotation after %s then %s", async (enter, leave) => {
+    await render(<Excalidraw />);
+    selectTool("annotation");
+    mouse.downAt(100, 100);
+    mouse.moveTo(200, 100);
+    mouse.up();
+    Keyboard.keyPress(enter, GlobalTestState.interactiveCanvas);
+    expect(h.state.activeTool.type).toBe(enter === "h" ? "hand" : "eraser");
+    expect(h.app.ownerDocument.querySelector(".SVGLayer path")).toBeNull();
+    Keyboard.keyPress(leave, GlobalTestState.interactiveCanvas);
+    expect(h.state.activeTool.type).toBe("laser");
+    expect(h.state.activeTool.laserPersistent).toBe(true);
+    startClock();
+    mouse.downAt(100, 200);
+    mouse.moveTo(200, 200);
+    mouse.up();
+    act(() => vi.advanceTimersByTime(2000));
+    expect(h.app.ownerDocument.querySelector(".SVGLayer path")).not.toBeNull();
+  });
+
+  it.each(["desktop", "phone"] as const)(
+    "keeps Clear accessible in view mode on %s",
+    async (formFactor) => {
+      await render(
+        <Excalidraw UIOptions={{ getFormFactor: () => formFactor }} />,
+      );
+      fireEvent.resize(h.app.ownerWindow);
+      await waitFor(() =>
+        expect(h.app.editorInterface.formFactor).toBe(formFactor),
+      );
+      selectTool("annotation");
+      mouse.downAt(100, 100);
+      mouse.moveTo(200, 100);
+      mouse.up();
+      API.setAppState({ viewModeEnabled: true });
+      mouse.downAt(100, 200);
+      mouse.moveTo(200, 200);
+      mouse.up();
+      const ownerDocument = h.app.ownerDocument;
+      expect(
+        ownerDocument
+          .querySelector(".SVGLayer path")!
+          .getAttribute("d")!
+          .match(/M/g),
+      ).toHaveLength(2);
+      const button = ownerDocument.querySelector(
+        '[data-testid="clear-annotations"]',
+      );
+      expect(button).not.toBeNull();
+      fireEvent.click(button!);
+      expect(ownerDocument.querySelector(".SVGLayer path")).toBeNull();
+      expect(
+        ownerDocument.querySelector('[data-testid="clear-annotations"]'),
+      ).toBeNull();
+      expect(h.state.viewModeEnabled).toBe(true);
+      expect(h.state.activeTool.laserPersistent).toBe(true);
+    },
+  );
+
+  it.each(["h", "e"])(
+    "keeps the fading laser mode when returning from %s",
+    async (key) => {
+      await render(<Excalidraw />);
+      selectTool("laser");
+      Keyboard.keyPress(key, GlobalTestState.interactiveCanvas);
+      Keyboard.keyPress("Escape", GlobalTestState.interactiveCanvas);
+      expect(h.state.activeTool.type).toBe("laser");
+      expect(h.state.activeTool.laserPersistent).toBe(false);
+      startClock();
+      mouse.downAt(100, 100);
+      mouse.moveTo(200, 100);
+      mouse.up();
+      act(() => vi.advanceTimersByTime(2000));
+      expect(h.app.ownerDocument.querySelector(".SVGLayer path")).toBeNull();
+    },
+  );
+
+  it("only marks the collaboration laser button selected for the fading laser", async () => {
+    await render(<Excalidraw isCollaborating />);
+    const button = h.app.ownerDocument.querySelector(
+      '.App-toolbar-container [aria-label="Laser pointer"]',
+    )!;
+    expect(button).not.toBeNull();
+    selectTool("annotation");
+    expect(button.getAttribute("aria-pressed")).toBe("false");
+    mouse.downAt(100, 100);
+    mouse.moveTo(200, 100);
+    mouse.up();
+    fireEvent.click(button);
+    expect(button.getAttribute("aria-pressed")).toBe("true");
+    expect(h.state.activeTool.laserPersistent).toBe(false);
+    expect(h.app.ownerDocument.querySelector(".SVGLayer path")).toBeNull();
   });
 
   it("does not make collaborators' laser strokes persistent", async () => {

@@ -171,7 +171,7 @@ export type ToolType =
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
-export type ActiveTool =
+export type ActiveTool = (
   | {
       type: ToolType;
       customType: null;
@@ -179,7 +179,11 @@ export type ActiveTool =
   | {
       type: "custom";
       customType: string;
-    };
+    }
+) & {
+  /** Whether the local laser tool is drawing persistent annotations. */
+  laserPersistent?: boolean;
+};
 
 export type SidebarName = string;
 export type SidebarTabName = string;
@@ -434,8 +438,6 @@ export interface AppState {
     // indicates if the current tool is temporarily switched on from the selection tool
     fromSelection: boolean;
   } & ActiveTool;
-  /** Whether the local laser tool is drawing persistent annotations. */
-  laserPersistent: boolean;
   preferredSelectionTool: {
     type: "selection" | "lasso";
     initialized: boolean;
