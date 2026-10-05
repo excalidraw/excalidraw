@@ -9,6 +9,7 @@ import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
 import { MobileToolbar } from "./MobileToolbar";
+import { ClearAnnotationsButton } from "./ClearAnnotationsButton";
 import { FixedSideContainer } from "./FixedSideContainer";
 
 import { Island } from "./Island";
@@ -180,8 +181,12 @@ export const MobileMenu = ({
           />
 
           <Island className="App-toolbar">
-            {appState.openDialog?.name !== "elementLinkSelector" &&
-              renderToolbar()}
+            {appState.openDialog?.name !== "elementLinkSelector" && (
+              <>
+                <ClearAnnotationsButton isMobile />
+                {renderToolbar()}
+              </>
+            )}
           </Island>
         </div>
       )}

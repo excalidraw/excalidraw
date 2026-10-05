@@ -4284,6 +4284,22 @@ class App extends React.Component<AppProps, AppState> {
     this.handleInteractionStateChange(prevProps, prevState);
     this.handleForcedToolChange(prevProps, prevState);
 
+    if (
+      prevState.activeTool.type === "laser" &&
+      prevState.laserPersistent &&
+      (this.state.activeTool.type !== "laser" || !this.state.laserPersistent)
+    ) {
+      this.laserTrails.clearAnnotations();
+    } else if (
+      prevState.zoom.value !== this.state.zoom.value ||
+      prevState.scrollX !== this.state.scrollX ||
+      prevState.scrollY !== this.state.scrollY ||
+      prevState.offsetLeft !== this.state.offsetLeft ||
+      prevState.offsetTop !== this.state.offsetTop
+    ) {
+      this.laserTrails.redrawAnnotations();
+    }
+
     this.appStateObserver.flush(prevState);
 
     this.updateEmbeddables();
@@ -5721,6 +5737,7 @@ class App extends React.Component<AppProps, AppState> {
     },
     opts: {
       keepSelection?: boolean;
+      laserPersistent?: boolean;
       /**
        * When `true`, re-activating an already-active toggle tool (see
        * `TOGGLE_TOOLS`) switches back to the previously active tool.
@@ -5796,6 +5813,8 @@ class App extends React.Component<AppProps, AppState> {
 
     this.setState((prevState) => {
       const commonResets = {
+        laserPersistent:
+          nextActiveTool.type === "laser" && opts.laserPersistent === true,
         snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
         originSnapOffset: null,
         activeEmbeddable: null,

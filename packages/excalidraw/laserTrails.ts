@@ -4,13 +4,16 @@ import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
 
 import { AnimatedTrail } from "./animatedTrail";
 import { getClientColor } from "./clients";
+import { atom, editorJotaiStore } from "./editor-jotai";
 
 import type { Trail } from "./animatedTrail";
 import type App from "./components/App";
 import type { SocketId } from "./types";
 
 export class LaserTrails implements Trail {
+  public readonly hasAnnotationsAtom = atom(false);
   public localTrail: AnimatedTrail;
+  private annotationTrail: AnimatedTrail;
   private collabTrails = new Map<SocketId, AnimatedTrail>();
   private container?: SVGSVGElement;
 
@@ -18,6 +21,12 @@ export class LaserTrails implements Trail {
     this.localTrail = new AnimatedTrail(app, {
       ...this.getTrailOptions(),
       fill: () => DEFAULT_LASER_COLOR,
+    });
+    this.annotationTrail = new AnimatedTrail(app, {
+      ...this.getTrailOptions(),
+      sizeMapping: () => 1,
+      fill: () => DEFAULT_LASER_COLOR,
+      persistent: true,
     });
   }
 
@@ -43,24 +52,51 @@ export class LaserTrails implements Trail {
   }
 
   startPath(x: number, y: number): void {
-    this.localTrail.startPath(x, y);
+    this.getLocalTrail().startPath(x, y);
+    if (
+      this.app.state.laserPersistent &&
+      !editorJotaiStore.get(this.hasAnnotationsAtom)
+    ) {
+      this.app.updateEditorAtom(this.hasAnnotationsAtom, true);
+    }
   }
 
   addPointToPath(x: number, y: number): void {
-    this.localTrail.addPointToPath(x, y);
+    this.getLocalTrail().addPointToPath(x, y);
   }
 
   endPath(): void {
     this.localTrail.endPath();
+    this.annotationTrail.endPath();
+  }
+
+  private getLocalTrail() {
+    return this.app.state.laserPersistent
+      ? this.annotationTrail
+      : this.localTrail;
+  }
+
+  redrawAnnotations() {
+    this.annotationTrail.start();
+  }
+
+  clearAnnotations() {
+    this.annotationTrail.clearTrails();
+    if (editorJotaiStore.get(this.hasAnnotationsAtom)) {
+      this.app.updateEditorAtom(this.hasAnnotationsAtom, false);
+    }
   }
 
   start(container: SVGSVGElement) {
     this.container = container;
     this.localTrail.start(container);
+    this.annotationTrail.start(container);
   }
 
   stop() {
     this.localTrail.stop();
+    this.annotationTrail.stop();
+    editorJotaiStore.set(this.hasAnnotationsAtom, false);
     this.stopCollabTrails();
     this.container = undefined;
   }

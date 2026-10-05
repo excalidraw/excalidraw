@@ -25,6 +25,7 @@ export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
   stroke?: (trail: AnimatedTrail) => string;
   animateTrail?: boolean;
+  persistent?: boolean;
 }
 
 export class AnimatedTrail implements Trail {
@@ -90,6 +91,14 @@ export class AnimatedTrail implements Trail {
 
     if (this.trailElement.parentNode !== this.container && this.container) {
       this.container.appendChild(this.trailElement);
+    }
+
+    if (this.options.persistent) {
+      // Static annotations only redraw on input or viewport changes.
+      if (!this.onFrame()) {
+        this.cleanup();
+      }
+      return;
     }
 
     if (!AnimationController.running(this.key)) {

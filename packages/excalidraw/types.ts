@@ -434,6 +434,8 @@ export interface AppState {
     // indicates if the current tool is temporarily switched on from the selection tool
     fromSelection: boolean;
   } & ActiveTool;
+  /** Whether the local laser tool is drawing persistent annotations. */
+  laserPersistent: boolean;
   preferredSelectionTool: {
     type: "selection" | "lasso";
     initialized: boolean;
@@ -1221,6 +1223,7 @@ export type AppClassProperties = {
   arrowText: App["arrowText"];
   textTool: App["textTool"];
   cursor: App["cursor"];
+  laserTrails: App["laserTrails"];
   bucketFill: App["bucketFill"];
   duplicate: App["duplicate"];
   toolDrag: App["toolDrag"];

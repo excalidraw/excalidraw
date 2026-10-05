@@ -1,0 +1,13 @@
+.excalidraw {
+  .clear-annotations {
+    align-self: center;
+    flex-shrink: 0;
+    display: flex;
+
+    &--mobile {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 0;
+    }
+  }
+}

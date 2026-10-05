@@ -59,6 +59,7 @@ export const getDefaultAppState = (): Omit<
       fromSelection: false,
       lastActiveTool: null,
     },
+    laserPersistent: false,
     preferredSelectionTool: {
       type: "selection",
       initialized: false,
@@ -209,6 +210,7 @@ const APP_STATE_STORAGE_CONF = (<
   editingTextElement: { browser: false, export: false, server: false },
   editingGroupId: { browser: true, export: false, server: false },
   activeTool: { browser: true, export: false, server: false },
+  laserPersistent: { browser: false, export: false, server: false },
   preferredSelectionTool: { browser: true, export: false, server: false },
   penMode: { browser: true, export: false, server: false },
   penDetected: { browser: true, export: false, server: false },

@@ -61,6 +61,7 @@ import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
 import { Toast } from "./Toast";
 import { Toolbar } from "./Toolbar";
+import { ClearAnnotationsButton } from "./ClearAnnotationsButton";
 import {
   ViewportStatusBadge,
   ViewportStatusBorder,
@@ -371,6 +372,7 @@ const LayerUI = ({
                           onLockToggle={onLockToggle}
                           heading={heading}
                         />
+                        <ClearAnnotationsButton />
                         {isCollaborating && (
                           <Island
                             style={{
