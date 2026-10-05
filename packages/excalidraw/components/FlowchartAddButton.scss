@@ -95,3 +95,31 @@
   stroke-linejoin: round;
   stroke-width: 1.5;
 }
+
+.excalidraw.theme--dark {
+  .flowchart-add-step__trigger,
+  .flowchart-add-step__direction {
+    border-color: var(--color-border-outline);
+  }
+
+  .flowchart-add-step__picker {
+    border-color: var(--color-border-outline);
+    box-shadow: var(--shadow-island-stronger);
+  }
+
+  .flowchart-add-step__trigger:hover,
+  .flowchart-add-step__direction:hover {
+    background: var(--button-hover-bg);
+  }
+
+  .flowchart-add-step__trigger:active,
+  .flowchart-add-step__direction:active {
+    background: var(--button-active-bg);
+    border-color: var(--button-active-border);
+  }
+
+  .flowchart-add-step__trigger:focus-visible,
+  .flowchart-add-step__direction:focus-visible {
+    outline-color: var(--focus-highlight-color);
+  }
+}
