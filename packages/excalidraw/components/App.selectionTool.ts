@@ -2,6 +2,7 @@ import {
   CURSOR_TYPE,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
+  DRAGGING_THRESHOLD,
   getGridPoint,
   isSelectionLikeTool,
   KEYS,
@@ -40,7 +41,7 @@ import {
   transformElements,
   updateBoundElements,
 } from "@excalidraw/element";
-import { pointFrom } from "@excalidraw/math";
+import { pointDistance, pointFrom } from "@excalidraw/math";
 
 import type {
   ExcalidrawElement,
@@ -170,6 +171,17 @@ export class AppSelectionTool {
           pointerDownState.resize.arrowDirection = getResizeArrowDirection(
             pointerDownState.resize.handleType,
             selectedElements[0],
+          );
+        }
+        // an alt-click on a resize handle (over the selected element) cycles
+        // the selection too — alt-resizing starts past the drag threshold
+        if (pointerDownState.resize.handleType !== "rotation") {
+          pointerDownState.hit.cycleTarget = this.getSelectionCycleTarget(
+            event,
+            this.app.getElementsAtPosition(
+              pointerDownState.origin.x,
+              pointerDownState.origin.y,
+            ),
           );
         }
       } else {
@@ -317,23 +329,17 @@ export class AppSelectionTool {
         // multiple elements
         pointerDownState.hit.allHitElements = unlockedHitElements;
 
-        if (
-          event.altKey &&
-          !event[KEYS.CTRL_OR_CMD] &&
-          !event.shiftKey &&
-          !this.app.state.selectedLinearElement?.isEditing &&
-          !this.app.state.croppingElementId
-        ) {
-          pointerDownState.hit.cycleTarget =
-            this.getSelectionCycleTarget(unlockedHitElements);
-          // the selection cycles on pointerup — or, on an alt-drag, is what's
-          // duplicated
-          if (pointerDownState.hit.cycleTarget) {
-            this.app.setState({
-              previousSelectedElementIds: this.app.state.selectedElementIds,
-            });
-            return false;
-          }
+        pointerDownState.hit.cycleTarget = this.getSelectionCycleTarget(
+          event,
+          unlockedHitElements,
+        );
+        // the selection cycles on pointerup — or, on an alt-drag, is what's
+        // duplicated
+        if (pointerDownState.hit.cycleTarget) {
+          this.app.setState({
+            previousSelectedElementIds: this.app.state.selectedElementIds,
+          });
+          return false;
         }
 
         const hitElement = pointerDownState.hit.element;
@@ -669,6 +675,23 @@ export class AppSelectionTool {
       return false;
     }
 
+    // an alt-resize resizes only once it's a deliberate drag, leaving
+    // alt-clicks to cycle the selection
+    if (
+      event.altKey &&
+      transformHandleType &&
+      transformHandleType !== "rotation" &&
+      !this.app.state.isResizing &&
+      pointDistance(
+        pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+        pointFrom(pointerDownState.lastCoords.x, pointerDownState.lastCoords.y),
+      ) *
+        this.app.state.zoom.value <
+        DRAGGING_THRESHOLD
+    ) {
+      return true;
+    }
+
     this.app.activeResizeHandle =
       transformHandleType && transformHandleType !== "rotation"
         ? transformHandleType
@@ -816,9 +839,10 @@ export class AppSelectionTool {
     const hitElement = pointerDownState.hit.element;
 
     // alt-click: select the element below the selected one
-    const cycleTarget = !pointerDownState.drag.hasOccurred
-      ? pointerDownState.hit.cycleTarget
-      : null;
+    const cycleTarget =
+      !pointerDownState.drag.hasOccurred && !this.app.state.isResizing
+        ? pointerDownState.hit.cycleTarget
+        : null;
     if (cycleTarget) {
       this.app.setState((prevState) => {
         const nextState = selectGroupsForSelectedElements(
@@ -1118,13 +1142,25 @@ export class AppSelectionTool {
   /**
    * The element an alt-click selects: the selectable unit (an element, or
    * the group a click would select) below the selected one among the hit
-   * elements, wrapping around to the topmost — or `null` unless exactly one
-   * unit is selected and it's under the pointer. Inside an edited group, it
-   * cycles through the group's elements only, never leaving the group.
+   * elements, wrapping around to the topmost — or `null` unless it's an
+   * alt-click and exactly one unit is selected and it's under the pointer.
+   * Inside an edited group, it cycles through the group's elements only,
+   * never leaving the group.
    */
   private getSelectionCycleTarget(
+    event: React.PointerEvent<HTMLElement>,
     hitElements: readonly NonDeleted<ExcalidrawElement>[],
   ): NonDeleted<ExcalidrawElement> | null {
+    if (
+      !event.altKey ||
+      event[KEYS.CTRL_OR_CMD] ||
+      event.shiftKey ||
+      this.app.state.selectedLinearElement?.isEditing ||
+      this.app.state.croppingElementId
+    ) {
+      return null;
+    }
+
     const { editingGroupId } = this.app.state;
     const unitOf = (element: ExcalidrawElement) => {
       const editingGroupIndex = editingGroupId

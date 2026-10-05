@@ -263,6 +263,31 @@ describe("alt-click cycling", () => {
     expect(h.state.editingGroupId).toBe("group");
   });
 
+  it("cycles on the selected element's resize handle, alt-resizing only past the drag threshold", () => {
+    const { middle, top } = createStack({});
+
+    // the middle one's right resize handle, over the top one (a bit of a
+    // drag still being a click)
+    API.setSelectedElements([middle]);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(113, 60);
+      mouse.moveTo(118, 60);
+      mouse.upAt();
+    });
+    assertSelectedElements([top.id]);
+    expect(API.getElement(middle).width).toBe(100);
+
+    API.setSelectedElements([middle]);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(113, 60);
+      mouse.moveTo(153, 60);
+      mouse.upAt();
+    });
+    assertSelectedElements([middle.id]);
+    // (resized from its center)
+    expect(API.getElement(middle)).toMatchObject({ x: -30, width: 180 });
+  });
+
   it("sets up the line editor of an arrow it selects", () => {
     const rectangle = API.createElement({
       type: "rectangle",
