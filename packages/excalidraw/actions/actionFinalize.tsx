@@ -6,6 +6,7 @@ import {
   LinearElementEditor,
   newElementWith,
 } from "@excalidraw/element";
+import { bumpVersion } from "@excalidraw/element";
 
 import {
   isBindingElement,
@@ -387,6 +388,15 @@ export const actionFinalize = register<FormData>({
           },
         }
       : selectedLinearElement;
+
+    // When finalizing a multi-element (ESC/Enter), bump its version so that
+    // the state change is broadcast to collaborators. Without this, the
+    // local state update (clearing multiElement/selectedLinearElement) is not
+    // propagated because the elements array itself is unchanged and the scene
+    // version does not change.
+    if (appState.multiElement && element && !isInvisiblySmallElement(element)) {
+      bumpVersion(element);
+    }
 
     return {
       elements: newElements,
