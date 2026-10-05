@@ -6196,6 +6196,11 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       return;
     }
+    // alt-clicks cycle the selection, so their double-click does nothing
+    // (autoshape doesn't select, alt is its free-text-at-point escape hatch)
+    if (event.altKey && this.state.activeTool.type !== "autoshape") {
+      return;
+    }
     // case: double-clicking with arrow/line tool selected would both create
     // text and enter multiElement mode
     if (this.state.multiElement) {
@@ -8275,6 +8280,7 @@ class App extends React.Component<AppProps, AppState> {
         element: null,
         allHitElements: [],
         wasAddedToSelection: false,
+        cycleTarget: null,
         hasBeenDuplicated: false,
         advancedListMarkers: [],
         editedTextId: this.duplicate.handedOverTextId,
@@ -8590,6 +8596,25 @@ class App extends React.Component<AppProps, AppState> {
         // multiple elements
         pointerDownState.hit.allHitElements = unlockedHitElements;
 
+        if (
+          event.altKey &&
+          !event[KEYS.CTRL_OR_CMD] &&
+          !event.shiftKey &&
+          !this.state.selectedLinearElement?.isEditing &&
+          !this.state.croppingElementId
+        ) {
+          pointerDownState.hit.cycleTarget =
+            this.getSelectionCycleTarget(unlockedHitElements);
+          // the selection cycles on pointerup — or, on an alt-drag, is what's
+          // duplicated
+          if (pointerDownState.hit.cycleTarget) {
+            this.setState({
+              previousSelectedElementIds: this.state.selectedElementIds,
+            });
+            return false;
+          }
+        }
+
         const hitElement = pointerDownState.hit.element;
         const someHitElementIsSelected =
           pointerDownState.hit.allHitElements.some((element) =>
@@ -8809,6 +8834,58 @@ class App extends React.Component<AppProps, AppState> {
 
   private isASelectedElement(hitElement: ExcalidrawElement | null): boolean {
     return hitElement != null && this.state.selectedElementIds[hitElement.id];
+  }
+
+  /**
+   * The element an alt-click selects: the selectable unit (an element, or
+   * the group a click would select) below the selected one among the hit
+   * elements, wrapping around to the topmost — or `null` unless exactly one
+   * unit is selected and it's under the pointer. Inside an edited group, it
+   * cycles through the group's elements only, never leaving the group.
+   */
+  private getSelectionCycleTarget(
+    hitElements: readonly NonDeleted<ExcalidrawElement>[],
+  ): NonDeleted<ExcalidrawElement> | null {
+    const { editingGroupId } = this.state;
+    const unitOf = (element: ExcalidrawElement) => {
+      const editingGroupIndex = editingGroupId
+        ? element.groupIds.indexOf(editingGroupId)
+        : -1;
+      const groupIds =
+        editingGroupIndex > -1
+          ? element.groupIds.slice(0, editingGroupIndex)
+          : element.groupIds;
+      return groupIds.length ? groupIds[groupIds.length - 1] : element.id;
+    };
+    if (editingGroupId) {
+      hitElements = hitElements.filter((element) =>
+        isElementInGroup(element, editingGroupId),
+      );
+    }
+
+    const selectedUnits = new Set(
+      this.scene.getSelectedElements(this.state).map(unitOf),
+    );
+    if (selectedUnits.size !== 1) {
+      return null;
+    }
+    const [selectedUnit] = selectedUnits;
+
+    // topmost first, each unit at its topmost hit element
+    const units = new Map<string, NonDeleted<ExcalidrawElement>>();
+    for (let index = hitElements.length - 1; index > -1; index--) {
+      const unit = unitOf(hitElements[index]);
+      if (!units.has(unit)) {
+        units.set(unit, hitElements[index]);
+      }
+    }
+    const order = [...units.keys()];
+    const selectedIndex = order.indexOf(selectedUnit);
+    if (selectedIndex === -1) {
+      return null;
+    }
+    // (the selected unit itself if alone)
+    return units.get(order[(selectedIndex + 1) % order.length])!;
   }
 
   private isHittingCommonBoundingBoxOfSelectedElements(
@@ -9857,6 +9934,21 @@ class App extends React.Component<AppProps, AppState> {
         if (
           selectedElements.length > 0 &&
           selectedElements.every((element) => element.locked)
+        ) {
+          return;
+        }
+
+        // an alt-drag duplicates only once it's a deliberate drag, leaving
+        // alt-clicks to cycle the selection
+        if (
+          event.altKey &&
+          !pointerDownState.drag.hasOccurred &&
+          pointDistance(
+            pointFrom(pointerDownState.origin.x, pointerDownState.origin.y),
+            pointFrom(pointerCoords.x, pointerCoords.y),
+          ) *
+            this.state.zoom.value <
+            DRAGGING_THRESHOLD
         ) {
           return;
         }
@@ -11148,7 +11240,40 @@ class App extends React.Component<AppProps, AppState> {
         this.restoreReadyToEraseElements();
       }
 
+      // alt-click: select the element below the selected one
+      const cycleTarget = !pointerDownState.drag.hasOccurred
+        ? pointerDownState.hit.cycleTarget
+        : null;
+      if (cycleTarget) {
+        this.setState((prevState) => {
+          const nextState = selectGroupsForSelectedElements(
+            {
+              editingGroupId: prevState.editingGroupId,
+              selectedElementIds: { [cycleTarget.id]: true },
+            },
+            this.scene.getNonDeletedElements(),
+            prevState,
+            this,
+          );
+          return {
+            ...nextState,
+            selectedLinearElement:
+              isLinearElement(cycleTarget) &&
+              Object.keys(nextState.selectedElementIds).length === 1
+                ? prevState.selectedLinearElement?.elementId === cycleTarget.id
+                  ? prevState.selectedLinearElement
+                  : new LinearElementEditor(
+                      cycleTarget,
+                      this.scene.getNonDeletedElementsMap(),
+                    )
+                : null,
+            showHyperlinkPopup: false,
+          };
+        });
+      }
+
       if (
+        !cycleTarget &&
         hitElement &&
         !pointerDownState.drag.hasOccurred &&
         !pointerDownState.hit.wasAddedToSelection &&
@@ -11314,6 +11439,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (
+        !cycleTarget &&
         // do not clear selection if lasso is active
         this.state.activeTool.type !== "lasso" &&
         // not elbow midpoint dragged
