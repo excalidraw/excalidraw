@@ -73,7 +73,11 @@ import {
   actionZoomOut,
 } from "../actions/actionCanvas";
 
+import { setupTextAutocomplete } from "./textAutocomplete";
+
 import type { ParsedDataTranferList } from "../clipboard";
+
+import type { TextAutocomplete } from "./textAutocomplete";
 
 import type App from "../components/App";
 import type { AppState } from "../types";
@@ -620,18 +624,21 @@ export const textWysiwyg = ({
 
   /**
    * Where the caret is on screen (see getViewportCoords), as the editor lays
-   * the text out: the bounds of its line-high stroke.
+   * the text out: the bounds of its line-high stroke. Pass `caretOverride` to
+   * measure some other offset into the text (e.g. the start of the word being
+   * completed) instead of the current selection.
    */
-  const getCaretViewportBounds = () => {
+  const getCaretViewportBounds = (caretOverride?: number) => {
     const layout = currentTextLayout;
     if (!layout) {
       return null;
     }
     const { value } = editable;
     const caret =
-      editable.selectionDirection === "backward"
+      caretOverride ??
+      (editable.selectionDirection === "backward"
         ? editable.selectionStart
-        : editable.selectionEnd;
+        : editable.selectionEnd);
     const lines = getWrappedTextLines(
       value,
       layout.font,
@@ -726,6 +733,31 @@ export const textWysiwyg = ({
       }
     }
   };
+
+  // Word autocomplete: completions drawn from words already on the canvas,
+  // shown in a popup under the caret. Lives in the editor box alongside the
+  // textarea (see textAutocomplete.ts).
+  let autocomplete: TextAutocomplete | null = null;
+  if (editorBox) {
+    autocomplete = setupTextAutocomplete({
+      editable,
+      container: editorBox,
+      ownerDocument,
+      getCaretViewportBounds,
+      getBoxLeftInset: () => app.viewport.getSidebarInsets().left,
+      getCandidateTexts: () => {
+        const texts: string[] = [];
+        for (const el of app.scene.getNonDeletedElements()) {
+          if (isTextElement(el) && el.id !== element.id) {
+            texts.push(el.originalText);
+          }
+        }
+        // the text being edited, live — so repeated words complete too
+        texts.push(editable.value);
+        return texts;
+      },
+    });
+  }
 
   let pendingInitialSelection =
     initialSelection ??
@@ -851,6 +883,10 @@ export const textWysiwyg = ({
   }
 
   editable.onkeydown = (event) => {
+    // let the autocomplete popup consume navigation/accept/dismiss keys first
+    if (autocomplete?.handleKeyDown(event)) {
+      return;
+    }
     if (!event.shiftKey && actionZoomIn.keyTest(event)) {
       event.preventDefault();
       app.actionManager.executeAction(actionZoomIn);
@@ -1088,6 +1124,8 @@ export const textWysiwyg = ({
     editorBox?.removeEventListener("scroll", onEditorBoxScroll);
     editorBox?.style.removeProperty("left");
     editorBox?.style.removeProperty("right");
+
+    autocomplete?.destroy();
 
     editable.remove();
   };
