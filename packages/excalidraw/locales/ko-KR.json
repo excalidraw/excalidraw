@@ -403,6 +403,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "이 기능은 설정에서 \"dom.events.asyncClipboard.clipboardItem\" 플래그를 \"true\"로 설정하여 활성화할 수 있습니다. Firefox에서 브라우저 플래그를 수정하려면, \"about:config\" 페이지에 접속하세요.",
     "disableSnapping": "",
