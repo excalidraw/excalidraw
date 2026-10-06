@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} — добавить текст",
     "createFlowchart": "{{shortcut}} — создать блок-схему",
     "deepBoxSelect": "Удерживайте {{shortcut}} для глубокого выделения и предотвращения перетаскивания",
+    "cycleSelection": "",
     "eraserRevert": "Удерживайте {{shortcut}}, чтобы восстановить элементы, помеченные для удаления",
     "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага «dom.events.asyncClipboard.clipboardItem» на «true». Чтобы изменить флаги браузера в Firefox, зайдите на страницу «about:config».",
     "disableSnapping": "Удерживайте {{shortcut}}, чтобы отключить привязку",
