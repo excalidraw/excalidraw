@@ -64,6 +64,7 @@ import { Ellipsify } from "../Ellipsify";
 
 import {
   distributeLibraryItemsOnSquareGrid,
+  getLibraryItemsFiles,
   libraryItemsAtom,
 } from "../../data/library";
 
@@ -233,15 +234,18 @@ function CommandPaletteInner({
             <LibraryItemIcon
               id={libraryItem.id}
               elements={libraryItem.elements}
+              files={libraryItem.files}
             />
           ),
           category: "Library",
           order: getCategoryOrder("Library"),
           haystack: deburr(libraryItem.name),
           perform: () => {
-            app.onInsertElements(
-              distributeLibraryItemsOnSquareGrid([libraryItem]),
-            );
+            app.addElementsFromPasteOrLibrary({
+              elements: distributeLibraryItemsOnSquareGrid([libraryItem]),
+              files: getLibraryItemsFiles([libraryItem]),
+              position: "center",
+            });
           },
         })) || []
     );
@@ -971,14 +975,16 @@ function CommandPaletteInner({
 const LibraryItemIcon = ({
   id,
   elements,
+  files,
 }: {
   id: LibraryItem["id"] | null;
   elements: LibraryItem["elements"] | undefined;
+  files: LibraryItem["files"];
 }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const { svgCache } = useLibraryCache();
 
-  useLibraryItemSvg(id, elements, svgCache, ref);
+  useLibraryItemSvg(id, elements, files, svgCache, ref);
 
   return <div className="library-item-icon" ref={ref} />;
 };

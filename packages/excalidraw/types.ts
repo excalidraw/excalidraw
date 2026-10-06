@@ -658,6 +658,7 @@ export type LibraryItem = {
   elements: readonly NonDeleted<ExcalidrawElement>[];
   /** timestamp in epoch (ms) */
   created: number;
+  files?: BinaryFiles;
   name?: string;
   error?: string;
 };

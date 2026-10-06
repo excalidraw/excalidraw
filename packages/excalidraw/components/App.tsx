@@ -329,7 +329,10 @@ import {
 } from "../clipboard";
 
 import { exportCanvas, loadFromBlob } from "../data";
-import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import Library, {
+  distributeLibraryItemsOnSquareGrid,
+  getLibraryItemsFiles,
+} from "../data/library";
 import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -12087,7 +12090,7 @@ class App extends React.Component<AppProps, AppState> {
           this.addElementsFromPasteOrLibrary({
             elements: distributeLibraryItemsOnSquareGrid(libraryItems),
             position: event,
-            files: null,
+            files: getLibraryItemsFiles(libraryItems),
           });
         }
       } catch (error: any) {
