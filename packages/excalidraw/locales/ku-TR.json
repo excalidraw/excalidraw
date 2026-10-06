@@ -403,6 +403,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "ئەم تایبەتمەندییە بە ئەگەرێکی زۆرەوە دەتوانرێت چالاک بکرێت بە ڕێکخستنی ئاڵای \"dom.events.asyncClipboard.clipboardItem\" بۆ \"true\". بۆ گۆڕینی ئاڵاکانی وێبگەڕ لە فایەرفۆکسدا، سەردانی لاپەڕەی \"about:config\" بکە.",
     "disableSnapping": "",
