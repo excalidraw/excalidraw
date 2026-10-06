@@ -571,6 +571,8 @@ const isPanOnly = (
   prev.allElementsMap === next.allElementsMap &&
   // both draw elements beyond their bounds, or depend on all visible ones
   !next.appState.frameToHighlight &&
+  // grid dashes are anchored to scroll % gridSize, so they can't be shifted
+  !next.renderConfig.renderGrid &&
   !next.renderConfig.elementRenderOverrides?.size &&
   isShallowEqual(prev.renderConfig, next.renderConfig) &&
   isShallowEqual(prev.appState, next.appState, {
@@ -611,8 +613,11 @@ const paintPan = (
   // exposed strips, a band along every edge is repainted, as wide as that
   // padding, so what is kept of the last frame is exactly what a full render
   // would draw.
+  // Elements the pan just pushed out of view left their overflow (link icons,
+  // thick strokes, arrowheads) in the kept frame, so count the previous
+  // frame's elements too.
   let padding = 0;
-  for (const element of config.visibleElements) {
+  for (const element of [...prev.visibleElements, ...config.visibleElements]) {
     padding = Math.max(padding, getElementRenderPadding(element));
   }
   const band = Math.ceil(padding * devicePixels);
@@ -640,7 +645,16 @@ const paintPan = (
   // what a full render draws into the regions: the (culled) visible elements
   // that render into them
   const visibleElements = config.visibleElements.filter((element) => {
-    const [x1, y1, x2, y2] = getElementBounds(element, config.elementsMap);
+    let [x1, y1, x2, y2] = getElementBounds(element, config.elementsMap);
+    // a label is drawn with its container and may reach well past it
+    const label = getBoundTextElement(element, config.elementsMap);
+    if (label) {
+      const [lx1, ly1, lx2, ly2] = getElementBounds(label, config.elementsMap);
+      x1 = Math.min(x1, lx1);
+      y1 = Math.min(y1, ly1);
+      x2 = Math.max(x2, lx2);
+      y2 = Math.max(y2, ly2);
+    }
     const padding = getElementRenderPadding(element);
     return sceneRegions.some(
       ([rx1, ry1, rx2, ry2]) =>

@@ -193,4 +193,30 @@ describe("static scene rendering", () => {
     expect(selected).not.toContain(canvas);
     expect(selected.length).toBe(elements.length);
   });
+
+  it("repaints everything on a pan while the grid is shown", async () => {
+    const elements = Array.from({ length: 20 }, (_, i) =>
+      API.createElement({ type: "rectangle", x: i * 40, y: 0 }),
+    );
+    await render(<Excalidraw initialData={{ elements }} gridModeEnabled />);
+    const { canvas } = GlobalTestState;
+    const context = canvas.getContext("2d") as any;
+    await waitFor(() =>
+      expect(h.elements.every((el) => elementWithCanvasCache.get(el))).toBe(
+        true,
+      ),
+    );
+    context.__clearEvents();
+    act(() => h.setState({ scrollX: h.state.scrollX + 10 }));
+    await waitFor(() =>
+      expect(
+        context.__getEvents().filter((e: any) => e.type === "drawImage").length,
+      ).toBeGreaterThan(0),
+    );
+    const blits = context
+      .__getEvents()
+      .filter((e: any) => e.type === "drawImage")
+      .map((e: any) => e.props.img);
+    expect(blits).not.toContain(canvas);
+  });
 });
