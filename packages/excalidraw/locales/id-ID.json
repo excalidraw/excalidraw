@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} untuk menambahkan teks",
     "createFlowchart": "{{shortcut}} untuk membuat diagram alir",
     "deepBoxSelect": "Tahan {{shortcut}} untuk memilih tingkat dalam, dan untuk mencegah pergeseran",
+    "cycleSelection": "",
     "eraserRevert": "Tahan {{shortcut}} untuk mengembalikan elemen yang ditandai untuk dihapus",
     "firefox_clipboard_write": "Fitur ini dapat diaktifkan melalui pengaturan flag \"dom.events.asyncClipboard.clipboardItem\" ke \"true\". Untuk mengganti flag di Firefox, pergi ke laman \"about:config\".",
     "disableSnapping": "Tahan {{shortcut}} untuk menonaktifkan penambatan (snapping)",
