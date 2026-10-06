@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} per apondre un tèxt",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
