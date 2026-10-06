@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} za dodajanje besedila",
     "createFlowchart": "{{shortcut}} za ustvarjanje diagrama poteka",
     "deepBoxSelect": "Držite {{shortcut}} za globoko izbiro in za preprečevanje vlečenja",
+    "cycleSelection": "",
     "eraserRevert": "Držite {{shortcut}}, da razveljavite elemente, označene za brisanje",
     "firefox_clipboard_write": "To funkcijo lahko verjetno omogočite z nastavitvijo zastavice \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Če želite spremeniti zastavice brskalnika v Firefoxu, obiščite stran \"about:config\".",
     "disableSnapping": "Držite {{shortcut}}, da onemogočite pripenjanje",
