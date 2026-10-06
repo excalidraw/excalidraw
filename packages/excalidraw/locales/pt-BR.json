@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} para adicionar texto",
     "createFlowchart": "{{shortcut}} para criar um fluxo",
     "deepBoxSelect": "Segure {{shortcut}} para ativar seleção profunda e para evitar arrastamentos",
+    "cycleSelection": "",
     "eraserRevert": "Segure {{shortcut}} para reverter os elementos marcados para exclusão",
     "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
     "disableSnapping": "Segure {{shortcut}} para desativar o encaixe automático",
