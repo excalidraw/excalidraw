@@ -403,6 +403,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "हे वैशिष्ट्य \"dom.events.asyncClipboard.clipboardItem\" फ्लॅग \"सत्य\" वर सेट करून शक्यतो सक्षम केले जाऊ शकते. Firefox मध्ये ब्राउझर फ्लॅग बदलण्यासाठी, \"about:config\" पृष्ठावर जा.",
     "disableSnapping": "",
