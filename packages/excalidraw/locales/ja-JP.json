@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} でテキストを追加",
     "createFlowchart": "{{shortcut}} でフローチャートを作成",
     "deepBoxSelect": "{{shortcut}} を押し続けて詳細選択・ドラッグ防止",
+    "cycleSelection": "",
     "eraserRevert": "{{shortcut}} を押し続けて削除マークを取り消し",
     "firefox_clipboard_write": "この機能は、\"dom.events.asyncClipboard.clipboardItem\" フラグを \"true\" に設定することで有効になる可能性があります。Firefox でブラウザーの設定を変更するには、\"about:config\" ページを参照してください。",
     "disableSnapping": "{{shortcut}} を押し続けてスナップを無効化",
