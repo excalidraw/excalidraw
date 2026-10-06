@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} för att lägga till text",
     "createFlowchart": "{{shortcut}} för att skapa ett flödesschema",
     "deepBoxSelect": "Håll {{shortcut}} för att djupvälja, och för att förhindra att dra",
+    "cycleSelection": "",
     "eraserRevert": "Håll {{shortcut}} för att återställa de element som är markerade för borttagning",
     "firefox_clipboard_write": "Denna funktion kan sannolikt aktiveras genom att ställa in \"dom.events.asyncClipboard.clipboardItem\" flaggan till \"true\". För att ändra webbläsarens flaggor i Firefox, besök \"about:config\" sidan.",
     "disableSnapping": "Håll {{shortcut}} för att inaktivera fästning",
