@@ -403,6 +403,7 @@
     "bindTextToElement": "Nhấn {{shortcut}} để thêm văn bản",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Tính năng này có thể được bật bằng cách đặt cờ \"dom.events.asyncClipboard.clipboardItem\" thành \"true\". Để thay đổi cờ trình duyệt trong Firefox, hãy truy cập trang \"about:config\".",
     "disableSnapping": "",
