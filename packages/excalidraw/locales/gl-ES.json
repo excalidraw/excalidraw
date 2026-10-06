@@ -403,6 +403,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Esta función pódese activar establecendo a opción \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar as opcións do navegador en Firefox, visita a páxina \"about:config\".",
     "disableSnapping": "",
