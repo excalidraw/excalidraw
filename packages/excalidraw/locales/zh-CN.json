@@ -403,6 +403,7 @@
     "bindTextToElement": "按{{shortcut}}添加文本",
     "createFlowchart": "按{{shortcut}}创建流程图",
     "deepBoxSelect": "按住{{shortcut}}深度选择，并避免拖拽",
+    "cycleSelection": "",
     "eraserRevert": "按住{{shortcut}}反选被标记删除的元素",
     "firefox_clipboard_write": "将高级配置首选项“dom.events.asyncClipboard.clipboardItem”设置为“true”可以启用此功能。要更改 Firefox 的高级配置首选项，请前往“about:config”页面。",
     "disableSnapping": "按住{{shortcut}}禁用吸附",
