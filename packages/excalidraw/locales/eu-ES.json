@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} testua gehitzeko",
     "createFlowchart": "{{shortcut}} fluxu-diagrama sortzeko",
     "deepBoxSelect": "Heldu {{shortcut}} sakon hautatzeko eta arrastatzea saihesteko",
+    "cycleSelection": "",
     "eraserRevert": "Heldu {{shortcut}} leheneratzeko ezabatzeko markatutako elementuak",
     "firefox_clipboard_write": "Ezaugarri hau \"dom.events.asyncClipboard.clipboardItem\" marka \"true\" gisa ezarrita gaitu daiteke. Firefox-en arakatzailearen banderak aldatzeko, bisitatu \"about:config\" orrialdera.",
     "disableSnapping": "Heldu {{shortcut}} doiketa desgaitzeko",
