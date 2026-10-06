@@ -403,6 +403,7 @@
     "bindTextToElement": "按下 {{shortcut}} 新增文字",
     "createFlowchart": "按下 {{shortcut}} 建立流程圖",
     "deepBoxSelect": "按住 {{shortcut}} 以進行深度選取，並防止拖曳",
+    "cycleSelection": "",
     "eraserRevert": "按住 {{shortcut}} 以還原標記為刪除的元素",
     "firefox_clipboard_write": "此功能有機會透過將 \"dom.events.asyncClipboard.clipboardItem\" 設定為 \"true\" 來開啟。\n若要變更 Firefox 瀏覽器的此設定值，請至 \"about:config\" 頁面。",
     "disableSnapping": "按住 {{shortcut}} 以停用貼齊（自動對齊）",
