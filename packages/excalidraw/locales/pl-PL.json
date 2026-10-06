@@ -403,6 +403,7 @@
     "bindTextToElement": "Naciśnij {{shortcut}}, aby dodać tekst",
     "createFlowchart": "Naciśnij {{shortcut}}, aby utworzyć diagram",
     "deepBoxSelect": "Przytrzymaj {{shortcut}}, aby wybrać w obrębie grupy i zapobiec przeciągnięciu",
+    "cycleSelection": "",
     "eraserRevert": "Przytrzymaj {{shortcut}}, aby przywrócić elementy oznaczone do usunięcia",
     "firefox_clipboard_write": "Ta funkcja może być włączona poprzez ustawienie flagi \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Aby zmienić flagi przeglądarki w Firefox, odwiedź stronę \"about:config\".",
     "disableSnapping": "Przytrzymaj {{shortcut}} aby wyłączyć przyciąganie",
