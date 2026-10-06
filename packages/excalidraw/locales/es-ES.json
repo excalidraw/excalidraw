@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} Para añadir texto",
     "createFlowchart": "{{shortcut}} Para crear un diagrama de flujo",
     "deepBoxSelect": "Mantén pulsado {{shortcut}} para seleccionar en profundidad, y para evitar arrastrar",
+    "cycleSelection": "",
     "eraserRevert": "Mantén pulsado {{shortcut}} para revertir los elementos marcados para su eliminación",
     "firefox_clipboard_write": "Esta característica puede ser habilitada estableciendo la bandera \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar las banderas del navegador en Firefox, visite la página \"about:config\".",
     "disableSnapping": "Mantén pulsado {{shortcut}} para deshabilitar el ajuste",
