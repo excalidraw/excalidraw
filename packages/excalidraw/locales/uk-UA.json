@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} щоб додати текст",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Цю функцію можна ввімкнути, встановивши значення \"true\" для налаштування \"dom.events.asyncClipboard.clipboardItem\". Перейдіть на сторінку «about:config», щоб змінити налаштування браузера у Firefox.",
     "disableSnapping": "",
