@@ -403,6 +403,7 @@
     "bindTextToElement": "Metin eklemek için {{shortcut}} tuşuna basın",
     "createFlowchart": "Akış şeması oluşturmak için {{shortcut}} tuşuna basın",
     "deepBoxSelect": "Derin seçim yapmak ve sürüklemeyi engellemek için {{shortcut}} tuşuna basılı tutun",
+    "cycleSelection": "",
     "eraserRevert": "Silinmek üzere işaretlenen öğeleri geri döndürmek için {{shortcut}} tuşuna basılı tutun",
     "firefox_clipboard_write": "Bu özelliği etkinleştirmek muhtemelen \"dom.events.asyncClipboard.clipboardItem\" bayrağını \"true\" olarak ayarlayarak yapılabilir. Firefox'ta tarayıcı bayraklarını değiştirmek için \"about:config\" sayfasını ziyaret edin.",
     "disableSnapping": "Hizalamayı devre dışı bırakmak için {{shortcut}} tuşuna basılı tutun",
