@@ -301,6 +301,7 @@
     "svgImageInsertError": "Couldn't insert SVG image. The SVG markup looks invalid.",
     "failedToFetchImage": "Failed to fetch image.",
     "cannotResolveCollabServer": "Couldn't connect to the collab server. Please reload the page and try again.",
+    "encryptionUnavailable": "Sharing and collaboration need encryption, which the browser only allows over HTTPS (or on localhost). Open this page using an https:// address and try again.",
     "importLibraryError": "Couldn't load library",
     "saveLibraryError": "Couldn't save library to storage. Please save your library to a file locally to make sure you don't lose changes.",
     "collabSaveFailed": "Couldn't save to the backend database. If problems persist, you should save your file locally to ensure you don't lose your work.",
