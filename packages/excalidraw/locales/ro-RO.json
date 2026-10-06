@@ -403,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} pentru a adăuga text",
     "createFlowchart": "{{shortcut}} pentru a crea o schemă logică",
     "deepBoxSelect": "Ține apăsat {{shortcut}} pentru a efectua selectarea de adâncime și pentru a preveni glisarea",
+    "cycleSelection": "",
     "eraserRevert": "Ține apăsat {{shortcut}} pentru a anula elementele marcate pentru ștergere",
     "firefox_clipboard_write": "Această caracteristică poate fi probabil activată prin setarea preferinței „dom.events.asyncClipboard.clipboardItem” ca „true”. Pentru a schimba preferințele navigatorului în Firefox, accesează pagina „about:config”.",
     "disableSnapping": "Ține apăsat {{shortcut}} pentru a dezactiva ancorarea",
