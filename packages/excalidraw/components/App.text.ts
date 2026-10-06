@@ -31,6 +31,7 @@ import {
   isArrowElement,
   isFrameLikeElement,
   isNonDeletedElement,
+  isOpaqueForBinding,
   isStickyNoteElement,
   isTextBindableContainer,
   isTextElement,
@@ -169,6 +170,7 @@ export class AppText {
     {
       isExistingElement = false,
       initialCaretSceneCoords = null,
+      initialSelection = null,
     }: {
       isExistingElement?: boolean;
       /**
@@ -176,6 +178,8 @@ export class AppText {
        * text should be auto-selected
        */
       initialCaretSceneCoords?: { x: number; y: number } | null;
+      /** range of the text to select (takes precedence over the caret) */
+      initialSelection?: { start: number; end: number } | null;
     },
   ) {
     const elementsMap = this.app.scene.getElementsMapIncludingDeleted();
@@ -358,6 +362,7 @@ export class AppText {
       excalidrawContainer: this.dependencies.getContainer(),
       app: this.app,
       initialCaretSceneCoords,
+      initialSelection,
       // when text is selected, it's hard (at least on iOS) to re-position the
       // caret (i.e. deselect). There's not much use for always selecting
       // the text on edit anyway (and users can select-all from contextmenu
@@ -366,6 +371,18 @@ export class AppText {
     });
     // deselect all other elements when inserting text
     this.app.deselectElements();
+    // (the linear element editor stays up, to come back to on submit — but
+    // without the hover affordances, which are for the selection)
+    if (this.app.state.selectedLinearElement) {
+      this.app.setState({
+        selectedLinearElement: {
+          ...this.app.state.selectedLinearElement,
+          hoverPointIndex: -1,
+          segmentMidPointHoveredCoords: null,
+          hoveredFocusPointBinding: null,
+        },
+      });
+    }
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
@@ -502,44 +519,77 @@ export class AppText {
   /**
    * The text container at a position — an arrow hit on its path, any other
    * container hit anywhere in its bounds (frames are skipped so a container
-   * inside one can be hit). Purely positional: the selection plays no part.
+   * inside one can be hit, and a frame's children are only hit inside it,
+   * where they are drawn). Purely positional: the selection plays no part.
+   *
+   * Only what hides the rest ends the search — a filled element or an image
+   * (as for arrow binding), or an arrow — so containers below a transparent
+   * one stay in reach whatever their z-order. Of the containers found, the
+   * innermost one centered on the position wins, since that is where its
+   * label would go (an arrow counting as innermost: it is pointed at, not just
+   * enclosing); failing that, the top-most.
    */
   getTextBindableContainerAtPosition(x: number, y: number) {
     const elements = this.app.scene.getNonDeletedElements();
-    let hitElement = null;
+    const elementsMap = this.app.scene.getNonDeletedElementsMap();
+    // top-most first, each with the area it is ranked by
+    const hits: {
+      container: NonDeleted<ExcalidrawTextContainer>;
+      area: number;
+    }[] = [];
     // We need to do hit testing from front (end of the array) to back (beginning of the array)
     for (let index = elements.length - 1; index >= 0; --index) {
-      if (elements[index].isDeleted) {
+      const element = elements[index];
+      // to allow binding to containers within frames,
+      // ignore frames in hit testing
+      if (
+        isFrameLikeElement(element) ||
+        this.app.isClippedByFrameAt(x, y, element)
+      ) {
         continue;
       }
-      const [x1, y1, x2, y2] = getElementAbsoluteCoords(
-        elements[index],
-        this.app.scene.getNonDeletedElementsMap(),
-      );
+      const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+      const isArrow = isArrowElement(element);
       if (
-        isArrowElement(elements[index]) &&
-        hitElementItself({
-          point: pointFrom(x, y),
-          element: elements[index],
-          elementsMap: this.app.scene.getNonDeletedElementsMap(),
-          threshold: this.app.getElementHitThreshold(elements[index]),
-        })
+        isArrow
+          ? // an arrow has no inside to hit
+            !hitElementItself({
+              point: pointFrom(x, y),
+              element,
+              elementsMap,
+              threshold: this.app.getElementHitThreshold(element),
+            })
+          : !(x1 < x && x < x2 && y1 < y && y < y2)
       ) {
-        hitElement = elements[index];
-        break;
-      } else if (x1 < x && x < x2 && y1 < y && y < y2) {
-        // to allow binding to containers within frames,
-        // ignore frames in hit testing
-        if (isFrameLikeElement(elements[index])) {
-          continue;
-        }
-
-        hitElement = elements[index];
+        continue;
+      }
+      if (isTextBindableContainer(element, false)) {
+        hits.push({
+          container: element,
+          area: isArrow ? 0 : (x2 - x1) * (y2 - y1),
+        });
+      }
+      if (isArrow || isOpaqueForBinding(element)) {
         break;
       }
     }
 
-    return isTextBindableContainer(hitElement, false) ? hitElement : null;
+    const innermostCentered = hits
+      .filter(({ container }) =>
+        this.getTextWysiwygSnappedToCenterPosition(
+          x,
+          y,
+          this.app.state,
+          container,
+        ),
+      )
+      .reduce<typeof hits[number] | null>(
+        (innermost, hit) =>
+          !innermost || hit.area < innermost.area ? hit : innermost,
+        null,
+      );
+
+    return (innermostCentered ?? hits[0])?.container ?? null;
   }
 
   /**
@@ -567,6 +617,7 @@ export class AppText {
     container,
     autoEdit = true,
     initialCaretSceneCoords,
+    initialSelection,
     arrowEndpoint,
     textElement,
   }: {
@@ -579,6 +630,8 @@ export class AppText {
     container?: ExcalidrawTextContainer | null;
     autoEdit?: boolean;
     initialCaretSceneCoords?: { x: number; y: number };
+    /** range of an existing text to select (takes precedence over the caret) */
+    initialSelection?: { start: number; end: number };
     /**
      * creates the text as a label for this arrow endpoint: the binding then
      * dictates the text's position and alignment, overriding (sceneX, sceneY)
@@ -809,6 +862,7 @@ export class AppText {
         initialCaretSceneCoords: existingTextElement
           ? initialCaretSceneCoords
           : null,
+        initialSelection: existingTextElement ? initialSelection : null,
       });
     } else {
       this.app.setState({
