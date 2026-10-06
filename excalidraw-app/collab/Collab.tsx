@@ -604,7 +604,8 @@ class Collab extends PureComponent<CollabProps, CollabState> {
             // valid INIT can still initialize the room
             if (
               !decryptedData.payload ||
-              typeof decryptedData.payload !== "object"
+              typeof decryptedData.payload !== "object" ||
+              !Array.isArray(decryptedData.payload.elements)
             ) {
               return;
             }

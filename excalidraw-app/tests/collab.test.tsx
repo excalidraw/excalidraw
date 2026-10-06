@@ -291,6 +291,10 @@ describe("collaboration", () => {
       await emitBroadcast(42);
       await emitBroadcast({ type: "SCENE_INIT" });
       await emitBroadcast({ type: "SCENE_INIT", payload: null });
+      await emitBroadcast({ type: "SCENE_INIT", payload: {} });
+      await emitBroadcast({ type: "SCENE_INIT", payload: { elements: {} } });
+      await emitBroadcast({ type: "SCENE_INIT", payload: { elements: "x" } });
+      await emitBroadcast({ type: "SCENE_INIT", payload: { elements: null } });
       await emitBroadcast({ type: "SCENE_UPDATE" });
 
       expect(window.collab.portal.socketInitialized).toBe(false);
@@ -304,6 +308,18 @@ describe("collaboration", () => {
       const scene = await scenePromise;
       expect(window.collab.portal.socketInitialized).toBe(true);
       expect(scene?.elements).toEqual([expect.objectContaining({ id: "A" })]);
+    });
+
+    it("should initialize an empty room from SCENE_INIT", async () => {
+      const { scenePromise } = await joinRoom();
+
+      await emitBroadcast({ type: "SCENE_INIT", payload: { elements: [] } });
+
+      await expect(scenePromise).resolves.toEqual({
+        elements: [],
+        scrollToContent: true,
+      });
+      expect(window.collab.portal.socketInitialized).toBe(true);
     });
 
     it("should fall back to firebase when processing SCENE_INIT throws", async () => {

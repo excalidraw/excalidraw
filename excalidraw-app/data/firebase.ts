@@ -116,15 +116,14 @@ const decryptElements = async (
   );
 
   // the payload authenticated with the room key, but its contents may still
-  // be malformed. Treat it as an empty scene so the room can self-heal on
-  // the next save instead of failing forever.
-  try {
-    const elements = JSON.parse(decodedData);
-    return Array.isArray(elements) ? elements : [];
-  } catch (error: any) {
-    console.error("Failed to parse stored scene", error);
-    return [];
+  // be unreadable (corrupted, or a format we don't understand). Throw rather
+  // than treating it as an empty scene, as the next save would otherwise
+  // reconcile against nothing and irrecoverably replace the stored scene.
+  const elements = JSON.parse(decodedData);
+  if (!Array.isArray(elements)) {
+    throw new Error("Stored scene is not an array of elements");
   }
+  return elements;
 };
 
 class FirebaseSceneVersionCache {
