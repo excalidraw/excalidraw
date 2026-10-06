@@ -403,6 +403,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Tato funkce může být povolena nastavením vlajky \"dom.events.asyncClipboard.clipboardItem\" na \"true\". Chcete-li změnit vlajky prohlížeče ve Firefoxu, navštivte stránku \"about:config\".",
     "disableSnapping": "",
