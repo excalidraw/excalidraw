@@ -21,6 +21,7 @@ import {
   act,
   render,
   fireEvent,
+  GlobalTestState,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
@@ -198,6 +199,192 @@ describe("lasso reselection", () => {
     });
 
     assertSelectedElements([rectA.id]);
+  });
+});
+
+describe("alt-click cycling", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  // bottom to top, all three overlapping at (50, 50)
+  const createStack = (groupIds: { bottom?: string[]; middle?: string[] }) => {
+    const [bottom, middle, top] = (["bottom", "middle", "top"] as const).map(
+      (name, index) =>
+        API.createElement({
+          type: "rectangle",
+          x: index * 10,
+          y: index * 10,
+          width: 100,
+          height: 100,
+          backgroundColor: "red",
+          fillStyle: "solid",
+          groupIds: name === "top" ? [] : groupIds[name] ?? [],
+        }),
+    );
+    API.setElements([bottom, middle, top]);
+    return { bottom, middle, top };
+  };
+
+  it("selects the element below the selected one, wrapping around to the topmost", () => {
+    const { bottom, middle, top } = createStack({});
+
+    mouse.clickAt(50, 50);
+    assertSelectedElements([top.id]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.clickAt(50, 50);
+      assertSelectedElements([middle.id]);
+      mouse.clickAt(50, 50);
+      assertSelectedElements([bottom.id]);
+      mouse.clickAt(50, 50);
+      assertSelectedElements([top.id]);
+    });
+  });
+
+  it("cycles through the edited group's elements only", () => {
+    const { bottom, middle } = createStack({
+      bottom: ["group"],
+      middle: ["group"],
+    });
+
+    // deep select the middle one where the top one isn't
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      mouse.clickAt(15, 15);
+    });
+    assertSelectedElements([middle.id]);
+    expect(h.state.editingGroupId).toBe("group");
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.clickAt(50, 50);
+      assertSelectedElements([bottom.id]);
+      mouse.clickAt(50, 50);
+      assertSelectedElements([middle.id]);
+    });
+    expect(h.state.editingGroupId).toBe("group");
+  });
+
+  it("cycles on the selected element's resize handle, alt-resizing only past the drag threshold", () => {
+    const { middle, top } = createStack({});
+
+    // the middle one's right resize handle, over the top one (a bit of a
+    // drag still being a click)
+    API.setSelectedElements([middle]);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(113, 60);
+      mouse.moveTo(118, 60);
+      mouse.upAt();
+    });
+    assertSelectedElements([top.id]);
+    expect(API.getElement(middle).width).toBe(100);
+
+    API.setSelectedElements([middle]);
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(113, 60);
+      mouse.moveTo(153, 60);
+      mouse.upAt();
+    });
+    assertSelectedElements([middle.id]);
+    // (resized from its center)
+    expect(API.getElement(middle)).toMatchObject({ x: -30, width: 180 });
+  });
+
+  it("sets up the line editor of an arrow it selects", () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 20,
+      y: 50,
+      width: 60,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(60, 0)],
+    });
+    API.setElements([rectangle, arrow]);
+
+    // (off the arrow's midpoint knob)
+    mouse.clickAt(35, 50);
+    assertSelectedElements([arrow.id]);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.clickAt(35, 50);
+      assertSelectedElements([rectangle.id]);
+      mouse.clickAt(35, 50);
+    });
+    assertSelectedElements([arrow.id]);
+    expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+  });
+
+  it("alt+double-click doesn't create or edit text", () => {
+    createStack({});
+    mouse.clickAt(50, 50);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.doubleClickAt(50, 50);
+    });
+
+    expect(h.state.editingTextElement).toBe(null);
+    expect(h.elements.length).toBe(3);
+  });
+
+  it("hints at cycling while Alt is held over a single selection", () => {
+    const { middle, top } = createStack({});
+    const hint = () =>
+      h.app.ownerDocument.querySelector(".HintViewer")?.textContent ?? "";
+    const cycleHint = "to cycle selection";
+    const press = (modifiers: { alt?: boolean; ctrl?: boolean }) =>
+      Keyboard.withModifierKeys(modifiers, () => {
+        Keyboard.keyDown(KEYS.ALT, GlobalTestState.interactiveCanvas);
+      });
+    const release = () =>
+      Keyboard.keyUp(KEYS.ALT, GlobalTestState.interactiveCanvas);
+
+    mouse.clickAt(50, 50);
+    expect(hint()).not.toContain(cycleHint);
+    press({ alt: true });
+    expect(hint()).toContain(cycleHint);
+    // (the hover refresh after the click doesn't release Alt)
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.clickAt(50, 50);
+    });
+    assertSelectedElements([middle.id]);
+    expect(hint()).toContain(cycleHint);
+    release();
+    expect(hint()).not.toContain(cycleHint);
+
+    // Alt+Tab never delivers the keyup
+    press({ alt: true });
+    fireEvent.blur(window);
+    expect(hint()).not.toContain(cycleHint);
+
+    // (AltGr on Windows) alt-clicks with Ctrl don't cycle
+    press({ alt: true, ctrl: true });
+    expect(hint()).not.toContain(cycleHint);
+    release();
+
+    API.setSelectedElements([middle, top]);
+    press({ alt: true });
+    expect(hint()).not.toContain(cycleHint);
+    release();
+  });
+
+  it("alt-drag duplicates only past the drag threshold", () => {
+    const { top } = createStack({});
+    mouse.clickAt(50, 50);
+
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.downAt(50, 50);
+      mouse.moveTo(55, 55);
+      mouse.upAt();
+    });
+
+    expect(h.elements.length).toBe(3);
+    expect(API.getElement(top)).toMatchObject({ x: top.x, y: top.y });
   });
 });
 

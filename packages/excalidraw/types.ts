@@ -1225,6 +1225,8 @@ export type AppClassProperties = {
   duplicate: App["duplicate"];
   toolDrag: App["toolDrag"];
   activeResizeHandle: App["activeResizeHandle"];
+  selectionTool: App["selectionTool"];
+  modifiers: App["modifiers"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
@@ -1284,6 +1286,10 @@ export type PointerDownState = Readonly<{
     allHitElements: NonDeleted<ExcalidrawElement>[];
     // This is determined on the initial pointer down event
     wasAddedToSelection: boolean;
+    // The element an alt-click selects instead: the one below the selected
+    // one, cycling through the elements under the pointer (determined on the
+    // initial pointer down event)
+    cycleTarget: NonDeleted<ExcalidrawElement> | null;
     // Whether selected element(s) were duplicated, might change during the
     // pointer interaction
     hasBeenDuplicated: boolean;
