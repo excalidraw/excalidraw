@@ -18,7 +18,6 @@ import {
 } from "@excalidraw/math";
 
 import {
-  COLOR_PALETTE,
   CODES,
   shouldResizeFromCenter,
   shouldMaintainAspectRatio,
@@ -153,6 +152,9 @@ import {
   getCornerRadius,
   isPathALoop,
   createSrcDoc,
+  injectIframeElementCSP,
+  IFRAME_ELEMENT_CSP,
+  IFRAME_ELEMENT_PERMISSIONS_POLICY,
   embeddableURLValidator,
   getEmbedLink,
   getInitializedImageElements,
@@ -421,6 +423,7 @@ import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
 import Spinner from "./Spinner";
+import { DiagramToCodeError } from "./DiagramToCodePlugin/DiagramToCodeError";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { hideTooltip } from "./Tooltip";
@@ -471,6 +474,7 @@ import type {
   ElementsPendingErasure,
   ExcalidrawImperativeAPIEventMap,
   GenerateDiagramToCode,
+  RenderDiagramToCodeError,
   NullableGridSize,
   UIConfig,
 } from "../types";
@@ -1495,6 +1499,28 @@ class App extends React.Component<AppProps, AppState> {
     return this.iFrameRefs.get(element.id);
   }
 
+  private renderIframeElementGenerationError(error: {
+    code: string;
+    message?: string;
+  }) {
+    const hostContent = this.plugins.diagramToCode?.renderError?.(error);
+
+    return (
+      <div className="excalidraw__embeddable__error">
+        {hostContent ?? (
+          <>
+            <div className="excalidraw__embeddable__error__title">Error!</div>
+            <div className="excalidraw__embeddable__error__message">
+              {error.code === "ERR_GENERATION_INTERRUPTED"
+                ? "Generation was interrupted..."
+                : error.message || "Generation failed"}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
   /**
    * AI-generated iframe elements aren't interactive while their generation
    * is still in progress (the partial content is render-only).
@@ -1818,6 +1844,7 @@ class App extends React.Component<AppProps, AppState> {
 
           let src: IframeData | null;
           let isPendingGeneration = false;
+          let generationError: { code: string; message?: string } | null = null;
 
           if (isIframeElement(el)) {
             src = null;
@@ -1835,7 +1862,7 @@ class App extends React.Component<AppProps, AppState> {
                 intrinsicSize: { w: el.width, h: el.height },
                 type: "document",
                 srcdoc: () => {
-                  return html;
+                  return injectIframeElementCSP(html);
                 },
               } as const;
             } else if (data.status === "pending") {
@@ -1843,7 +1870,11 @@ class App extends React.Component<AppProps, AppState> {
                 intrinsicSize: { w: el.width, h: el.height },
                 type: "document",
                 srcdoc: () => {
-                  return createSrcDoc(`
+                  // the CSP persists across the document.open() below
+                  // (it doesn't reset the document's policy container), so
+                  // it also applies to the streamed partial HTML
+                  return injectIframeElementCSP(
+                    createSrcDoc(`
                     <style>
                       html, body {
                         width: 100%;
@@ -1862,6 +1893,12 @@ class App extends React.Component<AppProps, AppState> {
                       let opened = false;
 
                       const onPartialMessage = (event) => {
+                        // only accept snapshots from the editor — other frames
+                        // (e.g. sibling iframe elements via parent.frames[i])
+                        // can post to this window too
+                        if (event.source !== window.parent) {
+                          return;
+                        }
                         const data = event.data;
                         if (
                           !data ||
@@ -1884,43 +1921,24 @@ class App extends React.Component<AppProps, AppState> {
 
                       window.addEventListener("message", onPartialMessage);
                     </script>
-                  `);
+                  `),
+                  );
                 },
               } as const;
               isPendingGeneration = true;
             } else {
-              let message: string;
-              if (data.code === "ERR_GENERATION_INTERRUPTED") {
-                message = "Generation was interrupted...";
-              } else {
-                message = data.message || "Generation failed";
-              }
               src = {
                 intrinsicSize: { w: el.width, h: el.height },
                 type: "document",
-                srcdoc: () => {
-                  return createSrcDoc(`
-                    <style>
-                    html, body {
-                      height: 100%;
-                    }
-                      body {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        color: ${COLOR_PALETTE.red[3]};
-                      }
-                      h1, h3 {
-                        margin-top: 0;
-                        margin-bottom: 0.5rem;
-                      }
-                    </style>
-                    <h1>Error!</h1>
-                    <h3>${message}</h3>
-                  `);
-                },
+                srcdoc: () => injectIframeElementCSP(createSrcDoc("")),
               } as const;
+              generationError = {
+                // element data is untrusted (collaborators, share links,
+                // files) — only ever use it as plain text
+                code: typeof data.code === "string" ? data.code : "",
+                message:
+                  typeof data.message === "string" ? data.message : undefined,
+              };
             }
           } else {
             src = getEmbedLink(toValidURL(el.link || ""));
@@ -2039,13 +2057,32 @@ class App extends React.Component<AppProps, AppState> {
                         scrolling="no"
                         referrerPolicy="no-referrer-when-downgrade"
                         title="Excalidraw Embedded Content"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen={true}
-                        sandbox={`${
-                          src?.sandbox?.allowSameOrigin
-                            ? "allow-same-origin"
-                            : ""
-                        } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
+                        {...(isIframeElement(el)
+                          ? {
+                              csp: IFRAME_ELEMENT_CSP,
+                              allow: IFRAME_ELEMENT_PERMISSIONS_POLICY,
+                              // content could otherwise spoof browser UI
+                              allowFullScreen: false,
+                            }
+                          : {
+                              allow:
+                                "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+                              allowFullScreen: true,
+                            })}
+                        sandbox={
+                          isIframeElement(el)
+                            ? // `iframe` elements render arbitrary HTML via
+                              // srcdoc, so we don't let them open popups,
+                              // trigger downloads, or ever run same-origin.
+                              // Scripts are still needed, e.g. for streaming
+                              // partial HTML while generation is pending.
+                              "allow-scripts allow-forms"
+                            : `${
+                                src?.sandbox?.allowSameOrigin
+                                  ? "allow-same-origin"
+                                  : ""
+                              } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`
+                        }
                       />
                     )}
                   </div>
@@ -2056,6 +2093,8 @@ class App extends React.Component<AppProps, AppState> {
                     Generating…
                   </div>
                 )}
+                {generationError &&
+                  this.renderIframeElementGenerationError(generationError)}
               </div>
             </div>
           );
@@ -2546,7 +2585,7 @@ class App extends React.Component<AppProps, AppState> {
                                   }
                                 />
                                 <ElementCanvasButton
-                                  title="Enter fullscreen"
+                                  title={t("buttons.fullScreen")}
                                   icon={fullscreenIcon}
                                   checked={false}
                                   onChange={() => {
@@ -2554,9 +2593,20 @@ class App extends React.Component<AppProps, AppState> {
                                       this.getHTMLIFrameElement(
                                         firstSelectedElement,
                                       );
-                                    if (iframe) {
-                                      try {
-                                        iframe.requestFullscreen();
+                                    if (!iframe) {
+                                      return;
+                                    }
+                                    new Promise<void>((resolve) =>
+                                      resolve(iframe.requestFullscreen()),
+                                    ).then(
+                                      () => {
+                                        if (
+                                          this.unmounted ||
+                                          this.ownerDocument
+                                            .fullscreenElement !== iframe
+                                        ) {
+                                          return;
+                                        }
                                         this.setState({
                                           activeEmbeddable: {
                                             element: firstSelectedElement,
@@ -2568,14 +2618,17 @@ class App extends React.Component<AppProps, AppState> {
                                           newElement: null,
                                           selectionElement: null,
                                         });
-                                      } catch (err: any) {
+                                      },
+                                      (err: unknown) => {
                                         console.warn(err);
-                                        this.setState({
-                                          errorMessage:
-                                            "Couldn't enter fullscreen",
-                                        });
-                                      }
-                                    }
+                                        if (!this.unmounted) {
+                                          this.setState({
+                                            errorMessage:
+                                              "Couldn't enter fullscreen",
+                                          });
+                                        }
+                                      },
+                                    );
                                   }}
                                 />
                               </ElementCanvasButtons>
@@ -2827,11 +2880,17 @@ class App extends React.Component<AppProps, AppState> {
   public plugins: {
     diagramToCode?: {
       generate: GenerateDiagramToCode;
+      renderError?: RenderDiagramToCodeError;
     };
   } = {};
 
   public setPlugins(plugins: Partial<App["plugins"]>) {
+    const prevRenderError = this.plugins.diagramToCode?.renderError;
     Object.assign(this.plugins, plugins);
+    // rerender any (already rendered) generation error overlays
+    if (this.plugins.diagramToCode?.renderError !== prevRenderError) {
+      this.triggerRender();
+    }
   }
 
   private async onMagicFrameGenerate(
@@ -2946,7 +3005,7 @@ class App extends React.Component<AppProps, AppState> {
         frameElement,
         data: {
           status: "error",
-          code: "ERR_OAI",
+          code: error instanceof DiagramToCodeError ? error.code : "ERR_OAI",
           message: error.message || "Unknown error during generation",
         },
       });

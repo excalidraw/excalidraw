@@ -1052,6 +1052,45 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  // failed generation of an `iframe` element — rendered as app UI over the
+  // (empty) frame. Inherits the container's pointer-events so that it's
+  // interactive (e.g. host-supplied links) only while the element is active.
+  .excalidraw__embeddable__error {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    box-sizing: border-box;
+    overflow: auto;
+    border-radius: var(--embeddable-radius);
+    background: var(--island-bg-color);
+    color: var(--text-primary-color);
+    font-family: "Assistant";
+    font-size: 1rem;
+    text-align: center;
+    overflow-wrap: anywhere;
+
+    &__title {
+      color: var(--color-danger);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    &__message {
+      color: var(--color-danger);
+      white-space: pre-wrap;
+    }
+
+    a {
+      color: var(--link-color);
+    }
+  }
+
   .excalidraw__embeddable__outer {
     width: 100%;
     height: 100%;
@@ -1070,7 +1109,8 @@ body.excalidraw-cursor-resize * {
 
   .excalidraw__embeddable-hint {
     position: absolute;
-    z-index: 1;
+    // above the error overlay
+    z-index: 2;
     background: rgba(0, 0, 0, 0.5);
     padding: 1rem 1.6rem;
     border-radius: 12px;
