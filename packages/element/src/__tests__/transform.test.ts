@@ -1187,4 +1187,44 @@ describe("Test Transform", () => {
       expect(note.height).toBeGreaterThan(DEFAULT_STICKY_NOTE_SIZE);
     });
   });
+
+  describe("frame coordinates", () => {
+    it("should keep user defined frame coordinates when they are 0", () => {
+      const frames = convertToExcalidrawElements(
+        [
+          {
+            type: "rectangle",
+            id: "child",
+            x: 50,
+            y: 60,
+            width: 100,
+            height: 100,
+          },
+          {
+            type: "frame",
+            children: ["child"],
+            x: 0,
+            y: 0,
+            width: 400,
+            height: 300,
+          },
+          {
+            type: "frame",
+            children: [],
+            x: 0,
+            y: 0,
+            width: 400,
+            height: 300,
+          },
+        ],
+        opts,
+      ).filter((ele) => ele.type === "frame");
+
+      expect(frames.length).toBe(2);
+      frames.forEach((frame) => {
+        expect(frame.x).toBe(0);
+        expect(frame.y).toBe(0);
+      });
+    });
+  });
 });
