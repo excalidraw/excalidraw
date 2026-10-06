@@ -403,6 +403,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Tämä ominaisuus voidaan todennäköisesti ottaa käyttöön asettamalla \"dom.events.asyncClipboard.clipboardItem\" kohta \"true\":ksi. Vaihtaaksesi selaimen kohdan Firefoxissa, käy \"about:config\" sivulla.",
     "disableSnapping": "",
