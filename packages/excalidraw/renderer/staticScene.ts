@@ -580,6 +580,39 @@ const isPanOnly = (
     scrollY: () => true,
   });
 
+/** Scene-space bounds of what an element draws, label included: a label is
+ *  drawn with its container and may reach well past it. */
+const getElementDrawnBounds = (
+  element: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
+) => {
+  const bounds = getElementBounds(element, elementsMap);
+  const label = getBoundTextElement(element, elementsMap);
+  if (!label) {
+    return bounds;
+  }
+  const [lx1, ly1, lx2, ly2] = getElementBounds(label, elementsMap);
+  return [
+    Math.min(bounds[0], lx1),
+    Math.min(bounds[1], ly1),
+    Math.max(bounds[2], lx2),
+    Math.max(bounds[3], ly2),
+  ] as const;
+};
+
+/** How far an element draws past its own bounds (scene units). */
+const getElementOverflow = (
+  element: NonDeletedExcalidrawElement,
+  elementsMap: ElementsMap,
+) => {
+  const [x1, y1, x2, y2] = getElementBounds(element, elementsMap);
+  const [dx1, dy1, dx2, dy2] = getElementDrawnBounds(element, elementsMap);
+  return (
+    getElementRenderPadding(element) +
+    Math.max(x1 - dx1, y1 - dy1, dx2 - x2, dy2 - y2)
+  );
+};
+
 /**
  * Paints a pan by moving the last frame by the scroll delta and rendering
  * only the exposed strips, so panning over thousands of visible elements
@@ -617,8 +650,10 @@ const paintPan = (
   // thick strokes, arrowheads) in the kept frame, so count the previous
   // frame's elements too.
   let padding = 0;
-  for (const element of [...prev.visibleElements, ...config.visibleElements]) {
-    padding = Math.max(padding, getElementRenderPadding(element));
+  for (const { visibleElements, elementsMap } of [prev, config]) {
+    for (const element of visibleElements) {
+      padding = Math.max(padding, getElementOverflow(element, elementsMap));
+    }
   }
   const band = Math.ceil(padding * devicePixels);
   const { width, height } = canvas;
@@ -645,16 +680,7 @@ const paintPan = (
   // what a full render draws into the regions: the (culled) visible elements
   // that render into them
   const visibleElements = config.visibleElements.filter((element) => {
-    let [x1, y1, x2, y2] = getElementBounds(element, config.elementsMap);
-    // a label is drawn with its container and may reach well past it
-    const label = getBoundTextElement(element, config.elementsMap);
-    if (label) {
-      const [lx1, ly1, lx2, ly2] = getElementBounds(label, config.elementsMap);
-      x1 = Math.min(x1, lx1);
-      y1 = Math.min(y1, ly1);
-      x2 = Math.max(x2, lx2);
-      y2 = Math.max(y2, ly2);
-    }
+    const [x1, y1, x2, y2] = getElementDrawnBounds(element, config.elementsMap);
     const padding = getElementRenderPadding(element);
     return sceneRegions.some(
       ([rx1, ry1, rx2, ry2]) =>
