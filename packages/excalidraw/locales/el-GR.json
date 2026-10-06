@@ -403,6 +403,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Αυτή η επιλογή μπορεί πιθανώς να ενεργοποιηθεί αλλάζοντας την ρύθμιση \"dom.events.asyncClipboard.clipboardItem\" σε \"true\". Για να αλλάξετε τις ρυθμίσεις του προγράμματος περιήγησης στο Firefox, επισκεφθείτε τη σελίδα \"about:config\".",
     "disableSnapping": "",
