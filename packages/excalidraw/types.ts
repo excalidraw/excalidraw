@@ -1225,6 +1225,8 @@ export type AppClassProperties = {
   duplicate: App["duplicate"];
   toolDrag: App["toolDrag"];
   activeResizeHandle: App["activeResizeHandle"];
+  selectionTool: App["selectionTool"];
+  modifiers: App["modifiers"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];

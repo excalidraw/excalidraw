@@ -21,6 +21,7 @@ import {
   act,
   render,
   fireEvent,
+  GlobalTestState,
   mockBoundingClientRect,
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
@@ -329,6 +330,47 @@ describe("alt-click cycling", () => {
 
     expect(h.state.editingTextElement).toBe(null);
     expect(h.elements.length).toBe(3);
+  });
+
+  it("hints at cycling while Alt is held over a single selection", () => {
+    const { middle, top } = createStack({});
+    const hint = () =>
+      h.app.ownerDocument.querySelector(".HintViewer")?.textContent ?? "";
+    const cycleHint = "to cycle selection";
+    const press = (modifiers: { alt?: boolean; ctrl?: boolean }) =>
+      Keyboard.withModifierKeys(modifiers, () => {
+        Keyboard.keyDown(KEYS.ALT, GlobalTestState.interactiveCanvas);
+      });
+    const release = () =>
+      Keyboard.keyUp(KEYS.ALT, GlobalTestState.interactiveCanvas);
+
+    mouse.clickAt(50, 50);
+    expect(hint()).not.toContain(cycleHint);
+    press({ alt: true });
+    expect(hint()).toContain(cycleHint);
+    // (the hover refresh after the click doesn't release Alt)
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.clickAt(50, 50);
+    });
+    assertSelectedElements([middle.id]);
+    expect(hint()).toContain(cycleHint);
+    release();
+    expect(hint()).not.toContain(cycleHint);
+
+    // Alt+Tab never delivers the keyup
+    press({ alt: true });
+    fireEvent.blur(window);
+    expect(hint()).not.toContain(cycleHint);
+
+    // (AltGr on Windows) alt-clicks with Ctrl don't cycle
+    press({ alt: true, ctrl: true });
+    expect(hint()).not.toContain(cycleHint);
+    release();
+
+    API.setSelectedElements([middle, top]);
+    press({ alt: true });
+    expect(hint()).not.toContain(cycleHint);
+    release();
   });
 
   it("alt-drag duplicates only past the drag threshold", () => {

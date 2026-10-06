@@ -407,6 +407,7 @@ import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppDuplicate } from "./App.duplicate";
 import { AppFlowchart } from "./App.flowchart";
+import { AppModifiers } from "./App.modifiers";
 import { AppPan } from "./App.pan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import { AppWheel } from "./App.wheel";
@@ -759,6 +760,8 @@ class App extends React.Component<AppProps, AppState> {
     [event: PointerEvent | null]
   >();
   onRemoveEventListenersEmitter = new Emitter<[]>();
+
+  modifiers = new AppModifiers();
 
   api: ExcalidrawImperativeAPI;
   private elementRenderOverrides: ElementRenderOverrides = new Map();
@@ -3191,6 +3194,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private onBlur = withBatchedUpdates(() => {
     this.pan.setSpaceHeld(false);
+    this.modifiers.reset();
     this.setState({
       isBindingEnabled: this.state.bindingPreference === "enabled",
     });
@@ -3280,6 +3284,7 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeCleanupAfterMissingPointerUp(null);
 
     this.pan.setSpaceHeld(false);
+    this.modifiers.reset();
     isDraggingScrollBar = false;
     lastPointerUp = null;
 
@@ -5246,6 +5251,8 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      this.modifiers.sync(event);
+
       // Handle Alt key for bind mode
       if (event.key === KEYS.ALT) {
         if (this.state.activeTool.type === "bucketfill") {
@@ -5572,6 +5579,7 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private onKeyUp = withBatchedUpdates((event: KeyboardEvent) => {
+    this.modifiers.sync(event);
     if (!this.isInteractionEnabled()) {
       return;
     }
@@ -6822,6 +6830,8 @@ class App extends React.Component<AppProps, AppState> {
     }
     this.savePointer(event.clientX, event.clientY, this.state.cursorButton);
     this.lastPointerMoveEvent = event.nativeEvent;
+    // corrects a missed keydown/keyup (e.g. pressed outside the editor)
+    this.modifiers.sync(event);
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
     this.lastPointerMoveCoords = {

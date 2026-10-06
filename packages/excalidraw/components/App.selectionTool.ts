@@ -1139,57 +1139,75 @@ export class AppSelectionTool {
     );
   }
 
+  /** whether an alt-click on the selection (over other elements) cycles it */
+  canCycleSelection = () => this.getCyclableSelectedUnit() !== null;
+
   /**
-   * The element an alt-click selects: the selectable unit (an element, or
-   * the group a click would select) below the selected one among the hit
-   * elements, wrapping around to the topmost — or `null` unless it's an
-   * alt-click and exactly one unit is selected and it's under the pointer.
-   * Inside an edited group, it cycles through the group's elements only,
-   * never leaving the group.
+   * The selectable unit (an element, or the group a click would select) an
+   * element belongs to. Inside an edited group, its elements are units of
+   * their own.
    */
-  private getSelectionCycleTarget(
-    event: React.PointerEvent<HTMLElement>,
-    hitElements: readonly NonDeleted<ExcalidrawElement>[],
-  ): NonDeleted<ExcalidrawElement> | null {
+  private getSelectableUnit(element: ExcalidrawElement) {
+    const { editingGroupId } = this.app.state;
+    const editingGroupIndex = editingGroupId
+      ? element.groupIds.indexOf(editingGroupId)
+      : -1;
+    const groupIds =
+      editingGroupIndex > -1
+        ? element.groupIds.slice(0, editingGroupIndex)
+        : element.groupIds;
+    return groupIds.length ? groupIds[groupIds.length - 1] : element.id;
+  }
+
+  /**
+   * The selected unit, if an alt-click can cycle away from it: exactly one
+   * is selected, and neither the linear nor the crop editor is open.
+   */
+  private getCyclableSelectedUnit(): string | null {
     if (
-      !event.altKey ||
-      event[KEYS.CTRL_OR_CMD] ||
-      event.shiftKey ||
       this.app.state.selectedLinearElement?.isEditing ||
       this.app.state.croppingElementId
     ) {
       return null;
     }
+    const selectedUnits = new Set(
+      this.app.scene
+        .getSelectedElements(this.app.state)
+        .map((element) => this.getSelectableUnit(element)),
+    );
+    return selectedUnits.size === 1 ? [...selectedUnits][0] : null;
+  }
+
+  /**
+   * The element an alt-click selects: the selectable unit below the selected
+   * one among the hit elements, wrapping around to the topmost — or `null`
+   * unless it's an alt-click, the selection can cycle, and it's under the
+   * pointer. Inside an edited group, it cycles through the group's elements
+   * only, never leaving the group.
+   */
+  private getSelectionCycleTarget(
+    event: React.PointerEvent<HTMLElement>,
+    hitElements: readonly NonDeleted<ExcalidrawElement>[],
+  ): NonDeleted<ExcalidrawElement> | null {
+    if (!event.altKey || event[KEYS.CTRL_OR_CMD] || event.shiftKey) {
+      return null;
+    }
+    const selectedUnit = this.getCyclableSelectedUnit();
+    if (!selectedUnit) {
+      return null;
+    }
 
     const { editingGroupId } = this.app.state;
-    const unitOf = (element: ExcalidrawElement) => {
-      const editingGroupIndex = editingGroupId
-        ? element.groupIds.indexOf(editingGroupId)
-        : -1;
-      const groupIds =
-        editingGroupIndex > -1
-          ? element.groupIds.slice(0, editingGroupIndex)
-          : element.groupIds;
-      return groupIds.length ? groupIds[groupIds.length - 1] : element.id;
-    };
     if (editingGroupId) {
       hitElements = hitElements.filter((element) =>
         isElementInGroup(element, editingGroupId),
       );
     }
 
-    const selectedUnits = new Set(
-      this.app.scene.getSelectedElements(this.app.state).map(unitOf),
-    );
-    if (selectedUnits.size !== 1) {
-      return null;
-    }
-    const [selectedUnit] = selectedUnits;
-
     // topmost first, each unit at its topmost hit element
     const units = new Map<string, NonDeleted<ExcalidrawElement>>();
     for (let index = hitElements.length - 1; index > -1; index--) {
-      const unit = unitOf(hitElements[index]);
+      const unit = this.getSelectableUnit(hitElements[index]);
       if (!units.has(unit)) {
         units.set(unit, hitElements[index]);
       }
