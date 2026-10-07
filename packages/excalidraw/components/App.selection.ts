@@ -1,15 +1,17 @@
 import {
+  arrayToMap,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TRANSFORM_HANDLE_SPACING,
+  isReadonlyArray,
 } from "@excalidraw/common";
 import {
+  excludeElementsInFramesFromSelection,
   getCommonBounds,
-  getElementsInGroup,
-  getFrameChildren,
-  isEmbeddableElement,
+  getSelectedElements,
+  getSelectedGroupForElement,
+  isBoundToContainer,
   isFrameLikeElement,
   isLinearElement,
-  isSelectedViaGroup,
   LinearElementEditor,
   makeNextSelectedElementIds,
   selectGroupsForSelectedElements,
@@ -20,219 +22,301 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { getSelectedElements } from "../scene";
-
+import type { AppState } from "../types";
 import type App from "./App";
 
 /**
- * The selection: selecting an element, adding it to or removing it from the
- * selection, and clearing it — keeping its rules: an element is selected
+ * The line editor of a lone selected line or arrow (with its labels) —
+ * the current one if it's already that element's.
+ */
+const getLinearElementEditor = (
+  targetElements: readonly NonDeletedExcalidrawElement[],
+  allElements: readonly NonDeletedExcalidrawElement[],
+  appState: Pick<AppState, "selectedLinearElement">,
+) => {
+  const linears = targetElements.filter(isLinearElement);
+  if (linears.length === 1) {
+    const linear = linears[0];
+    const boundElements = linear.boundElements?.map((def) => def.id) ?? [];
+    const onlySingleLinearSelected = targetElements.every(
+      (el) => el.id === linear.id || boundElements.includes(el.id),
+    );
+
+    if (onlySingleLinearSelected) {
+      // keep the current one, e.g. not to reset its `hoverPointIndex`
+      if (appState.selectedLinearElement?.elementId === linear.id) {
+        return appState.selectedLinearElement;
+      }
+      return new LinearElementEditor(linear, arrayToMap(allElements));
+    }
+  }
+
+  return null;
+};
+
+/**
+ * The selection of the given elements alone, with their groups (within the
+ * edited group): a frame wins over its children, bound text is left to its
+ * container, and a lone line or arrow gets its line editor.
+ *
+ * @param allElements the (non-deleted) elements the selection is in
+ */
+export const getSelectionStateForElements = (
+  targetElements: readonly NonDeletedExcalidrawElement[],
+  allElements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  return {
+    selectedLinearElement: getLinearElementEditor(
+      targetElements,
+      allElements,
+      appState,
+    ),
+    ...selectGroupsForSelectedElements(
+      {
+        editingGroupId: appState.editingGroupId,
+        selectedElementIds: excludeElementsInFramesFromSelection(
+          targetElements,
+        ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
+          if (!isBoundToContainer(element)) {
+            acc[element.id] = true;
+          }
+          return acc;
+        }, {}),
+      },
+      allElements,
+      appState,
+      null,
+    ),
+  };
+};
+
+/**
+ * The selection with the given elements added, with their groups (within the
+ * edited group).
+ *
+ * A frame and its children aren't selected at the same time: an added frame
+ * deselects its children, an added child of a selected (or added) frame is
+ * left out, and an added element grouped with frames deselects those frames'
+ * children. In the element link selector, the added elements replace the
+ * selection (unless one's group is selected).
+ *
+ * @param allElements the (non-deleted) elements the selection is in
+ */
+export const getSelectionStateAddingElements = (
+  targetElements: readonly NonDeletedExcalidrawElement[],
+  allElements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  const elements = targetElements.filter(
+    (element) => !isBoundToContainer(element),
+  );
+
+  let nextSelectedElementIds: Record<ExcalidrawElement["id"], true> = {
+    ...appState.selectedElementIds,
+  };
+  for (const element of elements) {
+    nextSelectedElementIds[element.id] = true;
+  }
+
+  const addedFrameIds = new Set<ExcalidrawElement["id"]>();
+  // of the added elements neither frames nor in frames, which could be
+  // grouped with frames
+  const addedGroupIds = new Set<string>();
+  for (const element of elements) {
+    if (isFrameLikeElement(element)) {
+      addedFrameIds.add(element.id);
+    } else if (element.frameId) {
+      // in a frame that's selected (or added)
+      if (nextSelectedElementIds[element.frameId]) {
+        delete nextSelectedElementIds[element.id];
+      }
+    } else {
+      for (const groupId of element.groupIds) {
+        addedGroupIds.add(groupId);
+      }
+    }
+  }
+
+  // frames grouped with the added elements are selected along with them
+  const framesInAddedGroups = new Set<ExcalidrawElement["id"]>();
+  if (addedGroupIds.size) {
+    for (const element of allElements) {
+      if (
+        isFrameLikeElement(element) &&
+        element.groupIds.some((groupId) => addedGroupIds.has(groupId))
+      ) {
+        framesInAddedGroups.add(element.id);
+      }
+    }
+  }
+
+  // deselect the previously selected children of those frames (and their
+  // groups)
+  if (addedFrameIds.size || framesInAddedGroups.size) {
+    const deselectedGroupIds = new Set<string>();
+    for (const element of allElements) {
+      const { frameId } = element;
+      if (!frameId || !appState.selectedElementIds[element.id]) {
+        continue;
+      }
+      if (addedFrameIds.has(frameId)) {
+        delete nextSelectedElementIds[element.id];
+      }
+      if (framesInAddedGroups.has(frameId)) {
+        delete nextSelectedElementIds[element.id];
+        for (const groupId of element.groupIds) {
+          deselectedGroupIds.add(groupId);
+        }
+      }
+    }
+    if (deselectedGroupIds.size) {
+      for (const element of allElements) {
+        if (
+          element.groupIds.some((groupId) => deselectedGroupIds.has(groupId))
+        ) {
+          delete nextSelectedElementIds[element.id];
+        }
+      }
+    }
+  }
+
+  // in the element link selector, keep only one shape or group selected at a
+  // time: the added elements replace the selection unless one's group is
+  // selected
+  if (
+    appState.openDialog?.name === "elementLinkSelector" &&
+    !elements.some((element) =>
+      element.groupIds.some((groupId) => appState.selectedGroupIds[groupId]),
+    )
+  ) {
+    nextSelectedElementIds = {};
+    for (const element of elements) {
+      nextSelectedElementIds[element.id] = true;
+    }
+  }
+
+  return selectGroupsForSelectedElements(
+    {
+      editingGroupId: appState.editingGroupId,
+      selectedElementIds: nextSelectedElementIds,
+    },
+    allElements,
+    appState,
+    null,
+  );
+};
+
+/**
+ * The selection with the given elements removed — with the group they're
+ * selected via (if any) — and a lone remaining line or arrow getting its
+ * line editor.
+ *
+ * @param allElements the (non-deleted) elements the selection is in
+ */
+export const getSelectionStateRemovingElements = (
+  targetElements: readonly NonDeletedExcalidrawElement[],
+  allElements: readonly NonDeletedExcalidrawElement[],
+  appState: AppState,
+) => {
+  const nextSelectedElementIds = { ...appState.selectedElementIds };
+  const removedGroupIds = new Set<string>();
+  for (const element of targetElements) {
+    delete nextSelectedElementIds[element.id];
+    const groupId = getSelectedGroupForElement(appState, element);
+    if (groupId) {
+      removedGroupIds.add(groupId);
+    }
+  }
+  if (removedGroupIds.size) {
+    for (const element of allElements) {
+      if (element.groupIds.some((groupId) => removedGroupIds.has(groupId))) {
+        delete nextSelectedElementIds[element.id];
+      }
+    }
+  }
+
+  const remainingElements = getSelectedElements(allElements, {
+    selectedElementIds: nextSelectedElementIds,
+  });
+
+  return {
+    ...selectGroupsForSelectedElements(
+      {
+        editingGroupId: appState.editingGroupId,
+        selectedElementIds: nextSelectedElementIds,
+      },
+      allElements,
+      appState,
+      null,
+    ),
+    selectedLinearElement:
+      remainingElements.length === 1 && isLinearElement(remainingElements[0])
+        ? getLinearElementEditor(remainingElements, allElements, appState)
+        : null,
+  };
+};
+
+/** elements, or their ids — one or many */
+export type ElementsOrIds =
+  | ExcalidrawElement
+  | ExcalidrawElement["id"]
+  | readonly (ExcalidrawElement | ExcalidrawElement["id"])[];
+
+/**
+ * The selection: selecting elements, adding them to or removing them from
+ * the selection, and clearing it — keeping its rules: an element is selected
  * with its group (but within the edited group), a frame and its children
  * aren't selected at the same time, and a lone line or arrow gets its line
- * editor.
+ * editor (see the `getSelectionState*()` functions above).
+ *
+ * Elements are taken by id from the scene: missing and deleted ones are
+ * skipped.
  */
 export class AppSelection {
   constructor(private app: App) {}
 
   /**
-   * Selects the element alone (with its group).
+   * Selects the elements alone (with their groups).
    */
-  select(element: NonDeletedExcalidrawElement) {
-    this.app.setState((prevState) => ({
-      ...selectGroupsForSelectedElements(
-        {
-          editingGroupId: prevState.editingGroupId,
-          selectedElementIds: { [element.id]: true },
-        },
+  select(elementsOrIds: ElementsOrIds) {
+    const elements = this.resolve(elementsOrIds);
+    this.app.setState((prevState) =>
+      getSelectionStateForElements(
+        elements,
         this.app.scene.getNonDeletedElements(),
         prevState,
-        this.app,
       ),
-      selectedLinearElement: isLinearElement(element)
-        ? // Don't set `selectedLinearElement` if its same as the element, this is mainly to prevent resetting the `hoverPointIndex` to -1.
-          // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
-          prevState.selectedLinearElement?.elementId === element.id
-          ? prevState.selectedLinearElement
-          : new LinearElementEditor(
-              element,
-              this.app.scene.getNonDeletedElementsMap(),
-            )
-        : null,
-    }));
+    );
   }
 
   /**
-   * Adds the element (with its group) to the selection, and shows its link.
-   *
-   * A frame and its children aren't selected at the same time: a frame
-   * deselects its children, and a child of a selected frame isn't added.
+   * Adds the elements (with their groups) to the selection.
    */
-  add(element: NonDeletedExcalidrawElement) {
-    this.app.setState((prevState) => {
-      let nextSelectedElementIds: { [id: string]: true } = {
-        ...prevState.selectedElementIds,
-        [element.id]: true,
-      };
-
-      const previouslySelectedElements: ExcalidrawElement[] = [];
-
-      Object.keys(prevState.selectedElementIds).forEach((id) => {
-        const selectedElement = this.app.scene.getElement(id);
-        selectedElement && previouslySelectedElements.push(selectedElement);
-      });
-
-      // if element is frame-like, deselect all of its elements
-      // if they are selected
-      if (isFrameLikeElement(element)) {
-        getFrameChildren(previouslySelectedElements, element.id).forEach(
-          (child) => {
-            delete nextSelectedElementIds[child.id];
-          },
-        );
-      } else if (element.frameId) {
-        // if element is in a frame and its frame has been selected
-        // disable selection for the given element
-        if (nextSelectedElementIds[element.frameId]) {
-          delete nextSelectedElementIds[element.id];
-        }
-      } else {
-        // element is neither a frame nor an element in a frame
-        // but since element could be in a group with some frames
-        // this means selecting element will have the frames selected as well
-        // because we want to keep the invariant:
-        // - frames and their elements are not selected at the same time
-        // we deselect elements in those frames that were previously selected
-
-        const groupIds = element.groupIds;
-        const framesInGroups = new Set(
-          groupIds
-            .flatMap((gid) =>
-              getElementsInGroup(this.app.scene.getNonDeletedElements(), gid),
-            )
-            .filter((groupElement) => isFrameLikeElement(groupElement))
-            .map((frame) => frame.id),
-        );
-
-        if (framesInGroups.size > 0) {
-          previouslySelectedElements.forEach((selectedElement) => {
-            if (
-              selectedElement.frameId &&
-              framesInGroups.has(selectedElement.frameId)
-            ) {
-              // deselect element and groups containing the element
-              delete nextSelectedElementIds[selectedElement.id];
-              selectedElement.groupIds
-                .flatMap((gid) =>
-                  getElementsInGroup(
-                    this.app.scene.getNonDeletedElements(),
-                    gid,
-                  ),
-                )
-                .forEach((groupElement) => {
-                  delete nextSelectedElementIds[groupElement.id];
-                });
-            }
-          });
-        }
-      }
-
-      // Finally, in shape selection mode, we'd like to
-      // keep only one shape or group selected at a time.
-      // This means, if the element is a different shape or group
-      // than the previously selected ones, we deselect the previous ones
-      // and select the element
-      if (prevState.openDialog?.name === "elementLinkSelector") {
-        if (!element.groupIds.some((gid) => prevState.selectedGroupIds[gid])) {
-          nextSelectedElementIds = {
-            [element.id]: true,
-          };
-        }
-      }
-
-      return {
-        ...selectGroupsForSelectedElements(
-          {
-            editingGroupId: prevState.editingGroupId,
-            selectedElementIds: nextSelectedElementIds,
-          },
-          this.app.scene.getNonDeletedElements(),
-          prevState,
-          this.app,
-        ),
-        showHyperlinkPopup:
-          element.link || isEmbeddableElement(element) ? "info" : false,
-      };
-    });
+  add(elementsOrIds: ElementsOrIds) {
+    const elements = this.resolve(elementsOrIds);
+    this.app.setState((prevState) =>
+      getSelectionStateAddingElements(
+        elements,
+        this.app.scene.getNonDeletedElements(),
+        prevState,
+      ),
+    );
   }
 
   /**
-   * Removes the element from the selection — the whole group if it's
-   * selected via its group.
+   * Removes the elements from the selection — with the group they're
+   * selected via.
    */
-  remove(element: NonDeletedExcalidrawElement) {
-    if (isSelectedViaGroup(this.app.state, element)) {
-      this.app.setState((_prevState) => {
-        const nextSelectedElementIds = {
-          ..._prevState.selectedElementIds,
-        };
-
-        // We want to unselect all groups element is part of
-        // as well as all elements that are part of the groups
-        // element is part of
-        for (const groupedElement of element.groupIds.flatMap((groupId) =>
-          getElementsInGroup(this.app.scene.getNonDeletedElements(), groupId),
-        )) {
-          delete nextSelectedElementIds[groupedElement.id];
-        }
-
-        return {
-          selectedGroupIds: {
-            ..._prevState.selectedElementIds,
-            ...element.groupIds
-              .map((gId) => ({ [gId]: false }))
-              .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
-          },
-          selectedElementIds: makeNextSelectedElementIds(
-            nextSelectedElementIds,
-            _prevState,
-          ),
-        };
-      });
-    } else {
-      // remove element from selection while
-      // keeping prev elements selected
-      this.app.setState((prevState) => {
-        const newSelectedElementIds = {
-          ...prevState.selectedElementIds,
-        };
-        delete newSelectedElementIds[element.id];
-        const newSelectedElements = getSelectedElements(
-          this.app.scene.getNonDeletedElements(),
-          { selectedElementIds: newSelectedElementIds },
-        );
-
-        return {
-          ...selectGroupsForSelectedElements(
-            {
-              editingGroupId: prevState.editingGroupId,
-              selectedElementIds: newSelectedElementIds,
-            },
-            this.app.scene.getNonDeletedElements(),
-            prevState,
-            this.app,
-          ),
-          // set selectedLinearElement only if thats the only element selected
-          selectedLinearElement:
-            newSelectedElements.length === 1 &&
-            isLinearElement(newSelectedElements[0])
-              ? new LinearElementEditor(
-                  newSelectedElements[0],
-                  this.app.scene.getNonDeletedElementsMap(),
-                )
-              : prevState.selectedLinearElement,
-        };
-      });
-    }
+  remove(elementsOrIds: ElementsOrIds) {
+    const elements = this.resolve(elementsOrIds);
+    this.app.setState((prevState) =>
+      getSelectionStateRemovingElements(
+        elements,
+        this.app.scene.getNonDeletedElements(),
+        prevState,
+      ),
+    );
   }
 
   /**
@@ -275,5 +359,24 @@ export class AppSelection {
       point.y > y1 - boundsPadding - threshold &&
       point.y < y2 + boundsPadding + threshold
     );
+  }
+
+  /** the scene's (non-deleted) elements, by id, once each */
+  private resolve(elementsOrIds: ElementsOrIds) {
+    const elementsMap = this.app.scene.getNonDeletedElementsMap();
+    const elements = new Map<
+      ExcalidrawElement["id"],
+      NonDeletedExcalidrawElement
+    >();
+    for (const elementOrId of (isReadonlyArray(elementsOrIds)
+      ? elementsOrIds
+      : [elementsOrIds]) as readonly (ExcalidrawElement | string)[]) {
+      const id = typeof elementOrId === "string" ? elementOrId : elementOrId.id;
+      const element = elementsMap.get(id);
+      if (element) {
+        elements.set(id, element);
+      }
+    }
+    return [...elements.values()];
   }
 }

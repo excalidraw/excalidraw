@@ -16,7 +16,6 @@ import {
   duplicateElements,
   filterElementsEligibleAsFrameChildren,
   getCommonBounds,
-  getSelectionStateForElements,
   isBindableElement,
   isLinearElement,
   isTextElement,
@@ -32,6 +31,8 @@ import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
 } from "@excalidraw/element/types";
+
+import { getSelectionStateForElements } from "./App.selection";
 
 import type { PointerDownState } from "../types";
 

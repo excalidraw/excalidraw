@@ -194,7 +194,6 @@ import {
   selectGroupsForSelectedElements,
   syncInvalidIndices,
   excludeElementsInFramesFromSelection,
-  getSelectionStateForElements,
   makeNextSelectedElementIds,
   getCursorForResizingElement,
   getElementWithTransformHandleType,
@@ -410,7 +409,7 @@ import { AppModifiers } from "./App.modifiers";
 import { AppPan } from "./App.pan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import { AppWheel } from "./App.wheel";
-import { AppSelection } from "./App.selection";
+import { AppSelection, getSelectionStateForElements } from "./App.selection";
 import { AppSelectionTool } from "./App.selectionTool";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
@@ -7867,7 +7866,12 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.element &&
         !hitSelectedElement
       ) {
-        this.selection.add(pointerDownState.hit.element);
+        const hitElement = pointerDownState.hit.element;
+        this.selection.add(hitElement);
+        this.setState({
+          showHyperlinkPopup:
+            hitElement.link || isEmbeddableElement(hitElement) ? "info" : false,
+        });
         pointerDownState.hit.wasAddedToSelection = true;
       }
     } else if (this.state.activeTool.type === "text") {

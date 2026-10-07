@@ -26,6 +26,7 @@ import {
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
   unmountComponent,
+  waitFor,
 } from "./test-utils";
 
 unmountComponent();
@@ -199,6 +200,31 @@ describe("lasso reselection", () => {
     });
 
     assertSelectedElements([rectA.id]);
+  });
+});
+
+describe("lasso on touch devices", () => {
+  it("a tap selects the element", async () => {
+    await render(<Excalidraw UIOptions={{ getFormFactor: () => "tablet" }} />);
+    fireEvent.resize(window);
+    await waitFor(() =>
+      expect(h.app.editorInterface.formFactor).toBe("tablet"),
+    );
+    const rectangle = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    API.setElements([rectangle]);
+    act(() => {
+      h.app.setActiveTool({ type: "lasso" });
+    });
+
+    mouse.clickAt(50, 50);
+
+    assertSelectedElements([rectangle.id]);
   });
 });
 
@@ -1385,6 +1411,51 @@ describe("app.selection", () => {
     act(() => h.app.selection.select(rectangle));
     assertSelectedElements([rectangle.id]);
     expect(h.state.selectedLinearElement).toBe(null);
+  });
+
+  it("takes elements or ids, one or many, skipping missing ones", () => {
+    const [a, b, c] = [0, 100, 200].map((x) =>
+      API.createElement({ type: "rectangle", x }),
+    );
+    API.setElements([a, b, c]);
+
+    act(() => h.app.selection.select([a.id, "missing", b, a]));
+    assertSelectedElements([a.id, b.id]);
+
+    act(() => h.app.selection.add(c.id));
+    assertSelectedElements([a.id, b.id, c.id]);
+
+    act(() => h.app.selection.remove([a, b.id]));
+    assertSelectedElements([c.id]);
+  });
+
+  it("add() of a frame along with its child selects the frame, in either order", () => {
+    const { frame, child } = createFrame();
+    API.setElements([child, frame]);
+
+    act(() => h.app.selection.add([child, frame]));
+    assertSelectedElements([frame.id]);
+
+    act(() => h.app.selection.clear());
+    act(() => h.app.selection.add([frame, child]));
+    assertSelectedElements([frame.id]);
+  });
+
+  it("remove() of an element selected via its group keeps the other selected groups", () => {
+    const [a1, a2, b1, b2] = ["a", "a", "b", "b"].map((groupId, index) =>
+      API.createElement({
+        type: "rectangle",
+        x: index * 100,
+        groupIds: [groupId],
+      }),
+    );
+    API.setElements([a1, a2, b1, b2]);
+    API.setSelectedElements([a1, a2, b1, b2]);
+
+    act(() => h.app.selection.remove(a1));
+
+    assertSelectedElements([b1.id, b2.id]);
+    expect(h.state.selectedGroupIds).toEqual({ b: true });
   });
 
   it("remove() leaving an arrow alone sets up its line editor", () => {
