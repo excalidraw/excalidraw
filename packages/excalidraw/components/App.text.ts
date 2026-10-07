@@ -370,7 +370,7 @@ export class AppText {
       autoSelect: !this.app.editorInterface.isTouchScreen,
     });
     // deselect all other elements when inserting text
-    this.app.deselectElements();
+    this.app.selection.clear();
     // (the linear element editor stays up, to come back to on submit — but
     // without the hover affordances, which are for the selection)
     if (this.app.state.selectedLinearElement) {

@@ -1,7 +1,5 @@
 import {
   CURSOR_TYPE,
-  DEFAULT_COLLISION_THRESHOLD,
-  DEFAULT_TRANSFORM_HANDLE_SPACING,
   DRAGGING_THRESHOLD,
   getGridPoint,
   isSelectionLikeTool,
@@ -70,12 +68,7 @@ export class AppSelectionTool {
 
   clearSelectionIfNotUsingSelection = (): void => {
     if (!isSelectionLikeTool(this.app.state.activeTool.type)) {
-      this.app.setState({
-        selectedElementIds: makeNextSelectedElementIds({}, this.app.state),
-        selectedGroupIds: {},
-        editingGroupId: null,
-        activeEmbeddable: null,
-      });
+      this.app.selection.clear();
     }
   };
 
@@ -345,13 +338,14 @@ export class AppSelectionTool {
         const hitElement = pointerDownState.hit.element;
         const someHitElementIsSelected =
           pointerDownState.hit.allHitElements.some((element) =>
-            this.isASelectedElement(element),
+            this.app.selection.isASelectedElement(element),
           ) ||
           // the selected linear element's point handles, midpoint knob and
           // label extend beyond its own hit area, so a hit reported by
           // `LinearElementEditor.handlePointerDown` counts even when the
           // position-based hit test above missed the element
-          (hitElement !== null && this.isASelectedElement(hitElement));
+          (hitElement !== null &&
+            this.app.selection.isASelectedElement(hitElement));
         if (
           (hitElement === null || !someHitElementIsSelected) &&
           !event.shiftKey &&
@@ -425,15 +419,7 @@ export class AppSelectionTool {
               this.app.state.editingGroupId &&
               !isElementInGroup(hitElement, this.app.state.editingGroupId)
             ) {
-              this.app.setState({
-                selectedElementIds: makeNextSelectedElementIds(
-                  {},
-                  this.app.state,
-                ),
-                selectedGroupIds: {},
-                editingGroupId: null,
-                activeEmbeddable: null,
-              });
+              this.app.selection.clear();
             }
 
             // Add hit element to selection. At this point if we're not holding
@@ -445,111 +431,7 @@ export class AppSelectionTool {
               !someHitElementIsSelected &&
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
-              this.app.setState((prevState) => {
-                let nextSelectedElementIds: { [id: string]: true } = {
-                  ...prevState.selectedElementIds,
-                  [hitElement.id]: true,
-                };
-
-                const previouslySelectedElements: ExcalidrawElement[] = [];
-
-                Object.keys(prevState.selectedElementIds).forEach((id) => {
-                  const element = this.app.scene.getElement(id);
-                  element && previouslySelectedElements.push(element);
-                });
-
-                // if hitElement is frame-like, deselect all of its elements
-                // if they are selected
-                if (isFrameLikeElement(hitElement)) {
-                  getFrameChildren(
-                    previouslySelectedElements,
-                    hitElement.id,
-                  ).forEach((element) => {
-                    delete nextSelectedElementIds[element.id];
-                  });
-                } else if (hitElement.frameId) {
-                  // if hitElement is in a frame and its frame has been selected
-                  // disable selection for the given element
-                  if (nextSelectedElementIds[hitElement.frameId]) {
-                    delete nextSelectedElementIds[hitElement.id];
-                  }
-                } else {
-                  // hitElement is neither a frame nor an element in a frame
-                  // but since hitElement could be in a group with some frames
-                  // this means selecting hitElement will have the frames selected as well
-                  // because we want to keep the invariant:
-                  // - frames and their elements are not selected at the same time
-                  // we deselect elements in those frames that were previously selected
-
-                  const groupIds = hitElement.groupIds;
-                  const framesInGroups = new Set(
-                    groupIds
-                      .flatMap((gid) =>
-                        getElementsInGroup(
-                          this.app.scene.getNonDeletedElements(),
-                          gid,
-                        ),
-                      )
-                      .filter((element) => isFrameLikeElement(element))
-                      .map((frame) => frame.id),
-                  );
-
-                  if (framesInGroups.size > 0) {
-                    previouslySelectedElements.forEach((element) => {
-                      if (
-                        element.frameId &&
-                        framesInGroups.has(element.frameId)
-                      ) {
-                        // deselect element and groups containing the element
-                        delete nextSelectedElementIds[element.id];
-                        element.groupIds
-                          .flatMap((gid) =>
-                            getElementsInGroup(
-                              this.app.scene.getNonDeletedElements(),
-                              gid,
-                            ),
-                          )
-                          .forEach((element) => {
-                            delete nextSelectedElementIds[element.id];
-                          });
-                      }
-                    });
-                  }
-                }
-
-                // Finally, in shape selection mode, we'd like to
-                // keep only one shape or group selected at a time.
-                // This means, if the hitElement is a different shape or group
-                // than the previously selected ones, we deselect the previous ones
-                // and select the hitElement
-                if (prevState.openDialog?.name === "elementLinkSelector") {
-                  if (
-                    !hitElement.groupIds.some(
-                      (gid) => prevState.selectedGroupIds[gid],
-                    )
-                  ) {
-                    nextSelectedElementIds = {
-                      [hitElement.id]: true,
-                    };
-                  }
-                }
-
-                return {
-                  ...selectGroupsForSelectedElements(
-                    {
-                      editingGroupId: prevState.editingGroupId,
-                      selectedElementIds: nextSelectedElementIds,
-                    },
-                    this.app.scene.getNonDeletedElements(),
-                    prevState,
-                    this.app,
-                  ),
-                  showHyperlinkPopup:
-                    hitElement.link || isEmbeddableElement(hitElement)
-                      ? "info"
-                      : false,
-                };
-              });
+              this.app.selection.add(hitElement);
               pointerDownState.hit.wasAddedToSelection = true;
             }
           }
@@ -844,31 +726,8 @@ export class AppSelectionTool {
         ? pointerDownState.hit.cycleTarget
         : null;
     if (cycleTarget) {
-      this.app.setState((prevState) => {
-        const nextState = selectGroupsForSelectedElements(
-          {
-            editingGroupId: prevState.editingGroupId,
-            selectedElementIds: { [cycleTarget.id]: true },
-          },
-          this.app.scene.getNonDeletedElements(),
-          prevState,
-          this.app,
-        );
-        return {
-          ...nextState,
-          selectedLinearElement:
-            isLinearElement(cycleTarget) &&
-            Object.keys(nextState.selectedElementIds).length === 1
-              ? prevState.selectedLinearElement?.elementId === cycleTarget.id
-                ? prevState.selectedLinearElement
-                : new LinearElementEditor(
-                    cycleTarget,
-                    this.app.scene.getNonDeletedElementsMap(),
-                  )
-              : null,
-          showHyperlinkPopup: false,
-        };
-      });
+      this.app.selection.select(cycleTarget);
+      this.app.setState({ showHyperlinkPopup: false });
     }
 
     if (
@@ -890,74 +749,12 @@ export class AppSelectionTool {
         !this.app.state.selectedLinearElement?.isEditing
       ) {
         if (this.app.state.selectedElementIds[hitElement.id]) {
-          if (isSelectedViaGroup(this.app.state, hitElement)) {
-            this.app.setState((_prevState) => {
-              const nextSelectedElementIds = {
-                ..._prevState.selectedElementIds,
-              };
-
-              // We want to unselect all groups hitElement is part of
-              // as well as all elements that are part of the groups
-              // hitElement is part of
-              for (const groupedElement of hitElement.groupIds.flatMap(
-                (groupId) =>
-                  getElementsInGroup(
-                    this.app.scene.getNonDeletedElements(),
-                    groupId,
-                  ),
-              )) {
-                delete nextSelectedElementIds[groupedElement.id];
-              }
-
-              return {
-                selectedGroupIds: {
-                  ..._prevState.selectedElementIds,
-                  ...hitElement.groupIds
-                    .map((gId) => ({ [gId]: false }))
-                    .reduce((prev, acc) => ({ ...prev, ...acc }), {}),
-                },
-                selectedElementIds: makeNextSelectedElementIds(
-                  nextSelectedElementIds,
-                  _prevState,
-                ),
-              };
-            });
+          if (
+            isSelectedViaGroup(this.app.state, hitElement) ||
             // if not dragging a linear element point (outside editor)
-          } else if (!this.app.state.selectedLinearElement?.isDragging) {
-            // remove element from selection while
-            // keeping prev elements selected
-
-            this.app.setState((prevState) => {
-              const newSelectedElementIds = {
-                ...prevState.selectedElementIds,
-              };
-              delete newSelectedElementIds[hitElement!.id];
-              const newSelectedElements = getSelectedElements(
-                this.app.scene.getNonDeletedElements(),
-                { selectedElementIds: newSelectedElementIds },
-              );
-
-              return {
-                ...selectGroupsForSelectedElements(
-                  {
-                    editingGroupId: prevState.editingGroupId,
-                    selectedElementIds: newSelectedElementIds,
-                  },
-                  this.app.scene.getNonDeletedElements(),
-                  prevState,
-                  this.app,
-                ),
-                // set selectedLinearElement only if thats the only element selected
-                selectedLinearElement:
-                  newSelectedElements.length === 1 &&
-                  isLinearElement(newSelectedElements[0])
-                    ? new LinearElementEditor(
-                        newSelectedElements[0],
-                        this.app.scene.getNonDeletedElementsMap(),
-                      )
-                    : prevState.selectedLinearElement,
-              };
-            });
+            !this.app.state.selectedLinearElement?.isDragging
+          ) {
+            this.app.selection.remove(hitElement);
           }
         } else if (
           hitElement.frameId &&
@@ -1013,27 +810,7 @@ export class AppSelectionTool {
           }));
         }
       } else {
-        this.app.setState((prevState) => ({
-          ...selectGroupsForSelectedElements(
-            {
-              editingGroupId: prevState.editingGroupId,
-              selectedElementIds: { [hitElement.id]: true },
-            },
-            this.app.scene.getNonDeletedElements(),
-            prevState,
-            this.app,
-          ),
-          selectedLinearElement:
-            isLinearElement(hitElement) &&
-            // Don't set `selectedLinearElement` if its same as the hitElement, this is mainly to prevent resetting the `hoverPointIndex` to -1.
-            // Future we should update the API to take care of setting the correct `hoverPointIndex` when initialized
-            prevState.selectedLinearElement?.elementId !== hitElement.id
-              ? new LinearElementEditor(
-                  hitElement,
-                  this.app.scene.getNonDeletedElementsMap(),
-                )
-              : prevState.selectedLinearElement,
-        }));
+        this.app.selection.select(hitElement);
       }
     }
 
@@ -1072,12 +849,7 @@ export class AppSelectionTool {
         this.app.actionManager.executeAction(actionToggleLinearEditor);
       } else {
         // Deselect selected elements
-        this.app.setState({
-          selectedElementIds: makeNextSelectedElementIds({}, this.app.state),
-          selectedGroupIds: {},
-          editingGroupId: null,
-          activeEmbeddable: null,
-        });
+        this.app.selection.clear();
       }
       // reset cursor
       this.app.cursor.set(CURSOR_TYPE.AUTO);
@@ -1107,36 +879,6 @@ export class AppSelectionTool {
       previousSelectedElementIds: this.app.state.selectedElementIds,
       selectedLinearElement: null,
     });
-  }
-
-  isASelectedElement(hitElement: ExcalidrawElement | null): boolean {
-    return (
-      hitElement != null && this.app.state.selectedElementIds[hitElement.id]
-    );
-  }
-
-  isHittingCommonBoundingBoxOfSelectedElements(
-    point: Readonly<{ x: number; y: number }>,
-    selectedElements: readonly ExcalidrawElement[],
-  ): boolean {
-    if (selectedElements.length < 2) {
-      return false;
-    }
-
-    // How many pixels off the shape boundary we still consider a hit
-    const threshold = Math.max(
-      DEFAULT_COLLISION_THRESHOLD / this.app.state.zoom.value,
-      1,
-    );
-    const boundsPadding =
-      (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / this.app.state.zoom.value;
-    const [x1, y1, x2, y2] = getCommonBounds(selectedElements);
-    return (
-      point.x > x1 - boundsPadding - threshold &&
-      point.x < x2 + boundsPadding + threshold &&
-      point.y > y1 - boundsPadding - threshold &&
-      point.y < y2 + boundsPadding + threshold
-    );
   }
 
   /** whether an alt-click on the selection (over other elements) cycles it */
