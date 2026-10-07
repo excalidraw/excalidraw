@@ -1078,7 +1078,9 @@ export const textWysiwyg = ({
 
     ownerWindow.removeEventListener("resize", updateWysiwygStyle);
     ownerWindow.removeEventListener("wheel", stopEvent, true);
-    ownerWindow.removeEventListener("pointerdown", onPointerDown);
+    ownerWindow.removeEventListener("pointerdown", onPointerDown, {
+      capture: true,
+    });
     ownerWindow.removeEventListener("pointerup", bindBlurEvent);
     ownerWindow.removeEventListener("blur", handleSubmit);
     ownerWindow.removeEventListener("beforeunload", handleSubmit);
@@ -1150,13 +1152,13 @@ export const textWysiwyg = ({
 
     // panning canvas
     if (event.button === POINTER_BUTTON.WHEEL) {
+      // before the pan starts: it focuses the container, blurring the editor
+      temporarilyDisableSubmit();
       // trying to pan by clicking inside text area itself -> handle here
       if (target instanceof ownerWindow.HTMLTextAreaElement) {
         event.preventDefault();
         app.pan.start(event);
       }
-
-      temporarilyDisableSubmit();
       return;
     }
 

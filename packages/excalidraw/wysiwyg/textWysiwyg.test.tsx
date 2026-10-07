@@ -1332,6 +1332,38 @@ describe("textWysiwyg", () => {
       editorBox.scrollTop = 0;
     });
 
+    it("should pan the canvas by a wheel-button drag on the editor and keep editing", async () => {
+      // (the editor takes pointer downs from the next frame on)
+      const nextFrame = () =>
+        act(() => new Promise((resolve) => requestAnimationFrame(resolve)));
+      await nextFrame();
+      // in a later editing session, which the earlier ones don't pan too
+      updateTextEditor(textarea, "Hello");
+      Keyboard.exitTextEditor(textarea);
+      Keyboard.keyPress(KEYS.ENTER);
+      textarea = await getTextEditor();
+      await nextFrame();
+      const { scrollX, scrollY } = h.state;
+
+      const pointer = {
+        pointerId: 1,
+        pointerType: "mouse",
+        button: 1,
+        buttons: 4,
+        clientX: 100,
+        clientY: 100,
+      };
+      fireEvent.pointerDown(textarea, pointer);
+      const moved = { ...pointer, clientX: 140, clientY: 120 };
+      fireEvent.pointerMove(window, moved);
+      fireEvent.pointerUp(window, { ...moved, buttons: 0 });
+
+      expect(h.state.scrollX).toBe(scrollX + 40);
+      expect(h.state.scrollY).toBe(scrollY + 20);
+      expect(h.state.editingTextElement?.id).toBe(textElement.id);
+      await waitFor(() => expect(document.activeElement).toBe(textarea));
+    });
+
     it("should keep the editor's box off a docked sidebar", () => {
       const editorBox = textarea.parentElement!;
       const sidebar = dockSidebar(500, 300);
