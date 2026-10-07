@@ -26,6 +26,7 @@ interface ButtonProps
 export const Button = ({
   type = "button",
   onSelect,
+  onClick,
   selected,
   children,
   className = "",
@@ -33,7 +34,7 @@ export const Button = ({
 }: ButtonProps) => {
   return (
     <button
-      onClick={composeEventHandlers(rest.onClick, (event) => {
+      onClick={composeEventHandlers(onClick, (event) => {
         onSelect();
       })}
       type={type}
