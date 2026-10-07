@@ -35,7 +35,6 @@ import {
   isStickyNoteElement,
   LinearElementEditor,
   makeNextSelectedElementIds,
-  selectGroupsForSelectedElements,
   transformElements,
   updateBoundElements,
 } from "@excalidraw/element";
@@ -52,6 +51,8 @@ import { actionToggleLinearEditor } from "../actions";
 import { getSelectedElements } from "../scene";
 
 import { snapResizingElements } from "../snapping";
+
+import { selectGroupsForSelectedElements } from "./App.selection";
 
 import type React from "react";
 import type { PointerDownState } from "../types";

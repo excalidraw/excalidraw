@@ -16,10 +16,7 @@ import {
 } from "@excalidraw/element";
 import { getFrameChildren } from "@excalidraw/element";
 
-import {
-  getElementsInGroup,
-  selectGroupsForSelectedElements,
-} from "@excalidraw/element";
+import { getElementsInGroup } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -31,6 +28,8 @@ import { TrashIcon } from "../components/icons";
 import { IconButton } from "../components/IconButton";
 
 import { useStylesPanelMode } from "../components/App";
+
+import { selectGroupsForSelectedElements } from "../components/App.selection";
 
 import { register } from "./register";
 

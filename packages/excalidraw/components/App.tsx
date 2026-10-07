@@ -191,7 +191,6 @@ import {
   getElementsInGroup,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
-  selectGroupsForSelectedElements,
   syncInvalidIndices,
   excludeElementsInFramesFromSelection,
   makeNextSelectedElementIds,
@@ -409,7 +408,11 @@ import { AppModifiers } from "./App.modifiers";
 import { AppPan } from "./App.pan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import { AppWheel } from "./App.wheel";
-import { AppSelection, getSelectionStateForElements } from "./App.selection";
+import {
+  AppSelection,
+  getSelectionStateForElements,
+  selectGroupsForSelectedElements,
+} from "./App.selection";
 import { AppSelectionTool } from "./App.selectionTool";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
