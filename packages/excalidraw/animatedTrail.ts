@@ -25,6 +25,7 @@ export interface AnimatedTrailOptions {
   fill: (trail: AnimatedTrail) => string;
   stroke?: (trail: AnimatedTrail) => string;
   animateTrail?: boolean;
+  persistent?: boolean;
 }
 
 export class AnimatedTrail implements Trail {
@@ -90,6 +91,14 @@ export class AnimatedTrail implements Trail {
 
     if (this.trailElement.parentNode !== this.container && this.container) {
       this.container.appendChild(this.trailElement);
+    }
+
+    if (this.options.persistent) {
+      // Static annotations only redraw on input or viewport changes.
+      if (!this.onFrame()) {
+        this.cleanup();
+      }
+      return;
     }
 
     if (!AnimationController.running(this.key)) {
@@ -166,11 +175,14 @@ export class AnimatedTrail implements Trail {
       paths.push(currentPath);
     }
 
-    this.pastTrails = this.pastTrails.filter(
-      (t) =>
-        t.getStrokeOutline(t.options.size / this.app.state.zoom.value)
-          .length !== 0,
-    );
+    // An empty outline must not expire a persistent stroke.
+    if (!this.options.persistent) {
+      this.pastTrails = this.pastTrails.filter(
+        (t) =>
+          t.getStrokeOutline(t.options.size / this.app.state.zoom.value)
+            .length !== 0,
+      );
+    }
 
     if (paths.length === 0) {
       // Clean up the SVG path if there are no trails to render
@@ -202,8 +214,10 @@ export class AnimatedTrail implements Trail {
   }
 
   private drawTrail(trail: LaserPointer, state: AppState): string {
+    const size = trail.options.size / state.zoom.value;
     const _stroke = trail
-      .getStrokeOutline(trail.options.size / state.zoom.value)
+      // LaserPointer culls dots and two-point strokes below a radius of 0.5.
+      .getStrokeOutline(this.options.persistent ? Math.max(0.5, size) : size)
       .map(([x, y]) => {
         const result = sceneCoordsToViewportCoords(
           { sceneX: x, sceneY: y },

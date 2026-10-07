@@ -9,6 +9,7 @@ import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
 import { MobileToolbar } from "./MobileToolbar";
+import { ClearAnnotationsButton } from "./ClearAnnotationsButton";
 import { FixedSideContainer } from "./FixedSideContainer";
 
 import { Island } from "./Island";
@@ -180,11 +181,27 @@ export const MobileMenu = ({
           />
 
           <Island className="App-toolbar">
-            {appState.openDialog?.name !== "elementLinkSelector" &&
-              renderToolbar()}
+            {appState.openDialog?.name !== "elementLinkSelector" && (
+              <>
+                <ClearAnnotationsButton isMobile />
+                {renderToolbar()}
+              </>
+            )}
           </Island>
         </div>
       )}
+
+      {defaultUIEnabled &&
+        appState.viewModeEnabled &&
+        appState.openDialog?.name !== "elementLinkSelector" && (
+          <div
+            className="App-bottom-bar"
+            style={{ marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN }}
+            data-viewport-ui="bottom"
+          >
+            <ClearAnnotationsButton isMobile />
+          </div>
+        )}
 
       {!shouldRenderDefaultBottomBar && scrollBackToContentButton && (
         <div className="floating-status-stack">{scrollBackToContentButton}</div>

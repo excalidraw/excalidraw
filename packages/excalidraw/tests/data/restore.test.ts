@@ -972,6 +972,24 @@ describe("restoreElements", () => {
 });
 
 describe("restoreAppState", () => {
+  it("resets the transient annotation mode on restore", () => {
+    const appState = getDefaultAppState();
+    appState.activeTool = {
+      ...appState.activeTool,
+      type: "laser",
+      customType: null,
+      laserPersistent: true,
+    };
+    for (const restored of [
+      restore.restoreAppState(appState, null),
+      restore.restoreAppState(null, appState),
+    ]) {
+      expect(restored.activeTool.type).toBe("selection");
+      expect(restored.activeTool.laserPersistent).toBe(false);
+      expect(restored.activeTool.lastActiveTool).toBeNull();
+    }
+  });
+
   it("should restore freedraw mode app state values", () => {
     expect(
       restore.restoreAppState(
