@@ -418,6 +418,7 @@ import { activeEyeDropperAtom } from "./EyeDropper";
 import { FileDropOverlay } from "./FileDropOverlay";
 import { ViewportStatusBorder } from "./ViewportStatusFrame/ViewportStatusFrame";
 import LayerUI from "./LayerUI";
+import { confirmLoadScene } from "./OverwriteConfirm/OverwriteConfirm";
 import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
 import Spinner from "./Spinner";
@@ -3563,25 +3564,6 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private initializeScene = async () => {
-    if (
-      "launchQueue" in this.ownerWindow &&
-      "LaunchParams" in this.ownerWindow
-    ) {
-      (this.ownerWindow as any).launchQueue.setConsumer(
-        async (launchParams: { files: any[] }) => {
-          if (!launchParams.files.length) {
-            return;
-          }
-          const fileHandle = launchParams.files[0];
-          const blob: Blob = await fileHandle.getFile();
-          this.loadFileToCanvas(
-            new File([blob], blob.name || "", { type: blob.type }),
-            fileHandle,
-          );
-        },
-      );
-    }
-
     if (this.props.theme) {
       this.setState({ theme: this.props.theme });
     }
@@ -3711,6 +3693,46 @@ class App extends React.Component<AppProps, AppState> {
         fit: "scale-down",
         animation: false,
       });
+    }
+
+    // Register after initialData is restored so a cold launch cannot replace
+    // the saved drawing before we can offer to back it up.
+    if (
+      !this.unmounted &&
+      "launchQueue" in this.ownerWindow &&
+      "LaunchParams" in this.ownerWindow
+    ) {
+      // LaunchQueue does not await async consumers. Keep subsequent launches
+      // from replacing a confirmation that is still awaiting the user.
+      let pendingLaunch = Promise.resolve();
+      (this.ownerWindow as any).launchQueue.setConsumer(
+        ({ files }: { files: readonly FileSystemFileHandle[] }) => {
+          pendingLaunch = pendingLaunch
+            .then(async () => {
+              if (!files.length || this.unmounted) {
+                return;
+              }
+              const fileHandle = files[0];
+              const file = await fileHandle.getFile();
+              if (
+                this.unmounted ||
+                (this.scene.getNonDeletedElements().length &&
+                  !(await confirmLoadScene()))
+              ) {
+                return;
+              }
+              if (!this.unmounted) {
+                await this.loadFileToCanvas(file, fileHandle);
+              }
+            })
+            .catch((error) => {
+              if (!this.unmounted) {
+                this.setState({ errorMessage: error.message });
+              }
+            });
+          return pendingLaunch;
+        },
+      );
     }
   };
 
