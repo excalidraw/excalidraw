@@ -347,7 +347,27 @@
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
+    "mathSymbols": "Math symbols",
     "convertElementType": "Toggle shape type"
+  },
+  "mathSymbols": {
+    "title": "Math symbols",
+    "searchPlaceholder": "Search, e.g. epsilon, sum, infinity",
+    "noResults": "No symbols found",
+    "expression": "Text to insert",
+    "expressionPlaceholder": "Pick symbols or type, e.g. ∀ε > 0 ∃δ > 0",
+    "insert": "Insert",
+    "categories": {
+      "greekLower": "Greek letters",
+      "greekUpper": "Greek capitals",
+      "operators": "Operators",
+      "relations": "Relations",
+      "calculus": "Calculus",
+      "setsAndLogic": "Sets & logic",
+      "arrows": "Arrows",
+      "scripts": "Superscripts, subscripts & fractions",
+      "misc": "Geometry & more"
+    }
   },
   "bucketfill": {
     "noRegion": "Couldn't find an enclosed region to fill here.",

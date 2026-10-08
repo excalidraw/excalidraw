@@ -1,0 +1,73 @@
+@use "../../css/variables.module" as *;
+
+.excalidraw {
+  .MathSymbolsDialog {
+    .Dialog__content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    &__categories {
+      max-height: 22rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      @include isMobile {
+        max-height: none;
+        flex: 1 1 auto;
+      }
+    }
+
+    &__empty {
+      padding: 1rem 0;
+      text-align: center;
+      color: var(--color-gray-50);
+    }
+
+    &__category-title {
+      margin: 0 0 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr));
+      gap: 0.25rem;
+    }
+
+    &__symbol {
+      height: 2.25rem;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+      line-height: 1;
+      border: 1px solid var(--default-border-color);
+      border-radius: var(--border-radius-md);
+      background-color: var(--island-bg-color);
+      color: var(--color-on-surface);
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--button-hover-bg);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: -1px;
+      }
+    }
+
+    &__footer {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+    }
+  }
+}
