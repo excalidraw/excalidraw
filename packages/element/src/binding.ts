@@ -1,5 +1,6 @@
 import {
   arrayToMap,
+  DEFAULT_ZOOM,
   getFeatureFlag,
   getGridPoint,
   invariant,
@@ -66,9 +67,9 @@ import {
   projectFixedPointOntoDiagonal,
 } from "./utils";
 
-import { isNonDeletedElement } from ".";
+import { Scene } from "./Scene";
 
-import type { Scene } from "./Scene";
+import { isNonDeletedElement } from ".";
 
 import type { ElementUpdate } from "./mutateElement";
 import type {
@@ -86,6 +87,7 @@ import type {
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
   Ordered,
+  OrderedExcalidrawElement,
   PointsPositionUpdates,
 } from "./types";
 
@@ -852,6 +854,21 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
   }
 
   // Handle normal cases
+  const orbitPoint =
+    hit && !pointInElement && !opts?.angleLocked && appState.gridModeEnabled
+      ? snapBoundPointToGrid(
+          pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+          hit,
+          elementsMap,
+          appState.gridSize as NullableGridSize,
+          arrow,
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            arrow,
+            startDragged ? 1 : -2,
+            elementsMap,
+          ),
+        )
+      : globalPoint;
   const current: BindingStrategy = hit
     ? pointInElement
       ? {
@@ -865,22 +882,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
           focusPoint:
             projectFixedPointOntoDiagonal(
               arrow,
-              opts?.angleLocked
-                ? globalPoint
-                : appState.gridModeEnabled
-                ? snapBoundPointToGrid(
-                    pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-                    hit,
-                    elementsMap,
-                    appState.gridSize as NullableGridSize,
-                    arrow,
-                    LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                      arrow,
-                      startDragged ? 1 : -2,
-                      elementsMap,
-                    ),
-                  )
-                : globalPoint,
+              orbitPoint,
               hit,
               startDragged ? "start" : "end",
               elementsMap,
@@ -888,7 +890,7 @@ const getBindingStrategyForDraggingBindingElementEndpoints_simple = (
               appState.isMidpointSnappingEnabled &&
                 !opts?.angleLocked &&
                 !appState.gridModeEnabled,
-            ) || globalPoint,
+            ) || orbitPoint,
         }
     : { mode: null };
 
@@ -1200,15 +1202,17 @@ export const unbindBindingElement = (
     arrow[startOrEnd === "start" ? "endBinding" : "startBinding"];
   if (!oppositeBinding || oppositeBinding.elementId !== binding.elementId) {
     // Only remove the record on the bound element if the other
-    // end is not bound to the same element
+    // end is not bound to the same element.
     const boundElement = scene
-      .getNonDeletedElementsMap()
-      .get(binding.elementId) as NonDeleted<ExcalidrawBindableElement>;
-    scene.mutateElement(boundElement, {
-      boundElements: boundElement.boundElements?.filter(
-        (element) => element.id !== arrow.id,
-      ),
-    });
+      .getElementsMapIncludingDeleted()
+      .get(binding.elementId);
+    if (boundElement && !boundElement.isDeleted) {
+      scene.mutateElement(boundElement, {
+        boundElements: boundElement.boundElements?.filter(
+          (element) => element.id !== arrow.id,
+        ),
+      });
+    }
   }
 
   scene.mutateElement(arrow, { [field]: null });
@@ -2318,6 +2322,137 @@ export const fixDuplicatedBindingsAfterDuplication = (
   }
 };
 
+export const repairBindings = (
+  elements: readonly ExcalidrawElement[],
+): OrderedExcalidrawElement[] => {
+  const scene = new Scene(
+    elements.map((element) => ({ ...element })),
+    { skipValidation: true },
+  );
+  const elementsMap = scene.getNonDeletedElementsMap();
+  const liveElements = scene.getNonDeletedElements();
+  const arrows = liveElements.filter(isArrowElement);
+  const update = (
+    element: ExcalidrawElement,
+    updates: ElementUpdate<ExcalidrawElement>,
+  ) => scene.mutateElement(element, updates);
+
+  // arrow side: drop bindings to non-bindable or missing targets, record the
+  // arrow on the remaining ones
+  for (const arrow of arrows) {
+    for (const bindingProp of ["startBinding", "endBinding"] as const) {
+      const binding = arrow[bindingProp];
+      const target = binding && elementsMap.get(binding.elementId);
+      if (target && !isBindableElement(target)) {
+        scene.mutateElement(arrow, { [bindingProp]: null });
+      }
+    }
+    BoundElement.rebindAffected(elementsMap, arrow, update);
+  }
+
+  // target side: drop duplicate records and those of elements that do not
+  // bind back
+  for (const element of liveElements) {
+    if (!isBindableElement(element) || !element.boundElements) {
+      continue;
+    }
+    const seen = new Set<ExcalidrawElement["id"]>();
+    const boundElements = element.boundElements.filter(({ id }) => {
+      if (seen.has(id)) {
+        return false;
+      }
+      seen.add(id);
+      const bound = elementsMap.get(id) ?? null;
+      return isArrowElement(bound)
+        ? bound.startBinding?.elementId === element.id ||
+            bound.endBinding?.elementId === element.id
+        : isTextElement(bound) && bound.containerId === element.id;
+    });
+    if (boundElements.length !== element.boundElements.length) {
+      update(element, { boundElements });
+    }
+  }
+
+  for (const arrow of arrows) {
+    for (const startOrEnd of ["start", "end"] as const) {
+      const binding = arrow[`${startOrEnd}Binding`];
+      const target = binding
+        ? elementsMap.get(binding.elementId) ?? null
+        : null;
+      if (!binding || !isBindableElement(target)) {
+        continue;
+      }
+
+      // complete bindings are kept (normalized), incomplete ones are
+      // re-derived from the current endpoint (elbow arrows only ever orbit)
+      const isValidMode = ["inside", "orbit", "skip"].includes(binding.mode);
+      if (
+        isFixedPoint(binding.fixedPoint) &&
+        (isElbowArrow(arrow) ? binding.mode === "orbit" : isValidMode)
+      ) {
+        const fixedPoint = normalizeFixedPoint(binding.fixedPoint);
+        if (
+          fixedPoint[0] !== binding.fixedPoint[0] ||
+          fixedPoint[1] !== binding.fixedPoint[1]
+        ) {
+          scene.mutateElement(arrow, {
+            [`${startOrEnd}Binding`]: { ...binding, fixedPoint },
+          });
+        }
+        continue;
+      }
+
+      const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        arrow,
+        startOrEnd === "start" ? 0 : -1,
+        elementsMap,
+      );
+      const mode = isValidMode
+        ? binding.mode
+        : !isElbowArrow(arrow) && isPointInElement(point, target, elementsMap)
+        ? "inside"
+        : "orbit";
+
+      bindBindingElement(
+        arrow,
+        target,
+        mode,
+        startOrEnd,
+        scene,
+        DEFAULT_ZOOM,
+        point,
+      );
+    }
+
+    if (isElbowArrow(arrow)) {
+      scene.mutateElement(arrow, {});
+    }
+
+    // snap bound endpoints onto the target outline
+    const pointUpdates: PointsPositionUpdates = new Map();
+    for (const bindingProp of ["startBinding", "endBinding"] as const) {
+      const binding = arrow[bindingProp];
+      const target = binding
+        ? elementsMap.get(binding.elementId) ?? null
+        : null;
+      const point =
+        isBindableElement(target) &&
+        updateBoundPoint(arrow, bindingProp, binding, target, elementsMap);
+      if (point) {
+        pointUpdates.set(
+          bindingProp === "startBinding" ? 0 : arrow.points.length - 1,
+          { point },
+        );
+      }
+    }
+    if (pointUpdates.size) {
+      LinearElementEditor.movePoints(arrow, scene, pointUpdates);
+    }
+  }
+
+  return scene.getElementsIncludingDeleted() as OrderedExcalidrawElement[];
+};
+
 export const fixBindingsAfterDeletion = (
   sceneElements: readonly ExcalidrawElement[],
   deletedElements: readonly ExcalidrawElement[],
@@ -2339,11 +2474,11 @@ const newBoundElements = (
   idsToRemove: Set<ExcalidrawElement["id"]>,
   elementsToAdd: Array<ExcalidrawElement> = [],
 ) => {
-  if (!boundElements) {
+  if (!boundElements && !elementsToAdd.length) {
     return null;
   }
 
-  const nextBoundElements = boundElements.filter(
+  const nextBoundElements = (boundElements ?? []).filter(
     (boundElement) => !idsToRemove.has(boundElement.id),
   );
 
