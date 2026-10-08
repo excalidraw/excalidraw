@@ -8,6 +8,8 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "../app_constants";
 
+import { syncBrowserStateVersion } from "./tabSync";
+
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
     localStorage.setItem(
@@ -39,6 +41,9 @@ export const importFromLocalStorage = () => {
   let savedState = null;
 
   try {
+    // read the version before the data so that if another tab saves
+    // in between, we're considered stale rather than up to date
+    syncBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
     savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
   } catch (error: any) {
