@@ -8,6 +8,7 @@ import { Scene } from "../src/Scene";
 
 import type {
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   FixedPointBinding,
 } from "../src/types";
@@ -53,6 +54,8 @@ const elbow = (
   to: [number, number],
   extra: Partial<ExcalidrawArrowElement> = {},
 ) => arrow(id, from, to, { ...extra, elbowed: true });
+
+const P = (x: number, y: number) => pointFrom<LocalPoint>(x, y);
 
 /** every segment of an elbow arrow must be horizontal or vertical */
 const isOrthogonal = (element: ExcalidrawArrowElement) =>
@@ -390,25 +393,54 @@ describe("repairBindings", () => {
       expect(x.endBinding.fixedPoint).toHaveLength(2);
     });
 
-    it("reroutes orthogonally to a moved target", () => {
-      const { x } = byId(
-        repairBindings([
-          rect("a", 1000, { y: 200 }),
-          elbow("x", [300, 50], [102, 50], {
-            endBinding: {
-              elementId: "a",
-              mode: "orbit",
-              fixedPoint: [0, 0.5001],
-            },
-          }),
-        ]),
-      );
+    it.each([
+      ["empty", []],
+      // the normalized form of no fixed segments
+      ["null", null],
+      ["pinned", [{ index: 2, start: P(100, 0), end: P(100, 200) }]],
+    ] as const)(
+      "reroutes orthogonally to a moved target with %s fixed segments",
+      (_, fixedSegments) => {
+        const { x } = byId(
+          repairBindings([
+            rect("a", 1000, { y: 200 }),
+            elbow("x", [300, 50], [500, 250], {
+              points: [P(0, 0), P(100, 0), P(100, 200), P(200, 200)],
+              fixedSegments,
+              endBinding: {
+                elementId: "a",
+                mode: "orbit",
+                fixedPoint: [0, 0.5001],
+              },
+            } as Partial<ExcalidrawElbowArrowElement>),
+          ]),
+        );
 
-      // elbow arrows end exactly at their fixed point
-      const [endX, endY] = x.points[x.points.length - 1];
-      expect(x.x + endX).toBeCloseTo(1000, 0);
-      expect(x.y + endY).toBeCloseTo(250, 0);
-      expect(isOrthogonal(x)).toBe(true);
+        // elbow arrows end exactly at their fixed point
+        const [endX, endY] = x.points[x.points.length - 1];
+        expect(x.x + endX).toBeCloseTo(1000, 0);
+        expect(x.y + endY).toBeCloseTo(250, 0);
+        expect(isOrthogonal(x)).toBe(true);
+        expect(x.fixedSegments ?? []).toHaveLength(fixedSegments?.length ?? 0);
+      },
+    );
+
+    it("does not mutate the fixed segments of the input", () => {
+      // collinear with the previous segment, so normalization merges them
+      const segment = Object.freeze({
+        index: 2,
+        start: P(40, 0),
+        end: P(80, 0),
+      });
+      const input = elbow("x", [0, 0], [200, 100], {
+        points: [P(0, 0), P(40, 0), P(80, 0), P(80, 100), P(200, 100)],
+        fixedSegments: [segment],
+      } as Partial<ExcalidrawElbowArrowElement>);
+      const snapshot = JSON.stringify(input);
+
+      repairBindings([input]);
+
+      expect(JSON.stringify(input)).toBe(snapshot);
     });
 
     it("drops a dangling binding and keeps the route orthogonal", () => {

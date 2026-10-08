@@ -2424,6 +2424,10 @@ export const repairBindings = (
       );
     }
 
+    if (isElbowArrow(arrow)) {
+      scene.mutateElement(arrow, {});
+    }
+
     // snap bound endpoints onto the target outline
     const pointUpdates: PointsPositionUpdates = new Map();
     for (const bindingProp of ["startBinding", "endBinding"] as const) {
@@ -2441,10 +2445,7 @@ export const repairBindings = (
         );
       }
     }
-    if (isElbowArrow(arrow)) {
-      // an empty update re-routes the elbow arrow to its bindings
-      scene.mutateElement(arrow, {});
-    } else if (pointUpdates.size) {
+    if (pointUpdates.size) {
       LinearElementEditor.movePoints(arrow, scene, pointUpdates);
     }
   }
