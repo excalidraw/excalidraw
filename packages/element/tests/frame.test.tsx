@@ -551,6 +551,20 @@ describe("adding elements to frames", () => {
   describe("resizing frame over elements", async () => {
     await commonTestCases(resizeFrameOverElement);
 
+    it("should preserve element geometry when resizing a frame over it", async () => {
+      API.setElements([frame, rect2]);
+
+      const { x, y, width, height } = rect2;
+
+      resizeFrameOverElement(frame, rect2);
+
+      expect(rect2.x).toBe(x);
+      expect(rect2.y).toBe(y);
+      expect(rect2.width).toBe(width);
+      expect(rect2.height).toBe(height);
+      expect(rect2.frameId).toBe(frame.id);
+    });
+
     it.skip("resizing over text containers and labelled arrows", async () => {
       await resizingTest(
         "rectangle",
