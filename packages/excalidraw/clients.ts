@@ -16,7 +16,8 @@ import type {
 
 function hashToInteger(id: string) {
   let hash = 0;
-  if (id.length === 0) {
+  // guard against non-string ids coming from untrusted collaborator data
+  if (typeof id !== "string" || id.length === 0) {
     return hash;
   }
   for (let i = 0; i < id.length; i++) {
@@ -47,7 +48,8 @@ export const getClientColor = (
  */
 export const getNameInitial = (name?: string | null) => {
   // first char can be a surrogate pair, hence using codePointAt
-  const firstCodePoint = name?.trim()?.codePointAt(0);
+  const firstCodePoint =
+    typeof name === "string" ? name.trim().codePointAt(0) : undefined;
   return (
     firstCodePoint ? String.fromCodePoint(firstCodePoint) : "?"
   ).toUpperCase();

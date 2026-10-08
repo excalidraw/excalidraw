@@ -87,6 +87,8 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
+  BindMode,
+  BoundElement,
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawArrowElement,
@@ -96,8 +98,11 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawSelectionElement,
   ExcalidrawTextElement,
+  FixedPoint,
   FixedPointBinding,
+  FixedSegment,
   FontFamilyValues,
+  GroupId,
   NonDeleted,
   NonDeletedSceneElementsMap,
   OrderedExcalidrawElement,
@@ -264,6 +269,137 @@ const restoreStrokeVariability = (
     : defaultValue;
 };
 
+// Per-element cap for `version`. Scene versions are summed across elements
+// (`getSceneVersion`), so this keeps the sum exactly representable (and +1
+// bumps effective) for up to ~4M elements (MAX_SAFE_INTEGER / 2^31). No
+// legitimate element comes close: each version bump is one user edit.
+export const MAX_ELEMENT_VERSION = 2 ** 31 - 1;
+
+// Guards against malicious/corrupted versions (e.g. 1e300, NaN, strings)
+// which would otherwise dominate the scene version and freeze collab sync.
+const normalizeElementVersion = (version: unknown): number => {
+  if (!isFiniteNumber(version) || version < 1) {
+    return 1;
+  }
+  return Math.min(Math.floor(version), MAX_ELEMENT_VERSION);
+};
+
+// versionNonce is a 31-bit random int (`randomInteger()`); accept any 32-bit
+// signed integer and fall back to 0 otherwise.
+const normalizeElementVersionNonce = (versionNonce: unknown): number => {
+  return Number.isInteger(versionNonce) &&
+    (versionNonce as number) >= -(2 ** 31) &&
+    (versionNonce as number) < 2 ** 31
+    ? (versionNonce as number)
+    : 0;
+};
+
+// Future timestamps would keep deleted elements syncing (and persisting)
+// indefinitely, so clamp them to now.
+const normalizeElementUpdated = (updated: unknown): number => {
+  if (!isFiniteNumber(updated)) {
+    return getUpdatedTimestamp();
+  }
+  return Math.min(updated, Date.now());
+};
+
+// Non-array or non-string groupIds (e.g. from a malicious peer) crash group
+// selection. Order is meaningful (innermost group first), so keep it as is.
+const normalizeElementGroupIds = (groupIds: unknown): GroupId[] => {
+  if (!Array.isArray(groupIds)) {
+    return [];
+  }
+  return groupIds.filter(
+    (groupId): groupId is GroupId =>
+      typeof groupId === "string" && groupId.length > 0,
+  );
+};
+
+// Non-number opacity (e.g. an object from a malicious peer) gets rendered as
+// a React child by the opacity slider and crashes the editor on selection.
+const normalizeElementOpacity = (opacity: unknown): number => {
+  return isFiniteNumber(opacity)
+    ? clamp(opacity, 0, 100)
+    : DEFAULT_ELEMENT_PROPS.opacity;
+};
+
+// Non-array boundElements (e.g. from a malicious peer) crash rendering, which
+// calls `.find`/`.some`/`.filter` on it. Keep only well-formed entries, and
+// copy them so no unknown props leak through. Legacy `boundElementIds` are
+// migrated to arrow bindings when valid.
+const normalizeBoundElements = (
+  boundElements: unknown,
+  boundElementIds: unknown,
+): BoundElement[] => {
+  if (Array.isArray(boundElementIds)) {
+    return boundElementIds
+      .filter((id): id is string => typeof id === "string" && id.length > 0)
+      .map((id) => ({ type: "arrow", id }));
+  }
+  if (!Array.isArray(boundElements)) {
+    return [];
+  }
+  return boundElements
+    .filter(
+      (binding): binding is BoundElement =>
+        !!binding &&
+        typeof binding === "object" &&
+        (binding.type === "arrow" || binding.type === "text") &&
+        typeof binding.id === "string" &&
+        binding.id.length > 0,
+    )
+    .map(({ type, id }) => ({ type, id }));
+};
+
+// Malformed fixedSegments (e.g. a string or an array of junk from a malicious
+// peer) crash rendering (`.map`) and elbow arrow routing. Segment `index` N
+// is the segment between points[N - 1] and points[N]; the first (1) and last
+// (points.length - 1) segments can never be fixed. The elbow arrow code also
+// assumes fixed segments are axis-aligned, sorted by index and unique (e.g.
+// segment release looks up neighbors by array position), so enforce that.
+// Entries are copied so no unknown props leak through.
+const normalizeFixedSegments = (
+  fixedSegments: unknown,
+  points: readonly LocalPoint[],
+): FixedSegment[] | null => {
+  if (!Array.isArray(fixedSegments) || points.length < 4) {
+    return null;
+  }
+
+  const byIndex = new Map<number, FixedSegment>();
+  for (const segment of fixedSegments) {
+    if (
+      !segment ||
+      typeof segment !== "object" ||
+      !isValidPoint(segment.start) ||
+      !isValidPoint(segment.end) ||
+      !Number.isInteger(segment.index) ||
+      segment.index < 2 ||
+      segment.index > points.length - 2 ||
+      // must be either horizontal or vertical
+      (segment.start[0] !== segment.end[0] &&
+        segment.start[1] !== segment.end[1]) ||
+      byIndex.has(segment.index)
+    ) {
+      continue;
+    }
+    byIndex.set(segment.index, {
+      start: pointFrom<LocalPoint>(segment.start[0], segment.start[1]),
+      end: pointFrom<LocalPoint>(segment.end[0], segment.end[1]),
+      index: segment.index,
+    });
+  }
+
+  if (byIndex.size === 0) {
+    return null;
+  }
+
+  return [...byIndex.values()].sort((a, b) => a.index - b.index);
+};
+
+const normalizeElbowArrowIsSpecial = (isSpecial: unknown): boolean | null =>
+  typeof isSpecial === "boolean" ? isSpecial : null;
+
 const getStrokeWidthKey = (strokeWidth: unknown): StrokeWidthKey | null => {
   return isFiniteNumber(strokeWidth)
     ? STROKE_WIDTH_KEYS.find((key) => STROKE_WIDTH[key] === strokeWidth) ?? null
@@ -295,16 +431,33 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
+const BIND_MODES: readonly BindMode[] = ["inside", "orbit", "skip"];
+
+const normalizeBindMode = (mode: unknown): BindMode =>
+  BIND_MODES.includes(mode as BindMode) ? (mode as BindMode) : "orbit";
+
+// Malformed bindings (e.g. a string, or an object without a valid `elementId`
+// from a malicious peer) end up as bindings to nonexistent elements, which
+// crash arrow interactions.
+const isBindingLike = (
+  binding: unknown,
+): binding is { elementId: string; fixedPoint?: unknown; mode?: unknown } =>
+  !!binding &&
+  typeof binding === "object" &&
+  !Array.isArray(binding) &&
+  typeof (binding as { elementId?: unknown }).elementId === "string" &&
+  (binding as { elementId: string }).elementId.length > 0;
+
 const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,
-  binding: FixedPointBinding | null,
+  binding: unknown,
   targetElementsMap: Readonly<ElementsMap>,
   /** used for context (arrow bindings) */
   existingElementsMap: Readonly<ElementsMap> | null | undefined,
   startOrEnd: "start" | "end",
 ): FixedPointBinding | null => {
   try {
-    if (!binding) {
+    if (!isBindingLike(binding)) {
       return null;
     }
 
@@ -313,15 +466,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     // ---------------------------------------------------------------------------
 
     if (isElbowArrow(element)) {
-      const fixedPointBinding:
-        | ExcalidrawElbowArrowElement["startBinding"]
-        | ExcalidrawElbowArrowElement["endBinding"] = {
-        ...binding,
-        fixedPoint: normalizeFixedPoint(binding.fixedPoint),
-        mode: binding.mode || "orbit",
+      return {
+        elementId: binding.elementId,
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint as FixedPoint),
+        mode: normalizeBindMode(binding.mode),
       };
-
-      return fixedPointBinding;
     }
 
     // ---------------------------------------------------------------------------
@@ -334,14 +483,11 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     if (binding.mode) {
       // if latest binding schema, don't check if binding.elementId exists
       // (it's done in a separate pass)
-      if (binding.elementId) {
-        return {
-          elementId: binding.elementId,
-          mode: binding.mode,
-          fixedPoint: normalizeFixedPoint(binding.fixedPoint),
-        } as FixedPointBinding | null;
-      }
-      return null;
+      return {
+        elementId: binding.elementId,
+        mode: normalizeBindMode(binding.mode),
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint as FixedPoint),
+      };
     }
 
     // binding schema v1 (legacy) -> attempt to migrate to v2
@@ -450,8 +596,8 @@ const restoreElementWithProperties = <
     type: extra.type || element.type,
     // all elements must have version > 0 so getSceneVersion() will pick up
     // newly added elements
-    version: element.version || 1,
-    versionNonce: element.versionNonce ?? 0,
+    version: normalizeElementVersion(element.version),
+    versionNonce: normalizeElementVersionNonce(element.versionNonce),
     index: element.index ?? null,
     isDeleted: element.isDeleted ?? false,
     id: element.id || randomId(),
@@ -459,8 +605,7 @@ const restoreElementWithProperties = <
     strokeWidth: element.strokeWidth || DEFAULT_ELEMENT_PROPS.strokeWidth,
     strokeStyle: element.strokeStyle ?? DEFAULT_ELEMENT_PROPS.strokeStyle,
     roughness: element.roughness ?? DEFAULT_ELEMENT_PROPS.roughness,
-    opacity:
-      element.opacity == null ? DEFAULT_ELEMENT_PROPS.opacity : element.opacity,
+    opacity: normalizeElementOpacity(element.opacity),
     angle: element.angle || (0 as Radians),
     x: extra.x ?? element.x ?? 0,
     y: extra.y ?? element.y ?? 0,
@@ -470,7 +615,7 @@ const restoreElementWithProperties = <
     width: element.width || 0,
     height: element.height || 0,
     seed: element.seed ?? 1,
-    groupIds: element.groupIds ?? [],
+    groupIds: normalizeElementGroupIds(element.groupIds),
     frameId: element.frameId ?? null,
     roundness: element.roundness
       ? element.roundness
@@ -483,10 +628,11 @@ const restoreElementWithProperties = <
             : ROUNDNESS.PROPORTIONAL_RADIUS,
         }
       : null,
-    boundElements: element.boundElementIds
-      ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
-      : element.boundElements ?? [],
-    updated: element.updated ?? getUpdatedTimestamp(),
+    boundElements: normalizeBoundElements(
+      element.boundElements,
+      element.boundElementIds,
+    ),
+    updated: normalizeElementUpdated(element.updated),
     created: element.created ?? null,
     link: element.link ? normalizeLink(element.link) : null,
     locked: element.locked ?? false,
@@ -703,12 +849,14 @@ export const restoreElement = (
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
             ...base,
             elbowed: true,
-            fixedSegments:
-              element.fixedSegments?.length && base.points.length >= 4
-                ? element.fixedSegments
-                : null,
-            startIsSpecial: element.startIsSpecial,
-            endIsSpecial: element.endIsSpecial,
+            fixedSegments: normalizeFixedSegments(
+              element.fixedSegments,
+              base.points,
+            ),
+            startIsSpecial: normalizeElbowArrowIsSpecial(
+              element.startIsSpecial,
+            ),
+            endIsSpecial: normalizeElbowArrowIsSpecial(element.endIsSpecial),
           })
         : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
 
@@ -957,13 +1105,19 @@ export const restoreElements = <T extends ExcalidrawElement>(
 ): CombineBrandsIfNeeded<T, OrderedExcalidrawElement> => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
-  const targetElementsMap = arrayToMap(targetElements || []);
+  // guard against malformed input (non-array, null or primitive entries)
+  targetElements = Array.isArray(targetElements)
+    ? targetElements.filter(
+        (element) => element !== null && typeof element === "object",
+      )
+    : [];
+  const targetElementsMap = arrayToMap(targetElements);
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
 
   const restoredElements = syncInvalidIndices(
-    (targetElements || []).reduce((elements, element) => {
+    targetElements.reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
       if (element.type === "selection") {
