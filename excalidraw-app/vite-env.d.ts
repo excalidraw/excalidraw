@@ -38,6 +38,12 @@ interface ImportMetaEnv {
 
   VITE_APP_GIT_SHA: string;
 
+  // Optional Google Drive integration. Empty string disables the feature.
+  // All three are public credentials (no client secret in browser apps).
+  VITE_APP_GOOGLE_CLIENT_ID: string;
+  VITE_APP_GOOGLE_API_KEY: string;
+  VITE_APP_GOOGLE_APP_ID: string;
+
   MODE: string;
 
   DEV: string;

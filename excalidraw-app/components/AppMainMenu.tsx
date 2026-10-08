@@ -2,6 +2,7 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  GoogleDriveIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 import { MainMenu } from "@excalidraw/excalidraw/index";
@@ -20,6 +21,7 @@ export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
   isCollaborating: boolean;
   isCollabEnabled: boolean;
+  isDriveFileActive: boolean;
   theme: Theme | "system";
   refresh: () => void;
 }> = React.memo((props) => {
@@ -27,7 +29,14 @@ export const AppMainMenu: React.FC<{
   return (
     <MainMenu>
       <MainMenu.DefaultItems.LoadScene />
-      <MainMenu.DefaultItems.SaveToActiveFile />
+      {props.isDriveFileActive ? (
+        <MainMenu.DefaultItems.SaveToActiveFile
+          icon={GoogleDriveIcon}
+          label={t("googleDrive.saveMenuLabel")}
+        />
+      ) : (
+        <MainMenu.DefaultItems.SaveToActiveFile />
+      )}
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
       {props.isCollabEnabled && (

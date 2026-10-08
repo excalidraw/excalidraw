@@ -11,7 +11,12 @@ import { ProjectName } from "../components/ProjectName";
 import { Toast } from "../components/Toast";
 import { IconButton } from "../components/IconButton";
 import { Tooltip } from "../components/Tooltip";
-import { ExportIcon, questionCircle, saveAs } from "../components/icons";
+import {
+  ExportIcon,
+  LoadIcon,
+  questionCircle,
+  saveAs,
+} from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
@@ -258,11 +263,17 @@ export const actionSaveToActiveFile = register({
   predicate: (elements, appState, props, app) => {
     return (
       !!app.props.UIOptions.canvasActions.saveToActiveFile &&
-      !!appState.fileHandle &&
+      (!!appState.fileHandle || !!app.props.onSaveToActiveFile) &&
       !appState.viewModeEnabled
     );
   },
   perform: async (elements, appState, value, app) => {
+    // a cloud-backed document has no local file handle, so let the host save it
+    if (!appState.fileHandle && app.props.onSaveToActiveFile) {
+      await app.props.onSaveToActiveFile();
+      return false;
+    }
+
     if (onExportInProgress) {
       return false;
     }
@@ -426,6 +437,24 @@ export const actionLoadScene = register({
     }
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.O,
+});
+
+export const actionOpenFromCloud = register({
+  name: "openFromCloud",
+  label: "buttons.openFromCloud",
+  icon: LoadIcon,
+  trackEvent: { category: "menu" },
+  predicate: (_elements, appState, _props, app) => {
+    return (
+      !!app.props.onOpenFromCloud &&
+      !!app.props.UIOptions.canvasActions.openFromCloud &&
+      !appState.viewModeEnabled
+    );
+  },
+  perform: async (_elements, _appState, _value, app) => {
+    await app.props.onOpenFromCloud?.();
+    return false as const;
+  },
 });
 
 export const actionExportWithDarkMode = register<
