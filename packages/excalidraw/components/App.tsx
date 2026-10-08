@@ -579,6 +579,11 @@ const YOUTUBE_VIDEO_STATES = new Map<
   ValueOf<typeof YOUTUBE_STATES>
 >();
 
+/**
+ * Google Drive embeds already reloaded with autoplay
+ */
+const GOOGLE_DRIVE_AUTOPLAYED = new WeakSet<HTMLIFrameElement>();
+
 const MAX_EMBEDDABLE_VIEWPORT_SCALE = 4;
 
 let lastPointerUp: (() => void) | null = null;
@@ -1690,6 +1695,22 @@ class App extends React.Component<AppProps, AppState> {
         }),
         "*",
       );
+    }
+
+    // Drive's player has no postMessage API, but its preview page honors
+    // `autoplay=1`, so reload the embed with it on first activation.
+    // `location.replace` keeps the reload out of the session history and
+    // leaves `src` alone, so a remounted iframe doesn't autoplay.
+    if (
+      iframe.src.startsWith("https://drive.google.com/file/d/") &&
+      // we can't update unconditionally, since
+      // change src reloads the iframe
+      !GOOGLE_DRIVE_AUTOPLAYED.has(iframe)
+    ) {
+      GOOGLE_DRIVE_AUTOPLAYED.add(iframe);
+      const url = new URL(iframe.src);
+      url.searchParams.set("autoplay", "1");
+      iframe.contentWindow.location.replace(url.toString());
     }
 
     return true;
