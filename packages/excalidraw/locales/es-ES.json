@@ -689,7 +689,7 @@
     "retry": "Reintentar",
     "errors": {
       "promptTooShort": "El mensaje es demasiado corto (mínimo {{min}} caracteres)",
-      "promptTooLong": "El mensaje es demasiado largo (máximo {{mix}} caracteres)",
+      "promptTooLong": "El mensaje es demasiado largo (máximo {{max}} caracteres)",
       "generationFailed": "Generación fallida",
       "invalidDiagram": "Se generó un diagrama inválido :(. Puedes editarlo manualmente, intentar nuevamente con la corrección automática o probar con otro mensaje.",
       "fixInMermaid": "Editar Mermaid manualmente →",
