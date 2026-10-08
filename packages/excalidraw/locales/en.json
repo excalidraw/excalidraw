@@ -314,8 +314,7 @@
     },
     "libraryElementTypeError": {
       "embeddable": "Embeddable elements cannot be added to the library.",
-      "iframe": "IFrame elements cannot be added to the library.",
-      "image": "Support for adding images to the library coming soon!"
+      "iframe": "IFrame elements cannot be added to the library."
     },
     "asyncPasteFailedOnRead": "Couldn't paste (couldn't read from system clipboard).",
     "asyncPasteFailedOnParse": "Couldn't paste.",

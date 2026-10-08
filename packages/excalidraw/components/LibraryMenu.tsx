@@ -27,6 +27,8 @@ import { trackEvent } from "../analytics";
 import { useUIAppState } from "../context/ui-appState";
 import {
   distributeLibraryItemsOnSquareGrid,
+  getFilesForElements,
+  getLibraryItemsFiles,
   libraryItemsAtom,
 } from "../data/library";
 import { atom, useAtom } from "../editor-jotai";
@@ -52,6 +54,7 @@ import type {
   ExcalidrawProps,
   UIAppState,
   AppClassProperties,
+  BinaryFiles,
 } from "../types";
 import type Library from "../data/library";
 
@@ -71,6 +74,7 @@ const LibraryMenuContent = memo(
     library,
     id,
     theme,
+    files,
     selectedItems,
     onSelectItems,
   }: {
@@ -82,6 +86,7 @@ const LibraryMenuContent = memo(
     library: Library;
     id: string;
     theme: UIAppState["theme"];
+    files: BinaryFiles;
     selectedItems: LibraryItem["id"][];
     onSelectItems: (id: LibraryItem["id"][]) => void;
   }) => {
@@ -101,10 +106,12 @@ const LibraryMenuContent = memo(
               });
             }
           }
+          const itemFiles = getFilesForElements(processedElements, files);
           const nextItems: LibraryItems = [
             {
               status: "unpublished",
               elements: processedElements,
+              ...(Object.keys(itemFiles).length ? { files: itemFiles } : {}),
               id: randomId(),
               created: Date.now(),
             },
@@ -117,7 +124,13 @@ const LibraryMenuContent = memo(
         };
         addToLibrary(elements, libraryItemsData.libraryItems);
       },
-      [onAddToLibrary, library, setAppState, libraryItemsData.libraryItems],
+      [
+        onAddToLibrary,
+        library,
+        setAppState,
+        libraryItemsData.libraryItems,
+        files,
+      ],
     );
 
     const libraryItems = useMemo(
@@ -149,6 +162,7 @@ const LibraryMenuContent = memo(
         <LibraryMenuItems
           isLoading={libraryItemsData.status === "loading"}
           libraryItems={libraryItems}
+          files={files}
           onAddToLibrary={_onAddToLibrary}
           onInsertLibraryItems={onInsertLibraryItems}
           pendingElements={pendingElements}
@@ -263,7 +277,6 @@ const usePendingElementsMemo = (
  */
 export const LibraryMenu = memo(() => {
   const app = useApp();
-  const { onInsertElements } = app;
   const appProps = useAppProps();
   const appState = useUIAppState();
   const setAppState = useExcalidrawSetAppState();
@@ -318,10 +331,14 @@ export const LibraryMenu = memo(() => {
 
   const onInsertLibraryItems = useCallback(
     (libraryItems: LibraryItems) => {
-      onInsertElements(distributeLibraryItemsOnSquareGrid(libraryItems));
+      app.addElementsFromPasteOrLibrary({
+        elements: distributeLibraryItemsOnSquareGrid(libraryItems),
+        files: getLibraryItemsFiles(libraryItems),
+        position: "center",
+      });
       app.focusContainer();
     },
-    [onInsertElements, app],
+    [app],
   );
 
   const deselectItems = useCallback(() => {
@@ -340,6 +357,7 @@ export const LibraryMenu = memo(() => {
       setAppState={setAppState}
       libraryReturnUrl={appProps.libraryReturnUrl}
       library={memoizedLibrary}
+      files={app.files}
       id={app.id}
       theme={appState.theme}
       selectedItems={selectedItems}

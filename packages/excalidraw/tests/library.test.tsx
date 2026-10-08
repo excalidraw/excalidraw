@@ -12,15 +12,20 @@ import type {
 } from "@excalidraw/element/types";
 
 import { parseLibraryJSON } from "../data/blob";
+import { getDataURL } from "../data/blob";
 import { serializeLibraryAsJSON } from "../data/json";
-import { distributeLibraryItemsOnSquareGrid } from "../data/library";
+import {
+  distributeLibraryItemsOnSquareGrid,
+  getLibraryItemsFiles,
+} from "../data/library";
 import { Excalidraw } from "../index";
+import { actionAddToLibrary } from "../actions/actionAddToLibrary";
 
 import { API } from "./helpers/api";
 import { UI } from "./helpers/ui";
 import { fireEvent, render, waitFor } from "./test-utils";
 
-import type { LibraryItem, LibraryItems } from "../types";
+import type { BinaryFileData, LibraryItem, LibraryItems } from "../types";
 
 const { h } = window;
 
@@ -170,6 +175,92 @@ describe("library", () => {
     });
   });
 
+  it("preserves image files when exporting and importing a library", () => {
+    const file: BinaryFileData = {
+      id: "image-file" as BinaryFileData["id"],
+      dataURL: "data:image/png;base64,aW1hZ2U=" as BinaryFileData["dataURL"],
+      mimeType: MIME_TYPES.png,
+      created: 1,
+    };
+    const image = API.createElement({
+      id: "library-image",
+      type: "image",
+      fileId: file.id,
+    });
+    const libraryItems: LibraryItems = [
+      {
+        id: "image-library-item",
+        status: "unpublished",
+        elements: [image],
+        created: 1,
+        files: { [file.id]: file },
+      },
+    ];
+
+    const importedItems = parseLibraryJSON(
+      serializeLibraryAsJSON(libraryItems),
+    );
+
+    expect(importedItems[0].files).toEqual({ [file.id]: file });
+    expect(getLibraryItemsFiles(importedItems)).toEqual({ [file.id]: file });
+    expect(importedItems[0].elements[0]).toEqual(
+      expect.objectContaining({ type: "image", fileId: file.id }),
+    );
+  });
+
+  it("adds selected images to the library and restores them on insert", async () => {
+    const imageFile = await API.loadFile("./fixtures/deer.png");
+    const file: BinaryFileData = {
+      id: "image-file" as BinaryFileData["id"],
+      dataURL: await getDataURL(imageFile),
+      mimeType: MIME_TYPES.png,
+      created: 1,
+    };
+    const image = API.createElement({
+      id: "library-image",
+      type: "image",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+      fileId: file.id,
+    });
+
+    act(() => h.app.addFiles([file]));
+    API.updateScene({ elements: [image] });
+    API.setSelectedElements([image]);
+    API.executeAction(actionAddToLibrary);
+
+    await waitFor(async () => {
+      const items = await h.app.library.getLatestLibrary();
+      expect(items[0]).toEqual(
+        expect.objectContaining({
+          elements: [
+            expect.objectContaining({ type: "image", fileId: file.id }),
+          ],
+          files: { [file.id]: file },
+        }),
+      );
+    });
+
+    API.updateScene({ elements: [] });
+    const [libraryItem] = await h.app.library.getLatestLibrary();
+    await API.drop([
+      {
+        kind: "string",
+        value: JSON.stringify({ itemIds: [libraryItem.id] }),
+        type: MIME_TYPES.excalidrawlibIds,
+      },
+    ]);
+
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "image", fileId: file.id }),
+      ]);
+      expect(h.app.files[file.id]).toEqual(file);
+    });
+  });
+
   // NOTE: mocked to test logic, not actual drag&drop via UI
   it("drop library item onto canvas", async () => {
     expect(h.elements).toEqual([]);
@@ -243,6 +334,48 @@ describe("library", () => {
 });
 
 describe("library menu", () => {
+  it("adds a selected image through the pending library item", async () => {
+    const { container } = await render(<Excalidraw />);
+    const imageFile = await API.loadFile("./fixtures/deer.png");
+    const file: BinaryFileData = {
+      id: "pending-image-file" as BinaryFileData["id"],
+      dataURL: await getDataURL(imageFile),
+      mimeType: MIME_TYPES.png,
+      created: 1,
+    };
+    const image = API.createElement({
+      id: "pending-library-image",
+      type: "image",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+      fileId: file.id,
+    });
+
+    act(() => h.app.addFiles([file]));
+    API.updateScene({ elements: [image] });
+    API.setSelectedElements([image]);
+    fireEvent.click(container.querySelector(".sidebar-trigger")!);
+
+    await waitFor(() => {
+      expect(container.querySelector(".library-unit__dragger")).not.toBeNull();
+    });
+    fireEvent.click(container.querySelector(".library-unit__dragger")!);
+
+    await waitFor(async () => {
+      const items = await h.app.library.getLatestLibrary();
+      expect(items[0]).toEqual(
+        expect.objectContaining({
+          elements: [
+            expect.objectContaining({ type: "image", fileId: file.id }),
+          ],
+          files: { [file.id]: file },
+        }),
+      );
+    });
+  });
+
   it("should load library from file picker", async () => {
     const { container } = await render(<Excalidraw />);
 
