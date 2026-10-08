@@ -58,8 +58,9 @@ export const subsetWoff2GlyphsByCodepoints = async (
             e instanceof WorkerInTheMainChunkError)
         )
       ) {
+        // the fallback below recovers from this, so it's a warning, not an error
         // eslint-disable-next-line no-console
-        console.error(
+        console.warn(
           "Failed to use workers for subsetting, falling back to the main thread.",
           e,
         );
