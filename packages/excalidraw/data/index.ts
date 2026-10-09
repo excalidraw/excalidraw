@@ -126,6 +126,9 @@ export const exportCanvas = async (
       {
         exportBackground,
         exportWithDarkMode: appState.exportWithDarkMode,
+        exportWithGrid: appState.exportWithGrid,
+        gridSize: appState.gridSize,
+        gridStep: appState.gridStep,
         viewBackgroundColor,
         exportPadding,
         exportScale: appState.exportScale,
