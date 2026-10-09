@@ -35,5 +35,5 @@ export function rectangleIntersectRectangle<
   const [[minX1, minY1], [maxX1, maxY1]] = rectangle1;
   const [[minX2, minY2], [maxX2, maxY2]] = rectangle2;
 
-  return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
+  return minX1 <= maxX2 && maxX1 >= minX2 && minY1 <= maxY2 && maxY1 >= minY2;
 }
