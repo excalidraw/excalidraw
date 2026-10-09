@@ -150,17 +150,20 @@ export class ExcalidrawFontFace {
     const assetUrl: string = uri.replace(/^\/+/, "");
     const urls: URL[] = [];
 
-    if (typeof window.EXCALIDRAW_ASSET_PATH === "string") {
-      const normalizedBaseUrl = this.normalizeBaseUrl(
-        window.EXCALIDRAW_ASSET_PATH,
-      );
+    const assetPath = window.EXCALIDRAW_ASSET_PATH;
+    const basePaths =
+      typeof assetPath === "string"
+        ? [assetPath]
+        : Array.isArray(assetPath)
+        ? assetPath
+        : [];
 
-      urls.push(new URL(assetUrl, normalizedBaseUrl));
-    } else if (Array.isArray(window.EXCALIDRAW_ASSET_PATH)) {
-      window.EXCALIDRAW_ASSET_PATH.forEach((path) => {
-        const normalizedBaseUrl = this.normalizeBaseUrl(path);
-        urls.push(new URL(assetUrl, normalizedBaseUrl));
-      });
+    for (const basePath of basePaths) {
+      const url = ExcalidrawFontFace.createUrl(assetUrl, basePath);
+
+      if (url) {
+        urls.push(url);
+      }
     }
 
     // fallback url for bundled fonts
@@ -188,13 +191,34 @@ export class ExcalidrawFontFace {
     }
   }
 
-  private static normalizeBaseUrl(baseUrl: string) {
-    let result = baseUrl;
+  /**
+   * Resolves a single `EXCALIDRAW_ASSET_PATH` entry into an absolute font url.
+   *
+   * Never throws, so that a malformed custom asset path degrades to the bundled
+   * font fallback instead of taking down the whole editor on mount.
+   */
+  private static createUrl(assetUrl: string, basePath: string): URL | null {
+    try {
+      return new URL(assetUrl, ExcalidrawFontFace.normalizeBaseUrl(basePath));
+    } catch (error) {
+      console.warn(
+        `Skipping invalid EXCALIDRAW_ASSET_PATH entry "${basePath}", falling back to the bundled fonts.`,
+        error,
+      );
 
-    // in case user passed a root-relative url (~absolute path),
-    // like "/" or "/some/path", or relative (starts with "./"),
-    // prepend it with `location.origin`
-    if (/^\.?\//.test(result)) {
+      return null;
+    }
+  }
+
+  private static normalizeBaseUrl(baseUrl: string) {
+    let result = baseUrl.trim();
+
+    // `new URL(asset, base)` requires `base` to be an absolute url, so anything
+    // without a protocol gets resolved against `location.origin` first. that
+    // covers root-relative paths ("/" or "/some/path"), dot-relative ones
+    // ("./some/path"), and bare relative ones ("some/path"), the last of which
+    // used to throw `TypeError: Failed to construct 'URL': Invalid URL`.
+    if (!/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(result)) {
       result = new URL(
         result.replace(/^\.?\/+/, ""),
         window?.location?.origin,
