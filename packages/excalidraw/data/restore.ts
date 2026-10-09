@@ -909,7 +909,16 @@ const getRefreshedTextDimensions = (
     return null;
   }
 
-  return refreshTextDimensions(element, container, elementsMap) ?? null;
+  // wrap from the original text: `text` carries the line breaks of the last
+  // wrapping, which was done with other (e.g. fallback) metrics
+  return (
+    refreshTextDimensions(
+      element,
+      container,
+      elementsMap,
+      element.originalText,
+    ) ?? null
+  );
 };
 
 /**

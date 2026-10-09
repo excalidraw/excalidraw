@@ -26,6 +26,13 @@ import type App from "./App";
  * `updateScene`, collab) keeps the bounds it came with.
  */
 export class AppFonts {
+  /**
+   * Text whose fonts loaded while it was deleted (e.g. a paste undone before
+   * then). Redo brings back the bounds it was undone with, so it gets
+   * remeasured once it's restored instead.
+   */
+  private remeasureOnRestore = new Set<ExcalidrawElement["id"]>();
+
   constructor(private app: App) {}
 
   /**
@@ -137,9 +144,48 @@ export class AppFonts {
         // drops the fallback glyph widths and rerenders — or bails when the
         // `loadingdone` listener got there first, which cleared them as well
         this.app.fonts.onLoaded(fontFaces);
-        this.remeasureText(new Set(text.map((element) => element.id)));
+
+        const elementIds = new Set(text.map((element) => element.id));
+        for (const id of elementIds) {
+          if (this.app.scene.getElement(id)?.isDeleted) {
+            this.remeasureOnRestore.add(id);
+          }
+        }
+        this.remeasureText(elementIds);
       })
       .catch((error) => console.error(error));
+  };
+
+  /**
+   * Remeasures the text waiting for its restore, once it's back in the scene.
+   * Uncaptured like the correction it stands in for, so that the restored
+   * element doesn't get an undo entry of its own.
+   */
+  handleSceneUpdate = () => {
+    if (!this.remeasureOnRestore.size) {
+      return;
+    }
+
+    const restoredIds = new Set<ExcalidrawElement["id"]>();
+    for (const id of this.remeasureOnRestore) {
+      const element = this.app.scene.getElement(id);
+      if (!element) {
+        // gone for good (e.g. replaced by another scene)
+        this.remeasureOnRestore.delete(id);
+      } else if (!element.isDeleted) {
+        this.remeasureOnRestore.delete(id);
+        restoredIds.add(id);
+        // `onLoaded` cleared the fallback glyph widths only for the fonts of
+        // the text that wasn't deleted at the time
+        if (isTextElement(element)) {
+          charWidth.clearCache(getFontString(element));
+        }
+      }
+    }
+
+    if (restoredIds.size) {
+      this.remeasureText(restoredIds);
+    }
   };
 
   /**
