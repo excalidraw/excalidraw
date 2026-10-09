@@ -68,6 +68,7 @@ export const languages: Language[] = [
   ]
     .filter(
       (lang) =>
+        lang.code ==="ar-SA"||
         (percentages as Record<string, number>)[lang.code] >=
         COMPLETION_THRESHOLD,
     )
