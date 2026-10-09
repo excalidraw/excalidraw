@@ -1,0 +1,82 @@
+# Excalidraw — Cursor Rules
+
+You are working on **Excalidraw**, an open-source virtual whiteboard with a hand-drawn aesthetic. It is a React + TypeScript monorepo managed with Yarn workspaces.
+
+## Project Structure
+
+- `excalidraw-app/` — the hosted app at excalidraw.com
+- `packages/excalidraw/` — the core library published as `@excalidraw/excalidraw`
+- `packages/math/` — math utilities (points, vectors, angles)
+- `packages/element/` — element model and operations
+- `packages/common/` — shared utilities across packages
+- `packages/utils/` — helper utilities
+- `examples/` — integration examples
+
+## TypeScript & Code Style
+
+- Strict TypeScript. Use explicit types for function parameters and return values.
+- Use `type` imports with separate import statements (`@typescript-eslint/consistent-type-imports`):
+  ```ts
+  import type { ExcalidrawElement } from "./types";
+  ```
+- Import order is enforced by ESLint: builtin > external > `@excalidraw/*` > internal > parent > sibling > index > type.
+- Separate newlines between import groups.
+- Prettier is configured via `@excalidraw/prettier-config`. Do not override.
+
+## State Management
+
+- **Jotai** is used for state management. Never import directly from `"jotai"`. Use the app-specific modules:
+  - `editor-jotai` for editor state
+  - `app-jotai` for application state
+- Canvas state is managed via an imperative `AppState` object, not React state.
+- Element mutations must go through proper update functions — never mutate elements directly.
+
+## Architecture Patterns
+
+- The main canvas rendering is in `packages/excalidraw/components/App.tsx` — a large class component.
+- New UI components should be functional components with hooks.
+- Use `nanoid` for generating unique IDs.
+- Use `clsx` for conditional CSS class composition.
+- Mathematical operations (points, vectors, rotations) use helpers from `@excalidraw/math` — do not write raw math.
+- Roughjs is used for the hand-drawn rendering style.
+
+## Testing
+
+- Test runner is **Vitest** (not Jest). Config is in `vitest.config.ts`.
+- Tests live alongside source files as `*.test.ts` / `*.test.tsx`.
+- Use `vitest-canvas-mock` for canvas-related tests.
+- Run tests with `yarn test` from the root.
+
+## Build & Tooling
+
+- Bundler: **Vite** (not Webpack).
+- Package manager: **Yarn 1.x** (classic). Do not use npm or pnpm.
+- Monorepo build order: common -> math -> element -> excalidraw.
+- Build ESM outputs with `yarn build:packages`.
+
+## Naming Conventions
+
+- Files: `camelCase.ts` for utilities, `PascalCase.tsx` for React components.
+- Types/Interfaces: `PascalCase`, prefixed with `Excalidraw` for public API types (e.g., `ExcalidrawElement`).
+- Constants: `UPPER_SNAKE_CASE`, defined in dedicated constants files.
+- CSS: Component-scoped SCSS modules in `*.module.scss` files.
+
+## Canvas & Rendering
+
+- The canvas uses HTML5 Canvas API with roughjs for the sketchy aesthetic.
+- Elements are stored as plain objects conforming to `ExcalidrawElement` types.
+- Coordinate system: origin is top-left, y increases downward.
+- All angle measurements use **radians**, never degrees.
+
+## Performance Considerations
+
+- Throttle expensive operations (use `lodash.throttle`).
+- Avoid unnecessary React re-renders — the canvas is imperatively drawn.
+- Large operations should batch element updates.
+- Use `flushSync` sparingly and only when synchronous DOM updates are required.
+
+## Contributing
+
+- PRs should target the `master` branch.
+- Ensure `yarn lint` and `yarn test` pass before submitting.
+- Follow existing patterns in the codebase — consistency matters.
