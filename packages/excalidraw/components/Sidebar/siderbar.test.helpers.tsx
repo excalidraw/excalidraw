@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Excalidraw } from "../..";
+import { Excalidraw } from "../../index";
 import {
   GlobalTestState,
   queryByTestId,
