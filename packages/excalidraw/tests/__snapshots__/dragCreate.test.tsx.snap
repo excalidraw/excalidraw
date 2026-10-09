@@ -204,3 +204,38 @@ exports[`Test dragCreate > add element to the scene when pointer dragging long e
   "y": 20,
 }
 `;
+
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > star 3`] = `1`;
+
+exports[`Test dragCreate > add element to the scene when pointer dragging long enough > star 4`] = `
+{
+  "angle": 0,
+  "backgroundColor": "transparent",
+  "boundElements": null,
+  "created": 1,
+  "customData": undefined,
+  "fillStyle": "solid",
+  "frameId": null,
+  "groupIds": [],
+  "height": 50,
+  "id": "id0",
+  "index": "a0",
+  "isDeleted": false,
+  "link": null,
+  "locked": false,
+  "opacity": 100,
+  "roughness": 1,
+  "roundness": null,
+  "seed": 1278240551,
+  "strokeColor": "#1e1e1e",
+  "strokeStyle": "solid",
+  "strokeWidth": 2,
+  "type": "star",
+  "updated": 1,
+  "version": 3,
+  "versionNonce": 401146281,
+  "width": 30,
+  "x": 30,
+  "y": 20,
+}
+`;

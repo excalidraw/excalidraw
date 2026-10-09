@@ -43,4 +43,32 @@ describe("convert element type", () => {
     expect(h.elements[0].type).toBe("rectangle");
     expect(h.elements[0].roundness?.type).toBe(ROUNDNESS.ADAPTIVE_RADIUS);
   });
+
+  it("drops roundness when converting a rectangle to a star", () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 20,
+      width: 80,
+      height: 60,
+      roundness: { type: ROUNDNESS.ADAPTIVE_RADIUS },
+    });
+
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+
+    act(() => {
+      convertElementTypes(h.app, {
+        conversionType: "generic",
+        nextType: "star",
+      });
+    });
+
+    expect(h.elements[0].type).toBe("star");
+    expect(h.elements[0].x).toBe(10);
+    expect(h.elements[0].y).toBe(20);
+    expect(h.elements[0].width).toBe(80);
+    expect(h.elements[0].height).toBe(60);
+    expect(h.elements[0].roundness).toBeNull();
+  });
 });

@@ -32,11 +32,29 @@ This function converts the Excalidraw Element Skeleton to excalidraw elements wh
 
 ## Supported Features
 
-### Rectangle, Ellipse, and Diamond
+### Rectangle, Ellipse, Diamond, and Star
 
 To create these shapes you need to pass its `type` and `x` and `y` coordinates for position. The rest of the attributes are optional\_.
 
 For the Skeleton API to work, `convertToExcalidrawElements` needs to be called before passing it to Excalidraw Component via initialData, updateScene or any such API.
+
+Use `type: "star"` to create a five-point star. Stars also support labels and the same shared shape properties as rectangles, ellipses, and diamonds.
+
+```js
+convertToExcalidrawElements([
+  {
+    type: "star",
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 200,
+    backgroundColor: "#fff3bf",
+    label: {
+      text: "STAR",
+    },
+  },
+]);
+```
 
 ```jsx live
 function App() {

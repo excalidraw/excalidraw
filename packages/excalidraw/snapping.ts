@@ -12,6 +12,7 @@ import {
   getCommonBounds,
   getDraggedElementsBounds,
   getElementAbsoluteCoords,
+  getStarPoints,
 } from "@excalidraw/element";
 import { isBoundToContainer } from "@excalidraw/element";
 
@@ -234,7 +235,22 @@ export const getElementsCorners = (
     const halfWidth = (x2 - x1) / 2;
     const halfHeight = (y2 - y1) / 2;
 
-    if (
+    if (element.type === "star" && !boundingBoxCorners) {
+      const center = pointFrom<GlobalPoint>(cx, cy);
+      const tips = getStarPoints(element)
+        .filter((_, i) => i % 2 === 0)
+        .map(([px, py]) =>
+          pointRotateRads<GlobalPoint>(
+            pointFrom(
+              element.x + px + (dragOffset?.x ?? 0),
+              element.y + py + (dragOffset?.y ?? 0),
+            ),
+            center,
+            element.angle,
+          ),
+        );
+      result = omitCenter ? tips : [...tips, center];
+    } else if (
       (element.type === "diamond" || element.type === "ellipse") &&
       !boundingBoxCorners
     ) {
@@ -1406,6 +1422,7 @@ export const isActiveToolNonLinearSnappable = (
     activeToolType === TOOL_TYPE.rectangle ||
     activeToolType === TOOL_TYPE.ellipse ||
     activeToolType === TOOL_TYPE.diamond ||
+    activeToolType === TOOL_TYPE.star ||
     activeToolType === TOOL_TYPE.frame ||
     activeToolType === TOOL_TYPE.magicframe ||
     activeToolType === TOOL_TYPE.image ||

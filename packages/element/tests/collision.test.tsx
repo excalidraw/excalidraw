@@ -913,6 +913,61 @@ describe("ellipse outline hit test", () => {
   });
 });
 
+describe("star silhouette", () => {
+  const star = API.createElement({
+    type: "star",
+    x: 0,
+    y: 0,
+    width: 200,
+    height: 200,
+    backgroundColor: "red",
+    fillStyle: "solid",
+  });
+  const elementsMap = arrayToMap([star]);
+
+  it("contains the center and the top tip", () => {
+    expect(
+      isPointInElement(pointFrom<GlobalPoint>(100, 100), star, elementsMap),
+    ).toBe(true);
+    expect(
+      isPointInElement(pointFrom<GlobalPoint>(100, 2), star, elementsMap),
+    ).toBe(true);
+  });
+
+  it("excludes the AABB corner and the bay between tips", () => {
+    expect(
+      isPointInElement(pointFrom<GlobalPoint>(4, 4), star, elementsMap),
+    ).toBe(false);
+
+    const bayAngle = -Math.PI / 2 + Math.PI / 5;
+    const bay = pointFrom<GlobalPoint>(
+      100 + 60 * Math.cos(bayAngle),
+      100 + 60 * Math.sin(bayAngle),
+    );
+    expect(isPointInElement(bay, star, elementsMap)).toBe(false);
+  });
+
+  it("does not hit the interior of a transparent star from the center", () => {
+    const transparent = API.createElement({
+      type: "star",
+      x: 0,
+      y: 0,
+      width: 200,
+      height: 200,
+      backgroundColor: "transparent",
+    });
+
+    expect(
+      hitElementItself({
+        point: pointFrom<GlobalPoint>(100, 100),
+        element: transparent,
+        threshold: 1,
+        elementsMap: arrayToMap([transparent]),
+      }),
+    ).toBe(false);
+  });
+});
+
 describe("intersectElementWithLineSegment", () => {
   it("hits a rounded diamond corner along a line through its apex", () => {
     const diamond = API.createElement({
