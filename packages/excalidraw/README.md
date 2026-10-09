@@ -139,4 +139,4 @@ Read the [API docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/api)
 
 ## Contributing
 
-Read the [contributing docs](https://docs.excalidraw.com/docs/@excalidraw/excalidraw/contributing).
+Read the [contributing docs](https://docs.excalidraw.com/docs/introduction/contributing).
