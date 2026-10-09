@@ -1,5 +1,7 @@
 import { useRef } from "react";
 
+import { randomId } from "@excalidraw/common";
+
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useAtom, useAtomValue } from "../../editor-jotai";
@@ -13,14 +15,14 @@ import {
   insertToEditor,
   saveMermaidDataToStorage,
 } from "./common";
-import { errorAtom, chatHistoryAtom, showPreviewAtom } from "./TTDContext";
+import { chatHistoryAtom, errorAtom, showPreviewAtom } from "./TTDContext";
 
-import { useTTDChatStorage } from "./useTTDChatStorage";
+import { TTDChatPanel } from "./Chat/TTDChatPanel";
+import { useChatManagement } from "./hooks/useChatManagement";
 import { useMermaidRenderer } from "./hooks/useMermaidRenderer";
 import { useTextGeneration } from "./hooks/useTextGeneration";
-import { useChatManagement } from "./hooks/useChatManagement";
-import { TTDChatPanel } from "./Chat/TTDChatPanel";
 import { TTDPreviewPanel } from "./TTDPreviewPanel";
+import { useTTDChatStorage } from "./useTTDChatStorage";
 
 import { getLastAssistantMessage } from "./utils/chat";
 
@@ -55,7 +57,7 @@ const TextToDiagramContent = ({
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
   const showPreview = useAtomValue(showPreviewAtom);
 
-  const { savedChats } = useTTDChatStorage({ persistenceAdapter });
+  const { savedChats, deleteChat } = useTTDChatStorage({ persistenceAdapter });
 
   const lastAssistantMessage = getLastAssistantMessage(chatHistory);
 
@@ -167,20 +169,46 @@ const TextToDiagramContent = ({
     insertToEditor({ app, data });
   };
 
-  const handleDeleteMessage = (messageId: string) => {
+  const handleDeleteMessage = async (messageId: string) => {
     const assistantMessageIndex = chatHistory.messages.findIndex(
       (msg) => msg.id === messageId && msg.type === "assistant",
     );
 
+    if (assistantMessageIndex === -1) {
+      return;
+    }
+
     const remainingMessages = chatHistory.messages.slice(
       0,
-      assistantMessageIndex - 1,
+      Math.max(0, assistantMessageIndex - 1),
     );
 
-    setChatHistory({
+    if (remainingMessages.length === 0) {
+      await deleteChat(chatHistory.id);
+      setChatHistory({
+        id: randomId(),
+        messages: [],
+        currentPrompt: "",
+      });
+      setError(null);
+      // The history menu unmounts with zero saved chats; reset its open
+      // state so it doesn't auto-open when the next chat is saved.
+      handleMenuClose();
+      return;
+    }
+
+    const nextHistory = {
       ...chatHistory,
       messages: remainingMessages,
-    });
+    };
+    setChatHistory(nextHistory);
+
+    const nextLastAssistantMessage = getLastAssistantMessage(nextHistory);
+    setError(
+      nextLastAssistantMessage?.error
+        ? new Error(nextLastAssistantMessage.error)
+        : null,
+    );
   };
 
   const handlePromptChange = (newPrompt: string) => {
@@ -192,11 +220,10 @@ const TextToDiagramContent = ({
 
   return (
     <div
-      className={`ttd-dialog-layout ${
-        showPreview
-          ? "ttd-dialog-layout--split"
-          : "ttd-dialog-layout--chat-only"
-      }`}
+      className={`ttd-dialog-layout ${showPreview
+        ? "ttd-dialog-layout--split"
+        : "ttd-dialog-layout--chat-only"
+        }`}
     >
       <TTDChatPanel
         chatId={chatHistory.id}
