@@ -129,9 +129,14 @@ export class AnimatedTrail implements Trail {
   endPath() {
     if (this.currentTrail) {
       this.currentTrail.close();
+
+      this.currentTrail.setDecayStartTime(performance.now());
+
       this.currentTrail.options.keepHead = false;
+
       this.pastTrails.push(this.currentTrail);
       this.currentTrail = undefined;
+
       this.update();
     }
   }

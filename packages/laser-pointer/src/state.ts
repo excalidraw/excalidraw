@@ -8,6 +8,7 @@ export type SizeMappingDetails = {
   runningLength: number;
   currentIndex: number;
   totalLength: number;
+  decayStartTime?: number;
 };
 
 export type LaserPointerOptions = {
@@ -33,6 +34,12 @@ export class LaserPointer {
 
     sizeMapping: () => 1,
   };
+
+  private decayStartTime?: number;
+
+  setDecayStartTime(time: number) {
+    this.decayStartTime = time;
+  }
 
   static constants = {
     cornerDetectionMaxAngle: 75,
@@ -112,6 +119,7 @@ export class LaserPointer {
         runningLength,
         currentIndex: index,
         totalLength,
+        decayStartTime: this.decayStartTime,
       })
     );
   }
