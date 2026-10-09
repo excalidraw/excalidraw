@@ -14,17 +14,22 @@ const DropdownMenuSubTrigger = ({
   icon,
   shortcut,
   className,
+  ...rest
 }: {
   children: React.ReactNode;
   icon?: JSX.Element;
   shortcut?: string;
   className?: string;
-}) => {
+} & Omit<
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger>,
+  "children" | "className"
+>) => {
   return (
     <DropdownMenuPrimitive.SubTrigger
       className={`${getDropdownMenuItemClassName(
         className,
       )} dropdown-menu__submenu-trigger`}
+      {...rest}
     >
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}
