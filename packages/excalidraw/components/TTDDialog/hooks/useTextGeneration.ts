@@ -189,10 +189,13 @@ export const useTextGeneration = ({
         return;
       }
 
+      // outside the parse try so a chunk load failure isn't reported as a
+      // diagram parse error
+      const { parseMermaidToExcalidraw } = await import(
+        "@excalidraw/mermaid-to-excalidraw"
+      );
+
       try {
-        const { parseMermaidToExcalidraw } = await import(
-          "@excalidraw/mermaid-to-excalidraw"
-        );
         await parseMermaidToExcalidraw(generatedResponse ?? "");
         trackEvent("ai", "mermaid parse success", "ttd");
       } catch (error: any) {
