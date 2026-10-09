@@ -1182,4 +1182,100 @@ describe("adding elements to frames", () => {
       expect(h.elements.length).toBe(4);
     });
   });
+
+  describe("dragging multiple elements across multiple frames", () => {
+    it("should keep elements on frames", () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+
+      const frame2 = API.createElement({
+        type: "frame",
+        x: 300,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+
+      const rectangle1 = API.createElement({
+        type: "rectangle",
+        x: 50,
+        y: 50,
+        width: 50,
+        height: 50,
+        frameId: frame1.id,
+      });
+
+      const rectangle2 = API.createElement({
+        type: "rectangle",
+        x: 450,
+        y: 50,
+        width: 50,
+        height: 50,
+        frameId: frame2.id,
+      });
+
+      API.setElements([frame1, frame2, rectangle1, rectangle2]);
+
+      API.setSelectedElements([rectangle1, rectangle2]);
+
+      mouse.downAt(rectangle1.x, rectangle1.y);
+      mouse.moveTo(10, 10);
+      mouse.up();
+
+      expect(rectangle1.frameId).toBe(frame1.id);
+      expect(rectangle2.frameId).toBe(frame2.id);
+    });
+
+    it("should remove one element on frames", () => {
+      const frame1 = API.createElement({
+        type: "frame",
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+
+      const frame2 = API.createElement({
+        type: "frame",
+        x: 300,
+        y: 0,
+        width: 200,
+        height: 200,
+      });
+
+      const rectangle1 = API.createElement({
+        type: "rectangle",
+        x: 50,
+        y: 50,
+        width: 50,
+        height: 50,
+        frameId: frame1.id,
+      });
+
+      const rectangle2 = API.createElement({
+        type: "rectangle",
+        x: 450,
+        y: 50,
+        width: 50,
+        height: 50,
+        frameId: frame2.id,
+      });
+
+      API.setElements([frame1, frame2, rectangle1, rectangle2]);
+
+      API.setSelectedElements([rectangle1, rectangle2]);
+
+      mouse.downAt(rectangle1.x, rectangle1.y);
+      mouse.moveTo(150, 50);
+      mouse.up();
+
+      expect(rectangle1.frameId).toBe(frame1.id);
+      expect(rectangle2.frameId).toBe(null);
+    });
+  });
 });
