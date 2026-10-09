@@ -19,7 +19,7 @@
     "@types/socket.io-client": "3.0.0",
     "@vitejs/plugin-react": "3.1.0",
     "@vitest/coverage-v8": "3.0.7",
-    "@vitest/ui": "2.0.5",
+    "@vitest/ui": "^3.0.6",
     "chai": "4.3.6",
     "dotenv": "16.0.1",
     "eslint-config-prettier": "8.5.0",
