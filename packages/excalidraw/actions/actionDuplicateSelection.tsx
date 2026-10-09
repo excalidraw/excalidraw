@@ -74,9 +74,11 @@ export const actionDuplicateSelection = register({
       overrides: ({ origElement, origIdToDuplicateId }) => {
         const duplicateFrameId =
           origElement.frameId && origIdToDuplicateId.get(origElement.frameId);
+        const effectiveGridSize = app.getEffectiveGridSize();
+        const duplicateOffset = effectiveGridSize ?? DEFAULT_GRID_SIZE / 2;
         return {
-          x: origElement.x + DEFAULT_GRID_SIZE / 2,
-          y: origElement.y + DEFAULT_GRID_SIZE / 2,
+          x: origElement.x + duplicateOffset,
+          y: origElement.y + duplicateOffset,
           frameId: duplicateFrameId ?? origElement.frameId,
         };
       },
