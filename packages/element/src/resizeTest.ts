@@ -103,9 +103,9 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       const ZOOMED_SIDE_RESIZING_THRESHOLD =
         SIDE_RESIZING_THRESHOLD / zoom.value;
       const sides = getSelectionBorders(
-        pointFrom(x1 - SPACING, y1 - SPACING),
-        pointFrom(x2 + SPACING, y2 + SPACING),
-        pointFrom(cx, cy),
+        pointFrom<Point>(x1 - SPACING, y1 - SPACING),
+        pointFrom<Point>(x2 + SPACING, y2 + SPACING),
+        pointFrom<Point>(cx, cy),
         element.angle,
       );
 
@@ -113,7 +113,7 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
         // test to see if x, y are on the line segment
         if (
           pointOnLineSegment(
-            pointFrom(x, y),
+            pointFrom<Point>(x, y),
             side as LineSegment<Point>,
             ZOOMED_SIDE_RESIZING_THRESHOLD,
           )
@@ -193,9 +193,9 @@ export const getTransformHandleTypeFromCoords = <
     const SPACING = SIDE_RESIZING_THRESHOLD / zoom.value;
 
     const sides = getSelectionBorders(
-      pointFrom(x1 - SPACING, y1 - SPACING),
-      pointFrom(x2 + SPACING, y2 + SPACING),
-      pointFrom(cx, cy),
+      pointFrom<Point>(x1 - SPACING, y1 - SPACING),
+      pointFrom<Point>(x2 + SPACING, y2 + SPACING),
+      pointFrom<Point>(cx, cy),
       0 as Radians,
     );
 
@@ -203,7 +203,7 @@ export const getTransformHandleTypeFromCoords = <
       // test to see if x, y are on the line segment
       if (
         pointOnLineSegment(
-          pointFrom(scenePointerX, scenePointerY),
+          pointFrom<Point>(scenePointerX, scenePointerY),
           side as LineSegment<Point>,
           SPACING,
         )
@@ -280,10 +280,10 @@ const getSelectionBorders = <Point extends LocalPoint | GlobalPoint>(
   center: Point,
   angle: Radians,
 ) => {
-  const topLeft = pointRotateRads(pointFrom(x1, y1), center, angle);
-  const topRight = pointRotateRads(pointFrom(x2, y1), center, angle);
-  const bottomLeft = pointRotateRads(pointFrom(x1, y2), center, angle);
-  const bottomRight = pointRotateRads(pointFrom(x2, y2), center, angle);
+  const topLeft = pointRotateRads(pointFrom<Point>(x1, y1), center, angle);
+  const topRight = pointRotateRads(pointFrom<Point>(x2, y1), center, angle);
+  const bottomLeft = pointRotateRads(pointFrom<Point>(x1, y2), center, angle);
+  const bottomRight = pointRotateRads(pointFrom<Point>(x2, y2), center, angle);
 
   return {
     n: [topLeft, topRight],

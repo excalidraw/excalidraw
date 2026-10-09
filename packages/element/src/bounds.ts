@@ -780,11 +780,11 @@ export const getArrowheadPoints = (
   const prevOp = ops[index - 1];
   let p0 = pointFrom(0, 0);
   if (prevOp.op === "move") {
-    const p = pointFromArray(prevOp.data);
+    const p = pointFromArray<GlobalPoint>(prevOp.data);
     invariant(p != null, "Op data is not a point");
     p0 = p;
   } else if (prevOp.op === "bcurveTo") {
-    p0 = pointFrom(prevOp.data[4], prevOp.data[5]);
+    p0 = pointFrom<GlobalPoint>(prevOp.data[4], prevOp.data[5]);
   }
 
   // B(t) = p0 * (1-t)^3 + 3p1 * t * (1-t)^2 + 3p2 * t^2 * (1-t) + p3 * t^3
