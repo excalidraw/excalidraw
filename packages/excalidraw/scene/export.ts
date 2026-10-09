@@ -58,6 +58,13 @@ import { Fonts } from "../fonts";
 import { renderStaticScene } from "../renderer/staticScene";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
 
+import {
+  ATTRIBUTION_MARK_MIN_PADDING,
+  appendAttributionMarkToSvg,
+  drawAttributionMarkOnCanvas,
+} from "./exportAttributionMark";
+
+import type { AttributionMarkOptions } from "./exportAttributionMark";
 import type { RenderableElementsMap } from "./types";
 
 import type { AppState, BinaryFiles } from "../types";
@@ -186,11 +193,16 @@ export const exportToCanvas = async (
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
     exportingFrame,
+    attributionMark,
+    aspectRatio,
   }: {
     exportBackground: boolean;
     exportPadding?: number;
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+    attributionMark?: AttributionMarkOptions;
+    /** target canvas width / height; canvas is grown to it, never cropped */
+    aspectRatio?: number;
   },
   createCanvas: (
     width: number,
@@ -229,10 +241,21 @@ export const exportToCanvas = async (
     exportPadding = 0;
   }
 
-  const [minX, minY, width, height] = getCanvasSize(
+  if (attributionMark?.show) {
+    exportPadding = Math.max(exportPadding, ATTRIBUTION_MARK_MIN_PADDING);
+  }
+
+  const [minX, minY, contentWidth, contentHeight] = getCanvasSize(
     exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
     exportPadding,
   );
+
+  const width = aspectRatio
+    ? Math.max(contentWidth, contentHeight * aspectRatio)
+    : contentWidth;
+  const height = aspectRatio
+    ? Math.max(contentHeight, contentWidth / aspectRatio)
+    : contentHeight;
 
   const { canvas, scale = 1 } = createCanvas(width, height);
 
@@ -261,8 +284,9 @@ export const exportToCanvas = async (
       ...appState,
       frameRendering,
       viewBackgroundColor: exportBackground ? viewBackgroundColor : null,
-      scrollX: -minX + exportPadding,
-      scrollY: -minY + exportPadding,
+      // content is centered when the canvas was grown to fit `aspectRatio`
+      scrollX: -minX + exportPadding + (width - contentWidth) / 2,
+      scrollY: -minY + exportPadding + (height - contentHeight) / 2,
       zoom: defaultAppState.zoom,
       shouldCacheIgnoreZoom: false,
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
@@ -279,6 +303,13 @@ export const exportToCanvas = async (
       theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
     },
   });
+
+  if (attributionMark?.show) {
+    await drawAttributionMarkOnCanvas(canvas, {
+      scale,
+      isDarkMode: appState.exportWithDarkMode,
+    });
+  }
 
   return canvas;
 };
@@ -310,6 +341,7 @@ export const exportToSvg = async (
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
     skipInliningFonts?: true;
     reuseImages?: boolean;
+    attributionMark?: AttributionMarkOptions;
   },
 ): Promise<SVGSVGElement> => {
   const frameRendering = getFrameRenderingConfig(
@@ -336,6 +368,10 @@ export const exportToSvg = async (
 
   if (exportingFrame) {
     exportPadding = 0;
+  }
+
+  if (opts?.attributionMark?.show) {
+    exportPadding = Math.max(exportPadding, ATTRIBUTION_MARK_MIN_PADDING);
   }
 
   const [minX, minY, width, height] = getCanvasSize(
@@ -503,6 +539,14 @@ export const exportToSvg = async (
   );
 
   // ---------------------------------------------------------------------------
+
+  if (opts?.attributionMark?.show) {
+    appendAttributionMarkToSvg(svgRoot, {
+      width,
+      height,
+      isDarkMode: exportWithDarkMode,
+    });
+  }
 
   return svgRoot;
 };

@@ -2,6 +2,8 @@
 
 .excalidraw {
   --ImageExportModal-preview-border: #d6d6d6;
+  // preview height, also caps the settings column so it scrolls internally
+  --ImageExportModal-height: 460px;
 
   &.theme--dark {
     --ImageExportModal-preview-border: #5c5c5c;
@@ -46,7 +48,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 360px;
+      height: var(--ImageExportModal-height);
       width: 55%;
 
       margin-right: 1.5rem;
@@ -102,11 +104,72 @@
       }
     }
 
+    &__pills {
+      flex-basis: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    &__aspectRatio {
+      flex-basis: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      &__label {
+        color: var(--color-gray-60);
+        font-family: "Assistant";
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+    }
+
+    &__pill {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--color-surface-primary-container);
+      border-radius: 999px;
+      background: var(--island-bg-color);
+      color: var(--color-primary);
+      font-family: "Assistant";
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--color-primary);
+      }
+
+      &--active {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: var(--color-surface-lowest);
+      }
+    }
+
     &__settings {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
       gap: 18px;
+      // fixed share of the row, so the wide pills/buttons rows don't size
+      // this column by their content and squeeze the preview
+      width: 45%;
+
+      // the survey can make this column taller than the preview; scroll it
+      // internally (within the preview's fixed height) instead of letting
+      // the whole dialog grow/scroll, which would drag the preview along
+      // with it. `min-height: 0` overrides the flex default that otherwise
+      // stops a flex item from shrinking below its content's natural size.
+      // `flex-wrap: nowrap` stops overflow from splitting into a second
+      // side-by-side column instead of scrolling vertically.
+      max-height: var(--ImageExportModal-height);
+      min-height: 0;
+      overflow-y: auto;
+      padding-right: 4px;
+      flex-wrap: nowrap;
 
       @include isMobile {
         margin-left: unset;
@@ -115,6 +178,11 @@
         gap: 6px 34px;
 
         align-content: flex-start;
+
+        width: unset;
+        max-height: unset;
+        overflow-y: unset;
+        padding-right: unset;
       }
 
       &__setting {
@@ -163,6 +231,10 @@
 
         align-items: flex-end;
         align-content: flex-end;
+
+        &__button {
+          flex: 1 1 0;
+        }
 
         @include isMobile {
           padding-top: 32px;
