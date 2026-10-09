@@ -420,10 +420,10 @@ const ColorPickerComponent = ({
         role="dialog"
         aria-modal="true"
         className={clsx("color-picker-container", {
-          "color-picker-container--no-top-picks": isCompactMode,
+          "color-picker-container--no-top-picks": isCompactMode && type !== "canvasBackground",
         })}
       >
-        {!isCompactMode && (
+        {(!isCompactMode || type === "canvasBackground") && (
           <TopPicks
             theme={appState.theme}
             activeColor={color}
@@ -447,7 +447,7 @@ const ColorPickerComponent = ({
             onReset={resetTopPicks}
           />
         )}
-        {!isCompactMode && <ButtonSeparator />}
+        {(!isCompactMode || type === "canvasBackground") && <ButtonSeparator />}
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {
