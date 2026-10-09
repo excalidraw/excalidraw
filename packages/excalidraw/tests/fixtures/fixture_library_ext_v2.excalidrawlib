@@ -1,0 +1,70 @@
+{
+  "type": "excalidrawlib",
+  "version": 2,
+  "libraryItems": [
+    {
+      "id": "fixture-ext-item",
+      "status": "published",
+      "created": 0,
+      "name": "Two-element fixture",
+      "elements": [
+        {
+          "type": "rectangle",
+          "version": 1,
+          "versionNonce": 1001,
+          "isDeleted": false,
+          "id": "fixture-ext-rectangle",
+          "fillStyle": "solid",
+          "strokeWidth": 1,
+          "strokeStyle": "solid",
+          "roughness": 0,
+          "opacity": 100,
+          "angle": 0,
+          "x": 10,
+          "y": 20,
+          "strokeColor": "#1e1e1e",
+          "backgroundColor": "#a5d8ff",
+          "width": 100,
+          "height": 50,
+          "seed": 1001,
+          "groupIds": [],
+          "roundness": null,
+          "boundElements": [],
+          "frameId": null,
+          "index": null,
+          "updated": 0,
+          "link": null,
+          "locked": false
+        },
+        {
+          "type": "ellipse",
+          "version": 1,
+          "versionNonce": 1002,
+          "isDeleted": false,
+          "id": "fixture-ext-ellipse",
+          "fillStyle": "solid",
+          "strokeWidth": 1,
+          "strokeStyle": "solid",
+          "roughness": 0,
+          "opacity": 100,
+          "angle": 0,
+          "x": 140,
+          "y": 20,
+          "strokeColor": "#1e1e1e",
+          "backgroundColor": "#b2f2bb",
+          "width": 80,
+          "height": 80,
+          "seed": 1002,
+          "groupIds": [],
+          "roundness": null,
+          "boundElements": [],
+          "frameId": null,
+          "index": null,
+          "updated": 0,
+          "link": null,
+          "locked": false
+        }
+      ]
+    }
+  ]
+}

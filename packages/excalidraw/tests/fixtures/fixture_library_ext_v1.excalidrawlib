@@ -1,0 +1,79 @@
+{
+  "type": "excalidrawlib",
+  "version": 1,
+  "library": [
+    [
+      {
+        "type": "rectangle",
+        "version": 1,
+        "versionNonce": 2001,
+        "isDeleted": false,
+        "id": "v1-rect",
+        "fillStyle": "solid",
+        "strokeWidth": 1,
+        "strokeStyle": "solid",
+        "roughness": 0,
+        "opacity": 100,
+        "angle": 0,
+        "x": 10,
+        "y": 20,
+        "strokeColor": "#1e1e1e",
+        "backgroundColor": "#a5d8ff",
+        "width": 120,
+        "height": 60,
+        "seed": 2001,
+        "groupIds": [],
+        "strokeSharpness": "sharp",
+        "boundElementIds": []
+      },
+      {
+        "type": "ellipse",
+        "version": 1,
+        "versionNonce": 2002,
+        "isDeleted": false,
+        "id": "v1-ellipse",
+        "fillStyle": "solid",
+        "strokeWidth": 2,
+        "strokeStyle": "solid",
+        "roughness": 1,
+        "opacity": 100,
+        "angle": 0,
+        "x": 160,
+        "y": 10,
+        "strokeColor": "#1e1e1e",
+        "backgroundColor": "#b2f2bb",
+        "width": 70,
+        "height": 70,
+        "seed": 2002,
+        "groupIds": [],
+        "strokeSharpness": "round",
+        "boundElementIds": []
+      }
+    ],
+    [
+      {
+        "type": "diamond",
+        "version": 1,
+        "versionNonce": 2003,
+        "isDeleted": false,
+        "id": "v1-diamond",
+        "fillStyle": "hachure",
+        "strokeWidth": 1,
+        "strokeStyle": "dashed",
+        "roughness": 1,
+        "opacity": 100,
+        "angle": 0,
+        "x": -50,
+        "y": 100,
+        "strokeColor": "#c92a2a",
+        "backgroundColor": "#fff3bf",
+        "width": 90,
+        "height": 90,
+        "seed": 2003,
+        "groupIds": [],
+        "strokeSharpness": "sharp",
+        "boundElementIds": []
+      }
+    ]
+  ]
+}
