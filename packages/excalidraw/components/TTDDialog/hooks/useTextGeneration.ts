@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 import { isFiniteNumber } from "@excalidraw/math";
 
 import { useAtom } from "../../../editor-jotai";
@@ -189,6 +188,12 @@ export const useTextGeneration = ({
 
         return;
       }
+
+      // outside the parse try so a chunk load failure isn't reported as a
+      // diagram parse error
+      const { parseMermaidToExcalidraw } = await import(
+        "@excalidraw/mermaid-to-excalidraw"
+      );
 
       try {
         await parseMermaidToExcalidraw(generatedResponse ?? "");
