@@ -147,6 +147,7 @@ import {
   isBindableElement,
   isTextElement,
   isStickyNoteElement,
+  getPerfectElementSize,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -10117,8 +10118,15 @@ class App extends React.Component<AppProps, AppState> {
 
         if (newElement.type === "freedraw") {
           const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+          let dx = pointerCoords.x - newElement.x;
+          let dy = pointerCoords.y - newElement.y;
+          if (event.shiftKey) {
+            ({ width: dx, height: dy } = getPerfectElementSize(
+              "freedraw",
+              dx,
+              dy,
+            ));
+          }
 
           const lastPoint = points.length > 0 && points[points.length - 1];
           const discardPoint =
@@ -10127,12 +10135,17 @@ class App extends React.Component<AppProps, AppState> {
           if (!discardPoint) {
             const pressures = newElement.simulatePressure
               ? newElement.pressures
+              : event.shiftKey
+              ? [newElement.pressures[0], event.pressure]
               : [...newElement.pressures, event.pressure];
 
             this.scene.mutateElement(
               newElement,
               {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                points: [
+                  ...(event.shiftKey ? points.slice(0, 1) : points),
+                  pointFrom<LocalPoint>(dx, dy),
+                ],
                 pressures,
               },
               {
@@ -10618,6 +10631,13 @@ class App extends React.Component<AppProps, AppState> {
         const points = newElement.points;
         let dx = pointerCoords.x - newElement.x;
         let dy = pointerCoords.y - newElement.y;
+        if (childEvent.shiftKey) {
+          ({ width: dx, height: dy } = getPerfectElementSize(
+            "freedraw",
+            dx,
+            dy,
+          ));
+        }
 
         // Allows dots to avoid being flagged as infinitely small
         if (dx === points[0][0] && dy === points[0][1]) {
@@ -10627,10 +10647,15 @@ class App extends React.Component<AppProps, AppState> {
 
         const pressures = newElement.simulatePressure
           ? []
+          : childEvent.shiftKey
+          ? [newElement.pressures[0], childEvent.pressure]
           : [...newElement.pressures, childEvent.pressure];
 
         this.scene.mutateElement(newElement, {
-          points: [...points, pointFrom<LocalPoint>(dx, dy)],
+          points: [
+            ...(childEvent.shiftKey ? points.slice(0, 1) : points),
+            pointFrom<LocalPoint>(dx, dy),
+          ],
           pressures,
         });
 
