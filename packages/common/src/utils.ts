@@ -15,6 +15,7 @@ import type {
 import {
   DEFAULT_VERSION,
   ENV,
+  EXPORT_FILENAME_BRAND_PREFIX,
   FONT_FAMILY,
   getFontFamilyFallbacks,
   WINDOWS_EMOJI_FALLBACK_FONT,
@@ -43,6 +44,23 @@ export const getDateTime = () => {
   const min = `${date.getMinutes()}`.padStart(2, "0");
 
   return `${year}-${month}-${day}-${hr}${min}`;
+};
+
+/**
+ * Prefixes a default export filename with the Excalidraw brand prefix
+ * (e.g. `"excalidraw-"`) so exported assets (PNG/SVG/.excalidraw/etc)
+ * remain recognizable, while leaving the value fully editable afterwards.
+ *
+ * Idempotent — won't double-prefix a name that already starts with it
+ * (case-insensitive), so re-deriving a name that was previously branded
+ * (e.g. on repeated export-dialog opens) is a no-op.
+ */
+export const withExportFilenameBrandPrefix = (name: string): string => {
+  const prefix = `${EXPORT_FILENAME_BRAND_PREFIX}-`;
+  if (!name || name.toLowerCase().startsWith(prefix)) {
+    return name;
+  }
+  return `${prefix}${name}`;
 };
 
 export const capitalizeString = (str: string) =>

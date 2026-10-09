@@ -102,6 +102,7 @@ import {
   isSelectionLikeTool,
   oneOf,
   getStrokeWidthByKey,
+  withExportFilenameBrandPrefix,
 } from "@excalidraw/common";
 
 import {
@@ -5880,11 +5881,11 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   public getName = () => {
-    return (
+    const name =
       this.state.name ||
       this.props.name ||
-      `${t("labels.untitled")}-${getDateTime()}`
-    );
+      `${t("labels.untitled")}-${getDateTime()}`;
+    return withExportFilenameBrandPrefix(name);
   };
 
   // fires only on Safari

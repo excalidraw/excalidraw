@@ -7,6 +7,7 @@ import {
   isWritableElement,
   mapFind,
   reduceToCommonValue,
+  withExportFilenameBrandPrefix,
 } from "@excalidraw/common";
 import { vi } from "vitest";
 
@@ -92,6 +93,31 @@ describe("@excalidraw/common/utils", () => {
       expect(reduceToCommonValue([null])).toEqual(null);
       expect(reduceToCommonValue([undefined])).toEqual(null);
       expect(reduceToCommonValue([])).toEqual(null);
+    });
+  });
+
+  describe("withExportFilenameBrandPrefix()", () => {
+    it("prefixes a plain name with the excalidraw brand prefix", () => {
+      expect(withExportFilenameBrandPrefix("Architecture Diagram")).toEqual(
+        "excalidraw-Architecture Diagram",
+      );
+      expect(withExportFilenameBrandPrefix("Untitled-2026-09-23-1230")).toEqual(
+        "excalidraw-Untitled-2026-09-23-1230",
+      );
+    });
+
+    it("does not double-prefix a name that's already branded", () => {
+      expect(
+        withExportFilenameBrandPrefix("excalidraw-Architecture Diagram"),
+      ).toEqual("excalidraw-Architecture Diagram");
+      // case-insensitive guard
+      expect(withExportFilenameBrandPrefix("Excalidraw-My Diagram")).toEqual(
+        "Excalidraw-My Diagram",
+      );
+    });
+
+    it("returns falsy/empty input unchanged", () => {
+      expect(withExportFilenameBrandPrefix("")).toEqual("");
     });
   });
 
