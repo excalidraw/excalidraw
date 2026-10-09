@@ -1,7 +1,7 @@
 import { queryByText, queryByTestId } from "@testing-library/react";
 import { useMemo } from "react";
 
-import { THEME } from "@excalidraw/common";
+import { GRID_TYPE, THEME } from "@excalidraw/common";
 
 import { t } from "../i18n";
 import { Excalidraw, Footer, MainMenu } from "../index";
@@ -102,21 +102,47 @@ describe("<Excalidraw/>", () => {
   });
 
   describe("Test gridModeEnabled prop", () => {
-    it('should show grid mode in context menu when gridModeEnabled is "undefined"', async () => {
+    it('should show grid mode in context menu when gridModeEnabled is "undefined" and cycle through states', async () => {
       const { container } = await render(<Excalidraw />);
       expect(h.state.gridModeEnabled).toBe(false);
+      expect(h.state.gridType).toBe(GRID_TYPE.MESH);
 
       expect(
         container.getElementsByClassName("disable-zen-mode--visible").length,
       ).toBe(0);
+
+      // Cycle 1: Off -> Lines (Mesh)
       fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
         button: 2,
         clientX: 1,
         clientY: 1,
       });
-      const contextMenu = document.querySelector(".context-menu");
+      let contextMenu = document.querySelector(".context-menu");
       fireEvent.click(queryByText(contextMenu as HTMLElement, "Toggle grid")!);
       expect(h.state.gridModeEnabled).toBe(true);
+      expect(h.state.gridType).toBe(GRID_TYPE.MESH);
+
+      // Cycle 2: Lines -> Dots
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+        button: 2,
+        clientX: 1,
+        clientY: 1,
+      });
+      contextMenu = document.querySelector(".context-menu");
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Toggle grid")!);
+      expect(h.state.gridModeEnabled).toBe(true);
+      expect(h.state.gridType).toBe(GRID_TYPE.DOTS);
+
+      // Cycle 3: Dots -> Off
+      fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
+        button: 2,
+        clientX: 1,
+        clientY: 1,
+      });
+      contextMenu = document.querySelector(".context-menu");
+      fireEvent.click(queryByText(contextMenu as HTMLElement, "Toggle grid")!);
+      expect(h.state.gridModeEnabled).toBe(false);
+      expect(h.state.gridType).toBe(GRID_TYPE.MESH);
     });
 
     it('should not show grid mode in context menu when gridModeEnabled is not "undefined"', async () => {
