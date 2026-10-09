@@ -376,6 +376,31 @@ describe("restoreElements", () => {
     expect(untouched.width).toBe(999);
   });
 
+  it("should rewrap from the original text when refreshing dimensions", () => {
+    // wrapped elsewhere, with metrics too wide for it to fit on one line
+    const text = {
+      ...API.createElement({
+        type: "text",
+        text: "你好世界你好世界",
+        fontSize: 20,
+        width: 90,
+        height: 50,
+      }),
+      text: "你好世界\n你好世界",
+      autoResize: false,
+    };
+
+    const [restored] = restore.restoreElements([text], null, {
+      refreshDimensions: true,
+    }) as ExcalidrawTextElement[];
+
+    // fits on one line locally (8 * 10px)
+    expect(restored.text).toBe("你好世界你好世界");
+    expect(restored.originalText).toBe("你好世界你好世界");
+    expect(restored.width).toBe(90);
+    expect(restored.height).toBe(25);
+  });
+
   it("should measure a label against a container that is only in the existing elements", () => {
     const container = API.createElement({
       type: "rectangle",
