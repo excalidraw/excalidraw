@@ -282,7 +282,7 @@
     "cannotRestoreFromImage": "පින්තූරයෙන් ප්‍රතිස්ථාපනය කළ නොහැක",
     "invalidSceneUrl": "වලංගු නොවන දර්ශන URL",
     "resetLibrary": "පුස්තකාලය යළි සකසන්න",
-    "removeItemsFromsLibrary": "පුස්තකාලයෙන් අයිතම ඉවත් කරන්න",
+    "removeItemsFromsLibrary": "පුස්තකාලයෙන් අයිතම ඉවත් කරන්න ({{count}})",
     "invalidEncryptionKey": "වලංගු නොවන ගුප්තකේතන යතුර",
     "collabOfflineWarning": "සහයෝගිතාව ඕෆ්ලයින් ඇඟවීම",
     "localStorageQuotaExceeded": ""
@@ -508,7 +508,7 @@
   },
   "publishSuccessDialog": {
     "title": "ප්‍රකාශන සාර්ථකත්ව සංවාදය",
-    "content": "ප්‍රකාශන සාර්ථකත්ව අන්තර්ගතය"
+    "content": "ප්‍රකාශන සාර්ථකත්ව අන්තර්ගතය ({{authorName}})"
   },
   "confirmDialog": {
     "resetLibrary": "පුස්තකාලය යළි සකස් කිරීම තහවුරු කරන්න",
@@ -563,13 +563,13 @@
     "addedToLibrary": "පුස්තකාලයට එක් කරන ලදි",
     "copyStyles": "ශෛලීන් පිටපත් කරන ලදි",
     "copyToClipboard": "ක්ලිප්බෝඩ් එකට පිටපත් කරන ලදි",
-    "copyToClipboardAsPng": "PNG ලෙස ක්ලිප්බෝඩ් එකට පිටපත් කරන ලදි",
+    "copyToClipboardAsPng": "PNG ලෙස ක්ලිප්බෝඩ් එකට පිටපත් කරන ලදි ({{exportSelection}}, {{exportColorScheme}})",
     "copyToClipboardAsSvg": "",
     "fileSaved": "ගොනුව සුරැකිණි",
     "fileSavedToFilename": "ගොනුව ගොනු නාමයට සුරැකිණි",
     "canvas": "කැන්වස ටෝස්ට්",
     "selection": "තේරීම ටෝස්ට්",
-    "pasteAsSingleElement": "තනි අංගයක් ලෙස ඇලවීම",
+    "pasteAsSingleElement": "තනි අංගයක් ලෙස ඇලවීම ({{shortcut}})",
     "unableToEmbed": "බිහිදැමීමට නොහැක",
     "unrecognizedLinkFormat": "නොහඳුනන සබැඳි ආකෘතිය",
     "elementLinkCopied": ""
