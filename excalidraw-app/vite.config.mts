@@ -7,7 +7,10 @@ import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
-import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
+import {
+  woff2BrowserPlugin,
+  OSS_FONTS_CDN,
+} from "../scripts/woff2/woff2-vite-plugins";
 export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
@@ -173,6 +176,24 @@ export default defineConfig(({ mode }) => {
             // via a static import from the main bundle, defeating lazy
             // loading. So we exclude it by name instead.
             "**/CodeMirrorEditor-*.js",
+          ],
+          additionalManifestEntries: [
+            {
+              url: `${OSS_FONTS_CDN}fonts/Excalifont/Excalifont-Regular-a88b72a24fb54c9f94e3b5fdaa7481c9.woff2`,
+              revision: null,
+            },
+            {
+              url: `${OSS_FONTS_CDN}fonts/Nunito/Nunito-Regular-XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhdTQ3j6zbXWjgeg.woff2`,
+              revision: null,
+            },
+            {
+              url: `${OSS_FONTS_CDN}fonts/Assistant/Assistant-SemiBold.woff2`,
+              revision: null,
+            },
+            {
+              url: `${OSS_FONTS_CDN}fonts/ComicShanns/ComicShanns-Regular-279a7b317d12eb88de06167bd672b4b4.woff2`,
+              revision: null,
+            },
           ],
           runtimeCaching: [
             {
