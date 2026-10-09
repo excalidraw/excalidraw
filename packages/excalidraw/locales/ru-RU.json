@@ -2,6 +2,7 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
     "paste": "Вставить",
     "pasteAsPlaintext": "Вставить как обычный текст",
     "pasteCharts": "Вставить диаграммы",
@@ -27,6 +28,7 @@
     "copyStyles": "Скопировать стили",
     "pasteStyles": "Вставить стили",
     "stroke": "Обводка",
+    "textColor": "",
     "changeStroke": "Изменить цвет обводки",
     "background": "Фон",
     "changeBackground": "Изменить цвет фона",
@@ -195,7 +197,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "Привязка стрелкой",
-    "midpointSnapping": "Привязка к средней точке"
+    "midpointSnapping": "Привязка к средней точке",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "Ссылка на объект",
@@ -245,6 +251,7 @@
     "undo": "Шаг назад",
     "redo": "Шаг вперёд",
     "resetLibrary": "Сброс библиотеки",
+    "reset": "",
     "createNewRoom": "Создать новую комнату",
     "fullScreen": "Полный экран",
     "darkMode": "Тёмная тема",
@@ -332,6 +339,7 @@
     "eraser": "Ластик",
     "frame": "Фреймовый инструмент",
     "magicframe": "Каркас для кода",
+    "stickynote": "",
     "embeddable": "Встроенная страница",
     "laser": "Лазерная указка",
     "autoshape": "",
@@ -357,6 +365,7 @@
     "group": "Группа",
     "frame": "Фрейм",
     "magicframe": "Каркас для кода",
+    "stickynote": "",
     "embeddable": "Встроенная страница",
     "selection": "Выделение",
     "iframe": "IFrame"
@@ -375,6 +384,7 @@
     "freeDraw": "Нажмите и перетаскивайте, отпустите по завершении",
     "text": "Совет: при выбранном инструменте выделения дважды щёлкните в любом месте, чтобы добавить текст",
     "embeddable": "Перетащите для встраивания веб-сайта",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "Дважды щёлкните или нажмите {{shortcut}}, чтобы отредактировать текст",
     "text_editing": "Нажмите {{shortcut_1}} или {{shortcut_2}}, чтобы завершить редактирование",
@@ -382,6 +392,7 @@
     "lockAngle": "Вы можете ограничить угол, удерживая {{shortcut}}",
     "resize": "Вы можете ограничить пропорции, удерживая {{shortcut_1}} во время изменения размера,\nудерживайте {{shortcut_2}}, чтобы изменить размер от центра",
     "resizeImage": "Вы можете свободно изменять размер, удерживая {{shortcut_1}},\nудерживайте {{shortcut_2}}, чтобы изменить размер от центра",
+    "resizeStickyNote": "",
     "rotate": "Вы можете ограничить углы, удерживая {{shortcut}} во время поворота",
     "toggleArrowhead": "",
     "lineEditor_info": "Удерживайте {{shortcut_1}} и дважды щёлкните или нажмите {{shortcut_2}}, чтобы отредактировать точки",
@@ -392,6 +403,7 @@
     "bindTextToElement": "{{shortcut}} — добавить текст",
     "createFlowchart": "{{shortcut}} — создать блок-схему",
     "deepBoxSelect": "Удерживайте {{shortcut}} для глубокого выделения и предотвращения перетаскивания",
+    "cycleSelection": "",
     "eraserRevert": "Удерживайте {{shortcut}}, чтобы восстановить элементы, помеченные для удаления",
     "firefox_clipboard_write": "Эта функция может быть включена при изменении значения флага «dom.events.asyncClipboard.clipboardItem» на «true». Чтобы изменить флаги браузера в Firefox, зайдите на страницу «about:config».",
     "disableSnapping": "Удерживайте {{shortcut}}, чтобы отключить привязку",
@@ -649,6 +661,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "Из Mermaid в Excalidraw",
     "button": "Вставить",
@@ -656,7 +677,7 @@
     "syntax": "Синтаксис Mermaid",
     "preview": "Предпросмотр",
     "label": "Mermaid",
-    "inputPlaceholder": "Напишите здесь определение диаграммы Mermaid...",
+    "inputPlaceholder": "",
     "autoFixAvailable": "Автоисправление доступно"
   },
   "ttd": {
@@ -714,7 +735,9 @@
     },
     "sceneFonts": "В этой сцене",
     "availableFonts": "Доступные шрифты",
-    "empty": "Шрифты не найдены"
+    "empty": "Шрифты не найдены",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "Пользователи не найдены",
