@@ -69,11 +69,14 @@ export const resizeTest = <Point extends GlobalPoint | LocalPoint>(
       getOmitSidesForEditorInterface(editorInterface),
     );
 
-  if (
-    rotationTransformHandle &&
-    isInsideTransformHandle(rotationTransformHandle, x, y)
-  ) {
-    return "rotation" as TransformHandleType;
+  if (rotationTransformHandle) {
+    const cx = rotationTransformHandle[0] + rotationTransformHandle[2] / 2;
+    const cy = rotationTransformHandle[1] + rotationTransformHandle[3] / 2;
+    const hitRadius = rotationTransformHandle[2] / 2 + 7 / zoom.value;
+
+    if ((x - cx) ** 2 + (y - cy) ** 2 <= hitRadius ** 2) {
+      return "rotation" as TransformHandleType;
+    }
   }
 
   const filter = Object.keys(transformHandles).filter((key) => {
