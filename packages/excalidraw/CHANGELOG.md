@@ -13,6 +13,11 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### PDF import (2026-10-09) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- PDFs can be dropped, pasted, picked through the image tool, or inserted via the new "Insert PDF" item in the "More tools" menu. Each page is rasterized into an image element (PNG, or JPEG for scans/photos when smaller, capped by `imageOptions.maxWidthOrHeight`) and the pages are laid out side by side at their real size (10 per row, each document on its own row). Placeholders appear right away and are swapped for the rendered pages once done, recorded as a single undo step. At most 50 pages are imported from a single PDF.
+- Uses [pdf.js](https://github.com/mozilla/pdf.js) (`pdfjs-dist`, legacy build), lazy-loaded on first import and parsing in a Web Worker (spawned from the `pdf-worker.chunk` chunk, falling back to the main thread when workers are unavailable). Optional pdf.js resources (CJK cmaps, standard fonts, JPEG 2000/JBIG2 decoders) are fetched from jsDelivr only when a PDF needs them.
+
 ### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.

@@ -353,6 +353,13 @@ import {
 
 import { fileOpen } from "../data/filesystem";
 import {
+  isPdfFile,
+  layoutPdfPages,
+  openPdf,
+  PDF_MAX_PAGES,
+  type PdfDocument,
+} from "../data/pdf";
+import {
   showHyperlinkTooltip,
   hideHyperlinkToolip,
   Hyperlink,
@@ -11090,15 +11097,18 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
-      const imageFiles = await fileOpen({
+      const files = await fileOpen({
         description: "Image",
-        extensions: Object.keys(
-          IMAGE_MIME_TYPES,
-        ) as (keyof typeof IMAGE_MIME_TYPES)[],
+        extensions: [
+          ...(Object.keys(
+            IMAGE_MIME_TYPES,
+          ) as (keyof typeof IMAGE_MIME_TYPES)[]),
+          "pdf",
+        ],
         multiple: true,
       });
 
-      this.insertImages(imageFiles, x, y);
+      this.insertImagesAndPdfs(files, x, y);
     } catch (error: any) {
       if (error.name !== "AbortError") {
         console.error(error);
@@ -11313,6 +11323,212 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  /**
+   * Imports PDF files by rasterizing each page into an image element. Pages
+   * are laid out side by side (centered around the supplied coords) as
+   * placeholders, which get swapped for the pages once rendered in the
+   * background.
+   *
+   * @returns once the placeholders are inserted
+   */
+  public insertPdfs = async (
+    pdfFiles: File[],
+    sceneX: number,
+    sceneY: number,
+  ) => {
+    this.cursor.set("wait");
+
+    const documents: PdfDocument[] = [];
+    for (const file of pdfFiles) {
+      try {
+        documents.push(await openPdf(file));
+      } catch (error: any) {
+        console.error(error);
+        this.setState({
+          errorMessage:
+            error?.name === "PasswordException"
+              ? t("errors.pdfPasswordProtected")
+              : t("errors.pdfImportError"),
+        });
+      }
+    }
+
+    if (this.unmounted) {
+      documents.forEach((pdf) => this.destroyPdf(pdf));
+      return;
+    }
+
+    if (this.state.activeTool.type === "image") {
+      // when imported via the image tool
+      this.setActiveTool(
+        { type: this.state.preferredSelectionTool.type },
+        { keepSelection: true },
+      );
+    }
+
+    if (!documents.length) {
+      this.cursor.reset();
+      return;
+    }
+
+    const pages = documents.map((pdf) => pdf.pages.slice(0, PDF_MAX_PAGES));
+
+    if (documents.some((pdf) => pdf.pages.length > PDF_MAX_PAGES)) {
+      this.setToast({
+        message: t("toast.pdfPageLimit", { count: PDF_MAX_PAGES }),
+        duration: 5000,
+      });
+    }
+
+    const positions = layoutPdfPages(pages, { x: sceneX, y: sceneY });
+    const placeholders = pages.flat().map((page, index) =>
+      newElementWith(
+        this.newImagePlaceholder({
+          sceneX,
+          sceneY,
+          addToFrameUnderCursor: false,
+        }),
+        { ...positions[index], width: page.width, height: page.height },
+      ),
+    );
+
+    this.insertNewElements(placeholders);
+    this.setState({
+      selectedElementIds: makeNextSelectedElementIds(
+        Object.fromEntries(placeholders.map((el) => [el.id, true])),
+        this.state,
+      ),
+    });
+    this.revealIfHidden(placeholders);
+
+    // don't block callers (e.g. paste) until all pages render
+    this.renderPdfPages(
+      documents.map((pdf, index) => ({ pdf, pageCount: pages[index].length })),
+      placeholders,
+    ).catch((error) => console.error(error));
+  };
+
+  /**
+   * Renders PDF pages one by one, and swaps them for their placeholders.
+   *
+   * All placeholders are swapped at once in the end, so that the import is
+   * captured as a single history entry (updating them one by one would get
+   * them captured piecemeal, e.g. by the host updating image statuses).
+   */
+  private renderPdfPages = async (
+    documents: { pdf: PdfDocument; pageCount: number }[],
+    placeholders: ExcalidrawImageElement[],
+  ) => {
+    try {
+      const fileIds = new Map<ExcalidrawElement["id"], FileId>();
+
+      let placeholderIndex = 0;
+      for (const { pdf, pageCount } of documents) {
+        for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+          const placeholder = placeholders[placeholderIndex++];
+
+          if (this.unmounted) {
+            return;
+          }
+          // deleted in the meantime, or the scene was replaced
+          if (!this.scene.getNonDeletedElement(placeholder.id)) {
+            continue;
+          }
+
+          try {
+            const imageFile = await pdf.renderPage(pageIndex, {
+              maxWidthOrHeight: this.props.imageOptions.maxWidthOrHeight,
+              ownerDocument: this.ownerDocument,
+            });
+            const { fileId } = await this.initializeImage(
+              placeholder,
+              imageFile,
+            );
+            fileIds.set(placeholder.id, fileId);
+          } catch (error: any) {
+            console.error(error);
+            this.setState({
+              errorMessage: error.message || t("errors.pdfImportError"),
+            });
+          }
+        }
+      }
+
+      if (this.unmounted) {
+        return;
+      }
+
+      const placeholderIds = new Set(placeholders.map((el) => el.id));
+
+      this.updateScene({
+        elements: this.scene.getElementsIncludingDeleted().map((el) => {
+          if (!placeholderIds.has(el.id) || el.isDeleted) {
+            return el;
+          }
+          const fileId = fileIds.get(el.id);
+          // keep the placeholder's geometry (the page size, incl. changes
+          // made to the placeholder meanwhile)
+          return fileId
+            ? newElementWith(el as ExcalidrawImageElement, { fileId })
+            : newElementWith(el, { isDeleted: true });
+        }),
+        captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+      });
+    } finally {
+      documents.forEach(({ pdf }) => this.destroyPdf(pdf));
+      if (!this.unmounted) {
+        this.cursor.reset();
+      }
+    }
+  };
+
+  private destroyPdf = (pdf: PdfDocument) => {
+    pdf.destroy().catch((error) => console.warn(error));
+  };
+
+  /** inserts images and PDFs (pages as images), ignoring other files */
+  public insertImagesAndPdfs = async (
+    files: File[],
+    sceneX: number,
+    sceneY: number,
+  ) => {
+    const pdfFiles = files.filter((file) => isPdfFile(file));
+    const imageFiles = files.filter((file) => !isPdfFile(file));
+
+    await Promise.all([
+      imageFiles.length && this.insertImages(imageFiles, sceneX, sceneY),
+      pdfFiles.length && this.insertPdfs(pdfFiles, sceneX, sceneY),
+    ]);
+  };
+
+  public onPdfToolbarButtonClick = async () => {
+    if (!this.isToolSupported("image")) {
+      this.setState({ errorMessage: t("errors.imageToolNotSupported") });
+      return;
+    }
+    try {
+      const { x, y } = viewportCoordsToSceneCoords(
+        {
+          clientX: this.state.width / 2 + this.state.offsetLeft,
+          clientY: this.state.height / 2 + this.state.offsetTop,
+        },
+        this.state,
+      );
+
+      const pdfFiles = await fileOpen({
+        description: "PDF",
+        extensions: ["pdf"],
+        multiple: true,
+      });
+
+      await this.insertPdfs(pdfFiles, x, y);
+    } catch (error: any) {
+      if (error.name !== "AbortError") {
+        console.error(error);
+      }
+    }
+  };
+
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     if (!this.isFileDropEnabled()) {
       return;
@@ -11377,10 +11593,10 @@ class App extends React.Component<AppProps, AppState> {
 
     const imageFiles = fileItems
       .map((data) => data.file)
-      .filter((file) => isSupportedImageFile(file));
+      .filter((file) => isSupportedImageFile(file) || isPdfFile(file));
 
     if (imageFiles.length > 0 && this.isToolSupported("image")) {
-      return this.insertImages(imageFiles, sceneX, sceneY);
+      return this.insertImagesAndPdfs(imageFiles, sceneX, sceneY);
     }
     const excalidrawLibrary_ids = dataTransferList.getData(
       MIME_TYPES.excalidrawlibIds,

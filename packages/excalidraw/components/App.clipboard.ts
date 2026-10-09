@@ -154,7 +154,7 @@ export class AppClipboard {
       }
     }
 
-    // ------------------- Images or SVG code -------------------
+    // ------------------- Images, PDFs or SVG code -------------------
     const imageFiles = dataTransferFiles.map((data) => data.file);
 
     if (imageFiles.length === 0 && data.text && !isPlainPaste) {
@@ -168,7 +168,7 @@ export class AppClipboard {
 
     if (imageFiles.length > 0) {
       if (this.app.isToolSupported("image")) {
-        await this.app.insertImages(imageFiles, sceneX, sceneY);
+        await this.app.insertImagesAndPdfs(imageFiles, sceneX, sceneY);
       } else {
         this.app.setState({ errorMessage: t("errors.imageToolNotSupported") });
       }
