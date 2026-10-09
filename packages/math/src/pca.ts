@@ -1,7 +1,7 @@
 import { pointFrom } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 
-import type { GlobalPoint, LocalPoint, Vector } from "./types";
+import type { GenericPoint, GlobalPoint, LocalPoint, Vector } from "./types";
 
 /**
  * The principal axes of a point set, i.e. the eigen decomposition of its
@@ -13,7 +13,7 @@ import type { GlobalPoint, LocalPoint, Vector } from "./types";
  * translation and rotation, and dividing by `sqrt(majorVariance)` removes
  * scale.
  */
-export type PrincipalAxes<Point extends GlobalPoint | LocalPoint> = {
+export type PrincipalAxes<Point extends GenericPoint> = {
   centroid: Point;
   /** Unit vector along the direction of largest variance. */
   major: Vector;
@@ -34,7 +34,7 @@ export type PrincipalCoords = [u: number, v: number];
 /**
  * Compute the centroid of a point set.
  */
-export function centroid<Point extends GlobalPoint | LocalPoint>(
+export function centroid<Point extends GenericPoint>(
   points: readonly Point[],
 ): Point {
   let cx = 0;
