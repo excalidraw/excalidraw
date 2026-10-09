@@ -299,8 +299,6 @@
     "collabSaveFailed": "Nie udało się zapisać w bazie danych. Jeśli problemy nie ustąpią, zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "collabSaveFailed_sizeExceeded": "Nie udało się zapisać w bazie danych — dokument jest za duży. Zapisz plik lokalnie, aby nie utracić swojej pracy.",
     "imageToolNotSupported": "Dodawanie obrazów jest wyłączone.",
-    "pdfImportError": "Nie udało się zaimportować pliku PDF. Plik może być uszkodzony.",
-    "pdfPasswordProtected": "Pliki PDF chronione hasłem nie są obsługiwane.",
     "brave_measure_text_error": {
       "line1": "Wygląda na to, że używasz przeglądarki Brave z włączonym ustawieniem <bold>Agressively Block Fingerprinting</bold>.",
       "line2": "Może to doprowadzić do złamania <bold>elementów tekstu</bold> na rysunkach.",
@@ -320,7 +318,6 @@
     "selection": "Zaznaczenie",
     "lasso": "Wybór lassem",
     "image": "Wstaw obraz",
-    "pdf": "Wstaw PDF",
     "rectangle": "Prostokąt",
     "diamond": "Romb",
     "ellipse": "Elipsa",
@@ -575,8 +572,7 @@
     "pasteAsSingleElement": "Użyj {{shortcut}}, aby wkleić jako pojedynczy element,\nlub wklej do istniejącego edytora tekstu",
     "unableToEmbed": "Osadzenie tego linku jest obecnie niedozwolone. Zgłoś propozycję na portalu GitHub, aby dodać go do listy dozwolonych wyjątków",
     "unrecognizedLinkFormat": "Osadzony link ma niewłaściwy format. Spróbuj wkleić całą zawartość pola \"embed\" z oryginalnej strony.",
-    "elementLinkCopied": "Łącze skopiowane do schowka",
-    "pdfPageLimit": "Zaimportowano tylko pierwsze {{count}} stron pliku PDF."
+    "elementLinkCopied": "Łącze skopiowane do schowka"
   },
   "colors": {
     "transparent": "Przezroczysty",
