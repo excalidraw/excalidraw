@@ -608,7 +608,13 @@ const ExcalidrawWrapper = () => {
           const username = importUsernameFromLocalStorage();
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
-            ...localDataState,
+            elements: localDataState.elements,
+            appState: localDataState.appState
+              ? {
+                  ...excalidrawAPI.getAppState(),
+                  ...localDataState.appState,
+                }
+              : null,
             captureUpdate: CaptureUpdateAction.NEVER,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
