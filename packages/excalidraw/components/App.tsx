@@ -181,8 +181,6 @@ import {
   excludeElementsInFramesFromSelection,
   makeNextSelectedElementIds,
   getCursorForResizingElement,
-  getElementWithTransformHandleType,
-  getTransformHandleTypeFromCoords,
   dragNewElement,
   getDragOffsetXY,
   Scene,
@@ -7153,8 +7151,6 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    const elements = this.scene.getNonDeletedElements();
-
     const selectedElements = this.scene.getSelectedElements(this.state);
 
     if (
@@ -7164,14 +7160,14 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    if (
-      selectedElements.length === 1 &&
-      !isOverScrollBar &&
-      !this.state.selectedLinearElement?.isEditing
-    ) {
+    if (!isOverScrollBar) {
       // for linear elements, we'd like to prioritize point dragging over edge resizing
       // therefore, we update and check hovered point index first
-      if (this.state.selectedLinearElement) {
+      if (
+        selectedElements.length === 1 &&
+        !this.state.selectedLinearElement?.isEditing &&
+        this.state.selectedLinearElement
+      ) {
         this.handleHoverSelectedLinearElement(
           this.state.selectedLinearElement,
           scenePointerX,
@@ -7179,59 +7175,14 @@ class App extends React.Component<AppProps, AppState> {
         );
       }
 
-      if (
-        (!this.state.selectedLinearElement ||
-          this.state.selectedLinearElement.hoverPointIndex === -1) &&
-        this.state.openDialog?.name !== "elementLinkSelector" &&
-        !(selectedElements.length === 1 && isElbowArrow(selectedElements[0])) &&
-        // HACK: Disable transform handles for linear elements on mobile until a
-        // better way of showing them is found
-        !(
-          isLinearElement(selectedElements[0]) &&
-          (this.editorInterface.userAgent.isMobileDevice ||
-            selectedElements[0].points.length === 2)
-        )
-      ) {
-        const elementWithTransformHandleType =
-          getElementWithTransformHandleType(
-            elements,
-            this.state,
-            scenePointerX,
-            scenePointerY,
-            this.state.zoom,
-            event.pointerType,
-            this.scene.getNonDeletedElementsMap(),
-            this.editorInterface,
-          );
-        if (
-          elementWithTransformHandleType &&
-          elementWithTransformHandleType.transformHandleType
-        ) {
-          this.cursor.set(
-            getCursorForResizingElement(elementWithTransformHandleType),
-          );
-          return;
-        }
-      }
-    } else if (
-      selectedElements.length > 1 &&
-      !isOverScrollBar &&
-      this.state.openDialog?.name !== "elementLinkSelector"
-    ) {
-      const transformHandleType = getTransformHandleTypeFromCoords(
-        getCommonBounds(selectedElements),
+      const transformHandle = this.selectionTool.getTransformHandleAt(
+        selectedElements,
         scenePointerX,
         scenePointerY,
-        this.state.zoom,
         event.pointerType,
-        this.editorInterface,
       );
-      if (transformHandleType) {
-        this.cursor.set(
-          getCursorForResizingElement({
-            transformHandleType,
-          }),
-        );
+      if (transformHandle) {
+        this.cursor.set(getCursorForResizingElement(transformHandle));
         return;
       }
     }

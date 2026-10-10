@@ -1476,6 +1476,32 @@ describe("app.selection", () => {
   });
 });
 
+describe("transform handles", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("show the resize cursor over the selection's handles", () => {
+    const [a, b] = [0, 200].map((x) =>
+      API.createElement({ type: "rectangle", x, width: 100, height: 100 }),
+    );
+    API.setElements([a, b]);
+    const cursor = () => GlobalTestState.interactiveCanvas.style.cursor;
+
+    // a lone element's right edge
+    API.setSelectedElements([a]);
+    mouse.moveTo(103, 50);
+    expect(cursor()).toBe("ew-resize");
+
+    // the selection's right edge
+    API.setSelectedElements([a, b]);
+    mouse.moveTo(303, 50);
+    expect(cursor()).toBe("ew-resize");
+    mouse.moveTo(150, 50);
+    expect(cursor()).not.toBe("ew-resize");
+  });
+});
+
 describe("selection element", () => {
   it("create selection element on pointer down", async () => {
     const { getByToolName, container } = await render(<Excalidraw />);

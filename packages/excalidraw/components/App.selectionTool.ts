@@ -58,11 +58,13 @@ import {
   vectorSubtract,
 } from "@excalidraw/math";
 
+import type { TransformHandleType } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
+  PointerType,
 } from "@excalidraw/element/types";
 
 import { actionToggleLinearEditor } from "../actions";
@@ -107,66 +109,28 @@ export class AppSelectionTool {
         return false;
       }
 
-      const elements = this.app.scene.getNonDeletedElements();
       const elementsMap = this.app.scene.getNonDeletedElementsMap();
       const selectedElements = this.app.scene.getSelectedElements(
         this.app.state,
       );
 
-      if (
-        selectedElements.length === 1 &&
-        !this.app.state.selectedLinearElement?.isEditing &&
-        !isElbowArrow(selectedElements[0]) &&
-        !(
-          isLinearElement(selectedElements[0]) &&
-          (this.app.editorInterface.userAgent.isMobileDevice ||
-            selectedElements[0].points.length === 2)
-        ) &&
-        !(
-          this.app.state.selectedLinearElement &&
-          this.app.state.selectedLinearElement.hoverPointIndex !== -1
-        )
-      ) {
-        const elementWithTransformHandleType =
-          getElementWithTransformHandleType(
-            elements,
-            this.app.state,
-            pointerDownState.origin.x,
-            pointerDownState.origin.y,
-            this.app.state.zoom,
-            event.pointerType,
-            this.app.scene.getNonDeletedElementsMap(),
-            this.app.editorInterface,
-          );
-        if (elementWithTransformHandleType != null) {
-          if (
-            elementWithTransformHandleType.transformHandleType === "rotation"
-          ) {
-            this.app.setState({
-              resizingElement: elementWithTransformHandleType.element,
-            });
-            pointerDownState.resize.handleType =
-              elementWithTransformHandleType.transformHandleType;
-          } else if (this.app.state.croppingElementId) {
-            pointerDownState.resize.handleType =
-              elementWithTransformHandleType.transformHandleType;
-          } else {
-            this.app.setState({
-              resizingElement: elementWithTransformHandleType.element,
-            });
-            pointerDownState.resize.handleType =
-              elementWithTransformHandleType.transformHandleType;
-          }
+      const transformHandle = this.getTransformHandleAt(
+        selectedElements,
+        pointerDownState.origin.x,
+        pointerDownState.origin.y,
+        event.pointerType,
+      );
+      if (transformHandle) {
+        // (in the crop editor, the handles crop the image rather than resize it)
+        if (
+          transformHandle.element &&
+          (transformHandle.transformHandleType === "rotation" ||
+            !this.app.state.croppingElementId)
+        ) {
+          this.app.setState({ resizingElement: transformHandle.element });
         }
-      } else if (selectedElements.length > 1) {
-        pointerDownState.resize.handleType = getTransformHandleTypeFromCoords(
-          getCommonBounds(selectedElements),
-          pointerDownState.origin.x,
-          pointerDownState.origin.y,
-          this.app.state.zoom,
-          event.pointerType,
-          this.app.editorInterface,
-        );
+        pointerDownState.resize.handleType =
+          transformHandle.transformHandleType;
       }
       if (pointerDownState.resize.handleType) {
         pointerDownState.resize.isResizing = true;
@@ -1212,6 +1176,78 @@ export class AppSelectionTool {
 
     this.app.scene.replaceAllElements(nextElements);
   };
+
+  /**
+   * The selection's transform handle at the scene point, if any — with its
+   * element, for a lone selected element.
+   *
+   * A lone selected element has none while the line editor is open or one of
+   * its line points is hovered, nor does an elbow arrow, a two-point line or
+   * arrow, or (on mobile devices) any line or arrow. The selection has none in
+   * the element link selector.
+   */
+  getTransformHandleAt(
+    selectedElements: readonly NonDeletedExcalidrawElement[],
+    sceneX: number,
+    sceneY: number,
+    pointerType: PointerType,
+  ): {
+    element?: NonDeletedExcalidrawElement;
+    transformHandleType: TransformHandleType;
+  } | null {
+    const { state, editorInterface } = this.app;
+    if (state.openDialog?.name === "elementLinkSelector") {
+      return null;
+    }
+
+    if (selectedElements.length === 1) {
+      const [element] = selectedElements;
+      if (
+        state.selectedLinearElement?.isEditing ||
+        (state.selectedLinearElement &&
+          state.selectedLinearElement.hoverPointIndex !== -1) ||
+        isElbowArrow(element) ||
+        // HACK: Disable transform handles for linear elements on mobile until a
+        // better way of showing them is found
+        (isLinearElement(element) &&
+          (editorInterface.userAgent.isMobileDevice ||
+            element.points.length === 2))
+      ) {
+        return null;
+      }
+      const elementWithTransformHandleType = getElementWithTransformHandleType(
+        this.app.scene.getNonDeletedElements(),
+        state,
+        sceneX,
+        sceneY,
+        state.zoom,
+        pointerType,
+        this.app.scene.getNonDeletedElementsMap(),
+        editorInterface,
+      );
+      return elementWithTransformHandleType?.transformHandleType
+        ? {
+            element: elementWithTransformHandleType.element,
+            transformHandleType:
+              elementWithTransformHandleType.transformHandleType,
+          }
+        : null;
+    }
+
+    if (selectedElements.length > 1) {
+      const transformHandleType = getTransformHandleTypeFromCoords(
+        getCommonBounds(selectedElements),
+        sceneX,
+        sceneY,
+        state.zoom,
+        pointerType,
+        editorInterface,
+      );
+      return transformHandleType ? { transformHandleType } : null;
+    }
+
+    return null;
+  }
 
   /**
    * Updates the selection on a click (no drag): the element below the
