@@ -14,6 +14,7 @@ import { Excalidraw } from "../index";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
+import { API } from "./helpers/api";
 import { UI, Pointer, Keyboard } from "./helpers/ui";
 import { render, fireEvent, act, unmountComponent } from "./test-utils";
 
@@ -71,6 +72,28 @@ describe("move element", () => {
     expect([h.elements[0].x, h.elements[0].y]).toEqual([0, 40]);
 
     h.elements.forEach((element) => expect(element).toMatchSnapshot());
+  });
+
+  it("shift-drag moves along one axis only", async () => {
+    await render(<Excalidraw />);
+    const rectangle = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    API.setElements([rectangle]);
+    API.setSelectedElements([rectangle]);
+
+    const mouse = new Pointer("mouse");
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.downAt(50, 50);
+      mouse.moveTo(90, 60);
+      mouse.upAt();
+    });
+
+    expect(API.getElement(rectangle)).toMatchObject({ x: 40, y: 0 });
   });
 
   it("rectangles with binding arrow", async () => {

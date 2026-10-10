@@ -136,7 +136,7 @@ describe("Crop an image", () => {
     expect(image.height).toBeLessThan(initialHeight);
   });
 
-  it("Dragging a crop handle in the crop editor crops the image", () => {
+  it("In the crop editor, dragging a handle crops the image, and dragging the image moves it within its crop", () => {
     const image = API.createElement({
       type: "image",
       width: 200,
@@ -162,6 +162,14 @@ describe("Crop an image", () => {
 
     expect(API.getElement(image)).toMatchObject({ x: 50, width: 150 });
     expect(API.getElement(image).crop).toMatchObject({ x: 100, width: 300 });
+
+    // 20px to the right = 40px of the file, at twice the element's size
+    mouse.downAt(100, 50);
+    mouse.move(20, 0);
+    mouse.upAt();
+
+    expect(API.getElement(image)).toMatchObject({ x: 50, width: 150 });
+    expect(API.getElement(image).crop).toMatchObject({ x: 60, width: 300 });
   });
 
   it("Cropping has minimal sizes", async () => {
