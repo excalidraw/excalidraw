@@ -1,4 +1,8 @@
-import { CANVAS_SEARCH_TAB, DEFAULT_SIDEBAR } from "@excalidraw/common";
+import {
+  CANVAS_SEARCH_TAB,
+  DEFAULT_SIDEBAR,
+  isSelectionLikeTool,
+} from "@excalidraw/common";
 
 import {
   isArrowElement,
@@ -41,7 +45,8 @@ const getHints = ({
   isMobile,
   editorInterface,
   app,
-}: HintViewerProps): null | string | string[] => {
+  altHeld,
+}: HintViewerProps & { altHeld: boolean }): null | string | string[] => {
   const { activeTool, isResizing, isRotating, lastPointerDownWith } = appState;
   const multiMode = appState.multiElement !== null;
 
@@ -149,6 +154,23 @@ const getHints = ({
   if (isRotating && lastPointerDownWith === "mouse") {
     return t("hints.rotate", {
       shortcut: getTaggedShortcutKey("Shift"),
+    });
+  }
+
+  if (
+    // as the alt-click that cycles it (Shift and Ctrl/Cmd don't re-render
+    // the hint, they're read as they are when Alt does)
+    altHeld &&
+    !app.modifiers.get().shift &&
+    !app.modifiers.get().ctrlOrCmd &&
+    !isMobile &&
+    isSelectionLikeTool(activeTool.type) &&
+    !appState.editingTextElement &&
+    !appState.selectedElementsAreBeingDragged &&
+    app.selectionTool.canCycleSelection()
+  ) {
+    return t("hints.cycleSelection", {
+      shortcut: getTaggedShortcutKey("Alt"),
     });
   }
 
@@ -273,6 +295,8 @@ export const HintViewer = ({
   editorInterface,
   app,
 }: HintViewerProps) => {
+  const altHeld = app.modifiers.useHeld("alt");
+
   if (!appState.showHints) {
     return null;
   }
@@ -282,6 +306,7 @@ export const HintViewer = ({
     isMobile,
     editorInterface,
     app,
+    altHeld,
   });
 
   if (!hints) {

@@ -634,7 +634,7 @@ describe("duplication z-order", () => {
     mouse.select(rectangle1);
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(rectangle1.x + 5, rectangle1.y + 5);
-      mouse.up(rectangle1.x + 5, rectangle1.y + 5);
+      mouse.up(rectangle1.x + 10, rectangle1.y + 10);
     });
 
     assertElements(h.elements, [
@@ -700,7 +700,7 @@ describe("duplication z-order", () => {
     mouse.select(rectangle1);
     Keyboard.withModifierKeys({ alt: true }, () => {
       mouse.down(rectangle1.x + 5, rectangle1.y + 5);
-      mouse.up(rectangle1.x + 5, rectangle1.y + 5);
+      mouse.up(rectangle1.x + 10, rectangle1.y + 10);
     });
 
     assertElements(h.elements, [
