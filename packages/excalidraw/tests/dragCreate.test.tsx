@@ -20,6 +20,7 @@ import * as InteractiveScene from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
 import { API } from "./helpers/api";
+import { Keyboard, Pointer, UI } from "./helpers/ui";
 
 import {
   render,
@@ -453,6 +454,79 @@ describe("Test dragCreate", () => {
       expect(stickyNote.y + stickyNote.height).toBe(300);
       expect(stickyNote.width).toBe(25 + STICKY_NOTE_BODY_INSET_Y);
     });
+  });
+
+  describe("modifier keys while drawing with the tool locked", () => {
+    const mouse = new Pointer("mouse");
+
+    beforeEach(async () => {
+      mouse.reset();
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      // jsdom gives the editor no size, so there'd be nothing in view to snap to
+      API.setAppState({ width: 1000, height: 1000 });
+    });
+
+    it("keeps a line where it's drawn when Alt is pressed", () => {
+      UI.clickTool("line");
+      UI.clickTool("lock");
+
+      mouse.downAt(100, 100);
+      mouse.moveTo(300, 180);
+      Keyboard.withModifierKeys({ alt: true }, () => {
+        Keyboard.keyDown(KEYS.ALT);
+      });
+      Keyboard.keyUp(KEYS.ALT);
+      mouse.upAt(300, 180);
+
+      expect(h.elements[0]).toMatchObject({
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 80,
+        points: [
+          [0, 0],
+          [200, 80],
+        ],
+      });
+    });
+
+    it("keeps a line's size in sync with its points when Shift is pressed", () => {
+      UI.clickTool("line");
+      UI.clickTool("lock");
+
+      mouse.downAt(100, 100);
+      mouse.moveTo(300, 180);
+      Keyboard.withModifierKeys({ shift: true }, () => {
+        Keyboard.keyDown("Shift");
+        mouse.moveTo(300, 190);
+      });
+      Keyboard.keyUp("Shift");
+      mouse.upAt(300, 190);
+
+      const line = h.elements[0] as ExcalidrawLinearElement;
+      const [endX, endY] = line.points[line.points.length - 1];
+      expect(line.width).toBeCloseTo(endX);
+      expect(line.height).toBeCloseTo(endY);
+    });
+
+    it.each(["rectangle", "line", "arrow", "freedraw"] as const)(
+      "doesn't snap the %s being drawn to itself when Ctrl is pressed",
+      (type) => {
+        UI.clickTool(type);
+        UI.clickTool("lock");
+
+        mouse.downAt(100, 100);
+        mouse.moveTo(300, 180);
+        Keyboard.withModifierKeys({ ctrl: true }, () => {
+          Keyboard.keyDown("Control");
+        });
+        const { snapLines } = h.state;
+        Keyboard.keyUp("Control");
+        mouse.upAt(300, 180);
+
+        expect(snapLines).toEqual([]);
+      },
+    );
   });
 
   describe("do not add element to the scene if size is too small", () => {
