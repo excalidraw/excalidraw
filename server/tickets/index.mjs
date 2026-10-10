@@ -12,6 +12,7 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import path from "node:path";
 
+import { applyMove } from "./move.mjs";
 import {
   COLUMNS,
   buildBoard,
@@ -80,7 +81,9 @@ const listBoard = async (res) => {
       // The authoritative dev-id table may differ from the built-in one.
       const owner = card.devId ? devIds[card.devId] : undefined;
       if (owner && card.owner && card.owner.replace(/^@/, "") !== owner) {
-        card.problems.push(`filename id '${card.devId}' but owner ${card.owner}`);
+        card.problems.push(
+          `filename id '${card.devId}' but owner ${card.owner}`,
+        );
       }
       entries.push(card);
     }
@@ -114,20 +117,63 @@ const readTicket = async (res, relative) => {
   }
 };
 
+const readBody = (req) =>
+  new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > 64 * 1024) {
+        reject(new Error("body too large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", reject);
+  });
+
 const server = createServer(async (req, res) => {
   applyCors(req, res);
+
+  // Parsed FIRST: a route below reads `url.pathname`, and a `const` declared
+  // after its use is a temporal dead zone that takes the whole server down on the
+  // first request rather than returning an error.
+  const url = new URL(req.url ?? "/", "http://localhost");
+  const pathname = decodeURIComponent(url.pathname);
 
   if (req.method === "OPTIONS") {
     res.writeHead(204);
     return res.end();
   }
 
-  if (req.method !== "GET") {
-    return json(res, 405, { error: "read-only: only GET is served" });
+  // THE ONE WRITE. The board is read-only for content by design — a ticket body
+  // is authored in a file. Moving a ticket between columns IS the status change,
+  // so that one action is allowed, and it is the only one.
+  if (req.method === "POST" && url.pathname === "/api/tickets/move") {
+    let request;
+    try {
+      request = JSON.parse(await readBody(req));
+    } catch (error) {
+      return json(res, 400, { error: error.message });
+    }
+
+    const result = applyMove(config.root, request, {
+      logPath: config.writeLog,
+      who: req.headers["x-excalidraw-who"]?.toString() || "unknown",
+    });
+    if (!result.ok) {
+      return json(res, 400, { error: result.error });
+    }
+    return json(res, 200, { ok: true, detail: result.detail });
   }
 
-  const url = new URL(req.url ?? "/", "http://localhost");
-  const pathname = decodeURIComponent(url.pathname);
+  if (req.method !== "GET") {
+    return json(res, 405, {
+      error: "read-only: GET, and POST to /api/tickets/move",
+    });
+  }
 
   if (pathname === "/healthz") {
     return json(res, 200, { ok: true, root: config.root });

@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import { useAtom } from "../app-jotai";
 
+import { renderTicketMarkdown } from "../data/ticketMarkdown";
 import { settingsAtom } from "../data/settingsState";
 
 import "./TicketsDialog.scss";
@@ -41,6 +42,8 @@ export const TicketsDialog = ({ onClose }: { onClose: () => void }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<Detail>(null);
+  const [moving, setMoving] = useState<string | null>(null);
+  const [moveError, setMoveError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!api) {
@@ -87,6 +90,46 @@ export const TicketsDialog = ({ onClose }: { onClose: () => void }) => {
     [api],
   );
 
+  /**
+   * Moving a ticket IS the status change: the server renames the file between
+   * column folders, so the folder keeps meaning what it says. A name that breaks
+   * the naming contract is refused BY THE SERVER, with its reason shown here
+   * rather than swallowed.
+   */
+  const moveTicket = useCallback(
+    async (card: TicketCard, to: string) => {
+      if (!api) {
+        return;
+      }
+      setMoving(card.filename);
+      setMoveError(null);
+      try {
+        const response = await fetch(`${api}/api/tickets/move`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            column: card.column,
+            filename: card.filename,
+            to,
+          }),
+        });
+        const body = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(body?.error ?? `move returned ${response.status}`);
+        }
+        setDetail(null);
+        await load();
+      } catch (caught: any) {
+        setMoveError(caught?.message ?? String(caught));
+      } finally {
+        setMoving(null);
+      }
+    },
+    [api, load],
+  );
+
+  const COLUMN_IDS = ["open", "in-progress", "review", "done"] as const;
+
   return (
     <Dialog
       title={detail ? detail.filename : "Tickets"}
@@ -102,6 +145,10 @@ export const TicketsDialog = ({ onClose }: { onClose: () => void }) => {
         </p>
       )}
 
+      {api && moveError && !detail && (
+        <p className="tickets-dialog__error">{moveError}</p>
+      )}
+
       {api && error && (
         <p className="tickets-dialog__error">
           {error}{" "}
@@ -113,7 +160,37 @@ export const TicketsDialog = ({ onClose }: { onClose: () => void }) => {
 
       {api && !error && detail && (
         <div className="tickets-dialog__detail">
-          <pre>{detail.markdown}</pre>
+          <div className="tickets-dialog__move">
+            <span>Move to</span>
+            {COLUMN_IDS.filter((id) => id !== detail.column).map((id) => (
+              <button
+                type="button"
+                key={id}
+                disabled={moving !== null}
+                onClick={() =>
+                  void moveTicket(
+                    {
+                      column: detail.column,
+                      filename: detail.filename,
+                    } as TicketCard,
+                    id,
+                  )
+                }
+              >
+                {id}
+              </button>
+            ))}
+            {moving && <span className="tickets-dialog__meta">moving…</span>}
+          </div>
+          {moveError && <p className="tickets-dialog__error">{moveError}</p>}
+          <div
+            className="tickets-dialog__markdown"
+            // Safe by construction: renderTicketMarkdown ESCAPES the source before
+            // it adds any tag of its own, so a ticket file can never inject markup.
+            dangerouslySetInnerHTML={{
+              __html: renderTicketMarkdown(detail.markdown),
+            }}
+          />
         </div>
       )}
 

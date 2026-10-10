@@ -172,6 +172,8 @@ export const columnOf = (relativePath) => {
 
 export const readConfig = (env = process.env) => ({
   port: Number(env.TICKETS_PORT ?? 7314),
+  /** the append-only write log; empty means a move is not logged */
+  writeLog: env.TICKETS_WRITE_LOG ?? "",
   host: env.TICKETS_HOST ?? "127.0.0.1",
   root: path.resolve(env.TICKETS_REPO_ROOT ?? process.cwd()),
   allowedOrigins: (

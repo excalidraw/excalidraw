@@ -93,3 +93,131 @@
     overflow: auto;
   }
 }
+
+/* The write control and the rendered body (feature-0014). */
+.tickets-dialog {
+  .tickets-dialog__move {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-surface-low);
+    font-size: 0.8125rem;
+
+    > span:first-child {
+      opacity: 0.7;
+    }
+
+    button {
+      font: inherit;
+      padding: 0.25rem 0.6rem;
+      border-radius: 0.4rem;
+      border: 1px solid var(--color-surface-low);
+      background: var(--color-surface-lowest);
+      color: var(--text-primary-color);
+      cursor: pointer;
+
+      &:hover:not(:disabled) {
+        border-color: var(--color-primary);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+    }
+  }
+
+  /* The rendered ticket. Everything here is our own tag; the source was escaped
+     before any of it was written, so a ticket file cannot style or script us. */
+  .tickets-dialog__markdown {
+    max-height: 55vh;
+    overflow: auto;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      margin: 1em 0 0.4em;
+      line-height: 1.25;
+      font-size: 1em;
+    }
+
+    h1 {
+      font-size: 1.25em;
+    }
+    h2 {
+      font-size: 1.1em;
+    }
+
+    p {
+      margin: 0.5em 0;
+    }
+
+    ul,
+    ol {
+      margin: 0.5em 0;
+      padding-left: 1.4em;
+    }
+
+    code {
+      font-family: monospace;
+      font-size: 0.95em;
+      background: var(--color-surface-low);
+      border-radius: 0.25rem;
+      padding: 0.05em 0.3em;
+    }
+
+    pre {
+      margin: 0.6em 0;
+      padding: 0.6em 0.75em;
+      border-radius: 0.5rem;
+      background: var(--color-surface-low);
+      overflow: auto;
+
+      code {
+        background: none;
+        padding: 0;
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 0.6em 0;
+      width: 100%;
+
+      th,
+      td {
+        border: 1px solid var(--color-surface-low);
+        padding: 0.3em 0.5em;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: var(--color-surface-low);
+      }
+    }
+
+    blockquote {
+      margin: 0.6em 0;
+      padding-left: 0.75em;
+      border-left: 3px solid var(--color-surface-low);
+      opacity: 0.85;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--color-surface-low);
+      margin: 1em 0;
+    }
+
+    a {
+      color: var(--color-primary);
+    }
+  }
+}
