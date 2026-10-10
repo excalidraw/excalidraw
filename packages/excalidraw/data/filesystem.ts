@@ -46,7 +46,7 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   return (await normalizeFile(files)) as RetType;
 };
 
-export const fileSave = (
+export const fileSave = async (
   blob: Blob | Promise<Blob>,
   opts: {
     /** supply without the extension */
@@ -59,17 +59,33 @@ export const fileSave = (
     fileHandle?: FileSystemFileHandle | null;
   },
 ) => {
-  return _fileSave(
-    blob,
-    {
-      fileName: `${opts.name}.${opts.extension}`,
-      description: opts.description,
-      extensions: [`.${opts.extension}`],
-      mimeTypes: opts.mimeTypes,
-    },
-    opts.fileHandle,
-    false,
-  );
+  try {
+    return await _fileSave(
+      blob,
+      {
+        fileName: `${opts.name}.${opts.extension}`,
+        description: opts.description,
+        extensions: [`.${opts.extension}`],
+        mimeTypes: opts.mimeTypes,
+      },
+      opts.fileHandle,
+      false,
+    );
+  } catch (error: any) {
+    if (error.name !== "AbortError") {
+      console.warn(`${error.message} - falling back to regular download.`);
+
+      const a = document.createElement("a");
+      a.download = `${opts.name}.${opts.extension}`;
+      a.href = window.URL.createObjectURL(await blob);
+      a.click();
+      setTimeout(() => {
+        window.URL.revokeObjectURL(a.href);
+      }, 30000);
+      return null;
+    }
+    throw error;
+  }
 };
 
 export { nativeFileSystemSupported };
