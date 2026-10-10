@@ -10055,8 +10055,10 @@ class App extends React.Component<AppProps, AppState> {
         !croppingElementId ||
         // in the cropping mode
         (croppingElementId &&
-          // not cropping and no hit element
-          ((!hitElement && !isCropping) ||
+          // not cropping, nor clicking a crop handle, and no hit element
+          ((!hitElement &&
+            !isCropping &&
+            !pointerDownState.resize.handleType) ||
             // hitting something else
             (hitElement && hitElement.id !== croppingElementId)))
       ) {

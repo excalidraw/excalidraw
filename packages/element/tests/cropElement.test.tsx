@@ -129,6 +129,16 @@ describe("Enter and leave the crop editor", () => {
     expect(h.state.croppingElementId).toBe(image.id);
     expect(h.state.selectedElementIds).toEqual({ [image.id]: true });
   });
+
+  it("stay in the editor on clicking a crop handle", () => {
+    const image = h.elements[0];
+    Keyboard.keyDown(KEYS.ENTER);
+
+    // the east handle
+    mouse.clickAt(image.x + image.width, image.y + image.height / 2);
+
+    expect(h.state.croppingElementId).toBe(image.id);
+  });
 });
 
 describe("Crop an image", () => {
