@@ -30,3 +30,6 @@ meta*.json
 
 # per-install service config — never committed
 server/ttd-bridge/.env
+
+# the packaged bundle — built, not tracked
+desktop/app/

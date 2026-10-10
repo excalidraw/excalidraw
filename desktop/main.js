@@ -1,3 +1,4 @@
+const http = require("http");
 const path = require("path");
 const fs = require("fs");
 
@@ -10,7 +11,74 @@ app.commandLine.appendSwitch("disable-gpu-compositing");
 app.commandLine.appendSwitch("disable-gpu-sandbox");
 
 const PORT = process.env.EXCALIDRAW_PORT || 7311;
-const URL = `http://localhost:${PORT}`;
+const DEV_URL = `http://localhost:${PORT}`;
+
+/**
+ * PACKAGED MODE.
+ *
+ * A bundled `app/` beside this file means the production bundle is present, so
+ * the window is served from LOCAL FILES by a loopback-only static server started
+ * here — no Vite, no dev server, and nothing off the machine. Without it, the
+ * window points at the dev server as before.
+ *
+ * A loopback server rather than `file://` on purpose: the build's asset URLs are
+ * absolute (`/assets/…`, `/fonts/…`), which `file://` cannot resolve, and the
+ * whole point is that the app opens untouched by how it is loaded.
+ */
+const BUNDLED_APP_DIR = path.join(__dirname, "app");
+const isPackaged = fs.existsSync(path.join(BUNDLED_APP_DIR, "index.html"));
+
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".webmanifest": "application/manifest+json",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".ico": "image/x-icon",
+  ".woff2": "font/woff2",
+  ".txt": "text/plain; charset=utf-8",
+  ".map": "application/json; charset=utf-8",
+};
+
+/** Serves the bundle on 127.0.0.1 only. Returns the port. */
+function serveBundle() {
+  const server = http.createServer((req, res) => {
+    const url = new URL(req.url || "/", "http://localhost");
+    let rel;
+    try {
+      rel = decodeURIComponent(url.pathname);
+    } catch {
+      res.writeHead(400).end("bad request");
+      return;
+    }
+    let file = path.join(BUNDLED_APP_DIR, path.normalize(rel));
+    // Never leave the bundle directory.
+    if (!file.startsWith(BUNDLED_APP_DIR)) {
+      res.writeHead(403).end("forbidden");
+      return;
+    }
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+      file = path.join(BUNDLED_APP_DIR, "index.html"); // a single-page app
+    }
+    res.writeHead(200, {
+      "content-type": MIME[path.extname(file)] || "application/octet-stream",
+      "cache-control": file.endsWith("index.html")
+        ? "no-cache"
+        : "public, max-age=31536000, immutable",
+    });
+    fs.createReadStream(file).pipe(res);
+  });
+  server.listen(0, "127.0.0.1");
+  return new Promise((resolve) => {
+    server.once("listening", () => resolve(server.address().port));
+  });
+}
+
+let BUNDLE = null; // set when packaged, before the window opens
 const LOG_FILE = path.join(app.getPath("userData"), "debug.log");
 
 /**
@@ -43,10 +111,11 @@ function createWindow() {
     icon: path.join(__dirname, "icon.png"),
   });
 
-  log(`Loading Excalidraw at ${URL}`);
+  const target = BUNDLE ? `http://127.0.0.1:${BUNDLE}` : DEV_URL;
+  log(`Loading Excalidraw at ${target}`);
 
   win
-    .loadURL(URL)
+    .loadURL(target)
     .then(() => log("Page loaded successfully"))
     .catch((err) => log(`Failed to load page: ${err.message}`));
 
@@ -65,7 +134,11 @@ function createWindow() {
   });
 
   win.webContents.on("will-navigate", (event, url) => {
-    if (url !== URL && !url.includes(`localhost:${PORT}`)) {
+    const isLocal =
+      url === target ||
+      url.includes(`localhost:${PORT}`) ||
+      (BUNDLE !== null && url.includes(`127.0.0.1:${BUNDLE}`));
+    if (!isLocal) {
       log(`Navigation intercepted: ${url} → opening in system browser`);
       event.preventDefault();
       shell.openExternal(url);
@@ -88,7 +161,15 @@ app.on("activate", () => {
   }
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+  if (isPackaged) {
+    BUNDLE = await serveBundle();
+    log(
+      `packaged: serving the bundled app on 127.0.0.1:${BUNDLE} (no dev server)`,
+    );
+  }
+  createWindow();
+});
 
 // Don't quit on Ctrl+Q or window-all-closed — let the user manage the app lifecycle.
 app.on("window-all-closed", () => log("All windows closed — staying alive"));

@@ -9,3 +9,6 @@ packages/excalidraw/types
 examples/**/public
 dev-dist
 coverage
+
+# the packaged bundle — built, not source
+desktop/app

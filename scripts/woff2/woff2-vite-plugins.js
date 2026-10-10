@@ -1,5 +1,9 @@
 // define `EXCALIDRAW_ASSET_PATH` as a SSOT
-const OSS_FONTS_CDN = "https://excalidraw.nyc3.cdn.digitaloceanspaces.com/oss/";
+// LOCAL BY DEFAULT. Upstream points this at a DigitalOcean CDN; this fork serves
+// the fonts it already ships (233 woff2 files land in the build), so the app opens
+// with no external host at all. Override with EXCALIDRAW_FONTS_BASE if a mirror is
+// ever wanted.
+const OSS_FONTS_CDN = process.env.EXCALIDRAW_FONTS_BASE ?? "/";
 const OSS_FONTS_FALLBACK = "/";
 
 /**
@@ -67,7 +71,7 @@ module.exports.woff2BrowserPlugin = () => {
         return code.replace(
           "<!-- PLACEHOLDER:EXCALIDRAW_APP_FONTS -->",
           `<script>
-        // point into our CDN in prod, fallback to root (excalidraw.com) domain in case of issues
+        // point at THIS deployment — the fonts ship with the build
         window.EXCALIDRAW_ASSET_PATH = [
           "${OSS_FONTS_CDN}",
           "${OSS_FONTS_FALLBACK}",

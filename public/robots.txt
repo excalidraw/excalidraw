@@ -1,13 +1,4 @@
-User-agent: Twitterbot
-Disallow:
-
-User-agent: facebookexternalhit
-Disallow:
-
+# A self-hosted whiteboard. There is nothing here to crawl, and upstream's list
+# of allowed social crawlers was there to make excalidraw.com's link previews work.
 User-agent: *
-Allow: /$
-Allow: /
-Allow: /sitemap.xml
 Disallow: /
-
-Sitemap: https://excalidraw.com/sitemap.xml
