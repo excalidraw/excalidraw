@@ -1,4 +1,9 @@
 import { MIME_TYPES } from "@excalidraw/common";
+import * as clipboardModule from "@excalidraw/excalidraw/clipboard";
+import * as imageModule from "@excalidraw/excalidraw/data/image";
+import * as jsonModule from "@excalidraw/excalidraw/data/json";
+import * as staticSceneModule from "@excalidraw/excalidraw/renderer/staticScene";
+import * as staticSvgSceneModule from "@excalidraw/excalidraw/renderer/staticSvgScene";
 import * as mockedSceneExportUtils from "@excalidraw/excalidraw/scene/export";
 import { diagramFactory } from "@excalidraw/excalidraw/tests/fixtures/diagramFixture";
 import { vi } from "vitest";
@@ -153,5 +158,96 @@ describe("exportToSvg", () => {
 
     expect(passedData().elements.length).toBe(3);
     expect(passedData().appState?.exportEmbedScene).toBe(true);
+  });
+});
+
+// Elements persisted before `created` existed omit it (modeled with the cast
+// below, as the declared input type is a complete element). Every public
+// export entry point restores its input, so such elements must reach the
+// lower-level code restored, with `created: null`.
+describe("elements lacking creation metadata", () => {
+  const legacyDiagram = () => {
+    const { elements, ...rest } = diagramFactory({
+      overrides: { appState: void 0 },
+    });
+    return {
+      ...rest,
+      elements: elements.map(
+        ({ created, ...element }) => element,
+      ) as unknown as typeof elements,
+    };
+  };
+  const createdOf = (elements: readonly { created: number | null }[]) =>
+    elements.map((element) => element.created);
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("exportToSvg and exportToCanvas render the restored elements", async () => {
+    const renderSvgSpy = vi.spyOn(staticSvgSceneModule, "renderSceneToSvg");
+    const diagram = legacyDiagram();
+
+    await utils.exportToSvg({ data: diagram });
+
+    expect(createdOf(renderSvgSpy.mock.calls[0][0])).toEqual([
+      null,
+      null,
+      null,
+    ]);
+    expect(diagram.elements[0]).not.toHaveProperty("created");
+
+    const renderCanvasSpy = vi.spyOn(staticSceneModule, "renderStaticScene");
+    const canvas = await utils.exportToCanvas({ data: diagram });
+
+    expect(createdOf(renderCanvasSpy.mock.calls[0][0].visibleElements)).toEqual(
+      [null, null, null],
+    );
+    expect(canvas.width).toBeGreaterThan(0);
+  });
+
+  it("exportToSvg embeds the restored scene", async () => {
+    const serializeSpy = vi.spyOn(jsonModule, "serializeAsJSON");
+
+    await utils.exportToSvg({
+      data: { ...legacyDiagram(), appState: { exportEmbedScene: true } },
+    });
+
+    expect(serializeSpy).toHaveBeenCalledTimes(1);
+    expect(createdOf(serializeSpy.mock.calls[0][0])).toEqual([
+      null,
+      null,
+      null,
+    ]);
+  });
+
+  it("exportToBlob embeds the restored scene into png metadata", async () => {
+    const serializeSpy = vi.spyOn(jsonModule, "serializeAsJSON");
+    vi.spyOn(imageModule, "encodePngMetadata").mockImplementation(
+      async ({ blob }) => blob,
+    );
+
+    await utils.exportToBlob({
+      data: { ...legacyDiagram(), appState: { exportEmbedScene: true } },
+      config: { mimeType: MIME_TYPES.png },
+    });
+
+    expect(serializeSpy).toHaveBeenCalledTimes(1);
+    expect(createdOf(serializeSpy.mock.calls[0][0])).toEqual([
+      null,
+      null,
+      null,
+    ]);
+  });
+
+  it("exportToClipboard copies the restored elements as json", async () => {
+    const copySpy = vi
+      .spyOn(clipboardModule, "copyToClipboard")
+      .mockResolvedValue(undefined);
+
+    await utils.exportToClipboard({ type: "json", data: legacyDiagram() });
+
+    expect(copySpy).toHaveBeenCalledTimes(1);
+    expect(createdOf(copySpy.mock.calls[0][0])).toEqual([null, null, null]);
   });
 });

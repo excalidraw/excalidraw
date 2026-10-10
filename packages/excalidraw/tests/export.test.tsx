@@ -2,7 +2,7 @@ import React from "react";
 
 import { SVG_NS } from "@excalidraw/common";
 
-import type { FileId } from "@excalidraw/element/types";
+import type { FileId, FractionalIndex } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
 import { getDataURL } from "../data/blob";
@@ -26,6 +26,9 @@ const testElements = [
       type: "text",
       id: "A",
       text: "😀",
+      // a valid index, as in a real scene (restoring on export would
+      // otherwise re-index it, bumping its version with a random nonce)
+      index: "a0" as FractionalIndex,
     }),
     // can't get jsdom text measurement to work so this is a temp hack
     // to ensure the element isn't stripped as invisible

@@ -387,8 +387,7 @@ const configExportDimension = async ({
   // restore elements (normalizes & drops invisible elements) and filter out
   // deleted ones. The type contract requires non-deleted elements already,
   // but types alone don't protect JS consumers passing raw scene data.
-  // Note this only applies to rendering — when embedding the scene
-  // (`exportEmbedScene`), we serialize the original `data.elements`.
+  // These are also what SVG export embeds (`exportEmbedScene`).
   const elements = getNonDeletedElements(
     restoreElements(data.elements, null, { deleteInvisibleElements: true }),
   );
@@ -837,18 +836,12 @@ export const exportToSvg = async ({
     try {
       encodeSvgBase64Payload({
         metadataElement,
-        // when embedding scene, we want to embed the originally supplied
-        // elements which don't contain the temp frame labels, nor the
-        // restored/filtered variants — the payload should round-trip the
-        // caller's scene as-is (ids stable, restore happens again on import).
-        // But it also requires that the exportToSvg is being supplied with
-        // only the elements that we're exporting, and no extra.
-        payload: serializeAsJSON(
-          data.elements,
-          appState,
-          data.files || {},
-          "local",
-        ),
+        // when embedding scene, we want to embed the (restored) supplied
+        // elements which don't contain the temp frame labels. Restoring
+        // keeps the ids stable. But it also requires that the exportToSvg is
+        // being supplied with only the elements that we're exporting, and
+        // no extra.
+        payload: serializeAsJSON(elements, appState, data.files || {}, "local"),
       });
     } catch (error: any) {
       console.error(error);
@@ -1128,8 +1121,8 @@ export const exportToBlob = async ({
             metadata: serializeAsJSON(
               // NOTE as long as we're using the Scene hack, we need to ensure
               // we pass the original, uncloned elements when serializing
-              // so that we keep ids stable
-              data.elements,
+              // so that we keep ids stable (restoring keeps the ids)
+              restoreElements(data.elements, null),
               data.appState,
               data.files || {},
               "local",
@@ -1171,7 +1164,10 @@ export const exportToClipboard = async ({
   } else if (type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob({ data, config }));
   } else if (type === "json") {
-    await copyToClipboard(data.elements, data.files);
+    await copyToClipboard(
+      getNonDeletedElements(restoreElements(data.elements, null)),
+      data.files,
+    );
   } else {
     throw new Error("Invalid export type");
   }
