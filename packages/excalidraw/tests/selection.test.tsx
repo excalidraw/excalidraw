@@ -1375,7 +1375,13 @@ describe("app.selection", () => {
     API.setSelectedElements([child]);
 
     act(() => h.app.selection.add(grouped));
+    assertSelectedElements([frame.id, grouped.id]);
 
+    // the child added along with it, too
+    act(() => h.app.selection.clear());
+    act(() => h.app.selection.add([child, grouped]));
+    assertSelectedElements([frame.id, grouped.id]);
+    act(() => h.app.selection.select([child, grouped]));
     assertSelectedElements([frame.id, grouped.id]);
   });
 
@@ -1396,15 +1402,25 @@ describe("app.selection", () => {
     assertSelectedElements([target.id]);
   });
 
-  it("select() sets up the line editor of an arrow, and drops it for other elements", () => {
-    const arrow = API.createElement({
-      type: "arrow",
-      width: 100,
-      height: 0,
-      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+  it("sets up the line editor of a lone selected arrow — not of one selected with its group", () => {
+    const [arrow, groupedArrow] = [0, 200].map((y) =>
+      API.createElement({
+        type: "arrow",
+        y,
+        width: 100,
+        height: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+        groupIds: y ? ["group"] : [],
+      }),
+    );
+    const sibling = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 200,
+      groupIds: ["group"],
     });
     const rectangle = API.createElement({ type: "rectangle", x: 300 });
-    API.setElements([arrow, rectangle]);
+    API.setElements([arrow, rectangle, groupedArrow, sibling]);
 
     act(() => h.app.selection.select(arrow));
     assertSelectedElements([arrow.id]);
@@ -1412,6 +1428,14 @@ describe("app.selection", () => {
 
     act(() => h.app.selection.select(rectangle));
     assertSelectedElements([rectangle.id]);
+    expect(h.state.selectedLinearElement).toBe(null);
+
+    act(() => h.app.selection.clear());
+    act(() => h.app.selection.add(arrow));
+    expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+    act(() => h.app.selection.select(groupedArrow));
+    assertSelectedElements([groupedArrow.id, sibling.id]);
     expect(h.state.selectedLinearElement).toBe(null);
   });
 
@@ -1558,9 +1582,17 @@ describe("app.selection", () => {
     API.setElements([a, b, c]);
 
     act(() => h.app.selection.select([a, b], { deep: true }));
-
     assertSelectedElements([a.id, b.id]);
     expect(h.state.editingGroupId).toBe("group");
+
+    // not sharing a group: none of their groups
+    const [d, e] = [0, 100].map((x) =>
+      API.createElement({ type: "rectangle", x, y: 200, groupIds: ["other"] }),
+    );
+    API.setElements([a, b, c, d, e]);
+    act(() => h.app.selection.select([a, d], { deep: true }));
+    assertSelectedElements([a.id, d.id]);
+    expect(h.state.editingGroupId).toBe(null);
   });
 
   it("remove() leaving an arrow alone sets up its line editor", () => {

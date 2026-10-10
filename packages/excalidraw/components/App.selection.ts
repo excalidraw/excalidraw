@@ -5,7 +5,6 @@ import {
   isReadonlyArray,
 } from "@excalidraw/common";
 import {
-  excludeElementsInFramesFromSelection,
   getCommonBounds,
   getSelectedElements,
   getSelectedGroupForElement,
@@ -208,13 +207,74 @@ const getLinearElementEditor = (
 };
 
 /**
+ * The selection state with the line editor of what it selects: of a lone
+ * selected line or arrow, once groups are expanded.
+ */
+const withLinearElementEditor = <
+  T extends Pick<AppState, "selectedElementIds">,
+>(
+  selectionState: T,
+  allElements: readonly NonDeletedExcalidrawElement[],
+  appState: Pick<AppState, "selectedLinearElement">,
+) => ({
+  ...selectionState,
+  selectedLinearElement: getLinearElementEditor(
+    getSelectedElements(allElements, selectionState),
+    allElements,
+    appState,
+  ),
+});
+
+/**
+ * The frames that selecting the elements selects through their groups (those
+ * selected along with them, within the edited group) — of the elements
+ * neither frames nor in frames.
+ */
+const getFramesSelectedViaGroups = (
+  elements: readonly ExcalidrawElement[],
+  allElements: readonly NonDeletedExcalidrawElement[],
+  editingGroupId: AppState["editingGroupId"],
+) => {
+  const groupIds = new Set<GroupId>();
+  for (const element of elements) {
+    if (isFrameLikeElement(element) || element.frameId) {
+      continue;
+    }
+    const editingGroupIndex = editingGroupId
+      ? element.groupIds.indexOf(editingGroupId)
+      : -1;
+    const elementGroupIds =
+      editingGroupIndex > -1
+        ? element.groupIds.slice(0, editingGroupIndex)
+        : element.groupIds;
+    if (elementGroupIds.length) {
+      groupIds.add(elementGroupIds[elementGroupIds.length - 1]);
+    }
+  }
+
+  const frameIds = new Set<ExcalidrawElement["id"]>();
+  if (groupIds.size) {
+    for (const element of allElements) {
+      if (
+        isFrameLikeElement(element) &&
+        element.groupIds.some((groupId) => groupIds.has(groupId))
+      ) {
+        frameIds.add(element.id);
+      }
+    }
+  }
+  return frameIds;
+};
+
+/**
  * The selection of the given elements alone, with their groups (within the
  * edited group): a frame wins over its children, bound text is left to its
  * container, and a lone line or arrow gets its line editor.
  *
  * @param allElements the (non-deleted) elements the selection is in
  * @param deep select the elements themselves rather than their groups,
- *   editing their innermost group (if they share it) — as Ctrl+click does
+ *   editing their innermost group if they share it (and no group otherwise)
+ *   — as Ctrl+click does
  */
 export const getSelectionStateForElements = (
   targetElements: readonly NonDeletedExcalidrawElement[],
@@ -222,50 +282,66 @@ export const getSelectionStateForElements = (
   appState: AppState,
   deep = false,
 ) => {
+  const elements = targetElements.filter(
+    (element) => !isBoundToContainer(element),
+  );
+
   let editingGroupId = appState.editingGroupId;
   if (deep) {
     const innermostGroupIds = new Set(
-      targetElements.map((element) => element.groupIds[0] ?? null),
+      elements.map((element) => element.groupIds[0] ?? null),
     );
-    if (innermostGroupIds.size === 1) {
-      [editingGroupId] = innermostGroupIds;
+    editingGroupId =
+      innermostGroupIds.size === 1 ? [...innermostGroupIds][0] : null;
+  }
+
+  // frames win over their children: frames selected, or selected through
+  // the groups (not when deep, selecting no groups)
+  const selectedFrameIds = deep
+    ? new Set<ExcalidrawElement["id"]>()
+    : getFramesSelectedViaGroups(elements, allElements, editingGroupId);
+  for (const element of elements) {
+    if (isFrameLikeElement(element)) {
+      selectedFrameIds.add(element.id);
+    }
+  }
+  const selectedElementIds: Record<ExcalidrawElement["id"], true> = {};
+  for (const element of elements) {
+    if (!element.frameId || !selectedFrameIds.has(element.frameId)) {
+      selectedElementIds[element.id] = true;
     }
   }
 
-  return {
-    selectedLinearElement: getLinearElementEditor(
-      targetElements,
-      allElements,
-      appState,
-    ),
-    ...selectGroupsForSelectedElements(
-      {
-        editingGroupId,
-        selectedElementIds: excludeElementsInFramesFromSelection(
-          targetElements,
-        ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
-          if (!isBoundToContainer(element)) {
-            acc[element.id] = true;
-          }
-          return acc;
-        }, {}),
-      },
-      allElements,
-      appState,
-      null,
-    ),
-  };
+  return withLinearElementEditor(
+    deep
+      ? {
+          selectedElementIds: makeNextSelectedElementIds(
+            selectedElementIds,
+            appState,
+          ),
+          selectedGroupIds: {},
+          editingGroupId,
+        }
+      : selectGroupsForSelectedElements(
+          { editingGroupId, selectedElementIds },
+          allElements,
+          appState,
+          null,
+        ),
+    allElements,
+    appState,
+  );
 };
 
 /**
  * The selection with the given elements added, with their groups (within the
- * edited group).
+ * edited group) — and the line editor of a lone selected line or arrow.
  *
  * A frame and its children aren't selected at the same time: an added frame
  * deselects its children, an added child of a selected (or added) frame is
- * left out, and an added element grouped with frames deselects those frames'
- * children. In the element link selector, the added elements replace the
- * selection (unless one's group is selected).
+ * left out, and adding elements grouped with frames deselects those frames'
+ * children (and leaves the added ones out). In the element link selector, the
+ * added elements replace the selection (unless one's group is selected).
  *
  * @param allElements the (non-deleted) elements the selection is in
  */
@@ -285,35 +361,27 @@ export const getSelectionStateAddingElements = (
     nextSelectedElementIds[element.id] = true;
   }
 
+  // frames win over their children: the added frames, and the frames selected
+  // through the groups of the added elements
   const addedFrameIds = new Set<ExcalidrawElement["id"]>();
-  // of the added elements neither frames nor in frames, which could be
-  // grouped with frames
-  const addedGroupIds = new Set<string>();
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
       addedFrameIds.add(element.id);
-    } else if (element.frameId) {
-      // in a frame that's selected (or added)
-      if (nextSelectedElementIds[element.frameId]) {
-        delete nextSelectedElementIds[element.id];
-      }
-    } else {
-      for (const groupId of element.groupIds) {
-        addedGroupIds.add(groupId);
-      }
     }
   }
-
-  // frames grouped with the added elements are selected along with them
-  const framesInAddedGroups = new Set<ExcalidrawElement["id"]>();
-  if (addedGroupIds.size) {
-    for (const element of allElements) {
-      if (
-        isFrameLikeElement(element) &&
-        element.groupIds.some((groupId) => addedGroupIds.has(groupId))
-      ) {
-        framesInAddedGroups.add(element.id);
-      }
+  const framesInAddedGroups = getFramesSelectedViaGroups(
+    elements,
+    allElements,
+    appState.editingGroupId,
+  );
+  for (const element of elements) {
+    if (
+      !isFrameLikeElement(element) &&
+      element.frameId &&
+      (nextSelectedElementIds[element.frameId] ||
+        framesInAddedGroups.has(element.frameId))
+    ) {
+      delete nextSelectedElementIds[element.id];
     }
   }
 
@@ -362,14 +430,18 @@ export const getSelectionStateAddingElements = (
     }
   }
 
-  return selectGroupsForSelectedElements(
-    {
-      editingGroupId: appState.editingGroupId,
-      selectedElementIds: nextSelectedElementIds,
-    },
+  return withLinearElementEditor(
+    selectGroupsForSelectedElements(
+      {
+        editingGroupId: appState.editingGroupId,
+        selectedElementIds: nextSelectedElementIds,
+      },
+      allElements,
+      appState,
+      null,
+    ),
     allElements,
     appState,
-    null,
   );
 };
 
@@ -402,12 +474,8 @@ export const getSelectionStateRemovingElements = (
     }
   }
 
-  const remainingElements = getSelectedElements(allElements, {
-    selectedElementIds: nextSelectedElementIds,
-  });
-
-  return {
-    ...selectGroupsForSelectedElements(
+  return withLinearElementEditor(
+    selectGroupsForSelectedElements(
       {
         editingGroupId: appState.editingGroupId,
         selectedElementIds: nextSelectedElementIds,
@@ -416,11 +484,9 @@ export const getSelectionStateRemovingElements = (
       appState,
       null,
     ),
-    selectedLinearElement:
-      remainingElements.length === 1 && isLinearElement(remainingElements[0])
-        ? getLinearElementEditor(remainingElements, allElements, appState)
-        : null,
-  };
+    allElements,
+    appState,
+  );
 };
 
 /** elements, or their ids — one or many */
