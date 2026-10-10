@@ -15,6 +15,7 @@ import {
 import {
   exportToCanvas as _exportToCanvas,
   exportToSvg as _exportToSvg,
+  serializeSvg,
 } from "@excalidraw/excalidraw/scene/export";
 
 import type {
@@ -211,7 +212,7 @@ export const exportToClipboard = async (
 ) => {
   if (opts.type === "svg") {
     const svg = await exportToSvg(opts);
-    await copyTextToSystemClipboard(svg.outerHTML);
+    await copyTextToSystemClipboard(serializeSvg(svg));
   } else if (opts.type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob(opts));
   } else if (opts.type === "json") {
