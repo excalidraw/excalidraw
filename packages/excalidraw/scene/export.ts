@@ -507,6 +507,15 @@ export const exportToSvg = async (
   return svgRoot;
 };
 
+/**
+ * Serializes an exported SVG into a standalone SVG (XML) document string.
+ *
+ * `outerHTML` uses the HTML serializer, which writes U+00A0 as `&nbsp;`. XML
+ * doesn't define that entity, so the file wouldn't parse.
+ */
+export const serializeSvg = (svg: SVGSVGElement) =>
+  svg.outerHTML.replace(/&nbsp;/g, "&#160;");
+
 export const encodeSvgBase64Payload = ({
   payload,
   metadataElement,
