@@ -1,4 +1,4 @@
-import { arrayToMap, isShallowEqual, type Bounds } from "@excalidraw/common";
+import { isShallowEqual, type Bounds } from "@excalidraw/common";
 
 import type {
   AppState,
@@ -11,13 +11,9 @@ import { isElementInViewport } from "./sizeHelpers";
 import {
   isBoundToContainer,
   isFrameLikeElement,
-  isLinearElement,
   isTextElement,
 } from "./typeChecks";
 import { getFrameChildren } from "./frame";
-
-import { LinearElementEditor } from "./linearElementEditor";
-import { selectGroupsForSelectedElements } from "./groups";
 
 import { isNonDeletedElement } from ".";
 
@@ -243,52 +239,6 @@ export const makeNextSelectedElementIds = (
   }
 
   return nextSelectedElementIds;
-};
-
-const _getLinearElementEditor = (
-  targetElements: readonly NonDeletedExcalidrawElement[],
-  allElements: readonly NonDeletedExcalidrawElement[],
-) => {
-  const linears = targetElements.filter(isLinearElement);
-  if (linears.length === 1) {
-    const linear = linears[0];
-    const boundElements = linear.boundElements?.map((def) => def.id) ?? [];
-    const onlySingleLinearSelected = targetElements.every(
-      (el) => el.id === linear.id || boundElements.includes(el.id),
-    );
-
-    if (onlySingleLinearSelected) {
-      return new LinearElementEditor(linear, arrayToMap(allElements));
-    }
-  }
-
-  return null;
-};
-
-export const getSelectionStateForElements = (
-  targetElements: readonly NonDeletedExcalidrawElement[],
-  allElements: readonly NonDeletedExcalidrawElement[],
-  appState: AppState,
-) => {
-  return {
-    selectedLinearElement: _getLinearElementEditor(targetElements, allElements),
-    ...selectGroupsForSelectedElements(
-      {
-        editingGroupId: appState.editingGroupId,
-        selectedElementIds: excludeElementsInFramesFromSelection(
-          targetElements,
-        ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
-          if (!isBoundToContainer(element)) {
-            acc[element.id] = true;
-          }
-          return acc;
-        }, {}),
-      },
-      allElements,
-      appState,
-      null,
-    ),
-  };
 };
 
 /**

@@ -1901,7 +1901,9 @@ describe("Test Linear Elements", () => {
         ]);
 
         mouse.reset();
-        mouse.clickAt(0, 0);
+        // (not by a click, whose pointerup would normalize — reroute — this
+        // hand-built elbow arrow)
+        act(() => h.app.selection.select(arrow.id));
         expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
 
         // inside the label AND within the hit radius of the route point at
