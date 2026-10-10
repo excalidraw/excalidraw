@@ -404,6 +404,118 @@ export const cropElement = (
   };
 };
 
+/**
+ * As cropElement, but crops the opposite side by as much as the dragged one
+ * (about the element's center), as far as the image reaches on the nearer
+ * side.
+ */
+export const cropElementFromCenter = (
+  element: ExcalidrawImageElement,
+  elementsMap: ElementsMap,
+  transformHandle: TransformHandleType,
+  naturalWidth: number,
+  naturalHeight: number,
+  pointerX: number,
+  pointerY: number,
+  widthAspectRatio?: number,
+) => {
+  const { width: uncroppedWidth, height: uncroppedHeight } =
+    getUncroppedWidthAndHeight(element);
+
+  const center = elementCenterPoint(element, elementsMap);
+  const [x, y] = pointRotateRads(
+    pointFrom(pointerX, pointerY),
+    center,
+    -element.angle as Radians,
+  );
+
+  const crop = element.crop ?? {
+    x: 0,
+    y: 0,
+    width: naturalWidth,
+    height: naturalHeight,
+    naturalWidth,
+    naturalHeight,
+  };
+
+  // (the nearer of the image's sides, which flipping only swaps)
+  const croppedLeft = (crop.x / naturalWidth) * uncroppedWidth;
+  const croppedTop = (crop.y / naturalHeight) * uncroppedHeight;
+  const maxWidth =
+    Math.min(
+      croppedLeft + element.width / 2,
+      uncroppedWidth - croppedLeft - element.width / 2,
+    ) * 2;
+  const maxHeight =
+    Math.min(
+      croppedTop + element.height / 2,
+      uncroppedHeight - croppedTop - element.height / 2,
+    ) * 2;
+
+  let nextWidth = element.width;
+  let nextHeight = element.height;
+
+  if (transformHandle.includes("e")) {
+    nextWidth = (x - center[0]) * 2;
+  } else if (transformHandle.includes("w")) {
+    nextWidth = (center[0] - x) * 2;
+  }
+  if (transformHandle.includes("s")) {
+    nextHeight = (y - center[1]) * 2;
+  } else if (transformHandle.includes("n")) {
+    nextHeight = (center[1] - y) * 2;
+  }
+
+  if (widthAspectRatio) {
+    // a side handle drags its own size; a corner, the one cropping less
+    if (
+      transformHandle === "e" ||
+      transformHandle === "w" ||
+      (transformHandle.length === 2 &&
+        nextWidth / widthAspectRatio > nextHeight)
+    ) {
+      nextHeight = nextWidth / widthAspectRatio;
+    } else {
+      nextWidth = nextHeight * widthAspectRatio;
+    }
+    nextWidth = clamp(
+      nextWidth,
+      Math.max(MINIMAL_CROP_SIZE, MINIMAL_CROP_SIZE * widthAspectRatio),
+      Math.min(maxWidth, maxHeight * widthAspectRatio),
+    );
+    nextHeight = nextWidth / widthAspectRatio;
+  } else {
+    if (nextWidth !== element.width) {
+      nextWidth = clamp(nextWidth, MINIMAL_CROP_SIZE, maxWidth);
+    }
+    if (nextHeight !== element.height) {
+      nextHeight = clamp(nextHeight, MINIMAL_CROP_SIZE, maxHeight);
+    }
+  }
+
+  const nextCropWidth = (nextWidth / uncroppedWidth) * naturalWidth;
+  const nextCropHeight = (nextHeight / uncroppedHeight) * naturalHeight;
+
+  return {
+    x: center[0] - nextWidth / 2,
+    y: center[1] - nextHeight / 2,
+    width: nextWidth,
+    height: nextHeight,
+    // reset crop to null if we're back to orig size
+    crop:
+      isCloseTo(nextCropWidth, naturalWidth) &&
+      isCloseTo(nextCropHeight, naturalHeight)
+        ? null
+        : {
+            ...crop,
+            x: crop.x + (crop.width - nextCropWidth) / 2,
+            y: crop.y + (crop.height - nextCropHeight) / 2,
+            width: nextCropWidth,
+            height: nextCropHeight,
+          },
+  };
+};
+
 const recomputeOrigin = (
   stateAtCropStart: ExcalidrawElement,
   transformHandle: TransformHandleType,

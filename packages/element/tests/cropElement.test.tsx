@@ -201,6 +201,44 @@ describe("Crop an image", () => {
     expect(API.getElement(image).crop).toMatchObject({ x: 20, y: 50 });
   });
 
+  it("In the crop editor, alt-dragging a handle crops the image from its center", () => {
+    const image = API.createElement({
+      type: "image",
+      width: 200,
+      height: 100,
+      fileId: "file",
+    });
+    API.setElements([image]);
+    // the file loaded, at twice the element's size
+    const htmlImage = new Image();
+    Object.defineProperties(htmlImage, {
+      naturalWidth: { value: 400 },
+      naturalHeight: { value: 200 },
+    });
+    h.app.imageCache.set(image.fileId!, {
+      image: htmlImage,
+      mimeType: "image/png",
+    });
+    API.setSelectedElements([image]);
+    Keyboard.keyDown(KEYS.ENTER);
+
+    UI.resize(image, "e", [-30, 0], { alt: true });
+
+    expect(API.getElement(image)).toMatchObject({ x: 30, width: 140 });
+    // 30px off each side = 60px of the file, at twice the element's size
+    expect(API.getElement(image).crop).toMatchObject({ x: 60, width: 280 });
+
+    // keeping the aspect ratio too
+    UI.resize(image, "e", [-35, 0], { alt: true, shift: true });
+
+    expect(API.getElement(image)).toMatchObject({
+      x: 65,
+      y: 25,
+      width: 70,
+      height: 50,
+    });
+  });
+
   it("Cropping has minimal sizes", async () => {
     const image = h.elements[0] as ExcalidrawImageElement;
     const initialWidth = image.width;

@@ -13,6 +13,7 @@ import {
 import {
   addElementsToFrame,
   cropElement,
+  cropElementFromCenter,
   dragSelectedElements,
   getCommonBounds,
   getCommonFrameId,
@@ -495,7 +496,7 @@ export class AppSelectionTool {
 
         this.app.scene.mutateElement(
           croppingElement,
-          cropElement(
+          (shouldResizeFromCenter(event) ? cropElementFromCenter : cropElement)(
             croppingElement,
             this.app.scene.getNonDeletedElementsMap(),
             transformHandleType,
