@@ -707,8 +707,6 @@ class App extends React.Component<AppProps, AppState> {
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
-  /** previous frame pointer coords */
-  previousPointerMoveCoords: { x: number; y: number } | null = null;
 
   drawShape = new AppDrawShape(this);
   laserTrails = new LaserTrails(this);
@@ -8158,6 +8156,7 @@ class App extends React.Component<AppProps, AppState> {
         hasOccurred: false,
         offset: null,
         origin: { ...origin },
+        lastOffset: { x: 0, y: 0 },
         blockDragging: false,
       },
       eventListeners: {
@@ -9000,10 +8999,6 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const lastPointerCoords =
-        this.previousPointerMoveCoords ?? pointerDownState.origin;
-      this.previousPointerMoveCoords = pointerCoords;
-
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
@@ -9220,7 +9215,6 @@ class App extends React.Component<AppProps, AppState> {
           event,
           pointerDownState,
           pointerCoords,
-          lastPointerCoords,
           elementsMap,
         )
       ) {
@@ -9462,7 +9456,6 @@ class App extends React.Component<AppProps, AppState> {
 
       // just in case, tool changes mid drag, always clean up
       this.lassoTrail.endPath();
-      this.previousPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
       SnapCache.setVisibleGaps(null);

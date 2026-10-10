@@ -117,6 +117,18 @@ describe("Enter and leave the crop editor", () => {
     Keyboard.keyDown(KEYS.ESCAPE);
     expect(h.state.croppingElementId).toBe(null);
   });
+
+  it("stay in the editor on shift-clicking the image", () => {
+    const image = h.elements[0];
+    Keyboard.keyDown(KEYS.ENTER);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickAt(image.x + 50, image.y + 50);
+    });
+
+    expect(h.state.croppingElementId).toBe(image.id);
+    expect(h.state.selectedElementIds).toEqual({ [image.id]: true });
+  });
 });
 
 describe("Crop an image", () => {
@@ -136,7 +148,7 @@ describe("Crop an image", () => {
     expect(image.height).toBeLessThan(initialHeight);
   });
 
-  it("In the crop editor, dragging a handle crops the image, and dragging the image moves it within its crop", () => {
+  it("In the crop editor, dragging a handle crops the image, and dragging the image moves it within its crop (along one axis with shift)", () => {
     const image = API.createElement({
       type: "image",
       width: 200,
@@ -158,18 +170,35 @@ describe("Crop an image", () => {
     Keyboard.keyDown(KEYS.ENTER);
     expect(h.state.croppingElementId).toBe(image.id);
 
-    UI.resize(image, "w", [50, 0]);
+    UI.resize(image, "nw", [50, 25]);
 
-    expect(API.getElement(image)).toMatchObject({ x: 50, width: 150 });
-    expect(API.getElement(image).crop).toMatchObject({ x: 100, width: 300 });
+    expect(API.getElement(image)).toMatchObject({ x: 50, y: 25, width: 150 });
+    expect(API.getElement(image).crop).toMatchObject({ x: 100, y: 50 });
 
     // 20px to the right = 40px of the file, at twice the element's size
     mouse.downAt(100, 50);
     mouse.move(20, 0);
     mouse.upAt();
 
-    expect(API.getElement(image)).toMatchObject({ x: 50, width: 150 });
-    expect(API.getElement(image).crop).toMatchObject({ x: 60, width: 300 });
+    expect(API.getElement(image)).toMatchObject({ x: 50, y: 25, width: 150 });
+    expect(API.getElement(image).crop).toMatchObject({ x: 60, y: 50 });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.downAt(100, 50);
+      mouse.move(10, 4);
+      mouse.upAt();
+    });
+
+    expect(API.getElement(image).crop).toMatchObject({ x: 40, y: 50 });
+
+    // dragged past the file's edge, it moves back as soon as dragged back
+    mouse.downAt(100, 50);
+    mouse.move(40, 0);
+    expect(API.getElement(image).crop).toMatchObject({ x: 0 });
+    mouse.move(-10, 0);
+    mouse.upAt();
+
+    expect(API.getElement(image).crop).toMatchObject({ x: 20, y: 50 });
   });
 
   it("Cropping has minimal sizes", async () => {

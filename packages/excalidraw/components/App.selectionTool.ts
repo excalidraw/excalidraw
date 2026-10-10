@@ -701,7 +701,6 @@ export class AppSelectionTool {
     event: PointerEvent,
     pointerDownState: PointerDownState,
     pointerCoords: { x: number; y: number },
-    lastPointerCoords: { x: number; y: number },
     elementsMap: NonDeletedSceneElementsMap,
   ): boolean => {
     const hasHitASelectedElement = pointerDownState.hit.allHitElements.some(
@@ -843,10 +842,16 @@ export class AppSelectionTool {
 
             if (image && !(image instanceof Promise)) {
               const uncroppedSize = getUncroppedWidthAndHeight(croppingElement);
+              // moved by what the drag moved since the previous pointer move
+              // (locked to an axis with shift, as dragging elements is), so
+              // that the image moves back right away after being dragged past
+              // its edge
+              const { lastOffset } = pointerDownState.drag;
               const instantDragOffset = vector(
-                pointerCoords.x - lastPointerCoords.x,
-                pointerCoords.y - lastPointerCoords.y,
+                dragOffset.x - lastOffset.x,
+                dragOffset.y - lastOffset.y,
               );
+              pointerDownState.drag.lastOffset = dragOffset;
 
               // to reduce cursor:image drift, we need to take into account
               // the canvas image element scaling so we can accurately
@@ -1282,7 +1287,9 @@ export class AppSelectionTool {
       // when inside line editor, shift selects points instead
       if (
         childEvent.shiftKey &&
-        !this.app.state.selectedLinearElement?.isEditing
+        !this.app.state.selectedLinearElement?.isEditing &&
+        // (in the crop editor, the image stays the selection)
+        hitElement.id !== this.app.state.croppingElementId
       ) {
         if (this.app.state.selectedElementIds[hitElement.id]) {
           if (
