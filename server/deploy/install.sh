@@ -43,12 +43,15 @@ done
 # 'generateKey')`.
 PUBLIC_HOST="${EXCALIDRAW_PUBLIC_HOST:-$TAILNET_NAME}"
 PUBLIC_SCHEME="https"
-APP_URL="$PUBLIC_SCHEME://$PUBLIC_HOST"
-# Tailscale permits HTTPS on 443, 8443 and 10000 only — three doors, which is
-# enough: the app, the board and the room server.
-HTTPS_APP_PORT="${EXCALIDRAW_HTTPS_APP_PORT:-443}"
-HTTPS_BOARD_PORT="${EXCALIDRAW_HTTPS_BOARD_PORT:-8443}"
-HTTPS_COLLAB_PORT="${EXCALIDRAW_HTTPS_COLLAB_PORT:-10000}"
+
+# EACH SERVICE MAY LIVE AT ITS OWN ADDRESS. A Cloudflare tunnel gives one
+# hostname per service on 443 — three paths will not do, because cloudflared does
+# not rewrite a path and socket.io needs a root path. `tailscale serve`, by
+# contrast, allows HTTPS on only 443/8443/10000, so the same host carries ports.
+# Both shapes are one line each here rather than a rewrite.
+APP_URL="${EXCALIDRAW_APP_URL:-$PUBLIC_SCHEME://$PUBLIC_HOST}"
+TICKETS_URL="${EXCALIDRAW_TICKETS_URL:-$PUBLIC_SCHEME://$PUBLIC_HOST:${EXCALIDRAW_HTTPS_BOARD_PORT:-8443}}"
+COLLAB_URL="${EXCALIDRAW_COLLAB_URL:-$PUBLIC_SCHEME://$PUBLIC_HOST:${EXCALIDRAW_HTTPS_COLLAB_PORT:-10000}}"
 APP_PORT="${EXCALIDRAW_APP_PORT:-7311}"
 COLLAB_PORT="${EXCALIDRAW_COLLAB_PORT:-7312}"
 BRIDGE_PORT="${EXCALIDRAW_BRIDGE_PORT:-7313}"
@@ -64,9 +67,9 @@ echo "deploying the fork to $USER_NAME@$HOST:$REMOTE_DIR (tailnet-only)"
 say "building the app with this host's addresses baked in"
 cd "$ROOT"
 VITE_APP_PUBLIC_URL="$APP_URL/" \
-VITE_APP_COLLAB_SERVER="$APP_URL:$HTTPS_COLLAB_PORT" \
-VITE_APP_AI_BACKEND="$APP_URL:$HTTPS_APP_PORT" \
-VITE_APP_TICKETS_API="$APP_URL:$HTTPS_BOARD_PORT" \
+VITE_APP_COLLAB_SERVER="$COLLAB_URL" \
+VITE_APP_AI_BACKEND="$APP_URL" \
+VITE_APP_TICKETS_API="$TICKETS_URL" \
 yarn --silent build:app >/dev/null
 say "built: $(du -sh excalidraw-app/build | cut -f1)"
 
@@ -200,18 +203,30 @@ Environment=TICKETS_ORIGINS=$APP_URL"
 
 # ── 7. Enable and start ──────────────────────────────────────────────────────
 say "enabling and starting"
+# NOTE: no backticks in this string. It is double-quoted, so the LOCAL shell would
+# run them and the command would arrive mangled — which is exactly what happened.
 $SSH "mkdir -p ~/.config/systemd/user && cp '$REMOTE_DIR/units/'*.service ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable excalidraw-app excalidraw-collab excalidraw-board 2>&1 | tail -3
-# RESTART, not `enable --now`: for a unit already running, `--now` does nothing
-# and the service keeps the OLD environment — so a re-deploy silently changes
-# nothing while reporting success.
+# RESTART, not enable --now: for a unit already running --now does nothing and the
+# service keeps the OLD environment, so a re-deploy would silently change nothing
+# while reporting success.
 systemctl --user restart excalidraw-app excalidraw-collab excalidraw-board; systemctl --user --no-pager --lines=0 status excalidraw-app excalidraw-collab excalidraw-board 2>&1 | grep -E 'Active|●' | head"
 
-# ── 8. The HTTPS doors — this is what makes the app a SECURE CONTEXT ─────────
-say "serving over HTTPS on the tailnet (tailscale serve)"
-$SSH "tailscale serve --bg --https=$HTTPS_APP_PORT  http://127.0.0.1:$APP_PORT  >/dev/null 2>&1 || true
-tailscale serve --bg --https=$HTTPS_BOARD_PORT http://127.0.0.1:$BOARD_PORT >/dev/null 2>&1 || true
-tailscale serve --bg --https=$HTTPS_COLLAB_PORT http://127.0.0.1:$COLLAB_PORT >/dev/null 2>&1 || true
-tailscale serve status 2>&1 | head -8"
+# ── 8. The TLS terminator — a CHOICE, and the one that makes the app a SECURE CONTEXT ─
+#
+# Cloudflare is the default because it is the door the TEAM can reach: the tailnet
+# certifies the tailnet NAME, and team members have no tailnet access. Set
+# EXCALIDRAW_TLS=tailscale to add the tailnet door as well — useful for the
+# operator, and it must not replace the public one.
+case "${EXCALIDRAW_TLS:-cloudflare}" in
+  tailscale)
+    say "also serving over HTTPS on the tailnet (tailscale serve)"
+    $SSH "tailscale serve --bg --https=443 http://127.0.0.1:$APP_PORT >/dev/null 2>&1 || true
+tailscale serve --bg --https=8443 http://127.0.0.1:$BOARD_PORT >/dev/null 2>&1 || true
+tailscale serve --bg --https=10000 http://127.0.0.1:$COLLAB_PORT >/dev/null 2>&1 || true
+tailscale serve status 2>&1 | head -8" ;;
+  *)
+    say "TLS is the Cloudflare tunnel's job (see the tunnel step in README.md)" ;;
+esac
 
 # ── 9. Prove it answers ──────────────────────────────────────────────────────
 say "checking"
@@ -221,15 +236,15 @@ for probe in "127.0.0.1:$APP_PORT/" "127.0.0.1:$COLLAB_PORT/healthz" "127.0.0.1:
   $SSH "curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://$probe" 2>/dev/null || printf 'no-answer'
   echo
 done
-for probe in "$PUBLIC_HOST/" "$PUBLIC_HOST:$HTTPS_BOARD_PORT/healthz" "$PUBLIC_HOST:$HTTPS_COLLAB_PORT/healthz"; do
+for probe in "${APP_URL#https://}/" "${TICKETS_URL#https://}/healthz" "${COLLAB_URL#https://}/healthz"; do
   printf '    https  %-30s ' "$probe"
   $SSH "curl -s -o /dev/null -w '%{http_code}' --max-time 8 https://$probe" 2>/dev/null || printf 'no-answer'
   echo
 done
 
 echo
-echo "done. The app is at $APP_URL/ (HTTPS, tailnet only)."
-echo "      board $APP_URL:$HTTPS_BOARD_PORT  ·  collab wss://$PUBLIC_HOST:$HTTPS_COLLAB_PORT"
+echo "done. The app is at $APP_URL/"
+echo "      board $TICKETS_URL  ·  collab $COLLAB_URL"
 echo "      HTTPS is not decoration: collaboration needs crypto.subtle, which a"
 echo "      browser only exposes in a secure context."
 echo "The bridge is NOT deployed: it refuses to start without a model, and this host"
