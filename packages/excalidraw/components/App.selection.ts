@@ -463,12 +463,10 @@ type SelectOptions = AddOptions & {
  *
  * What hangs on the selection follows it: the link popup shows for a lone
  * selected element with a link (or an embeddable), an embed stays active only
- * while selected, and cropping ends unless the cropped image stays the
- * selection. The line editor ends once its line is deselected (see
- * `componentDidUpdate()`). Text editing isn't ended here: the editor ends
- * itself when the user goes elsewhere, and submitting it in the middle of a
- * pointer event would commit half the event's state — programmatic callers
- * should submit it first (`app.text.textWysiwygSubmitHandler`).
+ * while selected, cropping ends (unless the cropped image is selected again),
+ * and selecting (or adding) anything but the edited text ends text editing,
+ * submitting the text. The line editor ends once its line is deselected (see
+ * `componentDidUpdate()`).
  *
  * Elements are taken by id from the scene: missing and deleted ones are
  * skipped.
@@ -481,10 +479,12 @@ export class AppSelection {
    */
   select(elementsOrIds: ElementsOrIds, opts: SelectOptions = {}) {
     const elements = this.resolve(elementsOrIds, opts.includeLocked);
-    const { croppingElementId } = this.app.state;
     this.beforeChange(
-      elements.length === 1 && elements[0].id === croppingElementId,
+      // (a click inside the image in the crop editor selects it again)
+      elements.length === 1 &&
+        elements[0].id === this.app.state.croppingElementId,
       opts,
+      elements,
     );
     this.app.setState((prevState) =>
       this.withFollowingState(
@@ -504,11 +504,7 @@ export class AppSelection {
    */
   add(elementsOrIds: ElementsOrIds, opts: AddOptions = {}) {
     const elements = this.resolve(elementsOrIds, opts.includeLocked);
-    const { croppingElementId } = this.app.state;
-    this.beforeChange(
-      elements.every((element) => element.id === croppingElementId),
-      opts,
-    );
+    this.beforeChange(false, opts, elements);
     this.app.setState((prevState) =>
       this.withFollowingState(
         prevState,
@@ -527,11 +523,7 @@ export class AppSelection {
    */
   remove(elementsOrIds: ElementsOrIds, opts: SelectionChangeOptions = {}) {
     const elements = this.resolve(elementsOrIds, true);
-    const { croppingElementId } = this.app.state;
-    this.beforeChange(
-      !elements.some((element) => element.id === croppingElementId),
-      opts,
-    );
+    this.beforeChange(false, opts);
     this.app.setState((prevState) =>
       this.withFollowingState(
         prevState,
@@ -546,6 +538,8 @@ export class AppSelection {
 
   /**
    * Clears the selection, leaving the edited group and ending cropping.
+   *
+   * (Doesn't end text editing: starting it clears the selection.)
    */
   clear(opts: SelectionChangeOptions = {}) {
     this.app.finishImageCropping();
@@ -562,13 +556,38 @@ export class AppSelection {
   }
 
   /**
-   * Ends cropping, unless the cropped image stays the selection, and records
-   * the change for undo as asked.
+   * Ends what changing the selection ends — cropping (unless
+   * `keepsCroppedImage`), and text editing (unless selecting the edited text,
+   * or its container) — and records the change for undo as asked.
+   *
+   * @param elements the elements being selected (or added) — none for a
+   *   change that leaves text editing be
    */
   private beforeChange(
     keepsCroppedImage: boolean,
     { captureUpdate }: SelectionChangeOptions,
+    elements?: readonly NonDeletedExcalidrawElement[],
   ) {
+    const { editingTextElement } = this.app.state;
+    if (
+      elements &&
+      editingTextElement &&
+      !elements.some(
+        (element) =>
+          element.id === editingTextElement.id ||
+          element.id === editingTextElement.containerId,
+      )
+    ) {
+      // after the current event, as the editor submits with a flushSync (and
+      // a pointer event's own blur would end it then anyway) — unless another
+      // editing session started meanwhile
+      const submit = this.app.text.textWysiwygSubmitHandler;
+      queueMicrotask(() => {
+        if (submit && this.app.text.textWysiwygSubmitHandler === submit) {
+          submit();
+        }
+      });
+    }
     if (!keepsCroppedImage) {
       this.app.finishImageCropping();
     }

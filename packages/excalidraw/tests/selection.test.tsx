@@ -17,6 +17,7 @@ import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
 import { API } from "./helpers/api";
+import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   act,
@@ -1515,6 +1516,23 @@ describe("app.selection", () => {
     expect(h.state.activeEmbeddable?.element.id).toBe(embed.id);
     act(() => h.app.selection.remove(embed));
     expect(h.state.activeEmbeddable).toBe(null);
+  });
+
+  it("ends text editing (after the event), submitting the text, unless selecting the edited text", async () => {
+    const rectangle = API.createElement({ type: "rectangle", x: 300, y: 300 });
+    API.setElements([rectangle]);
+    const text = UI.createElement("text");
+    updateTextEditor(await getTextEditor(), "hello");
+
+    act(() => h.app.selection.add(text));
+    await act(async () => {});
+    expect(h.state.editingTextElement?.id).toBe(text.id);
+
+    act(() => h.app.selection.select(rectangle));
+    await act(async () => {});
+    expect(h.state.editingTextElement).toBe(null);
+    expect(API.getElement(text).text).toBe("hello");
+    assertSelectedElements([rectangle.id]);
   });
 
   it("records the change for undo with captureUpdate", () => {
