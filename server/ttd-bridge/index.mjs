@@ -17,6 +17,7 @@ import { createServer } from "node:http";
 
 import {
   buildUpstreamRequest,
+  buildVisionRequest,
   createFenceFilter,
   readConfig,
   sse,
@@ -146,23 +147,91 @@ const handleTextToDiagram = async (req, res) => {
   }
 };
 
+/**
+ * Diagram to code — the VISION route.
+ *
+ * A drawing goes in and code comes out. It needs a model that can SEE, which is a
+ * different model from the text one, so it is configured separately: with no
+ * `TTD_VISION_MODEL` the route refuses with exactly that reason rather than
+ * pretending, and the panel shows it.
+ */
 const handleDiagramToCode = async (req, res) => {
-  // The panel expects an SSE stream here too. The bridge answers with a single
-  // error frame rather than pretending: generating code from a diagram needs
-  // the vision path, which is a separate piece of work (a follow-up ticket).
+  let payload;
+  try {
+    payload = JSON.parse(await readBody(req));
+  } catch (error) {
+    return json(res, 400, { error: error.message });
+  }
+
   res.writeHead(200, {
     "content-type": "text/event-stream",
     "cache-control": "no-cache, no-transform",
+    connection: "keep-alive",
   });
-  res.write(
-    sse(
-      ttdError(
-        "diagram-to-code is not implemented by this bridge yet. " +
-          "Use the text-to-diagram tab.",
+
+  if (!config.visionModel) {
+    res.write(
+      sse(
+        ttdError(
+          "No vision model is configured for this bridge. Set TTD_VISION_MODEL to a " +
+            "model that can see images (one launched with an mmproj projector).",
+        ),
       ),
-    ),
+    );
+    res.end();
+    return;
+  }
+
+  const startedAt = Date.now();
+  const controller = new AbortController();
+  req.on("close", () => controller.abort());
+
+  const { url, init, hasImage } = buildVisionRequest(
+    {
+      baseURL: config.modelBaseURL,
+      model: payload.model || config.visionModel,
+      apiKey: config.modelApiKey,
+    },
+    {
+      texts: payload.texts,
+      image: payload.image,
+      signal: controller.signal,
+    },
   );
-  res.end();
+
+  if (!hasImage) {
+    res.write(
+      sse(ttdError("The request carried no image to read.")),
+    );
+    res.end();
+    return;
+  }
+
+  let firstDeltaAt = null;
+  try {
+    const upstream = await fetch(url, init);
+    const fenceFilter = createFenceFilter();
+    for await (const frame of translateUpstream(upstream, { transform: fenceFilter })) {
+      if (firstDeltaAt === null && frame.includes('"type":"content"')) {
+        firstDeltaAt = Date.now();
+      }
+      res.write(frame);
+    }
+  } catch (error) {
+    res.write(sse(ttdError(error?.message ?? String(error))));
+  } finally {
+    res.end();
+    // Timing only. The prompt and the IMAGE are never logged.
+    console.log(
+      JSON.stringify({
+        event: "ttd-vision",
+        ok: true,
+        ms: Date.now() - startedAt,
+        firstDeltaMs: firstDeltaAt === null ? null : firstDeltaAt - startedAt,
+        model: payload.model || config.visionModel,
+      }),
+    );
+  }
 };
 
 const server = createServer(async (req, res) => {
@@ -179,6 +248,7 @@ const server = createServer(async (req, res) => {
     return json(res, 200, {
       ok: true,
       model: config.model || null,
+      vision: Boolean(config.visionModel),
       // The base URL is operator-supplied, so echoing it leaks nothing.
       upstream: config.modelBaseURL,
     });

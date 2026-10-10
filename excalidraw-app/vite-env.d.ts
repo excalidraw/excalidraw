@@ -35,6 +35,8 @@ interface ImportMetaEnv {
   VITE_APP_TICKETS_API: string;
   // The address a room link carries — the host the team reaches.
   VITE_APP_PUBLIC_URL: string;
+  // "true" only when the bridge has a model that can see images.
+  VITE_APP_VISION_ENABLED: string;
 
   // Set this flag to false if you want to open the overlay by default
   VITE_APP_COLLAPSE_OVERLAY: string;

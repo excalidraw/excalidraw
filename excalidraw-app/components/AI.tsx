@@ -71,7 +71,11 @@ export const AIComponents = ({
 
   return (
     <>
-      <DiagramToCodePlugin
+      {/* Offered only when the bridge can actually see: an entry that always
+          errors reads as a defect, and the bridge answers the same question at
+          /healthz with `vision`. */}
+      {settings?.visionEnabled && (
+        <DiagramToCodePlugin
         generate={async ({ frame, children, onPartial }) => {
           const appState = excalidrawAPI.getAppState();
 
@@ -188,11 +192,12 @@ export const AIComponents = ({
             throw new Error("Generation failed (invalid response)");
           }
 
-          return {
-            html,
-          };
-        }}
-      />
+            return {
+              html,
+            };
+          }}
+        />
+      )}
 
       <TTDDialog
         onTextSubmit={async (props) => {

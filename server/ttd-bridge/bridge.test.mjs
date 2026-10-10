@@ -3,7 +3,9 @@ import { describe, it } from "node:test";
 
 import {
   DEFAULT_SYSTEM_PROMPT,
+  DEFAULT_VISION_PROMPT,
   buildUpstreamRequest,
+  buildVisionRequest,
   createFenceFilter,
   withSystemPrompt,
   mapFinishReason,
@@ -259,5 +261,48 @@ describe("the fence filter", () => {
     assert.equal(filter.sawContent, false);
     filter.push("flowchart TD");
     assert.equal(filter.sawContent, true);
+  });
+});
+
+describe("the vision route (feature-0015)", () => {
+  it("builds an OpenAI vision request carrying the panel's data URL", () => {
+    const { url, init, hasImage } = buildVisionRequest(
+      { baseURL: "http://127.0.0.1:8080/v1", model: "vision-model" },
+      { texts: ["Start", "Done"], image: "data:image/png;base64,AAAA" },
+    );
+    assert.equal(url, "http://127.0.0.1:8080/v1/chat/completions");
+    assert.equal(hasImage, true);
+
+    const body = JSON.parse(init.body);
+    assert.equal(body.stream, true);
+    assert.equal(body.model, "vision-model");
+    const parts = body.messages[0].content;
+    assert.equal(parts.some((p) => p.type === "image_url"), true);
+    assert.equal(parts.find((p) => p.type === "image_url").image_url.url, "data:image/png;base64,AAAA");
+    // The drawing's own text rides along as a text part.
+    assert.match(JSON.stringify(parts), /Start \| Done/);
+  });
+
+  it("says so when there is no image to read", () => {
+    const { hasImage } = buildVisionRequest(
+      { baseURL: "http://h/v1", model: "m" },
+      { texts: ["x"], image: undefined },
+    );
+    assert.equal(hasImage, false);
+  });
+
+  it("sends no Authorization when no key is configured", () => {
+    const { init } = buildVisionRequest({ baseURL: "http://h/v1", model: "m" }, {});
+    assert.equal(init.headers.Authorization, undefined);
+  });
+
+  it("has a default prompt that names what it prevents", () => {
+    assert.match(DEFAULT_VISION_PROMPT, /code ONLY/i);
+    assert.match(DEFAULT_VISION_PROMPT, /fences/i);
+  });
+
+  it("reports vision as UNSET by default, so the route is refused rather than faked", () => {
+    assert.equal(readConfig({}).visionModel, "");
+    assert.equal(readConfig({ TTD_VISION_MODEL: "v" }).visionModel, "v");
   });
 });

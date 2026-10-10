@@ -40,6 +40,12 @@ export type Settings = {
    * honest and never points anyone at a server we do not run.
    */
   publicUrl?: string;
+  /**
+   * Whether the bridge has a model that can SEE. The diagram-to-code entry is
+   * hidden without one, because an offered feature that always errors is worse
+   * than an absent one — the bridge serves the same answer at /healthz.
+   */
+  visionEnabled?: boolean;
 };
 
 /** The empty shape — what a migration falls back to, and the local-only state. */
@@ -110,6 +116,9 @@ const envDefaults = () => {
     ...(isString(import.meta.env.VITE_APP_PUBLIC_URL)
       ? { publicUrl: normalizeBaseURL(import.meta.env.VITE_APP_PUBLIC_URL) }
       : {}),
+    ...(import.meta.env.VITE_APP_VISION_ENABLED === "true"
+      ? { visionEnabled: true }
+      : {}),
   };
 };
 
@@ -169,6 +178,7 @@ export const migrateSettings = (input: unknown): Settings => {
     ...(isString(raw.publicUrl)
       ? { publicUrl: normalizeBaseURL(raw.publicUrl) }
       : {}),
+    ...(raw.visionEnabled === true ? { visionEnabled: true } : {}),
   };
 };
 

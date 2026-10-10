@@ -183,6 +183,58 @@ export async function* translateUpstream(response, { onUsage, transform } = {}) 
 }
 
 /**
+ * The instruction a VISION model is given, for the diagram-to-code route.
+ *
+ * The panel sends the frame's texts and a PNG data URL; the model answers with
+ * code. Same reason as the Mermaid prompt: without it a general model wraps the
+ * answer in prose and the panel cannot use it.
+ */
+export const DEFAULT_VISION_PROMPT = [
+  "You are given a hand-drawn wireframe or diagram as an image, plus any text in it.",
+  "Produce clean, semantic HTML with inline CSS that reproduces the layout.",
+  "Reply with the code ONLY: no explanation, no markdown fences, no commentary.",
+].join("\n");
+
+/**
+ * The upstream request for the vision route. The image travels as an OpenAI
+ * `image_url` content part carrying the data URL the panel already produced — it
+ * goes to the model the operator configured and nowhere else.
+ */
+export const buildVisionRequest = (
+  { baseURL, model, apiKey },
+  { prompt = DEFAULT_VISION_PROMPT, texts = [], image, signal } = {},
+) => {
+  const url = `${normalizeBaseURL(baseURL)}/chat/completions`;
+  const headers = { "content-type": "application/json" };
+  if (apiKey) {
+    headers.Authorization = `Bearer ${apiKey}`;
+  }
+
+  const parts = [{ type: "text", text: prompt }];
+  if (Array.isArray(texts) && texts.length) {
+    parts.push({ type: "text", text: `Text in the drawing: ${texts.join(" | ")}` });
+  }
+  if (typeof image === "string" && image.startsWith("data:")) {
+    parts.push({ type: "image_url", image_url: { url: image } });
+  }
+
+  return {
+    url,
+    hasImage: parts.some((part) => part.type === "image_url"),
+    init: {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        model,
+        stream: true,
+        messages: [{ role: "user", content: parts }],
+      }),
+      ...(signal ? { signal } : {}),
+    },
+  };
+};
+
+/**
  * The instruction the model is given, prepended to whatever the panel sent.
  *
  * The panel expects **bare Mermaid** — it parses the reply as Mermaid and shows
@@ -296,6 +348,8 @@ export const readConfig = (env = process.env) => ({
   modelBaseURL: normalizeBaseURL(env.TTD_MODEL_BASE_URL),
   model: env.TTD_MODEL ?? "",
   modelApiKey: env.TTD_MODEL_API_KEY ?? "",
+  /** the model that serves the VISION route; unset means the route is refused */
+  visionModel: env.TTD_VISION_MODEL ?? "",
   /** the instruction prepended to the panel's messages */
   systemPrompt: env.TTD_SYSTEM_PROMPT ?? DEFAULT_SYSTEM_PROMPT,
   /** comma-separated origins allowed to call the bridge */

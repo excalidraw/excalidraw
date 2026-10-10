@@ -4,10 +4,9 @@ set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Per-install configuration, if present. The environment always wins over it.
-if [ -f "$DIR/.env" ]; then
-  set -a
-  # shellcheck disable=SC1091
-  . "$DIR/.env"
-  set +a
-fi
+# The CALLER wins over the file: `TTD_MODEL=... ./start.sh` must beat a stale
+# `.env`, which is what every README here promises.
+# shellcheck source=../.env-loader.sh
+. "$DIR/../.env-loader.sh"
+load_env_file "$DIR/.env"
 exec node "$DIR/index.mjs"
