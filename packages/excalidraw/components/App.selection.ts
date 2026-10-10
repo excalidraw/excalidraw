@@ -543,7 +543,7 @@ export class AppSelection {
   /**
    * Selects the elements alone (with their groups, unless `deep`).
    */
-  select(elementsOrIds: ElementsOrIds, opts: SelectOptions = {}) {
+  select = (elementsOrIds: ElementsOrIds, opts: SelectOptions = {}) => {
     const elements = this.resolve(elementsOrIds, opts.includeLocked);
     this.beforeChange(
       // (a click inside the image in the crop editor selects it again)
@@ -563,12 +563,12 @@ export class AppSelection {
         ),
       ),
     );
-  }
+  };
 
   /**
    * Adds the elements (with their groups) to the selection.
    */
-  add(elementsOrIds: ElementsOrIds, opts: AddOptions = {}) {
+  add = (elementsOrIds: ElementsOrIds, opts: AddOptions = {}) => {
     const elements = this.resolve(elementsOrIds, opts.includeLocked);
     this.beforeChange(false, opts, elements);
     this.app.setState((prevState) =>
@@ -581,13 +581,16 @@ export class AppSelection {
         ),
       ),
     );
-  }
+  };
 
   /**
    * Removes the elements from the selection — with the group they're
    * selected via.
    */
-  remove(elementsOrIds: ElementsOrIds, opts: SelectionChangeOptions = {}) {
+  remove = (
+    elementsOrIds: ElementsOrIds,
+    opts: SelectionChangeOptions = {},
+  ) => {
     const elements = this.resolve(elementsOrIds, true);
     this.beforeChange(false, opts);
     this.app.setState((prevState) =>
@@ -600,14 +603,14 @@ export class AppSelection {
         ),
       ),
     );
-  }
+  };
 
   /**
    * Clears the selection, leaving the edited group and ending cropping.
    *
    * (Doesn't end text editing: starting it clears the selection.)
    */
-  clear(opts: SelectionChangeOptions = {}) {
+  clear = (opts: SelectionChangeOptions = {}) => {
     this.app.finishImageCropping();
     if (opts.captureUpdate) {
       this.app.store.scheduleAction(opts.captureUpdate);
@@ -619,7 +622,7 @@ export class AppSelection {
       activeEmbeddable: null,
       showHyperlinkPopup: false,
     });
-  }
+  };
 
   /**
    * Ends what changing the selection ends — cropping (unless
