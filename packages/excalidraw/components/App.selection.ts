@@ -10,6 +10,7 @@ import {
   getSelectedElements,
   getSelectedGroupForElement,
   isBoundToContainer,
+  isEmbeddableElement,
   isFrameLikeElement,
   isLinearElement,
   LinearElementEditor,
@@ -429,14 +430,20 @@ export class AppSelection {
 
   /**
    * Selects the elements alone (with their groups).
+   *
+   * Like `add()` and `remove()`, shows the link popup of a lone selected
+   * element with a link (or an embeddable), and hides it otherwise.
    */
   select(elementsOrIds: ElementsOrIds) {
     const elements = this.resolve(elementsOrIds);
     this.app.setState((prevState) =>
-      getSelectionStateForElements(
-        elements,
-        this.app.scene.getNonDeletedElements(),
+      this.withLinkPopup(
         prevState,
+        getSelectionStateForElements(
+          elements,
+          this.app.scene.getNonDeletedElements(),
+          prevState,
+        ),
       ),
     );
   }
@@ -447,10 +454,13 @@ export class AppSelection {
   add(elementsOrIds: ElementsOrIds) {
     const elements = this.resolve(elementsOrIds);
     this.app.setState((prevState) =>
-      getSelectionStateAddingElements(
-        elements,
-        this.app.scene.getNonDeletedElements(),
+      this.withLinkPopup(
         prevState,
+        getSelectionStateAddingElements(
+          elements,
+          this.app.scene.getNonDeletedElements(),
+          prevState,
+        ),
       ),
     );
   }
@@ -462,10 +472,13 @@ export class AppSelection {
   remove(elementsOrIds: ElementsOrIds) {
     const elements = this.resolve(elementsOrIds);
     this.app.setState((prevState) =>
-      getSelectionStateRemovingElements(
-        elements,
-        this.app.scene.getNonDeletedElements(),
+      this.withLinkPopup(
         prevState,
+        getSelectionStateRemovingElements(
+          elements,
+          this.app.scene.getNonDeletedElements(),
+          prevState,
+        ),
       ),
     );
   }
@@ -479,7 +492,37 @@ export class AppSelection {
       selectedGroupIds: {},
       editingGroupId: null,
       activeEmbeddable: null,
+      showHyperlinkPopup: false,
     });
+  }
+
+  /**
+   * The next selection state with its link popup: shown for a lone selected
+   * element with a link (or an embeddable) — the link editor staying open if
+   * it's the same element — and hidden otherwise.
+   */
+  private withLinkPopup<T extends Pick<AppState, "selectedElementIds">>(
+    prevState: AppState,
+    nextState: T,
+  ): T & Pick<AppState, "showHyperlinkPopup"> {
+    const ids = Object.keys(nextState.selectedElementIds);
+    const element =
+      ids.length === 1
+        ? this.app.scene.getNonDeletedElementsMap().get(ids[0])
+        : undefined;
+    if (!element || !(element.link || isEmbeddableElement(element))) {
+      return { ...nextState, showHyperlinkPopup: false };
+    }
+    const prevIds = Object.keys(prevState.selectedElementIds);
+    return {
+      ...nextState,
+      showHyperlinkPopup:
+        prevState.showHyperlinkPopup === "editor" &&
+        prevIds.length === 1 &&
+        prevIds[0] === element.id
+          ? "editor"
+          : "info",
+    };
   }
 
   isASelectedElement(hitElement: ExcalidrawElement | null): boolean {

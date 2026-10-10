@@ -7800,12 +7800,7 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.hit.element &&
         !hitSelectedElement
       ) {
-        const hitElement = pointerDownState.hit.element;
-        this.selection.add(hitElement);
-        this.setState({
-          showHyperlinkPopup:
-            hitElement.link || isEmbeddableElement(hitElement) ? "info" : false,
-        });
+        this.selection.add(pointerDownState.hit.element);
         pointerDownState.hit.wasAddedToSelection = true;
       }
     } else if (this.state.activeTool.type === "text") {

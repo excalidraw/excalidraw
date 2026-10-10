@@ -419,12 +419,6 @@ export class AppSelectionTool {
               !pointerDownState.hit.hasHitCommonBoundingBoxOfSelectedElements
             ) {
               this.app.selection.add(hitElement);
-              this.app.setState({
-                showHyperlinkPopup:
-                  hitElement.link || isEmbeddableElement(hitElement)
-                    ? "info"
-                    : false,
-              });
               pointerDownState.hit.wasAddedToSelection = true;
             }
           }
@@ -1271,7 +1265,6 @@ export class AppSelectionTool {
         : null;
     if (cycleTarget) {
       this.app.selection.select(cycleTarget);
-      this.app.setState({ showHyperlinkPopup: false });
     }
 
     if (

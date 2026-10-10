@@ -1458,6 +1458,31 @@ describe("app.selection", () => {
     expect(h.state.selectedGroupIds).toEqual({ b: true });
   });
 
+  it("shows the link popup of a lone selected element with a link, whatever was selected before", () => {
+    const linked = API.createElement({ type: "rectangle" });
+    const other = API.createElement({ type: "rectangle", x: 300 });
+    API.setElements([linked, other]);
+    API.updateElement(linked, { link: "https://excalidraw.com" });
+
+    act(() => h.app.selection.select(linked.id));
+    expect(h.state.showHyperlinkPopup).toBe("info");
+
+    act(() => h.app.selection.select(other));
+    expect(h.state.showHyperlinkPopup).toBe(false);
+
+    act(() => h.app.selection.select(linked));
+    expect(h.state.showHyperlinkPopup).toBe("info");
+
+    act(() => h.app.selection.add(other));
+    expect(h.state.showHyperlinkPopup).toBe(false);
+
+    act(() => h.app.selection.remove(other));
+    expect(h.state.showHyperlinkPopup).toBe("info");
+
+    act(() => h.app.selection.clear());
+    expect(h.state.showHyperlinkPopup).toBe(false);
+  });
+
   it("remove() leaving an arrow alone sets up its line editor", () => {
     const arrow = API.createElement({
       type: "arrow",
