@@ -11026,7 +11026,8 @@ class App extends React.Component<AppProps, AppState> {
     trackEvent("contextMenu", "openContextMenu", type);
 
     if (element && !this.state.selectedElementIds[element.id]) {
-      this.selection.select(element);
+      // (locked ones too, for the menu to offer unlocking them)
+      this.selection.select(element, { includeLocked: true });
     }
     this.setState(
       {

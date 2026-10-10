@@ -14,7 +14,6 @@ import {
   addElementsToFrame,
   cropElement,
   dragSelectedElements,
-  editGroupForSelectedElement,
   getCommonBounds,
   getCommonFrameId,
   getElementAbsoluteCoords,
@@ -388,10 +387,10 @@ export class AppSelectionTool {
             if (!this.app.state.selectedElementIds[hitElement.id]) {
               pointerDownState.hit.wasAddedToSelection = true;
             }
-            this.app.setState((prevState) => ({
-              ...editGroupForSelectedElement(prevState, hitElement),
+            this.app.setState({
               previousSelectedElementIds: this.app.state.selectedElementIds,
-            }));
+            });
+            this.app.selection.select(hitElement, { deep: true });
             // mark as not completely handled so as to allow dragging etc.
             return false;
           }

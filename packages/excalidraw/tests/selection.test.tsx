@@ -3,6 +3,7 @@ import { vi } from "vitest";
 
 import { KEYS, ROUNDNESS, arrayToMap, reseed } from "@excalidraw/common";
 import {
+  CaptureUpdateAction,
   getElementBounds,
   getElementLineSegments,
   getElementsWithinSelection,
@@ -1481,6 +1482,67 @@ describe("app.selection", () => {
 
     act(() => h.app.selection.clear());
     expect(h.state.showHyperlinkPopup).toBe(false);
+  });
+
+  it("skips locked elements, unless includeLocked", () => {
+    const locked = API.createElement({ type: "rectangle", locked: true });
+    const other = API.createElement({ type: "rectangle", x: 300 });
+    API.setElements([locked, other]);
+
+    act(() => h.app.selection.select([locked, other]));
+    assertSelectedElements([other.id]);
+
+    act(() => h.app.selection.add(locked, { includeLocked: true }));
+    assertSelectedElements([locked.id, other.id]);
+  });
+
+  it("ends the cropping and deactivates the embed of what it deselects", () => {
+    const image = API.createElement({ type: "image" });
+    const embed = API.createElement({ type: "embeddable", x: 300 });
+    const other = API.createElement({ type: "rectangle", x: 600 });
+    API.setElements([image, embed, other]);
+
+    API.setSelectedElements([image]);
+    API.setAppState({ croppingElementId: image.id });
+    act(() => h.app.selection.select(image));
+    expect(h.state.croppingElementId).toBe(image.id);
+    act(() => h.app.selection.select(other));
+    expect(h.state.croppingElementId).toBe(null);
+
+    API.setSelectedElements([embed]);
+    API.setAppState({ activeEmbeddable: { element: embed, state: "active" } });
+    act(() => h.app.selection.add(other));
+    expect(h.state.activeEmbeddable?.element.id).toBe(embed.id);
+    act(() => h.app.selection.remove(embed));
+    expect(h.state.activeEmbeddable).toBe(null);
+  });
+
+  it("records the change for undo with captureUpdate", () => {
+    const [a, b] = [0, 300].map((x) =>
+      API.createElement({ type: "rectangle", x }),
+    );
+    API.setElements([a, b]);
+    const { IMMEDIATELY } = CaptureUpdateAction;
+
+    act(() => h.app.selection.select(a, { captureUpdate: IMMEDIATELY }));
+    act(() => h.app.selection.select(b, { captureUpdate: IMMEDIATELY }));
+    act(() => {
+      h.app.actionManager.executeAction(h.app.actionManager.actions.undo);
+    });
+
+    assertSelectedElements([a.id]);
+  });
+
+  it("deep-selects the elements themselves, editing their shared group", () => {
+    const [a, b, c] = [0, 100, 200].map((x) =>
+      API.createElement({ type: "rectangle", x, groupIds: ["group"] }),
+    );
+    API.setElements([a, b, c]);
+
+    act(() => h.app.selection.select([a, b], { deep: true }));
+
+    assertSelectedElements([a.id, b.id]);
+    expect(h.state.editingGroupId).toBe("group");
   });
 
   it("remove() leaving an arrow alone sets up its line editor", () => {

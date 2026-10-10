@@ -24,6 +24,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
+import type { CaptureUpdateActionType } from "@excalidraw/element";
 
 import type {
   AppClassProperties,
@@ -212,12 +213,25 @@ const getLinearElementEditor = (
  * container, and a lone line or arrow gets its line editor.
  *
  * @param allElements the (non-deleted) elements the selection is in
+ * @param deep select the elements themselves rather than their groups,
+ *   editing their innermost group (if they share it) — as Ctrl+click does
  */
 export const getSelectionStateForElements = (
   targetElements: readonly NonDeletedExcalidrawElement[],
   allElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
+  deep = false,
 ) => {
+  let editingGroupId = appState.editingGroupId;
+  if (deep) {
+    const innermostGroupIds = new Set(
+      targetElements.map((element) => element.groupIds[0] ?? null),
+    );
+    if (innermostGroupIds.size === 1) {
+      [editingGroupId] = innermostGroupIds;
+    }
+  }
+
   return {
     selectedLinearElement: getLinearElementEditor(
       targetElements,
@@ -226,7 +240,7 @@ export const getSelectionStateForElements = (
     ),
     ...selectGroupsForSelectedElements(
       {
-        editingGroupId: appState.editingGroupId,
+        editingGroupId,
         selectedElementIds: excludeElementsInFramesFromSelection(
           targetElements,
         ).reduce((acc: Record<ExcalidrawElement["id"], true>, element) => {
@@ -415,12 +429,46 @@ export type ElementsOrIds =
   | ExcalidrawElement["id"]
   | readonly (ExcalidrawElement | ExcalidrawElement["id"])[];
 
+type SelectionChangeOptions = {
+  /**
+   * how the change is recorded for undo (see `updateScene()`) — by default,
+   * along with the next undoable change
+   */
+  captureUpdate?: CaptureUpdateActionType;
+};
+
+type AddOptions = SelectionChangeOptions & {
+  /**
+   * select locked elements too — e.g. for the context menu to offer unlocking
+   * them
+   */
+  includeLocked?: boolean;
+};
+
+type SelectOptions = AddOptions & {
+  /**
+   * select the elements themselves rather than their groups, editing their
+   * innermost group (if they share it) — as Ctrl+click does
+   */
+  deep?: boolean;
+};
+
 /**
  * The selection: selecting elements, adding them to or removing them from
  * the selection, and clearing it — keeping its rules: an element is selected
  * with its group (but within the edited group), a frame and its children
- * aren't selected at the same time, and a lone line or arrow gets its line
- * editor (see the `getSelectionState*()` functions above).
+ * aren't selected at the same time, locked elements aren't selected, and a
+ * lone line or arrow gets its line editor (see the `getSelectionState*()`
+ * functions above).
+ *
+ * What hangs on the selection follows it: the link popup shows for a lone
+ * selected element with a link (or an embeddable), an embed stays active only
+ * while selected, and cropping ends unless the cropped image stays the
+ * selection. The line editor ends once its line is deselected (see
+ * `componentDidUpdate()`). Text editing isn't ended here: the editor ends
+ * itself when the user goes elsewhere, and submitting it in the middle of a
+ * pointer event would commit half the event's state — programmatic callers
+ * should submit it first (`app.text.textWysiwygSubmitHandler`).
  *
  * Elements are taken by id from the scene: missing and deleted ones are
  * skipped.
@@ -429,20 +477,23 @@ export class AppSelection {
   constructor(private app: App) {}
 
   /**
-   * Selects the elements alone (with their groups).
-   *
-   * Like `add()` and `remove()`, shows the link popup of a lone selected
-   * element with a link (or an embeddable), and hides it otherwise.
+   * Selects the elements alone (with their groups, unless `deep`).
    */
-  select(elementsOrIds: ElementsOrIds) {
-    const elements = this.resolve(elementsOrIds);
+  select(elementsOrIds: ElementsOrIds, opts: SelectOptions = {}) {
+    const elements = this.resolve(elementsOrIds, opts.includeLocked);
+    const { croppingElementId } = this.app.state;
+    this.beforeChange(
+      elements.length === 1 && elements[0].id === croppingElementId,
+      opts,
+    );
     this.app.setState((prevState) =>
-      this.withLinkPopup(
+      this.withFollowingState(
         prevState,
         getSelectionStateForElements(
           elements,
           this.app.scene.getNonDeletedElements(),
           prevState,
+          opts.deep,
         ),
       ),
     );
@@ -451,10 +502,15 @@ export class AppSelection {
   /**
    * Adds the elements (with their groups) to the selection.
    */
-  add(elementsOrIds: ElementsOrIds) {
-    const elements = this.resolve(elementsOrIds);
+  add(elementsOrIds: ElementsOrIds, opts: AddOptions = {}) {
+    const elements = this.resolve(elementsOrIds, opts.includeLocked);
+    const { croppingElementId } = this.app.state;
+    this.beforeChange(
+      elements.every((element) => element.id === croppingElementId),
+      opts,
+    );
     this.app.setState((prevState) =>
-      this.withLinkPopup(
+      this.withFollowingState(
         prevState,
         getSelectionStateAddingElements(
           elements,
@@ -469,10 +525,15 @@ export class AppSelection {
    * Removes the elements from the selection — with the group they're
    * selected via.
    */
-  remove(elementsOrIds: ElementsOrIds) {
-    const elements = this.resolve(elementsOrIds);
+  remove(elementsOrIds: ElementsOrIds, opts: SelectionChangeOptions = {}) {
+    const elements = this.resolve(elementsOrIds, true);
+    const { croppingElementId } = this.app.state;
+    this.beforeChange(
+      !elements.some((element) => element.id === croppingElementId),
+      opts,
+    );
     this.app.setState((prevState) =>
-      this.withLinkPopup(
+      this.withFollowingState(
         prevState,
         getSelectionStateRemovingElements(
           elements,
@@ -484,9 +545,13 @@ export class AppSelection {
   }
 
   /**
-   * Clears the selection, leaving the edited group.
+   * Clears the selection, leaving the edited group and ending cropping.
    */
-  clear() {
+  clear(opts: SelectionChangeOptions = {}) {
+    this.app.finishImageCropping();
+    if (opts.captureUpdate) {
+      this.app.store.scheduleAction(opts.captureUpdate);
+    }
     this.app.setState({
       selectedElementIds: makeNextSelectedElementIds({}, this.app.state),
       selectedGroupIds: {},
@@ -497,25 +562,49 @@ export class AppSelection {
   }
 
   /**
-   * The next selection state with its link popup: shown for a lone selected
-   * element with a link (or an embeddable) — the link editor staying open if
-   * it's the same element — and hidden otherwise.
+   * Ends cropping, unless the cropped image stays the selection, and records
+   * the change for undo as asked.
    */
-  private withLinkPopup<T extends Pick<AppState, "selectedElementIds">>(
+  private beforeChange(
+    keepsCroppedImage: boolean,
+    { captureUpdate }: SelectionChangeOptions,
+  ) {
+    if (!keepsCroppedImage) {
+      this.app.finishImageCropping();
+    }
+    if (captureUpdate) {
+      this.app.store.scheduleAction(captureUpdate);
+    }
+  }
+
+  /**
+   * The next selection state with what follows it: the link popup — shown for
+   * a lone selected element with a link (or an embeddable), the link editor
+   * staying open if it's the same element, and hidden otherwise — and the
+   * active embed, which stays active only while selected.
+   */
+  private withFollowingState<T extends Pick<AppState, "selectedElementIds">>(
     prevState: AppState,
     nextState: T,
-  ): T & Pick<AppState, "showHyperlinkPopup"> {
+  ): T & Pick<AppState, "showHyperlinkPopup" | "activeEmbeddable"> {
+    const activeEmbeddable =
+      prevState.activeEmbeddable &&
+      nextState.selectedElementIds[prevState.activeEmbeddable.element.id]
+        ? prevState.activeEmbeddable
+        : null;
+
     const ids = Object.keys(nextState.selectedElementIds);
     const element =
       ids.length === 1
         ? this.app.scene.getNonDeletedElementsMap().get(ids[0])
         : undefined;
     if (!element || !(element.link || isEmbeddableElement(element))) {
-      return { ...nextState, showHyperlinkPopup: false };
+      return { ...nextState, activeEmbeddable, showHyperlinkPopup: false };
     }
     const prevIds = Object.keys(prevState.selectedElementIds);
     return {
       ...nextState,
+      activeEmbeddable,
       showHyperlinkPopup:
         prevState.showHyperlinkPopup === "editor" &&
         prevIds.length === 1 &&
@@ -555,8 +644,11 @@ export class AppSelection {
     );
   }
 
-  /** the scene's (non-deleted) elements, by id, once each */
-  private resolve(elementsOrIds: ElementsOrIds) {
+  /**
+   * The scene's (non-deleted) elements, by id, once each — but locked ones,
+   * unless `includeLocked`
+   */
+  private resolve(elementsOrIds: ElementsOrIds, includeLocked = false) {
     const elementsMap = this.app.scene.getNonDeletedElementsMap();
     const elements = new Map<
       ExcalidrawElement["id"],
@@ -567,7 +659,7 @@ export class AppSelection {
       : [elementsOrIds]) as readonly (ExcalidrawElement | string)[]) {
       const id = typeof elementOrId === "string" ? elementOrId : elementOrId.id;
       const element = elementsMap.get(id);
-      if (element) {
+      if (element && (includeLocked || !element.locked)) {
         elements.set(id, element);
       }
     }
