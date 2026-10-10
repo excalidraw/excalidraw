@@ -43,6 +43,7 @@ import {
   LinearElementEditor,
   makeNextSelectedElementIds,
   transformElements,
+  uncropElementSides,
   updateBoundElements,
   updateFrameMembershipOfSelectedElements,
 } from "@excalidraw/element";
@@ -522,6 +523,48 @@ export class AppSelectionTool {
     }
 
     return false;
+  };
+
+  /**
+   * In the crop editor, a double-click on a handle uncrops its side (a
+   * corner's two), and mirrored, the opposite side(s) too.
+   *
+   * @returns whether the double-click has been handled
+   */
+  maybeUncropSides = (
+    sceneX: number,
+    sceneY: number,
+    pointerType: PointerType,
+    mirrored: boolean,
+  ): boolean => {
+    const croppingElement =
+      this.app.state.croppingElementId &&
+      this.app.scene
+        .getNonDeletedElementsMap()
+        .get(this.app.state.croppingElementId);
+    if (!croppingElement || !isImageElement(croppingElement)) {
+      return false;
+    }
+    const handle = this.getTransformHandleAt(
+      [croppingElement],
+      sceneX,
+      sceneY,
+      pointerType,
+    )?.transformHandleType;
+    if (!handle || handle === "rotation") {
+      return false;
+    }
+    const updates = uncropElementSides(
+      croppingElement,
+      this.app.scene.getNonDeletedElementsMap(),
+      handle,
+      mirrored,
+    );
+    if (updates) {
+      this.app.store.scheduleCapture();
+      this.app.scene.mutateElement(croppingElement, updates);
+    }
+    return true;
   };
 
   maybeHandleResize = (

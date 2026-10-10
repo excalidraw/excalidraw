@@ -6185,8 +6185,13 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     // alt-clicks cycle the selection, so their double-click does nothing
-    // (autoshape doesn't select, alt is its free-text-at-point escape hatch)
-    if (event.altKey && this.state.activeTool.type !== "autoshape") {
+    // (autoshape doesn't select, alt is its free-text-at-point escape hatch;
+    // the crop editor doesn't cycle, alt mirrors the sides it uncrops)
+    if (
+      event.altKey &&
+      this.state.activeTool.type !== "autoshape" &&
+      !this.state.croppingElementId
+    ) {
       return;
     }
     // case: double-clicking with arrow/line tool selected would both create
@@ -6299,7 +6304,16 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
-      this.startImageCropping(selectedElements[0]);
+      if (
+        !this.selectionTool.maybeUncropSides(
+          sceneX,
+          sceneY,
+          this.lastPointerDownEvent?.pointerType ?? "mouse",
+          event.altKey,
+        )
+      ) {
+        this.startImageCropping(selectedElements[0]);
+      }
       return;
     }
 

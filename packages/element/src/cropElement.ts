@@ -20,7 +20,10 @@ import {
   getResizedElementAbsoluteCoords,
 } from "./bounds";
 
-import type { TransformHandleType } from "./transformHandles";
+import type {
+  TransformHandleDirection,
+  TransformHandleType,
+} from "./transformHandles";
 import type {
   ElementsMap,
   ExcalidrawElement,
@@ -402,6 +405,57 @@ export const cropElement = (
     height: nextHeight,
     crop,
   };
+};
+
+const OPPOSITE_HANDLES: Record<
+  TransformHandleDirection,
+  TransformHandleDirection
+> = { n: "s", s: "n", e: "w", w: "e", nw: "se", se: "nw", ne: "sw", sw: "ne" };
+
+/**
+ * Uncrops the image on the handle's side (a corner's two), as dragging the
+ * handle out as far as the image reaches does; mirrored, on the opposite
+ * side(s) too.
+ */
+export const uncropElementSides = (
+  element: ExcalidrawImageElement,
+  elementsMap: ElementsMap,
+  handle: TransformHandleDirection,
+  mirrored = false,
+): ReturnType<typeof cropElement> | null => {
+  if (!element.crop) {
+    return null;
+  }
+  const { width, height } = getUncroppedWidthAndHeight(element);
+  const center = elementCenterPoint(element, elementsMap);
+  // past the image's edge on the handle's side(s), where cropping stops at it
+  const [pointerX, pointerY] = pointRotateRads(
+    pointFrom(
+      center[0] +
+        (handle.includes("e") ? width : handle.includes("w") ? -width : 0),
+      center[1] +
+        (handle.includes("s") ? height : handle.includes("n") ? -height : 0),
+    ),
+    center,
+    element.angle,
+  );
+  const updates = cropElement(
+    // (cropElement updates the crop it's given)
+    { ...element, crop: { ...element.crop } },
+    elementsMap,
+    handle,
+    element.crop.naturalWidth,
+    element.crop.naturalHeight,
+    pointerX,
+    pointerY,
+  );
+  return mirrored
+    ? uncropElementSides(
+        { ...element, ...updates },
+        elementsMap,
+        OPPOSITE_HANDLES[handle],
+      ) ?? updates
+    : updates;
 };
 
 /**

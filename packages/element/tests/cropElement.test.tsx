@@ -249,6 +249,59 @@ describe("Crop an image", () => {
     });
   });
 
+  it("In the crop editor, double-clicking a handle uncrops its side(s), mirrored with alt", () => {
+    // the middle of an image twice the element's size, at (0, 0)
+    const image = API.createElement({
+      type: "image",
+      x: 50,
+      y: 25,
+      width: 100,
+      height: 50,
+      fileId: "file",
+    });
+    API.setElements([image]);
+    API.updateElement(image, {
+      crop: {
+        x: 100,
+        y: 50,
+        width: 200,
+        height: 100,
+        naturalWidth: 400,
+        naturalHeight: 200,
+      },
+    });
+    API.setSelectedElements([image]);
+    Keyboard.keyDown(KEYS.ENTER);
+
+    // the north-east handle
+    mouse.doubleClickAt(150, 25);
+
+    expect(API.getElement(image)).toMatchObject({
+      x: 50,
+      y: 0,
+      width: 150,
+      height: 75,
+    });
+    expect(API.getElement(image).crop).toMatchObject({ y: 0, width: 300 });
+
+    Keyboard.undo();
+
+    expect(API.getElement(image)).toMatchObject({ y: 25, width: 100 });
+
+    // the west handle, and so the east one
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.doubleClickAt(50, 50);
+    });
+
+    expect(API.getElement(image)).toMatchObject({
+      x: 0,
+      y: 25,
+      width: 200,
+      height: 50,
+    });
+    expect(API.getElement(image).crop).toMatchObject({ x: 0, width: 400 });
+  });
+
   it("Cropping has minimal sizes", async () => {
     const image = h.elements[0] as ExcalidrawImageElement;
     const initialWidth = image.width;
