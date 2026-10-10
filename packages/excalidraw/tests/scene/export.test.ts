@@ -278,11 +278,14 @@ describe("exportToSvg", () => {
       containerId: "arrow-hole",
     });
 
-    const svgElement = await exportUtils.exportToSvg(
-      [arrow, label] as NonDeletedExcalidrawElement[],
-      { ...DEFAULT_OPTIONS, exportPadding: 0 },
-      null,
-    );
+    const svgElement = await exportUtils.exportToSvg({
+      data: {
+        elements: [arrow, label] as NonDeletedExcalidrawElement[],
+        appState: DEFAULT_APP_STATE,
+        files: null,
+      },
+      config: { padding: 0 },
+    });
 
     // the mask's first rect is the visible region, sized to the arrow plus
     // its offset within the export; the second is the hole cut for the label

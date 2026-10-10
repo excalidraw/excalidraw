@@ -275,8 +275,15 @@ describe("setElementRenderOverrides", () => {
   it("leaves exported geometry and opacity unchanged", async () => {
     const { element, submit } = await setup();
     const exportScene = async () =>
-      (await exportToSvg(h.app.api.getSceneElements(), h.state, null))
-        .outerHTML;
+      (
+        await exportToSvg({
+          data: {
+            elements: h.app.api.getSceneElements(),
+            appState: h.state,
+            files: null,
+          },
+        })
+      ).outerHTML;
     const before = await exportScene();
     submit(
       new Map([[element.id, { opacity: 0, offset: { x: 1000, y: 1000 } }]]),

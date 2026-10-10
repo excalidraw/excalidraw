@@ -1157,16 +1157,18 @@ describe("sticky notes", () => {
         }),
       ];
 
-      const svg = await exportToSvg(
-        elements,
-        { exportBackground: false, viewBackgroundColor: "#ffffff" },
-        {},
-      );
+      const svg = await exportToSvg({
+        data: {
+          elements,
+          appState: { exportBackground: false, viewBackgroundColor: "#ffffff" },
+          files: {},
+        },
+      });
       expect(
         [...svg.querySelectorAll("text")].map((text) => text.textContent),
       ).toEqual(["7 Mar 2025"]);
 
-      const canvas = await exportToCanvas({ elements, files: {} });
+      const canvas = await exportToCanvas({ data: { elements, files: {} } });
       expect(canvas.getContext("2d")?.fillText).toHaveBeenCalledWith(
         "7 Mar 2025",
         expect.any(Number),
