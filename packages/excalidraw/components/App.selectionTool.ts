@@ -558,6 +558,7 @@ export class AppSelectionTool {
     if (updates) {
       this.app.store.scheduleCapture();
       this.app.scene.mutateElement(image, updates);
+      updateBoundElements(image, this.app.scene);
     }
     return true;
   };

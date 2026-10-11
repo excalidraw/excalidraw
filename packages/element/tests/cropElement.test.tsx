@@ -270,6 +270,13 @@ describe("Crop an image", () => {
         naturalHeight: 200,
       },
     });
+    // bound near the image's south-east corner
+    const arrow = UI.createElement("arrow", {
+      x: 140,
+      y: 300,
+      width: 0,
+      height: -230,
+    });
     API.setSelectedElements([image]);
     Keyboard.keyDown(KEYS.ENTER);
 
@@ -283,6 +290,9 @@ describe("Crop an image", () => {
       height: 75,
     });
     expect(API.getElement(image).crop).toMatchObject({ y: 0, width: 300 });
+    // the arrow following the image
+    const { x, points } = API.getElement(arrow);
+    expect(x + points[1][0]).toBeCloseTo(185);
 
     Keyboard.undo();
 
