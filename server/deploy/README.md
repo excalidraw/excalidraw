@@ -53,7 +53,7 @@ done
 ```yaml
 protocol: http2
 tunnel: <uuid>
-credentials-file: /home/zerwizserver/.cloudflared/<uuid>.json
+credentials-file: $HOME/.cloudflared/<uuid>.json
 ingress:
   - hostname: excalidraw.zerwiz.org
     service: http://127.0.0.1:7311

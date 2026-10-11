@@ -85,7 +85,7 @@ _(filled on close)_
 - **17 server tests** (`yarn test:server`, now covering both services: 33 total).
 - **Full suite: 144 files, 2489 tests passed** · `yarn test:typecheck` clean · `yarn build:app` built · eslint clean.
 - **Live against the real repository:**
-  - `GET /healthz` → `{"ok":true,"root":"/home/zerwizomar/CodeP/excalidraw"}`
+  - `GET /healthz` → `{"ok":true,"root":"<the repo root>"}` _(redacted — see the note at the foot of this ticket)_
   - `GET /api/tickets` → **7 tickets: 3 open, 4 review**, each with type/risk/owner and **zero problems**
   - `GET /api/tickets/review/chore-0001-…md` → the markdown
   - **Traversal refused** — `../../RULES/08-tickets.md`, `..%2f..%2fRULES%2f…`, `open%2f..%2f..%2f..%2fetc%2fpasswd` and `%2e%2e%2f…%2fAGENTS.md` all → `404 {"error":"not a ticket path"}`; `_templates/feature.md` → the same, because only the four status folders are servable.
@@ -96,3 +96,11 @@ _(filled on close)_
 - **No editing, moving or creating from the UI.** The files stay the source of truth; a write path is what would let the board become a second, divergent backlog.
 - **The body renders as pre-formatted text, not rendered markdown.** The contract asks that the body renders; a markdown renderer is a dependency and a surface this ticket does not need. Worth its own ticket if the plain view grates.
 - **No polling.** The board loads on open; a board that has gone stale says so on the next open rather than streaming.
+
+---
+
+## Appended 2026-10-11 — a path was redacted from the Resolution above
+
+The verification line for `/healthz` carried the machine's real checkout path, pasted from the output. That is operator topology in a **public** repository, which is the one law this project states first — so it is redacted to `<the repo root>`.
+
+**Appended rather than silently edited**, so the change is visible: the record now says a redaction happened instead of pretending the line always read that way. Found while auditing the AI model logic (`docs/2026-10-11-ai-model-audit.md`), and now caught by `bin/guards/no-private-paths.sh` rather than by anyone's memory.

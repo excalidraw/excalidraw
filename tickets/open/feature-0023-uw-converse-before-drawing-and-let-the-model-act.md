@@ -14,7 +14,55 @@
 
 **Converse → propose → consent → apply.** Three layers, and the order is the design: the conversation can see, the skills can change, and **nothing changes unseen**.
 
-Full reasoning, the skill list, the order of work and the open questions are in [`plans/03-talking-to-the-model.md`](../../../../../Documents/ymirhome/svartalfaheim/whynotproductions/projects/excalidraw/plans/03-talking-to-the-model.md).
+### Why tools rather than a better prompt
+
+A prompt can only describe; a **tool** can read.
+
+| Ask | Today | With skills |
+| --- | --- | --- |
+| "what is on the board?" | impossible | _read the scene_, summarised |
+| "add a queue before the API" | a fresh diagram, losing everything else | _read_, then _add one element_ |
+| "tidy this into a grid" | a description of a grid | _lay out the selection_ |
+| "make the boxes the same width" | the same, if the model guesses | _set width on these elements_ |
+
+A tool call is also **auditable**: "the model changed seven elements" is a fact; "the model said it changed seven elements" is not.
+
+### The six skills, in the order they earn their place
+
+```
+skills[6]{skill,reads,changes,risk}:
+  "scene.read","the whole scene — a summary plus elements","nothing","none"
+  "scene.inspect","one element or a selection, in detail","nothing","none"
+  "scene.add","—","new elements","medium — additive, and undoable"
+  "element.update","the elements it names","those elements' fields","medium"
+  "selection.layout","the selection's bounds","positions","low"
+  "scene.screenshot","the board as an image","nothing","none — this is what a vision model needs"
+```
+
+**Everything starts read-only.** A `scene.read` that works is worth more than an `element.update` that misfires, and it is the tool every other one depends on.
+
+### The shape of a changing turn
+
+1. The model **proposes**: a tool call rendered as a sentence — _"Add a rectangle labelled 'Queue' above 'API'?"_ — naming the elements it would touch.
+2. The person **accepts or refuses**, per proposal or for the turn.
+3. Only then is it **applied**, as a normal undoable action: one turn is one undo.
+
+### The order of work
+
+```
+order[5]{step,why_first}:
+  "1 — the ACTIVE model","nothing here can be tested while models[0] is the only choice (feature-0020)"
+  "2 — scene.read","what every other tool and every honest conversation depends on; changes nothing, so it ships alone"
+  "3 — the conversation","a real multi-turn chat with the scene in view, still generating only on request"
+  "4 — scene.screenshot + vision","the vision route (feature-0015) has been missing something to read"
+  "5 — proposals that change things","scene.add and element.update, behind consent, last — they are the only irreversible ones"
+```
+
+### Open questions, recorded rather than assumed
+
+- **Do skills run in the browser or the bridge?** Browser: they reach the scene directly. Bridge: testable without one. Leaning **browser**, with the bridge carrying only the conversation.
+- **How much of the scene is a prompt?** A large board will not fit. Summarise, and let `scene.inspect` fetch detail on demand.
+- **Does the conversation persist, and is it shared?** Chat history already persists per browser. A _shared room's_ conversation is a separate decision and collides with `feature-0021`.
 
 ## Requirements
 

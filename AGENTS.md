@@ -51,4 +51,5 @@ yarn test:app --watch=false
 yarn test:code
 yarn build:app
 ./bin/guards/ticket-ids.sh
+./bin/guards/no-private-paths.sh   # this repo is PUBLIC: no operator path in it
 ```
