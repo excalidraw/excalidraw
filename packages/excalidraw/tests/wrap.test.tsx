@@ -273,6 +273,22 @@ describe("wrap (w)", () => {
     );
   });
 
+  it("doesn't count resizing the text as moving it", () => {
+    const [rectangle, label] = createLabeled("rectangle", "rect");
+    API.setElements([rectangle, label]);
+    API.setSelectedElements([rectangle]);
+
+    pressW();
+    act(() => {
+      h.app.actionManager.executeAction(actionChangeFontSize, "ui", 36);
+    });
+    dragBy(getElement(label.id), 100, 50);
+    pressW();
+
+    expect(getElement("rect").x).toBeCloseTo(100);
+    expect(getElement("rect").y).toBeCloseTo(50);
+  });
+
   it("brings the container back into the frame its text was moved to", () => {
     const [diamond, label] = createLabeled("diamond", "diamond");
     const frame = API.createElement({

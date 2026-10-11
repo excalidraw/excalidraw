@@ -1,15 +1,17 @@
+import { TEXT_ALIGN } from "@excalidraw/common";
+
 import {
   BoundElement,
   CaptureUpdateAction,
   fixBindingsAfterDeletion,
   getBoundTextElement,
+  getNonDeletedElements,
   hasBoundTextElement,
   isArrowElement,
   isBoundToContainer,
   isFrameLikeElement,
   isTextBindableContainer,
   isTextElement,
-  getNonDeletedElements,
   normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
   updateBoundElements,
@@ -51,11 +53,11 @@ type UnwrappedContainer = {
   textId: ExcalidrawTextElement["id"];
   baseFontSize: ExcalidrawTextElement["baseFontSize"];
   labelPosition: ExcalidrawTextElement["labelPosition"];
-  /** where the freed text landed, to tell how far it moved since */
-  textX: number;
-  textY: number;
-  /** its font size then, to tell whether it was resized since */
-  textFontSize: number;
+  /** the freed text as it landed, to tell how far it moved since */
+  text: Pick<
+    ExcalidrawTextElement,
+    "x" | "y" | "width" | "height" | "fontSize"
+  >;
   /** the arrows bound to the container, as they were bound */
   arrows: Pick<ExcalidrawArrowElement, "id" | "startBinding" | "endBinding">[];
 };
@@ -66,6 +68,30 @@ const rebind = (
   toId: ExcalidrawElement["id"],
 ) =>
   binding?.elementId === fromId ? { ...binding, elementId: toId } : binding;
+
+/**
+ * How far the text moved since: a font size change keeps the text's alignment
+ * edge and middle in place (any other change, its top left), so resizing it
+ * doesn't count as a move.
+ */
+const getTextMove = (
+  prev: UnwrappedContainer["text"],
+  text: ExcalidrawTextElement,
+) => {
+  if (text.fontSize === prev.fontSize) {
+    return [text.x - prev.x, text.y - prev.y] as const;
+  }
+  const alignment =
+    text.textAlign === TEXT_ALIGN.LEFT
+      ? 0
+      : text.textAlign === TEXT_ALIGN.CENTER
+      ? 0.5
+      : 1;
+  return [
+    text.x + text.width * alignment - (prev.x + prev.width * alignment),
+    text.y + text.height / 2 - (prev.y + prev.height / 2),
+  ] as const;
+};
 
 /**
  * Wraps the selection in what fits it, or unwraps it, preferring containers
@@ -209,9 +235,13 @@ export class AppWrap {
         textId: text.id,
         baseFontSize,
         labelPosition,
-        textX: text.x,
-        textY: text.y,
-        textFontSize: text.fontSize,
+        text: {
+          x: text.x,
+          y: text.y,
+          width: text.width,
+          height: text.height,
+          fontSize: text.fontSize,
+        },
         arrows: arrows.map(({ id, startBinding, endBinding }) => ({
           id,
           startBinding,
@@ -315,16 +345,13 @@ export class AppWrap {
       // except an arrow anchored to the elements it connects
       const isAnchored =
         isArrowContainer && !!(container.startBinding || container.endBinding);
+      const [dx, dy] = isAnchored ? [0, 0] : getTextMove(entry.text, text);
       const stickyInk = getStickyNoteInk(text, container);
       scene.mutateElement(container, {
         frameId: text.frameId,
+        x: container.x + dx,
+        y: container.y + dy,
         ...(stickyInk ? { strokeColor: stickyInk } : null),
-        ...(isAnchored
-          ? null
-          : {
-              x: container.x + text.x - entry.textX,
-              y: container.y + text.y - entry.textY,
-            }),
         ...(isArrowContainer ? null : { angle: text.angle }),
       });
       // an arrow container rejoins the elements it connects
@@ -360,7 +387,7 @@ export class AppWrap {
         containerId: container.id,
         // a note's label keeps the size picked while it was unwrapped
         baseFontSize:
-          entry.baseFontSize !== null && text.fontSize !== entry.textFontSize
+          entry.baseFontSize !== null && text.fontSize !== entry.text.fontSize
             ? normalizeStickyNoteFontSize(text.fontSize)
             : entry.baseFontSize,
         labelPosition: entry.labelPosition,
