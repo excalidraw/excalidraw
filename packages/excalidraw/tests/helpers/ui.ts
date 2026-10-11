@@ -642,7 +642,7 @@ export class UI {
       naturalHeight,
       clientX + mouseMove[0],
       clientY + mouseMove[1],
-      keepAspectRatio ? element.width / element.height : undefined,
+      { shouldMaintainAspectRatio: keepAspectRatio },
     );
 
     API.updateElement(element, mutations);

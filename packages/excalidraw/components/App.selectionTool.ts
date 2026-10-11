@@ -42,6 +42,7 @@ import {
   LinearElementEditor,
   makeNextSelectedElementIds,
   transformElements,
+  uncropElementSides,
   updateBoundElements,
   updateFrameMembershipOfSelectedElements,
 } from "@excalidraw/element";
@@ -60,6 +61,7 @@ import {
 import type { TransformHandleType } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
+  ExcalidrawImageElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -121,11 +123,7 @@ export class AppSelectionTool {
       );
       if (transformHandle) {
         // (in the crop editor, the handles crop the image rather than resize it)
-        if (
-          transformHandle.element &&
-          (transformHandle.transformHandleType === "rotation" ||
-            !this.app.state.croppingElementId)
-        ) {
+        if (transformHandle.element && !this.app.state.croppingElementId) {
           this.app.setState({ resizingElement: transformHandle.element });
         }
         pointerDownState.resize.handleType =
@@ -454,6 +452,7 @@ export class AppSelectionTool {
 
     if (
       transformHandleType &&
+      transformHandleType !== "rotation" &&
       croppingElement &&
       isImageElement(croppingElement)
     ) {
@@ -496,23 +495,24 @@ export class AppSelectionTool {
         this.app.scene.mutateElement(
           croppingElement,
           cropElement(
-            croppingElement,
+            croppingAtStateStart,
             this.app.scene.getNonDeletedElementsMap(),
             transformHandleType,
             image.naturalWidth,
             image.naturalHeight,
             x + snapOffset.x,
             y + snapOffset.y,
-            event.shiftKey
-              ? croppingAtStateStart.width / croppingAtStateStart.height
-              : undefined,
+            {
+              shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
+              shouldResizeFromCenter: shouldResizeFromCenter(event),
+            },
           ),
         );
 
         updateBoundElements(croppingElement, this.app.scene);
 
         this.app.setState({
-          isCropping: transformHandleType && transformHandleType !== "rotation",
+          isCropping: true,
           snapLines,
         });
       }
@@ -523,10 +523,52 @@ export class AppSelectionTool {
     return false;
   };
 
+  /**
+   * In the crop editor, a double-click on a handle uncrops its side (a
+   * corner's two), and mirrored, the opposite side(s) too.
+   *
+   * @returns whether the double-click has been handled
+   */
+  maybeUncropSides = (
+    image: NonDeleted<ExcalidrawImageElement>,
+    sceneX: number,
+    sceneY: number,
+    mirrored: boolean,
+  ): boolean => {
+    const handle =
+      image.id === this.app.state.croppingElementId &&
+      this.getTransformHandleAt(
+        [image],
+        sceneX,
+        sceneY,
+        this.app.state.lastPointerDownWith,
+      )?.transformHandleType;
+    if (!handle || handle === "rotation") {
+      return false;
+    }
+    const updates = uncropElementSides(
+      image,
+      this.app.scene.getNonDeletedElementsMap(),
+      handle,
+      mirrored,
+    );
+    if (updates) {
+      this.app.store.scheduleCapture();
+      this.app.scene.mutateElement(image, updates);
+      updateBoundElements(image, this.app.scene);
+    }
+    return true;
+  };
+
   maybeHandleResize = (
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
+    // in the crop editor, the handles crop the image
+    if (this.app.state.croppingElementId) {
+      return this.maybeHandleCrop(pointerDownState, event);
+    }
+
     const selectedElements = this.app.scene.getSelectedElements(this.app.state);
     const selectedFrames = selectedElements.filter(isFrameLikeElement);
 
@@ -536,9 +578,7 @@ export class AppSelectionTool {
       // Frames cannot be rotated.
       (selectedFrames.length > 0 && transformHandleType === "rotation") ||
       // Elbow arrows cannot be transformed (resized or rotated).
-      (selectedElements.length === 1 && isElbowArrow(selectedElements[0])) ||
-      // Do not resize when in crop mode
-      this.app.state.croppingElementId
+      (selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
     ) {
       return false;
     }
@@ -701,7 +741,6 @@ export class AppSelectionTool {
     event: PointerEvent,
     pointerDownState: PointerDownState,
     pointerCoords: { x: number; y: number },
-    lastPointerCoords: { x: number; y: number },
     elementsMap: NonDeletedSceneElementsMap,
   ): boolean => {
     const hasHitASelectedElement = pointerDownState.hit.allHitElements.some(
@@ -843,10 +882,16 @@ export class AppSelectionTool {
 
             if (image && !(image instanceof Promise)) {
               const uncroppedSize = getUncroppedWidthAndHeight(croppingElement);
+              // moved by what the drag moved since the previous pointer move
+              // (locked to an axis with shift, as dragging elements is), so
+              // that the image moves back right away after being dragged past
+              // its edge
+              const { lastOffset } = pointerDownState.drag;
               const instantDragOffset = vector(
-                pointerCoords.x - lastPointerCoords.x,
-                pointerCoords.y - lastPointerCoords.y,
+                dragOffset.x - lastOffset.x,
+                dragOffset.y - lastOffset.y,
               );
+              pointerDownState.drag.lastOffset = dragOffset;
 
               // to reduce cursor:image drift, we need to take into account
               // the canvas image element scaling so we can accurately
@@ -1282,7 +1327,9 @@ export class AppSelectionTool {
       // when inside line editor, shift selects points instead
       if (
         childEvent.shiftKey &&
-        !this.app.state.selectedLinearElement?.isEditing
+        !this.app.state.selectedLinearElement?.isEditing &&
+        // (in the crop editor, the image stays the selection)
+        hitElement.id !== this.app.state.croppingElementId
       ) {
         if (this.app.state.selectedElementIds[hitElement.id]) {
           if (

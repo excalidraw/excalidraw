@@ -1319,6 +1319,9 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
+    // The offset from origin (axis-locked with shift) as of the previous
+    // pointer move in the crop editor, which moves the image by the change
+    lastOffset: { x: number; y: number };
     // explicit flag for specific scenarios such as:
     // - after lasso selection until the next pointer down
     blockDragging: boolean;
