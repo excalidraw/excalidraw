@@ -37,11 +37,7 @@ export const AIComponents = ({
           const blob = await exportToBlob({
             data: {
               elements: getNonDeletedElements(children),
-              appState: {
-                ...appState,
-                exportBackground: true,
-                viewBackgroundColor: appState.viewBackgroundColor,
-              },
+              appState,
               files: excalidrawAPI.getFiles(),
             },
             config: {

@@ -75,15 +75,12 @@ const ChartPreviewBtn = (props: {
       svg = await exportToSvg({
         data: {
           elements,
-          appState: {
-            exportBackground: false,
-            viewBackgroundColor: "#fff",
-          },
           files: null,
         },
         config: {
           skipInliningFonts: true,
           theme,
+          canvasBackgroundColor: false,
         },
       });
       svg.querySelector(".style-fonts")?.remove();
@@ -139,15 +136,12 @@ const PlainTextPreviewBtn = (props: {
       const svg = await exportToSvg({
         data: {
           elements: [textElement],
-          appState: {
-            exportBackground: false,
-            viewBackgroundColor: "#fff",
-          },
           files: null,
         },
         config: {
           skipInliningFonts: true,
           theme,
+          canvasBackgroundColor: false,
         },
       });
       svg.querySelector(".style-fonts")?.remove();

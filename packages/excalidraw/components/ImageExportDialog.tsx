@@ -134,7 +134,6 @@ const ImageExportModal = ({
         appState: {
           ...appStateSnapshot,
           name: projectName,
-          exportBackground: exportWithBackground,
           exportScale,
           exportEmbedScene: embedScene,
         },

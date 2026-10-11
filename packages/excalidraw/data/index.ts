@@ -130,7 +130,6 @@ export const exportCanvas = async (
         elements,
         appState: {
           ...appState,
-          exportBackground,
           exportEmbedScene: appState.exportEmbedScene && type === "svg",
         },
         files,
@@ -139,9 +138,7 @@ export const exportCanvas = async (
         padding: exportPadding,
         exportingFrame,
         theme,
-        canvasBackgroundColor: exportBackground
-          ? viewBackgroundColor
-          : "transparent",
+        canvasBackgroundColor: exportBackground ? viewBackgroundColor : false,
       },
     });
 

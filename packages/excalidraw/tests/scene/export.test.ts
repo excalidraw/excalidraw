@@ -3,6 +3,7 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  MIME_TYPES,
   THEME,
 } from "@excalidraw/common";
 
@@ -17,7 +18,7 @@ import type {
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { exportToCanvas, exportToSvg } from "../../scene/export";
+import { exportToBlob, exportToCanvas, exportToSvg } from "../../scene/export";
 
 import { prepareElementsForExport } from "../../data";
 import * as exportUtils from "../../scene/export";
@@ -61,7 +62,6 @@ describe("exportToSvg", () => {
   ] as NonDeletedExcalidrawElement[];
 
   const DEFAULT_APP_STATE = {
-    exportBackground: false,
     viewBackgroundColor: "#ffffff",
   };
 
@@ -72,6 +72,7 @@ describe("exportToSvg", () => {
         appState: DEFAULT_APP_STATE,
         files: {},
       },
+      config: { canvasBackgroundColor: false },
     });
 
     expect(svgElement).toMatchSnapshot();
@@ -95,6 +96,7 @@ describe("exportToSvg", () => {
         appState: DEFAULT_APP_STATE,
         files: {},
       },
+      config: { canvasBackgroundColor: false },
     });
 
     expect(svgElement).toMatchSnapshot();
@@ -109,7 +111,6 @@ describe("exportToSvg", () => {
         elements: ELEMENTS,
         appState: {
           ...DEFAULT_APP_STATE,
-          exportBackground: true,
           viewBackgroundColor: BACKGROUND_COLOR,
         },
         files: {},
@@ -132,6 +133,7 @@ describe("exportToSvg", () => {
         files: {},
       },
       config: {
+        canvasBackgroundColor: false,
         theme: THEME.DARK,
       },
     });
@@ -155,6 +157,7 @@ describe("exportToSvg", () => {
         files: {},
       },
       config: {
+        canvasBackgroundColor: false,
         padding: 0,
       },
     });
@@ -177,6 +180,7 @@ describe("exportToSvg", () => {
         files: {},
       },
       config: {
+        canvasBackgroundColor: false,
         padding: 0,
         scale: SCALE,
       },
@@ -202,6 +206,7 @@ describe("exportToSvg", () => {
         },
         files: {},
       },
+      config: { canvasBackgroundColor: false },
     });
     expect(svgElement.innerHTML).toMatchSnapshot();
   });
@@ -213,6 +218,7 @@ describe("exportToSvg", () => {
         appState: DEFAULT_APP_STATE,
         files: {},
       },
+      config: { canvasBackgroundColor: false },
     });
     expect(svgElement.innerHTML).toMatchSnapshot();
   });
@@ -245,6 +251,7 @@ describe("exportToSvg", () => {
         appState: DEFAULT_APP_STATE,
         files: null,
       },
+      config: { canvasBackgroundColor: false },
     });
 
     const mask = svgElement.querySelector("mask");
@@ -284,7 +291,7 @@ describe("exportToSvg", () => {
         appState: DEFAULT_APP_STATE,
         files: null,
       },
-      config: { padding: 0 },
+      config: { padding: 0, canvasBackgroundColor: false },
     });
 
     // the mask's first rect is the visible region, sized to the arrow plus
@@ -352,7 +359,7 @@ describe("exportToCanvas", () => {
     const canvas = await exportToCanvas({
       data: {
         elements: [rectangle, arrow, label],
-        appState: { exportBackground: true, viewBackgroundColor: "#ffffff" },
+        appState: { viewBackgroundColor: "#ffffff" },
         files: null,
       },
     });
@@ -381,6 +388,93 @@ describe("exportToCanvas", () => {
           event.props.height === holeHeight,
       ),
     ).toEqual([]);
+  });
+});
+
+describe("export background", () => {
+  // an outline arrowhead fakes its hollow interior by filling it with the
+  // background color — the arrow's shaft runs into the arrowhead
+  const sceneWithOutlineArrow = (viewBackgroundColor = "#ffffff") => ({
+    elements: [
+      API.createElement({
+        type: "arrow",
+        width: 100,
+        height: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+        endArrowhead: "triangle_outline",
+      }),
+    ],
+    appState: { viewBackgroundColor },
+    files: null,
+  });
+  const getBackgroundRects = (svg: SVGSVGElement) =>
+    Array.from(svg.children).filter((child) => child.tagName === "rect");
+  const getCanvasFillStyles = (canvas: HTMLCanvasElement) =>
+    (canvas.getContext("2d") as any)
+      .__getEvents()
+      .filter((event: any) => event.type === "fillStyle")
+      .map((event: any) => event.props.value);
+
+  it("exportToSvg paints no background for `false` or a transparent scene background", async () => {
+    const svg = await exportToSvg({
+      data: sceneWithOutlineArrow(),
+      config: { canvasBackgroundColor: false },
+    });
+    expect(getBackgroundRects(svg)).toEqual([]);
+
+    const svgOfTransparentScene = await exportToSvg({
+      data: sceneWithOutlineArrow("transparent"),
+    });
+    expect(getBackgroundRects(svgOfTransparentScene)).toEqual([]);
+  });
+
+  it("exportToSvg fills outline arrowheads with the configured background", async () => {
+    const svg = await exportToSvg({
+      data: sceneWithOutlineArrow(),
+      config: { canvasBackgroundColor: "#000000" },
+    });
+    expect(getBackgroundRects(svg)[0]).toHaveAttribute("fill", "#000000");
+    expect(svg.querySelector('g path[fill="#000000"]')).not.toBeNull();
+  });
+
+  it("transparent exports keep filling outline arrowheads with the scene background", async () => {
+    const canvas = await exportToCanvas({
+      data: sceneWithOutlineArrow(),
+      config: { canvasBackgroundColor: false },
+    });
+    expect(getCanvasFillStyles(canvas)).toContain("#ffffff");
+
+    const svg = await exportToSvg({
+      data: sceneWithOutlineArrow(),
+      config: { canvasBackgroundColor: false },
+    });
+    expect(svg.querySelector('g path[fill="#ffffff"]')).not.toBeNull();
+  });
+
+  it("exportToBlob paints the default background for JPEG instead of `false`", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const canvas = document.createElement("canvas");
+
+    await exportToBlob({
+      data: sceneWithOutlineArrow("#abcdef"),
+      config: { mimeType: MIME_TYPES.jpg, createCanvas: () => canvas },
+    });
+    // the default background needs no warning
+    expect(warn).not.toHaveBeenCalled();
+
+    const canvasWithoutBackground = document.createElement("canvas");
+    await exportToBlob({
+      data: sceneWithOutlineArrow("#abcdef"),
+      config: {
+        mimeType: MIME_TYPES.jpg,
+        canvasBackgroundColor: false,
+        createCanvas: () => canvasWithoutBackground,
+      },
+    });
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(getCanvasFillStyles(canvasWithoutBackground)).toContain("#abcdef");
+
+    warn.mockRestore();
   });
 });
 

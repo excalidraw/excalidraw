@@ -57,10 +57,7 @@ describe("exportToBlob", async () => {
       const blob = await utils.exportToBlob({
         data: {
           elements: diagramData.elements,
-          appState: {
-            ...diagramData.appState,
-            exportBackground: true,
-          },
+          appState: diagramData.appState,
           files: diagramData.files,
         },
         config: {

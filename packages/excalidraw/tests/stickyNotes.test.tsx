@@ -1158,11 +1158,8 @@ describe("sticky notes", () => {
       ];
 
       const svg = await exportToSvg({
-        data: {
-          elements,
-          appState: { exportBackground: false, viewBackgroundColor: "#ffffff" },
-          files: {},
-        },
+        data: { elements, files: {} },
+        config: { canvasBackgroundColor: false },
       });
       expect(
         [...svg.querySelectorAll("text")].map((text) => text.textContent),

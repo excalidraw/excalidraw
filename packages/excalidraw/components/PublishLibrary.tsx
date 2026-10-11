@@ -134,15 +134,12 @@ const SingleLibraryItem = ({
       const svg = await exportToSvg({
         data: {
           elements: libItem.elements,
-          appState: {
-            ...appState,
-            viewBackgroundColor: "#fff",
-            exportBackground: true,
-          },
+          appState,
           files: null,
         },
         config: {
           skipInliningFonts: true,
+          canvasBackgroundColor: "#fff",
         },
       });
       node.innerHTML = svg.outerHTML;

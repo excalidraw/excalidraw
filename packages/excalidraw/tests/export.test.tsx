@@ -199,7 +199,7 @@ describe("export", () => {
         angle: normalizeAngle(315),
       }),
     ];
-    const appState = { ...getDefaultAppState(), exportBackground: false };
+    const appState = getDefaultAppState();
     const files = {
       file_A: {
         id: "file_A" as FileId,
@@ -216,6 +216,7 @@ describe("export", () => {
         appState,
         files,
       },
+      config: { canvasBackgroundColor: false },
     });
 
     const svgText = svg.outerHTML;

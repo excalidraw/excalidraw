@@ -198,7 +198,10 @@ const prepareElementsForRender = ({
 export type ExportSceneData = {
   elements: readonly NonDeletedExcalidrawElement[];
   appState?: Partial<
-    Omit<AppState, "offsetTop" | "offsetLeft" | "exportWithDarkMode">
+    Omit<
+      AppState,
+      "offsetTop" | "offsetLeft" | "exportWithDarkMode" | "exportBackground"
+    >
   >;
   files: BinaryFiles | null;
 };
@@ -209,8 +212,13 @@ export type ExportSceneConfig = {
    * Canvas background. Valid values are:
    *
    * - `undefined` - the background of "appState.viewBackgroundColor" is used.
-   * - `false` - no background is used (set to "transparent").
+   * - `false` - no background is used (transparent). Not supported for JPEG,
+   *   which falls back to the default.
    * - `string` - should be a valid CSS color.
+   *
+   * Specified in light-theme terms: `theme: "dark"` transforms it like any
+   * other scene color. Only affects the rendered image, not the embedded
+   * scene (`exportEmbedScene`).
    *
    * @default undefined
    */
@@ -396,6 +404,16 @@ const configExportDimension = async ({
   // ---------------------------------------------------------------------------
 
   const appState = restoreAppState(data.appState, null);
+
+  // the background the scene is rendered against. Used even when the
+  // background isn't painted, to fake holes in elements (e.g. outline
+  // arrowheads covering the arrow's shaft), so they keep looking the same.
+  const backgroundColor =
+    cfg.canvasBackgroundColor || appState.viewBackgroundColor || COLOR_WHITE;
+  // "transparent" = no background (also when the scene's background is set
+  // to transparent)
+  const paintedBackgroundColor =
+    cfg.canvasBackgroundColor === false ? "transparent" : backgroundColor;
 
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
@@ -632,6 +650,8 @@ const configExportDimension = async ({
     elementsForRender,
     appState,
     frameRendering,
+    backgroundColor,
+    paintedBackgroundColor,
   };
 };
 
@@ -664,6 +684,8 @@ export const exportToCanvas = async ({
     elementsForRender,
     appState,
     frameRendering,
+    backgroundColor,
+    paintedBackgroundColor,
   } = await configExportDimension({ data, config });
 
   const canvas = cfg.createCanvas
@@ -683,15 +705,6 @@ export const exportToCanvas = async ({
 
   const theme =
     cfg.theme ?? (appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT);
-
-  // Determine the background color for the canvas
-  const viewBackgroundColor =
-    cfg.canvasBackgroundColor === false
-      ? // "transparent" triggers clearRect in bootstrapCanvas
-        "transparent"
-      : cfg.canvasBackgroundColor ||
-        appState.viewBackgroundColor ||
-        COLOR_WHITE;
 
   renderStaticScene({
     canvas,
@@ -716,10 +729,11 @@ export const exportToCanvas = async ({
       zoom: { value: DEFAULT_ZOOM_VALUE },
       shouldCacheIgnoreZoom: false,
       theme,
-      viewBackgroundColor,
+      // "transparent" makes bootstrapCanvas clear the canvas
+      viewBackgroundColor: paintedBackgroundColor,
     },
     renderConfig: {
-      canvasBackgroundColor: viewBackgroundColor,
+      canvasBackgroundColor: backgroundColor,
       imageCache,
       renderGrid: false,
       isExporting: true,
@@ -791,6 +805,8 @@ export const exportToSvg = async ({
     elementsForRender,
     appState,
     frameRendering,
+    backgroundColor,
+    paintedBackgroundColor,
   } = await configExportDimension({ data, config });
 
   const offsetX = -(x - normalizedPadding);
@@ -914,14 +930,16 @@ export const exportToSvg = async ({
   // ---------------------------------------------------------------------------
 
   // render background rect
-  if (appState.exportBackground && appState.viewBackgroundColor) {
-    const bgColor = cfg.canvasBackgroundColor || appState.viewBackgroundColor;
+  if (paintedBackgroundColor !== "transparent") {
     const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
     rect.setAttribute("y", "0");
     rect.setAttribute("width", `${exportWidth / exportScale}`);
     rect.setAttribute("height", `${exportHeight / exportScale}`);
-    rect.setAttribute("fill", applyDarkModeFilter(bgColor, exportWithDarkMode));
+    rect.setAttribute(
+      "fill",
+      applyDarkModeFilter(paintedBackgroundColor, exportWithDarkMode),
+    );
     svgRoot.appendChild(rect);
   }
 
@@ -946,7 +964,7 @@ export const exportToSvg = async ({
       exportWithDarkMode,
       renderEmbeddables,
       frameRendering,
-      canvasBackgroundColor: appState.viewBackgroundColor,
+      canvasBackgroundColor: backgroundColor,
       embedsValidationStatus: renderEmbeddables
         ? new Map(
             elementsForRender
@@ -1088,17 +1106,12 @@ export const exportToBlob = async ({
     mimeType = MIME_TYPES.jpg;
   }
 
-  if (mimeType === MIME_TYPES.jpg && config?.canvasBackgroundColor !== false) {
-    if (config?.canvasBackgroundColor === undefined) {
-      console.warn(
-        `Defaulting "canvasBackgroundColor" for "${MIME_TYPES.jpg}" mimeType`,
-      );
-      config = {
-        ...config,
-        canvasBackgroundColor:
-          data.appState?.viewBackgroundColor || COLOR_WHITE,
-      };
-    }
+  // JPEG has no alpha channel (transparent pixels would turn black)
+  if (mimeType === MIME_TYPES.jpg && config?.canvasBackgroundColor === false) {
+    console.warn(
+      `"canvasBackgroundColor: false" is not supported for "${MIME_TYPES.jpg}" mimeType, using the default background`,
+    );
+    config = { ...config, canvasBackgroundColor: undefined };
   }
 
   const canvas = await exportToCanvas({ data, config });
