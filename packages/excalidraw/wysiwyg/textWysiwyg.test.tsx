@@ -2040,6 +2040,10 @@ describe("textWysiwyg", () => {
       expect((h.elements[1] as ExcalidrawTextElement).containerId).toEqual(
         null,
       );
+      expect(h.state.selectedElementIds).toEqual({
+        [rectangle.id]: true,
+        [text.id]: true,
+      });
     });
 
     it("shouldn't bind to container if container has bound text", async () => {

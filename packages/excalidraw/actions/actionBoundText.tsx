@@ -69,9 +69,14 @@ export const actionUnbindText = register({
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     const elementsMap = app.scene.getNonDeletedElementsMap();
+    const selectedElementIds: Mutable<AppState["selectedElementIds"]> = {
+      ...appState.selectedElementIds,
+    };
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
+        // the freed text stays selected along with its former container
+        selectedElementIds[boundTextElement.id] = true;
         const { width, height } = measureText(
           boundTextElement.originalText,
           getFontString(boundTextElement),
@@ -115,7 +120,7 @@ export const actionUnbindText = register({
     });
     return {
       elements,
-      appState,
+      appState: { ...appState, selectedElementIds },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
