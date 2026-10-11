@@ -95,9 +95,9 @@ const truncateText = (
 
   if (metrics.width > maxWidth) {
     // we iterate from the right, removing characters one by one instead
-    // of bulding the string up. This assumes that it's more likely
+    // of building the string up. This assumes that it's more likely
     // your frame names will overflow by not that many characters
-    // (if ever), so it sohuld be faster this way.
+    // (if ever), so it should be faster this way.
     for (let i = text.length; i > 0; i--) {
       const newText = `${text.slice(0, i)}...`;
       if (ctx.measureText(newText).width <= maxWidth) {
@@ -236,7 +236,7 @@ export type ExportSceneConfig = {
    *
    * When `fit` set to `contain`, padding is subtracted from the content
    * bounding box (ensuring the size doesn't exceed the supplied values, with
-   * the exeception of using alongside `scale` as noted above), and the padding
+   * the exception of using alongside `scale` as noted above), and the padding
    * serves as a minimum distance between the content and the canvas edges, as
    * it may exceed the supplied padding value from one side or the other in
    * order to maintain the aspect ratio. It is recommended to set `position`
@@ -260,7 +260,7 @@ export type ExportSceneConfig = {
    */
   maxWidthOrHeight?: number;
   /**
-   * Scale the canvas content to be excatly this many pixels wide/tall,
+   * Scale the canvas content to be exactly this many pixels wide/tall,
    * maintaining the aspect ratio.
    *
    * Cannot be used in conjunction with `maxWidthOrHeight`.
@@ -271,7 +271,7 @@ export type ExportSceneConfig = {
   widthOrHeight?: number;
   // -------------------------------------------------------------------------
   /**
-   * Width of the frame. Supply `x` or `y` if you want to ofsset the canvas
+   * Width of the frame. Supply `x` or `y` if you want to offset the canvas
    * content.
    *
    * If `width` omitted but `height` supplied, `width` is calculated from the
@@ -295,14 +295,14 @@ export type ExportSceneConfig = {
    * Left canvas offset. By default the coordinate is relative to the canvas.
    * You can switch to content coordinates by setting `origin` to `content`.
    *
-   * Defaults to the `x` postion of the content bounding box.
+   * Defaults to the `x` position of the content bounding box.
    */
   x?: number;
   /**
    * Top canvas offset. By default the coordinate is relative to the canvas.
    * You can switch to content coordinates by setting `origin` to `content`.
    *
-   * Defaults to the `y` postion of the content bounding box.
+   * Defaults to the `y` position of the content bounding box.
    */
   y?: number;
   /**
@@ -355,7 +355,7 @@ export type ExportSceneConfig = {
    */
   scale?: number;
   /**
-   * If you need to suply your own canvas, e.g. in test environments or in
+   * If you need to supply your own canvas, e.g. in test environments or in
    * Node.js.
    *
    * Do not set `canvas.width/height` or modify the canvas context as that's
@@ -667,7 +667,7 @@ const configExportDimension = async ({
 // ---------------------------------------------------------------------------
 
 /**
- * This API is usually used as a precursor to searializing to Blob or PNG,
+ * This API is usually used as a precursor to serializing to Blob or PNG,
  * but can also be used to create a canvas for other purposes.
  */
 export const exportToCanvas = async ({
