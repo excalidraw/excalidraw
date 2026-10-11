@@ -69,6 +69,8 @@ describe("exportToCanvas", async () => {
     const getDimensions = vi.fn(() => ({ width: 500, height: 500 }));
     const canvas = await utils.exportToCanvas({
       data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      // the types forbid combining size options, JS callers still can
+      // @ts-expect-error
       config: { getDimensions, widthOrHeight: 50 },
     });
 

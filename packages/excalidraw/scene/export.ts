@@ -207,7 +207,7 @@ export type ExportSceneData = {
   files: BinaryFiles | null;
 };
 
-export type ExportSceneConfig = {
+type ExportSceneBaseConfig = {
   /**
    * @default "light"
    */
@@ -251,46 +251,6 @@ export type ExportSceneConfig = {
    */
   padding?: number;
   // -------------------------------------------------------------------------
-  /**
-   * Makes sure the canvas content fits into a frame of width/height no larger
-   * than this value, while maintaining the aspect ratio.
-   *
-   * Final dimensions can get smaller/larger if used in conjunction with
-   * `scale`.
-   */
-  maxWidthOrHeight?: number;
-  /**
-   * Scale the canvas content to be exactly this many pixels wide/tall,
-   * maintaining the aspect ratio.
-   *
-   * Cannot be used in conjunction with `maxWidthOrHeight`.
-   *
-   * Final dimensions can get smaller/larger if used in conjunction with
-   * `scale`.
-   */
-  widthOrHeight?: number;
-  // -------------------------------------------------------------------------
-  /**
-   * Width of the frame. Supply `x` or `y` if you want to offset the canvas
-   * content.
-   *
-   * If `width` omitted but `height` supplied, `width` is calculated from the
-   * the content's bounding box to preserve the aspect ratio.
-   *
-   * Defaults to the content bounding box width when both `width` and `height`
-   * are omitted.
-   */
-  width?: number;
-  /**
-   * Height of the frame.
-   *
-   * If `height` omitted but `width` supplied, `height` is calculated from the
-   * content's bounding box to preserve the aspect ratio.
-   *
-   * Defaults to the content bounding box height when both `width` and `height`
-   * are omitted.
-   */
-  height?: number;
   /**
    * Left canvas offset. By default the coordinate is relative to the canvas.
    * You can switch to content coordinates by setting `origin` to `content`.
@@ -364,22 +324,92 @@ export type ExportSceneConfig = {
    * Defaults to `document.createElement("canvas")`.
    */
   createCanvas?: () => HTMLCanvasElement;
-  /**
-   * If you want to supply `width`/`height` dynamically (or derive from the
-   * content bounding box), you can use this function.
-   *
-   * Ignored if `width`, `height`, `maxWidthOrHeight`, or `widthOrHeight` is
-   * set.
-   */
-  getDimensions?: (
-    width: number,
-    height: number,
-  ) => { width: number; height: number; scale?: number };
 
   exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
 
   loadFonts?: () => Promise<void>;
 };
+
+/** The ways to size the export — only one can be used. */
+type ExportSizeOptions = {
+  /**
+   * Makes sure the canvas content fits into a frame of width/height no larger
+   * than this value, while maintaining the aspect ratio.
+   *
+   * Final dimensions can get smaller/larger if used in conjunction with
+   * `scale`.
+   *
+   * Can't be combined with `width`/`height`, `widthOrHeight`, or
+   * `getDimensions`.
+   */
+  maxWidthOrHeight?: number;
+  /**
+   * Scale the canvas content to be exactly this many pixels wide/tall,
+   * maintaining the aspect ratio.
+   *
+   * Final dimensions can get smaller/larger if used in conjunction with
+   * `scale`.
+   *
+   * Can't be combined with `width`/`height`, `maxWidthOrHeight`, or
+   * `getDimensions`.
+   */
+  widthOrHeight?: number;
+  /**
+   * Width of the frame. Supply `x` or `y` if you want to offset the canvas
+   * content.
+   *
+   * If `width` omitted but `height` supplied, `width` is calculated from the
+   * the content's bounding box to preserve the aspect ratio.
+   *
+   * Defaults to the content bounding box width when both `width` and `height`
+   * are omitted.
+   *
+   * Can't be combined with `maxWidthOrHeight`, `widthOrHeight`, or
+   * `getDimensions`.
+   */
+  width?: number;
+  /**
+   * Height of the frame.
+   *
+   * If `height` omitted but `width` supplied, `height` is calculated from the
+   * content's bounding box to preserve the aspect ratio.
+   *
+   * Defaults to the content bounding box height when both `width` and `height`
+   * are omitted.
+   *
+   * Can't be combined with `maxWidthOrHeight`, `widthOrHeight`, or
+   * `getDimensions`.
+   */
+  height?: number;
+  /**
+   * If you want to supply `width`/`height` dynamically (or derive from the
+   * content bounding box), you can use this function.
+   *
+   * Can't be combined with `width`/`height`, `maxWidthOrHeight`, or
+   * `widthOrHeight`.
+   */
+  getDimensions?: (
+    width: number,
+    height: number,
+  ) => { width: number; height: number; scale?: number };
+};
+
+type ExportSizeOption<K extends keyof ExportSizeOptions> = Pick<
+  ExportSizeOptions,
+  K
+> & {
+  // remapping over `keyof` (rather than `Exclude<keyof …>`) keeps the
+  // properties' JSDoc in editor hovers & completions
+  [P in keyof ExportSizeOptions as P extends K ? never : P]?: never;
+};
+
+type ExportSizeConfig =
+  | ExportSizeOption<"width" | "height">
+  | ExportSizeOption<"maxWidthOrHeight">
+  | ExportSizeOption<"widthOrHeight">
+  | ExportSizeOption<"getDimensions">;
+
+export type ExportSceneConfig = ExportSceneBaseConfig & ExportSizeConfig;
 
 // ---------------------------------------------------------------------------
 // Internal helper to configure export dimensions
@@ -392,8 +422,11 @@ const configExportDimension = async ({
   data: ExportSceneData;
   config?: ExportSceneConfig;
 }) => {
-  // clone
-  const cfg = Object.assign({}, config);
+  // clone (widened, as the size options get normalized below)
+  const cfg: ExportSceneBaseConfig & ExportSizeOptions = Object.assign(
+    {},
+    config,
+  );
 
   const { exportingFrame } = cfg;
 
@@ -752,31 +785,27 @@ export const exportToCanvas = async ({
 // ---------------------------------------------------------------------------
 
 type ExportToSvgConfig = Pick<
-  ExportSceneConfig,
+  ExportSceneBaseConfig,
   | "canvasBackgroundColor"
   | "padding"
   | "theme"
   | "exportingFrame"
   | "scale"
-  | "width"
-  | "height"
   | "x"
   | "y"
   | "origin"
   | "fit"
   | "position"
-  | "maxWidthOrHeight"
-  | "widthOrHeight"
-  | "getDimensions"
   | "loadFonts"
-> & {
-  /**
-   * if true, all embeddables passed in will be rendered when possible.
-   */
-  renderEmbeddables?: boolean;
-  skipInliningFonts?: true;
-  reuseImages?: boolean;
-};
+> &
+  ExportSizeConfig & {
+    /**
+     * if true, all embeddables passed in will be rendered when possible.
+     */
+    renderEmbeddables?: boolean;
+    skipInliningFonts?: true;
+    reuseImages?: boolean;
+  };
 
 const createHTMLComment = (text: string) => {
   // surrounding with spaces to maintain prettified consistency with previous
