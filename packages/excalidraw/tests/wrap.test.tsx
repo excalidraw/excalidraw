@@ -1,6 +1,6 @@
 import React from "react";
 
-import { KEYS, arrayToMap } from "@excalidraw/common";
+import { COLOR_PALETTE, KEYS, arrayToMap } from "@excalidraw/common";
 import { LinearElementEditor } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
@@ -12,6 +12,10 @@ import type {
 } from "@excalidraw/element/types";
 
 import { actionWrapSelectionInFrame } from "../actions/actionFrame";
+import {
+  actionChangeFontSize,
+  actionChangeStrokeColor,
+} from "../actions/actionProperties";
 import { Excalidraw } from "../index";
 
 import { API } from "./helpers/api";
@@ -200,6 +204,37 @@ describe("wrap (w)", () => {
     pressW();
 
     expect(h.state.selectedLinearElement).toBe(null);
+  });
+
+  it("brings a note back with the label's font size and color", () => {
+    const note = API.createElement({ type: "stickynote", id: "note" });
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      text: "note",
+      fontSize: 20,
+    });
+    API.setElements([note, text]);
+    API.setSelectedElements([note, text]);
+    pressW();
+    expect(getElement<ExcalidrawTextElement>("text").baseFontSize).toBe(20);
+
+    API.setSelectedElements([getElement("note")]);
+    pressW();
+    act(() => {
+      h.app.actionManager.executeAction(actionChangeFontSize, "ui", 36);
+      h.app.actionManager.executeAction(actionChangeStrokeColor, "ui", {
+        color: COLOR_PALETTE.red[4],
+      });
+    });
+    pressW();
+
+    expect(getElement<ExcalidrawTextElement>("text")).toMatchObject({
+      containerId: "note",
+      baseFontSize: 36,
+      strokeColor: COLOR_PALETTE.red[4],
+    });
+    expect(getElement("note").strokeColor).toBe(COLOR_PALETTE.red[4]);
   });
 
   it("wraps in a new container once the selection changed", () => {

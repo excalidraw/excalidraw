@@ -10,6 +10,7 @@ import {
   isTextBindableContainer,
   isTextElement,
   getNonDeletedElements,
+  normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
   updateBoundElements,
 } from "@excalidraw/element";
@@ -27,6 +28,7 @@ import type { Radians } from "@excalidraw/math";
 
 import {
   bindTextToContainer,
+  getStickyNoteInk,
   pushContainerBelowText,
   unbindTextFromContainer,
   wrapTextsInContainers,
@@ -52,6 +54,8 @@ type UnwrappedContainer = {
   /** where the freed text landed, to tell how far it moved since */
   textX: number;
   textY: number;
+  /** its font size then, to tell whether it was resized since */
+  textFontSize: number;
   /** the arrows bound to the container, as they were bound */
   arrows: Pick<ExcalidrawArrowElement, "id" | "startBinding" | "endBinding">[];
 };
@@ -207,6 +211,7 @@ export class AppWrap {
         labelPosition,
         textX: text.x,
         textY: text.y,
+        textFontSize: text.fontSize,
         arrows: arrows.map(({ id, startBinding, endBinding }) => ({
           id,
           startBinding,
@@ -310,8 +315,10 @@ export class AppWrap {
       // except an arrow anchored to the elements it connects
       const isAnchored =
         isArrowContainer && !!(container.startBinding || container.endBinding);
+      const stickyInk = getStickyNoteInk(text, container);
       scene.mutateElement(container, {
         frameId: text.frameId,
+        ...(stickyInk ? { strokeColor: stickyInk } : null),
         ...(isAnchored
           ? null
           : {
@@ -351,8 +358,13 @@ export class AppWrap {
       });
       scene.mutateElement(text, {
         containerId: container.id,
-        baseFontSize: entry.baseFontSize,
+        // a note's label keeps the size picked while it was unwrapped
+        baseFontSize:
+          entry.baseFontSize !== null && text.fontSize !== entry.textFontSize
+            ? normalizeStickyNoteFontSize(text.fontSize)
+            : entry.baseFontSize,
         labelPosition: entry.labelPosition,
+        ...(stickyInk ? { strokeColor: stickyInk } : null),
         // a label carries no arrows of its own
         boundElements: null,
         ...(isArrowContainer ? { angle: 0 as Radians } : null),

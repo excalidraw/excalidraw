@@ -192,6 +192,20 @@ export const actionBindText = register({
   },
 });
 
+/**
+ * A note and its label share one ink: the text the user styled wins, unless it
+ * is transparent (a note's label never is).
+ */
+export const getStickyNoteInk = (
+  textElement: ExcalidrawTextElement,
+  container: ExcalidrawElement,
+) =>
+  isStickyNoteElement(container)
+    ? isTransparent(textElement.strokeColor)
+      ? container.strokeColor
+      : textElement.strokeColor
+    : null;
+
 /** binds the text to the (label-less) container, selecting the container */
 export const bindTextToContainer = (
   elements: readonly ExcalidrawElement[],
@@ -200,13 +214,7 @@ export const bindTextToContainer = (
   container: ExcalidrawTextContainer,
   app: AppClassProperties,
 ): ActionResult => {
-  // a note and its label share one ink: the text the user styled wins,
-  // unless it is transparent (a note's label never is)
-  const stickyInk = isStickyNoteElement(container)
-    ? isTransparent(textElement.strokeColor)
-      ? container.strokeColor
-      : textElement.strokeColor
-    : null;
+  const stickyInk = getStickyNoteInk(textElement, container);
   app.scene.mutateElement(textElement, {
     containerId: container.id,
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
