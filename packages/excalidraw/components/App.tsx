@@ -394,6 +394,7 @@ import {
   selectGroupsForSelectedElements,
 } from "./App.selection";
 import { AppSelectionTool } from "./App.selectionTool";
+import { AppWrap } from "./App.wrap";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -684,6 +685,7 @@ class App extends React.Component<AppProps, AppState> {
   public wheel: AppWheel = new AppWheel(this);
   public selection: AppSelection = new AppSelection(this);
   public selectionTool: AppSelectionTool = new AppSelectionTool(this);
+  public wrap: AppWrap = new AppWrap(this);
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
