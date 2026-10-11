@@ -25,34 +25,55 @@ const NOT_CONFIGURED_MESSAGE =
   "at one — a local llama.cpp, Claude, or OpenCode Zen.";
 
 /**
- * WHICH MODEL IS ANSWERING — said in the panel, not hidden in Settings.
+ * WHICH MODEL IS ANSWERING — said in the panel, not hidden away.
  *
- * A user who has connected their own model should never have to guess whether
- * their prompt went to it or to whatever the deployment happens to run
- * (`feature-0017`). The chain is: this browser's Settings, then the install's
- * default, then nothing — and the panel says which one it landed on.
+ * Three things this line must NOT say, learned by getting them wrong:
+ *
+ *  - NOT "this browser's settings". Settings are **yours**, not a property of a
+ *    browser. The distinction matters because two people on one machine are two
+ *    people, and one person on two machines is one person.
+ *  - NOT "via llama.cpp" on its own. llama.cpp says the KIND of server, not where
+ *    it runs, and "llama.cpp" reads as "local" — while the model that answers the
+ *    deployed app is llama.cpp running on ANOTHER machine and reached over the
+ *    tailnet. The endpoint says where; the kind alone cannot.
+ *  - NOT a boast about defaults. Whoever chose it, the line states it plainly.
  */
 const AnsweringWith = ({
   provider,
   model,
-  fromSettings,
+  baseURL,
+  fromUserSettings,
 }: {
   provider: string;
   model?: string;
-  fromSettings: boolean;
-}) => (
-  <p
-    className="chat-interface__welcome-screen__welcome-message"
-    style={{ marginTop: ".5rem" }}
-  >
-    Answering with <strong>{model || "(no model chosen)"}</strong>{" "}
-    {model ? `via ${provider}` : `via ${provider}`}
-    {fromSettings
-      ? " — your own choice, from this browser's Settings"
-      : " — the install's default"}
-    .
-  </p>
-);
+  baseURL?: string;
+  fromUserSettings: boolean;
+}) => {
+  // The host is the honest part: it says where the model actually runs.
+  let where = "";
+  try {
+    where = baseURL ? new URL(baseURL).host : "";
+  } catch {
+    where = baseURL ?? "";
+  }
+
+  return (
+    <p style={{ marginTop: ".5rem" }}>
+      Answering with <strong>{model || "the app's default model"}</strong>
+      {where ? (
+        <>
+          {" "}
+          — {provider} at <code>{where}</code>
+        </>
+      ) : (
+        <> — {provider}</>
+      )}
+      {fromUserSettings
+        ? ", from your settings."
+        : ", the default for this app."}
+    </p>
+  );
+};
 
 /** The door to Settings, offered where the problem is seen. */
 const OpenSettings = () => {
@@ -80,9 +101,10 @@ export const AIComponents = ({
   // Which model this browser will use, and where that choice came from.
   const chosen = settings?.models?.[0];
   const answering = {
-    provider: chosen?.kind ?? "the install's default",
+    provider: chosen?.kind ?? "llama.cpp",
     model: chosen?.model,
-    fromSettings: Boolean(chosen?.baseURL),
+    baseURL: chosen?.baseURL,
+    fromUserSettings: Boolean(chosen?.baseURL),
   };
 
   if (!aiBackend) {
@@ -100,8 +122,9 @@ export const AIComponents = ({
           <>
             <TTDDialog.WelcomeMessage />
             <p className="chat-interface__welcome-screen__welcome-message">
-              No model is configured for this browser yet. <OpenSettings /> to
-              connect your own — a local llama.cpp, Claude, or OpenCode Zen.
+              No model is configured yet. <OpenSettings /> to connect one — a
+              llama.cpp server (here or at a machine you reach), Claude, or
+              OpenCode Zen.
             </p>
           </>
         )}
