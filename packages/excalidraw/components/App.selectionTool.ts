@@ -499,7 +499,7 @@ export class AppSelectionTool {
         this.app.scene.mutateElement(
           croppingElement,
           (shouldResizeFromCenter(event) ? cropElementFromCenter : cropElement)(
-            croppingElement,
+            croppingAtStateStart,
             this.app.scene.getNonDeletedElementsMap(),
             transformHandleType,
             image.naturalWidth,
@@ -567,6 +567,11 @@ export class AppSelectionTool {
     pointerDownState: PointerDownState,
     event: MouseEvent | KeyboardEvent,
   ): boolean => {
+    // in the crop editor, the handles crop the image
+    if (this.app.state.croppingElementId) {
+      return this.maybeHandleCrop(pointerDownState, event);
+    }
+
     const selectedElements = this.app.scene.getSelectedElements(this.app.state);
     const selectedFrames = selectedElements.filter(isFrameLikeElement);
 
@@ -576,9 +581,7 @@ export class AppSelectionTool {
       // Frames cannot be rotated.
       (selectedFrames.length > 0 && transformHandleType === "rotation") ||
       // Elbow arrows cannot be transformed (resized or rotated).
-      (selectedElements.length === 1 && isElbowArrow(selectedElements[0])) ||
-      // Do not resize when in crop mode
-      this.app.state.croppingElementId
+      (selectedElements.length === 1 && isElbowArrow(selectedElements[0]))
     ) {
       return false;
     }

@@ -9061,9 +9061,6 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
-        if (this.selectionTool.maybeHandleCrop(pointerDownState, event)) {
-          return true;
-        }
         if (this.selectionTool.maybeHandleResize(pointerDownState, event)) {
           return true;
         }

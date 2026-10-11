@@ -232,6 +232,20 @@ describe("Crop an image", () => {
     API.setSelectedElements([image]);
     Keyboard.keyDown(KEYS.ENTER);
 
+    // as resizing, pressing alt mid-drag crops about the center the drag
+    // started with, and releasing it, from the opposite side again
+    mouse.downAt(200, 50);
+    mouse.moveTo(170, 50);
+    expect(API.getElement(image)).toMatchObject({ x: 0, width: 170 });
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.keyDown(KEYS.ALT);
+    });
+    expect(API.getElement(image)).toMatchObject({ x: 30, width: 140 });
+    Keyboard.keyUp(KEYS.ALT);
+    expect(API.getElement(image)).toMatchObject({ x: 0, width: 170 });
+    mouse.moveTo(200, 50);
+    mouse.upAt();
+
     UI.resize(image, "e", [-30, 0], { alt: true });
 
     expect(API.getElement(image)).toMatchObject({ x: 30, width: 140 });
@@ -448,13 +462,12 @@ describe("Cropping and other features", async () => {
       initialWidth / 2,
       initialHeight / 2,
     ]);
-    const cropBeforeResizing = image.crop;
     const cropBeforeResizingCloned = cloneJSON(image.crop) as ImageCrop;
-    expect(cropBeforeResizing).not.toBe(null);
+    expect(image.crop).not.toBe(null);
 
     UI.crop(image, "e", naturalWidth, naturalHeight, [200, 0]);
-    expect(cropBeforeResizing).toBe(image.crop);
     compareCrops(cropBeforeResizingCloned, image.crop!);
+    const cropBeforeResizing = image.crop;
 
     UI.resize(image, "s", [0, -100]);
     expect(cropBeforeResizing).toBe(image.crop);
