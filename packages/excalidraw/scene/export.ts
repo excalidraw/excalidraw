@@ -1172,13 +1172,7 @@ export const exportToClipboard = async ({
   | { type: "json"; config?: never }
 )) => {
   if (type === "svg") {
-    const svg = await exportToSvg({
-      data: {
-        ...data,
-        appState: restoreAppState(data.appState, null),
-      },
-      config,
-    });
+    const svg = await exportToSvg({ data, config });
     await copyTextToSystemClipboard(svg.outerHTML);
   } else if (type === "png") {
     await copyBlobToClipboardAsPng(exportToBlob({ data, config }));
