@@ -368,7 +368,8 @@ export type ExportSceneConfig = {
    * If you want to supply `width`/`height` dynamically (or derive from the
    * content bounding box), you can use this function.
    *
-   * Ignored if `maxWidthOrHeight`, `width`, or `height` is set.
+   * Ignored if `width`, `height`, `maxWidthOrHeight`, or `widthOrHeight` is
+   * set.
    */
   getDimensions?: (
     width: number,
@@ -475,12 +476,15 @@ const configExportDimension = async ({
   }
 
   if (
-    (cfg.maxWidthOrHeight != null || cfg.width != null || cfg.height != null) &&
+    (cfg.width != null ||
+      cfg.height != null ||
+      cfg.maxWidthOrHeight != null ||
+      cfg.widthOrHeight != null) &&
     cfg.getDimensions
   ) {
     if (!import.meta.env.PROD) {
       console.warn(
-        "`getDimensions` is ignored when `width`, `height`, or `maxWidthOrHeight` is set",
+        "`getDimensions` is ignored when `width`, `height`, `maxWidthOrHeight`, or `widthOrHeight` is set",
       );
     }
     cfg.getDimensions = undefined;
@@ -514,6 +518,16 @@ const configExportDimension = async ({
   width = cfg.width ?? width;
   height = cfg.height ?? height;
 
+  // `getDimensions` supplies `width`/`height` (and optionally `scale`)
+  // dynamically
+  if (cfg.getDimensions) {
+    const ret = cfg.getDimensions(width, height);
+
+    width = ret.width;
+    height = ret.height;
+    cfg.scale = ret.scale ?? cfg.scale;
+  }
+
   if (cfg.fit === "contain" || cfg.widthOrHeight || cfg.maxWidthOrHeight) {
     // clamp padding so the exported canvas doesn't get smaller than
     // DEFAULT_SMALLEST_EXPORT_SIZE (never going below 0, which would shrink
@@ -530,21 +544,7 @@ const configExportDimension = async ({
           )
         : 0;
 
-    if (cfg.getDimensions != null) {
-      const ret = cfg.getDimensions(width, height);
-
-      width = ret.width;
-      height = ret.height;
-
-      cfg.padding = Math.max(
-        0,
-        Math.min(
-          cfg.padding,
-          (width - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
-          (height - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
-        ),
-      );
-    } else if (cfg.widthOrHeight != null) {
+    if (cfg.widthOrHeight != null) {
       cfg.padding = Math.max(
         0,
         Math.min(
@@ -583,12 +583,6 @@ const configExportDimension = async ({
 
     width *= exportScale;
     height *= exportScale;
-  } else if (cfg.getDimensions) {
-    const ret = cfg.getDimensions(width, height);
-
-    width = ret.width;
-    height = ret.height;
-    cfg.scale = ret.scale ?? cfg.scale;
   } else if (cfg.fit === "contain") {
     width -= cfg.padding * 2;
     height -= cfg.padding * 2;

@@ -48,6 +48,35 @@ describe("exportToCanvas", async () => {
     expect(canvas.width).toBe(200);
     expect(canvas.height).toBe(200);
   });
+
+  it("calls getDimensions once with fit: contain", async () => {
+    const getDimensions = vi.fn((width: number, height: number) => ({
+      width: width * 2,
+      height: height * 2,
+    }));
+    const canvas = await utils.exportToCanvas({
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      config: { getDimensions, fit: "contain" },
+    });
+
+    expect(getDimensions).toHaveBeenCalledTimes(1);
+    expect(canvas.width).toBe(200);
+    expect(canvas.height).toBe(200);
+  });
+
+  it("ignores getDimensions when widthOrHeight is set", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const getDimensions = vi.fn(() => ({ width: 500, height: 500 }));
+    const canvas = await utils.exportToCanvas({
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      config: { getDimensions, widthOrHeight: 50 },
+    });
+
+    expect(getDimensions).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(Math.max(canvas.width, canvas.height)).toBe(50);
+    warn.mockRestore();
+  });
 });
 
 describe("exportToBlob", async () => {
