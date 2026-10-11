@@ -7,6 +7,7 @@ import {
   parseSSEStream,
   TTDDialog,
   TTDStreamFetch,
+  THEME,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
@@ -43,6 +44,7 @@ export const AIComponents = ({
             config: {
               exportingFrame: frame,
               mimeType: MIME_TYPES.jpg,
+              theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
             },
           });
 

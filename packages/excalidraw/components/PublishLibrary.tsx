@@ -4,6 +4,7 @@ import {
   EDITOR_LS_KEYS,
   EXPORT_DATA_TYPES,
   MIME_TYPES,
+  THEME,
   VERSIONS,
   chunk,
   getExportSource,
@@ -140,6 +141,7 @@ const SingleLibraryItem = ({
         config: {
           skipInliningFonts: true,
           canvasBackgroundColor: "#fff",
+          theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
         },
       });
       node.innerHTML = svg.outerHTML;

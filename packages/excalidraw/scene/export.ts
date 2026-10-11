@@ -210,6 +210,9 @@ export type ExportSceneData = {
 };
 
 export type ExportSceneConfig = {
+  /**
+   * @default "light"
+   */
   theme?: Theme;
   /**
    * Canvas background. Valid values are:
@@ -408,8 +411,7 @@ const configExportDimension = async ({
 
   const appState = restoreAppState(data.appState, null);
 
-  const theme =
-    cfg.theme ?? (appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT);
+  const theme = cfg.theme ?? THEME.LIGHT;
 
   // the background the scene is rendered against. Used even when the
   // background isn't painted, to fake holes in elements (e.g. outline
