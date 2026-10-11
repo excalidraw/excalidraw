@@ -1217,48 +1217,75 @@ const drawElement = (
           context.imageSmoothingEnabled = false;
         }
 
-        if (
+        const uncroppedElementCanvas =
           element.id === appState.croppingElementId &&
           isImageElement(elementWithCanvas.element) &&
           elementWithCanvas.element.crop !== null
-        ) {
+            ? generateElementCanvas(
+                getUncroppedImageElement(
+                  elementWithCanvas.element,
+                  elementsMap,
+                ) as NonDeleted<ExcalidrawImageElement>,
+                allElementsMap,
+                appState.zoom,
+                renderConfig,
+                appState,
+              )
+            : null;
+
+        if (uncroppedElementCanvas) {
+          // the crop editor shows the uncropped image, faded outside the
+          // crop: one bitmap, so cropping moves only the crop's edges over it
+          // (the cropped image's own bitmap snaps to whole pixels by its own
+          // corner, shifting the image by a pixel as that corner moves)
           context.save();
           context.globalAlpha = 0.1;
-
-          const uncroppedElementCanvas = generateElementCanvas(
-            getUncroppedImageElement(
-              elementWithCanvas.element,
-              elementsMap,
-            ) as NonDeleted<ExcalidrawImageElement>,
-            allElementsMap,
-            appState.zoom,
+          drawElementFromCanvas(
+            uncroppedElementCanvas,
+            context,
             renderConfig,
             appState,
+            allElementsMap,
+            // The crop editor's uncropped preview stays at document coordinates.
+            ZERO_RENDER_OFFSET,
           );
-
-          if (uncroppedElementCanvas) {
-            drawElementFromCanvas(
-              uncroppedElementCanvas,
-              context,
-              renderConfig,
-              appState,
-              allElementsMap,
-              // The crop editor's uncropped preview stays at document coordinates.
-              ZERO_RENDER_OFFSET,
-            );
-          }
-
           context.restore();
-        }
 
-        drawElementFromCanvas(
-          elementWithCanvas,
-          context,
-          renderConfig,
-          appState,
-          allElementsMap,
-          renderState.offset,
-        );
+          const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+            elementWithCanvas.element,
+            allElementsMap,
+          );
+          context.save();
+          // (built in the element's rotated box: save/restore leaves the path)
+          context.save();
+          context.translate(
+            (x1 + x2) / 2 + renderState.offset.x + appState.scrollX,
+            (y1 + y2) / 2 + renderState.offset.y + appState.scrollY,
+          );
+          context.rotate(elementWithCanvas.element.angle);
+          context.beginPath();
+          context.rect((x1 - x2) / 2, (y1 - y2) / 2, x2 - x1, y2 - y1);
+          context.restore();
+          context.clip();
+          drawElementFromCanvas(
+            uncroppedElementCanvas,
+            context,
+            renderConfig,
+            appState,
+            allElementsMap,
+            renderState.offset,
+          );
+          context.restore();
+        } else {
+          drawElementFromCanvas(
+            elementWithCanvas,
+            context,
+            renderConfig,
+            appState,
+            allElementsMap,
+            renderState.offset,
+          );
+        }
 
         // reset
         context.imageSmoothingEnabled = currentImageSmoothingStatus;
