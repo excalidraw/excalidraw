@@ -95,6 +95,18 @@ describe("wrap (w)", () => {
     expect(selectedIds()).toEqual(["rect"]);
   });
 
+  it("binds a text to the selected arrow, selecting the arrow to edit", () => {
+    const arrow = API.createElement({ type: "arrow", id: "arrow" });
+    const text = API.createElement({ type: "text", id: "text", x: 300 });
+    API.setElements([arrow, text]);
+    API.setSelectedElements([arrow, text]);
+
+    pressW();
+
+    expect(getElement<ExcalidrawTextElement>("text").containerId).toBe("arrow");
+    expect(h.state.selectedLinearElement?.elementId).toBe("arrow");
+  });
+
   it("wraps texts, keeping labeled containers selected to unwrap next", () => {
     const [rectangle, label] = createLabeled("rectangle", "rect");
     const text = API.createElement({ type: "text", id: "text", x: 300 });
@@ -412,6 +424,25 @@ describe("wrap (w)", () => {
       expect(newFrameId).not.toBe("frame");
       expect(getElement(newFrameId!).type).toBe("frame");
       expect(getElement("b").frameId).toBe("frame");
+    });
+
+    it("drops the point editor of an arrow it frames", () => {
+      const arrow = API.createElement({ type: "arrow" });
+      API.setElements([arrow]);
+      API.setSelectedElements([arrow]);
+      act(() => {
+        h.setState({
+          selectedLinearElement: new LinearElementEditor(
+            arrow,
+            arrayToMap(h.elements),
+          ),
+        });
+      });
+
+      pressW();
+
+      expect(getElement(arrow.id).frameId).toBeTruthy();
+      expect(h.state.selectedLinearElement).toBe(null);
     });
 
     it("leaves several frames be", () => {

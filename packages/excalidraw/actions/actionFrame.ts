@@ -258,7 +258,13 @@ export const wrapInFrame = (
   return {
     elements: nextElements,
     appState: {
-      selectedElementIds: { [frame.id]: true },
+      ...appState,
+      // dropping the line editor of a framed arrow
+      ...getSelectionStateForElements(
+        [frame],
+        getNonDeletedElements(nextElements),
+        appState,
+      ),
     },
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,
   };

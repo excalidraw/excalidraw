@@ -34,7 +34,7 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { measureText } from "@excalidraw/element";
+import { getNonDeletedElements, measureText } from "@excalidraw/element";
 
 import { syncMovedIndices } from "@excalidraw/element";
 
@@ -51,11 +51,14 @@ import type {
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
   NonDeleted,
+  NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type { Radians } from "@excalidraw/math";
+
+import { getSelectionStateForElements } from "../components/App.selection";
 
 import { register } from "./register";
 
@@ -107,14 +110,11 @@ export const actionUnbindText = register({
   perform: (elements, appState, _, app) => {
     const selectedElements = app.scene.getSelectedElements(appState);
     const elementsMap = app.scene.getNonDeletedElementsMap();
-    const selectedElementIds: Mutable<AppState["selectedElementIds"]> = {
-      ...appState.selectedElementIds,
-    };
+    const freedTextElements: NonDeletedExcalidrawElement[] = [];
     selectedElements.forEach((element) => {
       const boundTextElement = getBoundTextElement(element, elementsMap);
       if (boundTextElement) {
-        // the freed text stays selected along with its former container
-        selectedElementIds[boundTextElement.id] = true;
+        freedTextElements.push(boundTextElement);
         const originalContainerHeight = getOriginalContainerHeightFromCache(
           element.id,
         );
@@ -134,7 +134,15 @@ export const actionUnbindText = register({
     });
     return {
       elements,
-      appState: { ...appState, selectedElementIds },
+      appState: {
+        ...appState,
+        // the freed texts stay selected along with their former containers
+        ...getSelectionStateForElements(
+          [...selectedElements, ...freedTextElements],
+          getNonDeletedElements(elements),
+          appState,
+        ),
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
@@ -175,7 +183,7 @@ export const actionBindText = register({
     const selectedElements = app.scene.getSelectedElements(appState);
 
     let textElement: ExcalidrawTextElement;
-    let container: ExcalidrawTextContainer;
+    let container: NonDeleted<ExcalidrawTextContainer>;
 
     if (
       isTextElement(selectedElements[0]) &&
@@ -185,7 +193,7 @@ export const actionBindText = register({
       container = selectedElements[1];
     } else {
       textElement = selectedElements[1] as ExcalidrawTextElement;
-      container = selectedElements[0] as ExcalidrawTextContainer;
+      container = selectedElements[0] as NonDeleted<ExcalidrawTextContainer>;
     }
 
     return bindTextToContainer(elements, appState, textElement, container, app);
@@ -211,7 +219,7 @@ export const bindTextToContainer = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   textElement: ExcalidrawTextElement,
-  container: ExcalidrawTextContainer,
+  container: NonDeleted<ExcalidrawTextContainer>,
   app: AppClassProperties,
 ): ActionResult => {
   const stickyInk = getStickyNoteInk(textElement, container);
@@ -247,9 +255,19 @@ export const bindTextToContainer = (
   // it can be restored when unbind
   updateOriginalContainerCache(container.id, originalContainerHeight);
 
+  const nextElements = pushTextAboveContainer(elements, container, textElement);
+
   return {
-    elements: pushTextAboveContainer(elements, container, textElement),
-    appState: { ...appState, selectedElementIds: { [container.id]: true } },
+    elements: nextElements,
+    appState: {
+      ...appState,
+      // with the line editor of an arrow
+      ...getSelectionStateForElements(
+        [container],
+        getNonDeletedElements(nextElements),
+        appState,
+      ),
+    },
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,
   };
 };
