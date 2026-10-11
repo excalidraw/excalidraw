@@ -41,8 +41,6 @@ import { type Mutable } from "@excalidraw/common/utility-types";
 
 import { newTextElement } from "@excalidraw/element";
 
-import type { Bounds } from "@excalidraw/common";
-
 import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
@@ -1052,35 +1050,14 @@ export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
 // ---------------------------------------------------------------------------
 
 // calculate smallest area to fit the contents in
-export const getCanvasSize = (
+const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
-): Bounds => {
+): [x: number, y: number, width: number, height: number] => {
   const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   const width = distance(minX, maxX);
   const height = distance(minY, maxY);
 
   return [minX, minY, width, height];
-};
-
-/**
- * Gets the export dimensions for a set of elements.
- *
- * @param elements - Elements to calculate size for
- * @param exportPadding - Padding to add around the elements
- * @param scale - Scale factor
- * @returns [width, height] tuple
- */
-export const getExportSize = (
-  elements: readonly NonDeletedExcalidrawElement[],
-  exportPadding: number,
-  scale: number,
-): [number, number] => {
-  const [, , width, height] = getCanvasSize(elements);
-
-  return [
-    Math.trunc((width + exportPadding * 2) * scale),
-    Math.trunc((height + exportPadding * 2) * scale),
-  ];
 };
 
 // ---------------------------------------------------------------------------
