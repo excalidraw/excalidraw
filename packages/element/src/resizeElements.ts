@@ -985,7 +985,7 @@ export const resizeSingleElement = (
   }
 };
 
-const getNextSingleWidthAndHeightFromPointer = (
+export const getNextSingleWidthAndHeightFromPointer = (
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
   handleDirection: TransformHandleDirection,

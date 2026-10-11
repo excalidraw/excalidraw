@@ -13,7 +13,6 @@ import {
 import {
   addElementsToFrame,
   cropElement,
-  cropElementFromCenter,
   dragSelectedElements,
   getCommonBounds,
   getCommonFrameId,
@@ -453,6 +452,7 @@ export class AppSelectionTool {
 
     if (
       transformHandleType &&
+      transformHandleType !== "rotation" &&
       croppingElement &&
       isImageElement(croppingElement)
     ) {
@@ -494,7 +494,7 @@ export class AppSelectionTool {
 
         this.app.scene.mutateElement(
           croppingElement,
-          (shouldResizeFromCenter(event) ? cropElementFromCenter : cropElement)(
+          cropElement(
             croppingAtStateStart,
             this.app.scene.getNonDeletedElementsMap(),
             transformHandleType,
@@ -502,16 +502,17 @@ export class AppSelectionTool {
             image.naturalHeight,
             x + snapOffset.x,
             y + snapOffset.y,
-            event.shiftKey
-              ? croppingAtStateStart.width / croppingAtStateStart.height
-              : undefined,
+            {
+              shouldMaintainAspectRatio: shouldMaintainAspectRatio(event),
+              shouldResizeFromCenter: shouldResizeFromCenter(event),
+            },
           ),
         );
 
         updateBoundElements(croppingElement, this.app.scene);
 
         this.app.setState({
-          isCropping: transformHandleType && transformHandleType !== "rotation",
+          isCropping: true,
           snapLines,
         });
       }
