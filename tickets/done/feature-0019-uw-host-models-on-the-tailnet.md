@@ -49,3 +49,31 @@
 ## Resolution
 
 _(filled on close)_
+
+---
+
+## Resolution
+
+**Landed** 2026-10-11.
+
+### The door
+
+`~/.local/share/llama-router/scripts/llama-tailnet-publish` — `status` · `on [port]` · `off [port]`, defaulting to 8080. It publishes the rail's loopback port on the tailnet with `tailscale serve`.
+
+**One-time prerequisite, now done here:** `sudo tailscale set --operator=$USER`, after which no password is needed again. (The Allfather granted it; it is used and retained nowhere.)
+
+### Why it was needed
+
+Measured before this: this machine's `llama-server` bound **`127.0.0.1:8080`**, and the server asking `http://omarchy.tailefab81.ts.net:8080/v1/models` got **no answer at all**. Heimdall hosts models that way; this laptop did not — so a rail that can serve a 35B was invisible to the fleet and to the deployed app, which had fallen back to a model that could not answer.
+
+### Verified
+
+- **`on` twice** → one door, not stacked.
+- **`off`** → `not published on :8080 (loopback only)`, and the rail still answers on loopback.
+- **`on` again** → `tcp://omarchy.tailefab81.ts.net:8080 -> tcp://127.0.0.1:8080`.
+- **From the server**, a _different machine_: `http://omarchy.tailefab81.ts.net:8080/v1/models` → **200**, with the model list. That is the test the ticket asked for.
+- The deployed bridge then answers on the 35B through the public door.
+
+### What it does not do, by design
+
+It does not touch the rail — the server keeps binding loopback and this is a door onto it. It does not publish on **the public internet**; that is `tailscale funnel`, deliberately out of scope. And it states the consequence: anything pointed at a published rail **depends on that machine being awake**, which the deploy now repeats when it uses one.

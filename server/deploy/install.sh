@@ -76,6 +76,9 @@ cd "$ROOT"
 VITE_APP_PUBLIC_URL="$APP_URL/" \
 VITE_APP_COLLAB_SERVER="$COLLAB_URL" \
 VITE_APP_AI_BACKEND="$AI_URL" \
+# The model's NAME, not a secret: so a browser with no settings of its own can
+# still say which model is answering it.
+VITE_APP_MODEL="$MODEL_ID" \
 VITE_APP_TICKETS_API="$TICKETS_URL" \
 yarn --silent build:app >/dev/null
 say "built: $(du -sh excalidraw-app/build | cut -f1)"
@@ -243,6 +246,28 @@ $SSH "mkdir -p ~/.config/systemd/user && cp '$REMOTE_DIR/units/'*.service ~/.con
 # while reporting success.
 systemctl --user restart $UNITS; systemctl --user --no-pager --lines=0 status $UNITS 2>&1 | grep -E 'Active|●' | head"
 
+# ── 7b. PROVE the model answers — health is not enough ───────────────────────
+#
+# Measured 2026-10-11: a bridge can report /healthz ok and stream back an EMPTY
+# reply for every prompt. That is worse than no model — it looks configured and
+# behaves as broken — so the deploy asks the model a question and reads the answer.
+if [ -n "$MODEL_URL" ]; then
+  say "proving the model answers (health alone is not enough) ..."
+  # `grep -c` already prints 0 and exits non-zero when it finds none, so no
+  # fallback echo: that produced "0\n0" and the test below could not read it.
+  PROOF="$($SSH "curl -sN --max-time 180 -X POST http://127.0.0.1:$BRIDGE_PORT/v1/ai/text-to-diagram/chat-streaming -H 'content-type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"Reply with exactly: flowchart TD\"}]}' 2>/dev/null | grep -c '\"type\":\"content\"'" || true)"
+  PROOF="$(printf '%s' "$PROOF" | tr -dc '0-9' | head -c 6)"
+  if [ "${PROOF:-0}" -gt 0 ]; then
+    say "the model answered — $PROOF content frame(s) came back"
+  else
+    say "THE MODEL DID NOT ANSWER. $MODEL_ID at $MODEL_URL returned no content."
+    say "  The bridge is running but the chat will return nothing. Point"
+    say "  EXCALIDRAW_MODEL_URL at a model that answers, or leave the app with no"
+    say "  AI backend so it says so plainly rather than accepting a prompt."
+    AI_BROKEN=1
+  fi
+fi
+
 # ── 8. The TLS terminator — a CHOICE, and the one that makes the app a SECURE CONTEXT ─
 #
 # Cloudflare is the default because it is the door the TEAM can reach: the tailnet
@@ -280,9 +305,20 @@ echo "done. The app is at $APP_URL/"
 echo "      board $TICKETS_URL  ·  collab $COLLAB_URL"
 echo "      HTTPS is not decoration: collaboration needs crypto.subtle, which a"
 echo "      browser only exposes in a secure context."
-# The AI backend is deliberately EMPTY unless the operator supplies one: the app
-# must say "no model configured" rather than claim one, and the bridge is not
-# deployed here (it refuses to start without a model).
-echo "The bridge is NOT deployed: it refuses to start without a model, and this host"
-echo "has only an embedding model in Ollama. Point it at one, then add a unit — or set"
-echo "EXCALIDRAW_AI_URL when the bridge runs somewhere the app can reach."
+if [ -n "$MODEL_URL" ]; then
+  if [ "${AI_BROKEN:-0}" = "1" ]; then
+    echo "AI: DEPLOYED BUT NOT ANSWERING — $MODEL_ID returned no content. The chat will"
+    echo "    accept a prompt and answer nothing; fix the model before users meet it."
+  else
+    echo "AI: answering with $MODEL_ID ($MODEL_URL), proven by a real prompt."
+    case "$MODEL_URL" in
+      *tailefab*|*ts.net*)
+        echo "    NOTE: that model lives on ANOTHER machine, so this deployment needs it awake." ;;
+    esac
+  fi
+else
+  # The AI backend is deliberately EMPTY unless the operator supplies one: the app
+  # must say "no model configured" rather than claim one.
+  echo "AI: no bridge deployed. Set EXCALIDRAW_MODEL_URL (and EXCALIDRAW_MODEL, and"
+  echo "    EXCALIDRAW_AI_URL if the app should reach it through the tunnel) to add one."
+fi

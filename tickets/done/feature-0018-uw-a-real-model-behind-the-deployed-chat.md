@@ -54,3 +54,29 @@ The floor's job is to **work**. It is not a promise of quality; quality is the u
 ## Resolution
 
 _(filled on close)_
+
+---
+
+## Resolution
+
+**Landed** 2026-10-11 — and it caught a real one on its first run.
+
+### The proof, in the deploy
+
+`server/deploy/install.sh` now asks the model a question and **reads the answer**; health alone no longer qualifies. If no content comes back it says so in capitals, and the closing report reads `AI: DEPLOYED BUT NOT ANSWERING — … the chat will accept a prompt and answer nothing`.
+
+**Measured, both directions:**
+
+- against the server's own Ollama (`qwen3.5:2b`) → _"THE MODEL DID NOT ANSWER … returned no content"_, and the report warned rather than claimed success. Its `/healthz` had said `ok` throughout.
+- against this machine's 35B (`qwen3.6-35b-a3b-3050@iq2_xxs`, over the tailnet) → _"the model answered — 3 content frame(s) came back"_, and the report named it, **proven by a real prompt**.
+
+When the model lives on another machine the report says so: _"NOTE: that model lives on ANOTHER machine, so this deployment needs it awake."_
+
+### A bug the new check found in itself
+
+`grep -c` prints `0` **and exits non-zero**, so appending `|| echo 0` produced `"0\n0"` and the test could not read it (`[: 0\n0: integer expected`). The count is now sanitised to digits. A check that cannot read its own result is worth less than none, which is the point of the ticket.
+
+### Verified
+
+- Both directions run live against the real server; the public AI door returned `flowchart TD / Start --> Work --> Done`.
+- The deployed app's `/healthz` on the AI host reports the model it is serving.

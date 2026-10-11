@@ -17,12 +17,56 @@ import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 import { TTDIndexedDBAdapter } from "../data/TTDStorage";
 import { ENDPOINTS } from "../endpoints";
-import { useAtomValue } from "../app-jotai";
-import { settingsAtom } from "../data/settingsState";
+import { useAtom, useAtomValue } from "../app-jotai";
+import { settingsAtom, settingsDialogStateAtom } from "../data/settingsState";
 
 const NOT_CONFIGURED_MESSAGE =
   "No model is configured for this whiteboard. Ask an administrator to point it " +
   "at one — a local llama.cpp, Claude, or OpenCode Zen.";
+
+/**
+ * WHICH MODEL IS ANSWERING — said in the panel, not hidden in Settings.
+ *
+ * A user who has connected their own model should never have to guess whether
+ * their prompt went to it or to whatever the deployment happens to run
+ * (`feature-0017`). The chain is: this browser's Settings, then the install's
+ * default, then nothing — and the panel says which one it landed on.
+ */
+const AnsweringWith = ({
+  provider,
+  model,
+  fromSettings,
+}: {
+  provider: string;
+  model?: string;
+  fromSettings: boolean;
+}) => (
+  <p
+    className="chat-interface__welcome-screen__welcome-message"
+    style={{ marginTop: ".5rem" }}
+  >
+    Answering with <strong>{model || "(no model chosen)"}</strong>{" "}
+    {model ? `via ${provider}` : `via ${provider}`}
+    {fromSettings
+      ? " — your own choice, from this browser's Settings"
+      : " — the install's default"}
+    .
+  </p>
+);
+
+/** The door to Settings, offered where the problem is seen. */
+const OpenSettings = () => {
+  const [, setSettingsDialogState] = useAtom(settingsDialogStateAtom);
+  return (
+    <button
+      type="button"
+      className="welcome-modal__link"
+      onClick={() => setSettingsDialogState({ isOpen: true })}
+    >
+      Open Settings
+    </button>
+  );
+};
 
 export const AIComponents = ({
   excalidrawAPI,
@@ -33,18 +77,34 @@ export const AIComponents = ({
   const settings = useAtomValue(settingsAtom);
   const aiBackend = settings?.aiBackend ?? ENDPOINTS.aiBackend;
 
+  // Which model this browser will use, and where that choice came from.
+  const chosen = settings?.models?.[0];
+  const answering = {
+    provider: chosen?.kind ?? "the install's default",
+    model: chosen?.model,
+    fromSettings: Boolean(chosen?.baseURL),
+  };
+
   if (!aiBackend) {
-    // THE REAL CHAT MODAL, not a reduced one. Everything the panel offers — the
-    // tabs, the history, the input, the Mermaid path — is the panel's own, and the
-    // missing model is reported as a message IN the chat. A user should get the
-    // whole chatbox with one honest line about why no answer comes back, rather
-    // than a different, smaller thing that is not the chat.
+    // THE REAL CHAT MODAL, not a reduced one: every option the panel has — the
+    // tabs, the history, the input, the Mermaid path — is its own. The missing
+    // model is one extra line ON the real welcome screen, with the door to
+    // Settings beside it, rather than a different, smaller panel.
     return (
       <TTDDialog
         onTextSubmit={async () => ({
           error: new RequestError({ message: NOT_CONFIGURED_MESSAGE }),
           generatedResponse: null,
         })}
+        renderWelcomeScreen={() => (
+          <>
+            <TTDDialog.WelcomeMessage />
+            <p className="chat-interface__welcome-screen__welcome-message">
+              No model is configured for this browser yet. <OpenSettings /> to
+              connect your own — a local llama.cpp, Claude, or OpenCode Zen.
+            </p>
+          </>
+        )}
         persistenceAdapter={TTDIndexedDBAdapter}
       />
     );
@@ -195,6 +255,12 @@ export const AIComponents = ({
 
           return result;
         }}
+        renderWelcomeScreen={() => (
+          <>
+            <TTDDialog.WelcomeMessage />
+            <AnsweringWith {...answering} />
+          </>
+        )}
         persistenceAdapter={TTDIndexedDBAdapter}
       />
     </>

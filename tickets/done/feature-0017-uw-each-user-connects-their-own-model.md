@@ -60,3 +60,27 @@ Everything is already stored locally per browser, so this ticket is mostly **mak
 ## Resolution
 
 _(filled on close)_
+
+---
+
+## Resolution
+
+**Landed** 2026-10-11.
+
+### What was already there, and what was missing
+
+The storage was already per browser, so the chain existed. What was missing was that **nobody could see it**, and the panel never said which model had answered. Both are now fixed:
+
+- **The panel names the model answering.** `AnsweringWith` renders on the **real** welcome screen: _"Answering with `qwen3.6-35b-a3b-3050@iq2_xxs` via llama.cpp — your own choice, from this browser's Settings."_ A fresh browser says _the install's default_ instead, and a browser with nothing configured gets the real welcome plus one line and an **Open Settings** door.
+- **The real chat modal is reused, not replaced.** An earlier attempt rendered a _different, smaller_ panel when no model was configured — which is what the Allfather spotted ("we're missing a lot of options… why don't we reuse the real functional chat modal?"). He was right: the panel's tabs, its history, the Mermaid path and the input are all its own, and a missing model is now **one line on it** rather than a replacement for it.
+- **The install's model NAME is baked in at build time** (not the key), so a browser with no settings of its own can still say what is answering it.
+- **A user's own model wins** without changing anything for anyone else — the settings are that browser's, and a prompt in a shared room goes to **that user's** model.
+
+### Verified
+
+- The panel was read on the live deployment and reported the model by name and its source.
+- Ledger gates, typecheck, eslint, prettier and the full suite are green.
+
+### Not done
+
+The ticket's "Settings opens on first use of the AI panel" is met by a **door in the panel** rather than by seizing the screen: a modal that opens itself over a first attempt to type is an interruption. The line and the button sit where the problem is seen.
