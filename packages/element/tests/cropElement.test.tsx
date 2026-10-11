@@ -118,6 +118,16 @@ describe("Enter and leave the crop editor", () => {
     expect(h.state.croppingElementId).toBe(null);
   });
 
+  it("leave the editor by clicking where the rotation handle would be", () => {
+    const image = h.elements[0];
+    Keyboard.keyDown(KEYS.ENTER);
+
+    // (the editor draws no rotation handle)
+    mouse.clickAt(image.x + image.width / 2, image.y - 16);
+
+    expect(h.state.croppingElementId).toBe(null);
+  });
+
   it("stay in the editor on shift-clicking the image", () => {
     const image = h.elements[0];
     Keyboard.keyDown(KEYS.ENTER);

@@ -124,11 +124,7 @@ export class AppSelectionTool {
       );
       if (transformHandle) {
         // (in the crop editor, the handles crop the image rather than resize it)
-        if (
-          transformHandle.element &&
-          (transformHandle.transformHandleType === "rotation" ||
-            !this.app.state.croppingElementId)
-        ) {
+        if (transformHandle.element && !this.app.state.croppingElementId) {
           this.app.setState({ resizingElement: transformHandle.element });
         }
         pointerDownState.resize.handleType =
