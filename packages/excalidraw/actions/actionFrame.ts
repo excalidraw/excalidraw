@@ -30,7 +30,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import { selectGroupsForSelectedElements } from "../components/App.selection";
+import { getSelectionStateForElements } from "../components/App.selection";
 import { getSelectedElements } from "../scene";
 
 import { register } from "./register";
@@ -187,9 +187,7 @@ export const unwrapFrame = (
   frame: ExcalidrawFrameLikeElement,
   app: AppClassProperties,
 ): ActionResult => {
-  const children = getFrameChildren(elements, frame.id).filter(
-    (element) => !element.isDeleted && !isBoundToContainer(element),
-  );
+  const children = getNonDeletedElements(getFrameChildren(elements, frame.id));
 
   removeAllElementsFromFrame(elements, frame);
   app.scene.mutateElement(frame, { isDeleted: true });
@@ -199,16 +197,10 @@ export const unwrapFrame = (
     elements,
     appState: {
       ...appState,
-      ...selectGroupsForSelectedElements(
-        {
-          selectedElementIds: Object.fromEntries(
-            children.map((element) => [element.id, true] as const),
-          ),
-          editingGroupId: null,
-        },
+      ...getSelectionStateForElements(
+        children,
         getNonDeletedElements(elements),
-        appState,
-        null,
+        { ...appState, editingGroupId: null },
       ),
     },
     captureUpdate: CaptureUpdateAction.IMMEDIATELY,

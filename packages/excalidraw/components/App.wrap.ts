@@ -9,6 +9,7 @@ import {
   isFrameLikeElement,
   isTextBindableContainer,
   isTextElement,
+  getNonDeletedElements,
   redrawTextBoundingBox,
   updateBoundElements,
 } from "@excalidraw/element";
@@ -22,7 +23,6 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { Mutable } from "@excalidraw/common/utility-types";
 import type { Radians } from "@excalidraw/math";
 
 import {
@@ -36,6 +36,8 @@ import {
   unwrapFrame,
   wrapInFrame,
 } from "../actions/actionFrame";
+
+import { getSelectionStateForElements } from "./App.selection";
 
 import type { ActionResult } from "../actions/types";
 import type { AppState } from "../types";
@@ -183,7 +185,7 @@ export class AppWrap {
   ): ActionResult {
     const { scene } = this.app;
     const elementsMap = scene.getNonDeletedElementsMap();
-    const selectedElementIds: Mutable<AppState["selectedElementIds"]> = {};
+    const texts: NonDeletedExcalidrawElement[] = [];
     const unwrapped: UnwrappedContainer[] = [];
 
     for (const container of containers) {
@@ -234,7 +236,7 @@ export class AppWrap {
       });
       updateBoundElements(text, scene);
 
-      selectedElementIds[text.id] = true;
+      texts.push(text);
     }
 
     fixBindingsAfterDeletion(
@@ -242,11 +244,20 @@ export class AppWrap {
       containers.filter((container) => container.isDeleted),
     );
 
-    this.unwrapped = { selectedElementIds, containers: unwrapped };
+    // also drops the line editor of an unwrapped arrow
+    const selection = getSelectionStateForElements(
+      texts,
+      getNonDeletedElements(elements),
+      appState,
+    );
+    this.unwrapped = {
+      selectedElementIds: selection.selectedElementIds,
+      containers: unwrapped,
+    };
 
     return {
       elements,
-      appState: { ...appState, selectedElementIds },
+      appState: { ...appState, ...selection },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   }
@@ -287,7 +298,7 @@ export class AppWrap {
     scene.replaceAllElements(scene.getElementsIncludingDeleted());
 
     const elementsMap = scene.getNonDeletedElementsMap();
-    const selectedElementIds: Mutable<AppState["selectedElementIds"]> = {};
+    const containers: NonDeletedExcalidrawElement[] = [];
 
     let nextElements: readonly ExcalidrawElement[] =
       scene.getElementsIncludingDeleted();
@@ -351,12 +362,20 @@ export class AppWrap {
       // the text may have changed layers since
       nextElements = pushContainerBelowText(nextElements, container, text);
 
-      selectedElementIds[container.id] = true;
+      containers.push(container);
     }
 
     return {
       elements: nextElements,
-      appState: { ...appState, selectedElementIds },
+      appState: {
+        ...appState,
+        // with the line editor of a restored arrow
+        ...getSelectionStateForElements(
+          containers,
+          getNonDeletedElements(nextElements),
+          appState,
+        ),
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   }

@@ -1,12 +1,14 @@
 import React from "react";
 
-import { KEYS } from "@excalidraw/common";
+import { KEYS, arrayToMap } from "@excalidraw/common";
+import { LinearElementEditor } from "@excalidraw/element";
 import { pointFrom } from "@excalidraw/math";
 
 import type {
   ExcalidrawArrowElement,
   ExcalidrawElement,
   ExcalidrawTextElement,
+  NonDeleted,
 } from "@excalidraw/element/types";
 
 import { actionWrapSelectionInFrame } from "../actions/actionFrame";
@@ -177,6 +179,27 @@ describe("wrap (w)", () => {
       arrow.id,
     );
     expect(selectedIds()).toEqual([arrow.id]);
+  });
+
+  it("drops the point editor of an unwrapped arrow", () => {
+    const [arrow, label] = API.createLabeledArrow();
+    API.setElements([arrow, label]);
+    API.setSelectedElements([arrow]);
+    act(() => {
+      h.setState({
+        selectedLinearElement: {
+          ...new LinearElementEditor(
+            arrow as NonDeleted<ExcalidrawArrowElement>,
+            arrayToMap(h.elements),
+          ),
+          isEditing: true,
+        },
+      });
+    });
+
+    pressW();
+
+    expect(h.state.selectedLinearElement).toBe(null);
   });
 
   it("wraps in a new container once the selection changed", () => {
