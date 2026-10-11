@@ -62,6 +62,7 @@ import {
 import type { TransformHandleType } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
+  ExcalidrawImageElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -532,37 +533,31 @@ export class AppSelectionTool {
    * @returns whether the double-click has been handled
    */
   maybeUncropSides = (
+    image: NonDeleted<ExcalidrawImageElement>,
     sceneX: number,
     sceneY: number,
-    pointerType: PointerType,
     mirrored: boolean,
   ): boolean => {
-    const croppingElement =
-      this.app.state.croppingElementId &&
-      this.app.scene
-        .getNonDeletedElementsMap()
-        .get(this.app.state.croppingElementId);
-    if (!croppingElement || !isImageElement(croppingElement)) {
-      return false;
-    }
-    const handle = this.getTransformHandleAt(
-      [croppingElement],
-      sceneX,
-      sceneY,
-      pointerType,
-    )?.transformHandleType;
+    const handle =
+      image.id === this.app.state.croppingElementId &&
+      this.getTransformHandleAt(
+        [image],
+        sceneX,
+        sceneY,
+        this.app.state.lastPointerDownWith,
+      )?.transformHandleType;
     if (!handle || handle === "rotation") {
       return false;
     }
     const updates = uncropElementSides(
-      croppingElement,
+      image,
       this.app.scene.getNonDeletedElementsMap(),
       handle,
       mirrored,
     );
     if (updates) {
       this.app.store.scheduleCapture();
-      this.app.scene.mutateElement(croppingElement, updates);
+      this.app.scene.mutateElement(image, updates);
     }
     return true;
   };

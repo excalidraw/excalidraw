@@ -14,6 +14,8 @@ import {
 } from "@excalidraw/math";
 import { type Point } from "points-on-curve";
 
+import type { Bounds } from "@excalidraw/common";
+
 import {
   elementCenterPoint,
   getElementAbsoluteCoords,
@@ -407,55 +409,83 @@ export const cropElement = (
   };
 };
 
-const OPPOSITE_HANDLES: Record<
-  TransformHandleDirection,
-  TransformHandleDirection
-> = { n: "s", s: "n", e: "w", w: "e", nw: "se", se: "nw", ne: "sw", sw: "ne" };
+/**
+ * Crops the image to `bounds`, relative to the element as shown (flipped).
+ */
+const cropElementToBounds = (
+  element: ExcalidrawImageElement,
+  elementsMap: ElementsMap,
+  naturalWidth: number,
+  naturalHeight: number,
+  [x1, y1, x2, y2]: Bounds,
+) => {
+  // the image's natural pixels per element unit
+  const scaleX = (element.crop?.width ?? naturalWidth) / element.width;
+  const scaleY = (element.crop?.height ?? naturalHeight) / element.height;
+  const width = x2 - x1;
+  const height = y2 - y1;
+  const [centerX, centerY] = pointRotateRads(
+    pointFrom(element.x + (x1 + x2) / 2, element.y + (y1 + y2) / 2),
+    elementCenterPoint(element, elementsMap),
+    element.angle,
+  );
+  const crop = {
+    x:
+      (element.crop?.x ?? 0) +
+      (element.scale[0] === -1 ? element.width - x2 : x1) * scaleX,
+    y:
+      (element.crop?.y ?? 0) +
+      (element.scale[1] === -1 ? element.height - y2 : y1) * scaleY,
+    width: width * scaleX,
+    height: height * scaleY,
+    naturalWidth,
+    naturalHeight,
+  };
+
+  return {
+    x: centerX - width / 2,
+    y: centerY - height / 2,
+    width,
+    height,
+    // reset crop to null if we're back to orig size
+    crop:
+      isCloseTo(crop.width, naturalWidth) &&
+      isCloseTo(crop.height, naturalHeight)
+        ? null
+        : crop,
+  };
+};
 
 /**
- * Uncrops the image on the handle's side (a corner's two), as dragging the
- * handle out as far as the image reaches does; mirrored, on the opposite
- * side(s) too.
+ * Uncrops the image on the handle's side (a corner's two); mirrored, on the
+ * opposite side(s) too.
  */
 export const uncropElementSides = (
   element: ExcalidrawImageElement,
   elementsMap: ElementsMap,
   handle: TransformHandleDirection,
   mirrored = false,
-): ReturnType<typeof cropElement> | null => {
+) => {
   if (!element.crop) {
     return null;
   }
   const { width, height } = getUncroppedWidthAndHeight(element);
-  const center = elementCenterPoint(element, elementsMap);
-  // past the image's edge on the handle's side(s), where cropping stops at it
-  const [pointerX, pointerY] = pointRotateRads(
-    pointFrom(
-      center[0] +
-        (handle.includes("e") ? width : handle.includes("w") ? -width : 0),
-      center[1] +
-        (handle.includes("s") ? height : handle.includes("n") ? -height : 0),
-    ),
-    center,
-    element.angle,
-  );
-  const updates = cropElement(
-    // (cropElement updates the crop it's given)
-    { ...element, crop: { ...element.crop } },
+  const { x: left, y: top } = getFlipAdjustedCropPosition(element)!;
+  const uncrops = (side: string, opposite: string) =>
+    handle.includes(side) || (mirrored && handle.includes(opposite));
+
+  return cropElementToBounds(
+    element,
     elementsMap,
-    handle,
     element.crop.naturalWidth,
     element.crop.naturalHeight,
-    pointerX,
-    pointerY,
+    [
+      uncrops("w", "e") ? -left : 0,
+      uncrops("n", "s") ? -top : 0,
+      uncrops("e", "w") ? width - left : element.width,
+      uncrops("s", "n") ? height - top : element.height,
+    ],
   );
-  return mirrored
-    ? uncropElementSides(
-        { ...element, ...updates },
-        elementsMap,
-        OPPOSITE_HANDLES[handle],
-      ) ?? updates
-    : updates;
 };
 
 /**
@@ -475,6 +505,10 @@ export const cropElementFromCenter = (
 ) => {
   const { width: uncroppedWidth, height: uncroppedHeight } =
     getUncroppedWidthAndHeight(element);
+  const { x: left, y: top } = getFlipAdjustedCropPosition(element) ?? {
+    x: 0,
+    y: 0,
+  };
 
   const center = elementCenterPoint(element, elementsMap);
   const [x, y] = pointRotateRads(
@@ -483,28 +517,11 @@ export const cropElementFromCenter = (
     -element.angle as Radians,
   );
 
-  const crop = element.crop ?? {
-    x: 0,
-    y: 0,
-    width: naturalWidth,
-    height: naturalHeight,
-    naturalWidth,
-    naturalHeight,
-  };
-
-  // (the nearer of the image's sides, which flipping only swaps)
-  const croppedLeft = (crop.x / naturalWidth) * uncroppedWidth;
-  const croppedTop = (crop.y / naturalHeight) * uncroppedHeight;
-  const maxWidth =
-    Math.min(
-      croppedLeft + element.width / 2,
-      uncroppedWidth - croppedLeft - element.width / 2,
-    ) * 2;
-  const maxHeight =
-    Math.min(
-      croppedTop + element.height / 2,
-      uncroppedHeight - croppedTop - element.height / 2,
-    ) * 2;
+  // as far as the image reaches on the side nearer the element's center
+  const centerX = left + element.width / 2;
+  const centerY = top + element.height / 2;
+  const maxWidth = Math.min(centerX, uncroppedWidth - centerX) * 2;
+  const maxHeight = Math.min(centerY, uncroppedHeight - centerY) * 2;
 
   let nextWidth = element.width;
   let nextHeight = element.height;
@@ -547,27 +564,18 @@ export const cropElementFromCenter = (
     }
   }
 
-  const nextCropWidth = (nextWidth / uncroppedWidth) * naturalWidth;
-  const nextCropHeight = (nextHeight / uncroppedHeight) * naturalHeight;
-
-  return {
-    x: center[0] - nextWidth / 2,
-    y: center[1] - nextHeight / 2,
-    width: nextWidth,
-    height: nextHeight,
-    // reset crop to null if we're back to orig size
-    crop:
-      isCloseTo(nextCropWidth, naturalWidth) &&
-      isCloseTo(nextCropHeight, naturalHeight)
-        ? null
-        : {
-            ...crop,
-            x: crop.x + (crop.width - nextCropWidth) / 2,
-            y: crop.y + (crop.height - nextCropHeight) / 2,
-            width: nextCropWidth,
-            height: nextCropHeight,
-          },
-  };
+  return cropElementToBounds(
+    element,
+    elementsMap,
+    naturalWidth,
+    naturalHeight,
+    [
+      (element.width - nextWidth) / 2,
+      (element.height - nextHeight) / 2,
+      (element.width + nextWidth) / 2,
+      (element.height + nextHeight) / 2,
+    ],
+  );
 };
 
 const recomputeOrigin = (

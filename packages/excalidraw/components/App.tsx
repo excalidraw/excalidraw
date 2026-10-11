@@ -6306,9 +6306,9 @@ class App extends React.Component<AppProps, AppState> {
     if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
       if (
         !this.selectionTool.maybeUncropSides(
+          selectedElements[0],
           sceneX,
           sceneY,
-          this.lastPointerDownEvent?.pointerType ?? "mouse",
           event.altKey,
         )
       ) {
