@@ -9,7 +9,6 @@ import {
   TTDStreamFetch,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
-import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
 import { RequestError } from "@excalidraw/excalidraw/errors";
 import { safelyParseJSON } from "@excalidraw/common";
 
@@ -18,33 +17,12 @@ import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 import { TTDIndexedDBAdapter } from "../data/TTDStorage";
 import { ENDPOINTS } from "../endpoints";
-import { useAtom, useAtomValue } from "../app-jotai";
-import { settingsAtom, settingsDialogStateAtom } from "../data/settingsState";
+import { useAtomValue } from "../app-jotai";
+import { settingsAtom } from "../data/settingsState";
 
 const NOT_CONFIGURED_MESSAGE =
-  "No model is configured. Connect one in Settings — a local llama.cpp, Claude, " +
-  "or OpenCode Zen — and this panel will use it.";
-
-/**
- * The panel is shown even with no model, so the reason is stated and the door
- * to Settings is one click away — rather than a hidden feature with no
- * explanation. No request is made in this state.
- */
-const NotConfiguredNotice = () => {
-  const [, setSettingsDialogState] = useAtom(settingsDialogStateAtom);
-  return (
-    <div className="chat-interface__welcome-screen__welcome-message">
-      <h3>No model configured</h3>
-      <p>{NOT_CONFIGURED_MESSAGE}</p>
-      <FilledButton
-        size="medium"
-        onClick={() => setSettingsDialogState({ isOpen: true })}
-      >
-        Open Settings
-      </FilledButton>
-    </div>
-  );
-};
+  "No model is configured for this whiteboard. Ask an administrator to point it " +
+  "at one — a local llama.cpp, Claude, or OpenCode Zen.";
 
 export const AIComponents = ({
   excalidrawAPI,
@@ -56,14 +34,17 @@ export const AIComponents = ({
   const aiBackend = settings?.aiBackend ?? ENDPOINTS.aiBackend;
 
   if (!aiBackend) {
+    // THE REAL CHAT MODAL, not a reduced one. Everything the panel offers — the
+    // tabs, the history, the input, the Mermaid path — is the panel's own, and the
+    // missing model is reported as a message IN the chat. A user should get the
+    // whole chatbox with one honest line about why no answer comes back, rather
+    // than a different, smaller thing that is not the chat.
     return (
       <TTDDialog
         onTextSubmit={async () => ({
-          // Refuse rather than send anywhere: there is no model to send to.
           error: new RequestError({ message: NOT_CONFIGURED_MESSAGE }),
           generatedResponse: null,
         })}
-        renderWelcomeScreen={() => <NotConfiguredNotice />}
         persistenceAdapter={TTDIndexedDBAdapter}
       />
     );

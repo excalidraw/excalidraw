@@ -2,6 +2,7 @@ import {
   eyeIcon,
   settingsIcon,
   frameToolIcon,
+  helpIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -18,6 +19,7 @@ export const AppMainMenu: React.FC<{
   onCollabDialogOpen: () => any;
   onSettingsDialogOpen: () => any;
   onTicketsDialogOpen: () => any;
+  onWelcomeDialogOpen: () => any;
   isCollaborating: boolean;
   isCollabEnabled: boolean;
   theme: Theme | "system";
@@ -42,6 +44,9 @@ export const AppMainMenu: React.FC<{
       </MainMenu.Item>
       <MainMenu.Item icon={frameToolIcon} onSelect={props.onTicketsDialogOpen}>
         Tickets
+      </MainMenu.Item>
+      <MainMenu.Item icon={helpIcon} onSelect={props.onWelcomeDialogOpen}>
+        How to use
       </MainMenu.Item>
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />

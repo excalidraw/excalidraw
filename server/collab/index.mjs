@@ -44,6 +44,62 @@ import {
   readConfig,
 } from "./rooms.mjs";
 
+/** A small root page, so a shared link to THIS hostname previews properly. */
+const landingPage = ({
+  title,
+  description,
+  points,
+  host,
+  appUrl,
+  card,
+}) => `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<title>${title}</title>
+<meta name="description" content="${description}" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="theme-color" content="#121212" />
+${
+  appUrl
+    ? `<link rel="canonical" href="https://${host}/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="${title}" />
+<meta property="og:url" content="https://${host}/" />
+<meta property="og:title" content="${title}" />
+<meta property="og:description" content="${description}" />
+<meta property="og:image" content="${appUrl}/${card}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${title}" />
+<meta name="twitter:description" content="${description}" />
+<meta name="twitter:image" content="${appUrl}/${card}" />`
+    : ""
+}
+<style>
+  :root { color-scheme: dark }
+  body { margin:0; min-height:100vh; display:grid; place-items:center;
+         background:linear-gradient(135deg,#121212,#1b1b2b); color:#fff;
+         font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif }
+  main { max-width:38rem; padding:2rem }
+  h1 { margin:0 0 .25rem; font-size:1.6rem }
+  p.sub { margin:0 0 1.5rem; color:#b6b6c9 }
+  li { margin:.5rem 0; color:#cfcfe0 }
+  a { color:#a8a5ff }
+  code { background:#1f1f2e; padding:.1rem .35rem; border-radius:.25rem }
+</style>
+</head><body><main>
+<h1>${title}</h1>
+<p class="sub">${description}</p>
+<ul>${points.map((point) => `<li>${point}</li>`).join("")}</ul>
+${
+  appUrl
+    ? `<p>The whiteboard itself is at <a href="${appUrl}">${appUrl}</a>.</p>`
+    : ""
+}
+<p><code>${host}</code></p>
+</main></body></html>`;
+
 const config = readConfig();
 const access = readAccessConfig();
 const files = readFilesConfig();
@@ -97,7 +153,7 @@ export const createCollabServer = ({
         });
         res.writeHead(result.ok ? 200 : 400, {
           "content-type": "application/json",
-          ...(corsFor(req)),
+          ...corsFor(req),
         });
         res.end(JSON.stringify(result));
         return;
@@ -106,7 +162,10 @@ export const createCollabServer = ({
       if (req.method === "GET") {
         const blob = await readBlob(files.dir, key);
         if (!blob) {
-          res.writeHead(404, { "content-type": "application/json", ...corsFor(req) });
+          res.writeHead(404, {
+            "content-type": "application/json",
+            ...corsFor(req),
+          });
           res.end(JSON.stringify({ error: "no such blob" }));
           return;
         }
@@ -120,8 +179,36 @@ export const createCollabServer = ({
         return;
       }
 
-      res.writeHead(405, { "content-type": "application/json", ...corsFor(req) });
+      res.writeHead(405, {
+        "content-type": "application/json",
+        ...corsFor(req),
+      });
       res.end(JSON.stringify({ error: "method not allowed" }));
+      return;
+    }
+
+    if (
+      req.method === "GET" &&
+      (url.pathname === "/" || url.pathname === "/index.html")
+    ) {
+      const host = (req.headers.host ?? "").toString();
+      const html = landingPage({
+        title: "Whiteboard Rooms",
+        description: "Collaborate, end to end encrypted.",
+        points: [
+          "The room key never leaves the browser — this server relays ciphertext and can read nothing.",
+          "Members, invites, and rooms only a granted member may enter.",
+          "Rooms are joined over the socket protocol; <code>/healthz</code> reports the roster.",
+        ],
+        host,
+        appUrl: process.env.COLLAB_APP_URL || "",
+        card: "og-collab.png",
+      });
+      res.writeHead(200, {
+        "content-type": "text/html; charset=utf-8",
+        ...corsFor(req),
+      });
+      res.end(html);
       return;
     }
 
@@ -245,8 +332,8 @@ export const createCollabServer = ({
         data instanceof ArrayBuffer
           ? new Uint8Array(data)
           : data instanceof Uint8Array
-            ? data
-            : null;
+          ? data
+          : null;
       if (!payload || !isPlausiblePayload(payload)) {
         return;
       }
@@ -323,7 +410,10 @@ export const createCollabServer = ({
         // The ROSTER comes from the store, not from socket.io's room — leaving
         // the socket.io room alone would leave the name on the list.
         store.leave(roomId, socket.id);
-        socket.emit("access-revoked", { roomId, reason: "membership was revoked" });
+        socket.emit("access-revoked", {
+          roomId,
+          reason: "membership was revoked",
+        });
         io.to(roomId).emit("room-user-change", store.memberIds(roomId));
         logMembership(accessConfig.logPath, {
           event: "revoked",
@@ -353,7 +443,13 @@ export const createCollabServer = ({
     }
   }
 
-  return { io, httpServer, store, revokeVanishedMembers, stopWatching: () => watcher?.close() };
+  return {
+    io,
+    httpServer,
+    store,
+    revokeVanishedMembers,
+    stopWatching: () => watcher?.close(),
+  };
 };
 
 // Only listen when run directly, so tests can start it on an ephemeral port.
@@ -368,7 +464,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const sweeper = setInterval(() => {
     const dropped = store.sweep();
     if (dropped > 0) {
-      console.log(JSON.stringify({ event: "sweep", dropped, ...store.stats() }));
+      console.log(
+        JSON.stringify({ event: "sweep", dropped, ...store.stats() }),
+      );
     }
   }, 60_000);
   sweeper.unref?.();

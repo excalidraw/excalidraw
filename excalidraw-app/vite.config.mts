@@ -7,6 +7,51 @@ import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
+
+/**
+ * Social metadata, injected from the address this install is REACHED at.
+ *
+ * A plugin of our own rather than template syntax: `index.html` passes through
+ * more than one HTML transform already and `<%= %>` in it vanishes somewhere
+ * between them. With no public URL configured the absolute tags are omitted
+ * entirely — metadata naming the wrong host is worse than none.
+ */
+const socialMetadata = (publicUrl: string) => ({
+  name: "social-metadata",
+  transformIndexHtml: {
+    order: "post" as const,
+    handler(html: string) {
+      const base = publicUrl.replace(/\/+$/, "");
+      const title = "Excalidraw Whiteboard";
+      const description =
+        "The team's whiteboard: self-hosted, end-to-end encrypted rooms, and your own models.";
+      const tags = [
+        `<meta name="title" content="${title}" />`,
+        `<meta name="description" content="${description}" />`,
+      ];
+
+      if (base) {
+        tags.push(
+          `<link rel="canonical" href="${base}/" />`,
+          `<meta property="og:type" content="website" />`,
+          `<meta property="og:site_name" content="${title}" />`,
+          `<meta property="og:url" content="${base}/" />`,
+          `<meta property="og:title" content="${title}" />`,
+          `<meta property="og:description" content="${description}" />`,
+          `<meta property="og:image" content="${base}/og-app.png" />`,
+          `<meta property="og:image:width" content="1200" />`,
+          `<meta property="og:image:height" content="630" />`,
+          `<meta property="og:image:alt" content="${title}" />`,
+          `<meta name="twitter:card" content="summary_large_image" />`,
+          `<meta name="twitter:title" content="${title}" />`,
+          `<meta name="twitter:description" content="${description}" />`,
+          `<meta name="twitter:image" content="${base}/og-app.png" />`,
+        );
+      }
+      return html.replace("<!-- OG_META -->", tags.join("\n    "));
+    },
+  },
+});
 export default defineConfig(({ mode }) => {
   // To load .env variables
   const envVars = loadEnv(mode, `../`);
@@ -148,7 +193,8 @@ export default defineConfig(({ mode }) => {
         },
       }),
       svgrPlugin(),
-      ViteEjsPlugin(),
+      ViteEjsPlugin({ PROD: mode === "production" }),
+      socialMetadata(envVars.VITE_APP_PUBLIC_URL || ""),
       VitePWA({
         registerType: "autoUpdate",
         devOptions: {

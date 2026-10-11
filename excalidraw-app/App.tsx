@@ -126,9 +126,11 @@ import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
 import { SettingsDialog } from "./components/SettingsDialog";
 import { TicketsDialog } from "./components/TicketsDialog";
+import { WelcomeModal, hasSeenWelcome } from "./components/WelcomeModal";
 import {
   settingsDialogStateAtom,
   ticketsDialogStateAtom,
+  welcomeDialogStateAtom,
 } from "./data/settingsState";
 import CollabError, { collabErrorIndicatorAtom } from "./collab/CollabError";
 import { useHandleAppTheme } from "./useHandleAppTheme";
@@ -409,6 +411,17 @@ const ExcalidrawWrapper = () => {
   const [ticketsDialogState, setTicketsDialogState] = useAtom(
     ticketsDialogStateAtom,
   );
+  const [welcomeDialogState, setWelcomeDialogState] = useAtom(
+    welcomeDialogStateAtom,
+  );
+
+  // A teammate opening this for the first time should be told what it is and
+  // where the sharp edge is. Once, then never again unless asked for.
+  useEffect(() => {
+    if (!hasSeenWelcome()) {
+      setWelcomeDialogState({ isOpen: true });
+    }
+  }, [setWelcomeDialogState]);
   const [collabAPI] = useAtom(collabAPIAtom);
   const [isCollaborating] = useAtomWithInitialValue(isCollaboratingAtom, () => {
     return isCollaborationLink(window.location.href);
@@ -965,6 +978,7 @@ const ExcalidrawWrapper = () => {
           onCollabDialogOpen={onCollabDialogOpen}
           onSettingsDialogOpen={() => setSettingsDialogState({ isOpen: true })}
           onTicketsDialogOpen={() => setTicketsDialogState({ isOpen: true })}
+          onWelcomeDialogOpen={() => setWelcomeDialogState({ isOpen: true })}
           isCollaborating={isCollaborating}
           isCollabEnabled={!isCollabDisabled}
           theme={appTheme}
@@ -1023,6 +1037,8 @@ const ExcalidrawWrapper = () => {
         <AppSidebar />
 
         {settingsDialogState.isOpen && <SettingsDialog />}
+
+        {welcomeDialogState.isOpen && <WelcomeModal />}
 
         {ticketsDialogState.isOpen && (
           <TicketsDialog

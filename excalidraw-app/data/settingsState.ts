@@ -16,6 +16,11 @@ export const settingsDialogStateAtom = atom<{ isOpen: boolean }>({
   isOpen: false,
 });
 
+/** Whether the "how to use" welcome is open. */
+export const welcomeDialogStateAtom = atom<{ isOpen: boolean }>({
+  isOpen: false,
+});
+
 /** Whether the read-only tickets board is open. */
 export const ticketsDialogStateAtom = atom<{ isOpen: boolean }>({
   isOpen: false,

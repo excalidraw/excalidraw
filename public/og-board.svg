@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Social card for whiteboard-board.zerwiz.org. The SVG is the source; the PNG beside it is what
+       the metadata points at. Rendered with rsvg-convert, so the fonts must
+       exist locally — not a web font. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#121212"/>
+      <stop offset="100%" stop-color="#1b1b2b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.85" cy="0.15" r="0.7">
+      <stop offset="0%" stop-color="#6965db" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#6965db" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <g stroke="#a8a5ff" stroke-width="4" fill="#6965db" fill-opacity="0.16"
+     stroke-linecap="round" stroke-linejoin="round">
+    <rect x="820" y="290" width="250" height="130" rx="12"/>
+  </g>
+  <text x="945" y="368" font-family="Liberation Sans, DejaVu Sans, sans-serif" font-size="32"
+        fill="#e9e9ff" text-anchor="middle">board</text>
+
+  <text x="80" y="250" font-family="Liberation Sans, DejaVu Sans, sans-serif" font-size="74"
+        font-weight="bold" fill="#ffffff">Whiteboard Tickets</text>
+  <text x="80" y="312" font-family="Liberation Sans, DejaVu Sans, sans-serif" font-size="30"
+        fill="#b6b6c9">The behaviour contracts, live</text>
+
+  <text x="80" y="470" font-family="Liberation Sans, DejaVu Sans, sans-serif" font-size="26"
+        fill="#8f8fa8">Read from the ticket files themselves — the repo stays the source.</text>
+  <text x="80" y="512" font-family="Liberation Sans, DejaVu Sans, sans-serif" font-size="26"
+        fill="#8f8fa8">Move a card and the file moves: the folder IS the status.</text>
+
+  <rect x="80" y="548" width="1040" height="1" fill="#2a2a3d"/>
+  <text x="80" y="590" font-family="Liberation Sans, DejaVu Sans, sans-serif" font-size="24"
+        fill="#6965db">whiteboard-board.zerwiz.org</text>
+</svg>

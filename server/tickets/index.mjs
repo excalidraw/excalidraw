@@ -25,6 +25,62 @@ import {
 
 const config = readConfig();
 
+/** A small root page, so a shared link to THIS hostname previews properly. */
+const landingPage = ({
+  title,
+  description,
+  points,
+  host,
+  appUrl,
+  card,
+}) => `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<title>${title}</title>
+<meta name="description" content="${description}" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="theme-color" content="#121212" />
+${
+  appUrl
+    ? `<link rel="canonical" href="https://${host}/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="${title}" />
+<meta property="og:url" content="https://${host}/" />
+<meta property="og:title" content="${title}" />
+<meta property="og:description" content="${description}" />
+<meta property="og:image" content="${appUrl}/${card}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${title}" />
+<meta name="twitter:description" content="${description}" />
+<meta name="twitter:image" content="${appUrl}/${card}" />`
+    : ""
+}
+<style>
+  :root { color-scheme: dark }
+  body { margin:0; min-height:100vh; display:grid; place-items:center;
+         background:linear-gradient(135deg,#121212,#1b1b2b); color:#fff;
+         font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif }
+  main { max-width:38rem; padding:2rem }
+  h1 { margin:0 0 .25rem; font-size:1.6rem }
+  p.sub { margin:0 0 1.5rem; color:#b6b6c9 }
+  li { margin:.5rem 0; color:#cfcfe0 }
+  a { color:#a8a5ff }
+  code { background:#1f1f2e; padding:.1rem .35rem; border-radius:.25rem }
+</style>
+</head><body><main>
+<h1>${title}</h1>
+<p class="sub">${description}</p>
+<ul>${points.map((point) => `<li>${point}</li>`).join("")}</ul>
+${
+  appUrl
+    ? `<p>The whiteboard itself is at <a href="${appUrl}">${appUrl}</a>.</p>`
+    : ""
+}
+<p><code>${host}</code></p>
+</main></body></html>`;
+
 const json = (res, status, body) => {
   const payload = JSON.stringify(body);
   res.writeHead(status, {
@@ -173,6 +229,29 @@ const server = createServer(async (req, res) => {
     return json(res, 405, {
       error: "read-only: GET, and POST to /api/tickets/move",
     });
+  }
+
+  if (
+    req.method === "GET" &&
+    (pathname === "/" || pathname === "/index.html")
+  ) {
+    const html = landingPage({
+      title: "Whiteboard Tickets",
+      description: "The behaviour contracts, live.",
+      points: [
+        "Read from the ticket files themselves — the repo stays the source.",
+        "Move a card and the file moves: the folder IS the status.",
+        "The JSON API is at <code>/api/tickets</code>.",
+      ],
+      host: (req.headers.host ?? "").toString(),
+      appUrl: process.env.TICKETS_APP_URL || "",
+      card: "og-board.png",
+    });
+    // CORS headers are already on the response from applyCors() above — this
+    // server has that helper, not the collab server's corsFor().
+    res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+    res.end(html);
+    return;
   }
 
   if (pathname === "/healthz") {

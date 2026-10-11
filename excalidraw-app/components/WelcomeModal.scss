@@ -1,0 +1,98 @@
+.welcome-modal {
+  .welcome-modal__intro {
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+    opacity: 0.9;
+  }
+
+  .welcome-modal__steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .welcome-modal__step {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+
+    h4 {
+      margin: 0 0 0.2rem;
+      font-size: 0.9375rem;
+    }
+
+    p {
+      margin: 0 0 0.3rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+  }
+
+  .welcome-modal__number {
+    flex: none;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .welcome-modal__note {
+    font-size: 0.8125rem;
+    opacity: 0.75;
+    font-style: italic;
+  }
+
+  .welcome-modal__privacy {
+    margin-top: 1.25rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.5rem;
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-surface-lowest);
+
+    h4 {
+      margin: 0 0 0.4rem;
+      font-size: 0.875rem;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+
+    li {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      margin-bottom: 0.35rem;
+    }
+  }
+
+  .welcome-modal__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+  }
+
+  .welcome-modal__hint {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  kbd,
+  code {
+    font-family: monospace;
+    font-size: 0.9em;
+    background: var(--color-surface-low);
+    border-radius: 0.25rem;
+    padding: 0.05em 0.3em;
+  }
+}

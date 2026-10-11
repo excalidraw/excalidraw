@@ -52,6 +52,13 @@ PUBLIC_SCHEME="https"
 APP_URL="${EXCALIDRAW_APP_URL:-$PUBLIC_SCHEME://$PUBLIC_HOST}"
 TICKETS_URL="${EXCALIDRAW_TICKETS_URL:-$PUBLIC_SCHEME://$PUBLIC_HOST:${EXCALIDRAW_HTTPS_BOARD_PORT:-8443}}"
 COLLAB_URL="${EXCALIDRAW_COLLAB_URL:-$PUBLIC_SCHEME://$PUBLIC_HOST:${EXCALIDRAW_HTTPS_COLLAB_PORT:-10000}}"
+AI_URL="${EXCALIDRAW_AI_URL:-}"
+
+# THE BRIDGE IS DEPLOYED ONLY WHEN THERE IS A MODEL BEHIND IT — it refuses to
+# start without one, and an app pointed at a bridge that is not there is worse
+# than an app that says it has no model.
+MODEL_URL="${EXCALIDRAW_MODEL_URL:-}"
+MODEL_ID="${EXCALIDRAW_MODEL:-}"
 APP_PORT="${EXCALIDRAW_APP_PORT:-7311}"
 COLLAB_PORT="${EXCALIDRAW_COLLAB_PORT:-7312}"
 BRIDGE_PORT="${EXCALIDRAW_BRIDGE_PORT:-7313}"
@@ -68,7 +75,7 @@ say "building the app with this host's addresses baked in"
 cd "$ROOT"
 VITE_APP_PUBLIC_URL="$APP_URL/" \
 VITE_APP_COLLAB_SERVER="$COLLAB_URL" \
-VITE_APP_AI_BACKEND="$APP_URL" \
+VITE_APP_AI_BACKEND="$AI_URL" \
 VITE_APP_TICKETS_API="$TICKETS_URL" \
 yarn --silent build:app >/dev/null
 say "built: $(du -sh excalidraw-app/build | cut -f1)"
@@ -191,25 +198,50 @@ write_unit excalidraw-collab "Excalidraw room server (encrypted relay only) :$CO
   "Environment=COLLAB_PORT=$COLLAB_PORT
 Environment=COLLAB_HOST=127.0.0.1
 Environment=COLLAB_ORIGINS=$APP_URL
+Environment=COLLAB_APP_URL=$APP_URL
 Environment=COLLAB_MEMBERS=$REMOTE_DIR/state/members.json
 Environment=COLLAB_ACCESS_LOG=$REMOTE_DIR/state/access.log"
+
+if [ -n "$MODEL_URL" ]; then
+  write_unit excalidraw-bridge "Excalidraw text-to-diagram bridge :$BRIDGE_PORT" \
+    "$REMOTE_NODE $REMOTE_DIR/server/ttd-bridge/index.mjs" \
+    "Environment=TTD_MODEL_BASE_URL=$MODEL_URL
+Environment=TTD_MODEL=$MODEL_ID
+Environment=TTD_BRIDGE_PORT=$BRIDGE_PORT
+Environment=TTD_BRIDGE_HOST=127.0.0.1
+Environment=TTD_BRIDGE_ORIGINS=$APP_URL"
+  say "the bridge will be deployed against $MODEL_URL ($MODEL_ID)"
+else
+  say "NO bridge: set EXCALIDRAW_MODEL_URL (and EXCALIDRAW_MODEL) to deploy one"
+fi
 
 write_unit excalidraw-board "Excalidraw tickets board (read-only) :$BOARD_PORT" \
   "$REMOTE_NODE $REMOTE_DIR/server/tickets/index.mjs" \
   "Environment=TICKETS_PORT=$BOARD_PORT
 Environment=TICKETS_HOST=127.0.0.1
 Environment=TICKETS_REPO_ROOT=$REMOTE_DIR
-Environment=TICKETS_ORIGINS=$APP_URL"
+Environment=TICKETS_ORIGINS=$APP_URL
+Environment=TICKETS_APP_URL=$APP_URL"
 
 # ── 7. Enable and start ──────────────────────────────────────────────────────
-say "enabling and starting"
-# NOTE: no backticks in this string. It is double-quoted, so the LOCAL shell would
-# run them and the command would arrive mangled — which is exactly what happened.
-$SSH "mkdir -p ~/.config/systemd/user && cp '$REMOTE_DIR/units/'*.service ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable excalidraw-app excalidraw-collab excalidraw-board 2>&1 | tail -3
+#
+# The unit list is built HERE, in the caller's shell, and then interpolated into
+# the remote command. A variable assigned inside a double-quoted remote string is
+# the caller's shell expanding it, not the server's — which produced
+# "UNITS: unbound variable" and a half-run deploy.
+UNITS="excalidraw-app excalidraw-collab excalidraw-board"
+if [ -n "$MODEL_URL" ]; then
+  UNITS="$UNITS excalidraw-bridge"
+fi
+say "enabling and starting: $UNITS"
+
+# NOTE: no backticks in the string below. It is double-quoted, so the LOCAL shell
+# would run them and the command would arrive mangled — which is what happened.
+$SSH "mkdir -p ~/.config/systemd/user && cp '$REMOTE_DIR/units/'*.service ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable $UNITS 2>&1 | tail -3
 # RESTART, not enable --now: for a unit already running --now does nothing and the
 # service keeps the OLD environment, so a re-deploy would silently change nothing
 # while reporting success.
-systemctl --user restart excalidraw-app excalidraw-collab excalidraw-board; systemctl --user --no-pager --lines=0 status excalidraw-app excalidraw-collab excalidraw-board 2>&1 | grep -E 'Active|●' | head"
+systemctl --user restart $UNITS; systemctl --user --no-pager --lines=0 status $UNITS 2>&1 | grep -E 'Active|●' | head"
 
 # ── 8. The TLS terminator — a CHOICE, and the one that makes the app a SECURE CONTEXT ─
 #
@@ -231,6 +263,7 @@ esac
 # ── 9. Prove it answers ──────────────────────────────────────────────────────
 say "checking"
 # Loopback proves the SERVICES; the HTTPS door proves the CERTIFICATE.
+[ -n "$MODEL_URL" ] && $SSH "printf '    local  %-30s ' 127.0.0.1:$BRIDGE_PORT/healthz; curl -s -o /dev/null -w '%{http_code}\n' --max-time 5 http://127.0.0.1:$BRIDGE_PORT/healthz"
 for probe in "127.0.0.1:$APP_PORT/" "127.0.0.1:$COLLAB_PORT/healthz" "127.0.0.1:$BOARD_PORT/healthz"; do
   printf '    local  %-30s ' "$probe"
   $SSH "curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://$probe" 2>/dev/null || printf 'no-answer'
@@ -247,5 +280,9 @@ echo "done. The app is at $APP_URL/"
 echo "      board $TICKETS_URL  ·  collab $COLLAB_URL"
 echo "      HTTPS is not decoration: collaboration needs crypto.subtle, which a"
 echo "      browser only exposes in a secure context."
+# The AI backend is deliberately EMPTY unless the operator supplies one: the app
+# must say "no model configured" rather than claim one, and the bridge is not
+# deployed here (it refuses to start without a model).
 echo "The bridge is NOT deployed: it refuses to start without a model, and this host"
-echo "has only an embedding model in Ollama. Point it at one, then add a unit."
+echo "has only an embedding model in Ollama. Point it at one, then add a unit — or set"
+echo "EXCALIDRAW_AI_URL when the bridge runs somewhere the app can reach."
