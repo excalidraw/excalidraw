@@ -13,6 +13,7 @@ import {
   getFontString,
   toBrandedType,
   applyDarkModeFilter,
+  removeDarkModeFilter,
 } from "@excalidraw/common";
 
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
@@ -118,7 +119,7 @@ const truncateText = (
  */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  opts: Pick<AppState, "exportWithDarkMode">,
+  opts: { theme: Theme },
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements) {
@@ -131,9 +132,13 @@ const addFrameLabelsAsTextElements = (
           fontSize: FRAME_STYLE.nameFontSize,
           lineHeight:
             FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
-          strokeColor: opts.exportWithDarkMode
-            ? FRAME_STYLE.nameColorDarkTheme
-            : FRAME_STYLE.nameColorLightTheme,
+          strokeColor:
+            opts.theme === THEME.DARK
+              ? // the renderer applies the dark mode filter to element
+                // colors, so revert it upfront to end up with the color
+                // the editor uses for frame names
+                removeDarkModeFilter(FRAME_STYLE.nameColorDarkTheme)
+              : FRAME_STYLE.nameColorLightTheme,
           text: getFrameLikeTitle(element),
         });
       textElement.y -= textElement.height;
@@ -165,12 +170,12 @@ const prepareElementsForRender = ({
   elements,
   exportingFrame,
   frameRendering,
-  exportWithDarkMode,
+  theme,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
   frameRendering: AppState["frameRendering"];
-  exportWithDarkMode: AppState["exportWithDarkMode"];
+  theme: Theme;
 }) => {
   let nextElements: readonly NonDeletedExcalidrawElement[];
 
@@ -181,9 +186,7 @@ const prepareElementsForRender = ({
       arrayToMap(elements),
     );
   } else if (frameRendering.enabled && frameRendering.name) {
-    nextElements = addFrameLabelsAsTextElements(elements, {
-      exportWithDarkMode,
-    });
+    nextElements = addFrameLabelsAsTextElements(elements, { theme });
   } else {
     nextElements = elements;
   }
@@ -405,6 +408,9 @@ const configExportDimension = async ({
 
   const appState = restoreAppState(data.appState, null);
 
+  const theme =
+    cfg.theme ?? (appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT);
+
   // the background the scene is rendered against. Used even when the
   // background isn't painted, to fake holes in elements (e.g. outline
   // arrowheads covering the arrow's shaft), so they keep looking the same.
@@ -428,7 +434,7 @@ const configExportDimension = async ({
   const elementsForRender = prepareElementsForRender({
     elements,
     exportingFrame,
-    exportWithDarkMode: appState.exportWithDarkMode,
+    theme,
     frameRendering,
   });
 
@@ -652,6 +658,7 @@ const configExportDimension = async ({
     frameRendering,
     backgroundColor,
     paintedBackgroundColor,
+    theme,
   };
 };
 
@@ -686,6 +693,7 @@ export const exportToCanvas = async ({
     frameRendering,
     backgroundColor,
     paintedBackgroundColor,
+    theme,
   } = await configExportDimension({ data, config });
 
   const canvas = cfg.createCanvas
@@ -702,9 +710,6 @@ export const exportToCanvas = async ({
     ),
     files: data.files || {},
   });
-
-  const theme =
-    cfg.theme ?? (appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT);
 
   renderStaticScene({
     canvas,
@@ -807,13 +812,12 @@ export const exportToSvg = async ({
     frameRendering,
     backgroundColor,
     paintedBackgroundColor,
+    theme,
   } = await configExportDimension({ data, config });
 
   const offsetX = -(x - normalizedPadding);
   const offsetY = -(y - normalizedPadding);
 
-  const theme =
-    cfg.theme ?? (appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT);
   const exportWithDarkMode = theme === THEME.DARK;
 
   // ---------------------------------------------------------------------------

@@ -566,6 +566,20 @@ describe("exporting frames", () => {
   // exportToSvg (so we can test for element existence)
   // ---------------------------------------------------------------------------
   describe("exportToSvg", () => {
+    it("colors frame names like the editor in the configured theme", async () => {
+      const frame = API.createElement({ type: "frame" });
+
+      const svg = await exportToSvg({
+        data: { elements: [frame], files: null },
+        config: { theme: THEME.DARK },
+      });
+
+      const label = Array.from(svg.querySelectorAll("text")).find(
+        (text) => text.textContent === "Frame",
+      );
+      expect(label).toHaveAttribute("fill", FRAME_STYLE.nameColorDarkTheme);
+    });
+
     it("exporting frame should include overlapping elements, but crop to frame", async () => {
       const frame = API.createElement({
         type: "frame",
