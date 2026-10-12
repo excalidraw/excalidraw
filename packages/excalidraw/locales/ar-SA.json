@@ -189,6 +189,8 @@
     "copyElementLink": "نسخ رابط الكائن",
     "linkToElement": "رابط إلى الكائن",
     "wrapSelectionInFrame": "تغليف التحديد في إطار",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
