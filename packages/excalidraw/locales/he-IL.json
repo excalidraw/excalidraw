@@ -189,6 +189,8 @@
     "copyElementLink": "העתקת קישור לפריט",
     "linkToElement": "קישור לפריט",
     "wrapSelectionInFrame": "לעטוף את הבחירה במסגרת",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "לשונית",
     "shapeSwitch": "החלפת צורה",
     "preferences": "העדפות",
