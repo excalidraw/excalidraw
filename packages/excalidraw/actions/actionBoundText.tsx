@@ -4,7 +4,6 @@ import {
   TEXT_ALIGN,
   VERTICAL_ALIGN,
   arrayToMap,
-  getFontString,
   isTransparent,
 } from "@excalidraw/common";
 import {
@@ -33,7 +32,7 @@ import {
   isUsingAdaptiveRadius,
 } from "@excalidraw/element";
 
-import { getNonDeletedElements, measureText } from "@excalidraw/element";
+import { getNonDeletedElements } from "@excalidraw/element";
 
 import { syncMovedIndices } from "@excalidraw/element";
 
@@ -65,17 +64,15 @@ import { register } from "./register";
 import type { ActionResult } from "./types";
 import type { AppClassProperties, AppState } from "../types";
 
-/** frees the container's text, unwrapped where it rendered */
+/**
+ * Frees the container's text as it rendered: wrapped the same, at a fixed
+ * width.
+ */
 export const unbindTextFromContainer = (
   container: ExcalidrawElement,
   boundTextElement: ExcalidrawTextElementWithContainer,
   scene: Scene,
 ) => {
-  const { width, height } = measureText(
-    boundTextElement.originalText,
-    getFontString(boundTextElement),
-    boundTextElement.lineHeight,
-  );
   const { x, y } = computeBoundTextPosition(
     container,
     boundTextElement,
@@ -83,9 +80,7 @@ export const unbindTextFromContainer = (
   );
   scene.mutateElement(boundTextElement as ExcalidrawTextElement, {
     containerId: null,
-    width,
-    height,
-    text: boundTextElement.originalText,
+    autoResize: false,
     baseFontSize: null,
     x,
     y,

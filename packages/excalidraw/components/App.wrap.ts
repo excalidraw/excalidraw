@@ -1,5 +1,3 @@
-import { TEXT_ALIGN } from "@excalidraw/common";
-
 import {
   BoundElement,
   CaptureUpdateAction,
@@ -53,11 +51,13 @@ type UnwrappedContainer = {
   textId: ExcalidrawTextElement["id"];
   baseFontSize: ExcalidrawTextElement["baseFontSize"];
   labelPosition: ExcalidrawTextElement["labelPosition"];
-  /** the freed text as it landed, to tell how far it moved since */
-  text: Pick<
-    ExcalidrawTextElement,
-    "x" | "y" | "width" | "height" | "fontSize"
-  >;
+  autoResize: ExcalidrawTextElement["autoResize"];
+  /**
+   * the freed text as it landed, to tell how far it moved since (it doesn't
+   * auto-resize, so a font size change doesn't move it) and whether it was
+   * resized
+   */
+  text: Pick<ExcalidrawTextElement, "x" | "y" | "fontSize">;
   /** the arrows bound to the container, as they were bound */
   arrows: Pick<ExcalidrawArrowElement, "id" | "startBinding" | "endBinding">[];
 };
@@ -68,30 +68,6 @@ const rebind = (
   toId: ExcalidrawElement["id"],
 ) =>
   binding?.elementId === fromId ? { ...binding, elementId: toId } : binding;
-
-/**
- * How far the text moved since: a font size change keeps the text's alignment
- * edge and middle in place (any other change, its top left), so resizing it
- * doesn't count as a move.
- */
-const getTextMove = (
-  prev: UnwrappedContainer["text"],
-  text: ExcalidrawTextElement,
-) => {
-  if (text.fontSize === prev.fontSize) {
-    return [text.x - prev.x, text.y - prev.y] as const;
-  }
-  const alignment =
-    text.textAlign === TEXT_ALIGN.LEFT
-      ? 0
-      : text.textAlign === TEXT_ALIGN.CENTER
-      ? 0.5
-      : 1;
-  return [
-    text.x + text.width * alignment - (prev.x + prev.width * alignment),
-    text.y + text.height / 2 - (prev.y + prev.height / 2),
-  ] as const;
-};
 
 /**
  * Wraps the selection in what fits it, or unwraps it, preferring containers
@@ -228,20 +204,15 @@ export class AppWrap {
         return arrow && isArrowElement(arrow) ? [arrow] : [];
       });
 
-      const { baseFontSize, labelPosition } = text;
+      const { baseFontSize, labelPosition, autoResize } = text;
       unbindTextFromContainer(container, text, scene);
       unwrapped.push({
         containerId: container.id,
         textId: text.id,
         baseFontSize,
         labelPosition,
-        text: {
-          x: text.x,
-          y: text.y,
-          width: text.width,
-          height: text.height,
-          fontSize: text.fontSize,
-        },
+        autoResize,
+        text: { x: text.x, y: text.y, fontSize: text.fontSize },
         arrows: arrows.map(({ id, startBinding, endBinding }) => ({
           id,
           startBinding,
@@ -345,7 +316,9 @@ export class AppWrap {
       // except an arrow anchored to the elements it connects
       const isAnchored =
         isArrowContainer && !!(container.startBinding || container.endBinding);
-      const [dx, dy] = isAnchored ? [0, 0] : getTextMove(entry.text, text);
+      const [dx, dy] = isAnchored
+        ? [0, 0]
+        : [text.x - entry.text.x, text.y - entry.text.y];
       const stickyInk = getStickyNoteInk(text, container);
       scene.mutateElement(container, {
         frameId: text.frameId,
@@ -391,6 +364,7 @@ export class AppWrap {
             ? normalizeStickyNoteFontSize(text.fontSize)
             : entry.baseFontSize,
         labelPosition: entry.labelPosition,
+        autoResize: entry.autoResize,
         ...(stickyInk ? { strokeColor: stickyInk } : null),
         // a label carries no arrows of its own
         boundElements: null,

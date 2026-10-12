@@ -156,6 +156,44 @@ describe("wrap (w)", () => {
     expect(selectedIds().sort()).toEqual(["rect-label", "text"]);
   });
 
+  it("unwraps a text as it rendered, at a fixed width", () => {
+    const rectangle = API.createElement({
+      type: "rectangle",
+      id: "rect",
+      width: 120,
+      height: 100,
+    });
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      x: 300,
+      text: "a label long enough to wrap",
+    });
+    API.setElements([rectangle, text]);
+    API.setSelectedElements([rectangle, text]);
+    pressW();
+    const label = getElement<ExcalidrawTextElement>("text");
+    const { width, text: wrapped } = label;
+    expect(wrapped).toContain("\n");
+
+    API.setSelectedElements([getElement("rect")]);
+    pressW();
+
+    expect(getElement<ExcalidrawTextElement>("text")).toMatchObject({
+      containerId: null,
+      autoResize: false,
+      width,
+      text: wrapped,
+    });
+
+    pressW();
+
+    expect(getElement<ExcalidrawTextElement>("text")).toMatchObject({
+      containerId: "rect",
+      autoResize: true,
+    });
+  });
+
   it("brings back the unwrapped containers, arrows included", () => {
     const [diamond, label] = createLabeled("diamond", "diamond", [
       { type: "text", id: "diamond-label" },
