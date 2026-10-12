@@ -189,6 +189,8 @@
     "copyElementLink": "คัดลอกลิงค์ไปสู่วัตถุ",
     "linkToElement": "ลิงค์ไปสู่วัตถุ",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "แท็บ",
     "shapeSwitch": "",
     "preferences": "การตั้งค่า",
