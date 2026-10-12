@@ -189,6 +189,8 @@
     "copyElementLink": "Copiere link către obiect",
     "linkToElement": "Link către obiect",
     "wrapSelectionInFrame": "Încapsulare selecție în cadru",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Filă",
     "shapeSwitch": "Comutare formă",
     "preferences": "Preferințe",
