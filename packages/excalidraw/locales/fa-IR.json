@@ -189,6 +189,8 @@
     "copyElementLink": "کپی لینک به آیتم",
     "linkToElement": "لینک به آیتم",
     "wrapSelectionInFrame": "انتخاب را در قاب قرار دهید",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "تعویض شکل",
     "preferences": "ترجیحات",
