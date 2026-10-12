@@ -189,6 +189,8 @@
     "copyElementLink": "Kopiera länk till objektet",
     "linkToElement": "Länk till objektet",
     "wrapSelectionInFrame": "Omslut urvaled i ram",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Flik",
     "shapeSwitch": "Byt form",
     "preferences": "Inställningar",
