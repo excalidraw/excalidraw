@@ -2323,6 +2323,12 @@ export class LinearElementEditor {
         fixedSegments: nextFixedSegments,
       });
 
+      // the update is discarded if the arrow is bound to a missing or deleted
+      // element (e.g. concurrent remote edit)
+      if (!element.fixedSegments?.[offset]) {
+        return linearElement;
+      }
+
       const point = pointFrom<GlobalPoint>(
         element.x +
           (element.fixedSegments![offset].start[0] +

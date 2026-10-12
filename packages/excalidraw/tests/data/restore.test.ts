@@ -22,6 +22,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawStickyNoteElement,
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -102,6 +103,479 @@ describe("restoreElements", () => {
     expect(restored[0].id).not.toBe(restored[1].id);
   });
 
+  it.each([
+    [1e300, restore.MAX_ELEMENT_VERSION],
+    [Infinity, 1],
+    [-Infinity, 1],
+    [NaN, 1],
+    ["zzz", 1],
+    [{}, 1],
+    [-5, 1],
+    [0, 1],
+    [2.7, 2],
+    [42, 42],
+    [restore.MAX_ELEMENT_VERSION, restore.MAX_ELEMENT_VERSION],
+  ])("normalizes version=%s to %s", (version, expected) => {
+    const element = {
+      ...API.createElement({
+        type: "rectangle",
+        index: "a0" as FractionalIndex,
+      }),
+      version,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.version).toBe(expected);
+    // bumps must remain effective
+    expect(restored.version + 1).not.toBe(restored.version);
+  });
+
+  it.each([
+    [-1e300, 0],
+    [1e300, 0],
+    [NaN, 0],
+    [Infinity, 0],
+    ["zzz", 0],
+    [1.5, 0],
+    [2 ** 31, 0],
+    [-(2 ** 31), -(2 ** 31)],
+    [0, 0],
+    [123456789, 123456789],
+    [2 ** 31 - 1, 2 ** 31 - 1],
+  ])("normalizes versionNonce=%s to %s", (versionNonce, expected) => {
+    const element = {
+      ...API.createElement({
+        type: "rectangle",
+        index: "a0" as FractionalIndex,
+      }),
+      versionNonce,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.versionNonce).toBe(expected);
+  });
+
+  it.each([
+    [{}, []],
+    ["abc", []],
+    [123, []],
+    [null, []],
+    [undefined, []],
+    [
+      [null, {}, 1, "", "g1", ["g2"], "g3"],
+      ["g1", "g3"],
+    ],
+    [
+      ["inner", "middle", "outer"],
+      ["inner", "middle", "outer"],
+    ],
+  ])("normalizes groupIds=%j to %j", (groupIds, expected) => {
+    const element = {
+      ...API.createElement({ type: "rectangle" }),
+      groupIds,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null, {
+      repairBindings: true,
+    });
+    expect(restored.groupIds).toEqual(expected);
+  });
+
+  it.each([
+    [{}, []],
+    [{ a: 1 }, []],
+    ["abc", []],
+    [123, []],
+    [true, []],
+    [null, []],
+    [undefined, []],
+    [
+      [
+        null,
+        1,
+        "b1",
+        {},
+        { type: "arrow" },
+        { type: "arrow", id: "" },
+        { type: "arrow", id: 1 },
+        { type: "line", id: "b2" },
+        { type: "arrow", id: "a1", extra: "x" },
+        { type: "text", id: "t1" },
+      ],
+      [
+        { type: "arrow", id: "a1" },
+        { type: "text", id: "t1" },
+      ],
+    ],
+  ])("normalizes boundElements=%j to %j", (boundElements, expected) => {
+    const element = {
+      ...API.createElement({ type: "rectangle" }),
+      boundElements,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.boundElements).toEqual(expected);
+  });
+
+  it.each([
+    [{}, 100],
+    [{ a: 1 }, 100],
+    [[50], 100],
+    ["50", 100],
+    [true, 100],
+    [NaN, 100],
+    [Infinity, 100],
+    [-Infinity, 100],
+    [null, 100],
+    [undefined, 100],
+    [-10, 0],
+    [150, 100],
+    [0, 0],
+    [50, 50],
+    [100, 100],
+  ])("normalizes opacity=%j to %j", (opacity, expected) => {
+    const element = {
+      ...API.createElement({ type: "rectangle" }),
+      opacity,
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.opacity).toBe(expected);
+  });
+
+  describe("fixedSegments", () => {
+    // 5 points -> segments 1..4, of which only 2 and 3 may be fixed
+    const points = [
+      pointFrom<LocalPoint>(0, 0),
+      pointFrom<LocalPoint>(50, 0),
+      pointFrom<LocalPoint>(50, 100),
+      pointFrom<LocalPoint>(150, 100),
+      pointFrom<LocalPoint>(150, 200),
+    ];
+    const seg2 = { start: [50, 0], end: [50, 100], index: 2 };
+    const seg3 = { start: [50, 100], end: [150, 100], index: 3 };
+
+    const restoreElbowArrow = (
+      fixedSegments: unknown,
+      arrowPoints: LocalPoint[] = points,
+    ) => {
+      const element = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed: true,
+          points: arrowPoints,
+        }),
+        fixedSegments,
+      } as unknown as ExcalidrawElement;
+
+      const [restored] = restore.restoreElements([element], null);
+      return restored as ExcalidrawElbowArrowElement;
+    };
+
+    it.each([
+      "str",
+      "",
+      123,
+      true,
+      {},
+      { length: 1 },
+      { length: 1, 0: seg2 },
+      null,
+      undefined,
+      [],
+    ])("normalizes fixedSegments=%j to null", (fixedSegments) => {
+      expect(restoreElbowArrow(fixedSegments).fixedSegments).toBe(null);
+    });
+
+    it.each([
+      [[null, undefined, 1, "seg", [], {}, [50, 0]]],
+      [[{ start: [50, 0], end: [50, 100] }]],
+      [[{ start: [50, 0], end: [50, 100], index: "2" }]],
+      [[{ start: [50, 0], end: [50, 100], index: 2.5 }]],
+      [[{ start: [50, 0], end: [50, 100], index: NaN }]],
+      [[{ start: "50,0", end: [50, 100], index: 2 }]],
+      [[{ start: [50, 0], end: null, index: 2 }]],
+      [[{ start: [50], end: [50, 100], index: 2 }]],
+      [[{ start: [50, 0, 1], end: [50, 100], index: 2 }]],
+      [[{ start: [50, "0"], end: [50, 100], index: 2 }]],
+      [[{ start: [50, Infinity], end: [50, 100], index: 2 }]],
+      // neither horizontal nor vertical
+      [[{ start: [0, 0], end: [50, 100], index: 2 }]],
+      // first and last segments cannot be fixed
+      [[{ start: [0, 0], end: [50, 0], index: 1 }]],
+      [[{ start: [150, 100], end: [150, 200], index: 4 }]],
+      // out of range
+      [[{ start: [50, 0], end: [50, 100], index: 0 }]],
+      [[{ start: [50, 0], end: [50, 100], index: -2 }]],
+      [[{ start: [50, 0], end: [50, 100], index: 5 }]],
+      [[{ start: [50, 0], end: [50, 100], index: 1e9 }]],
+    ])("normalizes invalid fixedSegments=%j to null", (fixedSegments) => {
+      expect(restoreElbowArrow(fixedSegments).fixedSegments).toBe(null);
+    });
+
+    it("keeps only valid fixedSegments, sorted and deduplicated", () => {
+      const restored = restoreElbowArrow([
+        "junk",
+        null,
+        { ...seg3, extra: "x" },
+        { start: [0, 0], end: [50, 0], index: 1 },
+        seg2,
+        { ...seg2, start: [50, 10] },
+        { start: [150, 100], end: [150, 200], index: 4 },
+        { start: [50, 0], end: [50, 100], index: 7 },
+      ]);
+
+      expect(restored.fixedSegments).toEqual([seg2, seg3]);
+      expect(restored.fixedSegments?.[1]).not.toHaveProperty("extra");
+    });
+
+    it("keeps valid fixedSegments", () => {
+      expect(restoreElbowArrow([seg2, seg3]).fixedSegments).toEqual([
+        seg2,
+        seg3,
+      ]);
+    });
+
+    it("drops fixedSegments of elbow arrows with less than 4 points", () => {
+      expect(
+        restoreElbowArrow(
+          [seg2],
+          [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(50, 100)],
+        ).fixedSegments,
+      ).toBe(null);
+    });
+  });
+
+  describe("arrow bindings", () => {
+    const restoreArrow = (
+      startBinding: unknown,
+      { elbowed = false }: { elbowed?: boolean } = {},
+    ) => {
+      const element = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+        }),
+        startBinding,
+      } as unknown as ExcalidrawElement;
+
+      const [restored] = restore.restoreElements([element], null);
+      return restored as ExcalidrawArrowElement;
+    };
+
+    describe.each([
+      ["elbow", true],
+      ["simple", false],
+    ])("%s arrow", (_, elbowed) => {
+      it.each([
+        null,
+        undefined,
+        "str",
+        "",
+        123,
+        NaN,
+        Infinity,
+        true,
+        // wrapped, as it.each spreads array cases into arguments
+        [[]],
+        [[1, "a"]],
+        {},
+        { a: 1 },
+        { elementId: 123, mode: "orbit" },
+        { elementId: {}, mode: "orbit" },
+        { elementId: ["rect"], mode: "orbit" },
+        { elementId: "", mode: "orbit" },
+      ])("normalizes startBinding=%j to null", (binding) => {
+        expect(restoreArrow(binding, { elbowed }).startBinding).toBe(null);
+      });
+
+      it.each([
+        ["str", [0.5001, 0.5001]],
+        [
+          [NaN, 1],
+          [0.5001, 0.5001],
+        ],
+        [[1], [0.5001, 0.5001]],
+        [
+          [1, 0.5, 0],
+          [0.5001, 0.5001],
+        ],
+        [{}, [0.5001, 0.5001]],
+        [null, [0.5001, 0.5001]],
+        [
+          [1, Infinity],
+          [0.5001, 0.5001],
+        ],
+        [
+          [1e9, -1e9],
+          [10, -10],
+        ],
+        [
+          [1, 0.25],
+          [1, 0.25],
+        ],
+      ])("normalizes fixedPoint=%j to %j", (fixedPoint, expected) => {
+        expect(
+          restoreArrow(
+            { elementId: "rect", fixedPoint, mode: "orbit" },
+            { elbowed },
+          ).startBinding?.fixedPoint,
+        ).toEqual(expected);
+      });
+
+      it.each([
+        [123, "orbit"],
+        [{}, "orbit"],
+        ["bogus", "orbit"],
+        [true, "orbit"],
+        ["inside", "inside"],
+        ["orbit", "orbit"],
+        ["skip", "skip"],
+      ])("normalizes mode=%j to %j", (mode, expected) => {
+        expect(
+          restoreArrow(
+            { elementId: "rect", fixedPoint: [1, 0.25], mode },
+            { elbowed },
+          ).startBinding?.mode,
+        ).toBe(expected);
+      });
+
+      it("keeps only known binding props", () => {
+        expect(
+          restoreArrow(
+            {
+              elementId: "rect",
+              fixedPoint: [1, 0.25],
+              mode: "inside",
+              extra: "x",
+            },
+            { elbowed },
+          ).startBinding,
+        ).toEqual({ elementId: "rect", fixedPoint: [1, 0.25], mode: "inside" });
+      });
+    });
+
+    it("defaults elbow arrow binding mode to orbit", () => {
+      expect(
+        restoreArrow(
+          { elementId: "rect", fixedPoint: [1, 0.25] },
+          { elbowed: true },
+        ).startBinding,
+      ).toEqual({ elementId: "rect", fixedPoint: [1, 0.25], mode: "orbit" });
+    });
+
+    it.each([
+      [true, true],
+      [false, false],
+      [null, null],
+      [undefined, null],
+      ["true", null],
+      [1, null],
+      [{}, null],
+    ])("normalizes startIsSpecial/endIsSpecial=%j to %j", (value, expected) => {
+      const element = {
+        ...API.createElement({
+          type: "arrow",
+          elbowed: true,
+          points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+        }),
+        startIsSpecial: value,
+        endIsSpecial: value,
+      } as unknown as ExcalidrawElement;
+
+      const [restored] = restore.restoreElements([element], null) as [
+        ExcalidrawElbowArrowElement,
+      ];
+      expect(restored.startIsSpecial).toBe(expected);
+      expect(restored.endIsSpecial).toBe(expected);
+    });
+  });
+
+  it("keeps valid boundElements on repair", () => {
+    const container = API.createElement({ type: "rectangle" });
+    const arrow = API.createElement({ type: "arrow" });
+    const text = API.createElement({
+      type: "text",
+      containerId: container.id,
+    });
+    const element = {
+      ...container,
+      boundElements: [
+        { type: "arrow", id: arrow.id },
+        { type: "text", id: text.id },
+        "junk",
+      ],
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element, arrow, text], null, {
+      repairBindings: true,
+    });
+    expect(restored.boundElements).toEqual([
+      { type: "arrow", id: arrow.id },
+      { type: "text", id: text.id },
+    ]);
+  });
+
+  it.each([{}, "abc", 123, true, { a: 1 }])(
+    "does not drop element with legacy boundElementIds=%j",
+    (boundElementIds) => {
+      const element = {
+        ...API.createElement({ type: "rectangle" }),
+        boundElements: [{ type: "arrow", id: "a1" }],
+        boundElementIds,
+      } as unknown as ExcalidrawElement;
+
+      const restored = restore.restoreElements([element], null);
+      expect(restored).toHaveLength(1);
+      // falls back to (valid) boundElements
+      expect(restored[0].boundElements).toEqual([{ type: "arrow", id: "a1" }]);
+      expect("boundElementIds" in restored[0]).toBe(false);
+    },
+  );
+
+  it("migrates valid legacy boundElementIds", () => {
+    const element = {
+      ...API.createElement({ type: "rectangle" }),
+      boundElementIds: ["a1", "", null, 2, "a2"],
+    } as unknown as ExcalidrawElement;
+
+    const [restored] = restore.restoreElements([element], null);
+    expect(restored.boundElements).toEqual([
+      { type: "arrow", id: "a1" },
+      { type: "arrow", id: "a2" },
+    ]);
+  });
+
+  it("keeps scene version bumpable after restoring a pinned version", () => {
+    const evil = {
+      ...API.createElement({ type: "rectangle", isDeleted: true }),
+      version: 1e300,
+      versionNonce: -1e300,
+      updated: 8.64e15,
+    } as unknown as ExcalidrawElement;
+    const normal = API.createElement({ type: "rectangle" });
+
+    const restored = restore.restoreElements([evil, normal], null);
+    const sceneVersion = restored.reduce((acc, el) => acc + el.version, 0);
+    expect(Number.isSafeInteger(sceneVersion)).toBe(true);
+    expect(sceneVersion + 1).toBeGreaterThan(sceneVersion);
+    expect(restored[0].updated).toBeLessThanOrEqual(Date.now());
+  });
+
+  it.each([Infinity, NaN, "zzz"])(
+    "normalizes non-finite updated=%s",
+    (updated) => {
+      const element = {
+        ...API.createElement({ type: "rectangle" }),
+        updated,
+      } as unknown as ExcalidrawElement;
+
+      const [restored] = restore.restoreElements([element], null);
+      expect(Number.isFinite(restored.updated)).toBe(true);
+    },
+  );
+
   it("should restore transparent sticky note stroke as black", () => {
     const stickyNote = {
       ...API.createElement({ type: "stickynote" }),
@@ -120,6 +594,24 @@ describe("restoreElements", () => {
 
   it("should return empty array when element is null", () => {
     expect(restore.restoreElements(null, null)).toStrictEqual([]);
+  });
+
+  it("should return empty array when input is not an array", () => {
+    for (const input of [{}, "x", 1, true]) {
+      expect(restore.restoreElements(input as any, null)).toStrictEqual([]);
+    }
+  });
+
+  it("should skip null and primitive entries", () => {
+    const rectElement = API.createElement({ type: "rectangle" });
+    const restoredElements = restore.restoreElements(
+      [null, 1, "a", undefined, true, {}, rectElement] as any,
+      null,
+      { repairBindings: true },
+    );
+    expect(restoredElements).toEqual([
+      expect.objectContaining({ id: rectElement.id, type: "rectangle" }),
+    ]);
   });
 
   it("should not call isInvisiblySmallElement when element is a selection element", () => {

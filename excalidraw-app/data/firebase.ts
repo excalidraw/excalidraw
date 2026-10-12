@@ -108,11 +108,22 @@ const decryptElements = async (
   const ciphertext = data.ciphertext.toUint8Array() as Uint8Array<ArrayBuffer>;
   const iv = data.iv.toUint8Array() as Uint8Array<ArrayBuffer>;
 
+  // NOTE decryption failures (wrong key, tampered ciphertext) intentionally
+  // throw so that we never overwrite a scene we can't read
   const decrypted = await decryptData(iv, ciphertext, roomKey);
   const decodedData = new TextDecoder("utf-8").decode(
     new Uint8Array(decrypted),
   );
-  return JSON.parse(decodedData);
+
+  // the payload authenticated with the room key, but its contents may still
+  // be unreadable (corrupted, or a format we don't understand). Throw rather
+  // than treating it as an empty scene, as the next save would otherwise
+  // reconcile against nothing and irrecoverably replace the stored scene.
+  const elements = JSON.parse(decodedData);
+  if (!Array.isArray(elements)) {
+    throw new Error("Stored scene is not an array of elements");
+  }
+  return elements;
 };
 
 class FirebaseSceneVersionCache {
