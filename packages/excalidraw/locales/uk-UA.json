@@ -189,6 +189,8 @@
     "copyElementLink": "Копіювати посилання на об'єкт",
     "linkToElement": "Посилання на об’єкт",
     "wrapSelectionInFrame": "Обтікання виділеного фрагмента рамкою",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
