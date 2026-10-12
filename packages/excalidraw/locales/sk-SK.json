@@ -189,6 +189,8 @@
     "copyElementLink": "Kopírovať odkaz na objekt",
     "linkToElement": "Odkaz na objekt",
     "wrapSelectionInFrame": "Zabaliť výber do rámu",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "Zmeniť tvar",
     "preferences": "Nastavenia",
