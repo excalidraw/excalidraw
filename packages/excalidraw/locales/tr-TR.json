@@ -189,6 +189,8 @@
     "copyElementLink": "Bağlantıyı nesneye kopyala",
     "linkToElement": "Nesneye bağlantıla",
     "wrapSelectionInFrame": "Seçimi karede kaydır",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Sekme",
     "shapeSwitch": "Şekli başkasıyla değiştir",
     "preferences": "Tercihler",
