@@ -550,12 +550,7 @@ exports[`given element A and group of elements B and given both are selected whe
     "id3": true,
   },
   "selectedElementsAreBeingDragged": false,
-  "selectedGroupIds": {
-    "id0": true,
-    "id12": false,
-    "id3": true,
-    "id6": true,
-  },
+  "selectedGroupIds": {},
   "selectedLinearElement": null,
   "selectionElement": null,
   "shouldCacheIgnoreZoom": false,
@@ -846,12 +841,7 @@ exports[`given element A and group of elements B and given both are selected whe
       "delta": Delta {
         "deleted": {
           "selectedElementIds": {},
-          "selectedGroupIds": {
-            "id0": true,
-            "id12": false,
-            "id3": true,
-            "id6": true,
-          },
+          "selectedGroupIds": {},
         },
         "inserted": {
           "selectedElementIds": {

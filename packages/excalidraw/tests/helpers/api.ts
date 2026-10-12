@@ -27,7 +27,7 @@ import {
 } from "@excalidraw/element";
 
 import { isUsingAdaptiveRadius, getSelectedElements } from "@excalidraw/element";
-import { selectGroupsForSelectedElements } from "@excalidraw/element";
+
 
 import { FONT_SIZES } from "@excalidraw/common";
 
@@ -51,6 +51,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
+
+import { selectGroupsForSelectedElements } from "../../components/App.selection";
 
 import { getMimeType } from "../../data/blob";
 import { createTestHook } from "../../components/App";

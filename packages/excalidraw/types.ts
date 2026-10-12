@@ -1227,6 +1227,7 @@ export type AppClassProperties = {
   toolDrag: App["toolDrag"];
   activeResizeHandle: App["activeResizeHandle"];
   selectionTool: App["selectionTool"];
+  wrap: App["wrap"];
   modifiers: App["modifiers"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
@@ -1320,6 +1321,9 @@ export type PointerDownState = Readonly<{
     // by default same as PointerDownState.origin. On alt-duplication, reset
     // to current pointer position at time of duplication.
     origin: { x: number; y: number };
+    // The offset from origin (axis-locked with shift) as of the previous
+    // pointer move in the crop editor, which moves the image by the change
+    lastOffset: { x: number; y: number };
     // explicit flag for specific scenarios such as:
     // - after lasso selection until the next pointer down
     blockDragging: boolean;
@@ -1375,6 +1379,24 @@ export interface ExcalidrawImperativeAPI {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
+  /**
+   * Selects elements (or their ids — one or many), adds them to or removes
+   * them from the selection, or clears it — as the editor does: an element is
+   * selected with its group (unless `deep`), a frame and its children aren't
+   * selected at the same time, and locked elements are skipped (unless
+   * `includeLocked`). Text editing and cropping end, and the link popup of a
+   * lone selected element shows. Missing and deleted elements are skipped.
+   *
+   * By default the change is recorded for undo along with the next undoable
+   * change — pass `captureUpdate` as for `updateScene()` otherwise. Like
+   * `updateScene()`, it applies on the next render: read it back through
+   * `onChange()` or `getAppState()` after that. Works in view mode too, where
+   * the selection shows without transform handles.
+   */
+  selection: Pick<
+    InstanceType<typeof App>["selection"],
+    "select" | "add" | "remove" | "clear"
+  >;
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];

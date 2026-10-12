@@ -3,6 +3,7 @@ import { vi } from "vitest";
 
 import { KEYS, ROUNDNESS, arrayToMap, reseed } from "@excalidraw/common";
 import {
+  CaptureUpdateAction,
   getElementBounds,
   getElementLineSegments,
   getElementsWithinSelection,
@@ -16,6 +17,7 @@ import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
 import { API } from "./helpers/api";
+import { getTextEditor, updateTextEditor } from "./queries/dom";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
 import {
   act,
@@ -26,6 +28,7 @@ import {
   restoreOriginalGetBoundingClientRect,
   assertSelectedElements,
   unmountComponent,
+  waitFor,
 } from "./test-utils";
 
 unmountComponent();
@@ -199,6 +202,31 @@ describe("lasso reselection", () => {
     });
 
     assertSelectedElements([rectA.id]);
+  });
+});
+
+describe("lasso on touch devices", () => {
+  it("a tap selects the element", async () => {
+    await render(<Excalidraw UIOptions={{ getFormFactor: () => "tablet" }} />);
+    fireEvent.resize(window);
+    await waitFor(() =>
+      expect(h.app.editorInterface.formFactor).toBe("tablet"),
+    );
+    const rectangle = API.createElement({
+      type: "rectangle",
+      width: 100,
+      height: 100,
+      backgroundColor: "red",
+      fillStyle: "solid",
+    });
+    API.setElements([rectangle]);
+    act(() => {
+      h.app.setActiveTool({ type: "lasso" });
+    });
+
+    mouse.clickAt(50, 50);
+
+    assertSelectedElements([rectangle.id]);
   });
 });
 
@@ -1291,6 +1319,323 @@ describe("inner box-selection", () => {
       expect(h.state.selectedGroupIds).toEqual({});
       mouse.up();
     });
+  });
+});
+
+describe("app.selection", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  const createFrame = (groupIds: string[] = []) => {
+    const frame = API.createElement({
+      type: "frame",
+      width: 200,
+      height: 200,
+      groupIds,
+    });
+    const child = API.createElement({
+      type: "rectangle",
+      x: 10,
+      y: 10,
+      frameId: frame.id,
+    });
+    return { frame, child };
+  };
+
+  it("add() of a frame deselects its children", () => {
+    const { frame, child } = createFrame();
+    const other = API.createElement({ type: "rectangle", x: 300 });
+    API.setElements([child, frame, other]);
+    API.setSelectedElements([child, other]);
+
+    act(() => h.app.selection.add(frame));
+
+    assertSelectedElements([other.id, frame.id]);
+  });
+
+  it("add() doesn't add a child of a selected frame", () => {
+    const { frame, child } = createFrame();
+    API.setElements([child, frame]);
+    API.setSelectedElements([frame]);
+
+    act(() => h.app.selection.add(child));
+
+    assertSelectedElements([frame.id]);
+  });
+
+  it("add() of an element grouped with a frame deselects that frame's children", () => {
+    const { frame, child } = createFrame(["group"]);
+    const grouped = API.createElement({
+      type: "rectangle",
+      x: 300,
+      groupIds: ["group"],
+    });
+    API.setElements([child, frame, grouped]);
+    API.setSelectedElements([child]);
+
+    act(() => h.app.selection.add(grouped));
+    assertSelectedElements([frame.id, grouped.id]);
+
+    // the child added along with it, too
+    act(() => h.app.selection.clear());
+    act(() => h.app.selection.add([child, grouped]));
+    assertSelectedElements([frame.id, grouped.id]);
+    act(() => h.app.selection.select([child, grouped]));
+    assertSelectedElements([frame.id, grouped.id]);
+  });
+
+  it("add() replaces the selection in the element link selector", () => {
+    const source = API.createElement({ type: "rectangle" });
+    const target = API.createElement({ type: "rectangle", x: 300 });
+    const linked = API.createElement({ type: "rectangle", x: 600 });
+    API.setElements([source, target, linked]);
+    API.setAppState({
+      openDialog: { name: "elementLinkSelector", sourceElementId: source.id },
+    });
+    // (opening the selector clears the selection)
+    API.setSelectedElements([linked]);
+    assertSelectedElements([linked.id]);
+
+    act(() => h.app.selection.add(target));
+
+    assertSelectedElements([target.id]);
+  });
+
+  it("sets up the line editor of a lone selected arrow — not of one selected with its group", () => {
+    const [arrow, groupedArrow] = [0, 200].map((y) =>
+      API.createElement({
+        type: "arrow",
+        y,
+        width: 100,
+        height: 0,
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+        groupIds: y ? ["group"] : [],
+      }),
+    );
+    const sibling = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 200,
+      groupIds: ["group"],
+    });
+    const rectangle = API.createElement({ type: "rectangle", x: 300 });
+    API.setElements([arrow, rectangle, groupedArrow, sibling]);
+
+    act(() => h.app.selection.select(arrow));
+    assertSelectedElements([arrow.id]);
+    expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+    act(() => h.app.selection.select(rectangle));
+    assertSelectedElements([rectangle.id]);
+    expect(h.state.selectedLinearElement).toBe(null);
+
+    act(() => h.app.selection.clear());
+    act(() => h.app.selection.add(arrow));
+    expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+
+    act(() => h.app.selection.select(groupedArrow));
+    assertSelectedElements([groupedArrow.id, sibling.id]);
+    expect(h.state.selectedLinearElement).toBe(null);
+  });
+
+  it("takes elements or ids, one or many, skipping missing ones", () => {
+    const [a, b, c] = [0, 100, 200].map((x) =>
+      API.createElement({ type: "rectangle", x }),
+    );
+    API.setElements([a, b, c]);
+
+    act(() => h.app.selection.select([a.id, "missing", b, a]));
+    assertSelectedElements([a.id, b.id]);
+
+    act(() => h.app.selection.add(c.id));
+    assertSelectedElements([a.id, b.id, c.id]);
+
+    act(() => h.app.selection.remove([a, b.id]));
+    assertSelectedElements([c.id]);
+  });
+
+  it("add() of a frame along with its child selects the frame, in either order", () => {
+    const { frame, child } = createFrame();
+    API.setElements([child, frame]);
+
+    act(() => h.app.selection.add([child, frame]));
+    assertSelectedElements([frame.id]);
+
+    act(() => h.app.selection.clear());
+    act(() => h.app.selection.add([frame, child]));
+    assertSelectedElements([frame.id]);
+  });
+
+  it("remove() of an element selected via its group keeps the other selected groups", () => {
+    const [a1, a2, b1, b2] = ["a", "a", "b", "b"].map((groupId, index) =>
+      API.createElement({
+        type: "rectangle",
+        x: index * 100,
+        groupIds: [groupId],
+      }),
+    );
+    API.setElements([a1, a2, b1, b2]);
+    API.setSelectedElements([a1, a2, b1, b2]);
+
+    act(() => h.app.selection.remove(a1));
+
+    assertSelectedElements([b1.id, b2.id]);
+    expect(h.state.selectedGroupIds).toEqual({ b: true });
+  });
+
+  it("shows the link popup of a lone selected element with a link, whatever was selected before", () => {
+    const linked = API.createElement({ type: "rectangle" });
+    const other = API.createElement({ type: "rectangle", x: 300 });
+    API.setElements([linked, other]);
+    API.updateElement(linked, { link: "https://excalidraw.com" });
+
+    act(() => h.app.selection.select(linked.id));
+    expect(h.state.showHyperlinkPopup).toBe("info");
+
+    act(() => h.app.selection.select(other));
+    expect(h.state.showHyperlinkPopup).toBe(false);
+
+    act(() => h.app.selection.select(linked));
+    expect(h.state.showHyperlinkPopup).toBe("info");
+
+    act(() => h.app.selection.add(other));
+    expect(h.state.showHyperlinkPopup).toBe(false);
+
+    act(() => h.app.selection.remove(other));
+    expect(h.state.showHyperlinkPopup).toBe("info");
+
+    act(() => h.app.selection.clear());
+    expect(h.state.showHyperlinkPopup).toBe(false);
+  });
+
+  it("skips locked elements, unless includeLocked", () => {
+    const locked = API.createElement({ type: "rectangle", locked: true });
+    const other = API.createElement({ type: "rectangle", x: 300 });
+    API.setElements([locked, other]);
+
+    act(() => h.app.selection.select([locked, other]));
+    assertSelectedElements([other.id]);
+
+    act(() => h.app.selection.add(locked, { includeLocked: true }));
+    assertSelectedElements([locked.id, other.id]);
+  });
+
+  it("ends the cropping and deactivates the embed of what it deselects", () => {
+    const image = API.createElement({ type: "image" });
+    const embed = API.createElement({ type: "embeddable", x: 300 });
+    const other = API.createElement({ type: "rectangle", x: 600 });
+    API.setElements([image, embed, other]);
+
+    API.setSelectedElements([image]);
+    API.setAppState({ croppingElementId: image.id });
+    act(() => h.app.selection.select(image));
+    expect(h.state.croppingElementId).toBe(image.id);
+    act(() => h.app.selection.select(other));
+    expect(h.state.croppingElementId).toBe(null);
+
+    API.setSelectedElements([embed]);
+    API.setAppState({ activeEmbeddable: { element: embed, state: "active" } });
+    act(() => h.app.selection.add(other));
+    expect(h.state.activeEmbeddable?.element.id).toBe(embed.id);
+    act(() => h.app.selection.remove(embed));
+    expect(h.state.activeEmbeddable).toBe(null);
+  });
+
+  it("ends text editing (after the event), submitting the text, unless selecting the edited text", async () => {
+    const rectangle = API.createElement({ type: "rectangle", x: 300, y: 300 });
+    API.setElements([rectangle]);
+    const text = UI.createElement("text");
+    updateTextEditor(await getTextEditor(), "hello");
+
+    act(() => h.app.selection.add(text));
+    await act(async () => {});
+    expect(h.state.editingTextElement?.id).toBe(text.id);
+
+    act(() => h.app.selection.select(rectangle));
+    await act(async () => {});
+    expect(h.state.editingTextElement).toBe(null);
+    expect(API.getElement(text).text).toBe("hello");
+    assertSelectedElements([rectangle.id]);
+  });
+
+  it("records the change for undo with captureUpdate", () => {
+    const [a, b] = [0, 300].map((x) =>
+      API.createElement({ type: "rectangle", x }),
+    );
+    API.setElements([a, b]);
+    const { IMMEDIATELY } = CaptureUpdateAction;
+
+    act(() => h.app.selection.select(a, { captureUpdate: IMMEDIATELY }));
+    act(() => h.app.selection.select(b, { captureUpdate: IMMEDIATELY }));
+    act(() => {
+      h.app.actionManager.executeAction(h.app.actionManager.actions.undo);
+    });
+
+    assertSelectedElements([a.id]);
+  });
+
+  it("deep-selects the elements themselves, editing their shared group", () => {
+    const [a, b, c] = [0, 100, 200].map((x) =>
+      API.createElement({ type: "rectangle", x, groupIds: ["group"] }),
+    );
+    API.setElements([a, b, c]);
+
+    act(() => h.app.selection.select([a, b], { deep: true }));
+    assertSelectedElements([a.id, b.id]);
+    expect(h.state.editingGroupId).toBe("group");
+
+    // not sharing a group: none of their groups
+    const [d, e] = [0, 100].map((x) =>
+      API.createElement({ type: "rectangle", x, y: 200, groupIds: ["other"] }),
+    );
+    API.setElements([a, b, c, d, e]);
+    act(() => h.app.selection.select([a, d], { deep: true }));
+    assertSelectedElements([a.id, d.id]);
+    expect(h.state.editingGroupId).toBe(null);
+  });
+
+  it("remove() leaving an arrow alone sets up its line editor", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      width: 100,
+      height: 0,
+      points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(100, 0)],
+    });
+    const rectangle = API.createElement({ type: "rectangle", x: 300 });
+    API.setElements([arrow, rectangle]);
+    API.setSelectedElements([arrow, rectangle]);
+
+    act(() => h.app.selection.remove(rectangle));
+
+    assertSelectedElements([arrow.id]);
+    expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
+  });
+});
+
+describe("transform handles", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  it("show the resize cursor over the selection's handles", () => {
+    const [a, b] = [0, 200].map((x) =>
+      API.createElement({ type: "rectangle", x, width: 100, height: 100 }),
+    );
+    API.setElements([a, b]);
+    const cursor = () => GlobalTestState.interactiveCanvas.style.cursor;
+
+    // a lone element's right edge
+    API.setSelectedElements([a]);
+    mouse.moveTo(103, 50);
+    expect(cursor()).toBe("ew-resize");
+
+    // the selection's right edge
+    API.setSelectedElements([a, b]);
+    mouse.moveTo(303, 50);
+    expect(cursor()).toBe("ew-resize");
+    mouse.moveTo(150, 50);
+    expect(cursor()).not.toBe("ew-resize");
   });
 });
 

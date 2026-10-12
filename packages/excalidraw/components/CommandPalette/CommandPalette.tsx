@@ -314,6 +314,7 @@ function CommandPaletteInner({
         actionManager.actions.copy,
         actionManager.actions.deleteSelectedElements,
         actionManager.actions.wrapSelectionInFrame,
+        actionManager.actions.toggleWrap,
         actionManager.actions.copyStyles,
         actionManager.actions.pasteStyles,
         actionManager.actions.bringToFront,

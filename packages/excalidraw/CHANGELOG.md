@@ -13,10 +13,17 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
-### PDF import (2026-10-09) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+### PDF import (2026-10-12) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - PDFs can be dropped, pasted, picked through the image tool, or inserted via the new "Insert PDF" item in the "More tools" menu. Each page is rasterized into an image element (PNG, or JPEG for scans/photos when smaller, capped by `imageOptions.maxWidthOrHeight`) and the pages are laid out side by side at their real size (10 per row, each document on its own row). Placeholders appear right away and are swapped for the rendered pages once done, recorded as a single undo step. At most 50 pages are imported from a single PDF.
 - Uses [pdf.js](https://github.com/mozilla/pdf.js) (`pdfjs-dist`, legacy build), lazy-loaded on first import and parsing in a Web Worker (spawned from the `pdf-worker.chunk` chunk, falling back to the main thread when workers are unavailable). Optional pdf.js resources (CJK cmaps, standard fonts, JPEG 2000/JBIG2 decoders) are fetched from jsDelivr only when a PDF needs them.
+
+### Selection API (2026-10-10) [#12258](https://github.com/excalidraw/excalidraw/pull/12258)
+
+- New `excalidrawAPI.selection`: `select(elements, opts?)`, `add(elements, opts?)`, `remove(elements, opts?)` and `clear(opts?)`, taking elements or their ids, one or many. Missing and deleted elements are skipped.
+- It follows the editor's rules: an element is selected with its group, a frame and its children aren't selected at the same time, and locked elements are skipped. Text editing and cropping end, and the link popup of a lone selected element with a link shows.
+- Options: `deep` selects the elements themselves rather than their groups, editing their group if they share one (as Ctrl/Cmd+click does); `includeLocked` selects locked elements too; `captureUpdate` records the change for undo as for `updateScene()` — by default it's recorded along with the next undoable change.
+- Like `updateScene()`, the change applies on the next render: read it back through `onChange()` or `getAppState()` after that. It works in view mode too, where the selection shows without the transform handles.
 
 ### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
