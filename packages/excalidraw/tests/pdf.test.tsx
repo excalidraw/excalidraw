@@ -190,7 +190,11 @@ describe("PDF import", () => {
     Keyboard.undo();
     expect(h.elements.every((el) => el.isDeleted)).toBe(true);
     Keyboard.redo();
-    expect(h.elements.every((el) => !el.isDeleted && el.fileId)).toBe(true);
+    expect(
+      h.elements.every(
+        (el) => el.type === "image" && !el.isDeleted && el.fileId,
+      ),
+    ).toBe(true);
   });
 
   it("imports pasted PDF", async () => {
