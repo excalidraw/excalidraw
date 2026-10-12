@@ -147,7 +147,7 @@ import {
   isBindableElement,
   isTextElement,
   isStickyNoteElement,
-  getPerfectElementSize,
+  getLockedLinearCursorAlignSize,
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
@@ -500,6 +500,7 @@ const editorInterfaceContextInitialValue: EditorInterface = {
   canFitSidebar: false,
   isLandscape: true,
 };
+
 const EditorInterfaceContext = React.createContext<EditorInterface>(
   editorInterfaceContextInitialValue,
 );
@@ -8239,6 +8240,7 @@ class App extends React.Component<AppProps, AppState> {
     return {
       origin,
       withCmdOrCtrl: event[KEYS.CTRL_OR_CMD],
+      freeDrawSamples: [],
       originInGrid: tupleToCoors(
         getGridPoint(
           origin.x,
@@ -8875,6 +8877,12 @@ class App extends React.Component<AppProps, AppState> {
       pressures: simulatePressure ? [] : [event.pressure],
     });
 
+    pointerDownState.freeDrawSamples.push({
+      x: gridX,
+      y: gridY,
+      pressure: event.pressure,
+    });
+
     this.insertNewElement(element);
 
     this.setState((prevState) => {
@@ -8894,6 +8902,51 @@ class App extends React.Component<AppProps, AppState> {
       newElement: element,
       suggestedBinding: null,
     });
+  };
+
+  private getFreeDrawPoints = (
+    element: ExcalidrawFreeDrawElement,
+    pointerDownState: PointerDownState,
+    pointerCoords: { x: number; y: number },
+    pressure: number,
+    shiftKey: boolean,
+    isFinal = false,
+  ) => {
+    const samples = pointerDownState.freeDrawSamples;
+    const lastSample = samples[samples.length - 1];
+
+    if (
+      isFinal ||
+      pointerCoords.x !== lastSample.x ||
+      pointerCoords.y !== lastSample.y
+    ) {
+      samples.push({ ...pointerCoords, pressure });
+    }
+
+    if (shiftKey) {
+      const { width, height } = getLockedLinearCursorAlignSize(
+        0,
+        0,
+        pointerCoords.x - element.x,
+        pointerCoords.y - element.y,
+      );
+
+      return {
+        points: [element.points[0], pointFrom<LocalPoint>(width, height)],
+        pressures: element.simulatePressure
+          ? []
+          : [samples[0].pressure, pressure],
+      };
+    }
+
+    return {
+      points: samples.map(({ x, y }) =>
+        pointFrom<LocalPoint>(x - element.x, y - element.y),
+      ),
+      pressures: element.simulatePressure
+        ? []
+        : samples.map(({ pressure }) => pressure),
+    };
   };
 
   public insertIframeElement = ({
@@ -10117,50 +10170,26 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
-          const points = newElement.points;
-          let dx = pointerCoords.x - newElement.x;
-          let dy = pointerCoords.y - newElement.y;
-          if (event.shiftKey) {
-            ({ width: dx, height: dy } = getPerfectElementSize(
-              "freedraw",
-              dx,
-              dy,
-            ));
-          }
+          const { points, pressures } = this.getFreeDrawPoints(
+            newElement,
+            pointerDownState,
+            pointerCoords,
+            event.pressure,
+            event.shiftKey,
+          );
 
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint &&
-            lastPoint[0] === dx &&
-            lastPoint[1] === dy &&
-            (!event.shiftKey || points.length === 2);
+          this.scene.mutateElement(
+            newElement,
+            { points, pressures },
+            {
+              informMutation: false,
+              isDragging: false,
+            },
+          );
 
-          if (!discardPoint) {
-            const pressures = newElement.simulatePressure
-              ? newElement.pressures
-              : event.shiftKey
-              ? [newElement.pressures[0], event.pressure]
-              : [...newElement.pressures, event.pressure];
-
-            this.scene.mutateElement(
-              newElement,
-              {
-                points: [
-                  ...(event.shiftKey ? points.slice(0, 1) : points),
-                  pointFrom<LocalPoint>(dx, dy),
-                ],
-                pressures,
-              },
-              {
-                informMutation: false,
-                isDragging: false,
-              },
-            );
-
-            this.setState({
-              newElement,
-            });
-          }
+          this.setState({
+            newElement,
+          });
         } else if (isLinearElement(newElement) && !newElement.isDeleted) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;
@@ -10631,34 +10660,29 @@ class App extends React.Component<AppProps, AppState> {
           this.state,
         );
 
-        const points = newElement.points;
-        let dx = pointerCoords.x - newElement.x;
-        let dy = pointerCoords.y - newElement.y;
-        if (childEvent.shiftKey) {
-          ({ width: dx, height: dy } = getPerfectElementSize(
-            "freedraw",
-            dx,
-            dy,
-          ));
-        }
+        const { points: sampledPoints, pressures } = this.getFreeDrawPoints(
+          newElement,
+          pointerDownState,
+          pointerCoords,
+          childEvent.pressure,
+          childEvent.shiftKey,
+          true,
+        );
+        const points = [...sampledPoints];
+        const lastPoint = points[points.length - 1];
 
-        // Allows dots to avoid being flagged as infinitely small
-        if (dx === points[0][0] && dy === points[0][1]) {
-          dy += 0.0001;
-          dx += 0.0001;
+        // Keep dots visible without moving a Shift-constrained endpoint off its angle.
+        if (lastPoint[0] === points[0][0] && lastPoint[1] === points[0][1]) {
+          points[points.length - 1] = childEvent.shiftKey
+            ? pointFrom<LocalPoint>(lastPoint[0] + 0.0001, lastPoint[1])
+            : pointFrom<LocalPoint>(
+                lastPoint[0] + 0.0001,
+                lastPoint[1] + 0.0001,
+              );
         }
-
-        const pressures = newElement.simulatePressure
-          ? []
-          : childEvent.shiftKey
-          ? [newElement.pressures[0], childEvent.pressure]
-          : [...newElement.pressures, childEvent.pressure];
 
         this.scene.mutateElement(newElement, {
-          points: [
-            ...(childEvent.shiftKey ? points.slice(0, 1) : points),
-            pointFrom<LocalPoint>(dx, dy),
-          ],
+          points,
           pressures,
         });
 
