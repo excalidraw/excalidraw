@@ -118,9 +118,18 @@
   }
 
   &__icon {
+    display: flex;
     flex-shrink: 0;
-    width: 1.25rem;
-    height: 1.25rem;
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      stroke-width: 1.75;
+    }
+
+    g {
+      stroke-width: inherit;
+    }
   }
 
   &__text {
