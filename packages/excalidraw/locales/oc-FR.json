@@ -189,6 +189,8 @@
     "copyElementLink": "Copiar lo ligam cap a l’objècte",
     "linkToElement": "Ligam cap a l’objècte",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Onglet",
     "shapeSwitch": "",
     "preferences": "",
