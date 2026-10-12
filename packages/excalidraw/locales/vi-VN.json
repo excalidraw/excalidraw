@@ -189,6 +189,8 @@
     "copyElementLink": "Sao chép liên kết tới đối tượng",
     "linkToElement": "Liên kết đến đối tượng",
     "wrapSelectionInFrame": "Đưa vùng chọn vào khung",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
