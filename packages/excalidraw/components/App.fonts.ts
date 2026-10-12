@@ -1,4 +1,4 @@
-import { getFontString } from "@excalidraw/common";
+import { getFontFamilyString, getFontString } from "@excalidraw/common";
 
 import {
   CaptureUpdateAction,
@@ -18,6 +18,22 @@ import { Fonts } from "../fonts";
 
 import type App from "./App";
 
+/** adds each character of `chars` to the set kept under `family` */
+const addChars = (
+  charsByFamily: Map<string, Set<string>>,
+  family: string,
+  chars: string,
+) => {
+  let set = charsByFamily.get(family);
+  if (!set) {
+    set = new Set();
+    charsByFamily.set(family, set);
+  }
+  for (const char of chars) {
+    set.add(char);
+  }
+};
+
 /**
  * Owns font loading on behalf of the scene, and the correction of text
  * bounds that were measured before the fonts they need were loaded. Only
@@ -33,7 +49,35 @@ export class AppFonts {
    */
   private remeasureOnRestore = new Set<ExcalidrawElement["id"]>();
 
+  /**
+   * Characters the document's fonts are known to cover, per font family
+   * string (with its fallbacks). Keyed by family rather than the full font
+   * string: which faces cover a character doesn't depend on the font size.
+   * `fonts.check` scans its whole text on every call and costs tens of µs per
+   * character per family, so typing checks only what this doesn't hold yet.
+   * Faces are only ever added to the document, never removed, so a character
+   * once covered stays covered.
+   */
+  private loadedChars = new Map<string, Set<string>>();
+
   constructor(private app: App) {}
+
+  /** the characters of `text` not yet known to be covered by `family` */
+  private getUnloadedChars = (
+    family: string,
+    text: string,
+    skip?: ReadonlySet<string>,
+  ) => {
+    const loaded = this.loadedChars.get(family);
+    let chars = "";
+    // iterates code points, so surrogate pairs (emoji) stay whole
+    for (const char of new Set(text)) {
+      if (!loaded?.has(char) && !skip?.has(char)) {
+        chars += char;
+      }
+    }
+    return chars;
+  };
 
   /**
    * Loads the fonts of the initial scene explicitly — faster than waiting for
@@ -68,6 +112,9 @@ export class AppFonts {
   ) => {
     let isEditing = true;
     const pendingFontLoads = new Map<string, Promise<unknown>>();
+    // characters whose load failed (e.g. offline), per font family — not
+    // retried on every keystroke for the rest of the session
+    const failedChars = new Map<string, Set<string>>();
 
     const remeasureOnceFontLoads = (nextOriginalText: string) => {
       const latestTextElement =
@@ -76,18 +123,29 @@ export class AppFonts {
         return;
       }
       const font = getFontString(latestTextElement);
-      if (
-        pendingFontLoads.has(font) ||
-        this.app.ownerDocument.fonts.check(font, nextOriginalText)
-      ) {
+      if (pendingFontLoads.has(font)) {
+        return;
+      }
+      const family = getFontFamilyString(latestTextElement);
+      const chars = this.getUnloadedChars(
+        family,
+        nextOriginalText,
+        failedChars.get(family),
+      );
+      if (!chars) {
+        return;
+      }
+      if (this.app.ownerDocument.fonts.check(font, chars)) {
+        addChars(this.loadedChars, family, chars);
         return;
       }
       pendingFontLoads.set(
         font,
         this.app.ownerDocument.fonts
-          .load(font, nextOriginalText)
+          .load(font, chars)
           .then((fontFaces) => {
             pendingFontLoads.delete(font);
+            addChars(this.loadedChars, family, chars);
             if (!isEditing) {
               return;
             }
@@ -109,6 +167,7 @@ export class AppFonts {
           })
           .catch((error) => {
             pendingFontLoads.delete(font);
+            addChars(failedChars, family, chars);
             console.error(error);
           }),
       );
