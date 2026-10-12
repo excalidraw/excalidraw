@@ -1,7 +1,8 @@
-import { arrayToMap } from "@excalidraw/common";
+import { arrayToMap, type Bounds } from "@excalidraw/common";
 import {
   isPointWithinBounds,
   pointFrom,
+  PRECISION,
   segmentsIntersectAt,
 } from "@excalidraw/math";
 
@@ -13,7 +14,10 @@ import type {
 
 import type { ReadonlySetLike } from "@excalidraw/common/utility-types";
 
-import { getElementsWithinSelection, getSelectedElements } from "./selection";
+import {
+  getSelectedElements,
+  shouldIgnoreElementFromSelection,
+} from "./selection";
 import { getElementsInGroup, selectGroupsFromGivenElements } from "./groups";
 
 import {
@@ -23,6 +27,7 @@ import {
   doBoundsIntersect,
   getElementBounds,
   boundsContainBounds,
+  elementsOverlappingBBox,
 } from "./bounds";
 import { mutateElement } from "./mutateElement";
 import { getBoundTextElement, getContainerElement } from "./textElement";
@@ -90,13 +95,34 @@ export function isElementIntersectingFrame(
   return intersecting;
 }
 
+/**
+ * What's in the frame: to a hair beyond its edges, which snapping it to an
+ * element's (or an element to its) leaves the element at.
+ */
+const getFrameInnerBounds = (
+  frame: ExcalidrawFrameLikeElement,
+  elementsMap: ElementsMap,
+): Bounds => {
+  const [x1, y1, x2, y2] = getElementBounds(frame, elementsMap);
+  return [x1 - PRECISION, y1 - PRECISION, x2 + PRECISION, y2 + PRECISION];
+};
+
 export const getElementsCompletelyInFrame = (
   elements: readonly ExcalidrawElement[],
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) =>
   omitGroupsContainingFrameLikes(
-    getElementsWithinSelection(elements, frame, elementsMap, false),
+    // by their outlines (as the frame's other bounds checks), so that a frame
+    // snapped to an element's edges contains it
+    elementsOverlappingBBox({
+      elements,
+      elementsMap,
+      bounds: getFrameInnerBounds(frame, elementsMap),
+      type: "contain",
+      shouldIgnoreElementFromSelection,
+      includeStroke: false,
+    }),
   ).filter(
     (element) =>
       (!isFrameLikeElement(element) && !element.frameId) ||
@@ -129,7 +155,7 @@ export const elementsAreInFrameBounds = (
   frame: ExcalidrawFrameLikeElement,
   elementsMap: ElementsMap,
 ) => {
-  const [frameX1, frameY1, frameX2, frameY2] = getElementAbsoluteCoords(
+  const [frameX1, frameY1, frameX2, frameY2] = getFrameInnerBounds(
     frame,
     elementsMap,
   );

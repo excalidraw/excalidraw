@@ -8,6 +8,7 @@ import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { Keyboard, Pointer, UI } from "@excalidraw/excalidraw/tests/helpers/ui";
 import { getTextEditor } from "@excalidraw/excalidraw/tests/queries/dom";
 import {
+  act,
   getCloneByOrigId,
   render,
 } from "@excalidraw/excalidraw/tests/test-utils";
@@ -154,6 +155,63 @@ describe("adding elements to frames", () => {
         arrayToMap(h.elements),
       ),
     ).toBe(true);
+  });
+
+  it("should add a group a new frame matches edge to edge", () => {
+    // a hair outside, as snapping the frame to it leaves it
+    const rects = [
+      [100 - 1e-8, 100],
+      [200, 100 + 1e-8],
+    ].map(([x, width]) =>
+      API.createElement({
+        type: "rectangle",
+        x,
+        y: 100,
+        width,
+        height: 100,
+        strokeWidth: 4,
+        groupIds: ["group"],
+      }),
+    );
+    API.setElements(rects);
+
+    act(() => h.app.setActiveTool({ type: "frame" }));
+    mouse.downAt(100, 100);
+    mouse.moveTo(300, 200);
+    mouse.up();
+
+    const newFrame = h.elements.find((el) => el.type === "frame");
+    expect(newFrame).toMatchObject({ x: 100, y: 100, width: 200 });
+    expect(
+      rects.map((rect) => h.elements.find((el) => el.id === rect.id)?.frameId),
+    ).toEqual([newFrame!.id, newFrame!.id]);
+  });
+
+  it("should add a group a resized frame matches edge to edge", () => {
+    // a hair outside, as snapping the frame to it leaves it
+    const rects = [
+      [160, 40],
+      [200, 50 + 1e-8],
+    ].map(([x, width]) =>
+      API.createElement({
+        type: "rectangle",
+        x,
+        y: 0,
+        width,
+        height: 100,
+        groupIds: ["group"],
+      }),
+    );
+    API.setElements([frame, ...rects]);
+
+    mouse.clickAt(0, 0);
+    mouse.downAt(frame.x + frame.width, frame.y + frame.height);
+    mouse.moveTo(250, 100);
+    mouse.up();
+
+    expect(
+      rects.map((rect) => h.elements.find((el) => el.id === rect.id)?.frameId),
+    ).toEqual([frame.id, frame.id]);
   });
 
   it("should not add a newly created element to a frame behind a non-frame element", () => {
