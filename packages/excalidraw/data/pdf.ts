@@ -22,6 +22,13 @@ const PDF_RENDER_SCALE = 2;
 const PDF_PAGE_PNG_MAX_SIZE = 512 * 1024;
 const PDF_PAGE_JPEG_QUALITY = 0.92;
 
+/**
+ * Pages get a thin outline baked in, so that white pages don't blend into
+ * a white canvas (width in scene units).
+ */
+const PDF_PAGE_OUTLINE_WIDTH = 2;
+const PDF_PAGE_OUTLINE_COLOR = "#ced4da";
+
 /** max number of pages imported from a single PDF */
 export const PDF_MAX_PAGES = 50;
 /** pages per row before wrapping onto the next one */
@@ -269,6 +276,22 @@ export const openPdf = async (file: Blob): Promise<PdfDocument> => {
         canvas.height = Math.max(1, Math.floor(viewport.height));
 
         await page.render({ canvas, viewport }).promise;
+
+        const context = canvas.getContext("2d");
+        if (context) {
+          const lineWidth = Math.max(
+            1,
+            Math.round(PDF_PAGE_OUTLINE_WIDTH * (canvas.width / width)),
+          );
+          context.strokeStyle = PDF_PAGE_OUTLINE_COLOR;
+          context.lineWidth = lineWidth;
+          context.strokeRect(
+            lineWidth / 2,
+            lineWidth / 2,
+            canvas.width - lineWidth,
+            canvas.height - lineWidth,
+          );
+        }
 
         const blob = await encodePage(canvas);
         const extension = blob.type === MIME_TYPES.jpg ? "jpg" : "png";
