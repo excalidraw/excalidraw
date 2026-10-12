@@ -189,6 +189,8 @@
     "copyElementLink": "Kopiraj povezavo do objekta",
     "linkToElement": "Povezava do objekta",
     "wrapSelectionInFrame": "Zavij izbor v okvir",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Zavihek",
     "shapeSwitch": "Spremeni obliko",
     "preferences": "Nastavitve",
