@@ -189,6 +189,8 @@
     "copyElementLink": "இணைப்பை நகலெடு",
     "linkToElement": "இணைப்பு",
     "wrapSelectionInFrame": "தேர்வை வடிவத்தில் சுற்று",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
