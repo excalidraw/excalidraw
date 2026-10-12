@@ -189,6 +189,8 @@
     "copyElementLink": "객체 링크 복사",
     "linkToElement": "객체에 연결",
     "wrapSelectionInFrame": "선택 영역을 프레임으로 감싸기",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "도형 변경",
     "preferences": "환경 설정",
