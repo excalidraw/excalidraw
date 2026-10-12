@@ -189,6 +189,8 @@
     "copyElementLink": "Kopieer link naar object",
     "linkToElement": "Link naar object",
     "wrapSelectionInFrame": "Selectie omslaan in frame",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "Verander vorm",
     "preferences": "Voorkeuren",
