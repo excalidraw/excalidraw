@@ -189,6 +189,8 @@
     "copyElementLink": "Copia il link all'oggetto",
     "linkToElement": "Link all'oggetto",
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Scheda",
     "shapeSwitch": "Cambia forma",
     "preferences": "Preferenze",
