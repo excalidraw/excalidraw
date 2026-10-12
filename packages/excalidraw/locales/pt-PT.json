@@ -189,6 +189,8 @@
     "copyElementLink": "Copiar hiperligação para o objeto",
     "linkToElement": "Hiperligação para o objeto",
     "wrapSelectionInFrame": "Ajustar seleção no quadro",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "Trocar forma",
     "preferences": "Preferências",
