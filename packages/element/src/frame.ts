@@ -945,6 +945,21 @@ export const shouldApplyFrameClip = (
     return false;
   }
 
+  // a frame's children are clipped to it (as in SVG exports): one inside it
+  // may still reach out of it with its stroke. Only those being dragged are
+  // checked (as their drop will be), the rest are in it as they stand.
+  if (element.frameId === frame.id) {
+    const shouldClip = isElementInFrame(element, elementsMap, appState, {
+      targetFrame: frame,
+      checkedGroups,
+    });
+
+    for (const groupId of element.groupIds) {
+      checkedGroups?.set(groupId, shouldClip);
+    }
+    return shouldClip;
+  }
+
   // for individual elements, only clip when the element is
   // a. overlapping with the frame, or
   // b. containing the frame, for example when an element is used as a background
@@ -961,28 +976,17 @@ export const shouldApplyFrameClip = (
     return true;
   }
 
-  // if an element is outside the frame, but is part of a group that has some elements
+  // if an element is outside the frame, but is part of a group being dragged
   // "in" the frame, we should clip the element
   if (
-    !shouldClipElementItself &&
+    appState.selectedElementsAreBeingDragged &&
     element.groupIds.length > 0 &&
     !elementsAreInFrameBounds([element], frame, elementsMap)
   ) {
-    let shouldClip = false;
-
-    // if no elements are being dragged, we can skip the geometry check
-    // because we know if the element is in the given frame or not
-    if (!appState.selectedElementsAreBeingDragged) {
-      shouldClip = element.frameId === frame.id;
-      for (const groupId of element.groupIds) {
-        checkedGroups?.set(groupId, shouldClip);
-      }
-    } else {
-      shouldClip = isElementInFrame(element, elementsMap, appState, {
-        targetFrame: frame,
-        checkedGroups,
-      });
-    }
+    const shouldClip = isElementInFrame(element, elementsMap, appState, {
+      targetFrame: frame,
+      checkedGroups,
+    });
 
     for (const groupId of element.groupIds) {
       checkedGroups?.set(groupId, shouldClip);

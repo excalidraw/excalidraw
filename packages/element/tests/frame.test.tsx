@@ -15,7 +15,7 @@ import {
 
 import { getSelectedElements } from "@excalidraw/excalidraw/scene";
 
-import { elementOverlapsWithFrame } from "../src/frame";
+import { elementOverlapsWithFrame, shouldApplyFrameClip } from "../src/frame";
 
 import type {
   ExcalidrawElement,
@@ -212,6 +212,51 @@ describe("adding elements to frames", () => {
     expect(
       rects.map((rect) => h.elements.find((el) => el.id === rect.id)?.frameId),
     ).toEqual([frame.id, frame.id]);
+  });
+
+  it("should clip a frame's child to it, even if inside it (but for its stroke)", () => {
+    const child = API.createElement({
+      type: "rectangle",
+      x: 1e-7,
+      y: 1e-7,
+      width: 150 - 2e-7,
+      height: 100 - 2e-7,
+      frameId: frame.id,
+    });
+    API.setElements([child, frame]);
+
+    expect(
+      shouldApplyFrameClip(
+        child,
+        frame as ExcalidrawFrameLikeElement,
+        h.state,
+        arrayToMap(h.elements),
+      ),
+    ).toBe(true);
+  });
+
+  it("should not clip a child dragged out of its frame", () => {
+    const child = API.createElement({
+      type: "rectangle",
+      x: 300,
+      width: 50,
+      height: 50,
+      frameId: frame.id,
+    });
+    API.setElements([child, frame]);
+
+    expect(
+      shouldApplyFrameClip(
+        child,
+        frame as ExcalidrawFrameLikeElement,
+        {
+          ...h.state,
+          selectedElementIds: { [child.id]: true },
+          selectedElementsAreBeingDragged: true,
+        },
+        arrayToMap(h.elements),
+      ),
+    ).toBe(false);
   });
 
   it("should not add a newly created element to a frame behind a non-frame element", () => {
