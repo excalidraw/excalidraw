@@ -23,6 +23,7 @@ import type {
   LineSegment,
   LocalPoint,
   Radians,
+  GenericPoint,
 } from "@excalidraw/math";
 import type { AppState } from "@excalidraw/excalidraw/types";
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -677,7 +678,7 @@ export const getMinMaxXYFromCurvePathOps = (
   return [minX, minY, maxX, maxY];
 };
 
-export const getBoundsFromPoints = <P extends GlobalPoint | LocalPoint>(
+export const getBoundsFromPoints = <P extends GenericPoint>(
   points: readonly P[],
   padding: number = 0,
 ): Bounds => {
@@ -1226,7 +1227,7 @@ export const aabbForElement = (
   return bounds;
 };
 
-export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
+export const pointInsideBounds = <P extends GenericPoint>(
   p: P,
   bounds: Bounds,
 ): boolean =>
@@ -1234,7 +1235,7 @@ export const pointInsideBounds = <P extends GlobalPoint | LocalPoint>(
 
 // TODO make pointInsideBounds inclusive and remove this function once we
 // test nothing is breaking
-export const pointInsideBoundsInclusive = <P extends GlobalPoint | LocalPoint>(
+export const pointInsideBoundsInclusive = <P extends GenericPoint>(
   p: P,
   bounds: Bounds,
 ): boolean =>

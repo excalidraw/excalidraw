@@ -16,6 +16,7 @@ import {
   clamp,
   bezierEquation,
   isCurve,
+  type GenericPoint,
 } from "@excalidraw/math";
 
 import { getCurvePathOps } from "@excalidraw/utils/shape";
@@ -932,7 +933,7 @@ export class LinearElementEditor {
     return null;
   };
 
-  static isSegmentTooShort<P extends GlobalPoint | LocalPoint>(
+  static isSegmentTooShort<P extends GenericPoint>(
     element: ExcalidrawLinearElement,
     startPoint: P,
     endPoint: P,
@@ -1242,7 +1243,7 @@ export class LinearElementEditor {
     return ret;
   }
 
-  static arePointsEqual<Point extends LocalPoint | GlobalPoint>(
+  static arePointsEqual<Point extends GenericPoint>(
     point1: Point | null,
     point2: Point | null,
   ) {

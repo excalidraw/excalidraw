@@ -30,8 +30,7 @@ import {
   vectorAdd,
   vectorFromPoint,
   vectorScale,
-  type GlobalPoint,
-  type LocalPoint,
+  type GenericPoint,
 } from "@excalidraw/math";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
@@ -60,24 +59,23 @@ import type { Drawable, Op } from "roughjs/bin/core";
 // a polyline (made up term here) is a line consisting of other line segments
 // this corresponds to a straight line element in the editor but it could also
 // be used to model other elements
-export type Polyline<Point extends GlobalPoint | LocalPoint> =
-  LineSegment<Point>[];
+export type Polyline<Point extends GenericPoint> = LineSegment<Point>[];
 
 // a polycurve is a curve consisting of ther curves, this corresponds to a complex
 // curve on the canvas
-export type Polycurve<Point extends GlobalPoint | LocalPoint> = Curve<Point>[];
+export type Polycurve<Point extends GenericPoint> = Curve<Point>[];
 
 // an ellipse is specified by its center, angle, and its major and minor axes
 // but for the sake of simplicity, we've used halfWidth and halfHeight instead
 // in replace of semi major and semi minor axes
-export type Ellipse<Point extends GlobalPoint | LocalPoint> = {
+export type Ellipse<Point extends GenericPoint> = {
   center: Point;
   angle: Radians;
   halfWidth: number;
   halfHeight: number;
 };
 
-export type GeometricShape<Point extends GlobalPoint | LocalPoint> =
+export type GeometricShape<Point extends GenericPoint> =
   | {
       type: "line";
       data: LineSegment<Point>;
@@ -115,7 +113,7 @@ type RectangularElement =
   | ExcalidrawSelectionElement;
 
 // polygon
-export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
+export const getPolygonShape = <Point extends GenericPoint>(
   element: RectangularElement,
 ): GeometricShape<Point> => {
   const { angle, width, height, x, y } = element;
@@ -150,7 +148,7 @@ export const getPolygonShape = <Point extends GlobalPoint | LocalPoint>(
 };
 
 // return the selection box for an element, possibly rotated as well
-export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
+export const getSelectionBoxShape = <Point extends GenericPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
   padding = 10,
@@ -180,7 +178,7 @@ export const getSelectionBoxShape = <Point extends GlobalPoint | LocalPoint>(
 };
 
 // ellipse
-export const getEllipseShape = <Point extends GlobalPoint | LocalPoint>(
+export const getEllipseShape = <Point extends GenericPoint>(
   element: ExcalidrawEllipseElement,
 ): GeometricShape<Point> => {
   const { width, height, angle, x, y } = element;
@@ -211,7 +209,7 @@ export const getCurvePathOps = (shape: Drawable): Op[] => {
 };
 
 // linear
-export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
+export const getCurveShape = <Point extends GenericPoint>(
   roughShape: Drawable,
   startingPoint: Point = pointFrom(0, 0),
   angleInRadian: Radians,
@@ -249,7 +247,7 @@ export const getCurveShape = <Point extends GlobalPoint | LocalPoint>(
   };
 };
 
-const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
+const polylineFromPoints = <Point extends GenericPoint>(
   points: Point[],
 ): Polyline<Point> => {
   let previousPoint: Point = points[0];
@@ -264,7 +262,7 @@ const polylineFromPoints = <Point extends GlobalPoint | LocalPoint>(
   return polyline;
 };
 
-export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
+export const getFreedrawShape = <Point extends GenericPoint>(
   element: ExcalidrawFreeDrawElement,
   center: Point,
   isClosed: boolean = false,
@@ -295,7 +293,7 @@ export const getFreedrawShape = <Point extends GlobalPoint | LocalPoint>(
   ) as GeometricShape<Point>;
 };
 
-export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
+export const getClosedCurveShape = <Point extends GenericPoint>(
   element: ExcalidrawLinearElement,
   roughShape: Drawable,
   startingPoint: Point = pointFrom<Point>(0, 0),
@@ -361,9 +359,7 @@ export const getClosedCurveShape = <Point extends GlobalPoint | LocalPoint>(
  * @returns An array of intersections
  */
 // TODO: Replace with final rounded rectangle code
-export const segmentIntersectRectangleElement = <
-  Point extends LocalPoint | GlobalPoint,
->(
+export const segmentIntersectRectangleElement = <Point extends GenericPoint>(
   element: ExcalidrawBindableElement,
   segment: LineSegment<Point>,
   gap: number = 0,
@@ -401,7 +397,7 @@ export const segmentIntersectRectangleElement = <
     .filter((i): i is Point => !!i);
 };
 
-const distanceToEllipse = <Point extends LocalPoint | GlobalPoint>(
+const distanceToEllipse = <Point extends GenericPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
 ) => {
@@ -458,7 +454,7 @@ const distanceToEllipse = <Point extends LocalPoint | GlobalPoint>(
   );
 };
 
-export const pointOnEllipse = <Point extends LocalPoint | GlobalPoint>(
+export const pointOnEllipse = <Point extends GenericPoint>(
   point: Point,
   ellipse: Ellipse<Point>,
   threshold = PRECISION,
@@ -466,7 +462,7 @@ export const pointOnEllipse = <Point extends LocalPoint | GlobalPoint>(
   return distanceToEllipse(point, ellipse) <= threshold;
 };
 
-export const pointInEllipse = <Point extends LocalPoint | GlobalPoint>(
+export const pointInEllipse = <Point extends GenericPoint>(
   p: Point,
   ellipse: Ellipse<Point>,
 ) => {
@@ -488,7 +484,7 @@ export const pointInEllipse = <Point extends LocalPoint | GlobalPoint>(
   );
 };
 
-export const ellipseAxes = <Point extends LocalPoint | GlobalPoint>(
+export const ellipseAxes = <Point extends GenericPoint>(
   ellipse: Ellipse<Point>,
 ) => {
   const widthGreaterThanHeight = ellipse.halfWidth > ellipse.halfHeight;
@@ -506,7 +502,7 @@ export const ellipseAxes = <Point extends LocalPoint | GlobalPoint>(
   };
 };
 
-export const ellipseFocusToCenter = <Point extends LocalPoint | GlobalPoint>(
+export const ellipseFocusToCenter = <Point extends GenericPoint>(
   ellipse: Ellipse<Point>,
 ) => {
   const { majorAxis, minorAxis } = ellipseAxes(ellipse);
@@ -514,7 +510,7 @@ export const ellipseFocusToCenter = <Point extends LocalPoint | GlobalPoint>(
   return Math.sqrt(majorAxis ** 2 - minorAxis ** 2);
 };
 
-export const ellipseExtremes = <Point extends LocalPoint | GlobalPoint>(
+export const ellipseExtremes = <Point extends GenericPoint>(
   ellipse: Ellipse<Point>,
 ) => {
   const { center, angle } = ellipse;

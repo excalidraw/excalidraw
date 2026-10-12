@@ -1,4 +1,4 @@
-import { pointFrom, type GlobalPoint, type LocalPoint } from "@excalidraw/math";
+import { pointFrom, type GenericPoint } from "@excalidraw/math";
 
 import { THEME } from "@excalidraw/common";
 
@@ -92,7 +92,7 @@ const drawPointerSnapLine = (
   }
 };
 
-const drawCross = <Point extends LocalPoint | GlobalPoint>(
+const drawCross = <Point extends GenericPoint>(
   [x, y]: Point,
   appState: InteractiveCanvasAppState,
   context: CanvasRenderingContext2D,
@@ -113,7 +113,7 @@ const drawCross = <Point extends LocalPoint | GlobalPoint>(
   context.restore();
 };
 
-const drawLine = <Point extends LocalPoint | GlobalPoint>(
+const drawLine = <Point extends GenericPoint>(
   from: Point,
   to: Point,
   context: CanvasRenderingContext2D,
@@ -124,7 +124,7 @@ const drawLine = <Point extends LocalPoint | GlobalPoint>(
   context.stroke();
 };
 
-const drawGapLine = <Point extends LocalPoint | GlobalPoint>(
+const drawGapLine = <Point extends GenericPoint>(
   from: Point,
   to: Point,
   direction: "horizontal" | "vertical",
