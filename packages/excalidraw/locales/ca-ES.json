@@ -189,6 +189,8 @@
     "copyElementLink": "Copiar enllaç a objecte",
     "linkToElement": "Enllaç a l'objecte",
     "wrapSelectionInFrame": "Embolica la selecció en un marc",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
