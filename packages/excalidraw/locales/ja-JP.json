@@ -189,6 +189,8 @@
     "copyElementLink": "オブジェクトへのリンクをコピー",
     "linkToElement": "オブジェクトにリンク",
     "wrapSelectionInFrame": "選択範囲をフレームで囲む",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "図形形状を変更",
     "preferences": "環境設定",
