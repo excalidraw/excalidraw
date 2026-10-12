@@ -189,6 +189,8 @@
     "copyElementLink": "复制此对象的链接",
     "linkToElement": "链接到对象",
     "wrapSelectionInFrame": "用选中的元素创建画框",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "切换形状",
     "preferences": "首选项",
