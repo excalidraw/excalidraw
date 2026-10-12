@@ -5,7 +5,6 @@ import {
   VERTICAL_ALIGN,
   arrayToMap,
   getFontString,
-  getStrokeWidthByKey,
   isTransparent,
 } from "@excalidraw/common";
 import {
@@ -58,6 +57,7 @@ import type { Mutable } from "@excalidraw/common/utility-types";
 
 import type { Radians } from "@excalidraw/math";
 
+import { getDefaultAppState } from "../appState";
 import { getSelectionStateForElements } from "../components/App.selection";
 
 import { register } from "./register";
@@ -348,32 +348,24 @@ export const wrapTextsInContainers = (
   const containerIds: Mutable<AppState["selectedElementIds"]> = {};
 
   for (const textElement of textElements) {
+    // a default rectangle (not the current item's style), drawn in the
+    // text's color
     const container = newElement({
       type: "rectangle",
-      backgroundColor: appState.currentItemBackgroundColor,
       boundElements: [
         ...(textElement.boundElements || []),
         { id: textElement.id, type: "text" },
       ],
       angle: textElement.angle,
-      fillStyle: appState.currentItemFillStyle,
-      strokeColor: appState.currentItemStrokeColor,
-      roughness: appState.currentItemRoughness,
-      strokeWidth: getStrokeWidthByKey(
-        "rectangle",
-        appState.currentItemStrokeWidthKey,
-      ),
-      strokeStyle: appState.currentItemStrokeStyle,
+      strokeColor: textElement.strokeColor,
       roundness:
-        appState.currentItemRoundness === "round"
+        getDefaultAppState().currentItemRoundness === "round"
           ? {
               type: isUsingAdaptiveRadius("rectangle")
                 ? ROUNDNESS.ADAPTIVE_RADIUS
                 : ROUNDNESS.PROPORTIONAL_RADIUS,
             }
           : null,
-      opacity: 100,
-      locked: false,
       x: textElement.x - BOUND_TEXT_PADDING,
       y: textElement.y - BOUND_TEXT_PADDING,
       width: computeContainerDimensionForBoundText(

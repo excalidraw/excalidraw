@@ -107,6 +107,32 @@ describe("wrap (w)", () => {
     expect(h.state.selectedLinearElement?.elementId).toBe("arrow");
   });
 
+  it("wraps a text in a default rectangle of the text's color", () => {
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      strokeColor: COLOR_PALETTE.blue[4],
+    });
+    API.setElements([text]);
+    API.setSelectedElements([text]);
+    act(() => {
+      h.setState({
+        currentItemStrokeColor: COLOR_PALETTE.red[4],
+        currentItemBackgroundColor: COLOR_PALETTE.yellow[1],
+        currentItemStrokeStyle: "dashed",
+      });
+    });
+
+    pressW();
+
+    const containerId = getElement<ExcalidrawTextElement>("text").containerId!;
+    expect(getElement(containerId)).toMatchObject({
+      strokeColor: COLOR_PALETTE.blue[4],
+      backgroundColor: "transparent",
+      strokeStyle: "solid",
+    });
+  });
+
   it("wraps texts, keeping labeled containers selected to unwrap next", () => {
     const [rectangle, label] = createLabeled("rectangle", "rect");
     const text = API.createElement({ type: "text", id: "text", x: 300 });
