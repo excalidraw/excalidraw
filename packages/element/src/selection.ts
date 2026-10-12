@@ -26,7 +26,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "./types";
 
-const shouldIgnoreElementFromSelection = (element: ExcalidrawElement) =>
+export const shouldIgnoreElementFromSelection = (element: ExcalidrawElement) =>
   element.locked || isBoundToContainer(element);
 
 const excludeElementsFromFrames = <T extends ExcalidrawElement>(
