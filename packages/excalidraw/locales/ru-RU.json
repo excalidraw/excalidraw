@@ -189,6 +189,8 @@
     "copyElementLink": "Скопировать ссылку на объект",
     "linkToElement": "Ссылка на объект",
     "wrapSelectionInFrame": "Поместить выделенное в фрейм",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Вкладка",
     "shapeSwitch": "Сменить форму",
     "preferences": "Настройки",
