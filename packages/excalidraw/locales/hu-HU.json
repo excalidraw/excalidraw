@@ -189,6 +189,8 @@
     "copyElementLink": "",
     "linkToElement": "Hivatkozás az objektumhoz",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "",
     "preferences": "",
