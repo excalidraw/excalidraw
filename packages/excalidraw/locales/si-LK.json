@@ -189,6 +189,8 @@
     "copyElementLink": "",
     "linkToElement": "",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
