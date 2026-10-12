@@ -531,10 +531,13 @@ const ExcalidrawWrapper = () => {
               ),
             ]);
           });
-        } else if (isInitialLoad) {
-          if (fileIds.length) {
+        } else {
+          const missingFileIds = fileIds.filter(
+            (id) => !excalidrawAPI.getFiles()[id],
+          );
+          if (missingFileIds.length) {
             LocalData.fileStorage
-              .getFiles(fileIds)
+              .getFiles(missingFileIds)
               .then(async ({ loadedFiles, erroredFiles }) => {
                 if (loadedFiles.length) {
                   excalidrawAPI.addFiles(loadedFiles);
@@ -548,9 +551,11 @@ const ExcalidrawWrapper = () => {
           }
           // on fresh load, clear unused files from IDB (from previous
           // session)
-          LocalData.fileStorage.clearObsoleteFiles({
-            currentFileIds: fileIds,
-          });
+          if (isInitialLoad) {
+            LocalData.fileStorage.clearObsoleteFiles({
+              currentFileIds: fileIds,
+            });
+          }
         }
       }
     },
@@ -602,6 +607,7 @@ const ExcalidrawWrapper = () => {
         !document.hidden &&
         ((collabAPI && !collabAPI.isCollaborating()) || isCollabDisabled)
       ) {
+        LocalData.flushSave();
         // don't sync if local state is newer or identical to browser state
         if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
           const localDataState = importFromLocalStorage();
@@ -609,6 +615,14 @@ const ExcalidrawWrapper = () => {
           setLangCode(getPreferredLanguage());
           excalidrawAPI.updateScene({
             ...localDataState,
+            elements: reconcileElements(
+              excalidrawAPI.getSceneElementsIncludingDeleted(),
+              restoreElements(
+                localDataState.elements,
+                excalidrawAPI.getSceneElementsIncludingDeleted(),
+              ) as RemoteExcalidrawElement[],
+              excalidrawAPI.getAppState(),
+            ),
             captureUpdate: CaptureUpdateAction.NEVER,
           });
           LibraryIndexedDBAdapter.load().then((data) => {
@@ -724,33 +738,49 @@ const ExcalidrawWrapper = () => {
     // this check is redundant, but since this is a hot path, it's best
     // not to evaludate the nested expression every time
     if (!LocalData.isSavePaused()) {
-      LocalData.save(elements, appState, files, () => {
-        if (excalidrawAPI) {
-          let didChange = false;
+      LocalData.save(
+        elements,
+        appState,
+        files,
+        () => {
+          if (excalidrawAPI) {
+            let didChange = false;
 
-          const elements = excalidrawAPI
-            .getSceneElementsIncludingDeleted()
-            .map((element) => {
-              if (
-                LocalData.fileStorage.shouldUpdateImageElementStatus(element)
-              ) {
-                const newElement = newElementWith(element, { status: "saved" });
-                if (newElement !== element) {
-                  didChange = true;
+            const elements = excalidrawAPI
+              .getSceneElementsIncludingDeleted()
+              .map((element) => {
+                if (
+                  LocalData.fileStorage.shouldUpdateImageElementStatus(element)
+                ) {
+                  const newElement = newElementWith(element, {
+                    status: "saved",
+                  });
+                  if (newElement !== element) {
+                    didChange = true;
+                  }
+                  return newElement;
                 }
-                return newElement;
-              }
-              return element;
-            });
+                return element;
+              });
 
-          if (didChange) {
+            if (didChange) {
+              excalidrawAPI.updateScene({
+                elements,
+                captureUpdate: CaptureUpdateAction.NEVER,
+              });
+            }
+          }
+        },
+        (elements) => {
+          if (excalidrawAPI) {
             excalidrawAPI.updateScene({
               elements,
               captureUpdate: CaptureUpdateAction.NEVER,
             });
+            loadImages({ scene: { elements }, isExternalScene: false });
           }
-        }
-      });
+        },
+      );
     }
 
     // Render the debug scene if the debug canvas is available

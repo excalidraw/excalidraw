@@ -22,8 +22,11 @@ export const syncBrowserStateVersion = (type: BrowserStateTypes) => {
 };
 
 export const updateBrowserStateVersion = (type: BrowserStateTypes) => {
-  const timestamp = Date.now();
   try {
+    const timestamp = Math.max(
+      Date.now(),
+      getBrowserStorageStateVersion(type) + 1,
+    );
     localStorage.setItem(type, JSON.stringify(timestamp));
     LOCAL_STATE_VERSIONS[type] = timestamp;
   } catch (error) {

@@ -26,11 +26,16 @@ import {
   get,
 } from "idb-keyval";
 
-import { getNonDeletedElements } from "@excalidraw/element";
+import { reconcileElements } from "@excalidraw/excalidraw/data/reconcile";
+import { restoreElements } from "@excalidraw/excalidraw/data/restore";
 
+import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 import type { LibraryPersistedData } from "@excalidraw/excalidraw/data/library";
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
-import type { ExcalidrawElement, FileId } from "@excalidraw/element/types";
+import type {
+  OrderedExcalidrawElement,
+  FileId,
+} from "@excalidraw/element/types";
 import type {
   AppState,
   BinaryFileData,
@@ -48,6 +53,8 @@ import {
   isBrowserStorageStateNewer,
   updateBrowserStateVersion,
 } from "./tabSync";
+
+import { getSyncableElements } from ".";
 
 const filesStore = createStore("files-db", "files-store");
 
@@ -74,23 +81,27 @@ class LocalFileManager extends FileManager {
 }
 
 const saveDataStateToLocalStorage = (
-  elements: readonly ExcalidrawElement[],
+  elements: readonly OrderedExcalidrawElement[],
   appState: AppState,
 ) => {
   const localStorageQuotaExceeded = appJotaiStore.get(
     localStorageQuotaExceededAtom,
   );
   try {
-    // another tab saved since we last synced, so our scene is stale and
-    // we must not overwrite it, unless the user is working in this tab.
-    // We'll sync once this tab is focused.
-    if (
-      !document.hasFocus() &&
-      isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)
-    ) {
-      return;
-    }
-
+    const reconciledElements = isBrowserStorageStateNewer(
+      STORAGE_KEYS.VERSION_DATA_STATE,
+    )
+      ? reconcileElements(
+          elements,
+          restoreElements(
+            JSON.parse(
+              localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS) || "[]",
+            ),
+            elements,
+          ) as RemoteExcalidrawElement[],
+          appState,
+        )
+      : null;
     const _appState = clearAppStateForLocalStorage(appState);
 
     if (
@@ -102,7 +113,7 @@ const saveDataStateToLocalStorage = (
 
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
+      JSON.stringify(getSyncableElements(reconciledElements ?? elements)),
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
@@ -112,6 +123,7 @@ const saveDataStateToLocalStorage = (
     if (localStorageQuotaExceeded) {
       appJotaiStore.set(localStorageQuotaExceededAtom, false);
     }
+    return reconciledElements;
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
@@ -130,12 +142,21 @@ type SavingLockTypes = "collaboration";
 export class LocalData {
   private static _save = debounce(
     async (
-      elements: readonly ExcalidrawElement[],
+      elements: readonly OrderedExcalidrawElement[],
       appState: AppState,
       files: BinaryFiles,
       onFilesSaved: () => void,
+      onElementsReconciled: (
+        elements: readonly OrderedExcalidrawElement[],
+      ) => void,
     ) => {
-      saveDataStateToLocalStorage(elements, appState);
+      const reconciledElements = saveDataStateToLocalStorage(
+        elements,
+        appState,
+      );
+      if (reconciledElements) {
+        onElementsReconciled(reconciledElements);
+      }
 
       await this.fileStorage.saveFiles({
         elements,
@@ -148,14 +169,17 @@ export class LocalData {
 
   /** Saves DataState, including files. Bails if saving is paused */
   static save = (
-    elements: readonly ExcalidrawElement[],
+    elements: readonly OrderedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
     onFilesSaved: () => void,
+    onElementsReconciled: (
+      elements: readonly OrderedExcalidrawElement[],
+    ) => void,
   ) => {
     // we need to make the `isSavePaused` check synchronously (undebounced)
     if (!this.isSavePaused()) {
-      this._save(elements, appState, files, onFilesSaved);
+      this._save(elements, appState, files, onFilesSaved, onElementsReconciled);
     }
   };
 
