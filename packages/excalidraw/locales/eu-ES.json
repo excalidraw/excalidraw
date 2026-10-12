@@ -189,6 +189,8 @@
     "copyElementLink": "Kopiatu esteka objektura",
     "linkToElement": "Estekatu objektura",
     "wrapSelectionInFrame": "Bildu hautapena marko batean",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "Aldatu forma",
     "preferences": "Hobespenak",
