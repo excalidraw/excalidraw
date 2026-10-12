@@ -189,6 +189,8 @@
     "copyElementLink": "Link zum Objekt kopieren",
     "linkToElement": "Link zum Objekt",
     "wrapSelectionInFrame": "Auswahl in Rahmen einbetten",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "Form wechseln",
     "preferences": "Einstellungen",
