@@ -1669,6 +1669,8 @@ describe("Test Linear Elements", () => {
       contextMenu = document.querySelector(".context-menu");
       fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
       expect(container.boundElements).toEqual([]);
+      // the arrow is selected along with the freed label
+      expect(h.state.selectedLinearElement).toBe(null);
       expect(text).toEqual(
         expect.objectContaining({
           containerId: null,
