@@ -56,6 +56,30 @@ describe("freedraw mode action", () => {
     expect(element.points.at(-1)?.[1]).toBeCloseTo(100 * Math.sqrt(3), 3);
   });
 
+  it("constrains an existing stroke when Shift is pressed at its last point", () => {
+    UI.clickTool("freedraw");
+
+    const pointer = new Pointer("mouse");
+    pointer.downAt(100, 100);
+    pointer.moveTo(130, 130);
+    pointer.moveTo(160, 160);
+
+    expect(
+      (h.state.newElement as ExcalidrawFreeDrawElement).points,
+    ).toHaveLength(3);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      pointer.moveTo(160, 160);
+    });
+
+    const element = h.state.newElement as ExcalidrawFreeDrawElement;
+    expect(element.points).toHaveLength(2);
+    expect(element.points[1][0]).toBeCloseTo(60, 3);
+    expect(element.points[1][1]).toBeCloseTo(60, 3);
+
+    pointer.upAt(160, 160);
+  });
+
   it("toggling the radio updates both the selected element and the default", () => {
     const element = UI.createElement("freedraw", { x: 0, y: 0 });
     API.setSelectedElements([element.get()] as NonDeletedExcalidrawElement[]);

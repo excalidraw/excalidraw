@@ -10130,7 +10130,10 @@ class App extends React.Component<AppProps, AppState> {
 
           const lastPoint = points.length > 0 && points[points.length - 1];
           const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+            lastPoint &&
+            lastPoint[0] === dx &&
+            lastPoint[1] === dy &&
+            (!event.shiftKey || points.length === 2);
 
           if (!discardPoint) {
             const pressures = newElement.simulatePressure
