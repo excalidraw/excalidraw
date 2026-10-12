@@ -189,6 +189,8 @@
     "copyElementLink": "Salin tautan ke objek",
     "linkToElement": "Taut ke objek",
     "wrapSelectionInFrame": "Bungkus pilihan dalam bingkai",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Tab",
     "shapeSwitch": "Keputusan",
     "preferences": "Preferensi",
