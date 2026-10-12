@@ -189,6 +189,8 @@
     "copyElementLink": "Copiar link para o objeto",
     "linkToElement": "Links para o objeto",
     "wrapSelectionInFrame": "Ajustar seleção no frame",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "Aba",
     "shapeSwitch": "Trocar forma",
     "preferences": "Preferências",
