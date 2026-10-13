@@ -11,10 +11,14 @@ import {
   isMermaidCaretLine,
 } from "./utils/mermaidError";
 
+import type { MermaidToExcalidrawLibProps } from "./types";
+
 interface TTDDialogOutputProps {
   error: Error | null;
   canvasRef: React.RefObject<HTMLDivElement | null>;
-  loaded: boolean;
+  loadStatus: MermaidToExcalidrawLibProps["status"];
+  loadErrorReloadRequired?: boolean;
+  onRetryLoad?: () => void;
   hideErrorDetails?: boolean;
   sourceText?: string;
   autoFixAvailable?: boolean;
@@ -24,12 +28,16 @@ interface TTDDialogOutputProps {
 export const TTDDialogOutput = ({
   error,
   canvasRef,
-  loaded,
+  loadStatus,
+  loadErrorReloadRequired,
+  onRetryLoad,
   hideErrorDetails,
   sourceText,
   autoFixAvailable,
   onApplyAutoFix,
 }: TTDDialogOutputProps) => {
+  const loadFailed = loadStatus === "error";
+
   const errorMessage = error
     ? hideErrorDetails
       ? t("chat.errors.mermaidParseError")
@@ -47,10 +55,10 @@ export const TTDDialogOutput = ({
   return (
     <div
       className={`ttd-dialog-output-wrapper ${
-        error ? "ttd-dialog-output-wrapper--error" : ""
+        error || loadFailed ? "ttd-dialog-output-wrapper--error" : ""
       }`}
     >
-      {error && (
+      {error && !loadFailed && (
         <div
           key="error"
           data-testid="ttd-dialog-output-error"
@@ -105,7 +113,32 @@ export const TTDDialogOutput = ({
           </div>
         </div>
       )}
-      {loaded ? (
+      {loadFailed ? (
+        <div
+          key="load-error"
+          data-testid="ttd-dialog-output-load-error"
+          className="ttd-dialog-output-error"
+        >
+          <div className="ttd-dialog-output-error-content">
+            <div className="ttd-dialog-output-error-icon">
+              {alertTriangleIcon}
+            </div>
+            <div className="ttd-dialog-output-error-title">
+              {loadErrorReloadRequired
+                ? t("mermaid.loadErrorReload")
+                : t("mermaid.loadError")}
+            </div>
+            {onRetryLoad && (
+              <Button
+                className="ttd-dialog-panel-button"
+                onSelect={onRetryLoad}
+              >
+                {t("chat.retry")}
+              </Button>
+            )}
+          </div>
+        </div>
+      ) : loadStatus === "loaded" ? (
         <div
           key="canvas"
           className={clsx("ttd-dialog-output-canvas-container", {

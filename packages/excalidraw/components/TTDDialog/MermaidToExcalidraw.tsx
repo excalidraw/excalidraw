@@ -62,9 +62,11 @@ const getErrorMessage = (error: unknown): string => {
 
 const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib,
+  onRetryLoad,
   isActive,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
+  onRetryLoad?: () => void;
   isActive?: boolean;
 }) => {
   const [text, setText] = useState(
@@ -94,7 +96,7 @@ const MermaidToExcalidraw = ({
 
   useEffect(() => {
     const doRender = async () => {
-      if (!mermaidToExcalidrawLib.loaded) {
+      if (mermaidToExcalidrawLib.status !== "loaded") {
         return;
       }
       try {
@@ -142,7 +144,7 @@ const MermaidToExcalidraw = ({
       isActive &&
       isMermaidAutoFixableError(errorMessage) &&
       !!sourceText.trim() &&
-      mermaidToExcalidrawLib.loaded;
+      mermaidToExcalidrawLib.status === "loaded";
 
     if (!shouldTryAutoFix) {
       setAutoFixCandidate(null);
@@ -303,7 +305,9 @@ const MermaidToExcalidraw = ({
         >
           <TTDDialogOutput
             canvasRef={canvasRef}
-            loaded={mermaidToExcalidrawLib.loaded}
+            loadStatus={mermaidToExcalidrawLib.status}
+            loadErrorReloadRequired={mermaidToExcalidrawLib.reloadRequired}
+            onRetryLoad={onRetryLoad}
             error={error}
             sourceText={text}
             autoFixAvailable={!!autoFixCandidate}
