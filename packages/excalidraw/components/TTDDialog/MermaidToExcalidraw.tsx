@@ -94,6 +94,9 @@ const MermaidToExcalidraw = ({
 
   useEffect(() => {
     const doRender = async () => {
+      if (!mermaidToExcalidrawLib.loaded) {
+        return;
+      }
       try {
         if (!deferredText.trim()) {
           resetPreview({ canvasRef, setError });
