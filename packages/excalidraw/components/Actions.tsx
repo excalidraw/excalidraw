@@ -171,6 +171,8 @@ export const SelectedShapeActions = ({
 
       {predicates.freedrawMode && renderAction("changeFreedrawMode")}
 
+      {predicates.freedrawMode && renderAction("savedPens")}
+
       {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
 
       {predicates.roundness && <>{renderAction("changeRoundness")}</>}
@@ -296,6 +298,7 @@ const CombinedShapeProperties = ({
               {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
               {predicates.opacity && renderAction("changeOpacity")}
+              {predicates.freedrawMode && renderAction("savedPens")}
             </div>
           </PropertiesPopover>
         )}

@@ -587,7 +587,16 @@ export interface AppState {
   /** user-customized font-picker top picks (pinned via drag & drop from the
    * font picker popup). `null` means no customization (defaults are used) */
   fontTopPicks: readonly FontFamilyValues[] | null;
+  /** user-saved freedraw styles (pens & highlighters), applied as a whole */
+  savedPens: readonly SavedPen[];
 }
+
+export type SavedPen = {
+  strokeColor: string;
+  strokeWidthKey: StrokeWidthKey;
+  opacity: number;
+  strokeVariability: StrokeVariability;
+};
 
 export type SearchMatch = {
   id: string;

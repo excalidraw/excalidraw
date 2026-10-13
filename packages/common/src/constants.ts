@@ -274,6 +274,9 @@ export const DEFAULT_FONT_FAMILY: FontFamilyValues = FONT_FAMILY.Excalifont;
  * `packages/excalidraw/components/FontPicker/FontPicker.tsx` (enforced by
  * `fontTopPicks.test.ts`) */
 export const FONT_TOP_PICKS_SLOTS = 3;
+/** upper bound on `appState.savedPens`, guarding against hostile or
+ * hand-edited storage rather than limiting regular use */
+export const SAVED_PENS_MAX = 100;
 export const DEFAULT_TEXT_ALIGN = "left";
 export const DEFAULT_VERTICAL_ALIGN = "top";
 export const DEFAULT_VERSION = "{version}";

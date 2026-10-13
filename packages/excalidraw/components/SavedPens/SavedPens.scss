@@ -1,0 +1,26 @@
+.excalidraw {
+  .saved-pens__pen {
+    --saved-pen-dot-size: 0.625rem;
+
+    &--thin {
+      --saved-pen-dot-size: 0.375rem;
+    }
+
+    &--bold {
+      --saved-pen-dot-size: 0.875rem;
+    }
+  }
+
+  .saved-pens__dot {
+    width: var(--saved-pen-dot-size);
+    height: var(--saved-pen-dot-size);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--color-outline);
+    pointer-events: none;
+  }
+
+  .saved-pens__save:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
