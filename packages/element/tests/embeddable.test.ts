@@ -243,3 +243,58 @@ describe("Google Drive video embedding", () => {
     ).toBe(true);
   });
 });
+
+describe("Vimeo video embedding", () => {
+  it.each([
+    {
+      url: "https://vimeo.com/76979871",
+      expectedLink: "https://player.vimeo.com/video/76979871?api=1",
+    },
+    {
+      url: "https://player.vimeo.com/video/76979871",
+      expectedLink: "https://player.vimeo.com/video/76979871?api=1",
+    },
+    {
+      url: "https://player.vimeo.com/video/76979871?badge=0&autopause=0",
+      expectedLink: "https://player.vimeo.com/video/76979871?api=1",
+    },
+    // unlisted videos only play with their privacy hash
+    {
+      url: "https://vimeo.com/123456789/abcdef1234",
+      expectedLink:
+        "https://player.vimeo.com/video/123456789?h=abcdef1234&api=1",
+    },
+    {
+      url: "https://vimeo.com/123456789/abcdef1234?share=copy",
+      expectedLink:
+        "https://player.vimeo.com/video/123456789?h=abcdef1234&api=1",
+    },
+    {
+      url: "https://player.vimeo.com/video/123456789?h=abcdef1234&badge=0",
+      expectedLink:
+        "https://player.vimeo.com/video/123456789?h=abcdef1234&api=1",
+    },
+    {
+      url: "https://player.vimeo.com/video/123456789?badge=0&h=abcdef1234",
+      expectedLink:
+        "https://player.vimeo.com/video/123456789?h=abcdef1234&api=1",
+    },
+  ])("should normalize Vimeo link: $url", ({ url, expectedLink }) => {
+    const result = getEmbedLink(url);
+
+    expect(result?.type).toBe("video");
+    expect(result?.error).toBeUndefined();
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(expectedLink);
+    }
+    expect(result?.intrinsicSize).toEqual({ w: 560, h: 315 });
+  });
+
+  it("should still flag unsupported Vimeo link formats", () => {
+    const result = getEmbedLink(
+      "https://vimeo.com/channels/staffpicks/76979871",
+    );
+
+    expect(result?.error).toBeInstanceOf(URIError);
+  });
+});
