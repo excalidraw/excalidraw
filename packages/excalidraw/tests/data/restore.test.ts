@@ -6,6 +6,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_SIDEBAR,
   FONT_FAMILY,
+  getLineHeight,
   ROUNDNESS,
   STICKY_NOTE_MAX_FONT_SIZE,
   DEFAULT_STICKY_NOTE_BG,
@@ -233,6 +234,7 @@ describe("restoreElements", () => {
     )[0] as ExcalidrawTextElement;
 
     expect(restoredText.fontSize).toBe(20);
+    expect(restoredText.fontFamily).toBe(FONT_FAMILY.Virgil);
     expect(restoredText.lineHeight).toBe(2.5);
   });
 
@@ -251,9 +253,8 @@ describe("restoreElements", () => {
       null,
     )[0] as ExcalidrawTextElement;
 
-    expect(Number.isFinite(restoredText.lineHeight)).toBe(true);
+    expect(restoredText.lineHeight).toBe(getLineHeight(textElement.fontFamily));
   });
-
 
   it("should sanitize non-finite font sizes on text elements", () => {
     const textElement: any = API.createElement({
