@@ -876,8 +876,8 @@ export const convertToExcalidrawElements = (
     maxX = maxX + PADDING;
     maxY = maxY + PADDING;
 
-    const frameX = frame?.x || minX;
-    const frameY = frame?.y || minY;
+    const frameX = element.x ?? minX;
+    const frameY = element.y ?? minY;
     const frameWidth = frame?.width || maxX - minX;
     const frameHeight = frame?.height || maxY - minY;
 
