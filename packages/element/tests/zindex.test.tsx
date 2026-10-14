@@ -18,9 +18,9 @@ import {
   unmountComponent,
 } from "@excalidraw/excalidraw/tests/test-utils";
 
-import type { AppState } from "@excalidraw/excalidraw/types";
+import { selectGroupsForSelectedElements } from "@excalidraw/excalidraw/components/App.selection";
 
-import { selectGroupsForSelectedElements } from "../src/groups";
+import type { AppState } from "@excalidraw/excalidraw/types";
 
 import type {
   ExcalidrawElement,

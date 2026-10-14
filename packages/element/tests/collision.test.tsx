@@ -247,6 +247,50 @@ describe("hitElementItself cache", () => {
       }),
     ).toBe(true);
   });
+
+  it("rechecks a bound label when only its arrow changes", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      x: 200,
+      y: 200,
+      width: 300,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(300, 0)],
+    });
+    const label = API.createElement({
+      type: "text",
+      text: "label",
+      x: 325,
+      y: 187.5,
+      width: 50,
+      height: 25,
+      containerId: arrow.id,
+    });
+    API.setElements([arrow, label]);
+    API.updateElement(arrow, {
+      boundElements: [{ id: label.id, type: "text" }],
+    });
+    const elementsMap = window.h.scene.getNonDeletedElementsMap();
+    const labelVersion = label.version;
+    const point = pointFrom<GlobalPoint>(350, 200);
+
+    expect(
+      hitElementItself({ point, element: label, threshold: 1, elementsMap }),
+    ).toBe(true);
+    API.updateElement(arrow, { x: 500 });
+    expect(label.version).toBe(labelVersion);
+    expect(
+      hitElementItself({ point, element: label, threshold: 1, elementsMap }),
+    ).toBe(false);
+    expect(
+      hitElementItself({
+        point: pointFrom<GlobalPoint>(650, 200),
+        element: label,
+        threshold: 1,
+        elementsMap,
+      }),
+    ).toBe(true);
+  });
 });
 
 describe("freedraw collision matches the rendered stroke width", () => {
@@ -721,6 +765,56 @@ describe("binding hit tests", () => {
     const transparent = hitTest([hidden, cover("transparent")], point);
     expect(transparent.hovered).toBe("hidden");
     expect(transparent.all).toEqual(["cover", "hidden"]);
+  });
+
+  it("an image, and a locked opaque element, hide what's behind them", () => {
+    const hidden = API.createElement({
+      id: "hidden",
+      type: "rectangle",
+      x: 30,
+      y: 30,
+      width: 40,
+      height: 40,
+      index: "a0" as SceneElement["index"],
+    }) as SceneElement;
+    const point = pointFrom<GlobalPoint>(50, 50);
+
+    const image = API.createElement({
+      id: "image",
+      type: "image",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      index: "a1" as SceneElement["index"],
+    }) as SceneElement;
+    expect(hitTest([hidden, image], point)).toEqual({
+      hovered: "image",
+      all: ["image"],
+    });
+
+    const locked = (backgroundColor: string) =>
+      API.createElement({
+        id: "locked",
+        type: "rectangle",
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        backgroundColor,
+        locked: true,
+        index: "a1" as SceneElement["index"],
+      }) as SceneElement;
+    // can't bind to the locked element, nor through it
+    expect(hitTest([hidden, locked("#ffc9c9")], point)).toEqual({
+      hovered: undefined,
+      all: [],
+    });
+    // a transparent locked element hides nothing
+    expect(hitTest([hidden, locked("transparent")], point)).toEqual({
+      hovered: "hidden",
+      all: ["hidden"],
+    });
   });
 
   describe("overlapping elements", () => {

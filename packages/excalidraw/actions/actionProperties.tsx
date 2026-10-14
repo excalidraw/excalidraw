@@ -1143,7 +1143,10 @@ export const actionIncreaseFontSize = register({
 type ChangeFontFamilyData = Partial<
   Pick<
     AppState,
-    "openPopup" | "currentItemFontFamily" | "currentHoveredFontFamily"
+    | "openPopup"
+    | "currentItemFontFamily"
+    | "currentHoveredFontFamily"
+    | "fontTopPicks"
   >
 > & {
   /** cache of selected & editing elements populated on opened popup */
@@ -1441,7 +1444,9 @@ export const actionChangeFontFamily = register<{
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
+          topPicks={appState.fontTopPicks}
           compactMode={stylesPanelMode !== "full"}
+          onTopPicksChange={(fontTopPicks) => updateData({ fontTopPicks })}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(
               () => {

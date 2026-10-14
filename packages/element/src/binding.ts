@@ -1322,6 +1322,7 @@ export const updateBoundElements = (
   changedElement: NonDeletedExcalidrawElement,
   scene: Scene,
   options?: {
+    /** see `getSimultaneouslyUpdatedElementIds` for how to pass it */
     simultaneouslyUpdated?: readonly NonDeletedExcalidrawElement[];
     changedElements?: Map<string, ExcalidrawElement>;
   },
@@ -1541,10 +1542,33 @@ const doesNeedUpdate = (
   );
 };
 
-const getSimultaneouslyUpdatedElementIds = (
+// PERF: callers updating many elements invoke `updateBoundElements()` for each
+// of them with the same `simultaneouslyUpdated` array, so cache the id set
+// per array to avoid rebuilding it on every call (O(n^2) on multi-element
+// transforms)
+const simultaneouslyUpdatedElementIdsCache = new WeakMap<
+  readonly ExcalidrawElement[],
+  ReadonlySet<ExcalidrawElement["id"]>
+>();
+
+/**
+ * The id set of `simultaneouslyUpdated`, shared by every `updateBoundElements()`
+ * call given the same array. Pass one array instance for all elements of an
+ * operation, and don't change its membership after the first lookup, or the
+ * cached ids go stale.
+ */
+export const getSimultaneouslyUpdatedElementIds = (
   simultaneouslyUpdated: readonly ExcalidrawElement[] | undefined,
-): Set<ExcalidrawElement["id"]> => {
-  return new Set((simultaneouslyUpdated || []).map((element) => element.id));
+): ReadonlySet<ExcalidrawElement["id"]> => {
+  if (!simultaneouslyUpdated) {
+    return new Set();
+  }
+  let ids = simultaneouslyUpdatedElementIdsCache.get(simultaneouslyUpdated);
+  if (!ids) {
+    ids = new Set(simultaneouslyUpdated.map((element) => element.id));
+    simultaneouslyUpdatedElementIdsCache.set(simultaneouslyUpdated, ids);
+  }
+  return ids;
 };
 
 export const getHeadingForElbowArrowSnap = (

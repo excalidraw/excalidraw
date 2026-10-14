@@ -118,6 +118,16 @@
         display: inline-flex;
       }
 
+      // inset, so the focus/pressed rings are neither clipped by the scroll
+      // container nor covered by the adjacent item
+      .dropdown-menu-item:focus-visible {
+        box-shadow: inset 0 0 0 1px var(--color-brand-hover);
+      }
+
+      .dropdown-menu-item:active {
+        box-shadow: inset 0 0 0 1px var(--color-brand-active);
+      }
+
       .dropdown-menu-group:not(:first-child) {
         margin-top: 1rem;
       }

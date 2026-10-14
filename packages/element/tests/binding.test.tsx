@@ -1,4 +1,4 @@
-import { KEYS, ROUNDNESS, arrayToMap } from "@excalidraw/common";
+import { KEYS, ROUNDNESS, arrayToMap, DEFAULT_ZOOM } from "@excalidraw/common";
 
 import { pointFrom } from "@excalidraw/math";
 
@@ -17,8 +17,6 @@ import {
 import { defaultLang, setLanguage } from "@excalidraw/excalidraw/i18n";
 
 import type { Radians } from "@excalidraw/math";
-
-import type { Zoom } from "@excalidraw/excalidraw/types";
 
 import {
   bindBindingElement,
@@ -1085,9 +1083,7 @@ describe("binding to a point-like (sub-pixel) element", () => {
       }) as NonDeleted<ExcalidrawArrowElement>;
       API.setElements([rect, arrow]);
 
-      bindBindingElement(arrow, rect, "orbit", "end", h.scene, {
-        value: 1,
-      } as Zoom);
+      bindBindingElement(arrow, rect, "orbit", "end", h.scene, DEFAULT_ZOOM);
 
       const endBinding = arrow.endBinding as FixedPointBinding;
       expect(endBinding.elementId).toBe(rect.id);

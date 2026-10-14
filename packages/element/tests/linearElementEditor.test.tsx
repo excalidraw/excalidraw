@@ -426,6 +426,40 @@ describe("Test Linear Elements", () => {
     await getTextEditor();
   });
 
+  it("updates the hovered handles together (midpoint, then endpoint)", () => {
+    createTwoPointerLinearElement("arrow");
+    mouse.moveTo(midpoint[0], midpoint[1]);
+    expect(
+      h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+    ).not.toBe(null);
+
+    mouse.moveTo(p2[0], p2[1]);
+    expect(h.state.selectedLinearElement).toMatchObject({
+      hoverPointIndex: 1,
+      segmentMidPointHoveredCoords: null,
+    });
+  });
+
+  it("doesn't highlight the arrow's midpoint while its label is edited", async () => {
+    createTwoPointerLinearElement("arrow");
+    mouse.moveTo(midpoint[0], midpoint[1]);
+    expect(
+      h.state.selectedLinearElement?.segmentMidPointHoveredCoords,
+    ).not.toBe(null);
+
+    mouse.doubleClickAt(midpoint[0], midpoint[1]);
+    await getTextEditor();
+    expect(h.state.selectedLinearElement?.segmentMidPointHoveredCoords).toBe(
+      null,
+    );
+
+    // (beside the editor)
+    mouse.moveTo(midpoint[0] + 8, midpoint[1]);
+    expect(h.state.selectedLinearElement?.segmentMidPointHoveredCoords).toBe(
+      null,
+    );
+  });
+
   it.each([
     ["start", null],
     ["start", "triangle"],
@@ -1635,6 +1669,8 @@ describe("Test Linear Elements", () => {
       contextMenu = document.querySelector(".context-menu");
       fireEvent.click(queryByText(contextMenu as HTMLElement, "Unbind text")!);
       expect(container.boundElements).toEqual([]);
+      // the arrow is selected along with the freed label
+      expect(h.state.selectedLinearElement).toBe(null);
       expect(text).toEqual(
         expect.objectContaining({
           containerId: null,
@@ -1867,7 +1903,9 @@ describe("Test Linear Elements", () => {
         ]);
 
         mouse.reset();
-        mouse.clickAt(0, 0);
+        // (not by a click, whose pointerup would normalize — reroute — this
+        // hand-built elbow arrow)
+        act(() => h.app.selection.select(arrow.id));
         expect(h.state.selectedLinearElement?.elementId).toBe(arrow.id);
 
         // inside the label AND within the hit radius of the route point at

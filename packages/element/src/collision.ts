@@ -42,6 +42,7 @@ import {
 import {
   hasBoundTextElement,
   isBindableElement,
+  isBoundToContainer,
   isFrameLikeElement,
   isFreeDrawElement,
   isIframeLikeElement,
@@ -55,9 +56,10 @@ import {
   deconstructRectanguloidElement,
 } from "./utils";
 
-import { getBoundTextElement } from "./textElement";
-
-import { LinearElementEditor } from "./linearElementEditor";
+import {
+  getBoundTextElement,
+  getTextElementWithAccuratePosition,
+} from "./textElement";
 
 import { distanceToElement } from "./distance";
 
@@ -144,7 +146,10 @@ export const hitElementItself = ({
   // A cached hit stays valid for any larger threshold, while a cached miss
   // stays valid only for a threshold no larger than the cached one (a larger
   // threshold could turn a miss into a hit).
+  // Skipped for container-bound labels — their position can change without
+  // their version being bumped (see ElementBounds.getBounds).
   if (
+    !isBoundToContainer(element) &&
     cachedPoint &&
     pointsEqual(point, cachedPoint) &&
     (cachedHit ? cachedThreshold <= threshold : cachedThreshold >= threshold) &&
@@ -190,6 +195,15 @@ export const hitElementItself = ({
   // rotated bounding box or not hitting the frame name (saves 99%)
   if (!hitBounds && !hitFrameName) {
     return false;
+  }
+
+  // an arrow label's stored coords can be stale. The bounds test above
+  // already accounts for it (getElementBounds derives the position
+  // internally), but the precise test below reads the element coords
+  // directly, so substitute them. Done after the early bail so the common
+  // miss path stays allocation-free.
+  if (isTextElement(element)) {
+    element = getTextElementWithAccuratePosition(element, elementsMap);
   }
 
   // Do the precise (and relatively costly) hit test
@@ -262,18 +276,10 @@ export const hitElementBoundText = (
   if (!boundTextElementCandidate) {
     return false;
   }
-  const boundTextElement = isLinearElement(element)
-    ? {
-        ...boundTextElementCandidate,
-        // arrow's bound text accurate position is not stored in the element's property
-        // but rather calculated and returned from the following static method
-        ...LinearElementEditor.getBoundTextElementPosition(
-          element,
-          boundTextElementCandidate,
-          elementsMap,
-        ),
-      }
-    : boundTextElementCandidate;
+  const boundTextElement = getTextElementWithAccuratePosition(
+    boundTextElementCandidate,
+    elementsMap,
+  );
 
   return isPointInElement(point, boundTextElement, elementsMap);
 };
@@ -340,9 +346,19 @@ type BindingCandidate = {
 };
 
 /**
+ * Whether the element hides what is behind it from binding — an arrow's or a
+ * text label's. Images count as opaque, and frames once they support a
+ * background.
+ */
+export const isOpaqueForBinding = (element: ExcalidrawElement) =>
+  isImageElement(element) ||
+  (hasBackground(element.type) && !isTransparent(element.backgroundColor));
+
+/**
  * Bindable elements within binding distance of the point, front to back.
  * Stops at the first opaque element containing the point, since it hides
- * everything behind it.
+ * everything behind it. Locked elements can't be bound to, but still hide
+ * what is behind them.
  */
 const getBindingCandidates = (
   point: Readonly<GlobalPoint>,
@@ -352,6 +368,9 @@ const getBindingCandidates = (
 ): BindingCandidate[] => {
   const maxDistance = maxBindingDistance_simple(zoom);
   const candidates: BindingCandidate[] = [];
+  // A frame's children sit just below it in z-order, so a frame's background
+  // can't end the search: it only hides the non-children behind it
+  let occludingFrameId: ExcalidrawElement["id"] | null = null;
   // We need to do hit testing from front (end of the array) to back (beginning of the array)
   // because array is ordered from lower z-index to highest and we want element z-index
   // with higher z-index
@@ -363,8 +382,21 @@ const getBindingCandidates = (
       "Elements passed to binding hit tests should not contain deleted elements",
     );
 
-    if (!isBindableElement(element, false)) {
+    if (occludingFrameId && element.frameId !== occludingFrameId) {
       continue;
+    }
+
+    if (!isBindableElement(element)) {
+      continue;
+    }
+
+    if (isFrameLikeElement(element)) {
+      if (
+        isOpaqueForBinding(element) &&
+        isPointInElement(point, element, elementsMap)
+      ) {
+        occludingFrameId = element.id;
+      }
     }
 
     const distance = bindableElementBorderDistanceIfClose(
@@ -375,13 +407,11 @@ const getBindingCandidates = (
     );
 
     if (distance > -maxDistance) {
-      candidates.push({ element, distance });
+      if (!element.locked) {
+        candidates.push({ element, distance });
+      }
 
-      if (
-        hasBackground(element.type) &&
-        !isTransparent(element.backgroundColor) &&
-        distance >= 0
-      ) {
+      if (distance >= 0 && isOpaqueForBinding(element)) {
         break;
       }
     }

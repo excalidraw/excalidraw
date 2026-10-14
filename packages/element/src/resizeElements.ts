@@ -325,6 +325,15 @@ export const resizeSingleTextElement = (
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
+  // a corner follows the axis it grows most, as keeping the aspect ratio
+  // does (which text always does)
+  if (transformHandleType.length === 2) {
+    nextHeight = Math.max(
+      nextHeight,
+      (nextWidth / origElement.width) * origElement.height,
+    );
+  }
+
   const metricsWidth = element.width * (nextHeight / element.height);
 
   const metrics = measureFontSizeFromWidth(element, elementsMap, metricsWidth);
@@ -985,7 +994,7 @@ export const resizeSingleElement = (
   }
 };
 
-const getNextSingleWidthAndHeightFromPointer = (
+export const getNextSingleWidthAndHeightFromPointer = (
   latestElement: ExcalidrawElement,
   origElement: ExcalidrawElement,
   handleDirection: TransformHandleDirection,

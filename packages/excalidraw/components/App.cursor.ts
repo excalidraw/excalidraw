@@ -1,4 +1,4 @@
-import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
+import { CURSOR_TYPE, KEYS, MIME_TYPES, THEME } from "@excalidraw/common";
 
 import { isHandToolActive, isEraserActive } from "../appState";
 
@@ -185,12 +185,17 @@ export class AppCursor {
     const EventConstructor =
       typeof PointerEvent !== "undefined" ? PointerEvent : MouseEvent;
 
+    // with the modifiers held now, which the move would otherwise release
+    const modifiers = this.app.modifiers.get();
     this.canvas.dispatchEvent(
       new EventConstructor("pointermove", {
         bubbles: true,
         cancelable: true,
         clientX: lastEvent.clientX,
         clientY: lastEvent.clientY,
+        altKey: modifiers.alt,
+        shiftKey: modifiers.shift,
+        [KEYS.CTRL_OR_CMD]: modifiers.ctrlOrCmd,
       }),
     );
   };

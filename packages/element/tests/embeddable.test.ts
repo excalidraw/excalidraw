@@ -95,6 +95,18 @@ describe("YouTube timestamp parsing", () => {
     expect(result?.intrinsicSize).toEqual({ w: 315, h: 560 });
   });
 
+  it("should handle YouTube live URLs", () => {
+    const url = "https://www.youtube.com/live/dQw4w9WgXcQ?si=abc&t=30";
+    const result = getEmbedLink(url);
+
+    expect(result?.type).toBe("video");
+    if (result?.type === "video" || result?.type === "generic") {
+      expect(result.link).toBe(
+        "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&start=30",
+      );
+    }
+  });
+
   it("should handle playlist URLs with timestamps", () => {
     const url =
       "https://www.youtube.com/playlist?list=PLrAXtmRdnEQy1KbG5lbfgQ0-PKQY6FKYZ&t=60";

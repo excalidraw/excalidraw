@@ -21,6 +21,7 @@ import {
   getSizeFromPoints,
   isDevEnv,
   arrayToMap,
+  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -1218,7 +1219,7 @@ const getElbowArrowData = (
 
   // NOTE: updates coming through `mutateElement` don't carry the zoom, so
   // those fall back to the zoom=1 binding distance
-  const zoom = options?.zoom ?? ({ value: 1 } as AppState["zoom"]);
+  const zoom = options?.zoom ?? DEFAULT_ZOOM;
 
   let hoveredStartElement = null;
   let hoveredEndElement = null;

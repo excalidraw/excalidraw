@@ -17,6 +17,7 @@ import {
   getLineHeight,
   DEFAULT_STICKY_NOTE_SIZE,
   isTransparent,
+  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 
 import type { MarkOptional } from "@excalidraw/common/utility-types";
@@ -786,7 +787,7 @@ export const convertToExcalidrawElements = (
                 originalEnd,
                 elementStore,
                 scene,
-                { value: 1 } as Zoom,
+                DEFAULT_ZOOM,
               );
             container = linearElement;
             elementStore.add(linearElement);
@@ -812,7 +813,7 @@ export const convertToExcalidrawElements = (
                   end,
                   elementStore,
                   scene,
-                  { value: 1 } as Zoom,
+                  DEFAULT_ZOOM,
                 );
 
               elementStore.add(linearElement);

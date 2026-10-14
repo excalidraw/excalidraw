@@ -394,6 +394,8 @@ const getAdjustedDimensions = (
   element: ExcalidrawTextElement,
   elementsMap: ElementsMap,
   nextText: string,
+  /** the width the text is to take regardless of its content */
+  nextFixedWidth?: number,
 ): {
   x: number;
   y: number;
@@ -407,7 +409,9 @@ const getAdjustedDimensions = (
   );
 
   // wrapped text
-  if (!element.autoResize) {
+  if (nextFixedWidth !== undefined) {
+    nextWidth = nextFixedWidth;
+  } else if (!element.autoResize) {
     nextWidth = element.width;
   }
 
@@ -531,9 +535,37 @@ export const refreshTextDimensions = (
   container: ExcalidrawTextContainer | null,
   elementsMap: ElementsMap,
   text = textElement.text,
+  /**
+   * For a free text that grows with its content (`autoResize`): the widest
+   * it may grow to. Crossing it, the text stops growing and wraps at this
+   * width from then on (`autoResize: false`), anchored as its growth was. A
+   * text that is already wider keeps growing.
+   */
+  maxWidth?: number,
 ) => {
   if (textElement.isDeleted) {
     return;
+  }
+  if (
+    maxWidth !== undefined &&
+    !container &&
+    textElement.autoResize &&
+    textElement.width <= maxWidth
+  ) {
+    const font = getFontString(textElement);
+    if (measureText(text, font, textElement.lineHeight).width > maxWidth) {
+      const wrappedText = wrapText(text, font, maxWidth);
+      return {
+        text: wrappedText,
+        autoResize: false,
+        ...getAdjustedDimensions(
+          textElement,
+          elementsMap,
+          wrappedText,
+          maxWidth,
+        ),
+      };
+    }
   }
   if (container || !textElement.autoResize) {
     text = wrapText(
