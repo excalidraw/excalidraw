@@ -170,6 +170,7 @@
     },
     "statusPublished": "Yayınlandı",
     "sidebarLock": "Kenar çubuğu açık kalsın",
+    "sidebarUnlock": "Kenar çubuğunun sabitlemesini kaldır",
     "selectAllElementsInFrame": "Çerçevedeki tüm bileşenleri seç",
     "removeAllElementsFromFrame": "Çerçevedeki tüm bileşenleri sil",
     "eyeDropper": "Tuvalden renk seç",
