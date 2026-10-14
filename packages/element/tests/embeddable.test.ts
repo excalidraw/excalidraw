@@ -242,4 +242,13 @@ describe("Google Drive video embedding", () => {
       ),
     ).toBe(true);
   });
+
+  it("should validate World Bank data URLs by default", () => {
+    expect(
+      embeddableURLValidator(
+        "https://data.worldbank.org/share/widget?indicators=EN.ATM.PM25.MC.M3&locations=IN-PK",
+        undefined,
+      ),
+    ).toBe(true);
+  });
 });
