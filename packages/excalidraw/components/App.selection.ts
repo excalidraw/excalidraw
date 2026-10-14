@@ -742,9 +742,9 @@ export class AppSelection {
       ExcalidrawElement["id"],
       NonDeletedExcalidrawElement
     >();
-    for (const elementOrId of (isReadonlyArray(elementsOrIds)
+    for (const elementOrId of isReadonlyArray(elementsOrIds)
       ? elementsOrIds
-      : [elementsOrIds]) as readonly (ExcalidrawElement | string)[]) {
+      : [elementsOrIds]) {
       const id = typeof elementOrId === "string" ? elementOrId : elementOrId.id;
       const element = elementsMap.get(id);
       if (element && (includeLocked || !element.locked)) {
