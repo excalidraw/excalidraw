@@ -86,7 +86,6 @@ import {
   importUsernameFromLocalStorage,
   saveUsernameToLocalStorage,
 } from "../data/localStorage";
-import { resetBrowserStateVersions } from "../data/tabSync";
 
 import { collabErrorIndicatorAtom } from "./CollabError";
 import Portal from "./Portal";
@@ -385,9 +384,7 @@ class Collab extends PureComponent<CollabProps, CollabState> {
       LocalData.fileStorage.reset();
       this.destroySocketClient();
     } else if (window.confirm(t("alerts.collabStopOverridePrompt"))) {
-      // hack to ensure that we prefer we disregard any new browser state
-      // that could have been saved in other tabs while we were collaborating
-      resetBrowserStateVersions();
+      LocalData.replaceScene();
 
       window.history.pushState({}, APP_NAME, window.location.origin);
       this.destroySocketClient();

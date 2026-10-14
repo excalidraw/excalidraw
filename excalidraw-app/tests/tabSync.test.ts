@@ -10,12 +10,7 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { DELETED_ELEMENT_TIMEOUT, STORAGE_KEYS } from "../app_constants";
 import { LocalData } from "../data/LocalData";
-import { importFromLocalStorage } from "../data/localStorage";
-import {
-  isBrowserStorageStateNewer,
-  resetBrowserStateVersions,
-  updateBrowserStateVersion,
-} from "../data/tabSync";
+import { updateBrowserStateVersion } from "../data/tabSync";
 
 const createElement = (
   overrides: Partial<OrderedExcalidrawElement & ExcalidrawGenericElement>,
@@ -24,13 +19,25 @@ const createElement = (
   ...overrides,
 });
 
-const saveScene = (
+const saveScene = async (
   elements: readonly OrderedExcalidrawElement[],
   onElementsReconciled = vi.fn(),
   appState = getDefaultAppState() as AppState,
 ) => {
-  LocalData.save(elements, appState, {}, vi.fn(), onElementsReconciled);
-  LocalData.flushSave();
+  LocalData.save({
+    getSnapshot: () => ({
+      elements,
+      appState: { ...appState, isLoading: false },
+      files: {},
+    }),
+    onFilesSaved: vi.fn(),
+    onSync: (updates) => {
+      if (updates.elements) {
+        onElementsReconciled(updates.elements);
+      }
+    },
+  });
+  await LocalData.flushSave();
   return onElementsReconciled;
 };
 
@@ -53,9 +60,9 @@ const saveSceneFromOtherTab = (
 };
 
 describe("tab sync", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
-    resetBrowserStateVersions();
+    await LocalData.load();
     vi.spyOn(document, "hidden", "get").mockReturnValue(false);
     vi.spyOn(LocalData.fileStorage, "saveFiles").mockResolvedValue({
       savedFiles: new Map(),
@@ -63,33 +70,36 @@ describe("tab sync", () => {
     });
   });
 
-  afterEach(() => {
-    LocalData.flushSave();
+  afterEach(async () => {
+    await LocalData.flushSave();
     vi.restoreAllMocks();
   });
 
   it.each([true, false])(
     "merges both tabs' elements when hasFocus is %s",
-    (hasFocus) => {
+    async (hasFocus) => {
       vi.spyOn(document, "hasFocus").mockReturnValue(hasFocus);
       const [local, remote] = syncInvalidIndices([
         createElement({ type: "rectangle", id: "local" }),
         createElement({ type: "rectangle", id: "remote" }),
       ]);
-      saveScene([local]);
-      saveSceneFromOtherTab([remote]);
+      await saveScene([local]);
+      saveSceneFromOtherTab([local, remote]);
 
-      const onElementsReconciled = saveScene([local]);
+      const onElementsReconciled = await saveScene([local]);
 
       expect(getSavedElements().map(({ id }) => id)).toEqual([
         "local",
         "remote",
       ]);
       expect(onElementsReconciled).toHaveBeenCalledWith(getSavedElements());
+      expect(getSavedElements().every((element) => !element.isDeleted)).toBe(
+        true,
+      );
     },
   );
 
-  it("retains a merge on the next save from the updated editor", () => {
+  it("retains a merge on the next save from the updated editor", async () => {
     const [local, remote] = syncInvalidIndices([
       createElement({ type: "rectangle", id: "local" }),
       createElement({ type: "rectangle", id: "remote" }),
@@ -100,8 +110,8 @@ describe("tab sync", () => {
       scene = elements;
     });
 
-    saveScene(scene, onElementsReconciled);
-    saveScene(scene, onElementsReconciled);
+    await saveScene(scene, onElementsReconciled);
+    await saveScene(scene, onElementsReconciled);
 
     expect(onElementsReconciled).toHaveBeenCalledTimes(1);
     expect(getSavedElements().map(({ id }) => id)).toEqual(["local", "remote"]);
@@ -109,7 +119,7 @@ describe("tab sync", () => {
 
   it.each(["local", "remote"])(
     "preserves a newer deletion from the %s tab",
-    (deletedIn) => {
+    async (deletedIn) => {
       const element = createElement({
         type: "rectangle",
         id: "rect",
@@ -123,7 +133,7 @@ describe("tab sync", () => {
       };
       saveSceneFromOtherTab([deletedIn === "remote" ? deleted : element]);
 
-      saveScene([deletedIn === "local" ? deleted : element]);
+      await saveScene([deletedIn === "local" ? deleted : element]);
 
       expect(getSavedElements()).toMatchObject([
         { id: "rect", isDeleted: true, version: 2 },
@@ -131,7 +141,7 @@ describe("tab sync", () => {
     },
   );
 
-  it("uses element versions and deterministic nonces to resolve conflicts", () => {
+  it("uses element versions and deterministic nonces to resolve conflicts", async () => {
     const [a, b] = syncInvalidIndices([
       createElement({
         type: "rectangle",
@@ -147,7 +157,7 @@ describe("tab sync", () => {
       { ...b, versionNonce: 1, x: 200 },
     ]);
 
-    saveScene([a, b]);
+    await saveScene([a, b]);
 
     expect(getSavedElements()).toMatchObject([
       { id: "a", version: 3, x: 100 },
@@ -155,7 +165,7 @@ describe("tab sync", () => {
     ]);
   });
 
-  it("preserves an element being resized locally", () => {
+  it("preserves an element being resized locally", async () => {
     const element = createElement({
       type: "rectangle",
       id: "rect",
@@ -163,7 +173,7 @@ describe("tab sync", () => {
     });
     saveSceneFromOtherTab([{ ...element, version: 2, width: 500 }]);
 
-    saveScene([element], vi.fn(), {
+    await saveScene([element], vi.fn(), {
       ...getDefaultAppState(),
       resizingElement: element,
     } as AppState);
@@ -171,7 +181,7 @@ describe("tab sync", () => {
     expect(getSavedElements()).toEqual([element]);
   });
 
-  it("keeps recent tombstones and discards expired tombstones and invisible elements", () => {
+  it("keeps recent tombstones and discards expired tombstones and invisible elements", async () => {
     const elements = syncInvalidIndices([
       createElement({
         type: "rectangle",
@@ -193,31 +203,34 @@ describe("tab sync", () => {
       }),
     ]);
 
-    saveScene(elements);
+    await saveScene(elements);
 
     expect(getSavedElements().map(({ id }) => id)).toEqual(["recent"]);
   });
 
-  it("allows an intentional scene replacement after importing the current storage version", () => {
+  it("allows an intentional scene replacement after importing the current storage version", async () => {
     saveSceneFromOtherTab([
       createElement({ type: "rectangle", id: "previous" }),
     ]);
-    importFromLocalStorage();
+    await LocalData.load();
     const replacement = createElement({
       type: "rectangle",
       id: "replacement",
     });
 
-    const onElementsReconciled = saveScene([replacement]);
+    const onElementsReconciled = await saveScene([replacement]);
 
     expect(getSavedElements()).toEqual([replacement]);
     expect(onElementsReconciled).not.toHaveBeenCalled();
   });
 
-  it("does not mark a failed save as synced, so a retry still merges", () => {
+  it("does not mark a failed save as synced, so a retry still merges", async () => {
     const local = createElement({ type: "rectangle", id: "local" });
     const remote = createElement({ type: "rectangle", id: "remote" });
     saveSceneFromOtherTab([remote]);
+    const versionBeforeSave = localStorage.getItem(
+      STORAGE_KEYS.VERSION_DATA_STATE,
+    );
     const setItem = vi
       .spyOn(localStorage, "setItem")
       .mockImplementationOnce(() => {
@@ -225,14 +238,14 @@ describe("tab sync", () => {
       });
     vi.spyOn(console, "error").mockImplementation(() => {});
 
-    const onElementsReconciled = saveScene([local]);
+    const onElementsReconciled = await saveScene([local]);
 
     expect(onElementsReconciled).not.toHaveBeenCalled();
-    expect(isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)).toBe(
-      true,
+    expect(localStorage.getItem(STORAGE_KEYS.VERSION_DATA_STATE)).toBe(
+      versionBeforeSave,
     );
     setItem.mockRestore();
-    saveScene([local]);
+    await saveScene([local]);
     expect(
       getSavedElements()
         .map(({ id }) => id)
@@ -240,7 +253,7 @@ describe("tab sync", () => {
     ).toEqual(["local", "remote"]);
   });
 
-  it("increments storage versions for saves within one millisecond", () => {
+  it("increments storage versions for saves within one millisecond", async () => {
     vi.spyOn(Date, "now").mockReturnValue(1000);
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
     expect(localStorage.getItem(STORAGE_KEYS.VERSION_DATA_STATE)).toBe("1000");

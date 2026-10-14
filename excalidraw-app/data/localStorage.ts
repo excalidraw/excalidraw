@@ -2,13 +2,29 @@ import {
   clearAppStateForLocalStorage,
   getDefaultAppState,
 } from "@excalidraw/excalidraw/appState";
+import { createStore, update } from "idb-keyval";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "../app_constants";
 
-import { syncBrowserStateVersion } from "./tabSync";
+const synchronizationStore = createStore("excalidraw-sync", "locks");
+
+export const withBrowserStorageLock = async <T>(
+  callback: () => T,
+): Promise<T> => {
+  let result: T;
+  await update(
+    "scene",
+    () => {
+      result = callback();
+      return 0;
+    },
+    synchronizationStore,
+  );
+  return result!;
+};
 
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
@@ -39,14 +55,13 @@ export const importUsernameFromLocalStorage = (): string | null => {
 export const importFromLocalStorage = () => {
   let savedElements = null;
   let savedState = null;
+  let elementsValid = true;
 
   try {
-    // read the version before the data so that if another tab saves
-    // in between, we're considered stale rather than up to date
-    syncBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
     savedElements = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS);
     savedState = localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE);
   } catch (error: any) {
+    elementsValid = false;
     // Unable to access localStorage
     console.error(error);
   }
@@ -54,8 +69,22 @@ export const importFromLocalStorage = () => {
   let elements: ExcalidrawElement[] = [];
   if (savedElements) {
     try {
-      elements = JSON.parse(savedElements);
+      const parsed: unknown = JSON.parse(savedElements);
+      if (
+        !Array.isArray(parsed) ||
+        parsed.some(
+          (element) =>
+            !element ||
+            typeof element !== "object" ||
+            typeof element.id !== "string" ||
+            typeof element.type !== "string",
+        )
+      ) {
+        throw new Error("Invalid stored scene");
+      }
+      elements = parsed;
     } catch (error: any) {
+      elementsValid = false;
       console.error(error);
       // Do nothing because elements array is already empty
     }
@@ -75,7 +104,7 @@ export const importFromLocalStorage = () => {
       // Do nothing because appState is already null
     }
   }
-  return { elements, appState };
+  return { elements, appState, elementsValid };
 };
 
 export const getElementsStorageSize = () => {
