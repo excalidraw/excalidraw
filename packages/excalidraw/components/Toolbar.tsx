@@ -22,6 +22,7 @@ import {
   laserPointerToolIcon,
   bucketFillIcon,
   MagicIcon,
+  mathSymbolsIcon,
   mermaidLogoIcon,
   DotsIcon,
 } from "./icons";
@@ -192,6 +193,13 @@ const ExtraToolsDropdown = ({
             {t("toolBar.lasso")}
           </DropdownMenu.Item>
         )}
+        <DropdownMenu.Item
+          onSelect={() => app.setOpenDialog({ name: "mathSymbols" })}
+          icon={mathSymbolsIcon}
+          data-testid="toolbar-math-symbols"
+        >
+          {t("toolBar.mathSymbols")}
+        </DropdownMenu.Item>
         <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
           Generate
         </div>
