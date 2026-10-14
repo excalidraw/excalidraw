@@ -5,6 +5,7 @@ import { withBatchedUpdates } from "../reactUtils";
 import { getNormalizedZoom } from "../scene";
 import { getViewportForZoomWithScrollConstraints } from "../viewport";
 
+import type { ToolType } from "../types";
 import type App from "./App";
 
 /** `MouseEvent.buttons` bit of the wheel (middle) button */
@@ -20,6 +21,9 @@ const WHEEL_BUTTON_MASK = 4;
  */
 export class AppWheel {
   constructor(private app: App) {}
+
+  private accumulatedToolWheelDelta = 0;
+  private resetAccumulatedToolWheelDeltaTimer = 0;
 
   /** the editor surfaces whose wheel input the editor consumes; everywhere
    * else (menus, sidebars, …) the DOM keeps scrolling. The frame-name labels
@@ -74,6 +78,37 @@ export class AppWheel {
 
     const { deltaX, deltaY } = event;
     if (!deltaX && !deltaY) {
+      return;
+    }
+
+    // Alt + wheel cycles through hotbar tools (like Minecraft hotbar)
+    if (
+      event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      deltaY !== 0
+    ) {
+      let normalizedDeltaY = deltaY;
+      if (event.deltaMode === 1) {
+        normalizedDeltaY *= 30;
+      } else if (event.deltaMode === 2) {
+        normalizedDeltaY *= 100;
+      }
+
+      window.clearTimeout(this.resetAccumulatedToolWheelDeltaTimer);
+      this.resetAccumulatedToolWheelDeltaTimer = window.setTimeout(() => {
+        this.accumulatedToolWheelDelta = 0;
+      }, 300);
+
+      this.accumulatedToolWheelDelta += normalizedDeltaY;
+      const THRESHOLD = 30;
+
+      if (Math.abs(this.accumulatedToolWheelDelta) >= THRESHOLD) {
+        const direction = this.accumulatedToolWheelDelta > 0 ? 1 : -1;
+        this.accumulatedToolWheelDelta = 0;
+        this.cycleTool(direction);
+      }
       return;
     }
     // note that event.ctrlKey is necessary to handle pinch zooming
@@ -174,5 +209,57 @@ export class AppWheel {
     if (didTranslate) {
       this.app.resetShouldCacheIgnoreZoomDebounced();
     }
+  };
+
+  /** cycles through toolbar tools (hotbar) */
+  private cycleTool = (direction: 1 | -1) => {
+    if (this.app.props.activeTool != null || this.app.props.viewModeEnabled) {
+      return;
+    }
+
+    const HOTBAR_TOOLS: ToolType[] = [
+      "hand",
+      "selection",
+      "rectangle",
+      "diamond",
+      "ellipse",
+      "arrow",
+      "line",
+      "freedraw",
+      "text",
+      "stickynote",
+      "eraser",
+    ];
+
+    const availableTools = HOTBAR_TOOLS.filter((tool) =>
+      this.app.isToolSupported(tool),
+    );
+
+    if (availableTools.length <= 1) {
+      return;
+    }
+
+    const currentToolType = this.app.state.activeTool.type;
+    const currentNormalized =
+      currentToolType === "lasso" ? "selection" : currentToolType;
+
+    let currentIndex = availableTools.indexOf(currentNormalized as ToolType);
+    if (currentIndex === -1) {
+      currentIndex = 0;
+    }
+
+    const nextIndex =
+      (currentIndex + direction + availableTools.length) %
+      availableTools.length;
+    let nextTool = availableTools[nextIndex];
+
+    if (
+      nextTool === "selection" &&
+      this.app.state.preferredSelectionTool.type === "lasso"
+    ) {
+      nextTool = "lasso";
+    }
+
+    this.app.setActiveTool({ type: nextTool });
   };
 }
