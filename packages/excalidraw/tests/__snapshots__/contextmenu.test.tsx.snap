@@ -137,6 +137,53 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
           "category": "element",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 4l18 0"
+            />
+            <path
+              d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"
+            />
+            <path
+              d="M12 16l0 4"
+            />
+            <path
+              d="M9 20l6 0"
+            />
+            <path
+              d="M8 12l3 -3l2 2l3 -3"
+            />
+          </g>
+        </svg>,
+        "label": "presentation.startFromFrame",
+        "name": "presentFromFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+        },
+        "viewMode": true,
+      },
       "separator",
       {
         "PanelComponent": [Function],
@@ -970,6 +1017,7 @@ exports[`contextMenu element > right-clicking on a group should select whole gro
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -1181,6 +1229,7 @@ exports[`contextMenu element > selecting 'Add to library' in context menu adds e
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -1410,6 +1459,7 @@ exports[`contextMenu element > selecting 'Bring forward' in context menu brings 
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -1758,6 +1808,7 @@ exports[`contextMenu element > selecting 'Bring to front' in context menu brings
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -2106,6 +2157,7 @@ exports[`contextMenu element > selecting 'Copy styles' in context menu copies st
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -2335,6 +2387,7 @@ exports[`contextMenu element > selecting 'Delete' in context menu deletes elemen
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -2591,6 +2644,7 @@ exports[`contextMenu element > selecting 'Duplicate' in context menu duplicates 
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -2906,6 +2960,7 @@ exports[`contextMenu element > selecting 'Group selection' in context menu group
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {
     "id3": true,
   },
@@ -3295,6 +3350,7 @@ exports[`contextMenu element > selecting 'Paste styles' in context menu pastes s
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -3832,6 +3888,7 @@ exports[`contextMenu element > selecting 'Send backward' in context menu sends e
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -4172,6 +4229,7 @@ exports[`contextMenu element > selecting 'Send to back' in context menu sends el
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -4512,6 +4570,7 @@ exports[`contextMenu element > selecting 'Ungroup selection' in context menu ung
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {
     "id3": true,
   },
@@ -4984,6 +5043,53 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
           "category": "element",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 4l18 0"
+            />
+            <path
+              d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"
+            />
+            <path
+              d="M12 16l0 4"
+            />
+            <path
+              d="M9 20l6 0"
+            />
+            <path
+              d="M8 12l3 -3l2 2l3 -3"
+            />
+          </g>
+        </svg>,
+        "label": "presentation.startFromFrame",
+        "name": "presentFromFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+        },
+        "viewMode": true,
+      },
       "separator",
       {
         "PanelComponent": [Function],
@@ -5814,6 +5920,7 @@ exports[`contextMenu element > shows 'Group selection' in context menu for multi
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -6218,6 +6325,53 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
           "category": "element",
         },
       },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 4l18 0"
+            />
+            <path
+              d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"
+            />
+            <path
+              d="M12 16l0 4"
+            />
+            <path
+              d="M9 20l6 0"
+            />
+            <path
+              d="M8 12l3 -3l2 2l3 -3"
+            />
+          </g>
+        </svg>,
+        "label": "presentation.startFromFrame",
+        "name": "presentFromFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+        },
+        "viewMode": true,
+      },
       "separator",
       {
         "PanelComponent": [Function],
@@ -7048,6 +7202,7 @@ exports[`contextMenu element > shows 'Ungroup selection' in context menu for gro
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {
     "id0": true,
   },
@@ -7892,6 +8047,62 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
           viewBox="0 0 24 24"
         >
           <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 4l18 0"
+            />
+            <path
+              d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"
+            />
+            <path
+              d="M12 16l0 4"
+            />
+            <path
+              d="M9 20l6 0"
+            />
+            <path
+              d="M8 12l3 -3l2 2l3 -3"
+            />
+          </g>
+        </svg>,
+        "keyTest": [Function],
+        "keywords": [
+          "slides",
+          "slideshow",
+          "present",
+          "frames",
+        ],
+        "label": [Function],
+        "name": "presentation",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+          "predicate": [Function],
+        },
+        "viewMode": true,
+      },
+      {
+        "checked": [Function],
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
             strokeWidth={"1.25000"}
           >
             <path
@@ -8025,6 +8236,7 @@ exports[`contextMenu element > shows context menu for canvas > [end of test] app
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -8204,6 +8416,53 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "category": "element",
         },
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 4l18 0"
+            />
+            <path
+              d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"
+            />
+            <path
+              d="M12 16l0 4"
+            />
+            <path
+              d="M9 20l6 0"
+            />
+            <path
+              d="M8 12l3 -3l2 2l3 -3"
+            />
+          </g>
+        </svg>,
+        "label": "presentation.startFromFrame",
+        "name": "presentFromFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -9035,6 +9294,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,
@@ -9208,6 +9468,53 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
         "trackEvent": {
           "category": "element",
         },
+      },
+      {
+        "icon": <svg
+          aria-hidden="true"
+          className=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <g
+            strokeWidth="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 4l18 0"
+            />
+            <path
+              d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"
+            />
+            <path
+              d="M12 16l0 4"
+            />
+            <path
+              d="M9 20l6 0"
+            />
+            <path
+              d="M8 12l3 -3l2 2l3 -3"
+            />
+          </g>
+        </svg>,
+        "label": "presentation.startFromFrame",
+        "name": "presentFromFrame",
+        "perform": [Function],
+        "predicate": [Function],
+        "trackEvent": {
+          "category": "canvas",
+        },
+        "viewMode": true,
       },
       "separator",
       {
@@ -10042,6 +10349,7 @@ exports[`contextMenu element > shows context menu for element > [end of test] ap
     "initialized": true,
     "type": "selection",
   },
+  "presentation": null,
   "previousSelectedElementIds": {},
   "resizingElement": null,
   "scrollConstraints": null,

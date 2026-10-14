@@ -6,6 +6,7 @@ import {
   getColorTargetElement,
   hasBoundTextElement,
   isElbowArrow,
+  isFrameLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
@@ -180,6 +181,9 @@ export const getShapeActionPredicates = (
       !appState.croppingElementId &&
       singleSelected &&
       isImageElement(targetElements[0]),
+    frameSize:
+      activeToolType === "frame" ||
+      (singleSelected && isFrameLikeElement(targetElements[0])),
     lineEditor:
       !appState.selectedLinearElement?.isEditing &&
       singleSelected &&

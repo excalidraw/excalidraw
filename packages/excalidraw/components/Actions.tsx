@@ -36,6 +36,7 @@ import {
   TextSizeIcon,
   adjustmentsIcon,
   DotsHorizontalIcon,
+  frameToolIcon,
   pencilIcon,
 } from "./icons";
 
@@ -189,6 +190,8 @@ export const SelectedShapeActions = ({
       {predicates.arrowheads && <>{renderAction("changeArrowhead")}</>}
 
       {predicates.opacity && renderAction("changeOpacity")}
+
+      {predicates.frameSize && renderAction("changeFrameSize")}
 
       {predicates.layers && <LayersFieldset renderAction={renderAction} />}
 
@@ -580,6 +583,60 @@ const CombinedExtraActions = ({
   );
 };
 
+const CombinedFrameSize = ({
+  appState,
+  renderAction,
+  setAppState,
+  container,
+}: {
+  appState: UIAppState;
+  renderAction: ActionManager["renderAction"];
+  setAppState: React.Component<any, AppState>["setState"];
+  container: HTMLDivElement | null;
+}) => {
+  const isOpen = appState.openPopup === "compactFrameSize";
+
+  return (
+    <div className="compact-action-item">
+      <Popover.Root
+        open={isOpen}
+        onOpenChange={(open) =>
+          setAppState({ openPopup: open ? "compactFrameSize" : null })
+        }
+      >
+        <Popover.Trigger asChild>
+          <button
+            type="button"
+            className={clsx("compact-action-button properties-trigger", {
+              active: isOpen,
+            })}
+            title={t("frameSize.title")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setAppState({ openPopup: isOpen ? null : "compactFrameSize" });
+            }}
+          >
+            {frameToolIcon}
+          </button>
+        </Popover.Trigger>
+        {isOpen && (
+          <PropertiesPopover
+            className={PROPERTIES_CLASSES}
+            container={container}
+            style={{ maxWidth: "15rem" }}
+            onClose={() => {}}
+          >
+            <div className="selected-shape-actions">
+              {renderAction("changeFrameSize")}
+            </div>
+          </PropertiesPopover>
+        )}
+      </Popover.Root>
+    </div>
+  );
+};
+
 const LinearEditorAction = ({
   renderAction,
   predicates,
@@ -673,6 +730,15 @@ export const CompactShapeActions = ({
         <div className="compact-action-item">
           {renderAction("toggleLinearEditor")}
         </div>
+      )}
+
+      {predicates.frameSize && (
+        <CombinedFrameSize
+          appState={appState}
+          renderAction={renderAction}
+          setAppState={setAppState}
+          container={container}
+        />
       )}
 
       {/* Text Properties */}

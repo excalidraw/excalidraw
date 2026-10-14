@@ -2,7 +2,7 @@
 
 exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu items if passed from host 1`] = `
 <div
-  aria-labelledby="radix-:r85:"
+  aria-labelledby="radix-:r8j:"
   aria-orientation="vertical"
   class="dropdown-menu main-menu"
   data-align="start"
@@ -12,7 +12,7 @@ exports[`<Excalidraw/> > <MainMenu/> > should render main menu with host menu it
   data-state="open"
   data-testid="dropdown-menu"
   dir="ltr"
-  id="radix-:r86:"
+  id="radix-:r8k:"
   role="menu"
   style="outline: none; --radix-dropdown-menu-content-transform-origin: var(--radix-popper-transform-origin); --radix-dropdown-menu-content-available-width: var(--radix-popper-available-width); --radix-dropdown-menu-content-available-height: var(--radix-popper-available-height); --radix-dropdown-menu-trigger-width: var(--radix-popper-anchor-width); --radix-dropdown-menu-trigger-height: var(--radix-popper-anchor-height); animation: none;"
   tabindex="-1"
@@ -366,6 +366,72 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         class="dropdown-menu-item__shortcut"
       >
         Ctrl+F
+      </div>
+    </button>
+    <button
+      aria-label="Start presentation"
+      class="radix-menu-item dropdown-menu-item dropdown-menu-item-base"
+      data-orientation="vertical"
+      data-radix-collection-item=""
+      data-testid="presentation-menu-button"
+      role="menuitem"
+      tabindex="-1"
+      title="Start presentation"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      >
+        <svg
+          aria-hidden="true"
+          class=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <g
+            stroke-width="1.25"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 4l18 0"
+            />
+            <path
+              d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10"
+            />
+            <path
+              d="M12 16l0 4"
+            />
+            <path
+              d="M9 20l6 0"
+            />
+            <path
+              d="M8 12l3 -3l2 2l3 -3"
+            />
+          </g>
+        </svg>
+      </div>
+      <div
+        class="dropdown-menu-item__text"
+      >
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Start presentation
+        </span>
+      </div>
+      <div
+        class="dropdown-menu-item__shortcut"
+      >
+        Alt+Shift+P
       </div>
     </button>
     <button
@@ -763,7 +829,7 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
             style="width: 1px; height: 1rem; margin: 0px auto;"
           />
           <button
-            aria-controls="radix-:r16:"
+            aria-controls="radix-:r17:"
             aria-expanded="false"
             aria-haspopup="dialog"
             aria-label="Canvas background"

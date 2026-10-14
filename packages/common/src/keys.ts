@@ -25,6 +25,7 @@ export const CODES = {
   Y: "KeyY",
   R: "KeyR",
   S: "KeyS",
+  P: "KeyP",
 } as const;
 
 export const KEYS = {
@@ -34,6 +35,8 @@ export const KEYS = {
   ARROW_UP: "ArrowUp",
   PAGE_UP: "PageUp",
   PAGE_DOWN: "PageDown",
+  HOME: "Home",
+  END: "End",
   BACKSPACE: "Backspace",
   ALT: "Alt",
   CTRL_OR_CMD: isDarwin ? "metaKey" : "ctrlKey",

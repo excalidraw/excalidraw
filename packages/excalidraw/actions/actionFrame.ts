@@ -38,15 +38,16 @@ import { register } from "./register";
 import type { ActionResult } from "./types";
 import type { AppClassProperties, AppState, UIAppState } from "../types";
 
-const isSingleFrameSelected = (
+export const getSingleSelectedFrame = (
   appState: UIAppState,
   app: AppClassProperties,
 ) => {
   const selectedElements = app.scene.getSelectedElements(appState);
 
-  return (
-    selectedElements.length === 1 && isFrameLikeElement(selectedElements[0])
-  );
+  return selectedElements.length === 1 &&
+    isFrameLikeElement(selectedElements[0])
+    ? selectedElements[0]
+    : null;
 };
 
 export const actionSelectAllElementsInFrame = register({
@@ -83,7 +84,7 @@ export const actionSelectAllElementsInFrame = register({
     };
   },
   predicate: (elements, appState, _, app) =>
-    isSingleFrameSelected(appState, app),
+    !!getSingleSelectedFrame(appState, app),
 });
 
 export const actionRemoveAllElementsFromFrame = register({
@@ -114,7 +115,7 @@ export const actionRemoveAllElementsFromFrame = register({
     };
   },
   predicate: (elements, appState, _, app) =>
-    isSingleFrameSelected(appState, app),
+    !!getSingleSelectedFrame(appState, app),
 });
 
 export const actionupdateFrameRendering = register({
