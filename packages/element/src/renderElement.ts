@@ -206,17 +206,98 @@ export interface ExcalidrawElementWithCanvas {
   canvas: HTMLCanvasElement;
   theme: AppState["theme"];
   scale: number;
+  devicePixelRatio: number;
   zoomValue: AppState["zoom"]["value"];
   canvasOffsetX: number;
   canvasOffsetY: number;
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
+  viewport?: ElementCanvasViewport;
 }
+
+type ElementCanvasViewport = {
+  // Scene-space offset from the padded, unrotated element bounds.
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+const getElementCanvasViewport = (
+  element: NonDeletedExcalidrawElement,
+  elementsMap: NonDeletedSceneElementsMap,
+  context: CanvasRenderingContext2D,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  offset: RenderPositionOffset,
+): ElementCanvasViewport => {
+  const devicePixelRatio =
+    context.canvas.ownerDocument.defaultView?.devicePixelRatio ?? 1;
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
+  const padding = getCanvasPadding(element) / devicePixelRatio;
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const { a, b, c, d, e, f } = context.getTransform();
+  const determinant = a * d - b * c;
+  const cos = Math.cos(element.angle);
+  const sin = Math.sin(element.angle);
+  const corners = [
+    [0, 0],
+    [context.canvas.width, 0],
+    [0, context.canvas.height],
+    [context.canvas.width, context.canvas.height],
+  ].map(([x, y]) => {
+    // Undo the canvas transform, scroll, visual offset and element rotation.
+    const dx =
+      (d * (x - e) - c * (y - f)) / determinant -
+      appState.scrollX -
+      offset.x -
+      cx;
+    const dy =
+      (a * (y - f) - b * (x - e)) / determinant -
+      appState.scrollY -
+      offset.y -
+      cy;
+    return [cx + cos * dx + sin * dy, cy - sin * dx + cos * dy];
+  });
+  // One device pixel of bleed avoids cutting off edge antialiasing.
+  const bleed = 1 / (devicePixelRatio * appState.zoom.value);
+  const left = Math.max(
+    x1 - padding,
+    Math.min(...corners.map(([x]) => x)) - bleed,
+  );
+  const top = Math.max(
+    y1 - padding,
+    Math.min(...corners.map(([, y]) => y)) - bleed,
+  );
+  const right = Math.min(
+    x2 + padding,
+    Math.max(...corners.map(([x]) => x)) + bleed,
+  );
+  const bottom = Math.min(
+    y2 + padding,
+    Math.max(...corners.map(([, y]) => y)) + bleed,
+  );
+  // Anchor the crop to the full bitmap's pixel grid so panning does not
+  // change the rasterization phase of strokes inside the visible section.
+  const pixelsPerUnit = devicePixelRatio * appState.zoom.value;
+  const pixelX = Math.floor((left - (x1 - padding)) * pixelsPerUnit);
+  const pixelY = Math.floor((top - (y1 - padding)) * pixelsPerUnit);
+  const pixelRight = Math.ceil((right - (x1 - padding)) * pixelsPerUnit);
+  const pixelBottom = Math.ceil((bottom - (y1 - padding)) * pixelsPerUnit);
+  return {
+    x: pixelX / pixelsPerUnit,
+    y: pixelY / pixelsPerUnit,
+    width: Math.max(0, pixelRight - pixelX) / pixelsPerUnit,
+    height: Math.max(0, pixelBottom - pixelY) / pixelsPerUnit,
+  };
+};
 
 const cappedElementCanvasSize = (
   element: NonDeletedExcalidrawElement,
   elementsMap: ElementsMap,
   zoom: Zoom,
+  viewport?: ElementCanvasViewport,
+  devicePixelRatio = window.devicePixelRatio,
 ): {
   width: number;
   height: number;
@@ -244,8 +325,12 @@ const cappedElementCanvasSize = (
       ? distance(y1, y2)
       : element.height;
 
-  let width = elementWidth * window.devicePixelRatio + padding * 2;
-  let height = elementHeight * window.devicePixelRatio + padding * 2;
+  let width = viewport
+    ? viewport.width * devicePixelRatio
+    : elementWidth * devicePixelRatio + padding * 2;
+  let height = viewport
+    ? viewport.height * devicePixelRatio
+    : elementHeight * devicePixelRatio + padding * 2;
 
   let scale: number = zoom.value;
 
@@ -274,15 +359,21 @@ const generateElementCanvas = (
   zoom: Zoom,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  viewport?: ElementCanvasViewport,
+  ownerDocument?: Document,
 ): ExcalidrawElementWithCanvas | null => {
-  const canvas = document.createElement("canvas");
+  const canvas = (ownerDocument ?? document).createElement("canvas");
   const context = canvas.getContext("2d")!;
+  const devicePixelRatio =
+    canvas.ownerDocument.defaultView?.devicePixelRatio ?? 1;
   const padding = getCanvasPadding(element);
 
   const { width, height, scale } = cappedElementCanvasSize(
     element,
     elementsMap,
     zoom,
+    viewport,
+    devicePixelRatio,
   );
 
   if (!width || !height) {
@@ -292,6 +383,13 @@ const generateElementCanvas = (
   canvas.width = width;
   canvas.height = height;
 
+  if (viewport) {
+    context.translate(
+      -viewport.x * devicePixelRatio * scale,
+      -viewport.y * devicePixelRatio * scale,
+    );
+  }
+
   let canvasOffsetX = -100;
   let canvasOffsetY = 0;
 
@@ -299,24 +397,17 @@ const generateElementCanvas = (
     const [x1, y1] = getElementAbsoluteCoords(element, elementsMap);
 
     canvasOffsetX =
-      element.x > x1
-        ? distance(element.x, x1) * window.devicePixelRatio * scale
-        : 0;
+      element.x > x1 ? distance(element.x, x1) * devicePixelRatio * scale : 0;
 
     canvasOffsetY =
-      element.y > y1
-        ? distance(element.y, y1) * window.devicePixelRatio * scale
-        : 0;
+      element.y > y1 ? distance(element.y, y1) * devicePixelRatio * scale : 0;
 
     context.translate(canvasOffsetX, canvasOffsetY);
   }
 
   context.save();
   context.translate(padding * scale, padding * scale);
-  context.scale(
-    window.devicePixelRatio * scale,
-    window.devicePixelRatio * scale,
-  );
+  context.scale(devicePixelRatio * scale, devicePixelRatio * scale);
 
   const rc = rough.canvas(canvas);
 
@@ -329,9 +420,11 @@ const generateElementCanvas = (
     canvas,
     theme: appState.theme,
     scale,
+    devicePixelRatio,
     zoomValue: zoom.value,
     canvasOffsetX,
     canvasOffsetY,
+    viewport,
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     imageCrop: isImageElement(element) ? element.crop : null,
@@ -689,9 +782,38 @@ const generateElementWithCanvas = (
   elementsMap: NonDeletedSceneElementsMap,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  context: CanvasRenderingContext2D,
+  offset: RenderPositionOffset,
 ) => {
   const zoom: Zoom = renderConfig ? appState.zoom : DEFAULT_ZOOM;
+  const devicePixelRatio =
+    context.canvas.ownerDocument.defaultView?.devicePixelRatio ?? 1;
+  // Only oversized linear elements need a viewport-dependent bitmap. Ordinary
+  // elements retain their scroll-independent cache, including during gestures.
+  const viewport =
+    isLinearElement(element) &&
+    cappedElementCanvasSize(
+      element,
+      elementsMap,
+      zoom,
+      undefined,
+      devicePixelRatio,
+    ).scale < zoom.value
+      ? getElementCanvasViewport(
+          element,
+          elementsMap,
+          context,
+          appState,
+          offset,
+        )
+      : undefined;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
+  const previousViewport = prevElementWithCanvas?.viewport;
+  const viewportChanged =
+    previousViewport?.x !== viewport?.x ||
+    previousViewport?.y !== viewport?.y ||
+    previousViewport?.width !== viewport?.width ||
+    previousViewport?.height !== viewport?.height;
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
     prevElementWithCanvas.zoomValue !== zoom.value &&
@@ -703,6 +825,9 @@ const generateElementWithCanvas = (
 
   if (
     !prevElementWithCanvas ||
+    viewportChanged ||
+    prevElementWithCanvas.devicePixelRatio !== devicePixelRatio ||
+    (viewport && prevElementWithCanvas.zoomValue !== zoom.value) ||
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
@@ -714,6 +839,8 @@ const generateElementWithCanvas = (
       zoom,
       renderConfig,
       appState,
+      viewport,
+      context.canvas.ownerDocument,
     );
 
     if (!elementWithCanvas) {
@@ -768,9 +895,7 @@ const drawElementFromCanvas = (
   positionOffset: RenderPositionOffset,
 ) => {
   const element = elementWithCanvas.element;
-  // the ratio the cached bitmap was generated with (`generateElementCanvas`);
-  // the blit's size math needs the same one, so it is not the owner window's
-  const devicePixelRatio = window.devicePixelRatio;
+  const { devicePixelRatio } = elementWithCanvas;
   const padding = getCanvasPadding(element);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
   const cx =
@@ -842,6 +967,10 @@ const drawElementFromCanvas = (
     (x1 + positionOffset.x + appState.scrollX) * devicePixelRatio - padding;
   let drawY =
     (y1 + positionOffset.y + appState.scrollY) * devicePixelRatio - padding;
+  const viewportX = (elementWithCanvas.viewport?.x ?? 0) * devicePixelRatio;
+  const viewportY = (elementWithCanvas.viewport?.y ?? 0) * devicePixelRatio;
+  drawX += viewportX;
+  drawY += viewportY;
 
   const transform = context.getTransform();
 
@@ -883,8 +1012,16 @@ const drawElementFromCanvas = (
       anchorPadding;
 
     // Form the relative vector before introducing the scroll translation.
-    const dx = (x1 - anchorSceneX) * devicePixelRatio + anchorPadding - padding;
-    const dy = (y1 - anchorSceneY) * devicePixelRatio + anchorPadding - padding;
+    const dx =
+      (x1 - anchorSceneX) * devicePixelRatio +
+      anchorPadding -
+      padding +
+      viewportX;
+    const dy =
+      (y1 - anchorSceneY) * devicePixelRatio +
+      anchorPadding -
+      padding +
+      viewportY;
     context.setTransform(
       a,
       b,
@@ -1081,6 +1218,8 @@ const drawElement = (
           allElementsMap,
           renderConfig,
           appState,
+          context,
+          renderState.offset,
         );
         if (!elementWithCanvas) {
           return;
@@ -1196,6 +1335,8 @@ const drawElement = (
           allElementsMap,
           renderConfig,
           appState,
+          context,
+          renderState.offset,
         );
 
         if (!elementWithCanvas) {
