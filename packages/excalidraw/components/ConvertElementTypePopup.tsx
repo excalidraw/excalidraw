@@ -317,6 +317,7 @@ const Panel = ({
       ref={panelRef}
       tabIndex={-1}
       style={{
+        visibility: `${positionRef.current === "" ? "hidden" : "visible"}`,
         position: "absolute",
         top: `${
           panelPosition.y +
