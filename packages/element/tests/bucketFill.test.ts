@@ -548,6 +548,45 @@ describe("computeBucketFillPolygon", () => {
     expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -1);
   });
 
+  it("does not treat a frame as a fill boundary", () => {
+    // A frame is a container rather than an outline: it must not own a fill
+    // and must not bound one. The frame sits on top of the rectangle so that
+    // a frame-as-boundary-type would both claim ownership and clip the fill.
+    // Its stroke is opaque so type is the only thing excluding it.
+    const owner = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      roundness: null,
+    });
+    const frame = API.createElement({
+      type: "frame",
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      strokeColor: "#000000",
+    });
+    const { elements, elementsMap } = setup([owner, frame]);
+
+    const result = computeBucketFillPolygon({
+      point: pointFrom<GlobalPoint>(50, 50),
+      elements,
+      elementsMap,
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+    // The rectangle owns the fill, not the frame sitting above it.
+    expect(result.ownerId).toBe(owner.id);
+    expect(result.boundaryElementIds).not.toContain(frame.id);
+    expect(polygonArea(result.scenePoints)).toBeCloseTo(10000, -1);
+  });
+
   it("does not treat a hachure-filled element as covering", () => {
     // hachure fill is see-through: the lower outline stays visible through it
     // and must still act as a boundary
