@@ -391,6 +391,7 @@ export const DEFAULT_UI_OPTIONS: AppProps["UIOptions"] = {
     export: { saveFileToDisk: true },
     loadScene: true,
     saveToActiveFile: true,
+    openFromCloud: true,
     toggleTheme: null,
     saveAsImage: true,
   },
