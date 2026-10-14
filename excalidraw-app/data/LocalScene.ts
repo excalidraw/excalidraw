@@ -61,14 +61,16 @@ export class LocalScene {
   }
 
   reconcile(local: LocalSceneSnapshot, stored: StoredScene, replace: boolean) {
+    const localIds = new Set(local.elements.map((element) => element.id));
+    const replacesScene =
+      replace || [...this.baselineIds].some((id) => !localIds.has(id));
     let elements = local.elements;
     const remoteElements = JSON.stringify(stored.elements);
     if (
-      !replace &&
+      !replacesScene &&
       stored.elementsValid &&
       remoteElements !== this.baselineElements
     ) {
-      const localIds = new Set(local.elements.map((element) => element.id));
       const remoteIds = new Set(stored.elements.map((element) => element.id));
       const localElements = local.elements.map((element) =>
         !element.isDeleted &&
@@ -77,14 +79,7 @@ export class LocalScene {
           ? newElementWith(element, { isDeleted: true })
           : element,
       );
-      const restored = restoreElements(stored.elements, localElements).map(
-        (element) =>
-          !element.isDeleted &&
-          this.baselineIds.has(element.id) &&
-          !localIds.has(element.id)
-            ? newElementWith(element, { isDeleted: true })
-            : element,
-      );
+      const restored = restoreElements(stored.elements, localElements);
       elements = reconcileElements(
         localElements,
         restored as RemoteExcalidrawElement[],
@@ -93,7 +88,7 @@ export class LocalScene {
     }
 
     const localState = getStoredAppState(local.appState);
-    const appState = replace
+    const appState = replacesScene
       ? localState
       : {
           ...getStoredAppState(stored.appState ?? local.appState),

@@ -160,6 +160,23 @@ describe("baseline-aware local scene reconciliation", () => {
     expect(merged.elements.map(({ id }) => id)).toEqual(["room"]);
   });
 
+  it("does not mix concurrent stored additions into a whole-scene replacement", async () => {
+    const [old, addition, replacement] = makeElements(
+      "old",
+      "remote-addition",
+      "replacement",
+    );
+    write([old]);
+    const client = makeClient();
+    write([old, addition]);
+
+    const merged = await persist(client, snapshot([replacement]));
+
+    expect(getNonDeletedElements(merged.elements).map(({ id }) => id)).toEqual([
+      "replacement",
+    ]);
+  });
+
   it("serializes concurrent read/merge/write operations from independent clients", async () => {
     const first = makeClient();
     const second = makeClient();
