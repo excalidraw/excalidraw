@@ -70,6 +70,7 @@ const TOOLTIP_WARM_WINDOW = 300;
 
 let showTooltipTimer = 0;
 let tooltipHiddenAt = 0;
+let activeTooltipItem: HTMLElement | null = null;
 /**
  * while a tooltip is visible, hides it once its item is removed from the DOM
  * (e.g. unmounted while hovered, which doesn't fire pointerleave)
@@ -77,6 +78,7 @@ let tooltipHiddenAt = 0;
 let tooltipItemObserver: MutationObserver | null = null;
 
 export const hideTooltip = () => {
+  activeTooltipItem = null;
   clearTimeout(showTooltipTimer);
   tooltipItemObserver?.disconnect();
   tooltipItemObserver = null;
@@ -95,6 +97,7 @@ const updateTooltip = (
   long: boolean,
   position: "bottom" | "top",
 ) => {
+  activeTooltipItem = item;
   tooltip.classList.add("excalidraw-tooltip--visible");
   tooltip.style.minWidth = long ? "50ch" : "10ch";
   tooltip.style.maxWidth = long ? "50ch" : "15ch";
@@ -168,11 +171,26 @@ export const Tooltip = ({
   disabled,
   delay = false,
 }: TooltipProps) => {
+  const itemRef = React.useRef<HTMLDivElement>(null);
+
+  React.useLayoutEffect(() => {
+    const item = itemRef.current;
+    if (item && activeTooltipItem === item) {
+      const tooltip = item.ownerDocument.querySelector<HTMLDivElement>(
+        ".excalidraw-tooltip",
+      );
+      if (tooltip) {
+        updateTooltip(item, tooltip, label, long, "bottom");
+      }
+    }
+  }, [label, long]);
+
   if (disabled) {
     return null;
   }
   return (
     <div
+      ref={itemRef}
       className={clsx("excalidraw-tooltip-wrapper", className)}
       onPointerEnter={(event) =>
         showTooltip(event.currentTarget, label, { long, delay })
