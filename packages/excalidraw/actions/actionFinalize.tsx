@@ -178,6 +178,7 @@ export const actionFinalize = register<FormData>({
               : newElements,
           appState: {
             ...appState,
+            selectionElement: null,
             cursorButton: "up",
             selectedElementIds: isDrawShapeTool
               ? {}
