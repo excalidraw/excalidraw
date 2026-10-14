@@ -592,6 +592,8 @@ export interface AppState {
 export type SearchMatch = {
   id: string;
   focus: boolean;
+  /** Scene-space bounds for recognized handwriting spanning multiple strokes. */
+  sceneBounds?: readonly [number, number, number, number];
   matchedLines: {
     offsetX: number;
     offsetY: number;
