@@ -2,12 +2,14 @@ import {
   pointFrom,
   pointFromPair,
   type GlobalPoint,
-  type GenericPoint,
+  type LocalPoint,
 } from "@excalidraw/math";
 
 import type { NullableGridSize } from "@excalidraw/excalidraw/types";
 
-export const getSizeFromPoints = (points: readonly GenericPoint[]) => {
+export const getSizeFromPoints = (
+  points: readonly (GlobalPoint | LocalPoint)[],
+) => {
   const xs = points.map((point) => point[0]);
   const ys = points.map((point) => point[1]);
   return {
@@ -17,7 +19,7 @@ export const getSizeFromPoints = (points: readonly GenericPoint[]) => {
 };
 
 /** @arg dimension, 0 for rescaling only x, 1 for y */
-export const rescalePoints = <Point extends GenericPoint>(
+export const rescalePoints = <Point extends GlobalPoint | LocalPoint>(
   dimension: 0 | 1,
   newSize: number,
   points: readonly Point[],

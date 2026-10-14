@@ -20,23 +20,20 @@ import type {
  * @param y The Y coordinate
  * @returns The branded and created point
  */
-export function pointFrom<Point extends GenericPoint>(
-  x: number,
-  y: number,
-): Point;
+export function pointFrom<
+  Point extends GenericPoint = GlobalPoint | LocalPoint,
+>(x: number, y: number): Point;
 // TODO remove the overload once we migrate to using Point tuples everywhere
 export function pointFrom<Coord extends GlobalCoord | LocalCoord>(
   coords: Coord,
 ): Coord extends GlobalCoord ? GlobalPoint : LocalPoint;
 // TODO remove the overload once we migrate to using Point tuples everywhere
-export function pointFrom<Point extends GenericPoint>(coords: {
-  x: number;
-  y: number;
-}): Point;
-export function pointFrom<Point extends GenericPoint>(
-  xOrCoords: number | { x: number; y: number },
-  y?: number,
-): Point {
+export function pointFrom<
+  Point extends GenericPoint = GlobalPoint | LocalPoint,
+>(coords: { x: number; y: number }): Point;
+export function pointFrom<
+  Point extends GenericPoint = GlobalPoint | LocalPoint,
+>(xOrCoords: number | { x: number; y: number }, y?: number): Point {
   return typeof xOrCoords === "object"
     ? ([xOrCoords.x, xOrCoords.y] as Point)
     : ([xOrCoords, y!] as Point);
@@ -48,9 +45,9 @@ export function pointFrom<Point extends GenericPoint>(
  * @param numberArray The number array to check and to convert to Point
  * @returns The point instance
  */
-export function pointFromArray<Point extends GenericPoint>(
-  numberArray: number[],
-): Point | undefined {
+export function pointFromArray<
+  Point extends GenericPoint = GlobalPoint | LocalPoint,
+>(numberArray: number[]): Point | undefined {
   return numberArray.length === 2
     ? pointFrom<Point>(numberArray[0], numberArray[1])
     : undefined;
@@ -62,9 +59,9 @@ export function pointFromArray<Point extends GenericPoint>(
  * @param pair A number pair to convert to Point
  * @returns The point instance
  */
-export function pointFromPair<Point extends GenericPoint>(
-  pair: [number, number],
-): Point {
+export function pointFromPair<
+  Point extends GenericPoint = GlobalPoint | LocalPoint,
+>(pair: [number, number]): Point {
   return pair as Point;
 }
 
@@ -74,10 +71,9 @@ export function pointFromPair<Point extends GenericPoint>(
  * @param v The vector to convert
  * @returns The point the vector points at with origin 0,0
  */
-export function pointFromVector<P extends GenericPoint>(
-  v: Vector,
-  offset: P = pointFrom(0, 0),
-): P {
+export function pointFromVector<
+  P extends GenericPoint = GlobalPoint | LocalPoint,
+>(v: Vector, offset: P = pointFrom(0, 0)): P {
   return pointFrom<P>(offset[0] + v[0], offset[1] + v[1]);
 }
 
@@ -170,7 +166,7 @@ export function pointRotateDegs<Point extends GenericPoint>(
 // TODO 99% of use is translating between global and local coords, which need to be formalized
 export function pointTranslate<
   From extends GenericPoint,
-  To extends GenericPoint,
+  To extends GenericPoint = GlobalPoint | LocalPoint,
 >(p: From, v: Vector = [0, 0] as Vector): To {
   return pointFrom(p[0] + v[0], p[1] + v[1]);
 }

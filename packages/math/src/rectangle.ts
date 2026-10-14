@@ -24,10 +24,10 @@ export function rectangleIntersectLineSegment<Point extends GenericPoint>(
   l: LineSegment<Point>,
 ): Point[] {
   return [
-    lineSegment(r[0], pointFrom(r[1][0], r[0][1])),
-    lineSegment(pointFrom(r[1][0], r[0][1]), r[1]),
-    lineSegment(r[1], pointFrom(r[0][0], r[1][1])),
-    lineSegment(pointFrom(r[0][0], r[1][1]), r[0]),
+    lineSegment(r[0], pointFrom<Point>(r[1][0], r[0][1])),
+    lineSegment(pointFrom<Point>(r[1][0], r[0][1]), r[1]),
+    lineSegment(r[1], pointFrom<Point>(r[0][0], r[1][1])),
+    lineSegment(pointFrom<Point>(r[0][0], r[1][1]), r[0]),
   ]
     .map((s) => lineSegmentIntersectionPoints(l, s))
     .filter((i): i is Point => !!i);

@@ -4,7 +4,7 @@ import {
   pointFrom,
   pointsEqual,
   type GlobalPoint,
-  type GenericPoint,
+  type LocalPoint,
   type Radians,
   bezierEquation,
   pointRotateRads,
@@ -192,7 +192,7 @@ const renderLinearElementPointHighlight = (
 };
 
 /** draws the point marker in scene coordinates */
-const highlightPoint = <Point extends GenericPoint>(
+const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   point: Point,
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -216,7 +216,7 @@ const highlightPoint = <Point extends GenericPoint>(
   context.restore();
 };
 
-const renderSingleLinearPoint = <Point extends GenericPoint>(
+const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   point: Point,

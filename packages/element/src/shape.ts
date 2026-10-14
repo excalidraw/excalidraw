@@ -31,7 +31,7 @@ import {
 
 import { RoughGenerator } from "roughjs/bin/generator";
 
-import type { GenericPoint, GlobalPoint, Polygon } from "@excalidraw/math";
+import type { GlobalPoint, Polygon } from "@excalidraw/math";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
 
@@ -1084,7 +1084,7 @@ const generateElbowArrowShape = (
  * get the pure geometric shape of an excalidraw elementw
  * which is then used for hit detection
  */
-export const getElementShape = <Point extends GenericPoint>(
+export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
   element: ExcalidrawElement,
   elementsMap: ElementsMap,
 ): GeometricShape<Point> => {

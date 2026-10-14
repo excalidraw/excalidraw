@@ -28,12 +28,7 @@ import {
 
 import type { App, AppState } from "@excalidraw/excalidraw/types";
 
-import type {
-  LocalPoint,
-  GlobalPoint,
-  Radians,
-  GenericPoint,
-} from "@excalidraw/math";
+import type { LocalPoint, GlobalPoint, Radians } from "@excalidraw/math";
 import type { Bounds } from "@excalidraw/common";
 import type {
   ExcalidrawArrowElement,
@@ -80,7 +75,7 @@ type NonDeletedRecognizedShapeElement = NonDeleted<
 
 type Shape = NonDeletedRecognizedShapeElement["type"];
 
-interface ShapeRecognitionResult<P extends GenericPoint> {
+interface ShapeRecognitionResult<P extends LocalPoint | GlobalPoint> {
   // The type of the recognized shape, or "freedraw" if no good match was found
   type: Shape;
 
@@ -142,7 +137,10 @@ const TURN_WINDOW = 3;
 // =============================================================================
 
 // Resample `pts` to exactly `n` evenly-spaced points along the stroke path.
-function resample<P extends GenericPoint>(pts: readonly P[], n: number): P[] {
+function resample<P extends LocalPoint | GlobalPoint>(
+  pts: readonly P[],
+  n: number,
+): P[] {
   let totalLen = 0;
   for (let i = 1; i < pts.length; i++) {
     totalLen += Math.hypot(
@@ -231,7 +229,7 @@ interface StrokeFeatures {
 }
 
 // See StrokeFeatures.shaftDeviationRatio.
-function shaftDeviationRatio<P extends GenericPoint>(
+function shaftDeviationRatio<P extends LocalPoint | GlobalPoint>(
   pts: readonly P[],
 ): number {
   const start = pts[0];
@@ -265,7 +263,9 @@ function shaftDeviationRatio<P extends GenericPoint>(
 // treated as a closed loop: wrapping around would let the closure artifacts of
 // a hand-drawn outline (overshooting or undershooting the starting point)
 // fabricate a sharp corner that was never drawn.
-function windowedTurns<P extends GenericPoint>(pts: readonly P[]): number[] {
+function windowedTurns<P extends LocalPoint | GlobalPoint>(
+  pts: readonly P[],
+): number[] {
   const turns: number[] = [];
   for (let i = TURN_WINDOW; i < pts.length - TURN_WINDOW; i++) {
     const [ax, ay] = pts[i - TURN_WINDOW];
@@ -285,7 +285,9 @@ function windowedTurns<P extends GenericPoint>(pts: readonly P[]): number[] {
 // See StrokeFeatures.cornerTurnShare. Greedily picks the 4 strongest turn
 // peaks, each absorbing its ±TURN_WINDOW neighborhood so one physical corner
 // (whose turn smears across the window) counts once.
-function cornerTurnShare<P extends GenericPoint>(pts: readonly P[]): number {
+function cornerTurnShare<P extends LocalPoint | GlobalPoint>(
+  pts: readonly P[],
+): number {
   const turns = windowedTurns(pts);
   const total = turns.reduce((sum, turn) => sum + turn, 0);
   if (total === 0) {
@@ -316,7 +318,7 @@ function cornerTurnShare<P extends GenericPoint>(pts: readonly P[]): number {
   return top4 / total;
 }
 
-function extractFeatures<P extends GenericPoint>(
+function extractFeatures<P extends LocalPoint | GlobalPoint>(
   points: readonly P[],
 ): StrokeFeatures {
   // Resample first: features are moments of the point set, so they would
@@ -441,7 +443,7 @@ function classify(features: StrokeFeatures): Shape {
 // correspond to the actual arrow tip. The tip must lie on the bounding-box
 // perimeter and is the perimeter point farthest from the start (first input
 // point). We find the closest original input point to that ideal tip.
-function getArrowEndpoint<P extends GenericPoint>(
+function getArrowEndpoint<P extends LocalPoint | GlobalPoint>(
   points: readonly P[],
   boundingBox: Bounds,
   startPoint: P,
@@ -497,7 +499,7 @@ function getArrowEndpoint<P extends GenericPoint>(
 // =============================================================================
 
 // Recognizes common shapes from free-draw input points
-export const recognizeShape = <P extends GenericPoint>(
+export const recognizeShape = <P extends LocalPoint | GlobalPoint>(
   points: P[],
   previousElement: ExcalidrawElement | null,
   zoom: number = 1,
