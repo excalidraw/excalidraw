@@ -69,6 +69,8 @@ export const getDefaultAppState = (): Omit<
     exportBackground: true,
     exportScale: defaultExportScale,
     exportEmbedScene: false,
+    // off for the npm package; excalidraw.com turns it on by default
+    exportWithAttribution: false,
     exportWithDarkMode: false,
     fileHandle: null,
     gridSize: DEFAULT_GRID_SIZE,
@@ -215,6 +217,7 @@ const APP_STATE_STORAGE_CONF = (<
   errorMessage: { browser: false, export: false, server: false },
   exportBackground: { browser: true, export: false, server: false },
   exportEmbedScene: { browser: true, export: false, server: false },
+  exportWithAttribution: { browser: true, export: false, server: false },
   exportScale: { browser: true, export: false, server: false },
   exportWithDarkMode: { browser: true, export: false, server: false },
   fileHandle: { browser: false, export: false, server: false },

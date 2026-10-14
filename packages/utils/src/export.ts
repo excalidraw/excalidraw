@@ -37,6 +37,11 @@ type ExportOpts = {
     width: number,
     height: number,
   ) => { width: number; height: number; scale?: number };
+  /**
+   * adds the "excalidraw.com" badge below the content
+   * (off unless explicitly requested)
+   */
+  exportWithAttribution?: boolean;
 };
 
 export const exportToCanvas = ({
@@ -47,6 +52,7 @@ export const exportToCanvas = ({
   getDimensions,
   exportPadding,
   exportingFrame,
+  exportWithAttribution,
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
@@ -62,7 +68,13 @@ export const exportToCanvas = ({
     restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
+    {
+      exportBackground,
+      exportPadding,
+      viewBackgroundColor,
+      exportingFrame,
+      exportWithAttribution,
+    },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 
@@ -176,6 +188,7 @@ export const exportToSvg = async ({
   exportingFrame,
   skipInliningFonts,
   reuseImages,
+  exportWithAttribution,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
@@ -199,6 +212,7 @@ export const exportToSvg = async ({
     renderEmbeddables,
     skipInliningFonts,
     reuseImages,
+    exportWithAttribution,
   });
 };
 

@@ -18,7 +18,7 @@ import { nativeFileSystemSupported } from "../data/filesystem";
 
 import { resaveAsImageWithScene } from "../data/resave";
 
-import { t } from "../i18n";
+import { hasOwnTranslation, t } from "../i18n";
 
 import "../components/ToolIcon.scss";
 
@@ -111,6 +111,58 @@ export const actionChangeExportEmbedScene = register<
       </Tooltip>
     </CheckboxItem>
   ),
+});
+
+/**
+ * The switch label invites people to keep the badge on. It is only written in
+ * English so far, so other languages keep the already translated
+ * "Made with Excalidraw" label rather than showing an English sentence.
+ */
+const getExportAttributionLabelKey = () =>
+  hasOwnTranslation("imageExportDialog.label.attribution")
+    ? "imageExportDialog.label.attribution"
+    : "labels.addWatermark";
+
+export const getExportAttributionLabel = () =>
+  getExportAttributionLabelKey() === "imageExportDialog.label.attribution"
+    ? {
+        label: t("imageExportDialog.label.attribution"),
+        tooltip: t("imageExportDialog.tooltip.attribution"),
+      }
+    : { label: t("labels.addWatermark"), tooltip: undefined };
+
+export const actionChangeExportWithAttribution = register<
+  AppState["exportWithAttribution"]
+>({
+  name: "changeExportWithAttribution",
+  label: getExportAttributionLabelKey,
+  trackEvent: {
+    category: "export",
+    action: "toggleAttribution",
+    getLabelSuffix: (_appState, value) => `attribution:${value ? "on" : "off"}`,
+  },
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportWithAttribution: value },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => {
+    const { label, tooltip } = getExportAttributionLabel();
+    return (
+      <CheckboxItem
+        checked={appState.exportWithAttribution}
+        onChange={(checked) => updateData(checked)}
+      >
+        {label}
+        {tooltip && (
+          <Tooltip label={tooltip} long={true}>
+            <div className="excalidraw-tooltip-icon">{questionCircle}</div>
+          </Tooltip>
+        )}
+      </CheckboxItem>
+    );
+  },
 });
 
 // ---------------------------------------------------------------------------

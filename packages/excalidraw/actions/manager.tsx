@@ -34,12 +34,17 @@ const trackAction = (
           ? action.trackEvent.predicate(appState, elements, value)
           : true;
         if (shouldTrack) {
+          const label = `${source} (${
+            app.editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+          })`;
+          const labelSuffix = action.trackEvent.getLabelSuffix?.(
+            appState,
+            value,
+          );
           trackEvent(
             action.trackEvent.category,
             action.trackEvent.action || action.name,
-            `${source} (${
-              app.editorInterface.formFactor === "phone" ? "mobile" : "desktop"
-            })`,
+            labelSuffix ? `${label} | ${labelSuffix}` : label,
           );
         }
       }

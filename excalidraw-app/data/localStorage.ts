@@ -8,6 +8,15 @@ import type { AppState } from "@excalidraw/excalidraw/types";
 
 import { STORAGE_KEYS } from "../app_constants";
 
+/**
+ * excalidraw.com defaults that differ from the npm package. Used only when the
+ * user hasn't saved their own choice yet.
+ */
+export const APP_DEFAULT_APP_STATE: Pick<AppState, "exportWithAttribution"> = {
+  // "excalidraw.com" badge on exports: on by default, one click off
+  exportWithAttribution: true,
+};
+
 export const saveUsernameToLocalStorage = (username: string) => {
   try {
     localStorage.setItem(
@@ -61,6 +70,7 @@ export const importFromLocalStorage = () => {
     try {
       appState = {
         ...getDefaultAppState(),
+        ...APP_DEFAULT_APP_STATE,
         ...clearAppStateForLocalStorage(
           JSON.parse(savedState) as Partial<AppState>,
         ),
