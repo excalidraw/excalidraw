@@ -171,7 +171,7 @@ export type ToolType =
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
-export type ActiveTool =
+export type ActiveTool = (
   | {
       type: ToolType;
       customType: null;
@@ -179,7 +179,11 @@ export type ActiveTool =
   | {
       type: "custom";
       customType: string;
-    };
+    }
+) & {
+  /** Whether the local laser tool is drawing persistent annotations. */
+  laserPersistent?: boolean;
+};
 
 export type SidebarName = string;
 export type SidebarTabName = string;
@@ -1221,6 +1225,7 @@ export type AppClassProperties = {
   arrowText: App["arrowText"];
   textTool: App["textTool"];
   cursor: App["cursor"];
+  laserTrails: App["laserTrails"];
   bucketFill: App["bucketFill"];
   duplicate: App["duplicate"];
   toolDrag: App["toolDrag"];

@@ -69,7 +69,10 @@ const ExtraToolsDropdown = ({
   const imageToolSelected = activeTool.type === "image";
   const frameToolSelected = activeTool.type === "frame";
   const drawShapeToolSelected = activeTool.type === "autoshape";
-  const laserToolSelected = activeTool.type === "laser";
+  const laserToolSelected =
+    activeTool.type === "laser" && !activeTool.laserPersistent;
+  const annotationToolSelected =
+    activeTool.type === "laser" && activeTool.laserPersistent;
   const bucketFillToolSelected = activeTool.type === "bucketfill";
   const lassoToolSelected =
     isFullStylesPanel &&
@@ -88,6 +91,7 @@ const ExtraToolsDropdown = ({
             (isFullStylesPanel && drawShapeToolSelected) ||
             lassoToolSelected ||
             bucketFillToolSelected ||
+            annotationToolSelected ||
             // in collab we're already highlighting the laser button
             // outside toolbar, so let's not highlight extra-tools button
             // on top of it
@@ -107,7 +111,8 @@ const ExtraToolsDropdown = ({
           ? EmbedIcon
           : isFullStylesPanel && drawShapeToolSelected
           ? drawShapeToolIcon
-          : laserToolSelected && !app.props.isCollaborating
+          : annotationToolSelected ||
+            (laserToolSelected && !app.props.isCollaborating)
           ? laserPointerToolIcon
           : lassoToolSelected
           ? LassoIcon
@@ -170,6 +175,17 @@ const ExtraToolsDropdown = ({
           disabled={isToolButtonDisabled(app, "laser")}
         >
           {t("toolBar.laser")}
+        </DropdownMenu.Item>
+        <DropdownMenu.Item
+          onSelect={() =>
+            app.setActiveTool({ type: "laser" }, { laserPersistent: true })
+          }
+          icon={laserPointerToolIcon}
+          data-testid="toolbar-annotation"
+          selected={annotationToolSelected}
+          disabled={isToolButtonDisabled(app, "laser")}
+        >
+          {t("toolBar.annotation")}
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "bucketfill" })}
