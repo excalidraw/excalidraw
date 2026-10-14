@@ -1,0 +1,94 @@
+.excalidraw {
+  .AttributionMarkSurvey {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    box-sizing: border-box;
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    background: var(--color-surface-low);
+
+    font-family: "Assistant";
+
+    &__header {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    &__question {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      &__row {
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      &__progress {
+        color: var(--color-primary);
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      &__label {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      &__hint {
+        color: var(--color-gray-60);
+        font-size: 0.8rem;
+      }
+
+      &__done {
+        margin-left: auto;
+        color: var(--color-primary);
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      &__answer {
+        padding-left: 10px;
+        border-left: 2px solid var(--color-primary);
+        color: var(--color-on-surface);
+        font-size: 0.85rem;
+      }
+
+      &__options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      &__option {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--default-border-color);
+        background: var(--island-bg-color);
+        color: var(--color-on-surface);
+        font-family: "Assistant";
+        font-size: 0.9rem;
+        text-align: left;
+        cursor: pointer;
+
+        &:hover {
+          border-color: var(--color-primary-hover);
+        }
+      }
+
+      &__other {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  }
+}

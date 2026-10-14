@@ -47,8 +47,12 @@ export const exportToCanvas = ({
   getDimensions,
   exportPadding,
   exportingFrame,
+  attributionMark,
+  aspectRatio,
 }: ExportOpts & {
   exportPadding?: number;
+  attributionMark?: { show: boolean };
+  aspectRatio?: number;
 }) => {
   const restoredElements = getNonDeletedElements(
     restoreElements(elements, null, {
@@ -62,7 +66,14 @@ export const exportToCanvas = ({
     restoredElements,
     { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
     files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
+    {
+      exportBackground,
+      exportPadding,
+      viewBackgroundColor,
+      exportingFrame,
+      attributionMark,
+      aspectRatio,
+    },
     (width: number, height: number) => {
       const canvas = document.createElement("canvas");
 
@@ -176,11 +187,13 @@ export const exportToSvg = async ({
   exportingFrame,
   skipInliningFonts,
   reuseImages,
+  attributionMark,
 }: Omit<ExportOpts, "getDimensions"> & {
   exportPadding?: number;
   renderEmbeddables?: boolean;
   skipInliningFonts?: true;
   reuseImages?: boolean;
+  attributionMark?: { show: boolean };
 }): Promise<SVGSVGElement> => {
   const restoredElements = getNonDeletedElements(
     restoreElements(elements, null, {
@@ -199,6 +212,7 @@ export const exportToSvg = async ({
     renderEmbeddables,
     skipInliningFonts,
     reuseImages,
+    attributionMark,
   });
 };
 
