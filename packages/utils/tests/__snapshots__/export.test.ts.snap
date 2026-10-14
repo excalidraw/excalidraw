@@ -96,6 +96,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   },
   "previousSelectedElementIds": {},
   "resizingElement": null,
+  "savedPens": [],
   "scrollConstraints": null,
   "scrollX": 0,
   "scrollY": 0,

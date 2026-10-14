@@ -18,6 +18,7 @@ import {
   FONT_METADATA,
   FONT_TOP_PICKS_SLOTS,
   ROUNDNESS,
+  SAVED_PENS_MAX,
   DEFAULT_SIDEBAR,
   DEFAULT_ELEMENT_PROPS,
   DEFAULT_GRID_SIZE,
@@ -115,7 +116,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type { AppState, BinaryFiles, LibraryItem } from "../types";
+import type { AppState, BinaryFiles, LibraryItem, SavedPen } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -1261,6 +1262,33 @@ const restoreFontTopPicks = (
   return fontFamilies.size ? [...fontFamilies] : null;
 };
 
+const restoreSavedPens = (value: unknown): readonly SavedPen[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  const pens: SavedPen[] = [];
+  for (const pen of value) {
+    if (
+      typeof pen?.strokeColor !== "string" ||
+      !STROKE_WIDTH_KEYS.includes(pen.strokeWidthKey) ||
+      !isFiniteNumber(pen.opacity) ||
+      !ALLOWED_STROKE_VARIABILITIES.has(pen.strokeVariability)
+    ) {
+      continue;
+    }
+    pens.push({
+      strokeColor: pen.strokeColor,
+      strokeWidthKey: pen.strokeWidthKey,
+      opacity: clamp(pen.opacity, 0, 100),
+      strokeVariability: pen.strokeVariability,
+    });
+    if (pens.length >= SAVED_PENS_MAX) {
+      break;
+    }
+  }
+  return pens;
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -1326,6 +1354,7 @@ export const restoreAppState = (
     ),
   };
   nextAppState.fontTopPicks = restoreFontTopPicks(nextAppState.fontTopPicks);
+  nextAppState.savedPens = restoreSavedPens(nextAppState.savedPens);
 
   // legacy
   if ((appState as any).currentItemStrokeWidth !== undefined) {

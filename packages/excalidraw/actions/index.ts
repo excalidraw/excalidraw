@@ -22,6 +22,7 @@ export {
   actionChangeVerticalAlign,
   actionChangeArrowProperties,
 } from "./actionProperties";
+export { actionSavedPens } from "./actionSavedPens";
 
 export {
   actionChangeViewBackgroundColor,

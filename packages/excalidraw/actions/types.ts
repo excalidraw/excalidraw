@@ -70,6 +70,7 @@ export type ActionName =
   | "changeStrokeWidth"
   | "changeSloppiness"
   | "changeFreedrawMode"
+  | "savedPens"
   | "changeStrokeStyle"
   | "changeArrowhead"
   | "changeArrowType"
