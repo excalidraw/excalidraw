@@ -345,7 +345,7 @@ export const getSelectionStateForElements = (
  *
  * @param allElements the (non-deleted) elements the selection is in
  */
-export const getSelectionStateAddingElements = (
+const getSelectionStateAddingElements = (
   targetElements: readonly NonDeletedExcalidrawElement[],
   allElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -452,7 +452,7 @@ export const getSelectionStateAddingElements = (
  *
  * @param allElements the (non-deleted) elements the selection is in
  */
-export const getSelectionStateRemovingElements = (
+const getSelectionStateRemovingElements = (
   targetElements: readonly NonDeletedExcalidrawElement[],
   allElements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
