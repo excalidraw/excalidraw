@@ -1,4 +1,5 @@
 import path from "path";
+
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgrPlugin from "vite-plugin-svgr";
@@ -7,6 +8,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import checker from "vite-plugin-checker";
 import { createHtmlPlugin } from "vite-plugin-html";
 import Sitemap from "vite-plugin-sitemap";
+
 import { woff2BrowserPlugin } from "../scripts/woff2/woff2-vite-plugins";
 export default defineConfig(({ mode }) => {
   // To load .env variables
@@ -108,6 +110,11 @@ export default defineConfig(({ mode }) => {
           // app precache. en.json and percentages.json are needed for first load
           // or fallback hence not clubbing with locales so first load followed by offline mode works fine. This is how CRA used to work too.
           manualChunks(id) {
+            // Workers must not import DOM-dependent application chunks just to
+            // reuse Vite's dynamic-import helper.
+            if (id.includes("vite/preload-helper")) {
+              return "preload-helper.chunk";
+            }
             if (
               id.includes("packages/excalidraw/locales") &&
               id.match(/en.json|percentages.json/) === null
@@ -173,6 +180,9 @@ export default defineConfig(({ mode }) => {
             // via a static import from the main bundle, defeating lazy
             // loading. So we exclude it by name instead.
             "**/CodeMirrorEditor-*.js",
+            // Handwriting recognition is loaded only when explicitly enabled.
+            "**/transformers.web-*.js",
+            "**/ort-wasm-*.wasm",
           ],
           runtimeCaching: [
             {
