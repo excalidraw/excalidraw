@@ -39,6 +39,7 @@ export const getDefaultAppState = (): Omit<
     currentItemStrokeVariability: "constant",
     currentItemStartArrowhead: null,
     currentItemStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
+    currentItemFreedrawPointer: "crosshair",
     currentItemStickynoteStrokeColor: DEFAULT_ELEMENT_PROPS.strokeColor,
     currentItemStickynoteBackgroundColor: DEFAULT_STICKY_NOTE_BG,
     currentItemRoundness: isTestEnv() ? "sharp" : "round",
@@ -189,6 +190,11 @@ const APP_STATE_STORAGE_CONF = (<
   },
   currentItemStartArrowhead: { browser: true, export: false, server: false },
   currentItemStrokeColor: { browser: true, export: false, server: false },
+  currentItemFreedrawPointer: {
+    browser: true,
+    export: false,
+    server: false,
+  },
   currentItemStickynoteStrokeColor: {
     browser: true,
     export: false,

@@ -140,6 +140,7 @@ export const getShapeActionPredicates = (
 
     // stroke / shape properties
     strokeWidth: forToolOrSelection(hasStrokeWidth),
+    freedrawPointer: activeToolType === "freedraw",
     freedrawMode: forToolOrSelection(hasFreedrawMode),
     strokeStyle: forToolOrSelection(hasStrokeStyle),
     sloppiness: forToolOrSelection(hasRoughness),

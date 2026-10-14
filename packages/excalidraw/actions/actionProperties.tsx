@@ -153,6 +153,7 @@ import {
   ArrowheadCardinalityZeroOrOneIcon,
   strokeVariabilityConstantIcon,
   strokeVariabilityVariableIcon,
+  PlusIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -756,6 +757,58 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
             (hasSelection) =>
               hasSelection ? null : appState.currentItemStrokeWidthKey,
           )}
+          onChange={(value) => updateData(value)}
+        />
+      </div>
+    </fieldset>
+  ),
+});
+
+export const actionChangeFreedrawPointer = register<
+  AppState["currentItemFreedrawPointer"]
+>({
+  name: "changeFreedrawPointer",
+  label: "labels.pointer",
+  trackEvent: false,
+  perform: (elements, appState, value) => {
+    invariant(value, "actionChangeFreedrawPointer: value must be defined");
+
+    return {
+      elements,
+      appState: { ...appState, currentItemFreedrawPointer: value },
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <fieldset>
+      <legend>{t("labels.pointer")}</legend>
+      <div className="buttonList">
+        <RadioSelection<AppState["currentItemFreedrawPointer"]>
+          group="freedraw-pointer"
+          options={[
+            {
+              value: "crosshair",
+              text: t("labels.crosshair"),
+              icon: PlusIcon,
+              testId: "freedrawPointer-crosshair",
+            },
+            {
+              value: "dot",
+              text: t("labels.dot"),
+              icon: (
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="4"
+                    fill={appState.currentItemStrokeColor}
+                  />
+                </svg>
+              ),
+              testId: "freedrawPointer-dot",
+            },
+          ]}
+          value={appState.currentItemFreedrawPointer}
           onChange={(value) => updateData(value)}
         />
       </div>

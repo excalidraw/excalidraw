@@ -35,6 +35,11 @@ const createBucketFillCursorDataURL = (color: string) => {
   )}`;
 };
 
+const createFreedrawDotCursorDataURL = (color: string) =>
+  `data:${MIME_TYPES.svg},${encodeURIComponent(
+    `<svg viewBox="0 0 16 16" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="3.5" fill="${color}" stroke="#fff" stroke-width="1.5"/></svg>`,
+  )}`;
+
 /**
  * Captures all cursor management for the interactive canvas.
  *
@@ -48,6 +53,8 @@ export class AppCursor {
     canvas: HTMLCanvasElement;
     type: AppState["activeTool"]["type"];
     bucketFillColor?: string;
+    freedrawPointer?: AppState["currentItemFreedrawPointer"];
+    freedrawPointerColor?: string;
     theme?: AppState["theme"];
   } | null = null;
 
@@ -114,11 +121,21 @@ export class AppCursor {
             theme,
           )
         : undefined;
+    const freedrawPointer =
+      activeTool.type === "freedraw"
+        ? this.app.state.currentItemFreedrawPointer
+        : undefined;
+    const freedrawPointerColor =
+      activeTool.type === "freedraw" && freedrawPointer === "dot"
+        ? this.app.state.currentItemStrokeColor
+        : undefined;
     const memo = this.toolCursorMemo;
     if (
       memo?.canvas === canvas &&
       memo.type === activeTool.type &&
       memo.bucketFillColor === bucketFillColor &&
+      memo.freedrawPointer === freedrawPointer &&
+      memo.freedrawPointerColor === freedrawPointerColor &&
       memo.theme === theme
     ) {
       return;
@@ -132,6 +149,12 @@ export class AppCursor {
       this.applyEraser();
     } else if (activeTool.type === "autoshape") {
       this.set(CURSOR_TYPE.CROSSHAIR);
+    } else if (activeTool.type === "freedraw" && freedrawPointer === "dot") {
+      this.set(
+        `url(${createFreedrawDotCursorDataURL(
+          freedrawPointerColor!,
+        )}) 8 8, crosshair`,
+      );
     } else if (activeTool.type === "bucketfill") {
       // The hotspot is the center of the paint droplet in the icon.
       this.set(
@@ -156,6 +179,8 @@ export class AppCursor {
       canvas,
       type: activeTool.type,
       bucketFillColor,
+      freedrawPointer,
+      freedrawPointerColor,
       theme,
     };
   };
