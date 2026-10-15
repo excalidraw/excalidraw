@@ -34,6 +34,11 @@ import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
 import { TopPicks } from "./TopPicks";
+import {
+  createSavedPenPreset,
+  getTopPickColor,
+  isSameTopPick,
+} from "./colorTopPickUtils";
 import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import {
   ColorPickerDnDContext,
@@ -45,7 +50,7 @@ import "./ColorPicker.scss";
 
 import type { ColorPickerType } from "./colorPickerUtils";
 
-import type { AppState, UIAppState } from "../../types";
+import type { AppState, SavedPenPreset, UIAppState } from "../../types";
 
 interface ColorPickerProps {
   type: ColorPickerType;
@@ -54,7 +59,11 @@ interface ColorPickerProps {
    * (e.g. when multiple shapes selected with different colors)
    */
   color: string | null;
-  onChange: (color: string) => void;
+  onChange: (
+    color: string,
+    appStateUpdates?: Partial<AppState>,
+    preset?: SavedPenPreset,
+  ) => void;
   label: string;
   elements: readonly ExcalidrawElement[];
   appState: UIAppState;
@@ -81,6 +90,9 @@ const ColorPickerPopupContent = ({
   appState,
   excludedColors,
   onResetTopPicks,
+  isAddingTopPick,
+  onAddTopPick,
+  onStopAddingTopPick,
 }: Pick<
   ColorPickerProps,
   | "type"
@@ -96,6 +108,11 @@ const ColorPickerPopupContent = ({
   getOpenPopup: () => AppState["openPopup"];
   /** present only while the top picks are customized */
   onResetTopPicks?: () => void;
+  /** whether a new saved pen is being picked */
+  isAddingTopPick?: () => boolean;
+  /** append a saved pen from the color picker */
+  onAddTopPick?: (color: string) => Partial<AppState>;
+  onStopAddingTopPick?: () => void;
 }) => {
   const { container } = useExcalidrawContainer();
   const app = useApp();
@@ -173,6 +190,7 @@ const ColorPickerPopupContent = ({
         }
       }}
       onClose={() => {
+        onStopAddingTopPick?.();
         // only clear if we're still the active popup (avoid racing with switch)
         if (getOpenPopup() === type) {
           updateData({ openPopup: null });
@@ -206,7 +224,13 @@ const ColorPickerPopupContent = ({
               ? saveCaretPosition(app.ownerDocument)
               : null;
 
-            onChange(changedColor);
+            onChange(
+              changedColor,
+              isAddingTopPick?.() && onAddTopPick
+                ? onAddTopPick(changedColor)
+                : undefined,
+            );
+            onStopAddingTopPick?.();
 
             // Restore caret position after color change if editing text
             if (appState.editingTextElement && savedSelection) {
@@ -361,13 +385,14 @@ const ColorPickerComponent = ({
   customizableTopPicks,
 }: ColorPickerProps) => {
   const openRef = useRef(appState.openPopup);
+  const addingTopPickRef = useRef(false);
   useEffect(() => {
     openRef.current = appState.openPopup;
   }, [appState.openPopup]);
   const stylesPanelMode = useStylesPanelMode();
   const isCompactMode = stylesPanelMode !== "full";
 
-  const isTopPicksCustomizable = !!customizableTopPicks && !isCompactMode;
+  const isTopPicksCustomizable = !!customizableTopPicks;
 
   // user-pinned picks trump the (host-provided or default) baseline
   const customTopPicks =
@@ -384,6 +409,25 @@ const ColorPickerComponent = ({
         ? DEFAULT_ELEMENT_STROKE_PICKS
         : DEFAULT_ELEMENT_BACKGROUND_PICKS);
 
+  const removeTopPick =
+    isTopPicksCustomizable && customizableTopPicks
+      ? (index: number) => {
+          const current = customTopPicks?.length
+            ? customTopPicks
+            : topPicks ??
+              (type === "elementStroke"
+                ? DEFAULT_ELEMENT_STROKE_PICKS
+                : DEFAULT_ELEMENT_BACKGROUND_PICKS);
+          const next = current.filter((_, pickIndex) => pickIndex !== index);
+          updateData({
+            colorTopPicks: {
+              ...appState.colorTopPicks,
+              [customizableTopPicks]: next.length ? next : null,
+            },
+          });
+        }
+      : undefined;
+
   const resetTopPicks =
     isTopPicksCustomizable && customizableTopPicks
       ? () => {
@@ -393,6 +437,25 @@ const ColorPickerComponent = ({
               [customizableTopPicks]: null,
             },
           });
+        }
+      : undefined;
+
+  const addTopPick =
+    isTopPicksCustomizable && customizableTopPicks
+      ? (pick: string): Partial<AppState> => {
+          const preset = createSavedPenPreset(pick, appState);
+          const picks = effectiveTopPicks.some((existing) =>
+            isSameTopPick(existing, preset),
+          )
+            ? effectiveTopPicks
+            : [...effectiveTopPicks, preset];
+          return {
+            colorTopPicks: {
+              ...appState.colorTopPicks,
+              [customizableTopPicks]: picks,
+            },
+            openPopup: null,
+          };
         }
       : undefined;
 
@@ -415,7 +478,22 @@ const ColorPickerComponent = ({
   });
 
   return (
-    <ColorPickerDnDContext.Provider value={isTopPicksCustomizable ? dnd : null}>
+    <ColorPickerDnDContext.Provider
+      value={
+        isTopPicksCustomizable
+          ? {
+              ...dnd,
+              startSourceDrag: (event, pick) =>
+                dnd.startSourceDrag(
+                  event,
+                  typeof pick === "string"
+                    ? createSavedPenPreset(pick, appState)
+                    : pick,
+                ),
+            }
+          : null
+      }
+    >
       <div
         role="dialog"
         aria-modal="true"
@@ -423,36 +501,49 @@ const ColorPickerComponent = ({
           "color-picker-container--no-top-picks": isCompactMode,
         })}
       >
-        {!isCompactMode && (
-          <TopPicks
-            theme={appState.theme}
-            activeColor={color}
-            onChange={(pickedColor) => {
-              onChange(pickedColor);
-              // if another color-picker popup is open, follow the user's
-              // focus over to this picker (same as clicking its trigger)
-              if (
-                isColorPickerPopup(appState.openPopup) &&
-                appState.openPopup !== type
-              ) {
-                // deferred: each updateData spreads the full pre-commit
-                // appState, so issuing this in the same task would clobber
-                // the color change committed by `onChange` above
-                setTimeout(() => updateData({ openPopup: type }), 0);
-              }
-            }}
-            type={type}
-            topPicks={customTopPicks?.length ? customTopPicks : topPicks}
-            isCustomized={!!customTopPicks?.length}
-            onReset={resetTopPicks}
-          />
-        )}
+        <TopPicks
+          theme={appState.theme}
+          activeColor={color}
+          onChange={(pick) => {
+            onChange(
+              getTopPickColor(pick),
+              undefined,
+              typeof pick === "string" ? undefined : pick,
+            );
+            // if another color-picker popup is open, follow the user's
+            // focus over to this picker (same as clicking its trigger)
+            if (
+              isColorPickerPopup(appState.openPopup) &&
+              appState.openPopup !== type
+            ) {
+              // deferred: each updateData spreads the full pre-commit
+              // appState, so issuing this in the same task would clobber
+              // the color change committed by `onChange` above
+              setTimeout(() => updateData({ openPopup: type }), 0);
+            }
+          }}
+          type={type}
+          topPicks={customTopPicks?.length ? customTopPicks : topPicks}
+          isCustomized={!!customTopPicks?.length}
+          onReset={resetTopPicks}
+          onRequestAdd={
+            isTopPicksCustomizable
+              ? () => {
+                  addingTopPickRef.current = true;
+                  updateData({ openPopup: type });
+                }
+              : undefined
+          }
+          onRemove={removeTopPick}
+        />
         {!isCompactMode && <ButtonSeparator />}
         <Popover.Root
           open={appState.openPopup === type}
           onOpenChange={(open) => {
             if (open) {
               updateData({ openPopup: type });
+            } else {
+              addingTopPickRef.current = false;
             }
           }}
         >
@@ -468,11 +559,14 @@ const ColorPickerComponent = ({
               // atomic switch: if another popup is open, close it first, then open this one next tick
               if (appState.openPopup === type) {
                 // toggle off on same trigger
+                addingTopPickRef.current = false;
                 updateData({ openPopup: null });
               } else if (appState.openPopup) {
+                addingTopPickRef.current = false;
                 updateData({ openPopup: type });
               } else {
                 // open this one
+                addingTopPickRef.current = false;
                 updateData({ openPopup: type });
               }
             }}
@@ -493,6 +587,11 @@ const ColorPickerComponent = ({
               onResetTopPicks={
                 customTopPicks?.length ? resetTopPicks : undefined
               }
+              isAddingTopPick={() => addingTopPickRef.current}
+              onAddTopPick={addTopPick}
+              onStopAddingTopPick={() => {
+                addingTopPickRef.current = false;
+              }}
             />
           )}
         </Popover.Root>

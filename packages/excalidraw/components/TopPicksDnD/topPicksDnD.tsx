@@ -38,6 +38,8 @@ export type TopPicksDragState<T> = {
   duplicateIndex: number | null;
   /** signed distance between strip slot centers (for reorder preview) */
   slotSpan: number;
+  /** the color strip can grow into multiple rows */
+  isWrapped: boolean;
 } | null;
 
 export type TopPicksGhost = {
@@ -104,7 +106,8 @@ export const getTopPickReorderOffset = (
   if (
     !dragState ||
     dragState.origin.kind !== "pick" ||
-    dragState.overIndex === null
+    dragState.overIndex === null ||
+    dragState.isWrapped
   ) {
     return 0;
   }
@@ -172,12 +175,16 @@ export const useTopPicksDnD = <T,>({
 
     const publish = () => {
       if (session?.activated) {
+        const firstSlotTop = session.slotRects[0]?.top;
         setDragState({
           value: session.value,
           origin: session.origin,
           overIndex: session.overIndex,
           duplicateIndex: session.duplicateIndex,
           slotSpan: session.slotSpan,
+          isWrapped: session.slotRects.some(
+            (rect) => rect.top !== firstSlotTop,
+          ),
         });
       } else {
         setDragState(null);
@@ -290,7 +297,10 @@ export const useTopPicksDnD = <T,>({
         let best = 0;
         let bestDistance = Infinity;
         slotRects.forEach((rect, index) => {
-          const distance = Math.abs(x - (rect.left + rect.width / 2));
+          const distance = Math.hypot(
+            x - (rect.left + rect.width / 2),
+            y - (rect.top + rect.height / 2),
+          );
           if (distance < bestDistance) {
             bestDistance = distance;
             best = index;
