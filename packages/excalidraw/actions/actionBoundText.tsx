@@ -220,6 +220,9 @@ export const bindTextToContainer = (
   const stickyInk = getStickyNoteInk(textElement, container);
   app.scene.mutateElement(textElement, {
     containerId: container.id,
+    // a label belongs where its container does
+    frameId: container.frameId,
+    groupIds: container.groupIds,
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     textAlign: TEXT_ALIGN.CENTER,
     autoResize: true,
