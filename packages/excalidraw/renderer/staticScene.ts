@@ -438,6 +438,15 @@ const _renderStaticScene = ({
 
         if (!isExporting && renderConfig.renderLinks !== false) {
           renderLinkIcon(element, context, appState, elementsMap, renderState);
+          if (boundTextElement?.link) {
+            renderLinkIcon(
+              boundTextElement,
+              context,
+              appState,
+              elementsMap,
+              getRenderState(boundTextElement),
+            );
+          }
         }
       } catch (error: any) {
         console.error(
