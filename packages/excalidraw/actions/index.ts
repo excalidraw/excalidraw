@@ -21,6 +21,9 @@ export {
   actionChangeTextAlign,
   actionChangeVerticalAlign,
   actionChangeArrowProperties,
+  actionChangeCodeBlockLanguage,
+  actionChangeCodeBlockTheme,
+  actionChangeCodeBlockLineNumbers,
 } from "./actionProperties";
 
 export {

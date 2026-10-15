@@ -28,6 +28,7 @@ import {
   newArrowElement,
   newElement,
   newEmbeddableElement,
+  newCodeBlockElement,
   newFrameElement,
   newFreeDrawElement,
   newIframeElement,
@@ -59,6 +60,7 @@ import { Scene } from "./Scene";
 import type {
   ExcalidrawArrowElement,
   ExcalidrawBindableElement,
+  ExcalidrawCodeBlockElement,
   ExcalidrawElement,
   ExcalidrawFrameElement,
   ExcalidrawFreeDrawElement,
@@ -247,7 +249,12 @@ export type ExcalidrawElementSkeleton =
       type: "magicframe";
       children: readonly ExcalidrawElement["id"][];
       name?: string;
-    } & Partial<ExcalidrawMagicFrameElement>);
+    } & Partial<ExcalidrawMagicFrameElement>)
+  | ({
+      type: "codeblock";
+      x: number;
+      y: number;
+    } & Partial<ExcalidrawCodeBlockElement>);
 
 const DEFAULT_LINEAR_ELEMENT_PROPS = {
   width: 100,
@@ -714,6 +721,13 @@ export const convertToExcalidrawElements = (
       }
       case "embeddable": {
         excalidrawElement = newEmbeddableElement({ ...element });
+        break;
+      }
+      case "codeblock": {
+        excalidrawElement = newCodeBlockElement({
+          ...element,
+          type: "codeblock",
+        });
         break;
       }
 

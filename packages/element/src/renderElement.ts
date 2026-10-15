@@ -67,9 +67,17 @@ import {
   isMagicFrameElement,
   isFrameLikeElement,
   isImageElement,
+  isCodeBlockElement,
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
 import { getCornerRadius } from "./utils";
+import {
+  getCodeBlockLayout,
+  CODE_BLOCK_HEADER_LABEL,
+  CODE_BLOCK_PLACEHOLDER,
+  getCodeBlockFontString,
+  getCodeBlockTheme,
+} from "./codeBlock";
 
 import { ShapeCache } from "./shape";
 import {
@@ -85,6 +93,7 @@ import type {
   NonDeletedExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
+  ExcalidrawCodeBlockElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedSceneElementsMap,
   ElementsMap,
@@ -105,6 +114,8 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
       return element.strokeWidth * 12;
     case "text":
       return element.fontSize / 2;
+    case "codeblock":
+      return Math.max(60, element.strokeWidth * 12);
     case "arrow":
       if (element.endArrowhead || element.endArrowhead) {
         return 40;
@@ -211,6 +222,7 @@ export interface ExcalidrawElementWithCanvas {
   canvasOffsetY: number;
   imageCrop: ExcalidrawImageElement["crop"] | null;
   containingFrameOpacity: number;
+  versionNonce?: number;
 }
 
 const cappedElementCanvasSize = (
@@ -335,6 +347,7 @@ const generateElementCanvas = (
     containingFrameOpacity:
       getContainingFrame(element, elementsMap)?.opacity || 100,
     imageCrop: isImageElement(element) ? element.crop : null,
+    versionNonce: element.versionNonce,
   };
 };
 
@@ -428,13 +441,167 @@ const strokeStickyNoteEdge = (
   context.restore();
 };
 
+const drawCodeBlockElementOnCanvas = (
+  element: ExcalidrawCodeBlockElement,
+  context: CanvasRenderingContext2D,
+  renderConfig: StaticCanvasRenderConfig,
+  appState?: StaticCanvasAppState | InteractiveCanvasAppState,
+) => {
+  context.save();
+
+  // export canvas title (interactive canvas uses renderFrameNames)
+  if (renderConfig.isExporting) {
+    const title = element.title || CODE_BLOCK_HEADER_LABEL;
+    context.font = "500 14px Assistant, Helvetica, sans-serif";
+    context.fillStyle =
+      renderConfig.theme === THEME.DARK
+        ? FRAME_STYLE.nameColorDarkTheme
+        : FRAME_STYLE.nameColorLightTheme;
+    context.textAlign = "left";
+    context.textBaseline = "bottom";
+    context.fillText(title, 0, -FRAME_STYLE.nameOffsetY);
+  }
+
+  // disable ligatures so operators like != don't combine
+  if ("fontVariantLigatures" in context) {
+    (context as any).fontVariantLigatures = "none";
+  }
+
+  const theme = getCodeBlockTheme(element.theme);
+
+  const radius = element.roundness
+    ? getCornerRadius(Math.min(element.width, element.height), element)
+    : 0;
+  context.beginPath();
+  if (radius > 0 && context.roundRect) {
+    context.roundRect(0, 0, element.width, element.height, radius);
+  } else {
+    context.rect(0, 0, element.width, element.height);
+  }
+  context.fillStyle =
+    element.backgroundColor && element.backgroundColor !== "transparent"
+      ? element.backgroundColor
+      : theme.background;
+  context.fill();
+
+  context.save();
+  context.beginPath();
+  if (radius > 0 && context.roundRect) {
+    context.roundRect(0, 0, element.width, element.height, radius);
+  } else {
+    context.rect(0, 0, element.width, element.height);
+  }
+  context.clip();
+
+  const layout = getCodeBlockLayout(element);
+  const startX =
+    (element.showLineNumbers ? layout.gutterWidth : 0) + layout.padding;
+
+  if (element.showLineNumbers && layout.gutterWidth > 0) {
+    context.fillStyle = theme.gutterBackground;
+    context.fillRect(0, 0, layout.gutterWidth, element.height);
+
+    context.font = getCodeBlockFontString(element.fontSize);
+    context.fillStyle = theme.gutterText;
+    context.textAlign = "right";
+    context.textBaseline = "middle";
+
+    const gutterTextPadding = Math.max(
+      6,
+      Math.round(12 * (element.fontSize / 14)),
+    );
+
+    for (let i = 0; i < layout.visualLines.length; i++) {
+      const vLine = layout.visualLines[i];
+      const lineCenterY = layout.padding + (i + 0.5) * layout.lineHeightPx;
+      if (lineCenterY > element.height) {
+        break;
+      }
+      if (vLine.isFirstSubLine) {
+        context.fillText(
+          String(vLine.logicalLineNumber),
+          layout.gutterWidth - gutterTextPadding,
+          lineCenterY,
+        );
+      }
+    }
+  }
+
+  context.font = getCodeBlockFontString(element.fontSize);
+  context.textAlign = "left";
+  context.textBaseline = "middle";
+
+  if (
+    !element.code &&
+    layout.visualLines.length <= 1 &&
+    (!layout.visualLines[0] || !layout.visualLines[0].text)
+  ) {
+    context.fillStyle = theme.placeholder;
+    context.fillText(
+      CODE_BLOCK_PLACEHOLDER,
+      startX,
+      layout.padding + 0.5 * layout.lineHeightPx,
+    );
+  } else {
+    for (let i = 0; i < layout.visualLines.length; i++) {
+      const vLine = layout.visualLines[i];
+      const lineCenterY = layout.padding + (i + 0.5) * layout.lineHeightPx;
+      if (lineCenterY > element.height) {
+        break;
+      }
+
+      let curX = startX;
+      for (const token of vLine.tokens) {
+        const color = theme.tokenColors[token.type] || theme.tokenColors.plain;
+        context.fillStyle = color;
+        const isItalic = token.type === "comment" || token.type === "instance";
+        context.font = isItalic
+          ? `italic ${getCodeBlockFontString(element.fontSize)}`
+          : getCodeBlockFontString(element.fontSize);
+        context.fillText(token.text, curX, lineCenterY);
+        curX += context.measureText(token.text).width;
+      }
+    }
+  }
+
+  context.restore();
+
+  context.beginPath();
+  if (radius > 0 && context.roundRect) {
+    context.roundRect(0, 0, element.width, element.height, radius);
+  } else {
+    context.rect(0, 0, element.width, element.height);
+  }
+  context.lineWidth = element.strokeWidth || 1;
+  context.strokeStyle =
+    element.strokeColor && element.strokeColor !== "transparent"
+      ? element.strokeColor
+      : theme.border;
+  if (element.strokeStyle === "dashed") {
+    context.setLineDash([8, 8]);
+  } else if (element.strokeStyle === "dotted") {
+    context.setLineDash([3, 3]);
+  } else {
+    context.setLineDash([]);
+  }
+  context.stroke();
+  context.setLineDash([]);
+
+  context.restore();
+};
+
 const drawElementOnCanvas = (
   element: NonDeletedExcalidrawElement,
   rc: RoughCanvas,
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
+  appState?: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
   switch (element.type) {
+    case "codeblock": {
+      drawCodeBlockElementOnCanvas(element, context, renderConfig, appState);
+      break;
+    }
     case "stickynote": {
       context.save();
       context.fillStyle = `rgba(0, 0, 0, ${STICKY_NOTE_SHADOW_OPACITY})`;
@@ -706,7 +873,9 @@ const generateElementWithCanvas = (
     shouldRegenerateBecauseZoom ||
     prevElementWithCanvas.theme !== appState.theme ||
     prevElementWithCanvas.imageCrop !== imageCrop ||
-    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity
+    prevElementWithCanvas.containingFrameOpacity !== containingFrameOpacity ||
+    (prevElementWithCanvas.versionNonce != null &&
+      prevElementWithCanvas.versionNonce !== element.versionNonce)
   ) {
     const elementWithCanvas = generateElementCanvas(
       element,
@@ -1107,7 +1276,8 @@ const drawElement = (
     case "image":
     case "text":
     case "iframe":
-    case "embeddable": {
+    case "embeddable":
+    case "codeblock": {
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const centerX = (x1 + x2) / 2;
@@ -1199,6 +1369,15 @@ const drawElement = (
         );
 
         if (!elementWithCanvas) {
+          return;
+        }
+
+        if (
+          isCodeBlockElement(element) &&
+          appState &&
+          "editingCodeBlockElement" in appState &&
+          (appState as any).editingCodeBlockElement?.id === element.id
+        ) {
           return;
         }
 

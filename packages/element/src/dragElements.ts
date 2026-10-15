@@ -30,7 +30,9 @@ import {
   isFrameLikeElement,
   isImageElement,
   isTextElement,
+  isCodeBlockElement,
 } from "./typeChecks";
+import { getCodeBlockLayout, DEFAULT_CODE_BLOCK_WIDTH } from "./codeBlock";
 
 import type { Scene } from "./Scene";
 
@@ -369,6 +371,34 @@ export const dragNewElement = ({
       scene,
       informMutation,
     });
+    return;
+  }
+
+  if (isCodeBlockElement(newElement)) {
+    const finalWidth = Math.max(DEFAULT_CODE_BLOCK_WIDTH, width);
+    const layout = getCodeBlockLayout({
+      ...newElement,
+      width: finalWidth,
+    });
+    const finalHeight = Math.ceil(layout.totalContentHeight);
+    let newX = x < originX ? originX - finalWidth : originX;
+    let newY = y < originY ? originY - finalHeight : originY;
+
+    if (shouldResizeFromCenter) {
+      newX = originX - finalWidth / 2;
+      newY = originY - finalHeight / 2;
+    }
+
+    scene.mutateElement(
+      newElement,
+      {
+        x: newX + (originOffset?.x ?? 0),
+        y: newY + (originOffset?.y ?? 0),
+        width: finalWidth,
+        height: finalHeight,
+      },
+      { informMutation, isDragging: false },
+    );
     return;
   }
 

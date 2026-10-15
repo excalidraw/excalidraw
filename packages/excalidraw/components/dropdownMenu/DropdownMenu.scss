@@ -299,4 +299,100 @@
       height: var(--default-button-size);
     }
   }
+
+  .code-block-language-fieldset {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .code-block-language-dropdown {
+    &__trigger {
+      width: 100% !important;
+      min-width: 0;
+      height: 2rem !important;
+      padding: 0 0.625rem !important;
+      display: flex !important;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--default-border-color) !important;
+      background-color: var(--island-bg-color);
+      color: var(--color-on-surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-family: inherit;
+      box-sizing: border-box;
+
+      &:hover {
+        background-color: var(--button-hover-bg, var(--color-surface-high));
+      }
+
+      &,
+      &.dropdown-menu-button,
+      &.dropdown-menu-button--mobile {
+        width: 100% !important;
+        height: 2rem !important;
+        padding: 0 0.625rem !important;
+        border: 1px solid var(--default-border-color) !important;
+      }
+    }
+
+    &__icon {
+      display: flex;
+      align-items: center;
+      opacity: 0.7;
+      transition: transform 0.15s ease;
+
+      &--open {
+        transform: rotate(180deg);
+      }
+    }
+
+    &__content {
+      width: var(--radix-dropdown-menu-trigger-width, 100%);
+      min-width: var(--radix-dropdown-menu-trigger-width, 180px);
+      max-width: var(--radix-dropdown-menu-content-available-width, 100%);
+      box-sizing: border-box;
+      z-index: 10;
+
+      .dropdown-menu-container {
+        padding: 0;
+        overflow: hidden;
+      }
+    }
+
+    &__list {
+      max-height: 260px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 4px 6px;
+      box-sizing: border-box;
+      scrollbar-gutter: stable;
+
+      .dropdown-menu-item {
+        &:focus-visible,
+        &:active,
+        &[data-highlighted] {
+          outline: none;
+          box-shadow: inset 0 0 0 1px var(--color-brand-hover) !important;
+        }
+
+        &:active {
+          box-shadow: inset 0 0 0 1px var(--color-brand-active) !important;
+        }
+      }
+    }
+  }
+
+  @at-root .excalidraw--mobile#{&} {
+    .code-block-language-dropdown__trigger {
+      width: 100% !important;
+      height: 2rem !important;
+      padding: 0 0.625rem !important;
+      border: 1px solid var(--default-border-color) !important;
+    }
+  }
 }
+

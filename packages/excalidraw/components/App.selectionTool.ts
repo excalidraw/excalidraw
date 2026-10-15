@@ -39,6 +39,7 @@ import {
   isNonDeletedElement,
   isSelectedViaGroup,
   isStickyNoteElement,
+  isCodeBlockElement,
   LinearElementEditor,
   makeNextSelectedElementIds,
   transformElements,
@@ -679,6 +680,14 @@ export class AppSelectionTool {
     // images are proportional by default, and so is a sticky note's corner
     // (its label's font ceiling scales with it); Shift frees them. A note's
     // edges stay free by default — Shift constrains them like any shape.
+    const isCodeBlockProportional =
+      selectedElements.length === 1 &&
+      isCodeBlockElement(selectedElements[0]) &&
+      typeof transformHandleType === "string" &&
+      (transformHandleType.length === 2 ||
+        transformHandleType === "n" ||
+        transformHandleType === "s");
+
     const proportionalByDefault =
       selectedElements.some((element) => isImageElement(element)) ||
       (selectedElements.length === 1 &&
@@ -694,7 +703,9 @@ export class AppSelectionTool {
         this.app.scene,
         shouldRotateWithDiscreteAngle(event),
         shouldResizeFromCenter(event),
-        proportionalByDefault
+        isCodeBlockProportional
+          ? true
+          : proportionalByDefault
           ? !shouldMaintainAspectRatio(event)
           : shouldMaintainAspectRatio(event),
         resizeX,
@@ -1418,9 +1429,10 @@ export class AppSelectionTool {
             element: hitElement,
             elementsMap,
             threshold: this.app.getElementHitThreshold(hitElement),
-            frameNameBound: isFrameLikeElement(hitElement)
-              ? this.app.frameNameBoundsCache.get(hitElement)
-              : null,
+            frameNameBound:
+              isFrameLikeElement(hitElement) || isCodeBlockElement(hitElement)
+                ? this.app.frameNameBoundsCache.get(hitElement)
+                : null,
           },
           elementsMap,
         )) ||
