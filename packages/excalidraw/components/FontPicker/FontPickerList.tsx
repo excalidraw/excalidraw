@@ -21,11 +21,13 @@ import {
 import { PropertiesPopover } from "../PropertiesPopover";
 import { QuickSearch } from "../QuickSearch";
 import { ScrollableList } from "../ScrollableList";
+import { TopPicksTip } from "../TopPicksDnD/TopPicksTip";
 import DropdownMenuGroup from "../dropdownMenu/DropdownMenuGroup";
 import MenuItemContent from "../dropdownMenu/DropdownMenuItemContent";
 import { getDropdownMenuItemClassName } from "../dropdownMenu/common";
 import { PlusIcon } from "../icons";
 
+import { useFontPickerDnD } from "./fontTopPicksDnD";
 import { fontPickerKeyHandler } from "./keyboardNavHandlers";
 import {
   FontPickerListItem,
@@ -50,6 +52,8 @@ interface FontPickerListProps {
   onLeave: () => void;
   onOpen: () => void;
   onClose: () => void;
+  /** present only while the top picks are customized */
+  onResetTopPicks?: () => void;
 }
 
 export const FontPickerList = React.memo(
@@ -61,6 +65,7 @@ export const FontPickerList = React.memo(
     onLeave,
     onOpen,
     onClose,
+    onResetTopPicks,
   }: FontPickerListProps) => {
     const { container } = useExcalidrawContainer();
     const app = useApp();
@@ -71,6 +76,8 @@ export const FontPickerList = React.memo(
       () => !!Object.keys(fontProviders ?? {}).length,
       [fontProviders],
     );
+    // present only when the top picks are customizable
+    const dnd = useFontPickerDnD();
 
     const [localHoveredFontFamily, setLocalHoveredFontFamily] =
       useState<FontFamily | null>(null);
@@ -379,10 +386,19 @@ export const FontPickerList = React.memo(
             </button>
           ) : null}
         </ScrollableList>
+        {dnd && (
+          <TopPicksTip
+            className="FontPicker__tip"
+            tip={t("fontList.topPicksTip")}
+            onReset={onResetTopPicks}
+            resetTitle={t("fontList.resetTopPicks")}
+          />
+        )}
       </PropertiesPopover>
     );
   },
   (prev, next) =>
     prev.selectedFontFamily === next.selectedFontFamily &&
-    prev.hoveredFontFamily === next.hoveredFontFamily,
+    prev.hoveredFontFamily === next.hoveredFontFamily &&
+    !!prev.onResetTopPicks === !!next.onResetTopPicks,
 );

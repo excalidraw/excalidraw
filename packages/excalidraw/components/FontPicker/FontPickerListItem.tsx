@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import { getFontFamilyString } from "@excalidraw/common";
+import { getFontFamilyString, isCustomFontFamily } from "@excalidraw/common";
 
 import type { FontFamily } from "@excalidraw/common";
 
@@ -9,6 +9,8 @@ import { DropDownMenuItemBadge } from "../dropdownMenu/DropdownMenuItem";
 import MenuItemContent from "../dropdownMenu/DropdownMenuItemContent";
 import { getDropdownMenuItemClassName } from "../dropdownMenu/common";
 import { RetryIcon } from "../icons";
+
+import { useFontPickerDnD } from "./fontTopPicksDnD";
 
 import type { FontDescriptor } from "./useFontCatalog";
 
@@ -47,6 +49,7 @@ export const FontPickerListItem = ({
   setItemRef,
 }: FontPickerListItemProps) => {
   const ref = useRef<HTMLButtonElement>(null);
+  const dnd = useFontPickerDnD();
   const isUnsupported = font.status === "unsupported";
 
   useEffect(() => {
@@ -86,10 +89,17 @@ export const FontPickerListItem = ({
       tabIndex={isSelected ? 0 : -1}
       onClick={() => onSelect(font.value)}
       onMouseMove={() => {
-        if (!isHovered) {
+        // don't live-preview fonts the dragged one merely passes over
+        if (!dnd?.dragState && !isHovered) {
           onHover(font.value);
         }
       }}
+      onPointerDown={
+        // top picks are restored as built-in families only
+        dnd && !isCustomFontFamily(font.value)
+          ? (event) => dnd.startSourceDrag(event, font.value)
+          : undefined
+      }
     >
       <MenuItemContent
         icon={font.icon}

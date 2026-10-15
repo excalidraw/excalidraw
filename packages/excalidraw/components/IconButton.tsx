@@ -56,6 +56,8 @@ type IconButtonProps =
        * (unlike the click event's own pointerType on iOS).
        */
       onSelect?(data: { pointerType: PointerType | null }): void;
+      /** the press that may become a click — e.g. to arm a drag out of the toolbar */
+      onPointerDown?(event: React.PointerEvent<HTMLButtonElement>): void;
     });
 
 export const IconButton = React.forwardRef(
@@ -172,6 +174,7 @@ export const IconButton = React.forwardRef(
         aria-disabled={!!props.disabled}
         onPointerDown={(event) => {
           lastPointerTypeRef.current = event.pointerType || null;
+          props.onPointerDown?.(event);
         }}
         onPointerUp={() => {
           requestAnimationFrame(() => {

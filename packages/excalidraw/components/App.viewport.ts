@@ -469,6 +469,114 @@ export class AppViewport {
   };
 
   /**
+   * The side a rendered side UI (`data-viewport-ui="side"`) docks to, and
+   * how far it reaches into the canvas from it, in screen px.
+   */
+  private measureSide = (node: HTMLElement, containerRect: DOMRect) => {
+    const domRect = node.getBoundingClientRect();
+    const left = domRect.left - containerRect.left;
+    const right = domRect.right - containerRect.left;
+    return left + domRect.width / 2 < this.app.state.width / 2
+      ? { side: "left" as const, offset: right }
+      : { side: "right" as const, offset: this.app.state.width - left };
+  };
+
+  /**
+   * The side a named surface docks to while it's hidden, and how far it
+   * reaches into the canvas from it: as last measured, else approximately.
+   */
+  private getReservedSide = (
+    name: keyof NonNullable<ViewportOffsetsOptions["reserve"]>,
+  ) => {
+    const isRTL = getLanguage().rtl;
+    return (
+      this.uiLastMeasured.get(name) ??
+      (name === "stylesPanel"
+        ? {
+            side: isRTL ? ("right" as const) : ("left" as const),
+            offset:
+              this.dependencies.getStylesPanelMode() === "compact"
+                ? STYLES_PANEL_APPROX_WIDTH.compact
+                : STYLES_PANEL_APPROX_WIDTH.full,
+          }
+        : {
+            side: isRTL ? ("left" as const) : ("right" as const),
+            offset: RIGHT_SIDEBAR_WIDTH,
+          })
+    );
+  };
+
+  private querySideUI = (container: HTMLElement, name: ViewportUIName) =>
+    container.querySelector<HTMLElement>(
+      `[data-viewport-ui="side"][data-viewport-ui-name="${name}"]`,
+    );
+
+  /**
+   * Where a rendered side UI is, relative to the editor's container, in
+   * screen px; null when it isn't rendered.
+   */
+  getSideUIRect = (name: ViewportUIName) => {
+    const container = this.dependencies.getContainer();
+    const node = container && this.querySideUI(container, name);
+    if (!container || !node) {
+      return null;
+    }
+    const containerRect = container.getBoundingClientRect();
+    const rect = node.getBoundingClientRect();
+    return {
+      left: rect.left - containerRect.left,
+      right: rect.right - containerRect.left,
+      top: rect.top - containerRect.top,
+      bottom: rect.bottom - containerRect.top,
+    };
+  };
+
+  /**
+   * How far the named side UIs reach into the canvas, in screen px, from
+   * the left and the right: the part of the canvas they cover. Zero at a
+   * side none of them is rendered at — e.g. with the sidebar closed, or on
+   * phones, where it's an overlay that doesn't count as viewport UI — unless
+   * a hidden one is reserved (see `ViewportOffsetsOptions.reserve`).
+   */
+  getSideInsets = (
+    names: readonly ViewportUIName[],
+    opts?: Pick<ViewportOffsetsOptions, "reserve">,
+  ) => {
+    const insets = { left: 0, right: 0 };
+    const container = this.dependencies.getContainer();
+    if (!container) {
+      return insets;
+    }
+    const containerRect = container.getBoundingClientRect();
+    for (const name of names) {
+      const node = this.querySideUI(container, name);
+      let footprint: { side: "left" | "right"; offset: number } | null = null;
+      if (node) {
+        footprint = this.measureSide(node, containerRect);
+        if (footprint.offset > 0) {
+          this.uiLastMeasured.set(name, footprint);
+        }
+      } else if (
+        name !== "stats" &&
+        opts?.reserve?.[name] &&
+        this.app.editorInterface.formFactor !== "phone"
+      ) {
+        footprint = this.getReservedSide(name);
+      }
+      if (footprint) {
+        insets[footprint.side] = Math.max(
+          insets[footprint.side],
+          footprint.offset,
+        );
+      }
+    }
+    return insets;
+  };
+
+  /** How far the sidebar reaches into the canvas (see `getSideInsets`). */
+  getSidebarInsets = () => this.getSideInsets(["sidebar"]);
+
+  /**
    * Resolves user-supplied viewport offsets into concrete per-side pixel
    * values. Static sides take precedence over UI-derived sides.
    */
@@ -532,10 +640,10 @@ export class AppViewport {
             );
             break;
           case "side": {
-            const [side, offset] =
-              rect.left + rect.width / 2 < this.app.state.width / 2
-                ? (["left", rect.right] as const)
-                : (["right", this.app.state.width - rect.left] as const);
+            const { side, offset } = this.measureSide(
+              node,
+              excalidrawContainerRect,
+            );
 
             measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
 
@@ -555,31 +663,11 @@ export class AppViewport {
     }
 
     if (opts?.reserve && this.app.editorInterface.formFactor !== "phone") {
-      const reserveSurface = (
-        name: ViewportUIName,
-        fallback: { side: "left" | "right"; offset: number },
-      ) => {
-        if (renderedSurfaces.has(name)) {
-          return;
+      for (const name of ["stylesPanel", "sidebar"] as const) {
+        if (opts.reserve[name] && !renderedSurfaces.has(name)) {
+          const { side, offset } = this.getReservedSide(name);
+          measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
         }
-        const { side, offset } = this.uiLastMeasured.get(name) ?? fallback;
-        measuredOffsets[side] = Math.max(measuredOffsets[side], offset);
-      };
-
-      if (opts.reserve.stylesPanel) {
-        reserveSurface("stylesPanel", {
-          side: isRTL ? "right" : "left",
-          offset:
-            this.dependencies.getStylesPanelMode() === "compact"
-              ? STYLES_PANEL_APPROX_WIDTH.compact
-              : STYLES_PANEL_APPROX_WIDTH.full,
-        });
-      }
-      if (opts.reserve.sidebar) {
-        reserveSurface("sidebar", {
-          side: isRTL ? "left" : "right",
-          offset: RIGHT_SIDEBAR_WIDTH,
-        });
       }
     }
 
@@ -630,7 +718,10 @@ export class AppViewport {
     });
   };
 
-  /** Navigates to a target and optionally installs scroll/zoom constraints. */
+  /**
+   * Navigates to a target and optionally installs scroll/zoom constraints.
+   * Navigating stops following a collaborator, as a user's pan does.
+   */
   setViewport = (opts: SetViewportOptions | null) => {
     if (opts === null) {
       this.cancelTransition();
@@ -663,6 +754,10 @@ export class AppViewport {
       }
       return;
     }
+
+    // the view is about to show something other than what the followed
+    // user sees
+    this.app.requestUnfollow();
 
     const viewportUpdate = getConstrainedTargetViewport(
       this.app.state,
@@ -744,27 +839,40 @@ export class AppViewport {
       return false;
     }
 
+    // a user gesture interrupting an animated `setViewport` takes over from
+    // frames that draw from zoom-scaled bitmaps, and the completion handler
+    // that would switch back to crisp ones no longer runs. Otherwise the
+    // flag is left alone: wheel and touch zoom set it and clear it on a
+    // debounce once the gesture is over, and a pan frame landing between two
+    // zoom ticks must not force every element to be re-rasterized at the
+    // in-progress zoom
+    if (this.activeTransition) {
+      this.app.setState({ shouldCacheIgnoreZoom: false });
+    }
     this.cancelTransition();
     if (!opts?.preserveScrollConstraintsSnapBack) {
       AnimationController.cancel(SCROLL_CONSTRAINTS_SNAP_BACK_ANIMATION_KEY);
     }
-    this.app.setState({ shouldCacheIgnoreZoom: false });
     this.app.requestUnfollow();
 
-    const prevZoom = this.app.state.zoom.value;
-    this.app.setState(state);
-
-    this.app.setState((prevState) => {
-      if (!prevState.scrollConstraints) {
+    this.app.setState((prevState, props) => {
+      const update =
+        typeof state === "function" ? state(prevState, props) : state;
+      if (!update) {
         return null;
       }
+      const nextState = { ...prevState, ...update };
+      if (!nextState.scrollConstraints) {
+        return update;
+      }
       const zoomed =
-        !opts?.zoomPreConstrained && prevState.zoom.value !== prevZoom;
-      const overscroll = zoomed ? 0 : prevState.scrollConstraints.overscroll;
+        !opts?.zoomPreConstrained &&
+        nextState.zoom.value !== prevState.zoom.value;
+      const overscroll = zoomed ? 0 : nextState.scrollConstraints.overscroll;
       if (overscroll > 0) {
         this.snapBackDebounced();
       }
-      return constrainScrollState(prevState, overscroll);
+      return { ...nextState, ...constrainScrollState(nextState, overscroll) };
     });
 
     return true;

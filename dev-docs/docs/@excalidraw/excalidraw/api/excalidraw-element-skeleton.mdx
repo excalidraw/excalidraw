@@ -274,6 +274,35 @@ convertToExcalidrawElements([
 
 ![image](https://github.com/excalidraw/excalidraw/assets/11256141/f8123cd1-c9aa-452d-b96b-05c846c5030d)
 
+### Sticky Notes
+
+A sticky note is an always-filled note whose label auto-fits: the font shrinks from the label's `fontSize` (the note's font ceiling) down to a minimum, and only then does the note grow in height. Only `type`, `x` and `y` are required; `width`/`height` default to a 250×250 square and `label` is optional. The note's `strokeColor` is its ink — its text and creation-date footer are always one color; a label that sets its own `strokeColor` gives it to the note. A footer band below the label shows the note's creation date (`created`); pass `created: null` for a note without one (the band stays reserved, but empty).
+
+```js
+convertToExcalidrawElements([
+  {
+    type: "stickynote",
+    x: 100,
+    y: 100,
+    label: {
+      text: "Remember to ship it",
+      fontSize: 28,
+    },
+  },
+  {
+    type: "stickynote",
+    x: 400,
+    y: 100,
+    width: 200,
+    height: 200,
+    backgroundColor: "#fcc2d7",
+    strokeColor: "#c2255c",
+  },
+]);
+```
+
+Notes keep their invariants regardless of the properties you pass: the background is never transparent (it falls back to the default yellow), the fill is solid, and the size is at least 75×75. The height you pass is kept as the note's `baseHeight`; if a label needs more room at the minimum font size, the created note is taller.
+
 ### Labelled Arrows
 
 Similar to Text Containers, you can create labelled arrows as well.

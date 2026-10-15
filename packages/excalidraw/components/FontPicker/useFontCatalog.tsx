@@ -38,7 +38,7 @@ export interface FontDescriptor {
   };
 }
 
-const getFontFamilyIcon = (
+export const getFontFamilyIcon = (
   fontFamily: FontFamily,
   icons?: Record<string, { icon: JSX.Element }>,
 ): JSX.Element => {
@@ -67,7 +67,7 @@ const getFontFamilyIcon = (
   }
 };
 
-const getFontFamilyLabel = (
+export const getFontFamilyLabel = (
   fontFamily: FontFamily,
   fontFaces: ExcalidrawFontFace[],
 ) => {

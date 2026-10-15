@@ -12,6 +12,7 @@ import type {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
+  ElementRenderOverrides,
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
@@ -40,6 +41,7 @@ export type StaticCanvasRenderConfig = {
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
   theme: AppState["theme"];
+  elementRenderOverrides?: ElementRenderOverrides;
 };
 
 export type SVGRenderConfig = {
@@ -170,6 +172,7 @@ export type ElementShapes = {
   arrow: Drawable[];
   line: Drawable[];
   text: null;
+  stickynote: null;
   image: null;
   frame: null;
   magicframe: null;

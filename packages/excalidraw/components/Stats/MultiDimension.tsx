@@ -10,6 +10,12 @@ import {
   updateBoundElements,
 } from "@excalidraw/element";
 import {
+  getStickyNoteResizeIntent,
+  isStickyNoteBoundText,
+  isStickyNoteElement,
+  updateStickyNoteLayout,
+} from "@excalidraw/element";
+import {
   rescalePointsInElement,
   resizeSingleElement,
 } from "@excalidraw/element";
@@ -85,9 +91,34 @@ const resizeElementInGroup = (
   scene: Scene,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
+
+  if (
+    isTextElement(latestElement) &&
+    isStickyNoteBoundText(latestElement, elementsMap)
+  ) {
+    // a group unit lists the note's label too; the note's layout owns it
+    // entirely (a direct scale here would overwrite the fitted size)
+    return;
+  }
+
   const updates = getResizedUpdates(anchorX, anchorY, scale, origElement);
 
   scene.mutateElement(latestElement, updates);
+
+  if (isStickyNoteElement(latestElement)) {
+    // group scaling is uniform: base height and font ceiling scale with the
+    // note (empty notes included); the layout runs the arrow pass itself
+    updateStickyNoteLayout(latestElement, scene, {
+      ...getStickyNoteResizeIntent(
+        latestElement,
+        originalElementsMap,
+        property === "width" ? "e" : "s",
+        { proportional: true, fromCenter: false },
+      ),
+      anchor: "top",
+    });
+    return;
+  }
 
   const boundTextElement = getBoundTextElement(
     origElement,

@@ -13,7 +13,42 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Selection API (2026-10-10) [#12258](https://github.com/excalidraw/excalidraw/pull/12258)
+
+- New `excalidrawAPI.selection`: `select(elements, opts?)`, `add(elements, opts?)`, `remove(elements, opts?)` and `clear(opts?)`, taking elements or their ids, one or many. Missing and deleted elements are skipped.
+- It follows the editor's rules: an element is selected with its group, a frame and its children aren't selected at the same time, and locked elements are skipped. Text editing and cropping end, and the link popup of a lone selected element with a link shows.
+- Options: `deep` selects the elements themselves rather than their groups, editing their group if they share one (as Ctrl/Cmd+click does); `includeLocked` selects locked elements too; `captureUpdate` records the change for undo as for `updateScene()` — by default it's recorded along with the next undoable change.
+- Like `updateScene()`, the change applies on the next render: read it back through `onChange()` or `getAppState()` after that. It works in view mode too, where the selection shows without the transform handles.
+
+### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.
+- New `appState.inputDevice` preference (`"auto" | "mouse" | "trackpad"`, default `"auto"`, persisted in browser storage) selecting the wheel mappings. With `"trackpad"` a plain wheel pans; with `"mouse"` a plain wheel zooms. Ctrl/cmd+wheel (how a pinch is delivered) zooms with either device. Shift+wheel pans horizontally, and ctrl/cmd+shift+wheel pans vertically. The wheel-button zoom above is unaffected. `"auto"` is reserved for detecting the device from the wheel events and resolves to `"trackpad"` until that is implemented (`resolveInputDevice()`). Set it from the new "Input device" radio in the main menu's preferences submenu, also exposed as `MainMenu.DefaultItems.Preferences.InputDevice`.
+
+### Sticky notes (2026-09-06) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- New `stickynote` element type and toolbar tool (`N`): an always-filled, flat-rendered note whose label auto-fits — the font shrinks from the user's size down to a minimum, and only then does the note grow in height (it never shrinks below the height the user gave it). Click to place a 250×250 note, drag to size it (previewed at the dragged size, snapped to a font-aware minimum on release); text editing starts right away.
+- Element model: the note carries `baseHeight` (the user's height; `height ≥ baseHeight`), its label carries `baseFontSize` (the user's font ceiling, `null`/absent on any other text) while `fontSize` holds the fitted size. Read a text element's user-facing size through `getBaseFontSize(text, elementsMap)`.
+- Sticky notes are their own color domain: new `appState.currentItemStickynoteStrokeColor` (the note's text color) and `appState.currentItemStickynoteBackgroundColor` defaults, and new customizable top-pick slots `appState.colorTopPicks.stickyNoteStroke` / `stickyNoteBackground`. The stroke and background pickers, both eyedroppers and paste-styles resolve their target (regular / sticky / mixed) at execution time. A note and its label share one ink (the stroke picker reads "Text color" for notes): coloring the label while editing colors the note too, binding a colored text gives the note its color, and the creation-date footer always paints in that ink.
+- Skeleton API: `convertToExcalidrawElements([{ type: "stickynote", x, y, label?: { text, fontSize? } }])` creates a note (and fitted label); see the element-skeleton docs.
+- Tools can be dragged out of the toolbar: drag the sticky note button onto the canvas to drop a default-sized note where you release it, previewed translucently while dragging (nothing reaches the scene, history or collaborators until the drop; Escape cancels). The mechanism is generic — other tools can opt in.
+- Toolbar: on desktop and tablet the image tool moved into the "More tools" menu (still `9`; `UIOptions.tools.image` keeps hiding it; the mobile toolbar keeps its image slot), and tool badges now show the letter shortcuts (`R`, `T`, `N`, …) instead of the numbers, which are no longer contiguous. The number keys keep working.
+- Each note shows its creation date (`element.created`) in a footer band — "7 Sep", or "7 Sep 2025" once the year differs — on canvas and in SVG/PNG exports. The band is reserved in the note's layout, so the label never overlaps it; notes without a timestamp keep the band empty.
+- Resize semantics: a note's corners resize proportionally by default and scale the label's font ceiling with the note (Shift frees them); its edges resize freely by default (Shift constrains them). Drag-creation is proportional by default too (Shift frees it) and never touches the font ceiling. Width-only gestures keep the base height, height gestures set it, aspect-locked multi-select and Stats group edits scale the ceiling; flips preserve everything. Arrows bound to a note follow it as it grows.
+
 ## Excalidraw API
+
+### `setViewport` stops following a collaborator (2026-09-26) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- `setViewport` now asks to stop following a collaborator whenever it navigates (`onUserFollow` with `action: "UNFOLLOW"`, if `userToFollow` is set), as a user's pan or zoom does. `setViewport(null)` (clearing a lock) and a target that doesn't resolve don't navigate, and leave following alone.
+
+### `onDuplicate` can replace and veto duplicates (2026-09-18) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- `props.onDuplicate` may now return new objects for the duplicated elements in every duplication path. Previously the editor kept using the objects it created, so on paste (and library insert) the frame assignment and bound text redraw went to objects that were no longer in the scene, and alt-drag dragged an element that wasn't in the scene. The returned changes are now merged into the editor's duplicates, so they're part of the duplication's own undo entry and durable increment (no follow-up `updateScene` needed).
+- When pasting or inserting onto a frame, the duplicates passed to `onDuplicate` already have their `frameId` set (and are ordered under the frame).
+- Omitting a duplicate from the returned array (or returning it as deleted) now reliably prevents that element from being duplicated — previously pasting over a frame brought it back, and alt-drag broke. References to it from the remaining duplicates (bindings, `boundElements`, `frameId`) are cleared, and a bound text isn't duplicated without its container. If no duplicate remains, the duplication is cancelled and the returned elements are ignored: paste and the duplicate action do nothing, and alt-drag moves the original elements instead. When only some duplicates are vetoed during alt-drag, their originals stay where they were.
+- `onDuplicate` may return `false` to prevent the duplication as a whole (same as omitting every duplicate, without having to find them).
+- `onDuplicate` receives a third argument with lookups covering just the elements taking part in the duplication, so you don't have to derive them by scanning the scene: `{ duplicateElements, originalElements, origIdToDuplicateId, duplicateIdToOrigId }` — the duplicates by id, the elements they were made from by id, and their ids mapped in both directions (`duplicateIdToOrigId` to look up a duplicate's original while modifying it, `origIdToDuplicateId` e.g. for remapping element ids you keep in `customData`). On paste and library insert the originals are the inserted elements, which aren't part of the scene. The maps are read-only.
 
 ### Host-controlled active tool (2026-07-14) [#11665](https://github.com/excalidraw/excalidraw/pull/11665)
 

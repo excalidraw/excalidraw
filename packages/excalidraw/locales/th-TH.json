@@ -1,13 +1,13 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
+    "signUp": "สมัครสมาชิก",
+    "signIn": "เข้าสู่ระบบ",
     "paste": "วาง",
     "pasteAsPlaintext": "วางโดยไม่มีการจัดรูปแบบ",
     "pasteCharts": "วางแผนภูมิ",
-    "chartType_bar": "",
+    "chartType_bar": "แผนภูมิแท่ง",
     "chartType_line": "แผนภูมิเส้น",
-    "chartType_radar": "",
+    "chartType_radar": "แผนภูมิแท่ง",
     "chartType_plaintext": "ข้อความธรรมดา",
     "selectAll": "เลือกทั้งหมด",
     "multiSelect": "เพิ่มองค์ประกอบในการเลือก",
@@ -37,8 +37,8 @@
     "strokeStyle_dashed": "เส้นประ",
     "strokeStyle_dotted": "จุด",
     "sloppiness": "ความเลอะเทอะ",
-    "pressure": "",
-    "pressure_constant": "",
+    "pressure": "แรงกด",
+    "pressure_constant": "คงที่",
     "pressure_variable": "",
     "opacity": "ความทึบแสง",
     "textAlign": "จัดข้อความ",
@@ -62,7 +62,7 @@
     "arrowhead_cardinality_many": "",
     "arrowhead_cardinality_one_or_many": "",
     "arrowhead_cardinality_exactly_one": "",
-    "arrowhead_cardinality_zero_or_one": "",
+    "arrowhead_cardinality_zero_or_one": "คาร์ดินัลลิตี (ศูนย์หรือหนึ่ง)",
     "arrowhead_cardinality_zero_or_many": "",
     "more_options": "ตัวเลือกเพิ่มเติม",
     "cardinality": "",
@@ -205,7 +205,7 @@
   "library": {
     "noItems": "ยังไม่มีรายการที่เพิ่มเข้าไปได้",
     "hint_emptyLibrary": "",
-    "hint_emptyPrivateLibrary": "",
+    "hint_emptyPrivateLibrary": "เลือกรายการบนแคนวาสเพื่อเพิ่มลงในที่นี้",
     "search": {
       "inputPlaceholder": "ค้นหาห้องสมุด",
       "heading": "",
@@ -266,7 +266,7 @@
   "alerts": {
     "clearReset": "",
     "couldNotCreateShareableLink": "ไม่สามารถสร้างลิงค์ได้",
-    "couldNotCreateShareableLinkTooBig": "",
+    "couldNotCreateShareableLinkTooBig": "ไม่สามารถสร้างลิงก์สำหรับแชร์ได้: ฉากมีขนาดใหญ่เกินไป",
     "couldNotLoadInvalidFile": "ไม่สามารถโหลดไฟล์ที่ผิดพลาดได้",
     "importBackendFailed": "เกิดข้อผิดพลาดจากการนำเข้าจากระบบหลังบ้าน",
     "cannotExportEmptyCanvas": "ไม่สามารถนำออกจากผืนผ้าใบที่ว่างเปล่าได้",
@@ -296,14 +296,14 @@
     "cannotResolveCollabServer": "ไม่สามารถเชื่อต่อกับ collab เซิร์ฟเวอร์ได้ โปรดลองโหลดหน้านี้ใหม่และลองอีกครั้ง",
     "importLibraryError": "",
     "saveLibraryError": "",
-    "collabSaveFailed": "",
+    "collabSaveFailed": "ไม่สามารถบันทึกลงในฐานข้อมูลแบ็กเอนด์ได้ หากยังมีปัญหาอยู่ คุณควรบันทึกไฟล์ลงในเครื่องของคุณเพื่อให้แน่ใจว่างานของคุณจะไม่สูญหาย",
     "collabSaveFailed_sizeExceeded": "",
     "imageToolNotSupported": "",
     "brave_measure_text_error": {
       "line1": "",
       "line2": "",
       "line3": "",
-      "line4": ""
+      "line4": "หากการปิดใช้งานการตั้งค่านี้ไม่สามารถแก้ไขการแสดงผลขององค์ประกอบข้อความได้ โปรดเปิด <issueLink>issue</issueLink> บน GitHub ของเรา หรือเขียนถึงเราผ่าน <discordLink>Discord</discordLink>"
     },
     "libraryElementTypeError": {
       "embeddable": "การเพิ่มองค์ประกอบที่ฝังยังไม่สามารถเพิ่มเข้าไปในไลบลารีได้",

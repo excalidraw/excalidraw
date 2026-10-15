@@ -23,7 +23,7 @@ type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 const embeddedLinkCache = new Map<string, IframeDataWithSandbox>();
 
 const RE_YOUTUBE =
-  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)/;
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|live\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)/;
 
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;

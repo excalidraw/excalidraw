@@ -241,6 +241,24 @@ describe("stats for a generic element", () => {
     expect(rectangle.width).toBe(88.99);
   });
 
+  it("should reject non-finite values", () => {
+    const rectangle = h.elements[0];
+
+    const input = UI.queryStatsProperty("W")?.querySelector(
+      ".drag-input",
+    ) as HTMLInputElement;
+    expect(input).toBeDefined();
+
+    UI.updateInput(input, "100");
+    expect(rectangle.width).toBe(100);
+
+    for (const garbage of ["Infinity", "-Infinity", "1e999"]) {
+      UI.updateInput(input, garbage);
+      expect(rectangle.width).toBe(100);
+      expect(input.value).toBe("100");
+    }
+  });
+
   it("should update input x and y when angle is changed", () => {
     const rectangle = h.elements[0];
     const [cx, cy] = [

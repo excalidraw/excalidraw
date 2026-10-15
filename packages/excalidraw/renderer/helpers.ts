@@ -3,6 +3,18 @@ import { COLOR_WHITE, THEME, applyDarkModeFilter } from "@excalidraw/common";
 import type { StaticCanvasRenderConfig } from "../scene/types";
 import type { AppState, StaticCanvasAppState } from "../types";
 
+export const DEFAULT_SELECTION_COLOR = "#6965db";
+
+/**
+ * Returns the theme's selection color (`--color-selection`), read from the
+ * computed style of any element inside the editor container so that host
+ * overrides are respected. Falls back to the default when unavailable.
+ */
+export const getSelectionColor = (element: Element | null | undefined) =>
+  (element &&
+    getComputedStyle(element).getPropertyValue("--color-selection").trim()) ||
+  DEFAULT_SELECTION_COLOR;
+
 export const fillCircle = (
   context: CanvasRenderingContext2D,
   cx: number,
@@ -19,6 +31,35 @@ export const fillCircle = (
   if (stroke) {
     context.stroke();
   }
+};
+
+/**
+ * The scroll the renderers draw at: the real one, rounded to whole device
+ * pixels. Panning writes a fractional scroll (pointer delta ÷ zoom), and an
+ * element's cached bitmap blitted at a fractional device offset gets
+ * resampled — so as the fraction drifts under a pan, every element pulses
+ * between crisp and soft. A whole-pixel scroll moves the scene the way a
+ * browser scrolls a page: each element keeps its own, constant sub-pixel
+ * phase and a pan never changes how anything is filtered. The difference
+ * stays under half a device pixel, so hit-testing and DOM overlays keep
+ * using the real scroll. Identity when nothing needs to change.
+ */
+export const snapScrollToDevicePixels = <
+  T extends { scrollX: number; scrollY: number; zoom: { value: number } },
+>(
+  appState: T,
+  scale: number,
+): T => {
+  // device pixels per scene unit
+  const devicePixels = appState.zoom.value * scale;
+  if (!(devicePixels > 0)) {
+    return appState;
+  }
+  const scrollX = Math.round(appState.scrollX * devicePixels) / devicePixels;
+  const scrollY = Math.round(appState.scrollY * devicePixels) / devicePixels;
+  return scrollX === appState.scrollX && scrollY === appState.scrollY
+    ? appState
+    : { ...appState, scrollX, scrollY };
 };
 
 export const getNormalizedCanvasDimensions = (

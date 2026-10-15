@@ -7,7 +7,11 @@ import {
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import {
+  bootstrapCanvas,
+  getNormalizedCanvasDimensions,
+  snapScrollToDevicePixels,
+} from "./helpers";
 
 import { frameClip } from "./staticScene";
 
@@ -20,10 +24,12 @@ const _renderNewElementScene = ({
   elementsMap,
   allElementsMap,
   scale,
-  appState,
+  appState: unsnappedAppState,
   renderConfig,
 }: NewElementSceneRenderConfig) => {
   if (canvas) {
+    // the same whole-device-pixel scroll the static scene draws at
+    const appState = snapScrollToDevicePixels(unsnappedAppState, scale);
     const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
       canvas,
       scale,
