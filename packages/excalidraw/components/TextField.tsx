@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import { t } from "../i18n";
+
 import { Button } from "./Button";
 import { eyeIcon, eyeClosedIcon } from "./icons";
 
@@ -63,6 +65,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     const [isTemporarilyUnredacted, setIsTemporarilyUnredacted] =
       useState<boolean>(false);
+    const redactionToggleLabel = isTemporarilyUnredacted
+      ? t("buttons.hideRedactedValue")
+      : t("buttons.showRedactedValue");
 
     return (
       <div
@@ -106,6 +111,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
                 setIsTemporarilyUnredacted(!isTemporarilyUnredacted)
               }
               style={{ border: 0, userSelect: "none" }}
+              aria-label={redactionToggleLabel}
+              aria-pressed={isTemporarilyUnredacted}
+              title={redactionToggleLabel}
             >
               {isTemporarilyUnredacted ? eyeClosedIcon : eyeIcon}
             </Button>
