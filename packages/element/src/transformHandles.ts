@@ -19,6 +19,7 @@ import {
   isFrameLikeElement,
   isImageElement,
   isLinearElement,
+  isCodeBlockElement,
 } from "./typeChecks";
 
 import type {
@@ -308,6 +309,8 @@ export const getTransformHandles = (
       ...omitSides,
       rotation: true,
     };
+  } else if (isCodeBlockElement(element)) {
+    omitSides = {};
   }
   const margin = isLinearElement(element)
     ? DEFAULT_TRANSFORM_HANDLE_SPACING + 8

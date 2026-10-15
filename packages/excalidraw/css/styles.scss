@@ -148,6 +148,15 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  .excalidraw-codeblock-wysiwyg {
+    pointer-events: auto;
+
+    textarea::selection {
+      background: rgba(137, 180, 250, 0.35) !important;
+      color: transparent !important;
+    }
+  }
+
   &__embeddable {
     width: 100%;
     height: 100%;

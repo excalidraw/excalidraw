@@ -73,6 +73,18 @@ describe("setActiveTool()", () => {
     expect(h.state.activeTool.type).toBe("custom");
     expect(h.state.activeTool.customType).toBe("comment");
   });
+
+  it("initializes codeblock with correct default font size when placed via tool", async () => {
+    act(() => {
+      excalidrawAPI.setActiveTool({ type: "codeblock" });
+    });
+    mouse.down(50, 50);
+    mouse.up(150, 150);
+
+    const codeBlock = h.elements.find((el) => el.type === "codeblock");
+    expect(codeBlock).toBeDefined();
+    expect((codeBlock as any).fontSize).toBe(14);
+  });
 });
 describe("findShapeByKey()", () => {
   const appWithPreferredTool = (
@@ -366,6 +378,12 @@ describe("toolbar", () => {
     openExtraTools();
     expect(queryTool("image")).not.toBe(null);
     expect(queryTool("frame")).not.toBe(null);
+    expect(queryTool("codeblock")).not.toBe(null);
+  });
+
+  it("maps backtick to the codeblock tool", async () => {
+    await render(<Excalidraw />);
+    expect(findShapeByKey("`", window.h.app)).toBe("codeblock");
   });
 
   it("hides the image tool through UIOptions.tools.image", async () => {

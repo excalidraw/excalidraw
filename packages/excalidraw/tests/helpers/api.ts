@@ -23,6 +23,7 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newStickyNoteElement,
+  newCodeBlockElement,
   newTextElement,
 } from "@excalidraw/element";
 
@@ -45,6 +46,7 @@ import type {
   ExcalidrawElbowArrowElement,
   ExcalidrawArrowElement,
   ExcalidrawStickyNoteElement,
+  ExcalidrawCodeBlockElement,
   FixedSegment,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -201,7 +203,9 @@ export class API {
     opacity?: ExcalidrawGenericElement["opacity"];
     // text props
     text?: T extends "text" ? ExcalidrawTextElement["text"] : never;
-    fontSize?: T extends "text" ? ExcalidrawTextElement["fontSize"] : never;
+    fontSize?: T extends "text" | "codeblock"
+      ? ExcalidrawTextElement["fontSize"]
+      : never;
     fontFamily?: T extends "text" ? ExcalidrawTextElement["fontFamily"] : never;
     textAlign?: T extends "text" ? ExcalidrawTextElement["textAlign"] : never;
     verticalAlign?: T extends "text"
@@ -214,6 +218,15 @@ export class API {
     containerId?: T extends "text"
       ? ExcalidrawTextElement["containerId"]
       : never;
+    code?: T extends "codeblock" ? ExcalidrawCodeBlockElement["code"] : never;
+    language?: T extends "codeblock"
+      ? ExcalidrawCodeBlockElement["language"]
+      : never;
+    theme?: T extends "codeblock" ? ExcalidrawCodeBlockElement["theme"] : never;
+    showLineNumbers?: T extends "codeblock"
+      ? ExcalidrawCodeBlockElement["showLineNumbers"]
+      : never;
+    title?: T extends "codeblock" ? ExcalidrawCodeBlockElement["title"] : never;
     points?: T extends "arrow" | "line" | "freedraw" ? readonly LocalPoint[] : never;
     polygon?: T extends "line" ? boolean : never;
     strokeOptions?: T extends "freedraw"
@@ -252,6 +265,8 @@ export class API {
       ? ExcalidrawMagicFrameElement
       : T extends "stickynote"
       ? ExcalidrawStickyNoteElement
+      : T extends "codeblock"
+      ? ExcalidrawCodeBlockElement
       : ExcalidrawGenericElement
   > => {
     let element: Mutable<ExcalidrawElement> = null!;
@@ -405,6 +420,19 @@ export class API {
         break;
       case "magicframe":
         element = newMagicFrameElement({ ...base, width, height });
+        break;
+      case "codeblock":
+        element = newCodeBlockElement({
+          ...base,
+          width,
+          height,
+          code: (rest as any).code,
+          language: (rest as any).language,
+          theme: (rest as any).theme,
+          fontSize: (rest as any).fontSize,
+          showLineNumbers: (rest as any).showLineNumbers,
+          title: (rest as any).title,
+        });
         break;
       default:
         assertNever(

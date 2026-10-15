@@ -911,6 +911,51 @@ describe("ellipse outline hit test", () => {
       }),
     ).toBe(false);
   });
+
+  it("hits a rotated code block title correctly and does not hit unrotated space", () => {
+    const codeBlock = API.createElement({
+      type: "codeblock",
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 100,
+      angle: (Math.PI / 2) as any,
+    });
+
+    const elementsMap = arrayToMap([codeBlock]);
+
+    // Hit the rotated title
+    expect(
+      hitElementItself({
+        point: pointFrom<GlobalPoint>(265, 100),
+        element: codeBlock,
+        threshold: 10,
+        elementsMap,
+        frameNameBound: {
+          x: 100,
+          y: 80,
+          width: 100,
+          height: 20,
+        },
+      }),
+    ).toBe(true);
+
+    // Unrotated space above element should not hit
+    expect(
+      hitElementItself({
+        point: pointFrom<GlobalPoint>(120, 80),
+        element: codeBlock,
+        threshold: 10,
+        elementsMap,
+        frameNameBound: {
+          x: 100,
+          y: 80,
+          width: 100,
+          height: 20,
+        },
+      }),
+    ).toBe(false);
+  });
 });
 
 describe("intersectElementWithLineSegment", () => {

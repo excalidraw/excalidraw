@@ -432,6 +432,25 @@ describe("exporting frames", () => {
       expect(canvas.width).toEqual(frame.width);
       expect(canvas.height).toEqual(frame.height);
     });
+
+    it("exporting code block should include title in canvas export without clipping", async () => {
+      const codeBlock = API.createElement({
+        type: "codeblock",
+        width: 300,
+        height: 100,
+        x: 0,
+        y: 0,
+      });
+
+      const canvas = await exportToCanvas({
+        elements: [codeBlock],
+        files: null,
+        exportPadding: 0,
+      });
+
+      // Canvas height must account for the title extending above the code block
+      expect(canvas.height).toBeGreaterThan(codeBlock.height);
+    });
   });
 
   // exportToSvg (so we can test for element existence)
@@ -694,6 +713,29 @@ describe("exporting frames", () => {
 
       expect(svg.getAttribute("width")).toBe(frame1.width.toString());
       expect(svg.getAttribute("height")).toBe(frame1.height.toString());
+    });
+
+    it("exporting code block should include title in svg export without clipping", async () => {
+      const codeBlock = API.createElement({
+        type: "codeblock",
+        width: 300,
+        height: 100,
+        x: 0,
+        y: 0,
+        title: "My Code Block",
+      });
+
+      const svg = await exportToSvg({
+        elements: [codeBlock],
+        files: null,
+        exportPadding: 0,
+      });
+
+      expect(Number(svg.getAttribute("height"))).toBeGreaterThan(
+        codeBlock.height,
+      );
+      const titleEl = svg.querySelector("text");
+      expect(titleEl?.textContent).toBe("My Code Block");
     });
   });
 });

@@ -15,7 +15,12 @@ import {
   applyDarkModeFilter,
 } from "@excalidraw/common";
 
-import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getCommonBounds,
+  getElementAbsoluteCoords,
+  isCodeBlockElement,
+  CODE_BLOCK_HEADER_LABEL,
+} from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
@@ -39,10 +44,13 @@ import { type Mutable } from "@excalidraw/common/utility-types";
 
 import { newTextElement } from "@excalidraw/element";
 
+import { pointFrom, pointRotateRads } from "@excalidraw/math";
+
 import type { Bounds } from "@excalidraw/common";
 
 import type {
   ExcalidrawFrameLikeElement,
+  ExcalidrawCodeBlockElement,
   ExcalidrawTextElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
@@ -562,12 +570,76 @@ export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
   throw new Error("INVALID");
 };
 
+const getCodeBlockExportTitleBounds = (
+  element: ExcalidrawCodeBlockElement,
+): [number, number, number, number] => {
+  const title = element.title || CODE_BLOCK_HEADER_LABEL;
+  const titleHeight = Math.ceil(
+    FRAME_STYLE.nameOffsetY +
+      FRAME_STYLE.nameFontSize * FRAME_STYLE.nameLineHeight,
+  );
+  const titleWidth = Math.min(
+    element.width,
+    Math.max(60, title.length * (FRAME_STYLE.nameFontSize * 0.6) + 12),
+  );
+
+  const cx = element.x + element.width / 2;
+  const cy = element.y + element.height / 2;
+
+  if (!element.angle) {
+    return [
+      element.x,
+      element.y - titleHeight,
+      element.x + titleWidth,
+      element.y,
+    ];
+  }
+
+  const p1 = pointRotateRads(
+    pointFrom(element.x, element.y - titleHeight),
+    pointFrom(cx, cy),
+    element.angle,
+  );
+  const p2 = pointRotateRads(
+    pointFrom(element.x + titleWidth, element.y - titleHeight),
+    pointFrom(cx, cy),
+    element.angle,
+  );
+  const p3 = pointRotateRads(
+    pointFrom(element.x, element.y),
+    pointFrom(cx, cy),
+    element.angle,
+  );
+  const p4 = pointRotateRads(
+    pointFrom(element.x + titleWidth, element.y),
+    pointFrom(cx, cy),
+    element.angle,
+  );
+
+  return [
+    Math.min(p1[0], p2[0], p3[0], p4[0]),
+    Math.min(p1[1], p2[1], p3[1], p4[1]),
+    Math.max(p1[0], p2[0], p3[0], p4[0]),
+    Math.max(p1[1], p2[1], p3[1], p4[1]),
+  ];
+};
+
 // calculate smallest area to fit the contents in
 const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
   exportPadding: number,
 ): Bounds => {
-  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  let [minX, minY, maxX, maxY] = getCommonBounds(elements);
+  for (const element of elements) {
+    if (isCodeBlockElement(element)) {
+      const [cbMinX, cbMinY, cbMaxX, cbMaxY] =
+        getCodeBlockExportTitleBounds(element);
+      minX = Math.min(minX, cbMinX);
+      minY = Math.min(minY, cbMinY);
+      maxX = Math.max(maxX, cbMaxX);
+      maxY = Math.max(maxY, cbMaxY);
+    }
+  }
   const width = distance(minX, maxX) + exportPadding * 2;
   const height = distance(minY, maxY) + exportPadding * 2;
 

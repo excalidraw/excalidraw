@@ -49,7 +49,9 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
+  isCodeBlockElement,
 } from "./typeChecks";
+import { isHittingCodeBlockTitle } from "./codeBlock";
 import {
   deconstructDiamondElement,
   deconstructLinearOrFreeDrawElement,
@@ -87,6 +89,10 @@ import type {
 export const shouldTestInside = (element: ExcalidrawElement) => {
   if (element.type === "arrow") {
     return false;
+  }
+
+  if (element.type === "codeblock") {
+    return true;
   }
 
   const isDraggableFromInside =
@@ -168,16 +174,17 @@ export const hitElementItself = ({
   }
 
   // Hit test against a frame's name
-  const hitFrameName = frameNameBound
-    ? isPointWithinBounds(
-        pointFrom(frameNameBound.x - threshold, frameNameBound.y - threshold),
-        point,
-        pointFrom(
-          frameNameBound.x + frameNameBound.width + threshold,
-          frameNameBound.y + frameNameBound.height + threshold,
-        ),
-      )
-    : false;
+  const hitFrameName =
+    frameNameBound && isFrameLikeElement(element)
+      ? isPointWithinBounds(
+          pointFrom(frameNameBound.x - threshold, frameNameBound.y - threshold),
+          point,
+          pointFrom(
+            frameNameBound.x + frameNameBound.width + threshold,
+            frameNameBound.y + frameNameBound.height + threshold,
+          ),
+        )
+      : false;
 
   // Hit test against the extended, rotated bounding box of the element first
   const bounds = getElementBounds(element, elementsMap, true);
@@ -191,9 +198,13 @@ export const hitElementItself = ({
       : threshold,
   );
 
+  const hitCodeBlockTitle =
+    isCodeBlockElement(element) &&
+    isHittingCodeBlockTitle(element, point[0], point[1]);
+
   // PERF: Bail out early if the point is not even in the
-  // rotated bounding box or not hitting the frame name (saves 99%)
-  if (!hitBounds && !hitFrameName) {
+  // rotated bounding box or not hitting the frame name / code block title (saves 99%)
+  if (!hitBounds && !hitFrameName && !hitCodeBlockTitle) {
     return false;
   }
 
@@ -216,7 +227,7 @@ export const hitElementItself = ({
       isPointOnElementOutline(point, element, elementsMap, threshold)
     : isPointOnElementOutline(point, element, elementsMap, threshold);
 
-  const result = hitElement || hitFrameName;
+  const result = hitElement || hitFrameName || hitCodeBlockTitle;
 
   // Cache end result
   cachedPoint = point;
@@ -521,6 +532,7 @@ export const intersectElementWithLineSegment = (
     case "text":
     case "iframe":
     case "embeddable":
+    case "codeblock":
     case "frame":
     case "selection":
     case "magicframe":

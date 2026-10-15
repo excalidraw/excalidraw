@@ -60,6 +60,7 @@ import {
   isLinearElement,
   isStickyNoteElement,
   isTextElement,
+  isCodeBlockElement,
 } from "./typeChecks";
 
 import { isInGroup } from "./groups";
@@ -68,6 +69,7 @@ import {
   getStickyNoteResizeIntent,
   updateStickyNoteLayout,
 } from "./stickyNote";
+import { getCodeBlockLayout, MIN_CODE_BLOCK_WIDTH } from "./codeBlock";
 
 import type { Scene } from "./Scene";
 
@@ -79,6 +81,7 @@ import type {
 import type {
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
+  ExcalidrawCodeBlockElement,
   NonDeletedExcalidrawElement,
   NonDeleted,
   ExcalidrawElement,
@@ -124,6 +127,25 @@ export const transformElements = (
       const origElement = originalElements.get(elementId);
 
       if (latestElement && origElement) {
+        let maintainAspectRatio = shouldMaintainAspectRatio;
+        if (isCodeBlockElement(latestElement)) {
+          if (
+            transformHandleType === "nw" ||
+            transformHandleType === "ne" ||
+            transformHandleType === "sw" ||
+            transformHandleType === "se" ||
+            transformHandleType === "n" ||
+            transformHandleType === "s"
+          ) {
+            maintainAspectRatio = true;
+          } else if (
+            transformHandleType === "w" ||
+            transformHandleType === "e"
+          ) {
+            maintainAspectRatio = false;
+          }
+        }
+
         const { nextWidth, nextHeight } =
           getNextSingleWidthAndHeightFromPointer(
             latestElement,
@@ -132,7 +154,7 @@ export const transformElements = (
             pointerX,
             pointerY,
             {
-              shouldMaintainAspectRatio,
+              shouldMaintainAspectRatio: maintainAspectRatio,
               shouldResizeFromCenter,
             },
           );
@@ -146,7 +168,7 @@ export const transformElements = (
           scene,
           transformHandleType,
           {
-            shouldMaintainAspectRatio,
+            shouldMaintainAspectRatio: maintainAspectRatio,
             shouldResizeFromCenter,
           },
         );
@@ -415,6 +437,124 @@ export const resizeSingleTextElement = (
 
     scene.mutateElement(element, resizedElement);
   }
+};
+
+export const resizeSingleCodeBlockElement = (
+  origElement: NonDeleted<ExcalidrawCodeBlockElement>,
+  element: NonDeleted<ExcalidrawCodeBlockElement>,
+  scene: Scene,
+  transformHandleType: TransformHandleDirection,
+  shouldResizeFromCenter: boolean,
+  nextWidth: number,
+  nextHeight: number,
+) => {
+  const previousOrigin = pointFrom<GlobalPoint>(origElement.x, origElement.y);
+
+  if (transformHandleType === "e" || transformHandleType === "w") {
+    // side handles reflow code height at the current font size
+    const newWidth = Math.max(MIN_CODE_BLOCK_WIDTH, Math.abs(nextWidth));
+    const layout = getCodeBlockLayout({
+      ...element,
+      width: newWidth,
+      fontSize: origElement.fontSize,
+      showLineNumbers: origElement.showLineNumbers,
+      code: origElement.code,
+      language: origElement.language,
+    });
+    const newHeight = Math.ceil(layout.totalContentHeight);
+
+    const newOrigin = shouldResizeFromCenter
+      ? getResizedOrigin(
+          previousOrigin,
+          origElement.width,
+          origElement.height,
+          newWidth,
+          newHeight,
+          element.angle,
+          transformHandleType,
+          false,
+          true,
+        )
+      : transformHandleType === "w"
+      ? getResizedOrigin(
+          previousOrigin,
+          origElement.width,
+          origElement.height,
+          newWidth,
+          newHeight,
+          element.angle,
+          "sw", // hits return "top-right" in getResizeAnchor
+          false,
+          false,
+        )
+      : getResizedOrigin(
+          previousOrigin,
+          origElement.width,
+          origElement.height,
+          newWidth,
+          newHeight,
+          element.angle,
+          "e", // hits return "top-left" in getResizeAnchor
+          false,
+          false,
+        );
+
+    scene.mutateElement(element, {
+      width: newWidth,
+      height: newHeight,
+      x: newOrigin.x,
+      y: newOrigin.y,
+      widthOverridden: true,
+    });
+    return;
+  }
+
+  // corner and vertical handles scale font size proportionally
+  const scale =
+    transformHandleType.includes("n") || transformHandleType.includes("s")
+      ? Math.abs(nextHeight) / origElement.height
+      : Math.max(
+          Math.abs(nextWidth) / origElement.width,
+          Math.abs(nextHeight) / origElement.height,
+        );
+
+  const MIN_CODE_BLOCK_FONT_SIZE = 8;
+  const nextFontSize = Math.max(
+    MIN_CODE_BLOCK_FONT_SIZE,
+    Math.round(origElement.fontSize * scale * 10) / 10,
+  );
+  const effectiveScale = nextFontSize / origElement.fontSize;
+  const newWidth = Math.max(
+    MIN_CODE_BLOCK_WIDTH,
+    Math.round(origElement.width * effectiveScale),
+  );
+
+  const layout = getCodeBlockLayout({
+    ...element,
+    fontSize: nextFontSize,
+    width: newWidth,
+  });
+  const newHeight = Math.ceil(layout.totalContentHeight);
+
+  const newOrigin = getResizedOrigin(
+    previousOrigin,
+    origElement.width,
+    origElement.height,
+    newWidth,
+    newHeight,
+    element.angle,
+    transformHandleType,
+    true, // shouldMaintainAspectRatio = true
+    shouldResizeFromCenter,
+  );
+
+  scene.mutateElement(element, {
+    fontSize: nextFontSize,
+    width: newWidth,
+    height: newHeight,
+    x: newOrigin.x,
+    y: newOrigin.y,
+  });
 };
 
 const rotateMultipleElements = (
@@ -755,6 +895,18 @@ export const resizeSingleElement = (
 ) => {
   if (isTextElement(latestElement) && isTextElement(origElement)) {
     return resizeSingleTextElement(
+      origElement,
+      latestElement,
+      scene,
+      handleDirection,
+      shouldResizeFromCenter,
+      nextWidth,
+      nextHeight,
+    );
+  }
+
+  if (isCodeBlockElement(latestElement) && isCodeBlockElement(origElement)) {
+    return resizeSingleCodeBlockElement(
       origElement,
       latestElement,
       scene,

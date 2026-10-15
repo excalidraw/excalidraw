@@ -26,7 +26,8 @@ export const hasStrokeColor = (type: ElementOrToolType) =>
   type === "line" ||
   type === "text" ||
   type === "embeddable" ||
-  type === "autoshape";
+  type === "autoshape" ||
+  type === "codeblock";
 
 export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "rectangle" ||
@@ -37,7 +38,8 @@ export const hasStrokeWidth = (type: ElementOrToolType) =>
   type === "freedraw" ||
   type === "arrow" ||
   type === "line" ||
-  type === "autoshape";
+  type === "autoshape" ||
+  type === "codeblock";
 
 export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "rectangle" ||
@@ -47,10 +49,11 @@ export const hasStrokeStyle = (type: ElementOrToolType) =>
   type === "diamond" ||
   type === "arrow" ||
   type === "line" ||
-  type === "autoshape";
+  type === "autoshape" ||
+  type === "codeblock";
 
 export const hasRoughness = (type: ElementOrToolType) =>
-  hasStrokeStyle(type) || type === "stickynote";
+  (hasStrokeStyle(type) && type !== "codeblock") || type === "stickynote";
 
 export const hasFreedrawMode = (type: ElementOrToolType) => type === "freedraw";
 

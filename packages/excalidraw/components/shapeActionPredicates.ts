@@ -9,6 +9,7 @@ import {
   isImageElement,
   isLinearElement,
   isTextElement,
+  isCodeBlockElement,
   hasStrokeColor,
   toolIsArrow,
 } from "@excalidraw/element";
@@ -110,9 +111,17 @@ export const getShapeActionPredicates = (
       hasBoundTextElement(targetElements[1]));
 
   const isEditingTextOrNewElement = Boolean(
-    appState.editingTextElement || appState.newElement,
+    appState.editingTextElement ||
+      appState.editingCodeBlockElement ||
+      appState.newElement,
   );
   const hasSelection = targetElements.length > 0;
+
+  const isOnlyCodeBlock =
+    targetElements.length > 0 && targetElements.every(isCodeBlockElement);
+  const isCodeBlockToolWithoutSelection =
+    activeToolType === "codeblock" && targetElements.length === 0;
+  const isCodeBlockContext = isOnlyCodeBlock || isCodeBlockToolWithoutSelection;
 
   return {
     /** some element(s) selected */
@@ -122,30 +131,32 @@ export const getShapeActionPredicates = (
 
     // color
     strokeColor: canChangeStrokeColor(appState, targetElements),
-    backgroundColor: canChangeBackgroundColor(
-      appState,
-      targetElements,
-      elementsMap,
-    ),
+    backgroundColor:
+      !isCodeBlockContext &&
+      canChangeBackgroundColor(appState, targetElements, elementsMap),
     fill:
-      // bucket fill never renders transparent (it falls back to a real
-      // color), so its fill style stays relevant either way
-      activeToolType === "bucketfill" ||
-      (hasFillStyle(activeToolType) &&
-        !isTransparent(appState.currentItemBackgroundColor)) ||
-      targetElements.some(
-        (element) =>
-          hasFillStyle(element.type) && !isTransparent(element.backgroundColor),
-      ),
+      !isCodeBlockContext &&
+      (activeToolType === "bucketfill" ||
+        (hasFillStyle(activeToolType) &&
+          !isTransparent(appState.currentItemBackgroundColor)) ||
+        targetElements.some(
+          (element) =>
+            hasFillStyle(element.type) &&
+            !isTransparent(element.backgroundColor),
+        )),
 
     // stroke / shape properties
     strokeWidth: forToolOrSelection(hasStrokeWidth),
-    freedrawMode: forToolOrSelection(hasFreedrawMode),
-    strokeStyle: forToolOrSelection(hasStrokeStyle),
-    sloppiness: forToolOrSelection(hasRoughness),
-    roundness: forToolOrSelection(canChangeRoundness),
+    freedrawMode: !isCodeBlockContext && forToolOrSelection(hasFreedrawMode),
+    strokeStyle: !isCodeBlockContext && forToolOrSelection(hasStrokeStyle),
+    sloppiness: !isCodeBlockContext && forToolOrSelection(hasRoughness),
+    roundness: !isCodeBlockContext && forToolOrSelection(canChangeRoundness),
     arrowType: forToolOrSelection(toolIsArrow),
     arrowheads: forToolOrSelection(canHaveArrowheads),
+
+    // codeblock
+    codeblock:
+      activeToolType === "codeblock" || targetElements.some(isCodeBlockElement),
 
     // text
     text: activeToolType === "text" || targetElements.some(isTextElement),

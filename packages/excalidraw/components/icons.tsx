@@ -2591,3 +2591,35 @@ export const settingsIcon = createIcon(
   </g>,
   tablerIconProps,
 );
+
+export const codeBlockToolIcon = createIcon(
+  <g strokeWidth={1.75}>
+    <rect x="3" y="3" width="18" height="18" rx="4" ry="4" />
+    <polyline points="8 10 6 12 8 14" />
+    <polyline points="16 10 18 12 16 14" />
+    <line x1="13" y1="9" x2="11" y2="15" />
+  </g>,
+  tablerIconProps,
+);
+
+export const lineNumbersIcon = createIcon(
+  <g strokeWidth={1.75}>
+    <line x1="10" y1="6" x2="21" y2="6" />
+    <line x1="10" y1="12" x2="21" y2="12" />
+    <line x1="10" y1="18" x2="21" y2="18" />
+    <path d="M4 6h1v4" />
+    <path d="M4 10h2" />
+    <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
+  </g>,
+  tablerIconProps,
+);
+
+export const lineNumbersOffIcon = createIcon(
+  <g strokeWidth={1.75}>
+    <line x1="6" y1="6" x2="21" y2="6" />
+    <line x1="6" y1="12" x2="21" y2="12" />
+    <line x1="6" y1="18" x2="21" y2="18" />
+    <line x1="3" y1="3" x2="21" y2="21" />
+  </g>,
+  tablerIconProps,
+);

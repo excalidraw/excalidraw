@@ -39,6 +39,9 @@ import type {
   BindMode,
   ExcalidrawTextElement,
   StrokeVariability,
+  ExcalidrawCodeBlockElement,
+  CodeBlockLanguage,
+  CodeBlockThemeName,
 } from "@excalidraw/element/types";
 
 import type {
@@ -167,6 +170,7 @@ export type ToolType =
   | "embeddable"
   | "laser"
   | "autoshape"
+  | "codeblock"
   | "bucketfill";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
@@ -246,6 +250,7 @@ export type InteractiveCanvasAppState = Readonly<
     snapLines: AppState["snapLines"];
     zenModeEnabled: AppState["zenModeEnabled"];
     editingTextElement: AppState["editingTextElement"];
+    editingCodeBlockElement: AppState["editingCodeBlockElement"];
     // Cropping
     isCropping: AppState["isCropping"];
     croppingElementId: AppState["croppingElementId"];
@@ -424,6 +429,10 @@ export interface AppState {
    * set when a new text is created or when an existing text is being edited
    */
   editingTextElement: ExcalidrawTextElement | null;
+  /**
+   * set when a code block is being edited
+   */
+  editingCodeBlockElement: ExcalidrawCodeBlockElement | null;
   activeTool: {
     /**
      * indicates a previous tool we should revert back to if we deselect the
@@ -459,6 +468,9 @@ export interface AppState {
   currentItemOpacity: number;
   currentItemFontFamily: FontFamilyValues;
   currentItemFontSize: number;
+  currentItemCodeBlockLanguage: CodeBlockLanguage;
+  currentItemCodeBlockTheme: CodeBlockThemeName;
+  currentItemCodeBlockLineNumbers: boolean;
   currentItemTextAlign: TextAlign;
   currentItemStartArrowhead: Arrowhead | null;
   currentItemEndArrowhead: Arrowhead | null;
