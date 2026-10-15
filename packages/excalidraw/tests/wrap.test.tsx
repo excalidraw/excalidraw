@@ -107,6 +107,101 @@ describe("wrap (w)", () => {
     expect(h.state.selectedLinearElement?.elementId).toBe("arrow");
   });
 
+  it("binds the text's arrows to the container", () => {
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      text: "text",
+      boundElements: [{ type: "arrow", id: "arrow" }],
+    });
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow",
+      x: 30,
+      y: 300,
+      width: 0,
+      height: -270,
+      points: [pointFrom(0, 0), pointFrom(0, -270)],
+      endBinding: { elementId: "text", fixedPoint: [0.5, 1], mode: "orbit" },
+    });
+    const rectangle = API.createElement({
+      type: "rectangle",
+      id: "rect",
+      x: 600,
+      y: 250,
+      width: 200,
+      height: 100,
+      boundElements: [{ type: "arrow", id: "other" }],
+    });
+    API.setElements([text, arrow, rectangle]);
+    API.setSelectedElements([text, rectangle]);
+
+    pressW();
+
+    expect(getElement<ExcalidrawTextElement>("text")).toMatchObject({
+      containerId: "rect",
+      boundElements: null,
+    });
+    expect(getElement<ExcalidrawArrowElement>("arrow").endBinding).toEqual({
+      elementId: "rect",
+      fixedPoint: [0.5, 1],
+      mode: "orbit",
+    });
+    expect(getElement("rect").boundElements).toEqual([
+      { type: "arrow", id: "other" },
+      { type: "text", id: "text" },
+      { type: "arrow", id: "arrow" },
+    ]);
+
+    // the arrow ends at the container, and follows it
+    const arrowEnd = () =>
+      LinearElementEditor.getPointAtIndexGlobalCoordinates(
+        getElement<ExcalidrawArrowElement>("arrow"),
+        -1,
+        h.app.scene.getNonDeletedElementsMap(),
+      );
+    const rect = getElement("rect");
+    const [x, y] = arrowEnd();
+    expect(x).toBeGreaterThan(rect.x - 10);
+    expect(x).toBeLessThan(rect.x);
+    expect(y).toBeGreaterThan(rect.y);
+    expect(y).toBeLessThan(rect.y + rect.height);
+    dragBy(rect, 100, 0);
+    expect(arrowEnd()[0]).toBeCloseTo(x + 100);
+  });
+
+  it("unbinds the text's arrows when binding it to an arrow", () => {
+    const arrow = API.createElement({
+      type: "arrow",
+      id: "arrow",
+      width: 200,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(200, 0)],
+      endBinding: { elementId: "text", fixedPoint: [0, 0.5], mode: "orbit" },
+    });
+    const text = API.createElement({
+      type: "text",
+      id: "text",
+      text: "text",
+      x: 205,
+      y: -12,
+      boundElements: [{ type: "arrow", id: "arrow" }],
+    });
+    API.setElements([arrow, text]);
+    API.setSelectedElements([arrow, text]);
+
+    pressW();
+
+    expect(getElement<ExcalidrawTextElement>("text")).toMatchObject({
+      containerId: "arrow",
+      boundElements: null,
+    });
+    expect(getElement<ExcalidrawArrowElement>("arrow")).toMatchObject({
+      endBinding: null,
+      boundElements: [{ type: "text", id: "text" }],
+    });
+  });
+
   it("wraps a text in a default rectangle of the text's color", () => {
     const text = API.createElement({
       type: "text",

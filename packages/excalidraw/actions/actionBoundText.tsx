@@ -20,12 +20,14 @@ import {
   getBoundTextElement,
   normalizeStickyNoteFontSize,
   redrawTextBoundingBox,
+  updateBoundElements,
   updateStickyNoteLayout,
 } from "@excalidraw/element";
 
 import {
   hasBoundTextElement,
   isArrowElement,
+  isBindableElement,
   isStickyNoteElement,
   isTextBindableContainer,
   isTextElement,
@@ -48,6 +50,7 @@ import type {
   ExcalidrawTextContainer,
   ExcalidrawTextElement,
   ExcalidrawTextElementWithContainer,
+  FixedPointBinding,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -218,8 +221,38 @@ export const bindTextToContainer = (
   app: AppClassProperties,
 ): ActionResult => {
   const stickyInk = getStickyNoteInk(textElement, container);
+
+  // a label carries no arrows of its own: the text's arrows are bound to the
+  // container instead, or unbound if it can't take them (an arrow)
+  const elementsMap = app.scene.getNonDeletedElementsMap();
+  const isContainerBindable = isBindableElement(container);
+  const toContainer = (binding: FixedPointBinding | null) =>
+    binding?.elementId !== textElement.id
+      ? binding
+      : isContainerBindable
+      ? { ...binding, elementId: container.id }
+      : null;
+  const reboundArrowIds: ExcalidrawElement["id"][] = [];
+  for (const { id, type } of textElement.boundElements ?? []) {
+    const arrow = elementsMap.get(id);
+    if (type !== "arrow" || !isArrowElement(arrow)) {
+      continue;
+    }
+    app.scene.mutateElement(arrow, {
+      startBinding: toContainer(arrow.startBinding),
+      endBinding: toContainer(arrow.endBinding),
+    });
+    if (
+      isContainerBindable &&
+      !container.boundElements?.some((element) => element.id === id)
+    ) {
+      reboundArrowIds.push(id);
+    }
+  }
+
   app.scene.mutateElement(textElement, {
     containerId: container.id,
+    boundElements: null,
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     textAlign: TEXT_ALIGN.CENTER,
     autoResize: true,
@@ -237,15 +270,17 @@ export const bindTextToContainer = (
       : null),
   });
   app.scene.mutateElement(container, {
-    boundElements: (container.boundElements || []).concat({
-      type: "text",
-      id: textElement.id,
-    }),
+    boundElements: [
+      ...(container.boundElements ?? []),
+      { type: "text", id: textElement.id },
+      ...reboundArrowIds.map((id) => ({ type: "arrow" as const, id })),
+    ],
     // the footer paints with the note's ink
     ...(stickyInk ? { strokeColor: stickyInk } : null),
   });
   const originalContainerHeight = container.height;
   redrawTextBoundingBox(textElement, container, app.scene);
+  updateBoundElements(container, app.scene);
   // overwritting the cache with original container height so
   // it can be restored when unbind
   updateOriginalContainerCache(container.id, originalContainerHeight);
