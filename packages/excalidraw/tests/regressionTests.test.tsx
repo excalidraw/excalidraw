@@ -574,6 +574,33 @@ describe("regression tests", () => {
     expect(h.state.editingGroupId).not.toBe(null);
   });
 
+  it("press enter to edit a group and select all its elements", () => {
+    UI.clickTool("rectangle");
+    mouse.down(10, 10);
+    mouse.up(10, 10);
+
+    UI.clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    UI.clickTool("rectangle");
+    mouse.down(10, -10);
+    mouse.up(10, 10);
+
+    Keyboard.withModifierKeys({ ctrl: true }, () => {
+      Keyboard.keyPress(KEYS.A);
+      Keyboard.keyPress(KEYS.G);
+    });
+
+    expect(API.getSelectedElements().length).toBe(3);
+    expect(h.state.editingGroupId).toBe(null);
+
+    Keyboard.keyPress(KEYS.ENTER);
+
+    expect(API.getSelectedElements().length).toBe(3);
+    expect(h.state.editingGroupId).not.toBe(null);
+  });
+
   it("adjusts z order when grouping", () => {
     const positions: number[][] = [];
 
