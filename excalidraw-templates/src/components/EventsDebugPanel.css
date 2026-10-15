@@ -1,0 +1,55 @@
+.events-debug-panel {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 10;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.events-debug-panel__toggle {
+  background: #222;
+  color: #0f0;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.events-debug-panel__body {
+  position: absolute;
+  right: 0;
+  bottom: 36px;
+  width: 420px;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  background: #111;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.events-debug-panel__actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-bottom: 1px solid #333;
+}
+
+.events-debug-panel__actions button {
+  background: #222;
+  color: #eee;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.events-debug-panel__json {
+  margin: 0;
+  padding: 8px;
+  overflow: auto;
+  color: #0f0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
