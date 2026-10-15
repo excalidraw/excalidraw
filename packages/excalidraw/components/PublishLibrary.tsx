@@ -186,7 +186,7 @@ const SingleLibraryItem = ({
             ref={inputRef}
             style={{ width: "80%", padding: "0.2rem" }}
             defaultValue={libItem.name}
-            placeholder="Item name"
+            placeholder={t("publishDialog.itemName")}
             onChange={(event) => {
               onChange(event.target.value, index);
             }}
@@ -249,10 +249,26 @@ const PublishLibrary = ({
   }, [libraryItems]);
 
   const onInputChange = (event: any) => {
+    // A non-empty customValidity keeps the field invalid until it is cleared,
+    // so drop the message set by onInvalid whenever the value changes.
+    event.target.setCustomValidity("");
     setLibraryData({
       ...libraryData,
       [event.target.name]: event.target.value,
     });
+  };
+
+  // The browser renders constraint-validation messages in its own locale, which
+  // ignores the editor's language setting. Supply the translated text instead.
+  const onInvalid = (
+    event: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const target = event.currentTarget;
+    target.setCustomValidity(
+      target.validity.patternMismatch
+        ? t("publishDialog.errors.website")
+        : t("publishDialog.errors.required"),
+    );
   };
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -433,6 +449,7 @@ const PublishLibrary = ({
                 required
                 value={libraryData.name}
                 onChange={onInputChange}
+                onInvalid={onInvalid}
                 placeholder={t("publishDialog.placeholder.libraryName")}
               />
             </label>
@@ -449,6 +466,7 @@ const PublishLibrary = ({
                 required
                 value={libraryData.description}
                 onChange={onInputChange}
+                onInvalid={onInvalid}
                 placeholder={t("publishDialog.placeholder.libraryDesc")}
               />
             </label>
@@ -465,6 +483,7 @@ const PublishLibrary = ({
                 required
                 value={libraryData.authorName}
                 onChange={onInputChange}
+                onInvalid={onInvalid}
                 placeholder={t("publishDialog.placeholder.authorName")}
               />
             </label>
@@ -497,6 +516,7 @@ const PublishLibrary = ({
                 title={t("publishDialog.errors.website")}
                 value={libraryData.website}
                 onChange={onInputChange}
+                onInvalid={onInvalid}
                 placeholder={t("publishDialog.placeholder.website")}
               />
             </label>
