@@ -1026,6 +1026,75 @@ describe("adding elements to frames", () => {
       ]);
     });
 
+    describe("while editing a group", () => {
+      const setup = (frameId: string | null) => {
+        const groupFrame = API.createElement({
+          id: "groupFrame",
+          type: "frame",
+          x: 0,
+          y: 0,
+          width: 500,
+          height: 500,
+        });
+        const member = API.createElement({
+          id: "member",
+          type: "rectangle",
+          x: frameId ? 50 : 600,
+          y: 50,
+          width: 100,
+          height: 100,
+          backgroundColor: "#ffc9c9",
+          fillStyle: "solid",
+          groupIds: ["group"],
+          frameId,
+        });
+        const otherMember = API.createElement({
+          id: "otherMember",
+          type: "rectangle",
+          x: frameId ? 250 : 800,
+          y: 250,
+          width: 100,
+          height: 100,
+          groupIds: ["group"],
+          frameId,
+        });
+        API.setElements([groupFrame, member, otherMember]);
+
+        const center = [member.x + 50, member.y + 50] as const;
+        mouse.clickAt(...center);
+        mouse.doubleClickAt(...center);
+        expect(h.state.editingGroupId).toBe("group");
+        expect(h.state.selectedElementIds).toEqual({ [member.id]: true });
+        mouse.downAt(...center);
+
+        return { groupFrame, member, otherMember };
+      };
+
+      it("should keep a member dragged within its frame in the group", () => {
+        const { groupFrame, member, otherMember } = setup("groupFrame");
+
+        mouse.moveTo(member.x + 80, member.y + 70);
+        mouse.up();
+
+        expect(member).toMatchObject({
+          x: 80,
+          frameId: groupFrame.id,
+          groupIds: ["group"],
+        });
+        expect(otherMember.groupIds).toEqual(["group"]);
+      });
+
+      it("should remove a member dragged into a frame from the group", () => {
+        const { groupFrame, member, otherMember } = setup(null);
+
+        mouse.moveTo(200, 200);
+        mouse.up();
+
+        expect(member).toMatchObject({ frameId: groupFrame.id, groupIds: [] });
+        expect(otherMember.groupIds).toEqual([]);
+      });
+    });
+
     it("should not reorder dragged elements already in the highlighted frame", () => {
       const frameChild = API.createElement({
         id: "frameChild",

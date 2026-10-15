@@ -1186,7 +1186,13 @@ export class AppSelectionTool {
       );
 
       if (this.app.state.editingGroupId) {
-        updateGroupIdsAfterEditingGroup(elementsToAdd);
+        // only elements joining the frame leave the edited group, not those
+        // dragged within it
+        updateGroupIdsAfterEditingGroup(
+          elementsToAdd.filter(
+            (element) => element.frameId !== topLayerFrame.id,
+          ),
+        );
       }
 
       nextElements = addElementsToFrame(
