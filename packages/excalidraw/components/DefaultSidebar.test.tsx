@@ -5,6 +5,7 @@ import { DEFAULT_SIDEBAR } from "@excalidraw/common";
 import { DefaultSidebar } from "../index";
 import {
   fireEvent,
+  GlobalTestState,
   waitFor,
   withExcalidrawDimensions,
 } from "../tests/test-utils";
@@ -17,6 +18,25 @@ import {
 const { h } = window;
 
 describe("DefaultSidebar", () => {
+  it("should label default sidebar tab buttons", async () => {
+    await assertExcalidrawWithSidebar(
+      <DefaultSidebar />,
+      DEFAULT_SIDEBAR.name,
+      async () => {
+        const sidebar =
+          GlobalTestState.renderResult.container.querySelector<HTMLElement>(
+            ".sidebar",
+          );
+
+        expect(sidebar).not.toBe(null);
+        expect(
+          sidebar!.querySelector('[aria-label="Find on canvas"]'),
+        ).not.toBe(null);
+        expect(sidebar!.querySelector('[aria-label="Library"]')).not.toBe(null);
+      },
+    );
+  });
+
   it("when `docked={undefined}` & `onDock={undefined}`, should allow docking", async () => {
     await assertExcalidrawWithSidebar(
       <DefaultSidebar />,
