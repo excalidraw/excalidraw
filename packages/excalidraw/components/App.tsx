@@ -97,6 +97,7 @@ import {
 import {
   getObservedAppState,
   getCommonBounds,
+  getNonDeletedElements,
   bindOrUnbindBindingElements,
   getHoveredElementForBinding,
   isBindingEnabled,
@@ -4592,9 +4593,16 @@ class App extends React.Component<AppProps, AppState> {
     fit?: SetViewportOptions["fit"];
     preserveFrameChildrenOrder?: boolean;
   }) => {
-    const elements = restoreElements(opts.elements, null, {
-      deleteInvisibleElements: true,
-    });
+    // the inserted elements are new to the scene, so deleted ones (such as
+    // those a saved scene keeps) have no place among them
+    const elements = getNonDeletedElements(
+      restoreElements(opts.elements, null, {
+        deleteInvisibleElements: true,
+      }),
+    );
+    if (!elements.length) {
+      return;
+    }
     const clientX =
       typeof opts.position === "object"
         ? opts.position.clientX
