@@ -2,6 +2,10 @@ import React from "react";
 
 import { MIME_TYPES } from "@excalidraw/common";
 
+import {
+  actionChangeBackgroundColor,
+  actionChangeStrokeColor,
+} from "../actions";
 import { serializeAsJSON } from "../data/json";
 import { Excalidraw } from "../index";
 
@@ -219,6 +223,42 @@ describe("dropping scenes", () => {
       expect.objectContaining({ id: original.id, type: "rectangle" }),
     ]);
     expect(h.state.viewBackgroundColor).toBe("#ffffff");
+  });
+
+  it("replaces the scene with an earlier save of it, undoably, and keeps recording changes", async () => {
+    const saved = new h.app.ownerWindow.File(
+      [serializeAsJSON(h.elements, h.state, {}, "local")],
+      "scene.excalidraw",
+      { type: MIME_TYPES.json },
+    );
+    API.setSelectedElements([...h.app.scene.getNonDeletedElements()]);
+    act(() => {
+      h.app.actionManager.executeAction(actionChangeStrokeColor, "ui", {
+        color: "#e03131",
+      });
+    });
+    expect(h.elements[0].strokeColor).toBe("#e03131");
+
+    drag(GlobalTestState.interactiveCanvas, "drop", { files: [saved] });
+    await waitFor(() => expect(h.elements[0].strokeColor).toBe("#1e1e1e"));
+
+    Keyboard.undo();
+    expect(h.elements[0].strokeColor).toBe("#e03131");
+    Keyboard.redo();
+    expect(h.elements[0].strokeColor).toBe("#1e1e1e");
+
+    API.setSelectedElements([...h.app.scene.getNonDeletedElements()]);
+    act(() => {
+      h.app.actionManager.executeAction(actionChangeBackgroundColor, "ui", {
+        color: "#ffc9c9",
+      });
+    });
+    expect(h.elements[0].backgroundColor).toBe("#ffc9c9");
+    Keyboard.undo();
+    expect(h.elements[0]).toMatchObject({
+      strokeColor: "#1e1e1e",
+      backgroundColor: "transparent",
+    });
   });
 
   it("toasts how to undo when a scene embedded in an image replaces the scene", async () => {
