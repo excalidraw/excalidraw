@@ -12,6 +12,7 @@ interface Props {
   langCode: Language["code"];
   children: React.ReactElement;
   theme?: Theme;
+  applyLanguageToDocument?: boolean;
 }
 
 export const InitializeApp = (props: Props) => {
@@ -19,13 +20,13 @@ export const InitializeApp = (props: Props) => {
 
   useEffect(() => {
     const updateLang = async () => {
-      await setLanguage(currentLang);
+      await setLanguage(currentLang, props.applyLanguageToDocument);
       setLoading(false);
     };
     const currentLang =
       languages.find((lang) => lang.code === props.langCode) || defaultLang;
     updateLang();
-  }, [props.langCode]);
+  }, [props.langCode, props.applyLanguageToDocument]);
 
   return loading ? <LoadingMessage theme={props.theme} /> : props.children;
 };
