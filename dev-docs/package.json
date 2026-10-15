@@ -47,5 +47,8 @@
   },
   "engines": {
     "node": ">=16.14"
+  },
+  "resolutions": {
+    "shell-quote": "1.9.0"
   }
 }

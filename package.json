@@ -91,6 +91,7 @@
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
-    "strip-ansi": "6.0.1"
+    "strip-ansi": "6.0.1",
+    "shell-quote": "1.9.0"
   }
 }
