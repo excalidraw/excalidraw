@@ -62,6 +62,41 @@ import type { RenderableElementsMap } from "./types";
 
 import type { AppState, BinaryFiles } from "../types";
 
+// Hardware limits for browser canvas elements (standard for Chrome/Safari)
+const MAX_CANVAS_DIMENSION = 16384;
+const MAX_CANVAS_AREA = 268435456; // 16384 * 16384
+
+/**
+ * Calculates a scale that ensures the final canvas dimensions
+ * do not exceed browser hardware limits (either individual dimension or total area).
+ */
+const getSafeScale = (width: number, height: number, scale: number): number => {
+  const scaledWidth = width * scale;
+  const scaledHeight = height * scale;
+
+  if (
+    scaledWidth > MAX_CANVAS_DIMENSION ||
+    scaledHeight > MAX_CANVAS_DIMENSION ||
+    scaledWidth * scaledHeight > MAX_CANVAS_AREA
+  ) {
+    const safeScale = Math.min(
+      MAX_CANVAS_DIMENSION / width,
+      MAX_CANVAS_DIMENSION / height,
+      Math.sqrt(MAX_CANVAS_AREA / (width * height)),
+    );
+
+    console.info(
+      `Excalidraw Export: Requested scale (${scale}x) exceeds browser limits. ` +
+        `Automatically adjusted to ${
+          Math.floor(safeScale * 100) / 100
+        }x to prevent crash.`,
+    );
+    return safeScale;
+  }
+
+  return scale;
+};
+
 const truncateText = (
   element: NonDeleted<ExcalidrawTextElement>,
   maxWidth: number,
@@ -192,14 +227,20 @@ export const exportToCanvas = async (
     viewBackgroundColor: string;
     exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   },
+
   createCanvas: (
     width: number,
     height: number,
   ) => { canvas: HTMLCanvasElement; scale: number } = (width, height) => {
     const canvas = document.createElement("canvas");
-    canvas.width = width * appState.exportScale;
-    canvas.height = height * appState.exportScale;
-    return { canvas, scale: appState.exportScale };
+
+    // Ensure we don't exceed browser hardware limits during export
+    const safeScale = getSafeScale(width, height, appState.exportScale);
+
+    canvas.width = Math.floor(width * safeScale);
+    canvas.height = Math.floor(height * safeScale);
+
+    return { canvas, scale: safeScale };
   },
   loadFonts: () => Promise<void> = async () => {
     await Fonts.loadElementsFonts(elements);
