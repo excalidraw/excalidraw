@@ -24,6 +24,7 @@ import {
   MagicIcon,
   mermaidLogoIcon,
   DotsIcon,
+  PdfIcon,
 } from "./icons";
 import {
   ArrowToolButton,
@@ -130,6 +131,16 @@ const ExtraToolsDropdown = ({
             disabled={isToolButtonDisabled(app, "image")}
           >
             {t("toolBar.image")}
+          </DropdownMenu.Item>
+        )}
+        {UIOptions.tools?.image !== false && (
+          <DropdownMenu.Item
+            onSelect={() => app.onPdfToolbarButtonClick()}
+            icon={PdfIcon}
+            data-testid="toolbar-pdf"
+            disabled={isToolButtonDisabled(app, "image")}
+          >
+            {t("toolBar.pdf")}
           </DropdownMenu.Item>
         )}
         <DropdownMenu.Item

@@ -124,6 +124,14 @@ export default defineConfig(({ mode }) => {
             if (id.includes("@codemirror/") || id.includes("@lezer/")) {
               return "codemirror.chunk";
             }
+
+            // keep pdf.js out of the precache, it's only needed on PDF import
+            if (id.includes("pdfjs-dist") && id.includes("pdf.worker")) {
+              return "pdfjs-worker.chunk";
+            }
+            if (id.includes("pdfjs-dist")) {
+              return "pdfjs.chunk";
+            }
           },
         },
       },

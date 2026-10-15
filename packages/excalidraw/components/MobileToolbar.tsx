@@ -34,6 +34,7 @@ import {
   mermaidLogoIcon,
   MagicIcon,
   stickyNoteToolIcon,
+  PdfIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -283,6 +284,14 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
               {t("toolBar.image")}
             </DropdownMenu.Item>
           )}
+          <DropdownMenu.Item
+            onSelect={() => app.onPdfToolbarButtonClick()}
+            icon={PdfIcon}
+            data-testid="toolbar-pdf"
+            disabled={isToolButtonDisabled(app, "image")}
+          >
+            {t("toolBar.pdf")}
+          </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "stickynote" })}
             icon={stickyNoteToolIcon}
