@@ -2,6 +2,8 @@ import rough from "roughjs/bin/rough";
 
 import {
   DEFAULT_EXPORT_PADDING,
+  DEFAULT_GRID_SIZE,
+  DEFAULT_GRID_STEP,
   FRAME_STYLE,
   FONT_FAMILY,
   SVG_NS,
@@ -56,7 +58,7 @@ import { serializeAsJSON } from "../data/json";
 import { Fonts } from "../fonts";
 
 import { renderStaticScene } from "../renderer/staticScene";
-import { renderSceneToSvg } from "../renderer/staticSvgScene";
+import { renderGridToSvg, renderSceneToSvg } from "../renderer/staticSvgScene";
 
 import type { RenderableElementsMap } from "./types";
 
@@ -270,7 +272,7 @@ export const exportToCanvas = async (
     renderConfig: {
       canvasBackgroundColor: viewBackgroundColor,
       imageCache,
-      renderGrid: false,
+      renderGrid: appState.exportWithGrid ?? false,
       isExporting: true,
       // empty disables embeddable rendering
       embedsValidationStatus: new Map(),
@@ -298,7 +300,10 @@ export const exportToSvg = async (
     exportScale?: number;
     viewBackgroundColor: string;
     exportWithDarkMode?: boolean;
+    exportWithGrid?: boolean;
     exportEmbedScene?: boolean;
+    gridSize?: AppState["gridSize"];
+    gridStep?: AppState["gridStep"];
     frameRendering?: AppState["frameRendering"];
   },
   files: BinaryFiles | null,
@@ -466,6 +471,23 @@ export const exportToSvg = async (
       applyDarkModeFilter(viewBackgroundColor, exportWithDarkMode),
     );
     svgRoot.appendChild(rect);
+  }
+
+  // ---------------------------------------------------------------------------
+  // grid (rendered below elements, above background)
+  // ---------------------------------------------------------------------------
+
+  if (appState.exportWithGrid) {
+    renderGridToSvg({
+      svgRoot,
+      gridSize: appState.gridSize ?? DEFAULT_GRID_SIZE,
+      gridStep: appState.gridStep ?? DEFAULT_GRID_STEP,
+      offsetX,
+      offsetY,
+      width,
+      height,
+      theme: exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+    });
   }
 
   // ---------------------------------------------------------------------------

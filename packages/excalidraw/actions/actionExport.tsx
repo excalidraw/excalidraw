@@ -88,6 +88,26 @@ export const actionChangeExportBackground = register<
   ),
 });
 
+export const actionChangeExportWithGrid = register<AppState["exportWithGrid"]>({
+  name: "changeExportWithGrid",
+  label: "imageExportDialog.label.withGrid",
+  trackEvent: { category: "export", action: "toggleGrid" },
+  perform: (_elements, appState, value) => {
+    return {
+      appState: { ...appState, exportWithGrid: value },
+      captureUpdate: CaptureUpdateAction.EVENTUALLY,
+    };
+  },
+  PanelComponent: ({ appState, updateData }) => (
+    <CheckboxItem
+      checked={appState.exportWithGrid}
+      onChange={(checked) => updateData(checked)}
+    >
+      {t("imageExportDialog.label.withGrid")}
+    </CheckboxItem>
+  ),
+});
+
 export const actionChangeExportEmbedScene = register<
   AppState["exportEmbedScene"]
 >({

@@ -82,6 +82,7 @@ export type ActionName =
   | "changeProjectName"
   | "changeExportBackground"
   | "changeExportEmbedScene"
+  | "changeExportWithGrid"
   | "changeExportScale"
   | "saveToActiveFile"
   | "saveFileToDisk"
