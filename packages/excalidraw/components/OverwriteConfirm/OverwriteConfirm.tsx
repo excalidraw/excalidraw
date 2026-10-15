@@ -41,7 +41,12 @@ const OverwriteConfirmDialog = Object.assign(
 
       return (
         <OverwriteConfirmDialogTunnel.In>
-          <Dialog onCloseRequest={handleClose} title={false} size={916}>
+          <Dialog
+            onCloseRequest={handleClose}
+            title={false}
+            ariaLabel={overwriteConfirmState.title}
+            size={916}
+          >
             <div className="OverwriteConfirm">
               <h3>{overwriteConfirmState.title}</h3>
               <div
