@@ -5,7 +5,12 @@ import { flushSync } from "react-dom";
 import rough from "roughjs/bin/rough";
 import { nanoid } from "nanoid";
 
-import { clamp, pointFrom, pointDistance } from "@excalidraw/math";
+import {
+  clamp,
+  pointFrom,
+  pointDistance,
+  pointRotateRads,
+} from "@excalidraw/math";
 
 import {
   COLOR_PALETTE,
@@ -108,6 +113,7 @@ import {
   newEmbeddableElement,
   newMagicFrameElement,
   newStickyNoteElement,
+  newCodeBlockElement,
   newIframeElement,
   newArrowElement,
   newElement,
@@ -120,6 +126,7 @@ import {
   isBindingElement,
   isBindingElementType,
   isBoundToContainer,
+  isCodeBlockElement,
   isFrameLikeElement,
   isImageElement,
   isEmbeddableElement,
@@ -138,6 +145,7 @@ import {
   getNormalizedDimensions,
   isElementCompletelyInViewport,
   isElementInViewport,
+  DEFAULT_CODE_BLOCK_WIDTH,
   isInvisiblySmallElement,
   getCornerRadius,
   isPathALoop,
@@ -207,6 +215,11 @@ import {
   isEligibleFrameChildType,
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
+  computeCodeBlockDimensions,
+  updateCodeBlockElementLayout,
+  isHittingCodeBlockTitle,
+  CODE_BLOCK_HEADER_LABEL,
+  getCodeBlockTheme,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint } from "@excalidraw/math";
@@ -235,6 +248,7 @@ import type {
   SceneElementsMap,
   NonDeletedSceneElementsMap,
   ExcalidrawBindableElement,
+  ExcalidrawCodeBlockElement,
 } from "@excalidraw/element/types";
 
 import type { TransformHandleDirection } from "@excalidraw/element";
@@ -366,6 +380,11 @@ import {
   getColorTargetAppStateUpdates,
   resolveColorTarget,
 } from "../actions/colorTargets";
+
+import {
+  codeBlockWysiwyg,
+  type CodeBlockWysiwygSubmitHandler,
+} from "../wysiwyg/codeBlockWysiwyg";
 
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
@@ -686,6 +705,8 @@ class App extends React.Component<AppProps, AppState> {
   public selection: AppSelection = new AppSelection(this);
   public selectionTool: AppSelectionTool = new AppSelectionTool(this);
   public wrap: AppWrap = new AppWrap(this);
+  public codeBlockWysiwygSubmitHandler: CodeBlockWysiwygSubmitHandler | null =
+    null;
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
 
@@ -2116,23 +2137,43 @@ class App extends React.Component<AppProps, AppState> {
     _cache: new Map(),
   };
 
-  private resetEditingFrame = (frame: ExcalidrawFrameLikeElement | null) => {
+  private resetEditingFrame = (
+    frame: ExcalidrawFrameLikeElement | ExcalidrawCodeBlockElement | null,
+  ) => {
     if (frame) {
-      this.scene.mutateElement(frame, { name: frame.name?.trim() || null });
+      if (isCodeBlockElement(frame)) {
+        this.scene.mutateElement(frame, {
+          title: frame.title?.trim() || undefined,
+        });
+        ShapeCache.delete(frame);
+      } else {
+        this.scene.mutateElement(frame, { name: frame.name?.trim() || null });
+      }
+      this.store.scheduleCapture();
     }
     this.setState({ editingFrame: null });
   };
 
   private renderFrameNames = () => {
-    if (!this.state.frameRendering.enabled || !this.state.frameRendering.name) {
+    const isDarkTheme = this.state.theme === THEME.DARK;
+    const nonDeletedFramesLikes =
+      this.state.frameRendering.enabled && this.state.frameRendering.name
+        ? this.scene.getNonDeletedFramesLikes()
+        : [];
+    const nonDeletedCodeBlocks = this.scene
+      .getNonDeletedElements()
+      .filter(isCodeBlockElement);
+    const elementsWithTitles = [
+      ...nonDeletedFramesLikes,
+      ...nonDeletedCodeBlocks,
+    ];
+
+    if (elementsWithTitles.length === 0) {
       if (this.state.editingFrame) {
         this.resetEditingFrame(null);
       }
       return null;
     }
-
-    const isDarkTheme = this.state.theme === THEME.DARK;
-    const nonDeletedFramesLikes = this.scene.getNonDeletedFramesLikes();
 
     const focusedSearchMatch =
       nonDeletedFramesLikes.length > 0
@@ -2144,7 +2185,8 @@ class App extends React.Component<AppProps, AppState> {
           : null
         : null;
 
-    return nonDeletedFramesLikes.map((f) => {
+    return elementsWithTitles.map((f) => {
+      const isCodeBlock = isCodeBlockElement(f);
       // The name is a decoration that follows the frame's render overrides,
       // except while it's being edited: editing is interaction and keeps to
       // document geometry like everything else interactive. Culling by the
@@ -2176,10 +2218,30 @@ class App extends React.Component<AppProps, AppState> {
         return null;
       }
 
+      let sceneAnchorX = f.x + renderState.offset.x;
+      let sceneAnchorY =
+        f.y +
+        renderState.offset.y -
+        FRAME_STYLE.nameOffsetY / this.state.zoom.value;
+
+      if (f.angle) {
+        const center = pointFrom(
+          f.x + renderState.offset.x + f.width / 2,
+          f.y + renderState.offset.y + f.height / 2,
+        );
+        const [rx, ry] = pointRotateRads(
+          pointFrom(sceneAnchorX, sceneAnchorY),
+          center,
+          f.angle,
+        );
+        sceneAnchorX = rx;
+        sceneAnchorY = ry;
+      }
+
       const { x: x1, y: y1 } = sceneCoordsToViewportCoords(
         {
-          sceneX: f.x + renderState.offset.x,
-          sceneY: f.y + renderState.offset.y,
+          sceneX: sceneAnchorX,
+          sceneY: sceneAnchorY,
         },
         this.state,
       );
@@ -2188,19 +2250,29 @@ class App extends React.Component<AppProps, AppState> {
 
       let frameNameJSX;
 
-      const frameName = getFrameLikeTitle(f);
+      const frameName = isCodeBlock
+        ? f.title || CODE_BLOCK_HEADER_LABEL
+        : getFrameLikeTitle(f);
 
       if (f.id === this.state.editingFrame) {
-        const frameNameInEdit = frameName;
+        const frameNameInEdit = isCodeBlock ? f.title ?? "" : frameName;
 
         frameNameJSX = (
           <input
             autoFocus
+            className="excalidraw-frame-name-input"
             value={frameNameInEdit}
+            placeholder={isCodeBlock ? CODE_BLOCK_HEADER_LABEL : undefined}
             onChange={(e) => {
-              this.scene.mutateElement(f, {
-                name: e.target.value,
-              });
+              if (isCodeBlock) {
+                this.scene.mutateElement(f, {
+                  title: e.target.value,
+                });
+              } else {
+                this.scene.mutateElement(f, {
+                  name: e.target.value,
+                });
+              }
             }}
             onFocus={(e) => e.target.select()}
             onBlur={() => this.resetEditingFrame(f)}
@@ -2260,13 +2332,10 @@ class App extends React.Component<AppProps, AppState> {
             // messes up input position when editing the frame name.
             // This makes the positioning deterministic and we can calculate
             // the same position when rendering to canvas / svg.
-            bottom: `${
-              this.state.height +
-              FRAME_STYLE.nameOffsetY -
-              y1 +
-              this.state.offsetTop
-            }px`,
+            bottom: `${this.state.height - y1 + this.state.offsetTop}px`,
             left: `${x1 - this.state.offsetLeft}px`,
+            transform: f.angle ? `rotate(${f.angle}rad)` : undefined,
+            transformOrigin: "0 100%",
             zIndex: 2,
             fontSize: FRAME_STYLE.nameFontSize,
             color: isDarkTheme
@@ -3319,7 +3388,11 @@ class App extends React.Component<AppProps, AppState> {
 
     if (this.state.editingFrame) {
       const frame = this.scene.getNonDeletedElement(this.state.editingFrame);
-      this.resetEditingFrame(frame && isFrameLikeElement(frame) ? frame : null);
+      this.resetEditingFrame(
+        frame && (isFrameLikeElement(frame) || isCodeBlockElement(frame))
+          ? (frame as any)
+          : null,
+      );
     }
 
     // textWysiwyg's submit path uses flushSync. Defer until after the current
@@ -3328,6 +3401,7 @@ class App extends React.Component<AppProps, AppState> {
     queueMicrotask(() => {
       if (!this.isInteractionEnabled() || this.state.viewModeEnabled) {
         this.text.textWysiwygSubmitHandler?.();
+        this.codeBlockWysiwygSubmitHandler?.();
       }
     });
 
@@ -3897,6 +3971,7 @@ class App extends React.Component<AppProps, AppState> {
 
     this.ownerWindow.clearTimeout(this.zenModeTransitionTimer);
     this.unmarkZenModeTransition();
+    this.codeBlockWysiwygSubmitHandler?.();
     this.editorLifecycleEvents.emit("editor:unmount");
     this.props.onUnmount?.();
     this.props.onExcalidrawAPI?.(null);
@@ -4450,6 +4525,15 @@ class App extends React.Component<AppProps, AppState> {
       }
     }
 
+    if (this.state.editingCodeBlockElement) {
+      const sceneElement = this.scene.getElement(
+        this.state.editingCodeBlockElement.id,
+      );
+      if (!sceneElement || sceneElement.isDeleted) {
+        this.setState({ editingCodeBlockElement: null });
+      }
+    }
+
     // Forced false while a viewport animation runs — the scroll-back-to-content
     // button must not render mid-animation (clicking it would fight the
     // animation, which overwrites the viewport every frame). The animation's
@@ -4457,7 +4541,9 @@ class App extends React.Component<AppProps, AppState> {
     // on the target viewport.
     const scrolledOutside =
       // hide when editing text
-      this.state.editingTextElement || this.viewport.isAnimating
+      this.state.editingTextElement ||
+      this.state.editingCodeBlockElement ||
+      this.viewport.isAnimating
         ? false
         : !this.visibleElements.length && this.hasRenderableElements;
     if (this.state.scrolledOutside !== scrolledOutside) {
@@ -5488,6 +5574,10 @@ class App extends React.Component<AppProps, AppState> {
             });
             event.preventDefault();
             return;
+          } else if (isCodeBlockElement(selectedElement)) {
+            this.startCodeBlockEditing(selectedElement);
+            event.preventDefault();
+            return;
           } else if (isFrameLikeElement(selectedElement)) {
             this.setState({
               editingFrame: selectedElement.id,
@@ -5990,9 +6080,11 @@ class App extends React.Component<AppProps, AppState> {
         // this also avoids the need to update past tests
         threshold: this.getElementHitThreshold(elementWithHighestZIndex) / 2,
         elementsMap: this.scene.getNonDeletedElementsMap(),
-        frameNameBound: isFrameLikeElement(elementWithHighestZIndex)
-          ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
-          : null,
+        frameNameBound:
+          isFrameLikeElement(elementWithHighestZIndex) ||
+          isCodeBlockElement(elementWithHighestZIndex)
+            ? this.frameNameBoundsCache.get(elementWithHighestZIndex)
+            : null,
       })
         ? elementWithHighestZIndex
         : allHitElements[allHitElements.length - 2];
@@ -6121,9 +6213,10 @@ class App extends React.Component<AppProps, AppState> {
       element,
       threshold: this.getElementHitThreshold(element),
       elementsMap: this.scene.getNonDeletedElementsMap(),
-      frameNameBound: isFrameLikeElement(element)
-        ? this.frameNameBoundsCache.get(element)
-        : null,
+      frameNameBound:
+        isFrameLikeElement(element) || isCodeBlockElement(element)
+          ? this.frameNameBoundsCache.get(element)
+          : null,
     });
   }
 
@@ -6141,6 +6234,50 @@ class App extends React.Component<AppProps, AppState> {
         croppingElementId: null,
       });
     }
+  };
+
+  public startCodeBlockEditing = (
+    element: NonDeleted<ExcalidrawCodeBlockElement>,
+    initialCaretSceneCoords?: { x: number; y: number } | null,
+  ) => {
+    this.codeBlockWysiwygSubmitHandler?.();
+
+    this.setState((prevState) => ({
+      editingCodeBlockElement: element,
+      selectedElementIds: makeNextSelectedElementIds(
+        { [element.id]: true },
+        prevState,
+      ),
+    }));
+
+    this.codeBlockWysiwygSubmitHandler = codeBlockWysiwyg({
+      element,
+      excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
+      initialCaretSceneCoords,
+      onChange: (nextCode: string) => {
+        const latest = this.scene.getElement<
+          NonDeleted<ExcalidrawCodeBlockElement>
+        >(element.id);
+        if (latest) {
+          updateCodeBlockElementLayout(latest, { code: nextCode }, this.scene);
+        }
+      },
+      onSubmit: ({ nextCode }: { nextCode: string }) => {
+        this.codeBlockWysiwygSubmitHandler = null;
+        const latest = this.scene.getElement<
+          NonDeleted<ExcalidrawCodeBlockElement>
+        >(element.id);
+        if (latest) {
+          updateCodeBlockElementLayout(latest, { code: nextCode }, this.scene);
+        }
+        this.store.scheduleCapture();
+        this.setState({
+          editingCodeBlockElement: null,
+        });
+        this.focusContainer();
+      },
+    });
   };
 
   private shouldHandleBrowserCanvasDoubleClick = (type: string) => {
@@ -6218,6 +6355,28 @@ class App extends React.Component<AppProps, AppState> {
       event,
       this.state,
     );
+
+    if (
+      selectedElements.length === 1 &&
+      isCodeBlockElement(selectedElements[0])
+    ) {
+      if (isHittingCodeBlockTitle(selectedElements[0], sceneX, sceneY)) {
+        this.setState({ editingFrame: selectedElements[0].id });
+        return;
+      }
+      this.startCodeBlockEditing(selectedElements[0], { x: sceneX, y: sceneY });
+      return;
+    }
+
+    const hitCodeBlock = this.getElementAtPosition(sceneX, sceneY);
+    if (hitCodeBlock && isCodeBlockElement(hitCodeBlock)) {
+      if (isHittingCodeBlockTitle(hitCodeBlock, sceneX, sceneY)) {
+        this.setState({ editingFrame: hitCodeBlock.id });
+        return;
+      }
+      this.startCodeBlockEditing(hitCodeBlock, { x: sceneX, y: sceneY });
+      return;
+    }
 
     if (selectedElements.length === 1 && isLinearElement(selectedElements[0])) {
       const selectedLinearElement: ExcalidrawLinearElement =
@@ -8756,7 +8915,8 @@ class App extends React.Component<AppProps, AppState> {
       | "diamond"
       | "ellipse"
       | "iframe"
-      | "embeddable",
+      | "embeddable"
+      | "codeblock",
   ) {
     return this.state.currentItemRoundness === "round"
       ? {
@@ -8775,7 +8935,11 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private createGenericElementOnPointerDown = (
-    elementType: ExcalidrawGenericElement["type"] | "embeddable" | "stickynote",
+    elementType:
+      | ExcalidrawGenericElement["type"]
+      | "embeddable"
+      | "stickynote"
+      | "codeblock",
     pointerDownState: PointerDownState,
   ): void => {
     const [gridX, gridY] = getGridPoint(
@@ -8791,16 +8955,24 @@ class App extends React.Component<AppProps, AppState> {
       y: gridY,
     });
 
+    const codeBlockTheme = getCodeBlockTheme(
+      this.state.currentItemCodeBlockTheme,
+    );
+
     const baseElementAttributes = {
       x: gridX,
       y: gridY,
       strokeColor:
         elementType === "stickynote"
           ? this.state.currentItemStickynoteStrokeColor
+          : elementType === "codeblock"
+          ? codeBlockTheme.border
           : this.state.currentItemStrokeColor,
       backgroundColor:
         elementType === "stickynote"
           ? this.state.currentItemStickynoteBackgroundColor
+          : elementType === "codeblock"
+          ? codeBlockTheme.background
           : this.state.currentItemBackgroundColor,
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.getCurrentItemStrokeWidth(elementType),
@@ -8822,6 +8994,15 @@ class App extends React.Component<AppProps, AppState> {
       element = newStickyNoteElement({
         type: "stickynote",
         ...baseElementAttributes,
+      });
+    } else if (elementType === "codeblock") {
+      element = newCodeBlockElement({
+        type: "codeblock",
+        ...baseElementAttributes,
+        fontSize: this.state.currentItemFontSize,
+        language: this.state.currentItemCodeBlockLanguage,
+        theme: this.state.currentItemCodeBlockTheme,
+        showLineNumbers: this.state.currentItemCodeBlockLineNumbers,
       });
     } else {
       element = newElement({
@@ -9905,6 +10086,56 @@ class App extends React.Component<AppProps, AppState> {
           sceneY: newElement.y + newElement.height / 2,
           container: newElement,
         });
+        return;
+      }
+
+      if (newElement && isCodeBlockElement(newElement)) {
+        const targetWidth = Math.max(
+          newElement.width,
+          DEFAULT_CODE_BLOCK_WIDTH,
+        );
+        const { width, height } = computeCodeBlockDimensions(newElement, {
+          width: targetWidth,
+        });
+
+        const { originInGrid } = pointerDownState;
+        const nextGeometry = {
+          x:
+            newElement.x < originInGrid.x
+              ? originInGrid.x - width
+              : newElement.x,
+          y:
+            newElement.y < originInGrid.y
+              ? originInGrid.y - height
+              : newElement.y,
+          width,
+          height,
+        };
+
+        this.scene.mutateElement(newElement, nextGeometry, {
+          informMutation: false,
+          isDragging: false,
+        });
+
+        this.store.scheduleCapture();
+        this.scene.triggerUpdate();
+
+        this.cursor.reset();
+        if (!activeTool.locked) {
+          this.setState({
+            activeTool: updateActiveTool(this.state, {
+              type: this.state.preferredSelectionTool.type,
+            }),
+          });
+        }
+        this.setState((prevState) => ({
+          newElement: null,
+          selectedElementIds: makeNextSelectedElementIds(
+            { [newElement.id]: true },
+            prevState,
+          ),
+        }));
+        this.startCodeBlockEditing(newElement);
         return;
       }
 

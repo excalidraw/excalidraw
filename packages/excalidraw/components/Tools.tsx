@@ -30,6 +30,7 @@ import {
   frameToolIcon,
   EmbedIcon,
   stickyNoteToolIcon,
+  codeBlockToolIcon,
 } from "./icons";
 
 import type {
@@ -144,6 +145,10 @@ export const TOOLS = defineTools({
   },
   embeddable: {
     icon: EmbedIcon,
+  },
+  codeblock: {
+    icon: codeBlockToolIcon,
+    letterKey: KEYS.BACKTICK,
   },
   laser: {
     icon: laserPointerToolIcon,

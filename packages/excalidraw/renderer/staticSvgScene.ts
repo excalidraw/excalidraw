@@ -45,9 +45,17 @@ import {
 } from "@excalidraw/element";
 
 import { getElementAbsoluteCoords } from "@excalidraw/element";
+import {
+  getCodeBlockLayout,
+  CODE_BLOCK_HEADER_LABEL,
+  CODE_BLOCK_PLACEHOLDER,
+  CODE_BLOCK_FONT_FAMILY,
+  getCodeBlockTheme,
+} from "@excalidraw/element";
 
 import type {
   ExcalidrawElement,
+  ExcalidrawCodeBlockElement,
   ExcalidrawTextElementWithContainer,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -770,6 +778,227 @@ const renderElementToSvg = (
 
         addToRoot(rect, element);
       }
+      break;
+    }
+    case "codeblock": {
+      const codeBlockElement = element as ExcalidrawCodeBlockElement;
+      const theme = getCodeBlockTheme(codeBlockElement.theme);
+      const group = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+      group.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      if (opacity !== 1) {
+        group.setAttribute("opacity", `${opacity}`);
+      }
+
+      const title = codeBlockElement.title || CODE_BLOCK_HEADER_LABEL;
+      const titleText = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
+      titleText.setAttribute("x", "0");
+      titleText.setAttribute("y", `-${FRAME_STYLE.nameOffsetY}`);
+      titleText.setAttribute("font-family", "Assistant, Helvetica, sans-serif");
+      titleText.setAttribute("font-weight", "500");
+      titleText.setAttribute("font-size", `${FRAME_STYLE.nameFontSize}px`);
+      titleText.setAttribute("dominant-baseline", "auto");
+      titleText.setAttribute(
+        "fill",
+        renderConfig.exportWithDarkMode
+          ? FRAME_STYLE.nameColorDarkTheme
+          : FRAME_STYLE.nameColorLightTheme,
+      );
+      titleText.textContent = title;
+      group.appendChild(titleText);
+
+      const radius = codeBlockElement.roundness
+        ? getCornerRadius(
+            Math.min(codeBlockElement.width, codeBlockElement.height),
+            codeBlockElement,
+          )
+        : 0;
+      const bgRect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      bgRect.setAttribute("x", "0");
+      bgRect.setAttribute("y", "0");
+      bgRect.setAttribute("width", `${codeBlockElement.width}`);
+      bgRect.setAttribute("height", `${codeBlockElement.height}`);
+      if (radius > 0) {
+        bgRect.setAttribute("rx", `${radius}`);
+        bgRect.setAttribute("ry", `${radius}`);
+      }
+      bgRect.setAttribute(
+        "fill",
+        codeBlockElement.backgroundColor &&
+          codeBlockElement.backgroundColor !== "transparent"
+          ? codeBlockElement.backgroundColor
+          : theme.background,
+      );
+      bgRect.setAttribute("stroke", "none");
+      group.appendChild(bgRect);
+
+      const clipId = `codeblock-clipPath-${codeBlockElement.id}`;
+      const clipPath = svgRoot.ownerDocument.createElementNS(
+        SVG_NS,
+        "clipPath",
+      );
+      clipPath.setAttribute("id", clipId);
+      const clipRect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      clipRect.setAttribute("x", "0");
+      clipRect.setAttribute("y", "0");
+      clipRect.setAttribute("width", `${codeBlockElement.width}`);
+      clipRect.setAttribute("height", `${codeBlockElement.height}`);
+      if (radius > 0) {
+        clipRect.setAttribute("rx", `${radius}`);
+        clipRect.setAttribute("ry", `${radius}`);
+      }
+      clipPath.appendChild(clipRect);
+      addToRoot(clipPath, codeBlockElement);
+
+      const contentGroup = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+      contentGroup.setAttribute("clip-path", `url(#${clipId})`);
+
+      const layout = getCodeBlockLayout(codeBlockElement);
+      const startX =
+        (codeBlockElement.showLineNumbers ? layout.gutterWidth : 0) +
+        layout.padding;
+
+      if (codeBlockElement.showLineNumbers && layout.gutterWidth > 0) {
+        const gutterRect = svgRoot.ownerDocument.createElementNS(
+          SVG_NS,
+          "rect",
+        );
+        gutterRect.setAttribute("x", "0");
+        gutterRect.setAttribute("y", "0");
+        gutterRect.setAttribute("width", `${layout.gutterWidth}`);
+        gutterRect.setAttribute("height", `${codeBlockElement.height}`);
+        gutterRect.setAttribute("fill", theme.gutterBackground);
+        contentGroup.appendChild(gutterRect);
+
+        const gutterTextPadding = Math.max(
+          6,
+          Math.round(12 * (codeBlockElement.fontSize / 14)),
+        );
+
+        for (let i = 0; i < layout.visualLines.length; i++) {
+          const vLine = layout.visualLines[i];
+          const lineY = layout.padding + (i + 0.5) * layout.lineHeightPx;
+          if (lineY > codeBlockElement.height) {
+            break;
+          }
+          if (vLine.isFirstSubLine) {
+            const numText = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "text",
+            );
+            numText.setAttribute(
+              "x",
+              `${layout.gutterWidth - gutterTextPadding}`,
+            );
+            numText.setAttribute("y", `${lineY}`);
+            numText.setAttribute("text-anchor", "end");
+            numText.setAttribute("dominant-baseline", "central");
+            numText.setAttribute("font-family", CODE_BLOCK_FONT_FAMILY);
+            numText.setAttribute("font-size", `${codeBlockElement.fontSize}px`);
+            numText.setAttribute("fill", theme.gutterText);
+            numText.textContent = String(vLine.logicalLineNumber);
+            contentGroup.appendChild(numText);
+          }
+        }
+      }
+
+      if (
+        !codeBlockElement.code &&
+        layout.visualLines.length <= 1 &&
+        (!layout.visualLines[0] || !layout.visualLines[0].text)
+      ) {
+        const placeholder = svgRoot.ownerDocument.createElementNS(
+          SVG_NS,
+          "text",
+        );
+        placeholder.setAttribute("x", `${startX}`);
+        placeholder.setAttribute(
+          "y",
+          `${layout.padding + 0.5 * layout.lineHeightPx}`,
+        );
+        placeholder.setAttribute("dominant-baseline", "central");
+        placeholder.setAttribute("font-family", CODE_BLOCK_FONT_FAMILY);
+        placeholder.setAttribute("font-size", `${codeBlockElement.fontSize}px`);
+        placeholder.setAttribute("fill", theme.placeholder);
+        placeholder.textContent = CODE_BLOCK_PLACEHOLDER;
+        contentGroup.appendChild(placeholder);
+      } else {
+        for (let i = 0; i < layout.visualLines.length; i++) {
+          const vLine = layout.visualLines[i];
+          const lineY = layout.padding + (i + 0.5) * layout.lineHeightPx;
+          if (lineY > codeBlockElement.height) {
+            break;
+          }
+          const textEl = svgRoot.ownerDocument.createElementNS(SVG_NS, "text");
+          textEl.setAttribute("x", `${startX}`);
+          textEl.setAttribute("y", `${lineY}`);
+          textEl.setAttribute("dominant-baseline", "central");
+          textEl.setAttribute("font-family", CODE_BLOCK_FONT_FAMILY);
+          textEl.setAttribute("font-size", `${codeBlockElement.fontSize}px`);
+          textEl.setAttribute("xml:space", "preserve");
+
+          for (const token of vLine.tokens) {
+            const tspan = svgRoot.ownerDocument.createElementNS(
+              SVG_NS,
+              "tspan",
+            );
+            tspan.setAttribute(
+              "fill",
+              theme.tokenColors[token.type] || theme.tokenColors.plain,
+            );
+            if (token.type === "comment" || token.type === "instance") {
+              tspan.setAttribute("font-style", "italic");
+            }
+            tspan.textContent = token.text;
+            textEl.appendChild(tspan);
+          }
+          contentGroup.appendChild(textEl);
+        }
+      }
+
+      group.appendChild(contentGroup);
+
+      const borderRect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      borderRect.setAttribute("x", "0");
+      borderRect.setAttribute("y", "0");
+      borderRect.setAttribute("width", `${codeBlockElement.width}`);
+      borderRect.setAttribute("height", `${codeBlockElement.height}`);
+      if (radius > 0) {
+        borderRect.setAttribute("rx", `${radius}`);
+        borderRect.setAttribute("ry", `${radius}`);
+      }
+      borderRect.setAttribute("fill", "none");
+      borderRect.setAttribute(
+        "stroke",
+        codeBlockElement.strokeColor &&
+          codeBlockElement.strokeColor !== "transparent"
+          ? codeBlockElement.strokeColor
+          : theme.border,
+      );
+      borderRect.setAttribute(
+        "stroke-width",
+        `${codeBlockElement.strokeWidth || 1}`,
+      );
+      if (codeBlockElement.strokeStyle === "dashed") {
+        borderRect.setAttribute("stroke-dasharray", "8 8");
+      } else if (codeBlockElement.strokeStyle === "dotted") {
+        borderRect.setAttribute("stroke-dasharray", "3 3");
+      }
+      group.appendChild(borderRect);
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [group],
+        renderConfig.frameRendering,
+        elementsMap,
+      );
+
+      addToRoot(g || group, element);
       break;
     }
     default: {

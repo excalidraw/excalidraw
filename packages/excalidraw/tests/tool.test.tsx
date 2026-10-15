@@ -366,6 +366,12 @@ describe("toolbar", () => {
     openExtraTools();
     expect(queryTool("image")).not.toBe(null);
     expect(queryTool("frame")).not.toBe(null);
+    expect(queryTool("codeblock")).not.toBe(null);
+  });
+
+  it("maps backtick to the codeblock tool", async () => {
+    await render(<Excalidraw />);
+    expect(findShapeByKey("`", window.h.app)).toBe("codeblock");
   });
 
   it("hides the image tool through UIOptions.tools.image", async () => {

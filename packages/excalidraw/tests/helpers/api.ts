@@ -23,6 +23,7 @@ import {
   newLinearElement,
   newMagicFrameElement,
   newStickyNoteElement,
+  newCodeBlockElement,
   newTextElement,
 } from "@excalidraw/element";
 
@@ -405,6 +406,9 @@ export class API {
         break;
       case "magicframe":
         element = newMagicFrameElement({ ...base, width, height });
+        break;
+      case "codeblock":
+        element = newCodeBlockElement({ ...base, width, height });
         break;
       default:
         assertNever(

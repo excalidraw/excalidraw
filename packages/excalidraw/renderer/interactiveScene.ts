@@ -1990,8 +1990,9 @@ const _renderInteractiveScene = ({
       if (
         !appState.viewModeEnabled &&
         showBoundingBox &&
-        // do not show transform handles when text is being edited
+        // do not show transform handles when text or code block is being edited
         !isTextElement(appState.editingTextElement) &&
+        !appState.editingCodeBlockElement &&
         // do not show transform handles when image is being cropped
         !appState.croppingElementId
       ) {
