@@ -7587,9 +7587,9 @@ class App extends React.Component<AppProps, AppState> {
     // just a spike, otherwise finalize the freedraw element when the second
     // finger is lifted
     if (
-      event.pointerType === "touch" &&
       this.state.newElement &&
-      this.state.newElement.type === "freedraw"
+      this.state.newElement.type === "freedraw" &&
+      gesture.pointers.size > 1
     ) {
       const element = this.state.newElement as ExcalidrawFreeDrawElement;
       this.updateScene({
@@ -9278,6 +9278,9 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
+          if (gesture.pointers.size > 1) {
+            return;
+          }
           const points = newElement.points;
           const dx = pointerCoords.x - newElement.x;
           const dy = pointerCoords.y - newElement.y;
