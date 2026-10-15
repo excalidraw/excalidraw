@@ -2,9 +2,10 @@ import {
   DEFAULT_EXPORT_PADDING,
   EDITOR_LS_KEYS,
   THEME,
+  getFontString,
 } from "@excalidraw/common";
 
-import { convertToExcalidrawElements } from "@excalidraw/element";
+import { convertToExcalidrawElements, measureText } from "@excalidraw/element";
 
 import { exportToCanvas } from "@excalidraw/utils";
 
@@ -97,8 +98,39 @@ export const convertMermaidToExcalidraw = async ({
     const { elements, files = {} } = ret;
     setError(null);
 
+    const processedElements = elements.map((el: any) => {
+      if (
+        el.type === "text" &&
+        typeof el.text === "string" &&
+        /<br\s*\/?>/i.test(el.text)
+      ) {
+        const nextText = el.text.replace(/<br\s*\/?>/gi, "\n");
+        const nextOriginalText = (el.originalText || el.text).replace(
+          /<br\s*\/?>/gi,
+          "\n",
+        );
+        const fontString = getFontString({
+          fontSize: el.fontSize ?? 20,
+          fontFamily: el.fontFamily ?? 1,
+        });
+        const metrics = measureText(
+          nextText,
+          fontString,
+          el.lineHeight ?? 1.25,
+        );
+        return {
+          ...el,
+          text: nextText,
+          originalText: nextOriginalText,
+          width: metrics.width,
+          height: metrics.height,
+        };
+      }
+      return el;
+    });
+
     data.current = {
-      elements: convertToExcalidrawElements(elements, {
+      elements: convertToExcalidrawElements(processedElements, {
         regenerateIds: true,
       }),
       files,
