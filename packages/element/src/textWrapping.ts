@@ -106,7 +106,7 @@ const CJK = {
    *         ↑ BREAK AFTER "」"
    */
   // eslint-disable-next-line prettier/prettier
-  OPENING:/（［｛〈《｟｢「『【〖〔〘〚＜〝/u,
+  OPENING: /（［｛〈《｟｢「『【〖〔〘〚＜〝/u,
   CLOSING: /）］｝〉》｠｣」』】〗〕〙〛＞。．，、〟‥？！：；・〜〞/u,
   /**
    * Currency symbols break before, not after
@@ -478,6 +478,33 @@ export const getWrappedTextLines = (
 };
 
 /**
+ * Maps the given parts (whose concatenation is the NFC form of `source`, e.g.
+ * the tokens from `parseTokens()`) back to their lengths in `source` code units,
+ * so that offsets stay correct for non-NFC (e.g. decomposed, NFD) input.
+ */
+const getSourceLengths = (source: string, parts: readonly string[]) => {
+  if (source.normalize("NFC") === source) {
+    return parts.map((part) => part.length);
+  }
+
+  let offset = 0;
+
+  return parts.map((part) => {
+    for (let end = offset + 1; end <= source.length; end++) {
+      if (source.slice(offset, end).normalize("NFC") === part) {
+        const length = end - offset;
+        offset = end;
+        return length;
+      }
+    }
+
+    // defensively fall back to the normalized length
+    offset += part.length;
+    return part.length;
+  });
+};
+
+/**
  * Wraps a single hard line into one or more visual lines.
  *
  * The line-local offsets are tracked in original-text code units so
@@ -491,6 +518,7 @@ const wrapLine = (
 ): WrappedTextLine[] => {
   const lines: WrappedTextLine[] = [];
   const tokens = parseTokens(line);
+  const tokenSourceLengths = getSourceLengths(line, tokens);
 
   let currentLine = "";
   let currentLineStart = lineStart;
@@ -503,7 +531,7 @@ const wrapLine = (
   while (tokenIndex < tokens.length) {
     const token = tokens[tokenIndex];
     const tokenStart = tokenOffset;
-    const tokenEnd = tokenStart + token.length;
+    const tokenEnd = tokenStart + tokenSourceLengths[tokenIndex];
     const testLine = currentLine + token;
 
     // cache single codepoint whitespace, CJK or emoji width calc. as kerning should not apply here
@@ -526,7 +554,13 @@ const wrapLine = (
 
     // current line is empty => just the token (word) is longer than `maxWidth` and needs to be wrapped
     if (!currentLine) {
-      const wrappedWord = wrapWord(token, font, maxWidth, tokenStart);
+      const wrappedWord = wrapWord(
+        token,
+        font,
+        maxWidth,
+        tokenStart,
+        line.slice(tokenStart - lineStart, tokenEnd - lineStart),
+      );
       const trailingLine = wrappedWord[wrappedWord.length - 1] ?? {
         text: "",
         start: tokenStart,
@@ -580,6 +614,8 @@ const wrapWord = (
   font: FontString,
   maxWidth: number,
   wordStart: number,
+  /** the word as it appears in the source text (may not be NFC) */
+  sourceWord: string = word,
 ): WrappedTextLine[] => {
   // multi-codepoint emojis are already broken apart and shouldn't be broken further
   if (getEmojiRegex().test(word)) {
@@ -587,7 +623,7 @@ const wrapWord = (
       {
         text: word,
         start: wordStart,
-        end: wordStart + word.length,
+        end: wordStart + sourceWord.length,
       },
     ];
   }
@@ -596,6 +632,7 @@ const wrapWord = (
 
   const lines: WrappedTextLine[] = [];
   const chars = Array.from(word);
+  const charSourceLengths = getSourceLengths(sourceWord, chars);
 
   let currentLine = "";
   let currentLineStart = wordStart;
@@ -603,9 +640,9 @@ const wrapWord = (
   let currentLineWidth = 0;
   let offset = wordStart;
 
-  for (const char of chars) {
+  for (const [charIndex, char] of chars.entries()) {
     const charStart = offset;
-    const charEnd = charStart + char.length;
+    const charEnd = charStart + charSourceLengths[charIndex];
     const _charWidth = charWidth.calculate(char, font);
     const testLineWidth = currentLineWidth + _charWidth;
 
