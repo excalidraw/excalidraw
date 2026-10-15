@@ -1,5 +1,6 @@
 export * from "./binary-heap";
 export * from "./bounds";
+export * from "./brand";
 export * from "./colors";
 export * from "./constants";
 export * from "./font-metadata";

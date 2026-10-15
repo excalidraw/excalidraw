@@ -15,6 +15,9 @@ export interface ExportedDataState {
   type: string;
   version: number;
   source: string;
+  /** URL of the official Excalidraw brand icon, for tooling that wants to
+   * display a consistent icon for the file (see `getExportIconUrl`). */
+  icon: string;
   elements: readonly ExcalidrawElement[];
   appState: ReturnType<typeof cleanAppStateForExport>;
   files: BinaryFiles | undefined;
@@ -36,6 +39,8 @@ export interface ImportedDataState {
   type?: string;
   version?: number;
   source?: string;
+  /** optional for backward compat with files exported before this field existed */
+  icon?: string;
   elements?: readonly ExcalidrawElement[] | null;
   appState?: Readonly<
     Partial<

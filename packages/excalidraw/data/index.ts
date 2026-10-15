@@ -7,6 +7,7 @@ import {
   cloneJSON,
   SVG_DOCUMENT_PREAMBLE,
   arrayToMap,
+  withExportFilenameBrandPrefix,
 } from "@excalidraw/common";
 
 import { getNonDeletedElements } from "@excalidraw/element";
@@ -104,7 +105,7 @@ export const exportCanvas = async (
     exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
     viewBackgroundColor,
-    name = appState.name || DEFAULT_FILENAME,
+    name = withExportFilenameBrandPrefix(appState.name || DEFAULT_FILENAME),
     fileHandle = null,
     exportingFrame = null,
   }: {
