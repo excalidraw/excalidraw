@@ -964,11 +964,18 @@ export class AppSelectionTool {
           }
         }
 
+        // Frame children move along with their frame, so they must not be
+        // used as snap references while dragging it
+        const draggedElements = this.app.scene.getSelectedElements({
+          selectedElementIds: this.app.state.selectedElementIds,
+          includeElementsInFrames: true,
+        });
+
         // Snap cache *must* be synchronously popuplated before initial drag,
         // otherwise the first drag even will not snap, causing a jump before
         // it snaps to its position if previously snapped already.
-        this.app.maybeCacheVisibleGaps(event, selectedElements);
-        this.app.maybeCacheReferenceSnapPoints(event, selectedElements);
+        this.app.maybeCacheVisibleGaps(event, draggedElements);
+        this.app.maybeCacheReferenceSnapPoints(event, draggedElements);
 
         const { snapOffset, snapLines } = snapDraggedElements(
           originalElements,
