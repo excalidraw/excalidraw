@@ -100,6 +100,12 @@ describe("findShapeByKey()", () => {
     expect(findShapeByKey("1", app)).toBe("lasso");
   });
 
+  it("lasso has a direct shortcut", () => {
+    const app = appWithPreferredTool("selection");
+
+    expect(findShapeByKey("c", app)).toBe("lasso");
+  });
+
   it("letter shortcuts are CapsLock-insensitive", () => {
     const app = appWithPreferredTool("selection");
 
