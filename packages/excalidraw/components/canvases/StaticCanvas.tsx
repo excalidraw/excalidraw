@@ -66,6 +66,7 @@ const StaticCanvas = (props: StaticCanvasProps) => {
         visibleElements: props.visibleElements,
         appState: props.appState,
         renderConfig: props.renderConfig,
+        canvasNonce: props.canvasNonce,
       },
       isRenderThrottlingEnabled(),
     );

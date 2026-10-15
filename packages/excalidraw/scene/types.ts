@@ -91,6 +91,9 @@ export type StaticSceneRenderConfig = {
   scale: number;
   appState: StaticCanvasAppState;
   renderConfig: StaticCanvasRenderConfig;
+  /** changes whenever the rendered elements do; lets a pan be painted
+   *  incrementally over the last frame when it's all that changed */
+  canvasNonce?: string;
 };
 
 export type InteractiveSceneRenderAnimationState = {
