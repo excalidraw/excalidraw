@@ -9,7 +9,11 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import type { MaybePromise } from "@excalidraw/common/utility-types";
 
-import { cleanAppStateForExport, clearAppStateForDatabase } from "../appState";
+import {
+  cleanAppStateForExport,
+  clearAppStateForDatabase,
+  clearAppStateForLocalStorage,
+} from "../appState";
 
 import { isImageFileHandle, loadFromBlob } from "./blob";
 import { fileOpen, fileSave } from "./filesystem";
@@ -53,7 +57,7 @@ export const serializeAsJSON = (
   elements: readonly ExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
-  type: "local" | "database",
+  type: "local" | "database" | "browser",
 ): string => {
   const data: ExportedDataState = {
     type: EXPORT_DATA_TYPES.excalidraw,
@@ -63,9 +67,11 @@ export const serializeAsJSON = (
     appState:
       type === "local"
         ? cleanAppStateForExport(appState)
-        : clearAppStateForDatabase(appState),
+        : type === "browser"
+          ? clearAppStateForLocalStorage(appState)
+          : clearAppStateForDatabase(appState),
     files:
-      type === "local"
+      type === "local" || type === "browser"
         ? filterOutDeletedFiles(elements, files)
         : // will be stripped from JSON
           undefined,
