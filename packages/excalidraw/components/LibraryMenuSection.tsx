@@ -8,7 +8,7 @@ import { useTransition } from "../hooks/useTransition";
 import { EmptyLibraryUnit, LibraryUnit } from "./LibraryUnit";
 
 import type { SvgCache } from "../hooks/useLibraryItemSvg";
-import type { LibraryItem } from "../types";
+import type { BinaryFiles, LibraryItem } from "../types";
 import type { ReactNode } from "react";
 
 type LibraryOrPendingItem = readonly (
@@ -26,6 +26,7 @@ interface Props {
   onItemDrag: (id: LibraryItem["id"], event: React.DragEvent) => void;
   isItemSelected: (id: LibraryItem["id"] | null) => boolean;
   svgCache: SvgCache;
+  files: BinaryFiles;
   itemsRenderedPerBatch: number;
   /** larger items with their name below */
   showNames?: boolean;
@@ -58,6 +59,7 @@ export const LibraryMenuSection = memo(
     isItemSelected,
     onClick,
     svgCache,
+    files,
     itemsRenderedPerBatch,
     showNames,
   }: Props) => {
@@ -78,6 +80,7 @@ export const LibraryMenuSection = memo(
           return i < index ? (
             <LibraryUnit
               elements={item?.elements}
+              files={"files" in item ? item.files : files}
               isPending={!item?.id && !!item?.elements}
               onClick={onClick}
               svgCache={svgCache}

@@ -44,6 +44,7 @@ import { Button } from "./Button";
 import type { ExcalidrawLibraryIds } from "../data/types";
 
 import type {
+  BinaryFiles,
   ExcalidrawProps,
   LibraryItem,
   LibraryItems,
@@ -60,6 +61,7 @@ const CACHED_ITEMS_RENDERED_PER_BATCH = 64;
 export default function LibraryMenuItems({
   isLoading,
   libraryItems,
+  files,
   onAddToLibrary,
   onInsertLibraryItems,
   pendingElements,
@@ -71,6 +73,7 @@ export default function LibraryMenuItems({
 }: {
   isLoading: boolean;
   libraryItems: LibraryItems;
+  files: BinaryFiles;
   pendingElements: LibraryItem["elements"];
   onInsertLibraryItems: (libraryItems: LibraryItems) => void;
   onAddToLibrary: (elements: LibraryItem["elements"]) => void;
@@ -295,6 +298,7 @@ export default function LibraryMenuItems({
               onClick={onAddToLibraryClick}
               isItemSelected={isItemSelected}
               svgCache={svgCache}
+              files={files}
             />
           )}
           <LibraryMenuSection
@@ -305,6 +309,7 @@ export default function LibraryMenuItems({
             onClick={onItemClick}
             isItemSelected={isItemSelected}
             svgCache={svgCache}
+            files={files}
           />
         </LibraryMenuSectionGrid>
       )}
@@ -327,6 +332,7 @@ export default function LibraryMenuItems({
             onClick={onItemClick}
             isItemSelected={isItemSelected}
             svgCache={svgCache}
+            files={files}
           />
         </LibraryMenuSectionGrid>
       )}
@@ -360,6 +366,7 @@ export default function LibraryMenuItems({
             onClick={onItemClick}
             isItemSelected={isItemSelected}
             svgCache={svgCache}
+            files={files}
             showNames
           />
         </LibraryMenuSectionGrid>

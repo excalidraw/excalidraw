@@ -545,7 +545,6 @@ export const DEFAULT_SIDEBAR = {
 export const LIBRARY_DISABLED_TYPES = new Set([
   "iframe",
   "embeddable",
-  "image",
 ] as const);
 
 // use these constants to easily identify reference sites

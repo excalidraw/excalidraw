@@ -37,6 +37,7 @@ import { restoreLibraryItems } from "./restore";
 import type App from "../components/App";
 
 import type {
+  BinaryFiles,
   LibraryItems,
   LibraryItem,
   ExcalidrawImperativeAPI,
@@ -154,6 +155,27 @@ export const mergeLibraryItems = (
   }
 
   return [...newItems, ...localItems];
+};
+
+export const getFilesForElements = (
+  elements: readonly ExcalidrawElement[],
+  files: BinaryFiles,
+): BinaryFiles => {
+  const result: BinaryFiles = {};
+  for (const element of elements) {
+    if (element.type === "image" && element.fileId && files[element.fileId]) {
+      result[element.fileId] = files[element.fileId];
+    }
+  }
+  return result;
+};
+
+export const getLibraryItemsFiles = (items: LibraryItems): BinaryFiles => {
+  const files: BinaryFiles = {};
+  for (const item of items) {
+    Object.assign(files, item.files);
+  }
+  return files;
 };
 
 /**

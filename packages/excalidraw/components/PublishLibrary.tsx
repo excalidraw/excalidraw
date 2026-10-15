@@ -64,7 +64,7 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
   for (const [index, item] of libraryItems.entries()) {
     const itemCanvas = await exportToCanvas({
       elements: item.elements,
-      files: null,
+      files: item.files || null,
       maxWidthOrHeight: BOX_SIZE,
     });
 
@@ -133,7 +133,7 @@ const SingleLibraryItem = ({
           viewBackgroundColor: "#fff",
           exportBackground: true,
         },
-        files: null,
+        files: libItem.files || null,
         skipInliningFonts: true,
       });
       node.innerHTML = svg.outerHTML;

@@ -3,6 +3,7 @@ import { deepCopyElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
+import { getFilesForElements } from "../data/library";
 import { t } from "../i18n";
 
 import { register } from "./register";
@@ -32,12 +33,14 @@ export const actionAddToLibrary = register({
     return app.library
       .getLatestLibrary()
       .then((items) => {
+        const files = getFilesForElements(selectedElements, app.files);
         return app.library.setLibrary([
           {
             id: randomId(),
             status: "unpublished",
             elements: selectedElements.map(deepCopyElement),
             created: Date.now(),
+            ...(Object.keys(files).length ? { files } : {}),
           },
           ...items,
         ]);
