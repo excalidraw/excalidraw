@@ -1,5 +1,7 @@
 import clsx from "clsx";
 
+import { isChrome } from "@excalidraw/common";
+
 import { Button } from "../Button";
 import Spinner from "../Spinner";
 import { t } from "../../i18n";
@@ -128,13 +130,27 @@ export const TTDDialogOutput = ({
                 ? t("mermaid.loadErrorReload")
                 : t("mermaid.loadError")}
             </div>
-            {onRetryLoad && (
+            {/*
+             * TODO: Chrome (at least on v155) caches a failed dynamic import
+             * for the page's lifetime, so retrying the import can't succeed
+             * here -> reload instead
+             */}
+            {isChrome ? (
               <Button
                 className="ttd-dialog-panel-button"
-                onSelect={onRetryLoad}
+                onSelect={() => window.location.reload()}
               >
-                {t("chat.retry")}
+                {t("mermaid.reload")}
               </Button>
+            ) : (
+              onRetryLoad && (
+                <Button
+                  className="ttd-dialog-panel-button"
+                  onSelect={onRetryLoad}
+                >
+                  {t("chat.retry")}
+                </Button>
+              )
             )}
           </div>
         </div>
