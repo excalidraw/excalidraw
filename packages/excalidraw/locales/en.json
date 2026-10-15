@@ -609,7 +609,7 @@
   },
   "welcomeScreen": {
     "app": {
-      "center_heading": "Your drawings are saved in your browser's storage.",
+      "center_heading": "THIS IS ALISTER'S EXCALIDRAW INSTANCE, HOW GOOD IS THAT!.",
       "center_heading_line2": "Browser storage can be cleared unexpectedly.",
       "center_heading_line3": "Save your work to a file regularly to avoid losing it.",
       "center_heading_plus": "Did you want to go to the Excalidraw+ instead?",
