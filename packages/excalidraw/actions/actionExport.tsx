@@ -406,6 +406,7 @@ export const actionLoadScene = register({
         appState: loadedAppState,
         files,
       } = await loadFromJSON(appState, elements);
+      app.fontMetrics.remeasureTextOnceLoaded(loadedElements);
       return {
         elements: loadedElements,
         appState: loadedAppState,

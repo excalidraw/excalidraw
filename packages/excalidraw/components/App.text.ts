@@ -274,6 +274,11 @@ export class AppText {
       }
     };
 
+    const fontSession = this.app.fontMetrics.createEditSession(
+      element,
+      (originalText) => updateElement(originalText, false),
+    );
+
     this.textWysiwygSubmitHandler = textWysiwyg({
       canvas: this.app.canvas,
       getViewportCoords: (x, y) => {
@@ -294,8 +299,10 @@ export class AppText {
         if (isNonDeletedElement(element)) {
           updateBoundElements(element, this.app.scene);
         }
+        fontSession.onChange(nextOriginalText);
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
+        fontSession.end();
         this.textWysiwygSubmitHandler = null;
 
         const isDeleted = !nextOriginalText.trim();
