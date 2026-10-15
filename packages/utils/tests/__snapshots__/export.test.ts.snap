@@ -34,6 +34,7 @@ exports[`exportToSvg > with default arguments 1`] = `
   "currentItemOpacity": 100,
   "currentItemRoughness": 1,
   "currentItemRoundness": "sharp",
+  "currentItemRoundnessValue": null,
   "currentItemStartArrowhead": null,
   "currentItemStickynoteBackgroundColor": "#ffdf6b",
   "currentItemStickynoteStrokeColor": "#1e1e1e",
