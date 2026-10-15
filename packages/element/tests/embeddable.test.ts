@@ -243,3 +243,17 @@ describe("Google Drive video embedding", () => {
     ).toBe(true);
   });
 });
+it("should validate PhET domain by default", () => {
+  expect(
+    embeddableURLValidator(
+      "https://phet.colorado.edu/en/simulations/filter?type=html",
+      undefined,
+    ),
+  ).toBe(true);
+});
+
+it("should validate Vascak domain by default", () => {
+  expect(
+    embeddableURLValidator("https://www.vascak.cz/#kapitola0", undefined),
+  ).toBe(true);
+});
