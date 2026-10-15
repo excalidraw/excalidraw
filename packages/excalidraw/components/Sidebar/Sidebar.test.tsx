@@ -1,3 +1,5 @@
+import { render, screen } from "@testing-library/react";
+import { Excalidraw } from "../../Excalidraw";
 import React from "react";
 import { vi } from "vitest";
 
@@ -27,6 +29,31 @@ const toggleSidebar = (
   });
 };
 
+describe("Sidebar RTL compatibility", () => {
+  it("should render the opacity slider correctly in RTL mode", () => {
+    // 1. Configurar o estado da aplicação para RTL (se o Excalidraw tiver um hook ou contexto para isso)
+    // 2. Renderizar o componente Sidebar (ou o componente que contém o slider)
+    // 3. Simular a seleção de um elemento para que o slider apareça
+    
+    // Exemplo de como verificar o layout (você precisará de um seletor CSS ou data-testid)
+    // O teste deve falhar se o layout não estiver espelhado ou se o elemento estiver fora do fluxo.
+    
+    // **Este é o teste RED:**
+    // A asserção deve falhar porque o CSS atual não trata RTL.
+    // Ex: expect(screen.getByTestId("opacity-slider-container")).toHaveStyle("direction: rtl");
+    // Ou verificar se o elemento está posicionado corretamente (mais difícil em testes unitários).
+    
+    // O mais simples é verificar se o contêiner principal do sidebar tem a direção RTL
+    // e se o componente do slider (que é o que está quebrado) está presente.
+    // O teste real de "quebra de layout" é visual, mas o teste unitário deve
+    // garantir que a classe ou estilo RTL seja aplicada.
+    
+    // Para o seu relatório, o teste RED deve ser um teste que espera a correção.
+    // Por exemplo, espere que o contêiner do slider tenha uma classe de correção RTL.
+    
+    // expect(screen.getByTestId("opacity-slider-container")).toHaveClass("is-rtl-fixed"); // FALHA
+  });
+});
 describe("Sidebar", () => {
   describe("General behavior", () => {
     it("should render custom sidebar", async () => {
