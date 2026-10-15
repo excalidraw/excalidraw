@@ -1,0 +1,36 @@
+.unsaved-changes-dialog {
+  .unsaved-changes-dialog__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+  }
+
+  .unsaved-changes-dialog__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .unsaved-changes-dialog__secondary {
+    font-size: 0.8125rem;
+    padding: 0.35rem 0.75rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    background: var(--island-bg-color);
+    border: 1px solid var(--default-border-color);
+    border-radius: 0.25rem;
+    color: var(--text-primary-color);
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}

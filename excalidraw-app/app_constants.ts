@@ -48,6 +48,12 @@ export const STORAGE_KEYS = {
   IDB_LIBRARY: "excalidraw-library",
   IDB_TTD_CHATS: "excalidraw-ttd-chats",
 
+  LOCAL_STORAGE_COLLECTIONS_INDEX: "excalidraw-collections-index",
+  LOCAL_STORAGE_ACTIVE_COLLECTION_ID: "excalidraw-active-collection-id",
+  LOCAL_STORAGE_COLLECTIONS_OS_PATH: "excalidraw-collections-os-path",
+  LOCAL_STORAGE_COLLECTIONS_SORT: "excalidraw-collections-sort",
+  IDB_COLLECTIONS: "excalidraw-collections",
+
   // do not use apart from migrations
   __LEGACY_LOCAL_STORAGE_LIBRARY: "excalidraw-library",
 } as const;
