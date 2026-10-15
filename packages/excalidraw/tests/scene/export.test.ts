@@ -5,6 +5,8 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
+  MIME_TYPES,
+  SVG_DOCUMENT_PREAMBLE,
 } from "@excalidraw/common";
 
 import { pointFrom } from "@excalidraw/math";
@@ -197,6 +199,28 @@ describe("exportToSvg", () => {
       null,
     );
     expect(svgElement.innerHTML).toMatchSnapshot();
+  });
+
+  it("serializes text with non-breaking spaces as valid XML (#1743)", async () => {
+    const svgElement = await exportUtils.exportToSvg(
+      [
+        API.createElement({
+          type: "text",
+          text: "a b",
+          width: 100,
+          height: 20,
+        }),
+      ],
+      DEFAULT_OPTIONS,
+      null,
+    );
+
+    const doc = new DOMParser().parseFromString(
+      SVG_DOCUMENT_PREAMBLE + exportUtils.serializeSvg(svgElement),
+      MIME_TYPES.svg,
+    );
+    expect(doc.querySelector("parsererror")).toBeNull();
+    expect(doc.querySelector("text")?.textContent).toBe("a b");
   });
 
   // #11439: a perfectly horizontal/vertical arrow has a zero-size bounding box.
