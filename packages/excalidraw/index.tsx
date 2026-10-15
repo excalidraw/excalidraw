@@ -89,6 +89,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     activeTool,
     zenModeEnabled,
     gridModeEnabled,
+    gridType,
     libraryReturnUrl,
     theme,
     name,
@@ -231,6 +232,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           activeTool={activeTool}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
+          gridType={gridType}
           libraryReturnUrl={libraryReturnUrl}
           theme={theme}
           name={name}

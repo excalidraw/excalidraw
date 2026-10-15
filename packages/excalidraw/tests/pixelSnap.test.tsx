@@ -1,5 +1,7 @@
 import React from "react";
 
+import { GRID_TYPE } from "@excalidraw/common";
+
 import { Excalidraw } from "../index";
 import { snapScrollToDevicePixels } from "../renderer/helpers";
 
@@ -375,6 +377,79 @@ describe("grid pixel snap", () => {
           Math.abs(fraction(line.y) - 0.5) < 1e-6;
         expect(onHalfPixel).toBe(true);
       }
+    }
+  });
+
+  const getArcCenters = () => {
+    const context = GlobalTestState.canvas.getContext("2d") as any;
+    return (context.__getEvents() as any[])
+      .filter((event) => event.type === "arc")
+      .map(({ transform: [a, , , d, e, f], props }) => ({
+        scale: a,
+        x: a * props.x + e,
+        y: d * props.y + f,
+        radius: props.radius,
+      }));
+  };
+
+  it("centers dot grid points on whole device pixels and prunes minor dots when zoomed out", async () => {
+    await render(<Excalidraw />);
+    API.setAppState({
+      width: 800,
+      height: 600,
+      gridModeEnabled: true,
+      gridType: GRID_TYPE.DOTS,
+    });
+
+    (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
+    API.setAppState({
+      zoom: { value: 1 as NormalizedZoomValue },
+      scrollX: 3.3,
+      scrollY: -7.77,
+    });
+
+    const fullDots = await waitFor(() => {
+      const dots = getArcCenters().filter(
+        (dot) => Math.abs(dot.scale - 1) < 1e-9,
+      );
+      expect(dots.length).toBeGreaterThan(0);
+      return dots;
+    });
+
+    // Both minor and major dots are rendered at zoom 1.0 (approx 800/20 * 600/20 = ~1200 dots)
+    expect(fullDots.length).toBeGreaterThan(500);
+
+    for (const dot of fullDots) {
+      // Dot center must be on an integer device pixel
+      const diffFromIntX = Math.abs(dot.x - Math.round(dot.x));
+      const diffFromIntY = Math.abs(dot.y - Math.round(dot.y));
+      expect(diffFromIntX).toBeLessThan(1e-4);
+      expect(diffFromIntY).toBeLessThan(1e-4);
+    }
+
+    // Zoom out: minor dots (< 14px screen pitch) must be pruned
+    (GlobalTestState.canvas.getContext("2d") as any).__clearEvents();
+    API.setAppState({
+      zoom: { value: 0.5 as NormalizedZoomValue },
+      scrollX: 3.3,
+      scrollY: -7.77,
+    });
+
+    const prunedDots = await waitFor(() => {
+      const dots = getArcCenters().filter(
+        (dot) => Math.abs(dot.scale - 0.5) < 1e-9,
+      );
+      expect(dots.length).toBeGreaterThan(0);
+      return dots;
+    });
+
+    // Only major dots remain (spaced at 100px: approx 800/50 * 600/50 = ~192 dots)
+    expect(prunedDots.length).toBeLessThan(fullDots.length / 5);
+    for (const dot of prunedDots) {
+      const diffFromIntX = Math.abs(dot.x - Math.round(dot.x));
+      const diffFromIntY = Math.abs(dot.y - Math.round(dot.y));
+      expect(diffFromIntX).toBeLessThan(1e-4);
+      expect(diffFromIntY).toBeLessThan(1e-4);
     }
   });
 });

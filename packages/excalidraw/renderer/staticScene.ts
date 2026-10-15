@@ -2,6 +2,7 @@ import {
   applyDarkModeFilter,
   COLOR_WHITE,
   FRAME_STYLE,
+  GRID_TYPE,
   THEME,
   throttleRAF,
 } from "@excalidraw/common";
@@ -62,6 +63,17 @@ const GridLineColor = {
   [THEME.DARK]: {
     bold: applyDarkModeFilter("#dddddd"),
     regular: applyDarkModeFilter("#e5e5e5"),
+  },
+} as const;
+
+const DotGridColor = {
+  [THEME.LIGHT]: {
+    bold: "#b8b8b8",
+    regular: "#cccccc",
+  },
+  [THEME.DARK]: {
+    bold: applyDarkModeFilter("#b8b8b8"),
+    regular: applyDarkModeFilter("#cccccc"),
   },
 } as const;
 
@@ -159,6 +171,109 @@ const strokeGrid = (
     context.lineTo(Math.ceil(offsetX + width + gridSize * 2), position);
     context.stroke();
   }
+  context.restore();
+};
+
+const renderDotGrid = (
+  context: CanvasRenderingContext2D,
+  /** grid cell pixel size */
+  gridSize: number,
+  /** setting to 1 will disable bold lines / major grid */
+  gridStep: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  theme: StaticCanvasRenderConfig["theme"],
+  width: number,
+  height: number,
+  scale: number,
+) => {
+  const actualGridSize = gridSize * zoom.value;
+  const majorGridSize = gridStep * gridSize;
+  const devicePixels = zoom.value * scale;
+
+  // Cut minor dots if screen pitch < 14px to eliminate visual noise and lag
+  const renderMinorDots = actualGridSize >= 14;
+
+  const snapCoord = (pos: number) => {
+    return Math.round(pos * devicePixels) / devicePixels;
+  };
+
+  // Clamped dot radii (computed in device pixels, converted to scene units)
+  const majorRadiusDevice = Math.max(
+    1,
+    Math.min(2.5 * scale, 1.25 * devicePixels),
+  );
+  const minorRadiusDevice = Math.max(
+    0.6,
+    Math.min(1.75 * scale, 0.75 * devicePixels),
+  );
+
+  const majorRadiusScene = majorRadiusDevice / devicePixels;
+  const minorRadiusScene = minorRadiusDevice / devicePixels;
+
+  const offsetX = (scrollX % gridSize) - gridSize;
+  const offsetY = (scrollY % gridSize) - gridSize;
+  const minX = offsetX;
+  const maxX = offsetX + width + gridSize * 2;
+  const minY = offsetY;
+  const maxY = offsetY + height + gridSize * 2;
+
+  context.save();
+
+  // 1. Minor dots batch (single path / single fill)
+  if (renderMinorDots) {
+    context.beginPath();
+    context.fillStyle = DotGridColor[theme].regular;
+    for (let x = minX; x < maxX; x += gridSize) {
+      const isMajorX =
+        gridStep > 1 && Math.round(x - scrollX) % majorGridSize === 0;
+      const snappedX = snapCoord(x);
+
+      for (let y = minY; y < maxY; y += gridSize) {
+        const isMajorY =
+          gridStep > 1 && Math.round(y - scrollY) % majorGridSize === 0;
+        if (isMajorX && isMajorY) {
+          continue; // Drawn in major batch
+        }
+
+        const snappedY = snapCoord(y);
+        context.moveTo(snappedX + minorRadiusScene, snappedY);
+        context.arc(snappedX, snappedY, minorRadiusScene, 0, Math.PI * 2);
+      }
+    }
+    context.fill();
+  }
+
+  // 2. Major dots batch (steps up interval if zoomed way out < 14px)
+  let effectiveMajorStep = majorGridSize;
+  while (effectiveMajorStep * zoom.value < 14 && effectiveMajorStep < 10000) {
+    effectiveMajorStep *= gridStep;
+  }
+
+  const majorOffsetX = (scrollX % effectiveMajorStep) - effectiveMajorStep;
+  const majorOffsetY = (scrollY % effectiveMajorStep) - effectiveMajorStep;
+
+  context.beginPath();
+  context.fillStyle = DotGridColor[theme].bold;
+  for (
+    let x = majorOffsetX;
+    x < majorOffsetX + width + effectiveMajorStep * 2;
+    x += effectiveMajorStep
+  ) {
+    const snappedX = snapCoord(x);
+    for (
+      let y = majorOffsetY;
+      y < majorOffsetY + height + effectiveMajorStep * 2;
+      y += effectiveMajorStep
+    ) {
+      const snappedY = snapCoord(y);
+      context.moveTo(snappedX + majorRadiusScene, snappedY);
+      context.arc(snappedX, snappedY, majorRadiusScene, 0, Math.PI * 2);
+    }
+  }
+  context.fill();
+
   context.restore();
 };
 
@@ -311,18 +426,33 @@ const _renderStaticScene = ({
 
   // Grid
   if (renderGrid) {
-    strokeGrid(
-      context,
-      appState.gridSize,
-      appState.gridStep,
-      appState.scrollX,
-      appState.scrollY,
-      appState.zoom,
-      renderConfig.theme,
-      normalizedWidth / appState.zoom.value,
-      normalizedHeight / appState.zoom.value,
-      scale,
-    );
+    if (appState.gridType === GRID_TYPE.DOTS) {
+      renderDotGrid(
+        context,
+        appState.gridSize,
+        appState.gridStep,
+        appState.scrollX,
+        appState.scrollY,
+        appState.zoom,
+        renderConfig.theme,
+        normalizedWidth / appState.zoom.value,
+        normalizedHeight / appState.zoom.value,
+        scale,
+      );
+    } else {
+      strokeGrid(
+        context,
+        appState.gridSize,
+        appState.gridStep,
+        appState.scrollX,
+        appState.scrollY,
+        appState.zoom,
+        renderConfig.theme,
+        normalizedWidth / appState.zoom.value,
+        normalizedHeight / appState.zoom.value,
+        scale,
+      );
+    }
   }
 
   const groupsToBeAddedToFrame = new Set<string>();

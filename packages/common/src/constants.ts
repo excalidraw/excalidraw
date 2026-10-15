@@ -296,6 +296,15 @@ export const CANVAS_ONLY_ACTIONS = ["selectAll"];
 export const DEFAULT_GRID_SIZE = 20;
 export const DEFAULT_GRID_STEP = 5;
 
+export const GRID_TYPE = {
+  MESH: "mesh",
+  DOTS: "dots",
+} as const;
+
+export type GridType = typeof GRID_TYPE[keyof typeof GRID_TYPE];
+
+export const DEFAULT_GRID_TYPE: GridType = GRID_TYPE.MESH;
+
 export const IMAGE_MIME_TYPES = {
   svg: "image/svg+xml",
   png: "image/png",

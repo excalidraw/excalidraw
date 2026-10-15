@@ -1,4 +1,4 @@
-import { CODES, KEYS } from "@excalidraw/common";
+import { CODES, GRID_TYPE, KEYS } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
@@ -17,10 +17,25 @@ export const actionToggleGridMode = register({
     predicate: (appState) => appState.gridModeEnabled,
   },
   perform(elements, appState) {
+    let nextGridModeEnabled = appState.gridModeEnabled;
+    let nextGridType = appState.gridType;
+
+    if (!appState.gridModeEnabled) {
+      nextGridModeEnabled = true;
+      nextGridType = GRID_TYPE.MESH;
+    } else if (appState.gridType === GRID_TYPE.MESH) {
+      nextGridModeEnabled = true;
+      nextGridType = GRID_TYPE.DOTS;
+    } else {
+      nextGridModeEnabled = false;
+      nextGridType = GRID_TYPE.MESH;
+    }
+
     return {
       appState: {
         ...appState,
-        gridModeEnabled: !this.checked!(appState),
+        gridModeEnabled: nextGridModeEnabled,
+        gridType: nextGridType,
         objectsSnapModeEnabled: false,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
