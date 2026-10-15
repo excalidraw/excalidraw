@@ -54,6 +54,7 @@ import type {
   ElementsMap,
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
+  FixedPointBinding,
   ExcalidrawLineElement,
   ExcalidrawStickyNoteElement,
 } from "./types";
@@ -638,6 +639,8 @@ export const newArrowElement = <T extends boolean>(
     points?: ExcalidrawArrowElement["points"];
     elbowed?: T;
     fixedSegments?: ExcalidrawElbowArrowElement["fixedSegments"] | null;
+    startBinding?: FixedPointBinding | null;
+    endBinding?: FixedPointBinding | null;
   } & ElementConstructorOpts,
 ): T extends true
   ? NonDeleted<ExcalidrawElbowArrowElement>
@@ -646,8 +649,8 @@ export const newArrowElement = <T extends boolean>(
     return {
       ..._newElementBase<ExcalidrawElbowArrowElement>(opts.type, opts),
       points: opts.points || [],
-      startBinding: null,
-      endBinding: null,
+      startBinding: opts.startBinding || null,
+      endBinding: opts.endBinding || null,
       startArrowhead: opts.startArrowhead || null,
       endArrowhead: opts.endArrowhead || null,
       elbowed: true,
@@ -660,8 +663,8 @@ export const newArrowElement = <T extends boolean>(
   return {
     ..._newElementBase<ExcalidrawArrowElement>(opts.type, opts),
     points: opts.points || [],
-    startBinding: null,
-    endBinding: null,
+    startBinding: opts.startBinding || null,
+    endBinding: opts.endBinding || null,
     startArrowhead: opts.startArrowhead || null,
     endArrowhead: opts.endArrowhead || null,
     elbowed: false,
