@@ -71,6 +71,7 @@ const ImageExportModal = ({
   name,
   exportWithDarkMode,
 }: ImageExportModalProps) => {
+  const canCopyToClipboard = probablySupportsClipboardBlob || isFirefox;
   const hasSelection = isSomeElementSelected(
     elementsSnapshot,
     appStateSnapshot,
@@ -325,7 +326,7 @@ const ImageExportModal = ({
           >
             {t("imageExportDialog.button.exportToSvg")}
           </FilledButton>
-          {(probablySupportsClipboardBlob || isFirefox) && (
+          {canCopyToClipboard && (
             <FilledButton
               className="ImageExportModal__settings__buttons__button"
               label={t("imageExportDialog.title.copyPngToClipboard")}
@@ -346,6 +347,11 @@ const ImageExportModal = ({
             </FilledButton>
           )}
         </div>
+        {embedScene && canCopyToClipboard && (
+          <p className="ImageExportModal__settings__note">
+            {t("imageExportDialog.note.embedScene")}
+          </p>
+        )}
       </div>
     </div>
   );
