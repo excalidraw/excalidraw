@@ -2,6 +2,8 @@ import { useRef } from "react";
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 import { isFiniteNumber } from "@excalidraw/math";
 
+import { sanitizeMermaidRenderingError } from "../utils/mermaidError";
+
 import { useAtom } from "../../../editor-jotai";
 
 import { trackEvent } from "../../../analytics";
@@ -195,8 +197,12 @@ export const useTextGeneration = ({
         trackEvent("ai", "mermaid parse success", "ttd");
       } catch (error: any) {
         trackEvent("ai", "mermaid parse failed", "ttd");
+        const sanitized = sanitizeMermaidRenderingError(
+          error instanceof Error ? error : new Error(error.message),
+          generatedResponse ?? "",
+        );
         const _error = new Error(
-          error.message || t("chat.errors.mermaidParseError"),
+          sanitized.message || t("chat.errors.mermaidParseError"),
         );
         setAssistantError(_error.message, "parse");
         setError(_error);
