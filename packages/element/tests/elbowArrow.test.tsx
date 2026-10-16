@@ -1,4 +1,4 @@
-import { ARROW_TYPE } from "@excalidraw/common";
+import { ARROW_TYPE, DEFAULT_ZOOM } from "@excalidraw/common";
 import { pointFrom } from "@excalidraw/math";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { actionSelectAll } from "@excalidraw/excalidraw/actions";
@@ -188,8 +188,22 @@ describe("elbow arrow routing", () => {
     }) as NonDeleted<ExcalidrawElbowArrowElement>;
     API.setElements([rectangle1, rectangle2, arrow]);
 
-    bindBindingElement(arrow, rectangle1, "orbit", "start", h.scene);
-    bindBindingElement(arrow, rectangle2, "orbit", "end", h.scene);
+    bindBindingElement(
+      arrow,
+      rectangle1,
+      "orbit",
+      "start",
+      h.scene,
+      DEFAULT_ZOOM,
+    );
+    bindBindingElement(
+      arrow,
+      rectangle2,
+      "orbit",
+      "end",
+      h.scene,
+      DEFAULT_ZOOM,
+    );
 
     expect(arrow.startBinding).not.toBe(null);
     expect(arrow.endBinding).not.toBe(null);

@@ -153,4 +153,41 @@ describe("UIOptions.canvasHandleScale", () => {
     expect(h.elements[0].width).toBeGreaterThan(300);
     expect(h.elements[0].height).toBeGreaterThan(200);
   });
+
+  it("resizes multiple selected elements from the enlarged corner", async () => {
+    const first = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 100,
+      width: 100,
+      height: 100,
+    });
+    const second = API.createElement({
+      type: "rectangle",
+      x: 300,
+      y: 100,
+      width: 100,
+      height: 200,
+    });
+    await render(
+      <Excalidraw
+        UIOptions={{ canvasHandleScale: 2 }}
+        initialData={{
+          elements: [first, second],
+          appState: {
+            selectedElementIds: { [first.id]: true, [second.id]: true },
+          },
+        }}
+      />,
+    );
+
+    const mouse = new Pointer("mouse");
+    mouse.downAt(411, 311);
+    mouse.moveTo(451, 341);
+    mouse.upAt(451, 341);
+
+    expect(h.elements[0].width).toBeGreaterThan(100);
+    expect(h.elements[1].width).toBeGreaterThan(100);
+    expect(h.elements[1].height).toBeGreaterThan(200);
+  });
 });

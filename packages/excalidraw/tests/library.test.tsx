@@ -2,7 +2,7 @@ import { act, queryByTestId } from "@testing-library/react";
 import React from "react";
 import { vi } from "vitest";
 
-import { MIME_TYPES, ORIG_ID } from "@excalidraw/common";
+import { KEYS, MIME_TYPES, ORIG_ID } from "@excalidraw/common";
 
 import { getCommonBoundingBox } from "@excalidraw/element";
 
@@ -271,6 +271,66 @@ describe("library menu", () => {
         expect.objectContaining(strippedElement),
       ]);
     });
+  });
+});
+
+describe("library menu Escape (undocked sidebar)", () => {
+  const openLibraryWithItems = async () => {
+    const { container } = await render(<Excalidraw />);
+    await act(() =>
+      h.app.library.updateLibrary({
+        libraryItems: ["wall", "door"].map((name) => ({
+          id: name,
+          name,
+          status: "unpublished",
+          created: 1,
+          elements: [API.createElement({ type: "rectangle", id: name })],
+        })),
+        openLibraryMenu: true,
+      }),
+    );
+    const searchInput = await waitFor(() => {
+      const input = container.querySelector<HTMLInputElement>(
+        ".library-menu-items-container__search input",
+      );
+      expect(input).not.toBeNull();
+      return input!;
+    });
+    expect(h.state.openSidebar).not.toBe(null);
+    return { container, searchInput };
+  };
+
+  it("should clear an active search instead of closing the sidebar", async () => {
+    const { searchInput } = await openLibraryWithItems();
+
+    fireEvent.change(searchInput, { target: { value: "wall" } });
+    expect(searchInput.value).toBe("wall");
+
+    fireEvent.keyDown(searchInput, { key: KEYS.ESCAPE });
+    expect(h.state.openSidebar).not.toBe(null);
+    expect(searchInput.value).toBe("");
+
+    // with the search cleared, Escape closes the sidebar
+    fireEvent.keyDown(searchInput, { key: KEYS.ESCAPE });
+    expect(h.state.openSidebar).toBe(null);
+  });
+
+  it("should clear the item selection instead of closing the sidebar", async () => {
+    const { container, searchInput } = await openLibraryWithItems();
+
+    const itemDragger = await waitFor(() => {
+      const dragger = container.querySelector(".library-unit__dragger");
+      expect(dragger).not.toBeNull();
+      return dragger!;
+    });
+    fireEvent.click(itemDragger, { shiftKey: true });
+    await waitFor(() =>
+      expect(container.querySelector(".library-unit--selected")).not.toBe(null),
+    );
+
+    fireEvent.keyDown(searchInput, { key: KEYS.ESCAPE });
+    expect(container.querySelector(".library-unit--selected")).toBe(null);
+    expect(h.state.openSidebar).not.toBe(null);
   });
 });
 

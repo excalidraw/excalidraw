@@ -15,6 +15,8 @@ import {
   DEFAULT_TEXT_ALIGN,
   DEFAULT_VERTICAL_ALIGN,
   FONT_FAMILY,
+  FONT_METADATA,
+  FONT_TOP_PICKS_SLOTS,
   ROUNDNESS,
   DEFAULT_SIDEBAR,
   DEFAULT_ELEMENT_PROPS,
@@ -31,6 +33,7 @@ import {
   STROKE_WIDTH_KEYS,
   type StrokeWidthKey,
   isTransparent,
+  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 import {
   calculateFixedPointForNonElbowArrowBinding,
@@ -112,12 +115,7 @@ import {
   getNormalizedZoom,
 } from "../scene";
 
-import type {
-  AppState,
-  BinaryFiles,
-  LibraryItem,
-  NormalizedZoomValue,
-} from "../types";
+import type { AppState, BinaryFiles, LibraryItem } from "../types";
 import type { ImportedDataState, LegacyAppState } from "./types";
 
 type RestoredAppState = Omit<
@@ -297,6 +295,26 @@ const getFontFamilyByName = (fontFamilyName: string): FontFamilyValues => {
   return DEFAULT_FONT_FAMILY;
 };
 
+/**
+ * Line-height might not be specified either when creating elements
+ * programmatically, or when importing old diagrams. For the latter we want to
+ * detect the original line height, which will likely differ from our per-font
+ * fixed line height we now use, to maintain backward compatibility.
+ *
+ * Takes the element with the font properties already migrated: a diagram old
+ * enough to carry the legacy `font` prop has neither `fontSize` nor
+ * `fontFamily`, so detecting off the raw element divides by `undefined`.
+ */
+const restoreLineHeight = (
+  element: ExcalidrawTextElement,
+): ExcalidrawTextElement["lineHeight"] => {
+  const detected = element.height ? detectLineHeight(element) : null;
+
+  return isFiniteNumber(detected) && detected > 0
+    ? detected
+    : getLineHeight(element.fontFamily);
+};
+
 const repairBinding = <T extends ExcalidrawArrowElement>(
   element: T,
   binding: FixedPointBinding | null,
@@ -402,7 +420,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               boundElement,
               startOrEnd,
               elementsMap,
-              { value: 1 as NormalizedZoomValue },
+              DEFAULT_ZOOM,
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
         safeElement as NonDeleted<ExcalidrawArrowElement>,
@@ -549,19 +567,9 @@ export const restoreElement = (
       }
       const text = (typeof element.text === "string" && element.text) || "";
 
-      // line-height might not be specified either when creating elements
-      // programmatically, or when importing old diagrams.
-      // For the latter we want to detect the original line height which
-      // will likely differ from our per-font fixed line height we now use,
-      // to maintain backward compatibility.
       const lineHeight =
         element.lineHeight ||
-        (element.height
-          ? // detect line-height from current element height and font-size
-            detectLineHeight(element)
-          : // no element height likely means programmatic use, so default
-            // to a fixed line height
-            getLineHeight(element.fontFamily));
+        restoreLineHeight({ ...element, fontSize, fontFamily, text });
       element = restoreElementWithProperties(element, {
         fontSize,
         fontFamily,
@@ -1231,6 +1239,28 @@ const restoreColorTopPicksList = (value: unknown): readonly string[] | null => {
   return colors.size ? [...colors.values()] : null;
 };
 
+const restoreFontTopPicks = (
+  value: unknown,
+): readonly FontFamilyValues[] | null => {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+  const fontFamilies = new Set<FontFamilyValues>();
+  for (const fontFamily of value) {
+    const metadata =
+      typeof fontFamily === "number" ? FONT_METADATA[fontFamily] : undefined;
+    // only families the font picker lists (no internal or fallback fonts)
+    if (!metadata || metadata.private || metadata.fallback) {
+      continue;
+    }
+    fontFamilies.add(fontFamily as FontFamilyValues);
+    if (fontFamilies.size >= FONT_TOP_PICKS_SLOTS) {
+      break;
+    }
+  }
+  return fontFamilies.size ? [...fontFamilies] : null;
+};
+
 export const restoreAppState = (
   appState: ImportedDataState["appState"],
   localAppState: Partial<AppState> | null | undefined,
@@ -1295,6 +1325,7 @@ export const restoreAppState = (
       nextAppState.colorTopPicks?.stickyNoteBackground,
     ),
   };
+  nextAppState.fontTopPicks = restoreFontTopPicks(nextAppState.fontTopPicks);
 
   // legacy
   if ((appState as any).currentItemStrokeWidth !== undefined) {

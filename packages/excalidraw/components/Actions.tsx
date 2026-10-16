@@ -94,31 +94,24 @@ const AlignFieldset = ({
   return (
     <fieldset>
       <legend>{t("labels.align")}</legend>
-      <div className="buttonList">
-        {isRTL ? (
-          <>
-            {renderAction("alignRight")}
-            {renderAction("alignHorizontallyCentered")}
-            {renderAction("alignLeft")}
-          </>
-        ) : (
-          <>
-            {renderAction("alignLeft")}
-            {renderAction("alignHorizontallyCentered")}
-            {renderAction("alignRight")}
-          </>
-        )}
-        {showDistribute && renderAction("distributeHorizontally")}
-        {/* breaks the row ˇˇ */}
-        <div style={{ flexBasis: "100%", height: 0 }} />
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: ".5rem",
-            marginTop: "-0.5rem",
-          }}
-        >
+      <div className="buttonList align-buttons">
+        <div className="align-buttons__row">
+          {isRTL ? (
+            <>
+              {renderAction("alignRight")}
+              {renderAction("alignHorizontallyCentered")}
+              {renderAction("alignLeft")}
+            </>
+          ) : (
+            <>
+              {renderAction("alignLeft")}
+              {renderAction("alignHorizontallyCentered")}
+              {renderAction("alignRight")}
+            </>
+          )}
+          {showDistribute && renderAction("distributeHorizontally")}
+        </div>
+        <div className="align-buttons__row">
           {renderAction("alignTop")}
           {renderAction("alignVerticallyCentered")}
           {renderAction("alignBottom")}
@@ -904,10 +897,14 @@ export const UndoRedoActions = ({
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
     <div className="undo-button-container">
-      <Tooltip label={t("buttons.undo")}>{renderAction("undo")}</Tooltip>
+      <Tooltip label={t("buttons.undo")} delay>
+        {renderAction("undo")}
+      </Tooltip>
     </div>
     <div className="redo-button-container">
-      <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
+      <Tooltip label={t("buttons.redo")} delay>
+        {renderAction("redo")}
+      </Tooltip>
     </div>
   </div>
 );

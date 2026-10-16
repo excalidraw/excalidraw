@@ -47,7 +47,7 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    background-color: rgba(#121212, 0.2);
+    background-color: var(--overlay-bg-color);
 
     animation: Modal__background__fade-in 0.1s linear forwards;
   }

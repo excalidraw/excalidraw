@@ -117,6 +117,38 @@ describe("Enter and leave the crop editor", () => {
     Keyboard.keyDown(KEYS.ESCAPE);
     expect(h.state.croppingElementId).toBe(null);
   });
+
+  it("leave the editor by clicking where the rotation handle would be", () => {
+    const image = h.elements[0];
+    Keyboard.keyDown(KEYS.ENTER);
+
+    // (the editor draws no rotation handle)
+    mouse.clickAt(image.x + image.width / 2, image.y - 16);
+
+    expect(h.state.croppingElementId).toBe(null);
+  });
+
+  it("stay in the editor on shift-clicking the image", () => {
+    const image = h.elements[0];
+    Keyboard.keyDown(KEYS.ENTER);
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.clickAt(image.x + 50, image.y + 50);
+    });
+
+    expect(h.state.croppingElementId).toBe(image.id);
+    expect(h.state.selectedElementIds).toEqual({ [image.id]: true });
+  });
+
+  it("stay in the editor on clicking a crop handle", () => {
+    const image = h.elements[0];
+    Keyboard.keyDown(KEYS.ENTER);
+
+    // the east handle
+    mouse.clickAt(image.x + image.width, image.y + image.height / 2);
+
+    expect(h.state.croppingElementId).toBe(image.id);
+  });
 });
 
 describe("Crop an image", () => {
@@ -134,6 +166,174 @@ describe("Crop an image", () => {
     expect(image.width).toBeLessThan(initialWidth);
     UI.crop(image, "n", naturalWidth, naturalHeight, [0, initialHeight / 2]);
     expect(image.height).toBeLessThan(initialHeight);
+  });
+
+  it("In the crop editor, dragging a handle crops the image, and dragging the image moves it within its crop (along one axis with shift)", () => {
+    const image = API.createElement({
+      type: "image",
+      width: 200,
+      height: 100,
+      fileId: "file",
+    });
+    API.setElements([image]);
+    // the file loaded, at twice the element's size
+    const htmlImage = new Image();
+    Object.defineProperties(htmlImage, {
+      naturalWidth: { value: 400 },
+      naturalHeight: { value: 200 },
+    });
+    h.app.imageCache.set(image.fileId!, {
+      image: htmlImage,
+      mimeType: "image/png",
+    });
+    API.setSelectedElements([image]);
+    Keyboard.keyDown(KEYS.ENTER);
+    expect(h.state.croppingElementId).toBe(image.id);
+
+    UI.resize(image, "nw", [50, 25]);
+
+    expect(API.getElement(image)).toMatchObject({ x: 50, y: 25, width: 150 });
+    expect(API.getElement(image).crop).toMatchObject({ x: 100, y: 50 });
+
+    // 20px to the right = 40px of the file, at twice the element's size
+    mouse.downAt(100, 50);
+    mouse.move(20, 0);
+    mouse.upAt();
+
+    expect(API.getElement(image)).toMatchObject({ x: 50, y: 25, width: 150 });
+    expect(API.getElement(image).crop).toMatchObject({ x: 60, y: 50 });
+
+    Keyboard.withModifierKeys({ shift: true }, () => {
+      mouse.downAt(100, 50);
+      mouse.move(10, 4);
+      mouse.upAt();
+    });
+
+    expect(API.getElement(image).crop).toMatchObject({ x: 40, y: 50 });
+
+    // dragged past the file's edge, it moves back as soon as dragged back
+    mouse.downAt(100, 50);
+    mouse.move(40, 0);
+    expect(API.getElement(image).crop).toMatchObject({ x: 0 });
+    mouse.move(-10, 0);
+    mouse.upAt();
+
+    expect(API.getElement(image).crop).toMatchObject({ x: 20, y: 50 });
+  });
+
+  it("In the crop editor, alt-dragging a handle crops the image from its center", () => {
+    const image = API.createElement({
+      type: "image",
+      width: 200,
+      height: 100,
+      fileId: "file",
+    });
+    API.setElements([image]);
+    // the file loaded, at twice the element's size
+    const htmlImage = new Image();
+    Object.defineProperties(htmlImage, {
+      naturalWidth: { value: 400 },
+      naturalHeight: { value: 200 },
+    });
+    h.app.imageCache.set(image.fileId!, {
+      image: htmlImage,
+      mimeType: "image/png",
+    });
+    API.setSelectedElements([image]);
+    Keyboard.keyDown(KEYS.ENTER);
+
+    // as resizing, pressing alt mid-drag crops about the center the drag
+    // started with, and releasing it, from the opposite side again
+    mouse.downAt(200, 50);
+    mouse.moveTo(170, 50);
+    expect(API.getElement(image)).toMatchObject({ x: 0, width: 170 });
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      Keyboard.keyDown(KEYS.ALT);
+    });
+    expect(API.getElement(image)).toMatchObject({ x: 30, width: 140 });
+    Keyboard.keyUp(KEYS.ALT);
+    expect(API.getElement(image)).toMatchObject({ x: 0, width: 170 });
+    mouse.moveTo(200, 50);
+    mouse.upAt();
+
+    UI.resize(image, "e", [-30, 0], { alt: true });
+
+    expect(API.getElement(image)).toMatchObject({ x: 30, width: 140 });
+    // 30px off each side = 60px of the file, at twice the element's size
+    expect(API.getElement(image).crop).toMatchObject({ x: 60, width: 280 });
+
+    // keeping the aspect ratio too
+    UI.resize(image, "e", [-35, 0], { alt: true, shift: true });
+
+    expect(API.getElement(image)).toMatchObject({
+      x: 65,
+      y: 25,
+      width: 70,
+      height: 50,
+    });
+  });
+
+  it("In the crop editor, double-clicking a handle uncrops its side(s), mirrored with alt", () => {
+    // the middle of an image twice the element's size, at (0, 0)
+    const image = API.createElement({
+      type: "image",
+      x: 50,
+      y: 25,
+      width: 100,
+      height: 50,
+      fileId: "file",
+    });
+    API.setElements([image]);
+    API.updateElement(image, {
+      crop: {
+        x: 100,
+        y: 50,
+        width: 200,
+        height: 100,
+        naturalWidth: 400,
+        naturalHeight: 200,
+      },
+    });
+    // bound near the image's south-east corner
+    const arrow = UI.createElement("arrow", {
+      x: 140,
+      y: 300,
+      width: 0,
+      height: -230,
+    });
+    API.setSelectedElements([image]);
+    Keyboard.keyDown(KEYS.ENTER);
+
+    // the north-east handle
+    mouse.doubleClickAt(150, 25);
+
+    expect(API.getElement(image)).toMatchObject({
+      x: 50,
+      y: 0,
+      width: 150,
+      height: 75,
+    });
+    expect(API.getElement(image).crop).toMatchObject({ y: 0, width: 300 });
+    // the arrow following the image
+    const { x, points } = API.getElement(arrow);
+    expect(x + points[1][0]).toBeCloseTo(185);
+
+    Keyboard.undo();
+
+    expect(API.getElement(image)).toMatchObject({ y: 25, width: 100 });
+
+    // the west handle, and so the east one
+    Keyboard.withModifierKeys({ alt: true }, () => {
+      mouse.doubleClickAt(50, 50);
+    });
+
+    expect(API.getElement(image)).toMatchObject({
+      x: 0,
+      y: 25,
+      width: 200,
+      height: 50,
+    });
+    expect(API.getElement(image).crop).toMatchObject({ x: 0, width: 400 });
   });
 
   it("Cropping has minimal sizes", async () => {
@@ -272,13 +472,12 @@ describe("Cropping and other features", async () => {
       initialWidth / 2,
       initialHeight / 2,
     ]);
-    const cropBeforeResizing = image.crop;
     const cropBeforeResizingCloned = cloneJSON(image.crop) as ImageCrop;
-    expect(cropBeforeResizing).not.toBe(null);
+    expect(image.crop).not.toBe(null);
 
     UI.crop(image, "e", naturalWidth, naturalHeight, [200, 0]);
-    expect(cropBeforeResizing).toBe(image.crop);
     compareCrops(cropBeforeResizingCloned, image.crop!);
+    const cropBeforeResizing = image.crop;
 
     UI.resize(image, "s", [0, -100]);
     expect(cropBeforeResizing).toBe(image.crop);

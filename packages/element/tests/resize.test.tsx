@@ -734,6 +734,18 @@ describe("text element", () => {
     expect(text.fontSize).toBeCloseTo(fontSize * scale);
   });
 
+  it("resizes by a corner following the axis it grows most", async () => {
+    const text = UI.createElement("text");
+    await UI.editText(text, "hello\nworld");
+    const { width, height, fontSize } = text;
+    const scale = 60 / width + 1;
+    UI.resize(text, "se", [60, 5]);
+
+    expect(text.width).toBeCloseTo(width * scale);
+    expect(text.height).toBeCloseTo(height * scale);
+    expect(text.fontSize).toBeCloseTo(fontSize * scale);
+  });
+
   // TODO enable this test after adding single text element flipping
   it.skip("flips while resizing", async () => {
     const text = UI.createElement("text");

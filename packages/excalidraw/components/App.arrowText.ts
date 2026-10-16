@@ -3,7 +3,6 @@ import { CURSOR_TYPE, DRAGGING_THRESHOLD } from "@excalidraw/common";
 import {
   bindBindingElementToFixedPoint,
   dragNewTextElement,
-  getBoundTextElement,
   getEndpointBoundTextDragAnchor,
   getTextBindingForArrowEndpoint,
   getUnboundArrowEndpointAtPoint,
@@ -27,67 +26,23 @@ import type {
 } from "@excalidraw/element/types";
 
 import type App from "./App";
-import type { AppState, PointerDownState } from "../types";
+import type { PointerDownState } from "../types";
 
 /**
  * Text ↔ arrow interactions.
  *
- * With the text tool: the hover affordance showing where a click would attach
- * text to an arrow — a free endpoint (binds the arrow to a new text element
- * positioned against that endpoint) or the arrow's midpoint (adds a label
- * bound to the arrow) — and the endpoint-bound flavor of drag-sizing a new
- * text.
+ * With the text tool: the free endpoint a click would bind a new text to
+ * (`AppTextTool` resolves and shows it), the binding itself, and the
+ * endpoint-bound flavor of drag-sizing a new text.
  *
  * With the selection tool: dragging an arrow's existing label along the arrow
- * — the grab affordance, the drag itself, and where a double-click starts
- * editing a label the drag has moved.
+ * — the grab affordance and the drag itself.
  *
  * The scene-level logic lives in `@excalidraw/element`'s
  * `arrowEndpointText.ts` and `linearElementEditor.ts`.
  */
 export class AppArrowText {
   constructor(private app: App) {}
-
-  /**
-   * With the text tool active, an arrow under the cursor is a target for
-   * attaching text. Returns where the text would land (if anywhere), and keeps
-   * `appState.hoveredArrowTextAnchor` — which drives the highlight — in sync.
-   */
-  updateHoveredAnchor = (scenePointer: {
-    x: number;
-    y: number;
-  }): AppState["hoveredArrowTextAnchor"] => {
-    const hovered =
-      this.app.state.activeTool.type === "text" &&
-      !this.app.state.editingTextElement &&
-      !this.app.state.newElement
-        ? this.getAnchorAtPosition(scenePointer.x, scenePointer.y)
-        : null;
-
-    const previous = this.app.state.hoveredArrowTextAnchor;
-
-    if (
-      previous?.elementId !== hovered?.elementId ||
-      previous?.anchor !== hovered?.anchor
-    ) {
-      this.app.setState({ hoveredArrowTextAnchor: hovered });
-    }
-
-    return hovered;
-  };
-
-  /**
-   * Re-evaluates the hovered anchor at the last known pointer position — for
-   * events that change what a click would do without the pointer moving,
-   * i.e. the ctrl/cmd binding toggle. (Events that invalidate the anchor
-   * wholesale — tool switches, finalize, deselect — clear it directly
-   * instead.)
-   */
-  refresh = (): void => {
-    if (this.app.lastPointerMoveCoords) {
-      this.updateHoveredAnchor(this.app.lastPointerMoveCoords);
-    }
-  };
 
   /**
    * A free arrow endpoint a new text could be bound to. Binding an endpoint is
@@ -110,17 +65,17 @@ export class AppArrowText {
       return null;
     }
 
-    // The text tool edits before it creates: when a text element is the
-    // top-most hit at this position, a click edits that text, so a nearby
-    // endpoint must not be offered over it.
-    if (this.app.getTextElementAtPosition(x, y)) {
-      return null;
-    }
-
     // The endpoint scan only knows about arrows, so it happily reaches through
     // whatever is drawn on top of them. An element stacked above the arrow that
-    // the pointer actually hits owns the click — the text tool should label
-    // that element rather than bind the endpoint hidden behind it.
+    // the pointer actually hits owns the click — the text tool should edit or
+    // label that element rather than bind the endpoint hidden behind it. This
+    // includes text: a text stacked above the arrow keeps its edit behavior.
+    //
+    // The preference is z-aware on purpose. When the arrow is the top-most hit
+    // (e.g. drawn over an existing text), its endpoint has full preference
+    // over the whole hit circle — a z-blind "any text under the cursor wins"
+    // rule would make the affordance flicker between the endpoint anchor and
+    // text editing wherever a text bbox edge cuts into the circle.
     const hitElement = this.app.getElementAtPosition(x, y, {
       includeLockedElements: true,
     });
@@ -135,49 +90,6 @@ export class AppArrowText {
     }
 
     return endpoint;
-  }
-
-  /**
-   * Mirrors what `handleTextOnPointerDown` would do at this position, so the
-   * highlight can't promise something the click won't deliver.
-   */
-  private getAnchorAtPosition(
-    x: number,
-    y: number,
-  ): AppState["hoveredArrowTextAnchor"] {
-    const endpoint = this.getBindableEndpointAtPosition(x, y);
-
-    if (endpoint) {
-      return { elementId: endpoint.arrow.id, anchor: endpoint.startOrEnd };
-    }
-
-    const container = this.app.getTextBindableContainerAtPosition(x, y);
-
-    // Only arrows get a midpoint label anchor worth pointing at; other
-    // containers center the text in themselves, which needs no affordance.
-    // An arrow that already has a label is edited in place, not re-anchored.
-    if (
-      !isArrowElement(container) ||
-      getBoundTextElement(container, this.app.scene.getNonDeletedElementsMap())
-    ) {
-      return null;
-    }
-
-    // `getTextBindableContainerAtPosition` resolves an arrow anywhere in its
-    // bounding box, but a click only becomes a *label* when it also snaps to
-    // the arrow's center — off-center clicks drop a free-floating text
-    // instead. Gate on the same check so the highlight can't promise a label
-    // the click won't deliver.
-    const snappedToCenter = this.app.getTextWysiwygSnappedToCenterPosition(
-      x,
-      y,
-      this.app.state,
-      container,
-    );
-
-    return snappedToCenter
-      ? { elementId: container.id, anchor: "label" }
-      : null;
   }
 
   /**
@@ -318,35 +230,5 @@ export class AppArrowText {
     }
 
     return true;
-  }
-
-  /**
-   * Where a double-click on a labeled arrow should start text editing: the
-   * center of the label itself, which a label drag may have moved away from
-   * the arrow's midpoint. Null when the element is not a labeled arrow.
-   */
-  getLabelCenter(element: ExcalidrawElement): { x: number; y: number } | null {
-    const elementsMap = this.app.scene.getNonDeletedElementsMap();
-
-    if (!isArrowElement(element)) {
-      return null;
-    }
-
-    const boundTextElement = getBoundTextElement(element, elementsMap);
-
-    if (!boundTextElement) {
-      return null;
-    }
-
-    const { x, y } = LinearElementEditor.getBoundTextElementPosition(
-      element,
-      boundTextElement,
-      elementsMap,
-    );
-
-    return {
-      x: x + boundTextElement.width / 2,
-      y: y + boundTextElement.height / 2,
-    };
   }
 }

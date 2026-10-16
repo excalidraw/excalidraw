@@ -13,6 +13,13 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Selection API (2026-10-10) [#12258](https://github.com/excalidraw/excalidraw/pull/12258)
+
+- New `excalidrawAPI.selection`: `select(elements, opts?)`, `add(elements, opts?)`, `remove(elements, opts?)` and `clear(opts?)`, taking elements or their ids, one or many. Missing and deleted elements are skipped.
+- It follows the editor's rules: an element is selected with its group, a frame and its children aren't selected at the same time, and locked elements are skipped. Text editing and cropping end, and the link popup of a lone selected element with a link shows.
+- Options: `deep` selects the elements themselves rather than their groups, editing their group if they share one (as Ctrl/Cmd+click does); `includeLocked` selects locked elements too; `captureUpdate` records the change for undo as for `updateScene()` — by default it's recorded along with the next undoable change.
+- Like `updateScene()`, the change applies on the next render: read it back through `onChange()` or `getAppState()` after that. It works in view mode too, where the selection shows without the transform handles.
+
 ### Wheel navigation (2026-09-13) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
 - Scrolling while holding the wheel (middle) mouse button zooms the canvas around the pointer, the same as ctrl/cmd+wheel — a wheel-button pan can be zoomed one-handed, without reaching for a modifier.
@@ -30,6 +37,10 @@ Please add the latest change on the top under the correct section.
 - Resize semantics: a note's corners resize proportionally by default and scale the label's font ceiling with the note (Shift frees them); its edges resize freely by default (Shift constrains them). Drag-creation is proportional by default too (Shift frees it) and never touches the font ceiling. Width-only gestures keep the base height, height gestures set it, aspect-locked multi-select and Stats group edits scale the ceiling; flips preserve everything. Arrows bound to a note follow it as it grows.
 
 ## Excalidraw API
+
+### `setViewport` stops following a collaborator (2026-09-26) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+- `setViewport` now asks to stop following a collaborator whenever it navigates (`onUserFollow` with `action: "UNFOLLOW"`, if `userToFollow` is set), as a user's pan or zoom does. `setViewport(null)` (clearing a lock) and a target that doesn't resolve don't navigate, and leave following alone.
 
 ### `onDuplicate` can replace and veto duplicates (2026-09-18) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
 
