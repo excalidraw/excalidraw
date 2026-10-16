@@ -39,7 +39,7 @@ import { tryParseSpreadsheet } from "../charts";
 import { parseClipboard, parseDataTransferEvent } from "../clipboard";
 import { ImageURLToFile, SVGStringToFile } from "../data/blob";
 import { t } from "../i18n";
-import { isMaybeMermaidDefinition } from "../mermaid";
+import { isMaybeMermaidDefinition, replaceMermaidLineBreaks } from "../mermaid";
 import { withBatchedUpdates } from "../reactUtils";
 import { getShortcutKey } from "../shortcut";
 import { scrollBoundsIntoView } from "../viewport";
@@ -207,8 +207,22 @@ export class AppClipboard {
     if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
       const api = await import("@excalidraw/mermaid-to-excalidraw");
       try {
-        const { elements: skeletonElements, files = {} } =
+        const { elements: parsedElements, files = {} } =
           await api.parseMermaidToExcalidraw(data.text);
+
+        // mermaid supports <br> in node labels; the parser keeps them
+        // verbatim, so turn them into real newlines for the text elements
+        const skeletonElements = parsedElements.map((element) =>
+          element.label?.text
+            ? {
+                ...element,
+                label: {
+                  ...element.label,
+                  text: replaceMermaidLineBreaks(element.label.text as string),
+                },
+              }
+            : element,
+        );
 
         const elements = convertToExcalidrawElements(skeletonElements, {
           regenerateIds: true,
