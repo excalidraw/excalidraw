@@ -13,6 +13,7 @@ import { pointFrom, pointRotateRads, type LocalPoint } from "@excalidraw/math";
 import { TOOLS } from "../components/Tools";
 
 import { Excalidraw } from "../index";
+import { DEFAULT_SELECTION_COLOR } from "../renderer/helpers";
 import * as InteractiveCanvas from "../renderer/interactiveScene";
 import * as StaticScene from "../renderer/staticScene";
 
@@ -2027,5 +2028,88 @@ describe("deselecting", () => {
     expect(API.getSelectedElements()).toEqual([]);
     expect(h.state.editingGroupId).toBeNull();
     expect(h.state.selectedGroupIds).toEqual({});
+  });
+});
+
+describe("group selection border color", () => {
+  beforeEach(async () => {
+    await render(<Excalidraw />);
+  });
+
+  const createGroup = (locked = false) => {
+    const rect1 = API.createElement({
+      type: "rectangle",
+      x: 0,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+      locked,
+    });
+    const rect2 = API.createElement({
+      type: "rectangle",
+      x: 100,
+      y: 0,
+      width: 50,
+      height: 50,
+      groupIds: ["A"],
+      locked,
+    });
+    API.setElements([rect1, rect2]);
+    return [rect1, rect2];
+  };
+
+  // collects the stroke color of every dashed rectangle drawn on the
+  // interactive canvas while `fn` runs
+  const getDashedBorderColors = (fn: () => void) => {
+    const context = GlobalTestState.interactiveCanvas.getContext("2d")!;
+    const strokeRect = vi.spyOn(context, "strokeRect");
+    const colors: string[] = [];
+    strokeRect.mockImplementation(function (this: CanvasRenderingContext2D) {
+      if (this.getLineDash().length) {
+        colors.push(this.strokeStyle as string);
+      }
+    });
+    try {
+      fn();
+    } finally {
+      strokeRect.mockRestore();
+    }
+    return colors;
+  };
+
+  it("uses the selection color for a selected group", () => {
+    const [rect1] = createGroup();
+
+    const colors = getDashedBorderColors(() => mouse.clickOn(rect1));
+
+    expect(h.state.selectedGroupIds).toEqual({ A: true });
+    expect(colors).toContain(DEFAULT_SELECTION_COLOR);
+    expect(colors).not.toContain("#000000");
+  });
+
+  it("uses the selection color for the group being edited", () => {
+    const [rect1] = createGroup();
+    mouse.select(rect1);
+
+    const colors = getDashedBorderColors(() => mouse.doubleClickOn(rect1));
+
+    expect(h.state.editingGroupId).toBe("A");
+    expect(colors).toContain(DEFAULT_SELECTION_COLOR);
+    expect(colors).not.toContain("#000000");
+  });
+
+  it("keeps the locked color for a selected locked group", () => {
+    const [rect1, rect2] = createGroup(true);
+
+    const colors = getDashedBorderColors(() =>
+      API.setAppState({
+        selectedElementIds: { [rect1.id]: true, [rect2.id]: true },
+        selectedGroupIds: { A: true },
+      }),
+    );
+
+    expect(colors).toContain("#ced4da");
+    expect(colors).not.toContain(DEFAULT_SELECTION_COLOR);
   });
 });
