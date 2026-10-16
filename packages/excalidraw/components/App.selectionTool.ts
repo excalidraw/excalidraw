@@ -1262,6 +1262,7 @@ export class AppSelectionTool {
         pointerType,
         this.app.scene.getNonDeletedElementsMap(),
         editorInterface,
+        this.app.props.UIOptions.canvasHandleScale,
       );
       return elementWithTransformHandleType?.transformHandleType
         ? {
@@ -1280,6 +1281,7 @@ export class AppSelectionTool {
         state.zoom,
         pointerType,
         editorInterface,
+        this.app.props.UIOptions.canvasHandleScale,
       );
       return transformHandleType ? { transformHandleType } : null;
     }

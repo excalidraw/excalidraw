@@ -119,11 +119,16 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
+  const canvasHandleScale =
+    props.UIOptions?.canvasHandleScale ?? DEFAULT_UI_OPTIONS.canvasHandleScale;
 
   // FIXME normalize/set defaults in parent component so that the memo resolver
   // compares the same values
   const UIOptions: AppProps["UIOptions"] = {
     ...props.UIOptions,
+    canvasHandleScale: Number.isFinite(canvasHandleScale)
+      ? Math.min(2, Math.max(1, canvasHandleScale))
+      : DEFAULT_UI_OPTIONS.canvasHandleScale,
     canvasActions: {
       ...DEFAULT_UI_OPTIONS.canvasActions,
       ...canvasActions,
