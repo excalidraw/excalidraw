@@ -831,6 +831,54 @@ describe("clipboard - pasting mermaid definition", () => {
       );
     });
   });
+
+  it("should replace <br> tags in mermaid node labels with newlines", async () => {
+    // Re-spies on the same module binding that `mockMermaidToExcalidraw` in
+    // `beforeAll` set up, overriding its implementation for this test.
+    const mermaidModule = (await import(
+      "@excalidraw/mermaid-to-excalidraw"
+    )) as typeof import("@excalidraw/mermaid-to-excalidraw");
+    const previous = mermaidModule.parseMermaidToExcalidraw;
+    mermaidModule.parseMermaidToExcalidraw = async () => ({
+      elements: [
+        {
+          id: "rect1",
+          type: "rectangle",
+          groupIds: [],
+          x: 0,
+          y: 0,
+          width: 69.703125,
+          height: 44,
+          strokeWidth: 2,
+          label: {
+            groupIds: [],
+            text: "User Registration<br>Process",
+            fontSize: 20,
+          },
+          link: null,
+        },
+      ],
+    });
+    try {
+      pasteWithCtrlCmdV("flowchart TD\nA");
+      await waitFor(() => {
+        expect(h.elements.length).toEqual(2);
+        const textElement = h.elements.find(
+          (element) => element.type === "text",
+        ) as ExcalidrawTextElement | undefined;
+        expect(textElement).toBeDefined();
+        // The label must contain a real newline where <br> was, and must
+        // not contain the literal tag. The exact wrapping depends on the
+        // (mocked) text metrics, so strip all whitespace before comparing.
+        const stripped = textElement!.text.replace(/\s+/g, "");
+        expect(stripped).toBe("UserRegistrationProcess");
+        expect(textElement!.text).toContain("\n");
+        expect(textElement!.text).not.toContain("<br");
+      });
+    } finally {
+      mermaidModule.parseMermaidToExcalidraw = previous;
+    }
+  });
 });
 
 describe("copy and cut events", () => {
