@@ -147,6 +147,7 @@ const ALLOWED_DOMAINS = new Set([
   "giphy.com",
   "reddit.com",
   "forms.microsoft.com",
+  "data.worldbank.org",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
