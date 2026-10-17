@@ -53,7 +53,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import type { RenderableElementsMap, SVGRenderConfig } from "../scene/types";
-import type { AppState, BinaryFiles } from "../types";
+import type { BinaryFiles } from "../types";
 import type { Drawable } from "roughjs/bin/core";
 import type { RoughSVG } from "roughjs/bin/svg";
 
@@ -71,27 +71,6 @@ const roughSVGDrawWithPrecision = (
     options: { ...drawable.options, fixedDecimalPlaceDigits: precision },
   };
   return rsvg.draw(pshape);
-};
-
-const maybeWrapNodesInFrameClipPath = (
-  element: Readonly<NonDeletedExcalidrawElement>,
-  root: SVGElement,
-  nodes: SVGElement[],
-  frameRendering: AppState["frameRendering"],
-  elementsMap: RenderableElementsMap,
-) => {
-  if (!frameRendering.enabled || !frameRendering.clip) {
-    return null;
-  }
-  const frame = getContainingFrame(element, elementsMap);
-  if (frame) {
-    const g = root.ownerDocument.createElementNS(SVG_NS, "g");
-    g.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
-    nodes.forEach((node) => g.appendChild(node));
-    return g;
-  }
-
-  return null;
 };
 
 const renderElementToSvg = (
@@ -257,15 +236,7 @@ const renderElementToSvg = (
         group.appendChild(dateText);
       }
 
-      const g = maybeWrapNodesInFrameClipPath(
-        element,
-        root,
-        [group],
-        renderConfig.frameRendering,
-        elementsMap,
-      );
-
-      addToRoot(g || group, element);
+      addToRoot(group, element);
       break;
     }
     case "rectangle":
@@ -289,15 +260,7 @@ const renderElementToSvg = (
         }) rotate(${degree} ${cx} ${cy})`,
       );
 
-      const g = maybeWrapNodesInFrameClipPath(
-        element,
-        root,
-        [node],
-        renderConfig.frameRendering,
-        elementsMap,
-      );
-
-      addToRoot(g || node, element);
+      addToRoot(node, element);
       break;
     }
     case "iframe":
@@ -497,20 +460,8 @@ const renderElementToSvg = (
         group.appendChild(node);
       });
 
-      const g = maybeWrapNodesInFrameClipPath(
-        element,
-        root,
-        [group, maskPath],
-        renderConfig.frameRendering,
-        elementsMap,
-      );
-      if (g) {
-        addToRoot(g, element);
-        root.appendChild(g);
-      } else {
-        addToRoot(group, element);
-        root.append(maskPath);
-      }
+      addToRoot(group, element);
+      root.append(maskPath);
       break;
     }
     case "freedraw": {
@@ -563,15 +514,7 @@ const renderElementToSvg = (
       );
       wrapper.setAttribute("stroke", "none");
 
-      const g = maybeWrapNodesInFrameClipPath(
-        element,
-        root,
-        [wrapper],
-        renderConfig.frameRendering,
-        elementsMap,
-      );
-
-      addToRoot(g || wrapper, element);
+      addToRoot(wrapper, element);
       break;
     }
     case "image": {
@@ -725,14 +668,7 @@ const renderElementToSvg = (
           g.setAttributeNS(SVG_NS, "clip-path", `url(#${clipPath.id})`);
         }
 
-        const clipG = maybeWrapNodesInFrameClipPath(
-          element,
-          root,
-          [g],
-          renderConfig.frameRendering,
-          elementsMap,
-        );
-        addToRoot(clipG || g, element);
+        addToRoot(g, element);
       }
       break;
     }
@@ -830,15 +766,7 @@ const renderElementToSvg = (
           node.appendChild(text);
         }
 
-        const g = maybeWrapNodesInFrameClipPath(
-          element,
-          root,
-          [node],
-          renderConfig.frameRendering,
-          elementsMap,
-        );
-
-        addToRoot(g || node, element);
+        addToRoot(node, element);
       } else {
         // @ts-ignore
         throw new Error(`Unimplemented type ${element.type}`);
@@ -859,6 +787,53 @@ export const renderSceneToSvg = (
     return;
   }
 
+  let currentFrameClipGroup: {
+    frameId: string;
+    node: SVGElement;
+  } | null = null;
+
+  const renderElement = (element: Readonly<NonDeletedExcalidrawElement>) => {
+    const frame =
+      renderConfig.frameRendering.enabled && renderConfig.frameRendering.clip
+        ? getContainingFrame(element, elementsMap)
+        : null;
+
+    let root = svgRoot;
+    let shouldAppendFrameClipGroup = false;
+
+    if (frame) {
+      if (currentFrameClipGroup?.frameId === frame.id) {
+        root = currentFrameClipGroup.node;
+      } else {
+        root = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+        root.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
+        currentFrameClipGroup = { frameId: frame.id, node: root };
+        shouldAppendFrameClipGroup = true;
+      }
+    } else {
+      currentFrameClipGroup = null;
+    }
+
+    renderElementToSvg(
+      element,
+      elementsMap,
+      rsvg,
+      root,
+      files,
+      element.x + renderConfig.offsetX,
+      element.y + renderConfig.offsetY,
+      renderConfig,
+    );
+
+    if (shouldAppendFrameClipGroup) {
+      if (root.childNodes.length > 0) {
+        svgRoot.appendChild(root);
+      } else {
+        currentFrameClipGroup = null;
+      }
+    }
+  };
+
   // render elements
   elements
     .filter((el) => !isIframeLikeElement(el))
@@ -874,28 +849,12 @@ export const renderSceneToSvg = (
         }
 
         try {
-          renderElementToSvg(
-            element,
-            elementsMap,
-            rsvg,
-            svgRoot,
-            files,
-            element.x + renderConfig.offsetX,
-            element.y + renderConfig.offsetY,
-            renderConfig,
-          );
+          renderElement(element);
 
           const boundTextElement = getBoundTextElement(element, elementsMap);
           if (boundTextElement?.isDeleted === false) {
-            renderElementToSvg(
+            renderElement(
               boundTextElement as Readonly<NonDeletedExcalidrawElement>,
-              elementsMap,
-              rsvg,
-              svgRoot,
-              files,
-              boundTextElement.x + renderConfig.offsetX,
-              boundTextElement.y + renderConfig.offsetY,
-              renderConfig,
             );
           } else if (boundTextElement) {
             // SAFETY: This should never happen, but log it just in case
@@ -910,6 +869,7 @@ export const renderSceneToSvg = (
     });
 
   // render embeddables on top
+  currentFrameClipGroup = null;
   elements
     .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
