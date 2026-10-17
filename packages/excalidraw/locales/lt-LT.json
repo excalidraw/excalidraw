@@ -2,6 +2,9 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Įklijuoti",
     "pasteAsPlaintext": "Įklijuoti kaip paprastą tekstą",
     "pasteCharts": "Įklijuoti diagramas",
@@ -27,6 +30,7 @@
     "copyStyles": "Kopijuoti stilius",
     "pasteStyles": "Įklijuoti stilius",
     "stroke": "Linija",
+    "textColor": "",
     "changeStroke": "",
     "background": "Fonas",
     "changeBackground": "",
@@ -187,6 +191,8 @@
     "copyElementLink": "",
     "linkToElement": "",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
@@ -195,7 +201,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -245,6 +255,7 @@
     "undo": "Anuliuoti",
     "redo": "",
     "resetLibrary": "Atstatyti biblioteką",
+    "reset": "",
     "createNewRoom": "Sukurti naują kambarį",
     "fullScreen": "Visas ekranas",
     "darkMode": "Tamsus režimas",
@@ -332,6 +343,7 @@
     "eraser": "Trintukas",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "laser": "",
     "autoshape": "",
@@ -357,6 +369,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,6 +388,7 @@
     "freeDraw": "Spausk ir tempk, paleisk kai norėsi pabaigti",
     "text": "Užuomina: tekstą taip pat galima pridėti bet kur su dvigubu pelės paspaudimu, kol parinkas žymėjimo įrankis",
     "embeddable": "",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +396,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -392,6 +407,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "",
     "disableSnapping": "",
@@ -649,6 +665,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "",
@@ -714,7 +739,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",

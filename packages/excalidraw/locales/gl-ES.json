@@ -2,6 +2,9 @@
   "labels": {
     "signUp": "",
     "signIn": "",
+    "upgrade": "",
+    "tryExcalidrawPlus": "",
+    "plusFreeTrial": "",
     "paste": "Pegar",
     "pasteAsPlaintext": "Pegar coma texto sen formato",
     "pasteCharts": "Pegar gráficos",
@@ -27,6 +30,7 @@
     "copyStyles": "Copiar estilo",
     "pasteStyles": "Pegar estilo",
     "stroke": "Trazo",
+    "textColor": "",
     "changeStroke": "",
     "background": "Fondo",
     "changeBackground": "",
@@ -187,6 +191,8 @@
     "copyElementLink": "",
     "linkToElement": "",
     "wrapSelectionInFrame": "",
+    "removeFrame": "",
+    "toggleWrap": "",
     "tab": "",
     "shapeSwitch": "",
     "preferences": "",
@@ -195,7 +201,11 @@
     "boxSelectionContain": "",
     "boxSelectionOverlap": "",
     "arrowBinding": "",
-    "midpointSnapping": ""
+    "midpointSnapping": "",
+    "showHints": "",
+    "inputDevice": "",
+    "inputDeviceTrackpad": "",
+    "inputDeviceMouse": ""
   },
   "elementLink": {
     "title": "",
@@ -245,6 +255,7 @@
     "undo": "Desfacer",
     "redo": "Refacer",
     "resetLibrary": "Reiniciar biblioteca",
+    "reset": "",
     "createNewRoom": "Crear nova sala",
     "fullScreen": "Pantalla completa",
     "darkMode": "Modo escuro",
@@ -332,6 +343,7 @@
     "eraser": "Goma de borrar",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "Inserir na web",
     "laser": "Punteiro láser",
     "autoshape": "",
@@ -357,6 +369,7 @@
     "group": "",
     "frame": "",
     "magicframe": "",
+    "stickynote": "",
     "embeddable": "",
     "selection": "",
     "iframe": ""
@@ -375,6 +388,7 @@
     "freeDraw": "Fai clic e arrastra, solta cando acabes",
     "text": "Consello: tamén podes engadir texto facendo dobre-clic en calquera lugar coa ferramenta de selección",
     "embeddable": "Faga clic e arrastre para crear un sitio web embebido",
+    "stickynote": "",
     "autoshape": "",
     "text_selected": "",
     "text_editing": "",
@@ -382,6 +396,7 @@
     "lockAngle": "",
     "resize": "",
     "resizeImage": "",
+    "resizeStickyNote": "",
     "rotate": "",
     "toggleArrowhead": "",
     "lineEditor_info": "",
@@ -392,6 +407,7 @@
     "bindTextToElement": "",
     "createFlowchart": "",
     "deepBoxSelect": "",
+    "cycleSelection": "",
     "eraserRevert": "",
     "firefox_clipboard_write": "Esta función pódese activar establecendo a opción \"dom.events.asyncClipboard.clipboardItem\" a \"true\". Para cambiar as opcións do navegador en Firefox, visita a páxina \"about:config\".",
     "disableSnapping": "",
@@ -649,6 +665,15 @@
       }
     }
   },
+  "fileDrop": {
+    "replace": "",
+    "add": "",
+    "importLibrary": "",
+    "replaceHint": "",
+    "keepHint": "",
+    "libraryHint": "",
+    "replacedToast": ""
+  },
   "mermaid": {
     "title": "",
     "button": "Inserir",
@@ -714,7 +739,9 @@
     },
     "sceneFonts": "",
     "availableFonts": "",
-    "empty": ""
+    "empty": "",
+    "topPicksTip": "",
+    "resetTopPicks": ""
   },
   "userList": {
     "empty": "",
