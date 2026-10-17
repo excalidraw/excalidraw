@@ -1,10 +1,10 @@
 {
   "labels": {
-    "signUp": "",
-    "signIn": "",
-    "upgrade": "",
-    "tryExcalidrawPlus": "",
-    "plusFreeTrial": "",
+    "signUp": "Cadastrar-se",
+    "signIn": "Entrar",
+    "upgrade": "Atualizar",
+    "tryExcalidrawPlus": "Experimente o Excalidraw+",
+    "plusFreeTrial": "Teste grátis por 14 dias",
     "paste": "Colar",
     "pasteAsPlaintext": "Colar como texto sem formatação",
     "pasteCharts": "Colar gráficos",
@@ -30,7 +30,7 @@
     "copyStyles": "Copiar os estilos",
     "pasteStyles": "Colar os estilos",
     "stroke": "Contorno",
-    "textColor": "",
+    "textColor": "Cor do texto",
     "changeStroke": "Alterar cor da borda",
     "background": "Fundo",
     "changeBackground": "Alterar cor de fundo",
@@ -41,9 +41,9 @@
     "strokeStyle_dashed": "Tracejado",
     "strokeStyle_dotted": "Pontilhado",
     "sloppiness": "Precisão do traço",
-    "pressure": "",
-    "pressure_constant": "",
-    "pressure_variable": "",
+    "pressure": "Pressão",
+    "pressure_constant": "Constante",
+    "pressure_variable": "Variável",
     "opacity": "Opacidade",
     "textAlign": "Alinhamento do texto",
     "edges": "Arestas",
@@ -115,7 +115,7 @@
     "group": "Agrupar seleção",
     "ungroup": "Desagrupar seleção",
     "collaborators": "Colaboradores",
-    "you": "",
+    "you": "Você",
     "toggleGrid": "Alternar grade",
     "addToLibrary": "Adicionar à biblioteca",
     "removeFromLibrary": "Remover da biblioteca",
@@ -191,21 +191,21 @@
     "copyElementLink": "Copiar link para o objeto",
     "linkToElement": "Links para o objeto",
     "wrapSelectionInFrame": "Ajustar seleção no frame",
-    "removeFrame": "",
-    "toggleWrap": "",
+    "removeFrame": "Remover quadro",
+    "toggleWrap": "Alternar quebra de linha",
     "tab": "Aba",
     "shapeSwitch": "Trocar forma",
     "preferences": "Preferências",
     "preferences_toolLock": "Bloqueio de ferramenta",
-    "boxSelectionMode": "",
-    "boxSelectionContain": "",
-    "boxSelectionOverlap": "",
+    "boxSelectionMode": "Selecionar por",
+    "boxSelectionContain": "Conter",
+    "boxSelectionOverlap": "Sobrepor",
     "arrowBinding": "Atalho de flecha",
     "midpointSnapping": "Encaixar em pontos intermediários",
-    "showHints": "",
-    "inputDevice": "",
-    "inputDeviceTrackpad": "",
-    "inputDeviceMouse": ""
+    "showHints": "Mostrar dicas",
+    "inputDevice": "Entrada",
+    "inputDeviceTrackpad": "Trackpad",
+    "inputDeviceMouse": "Mouse"
   },
   "elementLink": {
     "title": "Links para o objeto",
@@ -255,7 +255,7 @@
     "undo": "Desfazer",
     "redo": "Refazer",
     "resetLibrary": "Redefinir biblioteca",
-    "reset": "",
+    "reset": "Redefinir",
     "createNewRoom": "Criar nova sala",
     "fullScreen": "Tela cheia",
     "darkMode": "Modo escuro",
@@ -343,19 +343,19 @@
     "eraser": "Borracha",
     "frame": "Ferramenta de quadro",
     "magicframe": "Wireframe para código",
-    "stickynote": "",
+    "stickynote": "Nota adesiva",
     "embeddable": "Página web incorporada",
     "laser": "Ponteiro de laser",
-    "autoshape": "",
-    "bucketfill": "",
+    "autoshape": "Desenho para forma",
+    "bucketfill": "Preenchimento com balde",
     "hand": "Mão (ferramenta de rolagem)",
     "extraTools": "Mais ferramentas",
     "mermaidToExcalidraw": "Mermaid para Excalidraw",
     "convertElementType": "Alternar tipo de forma"
   },
   "bucketfill": {
-    "noRegion": "",
-    "tooComplex": ""
+    "noRegion": "Não foi possível encontrar uma região fechada para preencher aqui.",
+    "tooComplex": "Esta região é muito complexa para preencher."
   },
   "element": {
     "rectangle": "Retângulo",
@@ -369,7 +369,7 @@
     "group": "Grupo",
     "frame": "Moldura",
     "magicframe": "Wireframe para código",
-    "stickynote": "",
+    "stickynote": "Nota adesiva",
     "embeddable": "Página web incorporada",
     "selection": "Seleção",
     "iframe": "IFrame"
@@ -388,17 +388,17 @@
     "freeDraw": "Toque e arraste, solte quando terminar",
     "text": "Dica: você também pode adicionar texto clicando duas vezes em qualquer lugar com a ferramenta de seleção",
     "embeddable": "Clique e arraste para criar um site incorporado",
-    "stickynote": "",
-    "autoshape": "",
+    "stickynote": "Clique para posicionar uma nota ou arraste para redimensioná-la",
+    "autoshape": "Desenhe retângulos, círculos, losangos, linhas e setas",
     "text_selected": "Clique duas vezes ou pressione {{shortcut}} para editar texto",
     "text_editing": "Pressione {{shortcut_1}} ou {{shortcut_2}} para salvar as edições",
     "linearElementMulti": "Clique no último ponto ou pressione {{shortcut_1}} ou {{shortcut_2}} para finalizar",
     "lockAngle": "Você pode restringir ângulos segurando {{shortcut}}",
     "resize": "Você pode restringir proporções segurando {{shortcut_1}} enquanto redimensiona,\nsegure {{shortcut_2}} para redimensionar a partir do centro",
     "resizeImage": "Você pode redimensionar livremente segurando {{shortcut_1}},\nsegure {{shortcut_2}} para redimensionar a partir do centro",
-    "resizeStickyNote": "",
+    "resizeStickyNote": "segure {{shortcut_1}} para redimensionar livremente, {{shortcut_2}} para redimensionar a partir do centro",
     "rotate": "Você pode restringir ângulos segurando {{shortcut}} enquanto rotaciona",
-    "toggleArrowhead": "",
+    "toggleArrowhead": "Clique duas vezes para alternar a ponta da seta",
     "lineEditor_info": "Segure {{shortcut_1}} e clique duas vezes com o mouse ou pressione {{shortcut_2}} para editar pontos",
     "lineEditor_line_info": "Clique duas vezes ou pressione {{shortcut}} para editar pontos",
     "lineEditor_pointSelected": "Pressione {{shortcut_1}} para remover ponto(s),\n{{shortcut_2}} para duplicar ou arraste para mover",
@@ -407,7 +407,7 @@
     "bindTextToElement": "{{shortcut}} para adicionar texto",
     "createFlowchart": "{{shortcut}} para criar um fluxo",
     "deepBoxSelect": "Segure {{shortcut}} para ativar seleção profunda e para evitar arrastamentos",
-    "cycleSelection": "",
+    "cycleSelection": "Clique com {{shortcut}} para alternar a seleção ou arraste para duplicar",
     "eraserRevert": "Segure {{shortcut}} para reverter os elementos marcados para exclusão",
     "firefox_clipboard_write": "Esse recurso pode ser ativado configurando a opção \"dom.events.asyncClipboard.clipboardItem\" como \"true\". Para alterar os sinalizadores do navegador no Firefox, visite a página \"about:config\".",
     "disableSnapping": "Segure {{shortcut}} para desativar o encaixe automático",
@@ -629,10 +629,10 @@
     "shades": "Tons",
     "hexCode": "Código hexadecimal",
     "noShades": "Sem tons disponíveis para essa cor",
-    "invalidColor": "",
-    "invalidHexLength": "",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "invalidColor": "Cor inválida",
+    "invalidHexLength": "O código hexadecimal deve ter 3, 4, 6 ou 8 caracteres",
+    "topPicksTip": "Dica: arraste qualquer cor para as suas principais escolhas para fixá-la",
+    "resetTopPicks": "Restaurar cores padrão"
   },
   "overwriteConfirm": {
     "action": {
@@ -666,13 +666,13 @@
     }
   },
   "fileDrop": {
-    "replace": "",
-    "add": "",
-    "importLibrary": "",
-    "replaceHint": "",
-    "keepHint": "",
-    "libraryHint": "",
-    "replacedToast": ""
+    "replace": "Largue para substituir o conteúdo",
+    "add": "Largue para adicionar à tela",
+    "importLibrary": "Largue para importar a biblioteca",
+    "replaceHint": "Segure <shift>Shift</shift> para manter o conteúdo existente",
+    "keepHint": "Seu conteúdo existente será mantido",
+    "libraryHint": "Os arquivos da biblioteca serão adicionados",
+    "replacedToast": "Conteúdo substituído. {{shortcut}} para desfazer"
   },
   "mermaid": {
     "title": "Mermaid para Excalidraw",
@@ -681,7 +681,7 @@
     "syntax": "Sintaxe em Mermaid",
     "preview": "Visualizar",
     "label": "Mermaid",
-    "inputPlaceholder": "",
+    "inputPlaceholder": "Digite a definição do diagrama Mermaid aqui...",
     "autoFixAvailable": "Auto-correção disponível"
   },
   "ttd": {
@@ -707,7 +707,7 @@
     "placeholder": {
       "title": "Vamos criar seu diagrama",
       "description": "Descreva o diagrama que você quer criar, e vamos gerá-lo para você.",
-      "hint": ""
+      "hint": "Neste momento conhecemos os diagramas Flowchart, Sequência, Class, Estado e Relacionamento de Entidades."
     },
     "preview": "Pré-visualizar",
     "insert": "Inserir",
@@ -740,8 +740,8 @@
     "sceneFonts": "Neste cenário",
     "availableFonts": "Fontes disponíveis",
     "empty": "Nenhuma fonte encontrada",
-    "topPicksTip": "",
-    "resetTopPicks": ""
+    "topPicksTip": "Dica: arraste qualquer fonte para suas escolhas superiores para fixá-la",
+    "resetTopPicks": "Redefinir para escolhas padrão"
   },
   "userList": {
     "empty": "Nenhum usuário encontrado",
