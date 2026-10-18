@@ -67,6 +67,21 @@ describe("exportToCanvas", async () => {
     expect([fromWidth.width, fromWidth.height]).toEqual([100, 60]);
   });
 
+  it("crops (doesn't scale) an x/y region by default", async () => {
+    const canvas = await utils.exportToCanvas({
+      data: {
+        elements: [
+          API.createElement({ type: "rectangle", width: 200, height: 100 }),
+        ],
+        files: null,
+      },
+      config: { padding: EXPORT_PADDING, x: 50, y: 0, width: 100, height: 100 },
+    });
+
+    // `fit: "none"` adds the padding around the region
+    expect([canvas.width, canvas.height]).toEqual([120, 120]);
+  });
+
   it("with a scale function", async () => {
     const scale = vi.fn((width: number, height: number) => 60 / width);
     const canvas = await utils.exportToCanvas({

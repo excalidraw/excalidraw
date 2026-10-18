@@ -250,6 +250,9 @@ type ExportSceneBaseConfig = {
    * You can switch to content coordinates by setting `origin` to `content`.
    *
    * Defaults to the `x` position of the content bounding box.
+   *
+   * Setting `x` or `y` makes `fit` default to `none` (cropping the region),
+   * as they're ignored with `fit: "contain"`.
    */
   x?: number;
   /**
@@ -257,6 +260,9 @@ type ExportSceneBaseConfig = {
    * You can switch to content coordinates by setting `origin` to `content`.
    *
    * Defaults to the `y` position of the content bounding box.
+   *
+   * Setting `x` or `y` makes `fit` default to `none` (cropping the region),
+   * as they're ignored with `fit: "contain"`.
    */
   y?: number;
   /**
@@ -278,7 +284,8 @@ type ExportSceneBaseConfig = {
    *
    * If `maxWidthOrHeight` or `widthOrHeight` is set, `fit` is ignored.
    *
-   * @default "contain" if `width` or `height` is set, otherwise "none"
+   * @default "contain" if `width` or `height` is set (and `x`/`y` aren't),
+   * otherwise "none"
    */
   fit?: "none" | "contain";
   /**
@@ -467,12 +474,15 @@ const configExportDimension = async ({
     cfg.widthOrHeight = undefined;
   }
 
+  // an explicit `x`/`y` region is cropped rather than scaled by default
   cfg.fit =
     cfg.fit ??
+    (cfg.x == null &&
+    cfg.y == null &&
     (cfg.width != null ||
-    cfg.height != null ||
-    cfg.maxWidthOrHeight != null ||
-    cfg.widthOrHeight != null
+      cfg.height != null ||
+      cfg.maxWidthOrHeight != null ||
+      cfg.widthOrHeight != null)
       ? "contain"
       : "none");
 
