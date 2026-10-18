@@ -454,16 +454,12 @@ const generateIndices = (
   return elementsUpdates;
 };
 
-const isOrderedElement = (element: ExcalidrawElement): boolean => {
-  // elements are typed as ordered, but defensively check the index exists at
-  // runtime, as unrestored elements could still slip in
-  // for now it's sufficient whether the index is there
-  // meaning, the element was already ordered in the past
-  // meaning, it is not a newly inserted element, not an unrestored element, etc.
-  // it does not have to mean that the index itself is valid
-  if (element.index) {
-    return true;
-  }
-
-  return false;
-};
+/**
+ * Elements are typed as ordered, but defensively check that the index exists
+ * at runtime, as newly created or unrestored elements could still slip in.
+ *
+ * Having an index means the element was already ordered in the past, it does
+ * not have to mean the index itself is valid.
+ */
+const isOrderedElement = (element: ExcalidrawElement): boolean =>
+  !!element.index;
