@@ -112,15 +112,11 @@ export const getApproxMinLineHeight = (
 };
 
 let customTextMetricsProvider: TextMetricsProvider | undefined;
-const customTextMetricsProviders = new WeakMap<
-  RenderEnvironment,
-  TextMetricsProvider
->();
 /**
  * The lazily-built canvas-backed default provider per environment -- each
  * environment (e.g. each editor's owner window) measures on a canvas of its
- * own. A custom provider (see `setCustomTextMetricsProvider`) is the caller's
- * and is left alone.
+ * own. A custom provider (the environment's `textMetrics`, or the global one
+ * set with `setCustomTextMetricsProvider`) replaces it.
  */
 const defaultTextMetricsProviders = new WeakMap<
   RenderEnvironment,
@@ -128,22 +124,16 @@ const defaultTextMetricsProviders = new WeakMap<
 >();
 
 /**
- * Set a custom text metrics provider.
+ * Set a custom text metrics provider, for all text measured in an environment
+ * without its own (`RenderEnvironment["textMetrics"]`) -- e.g. elements
+ * created outside the editor, on a server. Pass `undefined` to go back to
+ * measuring on a canvas.
  *
  * Useful for overriding the width calculation algorithm where canvas API is not available / desired.
  */
 export const setCustomTextMetricsProvider = (
   provider: TextMetricsProvider | undefined,
-  env?: RenderEnvironment,
 ) => {
-  if (env) {
-    if (provider) {
-      customTextMetricsProviders.set(env, provider);
-    } else {
-      customTextMetricsProviders.delete(env);
-    }
-    return;
-  }
   customTextMetricsProvider = provider;
 };
 
@@ -201,7 +191,7 @@ export const getLineWidth = (
 ) => {
   const resolvedEnv = getRenderEnvironment(env);
   const provider =
-    customTextMetricsProviders.get(resolvedEnv) ??
+    resolvedEnv.textMetrics ??
     customTextMetricsProvider ??
     getDefaultTextMetricsProvider(resolvedEnv);
   return provider.getLineWidth(text, font);

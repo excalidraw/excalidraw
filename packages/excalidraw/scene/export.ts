@@ -21,6 +21,7 @@ import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
+  getLineWidth,
   getNonDeletedElements,
   getRenderEnvironment,
   updateImageCache,
@@ -100,25 +101,21 @@ const truncateText = (
   if (element.width <= maxWidth) {
     return element;
   }
-  const canvas = renderEnvironment.createCanvas();
-  const ctx = canvas.getContext("2d")!;
-  ctx.font = getFontString({
+  const font = getFontString({
     fontFamily: element.fontFamily,
     fontSize: element.fontSize,
   });
 
   let text = element.text;
 
-  const metrics = ctx.measureText(text);
-
-  if (metrics.width > maxWidth) {
+  if (getLineWidth(text, font, renderEnvironment) > maxWidth) {
     // we iterate from the right, removing characters one by one instead
     // of building the string up. This assumes that it's more likely
     // your frame names will overflow by not that many characters
     // (if ever), so it should be faster this way.
     for (let i = text.length; i > 0; i--) {
       const newText = `${text.slice(0, i)}...`;
-      if (ctx.measureText(newText).width <= maxWidth) {
+      if (getLineWidth(newText, font, renderEnvironment) <= maxWidth) {
         text = newText;
         break;
       }
@@ -236,6 +233,12 @@ export type ExportSceneData = {
 /**
  * The host capabilities an export uses, shared by every format: e.g. for test
  * environments, Node.js or another window.
+ *
+ * Unlike the editor's `renderEnvironment` prop, this needn't be the same
+ * object across exports (e.g. on a server): exports draw without the element
+ * caches keyed by an environment, and measure little text. Passing a complete
+ * one (`createCanvas` and `createImage`) as-is, as the editor does, only keeps
+ * its measuring caches warm.
  */
 type ExportEnvironment = {
   /**
@@ -267,6 +270,14 @@ type ExportEnvironment = {
    * Defaults to the global `document`.
    */
   document?: RenderEnvironment["document"];
+  /**
+   * Measures text (frame labels, embed placeholders), e.g. where there is no
+   * canvas to measure on.
+   *
+   * Defaults to the global provider set with `setCustomTextMetricsProvider`,
+   * else to measuring on a canvas from `createCanvas`.
+   */
+  textMetrics?: RenderEnvironment["textMetrics"];
   /**
    * Loads the fonts the exported elements use, before rendering.
    *
@@ -489,12 +500,18 @@ export type ExportSceneConfig = ExportSceneBaseConfig & ExportSizeConfig;
 const getExportRenderEnvironment = (
   environment: ExportEnvironment | undefined,
 ): RenderEnvironment => {
+  // a complete one (e.g. the editor's) is used as-is, keeping the caches
+  // keyed by its identity
+  if (environment?.createCanvas && environment.createImage) {
+    return environment as RenderEnvironment;
+  }
   const defaults = getRenderEnvironment();
   return {
     createCanvas: environment?.createCanvas ?? defaults.createCanvas,
     createImage: environment?.createImage ?? defaults.createImage,
     createPath: environment?.createPath ?? defaults.createPath,
     document: environment?.document ?? defaults.document,
+    textMetrics: environment?.textMetrics ?? defaults.textMetrics,
   };
 };
 

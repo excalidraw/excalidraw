@@ -13,6 +13,8 @@
  * `document` is the DOM side of the same host: what SVG exports are built in
  * (a DOM implementation such as `linkedom` under Node).
  */
+import type { TextMetricsProvider } from "./textMeasurements";
+
 export type RenderEnvironment = {
   /** Creates a blank canvas. Callers set `width`/`height` themselves. */
   createCanvas: () => HTMLCanvasElement;
@@ -43,6 +45,14 @@ export type RenderEnvironment = {
    * Optional; falls back to the global `document`.
    */
   document?: Document;
+  /**
+   * Measures text (line widths, for wrapping and layout).
+   *
+   * Optional; falls back to the global provider set with
+   * `setCustomTextMetricsProvider`, else to measuring on a canvas from
+   * `createCanvas`.
+   */
+  textMetrics?: TextMetricsProvider;
 };
 
 const defaultCreateCanvas = () => {

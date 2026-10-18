@@ -531,6 +531,24 @@ describe("export inputs", () => {
     expect(loadFonts).toHaveBeenCalledTimes(1);
   });
 
+  it("measures text through environment.textMetrics", async () => {
+    const getLineWidth = vi.fn((text: string) => text.length * 100);
+    const frame = API.createElement({ type: "frame", width: 450 });
+
+    const svg = await exportScene({
+      type: "svg",
+      data: { elements: [frame] },
+      config: { environment: { textMetrics: { getLineWidth } } },
+    });
+
+    // "Frame" is 500 wide by these metrics, so the label is truncated to fit
+    // the 450 wide frame
+    expect(getLineWidth).toHaveBeenCalledWith("Frame", expect.any(String));
+    expect(
+      Array.from(svg.querySelectorAll("text")).map((text) => text.textContent),
+    ).toContain("F...");
+  });
+
   it("renders frame decorations per config.frames", async () => {
     const elements = [API.createElement({ type: "frame" })];
     const countFrameNames = (svg: SVGSVGElement) =>
