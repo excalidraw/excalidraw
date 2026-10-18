@@ -233,10 +233,14 @@ export type ExportSceneData = {
   files?: BinaryFiles | null;
 };
 
+/**
+ * The host capabilities an export uses, shared by every format: e.g. for test
+ * environments, Node.js or another window.
+ */
 type ExportEnvironment = {
   /**
-   * Creates the canvas to export into (and any canvas the export needs, e.g.
-   * to measure frame labels).
+   * Creates the canvas a canvas/PNG/JPEG export renders into, and any canvas
+   * the export measures text with (e.g. frame labels, embed placeholders).
    *
    * Do not set `canvas.width/height` or modify the canvas context as that's
    * handled by Excalidraw.
@@ -260,6 +264,13 @@ type ExportEnvironment = {
    * unless overridden.
    */
   createPath?: RenderEnvironment["createPath"];
+  /**
+   * The document an SVG export is built in, e.g. a popout window's or,
+   * outside the browser, a DOM implementation's (such as `linkedom`).
+   *
+   * Defaults to the global `document`.
+   */
+  document?: Document;
   /**
    * Loads the fonts the exported elements use, before rendering.
    *
@@ -476,8 +487,8 @@ type ExportSizeConfig =
 export type ExportSceneConfig = ExportSceneBaseConfig & ExportSizeConfig;
 
 /**
- * The render environment of a canvas export: `config.environment` overrides
- * on top of the process-wide one (see `setRenderEnvironment`).
+ * The render environment of an export: `config.environment` overrides on top
+ * of the process-wide one (see `setRenderEnvironment`).
  */
 const getExportRenderEnvironment = (
   environment: ExportEnvironment | undefined,
@@ -908,20 +919,9 @@ type ExportToSvgConfig = Pick<
   | "exportingFrame"
   | "scale"
   | "frames"
+  | "environment"
 > &
   ExportSizeConfig & {
-    /**
-     * Host environment overrides, e.g. for test environments or Node.js.
-     */
-    environment?: Pick<ExportEnvironment, "loadFonts"> & {
-      /**
-       * The document the SVG is built in, e.g. a popout window's or, outside
-       * the browser, a DOM implementation's (such as `linkedom`).
-       *
-       * @default document
-       */
-      ownerDocument?: Document;
-    };
     /**
      * if true, all embeddables passed in will be rendered when possible.
      */
@@ -950,15 +950,17 @@ const exportToSvg = async ({
   config?: ExportToSvgConfig;
 }) => {
   const ownerDocument =
-    config?.environment?.ownerDocument ??
+    config?.environment?.document ??
     (typeof document !== "undefined" ? document : null);
 
   if (!ownerDocument) {
     throw new Error(
       "exportScene: no document to build the SVG in. Pass " +
-        "`config.environment.ownerDocument` when running outside the browser.",
+        "`config.environment.document` when running outside the browser.",
     );
   }
+
+  const renderEnvironment = getExportRenderEnvironment(config?.environment);
 
   const {
     config: cfg,
@@ -975,11 +977,7 @@ const exportToSvg = async ({
     backgroundColor,
     paintedBackgroundColor,
     theme,
-  } = await configExportDimension({
-    data,
-    config,
-    renderEnvironment: getRenderEnvironment(),
-  });
+  } = await configExportDimension({ data, config, renderEnvironment });
 
   const offsetX = -(x - normalizedPadding);
   const offsetY = -(y - normalizedPadding);
@@ -1143,6 +1141,7 @@ const exportToSvg = async ({
       offsetX,
       offsetY,
       isExporting: true,
+      renderEnvironment,
       exportWithDarkMode,
       renderEmbeddables,
       frameRendering,

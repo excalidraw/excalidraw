@@ -421,7 +421,7 @@ describe("headless (server-side) export", () => {
         data: { elements, files },
         config: {
           canvasBackgroundColor: "#ffffff",
-          environment: { ownerDocument: hostDocument },
+          environment: { ...renderEnvironment, document: hostDocument },
         },
       });
 

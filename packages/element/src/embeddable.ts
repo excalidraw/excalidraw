@@ -435,6 +435,7 @@ export const createPlaceholderEmbeddableLabel = (
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     angle: element.angle ?? 0,
+    renderEnvironment,
   });
 };
 

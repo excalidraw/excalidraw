@@ -139,7 +139,7 @@ export const exportCanvas = async (
       config: {
         ...config,
         embedScene: appState.exportEmbedScene && type === "svg",
-        environment: { ownerDocument },
+        environment: { document: ownerDocument },
       },
     });
 

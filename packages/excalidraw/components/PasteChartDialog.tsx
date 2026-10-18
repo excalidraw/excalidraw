@@ -84,7 +84,7 @@ const ChartPreviewBtn = (props: {
           skipInliningFonts: true,
           theme,
           canvasBackgroundColor: false,
-          environment: { ownerDocument },
+          environment: { document: ownerDocument },
         },
       });
       svg.querySelector(".style-fonts")?.remove();
@@ -155,7 +155,7 @@ const PlainTextPreviewBtn = (props: {
           skipInliningFonts: true,
           theme,
           canvasBackgroundColor: false,
-          environment: { ownerDocument },
+          environment: { document: ownerDocument },
         },
       });
       svg.querySelector(".style-fonts")?.remove();
