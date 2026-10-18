@@ -70,6 +70,8 @@ import {
   isLineElement,
   isTextElement,
   isUsingAdaptiveRadius,
+  CODE_BLOCK_LANGUAGES,
+  DEFAULT_CODE_BLOCK_LANGUAGE,
 } from "@excalidraw/element";
 
 import {
@@ -240,6 +242,7 @@ export const AllowedExcalidrawActiveTools: Record<
   laser: false,
   autoshape: false,
   magicframe: false,
+  codeblock: true,
   bucketfill: true,
 };
 
@@ -752,6 +755,19 @@ export const restoreElement = (
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
+      });
+    case "codeblock":
+      return restoreElementWithProperties(element, {
+        code: typeof element.code === "string" ? element.code : "",
+        language:
+          element.language &&
+          (CODE_BLOCK_LANGUAGES as readonly string[]).includes(element.language)
+            ? element.language
+            : DEFAULT_CODE_BLOCK_LANGUAGE,
+        fontSize: isFiniteNumber(element.fontSize) ? element.fontSize : 14,
+        showLineNumbers: element.showLineNumbers ?? true,
+        title: element.title,
+        widthOverridden: element.widthOverridden ?? false,
       });
 
     // Don't use default case so as to catch a missing an element type case.

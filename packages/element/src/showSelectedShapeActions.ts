@@ -13,6 +13,7 @@ export const showSelectedShapeActions = (
       appState.openDialog?.name !== "elementLinkSelector" &&
       ((appState.activeTool.type !== "custom" &&
         (appState.editingTextElement ||
+          appState.editingCodeBlockElement ||
           (appState.activeTool.type !== "selection" &&
             appState.activeTool.type !== "lasso" &&
             appState.activeTool.type !== "eraser" &&

@@ -23,6 +23,7 @@ describe("element creation time", () => {
     "magicframe",
     "embeddable",
     "iframe",
+    "codeblock",
   ] as const)("initializes a new %s before any capture", (type) => {
     vi.spyOn(common, "getUpdatedTimestamp").mockReturnValue(123);
     const element = API.createElement({ type });

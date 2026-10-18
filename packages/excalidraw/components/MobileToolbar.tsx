@@ -34,6 +34,7 @@ import {
   mermaidLogoIcon,
   MagicIcon,
   stickyNoteToolIcon,
+  codeBlockToolIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -78,6 +79,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
+  const codeBlockToolSelected = activeTool.type === "codeblock";
   const bucketFillToolSelected = activeTool.type === "bucketfill";
   const stickyNoteToolSelected = activeTool.type === "stickynote";
 
@@ -119,6 +121,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       "stickynote",
       "frame",
       "embeddable",
+      "codeblock",
       "laser",
       "bucketfill",
       "magicframe",
@@ -144,6 +147,8 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       ? stickyNoteToolIcon
       : activeTool.type === "embeddable"
       ? EmbedIcon
+      : activeTool.type === "codeblock"
+      ? codeBlockToolIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
       : activeTool.type === "bucketfill"
@@ -314,6 +319,16 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             disabled={isToolButtonDisabled(app, "embeddable")}
           >
             {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "codeblock" })}
+            icon={codeBlockToolIcon}
+            shortcut={KEYS.BACKTICK}
+            data-testid="toolbar-codeblock"
+            selected={codeBlockToolSelected}
+            disabled={isToolButtonDisabled(app, "codeblock")}
+          >
+            {t("toolBar.codeblock")}
           </DropdownMenu.Item>
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "autoshape" })}

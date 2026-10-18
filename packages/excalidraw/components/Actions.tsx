@@ -175,6 +175,15 @@ export const SelectedShapeActions = ({
 
       {predicates.roundness && <>{renderAction("changeRoundness")}</>}
 
+      {predicates.codeblock && (
+        <>
+          {renderAction("changeCodeBlockLanguage")}
+          {renderAction("changeCodeBlockTheme")}
+          {renderAction("changeFontSize")}
+          {renderAction("changeCodeBlockLineNumbers")}
+        </>
+      )}
+
       {predicates.arrowType && <>{renderAction("changeArrowType")}</>}
 
       {predicates.text && (
@@ -295,6 +304,14 @@ const CombinedShapeProperties = ({
               )}
               {predicates.sloppiness && <>{renderAction("changeSloppiness")}</>}
               {predicates.roundness && renderAction("changeRoundness")}
+              {predicates.codeblock && (
+                <>
+                  {renderAction("changeCodeBlockLanguage")}
+                  {renderAction("changeCodeBlockTheme")}
+                  {renderAction("changeFontSize")}
+                  {renderAction("changeCodeBlockLineNumbers")}
+                </>
+              )}
               {predicates.opacity && renderAction("changeOpacity")}
             </div>
           </PropertiesPopover>

@@ -637,7 +637,7 @@ export class AppSelection {
     { captureUpdate }: SelectionChangeOptions,
     elements?: readonly NonDeletedExcalidrawElement[],
   ) {
-    const { editingTextElement } = this.app.state;
+    const { editingTextElement, editingCodeBlockElement } = this.app.state;
     if (
       elements &&
       editingTextElement &&
@@ -653,6 +653,18 @@ export class AppSelection {
       const submit = this.app.text.textWysiwygSubmitHandler;
       queueMicrotask(() => {
         if (submit && this.app.text.textWysiwygSubmitHandler === submit) {
+          submit();
+        }
+      });
+    }
+    if (
+      elements &&
+      editingCodeBlockElement &&
+      !elements.some((element) => element.id === editingCodeBlockElement.id)
+    ) {
+      const submit = this.app.codeBlockWysiwygSubmitHandler;
+      queueMicrotask(() => {
+        if (submit && this.app.codeBlockWysiwygSubmitHandler === submit) {
           submit();
         }
       });

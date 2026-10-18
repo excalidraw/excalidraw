@@ -49,6 +49,7 @@ export const KEYS = {
   COMMA: ",",
   SUBTRACT: "-",
   SLASH: "/",
+  BACKTICK: "`",
 
   A: "a",
   B: "b",
