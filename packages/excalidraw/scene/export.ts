@@ -2,6 +2,7 @@ import rough from "roughjs/bin/rough";
 
 import {
   FRAME_STYLE,
+  FONT_FAMILY,
   SVG_NS,
   THEME,
   MIME_TYPES,
@@ -13,6 +14,7 @@ import {
   getFontString,
   toBrandedType,
   applyDarkModeFilter,
+  removeDarkModeFilter,
 } from "@excalidraw/common";
 
 import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
@@ -31,14 +33,15 @@ import { isFrameLikeElement } from "@excalidraw/element";
 import {
   getElementsOverlappingFrame,
   getFrameLikeElements,
+  getFrameLikeTitle,
   getRootElements,
 } from "@excalidraw/element";
 
 import { syncInvalidIndices } from "@excalidraw/element";
 
-import { newTextElement, getFrameLabel } from "@excalidraw/element";
+import { type Mutable } from "@excalidraw/common/utility-types";
 
-import type { Bounds } from "@excalidraw/common";
+import { newTextElement } from "@excalidraw/element";
 
 import type { RenderEnvironment } from "@excalidraw/element";
 
@@ -125,11 +128,10 @@ const truncateText = (
 };
 
 /**
- * Frame labels are DOM overlays while editing. For canvas export we bake them
- * in as text elements, measured and ellipsis-truncated to the frame's width
- * (the SVG renderer draws them itself, without measuring -- see
- * `renderFrameLabelToSvg`). In the future we'll want to move to proper canvas
- * rendering, even within editor (instead of DOM).
+ * When exporting frames, we need to render frame labels which are currently
+ * being rendered in DOM when editing. Adding the labels as regular text
+ * elements seems like a simple hack. In the future we'll want to move to
+ * proper canvas rendering, even within editor (instead of DOM).
  */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -138,21 +140,33 @@ const addFrameLabelsAsTextElements = (
   const nextElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements) {
     if (isFrameLikeElement(element)) {
-      const label = getFrameLabel(element, opts);
-      const textElement = newTextElement({
-        x: label.x,
-        y: label.y,
-        fontFamily: label.fontFamily,
-        fontSize: label.fontSize,
-        lineHeight: label.lineHeight,
-        strokeColor: label.color,
-        text: label.text,
-        renderEnvironment: opts.renderEnvironment,
-      });
+      let textElement: Mutable<NonDeleted<ExcalidrawTextElement>> =
+        newTextElement({
+          x: element.x,
+          y: element.y - FRAME_STYLE.nameOffsetY,
+          fontFamily: FONT_FAMILY.Helvetica,
+          fontSize: FRAME_STYLE.nameFontSize,
+          lineHeight:
+            FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
+          strokeColor:
+            opts.theme === THEME.DARK
+              ? // the renderer applies the dark mode filter to element
+                // colors, so revert it upfront to end up with the color
+                // the editor uses for frame names
+                removeDarkModeFilter(FRAME_STYLE.nameColorDarkTheme)
+              : FRAME_STYLE.nameColorLightTheme,
+          text: getFrameLikeTitle(element),
+          renderEnvironment: opts.renderEnvironment,
+        });
+      textElement.y -= textElement.height;
 
-      nextElements.push(
-        truncateText(textElement, label.maxWidth, opts.renderEnvironment),
+      textElement = truncateText(
+        textElement,
+        element.width,
+        opts.renderEnvironment,
       );
+
+      nextElements.push(textElement);
     }
     nextElements.push(element);
   }
@@ -170,26 +184,37 @@ const getFrameRenderingConfig = (
   clip: exportingFrame ? true : frames?.clip ?? true,
 });
 
-/**
- * The elements an export renders: when exporting a single frame, only what
- * overlaps it (the renderer clips to the frame); otherwise the elements as
- * supplied.
- */
 const prepareElementsForRender = ({
   elements,
   exportingFrame,
+  frameRendering,
+  theme,
+  renderEnvironment,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
+  frameRendering: AppState["frameRendering"];
+  theme: Theme;
+  renderEnvironment: RenderEnvironment;
 }) => {
+  let nextElements: readonly NonDeletedExcalidrawElement[];
+
   if (exportingFrame) {
-    return getElementsOverlappingFrame(
+    nextElements = getElementsOverlappingFrame(
       elements,
       exportingFrame,
       arrayToMap(elements),
     );
+  } else if (frameRendering.enabled && frameRendering.name) {
+    nextElements = addFrameLabelsAsTextElements(elements, {
+      theme,
+      renderEnvironment,
+    });
+  } else {
+    nextElements = elements;
   }
-  return elements;
+
+  return nextElements;
 };
 
 // ---------------------------------------------------------------------------
@@ -496,15 +521,12 @@ export const getExportConfigFromAppState = (
 const configExportDimension = async ({
   data,
   config,
-  frameLabels,
+  renderEnvironment,
 }: {
   data: ExportSceneData;
   config?: ExportSceneConfig;
-  /**
-   * How frame labels are drawn: baked in as text elements, measured through
-   * this environment (canvas), or by the renderer itself (SVG).
-   */
-  frameLabels: { renderEnvironment: RenderEnvironment } | "renderer";
+  /** measures what the export adds (frame labels) */
+  renderEnvironment: RenderEnvironment;
 }) => {
   // clone (widened, as the size options get normalized below)
   const cfg: ExportSceneBaseConfig & ExportSizeOptions = Object.assign(
@@ -556,32 +578,13 @@ const configExportDimension = async ({
     frameRendering.clip = false;
   }
 
-  let elementsForRender = prepareElementsForRender({
+  const elementsForRender = prepareElementsForRender({
     elements,
     exportingFrame,
+    theme,
+    frameRendering,
+    renderEnvironment,
   });
-
-  // frame labels sit above their frames, so they're fitted into the export.
-  // `getFrameRenderingConfig` turns names off when exporting a single frame.
-  const frameLabelBounds: Bounds[] = [];
-  if (frameRendering.enabled && frameRendering.name) {
-    if (frameLabels === "renderer") {
-      for (const frame of getFrameLikeElements(elementsForRender)) {
-        const label = getFrameLabel(frame, { theme });
-        frameLabelBounds.push([
-          label.x,
-          label.y,
-          label.x + label.maxWidth,
-          label.y + label.height,
-        ]);
-      }
-    } else {
-      elementsForRender = addFrameLabelsAsTextElements(elementsForRender, {
-        theme,
-        renderEnvironment: frameLabels.renderEnvironment,
-      });
-    }
-  }
 
   if (exportingFrame) {
     cfg.padding = 0;
@@ -653,7 +656,6 @@ const configExportDimension = async ({
 
   const origCanvasSize = getCanvasSize(
     exportingFrame ? [exportingFrame] : getRootElements(elementsForRender),
-    frameLabelBounds,
   );
 
   // variables for original content bounding box
@@ -831,11 +833,7 @@ const exportToCanvas = async ({
     backgroundColor,
     paintedBackgroundColor,
     theme,
-  } = await configExportDimension({
-    data,
-    config,
-    frameLabels: { renderEnvironment },
-  });
+  } = await configExportDimension({ data, config, renderEnvironment });
 
   const canvas = renderEnvironment.createCanvas();
 
@@ -977,7 +975,11 @@ const exportToSvg = async ({
     backgroundColor,
     paintedBackgroundColor,
     theme,
-  } = await configExportDimension({ data, config, frameLabels: "renderer" });
+  } = await configExportDimension({
+    data,
+    config,
+    renderEnvironment: getRenderEnvironment(),
+  });
 
   const offsetX = -(x - normalizedPadding);
   const offsetY = -(y - normalizedPadding);
@@ -1234,16 +1236,8 @@ export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {
 // calculate smallest area to fit the contents in
 const getCanvasSize = (
   elements: readonly NonDeletedExcalidrawElement[],
-  /** extra boxes to fit, for things drawn that aren't elements (frame labels) */
-  extraBounds: readonly Bounds[] = [],
 ): [x: number, y: number, width: number, height: number] => {
-  let [minX, minY, maxX, maxY] = getCommonBounds(elements);
-  for (const [x1, y1, x2, y2] of extraBounds) {
-    minX = Math.min(minX, x1);
-    minY = Math.min(minY, y1);
-    maxX = Math.max(maxX, x2);
-    maxY = Math.max(maxY, y2);
-  }
+  const [minX, minY, maxX, maxY] = getCommonBounds(elements);
   const width = distance(minX, maxX);
   const height = distance(minY, maxY);
 
