@@ -244,67 +244,6 @@ type ExportSceneBaseConfig = {
   padding?: number;
   // -------------------------------------------------------------------------
   /**
-   * Left edge of the exported region (`padding` is added around it). By
-   * default the coordinate is relative to the canvas. You can switch to
-   * content coordinates by setting `origin` to `content`.
-   *
-   * Defaults to the `x` position of the content bounding box.
-   *
-   * Ignored when the content is scaled to fit (`fit: "contain"`,
-   * `maxWidthOrHeight`, or `widthOrHeight`), so setting `x` or `y` makes
-   * `fit` default to `none` (cropping the region).
-   */
-  x?: number;
-  /**
-   * Top edge of the exported region (`padding` is added around it). By
-   * default the coordinate is relative to the canvas. You can switch to
-   * content coordinates by setting `origin` to `content`.
-   *
-   * Defaults to the `y` position of the content bounding box.
-   *
-   * Ignored when the content is scaled to fit (`fit: "contain"`,
-   * `maxWidthOrHeight`, or `widthOrHeight`), so setting `x` or `y` makes
-   * `fit` default to `none` (cropping the region).
-   */
-  y?: number;
-  /**
-   * Indicates the coordinate system of the `x` and `y` values.
-   *
-   * - `canvas` - `x` and `y` are relative to the canvas [0, 0] position.
-   * - `content` - `x` and `y` are relative to the content bounding box.
-   *
-   * @default "canvas"
-   */
-  origin?: "canvas" | "content";
-  /**
-   * How the content should be scaled into the `width`/`height` frame.
-   *
-   * Behavior aligns with the `object-fit` CSS property.
-   *
-   * - `none`    - no scaling.
-   * - `contain` - scale to fit the frame. Includes `padding`.
-   *
-   * If `maxWidthOrHeight` or `widthOrHeight` is set, `fit` is ignored.
-   *
-   * @default "contain" if `width` or `height` is set (and `x`/`y` aren't),
-   * otherwise "none"
-   */
-  fit?: "none" | "contain";
-  /**
-   * When either `x` or `y` are not specified, indicates how the canvas should
-   * be aligned on the respective axis.
-   *
-   * - `topLeft` - canvas aligned to top left.
-   * - `center`  - canvas is centered on the axis which is not specified
-   *               (or both).
-   *
-   * If `maxWidthOrHeight` or `widthOrHeight` is set, `position` is ignored.
-   *
-   * @default "center"
-   */
-  position?: "center" | "topLeft";
-  // -------------------------------------------------------------------------
-  /**
    * A multiplier to increase/decrease the frame dimensions
    * (content resolution).
    *
@@ -346,7 +285,11 @@ type ExportSceneBaseConfig = {
   loadFonts?: () => Promise<void>;
 };
 
-/** The ways to size the export — only one can be used. */
+/**
+ * The ways to size the export — only one can be used. The positioning options
+ * (`fit`, `position`, `x`, `y`, `origin`) belong to `width`/`height` (or no
+ * size option).
+ */
 type ExportSizeOptions = {
   /**
    * Makes sure the canvas content fits into a frame of width/height no larger
@@ -355,7 +298,8 @@ type ExportSizeOptions = {
    * Final dimensions can get smaller/larger if used in conjunction with
    * `scale`.
    *
-   * Can't be combined with `width`/`height` or `widthOrHeight`.
+   * Can't be combined with `width`/`height`, `widthOrHeight`, or the
+   * positioning options (`fit`, `position`, `x`, `y`, `origin`).
    */
   maxWidthOrHeight?: number;
   /**
@@ -365,7 +309,8 @@ type ExportSizeOptions = {
    * Final dimensions can get smaller/larger if used in conjunction with
    * `scale`.
    *
-   * Can't be combined with `width`/`height` or `maxWidthOrHeight`.
+   * Can't be combined with `width`/`height`, `maxWidthOrHeight`, or the
+   * positioning options (`fit`, `position`, `x`, `y`, `origin`).
    */
   widthOrHeight?: number;
   /**
@@ -395,6 +340,69 @@ type ExportSizeOptions = {
    * Can't be combined with `maxWidthOrHeight` or `widthOrHeight`.
    */
   height?: number;
+  // -------------------------------------------------------------------------
+  /**
+   * Left edge of the exported region (`padding` is added around it). By
+   * default the coordinate is relative to the canvas. You can switch to
+   * content coordinates by setting `origin` to `content`.
+   *
+   * Defaults to the `x` position of the content bounding box.
+   *
+   * Can't be combined with `maxWidthOrHeight` or `widthOrHeight`, and is
+   * ignored with `fit: "contain"`, so setting `x` or `y` makes `fit` default
+   * to `none` (cropping the region).
+   */
+  x?: number;
+  /**
+   * Top edge of the exported region (`padding` is added around it). By
+   * default the coordinate is relative to the canvas. You can switch to
+   * content coordinates by setting `origin` to `content`.
+   *
+   * Defaults to the `y` position of the content bounding box.
+   *
+   * Can't be combined with `maxWidthOrHeight` or `widthOrHeight`, and is
+   * ignored with `fit: "contain"`, so setting `x` or `y` makes `fit` default
+   * to `none` (cropping the region).
+   */
+  y?: number;
+  /**
+   * Indicates the coordinate system of the `x` and `y` values.
+   *
+   * - `canvas` - `x` and `y` are relative to the canvas [0, 0] position.
+   * - `content` - `x` and `y` are relative to the content bounding box.
+   *
+   * Can't be combined with `maxWidthOrHeight` or `widthOrHeight`.
+   *
+   * @default "canvas"
+   */
+  origin?: "canvas" | "content";
+  /**
+   * How the content should be scaled into the `width`/`height` frame.
+   *
+   * Behavior aligns with the `object-fit` CSS property.
+   *
+   * - `none`    - no scaling.
+   * - `contain` - scale to fit the frame. Includes `padding`.
+   *
+   * Can't be combined with `maxWidthOrHeight` or `widthOrHeight`.
+   *
+   * @default "contain" if `width` or `height` is set (and `x`/`y` aren't),
+   * otherwise "none"
+   */
+  fit?: "none" | "contain";
+  /**
+   * When either `x` or `y` are not specified, indicates how the canvas should
+   * be aligned on the respective axis.
+   *
+   * - `topLeft` - canvas aligned to top left.
+   * - `center`  - canvas is centered on the axis which is not specified
+   *               (or both).
+   *
+   * Can't be combined with `maxWidthOrHeight` or `widthOrHeight`.
+   *
+   * @default "center"
+   */
+  position?: "center" | "topLeft";
 };
 
 type ExportSizeOption<K extends keyof ExportSizeOptions> = Pick<
@@ -407,7 +415,9 @@ type ExportSizeOption<K extends keyof ExportSizeOptions> = Pick<
 };
 
 type ExportSizeConfig =
-  | ExportSizeOption<"width" | "height">
+  | ExportSizeOption<
+      "width" | "height" | "fit" | "position" | "x" | "y" | "origin"
+    >
   | ExportSizeOption<"maxWidthOrHeight">
   | ExportSizeOption<"widthOrHeight">;
 
@@ -836,11 +846,6 @@ type ExportToSvgConfig = Pick<
   | "theme"
   | "exportingFrame"
   | "scale"
-  | "x"
-  | "y"
-  | "origin"
-  | "fit"
-  | "position"
   | "frames"
   | "loadFonts"
 > &

@@ -129,6 +129,8 @@ describe("exportScene: canvas", async () => {
     await exportWith({ width: 100, height: 100, fit: "contain" });
     await exportWith({ width: 100, height: 100, fit: "contain", x: 30, y: 20 });
     await exportWith({ maxWidthOrHeight: 100 });
+    // the types forbid x/y with maxWidthOrHeight, JS callers still can
+    // @ts-expect-error
     await exportWith({ maxWidthOrHeight: 100, x: 30, y: 20 });
 
     expect(renderedScroll(1)).toEqual(renderedScroll(0));
