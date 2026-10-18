@@ -375,6 +375,8 @@ describe("headless (server-side) export", () => {
       createCanvas,
       createImage,
       createPath,
+      // a DOM shim's, for SVG export
+      document: hostDocument,
     };
 
     const appState = {
@@ -421,7 +423,7 @@ describe("headless (server-side) export", () => {
         data: { elements, files },
         config: {
           canvasBackgroundColor: "#ffffff",
-          environment: { ...renderEnvironment, document: hostDocument },
+          environment: renderEnvironment,
         },
       });
 

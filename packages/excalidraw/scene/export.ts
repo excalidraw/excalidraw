@@ -268,9 +268,10 @@ type ExportEnvironment = {
    * The document an SVG export is built in, e.g. a popout window's or,
    * outside the browser, a DOM implementation's (such as `linkedom`).
    *
-   * Defaults to the global `document`.
+   * Defaults to the process-wide render environment's, the global `document`
+   * unless overridden.
    */
-  document?: Document;
+  document?: RenderEnvironment["document"];
   /**
    * Loads the fonts the exported elements use, before rendering.
    *
@@ -498,6 +499,7 @@ const getExportRenderEnvironment = (
     createCanvas: environment?.createCanvas ?? defaults.createCanvas,
     createImage: environment?.createImage ?? defaults.createImage,
     createPath: environment?.createPath ?? defaults.createPath,
+    document: environment?.document ?? defaults.document,
   };
 };
 
@@ -949,8 +951,10 @@ const exportToSvg = async ({
   data: ExportSceneData;
   config?: ExportToSvgConfig;
 }) => {
+  const renderEnvironment = getExportRenderEnvironment(config?.environment);
+
   const ownerDocument =
-    config?.environment?.document ??
+    renderEnvironment.document ??
     (typeof document !== "undefined" ? document : null);
 
   if (!ownerDocument) {
@@ -959,8 +963,6 @@ const exportToSvg = async ({
         "`config.environment.document` when running outside the browser.",
     );
   }
-
-  const renderEnvironment = getExportRenderEnvironment(config?.environment);
 
   const {
     config: cfg,

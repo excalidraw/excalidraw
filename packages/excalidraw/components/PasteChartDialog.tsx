@@ -48,7 +48,7 @@ const ChartPreviewBtn = (props: {
     null,
   );
   const { theme } = useUIAppState();
-  const { renderEnvironment, ownerDocument } = useApp();
+  const { renderEnvironment } = useApp();
 
   useLayoutEffect(() => {
     if (!props.spreadsheet) {
@@ -84,7 +84,7 @@ const ChartPreviewBtn = (props: {
           skipInliningFonts: true,
           theme,
           canvasBackgroundColor: false,
-          environment: { document: ownerDocument },
+          environment: renderEnvironment,
         },
       });
       svg.querySelector(".style-fonts")?.remove();
@@ -101,7 +101,6 @@ const ChartPreviewBtn = (props: {
     props.colorSeed,
     theme,
     renderEnvironment,
-    ownerDocument,
   ]);
 
   const chartTypeLabel = getChartTypeLabel(props.chartType);
@@ -129,7 +128,7 @@ const PlainTextPreviewBtn = (props: {
 }) => {
   const previewRef = useRef<HTMLDivElement | null>(null);
   const { theme } = useUIAppState();
-  const { ownerDocument } = useApp();
+  const { renderEnvironment } = useApp();
 
   useLayoutEffect(() => {
     if (!props.rawText) {
@@ -155,7 +154,7 @@ const PlainTextPreviewBtn = (props: {
           skipInliningFonts: true,
           theme,
           canvasBackgroundColor: false,
-          environment: { document: ownerDocument },
+          environment: renderEnvironment,
         },
       });
       svg.querySelector(".style-fonts")?.remove();
@@ -166,7 +165,7 @@ const PlainTextPreviewBtn = (props: {
     return () => {
       previewNode.replaceChildren();
     };
-  }, [props.rawText, theme, ownerDocument]);
+  }, [props.rawText, theme, renderEnvironment]);
 
   return (
     <button

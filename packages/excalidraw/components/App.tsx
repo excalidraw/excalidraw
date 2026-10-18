@@ -2793,7 +2793,6 @@ class App extends React.Component<AppProps, AppState> {
         name: this.getName(),
         exportingFrame: opts.exportingFrame,
         renderEnvironment: this.renderEnvironment,
-        ownerDocument: this.ownerDocument,
       },
     )
       .catch(muteFSAbortError)

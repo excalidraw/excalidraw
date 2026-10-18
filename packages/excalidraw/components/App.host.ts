@@ -126,6 +126,7 @@ export class AppHost {
         // to the global for realms without one (e.g. jsdom iframes).
         createPath: (svgPath: string) =>
           new (this.app.ownerWindow.Path2D ?? Path2D)(svgPath),
+        document: ownerDocument,
       };
     }
     return this._renderEnvironment;

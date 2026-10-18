@@ -9,9 +9,8 @@
  * the export pipeline running where `document`/`window` don't exist (Node
  * with `node-canvas` / `@napi-rs/canvas`).
  *
- * `exportToSvg` builds its output through `document.createElementNS` /
- * `createTextNode` / `createComment` and stays browser-only -- this
- * abstraction does not make it importable-and-runnable under Node.
+ * `document` is the DOM side of the same host: what SVG exports are built in
+ * (a DOM implementation such as `linkedom` under Node).
  */
 export type RenderEnvironment = {
   /** Creates a blank canvas. Callers set `width`/`height` themselves. */
@@ -36,6 +35,13 @@ export type RenderEnvironment = {
    * one every freedraw element fails to render.
    */
   createPath?: (svgPath: string) => Path2D;
+  /**
+   * The document SVG exports are built in: the editor's owner document, or
+   * outside the browser a DOM implementation's (e.g. `linkedom`).
+   *
+   * Optional; falls back to the global `document`.
+   */
+  document?: Document;
 };
 
 const defaultCreateCanvas = () => {
@@ -90,6 +96,7 @@ export const setRenderEnvironment = (env: Partial<RenderEnvironment>) => {
     createCanvas: env.createCanvas ?? defaultCreateCanvas,
     createImage: env.createImage ?? defaultCreateImage,
     createPath: env.createPath ?? defaultCreatePath,
+    document: env.document,
   };
 };
 

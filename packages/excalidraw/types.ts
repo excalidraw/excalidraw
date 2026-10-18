@@ -868,9 +868,11 @@ export interface ExcalidrawProps {
    *
    * Only `createCanvas` and `createImage` are required. `createPath` (used to
    * fill freedraw strokes) falls back to the global `Path2D`, which every
-   * browser has -- a non-browser host without one must supply it.
+   * browser has -- a non-browser host without one must supply it. Pass
+   * `document` (the owner document) for SVG exports to be built in it rather
+   * than in the global `document`.
    *
-   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image(), createPath: (d) => new ownerWindow.Path2D(d) }
+   * @default { createCanvas: () => ownerDocument.createElement("canvas"), createImage: () => new ownerWindow.Image(), createPath: (d) => new ownerWindow.Path2D(d), document: ownerDocument }
    */
   renderEnvironment?: RenderEnvironment;
   onChange?: (
