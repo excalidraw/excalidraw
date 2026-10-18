@@ -13,6 +13,33 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+### Export API: `exportScene` (2026-10-18) [#XXXX](https://github.com/excalidraw/excalidraw/pull/XXXX)
+
+Breaking. `exportToCanvas`, `exportToBlob` and `exportToSvg` (in both `@excalidraw/excalidraw` and `@excalidraw/utils`) are replaced by a single `exportScene`, and every rendering option moved from `appState` into an explicit `config`.
+
+- `exportScene({ type, data, config })` with `type` `"canvas"`, `"png"`, `"jpeg"` or `"svg"` resolves to an `HTMLCanvasElement`, a `Blob` or an `SVGSVGElement`. `exportToClipboard({ type: "png" | "svg" | "json", data, config })` stays. Types: `ExportSceneData`, `ExportSceneConfig`, `ExportSceneOptions`.
+- `data` is `{ elements, appState?, files? }`, the shape of a `.excalidraw` file. Only the scene settings a file stores are read from `appState`: `viewBackgroundColor` as the default background, and the grid settings that `embedScene` embeds. Any other key is ignored, so passing a live `appState` can't affect the output.
+- Migration:
+
+  | Before | Now |
+  | --- | --- |
+  | `exportToCanvas({ elements, appState, files, … })` | `exportScene({ type: "canvas", data: { elements, appState, files }, config })` |
+  | `exportToBlob({ …, mimeType, quality })` | `exportScene({ type: "png" \| "jpeg", …, config })` — `quality` is JPEG-only |
+  | `exportToSvg({ … })` | `exportScene({ type: "svg", … })` |
+  | `appState.exportBackground: false` | `config.canvasBackgroundColor: false` (a color string overrides the background; JPEG always gets one) |
+  | `appState.exportWithDarkMode` | `config.theme: "dark"` |
+  | `appState.exportScale` | `config.scale` (also multiplies a `maxWidthOrHeight` result) |
+  | `appState.exportEmbedScene` | `config.embedScene` (png, svg) |
+  | `appState.frameRendering` | `config.frames: { name?, outline?, clip? }` |
+  | `exportPadding` (default 10) | `config.padding` (default **0**) |
+  | `getDimensions: (w, h) => ({ width, height, scale })` | `config.width`/`height`, `maxWidthOrHeight` or `widthOrHeight`, plus `config.scale` — a number, or `(width, height) => number` receiving the export size at scale 1 (padding included), e.g. to cap the output by a pixel budget |
+  | `maxWidthOrHeight`, `exportingFrame`, `renderEmbeddables`, `skipInliningFonts`, `reuseImages` | same names, in `config` |
+
+- New sizing options: `width`/`height` (only one given: the other follows the content's aspect ratio), `widthOrHeight` (scales the longest side to exactly that size), `fit: "contain" | "none"` and `position: "center" | "topLeft"` within a `width`/`height` frame, and `x`/`y`/`origin` to export a region (cropped, with padding on all sides). The size options are mutually exclusive in the types, and `fit`, `position` and `x`/`y` only combine with `width`/`height`.
+- `config.environment` for non-browser hosts: `createCanvas` (e.g. `node-canvas`) and `loadFonts`.
+- Canvas dimensions are rounded instead of truncated, so float noise no longer costs a pixel (a 20.5px frame-label band now rounds up).
+- In dark exports, frame names now use the editor's dark frame-name color (they were dark-filtered twice and came out lighter).
+
 ### Selection API (2026-10-10) [#12258](https://github.com/excalidraw/excalidraw/pull/12258)
 
 - New `excalidrawAPI.selection`: `select(elements, opts?)`, `add(elements, opts?)`, `remove(elements, opts?)` and `clear(opts?)`, taking elements or their ids, one or many. Missing and deleted elements are skipped.
