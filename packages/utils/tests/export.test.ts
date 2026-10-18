@@ -11,6 +11,8 @@ import { vi } from "vitest";
 
 import * as utils from "../src";
 
+import type { ExportSceneConfig } from "../src";
+
 const exportToSvgSpy = vi.spyOn(mockedSceneExportUtils, "exportToSvg");
 
 describe("exportToCanvas", async () => {
@@ -80,6 +82,36 @@ describe("exportToCanvas", async () => {
 
     // `fit: "none"` adds the padding around the region
     expect([canvas.width, canvas.height]).toEqual([120, 120]);
+  });
+
+  it("ignores x/y when the content is scaled to fit", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const renderSpy = vi.spyOn(staticSceneModule, "renderStaticScene");
+    const exportWith = (config: ExportSceneConfig) =>
+      utils.exportToCanvas({
+        data: {
+          elements: [
+            API.createElement({ type: "rectangle", width: 200, height: 100 }),
+          ],
+          files: null,
+        },
+        config: { padding: EXPORT_PADDING, ...config },
+      });
+    const renderedScroll = (call: number) => {
+      const { scrollX, scrollY } = renderSpy.mock.calls[call][0].appState;
+      return [scrollX, scrollY];
+    };
+
+    await exportWith({ width: 100, height: 100, fit: "contain" });
+    await exportWith({ width: 100, height: 100, fit: "contain", x: 30, y: 20 });
+    await exportWith({ maxWidthOrHeight: 100 });
+    await exportWith({ maxWidthOrHeight: 100, x: 30, y: 20 });
+
+    expect(renderedScroll(1)).toEqual(renderedScroll(0));
+    expect(renderedScroll(3)).toEqual(renderedScroll(2));
+    expect(warn).toHaveBeenCalledTimes(2);
+    warn.mockRestore();
+    renderSpy.mockRestore();
   });
 
   it("with a scale function", async () => {

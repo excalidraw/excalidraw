@@ -251,8 +251,9 @@ type ExportSceneBaseConfig = {
    *
    * Defaults to the `x` position of the content bounding box.
    *
-   * Setting `x` or `y` makes `fit` default to `none` (cropping the region),
-   * as they're ignored with `fit: "contain"`.
+   * Ignored when the content is scaled to fit (`fit: "contain"`,
+   * `maxWidthOrHeight`, or `widthOrHeight`), so setting `x` or `y` makes
+   * `fit` default to `none` (cropping the region).
    */
   x?: number;
   /**
@@ -261,8 +262,9 @@ type ExportSceneBaseConfig = {
    *
    * Defaults to the `y` position of the content bounding box.
    *
-   * Setting `x` or `y` makes `fit` default to `none` (cropping the region),
-   * as they're ignored with `fit: "contain"`.
+   * Ignored when the content is scaled to fit (`fit: "contain"`,
+   * `maxWidthOrHeight`, or `widthOrHeight`), so setting `x` or `y` makes
+   * `fit` default to `none` (cropping the region).
    */
   y?: number;
   /**
@@ -496,6 +498,21 @@ const configExportDimension = async ({
       console.warn("`maxWidthOrHeight` is ignored when `widthOrHeight` is set");
     }
     cfg.maxWidthOrHeight = undefined;
+  }
+
+  if (
+    (cfg.x != null || cfg.y != null) &&
+    (cfg.fit === "contain" ||
+      cfg.maxWidthOrHeight != null ||
+      cfg.widthOrHeight != null)
+  ) {
+    if (!import.meta.env.PROD) {
+      console.warn(
+        '`x`/`y` are ignored when the content is scaled to fit (`fit: "contain"`, `maxWidthOrHeight`, or `widthOrHeight`)',
+      );
+    }
+    cfg.x = undefined;
+    cfg.y = undefined;
   }
 
   // ---------------------------------------------------------------------------
