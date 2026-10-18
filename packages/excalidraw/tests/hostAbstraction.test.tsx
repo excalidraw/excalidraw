@@ -436,12 +436,13 @@ describe("headless (server-side) export", () => {
     }
   });
 
-  it("fails the export rather than shipping a partial image", async () => {
+  it("exports the rest of the scene when an element fails to render", async () => {
     const hostDocument = document;
     const target = hostDocument.createElement("canvas");
     const consoleError = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
+    const fillText = vi.spyOn(target.getContext("2d")!, "fillText");
 
     const { elements } = makeScene();
     const appState = {
@@ -455,24 +456,34 @@ describe("headless (server-side) export", () => {
     vi.stubGlobal("Path2D", undefined);
 
     try {
-      await expect(
-        exportScene({
-          type: "canvas",
-          data: { elements, appState },
-          config: {
-            canvasBackgroundColor: "#ffffff",
-            environment: {
-              createCanvas: () => target,
-              loadFonts: async () => {},
-            },
+      const canvas = await exportScene({
+        type: "canvas",
+        data: { elements, appState },
+        config: {
+          canvasBackgroundColor: "#ffffff",
+          environment: {
+            createCanvas: () => target,
+            loadFonts: async () => {},
           },
-        }),
-      ).rejects.toThrow(/Path2D/);
-      // the editor logs and keeps painting; an export must not
-      expect(consoleError).not.toHaveBeenCalled();
+        },
+      });
+
+      expect(canvas).toBe(target);
+      // the bad element is logged...
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringMatching(/Path2D/) }),
+        expect.any(String),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+        expect.any(Number),
+      );
+      // ...and the rest still painted
+      expect(fillText).toHaveBeenCalledWith("hello", 0, expect.any(Number));
     } finally {
       vi.unstubAllGlobals();
       consoleError.mockRestore();
+      fillText.mockRestore();
     }
   });
 });

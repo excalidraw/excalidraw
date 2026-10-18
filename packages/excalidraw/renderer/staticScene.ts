@@ -59,19 +59,14 @@ import type {
 import type { StaticCanvasAppState, Zoom } from "../types";
 
 /**
- * A render failure is per-element on purpose in the editor: one bad element
- * must not blank the whole canvas. On export the same tolerance is a trap --
- * the caller gets a silently blank or partial image with nothing but a
- * `console.error` as evidence, so exports fail loudly instead.
+ * A render failure is per-element on purpose, on export too: one bad element
+ * must not blank the canvas or fail the export, the rest of the scene
+ * survives it.
  */
-const handleElementRenderError = (
+const logElementRenderError = (
   error: unknown,
   element: NonDeletedExcalidrawElement,
-  isExporting: boolean,
 ) => {
-  if (isExporting) {
-    throw error;
-  }
   console.error(
     error,
     element.id,
@@ -523,7 +518,7 @@ const _renderStaticScene = ({
           );
         }
       } catch (error: any) {
-        handleElementRenderError(error, element, isExporting);
+        logElementRenderError(error, element);
       }
     });
 
@@ -587,7 +582,7 @@ const _renderStaticScene = ({
         }
         context.restore();
       } catch (error: any) {
-        handleElementRenderError(error, element, isExporting);
+        logElementRenderError(error, element);
       }
     });
 
@@ -604,7 +599,7 @@ const _renderStaticScene = ({
         appState,
       );
     } catch (error) {
-      handleElementRenderError(error, element, isExporting);
+      logElementRenderError(error, element);
     }
   });
 };
