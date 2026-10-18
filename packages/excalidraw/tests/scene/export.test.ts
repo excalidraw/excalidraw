@@ -655,6 +655,37 @@ describe("exporting frames", () => {
       expect(label).toHaveAttribute("fill", FRAME_STYLE.nameColorDarkTheme);
     });
 
+    it("clips a frame export larger than the frame to the frame", async () => {
+      const frame = API.createElement({
+        type: "frame",
+        width: 100,
+        height: 100,
+      });
+      const child = API.createElement({
+        type: "rectangle",
+        x: 50,
+        y: 20,
+        width: 150,
+        height: 40,
+        frameId: frame.id,
+      });
+      const data = { elements: [frame, child] };
+      const config = { exportingFrame: frame, width: 200, height: 100 };
+
+      const svg = await exportScene({ type: "svg", data, config });
+      expect(
+        svg.querySelector(
+          `g[clip-path="url(#${frame.id})"] [data-id="${child.id}"]`,
+        ),
+      ).not.toBeNull();
+
+      const canvas = await exportScene({ type: "canvas", data, config });
+      const clips = (canvas.getContext("2d") as any)
+        .__getEvents()
+        .filter((event: any) => event.type === "clip");
+      expect(clips).toHaveLength(1);
+    });
+
     it("exporting frame should include overlapping elements, but crop to frame", async () => {
       const frame = API.createElement({
         type: "frame",

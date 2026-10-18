@@ -522,8 +522,9 @@ const configExportDimension = async ({
     exportingFrame ?? null,
     cfg.frames,
   );
-  // for canvas export, don't clip if exporting a specific frame as it would
-  // clip the corners of the content
+  // when exporting a frame, everything drawn is clipped to the frame as a
+  // whole, with square corners (see `exportToCanvas`/`exportToSvg`) — the
+  // per-element frame clips would round the corners of the content
   if (exportingFrame) {
     frameRendering.clip = false;
   }
@@ -827,6 +828,7 @@ const exportToCanvas = async ({
     },
     renderConfig: {
       canvasBackgroundColor: backgroundColor,
+      clipToFrame: cfg.exportingFrame ?? null,
       imageCache,
       renderGrid: false,
       isExporting: true,
@@ -961,6 +963,13 @@ const exportToSvg = async ({
   // ---------------------------------------------------------------------------
 
   const frameElements = getFrameLikeElements(elements);
+  const { exportingFrame } = cfg;
+  if (
+    exportingFrame &&
+    !frameElements.some((frame) => frame.id === exportingFrame.id)
+  ) {
+    frameElements.push(exportingFrame);
+  }
 
   if (frameElements.length) {
     const elementsMap = arrayToMap(elements);
@@ -1043,11 +1052,20 @@ const exportToSvg = async ({
 
   const renderEmbeddables = config?.renderEmbeddables ?? false;
 
+  // when exporting a frame, clip everything drawn to it (its clip path has
+  // square corners), as the export may be larger than the frame
+  let elementsRoot: SVGElement = svgRoot;
+  if (cfg.exportingFrame) {
+    elementsRoot = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+    elementsRoot.setAttribute("clip-path", `url(#${cfg.exportingFrame.id})`);
+    svgRoot.appendChild(elementsRoot);
+  }
+
   renderSceneToSvg(
     elementsForRender,
     toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
     rsvg,
-    svgRoot,
+    elementsRoot,
     data.files || {},
     {
       offsetX,
