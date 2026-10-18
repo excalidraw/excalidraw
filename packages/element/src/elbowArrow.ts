@@ -63,7 +63,6 @@ import type {
   FixedPointBinding,
   FixedSegment,
   NonDeletedExcalidrawElement,
-  Ordered,
 } from "./types";
 
 type GridAddress = [number, number] & { _brand: "gridaddress" };
@@ -2281,7 +2280,7 @@ const getBindPointHeading = (
 const getHoveredElement = (
   origPoint: GlobalPoint,
   elementsMap: NonDeletedSceneElementsMap,
-  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  elements: readonly NonDeletedExcalidrawElement[],
   zoom: AppState["zoom"],
 ) => {
   return getHoveredElementForBinding(origPoint, elements, elementsMap, zoom);

@@ -34,11 +34,11 @@ import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawElementType,
   ExcalidrawIframeLikeElement,
-  OrderedExcalidrawElement,
   ExcalidrawNonSelectionElement,
   BindMode,
   ExcalidrawTextElement,
   StrokeVariability,
+  NonRestoredExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import type {
@@ -852,7 +852,7 @@ export interface ExcalidrawProps {
    */
   ownerDocument?: Document;
   onChange?: (
-    elements: readonly OrderedExcalidrawElement[],
+    elements: readonly ExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
   ) => void;
@@ -1094,7 +1094,7 @@ export interface ExcalidrawProps {
 
 export type SceneData = {
   /** Expects normalized elements; restore imported data before updating the scene. */
-  elements?: readonly ExcalidrawElement[] | null;
+  elements?: readonly NonRestoredExcalidrawElement[] | null;
   appState?: ImportedDataState["appState"];
   collaborators?: Map<SocketId, Collaborator>;
   captureUpdate?: CaptureUpdateActionType;

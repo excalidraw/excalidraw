@@ -48,6 +48,7 @@ import type {
   FixedSegment,
   NonDeleted,
   NonDeletedExcalidrawElement,
+  FractionalIndex,
 } from "@excalidraw/element/types";
 
 import type { Mutable } from "@excalidraw/common/utility-types";
@@ -268,7 +269,11 @@ export class API {
       | "groupIds"
       | "link"
       | "updated"
-    > = {
+      | "index"
+    > & {
+      // created elements are not ordered until inserted into the scene
+      index: FractionalIndex | null;
+    } = {
       seed: 1,
       x,
       y,

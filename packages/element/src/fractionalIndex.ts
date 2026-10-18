@@ -15,8 +15,6 @@ import type {
   ElementsMap,
   ExcalidrawElement,
   FractionalIndex,
-  Ordered,
-  OrderedExcalidrawElement,
   SceneElementsMap,
 } from "./types";
 
@@ -147,9 +145,7 @@ export const validateFractionalIndices = (
  * - when fractional indices are identical, break the tie based on the element id
  * - when there is no fractional index in one of the elements, respect the order of the array
  */
-export const orderByFractionalIndex = (
-  elements: OrderedExcalidrawElement[],
-) => {
+export const orderByFractionalIndex = (elements: ExcalidrawElement[]) => {
   return elements.sort((a, b) => {
     // in case the indices are not the defined at runtime
     if (isOrderedElement(a) && isOrderedElement(b)) {
@@ -175,7 +171,7 @@ export const orderByFractionalIndex = (
 export const syncMovedIndices = (
   elements: readonly ExcalidrawElement[],
   movedElements: ElementsMap,
-): OrderedExcalidrawElement[] => {
+): ExcalidrawElement[] => {
   try {
     const elementsMap = arrayToMap(elements);
     const indicesGroups = getMovedIndicesGroups(elements, movedElements);
@@ -212,7 +208,7 @@ export const syncMovedIndices = (
     syncInvalidIndices(elements);
   }
 
-  return elements as OrderedExcalidrawElement[];
+  return elements as ExcalidrawElement[];
 };
 
 /**
@@ -222,7 +218,7 @@ export const syncMovedIndices = (
  */
 export const syncInvalidIndices = <T extends ExcalidrawElement>(
   elements: readonly T[],
-): Ordered<T>[] => {
+): T[] => {
   const elementsMap = arrayToMap(elements);
   const indicesGroups = getInvalidIndicesGroups(elements);
   const elementsUpdates = generateIndices(elements, indicesGroups);
@@ -231,7 +227,7 @@ export const syncInvalidIndices = <T extends ExcalidrawElement>(
     mutateElement(element, elementsMap, { index });
   }
 
-  return elements as Ordered<T>[];
+  return elements as T[];
 };
 
 /**
@@ -458,9 +454,9 @@ const generateIndices = (
   return elementsUpdates;
 };
 
-const isOrderedElement = (
-  element: ExcalidrawElement,
-): element is OrderedExcalidrawElement => {
+const isOrderedElement = (element: ExcalidrawElement): boolean => {
+  // elements are typed as ordered, but defensively check the index exists at
+  // runtime, as unrestored elements could still slip in
   // for now it's sufficient whether the index is there
   // meaning, the element was already ordered in the past
   // meaning, it is not a newly inserted element, not an unrestored element, etc.

@@ -32,7 +32,6 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 import type {
   ExcalidrawElement,
   ExcalidrawTextElement,
-  OrderedExcalidrawElement,
 } from "@excalidraw/element/types";
 
 import { IconButton } from "../components/IconButton";
@@ -172,9 +171,7 @@ export const actionGroup = register({
     // to the z order of the highest element in the layer stack
     const elementsInGroup = getElementsInGroup(nextElements, newGroupId);
     const lastElementInGroup = elementsInGroup[elementsInGroup.length - 1];
-    const lastGroupElementIndex = nextElements.lastIndexOf(
-      lastElementInGroup as OrderedExcalidrawElement,
-    );
+    const lastGroupElementIndex = nextElements.lastIndexOf(lastElementInGroup);
     const elementsAfterGroup = nextElements.slice(lastGroupElementIndex + 1);
     const elementsBeforeGroup = nextElements
       .slice(0, lastGroupElementIndex)
