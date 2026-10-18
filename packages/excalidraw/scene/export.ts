@@ -352,7 +352,8 @@ type ExportSizeOptions = {
    * content.
    *
    * If `width` omitted but `height` supplied, `width` is calculated from the
-   * the content's bounding box to preserve the aspect ratio.
+   * content's aspect ratio when `fit` is `contain` (the default), or is the
+   * content bounding box width when `fit` is `none`.
    *
    * Defaults to the content bounding box width when both `width` and `height`
    * are omitted.
@@ -364,7 +365,8 @@ type ExportSizeOptions = {
    * Height of the frame.
    *
    * If `height` omitted but `width` supplied, `height` is calculated from the
-   * content's bounding box to preserve the aspect ratio.
+   * content's aspect ratio when `fit` is `contain` (the default), or is the
+   * content bounding box height when `fit` is `none`.
    *
    * Defaults to the content bounding box height when both `width` and `height`
    * are omitted.
@@ -514,6 +516,20 @@ const configExportDimension = async ({
   y = cfg.y ?? y;
   width = cfg.width ?? width;
   height = cfg.height ?? height;
+
+  // with `contain`, derive a missing `width`/`height` from the content's
+  // aspect ratio (keeping the padding the same on all sides)
+  if (cfg.fit === "contain") {
+    if (cfg.width != null && cfg.height == null && origWidth > 0) {
+      height =
+        ((cfg.width - cfg.padding * 2) * origHeight) / origWidth +
+        cfg.padding * 2;
+    } else if (cfg.height != null && cfg.width == null && origHeight > 0) {
+      width =
+        ((cfg.height - cfg.padding * 2) * origWidth) / origHeight +
+        cfg.padding * 2;
+    }
+  }
 
   if (cfg.fit === "contain" || cfg.widthOrHeight || cfg.maxWidthOrHeight) {
     // clamp padding so the exported canvas doesn't get smaller than

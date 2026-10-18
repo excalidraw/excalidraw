@@ -48,6 +48,25 @@ describe("exportToCanvas", async () => {
     expect(canvas.height).toBe(200);
   });
 
+  it("derives a missing width/height from the aspect ratio", async () => {
+    const elements = [
+      API.createElement({ type: "rectangle", width: 200, height: 100 }),
+    ];
+
+    const fromHeight = await utils.exportToCanvas({
+      data: { elements, files: null },
+      config: { padding: EXPORT_PADDING, height: 50 },
+    });
+    // 30px of content height → 60px of content width, plus padding
+    expect([fromHeight.width, fromHeight.height]).toEqual([80, 50]);
+
+    const fromWidth = await utils.exportToCanvas({
+      data: { elements, files: null },
+      config: { padding: EXPORT_PADDING, width: 100 },
+    });
+    expect([fromWidth.width, fromWidth.height]).toEqual([100, 60]);
+  });
+
   it("with a scale function", async () => {
     const scale = vi.fn((width: number, height: number) => 60 / width);
     const canvas = await utils.exportToCanvas({
