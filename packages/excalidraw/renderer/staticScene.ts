@@ -188,7 +188,10 @@ export const frameClip = (
   );
 };
 
-type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
+type LinkIconCanvas = HTMLCanvasElement & {
+  zoom: number;
+  backgroundColor: string;
+};
 
 const linkIconCanvasCache: {
   regularLink: LinkIconCanvas | null;
@@ -197,6 +200,19 @@ const linkIconCanvasCache: {
   regularLink: null,
   elementLink: null,
 };
+
+/**
+ * Color of the chip drawn behind the link icon. It must match the canvas
+ * background as it is actually rendered, i.e. with the dark mode filter
+ * applied when the dark theme is active.
+ */
+export const getLinkIconBackgroundColor = (
+  appState: Pick<StaticCanvasAppState, "viewBackgroundColor" | "theme">,
+) =>
+  applyDarkModeFilter(
+    appState.viewBackgroundColor || COLOR_WHITE,
+    appState.theme === THEME.DARK,
+  );
 
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
@@ -227,11 +243,18 @@ const renderLinkIcon = (
       ? "elementLink"
       : "regularLink";
 
+    const backgroundColor = getLinkIconBackgroundColor(appState);
+
     let linkCanvas = linkIconCanvasCache[canvasKey];
 
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
+    if (
+      !linkCanvas ||
+      linkCanvas.zoom !== appState.zoom.value ||
+      linkCanvas.backgroundColor !== backgroundColor
+    ) {
       linkCanvas = Object.assign(document.createElement("canvas"), {
         zoom: appState.zoom.value,
+        backgroundColor,
       });
       linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
       linkCanvas.height =
@@ -247,8 +270,7 @@ const renderLinkIcon = (
       // Seed a sane default so a corrupted color (silently rejected by the
       // canvas) falls back to white instead of a stale fillStyle.
       linkCanvasCacheContext.fillStyle = COLOR_WHITE;
-      linkCanvasCacheContext.fillStyle =
-        appState.viewBackgroundColor || COLOR_WHITE;
+      linkCanvasCacheContext.fillStyle = backgroundColor;
 
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
