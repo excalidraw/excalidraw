@@ -198,7 +198,7 @@ describe("multi-window editors", () => {
     const realmA = createRealm();
     const realmB = createRealm();
     // built up front: measuring their text mints a canvas through the
-    // process-wide default environment, which is not what is under test here
+    // default environment, which is not what is under test here
     const sceneA = makeScene();
     const sceneB = makeScene();
     const mainCreateElement = vi.spyOn(document, "createElement");

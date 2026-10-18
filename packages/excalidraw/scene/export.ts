@@ -245,31 +245,26 @@ type ExportEnvironment = {
    * Do not set `canvas.width/height` or modify the canvas context as that's
    * handled by Excalidraw.
    *
-   * Defaults to the process-wide render environment's (see
-   * `setRenderEnvironment`), `document.createElement("canvas")` unless
-   * overridden.
+   * Defaults to `document.createElement("canvas")`.
    */
   createCanvas?: RenderEnvironment["createCanvas"];
   /**
    * Creates the images that image elements are decoded into.
    *
-   * Defaults to the process-wide render environment's, `new Image()` unless
-   * overridden.
+   * Defaults to `new Image()`.
    */
   createImage?: RenderEnvironment["createImage"];
   /**
    * Creates the paths that freedraw elements are filled through.
    *
-   * Defaults to the process-wide render environment's, the global `Path2D`
-   * unless overridden.
+   * Defaults to the global `Path2D`.
    */
   createPath?: RenderEnvironment["createPath"];
   /**
    * The document an SVG export is built in, e.g. a popout window's or,
    * outside the browser, a DOM implementation's (such as `linkedom`).
    *
-   * Defaults to the process-wide render environment's, the global `document`
-   * unless overridden.
+   * Defaults to the global `document`.
    */
   document?: RenderEnvironment["document"];
   /**
@@ -488,8 +483,8 @@ type ExportSizeConfig =
 export type ExportSceneConfig = ExportSceneBaseConfig & ExportSizeConfig;
 
 /**
- * The render environment of an export: `config.environment` overrides on top
- * of the process-wide one (see `setRenderEnvironment`).
+ * The render environment of an export: `config.environment` over the browser
+ * defaults.
  */
 const getExportRenderEnvironment = (
   environment: ExportEnvironment | undefined,

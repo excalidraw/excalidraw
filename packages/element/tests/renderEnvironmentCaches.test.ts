@@ -1,10 +1,5 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 
-import {
-  getRenderEnvironment,
-  setRenderEnvironment,
-  resetRenderEnvironment,
-} from "../src/renderEnvironment";
 import {
   charWidth,
   getMaxCharWidth,
@@ -35,54 +30,32 @@ const makeEnv = (perChar: number): RenderEnvironment => ({
  * so a swap must invalidate rather than serve one realm's pixels to another.
  */
 describe("render environment cache invalidation", () => {
-  afterEach(() => resetRenderEnvironment());
+  it("builds a text metrics provider per environment", () => {
+    const makeCountingEnv = () => {
+      const canvases: HTMLCanvasElement[] = [];
+      const env: RenderEnvironment = {
+        createCanvas: () => {
+          const canvas = document.createElement("canvas");
+          canvases.push(canvas);
+          return canvas;
+        },
+        createImage: () => ({} as HTMLImageElement),
+      };
+      return { env, canvases };
+    };
+    const first = makeCountingEnv();
+    const second = makeCountingEnv();
 
-  it("installs a fresh identity per swap, dropping identity-keyed caches", () => {
-    const before = getRenderEnvironment();
-    expect(getRenderEnvironment()).toBe(before);
+    // builds + caches the provider's canvas
+    getTextWidth("measure me", FONT, first.env);
+    getTextWidth("measure me twice", FONT, first.env);
+    expect(first.canvases).toHaveLength(1);
 
-    const cache = new WeakMap<RenderEnvironment, number>();
-    cache.set(before, 1);
-
-    setRenderEnvironment(makeEnv(3));
-    const swapped = getRenderEnvironment();
-    expect(swapped).not.toBe(before);
-    expect(cache.get(swapped)).toBeUndefined();
-
-    // even an identical override is a new realm as far as the caches go
-    setRenderEnvironment(makeEnv(3));
-    expect(getRenderEnvironment()).not.toBe(swapped);
-
-    resetRenderEnvironment();
-    expect(getRenderEnvironment()).not.toBe(swapped);
-  });
-
-  it("rebuilds the default text metrics provider for a new environment", () => {
-    const firstEnvCanvases: HTMLCanvasElement[] = [];
-    setRenderEnvironment({
-      createCanvas: () => {
-        const canvas = document.createElement("canvas");
-        firstEnvCanvases.push(canvas);
-        return canvas;
-      },
-    });
-    // builds + caches the default provider's canvas
-    getTextWidth("measure me", FONT);
-    expect(firstEnvCanvases).toHaveLength(1);
-
-    const secondEnvCanvases: HTMLCanvasElement[] = [];
-    setRenderEnvironment({
-      createCanvas: () => {
-        const canvas = document.createElement("canvas");
-        secondEnvCanvases.push(canvas);
-        return canvas;
-      },
-    });
-    getTextWidth("measure me again", FONT);
+    getTextWidth("measure me again", FONT, second.env);
 
     // measured on a canvas of its own rather than the first env's
-    expect(secondEnvCanvases).toHaveLength(1);
-    expect(firstEnvCanvases).toHaveLength(1);
+    expect(second.canvases).toHaveLength(1);
+    expect(first.canvases).toHaveLength(1);
   });
 
   it("never serves one environment's char widths to another", () => {

@@ -2,7 +2,7 @@
 
 import { RoughCanvas } from "roughjs/bin/canvas";
 
-import { newElement, resetRenderEnvironment } from "@excalidraw/element";
+import { newElement } from "@excalidraw/element";
 
 import { vi } from "vitest";
 
@@ -106,7 +106,6 @@ const makeConfig = (
 };
 
 afterEach(() => {
-  resetRenderEnvironment();
   vi.restoreAllMocks();
 });
 

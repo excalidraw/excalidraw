@@ -5,9 +5,10 @@
  * `StaticCanvasRenderConfig["renderEnvironment"]`) scopes canvas and image
  * creation to one render target -- e.g. the editor's owner window, so that
  * one process can host editors in multiple realms (popouts, multi-tenant
- * embeds). `setRenderEnvironment` overrides the default process-wide, for
- * the export pipeline running where `document`/`window` don't exist (Node
- * with `node-canvas` / `@napi-rs/canvas`).
+ * embeds), or an export running where `document`/`window` don't exist (Node
+ * with `node-canvas` / `@napi-rs/canvas`, passed in `config.environment`).
+ * There is deliberately no process-wide override: every render and export
+ * takes its environment explicitly.
  *
  * `document` is the DOM side of the same host: what SVG exports are built in
  * (a DOM implementation such as `linkedom` under Node).
@@ -48,10 +49,10 @@ const defaultCreateCanvas = () => {
   if (typeof document === "undefined") {
     throw new Error(
       "Excalidraw: creating a canvas needs a `document`, and this " +
-        "environment has none. Install a host environment with " +
-        "`setRenderEnvironment({ createCanvas, createImage })` (e.g. backed " +
-        "by `@napi-rs/canvas`), or, if the canvas was only needed to measure " +
-        "text, a provider via `setCustomTextMetricsProvider`.",
+        "environment has none. Pass `createCanvas` in the export's " +
+        "`config.environment` (e.g. backed by `@napi-rs/canvas`), or, if the " +
+        "canvas was only needed to measure text, set a provider via " +
+        "`setCustomTextMetricsProvider`.",
     );
   }
   return document.createElement("canvas");
@@ -60,8 +61,8 @@ const defaultCreateImage = () => {
   if (typeof Image === "undefined") {
     throw new Error(
       "Excalidraw: decoding an image needs a global `Image`, and this " +
-        "environment has none. Pass `createImage` in " +
-        "`setRenderEnvironment` (e.g. `@napi-rs/canvas`'s `Image`).",
+        "environment has none. Pass `createImage` in the export's " +
+        "`config.environment` (e.g. `@napi-rs/canvas`'s `Image`).",
     );
   }
   return new Image();
@@ -84,39 +85,19 @@ const defaultCreatePath = (svgPath: string) => {
  * `StaticCanvasRenderConfig["scale"]`, which already carries the owner window's
  * ratio (editor) or exportScale (export).
  */
-let environment: RenderEnvironment = {
+const defaultEnvironment: RenderEnvironment = {
   createCanvas: defaultCreateCanvas,
   createImage: defaultCreateImage,
   createPath: defaultCreatePath,
 };
 
-/** Overrides the default process-wide render environment. */
-export const setRenderEnvironment = (env: Partial<RenderEnvironment>) => {
-  environment = {
-    createCanvas: env.createCanvas ?? defaultCreateCanvas,
-    createImage: env.createImage ?? defaultCreateImage,
-    createPath: env.createPath ?? defaultCreatePath,
-    document: env.document,
-  };
-};
-
-/** Restores the browser defaults. */
-export const resetRenderEnvironment = () => {
-  environment = {
-    createCanvas: defaultCreateCanvas,
-    createImage: defaultCreateImage,
-    createPath: defaultCreatePath,
-  };
-};
-
 /**
- * Resolves the host environment for a render. An explicitly scoped
- * environment (e.g. the editor's owner window) takes precedence over the
- * process-wide default.
+ * Resolves the host environment for a render: the explicitly scoped one (e.g.
+ * the editor's owner window, or an export's), else the browser default.
  */
 export const getRenderEnvironment = (
   env?: RenderEnvironment,
-): RenderEnvironment => env ?? environment;
+): RenderEnvironment => env ?? defaultEnvironment;
 
 /**
  * Resolves the path factory for a render. `createPath` is the one optional

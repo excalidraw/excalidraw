@@ -38,8 +38,8 @@ export type StaticCanvasRenderConfig = {
   scale: number;
   /**
    * Host environment that creates the canvases and images this render
-   * rasterizes (per-editor owner window in the app; the process-wide default
-   * for headless export).
+   * rasterizes (per-editor owner window in the app; the export's
+   * `config.environment` when exporting). Defaults to the browser's.
    */
   renderEnvironment?: RenderEnvironment;
   /** export only: clips everything drawn to this frame (square corners) */
@@ -65,7 +65,7 @@ export type SVGRenderConfig = {
   /**
    * Host environment used for the text measurements this render needs (the
    * SVG itself is built through `exportToSvg`'s owner document). Defaults to
-   * the process-wide environment.
+   * the browser's.
    */
   renderEnvironment?: RenderEnvironment;
   offsetX: number;
