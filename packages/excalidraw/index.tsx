@@ -421,12 +421,13 @@ export {
 
 export { reconcileElements } from "./data/reconcile";
 
-export {
-  exportToCanvas,
-  exportToBlob,
-  exportToSvg,
-  exportToClipboard,
-} from "@excalidraw/utils/export";
+export { exportScene, exportToClipboard } from "./scene/export";
+
+export type {
+  ExportSceneData,
+  ExportSceneConfig,
+  ExportSceneOptions,
+} from "./scene/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {

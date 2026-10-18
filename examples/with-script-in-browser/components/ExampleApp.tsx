@@ -80,9 +80,7 @@ export default function ExampleApp({
   excalidrawLib,
 }: AppProps) {
   const {
-    exportToCanvas,
-    exportToSvg,
-    exportToBlob,
+    exportScene,
     exportToClipboard,
     useHandleLibrary,
     MIME_TYPES,
@@ -115,6 +113,10 @@ export default function ExampleApp({
   const [canvasUrl, setCanvasUrl] = useState<string>("");
   const [exportWithDarkMode, setExportWithDarkMode] = useState(false);
   const [exportEmbedScene, setExportEmbedScene] = useState(false);
+  const exportConfig = {
+    theme: exportWithDarkMode ? "dark" : "light",
+    padding: 10,
+  } as const;
   const [theme, setTheme] = useState<Theme>("light");
   const [disableImageTool, setDisableImageTool] = useState(false);
   const [isCollaborating, setIsCollaborating] = useState(false);
@@ -387,10 +389,12 @@ export default function ExampleApp({
       return false;
     }
     await exportToClipboard({
-      elements: excalidrawAPI.getSceneElements(),
-      appState: excalidrawAPI.getAppState(),
-      files: excalidrawAPI.getFiles(),
       type,
+      data: {
+        elements: excalidrawAPI.getSceneElements(),
+        appState: excalidrawAPI.getAppState(),
+        files: excalidrawAPI.getFiles(),
+      },
     });
     window.alert(`Copied to clipboard as ${type} successfully`);
   };
@@ -888,16 +892,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const svg = await exportToSvg({
-                elements: excalidrawAPI?.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
-                  exportEmbedScene,
-                  width: 300,
-                  height: 100,
+              const svg = await exportScene({
+                type: "svg",
+                data: {
+                  elements: excalidrawAPI.getSceneElements(),
+                  appState: initialData.appState,
+                  files: excalidrawAPI.getFiles(),
                 },
-                files: excalidrawAPI?.getFiles(),
+                config: { ...exportConfig, embedScene: exportEmbedScene },
               });
               appRef.current.querySelector(".export-svg").innerHTML =
                 svg.outerHTML;
@@ -912,15 +914,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const blob = await exportToBlob({
-                elements: excalidrawAPI?.getSceneElements(),
-                mimeType: "image/png",
-                appState: {
-                  ...initialData.appState,
-                  exportEmbedScene,
-                  exportWithDarkMode,
+              const blob = await exportScene({
+                type: "png",
+                data: {
+                  elements: excalidrawAPI.getSceneElements(),
+                  appState: initialData.appState,
+                  files: excalidrawAPI.getFiles(),
                 },
-                files: excalidrawAPI?.getFiles(),
+                config: { ...exportConfig, embedScene: exportEmbedScene },
               });
               setBlobUrl(window.URL.createObjectURL(blob));
             }}
@@ -935,13 +936,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const canvas = await exportToCanvas({
-                elements: excalidrawAPI.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
+              const canvas = await exportScene({
+                type: "canvas",
+                data: {
+                  elements: excalidrawAPI.getSceneElements(),
+                  appState: initialData.appState,
+                  files: excalidrawAPI.getFiles(),
                 },
-                files: excalidrawAPI.getFiles(),
+                config: exportConfig,
               });
               const ctx = canvas.getContext("2d")!;
               ctx.font = "30px Excalifont";
@@ -956,13 +958,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const canvas = await exportToCanvas({
-                elements: excalidrawAPI.getSceneElements(),
-                appState: {
-                  ...initialData.appState,
-                  exportWithDarkMode,
+              const canvas = await exportScene({
+                type: "canvas",
+                data: {
+                  elements: excalidrawAPI.getSceneElements(),
+                  appState: initialData.appState,
+                  files: excalidrawAPI.getFiles(),
                 },
-                files: excalidrawAPI.getFiles(),
+                config: exportConfig,
               });
               const ctx = canvas.getContext("2d")!;
               ctx.font = "30px Excalifont";
