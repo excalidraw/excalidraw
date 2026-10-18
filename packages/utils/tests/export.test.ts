@@ -6,6 +6,7 @@ import * as staticSceneModule from "@excalidraw/excalidraw/renderer/staticScene"
 import * as staticSvgSceneModule from "@excalidraw/excalidraw/renderer/staticSvgScene";
 import * as mockedSceneExportUtils from "@excalidraw/excalidraw/scene/export";
 import { diagramFactory } from "@excalidraw/excalidraw/tests/fixtures/diagramFixture";
+import { API } from "@excalidraw/excalidraw/tests/helpers/api";
 import { vi } from "vitest";
 
 import * as utils from "../src";
@@ -40,44 +41,41 @@ describe("exportToCanvas", async () => {
   it("when custom width and height", async () => {
     const canvas = await utils.exportToCanvas({
       data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
-      config: {
-        getDimensions: () => ({ width: 200, height: 200, scale: 1 }),
+      config: { width: 200, height: 200 },
+    });
+
+    expect(canvas.width).toBe(200);
+    expect(canvas.height).toBe(200);
+  });
+
+  it("with a scale function", async () => {
+    const scale = vi.fn((width: number, height: number) => 60 / width);
+    const canvas = await utils.exportToCanvas({
+      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
+      config: { padding: EXPORT_PADDING, scale },
+    });
+
+    // receives the export dimensions at scale 1, padding included
+    expect(scale).toHaveBeenCalledWith(120, 120);
+    expect(canvas.width).toBe(60);
+    expect(canvas.height).toBe(60);
+  });
+
+  it("rounds the canvas dimensions", async () => {
+    const size = 29 / 1.1;
+    const canvas = await utils.exportToCanvas({
+      data: {
+        elements: [
+          API.createElement({ type: "rectangle", width: size, height: size }),
+        ],
+        files: null,
       },
+      // size * 1.1 === 28.999999999999996
+      config: { scale: 1.1 },
     });
 
-    expect(canvas.width).toBe(200);
-    expect(canvas.height).toBe(200);
-  });
-
-  it("calls getDimensions once with fit: contain", async () => {
-    const getDimensions = vi.fn((width: number, height: number) => ({
-      width: width * 2,
-      height: height * 2,
-    }));
-    const canvas = await utils.exportToCanvas({
-      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
-      config: { getDimensions, fit: "contain" },
-    });
-
-    expect(getDimensions).toHaveBeenCalledTimes(1);
-    expect(canvas.width).toBe(200);
-    expect(canvas.height).toBe(200);
-  });
-
-  it("ignores getDimensions when widthOrHeight is set", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const getDimensions = vi.fn(() => ({ width: 500, height: 500 }));
-    const canvas = await utils.exportToCanvas({
-      data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
-      // the types forbid combining size options, JS callers still can
-      // @ts-expect-error
-      config: { getDimensions, widthOrHeight: 50 },
-    });
-
-    expect(getDimensions).not.toHaveBeenCalled();
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(Math.max(canvas.width, canvas.height)).toBe(50);
-    warn.mockRestore();
+    expect(canvas.width).toBe(29);
+    expect(canvas.height).toBe(29);
   });
 });
 
@@ -92,7 +90,6 @@ describe("exportToBlob", async () => {
           files: diagramData.files,
         },
         config: {
-          getDimensions: (width, height) => ({ width, height, scale: 1 }),
           // testing typo in MIME type (jpg → jpeg)
           mimeType: "image/jpg",
         },

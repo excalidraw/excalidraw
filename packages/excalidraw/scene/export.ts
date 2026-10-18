@@ -311,9 +311,13 @@ type ExportSceneBaseConfig = {
    * For example, if your canvas is 300x150 and you set scale to 2, the
    * resulting size will be 600x300.
    *
+   * Can be a function, which receives the export dimensions at scale 1
+   * (padding included) and returns the multiplier — e.g. to cap the output
+   * by a pixel budget.
+   *
    * @default 1
    */
-  scale?: number;
+  scale?: number | ((width: number, height: number) => number);
   /**
    * If you need to supply your own canvas, e.g. in test environments or in
    * Node.js.
@@ -339,8 +343,7 @@ type ExportSizeOptions = {
    * Final dimensions can get smaller/larger if used in conjunction with
    * `scale`.
    *
-   * Can't be combined with `width`/`height`, `widthOrHeight`, or
-   * `getDimensions`.
+   * Can't be combined with `width`/`height` or `widthOrHeight`.
    */
   maxWidthOrHeight?: number;
   /**
@@ -350,8 +353,7 @@ type ExportSizeOptions = {
    * Final dimensions can get smaller/larger if used in conjunction with
    * `scale`.
    *
-   * Can't be combined with `width`/`height`, `maxWidthOrHeight`, or
-   * `getDimensions`.
+   * Can't be combined with `width`/`height` or `maxWidthOrHeight`.
    */
   widthOrHeight?: number;
   /**
@@ -364,8 +366,7 @@ type ExportSizeOptions = {
    * Defaults to the content bounding box width when both `width` and `height`
    * are omitted.
    *
-   * Can't be combined with `maxWidthOrHeight`, `widthOrHeight`, or
-   * `getDimensions`.
+   * Can't be combined with `maxWidthOrHeight` or `widthOrHeight`.
    */
   width?: number;
   /**
@@ -377,21 +378,9 @@ type ExportSizeOptions = {
    * Defaults to the content bounding box height when both `width` and `height`
    * are omitted.
    *
-   * Can't be combined with `maxWidthOrHeight`, `widthOrHeight`, or
-   * `getDimensions`.
+   * Can't be combined with `maxWidthOrHeight` or `widthOrHeight`.
    */
   height?: number;
-  /**
-   * If you want to supply `width`/`height` dynamically (or derive from the
-   * content bounding box), you can use this function.
-   *
-   * Can't be combined with `width`/`height`, `maxWidthOrHeight`, or
-   * `widthOrHeight`.
-   */
-  getDimensions?: (
-    width: number,
-    height: number,
-  ) => { width: number; height: number; scale?: number };
 };
 
 type ExportSizeOption<K extends keyof ExportSizeOptions> = Pick<
@@ -406,8 +395,7 @@ type ExportSizeOption<K extends keyof ExportSizeOptions> = Pick<
 type ExportSizeConfig =
   | ExportSizeOption<"width" | "height">
   | ExportSizeOption<"maxWidthOrHeight">
-  | ExportSizeOption<"widthOrHeight">
-  | ExportSizeOption<"getDimensions">;
+  | ExportSizeOption<"widthOrHeight">;
 
 export type ExportSceneConfig = ExportSceneBaseConfig & ExportSizeConfig;
 
@@ -496,7 +484,6 @@ const configExportDimension = async ({
       : "none");
 
   cfg.padding = cfg.padding ?? 0;
-  cfg.scale = cfg.scale ?? 1;
 
   cfg.origin = cfg.origin ?? "canvas";
   cfg.position = cfg.position ?? "center";
@@ -508,20 +495,6 @@ const configExportDimension = async ({
     cfg.maxWidthOrHeight = undefined;
   }
 
-  if (
-    (cfg.width != null ||
-      cfg.height != null ||
-      cfg.maxWidthOrHeight != null ||
-      cfg.widthOrHeight != null) &&
-    cfg.getDimensions
-  ) {
-    if (!import.meta.env.PROD) {
-      console.warn(
-        "`getDimensions` is ignored when `width`, `height`, `maxWidthOrHeight`, or `widthOrHeight` is set",
-      );
-    }
-    cfg.getDimensions = undefined;
-  }
   // ---------------------------------------------------------------------------
 
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
@@ -550,16 +523,6 @@ const configExportDimension = async ({
   y = cfg.y ?? y;
   width = cfg.width ?? width;
   height = cfg.height ?? height;
-
-  // `getDimensions` supplies `width`/`height` (and optionally `scale`)
-  // dynamically
-  if (cfg.getDimensions) {
-    const ret = cfg.getDimensions(width, height);
-
-    width = ret.width;
-    height = ret.height;
-    cfg.scale = ret.scale ?? cfg.scale;
-  }
 
   if (cfg.fit === "contain" || cfg.widthOrHeight || cfg.maxWidthOrHeight) {
     // clamp padding so the exported canvas doesn't get smaller than
@@ -657,15 +620,21 @@ const configExportDimension = async ({
   // `cfg.scale` being set, which also scales the padding)
   const normalizedPadding = cfg.padding / exportScale;
 
-  // scale the whole frame by cfg.scale (on top of whatever canvasScale we
+  // a `scale` function sizes the export by its dimensions at scale 1
+  const scale =
+    typeof cfg.scale === "function"
+      ? cfg.scale(width + cfg.padding * 2, height + cfg.padding * 2)
+      : cfg.scale ?? 1;
+
+  // scale the whole frame by `scale` (on top of whatever canvasScale we
   // calculated above)
-  exportScale *= cfg.scale;
+  exportScale *= scale;
 
-  width *= cfg.scale;
-  height *= cfg.scale;
+  width *= scale;
+  height *= scale;
 
-  const exportWidth = width + cfg.padding * 2 * cfg.scale;
-  const exportHeight = height + cfg.padding * 2 * cfg.scale;
+  const exportWidth = width + cfg.padding * 2 * scale;
+  const exportHeight = height + cfg.padding * 2 * scale;
 
   return {
     config: cfg,
@@ -727,8 +696,10 @@ export const exportToCanvas = async ({
     ? cfg.createCanvas()
     : document.createElement("canvas");
 
-  canvas.width = exportWidth;
-  canvas.height = exportHeight;
+  // round rather than letting the canvas truncate, which would turn float
+  // noise (e.g. 28.999999999999996) into a pixel lost
+  canvas.width = Math.round(exportWidth);
+  canvas.height = Math.round(exportHeight);
 
   const { imageCache } = await updateImageCache({
     imageCache: new Map(),

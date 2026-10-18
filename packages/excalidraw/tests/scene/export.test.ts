@@ -483,9 +483,9 @@ describe("exporting frames", () => {
     const height =
       FRAME_STYLE.nameFontSize * FRAME_STYLE.nameLineHeight +
       FRAME_STYLE.nameOffsetY;
-    // canvas truncates dimensions to integers
+    // canvas rounds dimensions to integers
     if (exportType === "canvas") {
-      return Math.trunc(height);
+      return Math.round(height);
     }
     return height;
   };
