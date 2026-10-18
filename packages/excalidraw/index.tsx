@@ -423,12 +423,13 @@ export {
 
 export { reconcileElements } from "./data/reconcile";
 
-export {
-  exportToCanvas,
-  exportToBlob,
-  exportToSvg,
-  exportToClipboard,
-} from "@excalidraw/utils/export";
+export { exportScene, exportToClipboard } from "./scene/export";
+
+export type {
+  ExportSceneData,
+  ExportSceneConfig,
+  ExportSceneOptions,
+} from "./scene/export";
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
@@ -493,7 +494,11 @@ export type {
   SavedChats,
 } from "./components/TTDDialog/types";
 
-export type { ViewportStatusFrame } from "./types";
+export type {
+  ViewportStatusFrame,
+  ElementRenderOverride,
+  ElementRenderOverrides,
+} from "./types";
 
 export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
 

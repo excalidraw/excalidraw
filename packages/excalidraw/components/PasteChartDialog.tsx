@@ -7,7 +7,7 @@ import type { ChartType } from "@excalidraw/element/types";
 import { trackEvent } from "../analytics";
 import { isSpreadsheetValidForChartType, renderSpreadsheet } from "../charts";
 import { t } from "../i18n";
-import { exportToSvg } from "../scene/export";
+import { exportScene } from "../scene/export";
 
 import { useUIAppState } from "../context/ui-appState";
 
@@ -74,19 +74,19 @@ const ChartPreviewBtn = (props: {
     const previewNode = previewRef.current!;
 
     (async () => {
-      svg = await exportToSvg(
-        elements,
-        {
-          exportBackground: false,
-          viewBackgroundColor: "#fff",
-          exportWithDarkMode: theme === "dark",
+      svg = await exportScene({
+        type: "svg",
+        data: {
+          elements,
+          files: null,
         },
-        null, // files
-        {
+        config: {
           skipInliningFonts: true,
-          ownerDocument,
+          theme,
+          canvasBackgroundColor: false,
+          environment: { ownerDocument },
         },
-      );
+      });
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
       previewNode.appendChild(svg);
@@ -145,19 +145,19 @@ const PlainTextPreviewBtn = (props: {
     const previewNode = previewRef.current!;
 
     (async () => {
-      const svg = await exportToSvg(
-        [textElement],
-        {
-          exportBackground: false,
-          viewBackgroundColor: "#fff",
-          exportWithDarkMode: theme === "dark",
+      const svg = await exportScene({
+        type: "svg",
+        data: {
+          elements: [textElement],
+          files: null,
         },
-        null,
-        {
+        config: {
           skipInliningFonts: true,
-          ownerDocument,
+          theme,
+          canvasBackgroundColor: false,
+          environment: { ownerDocument },
         },
-      );
+      });
       svg.querySelector(".style-fonts")?.remove();
       previewNode.replaceChildren();
       previewNode.appendChild(svg);

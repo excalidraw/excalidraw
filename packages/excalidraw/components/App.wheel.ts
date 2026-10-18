@@ -15,20 +15,11 @@ const WHEEL_BUTTON_MASK = 4;
  * pointer (`viewport.lastPosition`) — on ctrl/cmd+wheel (which is also how
  * a trackpad pinch is delivered), while the wheel button itself is held
  * down, or on a plain wheel when the input device is a mouse
- * (`appState.inputDevice`; ctrl/cmd+wheel pans instead then).
+ * (`appState.inputDevice`). Shift+wheel pans horizontally;
+ * ctrl/cmd+shift+wheel pans vertically.
  */
 export class AppWheel {
-  constructor(
-    private app: App,
-    private dependencies: {
-      /** whether a drag-pan (wheel button, space+drag, hand tool) is in
-       * progress — wheel input is ignored meanwhile */
-      isPanning: () => boolean;
-      /** applies the pointer movement the drag-pan is holding back for its
-       * next frame, if any */
-      flushPanMove: () => void;
-    },
-  ) {}
+  constructor(private app: App) {}
 
   /** the editor surfaces whose wheel input the editor consumes; everywhere
    * else (menus, sidebars, …) the DOM keeps scrolling. The frame-name labels
@@ -66,7 +57,10 @@ export class AppWheel {
     // drag-pan the button itself started
     const isWheelButtonHeld = !!(event.buttons & WHEEL_BUTTON_MASK);
 
-    if (this.dependencies.isPanning()) {
+    // a drag-pan (wheel button, space+drag, hand tool) in progress owns the
+    // viewport; wheel input is ignored meanwhile — except for the wheel
+    // button's own zoom
+    if (this.app.pan.isActive()) {
       if (!isWheelButtonHeld) {
         return;
       }
@@ -75,7 +69,7 @@ export class AppWheel {
       // it — at the new zoom, on a viewport the zoom anchored without it —
       // and the point grabbed by the pan drifts from under the cursor a
       // little on every tick
-      this.dependencies.flushPanMove();
+      this.app.pan.flushMove();
     }
 
     const { deltaX, deltaY } = event;
@@ -86,24 +80,24 @@ export class AppWheel {
     const hasZoomModifier = event.metaKey || event.ctrlKey;
     const shouldZoom =
       // a horizontal-only wheel (tilt wheel, sideways two-finger scroll)
-      // has nothing to zoom by; it pans sideways below instead
+      // has nothing to zoom by; it follows the pan mappings below instead
       deltaY !== 0 &&
       (isWheelButtonHeld ||
-        (resolveInputDevice(this.app.state.inputDevice) === "mouse"
-          ? // a mouse has no pinch: a plain wheel zooms, and any modifier
-            // pans instead (ctrl/cmd vertically, shift horizontally)
-            !hasZoomModifier && !event.shiftKey
-          : hasZoomModifier));
+        (!event.shiftKey &&
+          (hasZoomModifier ||
+            resolveInputDevice(this.app.state.inputDevice) === "mouse")));
     if (shouldZoom) {
       this.zoomBy(deltaY);
       return;
     }
 
-    // scroll horizontally when shift pressed
+    // Shift pans horizontally; ctrl/cmd+shift pans vertically.
     if (event.shiftKey) {
-      this.app.viewport.translate(({ zoom, scrollX }) => ({
-        // on Mac, shift+wheel tends to result in deltaX
-        scrollX: scrollX - (deltaY || deltaX) / zoom.value,
+      // on Mac, shift+wheel tends to result in deltaX
+      const delta = deltaY || deltaX;
+      this.app.viewport.translate(({ zoom, scrollX, scrollY }) => ({
+        scrollX: hasZoomModifier ? scrollX : scrollX - delta / zoom.value,
+        scrollY: hasZoomModifier ? scrollY - delta / zoom.value : scrollY,
       }));
       return;
     }

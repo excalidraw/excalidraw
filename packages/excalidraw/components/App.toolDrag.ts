@@ -69,7 +69,7 @@ export const DRAGGABLE_TOOLS: Partial<Record<ToolType, DraggableTool>> = {
     },
     onDrop: (app, element) => {
       if (isStickyNoteElement(element)) {
-        app.startTextEditing({
+        app.text.startTextEditing({
           sceneX: element.x + element.width / 2,
           sceneY: element.y + element.height / 2,
           container: element,

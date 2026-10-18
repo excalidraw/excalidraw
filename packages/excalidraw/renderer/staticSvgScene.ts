@@ -166,9 +166,7 @@ const renderFrameLabelToSvg = (
   renderConfig: SVGRenderConfig,
 ) => {
   const doc = svgRoot.ownerDocument;
-  const label = getFrameLabel(frame, {
-    exportWithDarkMode: renderConfig.exportWithDarkMode,
-  });
+  const label = getFrameLabel(frame, { theme: renderConfig.theme });
 
   const node = doc.createElementNS(SVG_NS, "g");
   node.setAttribute(

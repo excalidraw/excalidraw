@@ -1,8 +1,12 @@
+import { PlusPromoIcon } from "@excalidraw/excalidraw/components/icons";
+import { useI18n } from "@excalidraw/excalidraw/i18n";
+
 export const ExcalidrawPlusPromoBanner = ({
   isSignedIn,
 }: {
   isSignedIn: boolean;
 }) => {
+  const { t } = useI18n();
   return (
     <a
       href={
@@ -16,7 +20,17 @@ export const ExcalidrawPlusPromoBanner = ({
       rel="noopener"
       className="plus-banner"
     >
-      Excalidraw+
+      <span className="plus-banner__icon">{PlusPromoIcon}</span>
+      <span className="plus-banner__text">
+        <span className="plus-banner__title">
+          {isSignedIn ? t("labels.signIn") : t("labels.tryExcalidrawPlus")}
+        </span>
+        {!isSignedIn && (
+          <span className="plus-banner__subtitle">
+            {t("labels.plusFreeTrial")}
+          </span>
+        )}
+      </span>
     </a>
   );
 };

@@ -12,7 +12,7 @@ import { FONT_FAMILY } from "@excalidraw/common";
 import type { FontFamilyValues } from "@excalidraw/element/types";
 
 import { Excalidraw } from "../index";
-import { useTopPicksDnD } from "../components/ColorPicker/topPicksDnD";
+import { useColorTopPicksDnD } from "../components/ColorPicker/colorTopPicksDnD";
 
 import type { ExcalidrawImperativeAPI } from "../types";
 
@@ -88,11 +88,11 @@ describe("cross-document rendering", () => {
       removeEventListener: { value: vi.fn() },
     });
     let startPickDrag:
-      | ReturnType<typeof useTopPicksDnD>["startPickDrag"]
+      | ReturnType<typeof useColorTopPicksDnD>["startPickDrag"]
       | null = null;
 
     const Harness = () => {
-      const drag = useTopPicksDnD({
+      const drag = useColorTopPicksDnD({
         enabled: true,
         picks: ["#000000", "#ffffff"],
         onPicksChange: vi.fn(),

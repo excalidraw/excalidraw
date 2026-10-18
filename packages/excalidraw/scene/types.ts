@@ -1,6 +1,7 @@
 import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -13,6 +14,7 @@ import type {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
+  ElementRenderOverrides,
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
@@ -40,6 +42,8 @@ export type StaticCanvasRenderConfig = {
    * for headless export).
    */
   renderEnvironment?: RenderEnvironment;
+  /** export only: clips everything drawn to this frame (square corners) */
+  clipToFrame?: ExcalidrawFrameLikeElement | null;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
@@ -54,6 +58,7 @@ export type StaticCanvasRenderConfig = {
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
   theme: AppState["theme"];
+  elementRenderOverrides?: ElementRenderOverrides;
 };
 
 /**

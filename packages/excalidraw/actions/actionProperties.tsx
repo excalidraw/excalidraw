@@ -1148,7 +1148,10 @@ export const actionIncreaseFontSize = register({
 type ChangeFontFamilyData = Partial<
   Pick<
     AppState,
-    "openPopup" | "currentItemFontFamily" | "currentHoveredFontFamily"
+    | "openPopup"
+    | "currentItemFontFamily"
+    | "currentHoveredFontFamily"
+    | "fontTopPicks"
   >
 > & {
   /** cache of selected & editing elements populated on opened popup */
@@ -1452,7 +1455,9 @@ export const actionChangeFontFamily = register<{
           isOpened={appState.openPopup === "fontFamily"}
           selectedFontFamily={selectedFontFamily}
           hoveredFontFamily={appState.currentHoveredFontFamily}
+          topPicks={appState.fontTopPicks}
           compactMode={stylesPanelMode !== "full"}
+          onTopPicksChange={(fontTopPicks) => updateData({ fontTopPicks })}
           onSelect={(fontFamily) => {
             withCaretPositionPreservation(
               () => {
@@ -2160,6 +2165,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   startElement,
                   "start",
                   elementsMap,
+                  appState.zoom,
                   appState.isBindingEnabled,
                 ),
               }
@@ -2174,6 +2180,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   endElement,
                   "end",
                   elementsMap,
+                  appState.zoom,
                   appState.isBindingEnabled,
                 ),
               }
@@ -2206,6 +2213,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               appState.bindMode === "inside" ? "inside" : "orbit",
               "start",
               app.scene,
+              appState.zoom,
             );
           }
         }
@@ -2220,6 +2228,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
               appState.bindMode === "inside" ? "inside" : "orbit",
               "end",
               app.scene,
+              appState.zoom,
             );
           }
         }

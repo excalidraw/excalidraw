@@ -19,7 +19,11 @@ import {
   shouldApplyFrameClip,
 } from "@excalidraw/element";
 
-import { renderElement } from "@excalidraw/element";
+import {
+  getRenderElementWithPositionOverride,
+  resolveElementRenderState,
+  renderElement,
+} from "@excalidraw/element";
 
 import { getRenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
@@ -27,8 +31,11 @@ import { getElementAbsoluteCoords } from "@excalidraw/element";
 
 import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
+import type { ElementRenderState } from "@excalidraw/element";
+
 import type {
   ElementsMap,
+  ExcalidrawElement,
   ExcalidrawFrameLikeElement,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
@@ -229,6 +236,7 @@ const renderLinkIcon = (
   context: CanvasRenderingContext2D,
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,
+  renderState: ElementRenderState,
   /** backing-store scale, see StaticCanvasRenderConfig["scale"] */
   scale: number,
   renderEnvironment: RenderEnvironment,
@@ -236,7 +244,12 @@ const renderLinkIcon = (
   if (element.link && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
     const [x, y, width, height] = getLinkHandleFromCoords(
-      [x1, y1, x2, y2],
+      [
+        x1 + renderState.offset.x,
+        y1 + renderState.offset.y,
+        x2 + renderState.offset.x,
+        y2 + renderState.offset.y,
+      ],
       element.angle,
       appState,
     );
@@ -316,7 +329,7 @@ const renderLinkIcon = (
 
       linkCanvasCacheContext.restore();
     }
-    context.globalAlpha = element.opacity / 100;
+    context.globalAlpha = renderState.opacity;
     context.drawImage(linkCanvas, x - centerX, y - centerY, width, height);
     context.restore();
   }
@@ -375,6 +388,18 @@ const _renderStaticScene = ({
     );
   }
 
+  if (renderConfig.clipToFrame) {
+    const frame = renderConfig.clipToFrame;
+    context.beginPath();
+    context.rect(
+      frame.x + appState.scrollX,
+      frame.y + appState.scrollY,
+      frame.width,
+      frame.height,
+    );
+    context.clip();
+  }
+
   const groupsToBeAddedToFrame = new Set<string>();
 
   visibleElements.forEach((element) => {
@@ -397,13 +422,56 @@ const _renderStaticScene = ({
 
   const inFrameGroupsMap = new Map<string, boolean>();
 
+  const getRenderState = (element: ExcalidrawElement) =>
+    resolveElementRenderState(
+      element,
+      elementsMap,
+      renderConfig,
+      allElementsMap,
+    );
+
+  const clipElementToFrame = (
+    element: NonDeletedExcalidrawElement,
+    renderState: ElementRenderState,
+  ) => {
+    if (
+      !(element.frameId || appState.frameToHighlight?.id) ||
+      !appState.frameRendering.enabled ||
+      !appState.frameRendering.clip
+    ) {
+      return;
+    }
+    const targetFrame = getTargetFrame(element, elementsMap, appState);
+    if (!targetFrame) {
+      return;
+    }
+    const frameState = getRenderState(targetFrame);
+    const frame = getRenderElementWithPositionOverride(
+      targetFrame,
+      frameState.offset,
+    );
+    const isTranslated = (state: ElementRenderState) =>
+      state.offset.x !== 0 || state.offset.y !== 0;
+    if (
+      (element.frameId === frame.id &&
+        (isTranslated(renderState) || isTranslated(frameState))) ||
+      shouldApplyFrameClip(
+        getRenderElementWithPositionOverride(element, renderState.offset),
+        frame,
+        appState,
+        elementsMap,
+        inFrameGroupsMap,
+      )
+    ) {
+      frameClip(frame, context, renderConfig, appState);
+    }
+  };
+
   // Paint visible elements
   visibleElements
     .filter((el) => !isIframeLikeElement(el))
     .forEach((element) => {
       try {
-        const frameId = element.frameId || appState.frameToHighlight?.id;
-
         if (
           isTextElement(element) &&
           element.containerId &&
@@ -414,47 +482,21 @@ const _renderStaticScene = ({
         }
 
         context.save();
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          const frame = getTargetFrame(element, elementsMap, appState);
-          if (
-            frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          renderElement(
-            element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        } else {
-          renderElement(
-            element,
-            elementsMap,
-            allElementsMap,
-            rc,
-            context,
-            renderConfig,
-            appState,
-          );
-        }
-
         const boundTextElement = getBoundTextElement(element, elementsMap);
+
+        const renderState = getRenderState(element);
+        clipElementToFrame(element, renderState);
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+          renderState,
+        );
+
         if (boundTextElement) {
           renderElement(
             boundTextElement,
@@ -475,6 +517,7 @@ const _renderStaticScene = ({
             context,
             appState,
             elementsMap,
+            renderState,
             scale,
             getRenderEnvironment(renderConfig.renderEnvironment),
           );
@@ -489,9 +532,37 @@ const _renderStaticScene = ({
     .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
       try {
-        const render = () => {
+        const renderState = getRenderState(element);
+        context.save();
+        clipElementToFrame(element, renderState);
+        renderElement(
+          element,
+          elementsMap,
+          allElementsMap,
+          rc,
+          context,
+          renderConfig,
+          appState,
+          renderState,
+        );
+
+        if (
+          isIframeLikeElement(element) &&
+          (isExporting ||
+            (isEmbeddableElement(element) &&
+              renderConfig.embedsValidationStatus.get(element.id) !== true)) &&
+          element.width &&
+          element.height
+        ) {
+          const label = {
+            ...createPlaceholderEmbeddableLabel(element),
+            // Synthetic visual: resolve overrides and frame opacity through
+            // its owner, without creating another animation target.
+            id: element.id,
+            frameId: element.frameId,
+          };
           renderElement(
-            element,
+            label,
             elementsMap,
             allElementsMap,
             rc,
@@ -499,69 +570,19 @@ const _renderStaticScene = ({
             renderConfig,
             appState,
           );
-
-          if (
-            isIframeLikeElement(element) &&
-            (isExporting ||
-              (isEmbeddableElement(element) &&
-                renderConfig.embedsValidationStatus.get(element.id) !==
-                  true)) &&
-            element.width &&
-            element.height
-          ) {
-            const label = createPlaceholderEmbeddableLabel(element);
-            renderElement(
-              label,
-              elementsMap,
-              allElementsMap,
-              rc,
-              context,
-              renderConfig,
-              appState,
-            );
-          }
-          if (!isExporting && renderConfig.renderLinks !== false) {
-            renderLinkIcon(
-              element,
-              context,
-              appState,
-              elementsMap,
-              scale,
-              getRenderEnvironment(renderConfig.renderEnvironment),
-            );
-          }
-        };
-        // - when exporting the whole canvas, we DO NOT apply clipping
-        // - when we are exporting a particular frame, apply clipping
-        //   if the containing frame is not selected, apply clipping
-        const frameId = element.frameId || appState.frameToHighlight?.id;
-
-        if (
-          frameId &&
-          appState.frameRendering.enabled &&
-          appState.frameRendering.clip
-        ) {
-          context.save();
-
-          const frame = getTargetFrame(element, elementsMap, appState);
-
-          if (
-            frame &&
-            shouldApplyFrameClip(
-              element,
-              frame,
-              appState,
-              elementsMap,
-              inFrameGroupsMap,
-            )
-          ) {
-            frameClip(frame, context, renderConfig, appState);
-          }
-          render();
-          context.restore();
-        } else {
-          render();
         }
+        if (!isExporting && renderConfig.renderLinks !== false) {
+          renderLinkIcon(
+            element,
+            context,
+            appState,
+            elementsMap,
+            renderState,
+            scale,
+            getRenderEnvironment(renderConfig.renderEnvironment),
+          );
+        }
+        context.restore();
       } catch (error: any) {
         handleElementRenderError(error, element, isExporting);
       }

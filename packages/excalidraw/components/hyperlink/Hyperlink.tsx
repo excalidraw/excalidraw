@@ -45,7 +45,7 @@ import { trackEvent } from "../../analytics";
 import {
   TOOLTIP_VISIBLE_CLASS,
   getTooltipDiv,
-  hideTooltip,
+  hideDocumentTooltip,
   updateTooltipPosition,
 } from "../../components/Tooltip";
 
@@ -534,7 +534,7 @@ const clearHyperlinkTooltip = () => {
   }
   if (IS_HYPERLINK_TOOLTIP_VISIBLE && HYPERLINK_TOOLTIP_OWNER_DOCUMENT) {
     IS_HYPERLINK_TOOLTIP_VISIBLE = false;
-    hideTooltip(HYPERLINK_TOOLTIP_OWNER_DOCUMENT);
+    hideDocumentTooltip(HYPERLINK_TOOLTIP_OWNER_DOCUMENT);
   }
   HYPERLINK_TOOLTIP_OWNER = null;
   HYPERLINK_TOOLTIP_OWNER_DOCUMENT = null;

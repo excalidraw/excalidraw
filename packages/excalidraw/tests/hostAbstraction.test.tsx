@@ -23,8 +23,12 @@ import type { FileId } from "@excalidraw/element/types";
 import { Excalidraw } from "../index";
 import { getDefaultAppState } from "../appState";
 import { AnimationController } from "../renderer/animation";
-import { exportToCanvas, exportToSvg } from "../scene/export";
-import { TOOLTIP_CLASS, TOOLTIP_VISIBLE_CLASS } from "../components/Tooltip";
+import { exportScene } from "../scene/export";
+import {
+  TOOLTIP_CLASS,
+  TOOLTIP_DELAY,
+  TOOLTIP_VISIBLE_CLASS,
+} from "../components/Tooltip";
 
 import type { AppState, BinaryFiles, DataURL } from "../types";
 import type App from "../components/App";
@@ -288,8 +292,11 @@ describe("multi-window editors", () => {
         ".excalidraw-tooltip-wrapper",
       )!;
       expect(wrapperA).not.toBeNull();
+      // the trigger may show its tooltip after a delay, timed in its own window
+      vi.useFakeTimers();
       act(() => {
         fireEvent.pointerEnter(wrapperA);
+        vi.advanceTimersByTime(TOOLTIP_DELAY);
       });
       expect(
         realmA.ownerDocument.querySelector(`.${TOOLTIP_CLASS}`),
@@ -315,6 +322,7 @@ describe("multi-window editors", () => {
         realmA.ownerDocument.querySelector(`.${TOOLTIP_CLASS}`),
       ).not.toHaveClass(TOOLTIP_VISIBLE_CLASS);
     } finally {
+      vi.useRealTimers();
       a.renderResult.unmount();
       b.renderResult.unmount();
       realmA.iframe.remove();
@@ -369,7 +377,6 @@ describe("headless (server-side) export", () => {
       createPath,
     };
 
-    const target = createCanvas();
     const appState = {
       ...getDefaultAppState(),
       width: 200,
@@ -390,23 +397,16 @@ describe("headless (server-side) export", () => {
     vi.stubGlobal("Path2D", undefined);
 
     try {
-      const canvas = await exportToCanvas(
-        elements,
-        appState,
-        files,
-        {
-          exportBackground: true,
-          viewBackgroundColor: "#ffffff",
-          renderEnvironment,
+      const canvas = await exportScene({
+        type: "canvas",
+        data: { elements, appState, files },
+        config: {
+          canvasBackgroundColor: "#ffffff",
+          environment: renderEnvironment,
         },
-        (width, height) => {
-          target.width = width;
-          target.height = height;
-          return { canvas: target, scale: 1 };
-        },
-      );
+      });
 
-      expect(canvas).toBe(target);
+      expect(canvases).toContain(canvas);
       // text was measured and painted rather than swallowed by the
       // renderer's per-element error handling
       expect(fillText).toHaveBeenCalledWith("hello", 0, expect.any(Number));
@@ -417,15 +417,14 @@ describe("headless (server-side) export", () => {
       // `exportToSvg` builds real DOM nodes, so a server-side caller supplies
       // the document (a DOM shim). It takes no render environment: SVG
       // export measures no text and creates no canvas
-      const svg = await exportToSvg(
-        elements,
-        {
-          exportBackground: true,
-          viewBackgroundColor: "#ffffff",
+      const svg = await exportScene({
+        type: "svg",
+        data: { elements, files },
+        config: {
+          canvasBackgroundColor: "#ffffff",
+          environment: { ownerDocument: hostDocument },
         },
-        files,
-        { ownerDocument: hostDocument },
-      );
+      });
 
       expect(svg.tagName.toLowerCase()).toBe("svg");
       expect(svg.ownerDocument).toBe(hostDocument);
@@ -456,18 +455,17 @@ describe("headless (server-side) export", () => {
 
     try {
       await expect(
-        exportToCanvas(
-          elements,
-          appState,
-          {},
-          { exportBackground: true, viewBackgroundColor: "#ffffff" },
-          (width, height) => {
-            target.width = width;
-            target.height = height;
-            return { canvas: target, scale: 1 };
+        exportScene({
+          type: "canvas",
+          data: { elements, appState },
+          config: {
+            canvasBackgroundColor: "#ffffff",
+            environment: {
+              createCanvas: () => target,
+              loadFonts: async () => {},
+            },
           },
-          async () => {},
-        ),
+        }),
       ).rejects.toThrow(/Path2D/);
       // the editor logs and keeps painting; an export must not
       expect(consoleError).not.toHaveBeenCalled();

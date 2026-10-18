@@ -1,4 +1,9 @@
-import { FONT_FAMILY, FRAME_STYLE } from "@excalidraw/common";
+import {
+  FONT_FAMILY,
+  FRAME_STYLE,
+  THEME,
+  removeDarkModeFilter,
+} from "@excalidraw/common";
 
 import { getFrameLikeTitle } from "./frame";
 import { getTextHeight, normalizeText } from "./textMeasurements";
@@ -6,6 +11,7 @@ import { getTextHeight, normalizeText } from "./textMeasurements";
 import type {
   ExcalidrawFrameLikeElement,
   ExcalidrawTextElement,
+  Theme,
 } from "./types";
 
 /**
@@ -31,13 +37,16 @@ export type FrameLabel = {
   fontFamily: ExcalidrawTextElement["fontFamily"];
   fontSize: number;
   lineHeight: ExcalidrawTextElement["lineHeight"];
-  /** unfiltered -- renderers apply the dark-mode filter as for any text */
+  /**
+   * in light-theme terms -- renderers apply the dark-mode filter as for any
+   * text
+   */
   color: string;
 };
 
 export const getFrameLabel = (
   frame: ExcalidrawFrameLikeElement,
-  { exportWithDarkMode }: { exportWithDarkMode: boolean },
+  { theme }: { theme: Theme },
 ): FrameLabel => {
   const text = normalizeText(getFrameLikeTitle(frame));
   const fontSize = FRAME_STYLE.nameFontSize;
@@ -54,8 +63,11 @@ export const getFrameLabel = (
     fontFamily: FONT_FAMILY.Helvetica,
     fontSize,
     lineHeight,
-    color: exportWithDarkMode
-      ? FRAME_STYLE.nameColorDarkTheme
-      : FRAME_STYLE.nameColorLightTheme,
+    color:
+      theme === THEME.DARK
+        ? // revert the filter upfront to end up with the color the editor
+          // uses for frame names
+          removeDarkModeFilter(FRAME_STYLE.nameColorDarkTheme)
+        : FRAME_STYLE.nameColorLightTheme,
   };
 };

@@ -1,6 +1,7 @@
 import rough from "roughjs/bin/rough";
 
 import {
+  clamp,
   type GlobalPoint,
   isRightAngleRads,
   lineSegment,
@@ -28,6 +29,7 @@ import {
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_FOOTER,
   STICKY_NOTE_SHADOW_OPACITY,
+  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 
 import type {
@@ -35,9 +37,7 @@ import type {
   StaticCanvasAppState,
   Zoom,
   InteractiveCanvasAppState,
-  ElementsPendingErasure,
-  PendingExcalidrawElements,
-  NormalizedZoomValue,
+  ElementRenderOverrides,
 } from "@excalidraw/excalidraw/types";
 
 import type {
@@ -67,6 +67,7 @@ import {
   isArrowElement,
   hasBoundTextElement,
   isMagicFrameElement,
+  isFrameLikeElement,
   isImageElement,
 } from "./typeChecks";
 import { getContainingFrame } from "./frame";
@@ -89,7 +90,6 @@ import type {
   ExcalidrawFreeDrawElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
-  ExcalidrawFrameLikeElement,
   NonDeletedSceneElementsMap,
   ElementsMap,
 } from "./types";
@@ -119,30 +119,90 @@ const getCanvasPadding = (element: ExcalidrawElement) => {
   }
 };
 
-export const getRenderOpacity = (
-  element: ExcalidrawElement,
-  containingFrame: ExcalidrawFrameLikeElement | null,
-  elementsPendingErasure: ElementsPendingErasure,
-  pendingNodes: Readonly<PendingExcalidrawElements> | null,
-  globalAlpha: number = 1,
-) => {
-  // multiplying frame opacity with element opacity to combine them
-  // (e.g. frame 50% and element 50% opacity should result in 25% opacity)
-  let opacity =
-    (((containingFrame?.opacity ?? 100) * element.opacity) / 10000) *
-    globalAlpha;
+export type RenderPositionOffset = Readonly<{ x: number; y: number }>;
 
-  // if pending erasure, multiply again to combine further
-  // (so that erasing always results in lower opacity than original)
+const ZERO_RENDER_OFFSET: RenderPositionOffset = { x: 0, y: 0 };
+
+/** Bound labels follow their container; a label's own offset is ignored. */
+export const getElementRenderOffset = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  overrides: ElementRenderOverrides | undefined,
+): RenderPositionOffset | undefined => {
+  const container = isTextElement(element)
+    ? getContainerElement(element, elementsMap)
+    : null;
+  return overrides?.get((container ?? element).id)?.offset;
+};
+
+export const getRenderElementWithPositionOverride = <
+  TElement extends ExcalidrawElement,
+>(
+  element: TElement,
+  positionOffset: RenderPositionOffset,
+): TElement => {
+  if (positionOffset.x === 0 && positionOffset.y === 0) {
+    return element;
+  }
+
+  return {
+    ...element,
+    x: element.x + positionOffset.x,
+    y: element.y + positionOffset.y,
+  } as TElement;
+};
+
+export type ElementRenderState = Readonly<{
+  /** Alpha including frame opacity and pending erasure; selection dimming is separate. */
+  opacity: number;
+  offset: RenderPositionOffset;
+}>;
+
+/** Resolve visual state at the drawing boundary, preserving document cache keys. */
+export const resolveElementRenderState = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  renderConfig: Pick<
+    StaticCanvasRenderConfig,
+    | "elementRenderOverrides"
+    | "elementsPendingErasure"
+    | "pendingFlowchartNodes"
+  >,
+  allElementsMap: ElementsMap = elementsMap,
+): ElementRenderState => {
+  const {
+    elementRenderOverrides,
+    elementsPendingErasure,
+    pendingFlowchartNodes,
+  } = renderConfig;
+  const override = elementRenderOverrides?.get(element.id);
+  const containingFrame = getContainingFrame(element, elementsMap);
+  const frameOpacity = containingFrame
+    ? clamp(
+        elementRenderOverrides?.get(containingFrame.id)?.opacity ??
+          containingFrame.opacity,
+        0,
+        100,
+      )
+    : 100;
+  // Frame and element alpha multiply (50% each produces 25%).
+  let opacity =
+    (frameOpacity * clamp(override?.opacity ?? element.opacity, 0, 100)) /
+    10000;
   if (
     elementsPendingErasure.has(element.id) ||
-    (pendingNodes && pendingNodes.some((node) => node.id === element.id)) ||
+    pendingFlowchartNodes?.some((node) => node.id === element.id) ||
     (containingFrame && elementsPendingErasure.has(containingFrame.id))
   ) {
     opacity *= ELEMENT_READY_TO_ERASE_OPACITY / 100;
   }
+  const offset = getElementRenderOffset(
+    element,
+    allElementsMap,
+    elementRenderOverrides,
+  );
 
-  return opacity;
+  return { opacity, offset: offset ?? ZERO_RENDER_OFFSET };
 };
 
 export interface ExcalidrawElementWithCanvas {
@@ -658,11 +718,7 @@ const generateElementWithCanvas = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
-  const zoom: Zoom = renderConfig
-    ? appState.zoom
-    : {
-        value: 1 as NormalizedZoomValue,
-      };
+  const zoom: Zoom = renderConfig ? appState.zoom : DEFAULT_ZOOM;
   const renderEnvironment = getRenderEnvironment(
     renderConfig.renderEnvironment,
   );
@@ -742,6 +798,7 @@ const drawElementFromCanvas = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
   allElementsMap: NonDeletedSceneElementsMap,
+  positionOffset: RenderPositionOffset,
 ) => {
   const element = elementWithCanvas.element;
   // the backing-store scale the cached bitmap was generated with
@@ -750,8 +807,10 @@ const drawElementFromCanvas = (
   const devicePixelRatio = renderConfig.scale;
   const padding = getCanvasPadding(element);
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, allElementsMap);
-  const cx = ((x1 + x2) / 2 + appState.scrollX) * devicePixelRatio;
-  const cy = ((y1 + y2) / 2 + appState.scrollY) * devicePixelRatio;
+  const cx =
+    ((x1 + x2) / 2 + positionOffset.x + appState.scrollX) * devicePixelRatio;
+  const cy =
+    ((y1 + y2) / 2 + positionOffset.y + appState.scrollY) * devicePixelRatio;
 
   context.save();
   context.scale(1 / devicePixelRatio, 1 / devicePixelRatio);
@@ -777,11 +836,13 @@ const drawElementFromCanvas = (
       (boundTextCx -
         boundTextElement.width / 2 -
         BOUND_TEXT_PADDING +
+        positionOffset.x +
         appState.scrollX) *
         devicePixelRatio,
       (boundTextCy -
         boundTextElement.height / 2 -
         BOUND_TEXT_PADDING +
+        positionOffset.y +
         appState.scrollY) *
         devicePixelRatio,
       (boundTextElement.width + BOUND_TEXT_PADDING * 2) * devicePixelRatio,
@@ -811,8 +872,10 @@ const drawElementFromCanvas = (
 
   // the blit origin, in the space the context is in here (scaled by
   // canvas scale × zoom ÷ devicePixelRatio)
-  let drawX = (x1 + appState.scrollX) * devicePixelRatio - padding;
-  let drawY = (y1 + appState.scrollY) * devicePixelRatio - padding;
+  let drawX =
+    (x1 + positionOffset.x + appState.scrollX) * devicePixelRatio - padding;
+  let drawY =
+    (y1 + positionOffset.y + appState.scrollY) * devicePixelRatio - padding;
 
   const transform = context.getTransform();
 
@@ -835,8 +898,8 @@ const drawElementFromCanvas = (
     const container = isTextElement(element)
       ? getContainerElement(element, allElementsMap)
       : null;
-    // A bound label shares its unrotated container's anchor. Other bitmaps
-    // anchor to themselves, with a zero relative offset.
+    // A bound label shares its unrotated container's offset and anchor.
+    // Other bitmaps anchor to themselves.
     const anchor = container && !container.angle ? container : element;
     const anchorCoords =
       anchor === element
@@ -847,9 +910,11 @@ const drawElementFromCanvas = (
     const anchorPadding =
       anchor === element ? padding : getCanvasPadding(anchor);
     const anchorX =
-      (anchorSceneX + appState.scrollX) * devicePixelRatio - anchorPadding;
+      (anchorSceneX + positionOffset.x + appState.scrollX) * devicePixelRatio -
+      anchorPadding;
     const anchorY =
-      (anchorSceneY + appState.scrollY) * devicePixelRatio - anchorPadding;
+      (anchorSceneY + positionOffset.y + appState.scrollY) * devicePixelRatio -
+      anchorPadding;
 
     // Form the relative vector before introducing the scroll translation.
     const dx = (x1 - anchorSceneX) * devicePixelRatio + anchorPadding - padding;
@@ -891,8 +956,8 @@ const drawElementFromCanvas = (
     context.strokeStyle = "#c92a2a";
     context.lineWidth = 3;
     context.strokeRect(
-      (coords.x + appState.scrollX) * devicePixelRatio,
-      (coords.y + appState.scrollY) * devicePixelRatio,
+      (coords.x + positionOffset.x + appState.scrollX) * devicePixelRatio,
+      (coords.y + positionOffset.y + appState.scrollY) * devicePixelRatio,
       getBoundTextMaxWidth(element, textElement) * devicePixelRatio,
       getBoundTextMaxHeight(element, textElement) * devicePixelRatio,
     );
@@ -937,20 +1002,56 @@ export const renderElement = (
   context: CanvasRenderingContext2D,
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  renderState = resolveElementRenderState(
+    element,
+    elementsMap,
+    renderConfig,
+    allElementsMap,
+  ),
 ) => {
   const reduceAlphaForSelection =
     appState.openDialog?.name === "elementLinkSelector" &&
     !appState.selectedElementIds[element.id] &&
     !appState.hoveredElementIds[element.id];
 
-  context.globalAlpha = getRenderOpacity(
-    element,
-    getContainingFrame(element, elementsMap),
-    renderConfig.elementsPendingErasure,
-    renderConfig.pendingFlowchartNodes,
-    reduceAlphaForSelection ? DEFAULT_REDUCED_GLOBAL_ALPHA : 1,
-  );
+  context.save();
+  context.globalAlpha =
+    renderState.opacity *
+    (reduceAlphaForSelection ? DEFAULT_REDUCED_GLOBAL_ALPHA : 1);
+  // Cached bitmaps apply the offset before pixel snapping. Moving it into
+  // the canvas transform first loses precision at half-device-pixel ties.
+  if (
+    (renderConfig.isExporting || isFrameLikeElement(element)) &&
+    (renderState.offset.x || renderState.offset.y)
+  ) {
+    context.translate(renderState.offset.x, renderState.offset.y);
+  }
+  try {
+    drawElement(
+      element,
+      elementsMap,
+      allElementsMap,
+      rc,
+      context,
+      renderConfig,
+      appState,
+      renderState,
+    );
+  } finally {
+    context.restore();
+  }
+};
 
+const drawElement = (
+  element: NonDeletedExcalidrawElement,
+  elementsMap: RenderableElementsMap,
+  allElementsMap: NonDeletedSceneElementsMap,
+  rc: RoughCanvas,
+  context: CanvasRenderingContext2D,
+  renderConfig: StaticCanvasRenderConfig,
+  appState: StaticCanvasAppState | InteractiveCanvasAppState,
+  renderState: ElementRenderState,
+) => {
   switch (element.type) {
     case "magicframe":
     case "frame": {
@@ -1025,6 +1126,7 @@ export const renderElement = (
           renderConfig,
           appState,
           allElementsMap,
+          renderState.offset,
         );
       }
 
@@ -1149,45 +1251,75 @@ export const renderElement = (
           context.imageSmoothingEnabled = false;
         }
 
-        if (
+        const uncroppedElementCanvas =
           element.id === appState.croppingElementId &&
           isImageElement(elementWithCanvas.element) &&
           elementWithCanvas.element.crop !== null
-        ) {
+            ? generateElementCanvas(
+                getUncroppedImageElement(
+                  elementWithCanvas.element,
+                  elementsMap,
+                ) as NonDeleted<ExcalidrawImageElement>,
+                allElementsMap,
+                appState.zoom,
+                renderConfig,
+                appState,
+              )
+            : null;
+
+        if (uncroppedElementCanvas) {
+          // the crop editor shows the uncropped image, faded outside the
+          // crop: one bitmap, so cropping moves only the crop's edges over it
+          // (the cropped image's own bitmap snaps to whole pixels by its own
+          // corner, shifting the image by a pixel as that corner moves)
           context.save();
           context.globalAlpha = 0.1;
-
-          const uncroppedElementCanvas = generateElementCanvas(
-            getUncroppedImageElement(
-              elementWithCanvas.element,
-              elementsMap,
-            ) as NonDeleted<ExcalidrawImageElement>,
-            allElementsMap,
-            appState.zoom,
+          drawElementFromCanvas(
+            uncroppedElementCanvas,
+            context,
             renderConfig,
             appState,
+            allElementsMap,
+            // The crop editor's uncropped preview stays at document coordinates.
+            ZERO_RENDER_OFFSET,
           );
-
-          if (uncroppedElementCanvas) {
-            drawElementFromCanvas(
-              uncroppedElementCanvas,
-              context,
-              renderConfig,
-              appState,
-              allElementsMap,
-            );
-          }
-
           context.restore();
-        }
 
-        drawElementFromCanvas(
-          elementWithCanvas,
-          context,
-          renderConfig,
-          appState,
-          allElementsMap,
-        );
+          const [x1, y1, x2, y2] = getElementAbsoluteCoords(
+            elementWithCanvas.element,
+            allElementsMap,
+          );
+          context.save();
+          // (built in the element's rotated box: save/restore leaves the path)
+          context.save();
+          context.translate(
+            (x1 + x2) / 2 + renderState.offset.x + appState.scrollX,
+            (y1 + y2) / 2 + renderState.offset.y + appState.scrollY,
+          );
+          context.rotate(elementWithCanvas.element.angle);
+          context.beginPath();
+          context.rect((x1 - x2) / 2, (y1 - y2) / 2, x2 - x1, y2 - y1);
+          context.restore();
+          context.clip();
+          drawElementFromCanvas(
+            uncroppedElementCanvas,
+            context,
+            renderConfig,
+            appState,
+            allElementsMap,
+            renderState.offset,
+          );
+          context.restore();
+        } else {
+          drawElementFromCanvas(
+            elementWithCanvas,
+            context,
+            renderConfig,
+            appState,
+            allElementsMap,
+            renderState.offset,
+          );
+        }
 
         // reset
         context.imageSmoothingEnabled = currentImageSmoothingStatus;
@@ -1199,8 +1331,6 @@ export const renderElement = (
       throw new Error(`Unimplemented type ${element.type}`);
     }
   }
-
-  context.globalAlpha = 1;
 };
 
 export function getFreedrawOutlineAsSegments(

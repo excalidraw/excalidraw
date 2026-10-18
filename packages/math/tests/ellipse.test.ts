@@ -1,5 +1,6 @@
 import {
   ellipse,
+  ellipseDistanceFromPoint,
   ellipseSegmentInterceptPoints,
   ellipseIncludesPoint,
   ellipseTouchesPoint,
@@ -57,6 +58,35 @@ describe("point and ellipse", () => {
 
     expect(ellipseIncludesPoint(pointFrom(-1, 1), target)).toBe(false);
     expect(ellipseIncludesPoint(pointFrom(-1.4, 0.8), target)).toBe(false);
+  });
+});
+
+describe("point distance to ellipse outline", () => {
+  const center = pointFrom<GlobalPoint>(0, 0);
+
+  it("is the radius at a circle's center", () => {
+    const circle = ellipse(center, 100, 100);
+
+    expect(ellipseDistanceFromPoint(center, circle)).toBe(100);
+    expect(ellipseDistanceFromPoint(pointFrom(1, 0), circle)).toBe(99);
+    expect(ellipseDistanceFromPoint(pointFrom(30, 40), circle)).toBe(50);
+  });
+
+  it("measures points on the axes of a non-circular ellipse", () => {
+    const wide = ellipse(center, 200, 50);
+
+    // closest to the top/bottom of the outline, not to the long axis
+    expect(ellipseDistanceFromPoint(center, wide)).toBeCloseTo(50);
+    expect(ellipseDistanceFromPoint(pointFrom(10, 0), wide)).toBeCloseTo(
+      49.93,
+      1,
+    );
+    expect(ellipseDistanceFromPoint(pointFrom(-150, 0), wide)).toBeCloseTo(
+      31.62,
+      1,
+    );
+    expect(ellipseDistanceFromPoint(pointFrom(0, 10), wide)).toBeCloseTo(40);
+    expect(ellipseDistanceFromPoint(pointFrom(250, 0), wide)).toBeCloseTo(50);
   });
 });
 

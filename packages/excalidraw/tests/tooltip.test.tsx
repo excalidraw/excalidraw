@@ -1,7 +1,5 @@
-import React from "react";
-
-import { act, fireEvent, render } from "@testing-library/react";
-import { afterEach, beforeEach, vi } from "vitest";
+import { render as renderComponent, fireEvent } from "@testing-library/react";
+import { vi } from "vitest";
 
 import { HYPERLINK_TOOLTIP_DELAY } from "@excalidraw/common";
 import { newTextElement } from "@excalidraw/element";
@@ -12,65 +10,136 @@ import {
   TOOLTIP_CLASS,
   TOOLTIP_VISIBLE_CLASS,
   Tooltip,
+  hideTooltip,
 } from "../components/Tooltip";
-
 import {
   hideHyperlinkToolip,
   showHyperlinkTooltip,
   type HyperlinkTooltipOwner,
 } from "../components/hyperlink/Hyperlink";
 
+import { act } from "./test-utils";
+
 import type { AppState } from "../types";
 
-const getSharedTooltip = (ownerDocument: Document) =>
-  ownerDocument.querySelector(`.${TOOLTIP_CLASS}`);
+const TOOLTIP_DELAY = 500;
+const TOOLTIP_WARM_WINDOW = 300;
 
-/**
- * The tooltip is a single div shared by every trigger in the process, shown
- * and hidden imperatively. Its bugs are all the same shape: the event that
- * would hide it never arrives (the trigger is gone, the window lost focus,
- * the owner is another editor), leaving a stale tooltip on screen. See also
- * the cross-document scoping covered in `hostAbstraction.test.tsx`.
- */
+const getTooltip = () =>
+  document.querySelector<HTMLDivElement>(`.${TOOLTIP_CLASS}`);
+
+const isTooltipVisible = () =>
+  !!getTooltip()?.classList.contains(TOOLTIP_VISIBLE_CLASS);
+
+const wrapperOf = (container: HTMLElement, label: string) =>
+  container.querySelector<HTMLDivElement>(`[data-testid="${label}"]`)!
+    .parentElement!;
+
+const Harness = ({ labels, delay }: { labels: string[]; delay?: boolean }) => (
+  <>
+    {labels.map((label) => (
+      <Tooltip key={label} label={label} delay={delay}>
+        <button data-testid={label} />
+      </Tooltip>
+    ))}
+  </>
+);
+
 describe("Tooltip", () => {
-  it("clears the shared tooltip when the trigger goes away mid-hover", () => {
-    const { rerender, unmount } = render(
-      <Tooltip label="Help" disabled={false}>
-        <button>hover me</button>
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // the tooltip state is shared by every instance (one tooltip node per
+    // page), so start each test cold: nothing visible, warm window elapsed
+    hideTooltip();
+    vi.advanceTimersByTime(TOOLTIP_WARM_WINDOW + 1);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("does not flash when the pointer only passes over", () => {
+    const { container } = renderComponent(<Harness labels={["a"]} delay />);
+    const wrapper = wrapperOf(container, "a");
+
+    fireEvent.pointerEnter(wrapper);
+    fireEvent.pointerLeave(wrapper);
+
+    act(() => {
+      vi.advanceTimersByTime(TOOLTIP_DELAY);
+    });
+    expect(isTooltipVisible()).toBe(false);
+  });
+
+  it("skips the delay while still warm from a tooltip that just hid", () => {
+    const { container } = renderComponent(
+      <Harness labels={["a", "b"]} delay />,
+    );
+
+    fireEvent.pointerEnter(wrapperOf(container, "a"));
+    act(() => {
+      vi.advanceTimersByTime(TOOLTIP_DELAY);
+    });
+    expect(isTooltipVisible()).toBe(true);
+
+    fireEvent.pointerLeave(wrapperOf(container, "a"));
+    expect(isTooltipVisible()).toBe(false);
+
+    fireEvent.pointerEnter(wrapperOf(container, "b"));
+    expect(isTooltipVisible()).toBe(true);
+    expect(getTooltip()!.textContent).toBe("b");
+  });
+
+  it("an unrelated Tooltip unmounting doesn't hide a visible tooltip", async () => {
+    const { container, rerender } = renderComponent(
+      <Harness labels={["a", "b"]} />,
+    );
+
+    fireEvent.pointerEnter(wrapperOf(container, "a"));
+    expect(isTooltipVisible()).toBe(true);
+
+    // "b" unmounts for its own reasons (e.g. a collaborator leaving)
+    rerender(<Harness labels={["a"]} />);
+    await Promise.resolve();
+
+    expect(isTooltipVisible()).toBe(true);
+    expect(getTooltip()!.textContent).toBe("a");
+  });
+
+  it("hides when the Tooltip showing it unmounts", async () => {
+    const { container, rerender } = renderComponent(
+      <Harness labels={["a", "b"]} />,
+    );
+
+    fireEvent.pointerEnter(wrapperOf(container, "a"));
+    expect(isTooltipVisible()).toBe(true);
+
+    rerender(<Harness labels={["b"]} />);
+    // retracted by the MutationObserver, whose callbacks run as a microtask
+    await Promise.resolve();
+
+    expect(isTooltipVisible()).toBe(false);
+  });
+
+  it("hides when the Tooltip showing it gets disabled", async () => {
+    const { container, rerender } = renderComponent(
+      <Tooltip label="a" disabled={false}>
+        <button data-testid="a" />
       </Tooltip>,
     );
 
-    const hover = () => {
-      const wrapper = document.querySelector(".excalidraw-tooltip-wrapper");
-      expect(wrapper).not.toBeNull();
-      act(() => {
-        fireEvent.pointerEnter(wrapper as HTMLElement);
-      });
-      const tooltip = getSharedTooltip(document);
-      expect(tooltip).toHaveClass(TOOLTIP_VISIBLE_CLASS);
-      return tooltip;
-    };
+    fireEvent.pointerEnter(wrapperOf(container, "a"));
+    expect(isTooltipVisible()).toBe(true);
 
-    // the wrapper's onPointerLeave never fires once the node is gone, so the
-    // component itself has to clear the shared div -- on disable...
-    const tooltip = hover();
+    // a disabled Tooltip renders no wrapper, so its onPointerLeave never fires
     rerender(
-      <Tooltip label="Help" disabled>
-        <button>hover me</button>
+      <Tooltip label="a" disabled>
+        <button data-testid="a" />
       </Tooltip>,
     );
-    expect(document.querySelector(".excalidraw-tooltip-wrapper")).toBeNull();
-    expect(tooltip).not.toHaveClass(TOOLTIP_VISIBLE_CLASS);
+    await Promise.resolve();
 
-    // ...and on unmount
-    rerender(
-      <Tooltip label="Help" disabled={false}>
-        <button>hover me</button>
-      </Tooltip>,
-    );
-    expect(hover()?.textContent).toBe("Help");
-    unmount();
-    expect(tooltip).not.toHaveClass(TOOLTIP_VISIBLE_CLASS);
+    expect(isTooltipVisible()).toBe(false);
   });
 });
 
@@ -97,7 +166,7 @@ describe("hyperlink tooltip", () => {
     act(() => {
       vi.advanceTimersByTime(HYPERLINK_TOOLTIP_DELAY + 1);
     });
-    expect(getSharedTooltip(document)).toHaveClass(TOOLTIP_VISIBLE_CLASS);
+    expect(getTooltip()).toHaveClass(TOOLTIP_VISIBLE_CLASS);
     return owner;
   };
 
@@ -109,7 +178,7 @@ describe("hyperlink tooltip", () => {
   });
 
   it("drops the tooltip when its owning window goes away", () => {
-    const tooltip = () => getSharedTooltip(document);
+    const tooltip = () => getTooltip();
 
     // no in-window event will ever call `hideHyperlinkToolip` once the window
     // loses focus, so the window itself must drop the tooltip
@@ -151,7 +220,7 @@ describe("hyperlink tooltip", () => {
 
   it("lets a new owner take over from a stale one", () => {
     showAndRender("https://first.example");
-    const tooltip = getSharedTooltip(document);
+    const tooltip = getTooltip();
     expect(tooltip?.textContent).toBe("https://first.example");
 
     show("https://second.example");
@@ -168,7 +237,7 @@ describe("hyperlink tooltip", () => {
 
   it("ignores hide calls from a foreign owner", () => {
     const owner = showAndRender("https://example.com");
-    const tooltip = getSharedTooltip(document);
+    const tooltip = getTooltip();
 
     // another editor's pointer leaving its own link must not tear down the
     // tooltip this one owns

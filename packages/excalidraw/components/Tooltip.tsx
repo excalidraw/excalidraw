@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import clsx from "clsx";
+import React from "react";
 
 import { getTargetWindow } from "@excalidraw/common";
 
@@ -20,7 +21,11 @@ export const getTooltipDiv = (ownerDocument: Document) => {
   return div;
 };
 
-export const hideTooltip = (ownerDocument: Document) => {
+/**
+ * Hides `ownerDocument`'s tooltip, for tooltips not shown through
+ * `showTooltip` (see `hideTooltip`).
+ */
+export const hideDocumentTooltip = (ownerDocument: Document) => {
   ownerDocument
     .querySelector(`.${TOOLTIP_CLASS}`)
     ?.classList.remove(TOOLTIP_VISIBLE_CLASS);
@@ -76,12 +81,60 @@ export const updateTooltipPosition = (
   });
 };
 
+/** ms before a `delay`ed tooltip shows */
+export const TOOLTIP_DELAY = 500;
+/**
+ * ms after a tooltip hides during which a `delay`ed tooltip shows right away
+ * (e.g. when moving across adjacent buttons)
+ */
+const TOOLTIP_WARM_WINDOW = 300;
+
+/** a pending delayed tooltip, timed in its item's window */
+let showTooltipTimer: { id: number; ownerWindow: Window } | null = null;
+let tooltipHiddenAt = 0;
+/**
+ * the tooltip `showTooltip` showed last (it lives in its item's document,
+ * which may be another window's)
+ */
+let shownTooltip: HTMLDivElement | null = null;
+/**
+ * while a tooltip is visible, hides it once its item is removed from the DOM
+ * (e.g. unmounted while hovered, which doesn't fire pointerleave)
+ */
+let tooltipItemObserver: MutationObserver | null = null;
+
+const clearShowTooltipTimer = () => {
+  if (showTooltipTimer) {
+    showTooltipTimer.ownerWindow.clearTimeout(showTooltipTimer.id);
+    showTooltipTimer = null;
+  }
+};
+
+/** Hides the tooltip `showTooltip` shows, and cancels a pending one. */
+export const hideTooltip = () => {
+  clearShowTooltipTimer();
+  tooltipItemObserver?.disconnect();
+  tooltipItemObserver = null;
+  const tooltip = shownTooltip;
+  shownTooltip = null;
+  if (tooltip?.classList.contains(TOOLTIP_VISIBLE_CLASS)) {
+    tooltip.classList.remove(TOOLTIP_VISIBLE_CLASS);
+    tooltipHiddenAt = Date.now();
+  }
+};
+
 const updateTooltip = (
-  item: HTMLDivElement,
+  item: HTMLElement,
   tooltip: HTMLDivElement,
   label: string,
   long: boolean,
+  position: "bottom" | "top",
 ) => {
+  if (shownTooltip && shownTooltip !== tooltip) {
+    // shown in another document before
+    shownTooltip.classList.remove(TOOLTIP_VISIBLE_CLASS);
+  }
+  shownTooltip = tooltip;
   tooltip.classList.add(TOOLTIP_VISIBLE_CLASS);
   tooltip.style.minWidth = long ? "50ch" : "10ch";
   tooltip.style.maxWidth = long ? "50ch" : "15ch";
@@ -89,7 +142,65 @@ const updateTooltip = (
   tooltip.textContent = label;
 
   const itemRect = item.getBoundingClientRect();
-  updateTooltipPosition(tooltip, itemRect);
+  updateTooltipPosition(tooltip, itemRect, position);
+
+  tooltipItemObserver?.disconnect();
+  tooltipItemObserver = new MutationObserver(() => {
+    if (!item.isConnected) {
+      hideTooltip();
+    }
+  });
+  tooltipItemObserver.observe(item.ownerDocument.body, {
+    childList: true,
+    subtree: true,
+  });
+};
+
+/**
+ * Shows the tooltip for `item`. For elements that can't be wrapped
+ * in <Tooltip>. Pair with `hideTooltip()`.
+ */
+export const showTooltip = (
+  item: HTMLElement,
+  label: string,
+  {
+    long = false,
+    delay = false,
+    position = "bottom",
+  }: {
+    long?: boolean;
+    /** show after a short delay (unless a tooltip was visible just now) */
+    delay?: boolean;
+    position?: "bottom" | "top";
+  } = {},
+) => {
+  const show = () => {
+    // item may have been unmounted while the delayed tooltip was pending
+    showTooltipTimer = null;
+    if (item.isConnected) {
+      updateTooltip(
+        item,
+        getTooltipDiv(item.ownerDocument),
+        label,
+        long,
+        position,
+      );
+    }
+  };
+  clearShowTooltipTimer();
+  const ownerWindow = getTargetWindow(item);
+  if (
+    ownerWindow &&
+    delay &&
+    Date.now() - tooltipHiddenAt > TOOLTIP_WARM_WINDOW
+  ) {
+    showTooltipTimer = {
+      id: ownerWindow.setTimeout(show, TOOLTIP_DELAY),
+      ownerWindow,
+    };
+  } else {
+    show();
+  }
 };
 
 type TooltipProps = {
@@ -97,7 +208,10 @@ type TooltipProps = {
   label: string;
   long?: boolean;
   style?: React.CSSProperties;
+  className?: string;
   disabled?: boolean;
+  /** show after a short delay (unless a tooltip was visible just now) */
+  delay?: boolean;
 };
 
 export const Tooltip = ({
@@ -105,45 +219,20 @@ export const Tooltip = ({
   label,
   long = false,
   style,
+  className,
   disabled,
+  delay = false,
 }: TooltipProps) => {
-  // the tooltip div we're currently showing (may live in another document),
-  // so that unmounting while hovered doesn't leave it stuck on screen
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    return () => {
-      tooltipRef.current?.classList.remove(TOOLTIP_VISIBLE_CLASS);
-      tooltipRef.current = null;
-    };
-  }, []);
-  useEffect(() => {
-    // the wrapper is unmounted while disabled, so its onPointerLeave never
-    // fires and the shared tooltip div must be cleared here instead
-    if (disabled) {
-      tooltipRef.current?.classList.remove(TOOLTIP_VISIBLE_CLASS);
-      tooltipRef.current = null;
-    }
-  }, [disabled]);
   if (disabled) {
     return null;
   }
   return (
     <div
-      className="excalidraw-tooltip-wrapper"
-      onPointerEnter={(event) => {
-        const tooltip = getTooltipDiv(event.currentTarget.ownerDocument);
-        tooltipRef.current = tooltip;
-        updateTooltip(
-          event.currentTarget as HTMLDivElement,
-          tooltip,
-          label,
-          long,
-        );
-      }}
-      onPointerLeave={(event) => {
-        hideTooltip(event.currentTarget.ownerDocument);
-        tooltipRef.current = null;
-      }}
+      className={clsx("excalidraw-tooltip-wrapper", className)}
+      onPointerEnter={(event) =>
+        showTooltip(event.currentTarget, label, { long, delay })
+      }
+      onPointerLeave={hideTooltip}
       style={style}
     >
       {children}
