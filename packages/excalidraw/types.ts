@@ -1200,6 +1200,7 @@ export type AppClassProperties = {
   editorInterface: App["editorInterface"];
   scene: App["scene"];
   syncActionResult: App["syncActionResult"];
+  fontMetrics: App["fontMetrics"];
   fonts: App["fonts"];
   clipboard: App["clipboard"];
   id: App["id"];

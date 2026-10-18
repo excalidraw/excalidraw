@@ -1,0 +1,273 @@
+import { getFontFamilyString, getFontString } from "@excalidraw/common";
+
+import {
+  CaptureUpdateAction,
+  charWidth,
+  isNonDeletedElement,
+  isTextElement,
+  updateBoundElements,
+} from "@excalidraw/element";
+
+import type {
+  ExcalidrawElement,
+  ExcalidrawTextElement,
+} from "@excalidraw/element/types";
+
+import { remeasureTextElements } from "../data/restore";
+import { Fonts } from "../fonts";
+
+import type App from "./App";
+
+/** adds each character of `chars` to the set kept under `family` */
+const addChars = (
+  charsByFamily: Map<string, Set<string>>,
+  family: string,
+  chars: string,
+) => {
+  let set = charsByFamily.get(family);
+  if (!set) {
+    set = new Set();
+    charsByFamily.set(family, set);
+  }
+  for (const char of chars) {
+    set.add(char);
+  }
+};
+
+/**
+ * Owns font loading on behalf of the scene, and the correction of text
+ * bounds that were measured before the fonts they need were loaded. Only
+ * text entering the scene through paste or file import, or typed into the
+ * editor, is corrected; text arriving any other way (initial data, host
+ * `updateScene`, collab) keeps the bounds it came with.
+ */
+export class AppFonts {
+  /**
+   * Text whose fonts loaded while it was deleted (e.g. a paste undone before
+   * then). Redo brings back the bounds it was undone with, so it gets
+   * remeasured once it's restored instead.
+   */
+  private remeasureOnRestore = new Set<ExcalidrawElement["id"]>();
+
+  /**
+   * Characters the document's fonts are known to cover, per font family
+   * string (with its fallbacks). Keyed by family rather than the full font
+   * string: which faces cover a character doesn't depend on the font size.
+   * `fonts.check` scans its whole text on every call and costs tens of µs per
+   * character per family, so typing checks only what this doesn't hold yet.
+   * Faces are only ever added to the document, never removed, so a character
+   * once covered stays covered.
+   */
+  private loadedChars = new Map<string, Set<string>>();
+
+  constructor(private app: App) {}
+
+  /** the characters of `text` not yet known to be covered by `family` */
+  private getUnloadedChars = (
+    family: string,
+    text: string,
+    skip?: ReadonlySet<string>,
+  ) => {
+    const loaded = this.loadedChars.get(family);
+    let chars = "";
+    // iterates code points, so surrogate pairs (emoji) stay whole
+    for (const char of new Set(text)) {
+      if (!loaded?.has(char) && !skip?.has(char)) {
+        chars += char;
+      }
+    }
+    return chars;
+  };
+
+  /**
+   * Loads the fonts of the initial scene explicitly — faster than waiting for
+   * `loadingdone` even in browsers that do fire it.
+   */
+  loadSceneFonts = () => {
+    this.app.fonts.loadSceneFonts().then((fontFaces) => {
+      this.app.fonts.onLoaded(fontFaces);
+    });
+  };
+
+  /**
+   * Rerenders text elements once font faces land (#637, #1553).
+   */
+  handleLoadingDone = (event: Event) => {
+    const fontFaces = (event as FontFaceSetLoadEvent).fontfaces;
+    this.app.fonts.onLoaded(fontFaces);
+  };
+
+  /**
+   * Font loading for one text editing session. Typed text may need font
+   * subsets (e.g. CJK) that only load now, so the text gets wrapped with
+   * fallback metrics first; the session loads what the latest text needs
+   * and reflows the element once the faces arrive.
+   *
+   * @param element the text element being edited
+   * @param reflow re-wraps the element in the scene from its original text
+   */
+  createEditSession = (
+    element: ExcalidrawTextElement,
+    reflow: (originalText: string) => void,
+  ) => {
+    let isEditing = true;
+    const pendingFontLoads = new Map<string, Promise<unknown>>();
+    // characters whose load failed (e.g. offline), per font family — not
+    // retried on every keystroke for the rest of the session
+    const failedChars = new Map<string, Set<string>>();
+
+    const remeasureOnceFontLoads = (nextOriginalText: string) => {
+      const latestTextElement =
+        this.app.scene.getElement<ExcalidrawTextElement>(element.id);
+      if (!latestTextElement || !nextOriginalText) {
+        return;
+      }
+      const font = getFontString(latestTextElement);
+      if (pendingFontLoads.has(font)) {
+        return;
+      }
+      const family = getFontFamilyString(latestTextElement);
+      const chars = this.getUnloadedChars(
+        family,
+        nextOriginalText,
+        failedChars.get(family),
+      );
+      if (!chars) {
+        return;
+      }
+      if (this.app.ownerDocument.fonts.check(font, chars)) {
+        addChars(this.loadedChars, family, chars);
+        return;
+      }
+      pendingFontLoads.set(
+        font,
+        this.app.ownerDocument.fonts
+          .load(font, chars)
+          .then((fontFaces) => {
+            pendingFontLoads.delete(font);
+            addChars(this.loadedChars, family, chars);
+            if (!isEditing) {
+              return;
+            }
+            const currentTextElement =
+              this.app.scene.getElement<ExcalidrawTextElement>(element.id);
+            if (!currentTextElement || currentTextElement.isDeleted) {
+              return;
+            }
+            // drop the fallback glyph widths before wrapping again
+            charWidth.clearCache(font);
+            this.app.fonts.onLoaded(fontFaces);
+            reflow(currentTextElement.originalText);
+            if (isNonDeletedElement(element)) {
+              updateBoundElements(element, this.app.scene);
+            }
+            // text typed while this load was in flight may need subsets this
+            // load didn't cover — re-check once against the latest text
+            remeasureOnceFontLoads(currentTextElement.originalText);
+          })
+          .catch((error) => {
+            pendingFontLoads.delete(font);
+            addChars(failedChars, family, chars);
+            console.error(error);
+          }),
+      );
+    };
+
+    return {
+      /** call with the text as it is typed */
+      onChange: remeasureOnceFontLoads,
+      /** call on submit; loads still in flight then leave the element alone */
+      end: () => {
+        isEditing = false;
+      },
+    };
+  };
+
+  /**
+   * Loads the fonts the given (pasted or imported) text elements need and
+   * remeasures them with the local metrics once the faces arrive.
+   */
+  remeasureTextOnceLoaded = (elements: readonly ExcalidrawElement[]) => {
+    const text = elements.filter((element) =>
+      isTextElement(element),
+    ) as ExcalidrawTextElement[];
+    if (!text.length) {
+      return;
+    }
+    Fonts.loadElementsFonts(text, this.app.ownerDocument)
+      .then((fontFaces) => {
+        // only the faces that had to be loaded come back
+        if (!fontFaces.length) {
+          return;
+        }
+        // drops the fallback glyph widths and rerenders — or bails when the
+        // `loadingdone` listener got there first, which cleared them as well
+        this.app.fonts.onLoaded(fontFaces);
+
+        const elementIds = new Set(text.map((element) => element.id));
+        for (const id of elementIds) {
+          if (this.app.scene.getElement(id)?.isDeleted) {
+            this.remeasureOnRestore.add(id);
+          }
+        }
+        this.remeasureText(elementIds);
+      })
+      .catch((error) => console.error(error));
+  };
+
+  /**
+   * Remeasures the text waiting for its restore, once it's back in the scene.
+   * Uncaptured like the correction it stands in for, so that the restored
+   * element doesn't get an undo entry of its own.
+   */
+  handleSceneUpdate = () => {
+    if (!this.remeasureOnRestore.size) {
+      return;
+    }
+
+    const restoredIds = new Set<ExcalidrawElement["id"]>();
+    for (const id of this.remeasureOnRestore) {
+      const element = this.app.scene.getElement(id);
+      if (!element) {
+        // gone for good (e.g. replaced by another scene)
+        this.remeasureOnRestore.delete(id);
+      } else if (!element.isDeleted) {
+        this.remeasureOnRestore.delete(id);
+        restoredIds.add(id);
+        // `onLoaded` cleared the fallback glyph widths only for the fonts of
+        // the text that wasn't deleted at the time
+        if (isTextElement(element)) {
+          charWidth.clearCache(getFontString(element));
+        }
+      }
+    }
+
+    if (restoredIds.size) {
+      this.remeasureText(restoredIds);
+    }
+  };
+
+  /**
+   * Remeasures the given text elements with the local font metrics.
+   */
+  private remeasureText = (
+    elementIds: ReadonlySet<ExcalidrawElement["id"]>,
+  ) => {
+    this.app.setState({}, () => {
+      const editingTextElementId = this.app.state.editingTextElement?.id;
+
+      const remeasuredElements = remeasureTextElements(
+        this.app.scene.getElementsIncludingDeleted(),
+        (element) =>
+          elementIds.has(element.id) && element.id !== editingTextElementId,
+      );
+
+      if (remeasuredElements) {
+        this.app.updateScene({
+          elements: remeasuredElements,
+          captureUpdate: CaptureUpdateAction.NEVER,
+        });
+      }
+    });
+  };
+}

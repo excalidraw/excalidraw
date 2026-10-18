@@ -21,6 +21,7 @@ import {
   applyDarkModeFilter,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
+  getFontString,
 } from "@excalidraw/common";
 
 import type {
@@ -3592,6 +3593,118 @@ describe("textWysiwyg", () => {
       Keyboard.undo();
 
       expect(h.elements.filter((el) => !el.isDeleted)).toHaveLength(0);
+    });
+  });
+
+  describe("font loading while typing", () => {
+    const fontsCheck = vi.mocked(document.fonts.check);
+    const fontsLoad = vi.mocked(document.fonts.load);
+    const loadedCheck = fontsCheck.getMockImplementation()!;
+    const loadedLoad = fontsLoad.getMockImplementation()!;
+
+    let editor: HTMLTextAreaElement;
+    let font: string;
+
+    // lets a font load in flight settle
+    const settle = () =>
+      act(() => new Promise((resolve) => setTimeout(resolve, 0)));
+
+    beforeEach(async () => {
+      await render(<Excalidraw handleKeyboardGlobally={true} />);
+      UI.clickTool("text");
+      mouse.clickAt(100, 100);
+      editor = await getTextEditor();
+      font = getFontString(h.state.editingTextElement!);
+      fontsCheck.mockClear();
+      fontsLoad.mockClear();
+    });
+
+    afterEach(() => {
+      fontsCheck.mockImplementation(loadedCheck);
+      fontsLoad.mockImplementation(loadedLoad);
+    });
+
+    it("should check only the characters not yet known to be loaded", () => {
+      fontsCheck.mockReturnValue(true);
+
+      updateTextEditor(editor, "你好");
+      expect(fontsCheck.mock.calls).toEqual([[font, "你好"]]);
+
+      updateTextEditor(editor, "你好你好");
+      expect(fontsCheck).toHaveBeenCalledTimes(1);
+
+      updateTextEditor(editor, "你好世");
+      expect(fontsCheck.mock.calls).toEqual([
+        [font, "你好"],
+        [font, "世"],
+      ]);
+      expect(fontsLoad).not.toHaveBeenCalled();
+    });
+
+    it("should reuse confirmed characters across font sizes, not families", () => {
+      const getText = () => h.elements[0] as ExcalidrawTextElement;
+      fontsCheck.mockReturnValue(true);
+
+      updateTextEditor(editor, "你好");
+      expect(fontsCheck).toHaveBeenCalledTimes(1);
+
+      // which faces cover a character depends on the family, not the size
+      API.updateElement(getText(), { fontSize: getText().fontSize * 2 });
+      updateTextEditor(editor, "你好你好");
+      expect(fontsCheck).toHaveBeenCalledTimes(1);
+
+      API.updateElement(getText(), { fontFamily: FONT_FAMILY.Nunito });
+      updateTextEditor(editor, "你好");
+      expect(fontsCheck.mock.calls).toEqual([
+        [font, "你好"],
+        [getFontString(getText()), "你好"],
+      ]);
+    });
+
+    it("should not check characters again once their fonts load", async () => {
+      fontsCheck.mockReturnValue(false);
+      fontsLoad.mockResolvedValue([]);
+
+      updateTextEditor(editor, "你好");
+      expect(fontsLoad.mock.calls).toEqual([[font, "你好"]]);
+      await settle();
+
+      fontsCheck.mockClear();
+      fontsLoad.mockClear();
+      updateTextEditor(editor, "你好你好");
+      expect(fontsCheck).not.toHaveBeenCalled();
+      expect(fontsLoad).not.toHaveBeenCalled();
+
+      updateTextEditor(editor, "你好世");
+      expect(fontsCheck.mock.calls).toEqual([[font, "世"]]);
+      expect(fontsLoad.mock.calls).toEqual([[font, "世"]]);
+      await settle();
+    });
+
+    it("should not retry characters whose fonts failed to load", async () => {
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      fontsCheck.mockReturnValue(false);
+      fontsLoad.mockRejectedValue(new Error("offline"));
+
+      try {
+        updateTextEditor(editor, "你好");
+        await settle();
+        expect(fontsLoad).toHaveBeenCalledTimes(1);
+        expect(consoleError).toHaveBeenCalledTimes(1);
+
+        fontsCheck.mockClear();
+        fontsLoad.mockClear();
+        updateTextEditor(editor, "你好你好");
+        expect(fontsCheck).not.toHaveBeenCalled();
+
+        updateTextEditor(editor, "你好世");
+        expect(fontsLoad.mock.calls).toEqual([[font, "世"]]);
+        await settle();
+      } finally {
+        consoleError.mockRestore();
+      }
     });
   });
 });

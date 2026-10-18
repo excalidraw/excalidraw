@@ -8,7 +8,11 @@ import {
 import { vi } from "vitest";
 import { pointFrom } from "@excalidraw/math";
 
-import { newElementWith } from "@excalidraw/element";
+import {
+  measureText,
+  newElementWith,
+  setCustomTextMetricsProvider,
+} from "@excalidraw/element";
 
 import {
   EXPORT_DATA_TYPES,
@@ -19,6 +23,7 @@ import {
   COLOR_PALETTE,
   DEFAULT_ELEMENT_BACKGROUND_COLOR_INDEX,
   DEFAULT_ELEMENT_STROKE_COLOR_INDEX,
+  getFontString,
   reseed,
   randomId,
 } from "@excalidraw/common";
@@ -55,7 +60,7 @@ import { actionToggleViewMode } from "../actions/actionToggleViewMode";
 import * as StaticScene from "../renderer/staticScene";
 import { getDefaultAppState } from "../appState";
 import { Excalidraw } from "../index";
-import { createPasteEvent } from "../clipboard";
+import { createPasteEvent, serializeAsClipboardJSON } from "../clipboard";
 
 import * as blobModule from "../data/blob";
 
@@ -808,6 +813,412 @@ describe("history", () => {
           isDeleted: false,
         }),
       ]);
+    });
+
+    // fonts are always "loaded" in tests; make the one the text needs
+    // arrive late, so the sync measurement runs with fallback metrics
+    const withLateFont = async (fn: () => Promise<void>) => {
+      const fontsCheck = vi.mocked(document.fonts.check);
+      const fontsLoad = vi.mocked(document.fonts.load);
+      const loadedCheck = fontsCheck.getMockImplementation();
+      const loadedLoad = fontsLoad.getMockImplementation();
+      fontsCheck.mockReturnValue(false);
+      fontsLoad.mockResolvedValue([
+        {
+          family: "late",
+          style: "normal",
+          weight: "400",
+          unicodeRange: "U+4E00-9FFF",
+        } as FontFace,
+      ]);
+      try {
+        await fn();
+      } finally {
+        fontsCheck.mockImplementation(loadedCheck!);
+        fontsLoad.mockImplementation(loadedLoad!);
+      }
+    };
+
+    it("should redo pasted text with its remeasured bounds once its fonts load", async () => {
+      // paste captures the text right away, measured with whatever font is
+      // loaded at that moment; the correction that follows the font load is
+      // not captured (a measurement is not an edit), but the snapshot must
+      // carry it — otherwise undo/redo would revert to the stale bounds
+      const pastedText = API.createElement({
+        type: "text",
+        text: "你好世界",
+        // stale bounds, i.e. measured with a fallback font elsewhere
+        width: 999,
+        height: 999,
+      });
+      const expected = measureText(
+        pastedText.text,
+        getFontString(pastedText),
+        pastedText.lineHeight,
+      );
+
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+
+      await withLateFont(async () => {
+        document.dispatchEvent(
+          createPasteEvent({
+            types: {
+              "text/plain": serializeAsClipboardJSON({
+                elements: [pastedText],
+                files: null,
+              }),
+            },
+          }),
+        );
+
+        await waitFor(() => {
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              text: pastedText.text,
+              width: expected.width,
+              height: expected.height,
+            }),
+          ]);
+        });
+        const [text] = h.elements;
+
+        expect(API.getUndoStack().length).toBe(1);
+        expect(h.store.snapshot.elements.get(text.id)).toEqual(
+          expect.objectContaining({
+            width: expected.width,
+            height: expected.height,
+          }),
+        );
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(0);
+        expect(API.getRedoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({ id: text.id, isDeleted: true }),
+        ]);
+
+        Keyboard.redo();
+        expect(API.getUndoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: text.id,
+            isDeleted: false,
+            width: expected.width,
+            height: expected.height,
+          }),
+        ]);
+      });
+    });
+
+    it("should keep remeasured imported text out of undo once its fonts load", async () => {
+      const importedText = API.createElement({
+        type: "text",
+        id: "imported",
+        text: "你好世界",
+        width: 999,
+        height: 999,
+      });
+      const expected = measureText(
+        importedText.text,
+        getFontString(importedText),
+        importedText.lineHeight,
+      );
+
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+
+      await withLateFont(async () => {
+        await API.drop([
+          {
+            kind: "file",
+            file: new Blob(
+              [
+                JSON.stringify({
+                  type: EXPORT_DATA_TYPES.excalidraw,
+                  appState: getDefaultAppState(),
+                  elements: [importedText],
+                }),
+              ],
+              { type: MIME_TYPES.json },
+            ),
+          },
+        ]);
+
+        await waitFor(() => {
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: importedText.id,
+              width: expected.width,
+              height: expected.height,
+            }),
+          ]);
+        });
+
+        // the import is one undo entry; the correction adds none
+        expect(API.getUndoStack().length).toBe(1);
+        expect(h.store.snapshot.elements.get(importedText.id)).toEqual(
+          expect.objectContaining({
+            width: expected.width,
+            height: expected.height,
+          }),
+        );
+
+        // a local move and its undo touch only the position
+        API.updateScene({
+          elements: [newElementWith(h.elements[0], { x: 100 })],
+          captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+        });
+        expect(API.getUndoStack().length).toBe(2);
+
+        Keyboard.undo();
+        expect(API.getUndoStack().length).toBe(1);
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            x: importedText.x,
+            width: expected.width,
+            height: expected.height,
+          }),
+        ]);
+      });
+    });
+
+    it("should leave text from updateScene with the bounds it came with", async () => {
+      // only paste and file import remeasure: text a host or a remote peer
+      // pushes in keeps its metrics even once the font it needs loads here
+      const remoteText = API.createElement({
+        type: "text",
+        text: "你好世界",
+        width: 999,
+        height: 999,
+      });
+
+      await render(<Excalidraw />);
+
+      await withLateFont(async () => {
+        API.updateScene({
+          elements: [remoteText],
+          captureUpdate: CaptureUpdateAction.NEVER,
+        });
+
+        // give any font load a chance to settle
+        await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: remoteText.id,
+            width: 999,
+            height: 999,
+          }),
+        ]);
+        expect(API.getUndoStack().length).toBe(0);
+      });
+    });
+
+    // like `withLateFont`, but the font arrives only once `loadFont` is
+    // called, and text measures twice as wide (20px per char) until then
+    let pendingFontCount = 0;
+    const withPendingFont = async (
+      fn: (loadFont: () => Promise<void>) => Promise<void>,
+    ) => {
+      const fontsCheck = vi.mocked(document.fonts.check);
+      const fontsLoad = vi.mocked(document.fonts.load);
+      const loadedCheck = fontsCheck.getMockImplementation();
+      const loadedLoad = fontsLoad.getMockImplementation();
+      let isFontLoaded = false;
+      // once loaded, same as the default (canvas mock) metrics of 10px per char
+      setCustomTextMetricsProvider({
+        getLineWidth: (text) => text.length * (isFontLoaded ? 10 : 20),
+      });
+      let resolveLoad!: (fontFaces: FontFace[]) => void;
+      const pendingLoad = new Promise<FontFace[]>((resolve) => {
+        resolveLoad = resolve;
+      });
+      fontsCheck.mockReturnValue(false);
+      fontsLoad.mockReturnValue(pendingLoad);
+
+      const loadFont = async () => {
+        isFontLoaded = true;
+        resolveLoad([
+          {
+            // a face not seen before, so that `onLoaded` doesn't bail
+            family: `pending-${++pendingFontCount}`,
+            style: "normal",
+            weight: "400",
+            unicodeRange: "U+4E00-9FFF",
+          } as FontFace,
+        ]);
+        await act(() => new Promise((resolve) => setTimeout(resolve, 10)));
+      };
+
+      try {
+        await fn(loadFont);
+      } finally {
+        isFontLoaded = true;
+        fontsCheck.mockImplementation(loadedCheck!);
+        fontsLoad.mockImplementation(loadedLoad!);
+      }
+    };
+
+    it("should rewrap pasted text from its original text once its fonts load", async () => {
+      // fits on one line with the final metrics (8 * 10px), but not with the
+      // fallback ones (8 * 20px), which wrap it into two lines
+      const originalText = "你好世界你好世界";
+      const fixedWidthText = {
+        ...API.createElement({
+          type: "text",
+          id: "fixed",
+          text: originalText,
+          fontSize: 20,
+          width: 90,
+          height: 25,
+        }),
+        autoResize: false,
+      };
+      const container = API.createElement({
+        type: "rectangle",
+        id: "container",
+        x: 200,
+        // label max width of 90
+        width: 100,
+        height: 100,
+        boundElements: [{ type: "text", id: "label" }],
+      });
+      const label = API.createElement({
+        type: "text",
+        id: "label",
+        text: originalText,
+        fontSize: 20,
+        containerId: container.id,
+      });
+
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+      Object.assign(document, {
+        elementFromPoint: () => GlobalTestState.canvas,
+      });
+
+      await withPendingFont(async (loadFont) => {
+        document.dispatchEvent(
+          createPasteEvent({
+            types: {
+              "text/plain": serializeAsClipboardJSON({
+                elements: [fixedWidthText, container, label],
+                files: null,
+              }),
+            },
+          }),
+        );
+
+        const getText = () =>
+          h.elements.filter(
+            (element): element is ExcalidrawTextElement =>
+              element.type === "text",
+          );
+
+        await waitFor(() => {
+          expect(getText()).toEqual([
+            expect.objectContaining({
+              text: "你好世界\n你好世界",
+              originalText,
+              height: 50,
+            }),
+            expect.objectContaining({
+              text: "你好世界\n你好世界",
+              originalText,
+              height: 50,
+            }),
+          ]);
+        });
+
+        await loadFont();
+
+        expect(getText()).toEqual([
+          expect.objectContaining({ text: originalText, height: 25 }),
+          expect.objectContaining({ text: originalText, height: 25 }),
+        ]);
+        expect(API.getUndoStack().length).toBe(1);
+      });
+    });
+
+    it("should remeasure pasted text undone before its fonts load once it's redone", async () => {
+      const pastedText = API.createElement({
+        type: "text",
+        text: "你好世界",
+        fontSize: 20,
+        // measured with the final font elsewhere (4 * 10px)
+        width: 40,
+        height: 25,
+      });
+
+      await render(
+        <Excalidraw autoFocus={true} handleKeyboardGlobally={true} />,
+      );
+      Object.assign(document, {
+        elementFromPoint: () => GlobalTestState.canvas,
+      });
+
+      await withPendingFont(async (loadFont) => {
+        document.dispatchEvent(
+          createPasteEvent({
+            types: {
+              "text/plain": serializeAsClipboardJSON({
+                elements: [pastedText],
+                files: null,
+              }),
+            },
+          }),
+        );
+
+        // measured with the fallback metrics (4 * 20px)
+        await waitFor(() => {
+          expect(h.elements).toEqual([expect.objectContaining({ width: 80 })]);
+        });
+        const [text] = h.elements;
+
+        Keyboard.undo();
+        expect(h.elements).toEqual([
+          expect.objectContaining({ id: text.id, isDeleted: true }),
+        ]);
+
+        // nothing to correct while it's deleted
+        await loadFont();
+        expect(h.elements).toEqual([
+          expect.objectContaining({ id: text.id, isDeleted: true, width: 80 }),
+        ]);
+
+        // redo brings back the stale bounds, which get corrected right away,
+        // without an undo entry of their own
+        Keyboard.redo();
+        await waitFor(() => {
+          expect(h.elements).toEqual([
+            expect.objectContaining({
+              id: text.id,
+              isDeleted: false,
+              width: 40,
+              height: 25,
+            }),
+          ]);
+        });
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+
+        // and the correction sticks across further undo / redo
+        Keyboard.undo();
+        Keyboard.redo();
+        expect(h.elements).toEqual([
+          expect.objectContaining({
+            id: text.id,
+            isDeleted: false,
+            width: 40,
+            height: 25,
+          }),
+        ]);
+        expect(API.getUndoStack().length).toBe(1);
+        expect(API.getRedoStack().length).toBe(0);
+      });
     });
 
     it("should support appstate name or viewBackgroundColor change", async () => {
@@ -2201,8 +2612,6 @@ describe("history", () => {
       ]);
     });
 
-    // https://www.figma.com/blog/how-figmas-multiplayer-technology-works/#implementing-undo
-    // This is due to the fact that deltas are updated in `applyLatestChanges`.
     it("should update history entries after remote changes on the same properties", async () => {
       UI.createElement("rectangle", { x: 10 });
       togglePopover("Background");
