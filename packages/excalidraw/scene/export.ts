@@ -50,7 +50,7 @@ import type {
   Theme,
 } from "@excalidraw/element/types";
 
-import { getDefaultAppState } from "../appState";
+import { cleanAppStateForExport } from "../appState";
 import { base64ToString, decode, encode, stringToBase64 } from "../data/encode";
 import { serializeAsJSON } from "../data/json";
 import { restoreAppState, restoreElements } from "../data/restore";
@@ -153,16 +153,13 @@ const addFrameLabelsAsTextElements = (
 
 const getFrameRenderingConfig = (
   exportingFrame: ExcalidrawFrameLikeElement | null,
-  frameRendering: AppState["frameRendering"] | null,
-): AppState["frameRendering"] => {
-  frameRendering = frameRendering || getDefaultAppState().frameRendering;
-  return {
-    enabled: exportingFrame ? true : frameRendering.enabled,
-    outline: exportingFrame ? false : frameRendering.outline,
-    name: exportingFrame ? false : frameRendering.name,
-    clip: exportingFrame ? true : frameRendering.clip,
-  };
-};
+  frames: ExportSceneBaseConfig["frames"],
+): AppState["frameRendering"] => ({
+  enabled: true,
+  outline: exportingFrame ? false : frames?.outline ?? true,
+  name: exportingFrame ? false : frames?.name ?? true,
+  clip: exportingFrame ? true : frames?.clip ?? true,
+});
 
 const prepareElementsForRender = ({
   elements,
@@ -198,16 +195,13 @@ const prepareElementsForRender = ({
 
 export type ExportSceneData = {
   elements: readonly NonDeletedExcalidrawElement[];
-  appState?: Partial<
-    Omit<
-      AppState,
-      | "offsetTop"
-      | "offsetLeft"
-      | "exportWithDarkMode"
-      | "exportBackground"
-      | "exportEmbedScene"
-    >
-  >;
+  /**
+   * The scene settings a `.excalidraw` file stores (`viewBackgroundColor`,
+   * grid settings) — not editor state. Used as the default background
+   * (`canvasBackgroundColor`) and embedded with the scene (`embedScene`).
+   * Anything else passed in is ignored; rendering options go to `config`.
+   */
+  appState?: ReturnType<typeof cleanAppStateForExport>;
   files?: BinaryFiles | null;
 };
 
@@ -340,6 +334,14 @@ type ExportSceneBaseConfig = {
   };
 
   exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
+  /**
+   * Which frame decorations to render. Ignored when exporting a single frame
+   * (`exportingFrame`), which renders neither its name nor outline, and clips
+   * to it.
+   *
+   * @default { name: true, outline: true, clip: true }
+   */
+  frames?: { name?: boolean; outline?: boolean; clip?: boolean };
 
   loadFonts?: () => Promise<void>;
 };
@@ -411,6 +413,30 @@ type ExportSizeConfig =
 
 export type ExportSceneConfig = ExportSceneBaseConfig & ExportSizeConfig;
 
+/**
+ * The export config the editor's export settings translate to. Internal: hosts
+ * pass their own config.
+ */
+export const getExportConfigFromAppState = (
+  appState: Pick<
+    AppState,
+    | "exportWithDarkMode"
+    | "exportBackground"
+    | "viewBackgroundColor"
+    | "exportScale"
+    | "frameRendering"
+  >,
+) => ({
+  theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+  canvasBackgroundColor: appState.exportBackground
+    ? appState.viewBackgroundColor
+    : (false as const),
+  scale: appState.exportScale,
+  frames: appState.frameRendering.enabled
+    ? appState.frameRendering
+    : { name: false, outline: false, clip: false },
+});
+
 // ---------------------------------------------------------------------------
 // Internal helper to configure export dimensions
 // ---------------------------------------------------------------------------
@@ -441,7 +467,13 @@ const configExportDimension = async ({
   // initialize defaults
   // ---------------------------------------------------------------------------
 
-  const appState = restoreAppState(data.appState, null);
+  // only the scene settings a file stores are taken from `data.appState`, so
+  // that editor state passed in (e.g. a live AppState) can't affect the
+  // output; everything else the renderers read is a default
+  const appState = restoreAppState(
+    cleanAppStateForExport(data.appState ?? {}),
+    null,
+  );
 
   const theme = cfg.theme ?? THEME.LIGHT;
 
@@ -457,7 +489,7 @@ const configExportDimension = async ({
 
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
-    appState.frameRendering ?? null,
+    cfg.frames,
   );
   // for canvas export, don't clip if exporting a specific frame as it would
   // clip the corners of the content
@@ -809,6 +841,7 @@ type ExportToSvgConfig = Pick<
   | "origin"
   | "fit"
   | "position"
+  | "frames"
   | "loadFonts"
 > &
   ExportSizeConfig & {

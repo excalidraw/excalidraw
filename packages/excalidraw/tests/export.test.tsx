@@ -5,6 +5,8 @@ import { SVG_NS } from "@excalidraw/common";
 import type { FileId, FractionalIndex } from "@excalidraw/element/types";
 
 import { getDefaultAppState } from "../appState";
+import * as clipboardModule from "../clipboard";
+import { exportCanvas, prepareElementsForExport } from "../data";
 import { getDataURL } from "../data/blob";
 import { encodePngMetadata } from "../data/image";
 import { serializeAsJSON } from "../data/json";
@@ -83,6 +85,32 @@ describe("export", () => {
     expect(decoded.elements).toEqual([
       expect.objectContaining({ type: "text", text: "😀" }),
     ]);
+  });
+
+  it("exports SVG at the export scale", async () => {
+    const copySpy = vi
+      .spyOn(clipboardModule, "copyTextToSystemClipboard")
+      .mockResolvedValue();
+    const exportedWidthAt = async (exportScale: number) => {
+      const appState = { ...h.state, exportScale };
+      const { exportedElements } = prepareElementsForExport(
+        testElements,
+        appState,
+        false,
+      );
+      await exportCanvas(
+        "clipboard-svg",
+        exportedElements,
+        appState,
+        {},
+        { exportingFrame: null },
+      );
+      const svg = copySpy.mock.lastCall![0] as string;
+      return Number(/<svg[^>]* width="([\d.]+)"/.exec(svg)![1]);
+    };
+
+    expect(await exportedWidthAt(2)).toBe((await exportedWidthAt(1)) * 2);
+    copySpy.mockRestore();
   });
 
   it("export svg-embedded scene", async () => {

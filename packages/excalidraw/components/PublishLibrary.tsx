@@ -68,7 +68,6 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
       data: {
         elements: item.elements,
         files: null,
-        appState: {},
       },
       config: {
         maxWidthOrHeight: BOX_SIZE,
@@ -137,7 +136,6 @@ const SingleLibraryItem = ({
         type: "svg",
         data: {
           elements: libItem.elements,
-          appState,
           files: null,
         },
         config: {

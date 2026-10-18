@@ -146,7 +146,6 @@ export const actionCopyAsSvg = register({
         appState,
         app.files,
         {
-          ...appState,
           exportingFrame,
           name: app.getName(),
         },
@@ -213,7 +212,6 @@ export const actionCopyAsPng = register({
     );
     try {
       await exportCanvas("clipboard", exportedElements, appState, app.files, {
-        ...appState,
         exportingFrame,
         name: app.getName(),
       });

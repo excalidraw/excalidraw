@@ -17,6 +17,8 @@ import type {
 
 import type { LocalPoint } from "@excalidraw/math";
 
+import { getDefaultAppState } from "../../appState";
+import * as staticSceneModule from "../../renderer/staticScene";
 import { exportScene } from "../../scene/export";
 
 import { prepareElementsForExport } from "../../data";
@@ -27,6 +29,8 @@ import {
   textFixture,
 } from "../fixtures/elementFixture";
 import { API } from "../helpers/api";
+
+import type { ExportSceneData } from "../../scene/export";
 
 describe("exportToSvg", () => {
   const ELEMENT_HEIGHT = 100;
@@ -487,6 +491,50 @@ describe("export background", () => {
     expect(getCanvasFillStyles(canvasWithoutBackground)).toContain("#abcdef");
 
     warn.mockRestore();
+  });
+});
+
+describe("export inputs", () => {
+  it("takes only the scene settings from data.appState", async () => {
+    const renderSpy = vi.spyOn(staticSceneModule, "renderStaticScene");
+
+    await exportScene({
+      type: "canvas",
+      data: {
+        elements: [API.createElement({ type: "rectangle" })],
+        // a live AppState, as JS callers (and the editor) may pass
+        appState: {
+          ...getDefaultAppState(),
+          viewBackgroundColor: "#abcdef",
+          openDialog: { name: "elementLinkSelector", sourceElementId: "x" },
+          croppingElementId: "x",
+        } as ExportSceneData["appState"],
+      },
+    });
+
+    const { appState } = renderSpy.mock.calls[0][0];
+    expect(appState.viewBackgroundColor).toBe("#abcdef");
+    expect(appState.openDialog).toBe(null);
+    expect(appState.croppingElementId).toBe(null);
+    renderSpy.mockRestore();
+  });
+
+  it("renders frame decorations per config.frames", async () => {
+    const elements = [API.createElement({ type: "frame" })];
+    const countFrameNames = (svg: SVGSVGElement) =>
+      Array.from(svg.querySelectorAll("text")).filter(
+        (text) => text.textContent === "Frame",
+      ).length;
+
+    const svg = await exportScene({ type: "svg", data: { elements } });
+    const svgWithoutNames = await exportScene({
+      type: "svg",
+      data: { elements },
+      config: { frames: { name: false } },
+    });
+
+    expect(countFrameNames(svg)).toBe(1);
+    expect(countFrameNames(svgWithoutNames)).toBe(0);
   });
 });
 

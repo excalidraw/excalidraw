@@ -4,7 +4,6 @@ import {
   IMAGE_MIME_TYPES,
   isFirefox,
   MIME_TYPES,
-  THEME,
   cloneJSON,
   SVG_DOCUMENT_PREAMBLE,
   arrayToMap,
@@ -30,7 +29,7 @@ import {
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { exportScene } from "../scene/export";
+import { exportScene, getExportConfigFromAppState } from "../scene/export";
 
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
@@ -102,16 +101,12 @@ export const exportCanvas = async (
   appState: AppState,
   files: BinaryFiles,
   {
-    exportBackground,
     exportPadding = DEFAULT_EXPORT_PADDING,
-    viewBackgroundColor,
     name = appState.name || DEFAULT_FILENAME,
     fileHandle = null,
     exportingFrame = null,
   }: {
-    exportBackground: boolean;
     exportPadding?: number;
-    viewBackgroundColor: string;
     /** filename, if applicable */
     name?: string;
     fileHandle?: FileSystemFileHandle | null;
@@ -122,7 +117,11 @@ export const exportCanvas = async (
     throw new Error(t("alerts.cannotExportEmptyCanvas"));
   }
 
-  const theme = appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT;
+  const config = {
+    ...getExportConfigFromAppState(appState),
+    padding: exportPadding,
+    exportingFrame,
+  };
 
   if (type === "svg" || type === "clipboard-svg") {
     const svgPromise = exportScene({
@@ -133,10 +132,7 @@ export const exportCanvas = async (
         files,
       },
       config: {
-        padding: exportPadding,
-        exportingFrame,
-        theme,
-        canvasBackgroundColor: exportBackground ? viewBackgroundColor : false,
+        ...config,
         embedScene: appState.exportEmbedScene && type === "svg",
       },
     });
@@ -176,13 +172,7 @@ export const exportCanvas = async (
       appState,
       files,
     },
-    config: {
-      canvasBackgroundColor: exportBackground ? viewBackgroundColor : false,
-      padding: exportPadding,
-      theme,
-      scale: appState.exportScale,
-      exportingFrame,
-    },
+    config,
   });
 
   if (type === "png") {
