@@ -230,22 +230,16 @@ type ExportSceneBaseConfig = {
   /**
    * Canvas padding in pixels. Affected by `scale`.
    *
-   * When `fit` is set to `none`, padding is added to the content bounding box
-   * (including if you set `width` or `height` or `maxWidthOrHeight` or
-   * `widthOrHeight`).
+   * When `fit` is `none`, padding is added around the content bounding box,
+   * or around the `width`/`height` frame if set — in which case the content
+   * may overflow the frame, thus right or bottom padding may be ignored.
    *
-   * When `fit` set to `contain`, padding is subtracted from the content
-   * bounding box (ensuring the size doesn't exceed the supplied values, with
-   * the exception of using alongside `scale` as noted above), and the padding
-   * serves as a minimum distance between the content and the canvas edges, as
-   * it may exceed the supplied padding value from one side or the other in
-   * order to maintain the aspect ratio. It is recommended to set `position`
-   * to `center` when using `fit=contain`.
-   *
-   * When `fit` is set to `none` and either `width` or `height` or
-   * `maxWidthOrHeight` is set, padding is simply adding to the bounding box
-   * and the content may overflow the canvas, thus right or bottom padding
-   * may be ignored.
+   * When `fit` is `contain`, or `maxWidthOrHeight`/`widthOrHeight` is set,
+   * padding is subtracted from the target size (so the export doesn't exceed
+   * it, `scale` aside), and serves as a minimum distance between the content
+   * and the canvas edges — it may be exceeded on one axis to maintain the
+   * aspect ratio. It is recommended to set `position` to `center` when using
+   * `fit: "contain"`.
    *
    * @default 0
    */
@@ -275,8 +269,7 @@ type ExportSceneBaseConfig = {
    */
   origin?: "canvas" | "content";
   /**
-   * If dimensions specified and `x` and `y` are not specified, this indicates
-   * how the canvas should be scaled.
+   * How the content should be scaled into the `width`/`height` frame.
    *
    * Behavior aligns with the `object-fit` CSS property.
    *
@@ -285,18 +278,16 @@ type ExportSceneBaseConfig = {
    *
    * If `maxWidthOrHeight` or `widthOrHeight` is set, `fit` is ignored.
    *
-   * @default "contain" unless `width`, `height`, `maxWidthOrHeight`, or
-   * `widthOrHeight` is specified in which case `none` is the default (can be
-   * changed). If `x` or `y` are specified, `none` is forced.
+   * @default "contain" if `width` or `height` is set, otherwise "none"
    */
   fit?: "none" | "contain";
   /**
    * When either `x` or `y` are not specified, indicates how the canvas should
    * be aligned on the respective axis.
    *
-   * - `none`   - canvas aligned to top left.
-   * - `center` - canvas is centered on the axis which is not specified
-   *              (or both).
+   * - `topLeft` - canvas aligned to top left.
+   * - `center`  - canvas is centered on the axis which is not specified
+   *               (or both).
    *
    * If `maxWidthOrHeight` or `widthOrHeight` is set, `position` is ignored.
    *
