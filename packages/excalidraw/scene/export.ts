@@ -74,6 +74,19 @@ import type { AppState, BinaryFiles, NormalizedZoomValue } from "../types";
 
 // Default minimum export size in pixels
 const DEFAULT_SMALLEST_EXPORT_SIZE = 20;
+
+/**
+ * Padding is taken from the target size when fitting into one: keep at least
+ * `DEFAULT_SMALLEST_EXPORT_SIZE` of each target dimension for the content.
+ */
+const clampPadding = (padding: number, targets: readonly number[]) =>
+  Math.max(
+    0,
+    Math.min(
+      padding,
+      ...targets.map((target) => (target - DEFAULT_SMALLEST_EXPORT_SIZE) / 2),
+    ),
+  );
 const DEFAULT_ZOOM_VALUE = 1 as NormalizedZoomValue;
 
 const truncateText = (
@@ -604,6 +617,21 @@ const configExportDimension = async ({
   width = cfg.width ?? width;
   height = cfg.height ?? height;
 
+  // clamp against the target being fitted into (not the content: a flat
+  // content axis mustn't zero the padding), before deriving from it
+  if (cfg.widthOrHeight != null) {
+    cfg.padding = clampPadding(cfg.padding, [cfg.widthOrHeight]);
+  } else if (cfg.maxWidthOrHeight != null) {
+    cfg.padding = clampPadding(cfg.padding, [cfg.maxWidthOrHeight]);
+  } else if (cfg.fit === "contain") {
+    cfg.padding = clampPadding(
+      cfg.padding,
+      cfg.width != null || cfg.height != null
+        ? [cfg.width, cfg.height].filter((size): size is number => size != null)
+        : [width, height],
+    );
+  }
+
   // with `contain`, derive a missing `width`/`height` from the content's
   // aspect ratio (keeping the padding the same on all sides)
   if (cfg.fit === "contain") {
@@ -615,41 +643,6 @@ const configExportDimension = async ({
       width =
         ((cfg.height - cfg.padding * 2) * origWidth) / origHeight +
         cfg.padding * 2;
-    }
-  }
-
-  if (cfg.fit === "contain" || cfg.widthOrHeight || cfg.maxWidthOrHeight) {
-    // clamp padding so the exported canvas doesn't get smaller than
-    // DEFAULT_SMALLEST_EXPORT_SIZE (never going below 0, which would shrink
-    // the canvas below the content size)
-    cfg.padding =
-      cfg.padding && cfg.padding > 0
-        ? Math.max(
-            0,
-            Math.min(
-              cfg.padding,
-              (width - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
-              (height - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
-            ),
-          )
-        : 0;
-
-    if (cfg.widthOrHeight != null) {
-      cfg.padding = Math.max(
-        0,
-        Math.min(
-          cfg.padding,
-          (cfg.widthOrHeight - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
-        ),
-      );
-    } else if (cfg.maxWidthOrHeight != null) {
-      cfg.padding = Math.max(
-        0,
-        Math.min(
-          cfg.padding,
-          (cfg.maxWidthOrHeight - DEFAULT_SMALLEST_EXPORT_SIZE) / 2,
-        ),
-      );
     }
   }
 
@@ -677,10 +670,15 @@ const configExportDimension = async ({
     width -= cfg.padding * 2;
     height -= cfg.padding * 2;
 
-    const wRatio = width / origWidth;
-    const hRatio = height / origHeight;
-    // scale the orig canvas to fit in the target region
-    exportScale = Math.min(wRatio, hRatio);
+    // scale the orig canvas to fit in the target region (a content axis of
+    // zero extent, e.g. a horizontal line's height, doesn't constrain it)
+    exportScale = Math.min(
+      origWidth > 0 ? width / origWidth : Infinity,
+      origHeight > 0 ? height / origHeight : Infinity,
+    );
+    if (!Number.isFinite(exportScale)) {
+      exportScale = 1;
+    }
   }
 
   x = cfg.x ?? origX;

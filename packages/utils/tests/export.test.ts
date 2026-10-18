@@ -6,6 +6,7 @@ import * as staticSceneModule from "@excalidraw/excalidraw/renderer/staticScene"
 import * as staticSvgSceneModule from "@excalidraw/excalidraw/renderer/staticSvgScene";
 import { diagramFactory } from "@excalidraw/excalidraw/tests/fixtures/diagramFixture";
 import { API } from "@excalidraw/excalidraw/tests/helpers/api";
+import { pointFrom } from "@excalidraw/math";
 import { vi } from "vitest";
 
 import * as utils from "../src";
@@ -137,6 +138,40 @@ describe("exportScene: canvas", async () => {
     expect(warn).toHaveBeenCalledTimes(2);
     warn.mockRestore();
     renderSpy.mockRestore();
+  });
+
+  it("keeps the padding of flat content", async () => {
+    const line = API.createElement({
+      type: "line",
+      width: 200,
+      height: 0,
+      points: [pointFrom(0, 0), pointFrom(200, 0)],
+    });
+    const exportLine = (config: ExportSceneConfig) =>
+      utils.exportScene({ type: "canvas", data: { elements: [line] }, config });
+
+    // the padding used to be clamped against the content's (zero) height
+    const fitted = await exportLine({ padding: 10, maxWidthOrHeight: 400 });
+    expect([fitted.width, fitted.height]).toEqual([220, 20]);
+
+    // never a zero-sized canvas, which can't be encoded
+    const unpadded = await exportLine({ padding: 0 });
+    expect([unpadded.width, unpadded.height]).toEqual([200, 1]);
+  });
+
+  it("derives a missing width/height after clamping the padding", async () => {
+    const canvas = await utils.exportScene({
+      type: "canvas",
+      data: {
+        elements: [
+          API.createElement({ type: "rectangle", width: 200, height: 100 }),
+        ],
+      },
+      // a 10px height leaves no room for the padding, so it's dropped
+      config: { height: 10, padding: 10 },
+    });
+
+    expect([canvas.width, canvas.height]).toEqual([20, 10]);
   });
 
   it("with a scale function", async () => {
