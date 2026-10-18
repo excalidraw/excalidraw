@@ -519,6 +519,18 @@ describe("export inputs", () => {
     renderSpy.mockRestore();
   });
 
+  it("loads fonts through environment.loadFonts", async () => {
+    const loadFonts = vi.fn(async () => {});
+
+    await exportScene({
+      type: "svg",
+      data: { elements: [API.createElement({ type: "text", text: "hi" })] },
+      config: { environment: { loadFonts } },
+    });
+
+    expect(loadFonts).toHaveBeenCalledTimes(1);
+  });
+
   it("renders frame decorations per config.frames", async () => {
     const elements = [API.createElement({ type: "frame" })];
     const countFrameNames = (svg: SVGSVGElement) =>

@@ -205,6 +205,25 @@ export type ExportSceneData = {
   files?: BinaryFiles | null;
 };
 
+type ExportEnvironment = {
+  /**
+   * Creates the canvas to export into.
+   *
+   * Do not set `canvas.width/height` or modify the canvas context as that's
+   * handled by Excalidraw.
+   *
+   * Defaults to `document.createElement("canvas")`.
+   */
+  createCanvas?: () => HTMLCanvasElement;
+  /**
+   * Loads the fonts the exported elements use, before rendering.
+   *
+   * Defaults to loading them through the browser's
+   * [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace).
+   */
+  loadFonts?: () => Promise<void>;
+};
+
 type ExportSceneBaseConfig = {
   /**
    * @default "light"
@@ -260,17 +279,7 @@ type ExportSceneBaseConfig = {
   /**
    * Host environment overrides, e.g. for test environments or Node.js.
    */
-  environment?: {
-    /**
-     * Creates the canvas to export into.
-     *
-     * Do not set `canvas.width/height` or modify the canvas context as that's
-     * handled by Excalidraw.
-     *
-     * Defaults to `document.createElement("canvas")`.
-     */
-    createCanvas?: () => HTMLCanvasElement;
-  };
+  environment?: ExportEnvironment;
 
   exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
   /**
@@ -281,8 +290,6 @@ type ExportSceneBaseConfig = {
    * @default { name: true, outline: true, clip: true }
    */
   frames?: { name?: boolean; outline?: boolean; clip?: boolean };
-
-  loadFonts?: () => Promise<void>;
 };
 
 /**
@@ -570,8 +577,8 @@ const configExportDimension = async ({
   // ---------------------------------------------------------------------------
 
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
-  if (cfg.loadFonts) {
-    await cfg.loadFonts();
+  if (cfg.environment?.loadFonts) {
+    await cfg.environment.loadFonts();
   } else {
     await Fonts.loadElementsFonts(elements);
   }
@@ -847,9 +854,12 @@ type ExportToSvgConfig = Pick<
   | "exportingFrame"
   | "scale"
   | "frames"
-  | "loadFonts"
 > &
   ExportSizeConfig & {
+    /**
+     * Host environment overrides, e.g. for test environments or Node.js.
+     */
+    environment?: Pick<ExportEnvironment, "loadFonts">;
     /**
      * if true, all embeddables passed in will be rendered when possible.
      */
