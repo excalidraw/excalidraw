@@ -84,6 +84,25 @@ describe("exportToCanvas", async () => {
     expect([canvas.width, canvas.height]).toEqual([120, 120]);
   });
 
+  it("pads an x/y region on all sides", async () => {
+    const renderSpy = vi.spyOn(staticSceneModule, "renderStaticScene");
+    const canvas = await utils.exportToCanvas({
+      data: {
+        elements: [
+          API.createElement({ type: "rectangle", width: 200, height: 100 }),
+        ],
+        files: null,
+      },
+      config: { padding: EXPORT_PADDING, x: 0, y: 0, width: 100, height: 100 },
+    });
+
+    // the canvas covers the scene from -10 to 110 on both axes
+    expect([canvas.width, canvas.height]).toEqual([120, 120]);
+    const { scrollX, scrollY } = renderSpy.mock.calls[0][0].appState;
+    expect([scrollX, scrollY]).toEqual([EXPORT_PADDING, EXPORT_PADDING]);
+    renderSpy.mockRestore();
+  });
+
   it("ignores x/y when the content is scaled to fit", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const renderSpy = vi.spyOn(staticSceneModule, "renderStaticScene");

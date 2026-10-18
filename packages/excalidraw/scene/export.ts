@@ -246,8 +246,9 @@ type ExportSceneBaseConfig = {
   padding?: number;
   // -------------------------------------------------------------------------
   /**
-   * Left canvas offset. By default the coordinate is relative to the canvas.
-   * You can switch to content coordinates by setting `origin` to `content`.
+   * Left edge of the exported region (`padding` is added around it). By
+   * default the coordinate is relative to the canvas. You can switch to
+   * content coordinates by setting `origin` to `content`.
    *
    * Defaults to the `x` position of the content bounding box.
    *
@@ -257,8 +258,9 @@ type ExportSceneBaseConfig = {
    */
   x?: number;
   /**
-   * Top canvas offset. By default the coordinate is relative to the canvas.
-   * You can switch to content coordinates by setting `origin` to `content`.
+   * Top edge of the exported region (`padding` is added around it). By
+   * default the coordinate is relative to the canvas. You can switch to
+   * content coordinates by setting `origin` to `content`.
    *
    * Defaults to the `y` position of the content bounding box.
    *
@@ -640,13 +642,15 @@ const configExportDimension = async ({
   // Centering the content to the frame.
   // We divide width/height by canvasScale so that we calculate in the original
   // aspect ratio dimensions.
+  // Only on the axes not pinned by `x`/`y`, so that a region gets padding on
+  // all sides.
   if (cfg.position === "center") {
-    x -=
-      width / exportScale / 2 -
-      (cfg.x == null ? origWidth : width + cfg.padding * 2) / 2;
-    y -=
-      height / exportScale / 2 -
-      (cfg.y == null ? origHeight : height + cfg.padding * 2) / 2;
+    if (cfg.x == null) {
+      x -= width / exportScale / 2 - origWidth / 2;
+    }
+    if (cfg.y == null) {
+      y -= height / exportScale / 2 - origHeight / 2;
+    }
   }
 
   // rescale padding based on current canvasScale factor so that the resulting
