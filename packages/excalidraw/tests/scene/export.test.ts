@@ -673,6 +673,25 @@ describe("exporting frames", () => {
       expect(label).toHaveAttribute("fill", FRAME_STYLE.nameColorDarkTheme);
     });
 
+    it("truncates frame names to what fits, down to no name at all", async () => {
+      // 10px per character in tests, so "..." is 30 wide
+      const svg = await exportScene({
+        type: "svg",
+        data: {
+          elements: [
+            API.createElement({ type: "frame", x: 0, width: 20 }),
+            API.createElement({ type: "frame", x: 100, width: 35 }),
+          ],
+        },
+      });
+
+      expect(
+        Array.from(svg.querySelectorAll("text"))
+          .map((text) => text.textContent)
+          .filter(Boolean),
+      ).toEqual(["..."]);
+    });
+
     it("clips a frame export larger than the frame to the frame", async () => {
       const frame = API.createElement({
         type: "frame",

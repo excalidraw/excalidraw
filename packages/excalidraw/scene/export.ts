@@ -112,14 +112,17 @@ const truncateText = (
     // we iterate from the right, removing characters one by one instead
     // of building the string up. This assumes that it's more likely
     // your frame names will overflow by not that many characters
-    // (if ever), so it should be faster this way.
-    for (let i = text.length; i > 0; i--) {
+    // (if ever), so it should be faster this way. Down to just the ellipsis,
+    // and no label at all where even that overflows the frame.
+    let truncated = "";
+    for (let i = text.length; i >= 0; i--) {
       const newText = `${text.slice(0, i)}...`;
       if (getLineWidth(newText, font, renderEnvironment) <= maxWidth) {
-        text = newText;
+        truncated = newText;
         break;
       }
     }
+    text = truncated;
   }
   return newElementWith(element, { text, width: maxWidth });
 };
