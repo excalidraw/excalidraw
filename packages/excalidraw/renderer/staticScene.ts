@@ -555,7 +555,10 @@ const _renderStaticScene = ({
           element.height
         ) {
           const label = {
-            ...createPlaceholderEmbeddableLabel(element),
+            ...createPlaceholderEmbeddableLabel(
+              element,
+              renderConfig.renderEnvironment,
+            ),
             // Synthetic visual: resolve overrides and frame opacity through
             // its owner, without creating another animation target.
             id: element.id,

@@ -415,8 +415,7 @@ describe("headless (server-side) export", () => {
       expect(createPath.mock.calls[0][0]).toMatch(/^M/);
 
       // `exportToSvg` builds real DOM nodes, so a server-side caller supplies
-      // the document (a DOM shim). It takes no render environment: SVG
-      // export measures no text and creates no canvas
+      // the document (a DOM shim)
       const svg = await exportScene({
         type: "svg",
         data: { elements, files },

@@ -61,12 +61,15 @@ export type StaticCanvasRenderConfig = {
   elementRenderOverrides?: ElementRenderOverrides;
 };
 
-/**
- * NOTE: deliberately carries no `RenderEnvironment`: SVG rendering measures
- * no text and creates no canvas -- its only host dependency is the document
- * `exportToSvg` builds into.
- */
 export type SVGRenderConfig = {
+  /**
+   * Host environment for the one thing this render still measures text for:
+   * embeddable placeholder labels (`createPlaceholderEmbeddableLabel`). The
+   * SVG itself is built through `exportToSvg`'s owner document, and frame
+   * labels are drawn without measuring. Defaults to the process-wide
+   * environment.
+   */
+  renderEnvironment?: RenderEnvironment;
   offsetX: number;
   offsetY: number;
   isExporting: boolean;
