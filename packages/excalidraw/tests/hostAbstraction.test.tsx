@@ -437,28 +437,36 @@ describe("headless (server-side) export", () => {
   });
 
   it("exports the rest of the scene when an element fails to render", async () => {
-    const hostDocument = document;
-    const target = hostDocument.createElement("canvas");
     const consoleError = vi
       .spyOn(console, "error")
       .mockImplementation(() => {});
-    const fillText = vi.spyOn(target.getContext("2d")!, "fillText");
 
     const { elements } = makeScene();
+    // the failing element first: what's drawn after it must not inherit its
+    // transforms (or clips)
+    const freedraw = elements.find((element) => element.type === "freedraw")!;
+    const scene = [
+      freedraw,
+      ...elements.filter((element) => element !== freedraw),
+    ];
     const appState = {
       ...getDefaultAppState(),
       width: 200,
       height: 200,
     } as AppState;
 
-    // a Node host that supplies no `createPath` and has no global `Path2D`:
-    // every freedraw element is unrenderable
-    vi.stubGlobal("Path2D", undefined);
-
-    try {
+    /** the transform each text line of the export was drawn with */
+    const exportTextTransforms = async () => {
+      const target = document.createElement("canvas");
+      const context = target.getContext("2d")!;
+      const transforms: number[][] = [];
+      vi.spyOn(context, "fillText").mockImplementation(() => {
+        const { a, b, c, d, e, f } = context.getTransform();
+        transforms.push([a, b, c, d, e, f]);
+      });
       const canvas = await exportScene({
         type: "canvas",
-        data: { elements, appState },
+        data: { elements: scene, appState },
         config: {
           canvasBackgroundColor: "#ffffff",
           environment: {
@@ -467,8 +475,20 @@ describe("headless (server-side) export", () => {
           },
         },
       });
-
       expect(canvas).toBe(target);
+      return transforms;
+    };
+
+    try {
+      const rendered = await exportTextTransforms();
+      expect(rendered).toHaveLength(1);
+      expect(consoleError).not.toHaveBeenCalled();
+
+      // a Node host that supplies no `createPath` and has no global `Path2D`:
+      // the freedraw element is unrenderable
+      vi.stubGlobal("Path2D", undefined);
+      const failed = await exportTextTransforms();
+
       // the bad element is logged...
       expect(consoleError).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringMatching(/Path2D/) }),
@@ -478,12 +498,11 @@ describe("headless (server-side) export", () => {
         expect.any(Number),
         expect.any(Number),
       );
-      // ...and the rest still painted
-      expect(fillText).toHaveBeenCalledWith("hello", 0, expect.any(Number));
+      // ...and the rest still painted, where it would have been
+      expect(failed).toEqual(rendered);
     } finally {
       vi.unstubAllGlobals();
       consoleError.mockRestore();
-      fillText.mockRestore();
     }
   });
 });

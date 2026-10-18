@@ -23,6 +23,7 @@ import {
   getRenderElementWithPositionOverride,
   resolveElementRenderState,
   renderElement,
+  withSavedContext,
 } from "@excalidraw/element";
 
 import { getRenderEnvironment } from "@excalidraw/element/renderEnvironment";
@@ -476,35 +477,34 @@ const _renderStaticScene = ({
           return;
         }
 
-        context.save();
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
         const renderState = getRenderState(element);
-        clipElementToFrame(element, renderState);
-        renderElement(
-          element,
-          elementsMap,
-          allElementsMap,
-          rc,
-          context,
-          renderConfig,
-          appState,
-          renderState,
-        );
-
-        if (boundTextElement) {
+        withSavedContext(context, () => {
+          clipElementToFrame(element, renderState);
           renderElement(
-            boundTextElement,
+            element,
             elementsMap,
             allElementsMap,
             rc,
             context,
             renderConfig,
             appState,
+            renderState,
           );
-        }
 
-        context.restore();
+          if (boundTextElement) {
+            renderElement(
+              boundTextElement,
+              elementsMap,
+              allElementsMap,
+              rc,
+              context,
+              renderConfig,
+              appState,
+            );
+          }
+        });
 
         if (!isExporting && renderConfig.renderLinks !== false) {
           renderLinkIcon(
@@ -528,59 +528,60 @@ const _renderStaticScene = ({
     .forEach((element) => {
       try {
         const renderState = getRenderState(element);
-        context.save();
-        clipElementToFrame(element, renderState);
-        renderElement(
-          element,
-          elementsMap,
-          allElementsMap,
-          rc,
-          context,
-          renderConfig,
-          appState,
-          renderState,
-        );
-
-        if (
-          isIframeLikeElement(element) &&
-          (isExporting ||
-            (isEmbeddableElement(element) &&
-              renderConfig.embedsValidationStatus.get(element.id) !== true)) &&
-          element.width &&
-          element.height
-        ) {
-          const label = {
-            ...createPlaceholderEmbeddableLabel(
-              element,
-              renderConfig.renderEnvironment,
-            ),
-            // Synthetic visual: resolve overrides and frame opacity through
-            // its owner, without creating another animation target.
-            id: element.id,
-            frameId: element.frameId,
-          };
+        withSavedContext(context, () => {
+          clipElementToFrame(element, renderState);
           renderElement(
-            label,
+            element,
             elementsMap,
             allElementsMap,
             rc,
             context,
             renderConfig,
             appState,
-          );
-        }
-        if (!isExporting && renderConfig.renderLinks !== false) {
-          renderLinkIcon(
-            element,
-            context,
-            appState,
-            elementsMap,
             renderState,
-            scale,
-            getRenderEnvironment(renderConfig.renderEnvironment),
           );
-        }
-        context.restore();
+
+          if (
+            isIframeLikeElement(element) &&
+            (isExporting ||
+              (isEmbeddableElement(element) &&
+                renderConfig.embedsValidationStatus.get(element.id) !==
+                  true)) &&
+            element.width &&
+            element.height
+          ) {
+            const label = {
+              ...createPlaceholderEmbeddableLabel(
+                element,
+                renderConfig.renderEnvironment,
+              ),
+              // Synthetic visual: resolve overrides and frame opacity through
+              // its owner, without creating another animation target.
+              id: element.id,
+              frameId: element.frameId,
+            };
+            renderElement(
+              label,
+              elementsMap,
+              allElementsMap,
+              rc,
+              context,
+              renderConfig,
+              appState,
+            );
+          }
+          if (!isExporting && renderConfig.renderLinks !== false) {
+            renderLinkIcon(
+              element,
+              context,
+              appState,
+              elementsMap,
+              renderState,
+              scale,
+              getRenderEnvironment(renderConfig.renderEnvironment),
+            );
+          }
+        });
       } catch (error: any) {
         logElementRenderError(error, element);
       }
