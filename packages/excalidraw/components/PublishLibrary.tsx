@@ -13,7 +13,7 @@ import {
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { canvasToBlob, resizeImageFile } from "../data/blob";
 import { t } from "../i18n";
-import { exportToCanvas, exportToSvg } from "../scene/export";
+import { exportScene } from "../scene/export";
 
 import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
@@ -63,7 +63,8 @@ const generatePreviewImage = async (libraryItems: LibraryItems) => {
   // draw items
   // ---------------------------------------------------------------------------
   for (const [index, item] of libraryItems.entries()) {
-    const itemCanvas = await exportToCanvas({
+    const itemCanvas = await exportScene({
+      type: "canvas",
       data: {
         elements: item.elements,
         files: null,
@@ -132,7 +133,8 @@ const SingleLibraryItem = ({
       return;
     }
     (async () => {
-      const svg = await exportToSvg({
+      const svg = await exportScene({
+        type: "svg",
         data: {
           elements: libItem.elements,
           appState,

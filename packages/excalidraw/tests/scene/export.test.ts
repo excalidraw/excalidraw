@@ -3,7 +3,6 @@ import {
   BOUND_TEXT_PADDING,
   FONT_FAMILY,
   FRAME_STYLE,
-  MIME_TYPES,
   THEME,
 } from "@excalidraw/common";
 
@@ -18,10 +17,9 @@ import type {
 
 import type { LocalPoint } from "@excalidraw/math";
 
-import { exportToBlob, exportToCanvas, exportToSvg } from "../../scene/export";
+import { exportScene } from "../../scene/export";
 
 import { prepareElementsForExport } from "../../data";
-import * as exportUtils from "../../scene/export";
 import {
   diamondFixture,
   ellipseFixture,
@@ -66,7 +64,8 @@ describe("exportToSvg", () => {
   };
 
   it("with default arguments", async () => {
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: ELEMENTS,
         appState: DEFAULT_APP_STATE,
@@ -79,7 +78,8 @@ describe("exportToSvg", () => {
   });
 
   it("with a CJK font", async () => {
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: [
           ...ELEMENTS,
@@ -106,7 +106,8 @@ describe("exportToSvg", () => {
   it("with background color", async () => {
     const BACKGROUND_COLOR = "#abcdef";
 
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: ELEMENTS,
         appState: {
@@ -124,7 +125,8 @@ describe("exportToSvg", () => {
   });
 
   it("with dark mode", async () => {
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: ELEMENTS,
         appState: {
@@ -150,7 +152,8 @@ describe("exportToSvg", () => {
   });
 
   it("with exportPadding", async () => {
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: ELEMENTS,
         appState: DEFAULT_APP_STATE,
@@ -173,7 +176,8 @@ describe("exportToSvg", () => {
   it("with scale", async () => {
     const SCALE = 2;
 
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: ELEMENTS,
         appState: DEFAULT_APP_STATE,
@@ -197,22 +201,21 @@ describe("exportToSvg", () => {
   });
 
   it("with exportEmbedScene", async () => {
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: ELEMENTS,
-        appState: {
-          ...DEFAULT_APP_STATE,
-          exportEmbedScene: true,
-        },
+        appState: DEFAULT_APP_STATE,
         files: {},
       },
-      config: { canvasBackgroundColor: false },
+      config: { canvasBackgroundColor: false, embedScene: true },
     });
     expect(svgElement.innerHTML).toMatchSnapshot();
   });
 
   it("with elements that have a link", async () => {
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: [rectangleWithLinkFixture] as NonDeletedExcalidrawElement[],
         appState: DEFAULT_APP_STATE,
@@ -245,7 +248,8 @@ describe("exportToSvg", () => {
       containerId: "arrow-11439",
     });
 
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: [arrow, label] as NonDeletedExcalidrawElement[],
         appState: DEFAULT_APP_STATE,
@@ -285,7 +289,8 @@ describe("exportToSvg", () => {
       containerId: "arrow-hole",
     });
 
-    const svgElement = await exportUtils.exportToSvg({
+    const svgElement = await exportScene({
+      type: "svg",
       data: {
         elements: [arrow, label] as NonDeletedExcalidrawElement[],
         appState: DEFAULT_APP_STATE,
@@ -356,7 +361,8 @@ describe("exportToCanvas", () => {
       containerId: "arrow-11591",
     });
 
-    const canvas = await exportToCanvas({
+    const canvas = await exportScene({
+      type: "canvas",
       data: {
         elements: [rectangle, arrow, label],
         appState: { viewBackgroundColor: "#ffffff" },
@@ -416,20 +422,23 @@ describe("export background", () => {
       .map((event: any) => event.props.value);
 
   it("exportToSvg paints no background for `false` or a transparent scene background", async () => {
-    const svg = await exportToSvg({
+    const svg = await exportScene({
+      type: "svg",
       data: sceneWithOutlineArrow(),
       config: { canvasBackgroundColor: false },
     });
     expect(getBackgroundRects(svg)).toEqual([]);
 
-    const svgOfTransparentScene = await exportToSvg({
+    const svgOfTransparentScene = await exportScene({
+      type: "svg",
       data: sceneWithOutlineArrow("transparent"),
     });
     expect(getBackgroundRects(svgOfTransparentScene)).toEqual([]);
   });
 
   it("exportToSvg fills outline arrowheads with the configured background", async () => {
-    const svg = await exportToSvg({
+    const svg = await exportScene({
+      type: "svg",
       data: sceneWithOutlineArrow(),
       config: { canvasBackgroundColor: "#000000" },
     });
@@ -438,37 +447,40 @@ describe("export background", () => {
   });
 
   it("transparent exports keep filling outline arrowheads with the scene background", async () => {
-    const canvas = await exportToCanvas({
+    const canvas = await exportScene({
+      type: "canvas",
       data: sceneWithOutlineArrow(),
       config: { canvasBackgroundColor: false },
     });
     expect(getCanvasFillStyles(canvas)).toContain("#ffffff");
 
-    const svg = await exportToSvg({
+    const svg = await exportScene({
+      type: "svg",
       data: sceneWithOutlineArrow(),
       config: { canvasBackgroundColor: false },
     });
     expect(svg.querySelector('g path[fill="#ffffff"]')).not.toBeNull();
   });
 
-  it("exportToBlob paints the default background for JPEG instead of `false`", async () => {
+  it("JPEG export paints the default background instead of `false`", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const canvas = document.createElement("canvas");
 
-    await exportToBlob({
+    await exportScene({
+      type: "jpeg",
       data: sceneWithOutlineArrow("#abcdef"),
-      config: { mimeType: MIME_TYPES.jpg, createCanvas: () => canvas },
+      config: { environment: { createCanvas: () => canvas } },
     });
     // the default background needs no warning
     expect(warn).not.toHaveBeenCalled();
 
     const canvasWithoutBackground = document.createElement("canvas");
-    await exportToBlob({
+    await exportScene({
+      type: "jpeg",
       data: sceneWithOutlineArrow("#abcdef"),
       config: {
-        mimeType: MIME_TYPES.jpg,
         canvasBackgroundColor: false,
-        createCanvas: () => canvasWithoutBackground,
+        environment: { createCanvas: () => canvasWithoutBackground },
       },
     });
     expect(warn).toHaveBeenCalledTimes(1);
@@ -512,7 +524,8 @@ describe("exporting frames", () => {
         }),
       ];
 
-      const canvas = await exportToCanvas({
+      const canvas = await exportScene({
+        type: "canvas",
         data: {
           elements,
           appState: {},
@@ -546,7 +559,8 @@ describe("exporting frames", () => {
         }),
       ];
 
-      const canvas = await exportToCanvas({
+      const canvas = await exportScene({
+        type: "canvas",
         data: {
           elements,
           appState: {},
@@ -569,7 +583,8 @@ describe("exporting frames", () => {
     it("colors frame names like the editor in the configured theme", async () => {
       const frame = API.createElement({ type: "frame" });
 
-      const svg = await exportToSvg({
+      const svg = await exportScene({
+        type: "svg",
         data: { elements: [frame], files: null },
         config: { theme: THEME.DARK },
       });
@@ -604,7 +619,8 @@ describe("exporting frames", () => {
         y: 0,
       });
 
-      const svg = await exportToSvg({
+      const svg = await exportScene({
+        type: "svg",
         data: {
           elements: [rectOverlapping, frame, frameChild],
           appState: {},
@@ -653,7 +669,8 @@ describe("exporting frames", () => {
         y: 0,
       });
 
-      const svg = await exportToSvg({
+      const svg = await exportScene({
+        type: "svg",
         data: {
           elements: [frameChild, frame, elementOutside],
           appState: {},
@@ -726,7 +743,8 @@ describe("exporting frames", () => {
         true,
       );
 
-      const svg = await exportToSvg({
+      const svg = await exportScene({
+        type: "svg",
         data: {
           elements: exportedElements,
           appState: {},
@@ -776,7 +794,8 @@ describe("exporting frames", () => {
         false,
       );
 
-      const svg = await exportToSvg({
+      const svg = await exportScene({
+        type: "svg",
         data: {
           elements: exportedElements,
           appState: {},
@@ -840,7 +859,8 @@ describe("exporting frames", () => {
         true,
       );
 
-      const svg = await exportToSvg({
+      const svg = await exportScene({
+        type: "svg",
         data: {
           elements: exportedElements,
           appState: {},

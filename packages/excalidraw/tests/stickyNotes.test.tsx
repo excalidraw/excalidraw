@@ -18,7 +18,6 @@ import {
   resizeSingleElement,
   updateStickyNoteLayout,
 } from "@excalidraw/element";
-import { exportToCanvas } from "@excalidraw/utils";
 
 import type {
   ExcalidrawArrowElement,
@@ -39,7 +38,7 @@ import { activeEyeDropperAtom } from "../components/EyeDropper";
 import { getShapeActionPredicates } from "../components/shapeActionPredicates";
 import { editorJotaiStore } from "../editor-jotai";
 import { Excalidraw } from "../index";
-import { exportToSvg } from "../scene/export";
+import { exportScene } from "../scene/export";
 
 import { API } from "./helpers/api";
 import { Keyboard, Pointer, UI } from "./helpers/ui";
@@ -1157,7 +1156,8 @@ describe("sticky notes", () => {
         }),
       ];
 
-      const svg = await exportToSvg({
+      const svg = await exportScene({
+        type: "svg",
         data: { elements, files: {} },
         config: { canvasBackgroundColor: false },
       });
@@ -1165,7 +1165,10 @@ describe("sticky notes", () => {
         [...svg.querySelectorAll("text")].map((text) => text.textContent),
       ).toEqual(["7 Mar 2025"]);
 
-      const canvas = await exportToCanvas({ data: { elements, files: {} } });
+      const canvas = await exportScene({
+        type: "canvas",
+        data: { elements, files: {} },
+      });
       expect(canvas.getContext("2d")?.fillText).toHaveBeenCalledWith(
         "7 Mar 2025",
         expect.any(Number),

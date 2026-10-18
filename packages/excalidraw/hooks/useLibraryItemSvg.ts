@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { exportToSvg } from "../scene/export";
+import { exportScene } from "../scene/export";
 
 import { atom, useAtom } from "../editor-jotai";
 
@@ -11,7 +11,8 @@ export type SvgCache = Map<LibraryItem["id"], SVGSVGElement>;
 export const libraryItemSvgsCache = atom<SvgCache>(new Map());
 
 const exportLibraryItemToSvg = async (elements: LibraryItem["elements"]) => {
-  return await exportToSvg({
+  return await exportScene({
+    type: "svg",
     data: {
       elements,
       files: null,

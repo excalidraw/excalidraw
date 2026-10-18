@@ -26,7 +26,7 @@ import { useCopyStatus } from "../hooks/useCopiedIndicator";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
-import { exportToCanvas } from "../scene/export";
+import { exportScene } from "../scene/export";
 
 import { copyIcon, downloadIcon, helpIcon } from "./icons";
 import { Dialog } from "./Dialog";
@@ -128,14 +128,14 @@ const ImageExportModal = ({
       return requestId !== previewRenderRequestIdRef.current;
     };
 
-    exportToCanvas({
+    exportScene({
+      type: "canvas",
       data: {
         elements: exportedElements,
         appState: {
           ...appStateSnapshot,
           name: projectName,
           exportScale,
-          exportEmbedScene: embedScene,
         },
         files,
       },

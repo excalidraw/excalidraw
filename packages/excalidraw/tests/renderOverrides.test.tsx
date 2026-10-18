@@ -15,7 +15,7 @@ import { Excalidraw } from "../index";
 import { getDefaultAppState } from "../appState";
 import * as StaticScene from "../renderer/staticScene";
 import { Renderer } from "../scene/Renderer";
-import { exportToSvg } from "../scene/export";
+import { exportScene } from "../scene/export";
 import { getNormalizedZoom } from "../scene";
 import { getElementRenderOffsets } from "../renderOverrides";
 
@@ -274,9 +274,10 @@ describe("setElementRenderOverrides", () => {
 
   it("leaves exported geometry and opacity unchanged", async () => {
     const { element, submit } = await setup();
-    const exportScene = async () =>
+    const exportSvg = async () =>
       (
-        await exportToSvg({
+        await exportScene({
+          type: "svg",
           data: {
             elements: h.app.api.getSceneElements(),
             appState: h.state,
@@ -284,11 +285,11 @@ describe("setElementRenderOverrides", () => {
           },
         })
       ).outerHTML;
-    const before = await exportScene();
+    const before = await exportSvg();
     submit(
       new Map([[element.id, { opacity: 0, offset: { x: 1000, y: 1000 } }]]),
     );
-    expect(await exportScene()).toBe(before);
+    expect(await exportSvg()).toBe(before);
   });
 
   it("clears on reset and ignores submissions after unmount", async () => {

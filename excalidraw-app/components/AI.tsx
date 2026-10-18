@@ -1,9 +1,8 @@
 import {
   DiagramToCodePlugin,
-  exportToBlob,
+  exportScene,
   getNonDeletedElements,
   getTextFromElements,
-  MIME_TYPES,
   parseSSEStream,
   TTDDialog,
   TTDStreamFetch,
@@ -35,7 +34,8 @@ export const AIComponents = ({
             );
           }
 
-          const blob = await exportToBlob({
+          const blob = await exportScene({
+            type: "jpeg",
             data: {
               elements: getNonDeletedElements(children),
               appState,
@@ -43,7 +43,6 @@ export const AIComponents = ({
             },
             config: {
               exportingFrame: frame,
-              mimeType: MIME_TYPES.jpg,
               theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
             },
           });

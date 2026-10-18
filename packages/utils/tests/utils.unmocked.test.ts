@@ -11,23 +11,24 @@ import * as utils from "../src";
 // mocked and unmocked API in the same file.
 
 describe("embedding scene data", () => {
-  describe("exportToSvg", () => {
+  describe("svg", () => {
     it("embedding scene data shouldn't modify them", async () => {
       const rectangle = API.createElement({ type: "rectangle" });
       const ellipse = API.createElement({ type: "ellipse" });
 
       const sourceElements = [rectangle, ellipse];
 
-      const svgNode = await utils.exportToSvg({
+      const svgNode = await utils.exportScene({
+        type: "svg",
         data: {
           elements: sourceElements,
           appState: {
             viewBackgroundColor: "#ffffff",
             gridModeEnabled: false,
-            exportEmbedScene: true,
           },
           files: null,
         },
+        config: { embedScene: true },
       });
 
       const svg = svgNode.outerHTML;
@@ -43,26 +44,24 @@ describe("embedding scene data", () => {
 
   // skipped because we can't test png encoding right now
   // (canvas.toBlob not supported in jsdom)
-  describe.skip("exportToBlob", () => {
+  describe.skip("png", () => {
     it("embedding scene data shouldn't modify them", async () => {
       const rectangle = API.createElement({ type: "rectangle" });
       const ellipse = API.createElement({ type: "ellipse" });
 
       const sourceElements = [rectangle, ellipse];
 
-      const blob = await utils.exportToBlob({
+      const blob = await utils.exportScene({
+        type: "png",
         data: {
           elements: sourceElements,
           appState: {
             viewBackgroundColor: "#ffffff",
             gridModeEnabled: false,
-            exportEmbedScene: true,
           },
           files: null,
         },
-        config: {
-          mimeType: "image/png",
-        },
+        config: { embedScene: true },
       });
 
       const parsedString = await decodePngMetadata(blob);

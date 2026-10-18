@@ -201,10 +201,14 @@ export type ExportSceneData = {
   appState?: Partial<
     Omit<
       AppState,
-      "offsetTop" | "offsetLeft" | "exportWithDarkMode" | "exportBackground"
+      | "offsetTop"
+      | "offsetLeft"
+      | "exportWithDarkMode"
+      | "exportBackground"
+      | "exportEmbedScene"
     >
   >;
-  files: BinaryFiles | null;
+  files?: BinaryFiles | null;
 };
 
 type ExportSceneBaseConfig = {
@@ -222,7 +226,7 @@ type ExportSceneBaseConfig = {
    *
    * Specified in light-theme terms: `theme: "dark"` transforms it like any
    * other scene color. Only affects the rendered image, not the embedded
-   * scene (`exportEmbedScene`).
+   * scene (`embedScene`).
    *
    * @default undefined
    */
@@ -321,15 +325,19 @@ type ExportSceneBaseConfig = {
    */
   scale?: number | ((width: number, height: number) => number);
   /**
-   * If you need to supply your own canvas, e.g. in test environments or in
-   * Node.js.
-   *
-   * Do not set `canvas.width/height` or modify the canvas context as that's
-   * handled by Excalidraw.
-   *
-   * Defaults to `document.createElement("canvas")`.
+   * Host environment overrides, e.g. for test environments or Node.js.
    */
-  createCanvas?: () => HTMLCanvasElement;
+  environment?: {
+    /**
+     * Creates the canvas to export into.
+     *
+     * Do not set `canvas.width/height` or modify the canvas context as that's
+     * handled by Excalidraw.
+     *
+     * Defaults to `document.createElement("canvas")`.
+     */
+    createCanvas?: () => HTMLCanvasElement;
+  };
 
   exportingFrame?: NonDeleted<ExcalidrawFrameLikeElement> | null;
 
@@ -425,7 +433,7 @@ const configExportDimension = async ({
   // restore elements (normalizes & drops invisible elements) and filter out
   // deleted ones. The type contract requires non-deleted elements already,
   // but types alone don't protect JS consumers passing raw scene data.
-  // These are also what SVG export embeds (`exportEmbedScene`).
+  // These are also what SVG export embeds (`embedScene`).
   const elements = getNonDeletedElements(
     restoreElements(data.elements, null, { deleteInvisibleElements: true }),
   );
@@ -700,11 +708,7 @@ const configExportDimension = async ({
 // exportToCanvas
 // ---------------------------------------------------------------------------
 
-/**
- * This API is usually used as a precursor to serializing to Blob or PNG,
- * but can also be used to create a canvas for other purposes.
- */
-export const exportToCanvas = async ({
+const exportToCanvas = async ({
   data,
   config,
 }: {
@@ -730,8 +734,8 @@ export const exportToCanvas = async ({
     theme,
   } = await configExportDimension({ data, config });
 
-  const canvas = cfg.createCanvas
-    ? cfg.createCanvas()
+  const canvas = cfg.environment?.createCanvas
+    ? cfg.environment.createCanvas()
     : document.createElement("canvas");
 
   // round rather than letting the canvas truncate, which would turn float
@@ -814,6 +818,11 @@ type ExportToSvgConfig = Pick<
     renderEmbeddables?: boolean;
     skipInliningFonts?: true;
     reuseImages?: boolean;
+    /**
+     * Embeds the scene into the SVG, so that it can be imported back into
+     * Excalidraw.
+     */
+    embedScene?: boolean;
   };
 
 const createHTMLComment = (text: string) => {
@@ -823,7 +832,7 @@ const createHTMLComment = (text: string) => {
   return document.createComment(` ${text} `);
 };
 
-export const exportToSvg = async ({
+const exportToSvg = async ({
   data,
   config,
 }: {
@@ -884,7 +893,7 @@ export const exportToSvg = async ({
 
   // we need to serialize the "original" elements before we put them through
   // the tempScene hack which duplicates and regenerates ids
-  if (appState.exportEmbedScene) {
+  if (config?.embedScene) {
     try {
       encodeSvgBase64Payload({
         metadataElement,
@@ -1098,40 +1107,41 @@ const getCanvasSize = (
 
 export { MIME_TYPES };
 
-type ExportToBlobConfig = ExportSceneConfig & {
-  mimeType?: string;
+type ExportToPngConfig = ExportSceneConfig & {
+  /**
+   * Embeds the scene into the PNG metadata, so that it can be imported back
+   * into Excalidraw.
+   */
+  embedScene?: boolean;
+};
+
+type ExportToJpegConfig = ExportSceneConfig & {
+  /**
+   * Encoding quality between 0 and 1.
+   *
+   * @default 0.92
+   */
   quality?: number;
 };
 
-export const exportToBlob = async ({
-  data,
-  config,
-}: {
-  data: ExportSceneData;
-  config?: ExportToBlobConfig;
-}): Promise<Blob> => {
-  let { mimeType = MIME_TYPES.png, quality } = config || {};
-
-  if (mimeType === MIME_TYPES.png && typeof quality === "number") {
-    console.warn(`"quality" will be ignored for "${MIME_TYPES.png}" mimeType`);
-  }
-
-  // typo in MIME type (should be "jpeg")
-  if (mimeType === "image/jpg") {
-    mimeType = MIME_TYPES.jpg;
-  }
+const exportToBlob = async (
+  opts: { data: ExportSceneData } & (
+    | { type: "png"; config?: ExportToPngConfig }
+    | { type: "jpeg"; config?: ExportToJpegConfig }
+  ),
+): Promise<Blob> => {
+  const { data } = opts;
+  let config: ExportSceneConfig | undefined = opts.config;
 
   // JPEG has no alpha channel (transparent pixels would turn black)
-  if (mimeType === MIME_TYPES.jpg && config?.canvasBackgroundColor === false) {
+  if (opts.type === "jpeg" && config?.canvasBackgroundColor === false) {
     console.warn(
-      `"canvasBackgroundColor: false" is not supported for "${MIME_TYPES.jpg}" mimeType, using the default background`,
+      `"canvasBackgroundColor: false" is not supported for JPEG, using the default background`,
     );
     config = { ...config, canvasBackgroundColor: undefined };
   }
 
   const canvas = await exportToCanvas({ data, config });
-
-  quality = quality ? quality : /image\/jpe?g/.test(mimeType) ? 0.92 : 0.8;
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -1139,11 +1149,7 @@ export const exportToBlob = async ({
         if (!blob) {
           return reject(new Error("couldn't export to blob"));
         }
-        if (
-          blob &&
-          mimeType === MIME_TYPES.png &&
-          data.appState?.exportEmbedScene
-        ) {
+        if (opts.type === "png" && opts.config?.embedScene) {
           blob = await encodePngMetadata({
             blob,
             metadata: serializeAsJSON(
@@ -1151,7 +1157,7 @@ export const exportToBlob = async ({
               // we pass the original, uncloned elements when serializing
               // so that we keep ids stable (restoring keeps the ids)
               restoreElements(data.elements, null),
-              data.appState,
+              data.appState ?? {},
               data.files || {},
               "local",
             ),
@@ -1159,36 +1165,72 @@ export const exportToBlob = async ({
         }
         resolve(blob);
       },
-      mimeType,
-      quality,
+      opts.type === "png" ? MIME_TYPES.png : MIME_TYPES.jpg,
+      opts.type === "jpeg" ? opts.config?.quality || 0.92 : undefined,
     );
   });
 };
 
 // ---------------------------------------------------------------------------
+// exportScene
+// ---------------------------------------------------------------------------
+
+export type ExportSceneOptions = { data: ExportSceneData } & (
+  | { type: "canvas"; config?: ExportSceneConfig }
+  | { type: "png"; config?: ExportToPngConfig }
+  | { type: "jpeg"; config?: ExportToJpegConfig }
+  | { type: "svg"; config?: ExportToSvgConfig }
+);
+
+/**
+ * Exports the scene to a canvas, a PNG or JPEG blob, or an SVG element.
+ */
+export function exportScene(
+  opts: Extract<ExportSceneOptions, { type: "canvas" }>,
+): Promise<HTMLCanvasElement>;
+export function exportScene(
+  opts: Extract<ExportSceneOptions, { type: "png" | "jpeg" }>,
+): Promise<Blob>;
+export function exportScene(
+  opts: Extract<ExportSceneOptions, { type: "svg" }>,
+): Promise<SVGSVGElement>;
+export function exportScene(
+  opts: ExportSceneOptions,
+): Promise<HTMLCanvasElement | Blob | SVGSVGElement>;
+export function exportScene(
+  opts: ExportSceneOptions,
+): Promise<HTMLCanvasElement | Blob | SVGSVGElement> {
+  switch (opts.type) {
+    case "canvas":
+      return exportToCanvas(opts);
+    case "png":
+    case "jpeg":
+      return exportToBlob(opts);
+    case "svg":
+      return exportToSvg(opts);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // exportToClipboard
 // ---------------------------------------------------------------------------
 
-export const exportToClipboard = async ({
-  type,
-  data,
-  config,
-}: {
-  data: ExportSceneData;
-} & (
-  | { type: "png"; config?: ExportToBlobConfig }
-  | { type: "svg"; config?: ExportToSvgConfig }
-  | { type: "json"; config?: never }
-)) => {
-  if (type === "svg") {
-    const svg = await exportToSvg({ data, config });
+export const exportToClipboard = async (
+  opts: { data: ExportSceneData } & (
+    | { type: "png"; config?: ExportToPngConfig }
+    | { type: "svg"; config?: ExportToSvgConfig }
+    | { type: "json"; config?: never }
+  ),
+) => {
+  if (opts.type === "svg") {
+    const svg = await exportScene(opts);
     await copyTextToSystemClipboard(svg.outerHTML);
-  } else if (type === "png") {
-    await copyBlobToClipboardAsPng(exportToBlob({ data, config }));
-  } else if (type === "json") {
+  } else if (opts.type === "png") {
+    await copyBlobToClipboardAsPng(exportScene(opts));
+  } else if (opts.type === "json") {
     await copyToClipboard(
-      getNonDeletedElements(restoreElements(data.elements, null)),
-      data.files,
+      getNonDeletedElements(restoreElements(opts.data.elements, null)),
+      opts.data.files ?? null,
     );
   } else {
     throw new Error("Invalid export type");

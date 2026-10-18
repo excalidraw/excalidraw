@@ -12,7 +12,7 @@ import { Excalidraw } from "../index";
 import {
   decodeSvgBase64Payload,
   encodeSvgBase64Payload,
-  exportToSvg,
+  exportScene,
 } from "../scene/export";
 
 import { API } from "./helpers/api";
@@ -86,12 +86,14 @@ describe("export", () => {
   });
 
   it("export svg-embedded scene", async () => {
-    const svg = await exportToSvg({
+    const svg = await exportScene({
+      type: "svg",
       data: {
         elements: testElements,
-        appState: { ...getDefaultAppState(), exportEmbedScene: true },
+        appState: getDefaultAppState(),
         files: {},
       },
+      config: { embedScene: true },
     });
     const svgText = svg.outerHTML;
 
@@ -210,7 +212,8 @@ describe("export", () => {
       },
     } as const;
 
-    const svg = await exportToSvg({
+    const svg = await exportScene({
+      type: "svg",
       data: {
         elements,
         appState,

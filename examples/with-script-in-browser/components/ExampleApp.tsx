@@ -80,9 +80,7 @@ export default function ExampleApp({
   excalidrawLib,
 }: AppProps) {
   const {
-    exportToCanvas,
-    exportToSvg,
-    exportToBlob,
+    exportScene,
     exportToClipboard,
     useHandleLibrary,
     MIME_TYPES,
@@ -894,13 +892,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const svg = await exportToSvg({
+              const svg = await exportScene({
+                type: "svg",
                 data: {
                   elements: excalidrawAPI.getSceneElements(),
-                  appState: { ...initialData.appState, exportEmbedScene },
+                  appState: initialData.appState,
                   files: excalidrawAPI.getFiles(),
                 },
-                config: exportConfig,
+                config: { ...exportConfig, embedScene: exportEmbedScene },
               });
               appRef.current.querySelector(".export-svg").innerHTML =
                 svg.outerHTML;
@@ -915,13 +914,14 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const blob = await exportToBlob({
+              const blob = await exportScene({
+                type: "png",
                 data: {
                   elements: excalidrawAPI.getSceneElements(),
-                  appState: { ...initialData.appState, exportEmbedScene },
+                  appState: initialData.appState,
                   files: excalidrawAPI.getFiles(),
                 },
-                config: { ...exportConfig, mimeType: "image/png" },
+                config: { ...exportConfig, embedScene: exportEmbedScene },
               });
               setBlobUrl(window.URL.createObjectURL(blob));
             }}
@@ -936,7 +936,8 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const canvas = await exportToCanvas({
+              const canvas = await exportScene({
+                type: "canvas",
                 data: {
                   elements: excalidrawAPI.getSceneElements(),
                   appState: initialData.appState,
@@ -957,7 +958,8 @@ export default function ExampleApp({
               if (!excalidrawAPI) {
                 return;
               }
-              const canvas = await exportToCanvas({
+              const canvas = await exportScene({
+                type: "canvas",
                 data: {
                   elements: excalidrawAPI.getSceneElements(),
                   appState: initialData.appState,

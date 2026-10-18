@@ -1,8 +1,6 @@
 // Re-export from @excalidraw/excalidraw for backwards compatibility
 export {
-  exportToCanvas,
-  exportToBlob,
-  exportToSvg,
+  exportScene,
   exportToClipboard,
   MIME_TYPES,
 } from "@excalidraw/excalidraw/scene/export";
@@ -10,6 +8,7 @@ export {
 export type {
   ExportSceneData,
   ExportSceneConfig,
+  ExportSceneOptions,
 } from "@excalidraw/excalidraw/scene/export";
 
 export { elementsOverlappingBBox } from "@excalidraw/element";

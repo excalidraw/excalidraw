@@ -2,7 +2,7 @@ import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
 
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
-import { exportToCanvas } from "@excalidraw/utils";
+import { exportScene } from "@excalidraw/utils";
 
 import type {
   NonDeletedExcalidrawElement,
@@ -100,7 +100,8 @@ export const convertMermaidToExcalidraw = async ({
       files,
     };
 
-    const canvas = await exportToCanvas({
+    const canvas = await exportScene({
+      type: "canvas",
       data: {
         elements: data.current.elements,
         files: data.current.files,

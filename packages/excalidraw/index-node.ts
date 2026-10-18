@@ -1,4 +1,4 @@
-import { exportToCanvas } from "./scene/export";
+import { exportScene } from "./scene/export";
 
 const fs = require("fs");
 
@@ -59,7 +59,8 @@ registerFont("./public/Virgil.woff2", { family: "Virgil" });
 registerFont("./public/Cascadia.woff2", { family: "Cascadia" });
 
 (async () => {
-  const canvas = await exportToCanvas({
+  const canvas = await exportScene({
+    type: "canvas",
     data: {
       elements: elements as any,
       appState: {},
@@ -67,7 +68,7 @@ registerFont("./public/Cascadia.woff2", { family: "Cascadia" });
     },
     config: {
       canvasBackgroundColor: "#ffffff",
-      createCanvas,
+      environment: { createCanvas },
     },
   });
 

@@ -30,7 +30,7 @@ import {
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { exportToCanvas, exportToSvg } from "../scene/export";
+import { exportScene } from "../scene/export";
 
 import { canvasToBlob } from "./blob";
 import { fileSave } from "./filesystem";
@@ -125,13 +125,11 @@ export const exportCanvas = async (
   const theme = appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT;
 
   if (type === "svg" || type === "clipboard-svg") {
-    const svgPromise = exportToSvg({
+    const svgPromise = exportScene({
+      type: "svg",
       data: {
         elements,
-        appState: {
-          ...appState,
-          exportEmbedScene: appState.exportEmbedScene && type === "svg",
-        },
+        appState,
         files,
       },
       config: {
@@ -139,6 +137,7 @@ export const exportCanvas = async (
         exportingFrame,
         theme,
         canvasBackgroundColor: exportBackground ? viewBackgroundColor : false,
+        embedScene: appState.exportEmbedScene && type === "svg",
       },
     });
 
@@ -170,7 +169,8 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas({
+  const tempCanvas = exportScene({
+    type: "canvas",
     data: {
       elements,
       appState,
