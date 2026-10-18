@@ -15,15 +15,14 @@ import type { ExportSceneConfig } from "../src";
 describe("exportScene: canvas", async () => {
   const EXPORT_PADDING = 10;
 
-  it("with default arguments (no padding)", async () => {
+  it("with default arguments (padding 10)", async () => {
     const canvas = await utils.exportScene({
       type: "canvas",
       data: diagramFactory({ elementOverrides: { width: 100, height: 100 } }),
     });
 
-    // New API has no default padding - call sites must explicitly set it
-    expect(canvas.width).toBe(100);
-    expect(canvas.height).toBe(100);
+    expect(canvas.width).toBe(100 + 2 * EXPORT_PADDING);
+    expect(canvas.height).toBe(100 + 2 * EXPORT_PADDING);
   });
 
   it("with padding", async () => {
@@ -165,7 +164,7 @@ describe("exportScene: canvas", async () => {
         files: null,
       },
       // size * 1.1 === 28.999999999999996
-      config: { scale: 1.1 },
+      config: { scale: 1.1, padding: 0 },
     });
 
     expect(canvas.width).toBe(29);

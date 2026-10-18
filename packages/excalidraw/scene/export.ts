@@ -8,6 +8,7 @@ import {
   MIME_TYPES,
   EXPORT_DATA_TYPES,
   COLOR_WHITE,
+  DEFAULT_EXPORT_PADDING,
   arrayToMap,
   distance,
   getFontString,
@@ -258,7 +259,7 @@ type ExportSceneBaseConfig = {
    * aspect ratio. It is recommended to set `position` to `center` when using
    * `fit: "contain"`.
    *
-   * @default 0
+   * @default 10
    */
   padding?: number;
   // -------------------------------------------------------------------------
@@ -547,7 +548,7 @@ const configExportDimension = async ({
       ? "contain"
       : "none");
 
-  cfg.padding = cfg.padding ?? 0;
+  cfg.padding = cfg.padding ?? DEFAULT_EXPORT_PADDING;
 
   cfg.origin = cfg.origin ?? "canvas";
   cfg.position = cfg.position ?? "center";
@@ -789,8 +790,8 @@ const exportToCanvas = async ({
 
   // round rather than letting the canvas truncate, which would turn float
   // noise (e.g. 28.999999999999996) into a pixel lost
-  canvas.width = Math.round(exportWidth);
-  canvas.height = Math.round(exportHeight);
+  canvas.width = Math.max(1, Math.round(exportWidth));
+  canvas.height = Math.max(1, Math.round(exportHeight));
 
   const { imageCache } = await updateImageCache({
     imageCache: new Map(),
