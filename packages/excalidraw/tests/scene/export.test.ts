@@ -554,16 +554,42 @@ describe("export inputs", () => {
       vi.unstubAllGlobals();
     });
 
-    it("exports without loading fonts", async () => {
+    it("exports without loading fonts, warning once", async () => {
+      const consoleWarn = vi
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
       // jsdom implements no `document.fonts`; only the test document is mocked
       vi.stubGlobal("document", document.implementation.createHTMLDocument());
 
-      const svg = await exportScene({
+      // a local font is never loaded, so nothing is missing
+      await exportScene({
         type: "svg",
-        data: { elements: [API.createElement({ type: "text", text: "hi" })] },
+        data: {
+          elements: [
+            API.createElement({
+              type: "text",
+              text: "hi",
+              fontFamily: FONT_FAMILY.Helvetica,
+            }),
+          ],
+        },
       });
+      expect(consoleWarn).not.toHaveBeenCalled();
 
-      expect(svg.querySelector("text")?.textContent).toBe("hi");
+      for (let i = 0; i < 2; i++) {
+        const svg = await exportScene({
+          type: "svg",
+          data: {
+            elements: [API.createElement({ type: "text", text: "hi" })],
+          },
+        });
+        expect(svg.querySelector("text")?.textContent).toBe("hi");
+      }
+      expect(consoleWarn).toHaveBeenCalledTimes(1);
+      expect(consoleWarn).toHaveBeenCalledWith(
+        expect.stringContaining("config.environment.loadFonts"),
+      );
+      consoleWarn.mockRestore();
     });
 
     it("loads fonts into a worker's own font set", async () => {

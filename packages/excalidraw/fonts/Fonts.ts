@@ -44,6 +44,9 @@ import { NunitoFontFaces } from "./Nunito";
 import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 
+/** warned once per process, not per export (e.g. on a server) */
+let warnedNoFontFaceSet = false;
+
 /** a worker's own font set (`WorkerGlobalScope.fonts`), if this is one */
 const getWorkerFontFaceSet = (): FontFaceSet | null =>
   typeof self !== "undefined" && "fonts" in self
@@ -185,7 +188,8 @@ export class Fonts {
    * Loads into the document's font set, or in a worker into the worker's own
    * (`self.fonts`, what an `OffscreenCanvas` there measures with). Where there
    * is neither -- e.g. a DOM shim without `FontFaceSet` (`linkedom`), or Node
-   * -- nothing is loaded: the host makes the fonts available itself.
+   * -- nothing is loaded: the host makes the fonts available itself, and is
+   * warned once if the elements use fonts that would need loading.
    */
   public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
@@ -195,11 +199,25 @@ export class Fonts {
       (ownerDocument ?? (typeof document !== "undefined" ? document : null))
         ?.fonts ?? getWorkerFontFaceSet();
 
+    const fontFamilies = Fonts.getUniqueFamilies(elements);
+
     if (!fontFaceSet) {
+      // local fonts (e.g. Helvetica) are never loaded anyway
+      if (
+        !warnedNoFontFaceSet &&
+        fontFamilies.some((family) => !FONT_METADATA[family]?.local)
+      ) {
+        warnedNoFontFaceSet = true;
+        console.warn(
+          "Excalidraw: there is no font set (`document.fonts`, or a worker's " +
+            "`self.fonts`) to load the exported fonts into, so text is " +
+            "measured and drawn with whatever fonts this environment has. " +
+            "Load them yourself in `config.environment.loadFonts`.",
+        );
+      }
       return [];
     }
 
-    const fontFamilies = Fonts.getUniqueFamilies(elements);
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
     return Fonts.loadFontFaces(fontFamilies, charsPerFamily, fontFaceSet);
