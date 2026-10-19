@@ -14,6 +14,7 @@ import {
   addElementsToFrame,
   cropElement,
   dragSelectedElements,
+  getBoundTextElement,
   getCommonBounds,
   getCommonFrameId,
   getElementAbsoluteCoords,
@@ -1142,7 +1143,17 @@ export class AppSelectionTool {
 
     const updateGroupIdsAfterEditingGroup = (elements: ExcalidrawElement[]) => {
       if (elements.length > 0) {
+        // bound text is never selected on its own, but must follow its
+        // container out of the edited group
+        const elementsWithBoundText = new Set(elements);
         for (const element of elements) {
+          const boundText = getBoundTextElement(element, nextElements);
+          if (boundText) {
+            elementsWithBoundText.add(boundText);
+          }
+        }
+
+        for (const element of elementsWithBoundText) {
           const index = element.groupIds.indexOf(
             this.app.state.editingGroupId!,
           );
