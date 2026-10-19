@@ -350,6 +350,8 @@
     "bucketfill": "Bucket fill",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
+    "hideToolbar": "Hide drawing toolbar",
+    "showToolbar": "Show drawing toolbar",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "convertElementType": "Toggle shape type"
   },
