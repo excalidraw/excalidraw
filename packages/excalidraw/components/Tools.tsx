@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 
-import { KEYS, capitalizeString } from "@excalidraw/common";
+import { KEYS, capitalizeString, matchKey } from "@excalidraw/common";
 
 import type { PointerType } from "@excalidraw/element/types";
 
@@ -190,14 +190,12 @@ export const getToolShortcut = (type: ToolbarToolType) => {
 };
 
 export const findShapeByKey = (
-  key: string,
+  eventOrKey: string | React.KeyboardEvent | KeyboardEvent,
   app: AppClassProperties,
   shiftKey: boolean = false,
 ) => {
-  // CapsLock-insensitive: the caller excludes every modifier but shift, and
-  // shift is matched explicitly below, so a capital letter on its own means
-  // CapsLock
-  const lowerKey = key.toLowerCase();
+  const isString = typeof eventOrKey === "string";
+  const lowerKey = isString ? eventOrKey.toLowerCase() : "";
 
   for (const type of Object.keys(TOOLS) as ToolbarToolType[]) {
     const { letterKey, numericKey, shiftKey: requiresShift } = TOOLS[type];
@@ -205,13 +203,20 @@ export const findShapeByKey = (
     if (shiftKey !== Boolean(requiresShift)) {
       continue;
     }
-    if (
-      (numericKey != null && key === numericKey) ||
-      (letterKey &&
-        (typeof letterKey === "string"
-          ? letterKey === lowerKey
-          : letterKey.includes(lowerKey)))
-    ) {
+
+    const matched = isString
+      ? (numericKey != null && eventOrKey === numericKey) ||
+        (letterKey &&
+          (typeof letterKey === "string"
+            ? letterKey === lowerKey
+            : letterKey.includes(lowerKey)))
+      : (numericKey != null && matchKey(eventOrKey, numericKey as any)) ||
+        (letterKey &&
+          (typeof letterKey === "string"
+            ? matchKey(eventOrKey, letterKey as any)
+            : letterKey.some((k) => matchKey(eventOrKey, k as any))));
+
+    if (matched) {
       // the selection shortcut activates whichever selection tool the user
       // prefers (selection or lasso)
       return type === "selection"
