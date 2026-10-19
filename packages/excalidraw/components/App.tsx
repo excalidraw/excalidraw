@@ -177,6 +177,7 @@ import {
   getRenderElementWithPositionOverride,
   getSelectedGroupIdForElement,
   getSelectedGroupIds,
+  getElementsInGroup,
   syncInvalidIndices,
   excludeElementsInFramesFromSelection,
   makeNextSelectedElementIds,
@@ -10087,7 +10088,9 @@ class App extends React.Component<AppProps, AppState> {
           pointFrom(pointerEnd.clientX, pointerEnd.clientY),
         );
 
-        if (draggedDistance === 0) {
+        // a click erases only the top-most element (with its group), while
+        // dragging keeps erasing everything under the path (#9648)
+        if (draggedDistance < DRAGGING_THRESHOLD) {
           const scenePointer = viewportCoordsToSceneCoords(
             {
               clientX: pointerEnd.clientX,
@@ -10095,13 +10098,23 @@ class App extends React.Component<AppProps, AppState> {
             },
             this.state,
           );
-          const hitElements = this.getElementsAtPosition(
+          const hitElement = this.getElementAtPosition(
             scenePointer.x,
             scenePointer.y,
           );
-          hitElements.forEach((hitElement) =>
-            this.elementsPendingErasure.add(hitElement.id),
-          );
+          this.elementsPendingErasure = new Set();
+          if (hitElement) {
+            const groupId = hitElement.groupIds.at(-1);
+            const elementsToErase = groupId
+              ? getElementsInGroup(
+                  this.scene.getNonDeletedElementsMap(),
+                  groupId,
+                )
+              : [hitElement];
+            elementsToErase.forEach((element) =>
+              this.elementsPendingErasure.add(element.id),
+            );
+          }
         }
         this.eraseElements();
         return;
