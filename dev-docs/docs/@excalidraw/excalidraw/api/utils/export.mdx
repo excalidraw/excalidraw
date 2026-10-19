@@ -25,7 +25,7 @@ exportToCanvas(&#123;<br/>&nbsp;
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `elements` | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114) |  | The elements to be exported to canvas. |
+| `elements` | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206) |  | The elements to be exported to canvas. |
 | `appState` | [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/packages/utils.ts#L23) | [Default App State](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/appState.ts#L17) | The app state of the scene. |
 | [`getDimensions`](#getdimensions) | `function` | _ | A function which returns the `width`, `height`, and optionally `scale` (defaults to  `1`), with which canvas is to be exported. |
 | `maxWidthOrHeight` | `number` | _ | The maximum `width` or `height` of the exported image. If provided, `getDimensions` is ignored. |
@@ -134,7 +134,7 @@ Returns a promise which resolves with a [blob](https://developer.mozilla.org/en-
 <pre>
 exportToSvg(&#123;<br/>&nbsp;
   elements:&nbsp; 
-    <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114">
+    <a href="https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206">
       ExcalidrawElement[]
     </a>,<br/>&nbsp;
   appState:
@@ -151,7 +151,7 @@ exportToSvg(&#123;<br/>&nbsp;
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/element/types.ts#L114) |  | The elements to exported as `svg `|
+| elements | [Excalidraw Element []](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts#L206) |  | The elements to exported as `svg `|
 | appState | [AppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L95) | [defaultAppState](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/appState.ts#L11) | The `appState` of the scene |
 | exportPadding | number | 10 | The `padding` to be added on canvas |
 | files | [BinaryFiles](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/types.ts#L64) | undefined | The `files` added to the scene. |
