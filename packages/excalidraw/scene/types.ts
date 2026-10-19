@@ -1,6 +1,7 @@
 import type { UserIdleState, EditorInterface } from "@excalidraw/common";
 import type {
   ExcalidrawElement,
+  ExcalidrawFrameLikeElement,
   NonDeletedElementsMap,
   NonDeletedExcalidrawElement,
   NonDeletedSceneElementsMap,
@@ -27,6 +28,8 @@ export type RenderableElementsMap = NonDeletedElementsMap &
 
 export type StaticCanvasRenderConfig = {
   canvasBackgroundColor: AppState["viewBackgroundColor"];
+  /** export only: clips everything drawn to this frame (square corners) */
+  clipToFrame?: ExcalidrawFrameLikeElement | null;
   // extra options passed to the renderer
   // ---------------------------------------------------------------------------
   imageCache: AppClassProperties["imageCache"];
