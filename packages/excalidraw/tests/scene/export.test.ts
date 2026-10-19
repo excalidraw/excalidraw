@@ -549,6 +549,45 @@ describe("export inputs", () => {
     ).toContain("F...");
   });
 
+  describe("without a document font set (e.g. a DOM shim like linkedom)", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("exports without loading fonts", async () => {
+      // jsdom implements no `document.fonts`; only the test document is mocked
+      vi.stubGlobal("document", document.implementation.createHTMLDocument());
+
+      const svg = await exportScene({
+        type: "svg",
+        data: { elements: [API.createElement({ type: "text", text: "hi" })] },
+      });
+
+      expect(svg.querySelector("text")?.textContent).toBe("hi");
+    });
+
+    it("loads fonts into a worker's own font set", async () => {
+      const fonts = {
+        has: () => true,
+        add: vi.fn(),
+        check: () => false,
+        load: vi.fn(async () => []),
+      };
+      vi.stubGlobal("document", document.implementation.createHTMLDocument());
+      vi.stubGlobal("self", { fonts });
+
+      await exportScene({
+        type: "svg",
+        data: { elements: [API.createElement({ type: "text", text: "hi" })] },
+      });
+
+      expect(fonts.load).toHaveBeenCalledWith(
+        expect.stringContaining("Excalifont"),
+        "hi",
+      );
+    });
+  });
+
   it("renders frame decorations per config.frames", async () => {
     const elements = [API.createElement({ type: "frame" })];
     const countFrameNames = (svg: SVGSVGElement) =>
