@@ -128,6 +128,7 @@ import {
   LibraryLocalStorageMigrationAdapter,
   LocalData,
   localStorageQuotaExceededAtom,
+  localStorageSaveErrorAtom,
 } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import { ShareDialog, shareDialogStateAtom } from "./share/ShareDialog";
@@ -603,7 +604,10 @@ const ExcalidrawWrapper = () => {
         ((collabAPI && !collabAPI.isCollaborating()) || isCollabDisabled)
       ) {
         // don't sync if local state is newer or identical to browser state
-        if (isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)) {
+        if (
+          !appJotaiStore.get(localStorageSaveErrorAtom) &&
+          isBrowserStorageStateNewer(STORAGE_KEYS.VERSION_DATA_STATE)
+        ) {
           const localDataState = importFromLocalStorage();
           const username = importUsernameFromLocalStorage();
           setLangCode(getPreferredLanguage());
@@ -693,9 +697,10 @@ const ExcalidrawWrapper = () => {
 
       if (
         excalidrawAPI &&
-        LocalData.fileStorage.shouldPreventUnload(
-          excalidrawAPI.getSceneElements(),
-        )
+        (appJotaiStore.get(localStorageSaveErrorAtom) ||
+          LocalData.fileStorage.shouldPreventUnload(
+            excalidrawAPI.getSceneElements(),
+          ))
       ) {
         if (import.meta.env.VITE_APP_DISABLE_PREVENT_UNLOAD !== "true") {
           preventUnload(event);
@@ -824,6 +829,7 @@ const ExcalidrawWrapper = () => {
   const isOffline = useAtomValue(isOfflineAtom);
 
   const localStorageQuotaExceeded = useAtomValue(localStorageQuotaExceededAtom);
+  const localStorageSaveError = useAtomValue(localStorageSaveErrorAtom);
 
   const onCollabDialogOpen = useCallback(
     () => setShareDialogState({ isOpen: true, type: "collaborationOnly" }),
@@ -1067,9 +1073,23 @@ const ExcalidrawWrapper = () => {
             {t("alerts.collabOfflineWarning")}
           </div>
         )}
-        {localStorageQuotaExceeded && (
-          <div className="alert alert--danger">
-            {t("alerts.localStorageQuotaExceeded")}
+        {localStorageSaveError && (
+          <div className="alert alert--danger alert--storage" role="alert">
+            {t(
+              localStorageQuotaExceeded
+                ? "alerts.localStorageQuotaExceeded"
+                : "alerts.localStorageSaveFailed",
+            )}{" "}
+            <button
+              type="button"
+              onClick={() =>
+                excalidrawAPI?.updateScene({
+                  appState: { openDialog: { name: "jsonExport" } },
+                })
+              }
+            >
+              {t("buttons.saveAs")}
+            </button>
           </div>
         )}
         {latestShareableLink && (

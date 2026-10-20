@@ -49,6 +49,7 @@ import { updateBrowserStateVersion } from "./tabSync";
 const filesStore = createStore("files-db", "files-store");
 
 export const localStorageQuotaExceededAtom = atom(false);
+export const localStorageSaveErrorAtom = atom(false);
 
 class LocalFileManager extends FileManager {
   clearObsoleteFiles = async (opts: { currentFileIds: FileId[] }) => {
@@ -87,21 +88,34 @@ const saveDataStateToLocalStorage = (
       _appState.openSidebar = null;
     }
 
+    const serializedElements = JSON.stringify(getNonDeletedElements(elements));
+    const serializedAppState = JSON.stringify(_appState);
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS,
-      JSON.stringify(getNonDeletedElements(elements)),
+      serializedElements,
     );
     localStorage.setItem(
       STORAGE_KEYS.LOCAL_STORAGE_APP_STATE,
-      JSON.stringify(_appState),
+      serializedAppState,
     );
+    // Some browser storage implementations may silently discard writes.
+    if (
+      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_ELEMENTS) !==
+        serializedElements ||
+      localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_APP_STATE) !==
+        serializedAppState
+    ) {
+      throw new Error("Browser storage did not retain the drawing");
+    }
     updateBrowserStateVersion(STORAGE_KEYS.VERSION_DATA_STATE);
+    appJotaiStore.set(localStorageSaveErrorAtom, false);
     if (localStorageQuotaExceeded) {
       appJotaiStore.set(localStorageQuotaExceededAtom, false);
     }
   } catch (error: any) {
     // Unable to access window.localStorage
     console.error(error);
+    appJotaiStore.set(localStorageSaveErrorAtom, true);
     if (isQuotaExceededError(error) && !localStorageQuotaExceeded) {
       appJotaiStore.set(localStorageQuotaExceededAtom, true);
     }
@@ -109,7 +123,10 @@ const saveDataStateToLocalStorage = (
 };
 
 const isQuotaExceededError = (error: any) => {
-  return error instanceof DOMException && error.name === "QuotaExceededError";
+  return (
+    error?.name === "QuotaExceededError" ||
+    error?.name === "NS_ERROR_DOM_QUOTA_REACHED"
+  );
 };
 
 type SavingLockTypes = "collaboration";
