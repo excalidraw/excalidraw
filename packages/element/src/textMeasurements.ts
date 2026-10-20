@@ -177,19 +177,25 @@ export const getTextHeight = (
 };
 
 export const charWidth = (() => {
-  const cachedCharWidth: { [key: FontString]: Array<number> } = {};
+  // Keyed by the character itself. Keying by `charCodeAt(0)` meant every
+  // character outside the BMP was stored under its leading surrogate, so the
+  // 1024 characters sharing one surrogate all took the width of whichever was
+  // measured first: 😀 and 😁, or 𝐀 and 𝟘.
+  const cachedCharWidth: { [key: FontString]: Map<string, number> } = {};
 
   const calculate = (char: string, font: FontString) => {
-    const unicode = char.charCodeAt(0);
-    if (!cachedCharWidth[font]) {
-      cachedCharWidth[font] = [];
+    let cache = cachedCharWidth[font];
+    if (!cache) {
+      cache = new Map();
+      cachedCharWidth[font] = cache;
     }
-    if (!cachedCharWidth[font][unicode]) {
-      const width = getLineWidth(char, font);
-      cachedCharWidth[font][unicode] = width;
+    // `has`, not a falsy check: a zero width is a real answer for a
+    // zero-width character and should not be measured again.
+    if (!cache.has(char)) {
+      cache.set(char, getLineWidth(char, font));
     }
 
-    return cachedCharWidth[font][unicode];
+    return cache.get(char)!;
   };
 
   const getCache = (font: FontString) => {
@@ -197,7 +203,7 @@ export const charWidth = (() => {
   };
 
   const clearCache = (font: FontString) => {
-    cachedCharWidth[font] = [];
+    cachedCharWidth[font] = new Map();
   };
 
   return {
@@ -209,19 +215,18 @@ export const charWidth = (() => {
 
 export const getMinCharWidth = (font: FontString) => {
   const cache = charWidth.getCache(font);
-  if (!cache) {
+  if (!cache || cache.size === 0) {
     return 0;
   }
-  const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
 
-  return Math.min(...cacheWithOutEmpty);
+  return Math.min(...cache.values());
 };
 
 export const getMaxCharWidth = (font: FontString) => {
   const cache = charWidth.getCache(font);
-  if (!cache) {
+  if (!cache || cache.size === 0) {
     return 0;
   }
-  const cacheWithOutEmpty = cache.filter((val) => val !== undefined);
-  return Math.max(...cacheWithOutEmpty);
+
+  return Math.max(...cache.values());
 };
