@@ -38,8 +38,8 @@ export const actionCopy = register<ClipboardEvent | null>({
       return {
         captureUpdate: CaptureUpdateAction.EVENTUALLY,
         appState: {
-          ...appState,
-          errorMessage: error.message,
+          errorMessage:
+            error?.message || t("errors.copyToSystemClipboardFailed"),
         },
       };
     }
@@ -114,9 +114,21 @@ export const actionCut = register<ClipboardEvent | null>({
   label: "labels.cut",
   icon: cutIcon,
   trackEvent: { category: "element" },
-  perform: (elements, appState, event, app) => {
-    actionCopy.perform(elements, appState, event, app);
-    return actionDeleteSelected.perform(elements, appState, null, app);
+  perform: async (elements, appState, event, app) => {
+    const sceneNonce = app.scene.getSceneNonce();
+    const result = await actionCopy.perform(elements, appState, event, app);
+    if (!result || result.appState?.errorMessage) {
+      return result;
+    }
+    // Do not overwrite edits or cut a different selection while copying.
+    if (
+      app.scene.getElementsIncludingDeleted() !== elements ||
+      app.scene.getSceneNonce() !== sceneNonce ||
+      app.state.selectedElementIds !== appState.selectedElementIds
+    ) {
+      return false;
+    }
+    return actionDeleteSelected.perform(elements, app.state, null, app);
   },
   keyTest: (event) => event[KEYS.CTRL_OR_CMD] && event.key === KEYS.X,
 });
