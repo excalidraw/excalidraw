@@ -549,6 +549,71 @@ describe("export inputs", () => {
     ).toContain("F...");
   });
 
+  describe("without a document font set (e.g. a DOM shim like linkedom)", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("exports without loading fonts, warning once", async () => {
+      const consoleWarn = vi
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+      // jsdom implements no `document.fonts`; only the test document is mocked
+      vi.stubGlobal("document", document.implementation.createHTMLDocument());
+
+      // a local font is never loaded, so nothing is missing
+      await exportScene({
+        type: "svg",
+        data: {
+          elements: [
+            API.createElement({
+              type: "text",
+              text: "hi",
+              fontFamily: FONT_FAMILY.Helvetica,
+            }),
+          ],
+        },
+      });
+      expect(consoleWarn).not.toHaveBeenCalled();
+
+      for (let i = 0; i < 2; i++) {
+        const svg = await exportScene({
+          type: "svg",
+          data: {
+            elements: [API.createElement({ type: "text", text: "hi" })],
+          },
+        });
+        expect(svg.querySelector("text")?.textContent).toBe("hi");
+      }
+      expect(consoleWarn).toHaveBeenCalledTimes(1);
+      expect(consoleWarn).toHaveBeenCalledWith(
+        expect.stringContaining("config.environment.loadFonts"),
+      );
+      consoleWarn.mockRestore();
+    });
+
+    it("loads fonts into a worker's own font set", async () => {
+      const fonts = {
+        has: () => true,
+        add: vi.fn(),
+        check: () => false,
+        load: vi.fn(async () => []),
+      };
+      vi.stubGlobal("document", document.implementation.createHTMLDocument());
+      vi.stubGlobal("self", { fonts });
+
+      await exportScene({
+        type: "svg",
+        data: { elements: [API.createElement({ type: "text", text: "hi" })] },
+      });
+
+      expect(fonts.load).toHaveBeenCalledWith(
+        expect.stringContaining("Excalifont"),
+        "hi",
+      );
+    });
+  });
+
   it("renders frame decorations per config.frames", async () => {
     const elements = [API.createElement({ type: "frame" })];
     const countFrameNames = (svg: SVGSVGElement) =>
