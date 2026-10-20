@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 import { IconButton } from "./IconButton";
-import { PenModeIcon } from "./icons";
+import { penModeIcon } from "./icons";
 
 type PenModeButtonProps = {
   title?: string;
@@ -20,7 +20,7 @@ export const PenModeButton = (props: PenModeButtonProps) => {
     <IconButton
       className={clsx("ToolIcon__penMode", { "is-mobile": props.isMobile })}
       type="toggle"
-      icon={PenModeIcon}
+      icon={penModeIcon}
       checked={props.checked}
       title={`${props.title}`}
       aria-label={`${props.title}`}

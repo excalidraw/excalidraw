@@ -87,11 +87,11 @@ import { atom } from "../editor-jotai";
 import "./ConvertElementTypePopup.scss";
 import { IconButton } from "./IconButton";
 import {
-  DiamondIcon,
+  diamondIcon,
   elbowArrowIcon,
-  EllipseIcon,
-  LineIcon,
-  RectangleIcon,
+  ellipseIcon,
+  lineIcon,
+  rectangleIcon,
   roundArrowIcon,
   sharpArrowIcon,
 } from "./icons";
@@ -299,16 +299,16 @@ const Panel = ({
   const SHAPES: [string, ReactNode][] =
     conversionType === "linear"
       ? [
-          ["line", LineIcon],
+          ["line", lineIcon],
           ["sharpArrow", sharpArrowIcon],
           ["curvedArrow", roundArrowIcon],
           ["elbowArrow", elbowArrowIcon],
         ]
       : conversionType === "generic"
       ? [
-          ["rectangle", RectangleIcon],
-          ["diamond", DiamondIcon],
-          ["ellipse", EllipseIcon],
+          ["rectangle", rectangleIcon],
+          ["diamond", diamondIcon],
+          ["ellipse", ellipseIcon],
         ]
       : [];
 

@@ -15,7 +15,7 @@ import {
 import { Island } from "./Island";
 import { isLibraryMenuOpenAtom } from "./LibraryMenu";
 import { Modal } from "./Modal";
-import { CloseIcon } from "./icons";
+import { closeIcon } from "./icons";
 
 import "./Dialog.scss";
 
@@ -127,7 +127,7 @@ export const Dialog = (props: DialogProps) => {
             aria-label={t("buttons.close")}
             type="button"
           >
-            {CloseIcon}
+            {closeIcon}
           </button>
         )}
         <div className="Dialog__content">{props.children}</div>

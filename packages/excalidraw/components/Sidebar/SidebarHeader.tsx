@@ -5,7 +5,7 @@ import { t } from "../../i18n";
 import { useEditorInterface } from "../App";
 import { Button } from "../Button";
 import { Tooltip } from "../Tooltip";
-import { CloseIcon, PinIcon } from "../icons";
+import { closeIcon, pinIcon } from "../icons";
 
 import { SidebarPropsContext } from "./common";
 
@@ -39,7 +39,7 @@ export const SidebarHeader = ({
               data-testid="sidebar-dock"
               aria-label={t("labels.sidebarLock")}
             >
-              {PinIcon}
+              {pinIcon}
             </Button>
           </Tooltip>
         )}
@@ -49,7 +49,7 @@ export const SidebarHeader = ({
           onSelect={props.onCloseRequest}
           aria-label={t("buttons.close")}
         >
-          {CloseIcon}
+          {closeIcon}
         </Button>
       </div>
     </div>

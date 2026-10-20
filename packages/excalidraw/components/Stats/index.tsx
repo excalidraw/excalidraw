@@ -18,7 +18,7 @@ import { t } from "../../i18n";
 import { isGridModeEnabled } from "../../snapping";
 import { useExcalidrawAppState, useExcalidrawSetAppState } from "../App";
 import { Island } from "../Island";
-import { CloseIcon } from "../icons";
+import { closeIcon } from "../icons";
 
 import Angle from "./Angle";
 import CanvasGrid from "./CanvasGrid";
@@ -192,7 +192,7 @@ export const StatsInner = memo(
           <div className="title">
             <h2>{t("stats.title")}</h2>
             <div className="close" onClick={onClose}>
-              {CloseIcon}
+              {closeIcon}
             </div>
           </div>
 

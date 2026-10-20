@@ -8,7 +8,7 @@ import { atom, useAtom } from "../editor-jotai";
 import { useApp, useExcalidrawContainer } from "./App";
 import { positionElementBesideCursor } from "./positionElementBesideCursor";
 import {
-  LineIcon,
+  lineIcon,
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
@@ -96,7 +96,7 @@ export class CursorHints {
     if (source === "digit" || !this.isOnCooldown()) {
       this.show(
         tool === "line"
-          ? LineIcon
+          ? lineIcon
           : getArrowTypeIcon(this.app.state.currentItemArrowType),
       );
     }

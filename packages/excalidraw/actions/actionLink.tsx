@@ -9,7 +9,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { IconButton } from "../components/IconButton";
 import { getContextMenuLabel } from "../components/hyperlink/Hyperlink";
-import { LinkIcon } from "../components/icons";
+import { linkIcon } from "../components/icons";
 import { t } from "../i18n";
 import { getSelectedElements } from "../scene";
 import { getShortcutKey } from "../shortcut";
@@ -20,7 +20,7 @@ export const actionLink = register({
   name: "hyperlink",
   label: (elements, appState) =>
     getContextMenuLabel(getNonDeletedElements(elements), appState),
-  icon: LinkIcon,
+  icon: linkIcon,
   perform: (elements, appState) => {
     if (appState.showHyperlinkPopup === "editor") {
       return false;
@@ -48,7 +48,7 @@ export const actionLink = register({
     return (
       <IconButton
         type="toggle"
-        icon={LinkIcon}
+        icon={linkIcon}
         aria-label={t(
           getContextMenuLabel(getNonDeletedElements(elements), appState),
         )}

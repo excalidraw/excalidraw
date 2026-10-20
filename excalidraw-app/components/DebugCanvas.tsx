@@ -1,7 +1,7 @@
 import {
   ArrowheadArrowIcon,
-  CloseIcon,
-  TrashIcon,
+  closeIcon,
+  trashIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import {
   bootstrapCanvas,
@@ -483,7 +483,7 @@ export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
           aria-hidden="true"
           aria-disabled="false"
         >
-          {TrashIcon}
+          {trashIcon}
         </div>
       </button>
       <button
@@ -513,7 +513,7 @@ export const DebugFooter = ({ onChange }: { onChange: () => void }) => {
           aria-hidden="true"
           aria-disabled="false"
         >
-          {CloseIcon}
+          {closeIcon}
         </div>
       </button>
       <button

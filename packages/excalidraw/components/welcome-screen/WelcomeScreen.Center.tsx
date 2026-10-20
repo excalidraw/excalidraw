@@ -5,7 +5,7 @@ import { useUIAppState } from "../../context/ui-appState";
 import { t, useI18n } from "../../i18n";
 import { useEditorInterface, useExcalidrawActionManager } from "../App";
 import { ExcalidrawLogo } from "../ExcalidrawLogo";
-import { HelpIcon, LoadIcon, usersIcon } from "../icons";
+import { helpCircleIcon, loadIcon, usersIcon } from "../icons";
 
 import type { JSX } from "react";
 
@@ -139,7 +139,7 @@ const MenuItemHelp = () => {
     <WelcomeScreenMenuItem
       onSelect={() => actionManager.executeAction(actionShortcuts)}
       shortcut="?"
-      icon={HelpIcon}
+      icon={helpCircleIcon}
     >
       {t("helpDialog.title")}
     </WelcomeScreenMenuItem>
@@ -159,7 +159,7 @@ const MenuItemLoadScene = () => {
     <WelcomeScreenMenuItem
       onSelect={() => actionManager.executeAction(actionLoadScene)}
       shortcut={getShortcutFromShortcutName("loadScene")}
-      icon={LoadIcon}
+      icon={loadIcon}
     >
       {t("buttons.load")}
     </WelcomeScreenMenuItem>

@@ -13,7 +13,7 @@ import { t } from "../i18n";
 import { Card } from "./Card";
 import { Dialog } from "./Dialog";
 import { IconButton } from "./IconButton";
-import { exportToFileIcon, LinkIcon } from "./icons";
+import { exportToFileIcon, linkIcon } from "./icons";
 
 import "./ExportDialog.scss";
 
@@ -72,7 +72,7 @@ const JSONExportModal = ({
         )}
         {onExportToBackend && (
           <Card color="pink">
-            <div className="Card-icon">{LinkIcon}</div>
+            <div className="Card-icon">{linkIcon}</div>
             <h2>{t("exportDialog.link_title")}</h2>
             <div className="Card-details">{t("exportDialog.link_details")}</div>
             <IconButton

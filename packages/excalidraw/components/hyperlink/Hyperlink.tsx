@@ -43,7 +43,7 @@ import { t } from "../../i18n";
 
 import { useAppProps, useEditorInterface, useExcalidrawAppState } from "../App";
 import { IconButton } from "../IconButton";
-import { FreedrawIcon, TrashIcon, elementLinkIcon } from "../icons";
+import { freedrawIcon, trashIcon, elementLinkIcon } from "../icons";
 import { getSelectedElements } from "../../scene";
 
 import { getLinkHandleFromCoords } from "./helpers";
@@ -319,7 +319,7 @@ export const Hyperlink = ({
             label={t("buttons.edit")}
             onClick={onEdit}
             className="excalidraw-hyperlinkContainer--edit"
-            icon={FreedrawIcon}
+            icon={freedrawIcon}
           />
         )}
         <IconButton
@@ -345,7 +345,7 @@ export const Hyperlink = ({
             label={t("buttons.remove")}
             onClick={handleRemove}
             className="excalidraw-hyperlinkContainer--remove"
-            icon={TrashIcon}
+            icon={trashIcon}
           />
         )}
       </div>

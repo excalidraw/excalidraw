@@ -47,7 +47,7 @@ import {
   upIcon,
   searchIcon,
   frameToolIcon,
-  TextIcon,
+  textIcon,
 } from "./icons";
 
 import "./SearchMenu.scss";
@@ -515,7 +515,7 @@ const MatchListBase = (props: MatchListProps) => {
       {textMatches.length > 0 && (
         <div className="layer-ui__search-result-container">
           <div className="layer-ui__search-result-title">
-            <div className="title-icon">{TextIcon}</div>
+            <div className="title-icon">{textIcon}</div>
             <div>{t("search.texts")}</div>
           </div>
           {textMatches.map((searchMatch, index) => (

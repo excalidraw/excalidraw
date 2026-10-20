@@ -13,7 +13,7 @@ import {
   probablySupportsClipboardWriteText,
   readSystemClipboard,
 } from "../clipboard";
-import { DuplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
+import { duplicateIcon, cutIcon, pngIcon, svgIcon } from "../components/icons";
 import { exportCanvas, prepareElementsForExport } from "../data/index";
 import { t } from "../i18n";
 
@@ -23,7 +23,7 @@ import { register } from "./register";
 export const actionCopy = register<ClipboardEvent | null>({
   name: "copy",
   label: "labels.copy",
-  icon: DuplicateIcon,
+  icon: duplicateIcon,
   trackEvent: { category: "element" },
   perform: async (elements, appState, event, app) => {
     const elementsToCopy = app.scene.getSelectedElements({

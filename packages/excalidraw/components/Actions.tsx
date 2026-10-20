@@ -33,9 +33,9 @@ import {
   sharpArrowIcon,
   roundArrowIcon,
   elbowArrowIcon,
-  TextSizeIcon,
+  textSizeIcon,
   adjustmentsIcon,
-  DotsHorizontalIcon,
+  dotsHorizontalIcon,
   pencilIcon,
 } from "./icons";
 
@@ -457,7 +457,7 @@ const CombinedTextProperties = ({
               }
             }}
           >
-            {TextSizeIcon}
+            {textSizeIcon}
           </button>
         </Popover.Trigger>
         {appState.openPopup === "compactTextProperties" && (
@@ -536,7 +536,7 @@ const CombinedExtraActions = ({
               });
             }}
           >
-            {DotsHorizontalIcon}
+            {dotsHorizontalIcon}
           </button>
         </Popover.Trigger>
         {isOpen && (

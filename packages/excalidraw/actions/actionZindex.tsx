@@ -10,10 +10,10 @@ import {
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import {
-  BringForwardIcon,
-  BringToFrontIcon,
-  SendBackwardIcon,
-  SendToBackIcon,
+  bringForwardIcon,
+  bringToFrontIcon,
+  sendBackwardIcon,
+  sendToBackIcon,
 } from "../components/icons";
 import { t } from "../i18n";
 import { getShortcutKey } from "../shortcut";
@@ -24,7 +24,7 @@ export const actionSendBackward = register({
   name: "sendBackward",
   label: "labels.sendBackward",
   keywords: ["move down", "zindex", "layer"],
-  icon: SendBackwardIcon,
+  icon: sendBackwardIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, value, app) => {
     return {
@@ -45,7 +45,7 @@ export const actionSendBackward = register({
       onClick={() => updateData(null)}
       title={`${t("labels.sendBackward")} — ${getShortcutKey("CtrlOrCmd+[")}`}
     >
-      {SendBackwardIcon}
+      {sendBackwardIcon}
     </button>
   ),
 });
@@ -54,7 +54,7 @@ export const actionBringForward = register({
   name: "bringForward",
   label: "labels.bringForward",
   keywords: ["move up", "zindex", "layer"],
-  icon: BringForwardIcon,
+  icon: bringForwardIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, value, app) => {
     return {
@@ -75,7 +75,7 @@ export const actionBringForward = register({
       onClick={() => updateData(null)}
       title={`${t("labels.bringForward")} — ${getShortcutKey("CtrlOrCmd+]")}`}
     >
-      {BringForwardIcon}
+      {bringForwardIcon}
     </button>
   ),
 });
@@ -84,7 +84,7 @@ export const actionSendToBack = register({
   name: "sendToBack",
   label: "labels.sendToBack",
   keywords: ["move down", "zindex", "layer"],
-  icon: SendToBackIcon,
+  icon: sendToBackIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState) => {
     return {
@@ -112,7 +112,7 @@ export const actionSendToBack = register({
           : getShortcutKey("CtrlOrCmd+Shift+[")
       }`}
     >
-      {SendToBackIcon}
+      {sendToBackIcon}
     </button>
   ),
 });
@@ -121,7 +121,7 @@ export const actionBringToFront = register({
   name: "bringToFront",
   label: "labels.bringToFront",
   keywords: ["move up", "zindex", "layer"],
-  icon: BringToFrontIcon,
+  icon: bringToFrontIcon,
   trackEvent: { category: "element" },
 
   perform: (elements, appState) => {
@@ -150,7 +150,7 @@ export const actionBringToFront = register({
           : getShortcutKey("CtrlOrCmd+Shift+]")
       }`}
     >
-      {BringToFrontIcon}
+      {bringToFrontIcon}
     </button>
   ),
 });

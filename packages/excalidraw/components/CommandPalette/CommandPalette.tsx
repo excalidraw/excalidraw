@@ -42,15 +42,15 @@ import { InlineIcon } from "../InlineIcon";
 import { TextField } from "../TextField";
 import { getSelectedElements } from "../../scene";
 import {
-  LockedIcon,
-  UnlockedIcon,
+  lockedIcon,
+  unlockedIcon,
   searchIcon,
   boltIcon,
   bucketFillIcon,
-  ExportImageIcon,
+  exportImageIcon,
   mermaidLogoIcon,
-  brainIconThin,
-  LibraryIcon,
+  brainThinIcon,
+  libraryIcon,
   historyCommandIcon,
 } from "../icons";
 
@@ -403,7 +403,7 @@ function CommandPaletteInner({
         {
           label: t("buttons.exportImage"),
           category: DEFAULT_CATEGORIES.export,
-          icon: ExportImageIcon,
+          icon: exportImageIcon,
           shortcut: getShortcutFromShortcutName("imageExport"),
           keywords: [
             "export",
@@ -426,7 +426,7 @@ function CommandPaletteInner({
         {
           label: t("toolBar.library"),
           category: DEFAULT_CATEGORIES.app,
-          icon: LibraryIcon,
+          icon: libraryIcon,
           viewMode: false,
           perform: () => {
             if (uiAppState.openSidebar) {
@@ -553,7 +553,7 @@ function CommandPaletteInner({
         {
           label: t("toolBar.lock"),
           category: DEFAULT_CATEGORIES.tools,
-          icon: uiAppState.activeTool.locked ? LockedIcon : UnlockedIcon,
+          icon: uiAppState.activeTool.locked ? lockedIcon : unlockedIcon,
           shortcut: KEYS.Q.toLocaleUpperCase(),
           viewMode: false,
           perform: () => {
@@ -563,7 +563,7 @@ function CommandPaletteInner({
         {
           label: `${t("labels.textToDiagram")}...`,
           category: DEFAULT_CATEGORIES.tools,
-          icon: brainIconThin,
+          icon: brainThinIcon,
           viewMode: false,
           predicate: appProps.aiEnabled,
           perform: () => {

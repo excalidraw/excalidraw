@@ -18,12 +18,12 @@ import type { Alignment } from "@excalidraw/element";
 
 import { IconButton } from "../components/IconButton";
 import {
-  AlignBottomIcon,
-  AlignLeftIcon,
-  AlignRightIcon,
-  AlignTopIcon,
-  CenterHorizontallyIcon,
-  CenterVerticallyIcon,
+  alignBottomIcon,
+  alignLeftIcon,
+  alignRightIcon,
+  alignTopIcon,
+  centerHorizontallyIcon,
+  centerVerticallyIcon,
 } from "../components/icons";
 
 import { t } from "../i18n";
@@ -79,7 +79,7 @@ const alignSelectedElements = (
 export const actionAlignTop = register({
   name: "alignTop",
   label: "labels.alignTop",
-  icon: AlignTopIcon,
+  icon: alignTopIcon,
   trackEvent: { category: "element" },
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
@@ -99,7 +99,7 @@ export const actionAlignTop = register({
     <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
-      icon={AlignTopIcon}
+      icon={alignTopIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.alignTop")} — ${getShortcutKey(
         "CtrlOrCmd+Shift+Up",
@@ -113,7 +113,7 @@ export const actionAlignTop = register({
 export const actionAlignBottom = register({
   name: "alignBottom",
   label: "labels.alignBottom",
-  icon: AlignBottomIcon,
+  icon: alignBottomIcon,
   trackEvent: { category: "element" },
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
@@ -133,7 +133,7 @@ export const actionAlignBottom = register({
     <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
-      icon={AlignBottomIcon}
+      icon={alignBottomIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.alignBottom")} — ${getShortcutKey(
         "CtrlOrCmd+Shift+Down",
@@ -147,7 +147,7 @@ export const actionAlignBottom = register({
 export const actionAlignLeft = register({
   name: "alignLeft",
   label: "labels.alignLeft",
-  icon: AlignLeftIcon,
+  icon: alignLeftIcon,
   trackEvent: { category: "element" },
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
@@ -167,7 +167,7 @@ export const actionAlignLeft = register({
     <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
-      icon={AlignLeftIcon}
+      icon={alignLeftIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.alignLeft")} — ${getShortcutKey(
         "CtrlOrCmd+Shift+Left",
@@ -181,7 +181,7 @@ export const actionAlignLeft = register({
 export const actionAlignRight = register({
   name: "alignRight",
   label: "labels.alignRight",
-  icon: AlignRightIcon,
+  icon: alignRightIcon,
   trackEvent: { category: "element" },
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
@@ -201,7 +201,7 @@ export const actionAlignRight = register({
     <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
-      icon={AlignRightIcon}
+      icon={alignRightIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.alignRight")} — ${getShortcutKey(
         "CtrlOrCmd+Shift+Right",
@@ -215,7 +215,7 @@ export const actionAlignRight = register({
 export const actionAlignVerticallyCentered = register({
   name: "alignVerticallyCentered",
   label: "labels.centerVertically",
-  icon: CenterVerticallyIcon,
+  icon: centerVerticallyIcon,
   trackEvent: { category: "element" },
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
@@ -233,7 +233,7 @@ export const actionAlignVerticallyCentered = register({
     <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
-      icon={CenterVerticallyIcon}
+      icon={centerVerticallyIcon}
       onClick={() => updateData(null)}
       title={t("labels.centerVertically")}
       aria-label={t("labels.centerVertically")}
@@ -245,7 +245,7 @@ export const actionAlignVerticallyCentered = register({
 export const actionAlignHorizontallyCentered = register({
   name: "alignHorizontallyCentered",
   label: "labels.centerHorizontally",
-  icon: CenterHorizontallyIcon,
+  icon: centerHorizontallyIcon,
   trackEvent: { category: "element" },
   predicate: (elements, appState, appProps, app) =>
     alignActionsPredicate(appState, app),
@@ -263,7 +263,7 @@ export const actionAlignHorizontallyCentered = register({
     <IconButton
       hidden={!alignActionsPredicate(appState, app)}
       type="button"
-      icon={CenterHorizontallyIcon}
+      icon={centerHorizontallyIcon}
       onClick={() => updateData(null)}
       title={t("labels.centerHorizontally")}
       aria-label={t("labels.centerHorizontally")}

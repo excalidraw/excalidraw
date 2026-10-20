@@ -2,14 +2,14 @@ import { KEYS } from "@excalidraw/common";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { HelpIconThin } from "../components/icons";
+import { helpCircleThinIcon } from "../components/icons";
 
 import { register } from "./register";
 
 export const actionShortcuts = register({
   name: "toggleShortcuts",
   label: "welcomeScreen.defaults.helpHint",
-  icon: HelpIconThin,
+  icon: helpCircleThinIcon,
   viewMode: true,
   trackEvent: { category: "menu", action: "toggleHelpDialog" },
   perform: (_elements, appState, _, { focusContainer }) => {

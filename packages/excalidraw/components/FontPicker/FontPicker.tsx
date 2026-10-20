@@ -14,9 +14,9 @@ import { Fonts } from "../../fonts";
 import { t } from "../../i18n";
 import { ButtonSeparator } from "../ButtonSeparator";
 import {
-  FontFamilyCodeIcon,
-  FontFamilyNormalIcon,
-  FreedrawIcon,
+  fontFamilyCodeIcon,
+  fontFamilyNormalIcon,
+  freedrawIcon,
 } from "../icons";
 import { TopPicksContextMenu } from "../TopPicksDnD/TopPicksContextMenu";
 import {
@@ -42,19 +42,19 @@ import "./FontPicker.scss";
 export const DEFAULT_FONTS = [
   {
     value: FONT_FAMILY.Excalifont,
-    icon: FreedrawIcon,
+    icon: freedrawIcon,
     text: t("labels.handDrawn"),
     testId: "font-family-hand-drawn",
   },
   {
     value: FONT_FAMILY.Nunito,
-    icon: FontFamilyNormalIcon,
+    icon: fontFamilyNormalIcon,
     text: t("labels.normal"),
     testId: "font-family-normal",
   },
   {
     value: FONT_FAMILY["Comic Shanns"],
-    icon: FontFamilyCodeIcon,
+    icon: fontFamilyCodeIcon,
     text: t("labels.code"),
     testId: "font-family-code",
   },

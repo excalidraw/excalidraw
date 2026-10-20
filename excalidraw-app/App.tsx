@@ -38,13 +38,13 @@ import { loadFromBlob } from "@excalidraw/excalidraw/data/blob";
 import { t } from "@excalidraw/excalidraw/i18n";
 
 import {
-  GithubIcon,
-  XBrandIcon,
-  DiscordIcon,
-  ExcalLogo,
+  githubIcon,
+  xBrandIcon,
+  discordIcon,
+  excalLogoIcon,
   usersIcon,
-  exportToPlus,
-  share,
+  exportToPlusIcon,
+  shareIcon,
   youtubeIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { isElementLink } from "@excalidraw/element";
@@ -903,7 +903,7 @@ const ExcalidrawWrapper = () => {
     label: "Excalidraw+",
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
-    icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
+    icon: <div style={{ width: 14 }}>{excalLogoIcon}</div>,
     keywords: ["plus", "cloud", "server"],
     perform: () => {
       window.open(
@@ -918,7 +918,7 @@ const ExcalidrawWrapper = () => {
     label: "Sign up",
     category: DEFAULT_CATEGORIES.links,
     predicate: true,
-    icon: <div style={{ width: 14 }}>{ExcalLogo}</div>,
+    icon: <div style={{ width: 14 }}>{excalLogoIcon}</div>,
     keywords: [
       "excalidraw",
       "plus",
@@ -1155,7 +1155,7 @@ const ExcalidrawWrapper = () => {
               label: t("labels.share"),
               category: DEFAULT_CATEGORIES.app,
               predicate: true,
-              icon: share,
+              icon: shareIcon,
               keywords: [
                 "link",
                 "shareable",
@@ -1173,7 +1173,7 @@ const ExcalidrawWrapper = () => {
             },
             {
               label: "GitHub",
-              icon: GithubIcon,
+              icon: githubIcon,
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
               keywords: [
@@ -1195,7 +1195,7 @@ const ExcalidrawWrapper = () => {
             },
             {
               label: t("labels.followUs"),
-              icon: XBrandIcon,
+              icon: xBrandIcon,
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
               keywords: ["twitter", "contact", "social", "community"],
@@ -1211,7 +1211,7 @@ const ExcalidrawWrapper = () => {
               label: t("labels.discordChat"),
               category: DEFAULT_CATEGORIES.links,
               predicate: true,
-              icon: DiscordIcon,
+              icon: discordIcon,
               keywords: [
                 "chat",
                 "talk",
@@ -1258,7 +1258,7 @@ const ExcalidrawWrapper = () => {
             {
               label: t("overwriteConfirm.action.excalidrawPlus.button"),
               category: DEFAULT_CATEGORIES.export,
-              icon: exportToPlus,
+              icon: exportToPlusIcon,
               predicate: true,
               keywords: ["plus", "export", "save", "backup"],
               perform: () => {

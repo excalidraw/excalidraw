@@ -6,7 +6,7 @@ import type { FontFamilyValues } from "@excalidraw/element/types";
 
 import { t } from "../../i18n";
 import { IconButton } from "../IconButton";
-import { TextIcon } from "../icons";
+import { textIcon } from "../icons";
 
 import { useExcalidrawSetAppState } from "../App";
 
@@ -36,7 +36,7 @@ export const FontPickerTrigger = ({
       <div data-openpopup="fontFamily" className="properties-trigger">
         <IconButton
           type="toggle"
-          icon={TextIcon}
+          icon={textIcon}
           title={t("labels.showFonts")}
           aria-label={t("labels.showFonts")}
           className="standalone properties-trigger"

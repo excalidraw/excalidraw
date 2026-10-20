@@ -5,7 +5,7 @@ import { useLibraryItemSvg } from "../hooks/useLibraryItemSvg";
 
 import { useEditorInterface } from "./App";
 import { CheckboxItem } from "./CheckboxItem";
-import { PlusIcon } from "./icons";
+import { plusIcon } from "./icons";
 import { hideTooltip, showTooltip } from "./Tooltip";
 
 import "./LibraryUnit.scss";
@@ -46,7 +46,7 @@ export const LibraryUnit = memo(
     const hasName = !!name?.trim();
 
     const adder = isPending && (
-      <div className="library-unit__adder">{PlusIcon}</div>
+      <div className="library-unit__adder">{plusIcon}</div>
     );
 
     return (

@@ -15,15 +15,15 @@ import Stack from "./Stack";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
   drawShapeToolIcon,
-  EmbedIcon,
+  embedIcon,
   frameToolIcon,
-  ImageIcon,
-  LassoIcon,
+  imageIcon,
+  lassoIcon,
   laserPointerToolIcon,
   bucketFillIcon,
-  MagicIcon,
+  magicIcon,
   mermaidLogoIcon,
-  DotsIcon,
+  dotsIcon,
 } from "./icons";
 import {
   ArrowToolButton,
@@ -100,20 +100,20 @@ const ExtraToolsDropdown = ({
         title={t("toolBar.extraTools")}
       >
         {imageToolSelected
-          ? ImageIcon
+          ? imageIcon
           : frameToolSelected
           ? frameToolIcon
           : embeddableToolSelected
-          ? EmbedIcon
+          ? embedIcon
           : isFullStylesPanel && drawShapeToolSelected
           ? drawShapeToolIcon
           : laserToolSelected && !app.props.isCollaborating
           ? laserPointerToolIcon
           : lassoToolSelected
-          ? LassoIcon
+          ? lassoIcon
           : bucketFillToolSelected
           ? bucketFillIcon
-          : DotsIcon}
+          : dotsIcon}
       </DropdownMenu.Trigger>
       <DropdownMenu.Content
         onClickOutside={() => setIsExtraToolsMenuOpen(false)}
@@ -123,7 +123,7 @@ const ExtraToolsDropdown = ({
         {UIOptions.tools?.image !== false && (
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "image" })}
-            icon={ImageIcon}
+            icon={imageIcon}
             shortcut={KEYS["9"]}
             data-testid="toolbar-image"
             selected={imageToolSelected}
@@ -144,7 +144,7 @@ const ExtraToolsDropdown = ({
         </DropdownMenu.Item>
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "embeddable" })}
-          icon={EmbedIcon}
+          icon={embedIcon}
           data-testid="toolbar-embeddable"
           selected={embeddableToolSelected}
           disabled={isToolButtonDisabled(app, "embeddable")}
@@ -184,7 +184,7 @@ const ExtraToolsDropdown = ({
         {isFullStylesPanel && (
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "lasso" })}
-            icon={LassoIcon}
+            icon={lassoIcon}
             data-testid="toolbar-lasso"
             selected={lassoToolSelected}
             disabled={isToolButtonDisabled(app, "lasso")}
@@ -206,7 +206,7 @@ const ExtraToolsDropdown = ({
         {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
           <DropdownMenu.Item
             onSelect={() => app.onMagicframeToolSelect()}
-            icon={MagicIcon}
+            icon={magicIcon}
             data-testid="toolbar-magicframe"
             badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
             disabled={isToolButtonDisabled(app, "magicframe")}

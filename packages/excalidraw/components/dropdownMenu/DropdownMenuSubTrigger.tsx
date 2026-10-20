@@ -2,7 +2,7 @@ import React from "react";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
-import { chevronRight } from "../icons";
+import { chevronRightIcon } from "../icons";
 
 import { getDropdownMenuItemClassName } from "./common";
 import MenuItemContent from "./DropdownMenuItemContent";
@@ -29,7 +29,9 @@ const DropdownMenuSubTrigger = ({
       <MenuItemContent icon={icon} shortcut={shortcut}>
         {children}
       </MenuItemContent>
-      <div className="dropdown-menu__submenu-trigger-icon">{chevronRight}</div>
+      <div className="dropdown-menu__submenu-trigger-icon">
+        {chevronRightIcon}
+      </div>
     </DropdownMenuPrimitive.SubTrigger>
   );
 };
