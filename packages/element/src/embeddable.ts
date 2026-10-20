@@ -148,6 +148,7 @@ const ALLOWED_DOMAINS = new Set([
   "giphy.com",
   "reddit.com",
   "forms.microsoft.com",
+  "somnathsinghstatrys.github.io",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
