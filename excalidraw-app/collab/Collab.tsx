@@ -67,6 +67,7 @@ import {
   generateCollaborationLinkData,
   getCollaborationLink,
   getSyncableElements,
+  isEncryptionAvailable,
 } from "../data";
 import {
   encodeFilesForUpload,
@@ -481,6 +482,11 @@ class Collab extends PureComponent<CollabProps, CollabState> {
   startCollaboration = async (
     existingRoomLinkData: null | { roomId: string; roomKey: string },
   ) => {
+    if (!isEncryptionAvailable()) {
+      this.setErrorDialog(t("errors.encryptionUnavailable"));
+      return null;
+    }
+
     if (!this.state.username) {
       import("@excalidraw/random-username").then(({ getRandomUsername }) => {
         const username = getRandomUsername();
