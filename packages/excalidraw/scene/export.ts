@@ -21,7 +21,9 @@ import { getCommonBounds, getElementAbsoluteCoords } from "@excalidraw/element";
 
 import {
   getInitializedImageElements,
+  getLineWidth,
   getNonDeletedElements,
+  getRenderEnvironment,
   updateImageCache,
 } from "@excalidraw/element";
 
@@ -41,6 +43,8 @@ import { syncInvalidIndices } from "@excalidraw/element";
 import { type Mutable } from "@excalidraw/common/utility-types";
 
 import { newTextElement } from "@excalidraw/element";
+
+import type { RenderEnvironment } from "@excalidraw/element";
 
 import type {
   ExcalidrawFrameLikeElement,
@@ -92,33 +96,33 @@ const DEFAULT_ZOOM_VALUE = 1 as NormalizedZoomValue;
 const truncateText = (
   element: NonDeleted<ExcalidrawTextElement>,
   maxWidth: number,
+  renderEnvironment: RenderEnvironment,
 ) => {
   if (element.width <= maxWidth) {
     return element;
   }
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
-  ctx.font = getFontString({
+  const font = getFontString({
     fontFamily: element.fontFamily,
     fontSize: element.fontSize,
   });
 
   let text = element.text;
 
-  const metrics = ctx.measureText(text);
-
-  if (metrics.width > maxWidth) {
+  if (getLineWidth(text, font, renderEnvironment) > maxWidth) {
     // we iterate from the right, removing characters one by one instead
     // of building the string up. This assumes that it's more likely
     // your frame names will overflow by not that many characters
-    // (if ever), so it should be faster this way.
-    for (let i = text.length; i > 0; i--) {
+    // (if ever), so it should be faster this way. Down to just the ellipsis,
+    // and no label at all where even that overflows the frame.
+    let truncated = "";
+    for (let i = text.length; i >= 0; i--) {
       const newText = `${text.slice(0, i)}...`;
-      if (ctx.measureText(newText).width <= maxWidth) {
-        text = newText;
+      if (getLineWidth(newText, font, renderEnvironment) <= maxWidth) {
+        truncated = newText;
         break;
       }
     }
+    text = truncated;
   }
   return newElementWith(element, { text, width: maxWidth });
 };
@@ -131,7 +135,7 @@ const truncateText = (
  */
 const addFrameLabelsAsTextElements = (
   elements: readonly NonDeletedExcalidrawElement[],
-  opts: { theme: Theme },
+  opts: { theme: Theme; renderEnvironment: RenderEnvironment },
 ) => {
   const nextElements: NonDeletedExcalidrawElement[] = [];
   for (const element of elements) {
@@ -152,10 +156,15 @@ const addFrameLabelsAsTextElements = (
                 removeDarkModeFilter(FRAME_STYLE.nameColorDarkTheme)
               : FRAME_STYLE.nameColorLightTheme,
           text: getFrameLikeTitle(element),
+          renderEnvironment: opts.renderEnvironment,
         });
       textElement.y -= textElement.height;
 
-      textElement = truncateText(textElement, element.width);
+      textElement = truncateText(
+        textElement,
+        element.width,
+        opts.renderEnvironment,
+      );
 
       nextElements.push(textElement);
     }
@@ -180,11 +189,13 @@ const prepareElementsForRender = ({
   exportingFrame,
   frameRendering,
   theme,
+  renderEnvironment,
 }: {
   elements: readonly NonDeletedExcalidrawElement[];
   exportingFrame: ExcalidrawFrameLikeElement | null | undefined;
   frameRendering: AppState["frameRendering"];
   theme: Theme;
+  renderEnvironment: RenderEnvironment;
 }) => {
   let nextElements: readonly NonDeletedExcalidrawElement[];
 
@@ -195,7 +206,10 @@ const prepareElementsForRender = ({
       arrayToMap(elements),
     );
   } else if (frameRendering.enabled && frameRendering.name) {
-    nextElements = addFrameLabelsAsTextElements(elements, { theme });
+    nextElements = addFrameLabelsAsTextElements(elements, {
+      theme,
+      renderEnvironment,
+    });
   } else {
     nextElements = elements;
   }
@@ -219,16 +233,54 @@ export type ExportSceneData = {
   files?: BinaryFiles | null;
 };
 
+/**
+ * The host capabilities an export uses, shared by every format: e.g. for test
+ * environments, Node.js or another window.
+ *
+ * Unlike the editor's `renderEnvironment` prop, this needn't be the same
+ * object across exports (e.g. on a server): exports draw without the element
+ * caches keyed by an environment, and measure little text. Passing a complete
+ * one (`createCanvas` and `createImage`) as-is, as the editor does, only keeps
+ * its measuring caches warm.
+ */
 type ExportEnvironment = {
   /**
-   * Creates the canvas to export into.
+   * Creates the canvas a canvas/PNG/JPEG export renders into, and any canvas
+   * the export measures text with (e.g. frame labels, embed placeholders).
    *
    * Do not set `canvas.width/height` or modify the canvas context as that's
    * handled by Excalidraw.
    *
    * Defaults to `document.createElement("canvas")`.
    */
-  createCanvas?: () => HTMLCanvasElement;
+  createCanvas?: RenderEnvironment["createCanvas"];
+  /**
+   * Creates the images that image elements are decoded into.
+   *
+   * Defaults to `new Image()`.
+   */
+  createImage?: RenderEnvironment["createImage"];
+  /**
+   * Creates the paths that freedraw elements are filled through.
+   *
+   * Defaults to the global `Path2D`.
+   */
+  createPath?: RenderEnvironment["createPath"];
+  /**
+   * The document an SVG export is built in, e.g. a popout window's or,
+   * outside the browser, a DOM implementation's (such as `linkedom`).
+   *
+   * Defaults to the global `document`.
+   */
+  document?: RenderEnvironment["document"];
+  /**
+   * Measures text (frame labels, embed placeholders), e.g. where there is no
+   * canvas to measure on.
+   *
+   * Defaults to the global provider set with `setCustomTextMetricsProvider`,
+   * else to measuring on a canvas from `createCanvas`.
+   */
+  textMetrics?: RenderEnvironment["textMetrics"];
   /**
    * Loads the fonts the exported elements use, before rendering.
    *
@@ -445,6 +497,28 @@ type ExportSizeConfig =
 export type ExportSceneConfig = ExportSceneBaseConfig & ExportSizeConfig;
 
 /**
+ * The render environment of an export: `config.environment` over the browser
+ * defaults.
+ */
+const getExportRenderEnvironment = (
+  environment: ExportEnvironment | undefined,
+): RenderEnvironment => {
+  // a complete one (e.g. the editor's) is used as-is, keeping the caches
+  // keyed by its identity
+  if (environment?.createCanvas && environment.createImage) {
+    return environment as RenderEnvironment;
+  }
+  const defaults = getRenderEnvironment();
+  return {
+    createCanvas: environment?.createCanvas ?? defaults.createCanvas,
+    createImage: environment?.createImage ?? defaults.createImage,
+    createPath: environment?.createPath ?? defaults.createPath,
+    document: environment?.document ?? defaults.document,
+    textMetrics: environment?.textMetrics ?? defaults.textMetrics,
+  };
+};
+
+/**
  * The export config the editor's export settings translate to. Internal: hosts
  * pass their own config.
  */
@@ -475,9 +549,12 @@ export const getExportConfigFromAppState = (
 const configExportDimension = async ({
   data,
   config,
+  renderEnvironment,
 }: {
   data: ExportSceneData;
   config?: ExportSceneConfig;
+  /** measures what the export adds (frame labels) */
+  renderEnvironment: RenderEnvironment;
 }) => {
   // clone (widened, as the size options get normalized below)
   const cfg: ExportSceneBaseConfig & ExportSizeOptions = Object.assign(
@@ -534,6 +611,7 @@ const configExportDimension = async ({
     exportingFrame,
     theme,
     frameRendering,
+    renderEnvironment,
   });
 
   if (exportingFrame) {
@@ -764,6 +842,8 @@ const exportToCanvas = async ({
   data: ExportSceneData;
   config?: ExportSceneConfig;
 }) => {
+  const renderEnvironment = getExportRenderEnvironment(config?.environment);
+
   const {
     config: cfg,
     elements,
@@ -781,11 +861,9 @@ const exportToCanvas = async ({
     backgroundColor,
     paintedBackgroundColor,
     theme,
-  } = await configExportDimension({ data, config });
+  } = await configExportDimension({ data, config, renderEnvironment });
 
-  const canvas = cfg.environment?.createCanvas
-    ? cfg.environment.createCanvas()
-    : document.createElement("canvas");
+  const canvas = renderEnvironment.createCanvas();
 
   // round rather than letting the canvas truncate, which would turn float
   // noise (e.g. 28.999999999999996) into a pixel lost
@@ -798,6 +876,7 @@ const exportToCanvas = async ({
       (element) => element.fileId,
     ),
     files: data.files || {},
+    createImage: renderEnvironment.createImage,
   });
 
   renderStaticScene({
@@ -829,6 +908,8 @@ const exportToCanvas = async ({
     renderConfig: {
       canvasBackgroundColor: backgroundColor,
       clipToFrame: cfg.exportingFrame ?? null,
+      scale: exportScale,
+      renderEnvironment,
       imageCache,
       renderGrid: false,
       isExporting: true,
@@ -855,12 +936,9 @@ type ExportToSvgConfig = Pick<
   | "exportingFrame"
   | "scale"
   | "frames"
+  | "environment"
 > &
   ExportSizeConfig & {
-    /**
-     * Host environment overrides, e.g. for test environments or Node.js.
-     */
-    environment?: Pick<ExportEnvironment, "loadFonts">;
     /**
      * if true, all embeddables passed in will be rendered when possible.
      */
@@ -874,11 +952,11 @@ type ExportToSvgConfig = Pick<
     embedScene?: boolean;
   };
 
-const createHTMLComment = (text: string) => {
+const createHTMLComment = (ownerDocument: Document, text: string) => {
   // surrounding with spaces to maintain prettified consistency with previous
   // iterations
   // <!-- comment -->
-  return document.createComment(` ${text} `);
+  return ownerDocument.createComment(` ${text} `);
 };
 
 const exportToSvg = async ({
@@ -888,6 +966,19 @@ const exportToSvg = async ({
   data: ExportSceneData;
   config?: ExportToSvgConfig;
 }) => {
+  const renderEnvironment = getExportRenderEnvironment(config?.environment);
+
+  const ownerDocument =
+    renderEnvironment.document ??
+    (typeof document !== "undefined" ? document : null);
+
+  if (!ownerDocument) {
+    throw new Error(
+      "exportScene: no document to build the SVG in. Pass " +
+        "`config.environment.document` when running outside the browser.",
+    );
+  }
+
   const {
     config: cfg,
     elements,
@@ -903,7 +994,7 @@ const exportToSvg = async ({
     backgroundColor,
     paintedBackgroundColor,
     theme,
-  } = await configExportDimension({ data, config });
+  } = await configExportDimension({ data, config, renderEnvironment });
 
   const offsetX = -(x - normalizedPadding);
   const offsetY = -(y - normalizedPadding);
@@ -914,7 +1005,7 @@ const exportToSvg = async ({
   // initialize SVG root element
   // ---------------------------------------------------------------------------
 
-  const svgRoot = document.createElementNS(SVG_NS, "svg");
+  const svgRoot = ownerDocument.createElementNS(SVG_NS, "svg");
 
   svgRoot.setAttribute("version", "1.1");
   svgRoot.setAttribute("xmlns", SVG_NS);
@@ -925,14 +1016,13 @@ const exportToSvg = async ({
   svgRoot.setAttribute("width", `${exportWidth}`);
   svgRoot.setAttribute("height", `${exportHeight}`);
 
-  const defsElement = svgRoot.ownerDocument.createElementNS(SVG_NS, "defs");
+  const defsElement = ownerDocument.createElementNS(SVG_NS, "defs");
 
-  const metadataElement = svgRoot.ownerDocument.createElementNS(
-    SVG_NS,
-    "metadata",
+  const metadataElement = ownerDocument.createElementNS(SVG_NS, "metadata");
+
+  svgRoot.appendChild(
+    createHTMLComment(ownerDocument, "svg-source:excalidraw"),
   );
-
-  svgRoot.appendChild(createHTMLComment("svg-source:excalidraw"));
   svgRoot.appendChild(metadataElement);
   svgRoot.appendChild(defsElement);
 
@@ -975,10 +1065,7 @@ const exportToSvg = async ({
     const elementsMap = arrayToMap(elements);
 
     for (const frame of frameElements) {
-      const clipPath = svgRoot.ownerDocument.createElementNS(
-        SVG_NS,
-        "clipPath",
-      );
+      const clipPath = ownerDocument.createElementNS(SVG_NS, "clipPath");
 
       clipPath.setAttribute("id", frame.id);
 
@@ -986,7 +1073,7 @@ const exportToSvg = async ({
       const cx = (x2 - x1) / 2 - (frame.x - x1);
       const cy = (y2 - y1) / 2 - (frame.y - y1);
 
-      const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+      const rect = ownerDocument.createElementNS(SVG_NS, "rect");
       rect.setAttribute(
         "transform",
         `translate(${frame.x + offsetX} ${frame.y + offsetY}) rotate(${
@@ -1018,10 +1105,10 @@ const exportToSvg = async ({
 
   const delimiter = "\n      "; // 6 spaces
 
-  const style = svgRoot.ownerDocument.createElementNS(SVG_NS, "style");
+  const style = ownerDocument.createElementNS(SVG_NS, "style");
   style.classList.add("style-fonts");
   style.appendChild(
-    document.createTextNode(`${delimiter}${fontFaces.join(delimiter)}`),
+    ownerDocument.createTextNode(`${delimiter}${fontFaces.join(delimiter)}`),
   );
 
   defsElement.appendChild(style);
@@ -1032,7 +1119,7 @@ const exportToSvg = async ({
 
   // render background rect
   if (paintedBackgroundColor !== "transparent") {
-    const rect = svgRoot.ownerDocument.createElementNS(SVG_NS, "rect");
+    const rect = ownerDocument.createElementNS(SVG_NS, "rect");
     rect.setAttribute("x", "0");
     rect.setAttribute("y", "0");
     rect.setAttribute("width", `${exportWidth / exportScale}`);
@@ -1056,7 +1143,7 @@ const exportToSvg = async ({
   // square corners), as the export may be larger than the frame
   let elementsRoot: SVGElement = svgRoot;
   if (cfg.exportingFrame) {
-    elementsRoot = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
+    elementsRoot = ownerDocument.createElementNS(SVG_NS, "g");
     elementsRoot.setAttribute("clip-path", `url(#${cfg.exportingFrame.id})`);
     svgRoot.appendChild(elementsRoot);
   }
@@ -1071,6 +1158,7 @@ const exportToSvg = async ({
       offsetX,
       offsetY,
       isExporting: true,
+      renderEnvironment,
       exportWithDarkMode,
       renderEmbeddables,
       frameRendering,
@@ -1108,13 +1196,19 @@ export const encodeSvgBase64Payload = ({
     true /* is already byte string */,
   );
 
+  const ownerDocument = metadataElement.ownerDocument;
+
   metadataElement.appendChild(
-    createHTMLComment(`payload-type:${MIME_TYPES.excalidraw}`),
+    createHTMLComment(ownerDocument, `payload-type:${MIME_TYPES.excalidraw}`),
   );
-  metadataElement.appendChild(createHTMLComment("payload-version:2"));
-  metadataElement.appendChild(createHTMLComment("payload-start"));
-  metadataElement.appendChild(document.createTextNode(base64));
-  metadataElement.appendChild(createHTMLComment("payload-end"));
+  metadataElement.appendChild(
+    createHTMLComment(ownerDocument, "payload-version:2"),
+  );
+  metadataElement.appendChild(
+    createHTMLComment(ownerDocument, "payload-start"),
+  );
+  metadataElement.appendChild(ownerDocument.createTextNode(base64));
+  metadataElement.appendChild(createHTMLComment(ownerDocument, "payload-end"));
 };
 
 export const decodeSvgBase64Payload = ({ svg }: { svg: string }) => {

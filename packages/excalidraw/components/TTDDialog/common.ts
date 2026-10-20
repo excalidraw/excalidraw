@@ -110,7 +110,7 @@ export const convertMermaidToExcalidraw = async ({
         padding: DEFAULT_EXPORT_PADDING,
         maxWidthOrHeight:
           Math.max(parent.offsetWidth, parent.offsetHeight) *
-          window.devicePixelRatio,
+          (parent.ownerDocument.defaultView?.devicePixelRatio ?? 1),
         theme,
       },
     });

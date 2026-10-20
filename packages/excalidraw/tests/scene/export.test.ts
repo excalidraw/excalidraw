@@ -531,6 +531,24 @@ describe("export inputs", () => {
     expect(loadFonts).toHaveBeenCalledTimes(1);
   });
 
+  it("measures text through environment.textMetrics", async () => {
+    const getLineWidth = vi.fn((text: string) => text.length * 100);
+    const frame = API.createElement({ type: "frame", width: 450 });
+
+    const svg = await exportScene({
+      type: "svg",
+      data: { elements: [frame] },
+      config: { environment: { textMetrics: { getLineWidth } } },
+    });
+
+    // "Frame" is 500 wide by these metrics, so the label is truncated to fit
+    // the 450 wide frame
+    expect(getLineWidth).toHaveBeenCalledWith("Frame", expect.any(String));
+    expect(
+      Array.from(svg.querySelectorAll("text")).map((text) => text.textContent),
+    ).toContain("F...");
+  });
+
   it("renders frame decorations per config.frames", async () => {
     const elements = [API.createElement({ type: "frame" })];
     const countFrameNames = (svg: SVGSVGElement) =>
@@ -653,6 +671,25 @@ describe("exporting frames", () => {
         (text) => text.textContent === "Frame",
       );
       expect(label).toHaveAttribute("fill", FRAME_STYLE.nameColorDarkTheme);
+    });
+
+    it("truncates frame names to what fits, down to no name at all", async () => {
+      // 10px per character in tests, so "..." is 30 wide
+      const svg = await exportScene({
+        type: "svg",
+        data: {
+          elements: [
+            API.createElement({ type: "frame", x: 0, width: 20 }),
+            API.createElement({ type: "frame", x: 100, width: 35 }),
+          ],
+        },
+      });
+
+      expect(
+        Array.from(svg.querySelectorAll("text"))
+          .map((text) => text.textContent)
+          .filter(Boolean),
+      ).toEqual(["..."]);
     });
 
     it("clips a frame export larger than the frame to the frame", async () => {

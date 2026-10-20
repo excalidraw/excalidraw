@@ -36,7 +36,7 @@ Breaking. `exportToCanvas`, `exportToBlob` and `exportToSvg` (in both `@excalidr
   | `maxWidthOrHeight`, `exportingFrame`, `renderEmbeddables`, `skipInliningFonts`, `reuseImages` | same names, in `config` |
 
 - New sizing options: `width`/`height` (only one given: the other follows the content's aspect ratio), `widthOrHeight` (scales the longest side to exactly that size), `fit: "contain" | "none"` and `position: "center" | "topLeft"` within a `width`/`height` frame, and `x`/`y`/`origin` to export a region (cropped, with padding on all sides). The size options are mutually exclusive in the types, and `fit`, `position` and `x`/`y` only combine with `width`/`height`.
-- `config.environment` for non-browser hosts: `createCanvas` (e.g. `node-canvas`) and `loadFonts`.
+- `config.environment` for non-browser hosts and other windows, the same for every format: `createCanvas` (e.g. `node-canvas`), `createImage`, `createPath`, `document` (the one SVG is built in, e.g. `linkedom`), `textMetrics` and `loadFonts`.
 - Canvas dimensions are rounded instead of truncated, so float noise no longer costs a pixel (a 20.5px frame-label band now rounds up), and are at least 1px (flat content with no padding used to produce an empty canvas that couldn't be encoded).
 - In dark exports, frame names now use the editor's dark frame-name color (they were dark-filtered twice and came out lighter).
 

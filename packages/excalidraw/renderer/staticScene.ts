@@ -23,9 +23,14 @@ import {
   getRenderElementWithPositionOverride,
   resolveElementRenderState,
   renderElement,
+  withSavedContext,
 } from "@excalidraw/element";
 
+import { getRenderEnvironment } from "@excalidraw/element/renderEnvironment";
+
 import { getElementAbsoluteCoords } from "@excalidraw/element";
+
+import type { RenderEnvironment } from "@excalidraw/element/renderEnvironment";
 
 import type { ElementRenderState } from "@excalidraw/element";
 
@@ -37,8 +42,8 @@ import type {
 } from "@excalidraw/element/types";
 
 import {
-  EXTERNAL_LINK_IMG,
-  ELEMENT_LINK_IMG,
+  getExternalLinkImg,
+  getElementLinkImg,
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 
@@ -53,6 +58,25 @@ import type {
   StaticSceneRenderConfig,
 } from "../scene/types";
 import type { StaticCanvasAppState, Zoom } from "../types";
+
+/**
+ * A render failure is per-element on purpose, on export too: one bad element
+ * must not blank the canvas or fail the export, the rest of the scene
+ * survives it.
+ */
+const logElementRenderError = (
+  error: unknown,
+  element: NonDeletedExcalidrawElement,
+) => {
+  console.error(
+    error,
+    element.id,
+    element.x,
+    element.y,
+    element.width,
+    element.height,
+  );
+};
 
 const GridLineColor = {
   [THEME.LIGHT]: {
@@ -188,15 +212,20 @@ export const frameClip = (
   );
 };
 
-type LinkIconCanvas = HTMLCanvasElement & { zoom: number };
+type LinkIconCanvasCacheType = "regularLink" | "elementLink";
 
-const linkIconCanvasCache: {
-  regularLink: LinkIconCanvas | null;
-  elementLink: LinkIconCanvas | null;
-} = {
-  regularLink: null,
-  elementLink: null,
-};
+const linkIconCanvasCache = new WeakMap<
+  RenderEnvironment,
+  Map<string, HTMLCanvasElement>
+>();
+const LINK_ICON_CACHE_MAX_ENTRIES = 8;
+
+const getLinkIconCacheKey = (
+  type: LinkIconCanvasCacheType,
+  canvasWidth: number,
+  canvasHeight: number,
+  backgroundColor: string,
+) => `${type}:${canvasWidth}x${canvasHeight}:${backgroundColor}`;
 
 const renderLinkIcon = (
   element: NonDeletedExcalidrawElement,
@@ -204,6 +233,9 @@ const renderLinkIcon = (
   appState: StaticCanvasAppState,
   elementsMap: ElementsMap,
   renderState: ElementRenderState,
+  /** backing-store scale, see StaticCanvasRenderConfig["scale"] */
+  scale: number,
+  renderEnvironment: RenderEnvironment,
 ) => {
   if (element.link && !appState.selectedElementIds[element.id]) {
     const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
@@ -223,46 +255,73 @@ const renderLinkIcon = (
     context.translate(appState.scrollX + centerX, appState.scrollY + centerY);
     context.rotate(element.angle);
 
-    const canvasKey = isElementLink(element.link)
+    const canvasKey: LinkIconCanvasCacheType = isElementLink(element.link)
       ? "elementLink"
       : "regularLink";
 
-    let linkCanvas = linkIconCanvasCache[canvasKey];
+    const linkImg =
+      canvasKey === "elementLink"
+        ? getElementLinkImg(renderEnvironment)
+        : getExternalLinkImg(renderEnvironment);
 
-    if (!linkCanvas || linkCanvas.zoom !== appState.zoom.value) {
-      linkCanvas = Object.assign(document.createElement("canvas"), {
-        zoom: appState.zoom.value,
-      });
-      linkCanvas.width = width * window.devicePixelRatio * appState.zoom.value;
-      linkCanvas.height =
-        height * window.devicePixelRatio * appState.zoom.value;
-      linkIconCanvasCache[canvasKey] = linkCanvas;
+    if (linkImg.status !== "decoded") {
+      context.restore();
+      return;
+    }
+
+    const canvasWidth = Math.max(
+      1,
+      Math.floor(width * scale * appState.zoom.value),
+    );
+    const canvasHeight = Math.max(
+      1,
+      Math.floor(height * scale * appState.zoom.value),
+    );
+    const backgroundColor = appState.viewBackgroundColor || COLOR_WHITE;
+    const cacheKey = getLinkIconCacheKey(
+      canvasKey,
+      canvasWidth,
+      canvasHeight,
+      backgroundColor,
+    );
+
+    let cache = linkIconCanvasCache.get(renderEnvironment);
+    if (!cache) {
+      cache = new Map();
+      linkIconCanvasCache.set(renderEnvironment, cache);
+    }
+
+    let linkCanvas = cache.get(cacheKey);
+
+    if (linkCanvas) {
+      cache.delete(cacheKey);
+      cache.set(cacheKey, linkCanvas);
+    } else {
+      linkCanvas = renderEnvironment.createCanvas();
+      linkCanvas.width = canvasWidth;
+      linkCanvas.height = canvasHeight;
+      cache.set(cacheKey, linkCanvas);
+      if (cache.size > LINK_ICON_CACHE_MAX_ENTRIES) {
+        const lruKey = cache.keys().next().value;
+        if (lruKey !== undefined) {
+          cache.delete(lruKey);
+        }
+      }
 
       const linkCanvasCacheContext = linkCanvas.getContext("2d")!;
       linkCanvasCacheContext.scale(
-        window.devicePixelRatio * appState.zoom.value,
-        window.devicePixelRatio * appState.zoom.value,
+        scale * appState.zoom.value,
+        scale * appState.zoom.value,
       );
 
       // Seed a sane default so a corrupted color (silently rejected by the
       // canvas) falls back to white instead of a stale fillStyle.
       linkCanvasCacheContext.fillStyle = COLOR_WHITE;
-      linkCanvasCacheContext.fillStyle =
-        appState.viewBackgroundColor || COLOR_WHITE;
+      linkCanvasCacheContext.fillStyle = backgroundColor;
 
       linkCanvasCacheContext.fillRect(0, 0, width, height);
 
-      if (canvasKey === "elementLink") {
-        linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
-      } else {
-        linkCanvasCacheContext.drawImage(
-          EXTERNAL_LINK_IMG,
-          0,
-          0,
-          width,
-          height,
-        );
-      }
+      linkCanvasCacheContext.drawImage(linkImg.img, 0, 0, width, height);
 
       linkCanvasCacheContext.restore();
     }
@@ -418,48 +477,48 @@ const _renderStaticScene = ({
           return;
         }
 
-        context.save();
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
         const renderState = getRenderState(element);
-        clipElementToFrame(element, renderState);
-        renderElement(
-          element,
-          elementsMap,
-          allElementsMap,
-          rc,
-          context,
-          renderConfig,
-          appState,
-          renderState,
-        );
-
-        if (boundTextElement) {
+        withSavedContext(context, () => {
+          clipElementToFrame(element, renderState);
           renderElement(
-            boundTextElement,
+            element,
             elementsMap,
             allElementsMap,
             rc,
             context,
             renderConfig,
             appState,
+            renderState,
           );
-        }
 
-        context.restore();
+          if (boundTextElement) {
+            renderElement(
+              boundTextElement,
+              elementsMap,
+              allElementsMap,
+              rc,
+              context,
+              renderConfig,
+              appState,
+            );
+          }
+        });
 
         if (!isExporting && renderConfig.renderLinks !== false) {
-          renderLinkIcon(element, context, appState, elementsMap, renderState);
+          renderLinkIcon(
+            element,
+            context,
+            appState,
+            elementsMap,
+            renderState,
+            scale,
+            getRenderEnvironment(renderConfig.renderEnvironment),
+          );
         }
       } catch (error: any) {
-        console.error(
-          error,
-          element.id,
-          element.x,
-          element.y,
-          element.width,
-          element.height,
-        );
+        logElementRenderError(error, element);
       }
     });
 
@@ -469,50 +528,62 @@ const _renderStaticScene = ({
     .forEach((element) => {
       try {
         const renderState = getRenderState(element);
-        context.save();
-        clipElementToFrame(element, renderState);
-        renderElement(
-          element,
-          elementsMap,
-          allElementsMap,
-          rc,
-          context,
-          renderConfig,
-          appState,
-          renderState,
-        );
-
-        if (
-          isIframeLikeElement(element) &&
-          (isExporting ||
-            (isEmbeddableElement(element) &&
-              renderConfig.embedsValidationStatus.get(element.id) !== true)) &&
-          element.width &&
-          element.height
-        ) {
-          const label = {
-            ...createPlaceholderEmbeddableLabel(element),
-            // Synthetic visual: resolve overrides and frame opacity through
-            // its owner, without creating another animation target.
-            id: element.id,
-            frameId: element.frameId,
-          };
+        withSavedContext(context, () => {
+          clipElementToFrame(element, renderState);
           renderElement(
-            label,
+            element,
             elementsMap,
             allElementsMap,
             rc,
             context,
             renderConfig,
             appState,
+            renderState,
           );
-        }
-        if (!isExporting && renderConfig.renderLinks !== false) {
-          renderLinkIcon(element, context, appState, elementsMap, renderState);
-        }
-        context.restore();
+
+          if (
+            isIframeLikeElement(element) &&
+            (isExporting ||
+              (isEmbeddableElement(element) &&
+                renderConfig.embedsValidationStatus.get(element.id) !==
+                  true)) &&
+            element.width &&
+            element.height
+          ) {
+            const label = {
+              ...createPlaceholderEmbeddableLabel(
+                element,
+                renderConfig.renderEnvironment,
+              ),
+              // Synthetic visual: resolve overrides and frame opacity through
+              // its owner, without creating another animation target.
+              id: element.id,
+              frameId: element.frameId,
+            };
+            renderElement(
+              label,
+              elementsMap,
+              allElementsMap,
+              rc,
+              context,
+              renderConfig,
+              appState,
+            );
+          }
+          if (!isExporting && renderConfig.renderLinks !== false) {
+            renderLinkIcon(
+              element,
+              context,
+              appState,
+              elementsMap,
+              renderState,
+              scale,
+              getRenderEnvironment(renderConfig.renderEnvironment),
+            );
+          }
+        });
       } catch (error: any) {
-        console.error(error);
+        logElementRenderError(error, element);
       }
     });
 
@@ -529,17 +600,57 @@ const _renderStaticScene = ({
         appState,
       );
     } catch (error) {
-      console.error(error);
+      logElementRenderError(error, element);
     }
   });
 };
 
-/** throttled to animation framerate */
-export const renderStaticSceneThrottled = throttleRAF(
-  (config: StaticSceneRenderConfig) => {
-    _renderStaticScene(config);
-  },
-);
+type StaticSceneThrottle = ReturnType<typeof throttleRAF>;
+
+const staticSceneThrottles = new WeakMap<
+  HTMLCanvasElement,
+  { throttle: StaticSceneThrottle; ownerWindow: Window }
+>();
+
+const getStaticSceneThrottle = (canvas: HTMLCanvasElement) => {
+  const ownerWindow = canvas.ownerDocument.defaultView ?? window;
+  let entry = staticSceneThrottles.get(canvas);
+  // the owner window is captured when the throttle is built, so a canvas
+  // adopted into another document (moved rather than remounted) would keep
+  // scheduling on the old window's rAF -- which never fires once that window
+  // is closed. rebuild whenever the owner window no longer matches.
+  if (entry && entry.ownerWindow !== ownerWindow) {
+    entry.throttle.cancel();
+    entry = undefined;
+  }
+  if (!entry) {
+    entry = {
+      throttle: throttleRAF((config: StaticSceneRenderConfig) => {
+        _renderStaticScene(config);
+      }, ownerWindow),
+      ownerWindow,
+    };
+    staticSceneThrottles.set(canvas, entry);
+  }
+  return entry.throttle;
+};
+
+/**
+ * Throttled to animation framerate, one throttle per canvas. A shared
+ * throttle drops all but the last caller's pending frame when multiple
+ * editors render in the same frame, and a module-realm scheduler would run
+ * popout renders on the main window's rAF, which freezes while that window
+ * is hidden.
+ */
+export const renderStaticSceneThrottled = (config: StaticSceneRenderConfig) => {
+  getStaticSceneThrottle(config.canvas)(config);
+};
+
+/** Drops the canvas' pending frame; the throttle itself is dropped with the
+ * canvas. */
+export const cancelStaticSceneThrottle = (canvas: HTMLCanvasElement) => {
+  staticSceneThrottles.get(canvas)?.throttle.cancel();
+};
 
 /**
  * Static scene is the non-ui canvas where we render elements.
