@@ -7047,7 +7047,7 @@ class App extends React.Component<AppProps, AppState> {
           // if we haven't yet created a temp point and we're beyond commit-zone
           // threshold, add a point
           pointDistance(
-            pointFrom(scenePointerX - rx, scenePointerY - ry),
+            pointFrom<LocalPoint>(scenePointerX - rx, scenePointerY - ry),
             lastPoint,
           ) >= LINE_CONFIRM_THRESHOLD
         ) {
@@ -7088,7 +7088,7 @@ class App extends React.Component<AppProps, AppState> {
         points.length > 2 &&
         lastCommittedPoint &&
         pointDistance(
-          pointFrom(scenePointerX - rx, scenePointerY - ry),
+          pointFrom<LocalPoint>(scenePointerX - rx, scenePointerY - ry),
           lastCommittedPoint,
         ) < LINE_CONFIRM_THRESHOLD
       ) {
@@ -8572,7 +8572,7 @@ class App extends React.Component<AppProps, AppState> {
       const lastCommittedPointIsInsideCommitZone =
         lastCommittedPoint &&
         pointDistance(
-          pointFrom(
+          pointFrom<LocalPoint>(
             pointerDownState.origin.x - rx,
             pointerDownState.origin.y - ry,
           ),

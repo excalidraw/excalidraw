@@ -2,8 +2,7 @@ import { PRECISION } from "./utils";
 
 import type {
   Degrees,
-  GlobalPoint,
-  LocalPoint,
+  GenericPoint,
   PolarCoords,
   Radians,
 } from "./types";
@@ -18,7 +17,7 @@ export const normalizeRadians = (angle: Radians): Radians =>
  * (x, y) for the center point 0,0 where the first number returned is the radius,
  * the second is the angle in radians.
  */
-export const cartesian2Polar = <P extends GlobalPoint | LocalPoint>([
+export const cartesian2Polar = <P extends GenericPoint>([
   x,
   y,
 ]: P): PolarCoords => [

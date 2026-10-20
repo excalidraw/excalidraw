@@ -2,7 +2,7 @@ import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 import { LegendreGaussN24CValues, LegendreGaussN24TValues } from "./constants";
 
-import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
+import type { Curve, GenericPoint, GlobalPoint, LineSegment, LocalPoint } from "./types";
 
 /**
  *
@@ -12,7 +12,7 @@ import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
  * @param d
  * @returns
  */
-export function curve<Point extends GlobalPoint | LocalPoint>(
+export function curve<Point extends GenericPoint>(
   a: Point,
   b: Point,
   c: Point,
@@ -21,7 +21,7 @@ export function curve<Point extends GlobalPoint | LocalPoint>(
   return [a, b, c, d] as Curve<Point>;
 }
 
-function solveWithAnalyticalJacobian<Point extends GlobalPoint | LocalPoint>(
+function solveWithAnalyticalJacobian<Point extends GenericPoint>(
   curve: Curve<Point>,
   lineSegment: LineSegment<Point>,
   t0: number,
