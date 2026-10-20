@@ -146,6 +146,31 @@ describe("contextMenu element", () => {
         contextMenu?.querySelector(`li[data-testid="${item}"]`),
       ).not.toBeNull();
     });
+
+    for (const actionName of [
+      "paste",
+      "wrapSelectionInFrame",
+      "addToLibrary",
+    ]) {
+      expect(
+        contextMenu?.querySelector(
+          `[data-testid="${actionName}"] .context-menu-item__icon svg`,
+        ),
+      ).not.toBeNull();
+    }
+
+    const copyIcon = contextMenu?.querySelector(
+      '[data-testid="copy"] .context-menu-item__icon',
+    );
+
+    expect(copyIcon?.querySelector("svg")).not.toBeNull();
+    expect(copyIcon?.getAttribute("aria-hidden")).toBe("true");
+
+    expect(
+      contextMenu?.querySelector(
+        '[data-testid="deleteSelectedElements"] .context-menu-item__icon svg',
+      ),
+    ).not.toBeNull();
   });
 
   it("shows context menu for element", () => {
@@ -239,6 +264,12 @@ describe("contextMenu element", () => {
         contextMenu?.querySelector(`li[data-testid="${shortcutName}"]`),
       ).not.toBeNull();
     });
+
+    expect(
+      contextMenu?.querySelector(
+        '[data-testid="group"] .context-menu-item__icon svg',
+      ),
+    ).not.toBeNull();
   });
 
   it("shows 'Ungroup selection' in context menu for group inside selected elements", () => {
