@@ -1,4 +1,8 @@
-import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
+import {
+  embeddableURLValidator,
+  getEmbedLink,
+  maybeParseEmbedSrc,
+} from "../src/embeddable";
 
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
@@ -241,5 +245,27 @@ describe("Google Drive video embedding", () => {
         undefined,
       ),
     ).toBe(true);
+  });
+});
+
+describe("Giphy links", () => {
+  it("should use the id at the end of slugged Giphy links", () => {
+    expect(
+      maybeParseEmbedSrc(
+        "https://giphy.com/gifs/theoffice-the-office-tv-michael-scott-ZK2W0gl0w0vkI",
+      ),
+    ).toBe("https://giphy.com/embed/ZK2W0gl0w0vkI");
+    expect(
+      maybeParseEmbedSrc("https://giphy.com/clips/cat-funny-abc123XYZ"),
+    ).toBe("https://giphy.com/embed/abc123XYZ");
+  });
+
+  it("should handle Giphy links without a slug", () => {
+    expect(maybeParseEmbedSrc("https://giphy.com/gifs/ZK2W0gl0w0vkI")).toBe(
+      "https://giphy.com/embed/ZK2W0gl0w0vkI",
+    );
+    expect(maybeParseEmbedSrc("https://giphy.com/embed/ZK2W0gl0w0vkI")).toBe(
+      "https://giphy.com/embed/ZK2W0gl0w0vkI",
+    );
   });
 });
