@@ -148,6 +148,7 @@ const ALLOWED_DOMAINS = new Set([
   "giphy.com",
   "reddit.com",
   "forms.microsoft.com",
+  "*.lovable.app",
 ]);
 
 const ALLOW_SAME_ORIGIN = new Set([
