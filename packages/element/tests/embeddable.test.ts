@@ -1,4 +1,8 @@
-import { embeddableURLValidator, getEmbedLink } from "../src/embeddable";
+import {
+  embeddableURLValidator,
+  getEmbedLink,
+  maybeParseEmbedSrc,
+} from "../src/embeddable";
 
 describe("YouTube timestamp parsing", () => {
   it("should parse YouTube URLs with timestamp in seconds", () => {
@@ -241,5 +245,63 @@ describe("Google Drive video embedding", () => {
         undefined,
       ),
     ).toBe(true);
+  });
+});
+
+describe("Giphy URL parsing in maybeParseEmbedSrc", () => {
+  it("should parse Giphy URLs with multi-word hyphenated slugs into correct embed ID", () => {
+    expect(
+      maybeParseEmbedSrc(
+        "https://giphy.com/gifs/studiosoriginals-hello-hi-wave-3o7btPCcdNniyf0ArS",
+      ),
+    ).toBe("https://giphy.com/embed/3o7btPCcdNniyf0ArS");
+
+    expect(
+      maybeParseEmbedSrc(
+        "https://giphy.com/gifs/funny-cat-cute-26FPqAH61DhAndwPa",
+      ),
+    ).toBe("https://giphy.com/embed/26FPqAH61DhAndwPa");
+  });
+
+  it("should parse Giphy URLs without slug or with single-word slug", () => {
+    expect(
+      maybeParseEmbedSrc("https://giphy.com/gifs/3o7btPCcdNniyf0ArS"),
+    ).toBe("https://giphy.com/embed/3o7btPCcdNniyf0ArS");
+
+    expect(
+      maybeParseEmbedSrc("https://giphy.com/gifs/cat-3o7btPCcdNniyf0ArS"),
+    ).toBe("https://giphy.com/embed/3o7btPCcdNniyf0ArS");
+  });
+
+  it("should parse Giphy clips and embed links", () => {
+    expect(
+      maybeParseEmbedSrc(
+        "https://giphy.com/clips/studiosoriginals-hello-hi-wave-3o7btPCcdNniyf0ArS",
+      ),
+    ).toBe("https://giphy.com/embed/3o7btPCcdNniyf0ArS");
+
+    expect(
+      maybeParseEmbedSrc("https://giphy.com/embed/3o7btPCcdNniyf0ArS"),
+    ).toBe("https://giphy.com/embed/3o7btPCcdNniyf0ArS");
+  });
+
+  it("should handle Giphy URLs with trailing slashes, query params, or hash", () => {
+    expect(
+      maybeParseEmbedSrc(
+        "https://giphy.com/gifs/funny-cat-3o7btPCcdNniyf0ArS?utm_source=twitter",
+      ),
+    ).toBe("https://giphy.com/embed/3o7btPCcdNniyf0ArS");
+
+    expect(
+      maybeParseEmbedSrc(
+        "https://giphy.com/gifs/funny-cat-3o7btPCcdNniyf0ArS/",
+      ),
+    ).toBe("https://giphy.com/embed/3o7btPCcdNniyf0ArS");
+
+    expect(
+      maybeParseEmbedSrc(
+        "https://giphy.com/gifs/funny-cat-3o7btPCcdNniyf0ArS#tag",
+      ),
+    ).toBe("https://giphy.com/embed/3o7btPCcdNniyf0ArS");
   });
 });

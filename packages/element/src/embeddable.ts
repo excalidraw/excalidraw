@@ -48,7 +48,7 @@ const RE_GENERIC_EMBED =
   /^<(?:iframe|blockquote)[\s\S]*?\s(?:src|href)=["']([^"']*)["'][\s\S]*?>$/i;
 
 const RE_GIPHY =
-  /giphy.com\/(?:clips|embed|gifs)\/[a-zA-Z0-9]*?-?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
+  /giphy.com\/(?:clips|embed|gifs)\/(?:[^/?#\s]*-)?([a-zA-Z0-9]+)(?:[^a-zA-Z0-9]|$)/;
 
 const RE_REDDIT =
   /^(?:http(?:s)?:\/\/)?(?:www\.)?reddit\.com\/r\/([a-zA-Z0-9_]+)\/comments\/([a-zA-Z0-9_]+)\/([a-zA-Z0-9_]+)\/?(?:\?[^#\s]*)?(?:#[^\s]*)?$/;
