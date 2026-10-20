@@ -27,6 +27,7 @@
     "copyStyles": "คัดลอกรูปแบบ",
     "pasteStyles": "วางรูปแบบ",
     "stroke": "เส้นขอบ",
+    "textColor": "สีข้อความ",
     "changeStroke": "เปลี่ยนสีเส้น",
     "background": "พื้นหลัง",
     "changeBackground": "เปลี่ยนสีพื้นหลัง",
