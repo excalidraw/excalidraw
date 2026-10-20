@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useLayoutEffect } from "react";
 import { KEYS } from "@excalidraw/common";
 
-import { ArrowRightIcon, stop as StopIcon } from "../../icons";
+import { arrowRightIcon, stopIcon } from "../../icons";
 import { InlineIcon } from "../../InlineIcon";
 
 import { t } from "../../../i18n";
@@ -180,7 +180,7 @@ export const ChatInterface = ({
             >
               <InlineIcon
                 size="1.5em"
-                icon={isGenerating ? StopIcon : ArrowRightIcon}
+                icon={isGenerating ? stopIcon : arrowRightIcon}
               />
             </button>
           </div>

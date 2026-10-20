@@ -1,5 +1,5 @@
 import { t } from "../../../i18n";
-import { ArrowRightIcon } from "../../icons";
+import { arrowRightIcon } from "../../icons";
 
 import { InlineIcon } from "../../InlineIcon";
 
@@ -93,7 +93,7 @@ export const TTDChatPanel = ({
       actions.push({
         action: onViewAsMermaid,
         label: t("chat.viewAsMermaid"),
-        icon: <InlineIcon icon={ArrowRightIcon} />,
+        icon: <InlineIcon icon={arrowRightIcon} />,
         variant: "link",
       });
     }

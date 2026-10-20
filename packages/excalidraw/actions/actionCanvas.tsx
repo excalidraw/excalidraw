@@ -21,13 +21,13 @@ import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import { IconButton } from "../components/IconButton";
 import { Tooltip } from "../components/Tooltip";
 import {
-  MoonIcon,
-  SunIcon,
-  TrashIcon,
+  moonIcon,
+  sunIcon,
+  trashIcon,
   zoomAreaIcon,
-  ZoomInIcon,
-  ZoomOutIcon,
-  ZoomResetIcon,
+  zoomInIcon,
+  zoomOutIcon,
+  zoomResetIcon,
 } from "../components/icons";
 import { useAppStateValue } from "../hooks/useAppStateValue";
 
@@ -84,7 +84,7 @@ export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
 export const actionClearCanvas = register({
   name: "clearCanvas",
   label: "labels.clearCanvas",
-  icon: TrashIcon,
+  icon: trashIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -131,7 +131,7 @@ export const actionZoomIn = register({
   label: "buttons.zoomIn",
   viewMode: true,
   navigation: true,
-  icon: ZoomInIcon,
+  icon: zoomInIcon,
   trackEvent: { category: "canvas" },
   predicate: (elements, appState, appProps, app) => app.isNavigationEnabled(),
   perform: (_elements, appState, _, app) => {
@@ -163,7 +163,7 @@ export const actionZoomIn = register({
         <IconButton
           type="button"
           className="zoom-in-button zoom-button"
-          icon={ZoomInIcon}
+          icon={zoomInIcon}
           aria-label={t("buttons.zoomIn")}
           // the shortcut used to reach AT via the (now removed) native title
           aria-keyshortcuts={getShortcutKey("CtrlOrCmd++")}
@@ -183,7 +183,7 @@ export const actionZoomIn = register({
 export const actionZoomOut = register({
   name: "zoomOut",
   label: "buttons.zoomOut",
-  icon: ZoomOutIcon,
+  icon: zoomOutIcon,
   viewMode: true,
   navigation: true,
   trackEvent: { category: "canvas" },
@@ -217,7 +217,7 @@ export const actionZoomOut = register({
         <IconButton
           type="button"
           className="zoom-out-button zoom-button"
-          icon={ZoomOutIcon}
+          icon={zoomOutIcon}
           aria-label={t("buttons.zoomOut")}
           // the shortcut used to reach AT via the (now removed) native title
           aria-keyshortcuts={getShortcutKey("CtrlOrCmd+-")}
@@ -237,7 +237,7 @@ export const actionZoomOut = register({
 export const actionResetZoom = register({
   name: "resetZoom",
   label: "buttons.resetZoom",
-  icon: ZoomResetIcon,
+  icon: zoomResetIcon,
   viewMode: true,
   navigation: true,
   trackEvent: { category: "canvas" },
@@ -438,7 +438,7 @@ export const actionToggleTheme = register<AppState["theme"]>({
   },
   keywords: ["toggle", "dark", "light", "mode", "theme"],
   icon: (appState, elements) =>
-    appState.theme === THEME.LIGHT ? MoonIcon : SunIcon,
+    appState.theme === THEME.LIGHT ? moonIcon : sunIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value, app) => {

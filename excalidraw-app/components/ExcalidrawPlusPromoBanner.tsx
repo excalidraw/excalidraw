@@ -1,4 +1,4 @@
-import { PlusPromoIcon } from "@excalidraw/excalidraw/components/icons";
+import { plusPromoIcon } from "@excalidraw/excalidraw/components/icons";
 import { useI18n } from "@excalidraw/excalidraw/i18n";
 
 export const ExcalidrawPlusPromoBanner = ({
@@ -20,7 +20,7 @@ export const ExcalidrawPlusPromoBanner = ({
       rel="noopener"
       className="plus-banner"
     >
-      <span className="plus-banner__icon">{PlusPromoIcon}</span>
+      <span className="plus-banner__icon">{plusPromoIcon}</span>
       <span className="plus-banner__text">
         <span className="plus-banner__title">
           {isSignedIn ? t("labels.signIn") : t("labels.tryExcalidrawPlus")}

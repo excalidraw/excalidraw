@@ -12,7 +12,7 @@ import { getShortcutKey } from "../shortcut";
 
 import { useExcalidrawActionManager } from "./App";
 import { Dialog } from "./Dialog";
-import { ExternalLinkIcon, GithubIcon, youtubeIcon } from "./icons";
+import { externalLinkIcon, githubIcon, youtubeIcon } from "./icons";
 
 import "./HelpDialog.scss";
 
@@ -26,7 +26,7 @@ const Header = () => (
       target="_blank"
       rel="noopener"
     >
-      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+      <div className="HelpDialog__link-icon">{externalLinkIcon}</div>
       {t("helpDialog.documentation")}
     </a>
     <a
@@ -35,7 +35,7 @@ const Header = () => (
       target="_blank"
       rel="noopener"
     >
-      <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
+      <div className="HelpDialog__link-icon">{externalLinkIcon}</div>
       {t("helpDialog.blog")}
     </a>
     <a
@@ -44,7 +44,7 @@ const Header = () => (
       target="_blank"
       rel="noopener noreferrer"
     >
-      <div className="HelpDialog__link-icon">{GithubIcon}</div>
+      <div className="HelpDialog__link-icon">{githubIcon}</div>
       {t("helpDialog.github")}
     </a>
     <a

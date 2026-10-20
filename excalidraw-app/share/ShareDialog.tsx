@@ -5,12 +5,12 @@ import { FilledButton } from "@excalidraw/excalidraw/components/FilledButton";
 import { TextField } from "@excalidraw/excalidraw/components/TextField";
 import {
   copyIcon,
-  LinkIcon,
+  linkIcon,
   playerPlayIcon,
   playerStopFilledIcon,
-  share,
-  shareIOS,
-  shareWindows,
+  shareIcon,
+  shareIOSIcon,
+  shareWindowsIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 import { useCopyStatus } from "@excalidraw/excalidraw/hooks/useCopiedIndicator";
@@ -39,12 +39,12 @@ const getShareIcon = () => {
   const isWindowsBrowser = navigator.appVersion.indexOf("Win") !== -1;
 
   if (isAppleBrowser) {
-    return shareIOS;
+    return shareIOSIcon;
   } else if (isWindowsBrowser) {
-    return shareWindows;
+    return shareWindowsIcon;
   }
 
-  return share;
+  return shareIcon;
 };
 
 export type ShareDialogProps = {
@@ -231,7 +231,7 @@ const ShareDialogPicker = (props: ShareDialogProps) => {
             <FilledButton
               size="large"
               label={t("exportDialog.link_button")}
-              icon={LinkIcon}
+              icon={linkIcon}
               onClick={async () => {
                 await props.onExportToBackend();
                 props.handleClose();

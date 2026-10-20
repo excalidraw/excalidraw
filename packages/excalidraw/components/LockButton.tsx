@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 import { IconButton } from "./IconButton";
-import { LockedIcon, UnlockedIcon } from "./icons";
+import { lockedIcon, unlockedIcon } from "./icons";
 
 type LockButtonProps = {
   title?: string;
@@ -16,7 +16,7 @@ export const LockButton = (props: LockButtonProps) => {
     <IconButton
       className={clsx("ToolIcon__lock", { "is-mobile": props.isMobile })}
       type="toggle"
-      icon={props.checked ? LockedIcon : UnlockedIcon}
+      icon={props.checked ? lockedIcon : unlockedIcon}
       checked={props.checked}
       disabled={props.disabled}
       title={`${props.title} — Q`}

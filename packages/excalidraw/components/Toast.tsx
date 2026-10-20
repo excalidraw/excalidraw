@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import { CloseIcon } from "./icons";
+import { closeIcon } from "./icons";
 import { IconButton } from "./IconButton";
 
 import "./Toast.scss";
@@ -66,7 +66,7 @@ const ToastComponent = ({
       <div className="Toast__message">{message}</div>
       {closable && (
         <IconButton
-          icon={CloseIcon}
+          icon={closeIcon}
           aria-label="close"
           type="icon"
           onClick={onClose}

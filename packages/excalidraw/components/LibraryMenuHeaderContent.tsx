@@ -20,11 +20,11 @@ import { IconButton } from "./IconButton";
 import Trans from "./Trans";
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
 import {
-  DotsIcon,
-  ExportIcon,
-  LoadIcon,
+  dotsIcon,
+  exportIcon,
+  loadIcon,
   publishIcon,
-  TrashIcon,
+  trashIcon,
 } from "./icons";
 
 import type Library from "../data/library";
@@ -195,7 +195,7 @@ export const LibraryDropdownMenuButton: React.FC<{
         <DropdownMenu.Trigger
           onToggle={() => setIsLibraryMenuOpen(!isLibraryMenuOpen)}
         >
-          {DotsIcon}
+          {dotsIcon}
         </DropdownMenu.Trigger>
         <DropdownMenu.Content
           onClickOutside={() => setIsLibraryMenuOpen(false)}
@@ -205,7 +205,7 @@ export const LibraryDropdownMenuButton: React.FC<{
           {!itemsSelected && (
             <DropdownMenu.Item
               onSelect={onLibraryImport}
-              icon={LoadIcon}
+              icon={loadIcon}
               data-testid="lib-dropdown--load"
             >
               {t("buttons.load")}
@@ -214,7 +214,7 @@ export const LibraryDropdownMenuButton: React.FC<{
           {!!items.length && (
             <DropdownMenu.Item
               onSelect={onLibraryExport}
-              icon={ExportIcon}
+              icon={exportIcon}
               data-testid="lib-dropdown--export"
             >
               {t("buttons.export")}
@@ -232,7 +232,7 @@ export const LibraryDropdownMenuButton: React.FC<{
           {!!items.length && (
             <DropdownMenu.Item
               onSelect={() => setShowRemoveLibAlert(true)}
-              icon={TrashIcon}
+              icon={trashIcon}
             >
               {resetLabel}
             </DropdownMenu.Item>

@@ -23,16 +23,16 @@ import {
 } from "./Tools";
 
 import {
-  TextIcon,
-  ImageIcon,
-  DotsIcon,
+  textIcon,
+  imageIcon,
+  dotsIcon,
   frameToolIcon,
-  EmbedIcon,
+  embedIcon,
   laserPointerToolIcon,
   drawShapeToolIcon,
   bucketFillIcon,
   mermaidLogoIcon,
-  MagicIcon,
+  magicIcon,
   stickyNoteToolIcon,
 } from "./icons";
 
@@ -135,23 +135,23 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const extraToolSelected = extraTools.includes(activeTool.type);
   const extraIcon = extraToolSelected
     ? activeTool.type === "text"
-      ? TextIcon
+      ? textIcon
       : activeTool.type === "image"
-      ? ImageIcon
+      ? imageIcon
       : activeTool.type === "frame"
       ? frameToolIcon
       : activeTool.type === "stickynote"
       ? stickyNoteToolIcon
       : activeTool.type === "embeddable"
-      ? EmbedIcon
+      ? embedIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
       : activeTool.type === "bucketfill"
       ? bucketFillIcon
       : activeTool.type === "magicframe"
-      ? MagicIcon
-      : DotsIcon
-    : DotsIcon;
+      ? magicIcon
+      : dotsIcon
+    : dotsIcon;
 
   const toolProps = { app, activeTool };
 
@@ -262,7 +262,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
           {!showTextToolOutside && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "text" })}
-              icon={TextIcon}
+              icon={textIcon}
               shortcut={KEYS.T.toLocaleUpperCase()}
               data-testid="toolbar-text"
               selected={activeTool.type === "text"}
@@ -275,7 +275,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
           {!showImageToolOutside && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "image" })}
-              icon={ImageIcon}
+              icon={imageIcon}
               data-testid="toolbar-image"
               selected={activeTool.type === "image"}
               disabled={isToolButtonDisabled(app, "image")}
@@ -308,7 +308,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
           )}
           <DropdownMenu.Item
             onSelect={() => app.setActiveTool({ type: "embeddable" })}
-            icon={EmbedIcon}
+            icon={embedIcon}
             data-testid="toolbar-embeddable"
             selected={embeddableToolSelected}
             disabled={isToolButtonDisabled(app, "embeddable")}
@@ -360,7 +360,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
             <>
               <DropdownMenu.Item
                 onSelect={() => app.onMagicframeToolSelect()}
-                icon={MagicIcon}
+                icon={magicIcon}
                 data-testid="toolbar-magicframe"
                 badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
                 disabled={isToolButtonDisabled(app, "magicframe")}

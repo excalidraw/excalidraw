@@ -11,7 +11,7 @@ import { CaptureUpdateAction } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
-import { LockedIcon, UnlockedIcon } from "../components/icons";
+import { lockedIcon, unlockedIcon } from "../components/icons";
 
 import { getSelectedElements } from "../scene";
 
@@ -36,7 +36,7 @@ export const actionToggleElementLock = register({
   },
   icon: (appState, elements) => {
     const selectedElements = getSelectedElements(elements, appState);
-    return shouldLock(selectedElements) ? LockedIcon : UnlockedIcon;
+    return shouldLock(selectedElements) ? lockedIcon : unlockedIcon;
   },
   trackEvent: { category: "element" },
   predicate: (elements, appState, _, app) => {
@@ -161,7 +161,7 @@ export const actionUnlockAllElements = register({
   name: "unlockAllElements",
   trackEvent: { category: "canvas" },
   viewMode: false,
-  icon: UnlockedIcon,
+  icon: unlockedIcon,
   predicate: (elements, appState) => {
     const selectedElements = getSelectedElements(elements, appState);
     return (

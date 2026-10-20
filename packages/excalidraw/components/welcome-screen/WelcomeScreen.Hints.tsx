@@ -1,9 +1,9 @@
 import { useTunnels } from "../../context/tunnels";
 import { t } from "../../i18n";
 import {
-  WelcomeScreenHelpArrow,
-  WelcomeScreenMenuArrow,
-  WelcomeScreenTopToolbarArrow,
+  welcomeScreenHelpArrowIcon,
+  welcomeScreenMenuArrowIcon,
+  welcomeScreenTopToolbarArrowIcon,
 } from "../icons";
 
 const MenuHint = ({ children }: { children?: React.ReactNode }) => {
@@ -11,7 +11,7 @@ const MenuHint = ({ children }: { children?: React.ReactNode }) => {
   return (
     <WelcomeScreenMenuHintTunnel.In>
       <div className="excalifont welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--menu">
-        {WelcomeScreenMenuArrow}
+        {welcomeScreenMenuArrowIcon}
         <div className="welcome-screen-decor-hint__label">
           {children || t("welcomeScreen.defaults.menuHint")}
         </div>
@@ -29,7 +29,7 @@ const ToolbarHint = ({ children }: { children?: React.ReactNode }) => {
         <div className="welcome-screen-decor-hint__label">
           {children || t("welcomeScreen.defaults.toolbarHint")}
         </div>
-        {WelcomeScreenTopToolbarArrow}
+        {welcomeScreenTopToolbarArrowIcon}
       </div>
     </WelcomeScreenToolbarHintTunnel.In>
   );
@@ -42,7 +42,7 @@ const HelpHint = ({ children }: { children?: React.ReactNode }) => {
     <WelcomeScreenHelpHintTunnel.In>
       <div className="excalifont welcome-screen-decor welcome-screen-decor-hint welcome-screen-decor-hint--help">
         <div>{children || t("welcomeScreen.defaults.helpHint")}</div>
-        {WelcomeScreenHelpArrow}
+        {welcomeScreenHelpArrowIcon}
       </div>
     </WelcomeScreenHelpHintTunnel.In>
   );

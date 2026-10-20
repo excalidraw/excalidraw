@@ -4,7 +4,7 @@ import { MQ_MIN_WIDTH_DESKTOP, type EditorInterface } from "@excalidraw/common";
 
 import { t } from "../../i18n";
 import { Button } from "../Button";
-import { share } from "../icons";
+import { shareIcon } from "../icons";
 import { useUIAppState } from "../../context/ui-appState";
 
 import "./LiveCollaborationTrigger.scss";
@@ -34,7 +34,7 @@ const LiveCollaborationTrigger = ({
       style={{ position: "relative", width: showIconOnly ? undefined : "auto" }}
       title={t("labels.liveCollaboration")}
     >
-      {showIconOnly ? share : t("labels.share")}
+      {showIconOnly ? shareIcon : t("labels.share")}
       {appState.collaborators.size > 0 && (
         <div className="CollabButton-collaborators">
           {appState.collaborators.size}

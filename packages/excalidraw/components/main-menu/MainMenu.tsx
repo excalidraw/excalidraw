@@ -14,7 +14,7 @@ import { UserList } from "../UserList";
 import DropdownMenu from "../dropdownMenu/DropdownMenu";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
 import { withInternalFallback } from "../hoc/withInternalFallback";
-import { HamburgerMenuIcon } from "../icons";
+import { hamburgerMenuIcon } from "../icons";
 
 import * as DefaultItems from "./DefaultItems";
 
@@ -51,7 +51,7 @@ const MainMenu = Object.assign(
               data-testid="main-menu-trigger"
               className="main-menu-trigger"
             >
-              {HamburgerMenuIcon}
+              {hamburgerMenuIcon}
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
               onClickOutside={() => setAppState({ openMenu: null })}

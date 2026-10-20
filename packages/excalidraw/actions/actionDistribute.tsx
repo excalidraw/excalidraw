@@ -18,8 +18,8 @@ import type { Distribution } from "@excalidraw/element";
 
 import { IconButton } from "../components/IconButton";
 import {
-  DistributeHorizontallyIcon,
-  DistributeVerticallyIcon,
+  distributeHorizontallyIcon,
+  distributeVerticallyIcon,
 } from "../components/icons";
 
 import { t } from "../i18n";
@@ -90,7 +90,7 @@ export const distributeHorizontally = register({
     <IconButton
       hidden={!enableActionGroup(appState, app)}
       type="button"
-      icon={DistributeHorizontallyIcon}
+      icon={distributeHorizontallyIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.distributeHorizontally")} — ${getShortcutKey(
         "Alt+H",
@@ -121,7 +121,7 @@ export const distributeVertically = register({
     <IconButton
       hidden={!enableActionGroup(appState, app)}
       type="button"
-      icon={DistributeVerticallyIcon}
+      icon={distributeVerticallyIcon}
       onClick={() => updateData(null)}
       title={`${t("labels.distributeVertically")} — ${getShortcutKey("Alt+V")}`}
       aria-label={t("labels.distributeVertically")}

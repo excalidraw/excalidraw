@@ -1,6 +1,6 @@
 import { t } from "../i18n";
 
-import { HelpIcon } from "./icons";
+import { helpCircleIcon } from "./icons";
 import { Tooltip } from "./Tooltip";
 
 type HelpButtonProps = {
@@ -17,7 +17,7 @@ export const HelpButton = (props: HelpButtonProps) => (
       type="button"
       aria-label={t("helpDialog.title")}
     >
-      {HelpIcon}
+      {helpCircleIcon}
     </button>
   </Tooltip>
 );

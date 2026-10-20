@@ -17,7 +17,7 @@ import { getSelectedElements } from "../scene";
 import DialogActionButton from "./DialogActionButton";
 import { TextField } from "./TextField";
 import { IconButton } from "./IconButton";
-import { TrashIcon } from "./icons";
+import { trashIcon } from "./icons";
 
 import "./ElementLinkDialog.scss";
 
@@ -151,7 +151,7 @@ const ElementLinkDialog = ({
               setLinkEdited(true);
             }}
             className="ElementLinkDialog__remove"
-            icon={TrashIcon}
+            icon={trashIcon}
           />
         )}
       </div>

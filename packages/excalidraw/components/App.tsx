@@ -415,7 +415,7 @@ import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { AppHost } from "./App.host";
 import { CursorHint, CursorHints } from "./CursorHint";
-import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
+import { magicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
 import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
@@ -2537,7 +2537,7 @@ class App extends React.Component<AppProps, AppState> {
                               >
                                 <ElementCanvasButton
                                   title={t("labels.convertToCode")}
-                                  icon={MagicIcon}
+                                  icon={magicIcon}
                                   checked={false}
                                   onChange={() =>
                                     this.onMagicFrameGenerate(

@@ -43,24 +43,24 @@ import DropdownMenuItemContentRadio from "../dropdownMenu/DropdownMenuItemConten
 import DropdownMenuItemLink from "../dropdownMenu/DropdownMenuItemLink";
 import DropdownMenuSub from "../dropdownMenu/DropdownMenuSub";
 import {
-  GithubIcon,
-  DiscordIcon,
-  XBrandIcon,
+  githubIcon,
+  discordIcon,
+  xBrandIcon,
   settingsIcon,
   emptyIcon,
 } from "../icons";
 import {
   boltIcon,
-  DeviceDesktopIcon,
-  ExportIcon,
-  ExportImageIcon,
-  HelpIcon,
-  LoadIcon,
-  MoonIcon,
-  save,
+  deviceDesktopIcon,
+  exportIcon,
+  exportImageIcon,
+  helpCircleIcon,
+  loadIcon,
+  moonIcon,
+  saveIcon,
   searchIcon,
-  SunIcon,
-  TrashIcon,
+  sunIcon,
+  trashIcon,
   usersIcon,
 } from "../icons";
 
@@ -99,7 +99,7 @@ export const LoadScene = () => {
 
   return (
     <DropdownMenuItem
-      icon={LoadIcon}
+      icon={loadIcon}
       onSelect={handleSelect}
       data-testid="load-button"
       shortcut={getShortcutFromShortcutName("loadScene")}
@@ -124,7 +124,7 @@ export const SaveToActiveFile = () => {
       shortcut={getShortcutFromShortcutName("saveScene")}
       data-testid="save-button"
       onSelect={() => actionManager.executeAction(actionSaveToActiveFile)}
-      icon={save}
+      icon={saveIcon}
       aria-label={`${t("buttons.save")}`}
     >{`${t("buttons.save")}`}</DropdownMenuItem>
   );
@@ -136,7 +136,7 @@ export const SaveAsImage = () => {
   const { t } = useI18n();
   return (
     <DropdownMenuItem
-      icon={ExportImageIcon}
+      icon={exportImageIcon}
       data-testid="image-export-button"
       onSelect={() => setAppState({ openDialog: { name: "imageExport" } })}
       shortcut={getShortcutFromShortcutName("imageExport")}
@@ -199,7 +199,7 @@ export const Help = () => {
   return (
     <DropdownMenuItem
       data-testid="help-menu-item"
-      icon={HelpIcon}
+      icon={helpCircleIcon}
       onSelect={() => actionManager.executeAction(actionShortcuts)}
       shortcut="?"
       aria-label={t("helpDialog.title")}
@@ -222,7 +222,7 @@ export const ClearCanvas = () => {
 
   return (
     <DropdownMenuItem
-      icon={TrashIcon}
+      icon={trashIcon}
       onSelect={() => setActiveConfirmDialog("clearCanvas")}
       data-testid="clear-canvas-button"
       aria-label={t("buttons.clearReset")}
@@ -276,17 +276,17 @@ export const ToggleTheme = (
         choices={[
           {
             value: THEME.LIGHT,
-            label: SunIcon,
+            label: sunIcon,
             ariaLabel: `${t("buttons.lightMode")} - ${shortcut}`,
           },
           {
             value: THEME.DARK,
-            label: MoonIcon,
+            label: moonIcon,
             ariaLabel: `${t("buttons.darkMode")} - ${shortcut}`,
           },
           {
             value: "system",
-            label: DeviceDesktopIcon,
+            label: deviceDesktopIcon,
             ariaLabel: t("buttons.systemMode"),
           },
         ]}
@@ -304,7 +304,7 @@ export const ToggleTheme = (
 
         actionManager.executeAction(actionToggleTheme);
       }}
-      icon={appState.theme === THEME.DARK ? SunIcon : MoonIcon}
+      icon={appState.theme === THEME.DARK ? sunIcon : moonIcon}
       data-testid="toggle-dark-mode"
       shortcut={shortcut}
       aria-label={
@@ -358,7 +358,7 @@ export const Export = () => {
   const setAppState = useExcalidrawSetAppState();
   return (
     <DropdownMenuItem
-      icon={ExportIcon}
+      icon={exportIcon}
       onSelect={() => {
         setAppState({ openDialog: { name: "jsonExport" } });
       }}
@@ -377,21 +377,21 @@ export const Socials = () => {
   return (
     <>
       <DropdownMenuItemLink
-        icon={GithubIcon}
+        icon={githubIcon}
         href="https://github.com/excalidraw/excalidraw"
         aria-label="GitHub"
       >
         GitHub
       </DropdownMenuItemLink>
       <DropdownMenuItemLink
-        icon={XBrandIcon}
+        icon={xBrandIcon}
         href="https://x.com/excalidraw"
         aria-label="X"
       >
         {t("labels.followUs")}
       </DropdownMenuItemLink>
       <DropdownMenuItemLink
-        icon={DiscordIcon}
+        icon={discordIcon}
         href="https://discord.gg/UexuTaE"
         aria-label="Discord"
       >

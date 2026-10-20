@@ -5,7 +5,7 @@ import { EDITOR_LS_KEYS, debounce, isDevEnv } from "@excalidraw/common";
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useApp } from "../App";
-import { ArrowRightIcon } from "../icons";
+import { arrowRightIcon } from "../icons";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { t } from "../../i18n";
 import Trans from "../Trans";
@@ -292,7 +292,7 @@ const MermaidToExcalidraw = ({
                 onInsertToEditor();
               },
               label: t("mermaid.button"),
-              icon: ArrowRightIcon,
+              icon: arrowRightIcon,
               variant: "button",
             },
           ]}

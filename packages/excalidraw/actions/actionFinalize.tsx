@@ -36,7 +36,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
-import { done } from "../components/icons";
+import { doneIcon } from "../components/icons";
 import { TOGGLE_TOOLS } from "../components/Tools";
 import { IconButton } from "../components/IconButton";
 
@@ -425,7 +425,7 @@ export const actionFinalize = register<FormData>({
   PanelComponent: ({ appState, updateData, data }) => (
     <IconButton
       type="button"
-      icon={done}
+      icon={doneIcon}
       title={t("buttons.done")}
       aria-label={t("buttons.done")}
       onClick={updateData}

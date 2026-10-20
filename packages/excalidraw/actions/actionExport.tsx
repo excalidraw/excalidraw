@@ -11,7 +11,11 @@ import { ProjectName } from "../components/ProjectName";
 import { Toast } from "../components/Toast";
 import { IconButton } from "../components/IconButton";
 import { Tooltip } from "../components/Tooltip";
-import { ExportIcon, questionCircle, saveAs } from "../components/icons";
+import {
+  exportIcon,
+  questionCircleIcon,
+  saveAsIcon,
+} from "../components/icons";
 import { loadFromJSON, saveAsJSON } from "../data";
 import { isImageFileHandle } from "../data/blob";
 import { nativeFileSystemSupported } from "../data/filesystem";
@@ -107,7 +111,7 @@ export const actionChangeExportEmbedScene = register<
     >
       {t("imageExportDialog.label.embedScene")}
       <Tooltip label={t("imageExportDialog.tooltip.embedScene")} long={true}>
-        <div className="excalidraw-tooltip-icon">{questionCircle}</div>
+        <div className="excalidraw-tooltip-icon">{questionCircleIcon}</div>
       </Tooltip>
     </CheckboxItem>
   ),
@@ -253,7 +257,7 @@ function prepareDataForJSONExport(
 export const actionSaveToActiveFile = register({
   name: "saveToActiveFile",
   label: "buttons.save",
-  icon: ExportIcon,
+  icon: exportIcon,
   trackEvent: { category: "export" },
   predicate: (elements, appState, props, app) => {
     return (
@@ -328,7 +332,7 @@ export const actionSaveToActiveFile = register({
 export const actionSaveFileToDisk = register({
   name: "saveFileToDisk",
   label: "exportDialog.disk_title",
-  icon: ExportIcon,
+  icon: exportIcon,
   viewMode: true,
   trackEvent: { category: "export" },
   perform: async (elements, appState, value, app) => {
@@ -379,7 +383,7 @@ export const actionSaveFileToDisk = register({
   PanelComponent: ({ updateData }) => (
     <IconButton
       type="button"
-      icon={saveAs}
+      icon={saveAsIcon}
       title={t("buttons.saveAs")}
       aria-label={t("buttons.saveAs")}
       showAriaLabel={useEditorInterface().formFactor === "phone"}

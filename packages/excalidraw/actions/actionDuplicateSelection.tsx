@@ -18,7 +18,7 @@ import { duplicateElements } from "@excalidraw/element";
 import { CaptureUpdateAction } from "@excalidraw/element";
 
 import { IconButton } from "../components/IconButton";
-import { DuplicateIcon } from "../components/icons";
+import { duplicateIcon } from "../components/icons";
 
 import { t } from "../i18n";
 import { isSomeElementSelected } from "../scene";
@@ -33,7 +33,7 @@ import { register } from "./register";
 export const actionDuplicateSelection = register({
   name: "duplicateSelection",
   label: "labels.duplicateSelection",
-  icon: DuplicateIcon,
+  icon: duplicateIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, formData, app) => {
     if (appState.selectedElementsAreBeingDragged) {
@@ -122,7 +122,7 @@ export const actionDuplicateSelection = register({
     return (
       <IconButton
         type="button"
-        icon={DuplicateIcon}
+        icon={duplicateIcon}
         title={`${t("labels.duplicateSelection")} — ${getShortcutKey(
           "CtrlOrCmd+D",
         )}`}

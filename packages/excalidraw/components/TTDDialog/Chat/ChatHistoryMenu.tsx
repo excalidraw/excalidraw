@@ -1,7 +1,7 @@
 import clsx from "clsx";
 
 import { t } from "../../../i18n";
-import { historyIcon, TrashIcon } from "../../icons";
+import { historyIcon, trashIcon } from "../../icons";
 import DropdownMenu from "../../dropdownMenu/DropdownMenu";
 
 import { FilledButton } from "../../FilledButton";
@@ -74,7 +74,7 @@ export const ChatHistoryMenu = ({
                       aria-label={t("chat.deleteChat")}
                       type="button"
                     >
-                      {TrashIcon}
+                      {trashIcon}
                     </button>
                   </DropdownMenu.ItemCustom>
                 ))}

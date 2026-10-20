@@ -24,7 +24,7 @@ import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
 import { getSelectedElements, isSomeElementSelected } from "../scene";
-import { TrashIcon } from "../components/icons";
+import { trashIcon } from "../components/icons";
 import { IconButton } from "../components/IconButton";
 
 import { useStylesPanelMode } from "../components/App";
@@ -217,7 +217,7 @@ export const actionDeleteSelected = register<{
 } | null>({
   name: "deleteSelectedElements",
   label: "labels.delete",
-  icon: TrashIcon,
+  icon: trashIcon,
   trackEvent: { category: "element", action: "delete" },
   perform: (elements, appState, formData, app) => {
     if (appState.selectedLinearElement?.isEditing) {
@@ -325,7 +325,7 @@ export const actionDeleteSelected = register<{
     return (
       <IconButton
         type="button"
-        icon={TrashIcon}
+        icon={trashIcon}
         title={t("labels.delete")}
         aria-label={t("labels.delete")}
         onClick={() => updateData(null)}

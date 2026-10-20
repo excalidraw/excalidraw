@@ -15,7 +15,7 @@ import { t } from "../i18n";
 
 import "./UnlockPopup.scss";
 
-import { LockedIconFilled } from "./icons";
+import { lockedFilledIcon } from "./icons";
 
 import type App from "./App";
 
@@ -83,7 +83,7 @@ const UnlockPopup = ({
       }}
       title={t("labels.elementLock.unlock")}
     >
-      {LockedIconFilled}
+      {lockedFilledIcon}
     </div>
   );
 };

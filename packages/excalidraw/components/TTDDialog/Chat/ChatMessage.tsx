@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 
 import { t } from "../../../i18n";
 import { FilledButton } from "../../FilledButton";
-import { TrashIcon, codeIcon, stackPushIcon, RetryIcon } from "../../icons";
+import { trashIcon, codeIcon, stackPushIcon, retryIcon } from "../../icons";
 
 import type { TChat, TTTDDialog } from "../types";
 
@@ -197,7 +197,7 @@ export const ChatMessage: React.FC<{
               aria-label={t("chat.deleteMessage")}
               title={t("chat.deleteMessage")}
             >
-              {TrashIcon}
+              {trashIcon}
             </button>
           )}
           {message.errorType === "network" && onRetry && isLastMessage && (
@@ -208,7 +208,7 @@ export const ChatMessage: React.FC<{
               aria-label={t("chat.retry")}
               title={t("chat.retry")}
             >
-              {RetryIcon}
+              {retryIcon}
             </button>
           )}
         </div>

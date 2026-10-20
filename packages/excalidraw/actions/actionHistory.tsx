@@ -12,7 +12,7 @@ import { orderByFractionalIndex } from "@excalidraw/element";
 import type { SceneElementsMap } from "@excalidraw/element/types";
 
 import { IconButton } from "../components/IconButton";
-import { UndoIcon, RedoIcon } from "../components/icons";
+import { undoIcon, redoIcon } from "../components/icons";
 import { HistoryChangedEvent } from "../history";
 import { useEmitter } from "../hooks/useEmitter";
 import { t } from "../i18n";
@@ -69,7 +69,7 @@ type ActionCreator = (history: History) => Action;
 export const createUndoAction: ActionCreator = (history) => ({
   name: "undo",
   label: "buttons.undo",
-  icon: UndoIcon,
+  icon: undoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
   perform: (elements, appState, value, app) =>
@@ -91,7 +91,7 @@ export const createUndoAction: ActionCreator = (history) => ({
     return (
       <IconButton
         type="button"
-        icon={UndoIcon}
+        icon={undoIcon}
         aria-label={t("buttons.undo")}
         onClick={updateData}
         size={data?.size || "medium"}
@@ -108,7 +108,7 @@ export const createUndoAction: ActionCreator = (history) => ({
 export const createRedoAction: ActionCreator = (history) => ({
   name: "redo",
   label: "buttons.redo",
-  icon: RedoIcon,
+  icon: redoIcon,
   trackEvent: { category: "history" },
   viewMode: false,
   perform: (elements, appState, __, app) =>
@@ -131,7 +131,7 @@ export const createRedoAction: ActionCreator = (history) => ({
     return (
       <IconButton
         type="button"
-        icon={RedoIcon}
+        icon={redoIcon}
         aria-label={t("buttons.redo")}
         onClick={updateData}
         size={data?.size || "medium"}

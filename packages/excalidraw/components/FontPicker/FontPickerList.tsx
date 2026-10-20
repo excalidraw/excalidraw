@@ -38,10 +38,10 @@ import {
 import MenuItemContent from "../dropdownMenu/DropdownMenuItemContent";
 import { getDropdownMenuItemClassName } from "../dropdownMenu/common";
 import {
-  FontFamilyCodeIcon,
-  FontFamilyHeadingIcon,
-  FontFamilyNormalIcon,
-  FreedrawIcon,
+  fontFamilyCodeIcon,
+  fontFamilyHeadingIcon,
+  fontFamilyNormalIcon,
+  freedrawIcon,
 } from "../icons";
 
 import { useFontPickerDnD } from "./fontTopPicksDnD";
@@ -79,17 +79,17 @@ export const getFontFamilyIcon = (
   switch (fontFamily) {
     case FONT_FAMILY.Excalifont:
     case FONT_FAMILY.Virgil:
-      return FreedrawIcon;
+      return freedrawIcon;
     case FONT_FAMILY.Nunito:
     case FONT_FAMILY.Helvetica:
-      return FontFamilyNormalIcon;
+      return fontFamilyNormalIcon;
     case FONT_FAMILY["Lilita One"]:
-      return FontFamilyHeadingIcon;
+      return fontFamilyHeadingIcon;
     case FONT_FAMILY["Comic Shanns"]:
     case FONT_FAMILY.Cascadia:
-      return FontFamilyCodeIcon;
+      return fontFamilyCodeIcon;
     default:
-      return FontFamilyNormalIcon;
+      return fontFamilyNormalIcon;
   }
 };
 

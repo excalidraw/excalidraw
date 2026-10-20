@@ -20,7 +20,7 @@ import type {
 
 import { getSelectedElements } from "../scene";
 
-import { flipHorizontal, flipVertical } from "../components/icons";
+import { flipHorizontalIcon, flipVerticalIcon } from "../components/icons";
 
 import { register } from "./register";
 
@@ -29,7 +29,7 @@ import type { AppClassProperties, AppState } from "../types";
 export const actionFlipHorizontal = register({
   name: "flipHorizontal",
   label: "labels.flipHorizontal",
-  icon: flipHorizontal,
+  icon: flipHorizontalIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {
@@ -54,7 +54,7 @@ export const actionFlipHorizontal = register({
 export const actionFlipVertical = register({
   name: "flipVertical",
   label: "labels.flipVertical",
-  icon: flipVertical,
+  icon: flipVerticalIcon,
   trackEvent: { category: "element" },
   perform: (elements, appState, _, app) => {
     return {

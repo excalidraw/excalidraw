@@ -20,7 +20,7 @@ import { Dialog } from "./Dialog";
 import DialogActionButton from "./DialogActionButton";
 import { IconButton } from "./IconButton";
 import Trans from "./Trans";
-import { CloseIcon } from "./icons";
+import { closeIcon } from "./icons";
 
 import "./PublishLibrary.scss";
 
@@ -163,7 +163,7 @@ const SingleLibraryItem = ({
       <IconButton
         aria-label={t("buttons.remove")}
         type="button"
-        icon={CloseIcon}
+        icon={closeIcon}
         className="single-library-item--remove"
         onClick={onRemove.bind(null, libItem.id)}
         title={t("buttons.remove")}
