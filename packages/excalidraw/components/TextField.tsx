@@ -35,6 +35,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   (
     {
       onChange,
+      onClick,
       label,
       fullWidth,
       placeholder,
@@ -97,6 +98,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             placeholder={placeholder}
             ref={innerRef}
             onChange={(event) => onChange?.(event.target.value)}
+            onClick={onClick}
             onKeyDown={onKeyDown}
             type={type}
           />
