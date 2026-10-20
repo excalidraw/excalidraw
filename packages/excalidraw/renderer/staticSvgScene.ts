@@ -787,10 +787,7 @@ export const renderSceneToSvg = (
     return;
   }
 
-  let currentFrameClipGroup: {
-    frameId: string;
-    node: SVGElement;
-  } | null = null;
+  const frameClipGroups = new Map<ExcalidrawElement["id"], SVGElement>();
 
   const renderElement = (element: Readonly<NonDeletedExcalidrawElement>) => {
     const frame =
@@ -799,19 +796,21 @@ export const renderSceneToSvg = (
         : null;
 
     let root = svgRoot;
-    let shouldAppendFrameClipGroup = false;
+    let newFrameClipGroup: {
+      frameId: ExcalidrawElement["id"];
+      node: SVGElement;
+    } | null = null;
 
     if (frame) {
-      if (currentFrameClipGroup?.frameId === frame.id) {
-        root = currentFrameClipGroup.node;
+      const frameClipGroup = frameClipGroups.get(frame.id);
+
+      if (frameClipGroup) {
+        root = frameClipGroup;
       } else {
         root = svgRoot.ownerDocument.createElementNS(SVG_NS, "g");
         root.setAttributeNS(SVG_NS, "clip-path", `url(#${frame.id})`);
-        currentFrameClipGroup = { frameId: frame.id, node: root };
-        shouldAppendFrameClipGroup = true;
+        newFrameClipGroup = { frameId: frame.id, node: root };
       }
-    } else {
-      currentFrameClipGroup = null;
     }
 
     renderElementToSvg(
@@ -825,12 +824,9 @@ export const renderSceneToSvg = (
       renderConfig,
     );
 
-    if (shouldAppendFrameClipGroup) {
-      if (root.childNodes.length > 0) {
-        svgRoot.appendChild(root);
-      } else {
-        currentFrameClipGroup = null;
-      }
+    if (newFrameClipGroup && newFrameClipGroup.node.childNodes.length > 0) {
+      frameClipGroups.set(newFrameClipGroup.frameId, newFrameClipGroup.node);
+      svgRoot.appendChild(newFrameClipGroup.node);
     }
   };
 
@@ -869,7 +865,6 @@ export const renderSceneToSvg = (
     });
 
   // render embeddables on top
-  currentFrameClipGroup = null;
   elements
     .filter((el) => isIframeLikeElement(el))
     .forEach((element) => {
