@@ -77,6 +77,23 @@
       background-color: var(--color-danger-dark);
       color: var(--color-danger-text);
     }
+
+    &--storage {
+      width: max-content;
+      max-width: calc(100% - 4rem);
+      white-space: normal;
+
+      button {
+        pointer-events: auto;
+        cursor: pointer;
+        color: inherit;
+        background: transparent;
+        border: 1px solid currentColor;
+        border-radius: var(--border-radius-md);
+        font: inherit;
+        padding: 0.125rem 0.5rem;
+      }
+    }
   }
 }
 
