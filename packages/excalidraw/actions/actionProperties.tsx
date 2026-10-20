@@ -1018,85 +1018,126 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
         value,
       );
     },
-    PanelComponent: ({ elements, appState, updateData, app, data }) => {
-      const { isCompact } = getStylesPanelInfo(app);
+  
+PanelComponent: ({ elements, appState, updateData, app, data }) => {
+  const { isCompact } = getStylesPanelInfo(app);
 
-      return (
-        <fieldset>
-          <legend>{t("labels.fontSize")}</legend>
-          <div className="buttonList">
-            <RadioSelection
-              group="font-size"
-              options={[
-                {
-                  value: FONT_SIZES.sm,
-                  text: t("labels.small"),
-                  icon: FontSizeSmallIcon,
-                  testId: "fontSize-small",
-                },
-                {
-                  value: FONT_SIZES.md,
-                  text: t("labels.medium"),
-                  icon: FontSizeMediumIcon,
-                  testId: "fontSize-medium",
-                },
-                {
-                  value: FONT_SIZES.lg,
-                  text: t("labels.large"),
-                  icon: FontSizeLargeIcon,
-                  testId: "fontSize-large",
-                },
-                {
-                  value: FONT_SIZES.xl,
-                  text: t("labels.veryLarge"),
-                  icon: FontSizeExtraLargeIcon,
-                  testId: "fontSize-veryLarge",
-                },
-              ]}
-              value={getFormValue(
-                elements,
-                app,
-                (element) => {
-                  const elementsMap = app.scene.getNonDeletedElementsMap();
-                  if (isTextElement(element)) {
-                    return getBaseFontSize(element, elementsMap);
-                  }
-                  const boundTextElement = getBoundTextElement(
-                    element,
-                    elementsMap,
-                  );
-                  if (boundTextElement) {
-                    return getBaseFontSize(boundTextElement, elementsMap);
-                  }
-                  return null;
-                },
-                (element) =>
-                  isTextElement(element) ||
-                  getBoundTextElement(
-                    element,
-                    app.scene.getNonDeletedElementsMap(),
-                  ) !== null,
-                (hasSelection) =>
-                  hasSelection
-                    ? null
-                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-              )}
-              onChange={(value) => {
-                withCaretPositionPreservation(
-                  () => updateData(value),
-                  isCompact,
-                  !!appState.editingTextElement,
-                  data?.onPreventClose,
-                );
-              }}
-            />
-          </div>
-        </fieldset>
+  const fontSize = getFormValue(
+    elements,
+    app,
+    (element) => {
+      const elementsMap = app.scene.getNonDeletedElementsMap();
+
+      if (isTextElement(element)) {
+        return getBaseFontSize(element, elementsMap);
+      }
+
+      const boundTextElement = getBoundTextElement(
+        element,
+        elementsMap,
       );
-    },
-  },
-);
 
+      if (boundTextElement) {
+        return getBaseFontSize(boundTextElement, elementsMap);
+      }
+
+      return null;
+    },
+    (element) =>
+      isTextElement(element) ||
+      getBoundTextElement(
+        element,
+        app.scene.getNonDeletedElementsMap(),
+      ) !== null,
+    (hasSelection) =>
+      hasSelection
+        ? null
+        : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+  );
+
+  const fontSizes = [
+    8, 9, 10, 11, 12, 14, 16, 18, 20, 22,
+    24, 26, 28, 32, 36, 40, 48, 56, 64, 72,
+    80, 96, 120, 144,
+  ];
+
+  const applyFontSize = (value: number) => {
+    if (!Number.isFinite(value) || value < 1 || value > 500) {
+      return;
+    }
+
+    withCaretPositionPreservation(
+      () => updateData(value),
+      isCompact,
+      !!appState.editingTextElement,
+      data?.onPreventClose,
+    );
+  };
+
+  return (
+    <fieldset>
+      <legend>{t("labels.fontSize")}</legend>
+
+      <div className="fontSizePicker">
+        <label htmlFor="font-size-number">
+          Font size
+        </label>
+
+        <input
+          id="font-size-number"
+          type="number"
+          min={1}
+          max={500}
+          step={1}
+          value={fontSize ?? DEFAULT_FONT_SIZE}
+          onChange={(event) => {
+            const value = Number(event.target.value);
+
+            if (
+              event.target.value !== "" &&
+              Number.isFinite(value) &&
+              value >= 1 &&
+              value <= 500
+            ) {
+              applyFontSize(value);
+            }
+          }}
+        />
+
+        <label htmlFor="font-size-list">
+          Choose a size
+        </label>
+
+        <select
+          id="font-size-list"
+          size={5}
+          value={fontSizes.includes(fontSize ?? DEFAULT_FONT_SIZE)
+            ? fontSize ?? DEFAULT_FONT_SIZE
+            : ""}
+          onChange={(event) => {
+            const value = Number(event.target.value);
+
+            if (value) {
+              applyFontSize(value);
+            }
+          }}
+        >
+          {!fontSizes.includes(fontSize ?? DEFAULT_FONT_SIZE) && (
+            <option value={fontSize ?? DEFAULT_FONT_SIZE}>
+              Current size: {fontSize ?? DEFAULT_FONT_SIZE}
+            </option>
+          )}
+
+          {fontSizes.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
+        </select>
+      </div>
+    </fieldset>
+  );
+},
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
   label: "labels.decreaseFontSize",
