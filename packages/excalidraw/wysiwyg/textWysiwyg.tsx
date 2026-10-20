@@ -540,7 +540,7 @@ export const textWysiwyg = ({
 
   if (isBoundToContainer(element) || !element.autoResize) {
     whiteSpace = "pre-wrap";
-    wordBreak = "break-word";
+    wordBreak = "normal";
   }
   Object.assign(editable.style, {
     position: "absolute",
