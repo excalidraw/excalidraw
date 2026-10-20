@@ -240,7 +240,7 @@ export class AppClipboard {
       // on a separate line, which isn't an embed by itself
       .filter(
         (s) =>
-          !/^<script\b[^>]*>\s*<\/script>$/i.test(s) ||
+          !/^<script\b[^>]*>\s*<\/script\b[^>]*>\s*$/i.test(s) ||
           maybeParseEmbedSrc(s) !== s,
       );
     const embbeddableUrls = nonEmptyLines
