@@ -868,6 +868,90 @@ describe("copy and cut events", () => {
 });
 
 describe("paste routing", () => {
+  it.each([
+    {
+      url: "https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC?si=share",
+      src: "https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC",
+      width: 400,
+      height: 352,
+    },
+    {
+      url: "https://music.youtube.com/watch?v=dQw4w9WgXcQ&t=30",
+      src: "https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&start=30",
+      width: 560,
+      height: 315,
+    },
+    {
+      url: "https://music.apple.com/us/album/abbey-road/1441164426?i=1441164589",
+      src: "https://embed.music.apple.com/us/album/abbey-road/1441164426?i=1441164589",
+      width: 660,
+      height: 175,
+    },
+    {
+      url: "https://soundcloud.com/artist/track",
+      src: "https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fartist%2Ftrack&auto_play=false",
+      width: 500,
+      height: 166,
+    },
+    {
+      url: "https://www.deezer.com/en/track/3135556",
+      src: "https://widget.deezer.com/widget/dark/track/3135556",
+      width: 700,
+      height: 300,
+    },
+    {
+      url: "https://tidal.com/browse/track/74695970",
+      src: "https://embed.tidal.com/tracks/74695970",
+      width: 600,
+      height: 150,
+    },
+  ])("pastes $url as a music player", async ({ url, src, width, height }) => {
+    pasteWithCtrlCmdV(url);
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "embeddable",
+          link: url,
+          width,
+          height,
+        }),
+      ]);
+      const iframe = document.querySelector("iframe.excalidraw__embeddable");
+      expect(iframe?.getAttribute("src")).toBe(src);
+      expect(iframe?.getAttribute("sandbox")).toContain("allow-same-origin");
+      expect(iframe?.getAttribute("sandbox")).toContain("allow-scripts");
+    });
+  });
+
+  it("pastes a music provider's iframe as an embed, without inserting its HTML", async () => {
+    pasteWithCtrlCmdV(
+      '<iframe src="https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC" width="100%" height="352" onload="alert(1)"></iframe>',
+    );
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({
+          type: "embeddable",
+          link: "https://open.spotify.com/embed/track/4uLU6hMCjMI75M1A2tKUQC",
+        }),
+      ]);
+      const iframe = document.querySelector("iframe.excalidraw__embeddable");
+      expect(iframe).not.toBeNull();
+      expect(iframe?.hasAttribute("onload")).toBe(false);
+    });
+  });
+
+  it("leaves a misleading music hostname as text", async () => {
+    const url =
+      "https://open.spotify.com.evil.test/track/4uLU6hMCjMI75M1A2tKUQC";
+    pasteWithCtrlCmdV(url);
+    await waitFor(() => {
+      expect(h.elements).toEqual([
+        expect.objectContaining({ type: "text", text: url }),
+      ]);
+    });
+    expect(document.querySelector("iframe.excalidraw__embeddable")).toBeNull();
+  });
+
   it("should paste embed code with its loader <script> on a separate line as an embeddable", async () => {
     pasteWithCtrlCmdV(
       `<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"><div style="padding:16px;"> <a href="https://www.instagram.com/p/BsOGulcndj-/?utm_source=ig_embed&amp;utm_campaign=loading" target="_blank">View this post on Instagram</a></div></blockquote>
