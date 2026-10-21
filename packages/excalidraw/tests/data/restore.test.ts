@@ -1165,6 +1165,23 @@ describe("repairing malformed elements", () => {
     expect(text.containerId).toBe("1");
   });
 
+  it("should restore { x, y } and numeric string points", () => {
+    const [line] = restoreImported([
+      {
+        type: "line",
+        id: "line",
+        points: [{ x: 0, y: 0 }, ["10", "20"]],
+      },
+    ]) as ExcalidrawLinearElement[];
+
+    expect(line.points).toEqual([
+      [0, 0],
+      [10, 20],
+    ]);
+    expect(line.width).toBe(10);
+    expect(line.height).toBe(20);
+  });
+
   it("should not throw on a non-string legacy font", () => {
     const [text] = restoreImported([
       { type: "text", id: "text", text: "hi", font: 5 },
@@ -1215,6 +1232,16 @@ describe("repairing malformed elements", () => {
     expect(rect.x).toBe(0);
     expect(rect.updated).not.toBe(2024);
     expect((rect as any).created).not.toBe(2024);
+  });
+
+  it("should not share points with the input", () => {
+    const point = [10, 10];
+    const [line] = restoreImported([
+      { type: "line", id: "line", points: [[0, 0], point] },
+    ]) as ExcalidrawLinearElement[];
+
+    expect(line.points[1]).toEqual(point);
+    expect(line.points[1]).not.toBe(point);
   });
 });
 

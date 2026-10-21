@@ -212,29 +212,62 @@ const IMAGE_STATUSES: readonly ExcalidrawImageElement["status"][] = [
   "error",
 ];
 
-const restoreLinearElementPoints = (
-  points: unknown,
-  width: unknown,
-  height: unknown,
-): LocalPoint[] => {
-  const restoredPoints = Array.isArray(points)
+/**
+ * Accepts `[x, y]` and `{ x, y }` points, the latter used by some generators.
+ */
+const restorePoint = (point: unknown): LocalPoint | null => {
+  if (isValidPoint(point)) {
+    return pointFrom<LocalPoint>(point[0], point[1]);
+  }
+  const [x, y] = Array.isArray(point)
+    ? point
+    : isRecordLike(point)
+    ? [point.x, point.y]
+    : [];
+  const restoredX = toFiniteNumber(x);
+  const restoredY = toFiniteNumber(y);
+  return restoredX !== null && restoredY !== null
+    ? pointFrom<LocalPoint>(restoredX, restoredY)
+    : null;
+};
+
+const restorePoints = (points: unknown): LocalPoint[] =>
+  Array.isArray(points)
     ? points.reduce<LocalPoint[]>((acc, point) => {
-        if (isValidPoint(point)) {
-          acc.push(pointFrom<LocalPoint>(point[0], point[1]));
+        const restoredPoint = restorePoint(point);
+        if (restoredPoint) {
+          acc.push(restoredPoint);
         }
         return acc;
       }, [])
     : [];
 
-  return restoredPoints.length < 2
-    ? [
+/**
+ * Linear elements need at least 2 points, so missing points are rebuilt as a
+ * straight segment spanning the element's size.
+ */
+const restoreLinearElementPoints = (
+  points: unknown,
+  width: unknown,
+  height: unknown,
+): LocalPoint[] => {
+  const restoredPoints = restorePoints(points);
+
+  if (restoredPoints.length >= 2) {
+    return restoredPoints;
+  }
+
+  const [point] = restoredPoints;
+  // a lone point other than the origin is the end of the segment
+  return point && (point[0] !== 0 || point[1] !== 0)
+    ? [pointFrom<LocalPoint>(0, 0), point]
+    : [
         pointFrom<LocalPoint>(0, 0),
         pointFrom<LocalPoint>(
-          isFiniteNumber(width) ? width : 0,
-          isFiniteNumber(height) ? height : 0,
+          toFiniteNumber(width) ?? 0,
+          toFiniteNumber(height) ?? 0,
         ),
-      ]
-    : restoredPoints;
+      ];
 };
 
 const restoreFreedrawPoints = (
@@ -258,8 +291,9 @@ const restoreFreedrawPoints = (
   const restoredPressures: number[] = [];
 
   points.forEach((point, index) => {
-    if (isValidPoint(point)) {
-      restoredPoints.push(pointFrom<LocalPoint>(point[0], point[1]));
+    const restoredPoint = restorePoint(point);
+    if (restoredPoint) {
+      restoredPoints.push(restoredPoint);
       if (index in pressureValues) {
         const pressure = pressureValues[index];
         restoredPressures.push(isFiniteNumber(pressure) ? pressure : 0.5);
