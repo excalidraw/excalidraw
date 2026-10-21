@@ -3,7 +3,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { getElementAbsoluteCoords, isLinearElement } from "@excalidraw/element";
 import { applyDarkModeFilter } from "@excalidraw/common";
 import { ShapeCache } from "@excalidraw/element/shape";
-import { restoreLinearElementAnimation } from "@excalidraw/element/linearElementAnimation";
+import {
+  getAnimationDuration,
+  restoreLinearElementAnimation,
+} from "@excalidraw/element/linearElementAnimation";
 
 import type {
   ExcalidrawLinearElement,
@@ -50,6 +53,8 @@ export const LinearAnimationOverlay = ({
   const hasAnimations = elements.some(
     (element) =>
       isLinearElement(element) &&
+      !!element.animation &&
+      element.animation.type !== "gap" &&
       !!restoreLinearElementAnimation(element.animation),
   );
   const ref = useRef<SVGSVGElement>(null);
@@ -88,7 +93,7 @@ export const LinearAnimationOverlay = ({
             return null;
           }
           const animation = restoreLinearElementAnimation(element.animation);
-          if (!animation) {
+          if (!animation || animation.type === "gap") {
             return null;
           }
           const d = getAnimationPath(element);
@@ -132,10 +137,13 @@ export const LinearAnimationOverlay = ({
                       element.strokeColor,
                       appState.theme === "dark",
                     )}
-                    strokeWidth={Math.max(element.strokeWidth * 2.5, 5)}
+                    strokeWidth={animation.size}
+                    pathLength={animation.type === "dot" ? 1 : undefined}
                     strokeLinecap="round"
                     strokeDasharray={
-                      animation.type === "pulse"
+                      animation.type === "dot"
+                        ? "0.000001 1"
+                        : animation.type === "pulse"
                         ? undefined
                         : animation.type === "dots"
                         ? "0.1 23.9"
@@ -144,13 +152,17 @@ export const LinearAnimationOverlay = ({
                     className={`linear-animation-${animation.type}`}
                     style={{
                       animationDuration: `${
-                        (animation.type === "pulse" ? 2 : 1) / animation.speed
+                        animation.type === "dot"
+                          ? getAnimationDuration(animation.speed)
+                          : (animation.type === "pulse" ? 1 : 0.5) /
+                            Math.max(animation.speed, 0.01)
                       }s`,
                       animationDirection:
                         animation.direction === "reverse"
                           ? "reverse"
                           : "normal",
-                      animationPlayState: hidden ? "paused" : "running",
+                      animationPlayState:
+                        hidden || animation.speed === 0 ? "paused" : "running",
                     }}
                   />
                 </g>

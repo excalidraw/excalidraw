@@ -368,9 +368,11 @@ export type AnyArrowhead = Arrowhead | ArrowheadLegacy;
 
 /** Optional, persisted motion settings. Missing/null means a static element. */
 export type LinearElementAnimation = Readonly<{
-  type: "dots" | "dashes" | "pulse";
-  /** Speed multiplier: 0.5 (slow), 1 (normal), or 2 (fast). */
-  speed: 0.5 | 1 | 2;
+  type: "dots" | "dot" | "gap" | "dashes" | "pulse";
+  /** Normalized speed in [0, 1]; 0 pauses motion. */
+  speed: number;
+  /** Dot diameter, effect thickness, or gap width in scene units (1–100). */
+  size: number;
   direction: "forward" | "reverse";
 }>;
 

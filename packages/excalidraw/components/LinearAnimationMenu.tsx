@@ -1,5 +1,10 @@
 import React, { useState } from "react";
 
+import {
+  DEFAULT_ANIMATION_SIZE,
+  restoreLinearElementAnimation,
+} from "@excalidraw/element/linearElementAnimation";
+
 import { isLinearElement } from "@excalidraw/element";
 
 import type { LinearElementAnimation } from "@excalidraw/element/types";
@@ -26,12 +31,15 @@ export const LinearAnimationMenu = ({
   );
   const first = selected[0];
   const initialAnimation =
-    first && isLinearElement(first) ? first.animation : null;
+    first && isLinearElement(first)
+      ? restoreLinearElementAnimation(first.animation)
+      : null;
   const [animation, setAnimation] = useState(initialAnimation);
   const [edited, setEdited] = useState(false);
   const settings = animation ?? {
     type: "dots",
-    speed: 1,
+    speed: 0.5,
+    size: DEFAULT_ANIMATION_SIZE,
     direction: "forward",
   };
   const mixed =
@@ -39,7 +47,7 @@ export const LinearAnimationMenu = ({
     selected.some(
       (element) =>
         isLinearElement(element) &&
-        JSON.stringify(element.animation ?? null) !==
+        JSON.stringify(restoreLinearElementAnimation(element.animation)) !==
           JSON.stringify(initialAnimation ?? null),
     );
   const update = (value: LinearElementAnimation | null) => {
@@ -50,7 +58,10 @@ export const LinearAnimationMenu = ({
     <div
       className="context-menu animation-menu"
       onKeyDown={(event) => {
-        if (event.key === "Escape" || event.key === "ArrowLeft") {
+        if (
+          event.key === "Escape" ||
+          (event.key === "ArrowLeft" && event.target === event.currentTarget)
+        ) {
           event.stopPropagation();
           onBack();
         }
@@ -87,6 +98,8 @@ export const LinearAnimationMenu = ({
             </option>
           )}
           <option value="none">{t("labels.animation.none")}</option>
+          <option value="dot">{t("labels.animation.dot")}</option>
+          <option value="gap">{t("labels.animation.gap")}</option>
           <option value="dots">{t("labels.animation.dots")}</option>
           <option value="dashes">{t("labels.animation.dashes")}</option>
           <option value="pulse">{t("labels.animation.pulse")}</option>
@@ -94,23 +107,49 @@ export const LinearAnimationMenu = ({
       </label>
       <label>
         {t("labels.animation.speed")}
-        <select
+        <input
+          type="range"
           aria-label={t("labels.animation.speed")}
+          min={0}
+          max={1}
+          step={0.01}
           disabled={!animation && !mixed}
           value={settings.speed}
           onChange={(event) =>
-            update({
-              ...settings,
-              speed: Number(
-                event.target.value,
-              ) as LinearElementAnimation["speed"],
-            })
+            update({ ...settings, speed: Number(event.target.value) })
           }
-        >
-          <option value={0.5}>{t("labels.animation.slow")}</option>
-          <option value={1}>{t("labels.animation.normal")}</option>
-          <option value={2}>{t("labels.animation.fast")}</option>
-        </select>
+        />
+        <output>{settings.speed.toFixed(2)}</output>
+      </label>
+      <label>
+        {t("labels.animation.size")}
+        <input
+          type="range"
+          aria-label={t("labels.animation.size")}
+          min={1}
+          max={100}
+          step={1}
+          disabled={!animation && !mixed}
+          value={settings.size}
+          onChange={(event) =>
+            update({ ...settings, size: Number(event.target.value) })
+          }
+        />
+        <input
+          type="number"
+          aria-label={t("labels.animation.sizeValue")}
+          min={1}
+          max={100}
+          step={1}
+          disabled={!animation && !mixed}
+          value={settings.size}
+          onChange={(event) => {
+            const size = event.target.valueAsNumber;
+            if (Number.isFinite(size) && size >= 1 && size <= 100) {
+              update({ ...settings, size });
+            }
+          }}
+        />
       </label>
       <label>
         {t("labels.animation.direction")}

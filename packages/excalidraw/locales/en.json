@@ -221,7 +221,11 @@
       "direction": "Direction",
       "forward": "Start to end",
       "reverse": "End to start",
-      "mixed": "Mixed animations"
+      "mixed": "Mixed animations",
+      "dot": "Traveling dot (single)",
+      "gap": "Traveling gap",
+      "size": "Size",
+      "sizeValue": "Size value"
     }
   },
   "elementLink": {

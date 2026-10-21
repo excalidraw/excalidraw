@@ -10,6 +10,10 @@
     animation: linear-element-flow 1s linear infinite;
   }
 
+  .linear-animation-dot {
+    animation: linear-element-single-flow 5s linear infinite;
+  }
+
   .linear-animation-pulse {
     animation: linear-element-pulse 2s ease-in-out infinite;
   }
@@ -35,5 +39,14 @@
   }
   50% {
     opacity: 1;
+  }
+}
+
+@keyframes linear-element-single-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -1.000001;
   }
 }

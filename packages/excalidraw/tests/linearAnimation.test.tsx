@@ -1,13 +1,23 @@
 import React from "react";
+import { vi } from "vitest";
 
-import { CaptureUpdateAction, isLinearElement } from "@excalidraw/element";
-import { restoreLinearElementAnimation } from "@excalidraw/element/linearElementAnimation";
+import {
+  CaptureUpdateAction,
+  LinearElementEditor,
+  isLinearElement,
+} from "@excalidraw/element";
+import {
+  getAnimationProgress,
+  restoreLinearElementAnimation,
+} from "@excalidraw/element/linearElementAnimation";
 
 import { pointFrom } from "@excalidraw/math";
 
 import type { LocalPoint } from "@excalidraw/math";
 
 import type { ExcalidrawLinearElement } from "@excalidraw/element/types";
+
+import * as StaticScene from "../renderer/staticScene";
 
 import { Excalidraw } from "../index";
 import { serializeAsJSON } from "../data/json";
@@ -29,7 +39,12 @@ import {
 } from "./test-utils";
 
 const { h } = window;
-const animation = { type: "dots", speed: 2, direction: "reverse" } as const;
+const animation = {
+  type: "dots",
+  speed: 0.75,
+  size: 12,
+  direction: "reverse",
+} as const;
 
 const changeAnimation = (value: typeof animation | null) =>
   act(() => {
@@ -70,7 +85,13 @@ it.each([
   true,
   "dots",
   {},
-  { ...animation, speed: 0 },
+  { ...animation, speed: -0.01 },
+  { ...animation, speed: 1.01 },
+  { ...animation, speed: NaN },
+  { ...animation, size: 0 },
+  { ...animation, size: 101 },
+  { ...animation, size: Infinity },
+  { ...animation, size: null },
   { ...animation, speed: Infinity },
   { ...animation, type: "future" },
   { ...animation, direction: "bad" },
@@ -126,16 +147,28 @@ it("opens Animate from a line's context menu and applies all controls", () => {
   fireEvent.click(screen.getByRole("button", { name: /Animate/ }));
   const type = screen.getByRole("combobox", { name: "Animation type" });
   fireEvent.change(type, { target: { value: "dashes" } });
-  fireEvent.change(screen.getByRole("combobox", { name: "Speed" }), {
-    target: { value: "2" },
+  fireEvent.change(screen.getByRole("slider", { name: "Speed" }), {
+    target: { value: "0.75" },
   });
+  fireEvent.keyDown(screen.getByRole("slider", { name: "Speed" }), {
+    key: "ArrowLeft",
+  });
+  expect(screen.getByRole("slider", { name: "Speed" })).toBeInTheDocument();
+  fireEvent.change(screen.getByRole("slider", { name: "Size" }), {
+    target: { value: "24" },
+  });
+  fireEvent.change(screen.getByRole("spinbutton", { name: "Size value" }), {
+    target: { value: "18" },
+  });
+  expect(screen.getByRole("slider", { name: "Size" })).toHaveValue("18");
   fireEvent.change(screen.getByRole("combobox", { name: "Direction" }), {
     target: { value: "reverse" },
   });
   fireEvent.click(screen.getByRole("button", { name: "Apply" }));
   expect(currentLine().animation).toEqual({
     type: "dashes",
-    speed: 2,
+    speed: 0.75,
+    size: 18,
     direction: "reverse",
   });
   fireEvent.contextMenu(GlobalTestState.interactiveCanvas, {
@@ -191,4 +224,128 @@ it("uses a continuous rendered shaft for straight, curved, and elbow arrows", ()
     expect(path.match(/M/g)).toHaveLength(1);
     expect(path).not.toMatch(/NaN|Infinity/);
   }
+});
+
+it.each(["dot", "gap", "dots", "dashes", "pulse"] as const)(
+  "round trips %s with paused and fractional speed and custom size",
+  (type) => {
+    for (const speed of [0, 0.01, 0.5, 1]) {
+      const value = { type, speed, size: 37, direction: "forward" as const };
+      const element = {
+        ...API.createElement({ type: "arrow" }),
+        animation: value,
+      };
+      const [restored] = restoreElements(
+        JSON.parse(serializeAsJSON([element], h.state, {}, "local")).elements,
+        null,
+      );
+      expect(isLinearElement(restored) && restored.animation).toEqual(value);
+    }
+  },
+);
+
+it.each([
+  [0.5, 0.25],
+  [1, 0.5],
+  [2, 1],
+])(
+  "migrates original speed %s without losing motion settings",
+  (oldSpeed, newSpeed) => {
+    expect(
+      restoreLinearElementAnimation({
+        type: "dots",
+        speed: oldSpeed,
+        direction: "reverse",
+      }),
+    ).toEqual({ type: "dots", speed: newSpeed, size: 8, direction: "reverse" });
+  },
+);
+
+it("pauses at zero and reverses the traveling gap", () => {
+  const value = {
+    type: "gap",
+    speed: 0.5,
+    size: 20,
+    direction: "forward",
+  } as const;
+  expect(getAnimationProgress(1250, value)).toBeCloseTo(0.25);
+  expect(
+    getAnimationProgress(1250, { ...value, direction: "reverse" }),
+  ).toBeCloseTo(0.75);
+  expect(getAnimationProgress(9000, { ...value, speed: 0 })).toBe(0);
+  expect(
+    getAnimationProgress(9000, { ...value, speed: 0, direction: "reverse" }),
+  ).toBe(1);
+});
+
+it("draws a single traveling dot, with editable diameter and a paused clock", () => {
+  const element = API.createElement({ type: "arrow" });
+  API.setElements([
+    {
+      ...element,
+      animation: { type: "dot", speed: 0, size: 19, direction: "forward" },
+    },
+  ]);
+  const dot = document.querySelector(".linear-animation-dot");
+  expect(dot).toHaveAttribute("pathLength", "1");
+  expect(dot).toHaveAttribute("stroke-dasharray", "0.000001 1");
+  expect(dot).toHaveAttribute("stroke-width", "19");
+  expect(dot).toHaveStyle({ animationPlayState: "paused" });
+});
+
+it("cuts a traveling gap only from its own bitmap, preserving normal export", () => {
+  const renderer = vi.spyOn(StaticScene, "renderStaticScene");
+  const arrow = API.createElement({ type: "arrow" });
+  API.setElements([
+    {
+      ...arrow,
+      animation: { type: "gap", speed: 0, size: 50, direction: "forward" },
+    },
+  ]);
+  const config = renderer.mock.calls.find(
+    ([config]) => config.renderConfig.linearAnimationTime !== undefined,
+  )![0];
+  expect(config).toBeDefined();
+  expect(document.querySelector(".linear-animation-gap")).toBeNull();
+  const context = config.canvas.getContext("2d")!;
+  const clip = vi.spyOn(context, "clip");
+  const arc = vi.spyOn(context, "arc");
+  const point = vi.spyOn(LinearElementEditor, "getPointAtPathParameter");
+  StaticScene.renderStaticScene(
+    {
+      ...config,
+      renderConfig: { ...config.renderConfig, linearAnimationTime: 1250 },
+    },
+    false,
+  );
+  expect(point).toHaveBeenCalledWith(
+    expect.objectContaining({ id: arrow.id }),
+    0,
+    expect.any(Map),
+  );
+  expect(clip).toHaveBeenCalledWith("evenodd");
+  expect(arc).toHaveBeenCalledWith(
+    expect.any(Number),
+    expect.any(Number),
+    25 * config.scale,
+    0,
+    Math.PI * 2,
+  );
+  point.mockClear();
+  StaticScene.renderStaticScene(
+    {
+      ...config,
+      renderConfig: {
+        ...config.renderConfig,
+        isExporting: true,
+        linearAnimationTime: 1250,
+      },
+    },
+    false,
+  );
+  expect(point).not.toHaveBeenCalled();
+  point.mockRestore();
+  clip.mockRestore();
+  arc.mockRestore();
+  renderer.mockRestore();
 });

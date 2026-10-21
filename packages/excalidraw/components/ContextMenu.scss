@@ -103,7 +103,7 @@
 
 .excalidraw .animation-menu {
   padding: 0.5rem;
-  min-width: 15rem;
+  min-width: 20rem;
 
   label {
     display: flex;
@@ -113,7 +113,23 @@
     padding: 0.5rem;
   }
 
-  select {
+  input[type="range"] {
+    width: 8rem;
+    min-width: 0;
+  }
+
+  input[type="number"] {
+    width: 3.5rem;
+  }
+
+  output {
+    min-width: 3.5rem;
+    text-align: end;
+    font-variant-numeric: tabular-nums;
+  }
+
+  select,
+  input[type="number"] {
     font: inherit;
     color: var(--popup-text-color);
     background: var(--popup-secondary-bg-color);
