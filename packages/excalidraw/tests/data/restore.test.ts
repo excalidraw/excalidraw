@@ -1201,6 +1201,67 @@ describe("repairing malformed elements", () => {
       deleteInvisibleElements: true,
     });
 
+  it("should infer a missing type from the element's properties", () => {
+    const restoredElements = restoreImported([
+      { id: "text", text: "hi" },
+      { id: "image", fileId: "file", width: 10, height: 10 },
+      {
+        id: "freedraw",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+        pressures: [0.5, 0.5],
+      },
+      {
+        id: "arrow",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+        endArrowhead: "arrow",
+      },
+      {
+        id: "line",
+        points: [
+          [0, 0],
+          [10, 10],
+        ],
+      },
+      { id: "rectangle", type: null, width: 10, height: 10 },
+      { id: "cased", type: " Ellipse ", width: 10, height: 10 },
+    ]);
+
+    expect(
+      restoredElements.map(({ id, type, isDeleted }) => ({
+        id,
+        type,
+        isDeleted,
+      })),
+    ).toEqual([
+      { id: "text", type: "text", isDeleted: false },
+      { id: "image", type: "image", isDeleted: false },
+      { id: "freedraw", type: "freedraw", isDeleted: false },
+      { id: "arrow", type: "arrow", isDeleted: false },
+      { id: "line", type: "line", isDeleted: false },
+      { id: "rectangle", type: "rectangle", isDeleted: false },
+      { id: "cased", type: "ellipse", isDeleted: false },
+    ]);
+  });
+
+  it("should drop elements of unknown type or without any hint of one", () => {
+    const rect = API.createElement({ type: "rectangle", id: "rect" });
+
+    expect(
+      restoreImported([
+        // may come from a newer version, so don't turn it into something else
+        { id: "future", type: "hexagon", width: 10, height: 10 },
+        { id: "hintless", x: 10 },
+        rect,
+      ]).map((element) => element.id),
+    ).toEqual(["rect"]);
+  });
+
   it("should measure text elements without a size", () => {
     const [text] = restoreImported([
       { type: "text", id: "text", text: "hi", x: 0, y: 0 },
@@ -1430,6 +1491,14 @@ describe("repairing malformed elements", () => {
     ]) as ExcalidrawTextElement[];
 
     expect(text.fontFamily).toBe(3);
+  });
+
+  it("should infer the type of an element with an empty type", () => {
+    const [text] = restoreImported([
+      { type: " ", id: "text", text: "hi" },
+    ]) as ExcalidrawTextElement[];
+
+    expect(text.type).toBe("text");
   });
 
   it("should never restore a version below 1", () => {

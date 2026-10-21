@@ -1296,6 +1296,71 @@ const restoreStickyNotes = (
   }
 };
 
+const ELEMENT_TYPES: ReadonlySet<string> = new Set<
+  ExcalidrawElement["type"] | "draw"
+>([
+  "text",
+  "freedraw",
+  "image",
+  "line",
+  // legacy
+  "draw",
+  "arrow",
+  "ellipse",
+  "rectangle",
+  "diamond",
+  "iframe",
+  "embeddable",
+  "stickynote",
+  "magicframe",
+  "frame",
+  "selection",
+]);
+
+const ARROW_ONLY_PROPS = [
+  "startArrowhead",
+  "endArrowhead",
+  "startBinding",
+  "endBinding",
+  "elbowed",
+] as const;
+
+/**
+ * Restores a missing or malformed element type, inferring it from the
+ * properties specific to each type where needed. Returns `null` if nothing
+ * hints at what the element was.
+ *
+ * Unknown type names are kept (and dropped by `restoreElement`), as they may
+ * come from a newer version and must not be converted to something else.
+ */
+const restoreElementType = (
+  element: Record<string, unknown>,
+): string | null => {
+  const type =
+    typeof element.type === "string" ? element.type.trim().toLowerCase() : "";
+  if (type) {
+    return ELEMENT_TYPES.has(type) ? type : (element.type as string);
+  }
+  if (typeof element.text === "string" || "originalText" in element) {
+    return "text";
+  }
+  if ("fileId" in element) {
+    return "image";
+  }
+  if (Array.isArray(element.points)) {
+    if ("pressures" in element || "simulatePressure" in element) {
+      return "freedraw";
+    }
+    return ARROW_ONLY_PROPS.some((prop) => element[prop] != null)
+      ? "arrow"
+      : "line";
+  }
+  if (toFiniteNumber(element.width) || toFiniteNumber(element.height)) {
+    return "rectangle";
+  }
+  return null;
+};
+
 const isInvisibleElement = (
   restoredElement: ExcalidrawElement,
   sourceElement: ExcalidrawElement,
@@ -1337,7 +1402,10 @@ export const restoreElements = <T extends ExcalidrawElement>(
     Array.isArray(targetElements) ? (targetElements as unknown[]) : []
   ).reduce<T[]>((acc, element) => {
     if (isRecordLike(element)) {
-      acc.push(element as T);
+      const type = restoreElementType(element);
+      if (type) {
+        acc.push((type === element.type ? element : { ...element, type }) as T);
+      }
     }
     return acc;
   }, []);
