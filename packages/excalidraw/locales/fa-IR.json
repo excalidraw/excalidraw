@@ -682,7 +682,10 @@
     "preview": "پیشنمایش",
     "label": "",
     "inputPlaceholder": "",
-    "autoFixAvailable": ""
+    "autoFixAvailable": "",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "خطا!"
