@@ -682,7 +682,10 @@
     "preview": "Предпросмотр",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "Автоисправление доступно"
+    "autoFixAvailable": "Автоисправление доступно",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "Ошибка!"
