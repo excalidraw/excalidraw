@@ -64,6 +64,7 @@ export const getDefaultAppState = (): Omit<
       locked: DEFAULT_ELEMENT_PROPS.locked,
       fromSelection: false,
       lastActiveTool: null,
+      laserPersistent: false,
     },
     preferredSelectionTool: {
       type: "selection",

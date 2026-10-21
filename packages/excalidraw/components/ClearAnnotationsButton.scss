@@ -1,0 +1,20 @@
+.excalidraw {
+  .clear-annotations {
+    align-self: center;
+    flex-shrink: 0;
+    display: flex;
+
+    &--mobile {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 0;
+    }
+  }
+
+  // In view mode there is no toolbar to anchor the mobile button to.
+  .App-bottom-bar > .clear-annotations {
+    position: static;
+    max-height: none;
+    align-self: flex-start;
+  }
+}
