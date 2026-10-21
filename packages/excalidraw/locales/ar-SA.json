@@ -682,7 +682,10 @@
     "preview": "معاينة",
     "label": "Mermaid",
     "inputPlaceholder": "",
-    "autoFixAvailable": "الإصلاح التلقائي متوفر"
+    "autoFixAvailable": "الإصلاح التلقائي متوفر",
+    "loadError": "",
+    "loadErrorReload": "",
+    "reload": ""
   },
   "ttd": {
     "error": "خطأ!"
