@@ -24,6 +24,7 @@ import type { LocalPoint } from "@excalidraw/math";
 import type {
   ExcalidrawStickyNoteElement,
   ExcalidrawArrowElement,
+  ExcalidrawElbowArrowElement,
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
@@ -1214,6 +1215,66 @@ describe("repairing malformed elements", () => {
     );
 
     expect(rect.version).toBe(1);
+  });
+
+  it("should drop out of range, duplicate and unordered fixed segments", () => {
+    const [arrow] = restoreImported([
+      {
+        type: "arrow",
+        id: "arrow",
+        elbowed: true,
+        points: [
+          [0, 0],
+          [50, 0],
+          [50, 50],
+          [100, 50],
+          [100, 100],
+        ],
+        fixedSegments: [
+          { start: [50, 50], end: [100, 50], index: 3 },
+          { start: [50, 0], end: [50, 50], index: 2 },
+          { start: [50, 0], end: [50, 50], index: 2 },
+          { start: [0, 0], end: [0, 0], index: 50 },
+          { start: [0, 0], end: [0, 0], index: 0 },
+        ],
+      },
+    ]) as ExcalidrawElbowArrowElement[];
+
+    expect(arrow.fixedSegments?.map((segment) => segment.index)).toEqual([
+      2, 3,
+    ]);
+  });
+
+  it("should drop empty and unknown arrowheads", () => {
+    const [arrow] = restoreImported([
+      {
+        type: "arrow",
+        id: "arrow",
+        points: [
+          [0, 0],
+          [100, 0],
+        ],
+        startArrowhead: "dot",
+        endArrowhead: "",
+      },
+    ]) as ExcalidrawArrowElement[];
+    const [line] = restoreImported([
+      {
+        type: "line",
+        id: "line",
+        points: [
+          [0, 0],
+          [100, 0],
+        ],
+        startArrowhead: "foo",
+        endArrowhead: "bar",
+      },
+    ]) as ExcalidrawLinearElement[];
+
+    expect(arrow.startArrowhead).toBe("circle");
+    expect(arrow.endArrowhead).toBe(null);
+    expect(line.startArrowhead).toBe(null);
+    expect(line.endArrowhead).toBe("bar");
   });
 
   it("should not truncate strings that aren't numbers to their leading number", () => {

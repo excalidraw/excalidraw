@@ -93,6 +93,8 @@ import { isInvisiblySmallElement } from "@excalidraw/element";
 import type { LocalPoint, Radians } from "@excalidraw/math";
 
 import type {
+  AnyArrowhead,
+  Arrowhead,
   ElementsMap,
   ElementsMapOrArray,
   ExcalidrawArrowElement,
@@ -106,6 +108,7 @@ import type {
   FileId,
   FillStyle,
   FixedPointBinding,
+  FixedSegment,
   FontFamilyValues,
   ImageCrop,
   StrokeStyle,
@@ -534,6 +537,70 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
   return null;
 };
 
+// a record so that new arrowheads can't be missed
+const ARROWHEADS_RECORD: Record<Arrowhead, true> = {
+  arrow: true,
+  bar: true,
+  circle: true,
+  circle_outline: true,
+  triangle: true,
+  triangle_outline: true,
+  diamond: true,
+  diamond_outline: true,
+  cardinality_one: true,
+  cardinality_many: true,
+  cardinality_one_or_many: true,
+  cardinality_exactly_one: true,
+  cardinality_zero_or_one: true,
+  cardinality_zero_or_many: true,
+};
+const ARROWHEADS = Object.keys(ARROWHEADS_RECORD) as Arrowhead[];
+
+/** Empty and unknown arrowheads would be drawn as a generic one, so drop them. */
+const restoreArrowhead = (arrowhead: unknown): Arrowhead | null => {
+  const normalized =
+    typeof arrowhead === "string"
+      ? normalizeArrowhead(arrowhead as AnyArrowhead)
+      : null;
+  return normalized && ARROWHEADS.includes(normalized) ? normalized : null;
+};
+
+/**
+ * A segment's `index` is that of its end point, so it must be within the
+ * arrow's points. The elbow arrow code also expects the segments to be unique
+ * and in ascending order.
+ */
+const restoreFixedSegments = (
+  fixedSegments: unknown,
+  pointsCount: number,
+): FixedSegment[] | null => {
+  if (!Array.isArray(fixedSegments)) {
+    return null;
+  }
+
+  const segments = new Map<number, FixedSegment>();
+  for (const segment of fixedSegments) {
+    const start = isRecordLike(segment) ? restorePoint(segment.start) : null;
+    const end = isRecordLike(segment) ? restorePoint(segment.end) : null;
+    const index = isRecordLike(segment) ? toFiniteNumber(segment.index) : null;
+    if (
+      start &&
+      end &&
+      index !== null &&
+      Number.isInteger(index) &&
+      index >= 1 &&
+      index < pointsCount &&
+      !segments.has(index)
+    ) {
+      segments.set(index, { start, end, index } as FixedSegment);
+    }
+  }
+
+  return segments.size
+    ? [...segments.values()].sort((a, b) => a.index - b.index)
+    : null;
+};
+
 const restoreRoundness = (
   roundness: unknown,
   /** @deprecated */
@@ -800,10 +867,10 @@ export const restoreElement = (
     // @ts-ignore LEGACY type
     // eslint-disable-next-line no-fallthrough
     case "draw":
-      const startArrowhead = normalizeArrowhead(element.startArrowhead);
-      const endArrowhead = normalizeArrowhead(element.endArrowhead);
-      let x = element.x;
-      let y = element.y;
+      const startArrowhead = restoreArrowhead(element.startArrowhead);
+      const endArrowhead = restoreArrowhead(element.endArrowhead);
+      let x = toFiniteNumber(element.x) ?? 0;
+      let y = toFiniteNumber(element.y) ?? 0;
       let points = restoreLinearElementPoints(
         element.points,
         element.width,
@@ -815,8 +882,8 @@ export const restoreElement = (
           LinearElementEditor.getNormalizeElementPointsAndCoords({
             ...element,
             points,
-            x: x ?? 0,
-            y: y ?? 0,
+            x,
+            y,
           } as ExcalidrawLinearElement));
       }
 
@@ -832,7 +899,7 @@ export const restoreElement = (
         ...(isLineElement(element)
           ? {
               polygon: isValidPolygon(points)
-                ? element.polygon ?? false
+                ? restoreBoolean(element.polygon, false)
                 : false,
             }
           : {}),
@@ -841,13 +908,14 @@ export const restoreElement = (
 
       return handleOversizedLinearElements(restoredLine);
     case "arrow": {
-      const startArrowhead = normalizeArrowhead(element.startArrowhead);
+      const startArrowhead = restoreArrowhead(element.startArrowhead);
       const endArrowhead =
         element.endArrowhead === undefined
           ? "arrow"
-          : normalizeArrowhead(element.endArrowhead);
-      const x = element.x as number | undefined;
-      const y = element.y as number | undefined;
+          : restoreArrowhead(element.endArrowhead);
+      const x = toFiniteNumber(element.x) ?? 0;
+      const y = toFiniteNumber(element.y) ?? 0;
+      const elbowed = (element as ExcalidrawArrowElement).elbowed === true;
       const points = restoreLinearElementPoints(
         element.points,
         element.width,
@@ -856,8 +924,9 @@ export const restoreElement = (
       const elementWithRestoredPoints = {
         ...element,
         points,
-        x: x ?? 0,
-        y: y ?? 0,
+        x,
+        y,
+        elbowed,
       } as ExcalidrawArrowElement;
 
       const base = {
@@ -879,23 +948,32 @@ export const restoreElement = (
         startArrowhead,
         endArrowhead,
         points,
-        x: x ?? 0,
-        y: y ?? 0,
-        elbowed: (element as ExcalidrawArrowElement).elbowed,
+        x,
+        y,
+        elbowed,
         ...getSizeFromPoints(points),
       };
 
       // TODO: Separate arrow from linear element
-      const restoredElement = isElbowArrow(element)
+      const restoredElement = elbowed
         ? restoreElementWithProperties(element as ExcalidrawElbowArrowElement, {
             ...base,
             elbowed: true,
             fixedSegments:
-              element.fixedSegments?.length && base.points.length >= 4
-                ? element.fixedSegments
+              base.points.length >= 4
+                ? restoreFixedSegments(
+                    (element as ExcalidrawElbowArrowElement).fixedSegments,
+                    base.points.length,
+                  )
                 : null,
-            startIsSpecial: element.startIsSpecial,
-            endIsSpecial: element.endIsSpecial,
+            startIsSpecial: restoreBoolean(
+              (element as ExcalidrawElbowArrowElement).startIsSpecial,
+              null,
+            ),
+            endIsSpecial: restoreBoolean(
+              (element as ExcalidrawElbowArrowElement).endIsSpecial,
+              null,
+            ),
           })
         : restoreElementWithProperties(element as ExcalidrawArrowElement, base);
 
