@@ -21,7 +21,7 @@ describe("Tooltip", () => {
     const button = getByRole("button");
     fireEvent.pointerEnter(button.parentElement!);
 
-    const tooltip = getTooltipDiv();
+    const tooltip = getTooltipDiv(button.ownerDocument);
     expect(tooltip.textContent).toBe("Keep sidebar open");
     fireEvent.click(button);
     expect(tooltip.textContent).toBe("Unpin sidebar");
@@ -49,7 +49,7 @@ describe("Tooltip", () => {
     fireEvent.pointerEnter(second);
 
     rerender(<Content label="Updated" />);
-    const tooltip = getTooltipDiv();
+    const tooltip = getTooltipDiv(second.ownerDocument);
     expect(tooltip.textContent).toBe("Second tooltip");
 
     fireEvent.pointerLeave(second);

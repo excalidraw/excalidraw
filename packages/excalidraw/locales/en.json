@@ -683,7 +683,10 @@
     "preview": "Preview",
     "label": "Mermaid",
     "inputPlaceholder": "Write Mermaid diagram definition here...",
-    "autoFixAvailable": "Auto-fix is available"
+    "autoFixAvailable": "Auto-fix is available",
+    "loadError": "Couldn't load Mermaid. Check your internet connection and try again.",
+    "loadErrorReload": "Couldn't load Mermaid. Reload the page to try again.",
+    "reload": "Reload"
   },
   "ttd": {
     "error": "Error!"

@@ -1,12 +1,8 @@
-import {
-  DEFAULT_EXPORT_PADDING,
-  EDITOR_LS_KEYS,
-  THEME,
-} from "@excalidraw/common";
+import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
 
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
-import { exportToCanvas } from "@excalidraw/utils";
+import { exportScene } from "@excalidraw/utils";
 
 import type {
   NonDeletedExcalidrawElement,
@@ -104,15 +100,18 @@ export const convertMermaidToExcalidraw = async ({
       files,
     };
 
-    const canvas = await exportToCanvas({
-      elements: data.current.elements,
-      files: data.current.files,
-      exportPadding: DEFAULT_EXPORT_PADDING,
-      maxWidthOrHeight:
-        Math.max(parent.offsetWidth, parent.offsetHeight) *
-        window.devicePixelRatio,
-      appState: {
-        exportWithDarkMode: theme === THEME.DARK,
+    const canvas = await exportScene({
+      type: "canvas",
+      data: {
+        elements: data.current.elements,
+        files: data.current.files,
+      },
+      config: {
+        padding: DEFAULT_EXPORT_PADDING,
+        maxWidthOrHeight:
+          Math.max(parent.offsetWidth, parent.offsetHeight) *
+          (parent.ownerDocument.defaultView?.devicePixelRatio ?? 1),
+        theme,
       },
     });
 

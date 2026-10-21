@@ -1,12 +1,12 @@
 import {
   DiagramToCodePlugin,
-  exportToBlob,
+  exportScene,
   getNonDeletedElements,
   getTextFromElements,
-  MIME_TYPES,
   parseSSEStream,
   TTDDialog,
   TTDStreamFetch,
+  THEME,
 } from "@excalidraw/excalidraw";
 import { getDataURL } from "@excalidraw/excalidraw/data/blob";
 import { safelyParseJSON } from "@excalidraw/common";
@@ -34,16 +34,17 @@ export const AIComponents = ({
             );
           }
 
-          const blob = await exportToBlob({
-            elements: getNonDeletedElements(children),
-            appState: {
-              ...appState,
-              exportBackground: true,
-              viewBackgroundColor: appState.viewBackgroundColor,
+          const blob = await exportScene({
+            type: "jpeg",
+            data: {
+              elements: getNonDeletedElements(children),
+              appState,
+              files: excalidrawAPI.getFiles(),
             },
-            exportingFrame: frame,
-            files: excalidrawAPI.getFiles(),
-            mimeType: MIME_TYPES.jpg,
+            config: {
+              exportingFrame: frame,
+              theme: appState.exportWithDarkMode ? THEME.DARK : THEME.LIGHT,
+            },
           });
 
           const dataURL = await getDataURL(blob);

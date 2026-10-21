@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
 
-import { EDITOR_LS_KEYS, debounce, isDevEnv } from "@excalidraw/common";
+import {
+  EDITOR_LS_KEYS,
+  EVENT,
+  addEventListener,
+  debounce,
+  isDevEnv,
+} from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -62,9 +68,11 @@ const getErrorMessage = (error: unknown): string => {
 
 const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib,
+  onRetryLoad,
   isActive,
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
+  onRetryLoad?: () => void;
   isActive?: boolean;
 }) => {
   const [text, setText] = useState(
@@ -94,6 +102,9 @@ const MermaidToExcalidraw = ({
 
   useEffect(() => {
     const doRender = async () => {
+      if (mermaidToExcalidrawLib.status !== "loaded") {
+        return;
+      }
       try {
         if (!deferredText.trim()) {
           resetPreview({ canvasRef, setError });
@@ -125,12 +136,18 @@ const MermaidToExcalidraw = ({
     }
   }, [deferredText, mermaidToExcalidrawLib, isActive, theme]);
 
-  useEffect(
-    () => () => {
-      debouncedSaveMermaidDefinition.flush();
-    },
-    [],
-  );
+  useEffect(() => {
+    const flush = () => debouncedSaveMermaidDefinition.flush();
+    const unsubscribe = addEventListener(
+      app.ownerWindow,
+      EVENT.BEFORE_UNLOAD,
+      flush,
+    );
+    return () => {
+      unsubscribe();
+      flush();
+    };
+  }, [app]);
 
   useEffect(() => {
     const errorMessage = error?.message ?? "";
@@ -139,7 +156,7 @@ const MermaidToExcalidraw = ({
       isActive &&
       isMermaidAutoFixableError(errorMessage) &&
       !!sourceText.trim() &&
-      mermaidToExcalidrawLib.loaded;
+      mermaidToExcalidrawLib.status === "loaded";
 
     if (!shouldTryAutoFix) {
       setAutoFixCandidate(null);
@@ -300,7 +317,9 @@ const MermaidToExcalidraw = ({
         >
           <TTDDialogOutput
             canvasRef={canvasRef}
-            loaded={mermaidToExcalidrawLib.loaded}
+            loadStatus={mermaidToExcalidrawLib.status}
+            loadErrorReloadRequired={mermaidToExcalidrawLib.reloadRequired}
+            onRetryLoad={onRetryLoad}
             error={error}
             sourceText={text}
             autoFixAvailable={!!autoFixCandidate}
